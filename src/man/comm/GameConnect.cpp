@@ -61,14 +61,19 @@ void GameConnect::handle(portals::OutPortal<messages::GameState>& out,
         result = _socket->receiveFrom(&packet[0], sizeof(packet),
                                       &from, &addrlen);
 
-        if (_timer->timestamp() - _gcTimestamp > TEAMMATE_DEAD_THRESHOLD)
+        if (_timer->timestamp() - _gcTimestamp > TEAMMATE_DEAD_THRESHOLD) {
             _haveRemoteGC = false;
+
+            fillMessage(gameMessage.get(), control);
+            out.setMessage(gameMessage);
+        }
 
         if (result <= 0)
             break;
 
         if (!verify(&packet[0]))
             continue;  // Bad Packet.
+
         _haveRemoteGC = true;
         _gcTimestamp = _timer->timestamp();
 
@@ -156,7 +161,6 @@ void GameConnect::fillMessage(messages::GameState* msg,
     messages::TeamInfo* red  = msg->add_team();
     fillTeam(blue, control.teams[TEAM_BLUE]);
     fillTeam(red , control.teams[TEAM_RED ]);
-
 }
 
 
@@ -188,9 +192,9 @@ void GameConnect::respond(int player, unsigned int msg)
     memcpy(&response.header, GAMECONTROLLER_RETURN_STRUCT_HEADER,
            sizeof(response.header));
     response.version = GAMECONTROLLER_RETURN_STRUCT_VERSION;
-    response.team = (uint16)_myTeamNumber;
-    response.player = (uint16)player;
-    response.message = msg;
+    response.team = (uint8_t)_myTeamNumber;
+    response.player = (uint8_t)player;
+    response.message = (uint8_t)msg;
 
     char packet[sizeof(RoboCupGameControlReturnData)];
     memcpy(&packet[0], &response, sizeof(RoboCupGameControlReturnData));

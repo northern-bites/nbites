@@ -12,10 +12,10 @@ using namespace man;
 BOOST_PYTHON_MODULE(noggin_constants)
 {
     // Lab Field or Full Field?
-#ifdef USING_LAB_FIELD
-    scope().attr("USING_LAB_FIELD") = true;
+#ifdef USE_LAB_FIELD
+    scope().attr("USE_LAB_FIELD") = true;
 #else
-    scope().attr("USING_LAB_FIELD") = false;
+    scope().attr("USE_LAB_FIELD") = false;
 #endif
 
     // Walk time

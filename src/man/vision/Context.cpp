@@ -59,7 +59,7 @@ Context::Context(Vision *vis, Threshold* thr, Field* fie)
     allFieldObjects[2] = vision->ygrp;
     allFieldObjects[3] = vision->yglp;
 #ifdef OFFLINE
-    debugIdentifyCorners = true;
+    debugIdentifyCorners = false;
 	debugDangerousBall = false;
 #endif
 
@@ -139,7 +139,8 @@ void Context::identifyCorners(list <VisualCorner> &corners)
 												  objectRightX, objectRightY);
 				if (distToObject < 150.0f) {
 					if (debugIdentifyCorners) {
-						cout << "Converting CC to a T because it is very near goal" << endl;
+						cout << "Converting CC to a T because it is very near goal " << endl;
+						cout << distToObject << endl;
 					}
 					one->setShape(T);
 					classifyT(*one);

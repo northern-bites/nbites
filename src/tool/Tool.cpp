@@ -78,10 +78,13 @@ Tool::Tool(const char* title) :
         file.close();
     }
     // If we don't have dimensions, default to hard-coded values
-    if((geometry->width() == 0) && (geometry->height() == 0)){
-        geometry = new QRect(75, 75, 1000, 900);
+    if(((geometry->width() == 0) && (geometry->height() == 0))
+	   || (geometry->height() > 1200)){
+        geometry = new QRect(75, 75, 1200, 900);
     }
     this->setGeometry(*geometry);
+	// For some reason the tool wants to grow to a height of 1580 - too big!
+	this->setFixedHeight(1200);
 
     QToolBar* toolBar = new QToolBar(this);
     connect(loadBtn, SIGNAL(clicked()), this, SLOT(loadColorTable()));
@@ -342,6 +345,30 @@ void Tool::keyPressEvent(QKeyEvent * event)
         break;
     case Qt::Key_P:
         diagram.runBackward();
+        break;
+    case Qt::Key_M:
+        for(int i = 0; i < 5; i++)
+        {
+            diagram.runForward();
+        }
+        break;
+    case Qt::Key_T:
+        for(int i = 0; i < 10; i++)
+        {
+            diagram.runForward();
+        }
+        break;
+    case Qt::Key_F:
+        for(int i = 0; i < 50; i++)
+        {
+            diagram.runForward();
+        }
+        break;
+    case Qt::Key_BracketLeft:
+        for(int i = 0; i < 5; i++)
+        {
+            diagram.runBackward();
+        }
         break;
     default:
         QWidget::keyPressEvent(event);

@@ -133,7 +133,27 @@ void Ball::createBall(int h) {
  */
 bool Ball::blobIsBigEnoughToBeABall(int w, int h) {
     const int MIN_SIZE = 2;
-    return !(w < MIN_SIZE || h < MIN_SIZE);
+	const int LOWER_MIN_SIZE = 10;
+	if (thresh->usingTopCamera) {
+		return !(w < MIN_SIZE || h < MIN_SIZE);
+	}
+	// need bigger balls in lower camera
+	return !(w < LOWER_MIN_SIZE || h < LOWER_MIN_SIZE);
+}
+
+/* Are the dimensions of a candidate blob worthy of further study?
+   @param w     the blob's width
+   @param h     the blob's height
+   @return      whether it meets the minimum criteria
+ */
+bool Ball::blobIsTooBigToBeABall(int w, int h) {
+    const int MAX_SIZE = 40;
+	const int LOWER_MAX_SIZE = 60;
+	if (thresh->usingTopCamera) {
+		return (w > MAX_SIZE || h > MAX_SIZE);
+	}
+	// need bigger balls in lower camera
+	return (w > LOWER_MAX_SIZE || h > LOWER_MAX_SIZE);
 }
 
 /*  Before we just take the biggest blob, we do some initial screening
@@ -179,6 +199,11 @@ void Ball::preScreenBlobsBasedOnSizeAndColor() {
         }
         if (!blobIsBigEnoughToBeABall(w, h)) {
             blobs->init(i);
+		} else if (blobIsTooBigToBeABall(w, h)) {
+			if (BALLDEBUG) {
+				cout << "Blob is too big " << w << " " << h << endl;
+			}
+			blobs->init(i);
         } else if (ar > 0) {
             if (blobs->get(i).getBottom() + diam <
                 horizonAt(blobs->get(i).getLeft()) && thresh->usingTopCamera) {
@@ -228,6 +253,10 @@ bool Ball::sanityChecks(int w, int h, VisualBall * thisBall) {
     float distanceDifference = fabs(kinematicsBasedEst.dist - radiusBasedEst.dist);
     int horb = horizonAt(topBlob->getLeftBottomX());
 
+	if (BALLDEBUG) {
+		cout << "Width/height " << w << " " << h << endl;
+	}
+
     if (!ballIsReasonablySquare(topBlob->getLeftTopX(), topBlob->getLeftTopY(),
                                 w, h)) {
         if (BALLDEBUG) {
@@ -274,12 +303,37 @@ bool Ball::sanityChecks(int w, int h, VisualBall * thisBall) {
 			if (BALLDEBUG) {
 				cout << "Screening due to a very large ball at a seemingly far distance "
 					 << w << " " << h << " " << kinematicsBasedEst.dist << endl;
+				drawBlob(*topBlob, WHITE);
 			}
-			drawBlob(*topBlob, WHITE);
 			topBlob->init();
 			thisBall->init();
 			return false;
 		}
+	} else if (thresh->usingTopCamera && (h > 30 || 3 > 40) &&
+			   (topBlob->getLeftTopY() < 3 * IMAGE_HEIGHT / 4)) {
+		if (BALLDEBUG) {
+			cout << "Saw a large ball in the top camera high in the visual field " << w << " " << h << endl;
+			drawBlob(*topBlob, WHITE);
+		}
+		topBlob->init();
+		thisBall->init();
+		return false;
+	} else if (thresh->usingTopCamera && (h > 40 || w > 40)) {
+		if (BALLDEBUG) {
+			cout << "Saw a very large ball in the top camera " << w << " " << h << endl;
+			drawBlob(*topBlob, WHITE);
+		}
+		topBlob->init();
+		thisBall->init();
+		return false;
+	} else if (!thresh->usingTopCamera && (h < 10 || w < 10)) {
+		if (BALLDEBUG) {
+			cout << "Saw a very small ball in the top camera " << w << " " << h << endl;
+			drawBlob(*topBlob, WHITE);
+		}
+		topBlob->init();
+		thisBall->init();
+		return false;
 	}
     return true;
 }
@@ -302,6 +356,9 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 
     preScreenBlobsBasedOnSizeAndColor();
     // loop through the blobs from biggest to smallest until we find a ball
+	if (BALLDEBUG) {
+		cout << endl << "Next ball" << endl;
+	}
     do {
       topBlob = blobs->getTopAndMerge(horizon);
       // the conditions when we know we don't have a ball
@@ -334,6 +391,11 @@ int Ball::balls(int horizon, VisualBall *thisBall)
     }
     if (BALLDEBUG) {
         cout << "Vision found ball " << endl;
+		if (thresh->usingTopCamera) {
+			cout << "In top camera" << endl;
+		} else {
+			cout << "In bottom camera" << endl;
+		}
         cout << topBlob->getLeftTopX() << " " << topBlob->getLeftTopY()
              << " " <<
             w << " " << h << " " << e.dist << endl;
@@ -341,7 +403,7 @@ int Ball::balls(int horizon, VisualBall *thisBall)
     if (BALLDISTDEBUG) {
         cout << "Distance is " << thisBall->getDistance() << " "
 			 << kinematicsBasedEst.dist << " " << radiusBasedEst.dist << endl;
-        cout<< "Radius"<<thisBall->getRadius()<<endl;
+        cout<< "Radius "<<thisBall->getRadius()<<endl;
     }
     return 0;
 }
