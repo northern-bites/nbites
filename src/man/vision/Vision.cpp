@@ -164,7 +164,7 @@ void Vision::notifyImage(const ThresholdImage& topThrIm, const PackedImage16& to
 
     thresh->visionLoop(ja, inert);
     PROF_ENTER(P_OBSTACLES)
-    thresh->obstacleLoop(ja, inert);
+		//thresh->obstacleLoop(ja, inert);
     PROF_EXIT(P_OBSTACLES)
 
    // drawEdges(*linesDetector->getEdges());
