@@ -1,12 +1,12 @@
 """
-A behavior to test kicking. States are defined as functions in KickingStates.
+A behavior to test walking. States are defined as functions in WalkingStates.
 """
 
 from . import SoccerFSA
 from . import FallControllerStates
 from . import RoleSwitchingStates
 from . import GameControllerStates
-from . import KickerStates
+from . import WalkingStates
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
@@ -14,8 +14,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(FallControllerStates)
         self.addStates(RoleSwitchingStates)
         self.addStates(GameControllerStates)
-        self.addStates(KickerStates)
-        self.setName('pKicker')
+        self.addStates(WalkingStates)
+        self.setName('pWalker')
         self.currentState = 'fallController' # initial state
 
         self.brain.fallController.enabled = True 

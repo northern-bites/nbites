@@ -37,8 +37,9 @@ def gameReady(player):
         player.penaltyKicking = False
         player.stand()
         player.brain.tracker.lookToAngle(0)
-        if player.lastDiffState != 'gameInitial':
-            return player.goLater('spinToWalkOffField')
+        # TODO is this actually possible?
+        # if player.lastDiffState != 'gameInitial':
+        #     return player.goLater('spinToWalkOffField')
 
     # Wait until the sensors are calibrated before moving.
     if(not player.brain.motion.calibrated):
@@ -81,8 +82,8 @@ def gamePlaying(player):
     if (not player.brain.motion.calibrated):
         return player.stay()
 
-    if (player.lastDiffState == 'gamePenalized' and
-        player.lastStateTime > 10):
+    if player.penalized:
+        player.penalized = False
         return player.goLater('afterPenalty')
 
     if player.lastDiffState == 'afterPenalty':
@@ -100,7 +101,9 @@ def gamePenalized(player):
         player.brain.fallController.enabled = False
         player.stopWalking()
         player.penalizeHeads()
+        player.penalized = True
 
+    # TODO is this actually possible?
     if player.lastDiffState == '':
         # Just started up! Need to calibrate sensors
         player.brain.nav.stand()

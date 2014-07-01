@@ -1,6 +1,6 @@
-import BoxPositionConstants as boxConstants
+import RoleConstants as role
 import ClaimTransitions as claimTransitions
-#The transitions file for transitions exclusive to the Box-based positioning
+import SharedTransitions as shared
 
 def ballInBox(player):
     """
@@ -8,11 +8,12 @@ def ballInBox(player):
     """
     ball = player.brain.ball
 
-    if ball.x > player.box[0][0] and ball.y > player.box[0][1] and \
-            ball.x < player.box[0][0] + player.box[1] and \
-            ball.y < player.box[0][1] + player.box[2] and ball.vis.frames_on > 2:
-        return True
-    return False
+    if ball.vis.frames_on > 0:
+        if role.isChaser(player.role):
+            return True
+        return (ball.x > player.box[0][0] and ball.y > player.box[0][1] and
+                ball.x < player.box[0][0] + player.box[1] and
+                ball.y < player.box[0][1] + player.box[2])
 
 def ballNotInBox(player):
     """
@@ -27,13 +28,14 @@ def ballInBufferedBox(player):
     between approachBall and positionAtHome if the ball is close to the edge of the box.
     """
     ball = player.brain.ball
-    buf = boxConstants.boxBuffer
+    buf = role.boxBuffer
 
-    if ball.x > player.box[0][0] - buf and ball.y > player.box[0][1] - buf and \
-            ball.x < player.box[0][0] + player.box[1] + buf and \
-            ball.y < player.box[0][1] + player.box[2] + buf and ball.vis.frames_on > 2:
-        return True
-    return False
+    if ball.vis.frames_on > 0:
+        if role.isChaser(player.role):
+            return True
+        return (ball.x > player.box[0][0] - buf and ball.y > player.box[0][1] - buf and \
+                ball.x < player.box[0][0] + player.box[1] + buf and \
+                ball.y < player.box[0][1] + player.box[2] + buf)
 
 def ballNotInBufferedBox(player):
     """
@@ -65,3 +67,18 @@ def shouldApproachBall(player):
         return False
 
     return True
+
+def shouldFindSharedBall(player):
+    # Transition returns true if shared ball is on, and cannot see ball
+
+    if shared.ballOffForNFrames(60) and player.brain.sharedBall.frames_on > 30:
+        return True
+    return False
+
+def shouldStopLookingForSharedBall(player):
+    if player.brain.sharedBall.frames_off > 60:
+        return True
+    return False
+
+def shouldBeSupporter(player):
+    return ballInBox(player) and claimTransitions.shouldCedeClaim(player)

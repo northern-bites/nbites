@@ -31,7 +31,31 @@ def findBall(player):
         return player.goLater('spinToFoundBall')
 
     if transitions.spunOnce(player):
-        return player.goLater('positionAtHome')
+        return player.goLater('playOffBall')
+
+    return player.stay()
+
+@superState('gameControllerResponder')
+def spinToFoundBall(player):
+    """
+    spins to the ball until it is facing the ball 
+    """
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        print "spinning to found ball"
+
+    theta = math.degrees(player.brain.ball.bearing)
+    spinToFoundBall.isFacingBall = math.fabs(theta) <= constants.FACING_BALL_ACCEPTABLE_BEARING
+
+    if spinToFoundBall.isFacingBall:
+        print "facing ball"
+        return player.goNow('approachBall')
+
+    # spins the appropriate direction
+    if theta < 0:
+        player.brain.nav.walk(0., 0., -1*constants.FIND_BALL_SPIN_SPEED)
+    else:
+        player.brain.nav.walk(0., 0., constants.FIND_BALL_SPIN_SPEED)
 
     return player.stay()
 
