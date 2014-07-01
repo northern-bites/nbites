@@ -7,4 +7,5 @@ message MotionStatus
     optional bool walk_is_active = 3;
     optional bool head_is_active = 4;
     optional bool calibrated = 5;
+    optional bool upright = 6;
 }

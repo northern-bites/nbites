@@ -169,6 +169,7 @@ public:
     int getFrameCount() const { return frameCount; }
 
     bool calibrated() { return walkProvider.calibrated(); }
+    bool upright() { return walkProvider.upright(); }
 
     /**
      * @brief Generates a JointAngles message from a series
