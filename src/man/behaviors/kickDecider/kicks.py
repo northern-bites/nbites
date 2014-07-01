@@ -67,14 +67,14 @@ RIGHT_SIDE_KICK = Kick("R_Side", x = 17.5, y = -2, h = -90,
                        move=SweetMoves.GOOGZ_RIGHT_SIDE_KICK)
 
 # Motion kicks
-M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 14.1, y = 3.6)
-M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 14.1, y = -3.6)
+M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 13.9, y = 3.6)
+M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 13.9, y = -3.6)
 
 M_LEFT_SIDE =  Kick("M_Left_Side", x = 12.2, y = -.2, h = 45)
 M_RIGHT_SIDE =  Kick("M_Right_Side", x = 12.2, y = .2, h = -45)
 
-M_LEFT_SIDE_OUT = Kick("M_Left_Side_Out", x = 13.1, y = -2.6, h = 0)
-M_RIGHT_SIDE_OUT = Kick("M_Right_Side_Out", x = 13.1, y = 2.6, h = 0)
+M_LEFT_SIDE_OUT = Kick("M_Left_Side_Out", x = 13.1, y = -2.6, h = 90)
+M_RIGHT_SIDE_OUT = Kick("M_Right_Side_Out", x = 13.1, y = 2.6, h = -90)
 
 # M_LEFT_SIDE_OUT = Kick("M_Left_Side_Out", x = 11.5, y = 9.3, h = -90)
 # M_RIGHT_SIDE_OUT = Kick("M_Right_Side_Out", x = 11.5, y = -9.3, h = 90)
