@@ -70,9 +70,15 @@ def prepareForKick(player):
 
     player.inKickingState = True
     if USE_MOTION_KICKS:
-        player.kick = prepareForKick.decider.motionKicksAsap()
+        player.kick = prepareForKick.decider.motionKicks()
     else:
         player.kick = prepareForKick.decider.sweetMovesOnGoal()
+
+    print "HEADINGS..."
+    print player.kick.setupH
+    print player.brain.loc.h
+    print "CHOSEN!!!"
+    print player.kick.name
 
     return player.goNow('orbitBall')
 

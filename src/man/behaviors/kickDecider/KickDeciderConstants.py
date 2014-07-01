@@ -11,4 +11,4 @@ SHOT_PRECISION = 30
 PASS_PRECISION = 50
 
 # When are we so close to the goal that we should start aiming to score?
-SHOT_THRESHOLD = 100
+SHOT_THRESHOLD = 150

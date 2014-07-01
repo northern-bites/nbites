@@ -92,12 +92,14 @@ class KickDecider(object):
         self.addFastestPossibleKicks()
 
         # TODO add filter for out of bounds balls
-        return (kick for kick in self.possibleKicks).next()
+        return (kick for kick in self.possibleKicks).next().next()
 
     def motionKicks(self):
-        if self.brain.ball.distTo(Location(nogginC.OPP_GOALBOX_RIGHT_X,
-                                           nogginC.CENTER_FIELD_Y)) < constants.SHOT_THRESHOLD:
+        if self.brain.loc.distTo(Location(nogginC.OPP_GOALBOX_RIGHT_X,
+                                          nogginC.CENTER_FIELD_Y)) < constants.SHOT_THRESHOLD:
+            print  "SHOOTING ON GOAL!"
             return self.motionKicksOnGoal()
+        print  "SHOOTING ASAP!"
         return self.motionKicksAsap()
 
     ### API ###
@@ -131,8 +133,8 @@ class KickDecider(object):
         self.addPassesTo(location)
 
     def addFastestPossibleKicks(self):
-        self.possibleKicks = itertools.chain.from_iterable(itertools.chain(self.possibleKicks,
-                                                                           self.generateFastestPossibleKicks()))
+        self.possibleKicks = itertools.chain(self.possibleKicks,
+                                             [self.generateFastestAndHighestScoringKick()])
 
     def clearPossibleKicks(self):
         self.possibleKicks = self.generateNothing()
@@ -142,6 +144,35 @@ class KickDecider(object):
         return
         yield
 
+    def generateFastestPossibleKicks(self):
+        for k in self.kicks:
+            kick = copy.deepcopy(k)
+
+            offset = -kick.setupH
+            kick.setupH = self.brain.loc.h
+
+            beforeFirstRotationX = 70 # TODO use kick specific range
+
+            afterFirstRotationX = beforeFirstRotationX*math.cos(math.radians(kick.setupH))
+            afterFirstRotationY = beforeFirstRotationX*math.sin(math.radians(kick.setupH))
+
+            afterSecondRotationX = (afterFirstRotationX*math.cos(math.radians(offset)) -
+                                    afterFirstRotationY*math.sin(math.radians(offset)))
+            afterSecondRotationY = (afterFirstRotationX*math.sin(math.radians(offset)) +
+                                    afterFirstRotationY*math.cos(math.radians(offset)))
+
+            kick.destinationX = self.brain.ball.x + afterSecondRotationX
+            kick.destinationY = self.brain.ball.y + afterSecondRotationY
+
+            yield kick
+
+    def generateFastestAndHighestScoringKick(self):
+        fastestKicks = self.generateFastestPossibleKicks()
+        print "DECIDING FASTEST KICKS"
+
+        yield max(fastestKicks,key=self.scoreKick)
+
+    # TODO use rotation matrices
     def generateIdealKicks(self, x, y):
         for k in self.kicks:
             kick = copy.deepcopy(k)
@@ -155,12 +186,8 @@ class KickDecider(object):
 
             kick.destinationX = x
             kick.destinationY = y
-            yield kick
 
-    def generateFastestPossibleKicks(self):
-        fastestKickXDest = 2.*self.brain.ball.x - self.brain.loc.x
-        fastestKickYDest = 2.*self.brain.ball.y - self.brain.loc.y
-        yield self.generateIdealKicks(fastestKickXDest,fastestKickYDest)
+            yield kick
 
     # NOTE N should be an odd number, so that a perfectly-aimed kick is chosen
     #      as one of the sampled kicks
@@ -194,8 +221,12 @@ class KickDecider(object):
         goalCenter = Location(nogginC.OPP_GOALBOX_RIGHT_X,
                               nogginC.CENTER_FIELD_Y)
         
-        return math.sqrt((kick.destinationX - goalCenter.x)**2 +
-                         (kick.destinationY - goalCenter.y)**2)
+        print "MIN DISTANCES TO GOAL"
+        print kick.name
+        print(-math.sqrt((kick.destinationX - goalCenter.x)**2 +
+                          (kick.destinationY - goalCenter.y)**2))
+        return -math.sqrt((kick.destinationX - goalCenter.x)**2 +
+                          (kick.destinationY - goalCenter.y)**2)
 
     ### FILTERS ###
     def inBounds(self, kick):
