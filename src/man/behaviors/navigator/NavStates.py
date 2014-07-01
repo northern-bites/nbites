@@ -238,16 +238,11 @@ def walking(nav):
     """
     State to be used for velocity walking.
     """
-
-    if ((walking.speeds != walking.lastSpeeds)
-        or not nav.brain.interface.motionStatus.walk_is_active):
-        helper.setSpeed(nav, walking.speeds)
-    walking.lastSpeeds = walking.speeds
+    helper.setSpeed(nav, walking.speeds)
 
     return Transition.getNextState(nav, walking)
 
 walking.speeds = constants.ZERO_SPEEDS     # current walking speeds
-walking.lastSpeeds = constants.ZERO_SPEEDS # useful for knowing if speeds changed
 walking.transitions = {}
 
 ### Stopping States ###
