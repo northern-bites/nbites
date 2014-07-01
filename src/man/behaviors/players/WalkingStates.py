@@ -1,5 +1,6 @@
 from ..headTracker import HeadMoves
-from .. import SweetMoves
+from ..navigator import Navigator
+from objects import RelRobotLocation
 from ..util import *
 
 @superState('gameControllerResponder')
@@ -7,13 +8,10 @@ def gameInitial(player):
     if player.firstFrame():
         player.gainsOn()
         player.brain.nav.stand()
-        player.runfallController = False
     return player.stay()
 
 @superState('gameControllerResponder')
 def gameReady(player):
-    if player.firstFrame():
-        player.brain.nav.stand()
     return player.stay()
 
 @superState('gameControllerResponder')
@@ -22,15 +20,13 @@ def gameSet(player):
 
 @superState('gameControllerResponder')
 def gamePlaying(player):
-    return player.goNow('kick')
-
-@superState('gameControllerResponder')
-def gamePenalized(player):
+    if player.firstFrame():
+        player.brain.nav.destinationWalkTo(RelRobotLocation(100,0,0),
+                                           Navigator.QUICK_SPEED)
     return player.stay()
 
 @superState('gameControllerResponder')
-def kick(player):
+def gamePenalized(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.LEFT_STRAIGHT_KICK)
-
+        player.brain.nav.stand()
     return player.stay()
