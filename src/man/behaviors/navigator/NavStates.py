@@ -123,7 +123,6 @@ goToPosition.adaptive = "adapts the speed to the distance of the destination"
 goToPosition.precision = "how precise we want to be in moving"
 
 goToPosition.speeds = ''
-goToPosition.lastSpeeds = ''
 goToPosition.bookingIt = False
 goToPosition.close = False
 
@@ -192,7 +191,6 @@ def destinationWalkingTo(nav):
     """
     if nav.firstFrame():
         destinationWalkingTo.enqueAZeroVector = False
-        return nav.stay()
 
     if len(destinationWalkingTo.destQueue) > 0:
         dest = destinationWalkingTo.destQueue.popleft()
@@ -200,7 +198,6 @@ def destinationWalkingTo(nav):
                               destinationWalkingTo.speed, 
                               destinationWalkingTo.kick)
         destinationWalkingTo.enqueAZeroVector = True
-        return nav.stay()
     elif destinationWalkingTo.enqueAZeroVector:
         helper.setDestination(nav, RelRobotLocation(0,0,0), 
                               destinationWalkingTo.speed, 
@@ -220,11 +217,11 @@ def walkingTo(nav):
         helper.stand(nav)
         return nav.stay()
 
+    # TODO why check standing?
     if nav.brain.interface.motionStatus.standing:
         if len(walkingTo.destQueue) > 0:
             dest = walkingTo.destQueue.popleft()
             helper.setOdometryDestination(nav, dest, walkingTo.speed)
-            return nav.stay()
         else:
             return nav.goNow('standing')
 
@@ -238,16 +235,11 @@ def walking(nav):
     """
     State to be used for velocity walking.
     """
-
-    if ((walking.speeds != walking.lastSpeeds)
-        or not nav.brain.interface.motionStatus.walk_is_active):
-        helper.setSpeed(nav, walking.speeds)
-    walking.lastSpeeds = walking.speeds
+    helper.setSpeed(nav, walking.speeds)
 
     return Transition.getNextState(nav, walking)
 
 walking.speeds = constants.ZERO_SPEEDS     # current walking speeds
-walking.lastSpeeds = constants.ZERO_SPEEDS # useful for knowing if speeds changed
 walking.transitions = {}
 
 ### Stopping States ###
