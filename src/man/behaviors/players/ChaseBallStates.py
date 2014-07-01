@@ -176,7 +176,7 @@ def spinToBall(player):
 
     if spinToBall.isFacingBall:
         print "facing ball"
-        return player.goNow('positionAndKickBall')
+        return player.goLater('positionAndKickBall')
 
     # spins the appropriate direction
     if theta < 0:
@@ -203,7 +203,6 @@ def positionForKick(player):
         player.brain.tracker.lookStraightThenTrack()
         player.brain.nav.destinationWalkTo(positionForKick.kickPose,
                                            Navigator.GRADUAL_SPEED)
-        positionForKick.counter = 0
         positionForKick.slowDown = False
     elif player.brain.ball.vis.on: # don't update if we don't see the ball
         # slows down the walk when very close to the ball to stabalize motion kicking and to not walk over the ball
@@ -216,18 +215,15 @@ def positionForKick(player):
                 positionForKick.slowDown = False
                 player.brain.nav.destinationWalkTo(positionForKick.kickPose,
                                            Navigator.GRADUAL_SPEED)
+            else:
+                player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
         else:
             player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
 
     player.ballBeforeKick = player.brain.ball
     if transitions.ballInPosition(player, positionForKick.kickPose):
         if player.motionKick:
-            positionForKick.counter = positionForKick.counter + 1
-            # stay at position for a short amount of time. stabalizes motion kicking by slowing down forward motion
-            if positionForKick.counter <= constants.WAIT_COUNT:
-                return player.stay()
-            else:
-                return player.goNow('executeMotionKick')
+           return player.goNow('executeMotionKick')
         else:
             player.brain.nav.stand()
             return player.goNow('executeKick')
