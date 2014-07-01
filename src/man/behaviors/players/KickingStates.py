@@ -75,6 +75,7 @@ def afterKick(player):
     if transitions.shouldKickAgain(player):
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
         if player.motionKick:
+            player.motionKick = False
             return player.goNow('spinToBall')
         else:        
             return player.goNow('positionForKick')

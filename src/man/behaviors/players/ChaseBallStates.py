@@ -6,7 +6,7 @@ import ChaseBallConstants as constants
 import DribbleTransitions as dr_trans
 import PlayOffBallTransitions as playOffTransitions
 from ..navigator import Navigator
-from ..kickDecider import KickDecider2
+from ..kickDecider import KickDecider
 from ..kickDecider import kicks
 from ..util import *
 from objects import RelRobotLocation, Location
@@ -60,7 +60,7 @@ def positionAndKickBall(player):
 @superState('positionAndKickBall')
 def prepareForKick(player):
     if player.firstFrame():
-        prepareForKick.decider = KickDecider2.KickDecider2(player.brain)
+        prepareForKick.decider = KickDecider.KickDecider(player.brain)
         player.brain.nav.stand()
 
     if player.brain.ball.distance > constants.APPROACH_BALL_AGAIN_DIST:
@@ -71,7 +71,13 @@ def prepareForKick(player):
     if USE_MOTION_KICKS:
         player.kick = prepareForKick.decider.motionKicks()
     else:
-        player.kick = prepareForKick.decider.normalKicks()
+        player.kick = prepareForKick.decider.sweetMovesOnGoal()
+
+    print "HEADINGS..."
+    print player.kick.setupH
+    print player.brain.loc.h
+    print "CHOSEN!!!"
+    print player.kick.name
 
     return player.goNow('orbitBall')
 

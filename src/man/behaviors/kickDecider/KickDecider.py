@@ -1,231 +1,243 @@
 import kicks
-import KickInformation
-import KickingConstants as constants
-import noggin_constants as NogginConstants
-from objects import RelRobotLocation
+import KickDeciderConstants as constants
+import noggin_constants as nogginC
+from objects import Location
+import math
+import copy
+import itertools
 
+# TODO use robot and open field detection to decide kicks
+# TODO develop kickoff strategy
+
+# TODO document here and on wiki
+# TODO kicks.py is ugly
+# TODO abstract from behaviors for testing purposes
 class KickDecider(object):
     """
-    Uses current info gathered by KickInformation to determine the
-    best possible kick and where we should position when called
+    Decides what kick to do. Load a bunch of kicks into self.kicks, a score 
+    function into self.scoreKick, and a bunch of filters into self.filters. 
+    Instruct the decider where the kick should go and let it do the math for 
+    you. Includes a variety of ready to go planners for different situations. 
     """
-
     def __init__(self, brain):
         self.brain = brain
-        self.info = KickInformation.KickInformation(brain)
 
-    def resetInfo(self):
-        """
-        resets kickInfo so we can decide on next kick
-        """
-        self.info = KickInformation.KickInformation(self.brain)
+        self.kicks = []                             # array of kicks to try
+        self.scoreKick = None                       # score kick function used to choose a kick
+        self.filters = []                           # array of filter functions used to filter out kicks
 
-    def getKick(self):
-        """
-        returns the kick we have decided. If None, then orbit for Loc.
-        """
-        return self.info.kick
+        self.possibleKicks = self.generateNothing() # acceptable kicks ordered by utility
+    
+    ### PLANNERS ###
+    def sweetMovesOnGoal(self):
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.LEFT_SIDE_KICK)
+        self.kicks.append(kicks.RIGHT_SIDE_KICK)
 
-    def setKick(self, k):
-        """
-        sets a particular kick
-        """
-        print "set kick"
-        self.info.kick = k
+        self.scoreKick = self.minimizeOrbitTime
 
-    def getIdealKickPosition(self):
-        """
-        gets an ideal position for the robot to be in
-        for the kick to work
-        """
-        (kick_x, kick_y, kick_heading) = self.info.kick.getPosition()
-        ballLoc = self.brain.ball.loc
-        myLoc = self.brain.my
+        self.clearPossibleKicks()
+        self.addShotsOnGoal()
 
-        return RelRobotLocation(ballLoc.relX - kick_x - constants.APPROACH_BALL_HACK,
-                                ballLoc.relY - kick_y,
-                                kick_heading - myLoc.h)
+        return (kick for kick in self.possibleKicks).next().next()
 
-    def getSweetMove(self):
-        """
-        returns the sweet move required for motion to kick
-        """
-        kick = self.info.kick
-        # TODO make this check unneccessary by making all kicks dynamic.
-        if kick == kicks.LEFT_DYNAMIC_STRAIGHT_KICK or \
-                kick == kicks.RIGHT_DYNAMIC_STRAIGHT_KICK:
-            ball = self.brain.ball
-            dist = ball.loc.distTo(kick.dest)
-            return kick.sweetMove(ball.loc.relY, dist)
+    def bigKicksOnGoal(self):
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_BIG_KICK)
+        self.kicks.append(kicks.RIGHT_BIG_KICK)
+        self.kicks.append(kicks.LEFT_SIDE_KICK)
+        self.kicks.append(kicks.RIGHT_SIDE_KICK)
+
+        self.scoreKick = self.minimizeOrbitTime
+
+        self.clearPossibleKicks()
+        self.addShotsOnGoal()
+
+        return (kick for kick in self.possibleKicks).next().next()
+
+    def motionKicksOnGoal(self):
+        self.brain.player.motionKick = True
+    
+        self.kicks = []
+        self.kicks.append(kicks.M_LEFT_STRAIGHT)
+        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
+        self.kicks.append(kicks.M_LEFT_SIDE)
+        self.kicks.append(kicks.M_RIGHT_SIDE)
+        self.kicks.append(kicks.M_LEFT_SIDE_OUT)
+        self.kicks.append(kicks.M_RIGHT_SIDE_OUT)
+
+        self.scoreKick = self.minimizeOrbitTime
+
+        self.clearPossibleKicks()
+        self.addShotsOnGoal()
+
+        return (kick for kick in self.possibleKicks).next().next()
+
+    def motionKicksAsap(self):
+        self.brain.player.motionKick = True
+    
+        self.kicks = []
+        self.kicks.append(kicks.M_LEFT_STRAIGHT)
+        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
+        self.kicks.append(kicks.M_LEFT_SIDE)
+        self.kicks.append(kicks.M_RIGHT_SIDE)
+        self.kicks.append(kicks.M_LEFT_SIDE_OUT)
+        self.kicks.append(kicks.M_RIGHT_SIDE_OUT)
+
+        self.scoreKick = self.minimizeDistanceToGoal
+
+        self.clearPossibleKicks()
+        self.addFastestPossibleKicks()
+
+        # TODO add filter for out of bounds balls
+        return (kick for kick in self.possibleKicks).next().next()
+
+    def motionKicks(self):
+        if self.brain.loc.distTo(Location(nogginC.OPP_GOALBOX_RIGHT_X,
+                                          nogginC.CENTER_FIELD_Y)) < constants.SHOT_THRESHOLD:
+            print  "SHOOTING ON GOAL!"
+            return self.motionKicksOnGoal()
+        print  "SHOOTING ASAP!"
+        return self.motionKicksAsap()
+
+    ### API ###
+    def addShotsOnGoal(self):
+        x = nogginC.OPP_GOALBOX_RIGHT_X - self.brain.ball.x
+        y1 = nogginC.OPP_GOALBOX_MIDDLE_Y - self.brain.ball.y
+        y2 = nogginC.OPP_GOALBOX_MIDDLE_Y - constants.SHOT_PRECISION - self.brain.ball.y
+        # Two vectors that share an x coordinate but have diff y coordinates
+        toGoalCenterMagnitude = math.sqrt(x**2+y1**2)
+        toGoalCenterMinusPrecisionMagnitude = math.sqrt(x**2+y2**2)
+        # Formula for angle between two vectors, cos(theta) = a.b/||a||||b||
+        theta = math.acos((x*x+y1*y2)/(toGoalCenterMagnitude*toGoalCenterMinusPrecisionMagnitude))
+        precision = toGoalCenterMagnitude*math.tan(theta)
+        self.possibleKicks = itertools.chain(self.possibleKicks,
+                                             [self.generateKicksFromGoalDest(nogginC.OPP_GOALBOX_RIGHT_X,
+                                                                             nogginC.CENTER_FIELD_Y,
+                                                                             precision)])
+
+    def addPassesTo(self, location):
+        self.possibleKicks = itertools.chain(self.possibleKicks,
+                                             [self.generateKicksFromGoalDest(location.x,
+                                                                             location.y,
+                                                                             constants.PASS_PRECISION)])
+
+    def addPassesToFieldCross(self):
+        betweenFieldCrossAndGoalBoxLeft = (nogginC.LANDMARK_OPP_FIELD_CROSS[0] +
+                                           nogginC.OPP_GOALBOX_LEFT_X) / 2.
+        location = Location(betweenFieldCrossAndGoalBoxLeft,nogginC.LANDMARK_OPP_FIELD_CROSS[1])
+
+
+        self.addPassesTo(location)
+
+    def addFastestPossibleKicks(self):
+        self.possibleKicks = itertools.chain(self.possibleKicks,
+                                             [self.generateFastestAndHighestScoringKick()])
+
+    def clearPossibleKicks(self):
+        self.possibleKicks = self.generateNothing()
+
+    ### GENERATORS ###
+    def generateNothing(self):
+        return
+        yield
+
+    def generateFastestPossibleKicks(self):
+        for k in self.kicks:
+            kick = copy.deepcopy(k)
+
+            offset = -kick.setupH
+            kick.setupH = self.brain.loc.h
+
+            beforeFirstRotationX = 70 # TODO use kick specific range
+
+            afterFirstRotationX = beforeFirstRotationX*math.cos(math.radians(kick.setupH))
+            afterFirstRotationY = beforeFirstRotationX*math.sin(math.radians(kick.setupH))
+
+            afterSecondRotationX = (afterFirstRotationX*math.cos(math.radians(offset)) -
+                                    afterFirstRotationY*math.sin(math.radians(offset)))
+            afterSecondRotationY = (afterFirstRotationX*math.sin(math.radians(offset)) +
+                                    afterFirstRotationY*math.cos(math.radians(offset)))
+
+            kick.destinationX = self.brain.ball.x + afterSecondRotationX
+            kick.destinationY = self.brain.ball.y + afterSecondRotationY
+
+            yield kick
+
+    def generateFastestAndHighestScoringKick(self):
+        fastestKicks = self.generateFastestPossibleKicks()
+        print "DECIDING FASTEST KICKS"
+
+        yield max(fastestKicks,key=self.scoreKick)
+
+    # TODO use rotation matrices
+    def generateIdealKicks(self, x, y):
+        for k in self.kicks:
+            kick = copy.deepcopy(k)
+
+            offset = kick.setupH
+            kick.setupH = 90 - math.degrees(math.atan(abs(x-self.brain.ball.x)/
+                                                      abs(y-self.brain.ball.y)))
+            if x < self.brain.ball.x: kick.setupH += 90
+            if y < self.brain.ball.y: kick.setupH = -kick.setupH
+            kick.setupH += offset
+
+            kick.destinationX = x
+            kick.destinationY = y
+
+            yield kick
+
+    # NOTE N should be an odd number, so that a perfectly-aimed kick is chosen
+    #      as one of the sampled kicks
+    def sampleKicks(self, x, y, precision, N):
+        if constants.NO_SAMPLING:
+            yield self.generateIdealKicks(x,y)
         else:
-            return kick.sweetMove
+            r, thetaInitial = self.fromCartesianToPolarCoordinates(x-self.brain.ball.x,
+                                                                   y-self.brain.ball.y)
+            bigTheta = 2*math.atan(precision/r)
+            littleTheta = bigTheta/N
+            theta = thetaInitial - bigTheta/2.
+            for i in xrange(N):
+                newX, newY = self.fromPolarToCartesianCoordinates(r,theta)
+                yield self.generateIdealKicks(newX+self.brain.ball.x,
+                                              newY+self.brain.ball.y)
+                theta += littleTheta
 
-    def setKickOff(self):
-        """
-        sets the kick we should do in the kickOff situation
-        """
-        smallTeam = self.brain.playbook.pb.numActiveFieldPlayers < 3
+    def generateKicksFromGoalDest(self, x, y, precision):
+        sampledKicks = itertools.chain.from_iterable(self.sampleKicks(x,y,precision,constants.NUM_OF_SAMPLES))
 
-        # if there are too few players on the field to do a side kick pass.
-        if smallTeam:
-            print "Kickoff Alone!"
-            self.setKick(self.info.chooseShortQuickKick())
-        # do a side kick pass depending on where the offender is.
-        elif self.brain.playbook.pb.kickoffFormation == 0:
-            self.setKick(kicks.RIGHT_SIDE_KICK)
-            print "Kickoff RIGHT_SIDE_KICK"
-        else:
-            self.setKick(kicks.LEFT_SIDE_KICK)
-            print "Kickoff LEFT_SIDE_KICK"
+        yield max(sampledKicks,key=self.scoreKick)
 
-    def decideKick(self):
-        """
-        using objective and heuristics and localization determines best kick
-        """
-        # Re-initialize to clear data
-        self.resetInfo()
+    ### SCORE KICK FUNCTIONS ###
+    def minimizeOrbitTime(self, kick):
+        orbitTime = abs(kick.setupH - self.brain.loc.h)
 
-        # Yay scripted Kickoffs!
-        if self.info.shouldKickOff():
-            self.setKickOff()
-            return
+        return -orbitTime
 
-        # Check localization to make sure it's good enough.
-        if self.brain.my.locScore == NogginConstants.locScore.BAD_LOC:
-            print "BAD_LOC!"
-            print "Uncertainty: ", self.brain.loc.xUncert, self.brain.loc.yUncert,\
-                self.brain.loc.hUncert
-            self.info.kick = kicks.ORBIT_KICK_POSITION
-            return
+    def minimizeDistanceToGoal(self, kick):
+        goalCenter = Location(nogginC.OPP_GOALBOX_RIGHT_X,
+                              nogginC.CENTER_FIELD_Y)
+        
+        print "MIN DISTANCES TO GOAL"
+        print kick.name
+        print(-math.sqrt((kick.destinationX - goalCenter.x)**2 +
+                          (kick.destinationY - goalCenter.y)**2))
+        return -math.sqrt((kick.destinationX - goalCenter.x)**2 +
+                          (kick.destinationY - goalCenter.y)**2)
 
-        if self.info.canScoreAll():
-            self.score()
-        elif self.info.canScoreSome():
-            self.chooseScoringKick()
-        if self.info.openTeammateCanScore():
-            self.chooseOneTimerKick()
-        elif self.info.openTeammate():
-            self.choosePassingKick()
-        if self.info.canClear():
-            self.chooseClearingKick()
-        """Don't use these for now. just clearing is simpler??"""
-        #if self.info.canAdvance():
-        #    self.chooseAdvancingKick()
-        #if self.info.canCross():
-        #    self.chooseCrossingKick()
-        if self.info.canPassBack():
-            self.choosePassBackKick()
+    ### FILTERS ###
+    def inBounds(self, kick):
+        return  (kick.destinationX >= nogginC.FIELD_WHITE_LEFT_SIDELINE_X and 
+                 kick.destinationX <= nogginC.FIELD_WHITE_RIGHT_SIDELINE_X and
+                 kick.destinationY >= nogginC.FIELD_WHITE_BOTTOM_SIDELINE_Y and
+                 kick.destinationY <= nogginC.FIELD_WHITE_TOP_SIDELINE_Y)
 
-        self.info.kick = self.chooseKick()
+    ### HELPER FUNCTIONS ###
+    def fromCartesianToPolarCoordinates(self, x, y):
+        return math.sqrt(x**2+y**2), math.atan2(y,x)
 
-        print "I'm at position " + str(self.brain.my)
-
-        print "Chose: {0}".format(self.info.kick)
-
-    def score(self):
-        """
-        We are confident we can score with any kick.
-        """
-
-        # First we want to figure out which aim point is better.
-        # For now just worry about which is faster to kick for,
-        # Don't worry about open field yet (6/28/11)
-
-        #kickDest = self.info.bestAlignedDest([constants.SHOOT_RIGHT_AIM_POINT,
-        #                                      constants.SHOOT_LEFT_AIM_POINT])
-        #                                      constants.SHOOT_CENTER_AIM_POINT])
-        kickDest = constants.SHOOT_CENTER_AIM_POINT # HACK just want to hit the target
-
-        # Next we want to find the best kick that will hit that point.
-        # Since we know any kick will score, we don't have to worry about
-        # any range determinations.
-
-        self.info.kickChoices['scoringKick'] = self.info.bestAlignedKick(kickDest)
-
-    def chooseScoringKick(self):
-        return
-
-    def chooseOneTimerKick(self):
-        return
-
-    def choosePassingKick(self):
-        return
-
-    def chooseClearingKick(self):
-        return
-
-    def chooseAdvancingKick(self):
-        return
-
-    def chooseCrossingKick(self):
-        return
-
-    def choosePassBackKick(self):
-        return
-
-
-    def chooseKick(self):
-        """
-        Chooses out of all possibilities, which kick to do.
-        Currently preferences by speed of dividends
-        (i.e. Scoring, passing, clearing). Passing comes before
-        clearing because the ball travels faster than robots.
-        """
-        # Since this order is the order of the dictionary,
-        # iterate through and find the first that isn't None.
-        for kind, kick in self.info.kickChoices.iteritems():
-            if kick == None:
-                continue
-            return kick
-
-        # OLD approach. saved for safe keeping.
-        """
-        # Note: may want to use headingTo(yglp) etc...
-        oppLeftPost = self.brain.oppGoalLeftPost
-        oppRightPost = self.brain.oppGoalRightPost
-
-        if (my.headingTo(oppLeftPost, forceCalc = True) > my.h >
-            my.headingTo(oppRightPost, forceCalc = True)):
-            return self.chooseDynamicKick()
-        elif (my.headingTo(oppLeftPost, forceCalc = True) > -1*my.h >
-              my.headingTo(oppRightPost, forceCalc = True)):
-            return self.chooseShortBackKick()
-        elif (my.h > 0):
-            print "LEFT_SIDE"
-            return kicks.LEFT_SIDE_KICK
-        else:
-            print "RIGHT_SIDE"
-            return kicks.RIGHT_SIDE_KICK
-        """
-
-    def chooseDynamicKick(self):
-        ball = self.brain.ball
-        if ball.loc.relY >= 0:
-            print "LEFT_DYNAMIC_STRAIGHT"
-            return kicks.LEFT_STRAIGHT_KICK
-        print "RIGHT_DYNAMIC_STRAIGHT"
-        return kicks.RIGHT_STRAIGHT_KICK
-
-    def chooseLongBackKick(self):
-        ball = self.brain.ball
-        if ball.loc.relY > 0:
-            print "LEFT_LONG_BACK"
-            return kicks.LEFT_LONG_BACK_KICK
-        print "RIGHT_LONG_BACK"
-        return kicks.RIGHT_LONG_BACK_KICK
-
-    def chooseShortBackKick(self):
-        ball = self.brain.ball
-        if ball.loc.relY > 0:
-            print "LEFT_SHORT_BACK"
-            return kicks.LEFT_SHORT_BACK_KICK
-        print "RIGHT_SHORT_BACK"
-        return kicks.RIGHT_SHORT_BACK_KICK
-
-    def chooseShortQuickKick(self):
-        ball = self.brain.ball
-        if ball.loc.relY > 0:
-            print "SHORT_QUICK_LEFT"
-            return kicks.LEFT_SHORT_STRAIGHT_KICK
-        print "SHORT_QUICK_RIGHT"
-        return kicks.RIGHT_SHORT_STRAIGHT_KICK
+    def fromPolarToCartesianCoordinates(self, r, theta):
+        return r*math.cos(theta), r*math.sin(theta)
