@@ -5,7 +5,6 @@ DEBUG_ORBIT = False
 # Transitions' Constants
 # Ball on and off frame thresholds
 BALL_ON_THRESH = 1
-# TODO was at 60
 BALL_OFF_THRESH = 10
 BALL_OFF_KICK_THRESH = 4 # 4 seconds, time threshold!
 

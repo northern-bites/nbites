@@ -14,8 +14,14 @@ def findBall(player):
         player.stopWalking()
         player.inKickingState = False
 
+    if transitions.shouldChaseBall(player):
+        player.stopWalking()
+        player.brain.tracker.trackBall()
+        return player.goLater('spinToFoundBall')
+
     if player.brain.nav.isStopped() and player.brain.tracker.isStopped():
-        if player.brain.ball.rel_x < 15:
+        #TODO CONST
+        if degrees(player.brain.ball.bearing) >= 25:
             my = player.brain.loc
             ball = Location(player.brain.ball.x, player.brain.ball.y)
             spinDir = my.spinDirToPoint(ball)
@@ -24,11 +30,6 @@ def findBall(player):
             player.brain.tracker.lookToSpinDirection(spinDir)
         else:
             return player.goNow('findBallForward')
-
-    if transitions.shouldChaseBall(player):
-        player.stopWalking()
-        player.brain.tracker.trackBall()
-        return player.goLater('spinToFoundBall')
 
     if transitions.spunOnce(player):
         return player.goLater('playOffBall')
@@ -76,26 +77,40 @@ def spinToFoundBall(player):
         return player.goNow('approachBall')
 
     # spins the appropriate direction
-    if theta < 0:
+    if theta < 0.:
         player.brain.nav.walk(0., 0., -1*constants.FIND_BALL_SPIN_SPEED)
     else:
         player.brain.nav.walk(0., 0., constants.FIND_BALL_SPIN_SPEED)
 
     return player.stay()
 
+@defaultState('backPedal')
 @superState('gameControllerResponder')
+@ifSwitchLater(transitions.shouldChaseBall, 'spinToFoundBall')
 def findBallForward(player):
+    pass
+
+#TODO CONSTS
+@superState('findBallForward')
+def backPedal(player):
+    if player.firstFrame():
+        player.setWalk(-.6, 0., 0.)
+
+    elif player.stateTime > 3:
+        return player.goLater('spinForwardSearch')
+
+    return player.stay()
+
+#TODO CONSTS
+@superState('findBallForward')
+def spinForwardSearch(player):
     if player.firstFrame():
         my = player.brain.loc
         ball = Location(player.brain.ball.x, player.brain.ball.y)
         spinDir = my.spinDirToPoint(ball)
-        player.setWalk(.1, .6*spinDir*-1, .5*spinDir*constants.FIND_BALL_SPIN_SPEED)    
-
-    if transitions.shouldChaseBall(player):
-        player.brain.tracker.trackBall()
-        return player.goLater('spinToFoundBall')
-
+        player.setWalk(.1, .8*spinDir*-1, .3*spinDir*constants.FIND_BALL_SPIN_SPEED)
+        player.brain.tracker.lookToAngle(spinDir*15)
     if transitions.spunOnce(player):
-        return player.goLater('positionAtHome')
+        return player.goLater('playOffBall')
 
     return player.stay()
