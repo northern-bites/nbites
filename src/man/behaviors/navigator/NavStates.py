@@ -46,12 +46,19 @@ def goToPosition(nav):
             goToPosition.dest = nav.brain.play.getPositionCoord()
 
     if goToPosition.fast:
+        # So that fast mode works for objects of type RobotLocation also
+        if isinstance(goToPosition.dest, RobotLocation) and not goToPosition.close:
+            fieldDest = RobotLocation(goToPosition.dest.x, goToPosition.dest.y, 0)
+            relDest = nav.brain.loc.relativeRobotLocationOf(fieldDest)
+            relDest.relH = nav.brain.loc.getRelativeBearing(fieldDest)
+        
         HEADING_ADAPT_CUTOFF = 103
         DISTANCE_ADAPT_CUTOFF = 10
 
         MAX_TURN = .5
 
         BOOK_IT_TURN_THRESHOLD = 23
+        BOOK_IT_DISTANCE_THRESHOLD = 50
 
         if relDest.relH >= HEADING_ADAPT_CUTOFF:
             velH = MAX_TURN
@@ -80,15 +87,19 @@ def goToPosition(nav):
                                     DISTANCE_ADAPT_CUTOFF,
                                     goToPosition.speed)
 
-        if fabs(relDest.relH) > BOOK_IT_TURN_THRESHOLD:
-            if relDest.relH > 0: velH = MAX_TURN
-            if relDest.relH < 0: velH = -MAX_TURN
-            velX = 0
-            velY = 0
-            goToPosition.bookingIt = False
+        if fabs(relDest.dist) > BOOK_IT_DISTANCE_THRESHOLD:
+            goToPosition.close = False
+            if fabs(relDest.relH) > BOOK_IT_TURN_THRESHOLD:
+                if relDest.relH > 0: velH = MAX_TURN
+                if relDest.relH < 0: velH = -MAX_TURN
+                velX = 0
+                velY = 0
+                goToPosition.bookingIt = False
+            else:
+                velY = 0
+                goToPosition.bookingIt = True
         else:
-            velY = 0
-            goToPosition.bookingIt = True
+            goToPosition.close = True
 
         goToPosition.speeds = (velX, velY, velH)
         helper.setSpeed(nav, goToPosition.speeds)
@@ -114,6 +125,7 @@ goToPosition.precision = "how precise we want to be in moving"
 goToPosition.speeds = ''
 goToPosition.lastSpeeds = ''
 goToPosition.bookingIt = False
+goToPosition.close = False
 
 # State where we are moving away from an obstacle
 def dodge(nav):
