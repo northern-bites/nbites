@@ -87,7 +87,7 @@ def orbitBall(player):
     if (relH > -constants.ORBIT_GOOD_BEARING and
         relH < constants.ORBIT_GOOD_BEARING):
         print "STOPPED! Because relH is: ", relH
-        player.stopWalking()
+        #player.stopWalking()
         destinationX = player.kick.destinationX
         destinationY = player.kick.destinationY
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
@@ -97,7 +97,7 @@ def orbitBall(player):
 
     if (transitions.orbitTooLong(player) or
         transitions.orbitBallTooFar(player)):
-        player.stopWalking()
+        #player.stopWalking()
         return player.goLater('approachBall')
 
     # Set our walk. Nav will make sure that we don't set duplicate speeds.
