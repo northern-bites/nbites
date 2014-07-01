@@ -188,7 +188,10 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
                 walkingEngine->theMotionRequestBH = motionRequest;
 
             } else {
-                currentCommand = MotionCommand::ptr();
+                MotionRequestBH motionRequest;
+                motionRequest.motion = MotionRequestBH::stand;
+
+                walkingEngine->theMotionRequestBH = motionRequest;
             }
 
         } else {
