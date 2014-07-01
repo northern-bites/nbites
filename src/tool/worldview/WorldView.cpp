@@ -20,7 +20,7 @@ WorldView::WorldView(QWidget* parent)
     commThread.addModule(wviewComm);
     commThread.addModule(wviewShared);
 
-#ifdef USING_LAB_FIELD
+#ifdef USE_LAB_FIELD
     fieldPainter = new WorldViewPainter(this, 2.);
 #else
     fieldPainter = new WorldViewPainter(this, 1.);
