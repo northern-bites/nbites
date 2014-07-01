@@ -177,7 +177,7 @@ def spinToBall(player):
 
     if spinToBall.isFacingBall:
         print "facing ball"
-        return player.goNow('positionAndKickBall')
+        return player.goLater('positionAndKickBall')
 
     # spins the appropriate direction
     if theta < 0:
@@ -216,6 +216,8 @@ def positionForKick(player):
                 positionForKick.slowDown = False
                 player.brain.nav.destinationWalkTo(positionForKick.kickPose,
                                            Navigator.GRADUAL_SPEED)
+            else:
+                player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
         else:
             player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
 
