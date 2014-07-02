@@ -33,9 +33,11 @@ void SharedBallModule::run_() {
     // sets the message
     sharedBallMessage.get()->set_x(x);
     sharedBallMessage.get()->set_y(y);
-    sharedBallMessage.get()->set_ball_on(ball_on);
-    sharedBallMessage.get()->set_frames_on(frames_on);
-    sharedBallMessage.get()->set_frames_off(frames_off);
+
+    // TODO turned off, waiting on Megan's PR
+    sharedBallMessage.get()->set_ball_on(false);
+    sharedBallMessage.get()->set_frames_on(0);
+    sharedBallMessage.get()->set_frames_off(100);
 
     sharedBallOutput.setMessage(sharedBallMessage);
 }
