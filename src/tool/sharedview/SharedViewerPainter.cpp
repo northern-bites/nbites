@@ -8,6 +8,13 @@ namespace sharer {
 SharedViewerPainter::SharedViewerPainter(QWidget* parent, float scaleFactor_) :
     PaintField(parent, scaleFactor_)
 {
+    // initializes arrays
+    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++) {
+        myXCoords[i] = 0.f;
+        myYCoords[i] = 0.f;
+        myHeadings[i] = 0.f;
+        myBallDist[i] = 0.f;
+    }
 }
 
 void SharedViewerPainter::paintEvent(QPaintEvent* event)
@@ -77,8 +84,6 @@ void SharedViewerPainter::paintRobot(QPaintEvent* event, float x, float y,
     // Draw the ball
     QPoint ballCenter(x + ballD*std::cos(TO_RAD*h),
                       y + ballD*std::sin(TO_RAD*h));
-
-    //draw where I think the ball is
     painter.setBrush(QColor::fromRgb(205,140,0));
     painter.drawEllipse(ballCenter, 8, 8);
 
@@ -106,8 +111,6 @@ void SharedViewerPainter::updateWithLocationInfo(float xCoord, float yCoord,
                                                  float heading, float ballDistance,
                                                  int index)
 {
-    std::cout<<index<<": X="<<myXCoords[index]<<", Y="<<myYCoords[index]<<", H="
-             <<myHeadings[index]<<", dist="<<myBallDist[index]<<std::endl;
     myXCoords[index] = xCoord;
     myYCoords[index] = yCoord;
     myHeadings[index] = heading;
@@ -115,10 +118,10 @@ void SharedViewerPainter::updateWithLocationInfo(float xCoord, float yCoord,
     update();
 }
 
-void SharedViewerPainter::updateWithSharedBallMessage(messages::SharedBall sharedLoc) {
+void SharedViewerPainter::updateWithSharedBallMessage(messages::SharedBall sharedLoc)
+{
     sharedBallLoc = sharedLoc;
     update();
-
 }
 
 } // namespace shared

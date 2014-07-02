@@ -15,6 +15,7 @@ SharedBallModule::SharedBallModule() :
     resety = 0.f;
     reseth = 0.f;
     timestamp = 0;
+    my_num = int(MY_PLAYER_NUMBER);
 }
 
 SharedBallModule::~SharedBallModule()
@@ -57,13 +58,17 @@ void SharedBallModule::run_()
     sharedBallMessage.get()->set_x(x);
     sharedBallMessage.get()->set_y(y);
     sharedBallMessage.get()->set_ball_on(ballOn);
+    sharedBallMessage.get()->set_num_robots(numRobotsOn);
     sharedBallOutput.setMessage(sharedBallMessage);
 
     // sets the message to reset the flipped robot to correct location
+// TOOL: Uncomment the set_uncert line. Used to tell which player to flip.
+//    float flippedNum = float(robotToIgnore) + 1.f;
     sharedBallResetMessage.get()->set_x(resetx);
     sharedBallResetMessage.get()->set_y(resety);
     sharedBallResetMessage.get()->set_h(reseth);
     sharedBallResetMessage.get()->set_timestamp(timestamp);
+//    sharedBallResetMessage.get()->set_uncert(flippedNum);
     sharedBallReset.setMessage(sharedBallResetMessage);
 }
 
@@ -73,6 +78,7 @@ void SharedBallModule::eliminateBadRobots()
     int maxes[NUM_PLAYERS_PER_TEAM] = { 0 }; //all elements are 0
     int bad_robot_max_num = 0;
     int bad_robot = -1;
+    float bigDist = 0.f;
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++) {
         if (!messages[i].ball_on()) {
             continue;
@@ -89,6 +95,9 @@ void SharedBallModule::eliminateBadRobots()
                 j_max = j;
             }
         }
+        if (max_distance > bigDist) {
+            bigDist = max_distance;
+        }
         if (j_max != -1) {
             maxes[j_max]++;
             if (maxes[j_max] > bad_robot_max_num) {
@@ -101,8 +110,10 @@ void SharedBallModule::eliminateBadRobots()
     }
 
     // now get rid of that robot if every player thinks its the bad robot
-    if (bad_robot_max_num == numRobotsOn - 1) {
-        robotToIgnore = bad_robot;
+    if ((bad_robot_max_num == numRobotsOn - 1) &&
+        (bigDist > DISTANCE_TOO_FAR*DISTANCE_TOO_FAR)) {
+            robotToIgnore = bad_robot;
+            numRobotsOn--;
     }
 }
 
@@ -159,20 +170,26 @@ void SharedBallModule::weightedavg()
  */
 void SharedBallModule::checkForPlayerFlip()
 {
-    if (robotToIgnore == -1) {
+    if (robotToIgnore != my_num) {
+//    TOOL: Comment out above line and uncomment below line
+//    if (robotToIgnore == -1){
+        return;
+    }
+    if (messages[robotToIgnore].my_x() > MIDFIELD_X - TOO_CLOSE_TO_MIDFIELD and
+        messages[robotToIgnore].my_x() < MIDFIELD_X + TOO_CLOSE_TO_MIDFIELD) {
         return;
     }
 
     calculateBallCoords(robotToIgnore);
-    float oldX = ballX[robotToIgnore];
-    float oldY = ballY[robotToIgnore];
-
     int rob = robotToIgnore;
+
+    float flipbx = (-1*(ballX[rob] - MIDFIELD_X)) + MIDFIELD_X;
+    float flipby = (-1*(ballY[rob] - MIDFIELD_Y)) + MIDFIELD_Y;
 
     float flipX =  (-1*(messages[rob].my_x() - MIDFIELD_X)) + MIDFIELD_X;
     float flipY = (-1*(messages[rob].my_y() - MIDFIELD_Y)) + MIDFIELD_Y;
 
-    float distance_sq = ( (x-flipX)*(x-flipX) + (y-flipY)*(y-flipY) );
+    float distance_sq = ( (x-flipbx)*(x-flipbx) + (y-flipby)*(y-flipby) );
     if (distance_sq < DISTANCE_FOR_FLIP*DISTANCE_FOR_FLIP) {
         resetx = flipX;
         resety = flipY;
@@ -182,6 +199,43 @@ void SharedBallModule::checkForPlayerFlip()
         }
         timestamp = messages[rob].timestamp();
     }
+}
+
+/* Calculates ball coordinates and puts them in global array if they
+ * have not been calculated yet. The idea is to not repeatedly
+ * calculate the same thing.
+ */
+void SharedBallModule::calculateBallCoords(int i) {
+    if (ballX[i] == -1 || ballY[i] == -1) {
+        float sinHB, cosHB;
+        float hb = TO_RAD*messages[i].my_h() + TO_RAD*messages[i].ball_bearing();
+        sincosf(hb, &sinHB, &cosHB);
+
+        float newx = messages[i].my_x() + messages[i].ball_dist()*cosHB;
+        float newy = messages[i].my_y() + messages[i].ball_dist()*sinHB;
+
+        ballX[i] = newx;
+        ballY[i] = newy;
+    }
+}
+
+/*
+ * Calculates distance between two players' balls.
+ */
+float SharedBallModule::getBallDistanceSquared(int i, int j)
+{
+    float x1, x2, y1, y2;
+    float hb, sinHB, cosHB;
+
+    calculateBallCoords(i);
+    x1 = ballX[i];
+    y1 = ballY[i];
+
+    calculateBallCoords(j);
+    x2 = ballX[j];
+    y2 = ballY[j];
+
+    return ( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
 }
 
 // As of now we are not calling this method but if we decide the goalie should
@@ -209,40 +263,6 @@ void SharedBallModule::incorporateGoalieWorldModel(messages::WorldModel newModel
     }
 }
 */
-
-
-/* Calculates ball coordinates and puts them in global array if they
- * have not been calculated yet.
- */
-void SharedBallModule::calculateBallCoords(int i) {
-    if (ballX[i] == -1 || ballY[i] == -1) {
-        float sinHB, cosHB;
-        float hb = TO_RAD*messages[i].my_h() + TO_RAD*messages[i].ball_bearing();
-        sincosf(hb, &sinHB, &cosHB);
-
-        float newx = messages[i].my_x() + messages[i].ball_dist()*cosHB;
-        float newy = messages[i].my_y() + messages[i].ball_dist()*sinHB;
-
-        ballX[i] = newx;
-        ballY[i] = newy;
-    }
-}
-
-float SharedBallModule::getBallDistanceSquared(int i, int j)
-{
-    float x1, x2, y1, y2;
-    float hb, sinHB, cosHB;
-
-    calculateBallCoords(i);
-    x1 = ballX[i];
-    y1 = ballY[i];
-
-    calculateBallCoords(j);
-    x2 = ballX[j];
-    y2 = ballY[j];
-
-    return ( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
-}
 
 } // namespace man
 } // namespace context

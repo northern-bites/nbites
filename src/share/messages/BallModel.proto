@@ -68,4 +68,5 @@ message SharedBall {
     optional float y = 2;
 
     optional bool ball_on  = 3;
+    optional int32 num_robots = 4;
 }
