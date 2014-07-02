@@ -37,6 +37,7 @@ GuardianModule::GuardianModule()
       chestButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       leftFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       rightFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
+      frameCount(0),
       useFallProtection(true),
       audioQueue()
 {
@@ -363,13 +364,11 @@ void GuardianModule::checkTemperatures()
     static const float REALLY_HIGH_TEMP = 50.0f; //deg C
 
     std::vector<float> newTemps = vectorizeTemperatures(temperaturesInput.message());
-
     if (frameCount == 0)
     {
         lastTemps = newTemps;
         return;
     }
-
     bool sayWarning = false;
     for(int joint = 0;
         joint < temperaturesInput.message().GetDescriptor()->field_count();
