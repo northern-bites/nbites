@@ -5,7 +5,8 @@ DEBUG_ORBIT = False
 # Transitions' Constants
 # Ball on and off frame thresholds
 BALL_ON_THRESH = 1
-BALL_OFF_THRESH = 60
+# TODO was at 60
+BALL_OFF_THRESH = 10
 BALL_OFF_KICK_THRESH = 4 # 4 seconds, time threshold!
 
 # Should position for kick
@@ -52,9 +53,9 @@ STOP_DRIBBLE_X = SHOULD_DRIBBLE_X + 20
 STOP_DRIBBLE_Y = SHOULD_DRIBBLE_Y + 20
 STOP_DRIBBLE_BEARING = 40.0
 
-# States' constants
-# turnToBall
-FIND_BALL_SPIN_SPEED = .5
+# Spin To Ball
+FIND_BALL_SPIN_SPEED = .7
+FACING_BALL_ACCEPTABLE_BEARING = 1.5
 
 # find ball
 SPUN_ONCE_TIME_THRESH = 7

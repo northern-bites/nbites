@@ -254,6 +254,10 @@ void FieldViewerPainter::paintRobotLocation(QPaintEvent* event,
                      size * std::sin(loc.h()) + loc.y());
 }
 
+
+
+
+
 void FieldViewerPainter::handleZoomIn()
 {
     scaleFactor += .1;
@@ -273,6 +277,7 @@ void FieldViewerPainter::updateWithLocationMessage(messages::RobotLocation newLo
         repaint();
     }
 }
+
 
 void FieldViewerPainter::updateWithParticleMessage(messages::ParticleSwarm newSwarm)
 {
