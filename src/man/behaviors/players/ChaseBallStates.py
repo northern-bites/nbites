@@ -213,11 +213,13 @@ def positionForKick(player):
     elif player.brain.ball.vis.on: # don't update if we don't see the ball
         # slows down the walk when very close to the ball to stabalize motion kicking and to not walk over the ball
         if player.motionKick:
-            if not positionForKick.slowDown and player.brain.ball.distance < constants.SLOW_DOWN_TO_BALL_DIST:
+            if (not positionForKick.slowDown and 
+                player.brain.ball.distance < constants.SLOW_DOWN_TO_BALL_DIST):
                 positionForKick.slowDown = True
                 player.brain.nav.destinationWalkTo(positionForKick.kickPose,
                                            Navigator.SLOW_SPEED)
-            elif positionForKick.slowDown and player.brain.ball.distance >= constants.SLOW_DOWN_TO_BALL_DIST:
+            elif (positionForKick.slowDown and 
+                player.brain.ball.distance >= constants.SLOW_DOWN_TO_BALL_DIST):
                 positionForKick.slowDown = False
                 player.brain.nav.destinationWalkTo(positionForKick.kickPose,
                                            Navigator.GRADUAL_SPEED)

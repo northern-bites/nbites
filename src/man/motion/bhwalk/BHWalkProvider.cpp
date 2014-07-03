@@ -240,10 +240,10 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
                     motionRequest.walkRequest.kickType = WalkRequest::right;
                 }
                 else if (command->kickType == 4){
-                    motionRequest.walkRequest.kickType = WalkRequest::outwardSideKickLeft;
+                    motionRequest.walkRequest.kickType = WalkRequest::diagonalLeft;
                 }
                 else {
-                    motionRequest.walkRequest.kickType = WalkRequest::outwardSideKickRight;
+                    motionRequest.walkRequest.kickType = WalkRequest::diagonalRight;
                 }
             }
 

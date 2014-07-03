@@ -73,11 +73,11 @@ RIGHT_SIDE_KICK = Kick("R_Side", x = 17.5, y = -2, h = -90,
 M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 14, y = 3.6)
 M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 14, y = -3.6)
 
-M_LEFT_SIDE =  Kick("M_Left_Side", x = 12.3, y = -.2, h = 45)
-M_RIGHT_SIDE =  Kick("M_Right_Side", x = 12.3, y = .2, h = -45)
+M_LEFT_CHIP_SHOT =  Kick("M_Left_Chip_Shot", x = 12.3, y = -.2, h = 45)
+M_RIGHT_CHIP_SHOT =  Kick("M_Right_Chip_Shot", x = 12.3, y = .2, h = -45)
 
-M_LEFT_SIDE_OUT = Kick("M_Left_Side_Out", x = 13.3, y = -2.6, h = 90)
-M_RIGHT_SIDE_OUT = Kick("M_Right_Side_Out", x = 13.3, y = 2.6, h = -90)
+M_LEFT_SIDE = Kick("M_Left_Side", x = 13.4, y = -2.7, h = 90)
+M_RIGHT_SIDE = Kick("M_Right_Side", x = 13.4, y = 2.7, h = -90)
 
 # Not used 04-19-13
 LEFT_SHORT_SIDE_KICK =  Kick("L_Short_Side", x = 15.5, y = -.5,
@@ -158,7 +158,7 @@ def chooseAlignedKickFromKick(player, kick):
             return LEFT_SHORT_BACK_KICK
         else:
             return RIGHT_SHORT_BACK_KICK
-    elif "Side" in kick.name:
+    elif ("Side" in kick.name) or ("Chip" in kick.name):
         return kick
     elif (kick == ORBIT_KICK_POSITION):
         return kick

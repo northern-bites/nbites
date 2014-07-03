@@ -65,8 +65,8 @@ class KickDecider(object):
         self.kicks.append(kicks.M_RIGHT_STRAIGHT)
         self.kicks.append(kicks.M_LEFT_SIDE)
         self.kicks.append(kicks.M_RIGHT_SIDE)
-        self.kicks.append(kicks.M_LEFT_SIDE_OUT)
-        self.kicks.append(kicks.M_RIGHT_SIDE_OUT)
+        self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+        self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
 
         self.scoreKick = self.minimizeOrbitTime
 
@@ -83,8 +83,8 @@ class KickDecider(object):
         self.kicks.append(kicks.M_RIGHT_STRAIGHT)
         self.kicks.append(kicks.M_LEFT_SIDE)
         self.kicks.append(kicks.M_RIGHT_SIDE)
-        self.kicks.append(kicks.M_LEFT_SIDE_OUT)
-        self.kicks.append(kicks.M_RIGHT_SIDE_OUT)
+        self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+        self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
 
         self.scoreKick = self.minimizeDistanceToGoal
 

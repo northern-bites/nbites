@@ -7,60 +7,39 @@ from math import fabs, degrees
 @superState('gameControllerResponder')
 def findBall(player):
     """
-    State to spin to find the ball.
+    Decides what type of search to do.
     """
     if player.firstFrame():
-        player.brain.tracker.stopHeadMoves()
-        player.stopWalking()
         player.inKickingState = False
 
-    if transitions.shouldChaseBall(player):
-        player.stopWalking()
-        player.brain.tracker.trackBall()
-        return player.goLater('spinToFoundBall')
-
-    if player.brain.nav.isStopped() and player.brain.tracker.isStopped():
-        #TODO CONST
-        if degrees(player.brain.ball.bearing) >= 25:
-            my = player.brain.loc
-            ball = Location(player.brain.ball.x, player.brain.ball.y)
-            spinDir = my.spinDirToPoint(ball)
-            player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
-
-            player.brain.tracker.lookToSpinDirection(spinDir)
+        distance = player.brain.ball.distance
+        if distance > constants.FAR_BALL_SEARCH_DIST:
+            return player.goNow('farBallSearch')
+            
+        bearing = fabs(degrees(player.brain.ball.bearing))
+        if distance <= constants.SCRUM_DIST and bearing < constants.SPIN_SEARCH_BEARING:
+            return player.goNow('scrumStrategy')
         else:
-            return player.goNow('findBallForward')
-
-    if transitions.spunOnce(player):
-        return player.goLater('playOffBall')
-
-    return player.stay()
+            return player.goNow('spinSearch')
 
 @superState('gameControllerResponder')
-def spinToFoundBall(player):
+@stay
+@ifSwitchLater(transitions.spunOnce, 'playOffBall')
+@ifSwitchLater(transitions.shouldChaseBall, 'spinToFoundBall')
+def spinSearch(player):
     """
-    spins to the ball until it is facing the ball 
+    spins and looks to the direction where the ball is thought to be
     """
     if player.firstFrame():
-        player.brain.tracker.trackBall()
-        print "spinning to found ball"
-
-    theta = math.degrees(player.brain.ball.bearing)
-    spinToFoundBall.isFacingBall = math.fabs(theta) <= constants.FACING_BALL_ACCEPTABLE_BEARING
-
-    if spinToFoundBall.isFacingBall:
-        print "facing ball"
-        return player.goNow('approachBall')
-
-    # spins the appropriate direction
-    if theta < 0:
-        player.brain.nav.walk(0., 0., -1*constants.FIND_BALL_SPIN_SPEED)
-    else:
-        player.brain.nav.walk(0., 0., constants.FIND_BALL_SPIN_SPEED)
-
-    return player.stay()
+        my = player.brain.loc
+        ball = Location(player.brain.ball.x, player.brain.ball.y)
+        spinDir = my.spinDirToPoint(ball)
+        player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
+        player.brain.tracker.lookToSpinDirection(spinDir)
 
 @superState('gameControllerResponder')
+@stay
+@ifSwitchLater(transitions.shouldFindBall, 'findBall')
 def spinToFoundBall(player):
     """
     spins to the ball until it is facing the ball 
@@ -70,11 +49,11 @@ def spinToFoundBall(player):
         print "spinning to found ball"
 
     theta = degrees(player.brain.ball.bearing)
-    spinToFoundBall.isFacingBall = fabs(theta) <= constants.FACING_BALL_ACCEPTABLE_BEARING
+    spinToFoundBall.isFacingBall = (fabs(theta) <= constants.FACING_BALL_ACCEPTABLE_BEARING)
 
     if spinToFoundBall.isFacingBall:
         print "facing ball"
-        return player.goNow('approachBall')
+        return player.goLater('approachBall')
 
     # spins the appropriate direction
     if theta < 0.:
@@ -82,35 +61,51 @@ def spinToFoundBall(player):
     else:
         player.brain.nav.walk(0., 0., constants.FIND_BALL_SPIN_SPEED)
 
-    return player.stay()
-
 @defaultState('backPedal')
 @superState('gameControllerResponder')
 @ifSwitchLater(transitions.shouldChaseBall, 'spinToFoundBall')
-def findBallForward(player):
+def scrumStrategy(player):
+    """
+    super state of the strategy to search for balls lost in front of robot
+    """
     pass
 
-#TODO CONSTS
-@superState('findBallForward')
+@superState('scrumStrategy')
+@stay
 def backPedal(player):
     if player.firstFrame():
-        player.setWalk(-.6, 0., 0.)
+        player.setWalk(constants.BACK_PEDAL_SPEED, 0., 0.)
 
-    elif player.stateTime > 3:
+    elif player.stateTime > constants.BACK_PEDAL_TIME:
         return player.goLater('spinForwardSearch')
 
-    return player.stay()
-
-#TODO CONSTS
-@superState('findBallForward')
+@superState('scrumStrategy')
+@stay
 def spinForwardSearch(player):
     if player.firstFrame():
         my = player.brain.loc
         ball = Location(player.brain.ball.x, player.brain.ball.y)
         spinDir = my.spinDirToPoint(ball)
-        player.setWalk(.1, .8*spinDir*-1, .3*spinDir*constants.FIND_BALL_SPIN_SPEED)
-        player.brain.tracker.lookToAngle(spinDir*15)
+        X = constants.FRONT_SPIN_SEARCH_SPEED_X
+        Y = constants.FRONT_SPIN_SEARCH_SPEED_Y
+        H = constants.FRONT_SPIN_SEARCH_SPEED_H
+        player.setWalk(X, Y*spinDir, H*spinDir)
+        player.brain.tracker.lookToAngle(spinDir*constants.FRONT_SPIN_LOOK_TO_ANGLE)
     if transitions.spunOnce(player):
         return player.goLater('playOffBall')
 
-    return player.stay()
+@defaultState('walkToBallModel')
+@superState('gameControllerResponder')
+@ifSwitchLater(transitions.shouldChaseBall, 'spinToFoundBall')
+def farBallSearch(player):
+    pass
+
+#TODO consts
+@superState('farBallSearch')
+@stay
+def walkToBallModel(player):
+    if player.firstFrame():
+        player.brain.nav.chaseBall(.5, fast = True)
+        player.brain.tracker.repeatFastNarrowPan()
+    elif player.stateTime > 5:
+        return player.goLater('spinSearch')

@@ -74,14 +74,16 @@ class HeadTracker(FSA.FSA):
             self.switchTo('repeatHeadMove')
 
     ##################### Fixed Pitch #######################
+    def performBasicPan(self):
+        '''Perform the basic fixed pitch pan once.'''
+        self.performHeadMove(HeadMoves.FIXED_PITCH_PAN)
 
     def repeatBasicPan(self):
         '''Repeat the basic fixed pitch pan.'''
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN)
-
-    def performBasicPan(self):
-        '''Perform the basic fixed pitch pan once.'''
-        self.performHeadMove(HeadMoves.FIXED_PITCH_PAN)
+    
+    def performWidePan(self):
+        self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
 
     def repeatWidePan(self):
         """
@@ -94,8 +96,8 @@ class HeadTracker(FSA.FSA):
         '''Repeat the narrow fixed pitch pan.'''
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN_NARROW)
 
-    def performWidePan(self):
-        self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
+    def repeatFastNarrowPan(self):
+        self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN_NARROW_FAST)
 
     def performBasicPan(self):
         self.performHeadMove(HeadMoves.FIXED_PITCH_PAN)
