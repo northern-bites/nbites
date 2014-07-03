@@ -118,7 +118,7 @@ void SharedBallModule::eliminateBadRobots()
 }
 
 /* Calculates a weighted average of the robot's ball locations, where
- * weight is determined by distance to the ball and uncertainty.
+ * weight is determined by distance to the ball.
  * The goalie's estimate is weighted twice as much.
  */
 void SharedBallModule::weightedavg()
@@ -126,9 +126,9 @@ void SharedBallModule::weightedavg()
     float numx = 0;       // numerator of weighted average of x
     float numy = 0;       // numerator of weighted average of y
     float sumweight = 0;  // denominator of weighted average = sum of weights
-    float weight = 0;     // determined by distance to ball and uncertainty
+    float weight = 0;     // determined by distance to ball
     float tempx, tempy;
-    float uncert, dist, hb, sinHB, cosHB;
+    float dist, hb, sinHB, cosHB;
     int weightFactor;
 
     for (int i=0; i<NUM_PLAYERS_PER_TEAM; i++) {
@@ -146,8 +146,7 @@ void SharedBallModule::weightedavg()
             weightFactor = 1;
         }
 
-        uncert = messages[i].my_uncert();
-        weight = weightFactor/(messages[i].ball_dist() * uncert);
+        weight = weightFactor/(messages[i].ball_dist());
 
         numx += tempx * weight;
         numy += tempy * weight;
@@ -244,9 +243,8 @@ float SharedBallModule::getBallDistanceSquared(int i, int j)
 void SharedBallModule::incorporateGoalieWorldModel(messages::WorldModel newModel)
 {
     if(newModel.ball_on()) {
-        float uncert = newModel.my_uncert();
         float dist = newModel.ball_dist();
-        weight = 1/(dist * uncert);
+        weight = 1/(dist);
 
         float hb = TO_RAD*HEADING_RIGHT + TO_RAD*newModel.ball_bearing();
         float sinHB, cosHB;
