@@ -1,6 +1,7 @@
 import RoleConstants as role
 import ClaimTransitions as claimTransitions
 import SharedTransitions as shared
+import ChaseBallConstants as chaseConstants
 
 def ballInBox(player):
     """
@@ -21,7 +22,7 @@ def ballNotInBox(player):
     """
     return not ballInBox(player)
 
-def ballInBufferedBox(player):
+def ballNotInBufferedBox(player):
     """
     A transition which allows a stretching of a box so that the box isn't
     so ridged. Intended use is for in approachBall, ensuring that we don't loop
@@ -29,19 +30,12 @@ def ballInBufferedBox(player):
     """
     ball = player.brain.ball
     buf = role.boxBuffer
+    inBox = (ball.x > player.box[0][0] - buf and ball.y > player.box[0][1] - buf and \
+            ball.x < player.box[0][0] + player.box[1] + buf and \
+            ball.y < player.box[0][1] + player.box[2] + buf)
 
-    if ball.vis.frames_on > 0:
-        if role.isChaser(player.role):
-            return True
-        return (ball.x > player.box[0][0] - buf and ball.y > player.box[0][1] - buf and \
-                ball.x < player.box[0][0] + player.box[1] + buf and \
-                ball.y < player.box[0][1] + player.box[2] + buf)
-
-def ballNotInBufferedBox(player):
-    """
-    Simple negation of ballInBufferedBox
-    """
-    return not ballInBufferedBox(player)
+    return (ball.vis.frames_off > chaseConstants.BALL_OFF_THRESH or 
+            (not inBox and not role.isChaser(player.role)))
 
 def tooFarFromHome(threshold):
     """

@@ -82,7 +82,6 @@ void CameraCalibrate::UpdateByName(std::string name)
         paramsBottom[ROLL] = 0.0f;
         paramsBottom[PITCH] = 0.09f;
     }
-
     UpdateWithParams(paramsTop, paramsBottom);
 }
 

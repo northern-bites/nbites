@@ -87,6 +87,10 @@ def setDestination(nav, dest, gain = 1.0, kick = None):
             command.dest.kick.kick_type = 2
         elif kick == kicks.M_RIGHT_STRAIGHT:
             command.dest.kick.kick_type = 3
+        elif kick == kicks.M_LEFT_CHIP_SHOT:
+            command.dest.kick.kick_type = 4
+        elif kick == kicks.M_RIGHT_CHIP_SHOT:
+            command.dest.kick.kick_type = 5
         else:
             raise TypeError, "Kick passed in is not a registered motion kick."
 
