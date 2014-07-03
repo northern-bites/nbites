@@ -3,6 +3,7 @@ from ..util import MyMath as MyMath
 from .. import StiffnessModes
 from math import fabs, degrees
 import HeadMoves
+import math
 
 class HeadTrackingHelper(object):
     def __init__(self, tracker):
@@ -201,7 +202,6 @@ class HeadTrackingHelper(object):
 
         command.timestamp = int(self.tracker.brain.time * 1000)
 
-
     # Unsafe to call... TODO: CoordHeadCommands for messages.
     def lookAtTarget(self, target):
 
@@ -210,24 +210,25 @@ class HeadTrackingHelper(object):
         Method is unsafe to call!!
         '''
         print ("HeadTrackingHelper.lookAtTarget method was called. METHOD IS UNSAFE! Looking in general direction of target in lieu of using target's exact loc values.")
-        self.lookToPoint(target)
+#        self.lookToPoint(target)
 
-        # if hasattr(target, "height"):
-        #     height = target.height
-        # else:
-        #     height = 0
+        if hasattr(target, "height"):
+             height = target.height
+        else:
+             height = 0
 
-        # if hasattr(target, "loc"):
-        #     target = target.loc
+        if hasattr(target, "loc"):
+             target = target.loc
 
-        # print str(target.rel_x) + " " + str(target.rel_y)
+        print str(target.rel_x) + " " + str(target.rel_y)
 
-        # headMove = motion.CoordHeadCommand(relX = target.rel_x,
-        #                                    relY = target.rel_y,
-        #                                    relZ = height)
+        headMove = self.tracker.brain.motion.CoordHeadCommand(relX = target.rel_x,
+                                            relY = target.rel_y,
+                                            relZ = height)
 
-        # self.tracker.brain.motion.coordHead(headMove)
-        # return headMove
+        self.tracker.brain.motion.coordHead(headMove)
+        return headMove
+
 
     def lookToPoint(self, target):
         """
@@ -256,8 +257,38 @@ class HeadTrackingHelper(object):
             pitch = 17.0
 
         return (((yaw, pitch),
-                 2.0, 1, StiffnessModes.LOW_HEAD_STIFFNESSES),)
+                 .5, 1, StiffnessModes.LOW_HEAD_STIFFNESSES),)
+
+
+
         # TODO: use constants above
+
+    def lookToXY(self, x, y):
+        self.tracker.target.x = x
+        self.tracker.target.y = y
+        heading = self.tracker.brain.loc.h
+        robx = self.tracker.brain.loc.x
+        roby = self.tracker.brain.loc.y
+        yaw = math.degrees(math.atan((y-roby)/(x-robx)))
+        if robx > x:
+            if roby < y:
+                yaw = 180 + yaw
+            else:
+                yaw = -180 + yaw
+        yaw = yaw - heading
+        curYaw  = degrees(self.tracker.brain.interface.joints.head_yaw)
+        maxSpeed = 2.0
+
+        # Set motion message fields
+        command = self.tracker.brain.interface.headMotionCommand
+        command.type = command.CommandType.POS_HEAD_COMMAND
+
+        command.pos_command.head_yaw = yaw
+        command.pos_command.head_pitch = constants.FIXED_PITCH_VALUE
+        command.pos_command.max_speed_yaw = maxSpeed
+        command.pos_command.max_speed_pitch = maxSpeed
+
+        command.timestamp = int(self.tracker.brain.time * 1000)
 
     def bounceTrackball(self):
         """
