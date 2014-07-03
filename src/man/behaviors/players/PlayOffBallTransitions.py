@@ -61,6 +61,7 @@ def tooFarFromHome(threshold):
 
 def shouldApproachBall(player):
     if ballNotInBox(player):
+        player.claimedBall = False
         return False
 
     if claimTransitions.shouldCedeClaim(player):
