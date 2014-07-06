@@ -8,10 +8,16 @@ DEBUG = False
 def tracking(tracker):
     """
     While the target is visible, track it via vision values.
-    If the target is lost, switches to fullPan.
+    If the target is lost, switches to altTrackSharedBallAndPan if shared ball
+    is reliable and fullPan if shared ball is not realiable.
     """
     # If the target is not in vision, trackObjectFixedPitch will track via loc.
     tracker.helper.trackObject()
+
+    # If cannot see ball and shared ball is reliable, go to altTrackSharedBallAndPan
+    if (tracker.target.vis.frames_off > 15  and tracker.brain.sharedBall.ball_on and
+        tracker.brain.sharedBall.reliability >= 2 and tracker.counter > 15):
+        return tracker.goLater('altTrackSharedBallAndPan')
 
     if not tracker.target.vis.on and tracker.counter > 15:
         if DEBUG : tracker.printf("Missing object this frame",'cyan')

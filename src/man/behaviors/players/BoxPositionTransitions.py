@@ -65,3 +65,15 @@ def shouldApproachBall(player):
         return False
 
     return True
+
+def shouldFindSharedBall(player):
+    return (player.brain.sharedBall.ball_on and
+            player.brain.sharedBall.reliability >= 2)
+
+def shouldStopLookingForSharedBall(player):
+    return not shouldFindSharedBall(player)
+
+def shouldBeSupporter(player):
+    # TODO does the ball need to be in robot's box?
+    return ballInBox(player) and claimTransitions.shouldCedeClaim(player)
+
