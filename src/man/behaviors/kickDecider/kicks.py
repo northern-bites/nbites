@@ -10,19 +10,19 @@ class Kick(object):
     kick.
     """
     def __init__(self, _name, x=16, y=0, h=0,
-                 move=None, maxDist=300):
+                 dist=100, move=None):
         self.name = _name
         self.sweetMove = move
 
         # TODO use destination objects
-        self.setupX = x
-        self.setupY = y
-        self.setupH = h
+        self.setupX = x                  # sweet spot
+        self.setupY = y                  # sweet spot
+        self.setupH = h                  # global heading for kick allignment
 
-        self.destinationX = 0            # set by kickDecider
-        self.destinationY = 0            # set by kickDecider
+        self.destinationX = 0            # where the kick is meant to go
+        self.destinationY = 0            # where the kick is meant to go
 
-        self.maxDist = maxDist           # upper limit of the range of the kick
+        self.distance = dist             # range of the kick
 
     def getPosition(self):
         return (self.setupX, self.setupY, self.setupH)
@@ -51,33 +51,45 @@ class Kick(object):
 # Some standard kicks. x, y, and move should not be modified unless you change
 # the sweetMove. Here heading indicates where one should setup to kick in a
 # particular direction, but it will be modified later on to indicate where the
-# robot needs to orbit to.
+# robot needs to orbit to. Dist indicates how far the kick goes on average.
 
 # Sweet move-based kicks
-LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 18.0, y =  4.3, 
+LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", 
+                                 x = 18.0, y =  4.3,
+                                 dist = 250,
                                  move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
-RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 18.0, y = -4.3,
+RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", 
+                                 x = 18.0, y = -4.3,
+                                 dist = 250,
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 
-LEFT_BIG_KICK =  Kick("L_Big_Straight", x = 15.5, y =  4.5,
+LEFT_BIG_KICK =  Kick("L_Big_Straight", 
+                      x = 15.5, y =  4.5,
+                      dist = 350,
                       move=SweetMoves.LEFT_BIG_KICK)
-RIGHT_BIG_KICK = Kick("R_Big_Straight", x = 15.5, y = -4.5,
+RIGHT_BIG_KICK = Kick("R_Big_Straight", 
+                      x = 15.5, y = -4.5,
+                      dist = 350,
                       move=SweetMoves.RIGHT_BIG_KICK)
 
-LEFT_SIDE_KICK =  Kick("L_Side", x = 17.5, y =  2, h = 90,
+LEFT_SIDE_KICK =  Kick("L_Side", 
+                       x = 17.5, y =  2, h = 90,
+                       dist = 150,
                        move=SweetMoves.GOOGZ_LEFT_SIDE_KICK)
-RIGHT_SIDE_KICK = Kick("R_Side", x = 17.5, y = -2, h = -90,
+RIGHT_SIDE_KICK = Kick("R_Side", 
+                       x = 17.5, y = -2, h = -90,
+                       dist = 150,
                        move=SweetMoves.GOOGZ_RIGHT_SIDE_KICK)
 
 # Motion kicks
-M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 14, y = 3.6)
-M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 14, y = -3.6)
+M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 14, y = 3.6, dist = 70)
+M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 14, y = -3.6, dist = 70)
 
-M_LEFT_CHIP_SHOT =  Kick("M_Left_Chip_Shot", x = 12.3, y = -.2, h = 45)
-M_RIGHT_CHIP_SHOT =  Kick("M_Right_Chip_Shot", x = 12.3, y = .2, h = -45)
+M_LEFT_CHIP_SHOT =  Kick("M_Left_Chip_Shot", x = 12.3, y = -.2, h = 45, dist = 70)
+M_RIGHT_CHIP_SHOT =  Kick("M_Right_Chip_Shot", x = 12.3, y = .2, h = -45, dist = 70)
 
-M_LEFT_SIDE = Kick("M_Left_Side", x = 13.4, y = -2.7, h = 90)
-M_RIGHT_SIDE = Kick("M_Right_Side", x = 13.4, y = 2.7, h = -90)
+M_LEFT_SIDE = Kick("M_Left_Side", x = 13.4, y = -2.7, h = 90, dist = 70)
+M_RIGHT_SIDE = Kick("M_Right_Side", x = 13.4, y = 2.7, h = -90, dist = 70)
 
 # Not used 04-19-13
 LEFT_SHORT_SIDE_KICK =  Kick("L_Short_Side", x = 15.5, y = -.5,
@@ -109,9 +121,6 @@ RIGHT_SHORT_BACK_KICK = Kick("R_Short_Back", x = 16.8, y = -4,
 # Dribble kick just tells player to run thru the ball, no actual sweet move
 LEFT_DRIBBLE =  Kick("L_Dribble", x = 0, y = 3.0)
 RIGHT_DRIBBLE =  Kick("R_Dribble", x = 0, y = -3.0)
-
-# Used when we haven't decided what kick to do yet
-ORBIT_KICK_POSITION = Kick("NULL_KICK", x = 12, y = 0)
 
 # TODO automate/generalize this?
 def chooseAlignedKickFromKick(player, kick):
