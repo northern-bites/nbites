@@ -17,7 +17,13 @@ option(
 
 option(
   USE_SPL_COMM
-  "Use the SPL's Standard Message rather than protobufs for comm"
+  "Use the SPL Standard Message rather than protobufs for comm"
+  OFF
+)
+
+option(
+  USE_V5
+  "Turn on if robot is a V5"
   OFF
 )
 

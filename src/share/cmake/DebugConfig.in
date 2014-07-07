@@ -67,6 +67,12 @@
 #   undef USE_SPL_COMM
 #endif
 
+#define USE_V5_${USE_V5}
+#ifdef  USE_V5_ON
+#   define USE_V5
+#else
+#   undef USE_V5
+#endif
 
 #define USE_LOGGING_${USE_LOGGING}
 #ifdef  USE_LOGGING_ON
