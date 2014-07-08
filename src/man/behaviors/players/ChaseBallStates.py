@@ -25,10 +25,10 @@ def approachBall(player):
         player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
                                                  0.8, 10)
         player.motionKick = False
-        player.inKickingState = False
         player.brain.tracker.trackBall()
         if player.shouldKickOff:
-            player.brain.nav.chaseBall(Navigator.MEDIUM_SPEED, fast = True)
+            player.inKickOffPlay = True
+            return player.goNow('giveAndGo')
         elif player.penaltyKicking:
             return player.goNow('prepareForPenaltyKick')
         else:
@@ -37,14 +37,7 @@ def approachBall(player):
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
 
-        if player.shouldKickOff:
-            if player.brain.ball.rel_y > 0:
-                player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
-            else:
-                player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
-            return player.goNow('positionForKick')
-        else:
-            return player.goNow('positionAndKickBall')
+        return player.goNow('positionAndKickBall')
 
 @defaultState('prepareForKick')
 @superState('gameControllerResponder')
@@ -55,7 +48,7 @@ def positionAndKickBall(player):
     """
     Superstate used to position for kick and kick the ball when close enough.
     """
-    player.inKickingState = True
+    pass
 
 @superState('positionAndKickBall')
 def prepareForKick(player):
@@ -63,15 +56,16 @@ def prepareForKick(player):
         prepareForKick.decider = KickDecider.KickDecider(player.brain)
         player.brain.nav.stand()
 
-    if player.brain.ball.distance > constants.APPROACH_BALL_AGAIN_DIST:
-        # Ball has moved away. Go get it!
-        return player.goLater('chase')
+    if not player.inKickOffPlay:
+        if USE_MOTION_KICKS:
+            player.kick = prepareForKick.decider.motionKicks()
+        else:
+            player.kick = prepareForKick.decider.sweetMovesOnGoal()
 
-    player.inKickingState = True
-    if USE_MOTION_KICKS:
-        player.kick = prepareForKick.decider.motionKicks()
-    else:
-        player.kick = prepareForKick.decider.sweetMovesOnGoal()
+        player.inKickingState = True
+
+    elif player.finishedPlay:
+        player.inKickOffPlay = False
 
     print "HEADINGS..."
     print player.kick.setupH

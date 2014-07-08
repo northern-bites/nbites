@@ -94,6 +94,39 @@ class KickDecider(object):
         # TODO add filter for out of bounds balls
         return (kick for kick in self.possibleKicks).next().next()
 
+    def motionKicksForKickOff(self):
+        self.brain.player.motionKick = False
+
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+
+        self.scoreKick = self.minimizeOrbitTime
+
+        self.clearPossibleKicks()
+        destX = nogginC.FIELD_WHITE_WIDTH
+        destY = nogginC.FIELD_WHITE_HEIGHT
+        dest = Location(destX, destY)
+        self.addPassesTo(dest)
+
+        return (kick for kick in self.possibleKicks).next().next()
+
+    def sweetMoveCrossToCenter(self):
+        self.brain.player.motionKick = True
+
+        self.kicks = []
+        self.kicks.append(kicks.M_LEFT_STRAIGHT)
+        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
+        self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+        self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
+
+        self.scoreKick = self.minimizeOrbitTime
+
+        self.clearPossibleKicks()
+        self.addPassesToFieldCross()
+
+        return (kick for kick in self.possibleKicks).next().next()
+
     def motionKicks(self):
         if self.brain.loc.distTo(Location(nogginC.OPP_GOALBOX_RIGHT_X,
                                           nogginC.CENTER_FIELD_Y)) < constants.SHOT_THRESHOLD:
@@ -122,7 +155,7 @@ class KickDecider(object):
         self.possibleKicks = itertools.chain(self.possibleKicks,
                                              [self.generateKicksFromGoalDest(location.x,
                                                                              location.y,
-                                                                             constants.PASS_PRECISION)])
+                                                                             constants.SHOT_PRECISION)])
 
     def addPassesToFieldCross(self):
         betweenFieldCrossAndGoalBoxLeft = (nogginC.LANDMARK_OPP_FIELD_CROSS[0] +

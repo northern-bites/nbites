@@ -39,14 +39,14 @@ def shouldSpinToBall(player):
     """
     We're not facing the ball well enough
     """
-    return fabs(degrees(player.brain.ball.bearing)) > constants.SHOULD_SPIN_TO_BALL_BEARING
+    return fabs(degrees(player.brain.ball.bearing)) > constants.SHOULD_SPIN_TO_BALL_BEARING and not player.inKickOffPlay
 
 def shouldApproachBallAgain(player):
     """
     The ball got really far away somehow
     """
     ball = player.brain.ball
-    return ball.vis.on and ball.distance > constants.APPROACH_BALL_AGAIN_DIST
+    return ball.vis.on and ball.distance > constants.APPROACH_BALL_AGAIN_DIST and not player.inKickOffPlay
 
 def shouldRedecideKick(player):
     """
@@ -123,7 +123,7 @@ def shouldFindBall(player):
     """
     We lost the ball, scan to find it
     """
-    return (player.brain.ball.vis.frames_off > constants.BALL_OFF_THRESH)
+    return (player.brain.ball.vis.frames_off > constants.BALL_OFF_THRESH) and not player.inKickOffPlay
 
 def shouldFindBallKick(player):
     """
