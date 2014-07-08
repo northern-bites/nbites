@@ -1,11 +1,6 @@
-#
-# A behavior to test kicking. States are defined as methods in Kicking States
-# Note that it is crucial to implement the appropriate game controller states
-# that you wish to override. (By default they do  nothing.)
-# By inheriting from the SoccerFSA, we only need to set the name of the player
-# and add any additional gourps of states. (GameControlerStates are added in the
-# super class.)
-#
+"""
+A behavior to test kicking. States are defined as functions in KickingStates.
+"""
 
 from . import SoccerFSA
 from . import FallControllerStates

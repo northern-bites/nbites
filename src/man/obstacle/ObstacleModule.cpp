@@ -37,7 +37,7 @@ void ObstacleModule::run_()
 
     portals::Message<messages::Obstacle> current(0);
 
-// #ifdef USING_LAB_FIELD // Walls are too close to field for sonar use
+// #ifdef USE_LAB_FIELD // Walls are too close to field for sonar use
     sonars = Obstacle::NONE;
 // #endif
 

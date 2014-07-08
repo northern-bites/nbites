@@ -3,7 +3,7 @@
  *
  * The file contains the definition of the class SampleSet and SampleSetProxy.
  *
- * @author <A href=mailto:roefer@tzi.de>Thomas Röfer</A>
+ * @author <A href=mailto:roefer@tzi.de>Thomas RÃ¶fer</A>
  */
 
 #pragma once
@@ -18,12 +18,12 @@
 class SelfLocatorSample
 {
 public:
-  Vector2<int> translation,   /**< The position in mm. */
-          rotation;      /**< Cosinus and sinus of the rotation multiplied by 1024. */
-  float angle,               /**< The rotation in radians. */
-        weighting;           /**< The weighting of a sample*/
-  int cluster;                /**< The number of the cluster this sample belongs to*/
-  SelfLocatorSample* next;               /**< The next robot sample when clustering samples using binning. */
+  Vector2BH<float> translation;   /**< The position in mm. */
+  Vector2BH<int> rotation;        /**< Cosinus and sinus of the rotation multiplied by 1024. */
+  float angle,                  /**< The rotation in radians. */
+        weighting;              /**< The weighting of a sample*/
+  int cluster;                  /**< The number of the cluster this sample belongs to*/
+  SelfLocatorSample* next;      /**< The next robot sample when clustering samples using binning. */
 
   /** Default constructor*/
   SelfLocatorSample() : rotation(1024, 0), angle(0), weighting(1.0f), cluster(0), next(0) {}
@@ -31,9 +31,9 @@ public:
   /** Conversion to general pose
   * @return a pose
   */
-  Pose2D toPose() const
+  Pose2DBH toPose() const
   {
-    return Pose2D(angle, (float) translation.x, (float) translation.y);
+    return Pose2DBH(angle, translation.x, translation.y);
   }
 };
 

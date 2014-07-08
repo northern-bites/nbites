@@ -23,6 +23,8 @@
 // Motion commands
 #include "BodyJointCommand.h"
 #include "WalkCommand.h"
+#include "DestinationCommand.h"
+#include "StepCommand.h"
 #include "FreezeCommand.h"
 #include "UnfreezeCommand.h"
 
@@ -167,6 +169,7 @@ public:
     int getFrameCount() const { return frameCount; }
 
     bool calibrated() { return walkProvider.calibrated(); }
+    bool upright() { return walkProvider.upright(); }
 
     /**
      * @brief Generates a JointAngles message from a series

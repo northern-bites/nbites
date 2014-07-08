@@ -1,8 +1,3 @@
-#
-# This file defines the states necessary for kick testing. Each method
-# defines a state.
-#
-
 from ..headTracker import HeadMoves
 from .. import SweetMoves
 from ..util import *
@@ -36,6 +31,6 @@ def gamePenalized(player):
 @superState('gameControllerResponder')
 def kick(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.LEFT_STRAIGHT_KICK)
+        player.executeMove(SweetMoves.GOALIE_ROLL_OUT_MEGAN)
 
     return player.stay()

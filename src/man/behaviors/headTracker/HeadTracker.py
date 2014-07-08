@@ -74,14 +74,16 @@ class HeadTracker(FSA.FSA):
             self.switchTo('repeatHeadMove')
 
     ##################### Fixed Pitch #######################
+    def performBasicPan(self):
+        '''Perform the basic fixed pitch pan once.'''
+        self.performHeadMove(HeadMoves.FIXED_PITCH_PAN)
 
     def repeatBasicPan(self):
         '''Repeat the basic fixed pitch pan.'''
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN)
-
-    def performBasicPan(self):
-        '''Perform the basic fixed pitch pan once.'''
-        self.performHeadMove(HeadMoves.FIXED_PITCH_PAN)
+    
+    def performWidePan(self):
+        self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
 
     def repeatWidePan(self):
         """
@@ -94,8 +96,8 @@ class HeadTracker(FSA.FSA):
         '''Repeat the narrow fixed pitch pan.'''
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN_NARROW)
 
-    def performWidePan(self):
-        self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
+    def repeatFastNarrowPan(self):
+        self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN_NARROW_FAST)
 
     def performBasicPan(self):
         self.performHeadMove(HeadMoves.FIXED_PITCH_PAN)
@@ -111,12 +113,12 @@ class HeadTracker(FSA.FSA):
         When ball is in view, tracks via vision values.
         Once ball is gone for some time, switch to wide pans.
         """
+
         # Check if we're using bounceTracking
         if TrackingConstants.USE_BOUNCE_TRACKING:
             self.bounceTrackBall()
             return
 
-        self.target = self.brain.ball
         if (self.currentState is not 'fullPan' and
             self.currentState is not 'tracking'):
             self.switchTo('tracking')
@@ -135,18 +137,26 @@ class HeadTracker(FSA.FSA):
         if self.currentState is not 'trackingFieldObject':
             self.switchTo('trackingFieldObject')
 
-    def spinPan(self):
+    def lookToSpinDirection(self, direction):
         """
-        Regardless of which direction we are spinning, look directly ahead.
-        This should result in the robot facing the ball when it sees it.
+        Look to the direction we are spinning.
         """
-        self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
+        if direction < 0:
+            self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_LESS_RIGHT)
+        else:
+            self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_LESS_LEFT)
 
     def lookToAngle(self, yaw):
         """
         Look to the given yaw at an appropriate (fixed) pitch.
         """
         self.performHeadMove(self.helper.lookToAngle(yaw))
+
+    def trackSharedBall(self):
+        self.switchTo('trackSharedBall')
+
+    def snapToCorner(self):
+        self.switchTo('snapToCorner')
 
     def lookStraightThenTrack(self):
         """

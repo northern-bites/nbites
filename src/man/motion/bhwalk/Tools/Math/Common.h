@@ -12,33 +12,42 @@
 #include <cmath>
 #include <cstdlib> // std::abs(int)
 
+
+#undef isnan
+#define isnan(x) bhisnan(x)
+
+inline bool bhisnan(float x)
+{
+  return (*(unsigned*) &x & 0x7fffffff) == 0x7fc00000;
+}
+
 /**
 * Returns the sign of a value.
 * \param a The value.
 * \return The sign of \c a.
 */
-template <class V> inline int sgn(const V& a) {return a < 0 ? -1 : ((a == 0) ? 0 : 1);}
+template <class V> inline int sgnBH(const V& a) {return a < 0 ? -1 : ((a == 0) ? 0 : 1);}
 
 /**
 * Calculates the square of a value.
 * \param a The value.
 * \return The square of \c a.
 */
-template <class V> inline V sqr(const V& a) {return a * a;}
+template <class V> inline V sqrBH(const V& a) {return a * a;}
 
 /**
-* Calculates the sec of a value.
+* Calculates the secBH of a value.
 * \param a The value.
-* \return The sec of \c a.
+* \return The secBH of \c a.
 */
-template <class V> inline V sec(const V& a) {return 1 / cos(a);}
+template <class V> inline V secBH(const V& a) {return 1 / cos(a);}
 
 /**
-* Calculates the cosec of a value.
+* Calculates the cosecBH of a value.
 * \param a The value.
-* \return The cosec of \c a.
+* \return The cosecBH of \c a.
 */
-template <class V> inline V cosec(const V& a) {return 1 / sin(a);}
+template <class V> inline V cosecBH(const V& a) {return 1 / sin(a);}
 
 /** @name constants for some often used angles */
 ///@{
@@ -57,10 +66,27 @@ const float pi_4 = pi * 0.25f;
 /** constant for a 3/8 circle*/
 const float pi3_4 = pi * 0.75f;
 /** constant for an expression used by the gaussian function*/
-const float sqrt2pi = sqrtf(2.0f * pi);
+const float sqrt2pi = std::sqrt(2.0f * pi);
 /** constant for converting radians to degrees */
 const float _180_pi = 180.0f / pi;
 ///@}
+
+/** constant for one tLaue in ms */
+const int tLaue = 8004;
+/** constant for one laue in mm */
+const float one_Laue = 1075.f;
+
+/** Converts distance from millimeter to laue.
+* \param distance distance coded in millimeter
+* \return distance coded in laue
+*/
+inline float toLaue(float distance) {return distance / one_Laue;}
+
+/** Converts distance from laue to millimeter.
+* \param distance distance coded in laue
+* \return distance coded in millimeter
+*/
+inline float fromLaue(float distance) {return distance * one_Laue;}
 
 /**
 * Converts angle from rad to degrees.
@@ -86,10 +112,10 @@ template <class V> inline V fromDegrees(const V& degrees) {return degrees * V(pi
 * \param data angle coded in rad
 * \return normalized angle coded in rad
 */
-template <class V> inline V normalize(const V& data)
+template <class V> inline V normalizeBH(const V& data)
 {
   if(data < V(pi) && data >= -V(pi)) return data;
-  V ndata = data - V((int)(data / V(pi2))) * V(pi2);
+  V ndata = data - ((int)(data / V(pi2))) * V(pi2);
   if(ndata >= V(pi))
   {
     ndata -= V(pi2);
@@ -118,5 +144,5 @@ inline int roundNumberToInt(float d)
 */
 inline float roundNumber(float d)
 {
-  return floorf(d + 0.5f);
+  return std::floor(d + 0.5f);
 }

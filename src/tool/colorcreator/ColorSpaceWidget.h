@@ -22,7 +22,7 @@ class ColorSpaceWidget: public QWidget {
     Q_OBJECT;
 
 public:
-    static const float FLOAT_SLIDER_SCALE = 256.0f;
+    static constexpr float FLOAT_SLIDER_SCALE = 256.0f;
 
 public:
     ColorSpaceWidget(ColorSpace* colorSpace, QWidget* parent = NULL);

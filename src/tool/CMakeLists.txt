@@ -18,6 +18,18 @@ set( CMAKE_CXX_FLAGS
 set( CMAKE_C_FLAGS
   "${CMAKE_CXX_FLAGS}" )
 
+# Enable C++11 features for bhuman
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+if(COMPILER_SUPPORTS_CXX11)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+elseif(COMPILER_SUPPORTS_CXX0X)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+else()
+    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
 # Option to turn rebuilding our protobuf libs on/off
 option( BUILD_PROTOBUF "Rebuild the protobuf libraries." OFF )
 if( BUILD_PROTOBUF )
@@ -28,6 +40,7 @@ endif()
 include ( ${SHARE_DIR}/cmake/BuildGTest.cmake )
 
 include( ${SHARE_DIR}/cmake/DebugConfig.cmake)
+
 
 # Configure the debug options
 configure_file(
@@ -89,6 +102,7 @@ add_subdirectory( ${MAN_DIR}/support ${CMAKE_CURRENT_BINARY_DIR}/man/support)
 
 add_subdirectory( ${MAN_DIR}/balltrack ${CMAKE_CURRENT_BINARY_DIR}/man/balltrack)
 add_subdirectory( ${MAN_DIR}/comm ${CMAKE_CURRENT_BINARY_DIR}/man/comm)
+add_subdirectory( ${MAN_DIR}/sharedball ${CMAKE_CURRENT_BINARY_DIR}/man/sharedball)
 add_subdirectory( ${MAN_DIR}/image ${CMAKE_CURRENT_BINARY_DIR}/man/image)
 add_subdirectory( ${MAN_DIR}/localization ${CMAKE_CURRENT_BINARY_DIR}/man/localization)
 add_subdirectory( ${MAN_DIR}/vision ${CMAKE_CURRENT_BINARY_DIR}/man/vision)
@@ -258,6 +272,7 @@ target_link_libraries(
   image # man image
   vision # man vision
   comm # man comm
+  sharedball # man sharedball
   fieldview
   tool_common
   colorcreator
@@ -279,6 +294,7 @@ target_link_libraries(
   unlog
   image_display
   logview
+  sharedball
   fieldview
   worldview
   tool_common
@@ -370,17 +386,6 @@ target_link_libraries(
   ${QT_LIBRARIES}
 )
 
-# Installer tool stuff:
-# add_library(installer
-#   STATIC
-#   Installer.cpp
-#   ${INSTALLER_HEADERS_MOC}
-# )
-# target_link_libraries(installer
-#   tool_common
-#   ${QT_LIBRARIES}
-# )
-# The InstallerTool executable
 add_executable( installer_tool
   ${installer_srcs}
   ${installer_headers_moc}
@@ -390,3 +395,4 @@ target_link_libraries(
   installer_tool
   ${QT_LIBRARIES}
 )
+
