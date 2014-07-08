@@ -188,7 +188,10 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
                 walkingEngine->theMotionRequestBH = motionRequest;
 
             } else {
-                currentCommand = MotionCommand::ptr();
+                MotionRequestBH motionRequest;
+                motionRequest.motion = MotionRequestBH::stand;
+
+                walkingEngine->theMotionRequestBH = motionRequest;
             }
 
         } else {
@@ -223,7 +226,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             motionRequest.walkRequest.target.translation.y = command->y_mm;
 
             // Let's do some motion kicking!
-            if (command->motionKick) {
+            if (command->motionKick && !justMotionKicked) {
                 if (command->kickType == 0) {
                     motionRequest.walkRequest.kickType = WalkRequest::sidewardsLeft;
                 }
@@ -233,14 +236,16 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
                 else if (command->kickType == 2) {
                     motionRequest.walkRequest.kickType = WalkRequest::left;
                 }
-                else {
+                else if (command->kickType == 3){
                     motionRequest.walkRequest.kickType = WalkRequest::right;
                 }
+                else if (command->kickType == 4){
+                    motionRequest.walkRequest.kickType = WalkRequest::diagonalLeft;
+                }
+                else {
+                    motionRequest.walkRequest.kickType = WalkRequest::diagonalRight;
+                }
             }
-            // TODO test motion kicking
-            // else {
-            //     motionRequest.walkRequest.kickType = WalkRequest::none;
-            // }
 
             walkingEngine->theMotionRequestBH = motionRequest;
         }
@@ -293,6 +298,15 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
     WalkingEngineOutputBH output;
     walkingEngine->update(output);
+
+    // Update justMotionKicked so that we do not motion kick multiple times in a row
+    if (output.executedWalk.kickType != WalkRequest::none) { // if we succesfully motion kicked
+        justMotionKicked = true;
+    }
+    else if (walkingEngine->theMotionRequestBH.walkRequest.mode != WalkRequest::targetMode || // else if we are no longer attempting to motion kick
+             !boost::shared_static_cast<DestinationCommand>(currentCommand)->motionKick) {
+        justMotionKicked = false;
+    }
 
     // Ignore the first chain since it's the head
     for (unsigned i = 1; i < Kinematics::NUM_CHAINS; i++) {
@@ -352,7 +366,6 @@ void BHWalkProvider::getOdometryUpdate(portals::OutPortal<messages::RobotLocatio
 }
 
 void BHWalkProvider::hardReset() {
-
     inactive();
 
     // Reset odometry
@@ -406,6 +419,10 @@ void BHWalkProvider::setCommand(const DestinationCommand::ptr command) {
 
 bool BHWalkProvider::calibrated() const {
     return walkingEngine->theInertiaSensorDataBH.calibrated;
+}
+
+bool BHWalkProvider::upright() const {
+    return walkingEngine->theFallDownStateBH.state == FallDownStateBH::upright;
 }
 
 float BHWalkProvider::leftHandSpeed() const {

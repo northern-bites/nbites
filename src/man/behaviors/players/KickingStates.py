@@ -7,28 +7,37 @@ from . import ChaseBallConstants as constants
 from ..util import *
 from ..kickDecider import kicks
 from ..navigator import Navigator as nav
-from objects import Location
+from objects import Location, RelRobotLocation
+
+# TODO refactor, super state?
 
 @superState('positionAndKickBall')
+@ifSwitchLater(transitions.ballMoved, 'approachBall') # TODO this doesn't work
 def executeMotionKick(player):
     """
     Do a motion kick.
     """
+    ball = player.brain.ball
+    executeMotionKick.kickPose = RelRobotLocation(ball.rel_x - player.kick.setupX,
+                                                  ball.rel_y - player.kick.setupY,
+                                                  0)
+
     if player.firstFrame():
-        player.motionKick = False
+        player.brain.nav.destinationWalkTo(executeMotionKick.kickPose,
+                                           nav.CAREFUL_SPEED,
+                                           player.kick)
+    elif player.brain.ball.vis.on: # don't update if we don't see the ball
+        player.brain.nav.updateDestinationWalkDest(executeMotionKick.kickPose)
 
-    if transitions.shouldRedecideKick(player):
-        return player.goLater('approachBall')
-
-    player.brain.nav.doMotionKick(player, # kind of a hack, nav is going to change soon anyway
-                                  player.brain.ball.rel_x, #LOL
-                                  player.brain.ball.rel_y,
-                                  player.kick)
+    # TODO not ideal at all!
+    if player.counter > 40:
+        player.inKickingState = False
+        return player.goNow('afterKick')
 
     return player.stay()
 
 @superState('positionAndKickBall')
-@ifSwitchLater(transitions.ballMoved, 'approachBall')
+@ifSwitchLater(transitions.ballMoved, 'approachBall') # TODO this doesn't work
 def executeKick(player):
     """
     Kick the ball.
@@ -39,6 +48,7 @@ def executeKick(player):
         player.shouldKickOff = False
         return player.stay()
 
+    # TODO consider lowering this
     if player.counter == 30:
         player.executeMove(executeKick.sweetMove)
         player.shouldKickOff = False
@@ -56,7 +66,6 @@ executeKick.sweetMove = None
 def afterKick(player):
     """
     State to follow up after a kick.
-    Currently exits after one frame.
     """
     if player.firstFrame():
         player.stand()        # stand up right, ready to walk
@@ -65,7 +74,11 @@ def afterKick(player):
 
     if transitions.shouldKickAgain(player):
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
-        return player.goNow('positionForKick')
+        if player.motionKick:
+            player.motionKick = False
+            return player.goNow('spinToBall')
+        else:        
+            return player.goNow('positionForKick')
     elif transitions.shouldChaseBall(player):
         return player.goLater('approachBall')
     else:

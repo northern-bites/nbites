@@ -13,7 +13,7 @@ import random
 
 @defaultState('branchOnRole')
 @superState('gameControllerResponder')
-@ifSwitchNow(claims.shouldCedeClaim, 'positionAsSupporter')
+@ifSwitchNow(transitions.shouldBeSupporter, 'positionAsSupporter')
 @ifSwitchNow(transitions.shouldApproachBall, 'approachBall')
 def playOffBall(player):
     """
@@ -62,7 +62,6 @@ def watchForBall(player):
 @stay
 @ifSwitchLater(shared.ballOffForNFrames(30), 'branchOnRole')
 def positionAsSupporter(player):
-    # TODO Nikki -- defenders should position between ball and goal
     # defenders position at midpoint between ball and goal
     if role.isLeftDefender(player.role):
         if player.brain.ball.y < NogginConstants.MIDFIELD_Y:
@@ -127,8 +126,10 @@ def searchFieldForBall(player):
     State used by chasers to search the field. Uses the shared ball if it is
     on. Moves to different quads of the field somewhat randomly.
     """
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+
     sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
-    player.brain.tracker.trackSharedBall()
     player.brain.nav.goTo(sharedball,
                           precision = nav.GENERAL_AREA,
                           speed = nav.QUICK_SPEED,
@@ -139,21 +140,22 @@ def searchFieldForBall(player):
 @stay
 @ifSwitchNow(transitions.shouldFindSharedBall, 'searchFieldForBall')
 def walkSearchFieldForBall(player):
-# Walk and search for ball, randomly walking to the center of each field quadrant
-
-
+    """
+    Walk and search for ball, randomly walking to the center of each field 
+    quadrant.
+    """
     quad1Center = Location(NogginConstants.CENTER_FIELD_X * .5, NogginConstants.CENTER_FIELD_Y * .5)
     quad2Center = Location(NogginConstants.CENTER_FIELD_X * .5, NogginConstants.CENTER_FIELD_Y * 1.5)
     quad3Center = Location(NogginConstants.CENTER_FIELD_X * 1.5, NogginConstants.CENTER_FIELD_Y * 1.5)
     quad4Center = Location(NogginConstants.CENTER_FIELD_X * 1.5, NogginConstants.CENTER_FIELD_Y * .5)
 
     if player.firstFrame():
+        player.brain.tracker.trackBall()
         walkSearchFieldForBall.dest = quad3Center
 
     # update destination to send it to a new quadrant on the field
     # prearranged order; change or ranndomize?
     if shared.navAtPosition(player):
-        print "I think I'm at my position"
         if walkSearchFieldForBall.dest == quad1Center:
             walkSearchFieldForBall.dest = quad2Center
         elif walkSearchFieldForBall.dest == quad3Center:
@@ -163,7 +165,6 @@ def walkSearchFieldForBall(player):
         elif walkSearchFieldForBall.dest == quad4Center:
             walkSearchFieldForBall.dest = quad3Center
 
-    player.brain.tracker.trackBall()
     player.brain.nav.goTo(walkSearchFieldForBall.dest, precision = nav.GRAINY,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,
                           fast = True, pb = False)

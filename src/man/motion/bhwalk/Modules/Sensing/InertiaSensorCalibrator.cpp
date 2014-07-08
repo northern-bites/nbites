@@ -82,7 +82,7 @@ void InertiaSensorCalibrator::update(InertiaSensorDataBH& inertiaSensorData)
   bool unstable = false;
   if(currentMotion != lastMotion || // motion change
      currentMotion != theMotionInfoBH.motion ||  // interpolating
-     !theGroundContactStateBH.contact)
+     theMotionInfoBH.motion != MotionRequestBH::stand) // only calibrate while standing
   {
     unstable = true;
   }
@@ -144,6 +144,7 @@ void InertiaSensorCalibrator::update(InertiaSensorDataBH& inertiaSensorData)
         Vector2BH<>& gyroBiasMeasurementNoise = collection.standing ? gyroBiasStandMeasurementNoise : gyroBiasWalkMeasurementNoise;
         if(!calibrated)
         {
+          std::cout << "BH walk is calibrated" << std::endl;
           calibrated = true;
           accXBias.init(collection.accAvg.x, sqrBH(accBiasMeasurementNoise.x));
           accYBias.init(collection.accAvg.y, sqrBH(accBiasMeasurementNoise.y));

@@ -34,6 +34,11 @@ configure_file(
   @ONLY # So cmake doesn't complaing about using ${VAR} in bash
 )
 
+if (NOT CMAKE_BUILD_TYPE)
+  message(STATUS "No build type selected, default to RelWithDebInfo")
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+endif()
+
 include_directories( ${PROJECT_BINARY_DIR} )
 
 # Option to turn rebuilding our protobuf libs on/off

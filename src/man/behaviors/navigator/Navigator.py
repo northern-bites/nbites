@@ -170,14 +170,13 @@ class Navigator(FSA.FSA):
         if speed is not KEEP_SAME_SPEED:
             NavStates.goToPosition.speed = speed
 
-    def destinationWalkTo(self, walkToDest, speed = FULL_SPEED, pedantic = False):
+    def destinationWalkTo(self, walkToDest, speed = FULL_SPEED, kick = None):
         """
         Walks to a RelRobotLocation via B-Human destination walking.
-        Great for close destinations (since odometry gets bad over time) in
-        case loc is bad.
-        Doesn't avoid obstacles! (that would make it very confused and odometry
-        very bad, especially if we're being pushed).
-        Switches to standing at the end.
+        Doesn't avoid obstacles!
+
+        Passing in a registered motion kick as an argument tells the walking
+        engine to perform a motion kick.
         """
         if not isinstance(walkToDest, RelRobotLocation):
             raise TypeError, "walkToDest must be a RelRobotLocation"
@@ -188,7 +187,7 @@ class Navigator(FSA.FSA):
 
         NavStates.destinationWalkingTo.destQueue.append(walkToDest)
         NavStates.destinationWalkingTo.speed = speed
-        NavStates.destinationWalkingTo.pedantic = pedantic
+        NavStates.destinationWalkingTo.kick = kick
 
         #reset the counter to make sure walkingTo.firstFrame() is true on entrance
         #in case we were in destinationWalkingTo before as well
@@ -245,15 +244,6 @@ class Navigator(FSA.FSA):
 
         NavStates.walking.speeds = (x, y, theta)
         self.switchTo('walking')
-
-    def doMotionKick(self, player, ball_rel_x, ball_rel_y, kick):
-        """
-        Enques a motion kick. Does not transition to an FSA state, so that
-        motion kicking can be done with any of our walks.
-        """
-        self.destination = RelLocation(ball_rel_x, ball_rel_y)
-
-        helper.createAndSendMotionKickVector(player, ball_rel_x, ball_rel_y, kick)
 
     def stand(self):
         """

@@ -21,7 +21,7 @@ def tracking(tracker):
     tracker.helper.trackObject()
 
     # If cannot see ball and sharedball is on, look at sharedball and pan
-    if tracker.target.vis.frames_off > 15  and tracker.brain.sharedBall.ball_on:
+    if tracker.target.vis.frames_off > 15  and tracker.brain.sharedBall.ball_on and tracker.counter > 15:
         return tracker.goLater('altTrackSharedBallAndPan')
 
     if not tracker.target.vis.on and tracker.counter > 15:
@@ -89,7 +89,7 @@ def snapToCorner(tracker):
 
     # only look to corner if head is finished moving and corner is not behind robot
     if not tracker.brain.motion.head_is_active and yaw < 110 and yaw > -110:
-        tracker.helper.lookToAngle(yaw)
+        tracker.helper.executeHeadMove(lookToAngle(yaw))
 
     if not tracker.brain.motion.head_is_active:
         snapToCorner.count = snapToCorner.count + 1

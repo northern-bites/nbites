@@ -46,13 +46,19 @@ def goToPosition(nav):
             goToPosition.dest = nav.brain.play.getPositionCoord()
 
     if goToPosition.fast:
+        # So that fast mode works for objects of type RobotLocation also
+        if isinstance(goToPosition.dest, RobotLocation) and not goToPosition.close:
+            fieldDest = RobotLocation(goToPosition.dest.x, goToPosition.dest.y, 0)
+            relDest = nav.brain.loc.relativeRobotLocationOf(fieldDest)
+            relDest.relH = nav.brain.loc.getRelativeBearing(fieldDest)
+        
         HEADING_ADAPT_CUTOFF = 103
         DISTANCE_ADAPT_CUTOFF = 10
 
         MAX_TURN = .5
 
-        BOOK_IT_DISTANCE_THRESHOLD = 60
         BOOK_IT_TURN_THRESHOLD = 23
+        BOOK_IT_DISTANCE_THRESHOLD = 50
 
         if relDest.relH >= HEADING_ADAPT_CUTOFF:
             velH = MAX_TURN
@@ -82,6 +88,7 @@ def goToPosition(nav):
                                     goToPosition.speed)
 
         if fabs(relDest.dist) > BOOK_IT_DISTANCE_THRESHOLD:
+            goToPosition.close = False
             if fabs(relDest.relH) > BOOK_IT_TURN_THRESHOLD:
                 if relDest.relH > 0: velH = MAX_TURN
                 if relDest.relH < 0: velH = -MAX_TURN
@@ -92,14 +99,10 @@ def goToPosition(nav):
                 velY = 0
                 goToPosition.bookingIt = True
         else:
-            goToPosition.bookingIt = False
+            goToPosition.close = True
 
         goToPosition.speeds = (velX, velY, velH)
-
-        if ((goToPosition.speeds != goToPosition.lastSpeeds)
-            or not nav.brain.interface.motionStatus.walk_is_active):
-            helper.setSpeed(nav, goToPosition.speeds)
-        goToPosition.lastSpeeds = goToPosition.speeds
+        helper.setSpeed(nav, goToPosition.speeds)
 
     else:
         if goToPosition.adaptive:
@@ -120,8 +123,8 @@ goToPosition.adaptive = "adapts the speed to the distance of the destination"
 goToPosition.precision = "how precise we want to be in moving"
 
 goToPosition.speeds = ''
-goToPosition.lastSpeeds = ''
 goToPosition.bookingIt = False
+goToPosition.close = False
 
 # State where we are moving away from an obstacle
 def dodge(nav):
@@ -188,19 +191,17 @@ def destinationWalkingTo(nav):
     """
     if nav.firstFrame():
         destinationWalkingTo.enqueAZeroVector = False
-        return nav.stay()
 
     if len(destinationWalkingTo.destQueue) > 0:
         dest = destinationWalkingTo.destQueue.popleft()
         helper.setDestination(nav, dest, 
                               destinationWalkingTo.speed, 
-                              destinationWalkingTo.pedantic)
+                              destinationWalkingTo.kick)
         destinationWalkingTo.enqueAZeroVector = True
-        return nav.stay()
     elif destinationWalkingTo.enqueAZeroVector:
         helper.setDestination(nav, RelRobotLocation(0,0,0), 
                               destinationWalkingTo.speed, 
-                              destinationWalkingTo.pedantic)
+                              destinationWalkingTo.kick)
         destinationWalkingTo.enqueAZeroVector = False
 
     return nav.stay()
@@ -216,11 +217,11 @@ def walkingTo(nav):
         helper.stand(nav)
         return nav.stay()
 
+    # TODO why check standing?
     if nav.brain.interface.motionStatus.standing:
         if len(walkingTo.destQueue) > 0:
             dest = walkingTo.destQueue.popleft()
             helper.setOdometryDestination(nav, dest, walkingTo.speed)
-            return nav.stay()
         else:
             return nav.goNow('standing')
 
@@ -234,30 +235,12 @@ def walking(nav):
     """
     State to be used for velocity walking.
     """
-
-    if ((walking.speeds != walking.lastSpeeds)
-        or not nav.brain.interface.motionStatus.walk_is_active):
-        helper.setSpeed(nav, walking.speeds)
-    walking.lastSpeeds = walking.speeds
+    helper.setSpeed(nav, walking.speeds)
 
     return Transition.getNextState(nav, walking)
 
 walking.speeds = constants.ZERO_SPEEDS     # current walking speeds
-walking.lastSpeeds = constants.ZERO_SPEEDS # useful for knowing if speeds changed
 walking.transitions = {}
-
-# State to be called by walkAndKick in navigator.py
-def walkingAndKicking(nav):
-    """
-    State to be used for velocity walking AND motion kicking.
-    """
-
-    if ((walking.speeds != walking.lastSpeeds)
-        or not nav.brain.interface.motionStatus.walk_is_active):
-        helper.createAndSendMotionKickVector(nav, *walking.speeds)
-    walking.lastSpeeds = walking.speeds
-
-    return Transition.getNextState(nav, walking)
 
 ### Stopping States ###
 def stopped(nav):

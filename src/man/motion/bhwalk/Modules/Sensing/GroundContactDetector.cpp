@@ -26,6 +26,7 @@ void GroundContactDetector::update(GroundContactStateBH& groundContactState)
 
   MODIFY("module:GroundContactDetector:contact", contact);
 
+  // Northern Bites don't trust this module, a bug in it means an inactive robot
   groundContactState.contact = true;
   return;
 

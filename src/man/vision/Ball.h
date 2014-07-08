@@ -108,6 +108,7 @@ public:
     bool sanityChecks(int w, int h, VisualBall * thisBall);
     bool blobOk(Blob b);
     bool blobIsBigEnoughToBeABall(int w, int h);
+	bool blobIsTooBigToBeABall(int w, int h);
 
     // debugging methods
     void printBall(Blob b, int c, float p, int o);

@@ -3,7 +3,7 @@ cmake_minimum_required( VERSION 2.8.3 )
 # Set source files here that need to be compiled.
 set( COMM_SRCS CommModule
                CommTimer
-	       NetworkMonitor
+	             NetworkMonitor
                TeamConnect
                GameConnect
                UDPSocket

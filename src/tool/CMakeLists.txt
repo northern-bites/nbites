@@ -41,6 +41,7 @@ include ( ${SHARE_DIR}/cmake/BuildGTest.cmake )
 
 include( ${SHARE_DIR}/cmake/DebugConfig.cmake)
 
+
 # Configure the debug options
 configure_file(
   "${SHARE_DIR}/cmake/DebugConfig.in"

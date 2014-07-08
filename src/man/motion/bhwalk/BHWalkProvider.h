@@ -39,6 +39,9 @@ public:
     // Provide calibration boolean to the rest of the system
     bool calibrated() const;
 
+    // Provide fall down detection to the rest of the system
+    bool upright() const;
+
     // Provide hand speeds to the rest of the system
     float leftHandSpeed() const;
     float rightHandSpeed() const;
@@ -87,6 +90,7 @@ protected:
 private:
     bool requestedToStop;
     bool standby;
+    bool justMotionKicked;
     MotionCommand::ptr currentCommand;
     Pose2DBH startOdometry;
 

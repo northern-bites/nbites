@@ -263,12 +263,12 @@ public:
   NaoProvider *naoProvider;
   JointFilter *jointFilter;
   RobotModelProvider *robotModelProvider;
+  GroundContactDetector *groundContactDetector;
   InertiaSensorCalibrator *inertiaSensorCalibrator;
   InertiaSensorFilter *inertiaSensorFilter;
   SensorFilter *sensorFilter;
   FallDownStateDetector *fallDownStateDetector;
   TorsoMatrixProvider *torsoMatrixProvider;
-  GroundContactDetector *groundContactDetector;
   MotionSelector *motionSelector;
 
   // Northern Bites hack for hand speed info

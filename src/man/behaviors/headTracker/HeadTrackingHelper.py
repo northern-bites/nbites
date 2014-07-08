@@ -256,8 +256,10 @@ class HeadTrackingHelper(object):
         else:
             pitch = 17.0
 
-        self.executeHeadMove((((yaw, pitch),
-                 .5, 1, StiffnessModes.LOW_HEAD_STIFFNESSES),))
+        return (((yaw, pitch),
+                 .5, 1, StiffnessModes.LOW_HEAD_STIFFNESSES),)
+
+
 
         # TODO: use constants above
 
