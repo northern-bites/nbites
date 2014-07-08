@@ -31,6 +31,8 @@ def passToCorner(player):
     if player.stateTime > 9 and transitions.shouldChaseBall(player):
         return player.goNow('passToFieldCross')
     elif player.stateTime > 14:
+        player.passBack = False
+        player.inKickOffPlay = False
         return player.goNow('findBall')
 
     return player.stay()
@@ -47,7 +49,10 @@ def passToFieldCross(player):
 
         elif roleConstants.isSecondChaser(player.role) and transitions.shouldChaseBall(player):
             decider = KickDecider.KickDecider(player.brain)
-            player.kick = decider.sweetMovesOnGoal()
+            # player.kick = decider.bigKicksOnGoal()
+            # player.kick = decider.sweetMovesOnGoal()
+            player.inKickingState = True
+            player.kick = decider.sweetMoveCrossToCenter()
             player.finishedPlay = True
             return player.goNow('approachBall')
 
@@ -76,7 +81,7 @@ def sidePass(player):
             # TODO this is the correct side for games
             # passDest = Location(nogginC.MIDFIELD_X + 20., 0.)
             # player.kick = decider.sweetMovesForKickOff(-1, passDest)
-            passDest = Location(nogginC.MIDFIELD_X + 20., nogginC.FIELD_WHITE_HEIGHT)
+            passDest = Location(nogginC.MIDFIELD_X, nogginC.FIELD_WHITE_HEIGHT)
             player.kick = decider.sweetMovesForKickOff(1, passDest)
             player.passBack = True
             player.inKickingState = True
@@ -86,6 +91,8 @@ def sidePass(player):
         if transitions.shouldChaseBall(player):
             return player.goNow('passToFieldCross')
         else:
+            player.passBack = False
+            player.inKickOffPlay = False
             return player.goNow('findBall')
 
     return player.stay()

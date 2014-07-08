@@ -14,8 +14,6 @@ import noggin_constants as nogginConstants
 import time
 from math import fabs, degrees
 
-USE_MOTION_KICKS = True
-
 @superState('gameControllerResponder')
 @stay
 @ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
@@ -36,7 +34,6 @@ def approachBall(player):
 
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
-
         return player.goNow('positionAndKickBall')
 
 @defaultState('prepareForKick')
@@ -57,21 +54,10 @@ def prepareForKick(player):
         player.brain.nav.stand()
 
     if not player.inKickOffPlay:
-        if USE_MOTION_KICKS:
-            player.kick = prepareForKick.decider.motionKicks()
-        else:
-            player.kick = prepareForKick.decider.sweetMovesOnGoal()
-            
+        player.kick = prepareForKick.decider.motionKicks()    
         player.inKickingState = True
-
     elif player.finishedPlay:
         player.inKickOffPlay = False
-
-    print "HEADINGS..."
-    print player.kick.setupH
-    print player.brain.loc.h
-    print "CHOSEN!!!"
-    print player.kick.name
 
     return player.goNow('orbitBall')
 
@@ -228,6 +214,9 @@ def positionForKick(player):
            return player.goNow('executeMotionKick')
         else:
             player.brain.nav.stand()
+            print "Executing kick!"
+            print player.brain.ball.x
+            print player.brain.ball.y
             return player.goNow('executeKick')
 
     return player.stay()
