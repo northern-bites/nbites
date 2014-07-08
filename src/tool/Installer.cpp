@@ -156,6 +156,21 @@ int Installer::validateInput(int index)
         std::cout << "Bad python player" << std::endl;
         return 0;
     }
+
+    if(!requestedPlayer.compare("pGoalie"))
+    {
+        if(playerNumber != 1){
+            std::cout << "pGoalie MUST be player 1!" << std::endl;
+            return 0;
+        }
+    }
+    else if(!requestedPlayer.compare("pBrunswick"))
+    {
+        if(playerNumber == 1){
+            std::cout << "pBrunswick cannot be player 1!" << std::endl;
+            return 0;
+        }
+    }
     return 1;
 }
 
