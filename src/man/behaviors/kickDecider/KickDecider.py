@@ -37,6 +37,8 @@ class KickDecider(object):
 
         self.scoreKick = self.minimizeOrbitTime
 
+        self.filters = []
+
         self.clearPossibleKicks()
         self.addShotsOnGoal()
 
@@ -50,6 +52,8 @@ class KickDecider(object):
         self.kicks.append(kicks.RIGHT_SIDE_KICK)
 
         self.scoreKick = self.minimizeOrbitTime
+
+        self.filters = []
 
         self.clearPossibleKicks()
         self.addShotsOnGoal()
@@ -68,6 +72,8 @@ class KickDecider(object):
         self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
 
         self.scoreKick = self.minimizeOrbitTime
+
+        self.filters = []
 
         self.clearPossibleKicks()
         self.addShotsOnGoal()
@@ -96,7 +102,6 @@ class KickDecider(object):
         return (kick for kick in self.possibleKicks).next().next()
 
     def motionKicks(self):
-        # TODO crosses if in corner
         asap = self.motionKicksAsap()
         if asap:
             return asap
@@ -115,8 +120,8 @@ class KickDecider(object):
         precision = toGoalCenterMagnitude*math.tan(theta)
         self.possibleKicks = itertools.chain(self.possibleKicks,
                                              self.generateKicksFromGoalDest(nogginC.OPP_GOALBOX_RIGHT_X,
-                                                                             nogginC.CENTER_FIELD_Y,
-                                                                             precision))
+                                                                            nogginC.CENTER_FIELD_Y,
+                                                                            precision))
 
     def addPassesTo(self, location):
         self.possibleKicks = itertools.chain(self.possibleKicks,
@@ -145,8 +150,11 @@ class KickDecider(object):
         yield
 
     def filterAndScoreKicks(self, kicks):
-        for filt in self.filters:
-            filteredKicks = (kick for kick in kicks if filt(kick))
+        if self.filters:
+            for filt in self.filters:
+                filteredKicks = (kick for kick in kicks if filt(kick))
+        else:
+            filteredKicks = kicks
 
         yield max(filteredKicks,key=self.scoreKick)
 
@@ -157,6 +165,7 @@ class KickDecider(object):
             offset = -kick.setupH
             kick.setupH = self.brain.loc.h
 
+            # Uses two rotation matrices to calculate where the kick will go
             beforeFirstRotationX = kick.distance
 
             afterFirstRotationX = beforeFirstRotationX*math.cos(math.radians(kick.setupH))
@@ -177,17 +186,20 @@ class KickDecider(object):
 
         yield self.filterAndScoreKicks(fastestKicks)
 
-    # TODO use rotation matrices
     def generateIdealKicks(self, x, y):
         for k in self.kicks:
             kick = copy.deepcopy(k)
 
-            offset = kick.setupH
-            kick.setupH = 90 - math.degrees(math.atan(abs(x-self.brain.ball.x)/
-                                                      abs(y-self.brain.ball.y)))
-            if x < self.brain.ball.x: kick.setupH += 90
-            if y < self.brain.ball.y: kick.setupH = -kick.setupH
-            kick.setupH += offset
+            kickDestinationX = x - self.brain.ball.x
+            kickDestinationY = y - self.brain.ball.y
+
+            # Angle between unit vector and kickDestination, cos(theta) = a.b / ||a||||b||
+            angleToKickDestination = math.degrees(math.acos(kickDestinationX / 
+                                                            math.sqrt(kickDestinationX**2 + kickDestinationY**2)))
+
+            # Before the following line, kick.setupH holds offset from standard kick setup
+            kick.setupH = angleToKickDestination + kick.setupH
+            # After, kick.setupH holds global heading used for kick allignment
 
             kick.destinationX = x
             kick.destinationY = y

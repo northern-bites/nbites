@@ -1,5 +1,5 @@
 # Should we kick directly at our target ignoring SHOT_PRECISON and PASS_PRECISION?
-NO_SAMPLING = False
+NO_SAMPLING = True
 
 # How finely should we search over possible kick setups?
 # NOTE NUM_OF_SAMPLES should be an odd number, so that a perfectly-aimed kick 
