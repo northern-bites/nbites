@@ -196,6 +196,7 @@ class KickDecider(object):
             # Angle between unit vector and kickDestination, cos(theta) = a.b / ||a||||b||
             angleToKickDestination = math.degrees(math.acos(kickDestinationX / 
                                                             math.sqrt(kickDestinationX**2 + kickDestinationY**2)))
+            if kickDestinationY < 0: angleToKickDestination = -angleToKickDestination
 
             # Before the following line, kick.setupH holds offset from standard kick setup
             kick.setupH = angleToKickDestination + kick.setupH
