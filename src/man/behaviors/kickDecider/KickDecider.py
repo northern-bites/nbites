@@ -94,19 +94,25 @@ class KickDecider(object):
         # TODO add filter for out of bounds balls
         return (kick for kick in self.possibleKicks).next().next()
 
-    def motionKicksForKickOff(self):
+    def sweetMovesForKickOff(self, direction, dest):
+        """
+        direction 0 is a forward kick, direction 1 is a left side pass
+        direction -1 is a right side pass
+        """
         self.brain.player.motionKick = False
 
         self.kicks = []
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        if direction == 0:
+            self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
+            self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        elif direction == 1:
+            self.kicks.append(kicks.RIGHT_SIDE_KICK)
+        elif direction == -1:
+            self.kicks.append(kicks.LEFT_SIDE_KICK)
 
         self.scoreKick = self.minimizeOrbitTime
 
         self.clearPossibleKicks()
-        destX = nogginC.FIELD_WHITE_WIDTH
-        destY = nogginC.FIELD_WHITE_HEIGHT
-        dest = Location(destX, destY)
         self.addPassesTo(dest)
 
         return (kick for kick in self.possibleKicks).next().next()
@@ -213,12 +219,22 @@ class KickDecider(object):
             offset = kick.setupH
             kick.setupH = 90 - math.degrees(math.atan(abs(x-self.brain.ball.x)/
                                                       abs(y-self.brain.ball.y)))
-            if x < self.brain.ball.x: kick.setupH += 90
+            print kick.setupH
+            if x < self.brain.ball.x: 
+                print "Case that rarely happens"
+                kick.setupH += 90
+                print kick.setupH
             if y < self.brain.ball.y: kick.setupH = -kick.setupH
+            print kick.setupH
             kick.setupH += offset
+            print kick.setupH
 
             kick.destinationX = x
             kick.destinationY = y
+
+            print "Heading?"
+            print kick.setupH
+            print "DONE"
 
             yield kick
 

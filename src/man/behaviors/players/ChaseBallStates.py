@@ -28,7 +28,7 @@ def approachBall(player):
         player.brain.tracker.trackBall()
         if player.shouldKickOff:
             player.inKickOffPlay = True
-            return player.goNow('giveAndGo')
+            return player.goNow('giveAndGo2')
         elif player.penaltyKicking:
             return player.goNow('prepareForPenaltyKick')
         else:
@@ -61,7 +61,7 @@ def prepareForKick(player):
             player.kick = prepareForKick.decider.motionKicks()
         else:
             player.kick = prepareForKick.decider.sweetMovesOnGoal()
-
+            
         player.inKickingState = True
 
     elif player.finishedPlay:

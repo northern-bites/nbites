@@ -5,6 +5,7 @@ from objects import RelRobotLocation, Location
 from ..navigator import Navigator
 import ChaseBallTransitions as transitions
 from ..kickDecider import KickDecider
+from ..kickDecider import kicks
 
 @superState('gameControllerResponder')
 def giveAndGo(player):
@@ -17,17 +18,19 @@ def passToCorner(player):
     if player.firstFrame():
         player.passBack = True
         if roleConstants.isFirstChaser(player.role):
+            # TODO wrong corner
+            corner = Location(nogginC.FIELD_WHITE_WIDTH, nogginC.FIELD_WHITE_HEIGHT)
             decider = KickDecider.KickDecider(player.brain)
-            player.kick = decider.motionKicksForKickOff()
+            player.kick = decider.sweetMovesForKickOff(0, corner)
             player.inKickingState = True
             return player.goNow('approachBall')
         elif roleConstants.isSecondChaser(player.role):
             player.brain.tracker.lookStraight()
             player.setWalk(.7, 0., 0.)
 
-    if player.stateTime > 6 and transitions.shouldChaseBall(player):
+    if player.stateTime > 9 and transitions.shouldChaseBall(player):
         return player.goNow('passToFieldCross')
-    elif player.stateTime > 10:
+    elif player.stateTime > 14:
         return player.goNow('findBall')
 
     return player.stay()
@@ -35,39 +38,25 @@ def passToCorner(player):
 @superState('gameControllerResponder')
 def passToFieldCross(player):
     if player.firstFrame():
-        player.give = False
-        passToFieldCross.count = 0
-
+        player.passBack = False
         if roleConstants.isFirstChaser(player.role):
             player.brain.tracker.lookStraight()
-            #fieldCrossX = nogginC.LANDMARK_OPP_FIELD_CROSS[0] - player.brain.loc.x
-            #fieldCrossY = nogginC.LANDMARK_OPP_FIELD_CROSS[1] - player.brain.loc.y
-            #fieldCrossH = -1*player.brain.loc.h
-            #fieldCross = RelRobotLocation(fieldCrossX, fieldCrossY, fieldCrossH)
-            #player.brain.nav.destinationWalkTo(fieldCross,
-            #                        Navigator.QUICK_SPEED)
             fieldCross = Location(nogginC.LANDMARK_OPP_FIELD_CROSS[0], nogginC.LANDMARK_OPP_FIELD_CROSS[1])
             player.brain.nav.goTo(fieldCross, Navigator.GENERAL_AREA, Navigator.QUICK_SPEED, 
                                 True, False, True, False)
 
         elif roleConstants.isSecondChaser(player.role) and transitions.shouldChaseBall(player):
             decider = KickDecider.KickDecider(player.brain)
-            player.kick = decider.motionKicksOnGoal()
+            player.kick = decider.sweetMovesOnGoal()
             player.finishedPlay = True
             return player.goNow('approachBall')
 
         return player.stay()
 
-    passToFieldCross.count = passToFieldCross.count + 1
     if roleConstants.isFirstChaser(player.role):
-        # fieldCrossX = nogginC.LANDMARK_OPP_FIELD_CROSS[0] - player.brain.loc.x
-        # fieldCrossY = nogginC.LANDMARK_OPP_FIELD_CROSS[1] - player.brain.loc.y
-        # fieldCrossH = -1*player.brain.loc.h
-        # fieldCross = RelRobotLocation(fieldCrossX, fieldCrossY, fieldCrossH)
-        # player.brain.nav.updateDestinationWalkDest(fieldCross)
         fieldCross = Location(nogginC.LANDMARK_OPP_FIELD_CROSS[0], nogginC.LANDMARK_OPP_FIELD_CROSS[1])
         player.brain.nav.updateDest(fieldCross)
-        if passToFieldCross.count > 300 and transitions.shouldChaseBall(player):
+        if player.stateTime > 12 and transitions.shouldChaseBall(player):
             player.inKickOffPlay = False
             return player.goNow('approachBall')
 
@@ -78,6 +67,28 @@ def giveAndGo2(player):
     player.finishedPlay = False
     player.shouldKickOff = False
     return player.goNow('sidePass')
+
+@superState('gameControllerResponder')
+def sidePass(player):
+    if player.firstFrame():
+        if roleConstants.isFirstChaser(player.role):
+            decider = KickDecider.KickDecider(player.brain)
+            # TODO this is the correct side for games
+            # passDest = Location(nogginC.MIDFIELD_X + 20., 0.)
+            # player.kick = decider.sweetMovesForKickOff(-1, passDest)
+            passDest = Location(nogginC.MIDFIELD_X + 20., nogginC.FIELD_WHITE_HEIGHT)
+            player.kick = decider.sweetMovesForKickOff(1, passDest)
+            player.passBack = True
+            player.inKickingState = True
+            return player.goNow('approachBall')
+
+    if roleConstants.isSecondChaser(player.role) and player.brain.gameController.timeSincePlaying > 8:
+        if transitions.shouldChaseBall(player):
+            return player.goNow('passToFieldCross')
+        else:
+            return player.goNow('findBall')
+
+    return player.stay()
 
 #giveAndGo -> give to corner, go to field cross
 #giveAndGo2 -> sideKick to shot on goal, to run to field cross

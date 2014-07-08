@@ -58,10 +58,10 @@ void MotionSystem::update(ParticleSet& particles,
         sincosf(curOdometry.h() - particle->getLocation().h(),
                 &sinh, &cosh);
 
-        // dX = (cosh*dX_R + sinh*dY_R) * FRICTION_FACTOR_X;
-        // dY = (cosh*dY_R - sinh*dX_R) * FRICTION_FACTOR_Y;
-        dX = dX_R * FRICTION_FACTOR_X;
-        dY = dY_R * FRICTION_FACTOR_Y;
+        dX = (cosh*dX_R + sinh*dY_R) * FRICTION_FACTOR_X;
+        dY = (cosh*dY_R - sinh*dX_R) * FRICTION_FACTOR_Y;
+        //dX = dX_R * FRICTION_FACTOR_X;
+        //dY = dY_R * FRICTION_FACTOR_Y;
         dH = dH_R * FRICTION_FACTOR_H;
 
         particle->shift(dX, dY, dH);
