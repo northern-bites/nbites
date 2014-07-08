@@ -28,18 +28,31 @@ SharedViewer::SharedViewer(QWidget* parent):
     zoomOutButton = new QPushButton("-", this);
     updateButton = new QPushButton("Update", this);
 
-    // none of these buttons currently do anything... only change global variable
-    selectorsP[0] = new QPushButton("Goalie");
-    selectorsP[1] = new QPushButton("L Def");
-    selectorsP[2] = new QPushButton("R Def");
-    selectorsP[3] = new QPushButton("Chaser");
-    selectorsP[4] = new QPushButton("Striker");
+    selectorsP[0] = new QLabel(tr("GOALIE:      "));
+    selectorsP[1] = new QLabel(tr("L DEF:         "));
+    selectorsP[2] = new QLabel(tr("R DEF:         "));
+    selectorsP[3] = new QLabel(tr("CHASER:      "));
+    selectorsP[4] = new QLabel(tr("STRIKER:     "));
 
-    selectorsB[0] = new QPushButton("Goalie Ball");
-    selectorsB[1] = new QPushButton("L Def Ball");
-    selectorsB[2] = new QPushButton("R Def Ball");
-    selectorsB[3] = new QPushButton("Chaser Ball");
-    selectorsB[4] = new QPushButton("Striker Ball");
+    selectorsB[0] = new QLabel(tr("GOALIE BALL:     "));
+    selectorsB[1] = new QLabel(tr("L DEF BALL:        "));
+    selectorsB[2] = new QLabel(tr("R DEF BALL:        "));
+    selectorsB[3] = new QLabel(tr("CHASER BALL:     "));
+    selectorsB[4] = new QLabel(tr("STRIKER BALL:    "));
+
+    // none of these buttons currently do anything... only change global variable
+    // To use click-on-field method, you'll want buttons. Currently using labels
+//    selectorsP[0] = new QPushButton("Goalie");
+//    selectorsP[1] = new QPushButton("L Def");
+//    selectorsP[2] = new QPushButton("R Def");
+//    selectorsP[3] = new QPushButton("Chaser");
+//    selectorsP[4] = new QPushButton("Striker");
+
+//    selectorsB[0] = new QPushButton("Goalie Ball");
+//    selectorsB[1] = new QPushButton("L Def Ball");
+//    selectorsB[2] = new QPushButton("R Def Ball");
+//    selectorsB[3] = new QPushButton("Chaser Ball");
+//    selectorsB[4] = new QPushButton("Striker Ball");
 
     field = new QHBoxLayout();
     field->addWidget(fieldPainter);
@@ -99,7 +112,7 @@ SharedViewer::SharedViewer(QWidget* parent):
 //        mapper.setMapping(selectorsB[i], i + NUM_PLAYERS_PER_TEAM);
 //    }
 
-    connect(&mapper, SIGNAL(mapped(int)), this, SLOT(changeSelection(int)));
+//    connect(&mapper, SIGNAL(mapped(int)), this, SLOT(changeSelection(int)));
 
     mainLayout->addLayout(updateLayout);
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++) {
@@ -203,7 +216,7 @@ void SharedViewer::checkForFlip(messages::RobotLocation msg) {
         lastReset = msg.timestamp();
         int rNum = int(msg.uncert()); //we set this as the robot num
         if (rNum == 0) {
-            std::cout<<"Uh oh I am 0!"<<std::endl;
+            std::cout<<"Uh oh I am 0! (Okay if it's the first time)"<<std::endl;
             return;
         }
 

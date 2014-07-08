@@ -15,6 +15,7 @@ SharedBallModule::SharedBallModule() :
     resety = 0.f;
     reseth = 0.f;
     timestamp = 0;
+    flippedRobot = 0.f;
     my_num = int(MY_PLAYER_NUMBER);
 }
 
@@ -26,27 +27,30 @@ void SharedBallModule::run_()
 {
     //reset variables
     numRobotsOn = 0;
-    robotToIgnore = -1;
+    reliability = 0;
 
-    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++) {
+    // this is in case we have 0 robots on: when these var. wont' get set
+    x = -100;
+    y = -100;
+    ballOn = false;
+
+    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++)
+    {
         worldModelIn[i].latch();
         messages[i] = worldModelIn[i].message();
-        if (messages[i].ball_on()) {
+        if (messages[i].ball_on())
+        {
             numRobotsOn++;
         }
         // resets ball estimates for each robot
         ballX[i] = -1.f;
         ballY[i] = -1.f;
     }
-    if (!(numRobotsOn)) {
-        x = -100;
-        y = -100;
-        ballOn = false;
-    } else if (numRobotsOn < 3) {
-        // makes a normal weighted average of ball from robots that see the ball
-        weightedavg();
-    } else {
-        eliminateBadRobots();
+
+    if (numRobotsOn)
+    {
+        ballOn = true;
+        chooseRobots();
         weightedavg();
         checkForPlayerFlip();
     }
@@ -58,62 +62,112 @@ void SharedBallModule::run_()
     sharedBallMessage.get()->set_x(x);
     sharedBallMessage.get()->set_y(y);
     sharedBallMessage.get()->set_ball_on(ballOn);
-    sharedBallMessage.get()->set_num_robots(numRobotsOn);
+    sharedBallMessage.get()->set_reliability(reliability);
     sharedBallOutput.setMessage(sharedBallMessage);
 
     // sets the message to reset the flipped robot to correct location
-// TOOL: Uncomment the set_uncert line. Used to tell which player to flip.
-//    float flippedNum = float(robotToIgnore) + 1.f;
+    // TOOL: Uncomment the set_uncert line. Used to tell which player to flip.
     sharedBallResetMessage.get()->set_x(resetx);
     sharedBallResetMessage.get()->set_y(resety);
     sharedBallResetMessage.get()->set_h(reseth);
     sharedBallResetMessage.get()->set_timestamp(timestamp);
-//    sharedBallResetMessage.get()->set_uncert(flippedNum);
+//    sharedBallResetMessage.get()->set_uncert(flippedRobot);
     sharedBallReset.setMessage(sharedBallResetMessage);
 }
 
-void SharedBallModule::eliminateBadRobots()
+/* Makes groups for each robot that include those other robots who
+ * have a ball estimate within the given threshold from its own
+ * ball estimate. Then it sets a global array based on groupings that
+ * tell other methods which robots to ignore.
+ */
+void SharedBallModule::chooseRobots()
 {
-    // get robot that has largest
-    int maxes[NUM_PLAYERS_PER_TEAM] = { 0 }; //all elements are 0
-    int bad_robot_max_num = 0;
-    int bad_robot = -1;
-    float bigDist = 0.f;
-    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++) {
-        if (!messages[i].ball_on()) {
-            continue;
-        }
-        int j_max = -1;
-        float max_distance = -1.f;
-        for (int j = 0; j < NUM_PLAYERS_PER_TEAM; j++) {
-            if (!messages[j].ball_on() || i == j) {
+    int inEstimate[NUM_PLAYERS_PER_TEAM][NUM_PLAYERS_PER_TEAM];
+    int numInEstimate[NUM_PLAYERS_PER_TEAM];
+    int maxInEstimate = 0;
+    int goodPlayer = -1;
+    int numWithMaxEstimate = 1;  //num robots with max num of consensuses
+
+    // Is the goalie in its box? If no, don't include it in estimate!
+    bool includeGoalie = inGoalieBox(messages[0].my_x(), messages[0].my_y());
+
+    // go through and see who is in each robot's ball estimate
+    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++)
+    {
+        numInEstimate[i] = 0;
+
+        for (int j = 0; j < NUM_PLAYERS_PER_TEAM; j++)
+        {
+            if (!messages[i].ball_on() || !messages[j].ball_on())
+            {
+                inEstimate[i][j] = 0;
                 continue;
             }
-            float curr_distance = getBallDistanceSquared(i, j);
-            if (curr_distance > max_distance) {
-                max_distance = curr_distance;
-                j_max = j;
+            // If I don't want goalie, don't use him!
+            if ( !includeGoalie && (i == 0 or j == 0) )
+            {
+                inEstimate[i][j] = 0;
+                continue;
             }
-        }
-        if (max_distance > bigDist) {
-            bigDist = max_distance;
-        }
-        if (j_max != -1) {
-            maxes[j_max]++;
-            if (maxes[j_max] > bad_robot_max_num) {
-                bad_robot_max_num = maxes[j_max];
-                bad_robot = j_max;
+
+            float dist = getBallDistanceSquared(i, j);
+            inEstimate[i][j] = 0;
+            if (dist < CONSENSUS_THRESHOLD * CONSENSUS_THRESHOLD
+                or i == j)
+            {
+                inEstimate[i][j] = 1;
+                numInEstimate[i]++;
+                if (numInEstimate[i] > maxInEstimate)
+                {
+                    maxInEstimate = numInEstimate[i];
+                    numWithMaxEstimate = 1;
+                    goodPlayer = i;
+                }
+                else if (numInEstimate[i] == maxInEstimate)
+                {
+                    numWithMaxEstimate++;
+                    if (goodPlayer == -1) {
+                        // mostly for case when there are a bunch of single robots
+                        goodPlayer = i;
+                    }
+                }
             }
-        } else {
-            std::cout<<"error"<<std::endl;
         }
     }
 
-    // now get rid of that robot if every player thinks its the bad robot
-    if ((bad_robot_max_num == numRobotsOn - 1) &&
-        (bigDist > DISTANCE_TOO_FAR*DISTANCE_TOO_FAR)) {
-            robotToIgnore = bad_robot;
-            numRobotsOn--;
+    // now decide whether or not to use sharedball
+    if (numWithMaxEstimate > maxInEstimate)
+    {
+        bool goalieOn = false;
+        for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++)
+        {
+            // if the goalie is in my estimate, and the goalie's grouping is max
+            if (inEstimate[i][0] && numInEstimate[0] == maxInEstimate)
+            {
+                goalieOn = true;
+                goodPlayer = i;
+                break;
+            }
+        }
+        if (!goalieOn)
+        {
+            // don't want to use shared ball: not large enough consensus, no goalie
+            ballOn = false;
+            return;
+        }
+        // else the goalie will be used to break the tie!
+    }
+
+    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++)
+    {
+        if (inEstimate[goodPlayer][i])
+        {
+            ignoreRobot[i] = 0;
+        }
+        else
+        {
+            ignoreRobot[i] = 1;
+        }
     }
 }
 
@@ -123,6 +177,11 @@ void SharedBallModule::eliminateBadRobots()
  */
 void SharedBallModule::weightedavg()
 {
+    if (!ballOn)
+    {
+        return;
+    }
+
     float numx = 0;       // numerator of weighted average of x
     float numy = 0;       // numerator of weighted average of y
     float sumweight = 0;  // denominator of weighted average = sum of weights
@@ -131,26 +190,30 @@ void SharedBallModule::weightedavg()
     float dist, hb, sinHB, cosHB;
     int weightFactor;
 
-    for (int i=0; i<NUM_PLAYERS_PER_TEAM; i++) {
-        if (i == robotToIgnore or !messages[i].ball_on()) {
+    for (int i=0; i<NUM_PLAYERS_PER_TEAM; i++)
+    {
+        if (ignoreRobot[i])
+        {
             continue;
         }
+
+        if ( i == 0 )
+        {
+            // goalie is on: counts double for reliability
+            reliability++;
+        }
+
         // avoids recalculating ball coord. if they have already been calculated
         calculateBallCoords(i);
         tempx = ballX[i];
         tempy = ballY[i];
 
-        if (i == 0) {
-            weightFactor = 2;
-        } else {
-            weightFactor = 1;
-        }
-
-        weight = weightFactor/(messages[i].ball_dist());
+        weight = 1/(messages[i].ball_dist());
 
         numx += tempx * weight;
         numy += tempy * weight;
         sumweight += weight;
+        reliability++;
     }
 
     // at least one robot sees the ball
@@ -159,9 +222,10 @@ void SharedBallModule::weightedavg()
         y = numy / sumweight;
         ballOn = true;
     } else {
-        std::cout<<"ERROR: sumweight is 0"<<std::endl;
+        std::cout<<"Error! SumWeight is 0!"<<std::endl;
     }
 }
+
 
 /* If the robot which was named to have "bad ball information" has
  * a ball estimate which would be correct if the robot were flipped,
@@ -169,42 +233,72 @@ void SharedBallModule::weightedavg()
  */
 void SharedBallModule::checkForPlayerFlip()
 {
-    if (robotToIgnore != my_num) {
-//    TOOL: Comment out above line and uncomment below line
-//    if (robotToIgnore == -1){
-        return;
-    }
-    if (messages[robotToIgnore].my_x() > MIDFIELD_X - TOO_CLOSE_TO_MIDFIELD and
-        messages[robotToIgnore].my_x() < MIDFIELD_X + TOO_CLOSE_TO_MIDFIELD) {
+    if (!ballOn or reliability < 2)
+    {
         return;
     }
 
-    calculateBallCoords(robotToIgnore);
-    int rob = robotToIgnore;
-
-    float flipbx = (-1*(ballX[rob] - MIDFIELD_X)) + MIDFIELD_X;
-    float flipby = (-1*(ballY[rob] - MIDFIELD_Y)) + MIDFIELD_Y;
-
-    float flipX =  (-1*(messages[rob].my_x() - MIDFIELD_X)) + MIDFIELD_X;
-    float flipY = (-1*(messages[rob].my_y() - MIDFIELD_Y)) + MIDFIELD_Y;
-
-    float distance_sq = ( (x-flipbx)*(x-flipbx) + (y-flipby)*(y-flipby) );
-    if (distance_sq < DISTANCE_FOR_FLIP*DISTANCE_FOR_FLIP) {
-        resetx = flipX;
-        resety = flipY;
-        reseth = messages[rob].my_h() + 180;
-        if (reseth > 180){
-            reseth -= 360;
+    int i = my_num;
+//TOOL: comment out the above line and uncomment the for loop (with brackets)
+//    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++)
+//    {
+        if (!messages[i].ball_on() or !ignoreRobot[i] or i == 0)
+        {
+            // If I was a good robot, or I'm the goalie, don't check for flip!
+//TOOL: comment out the return and uncomment the continue statement.
+//            continue;
+            return;
         }
-        timestamp = messages[rob].timestamp();
-    }
+        // if in no-flip zone: return! We don't want to flip me!
+        if ( (messages[i].my_x() > MIDFIELD_X - TOO_CLOSE_TO_MIDFIELD_X &&
+              messages[i].my_x() < MIDFIELD_X + TOO_CLOSE_TO_MIDFIELD_X) and
+             (messages[i].my_y() > MIDFIELD_Y - TOO_CLOSE_TO_MIDFIELD_Y &&
+              messages[i].my_y() < MIDFIELD_Y + TOO_CLOSE_TO_MIDFIELD_Y) ) {
+            return;
+        }
+
+        calculateBallCoords(i);
+        float flipbx = (-1*(ballX[i] - MIDFIELD_X)) + MIDFIELD_X;
+        float flipby = (-1*(ballY[i] - MIDFIELD_Y)) + MIDFIELD_Y;
+
+        float flipX =  (-1*(messages[i].my_x() - MIDFIELD_X)) + MIDFIELD_X;
+        float flipY = (-1*(messages[i].my_y() - MIDFIELD_Y)) + MIDFIELD_Y;
+
+        calculateBallCoords(0);
+        float gx = ballX[0];
+        float gy = ballY[0];
+
+        // if the goalie is reliable: on and in goal box, he must agree
+        if ( messages[0].ball_on() &&
+             inGoalieBox(messages[0].my_x(), messages[0].my_y()) )
+        {
+            float goalie_sq = ( (gx-flipbx)*(gx-flipbx) + (gy-flipby)*(gy-flipby) );
+            if (goalie_sq > DISTANCE_FOR_FLIP*DISTANCE_FOR_FLIP) {
+                return;
+            }
+        }
+
+        float distance_sq = ( (x-flipbx)*(x-flipbx) + (y-flipby)*(y-flipby) );
+        if (distance_sq < DISTANCE_FOR_FLIP*DISTANCE_FOR_FLIP) {
+            resetx = flipX;
+            resety = flipY;
+            reseth = messages[i].my_h() + 180;
+            if (reseth > 180){
+                reseth -= 360;
+            }
+            timestamp = messages[i].timestamp();
+            flippedRobot = float(i + 1);
+        }
+//TOOL: uncomment bracket for "for" loop!
+//    }
 }
 
 /* Calculates ball coordinates and puts them in global array if they
  * have not been calculated yet. The idea is to not repeatedly
  * calculate the same thing.
  */
-void SharedBallModule::calculateBallCoords(int i) {
+void SharedBallModule::calculateBallCoords(int i)
+{
     if (ballX[i] == -1 || ballY[i] == -1) {
         float sinHB, cosHB;
         float hb = TO_RAD*messages[i].my_h() + TO_RAD*messages[i].ball_bearing();
@@ -219,7 +313,7 @@ void SharedBallModule::calculateBallCoords(int i) {
 }
 
 /*
- * Calculates distance between two players' balls.
+ * Calculates distance between two players' balls. (squared because no need sqrt)
  */
 float SharedBallModule::getBallDistanceSquared(int i, int j)
 {
@@ -235,6 +329,38 @@ float SharedBallModule::getBallDistanceSquared(int i, int j)
     y2 = ballY[j];
 
     return ( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
+}
+
+int SharedBallModule::getQuadrantNumber(int i)
+{
+    calculateBallCoords(i);
+    if (ballX[i] < MIDFIELD_X && ballY[i] < MIDFIELD_Y)
+    {
+        return 1;
+    }
+    else if (ballX[i] < MIDFIELD_X && ballY[i] > MIDFIELD_Y)
+    {
+        return 2;
+    }
+    else if (ballX[i] > MIDFIELD_X && ballY[i] < MIDFIELD_Y)
+    {
+        return 3;
+    }
+    else
+    {
+        return 4;
+    }
+}
+
+bool SharedBallModule::inGoalieBox(float x, float y) {
+    if ((x > FIELD_WHITE_LEFT_SIDELINE_X - GOAL_DEPTH) and
+        (x <  FIELD_WHITE_LEFT_SIDELINE_X + GOALBOX_DEPTH) and
+        (y > BLUE_GOALBOX_BOTTOM_Y) and
+        (y < BLUE_GOALBOX_BOTTOM_Y + GOALBOX_WIDTH))
+    {
+        return true;
+    }
+    return false;
 }
 
 // As of now we are not calling this method but if we decide the goalie should

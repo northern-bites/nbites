@@ -14,7 +14,7 @@
  *       ball module.
  *
  * TODO: Would be nice to be able to click on the screen where you want to
- *       place the robot/ball. Only half-implemented here.
+ *       place the robot/ball. Only half-implemented here. (in comments)
  *
  * @author Megan Maher
  * @date   June 2014
@@ -88,8 +88,11 @@ protected:
     QPushButton* zoomOutButton;
     QPushButton* updateButton;
 
-    QPushButton* selectorsP[NUM_PLAYERS_PER_TEAM];
-    QPushButton* selectorsB[NUM_PLAYERS_PER_TEAM];
+// Would be used for click-on-field selecting
+//    QPushButton* selectorsP[NUM_PLAYERS_PER_TEAM];
+//    QPushButton* selectorsB[NUM_PLAYERS_PER_TEAM];
+    QLabel* selectorsP[NUM_PLAYERS_PER_TEAM];
+    QLabel* selectorsB[NUM_PLAYERS_PER_TEAM];
     QLabel* currentPlayer;
 
     float scaleFactor;

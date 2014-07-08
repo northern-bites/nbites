@@ -68,7 +68,7 @@ protected:
     vision::VisionDisplayModule visDispMod;
     colorcreator::ColorCalibrate colorCalibrate;
     viewer::FieldViewer fieldView;
-    shared::SharedViewer sharedView;
+    sharer::SharedViewer sharedView;
     playbook::PlaybookCreator playbookCreator;
 
     man::image::ImageConverterModule topConverter;

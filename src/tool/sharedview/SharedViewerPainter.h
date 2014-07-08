@@ -11,6 +11,7 @@
 
 #include <QtGui>
 #include <vector>
+#include <iostream>
 
 #include "FieldConstants.h"
 #include "Common.h"
