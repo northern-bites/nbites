@@ -181,6 +181,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     }
 
     obstacle.armContactIn.wireTo(&arms.contactOut, true);
+    obstacle.visionIn.wireTo(&vision.vision_obstacle, true);
     obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
 
     gamestate.commInput.wireTo(&comm._gameStateOutput, true);
