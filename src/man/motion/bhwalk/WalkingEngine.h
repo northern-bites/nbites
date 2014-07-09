@@ -74,8 +74,8 @@ MODULE(WalkingEngine)
   DEFINES_PARAMETER(VectorYZ, standComPosition, VectorYZ(50.f, 262.0f)) /**< The position of the center of mass relative to the right foot when standing */
   DEFINES_PARAMETER(float, standBodyTilt, 0.f) /**< The tilt of the torso when standing */
   DEFINES_PARAMETER(Vector2BH<>, standArmJointAngles, Vector2BH<>(0.2f, 0.f)) /**< The joint angles of the left arm when standing */
-  DEFINES_PARAMETER(int, standHardnessAnklePitch, 85) /**< The hardness of the ankle pitch joint for standing and walking */
-  DEFINES_PARAMETER(int, standHardnessAnkleRoll, 85) /**< The hardness of the ankle roll joint for standing and walking */
+  DEFINES_PARAMETER(int, standHardnessAnklePitch, 80) /**< The hardness of the ankle pitch joint for standing and walking */
+  DEFINES_PARAMETER(int, standHardnessAnkleRoll, 80) /**< The hardness of the ankle roll joint for standing and walking */
 
   DEFINES_PARAMETER(Vector2BH<>, walkRef, Vector2BH<>(16.f, 50.f)) /**< The position of the pendulum pivot point in Q */
   DEFINES_PARAMETER(Vector2BH<>, walkRefAtFullSpeedX, Vector2BH<>(9.5f, 40.f)) /**< The position of the pendulum pivot point when walking forwards with maximum speed */
@@ -84,15 +84,15 @@ MODULE(WalkingEngine)
   DEFINES_PARAMETER(RangeBH<>, walkRefYLimit, RangeBH<>(-30.f, 30.f)) /**< The limit for shifting the pendulum pivot point towards the y-axis when balancing */
   DEFINES_PARAMETER(RangeBH<>, walkStepSizeXPlanningLimit, RangeBH<>(-50.f, 60.f)) /**< The minimum and maximum step size used to plan the next step size */
   DEFINES_PARAMETER(RangeBH<>, walkStepSizeXLimit, RangeBH<>(-55.f, 66.f)) /**< The minimum and maximum step size when balancing */
-  DEFINES_PARAMETER(float, walkStepDuration, 525.f) /**< the duration of a full step cycle (two half steps) */
-  DEFINES_PARAMETER(float, walkStepDurationAtFullSpeedX, 525.f) /**< the duration of a full step cycle when walking forwards with maximum speed */
+  DEFINES_PARAMETER(float, walkStepDuration, 535.f) /**< the duration of a full step cycle (two half steps) */
+  DEFINES_PARAMETER(float, walkStepDurationAtFullSpeedX, 535.f) /**< the duration of a full step cycle when walking forwards with maximum speed */
   DEFINES_PARAMETER(float, walkStepDurationAtFullSpeedY, 180.f) /**< the duration of a full step cycle when walking sidewards with maximum speed */
   DEFINES_PARAMETER(Vector2BH<>, walkHeight, Vector2BH<>(262.f, 262.f)) /**< the height of the 3d linear inverted pendulum plane (for the pendulum motion towards the x-axis and the pendulum motion towards the y-axis) */
   DEFINES_PARAMETER(float, walkArmRotationAtFullSpeedX, 0.1f) /**< The maximum deflection for the arm swinging motion */
   DEFINES_PARAMETER(SubPhaseParameters, walkMovePhase, SubPhaseParameters(0.f, 1.f)) /**< The beginning and length of the trajectory used to move the swinging foot to its new position */
   DEFINES_PARAMETER(SubPhaseParameters, walkLiftPhase, SubPhaseParameters(0.f, 1.f)) /**< The beginning and length of the trajectory used to lift the swinging foot */
-  DEFINES_PARAMETER(Vector3BH<>, walkLiftOffset, Vector3BH<>(0.f, 5.f, 17.f)) /**< The height the swinging foot is lifted */
-  DEFINES_PARAMETER(Vector3BH<>, walkLiftOffsetAtFullSpeedX, Vector3BH<>(0.f, 5.f, 17.f)) /**< The height the swinging foot is lifted when walking full speed in x-direction */
+  DEFINES_PARAMETER(Vector3BH<>, walkLiftOffset, Vector3BH<>(0.f, 5.f, 22.f)) /**< The height the swinging foot is lifted */
+  DEFINES_PARAMETER(Vector3BH<>, walkLiftOffsetAtFullSpeedX, Vector3BH<>(0.f, 5.f, 22.f)) /**< The height the swinging foot is lifted when walking full speed in x-direction */
   DEFINES_PARAMETER(Vector3BH<>, walkLiftOffsetAtFullSpeedY, Vector3BH<>(0.f, 20.f, 25.f)) /**< The height the swinging foot is lifted when walking full speed in y-direction */
   DEFINES_PARAMETER(Vector3BH<>, walkLiftRotation, Vector3BH<>(-0.05f, -0.1f, 0.f)) /**< The amount the swinging foot is rotated while getting lifted */
   DEFINES_PARAMETER(float, walkSupportRotation, 0.f) /**< A rotation added to the supporting foot to boost the com acceleration */
