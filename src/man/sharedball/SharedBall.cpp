@@ -3,7 +3,7 @@
 namespace man {
 namespace context {
 
-SharedBallModule::SharedBallModule() :
+SharedBallModule::SharedBallModule(int playerNumber) :
     portals::Module(),
     sharedBallOutput(base()),
     sharedBallReset(base())
@@ -16,7 +16,7 @@ SharedBallModule::SharedBallModule() :
     reseth = 0.f;
     timestamp = 0;
     flippedRobot = 0.f;
-    my_num = int(MY_PLAYER_NUMBER);
+    my_num = playerNumber;
 }
 
 SharedBallModule::~SharedBallModule()

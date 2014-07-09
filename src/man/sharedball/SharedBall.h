@@ -4,7 +4,6 @@
 #include "Common.h"
 
 #include "FieldConstants.h"
-#include "RobotConfig.h"
 
 #include <iostream>
 
@@ -62,7 +61,7 @@ const float TOO_CLOSE_TO_MIDFIELD_Y = FIELD_GREEN_HEIGHT / 3.f;
 class SharedBallModule : public portals::Module
 {
 public:
-    SharedBallModule();
+    SharedBallModule(int playerNumber);
     virtual ~SharedBallModule();
 
     virtual void run_();
