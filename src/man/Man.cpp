@@ -44,7 +44,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       gamestate(teamNum, playerNum),
       behaviors(teamNum, playerNum),
       leds(broker),
-      sharedBall()
+      sharedBall(playerNum)
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
