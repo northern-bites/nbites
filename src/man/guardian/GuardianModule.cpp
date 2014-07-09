@@ -111,7 +111,7 @@ void GuardianModule::checkFalling()
         framesInBHWalk++;
 
     // If we are not in BH walk or just switched to it, then use NB fall down detection
-    if (framesInBHWalk < 100)
+    if (framesInBHWalk < 300)
     {
         struct Inertial inertial = {inertialInput.message().angle_x(),
                                      inertialInput.message().angle_y() };
