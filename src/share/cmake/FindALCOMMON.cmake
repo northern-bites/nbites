@@ -5,15 +5,15 @@ message(STATUS "Set $ENV{AL_DIR}/ as the SDK.")
 message(STATUS "If this is not correct, edit your nbites.bash.")
 
 if( NOT OFFLINE )
-  set( ALCOMMON_INCLUDE_DIR ${OE_SYSROOT}/usr/include/ )
+  set( ALCOMMON_INCLUDE_DIR ${OE_SYSROOT}/include/ )
 else()
   set( ALCOMMON_INCLUDE_DIR ${AL_DIR}/include/ )
 endif()
 
 if( NOT OFFLINE )
   set( ALCOMMON_LIBRARIES
-    ${OE_SYSROOT}/usr/lib/libalcommon.so
-    ${OE_SYSROOT}/usr/lib/libalmemoryfastaccess.so)
+    ${OE_SYSROOT}/lib/libalcommon.so
+    ${OE_SYSROOT}/lib/libalmemoryfastaccess.so)
 else()
   set( CMAKE_PREFIX_PATH ${AL_DIR} )
   set( ALCOMMON_LIBRARIES
