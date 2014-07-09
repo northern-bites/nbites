@@ -245,19 +245,22 @@ void SharedBallModule::checkForPlayerFlip()
         if (!messages[i].ball_on() or !ignoreRobot[i] or i == 0)
         {
             // If I was a good robot, or I'm the goalie, don't check for flip!
+            return;
 //TOOL: comment out the return and uncomment the continue statement.
 //            continue;
-            return;
-        }
-        // if in no-flip zone: return! We don't want to flip me!
-        if ( (messages[i].my_x() > MIDFIELD_X - TOO_CLOSE_TO_MIDFIELD_X &&
-              messages[i].my_x() < MIDFIELD_X + TOO_CLOSE_TO_MIDFIELD_X) and
-             (messages[i].my_y() > MIDFIELD_Y - TOO_CLOSE_TO_MIDFIELD_Y &&
-              messages[i].my_y() < MIDFIELD_Y + TOO_CLOSE_TO_MIDFIELD_Y) ) {
-            return;
         }
 
         calculateBallCoords(i);
+        // if my ball is in no-flip zone-> return! We don't want to flip me!
+        if ( (ballX[i] > MIDFIELD_X - TOO_CLOSE_TO_MIDFIELD_X &&
+              ballX[i] < MIDFIELD_X + TOO_CLOSE_TO_MIDFIELD_X) &&
+             (ballY[i] > MIDFIELD_Y - TOO_CLOSE_TO_MIDFIELD_Y &&
+              ballY[i] < MIDFIELD_Y + TOO_CLOSE_TO_MIDFIELD_Y) ) {
+            return;
+//TOOL: comment out the return and uncomment the continue statement.
+//            continue;
+        }
+
         float flipbx = (-1*(ballX[i] - MIDFIELD_X)) + MIDFIELD_X;
         float flipby = (-1*(ballY[i] - MIDFIELD_Y)) + MIDFIELD_Y;
 
@@ -275,6 +278,8 @@ void SharedBallModule::checkForPlayerFlip()
             float goalie_sq = ( (gx-flipbx)*(gx-flipbx) + (gy-flipby)*(gy-flipby) );
             if (goalie_sq > DISTANCE_FOR_FLIP*DISTANCE_FOR_FLIP) {
                 return;
+//TOOL: comment out the return statement and uncomment the continue statement.
+//                continue;
             }
         }
 
