@@ -11,6 +11,8 @@ ROLE_CONFIGURATION = {1: "Goalie",
                       5: "SecondChaser"}
 
 def getRole(role):
+    if role < 1:
+        return None
     return ROLE_CONFIGURATION[role]
 
 def isGoalie(role):
@@ -23,7 +25,7 @@ def isRightDefender(role):
     return getRole(role) == "RightDefender"
 
 def isDefender(role):
-    return isLeftDefender(role) or self.isRightDefender(role)
+    return isLeftDefender(role) or isRightDefender(role)
 
 def isFirstChaser(role):
     return getRole(role) == "FirstChaser"
@@ -36,6 +38,14 @@ def isChaser(role):
 
 def isCherryPicker(role):
     return getRole(role) == "CherryPicker"
+
+# Could be useful if we decide that the CherryPicker doesn't roleswitch
+def willRoleSwitch(role):
+    return isDefender(role) or isCherryPicker(role)
+
+# Makes it easy for arbitrary roleswitching
+def canRoleSwitchTo(role):
+    return isChaser(role)
 
 ### RANDOM STUFF
 isKickingOff = False # Default is false, changed by pBrunswick or some other if
