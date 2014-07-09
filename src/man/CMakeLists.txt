@@ -17,8 +17,8 @@ include( cmake/Flags.cmake )
 
 # Configure the robot options
 configure_file(
-  "${CMAKE_CURRENT_LIST_DIR}/cmake/RobotConfig.in"
-  "${PROJECT_BINARY_DIR}/RobotConfig.h"
+  "${CMAKE_CURRENT_LIST_DIR}/cmake/parameters.in"
+  "${PROJECT_BINARY_DIR}/install/lib/parameters.json"
 )
 
 # Configure the debug options
@@ -31,6 +31,7 @@ configure_file(
 configure_file(
   "${CMAKE_CURRENT_LIST_DIR}/cmake/upload.sh.in"
   "${PROJECT_BINARY_DIR}/upload.sh"
+  @ONLY # So cmake doesn't complaing about using ${VAR} in bash
 )
 
 if (NOT CMAKE_BUILD_TYPE)
@@ -82,8 +83,8 @@ add_dependencies(messages protobuf_libs)
 endif()
 
 # Actual subdirectories
-add_subdirectory( support )
 include_directories( support )
+add_subdirectory( support )
 include_directories( motion/bhwalk ) # @todo hack?
 
 # Actual modules
@@ -108,6 +109,7 @@ add_subdirectory( vision )
 set( MAN_SRCS main.cpp
   Man.cpp
   DiagramThread.cpp
+  ParamReader.cpp
 )
 
 add_library(

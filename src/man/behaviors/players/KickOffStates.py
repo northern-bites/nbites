@@ -18,7 +18,8 @@ def passToCorner(player):
     if player.firstFrame():
         player.passBack = True
         if roleConstants.isFirstChaser(player.role):
-            # TODO wrong corner
+            # TODO this is the right corner
+            corner = Location(nogginC.FIELD_WHITE_WIDTH, 0.)
             corner = Location(nogginC.FIELD_WHITE_WIDTH, nogginC.FIELD_WHITE_HEIGHT)
             decider = KickDecider.KickDecider(player.brain)
             player.kick = decider.sweetMovesForKickOff(0, corner)
@@ -88,9 +89,9 @@ def sidePass(player):
         if roleConstants.isFirstChaser(player.role):
             decider = KickDecider.KickDecider(player.brain)
             # TODO this is the correct side for games
-            # passDest = Location(nogginC.MIDFIELD_X + 20., 0.)
+            # passDest = Location(nogginC.MIDFIELD_X + constants.SIDE_PASS_OFFSET, 0.)
             # player.kick = decider.sweetMovesForKickOff(-1, passDest)
-            passDest = Location(nogginC.MIDFIELD_X, nogginC.FIELD_WHITE_HEIGHT)
+            passDest = Location(nogginC.MIDFIELD_X + constants.SIDE_PASS_OFFSET, nogginC.FIELD_WHITE_HEIGHT)
             player.kick = decider.sweetMovesForKickOff(1, passDest)   
             player.inKickingState = True
             return player.goNow('approachBall')

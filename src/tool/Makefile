@@ -15,6 +15,7 @@ VISION_EXECUTABLE = vision_tool
 CALIBRATE_EXECUTABLE = calibrate_tool
 PLAYBOOK_EXECUTABLE = playbook_tool
 SIM_EXECUTABLE = sim_tool
+INSTALLER_EXECUTABLE = installer_tool
 
 .PHONY: build_tool
 build_tool:
@@ -105,6 +106,20 @@ sim: build_sim
 	@echo "Running sim_tool executable."
 	@cd $(BUILD_DIR); \
 	./$(SIM_EXECUTABLE)
+
+.PHONY: build_installer
+build_installer:
+	mkdir -p $(BUILD_DIR)
+	cd $(BUILD_DIR); \
+	cmake $(FLAGS) $(SRC_DIR); \
+	$(MAKE) --no-print-directory $(INSTALLER_EXECUTABLE)
+
+.PHONY: installer
+installer: build_installer
+	@echo "Running installer_tool executable."
+	@cd $(BUILD_DIR); \
+	./$(INSTALLER_EXECUTABLE)
+
 
 .PHONY: config
 config:

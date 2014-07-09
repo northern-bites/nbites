@@ -6,6 +6,8 @@ SIDE_PASS_TIME = 8
 BALL_ON_THRESH = 5
 BALL_OFF_THRESH = 10
 
+SIDE_PASS_OFFSET = 20.
+
 def isSeeingBall(player):
     player.brain.ball.vis.frames_on > BALL_ON_THRESH
 

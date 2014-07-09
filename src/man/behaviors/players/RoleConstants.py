@@ -82,6 +82,9 @@ theirKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - \
                              NogginConstants.CENTER_FIELD_Y,
                              0)
 
+# newDefenderPos1 = RobotLocation(180, 230, 0)
+# newDefenderPos2 = RobotLocation(180, 360, 0)
+
 ### BOXES
 # These values are in cm, with the origin defined as the bottom corner of the
 # field closest to your own goal (when you have your goal to your left)
