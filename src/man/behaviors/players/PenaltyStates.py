@@ -120,7 +120,6 @@ def afterPenalty(player):
             return player.goNow('determineRole')
         return player.goLater(player.gameState)
 
-    return player.goNow('determineRole')
     return player.stay()
 
 @superState('gameControllerResponder')

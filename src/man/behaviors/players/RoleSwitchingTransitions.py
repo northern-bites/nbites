@@ -4,11 +4,6 @@ def chaserIsOut(player):
     """
     There is a chaser spot ready to be filled.
     """
-    if not player.brain.teamMembers[player.brain.playerNumber - 1].active:
-        print player.role, "*"
-    else:
-        print player.role
-
     if not player.roleSwitching or player.brain.gameController.penalized:
         return False
 
