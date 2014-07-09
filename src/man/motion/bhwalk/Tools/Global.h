@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Platform/SystemCall.h"
+#include "Platform/Linux/SystemCall.h"
 
 // Only declare prototypes. Don't include anything here, because this
 // file is included in many other files.
@@ -18,13 +18,7 @@ class StreamHandler;
 class DrawingManager;
 class DrawingManager3D;
 class ReleaseOptions;
-
-class Process;
-class Cognition;
-class ConsoleRoboCupCtrl;
-class RobotConsole;
-class TeamComm3DCtrl;
-class Framework;
+class TimingManager;
 
 /**
 * @class Global
@@ -33,15 +27,15 @@ class Framework;
 class Global
 {
 private:
-  PROCESS_WIDE_STORAGE_STATIC(OutMessage) theDebugOut;
-  PROCESS_WIDE_STORAGE_STATIC(OutMessage) theTeamOut;
-  PROCESS_WIDE_STORAGE_STATIC(Settings) theSettings;
-  PROCESS_WIDE_STORAGE_STATIC(DebugRequestTable) theDebugRequestTable;
-  PROCESS_WIDE_STORAGE_STATIC(DebugDataTable) theDebugDataTable;
-  PROCESS_WIDE_STORAGE_STATIC(StreamHandler) theStreamHandler;
-  PROCESS_WIDE_STORAGE_STATIC(DrawingManager) theDrawingManager;
-  PROCESS_WIDE_STORAGE_STATIC(DrawingManager3D) theDrawingManager3D;
-  PROCESS_WIDE_STORAGE_STATIC(ReleaseOptions) theReleaseOptions;
+  static PROCESS_WIDE_STORAGE(OutMessage) theDebugOut;
+  static PROCESS_WIDE_STORAGE(OutMessage) theTeamOut;
+  static PROCESS_WIDE_STORAGE(Settings) theSettings;
+  static PROCESS_WIDE_STORAGE(DebugRequestTable) theDebugRequestTable;
+  static PROCESS_WIDE_STORAGE(DebugDataTable) theDebugDataTable;
+  static PROCESS_WIDE_STORAGE(StreamHandler) theStreamHandler;
+  static PROCESS_WIDE_STORAGE(DrawingManager) theDrawingManager;
+  static PROCESS_WIDE_STORAGE(DrawingManager3D) theDrawingManager3D;
+  static PROCESS_WIDE_STORAGE(TimingManager) theTimingManager;
 
 public:
   /**
@@ -93,13 +87,14 @@ public:
   static DrawingManager3D& getDrawingManager3D() {return *theDrawingManager3D;}
 
   /**
-  * The method returns a reference to the process wide instance.
-  * @return The instance of the release options in this process.
-  */
-  static ReleaseOptions& getReleaseOptions() {return *theReleaseOptions;}
+   * The method returns a reference to the process wide instance.
+   * @return the instance of the timing manager in this process.
+   */
+  static TimingManager& getTimingManager() { return *theTimingManager;}
 
   friend class Process; // The class Process can set these pointers.
   friend class Cognition; // The class Cognition can set theTeamOut.
+  friend class Settings; // The class Settings can set a default StreamHandler.
   friend class ConsoleRoboCupCtrl; // The class ConsoleRoboCupCtrl can set theStreamHandler.
   friend class RobotConsole; // The class RobotConsole can set theDebugOut.
   friend class TeamComm3DCtrl;

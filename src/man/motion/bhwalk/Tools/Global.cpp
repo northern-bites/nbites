@@ -14,4 +14,4 @@ PROCESS_WIDE_STORAGE(DebugDataTable) Global::theDebugDataTable = 0;
 PROCESS_WIDE_STORAGE(StreamHandler) Global::theStreamHandler = 0;
 PROCESS_WIDE_STORAGE(DrawingManager) Global::theDrawingManager = 0;
 PROCESS_WIDE_STORAGE(DrawingManager3D) Global::theDrawingManager3D = 0;
-PROCESS_WIDE_STORAGE(ReleaseOptions) Global::theReleaseOptions = 0;
+PROCESS_WIDE_STORAGE(TimingManager) Global::theTimingManager = 0;

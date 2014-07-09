@@ -918,9 +918,6 @@ void MotionModule::sendMotionCommand(messages::DestinationWalk command)
     float relY = command.rel_y() * CM_TO_MM;
     float relH = command.rel_h() * TO_RAD;
 
-    float ballRelX = command.kick().ball_rel_x() * CM_TO_MM;
-    float ballRelY = command.kick().ball_rel_y() * CM_TO_MM;
-
     float gain; 
     if(command.gain() > 0.f)
         gain = command.gain();
@@ -934,10 +931,7 @@ void MotionModule::sendMotionCommand(messages::DestinationWalk command)
             relY,
             relH,
             gain,
-            command.pedantic(),
             command.kick().perform_motion_kick(),
-            ballRelX,
-            ballRelY,
             command.kick().kick_type())
         );
     walkProvider.setCommand(newCommand);
@@ -1234,6 +1228,7 @@ void MotionModule::updateStatus()
     status.get()->set_walk_is_active(isWalkActive());
     status.get()->set_head_is_active(isHeadActive());
     status.get()->set_calibrated(calibrated());
+    status.get()->set_upright(upright());
 
     motionStatusOutput_.setMessage(status);
 }

@@ -77,7 +77,6 @@ public:
         };
         return bottomSettings;
     }
-
     /*
      * Camera Parameters Go Here
      */

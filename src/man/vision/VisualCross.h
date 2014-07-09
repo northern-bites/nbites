@@ -22,7 +22,7 @@ class VisualCross : public VisualObject {
 
 public:
     //determined by common sense
-    static const float MAX_DISTANCE = 200.0f;
+    static constexpr float MAX_DISTANCE = 200.0f;
 
 public:
     // ConcreteType provided by this VisualObject

@@ -71,6 +71,7 @@ class Brain(object):
 
         # Information about the environment
         self.ball = None
+        self.sharedBall = None
         self.initTeamMembers()
         self.motion = None
         self.game = None
@@ -204,6 +205,7 @@ class Brain(object):
         Update estimates of robot and ball positions on the field
         """
         self.ball = self.interface.filteredBall
+        self.sharedBall = self.interface.sharedBall
         if (self.player.gameState == 'gameReady'
             or self.player.gameState == 'gameSet'):
             self.ball.x = Constants.CENTER_FIELD_X
@@ -247,9 +249,9 @@ class Brain(object):
         """
         # Does this matter for the goalie? It really shouldn't...
         if self.playerNumber == 1:
-            self.resetLocTo(Constants.FIELD_WHITE_LEFT_SIDELINE_X,
-                            Constants.FIELD_HEIGHT/2,
-                            Constants.HEADING_RIGHT)
+            self.resetLocTo(Constants.MIDFIELD_X,
+                            Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                            Constants.HEADING_UP)
         elif self.playerNumber == 2:
             self.resetLocTo(Constants.BLUE_GOALBOX_MIDPOINT_X,
                             Constants.FIELD_WHITE_TOP_SIDELINE_Y,

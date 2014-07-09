@@ -6,35 +6,34 @@
 
 #pragma once
 
-//#include "Tools/Module/Module.h"
+#include "Tools/Module/Module.h"
 #include "Representations/Infrastructure/SensorData.h"
 #include "Representations/Sensing/InertiaSensorData.h"
 #include "Representations/Sensing/OrientationData.h"
+#include "Representations/Configuration/DamageConfiguration.h"
 
-//MODULE(SensorFilter)
-//  REQUIRES(SensorData)
-//  REQUIRES(InertiaSensorData)
-//  REQUIRES(OrientationData)
-//  PROVIDES_WITH_MODIFY_AND_OUTPUT(FilteredSensorData)
-//END_MODULE
+MODULE(SensorFilter)
+  REQUIRES(SensorDataBH)
+  REQUIRES(InertiaSensorDataBH)
+  REQUIRES(OrientationDataBH)
+  REQUIRES(DamageConfigurationBH)
+  PROVIDES_WITH_MODIFY_AND_OUTPUT(FilteredSensorDataBH)
+END_MODULE
 
 /**
 * A module for sensor data filtering.
 */
-class SensorFilter //: public SensorFilterBase
+class SensorFilter : public SensorFilterBase
 {
 public:
+  static PROCESS_WIDE_STORAGE(SensorFilter) theInstance;
   /**
-  * Updates the FilteredSensorData representation.
+  * Updates the FilteredSensorDataBH representation.
   * @param filteredSensorData The sensor data representation which is updated by this module.
   */
-  void update(FilteredSensorData& filteredSensorData,
-          const InertiaSensorData& theInertiaSensorData,
-          const SensorData& theSensorData,
-          const OrientationData& theOrientationData);
+  void update(FilteredSensorDataBH& filteredSensorData);
 
-#ifndef RELEASE
+private:
   float gyroAngleXSum;
-  unsigned int lastIteration;
-#endif
+  unsigned lastIteration;
 };

@@ -11,19 +11,25 @@
 #include "Representations/Infrastructure/SensorData.h"
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/MotionControl/MotionInfo.h"
-#include "Representations/Modeling/FallDownState.h"
+#include "Representations/Sensing/FallDownState.h"
 #include "Representations/Sensing/InertiaSensorData.h"
-//#include "Tools/Module/Module.h"
+#include "Tools/Module/Module.h"
 #include "Tools/RingBufferWithSum.h"
 
 
-//MODULE(FallDownStateDetector)
-//  REQUIRES(FilteredSensorData)
-//  REQUIRES(InertiaSensorData)
-//  USES(MotionInfo)
-//  REQUIRES(FrameInfo)
-//  PROVIDES_WITH_MODIFY_AND_DRAW(FallDownState)
-//END_MODULE
+MODULE(FallDownStateDetector)
+  REQUIRES(FilteredSensorDataBH)
+  REQUIRES(InertiaSensorDataBH)
+  USES(MotionInfoBH)
+  REQUIRES(FrameInfoBH)
+  PROVIDES_WITH_MODIFY_AND_DRAW(FallDownStateBH)
+  DEFINES_PARAMETER(int, fallTime, 1000) /**< The time (in ms) to remain in state 'falling' after a detected fall */
+  DEFINES_PARAMETER(float, staggeringAngleX, 40) /**< The threshold angle which is used to detect the robot is staggering to the back or front*/
+  DEFINES_PARAMETER(float, staggeringAngleY, 30) /**< The threshold angle which is used to detect the robot is staggering sidewards*/
+  DEFINES_PARAMETER(float, fallDownAngleY, 45) /**< The threshold angle which is used to detect a fall to the back or front*/
+  DEFINES_PARAMETER(float, fallDownAngleX, 55) /**< The threshold angle which is used to detect a sidewards fall */
+  DEFINES_PARAMETER(float, onGroundAngle, 75) /**< The threshold angle which is used to detect the robot lying on the ground */
+END_MODULE
 
 
 /**
@@ -31,75 +37,34 @@
 *
 * A module for computing the current body state from sensor data
 */
-class FallDownStateDetector //: public FallDownStateDetectorBase
+class FallDownStateDetector: public FallDownStateDetectorBase
 {
 private:
-  /**
-   * @class Parameters
-   * The parameters for FallDownStateDetector
-   */
-  class Parameters : public Streamable
-  {
-  private:
-    void serialize(In* in, Out* out)
-    {
-      STREAM_REGISTER_BEGIN();
-      STREAM(staggeringAngleX);
-      STREAM(staggeringAngleY);
-      STREAM(fallDownAngleX);
-      STREAM(fallDownAngleY);
-      STREAM(fallTime);
-      STREAM(onGroundAngle);
-      STREAM_REGISTER_FINISH();
-    }
-
-  public:
-    int   fallTime; /**< The time (in ms) to remain in state 'falling' after a detected fall */
-    float staggeringAngleX, /**< The threshold angle which is used to detect the robot is staggering to the back or front*/
-          staggeringAngleY, /**< The threshold angle which is used to detect the robot is staggering sidewards*/
-          fallDownAngleY, /**< The threshold angle which is used to detect a fall to the back or front*/
-          fallDownAngleX, /**< The threshold angle which is used to detect a sidewards fall */
-          onGroundAngle; /**< The threshold angle which is used to detect the robot lying on the ground */
-  };
-
-  Parameters parameters; /**< The parameters of this module. */
-  public:
-  /** Executes this module
-  * @param fallDownState The data structure that is filled by this module
-  */
-  void update(FallDownState& fallDownState,
-          const FilteredSensorData& theFilteredSensorData,
-          const FrameInfo& theFrameInfo,
-          const InertiaSensorData& theInertiaSensorData);
-
-  bool isGettingUp();
-  bool isFalling(const FilteredSensorData& theFilteredSensorData);
-  bool isStaggering(const FilteredSensorData& theFilteredSensorData);
-//  bool isCalibrated();
-//  bool impact(FallDownState& fallDownState);
+  bool isFalling();
+  bool isStaggering();
+  bool isCalibrated();
   bool specialSpecialAction();
-  bool isUprightOrStaggering(FallDownState& fallDownState);
-  FallDownState::Direction directionOf(float angleX, float angleY);
-  FallDownState::Sidestate sidewardsOf(FallDownState::Direction dir);
+  bool isUprightOrStaggering(FallDownStateBH& fallDownState);
+  FallDownStateBH::Direction directionOf(float angleX, float angleY);
+  FallDownStateBH::Sidestate sidewardsOf(FallDownStateBH::Direction dir);
 
-  unsigned int lastFallDetected;
-
-  ENUM(KeeperJumped,
-    None,
-    KeeperJumpedLeft,
-    KeeperJumpedRight
-  );
-  KeeperJumped keeperJumped; /**< Whether the keeper has recently executed a jump motion that has to be integrated in odometry offset. */
+  unsigned lastFallDetected;
 
   /** Indices for buffers of sensor data */
   ENUM(BufferEntry, accX, accY, accZ);
 
   /** Buffers for averaging sensor data */
-  RingBufferWithSum<float, 15> buffers[numOfBufferEntrys];
+  RingBufferWithSumBH<float, 15> buffers[numOfBufferEntrys];
 
 public:
+  static PROCESS_WIDE_STORAGE(FallDownStateDetector) theInstance;
   /**
   * Default constructor.
   */
   FallDownStateDetector();
+
+  /** Executes this module
+  * @param fallDownState The data structure that is filled by this module
+  */
+  void update(FallDownStateBH& fallDownState);
 };

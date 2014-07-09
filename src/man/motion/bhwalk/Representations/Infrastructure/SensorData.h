@@ -8,13 +8,13 @@
 
 #pragma once
 
-#include "Representations/Infrastructure/JointData.h"
+#include "JointData.h"
 
 /**
-* @class SensorData
+* @class SensorDataBH
 * A class to represent the sensor data received from the robot.
 */
-class SensorData : public Streamable
+STREAMABLE(SensorDataBH,
 {
 public:
   ENUM(Sensor,
@@ -34,62 +34,69 @@ public:
     fsrRBL,
     fsrRBR,
     usL,
-    usR,
-    angleX,
+    usL1,
+    usL2,
+    usL3,
+    usL4,
+    usL5,
+    usL6,
+    usL7,
+    usL8,
+    usL9,
+    usLEnd,
+    us = usLEnd,
+    usR = us,
+    us1,
+    usR1 = us1,
+    us2,
+    usR2 = us2,
+    us3,
+    usR3 = us3,
+    us4,
+    usR4 = us4,
+    us5,
+    usR5 = us5,
+    us6,
+    usR6 = us6,
+    us7,
+    usR7 = us7,
+    us8,
+    usR8 = us8,
+    us9,
+    usR9 = us9,
+    usREnd,
+    angleX = usREnd,
     angleY
   );
 
-  enum
-  {
-    off = JointData::off /**< A special value to indicate that the sensor is missing. */
-  };
+  enum {off = JointDataBH::off}; /**< A special value to indicate that the sensor is missing. */
 
+  // Inserted dummies, due to access based on array index. (http://www.aldebaran-robotics.com/documentation/naoqi/sensors/dcm/pref_file_architecture.html#us-actuator-value)
   ENUM(UsActuatorMode,
     leftToLeft,
     leftToRight,
     rightToLeft,
-    rightToRight
-  );
+    rightToRight,
+    numOfSingleUsActuatorModes,
+    bothToSame = numOfSingleUsActuatorModes,
+    bothToOther
+  ),
 
-  float data[numOfSensors]; /**< The data of all sensors. */
-  float currents[JointData::numOfJoints]; /**< The currents of all motors. */
-  unsigned char temperatures[JointData::numOfJoints]; /**< The temperature of all motors. */
-  unsigned timeStamp; /**< The time when the sensor data was received. */
+  (float[numOfSensors]) data, /**< The data of all sensors. */
+  (short[JointDataBH::numOfJoints]) currents, /**< The currents of all motors. */
+  (unsigned char[JointDataBH::numOfJoints]) temperatures, /**< The temperature of all motors. */
+  (unsigned)(0) timeStamp, /**< The time when the sensor data was received. */
+  (UsActuatorMode)(leftToLeft) usActuatorMode, /**< The ultrasonice measure method which was used for measuring \c data[usL] and \c data[usR]. */
+  (unsigned)(0) usTimeStamp, /**< The time when the ultrasonic measurements were taken. */
 
-  UsActuatorMode usActuatorMode; /**< The ultrasonice measure method which was used for measuring \c data[usL] and \c data[usR]. */
-  unsigned usTimeStamp; /**< The time when the ultrasonic measurements were taken. */
-
-  /**
-  * Default constructor.
-  */
-  SensorData() : timeStamp(0), usActuatorMode(leftToLeft), usTimeStamp(0)
-  {
-    for(int i = 0; i < numOfSensors; ++i)
-      data[i] = off;
-    for(int i = 0; i < JointData::numOfJoints; ++i)
-      currents[i] = temperatures[i] = 0;
-  }
-
-private:
-  /**
-  * The method makes the object streamable.
-  * @param in The stream from which the object is read.
-  * @param out The stream to which the object is written.
-  */
-  virtual void serialize(In* in, Out* out)
-  {
-    STREAM_REGISTER_BEGIN();
-    STREAM(data);
-    STREAM(currents);
-    STREAM(temperatures);
-    STREAM(timeStamp);
-    STREAM(usActuatorMode);
-    STREAM(usTimeStamp);
-    STREAM_REGISTER_FINISH();
-  }
-};
+  // Initialization
+  for(int i = 0; i < numOfSensors; ++i)
+    data[i] = off;
+  for(int i = 0; i < JointDataBH::numOfJoints; ++i)
+    currents[i] = temperatures[i] = 0;
+});
 
 /**
 * A class to represent filtered sensor data.
 */
-class FilteredSensorData : public SensorData {};
+class FilteredSensorDataBH : public SensorDataBH {};

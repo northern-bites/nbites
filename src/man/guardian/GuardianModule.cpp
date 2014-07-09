@@ -37,6 +37,7 @@ GuardianModule::GuardianModule()
       chestButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       leftFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       rightFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
+      frameCount(0),
       useFallProtection(true),
       audioQueue()
 {
@@ -54,6 +55,7 @@ void GuardianModule::run_()
     inertialInput.latch();
     fsrInput.latch();
     batteryInput.latch();
+    motionStatusIn.latch();
 
     PROF_ENTER(P_GUARDIAN);
 
@@ -102,58 +104,74 @@ void GuardianModule::checkFalling()
         return;
     }
 
-    struct Inertial inertial = {inertialInput.message().angle_x(),
-                                 inertialInput.message().angle_y() };
-
-    /***** Determine if the robot is in the process of FALLING ****/
-    //Using just the magnitude:
-    const float angleMag = sqrtf(std::pow(inertial.angleX,2) +
-                                 std::pow(inertial.angleY,2));
-    const float lastAngleMag = sqrtf(std::pow(lastInertial.angleX,2) +
-                                     std::pow(lastInertial.angleY,2));
-
-    const float angleSpeed = angleMag - lastAngleMag;
-    const bool falling_critical_angle = angleMag > FALLING_ANGLE_THRESH;
-
-    if(isFalling(angleMag, angleSpeed))
-    {
-        // If falling, increment falling frames counter.
-        fallingFrames += 1;
-        notFallingFrames = 0;
-    }
+    messages::MotionStatus bh = motionStatusIn.message();
+    if (!bh.walk_is_active() || !bh.calibrated())
+        framesInBHWalk = 0;
     else
+        framesInBHWalk++;
+
+    // If we are not in BH walk or just switched to it, then use NB fall down detection
+    if (framesInBHWalk < 100)
     {
-        // Otherwise, not falling.
-        fallingFrames = 0;
-        notFallingFrames += 1;
+        struct Inertial inertial = {inertialInput.message().angle_x(),
+                                     inertialInput.message().angle_y() };
+
+        /***** Determine if the robot is in the process of FALLING ****/
+        //Using just the magnitude:
+        const float angleMag = sqrtf(std::pow(inertial.angleX,2) +
+                                     std::pow(inertial.angleY,2));
+        const float lastAngleMag = sqrtf(std::pow(lastInertial.angleX,2) +
+                                         std::pow(lastInertial.angleY,2));
+
+        const float angleSpeed = angleMag - lastAngleMag;
+        const bool falling_critical_angle = angleMag > FALLING_ANGLE_THRESH;
+
+        if(isFalling(angleMag, angleSpeed))
+        {
+            // If falling, increment falling frames counter.
+            fallingFrames += 1;
+            notFallingFrames = 0;
+        }
+        else
+        {
+            // Otherwise, not falling.
+            fallingFrames = 0;
+            notFallingFrames += 1;
+        }
+
+        // if(angleMag >= FALLING_ANGLE_THRESH)
+        // {
+        //     std::cout << "angleSpeed " << angleSpeed
+        //               << " and angleMag" << angleMag << std::endl
+        //               << "  fallingFrames is " << fallingFrames
+        //               << "  notFallingFrames is " << notFallingFrames
+        //               << "  and critical angle is " << falling_critical_angle
+        //               << std::endl;
+        // }
+
+        //If the robot has been falling for a while, and the robot is inclined
+        //already at a 45 degree angle, than we know we are falling
+        if (fallingFrames > FALLING_FRAMES_THRESH)
+        {
+            // When falling, execute the fall protection method.
+            //std::cout << "GuardianModule::checkFalling() : FALLING!" << std::endl;
+            falling = true;
+            //processFallingProtection(); // Should be called later in run_()
+        }
+        else if(notFallingFrames > FALLING_FRAMES_THRESH)
+        {
+            falling = false;
+        }
+
+        // To calculate the angular speed of the fall next time.
+        lastInertial  = inertial;
     }
-
-    // if(angleMag >= FALLING_ANGLE_THRESH)
-    // {
-    //     std::cout << "angleSpeed " << angleSpeed
-    //               << " and angleMag" << angleMag << std::endl
-    //               << "  fallingFrames is " << fallingFrames
-    //               << "  notFallingFrames is " << notFallingFrames
-    //               << "  and critical angle is " << falling_critical_angle
-    //               << std::endl;
-    // }
-
-    //If the robot has been falling for a while, and the robot is inclined
-    //already at a 45 degree angle, than we know we are falling
-    if (fallingFrames > FALLING_FRAMES_THRESH)
+    // If we have been in BH walk for some time, then use BH fall down detection
+    else if (!bh.upright())
     {
-        // When falling, execute the fall protection method.
-        //std::cout << "GuardianModule::checkFalling() : FALLING!" << std::endl;
+        std::cout << "BH thinks we are falling!" << std::endl;
         falling = true;
-        //processFallingProtection(); // Should be called later in run_()
     }
-    else if(notFallingFrames > FALLING_FRAMES_THRESH)
-    {
-        falling = false;
-    }
-
-    // To calculate the angular speed of the fall next time.
-    lastInertial  = inertial;
 }
 
 //Check if the angle is unstable, (ie tending AWAY from zero)
@@ -346,13 +364,11 @@ void GuardianModule::checkTemperatures()
     static const float REALLY_HIGH_TEMP = 50.0f; //deg C
 
     std::vector<float> newTemps = vectorizeTemperatures(temperaturesInput.message());
-
     if (frameCount == 0)
     {
         lastTemps = newTemps;
         return;
     }
-
     bool sayWarning = false;
     for(int joint = 0;
         joint < temperaturesInput.message().GetDescriptor()->field_count();

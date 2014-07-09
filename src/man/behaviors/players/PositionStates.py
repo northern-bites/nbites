@@ -4,7 +4,7 @@ from ..navigator import Navigator
 from ..util import *
 import noggin_constants as NogginConstants
 from objects import Location, RelRobotLocation
-from . import BoxPositionConstants as BPConstants
+from . import RoleConstants as roleConstants
 from . import SharedTransitions
 
 @superState('gameControllerResponder')
@@ -14,15 +14,17 @@ def positionReady(player):
     """
     if player.firstFrame():
         if player.brain.gameController.ownKickOff and player.isKickingOff:
-            player.kickoffPosition = BPConstants.ourKickoff
+            player.kickoffPosition = roleConstants.ourKickoff
         elif player.isKickingOff:
-            player.kickoffPosition = BPConstants.theirKickoff
+            player.kickoffPosition = roleConstants.theirKickoff
 
+        fast = (roleConstants.isChaser(player.role) or     # fast walk if chaser
+                roleConstants.isCherryPicker(player.role)) # or if cherry picker
         player.brain.nav.goTo(player.kickoffPosition,
                               precision = Navigator.PLAYBOOK,
                               speed = Navigator.QUICK_SPEED,
                               avoidObstacles = True,
-                              fast = False, pb = False)
+                              fast = fast, pb = False)
 
         player.brain.tracker.repeatBasicPan()
 

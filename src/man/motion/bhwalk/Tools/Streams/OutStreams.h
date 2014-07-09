@@ -3,22 +3,22 @@
 *
 * Declaration of out stream classes for different media and formats.
 *
-* @author Thomas Röfer
-* @author Martin Lötzsch
+* @author Thomas RÃ¶fer
+* @author Martin LÃ¶tzsch
 */
 
 #pragma once
 
+#include <vector>
 #include "Tools/Streams/InOut.h"
-#include "Tools/Configuration/ConfigMap.h"
 
 class File;
 
 /**
 * @class PhysicalOutStream
 *
-* The base class for physical out streams. Derivates of PhysicalOutStream only handle the
-* writing of data to a medium, not of formating data.
+* The base class for physical out streams. Derivatives of PhysicalOutStream only handle the
+* writing of data to a medium, not of formatting data.
 */
 class PhysicalOutStream
 {
@@ -29,14 +29,13 @@ public:
   * @param size The number of bytes to be written.
   */
   virtual void writeToStream(const void* p, int size) = 0;
-
 };
 
 /**
 * @class StreamWriter
 *
-* Generic class for formating data to be used in streams.
-* The physical writing is then done by OutStream derivates.
+* Generic class for formatting data to be used in streams.
+* The physical writing is then done by OutStream derivatives.
 */
 class StreamWriter
 {
@@ -98,6 +97,13 @@ protected:
   virtual void writeDouble(double d, PhysicalOutStream& stream) = 0;
 
   /**
+   * Writes a bool to a stream.
+   * @param d the data to write.
+   * @param stream the stream to write on.
+   */
+  virtual void writeBool(bool d, PhysicalOutStream& stream) = 0;
+
+  /**
   * Writes a string to a stream.
   * @param d the data to write.
   * @param stream the stream to write on.
@@ -123,14 +129,11 @@ protected:
 /**
 * @class OutStream
 *
-* Generic class for classes that do both formating and physical writing of data to streams.
+* Generic class for classes that do both formatting and physical writing of data to streams.
 */
 template <class S, class W> class OutStream : public S, public W, public Out
 {
 public:
-  /** Standard constructor */
-  OutStream() {};
-
   /**
   * The function writes a number of bytes into a stream.
   * @param p The address the data is located at.
@@ -189,6 +192,12 @@ protected:
   { W::writeDouble(d, *this); }
 
   /**
+   * Virtual redirection for operator<<(const bool& value).
+   */
+  virtual void outBool(bool d)
+  { W::writeBool(d, *this); }
+
+  /**
   * Virtual redirection for operator<<(const char* value).
   */
   virtual void outString(const char* d)
@@ -207,7 +216,7 @@ protected:
 * @class OutBinary
 *
 * Formats data binary to be used in streams.
-* The physical writing is then done by OutStream derivates.
+* The physical writing is then done by OutStream derivatives.
 */
 class OutBinary : public StreamWriter
 {
@@ -277,6 +286,14 @@ protected:
   { stream.writeToStream(&d, sizeof(d)); }
 
   /**
+   * Writes a bool to a stream.
+   * @param d the data to write.
+   * @param stream the stream to write on.
+   */
+  virtual void writeBool(bool d, PhysicalOutStream& stream)
+  { char c = (char) d; stream.writeToStream(&c, sizeof(c)); }
+
+  /**
   * Writes a string to a stream.
   * @param d the data to write.
   * @param stream the stream to write on.
@@ -303,7 +320,7 @@ protected:
 * @class OutText
 *
 * Formats data as text to be used in streams.
-* The physical writing is then done by PhysicalOutStream derivates.
+* The physical writing is then done by PhysicalOutStream derivatives.
 */
 class OutText : public StreamWriter
 {
@@ -368,6 +385,13 @@ protected:
   virtual void writeDouble(double d, PhysicalOutStream& stream);
 
   /**
+   * Writes a bool to a stream.
+   * @param d the data to write.
+   * @param stream the stream to write on.
+   */
+  virtual void writeBool(bool d, PhysicalOutStream& stream);
+
+  /**
   * Writes a string to a stream.
   * @param d the data to write.
   * @param stream the stream to write on.
@@ -393,7 +417,7 @@ protected:
 * @class OutTextRaw
 *
 * Formats data as raw text to be used in streams.
-* The physical writing is then done by PhysicalOutStream derivates.
+* The physical writing is then done by PhysicalOutStream derivatives.
 * Different from OutText, OutTextRaw does not escape spaces
 * and other special characters and no spaces are inserted before numbers.
 * (The result of the OutTextRaw StreamWriter is the same as the result of "std::cout")
@@ -461,6 +485,13 @@ protected:
   virtual void writeDouble(double d, PhysicalOutStream& stream);
 
   /**
+   * Writes a bool to a stream.
+   * @param d the data to write.
+   * @param stream the stream to write on.
+   */
+  virtual void writeBool(bool d, PhysicalOutStream& stream);
+
+  /**
   * Writes a string to a stream.
   * @param d the data to write.
   * @param stream the stream to write on.
@@ -481,8 +512,6 @@ protected:
   */
   virtual void writeData(const void* p, int size, PhysicalOutStream& stream);
 };
-
-
 
 /**
 * @class OutFile
@@ -686,11 +715,6 @@ class OutBinarySize : public OutStream<OutSize, OutBinary>
 {
 public:
   /**
-  * Constructor.
-  */
-  OutBinarySize() {}
-
-  /**
   * The function returns whether this is a binary stream.
   * @return Does it output data in binary format?
   */
@@ -796,88 +820,150 @@ public:
 *
 * A Text stream size counter
 */
-class OutTextSize : public OutStream<OutSize, OutText>
-{
-public:
-  /**
-  * Constructor.
-  */
-  OutTextSize() {}
-};
+class OutTextSize : public OutStream<OutSize, OutText> {};
 
 /**
 * @class OutTextRawSize
 *
 * A Text stream size counter
 */
-class OutTextRawSize : public OutStream<OutSize, OutTextRaw>
-{
-public:
-  /**
-  * Constructor.
-  */
-  OutTextRawSize() {}
-};
+class OutTextRawSize : public OutStream<OutSize, OutTextRaw> {};
 
-class OutConfigMap : public Out
+/**
+ * @class OutMap
+ *
+ * A stream that writes data in config map format.
+ */
+class OutMap : public Out
 {
   /**
-  * An entry representing a position in the ConfigMap.
+  * An entry representing the current state in the writing process.
   */
   class Entry
   {
   public:
-    const char* key; /**< The name of the current key (used by printError()). */
-    int type; /**< The type of the entry. -2: value or record, -1: array or list, >= 0: array/list element index. */
+    int type; /**< The type of the entry. -2: value or record, -1: array, >= 0: array element index. */
     const char* (*enumToString)(int); /**< A function that translates an enum to a string. */
+    bool hasSubEntries; /**< Has the current entry sub entries? */
 
-    Entry(const char* key, int type, const char * (*enumToString)(int)) :
-      key(key), type(type), enumToString(enumToString) {}
+    Entry(int type, const char * (*enumToString)(int)) :
+      type(type), enumToString(enumToString), hasSubEntries(false) {}
   };
-  std::string* name; /**< The name of the opened file. */
-  ConfigMap* map;
-  std::vector<Entry> stack; /**< The hierarchy of values to read. */
-  
+  Out& stream; /**< The map that is written to. */
+  bool singleLine; /**< Output to a single line. */
+  std::vector<Entry> stack; /**< The hierarchy of values that are written. */
+  std::string indentation; /**< The indentation as sequence of spaces. */
+
+  /** Writes a line break or simply a space if singleLine is active. */
+  void writeLn();
+
+protected:
   /**
-  * The method OUTPUTs an error message.
-  * @param msg The error message.
-  */
-  void printError(const std::string& msg);
-  
-public:
-  OutConfigMap(ConfigMap& map);
-  OutConfigMap(const std::string& filename);
-  ~OutConfigMap();
-  template<class T> void out(const T& value)
-  {
-    Entry e = stack.back();
-    try
-    {
-      if(e.type > -3)
-        (*map)[e.key] << value;
-    }
-    catch(std::invalid_argument& e)
-    {
-      printError(e.what());
-    }
-    catch(invalid_key& e)
-    {
-      printError(e.what());
-    }
-  }
-  virtual void outChar(char value);
+   * Writes to a stream in config map format.
+   * @param stream The stream that is written to.
+   * @param singleLine Output to a single line.
+   */
+  OutMap(Out& stream, bool singleLine);
+
+  /** Helper to write a value. */
+  template<class T> void out(const T& value) {stream << value;}
+
+  virtual void outChar(char value) {out((int) value);}
   virtual void outUChar(unsigned char value);
   virtual void outShort(short value) {out(value);}
   virtual void outUShort(unsigned short value) {out(value);}
-  virtual void outInt(int value);
+  virtual void outInt(int value) {out(value);}
   virtual void outUInt(unsigned int value);
   virtual void outFloat(float value) {out(value);}
   virtual void outDouble(double value) {out(value);}
+  virtual void outBool(bool value) {out(value);}
   virtual void outString(const char* value) {out(value);}
   virtual void outEndL() {}
-  virtual void select(const char* name, int type, const char * (*enumToString)(int) = 0);
+
+public:
+    /**
+     * Select an entry for writing.
+     * @param name The name of the entry if type == -2, otherwise 0.
+     * @param type The type of the entry.
+     *             -2: value or record,
+     *             -1: array,
+     *             >= 0: array element index.
+     * @param enumToString A function that translates an enum to a string.
+     */
+  virtual void select(const char* name, int type, const char* (*enumToString)(int));
+
+  /** Deselects a field for writing. */
   virtual void deselect();
-  virtual void write();
-  virtual void write(const void* p, int size) {}
-  virtual bool exists() const;
+
+  /** Writing raw data is not supported. Do not call. */
+  virtual void write(const void* p, int size);
+};
+
+/**
+ * @class OutMapFile
+ *
+ * A stream that writes data to a text file in config map format.
+ */
+class OutMapFile : public OutMap
+{
+private:
+  OutTextRawFile stream; /**< The text stream to write to. */
+
+public:
+  /**
+   * Constructor.
+   * @param name The name of the config file to write to.
+   * @param singleLine Output to a single line.
+   */
+  OutMapFile(const std::string& name, bool singleLine = false);
+
+  /**
+   * Checks whether was successfully opened.
+   * @return Was it possible to open that file for writing?
+   */
+  bool exists() const {return stream.exists();}
+};
+
+/**
+ * @class OutMapMemory
+ *
+ * A stream that writes data to a memory block config map format.
+ */
+class OutMapMemory : public OutMap
+{
+private:
+  OutTextRawMemory stream; /**< The memory stream to write to. */
+
+public:
+  /**
+   * Constructor.
+   * @param memory The block of memory that will be written to.
+   * @param singleLine Output to a single line.
+   */
+  OutMapMemory(void* memory, bool singleLine = false);
+};
+
+/**
+ * @class OutMapSize
+ *
+ * A stream that determines the number of bytes required to write data in config map format.
+ */
+class OutMapSize : public OutMap
+{
+private:
+  OutTextRawSize stream; /**< The stream that determines the size required. */
+
+public:
+  /**
+   * Constructor.
+   * @param singleLine Assume that output is to a single line.
+   */
+  OutMapSize(bool singleLine = false);
+
+  /**
+   * The function returns the number of bytes required to store the
+   * data written so far.
+   * @return The size of the memory block required for the data written.
+   */
+  unsigned getSize() const {return stream.getSize();}
 };

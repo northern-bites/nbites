@@ -3,14 +3,13 @@
 *
 * Declaration of in stream classes for different media and formats.
 *
-* @author Thomas Röfer
-* @author Martin Lötzsch
+* @author Thomas RÃ¶fer
+* @author Martin LÃ¶tzsch
 */
 
 #pragma once
 
-#include "Tools/Streams/InOut.h"
-#include "Tools/Configuration/ConfigMap.h"
+#include "SimpleMap.h"
 
 class File;
 
@@ -118,6 +117,13 @@ protected:
   virtual void readDouble(double& d, PhysicalInStream& stream) = 0;
 
   /**
+   * reads a bool from a stream
+   * @param d the data to read from the stream
+   * @param stream the stream to read from
+   */
+  virtual void readBool(bool& d, PhysicalInStream& stream) = 0;
+
+  /**
   * reads a string from a stream
   * @param d the data to read from the stream
   * @param stream the stream to read from
@@ -163,9 +169,6 @@ protected:
 template <class S, class R> class InStream : public S, public R, public In
 {
 public:
-  /** Standard constructor */
-  InStream() {};
-
   /**
   * The function reads a number of bytes from a stream.
   * @param p The address the data is written to. Note that p
@@ -236,6 +239,12 @@ protected:
   */
   virtual void inDouble(double& d)
   { R::readDouble(d, *this); }
+
+  /**
+   * Virtual redirection for operator>>(bool& value).
+   */
+  virtual void inBool(bool& d)
+  { R::readBool(d, *this); }
 
   /**
   * Virtual redirection for operator>>(std::string& value).
@@ -335,7 +344,6 @@ protected:
   */
   virtual void readInt(int& d, PhysicalInStream& stream);
 
-
   /**
   * reads a unsigned int from a stream
   * @param d the data to read from the stream
@@ -356,6 +364,13 @@ protected:
   * @param stream the stream to read from
   */
   virtual void readDouble(double& d, PhysicalInStream& stream);
+
+  /**
+   * reads a bool from a stream
+   * @param d the data to read from the stream
+   * @param stream the stream to read from
+   */
+  virtual void readBool(bool& d, PhysicalInStream& stream);
 
   /**
   * The function reads a string from a stream.
@@ -487,7 +502,7 @@ protected:
   /**
   * The function reads a char from the stream.
   * @param d The value that is read.
-  * @param stream A Stream to read from.
+  * @param stream A stream to read from.
   */
   virtual void readChar(char& d, PhysicalInStream& stream)
   {stream.readFromStream(&d, sizeof(d));}
@@ -495,7 +510,7 @@ protected:
   /**
   * The function reads an unsigned char from the stream.
   * @param d The value that is read.
-  * @param stream A Stream to read from.
+  * @param stream A stream to read from.
   */
   virtual void readUChar(unsigned char& d, PhysicalInStream& stream)
   {stream.readFromStream(&d, sizeof(d));}
@@ -503,7 +518,7 @@ protected:
   /**
   * The function reads a short int from the stream.
   * @param d The value that is read.
-  * @param stream A Stream to read from.
+  * @param stream A stream to read from.
   */
   virtual void readShort(short& d, PhysicalInStream& stream)
   {stream.readFromStream(&d, sizeof(d));}
@@ -511,7 +526,7 @@ protected:
   /**
   * The function reads an unsigned short int from the stream.
   * @param d The value that is read.
-  * @param stream A Stream to read from.
+  * @param stream A stream to read from.
   */
   virtual void readUShort(unsigned short& d, PhysicalInStream& stream)
   {stream.readFromStream(&d, sizeof(d));}
@@ -519,7 +534,7 @@ protected:
   /**
   * The function reads an int from the stream.
   * @param d The value that is read.
-  * @param stream A Stream to read from.
+  * @param stream A stream to read from.
   */
   virtual void readInt(int& d, PhysicalInStream& stream)
   {stream.readFromStream(&d, sizeof(d));}
@@ -527,7 +542,7 @@ protected:
   /**
   * The function reads an unsigned int from the stream.
   * @param d The value that is read.
-  * @param stream A Stream to read from.
+  * @param stream A stream to read from.
   */
   virtual void readUInt(unsigned int& d, PhysicalInStream& stream)
   {stream.readFromStream(&d, sizeof(d));}
@@ -535,7 +550,7 @@ protected:
   /**
   * The function reads a float from the stream.
   * @param d The value that is read.
-  * @param stream A Stream to read from.
+  * @param stream A stream to read from.
   */
   virtual void readFloat(float& d, PhysicalInStream& stream)
   {stream.readFromStream(&d, sizeof(d));}
@@ -543,28 +558,39 @@ protected:
   /**
   * The function reads a double from the stream.
   * @param d The value that is read.
-  * @param stream A Stream to read from.
+  * @param stream A stream to read from.
   */
   virtual void readDouble(double& d, PhysicalInStream& stream)
   {stream.readFromStream(&d, sizeof(d));}
 
   /**
+   * The function reads a bool from the stream.
+   * @param d The value that is read.
+   * @param stream A stream to read from.
+   */
+  virtual void readBool(bool& d, PhysicalInStream& stream)
+  {char c; stream.readFromStream(&c, sizeof(d)); d = c != 0;}
+
+  /**
   * The function reads a string from the stream.
   * @param d The value that is read.
-  * @param stream A Stream to read from.
+  * @param stream A stream to read from.
   */
   virtual void readString(std::string& d, PhysicalInStream& stream)
   {
     int size;
     stream.readFromStream(&size, sizeof(size));
     d.resize(size);
-    stream.readFromStream(&d[0], size);
+    if(size)
+    {
+      stream.readFromStream(&d[0], size);
+    }
   }
 
   /**
   * The function is intended to read an endl-symbol from the stream.
   * In fact, the function does nothing.
-  * @param stream A Stream to read from.
+  * @param stream A stream to read from.
   */
   virtual void readEndl(PhysicalInStream& stream) {};
 
@@ -574,7 +600,7 @@ protected:
   *          must point to a memory area that is at least
   *          "size" bytes large.
   * @param size The number of bytes to be read.
-  * @param stream A Stream to read from.
+  * @param stream A stream to read from.
   */
   virtual void readData(void* p, int size, PhysicalInStream& stream)
   { stream.readFromStream(p, size); }
@@ -814,14 +840,14 @@ public:
   { open(mem, size); initEof(*this); create(sectionName, *this); }
 };
 
-class InConfigMap : public In
+/**
+ * @class InMap
+ *
+ * A stream that reads data from a text in config map format.
+ */
+class InMap : public In
 {
 private:
-  /**
-   * Stores options of the Stream.
-   */
-  unsigned int flags;
-
   /**
    * An entry representing a position in the ConfigMap.
    */
@@ -829,18 +855,17 @@ private:
   {
   public:
     const char* key; /**< The name of the current key (used by printError()). */
-    ConfigValue* value; /**< The current value in the ConfigMap. */
-    int type; /**< The type of the entry. -2: value or record, -1: array or list, >= 0: array/list element index. */
+    const SimpleMap::Value* value; /**< The current value in the map. */
+    int type; /**< The type of the entry. -2: value or record, -1: array , >= 0: array element index. */
     const char* (*enumToString)(int); /**< A function that translates an enum to a string. */
 
-    Entry(const char* key, ConfigValue* value, int type, const char * (*enumToString)(int)) :
+    Entry(const char* key, const SimpleMap::Value* value, int type, const char* (*enumToString)(int)) :
       key(key), value(value), type(type), enumToString(enumToString) {}
   };
 
+  SimpleMap* map; /**< The configuration map that was read. */
   std::string name; /**< The name of the opened file. */
-  ConfigMap map; /**< The configuration map that was read. */
   std::vector<Entry> stack; /**< The hierarchy of values to read. */
-  int status; /**< Status returned by ConfigMap::read. */
 
   /**
    * The method OUTPUTs an error message.
@@ -849,35 +874,46 @@ private:
   void printError(const std::string& msg);
 
   /**
-   * The method WARNs.
-   * @param msg The warn message.
-   */
-  void printWarning(const std::string& msg);
-
-  /**
    * The method reads an entry from the config map.
    * The entry has been selected by select() before.
    * @param value The value that is read.
    */
   template<class T> void in(T& value)
   {
-    try
+    Entry& e = stack.back();
+    if(e.value)
     {
-      Entry& e = stack.back();
-      if(e.value)
-        *e.value >> value;
-    }
-    catch(std::invalid_argument& e)
-    {
-      printError(e.what());
-    }
-    catch(invalid_key& e)
-    {
-      printError(e.what());
+      const SimpleMap::Literal* literal = dynamic_cast<const SimpleMap::Literal*>(e.value);
+      if(literal)
+      {
+        In& stream = *literal;
+        stream >> value;
+        if(!stream.eof())
+          printError("wrong format");
+      }
+      else
+        printError("literal expected");
     }
   }
 
 protected:
+  /**
+   * Constructor.
+   */
+  InMap() : map(0) {}
+
+  /**
+   * Destructor.
+   */
+  ~InMap() {if(map) delete map;}
+
+  /**
+   * Parse the stream.
+   * @param stream The stream to read from.
+   * @param name The name of the map if it is a file.
+   */
+  void parse(In& stream, const std::string& name = "");
+
   /**
    * Virtual redirection for operator>>(char& value).
    */
@@ -926,7 +962,7 @@ protected:
   /**
    * Virtual redirection for operator>>(bool& value).
    */
-  virtual void inBool(bool& value);
+  virtual void inBool(bool& value) {in(value);}
 
   /**
    * Virtual redirection for operator>>(In& (*f)(In&)) that reads
@@ -935,64 +971,6 @@ protected:
   virtual void inEndL() {}
 
 public:
-
-  /**
-   * To be set in flags. Lets the stream output warnings if set.
-   */
-  static const unsigned int VERBOSE       = 0x01;
-
-  /**
-   * To be set in flags. Lets the stream ignore missing keys.
-   */
-  static const unsigned int TOLERANT      = 0x02;
-
-  /**
-   * To be set in flags. Lets the stream output a message if an error occures.
-   */
-  static const unsigned int OUTPUT_ERRORS = 0x04;
-
-  /**
-   * Constructor.
-   * @param name The name of the config file to read.
-   * @param flags Can be used to pass options to the Stream
-   */
-  InConfigMap(const std::string& name, unsigned int flags = OUTPUT_ERRORS);
-
-  /**
-   * Constructor.
-   * @param map The map to read.
-   */
-  InConfigMap(const ConfigMap& map);
-
-  /**
-   * Returns True if the Stream is TOLERANT.
-   */
-  inline bool isTolerant() const { return (flags & TOLERANT) != 0x00; }
-
-  /**
-   * Returns True if the Stream is VERBOSE.
-   */
-  inline bool isVerbose() const { return (flags & VERBOSE) != 0x00; }
-
-  /**
-   * Returns True if the Stream should output errors.
-   */
-  inline bool doOutputErrors() const { return (flags & OUTPUT_ERRORS) != 0x00; }
-
-  /**
-   * The function states whether this stream actually exists.
-   * @return Does the stream exist?
-   */
-  bool exists() {return status >= 0;}
-
-  /**
-   * The function disables error OUTPUTs.
-   * On some configuration files there aren't full filled streamd objects
-   * so errors would be confusing.
-   * @return True if errors are shown
-   */
-  inline bool toggleErrorOutput() { flags ^= OUTPUT_ERRORS; return doOutputErrors();}
-
   /**
    * The function reads a number of bytes from a stream.
    * Not allowed for this stream!
@@ -1011,19 +989,12 @@ public:
   virtual void skip(int size);
 
   /**
-   * Determines whether the end of file has been reached.
-   * This is only the case if the file does not exist or
-   * reading failed.
-   */
-  virtual bool eof() const {return status <= 0;}
-
-  /**
    * Select an entry for reading.
    * @param name The name of the entry if type == -2, otherwise 0.
    * @param type The type of the entry.
    *             -2: value or record,
-   *             -1: array or list.
-   *             >= 0: array/list element index.
+   *             -1: array,
+   *             >= 0: array element index.
    * @param enumToString A function that translates an enum to a string.
    */
   virtual void select(const char* name, int type, const char * (*enumToString)(int));
@@ -1032,4 +1003,54 @@ public:
    * Deselects a field for reading.
    */
   virtual void deselect();
+
+  /**
+   * Determines whether the end of file has been reached.
+   * This is only the case if the file does not exist or
+   * reading failed.
+   */
+  virtual bool eof() const {return (const SimpleMap::Value*) *map == 0;}
+};
+
+/**
+ * @class InMapFile
+ *
+ * A stream that reads data from a text file in config map format.
+ */
+class InMapFile : public InMap
+{
+private:
+  InBinaryFile stream;
+
+public:
+  /**
+   * Constructor.
+   * @param name The name of the config file to read.
+   */
+  InMapFile(const std::string& name);
+
+  /**
+   * The function states whether this stream actually exists.
+   * @return Does the stream exist?
+   */
+  bool exists() {return stream.exists();}
+};
+
+/**
+ * @class InMapMemory
+ *
+ * A stream that reads data from memory in config map format.
+ */
+class InMapMemory : public InMap
+{
+private:
+  InBinaryMemory stream;
+
+public:
+  /**
+   * Constructor.
+   * @param memory The block of memory to read from.
+   * @param size The size of the memory block to read from.
+   */
+  InMapMemory(const void* memory, unsigned size);
 };

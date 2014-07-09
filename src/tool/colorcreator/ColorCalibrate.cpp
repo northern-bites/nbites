@@ -28,8 +28,11 @@ ColorCalibrate::ColorCalibrate(QWidget *parent) :
 {
 
     mainLayout = new QVBoxLayout;
+	mainLayout->setSpacing(0);
+	//mainLayout->resize(800, 1000);
 
     topLayout = new QHBoxLayout;
+	//topLayout->setColor(
 
     //Adds modules to diagram then wires them together
     subdiagram.addModule(topDisplay);
@@ -107,9 +110,9 @@ ColorCalibrate::ColorCalibrate(QWidget *parent) :
     connect(fullColors, SIGNAL(toggled(bool)), this, SLOT(setFullColors(bool)));
     displayAllColors = false;
 
-    mainLayout->addLayout(topLayout);
-    bottomLayout->setAlignment(Qt::AlignBottom);
+    bottomLayout->setAlignment(Qt::AlignTop);
     mainLayout->addLayout(bottomLayout);
+    mainLayout->addLayout(topLayout);
 
     this->setLayout(mainLayout);
 }

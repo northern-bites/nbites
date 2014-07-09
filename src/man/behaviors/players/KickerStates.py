@@ -1,8 +1,3 @@
-#
-# This file defines the states necessary for kick testing. Each method
-# defines a state.
-#
-
 from ..headTracker import HeadMoves
 from .. import SweetMoves
 from ..util import *
