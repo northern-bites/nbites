@@ -61,7 +61,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.motionKick = False
         # Controls whether we will role switch
         self.roleSwitching = False
-        self.numChasers = 2
         # Controls whether we use claims
         self.useClaims = True
         self.returningFromPenalty = False
