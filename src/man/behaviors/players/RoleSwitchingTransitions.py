@@ -4,37 +4,44 @@ def chaserIsOut(player):
     """
     There is a chaser spot ready to be filled.
     """
-    checkForConsistency(player)
+    if not player.brain.teamMembers[player.brain.playerNumber - 1].active:
+        print player.role, "*"
+    else:
+        print player.role
 
-    if not player.roleSwitching:
+    if not player.roleSwitching or player.brain.gameController.penalized:
         return False
 
     if not player.gameState == "gamePlaying":
         return False
 
+    checkForConsistency(player)
+
     if constants.canRoleSwitchTo(player.role):
         return False
 
-    openPosition = 0
-    positions = [0, 0, 0, 0]
+    openPositions = ()
+    positions = [False, False, False, False]
     for mate in player.brain.teamMembers:
         if mate.role <= 1:
             continue
-        positions[mate.role - 2] += 1
+        if mate.frameSinceActive < 30:
+            positions[mate.role - 2] = True
         if mate.playerNumber == player.brain.playerNumber:
             continue
         if constants.canRoleSwitchTo(mate.role) and mate.frameSinceActive > 30:
-            openPosition = mate.role
+            openPositions += (mate.role,)
 
         if constants.willRoleSwitch(mate.role) \
                 and mate.playerNumber > player.brain.playerNumber \
-                and mate.frameSinceActive < 30:
+                and (mate.frameSinceActive < 30 or not mate.active):
             return False # Active, higher numbered player takes precedence
 
 
-    if openPosition > 0 and positions[openPosition - 2] == 1:
-        player.openChaser = openPosition
-        return True
+    for pos in openPositions:
+        if not positions[pos - 2]:
+            player.openChaser = pos
+            return True
 
     return False
 
@@ -50,8 +57,11 @@ def checkForConsistency(player):
 
     openSpaces = [True, True, True, True]
     conflict = False
+    position = 0
 
     for mate in player.brain.teamMembers:
+        if mate.playerNumber == player.brain.playerNumber:
+            continue
         openSpaces[mate.role - 2] = False
         if mate.role == player.role \
                 and mate.playerNumber > player.brain.playerNumber \
@@ -62,7 +72,7 @@ def checkForConsistency(player):
         return # The expected outcome
 
     for i in range(3):
-        if openSpaces[i] and roleConstants.canRoleSwitchTo(i+2):
+        if openSpaces[i] and constants.canRoleSwitchTo(i+2):
             constants.setRoleConstants(player, i+2)
             return
         elif openSpaces[i]:

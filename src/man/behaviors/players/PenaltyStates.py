@@ -120,6 +120,7 @@ def afterPenalty(player):
             return player.goNow('determineRole')
         return player.goLater(player.gameState)
 
+    return player.goNow('determineRole')
     return player.stay()
 
 @superState('gameControllerResponder')
@@ -129,6 +130,8 @@ def determineRole(player):
 
     openSpaces = [True, True, True, True]
     for mate in player.brain.teamMembers:
+        if mate.playerNumber == player.brain.playerNumber:
+            continue
         if not roleConstants.isGoalie(mate.role) \
                 and mate.frameSinceActive < 30:
             openSpaces[mate.role - 2] = False
