@@ -1,0 +1,4 @@
+{
+	"playerNumber": @PLAYER_NUMBER@,
+	"teamNumber": @TEAM_NUMBER@
+}
