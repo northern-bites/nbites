@@ -50,7 +50,7 @@ def positionAndKickBall(player):
 @superState('positionAndKickBall')
 def prepareForKick(player):
     if player.firstFrame():
-        prepareForKick.decider = KickDecider.KickDecider(player.brain)
+        player.decider = KickDecider.KickDecider(player.brain)
         player.brain.nav.stand()
 
     if player.brain.ball.distance > constants.APPROACH_BALL_AGAIN_DIST:
@@ -58,7 +58,7 @@ def prepareForKick(player):
         return player.goLater('chase')
 
     player.inKickingState = True
-    player.kick = prepareForKick.decider.motionKicks()
+    player.kick = player.decider.motionKicks()
 
     return player.goNow('orbitBall')
 
@@ -68,7 +68,7 @@ def orbitBall(player):
     State to orbit the ball
     """
     # Calculate relative heading every frame
-    relH = player.kick.setupH - player.brain.loc.h
+    relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
 
     # Are we within the acceptable heading range?
     if (relH > -constants.ORBIT_GOOD_BEARING and

@@ -189,7 +189,7 @@ class KickDecider(object):
     def generateIdealKicks(self, x, y):
         for k in self.kicks:
             kick = copy.deepcopy(k)
-
+            
             kickDestinationX = x - self.brain.ball.x
             kickDestinationY = y - self.brain.ball.y
 
@@ -199,7 +199,7 @@ class KickDecider(object):
             if kickDestinationY < 0: angleToKickDestination = -angleToKickDestination
 
             # Before the following line, kick.setupH holds offset from standard kick setup
-            kick.setupH = angleToKickDestination + kick.setupH
+            kick.setupH = self.normalizeAngle(angleToKickDestination + kick.setupH)
             # After, kick.setupH holds global heading used for kick allignment
 
             kick.destinationX = x
@@ -231,7 +231,7 @@ class KickDecider(object):
 
     ### SCORE KICK FUNCTIONS ###
     def minimizeOrbitTime(self, kick):
-        orbitTime = abs(kick.setupH - self.brain.loc.h)
+        orbitTime = abs(self.normalizeAngle(kick.setupH - self.brain.loc.h))
         return -orbitTime
 
     def minimizeDistanceToGoal(self, kick):
@@ -281,3 +281,9 @@ class KickDecider(object):
 
     def fromPolarToCartesianCoordinates(self, r, theta):
         return r*math.cos(theta), r*math.sin(theta)
+
+    def normalizeAngle(self, angle):
+        newAngle = angle
+        while newAngle <= -180: newAngle += 360
+        while newAngle > 180: newAngle -= 360
+        return newAngle
