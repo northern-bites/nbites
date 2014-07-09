@@ -36,6 +36,7 @@ def chaserIsOut(player):
     for pos in openPositions:
         if not positions[pos - 2]:
             player.openChaser = pos
+            print "Switching to role: ", pos
             return True
 
     return False
