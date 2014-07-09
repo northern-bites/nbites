@@ -46,10 +46,10 @@ class KickDecider(object):
 
     def bigKicksOnGoal(self):
         self.kicks = []
-        self.kicks.append(kicks.LEFT_BIG_KICK)
+        # self.kicks.append(kicks.LEFT_BIG_KICK)
         self.kicks.append(kicks.RIGHT_BIG_KICK)
-        self.kicks.append(kicks.LEFT_SIDE_KICK)
-        self.kicks.append(kicks.RIGHT_SIDE_KICK)
+        # self.kicks.append(kicks.LEFT_SIDE_KICK)
+        # self.kicks.append(kicks.RIGHT_SIDE_KICK)
 
         self.scoreKick = self.minimizeOrbitTime
 
@@ -246,11 +246,6 @@ class KickDecider(object):
             # Before the following line, kick.setupH holds offset from standard kick setup
             kick.setupH = angleToKickDestination + kick.setupH
             # After, kick.setupH holds global heading used for kick allignment
-            print "In decider!"
-            print kick.setupH
-            print self.brain.ball.x
-            print self.brain.ball.y
-            print self.brain.loc.h
 
             kick.destinationX = x
             kick.destinationY = y

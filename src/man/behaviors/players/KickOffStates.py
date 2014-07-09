@@ -1,12 +1,12 @@
 from ..util import *
 from . import RoleConstants as roleConstants
 import noggin_constants as nogginC
-from objects import RelRobotLocation, Location
+from objects import Location
 from ..navigator import Navigator
-import ChaseBallTransitions as transitions
 from ..kickDecider import KickDecider
-from ..kickDecider import kicks
+import KickOffConstants as constants
 
+#TODO add comm field to pass if one is aborting the play
 @superState('gameControllerResponder')
 def giveAndGo(player):
     player.finishedPlay = False
@@ -27,10 +27,12 @@ def passToCorner(player):
         elif roleConstants.isSecondChaser(player.role):
             player.brain.tracker.lookStraight()
             player.setWalk(.7, 0., 0.)
+        else:
+            return player.goNow('playOffBall')
 
-    if player.stateTime > 9 and transitions.shouldChaseBall(player):
+    if constants.shouldPassToFieldCross(player):
         return player.goNow('passToFieldCross')
-    elif player.stateTime > 14:
+    elif constants.ballNotPassedToCorner(player):
         player.passBack = False
         player.inKickOffPlay = False
         return player.goNow('findBall')
@@ -47,21 +49,27 @@ def passToFieldCross(player):
             player.brain.nav.goTo(fieldCross, Navigator.GENERAL_AREA, Navigator.QUICK_SPEED, 
                                 True, False, True, False)
 
-        elif roleConstants.isSecondChaser(player.role) and transitions.shouldChaseBall(player):
-            decider = KickDecider.KickDecider(player.brain)
-            # player.kick = decider.bigKicksOnGoal()
-            # player.kick = decider.sweetMovesOnGoal()
-            player.inKickingState = True
-            player.kick = decider.sweetMoveCrossToCenter()
-            player.finishedPlay = True
-            return player.goNow('approachBall')
+        elif roleConstants.isSecondChaser(player.role):
+            if not constants.ballIsLost(player):
+                decider = KickDecider.KickDecider(player.brain)
+                # player.kick = decider.bigKicksOnGoal()
+                player.kick = decider.sweetMovesOnGoal()
+                player.inKickingState = True
+                # player.kick = decider.sweetMoveCrossToCenter()
+                player.finishedPlay = True
+                return player.goNow('approachBall')
+            else:
+                player.inKickOffPlay = False
+                return player.goNow('findBall')
+        else:
+            return player.goNow('playOffBall')
 
         return player.stay()
 
     if roleConstants.isFirstChaser(player.role):
         fieldCross = Location(nogginC.LANDMARK_OPP_FIELD_CROSS[0], nogginC.LANDMARK_OPP_FIELD_CROSS[1])
         player.brain.nav.updateDest(fieldCross)
-        if player.stateTime > 12 and transitions.shouldChaseBall(player):
+        if constants.shouldStopWalkingToCross(player):
             player.inKickOffPlay = False
             return player.goNow('approachBall')
 
@@ -76,19 +84,25 @@ def giveAndGo2(player):
 @superState('gameControllerResponder')
 def sidePass(player):
     if player.firstFrame():
+        player.passBack = True
         if roleConstants.isFirstChaser(player.role):
             decider = KickDecider.KickDecider(player.brain)
             # TODO this is the correct side for games
             # passDest = Location(nogginC.MIDFIELD_X + 20., 0.)
             # player.kick = decider.sweetMovesForKickOff(-1, passDest)
             passDest = Location(nogginC.MIDFIELD_X, nogginC.FIELD_WHITE_HEIGHT)
-            player.kick = decider.sweetMovesForKickOff(1, passDest)
-            player.passBack = True
+            player.kick = decider.sweetMovesForKickOff(1, passDest)   
             player.inKickingState = True
             return player.goNow('approachBall')
+        elif roleConstants.isSecondChaser(player.role):
+            pass
+        else:
+            return player.goNow('playOffBall')
 
-    if roleConstants.isSecondChaser(player.role) and player.brain.gameController.timeSincePlaying > 8:
-        if transitions.shouldChaseBall(player):
+        return player.stay()
+
+    if constants.sidePassFinished(player)
+        if constants.isSeeingBall(player):
             return player.goNow('passToFieldCross')
         else:
             player.passBack = False

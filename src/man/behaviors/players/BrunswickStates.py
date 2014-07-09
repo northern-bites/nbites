@@ -17,7 +17,6 @@ def gameInitial(player):
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.inKickOffPlay = False
         player.brain.fallController.enabled = False
         player.gainsOn()
         player.stand()
@@ -64,7 +63,6 @@ def gameSet(player):
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.passBack = False
         player.brain.fallController.enabled = False
         player.brain.nav.stand()
         player.brain.tracker.performBasicPan()
@@ -82,6 +80,8 @@ def gameSet(player):
 def gamePlaying(player):
     if player.firstFrame():
         player.inKickingState = False
+        player.inKickOffPlay = False
+        player.passBack = False
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.trackBall()

@@ -214,9 +214,6 @@ def positionForKick(player):
            return player.goNow('executeMotionKick')
         else:
             player.brain.nav.stand()
-            print "Executing kick!"
-            print player.brain.ball.x
-            print player.brain.ball.y
             return player.goNow('executeKick')
 
     return player.stay()
