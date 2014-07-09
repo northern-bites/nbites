@@ -13,7 +13,7 @@ GC_LEDS = True
 FOOT_LEDS = True
 BALL_LEDS = True
 GOAL_LEDS = True
-PLAYBOOK_LEDS = True
+ROLESWITCH_LEDS = True
 LOC_LEDS = True
 COMM_LEDS = True
 
@@ -74,12 +74,18 @@ BALL_ON_LEDS = ((BALL_LED, RED, NOW),)
 BALL_OFF_LEDS = ((BALL_LED, BLUE, NOW),)
 
 ##### Roles #####
-CHASER_ON_LEDS =   ((ROLE_LED, RED, NOW),)
-OFFENDER_ON_LEDS = ((ROLE_LED, EYE_YELLOW, NOW),)
-MIDDIE_ON_LEDS =   ((ROLE_LED, CYAN, NOW),)
-DEFENDER_ON_LEDS = ((ROLE_LED, BLUE, NOW),)
-GOALIE_ON_LEDS =   ((ROLE_LED, PURPLE, NOW),)
-ROLE_OFF_LEDS =    ((ROLE_LED, OFF, NOW),)
+ROLE_ONE      = ((ROLE_LED, RED, NOW),)
+ROLE_TWO      = ((ROLE_LED, EYE_YELLOW, NOW),)
+ROLE_THREE    = ((ROLE_LED, CYAN, NOW),)
+ROLE_FOUR     = ((ROLE_LED, BLUE, NOW),)
+ROLE_FIVE     = ((ROLE_LED, PURPLE, NOW),)
+ROLE_OFF_LEDS = ((ROLE_LED, OFF, NOW),)
+
+ROLE_DICT = {1: ROLE_ONE,
+             2: ROLE_TWO,
+             3: ROLE_THREE,
+             4: ROLE_FOUR,
+             5: ROLE_FIVE}
 
 ##### GOAL ######
 LEFT_POST_ON_LEDS =   ((RIGHT_GOAL_LED, GREEN, NOW),)
@@ -164,6 +170,7 @@ class Leds():
         self.facingOpp = -1
         self.numActiveMates = 0
         self.oldLocScore = 3
+        self.role = -1
 
     def processLeds(self):
 
@@ -224,21 +231,14 @@ class Leds():
                     else:
                         self.executeLeds(PINK_GOAL_LEDS)
 
-        # TODO when roleswitching happens, this should be set up again
-        # if PLAYBOOK_LEDS:
-        #     if self.brain.playbook.roleChanged():
-        #         if self.brain.play.isRole(PBConstants.CHASER):
-        #             self.executeLeds(CHASER_ON_LEDS)
-        #         elif self.brain.play.isRole(PBConstants.OFFENDER):
-        #             self.executeLeds(OFFENDER_ON_LEDS)
-        #         elif self.brain.play.isRole(PBConstants.MIDDIE):
-        #             self.executeLeds(MIDDIE_ON_LEDS)
-        #         elif self.brain.play.isRole(PBConstants.DEFENDER):
-        #             self.executeLeds(DEFENDER_ON_LEDS)
-        #         elif self.brain.play.isRole(PBConstants.GOALIE):
-        #             self.executeLeds(GOALIE_ON_LEDS)
-        #         else:
-        #             self.executeLeds(ROLE_OFF_LEDS)
+        if ROLESWITCH_LEDS:
+            newRole = self.brain.player.role
+            if newRole != self.role:
+                if newRole == 0:
+                    self.executeLeds(ROLE_OFF_LEDS)
+                else:
+                    self.executeLeds(ROLE_DICT[newRole])
+                self.role = newRole
 
         if LOC_LEDS:
             newLocScore = self.locScore(self.brain.locUncert)

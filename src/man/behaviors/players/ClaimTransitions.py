@@ -27,11 +27,13 @@ def shouldCedeClaim(player):
         if (mateWeight < playerWeight):
             if mate.ballDist < claimDistance:
                 player.claimedBall = False
+                print "Mate #", mate.playerNumber, " claimed the ball"
                 return True
 
         if mate.inKickingState:
             if mate.ballDist < claimDistance:
                 player.claimedBall = False
+                print "Mate #", mate.playerNumber, " is kicking the ball"
                 return True
 
     player.claimedBall = True

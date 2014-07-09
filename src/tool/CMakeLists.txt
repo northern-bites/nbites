@@ -385,6 +385,7 @@ target_link_libraries(
   ${QT_LIBRARIES}
 )
 
+# The InstallerTool executable
 add_executable( installer_tool
   ${installer_srcs}
   ${installer_headers_moc}
