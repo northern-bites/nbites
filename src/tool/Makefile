@@ -15,6 +15,7 @@ VISION_EXECUTABLE = vision_tool
 CALIBRATE_EXECUTABLE = calibrate_tool
 PLAYBOOK_EXECUTABLE = playbook_tool
 SIM_EXECUTABLE = sim_tool
+INSTALLER_EXECUTABLE = installer_tool
 
 .PHONY: build_tool
 build_tool:

@@ -2,9 +2,9 @@
 
 namespace tool{
 
-#define PARAMETERS "../man/install/lib/parameters.json"
-#define PY_SWITCH "../man/behaviors/players/test.py"
-#define UPLOAD "../man/upload.sh"
+#define PARAMETERS "../../build/man/install/lib/parameters.json"
+#define PY_SWITCH "../../build/man/install/lib/python/players/Switch.py"
+#define UPLOAD "../../build/man/upload.sh"
 
 Installer::Installer(const char* title):
     teamNumber(new QLineEdit("Team Number", this)),
@@ -64,7 +64,6 @@ void Installer::installPlayer(int index)
     writePlayerNums(pnum.toInt(),team.toInt());
     writePyPlayer(player.toStdString());
     writeAddress(host.toStdString());
-    // TODO delete these
 
     int result = system(UPLOAD);
     std::cout << "Upload exited, returning: " << result << std::endl;
@@ -156,6 +155,21 @@ int Installer::validateInput(int index)
     {
         std::cout << "Bad python player" << std::endl;
         return 0;
+    }
+
+    if(!requestedPlayer.compare("pGoalie"))
+    {
+        if(playerNumber != 1){
+            std::cout << "pGoalie MUST be player 1!" << std::endl;
+            return 0;
+        }
+    }
+    else if(!requestedPlayer.compare("pBrunswick"))
+    {
+        if(playerNumber == 1){
+            std::cout << "pBrunswick cannot be player 1!" << std::endl;
+            return 0;
+        }
     }
     return 1;
 }
