@@ -78,6 +78,26 @@ class KickDecider(object):
 
         return (kick for kick in self.possibleKicks).next().next()
 
+    def frontKicksAsapOnGoal(self):
+        self.brain.player.motionKick = False
+    
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+
+        self.scoreKick = self.minimizeDistanceToGoal
+        
+        self.filters = []
+        self.filters.append(self.crossesGoalLine)
+
+        self.clearPossibleKicks()
+        self.addFastestPossibleKicks()
+
+        try:
+            return (kick for kick in self.possibleKicks).next().next()
+        except:
+            return None
+
     def motionKicksOnGoal(self):
         self.brain.player.motionKick = True
     
@@ -123,9 +143,17 @@ class KickDecider(object):
             return None
 
     def brunswick(self):
+        onGoalAsap = self.frontKicksAsapOnGoal()
+        if onGoalAsap: 
+            print "On goal asap!"
+            return onGoalAsap
+
         asap = self.motionKicksAsap()
         if asap:
+            print "Motion kicks asap!"
             return asap
+
+        print "Crossing!"
         return self.frontKickCrosses()
 
     ### API ###
