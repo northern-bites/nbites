@@ -12,7 +12,7 @@ WorldView::WorldView(QWidget* parent)
       QWidget(parent),
       commThread("comm", COMM_FRAME_LENGTH_uS),
       wviewComm(16,0),
-      wviewShared(),
+      wviewShared(1),
       newTeam(0),
       mutex()
 {

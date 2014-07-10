@@ -7,7 +7,8 @@ namespace sharer{
 
 SharedViewer::SharedViewer(QWidget* parent):
     QWidget(parent),
-    mutex()
+    mutex(),
+    wviewShared(1)
 {
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
