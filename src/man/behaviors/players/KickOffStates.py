@@ -20,7 +20,7 @@ def passToCorner(player):
         if roleConstants.isFirstChaser(player.role):
             # TODO this is the right corner
             corner = Location(nogginC.FIELD_WHITE_WIDTH, 0.)
-            corner = Location(nogginC.FIELD_WHITE_WIDTH, nogginC.FIELD_WHITE_HEIGHT)
+            #corner = Location(nogginC.FIELD_WHITE_WIDTH, nogginC.FIELD_WHITE_HEIGHT)
             decider = KickDecider.KickDecider(player.brain)
             player.kick = decider.sweetMovesForKickOff(0, corner)
             player.inKickingState = True
