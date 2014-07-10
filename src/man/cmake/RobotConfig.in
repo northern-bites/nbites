@@ -7,10 +7,3 @@
 #define MY_PLAYER_NUMBER @PLAYER_NUMBER@
 
 #define MY_TEAM_NUMBER @TEAM_NUMBER@
-
-#define USE_V5_${USE_V5}
-#ifdef  USE_V5_ON
-#   define V5
-#else
-#   undef USE_V5
-#endif

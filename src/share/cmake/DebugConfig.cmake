@@ -21,12 +21,6 @@ option(
   OFF
 )
 
-option(
-  USE_V5
-  "Turn on if robot is a V5"
-  OFF
-)
-
 if( NOT OFFLINE )
 
 option(
