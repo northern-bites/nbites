@@ -114,9 +114,14 @@ def positionAsSupporter(player):
                                                 player.brain.ball.y + 60,
                                                 -90)
 
+    if role.isChaser(player.role):
+        fast = True
+    else:
+        fast = False
+
     player.brain.nav.goTo(waitForBallPosition, precision = nav.GENERAL_AREA,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,
-                          fast = False, pb = False)
+                          fast = fast, pb = False)
 
 @superState('playOffBall')
 @stay
