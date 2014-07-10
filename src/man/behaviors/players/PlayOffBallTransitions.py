@@ -71,5 +71,5 @@ def shouldStopLookingForSharedBall(player):
     return not shouldFindSharedBall(player)
 
 def shouldBeSupporter(player):
-    return (ball.vis.frames_on > chaseConstants.BALL_ON_THRESH and 
+    return (player.brain.ball.vis.frames_on > chaseConstants.BALL_ON_THRESH and 
             claimTransitions.shouldCedeClaim(player))
