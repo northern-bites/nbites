@@ -44,12 +44,26 @@ class KickDecider(object):
 
         return (kick for kick in self.possibleKicks).next().next()
 
+    def sweetMovesCross(self):
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.LEFT_SIDE_KICK)
+        self.kicks.append(kicks.RIGHT_SIDE_KICK)
+
+        self.scoreKick = self.minimizeOrbitTime
+
+        self.filters = []
+
+        self.addPassesToFieldCross()
+        self.addShotsOnGoal()
+
+        return (kick for kick in self.possibleKicks).next().next()
+
     def bigKicksOnGoal(self):
         self.kicks = []
         self.kicks.append(kicks.LEFT_BIG_KICK)
         self.kicks.append(kicks.RIGHT_BIG_KICK)
-        self.kicks.append(kicks.LEFT_SIDE_KICK)
-        self.kicks.append(kicks.RIGHT_SIDE_KICK)
 
         self.scoreKick = self.minimizeOrbitTime
 
@@ -101,11 +115,13 @@ class KickDecider(object):
 
         return (kick for kick in self.possibleKicks).next().next()
 
-    def motionKicks(self):
+    def brunswick(self):
         asap = self.motionKicksAsap()
         if asap:
+            print  "Shooting asap!"
             return asap
-        return self.motionKicksOnGoal()
+        print  "Orbiting!"
+        return self.sweetMovesCross()
 
     ### API ###
     def addShotsOnGoal(self):
@@ -126,14 +142,13 @@ class KickDecider(object):
     def addPassesTo(self, location):
         self.possibleKicks = itertools.chain(self.possibleKicks,
                                              self.generateKicksFromGoalDest(location.x,
-                                                                             location.y,
-                                                                             constants.PASS_PRECISION))
+                                                                            location.y,
+                                                                            constants.PASS_PRECISION))
 
     def addPassesToFieldCross(self):
         betweenFieldCrossAndGoalBoxLeft = (nogginC.LANDMARK_OPP_FIELD_CROSS[0] +
                                            nogginC.OPP_GOALBOX_LEFT_X) / 2.
-        location = Location(betweenFieldCrossAndGoalBoxLeft,nogginC.LANDMARK_OPP_FIELD_CROSS[1])
-
+        location = Location(betweenFieldCrossAndGoalBoxLeft,nogginC.CENTER_FIELD_Y)
 
         self.addPassesTo(location)
 
@@ -156,7 +171,12 @@ class KickDecider(object):
         else:
             filteredKicks = kicks
 
-        yield max(filteredKicks,key=self.scoreKick)
+        if filteredKicks:
+            print "Took max of filtered kicks"
+            yield max(filteredKicks,key=self.scoreKick)
+        else: # Calling max on empty sequence cause a Python crash
+            print "Filtered kicks is empty so just passing it along"
+            yield filteredKicks
 
     def generateFastestPossibleKicks(self):
         for k in self.kicks:
@@ -236,7 +256,7 @@ class KickDecider(object):
 
     def minimizeDistanceToGoal(self, kick):
         if self.crossesGoalLine(kick):
-            offset = 10000000 # TODO a bit of a hack
+            offset = 10000000 # TODO make less of a hack
         else:
             offset = 0
 
