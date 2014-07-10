@@ -127,8 +127,9 @@ evenDefenderBox = defenderBox
 
 chaserBox = ((0, 0), NogginConstants.FIELD_HEIGHT, NogginConstants.FIELD_WIDTH)
 
-cherryPickerBox = (((NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.CENTER_FIELD_X)/2, 0), \
-                    NogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X, NogginConstants.FIELD_WHITE_HEIGHT)
+cherryPickerBox = (((NogginConstants.FIELD_WHITE_HEIGHT - NogginConstants.CENTER_FIELD_X)/2, 0),
+                    NogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X + NogginConstants.GREEN_PAD_X, 
+                    NogginConstants.FIELD_WIDTH)
 
 ### SETS PLAYER STATE PER ROLE
 def setRoleConstants(player, role):
