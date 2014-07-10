@@ -37,9 +37,10 @@ void ObstacleModule::run_()
 
     portals::Message<messages::Obstacle> current(0);
 
-#ifdef USE_LAB_FIELD // Walls are too close to field for sonar use
+    // Sonars don't work the same way with V5s
+// #ifdef USE_LAB_FIELD // Walls are too close to field for sonar use
     sonars = Obstacle::NONE;
-#endif
+// #endif
 
     // How do we combine the two decisions?
     // If they agree, easy
