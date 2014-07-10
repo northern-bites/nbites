@@ -28,7 +28,7 @@ def branchOnRole(player):
     role here.
     """
     if role.isChaser(player.role):
-        return player.goNow('searchFieldForBall')
+        return player.goNow('findBall')
     else:
         return player.goNow('positionAtHome')
 
@@ -114,7 +114,7 @@ def positionAsSupporter(player):
                                                 player.brain.ball.y + 60,
                                                 -90)
 
-    if role.isChaser(player.role):
+    if role.isChaser(player.role) and player.brain.ball.distance > 85:
         fast = True
     else:
         fast = False
