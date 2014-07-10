@@ -3,7 +3,10 @@
 import math
 claimExpiration = 5
 headingWeight = .5
+#TODO 75?
 claimDistance = 50
+#TODO play with this
+SMALL_WEIGHT_DIFFERENCE = 20
 
 def shouldCedeClaim(player):
     if not player.useClaims:
@@ -23,13 +26,18 @@ def shouldCedeClaim(player):
             continue # That claim has expired (Comm is probably lagging)
 
         mateWeight = weightedDistAndHeading(mate.ballDist, mate.h, mate.ballBearing)
+        if (math.fabs(mateWeight - playerWeight) < SMALL_WEIGHT_DIFFERENCE):
+            if player.role < mate.role:
+                player.claimedBall = False
+                return True
+
         # TODO: think more about comm lag/check comm lag
-        if (mateWeight < playerWeight):
+        elif (mateWeight < playerWeight):
             if mate.ballDist < claimDistance:
                 player.claimedBall = False
                 return True
 
-        if mate.inKickingState:
+        elif mate.inKickingState:
             if mate.ballDist < claimDistance:
                 player.claimedBall = False
                 return True
@@ -46,6 +54,7 @@ def weightedDistAndHeading(distance, heading, ballBearing):
         heading += 360
 
     ballHeading = heading + ballBearing
+    #TODO
     if math.fabs(ballHeading) > 90:
         distance += distance * headingWeight * math.fabs(math.cos(math.radians(ballHeading)))
     return distance

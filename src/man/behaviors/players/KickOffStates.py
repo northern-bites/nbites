@@ -26,12 +26,14 @@ def passToCorner(player):
             player.inKickingState = True
             return player.goNow('approachBall')
         elif roleConstants.isSecondChaser(player.role):
-            player.brain.tracker.lookStraight()
+            player.brain.tracker.repeatFastNarrowPan()
             player.setWalk(.7, 0., 0.)
         else:
             return player.goNow('playOffBall')
 
-    if constants.shouldPassToFieldCross(player):
+        return player.stay()
+
+    elif constants.shouldPassToFieldCross(player):
         return player.goNow('passToFieldCross')
     elif constants.ballNotPassedToCorner(player):
         player.passBack = False
@@ -45,7 +47,7 @@ def passToFieldCross(player):
     if player.firstFrame():
         player.passBack = False
         if roleConstants.isFirstChaser(player.role):
-            player.brain.tracker.lookStraight()
+            player.brain.tracker.repeatFastNarrowPan()
             fieldCross = Location(nogginC.LANDMARK_OPP_FIELD_CROSS[0], nogginC.LANDMARK_OPP_FIELD_CROSS[1])
             player.brain.nav.goTo(fieldCross, Navigator.GENERAL_AREA, Navigator.QUICK_SPEED, 
                                 True, False, True, False)
@@ -102,10 +104,10 @@ def sidePass(player):
 
         return player.stay()
 
-    if constants.sidePassFinished(player)
+    if constants.sidePassFinished(player):
         if constants.isSeeingBall(player):
             return player.goNow('passToFieldCross')
-        else:
+        elif constants.didNotRecieveSidePass(player):
             player.passBack = False
             player.inKickOffPlay = False
             return player.goNow('findBall')

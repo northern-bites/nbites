@@ -26,7 +26,7 @@ def approachBall(player):
         player.brain.tracker.trackBall()
         if player.shouldKickOff:
             player.inKickOffPlay = True
-            return player.goNow('giveAndGo2')
+            return player.goNow('giveAndGo')
         elif player.penaltyKicking:
             return player.goNow('prepareForPenaltyKick')
         else:
