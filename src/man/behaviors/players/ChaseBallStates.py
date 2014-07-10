@@ -58,7 +58,7 @@ def prepareForKick(player):
         return player.goLater('chase')
 
     player.inKickingState = True
-    player.kick = player.decider.motionKicks()
+    player.kick = player.decider.brunswick()
 
     return player.goNow('orbitBall')
 
