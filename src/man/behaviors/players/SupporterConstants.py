@@ -2,16 +2,18 @@ import noggin_constants as NogginConstants
 from objects import Location, RobotLocation
 import RoleConstants as role
 
-CHASER_DISTANCE = 60
-
 def getSupporterPosition(player, role):
+    """
+    Returns a position to stand at to support teammate who is chasing the ball.
+    Used in positionAsSupporter in PlayOffBallStates.
+    """
     if role.isLeftDefender(role):
         return leftDefender(player)
     elif role.isRightDefender(role):
         return rightDefender(player)
     elif role.isChaser(role):
         return chaser(player)
-    elif role.isCherryPicker(role):
+    else: # cherry picker
         return cherryPicker(player)
 
 def leftDefender(player):
@@ -30,6 +32,9 @@ def leftDefender(player):
                          player.brain.ball.bearing_deg + player.brain.loc.h)
 
 def rightDefender(player):
+    """
+    Defenders position between ball and goal.
+    """
     if player.brain.ball.y >=  NogginConstants.MIDFIELD_Y:
         return RobotLocation((player.brain.ball.x + NogginConstants.BLUE_GOALBOX_RIGHT_X)
                                             * .5, (player.brain.ball.y +
@@ -43,6 +48,9 @@ def rightDefender(player):
 
 # TODO rotation matrix
 def chaser(player):
+    """
+    Chasers position off to one side of the ball about a meter away.
+    """
     if (player.brain.ball.x >= player.brain.loc.x and
         player.brain.ball.y >= player.brain.loc.y):
         return RobotLocation(player.brain.ball.x - CHASER_DISTANCE,
@@ -58,13 +66,17 @@ def chaser(player):
         return RobotLocation(player.brain.ball.x + CHASER_DISTANCE,
                              player.brain.ball.y - CHASER_DISTANCE,
                              player.brain.ball.bearing_deg + player.brain.loc.h)
-    elif (player.brain.ball.x < player.brain.loc.x and
-        player.brain.ball.y < player.brain.loc.y):
+    else:
         return RobotLocation(player.brain.ball.x + CHASER_DISTANCE,
                              player.brain.ball.y + CHASER_DISTANCE,
                              player.brain.ball.bearing_deg + player.brain.loc.h)
 
+CHASER_DISTANCE = 60
+
 def cherryPicker(player):
+    """
+    Cherry pickers stay where they are but look to the ball.
+    """
     return RobotLocation(player.brain.loc.x,
                          player.brain.loc.y,
                          player.brain.ball.bearing_deg + player.brain.loc.h)

@@ -59,7 +59,7 @@ def watchForBall(player):
 
 @superState('playOffBall')
 @stay
-@ifSwitchLater(shared.ballOffForNFrames(30), 'branchOnRole')
+@ifSwitchLater(shared.ballOffForNFrames(60), 'branchOnRole')
 def positionAsSupporter(player):
     if player.firstFrame():
         position = getSupporterPosition(player, player.role)
@@ -79,10 +79,8 @@ def searchFieldForSharedBall(player):
         player.brain.tracker.trackBall()
 
     sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
-    player.brain.nav.goTo(sharedball,
-                          precision = nav.GENERAL_AREA,
-                          speed = nav.QUICK_SPEED,
-                          avoidObstacles = True,
+    player.brain.nav.goTo(sharedball, precision = nav.GENERAL_AREA,
+                          speed = nav.QUICK_SPEED, avoidObstacles = True,
                           fast = True, pb = False)
 
 @superState('playOffBall')
@@ -93,17 +91,27 @@ def searchFieldByQuad(player):
     Search the field quadrant by quadrant. Choose first quadrant by shared ball
     if it is on.
     """
-    quad1Center = Location(NogginConstants.CENTER_FIELD_X * .5, NogginConstants.CENTER_FIELD_Y * .5)
-    quad2Center = Location(NogginConstants.CENTER_FIELD_X * .5, NogginConstants.CENTER_FIELD_Y * 1.5)
-    quad3Center = Location(NogginConstants.CENTER_FIELD_X * 1.5, NogginConstants.CENTER_FIELD_Y * 1.5)
-    quad4Center = Location(NogginConstants.CENTER_FIELD_X * 1.5, NogginConstants.CENTER_FIELD_Y * .5)
-
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        searchFieldByQuad.dest = quad3Center
+        if player.brain.sharedBall.ball_on:
+            if shared.lowerLeft(player.brain.sharedBall):
+                searchFieldByQuad.dest = quad1Center
+            elif shared.lowerRight(player.brain.sharedBall):
+                searchFieldByQuad.dest = quad2Center
+            elif shared.upperLeft(player.brain.sharedBall):
+                searchFieldByQuad.dest = quad4Center
+            else:
+                searchFieldByQuad.dest = quad3Center
+        else:
+            if shared.lowerLeft(player.brain.loc):
+                searchFieldByQuad.dest = quad3Center
+            elif shared.lowerRight(player.brain.loc):
+                searchFieldByQuad.dest = quad4Center
+            elif shared.upperLeft(player.brain.loc):
+                searchFieldByQuad.dest = quad2Center
+            else:
+                searchFieldByQuad.dest = quad1Center
 
-    # update destination to send it to a new quadrant on the field
-    # prearranged order; change or ranndomize?
     if shared.navAtPosition(player):
         if searchFieldByQuad.dest == quad1Center:
             searchFieldByQuad.dest = quad2Center
@@ -117,3 +125,8 @@ def searchFieldByQuad(player):
     player.brain.nav.goTo(searchFieldByQuad.dest, precision = nav.GRAINY,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,
                           fast = True, pb = False)
+
+quad1Center = Location(NogginConstants.CENTER_FIELD_X * .6, NogginConstants.CENTER_FIELD_Y * .6)
+quad2Center = Location(NogginConstants.CENTER_FIELD_X * .6, NogginConstants.CENTER_FIELD_Y * 1.4)
+quad3Center = Location(NogginConstants.CENTER_FIELD_X * 1.4, NogginConstants.CENTER_FIELD_Y * 1.4)
+quad4Center = Location(NogginConstants.CENTER_FIELD_X * 1.4, NogginConstants.CENTER_FIELD_Y * .6)
