@@ -29,6 +29,8 @@ class KickDecider(object):
     
     ### PLANNERS ###
     def sweetMovesOnGoal(self):
+        self.brain.player.motionKick = False
+
         self.kicks = []
         self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
         self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
@@ -44,12 +46,12 @@ class KickDecider(object):
 
         return (kick for kick in self.possibleKicks).next().next()
 
-    def sweetMovesCross(self):
+    def frontKickCrosses(self):
+        self.brain.player.motionKick = False
+        
         self.kicks = []
         self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
         self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.LEFT_SIDE_KICK)
-        self.kicks.append(kicks.RIGHT_SIDE_KICK)
 
         self.scoreKick = self.minimizeOrbitTime
 
@@ -61,6 +63,8 @@ class KickDecider(object):
         return (kick for kick in self.possibleKicks).next().next()
 
     def bigKicksOnGoal(self):
+        self.brain.player.motionKick = False
+
         self.kicks = []
         self.kicks.append(kicks.LEFT_BIG_KICK)
         self.kicks.append(kicks.RIGHT_BIG_KICK)
@@ -113,15 +117,16 @@ class KickDecider(object):
         self.clearPossibleKicks()
         self.addFastestPossibleKicks()
 
-        return (kick for kick in self.possibleKicks).next().next()
+        try:
+            return (kick for kick in self.possibleKicks).next().next()
+        except:
+            return None
 
     def brunswick(self):
         asap = self.motionKicksAsap()
         if asap:
-            print  "Shooting asap!"
             return asap
-        print  "Orbiting!"
-        return self.sweetMovesCross()
+        return self.frontKickCrosses()
 
     ### API ###
     def addShotsOnGoal(self):
@@ -171,12 +176,10 @@ class KickDecider(object):
         else:
             filteredKicks = kicks
 
-        if filteredKicks:
-            print "Took max of filtered kicks"
+        try:
             yield max(filteredKicks,key=self.scoreKick)
-        else: # Calling max on empty sequence cause a Python crash
-            print "Filtered kicks is empty so just passing it along"
-            yield filteredKicks
+        except ValueError:
+            yield filteredKicks.next()
 
     def generateFastestPossibleKicks(self):
         for k in self.kicks:
