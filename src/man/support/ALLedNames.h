@@ -39,8 +39,8 @@ static const unsigned int NUM_CHEST_LEDS = 1;
 
 /**
  * The following were added by Wils Dawson on 6/7/12.
- * The ears are broken up into comm and loc halves where
- * loc is toward the front of the robot.
+ * The ears are broken up into comm and calibration halves where
+ * calibration is toward the front of the robot.
  * The eyes are broken up into three parts (top broken in half
  * and bottom is the third segment).
  *   For the right eye, the bottom shows my goal or opp goal,
@@ -49,7 +49,7 @@ static const unsigned int NUM_CHEST_LEDS = 1;
  *   the top shows the role.
  */
 static const unsigned int NUM_COMM_LEDS = 1;
-static const unsigned int NUM_LOC_LEDS  = 1;
+static const unsigned int NUM_CALIBRATION_LEDS  = 1;
 static const unsigned int NUM_GOAL_LEDS = (NUM_FACE_LEDS >> 2);
 static const unsigned int NUM_GOAL_ID_LEDS = (NUM_FACE_LEDS >> 1) - 1;
 static const unsigned int NUM_BALL_LEDS = (NUM_FACE_LEDS >> 1) - 1;
@@ -62,8 +62,8 @@ static const unsigned int NUM_ONE_EYE_LEDS = NUM_LED_COLORS * NUM_FACE_LEDS;
 
 static const unsigned int NUM_UNIQUE_LEDS = 29;
 static const unsigned int NUM_RGB_LEDS[NUM_UNIQUE_LEDS] ={
-    NUM_LOC_LEDS,NUM_LOC_LEDS,NUM_LOC_LEDS,NUM_LOC_LEDS,NUM_LOC_LEDS,
-    NUM_LOC_LEDS,NUM_LOC_LEDS,NUM_LOC_LEDS,NUM_LOC_LEDS,NUM_LOC_LEDS,
+    NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,
+    NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,
     NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,
     NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,
     NUM_ROLE_LEDS,NUM_BALL_LEDS,
@@ -288,12 +288,12 @@ static const std::string rightGoalL[NUM_LED_COLORS][NUM_GOAL_LEDS] ={
 
 static const std::string strPtr = footL[RIGHT_LED][0];
 static const std::string * RGB_LED_STRINGS[NUM_UNIQUE_LEDS] ={
-    &earL[LEFT_LED][0],             // Left Loc 1
+    &earL[LEFT_LED][0],             // Left Calibration 1
     &earL[LEFT_LED][1],             // 2
     &earL[LEFT_LED][2],             // 3
     &earL[LEFT_LED][3],             // 4
     &earL[LEFT_LED][4],             // 5
-    &earL[RIGHT_LED][1],            // Right Loc 1
+    &earL[RIGHT_LED][1],            // Right Calibration 1
     &earL[RIGHT_LED][2],            // 2
     &earL[RIGHT_LED][3],            // 3
     &earL[RIGHT_LED][4],            // 4
