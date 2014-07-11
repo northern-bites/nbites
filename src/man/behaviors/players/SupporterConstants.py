@@ -1,17 +1,17 @@
 import noggin_constants as NogginConstants
 from objects import Location, RobotLocation
-import RoleConstants as role
+import RoleConstants
 
 def getSupporterPosition(player, role):
     """
     Returns a position to stand at to support teammate who is chasing the ball.
     Used in positionAsSupporter in PlayOffBallStates.
     """
-    if role.isLeftDefender(role):
+    if RoleConstants.isLeftDefender(role):
         return leftDefender(player)
-    elif role.isRightDefender(role):
+    elif RoleConstants.isRightDefender(role):
         return rightDefender(player)
-    elif role.isChaser(role):
+    elif RoleConstants.isChaser(role):
         return chaser(player)
     else: # cherry picker
         return cherryPicker(player)

@@ -145,15 +145,12 @@ class KickDecider(object):
     def brunswick(self):
         onGoalAsap = self.frontKicksAsapOnGoal()
         if onGoalAsap: 
-            print "On goal asap!"
             return onGoalAsap
 
         asap = self.motionKicksAsap()
         if asap:
-            print "Motion kicks asap!"
             return asap
 
-        print "Crossing!"
         return self.frontKickCrosses()
 
     ### API ###

@@ -72,7 +72,8 @@ void SharedBallModule::run_()
     sharedBallResetMessage.get()->set_h(reseth);
     sharedBallResetMessage.get()->set_timestamp(timestamp);
 //    sharedBallResetMessage.get()->set_uncert(flippedRobot);
-    sharedBallReset.setMessage(sharedBallResetMessage);
+    // TODO turn back on after more extensive testing
+    // sharedBallReset.setMessage(sharedBallResetMessage);
 }
 
 /* Makes groups for each robot that include those other robots who
@@ -190,6 +191,7 @@ void SharedBallModule::weightedavg()
     float dist, hb, sinHB, cosHB;
     int weightFactor;
 
+
     for (int i=0; i<NUM_PLAYERS_PER_TEAM; i++)
     {
         if (ignoreRobot[i])
@@ -238,7 +240,7 @@ void SharedBallModule::checkForPlayerFlip()
         return;
     }
 
-    int i = my_num;
+    int i = my_num-1;
 //TOOL: comment out the above line and uncomment the for loop (with brackets)
 //    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++)
 //    {

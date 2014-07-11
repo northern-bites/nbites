@@ -67,8 +67,8 @@ oddChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
                               NogginConstants.GREEN_PAD_Y + 100,
                               90)
 
-oddChaserKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 20,
-                                 NogginConstants.OPP_GOALBOX_BOTTOM_Y,
+oddChaserKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 45,
+                                 NogginConstants.OPP_GOALBOX_BOTTOM_Y - 100,
                                  0)
 
 evenChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
@@ -83,12 +83,12 @@ cherryPickerKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 20,
                                     NogginConstants.OPP_GOALBOX_TOP_Y,
                                     0)
 
-ourKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 20,
+ourKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 45,
                            NogginConstants.CENTER_FIELD_Y,
                            0)
 
 theirKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - \
-                             NogginConstants.CENTER_CIRCLE_RADIUS - 10,
+                             NogginConstants.CENTER_CIRCLE_RADIUS - 20,
                              NogginConstants.CENTER_FIELD_Y,
                              0)
 

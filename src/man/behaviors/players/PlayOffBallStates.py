@@ -4,11 +4,12 @@ import RoleConstants as role
 import ChaseBallTransitions as chase
 import ChaseBallConstants as chaseConstants
 import ClaimTransitions as claims
-from SupporterConstants import getSupporterPosition
+from SupporterConstants import getSupporterPosition, CHASER_DISTANCE
 import noggin_constants as NogginConstants
 from ..navigator import Navigator as nav
 from objects import Location, RobotLocation
 from ..util import *
+from math import hypot
 import random
 
 @defaultState('branchOnRole')
@@ -59,13 +60,20 @@ def watchForBall(player):
 
 @superState('playOffBall')
 @stay
-@ifSwitchLater(shared.ballOffForNFrames(60), 'branchOnRole')
+@ifSwitchLater(shared.ballOffForNFrames(60), 'findBall')
 def positionAsSupporter(player):
     if player.firstFrame():
-        position = getSupporterPosition(player, player.role)
-        player.brain.nav.goTo(position, precision = nav.GENERAL_AREA,
-                              speed = nav.QUICK_SPEED, avoidObstacles = True,
-                              fast = False, pb = False)
+        positionAsSupporter.position = getSupporterPosition(player, player.role)
+
+    if (role.isChaser(player.role) and player.brain.ball.distance > 
+        hypot(CHASER_DISTANCE, CHASER_DISTANCE)):
+        fast = True
+    else:
+        fast = False
+
+    player.brain.nav.goTo(positionAsSupporter.position, precision = nav.GENERAL_AREA,
+                          speed = nav.QUICK_SPEED, avoidObstacles = True,
+                          fast = False, pb = False)
 
 @superState('playOffBall')
 @stay

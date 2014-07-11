@@ -2,8 +2,6 @@
 # TODO: determine a reasonable amount of time for this
 import math
 claimExpiration = 5
-headingWeight = .5
-claimDistance = 50
 
 def shouldCedeClaim(player):
     if not player.useClaims:
@@ -23,21 +21,27 @@ def shouldCedeClaim(player):
             continue # That claim has expired (Comm is probably lagging)
 
         mateWeight = weightedDistAndHeading(mate.ballDist, mate.h, mate.ballBearing)
-        # TODO: think more about comm lag/check comm lag
-        if (mateWeight < playerWeight):
-            if mate.ballDist < claimDistance:
-                player.claimedBall = False
-                print "Mate #", mate.playerNumber, " claimed the ball"
-                return True
 
-        if mate.inKickingState:
-            if mate.ballDist < claimDistance:
+        # sigmoid function so that the difference increases slowly at close distances but
+        # grows quickly at mid-range to far distances and at very far distances, asymptotically
+        # approaches a maximum. uses the distance of the close robot
+        if player.brain.ball.distance < mate.brain.ball.distance:
+            closerDistance = player.brain.ball.distance
+        else:
+            closerDistance = mate.brain.ball.distance
+        closeWeightDifference = 25 + 150/(1 + math.e**(6.25 - .05*closerDistance))
+        if (math.fabs(mateWeight - playerWeight) < closeWeightDifference):
+            if mate.role == 4:
                 player.claimedBall = False
-                print "Mate #", mate.playerNumber, " is kicking the ball"
                 return True
+            elif player.role < mate.role and player.role != 4:
+                player.claimedBall = False
+                return True
+        elif (mateWeight < playerWeight):
+            player.claimedBall = False
+            return True
 
     player.claimedBall = True
-
     return False
 
 #TODO: make this make use of amount of orbit necessary
@@ -48,6 +52,8 @@ def weightedDistAndHeading(distance, heading, ballBearing):
         heading += 360
 
     ballHeading = heading + ballBearing
-    if math.fabs(ballHeading) > 90:
-        distance += distance * headingWeight * math.fabs(math.cos(math.radians(ballHeading)))
+    if ballHeading > 90:
+        distance += distance * (ballBearing-90)**2 / 90**2
+    elif ballHeading < -90:
+        distance += distance * (ballBearing+90)**2 / 90**2
     return distance
