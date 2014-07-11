@@ -73,8 +73,10 @@ class GameController():
         # reset field for change
         self.teamColorChanged = False
 
-        if (gameState.team(self.teamColor).team_number != self.brain.teamNumber):
+        if (gameState.team(self.teamColor).team_number != self.brain.teamNumber) \
+                and not gameState.have_remote_gc:
             # We have the wrong team color
+            print "Team color changed"
             self.teamColorChanged = True
             # This function might look weird, but!
             #   0 -> 1 so team blue switches to team red
