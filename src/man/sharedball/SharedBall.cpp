@@ -72,7 +72,8 @@ void SharedBallModule::run_()
     sharedBallResetMessage.get()->set_h(reseth);
     sharedBallResetMessage.get()->set_timestamp(timestamp);
 //    sharedBallResetMessage.get()->set_uncert(flippedRobot);
-    sharedBallReset.setMessage(sharedBallResetMessage);
+    // TODO turn back on after more extensive testing
+    // sharedBallReset.setMessage(sharedBallResetMessage);
 }
 
 /* Makes groups for each robot that include those other robots who
