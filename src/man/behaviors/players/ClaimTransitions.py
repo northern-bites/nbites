@@ -34,13 +34,7 @@ def shouldCedeClaim(player):
             elif player.role < mate.role:
                 player.claimedBall = False
                 return True
-
-        # TODO: think more about comm lag/check comm lag
         elif (mateWeight < playerWeight):
-            player.claimedBall = False
-            return True
-
-        elif mate.inKickingState:
             player.claimedBall = False
             return True
 
