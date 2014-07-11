@@ -8,6 +8,7 @@
 
 #include "fieldview/FieldViewer.h"
 #include "worldview/WorldView.h"
+#include "sharedview/SharedViewer.h"
 
 #include "ParticleSwarm.pb.h"
 
@@ -23,8 +24,9 @@ public:
 public slots:
     void setUpModules();
 
- protected:
+protected:
     viewer::FieldViewer fieldView;
     worldview::WorldView worldView;
+    sharer::SharedViewer sharedView;
 };
 }

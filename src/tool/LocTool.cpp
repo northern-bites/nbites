@@ -10,12 +10,13 @@ namespace tool {
 LocTool::LocTool(const char* title) :
     fieldView(this),
     worldView(this),
+    sharedView(this),
     EmptyTool(title)
 
 {
     toolTabs->addTab(&fieldView, tr("FieldView"));
     toolTabs->addTab(&worldView, tr("World View"));
-
+    toolTabs->addTab(&sharedView, tr("SharedView"));
     connect(&diagram, SIGNAL(signalUnloggersReady()),
             this, SLOT(setUpModules()));
 }
@@ -75,4 +76,4 @@ void LocTool::setUpModules()
     fieldView.tryOffline();
 }
 
-}
+} //namespace tool

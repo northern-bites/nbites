@@ -20,7 +20,8 @@ SensorsModule::SensorsModule(boost::shared_ptr<AL::ALBroker> broker)
       broker_(broker),
       fastMemoryAccess_(new AL::ALMemoryFastAccess()),
       sensorValues_(NUM_SENSOR_VALUES),
-      sensorKeys_(NUM_SENSOR_VALUES)
+      sensorKeys_(NUM_SENSOR_VALUES),
+      lastPrint(0)
 {
     // Initialize the Aldebaran fast access memory interface
     // to quickly read sensor values from memory.
