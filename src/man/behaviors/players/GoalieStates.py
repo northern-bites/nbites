@@ -37,9 +37,8 @@ def gameReady(player):
         player.penaltyKicking = False
         player.stand()
         player.brain.tracker.lookToAngle(0)
-        # TODO is this actually possible?
-        # if player.lastDiffState != 'gameInitial':
-        #     return player.goLater('spinToWalkOffField')
+        if player.lastDiffState != 'gameInitial':
+            return player.goLater('spinToWalkOffField')
 
     # Wait until the sensors are calibrated before moving.
     if(not player.brain.motion.calibrated):
@@ -61,9 +60,6 @@ def gameSet(player):
         # The ball will be right in front of us, for sure
         player.brain.tracker.lookToAngle(0)
 
-    # The goalie always gets manually positioned, so reset loc to there.
-    player.brain.resetGoalieLocalization()
-
     # Wait until the sensors are calibrated before moving.
     if (not player.brain.motion.calibrated):
         return player.stay()
@@ -77,6 +73,7 @@ def gamePlaying(player):
         player.brain.fallController.enabled = True
         player.penaltyKicking = False
         player.brain.nav.stand()
+        player.brain.resetGoalieLocalization()
 
     # Wait until the sensors are calibrated before moving.
     if (not player.brain.motion.calibrated):

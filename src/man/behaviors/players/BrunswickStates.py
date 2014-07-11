@@ -20,8 +20,6 @@ def gameInitial(player):
         player.gainsOn()
         player.stand()
         player.zeroHeads()
-        #Reset localization to proper starting position by player number.
-        #Locations are defined in the wiki.
         player.brain.resetInitialLocalization()
         player.lastStiffStatus = True
 
@@ -42,6 +40,7 @@ def gameReady(player):
         player.inKickingState = False
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
+        player.brain.resetInitialLocalization()
         player.brain.tracker.repeatWidePan()
         player.timeReadyBegan = player.brain.time
 
