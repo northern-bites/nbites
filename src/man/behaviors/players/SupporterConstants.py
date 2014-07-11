@@ -20,33 +20,32 @@ def leftDefender(player):
     """
     Defenders position between ball and goal.
     """
-    if player.brain.ball.y < NogginConstants.MIDFIELD_Y:
-        return RobotLocation((player.brain.ball.x + 
-                              NogginConstants.BLUE_GOALBOX_RIGHT_X) * .5, 
-                             (player.brain.ball.y + 
-                              NogginConstants.GOALBOX_WIDTH * .25 +
-                              NogginConstants.BLUE_GOALBOX_BOTTOM_Y) * .5, 
-                             player.brain.ball.bearing_deg + player.brain.loc.h)
-    return RobotLocation((player.brain.ball.x + NogginConstants.BLUE_GOALBOX_RIGHT_X)*.5,
-                         (player.brain.ball.y + NogginConstants.MIDFIELD_Y)*.5,
+    # if player.brain.ball.y < NogginConstants.MIDFIELD_Y:
+    return RobotLocation((player.brain.ball.x + 
+                          NogginConstants.BLUE_GOALBOX_RIGHT_X) * .5, 
+                         (player.brain.ball.y + 
+                          NogginConstants.GOALBOX_WIDTH * .25 +
+                          NogginConstants.BLUE_GOALBOX_BOTTOM_Y) * .5, 
                          player.brain.ball.bearing_deg + player.brain.loc.h)
+    # return RobotLocation((player.brain.ball.x + NogginConstants.BLUE_GOALBOX_RIGHT_X)*.5,
+    #                      (player.brain.ball.y + NogginConstants.MIDFIELD_Y)*.5,
+    #                      player.brain.ball.bearing_deg + player.brain.loc.h)
 
 def rightDefender(player):
     """
     Defenders position between ball and goal.
     """
-    if player.brain.ball.y >=  NogginConstants.MIDFIELD_Y:
-        return RobotLocation((player.brain.ball.x + NogginConstants.BLUE_GOALBOX_RIGHT_X)
-                                            * .5, (player.brain.ball.y +
-                                                   NogginConstants.GOALBOX_WIDTH * .75 +
-                                                   NogginConstants.BLUE_GOALBOX_BOTTOM_Y)
-                                            * .5, player.brain.ball.bearing_deg +
-                                            player.brain.loc.h)
-    return RobotLocation((player.brain.ball.x + NogginConstants.BLUE_GOALBOX_RIGHT_X)*.5,
-                          (player.brain.ball.y + NogginConstants.MIDFIELD_Y)*.5,
-                          player.brain.ball.bearing_deg + player.brain.loc.h)
+    # if player.brain.ball.y >=  NogginConstants.MIDFIELD_Y:
+    return RobotLocation((player.brain.ball.x + 
+                          NogginConstants.BLUE_GOALBOX_RIGHT_X) * .5, 
+                         (player.brain.ball.y +
+                          NogginConstants.GOALBOX_WIDTH * .75 +
+                          NogginConstants.BLUE_GOALBOX_BOTTOM_Y) * .5, 
+                         player.brain.ball.bearing_deg + player.brain.loc.h)
+    # return RobotLocation((player.brain.ball.x + NogginConstants.BLUE_GOALBOX_RIGHT_X)*.5,
+    #                       (player.brain.ball.y + NogginConstants.MIDFIELD_Y)*.5,
+    #                       player.brain.ball.bearing_deg + player.brain.loc.h)
 
-# TODO rotation matrix
 def chaser(player):
     """
     Chasers position off to one side of the ball about a meter away.
