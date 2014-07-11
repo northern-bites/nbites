@@ -49,6 +49,8 @@ def weightedDistAndHeading(distance, heading, ballBearing):
         heading += 360
 
     ballHeading = heading + ballBearing
-    if math.fabs(ballHeading) > 90:
-        distance += distance * headingWeight * math.fabs(math.cos(math.radians(ballHeading)))
+    if ballHeading > 90:
+        distance += distance * (x-90)**2 / 90**2
+    elif ballHeading < -90:
+        distance += distance * (x+90)**2 / 90**2
     return distance
