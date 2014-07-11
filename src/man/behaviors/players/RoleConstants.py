@@ -79,8 +79,8 @@ cherryPickerHome = RobotLocation(NogginConstants.OPP_GOALBOX_LEFT_X,
                                  NogginConstants.OPP_GOALBOX_BOTTOM_Y,
                                  90)
 
-cherryPickerKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 20,
-                                    NogginConstants.OPP_GOALBOX_TOP_Y,
+cherryPickerKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 45,
+                                    NogginConstants.OPP_GOALBOX_TOP_Y + 100,
                                     0)
 
 ourKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 45,
@@ -127,8 +127,8 @@ evenDefenderBox = defenderBox
 
 chaserBox = ((0, 0), NogginConstants.FIELD_HEIGHT, NogginConstants.FIELD_WIDTH)
 
-cherryPickerBox = (((NogginConstants.FIELD_WHITE_HEIGHT - NogginConstants.CENTER_FIELD_X)/2, 0),
-                    NogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X + NogginConstants.GREEN_PAD_X, 
+cherryPickerBox = (((0.5*NogginConstants.FIELD_GREEN_HEIGHT + 0.25*NogginConstants.FIELD_WHITE_HEIGHT), 0),
+                    0.25*NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_X, 
                     NogginConstants.FIELD_WIDTH)
 
 ### SETS PLAYER STATE PER ROLE
@@ -156,6 +156,9 @@ def setRoleConstants(player, role):
         player.isKickingOff = False
     elif isCherryPicker(role):
         player.homePosition = cherryPickerHome
-        player.kickoffPosition = cherryPickerKickoff
+        if role == 2: # if there are two chasers
+            player.kickoffPosition = cherryPickerKickoff
+        else:         # if there is only one chaser, role (should) == 5
+            player.kickoffPosition = oddChaserKickoff
         player.box = cherryPickerBox
         player.isKickingOff = False
