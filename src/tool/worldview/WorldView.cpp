@@ -12,7 +12,8 @@ WorldView::WorldView(QWidget* parent)
       QWidget(parent),
       commThread("comm", COMM_FRAME_LENGTH_uS),
       wviewComm(16,0),
-      wviewShared(),
+      // Will run sharedball on player 1: should get same ball loc for everyone
+      wviewShared(1),
       newTeam(0),
       mutex()
 {
@@ -113,7 +114,6 @@ WorldView::WorldView(QWidget* parent)
     }
 
     sharedIn.wireTo(&wviewShared.sharedBallOutput);
-
 }
 
 
@@ -137,8 +137,6 @@ void WorldView::run_()
     }
     sharedIn.latch();
     fieldPainter->updateWithSharedBallMessage(sharedIn.message());
-
-
 
     mutex.unlock();
 }
@@ -182,5 +180,5 @@ void WorldView::updateStatus(messages::WorldModel msg, int index)
     }
 }
 
-}
-}
+} //namespace worldview
+} //namespace tool
