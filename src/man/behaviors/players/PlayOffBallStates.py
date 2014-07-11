@@ -28,7 +28,7 @@ def branchOnRole(player):
     role here.
     """
     if role.isChaser(player.role):
-        return player.goNow('findBall')
+        return player.goNow('searchFieldForBall')
     else:
         return player.goNow('positionAtHome')
 
