@@ -80,6 +80,7 @@ public:
     /*
      * Camera Parameters Go Here
      */
+
     // FORT ANDROS CAMERA PARAMETERS
     // TOP SETTINGS
     static const bool TOP_H_FLIP = 1;

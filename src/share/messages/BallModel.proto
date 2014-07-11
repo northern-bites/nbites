@@ -67,6 +67,5 @@ message SharedBall {
     optional float x = 1;
     optional float y = 2;
     optional bool ball_on  = 3;
-    optional sint32 frames_on = 4;
-    optional sint32 frames_off = 5;
+    optional int32 reliability = 4;
 }
