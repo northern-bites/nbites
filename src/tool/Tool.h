@@ -23,6 +23,7 @@
 #include "colorcreator/ColorTable.h"
 #include "vision_offline/VisionDisplayModule.h"
 #include "fieldview/FieldViewer.h"
+#include "sharedview/SharedViewer.h"
 
 #include "image/ImageConverterModule.h"
 
@@ -67,6 +68,7 @@ protected:
     vision::VisionDisplayModule visDispMod;
     colorcreator::ColorCalibrate colorCalibrate;
     viewer::FieldViewer fieldView;
+    sharer::SharedViewer sharedView;
     playbook::PlaybookCreator playbookCreator;
 
     man::image::ImageConverterModule topConverter;

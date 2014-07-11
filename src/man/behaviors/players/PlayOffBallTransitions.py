@@ -64,16 +64,13 @@ def shouldApproachBall(player):
     return True
 
 def shouldFindSharedBall(player):
-    # Transition returns true if shared ball is on, and cannot see ball
-
-    if shared.ballOffForNFrames(60) and player.brain.sharedBall.frames_on > 30:
-        return True
-    return False
+    return (player.brain.sharedBall.ball_on and
+            player.brain.sharedBall.reliability >= 2)
 
 def shouldStopLookingForSharedBall(player):
-    if player.brain.sharedBall.frames_off > 60:
-        return True
-    return False
+    return not shouldFindSharedBall(player)
 
 def shouldBeSupporter(player):
+    # TODO does the ball need to be in robot's box?
     return ballInBox(player) and claimTransitions.shouldCedeClaim(player)
+

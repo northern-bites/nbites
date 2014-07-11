@@ -44,7 +44,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       gamestate(teamNum, playerNum),
       behaviors(teamNum, playerNum),
       leds(broker),
-      sharedBall()
+      sharedBall(playerNum)
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
@@ -169,7 +169,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 
     localization.visionInput.wireTo(&vision.vision_field);
     localization.motionInput.wireTo(&motion.odometryOutput_, true);
-    localization.resetInput.wireTo(&behaviors.resetLocOut, true);
+    localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
+    localization.resetInput[1].wireTo(&sharedBall.sharedBallReset, true);
     localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
     localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
 
