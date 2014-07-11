@@ -24,14 +24,17 @@ def shouldCedeClaim(player):
 
         # sigmoid function so that the difference increases slowly at close distances but
         # grows quickly at mid-range to far distances and at very far distances, asymptotically
-        # approaches a maximum
-        closeWeightDifference = 25 + 150/(1 + math.e**(6.25 - .05*player.brain.ball.distance))
+        # approaches a maximum. uses the distance of the close robot
+        if player.brain.ball.distance < mate.brain.ball.distance:
+            closerDistance = player.brain.ball.distance
+        else:
+            closerDistance = mate.brain.ball.distance
+        closeWeightDifference = 25 + 150/(1 + math.e**(6.25 - .05*closerDistance))
         if (math.fabs(mateWeight - playerWeight) < closeWeightDifference):
-            print "call off by tie break"
             if mate.role == 4:
                 player.claimedBall = False
                 return True
-            elif player.role < mate.role:
+            elif player.role < mate.role and player.role != 4:
                 player.claimedBall = False
                 return True
         elif (mateWeight < playerWeight):
