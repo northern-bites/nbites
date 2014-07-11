@@ -60,7 +60,7 @@ def watchForBall(player):
 
 @superState('playOffBall')
 @stay
-@ifSwitchLater(shared.ballOffForNFrames(30), 'branchOnRole')
+@ifSwitchLater(shared.ballOffForNFrames(30), 'findBall')
 def positionAsSupporter(player):
     # defenders position at midpoint between ball and goal
     if role.isLeftDefender(player.role):

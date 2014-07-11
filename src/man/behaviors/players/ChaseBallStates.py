@@ -40,7 +40,7 @@ def approachBall(player):
 @superState('gameControllerResponder')
 @ifSwitchLater(transitions.shouldSpinToBall, 'spinToBall')
 @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
-@ifSwitchNow(transitions.shouldSupport, 'playOffBall')
+@ifSwitchNow(transitions.shouldSupport, 'positionAsSupporter')
 @ifSwitchLater(transitions.shouldFindBall, 'findBall')
 def positionAndKickBall(player):
     """
