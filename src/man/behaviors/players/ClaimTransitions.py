@@ -2,7 +2,6 @@
 # TODO: determine a reasonable amount of time for this
 import math
 claimExpiration = 5
-headingWeight = .5
 
 def shouldCedeClaim(player):
     if not player.useClaims:
@@ -26,8 +25,9 @@ def shouldCedeClaim(player):
         # sigmoid function so that the difference increases slowly at close distances but
         # grows quickly at mid-range to far distances and at very far distances, asymptotically
         # approaches a maximum
-        closeWeightDifference = 30 + 150/(1 + math.e**(6.25 - .05*player.brain.ball.distance))
+        closeWeightDifference = 25 + 150/(1 + math.e**(6.25 - .05*player.brain.ball.distance))
         if (math.fabs(mateWeight - playerWeight) < closeWeightDifference):
+            print "call off by tie break"
             if mate.role == 4:
                 player.claimedBall = False
                 return True
@@ -50,7 +50,7 @@ def weightedDistAndHeading(distance, heading, ballBearing):
 
     ballHeading = heading + ballBearing
     if ballHeading > 90:
-        distance += distance * (x-90)**2 / 90**2
+        distance += distance * (ballBearing-90)**2 / 90**2
     elif ballHeading < -90:
-        distance += distance * (x+90)**2 / 90**2
+        distance += distance * (ballBearing+90)**2 / 90**2
     return distance
