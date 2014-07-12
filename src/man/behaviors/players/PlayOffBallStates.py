@@ -9,7 +9,7 @@ import noggin_constants as NogginConstants
 from ..navigator import Navigator as nav
 from objects import Location, RobotLocation
 from ..util import *
-from math import hypot
+from math import hypot, fabs
 import random
 
 @defaultState('branchOnRole')
@@ -136,29 +136,11 @@ def searchFieldForFlippedSharedBall(player):
 @ifSwitchNow(transitions.shouldFindSharedBall, 'searchFieldForSharedBall')
 def searchFieldByQuad(player):
     """
-    Search the field quadrant by quadrant. Choose first quadrant by shared ball
-    if it is on.
+    Search the field quadrant by quadrant. Choose first quadrant by loc heading.
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        # if player.brain.sharedBall.ball_on:
-        #     if shared.lowerLeft(player.brain.sharedBall):
-        #         searchFieldByQuad.dest = quad1Center
-        #     elif shared.lowerRight(player.brain.sharedBall):
-        #         searchFieldByQuad.dest = quad2Center
-        #     elif shared.upperLeft(player.brain.sharedBall):
-        #         searchFieldByQuad.dest = quad4Center
-        #     else:
-        #         searchFieldByQuad.dest = quad3Center
-        # else:
-        if shared.lowerLeft(player.brain.loc):
-            searchFieldByQuad.dest = quad3Center
-        elif shared.lowerRight(player.brain.loc):
-            searchFieldByQuad.dest = quad4Center
-        elif shared.upperLeft(player.brain.loc):
-            searchFieldByQuad.dest = quad2Center
-        else:
-            searchFieldByQuad.dest = quad1Center
+        searchFieldByQuad.dest = min(points, key=lambda x:fabs(player.brain.loc.getRelativeBearing(x)))
 
     if shared.navAtPosition(player):
         if searchFieldByQuad.dest == quad1Center:
@@ -174,6 +156,7 @@ def searchFieldByQuad(player):
                           speed = nav.QUICK_SPEED, avoidObstacles = True,
                           fast = True, pb = False)
 
+points = [quad1Center, quad2Center, quad3Center, quad4Center]
 quad1Center = Location(NogginConstants.CENTER_FIELD_X * .6, NogginConstants.CENTER_FIELD_Y * .6)
 quad2Center = Location(NogginConstants.CENTER_FIELD_X * .6, NogginConstants.CENTER_FIELD_Y * 1.4)
 quad3Center = Location(NogginConstants.CENTER_FIELD_X * 1.4, NogginConstants.CENTER_FIELD_Y * 1.4)
