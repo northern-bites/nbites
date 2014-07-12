@@ -1,6 +1,8 @@
 # Time elapsed between packets before we deem a claim to be expired
 # TODO: determine a reasonable amount of time for this
 import math
+import RoleConstants as roleConstants
+
 claimExpiration = 5
 
 def shouldCedeClaim(player):
@@ -31,10 +33,10 @@ def shouldCedeClaim(player):
             closerDistance = mate.ballDist
         closeWeightDifference = 25 + 150/(1 + math.e**(6.25 - .05*closerDistance))
         if (math.fabs(mateWeight - playerWeight) < closeWeightDifference):
-            if mate.role == 4:
+            if roleConstants.isFirstChaser(mate.role):
                 player.claimedBall = False
                 return True
-            elif player.role < mate.role and player.role != 4:
+            elif player.role < mate.role and not roleConstants.isFirstChaser(player.role):
                 player.claimedBall = False
                 return True
         elif (mateWeight < playerWeight):
