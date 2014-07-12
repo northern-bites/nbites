@@ -27,6 +27,13 @@ def shouldReturnHome(player):
 
     return claimTrans.shouldCedeClaim(player)
 
+def shouldSupport(player):
+    """
+    when in positionAndKickBall don't care if the ball is in our box but do
+    want to check who has higher priority claim
+    """
+    return claimTrans.shouldCedeClaim(player)
+
 def shouldPrepareForKick(player):
     """
     We're close enough to prepare for a kick
