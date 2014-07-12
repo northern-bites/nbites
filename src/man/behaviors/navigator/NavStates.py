@@ -163,11 +163,12 @@ def dodge(nav):
                 temp = temp - 8
             elif temp < 1:
                 temp = temp + 8
-                    dest = RelRobotLocation(constants.DGE_DESTS[temp+1][0],
-                                            constants.DGE_DESTS[temp+1][1],
-                                            constants.DGE_DESTS[temp+1][2])
-                    helper.setOdometryDestination(nav, dest)
-                    return Transition.getNextState(nav, dodge)
+            if not dodge.positions[int(dodge.DDirects[temp])]:
+                dest = RelRobotLocation(constants.DGE_DESTS[temp+1][0],
+                                    constants.DGE_DESTS[temp+1][1],
+                                    constants.DGE_DESTS[temp+1][2])
+                helper.setOdometryDestination(nav, dest)
+                return Transition.getNextState(nav, dodge)
 
         # if i am here.... something seriously wrong!!
 
