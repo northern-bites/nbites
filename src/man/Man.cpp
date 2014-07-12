@@ -5,7 +5,6 @@
 #include "Common.h"
 #include "Profiler.h"
 #include "Camera.h"
-#include "RobotConfig.h"
 
 #ifndef OFFLINE
 SET_POOL_SIZE(messages::WorldModel,  24);
@@ -20,6 +19,9 @@ namespace man {
 
 Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     : AL::ALModule(broker, name),
+      param("/home/nao/nbites/lib/parameters.json"),
+      playerNum(param.getParam<int>("playerNumber")),
+      teamNum(param.getParam<int>("teamNumber")),
       sensorsThread("sensors", SENSORS_FRAME_LENGTH_uS),
       sensors(broker),
       jointEnactor(broker),
@@ -29,7 +31,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       guardian(),
       audio(),
       commThread("comm", COMM_FRAME_LENGTH_uS),
-      comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
+      comm(teamNum, playerNum),
       cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
       topTranscriber(*new image::ImageTranscriber(Camera::TOP)),
       bottomTranscriber(*new image::ImageTranscriber(Camera::BOTTOM)),
@@ -39,10 +41,10 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       localization(),
       ballTrack(),
       obstacle(),
-      gamestate(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
-      behaviors(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
+      gamestate(teamNum, playerNum),
+      behaviors(teamNum, playerNum),
       leds(broker),
-      sharedBall()
+      sharedBall(playerNum)
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
@@ -98,6 +100,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     guardian.inertialInput.wireTo(&sensors.inertialsOutput_, true);
     guardian.fsrInput.wireTo(&sensors.fsrOutput_, true);
     guardian.batteryInput.wireTo(&sensors.batteryOutput_, true);
+    guardian.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
     audio.audioIn.wireTo(&guardian.audioOutput);
 #ifdef LOG_GUARDIAN
     guardianThread.log<messages::StiffnessControl>(
@@ -166,7 +169,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 
     localization.visionInput.wireTo(&vision.vision_field);
     localization.motionInput.wireTo(&motion.odometryOutput_, true);
-    localization.resetInput.wireTo(&behaviors.resetLocOut, true);
+    localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
+    localization.resetInput[1].wireTo(&sharedBall.sharedBallReset, true);
     localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
     localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
 
@@ -178,6 +182,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     {
         sharedBall.worldModelIn[i].wireTo(comm._worldModels[i], true);
     }
+
+    behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
 
     obstacle.armContactIn.wireTo(&arms.contactOut, true);
     obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);

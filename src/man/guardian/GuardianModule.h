@@ -13,6 +13,7 @@
 
 #include "RoboGrams.h"
 #include "PMotion.pb.h"
+#include "MotionStatus.pb.h"
 #include "ButtonState.pb.h"
 #include "InertialState.pb.h"
 #include "StiffnessControl.pb.h"
@@ -62,6 +63,7 @@ public:
     portals::InPortal<messages::InertialState>   inertialInput;
     portals::InPortal<messages::FSR>             fsrInput;
     portals::InPortal<messages::BatteryState>    batteryInput;
+    portals::InPortal<messages::MotionStatus>    motionStatusIn;
 
 private:
     void checkFalling();
@@ -101,6 +103,7 @@ private:
         rightFootButton;
 
     unsigned int frameCount;
+    unsigned int framesInBHWalk;
 
     struct Inertial lastInertial;
     int fallingFrames,notFallingFrames,fallenCounter,groundOnCounter,groundOffCounter;

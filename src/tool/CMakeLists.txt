@@ -23,9 +23,9 @@ include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
 if(COMPILER_SUPPORTS_CXX11)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 elseif(COMPILER_SUPPORTS_CXX0X)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 else()
     message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
@@ -102,6 +102,7 @@ add_subdirectory( ${MAN_DIR}/support ${CMAKE_CURRENT_BINARY_DIR}/man/support)
 
 add_subdirectory( ${MAN_DIR}/balltrack ${CMAKE_CURRENT_BINARY_DIR}/man/balltrack)
 add_subdirectory( ${MAN_DIR}/comm ${CMAKE_CURRENT_BINARY_DIR}/man/comm)
+add_subdirectory( ${MAN_DIR}/sharedball ${CMAKE_CURRENT_BINARY_DIR}/man/sharedball)
 add_subdirectory( ${MAN_DIR}/image ${CMAKE_CURRENT_BINARY_DIR}/man/image)
 add_subdirectory( ${MAN_DIR}/localization ${CMAKE_CURRENT_BINARY_DIR}/man/localization)
 add_subdirectory( ${MAN_DIR}/vision ${CMAKE_CURRENT_BINARY_DIR}/man/vision)
@@ -115,6 +116,7 @@ add_subdirectory( fieldview )
 add_subdirectory( image )
 add_subdirectory( logview )
 add_subdirectory( playbook )
+add_subdirectory( sharedview )
 add_subdirectory( sim )
 add_subdirectory( unlog )
 add_subdirectory( vision_offline )
@@ -234,6 +236,15 @@ set( sim_headers
   SimTool.h
 )
 
+set( installer_srcs
+  installer_main.cpp
+  Installer.cpp
+  )
+
+set( installer_headers
+  Installer.h
+  )
+
 # Qt4 goodness (aka moc the headers)
 Qt4_wrap_cpp( tool_headers_moc ${tool_headers} )
 Qt4_wrap_cpp( loc_headers_moc ${loc_headers} )
@@ -242,6 +253,7 @@ Qt4_wrap_cpp( vision_headers_moc ${vision_headers} )
 Qt4_wrap_cpp( calibrate_headers_moc ${calibrate_headers} )
 Qt4_wrap_cpp( playbook_headers_moc ${playbook_headers} )
 Qt4_wrap_cpp( sim_headers_moc ${sim_headers} )
+Qt4_wrap_cpp( installer_headers_moc ${installer_headers} )
 
 ## EXECUTABLES ##
 
@@ -260,7 +272,9 @@ target_link_libraries(
   image # man image
   vision # man vision
   comm # man comm
+  sharedball # man sharedball
   fieldview
+  sharedview
   tool_common
   colorcreator
   vision_offline
@@ -281,6 +295,8 @@ target_link_libraries(
   unlog
   image_display
   logview
+  sharedball
+  sharedview
   fieldview
   worldview
   tool_common
@@ -320,6 +336,7 @@ target_link_libraries(
   image_display
   image # man image
   fieldview
+  sharedview
   tool_common
   colorcreator
   vision_offline
@@ -371,3 +388,15 @@ target_link_libraries(
   visionsim
   ${QT_LIBRARIES}
 )
+
+# The InstallerTool executable
+add_executable( installer_tool
+  ${installer_srcs}
+  ${installer_headers_moc}
+)
+
+target_link_libraries(
+  installer_tool
+  ${QT_LIBRARIES}
+)
+

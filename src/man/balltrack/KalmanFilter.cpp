@@ -319,7 +319,6 @@ void KalmanFilter::initialize(ufvector4 x_,
     cov = cov_;
 }
 
-
 void KalmanFilter::predictBallDest()
 {
     if(stationary)

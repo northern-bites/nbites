@@ -8,12 +8,13 @@ claimDistance = 50
 def shouldCedeClaim(player):
     if not player.useClaims:
         return False
+
     playerWeight = weightedDistAndHeading(player.brain.ball.distance, \
                                               player.brain.loc.h, player.brain.ball.bearing_deg)
     for mate in player.brain.teamMembers:
         if (mate.playerNumber == player.brain.playerNumber):
             continue
-        if not mate.claimedBall or not mate.active:
+        if not mate.claimedBall or not mate.active or mate.fallen:
             continue
 
         # Now we get into actual claims
@@ -26,11 +27,13 @@ def shouldCedeClaim(player):
         if (mateWeight < playerWeight):
             if mate.ballDist < claimDistance:
                 player.claimedBall = False
+                print "Mate #", mate.playerNumber, " claimed the ball"
                 return True
 
         if mate.inKickingState:
             if mate.ballDist < claimDistance:
                 player.claimedBall = False
+                print "Mate #", mate.playerNumber, " is kicking the ball"
                 return True
 
     player.claimedBall = True

@@ -188,7 +188,10 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
                 walkingEngine->theMotionRequestBH = motionRequest;
 
             } else {
-                currentCommand = MotionCommand::ptr();
+                MotionRequestBH motionRequest;
+                motionRequest.motion = MotionRequestBH::stand;
+
+                walkingEngine->theMotionRequestBH = motionRequest;
             }
 
         } else {
@@ -233,8 +236,14 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
                 else if (command->kickType == 2) {
                     motionRequest.walkRequest.kickType = WalkRequest::left;
                 }
-                else {
+                else if (command->kickType == 3){
                     motionRequest.walkRequest.kickType = WalkRequest::right;
+                }
+                else if (command->kickType == 4){
+                    motionRequest.walkRequest.kickType = WalkRequest::diagonalLeft;
+                }
+                else {
+                    motionRequest.walkRequest.kickType = WalkRequest::diagonalRight;
                 }
             }
 
@@ -410,6 +419,10 @@ void BHWalkProvider::setCommand(const DestinationCommand::ptr command) {
 
 bool BHWalkProvider::calibrated() const {
     return walkingEngine->theInertiaSensorDataBH.calibrated;
+}
+
+bool BHWalkProvider::upright() const {
+    return walkingEngine->theFallDownStateBH.state == FallDownStateBH::upright;
 }
 
 float BHWalkProvider::leftHandSpeed() const {

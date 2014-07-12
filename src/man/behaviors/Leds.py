@@ -13,8 +13,8 @@ GC_LEDS = True
 FOOT_LEDS = True
 BALL_LEDS = True
 GOAL_LEDS = True
-PLAYBOOK_LEDS = True
-LOC_LEDS = True
+ROLESWITCH_LEDS = True
+CALIBRATION_LEDS = True
 COMM_LEDS = True
 
 ####### LED DEFINITIONS #############
@@ -25,16 +25,16 @@ LED_ON = 1
 # and in ALLedNames.h
 NUM_LED_GROUPS = 29
 
-(LEFT_LOC_ONE_LED,
-LEFT_LOC_TWO_LED,
-LEFT_LOC_THREE_LED,
-LEFT_LOC_FOUR_LED,
-LEFT_LOC_FIVE_LED,
-RIGHT_LOC_ONE_LED,
-RIGHT_LOC_TWO_LED,
-RIGHT_LOC_THREE_LED,
-RIGHT_LOC_FOUR_LED,
-RIGHT_LOC_FIVE_LED,
+(LEFT_CALIBRATION_ONE_LED,
+LEFT_CALIBRATION_TWO_LED,
+LEFT_CALIBRATION_THREE_LED,
+LEFT_CALIBRATION_FOUR_LED,
+LEFT_CALIBRATION_FIVE_LED,
+RIGHT_CALIBRATION_ONE_LED,
+RIGHT_CALIBRATION_TWO_LED,
+RIGHT_CALIBRATION_THREE_LED,
+RIGHT_CALIBRATION_FOUR_LED,
+RIGHT_CALIBRATION_FIVE_LED,
 LEFT_COMM_ONE_LED,
 LEFT_COMM_TWO_LED,
 LEFT_COMM_THREE_LED,
@@ -74,12 +74,18 @@ BALL_ON_LEDS = ((BALL_LED, RED, NOW),)
 BALL_OFF_LEDS = ((BALL_LED, BLUE, NOW),)
 
 ##### Roles #####
-CHASER_ON_LEDS =   ((ROLE_LED, RED, NOW),)
-OFFENDER_ON_LEDS = ((ROLE_LED, EYE_YELLOW, NOW),)
-MIDDIE_ON_LEDS =   ((ROLE_LED, CYAN, NOW),)
-DEFENDER_ON_LEDS = ((ROLE_LED, BLUE, NOW),)
-GOALIE_ON_LEDS =   ((ROLE_LED, PURPLE, NOW),)
-ROLE_OFF_LEDS =    ((ROLE_LED, OFF, NOW),)
+ROLE_ONE      = ((ROLE_LED, RED, NOW),)
+ROLE_TWO      = ((ROLE_LED, EYE_YELLOW, NOW),)
+ROLE_THREE    = ((ROLE_LED, CYAN, NOW),)
+ROLE_FOUR     = ((ROLE_LED, BLUE, NOW),)
+ROLE_FIVE     = ((ROLE_LED, PURPLE, NOW),)
+ROLE_OFF_LEDS = ((ROLE_LED, OFF, NOW),)
+
+ROLE_DICT = {1: ROLE_ONE,
+             2: ROLE_TWO,
+             3: ROLE_THREE,
+             4: ROLE_FOUR,
+             5: ROLE_FIVE}
 
 ##### GOAL ######
 LEFT_POST_ON_LEDS =   ((RIGHT_GOAL_LED, GREEN, NOW),)
@@ -93,27 +99,27 @@ BLUE_GOAL_LEDS = ((GOAL_ID_LED, BLUE, NOW),)
 PINK_GOAL_LEDS = ((GOAL_ID_LED, PINK, NOW),)
 NO_GOAL_LEDS =   ((GOAL_ID_LED, OFF, NOW),)
 
-##### LOC #####
-LEFT_LOC_ONE_LEDS   = ((LEFT_LOC_ONE_LED, BLUE, NOW),)
-LEFT_LOC_TWO_LEDS   = ((LEFT_LOC_TWO_LED, BLUE, NOW),)
-LEFT_LOC_THREE_LEDS = ((LEFT_LOC_THREE_LED, BLUE, NOW),)
-LEFT_LOC_FOUR_LEDS  = ((LEFT_LOC_FOUR_LED, BLUE, NOW),)
-LEFT_LOC_FIVE_LEDS  = ((LEFT_LOC_FIVE_LED, BLUE, NOW),)
-RIGHT_LOC_ONE_LEDS  = ((RIGHT_LOC_ONE_LED, BLUE, NOW),)
-RIGHT_LOC_TWO_LEDS  = ((RIGHT_LOC_TWO_LED, BLUE, NOW),)
-RIGHT_LOC_THREE_LEDS= ((RIGHT_LOC_THREE_LED, BLUE, NOW),)
-RIGHT_LOC_FOUR_LEDS = ((RIGHT_LOC_FOUR_LED, BLUE, NOW),)
-RIGHT_LOC_FIVE_LEDS = ((RIGHT_LOC_FIVE_LED, BLUE, NOW),)
-LEFT_LOC_ONE_OFF_LEDS   = ((LEFT_LOC_ONE_LED, OFF, NOW),)
-LEFT_LOC_TWO_OFF_LEDS   = ((LEFT_LOC_TWO_LED, OFF, NOW),)
-LEFT_LOC_THREE_OFF_LEDS = ((LEFT_LOC_THREE_LED, OFF, NOW),)
-LEFT_LOC_FOUR_OFF_LEDS  = ((LEFT_LOC_FOUR_LED, OFF, NOW),)
-LEFT_LOC_FIVE_OFF_LEDS  = ((LEFT_LOC_FIVE_LED, OFF, NOW),)
-RIGHT_LOC_ONE_OFF_LEDS  = ((RIGHT_LOC_ONE_LED, OFF, NOW),)
-RIGHT_LOC_TWO_OFF_LEDS  = ((RIGHT_LOC_TWO_LED, OFF, NOW),)
-RIGHT_LOC_THREE_OFF_LEDS= ((RIGHT_LOC_THREE_LED, OFF, NOW),)
-RIGHT_LOC_FOUR_OFF_LEDS = ((RIGHT_LOC_FOUR_LED, OFF, NOW),)
-RIGHT_LOC_FIVE_OFF_LEDS = ((RIGHT_LOC_FIVE_LED, OFF, NOW),)
+##### CALIBRATION #####
+LEFT_CALIBRATION_ONE_LEDS   = ((LEFT_CALIBRATION_ONE_LED, BLUE, NOW),)
+LEFT_CALIBRATION_TWO_LEDS   = ((LEFT_CALIBRATION_TWO_LED, BLUE, NOW),)
+LEFT_CALIBRATION_THREE_LEDS = ((LEFT_CALIBRATION_THREE_LED, BLUE, NOW),)
+LEFT_CALIBRATION_FOUR_LEDS  = ((LEFT_CALIBRATION_FOUR_LED, BLUE, NOW),)
+LEFT_CALIBRATION_FIVE_LEDS  = ((LEFT_CALIBRATION_FIVE_LED, BLUE, NOW),)
+RIGHT_CALIBRATION_ONE_LEDS  = ((RIGHT_CALIBRATION_ONE_LED, BLUE, NOW),)
+RIGHT_CALIBRATION_TWO_LEDS  = ((RIGHT_CALIBRATION_TWO_LED, BLUE, NOW),)
+RIGHT_CALIBRATION_THREE_LEDS= ((RIGHT_CALIBRATION_THREE_LED, BLUE, NOW),)
+RIGHT_CALIBRATION_FOUR_LEDS = ((RIGHT_CALIBRATION_FOUR_LED, BLUE, NOW),)
+RIGHT_CALIBRATION_FIVE_LEDS = ((RIGHT_CALIBRATION_FIVE_LED, BLUE, NOW),)
+LEFT_CALIBRATION_ONE_OFF_LEDS   = ((LEFT_CALIBRATION_ONE_LED, OFF, NOW),)
+LEFT_CALIBRATION_TWO_OFF_LEDS   = ((LEFT_CALIBRATION_TWO_LED, OFF, NOW),)
+LEFT_CALIBRATION_THREE_OFF_LEDS = ((LEFT_CALIBRATION_THREE_LED, OFF, NOW),)
+LEFT_CALIBRATION_FOUR_OFF_LEDS  = ((LEFT_CALIBRATION_FOUR_LED, OFF, NOW),)
+LEFT_CALIBRATION_FIVE_OFF_LEDS  = ((LEFT_CALIBRATION_FIVE_LED, OFF, NOW),)
+RIGHT_CALIBRATION_ONE_OFF_LEDS  = ((RIGHT_CALIBRATION_ONE_LED, OFF, NOW),)
+RIGHT_CALIBRATION_TWO_OFF_LEDS  = ((RIGHT_CALIBRATION_TWO_LED, OFF, NOW),)
+RIGHT_CALIBRATION_THREE_OFF_LEDS= ((RIGHT_CALIBRATION_THREE_LED, OFF, NOW),)
+RIGHT_CALIBRATION_FOUR_OFF_LEDS = ((RIGHT_CALIBRATION_FOUR_LED, OFF, NOW),)
+RIGHT_CALIBRATION_FIVE_OFF_LEDS = ((RIGHT_CALIBRATION_FIVE_LED, OFF, NOW),)
 
 ##### COMM #####
 LEFT_COMM_ONE_LEDS   = ((LEFT_COMM_ONE_LED, BLUE, NOW),)
@@ -163,7 +169,8 @@ class Leds():
         self.goalCertainty = 0
         self.facingOpp = -1
         self.numActiveMates = 0
-        self.oldLocScore = 3
+        self.role = -1
+        self.calibrationCount = 0
 
     def processLeds(self):
 
@@ -224,52 +231,41 @@ class Leds():
                     else:
                         self.executeLeds(PINK_GOAL_LEDS)
 
-        # TODO when roleswitching happens, this should be set up again
-        # if PLAYBOOK_LEDS:
-        #     if self.brain.playbook.roleChanged():
-        #         if self.brain.play.isRole(PBConstants.CHASER):
-        #             self.executeLeds(CHASER_ON_LEDS)
-        #         elif self.brain.play.isRole(PBConstants.OFFENDER):
-        #             self.executeLeds(OFFENDER_ON_LEDS)
-        #         elif self.brain.play.isRole(PBConstants.MIDDIE):
-        #             self.executeLeds(MIDDIE_ON_LEDS)
-        #         elif self.brain.play.isRole(PBConstants.DEFENDER):
-        #             self.executeLeds(DEFENDER_ON_LEDS)
-        #         elif self.brain.play.isRole(PBConstants.GOALIE):
-        #             self.executeLeds(GOALIE_ON_LEDS)
-        #         else:
-        #             self.executeLeds(ROLE_OFF_LEDS)
+        if ROLESWITCH_LEDS:
+            newRole = self.brain.player.role
+            if newRole != self.role:
+                if newRole == 0:
+                    self.executeLeds(ROLE_OFF_LEDS)
+                else:
+                    self.executeLeds(ROLE_DICT[newRole])
+                self.role = newRole
 
-        if LOC_LEDS:
-            newLocScore = self.locScore(self.brain.locUncert)
-            if (newLocScore != self.oldLocScore):
-                self.oldLocScore = newLocScore
-                if(newLocScore > 0):
-                    self.executeLeds(LEFT_LOC_ONE_LEDS)
-                    self.executeLeds(RIGHT_LOC_ONE_LEDS)
-                else:
-                    self.executeLeds(LEFT_LOC_ONE_OFF_LEDS)
-                    self.executeLeds(RIGHT_LOC_ONE_OFF_LEDS)
-                if(newLocScore > 1):
-                    self.executeLeds(LEFT_LOC_TWO_LEDS)
-                    self.executeLeds(RIGHT_LOC_TWO_LEDS)
-                else:
-                    self.executeLeds(LEFT_LOC_TWO_OFF_LEDS)
-                    self.executeLeds(RIGHT_LOC_TWO_OFF_LEDS)
-                if(newLocScore > 2):
-                    self.executeLeds(LEFT_LOC_THREE_LEDS)
-                    self.executeLeds(RIGHT_LOC_THREE_LEDS)
-                    self.executeLeds(LEFT_LOC_FOUR_LEDS)
-                    self.executeLeds(RIGHT_LOC_FOUR_LEDS)
-                    self.executeLeds(LEFT_LOC_FIVE_LEDS)
-                    self.executeLeds(RIGHT_LOC_FIVE_LEDS)
-                else:
-                    self.executeLeds(LEFT_LOC_THREE_OFF_LEDS)
-                    self.executeLeds(RIGHT_LOC_THREE_OFF_LEDS)
-                    self.executeLeds(LEFT_LOC_FOUR_OFF_LEDS)
-                    self.executeLeds(LEFT_LOC_FIVE_OFF_LEDS)
-                    self.executeLeds(RIGHT_LOC_FIVE_OFF_LEDS)
-                    self.executeLeds(RIGHT_LOC_FOUR_OFF_LEDS)
+        if CALIBRATION_LEDS:
+            if (self.brain.motion.standing and not self.brain.motion.calibrated 
+                and self.calibrationCount % 8 < 4):
+                self.executeLeds(LEFT_CALIBRATION_ONE_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_TWO_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_THREE_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_FOUR_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_FIVE_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_ONE_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_TWO_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_THREE_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_FOUR_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_FIVE_LEDS)
+            else:
+                self.executeLeds(LEFT_CALIBRATION_ONE_OFF_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_TWO_OFF_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_THREE_OFF_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_FOUR_OFF_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_FIVE_OFF_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_ONE_OFF_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_TWO_OFF_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_THREE_OFF_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_FOUR_OFF_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_FIVE_OFF_LEDS) 
+
+            self.calibrationCount = self.calibrationCount + 1
 
         # If more teammates are added, consider making bottom of right
         # eye into localization uncertainty and using whole ear for comm
@@ -352,13 +348,3 @@ class Leds():
             # Unnecessary check, never triggered
             #if ledTuple[2] != NOW:
                 #print "Invalid timing command in Leds.py"
-
-    def locScore(self, newLoc):
-        if newLoc < 37:
-            return 0
-        elif newLoc < 45:
-            return 1
-        elif newLoc < 70:
-            return 2
-        else:
-            return 3
