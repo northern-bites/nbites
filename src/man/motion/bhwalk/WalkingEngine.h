@@ -277,6 +277,9 @@ public:
   float leftHandSpeed;
   float rightHandSpeed;
 
+  // Northern Bites hack for particle optmization
+  int countParams;
+
   /**
   * Intercept parameter streaming to compute derived paramaters.
   * Note that this does not work during the construction of the module.

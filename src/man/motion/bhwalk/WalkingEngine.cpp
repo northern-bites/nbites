@@ -227,52 +227,61 @@ void WalkingEngine::update(WalkingEngineOutputBH& walkingEngineOutput)
 	torsoMatrixProvider->update(theTorsoMatrixBH);
 	motionSelector->update(theMotionSelectionBH);
 
-	DEBUG_RESPONSE("module:WalkingEngine:optimize",
-			{
-			if(theMotionSelectionBH.ratios[MotionRequestBH::walk] > 0.9f)
-			{
-			if(!optimizeOptimizer.isRunning())
-			{
-			optimizeOptimizer.addDimension(walkHeight.y, walkHeight.y - 200.f, walkHeight.y + 200.f, 1.f);
-			optimizeOptimizer.addDimension(walkRef.y, walkRef.y - 20.f, walkRef.y + 20.f, 0.5f);
-			optimizeOptimizer.start();
-			(WalkingEngineBase&) optimizeBestParameters = *this;
-			}
-			if(optimizeStarted && theFrameInfoBH.getTimeSince(optimizeStartTime) > 4000)
-			{
-			const float rating = optimizeFitness.getAverage();
-			optimizeFitness.init();
-			optimizeOptimizer.setRating(rating);
-			if(rating == optimizeOptimizer.getBestRating())
-			{
-			OUTPUT(idText, text, "optimize: rating=" << rating << " (new optimum)");
-			(WalkingEngineBase&) optimizeBestParameters = *this;
-			}
-			else
-			{
-				OUTPUT(idText, text, "optimize: rating=" << rating);
-			}
-			optimizeStarted = false;
-			}
-	if(!optimizeStarted)
-	{
-		optimizeStarted = true;
-		optimizeStartTime = theFrameInfoBH.time;
+    // if(theMotionSelectionBH.ratios[MotionRequestBH::walk] > 0.9f && countParams <= 50)
+    // {
+    //     if(!optimizeOptimizer.isRunning())
+    //     {
+    //         countParams = 0;
+    //         optimizeOptimizer.addDimension(walkLiftOffset.y, 0.f, walkLiftOffset.y + 20.f, 1.f);
+    //         optimizeOptimizer.addDimension(walkLiftOffset.z, 0.f, walkLiftOffset.z + 20.f, 1.f);
+    //         optimizeOptimizer.start();
+    //         (WalkingEngineBase&) optimizeBestParameters = *this;
+    //     }
+    //     if(optimizeStarted && theFrameInfoBH.getTimeSince(optimizeStartTime) > 8000)
+    //     {
+    //         const float rating = optimizeFitness.getAverage();
+    //         optimizeFitness.init();
+    //         optimizeOptimizer.setRating(rating);
+    //         if(rating == optimizeOptimizer.getBestRating())
+    //         {
+    //             std::cout << "Best params!" << std::endl;
+    //             std::cout << rating << std::endl;
+    //             OUTPUT(idText, text, "optimize: rating=" << rating << " (new optimum)");
+    //             (WalkingEngineBase&) optimizeBestParameters = *this;
+    //         }
+    //         else
+    //         {
+    //             std::cout << "Not best params!" << std::endl;
+    //             std::cout << rating << std::endl;
+    //             OUTPUT(idText, text, "optimize: rating=" << rating);
+    //         }
+    //         optimizeStarted = false;
+    //     }
 
-		optimizeOptimizer.next();
-		init();
-	}
-			}
-			});
-	DEBUG_RESPONSE_NOT("module:WalkingEngine:optimize",
-			{
-			if(optimizeStarted)
-			{
-			optimizeStarted = false;
-			(WalkingEngineBase&) *this = optimizeBestParameters;
-			}
-			});
+    //     if(!optimizeStarted)
+    //     {
+    //         optimizeStarted = true;
+    //         optimizeStartTime = theFrameInfoBH.time;
 
+    //         optimizeOptimizer.next();
+    //         init();
+    //         std::cout << "Params:" << std::endl;
+    //         std::cout << countParams++ << std::endl;
+    //         std::cout << walkLiftOffset.y << std::endl;
+    //         std::cout << walkLiftOffset.z << std::endl;
+    //     }
+    // }
+    // if (countParams == 50)
+    // {
+    //     if(optimizeStarted)
+    //     {
+    //         optimizeStarted = false;
+    //         (WalkingEngineBase&) *this = optimizeBestParameters;
+    //         std::cout << "Best params:" << std::endl;
+    //         std::cout << walkLiftOffset.y << std::endl;
+    //         std::cout << walkLiftOffset.z << std::endl;
+    //     }
+    // }
 
 	if(theMotionSelectionBH.ratios[MotionRequestBH::walk] > 0.f || theMotionSelectionBH.ratios[MotionRequestBH::stand] > 0.f)
 	{
@@ -471,13 +480,10 @@ void WalkingEngine::computeError()
 		errorVelocity = Vector2BH<>();
 	}
 
-	DEBUG_RESPONSE("module:WalkingEngine:optimize",
-			{
-			if(theGroundContactStateBH.contact && currentMotionType == stepping)
-			optimizeFitness.add(sqrBH((errorLeft.y + errorRight.y) * 0.5f));
-			else
-			optimizeFitness.add(sqrBH((20.f + 20.f) * 0.5f));
-			});
+    // if(theGroundContactStateBH.contact && currentMotionType == stepping)
+    //     optimizeFitness.add(sqrBH((errorLeft.y + errorRight.y) * 0.5f));
+    // else
+    //     optimizeFitness.add(sqrBH((20.f + 20.f) * 0.5f));
 }
 
 void WalkingEngine::correctPendulumPlayer()
