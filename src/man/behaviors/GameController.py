@@ -70,16 +70,18 @@ class GameController():
         else:
             self.timeSincePlaying = 0
 
+        # The GC doesn't maintain the same indexing in packets, so we can't
+        # rely on always having the same index in the gameState message
+        teamIndex = 0
+        if gameState.team(1).team_number == self.brain.teamNumber:
+            teamIndex = 1
         # reset field for change
         self.teamColorChanged = False
 
-        if (gameState.team(self.teamColor).team_number != self.brain.teamNumber):
-            # We have the wrong team color
-            self.teamColorChanged = True
-            # This function might look weird, but!
-            #   0 -> 1 so team blue switches to team red
-            #   1 -> 0 so team red  switches to team blue
-            self.teamColor = -1*(self.teamColor)+1
+        if gameState.team(teamIndex).team_color != self.teamColor:
+            self.teamColor = gameState.team(teamIndex).team_color
+            self.teamColorChanged = True # Used by LEDs
+            print "Team color changed to: ", self.teamColor
 
         # reset field for change
         self.kickOffChanged = False
@@ -98,7 +100,7 @@ class GameController():
         # Egocentric check for penalty.
         # Note: being penalized is considered a state change, and should
         # override self.currentState when checked by the player FSA.
-        if (gameState.team(self.teamColor).player(self.brain.playerNumber-1).penalty):
+        if (gameState.team(teamIndex).player(self.brain.playerNumber-1).penalty):
             # I am penalized.
             if not self.penalized:
                 self.stateChanged = True
