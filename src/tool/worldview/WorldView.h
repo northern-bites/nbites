@@ -35,6 +35,7 @@ protected:
     WorldViewPainter* fieldPainter;
 
     QPushButton* startButton;
+    QPushButton* flipButton;
 
     QLineEdit* teamSelector;
 
@@ -48,6 +49,7 @@ protected:
     QMutex mutex;
 
 protected slots:
+    void flipButtonClicked();
     void startButtonClicked();
     void stopButtonClicked();
     void teamChanged();
