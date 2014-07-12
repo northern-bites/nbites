@@ -74,8 +74,8 @@ MODULE(WalkingEngine)
   DEFINES_PARAMETER(VectorYZ, standComPosition, VectorYZ(50.f, 262.0f)) /**< The position of the center of mass relative to the right foot when standing */
   DEFINES_PARAMETER(float, standBodyTilt, 0.f) /**< The tilt of the torso when standing */
   DEFINES_PARAMETER(Vector2BH<>, standArmJointAngles, Vector2BH<>(0.2f, 0.f)) /**< The joint angles of the left arm when standing */
-  DEFINES_PARAMETER(int, standHardnessAnklePitch, 80) /**< The hardness of the ankle pitch joint for standing and walking */
-  DEFINES_PARAMETER(int, standHardnessAnkleRoll, 80) /**< The hardness of the ankle roll joint for standing and walking */
+  DEFINES_PARAMETER(int, standHardnessAnklePitch, 85) /**< The hardness of the ankle pitch joint for standing and walking */
+  DEFINES_PARAMETER(int, standHardnessAnkleRoll, 85) /**< The hardness of the ankle roll joint for standing and walking */
 
   DEFINES_PARAMETER(Vector2BH<>, walkRef, Vector2BH<>(16.f, 50.f)) /**< The position of the pendulum pivot point in Q */
   DEFINES_PARAMETER(Vector2BH<>, walkRefAtFullSpeedX, Vector2BH<>(9.5f, 40.f)) /**< The position of the pendulum pivot point when walking forwards with maximum speed */
@@ -97,7 +97,7 @@ MODULE(WalkingEngine)
   DEFINES_PARAMETER(Vector3BH<>, walkLiftRotation, Vector3BH<>(-0.05f, -0.1f, 0.f)) /**< The amount the swinging foot is rotated while getting lifted */
   DEFINES_PARAMETER(float, walkSupportRotation, 0.f) /**< A rotation added to the supporting foot to boost the com acceleration */
   DEFINES_PARAMETER(Vector3BH<>, walkComLiftOffset, Vector3BH<>(0.f, 0.f, 2.3f)) /**< The height the center of mass is lifted within a single support phase */
-  DEFINES_PARAMETER(float, walkComBodyRotation, 0.05f) /**< How much the torso is rotated to achieve the center of mass shift along the y-axis */
+  DEFINES_PARAMETER(float, walkComBodyRotation, 0.07f) /**< How much the torso is rotated to achieve the center of mass shift along the y-axis */
 
   DEFINES_PARAMETER(Pose2DBH, speedMax, Pose2DBH(0.5f, Vector2BH<>(120.f, 50.f))) /**< The maximum walking speed (in "size of two steps") */
   DEFINES_PARAMETER(float, speedMaxBackwards, 80.f) /**< The maximum walking speed for backwards walking (in "size of two steps") */
