@@ -18,13 +18,11 @@ def positionReady(player):
         elif player.isKickingOff:
             player.kickoffPosition = roleConstants.theirKickoff
 
-        fast = (roleConstants.isChaser(player.role) or     # fast walk if chaser
-                roleConstants.isCherryPicker(player.role)) # or if cherry picker
         player.brain.nav.goTo(player.kickoffPosition,
                               precision = Navigator.PLAYBOOK,
                               speed = Navigator.QUICK_SPEED,
                               avoidObstacles = True,
-                              fast = fast, pb = False)
+                              fast = True, pb = False)
 
         player.brain.tracker.repeatBasicPan()
 

@@ -65,6 +65,7 @@ Tool::Tool(const char* title) :
     toolTabs->addTab(&colorCalibrate, tr("Color Calibrator"));
     toolTabs->addTab(&fieldView, tr("FieldView"));
     toolTabs->addTab(&worldView, tr("World Viewer"));
+    toolTabs->addTab(&sharedView, tr("SharedView"));
     toolTabs->addTab(&playbookCreator, tr("Playbook Creator"));
 
     this->setCentralWidget(toolTabs);
@@ -332,8 +333,6 @@ void Tool::setUpModules()
     }
     if(shouldAddFieldView)
         diagram.addModule(fieldView);
-
-
 }
 
 // Keyboard control
