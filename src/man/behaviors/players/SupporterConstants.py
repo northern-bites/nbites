@@ -23,8 +23,8 @@ def leftDefender(player):
     # if player.brain.ball.y < NogginConstants.MIDFIELD_Y:
     return RobotLocation((player.brain.ball.x + 
                           NogginConstants.BLUE_GOALBOX_RIGHT_X) * .5, 
-                         (player.brain.ball.y + 
-                          NogginConstants.GOALBOX_WIDTH * .25 +
+                         (player.brain.ball.y +
+                          NogginConstants.GOALBOX_WIDTH * .75 +
                           NogginConstants.BLUE_GOALBOX_BOTTOM_Y) * .5, 
                          player.brain.ball.bearing_deg + player.brain.loc.h)
     # return RobotLocation((player.brain.ball.x + NogginConstants.BLUE_GOALBOX_RIGHT_X)*.5,
@@ -38,8 +38,8 @@ def rightDefender(player):
     # if player.brain.ball.y >=  NogginConstants.MIDFIELD_Y:
     return RobotLocation((player.brain.ball.x + 
                           NogginConstants.BLUE_GOALBOX_RIGHT_X) * .5, 
-                         (player.brain.ball.y +
-                          NogginConstants.GOALBOX_WIDTH * .75 +
+                         (player.brain.ball.y + 
+                          NogginConstants.GOALBOX_WIDTH * .25 +
                           NogginConstants.BLUE_GOALBOX_BOTTOM_Y) * .5, 
                          player.brain.ball.bearing_deg + player.brain.loc.h)
     # return RobotLocation((player.brain.ball.x + NogginConstants.BLUE_GOALBOX_RIGHT_X)*.5,
