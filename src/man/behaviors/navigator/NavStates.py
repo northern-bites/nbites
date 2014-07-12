@@ -117,7 +117,6 @@ goToPosition.bookingIt = False
 
 # State where we are moving away from an obstacle
 def dodge(nav):
-    print("IN DODGING.............")
     order = [0, 1, -1, 2, -2, 3, -3, 4]
     if nav.firstFrame():
         # dodge.positions[0] is position.NONE, so direction numbers are their own index
@@ -127,13 +126,10 @@ def dodge(nav):
                 temp = temp - 8
             elif temp < 1:
                 temp = temp + 8
-            print "TEMP: ", temp
             if (temp == 3 or temp == 7):
                 continue
             # if there is no obstacle in this direction
-            print dodge.positions[int(dodge.DDirects[temp])]
             if not dodge.positions[int(dodge.DDirects[temp])]:
-                print  "I am empty in this direction."
                 numL = int(dodge.DDirects[temp] - 1)
                 if numL < 1:
                     numL = 8 # loops around to last indexed direction
@@ -141,14 +137,11 @@ def dodge(nav):
                 if numR > 8:
                     numR = 1 # loops to first indexed direction
                 # if no obstacles in my two surrounding dodge.DDirects, go in my direction
-                print "NUMS: LR = ", numL, ", ", numR
                 if not dodge.positions[numL] and not dodge.positions[numR]:
                     # Let's go here!
-                    print "   Where I am dodging: ", temp
                     dest = RelRobotLocation(constants.DGE_DESTS[temp-1][0],
                                             constants.DGE_DESTS[temp-1][1],
                                             constants.DGE_DESTS[temp-1][2])
-                    print "Dest = ", dest
                     helper.setOdometryDestination(nav, dest)
                     return Transition.getNextState(nav, dodge)
 
@@ -159,8 +152,6 @@ def dodge(nav):
                 temp = temp - 8
             elif temp < 1:
                 temp = temp + 8
-            print "TEMP: ", temp
-            if dodge.positions[int(dodge.DDirects[temp])] is 0:
                     dest = RelRobotLocation(constants.DGE_DESTS[temp+1][0],
                                             constants.DGE_DESTS[temp+1][1],
                                             constants.DGE_DESTS[temp+1][2])
@@ -168,7 +159,6 @@ def dodge(nav):
                     return Transition.getNextState(nav, dodge)
 
         # if i am here.... something seriously wrong!!
-        print "Made it to end in dodge... BAD!!!"
 
     return Transition.getNextState(nav, dodge)
 

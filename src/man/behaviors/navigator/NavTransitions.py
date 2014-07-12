@@ -56,8 +56,6 @@ def shouldDodge(nav):
     if destL < 1:
         destL = 8
 
-    # print walkingDest
-
     for i in range(size):
         curr_obst = obsts.obstacle(i)
         if ((curr_obst.position is not curr_obst.position.NONE) and
@@ -70,10 +68,7 @@ def shouldDodge(nav):
             #     int(curr_obst.position) == destL):
             #     setPosition = True
 
-    print "INFO: ", info
-
     if setPosition:
-        print walkingDest
         states.dodge.targetDest = walkingDest
         states.dodge.positions = info
         doneDodging.targetDest = walkingDest
@@ -121,26 +116,13 @@ def doneDodging(nav):
 
     noObstacles = True
     fieldObs = nav.brain.interface.fieldObstacles
-    print "DONE DODGING: ", doneDodging.positions
     for i in range(len(doneDodging.positions)):
         if (doneDodging.positions[i] < constants.DONE_DODGE_DIST and
             doneDodging.positions[i] is not fieldObs.obstacle(0).position.NONE):
             noObstacles = False
             break
 
-    print "NO OBSTACLES: ", noObstacles
-    print nav.brain.interface.motionStatus.standing
-        # if (doneDodging.positions[i] == doneDodging.targetDest or
-        #     int(doneDodging.positions[i]) == destR or
-        #     int(doneDodging.positions[i]) == destL):
-        #     if doneDodging.positions[i] is not fieldObs.obstacle(0).position.NONE:
-        #         noObstacles = False
-        #         break
-
     return (nav.brain.interface.motionStatus.standing or noObstacles)
-
-    # return (nav.brain.interface.motionStatus.standing or
-            # nav.brain.interface.obstacle.position is not doneDodging.position)
 
 def notAtLocPosition(nav):
     return not atDestination(nav)
