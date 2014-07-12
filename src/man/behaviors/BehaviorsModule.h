@@ -91,6 +91,8 @@ public:
     portals::InPortal<messages::FieldObstacles> obstacleIn;
     portals::InPortal<messages::VisionObstacle> visionObstacleIn;
 
+    portals::InPortal<messages::SharedBall> sharedBallIn;
+
     portals::OutPortal<messages::LedCommand> ledCommandOut;
     portals::OutPortal<messages::MotionRequest> motionRequestOut;
     portals::OutPortal<messages::MotionCommand> bodyMotionCommandOut;

@@ -3,7 +3,7 @@ from ..headTracker import HeadMoves
 import ChaseBallConstants as constants
 import noggin_constants as NogginConstants
 import ClaimTransitions as claimTrans
-from math import fabs
+from math import fabs, degrees
 
 ####### CHASING STUFF ##############
 
@@ -27,6 +27,13 @@ def shouldReturnHome(player):
 
     return claimTrans.shouldCedeClaim(player)
 
+def shouldSupport(player):
+    """
+    when in positionAndKickBall don't care if the ball is in our box but do
+    want to check who has higher priority claim
+    """
+    return claimTrans.shouldCedeClaim(player)
+
 def shouldPrepareForKick(player):
     """
     We're close enough to prepare for a kick
@@ -37,21 +44,9 @@ def shouldPrepareForKick(player):
 
 def shouldSpinToBall(player):
     """
-    We're not facing the ball well enough yet
+    We're not facing the ball well enough
     """
-    ball = player.brain.ball
-    return (ball.vis.on and
-            fabs(ball.rel_y) > constants.SHOULD_SPIN_TO_BALL_Y and
-            not (ball.distance > constants.SHOULD_SPIN_TO_BALL_DIST and
-                 fabs(ball.bearing_deg) < constants.SHOULD_SPIN_TO_BALL_BEAR))
-
-def shouldStopSpinningToBall(player):
-    """
-    We're done spinning
-    """
-    ball = player.brain.ball
-    return (ball.vis.on and
-            fabs(ball.rel_y) < constants.STOP_SPINNING_TO_BALL_Y)
+    return fabs(degrees(player.brain.ball.bearing)) > constants.SHOULD_SPIN_TO_BALL_BEARING
 
 def shouldApproachBallAgain(player):
     """
@@ -121,20 +116,6 @@ def orbitTooLong(player):
     return (player.stateTime > constants.ORBIT_TOO_LONG_THR)
 
 ####### PENALTY KICK STUFF ###########
-
-def shouldStopPenaltyKickDribbling(player):
-    """
-    While dribbling we should stop
-    """
-    my = player.brain.loc
-    # helpers is no longer used. Find a different way.
-    dribbleAimPoint = helpers.getShotCloseAimPoint(player)
-    goalBearing = my.getRelativeBearing(dribbleAimPoint)
-    return (inPenaltyKickStrikezone(player) or
-            player.brain.ball.rel_x > constants.STOP_DRIBBLE_X or
-            fabs(player.brain.ball.rel_y) > constants.STOP_DRIBBLE_Y or
-            fabs(goalBearing) > constants.STOP_DRIBBLE_BEARING or
-            player.counter > constants.STOP_PENALTY_DRIBBLE_COUNT)
 
 def inPenaltyKickStrikezone(player):
     """

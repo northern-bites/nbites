@@ -24,6 +24,8 @@ def gameInitial(player):
         #Locations are defined in the wiki.
         player.brain.resetInitialLocalization()
         player.lastStiffStatus = True
+        #Reset role to player number
+        player.brain.player.role = player.brain.playerNumber
 
     # If stiffnesses were JUST turned on, then stand up.
     if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
@@ -44,11 +46,6 @@ def gameReady(player):
         player.brain.nav.stand()
         player.brain.tracker.repeatWidePan()
         player.timeReadyBegan = player.brain.time
-
-    # Reset localization to proper starting position by player number.
-    # Locations are defined in the wiki.
-        if player.lastDiffState == 'gameInitial':
-            player.brain.resetInitialLocalization()
 
         if player.wasPenalized:
             player.wasPenalized = False
@@ -108,7 +105,8 @@ def gamePlaying(player):
         return player.goNow('approachBall')
     elif player.brain.gameController.timeSincePlaying < 10:
         return player.goNow('waitForKickoff')
-    return player.goNow('positionAtHome')
+    return player.goNow('playOffBall')
+
 
 @superState('gameControllerResponder')
 def gameFinished(player):
@@ -148,7 +146,7 @@ def waitForKickoff(player):
     if (player.brain.gameController.timeSincePlaying > 10 or
         fabs(player.brain.ball.rel_x - waitForKickoff.ballRelX) > 10 or
         fabs(player.brain.ball.rel_y - waitForKickoff.ballRelY) > 10):
-        return player.goNow('watchForBall')
+        return player.goNow('playOffBall')
 
     return player.stay()
 

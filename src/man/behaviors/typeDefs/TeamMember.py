@@ -27,13 +27,14 @@ class TeamMember(RobotLocation):
         self.ballVelX = 0
         self.ballVelY = 0
         self.ballUncert = 0
-        self.role = 1
+        self.role = 0
         self.inKickingState = False
         self.kickingToX = 0
         self.kickingToY = 0
         self.fallen = False
         self.active = True
         self.claimedBall = False
+        self.frameSinceActive = 0
 
         self.brain = tbrain # brain instance
 
@@ -62,6 +63,11 @@ class TeamMember(RobotLocation):
         self.active = info.active
         self.fallen = info.fallen
         self.claimedBall = info.claimed_ball
+
+        if self.active:
+            self.frameSinceActive = 0
+        else:
+            self.frameSinceActive += 1
 
         # Calculated from protobuf
         if self.claimedBall:
@@ -141,7 +147,9 @@ class TeamMember(RobotLocation):
             self.kickingToY = 0
         self.active = False
         self.fallen = False
-        self.claimedBall = self.brain.player.claimedBall
+        self.claimedBall = False
+        self.frameSinceActive = 0
+
 
     def getBearingToGoal(self):
         """returns bearing to goal"""

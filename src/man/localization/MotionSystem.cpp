@@ -3,9 +3,9 @@
 namespace man {
 namespace localization {
 
-static const float FRICTION_FACTOR_X = 1.1f;
+static const float FRICTION_FACTOR_X = 1.f;
 static const float FRICTION_FACTOR_Y = 1.f;
-static const float FRICTION_FACTOR_H = 2.4f;
+static const float FRICTION_FACTOR_H = 1.f;
 
 MotionSystem::MotionSystem(float xAndYNoise_, float hNoise_)
 {
@@ -60,7 +60,7 @@ void MotionSystem::update(ParticleSet& particles,
 
         dX = (cosh*dX_R + sinh*dY_R) * FRICTION_FACTOR_X;
         dY = (cosh*dY_R - sinh*dX_R) * FRICTION_FACTOR_Y;
-        dH = dH_R                    * FRICTION_FACTOR_H; // just add the rotation
+        dH = dH_R                    * FRICTION_FACTOR_H;
 
         particle->shift(dX, dY, dH);
 

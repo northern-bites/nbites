@@ -38,6 +38,7 @@ public:
     FieldViewerPainter(QWidget* parent = 0, float scaleFactor_ = 1.f);
 
     void updateWithLocationMessage(messages::RobotLocation newLoc);
+    void updateWithSharedBallMessage(messages::SharedBall sharedLoc);
     void updateWithParticleMessage(messages::ParticleSwarm newSwarm);
     void updateWithObsvMessage(messages::VisionField newObservations);
 
@@ -66,6 +67,7 @@ protected:
                             messages::RobotLocation loc,
                             bool red = false,
                             int size = PARTICLE_WIDTH);
+
     // Paint a Particle Swarm
     void paintParticleSwarm(QPaintEvent* event,
                             messages::ParticleSwarm swarm);

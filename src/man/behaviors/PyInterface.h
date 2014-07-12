@@ -46,6 +46,7 @@ public:
     messages::StiffStatus       const * stiffStatus_ptr;
     messages::FieldObstacles    const * obstacle_ptr;
     messages::VisionObstacle    const * visionObstacle_ptr;
+    messages::SharedBall        const * sharedBall_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -66,6 +67,10 @@ public:
     void setFilteredBall_ptr(const messages::FilteredBall* msg)
     {
         filteredBall_ptr = msg;
+    }
+    void setSharedBall_ptr(const messages::SharedBall* msg)
+    {
+        sharedBall_ptr = msg;
     }
     void setLedCommand_ptr(const messages::LedCommand* msg)
     {

@@ -77,10 +77,10 @@ public:
         };
         return bottomSettings;
     }
-
     /*
      * Camera Parameters Go Here
      */
+
     // FORT ANDROS CAMERA PARAMETERS
     // TOP SETTINGS
     static const bool TOP_H_FLIP = 1;
@@ -98,7 +98,7 @@ public:
     static const int TOP_WHITE_BALANCE = 3300;
     static const bool TOP_FADE_TO_BLACK = 0;
 
-    // BOTTOM SETTINGS
+    // // BOTTOM SETTINGS
     static const bool BOTTOM_H_FLIP = 0;
     static const bool BOTTOM_V_FLIP = 0;
     static const bool BOTTOM_AUTO_EXPOSURE = 0;

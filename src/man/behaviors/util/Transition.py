@@ -46,11 +46,11 @@ def getNextState(fsa, state):
     return fsa.stay()
 
 #############################################################
-# NEW METHOD OF CHECKING TRANSITIONS                        # 
+# NEW METHOD OF CHECKING TRANSITIONS                        #
 # Python generators used for describing transitional logic  #
 # See the following for more info:                          #
 # For info on Python decorators:                            #
-# http://stackoverflow.com/questions/739654/how-can-i-make-a-chain-of-function-decorators-in-python/1594484#1594484 
+# http://stackoverflow.com/questions/739654/how-can-i-make-a-chain-of-function-decorators-in-python/1594484#1594484
 # For info on hierarchical state machines:                  #
 # "Statecharts: A Visual Formalism for Complex Systems"     #
 #############################################################
@@ -148,7 +148,7 @@ def stay(fn):
     Like ifSwitch, see above for complete documentation.
 
     Return fsa.stay() at the end of function call if nothing else is
-    returned. 
+    returned.
     """
     def decoratedFunction(fsa):
         newState = fn(fsa)
@@ -163,8 +163,8 @@ def stay(fn):
 ### FOR HIERARCHICAL STATE MACHINES (STATECHARTS)
 def superState(state):
     """
-    A child state must mark its parent state with this decorator-returning 
-    function. This way the children inherit all the conditional logic of the 
+    A child state must mark its parent state with this decorator-returning
+    function. This way the children inherit all the conditional logic of the
     parent.
 
     See paper titled "Statecharts: A Visual Formalism for Complex Systems" for
@@ -188,7 +188,7 @@ def superState(state):
             fsa.ignoreDefaultState = False
 
             # (3) Switch to state switched to by super first
-            if stateSwitchedToBySuperState:
+            if stateSwitchedToBySuperState and stateSwitchedToBySuperState[1] != fsa.currentState:
                 return stateSwitchedToBySuperState
 
             # (4) Switch to state switched to by child
@@ -201,7 +201,7 @@ def superState(state):
 
 def defaultState(state):
     """
-    A parent state can have a default state that is switched to automatically 
+    A parent state can have a default state that is switched to automatically
     if control switches to the parent.
 
     See paper titled "Statecharts: A Visual Formalism for Complex Systems" for
@@ -272,7 +272,7 @@ class CountTransition:
 
     def __call__(self, fsa):
         return self.checkCondition(fsa)
-    
+
     def __str__(self):
         return (self.condition.__name__ + " happened " +
                 str(self.count) + " out of " + str(self.frameWindow) + " frames")

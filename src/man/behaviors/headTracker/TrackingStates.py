@@ -2,16 +2,29 @@ from . import TrackingConstants as constants
 import HeadMoves
 import noggin_constants as NogginConstants
 import BallModel_proto as BallModel
+import math
+
+#TODO: if targets are messed up, insert 'target = tracker.brain.ball'
+#in every function
 
 DEBUG = False
 
 def tracking(tracker):
     """
     While the target is visible, track it via vision values.
-    If the target is lost, switches to fullPan.
+    If the target is lost, switches to altTrackSharedBallAndPan if shared ball
+    is reliable and fullPan if shared ball is not realiable.
     """
+    # makes sure ball is default target when entering tracking
+    tracker.target = tracker.brain.ball
+
     # If the target is not in vision, trackObjectFixedPitch will track via loc.
     tracker.helper.trackObject()
+
+    # If cannot see ball and shared ball is reliable, go to altTrackSharedBallAndPan
+    # if (tracker.target.vis.frames_off > 15  and tracker.brain.sharedBall.ball_on and
+    #     tracker.brain.sharedBall.reliability >= 2 and tracker.counter > 15):
+    #     return tracker.goLater('altTrackSharedBallAndPan')
 
     if not tracker.target.vis.on and tracker.counter > 15:
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
@@ -45,6 +58,95 @@ def trackingFieldObject(tracker):
 def lookAtTarget(tracker):
     """Look to the localization coords of the stored target."""
     tracker.helper.lookAtTarget(tracker.target)
+    return tracker.stay()
+
+#TODO use constants
+def snapToCorner(tracker):
+    """ Snap to a corner to help localization """
+    lookTime = 5
+
+    if snapToCorner.count >= 0 and snapToCorner.count < lookTime:
+        tracker.target.x = NogginConstants.FIELD_WHITE_WIDTH
+        tracker.target.y = 0.0
+    if snapToCorner.count >= lookTime and snapToCorner.count < 2*lookTime:
+        tracker.target.x = 0.0
+        tracker.target.y = NogginConstants.FIELD_WHITE_HEIGHT
+    if snapToCorner.count >= 2*lookTime and snapToCorner.count < 3*lookTime:
+        tracker.target.x = NogginConstants.FIELD_WHITE_WIDTH
+        tracker.target.y = NogginConstants.FIELD_WHITE_HEIGHT
+    if snapToCorner.count >= 3*lookTime and snapToCorner.count < 4*lookTime:
+        tracker.target.x = 0.0
+        tracker.target.y = 0.0
+
+    heading = tracker.brain.loc.h
+    robx = tracker.brain.loc.x
+    roby = tracker.brain.loc.y
+    yaw = math.degrees(math.atan((tracker.target.y-roby)/(tracker.target.x-robx)))
+    if robx > tracker.target.x:
+        if roby < tracker.target.y:
+            yaw = 180 + yaw
+        else:
+            yaw = -180 + yaw
+    yaw = yaw - heading
+
+    # only look to corner if head is finished moving and corner is not behind robot
+    if not tracker.brain.motion.head_is_active and yaw < 110 and yaw > -110:
+        tracker.helper.executeHeadMove(lookToAngle(yaw))
+
+    if not tracker.brain.motion.head_is_active:
+        snapToCorner.count = snapToCorner.count + 1
+        if snapToCorner.count > 4*lookTime:
+            snapToCorner.count = 1
+
+    return tracker.stay()
+
+snapToCorner.count = 0
+
+def altTrackSharedBallAndPan(tracker):
+    # Alternates between track shared ball and a full pan
+    altTrackSharedBallAndPan.currentlyOn # 0 for look at shared ball, 1 for full pan
+    altTrackSharedBallAndPan.timeCounter
+    tracker.target = tracker.brain.sharedBall
+
+    # If shared ball is on, look to shared ball for amount of time determined by 'lookTime'
+    if altTrackSharedBallAndPan.currentlyOn == 0:
+        if not tracker.brain.motion.head_is_active:
+            if tracker.target.ball_on:
+                tracker.helper.lookToXY(tracker.target.x, tracker.target.y)
+            altTrackSharedBallAndPan.timeCounter = altTrackSharedBallAndPan.timeCounter + 1
+
+    # Automatically pan after a certain amount of time looking at shared ball, and also
+    # if shared ball is not on, for set amount of time determined by 'panTime'
+    if altTrackSharedBallAndPan.currentlyOn == 1 or (altTrackSharedBallAndPan.currentlyOn == 0
+                                                     and not tracker.target.ball_on):
+        if not tracker.brain.motion.head_is_active:
+            tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
+            altTrackSharedBallAndPan.timeCounter = altTrackSharedBallAndPan.timeCounter + 1
+
+    if altTrackSharedBallAndPan.timeCounter >= 0 and altTrackSharedBallAndPan.timeCounter < constants.LOOKTIME:
+        altTrackSharedBallAndPan.currentlyOn = 0
+    if altTrackSharedBallAndPan.timeCounter >= constants.LOOKTIME:
+        altTrackSharedBallAndPan.currentlyOn = 1
+    if altTrackSharedBallAndPan.timeCounter >= constants.PANTIME + constants.LOOKTIME:
+        altTrackSharedBallAndPan.timeCounter = 0
+
+    #If ever see the ball, immediately go to back to tracking
+    if tracker.brain.ball.vis.on:
+        return tracker.goLater('tracking')
+
+    return tracker.stay()
+
+altTrackSharedBallAndPan.currentlyOn = 0
+altTrackSharedBallAndPan.timeCounter = 0
+
+def trackSharedBall(tracker):
+    tracker.target = tracker.brain.sharedBall
+
+    if tracker.target.ball_on:
+        tracker.helper.lookToXY(tracker.target.x, tracker.target.y)
+
+    if tracker.brain.ball.vis.on:
+        return tracker.goLater('tracking')
     return tracker.stay()
 
 def lookStraightThenTrack(tracker):

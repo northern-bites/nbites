@@ -12,11 +12,13 @@ WorldView::WorldView(QWidget* parent)
       QWidget(parent),
       commThread("comm", COMM_FRAME_LENGTH_uS),
       wviewComm(16,0),
+      wviewShared(1),
       newTeam(0),
       mutex()
 {
     commThread.addModule(*this);
     commThread.addModule(wviewComm);
+    commThread.addModule(wviewShared);
 
 #ifdef USE_LAB_FIELD
     fieldPainter = new WorldViewPainter(this, 2.);
@@ -34,6 +36,8 @@ WorldView::WorldView(QWidget* parent)
     QVBoxLayout *options = new QVBoxLayout();
     options->setAlignment(Qt::AlignTop);
     startButton = new QPushButton(QString("Start World Viewer"));
+    flipButton = new QPushButton(QString("FLIP"));
+    options->addWidget(flipButton);
     options->addWidget(startButton);
 
     QHBoxLayout *teamLayout = new QHBoxLayout();
@@ -48,7 +52,7 @@ WorldView::WorldView(QWidget* parent)
     connect(teamSelector, SIGNAL(editingFinished()), this, SLOT(teamChanged()));
 
     QVBoxLayout *stateLayout = new QVBoxLayout();
-    stateLayout->setAlignment(Qt::AlignBottom);
+    stateLayout->setAlignment(Qt::AlignTop);
 
     QGroupBox *stateBox = new QGroupBox(tr("Robot States"));
     QVBoxLayout *boxLayout = new QVBoxLayout();
@@ -103,11 +107,15 @@ WorldView::WorldView(QWidget* parent)
     this->setLayout(mainLayout);
 
     connect(startButton, SIGNAL(clicked()), this, SLOT(startButtonClicked()));
+    connect(flipButton, SIGNAL(clicked()), this, SLOT(flipButtonClicked()));
 
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         commIn[i].wireTo(wviewComm._worldModels[i]);
+        wviewShared.worldModelIn[i].wireTo(wviewComm._worldModels[i]);
     }
+
+    sharedIn.wireTo(&wviewShared.sharedBallOutput);
 }
 
 
@@ -127,7 +135,18 @@ void WorldView::run_()
         commIn[i].latch();
         fieldPainter->updateWithLocationMessage(commIn[i].message(), i);
         updateStatus(commIn[i].message(), i);
+
     }
+    sharedIn.latch();
+    fieldPainter->updateWithSharedBallMessage(sharedIn.message());
+
+    mutex.unlock();
+}
+
+void WorldView::flipButtonClicked()
+{
+    mutex.lock();
+    fieldPainter->flipScreen();
     mutex.unlock();
 }
 
@@ -170,5 +189,5 @@ void WorldView::updateStatus(messages::WorldModel msg, int index)
     }
 }
 
-}
-}
+} //namespace worldview
+} //namespace tool

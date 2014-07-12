@@ -16,6 +16,10 @@ BALL_ON_ACTIVE_PAN_THRESH = 60
 STARE_TRACK_THRESH = 10
 LOOK_FIELD_OBJ_FRAMES = 10
 
+#sharedball constants
+LOOKTIME = 40
+PANTIME = 1
+
 FIXED_PITCH_VALUE = 20
 
 KICK_DICT = {"L_Side"           : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
@@ -37,7 +41,10 @@ KICK_DICT = {"L_Side"           : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
 
              "M_Left_Straight"  : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
              "M_Right_Straight" : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "M_Left_Chip_Shot" : HeadMoves.FIXED_PITCH_LOOK_LESS_RIGHT,
+             "M_Right_Chip_Shot": HeadMoves.FIXED_PITCH_LOOK_LESS_LEFT,
              "M_Left_Side"      : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
-             "M_Right_Side"     : HeadMoves.FIXED_PITCH_LOOK_LEFT}
+             "M_Right_Side"     : HeadMoves.FIXED_PITCH_LOOK_LEFT
+             }
 # TODO: Test and improve these pans.
 

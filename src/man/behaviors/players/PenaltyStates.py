@@ -4,7 +4,7 @@ hard reset to one of the two possible post-penalty positions.
 """
 
 import ChaseBallTransitions as transitions
-import BoxPositionConstants as BPConstants
+import RoleConstants as roleConstants
 from math import copysign, fabs
 from objects import RelRobotLocation
 from ..util import *
@@ -116,34 +116,12 @@ def afterPenalty(player):
         # Yes, when goal_right is less than 0, our goal is to our right.
         # It seems counter intuitive, but that's how it works. -Josh Z
         player.brain.resetLocalizationFromPenalty(player.goal_right < 0)
-        return player.goNow('determineRole')
-
+        if not roleConstants.isGoalie(player.role):
+            return player.goNow('determineRole')
+        return player.goLater(player.gameState)
 
     return player.stay()
 
-# @superState('gameControllerResponder')
-# def postPenaltyChaser(player):
-#     """
-#     If we come out of penalty directly into chaser, we'll waste
-#     time spinning on the side of the field. Instead, if we didn't
-#     see the ball during afterPenalty, odometry walk onto the field
-#     before spinning.
-#     """
-#     if player.firstFrame():
-#         player.brain.nav.walkTo(RelRobotLocation(200,0,0))
-#         player.brain.tracker.trackBall()
-#     elif (player.brain.nav.isStopped() or
-#           transitions.shouldChaseBall(player)):
-#         return player.goLater('chase')
-#
-#     if not player.brain.play.isChaser():
-#         # We've role switched out naturally. Go to appropriate state.
-#         player.stopWalking() # walkTo is a bit dangerous. do this to be careful.
-#         if player.usingBoxPositions:
-#             return player.goLater('positionAtHome')
-#         return player.goLater('playbookPosition')
-#
-#     return player.stay()
 @superState('gameControllerResponder')
 def determineRole(player):
     if not player.roleSwitching:
@@ -151,16 +129,23 @@ def determineRole(player):
 
     openSpaces = [True, True, True, True]
     for mate in player.brain.teamMembers:
-        if mate.role != 1 and mate.active:
+        if mate.playerNumber == player.brain.playerNumber:
+            continue
+        if not roleConstants.isGoalie(mate.role) \
+                and mate.frameSinceActive < 30:
             openSpaces[mate.role - 2] = False
 
-    if openSpaces[3]:
-        BPConstants.setRoleConstants(player, 5)
-    if openSpaces[2]:
-        BPConstants.setRoleConstants(player, 4)
-    elif openSpaces[1]:
-        BPConstants.setRoleConstants(player, 3)
-    elif openSpaces[0]:
-        BPConstants.setRoleConstants(player, 2)
+    position = 0
 
+    for i in range(3):
+        if openSpaces[i] and roleConstants.canRoleSwitchTo(i+2):
+            roleConstants.setRoleConstants(player, i+2)
+            return player.goLater(player.gameState)
+        elif openSpaces[i]:
+            position = i+2
+
+    if position == 0:
+        print "Came out of penalty and found no open spaces!!!"
+    roleConstants.setRoleConstants(player, position)
     return player.goLater(player.gameState)
+

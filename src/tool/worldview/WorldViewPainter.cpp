@@ -14,6 +14,7 @@ static const int VISION_DISTANCE = 50;
 WorldViewPainter::WorldViewPainter(QWidget* parent, float scaleFactor_) :
     PaintField(parent, scaleFactor_)
 {
+    flipped = 0;
 }
 
 void WorldViewPainter::paintEvent(QPaintEvent* event)
@@ -25,6 +26,35 @@ void WorldViewPainter::paintEvent(QPaintEvent* event)
     {
         paintRobotLocation(event, curLoc[i], QString::number(i+1));
     }
+
+    paintSharedBallLocation(event, sharedballLoc);
+}
+
+void WorldViewPainter::paintSharedBallLocation(QPaintEvent* event,
+                                               messages::SharedBall msg)
+{
+    if (msg.ball_on()) {
+        QPainter painter(this);
+        if (flipped)
+        {
+            painter.translate(FIELD_GREEN_WIDTH*scaleFactor, 0);
+            painter.scale(-scaleFactor, scaleFactor);
+        }
+        else
+        {
+            painter.translate(0, FIELD_GREEN_HEIGHT*scaleFactor);
+            painter.scale(scaleFactor, -scaleFactor);
+        }
+        QPoint ballCenter(msg.x(),
+                          msg.y());
+
+        //draw the weighted averaged location of the ball
+        painter.setBrush(QColor::fromRgb(153,0,153));
+        painter.drawEllipse(ballCenter,
+                            8,
+                            8);
+    }
+    return;
 }
 
 void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
@@ -37,8 +67,16 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
     }
 
     QPainter painter(this);
-    painter.translate(0, FIELD_GREEN_HEIGHT*scaleFactor);
-    painter.scale(scaleFactor, -scaleFactor);
+    if (flipped)
+    {
+        painter.translate(FIELD_GREEN_WIDTH*scaleFactor, 0);
+        painter.scale(-scaleFactor, scaleFactor);
+    }
+    else
+    {
+        painter.translate(0, FIELD_GREEN_HEIGHT*scaleFactor);
+        painter.scale(scaleFactor, -scaleFactor);
+    }
 
     Qt::GlobalColor brushColor = Qt::cyan;
     if (msg.fallen())
@@ -73,7 +111,7 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
         const QPoint walkingEnd(msg.walking_to_x(), msg.walking_to_y());
         painter.drawLine(locCenter, walkingEnd);
     }
-    
+
     painter.setBrush(brushColor);
     painter.setPen(brushColor);
 
@@ -131,6 +169,23 @@ void WorldViewPainter::updateWithLocationMessage(messages::WorldModel newLoc,
                                                  int index)
 {
     curLoc[index] = newLoc;
+    update();
+}
+
+void WorldViewPainter::updateWithSharedBallMessage(messages::SharedBall sharedLoc)
+{
+    sharedballLoc = sharedLoc;
+    update();
+}
+
+void WorldViewPainter::flipScreen()
+{
+    if (flipped) {
+        flipped = 0;
+    }
+    else {
+        flipped = 1;
+    }
     update();
 }
 
