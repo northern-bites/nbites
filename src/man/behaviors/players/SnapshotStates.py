@@ -12,11 +12,17 @@ NUM_FRAMES_TO_SAVE = 150
 
 @superState('gameControllerResponder')
 def gameInitial(player):
+    if player.firstFrame():
+        player.stand()
+        player.brain.tracker.lookToAngle(0)
     return player.stay()
 
 @superState('gameControllerResponder')
 def gameReady(player):
-     return player.stay()
+    if player.firstFrame():
+        player.stand()
+        player.brain.tracker.lookToAngle(0)
+    return player.stay()
 
 @superState('gameControllerResponder')
 def gameSet(player):
