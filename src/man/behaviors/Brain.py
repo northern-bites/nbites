@@ -247,7 +247,12 @@ class Brain(object):
         Note: Loc uses truly global coordinates, and the
               blue goalbox constants always match up with our goal.
         """
-        if self.playerNumber == 2:
+        # Does this matter for the goalie? It really shouldn't...
+        if self.playerNumber == 1:
+            self.resetLocTo(Constants.MIDFIELD_X,
+                            Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                            Constants.HEADING_UP)
+        elif self.playerNumber == 2:
             self.resetLocTo(Constants.BLUE_GOALBOX_MIDPOINT_X,
                             Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                             Constants.HEADING_DOWN)
