@@ -1308,3 +1308,57 @@ CELEBRATE = (
 
 	INITIAL_POS_KEYFRAME,
 	)
+
+DNAV_LEFT_KICK = (
+   #stand for a bit
+    ((90.,10.,-90.,-10.),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (90.,-10.,82.,13.2),
+     .5,0,stiff.NORMAL_STIFFNESSES),
+
+    #lean right/lift leg
+    ((20.,30.,0.,0.),
+     (0.,17.,-30,80,-20,-25.),
+     (0.,20.,-22.3,45,-22.5,-20),
+     (100.,-30.,0.,0),
+     .6,0, stiff.NORMAL_STIFFNESSES),
+
+    #kick?
+    ((43.,30.,0.,0.),
+     (0.,17.,-70,60,-15,-20.),
+     (0.,20.,-22.3,45,-22.5,-20),
+     (40.,-30.,0.,0),
+     .25,0, stiff.NORMAL_STIFFNESSES),
+
+    #recover
+    ((35.,30.,0.,0.),
+     (0.,25.,-35,65,-30,-25.),
+     (0.,10.,-22.3,45,-22.5,-20),
+     (90.,-30.,0.,0),
+     .4,0, stiff.NORMAL_STIFFNESSES),
+
+    #back to normal
+    ((40, 9, -80, -9),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (40, -9, 80, -9),
+     .7,0,stiff.NORMAL_STIFFNESSES),
+
+    #stand for a bit
+    ((90.,10.,-90.,-10.),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (90.,-10.,82.,13.2),
+     1,0,stiff.NORMAL_STIFFNESSES),
+)
+    
+
+DNAV_RIGHT_KICK = mirrorMove(DNAV_LEFT_KICK)
+
+# for
+#         ((LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll),
+#          (LHipYawPitch, LHipRoll, LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll),
+#          (RHipYawPitch, RHipRoll, RHipPitch, RKneePitch, RAnklePitch, RAnkleRoll),
+#          (RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll),
+#          interp_time, interpolation, stiffness) in positions)

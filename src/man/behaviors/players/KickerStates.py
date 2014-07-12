@@ -31,6 +31,10 @@ def gamePenalized(player):
 @superState('gameControllerResponder')
 def kick(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.LEFT_STRAIGHT_KICK)
+        player.executeMove(SweetMoves.DNAV_LEFT_KICK)
 
+    return player.stay()
+
+@superState('gameControllerResponder')
+def fallen(player):
     return player.stay()
