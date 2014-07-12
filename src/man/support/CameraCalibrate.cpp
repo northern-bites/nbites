@@ -37,10 +37,10 @@ void CameraCalibrate::UpdateByName(std::string name)
     float paramsBottom[] = {0.0f, 0.0f};
 
     if (name == "river") {
-        paramsTop[ROLL] = -0.03f;
-        paramsTop[PITCH] = -0.04f;
-        paramsBottom[ROLL] = -0.03f;
-        paramsBottom[PITCH] = 0.03f;
+        paramsTop[ROLL] = -0.01f;
+        paramsTop[PITCH] = -0.05f;
+        paramsBottom[ROLL] = 0.00f;
+        paramsBottom[PITCH] = 0.02f;
     } else if (name == "mal") {
         paramsTop[ROLL] = -0.01f;
         paramsTop[PITCH] = -0.06f;
