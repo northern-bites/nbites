@@ -39,6 +39,7 @@ public:
 
     void updateWithLocationMessage(messages::WorldModel newLoc, int index);
     void updateWithSharedBallMessage(messages::SharedBall sharedLoc);
+    void flipScreen();
 
 protected:
     // Paint the field
@@ -54,6 +55,8 @@ protected:
 private:
     messages::WorldModel curLoc[NUM_PLAYERS_PER_TEAM];
     messages::SharedBall sharedballLoc;
+
+    int flipped;
 
 };
 
