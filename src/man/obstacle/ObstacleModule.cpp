@@ -304,7 +304,6 @@ ObstacleModule::processVision(const messages::VisionObstacle& input)
     {
         bearing = input.right_bearing();
     }
-
     // now figure out in what direction the closest obstacle is
     if ( bearing < -5.f*ZONE_WIDTH)
     {
@@ -314,7 +313,6 @@ ObstacleModule::processVision(const messages::VisionObstacle& input)
         {
             SEDists.pop_front();
         }
-
         return checkAverage(FieldObstacles::Obstacle::SOUTHEAST, SEDists);
     }
     else if ( bearing < -3.f*ZONE_WIDTH )
@@ -325,7 +323,6 @@ ObstacleModule::processVision(const messages::VisionObstacle& input)
         {
             EDists.pop_front();
         }
-
         return checkAverage(FieldObstacles::Obstacle::EAST, EDists);
     }
     else if ( bearing < -ZONE_WIDTH )
@@ -336,7 +333,6 @@ ObstacleModule::processVision(const messages::VisionObstacle& input)
         {
             NEDists.pop_front();
         }
-
         return checkAverage(FieldObstacles::Obstacle::NORTHEAST, NEDists);
     }
     else if ( bearing < ZONE_WIDTH )
@@ -347,7 +343,6 @@ ObstacleModule::processVision(const messages::VisionObstacle& input)
         {
             NDists.pop_front();
         }
-
         return checkAverage(FieldObstacles::Obstacle::NORTH, NDists);
     }
     else if ( bearing < 3.f*ZONE_WIDTH )
@@ -358,7 +353,6 @@ ObstacleModule::processVision(const messages::VisionObstacle& input)
         {
             NWDists.pop_front();
         }
-
         return checkAverage(FieldObstacles::Obstacle::NORTHWEST, NWDists);
     }
     else if ( bearing < 5.f*ZONE_WIDTH )
@@ -369,10 +363,9 @@ ObstacleModule::processVision(const messages::VisionObstacle& input)
         {
             WDists.pop_front();
         }
-
         return checkAverage(FieldObstacles::Obstacle::WEST, WDists);
     }
-    else
+    else if ( bearing < 7.f * ZONE_WIDTH )
     {
         // obstacle to southwest
         SWDists.push_back(minDist);
@@ -380,8 +373,11 @@ ObstacleModule::processVision(const messages::VisionObstacle& input)
         {
             WDists.pop_front();
         }
-
         return checkAverage(FieldObstacles::Obstacle::SOUTHWEST, SWDists);
+    }
+    else
+    {
+        return FieldObstacles::Obstacle::NONE;
     }
 }
 

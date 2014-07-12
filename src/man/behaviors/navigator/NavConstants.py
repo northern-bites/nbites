@@ -17,3 +17,15 @@ DONE_AVOIDING_FRAMES_THRESH = 10
 DODGE_BACK_SPEED = speeds.REV_MAX_SPEED
 DODGE_RIGHT_SPEED = speeds.RIGHT_MAX_SPEED
 DODGE_LEFT_SPEED = speeds.LEFT_MAX_SPEED
+ZONE_WIDTH = 3.14159 / (2. * 4.) # 4 directions per PI
+DONE_DODGE_DIST = 100.0 #cm
+
+DGE_DESTS = ((15, 10, 0),            # Dodging to NORTH
+             (0, -15, 0),            # TO NORTHEAST
+             (0, -20, 0),            # TO EAST
+             (0, -15, 0),            # TO SOUTHEAST
+             (-15, -10, 0),           # TO SOUTH
+             (0, 15, 0),             # TO SOUTHWEST
+             (0, 20, 0),             # TO WEST
+             (0, 15, 0)              # TO NORTHWEST
+)
