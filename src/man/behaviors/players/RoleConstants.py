@@ -57,11 +57,11 @@ boxBuffer = 100 # Used for the buffered box when approach ball is potentially
 ### HOME POSITIONS
 oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 50,
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
-                                20)
+                                0)
 
 evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 100,
                                  NogginConstants.MY_GOALBOX_TOP_Y,
-                                 -20)
+                                 0)
 
 oddChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
                               NogginConstants.GREEN_PAD_Y + 100,
