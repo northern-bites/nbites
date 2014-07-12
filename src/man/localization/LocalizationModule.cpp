@@ -24,12 +24,14 @@ void LocalizationModule::update()
 {
 #ifndef OFFLINE
     // Modify based on control portal
-    if (lastReset != resetInput.message().timestamp())
-    {
-        lastReset = resetInput.message().timestamp();
-        particleFilter->resetLocTo(resetInput.message().x(),
-                                   resetInput.message().y(),
-                                   resetInput.message().h());
+    for (int i = 0; i < 2; i++) {
+        if (lastReset[i] != resetInput[i].message().timestamp())
+        {
+            lastReset[i] = resetInput[i].message().timestamp();
+            particleFilter->resetLocTo(resetInput[i].message().x(),
+                                       resetInput[i].message().y(),
+                                       resetInput[i].message().h());
+        }
     }
 #endif
 
@@ -69,7 +71,8 @@ void LocalizationModule::run_()
 #ifndef OFFLINE
     gameStateInput.latch();
     ballInput.latch();
-    resetInput.latch();
+    resetInput[0].latch();
+    resetInput[1].latch();
 #endif
 
     update();

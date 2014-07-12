@@ -144,7 +144,6 @@ void InertiaSensorCalibrator::update(InertiaSensorDataBH& inertiaSensorData)
         Vector2BH<>& gyroBiasMeasurementNoise = collection.standing ? gyroBiasStandMeasurementNoise : gyroBiasWalkMeasurementNoise;
         if(!calibrated)
         {
-          std::cout << "BH walk is calibrated" << std::endl;
           calibrated = true;
           accXBias.init(collection.accAvg.x, sqrBH(accBiasMeasurementNoise.x));
           accYBias.init(collection.accAvg.y, sqrBH(accBiasMeasurementNoise.y));

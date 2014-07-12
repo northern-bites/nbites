@@ -59,5 +59,6 @@ static const QString roles[] = {QString("GOALIE"),
                                 QString("CHASER #1"),
                                 QString("CHASER #2"),
                                 QString("DROP-IN PLAYER")};
-}
-}
+
+} //namespace worldview
+} //namespace tool
