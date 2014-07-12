@@ -70,6 +70,8 @@ class GameController():
         else:
             self.timeSincePlaying = 0
 
+        # The GC doesn't maintain the same indexing in packets, so we can't
+        # rely on always having the same index in the gameState message
         teamIndex = 0
         if gameState.team(1).team_number == self.brain.teamNumber:
             teamIndex = 1
@@ -78,7 +80,7 @@ class GameController():
 
         if gameState.team(teamIndex).team_color != self.teamColor:
             self.teamColor = gameState.team(teamIndex).team_color
-            self.teamColorChanged = True
+            self.teamColorChanged = True # Used by LEDs
             print "Team color changed to: ", self.teamColor
 
         # reset field for change
