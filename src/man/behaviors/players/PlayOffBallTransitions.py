@@ -9,7 +9,7 @@ def ballInBox(player):
     """
     ball = player.brain.ball
 
-    if ball.vis.frames_on > 0:
+    if ball.vis.frames_on > chaseConstants.BALL_ON_THRESH:
         if role.isChaser(player.role):
             return True
         return (ball.x > player.box[0][0] and ball.y > player.box[0][1] and
@@ -71,6 +71,5 @@ def shouldStopLookingForSharedBall(player):
     return not shouldFindSharedBall(player)
 
 def shouldBeSupporter(player):
-    # TODO does the ball need to be in robot's box?
-    return ballInBox(player) and claimTransitions.shouldCedeClaim(player)
-
+    return (player.brain.ball.vis.frames_on > chaseConstants.BALL_ON_THRESH and 
+            claimTransitions.shouldCedeClaim(player))

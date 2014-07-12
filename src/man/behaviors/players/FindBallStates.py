@@ -11,6 +11,7 @@ def findBall(player):
     """
     if player.firstFrame():
         player.inKickingState = False
+        player.claimedBall = False
 
         distance = player.brain.ball.distance
         if distance > constants.FAR_BALL_SEARCH_DIST:
