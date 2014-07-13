@@ -54,7 +54,7 @@ def positionAtHome(player):
           role.isCherryPicker(player.role)):
         home.h = player.brain.loc.getRelativeBearing(player.brain.sharedBall)
 
-    player.brain.nav.goTo(home, precision = nav.PLAYBOOK,
+    player.brain.nav.goTo(home, precision = nav.HOME,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,
                           fast = False, pb = False)
 
