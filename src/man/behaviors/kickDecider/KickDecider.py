@@ -82,8 +82,8 @@ class KickDecider(object):
         self.brain.player.motionKick = False
     
         self.kicks = []
-        self.kicks.append(kicks.ZELLVARRO_LEFT_KICK)
-        self.kicks.append(kicks.ZELLVARRO_RIGHT_KICK)
+        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
 
         self.scoreKick = self.minimizeDistanceToGoal
         
