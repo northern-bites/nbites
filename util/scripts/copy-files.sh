@@ -10,6 +10,7 @@ ROBOT=$1
 ROBOT_UNAME=$2
 ROBOCUP=robocup.bowdoin.edu:/mnt/research/robocup
 FOLDER=nao_files
+WIFI_CONFIG=wireless_config
 
 # Get the files from the server
 echo "Downloading files FROM ROBOCUP!"
@@ -24,6 +25,6 @@ ssh-keygen -f "/home/$(whoami)/.ssh/known_hosts" -R nao.local
 
 # Copy important libraries to home folder
 echo "Copying necessary files TO THE ROBOT!"
-scp -r $FOLDER setup-robot.sh $ROBOT_UNAME@$ROBOT:
+scp -r $FOLDER $WIFI_CONFIG setup-robot.sh $ROBOT_UNAME@$ROBOT:
 
 echo "Now run setup-robot.sh ON THE ROBOT."
