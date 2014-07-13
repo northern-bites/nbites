@@ -68,8 +68,6 @@ protected:
                             bool red = false,
                             int size = PARTICLE_WIDTH);
 
-   
-
     // Paint a Particle Swarm
     void paintParticleSwarm(QPaintEvent* event,
                             messages::ParticleSwarm swarm);

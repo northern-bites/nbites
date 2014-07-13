@@ -116,6 +116,7 @@ add_subdirectory( fieldview )
 add_subdirectory( image )
 add_subdirectory( logview )
 add_subdirectory( playbook )
+add_subdirectory( sharedview )
 add_subdirectory( sim )
 add_subdirectory( unlog )
 add_subdirectory( vision_offline )
@@ -273,6 +274,7 @@ target_link_libraries(
   comm # man comm
   sharedball # man sharedball
   fieldview
+  sharedview
   tool_common
   colorcreator
   vision_offline
@@ -294,6 +296,7 @@ target_link_libraries(
   image_display
   logview
   sharedball
+  sharedview
   fieldview
   worldview
   tool_common
@@ -333,6 +336,7 @@ target_link_libraries(
   image_display
   image # man image
   fieldview
+  sharedview
   tool_common
   colorcreator
   vision_offline
@@ -385,6 +389,7 @@ target_link_libraries(
   ${QT_LIBRARIES}
 )
 
+# The InstallerTool executable
 add_executable( installer_tool
   ${installer_srcs}
   ${installer_headers_moc}

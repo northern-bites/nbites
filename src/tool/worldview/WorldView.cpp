@@ -12,7 +12,7 @@ WorldView::WorldView(QWidget* parent)
       QWidget(parent),
       commThread("comm", COMM_FRAME_LENGTH_uS),
       wviewComm(16,0),
-      wviewShared(),
+      wviewShared(1),
       newTeam(0),
       mutex()
 {
@@ -36,6 +36,8 @@ WorldView::WorldView(QWidget* parent)
     QVBoxLayout *options = new QVBoxLayout();
     options->setAlignment(Qt::AlignTop);
     startButton = new QPushButton(QString("Start World Viewer"));
+    flipButton = new QPushButton(QString("FLIP"));
+    options->addWidget(flipButton);
     options->addWidget(startButton);
 
     QHBoxLayout *teamLayout = new QHBoxLayout();
@@ -50,7 +52,7 @@ WorldView::WorldView(QWidget* parent)
     connect(teamSelector, SIGNAL(editingFinished()), this, SLOT(teamChanged()));
 
     QVBoxLayout *stateLayout = new QVBoxLayout();
-    stateLayout->setAlignment(Qt::AlignBottom);
+    stateLayout->setAlignment(Qt::AlignTop);
 
     QGroupBox *stateBox = new QGroupBox(tr("Robot States"));
     QVBoxLayout *boxLayout = new QVBoxLayout();
@@ -105,6 +107,7 @@ WorldView::WorldView(QWidget* parent)
     this->setLayout(mainLayout);
 
     connect(startButton, SIGNAL(clicked()), this, SLOT(startButtonClicked()));
+    connect(flipButton, SIGNAL(clicked()), this, SLOT(flipButtonClicked()));
 
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
@@ -113,7 +116,6 @@ WorldView::WorldView(QWidget* parent)
     }
 
     sharedIn.wireTo(&wviewShared.sharedBallOutput);
-
 }
 
 
@@ -138,8 +140,13 @@ void WorldView::run_()
     sharedIn.latch();
     fieldPainter->updateWithSharedBallMessage(sharedIn.message());
 
+    mutex.unlock();
+}
 
-
+void WorldView::flipButtonClicked()
+{
+    mutex.lock();
+    fieldPainter->flipScreen();
     mutex.unlock();
 }
 
@@ -182,5 +189,5 @@ void WorldView::updateStatus(messages::WorldModel msg, int index)
     }
 }
 
-}
-}
+} //namespace worldview
+} //namespace tool
