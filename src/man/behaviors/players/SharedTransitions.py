@@ -130,18 +130,54 @@ def firstHalf(player):
     """
     We are on our half.
     """
-    field_len = nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X
-    return (player.brain.loc.x < field_len / 2.)
+    return ourHalf(player.brain.loc)
 
 def secondHalf(player):
     """
     We are on the opponent's half.
     """
-    field_len = nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X
-    return (player.brain.loc.x > field_len / 2.)
+    return not ourHalf(player.brain.loc)
 
 def navAtPosition(player):
     """
     Does nav think that it's at position?
     """
     return player.brain.nav.isAtPosition()
+
+### HELPER FUNCTIONS
+def ourHalf(location):
+    """
+    We are in our half.
+    """
+    return location.x < nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X / 2.
+
+def leftSide(location):
+    """
+    We are on the left side of the field.
+    """
+    return location.y < nogginConstants.CENTER_FIELD_Y
+
+def lowerLeft(location):
+    """
+    We are in the lower left quarter of the field.
+    """
+    return ourHalf(location) and leftSide(location)
+
+def lowerRight(location):
+    """
+    We are in the lower right quarter of the field.
+    """
+    return ourHalf(location) and not leftSide(location)
+
+def upperLeft(location):
+    """
+    We are in the upper left quarter of the field.
+    """
+    return not ourHalf(location) and leftSide(location)
+
+def upperRight(location):
+    """
+    We are in the upper right quarter of the field.
+    """
+    return not ourHalf(location) and not leftSide(location)
+

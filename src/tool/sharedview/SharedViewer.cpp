@@ -7,7 +7,6 @@ namespace sharer{
 
 SharedViewer::SharedViewer(QWidget* parent):
     QWidget(parent),
-    // Will run sharedball on player 1: should get same ball loc for everyone
     wviewShared(1),
     mutex()
 {

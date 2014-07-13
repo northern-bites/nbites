@@ -22,10 +22,9 @@ def tracking(tracker):
     tracker.helper.trackObject()
 
     # If cannot see ball and shared ball is reliable, go to altTrackSharedBallAndPan
-    if (tracker.target.vis.frames_off > 15  and tracker.brain.sharedBall.ball_on and
-        tracker.brain.sharedBall.reliability >= 2 and tracker.counter > 15):
-
-        return tracker.goLater('altTrackSharedBallAndPan')
+    # if (tracker.target.vis.frames_off > 15  and tracker.brain.sharedBall.ball_on and
+    #     tracker.brain.sharedBall.reliability >= 2 and tracker.counter > 15):
+    #     return tracker.goLater('altTrackSharedBallAndPan')
 
     if not tracker.target.vis.on and tracker.counter > 15:
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
