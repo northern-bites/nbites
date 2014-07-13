@@ -293,6 +293,8 @@ void SharedBallModule::checkForPlayerFlip()
             }
             timestamp = messages[i].timestamp();
             flippedRobot = float(i + 1);
+            std::cout<<"FLIPPED! I am "<<my_num<<" and I flipped with reliability "
+                     <<reliability<<"!"<<std::endl;
         }
 //TOOL: uncomment bracket for "for" loop!
 //    }
