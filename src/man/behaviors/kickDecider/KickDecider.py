@@ -32,8 +32,8 @@ class KickDecider(object):
         self.brain.player.motionKick = False
 
         self.kicks = []
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.ZELLVARRO_LEFT_KICK)
+        self.kicks.append(kicks.ZELLVARRO_RIGHT_KICK)
         self.kicks.append(kicks.LEFT_SIDE_KICK)
         self.kicks.append(kicks.RIGHT_SIDE_KICK)
 
@@ -50,8 +50,8 @@ class KickDecider(object):
         self.brain.player.motionKick = False
         
         self.kicks = []
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.ZELLVARRO_LEFT_KICK)
+        self.kicks.append(kicks.ZELLVARRO_RIGHT_KICK)
 
         self.scoreKick = self.minimizeOrbitTime
 
@@ -82,8 +82,8 @@ class KickDecider(object):
         self.brain.player.motionKick = False
     
         self.kicks = []
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.ZELLVARRO_LEFT_KICK)
+        self.kicks.append(kicks.ZELLVARRO_RIGHT_KICK)
 
         self.scoreKick = self.minimizeDistanceToGoal
         
@@ -156,8 +156,8 @@ class KickDecider(object):
 
         self.kicks = []
         if direction == 0:
-            self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-            self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+            self.kicks.append(kicks.ZELLVARRO_LEFT_KICK)
+            self.kicks.append(kicks.ZELLVARRO_RIGHT_KICK)
         elif direction == 1:
             self.kicks.append(kicks.RIGHT_SIDE_KICK)
         elif direction == -1:
@@ -176,8 +176,8 @@ class KickDecider(object):
         self.brain.player.motionKick = True
 
         self.kicks = []
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.ZELLVARRO_LEFT_KICK)
+        self.kicks.append(kicks.ZELLVARRO_RIGHT_KICK)
 
         self.scoreKick = self.minimizeOrbitTime
 

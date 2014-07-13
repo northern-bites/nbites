@@ -19,8 +19,8 @@ def passToCorner(player):
         player.passBack = True
         if roleConstants.isFirstChaser(player.role):
             # TODO this is the right corner
-            corner = Location(nogginC.FIELD_WHITE_WIDTH, 0.)
-            #corner = Location(nogginC.FIELD_WHITE_WIDTH, nogginC.FIELD_WHITE_HEIGHT)
+            #corner = Location(nogginC.FIELD_WHITE_WIDTH, 0.)
+            corner = Location(nogginC.FIELD_WHITE_WIDTH, nogginC.FIELD_WHITE_HEIGHT)
             decider = KickDecider.KickDecider(player.brain)
             player.kick = decider.sweetMovesForKickOff(0, corner)
             player.inKickingState = True
@@ -56,10 +56,11 @@ def passToFieldCross(player):
             if not constants.ballIsLost(player):
                 decider = KickDecider.KickDecider(player.brain)
                 # player.kick = decider.bigKicksOnGoal()
-                player.kick = decider.sweetMovesOnGoal()
-                player.inKickingState = True
+                # player.kick = decider.sweetMovesOnGoal()
                 # player.kick = decider.sweetMoveCrossToCenter()
+                player.kick = decider.brunswick()
                 player.finishedPlay = True
+                player.inKickingState = True
                 return player.goNow('approachBall')
             else:
                 player.inKickOffPlay = False

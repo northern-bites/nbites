@@ -404,8 +404,8 @@ FIXED_PITCH_PAN_NARROW = (
     ((-55.0,25.0), 3.0, 1, stiff.LOW_HEAD_STIFFNESSES)) # ~37 degrees per second
 
 FIXED_PITCH_PAN_NARROW_FAST = (
-    ((40.0,25.0), 1.3, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-40.0,25.0), 1.3, 1, stiff.LOW_HEAD_STIFFNESSES))
+    ((50.0,25.0), 1.25, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-50.0,25.0), 1.25, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 def BALLTRACK_PAN(dist, bear):
     #Note: Camera sees 60 degrees
