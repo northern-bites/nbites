@@ -37,6 +37,7 @@ void ObstacleModule::run_()
 
     portals::Message<messages::Obstacle> current(0);
 
+    // Sonars don't work the same way with V5s
 // #ifdef USE_LAB_FIELD // Walls are too close to field for sonar use
     sonars = Obstacle::NONE;
 // #endif

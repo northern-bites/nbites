@@ -17,7 +17,7 @@ option(
 
 option(
   USE_SPL_COMM
-  "Use the SPL's Standard Message rather than protobufs for comm"
+  "Use the SPL Standard Message rather than protobufs for comm"
   OFF
 )
 
