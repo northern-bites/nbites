@@ -2,7 +2,7 @@
 An FSA for responding to changes in the gameState according to gameController, 
 implemented as a hierarchical FSA. 
 
-The third to top level in player FSA.
+The fourth to top level in player FSA.
 """
 
 import noggin_constants as nogginConstants

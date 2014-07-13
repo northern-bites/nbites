@@ -4,16 +4,30 @@ from objects import RobotLocation
 ### ROLE CONFIGURATION
 # Possibilites are the following:
 # Goalie, LeftDefender, RightDefender, FirstChaser, SecondChaser, CherryPicker
-ROLE_CONFIGURATION = {1: "Goalie",
-                      2: "LeftDefender",
-                      3: "RightDefender",
-                      4: "FirstChaser",
-                      5: "SecondChaser"}
+roleConfiguration = moderate
+
+moderate = {1: "Goalie",
+            2: "LeftDefender",
+            3: "RightDefender",
+            4: "FirstChaser",
+            5: "SecondChaser"}
+
+aggresive = {1: "Goalie",
+             2: "LeftDefender",
+             3: "CherryPicker",
+             4: "FirstChaser",
+             5: "SecondChaser"}
+
+cautious = {1: "Goalie",
+            2: "LeftDefender",
+            3: "RightDefender",
+            4: "FirstChaser",
+            5: "CherryPicker"}
 
 def getRole(role):
     if role < 1:
         return None
-    return ROLE_CONFIGURATION[role]
+    return roleConfiguration[role]
 
 def isGoalie(role):
     return getRole(role) == "Goalie"
@@ -117,10 +131,10 @@ theirKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - \
 
 defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X - 70, NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
 
-# oddDefenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.CENTER_FIELD_Y + 75)
+oddDefenderBoxCautious = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.CENTER_FIELD_Y + 75)
 
-# evenDefenderBox = ((0, NogginConstants.CENTER_FIELD_Y - 75), NogginConstants.CENTER_FIELD_X, \
-#                    NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
+evenDefenderBoxCautious = ((0, NogginConstants.CENTER_FIELD_Y - 75), NogginConstants.CENTER_FIELD_X, \
+                           NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
 
 oddDefenderBox = defenderBox
 evenDefenderBox = defenderBox

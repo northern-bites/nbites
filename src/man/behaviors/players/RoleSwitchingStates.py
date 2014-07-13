@@ -9,7 +9,7 @@ import RoleSwitchingTransitions as transitions
 import RoleConstants as roleConstants
 from ..util import *
 
-@defaultState('gameControllerResponder')
+@defaultState('commMonitor')
 @ifSwitchNow(transitions.chaserIsOut, 'switchRoles')
 @superState('fallController')
 def roleSwitcher(player):

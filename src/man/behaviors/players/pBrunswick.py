@@ -64,3 +64,4 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Controls whether we use claims
         self.useClaims = True
         self.returningFromPenalty = False
+        self.badComm = False
