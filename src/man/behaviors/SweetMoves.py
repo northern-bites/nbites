@@ -1308,3 +1308,50 @@ CELEBRATE = (
 
 	INITIAL_POS_KEYFRAME,
 	)
+
+# Stands for the Dans; Zeller and Navarro
+ZELLVARRO_LEFT_KICK = (
+   # stand for a bit
+    ((90.,10.,-90.,-10.),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (90.,-10.,82.,13.2),
+     .5,0,stiff.NORMAL_STIFFNESSES),
+
+    # lean weight onto the right foot
+    ((75.,15.,-90.,-10.),
+     (-1.1, 13.1, -23.6, 50.1, -28.3, -13.7),
+     (0.0, 16.4, -23.3, 47.1, -27.2, -17.2),
+     (100.,-30.,90.,10),
+     .9,0, stiff.NORMAL_STIFFNESSES),
+
+    # lift leg and bring it back a little
+    ((50.,15.,-90.,-10.),
+     (-0.4, 20, -12.0, 70, -52.6, -9.8),
+     (0.,14,-16,45,-25,-20),
+     (97.,-37.,90.,10),
+     .45,0, stiff.NORMAL_STIFFNESSES),
+
+    # kick it!!
+    ((86.7, 37.3, -90., -10),
+     (-3.9, 20, -45, 70, -30, -16.8),
+     (0.0, 13.8, -10, 45, -27.6, -20),
+     (91.7, -15, 90., 10),
+     .15,0, stiff.NORMAL_STIFFNESSES),
+
+    # recover
+    ((86.8, 34.9, -89.8, -9.7),
+     (-2.2, 7.3, -46.2, 64.1, -16.6, -10.3),
+     (0.0, 9.3, -21.2, 44.8, -25.1, -8.6),
+     (89.5, -13.9, 89.7, 9.6),
+     .5,0, stiff.NORMAL_STIFFNESSES),
+
+    # stand for a bit
+    ((90.,10.,-90.,-10.),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (90.,-10.,82.,13.2),
+     1,0,stiff.NORMAL_STIFFNESSES),
+)
+
+ZELLVARRO_RIGHT_KICK = mirrorMove(ZELLVARRO_LEFT_KICK)
