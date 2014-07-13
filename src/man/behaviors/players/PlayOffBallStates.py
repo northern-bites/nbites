@@ -45,7 +45,7 @@ def positionAtHome(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
 
-    player.brain.nav.goTo(player.homePosition, precision = nav.GENERAL_AREA,
+    player.brain.nav.goTo(player.homePosition, precision = nav.PLAYBOOK,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,
                           fast = False, pb = False)
 
@@ -63,15 +63,13 @@ def watchForBall(player):
 @stay
 @ifSwitchLater(shared.ballOffForNFrames(60), 'findBall')
 def positionAsSupporter(player):
-    if player.firstFrame():
-        positionAsSupporter.position = getSupporterPosition(player, player.role)
-
     if (role.isChaser(player.role) and player.brain.ball.distance > 
         hypot(CHASER_DISTANCE, CHASER_DISTANCE)):
         fast = True
     else:
         fast = False
 
+    positionAsSupporter.position = getSupporterPosition(player, player.role)
     player.brain.nav.goTo(positionAsSupporter.position, precision = nav.GENERAL_AREA,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,
                           fast = False, pb = False)
@@ -116,7 +114,7 @@ def searchFieldForFlippedSharedBall(player):
         player.sharedBallCloseCount = 0
 
     sharedball = Location(-1*(player.brain.sharedBall.x-NogginConstants.MIDFIELD_X) + NogginConstants.MIDFIELD_X,
-                          -1*(player.brain.sharedBall.y-NogginConstants.MIDFIELD_X) + NogginConstants.MIDFIELD_X)
+                          -1*(player.brain.sharedBall.y-NogginConstants.MIDFIELD_Y) + NogginConstants.MIDFIELD_Y)
     player.brain.nav.goTo(sharedball, precision = nav.GENERAL_AREA,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,
                           fast = True, pb = False)
@@ -156,8 +154,8 @@ def searchFieldByQuad(player):
                           speed = nav.QUICK_SPEED, avoidObstacles = True,
                           fast = True, pb = False)
 
-points = [quad1Center, quad2Center, quad3Center, quad4Center]
 quad1Center = Location(NogginConstants.CENTER_FIELD_X * .6, NogginConstants.CENTER_FIELD_Y * .6)
 quad2Center = Location(NogginConstants.CENTER_FIELD_X * .6, NogginConstants.CENTER_FIELD_Y * 1.4)
 quad3Center = Location(NogginConstants.CENTER_FIELD_X * 1.4, NogginConstants.CENTER_FIELD_Y * 1.4)
 quad4Center = Location(NogginConstants.CENTER_FIELD_X * 1.4, NogginConstants.CENTER_FIELD_Y * .6)
+points = [quad1Center, quad2Center, quad3Center, quad4Center]

@@ -73,7 +73,8 @@ def gamePlaying(player):
         player.brain.fallController.enabled = True
         player.penaltyKicking = False
         player.brain.nav.stand()
-        player.brain.resetGoalieLocalization()
+        if player.lastDiffState != 'gameSet':
+            player.brain.resetGoalieLocalization()
 
     # Wait until the sensors are calibrated before moving.
     if (not player.brain.motion.calibrated):
