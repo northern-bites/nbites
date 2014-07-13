@@ -9,6 +9,7 @@ import itertools
 # TODO use open field detection and robot detection to score motion kicks
 # TODO use open field detection to decide when big kicking is appropriate
 # TODO close to goal motion kick strategy
+# TODO big kick based on secs_left
 
 # TODO document here and on wiki
 # TODO kicks.py is ugly

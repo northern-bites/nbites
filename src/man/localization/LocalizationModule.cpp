@@ -31,6 +31,7 @@ void LocalizationModule::update()
             particleFilter->resetLocTo(resetInput[i].message().x(),
                                        resetInput[i].message().y(),
                                        resetInput[i].message().h());
+            break;
         }
     }
 #endif
