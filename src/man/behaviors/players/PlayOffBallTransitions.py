@@ -65,10 +65,16 @@ def shouldApproachBall(player):
 
 def shouldFindSharedBall(player):
     return (player.brain.sharedBall.ball_on and
-            player.brain.sharedBall.reliability >= 2)
+            player.brain.sharedBall.reliability >= 1)
+
+def shouldFindFlippedSharedBall(player):
+    return player.sharedBallCloseCount >= 60
 
 def shouldStopLookingForSharedBall(player):
-    return not shouldFindSharedBall(player)
+    return player.sharedBallOffCount >= 30
+
+def shouldStopLookingForFlippedSharedBall(player):
+    return shouldFindFlippedSharedBall(player) or shouldStopLookingForSharedBall(player)
 
 def shouldBeSupporter(player):
     return (player.brain.ball.vis.frames_on > chaseConstants.BALL_ON_THRESH and 

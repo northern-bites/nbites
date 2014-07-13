@@ -54,10 +54,6 @@ def prepareForKick(player):
         player.decider = KickDecider.KickDecider(player.brain)
         player.brain.nav.stand()
 
-    if player.brain.ball.distance > constants.APPROACH_BALL_AGAIN_DIST:
-        # Ball has moved away. Go get it!
-        return player.goLater('chase')
-
     player.inKickingState = True
     player.kick = player.decider.brunswick()
 
