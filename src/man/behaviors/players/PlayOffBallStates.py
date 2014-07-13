@@ -61,6 +61,7 @@ def watchForBall(player):
 
 @superState('playOffBall')
 @stay
+@ifSwitchLater(transitions.shouldSpinToBall, 'spinSearch')
 @ifSwitchLater(shared.ballOffForNFrames(120), 'playOffBall')
 def positionAsSupporter(player):
     if (role.isChaser(player.role) and role.isChaser(player.roleOfClaimer) and 

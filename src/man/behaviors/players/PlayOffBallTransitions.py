@@ -2,6 +2,7 @@ import RoleConstants as role
 import ClaimTransitions as claimTransitions
 import SharedTransitions as shared
 import ChaseBallConstants as chaseConstants
+import ChaseBallTransitions as chaseTransitions
 
 def ballInBox(player):
     """
@@ -79,3 +80,11 @@ def shouldStopLookingForFlippedSharedBall(player):
 def shouldBeSupporter(player):
     return (ballInBox(player) and
             claimTransitions.shouldCedeClaim(player))
+
+def shouldSpinToBall(player):
+    distance = player.brain.ball.distance
+    bearing = fabs(degrees(player.brain.ball.bearing))
+
+    return (chaseTransitions.shouldFindBall(player) and 
+            distance <= chaseConstants.FAR_BALL_SEARCH_DIST and
+            bearing >= chaseConstants.SPIN_SEARCH_BEARING)
