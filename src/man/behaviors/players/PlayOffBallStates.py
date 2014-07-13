@@ -39,13 +39,22 @@ def branchOnRole(player):
 @ifSwitchNow(shared.navAtPosition, 'watchForBall')
 def positionAtHome(player):
     """
-    Go to the player's home position
-    If ball-chasing conditions are met it will exit and go to chase
+    Go to the player's home position. Defenders look in the direction of the 
+    shared ball if it is on with reliability >= 2. Cherry pickers look in the direction
+    of the shared ball if it is on with reliability >= 1.
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
 
-    player.brain.nav.goTo(player.homePosition, precision = nav.PLAYBOOK,
+    home = RobotLocation(player.homePosition.x player.homePosition.y, player.homePosition.h)
+    if (player.brain.sharedBall.ball_on and player.brain.sharedBall.reliability >= 2 and 
+        role.isDefender(player.role)):
+        home.h = player.brain.loc.getRelativeBearing(player.brain.sharedBall)
+    elif (player.brain.sharedBall.ball_on and player.brain.sharedBall.reliability >= 1 and 
+          role.isCherryPicker(player.role)):
+        home.h = player.brain.loc.getRelativeBearing(player.brain.sharedBall)
+
+    player.brain.nav.goTo(home, precision = nav.PLAYBOOK,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,
                           fast = False, pb = False)
 
