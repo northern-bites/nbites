@@ -22,11 +22,13 @@ def approachBall(player):
     if player.firstFrame():
         player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
                                                  0.8, 10)
-        player.motionKick = False
         player.brain.tracker.trackBall()
         if player.shouldKickOff:
-            player.inKickOffPlay = True
-            return player.goNow('giveAndGo')
+            if player.inKickOffPlay:
+                return player.goNow('giveAndGo')
+            else:
+                player.shouldKickOff = False
+
         elif player.penaltyKicking:
             return player.goNow('prepareForPenaltyKick')
         else:

@@ -142,11 +142,6 @@ class KickDecider(object):
         except:
             return None
 
-    def brunswick(self):
-        onGoalAsap = self.frontKicksAsapOnGoal()
-        if onGoalAsap: 
-            return onGoalAsap
-
     def sweetMovesForKickOff(self, direction, dest):
         """
         direction 0 is a forward kick, direction 1 is a left side pass
@@ -188,7 +183,12 @@ class KickDecider(object):
 
         return (kick for kick in self.possibleKicks).next().next()
 
-    def motionKicks(self):
+
+    def brunswick(self):
+        onGoalAsap = self.frontKicksAsapOnGoal()
+        if onGoalAsap: 
+            return onGoalAsap
+
         asap = self.motionKicksAsap()
         if asap:
             return asap

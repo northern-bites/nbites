@@ -6,7 +6,6 @@ from ..navigator import Navigator
 from ..kickDecider import KickDecider
 import KickOffConstants as constants
 
-#TODO add comm field to pass if one is aborting the play
 @superState('gameControllerResponder')
 def giveAndGo(player):
     player.finishedPlay = False
@@ -18,16 +17,16 @@ def passToCorner(player):
     if player.firstFrame():
         player.passBack = True
         if roleConstants.isFirstChaser(player.role):
-            # TODO this is the right corner
-            #corner = Location(nogginC.FIELD_WHITE_WIDTH, 0.)
-            corner = Location(nogginC.FIELD_WHITE_WIDTH, nogginC.FIELD_WHITE_HEIGHT)
+            corner = Location(nogginC.FIELD_WHITE_WIDTH, 0.)
             decider = KickDecider.KickDecider(player.brain)
             player.kick = decider.sweetMovesForKickOff(0, corner)
             player.inKickingState = True
             return player.goNow('approachBall')
         elif roleConstants.isSecondChaser(player.role):
             player.brain.tracker.repeatFastNarrowPan()
-            player.setWalk(.7, 0., 0.)
+            passDestination = Location(nogginC.OPP_GOALBOX_LEFT_X, 60.)
+            player.brain.nav.goTo(passDestination, Navigator.GENERAL_AREA, Navigator.QUICK_SPEED, 
+                                True, False, True, False)
         else:
             return player.goNow('playOffBall')
 
@@ -39,6 +38,9 @@ def passToCorner(player):
         player.passBack = False
         player.inKickOffPlay = False
         return player.goNow('findBall')
+    else:
+        passDestination = Location(nogginC.OPP_GOALBOX_LEFT_X, 60.)
+        player.brain.nav.updateDest(passDestination)
 
     return player.stay()
 
@@ -91,11 +93,8 @@ def sidePass(player):
         player.passBack = True
         if roleConstants.isFirstChaser(player.role):
             decider = KickDecider.KickDecider(player.brain)
-            # TODO this is the correct side for games
-            # passDest = Location(nogginC.MIDFIELD_X + constants.SIDE_PASS_OFFSET, 0.)
-            # player.kick = decider.sweetMovesForKickOff(-1, passDest)
-            passDest = Location(nogginC.MIDFIELD_X + constants.SIDE_PASS_OFFSET, nogginC.FIELD_WHITE_HEIGHT)
-            player.kick = decider.sweetMovesForKickOff(1, passDest)   
+            passDest = Location(nogginC.MIDFIELD_X + constants.SIDE_PASS_OFFSET, 0.)
+            player.kick = decider.sweetMovesForKickOff(-1, passDest) 
             player.inKickingState = True
             return player.goNow('approachBall')
         elif roleConstants.isSecondChaser(player.role):
@@ -114,7 +113,3 @@ def sidePass(player):
             return player.goNow('findBall')
 
     return player.stay()
-
-#giveAndGo -> give to corner, go to field cross
-#giveAndGo2 -> sideKick to shot on goal, to run to field cross
-#shoot from corner

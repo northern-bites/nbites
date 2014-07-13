@@ -7,6 +7,7 @@ from math import fabs
 from ..util import *
 from .. import SweetMoves
 from . import RoleConstants as roleConstants
+import KickOffConstants as kickOff
 
 ### NORMAL PLAY ###
 @superState('gameControllerResponder')
@@ -75,14 +76,14 @@ def gameSet(player):
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
         return player.stay()
-
+    
     return player.stay()
 
 @superState('gameControllerResponder')
 def gamePlaying(player):
     if player.firstFrame():
         player.inKickingState = False
-        player.inKickOffPlay = False
+        player.inKickOffPlay = kickOff.shouldRunKickOffPlay(player)
         player.passBack = False
         player.brain.fallController.enabled = True
         player.brain.nav.stand()

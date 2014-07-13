@@ -39,7 +39,7 @@ KICK_DICT = {"L_Side"               : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
              "L_Short_Back"         : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
              "R_Short_Back"         : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
              "Zellvarro_Left_Kick"  : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
-             "Zellvarro_Right_Kick"  : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT
+             "Zellvarro_Right_Kick" : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
 
              "M_Left_Straight"      : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
              "M_Right_Straight"     : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
