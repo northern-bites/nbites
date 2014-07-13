@@ -77,5 +77,5 @@ def shouldStopLookingForFlippedSharedBall(player):
     return shouldFindFlippedSharedBall(player) or shouldStopLookingForSharedBall(player)
 
 def shouldBeSupporter(player):
-    return (player.brain.ball.vis.frames_on > chaseConstants.BALL_ON_THRESH and 
+    return (ballInBox(player) and
             claimTransitions.shouldCedeClaim(player))
