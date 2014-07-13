@@ -44,7 +44,8 @@ void LocalizationModule::update()
     bool inSet = (STATE_SET == gameStateInput.message().state());
     // Update the Particle Filter with the new observations/odometry
 
-    if (inSet && gameStateInput.message().secs_remaining() != 600)
+    if (inSet && (!gameStateInput.message().have_remote_gc() || 
+        gameStateInput.message().secs_remaining() != 600))
         particleFilter->update(curOdometry, visionInput.message(), ballInput.message());
     else
 #endif

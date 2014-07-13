@@ -46,13 +46,15 @@ def positionAtHome(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
 
-    home = RobotLocation(player.homePosition.x player.homePosition.y, player.homePosition.h)
+    home = RobotLocation(player.homePosition.x, player.homePosition.y, player.homePosition.h)
     if (player.brain.sharedBall.ball_on and player.brain.sharedBall.reliability >= 2 and 
         role.isDefender(player.role)):
-        home.h = player.brain.loc.getRelativeBearing(player.brain.sharedBall)
+        sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
+        home.h = player.brain.loc.getRelativeBearing(sharedball)
     elif (player.brain.sharedBall.ball_on and player.brain.sharedBall.reliability >= 1 and 
           role.isCherryPicker(player.role)):
-        home.h = player.brain.loc.getRelativeBearing(player.brain.sharedBall)
+        sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
+        home.h = player.brain.loc.getRelativeBearing(sharedball)
 
     player.brain.nav.goTo(home, precision = nav.HOME,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,

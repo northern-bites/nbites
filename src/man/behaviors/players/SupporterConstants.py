@@ -52,7 +52,7 @@ def chaser(player):
     or cherry picker is calling them off. Chasers position further away up field if
     a defender is calling them off.
     """
-    if role.isDefender(player.roleOfClaimer):
+    if RoleConstants.isDefender(player.roleOfClaimer):
         if player.brain.ball.y >= player.brain.loc.y:
             return RobotLocation(player.brain.ball.x + 200,
                                  player.brain.ball.y - CHASER_DISTANCE,
@@ -61,7 +61,7 @@ def chaser(player):
                              player.brain.ball.y + CHASER_DISTANCE,
                              player.brain.ball.bearing_deg + player.brain.loc.h)
     else:
-        elif (player.brain.ball.x >= player.brain.loc.x and
+        if (player.brain.ball.x >= player.brain.loc.x and
             player.brain.ball.y >= player.brain.loc.y):
             return RobotLocation(player.brain.ball.x - CHASER_DISTANCE,
                                  player.brain.ball.y - CHASER_DISTANCE,

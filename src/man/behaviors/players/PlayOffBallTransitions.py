@@ -3,6 +3,7 @@ import ClaimTransitions as claimTransitions
 import SharedTransitions as shared
 import ChaseBallConstants as chaseConstants
 import ChaseBallTransitions as chaseTransitions
+from math import fabs, degrees
 
 def ballInBox(player):
     """

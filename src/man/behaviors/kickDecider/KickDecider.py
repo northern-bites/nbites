@@ -167,12 +167,12 @@ class KickDecider(object):
         self.addFastestPossibleKicks()
 
         try:
-            kick = (kick for kick in self.possibleKicks).next().next()
-            if kick.move: 
+            k = (kick for kick in self.possibleKicks).next().next()
+            if k.sweetMove: 
                 self.brain.player.motionKick = False
             else:
                 self.brain.player.motionKick = True
-            return kick
+            return k
         except:
             return None
 
