@@ -63,8 +63,8 @@ def watchForBall(player):
 @stay
 @ifSwitchLater(shared.ballOffForNFrames(120), 'playOffBall')
 def positionAsSupporter(player):
-    if (role.isChaser(player.role) and player.brain.ball.distance > 
-        hypot(CHASER_DISTANCE, CHASER_DISTANCE)):
+    if (role.isChaser(player.role) and role.isChaser(player.roleOfClaimer) and 
+        player.brain.ball.distance > hypot(CHASER_DISTANCE, CHASER_DISTANCE)):
         fast = True
     else:
         fast = False

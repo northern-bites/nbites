@@ -48,27 +48,38 @@ def rightDefender(player):
 
 def chaser(player):
     """
-    Chasers position off to one side of the ball about a meter away.
+    Chasers position off to one side of the ball about a meter away if a chaser
+    or cherry picker is calling them off. Chasers position further away up field if
+    a defender is calling them off.
     """
-    if (player.brain.ball.x >= player.brain.loc.x and
-        player.brain.ball.y >= player.brain.loc.y):
-        return RobotLocation(player.brain.ball.x - CHASER_DISTANCE,
-                             player.brain.ball.y - CHASER_DISTANCE,
-                             player.brain.ball.bearing_deg + player.brain.loc.h)
-    elif (player.brain.ball.x >= player.brain.loc.x and
-        player.brain.ball.y < player.brain.loc.y):
-        return RobotLocation(player.brain.ball.x - CHASER_DISTANCE,
+    if role.isDefender(player.roleOfClaimer):
+        if player.brain.ball.y >= player.brain.loc.y:
+            return RobotLocation(player.brain.ball.x + 200,
+                                 player.brain.ball.y - CHASER_DISTANCE,
+                                 player.brain.ball.bearing_deg + player.brain.loc.h)
+        return RobotLocation(player.brain.ball.x + 200,
                              player.brain.ball.y + CHASER_DISTANCE,
-                             player.brain.ball.bearing_deg + player.brain.loc.h)
-    elif (player.brain.ball.x < player.brain.loc.x and
-        player.brain.ball.y >= player.brain.loc.y):
-        return RobotLocation(player.brain.ball.x + CHASER_DISTANCE,
-                             player.brain.ball.y - CHASER_DISTANCE,
                              player.brain.ball.bearing_deg + player.brain.loc.h)
     else:
-        return RobotLocation(player.brain.ball.x + CHASER_DISTANCE,
-                             player.brain.ball.y + CHASER_DISTANCE,
-                             player.brain.ball.bearing_deg + player.brain.loc.h)
+        elif (player.brain.ball.x >= player.brain.loc.x and
+            player.brain.ball.y >= player.brain.loc.y):
+            return RobotLocation(player.brain.ball.x - CHASER_DISTANCE,
+                                 player.brain.ball.y - CHASER_DISTANCE,
+                                 player.brain.ball.bearing_deg + player.brain.loc.h)
+        elif (player.brain.ball.x >= player.brain.loc.x and
+            player.brain.ball.y < player.brain.loc.y):
+            return RobotLocation(player.brain.ball.x - CHASER_DISTANCE,
+                                 player.brain.ball.y + CHASER_DISTANCE,
+                                 player.brain.ball.bearing_deg + player.brain.loc.h)
+        elif (player.brain.ball.x < player.brain.loc.x and
+            player.brain.ball.y >= player.brain.loc.y):
+            return RobotLocation(player.brain.ball.x + CHASER_DISTANCE,
+                                 player.brain.ball.y - CHASER_DISTANCE,
+                                 player.brain.ball.bearing_deg + player.brain.loc.h)
+        else:
+            return RobotLocation(player.brain.ball.x + CHASER_DISTANCE,
+                                 player.brain.ball.y + CHASER_DISTANCE,
+                                 player.brain.ball.bearing_deg + player.brain.loc.h)
 
 CHASER_DISTANCE = 60
 
