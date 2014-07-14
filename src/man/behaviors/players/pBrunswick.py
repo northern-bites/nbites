@@ -64,4 +64,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Controls whether we use claims
         self.useClaims = True
         self.returningFromPenalty = False
-        self.badComm = False
+        # Trinary flag indicating state of communications
+        # 0 -- all field players are online
+        # 1 -- one field player is offline
+        # 2 -- more than one field player is offline
+        self.commMode = 0
