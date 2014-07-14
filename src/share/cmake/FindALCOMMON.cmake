@@ -12,8 +12,8 @@ endif()
 
 if( NOT OFFLINE )
   set( ALCOMMON_LIBRARIES
-    ${OE_SYSROOT}/lib/libalcommon.so
-    ${OE_SYSROOT}/lib/libalmemoryfastaccess.so)
+    ${OE_SYSROOT}/usr/lib/libalcommon.so
+    ${OE_SYSROOT}/usr/lib/libalmemoryfastaccess.so)
 else()
   set( CMAKE_PREFIX_PATH ${AL_DIR} )
   set( ALCOMMON_LIBRARIES

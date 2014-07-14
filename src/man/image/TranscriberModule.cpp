@@ -309,7 +309,7 @@ void ImageTranscriber::assertCameraSettings() {
     int sharpness = getControlSetting(V4L2_CID_SHARPNESS);
     int gain = getControlSetting(V4L2_CID_GAIN);
     int exposure = getControlSetting(V4L2_CID_EXPOSURE);
-#ifdef NAOQI_2:
+#ifdef NAOQI_2
     int whitebalance = getControlSetting(V4L2_CID_WHITE_BALANCE_TEMPERATURE);
 #else
     int whitebalance = getControlSetting(V4L2_CID_DO_WHITE_BALANCE);

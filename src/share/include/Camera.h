@@ -6,7 +6,7 @@
  */
 
 #pragma once
-#define NAOQI_2
+#include "DebugConfig.h"
 
 class Camera {
 
@@ -58,7 +58,6 @@ public:
             TOP_WHITE_BALANCE,
             TOP_FADE_TO_BLACK
         };
-        return topSettings;
     }
 
     static const Settings& getBottomSettings() {

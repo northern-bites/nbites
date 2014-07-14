@@ -67,6 +67,13 @@
 #   undef USE_SPL_COMM
 #endif
 
+#define USE_NAOQI_2_${USE_NAOQI_2}
+#ifdef  USE_NAOQI_2_ON
+#    define NAOQI_2
+#else
+#    undef NAOQI_2
+#endif
+
 #define USE_LOGGING_${USE_LOGGING}
 #ifdef  USE_LOGGING_ON
 #   define USE_LOGGING

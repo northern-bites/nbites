@@ -21,6 +21,12 @@ option(
   OFF
 )
 
+option(
+  USE_NAOQI_2
+  "Installing using the Naoqi 2.1 cross compiler"
+  OFF
+)
+
 if( NOT OFFLINE )
 
 option(
