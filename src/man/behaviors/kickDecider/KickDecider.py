@@ -99,6 +99,26 @@ class KickDecider(object):
 
         return (kick for kick in self.possibleKicks).next().next()
 
+    def bigKicksAsapOnGoal(self):
+        self.brain.player.motionKick = False
+
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_BIG_KICK)
+        self.kicks.append(kicks.RIGHT_BIG_KICK)
+
+        self.scoreKick = self.minimizeDistanceToGoal
+        
+        self.filters = []
+        self.filters.append(self.crossesGoalLinePrecise)
+
+        self.clearPossibleKicks()
+        self.addFastestPossibleKicks()
+
+        try:
+            return (kick for kick in self.possibleKicks).next().next()
+        except:
+            return None
+
     def motionKicksOrbit(self):
         self.brain.player.motionKick = True
     
@@ -304,15 +324,23 @@ class KickDecider(object):
 
         return self.frontKickCrosses()
 
-    def obstacleAware(self):
-        if self.checkObstacle(1,50):
+    def obstacleAware(self, clearing = False):
+        if self.checkObstacle(1,75):
             inScrum = self.motionKicksInScrumAsap()
             if inScrum:
                 return inScrum
 
-        if (not self.checkObstacle(1, 200) and not self.checkObstacle(1, 100) and
+        if (not self.checkObstacle(1, 200) and 
+            not self.checkObstacle(1, 100) and
             not self.checkObstacle(8, 100)):
-            timeAndSpace = self.allKicksIncludingBigKickAsap()
+            bigKick = self.bigKicksAsapOnGoal()
+            if bigKick:
+                return bigKick
+
+            if clearing:
+                timeAndSpace = self.allKicksAsap()
+            else:
+                timeAndSpace = self.allKicksAsapOnGoal()
             if timeAndSpace:
                 return timeAndSpace
 
@@ -518,6 +546,4 @@ class KickDecider(object):
 
     def checkObstacle(self, position, threshold):
         return (self.brain.obstacles[position] <= threshold and 
-                self.brain.obstacles[position] != 0.0
-
-    def checkGameState(self, position
+                self.brain.obstacles[position] != 0.0)

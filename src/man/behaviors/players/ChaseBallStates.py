@@ -59,7 +59,7 @@ def prepareForKick(player):
     if transitions.shouldChangeKickingStrategy(player):
         player.kick = player.decider.timeForSomeHeroics()
     else:
-        player.kick = player.decider.obstacleAware()
+        player.kick = player.decider.obstacleAware(roleConstants.isDefender(player.role))
 
     return player.goNow('orbitBall')
 

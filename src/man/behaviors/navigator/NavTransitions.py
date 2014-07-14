@@ -46,7 +46,7 @@ def shouldDodge(nav):
                                            states.goToPosition.dest)
     walkingDest = getDirection(relLoc.relH)
 
-    print "DEST: ", walkingDest
+    # print "DEST: ", walkingDest
 
     for i in range(1, len(nav.brain.obstacles)):
         if (nav.brain.obstacles[i] != 0.0 and
@@ -54,7 +54,7 @@ def shouldDodge(nav):
             info[i] = nav.brain.obstacles[i]
             setPosition = True
 
-    print "INFO: ", info
+    # print "INFO: ", info
 
     if setPosition:
         states.dodge.targetDest = walkingDest
@@ -103,8 +103,8 @@ def doneDodging(nav):
             (i >= 7 or i<=3)):
             noObstacles = False
 
-    print "DODGE DONE ", nav.brain.obstacles
-    print noObstacles
+    # print "DODGE DONE ", nav.brain.obstacles
+    # print noObstacles
 
     return (atDestination(nav) or noObstacles)
 
