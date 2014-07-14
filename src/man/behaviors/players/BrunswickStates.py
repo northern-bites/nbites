@@ -23,7 +23,8 @@ def gameInitial(player):
         player.brain.resetInitialLocalization()
         player.lastStiffStatus = True
         #Reset role to player number
-        player.brain.player.role = player.brain.playerNumber
+        player.role = player.brain.playerNumber
+        roleConstants.setRoleConstants(player, player.role)
 
     # If stiffnesses were JUST turned on, then stand up.
     if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
