@@ -8,12 +8,12 @@ import itertools
 
 # TODO use open field detection and robot detection to score motion kicks
 # TODO use open field detection to decide when big kicking is appropriate
-# TODO close to goal motion kick strategy
+# TODO close to goal motion kick strategy DONE
 # TODO big kick based on secs_left
 
-# TODO document here and on wiki
 # TODO kicks.py is ugly
-# TODO abstract from behaviors for testing purposes
+# TODO hierarchy of lower level planners
+# TODO document here and on wiki
 class KickDecider(object):
     """
     Decides what kick to do. Load a bunch of kicks into self.kicks, a score 
@@ -147,8 +147,61 @@ class KickDecider(object):
         except:
             return None
 
+    def motionKicksInScrumAsap(self):
+        self.brain.player.motionKick = True
+    
+        self.kicks = []
+        self.kicks.append(kicks.M_LEFT_SIDE)
+        self.kicks.append(kicks.M_RIGHT_SIDE)
+        self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+        self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
+
+        self.scoreKick = self.minimizeDistanceToGoal
+        
+        self.filters = []
+        self.filters.append(self.inBoundsOrGoal)
+
+        self.clearPossibleKicks()
+        self.addFastestPossibleKicks()
+
+        try:
+            return (kick for kick in self.possibleKicks).next().next()
+        except:
+            return None
+
     def allKicksAsap(self):
         self.kicks = []
+        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.M_LEFT_STRAIGHT)
+        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
+        self.kicks.append(kicks.M_LEFT_SIDE)
+        self.kicks.append(kicks.M_RIGHT_SIDE)
+        self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+        self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
+
+        self.scoreKick = self.minimizeDistanceToGoal
+        
+        self.filters = []
+        self.filters.append(self.inBoundsOrGoal)
+
+        self.clearPossibleKicks()
+        self.addFastestPossibleKicks()
+
+        try:
+            k = (kick for kick in self.possibleKicks).next().next()
+            if k.sweetMove: 
+                self.brain.player.motionKick = False
+            else:
+                self.brain.player.motionKick = True
+            return k
+        except:
+            return None
+
+    def allKicksIncludingBigKickAsap(self):
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_BIG_KICK)
+        self.kicks.append(kicks.RIGHT_BIG_KICK)
         self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
         self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
@@ -219,6 +272,24 @@ class KickDecider(object):
 
     def defender(self):
         asap = self.allKicksAsap()
+        if asap:
+            return asap
+
+        return self.frontKickCrosses()
+
+    def obstacleAware(self):
+        if self.checkObstacle(1,50):
+            inScrum = self.motionKicksInScrumAsap()
+            if inScrum:
+                return inScrum
+
+        if (not self.checkObstacle(1, 200) and not self.checkObstacle(1, 100) and
+            not self.checkObstacle(8, 100)):
+            timeAndSpace = self.allKicksIncludingBigKickAsap()
+            if timeAndSpace:
+                return timeAndSpace
+
+        asap = self.motionKicksAsap()
         if asap:
             return asap
 
@@ -406,3 +477,7 @@ class KickDecider(object):
         while newAngle <= -180: newAngle += 360
         while newAngle > 180: newAngle -= 360
         return newAngle
+
+    def checkObstacle(self, position, threshold):
+        return (self.brain.obstacles[position] <= threshold and 
+                self.brain.obstacles[position] != 0.0
