@@ -6,6 +6,7 @@ import noggin_constants as NogginConstants
 from objects import Location, RelRobotLocation
 from . import RoleConstants as roleConstants
 from . import SharedTransitions
+import math
 
 @superState('gameControllerResponder')
 def positionReady(player):
@@ -30,7 +31,7 @@ def positionReady(player):
         player.brain.tracker.trackBall()
         return player.stay()
 
-    if player.brain.time - player.timeReadyBegan > 38:
+    if player.brain.time - player.timeReadyBegan > 36.0:
         return player.goNow('readyFaceMiddle')
 
     return player.stay()
@@ -41,10 +42,12 @@ def readyFaceMiddle(player):
     If we didn't make it to our position, find the middle of the field
     """
     if player.firstFrame():
+        print "in ready face middle!"
         player.brain.tracker.lookToAngle(0)
         player.stand()
         readyFaceMiddle.startedSpinning = False
         readyFaceMiddle.done = False
+        readyFaceMiddle.spin = False
 
     centerField = Location(NogginConstants.CENTER_FIELD_X,
                            NogginConstants.CENTER_FIELD_Y)
@@ -52,18 +55,18 @@ def readyFaceMiddle(player):
     if player.brain.nav.isStopped() and not readyFaceMiddle.startedSpinning:
         readyFaceMiddle.startedSpinning = True
         spinDir = player.brain.loc.spinDirToPoint(centerField)
-        player.setWalk(0,0,spinDir*0.3)
+        readyFaceMiddle.spin = True
 
-    elif (not readyFaceMiddle.done and readyFaceMiddle.startedSpinning and
-        ((player.brain.ygrp.on and
-          player.brain.ygrp.distance > NogginConstants.MIDFIELD_X + 200) or
-        (player.brain.yglp.on and
-         player.brain.yglp.distance > NogginConstants.MIDFIELD_X + 200))):
-        print "Found a post at {0} or {1}".format(player.brain.ygrp.distance,
-                                                  player.brain.yglp.distance)
-        readyFaceMiddle.done = True
-        player.brain.tracker.repeatBasicPan()
-        player.stopWalking()
+    if readyFaceMiddle.spin:
+        myHeading = player.brain.loc.h
+        centerHeading = 0.0
+        headingToCenter = centerHeading - myHeading
+        correctHeading = RelRobotLocation(0.0, 0.0, headingToCenter)
+        if math.fabs(headingToCenter) > 5.0:
+            player.brain.nav.goTo(correctHeading, Navigator.CLOSE_ENOUGH, Navigator.MEDIUM_SPEED)
+        else:
+            player.stand()
+            readyFaceMiddle.spin = False
 
     return player.stay()
 
