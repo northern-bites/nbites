@@ -176,9 +176,38 @@ class KickDecider(object):
         except:
             return None
 
+    def allKicksAsapOnGoal(self):
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.M_LEFT_STRAIGHT)
+        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
+        self.kicks.append(kicks.M_LEFT_SIDE)
+        self.kicks.append(kicks.M_RIGHT_SIDE)
+        self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+        self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
+
+        self.scoreKick = self.minimizeDistanceToGoal
+        
+        self.filters = []
+        self.filters.append(self.crossesGoalLine)
+
+        self.clearPossibleKicks()
+        self.addFastestPossibleKicks()
+
+        try:
+            k = (kick for kick in self.possibleKicks).next().next()
+            if k.sweetMove: 
+                self.brain.player.motionKick = False
+            else:
+                self.brain.player.motionKick = True
+            return k
+        except:
+            return None
+
     ### HIGH LEVEL PLANNERS ###
     def attacker(self):
-        onGoalAsap = self.frontKicksAsapOnGoal()
+        onGoalAsap = self.allKicksAsapOnGoal()
         if onGoalAsap: 
             return onGoalAsap
 
