@@ -165,6 +165,30 @@ class KickDecider(object):
         except:
             return None
 
+    def motionKicksAsapOnGoal(self):
+        self.brain.player.motionKick = True
+    
+        self.kicks = []
+        self.kicks.append(kicks.M_LEFT_STRAIGHT)
+        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
+        self.kicks.append(kicks.M_LEFT_SIDE)
+        self.kicks.append(kicks.M_RIGHT_SIDE)
+        self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+        self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
+
+        self.scoreKick = self.minimizeDistanceToGoal
+        
+        self.filters = []
+        self.filters.append(self.crossesGoalLine)
+
+        self.clearPossibleKicks()
+        self.addFastestPossibleKicks()
+
+        try:
+            return (kick for kick in self.possibleKicks).next().next()
+        except:
+            return None
+
     def motionKicksInScrumAsap(self, obstacles):
         self.brain.player.motionKick = True
     
@@ -336,6 +360,10 @@ class KickDecider(object):
         return self.frontKickCrosses()
 
     def obstacleAware(self, clearing = False):
+        motionKicksOnGoal = self.motionKicksAsapOnGoal() # TODO avoid when shooting too?
+        if motionKicksOnGoal:
+            return motionKicksOnGoal
+
         obstacles = [self.checkObstacle(1,75), self.checkObstacle(2,75), self.checkObstacle(8,75)]
         if True in obstacles:
             inScrum = self.motionKicksInScrumAsap(obstacles)
@@ -351,10 +379,8 @@ class KickDecider(object):
 
             if clearing:
                 timeAndSpace = self.allKicksAsap()
-            else:
-                timeAndSpace = self.allKicksAsapOnGoal()
-            if timeAndSpace:
-                return timeAndSpace
+                if timeAndSpace:
+                    return timeAndSpace
 
         asap = self.motionKicksAsap()
         if asap:
