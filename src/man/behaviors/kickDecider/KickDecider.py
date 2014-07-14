@@ -163,19 +163,28 @@ class KickDecider(object):
         except:
             return None
 
-    def motionKicksInScrumAsap(self):
+    def motionKicksInScrumAsap(self, obstacles):
         self.brain.player.motionKick = True
     
         self.kicks = []
-        self.kicks.append(kicks.M_LEFT_SIDE)
-        self.kicks.append(kicks.M_RIGHT_SIDE)
-        self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
-        self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
+        if not obstacles[0]:
+            self.kicks.append(kicks.M_LEFT_STRAIGHT)
+            self.kicks.append(kicks.M_RIGHT_STRAIGHT)
+        if not obstacles[1]:
+            self.kicks.append(kicks.M_LEFT_SIDE)
+            self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+        if not obstacles[2]:
+            self.kicks.append(kicks.M_RIGHT_SIDE)
+            self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
+        if not self.kicks:
+            self.kicks.append(kicks.M_LEFT_SIDE)
+            self.kicks.append(kicks.M_RIGHT_SIDE)
 
         self.scoreKick = self.minimizeDistanceToGoal
         
         self.filters = []
         self.filters.append(self.inBoundsOrGoal)
+        self.filters.append(self.forwardProgress)
 
         self.clearPossibleKicks()
         self.addFastestPossibleKicks()
@@ -325,14 +334,17 @@ class KickDecider(object):
         return self.frontKickCrosses()
 
     def obstacleAware(self, clearing = False):
-        if self.checkObstacle(1,75):
-            inScrum = self.motionKicksInScrumAsap()
+        obstacles = [self.checkObstacle(1,75), self.checkObstacle(2,75), self.checkObstacle(8,75)]
+        if True in obstacles:
+            inScrum = self.motionKicksInScrumAsap(obstacles)
             if inScrum:
                 return inScrum
 
         if (not self.checkObstacle(1, 200) and 
             not self.checkObstacle(1, 100) and
-            not self.checkObstacle(8, 100)):
+            not self.checkObstacle(8, 100)): 
+            # TODO more precision asked for by filter
+            # TODO include straight kick also
             bigKick = self.bigKicksAsapOnGoal()
             if bigKick:
                 return bigKick
@@ -530,6 +542,13 @@ class KickDecider(object):
         if 0 <= scale <= 1:
             return (rightPostY <= kickVector[1]*scale <= leftPostY)
         return False
+
+    def forwardProgress(self, kick):
+        goalCenter = Location(nogginC.FIELD_WHITE_RIGHT_SIDELINE_X, nogginC.MIDFIELD_Y)
+        ball = Location(self.brain.ball.x, self.brain.ball.y)
+        kickDestination = Location(kick.destinationX, kick.destinationY)
+
+        return goalCenter.distTo(ball) > goalCenter.distTo(kickDestination)
 
     ### HELPER FUNCTIONS ###
     def fromCartesianToPolarCoordinates(self, x, y):
