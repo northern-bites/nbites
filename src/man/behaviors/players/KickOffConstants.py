@@ -27,8 +27,11 @@ def shouldRunKickOffPlay(player):
     elif roleConstants.isSecondChaser(player.role):
         shouldRunKickOffPlay.distToPosition = hypot(player.brain.loc.x - roleConstants.oddChaserKickoff.x,
                                                     player.brain.loc.y - roleConstants.oddChaserKickoff.y)
+    else:
+        shouldRunKickOffPlay.distToPosition = 0.
 
     if shouldRunKickOffPlay.distToPosition > DIST_TO_POSITION_THRESH:
+        # print "I was ", shouldRunKickOffPlay.distToPosition, " away from position"
         return False
 
     for mate in player.brain.teamMembers:
@@ -38,9 +41,13 @@ def shouldRunKickOffPlay(player):
         elif roleConstants.isFirstChaser(mate.role):
             shouldRunKickOffPlay.distToPosition = hypot(mate.x - roleConstants.ourKickoff.x,
                                                         mate.y - roleConstants.ourKickoff.y)
+        else:
+            shouldRunKickOffPlay.distToPosition = 0.
 
         if shouldRunKickOffPlay.distToPosition > DIST_TO_POSITION_THRESH:
+            # print "Mate was ", shouldRunKickOffPlay.distToPosition, " away from position"
             return False
+
     return True
 
 def isSeeingBall(player):
