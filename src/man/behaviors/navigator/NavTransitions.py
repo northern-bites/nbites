@@ -66,7 +66,6 @@ def shouldDodge(nav):
     return False
 
 def getDirection(h):
-    print "h = ", h
     if (h < helper.constants.ZONE_WIDTH * -7. or
        h > helper.constants.ZONE_WIDTH * 7.):
         # SOUTH
@@ -100,7 +99,8 @@ def doneDodging(nav):
 
     for i in range(1, len(nav.brain.obstacles)):
         if (nav.brain.obstacles[i] != 0.0 and
-            nav.brain.obstacles[i] < constants.DODGE_DIST):
+            nav.brain.obstacles[i] < constants.DODGE_DIST and
+            (i >= 7 or i<=3)):
             noObstacles = False
 
     print "DODGE DONE ", nav.brain.obstacles

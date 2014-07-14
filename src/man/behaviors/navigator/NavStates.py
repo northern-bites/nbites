@@ -135,35 +135,40 @@ def dodge(nav):
             temp = getIndex(int(dodge.targetDest) + order[i])
             # if there is no obstacle in this direction
             if not dodge.positions[int(dodge.DDirects[temp])]:
-                numL = getIndex(int(dodge.DDirects[temp] - 1))
-                numR = getIndex(int(dodge.DDirects[temp] + 1))
-                # if no obstacles in my two surrounding dodge.DDirects, go in my direction
-                if not dodge.positions[numL] and not dodge.positions[numR]:
-                    # Let's go here!
-                    print "Dodged at ", int(dodge.DDirects[temp])
-                    dest = RelRobotLocation(constants.DGE_DESTS[temp-1][0],
-                                            constants.DGE_DESTS[temp-1][1],
-                                            constants.DGE_DESTS[temp-1][2])
-                    # dest = RelRobotLocation(15, 0, 0)
-                    helper.setDestinationWalk(nav, dest)
-                    # helper.setOdometryDestination(nav, dest)
-                    return Transition.getNextState(nav, dodge)
-
-        # if we have not returned yet, let's just find a path that is open
-        for i in range(len(order)):
-            temp = getIndex(int(dodge.targetDest) + order[i])
-            if not dodge.positions[int(dodge.DDirects[temp])]:
                 dest = RelRobotLocation(constants.DGE_DESTS[temp-1][0],
                                     constants.DGE_DESTS[temp-1][1],
                                     constants.DGE_DESTS[temp-1][2])
-                # dest = RelRobotLocation(15, 0, 0)
                 helper.setDestinationWalk(nav, dest)
                 # helper.setOdometryDestination(nav, dest)
                 return Transition.getNextState(nav, dodge)
 
+        # if we have not returned yet, let's just find a path that is open
+        # for i in range(len(order)):
+        #     temp = getIndex(int(dodge.targetDest) + order[i])
+        #     if not dodge.positions[int(dodge.DDirects[temp])]:
+        #         dest = RelRobotLocation(constants.DGE_DESTS[temp-1][0],
+        #                             constants.DGE_DESTS[temp-1][1],
+        #                             constants.DGE_DESTS[temp-1][2])
+        #         # dest = RelRobotLocation(15, 0, 0)
+        #         helper.setDestinationWalk(nav, dest)
+        #         # helper.setOdometryDestination(nav, dest)
+        #         return Transition.getNextState(nav, dodge)
+
         # if i am here.... something seriously wrong!!
 
     return Transition.getNextState(nav, dodge)
+
+
+                # numL = getIndex(int(dodge.DDirects[temp] - 1))
+                # numR = getIndex(int(dodge.DDirects[temp] + 1))
+                # # if no obstacles in my two surrounding dodge.DDirects, go in my direction
+                # if not dodge.positions[numL] and not dodge.positions[numR]:
+                #     # Let's go here!
+                #     print "Dodged at ", int(dodge.DDirects[temp])
+                #     dest = RelRobotLocation(constants.DGE_DESTS[temp-1][0],
+                #                             constants.DGE_DESTS[temp-1][1],
+                #                             constants.DGE_DESTS[temp-1][2])
+                #     # dest = RelRobotLocation(15, 0, 0)
 
         ## SET UP the dodge direction based on where the obstacle is
         # if directly in front of us, move back and to one side based on
