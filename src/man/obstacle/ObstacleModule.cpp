@@ -21,10 +21,23 @@ float average(std::list<float>& buf)
     return avg;
 }
 
+float minimum(std::list<float>& buf)
+{
+    float min = 500.f;
+
+    for (std::list<float>::iterator i = buf.begin(); i != buf.end(); i++)
+    {
+        if (*i < min)
+            min = *i;
+    }
+
+    return min;
+}
+
 ObstacleModule::ObstacleModule() : obstacleOut(base())
 {
-    visionObstacleBuffer = { 0 };
-    visionObstacleDistances = { 0.f };
+    obstacleBuffer = { 0 };
+    obstacleDistances = { 0.f };
     // Used when setting the message fields
     obstaclesList = { FieldObstacles::Obstacle::NONE,
                       FieldObstacles::Obstacle::NORTH,
@@ -44,39 +57,55 @@ void ObstacleModule::run_()
     visionIn.latch();
     sonarIn.latch();
 
-    // Decide sonars and arms separately
+    // Decide sonars
     // FieldObstacles::Obstacle::ObstaclePosition
-        // sonars = processSonar(sonarIn.message());
+    //     sonars = processSonar(sonarIn.message());
+
+    // Process vision in all three sections of frame separately
     FieldObstacles::Obstacle::ObstaclePosition
-        vision = processVision(visionIn.message());
+        visionL = processVision(visionIn.message().left_dist(),
+                                visionIn.message().left_bearing());
+    FieldObstacles::Obstacle::ObstaclePosition
+        visionM = processVision(visionIn.message().mid_dist(),
+                                visionIn.message().mid_bearing());
+    FieldObstacles::Obstacle::ObstaclePosition
+        visionR = processVision(visionIn.message().right_dist(),
+                                visionIn.message().right_bearing());
+
+    // Decide arms
     FieldObstacles::Obstacle::ObstaclePosition
         arms = processArms(armContactIn.message());
 
-    // Updates vision obstacle buffer with information taken from vision
-    updateVisionObstacleBuffer(vision);
+
+    // update obstacle buffer with new information
+    updateObstacleBuffer(visionL, visionM, visionR, arms);
 
     // Used to check if there were any obstacles found
     bool didReturn = false;
     portals::Message<messages::FieldObstacles> current(0);
 
+    // std::cout<<"OBSTACLE: ";
+
     // ignore "NONE" direction, start at 1
     for (int i = 1; i < NUM_DIRECTIONS; i++)
     {
-        if (visionObstacleBuffer[i] != 0 or int(arms) == i)
+        if (obstacleBuffer[i] != 0)
         {
-            // adds an obstacle in this direction to the message
             FieldObstacles::Obstacle* temp = current.get()->add_obstacle();
             temp->set_position(obstaclesList[i]);
-            temp->set_distance(visionObstacleDistances[i]);
+            temp->set_distance(obstacleDistances[i]);
+            // std::cout<<obstacleDistances[i]<<", ";
             didReturn = true;
         }
     }
+    // std::cout<<std::endl;
 
     if (!(didReturn))
     {
         FieldObstacles::Obstacle*temp = current.get()->add_obstacle();
         temp->set_position(FieldObstacles::Obstacle::NONE);
         temp->set_distance(0.f);
+        // temp->set_type(FieldObstacles::Obstacle::EMPTY);
     }
 
     obstacleOut.setMessage(current);
@@ -271,136 +300,153 @@ ObstacleModule::processSonar(const messages::SonarState& input)
     else return FieldObstacles::Obstacle::NONE;
 }
 
-// Helper method, used to figure out if vision buffers have good values
 FieldObstacles::Obstacle::ObstaclePosition
-ObstacleModule::checkAverage(FieldObstacles::Obstacle::ObstaclePosition direction,
-             std::list<float> distances)
+ObstacleModule::processVision(float distance, float bearing)
 {
-    float avg = average(distances);
-    if (avg < VISION_MAX_DIST)
-    {
-        visionObstacleDistances[(int)direction] = avg;
-        return direction;
-    }
-    return FieldObstacles::Obstacle::NONE;
-}
+    FieldObstacles::Obstacle::ObstaclePosition dir;
+    float min;
 
-FieldObstacles::Obstacle::ObstaclePosition
-ObstacleModule::processVision(const messages::VisionObstacle& input)
-{
-    float minDist = std::min(std::min(input.left_dist(),
-                                      input.mid_dist()),
-                             input.right_dist());
-    float bearing, avg;
-    if (minDist == input.left_dist())
-    {
-        bearing = input.left_bearing();
-    }
-    else if (minDist == input.mid_dist())
-    {
-        bearing = input.mid_bearing();
-    }
-    else
-    {
-        bearing = input.right_bearing();
-    }
-    // now figure out in what direction the closest obstacle is
+    // Process what direction it is in: act appropriately
     if ( bearing < -5.f*ZONE_WIDTH)
     {
         // obstacle to the southeast
-        SEDists.push_back(minDist);
+        SEDists.push_back(distance);
         if (SEDists.size() > VISION_FRAMES_TO_BUFFER)
         {
             SEDists.pop_front();
         }
-        return checkAverage(FieldObstacles::Obstacle::SOUTHEAST, SEDists);
+
+        dir = FieldObstacles::Obstacle::SOUTHEAST;
+        min = minimum(SEDists);
+        obstacleDistances[int(dir)] = min;
+
+        return dir;
     }
     else if ( bearing < -3.f*ZONE_WIDTH )
     {
         // obstacle to the east
-        EDists.push_back(minDist);
+        EDists.push_back(distance);
         if (EDists.size() > VISION_FRAMES_TO_BUFFER)
         {
             EDists.pop_front();
         }
-        return checkAverage(FieldObstacles::Obstacle::EAST, EDists);
+
+        dir = FieldObstacles::Obstacle::EAST;
+        min = minimum(EDists);
+        obstacleDistances[int(dir)] = min;
+
+        return dir;
     }
     else if ( bearing < -ZONE_WIDTH )
     {
         // obstacle to northeast
-        NEDists.push_back(minDist);
+        NEDists.push_back(distance);
         if (NEDists.size() > VISION_FRAMES_TO_BUFFER)
         {
             NEDists.pop_front();
         }
-        return checkAverage(FieldObstacles::Obstacle::NORTHEAST, NEDists);
+
+        dir = FieldObstacles::Obstacle::NORTHEAST;
+        min = minimum(NEDists);
+        obstacleDistances[int(dir)] = min;
+
+        return dir;
     }
     else if ( bearing < ZONE_WIDTH )
     {
         // obstacle to north
-        NDists.push_back(minDist);
+        NDists.push_back(distance);
         if (NDists.size() > VISION_FRAMES_TO_BUFFER)
         {
             NDists.pop_front();
         }
-        return checkAverage(FieldObstacles::Obstacle::NORTH, NDists);
+
+        dir = FieldObstacles::Obstacle::NORTH;
+        min = minimum(NDists);
+        obstacleDistances[int(dir)] = min;
+
+        return dir;
     }
     else if ( bearing < 3.f*ZONE_WIDTH )
     {
         // obstacle to northwest
-        NWDists.push_back(minDist);
+        NWDists.push_back(distance);
         if (NWDists.size() > VISION_FRAMES_TO_BUFFER)
         {
             NWDists.pop_front();
         }
-        return checkAverage(FieldObstacles::Obstacle::NORTHWEST, NWDists);
+
+        dir = FieldObstacles::Obstacle::NORTHWEST;
+        min = minimum(NWDists);
+        obstacleDistances[int(dir)] = min;
+
+        return dir;
     }
     else if ( bearing < 5.f*ZONE_WIDTH )
     {
         // obstacle to west
-        WDists.push_back(minDist);
+        WDists.push_back(distance);
         if (WDists.size() > VISION_FRAMES_TO_BUFFER)
         {
             WDists.pop_front();
         }
-        return checkAverage(FieldObstacles::Obstacle::WEST, WDists);
+
+        dir = FieldObstacles::Obstacle::WEST;
+        min = minimum(WDists);
+        obstacleDistances[int(dir)] = min;
+
+        return dir;
     }
     else if ( bearing < 7.f * ZONE_WIDTH )
     {
         // obstacle to southwest
-        SWDists.push_back(minDist);
+        SWDists.push_back(distance);
         if (SWDists.size() > VISION_FRAMES_TO_BUFFER)
         {
             WDists.pop_front();
         }
-        return checkAverage(FieldObstacles::Obstacle::SOUTHWEST, SWDists);
+
+        dir = FieldObstacles::Obstacle::SOUTHWEST;
+        min = minimum(SWDists);
+        obstacleDistances[int(dir)] = min;
+
+        return dir;
     }
-    else
+    else // south
     {
         return FieldObstacles::Obstacle::NONE;
     }
 }
 
-void ObstacleModule::updateVisionObstacleBuffer
-(messages::FieldObstacles::Obstacle::ObstaclePosition vision)
+void ObstacleModule::updateObstacleBuffer
+(FieldObstacles::Obstacle::ObstaclePosition visionL,
+ FieldObstacles::Obstacle::ObstaclePosition visionM,
+ FieldObstacles::Obstacle::ObstaclePosition visionR,
+ FieldObstacles::Obstacle::ObstaclePosition arms)
 {
+    // std::cout<<"Obstacle Buffer: ";
     // start at 1 to ignore "NONE" direction
     for (int i = 1; i < NUM_DIRECTIONS; i++)
     {
-        if (i == int(vision))
+        if ( i == int(visionL) || i == int(visionM) ||
+             i == int(visionR) || i == int(arms) )
         {
-            visionObstacleBuffer[i] = 1;
+            obstacleBuffer[i] = 1;
+            // std::cout<<obstacleBuffer[i]<<", ";
             continue;
         }
-        if (visionObstacleBuffer[i] == 0 or
-            visionObstacleBuffer[i] > VISION_FRAMES_TO_HAVE_OBSTACLE)
+        if (obstacleBuffer[i] == 0 or
+            obstacleBuffer[i] > VISION_FRAMES_TO_HAVE_OBSTACLE)
         {
-            visionObstacleBuffer[i] = 0;
-            visionObstacleDistances[i] = 0;
+            obstacleBuffer[i] = 0;
+            obstacleDistances[i] = 0;
+            // std::cout<<obstacleBuffer[i]<<", ";
             continue;
         }
-        visionObstacleBuffer[i]++;
+        obstacleBuffer[i]++;
+        // std::cout<<obstacleBuffer[i]<<", ";
     }
+    // std::cout<<std::endl;
 }
 
 } // namespace obstacle

@@ -76,8 +76,8 @@ class ObstacleModule : public portals::Module
     // How many frames do we consider in our average of obstacle distances?
     static const unsigned int VISION_FRAMES_TO_BUFFER = 20;
     // After we see an obstacle, how long should we say it's still there?
-    // We say the time it takes to do a full pan: 6-7 seconds
-    static const int VISION_FRAMES_TO_HAVE_OBSTACLE = 200;
+    // We say the time it takes to do a full pan: 3-4 seconds
+    static const int VISION_FRAMES_TO_HAVE_OBSTACLE = 30;
 
 public:
     ObstacleModule();
@@ -98,15 +98,18 @@ protected:
 
     // Makes a decision based on vision
     messages::FieldObstacles::Obstacle::ObstaclePosition
-    processVision(const messages::VisionObstacle& input);
+    processVision(float distance, float bearing);
 
     // Makes a decision based on sonars, not using right now
     messages::FieldObstacles::Obstacle::ObstaclePosition
     processSonar(const messages::SonarState& input);
 
     // Updates vision buffer with info from last frame of vision
-    void updateVisionObstacleBuffer
-    (messages::FieldObstacles::Obstacle::ObstaclePosition vision);
+    void updateObstacleBuffer
+    (messages::FieldObstacles::Obstacle::ObstaclePosition visionL,
+     messages::FieldObstacles::Obstacle::ObstaclePosition visionM,
+     messages::FieldObstacles::Obstacle::ObstaclePosition visionR,
+     messages::FieldObstacles::Obstacle::ObstaclePosition arms);
 
     // Checks average of the appropriate buffer and acts accordingly
     messages::FieldObstacles::Obstacle::ObstaclePosition
@@ -121,11 +124,11 @@ private:
     std::list<float> SWDists, WDists, NWDists, NDists, NEDists, EDists, SEDists;
     // std::list<float> WBearings, NWBearings, NBearings, NEBearings, EBearings;
 
-    // Global buffer that is updated every vision frame to show all obstacles
-    int visionObstacleBuffer[NUM_DIRECTIONS];
+    // Global buffer that is updated every frame to show all obstacles
+    int obstacleBuffer[NUM_DIRECTIONS];
 
     // Global array that keeps avg distance of obstacle in given direction
-    float visionObstacleDistances[NUM_DIRECTIONS];
+    float obstacleDistances[NUM_DIRECTIONS];
 
     // Keeps a list of the obstacle message type locations
     messages::FieldObstacles::Obstacle::ObstaclePosition

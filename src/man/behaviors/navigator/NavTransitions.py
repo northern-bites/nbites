@@ -27,58 +27,46 @@ def shouldDodge(nav):
     if not states.goToPosition.avoidObstacles:
         return False
 
-    states.dodge.DDirects = (nav.brain.interface.fieldObstacles.obstacle(0).NONE,
-                      nav.brain.interface.fieldObstacles.obstacle(0).NORTH,
-                      nav.brain.interface.fieldObstacles.obstacle(0).NORTHEAST,
-                      nav.brain.interface.fieldObstacles.obstacle(0).EAST,
-                      nav.brain.interface.fieldObstacles.obstacle(0).SOUTHEAST,
-                      nav.brain.interface.fieldObstacles.obstacle(0).SOUTH,
-                      nav.brain.interface.fieldObstacles.obstacle(0).SOUTHWEST,
-                      nav.brain.interface.fieldObstacles.obstacle(0).WEST,
-                      nav.brain.interface.fieldObstacles.obstacle(0).NORTHWEST
-    )
-
-    # Get the obstacle model
-    info = [0.] * 9 #8 directions
     obsts = nav.brain.interface.fieldObstacles
-    size = nav.brain.interface.fieldObstacles.obstacle_size()
+    states.dodge.DDirects = ( obsts.obstacle(0).NONE,
+                              obsts.obstacle(0).NORTH,
+                              obsts.obstacle(0).NORTHEAST,
+                              obsts.obstacle(0).EAST,
+                              obsts.obstacle(0).SOUTHEAST,
+                              obsts.obstacle(0).SOUTH,
+                              obsts.obstacle(0).SOUTHWEST,
+                              obsts.obstacle(0).WEST,
+                              obsts.obstacle(0).NORTHWEST )
+
+    info = [0.] * 9 #8 directions
     setPosition = False
 
     # Get relative robot desitnation
     relLoc = helper.getRelativeDestination(nav.brain.loc,
-                                            states.goToPosition.dest)
-
+                                           states.goToPosition.dest)
     walkingDest = getDirection(relLoc.relH)
-    destR = int(walkingDest) + 1
-    destL = int(walkingDest) - 1
-    if destR > 8:
-        destR = 1
-    if destL < 1:
-        destL = 8
 
-    for i in range(size):
-        curr_obst = obsts.obstacle(i)
-        if ((curr_obst.position is not curr_obst.position.NONE) and
-            curr_obst.distance < constants.DONE_DODGE_DIST):
-            info[int(curr_obst.position)] = curr_obst.distance
+    print "DEST: ", walkingDest
+
+    for i in range(1, len(nav.brain.obstacles)):
+        if (nav.brain.obstacles[i] != 0.0 and
+            nav.brain.obstacles[i] < constants.DODGE_DIST):
+            info[i] = nav.brain.obstacles[i]
             setPosition = True
-            # Only dodge if I am walking towards the obstacle
-            # if (curr_obst.position == walkingDest or
-            #     int(curr_obst.position) == destR or
-            #     int(curr_obst.position) == destL):
-            #     setPosition = True
+
+    print "INFO: ", info
 
     if setPosition:
         states.dodge.targetDest = walkingDest
         states.dodge.positions = info
-        doneDodging.targetDest = walkingDest
-        doneDodging.positions = info
+        # doneDodging.targetDest = walkingDest
+        # doneDodging.positions = info
         return True
 
     return False
 
-
 def getDirection(h):
+    print "h = ", h
     if (h < helper.constants.ZONE_WIDTH * -7. or
        h > helper.constants.ZONE_WIDTH * 7.):
         # SOUTH
@@ -107,22 +95,45 @@ def getDirection(h):
 
 # Check if an obstacle is no longer there, or if we've completed the dodge
 def doneDodging(nav):
-    destR = int(doneDodging.targetDest) + 1
-    destL = int(doneDodging.targetDest) - 1
-    if destR > 8:
-        destR = 1
-    if destL < 1:
-        destL = 8
-
     noObstacles = True
-    fieldObs = nav.brain.interface.fieldObstacles
-    for i in range(len(doneDodging.positions)):
-        if (doneDodging.positions[i] < constants.DONE_DODGE_DIST and
-            doneDodging.positions[i] is not fieldObs.obstacle(0).position.NONE):
-            noObstacles = False
-            break
+    # same = True
 
-    return (nav.brain.interface.motionStatus.standing or noObstacles)
+    for i in range(1, len(nav.brain.obstacles)):
+        if (nav.brain.obstacles[i] != 0.0 and
+            nav.brain.obstacles[i] < constants.DODGE_DIST):
+            noObstacles = False
+
+    print "DODGE DONE ", nav.brain.obstacles
+    print noObstacles
+
+    return (atDestination(nav) or noObstacles)
+
+
+    # fieldObs = nav.brain.interface.fieldObstacles
+    # for i in range(1, len(doneDodging.positions)):
+    #     if (doneDodging.positions[i] < constants.DONE_DODGE_DIST and
+    #         doneDodging.positions[i] is not fieldObs.obstacle(0).position.NONE):
+    #         noObstacles = False
+    #     if (doneDodging.old[i] != doneDodging.positions[i]):
+    #         same = False
+    #     doneDodging.old[i] = doneDodging.positions[i]
+
+    # if same:
+    #     doneDodging.count = doneDodging.count + 1
+
+    # print "COUNT = ", doneDodging.count
+
+    # if doneDodging.count > 180:
+    #     doneDodging.count = 0
+    #     print "count big"
+    #     return True
+
+    # print "done dodging: ", doneDodging.positions
+    # # print "     motion status = ", nav.brain.interface.motionStatus.standing
+    # print "at dest: ", atDestination(nav)
+    # print "no obst = ", noObstacles
+    # return (nav.brain.interface.motionStatus.standing or noObstacles)
+
 
 def notAtLocPosition(nav):
     return not atDestination(nav)

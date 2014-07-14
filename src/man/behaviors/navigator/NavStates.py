@@ -51,7 +51,7 @@ def goToPosition(nav):
             fieldDest = RobotLocation(goToPosition.dest.x, goToPosition.dest.y, 0)
             relDest = nav.brain.loc.relativeRobotLocationOf(fieldDest)
             relDest.relH = nav.brain.loc.getRelativeBearing(fieldDest)
-        
+
         HEADING_ADAPT_CUTOFF = 103
         DISTANCE_ADAPT_CUTOFF = 10
 
@@ -132,42 +132,33 @@ def dodge(nav):
     if nav.firstFrame():
         # dodge.positions[0] is position.NONE, so direction numbers are their own index
         for i in range(len(order)):
-            temp = int(dodge.targetDest) + order[i]
-            if temp > 8:
-                temp = temp - 8
-            elif temp < 1:
-                temp = temp + 8
-            if (temp == 3 or temp == 7):
-                continue
+            temp = getIndex(int(dodge.targetDest) + order[i])
             # if there is no obstacle in this direction
             if not dodge.positions[int(dodge.DDirects[temp])]:
-                numL = int(dodge.DDirects[temp] - 1)
-                if numL < 1:
-                    numL = 8 # loops around to last indexed direction
-                numR = int(dodge.DDirects[temp] + 1)
-                if numR > 8:
-                    numR = 1 # loops to first indexed direction
+                numL = getIndex(int(dodge.DDirects[temp] - 1))
+                numR = getIndex(int(dodge.DDirects[temp] + 1))
                 # if no obstacles in my two surrounding dodge.DDirects, go in my direction
                 if not dodge.positions[numL] and not dodge.positions[numR]:
                     # Let's go here!
+                    print "Dodged at ", int(dodge.DDirects[temp])
                     dest = RelRobotLocation(constants.DGE_DESTS[temp-1][0],
                                             constants.DGE_DESTS[temp-1][1],
                                             constants.DGE_DESTS[temp-1][2])
-                    helper.setOdometryDestination(nav, dest)
+                    # dest = RelRobotLocation(15, 0, 0)
+                    helper.setDestinationWalk(nav, dest)
+                    # helper.setOdometryDestination(nav, dest)
                     return Transition.getNextState(nav, dodge)
 
         # if we have not returned yet, let's just find a path that is open
         for i in range(len(order)):
-            temp = int(dodge.targetDest) + order[i]
-            if temp > 8:
-                temp = temp - 8
-            elif temp < 1:
-                temp = temp + 8
+            temp = getIndex(int(dodge.targetDest) + order[i])
             if not dodge.positions[int(dodge.DDirects[temp])]:
-                dest = RelRobotLocation(constants.DGE_DESTS[temp+1][0],
-                                    constants.DGE_DESTS[temp+1][1],
-                                    constants.DGE_DESTS[temp+1][2])
-                helper.setOdometryDestination(nav, dest)
+                dest = RelRobotLocation(constants.DGE_DESTS[temp-1][0],
+                                    constants.DGE_DESTS[temp-1][1],
+                                    constants.DGE_DESTS[temp-1][2])
+                # dest = RelRobotLocation(15, 0, 0)
+                helper.setDestinationWalk(nav, dest)
+                # helper.setOdometryDestination(nav, dest)
                 return Transition.getNextState(nav, dodge)
 
         # if i am here.... something seriously wrong!!
@@ -214,6 +205,14 @@ def dodge(nav):
     #     helper.setOdometryDestination(nav, dodgeDest)
 
     # return Transition.getNextState(nav, dodge)
+
+def getIndex(num):
+    if num <=8 and num >= 1:
+        return num
+    elif num > 8:
+        return num - 8
+    else:
+        return num + 8
 
 # Quick stand to stabilize from the dodge.
 def briefStand(nav):
