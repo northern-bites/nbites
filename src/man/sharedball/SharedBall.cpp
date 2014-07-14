@@ -30,8 +30,6 @@ void SharedBallModule::run_()
     reliability = 0;
 
     // this is in case we have 0 robots on: when these var. wont' get set
-    x = -100;
-    y = -100;
     ballOn = false;
 
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++)
