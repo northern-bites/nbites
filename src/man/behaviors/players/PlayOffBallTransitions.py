@@ -71,7 +71,7 @@ def shouldFindFlippedSharedBall(player):
     return player.sharedBallCloseCount >= 60
 
 def shouldStopLookingForSharedBall(player):
-    return player.sharedBallOffCount >= 30
+    return player.sharedBallOffCount >= 105
 
 def shouldStopLookingForFlippedSharedBall(player):
     return shouldFindFlippedSharedBall(player) or shouldStopLookingForSharedBall(player)
