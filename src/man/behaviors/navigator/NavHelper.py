@@ -114,6 +114,18 @@ def setOdometryDestination(nav, dest, gain = 1.0):
     # Mark this message for sending
     command.timestamp = int(nav.brain.time * 1000)
 
+def setDestinationWalk(nav, dest, gain = 1.0):
+    command = nav.brain.interface.bodyMotionCommand
+    command.type = command.CommandType.DESTINATION_WALK
+
+    command.dest.rel_x = dest.relX
+    command.dest.rel_y = dest.relY
+    command.dest.rel_h = dest.relH
+
+    command.dest.gain = gain
+
+    command.timestamp = int(nav.brain.time * 1000)
+
 def setSpeed(nav, speeds):
     """
     Wrapper method to easily change the walk vector of the robot
