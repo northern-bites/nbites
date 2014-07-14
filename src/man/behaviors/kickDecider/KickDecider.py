@@ -99,12 +99,14 @@ class KickDecider(object):
 
         return (kick for kick in self.possibleKicks).next().next()
 
-    def bigKicksAsapOnGoal(self):
+    def frontKicksAsapOnGoal(self):
         self.brain.player.motionKick = False
 
         self.kicks = []
         self.kicks.append(kicks.LEFT_BIG_KICK)
         self.kicks.append(kicks.RIGHT_BIG_KICK)
+        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
 
         self.scoreKick = self.minimizeDistanceToGoal
         
@@ -343,11 +345,9 @@ class KickDecider(object):
         if (not self.checkObstacle(1, 200) and 
             not self.checkObstacle(1, 100) and
             not self.checkObstacle(8, 100)): 
-            # TODO more precision asked for by filter
-            # TODO include straight kick also
-            bigKick = self.bigKicksAsapOnGoal()
-            if bigKick:
-                return bigKick
+            timeAndSpace = self.frontKicksAsapOnGoal() # TODO ask for more precision here?
+            if timeAndSpace:
+                return timeAndSpace
 
             if clearing:
                 timeAndSpace = self.allKicksAsap()
