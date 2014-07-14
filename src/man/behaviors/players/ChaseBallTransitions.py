@@ -176,3 +176,11 @@ def shouldWalkFindBall(player):
     If we've been spinFindBall-ing too long we should walk
     """
     return player.stateTime > constants.WALK_FIND_BALL_TIME_THRESH
+
+def shouldChangeKickingStrategy(player):
+    """
+    It is the end of the game and we are loosing. Time to kick more aggresively!
+    """
+    return (player.brain.gameState.have_remote_gc and 
+            player.brain.gameState.secs_remaining <= 30 and
+            player.brain.theirScore > player.brain.ourScore)

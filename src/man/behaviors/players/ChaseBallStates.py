@@ -56,11 +56,10 @@ def prepareForKick(player):
         player.brain.nav.stand()
 
     player.inKickingState = True
-    # if roleConstants.isDefender(player.role):
-    #     player.kick = player.decider.defender()
-    # else:
-    #     player.kick = player.decider.attacker()
-    player.kick = player.decider.obstacleAware()
+    if transitions.shouldChangeKickingStrategy(player):
+        player.kick = player.decider.timeForSomeHeroics()
+    else:
+        player.kick = player.decider.obstacleAware()
 
     return player.goNow('orbitBall')
 
