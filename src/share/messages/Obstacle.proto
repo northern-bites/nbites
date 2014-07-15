@@ -18,7 +18,7 @@ message FieldObstacles
         }
 
         optional ObstaclePosition position = 1;
-	optional float distance = 2;
+        optional float distance = 2;
     }
     repeated Obstacle obstacle = 1;
 }

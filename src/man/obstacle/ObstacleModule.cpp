@@ -102,7 +102,6 @@ void ObstacleModule::run_()
     FieldObstacles::Obstacle*temp = current.get()->add_obstacle();
     temp->set_position(arms);
     temp->set_distance(1.f);
-    // temp->set_type(FieldObstacles::Obstacle::EMPTY);
 
     obstacleOut.setMessage(current);
 
@@ -154,11 +153,15 @@ ObstacleModule::processArms(const messages::ArmContactState& input)
     if ((input.right_push_direction() ==
          ArmContactState::SOUTH ||
          input.right_push_direction() ==
-         ArmContactState::SOUTHEAST) &&
+         ArmContactState::SOUTHEAST ||
+         input.right_push_direction() ==
+         ArmContactState::SOUTHWEST) &&
         (input.left_push_direction() ==
          ArmContactState::SOUTH ||
          input.left_push_direction() ==
-         ArmContactState::SOUTHWEST))
+         ArmContactState::SOUTHWEST ||
+         input.left_push_direction() ==
+         ArmContactState::SOUTHEAST))
     {
         return FieldObstacles::Obstacle::NORTH;
     }
@@ -166,11 +169,15 @@ ObstacleModule::processArms(const messages::ArmContactState& input)
     else if ((input.right_push_direction() ==
               ArmContactState::NORTH ||
               input.right_push_direction() ==
-              ArmContactState::NORTHEAST) &&
+              ArmContactState::NORTHEAST ||
+              input.right_push_direction() ==
+              ArmContactState::NORTHWEST) &&
              (input.left_push_direction() ==
               ArmContactState::NORTH ||
               input.left_push_direction() ==
-              ArmContactState::NORTHWEST))
+              ArmContactState::NORTHWEST ||
+              input.left_push_direction() ==
+              ArmContactState::NORTHEAST))
     {
         return FieldObstacles::Obstacle::SOUTH;
     }
