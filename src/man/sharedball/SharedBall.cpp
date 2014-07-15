@@ -19,6 +19,18 @@ SharedBallModule::SharedBallModule(int playerNumber) :
     my_num = playerNumber;
 }
 
+int inNoFlipZone(float xx, float yy)
+{
+    if ( (xx > MIDFIELD_X - TOO_CLOSE_TO_MIDFIELD_X &&
+          xx < MIDFIELD_X + TOO_CLOSE_TO_MIDFIELD_X) &&
+         (yy > MIDFIELD_Y - TOO_CLOSE_TO_MIDFIELD_Y &&
+          yy < MIDFIELD_Y + TOO_CLOSE_TO_MIDFIELD_Y) )
+    {
+        return 1;
+    }
+    return 0;
+}
+
 SharedBallModule::~SharedBallModule()
 {
 }
@@ -70,8 +82,7 @@ void SharedBallModule::run_()
     sharedBallResetMessage.get()->set_h(reseth);
     sharedBallResetMessage.get()->set_timestamp(timestamp);
 //    sharedBallResetMessage.get()->set_uncert(flippedRobot);
-    // TODO turn back on after more extensive testing
-    // sharedBallReset.setMessage(sharedBallResetMessage);
+    sharedBallReset.setMessage(sharedBallResetMessage);
 }
 
 /* Makes groups for each robot that include those other robots who
@@ -97,7 +108,8 @@ void SharedBallModule::chooseRobots()
 
         for (int j = 0; j < NUM_PLAYERS_PER_TEAM; j++)
         {
-            if (!messages[i].ball_on() || !messages[j].ball_on())
+            if (!messages[i].ball_on() || !messages[j].ball_on()
+                || !messages[i].active() || !messages[j].active())
             {
                 inEstimate[i][j] = 0;
                 continue;
@@ -251,11 +263,8 @@ void SharedBallModule::checkForPlayerFlip()
         }
 
         calculateBallCoords(i);
-        // if my ball is in no-flip zone-> return! We don't want to flip me!
-        if ( (ballX[i] > MIDFIELD_X - TOO_CLOSE_TO_MIDFIELD_X &&
-              ballX[i] < MIDFIELD_X + TOO_CLOSE_TO_MIDFIELD_X) &&
-             (ballY[i] > MIDFIELD_Y - TOO_CLOSE_TO_MIDFIELD_Y &&
-              ballY[i] < MIDFIELD_Y + TOO_CLOSE_TO_MIDFIELD_Y) ) {
+        // if my ball or sharedball is in no-flip zone-> don't flip!
+        if (inNoFlipZone(ballX[i], ballY[i]) || inNoFlipZone(x, y)) {
             return;
 //TOOL: comment out the return and uncomment the continue statement.
 //            continue;
@@ -291,8 +300,14 @@ void SharedBallModule::checkForPlayerFlip()
             if (reseth > 180){
                 reseth -= 360;
             }
-            timestamp = messages[i].timestamp();
+            timestamp = int(messages[i].timestamp());
             flippedRobot = float(i + 1);
+            std::cout<<"FLIPPED! I am "<<my_num<<" and I flipped with reliability "
+                     <<reliability<<"!"<<std::endl;
+            std::cout<<"I flipped from "<<messages[i].my_x()<<", "
+                     <<messages[i].my_y()<<std::endl;
+            std::cout<<"I flipped to "<<flipX<<", "<<flipY<<std::endl;
+            std::cout<<"...Because shared ball is at "<<x<<", "<<y<<std::endl;
         }
 //TOOL: uncomment bracket for "for" loop!
 //    }

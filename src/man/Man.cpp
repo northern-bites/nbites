@@ -206,6 +206,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
     behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
     behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
+    behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);
 
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
