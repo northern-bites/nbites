@@ -6,6 +6,7 @@ import noggin_constants as nogginConstants
 from math import fabs
 from ..util import *
 from .. import SweetMoves
+from . import RoleConstants as roleConstants
 
 ### NORMAL PLAY ###
 @superState('gameControllerResponder')
