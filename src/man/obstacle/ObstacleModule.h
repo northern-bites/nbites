@@ -108,8 +108,7 @@ protected:
     void updateObstacleBuffer
     (messages::FieldObstacles::Obstacle::ObstaclePosition visionL,
      messages::FieldObstacles::Obstacle::ObstaclePosition visionM,
-     messages::FieldObstacles::Obstacle::ObstaclePosition visionR,
-     messages::FieldObstacles::Obstacle::ObstaclePosition arms);
+     messages::FieldObstacles::Obstacle::ObstaclePosition visionR);
 
     // Checks average of the appropriate buffer and acts accordingly
     messages::FieldObstacles::Obstacle::ObstaclePosition
