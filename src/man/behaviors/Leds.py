@@ -305,7 +305,7 @@ class Leds():
 
         if SHAREDFLIP_LEDS:
             if ((self.oldFlipTime != self.brain.interface.sharedFlip.timestamp
-                 or self.flashingCount < 150) and self.flippingCount % 16 < 8):
+                 or self.flashingCount < 150) and self.flippingCount % 20 < 10):
                 self.oldFlipTime = self.brain.interface.sharedFlip.timestamp
                 if self.flashingCount >= 150:
                     self.flashingCount = 0

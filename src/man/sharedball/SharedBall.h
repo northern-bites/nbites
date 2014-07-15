@@ -1,5 +1,7 @@
 #pragma once
 
+#include "DebugConfig.h"
+
 #include "RoboGrams.h"
 #include "Common.h"
 
@@ -10,6 +12,7 @@
 #include "WorldModel.pb.h"
 #include "BallModel.pb.h"
 #include "RobotLocation.pb.h"
+#include "BallModel.pb.h"
 
 /**
  *
@@ -67,6 +70,10 @@ public:
     virtual void run_();
 
     portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
+    portals::InPortal<messages::RobotLocation> locIn;
+    portals::InPortal<messages::FilteredBall> ballIn;
+
+
     portals::OutPortal<messages::SharedBall> sharedBallOutput;
     portals::OutPortal<messages::RobotLocation> sharedBallReset;
 
@@ -82,11 +89,16 @@ private:
     int getQuadrantNumber(int i);
     bool inGoalieBox(float x, float y);
 
-    messages::WorldModel messages[NUM_PLAYERS_PER_TEAM];
+    messages::WorldModel worldMessages[NUM_PLAYERS_PER_TEAM];
+    messages::FilteredBall myBall;
 
     float x;            //ball x location for a given robot
     float y;            //ball y location for a given robot
-    int my_num;         // my player number
+
+    int my_num;               // my player number
+    float myX;
+    float myY;
+    float myH;
 
     // used for flipping robots
     float resetx;
