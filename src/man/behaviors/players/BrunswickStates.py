@@ -84,7 +84,7 @@ def gameSet(player):
 def gamePlaying(player):
     if player.firstFrame():
         player.inKickingState = False
-        player.inKickOffPlay = kickOff.shouldRunKickOffPlay(player)
+        player.inKickOffPlay = kickOff.shouldRunKickOffPlay(player) and roleConstants.isChaser(player.role)
         player.passBack = False
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
