@@ -304,7 +304,7 @@ FieldObstacles::Obstacle::ObstaclePosition
 ObstacleModule::processVision(float distance, float bearing)
 {
     FieldObstacles::Obstacle::ObstaclePosition dir;
-    float min;
+    float avg;
 
     // Process what direction it is in: act appropriately
     if ( bearing < -5.f*ZONE_WIDTH)
@@ -317,8 +317,8 @@ ObstacleModule::processVision(float distance, float bearing)
         }
 
         dir = FieldObstacles::Obstacle::SOUTHEAST;
-        min = minimum(SEDists);
-        obstacleDistances[int(dir)] = min;
+        avg = average(SEDists);
+        obstacleDistances[int(dir)] = avg;
 
         return dir;
     }
@@ -332,8 +332,8 @@ ObstacleModule::processVision(float distance, float bearing)
         }
 
         dir = FieldObstacles::Obstacle::EAST;
-        min = minimum(EDists);
-        obstacleDistances[int(dir)] = min;
+        avg = average(EDists);
+        obstacleDistances[int(dir)] = avg;
 
         return dir;
     }
@@ -347,8 +347,8 @@ ObstacleModule::processVision(float distance, float bearing)
         }
 
         dir = FieldObstacles::Obstacle::NORTHEAST;
-        min = minimum(NEDists);
-        obstacleDistances[int(dir)] = min;
+        avg = average(NEDists);
+        obstacleDistances[int(dir)] = avg;
 
         return dir;
     }
@@ -362,8 +362,8 @@ ObstacleModule::processVision(float distance, float bearing)
         }
 
         dir = FieldObstacles::Obstacle::NORTH;
-        min = minimum(NDists);
-        obstacleDistances[int(dir)] = min;
+        avg = average(NDists);
+        obstacleDistances[int(dir)] = avg;
 
         return dir;
     }
@@ -377,8 +377,8 @@ ObstacleModule::processVision(float distance, float bearing)
         }
 
         dir = FieldObstacles::Obstacle::NORTHWEST;
-        min = minimum(NWDists);
-        obstacleDistances[int(dir)] = min;
+        avg = average(NWDists);
+        obstacleDistances[int(dir)] = avg;
 
         return dir;
     }
@@ -392,8 +392,8 @@ ObstacleModule::processVision(float distance, float bearing)
         }
 
         dir = FieldObstacles::Obstacle::WEST;
-        min = minimum(WDists);
-        obstacleDistances[int(dir)] = min;
+        avg = average(WDists);
+        obstacleDistances[int(dir)] = avg;
 
         return dir;
     }
@@ -407,8 +407,8 @@ ObstacleModule::processVision(float distance, float bearing)
         }
 
         dir = FieldObstacles::Obstacle::SOUTHWEST;
-        min = minimum(SWDists);
-        obstacleDistances[int(dir)] = min;
+        avg = average(SWDists);
+        obstacleDistances[int(dir)] = avg;
 
         return dir;
     }

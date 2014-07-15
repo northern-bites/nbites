@@ -114,7 +114,7 @@ def setOdometryDestination(nav, dest, gain = 1.0):
     # Mark this message for sending
     command.timestamp = int(nav.brain.time * 1000)
 
-def setDestinationWalk(nav, dest, gain = 1.0):
+def setDestinationWalk(nav, dest, gain = 0.5):
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.DESTINATION_WALK
 

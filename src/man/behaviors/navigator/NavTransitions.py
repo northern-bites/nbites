@@ -99,8 +99,7 @@ def doneDodging(nav):
 
     for i in range(1, len(nav.brain.obstacles)):
         if (nav.brain.obstacles[i] != 0.0 and
-            nav.brain.obstacles[i] < constants.DODGE_DIST and
-            (i >= 7 or i<=3)):
+            nav.brain.obstacles[i] < constants.DODGE_DIST):
             noObstacles = False
 
     print "DODGE DONE ", nav.brain.obstacles
