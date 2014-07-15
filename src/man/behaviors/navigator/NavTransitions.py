@@ -52,15 +52,14 @@ def shouldDodge(nav):
         if (nav.brain.obstacles[i] != 0.0 and
             nav.brain.obstacles[i] < constants.DODGE_DIST):
             info[i] = nav.brain.obstacles[i]
-            setPosition = True
+            if i <= 3 or i >= 7:
+                setPosition = True
 
     print "INFO: ", info
 
     if setPosition:
         states.dodge.targetDest = walkingDest
         states.dodge.positions = info
-        # doneDodging.targetDest = walkingDest
-        # doneDodging.positions = info
         return True
 
     return False
@@ -95,44 +94,17 @@ def getDirection(h):
 # Check if an obstacle is no longer there, or if we've completed the dodge
 def doneDodging(nav):
     noObstacles = True
-    # same = True
 
     for i in range(1, len(nav.brain.obstacles)):
         if (nav.brain.obstacles[i] != 0.0 and
-            nav.brain.obstacles[i] < constants.DODGE_DIST):
+            nav.brain.obstacles[i] < constants.DODGE_DIST and
+            (i <= 3 or i >= 7)):
             noObstacles = False
 
     print "DODGE DONE ", nav.brain.obstacles
     print noObstacles
 
     return (atDestination(nav) or noObstacles)
-
-
-    # fieldObs = nav.brain.interface.fieldObstacles
-    # for i in range(1, len(doneDodging.positions)):
-    #     if (doneDodging.positions[i] < constants.DONE_DODGE_DIST and
-    #         doneDodging.positions[i] is not fieldObs.obstacle(0).position.NONE):
-    #         noObstacles = False
-    #     if (doneDodging.old[i] != doneDodging.positions[i]):
-    #         same = False
-    #     doneDodging.old[i] = doneDodging.positions[i]
-
-    # if same:
-    #     doneDodging.count = doneDodging.count + 1
-
-    # print "COUNT = ", doneDodging.count
-
-    # if doneDodging.count > 180:
-    #     doneDodging.count = 0
-    #     print "count big"
-    #     return True
-
-    # print "done dodging: ", doneDodging.positions
-    # # print "     motion status = ", nav.brain.interface.motionStatus.standing
-    # print "at dest: ", atDestination(nav)
-    # print "no obst = ", noObstacles
-    # return (nav.brain.interface.motionStatus.standing or noObstacles)
-
 
 def notAtLocPosition(nav):
     return not atDestination(nav)

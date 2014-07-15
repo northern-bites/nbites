@@ -99,13 +99,10 @@ void ObstacleModule::run_()
     }
     // std::cout<<std::endl;
 
-    if (!(didReturn))
-    {
-        FieldObstacles::Obstacle*temp = current.get()->add_obstacle();
-        temp->set_position(FieldObstacles::Obstacle::NONE);
-        temp->set_distance(0.f);
-        // temp->set_type(FieldObstacles::Obstacle::EMPTY);
-    }
+    FieldObstacles::Obstacle*temp = current.get()->add_obstacle();
+    temp->set_position(arms);
+    temp->set_distance(1.f);
+    // temp->set_type(FieldObstacles::Obstacle::EMPTY);
 
     obstacleOut.setMessage(current);
 
@@ -308,24 +305,19 @@ ObstacleModule::processVision(float distance, float bearing)
     // Process what direction it is in: act appropriately
     if ( bearing < -5.f*ZONE_WIDTH)
     {
-        std::cout<<"SE: begin"<<std::endl;
         // obstacle to the southeast
         SEDists.push_back(distance);
         if (SEDists.size() > VISION_FRAMES_TO_BUFFER)
         {
             SEDists.pop_front();
         }
-        std::cout<<"SE: middle"<<std::endl;
         dir = FieldObstacles::Obstacle::SOUTHEAST;
         avg = average(SEDists);
         obstacleDistances[int(dir)] = avg;
-        std::cout<<"SE: end"<<std::endl;
         return dir;
     }
     else if ( bearing < -3.f*ZONE_WIDTH )
     {
-        std::cout<<"E: begin"<<std::endl;
-
         // obstacle to the east
         EDists.push_back(distance);
         if (EDists.size() > VISION_FRAMES_TO_BUFFER)
@@ -333,20 +325,14 @@ ObstacleModule::processVision(float distance, float bearing)
             EDists.pop_front();
         }
 
-        std::cout<<"E: middle"<<std::endl;
-
         dir = FieldObstacles::Obstacle::EAST;
         avg = average(EDists);
         obstacleDistances[int(dir)] = avg;
-
-        std::cout<<"E: end"<<std::endl;
 
         return dir;
     }
     else if ( bearing < -ZONE_WIDTH )
     {
-        std::cout<<"NE: begin"<<std::endl;
-
         // obstacle to northeast
         NEDists.push_back(distance);
         if (NEDists.size() > VISION_FRAMES_TO_BUFFER)
@@ -354,20 +340,14 @@ ObstacleModule::processVision(float distance, float bearing)
             NEDists.pop_front();
         }
 
-        std::cout<<"NE: middle"<<std::endl;
-
         dir = FieldObstacles::Obstacle::NORTHEAST;
         avg = average(NEDists);
         obstacleDistances[int(dir)] = avg;
-
-        std::cout<<"NE: end"<<std::endl;
 
         return dir;
     }
     else if ( bearing < ZONE_WIDTH )
     {
-
-            std::cout<<"N: begin"<<std::endl;
         // obstacle to north
         NDists.push_back(distance);
         if (NDists.size() > VISION_FRAMES_TO_BUFFER)
@@ -375,20 +355,14 @@ ObstacleModule::processVision(float distance, float bearing)
             NDists.pop_front();
         }
 
-
-    std::cout<<"N: middle"<<std::endl;
         dir = FieldObstacles::Obstacle::NORTH;
         avg = average(NDists);
         obstacleDistances[int(dir)] = avg;
 
-
-    std::cout<<"N: end"<<std::endl;
         return dir;
     }
     else if ( bearing < 3.f*ZONE_WIDTH )
     {
-
-            std::cout<<"NW: begin"<<std::endl;
         // obstacle to northwest
         NWDists.push_back(distance);
         if (NWDists.size() > VISION_FRAMES_TO_BUFFER)
@@ -396,20 +370,14 @@ ObstacleModule::processVision(float distance, float bearing)
             NWDists.pop_front();
         }
 
-
-    std::cout<<"NW: middle"<<std::endl;
         dir = FieldObstacles::Obstacle::NORTHWEST;
         avg = average(NWDists);
         obstacleDistances[int(dir)] = avg;
 
-
-    std::cout<<"NW: end"<<std::endl;
         return dir;
     }
     else if ( bearing < 5.f*ZONE_WIDTH )
     {
-
-            std::cout<<"W: begin"<<std::endl;
         // obstacle to west
         WDists.push_back(distance);
         if (WDists.size() > VISION_FRAMES_TO_BUFFER)
@@ -417,42 +385,29 @@ ObstacleModule::processVision(float distance, float bearing)
             WDists.pop_front();
         }
 
-
-    std::cout<<"W: middle"<<std::endl;
         dir = FieldObstacles::Obstacle::WEST;
         avg = average(WDists);
         obstacleDistances[int(dir)] = avg;
 
-
-    std::cout<<"W: end"<<std::endl;
         return dir;
     }
     else if ( bearing < 7.f * ZONE_WIDTH )
     {
-
-        std::cout<<"SW: begin"<<std::endl;
         // obstacle to southwest
         SWDists.push_back(distance);
         if (SWDists.size() > VISION_FRAMES_TO_BUFFER)
         {
-            std::cout<<"SW: are we right?"<<std::endl;
             SWDists.pop_front();
-            std::cout<<"SW: NO!"<<std::endl;
         }
 
-
-    std::cout<<"SW: middle"<<std::endl;
         dir = FieldObstacles::Obstacle::SOUTHWEST;
         avg = average(SWDists);
         obstacleDistances[int(dir)] = avg;
 
-
-    std::cout<<"SW: end"<<std::endl;
         return dir;
     }
     else // south
     {
-        std::cout<<"south"<<std::endl;
         return FieldObstacles::Obstacle::NONE;
     }
 }
