@@ -77,5 +77,9 @@ def shouldStopLookingForFlippedSharedBall(player):
     return shouldFindFlippedSharedBall(player) or shouldStopLookingForSharedBall(player)
 
 def shouldBeSupporter(player):
+    if not player.brain.motion.calibrated:
+        player.claimedBall = False
+        return False
+        
     return (ballInBox(player) and
             claimTransitions.shouldCedeClaim(player))

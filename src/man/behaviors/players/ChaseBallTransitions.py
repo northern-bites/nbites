@@ -32,6 +32,10 @@ def shouldSupport(player):
     when in positionAndKickBall don't care if the ball is in our box but do
     want to check who has higher priority claim
     """
+    if not player.brain.motion.calibrated:
+        player.claimedBall = False
+        return False
+        
     return player.brain.ball.vis.frames_on and claimTrans.shouldCedeClaim(player)
 
 def shouldPrepareForKick(player):
