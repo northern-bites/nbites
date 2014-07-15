@@ -28,7 +28,7 @@ def approachBall(player):
             if player.inKickOffPlay:
                 return player.goNow('giveAndGo')
             else:
-                player.shouldKickOff = False
+                return player.goNow('positionAndKickBall')
 
         elif player.penaltyKicking:
             return player.goNow('prepareForPenaltyKick')
@@ -58,7 +58,11 @@ def prepareForKick(player):
         player.brain.nav.stand()
 
     if not player.inKickOffPlay:
-        if roleConstants.isDefender(player.role):
+        if player.shouldKickOff or player.brain.gameController.timeSincePlaying < 10:
+            print "Overriding kick decider for kickoff!"
+            player.shouldKickOff = False
+            player.kick = player.decider.motionKicksAsap()
+        elif roleConstants.isDefender(player.role):
             player.kick = player.decider.defender()
         else:
             player.kick = player.decider.attacker()
