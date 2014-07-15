@@ -19,4 +19,5 @@ docs/*
 *.o
 util/scripts/nbites.bash
 util/scripts/nao_files
+util/scripts/wireless_config/wpa_supplicant.conf
 src/serenity/cache.txt

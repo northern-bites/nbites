@@ -55,7 +55,7 @@ namespace context {
 
 const float CONSENSUS_THRESHOLD = 200.f;
 const float DISTANCE_FOR_FLIP = 100.f;
-const float TOO_CLOSE_TO_MIDFIELD_X = 100.f;
+const float TOO_CLOSE_TO_MIDFIELD_X = 120.f;
 const float TOO_CLOSE_TO_MIDFIELD_Y = FIELD_GREEN_HEIGHT / 3.f;
 
 class SharedBallModule : public portals::Module
