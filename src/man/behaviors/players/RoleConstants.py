@@ -129,7 +129,7 @@ theirKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - \
 #
 # Useful constants can be found in src/share/include/FieldConstants.h
 
-defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X - 70, NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
+defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X - 70, NogginConstants.FIELD_GREEN_HEIGHT)
 
 oddDefenderBoxCautious = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.CENTER_FIELD_Y + 75)
 
@@ -139,11 +139,11 @@ evenDefenderBoxCautious = ((0, NogginConstants.CENTER_FIELD_Y - 75), NogginConst
 oddDefenderBox = defenderBox
 evenDefenderBox = defenderBox
 
-chaserBox = ((0, 0), NogginConstants.FIELD_HEIGHT, NogginConstants.FIELD_WIDTH)
+chaserBox = ((0, 0), NogginConstants.FIELD_WIDTH, NogginConstants.FIELD_HEIGHT)
 
-cherryPickerBox = (((0.5*NogginConstants.FIELD_GREEN_HEIGHT + 0.25*NogginConstants.FIELD_WHITE_HEIGHT), 0),
-                    0.25*NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_X, 
-                    NogginConstants.FIELD_WIDTH)
+cherryPickerBox = (((0.5*NogginConstants.FIELD_GREEN_WIDTH + 0.25*NogginConstants.FIELD_WHITE_WIDTH), 0),
+                    0.25*NogginConstants.FIELD_WHITE_WIDTH + NogginConstants.GREEN_PAD_X, 
+                    NogginConstants.FIELD_HEIGHT)
 
 ### SETS PLAYER STATE PER ROLE
 def setRoleConstants(player, role):
