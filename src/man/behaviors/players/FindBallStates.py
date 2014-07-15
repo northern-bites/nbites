@@ -15,7 +15,7 @@ def findBall(player):
 
         distance = player.brain.ball.distance
         if distance > constants.FAR_BALL_SEARCH_DIST:
-            return player.goNow('farBallSearch')
+            return player.goNow('playOffBall')
             
         bearing = fabs(degrees(player.brain.ball.bearing))
         if distance <= constants.SCRUM_DIST and bearing < constants.SPIN_SEARCH_BEARING:
