@@ -56,9 +56,10 @@ def positionAtHome(player):
         sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
         home.h = player.brain.loc.getRelativeBearing(sharedball)
 
+    fastWalk = role.isCherryPicker(player.role)
     player.brain.nav.goTo(home, precision = nav.HOME,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,
-                          fast = False, pb = False)
+                          fast = fastWalk, pb = False)
 
 @superState('playOffBall')
 @stay
