@@ -1,7 +1,13 @@
 # Finds Aldebaran's libraries
 
-set( AL_DIR $ENV{AL_DIR} )
-message(STATUS "Set $ENV{AL_DIR}/ as the SDK.")
+if( IS_DIRECTORY "${NBITES_DIR}/lib/atomtoolchain/libnaoqi-sysroot/" )
+  set ( AL_DIR "${NBITES_DIR}/lib/naoqi-sdk-2.1.0.19-linux32" )
+else()
+  set ( AL_DIR "${NBITES_DIR}/lib/naoqi-sdk-1.14.5-linux32" )
+endif()
+
+#set( AL_DIR $ENV{AL_DIR} )
+message(STATUS "Set ${AL_DIR} as the SDK.")
 message(STATUS "If this is not correct, edit your nbites.bash.")
 
 if( NOT OFFLINE )
@@ -11,9 +17,15 @@ else()
 endif()
 
 if( NOT OFFLINE )
-  set( ALCOMMON_LIBRARIES
-    ${OE_SYSROOT}/usr/lib/libalcommon.so
-    ${OE_SYSROOT}/usr/lib/libalmemoryfastaccess.so)
+  if( IS_DIRECTORY "${NBITES_DIR}/lib/atomtoolchain/libnaoqi-sysroot/" )
+    set( ALCOMMON_LIBRARIES
+      ${OE_SYSROOT}/lib/libalcommon.so
+      ${OE_SYSROOT}/lib/libalmemoryfastaccess.so)
+  else()
+    set( ALCOMMON_LIBRARIES
+      ${OE_SYSROOT}/usr/lib/libalcommon.so
+      ${OE_SYSROOT}/usr/lib/libalmemoryfastaccess.so)
+  endif()
 else()
   set( CMAKE_PREFIX_PATH ${AL_DIR} )
   set( ALCOMMON_LIBRARIES

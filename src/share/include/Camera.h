@@ -58,6 +58,7 @@ public:
             TOP_WHITE_BALANCE,
             TOP_FADE_TO_BLACK
         };
+        return topSettings;
     }
 
     static const Settings& getBottomSettings() {
