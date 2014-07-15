@@ -76,7 +76,6 @@ void ObstacleModule::run_()
     FieldObstacles::Obstacle::ObstaclePosition
         arms = processArms(armContactIn.message());
 
-
     // update obstacle buffer with new information
     updateObstacleBuffer(visionL, visionM, visionR, arms);
 

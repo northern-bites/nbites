@@ -8,7 +8,9 @@ import itertools
 
 # TODO hierarchy of lower level planners
 # TODO actually use a true array of filters
+# TODO calculates a true destination when kicking to goal destination
 # TODO kicks.py is ugly and not complete
+# TODO use location objects throughout
 # TODO player.motionKick flag is unnecessary
 # TODO document here and on wiki
 class KickDecider(object):
@@ -64,7 +66,7 @@ class KickDecider(object):
 
         return (kick for kick in self.possibleKicks).next().next()
 
-    def frontKicksOrbitOnGoal(self):
+    def frontKicksOrbit(self):
         self.brain.player.motionKick = False
 
         self.kicks = []
@@ -74,7 +76,6 @@ class KickDecider(object):
         self.scoreKick = self.minimizeOrbitTime
 
         self.filters = []
-        self.filters.append(self.crossesGoalLine)
 
         self.clearPossibleKicks()
         self.addShotsOnGoal()
@@ -195,15 +196,12 @@ class KickDecider(object):
     
         self.kicks = []
         if not obstacles[1]:
-            print "Case left kicks"
             self.kicks.append(kicks.M_LEFT_SIDE)
             self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
         if not obstacles[2]:
-            print "Case right kicks"
             self.kicks.append(kicks.M_RIGHT_SIDE)
             self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
         if not self.kicks:
-            print "Case side kicks"
             self.kicks.append(kicks.M_LEFT_SIDE)
             self.kicks.append(kicks.M_RIGHT_SIDE)
 
@@ -362,37 +360,30 @@ class KickDecider(object):
     def obstacleAware(self, clearing = False):
         motionKicksOnGoal = self.motionKicksAsapOnGoal() # TODO avoid when shooting too?
         if motionKicksOnGoal:
-            print "Scoring goal with motion kick!"
             return motionKicksOnGoal
 
         obstacles = [self.checkObstacle(1,75), self.checkObstacle(2,75), self.checkObstacle(8,75)]
         if True in obstacles:
             inScrum = self.motionKicksInScrumAsap(obstacles)
             if inScrum:
-                print "Scrum motion kicking!"
                 return inScrum
 
         if (not self.checkObstacle(1, 150) and 
             not self.checkObstacle(1, 100) and
             not self.checkObstacle(8, 100)): 
-            print "Attempting time and space!"
             timeAndSpace = self.frontKicksAsapOnGoal() # TODO ask for more precision here?
             if timeAndSpace:
-                print  "Time and space shot on goal"
                 return timeAndSpace
 
             if clearing:
                 timeAndSpace = self.allKicksAsap()
                 if timeAndSpace:
-                    print "Clearing it!" # TODO
                     return timeAndSpace
 
         asap = self.motionKicksAsap()
         if asap:
-            print "Motion kicking asap!"
             return asap
         
-        print "Crossing it!" # TODO
         return self.frontKickCrosses()
 
     def timeForSomeHeroics(self):
@@ -400,9 +391,11 @@ class KickDecider(object):
         if asapOnGoal:
             return asapOnGoal
 
-        orbitFrontKickOnGoal = self.frontKicksOrbitOnGoal()
-        if orbitFrontKickOnGoal:
-            return orbitFrontKickOnGoal
+        # TODO hack for Brazil
+        goalCenter = Location(nogginC.FIELD_WHITE_RIGHT_SIDELINE_X, nogginC.MIDFIELD_Y)
+        ball = Location(self.brain.ball.x, self.brain.ball.y)
+        if ball.distTo(goalCenter) <= 200:
+            return self.frontKicksOrbit()
 
         return self.bigKicksOrbit()
 
@@ -448,10 +441,11 @@ class KickDecider(object):
         yield
 
     def filterAndScoreKicks(self, kicks):
-        filteredKicks = kicks
         if self.filters:
             for filt in self.filters:
-                filteredKicks = (kick for kick in filteredKicks if filt(kick))
+                filteredKicks = (kick for kick in kicks if filt(kick))
+        else:
+            filteredKicks = kicks
 
         try:
             yield max(filteredKicks,key=self.scoreKick)
@@ -547,8 +541,6 @@ class KickDecider(object):
 
     ### FILTERS ###
     def inBoundsOrGoal(self, kick):
-        print "In bounds or goal?"
-        print(self.inBounds(kick) or self.crossesGoalLine(kick))
         return self.inBounds(kick) or self.crossesGoalLine(kick)
 
     def inBoundsOrGoalAndForwardProgress(self, kick):
@@ -585,10 +577,6 @@ class KickDecider(object):
         ball = Location(self.brain.ball.x, self.brain.ball.y)
         kickDestination = Location(kick.destinationX, kick.destinationY)
 
-        print "Forward progress?"
-        print goalCenter.distTo(ball)
-        print goalCenter.distTo(kickDestination)
-        print(goalCenter.distTo(ball) > goalCenter.distTo(kickDestination))
         return goalCenter.distTo(ball) > goalCenter.distTo(kickDestination)
 
     ### HELPER FUNCTIONS ###
@@ -605,8 +593,5 @@ class KickDecider(object):
         return newAngle
 
     def checkObstacle(self, position, threshold):
-        print "Obstacle?"
-        print position
-        print self.brain.obstacles[position]
         return (self.brain.obstacles[position] <= threshold and 
                 self.brain.obstacles[position] != 0.0)
