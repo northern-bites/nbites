@@ -42,5 +42,11 @@ mv $LIB_DIR/$NEW_TOOLCHAIN_DIR $LIB_DIR/$TOOLCHAIN
 # Sets nbites.bash correctly (Even though we don't use AL_DIR currently)
 mv $SCRIPTS_DIR/nbites.bash bashBackup
 sed "2 c\export AL_DIR=$LIB_DIR/naoqi-sdk-$VERSION-linux32" bashBackup >> nbites.bash
+rm bashBackup
+
+pushd $NBITES_DIR/src/man
+echo "making clean"
+make clean
+popd
 
 

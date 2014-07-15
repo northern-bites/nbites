@@ -108,8 +108,11 @@ MODULE(WalkingEngine)
   DEFINES_PARAMETER(Vector3BH<>, walkLiftRotation, Vector3BH<>(-0.05f, -0.1f, 0.f)) /**< The amount the swinging foot is rotated while getting lifted */
   DEFINES_PARAMETER(float, walkSupportRotation, 0.f) /**< A rotation added to the supporting foot to boost the com acceleration */
   DEFINES_PARAMETER(Vector3BH<>, walkComLiftOffset, Vector3BH<>(0.f, 0.f, 2.3f)) /**< The height the center of mass is lifted within a single support phase */
+#ifdef NAOQI_2
   DEFINES_PARAMETER(float, walkComBodyRotation, 0.07f) /**< How much the torso is rotated to achieve the center of mass shift along the y-axis */
-
+#else
+  DEFINES_PARAMETER(float, walkComBodyRotation, 0.05f) /**< How much the torso is rotated to achieve the center of mass shift along the y-axis */
+#endif
   DEFINES_PARAMETER(Pose2DBH, speedMax, Pose2DBH(0.5f, Vector2BH<>(120.f, 50.f))) /**< The maximum walking speed (in "size of two steps") */
   DEFINES_PARAMETER(float, speedMaxBackwards, 80.f) /**< The maximum walking speed for backwards walking (in "size of two steps") */
   DEFINES_PARAMETER(Pose2DBH, speedMaxChange, Pose2DBH(0.1f, Vector2BH<>(8.f, 20.f))) /**< The maximum walking speed deceleration that is used to avoid overshooting of the walking target */
