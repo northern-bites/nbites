@@ -44,7 +44,7 @@ public:
     messages::FallStatus        const * fallStatus_ptr;
     messages::WorldModel        const * myWorldModel_ptr;
     messages::StiffStatus       const * stiffStatus_ptr;
-    messages::Obstacle          const * obstacle_ptr;
+    messages::FieldObstacles    const * obstacle_ptr;
     messages::VisionObstacle    const * visionObstacle_ptr;
     messages::SharedBall        const * sharedBall_ptr;
     messages::RobotLocation     const * sharedFlip_ptr;
@@ -133,7 +133,7 @@ public:
     {
         stiffStatus_ptr = msg;
     }
-    void setObstacle_ptr(const messages::Obstacle* msg)
+    void setObstacle_ptr(const messages::FieldObstacles* msg)
     {
         obstacle_ptr = msg;
     }
