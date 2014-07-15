@@ -22,29 +22,31 @@ PANTIME = 1
 
 FIXED_PITCH_VALUE = 20
 
-KICK_DICT = {"L_Side"           : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
-             "R_Side"           : HeadMoves.FIXED_PITCH_LOOK_LEFT,
-             "L_Short_Side"     : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
-             "R_Short_Side"     : HeadMoves.FIXED_PITCH_LOOK_LEFT,
-             "L_Straight"       : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
-             "R_Straight"       : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
-             "L_Short_Straight" : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
-             "R_Short_Straight" : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
-             "L_Quick_Straight" : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
-             "R_Quick_Straight" : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
-             "L_Big_Straight"   : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
-             "R_Big_Straight"   : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
-             "L_Long_Back"      : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
-             "R_Long_Back"      : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
-             "L_Short_Back"     : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
-             "R_Short_Back"     : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+KICK_DICT = {"L_Side"               : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
+             "R_Side"               : HeadMoves.FIXED_PITCH_LOOK_LEFT,
+             "L_Short_Side"         : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
+             "R_Short_Side"         : HeadMoves.FIXED_PITCH_LOOK_LEFT,
+             "L_Straight"           : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "R_Straight"           : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "L_Short_Straight"     : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "R_Short_Straight"     : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "L_Quick_Straight"     : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "R_Quick_Straight"     : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "L_Big_Straight"       : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "R_Big_Straight"       : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "L_Long_Back"          : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "R_Long_Back"          : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "L_Short_Back"         : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "R_Short_Back"         : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "Zellvarro_Left_Kick"  : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "Zellvarro_Right_Kick" : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
 
-             "M_Left_Straight"  : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
-             "M_Right_Straight" : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
-             "M_Left_Chip_Shot" : HeadMoves.FIXED_PITCH_LOOK_LESS_RIGHT,
-             "M_Right_Chip_Shot": HeadMoves.FIXED_PITCH_LOOK_LESS_LEFT,
-             "M_Left_Side"      : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
-             "M_Right_Side"     : HeadMoves.FIXED_PITCH_LOOK_LEFT
+             "M_Left_Straight"      : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "M_Right_Straight"     : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "M_Left_Chip_Shot"     : HeadMoves.FIXED_PITCH_LOOK_LESS_RIGHT,
+             "M_Right_Chip_Shot"    : HeadMoves.FIXED_PITCH_LOOK_LESS_LEFT,
+             "M_Left_Side"          : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
+             "M_Right_Side"         : HeadMoves.FIXED_PITCH_LOOK_LEFT
              }
 # TODO: Test and improve these pans.
 

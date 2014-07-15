@@ -37,8 +37,8 @@ class KickDecider(object):
         self.brain.player.motionKick = False
 
         self.kicks = []
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.ZELLVARRO_LEFT_KICK)
+        self.kicks.append(kicks.ZELLVARRO_RIGHT_KICK)
         self.kicks.append(kicks.LEFT_SIDE_KICK)
         self.kicks.append(kicks.RIGHT_SIDE_KICK)
 
@@ -55,8 +55,8 @@ class KickDecider(object):
         self.brain.player.motionKick = False
         
         self.kicks = []
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.ZELLVARRO_LEFT_KICK)
+        self.kicks.append(kicks.ZELLVARRO_RIGHT_KICK)
 
         self.scoreKick = self.minimizeOrbitTime
 
@@ -87,8 +87,8 @@ class KickDecider(object):
         self.brain.player.motionKick = False
     
         self.kicks = []
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.ZELLVARRO_LEFT_KICK)
+        self.kicks.append(kicks.ZELLVARRO_RIGHT_KICK)
 
         self.scoreKick = self.minimizeDistanceToGoal
         
@@ -175,6 +175,48 @@ class KickDecider(object):
             return k
         except:
             return None
+
+    def sweetMovesForKickOff(self, direction, dest):
+        """
+        direction 0 is a forward kick, direction 1 is a left side pass
+        direction -1 is a right side pass
+        """
+        self.brain.player.motionKick = False
+
+        self.kicks = []
+        if direction == 0:
+            self.kicks.append(kicks.ZELLVARRO_LEFT_KICK)
+            self.kicks.append(kicks.ZELLVARRO_RIGHT_KICK)
+        elif direction == 1:
+            self.kicks.append(kicks.RIGHT_SIDE_KICK)
+        elif direction == -1:
+            self.kicks.append(kicks.LEFT_SIDE_KICK)
+
+        self.scoreKick = self.minimizeOrbitTime
+
+        self.filters = []
+
+        self.clearPossibleKicks()
+        self.addPassesTo(dest)
+
+        return (kick for kick in self.possibleKicks).next().next()
+
+    def sweetMoveCrossToCenter(self):
+        self.brain.player.motionKick = True
+
+        self.kicks = []
+        self.kicks.append(kicks.ZELLVARRO_LEFT_KICK)
+        self.kicks.append(kicks.ZELLVARRO_RIGHT_KICK)
+
+        self.scoreKick = self.minimizeOrbitTime
+
+        self.filters = []
+
+        self.clearPossibleKicks()
+        self.addPassesToFieldCross()
+
+        return (kick for kick in self.possibleKicks).next().next()
+
 
     ### HIGH LEVEL PLANNERS ###
     def attacker(self):

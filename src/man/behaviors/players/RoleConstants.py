@@ -47,6 +47,25 @@ def willRoleSwitch(role):
 def canRoleSwitchTo(role):
     return isChaser(role)
 
+def bothChasersOnField(player):
+    firstChaser = False
+    secondChaser = False
+
+    if isFirstChaser(player.role):
+        firstChaser = True
+    elif isSecondChaser(player.role):
+        secondChaser = True
+
+    for mate in player.brain.teamMembers:
+        if isFirstChaser(mate.role):
+            firstChaser = True
+        elif isSecondChaser(mate.role):
+            secondChaser = True
+    if firstChaser and secondChaser:
+        return True
+
+    return False
+
 ### RANDOM STUFF
 isKickingOff = False # Default is false, changed by pBrunswick or some other if
                      # this is not the case, TODO this is ugly
