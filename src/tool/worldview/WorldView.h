@@ -7,7 +7,7 @@
 
 #include "WorldViewPainter.h"
 
-#include "sharedball/SharedBall.h"
+// #include "sharedball/SharedBall.h"
 #include "comm/CommModule.h"
 #include "Common.h"
 #include "RoboGrams.h"
@@ -24,7 +24,7 @@ public:
     WorldView(QWidget* parent = 0);
 
     portals::InPortal<messages::WorldModel> commIn[NUM_PLAYERS_PER_TEAM];
-    portals::InPortal<messages::SharedBall> sharedIn;
+    // portals::InPortal<messages::SharedBall> sharedIn;
 
 protected:
     virtual void run_();
@@ -43,7 +43,7 @@ protected:
 
     man::DiagramThread commThread;
     man::comm::CommModule wviewComm;
-    man::context::SharedBallModule wviewShared;
+    // man::context::SharedBallModule wviewShared;
 
     int newTeam;
     QMutex mutex;

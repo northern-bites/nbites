@@ -15,8 +15,8 @@ BALL_LEDS = True
 GOAL_LEDS = True
 ROLESWITCH_LEDS = True
 CALIBRATION_LEDS = True
-COMM_LEDS = True
 SHAREDFLIP_LEDS = True
+COMM_LEDS = True
 
 ####### LED DEFINITIONS #############
 LED_OFF = 0
@@ -24,19 +24,9 @@ LED_ON = 1
 
 #The order here must match the order of the string defined in Lights.h
 # and in ALLedNames.h
-NUM_LED_GROUPS = 39
+NUM_LED_GROUPS = 29
 
-(LEFT_SHAREDFLIP_ONE_LED,
-LEFT_SHAREDFLIP_TWO_LED,
-LEFT_SHAREDFLIP_THREE_LED,
-LEFT_SHAREDFLIP_FOUR_LED,
-LEFT_SHAREDFLIP_FIVE_LED,
-RIGHT_SHAREDFLIP_ONE_LED,
-RIGHT_SHAREDFLIP_TWO_LED,
-RIGHT_SHAREDFLIP_THREE_LED,
-RIGHT_SHAREDFLIP_FOUR_LED,
-RIGHT_SHAREDFLIP_FIVE_LED,
-LEFT_CALIBRATION_ONE_LED,
+(LEFT_CALIBRATION_ONE_LED,
 LEFT_CALIBRATION_TWO_LED,
 LEFT_CALIBRATION_THREE_LED,
 LEFT_CALIBRATION_FOUR_LED,
@@ -131,28 +121,6 @@ RIGHT_CALIBRATION_TWO_OFF_LEDS  = ((RIGHT_CALIBRATION_TWO_LED, OFF, NOW),)
 RIGHT_CALIBRATION_THREE_OFF_LEDS= ((RIGHT_CALIBRATION_THREE_LED, OFF, NOW),)
 RIGHT_CALIBRATION_FOUR_OFF_LEDS = ((RIGHT_CALIBRATION_FOUR_LED, OFF, NOW),)
 RIGHT_CALIBRATION_FIVE_OFF_LEDS = ((RIGHT_CALIBRATION_FIVE_LED, OFF, NOW),)
-
-##### SHAREDBALL FLIPPING #####
-LEFT_SHAREDFLIP_ONE_LEDS   = ((LEFT_SHAREDFLIP_ONE_LED, BLUE, NOW),)
-LEFT_SHAREDFLIP_TWO_LEDS   = ((LEFT_SHAREDFLIP_TWO_LED, BLUE, NOW),)
-LEFT_SHAREDFLIP_THREE_LEDS = ((LEFT_SHAREDFLIP_THREE_LED, BLUE, NOW),)
-LEFT_SHAREDFLIP_FOUR_LEDS  = ((LEFT_SHAREDFLIP_FOUR_LED, BLUE, NOW),)
-LEFT_SHAREDFLIP_FIVE_LEDS  = ((LEFT_SHAREDFLIP_FIVE_LED, BLUE, NOW),)
-RIGHT_SHAREDFLIP_ONE_LEDS  = ((RIGHT_SHAREDFLIP_ONE_LED, BLUE, NOW),)
-RIGHT_SHAREDFLIP_TWO_LEDS  = ((RIGHT_SHAREDFLIP_TWO_LED, BLUE, NOW),)
-RIGHT_SHAREDFLIP_THREE_LEDS= ((RIGHT_SHAREDFLIP_THREE_LED, BLUE, NOW),)
-RIGHT_SHAREDFLIP_FOUR_LEDS = ((RIGHT_SHAREDFLIP_FOUR_LED, BLUE, NOW),)
-RIGHT_SHAREDFLIP_FIVE_LEDS = ((RIGHT_SHAREDFLIP_FIVE_LED, BLUE, NOW),)
-LEFT_SHAREDFLIP_ONE_OFF_LEDS   = ((LEFT_SHAREDFLIP_ONE_LED, OFF, NOW),)
-LEFT_SHAREDFLIP_TWO_OFF_LEDS   = ((LEFT_SHAREDFLIP_TWO_LED, OFF, NOW),)
-LEFT_SHAREDFLIP_THREE_OFF_LEDS = ((LEFT_SHAREDFLIP_THREE_LED, OFF, NOW),)
-LEFT_SHAREDFLIP_FOUR_OFF_LEDS  = ((LEFT_SHAREDFLIP_FOUR_LED, OFF, NOW),)
-LEFT_SHAREDFLIP_FIVE_OFF_LEDS  = ((LEFT_SHAREDFLIP_FIVE_LED, OFF, NOW),)
-RIGHT_SHAREDFLIP_ONE_OFF_LEDS  = ((RIGHT_SHAREDFLIP_ONE_LED, OFF, NOW),)
-RIGHT_SHAREDFLIP_TWO_OFF_LEDS  = ((RIGHT_SHAREDFLIP_TWO_LED, OFF, NOW),)
-RIGHT_SHAREDFLIP_THREE_OFF_LEDS= ((RIGHT_SHAREDFLIP_THREE_LED, OFF, NOW),)
-RIGHT_SHAREDFLIP_FOUR_OFF_LEDS = ((RIGHT_SHAREDFLIP_FOUR_LED, OFF, NOW),)
-RIGHT_SHAREDFLIP_FIVE_OFF_LEDS = ((RIGHT_SHAREDFLIP_FIVE_LED, OFF, NOW),)
 
 ##### COMM #####
 LEFT_COMM_ONE_LEDS   = ((LEFT_COMM_ONE_LED, BLUE, NOW),)
@@ -303,38 +271,38 @@ class Leds():
 
             self.calibrationCount = self.calibrationCount + 1
 
-        if SHAREDFLIP_LEDS:
+        # TODO this is a hacky solution to using the same LEDs as calibration
+        if SHAREDFLIP_LEDS and self.brain.motion.calibrated:
             if ((self.oldFlipTime != self.brain.interface.sharedFlip.timestamp
-                 or self.flashingCount < 150) and self.flippingCount % 16 < 8):
+                 or self.flashingCount < 150) and self.flippingCount % 20 < 10):
                 self.oldFlipTime = self.brain.interface.sharedFlip.timestamp
                 if self.flashingCount >= 150:
                     self.flashingCount = 0
                 else:
                     self.flashingCount = self.flashingCount + 1
 
-                self.executeLeds(LEFT_SHAREDFLIP_ONE_LEDS)
-                self.executeLeds(LEFT_SHAREDFLIP_TWO_LEDS)
-                self.executeLeds(LEFT_SHAREDFLIP_THREE_LEDS)
-                self.executeLeds(LEFT_SHAREDFLIP_FOUR_LEDS)
-                self.executeLeds(LEFT_SHAREDFLIP_FIVE_LEDS)
-                self.executeLeds(RIGHT_SHAREDFLIP_ONE_LEDS)
-                self.executeLeds(RIGHT_SHAREDFLIP_TWO_LEDS)
-                self.executeLeds(RIGHT_SHAREDFLIP_THREE_LEDS)
-                self.executeLeds(RIGHT_SHAREDFLIP_FOUR_LEDS)
-                self.executeLeds(RIGHT_SHAREDFLIP_FIVE_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_ONE_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_TWO_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_THREE_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_FOUR_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_FIVE_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_ONE_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_TWO_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_THREE_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_FOUR_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_FIVE_LEDS)
             else:
-                self.executeLeds(LEFT_SHAREDFLIP_ONE_OFF_LEDS)
-                self.executeLeds(LEFT_SHAREDFLIP_TWO_OFF_LEDS)
-                self.executeLeds(LEFT_SHAREDFLIP_THREE_OFF_LEDS)
-                self.executeLeds(LEFT_SHAREDFLIP_FOUR_OFF_LEDS)
-                self.executeLeds(LEFT_SHAREDFLIP_FIVE_OFF_LEDS)
-                self.executeLeds(RIGHT_SHAREDFLIP_ONE_OFF_LEDS)
-                self.executeLeds(RIGHT_SHAREDFLIP_TWO_OFF_LEDS)
-                self.executeLeds(RIGHT_SHAREDFLIP_THREE_OFF_LEDS)
-                self.executeLeds(RIGHT_SHAREDFLIP_FOUR_OFF_LEDS)
-                self.executeLeds(RIGHT_SHAREDFLIP_FIVE_OFF_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_ONE_OFF_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_TWO_OFF_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_THREE_OFF_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_FOUR_OFF_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_FIVE_OFF_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_ONE_OFF_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_TWO_OFF_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_THREE_OFF_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_FOUR_OFF_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_FIVE_OFF_LEDS)
             self.flippingCount = self.flippingCount + 1
-
 
         # If more teammates are added, consider making bottom of right
         # eye into localization uncertainty and using whole ear for comm

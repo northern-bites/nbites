@@ -108,7 +108,6 @@ void VisionModule::updateVisionObstacle() {
     obstacle_data.get()->set_right_bearing(vision->fieldOpenings[2].bearing);
 
     vision_obstacle.setMessage(obstacle_data);
-
 }
 
 void VisionModule::updateVisionBall() {

@@ -95,6 +95,12 @@ class Brain(object):
         self.noFlipFilter = []
         self.flipFilter = []
 
+        # Used for obstacle detection
+        self.obstacles = [0.] * 9
+
+        self.ourScore = 0
+        self.theirScore = 0
+
     def initTeamMembers(self):
         self.teamMembers = []
         for i in xrange(Constants.NUM_PLAYERS_PER_TEAM):
@@ -138,6 +144,7 @@ class Brain(object):
 
         # Update objects
         self.updateVisionObjects()
+        self.updateObstacles()
         self.updateMotion()
         self.updateLoc()
         self.getCommUpdate()
@@ -192,6 +199,14 @@ class Brain(object):
     def getCommUpdate(self):
         self.teamMembers[self.playerNumber - 1].updateMe()
         self.game = self.interface.gameState
+        
+        if self.game.have_remote_gc:
+            for i in range(self.game.team_size()):
+                if self.game.team(i).team_number == self.teamNumber: 
+                    self.ourScore = self.game.team(i).score
+                else:
+                    self.theirScore = self.game.team(i).score
+
         for i in range(len(self.teamMembers)):
             if (i == self.playerNumber - 1):
                 continue
@@ -213,6 +228,14 @@ class Brain(object):
 
         self.yglp = self.interface.visionField.goal_post_l.visual_detection
         self.ygrp = self.interface.visionField.goal_post_r.visual_detection
+
+    def updateObstacles(self):
+        self.obstacles = [0.] * 9
+        size = self.interface.fieldObstacles.obstacle_size()
+        for i in range(size):
+            curr_obst = self.interface.fieldObstacles.obstacle(i)
+            if curr_obst.position is not curr_obst.position.NONE:
+                self.obstacles[int(curr_obst.position)] = curr_obst.distance
 
     def activeTeamMates(self):
         activeMates = 0

@@ -23,11 +23,13 @@ def approachBall(player):
     if player.firstFrame():
         player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
                                                  0.8, 10)
-        player.motionKick = False
-        player.inKickingState = False
         player.brain.tracker.trackBall()
         if player.shouldKickOff:
-            player.brain.nav.chaseBall(Navigator.MEDIUM_SPEED, fast = True)
+            if player.inKickOffPlay:
+                return player.goNow('giveAndGo')
+            else:
+                return player.goNow('positionAndKickBall')
+
         elif player.penaltyKicking:
             return player.goNow('prepareForPenaltyKick')
         else:
@@ -47,7 +49,7 @@ def positionAndKickBall(player):
     """
     Superstate used to position for kick and kick the ball when close enough.
     """
-    player.inKickingState = True
+    pass
 
 @superState('positionAndKickBall')
 def prepareForKick(player):
@@ -55,11 +57,21 @@ def prepareForKick(player):
         player.decider = KickDecider.KickDecider(player.brain)
         player.brain.nav.stand()
 
-    player.inKickingState = True
-    if roleConstants.isDefender(player.role):
-        player.kick = player.decider.defender()
-    else:
-        player.kick = player.decider.attacker()
+    if not player.inKickOffPlay:
+        if player.shouldKickOff or player.brain.gameController.timeSincePlaying < 10:
+            print "Overriding kick decider for kickoff!"
+            player.shouldKickOff = False
+            player.kick = player.decider.motionKicksAsap()
+        else:
+            # if transitions.shouldChangeKickingStrategy(player):
+            #     print "Time for some heroics!"
+            #     player.kick = player.decider.timeForSomeHeroics()
+            # else:
+            player.kick = player.decider.obstacleAware(roleConstants.isDefender(player.role))
+        player.inKickingState = True
+
+    elif player.finishedPlay:
+        player.inKickOffPlay = False
 
     return player.goNow('orbitBall')
 

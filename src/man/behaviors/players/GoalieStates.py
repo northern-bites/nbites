@@ -64,6 +64,8 @@ def gameSet(player):
     if (not player.brain.motion.calibrated):
         return player.stay()
 
+    player.brain.resetGoalieLocalization()
+
     return player.stay()
 
 @superState('gameControllerResponder')

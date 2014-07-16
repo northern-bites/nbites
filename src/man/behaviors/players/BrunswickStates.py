@@ -7,6 +7,7 @@ from math import fabs
 from ..util import *
 from .. import SweetMoves
 from . import RoleConstants as roleConstants
+import KickOffConstants as kickOff
 
 ### NORMAL PLAY ###
 @superState('gameControllerResponder')
@@ -66,7 +67,7 @@ def gameSet(player):
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.brain.fallController.enabled = False
+        player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.performBasicPan()
 
@@ -76,13 +77,17 @@ def gameSet(player):
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
         return player.stay()
-
+    
     return player.stay()
 
 @superState('gameControllerResponder')
 def gamePlaying(player):
     if player.firstFrame():
         player.inKickingState = False
+        player.inKickOffPlay = (kickOff.shouldRunKickOffPlay(player) and 
+                               (roleConstants.isChaser(player.role) or 
+                                roleConstants.isCherryPicker(player.role)))
+        player.passBack = False
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
@@ -101,12 +106,15 @@ def gamePlaying(player):
     if not player.brain.motion.calibrated:
         return player.stay()
 
-    if (player.isKickingOff and player.brain.gameController.ownKickOff and
-        player.brain.gameController.timeSincePlaying < 10):
-        player.shouldKickOff = True
-        return player.goNow('approachBall')
-    elif player.brain.gameController.timeSincePlaying < 10:
-        return player.goNow('waitForKickoff')
+    if player.brain.gameController.timeSincePlaying < 10:
+        if player.brain.gameController.ownKickOff:
+            if roleConstants.isChaser(player.role) or roleConstants.isCherryPicker(player.role):
+                player.shouldKickOff = True
+                return player.goNow('approachBall')
+            else:
+                return player.goNow('playOffBall')
+        else:
+            return player.goNow('waitForKickoff')
     return player.goNow('playOffBall')
 
 
