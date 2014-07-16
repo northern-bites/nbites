@@ -4,8 +4,6 @@ from objects import RobotLocation
 ### ROLE CONFIGURATION
 # Possibilites are the following:
 # Goalie, LeftDefender, RightDefender, FirstChaser, SecondChaser, CherryPicker
-roleConfiguration = moderate
-
 moderate = {1: "Goalie",
             2: "LeftDefender",
             3: "RightDefender",
@@ -23,6 +21,8 @@ cautious = {1: "Goalie",
             3: "RightDefender",
             4: "FirstChaser",
             5: "CherryPicker"}
+
+roleConfiguration = moderate
 
 def getRole(role):
     if role < 1:
@@ -84,7 +84,6 @@ oddChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
 oddChaserKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 45,
                                  NogginConstants.OPP_GOALBOX_BOTTOM_Y - 100,
                                  0)
-
 evenChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
                                NogginConstants.FIELD_GREEN_HEIGHT - 100,
                                -90)
@@ -134,7 +133,7 @@ defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X - 70, NogginConstants.FIEL
 oddDefenderBoxCautious = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.CENTER_FIELD_Y + 75)
 
 evenDefenderBoxCautious = ((0, NogginConstants.CENTER_FIELD_Y - 75), NogginConstants.CENTER_FIELD_X, \
-                           NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
+                           NogginConstants.CENTER_FIELD_Y + 75)
 
 oddDefenderBox = defenderBox
 evenDefenderBox = defenderBox

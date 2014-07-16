@@ -10,7 +10,7 @@ from ..GameController import convertStateFormat, convertStateFormatPenaltyShots
 from ..util import *
 
 @defaultState('gameInitial')
-@superState('roleSwitcher')
+@superState('commMonitor')
 def gameControllerResponder(player):
     """
     Superstate for responding to gameState switches and penalties.
