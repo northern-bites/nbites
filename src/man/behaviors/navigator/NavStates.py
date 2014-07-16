@@ -5,6 +5,7 @@ from collections import deque
 from objects import RobotLocation, RelRobotLocation
 from ..util import Transition
 from math import fabs
+from random import random
 
 def scriptedMove(nav):
     '''State that we stay in while doing sweet moves'''
@@ -136,12 +137,16 @@ def dodge(nav):
             # if there is no obstacle in this direction
             if not dodge.positions[temp]:
                 print "DODGE TO ", dodge.DDirects[temp]
-                dest = RelRobotLocation(constants.DGE_DESTS[temp-1][0],
-                                        constants.DGE_DESTS[temp-1][1],
-                                        constants.DGE_DESTS[temp-1][2])
-                helper.setDestination(nav, dest, 0.5)
-                return Transition.getNextState(nav, dodge)
+                dodge.dest = RelRobotLocation(constants.DGE_DESTS[temp-1][0],
+                                              constants.DGE_DESTS[temp-1][1],
+                                              constants.DGE_DESTS[temp-1][2])
+                break
 
+    # TODO the worst hack I have ever written, sorry -- Josh Imhoff
+    dest2 = RelRobotLocation(dodge.dest.relX + random(),
+                             dodge.dest.relY + random(),
+                             dodge.dest.relH + random())
+    helper.setDestination(nav, dest2, 0.5)
     return Transition.getNextState(nav, dodge)
 
 def getIndex(num):
