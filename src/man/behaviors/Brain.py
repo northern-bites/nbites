@@ -97,9 +97,6 @@ class Brain(object):
 
         # Used for obstacle detection
         self.obstacles = [0.] * 9
-        # self.assignors = [] * 9
-        Navigator.navTrans.doneDodging.old = [0.] * 9
-        Navigator.navTrans.doneDodging.count = 0
 
         self.ourScore = 0
         self.theirScore = 0
@@ -236,14 +233,9 @@ class Brain(object):
         self.obstacles = [0.] * 9
         size = self.interface.fieldObstacles.obstacle_size()
         for i in range(size):
-            # self.assignors = self.interface.fieldObstacles.obstacle(0).UNKNOWN
             curr_obst = self.interface.fieldObstacles.obstacle(i)
-            # print i, ": ", curr_obst.position
             if curr_obst.position is not curr_obst.position.NONE:
                 self.obstacles[int(curr_obst.position)] = curr_obst.distance
-                # self.assignors[int(curr_obst.position)] = curr_obst.type
-        # print "IN BRAIN OBST: ", self.obstacles
-        # print self.assignors
 
     def activeTeamMates(self):
         activeMates = 0

@@ -46,6 +46,21 @@ def positionAtHome(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
 
+        home = RobotLocation(player.homePosition.x, player.homePosition.y, player.homePosition.h)
+        if (player.brain.sharedBall.ball_on and player.brain.sharedBall.reliability >= 2 and 
+            role.isDefender(player.role)):
+            sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
+            home.h = player.brain.loc.getRelativeBearing(sharedball)
+        elif (player.brain.sharedBall.ball_on and player.brain.sharedBall.reliability >= 1 and 
+              role.isCherryPicker(player.role)):
+            sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
+            home.h = player.brain.loc.getRelativeBearing(sharedball)
+
+        fastWalk = role.isCherryPicker(player.role)
+        player.brain.nav.goTo(home, precision = nav.HOME,
+                              speed = nav.QUICK_SPEED, avoidObstacles = True,
+                              fast = fastWalk, pb = False)
+
     home = RobotLocation(player.homePosition.x, player.homePosition.y, player.homePosition.h)
     if (player.brain.sharedBall.ball_on and player.brain.sharedBall.reliability >= 2 and 
         role.isDefender(player.role)):
@@ -56,10 +71,7 @@ def positionAtHome(player):
         sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
         home.h = player.brain.loc.getRelativeBearing(sharedball)
 
-    fastWalk = role.isCherryPicker(player.role)
-    player.brain.nav.goTo(home, precision = nav.HOME,
-                          speed = nav.QUICK_SPEED, avoidObstacles = True,
-                          fast = fastWalk, pb = False)
+    player.brain.nav.updateDest(home)
 
 @superState('playOffBall')
 @stay
@@ -82,6 +94,8 @@ def positionAsSupporter(player):
         fast = False
 
     positionAsSupporter.position = getSupporterPosition(player, player.role)
+
+    # TODO don't call goTo every frame
     player.brain.nav.goTo(positionAsSupporter.position, precision = nav.GENERAL_AREA,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,
                           fast = False, pb = False)
@@ -99,10 +113,13 @@ def searchFieldForSharedBall(player):
         player.sharedBallCloseCount = 0
         player.sharedBallOffCount = 0
 
+        sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
+        player.brain.nav.goTo(sharedball, precision = nav.GENERAL_AREA,
+                              speed = nav.QUICK_SPEED, avoidObstacles = True,
+                              fast = True, pb = False)
+
     sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
-    player.brain.nav.goTo(sharedball, precision = nav.GENERAL_AREA,
-                          speed = nav.QUICK_SPEED, avoidObstacles = True,
-                          fast = True, pb = False)
+    player.brain.nav.updateDest(sharedball)
 
     if sharedball.distTo(player.brain.loc) < 100:
         player.sharedBallCloseCount += 1
@@ -152,6 +169,10 @@ def searchFieldByQuad(player):
         player.brain.tracker.trackBall()
         searchFieldByQuad.dest = min(points, key=lambda x:fabs(player.brain.loc.getRelativeBearing(x)))
 
+        player.brain.nav.goTo(searchFieldByQuad.dest, precision = nav.GRAINY,
+                          speed = nav.QUICK_SPEED, avoidObstacles = True,
+                          fast = True, pb = False)
+
     if shared.navAtPosition(player):
         if searchFieldByQuad.dest == quad1Center:
             searchFieldByQuad.dest = quad2Center
@@ -162,9 +183,7 @@ def searchFieldByQuad(player):
         elif searchFieldByQuad.dest == quad4Center:
             searchFieldByQuad.dest = quad3Center
 
-    player.brain.nav.goTo(searchFieldByQuad.dest, precision = nav.GRAINY,
-                          speed = nav.QUICK_SPEED, avoidObstacles = True,
-                          fast = True, pb = False)
+    player.brain.nav.updateDest(searchFieldByQuad.dest)
 
 quad1Center = Location(NogginConstants.CENTER_FIELD_X * .6, NogginConstants.CENTER_FIELD_Y * .6)
 quad2Center = Location(NogginConstants.CENTER_FIELD_X * .6, NogginConstants.CENTER_FIELD_Y * 1.4)

@@ -72,12 +72,12 @@ void ObstacleModule::run_()
         visionR = processVision(visionIn.message().right_dist(),
                                 visionIn.message().right_bearing());
 
+    // update obstacle buffer with new information from vision
+    updateObstacleBuffer(visionL, visionM, visionR);
+
     // Decide arms
     FieldObstacles::Obstacle::ObstaclePosition
         arms = processArms(armContactIn.message());
-
-    // update obstacle buffer with new information
-    updateObstacleBuffer(visionL, visionM, visionR, arms);
 
     // Used to check if there were any obstacles found
     bool didReturn = false;
@@ -99,13 +99,9 @@ void ObstacleModule::run_()
     }
     // std::cout<<std::endl;
 
-    if (!(didReturn))
-    {
-        FieldObstacles::Obstacle*temp = current.get()->add_obstacle();
-        temp->set_position(FieldObstacles::Obstacle::NONE);
-        temp->set_distance(0.f);
-        // temp->set_type(FieldObstacles::Obstacle::EMPTY);
-    }
+    FieldObstacles::Obstacle*temp = current.get()->add_obstacle();
+    temp->set_position(arms);
+    temp->set_distance(1.f);
 
     obstacleOut.setMessage(current);
 
@@ -157,11 +153,15 @@ ObstacleModule::processArms(const messages::ArmContactState& input)
     if ((input.right_push_direction() ==
          ArmContactState::SOUTH ||
          input.right_push_direction() ==
-         ArmContactState::SOUTHEAST) &&
+         ArmContactState::SOUTHEAST ||
+         input.right_push_direction() ==
+         ArmContactState::SOUTHWEST) &&
         (input.left_push_direction() ==
          ArmContactState::SOUTH ||
          input.left_push_direction() ==
-         ArmContactState::SOUTHWEST))
+         ArmContactState::SOUTHWEST ||
+         input.left_push_direction() ==
+         ArmContactState::SOUTHEAST))
     {
         return FieldObstacles::Obstacle::NORTH;
     }
@@ -169,11 +169,15 @@ ObstacleModule::processArms(const messages::ArmContactState& input)
     else if ((input.right_push_direction() ==
               ArmContactState::NORTH ||
               input.right_push_direction() ==
-              ArmContactState::NORTHEAST) &&
+              ArmContactState::NORTHEAST ||
+              input.right_push_direction() ==
+              ArmContactState::NORTHWEST) &&
              (input.left_push_direction() ==
               ArmContactState::NORTH ||
               input.left_push_direction() ==
-              ArmContactState::NORTHWEST))
+              ArmContactState::NORTHWEST ||
+              input.left_push_direction() ==
+              ArmContactState::NORTHEAST))
     {
         return FieldObstacles::Obstacle::SOUTH;
     }
@@ -303,7 +307,7 @@ FieldObstacles::Obstacle::ObstaclePosition
 ObstacleModule::processVision(float distance, float bearing)
 {
     FieldObstacles::Obstacle::ObstaclePosition dir;
-    float min;
+    float avg;
 
     // Process what direction it is in: act appropriately
     if ( bearing < -5.f*ZONE_WIDTH)
@@ -314,11 +318,9 @@ ObstacleModule::processVision(float distance, float bearing)
         {
             SEDists.pop_front();
         }
-
         dir = FieldObstacles::Obstacle::SOUTHEAST;
-        min = minimum(SEDists);
-        obstacleDistances[int(dir)] = min;
-
+        avg = average(SEDists);
+        obstacleDistances[int(dir)] = avg;
         return dir;
     }
     else if ( bearing < -3.f*ZONE_WIDTH )
@@ -331,8 +333,8 @@ ObstacleModule::processVision(float distance, float bearing)
         }
 
         dir = FieldObstacles::Obstacle::EAST;
-        min = minimum(EDists);
-        obstacleDistances[int(dir)] = min;
+        avg = average(EDists);
+        obstacleDistances[int(dir)] = avg;
 
         return dir;
     }
@@ -346,8 +348,8 @@ ObstacleModule::processVision(float distance, float bearing)
         }
 
         dir = FieldObstacles::Obstacle::NORTHEAST;
-        min = minimum(NEDists);
-        obstacleDistances[int(dir)] = min;
+        avg = average(NEDists);
+        obstacleDistances[int(dir)] = avg;
 
         return dir;
     }
@@ -361,8 +363,8 @@ ObstacleModule::processVision(float distance, float bearing)
         }
 
         dir = FieldObstacles::Obstacle::NORTH;
-        min = minimum(NDists);
-        obstacleDistances[int(dir)] = min;
+        avg = average(NDists);
+        obstacleDistances[int(dir)] = avg;
 
         return dir;
     }
@@ -376,8 +378,8 @@ ObstacleModule::processVision(float distance, float bearing)
         }
 
         dir = FieldObstacles::Obstacle::NORTHWEST;
-        min = minimum(NWDists);
-        obstacleDistances[int(dir)] = min;
+        avg = average(NWDists);
+        obstacleDistances[int(dir)] = avg;
 
         return dir;
     }
@@ -391,8 +393,8 @@ ObstacleModule::processVision(float distance, float bearing)
         }
 
         dir = FieldObstacles::Obstacle::WEST;
-        min = minimum(WDists);
-        obstacleDistances[int(dir)] = min;
+        avg = average(WDists);
+        obstacleDistances[int(dir)] = avg;
 
         return dir;
     }
@@ -402,12 +404,12 @@ ObstacleModule::processVision(float distance, float bearing)
         SWDists.push_back(distance);
         if (SWDists.size() > VISION_FRAMES_TO_BUFFER)
         {
-            WDists.pop_front();
+            SWDists.pop_front();
         }
 
         dir = FieldObstacles::Obstacle::SOUTHWEST;
-        min = minimum(SWDists);
-        obstacleDistances[int(dir)] = min;
+        avg = average(SWDists);
+        obstacleDistances[int(dir)] = avg;
 
         return dir;
     }
@@ -420,15 +422,14 @@ ObstacleModule::processVision(float distance, float bearing)
 void ObstacleModule::updateObstacleBuffer
 (FieldObstacles::Obstacle::ObstaclePosition visionL,
  FieldObstacles::Obstacle::ObstaclePosition visionM,
- FieldObstacles::Obstacle::ObstaclePosition visionR,
- FieldObstacles::Obstacle::ObstaclePosition arms)
+ FieldObstacles::Obstacle::ObstaclePosition visionR)
 {
     // std::cout<<"Obstacle Buffer: ";
     // start at 1 to ignore "NONE" direction
     for (int i = 1; i < NUM_DIRECTIONS; i++)
     {
         if ( i == int(visionL) || i == int(visionM) ||
-             i == int(visionR) || i == int(arms) )
+             i == int(visionR) )
         {
             obstacleBuffer[i] = 1;
             // std::cout<<obstacleBuffer[i]<<", ";

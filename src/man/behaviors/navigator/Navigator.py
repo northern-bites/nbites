@@ -47,7 +47,6 @@ class Navigator(FSA.FSA):
         self.setPrintStateChanges(True)
         self.stateChangeColor = 'cyan'
         self.destination = None # Used to set walking_to in world model proto
-
         #transitions
         #@todo: move this to the actual transitions file?
         self.atLocPositionTransition = Transition.CountTransition(navTrans.atDestination,
