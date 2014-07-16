@@ -134,7 +134,8 @@ def dodge(nav):
         for i in range(len(order)):
             temp = getIndex(int(dodge.targetDest) + order[i])
             # if there is no obstacle in this direction
-            if not dodge.positions[int(dodge.DDirects[temp])]:
+            if not dodge.positions[temp]:
+                print "DODGE TO ", dodge.DDirects[temp]
                 dest = RelRobotLocation(constants.DGE_DESTS[temp-1][0],
                                         constants.DGE_DESTS[temp-1][1],
                                         constants.DGE_DESTS[temp-1][2])

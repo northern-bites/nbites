@@ -27,6 +27,10 @@ def shouldDodge(nav):
     if not states.goToPosition.avoidObstacles:
         return False
 
+    if (nav.brain.obstacles[1] > constants.DODGE_DIST or
+        nav.brain.obstacles[1] == 0.0):
+        return False
+
     # if nav.brain.ball.distance < constants.DODGE_DIST:
     #     print "BALL DIST LESS THAN ME DIST"
     #     return False
