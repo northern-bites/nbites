@@ -18,7 +18,7 @@ def shouldRunKickOffPlay(player):
     """
     makes sure the robots are in position to run a play
     """
-    if not roleConstants.twoAttackersOnField(player):
+    if not roleConstants.twoAttackersOnField(player) or not player.brain.gameController.ownKickOff:
         # print "there were not two attackers on Field"
         return False
 
