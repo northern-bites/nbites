@@ -67,7 +67,7 @@ def gameSet(player):
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.brain.fallController.enabled = False
+        player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.performBasicPan()
 
