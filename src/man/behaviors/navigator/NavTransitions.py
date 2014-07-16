@@ -23,7 +23,6 @@ def atDestination(nav):
 
 # Transition: Should I perform a dodge? Also sets up the direction.
 def shouldDodge(nav):
-    return False
     # If nav isn't avoiding things, just no
     if not states.goToPosition.avoidObstacles:
         return False
