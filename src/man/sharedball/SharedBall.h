@@ -15,6 +15,7 @@
 #include "BallModel.pb.h"
 
 /**
+ *****DOES NOT WORK WITH WORLDVIEW OR SHARED VIEWER. MAJOR TODO.****
  *
  * A module that creates a global ball position. How it works:
  *

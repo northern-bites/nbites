@@ -57,7 +57,6 @@ void SharedBallModule::run_()
         ballY[i] = -1.f;
     }
 
-#ifndef OFFLINE
     // get myInfo:
     locIn.latch();
     myX = locIn.message().x();
@@ -65,16 +64,13 @@ void SharedBallModule::run_()
     myH = locIn.message().h();
     ballIn.latch();
     myBall = ballIn.message();
-#endif
 
     if (numRobotsOn)
     {
         ballOn = true;
         chooseRobots();
         weightedavg();
-#ifndef OFFLINE
         checkForPlayerFlip();
-#endif
     }
 
     portals::Message<messages::SharedBall> sharedBallMessage(0);
@@ -327,9 +323,7 @@ void SharedBallModule::calculateBallCoords(int i)
     }
 
     float sinHB, cosHB;
-#ifndef OFFLINE
     if (my_num-1 != i) {
-#endif
         float hb = TO_RAD*worldMessages[i].my_h() + TO_RAD*worldMessages[i].ball_bearing();
         sincosf(hb, &sinHB, &cosHB);
 
@@ -338,7 +332,6 @@ void SharedBallModule::calculateBallCoords(int i)
 
         ballX[i] = newx;
         ballY[i] = newy;
-#ifndef OFFLINE
     } else {
         float hb = TO_RAD*myH + TO_RAD*myBall.bearing();
         sincosf(hb, &sinHB, &cosHB);
@@ -349,7 +342,6 @@ void SharedBallModule::calculateBallCoords(int i)
         ballX[i] = newx;
         ballY[i] = newy;
     }
-#endif
 }
 
 /*
