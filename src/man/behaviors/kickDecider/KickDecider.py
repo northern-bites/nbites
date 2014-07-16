@@ -416,10 +416,11 @@ class KickDecider(object):
             if timeAndSpace:
                 return timeAndSpace
 
-            if clearing:
-                timeAndSpace = self.allKicksAsap()
-                if timeAndSpace:
-                    return timeAndSpace
+            # TODO implement smarter clearing strategy
+            # if clearing:
+            #     timeAndSpace = self.allKicksAsap()
+            #     if timeAndSpace:
+            #         return timeAndSpace
 
         asap = self.motionKicksAsap()
         if asap:
