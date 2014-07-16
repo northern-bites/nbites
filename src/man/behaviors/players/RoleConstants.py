@@ -130,10 +130,10 @@ theirKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - \
 
 defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X - 70, NogginConstants.FIELD_GREEN_HEIGHT)
 
-oddDefenderBoxCautious = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.CENTER_FIELD_Y + 75)
+oddDefenderBoxCautious = ((0, 0), NogginConstants.CENTER_FIELD_X - 70, NogginConstants.CENTER_FIELD_Y)
 
-evenDefenderBoxCautious = ((0, NogginConstants.CENTER_FIELD_Y - 75), NogginConstants.CENTER_FIELD_X, \
-                           NogginConstants.CENTER_FIELD_Y + 75)
+evenDefenderBoxCautious = ((0, NogginConstants.CENTER_FIELD_Y), NogginConstants.CENTER_FIELD_X - 70, \
+                           NogginConstants.CENTER_FIELD_Y)
 
 oddDefenderBox = defenderBox
 evenDefenderBox = defenderBox
