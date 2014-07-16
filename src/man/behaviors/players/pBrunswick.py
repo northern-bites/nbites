@@ -3,6 +3,7 @@ import time
 from . import SoccerFSA
 from . import FallControllerStates
 from . import RoleSwitchingStates
+from . import CommMonitorStates
 from . import GameControllerStates
 from . import BrunswickStates
 from . import ChaseBallStates
@@ -27,6 +28,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(FallControllerStates)
         self.addStates(GameControllerStates)
         self.addStates(RoleSwitchingStates)
+        self.addStates(CommMonitorStates)
         self.addStates(BrunswickStates)
         self.addStates(PlayOffBallStates)
         self.addStates(PositionStates)
@@ -66,3 +68,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Controls whether we use claims
         self.useClaims = True
         self.returningFromPenalty = False
+        # Trinary flag indicating state of communications
+        # 0 -- all field players are online
+        # 1 -- one field player is offline
+        # 2 -- more than one field player is offline
+        self.commMode = 0
