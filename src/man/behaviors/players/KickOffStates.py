@@ -22,7 +22,7 @@ def passToCorner(player):
             player.kick = decider.sweetMovesForKickOff(0, corner)
             player.inKickingState = True
             return player.goNow('approachBall')
-        elif roleConstants.isSecondChaser(player.role):
+        elif roleConstants.isSecondChaser(player.role) or roleConstants.isCherryPicker(player.role):
             player.brain.tracker.repeatFastNarrowPan()
             passDestination = Location(nogginC.OPP_GOALBOX_LEFT_X, 60.)
             player.brain.nav.goTo(passDestination, Navigator.GENERAL_AREA, Navigator.QUICK_SPEED, 
@@ -54,7 +54,7 @@ def passToFieldCross(player):
             player.brain.nav.goTo(fieldCross, Navigator.GENERAL_AREA, Navigator.QUICK_SPEED, 
                                 True, False, True, False)
 
-        elif roleConstants.isSecondChaser(player.role):
+        elif roleConstants.isSecondChaser(player.role) or roleConstants.isCherryPicker(player.role):
             if not constants.ballIsLost(player):
                 decider = KickDecider.KickDecider(player.brain)
                 # player.kick = decider.bigKicksOnGoal()
@@ -97,7 +97,7 @@ def sidePass(player):
             player.kick = decider.sweetMovesForKickOff(-1, passDest) 
             player.inKickingState = True
             return player.goNow('approachBall')
-        elif roleConstants.isSecondChaser(player.role):
+        elif roleConstants.isSecondChaser(player.role) or roleConstants.isCherryPicker(player.role):
             pass
         else:
             return player.goNow('playOffBall')

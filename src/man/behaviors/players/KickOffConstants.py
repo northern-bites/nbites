@@ -18,13 +18,16 @@ def shouldRunKickOffPlay(player):
     """
     makes sure the robots are in position to run a play
     """
-    if not roleConstants.bothChasersOnField(player):
+    if not roleConstants.twoAttackersOnField(player):
+        # print "there were not two attackers on Field"
         return False
 
     if roleConstants.isFirstChaser(player.role):
         shouldRunKickOffPlay.distToPosition = hypot(player.brain.loc.x - roleConstants.ourKickoff.x,
                                                     player.brain.loc.y - roleConstants.ourKickoff.y)
-    elif roleConstants.isSecondChaser(player.role):
+        # print "my loc = ", player.brain.loc.x, ", ", player.brain.loc.y
+        # print "should be ", roleConstants.ourKickoff.x, ", ", roleConstants.ourKickoff.y
+    elif roleConstants.isSecondChaser(player.role) or roleConstants.isCherryPicker(player.role):
         shouldRunKickOffPlay.distToPosition = hypot(player.brain.loc.x - roleConstants.oddChaserKickoff.x,
                                                     player.brain.loc.y - roleConstants.oddChaserKickoff.y)
     else:
@@ -35,12 +38,14 @@ def shouldRunKickOffPlay(player):
         return False
 
     for mate in player.brain.teamMembers:
-        if roleConstants.isSecondChaser(mate.role):
+        if roleConstants.isSecondChaser(mate.role) or roleConstants.isCherryPicker(mate.role):
             shouldRunKickOffPlay.distToPosition = hypot(mate.x - roleConstants.oddChaserKickoff.x,
                                                         mate.y - roleConstants.oddChaserKickoff.y)
         elif roleConstants.isFirstChaser(mate.role):
             shouldRunKickOffPlay.distToPosition = hypot(mate.x - roleConstants.ourKickoff.x,
                                                         mate.y - roleConstants.ourKickoff.y)
+            # print "mate loc = ", mate.x, ", ", mate.y
+            # print "should be ", roleConstants.ourKickoff.x, ", ", roleConstants.ourKickoff.y
         else:
             shouldRunKickOffPlay.distToPosition = 0.
 

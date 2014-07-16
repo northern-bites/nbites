@@ -8,7 +8,7 @@ ROLE_CONFIGURATION = {1: "Goalie",
                       2: "LeftDefender",
                       3: "RightDefender",
                       4: "FirstChaser",
-                      5: "SecondChaser"}
+                      5: "CherryPicker"}
 
 def getRole(role):
     if role < 1:
@@ -47,21 +47,21 @@ def willRoleSwitch(role):
 def canRoleSwitchTo(role):
     return isChaser(role)
 
-def bothChasersOnField(player):
-    firstChaser = False
-    secondChaser = False
+def twoAttackersOnField(player):
+    firstAttacker = False
+    secondAttacker = False
 
     if isFirstChaser(player.role):
-        firstChaser = True
-    elif isSecondChaser(player.role):
-        secondChaser = True
+        firstAttacker = True
+    elif isSecondChaser(player.role) or isCherryPicker(player.role):
+        secondAttacker = True
 
     for mate in player.brain.teamMembers:
         if isFirstChaser(mate.role):
-            firstChaser = True
-        elif isSecondChaser(mate.role):
-            secondChaser = True
-    if firstChaser and secondChaser:
+            firstAttacker = True
+        elif isSecondChaser(mate.role) or isCherryPicker(mate.role):
+            secondAttacker = True
+    if firstAttacker and secondAttacker:
         return True
 
     return False

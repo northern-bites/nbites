@@ -84,7 +84,9 @@ def gameSet(player):
 def gamePlaying(player):
     if player.firstFrame():
         player.inKickingState = False
-        player.inKickOffPlay = kickOff.shouldRunKickOffPlay(player) and roleConstants.isChaser(player.role)
+        player.inKickOffPlay = (kickOff.shouldRunKickOffPlay(player) and 
+                               (roleConstants.isChaser(player.role) or 
+                                roleConstants.isCherryPicker(player.role)))
         player.passBack = False
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
@@ -106,7 +108,7 @@ def gamePlaying(player):
 
     if player.brain.gameController.timeSincePlaying < 10:
         if player.brain.gameController.ownKickOff:
-            if roleConstants.isChaser(player.role):
+            if roleConstants.isChaser(player.role) or roleConstants.isCherryPicker(player.role):
                 player.shouldKickOff = True
                 return player.goNow('approachBall')
             else:
