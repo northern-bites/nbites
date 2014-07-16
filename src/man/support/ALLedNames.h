@@ -60,7 +60,7 @@ static const unsigned int NUM_LED_COLORS = 3;
 static const unsigned int NUM_LED_ORIENTATIONS = 2;
 static const unsigned int NUM_ONE_EYE_LEDS = NUM_LED_COLORS * NUM_FACE_LEDS;
 
-static const unsigned int NUM_UNIQUE_LEDS = 39;
+static const unsigned int NUM_UNIQUE_LEDS = 29;
 static const unsigned int NUM_RGB_LEDS[NUM_UNIQUE_LEDS] ={
     NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,
     NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,
@@ -288,16 +288,6 @@ static const std::string rightGoalL[NUM_LED_COLORS][NUM_GOAL_LEDS] ={
 
 static const std::string strPtr = footL[RIGHT_LED][0];
 static const std::string * RGB_LED_STRINGS[NUM_UNIQUE_LEDS] ={
-    &earL[LEFT_LED][0],             // Left Shared 1
-    &earL[LEFT_LED][1],             // 2
-    &earL[LEFT_LED][2],             // 3
-    &earL[LEFT_LED][3],             // 4
-    &earL[LEFT_LED][4],             // 5
-    &earL[RIGHT_LED][1],            // Right Shared 1
-    &earL[RIGHT_LED][2],            // 2
-    &earL[RIGHT_LED][3],            // 3
-    &earL[RIGHT_LED][4],            // 4
-    &earL[RIGHT_LED][5],            // 5
     &earL[LEFT_LED][0],             // Left Calibration 1
     &earL[LEFT_LED][1],             // 2
     &earL[LEFT_LED][2],             // 3
