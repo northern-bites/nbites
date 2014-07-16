@@ -70,9 +70,9 @@ class ObstacleModule : public portals::Module
     static const unsigned int SONAR_FRAMES_TO_BUFFER = 20;
 
     // How do we divide up the directions of the robot's field of vision?
-    static const float ZONE_WIDTH = (3.14159f) / (2.f * 4.f); //4 dir per pi
+    static constexpr float ZONE_WIDTH = (3.14159f) / (2.f * 4.f); //4 dir per pi
     // How far away should we consider something to be an obstacle?
-    static const float VISION_MAX_DIST = 150.f; // 1.5 meters
+    static constexpr float VISION_MAX_DIST = 150.f; // 1.5 meters
     // How many frames do we consider in our average of obstacle distances?
     static const unsigned int VISION_FRAMES_TO_BUFFER = 20;
     // After we see an obstacle, how long should we say it's still there?

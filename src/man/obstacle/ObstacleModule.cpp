@@ -36,19 +36,32 @@ float minimum(std::list<float>& buf)
 
 ObstacleModule::ObstacleModule() : obstacleOut(base())
 {
-    obstacleBuffer = { 0 };
-    obstacleDistances = { 0.f };
+    memset(obstacleBuffer, 0, sizeof(obstacleBuffer));
+    memset(obstacleDistances, 0, sizeof(obstacleDistances));
+
+    obstaclesList[0] = FieldObstacles::Obstacle::NONE;
+    obstaclesList[1] = FieldObstacles::Obstacle::NORTH;
+    obstaclesList[2] = FieldObstacles::Obstacle::NORTHEAST;
+    obstaclesList[3] = FieldObstacles::Obstacle::EAST;
+    obstaclesList[4] = FieldObstacles::Obstacle::SOUTHEAST;
+    obstaclesList[5] = FieldObstacles::Obstacle::SOUTH;
+    obstaclesList[6] = FieldObstacles::Obstacle::SOUTHWEST;
+    obstaclesList[7] = FieldObstacles::Obstacle::WEST;
+    obstaclesList[8] = FieldObstacles::Obstacle::NORTHWEST;
+
+    // obstacleBuffer = { 0 };
+    // obstacleDistances = { 0.f };
     // Used when setting the message fields
-    obstaclesList = { FieldObstacles::Obstacle::NONE,
-                      FieldObstacles::Obstacle::NORTH,
-                      FieldObstacles::Obstacle::NORTHEAST,
-                      FieldObstacles::Obstacle::EAST,
-                      FieldObstacles::Obstacle::SOUTHEAST,
-                      FieldObstacles::Obstacle::SOUTH,
-                      FieldObstacles::Obstacle::SOUTHWEST,
-                      FieldObstacles::Obstacle::WEST,
-                      FieldObstacles::Obstacle::NORTHWEST
-    };
+    // obstaclesList = { FieldObstacles::Obstacle::NONE,
+    //                   FieldObstacles::Obstacle::NORTH,
+    //                   FieldObstacles::Obstacle::NORTHEAST,
+    //                   FieldObstacles::Obstacle::EAST,
+    //                   FieldObstacles::Obstacle::SOUTHEAST,
+    //                   FieldObstacles::Obstacle::SOUTH,
+    //                   FieldObstacles::Obstacle::SOUTHWEST,
+    //                   FieldObstacles::Obstacle::WEST,
+    //                   FieldObstacles::Obstacle::NORTHWEST
+    // };
 }
 
 void ObstacleModule::run_()
