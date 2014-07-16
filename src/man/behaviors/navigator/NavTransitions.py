@@ -64,24 +64,32 @@ def shouldDodge(nav):
     if setPosition:
         states.dodge.targetDest = walkingDest
         states.dodge.positions = info
+        doneDodging.timer = 0
         return True
 
     return False
 
 # Check if an obstacle is no longer there, or if we've completed the dodge
 def doneDodging(nav):
-    noObstacles = True
+    timerDone = False
+    obstacles = False
+
+    doneDodging.timer += 1
+    if doneDodging.timer > 150:
+        timerDone = True
 
     for i in range(1, len(nav.brain.obstacles)):
         if (nav.brain.obstacles[i] != 0.0 and
             nav.brain.obstacles[i] < constants.DODGE_DIST and
             (i <= 3 or i >= 7)):
-            noObstacles = False
+            obstacles = True
 
-    print "DODGE DONE ", nav.brain.obstacles
-    print noObstacles
+    return timerDone and not obstacles
 
-    return (atDestination(nav) or noObstacles)
+    # print "DODGE DONE ", nav.brain.obstacles
+    # print noObstacles
+
+    # return (atDestination(nav) or !obstacles)
 
 def getDirection(h):
     if (h < helper.constants.ZONE_WIDTH * -7. or
