@@ -63,11 +63,11 @@ def prepareForKick(player):
             player.shouldKickOff = False
             player.kick = player.decider.motionKicksAsap()
         else:
-            if transitions.shouldChangeKickingStrategy(player):
-                print "Time for some heroics!"
-                player.kick = player.decider.timeForSomeHeroics()
-            else:
-                player.kick = player.decider.obstacleAware(roleConstants.isDefender(player.role))
+            # if transitions.shouldChangeKickingStrategy(player):
+            #     print "Time for some heroics!"
+            #     player.kick = player.decider.timeForSomeHeroics()
+            # else:
+            player.kick = player.decider.obstacleAware(roleConstants.isDefender(player.role))
         player.inKickingState = True
 
     elif player.finishedPlay:
