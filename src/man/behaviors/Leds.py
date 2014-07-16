@@ -271,7 +271,8 @@ class Leds():
 
             self.calibrationCount = self.calibrationCount + 1
 
-        if SHAREDFLIP_LEDS:
+        # TODO this is a hacky solution to using the same LEDs as calibration
+        if SHAREDFLIP_LEDS and self.brain.motion.calibrated:
             if ((self.oldFlipTime != self.brain.interface.sharedFlip.timestamp
                  or self.flashingCount < 150) and self.flippingCount % 16 < 8):
                 self.oldFlipTime = self.brain.interface.sharedFlip.timestamp
@@ -348,43 +349,6 @@ class Leds():
                 elif (gcState == GameController.STATE_INITIAL):
                     self.executeLeds(STATE_INITIAL_LEDS)
                 elif (gcState == GameController.STATE_READY):
-                    self.executeLeds(STATE_READY_LEDS)
-                elif (gcState == GameController.STATE_SET):
-                    self.executeLeds(STATE_SET_LEDS)
-                elif (gcState == GameController.STATE_PLAYING):
-                    self.executeLeds(STATE_PLAYING_LEDS)
-                elif (gcState == GameController.STATE_FINISHED):
-                    self.executeLeds(STATE_FINISHED_LEDS)
-
-        if FOOT_LEDS:
-            if (self.brain.gameController.kickOffChanged
-                or self.brain.gameController.teamColorChanged):
-                # At starts of halves, either kickOffChanged or
-                # teamColorChanged will trigger but not both, and
-                # both LEDs should update.
-                if self.brain.gameController.ownKickOff:
-                    self.executeLeds(HAVE_KICKOFF_LEDS)
-                else:
-                    self.executeLeds(NO_KICKOFF_LEDS)
-
-                if self.brain.gameController.teamColor == NogginConstants.teamColor.TEAM_BLUE:
-                    self.executeLeds(TEAM_BLUE_LEDS)
-                else:
-                    self.executeLeds(TEAM_RED_LEDS)
-
-    def executeLeds(self,listOfLeds):
-        for ledTuple in listOfLeds:
-            if len(ledTuple) != 3:
-                print "Invalid print command!! " + str(ledTuple)
-                continue
-            # Add command to brain's out message fields
-            self.brain.interface.ledCommand.add_led_id(ledTuple[0])
-            self.brain.interface.ledCommand.add_rgb_hex(ledTuple[1])
-
-            # Unnecessary check, never triggered
-            #if ledTuple[2] != NOW:
-                #print "Invalid timing command in Leds.py"
-e == GameController.STATE_READY):
                     self.executeLeds(STATE_READY_LEDS)
                 elif (gcState == GameController.STATE_SET):
                     self.executeLeds(STATE_SET_LEDS)
