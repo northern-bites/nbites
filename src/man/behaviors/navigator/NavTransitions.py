@@ -79,7 +79,7 @@ def doneDodging(nav):
     obstacles = False
 
     doneDodging.timer += 1
-    if doneDodging.timer > 150:
+    if doneDodging.timer > 180:
         timerDone = True
 
     for i in range(1, len(nav.brain.obstacles)):
