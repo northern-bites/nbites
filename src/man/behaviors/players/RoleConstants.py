@@ -8,7 +8,7 @@ ROLE_CONFIGURATION = {1: "Goalie",
                       2: "LeftDefender",
                       3: "RightDefender",
                       4: "FirstChaser",
-                      5: "CherryPicker"}
+                      5: "SecondChaser"}
 
 def getRole(role):
     if role < 1:
