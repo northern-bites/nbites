@@ -27,6 +27,10 @@ def shouldDodge(nav):
     if not states.goToPosition.avoidObstacles:
         return False
 
+    # if nav.brain.ball.distance < constants.DODGE_DIST:
+    #     print "BALL DIST LESS THAN ME DIST"
+    #     return False
+
     obsts = nav.brain.interface.fieldObstacles
     states.dodge.DDirects = ( obsts.obstacle(0).NONE,
                               obsts.obstacle(0).NORTH,
@@ -41,21 +45,21 @@ def shouldDodge(nav):
     info = [0.] * 9 #8 directions
     setPosition = False
 
-    # Get relative robot desitnation
+    # Get relative robot / ball desitnation
     relLoc = helper.getRelativeDestination(nav.brain.loc,
                                            states.goToPosition.dest)
     walkingDest = getDirection(relLoc.relH)
-
-    print "DEST: ", walkingDest
+    ballDir = getDirection(nav.brain.ball.bearing_deg)
 
     for i in range(1, len(nav.brain.obstacles)):
         if (nav.brain.obstacles[i] != 0.0 and
             nav.brain.obstacles[i] < constants.DODGE_DIST):
             info[i] = nav.brain.obstacles[i]
+            if (i == int(ballDir) and nav.brain.ball.distance <
+                nav.brain.obstacles[i]):
+                return False
             if i <= 3 or i >= 7:
                 setPosition = True
-
-    print "INFO: ", info
 
     if setPosition:
         states.dodge.targetDest = walkingDest
@@ -63,6 +67,21 @@ def shouldDodge(nav):
         return True
 
     return False
+
+# Check if an obstacle is no longer there, or if we've completed the dodge
+def doneDodging(nav):
+    noObstacles = True
+
+    for i in range(1, len(nav.brain.obstacles)):
+        if (nav.brain.obstacles[i] != 0.0 and
+            nav.brain.obstacles[i] < constants.DODGE_DIST and
+            (i <= 3 or i >= 7)):
+            noObstacles = False
+
+    print "DODGE DONE ", nav.brain.obstacles
+    print noObstacles
+
+    return (atDestination(nav) or noObstacles)
 
 def getDirection(h):
     if (h < helper.constants.ZONE_WIDTH * -7. or
@@ -90,21 +109,6 @@ def getDirection(h):
     else:
         # SOUTHWEST
         return states.dodge.DDirects[6]
-
-# Check if an obstacle is no longer there, or if we've completed the dodge
-def doneDodging(nav):
-    noObstacles = True
-
-    for i in range(1, len(nav.brain.obstacles)):
-        if (nav.brain.obstacles[i] != 0.0 and
-            nav.brain.obstacles[i] < constants.DODGE_DIST and
-            (i <= 3 or i >= 7)):
-            noObstacles = False
-
-    print "DODGE DONE ", nav.brain.obstacles
-    print noObstacles
-
-    return (atDestination(nav) or noObstacles)
 
 def notAtLocPosition(nav):
     return not atDestination(nav)

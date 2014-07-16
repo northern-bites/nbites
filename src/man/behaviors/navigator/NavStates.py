@@ -136,8 +136,8 @@ def dodge(nav):
             # if there is no obstacle in this direction
             if not dodge.positions[int(dodge.DDirects[temp])]:
                 dest = RelRobotLocation(constants.DGE_DESTS[temp-1][0],
-                                    constants.DGE_DESTS[temp-1][1],
-                                    constants.DGE_DESTS[temp-1][2])
+                                        constants.DGE_DESTS[temp-1][1],
+                                        constants.DGE_DESTS[temp-1][2])
                 helper.setDestination(nav, dest, 0.5)
                 return Transition.getNextState(nav, dodge)
 
