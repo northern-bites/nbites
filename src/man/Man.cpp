@@ -182,8 +182,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     {
         sharedBall.worldModelIn[i].wireTo(comm._worldModels[i], true);
     }
-
-    behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
+    sharedBall.locIn.wireTo(&localization.output);
+    sharedBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
 
     obstacle.armContactIn.wireTo(&arms.contactOut, true);
     obstacle.visionIn.wireTo(&vision.vision_obstacle, true);
@@ -207,6 +207,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
     behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
     behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
+    behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
     behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);
 
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)

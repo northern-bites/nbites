@@ -274,7 +274,7 @@ class Leds():
         # TODO this is a hacky solution to using the same LEDs as calibration
         if SHAREDFLIP_LEDS and self.brain.motion.calibrated:
             if ((self.oldFlipTime != self.brain.interface.sharedFlip.timestamp
-                 or self.flashingCount < 150) and self.flippingCount % 16 < 8):
+                 or self.flashingCount < 150) and self.flippingCount % 20 < 10):
                 self.oldFlipTime = self.brain.interface.sharedFlip.timestamp
                 if self.flashingCount >= 150:
                     self.flashingCount = 0
