@@ -44,9 +44,9 @@ def positionAtHome(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
 
-    player.brain.nav.goTo(player.homePosition, precision = nav.GENERAL_AREA,
-                          speed = nav.QUICK_SPEED, avoidObstacles = True,
-                          fast = False, pb = False)
+        player.brain.nav.goTo(player.homePosition, precision = nav.GENERAL_AREA,
+                              speed = nav.QUICK_SPEED, avoidObstacles = True,
+                              fast = False, pb = False)
 
 @superState('playOffBall')
 @stay
@@ -65,12 +65,13 @@ def positionAsSupporter(player):
     if player.firstFrame():
         positionAsSupporter.position = getSupporterPosition(player, player.role)
 
-    if (role.isChaser(player.role) and player.brain.ball.distance > 
+    if (role.isChaser(player.role) and player.brain.ball.distance >
         hypot(CHASER_DISTANCE, CHASER_DISTANCE)):
         fast = True
     else:
         fast = False
 
+    # TODO don't call goTo every frame
     player.brain.nav.goTo(positionAsSupporter.position, precision = nav.GENERAL_AREA,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,
                           fast = False, pb = False)
@@ -86,10 +87,13 @@ def searchFieldForSharedBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
 
+        sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
+        player.brain.nav.goTo(sharedball, precision = nav.GENERAL_AREA,
+                              speed = nav.QUICK_SPEED, avoidObstacles = True,
+                              fast = True, pb = False)
+
     sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
-    player.brain.nav.goTo(sharedball, precision = nav.GENERAL_AREA,
-                          speed = nav.QUICK_SPEED, avoidObstacles = True,
-                          fast = True, pb = False)
+    player.brain.nav.updateDest(sharedball)
 
 @superState('playOffBall')
 @stay
@@ -120,6 +124,10 @@ def searchFieldByQuad(player):
             else:
                 searchFieldByQuad.dest = quad1Center
 
+        player.brain.nav.goTo(searchFieldByQuad.dest, precision = nav.GRAINY,
+                          speed = nav.QUICK_SPEED, avoidObstacles = True,
+                          fast = True, pb = False)
+
     if shared.navAtPosition(player):
         if searchFieldByQuad.dest == quad1Center:
             searchFieldByQuad.dest = quad2Center
@@ -130,9 +138,7 @@ def searchFieldByQuad(player):
         elif searchFieldByQuad.dest == quad4Center:
             searchFieldByQuad.dest = quad3Center
 
-    player.brain.nav.goTo(searchFieldByQuad.dest, precision = nav.GRAINY,
-                          speed = nav.QUICK_SPEED, avoidObstacles = True,
-                          fast = True, pb = False)
+    player.brain.nav.updateDest(searchFieldByQuad.dest)
 
 quad1Center = Location(NogginConstants.CENTER_FIELD_X * .6, NogginConstants.CENTER_FIELD_Y * .6)
 quad2Center = Location(NogginConstants.CENTER_FIELD_X * .6, NogginConstants.CENTER_FIELD_Y * 1.4)
