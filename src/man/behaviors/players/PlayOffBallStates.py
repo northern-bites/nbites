@@ -76,13 +76,12 @@ def watchForBall(player):
 @stay
 @ifSwitchLater(shared.ballOffForNFrames(120), 'playOffBall')
 def positionAsSupporter(player):
-    if (role.isChaser(player.role) and role.isChaser(player.roleOfClaimer) and 
-        player.brain.ball.distance > hypot(CHASER_DISTANCE, CHASER_DISTANCE)):
+    positionAsSupporter.position = getSupporterPosition(player, player.role)
+
+    if fabs(player.brain.loc.getRelativeBearing(positionAsSupporter.position)) < 90:
         fast = True
     else:
         fast = False
-
-    positionAsSupporter.position = getSupporterPosition(player, player.role)
 
     if player.firstFrame():
         player.brain.nav.goTo(positionAsSupporter.position, precision = nav.GENERAL_AREA,
