@@ -91,6 +91,7 @@ private:
     bool requestedToStop;
     bool standby;
     bool justMotionKicked;
+    bool tryingToWalk;
     MotionCommand::ptr currentCommand;
     Pose2DBH startOdometry;
 

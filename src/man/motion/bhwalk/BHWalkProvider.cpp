@@ -59,7 +59,7 @@ static const JointDataBH::Joint nb_joint_order[] = {
 };
 
 BHWalkProvider::BHWalkProvider()
-    : MotionProvider(WALK_PROVIDER), requestedToStop(false)
+    : MotionProvider(WALK_PROVIDER), requestedToStop(false), tryingToWalk(false)
 {
 	// Setup Walk Engine Configuation Parameters
 	ModuleBase::config_path = common::paths::NAO_CONFIG_DIR;
@@ -119,19 +119,23 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
     PROF_ENTER(P_WALK);
 
-    // TODO reimplement or not necessary any more?
     // If our calibration became bad (as decided by the walkingEngine,
     // reset. We will wait until we're recalibrated to walk.
-    // if (walkingEngine->shouldReset && calibrated())
-    // if (calibrated())
-    // {
-    //     std::cout << "We are stuck! Recalibrating." << std::endl;
-    //     hardReset();
-    // }
+    // NOTE currentMotionType and requestMotionType are of type MotionType enum 
+    // defined in WalkingEngine.h
+    if (walkingEngine->currentMotionType == 0 && tryingToWalk &&
+        walkingEngine->instability.getAverageFloat() > 5.f && calibrated())
+    {
+        std::cout << "We are stuck! Recalibrating." << std::endl;
+        walkingEngine->inertiaSensorCalibrator->reset();
+        walkingEngine->instability.init();
+    }
 
     assert(JointDataBH::numOfJoints == Kinematics::NUM_JOINTS);
 
     if (standby) {
+        tryingToWalk = false;
+
         MotionRequestBH motionRequest;
         motionRequest.motion = MotionRequestBH::specialAction;
 
@@ -147,6 +151,8 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     } else {
     // TODO VERY UGLY -- refactor this please
     if (requestedToStop || !isActive()) {
+        tryingToWalk = false;
+
         MotionRequestBH motionRequest;
 
         // TODO why are we sitting?
@@ -166,6 +172,8 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
             walkingEngine->theMotionRequestBH = motionRequest;
         } else if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP) {
+            tryingToWalk = true;
+
             StepCommand::ptr command = boost::shared_static_cast<StepCommand>(currentCommand);
 
             Pose2DBH deltaOdometry = walkingEngine->theOdometryDataBH - startOdometry;
@@ -188,6 +196,8 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
                 walkingEngine->theMotionRequestBH = motionRequest;
 
             } else {
+                tryingToWalk = false;
+
                 MotionRequestBH motionRequest;
                 motionRequest.motion = MotionRequestBH::stand;
 
@@ -196,6 +206,8 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
         } else {
         if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK) {
+            tryingToWalk = true;
+
             WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
 
             MotionRequestBH motionRequest;
@@ -210,6 +222,8 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             walkingEngine->theMotionRequestBH = motionRequest;
         } else {
         if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
+            tryingToWalk = true;
+
             DestinationCommand::ptr command = boost::shared_static_cast<DestinationCommand>(currentCommand);
 
             MotionRequestBH motionRequest;
@@ -251,6 +265,8 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         }
         //TODO make special command for stand
         if (!currentCommand.get()) {
+            tryingToWalk = false;
+
             MotionRequestBH motionRequest;
             motionRequest.motion = MotionRequestBH::stand;
 
