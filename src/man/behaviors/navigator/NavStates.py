@@ -5,6 +5,7 @@ from collections import deque
 from objects import RobotLocation, RelRobotLocation
 from ..util import Transition
 from math import fabs
+from random import random
 
 def scriptedMove(nav):
     '''State that we stay in while doing sweet moves'''
@@ -51,7 +52,7 @@ def goToPosition(nav):
             fieldDest = RobotLocation(goToPosition.dest.x, goToPosition.dest.y, 0)
             relDest = nav.brain.loc.relativeRobotLocationOf(fieldDest)
             relDest.relH = nav.brain.loc.getRelativeBearing(fieldDest)
-        
+
         HEADING_ADAPT_CUTOFF = 103
         DISTANCE_ADAPT_CUTOFF = 10
 
@@ -128,52 +129,33 @@ goToPosition.close = False
 
 # State where we are moving away from an obstacle
 def dodge(nav):
+    order = [0, 1, -1, 2, -2, 3, -3, 4]
     if nav.firstFrame():
-        ## SET UP the dodge direction based on where the obstacle is
-        # if directly in front of us, move back and to one side based on
-        # where the goToPosition dest is
-        if dodge.position is dodge.position.NORTH:
-            print "Dodging NORTH obstacle"
-            relDest = helper.getRelativeDestination(nav.brain.loc,
-                                                    goToPosition.dest)
-            if relDest.relY <= 0:
-                direction = -1
-            else:
-                direction = 1
-            dodgeDest = RelRobotLocation(-15, direction*10, 0)
-        elif dodge.position is dodge.position.NORTHEAST:
-            print "Dodging NORTHEAST obstacle"
-            dodgeDest = RelRobotLocation(0, 15, 0)
-        elif dodge.position is dodge.position.EAST:
-            print "Dodging EAST obstacle"
-            dodgeDest = RelRobotLocation(0, 20, 0)
-        elif dodge.position is dodge.position.SOUTHEAST:
-            print "Dodging SOUTHEAST obstacle"
-            dodgeDest = RelRobotLocation(0, 15, 0)
-        # if directly behind us, move forward and to one side based on
-        # where the goToPosition dest is
-        elif dodge.position is dodge.position.SOUTH:
-            print "Dodging SOUTH obstacle"
-            relDest = helper.getRelativeDestination(nav.brain.loc,
-                                                    goToPosition.dest)
-            if relDest.relY <= 0:
-                direction = -1
-            else:
-                direction = 1
-            dodgeDest = RelRobotLocation(15, direction*10, 0)
-        elif dodge.position is dodge.position.SOUTHWEST:
-            print "Dodging SOUTHWEST obstacle"
-            dodgeDest = RelRobotLocation(0, -15, 0)
-        elif dodge.position is dodge.position.WEST:
-            print "Dodging WEST obstacle"
-            dodgeDest = RelRobotLocation(0, -20, 0)
-        elif dodge.position is dodge.position.NORTHWEST:
-            print "Dodging NORTHWEST obstacle"
-            dodgeDest = RelRobotLocation(0, -15, 0)
+        # dodge.positions[0] is position.NONE, so direction numbers are their own index
+        for i in range(len(order)):
+            temp = getIndex(int(dodge.targetDest) + order[i])
+            # if there is no obstacle in this direction
+            if not dodge.positions[temp]:
+                print "DODGE TO ", dodge.DDirects[temp]
+                dodge.dest = RelRobotLocation(constants.DGE_DESTS[temp-1][0],
+                                              constants.DGE_DESTS[temp-1][1],
+                                              constants.DGE_DESTS[temp-1][2])
+                break
 
-        helper.setOdometryDestination(nav, dodgeDest)
-
+    # TODO the worst hack I have ever written, sorry -- Josh Imhoff
+    dest2 = RelRobotLocation(dodge.dest.relX + random(),
+                             dodge.dest.relY + random(),
+                             dodge.dest.relH + random())
+    helper.setDestination(nav, dest2, 0.5)
     return Transition.getNextState(nav, dodge)
+
+def getIndex(num):
+    if num <=8 and num >= 1:
+        return num
+    elif num > 8:
+        return num - 8
+    else:
+        return num + 8
 
 # Quick stand to stabilize from the dodge.
 def briefStand(nav):
@@ -194,13 +176,13 @@ def destinationWalkingTo(nav):
 
     if len(destinationWalkingTo.destQueue) > 0:
         dest = destinationWalkingTo.destQueue.popleft()
-        helper.setDestination(nav, dest, 
-                              destinationWalkingTo.speed, 
+        helper.setDestination(nav, dest,
+                              destinationWalkingTo.speed,
                               destinationWalkingTo.kick)
         destinationWalkingTo.enqueAZeroVector = True
     elif destinationWalkingTo.enqueAZeroVector:
-        helper.setDestination(nav, RelRobotLocation(0,0,0), 
-                              destinationWalkingTo.speed, 
+        helper.setDestination(nav, RelRobotLocation(0,0,0),
+                              destinationWalkingTo.speed,
                               destinationWalkingTo.kick)
         destinationWalkingTo.enqueAZeroVector = False
 

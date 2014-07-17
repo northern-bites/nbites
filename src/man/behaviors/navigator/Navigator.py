@@ -47,7 +47,6 @@ class Navigator(FSA.FSA):
         self.setPrintStateChanges(True)
         self.stateChangeColor = 'cyan'
         self.destination = None # Used to set walking_to in world model proto
-
         #transitions
         #@todo: move this to the actual transitions file?
         self.atLocPositionTransition = Transition.CountTransition(navTrans.atDestination,
@@ -61,7 +60,7 @@ class Navigator(FSA.FSA):
             self.atLocPositionTransition : NavStates.atPosition,
 
             Transition.CountTransition(navTrans.shouldDodge,
-                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
             : NavStates.dodge
 
@@ -69,10 +68,10 @@ class Navigator(FSA.FSA):
 
         NavStates.dodge.transitions = {
             Transition.CountTransition(navTrans.doneDodging,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : NavStates.briefStand
-            }
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.INSTANT)
+           : NavStates.briefStand
+           }
 
         NavStates.atPosition.transitions = {
             self.locRepositionTransition : NavStates.goToPosition

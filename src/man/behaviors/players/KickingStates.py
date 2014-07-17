@@ -45,13 +45,11 @@ def executeKick(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
         executeKick.sweetMove = player.kick.sweetMove
-        player.shouldKickOff = False
         return player.stay()
 
     # TODO consider lowering this
     if player.counter == 30:
         player.executeMove(executeKick.sweetMove)
-        player.shouldKickOff = False
         return player.stay()
 
     # TODO not ideal at all!
@@ -72,7 +70,9 @@ def afterKick(player):
         player.brain.tracker.afterKickScan(player.kick.name)
         return player.stay()
 
-    if transitions.shouldKickAgain(player):
+    if player.passBack:
+        return player.goNow('passToFieldCross')
+    elif transitions.shouldKickAgain(player):
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
         if player.motionKick:
             player.motionKick = False
