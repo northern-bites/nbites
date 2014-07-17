@@ -162,13 +162,15 @@ class Navigator(FSA.FSA):
         if self.currentState is not 'goToPosition':
             self.switchTo('goToPosition')
 
-    def updateDest(self, dest, speed = KEEP_SAME_SPEED):
+    def updateDest(self, dest, speed = KEEP_SAME_SPEED, fast = None):
         """  Update the destination we're headed to   """
         self.destination = dest
 
         NavStates.goToPosition.dest = dest
         if speed is not KEEP_SAME_SPEED:
             NavStates.goToPosition.speed = speed
+        if fast:
+            NavStates.goToPosition.fast = fast
 
     def destinationWalkTo(self, walkToDest, speed = FULL_SPEED, kick = None):
         """
