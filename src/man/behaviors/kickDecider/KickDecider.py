@@ -123,6 +123,26 @@ class KickDecider(object):
         except:
             return None
 
+    def frontKicksClear(self):
+        self.brain.player.motionKick = False
+
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_KICK)
+        self.kicks.append(kicks.RIGHT_KICK)
+
+        self.scoreKick = self.minimizeDistanceToGoal
+
+        self.filters = []
+        self.filters.append(self.upfieldEnough)
+
+        self.clearPossibleKicks()
+        self.addFastestPossibleKicks()
+
+        try:
+            return (kick for kick in self.possibleKicks).next().next()
+        except:
+            return None
+
     def motionKicksOrbit(self):
         self.brain.player.motionKick = True
     
@@ -416,11 +436,10 @@ class KickDecider(object):
             if timeAndSpace:
                 return timeAndSpace
 
-            # TODO implement smarter clearing strategy
-            # if clearing:
-            #     timeAndSpace = self.allKicksAsap()
-            #     if timeAndSpace:
-            #         return timeAndSpace
+            if clearing:
+                clear = self.frontKicksClear()
+                if clear:
+                    return clear
 
         asap = self.motionKicksAsap()
         if asap:
@@ -620,6 +639,9 @@ class KickDecider(object):
         kickDestination = Location(kick.destinationX, kick.destinationY)
 
         return goalCenter.distTo(ball) > goalCenter.distTo(kickDestination)
+
+    def upfieldEnough(self, kick):
+        return -30 <= kick.setupH <= 30
 
     ### HELPER FUNCTIONS ###
     def fromCartesianToPolarCoordinates(self, x, y):
