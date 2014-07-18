@@ -215,15 +215,20 @@ class KickDecider(object):
         self.brain.player.motionKick = True
     
         self.kicks = []
-        if not obstacles[1]:
-            self.kicks.append(kicks.M_LEFT_SIDE)
-            self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
-        if not obstacles[2]:
-            self.kicks.append(kicks.M_RIGHT_SIDE)
-            self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
-        if not self.kicks:
-            self.kicks.append(kicks.M_LEFT_SIDE)
-            self.kicks.append(kicks.M_RIGHT_SIDE)
+        if self.brain.obstacles[2] == 0 or self.brain.obstacles[8] == 0:
+            if self.brain.obstacles[2] == 0:
+                self.kicks.append(kicks.M_LEFT_SIDE)
+                self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+            else:
+                self.kicks.append(kicks.M_RIGHT_SIDE)
+                self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
+        else:
+            if self.brain.obstacles[2] > self.brain.obstacles[8]:
+                self.kicks.append(kicks.M_LEFT_SIDE)
+                self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+            else:
+                self.kicks.append(kicks.M_RIGHT_SIDE)
+                self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
 
         self.scoreKick = self.minimizeDistanceToGoal
         
@@ -419,15 +424,14 @@ class KickDecider(object):
         return self.frontKickCrosses()
 
     def obstacleAware(self, clearing = False):
-        # motionKicksOnGoal = self.motionKicksAsapOnGoal() # TODO avoid when shooting too?
-        # if motionKicksOnGoal:
-        #     return motionKicksOnGoal
+        motionKicksOnGoal = self.motionKicksAsapOnGoal() # TODO avoid when shooting too?
+        if motionKicksOnGoal:
+            return motionKicksOnGoal
 
-        # obstacles = [self.checkObstacle(1,75), self.checkObstacle(2,75), self.checkObstacle(8,75)]
-        # if True in obstacles:
-        #     inScrum = self.motionKicksInScrumAsap(obstacles)
-        #     if inScrum:
-        #         return inScrum
+        if self.checkObstacle(1, 75):
+            inScrum = self.motionKicksInScrumAsap()
+            if inScrum:
+                return inScrum
 
         if (not self.checkObstacle(1, 150) and 
             not self.checkObstacle(1, 100) and
