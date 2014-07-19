@@ -7,6 +7,7 @@ from . import FallControllerStates
 from . import RoleSwitchingStates
 from . import GameControllerStates
 from . import KickerStates
+from . import CommMonitorStates
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
@@ -15,6 +16,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(RoleSwitchingStates)
         self.addStates(GameControllerStates)
         self.addStates(KickerStates)
+        self.addStates(CommMonitorStates)
+
         self.setName('pKicker')
         self.currentState = 'fallController' # initial state
 
