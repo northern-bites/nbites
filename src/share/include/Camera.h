@@ -98,7 +98,7 @@ public:
     static const bool TOP_AUTO_WHITEBALANCE = 0;
     static const int TOP_BACKLIGHT_COMPENSATION = 0x00;
     static const int TOP_EXPOSURE = 160;
-    static const int TOP_GAIN = 73;
+    static const int TOP_GAIN = 70;
     static const int TOP_WHITE_BALANCE = 4500;
     static const bool TOP_FADE_TO_BLACK = 0;
 
@@ -106,7 +106,7 @@ public:
     static const bool BOTTOM_H_FLIP = 0;
     static const bool BOTTOM_V_FLIP = 0;
     static const bool BOTTOM_AUTO_EXPOSURE = 0;
-    static const int BOTTOM_BRIGHTNESS = 200;
+    static const int BOTTOM_BRIGHTNESS = 160;
     static const int BOTTOM_CONTRAST = 56;
     static const int BOTTOM_SATURATION = 122;
     static const int BOTTOM_HUE = 0;
@@ -114,9 +114,9 @@ public:
     static const int BOTTOM_GAMMA = 220;
     static const bool BOTTOM_AUTO_WHITEBALANCE = 0;
     static const int BOTTOM_BACKLIGHT_COMPENSATION = 0x00;
-    static const int BOTTOM_EXPOSURE = 250;
+    static const int BOTTOM_EXPOSURE = 160;
     static const int BOTTOM_GAIN = 62;
-    static const int BOTTOM_WHITE_BALANCE = 3200;
+    static const int BOTTOM_WHITE_BALANCE = 4200;
     static const bool BOTTOM_FADE_TO_BLACK = 0;
 
     // // WATSON 2014 CAMERA PARAMETERS
