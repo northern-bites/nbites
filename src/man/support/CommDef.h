@@ -50,7 +50,7 @@ static const robot_ip_pair avril   = {"avril"  , "139.140.192.21"};
 static const robot_ip_pair robotIPs[NUM_ROBOTS] = {wash, river, jayne,
                                                    simon, inara, kaylee,
                                                    vera, mal, zoe,
-                                                   ringo, beyonce, ozzy};
+                                                   ringo, beyonce, ozzy, avril};
 
 //
 // Comm constants and MACRO definitions
