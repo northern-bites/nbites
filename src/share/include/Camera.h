@@ -95,7 +95,7 @@ public:
     static const int TOP_BACKLIGHT_COMPENSATION = 0x00;
     static const int TOP_EXPOSURE = 30;
     static const int TOP_GAIN = 73;
-    static const int TOP_WHITE_BALANCE = 3300;
+    static const int TOP_WHITE_BALANCE = 4500;
     static const bool TOP_FADE_TO_BLACK = 0;
 
     // // BOTTOM SETTINGS
