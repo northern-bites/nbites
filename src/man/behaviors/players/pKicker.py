@@ -17,6 +17,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(CommMonitorStates)
         self.addStates(GameControllerStates)
         self.addStates(KickerStates)
+
         self.setName('pKicker')
         self.currentState = 'fallController' # initial state
 

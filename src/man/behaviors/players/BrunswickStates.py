@@ -108,7 +108,8 @@ def gamePlaying(player):
 
     if player.brain.gameController.timeSincePlaying < 10:
         if player.brain.gameController.ownKickOff:
-            if roleConstants.isChaser(player.role) or roleConstants.isCherryPicker(player.role):
+            if (roleConstants.isChaser(player.role) or roleConstants.isCherryPicker(player.role)
+               and player.brain.ball.vis.on):
                 player.shouldKickOff = True
                 return player.goNow('approachBall')
             else:

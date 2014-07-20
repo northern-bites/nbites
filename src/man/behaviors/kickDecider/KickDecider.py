@@ -243,6 +243,13 @@ class KickDecider(object):
         except:
             return None
 
+    def kicksBeforeBallIsFree(self):
+        asap = self.motionKicksAsap()
+        if asap:
+            return asap
+
+        return self.frontKickCrosses()
+
     def allKicksAsap(self):
         self.kicks = []
         self.kicks.append(kicks.LEFT_KICK)
