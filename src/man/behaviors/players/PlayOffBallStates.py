@@ -44,7 +44,10 @@ def positionAtHome(player):
     of the shared ball if it is on with reliability >= 1.
     """
     if player.firstFrame():
-        player.brain.tracker.trackBall()
+        if role.isCherryPicker(player.role):
+            player.brain.tracker.performBasicPan()
+        else:
+            player.brain.tracker.trackBall()
 
         home = RobotLocation(player.homePosition.x, player.homePosition.y, player.homePosition.h)
         if (player.brain.sharedBall.ball_on and player.brain.sharedBall.reliability >= 2 and 
