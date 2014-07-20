@@ -123,6 +123,26 @@ class KickDecider(object):
         except:
             return None
 
+    def frontKicksClear(self):
+        self.brain.player.motionKick = False
+
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_KICK)
+        self.kicks.append(kicks.RIGHT_KICK)
+
+        self.scoreKick = self.minimizeDistanceToGoal
+
+        self.filters = []
+        self.filters.append(self.upfieldEnough)
+
+        self.clearPossibleKicks()
+        self.addFastestPossibleKicks()
+
+        try:
+            return (kick for kick in self.possibleKicks).next().next()
+        except:
+            return None
+
     def motionKicksOrbit(self):
         self.brain.player.motionKick = True
     
@@ -195,15 +215,20 @@ class KickDecider(object):
         self.brain.player.motionKick = True
     
         self.kicks = []
-        if not obstacles[1]:
-            self.kicks.append(kicks.M_LEFT_SIDE)
-            self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
-        if not obstacles[2]:
-            self.kicks.append(kicks.M_RIGHT_SIDE)
-            self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
-        if not self.kicks:
-            self.kicks.append(kicks.M_LEFT_SIDE)
-            self.kicks.append(kicks.M_RIGHT_SIDE)
+        if self.brain.obstacles[2] == 0 or self.brain.obstacles[8] == 0:
+            if self.brain.obstacles[2] == 0:
+                self.kicks.append(kicks.M_LEFT_SIDE)
+                self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+            else:
+                self.kicks.append(kicks.M_RIGHT_SIDE)
+                self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
+        else:
+            if self.brain.obstacles[2] > self.brain.obstacles[8]:
+                self.kicks.append(kicks.M_LEFT_SIDE)
+                self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+            else:
+                self.kicks.append(kicks.M_RIGHT_SIDE)
+                self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
 
         self.scoreKick = self.minimizeDistanceToGoal
         
@@ -399,13 +424,12 @@ class KickDecider(object):
         return self.frontKickCrosses()
 
     def obstacleAware(self, clearing = False):
-        # motionKicksOnGoal = self.motionKicksAsapOnGoal() # TODO avoid when shooting too?
-        # if motionKicksOnGoal:
-        #     return motionKicksOnGoal
+        motionKicksOnGoal = self.motionKicksAsapOnGoal()
+        if motionKicksOnGoal:
+            return motionKicksOnGoal
 
-        # obstacles = [self.checkObstacle(1,75), self.checkObstacle(2,75), self.checkObstacle(8,75)]
-        # if True in obstacles:
-        #     inScrum = self.motionKicksInScrumAsap(obstacles)
+        # if self.checkObstacle(1, 75):
+        #     inScrum = self.motionKicksInScrumAsap()
         #     if inScrum:
         #         return inScrum
 
@@ -416,11 +440,10 @@ class KickDecider(object):
             if timeAndSpace:
                 return timeAndSpace
 
-            # TODO implement smarter clearing strategy
-            # if clearing:
-            #     timeAndSpace = self.allKicksAsap()
-            #     if timeAndSpace:
-            #         return timeAndSpace
+            if clearing:
+                clear = self.frontKicksClear()
+                if clear:
+                    return clear
 
         asap = self.motionKicksAsap()
         if asap:
@@ -620,6 +643,9 @@ class KickDecider(object):
         kickDestination = Location(kick.destinationX, kick.destinationY)
 
         return goalCenter.distTo(ball) > goalCenter.distTo(kickDestination)
+
+    def upfieldEnough(self, kick):
+        return -30 <= kick.setupH <= 30
 
     ### HELPER FUNCTIONS ###
     def fromCartesianToPolarCoordinates(self, x, y):
