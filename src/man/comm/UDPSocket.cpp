@@ -325,8 +325,8 @@ int UDPSocket::sendToTarget(const char* data, const int len)
 
     if (nwritten < 0)
     {
-        std::cerr << "UDPSocket::sendToTarget() failed: "
-                  << strerror(errno) << std::endl;
+        // std::cerr << "UDPSocket::sendToTarget() failed: "
+        //           << strerror(errno) << std::endl;
     }
     else
     {
