@@ -12,7 +12,7 @@ set(PLAYER_NUMBER ${@ROBOT_PLAYER_NUMBER@})
 
 set(
   @ROBOT_TEAM_NUMBER@
-  "16"
+  "14"
   CACHE STRING
   "The team number for the robot."
 )
@@ -36,7 +36,7 @@ set(PYTHON_PLAYER ${@PYTHON_PLAYER@})
 
 set(
   @TABLE_TOP@
-  "../../data/tables/fortall.mtb"
+  "../../data/tables/brazilv4top.mtb"
   CACHE STRING
   "Path relative to man directory for the desired top camera color table"
 )
@@ -44,7 +44,7 @@ set(TABLE_TOP ${@TABLE_TOP@})
 
 set(
   @TABLE_BOTTOM@
-  "../../data/tables/fortallbottom.mtb"
+  "../../data/tables/brazilv4bottom.mtb"
   CACHE STRING
   "Path relative to man directory for the desired bottom camera color table"
 )
