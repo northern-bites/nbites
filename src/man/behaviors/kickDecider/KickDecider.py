@@ -424,14 +424,14 @@ class KickDecider(object):
         return self.frontKickCrosses()
 
     def obstacleAware(self, clearing = False):
-        motionKicksOnGoal = self.motionKicksAsapOnGoal() # TODO avoid when shooting too?
+        motionKicksOnGoal = self.motionKicksAsapOnGoal()
         if motionKicksOnGoal:
             return motionKicksOnGoal
 
-        if self.checkObstacle(1, 75):
-            inScrum = self.motionKicksInScrumAsap()
-            if inScrum:
-                return inScrum
+        # if self.checkObstacle(1, 75):
+        #     inScrum = self.motionKicksInScrumAsap()
+        #     if inScrum:
+        #         return inScrum
 
         if (not self.checkObstacle(1, 150) and 
             not self.checkObstacle(1, 100) and
