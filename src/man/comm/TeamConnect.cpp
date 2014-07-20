@@ -109,13 +109,13 @@ PROF_EXIT(P_COMM_BUILD_PACKET);
 PROF_ENTER(P_COMM_SERIALIZE_PACKET);
 
     // serialize the teamMessage for putting into the final field of the packet
-    // int dataByteSize = arbData->ByteSize();
-    // char datagram_arbdata[dataByteSize];
-    // arbData->SerializeToArray(datagram_arbdata, dataByteSize);
+    int dataByteSize = arbData->ByteSize();
+    char datagram_arbdata[dataByteSize];
+    arbData->SerializeToArray(datagram_arbdata, dataByteSize);
 
-    // // put it into the packet, along with its size
-    // memcpy(splMessage.data, datagram_arbdata, dataByteSize);
-    splMessage.numOfDataBytes = (uint16_t) 0;
+    // put it into the packet, along with its size
+    memcpy(splMessage.data, datagram_arbdata, dataByteSize);
+    splMessage.numOfDataBytes = (uint16_t) dataByteSize;
 
 PROF_EXIT(P_COMM_SERIALIZE_PACKET);
 
