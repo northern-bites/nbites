@@ -11,7 +11,8 @@ start() {
   ifconfig wlan0 up
   wpa_supplicant -iwlan0 -Dnl80211 -c/etc/wpa_supplicant/wpa_supplicant.conf -B
   sleep 1
-  dhclient wlan0
+  ifconfig wlan0 139.0.0.ROBOT netmask 255.255.255.0
+  route add -net default gw 139.0.0.0
 }
 
 stop() {
