@@ -61,7 +61,7 @@ def prepareForKick(player):
         if player.shouldKickOff or player.brain.gameController.timeSincePlaying < 10:
             print "Overriding kick decider for kickoff!"
             player.shouldKickOff = False
-            player.kick = player.decider.motionKicksAsap()
+            player.kick = player.decider.kicksBeforeBallIsFree()
         else:
             # if transitions.shouldChangeKickingStrategy(player):
             #     print "Time for some heroics!"
