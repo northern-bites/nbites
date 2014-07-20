@@ -54,7 +54,10 @@ def positionAtHome(player):
         home.h = player.brain.loc.getRelativeBearing(sharedball)
 
     if player.firstFrame():
-        player.brain.tracker.trackBall()
+        if role.isCherryPicker(player.role):
+            player.brain.tracker.repeatWidePan()
+        else:
+            player.brain.tracker.trackBall()
         fastWalk = role.isCherryPicker(player.role)
         player.brain.nav.goTo(home, precision = nav.HOME,
                               speed = nav.QUICK_SPEED, avoidObstacles = True,
