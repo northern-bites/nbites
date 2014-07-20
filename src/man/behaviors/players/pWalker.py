@@ -5,6 +5,7 @@ A behavior to test walking. States are defined as functions in WalkingStates.
 from . import SoccerFSA
 from . import FallControllerStates
 from . import RoleSwitchingStates
+from . import CommMonitorStates
 from . import GameControllerStates
 from . import WalkingStates
 
@@ -13,6 +14,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.__init__(self,brain)
         self.addStates(FallControllerStates)
         self.addStates(RoleSwitchingStates)
+        self.addStates(CommMonitorStates)
         self.addStates(GameControllerStates)
         self.addStates(WalkingStates)
         self.setName('pWalker')
@@ -21,3 +23,4 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.brain.fallController.enabled = True 
         self.roleSwitching = False
         self.role = brain.playerNumber
+        self.commMode = -1
