@@ -110,7 +110,6 @@ def gamePlaying(player):
         if player.brain.gameController.ownKickOff:
             if (roleConstants.isChaser(player.role) or roleConstants.isCherryPicker(player.role)
                and player.brain.ball.vis.on):
-            # if roleConstants.isChaser(player.role) or roleConstants.isCherryPicker(player.role):
                 player.shouldKickOff = True
                 return player.goNow('approachBall')
             else:

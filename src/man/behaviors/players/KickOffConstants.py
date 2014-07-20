@@ -18,6 +18,9 @@ def shouldRunKickOffPlay(player):
     """
     makes sure the robots are in position to run a play
     """
+    if not player.brain.ball.vis.on:
+        return False
+
     if not roleConstants.twoAttackersOnField(player) or not player.brain.gameController.ownKickOff:
         # print "there were not two attackers on Field"
         return False
@@ -41,9 +44,14 @@ def shouldRunKickOffPlay(player):
         if roleConstants.isSecondChaser(mate.role) or roleConstants.isCherryPicker(mate.role):
             shouldRunKickOffPlay.distToPosition = hypot(mate.x - roleConstants.oddChaserKickoff.x,
                                                         mate.y - roleConstants.oddChaserKickoff.y)
+            if not mate.ballOn:
+                return False
+
         elif roleConstants.isFirstChaser(mate.role):
             shouldRunKickOffPlay.distToPosition = hypot(mate.x - roleConstants.ourKickoff.x,
                                                         mate.y - roleConstants.ourKickoff.y)
+                if not mate.ballOn:
+                    return False
             # print "mate loc = ", mate.x, ", ", mate.y
             # print "should be ", roleConstants.ourKickoff.x, ", ", roleConstants.ourKickoff.y
         else:
