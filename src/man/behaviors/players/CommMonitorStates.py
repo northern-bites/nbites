@@ -11,7 +11,9 @@ from ..util import *
 @defaultState('gameControllerResponder')
 @superState('roleSwitcher')
 def commMonitor(player):
-    if player.commMode != 2 and transitions.awfulComm(player):
+    if player.commMode == -1:
+        pass
+    elif player.commMode != 2 and transitions.awfulComm(player):
         print "Switched to awful comm mode!"
         player.role = player.brain.playerNumber
         player.prevRoleConfig = RoleConstants.roleConfiguration
