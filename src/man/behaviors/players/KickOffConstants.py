@@ -50,8 +50,8 @@ def shouldRunKickOffPlay(player):
         elif roleConstants.isFirstChaser(mate.role):
             shouldRunKickOffPlay.distToPosition = hypot(mate.x - roleConstants.ourKickoff.x,
                                                         mate.y - roleConstants.ourKickoff.y)
-                if not mate.ballOn:
-                    return False
+            if not mate.ballOn:
+                return False
             # print "mate loc = ", mate.x, ", ", mate.y
             # print "should be ", roleConstants.ourKickoff.x, ", ", roleConstants.ourKickoff.y
         else:
