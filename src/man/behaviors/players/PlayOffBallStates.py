@@ -45,7 +45,7 @@ def positionAtHome(player):
     """
     if player.firstFrame():
         if role.isCherryPicker(player.role):
-            player.brain.tracker.performBasicPan()
+            player.brain.tracker.repeatWidePan()
         else:
             player.brain.tracker.trackBall()
 
