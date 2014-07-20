@@ -16,26 +16,25 @@ if [ "$1" = "" ]; then
     exit 1
 fi
 
-echo "Type username for RoboCup server, followed by [ENTER]"
-read username
+#echo "Type username for RoboCup server, followed by [ENTER]"
+#read username
 
-SERVER=$username@robocup.bowdoin.edu
-ROBOCUP_DIR=mnt/research/robocup
-TABLES_DIR=tables
+SERVER=nbites@Magnetite.local
+TABLES_DIR=/home/nbites/nbites/data/tables
 DEST=.
 EXCLUDE_SYNC=--exclude=sync*
 EXCLUDE_GIT="--exclude=tables.git* --exclude=.git*"
 
 
-SYNC_UP="$RSYNC $RSYNC_OPTS $UP_OPTS $EXCLUDE_SYNC $EXCLUDE_GIT $DEST/ $SERVER:/$ROBOCUP_DIR/$TABLES_DIR/"
-SYNC_DOWN="$RSYNC $RSYNC_OPTS $EXCLUDE_SYNC $EXCLUDE_GIT $SERVER:/$ROBOCUP_DIR/$TABLES_DIR/ $DEST/"
-DIFF="$RSYNC $RSYNC_OPTS -n $EXCLUDE_SYNC $EXCLUDE_GIT $DEST/ $SERVER:/$ROBOCUP_DIR/$TABLES_DIR/"
+SYNC_UP="$RSYNC $RSYNC_OPTS $UP_OPTS $EXCLUDE_SYNC $EXCLUDE_GIT $DEST/ $SERVER:$TABLES_DIR/"
+SYNC_DOWN="$RSYNC $RSYNC_OPTS $EXCLUDE_SYNC $EXCLUDE_GIT $SERVER:$TABLES_DIR/ $DEST/"
+DIFF="$RSYNC $RSYNC_OPTS -n $EXCLUDE_SYNC $EXCLUDE_GIT $DEST/ $SERVER:$TABLES_DIR/"
 
-CH_OWN="ssh $SERVER chgrp -R robocupgrp $ROBOCUP_DIR/$TABLES_DIR"
+CH_OWN="ssh $SERVER chgrp -R robocupgrp $TABLES_DIR"
 
 if [ "$UP_OR_DOWN" = "up" ]; then
 
-    echo "Syncing FROM `pwd` TO $SERVER/$ROBOCUP_DIR/$TABLES_DIR"
+    echo "Syncing FROM `pwd` TO $SERVER/$TABLES_DIR"
     echo $SYNC_UP
     $SYNC_UP
     echo $CH_OWN
@@ -43,7 +42,7 @@ if [ "$UP_OR_DOWN" = "up" ]; then
 
 elif [ "$UP_OR_DOWN" = "down" ]; then
 
-    echo "Syncing FROM $SERVER/$ROBOCUP_DIR/$TABLES_DIR TO `pwd` "
+    echo "Syncing FROM $SERVER/$TABLES_DIR TO `pwd` "
     echo $SYNC_DOWN
     $SYNC_DOWN
 
