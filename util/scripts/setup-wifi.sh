@@ -1,5 +1,5 @@
 # To be run on the robot AS ROOT
-if [ $# -ne 1 ] ; then
+if [ $# -ne 2 ]; then
     echo "Usage: ./setup-robot <new-hostname>"
     exit 1
 fi
@@ -86,16 +86,14 @@ else
 fi
 
 # Replacing connman with wpa_supplicant
-if [ $2 ]; then
-    if [ $2 == "connman" ]; then
-        echo "Replacing connman with wpa_supplicant"
-        mv $FOLDER/usr_autoload.ini naoqi/preferences/autoload.ini
-        rc-config delete connman boot
-        rc-config delete naopathe default
-        rc-config delete lighttpd default
-        rc-config add nbwired boot
-        rc-config add nbwireless boot
-    fi
+if [ $2 == "connman" ]; then
+    echo "Replacing connman with wpa_supplicant"
+    mv $FOLDER/sys_autoload.ini /etc/naoqi/autoload.ini
+    rc-config delete connman boot
+    rc-config delete naopathe default
+    rc-config delete lighttpd default
+    rc-config add nbwired boot
+    rc-config add nbwireless boot
 fi
 
 rm -rf $FOLDER
