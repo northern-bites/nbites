@@ -47,7 +47,7 @@ void CameraCalibrate::UpdateByName(std::string name)
         paramsBottom[ROLL] = -0.03f;
         paramsBottom[PITCH] = -0.07f;
     } else if (name == "zoe") {
-        paramsTop[ROLL] = -0.04f;
+        paramsTop[ROLL] = -0.03f;
         paramsTop[PITCH] = 0.0f;
         paramsBottom[ROLL] = -0.01f;
         paramsBottom[PITCH] = -0.01f;
