@@ -74,7 +74,7 @@ PROF_ENTER(P_COMM_BUILD_PACKET);
     strncpy(splMessage.header, SPL_STANDARD_MESSAGE_STRUCT_HEADER, sizeof(splMessage.header));
     splMessage.version = SPL_STANDARD_MESSAGE_STRUCT_VERSION;
     splMessage.playerNum = (uint8_t)arbData->player_number();
-    splMessage.teamColor = (uint8_t)arbData->team_number();
+    splMessage.team = (uint8_t)arbData->team_number();
     splMessage.fallen = (uint8_t)model.fallen();
     
     splMessage.pose[0] = (model.my_x()-CENTER_FIELD_X)*CM_TO_MM;
@@ -102,8 +102,6 @@ PROF_ENTER(P_COMM_BUILD_PACKET);
     splMessage.ballVel[0] = model.ball_vel_x()*CM_TO_MM;
     splMessage.ballVel[1] = model.ball_vel_y()*CM_TO_MM;
 
-    splMessage.intention = 0; // TODO not accurate
-    
 PROF_EXIT(P_COMM_BUILD_PACKET);
 
 PROF_ENTER(P_COMM_SERIALIZE_PACKET);
@@ -244,7 +242,7 @@ bool TeamConnect::verify(SPLStandardMessage* splMessage, int seqNumber, int64_t 
         return false;
     }
 
-    if (splMessage->teamColor != team)
+    if (splMessage->team != team)
     {
 #ifdef DEBUG_COMM
         std::cout << "Received packet with bad teamNumber"
