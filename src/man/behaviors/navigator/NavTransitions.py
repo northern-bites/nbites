@@ -23,52 +23,61 @@ def atDestination(nav):
 
 # Transition: Should I perform a dodge? Also sets up the direction.
 def shouldDodge(nav):
-    return False
     # If nav isn't avoiding things, just no
     if not states.goToPosition.avoidObstacles:
         return False
 
-    if (nav.brain.obstacles[1] > constants.DODGE_DIST or
-        nav.brain.obstacles[1] == 0.0):
-        return False
-
-    obsts = nav.brain.interface.fieldObstacles
-    states.dodge.DDirects = ( obsts.obstacle(0).NONE,
-                              obsts.obstacle(0).NORTH,
-                              obsts.obstacle(0).NORTHEAST,
-                              obsts.obstacle(0).EAST,
-                              obsts.obstacle(0).SOUTHEAST,
-                              obsts.obstacle(0).SOUTH,
-                              obsts.obstacle(0).SOUTHWEST,
-                              obsts.obstacle(0).WEST,
-                              obsts.obstacle(0).NORTHWEST )
-
-    info = [0.] * 9 #8 directions
-    setPosition = False
-
-    # Get relative robot / ball desitnation
-    relLoc = helper.getRelativeDestination(nav.brain.loc,
-                                           states.goToPosition.dest)
-    walkingDest = getDirection(relLoc.relH)
-    ballDir = getDirection(nav.brain.ball.bearing_deg)
-
     for i in range(1, len(nav.brain.obstacles)):
-        if (nav.brain.obstacles[i] != 0.0 and
-            nav.brain.obstacles[i] < constants.DODGE_DIST):
-            info[i] = nav.brain.obstacles[i]
-            if (i == int(ballDir) and nav.brain.ball.distance <
-                nav.brain.obstacles[i]):
-                return False
-            if i <= 3 or i >= 7:
-                setPosition = True
-
-    if setPosition:
-        states.dodge.targetDest = walkingDest
-        states.dodge.positions = info
-        doneDodging.timer = 0
-        return True
+        if nav.brain.obstacles[i] == 1.0:
+            states.dodge.armPosition = i
+            doneDodging.timer = 0
+            doneDodging.armPosition = i
+            return True
 
     return False
+
+    # TODO: HACK BRAZIL - TURNED OFF WAY TO PROCESS VISION OBSTACLES
+    # if (nav.brain.obstacles[1] > constants.DODGE_DIST or
+    #     nav.brain.obstacles[1] == 0.0):
+    #     return False
+
+    # obsts = nav.brain.interface.fieldObstacles
+    # states.dodge.DDirects = ( obsts.obstacle(0).NONE,
+    #                           obsts.obstacle(0).NORTH,
+    #                           obsts.obstacle(0).NORTHEAST,
+    #                           obsts.obstacle(0).EAST,
+    #                           obsts.obstacle(0).SOUTHEAST,
+    #                           obsts.obstacle(0).SOUTH,
+    #                           obsts.obstacle(0).SOUTHWEST,
+    #                           obsts.obstacle(0).WEST,
+    #                           obsts.obstacle(0).NORTHWEST )
+
+    # info = [0.] * 9 #8 directions
+    # setPosition = False
+
+    # # Get relative robot / ball desitnation
+    # relLoc = helper.getRelativeDestination(nav.brain.loc,
+    #                                        states.goToPosition.dest)
+    # walkingDest = getDirection(relLoc.relH)
+    # ballDir = getDirection(nav.brain.ball.bearing_deg)
+
+    # for i in range(1, len(nav.brain.obstacles)):
+    #     if (nav.brain.obstacles[i] != 0.0 and
+    #         nav.brain.obstacles[i] < constants.DODGE_DIST):
+    #         info[i] = nav.brain.obstacles[i]
+    #         if (i == int(ballDir) and nav.brain.ball.distance <
+    #             nav.brain.obstacles[i]):
+    #             return False
+    #         if i <= 3 or i >= 7:
+    #             setPosition = True
+
+    # if setPosition:
+    #     states.dodge.targetDest = walkingDest
+    #     states.dodge.positions = info
+    #     doneDodging.timer = 0
+    #     return True
+
+    # return False
 
 # Check if an obstacle is no longer there, or if we've completed the dodge
 def doneDodging(nav):
@@ -76,21 +85,30 @@ def doneDodging(nav):
     obstacles = False
 
     doneDodging.timer += 1
-    if doneDodging.timer > 180:
+    if doneDodging.timer > 90:
         timerDone = True
 
-    for i in range(1, len(nav.brain.obstacles)):
-        if (nav.brain.obstacles[i] != 0.0 and
-            nav.brain.obstacles[i] < constants.DODGE_DIST and
-            (i <= 3 or i >= 7)):
-            obstacles = True
+    if nav.brain.obstacles[doneDodging.armPosition] == 1.0:
+        obstacles = True
 
     return timerDone and not obstacles
 
-    # print "DODGE DONE ", nav.brain.obstacles
-    # print noObstacles
 
-    # return (atDestination(nav) or !obstacles)
+    ### HACK FOR BRAZIL: COMMENT OUT WHAT WE USE FOR VISION OBSTACLE DODGING
+    # timerDone = False
+    # obstacles = False
+
+    # doneDodging.timer += 1
+    # if doneDodging.timer > 180:
+    #     timerDone = True
+
+    # for i in range(1, len(nav.brain.obstacles)):
+    #     if (nav.brain.obstacles[i] != 0.0 and
+    #         nav.brain.obstacles[i] < constants.DODGE_DIST and
+    #         (i <= 3 or i >= 7)):
+    #         obstacles = True
+
+    # return timerDone and not obstacles
 
 def getDirection(h):
     if (h < helper.constants.ZONE_WIDTH * -7. or
