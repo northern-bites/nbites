@@ -129,25 +129,78 @@ goToPosition.close = False
 
 # State where we are moving away from an obstacle
 def dodge(nav):
-    order = [0, 1, -1, 2, -2, 3, -3, 4]
-    if nav.firstFrame():
-        # dodge.positions[0] is position.NONE, so direction numbers are their own index
-        for i in range(len(order)):
-            temp = getIndex(int(dodge.targetDest) + order[i])
-            # if there is no obstacle in this direction
-            if not dodge.positions[temp]:
-                print "DODGE TO ", dodge.DDirects[temp]
-                dodge.dest = RelRobotLocation(constants.DGE_DESTS[temp-1][0],
-                                              constants.DGE_DESTS[temp-1][1],
-                                              constants.DGE_DESTS[temp-1][2])
-                break
 
-    # TODO the worst hack I have ever written, sorry -- Josh Imhoff
-    dest2 = RelRobotLocation(dodge.dest.relX + random(),
-                             dodge.dest.relY + random(),
-                             dodge.dest.relH + random())
-    helper.setDestination(nav, dest2, 0.5)
+    # TODO: HACK FOR BRAZIL - THIS IS USED WHEN IT'S ARM-ONLY DETECTION
+    if nav.firstFrame():
+        ## SET UP the dodge direction based on where the obstacle is
+        # if directly in front of us, move back and to one side based on
+        # where the goToPosition dest is
+        if dodge.armPosition == 1:
+            print "Dodging NORTH obstacle"
+            relDest = helper.getRelativeDestination(nav.brain.loc,
+                                                    goToPosition.dest)
+            if relDest.relY <= 0:
+                direction = -1
+            else:
+                direction = 1
+            dodge.dest = RelRobotLocation(-15, direction*10, 0)
+        elif dodge.armPosition == 2:
+            print "Dodging NORTHEAST obstacle"
+            dodge.dest = RelRobotLocation(-5, 15, 0)
+        elif dodge.armPosition == 3:
+            print "Dodging EAST obstacle"
+            dodge.dest = RelRobotLocation(0, 20, 0)
+        elif dodge.armPosition == 4:
+            print "Dodging SOUTHEAST obstacle"
+            dodge.dest = RelRobotLocation(5, 15, 0)
+        # if directly behind us, move forward and to one side based on
+        # where the goToPosition dest is
+        elif dodge.armPosition == 5:
+            print "Dodging SOUTH obstacle"
+            relDest = helper.getRelativeDestination(nav.brain.loc,
+                                                    goToPosition.dest)
+            if relDest.relY <= 0:
+                direction = -1
+            else:
+                direction = 1
+            dodge.dest = RelRobotLocation(15, direction*10, 0)
+        elif dodge.armPosition == 6:
+            print "Dodging SOUTHWEST obstacle"
+            dodge.dest = RelRobotLocation(5, -15, 0)
+        elif dodge.armPosition == 7:
+            print "Dodging WEST obstacle"
+            dodge.dest = RelRobotLocation(0, -20, 0)
+        elif dodge.armPosition == 8:
+            print "Dodging NORTHWEST obstacle"
+            dodge.dest = RelRobotLocation(-5, -15, 0)
+        else:
+            return
+
+    dest = RelRobotLocation(dodge.dest.relX + random(),
+                            dodge.dest.relY + random(),
+                            dodge.dest.relH + random())
+    helper.setDestination(nav, dest, 0.5)
     return Transition.getNextState(nav, dodge)
+
+    # order = [0, 1, -1, 2, -2, 3, -3, 4]
+    # if nav.firstFrame():
+    #     # dodge.positions[0] is position.NONE, so direction numbers are their own index
+    #     for i in range(len(order)):
+    #         temp = getIndex(int(dodge.targetDest) + order[i])
+    #         # if there is no obstacle in this direction
+    #         if not dodge.positions[temp]:
+    #             print "DODGE TO ", dodge.DDirects[temp]
+    #             dodge.dest = RelRobotLocation(constants.DGE_DESTS[temp-1][0],
+    #                                           constants.DGE_DESTS[temp-1][1],
+    #                                           constants.DGE_DESTS[temp-1][2])
+    #             break
+
+    # # TODO the worst hack I have ever written, sorry -- Josh Imhoff
+    # dest2 = RelRobotLocation(dodge.dest.relX + random(),
+    #                          dodge.dest.relY + random(),
+    #                          dodge.dest.relH + random())
+    # helper.setDestination(nav, dest2, 0.5)
+    # return Transition.getNextState(nav, dodge)
 
 def getIndex(num):
     if num <=8 and num >= 1:
