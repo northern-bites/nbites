@@ -44,14 +44,14 @@ def positionAtHome(player):
     of the shared ball if it is on with reliability >= 1.
     """
     home = RobotLocation(player.homePosition.x, player.homePosition.y, player.homePosition.h)
-    if (player.brain.sharedBall.ball_on and player.brain.sharedBall.reliability >= 2 and 
-        role.isDefender(player.role)):
-        sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
-        home.h = player.brain.loc.getRelativeBearing(sharedball)
-    elif (player.brain.sharedBall.ball_on and player.brain.sharedBall.reliability >= 1 and 
-          role.isCherryPicker(player.role)):
-        sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
-        home.h = player.brain.loc.getRelativeBearing(sharedball)
+    # if (player.brain.sharedBall.ball_on and player.brain.sharedBall.reliability >= 2 and 
+    #     role.isDefender(player.role)):
+    #     sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
+    #     home.h = player.brain.loc.getRelativeBearing(sharedball)
+    # elif (player.brain.sharedBall.ball_on and player.brain.sharedBall.reliability >= 1 and 
+    #       role.isCherryPicker(player.role)):
+    #     sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
+    #     home.h = player.brain.loc.getRelativeBearing(sharedball)
 
     if player.firstFrame():
         if role.isCherryPicker(player.role):
