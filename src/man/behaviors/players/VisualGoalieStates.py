@@ -34,16 +34,14 @@ def walkToGoal(player):
 @superState('gameControllerResponder')
 def spinAtGoal(player):
     if player.firstFrame():
-        spinAtGoal.home = RelRobotLocation(0, 0, 0)
-        # Decide which way to rotate based on the way we came from
-        if player.side == RIGHT:
-            spinAtGoal.home.relH = -90
-        else:
-            spinAtGoal.home.relH = 90
-        player.brain.nav.goTo(spinAtGoal.home,
-                              nav.CLOSE_ENOUGH, nav.CAREFUL_SPEED)
-
+        player.brain.nav.stop()
+        spinAtGoal.counter = 0
         player.brain.tracker.lookToAngle(0.0)
+    spinAtGoal.counter += 1
+    if spinAtGoal.counter > 200:
+            return player.goLater('watchWithCornerChecks')
+    if player.brain.nav.isStopped():
+        player.setWalk(0, 0, 20.0)
 
     return Transition.getNextState(player, spinAtGoal)
 
