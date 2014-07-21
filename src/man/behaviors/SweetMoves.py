@@ -221,6 +221,49 @@ STAND_UP_BACK = (
                   #(69.2, 14.1, -71.6, 90.3),
                   #.7,1, stiff.STANDUP_STIFFNESSES),
                   #knees up
+                  # **** JUST COMMENTED OUT NOW NIKKI REDO THIS OH MAN*
+                 # ((57.6, -3.2, 74.9, -90.9),
+                 #  (-19.9, -1.1, 13.0, -7.1, 17.7, 23.0),
+                 #  (0.0, -1.7, 10.3, -6.3, 22.1, -7.2),
+                 #  (58.2, 8.9, -81.0, 89.8),
+                 #  .3,1, stiff.STANDUP_STIFFNESSES),
+                 #  #kick for momentum
+
+                 # ((119,-11.08,94.13,-1.93),
+                 #  (-62.93,9.06,-84.64,116.72,21.88,23.73),
+                 #  (-62.93,-29.44,-82.62,103.71,30.85,-10.11),
+                 #  (115.93,17.58,-90.62,3.34),
+                 #  0.6,1, stiff.STANDUP_STIFFNESSES),
+                 # #sitting legs spread hands behind facing forward
+
+                 # ((40,60,4,-28),
+                 #  (-28,8,-49,126,-25,-22),
+                 #  (-28,-31,-87,80,52,0),
+                 #  (120,-33,-4,4),
+                 #  .6,1, stiff.STANDUP_STIFFNESSES),
+                 # # turns to right a little and stands with one arm on ground
+
+                 # ((42,28,5,-47),
+                 #  (-49,-16,22,101,-70,-5),
+                 #  (-49,-32,-89,61,39,-7),
+                 #  (101,-15,-4,3),
+                 #  0.6,1, stiff.STANDUP_STIFFNESSES),
+                 # #gets hips up and over knees
+
+                 # ((59.76,29.35,4.39,-45.79),
+                 #  (-30.23,-10.19,-35.86,122.78,-67.68,8.44),
+                 #  (-30.23,-26.72,-70.78,54.41,34.99,19.69),
+                 #  (54.85,-45.62,-0.27,24.35),
+                 #  0.4,1, stiff.STANDUP_STIFFNESSES),
+                 # #pulls right leg in a little
+
+                 # ((77.5, 28.9, 5.6, -40.7),
+                 #  (-30.1, 0.6, -28.2, 123.4, -69.9, 3.2),
+                 #  (0.0, -15.5, -55.8, 123.7, -43.5, 7.2),
+                 #  (88.1, -22.6, -1.0, 23.0),
+                 #  0.6,1, stiff.STANDUP_STIFFNESSES),
+                 # #pulls both legs in, squat
+                 # RECOMMENT TO THIS POINT PLEASE
 
                  ((57.6, -3.2, 74.9, -90.9),
                   (-19.9, -1.1, 13.0, -7.1, 17.7, 23.0),
@@ -236,22 +279,34 @@ STAND_UP_BACK = (
                   0.6,1, stiff.STANDUP_STIFFNESSES),
                  #sitting legs spread hands behind facing forward
 
+                 # makes elbow straight
                  ((40,60,4,-28),
                   (-28,8,-49,126,-25,-22),
                   (-28,-31,-87,80,52,0),
-                  (120,-33,-4,4),
-                  .6,1, stiff.STANDUP_STIFFNESSES),
+                  # (120,-33,-4,0.4),
+                  (123.1, -28.0, -1.7, 6.9),
+                  .7,1, stiff.STANDUP_STIFFNESSES),
                  # turns to right a little and stands with one arm on ground
 
-                 ((42,28,5,-47),
-                  (-49,-16,22,101,-70,-5),
+                 #extra practice one
+                  ((40,50,4,-34),
+                  (-31.6, -9.1, -27.5,110,-50,-13),
+                  (-32,-31,-95,73,44,0),
+                  # (120,-33,-4,0.4),
+                  # (124.3, -0.3, 30.8, 1.8),
+                  # (95.8, -44.2, 10.4, 2.9),
+                  (109.9, -38.2, -1.6, 1.7),
+                  .3,1, stiff.STANDUP_STIFFNESSES),
+
+                  ((42,28,5,-47),
+                  (-49,-16,27,101,-70,-5),
                   (-49,-32,-89,61,39,-7),
                   (101,-15,-4,3),
                   0.6,1, stiff.STANDUP_STIFFNESSES),
                  #gets hips up and over knees
 
                  ((59.76,29.35,4.39,-45.79),
-                  (-30.23,-10.19,-35.86,122.78,-67.68,8.44),
+                  (-30.23,-10.19,-45.86,122.78,-67.68,8.44),
                   (-30.23,-26.72,-70.78,54.41,34.99,19.69),
                   (54.85,-45.62,-0.27,24.35),
                   0.4,1, stiff.STANDUP_STIFFNESSES),
@@ -264,6 +319,27 @@ STAND_UP_BACK = (
                   0.6,1, stiff.STANDUP_STIFFNESSES),
                  #pulls both legs in, squat
 
+                 #  ((42,28,5,-47),
+                 #  (-49,-16,0,101,-70,-5),
+                 #  (-49,-32,-110,61,39,-7),
+                 #  (91,-20,-4,0),
+                 #  0.6,1, stiff.STANDUP_STIFFNESSES),
+                 #  # gets hips up and over knees
+                 #  #TIME WAS .9
+                 # ((59.76,29.35,4.39,-45.79),
+                 #  (-30.23,-10.19,-35.86,122.78,-67.68,8.44),
+                 #  (-30.23,-26.72,-70.78,54.41,34.99,19.69),
+                 #  (54.85,-45.62,-0.27,24.35),
+                 #  0.3,1, stiff.STANDUP_STIFFNESSES),
+                 # #pulls right leg in a little
+                 # #TIME WAS .5
+                 # ((77.5, 28.9, 5.6, -40.7),
+                 #  (-30.1, -2.2, -32.6, 123.5, -69.4, 3.1),
+                 #  (-30.1, -14.2, -61.5, 123.2, -42.8, 8.6),
+                 #  (88.1, -22.6, -1.0, 23.0),
+                 #  0.6, 1, stiff.STANDUP_STIFFNESSES),
+                 # # pulls both legs in, squat
+
                  #stands up
                  (INITIAL_POS[0][0],
                   INITIAL_POS[0][1],
@@ -271,6 +347,8 @@ STAND_UP_BACK = (
                   INITIAL_POS[0][3],
                   1,0, stiff.STANDUP_STIFFNESSES)
                  )
+
+REVERSE_STAND_UP_BACK = mirrorMove(STAND_UP_BACK)
 
 #**********************
 #                     *
