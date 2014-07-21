@@ -34,7 +34,7 @@ void JointEnactorModule::start()
     try
     {
         // Get the DCM proxy.
-        dcmProxy_ = broker_->getDcmProxy();
+        dcmProxy_ = broker_->getSpecialisedProxy<AL::DCMProxy>("DCM");
     }
     catch (AL::ALError& e)
     {
@@ -70,7 +70,7 @@ void JointEnactorModule::initialize()
     // commands to the joint actuators.
     aliases.arraySetSize(2);
     aliases[0] = std::string("jointActuator");
-    aliases[1].arraySetSize(26);
+    aliases[1].arraySetSize(25);
 
     aliases[1][sensors::HeadYaw]         = std::string("Device/SubDeviceList/HeadYaw/Position/Actuator/Value");
     aliases[1][sensors::HeadPitch]       = std::string("Device/SubDeviceList/HeadPitch/Position/Actuator/Value");
@@ -93,7 +93,7 @@ void JointEnactorModule::initialize()
     aliases[1][sensors::RHand]           = std::string("Device/SubDeviceList/RHand/Position/Actuator/Value");
     aliases[1][sensors::RHipPitch]      = std::string("Device/SubDeviceList/RHipPitch/Position/Actuator/Value");
     aliases[1][sensors::RHipRoll]       = std::string("Device/SubDeviceList/RHipRoll/Position/Actuator/Value");
-    aliases[1][sensors::RHipYawPitch]    = std::string("Device/SubDeviceList/RHipYawPitch/Position/Actuator/Value");
+    //aliases[1][sensors::RHipYawPitch]    = std::string("Device/SubDeviceList/RHipYawPitch/Position/Actuator/Value");
     aliases[1][sensors::RKneePitch]     = std::string("Device/SubDeviceList/RKneePitch/Position/Actuator/Value");
     aliases[1][sensors::RShoulderPitch] = std::string("Device/SubDeviceList/RShoulderPitch/Position/Actuator/Value");
     aliases[1][sensors::RShoulderRoll]  = std::string("Device/SubDeviceList/RShoulderRoll/Position/Actuator/Value");
@@ -115,7 +115,7 @@ void JointEnactorModule::initialize()
     aliases.clear();
     aliases.arraySetSize(2);
     aliases[0] = std::string("jointStiffness");
-    aliases[1].arraySetSize(26);
+    aliases[1].arraySetSize(25);
 
     aliases[1][sensors::HeadPitch]        = std::string("Device/SubDeviceList/HeadPitch/Hardness/Actuator/Value");
     aliases[1][sensors::HeadYaw]          = std::string("Device/SubDeviceList/HeadYaw/Hardness/Actuator/Value");
@@ -137,7 +137,7 @@ void JointEnactorModule::initialize()
     aliases[1][sensors::RElbowYaw]       = std::string("Device/SubDeviceList/RElbowYaw/Hardness/Actuator/Value");
     aliases[1][sensors::RHand]            = std::string("Device/SubDeviceList/RHand/Hardness/Actuator/Value");
     aliases[1][sensors::RHipPitch]       = std::string("Device/SubDeviceList/RHipPitch/Hardness/Actuator/Value");
-    aliases[1][sensors::RHipYawPitch]    = std::string("Device/SubDeviceList/RHipYawPitch/Hardness/Actuator/Value");
+    //aliases[1][sensors::RHipYawPitch]    = std::string("Device/SubDeviceList/RHipYawPitch/Hardness/Actuator/Value");
     aliases[1][sensors::RHipRoll]        = std::string("Device/SubDeviceList/RHipRoll/Hardness/Actuator/Value");
     aliases[1][sensors::RKneePitch]      = std::string("Device/SubDeviceList/RKneePitch/Hardness/Actuator/Value");
     aliases[1][sensors::RShoulderPitch]  = std::string("Device/SubDeviceList/RShoulderPitch/Hardness/Actuator/Value");
@@ -209,8 +209,10 @@ void JointEnactorModule::DCMPreProcessCallback()
 
         std::vector<float> jointAngles = motion::toJointAngles(latestJointAngles_);
         std::vector<float> jointStiffness = motion::toJointAngles(latestStiffness_);
+        jointAngles.erase(jointAngles.begin() + Kinematics::R_HIP_YAW_PITCH);
+        jointStiffness.erase(jointStiffness.begin() + Kinematics::R_HIP_YAW_PITCH);
 
-        for(unsigned int i = 0; i < Kinematics::NUM_JOINTS; ++i)
+        for(unsigned int i = 0; i < jointAngles.size(); ++i)
         {
             jointCommand_[5][i][0] = jointAngles[i];
             stiffnessCommand_[5][i][0] = jointStiffness[i];
