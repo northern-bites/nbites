@@ -20,7 +20,7 @@ def checkCommDropOffs(player):
 
         if mate.framesWithoutPacket == -1:
             offCommFromTheBeginning += 1
-        elif mate.framesWithoutPacket > 30:
+        elif mate.framesWithoutPacket > 20*30:
             droppedOffComm += 1
     
     return offCommFromTheBeginning, droppedOffComm
