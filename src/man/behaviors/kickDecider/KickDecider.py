@@ -85,6 +85,32 @@ class KickDecider(object):
         except:
             return None
 
+    def frontKicksOrbitIfSmall(self):
+        self.brain.player.motionKick = False
+
+        self.kicks = []
+        goalCenter = Location(nogginC.FIELD_WHITE_RIGHT_SIDELINE_X, nogginC.MIDFIELD_Y)
+        ball = Location(self.brain.ball.x, self.brain.ball.y)
+        if ball.distTo(goalCenter) <= 400:
+            self.kicks.append(kicks.LEFT_KICK)
+            self.kicks.append(kicks.RIGHT_KICK)
+        else:
+            self.kicks.append(kicks.LEFT_BIG_KICK)
+            self.kicks.append(kicks.RIGHT_BIG_KICK)
+
+        self.scoreKick = self.minimizeOrbitTime
+
+        self.filters = []
+        self.filters.append(self.isShortOrbit)
+
+        self.clearPossibleKicks()
+        self.addShotsOnGoal()
+
+        try:
+            return (kick for kick in self.possibleKicks).next().next()
+        except:
+            return None
+
     def bigKicksOrbit(self):
         self.brain.player.motionKick = False
 
@@ -440,17 +466,17 @@ class KickDecider(object):
         #     if inScrum:
         #         return inScrum
 
-        if (not self.checkObstacle(1, 150) and 
-            not self.checkObstacle(1, 100) and
-            not self.checkObstacle(8, 100)): 
-            timeAndSpace = self.frontKicksAsapOnGoal() # TODO ask for more precision here?
-            if timeAndSpace:
-                return timeAndSpace
-
+        if (not self.checkObstacle(1, 200) and 
+            not self.checkObstacle(1, 200) and
+            not self.checkObstacle(8, 200)): 
             if clearing:
                 clear = self.frontKicksClear()
                 if clear:
                     return clear
+            else:
+                timeAndSpace = self.frontKicksOrbitIfSmall()
+                if timeAndSpace:
+                    return timeAndSpace
 
         asap = self.motionKicksAsap()
         if asap:
@@ -653,6 +679,9 @@ class KickDecider(object):
 
     def upfieldEnough(self, kick):
         return -30 <= kick.setupH <= 30
+
+    def isShortOrbit(self, kick):
+        return math.fabs(self.brain.loc.h - kick.setupH) < 30
 
     ### HELPER FUNCTIONS ###
     def fromCartesianToPolarCoordinates(self, x, y):
