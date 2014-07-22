@@ -38,6 +38,9 @@ def shouldSupport(player):
         
     return player.brain.ball.vis.frames_on and claimTrans.shouldCedeClaim(player)
 
+def shouldDecelerate(player):
+    return player.brain.ball.distance <= constants.SLOW_CHASE_DIST
+
 def shouldPrepareForKick(player):
     """
     We're close enough to prepare for a kick
