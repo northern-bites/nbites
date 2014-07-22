@@ -99,7 +99,7 @@ class Navigator(FSA.FSA):
 
     def chaseBallDeceleratingSpeed(self):
         MAX_SPEED = FULL_SPEED
-        MIN_SPEED = GRADUAL_SPEED
+        MIN_SPEED = BRISK_SPEED
         ballDist = self.brain.ball.distance
         slope = (MAX_SPEED - MIN_SPEED)/(constants.SLOW_CHASE_DIST - constants.PREPARE_FOR_KICK_DIST)
         deceleratingSpeed = MAX_SPEED - slope*(constants.SLOW_CHASE_DIST - ballDist)
