@@ -97,6 +97,14 @@ class Navigator(FSA.FSA):
 
         self.goTo(self.brain.ball, CLOSE_ENOUGH, speed, True, fast = fast)
 
+    def chaseBallDeceleratingSpeed(self):
+        MAX_SPEED = FULL_SPEED
+        MIN_SPEED = GRADUAL_SPEED
+        ballDist = self.brain.ball.distance
+        slope = (MAX_SPEED - MIN_SPEED)/(constants.SLOW_CHASE_DIST - constants.PREPARE_FOR_KICK_DIST)
+        deceleratingSpeed = MAX_SPEED - slope*(constants.SLOW_CHASE_DIST - ballDist)
+        self.brain.nav.chaseBall(deceleratingSpeed, fast = True)
+
     def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED,
              avoidObstacles = False, adaptive = False, fast = False, pb = False):
         """

@@ -8,6 +8,9 @@ BALL_ON_THRESH = 2
 BALL_OFF_THRESH = 10
 BALL_OFF_KICK_THRESH = 4 # 4 seconds, time threshold!
 
+# should decelerate
+SLOW_CHASE_DIST = 150.
+
 # Should position for kick
 BALL_PFK_LEFT_Y = 16.0
 PREPARE_FOR_KICK_DIST = 50.0
