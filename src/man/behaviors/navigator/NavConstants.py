@@ -20,6 +20,10 @@ DODGE_LEFT_SPEED = speeds.LEFT_MAX_SPEED
 ZONE_WIDTH = 180. / (2. * 4.) # 4 directions per PI
 DODGE_DIST = 80.0 #cm
 
+# variable speed chase ball
+SLOW_CHASE_DIST = 150.
+PREPARE_FOR_KICK_DIST = 50.
+
 DGE_DESTS = ((40, 0, 0),            # Dodging to NORTH
              (30, -50, 0),            # TO NORTHEAST
              (0, -40, 0),            # TO EAST
