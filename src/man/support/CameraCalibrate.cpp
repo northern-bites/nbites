@@ -37,10 +37,10 @@ void CameraCalibrate::UpdateByName(std::string name)
     float paramsBottom[] = {0.0f, 0.0f};
 
     if (name == "river") {
-        paramsTop[ROLL] = -0.02f;
-        paramsTop[PITCH] = -0.05f;
-        paramsBottom[ROLL] = 0.00f;
-        paramsBottom[PITCH] = -0.01f;
+        paramsTop[ROLL] = -0.01f;
+        paramsTop[PITCH] = -0.04f;
+        paramsBottom[ROLL] = 0.01f;
+        paramsBottom[PITCH] = 0.02f;
     } else if (name == "mal") {
         paramsTop[ROLL] = -0.01f;
         paramsTop[PITCH] = -0.06f;
@@ -77,10 +77,30 @@ void CameraCalibrate::UpdateByName(std::string name)
         paramsBottom[ROLL] = -0.03f;
         paramsBottom[PITCH] = 0.08f;
     } else if (name == "simon") {
-        paramsTop[ROLL] = -0.02f;
-        paramsTop[PITCH] = 0.05f;
-        paramsBottom[ROLL] = 0.02f;
-        paramsBottom[PITCH] = 0.06f;
+        paramsTop[ROLL] = 0.01f;
+        paramsTop[PITCH] = 0.10f;
+        paramsBottom[ROLL] = 0.0f;
+        paramsBottom[PITCH] = 0.09f;
+    } else if (name == "ringo") {
+        paramsTop[ROLL] = 0.0f;
+        paramsTop[PITCH] = 0.0f;
+        paramsBottom[ROLL] = 0.0f;
+        paramsBottom[PITCH] = 0.0f;
+    } else if (name == "ozzy") {
+        paramsTop[ROLL] = 0.04f;
+        paramsTop[PITCH] = 0.04f;
+        paramsBottom[ROLL] = 0.03f;
+        paramsBottom[PITCH] = -0.02f;
+    } else if (name == "avril") {
+        paramsTop[ROLL] = 0.0f;
+        paramsTop[PITCH] = 0.04f;
+        paramsBottom[ROLL] = -0.07f;
+        paramsBottom[PITCH] = -0.02f;
+    } else if (name == "beyonce") {
+        paramsTop[ROLL] = 0.0f;
+        paramsTop[PITCH] = 0.0f;
+        paramsBottom[ROLL] = 0.0f;
+        paramsBottom[PITCH] = 0.0f;
     }
     UpdateWithParams(paramsTop, paramsBottom);
 }
