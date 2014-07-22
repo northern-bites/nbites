@@ -87,10 +87,10 @@ void CameraCalibrate::UpdateByName(std::string name)
         paramsBottom[ROLL] = 0.0f;
         paramsBottom[PITCH] = -0.05f;
     } else if (name == "ozzy") {
-        paramsTop[ROLL] = 0.04f;
+        paramsTop[ROLL] = 0.01f;
         paramsTop[PITCH] = 0.04f;
-        paramsBottom[ROLL] = 0.03f;
-        paramsBottom[PITCH] = -0.02f;
+        paramsBottom[ROLL] = 0.00f;
+        paramsBottom[PITCH] = -0.04f;
     } else if (name == "avril") {
         paramsTop[ROLL] = 0.0f;
         paramsTop[PITCH] = 0.04f;
