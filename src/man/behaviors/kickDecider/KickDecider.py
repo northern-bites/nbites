@@ -89,14 +89,8 @@ class KickDecider(object):
         self.brain.player.motionKick = False
 
         self.kicks = []
-        goalCenter = Location(nogginC.FIELD_WHITE_RIGHT_SIDELINE_X, nogginC.MIDFIELD_Y)
-        ball = Location(self.brain.ball.x, self.brain.ball.y)
-        if ball.distTo(goalCenter) <= 400:
-            self.kicks.append(kicks.LEFT_KICK)
-            self.kicks.append(kicks.RIGHT_KICK)
-        else:
-            self.kicks.append(kicks.LEFT_BIG_KICK)
-            self.kicks.append(kicks.RIGHT_BIG_KICK)
+        self.kicks.append(kicks.LEFT_KICK)
+        self.kicks.append(kicks.RIGHT_KICK)
 
         self.scoreKick = self.minimizeOrbitTime
 
@@ -466,17 +460,19 @@ class KickDecider(object):
         #     if inScrum:
         #         return inScrum
 
-        if (not self.checkObstacle(1, 200) and 
-            not self.checkObstacle(1, 200) and
-            not self.checkObstacle(8, 200)): 
-            if clearing:
-                clear = self.frontKicksClear()
-                if clear:
-                    return clear
-            else:
+        if (not self.checkObstacle(1, 215) and 
+            not self.checkObstacle(1, 215) and
+            not self.checkObstacle(8, 215)): 
+            goalCenter = Location(nogginC.FIELD_WHITE_RIGHT_SIDELINE_X, nogginC.MIDFIELD_Y)
+            ball = Location(self.brain.ball.x, self.brain.ball.y)
+            if ball.distTo(goalCenter) <= 400:
                 timeAndSpace = self.frontKicksOrbitIfSmall()
                 if timeAndSpace:
                     return timeAndSpace
+            elif clearing:
+                clear = self.frontKicksClear()
+                if clear:
+                    return clear
 
         asap = self.motionKicksAsap()
         if asap:
@@ -678,7 +674,7 @@ class KickDecider(object):
         return goalCenter.distTo(ball) > goalCenter.distTo(kickDestination)
 
     def upfieldEnough(self, kick):
-        return -30 <= kick.setupH <= 30
+        return -40 <= kick.setupH <= 40
 
     def isShortOrbit(self, kick):
         return math.fabs(self.brain.loc.h - kick.setupH) < 30
