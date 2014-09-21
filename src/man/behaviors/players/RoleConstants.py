@@ -4,16 +4,31 @@ from objects import RobotLocation
 ### ROLE CONFIGURATION
 # Possibilites are the following:
 # Goalie, LeftDefender, RightDefender, FirstChaser, SecondChaser, CherryPicker
-ROLE_CONFIGURATION = {1: "Goalie",
-                      2: "LeftDefender",
-                      3: "RightDefender",
-                      4: "FirstChaser",
-                      5: "SecondChaser"}
+
+moderate = {1: "Goalie",
+            2: "LeftDefender",
+            3: "RightDefender",
+            4: "FirstChaser",
+            5: "SecondChaser"}
+
+aggresive = {1: "Goalie",
+             2: "LeftDefender",
+             3: "CherryPicker",
+             4: "FirstChaser",
+             5: "SecondChaser"}
+
+cautious = {1: "Goalie",
+            2: "LeftDefender",
+            3: "RightDefender",
+            4: "FirstChaser",
+            5: "CherryPicker"}
+
+roleConfiguration = moderate
 
 def getRole(role):
     if role < 1:
         return None
-    return ROLE_CONFIGURATION[role]
+    return roleConfiguration[role]
 
 def isGoalie(role):
     return getRole(role) == "Goalie"
@@ -47,6 +62,25 @@ def willRoleSwitch(role):
 def canRoleSwitchTo(role):
     return isChaser(role)
 
+def twoAttackersOnField(player):
+    firstAttacker = False
+    secondAttacker = False
+
+    if isFirstChaser(player.role):
+        firstAttacker = True
+    elif isSecondChaser(player.role) or isCherryPicker(player.role):
+        secondAttacker = True
+
+    for mate in player.brain.teamMembers:
+        if isFirstChaser(mate.role):
+            firstAttacker = True
+        elif isSecondChaser(mate.role) or isCherryPicker(mate.role):
+            secondAttacker = True
+    if firstAttacker and secondAttacker:
+        return True
+
+    return False
+
 ### RANDOM STUFF
 isKickingOff = False # Default is false, changed by pBrunswick or some other if
                      # this is not the case, TODO this is ugly
@@ -70,7 +104,6 @@ oddChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
 oddChaserKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 45,
                                  NogginConstants.OPP_GOALBOX_BOTTOM_Y - 100,
                                  0)
-
 evenChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
                                NogginConstants.FIELD_GREEN_HEIGHT - 100,
                                -90)
@@ -115,21 +148,21 @@ theirKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - \
 #
 # Useful constants can be found in src/share/include/FieldConstants.h
 
-defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
+defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X - 70, NogginConstants.FIELD_GREEN_HEIGHT)
 
-# oddDefenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.CENTER_FIELD_Y + 75)
+oddDefenderBoxCautious = ((0, 0), NogginConstants.CENTER_FIELD_X - 70, NogginConstants.CENTER_FIELD_Y)
 
-# evenDefenderBox = ((0, NogginConstants.CENTER_FIELD_Y - 75), NogginConstants.CENTER_FIELD_X, \
-#                    NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
+evenDefenderBoxCautious = ((0, NogginConstants.CENTER_FIELD_Y), NogginConstants.CENTER_FIELD_X - 70, \
+                           NogginConstants.CENTER_FIELD_Y)
 
 oddDefenderBox = defenderBox
 evenDefenderBox = defenderBox
 
-chaserBox = ((0, 0), NogginConstants.FIELD_HEIGHT, NogginConstants.FIELD_WIDTH)
+chaserBox = ((0, 0), NogginConstants.FIELD_WIDTH, NogginConstants.FIELD_HEIGHT)
 
-cherryPickerBox = (((0.5*NogginConstants.FIELD_GREEN_HEIGHT + 0.25*NogginConstants.FIELD_WHITE_HEIGHT), 0),
-                    0.25*NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_X, 
-                    NogginConstants.FIELD_WIDTH)
+cherryPickerBox = (((0.5*NogginConstants.FIELD_GREEN_WIDTH + 0.25*NogginConstants.FIELD_WHITE_WIDTH), 0),
+                    0.25*NogginConstants.FIELD_WHITE_WIDTH + NogginConstants.GREEN_PAD_X, 
+                    NogginConstants.FIELD_HEIGHT)
 
 ### SETS PLAYER STATE PER ROLE
 def setRoleConstants(player, role):

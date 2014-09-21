@@ -10,7 +10,7 @@ TOOLCHAIN=atomtoolchain
 LIB_DIR=$NBITES_DIR/lib
 SCRIPTS_DIR=$NBITES_DIR/util/scripts
 
-line=`sed -n 2p $SCRIPTS_DIR/nbites.bash`
+line=`grep -e "AL_DIR" nbites.bash`
 
 if [[ $line == *1.14.5* ]]; then
     echo "current version is 1.14.5"
@@ -18,12 +18,16 @@ if [[ $line == *1.14.5* ]]; then
     BACKUP_TOOLCHAIN_DIR=$OLD
     NEW_TOOLCHAIN_DIR=$NEW
     VERSION=2.1.0.19
+    OLDVERSION=1.14.5
+
 elif [[ $line == *2.1.0.19* ]]; then
     echo "current version is 2.1.0.19"
     echo "Is this correct? (y/n)"
     BACKUP_TOOLCHAIN_DIR=$NEW
     NEW_TOOLCHAIN_DIR=$OLD
     VERSION=1.14.5
+    OLDVERSION=2.1.0.19
+
 else
     echo "COULDN'T FIND NAOQI VERSION"
     exit 1
@@ -39,10 +43,9 @@ fi
 mv $LIB_DIR/$TOOLCHAIN $LIB_DIR/$BACKUP_TOOLCHAIN_DIR
 mv $LIB_DIR/$NEW_TOOLCHAIN_DIR $LIB_DIR/$TOOLCHAIN
 
-# Sets nbites.bash correctly (Even though we don't use AL_DIR currently)
-mv $SCRIPTS_DIR/nbites.bash bashBackup
-sed "2 c\export AL_DIR=$LIB_DIR/naoqi-sdk-$VERSION-linux32" bashBackup >> nbites.bash
-rm bashBackup
+# Sets nbites.bash correctly
+sed -i "s/$OLDVERSION/$VERSION/g" nbites.bash
+
 
 pushd $NBITES_DIR/src/man
 echo "making clean"

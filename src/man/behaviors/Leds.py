@@ -15,6 +15,7 @@ BALL_LEDS = True
 GOAL_LEDS = True
 ROLESWITCH_LEDS = True
 CALIBRATION_LEDS = True
+SHAREDFLIP_LEDS = True
 COMM_LEDS = True
 
 ####### LED DEFINITIONS #############
@@ -171,6 +172,9 @@ class Leds():
         self.numActiveMates = 0
         self.role = -1
         self.calibrationCount = 0
+        self.flippingCount = 0
+        self.oldFlipTime = 0
+        self.flashingCount = 150
 
     def processLeds(self):
 
@@ -241,7 +245,7 @@ class Leds():
                 self.role = newRole
 
         if CALIBRATION_LEDS:
-            if (self.brain.motion.standing and not self.brain.motion.calibrated 
+            if (self.brain.motion.standing and not self.brain.motion.calibrated
                 and self.calibrationCount % 8 < 4):
                 self.executeLeds(LEFT_CALIBRATION_ONE_LEDS)
                 self.executeLeds(LEFT_CALIBRATION_TWO_LEDS)
@@ -263,9 +267,42 @@ class Leds():
                 self.executeLeds(RIGHT_CALIBRATION_TWO_OFF_LEDS)
                 self.executeLeds(RIGHT_CALIBRATION_THREE_OFF_LEDS)
                 self.executeLeds(RIGHT_CALIBRATION_FOUR_OFF_LEDS)
-                self.executeLeds(RIGHT_CALIBRATION_FIVE_OFF_LEDS) 
+                self.executeLeds(RIGHT_CALIBRATION_FIVE_OFF_LEDS)
 
             self.calibrationCount = self.calibrationCount + 1
+
+        # TODO this is a hacky solution to using the same LEDs as calibration
+        if SHAREDFLIP_LEDS and self.brain.motion.calibrated:
+            if ((self.oldFlipTime != self.brain.interface.sharedFlip.timestamp
+                 or self.flashingCount < 150) and self.flippingCount % 20 < 10):
+                self.oldFlipTime = self.brain.interface.sharedFlip.timestamp
+                if self.flashingCount >= 150:
+                    self.flashingCount = 0
+                else:
+                    self.flashingCount = self.flashingCount + 1
+
+                self.executeLeds(LEFT_CALIBRATION_ONE_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_TWO_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_THREE_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_FOUR_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_FIVE_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_ONE_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_TWO_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_THREE_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_FOUR_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_FIVE_LEDS)
+            else:
+                self.executeLeds(LEFT_CALIBRATION_ONE_OFF_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_TWO_OFF_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_THREE_OFF_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_FOUR_OFF_LEDS)
+                self.executeLeds(LEFT_CALIBRATION_FIVE_OFF_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_ONE_OFF_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_TWO_OFF_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_THREE_OFF_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_FOUR_OFF_LEDS)
+                self.executeLeds(RIGHT_CALIBRATION_FIVE_OFF_LEDS)
+            self.flippingCount = self.flippingCount + 1
 
         # If more teammates are added, consider making bottom of right
         # eye into localization uncertainty and using whole ear for comm

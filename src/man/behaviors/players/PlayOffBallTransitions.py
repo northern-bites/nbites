@@ -71,11 +71,15 @@ def shouldFindFlippedSharedBall(player):
     return player.sharedBallCloseCount >= 60
 
 def shouldStopLookingForSharedBall(player):
-    return player.sharedBallOffCount >= 30
+    return player.sharedBallOffCount >= 105
 
 def shouldStopLookingForFlippedSharedBall(player):
     return shouldFindFlippedSharedBall(player) or shouldStopLookingForSharedBall(player)
 
 def shouldBeSupporter(player):
-    return (player.brain.ball.vis.frames_on > chaseConstants.BALL_ON_THRESH and 
+    if not player.brain.motion.calibrated:
+        player.claimedBall = False
+        return False
+        
+    return (ballInBox(player) and
             claimTransitions.shouldCedeClaim(player))

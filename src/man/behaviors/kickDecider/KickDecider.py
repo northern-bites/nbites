@@ -6,17 +6,21 @@ import math
 import copy
 import itertools
 
-# TODO use open field detection to decide kicks
-
+# TODO hierarchy of lower level planners
+# TODO actually use a true array of filters
+# TODO calculates a true destination when kicking to goal destination
+# TODO kicks.py is ugly and not complete
+# TODO use location objects throughout
+# TODO player.motionKick flag is unnecessary
 # TODO document here and on wiki
-# TODO kicks.py is ugly
-# TODO abstract from behaviors for testing purposes
 class KickDecider(object):
     """
     Decides what kick to do. Load a bunch of kicks into self.kicks, a score 
     function into self.scoreKick, and a bunch of filters into self.filters. 
     Instruct the decider where the kick should go and let it do the math for 
-    you. Includes a variety of ready to go planners for different situations. 
+    you. Includes a variety of low level planners for different situations.
+    High level planners script the low level planners to create more complicated
+    kicking behaviors.
     """
     def __init__(self, brain):
         self.brain = brain
@@ -25,15 +29,15 @@ class KickDecider(object):
         self.scoreKick = None                       # score kick function used to choose a kick
         self.filters = []                           # array of filter functions used to filter out kicks
 
-        self.possibleKicks = self.generateNothing() # acceptable kicks ordered by utility
+        self.possibleKicks = self.generateNothing() # acceptable kicks ordered by score
     
-    ### PLANNERS ###
-    def sweetMovesOnGoal(self):
+    ### LOW LEVEL PLANNERS ###
+    def sweetMovesOrbit(self):
         self.brain.player.motionKick = False
 
         self.kicks = []
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.LEFT_KICK)
+        self.kicks.append(kicks.RIGHT_KICK)
         self.kicks.append(kicks.LEFT_SIDE_KICK)
         self.kicks.append(kicks.RIGHT_SIDE_KICK)
 
@@ -50,8 +54,8 @@ class KickDecider(object):
         self.brain.player.motionKick = False
         
         self.kicks = []
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.LEFT_KICK)
+        self.kicks.append(kicks.RIGHT_KICK)
 
         self.scoreKick = self.minimizeOrbitTime
 
@@ -62,7 +66,46 @@ class KickDecider(object):
 
         return (kick for kick in self.possibleKicks).next().next()
 
-    def bigKicksOnGoal(self):
+    def frontKicksOrbit(self):
+        self.brain.player.motionKick = False
+
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_KICK)
+        self.kicks.append(kicks.RIGHT_KICK)
+
+        self.scoreKick = self.minimizeOrbitTime
+
+        self.filters = []
+
+        self.clearPossibleKicks()
+        self.addShotsOnGoal()
+
+        try:
+            return (kick for kick in self.possibleKicks).next().next()
+        except:
+            return None
+
+    def frontKicksOrbitIfSmall(self):
+        self.brain.player.motionKick = False
+
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_KICK)
+        self.kicks.append(kicks.RIGHT_KICK)
+
+        self.scoreKick = self.minimizeOrbitTime
+
+        self.filters = []
+        self.filters.append(self.isShortOrbit)
+
+        self.clearPossibleKicks()
+        self.addShotsOnGoal()
+
+        try:
+            return (kick for kick in self.possibleKicks).next().next()
+        except:
+            return None
+
+    def bigKicksOrbit(self):
         self.brain.player.motionKick = False
 
         self.kicks = []
@@ -80,10 +123,12 @@ class KickDecider(object):
 
     def frontKicksAsapOnGoal(self):
         self.brain.player.motionKick = False
-    
+
         self.kicks = []
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.LEFT_BIG_KICK)
+        self.kicks.append(kicks.RIGHT_BIG_KICK)
+        self.kicks.append(kicks.LEFT_KICK)
+        self.kicks.append(kicks.RIGHT_KICK)
 
         self.scoreKick = self.minimizeDistanceToGoal
         
@@ -98,7 +143,27 @@ class KickDecider(object):
         except:
             return None
 
-    def motionKicksOnGoal(self):
+    def frontKicksClear(self):
+        self.brain.player.motionKick = False
+
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_KICK)
+        self.kicks.append(kicks.RIGHT_KICK)
+
+        self.scoreKick = self.minimizeDistanceToGoal
+
+        self.filters = []
+        self.filters.append(self.upfieldEnough)
+
+        self.clearPossibleKicks()
+        self.addFastestPossibleKicks()
+
+        try:
+            return (kick for kick in self.possibleKicks).next().next()
+        except:
+            return None
+
+    def motionKicksOrbit(self):
         self.brain.player.motionKick = True
     
         self.kicks = []
@@ -142,8 +207,233 @@ class KickDecider(object):
         except:
             return None
 
-    def brunswick(self):
-        onGoalAsap = self.frontKicksAsapOnGoal()
+    def motionKicksAsapOnGoal(self):
+        self.brain.player.motionKick = True
+    
+        self.kicks = []
+        self.kicks.append(kicks.M_LEFT_STRAIGHT)
+        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
+        self.kicks.append(kicks.M_LEFT_SIDE)
+        self.kicks.append(kicks.M_RIGHT_SIDE)
+        self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+        self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
+
+        self.scoreKick = self.minimizeDistanceToGoal
+        
+        self.filters = []
+        self.filters.append(self.crossesGoalLine)
+
+        self.clearPossibleKicks()
+        self.addFastestPossibleKicks()
+
+        try:
+            return (kick for kick in self.possibleKicks).next().next()
+        except:
+            return None
+
+    def motionKicksInScrumAsap(self, obstacles):
+        self.brain.player.motionKick = True
+    
+        self.kicks = []
+        if self.brain.obstacles[2] == 0 or self.brain.obstacles[8] == 0:
+            if self.brain.obstacles[2] == 0:
+                self.kicks.append(kicks.M_LEFT_SIDE)
+                self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+            else:
+                self.kicks.append(kicks.M_RIGHT_SIDE)
+                self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
+        else:
+            if self.brain.obstacles[2] > self.brain.obstacles[8]:
+                self.kicks.append(kicks.M_LEFT_SIDE)
+                self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+            else:
+                self.kicks.append(kicks.M_RIGHT_SIDE)
+                self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
+
+        self.scoreKick = self.minimizeDistanceToGoal
+        
+        self.filters = []
+        self.filters.append(self.inBoundsOrGoalAndForwardProgress)
+
+        self.clearPossibleKicks()
+        self.addFastestPossibleKicks()
+
+        try:
+            return (kick for kick in self.possibleKicks).next().next()
+        except:
+            return None
+
+    def kicksBeforeBallIsFree(self):
+        asap = self.motionKicksAsap()
+        if asap:
+            return asap
+
+        return self.frontKickCrosses()
+
+    def allKicksAsap(self):
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_KICK)
+        self.kicks.append(kicks.RIGHT_KICK)
+        self.kicks.append(kicks.M_LEFT_STRAIGHT)
+        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
+        self.kicks.append(kicks.M_LEFT_SIDE)
+        self.kicks.append(kicks.M_RIGHT_SIDE)
+        self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+        self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
+
+        self.scoreKick = self.minimizeDistanceToGoal
+        
+        self.filters = []
+        self.filters.append(self.inBoundsOrGoal)
+
+        self.clearPossibleKicks()
+        self.addFastestPossibleKicks()
+
+        try:
+            k = (kick for kick in self.possibleKicks).next().next()
+            if k.sweetMove: 
+                self.brain.player.motionKick = False
+            else:
+                self.brain.player.motionKick = True
+            return k
+        except:
+            return None
+
+    def sweetMovesForKickOff(self, direction, dest):
+        """
+        direction 0 is a forward kick, direction 1 is a left side pass
+        direction -1 is a right side pass
+        """
+        self.brain.player.motionKick = False
+
+        self.kicks = []
+        if direction == 0:
+            self.kicks.append(kicks.LEFT_KICK)
+            self.kicks.append(kicks.RIGHT_KICK)
+        elif direction == 1:
+            self.kicks.append(kicks.RIGHT_SIDE_KICK)
+        elif direction == -1:
+            self.kicks.append(kicks.LEFT_SIDE_KICK)
+
+        self.scoreKick = self.minimizeOrbitTime
+
+        self.filters = []
+
+        self.clearPossibleKicks()
+        self.addPassesTo(dest)
+
+        return (kick for kick in self.possibleKicks).next().next()
+
+    def sweetMoveCrossToCenter(self):
+        self.brain.player.motionKick = True
+
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_KICK)
+        self.kicks.append(kicks.RIGHT_KICK)
+
+        self.scoreKick = self.minimizeOrbitTime
+
+        self.filters = []
+
+        self.clearPossibleKicks()
+        self.addPassesToFieldCross()
+
+        return (kick for kick in self.possibleKicks).next().next()
+
+    def allKicksIncludingBigKickAsap(self):
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_BIG_KICK)
+        self.kicks.append(kicks.RIGHT_BIG_KICK)
+        self.kicks.append(kicks.LEFT_KICK)
+        self.kicks.append(kicks.RIGHT_KICK)
+        self.kicks.append(kicks.M_LEFT_STRAIGHT)
+        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
+        self.kicks.append(kicks.M_LEFT_SIDE)
+        self.kicks.append(kicks.M_RIGHT_SIDE)
+        self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+        self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
+
+        self.scoreKick = self.minimizeDistanceToGoal
+        
+        self.filters = []
+        self.filters.append(self.inBoundsOrGoal)
+
+        self.clearPossibleKicks()
+        self.addFastestPossibleKicks()
+
+        try:
+            k = (kick for kick in self.possibleKicks).next().next()
+            if k.sweetMove: 
+                self.brain.player.motionKick = False
+            else:
+                self.brain.player.motionKick = True
+            return k
+        except:
+            return None
+
+    def allKicksAsapOnGoal(self):
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_KICK)
+        self.kicks.append(kicks.RIGHT_KICK)
+        self.kicks.append(kicks.M_LEFT_STRAIGHT)
+        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
+        self.kicks.append(kicks.M_LEFT_SIDE)
+        self.kicks.append(kicks.M_RIGHT_SIDE)
+        self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+        self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
+
+        self.scoreKick = self.minimizeDistanceToGoal
+        
+        self.filters = []
+        self.filters.append(self.crossesGoalLine)
+
+        self.clearPossibleKicks()
+        self.addFastestPossibleKicks()
+
+        try:
+            k = (kick for kick in self.possibleKicks).next().next()
+            if k.sweetMove: 
+                self.brain.player.motionKick = False
+            else:
+                self.brain.player.motionKick = True
+            return k
+        except:
+            return None
+
+    def allKicksIncludingBigKickAsapOnGoal(self):
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_BIG_KICK)
+        self.kicks.append(kicks.RIGHT_BIG_KICK)
+        self.kicks.append(kicks.LEFT_KICK)
+        self.kicks.append(kicks.RIGHT_KICK)
+        self.kicks.append(kicks.M_LEFT_STRAIGHT)
+        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
+        self.kicks.append(kicks.M_LEFT_SIDE)
+        self.kicks.append(kicks.M_RIGHT_SIDE)
+        self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+        self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
+
+        self.scoreKick = self.minimizeDistanceToGoal
+        
+        self.filters = []
+        self.filters.append(self.crossesGoalLine)
+
+        self.clearPossibleKicks()
+        self.addFastestPossibleKicks()
+
+        try:
+            k = (kick for kick in self.possibleKicks).next().next()
+            if k.sweetMove: 
+                self.brain.player.motionKick = False
+            else:
+                self.brain.player.motionKick = True
+            return k
+        except:
+            return None
+
+    ### HIGH LEVEL PLANNERS ###
+    def attacker(self):
+        onGoalAsap = self.allKicksAsapOnGoal()
         if onGoalAsap: 
             return onGoalAsap
 
@@ -152,6 +442,56 @@ class KickDecider(object):
             return asap
 
         return self.frontKickCrosses()
+
+    def defender(self):
+        asap = self.allKicksAsap()
+        if asap:
+            return asap
+
+        return self.frontKickCrosses()
+
+    def obstacleAware(self, clearing = False):
+        motionKicksOnGoal = self.motionKicksAsapOnGoal()
+        if motionKicksOnGoal:
+            return motionKicksOnGoal
+
+        # if self.checkObstacle(1, 75):
+        #     inScrum = self.motionKicksInScrumAsap()
+        #     if inScrum:
+        #         return inScrum
+
+        if (not self.checkObstacle(1, 215) and 
+            not self.checkObstacle(1, 215) and
+            not self.checkObstacle(8, 215)): 
+            goalCenter = Location(nogginC.FIELD_WHITE_RIGHT_SIDELINE_X, nogginC.MIDFIELD_Y)
+            ball = Location(self.brain.ball.x, self.brain.ball.y)
+            if ball.distTo(goalCenter) <= 400:
+                timeAndSpace = self.frontKicksOrbitIfSmall()
+                if timeAndSpace:
+                    return timeAndSpace
+            elif clearing:
+                clear = self.frontKicksClear()
+                if clear:
+                    return clear
+
+        asap = self.motionKicksAsap()
+        if asap:
+            return asap
+        
+        return self.frontKickCrosses()
+
+    def timeForSomeHeroics(self):
+        asapOnGoal = self.allKicksIncludingBigKickAsapOnGoal()
+        if asapOnGoal:
+            return asapOnGoal
+
+        # TODO hack for Brazil
+        goalCenter = Location(nogginC.FIELD_WHITE_RIGHT_SIDELINE_X, nogginC.MIDFIELD_Y)
+        ball = Location(self.brain.ball.x, self.brain.ball.y)
+        if ball.distTo(goalCenter) <= 200:
+            return self.frontKicksOrbit()
+
+        return self.bigKicksOrbit()
 
     ### API ###
     def addShotsOnGoal(self):
@@ -297,6 +637,9 @@ class KickDecider(object):
     def inBoundsOrGoal(self, kick):
         return self.inBounds(kick) or self.crossesGoalLine(kick)
 
+    def inBoundsOrGoalAndForwardProgress(self, kick):
+        return  self.inBoundsOrGoal(kick) and self.forwardProgress(kick)
+
     def inBounds(self, kick):
         onField = (kick.destinationX >= nogginC.FIELD_WHITE_LEFT_SIDELINE_X and 
                    kick.destinationX <= nogginC.FIELD_WHITE_RIGHT_SIDELINE_X and
@@ -323,6 +666,19 @@ class KickDecider(object):
             return (rightPostY <= kickVector[1]*scale <= leftPostY)
         return False
 
+    def forwardProgress(self, kick):
+        goalCenter = Location(nogginC.FIELD_WHITE_RIGHT_SIDELINE_X, nogginC.MIDFIELD_Y)
+        ball = Location(self.brain.ball.x, self.brain.ball.y)
+        kickDestination = Location(kick.destinationX, kick.destinationY)
+
+        return goalCenter.distTo(ball) > goalCenter.distTo(kickDestination)
+
+    def upfieldEnough(self, kick):
+        return -40 <= kick.setupH <= 40
+
+    def isShortOrbit(self, kick):
+        return math.fabs(self.brain.loc.h - kick.setupH) < 30
+
     ### HELPER FUNCTIONS ###
     def fromCartesianToPolarCoordinates(self, x, y):
         return math.sqrt(x**2+y**2), math.atan2(y,x)
@@ -335,3 +691,7 @@ class KickDecider(object):
         while newAngle <= -180: newAngle += 360
         while newAngle > 180: newAngle -= 360
         return newAngle
+
+    def checkObstacle(self, position, threshold):
+        return (self.brain.obstacles[position] <= threshold and 
+                self.brain.obstacles[position] != 0.0)

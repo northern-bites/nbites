@@ -1,5 +1,7 @@
 #pragma once
 
+#include "DebugConfig.h"
+
 #include "RoboGrams.h"
 #include "Common.h"
 
@@ -10,8 +12,10 @@
 #include "WorldModel.pb.h"
 #include "BallModel.pb.h"
 #include "RobotLocation.pb.h"
+#include "BallModel.pb.h"
 
 /**
+ *****DOES NOT WORK WITH WORLDVIEW OR SHARED VIEWER. MAJOR TODO.****
  *
  * A module that creates a global ball position. How it works:
  *
@@ -55,7 +59,7 @@ namespace context {
 
 const float CONSENSUS_THRESHOLD = 200.f;
 const float DISTANCE_FOR_FLIP = 100.f;
-const float TOO_CLOSE_TO_MIDFIELD_X = 100.f;
+const float TOO_CLOSE_TO_MIDFIELD_X = 120.f;
 const float TOO_CLOSE_TO_MIDFIELD_Y = FIELD_GREEN_HEIGHT / 3.f;
 
 class SharedBallModule : public portals::Module
@@ -67,6 +71,10 @@ public:
     virtual void run_();
 
     portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
+    portals::InPortal<messages::RobotLocation> locIn;
+    portals::InPortal<messages::FilteredBall> ballIn;
+
+
     portals::OutPortal<messages::SharedBall> sharedBallOutput;
     portals::OutPortal<messages::RobotLocation> sharedBallReset;
 
@@ -82,11 +90,16 @@ private:
     int getQuadrantNumber(int i);
     bool inGoalieBox(float x, float y);
 
-    messages::WorldModel messages[NUM_PLAYERS_PER_TEAM];
+    messages::WorldModel worldMessages[NUM_PLAYERS_PER_TEAM];
+    messages::FilteredBall myBall;
 
     float x;            //ball x location for a given robot
     float y;            //ball y location for a given robot
-    int my_num;         // my player number
+
+    int my_num;               // my player number
+    float myX;
+    float myY;
+    float myH;
 
     // used for flipping robots
     float resetx;

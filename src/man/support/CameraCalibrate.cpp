@@ -38,8 +38,8 @@ void CameraCalibrate::UpdateByName(std::string name)
 
     if (name == "river") {
         paramsTop[ROLL] = -0.01f;
-        paramsTop[PITCH] = -0.05f;
-        paramsBottom[ROLL] = 0.00f;
+        paramsTop[PITCH] = -0.04f;
+        paramsBottom[ROLL] = 0.01f;
         paramsBottom[PITCH] = 0.02f;
     } else if (name == "mal") {
         paramsTop[ROLL] = -0.01f;
@@ -47,7 +47,7 @@ void CameraCalibrate::UpdateByName(std::string name)
         paramsBottom[ROLL] = -0.03f;
         paramsBottom[PITCH] = -0.07f;
     } else if (name == "zoe") {
-        paramsTop[ROLL] = -0.04f;
+        paramsTop[ROLL] = -0.03f;
         paramsTop[PITCH] = 0.0f;
         paramsBottom[ROLL] = -0.01f;
         paramsBottom[PITCH] = -0.01f;
@@ -67,10 +67,10 @@ void CameraCalibrate::UpdateByName(std::string name)
         paramsBottom[ROLL] = -0.03f;
         paramsBottom[PITCH] = 0.07f;
     } else if (name == "vera") {
-        paramsTop[ROLL] = -0.03f;
-        paramsTop[PITCH] = 0.06f;
-        paramsBottom[ROLL] = -0.03f;
-        paramsBottom[PITCH] = 0.09f;
+        paramsTop[ROLL] = -0.04f;
+        paramsTop[PITCH] = 0.10f;
+        paramsBottom[ROLL] = 0.00f;
+        paramsBottom[PITCH] = 0.11f;
     } else if (name == "inara") {
         paramsTop[ROLL] = -0.02f;
         paramsTop[PITCH] = 0.10f;
@@ -87,15 +87,15 @@ void CameraCalibrate::UpdateByName(std::string name)
         paramsBottom[ROLL] = 0.0f;
         paramsBottom[PITCH] = 0.0f;
     } else if (name == "ozzy") {
-        paramsTop[ROLL] = 0.0f;
-        paramsTop[PITCH] = 0.0f;
-        paramsBottom[ROLL] = 0.0f;
-        paramsBottom[PITCH] = 0.0f;
+        paramsTop[ROLL] = 0.04f;
+        paramsTop[PITCH] = 0.04f;
+        paramsBottom[ROLL] = 0.03f;
+        paramsBottom[PITCH] = -0.02f;
     } else if (name == "avril") {
         paramsTop[ROLL] = 0.0f;
-        paramsTop[PITCH] = 0.0f;
-        paramsBottom[ROLL] = 0.0f;
-        paramsBottom[PITCH] = 0.0f;
+        paramsTop[PITCH] = 0.04f;
+        paramsBottom[ROLL] = -0.07f;
+        paramsBottom[PITCH] = -0.02f;
     } else if (name == "beyonce") {
         paramsTop[ROLL] = 0.0f;
         paramsTop[PITCH] = 0.0f;

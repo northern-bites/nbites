@@ -32,7 +32,14 @@ def shouldSupport(player):
     when in positionAndKickBall don't care if the ball is in our box but do
     want to check who has higher priority claim
     """
+    if not player.brain.motion.calibrated:
+        player.claimedBall = False
+        return False
+        
     return player.brain.ball.vis.frames_on and claimTrans.shouldCedeClaim(player)
+
+def shouldDecelerate(player):
+    return player.brain.ball.distance <= constants.SLOW_CHASE_DIST
 
 def shouldPrepareForKick(player):
     """
@@ -46,14 +53,14 @@ def shouldSpinToBall(player):
     """
     We're not facing the ball well enough
     """
-    return fabs(degrees(player.brain.ball.bearing)) > constants.SHOULD_SPIN_TO_BALL_BEARING
+    return fabs(degrees(player.brain.ball.bearing)) > constants.SHOULD_SPIN_TO_BALL_BEARING and not player.inKickOffPlay
 
 def shouldApproachBallAgain(player):
     """
     The ball got really far away somehow
     """
     ball = player.brain.ball
-    return ball.vis.on and ball.distance > constants.APPROACH_BALL_AGAIN_DIST
+    return ball.vis.on and ball.distance > constants.APPROACH_BALL_AGAIN_DIST and not player.inKickOffPlay
 
 def shouldRedecideKick(player):
     """
@@ -130,7 +137,7 @@ def shouldFindBall(player):
     """
     We lost the ball, scan to find it
     """
-    return (player.brain.ball.vis.frames_off > constants.BALL_OFF_THRESH)
+    return (player.brain.ball.vis.frames_off > constants.BALL_OFF_THRESH) and not player.inKickOffPlay
 
 def shouldFindBallKick(player):
     """
@@ -176,3 +183,11 @@ def shouldWalkFindBall(player):
     If we've been spinFindBall-ing too long we should walk
     """
     return player.stateTime > constants.WALK_FIND_BALL_TIME_THRESH
+
+def shouldChangeKickingStrategy(player):
+    """
+    It is the end of the game and we are loosing. Time to kick more aggresively!
+    """
+    return (player.brain.game.have_remote_gc and 
+            player.brain.game.secs_remaining <= 30 and
+            player.brain.theirScore > player.brain.ourScore)

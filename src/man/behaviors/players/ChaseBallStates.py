@@ -3,6 +3,7 @@ Here we house all of the state methods used for chasing the ball
 """
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
+import RoleConstants as roleConstants
 import DribbleTransitions as dr_trans
 import PlayOffBallTransitions as playOffTransitions
 from ..navigator import Navigator
@@ -22,19 +23,27 @@ def approachBall(player):
     if player.firstFrame():
         player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
                                                  0.8, 10)
-        player.motionKick = False
-        player.inKickingState = False
         player.brain.tracker.trackBall()
         if player.shouldKickOff:
-            player.brain.nav.chaseBall(Navigator.MEDIUM_SPEED, fast = True)
+            if player.inKickOffPlay:
+                return player.goNow('giveAndGo')
+            else:
+                return player.goNow('positionAndKickBall')
+
         elif player.penaltyKicking:
             return player.goNow('prepareForPenaltyKick')
         else:
-            player.brain.nav.chaseBall(Navigator.QUICK_SPEED, fast = True)
+            player.brain.nav.chaseBall(Navigator.FULL_SPEED, fast = True)
 
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
         return player.goNow('positionAndKickBall')
+    
+    elif transitions.shouldDecelerate(player):
+        player.brain.nav.chaseBallDeceleratingSpeed()
+    else:
+        player.brain.nav.chaseBall(Navigator.FULL_SPEED, fast = True)
+
 
 @defaultState('prepareForKick')
 @superState('gameControllerResponder')
@@ -46,7 +55,7 @@ def positionAndKickBall(player):
     """
     Superstate used to position for kick and kick the ball when close enough.
     """
-    player.inKickingState = True
+    pass
 
 @superState('positionAndKickBall')
 def prepareForKick(player):
@@ -54,8 +63,21 @@ def prepareForKick(player):
         player.decider = KickDecider.KickDecider(player.brain)
         player.brain.nav.stand()
 
-    player.inKickingState = True
-    player.kick = player.decider.brunswick()
+    if not player.inKickOffPlay:
+        if player.shouldKickOff or player.brain.gameController.timeSincePlaying < 10:
+            print "Overriding kick decider for kickoff!"
+            player.shouldKickOff = False
+            player.kick = player.decider.kicksBeforeBallIsFree()
+        else:
+            # if transitions.shouldChangeKickingStrategy(player):
+            #     print "Time for some heroics!"
+            #     player.kick = player.decider.timeForSomeHeroics()
+            # else:
+            player.kick = player.decider.obstacleAware(roleConstants.isDefender(player.role))
+        player.inKickingState = True
+
+    elif player.finishedPlay:
+        player.inKickOffPlay = False
 
     return player.goNow('orbitBall')
 
@@ -186,7 +208,7 @@ def positionForKick(player):
     if player.firstFrame():
         player.brain.tracker.lookStraightThenTrack()
         player.brain.nav.destinationWalkTo(positionForKick.kickPose,
-                                           Navigator.GRADUAL_SPEED)
+                                           Navigator.BRISK_SPEED)
         positionForKick.slowDown = False
     elif player.brain.ball.vis.on: # don't update if we don't see the ball
         # slows down the walk when very close to the ball to stabalize motion kicking and to not walk over the ball
@@ -200,7 +222,7 @@ def positionForKick(player):
                 player.brain.ball.distance >= constants.SLOW_DOWN_TO_BALL_DIST):
                 positionForKick.slowDown = False
                 player.brain.nav.destinationWalkTo(positionForKick.kickPose,
-                                           Navigator.GRADUAL_SPEED)
+                                           Navigator.BRISK_SPEED)
             else:
                 player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
         else:

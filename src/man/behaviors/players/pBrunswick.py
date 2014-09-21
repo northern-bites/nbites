@@ -3,6 +3,7 @@ import time
 from . import SoccerFSA
 from . import FallControllerStates
 from . import RoleSwitchingStates
+from . import CommMonitorStates
 from . import GameControllerStates
 from . import BrunswickStates
 from . import ChaseBallStates
@@ -12,6 +13,7 @@ from . import FindBallStates
 from . import KickingStates
 from . import DribbleStates
 from . import PlayOffBallStates
+from . import KickOffStates
 
 import noggin_constants as NogginConstants
 
@@ -26,6 +28,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(FallControllerStates)
         self.addStates(GameControllerStates)
         self.addStates(RoleSwitchingStates)
+        self.addStates(CommMonitorStates)
         self.addStates(BrunswickStates)
         self.addStates(PlayOffBallStates)
         self.addStates(PositionStates)
@@ -34,6 +37,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(DribbleStates)
         self.addStates(FindBallStates)
         self.addStates(KickingStates)
+        self.addStates(KickOffStates)
         self.setName('pBrunswick')
         self.currentState = 'fallController' # initial state
 
@@ -60,7 +64,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Controls whether we do a motion kick
         self.motionKick = False
         # Controls whether we will role switch
-        self.roleSwitching = False
+        self.roleSwitching = True
         # Controls whether we use claims
         self.useClaims = True
         self.returningFromPenalty = False
+        # Trinary flag indicating state of communications
+        # 0 -- all field players are online
+        # 1 -- one field player is offline
+        # 2 -- more than one field player is offline
+        self.commMode = 0

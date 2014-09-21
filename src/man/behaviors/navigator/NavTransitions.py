@@ -27,24 +27,115 @@ def shouldDodge(nav):
     if not states.goToPosition.avoidObstacles:
         return False
 
-    # Get the obstacle model
-    pos = nav.brain.interface.obstacle.position
+    for i in range(1, len(nav.brain.obstacles)):
+        if nav.brain.obstacles[i] == 1.0:
+            states.dodge.armPosition = i
+            doneDodging.timer = 0
+            doneDodging.armPosition = i
+            return True
 
-    # If the obstacle module has decided that there is an obstacle,
-    # tell dodge and doneDodging what it is in case we go into a dodge
-    if pos is not pos.NONE:
-        states.dodge.position = pos
-        doneDodging.position = pos
-        return True
-
-    # Otherwise, nope
     return False
+
+    # TODO: HACK BRAZIL - TURNED OFF WAY TO PROCESS VISION OBSTACLES
+    # if (nav.brain.obstacles[1] > constants.DODGE_DIST or
+    #     nav.brain.obstacles[1] == 0.0):
+    #     return False
+
+    # obsts = nav.brain.interface.fieldObstacles
+    # states.dodge.DDirects = ( obsts.obstacle(0).NONE,
+    #                           obsts.obstacle(0).NORTH,
+    #                           obsts.obstacle(0).NORTHEAST,
+    #                           obsts.obstacle(0).EAST,
+    #                           obsts.obstacle(0).SOUTHEAST,
+    #                           obsts.obstacle(0).SOUTH,
+    #                           obsts.obstacle(0).SOUTHWEST,
+    #                           obsts.obstacle(0).WEST,
+    #                           obsts.obstacle(0).NORTHWEST )
+
+    # info = [0.] * 9 #8 directions
+    # setPosition = False
+
+    # # Get relative robot / ball desitnation
+    # relLoc = helper.getRelativeDestination(nav.brain.loc,
+    #                                        states.goToPosition.dest)
+    # walkingDest = getDirection(relLoc.relH)
+    # ballDir = getDirection(nav.brain.ball.bearing_deg)
+
+    # for i in range(1, len(nav.brain.obstacles)):
+    #     if (nav.brain.obstacles[i] != 0.0 and
+    #         nav.brain.obstacles[i] < constants.DODGE_DIST):
+    #         info[i] = nav.brain.obstacles[i]
+    #         if (i == int(ballDir) and nav.brain.ball.distance <
+    #             nav.brain.obstacles[i]):
+    #             return False
+    #         if i <= 3 or i >= 7:
+    #             setPosition = True
+
+    # if setPosition:
+    #     states.dodge.targetDest = walkingDest
+    #     states.dodge.positions = info
+    #     doneDodging.timer = 0
+    #     return True
+
+    # return False
 
 # Check if an obstacle is no longer there, or if we've completed the dodge
 def doneDodging(nav):
-    return (nav.brain.interface.motionStatus.standing or
-            (nav.brain.interface.obstacle.position is not
-             doneDodging.position))
+    timerDone = False
+    obstacles = False
+
+    doneDodging.timer += 1
+    if doneDodging.timer > 90:
+        timerDone = True
+
+    if nav.brain.obstacles[doneDodging.armPosition] == 1.0:
+        obstacles = True
+
+    return timerDone and not obstacles
+
+
+    ### HACK FOR BRAZIL: COMMENT OUT WHAT WE USE FOR VISION OBSTACLE DODGING
+    # timerDone = False
+    # obstacles = False
+
+    # doneDodging.timer += 1
+    # if doneDodging.timer > 180:
+    #     timerDone = True
+
+    # for i in range(1, len(nav.brain.obstacles)):
+    #     if (nav.brain.obstacles[i] != 0.0 and
+    #         nav.brain.obstacles[i] < constants.DODGE_DIST and
+    #         (i <= 3 or i >= 7)):
+    #         obstacles = True
+
+    # return timerDone and not obstacles
+
+def getDirection(h):
+    if (h < helper.constants.ZONE_WIDTH * -7. or
+       h > helper.constants.ZONE_WIDTH * 7.):
+        # SOUTH
+        return states.dodge.DDirects[5]
+    elif (h < helper.constants.ZONE_WIDTH * -5.):
+        # SOUTHEAST
+        return states.dodge.DDirects[4]
+    elif (h < helper.constants.ZONE_WIDTH * -3.):
+        # EAST
+        return states.dodge.DDirects[3]
+    elif (h < helper.constants.ZONE_WIDTH * -1):
+        # NORTHEAST
+        return states.dodge.DDirects[2]
+    elif (h < helper.constants.ZONE_WIDTH):
+        # NORTH
+        return states.dodge.DDirects[1]
+    elif (h < helper.constants.ZONE_WIDTH * 3):
+        # NORTHWEST
+        return states.dodge.DDirects[8]
+    elif (h < helper.constants.ZONE_WIDTH * 5):
+        # WEST
+        return states.dodge.DDirects[7]
+    else:
+        # SOUTHWEST
+        return states.dodge.DDirects[6]
 
 def notAtLocPosition(nav):
     return not atDestination(nav)

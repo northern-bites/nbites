@@ -19,6 +19,18 @@ SharedBallModule::SharedBallModule(int playerNumber) :
     my_num = playerNumber;
 }
 
+int inNoFlipZone(float xx, float yy)
+{
+    if ( (xx > MIDFIELD_X - TOO_CLOSE_TO_MIDFIELD_X &&
+          xx < MIDFIELD_X + TOO_CLOSE_TO_MIDFIELD_X) &&
+         (yy > MIDFIELD_Y - TOO_CLOSE_TO_MIDFIELD_Y &&
+          yy < MIDFIELD_Y + TOO_CLOSE_TO_MIDFIELD_Y) )
+    {
+        return 1;
+    }
+    return 0;
+}
+
 SharedBallModule::~SharedBallModule()
 {
 }
@@ -35,8 +47,8 @@ void SharedBallModule::run_()
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++)
     {
         worldModelIn[i].latch();
-        messages[i] = worldModelIn[i].message();
-        if (messages[i].ball_on())
+        worldMessages[i] = worldModelIn[i].message();
+        if (worldMessages[i].ball_on())
         {
             numRobotsOn++;
         }
@@ -44,6 +56,14 @@ void SharedBallModule::run_()
         ballX[i] = -1.f;
         ballY[i] = -1.f;
     }
+
+    // get myInfo:
+    locIn.latch();
+    myX = locIn.message().x();
+    myY = locIn.message().y();
+    myH = locIn.message().h();
+    ballIn.latch();
+    myBall = ballIn.message();
 
     if (numRobotsOn)
     {
@@ -87,7 +107,7 @@ void SharedBallModule::chooseRobots()
     int numWithMaxEstimate = 1;  //num robots with max num of consensuses
 
     // Is the goalie in its box? If no, don't include it in estimate!
-    bool includeGoalie = inGoalieBox(messages[0].my_x(), messages[0].my_y());
+    bool includeGoalie = inGoalieBox(worldMessages[0].my_x(), worldMessages[0].my_y());
 
     // go through and see who is in each robot's ball estimate
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++)
@@ -96,7 +116,8 @@ void SharedBallModule::chooseRobots()
 
         for (int j = 0; j < NUM_PLAYERS_PER_TEAM; j++)
         {
-            if (!messages[i].ball_on() || !messages[j].ball_on())
+            if (!worldMessages[i].ball_on() || !worldMessages[j].ball_on()
+                || !worldMessages[i].active() || !worldMessages[j].active())
             {
                 inEstimate[i][j] = 0;
                 continue;
@@ -207,7 +228,7 @@ void SharedBallModule::weightedavg()
         tempx = ballX[i];
         tempy = ballY[i];
 
-        weight = 1/(messages[i].ball_dist());
+        weight = 1/(worldMessages[i].ball_dist());
 
         numx += tempx * weight;
         numy += tempy * weight;
@@ -234,69 +255,61 @@ void SharedBallModule::checkForPlayerFlip()
 {
     if (!ballOn or reliability < 2)
     {
+        // std::cout<<"Flip return"<<std::endl;
         return;
     }
 
     int i = my_num-1;
-//TOOL: comment out the above line and uncomment the for loop (with brackets)
-//    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++)
-//    {
-        if (!messages[i].ball_on() or !ignoreRobot[i] or i == 0)
-        {
-            // If I was a good robot, or I'm the goalie, don't check for flip!
+
+    if (!worldMessages[i].ball_on() or !ignoreRobot[i] or i == 0)
+    {
+        // If I was a good robot, or I'm the goalie, don't check for flip!
+        return;
+    }
+
+    calculateBallCoords(i);
+    // if my ball or sharedball is in no-flip zone-> don't flip!
+    if (inNoFlipZone(ballX[i], ballY[i]) || inNoFlipZone(x, y)) {
+        return;
+    }
+
+    float flipbx = (-1*(ballX[i] - MIDFIELD_X)) + MIDFIELD_X;
+    float flipby = (-1*(ballY[i] - MIDFIELD_Y)) + MIDFIELD_Y;
+
+    float flipX =  (-1*(myX - MIDFIELD_X)) + MIDFIELD_X;
+    float flipY = (-1*(myY - MIDFIELD_Y)) + MIDFIELD_Y;
+
+    calculateBallCoords(0);
+    float gx = ballX[0];
+    float gy = ballY[0];
+
+    // if the goalie is reliable: on and in goal box, he must agree
+    if ( worldMessages[0].ball_on() && worldMessages[0].active() &&
+         inGoalieBox(worldMessages[0].my_x(), worldMessages[0].my_y()) )
+    {
+        float goalie_sq = ( (gx-flipbx)*(gx-flipbx) + (gy-flipby)*(gy-flipby) );
+        if (goalie_sq > DISTANCE_FOR_FLIP*DISTANCE_FOR_FLIP) {
             return;
-//TOOL: comment out the return and uncomment the continue statement.
-//            continue;
         }
-
-        calculateBallCoords(i);
-        // if my ball is in no-flip zone-> return! We don't want to flip me!
-        if ( (ballX[i] > MIDFIELD_X - TOO_CLOSE_TO_MIDFIELD_X &&
-              ballX[i] < MIDFIELD_X + TOO_CLOSE_TO_MIDFIELD_X) &&
-             (ballY[i] > MIDFIELD_Y - TOO_CLOSE_TO_MIDFIELD_Y &&
-              ballY[i] < MIDFIELD_Y + TOO_CLOSE_TO_MIDFIELD_Y) ) {
-            return;
-//TOOL: comment out the return and uncomment the continue statement.
-//            continue;
+    }
+    float distance_sq = ( (x-flipbx)*(x-flipbx) +
+                          (y-flipby)*(y-flipby) );
+    if (distance_sq < DISTANCE_FOR_FLIP*DISTANCE_FOR_FLIP) {
+        resetx = flipX;
+        resety = flipY;
+        reseth = myH + 180;
+        if (reseth > 180){
+            reseth -= 360;
         }
-
-        float flipbx = (-1*(ballX[i] - MIDFIELD_X)) + MIDFIELD_X;
-        float flipby = (-1*(ballY[i] - MIDFIELD_Y)) + MIDFIELD_Y;
-
-        float flipX =  (-1*(messages[i].my_x() - MIDFIELD_X)) + MIDFIELD_X;
-        float flipY = (-1*(messages[i].my_y() - MIDFIELD_Y)) + MIDFIELD_Y;
-
-        calculateBallCoords(0);
-        float gx = ballX[0];
-        float gy = ballY[0];
-
-        // if the goalie is reliable: on and in goal box, he must agree
-        if ( messages[0].ball_on() &&
-             inGoalieBox(messages[0].my_x(), messages[0].my_y()) )
-        {
-            float goalie_sq = ( (gx-flipbx)*(gx-flipbx) + (gy-flipby)*(gy-flipby) );
-            if (goalie_sq > DISTANCE_FOR_FLIP*DISTANCE_FOR_FLIP) {
-                return;
-//TOOL: comment out the return statement and uncomment the continue statement.
-//                continue;
-            }
-        }
-
-        float distance_sq = ( (x-flipbx)*(x-flipbx) + (y-flipby)*(y-flipby) );
-        if (distance_sq < DISTANCE_FOR_FLIP*DISTANCE_FOR_FLIP) {
-            resetx = flipX;
-            resety = flipY;
-            reseth = messages[i].my_h() + 180;
-            if (reseth > 180){
-                reseth -= 360;
-            }
-            timestamp = messages[i].timestamp();
-            flippedRobot = float(i + 1);
-            std::cout<<"FLIPPED! I am "<<my_num<<" and I flipped with reliability "
+        timestamp = int(worldMessages[i].timestamp());
+        flippedRobot = float(i + 1);
+        std::cout<<"FLIPPED! I am "<<my_num<<" and I flipped with reliability "
                      <<reliability<<"!"<<std::endl;
-        }
-//TOOL: uncomment bracket for "for" loop!
-//    }
+        std::cout<<"I flipped from "<<myX<<", "<<myY<<std::endl;
+        std::cout<<"I flipped to "<<flipX<<", "<<flipY<<std::endl;
+        std::cout<<"...Because shared ball is at "<<x<<", "<<y<<std::endl;
+        std::cout<<"And my ball was at "<<ballX[i]<<", "<<ballY[i]<<std::endl;
+    }
 }
 
 /* Calculates ball coordinates and puts them in global array if they
@@ -305,13 +318,26 @@ void SharedBallModule::checkForPlayerFlip()
  */
 void SharedBallModule::calculateBallCoords(int i)
 {
-    if (ballX[i] == -1 || ballY[i] == -1) {
-        float sinHB, cosHB;
-        float hb = TO_RAD*messages[i].my_h() + TO_RAD*messages[i].ball_bearing();
+    if (ballX[i] != -1 && ballY[i] != -1) {
+        return;
+    }
+
+    float sinHB, cosHB;
+    if (my_num-1 != i) {
+        float hb = TO_RAD*worldMessages[i].my_h() + TO_RAD*worldMessages[i].ball_bearing();
         sincosf(hb, &sinHB, &cosHB);
 
-        float newx = messages[i].my_x() + messages[i].ball_dist()*cosHB;
-        float newy = messages[i].my_y() + messages[i].ball_dist()*sinHB;
+        float newx = worldMessages[i].my_x() + worldMessages[i].ball_dist()*cosHB;
+        float newy = worldMessages[i].my_y() + worldMessages[i].ball_dist()*sinHB;
+
+        ballX[i] = newx;
+        ballY[i] = newy;
+    } else {
+        float hb = TO_RAD*myH + TO_RAD*myBall.bearing();
+        sincosf(hb, &sinHB, &cosHB);
+
+        float newx = myX + myBall.distance()*cosHB;
+        float newy = myY + myBall.distance()*sinHB;
 
         ballX[i] = newx;
         ballY[i] = newy;

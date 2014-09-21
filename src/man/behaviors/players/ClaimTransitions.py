@@ -34,12 +34,15 @@ def shouldCedeClaim(player):
         closeWeightDifference = 25 + 150/(1 + math.e**(6.25 - .05*closerDistance))
         if (math.fabs(mateWeight - playerWeight) < closeWeightDifference):
             if roleConstants.isFirstChaser(mate.role):
+                player.roleOfClaimer =  mate.role
                 player.claimedBall = False
                 return True
             elif player.role < mate.role and not roleConstants.isFirstChaser(player.role):
+                player.roleOfClaimer =  mate.role
                 player.claimedBall = False
                 return True
         elif (mateWeight < playerWeight):
+            player.roleOfClaimer =  mate.role
             player.claimedBall = False
             return True
 
@@ -54,6 +57,7 @@ def weightedDistAndHeading(distance, heading, ballBearing):
         heading += 360
 
     ballHeading = heading + ballBearing
+
     if ballHeading > 90:
         distance += distance * (ballBearing-90)**2 / 90**2
     elif ballHeading < -90:

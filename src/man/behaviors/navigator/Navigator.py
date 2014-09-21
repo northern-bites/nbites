@@ -24,6 +24,7 @@ KEEP_SAME_SPEED = -1
 ADAPTIVE = True
 #goTo precision
 GRAINY = (50.0, 50.0, 30)
+HOME = (50.0, 50.0, 20)
 PLAYBOOK = (10.0, 10.0, 10)
 GENERAL_AREA = (5.0, 5.0, 20)
 CLOSE_ENOUGH = (3.5, 3.5, 10)
@@ -46,7 +47,6 @@ class Navigator(FSA.FSA):
         self.setPrintStateChanges(True)
         self.stateChangeColor = 'cyan'
         self.destination = None # Used to set walking_to in world model proto
-
         #transitions
         #@todo: move this to the actual transitions file?
         self.atLocPositionTransition = Transition.CountTransition(navTrans.atDestination,
@@ -60,7 +60,7 @@ class Navigator(FSA.FSA):
             self.atLocPositionTransition : NavStates.atPosition,
 
             Transition.CountTransition(navTrans.shouldDodge,
-                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
             : NavStates.dodge
 
@@ -68,10 +68,10 @@ class Navigator(FSA.FSA):
 
         NavStates.dodge.transitions = {
             Transition.CountTransition(navTrans.doneDodging,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : NavStates.briefStand
-            }
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.INSTANT)
+           : NavStates.briefStand
+           }
 
         NavStates.atPosition.transitions = {
             self.locRepositionTransition : NavStates.goToPosition
@@ -96,6 +96,14 @@ class Navigator(FSA.FSA):
         self.destination = self.brain.ball
 
         self.goTo(self.brain.ball, CLOSE_ENOUGH, speed, True, fast = fast)
+
+    def chaseBallDeceleratingSpeed(self):
+        MAX_SPEED = FULL_SPEED
+        MIN_SPEED = BRISK_SPEED
+        ballDist = self.brain.ball.distance
+        slope = (MAX_SPEED - MIN_SPEED)/(constants.SLOW_CHASE_DIST - constants.PREPARE_FOR_KICK_DIST)
+        deceleratingSpeed = MAX_SPEED - slope*(constants.SLOW_CHASE_DIST - ballDist)
+        self.brain.nav.chaseBall(deceleratingSpeed, fast = True)
 
     def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED,
              avoidObstacles = False, adaptive = False, fast = False, pb = False):
@@ -162,13 +170,15 @@ class Navigator(FSA.FSA):
         if self.currentState is not 'goToPosition':
             self.switchTo('goToPosition')
 
-    def updateDest(self, dest, speed = KEEP_SAME_SPEED):
+    def updateDest(self, dest, speed = KEEP_SAME_SPEED, fast = None):
         """  Update the destination we're headed to   """
         self.destination = dest
 
         NavStates.goToPosition.dest = dest
         if speed is not KEEP_SAME_SPEED:
             NavStates.goToPosition.speed = speed
+        if fast:
+            NavStates.goToPosition.fast = fast
 
     def destinationWalkTo(self, walkToDest, speed = FULL_SPEED, kick = None):
         """

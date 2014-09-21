@@ -6,7 +6,7 @@
 #include "Common.h"
 
 #define IP_TARGET "255.255.255.255"
-#define TEAM_PORT 4500
+#define TEAM_PORT 11400
 
 #define UDP_BUF_SIZE 1024
 #define TCP_BUF_SIZE 1048576 // 1MB for the Nao's
@@ -23,7 +23,7 @@ typedef unsigned char byte;
 #define ERROR_DATATYPE "Unexpected data type read from socket connection."
 #define ERROR_DATASIZE "Unexpected amount of data read from socket connection."
 
-static const int NUM_ROBOTS = 12;    // Total number of robots we have
+static const int NUM_ROBOTS = 13;    // Total number of robots we have
 
 typedef struct robot_ip_pair_t
 {
@@ -32,15 +32,20 @@ typedef struct robot_ip_pair_t
 }robot_ip_pair;
 
 // Bowdoin IPs.
-static const robot_ip_pair wash    = {"wash"   , "139.140.192.9" };
-static const robot_ip_pair river   = {"river"  , "139.140.192.10"};
-static const robot_ip_pair jayne   = {"jayne"  , "139.140.192.11"};
-static const robot_ip_pair simon   = {"simon"  , "139.140.192.12"};
-static const robot_ip_pair inara   = {"inara"  , "139.140.192.13"};
-static const robot_ip_pair kaylee  = {"kaylee" , "139.140.192.14"};
-static const robot_ip_pair vera    = {"vera"   , "139.140.192.15"};
-static const robot_ip_pair mal     = {"mal"    , "139.140.192.16"};
-static const robot_ip_pair zoe     = {"zoe"    , "139.140.192.17"};
+static const robot_ip_pair wash    = {"wash"   , "10.0.14.9" };
+static const robot_ip_pair river   = {"river"  , "10.0.14.10"};
+static const robot_ip_pair jayne   = {"jayne"  , "10.0.14.11"};
+static const robot_ip_pair simon   = {"simon"  , "10.0.14.12"};
+static const robot_ip_pair inara   = {"inara"  , "10.0.14.13"};
+static const robot_ip_pair kaylee  = {"kaylee" , "10.0.14.14"};
+static const robot_ip_pair vera    = {"vera"   , "10.0.14.15"};
+static const robot_ip_pair mal     = {"mal"    , "10.0.14.16"};
+static const robot_ip_pair zoe     = {"zoe"    , "10.0.14.17"};
+
+static const robot_ip_pair ringo   = {"ringo"  , "10.0.14.18"};
+static const robot_ip_pair beyonce = {"beyonce", "10.0.14.19"};
+static const robot_ip_pair ozzy    = {"ozzy"   , "10.0.14.20"};
+static const robot_ip_pair avril   = {"avril"  , "10.0.14.21"};
 
 static const robot_ip_pair ringo   = {"ringo"  , "139.140.192.18"};
 static const robot_ip_pair beyonce = {"beyonce", "139.140.192.19"};
@@ -50,7 +55,7 @@ static const robot_ip_pair ozzy    = {"ozzy"   , "139.140.192.20"};
 static const robot_ip_pair robotIPs[NUM_ROBOTS] = {wash, river, jayne,
                                                    simon, inara, kaylee,
                                                    vera, mal, zoe,
-                                                   ringo, beyonce, ozzy};
+                                                   ringo, beyonce, ozzy, avril};
 
 //
 // Comm constants and MACRO definitions

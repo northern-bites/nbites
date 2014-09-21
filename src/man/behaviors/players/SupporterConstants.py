@@ -1,6 +1,7 @@
 import noggin_constants as NogginConstants
 from objects import Location, RobotLocation
 import RoleConstants
+from math import hypot
 
 def getSupporterPosition(player, role):
     """
@@ -48,27 +49,39 @@ def rightDefender(player):
 
 def chaser(player):
     """
-    Chasers position off to one side of the ball about a meter away.
+    Chasers position off to one side of the ball about a meter away if a chaser
+    or cherry picker is calling them off. Chasers position further away up field if
+    a defender is calling them off.
     """
-    if (player.brain.ball.x >= player.brain.loc.x and
-        player.brain.ball.y >= player.brain.loc.y):
-        return RobotLocation(player.brain.ball.x - CHASER_DISTANCE,
-                             player.brain.ball.y - CHASER_DISTANCE,
-                             player.brain.ball.bearing_deg + player.brain.loc.h)
-    elif (player.brain.ball.x >= player.brain.loc.x and
-        player.brain.ball.y < player.brain.loc.y):
-        return RobotLocation(player.brain.ball.x - CHASER_DISTANCE,
+    if RoleConstants.isDefender(player.roleOfClaimer):
+        if player.brain.ball.y >= player.brain.loc.y:
+            return RobotLocation(player.brain.ball.x + 200,
+                                 player.brain.ball.y - CHASER_DISTANCE,
+                                 player.brain.ball.bearing_deg + player.brain.loc.h)
+        return RobotLocation(player.brain.ball.x + 200,
                              player.brain.ball.y + CHASER_DISTANCE,
-                             player.brain.ball.bearing_deg + player.brain.loc.h)
-    elif (player.brain.ball.x < player.brain.loc.x and
-        player.brain.ball.y >= player.brain.loc.y):
-        return RobotLocation(player.brain.ball.x + CHASER_DISTANCE,
-                             player.brain.ball.y - CHASER_DISTANCE,
                              player.brain.ball.bearing_deg + player.brain.loc.h)
     else:
-        return RobotLocation(player.brain.ball.x + CHASER_DISTANCE,
-                             player.brain.ball.y + CHASER_DISTANCE,
-                             player.brain.ball.bearing_deg + player.brain.loc.h)
+        southEast = RobotLocation(player.brain.ball.x - CHASER_DISTANCE,
+                                  player.brain.ball.y - CHASER_DISTANCE,
+                                  player.brain.ball.bearing_deg + player.brain.loc.h)
+        southWest = RobotLocation(player.brain.ball.x - CHASER_DISTANCE,
+                                 player.brain.ball.y + CHASER_DISTANCE,
+                                 player.brain.ball.bearing_deg + player.brain.loc.h)
+        northEast = RobotLocation(player.brain.ball.x + CHASER_DISTANCE,
+                                 player.brain.ball.y - CHASER_DISTANCE,
+                                 player.brain.ball.bearing_deg + player.brain.loc.h)
+        northWest = RobotLocation(player.brain.ball.x + CHASER_DISTANCE,
+                                 player.brain.ball.y + CHASER_DISTANCE,
+                                 player.brain.ball.bearing_deg + player.brain.loc.h)
+
+        supportPostitions = [southEast,southWest,northEast,northWest]
+        positionsFilteredByInBounds = [position for position in supportPostitions if inBounds(position)]
+        if len(positionsFilteredByInBounds) > 0:
+            return min(positionsFilteredByInBounds, key=distanceToPosition(player))
+        
+        # print "no in bounds position"
+        return southEast
 
 CHASER_DISTANCE = 60
 
@@ -79,3 +92,14 @@ def cherryPicker(player):
     return RobotLocation(player.brain.loc.x,
                          player.brain.loc.y,
                          player.brain.ball.bearing_deg + player.brain.loc.h)
+
+def inBounds(position):
+    return (position.x >= NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X and 
+            position.x <= NogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X and
+            position.y >= NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y and
+            position.y <= NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y)
+
+def distanceToPosition(player):
+    def distToPositionHelper(position):
+        return hypot(player.brain.loc.x - position.x, player.brain.loc.y - position.y)
+    return distToPositionHelper
