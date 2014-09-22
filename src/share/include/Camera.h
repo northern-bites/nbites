@@ -90,7 +90,7 @@ public:
     static const bool TOP_H_FLIP = 1;
     static const bool TOP_V_FLIP = 1;
     static const bool TOP_AUTO_EXPOSURE = 0;
-    static const int TOP_BRIGHTNESS = 268;
+    static const int TOP_BRIGHTNESS = 180;
     static const int TOP_CONTRAST = 58;
     static const int TOP_SATURATION = 150;
     static const int TOP_HUE = 0;
@@ -111,7 +111,7 @@ public:
     static const bool BOTTOM_H_FLIP = 0;
     static const bool BOTTOM_V_FLIP = 0;
     static const bool BOTTOM_AUTO_EXPOSURE = 0;
-    static const int BOTTOM_BRIGHTNESS = 300;
+    static const int BOTTOM_BRIGHTNESS = 160;
     static const int BOTTOM_CONTRAST = 56;
     static const int BOTTOM_SATURATION = 122;
     static const int BOTTOM_HUE = 0;

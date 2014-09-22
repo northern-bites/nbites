@@ -16,7 +16,7 @@ namespace guardian{
 #ifdef NAOQI_2
 static const float FALL_SPEED_THRESH = 0.04f; // rads/20ms
 static const float NOFALL_SPEED_THRESH = 0.02f; // rads/20ms
-static const float FALLING_ANGLE_THRESH = M_PI_FLOAT/4.0f; // 36.0 degrees
+static const float FALLING_ANGLE_THRESH = M_PI_FLOAT/4.0f; // 45.0 degrees
 #else
 static const float FALL_SPEED_THRESH = 0.03f; // rads/20ms
 static const float NOFALL_SPEED_THRESH = 0.01f; // rads/20ms
