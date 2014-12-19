@@ -1,0 +1,9 @@
+#!/bin/bash
+
+BIN=$NBITES_DIR/build/nbclient
+
+rm -rf BIN
+mkdir BIN
+
+find ./src -name *.java > srcfiles
+javac -d BIN @srcfiles
