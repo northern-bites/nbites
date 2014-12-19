@@ -36,7 +36,7 @@ set(PYTHON_PLAYER ${@PYTHON_PLAYER@})
 
 set(
   @TABLE_TOP@
-  "../../data/tables/brazilv4top.mtb"
+  "../../data/tables/lab15.mtb"
   CACHE STRING
   "Path relative to man directory for the desired top camera color table"
 )
@@ -44,7 +44,7 @@ set(TABLE_TOP ${@TABLE_TOP@})
 
 set(
   @TABLE_BOTTOM@
-  "../../data/tables/brazilv4bottom.mtb"
+  "../../data/tables/lab15.mtb"
   CACHE STRING
   "Path relative to man directory for the desired bottom camera color table"
 )
