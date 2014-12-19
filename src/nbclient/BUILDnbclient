@@ -5,5 +5,8 @@ BIN=$NBITES_DIR/build/nbclient
 rm -rf $BIN
 mkdir $BIN
 
-find ./src -name *.java > srcfiles
-javac -d $BIN @srcfiles
+find ./src -name *.java > _tempFiles
+javac -d $BIN @_tempFiles
+
+cp ./src/nbclient/util/*.properties $BIN/nbclient/util
+rm _tempFiles

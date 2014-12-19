@@ -1,0 +1,7 @@
+#!/bin/bash
+
+./BUILDnbclient
+
+cd $NBITES_DIR/build/nbclient
+
+java -ea nbclient.gui.Display
