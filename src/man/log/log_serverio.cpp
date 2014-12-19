@@ -77,7 +77,7 @@ namespace nblog {
     //if recv_exactly finds this to differ from current time() by SERVER_SECONDS_TILL_BREAK seconds
     //it returns 1 and the connection will be closed.
     time_t last_heard;
-    //returns 1 on too much silence, or error
+    //returns 1 on too much silence, 2 on error, 0 success
     static inline int recv_exactly(int fd, size_t nbytes, void * buffer, int flags) {
         size_t read = 0;
         while (read < nbytes) {
@@ -92,12 +92,21 @@ namespace nblog {
             //as 0 data available.  This is because socket is non-blocking and so 0 data could well return EAGAIN or something.
             
             //Might be good to actually check the error code tho...
-            if (ret <= 0)
+            if (ret == 0) {
                 //shorter wait because we think data should be otw.
                 usleep(SERVER_USLEEP_EXPECTING);
-            else
+            } else if (ret < 0) {
+                int err_saved = errno;
+                if (err_saved == EAGAIN) {
+                    usleep(SERVER_USLEEP_EXPECTING);
+                } else {
+                    char buf[1000];
+                    strerror_r(err_saved, buf, 1000);
+                    printf("%s\n", buf);
+                    return 2;
+                }
+            } else
                 read += ret;
-            
         }
         
         //completed recv'ing.
@@ -108,18 +117,32 @@ namespace nblog {
     //Send guaranteed exactly.
     //Possibility that if socket is broken while this function is running we could infinite loop.
     //Need to check ret errors more carefully.
-    static inline void send_exactly(int fd, size_t nbytes, void * data, int flags) {
+    static inline int send_exactly(int fd, size_t nbytes, void * data, int flags) {
         
         int written = 0;
         while (written < nbytes) {
             
             int ret = (int) send(fd, ((uint8_t *) data) + written, nbytes - written, flags);
             
-            if (ret <= 0)
+            
+            if (ret == 0) {
+                //shorter wait because we think data should be otw.
                 usleep(SERVER_USLEEP_EXPECTING);
-            else
+            } else if (ret < 0) {
+                int err_saved = errno;
+                if (err_saved == EAGAIN) {
+                    usleep(SERVER_USLEEP_EXPECTING);
+                } else {
+                    char buf[1000];
+                    strerror_r(err_saved, buf, 1000);
+                    printf("%s\n", buf);
+                    return 2;
+                }
+            } else
                 written += ret;
         }
+        
+        return 0;
     }
     
     //Block thread unti client has attempted to connect.
@@ -175,6 +198,8 @@ namespace nblog {
         return a;
     }
     
+#define CHECK_RET(r) {if (r) goto connection_died;}
+    
     void * server_io_loop(void * arg) {
         
         int listenfd = 0, connfd = 0;
@@ -211,7 +236,7 @@ namespace nblog {
             uint32_t recvd;
             
             //init connection
-            send_exactly(connfd, 4, &seq_num, 0);
+            CHECK_RET(send_exactly(connfd, 4, &seq_num, 0));
             if (recv_exactly(connfd, 4, &recvd, 0)) {
                  LOGDEBUG(1, "log_serverio BREAKING CONNECTION DUE TO SILENCE (initiation) [s: %f]\n", difftime(time(NULL), last_heard));
                 goto connection_died;
@@ -250,11 +275,11 @@ namespace nblog {
                 NBLassert(obj->n_bytes < ULONG_MAX);
                 uint32_t data_len = htonl(obj->n_bytes);
                 
-                send_exactly(connfd, 4, &msg_seq_n, 0);
-                send_exactly(connfd, 4, &desc_len, 0);
-                send_exactly(connfd, strlen(desc), desc, 0);
-                send_exactly(connfd, 4, &data_len, 0);
-                send_exactly(connfd, obj->n_bytes, obj->data, 0);
+                CHECK_RET(send_exactly(connfd, 4, &msg_seq_n, 0));
+                CHECK_RET(send_exactly(connfd, 4, &desc_len, 0));
+                CHECK_RET(send_exactly(connfd, strlen(desc), desc, 0));
+                CHECK_RET(send_exactly(connfd, 4, &data_len, 0));
+                CHECK_RET(send_exactly(connfd, obj->n_bytes, obj->data, 0));
                 
                 //pthread_mutex_lock(&(buf->lock));
                 log_object_release(obj);

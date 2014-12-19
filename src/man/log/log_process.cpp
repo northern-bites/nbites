@@ -14,6 +14,7 @@
 namespace nblog {
     
     log_process_t * log_process = NULL;
+    log_stats_t * log_stats = NULL;
     
     const int LOG_BUFFER_SIZES[NUM_LOG_BUFFERS] = {
         200,
@@ -29,8 +30,11 @@ namespace nblog {
     void log_process_init() {
         LOGDEBUG(1, "log_process_init()\n");
         log_process =(log_process_t *) malloc(sizeof(log_process_t));
+        log_stats = (log_stats_t *) malloc(sizeof(log_stats_t));
         
-        log_process->creation_time = clock();
+        memset(log_stats, 0, sizeof(log_stats_t));
+        log_stats->start_time = time(NULL);
+        pthread_mutex_init(&(log_stats->lock), NULL);
         
         memset(log_process, 0, sizeof(log_process_t));
         for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
@@ -53,9 +57,31 @@ namespace nblog {
         log_fileio_init();
         
         while (1) {
-            //Nothing to do here for the moment, but this is where we should start checking stdout and sending that over the server connection.
-            
             sleep(1);
+            
+            //TODO
+            /*
+            if (log_process->flags & SERVER_CONNECTED) {
+                //Try to log some sort of stats message.
+                char buf[1024];
+                
+                int size = snprintf(buf, 1024, "bytes_logged=%llu logs_given=%llu logs_freed=%llu logs_lost=%llu logs_written=%llu logs_sent=%llu c_logs_sent=%llu c_bytes_sent=%llu c_logs_lost=%llu server_uptime=%f con_uptime=%f",
+                         log_stats->bytes_logged,
+                         log_stats->logs_given,
+                         log_stats->logs_freed,
+                         log_stats->logs_lost,
+                         log_stats->logs_written,
+                         log_stats->logs_sent,
+                         log_stats->c_logs_sent,
+                         log_stats->c_bytes_sent,
+                         log_stats->c_logs_lost,
+                         difftime(time(NULL), log_stats->start_time ),
+                         difftime(time(NULL), log_stats->connect_start));
+                
+                assert(size > 0);
+                assert(size < 1024);
+                NBlog(SMALL_BUFFER, 0, clock(), "log_stats_t", (size_t) size, (uint8_t *) buf);
+            } */
         }
         
         return NULL;
@@ -112,8 +138,22 @@ namespace nblog {
         return newp;
     }
     
+    void NBlog_statInc(size_t bytes) {
+        pthread_mutex_lock(&(log_stats->lock));
+        
+        log_stats->bytes_logged += bytes;
+        log_stats->logs_given += 1;
+        
+        log_stats->c_bytes_sent += bytes;
+        log_stats->c_logs_sent +=1;
+        
+        pthread_mutex_unlock(&(log_stats->lock));
+    }
+    
     void NBlog(int buffer_index, size_t image_index, clock_t creation_time, const char * type, size_t n_bytes, uint8_t * data) {
         LOGDEBUG(8, "NBlog(buffer_index=%i, image_index=%li, type=%s, bytes=%li)\n", buffer_index, image_index, type, n_bytes);
+        
+        NBlog_statInc(n_bytes);
         
         NBLassert(buffer_index < NUM_LOG_BUFFERS);
         //Can't log if the server's not running...

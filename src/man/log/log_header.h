@@ -155,9 +155,32 @@ namespace nblog {
     } log_buffer_t;
     
 #define NUM_LOG_BUFFERS 2
+    //Not final...
+#define IMAGE_BUFFER 0
+#define SMALL_BUFFER 1
     
     //declared in log_process.cpp
     const extern int LOG_BUFFER_SIZES[NUM_LOG_BUFFERS];
+    
+    typedef struct _log_stats {
+        //global
+        uint64_t bytes_logged;
+        uint64_t logs_given;
+        uint64_t logs_freed;
+        uint64_t logs_lost;
+        uint64_t logs_written;
+        uint64_t logs_sent;
+        
+        //network (reset each established connection)
+        uint64_t c_logs_sent;
+        uint64_t c_bytes_sent;
+        uint64_t c_logs_lost;
+        
+        time_t start_time;
+        time_t connect_start;
+        
+        pthread_mutex_t lock;
+    } log_stats_t;
     
     /*
      The central log_process thread structure.
@@ -170,8 +193,6 @@ namespace nblog {
 #define SERVER_CONNECTED 0x01
         uint8_t flags;
         
-        clock_t creation_time;
-        
         log_buffer_t * buffers[NUM_LOG_BUFFERS];
         
         pthread_t * log_process_thread;
@@ -182,6 +203,7 @@ namespace nblog {
     //global reference to the (singleton) log process object
     //declared in log_process.cpp
     extern log_process_t * log_process;
+    extern log_stats_t * log_stats;
     
 #define LOG_PORT 32000
 
@@ -224,7 +246,7 @@ namespace nblog {
     //init log_process thread
     void log_process_init();
     
-    //get next log from buffer[buffer_index].  Update last_read.
+    //get next log from buffer[buffer_index].  Updates last_read.
     //Returns null if no logs available.
     log_object_t * get_log(int buffer_index, int * last_read);
     
@@ -235,9 +257,7 @@ namespace nblog {
         }
     }
     
-    //Descriptions can be longer than 255... but right now we truncate them for file sizes.
-    
-    //Maybe need to change
+    //Generates a string w/ generic type specs encoded.
     static inline char * generate_type_specs(log_object_t * obj) {
         int32_t checksum = 0;
         for (int i = 0; i < obj->n_bytes; ++i)
