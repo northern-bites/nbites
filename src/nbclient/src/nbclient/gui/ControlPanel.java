@@ -150,6 +150,11 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 		String ptext = (String) settings_primary.getSelectedItem();
 		String stext = (String) settings_secondary.getSelectedItem();
 		
+		if (ptext == null)
+			ptext = "";
+		if (stext == null)
+			stext = "";
+		
 		settings_primary.setModel(new DefaultComboBoxModel<String>( P.putPrimaryValue(ptext) ));
 		settings_secondary.setModel(new DefaultComboBoxModel<String>( P.putSecondValue(stext) ));
 		

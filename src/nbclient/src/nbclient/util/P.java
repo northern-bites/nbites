@@ -67,9 +67,11 @@ public class P {
 			ret = pcached;
 		}
 		
-		ret.add(0, newest);
-		if (ret.size() > 5)
-			ret.remove(ret.size() - 1);
+		if (newest != null) {
+			ret.add(0, newest);
+			if (ret.size() > 5)
+				ret.remove(ret.size() - 1);
+		}
 		
 		for (int i = 0; i < ret.size(); ++i) {
 			p.put(PL_PREFIX + i, ret.get(i));
@@ -102,9 +104,11 @@ public class P {
 			ret = scached;
 		}
 		
-		ret.add(0, newest);
-		if (ret.size() > 5)
-			ret.remove(ret.size() - 1);
+		if (newest != null) {
+			ret.add(0, newest);
+			if (ret.size() > 5)
+				ret.remove(ret.size() - 1);
+		}
 		
 		for (int i = 0; i < ret.size(); ++i) {
 			p.put(SL_PREFIX + i, ret.get(i));
