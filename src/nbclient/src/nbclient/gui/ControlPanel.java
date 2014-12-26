@@ -15,8 +15,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import nbclient.data.DataHandler;
-import nbclient.data.DataHandler.STATUS;
+import nbclient.data.SessionHandler;
+import nbclient.data.SessionHandler.STATUS;
 import nbclient.data.OpaqueLog;
 import nbclient.util.N;
 import nbclient.util.N.EVENT;
@@ -26,7 +26,7 @@ import nbclient.util.U;
 
 public class ControlPanel extends JPanel implements ActionListener, NListener {
 	private static final long serialVersionUID = -3237233372276579379L;
-	protected ControlPanel(DataHandler ndh, LogDisplayPanel dp) {
+	protected ControlPanel(SessionHandler ndh, LogDisplayPanel dp) {
 		super();
 		dh = ndh;
 		ldp = dp;
@@ -161,18 +161,18 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 		switch(type.getSelectedIndex()) {
 		case 0: {
 			//network, saved
-			DataHandler.MODE m = DataHandler.MODE.NETWORK_SAVING;			
+			SessionHandler.MODE m = SessionHandler.MODE.NETWORK_SAVING;			
 			dh.start(m, ptext, stext);
 		} break;
 		case 1: {
 			//network, unsaved
-			DataHandler.MODE m = DataHandler.MODE.NETWORK_NOSAVE;
+			SessionHandler.MODE m = SessionHandler.MODE.NETWORK_NOSAVE;
 			dh.start(m, "",  stext);
 
 		} break;
 		case 2: {
 			//from filesystem
-			DataHandler.MODE m = DataHandler.MODE.FILESYSTEM;
+			SessionHandler.MODE m = SessionHandler.MODE.FILESYSTEM;
 			dh.start(m, ptext, "");
 		} break;
 		default: {
@@ -215,7 +215,7 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 		status.setText(news);
 	}
 	
-	public void setStatus(DataHandler.STATUS s) {
+	public void setStatus(SessionHandler.STATUS s) {
 		switch(s) {
 		case IDLE:
 			startb.setText("start");
@@ -272,6 +272,6 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 	
 	private StatsPanel stats;
 	
-	private DataHandler dh;
+	private SessionHandler dh;
 	private LogDisplayPanel ldp;
 }

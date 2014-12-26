@@ -12,7 +12,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import nbclient.data.DataHandler;
+import nbclient.data.SessionHandler;
 import nbclient.data.OpaqueLog;
 import nbclient.util.N;
 import nbclient.util.N.EVENT;
@@ -20,7 +20,7 @@ import nbclient.util.N.NListener;
 
 public class LogChooser extends JPanel {
 	private static final long serialVersionUID = 1L;
-	public LogChooser(DataHandler handler) {
+	public LogChooser(SessionHandler handler) {
 		setLayout(null);
 		dh = handler;
 		addComponentListener(new ComponentAdapter() {
@@ -67,5 +67,5 @@ public class LogChooser extends JPanel {
 	private JScrollPane sp;
 	private JTree tree;
 	private LCTreeModel model;
-	private DataHandler dh;	
+	private SessionHandler dh;	
 }

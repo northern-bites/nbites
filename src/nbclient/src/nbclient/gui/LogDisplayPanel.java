@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
-import nbclient.data.DataHandler;
+import nbclient.data.SessionHandler;
 import nbclient.data.OpaqueLog;
 import nbclient.gui.logviews.parent.ViewParent;
 import nbclient.util.N;
@@ -25,7 +25,7 @@ import nbclient.util.U;
 
 public class LogDisplayPanel extends JPanel implements NListener {
 	private static final long serialVersionUID = 1029394556736818161L;
-	protected LogDisplayPanel(DataHandler handler) {
+	protected LogDisplayPanel(SessionHandler handler) {
 		super();
 		setLayout(null);
 		addComponentListener(new ComponentAdapter() {

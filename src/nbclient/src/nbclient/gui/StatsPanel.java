@@ -12,7 +12,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-import nbclient.data.DataHandler;
+import nbclient.data.SessionHandler;
 import nbclient.data.Stats;
 import nbclient.util.N;
 import nbclient.util.N.EVENT;
@@ -20,7 +20,7 @@ import nbclient.util.N.NListener;
 
 public class StatsPanel extends JPanel implements NListener {
 	private static final long serialVersionUID = -3792669341719678442L;
-	public StatsPanel(DataHandler dh) {
+	public StatsPanel(SessionHandler dh) {
 		super();
 		setLayout(null);
 		addComponentListener(new ComponentAdapter() {

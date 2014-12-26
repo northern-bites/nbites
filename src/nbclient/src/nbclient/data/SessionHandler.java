@@ -18,7 +18,7 @@ import nbclient.util.N;
 import nbclient.util.N.EVENT;
 import nbclient.util.U;
 
-public class DataHandler implements NetIO.Boss, FileIO.Boss{
+public class SessionHandler implements NetIO.Boss, FileIO.Boss{
 		
 	public String log_directory; //Where we write to if from server, where we read from if from fs
 	
@@ -54,7 +54,7 @@ public class DataHandler implements NetIO.Boss, FileIO.Boss{
 	private FileIO fileioRunnable;
 	private NetIO netioRunnable;
 	
-	public DataHandler() {
+	public SessionHandler() {
 		mode = MODE.NONE;
 		status = STATUS.IDLE;
 		log_directory = "";

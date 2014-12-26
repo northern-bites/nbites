@@ -15,7 +15,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
-import nbclient.data.DataHandler;
+import nbclient.data.SessionHandler;
 import nbclient.io.CppIO;
 import nbclient.util.N;
 import nbclient.util.P;
@@ -61,7 +61,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		};
 		Runtime.getRuntime().addShutdownHook(new Thread(r));
 		
-		handler = new DataHandler();
+		handler = new SessionHandler();
 		
 		left = new JTabbedPane();
 		right = new JTabbedPane();
@@ -163,7 +163,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 	
 	private UtilPane up;
 	
-	private DataHandler handler;
+	private SessionHandler handler;
 	
 	private JSplitPane split1;
 	private JSplitPane split2;

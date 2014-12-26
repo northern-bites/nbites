@@ -16,8 +16,8 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-import nbclient.data.DataHandler;
-import nbclient.data.DataHandler.STATUS;
+import nbclient.data.SessionHandler;
+import nbclient.data.SessionHandler.STATUS;
 import nbclient.data.OpaqueLog;
 import nbclient.io.FileIO;
 import nbclient.util.N;
@@ -180,7 +180,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 			}
 			break;
 		case STATUS:
-			DataHandler hndlr = (DataHandler) src;
+			SessionHandler hndlr = (SessionHandler) src;
 			if (hndlr.status == STATUS.RUNNING) {
 				Branch newb = new Branch();
 				newb.dir = hndlr.log_directory; //Should be ok if null.
