@@ -21,6 +21,11 @@ import nbclient.util.N;
 import nbclient.util.P;
 import nbclient.util.U;
 
+/*
+ * nbclient main method
+ * nbclient top GUI class
+ * */
+
 public final class Display extends JFrame implements KeyEventPostProcessor {
 	private static final long serialVersionUID = 1L;
 	public static void main(String[] args) {
