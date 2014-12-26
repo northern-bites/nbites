@@ -182,6 +182,10 @@ namespace nblog {
         pthread_mutex_t lock;
     } log_stats_t;
     
+    typedef struct {
+        
+    } log_flags_t;
+    
     /*
      The central log_process thread structure.
      
@@ -204,6 +208,7 @@ namespace nblog {
     //declared in log_process.cpp
     extern log_process_t * log_process;
     extern log_stats_t * log_stats;
+    extern log_flags_t * log_flags;
     
 #define LOG_PORT 32000
 

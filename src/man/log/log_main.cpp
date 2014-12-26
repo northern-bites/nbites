@@ -1,5 +1,5 @@
 //
-//  log_process.c
+//  log_main.c
 //  NB_log_server
 //
 //  Created by Philip Koch on 10/4/14.
@@ -15,6 +15,7 @@ namespace nblog {
     
     log_process_t * log_process = NULL;
     log_stats_t * log_stats = NULL;
+    log_flags_t * log_flags = NULL;
     
     const int LOG_BUFFER_SIZES[NUM_LOG_BUFFERS] = {
         200,
@@ -31,6 +32,7 @@ namespace nblog {
         LOGDEBUG(1, "log_process_init()\n");
         log_process =(log_process_t *) malloc(sizeof(log_process_t));
         log_stats = (log_stats_t *) malloc(sizeof(log_stats_t));
+        log_flags = (log_flags_t *) malloc(sizeof(log_flags_t));
         
         memset(log_stats, 0, sizeof(log_stats_t));
         log_stats->start_time = time(NULL);
