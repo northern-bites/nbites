@@ -36,7 +36,7 @@ public class Stats implements NListener {
 		updateGUI();
 	}
 	
-	private void _update(OpaqueLog lg) {
+	private void _update(Log lg) {
 		++numlogs;
 		if (lg.bytes != null)
 			totalbytes += lg.bytes.length;
@@ -44,19 +44,19 @@ public class Stats implements NListener {
 		types.add((String) lg.getAttributes().get("type"));
 	}
 	
-	public void loaded(OpaqueLog lg) {
+	public void loaded(Log lg) {
 		totalbytes += lg.bytes.length;
 		
 		updateGUI();
 	}
 	
-	public void update(OpaqueLog lg) {
+	public void update(Log lg) {
 		_update(lg);
 		updateGUI();
 	}
 	
-	public void update(OpaqueLog[] lgs) {
-		for (OpaqueLog l : lgs) {
+	public void update(Log[] lgs) {
+		for (Log l : lgs) {
 			_update(l);
 		}
 		
@@ -70,6 +70,6 @@ public class Stats implements NListener {
 	
 	public void notified(EVENT e, Object src, Object... args) {
 		assert(e == EVENT.LOG_LOADED);
-		this.loaded((OpaqueLog) args[0]);
+		this.loaded((Log) args[0]);
 	}
 }

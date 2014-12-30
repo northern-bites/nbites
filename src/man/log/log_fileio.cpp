@@ -14,89 +14,89 @@
 namespace nblog {
     
     
-    const char * LOG_FOLDER = "/home/nao/nbites/log/";
+    static const char * LOG_FOLDER = "/home/nao/nbites/log/";
     //const char * LOG_FOLDER = "/Users/pkoch/Desktop/LOGS/";
     
-    int fileio_last_read[NUM_LOG_BUFFERS];
     void * file_io_loop(void * context);
     
     void log_fileio_init() {
         LOGDEBUG(1, "log_fileio_init()\n");
-        log_process->log_fileio_thread = (pthread_t *) malloc(sizeof(pthread_t));
+        log_main->log_fileio_thread = (pthread_t *) malloc(sizeof(pthread_t));
         
-        //First accessed index with be 0.
-        for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
-            fileio_last_read[i] = -1;
-        }
-        
-        //Do we want to be writing data to disk on the robot?
-#ifdef FILE_LOGGING
-        pthread_create(log_process->log_fileio_thread, NULL, &file_io_loop, NULL);
-#endif
+        pthread_create(log_main->log_fileio_thread, NULL, &file_io_loop, NULL);
     }
     
+    int write_to_fs(log_object_t * obj);
+    
     void * file_io_loop(void * context) {
-        while (1) {
-            uint8_t wrote_something = 0;
-            log_object_t * obj = NULL;
+        uint8_t wrote_something = 0;
+        log_object_t * obj = NULL;
+        
+        for (;;
+             (wrote_something) ? (wrote_something = 0) : usleep(FILE_USLEEP_ON_NTD)
+             )
+        {
+            if (!(log_flags->fileio)) {continue;}
             
-            //Log one from each buffer.
             for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
-                //log_buffer_t * buf = log_process->buffers[i];
-                obj = get_log(i, &(fileio_last_read[i]));
-                if (obj) {
-                    wrote_something = 1;
+                
+                for (int r = 0; r < LOG_RATIO[i]; ++r) {
+                    obj = acquire(i, &(log_main->buffers[i]->fileio_nextr));
                     
-                    char * f_name = generate_type_specs(obj);
-                    std::string cps(f_name);
-                    std::replace(cps.begin(), cps.end(), ' ', '_');
-                    int spos = cps.length() - 240;
-                    if (spos < 0) spos = 0;
-                    cps = cps.substr(spos, std::string::npos);
-                    cps.append(".nblog");
-                    size_t path_len = cps.length() + strlen(LOG_FOLDER) + 1;
-                    char * f_path = (char *) malloc(path_len);
-                    
-                    snprintf(f_path, path_len, "%s%s", LOG_FOLDER, cps.c_str());
-                    f_path[path_len - 1] = '\0';
-                    
-                    int fd = open(f_path, O_WRONLY | O_TRUNC | O_CREAT, S_IRWXG | S_IRWXU);
-                    
-                    if (fd < 0) {
-                        printf("*************NB_Log file_io COULD NOT OPEN LOG FILE \n\t%s\n\n", f_path);
-                        log_object_release(obj);
-                        continue;
+                    if (obj) {
+                        wrote_something = 1;
+                        write_to_fs(obj);
+                        
+                        release(obj, true);
+                    } else {
+                        break;
                     }
-                    
-                    uint32_t hord = strlen(f_name);
-                    uint32_t nlen = htonl(hord);
-                    write_exactly(fd, 4, &nlen);
-                    write_exactly(fd, hord, f_name);
-                    write_exactly(fd, obj->n_bytes, obj->data);
-                    close(fd);
-                    
-                    LOGDEBUG(6, "log_fileio WROTE SOMETHING! (%s)\n", f_path);
-                    free(f_name);
-                    free(f_path);
-                    
-                    //pthread_mutex_lock(&(buf->lock));
-                    log_object_release(obj);
-                    //pthread_mutex_unlock(&(buf->lock));
                 }
-            }
-            
-            //No buffers had available data, sleep
-            if (!wrote_something){
-                LOGDEBUG(11, "log_fileio sleeping on NTD...\n");
-                usleep(FILE_USLEEP_ON_NTD);
-                //Don't want to be grinding if there's nothing to write
-               
-            } else {
-                //we wrote something! woo
             }
         }
         
         return NULL;
+    }
+    
+    int write_to_fs(log_object_t * obj) {
+        int fd;
+        char buf[MAX_LOG_DESC_SIZE];
+        
+        int nw = description(buf, MAX_LOG_DESC_SIZE, obj);
+        
+        char * ss;
+        int len;
+        
+        //240 is ~ what we can put in a file name
+        if (nw < 240) {
+            len = nw;
+            ss = buf;
+        } else {
+            len = 240;
+            ss = buf + (nw - 240);
+        }
+        
+        std::string cpp_s(ss);
+        std::replace(cpp_s.begin(), cpp_s.end(), ' ', '_');
+        cpp_s.append(".nblog");
+        std::string path(LOG_FOLDER);
+        path.append(cpp_s);
+        
+        fd = open(path.c_str(), O_WRONLY | O_TRUNC | O_CREAT, S_IRWXG | S_IRWXU);
+        
+        if (fd < 0) {
+            printf("*************NB_Log file_io COULD NOT OPEN LOG FILE \n\t%s\n\n", path.c_str());
+            
+            return 1;
+        }
+        
+        if (write_log(fd, obj)) {
+            printf("*************NB_Log file_io COULD NOT WRITE LOG \n\t%s\n\n", path.c_str());
+            
+            return 2;
+        }
+        
+        return 0;
     }
     
 }

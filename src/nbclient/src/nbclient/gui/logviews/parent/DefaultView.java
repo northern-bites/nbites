@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import nbclient.data.OpaqueLog;
+import nbclient.data.Log;
 import nbclient.io.FileIO;
 import nbclient.util.U;
 
@@ -28,8 +28,8 @@ public class DefaultView extends ViewParent implements ActionListener {
 	private JTextArea data;
 	private JButton save;
 	
-	public OpaqueLog getLog() {return log;}
-	public void setLog(OpaqueLog newlog) {
+	public Log getLog() {return log;}
+	public void setLog(Log newlog) {
 		assert(newlog.bytes != null);
 		this.log = newlog;
 		desc.setText(log.description);

@@ -2,7 +2,7 @@ package nbclient.term;
 
 import java.util.ArrayList;
 
-import nbclient.data.OpaqueLog;
+import nbclient.data.Log;
 import nbclient.io.NetIO;
 import nbclient.io.NetIO.Boss;
 import nbclient.util.U;
@@ -10,7 +10,7 @@ import nbclient.util.U;
 public class term implements NetIO.Boss{
 	
 	NetIO netio;
-	ArrayList<OpaqueLog> logs;
+	ArrayList<Log> logs;
 	
 	public static void main(String[] args) throws InterruptedException {
 		//System.out.println(args.length);
@@ -33,8 +33,8 @@ public class term implements NetIO.Boss{
 	}
 
 	
-	public void takeDelivery(OpaqueLog log) {
-		System.out.println("" + ((OpaqueLog) log).description);
+	public void takeDelivery(Log log) {
+		System.out.println("" + ((Log) log).description);
 	}
 
 

@@ -6,17 +6,17 @@ import java.awt.event.ComponentEvent;
 
 import javax.swing.JPanel;
 
-import nbclient.data.OpaqueLog;
+import nbclient.data.Log;
 
 /**
  * Construction and setLog() are sometimes called in a separate thread.
  * */
 public abstract class ViewParent extends JPanel {
 	private static final long serialVersionUID = 1L;
-	protected OpaqueLog log;
+	protected Log log;
 	
 	//Use newlog to populate view.
-	public abstract void setLog(OpaqueLog newlog);
+	public abstract void setLog(Log newlog);
 	
 	//(ONLY CALLED IF CHILDREN CALL SUPER() )
 	//Determine proper size of all internal components here.  Note, feel free to simply add a JPanel as the only child of this view,

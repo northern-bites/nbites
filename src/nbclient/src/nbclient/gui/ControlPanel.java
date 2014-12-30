@@ -17,7 +17,7 @@ import javax.swing.JTextField;
 
 import nbclient.data.SessionHandler;
 import nbclient.data.SessionHandler.STATUS;
-import nbclient.data.OpaqueLog;
+import nbclient.data.Log;
 import nbclient.util.N;
 import nbclient.util.N.EVENT;
 import nbclient.util.N.NListener;
@@ -245,7 +245,7 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 			stream_box.setSelected(false);
 		case LOGS_ADDED:
 			if (stream_box.isSelected()) {
-				OpaqueLog lg = (OpaqueLog) args[0];
+				Log lg = (Log) args[0];
 				if (lg.description.contains(stream_field.getText())) {
 					ldp.setContents(lg);
 				}

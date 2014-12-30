@@ -53,13 +53,10 @@ namespace man{
          * @param desc Fields describing the logged data.
          */
         template<class T>
-        void log(portals::OutPortal<T>* out, std::string desc)
+        void log(uint8_t * flag, portals::OutPortal<T>* out, std::string desc)
         {
-            // Only let us do this if we really intend to log
-#ifdef USE_LOGGING
-            logs.push_back(new log::LogModule<T>(out, desc));
+            logs.push_back(new log::LogModule<T>(flag, out, desc));
             diagram.addModule(*logs.back());
-#endif
         }
         
         

@@ -18,7 +18,7 @@ import javax.swing.tree.TreePath;
 
 import nbclient.data.SessionHandler;
 import nbclient.data.SessionHandler.STATUS;
-import nbclient.data.OpaqueLog;
+import nbclient.data.Log;
 import nbclient.io.FileIO;
 import nbclient.util.N;
 import nbclient.util.U;
@@ -35,10 +35,10 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 		String name;
 		String dir; //if loading from FS, keep this around so that we can load log data later.
 		
-		ArrayList<OpaqueLog> leaves;
+		ArrayList<Log> leaves;
 		
 		public Branch() {
-			leaves = new ArrayList<OpaqueLog>();
+			leaves = new ArrayList<Log>();
 		}
 		
 		public String toString() {
@@ -51,8 +51,8 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 	Branch current;
 	JTree tree;
 	
-	public OpaqueLog NS_macro = null;
-	public OpaqueLog CS_macro = null;
+	public Log NS_macro = null;
+	public Log CS_macro = null;
 	
 	public LCTreeModel() {
 		root = "";
@@ -87,7 +87,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 
 	@Override
 	public boolean isLeaf(Object node) {
-		if (node.getClass() == OpaqueLog.class) return true;
+		if (node.getClass() == Log.class) return true;
 		else return false;
 	}
 
@@ -132,7 +132,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 			//LOG SELECTED.
 			
 			Object[] path_objs = path.getPath();
-			OpaqueLog lg = (OpaqueLog) path_objs[2];
+			Log lg = (Log) path_objs[2];
 			Branch b = (Branch) path_objs[1];
 			
 			if (lg.bytes == null) {
@@ -170,7 +170,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 			assert(current != null);
 			
 			for (Object _lg : args) {
-				OpaqueLog lg = (OpaqueLog) _lg;
+				Log lg = (Log) _lg;
 				current.leaves.add(lg);
 			}
 			
@@ -208,7 +208,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 		
 		private class LogTransfer implements Transferable {
 			
-			public OpaqueLog tp;
+			public Log tp;
 
 			public DataFlavor[] getTransferDataFlavors() {
 				return new DataFlavor[]{U.treeFlavor};
@@ -238,7 +238,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 			LogTransfer lt = new LogTransfer();
 			
 			if (p.getPathCount() != 3) return null;
-			lt.tp = (OpaqueLog) p.getLastPathComponent();
+			lt.tp = (Log) p.getLastPathComponent();
 			
 		    return lt;
 		}

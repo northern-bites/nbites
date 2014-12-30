@@ -4,7 +4,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import nbclient.data.OpaqueLog;
+import nbclient.data.Log;
 import nbclient.gui.logviews.parent.ViewParent;
 import nbclient.images.ImageParent;
 import nbclient.images.UV88image;
@@ -20,7 +20,7 @@ public class ImageView extends ViewParent{
 			g.drawImage(img, 0, 0, null);
     }
 	
-	public void setLog(OpaqueLog newlog) {
+	public void setLog(Log newlog) {
 		log = newlog;
 		
 		this.img = U.biFromLog(newlog);

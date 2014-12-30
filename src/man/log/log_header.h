@@ -26,12 +26,6 @@
 
 #include <assert.h>
 
-/*
-#ifndef __STDCPP_THREADS__
-#error NB_log_server REQUIRES threads.  Do not compile/link into a non-threading environment!
-#endif
- */
-
 namespace nblog {
     
     //colored output macros.
@@ -39,13 +33,11 @@ namespace nblog {
 #define NBlog_DB_cnrm  "\x1B[0m"
 #define NBlog_DB_asf   "\x1B[31m" //assertion failed
     
-    //NBlog debug level.  undef to never hear from log code,
+    //NBlog debug level.  undef to (almost) never hear from log code,
     //set higher to hear A LOT from log code
 #define NBlog_DB 5
     
-//We have NO guarantee assertions will be on... want some form of yelp if something goes wrong
-    
-    
+//Logging code has no guarantee assertions will be on... want some form of yelp if something goes wrong
 #ifdef NBlog_DB
 #define NBLassert(val) {if(!(val)) {printf(NBlog_DB_asf \
 "*************NBLassert FAILED:[%s][%i] (%s)\n\n" NBlog_DB_cnrm, \
@@ -55,7 +47,7 @@ namespace nblog {
 #endif
     
 #ifdef NBlog_DB
-    static inline void debug_printf(unsigned int lev, const char * format, ...) {
+    static inline void NBLdebug_printf(unsigned int lev, const char * format, ...) {
         
         va_list arguments;
         va_start(arguments, format);
@@ -72,65 +64,33 @@ namespace nblog {
 #endif
     
 #ifdef NBlog_DB
-#define LOGDEBUG(lev, ...) debug_printf(lev, __VA_ARGS__)
+#define LOGDEBUG(lev, ...) NBLdebug_printf(lev, __VA_ARGS__)
 #else
 #define LOGDEBUG(lev, ...) 
 #endif
     
     /*
-     Data is given to the log_process thread via the NBlog function.
+     Data is given to the logging system via the thread-safe NBlog function.
      
-     Each call COPIES all relevant data, using mutexes to modify the log data ring buffers.
+     Each call COPIES all relevant data (string, bytes, etc), using mutexes to modify the log data ring buffers.
      
-     Since the logging system keeps its own copies of all data, memory usage is an issue.  The log_process
-     keeps a limited number of each type of log data, low
-     density and high density.  Low-density refers to large objects such as images.  High density refers to
-     messages with high information density, such as proto-buffs.
+     Since the logging system keeps its own copies of all data, memory usage is an issue.
+     Larger logs are written to a separate, smaller, buffer to reduce footprint and give priority to smaller logs.
      
-     generally, the larger a log object the higher index buffer it should be placed in.  Right now,
-     
-     index 0 = high density
-     index 1 = low density
-     
-     The log_process immediately overwrites old objects as the buffer fills up.  If no io system is currently using the object (references == 0), it is immediately free'd.  If an io system is using the object, log_process removes it from the ring buffer.  It is now up to the last io system to stop using the object to free it.
+     The log_main immediately overwrites old objects as the buffer fills up.  If no io system is currently using the object (references == 0), it is immediately free'd.  If an io system is using the object, log_main removes it from the ring buffer.  It is now up to the last io system to stop using the object to free it.
      */
     
-    /*
-     NEEDS WORK:
-     
-     Should have all threads use attributes on creation, to make it easier to change priorities.  We might want higher priorities (trying to get as much data logged as possible) or very low priorities (not interfereing with host system).
-     
-     Better system for sending object attributes?
-     */
     
     /*
-     A logging object/structure.  log-owned data waiting to be thoroughly logged and then free'd.
-     */
-    
-    /*
-     <type> specifications
+     A logging object/structure.
+     Data referenced in object must be owned by the logging system.
      
-     required specs
-     fpl: file prefix length.  Since file names are a limited size, if we one day need long type strings we'll add the first fpl bytes of the file to the name to determine file specifications.  So ALL LOG FILES MUST INCLUDE THIS SPEC.  Just set it to 0 for now since we aren't using all of the max file name length.
-     type: type (image, protobuf type, stdout)
-     index: assocaited image index
-     time: creation time
-     
-     optionals...
-     from: from (camera top, localization)
-     
-     image specs
-     width:
-     height:
-     
-     
-     name: 
-        human readable name
+     type refers to a string of key/value pairs (e.g., type=YUVImage)
+        See log file formatting.
      */
     
     typedef struct _log_object_s {
         size_t image_index;     //associated image id
-        //time_t creation_time;   //time(NULL) when object created
         clock_t creation_time;
         const char * type;      //variable length string encoding data specifics.
         
@@ -147,21 +107,30 @@ namespace nblog {
         uint8_t was_written;
     } log_object_t;
     
-    //lock is for modifying the buffer, OR modifying (i.e. deleting/releasing) an object.
+#define MAX_LOG_DESC_SIZE 1024
+    
+    //Lock is for any modification of the buffer or its stored logs.
     typedef struct _log_buffer_s {
-        uint32_t last_written;
+        uint32_t fileio_nextr;
+        uint32_t servio_nextr;
+        
+        uint32_t next_write;
         pthread_mutex_t lock;
         log_object_t * objects[];
     } log_buffer_t;
     
 #define NUM_LOG_BUFFERS 2
-    //Not final...
-#define IMAGE_BUFFER 0
-#define SMALL_BUFFER 1
+    //Not final... but used for now to make code clearer.
+#define NBL_IMAGE_BUFFER 0
+#define NBL_SMALL_BUFFER 1
     
-    //declared in log_process.cpp
+    //declared in log_main.cpp
     const extern int LOG_BUFFER_SIZES[NUM_LOG_BUFFERS];
+    extern int LOG_RATIO[NUM_LOG_BUFFERS];
     
+    /*
+     Logging stats functions and structures
+     */
     typedef struct _log_stats {
         //global
         uint64_t bytes_logged;
@@ -182,44 +151,65 @@ namespace nblog {
         pthread_mutex_t lock;
     } log_stats_t;
     
+    /*
+     flags for the logging system.
+     
+     Generally, non-mutex written in one place,
+        read in multiple places.
+     */
     typedef struct {
+        uint8_t serv_connected;
         
+        //log to
+        uint8_t fileio;
+        uint8_t servio;
+        
+        //what to log
+        uint8_t STATS;
+        
+        //SPECIFIC modules
+        uint8_t SENSORS;
+        uint8_t GUARDIAN;
+        uint8_t COMM;
+        uint8_t LOCATION;
+        uint8_t ODOMETRY;
+        uint8_t OBSERVATIONS;
+        uint8_t LOCALIZATION;
+        uint8_t BALLTRACK;
+        uint8_t IMAGES;
+        uint8_t VISION;
     } log_flags_t;
     
     /*
-     The central log_process thread structure.
+     The central logging structure.
      
      Logging io threads should lock a buffer, take a reference and mark it as being written (increment ref count), then unlock.
      */
-    
-    typedef struct _log_process_s {
-        //Not to be modified except by serverio thread.
-#define SERVER_CONNECTED 0x01
-        uint8_t flags;
-        
+    typedef struct _log_main_s {
         log_buffer_t * buffers[NUM_LOG_BUFFERS];
         
-        pthread_t * log_process_thread;
+        pthread_t * log_main_thread;
         pthread_t * log_serverio_thread;
         pthread_t * log_fileio_thread;
-    } log_process_t;
+        pthread_t * log_cnc_thread;
+    } log_main_t;
     
     //global reference to the (singleton) log process object
-    //declared in log_process.cpp
-    extern log_process_t * log_process;
+    //declared in log_main.cpp
+    extern log_main_t * log_main;
     extern log_stats_t * log_stats;
     extern log_flags_t * log_flags;
     
-#define LOG_PORT 32000
+#define LOG_VERSION 3
+    
+#define LOG_PORT (32000)
+#define CNC_PORT (32001)
 
-#define SERVER_USLEEP_EXPECTING 1000
-#define SERVER_USLEEP_WAITING 100000
+#define USLEEP_EXPECTING (1000)
+#define IO_SEC_TO_BREAK (5.0)
     
-#define SERVER_SECONDS_TILL_BREAK 5.0
+#define SERVER_USLEEP_WAITING (100000)
     
-    //If this is not defined, nothing will be written to disk.
-    //If this is defined, EVERYTHING will be written to disk – barring io time problems.
-//#define FILE_LOGGING
 #define FILE_USLEEP_ON_NTD (100000)
     
     /**********************************************************
@@ -227,7 +217,7 @@ namespace nblog {
      
      Thread safe.
      
-     buffer_index: which buffer to put data on (buffers might have different sizes to restrict log system memory usage)
+     buffer_index: which buffer to put data on
      image_index: image that this log's encapsulated information was derived from.
         0 means n/a or unknown.
      
@@ -239,40 +229,37 @@ namespace nblog {
      */
     void NBlog(int buffer_index, size_t image_index, clock_t creation_time, const char * type, size_t n_bytes, uint8_t * data);
     
-    //Thread safe (uses obj->buffer_index's lock.
-    void log_object_release(log_object_t * obj);
+    //init log_main thread
+    void log_main_init();
     
-    //Only call this directly in rare occaisons.  Not thread safe.  Just call release outside the context of a lock. (because release locks)
-    void log_object_free(log_object_t * obj);
     
-    //constructor
-    log_object_t * log_object_create(size_t image_index, clock_t creation_time, const char * type, size_t bytes, uint8_t * data);
+    /**
+     logging lib common functions.
+     */
     
-    //init log_process thread
-    void log_process_init();
+    log_object_t * acquire(int buffer_index, uint32_t * relevant_last_read);
+    void release(log_object_t * obj, bool lock);
     
-    //get next log from buffer[buffer_index].  Updates last_read.
-    //Returns null if no logs available.
-    log_object_t * get_log(int buffer_index, int * last_read);
+    /*
+     Netio could use send/recv, but a.t.m. we're not using flags so this approach allows file and net io to use the same functions.
+     */
+    extern inline int write_exactly(int sck_or_fd, size_t nbytes, uint8_t * data);
     
-    static inline void write_exactly(int fd, size_t nbytes, void * data) {
-        size_t written = 0;
-        while (written < nbytes) {
-            written += write(fd, ((uint8_t *) data) + written, nbytes - written);
-        }
-    }
+    /*
+     time() has granularity of 1 second, so while max_wait
+     is a float, fractions are irrelevant.
+     */
+    extern inline int read_exactly(int sck_or_fd, size_t nbytes, uint8_t * buffer, double max_wait);
+    
+    /*
+     Write log (using write_exactly) to sock_or_fd.
+     
+     0 on success, + on failure
+     */
+    int write_log(int sock_or_fd, log_object_t * log);
     
     //Generates a string w/ generic type specs encoded.
-    static inline char * generate_type_specs(log_object_t * obj) {
-        int32_t checksum = 0;
-        for (int i = 0; i < obj->n_bytes; ++i)
-            checksum += obj->data[i];
-        char * f_path = (char *) malloc(1024);
-        int n_written = snprintf(f_path, 1024, "type=%s checksum=%i index=%li time=%lu", obj->type, checksum, obj->image_index, obj->creation_time);
-        NBLassert(n_written < 1024);
-        LOGDEBUG(8, "generate_type_specs() [%i] %s\n", n_written, f_path);
-        return f_path;
-    }
+    extern inline int description(char * buf, size_t size, log_object_t * obj);
     
 }//namespace NBlog
 

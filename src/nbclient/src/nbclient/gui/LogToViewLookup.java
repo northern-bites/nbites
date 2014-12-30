@@ -3,7 +3,7 @@ package nbclient.gui;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import nbclient.data.OpaqueLog;
+import nbclient.data.Log;
 import nbclient.gui.logviews.parent.ViewParent;
 import nbclient.util.P;
 import nbclient.util.U;
@@ -15,7 +15,7 @@ public class LogToViewLookup {
 	private static final String PROTOBUF_S = "protobuf";
 	private static final String TEST_S = "test";
 	
-	public static ArrayList<Class<? extends ViewParent>> viewsForLog(OpaqueLog lg) {
+	public static ArrayList<Class<? extends ViewParent>> viewsForLog(Log lg) {
 		ArrayList<Class<? extends ViewParent>> ret = new ArrayList<Class<? extends ViewParent>>();
 		
 		//Try to list most specific views first

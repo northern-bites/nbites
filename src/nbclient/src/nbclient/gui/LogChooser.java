@@ -13,7 +13,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import nbclient.data.SessionHandler;
-import nbclient.data.OpaqueLog;
+import nbclient.data.Log;
 import nbclient.util.N;
 import nbclient.util.N.EVENT;
 import nbclient.util.N.NListener;
@@ -56,11 +56,11 @@ public class LogChooser extends JPanel {
 		sp.setBounds(0, 0, size.width, size.height);
 	}
 	
-	public OpaqueLog currentlySelected() {
+	public Log currentlySelected() {
 		return model.CS_macro;
 	}
 	
-	public OpaqueLog nextSelection() {
+	public Log nextSelection() {
 		return model.NS_macro;
 	}
 	

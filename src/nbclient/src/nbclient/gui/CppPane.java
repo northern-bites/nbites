@@ -35,7 +35,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
 
-import nbclient.data.OpaqueLog;
+import nbclient.data.Log;
 import nbclient.io.CppIO;
 import nbclient.io.CppIO.CppFuncListener;
 import nbclient.util.N;
@@ -67,8 +67,8 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 		funcName.addActionListener(this);
 		funcName.setEnabled(false);
 		
-		arg_data = new ArrayList<OpaqueLog>();
-		der_data = new ArrayList<OpaqueLog>();
+		arg_data = new ArrayList<Log>();
+		der_data = new ArrayList<Log>();
 		arg_model = new MODEL(arg_data);
 		der_model = new MODEL(der_data);
 		
@@ -155,8 +155,8 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 	private MODEL arg_model;
 	private MODEL der_model;
 	
-	private ArrayList<OpaqueLog> arg_data;
-	private ArrayList<OpaqueLog> der_data;
+	private ArrayList<Log> arg_data;
+	private ArrayList<Log> der_data;
 	
 	private class HANDLER extends TransferHandler {		
 		private static final long serialVersionUID = 1L;
@@ -166,11 +166,11 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 		}
 		
 		public boolean importData(TransferSupport p) {
-			OpaqueLog imp = null;
+			Log imp = null;
 			try {
 				if (p.isDataFlavorSupported(U.treeFlavor)) {
 
-					imp = (OpaqueLog) p.getTransferable().getTransferData(U.treeFlavor);
+					imp = (Log) p.getTransferable().getTransferData(U.treeFlavor);
 				}
 				else if (p.isDataFlavorSupported(DataFlavor.stringFlavor)) {
 					String mcro = (String) p.getTransferable().getTransferData(DataFlavor.stringFlavor);
@@ -193,7 +193,7 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 			
 			
 			for (int i = 0; i < arg_data.size(); ++i) {
-				OpaqueLog cur = arg_data.get(i);
+				Log cur = arg_data.get(i);
 				if (cur.description.startsWith("::") || cur.bytes != null) 
 					continue;
 				else if (imp.description.startsWith("::")) {
@@ -221,8 +221,8 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 	
 	private class MODEL extends AbstractListModel<String> implements ListSelectionListener {
 		private static final long serialVersionUID = 1L;
-		private ArrayList<OpaqueLog> data;
-		protected MODEL(ArrayList<OpaqueLog> l) {this.data = l;}
+		private ArrayList<Log> data;
+		protected MODEL(ArrayList<Log> l) {this.data = l;}
 
 		@Override
 		public int getSize() {
@@ -251,7 +251,7 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 				return;
 			
 			int index = ((JList) e.getSource()).getSelectedIndex();
-			OpaqueLog l = der_data.get(index);
+			Log l = der_data.get(index);
 			N.notify(EVENT.SELECTION, this, l);
 		}
 	}
@@ -264,12 +264,12 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 		if (f.args.length != arg_data.size())
 			return "not enough arguments";
 		
-		OpaqueLog[] ARGS = new OpaqueLog[f.args.length];
+		Log[] ARGS = new Log[f.args.length];
 		arg_data.toArray(ARGS);
 		
 		//Get listing of arguments (I.e. convert macro to log)
 		for (int j = 0; j < f.args.length; ++j) {
-			OpaqueLog a = arg_data.get(i);
+			Log a = arg_data.get(i);
 			
 			if (a.description.equalsIgnoreCase(NA_S)) {
 				a = lc.nextSelection();
@@ -298,13 +298,13 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 		}
 		
 		CppIO.CppFuncCall call = CppIO.current.new CppFuncCall();
-		call.args = new ArrayList<OpaqueLog>(Arrays.asList(ARGS));
+		call.args = new ArrayList<Log>(Arrays.asList(ARGS));
 		call.listener = this;
 		call.index = funcName.getSelectedIndex(); assert(call.index >= 0);
 		call.name = f.name;
 		
 		U.wf("CppPane: call to %s (%d)\n", call.name, call.index);
-		for (OpaqueLog a : call.args) 
+		for (Log a : call.args) 
 			U.wf("\t%s\n", a.description);
 		
 		if (!CppIO.current.tryAddCall(call)) {
@@ -341,7 +341,7 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 			arg_data.clear();
 			
 			for (String s : f.args) {
-				arg_data.add(new OpaqueLog(s, null));
+				arg_data.add(new Log(s, null));
 			}
 			
 			arg_model.reload();
@@ -388,7 +388,7 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 	}
 	
 	//CppIO.CppCallListener
-	public void returned(int ret, OpaqueLog... out) {
+	public void returned(int ret, Log... out) {
 		
 		U.w("CppPane: function returned with ret:" + ret + " and " + out.length + " out.");
 		
@@ -401,8 +401,8 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 	private LogChooser lc;
 	private static final String NA_S = "::next selection::";
 	private static final String CA_S = "::current selection::";
-	private static final OpaqueLog NEXT_ALIAS = new OpaqueLog(NA_S, null);
-	private static final OpaqueLog CUR_ALIAS = new OpaqueLog(CA_S, null);
+	private static final Log NEXT_ALIAS = new Log(NA_S, null);
+	private static final Log CUR_ALIAS = new Log(CA_S, null);
 
 	
 }

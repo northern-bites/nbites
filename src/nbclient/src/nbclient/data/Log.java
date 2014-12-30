@@ -8,7 +8,7 @@ import nbclient.util.U;
 
 /*TODO:  if description changes, attributes is out of date.
  * */
-public class OpaqueLog implements Serializable {
+public class Log implements Serializable {
 	private static final long serialVersionUID = 5000703421741282261L;
 	public String name; //File name, might be null
 	public String description;
@@ -18,7 +18,7 @@ public class OpaqueLog implements Serializable {
 
 	private Map<String, Object> dictionary;
 	
-	public OpaqueLog(String d, byte[] b) {
+	public Log(String d, byte[] b) {
 		this.name = null;
 		this.description = d;
 		this.bytes = b;

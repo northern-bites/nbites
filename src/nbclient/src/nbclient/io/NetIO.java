@@ -10,8 +10,8 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import nbclient.data.OpaqueLog;
-import nbclient.data.OpaqueLog.SOURCE;
+import nbclient.data.Log;
+import nbclient.data.Log.SOURCE;
 import nbclient.util.U;
 
 /**
@@ -34,7 +34,7 @@ public class NetIO implements Runnable {
 	public int server_port;
 	
 	public interface Boss {
-		void takeDelivery(OpaqueLog log);
+		void takeDelivery(Log log);
 		void netThreadExiting();
 	}
 	public Boss boss;
@@ -84,7 +84,7 @@ public class NetIO implements Runnable {
 				readExactly(in, data_bytes);
 				
 				U.w("NetIO: thread got packet of data size: " + data_len + " desc: " + desc);
-				OpaqueLog nl = new OpaqueLog(desc, data_bytes);
+				Log nl = new Log(desc, data_bytes);
 				nl.source = SOURCE.NETWORK;
 				boss.takeDelivery(nl);
 				

@@ -14,7 +14,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import nbclient.data.OpaqueLog;
+import nbclient.data.Log;
 import nbclient.gui.logviews.parent.ViewParent;
 import nbclient.images.ImageParent;
 import nbclient.images.UV88image;
@@ -26,7 +26,7 @@ import nbclient.util.U;
 public class ZoomImageView extends ViewParent {
 	private static final long serialVersionUID = 1L;
 
-	public void setLog(OpaqueLog newlog) {
+	public void setLog(Log newlog) {
 		this.log = newlog;
 		
 		iv.useImage(U.biFromLog(newlog));

@@ -13,8 +13,8 @@ import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
 
-import nbclient.data.OpaqueLog;
-import nbclient.data.OpaqueLog.SOURCE;
+import nbclient.data.Log;
+import nbclient.data.Log.SOURCE;
 import nbclient.util.N;
 import nbclient.util.N.EVENT;
 import nbclient.util.U;
@@ -35,7 +35,7 @@ public class CppIO implements Runnable {
 	public static Thread thread;
 	public static volatile boolean running = true;
 
-	public final int PORT = 32001;
+	public final int PORT = 32002;
 	
 	public ArrayList<CppFunc> foundFuncs;
 	public Boolean connected;
@@ -151,7 +151,7 @@ public class CppIO implements Runnable {
 						dos.write(c.name.getBytes());
 						dos.writeInt(c.args.size());
 						
-						for (OpaqueLog l : c.args) {
+						for (Log l : c.args) {
 							byte[] cbytes = l.description.getBytes();
 							dos.writeInt(cbytes.length);
 							dos.write(cbytes);
@@ -177,7 +177,7 @@ public class CppIO implements Runnable {
 						final int ret = dis.readInt();
 						int num_out = dis.readInt();
 						U.w("CppIO: function finished call, num out: " + num_out);
-						final ArrayList<OpaqueLog> outs = new ArrayList<OpaqueLog>();
+						final ArrayList<Log> outs = new ArrayList<Log>();
 						for (int i = 0; i < num_out; ++i) {
 							int odl = dis.readInt();
 							byte[] odb = new byte[odl];
@@ -187,7 +187,7 @@ public class CppIO implements Runnable {
 							byte[] oab = new byte[oal];
 							dis.readFully(oab);
 							
-							OpaqueLog nl = new OpaqueLog(new String(odb), oab);
+							Log nl = new Log(new String(odb), oab);
 							nl.source = SOURCE.DERIVED;
 							U.w("CppIO: got out: " + nl.description);
 							outs.add(nl);
@@ -200,7 +200,7 @@ public class CppIO implements Runnable {
 						//Done calling function.
 						SwingUtilities.invokeLater(new Runnable(){
 							public void run() {
-								c.listener.returned(ret, outs.toArray(new OpaqueLog[0]));
+								c.listener.returned(ret, outs.toArray(new Log[0]));
 							}
 						});
 						
@@ -240,7 +240,7 @@ public class CppIO implements Runnable {
 	public class CppFuncCall {
 		public int index;
 		public String name;
-		public ArrayList<OpaqueLog> args;
+		public ArrayList<Log> args;
 		public CppFuncListener listener;
 	}
 	
@@ -270,6 +270,6 @@ public class CppIO implements Runnable {
 	 * and this makes it much easier to differentiate between the calls.
 	 * */
 	public static interface CppFuncListener {
-		public void returned(int ret, OpaqueLog ... out);
+		public void returned(int ret, Log ... out);
 	}
 }

@@ -15,7 +15,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import nbclient.data.SessionHandler;
-import nbclient.data.OpaqueLog;
+import nbclient.data.Log;
 import nbclient.gui.logviews.parent.ViewParent;
 import nbclient.util.N;
 import nbclient.util.N.EVENT;
@@ -55,11 +55,11 @@ public class LogDisplayPanel extends JPanel implements NListener {
 	
 	public void notified(EVENT e, Object src, Object... args) {
 		if (e == EVENT.SELECTION) {
-			setContents((OpaqueLog) args[0]);
+			setContents((Log) args[0]);
 		}
 	}
 	
-	protected void setContents(OpaqueLog l) {
+	protected void setContents(Log l) {
 		U.w("LDP.setContents() type: " + l.getAttributes().get("type"));
 		ArrayList<Class<? extends ViewParent>> list = LogToViewLookup.viewsForLog(l);
 		views.removeAll();
@@ -124,7 +124,7 @@ public class LogDisplayPanel extends JPanel implements NListener {
 		}
 	}
  	
-	private OpaqueLog current;
+	private Log current;
 	private JTabbedPane views;
 	
 	private <T extends ViewParent> void finishedLoading(int tindex, T newView, Class<? extends ViewParent> cls) {
@@ -137,10 +137,10 @@ public class LogDisplayPanel extends JPanel implements NListener {
 		int index;
 		ViewParent view;
 		Class<? extends ViewParent> nlClass;
-		OpaqueLog log;
+		Log log;
 		boolean done;
 		
-		protected CreateViewRunnable(int tabIndex, Class<? extends ViewParent> cls, OpaqueLog lg) {
+		protected CreateViewRunnable(int tabIndex, Class<? extends ViewParent> cls, Log lg) {
 			index = tabIndex;
 			view = null;
 			nlClass = cls;

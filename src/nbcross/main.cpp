@@ -18,7 +18,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
-#define PORTNUM 32001
+#define PORTNUM 32002
 
 #include "nbfuncs.h"
 

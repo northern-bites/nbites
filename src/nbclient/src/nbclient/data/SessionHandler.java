@@ -65,7 +65,7 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss{
 	/*
 	 * NetIO
 	 * */
-	public void takeDelivery(OpaqueLog log) {
+	public void takeDelivery(Log log) {
 		if (mode == MODE.NETWORK_SAVING) {
 			FileIO.addObject(log);
 		}
@@ -178,7 +178,7 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss{
 			
 			break;
 		case FILESYSTEM:
-			OpaqueLog[] logArray = FileIO.fetchLogs(log_directory);
+			Log[] logArray = FileIO.fetchLogs(log_directory);
 			
 			stats.update(logArray);
 			N.notify(EVENT.LOGS_ADDED, this, (Object[]) logArray);

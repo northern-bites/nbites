@@ -15,7 +15,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.tree.TreePath;
 
-import nbclient.data.OpaqueLog;
+import nbclient.data.Log;
 import nbclient.images.ImageParent;
 import nbclient.images.UV88image;
 import nbclient.images.Y16image;
@@ -91,7 +91,7 @@ public class U {
 		return ret;
 	}
 	
-	public static BufferedImage biFromLog(OpaqueLog log) {
+	public static BufferedImage biFromLog(Log log) {
 		int width = (Integer) log.getAttributes().get("width");
 		int height = (Integer) log.getAttributes().get("height");
 		String encoding = (String) log.getAttributes().get("encoding");
@@ -219,5 +219,5 @@ public class U {
 	}
 	
 	//Who names a class DataFlavor?  That's just so... Idk. Fllaavvvooorr.  Data Fllaaavoor. MMM, gimme some'o that DataFlav
-	public static DataFlavor treeFlavor = new DataFlavor(OpaqueLog.class, "NB-OpaqueLog");
+	public static DataFlavor treeFlavor = new DataFlavor(Log.class, "NB-OpaqueLog");
 }

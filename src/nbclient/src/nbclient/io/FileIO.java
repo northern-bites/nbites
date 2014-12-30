@@ -15,8 +15,8 @@ import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
 
-import nbclient.data.OpaqueLog;
-import nbclient.data.OpaqueLog.SOURCE;
+import nbclient.data.Log;
+import nbclient.data.Log.SOURCE;
 import nbclient.util.U;
 
 public class FileIO implements Runnable {
@@ -67,7 +67,7 @@ public class FileIO implements Runnable {
 		return r;
 	}
 	
-	public static void loadLog(OpaqueLog lg, String log_folder) throws IOException {
+	public static void loadLog(Log lg, String log_folder) throws IOException {
 		assert(checkLogFolder(log_folder));
 		assert(lg!=null);
 		assert(lg.name != null);
@@ -91,7 +91,7 @@ public class FileIO implements Runnable {
 		fis.close();
 	}
 	
-	public static void writeLog(OpaqueLog lg, String log_folder) throws IOException {
+	public static void writeLog(Log lg, String log_folder) throws IOException {
 		assert(checkLogFolder(log_folder)); 
 		assert(lg!=null);
 		assert(lg.name != null);
@@ -110,7 +110,7 @@ public class FileIO implements Runnable {
 		_wlINTERNAL(logf, lg);
 	}
 	
-	public static void writeLogToPath(OpaqueLog lg, String path) throws IOException {
+	public static void writeLogToPath(Log lg, String path) throws IOException {
 		assert(path.endsWith(".nblog"));
 		assert(lg.bytes != null);
 		
@@ -121,7 +121,7 @@ public class FileIO implements Runnable {
 		_wlINTERNAL(logf, lg);
 	}
 	
-	public static void _wlINTERNAL(File logf, OpaqueLog lg) throws IOException {
+	public static void _wlINTERNAL(File logf, Log lg) throws IOException {
 		FileOutputStream fos = new FileOutputStream(logf);
 		BufferedOutputStream bos = new BufferedOutputStream(fos);
 		DataOutputStream dos = new DataOutputStream(bos);
@@ -137,7 +137,7 @@ public class FileIO implements Runnable {
 		fos.close();
 	}
 	
-	public static OpaqueLog[] fetchLogs(String location) {
+	public static Log[] fetchLogs(String location) {
 		assert(checkLogFolder(location));
 		File logd = new File(location);
 		File[] files = logd.listFiles(new FilenameFilter(){
@@ -146,7 +146,7 @@ public class FileIO implements Runnable {
 			}
 		});
 		
-		OpaqueLog[] logs = new OpaqueLog[files.length];
+		Log[] logs = new Log[files.length];
 		
 		for (int i = 0; i < files.length; ++i) {
 			String desc = null;
@@ -158,7 +158,7 @@ public class FileIO implements Runnable {
 				return null;
 			}
 			
-			logs[i] = new OpaqueLog(desc, null);
+			logs[i] = new Log(desc, null);
 			logs[i].name = files[i].getName();
 			logs[i].source = SOURCE.FILE;
 		}
@@ -168,14 +168,14 @@ public class FileIO implements Runnable {
 		return logs;
 	}
 	
-	public static ArrayList<OpaqueLog> logsToWrite;
-	public static synchronized void addObject(OpaqueLog lg) {
+	public static ArrayList<Log> logsToWrite;
+	public static synchronized void addObject(Log lg) {
 		if (logsToWrite != null) logsToWrite.add(lg);
 	}
 	
-	public static synchronized OpaqueLog getObject() {
+	public static synchronized Log getObject() {
 		if (logsToWrite != null && logsToWrite.size() > 0) 
-			return (OpaqueLog) logsToWrite.remove(0);
+			return (Log) logsToWrite.remove(0);
 		else return null;
 	}
 
@@ -188,7 +188,7 @@ public class FileIO implements Runnable {
 	
 	private Boss boss;
 	public void run() {		
-		logsToWrite = new ArrayList<OpaqueLog>();
+		logsToWrite = new ArrayList<Log>();
 		
 		while(true) {
 			if (!running) {
@@ -197,7 +197,7 @@ public class FileIO implements Runnable {
 				return;
 			}
 			
-			OpaqueLog lg = null;
+			Log lg = null;
 			if ((lg = getObject()) != null) {
 				if (lg.name == null) {
 					lg.setNameFromDesc();

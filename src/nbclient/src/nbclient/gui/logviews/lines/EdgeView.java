@@ -4,7 +4,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import nbclient.data.OpaqueLog;
+import nbclient.data.Log;
 import nbclient.gui.logviews.parent.ViewParent;
 import nbclient.images.YUYV8888image;
 
@@ -16,7 +16,7 @@ public class EdgeView extends ViewParent{
 			g.drawImage(gray, 0, 0, null);
     }
 	
-	public void setLog(OpaqueLog newlog) {
+	public void setLog(Log newlog) {
 		log = newlog;
 		String encoding = (String) log.getAttributes().get("encoding");
 		
