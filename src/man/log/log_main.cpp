@@ -7,15 +7,20 @@
 
 #include "log_header.h"
 #include <string.h>
+#include <sys/types.h>
 
 //#include <unistd.h>
 //#include <fcntl.h>
 
 namespace nblog {
     
-    log_main_t * log_main = NULL;
-    log_stats_t * log_stats = NULL;
-    log_flags_t * log_flags = NULL;
+    log_main_t _log_main;
+    log_stats_t _log_stats;
+    log_flags_t _log_flags;
+    
+    log_main_t * log_main = &_log_main;
+    log_stats_t * log_stats = &_log_stats;
+    log_flags_t * log_flags = &_log_flags;
     
     const int LOG_BUFFER_SIZES[NUM_LOG_BUFFERS] = {
         1 << 8,
@@ -36,9 +41,6 @@ namespace nblog {
     
     void log_main_init() {
         LOGDEBUG(1, "log_main_init()\n");
-        log_main = (log_main_t *) malloc(sizeof(log_main_t));
-        log_stats = (log_stats_t *) malloc(sizeof(log_stats_t));
-        log_flags = (log_flags_t *) malloc(sizeof(log_flags_t));
         
         bzero(log_main, sizeof(log_main_t));
         bzero(log_stats, sizeof(log_stats_t));
@@ -46,8 +48,9 @@ namespace nblog {
         log_flags->servio = true;
         log_flags->STATS = true;
         
-        log_stats->start_time = time(NULL);
-        pthread_mutex_init(&(log_stats->lock), NULL);
+        log_stats->ts.start = time(NULL);
+        log_stats->ts.sio_upstart = time(NULL);
+        log_stats->num_cores = sysconf(_SC_NPROCESSORS_ONLN);
         
         for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
             size_t buffer_size = sizeof(log_buffer_t) + LOG_BUFFER_SIZES[i] * sizeof(log_object_t *);
@@ -55,6 +58,8 @@ namespace nblog {
             
             bzero(log_main->buffers[i], buffer_size);
             pthread_mutex_init(&(log_main->buffers[i]->lock), NULL);
+            
+            log_stats->size[i] = LOG_BUFFER_SIZES[i];
         }
         
         log_main->log_main_thread = (pthread_t *) malloc(sizeof(pthread_t));
@@ -62,6 +67,35 @@ namespace nblog {
         pthread_create(log_main->log_main_thread, NULL, &log_main_loop, NULL);
         //server thread is live...
         LOGDEBUG(1, "log_main thread running...\n");
+    }
+    
+    inline uint64_t net_time(time_t start, time_t end) {
+        double dt = difftime(end, start);
+        uint64_t hval = (uint64_t) dt;
+        return htonll(hval);
+    }
+    
+    inline void net_prep(bufstate_t * dest, bufstate_t * cur, bufstate_t * _start) {
+        bufstate_t * start;
+        bufstate_t buf[NUM_LOG_BUFFERS];
+    
+        if (_start) start = _start;
+        else {
+            start = buf;
+            bzero(buf, sizeof(bufstate_t) * NUM_LOG_BUFFERS);
+        }
+        
+        for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+            dest[i].l_given = htonl(cur[i].l_given - start[i].l_given);
+            dest[i].b_given = htonll(cur[i].b_given - start[i].b_given);
+            
+            dest[i].l_freed = htonl(cur[i].l_freed - start[i].l_freed);
+            dest[i].l_lost = htonl(cur[i].l_lost - start[i].l_lost);
+            dest[i].b_lost = htonll(cur[i].b_lost - start[i].b_lost);
+            
+            dest[i].l_writ = htonl(cur[i].l_writ - start[i].l_writ);
+            dest[i].b_writ = htonll(cur[i].b_writ - start[i].b_writ);
+        }
     }
     
     void * log_main_loop(void * context) {
@@ -72,29 +106,70 @@ namespace nblog {
         while (1) {
             sleep(1);
             
-            //TODO
-            /*
-            if (log_main->flags & SERVER_CONNECTED) {
-                //Try to log some sort of stats message.
-                char buf[1024];
+            if (log_flags->STATS) {
+                const time_t CURRENT = time(NULL);
                 
-                int size = snprintf(buf, 1024, "bytes_logged=%llu logs_given=%llu logs_freed=%llu logs_lost=%llu logs_written=%llu logs_sent=%llu c_logs_sent=%llu c_bytes_sent=%llu c_logs_lost=%llu server_uptime=%f con_uptime=%f",
-                         log_stats->bytes_logged,
-                         log_stats->logs_given,
-                         log_stats->logs_freed,
-                         log_stats->logs_lost,
-                         log_stats->logs_written,
-                         log_stats->logs_sent,
-                         log_stats->c_logs_sent,
-                         log_stats->c_bytes_sent,
-                         log_stats->c_logs_lost,
-                         difftime(time(NULL), log_stats->start_time ),
-                         difftime(time(NULL), log_stats->connect_start));
+                int stat_length = sizeof(log_stats_t) + sizeof(log_flags_t);
+                char buf[stat_length];
+                log_stats_t * ls = (log_stats_t *) buf;
+                log_flags_t * lf = (log_flags_t *) (buf + sizeof(log_stats_t));
                 
-                assert(size > 0);
-                assert(size < 1024);
-                NBlog(SMALL_BUFFER, 0, clock(), "log_stats_t", (size_t) size, (uint8_t *) buf);
-            } */
+                //Try to accumulate out data as quickly as possible, to minimize potential drift.
+                *ls = *log_stats;
+                *lf = *log_flags;
+                for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+                    memcpy(&(ls->manage[i]), log_main->buffers[i], sizeof(uint32_t) * 3);
+                    
+                    ls->ratio[i] = LOG_RATIO[i];
+                }
+                
+                //Data copied, now:
+                //  Set non-valid fields 0, convert to network endian-ness
+                
+                if (lf->fileio) {
+                    net_prep(ls->fio_start, ls->current, ls->fio_start);
+                    ls->ts.fio_upstart = net_time(ls->ts.fio_upstart, CURRENT);
+                } else {
+                    bzero(ls->fio_start, sizeof(bufstate_t) * NUM_LOG_BUFFERS);
+                    ls->ts.fio_upstart = 0;
+                }
+                
+                if (lf->serv_connected) {
+                    net_prep(ls->cio_start, ls->current, ls->cio_start);
+                    ls->ts.cio_upstart = net_time(ls->ts.cio_upstart, CURRENT);
+                } else {
+                    bzero(ls->cio_start, sizeof(bufstate_t) * NUM_LOG_BUFFERS);
+                    ls->ts.cio_upstart = 0;
+                }
+                
+                net_prep(ls->current, ls->current, NULL);
+                
+                for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+                    ls->manage[i].filenr = htonl(ls->manage[i].filenr);
+                    ls->manage[i].servnr = htonl(ls->manage[i].servnr);
+                    ls->manage[i].nextw = htonl(ls->manage[i].nextw);
+                }
+                
+                if (lf->servio) {
+                    ls->ts.sio_upstart = net_time(ls->ts.sio_upstart, CURRENT);
+                } else {
+                    ls->ts.sio_upstart = 0;
+                }
+                
+                if (lf->cnc_connected) {
+                    ls->ts.cnc_upstart = net_time(ls->ts.cnc_upstart, CURRENT);
+                } else {
+                    ls->ts.cnc_upstart = 0;
+                }
+                
+                ls->ts.start = net_time(ls->ts.start, CURRENT);
+                
+                //Flags can stay as they are.
+                
+                char cbuf[100];
+                snprintf(cbuf, 100, "stats nbuffers=%i", NUM_LOG_BUFFERS);
+                NBlog(0, 0, clock(), cbuf, stat_length, (uint8_t *) buf);
+            }
         }
         
         return NULL;
@@ -104,7 +179,7 @@ namespace nblog {
      Definitions for log lib functions.
      */
     
-    inline int description(char * buf, size_t size, log_object_t * obj)
+    int description(char * buf, size_t size, log_object_t * obj)
     {
         int32_t checksum = 0;
         if (obj->data) {
@@ -112,13 +187,14 @@ namespace nblog {
                 checksum += obj->data[i];
         }
         
-        int n_written = snprintf(buf, size, "type=%s checksum=%i index=%li time=%lu", obj->type, checksum, obj->image_index, obj->creation_time);
+        int n_written = snprintf(buf, size, "type=%s checksum=%i index=%li time=%lu version=%i", obj->type, checksum, obj->image_index, obj->creation_time, LOG_VERSION);
         NBLassert(n_written < size);
         
         return n_written;
     }
     
-    inline int write_exactly(int sck_or_fd, size_t nbytes, uint8_t * data) {
+    int write_exactly(int sck_or_fd, size_t nbytes, void * adata) {
+        uint8_t * data = (uint8_t *) adata;
         
         size_t written = 0;
         while (written < nbytes) {
@@ -147,7 +223,9 @@ namespace nblog {
         return 0;
     }
     
-    inline int read_exactly(int sck_or_fd, size_t nbytes, uint8_t * buffer, double max_wait) {
+    int read_exactly(int sck_or_fd, size_t nbytes, void * abuffer, double max_wait) {
+        uint8_t * buffer = (uint8_t *) abuffer;
+        
         NBLassert(max_wait >= 1);
         NBLassert(buffer);
         
@@ -230,8 +308,16 @@ namespace nblog {
         
         NBLassert(obj->references > 0);
         --obj->references;
-        if (obj->references == 0)
+        if (obj->references == 0) {
+            
+            log_stats->current[bi].l_freed += 1;
+            if (!obj->was_written) {
+                log_stats->current[bi].l_lost += 1;
+                log_stats->current[bi].b_lost += obj->n_bytes;
+            }
+            
             log_object_free(obj);
+        }
         
         if (lock) pthread_mutex_unlock(&(log_main->buffers[bi]->lock));
     }
@@ -248,13 +334,18 @@ namespace nblog {
             uint32_t rindex = (*relevant_last_read) % LOG_BUFFER_SIZES[buffer_index];
             
             ret = buf->objects[rindex];
+            assert(ret);
             
             ++(*relevant_last_read);
         } else {
             ret = NULL;
         }
         
-        ret->was_written = 1;
+        if (ret) {
+            ret->was_written = 1;
+            log_stats->current[buffer_index].l_writ += 1;
+            log_stats->current[buffer_index].b_writ += ret->n_bytes;
+        }
         
         pthread_mutex_unlock(&(buf->lock));
         return ret;
@@ -265,6 +356,11 @@ namespace nblog {
      */
     
     log_object_t * put(log_object_t * newp, log_buffer_t * buf, int bi) {
+        
+        assert(newp);
+        log_stats->current[bi].l_given += 1;
+        log_stats->current[bi].b_given += newp->n_bytes;
+        
         uint32_t old_i = buf->next_write;
         log_object_t * old = buf->objects[(old_i % LOG_BUFFER_SIZES[bi])];
         

@@ -80,6 +80,8 @@ namespace nblog {
      The log_main immediately overwrites old objects as the buffer fills up.  If no io system is currently using the object (references == 0), it is immediately free'd.  If an io system is using the object, log_main removes it from the ring buffer.  It is now up to the last io system to stop using the object to free it.
      */
     
+#define NUM_IO_TYPES 2
+    typedef enum {SERVER = 0, FILE = 1, NONE = -1} IO_TAG;
     
     /*
      A logging object/structure.
@@ -103,7 +105,7 @@ namespace nblog {
         //log objects know what buffer they're on (makes free/release easier)
         int buffer;
         
-        //For completeness tests.  Not accessed in a thread safe manner, so only check for 0 or 1.
+        //For completeness tests.
         uint8_t was_written;
     } log_object_t;
     
@@ -113,8 +115,8 @@ namespace nblog {
     typedef struct _log_buffer_s {
         uint32_t fileio_nextr;
         uint32_t servio_nextr;
-        
         uint32_t next_write;
+        
         pthread_mutex_t lock;
         log_object_t * objects[];
     } log_buffer_t;
@@ -131,24 +133,59 @@ namespace nblog {
     /*
      Logging stats functions and structures
      */
-    typedef struct _log_stats {
-        //global
-        uint64_t bytes_logged;
-        uint64_t logs_given;
-        uint64_t logs_freed;
-        uint64_t logs_lost;
-        uint64_t logs_written;
-        uint64_t logs_sent;
+    typedef struct {
+        uint32_t servnr;
+        uint32_t filenr;
         
-        //network (reset each established connection)
-        uint64_t c_logs_sent;
-        uint64_t c_bytes_sent;
-        uint64_t c_logs_lost;
+        uint32_t nextw;
+    } bufmanage_t;
+    
+    typedef struct {
+        uint32_t l_given;
+        uint64_t b_given;
         
-        time_t start_time;
-        time_t connect_start;
+        uint32_t l_freed;
+        uint32_t l_lost;
+        uint64_t b_lost;
         
-        pthread_mutex_t lock;
+        uint32_t l_writ;
+        uint64_t b_writ;
+    } bufstate_t;
+    
+    typedef struct {
+        //set by flags (or log initiation)
+        uint64_t fio_upstart;
+        uint64_t sio_upstart;
+        
+        //set by connection
+        uint64_t cio_upstart;
+        uint64_t cnc_upstart;
+        
+        uint64_t start;
+    } time_stats_t;
+    
+    typedef struct {
+        //Set when fileio flag set.
+        bufstate_t fio_start[NUM_LOG_BUFFERS];
+        //Set when connection established
+        bufstate_t cio_start[NUM_LOG_BUFFERS];
+        
+        //acquire, release, nblog
+        bufstate_t current[NUM_LOG_BUFFERS];
+        
+        //Copied right before stats sent.
+        bufmanage_t manage[NUM_LOG_BUFFERS];
+        
+        //Upstart set on flag or connection.
+        time_stats_t ts;
+        
+        //Copied right before stats sent.
+        uint32_t ratio[NUM_LOG_BUFFERS];
+        
+        //Constants
+        uint32_t size[NUM_LOG_BUFFERS];
+        uint32_t num_cores;
+        //then flags.
     } log_stats_t;
     
     /*
@@ -157,8 +194,10 @@ namespace nblog {
      Generally, non-mutex written in one place,
         read in multiple places.
      */
+    
     typedef struct {
         uint8_t serv_connected;
+        uint8_t cnc_connected;
         
         //log to
         uint8_t fileio;
@@ -243,13 +282,13 @@ namespace nblog {
     /*
      Netio could use send/recv, but a.t.m. we're not using flags so this approach allows file and net io to use the same functions.
      */
-    extern inline int write_exactly(int sck_or_fd, size_t nbytes, uint8_t * data);
+    int write_exactly(int sck_or_fd, size_t nbytes, void * data);
     
     /*
      time() has granularity of 1 second, so while max_wait
      is a float, fractions are irrelevant.
      */
-    extern inline int read_exactly(int sck_or_fd, size_t nbytes, uint8_t * buffer, double max_wait);
+    int read_exactly(int sck_or_fd, size_t nbytes, void * buffer, double max_wait);
     
     /*
      Write log (using write_exactly) to sock_or_fd.
@@ -259,7 +298,7 @@ namespace nblog {
     int write_log(int sock_or_fd, log_object_t * log);
     
     //Generates a string w/ generic type specs encoded.
-    extern inline int description(char * buf, size_t size, log_object_t * obj);
+    int description(char * buf, size_t size, log_object_t * obj);
     
 }//namespace NBlog
 

@@ -28,6 +28,9 @@ namespace nblog {
     }
     
     //Block thread unti client has attempted to connect.
+    /*
+     NOTE: the cnc server uses this function as well, so editors should ensure their changes do not break that code.
+     */
     int block_accept(int lfd) {
         int connfd = -1;
         
@@ -83,6 +86,9 @@ namespace nblog {
             
             LOGDEBUG(3, "log_serverio FOUND CLIENT [%i]\n", connfd);
             log_flags->serv_connected = 1;
+            memcpy(log_stats->cio_start, log_stats->current, sizeof(bufstate_t) * NUM_LOG_BUFFERS);
+            log_stats->ts.cio_upstart = time(NULL);
+            
             uint32_t version = htonl(LOG_VERSION);
             uint32_t seq_num = 0;
             uint32_t recvd;
