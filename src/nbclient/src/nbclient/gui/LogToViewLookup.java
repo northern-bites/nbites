@@ -14,6 +14,7 @@ public class LogToViewLookup {
 	private static final String IMAGE_S = "YUVImage";
 	private static final String PROTOBUF_S = "protobuf";
 	private static final String TEST_S = "test";
+	private static final String STATS_S = "stats";
 	
 	public static ArrayList<Class<? extends ViewParent>> viewsForLog(Log lg) {
 		ArrayList<Class<? extends ViewParent>> ret = new ArrayList<Class<? extends ViewParent>>();
@@ -23,9 +24,9 @@ public class LogToViewLookup {
 		
 		if (type.startsWith(TEST_S)) {
 			//Don't want this going in with the protobufs.
-			ret.addAll(P.LTVIEW_MAP.get(DEFAULT_S));
-			return ret;
-			
+			//No specific views atm.
+		} else if (type.equalsIgnoreCase(STATS_S)) { 
+			ret.addAll(P.LTVIEW_MAP.get(STATS_S));
 		} else if (type.equalsIgnoreCase(IMAGE_S)) {
 			ret.addAll(P.LTVIEW_MAP.get(IMAGE_S));
 		} else {

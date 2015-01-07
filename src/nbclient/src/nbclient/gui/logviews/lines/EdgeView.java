@@ -22,8 +22,8 @@ public class EdgeView extends ViewParent{
 		
 		//|| because could be old log, see U.biFromLog
 		if (encoding == null || encoding.equalsIgnoreCase(YUYV8888image.INSTANCE.encoding())) {
-			int width = (Integer) log.getAttributes().get("width");
-			int height = (Integer) log.getAttributes().get("height");
+			int width = log.width();
+			int height = log.height();
 			YUYV8888image img = new YUYV8888image(width, height, log.bytes);
 			this.gray = img.toY8().toBufferedImage();
 		}

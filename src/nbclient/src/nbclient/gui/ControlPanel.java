@@ -66,7 +66,7 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 		stream_box = new JCheckBox("objs w/ desc:");
 		stream_field = new JTextField(15);
 
-		stats = new StatsPanel(dh);
+		stats = new OldStatusPanel(dh);
 		
 		add(type);
 		add(settings_primary); add(settings_secondary);
@@ -270,7 +270,7 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 	private JLabel stream_desc;
 	private JTextField stream_field;
 	
-	private StatsPanel stats;
+	private OldStatusPanel stats;
 	
 	private SessionHandler dh;
 	private LogDisplayPanel ldp;

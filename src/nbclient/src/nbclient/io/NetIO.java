@@ -7,11 +7,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
 import nbclient.data.Log;
 import nbclient.data.Log.SOURCE;
+import nbclient.util.P;
 import nbclient.util.U;
 
 /**
@@ -40,6 +42,8 @@ public class NetIO implements Runnable {
 	public Boss boss;
 	
 	public volatile boolean running;
+	public InputStream _is;
+	public OutputStream _os;
 	
 	public void run() {
 		Socket socket = null;
@@ -52,9 +56,10 @@ public class NetIO implements Runnable {
 			
 			DataOutputStream out = new DataOutputStream(_out);
 			DataInputStream in = new DataInputStream(_in);
+			_os = out;
+			_is = in;
 			
 			U.w("NetIO: thread connected.");
-						
 			//initiate connection
 			
 			out.writeInt(0);
@@ -64,31 +69,34 @@ public class NetIO implements Runnable {
 			if (recv != 0)
 				throw new SequenceErrorException(0, recv);
 			
+			out.writeInt(P.VERSION);
+			out.flush();
+			recv = in.readInt();
+			if (recv != P.VERSION) {
+				U.w("WARNING: NetIO connected to robot with version " + recv + 
+						" but client is running version " + P.VERSION + " !!\n");
+			}
+			
 			int seq_num = 1;
 			while(true) {
 				checkRunning();
-				out.writeInt(seq_num);
-				out.flush();
 				
 				recv = in.readInt();
-				if (recv != seq_num)
+				
+				if (recv == 0) {
+					out.writeInt(0);
+					out.flush();
+				} else if (recv == seq_num) {
+					Log nl = CommonIO.readLog(in);
+					U.w("NetIO: thread got packet of data size: " + nl.bytes.length + " desc: " + nl.description);
+					
+					nl.source = SOURCE.NETWORK;
+					
+					boss.takeDelivery(nl);
+					++seq_num;
+				} else {
 					throw new SequenceErrorException(seq_num, recv);
-				
-				int desc_len = in.readInt();
-				byte[] desc_bytes = new byte[desc_len];
-				readExactly(in, desc_bytes);
-				String desc = new String(desc_bytes);
-				
-				int data_len = in.readInt();
-				byte[] data_bytes = new byte[data_len];
-				readExactly(in, data_bytes);
-				
-				U.w("NetIO: thread got packet of data size: " + data_len + " desc: " + desc);
-				Log nl = new Log(desc, data_bytes);
-				nl.source = SOURCE.NETWORK;
-				boss.takeDelivery(nl);
-				
-				++seq_num;
+				}
 			}
 		}
 		

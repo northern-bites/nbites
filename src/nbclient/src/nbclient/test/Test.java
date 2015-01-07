@@ -18,8 +18,9 @@ public class Test {
 	
 	public static void main(String[] args) {
 		
-		Object a = P.CLASS_EXCEPTIONS_MAP;
-		Object b = P.LTVIEW_MAP;
+		String a = "hello";
+		
+		U.wf("%20s", a);
 		
 	}
 }

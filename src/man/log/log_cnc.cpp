@@ -154,7 +154,7 @@ namespace nblog {
         bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
         
         //We don't want to crash the server if the pipe dies...
-        // signal(SIGPIPE, SIG_IGN);
+        //signal(SIGPIPE, SIG_IGN);
         
         //Accepting connections on this socket, backqueue of size 1.
         listen(listenfd, 1);

@@ -41,6 +41,8 @@ namespace nblog {
         int flags = fcntl(connfd, F_GETFL, 0);
         fcntl(connfd, F_SETFL, flags | O_NONBLOCK);
         
+        //setsockopt(<#int#>, <#int#>, <#int#>, <#const void *#>, <#socklen_t#>)
+        
         return connfd;
     }
     
@@ -74,6 +76,7 @@ namespace nblog {
         
         //We don't want to crash the server if the pipe dies...
        // signal(SIGPIPE, SIG_IGN);
+        //signal(SIGPIPE, SIG_IGN);
         
         //Accepting connections on this socket, backqueue of size 1.
         listen(listenfd, 1);
@@ -106,7 +109,7 @@ namespace nblog {
             
             CHECK_RET(read_exactly(connfd, 4, (uint8_t *) &recvd, IO_SEC_TO_BREAK));
             
-            LOGDEBUG(1, "log_serverio starting connection server version: %u, client version: %u\n", ntohl(version), ntohl(recvd));
+            LOGDEBUG(1, "log_serverio starting connection; server version: %u, client version: %u\n", ntohl(version), ntohl(recvd));
             
             ++seq_num;
             LOGDEBUG(1, "log_servio client connection ready...\n");
@@ -142,7 +145,7 @@ namespace nblog {
                             
                             CHECK_RET(write_exactly(connfd, 4, (uint8_t *) &msg_seq_n));
                             
-                            write_log(connfd, obj);
+                            CHECK_RET(write_log(connfd, obj));
                             
                             release(obj, true);
                         } else {

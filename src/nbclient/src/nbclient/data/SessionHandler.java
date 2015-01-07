@@ -49,7 +49,7 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss{
 	 * if coming from filesystem, the logs are created with only the description (their file name) set.  Bytes are unset.
 	 * If we request such a file, we must then go to the filesystem to get the bytes.
 	 * */
-	public Stats stats;
+	public OldStats stats;
 			
 	private FileIO fileioRunnable;
 	private NetIO netioRunnable;
@@ -59,7 +59,7 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss{
 		status = STATUS.IDLE;
 		log_directory = "";
 		
-		stats = new Stats();
+		stats = new OldStats();
 	}
 
 	/*

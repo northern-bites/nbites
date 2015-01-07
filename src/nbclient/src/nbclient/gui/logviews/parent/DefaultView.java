@@ -40,7 +40,7 @@ public class DefaultView extends ViewParent implements ActionListener {
 		else data.setText(U.bytesToHexString(U.subArray(log.bytes, 0, 1000)) + "...");
 		
 		if (log.getAttributes().get("checksum") != null) {
-			int recv_checksum = (Integer) log.getAttributes().get("checksum");
+			int recv_checksum = log.checksum();
 			int checksum = 0;
 			for (byte b : log.bytes)
 				checksum += (b & 0xFF); //NEED AND.  Forces java to treat the byte as an UNSIGNED value.
@@ -92,7 +92,7 @@ public class DefaultView extends ViewParent implements ActionListener {
 			String newdesc = desc.getText();
 			
 			try {
-				Map<String, Object> a = U.attributes(newdesc);
+				Map<String, String> a = U.attributes(newdesc);
 
 				if (a == null || a.size() < 2) {
 					U.w("Cannot use new description: " + newdesc);

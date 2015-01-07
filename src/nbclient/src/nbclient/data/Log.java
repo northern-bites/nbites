@@ -16,7 +16,7 @@ public class Log implements Serializable {
 	
 	public SOURCE source;
 
-	private Map<String, Object> dictionary;
+	private Map<String, String> dictionary;
 	
 	public Log(String d, byte[] b) {
 		this.name = null;
@@ -26,7 +26,7 @@ public class Log implements Serializable {
 	}
 	
 	//We cache the attributes which may be a bad idea.
-	public Map<String, Object> getAttributes() {
+	public Map<String, String> getAttributes() {
 		if (dictionary != null) return dictionary;
 		
 		dictionary = U.attributes(description);
@@ -34,22 +34,19 @@ public class Log implements Serializable {
 	}
 	
 	public void dumpAttributes() {
-		this.dictionary = null;
+		dictionary = null;
+		_index = null;
+		_time = null;
+		_height = null;
+		_width = null;
+		_checksum = null;
+		_version = null;
 	}
 	
 	public void setNameFromDesc() {
-		//Somewhat hackish, we want to get the time: field because it has the highest guarantee of uniqueness.
-		//The time field is usually at the end of the string.
-		this.name = this.description.substring(Math.max(0, this.description.length() - 256))
-				.replace(' ', '_').replace('/', '-') + ".nblog";
-	}
-	
-	public String getType() {
-		return (String) this.getAttributes().get("type");
-	}
-	
-	public Long getCreationTime() {
-		return (Long) this.getAttributes().get("time");
+		this.name = String.format("type=%s_from=%s_time=%d_v=%d", type(), from(), time(), version());
+		this.name = this.name
+				.substring(Math.max(0, this.name.length() - 240)).replace('/', '-') + ".nblog";
 	}
 	
 	public String toString() {
@@ -58,5 +55,93 @@ public class Log implements Serializable {
 	
 	public static enum SOURCE {
 		DERIVED, FILE, NETWORK
+	}
+	
+	/*
+	 * Some standard attributes parsed/cached.
+	 * */
+	
+	public String type() {
+		return getAttributes().get("type");
+	}
+	
+	public String from() {
+		return getAttributes().get("from");
+	}
+	
+	public String encoding() {
+		return getAttributes().get("encoding");
+	}
+	
+	private Integer _index = null;
+	public Integer index() {
+		if (_index != null) return _index;
+		
+		String str = getAttributes().get("index");
+		if (str == null) return null;
+		else {
+			_index = Integer.parseInt(str);
+			return _index;
+		}
+	}
+	
+	private Long _time = null;
+	public Long time() {
+		if (_time != null) return _time;
+		
+		String str = getAttributes().get("time");
+		if (str == null) return null;
+		else {
+			_time = Long.parseLong(str);
+			return _time;
+		}
+	}
+	
+	private Integer _height = null;
+	public Integer height() {
+		if (_height != null) return _height;
+		
+		String str = getAttributes().get("height");
+		if (str == null) return null;
+		else {
+			_height = Integer.parseInt(str);
+			return _height;
+		}
+	}
+	
+	private Integer _width = null;
+	public Integer width() {
+		if (_width != null) return _width;
+		
+		String str = getAttributes().get("width");
+		if (str == null) return null;
+		else {
+			_width = Integer.parseInt(str);
+			return _width;
+		}
+	}
+	
+	private Integer _checksum = null;
+	public Integer checksum() {
+		if (_checksum != null) return _checksum;
+		
+		String str = getAttributes().get("checksum");
+		if (str == null) return null;
+		else {
+			_checksum = Integer.parseInt(str);
+			return _checksum;
+		}
+	}
+	
+	private Integer _version = null;
+	public Integer version() {
+		if (_version != null) return _version;
+		
+		String str = getAttributes().get("version");
+		if (str == null) return null;
+		else {
+			_version = Integer.parseInt(str);
+			return _version;
+		}
 	}
 }

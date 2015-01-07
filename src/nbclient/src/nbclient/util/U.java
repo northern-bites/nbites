@@ -1,5 +1,6 @@
 package nbclient.util;
 
+import java.awt.BorderLayout;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -12,7 +13,9 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.tree.TreePath;
 
 import nbclient.data.Log;
@@ -45,9 +48,9 @@ public class U {
 		System.out.printf(f, a);
 	}
 	
-	public static Map<String, Object> attributes(String desc) {
+	public static Map<String, String> attributes(String desc) {
 		if (desc.trim().isEmpty()) return null;
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, String> map = new HashMap<String, String>();
 		
 		String[] attrs = desc.trim().split(" ");
 		for (String a : attrs) {
@@ -57,26 +60,16 @@ public class U {
 			if (parts.length != 2)
 				return null;
 			
-			if (parts[0].equalsIgnoreCase("type")) {
-				map.put("type", parts[1]);
-			} else if (parts[0].equalsIgnoreCase("index")) {
-				map.put("index", new Integer(Integer.parseInt(parts[1])));
-			} else if (parts[0].equalsIgnoreCase("time")) {
-				map.put("time", new Long(Long.parseLong(parts[1])));
-			} else if (parts[0].equalsIgnoreCase("from")) {
-				map.put("from", parts[1]);
-			} else if (parts[0].equalsIgnoreCase("width")) {
-				map.put("width", new Integer(Integer.parseInt(parts[1])));
-			} else if (parts[0].equalsIgnoreCase("height")) {
-				map.put("height", new Integer(Integer.parseInt(parts[1])));
-			} else if (parts[0].equalsIgnoreCase("encoding")) {
-				map.put("encoding", parts[1]);
-			} else if (parts[0].equalsIgnoreCase("checksum")) {
-				map.put("checksum", new Integer(Integer.parseInt(parts[1])));
-			} else {
-				U.w("Unknown attribute: " + parts);
+			String type = parts[0].trim();
+			if (type.isEmpty())
+				return null;
+			
+			if (map.containsKey(type)) {
+				U.wf("ERROR: description\n\t%s\ncontains multiple key: %s\n", desc, type);
 				return null;
 			}
+			
+			map.put(type, parts[1]);
 		}
 		
 		if (map.size() > 0) return map;
@@ -92,9 +85,10 @@ public class U {
 	}
 	
 	public static BufferedImage biFromLog(Log log) {
-		int width = (Integer) log.getAttributes().get("width");
-		int height = (Integer) log.getAttributes().get("height");
-		String encoding = (String) log.getAttributes().get("encoding");
+		assert(log.type().equalsIgnoreCase("YUVImage"));
+		int width = log.width();
+		int height = log.height();
+		String encoding = log.encoding();
 		
 		ImageParent ip = null;
 		if (encoding == null ) {
@@ -138,6 +132,14 @@ public class U {
 		ret.setLayout(new BoxLayout(ret, BoxLayout.LINE_AXIS));
 		
 		return ret;
+	}
+	
+	public static JPanel fieldWithlabel(JLabel l, JTextField f) {
+		JPanel p = new JPanel(new BorderLayout());
+		p.add(l,BorderLayout.WEST);
+		p.add(f,BorderLayout.CENTER);
+		
+		return p;
 	}
 	
 	public static Class<? extends com.google.protobuf.GeneratedMessage> protobufClassFromType(String type) {

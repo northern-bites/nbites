@@ -12,6 +12,10 @@
 //#include <unistd.h>
 //#include <fcntl.h>
 
+namespace nbsf {
+    uint8_t flags[num_flags];
+}
+
 namespace nblog {
     
     log_main_t _log_main;
@@ -42,6 +46,12 @@ namespace nblog {
     void log_main_init() {
         LOGDEBUG(1, "log_main_init()\n");
         
+        bzero(nbsf::flags, nbsf::num_flags);
+        nbsf::flags[nbsf::servio] = true;
+        nbsf::flags[nbsf::STATS] = true;
+        
+        signal(SIGPIPE, SIG_IGN);
+        
         bzero(log_main, sizeof(log_main_t));
         bzero(log_stats, sizeof(log_stats_t));
         bzero(log_flags, sizeof(log_flags));
@@ -71,7 +81,7 @@ namespace nblog {
     
     inline uint64_t net_time(time_t start, time_t end) {
         double dt = difftime(end, start);
-        uint64_t hval = (uint64_t) dt;
+        uint64_t hval = dt;
         return htonll(hval);
     }
     
@@ -109,10 +119,17 @@ namespace nblog {
             if (log_flags->STATS) {
                 const time_t CURRENT = time(NULL);
                 
+                struct contig_s {
+                    log_stats_t ls;
+                    log_flags_t lf;
+                } contig;
+                
                 int stat_length = sizeof(log_stats_t) + sizeof(log_flags_t);
-                char buf[stat_length];
-                log_stats_t * ls = (log_stats_t *) buf;
-                log_flags_t * lf = (log_flags_t *) (buf + sizeof(log_stats_t));
+                log_stats_t * ls = &contig.ls;
+                log_flags_t * lf = &contig.lf;
+                
+                printf("%lu vs. %d vs. %lu\n", sizeof(contig), stat_length, sizeof(contig_s));
+                NBLassert(sizeof(contig) == stat_length);
                 
                 //Try to accumulate out data as quickly as possible, to minimize potential drift.
                 *ls = *log_stats;
@@ -122,6 +139,17 @@ namespace nblog {
                     
                     ls->ratio[i] = LOG_RATIO[i];
                 }
+                
+                /*
+                strncpy(ls->smagic1, "stat", 4);
+                strncpy(ls->smagic2, "magic", 5);
+                
+                strncpy(lf->fmagic1, "flags", 5);
+                strncpy(lf->fmagic2, "endof", 5); */
+                
+                printf("sizes:\n\tmanage: %lu\n\tstate: %lu\n\ttime: %lu\n\tlog_stats: %lu\n\tlog_flags: %lu\n\ttotal: %lu\n", sizeof(bufmanage_t), sizeof(bufstate_t), sizeof(time_stats_t), sizeof(log_stats_t), sizeof(log_flags_t), sizeof(contig));
+                
+                
                 
                 //Data copied, now:
                 //  Set non-valid fields 0, convert to network endian-ness
@@ -165,10 +193,11 @@ namespace nblog {
                 ls->ts.start = net_time(ls->ts.start, CURRENT);
                 
                 //Flags can stay as they are.
+                printf("stat_length=%i\n", stat_length);
                 
                 char cbuf[100];
                 snprintf(cbuf, 100, "stats nbuffers=%i", NUM_LOG_BUFFERS);
-                NBlog(0, 0, clock(), cbuf, stat_length, (uint8_t *) buf);
+                NBlog(0, 0, clock(), cbuf, stat_length, (uint8_t *) &contig);
             }
         }
         
@@ -343,6 +372,7 @@ namespace nblog {
         
         if (ret) {
             ret->was_written = 1;
+            ++(ret->references);
             log_stats->current[buffer_index].l_writ += 1;
             log_stats->current[buffer_index].b_writ += ret->n_bytes;
         }

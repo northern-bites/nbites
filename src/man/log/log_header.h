@@ -26,6 +26,8 @@
 
 #include <assert.h>
 
+#include "log_sf.h"
+
 namespace nblog {
     
     //colored output macros.
@@ -166,6 +168,7 @@ namespace nblog {
     
     typedef struct {
         //Set when fileio flag set.
+        //char smagic1[4];
         bufstate_t fio_start[NUM_LOG_BUFFERS];
         //Set when connection established
         bufstate_t cio_start[NUM_LOG_BUFFERS];
@@ -175,6 +178,8 @@ namespace nblog {
         
         //Copied right before stats sent.
         bufmanage_t manage[NUM_LOG_BUFFERS];
+        
+        //char smagic2[5];
         
         //Upstart set on flag or connection.
         time_stats_t ts;
@@ -196,6 +201,7 @@ namespace nblog {
      */
     
     typedef struct {
+        //char fmagic1[5];
         uint8_t serv_connected;
         uint8_t cnc_connected;
         
@@ -217,6 +223,7 @@ namespace nblog {
         uint8_t BALLTRACK;
         uint8_t IMAGES;
         uint8_t VISION;
+        //char fmagic2[5];
     } log_flags_t;
     
     /*

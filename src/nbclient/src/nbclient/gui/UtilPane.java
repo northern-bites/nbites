@@ -7,14 +7,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.border.Border;
 
 import nbclient.gui.utilitypanes.UtilityManager;
 import nbclient.gui.utilitypanes.UtilityParent;
+import nbclient.util.P;
 import nbclient.util.U;
 
 
@@ -91,8 +95,8 @@ public class UtilPane extends JPanel{
 		}
 	}
 	
-	private class Prefs extends JPanel {
-		protected static final int REQ_HEIGHT = 50;
+	private class Prefs extends JPanel implements ActionListener {
+		protected static final int REQ_HEIGHT = 90;
 		protected Prefs() {
 			
 			super();
@@ -106,10 +110,49 @@ public class UtilPane extends JPanel{
 			
 			Border b = BorderFactory.createLineBorder(Color.BLACK);
 			setBorder(BorderFactory.createTitledBorder(b, "Preferences"));
+			
+			copyMappingB = new JButton("recopy view mapping (must restart)");
+			copyMappingB.addActionListener(this);
+			
+			add(copyMappingB);
+			
+			maxMemoryUsage = new JTextField("300000");
+			maxMemoryUsage.addActionListener(this);
+			JLabel lbl = new JLabel("max memory: ");
+			mmuPanel = U.fieldWithlabel(lbl, maxMemoryUsage);
+			
+			add(mmuPanel);
+			
 		}
 		
 		private void prefUseSize(Dimension size) {
+			Insets ins = this.getInsets();
+			int y = ins.top;
+			int mw = size.width - ins.left - ins.right;
 			
+			int height = mmuPanel.getPreferredSize().height;
+			mmuPanel.setBounds(ins.left, y, mw, height);
+			y += height;
+			
+			height = copyMappingB.getPreferredSize().height;
+			copyMappingB.setBounds(ins.left, y, mw, height);
+			y += height;
+		}
+		
+		private JButton copyMappingB;
+		private JTextField maxMemoryUsage;
+		private JPanel mmuPanel;
+		
+		public void actionPerformed(ActionEvent e) {
+			if (e.getSource() == copyMappingB) {
+				try {
+					P.copyOrReplaceMapping();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			} else {
+				U.w("" + e.getSource());
+			}
 		}
 	}
 }

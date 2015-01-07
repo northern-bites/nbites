@@ -11,6 +11,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,9 @@ import nbclient.gui.logviews.parent.ViewParent;
  * */
 
 public class P {
+	
+	public static final int VERSION = 3;
+	
 	public static Preferences p = java.util.prefs.Preferences.userRoot().node(P.class.getName());
 	public static Rectangle getBounds() {
 		int x = p.getInt("NB_Client_W_x", 0);
@@ -120,7 +124,15 @@ public class P {
 	/*****
 	 * .nbclient-views
 	 * .nbclient-exceptions
+	 * @throws IOException 
 	 */
+	
+	public static void copyOrReplaceMapping() throws IOException {
+		U.w("Copying log-to-view mapping to home from bundle.");
+		//Need to copy from package.
+		Path inpckg = FileSystems.getDefault().getPath(P.class.getResource("logtoview.properties").getPath());
+		Files.copy(inpckg, VIEW_PATH, StandardCopyOption.REPLACE_EXISTING);
+	}
 	
 	public static final Path VIEW_PATH = FileSystems.getDefault().getPath(U.localizePath("~/.nbclient-views.properties"));
 	public static final Path EXCEPTIONS_PATH = FileSystems.getDefault().getPath(U.localizePath("~/.nbclient-exceptions.properties"));
@@ -132,10 +144,7 @@ public class P {
 		try {
 			File f = VIEW_PATH.toFile();
 			if (!f.exists()) {
-				U.w("Copying log-to-view mapping to home from bundle.");
-				//Need to copy from package.
-				Path inpckg = FileSystems.getDefault().getPath(P.class.getResource("logtoview.properties").getPath());
-				Files.copy(inpckg, VIEW_PATH);
+				copyOrReplaceMapping();
 			}
 
 			assert(f.exists());

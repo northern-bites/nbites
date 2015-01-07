@@ -13,14 +13,14 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 
 import nbclient.data.SessionHandler;
-import nbclient.data.Stats;
+import nbclient.data.OldStats;
 import nbclient.util.N;
 import nbclient.util.N.EVENT;
 import nbclient.util.N.NListener;
 
-public class StatsPanel extends JPanel implements NListener {
+public class OldStatusPanel extends JPanel implements NListener {
 	private static final long serialVersionUID = -3792669341719678442L;
-	public StatsPanel(SessionHandler dh) {
+	public OldStatusPanel(SessionHandler dh) {
 		super();
 		setLayout(null);
 		addComponentListener(new ComponentAdapter() {
@@ -66,7 +66,7 @@ public class StatsPanel extends JPanel implements NListener {
 		tList.setBounds(x_offset, y_offset, d.width - 40, d.height);
 	}
 	
-	public void statsUpdate(Stats s) {
+	public void statsUpdate(OldStats s) {
 		nlField.setText("num logs: " + s.numlogs);
 		tbField.setText("total bytes: " + s.totalbytes);
 		
@@ -78,7 +78,7 @@ public class StatsPanel extends JPanel implements NListener {
 	
 	public void notified(EVENT e, Object src, Object... args) {
 		if (e == EVENT.STATS) {
-			statsUpdate((Stats) src);
+			statsUpdate((OldStats) src);
 		}
 	}
 	
