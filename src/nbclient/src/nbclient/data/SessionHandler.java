@@ -72,7 +72,7 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss{
 		
 		assert(log.bytes != null);
 		
-		stats.update(log);
+		//stats.update(log);
 		
 		N.notifyEDT(N.EVENT.LOGS_ADDED, this, log);
 	}

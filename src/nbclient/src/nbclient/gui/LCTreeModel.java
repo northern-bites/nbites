@@ -157,6 +157,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 				NS_macro = null;
 			}
 			
+			assert(lg != null);
 			N.notify(EVENT.SELECTION, this, lg);
 			break;
 		default:

@@ -26,18 +26,23 @@
 
 #include <assert.h>
 
-#include "log_sf.h"
-
 namespace nblog {
     
+//#define NBDB_USECOLOR
     //colored output macros.
+#ifdef NBDB_USECOLOR
 #define NBlog_DB_color "\x1B[36m"
 #define NBlog_DB_cnrm  "\x1B[0m"
 #define NBlog_DB_asf   "\x1B[31m" //assertion failed
+#else
+#define NBlog_DB_color
+#define NBlog_DB_cnrm
+#define NBlog_DB_asf
+#endif
     
     //NBlog debug level.  undef to (almost) never hear from log code,
     //set higher to hear A LOT from log code
-#define NBlog_DB 5
+#define NBlog_DB 6
     
 //Logging code has no guarantee assertions will be on... want some form of yelp if something goes wrong
 #ifdef NBlog_DB
@@ -82,9 +87,6 @@ namespace nblog {
      The log_main immediately overwrites old objects as the buffer fills up.  If no io system is currently using the object (references == 0), it is immediately free'd.  If an io system is using the object, log_main removes it from the ring buffer.  It is now up to the last io system to stop using the object to free it.
      */
     
-#define NUM_IO_TYPES 2
-    typedef enum {SERVER = 0, FILE = 1, NONE = -1} IO_TAG;
-    
     /*
      A logging object/structure.
      Data referenced in object must be owned by the logging system.
@@ -96,6 +98,7 @@ namespace nblog {
     typedef struct _log_object_s {
         size_t image_index;     //associated image id
         clock_t creation_time;
+        
         const char * type;      //variable length string encoding data specifics.
         
         size_t n_bytes;
@@ -133,100 +136,6 @@ namespace nblog {
     extern int LOG_RATIO[NUM_LOG_BUFFERS];
     
     /*
-     Logging stats functions and structures
-     */
-    typedef struct {
-        uint32_t servnr;
-        uint32_t filenr;
-        
-        uint32_t nextw;
-    } bufmanage_t;
-    
-    typedef struct {
-        uint32_t l_given;
-        uint64_t b_given;
-        
-        uint32_t l_freed;
-        uint32_t l_lost;
-        uint64_t b_lost;
-        
-        uint32_t l_writ;
-        uint64_t b_writ;
-    } bufstate_t;
-    
-    typedef struct {
-        //set by flags (or log initiation)
-        uint64_t fio_upstart;
-        uint64_t sio_upstart;
-        
-        //set by connection
-        uint64_t cio_upstart;
-        uint64_t cnc_upstart;
-        
-        uint64_t start;
-    } time_stats_t;
-    
-    typedef struct {
-        //Set when fileio flag set.
-        //char smagic1[4];
-        bufstate_t fio_start[NUM_LOG_BUFFERS];
-        //Set when connection established
-        bufstate_t cio_start[NUM_LOG_BUFFERS];
-        
-        //acquire, release, nblog
-        bufstate_t current[NUM_LOG_BUFFERS];
-        
-        //Copied right before stats sent.
-        bufmanage_t manage[NUM_LOG_BUFFERS];
-        
-        //char smagic2[5];
-        
-        //Upstart set on flag or connection.
-        time_stats_t ts;
-        
-        //Copied right before stats sent.
-        uint32_t ratio[NUM_LOG_BUFFERS];
-        
-        //Constants
-        uint32_t size[NUM_LOG_BUFFERS];
-        uint32_t num_cores;
-        //then flags.
-    } log_stats_t;
-    
-    /*
-     flags for the logging system.
-     
-     Generally, non-mutex written in one place,
-        read in multiple places.
-     */
-    
-    typedef struct {
-        //char fmagic1[5];
-        uint8_t serv_connected;
-        uint8_t cnc_connected;
-        
-        //log to
-        uint8_t fileio;
-        uint8_t servio;
-        
-        //what to log
-        uint8_t STATS;
-        
-        //SPECIFIC modules
-        uint8_t SENSORS;
-        uint8_t GUARDIAN;
-        uint8_t COMM;
-        uint8_t LOCATION;
-        uint8_t ODOMETRY;
-        uint8_t OBSERVATIONS;
-        uint8_t LOCALIZATION;
-        uint8_t BALLTRACK;
-        uint8_t IMAGES;
-        uint8_t VISION;
-        //char fmagic2[5];
-    } log_flags_t;
-    
-    /*
      The central logging structure.
      
      Logging io threads should lock a buffer, take a reference and mark it as being written (increment ref count), then unlock.
@@ -243,8 +152,6 @@ namespace nblog {
     //global reference to the (singleton) log process object
     //declared in log_main.cpp
     extern log_main_t * log_main;
-    extern log_stats_t * log_stats;
-    extern log_flags_t * log_flags;
     
 #define LOG_VERSION 3
     
@@ -278,31 +185,24 @@ namespace nblog {
     //init log_main thread
     void log_main_init();
     
-    
     /**
      logging lib common functions.
      */
     
-    log_object_t * acquire(int buffer_index, uint32_t * relevant_last_read);
+    //logs
+    log_object_t * acquire(int buffer_index, uint32_t * relevant_nextr);
     void release(log_object_t * obj, bool lock);
     
-    /*
-     Netio could use send/recv, but a.t.m. we're not using flags so this approach allows file and net io to use the same functions.
-     */
-    int write_exactly(int sck_or_fd, size_t nbytes, void * data);
     
-    /*
-     time() has granularity of 1 second, so while max_wait
-     is a float, fractions are irrelevant.
-     */
-    int read_exactly(int sck_or_fd, size_t nbytes, void * buffer, double max_wait);
+    //net stuff
+    int write_exactly(int fd, size_t nbytes, void * data);
+    int send_exactly(int sck, size_t nbytes, void * data);
+    //time() had 1 sec granularity, max_wait fractions are pointless
+    int recv_exactly(int sck, size_t nbytes, void * buffer, double max_wait);
     
-    /*
-     Write log (using write_exactly) to sock_or_fd.
-     
-     0 on success, + on failure
-     */
-    int write_log(int sock_or_fd, log_object_t * log);
+    //Both use same format, just different _exactly functions
+    int send_log(int sock, log_object_t * log);
+    int write_log(int fd, log_object_t * log);
     
     //Generates a string w/ generic type specs encoded.
     int description(char * buf, size_t size, log_object_t * obj);

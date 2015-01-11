@@ -6,13 +6,13 @@
 //
 
 #include "log_header.h"
+#include "log_sf.h"
 #include <string>
 #include <algorithm>
 #include <netinet/in.h>
 
 
 namespace nblog {
-    
     
     static const char * LOG_FOLDER = "/home/nao/nbites/log/";
     //const char * LOG_FOLDER = "/Users/pkoch/Desktop/LOGS/";
@@ -36,7 +36,7 @@ namespace nblog {
              (wrote_something) ? (wrote_something = 0) : usleep(FILE_USLEEP_ON_NTD)
              )
         {
-            if (!(log_flags->fileio)) {continue;}
+            if (!(nbsf::flags[nbsf::fileio])) {continue;}
             
             for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
                 
@@ -57,6 +57,10 @@ namespace nblog {
         
         return NULL;
     }
+    
+    /*
+     fileio
+     */
     
     int write_to_fs(log_object_t * obj) {
         int fd;

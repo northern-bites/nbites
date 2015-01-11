@@ -6,6 +6,7 @@
 //
 
 #include "log_header.h"
+#include "log_sf.h"
 #include <stdio.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -45,55 +46,42 @@
 namespace nblog {
     
     uint32_t cnc_test(std::string s, size_t u, uint8_t * p) {
-        printf("\ttest:[%s] %lu %lu %p\n", s.data(), s.size(), u, p);
+        printf("\tcnc_test:[%s] %lu %lu %p\n", s.data(), s.size(), u, p);
         return 0;
     }
     
-    //Notably DOES NOT include the serv_connected flag.
-    uint8_t * flag_ptrs[] = {
-        &(log_flags->fileio),
-        &(log_flags->servio),
-        
-        &(log_flags->STATS),
-        
-        &(log_flags->SENSORS),
-        &(log_flags->GUARDIAN),
-        &(log_flags->COMM),
-        &(log_flags->LOCATION),
-        &(log_flags->ODOMETRY),
-        &(log_flags->OBSERVATIONS),
-        &(log_flags->LOCALIZATION),
-        &(log_flags->BALLTRACK),
-        &(log_flags->IMAGES),
-        &(log_flags->VISION)
-    };
     //expects two bytes of data:
     //flag index
     //new flag value
     uint32_t cnc_setFlag(std::string s, size_t u, uint8_t * p) {
-        if (u != 2) return 1;
-        if (p[0] > 12) return 1;
+        if (u != 2) return 1; //need (index, value)
+        if (p[0] >= nbsf::num_flags) return 1;
         
         switch (p[0]) {
-            case 0: //setting fileio
-                if (p[1]) {
-                    memcpy(log_stats->fio_start, log_stats->current, sizeof(bufstate_t) * NUM_LOG_BUFFERS);
-                    log_stats->ts.fio_upstart = time(NULL);
-                }
-                
-                log_flags->fileio = p[1];
+            case nbsf::serv_connected:
+                printf("cnc_setFlag(): ERROR: CANNOT SET serv_connected!\n");
                 break;
-            case 1: //setting servio
+            case nbsf::cnc_connected:
+                printf("cnc_setFlag(): ERROR: CANNOT SET cnc_connected!\n");
+                break;
+            case nbsf::fileio: //setting fileio
                 if (p[1]) {
-                    log_stats->ts.sio_upstart = time(NULL);
+                    memcpy(nbsf::fio_start, nbsf::total, sizeof(nbsf::io_state_t) * NUM_LOG_BUFFERS);
+                    nbsf::fio_upstart = time(NULL);
                 }
                 
-                log_flags->servio = p[1];
+                nbsf::flags[nbsf::fileio] = p[1];
+                break;
+            case nbsf::servio: //setting servio
+                if (p[1]) {
+                    nbsf::sio_upstart = time(NULL);
+                }
+                
+                nbsf::flags[nbsf::servio] = p[1];
                 break;
                 
             default:
-                uint8_t * fp = flag_ptrs[p[0]];
-                *fp = p[1];
+                nbsf::flags[p[0]] = p[1];
                 break;
         }
         
@@ -154,7 +142,6 @@ namespace nblog {
         bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
         
         //We don't want to crash the server if the pipe dies...
-        //signal(SIGPIPE, SIG_IGN);
         
         //Accepting connections on this socket, backqueue of size 1.
         listen(listenfd, 1);
@@ -164,24 +151,24 @@ namespace nblog {
         for (;;) {
             connfd = block_accept(listenfd);
             LOGDEBUG(3, "log_cnc FOUND CLIENT [%i]\n", connfd);
-            log_stats->ts.cnc_upstart = time(NULL);
-            log_flags->cnc_connected = 1;
+            nbsf::cnc_upstart = time(NULL);
+            nbsf::flags[nbsf::cnc_connected] = 1;
             
             for (;; usleep(SERVER_USLEEP_WAITING)) {
                 uint32_t ping = 0;
                 uint32_t resp;
                 
-                CHECK_RET(write_exactly(connfd, 4, (uint8_t *) &ping) )
-                CHECK_RET(read_exactly(connfd, 4, (uint8_t *) &resp, IO_SEC_TO_BREAK))
+                CHECK_RET(send_exactly(connfd, 4, (uint8_t *) &ping) )
+                CHECK_RET(recv_exactly(connfd, 4, (uint8_t *) &resp, IO_SEC_TO_BREAK))
                 
                 if (ntohl(resp) == 1) {
                     //cnc call coming in:
-                    CHECK_RET(read_exactly(connfd, 4, (uint8_t *) &resp, IO_SEC_TO_BREAK))
+                    CHECK_RET(recv_exactly(connfd, 4, (uint8_t *) &resp, IO_SEC_TO_BREAK))
                     size_t desc_len = ntohl(resp);
                     char cbuf[desc_len];
-                    CHECK_RET(read_exactly(connfd, desc_len, (uint8_t *) cbuf, IO_SEC_TO_BREAK))
+                    CHECK_RET(recv_exactly(connfd, desc_len, (uint8_t *) cbuf, IO_SEC_TO_BREAK))
                     
-                    CHECK_RET(read_exactly(connfd, 4, (uint8_t *) &resp, IO_SEC_TO_BREAK))
+                    CHECK_RET(recv_exactly(connfd, 4, (uint8_t *) &resp, IO_SEC_TO_BREAK))
                     size_t data_len = ntohl(resp);
                     uint8_t dbuf[data_len];
                     
@@ -213,7 +200,7 @@ namespace nblog {
                     
                     uint32_t ret = htonl(fmap[cmnd[1]](desc, data_len, dptr));
                     
-                    CHECK_RET(write_exactly(connfd, 4, &ret))
+                    CHECK_RET(send_exactly(connfd, 4, &ret))
                     
                     LOGDEBUG(1, "log_cnc called %s with data_len:%lu\n", cmnd[1].data(), data_len);
                 } else {
@@ -226,7 +213,7 @@ namespace nblog {
             
             //Acts like an exception.
         connection_died:
-            log_flags->cnc_connected = 0;
+            nbsf::flags[nbsf::cnc_connected] = 0;
             close(connfd);
             LOGDEBUG(1, "log_cnc loop broken, connection closed.\n");
         }
