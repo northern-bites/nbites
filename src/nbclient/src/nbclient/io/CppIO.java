@@ -19,6 +19,8 @@ import nbclient.util.N;
 import nbclient.util.N.EVENT;
 import nbclient.util.U;
 
+import static nbclient.util.NBConstants.*;
+
 public class CppIO implements Runnable {
 	
 	public static void ref(){} //Force the JRE to init CppIO by statically referencing the class.
@@ -34,8 +36,6 @@ public class CppIO implements Runnable {
 	public static final CppIO current = init();
 	public static Thread thread;
 	public static volatile boolean running = true;
-
-	public final int PORT = 32002;
 	
 	public ArrayList<CppFunc> foundFuncs;
 	public Boolean connected;
@@ -50,7 +50,7 @@ public class CppIO implements Runnable {
 		connected = false;
 		
 		try {
-			server = new ServerSocket(PORT, 1, InetAddress.getByName("127.0.0.1"));
+			server = new ServerSocket(CPP_PORT, 1, InetAddress.getByName("127.0.0.1"));
 		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
 			return;
@@ -65,7 +65,7 @@ public class CppIO implements Runnable {
 			try {
 				socket = server.accept();
 				connected = true;
-				N.notifyEDT(EVENT.CPP_CONNECTED, this, connected);
+				N.notifyEDT(EVENT.CPP_CONNECTION, this, connected);
 				U.w("CppIO: found c++ sister process.");
 				
 				BufferedOutputStream _os = new BufferedOutputStream(socket.getOutputStream());
@@ -108,7 +108,7 @@ public class CppIO implements Runnable {
 					foundFuncs.add(f);
 				}
 				
-				N.notifyEDT(EVENT.CPP_FUNCS, this, foundFuncs);
+				N.notifyEDT(EVENT.CPP_FUNCS_FOUNDS, this, foundFuncs);
 				
 				dos.writeInt(nfuncs);
 				dos.flush();
@@ -218,7 +218,7 @@ public class CppIO implements Runnable {
 			}
 			
 			connected = false;
-			N.notifyEDT(EVENT.CPP_CONNECTED, this, connected);
+			N.notifyEDT(EVENT.CPP_CONNECTION, this, connected);
 		}
 		
 		if (server != null)

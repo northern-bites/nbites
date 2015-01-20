@@ -1,20 +1,14 @@
 package nbclient.gui;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import nbclient.data.Log;
 import nbclient.gui.logviews.parent.ViewParent;
 import nbclient.util.P;
 import nbclient.util.U;
+import static nbclient.util.NBConstants.*;
 
 public class LogToViewLookup {
-	
-	private static final String DEFAULT_S = "default";
-	private static final String IMAGE_S = "YUVImage";
-	private static final String PROTOBUF_S = "protobuf";
-	private static final String TEST_S = "test";
-	private static final String STATS_S = "stats";
 	
 	public static ArrayList<Class<? extends ViewParent>> viewsForLog(Log lg) {
 		ArrayList<Class<? extends ViewParent>> ret = new ArrayList<Class<? extends ViewParent>>();

@@ -219,7 +219,4 @@ public class U {
 					+ p.substring(1);
 		} else return p;
 	}
-	
-	//Who names a class DataFlavor?  That's just so... Idk. Fllaavvvooorr.  Data Fllaaavoor. MMM, gimme some'o that DataFlav
-	public static DataFlavor treeFlavor = new DataFlavor(Log.class, "NB-OpaqueLog");
 }

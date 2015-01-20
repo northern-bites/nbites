@@ -1,7 +1,6 @@
 package nbclient.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.swing.SwingUtilities;
 
@@ -9,11 +8,33 @@ import javax.swing.SwingUtilities;
 public class N {
 	
 	public static enum EVENT {
-		STATS(0), STREAM_UPDATE(1), SELECTION(2), LOGS_ADDED(3), LOG_LOADED(4), STATUS(5),
-		CPP_FUNCS(6), CPP_CONNECTED(7);
-		public int index;
-		private EVENT(int i) {
-			index = i;
+		
+		CPP_CONNECTION, /*(true/false)*/ CPP_FUNCS_FOUNDS,
+		CNC_CONNECTION, /*(true/false)*/
+		SIO_THREAD, /*(true/false)*/
+		FIO_THREAD, /*(true/false)*/
+		
+		LOG_LOAD,
+		LOG_FOUND,
+		LOG_DROP,
+		
+		REL_BOTSTAT,
+		
+		LOG_SELECTION,
+		SES_SELECTION,
+		
+		STATUS; //(src) status mode
+				
+		protected int index;
+		private EVENT() {
+			index = -1;
+		}
+		
+		static {
+			int i = 0;
+			for (EVENT e : EVENT.values() ) {
+				e.index = i++;
+			}
 		}
 	};
 
@@ -21,23 +42,34 @@ public class N {
 		public void notified(EVENT e, Object src, Object ... args);
 	}
 	
-	//private static HashMap<EVENT, ArrayList<NListener>> listeners;
-	private static ArrayList<NListener>[] listeners; 
-	static{setup();}
+	private static ArrayList<NListener>[] listeners = setup();
 	
-	@SuppressWarnings("unchecked") 
-	public static synchronized void setup() {
-		listeners = new ArrayList[EVENT.values().length];
-		for (int i = 0; i < EVENT.values().length; ++i)
-			listeners[i] = new ArrayList<NListener>();
+	@SuppressWarnings("unchecked")
+	private static ArrayList<NListener>[] setup() {
+		int len = EVENT.values().length;
+		ArrayList<NListener>[] ret = new ArrayList[len];
+		for (int i = 0; i < len; ++i) 
+			ret[i] = new ArrayList<NListener>();
+		
+		return ret;
 	}
-	public static synchronized void listen(EVENT e, NListener l) {
-		listeners[e.index].add(l);
+	
+	public static void listen(EVENT e, NListener l) {
+		ArrayList<NListener> list = listeners[e.index];
+		synchronized(list) {
+			list.add(l);
+		}
 	}
-	public static synchronized int notify(EVENT e, Object src, Object ... args) {
-		for (NListener nl : listeners[e.index])
-			nl.notified(e, src, args);
-		return listeners[e.index].size();
+	
+	public static synchronized int notify(final EVENT e, final Object src, final Object ... args) {
+		ArrayList<NListener> list = listeners[e.index];
+		
+		synchronized (list) {
+			for (NListener nl : list)
+				nl.notified(e, src, args);
+		}
+		
+		return list.size();
 	}
 	
 	//Not synchronized, we just end up calling synchd notify on EDT

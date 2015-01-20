@@ -24,9 +24,9 @@ import nbclient.util.N.NListener;
 import nbclient.util.P;
 import nbclient.util.U;
 
-public class ControlPanel extends JPanel implements ActionListener, NListener {
+public class OldControlPanel extends JPanel implements ActionListener, NListener {
 	private static final long serialVersionUID = -3237233372276579379L;
-	protected ControlPanel(SessionHandler ndh, LogDisplayPanel dp) {
+	protected OldControlPanel(SessionHandler ndh, LogDisplayPanel dp) {
 		super();
 		dh = ndh;
 		ldp = dp;

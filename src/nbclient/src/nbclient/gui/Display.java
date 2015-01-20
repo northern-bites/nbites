@@ -68,7 +68,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		
 		ldp = new LogDisplayPanel(handler);
 		
-		sp = new ControlPanel(handler, ldp);
+		sp = new OldControlPanel(handler, ldp);
 		lc = new LogChooser(handler);
 		left.addTab("status", sp);
 		left.addTab("logs", lc);
@@ -153,7 +153,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 	private JTabbedPane left;
 	private JTabbedPane right;
 	
-	private ControlPanel sp;
+	private OldControlPanel sp;
 	private LogChooser lc;
 		
 	private LogDisplayPanel ldp;

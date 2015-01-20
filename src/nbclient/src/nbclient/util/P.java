@@ -27,9 +27,7 @@ import nbclient.gui.logviews.parent.ViewParent;
  * */
 
 public class P {
-	
-	public static final int VERSION = 4;
-	
+		
 	public static Preferences p = java.util.prefs.Preferences.userRoot().node(P.class.getName());
 	public static Rectangle getBounds() {
 		int x = p.getInt("NB_Client_W_x", 0);
