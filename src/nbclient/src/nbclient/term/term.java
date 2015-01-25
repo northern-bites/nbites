@@ -15,7 +15,12 @@ public class term implements NetIO.Boss{
 	public static void main(String[] args) throws InterruptedException {
 		//System.out.println(args.length);
 		term t = new term();
-		t.netio = new NetIO(args[0], Integer.parseInt(args[1]), t);
+		t.netio = new NetIO();
+		t.netio.server_address = args[0];
+		t.netio.server_port = Integer.parseInt(args[1]);
+		t.netio.running = true;
+		
+		t.netio.boss = t;
 		
 		Thread thrd = new Thread(t.netio);
 		
@@ -35,7 +40,7 @@ public class term implements NetIO.Boss{
 
 	@Override
 	public void netThreadExiting() {
-		U.w("netio exiting!");
-		System.exit(1);
+		// TODO Auto-generated method stub
+		
 	}
 }

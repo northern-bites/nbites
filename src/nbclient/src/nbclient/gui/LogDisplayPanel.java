@@ -16,7 +16,7 @@ import javax.swing.SwingUtilities;
 
 import nbclient.data.SessionHandler;
 import nbclient.data.Log;
-import nbclient.gui.logviews.misc.ViewParent;
+import nbclient.gui.logviews.parent.ViewParent;
 import nbclient.util.N;
 import nbclient.util.N.EVENT;
 import nbclient.util.N.NListener;
@@ -24,8 +24,8 @@ import nbclient.util.U;
 
 
 public class LogDisplayPanel extends JPanel implements NListener {
-	private static final long serialVersionUID = 1L;
-	protected LogDisplayPanel() {
+	private static final long serialVersionUID = 1029394556736818161L;
+	protected LogDisplayPanel(SessionHandler handler) {
 		super();
 		setLayout(null);
 		addComponentListener(new ComponentAdapter() {
@@ -38,7 +38,7 @@ public class LogDisplayPanel extends JPanel implements NListener {
 		views.setBackground(Color.DARK_GRAY);
 		add(views);
 		
-		N.listen(EVENT.LOG_SELECTION, this);
+		N.listen(EVENT.SELECTION, this);
 		setVisible(true);
 	}
 	
@@ -54,7 +54,7 @@ public class LogDisplayPanel extends JPanel implements NListener {
 	}
 	
 	public void notified(EVENT e, Object src, Object... args) {
-		if (e == EVENT.LOG_SELECTION) {
+		if (e == EVENT.SELECTION) {
 			setContents((Log) args[0]);
 		}
 	}

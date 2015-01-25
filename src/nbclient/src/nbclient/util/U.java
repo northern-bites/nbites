@@ -27,17 +27,16 @@ import nbclient.images.YUYV8888image;
 
 public class U {
 	
+	public static PrintStream oldOut;
+	public static PrintStream oldErr;
+	
 	/*
 	 * Currently synchronized to avoid output interleaving.
 	 * 
 	 * If the code becomes sluggish, behaves erratically, this is a good place to start looking...
 	 * */
-	
-	/*
-	 * Also: synch methods sync on the class.  So while it makes sense for these three to be synchronized, if other static U methods
-	 * need to be synchronized it should be with a different locking object.
-	 * */
 	public static synchronized void w(String s) {
+		
 		System.out.println(s);
 	}
 	
@@ -59,11 +58,11 @@ public class U {
 			
 			String[] parts = a.split("=");
 			if (parts.length != 2)
-				return null;	//Don't attempt to reconstruct malformed descriptions.
+				return null;
 			
 			String type = parts[0].trim();
 			if (type.isEmpty())
-				return null;	//empty key is an error.  Empty value is NOT error, though parsing it may throw one later.
+				return null;
 			
 			if (map.containsKey(type)) {
 				U.wf("ERROR: description\n\t%s\ncontains multiple key: %s\n", desc, type);
@@ -73,7 +72,7 @@ public class U {
 			map.put(type, parts[1]);
 		}
 		
-		if (map.size() > 0) return map; //If description contains no k/v pairs, explicitly indicate that with null return.
+		if (map.size() > 0) return map;
 		else return null;
 	}
 	
@@ -85,7 +84,6 @@ public class U {
 		return ret;
 	}
 	
-	//Almost all image logs will have null or [Y8(U8/V8)] encoding, but this method should be extended if that changes.
 	public static BufferedImage biFromLog(Log log) {
 		assert(log.type().equalsIgnoreCase("YUVImage"));
 		int width = log.width();
@@ -122,6 +120,20 @@ public class U {
 		return new String(hexChars);
 	}
 	
+	public static JPanel pageAxisContainer() {
+		JPanel ret = new JPanel();
+		ret.setLayout(new BoxLayout(ret, BoxLayout.PAGE_AXIS));
+		
+		return ret;
+	}
+	
+	public static JPanel lineAxisContainer() {
+		JPanel ret = new JPanel();
+		ret.setLayout(new BoxLayout(ret, BoxLayout.LINE_AXIS));
+		
+		return ret;
+	}
+	
 	public static JPanel fieldWithlabel(JLabel l, JTextField f) {
 		JPanel p = new JPanel(new BorderLayout());
 		p.add(l,BorderLayout.WEST);
@@ -130,22 +142,9 @@ public class U {
 		return p;
 	}
 	
-	/*
-	 * Can't (to my knowledge) search for classes in the JVM except by trying to find specific ones.
-	 * 
-	 * So, this function tries a number of class name formats that (at the time of writing) span all used nb messages.
-	 * 
-	 * This is somewhat hackish, and renaming messages will break this: a better solution would involve rewriting all .proto
-	 * files so that protoc does not feel it needs to generate semi-arbitrary class names.
-	 * */
-	
-	
-	public static Class<? extends com.google.protobuf.GeneratedMessage> protobufClassFromType(String _type) {
-		assert(_type.startsWith(NBConstants.PROTOBUF_TYPE_PREFIX));
-		String type = _type.substring(NBConstants.PROTOBUF_TYPE_PREFIX.length()); //Remove prefix.
+	public static Class<? extends com.google.protobuf.GeneratedMessage> protobufClassFromType(String type) {
 		String classname;
 		String except;
-		
 		try {
 			except = P.CLASS_EXCEPTIONS_MAP.get(type);
 		} catch(MissingResourceException mre) {
@@ -153,10 +152,7 @@ public class U {
 		}
 		
 		ClassNotFoundException ocE = null, nocE = null;
-		
-		/*
-		 * Generate the %sOuterClass%s format, using the outer class name exception if found.
-		 * */
+		//TRY OuterClass format
 		if ( except != null )
 			classname = String.format("messages.%sOuterClass$%s", except, type);
 		else
@@ -164,7 +160,6 @@ public class U {
 
 		Class<? extends com.google.protobuf.GeneratedMessage> retClass = null;
 		
-		//Try that format.
 		try {
 			retClass = (Class<? extends com.google.protobuf.GeneratedMessage>) Class.forName(classname);
 		} catch (ClassNotFoundException e) {
@@ -173,10 +168,9 @@ public class U {
 		}
 		
 		if (retClass != null)
-			return retClass;	//OuterClass format found the class.
+			return retClass;
 		
-		//Didn't find the class, try class name format WITHOUT 'OuterClass'
-		if (except == null) return null; //Can't try this if we didn't find a class name exception.
+		//need to TRY no OuterClass
 		classname = String.format("messages.%s$%s", except, type);
 		try {
 			retClass = (Class<? extends com.google.protobuf.GeneratedMessage>) Class.forName(classname);
@@ -188,7 +182,6 @@ public class U {
 		if (retClass != null)
 			return retClass;
 		
-		//Couldn't find the class, print the errors we found for debugging.
 		ocE.printStackTrace();
 		nocE.printStackTrace();
 		return null;
@@ -220,9 +213,6 @@ public class U {
 		return ret;
 	}
 	
-	/*
-	 * Path localization assumes unix paths.  It should theoretically work on other filesystems, but this is untested.
-	 * */
 	public static String localizePath(String p) {
 		if (p.startsWith("~" + File.separator)) {
 			return System.getProperty("user.home") 

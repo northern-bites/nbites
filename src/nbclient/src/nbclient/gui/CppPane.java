@@ -43,7 +43,7 @@ import nbclient.util.N.EVENT;
 import nbclient.util.N.NListener;
 import nbclient.util.U;
 
-import nbclient.util.NBConstants;
+
 
 public class CppPane extends JPanel implements ActionListener, NListener, CppFuncListener {
 	private static final long serialVersionUID = 1L;
@@ -60,8 +60,8 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 		
 		this.lc = lc;
 		
-		connect_status = new JLabel("status: bad    ");
-		connect_status.setForeground(Color.RED);
+		connect_status = new JLabel(CppIO.current.connected ? "status: good    " : "status: bad    ");
+		connect_status.setForeground(CppIO.current.connected ? Color.GREEN : Color.RED);
 		
 		funcName = new JComboBox<String>();
 		funcName.addActionListener(this);
@@ -102,8 +102,8 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 		go.addActionListener(this);
 		clear.addActionListener(this);
 		
-		N.listen(EVENT.CPP_CONNECTION, this);
-		N.listen(EVENT.CPP_FUNCS_FOUND, this);
+		N.listen(EVENT.CPP_CONNECTED, this);
+		N.listen(EVENT.CPP_FUNCS, this);
 		
 		add(funcName);
 		add(macros);add(args);add(derived);add(go);add(clear);
@@ -162,16 +162,15 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 		private static final long serialVersionUID = 1L;
 		
 		public boolean canImport(TransferSupport p) {
-			return p.isDataFlavorSupported(DataFlavor.stringFlavor)
-					|| p.isDataFlavorSupported(NBConstants.treeFlavor);
+			return p.isDataFlavorSupported(DataFlavor.stringFlavor) || p.isDataFlavorSupported(U.treeFlavor);
 		}
 		
 		public boolean importData(TransferSupport p) {
 			Log imp = null;
 			try {
-				if (p.isDataFlavorSupported(NBConstants.treeFlavor)) {
+				if (p.isDataFlavorSupported(U.treeFlavor)) {
 
-					imp = (Log) p.getTransferable().getTransferData(NBConstants.treeFlavor);
+					imp = (Log) p.getTransferable().getTransferData(U.treeFlavor);
 				}
 				else if (p.isDataFlavorSupported(DataFlavor.stringFlavor)) {
 					String mcro = (String) p.getTransferable().getTransferData(DataFlavor.stringFlavor);
@@ -232,6 +231,7 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 
 		@Override
 		public String getElementAt(int index) {
+			// TODO Auto-generated method stub
 			return this.data.get(index).description;
 		}
 		
@@ -252,14 +252,14 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 			
 			int index = ((JList) e.getSource()).getSelectedIndex();
 			Log l = der_data.get(index);
-			N.notify(EVENT.LOG_SELECTION, this, l);
+			N.notify(EVENT.SELECTION, this, l);
 		}
 	}
 	
 	private String tryCall() {
 		int i = funcName.getSelectedIndex();
 		if (i < 0) return "no function selected";
-		CppIO.CppFunc f = fFuncs.get(i);
+		CppIO.CppFunc f = CppIO.current.foundFuncs.get(i);
 		
 		if (f.args.length != arg_data.size())
 			return "not enough arguments";
@@ -336,7 +336,7 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 			int i = funcName.getSelectedIndex();
 			if (i < 0) return;
 			
-			CppIO.CppFunc f = fFuncs.get(i);
+			CppIO.CppFunc f = CppIO.current.foundFuncs.get(i);
 			
 			arg_data.clear();
 			
@@ -353,14 +353,13 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 	
 	public void notified(EVENT e, Object src, Object... argArray) {
 		switch(e) {
-		case CPP_CONNECTION:
-			Boolean b = (Boolean) argArray[0];
-			String n = b ? "status: good" : "status: bad";
-			Color nc = b ? Color.GREEN : Color.RED;
+		case CPP_CONNECTED:
+			String n = CppIO.current.connected ? "status: good" : "status: bad";
+			Color nc = CppIO.current.connected ? Color.GREEN : Color.RED;
 			connect_status.setText(n);
 			connect_status.setForeground(nc);;
 			
-			if (b) {
+			if (CppIO.current.connected) {
 				args.setEnabled(true);
 				//macros.setEnabled(true);
 			} else {
@@ -369,10 +368,10 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 				funcName.setEnabled(false);
 			}
 			break;
-		case CPP_FUNCS_FOUND:
-			fFuncs = (ArrayList<CppIO.CppFunc>) argArray[0];
+		case CPP_FUNCS:
+			ArrayList<CppIO.CppFunc> funcs = (ArrayList<CppIO.CppFunc>) argArray[0];
 			funcName.removeAllItems();
-			for (CppIO.CppFunc f : fFuncs) {
+			for (CppIO.CppFunc f : funcs) {
 				funcName.addItem(f.name);
 			}
 			
@@ -398,8 +397,6 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 		der_model.reload();
 		derived.setEnabled(true);
 	}
-	
-	private ArrayList<CppIO.CppFunc> fFuncs = new ArrayList<CppIO.CppFunc>();
 	
 	private LogChooser lc;
 	private static final String NA_S = "::next selection::";

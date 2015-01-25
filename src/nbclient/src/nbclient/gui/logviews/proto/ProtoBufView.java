@@ -14,13 +14,13 @@ import com.google.protobuf.Message;
 import nbclient.data.Log;
 import nbclient.util.U;
 
-public final class ProtoBufView extends nbclient.gui.logviews.misc.ViewParent {
+public final class ProtoBufView extends nbclient.gui.logviews.parent.ViewParent {
 	private static final long serialVersionUID = -541524730464912737L;
 	
 	public static Boolean shouldLoadInParallel() {return true;}
 	public void setLog(Log newlog) {
 		
-		String t = (String) newlog.type();
+		String t = (String) newlog.getAttributes().get("type");
 		Class<? extends com.google.protobuf.GeneratedMessage> lClass = U.protobufClassFromType(t);
 		com.google.protobuf.Message msg = U.protobufInstanceForClassWithData(lClass, newlog.bytes);
 

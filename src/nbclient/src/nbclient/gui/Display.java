@@ -16,23 +16,18 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import nbclient.data.SessionHandler;
-import nbclient.data.SessionMaster;
-import nbclient.data.Stats;
 import nbclient.io.CppIO;
 import nbclient.util.N;
-import nbclient.util.NBConstants;
 import nbclient.util.P;
 import nbclient.util.U;
-import nbclient.util.N.EVENT;
 
 public final class Display extends JFrame implements KeyEventPostProcessor {
 	private static final long serialVersionUID = 1L;
 	public static void main(String[] args) {
 		//Run static setup.
-		U.w("static singleton Stats..." + Stats.INST.toString());
-		U.w("static singleton SessionMaster..." + SessionMaster.INST.toString());
-		U.w("static singleton CppIO server ..." + 
-				CppIO.current.toString() + " live:" + CppIO.thread.isAlive()); 
+		U.oldErr = System.err;
+		U.oldOut = System.out;
+		CppIO.ref(); //The init code doesn't seem to be called unless you ask for a reference.
 		
 		SwingUtilities.invokeLater(new Runnable(){
 
@@ -65,22 +60,25 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 			}
 		};
 		Runtime.getRuntime().addShutdownHook(new Thread(r));
-				
+		
+		handler = new SessionHandler();
+		
 		left = new JTabbedPane();
 		right = new JTabbedPane();
 		
-		ldp = new LogDisplayPanel();
+		ldp = new LogDisplayPanel(handler);
 		
-		cntrlp = new ControlPanel();
-		lc = new LogChooser();
-		left.addTab("status", cntrlp);
+		sp = new OldControlPanel(handler, ldp);
+		lc = new LogChooser(handler);
+		left.addTab("status", sp);
 		left.addTab("logs", lc);
-		
-		statusp = new StatusPanel();
-		right.addTab("status", statusp);
 		
 		cp = new CppPane(lc);
 		right.addTab("c++", cp);
+		
+		/*
+		rp = new RecordPanel();
+		right.addTab("record", rp); */
 		
 		up = new UtilPane();
 		right.addTab("prefs/utils", up);
@@ -97,8 +95,6 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		split2.setResizeWeight(.85);
 		
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventPostProcessor(this);
-		
-		N.notify(EVENT.STATUS, this, NBConstants.STATUS.IDLE, NBConstants.MODE.NONE);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
@@ -130,7 +126,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 			}
 	
 			if (c == '\n' && left.getSelectedIndex() == 0) {
-				//cntrlp.modelReturnAction();
+				sp.modelReturnAction();
 			}
 			
 			if (Character.isLetter(c)) {
@@ -157,15 +153,18 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 	private JTabbedPane left;
 	private JTabbedPane right;
 	
-	private ControlPanel cntrlp;
-	private StatusPanel statusp;
+	private OldControlPanel sp;
 	private LogChooser lc;
 		
 	private LogDisplayPanel ldp;
 	
-	private CppPane cp;	
+	private CppPane cp;
+	private RecordPanel rp;
+	
 	private UtilPane up;
-		
+	
+	private SessionHandler handler;
+	
 	private JSplitPane split1;
 	private JSplitPane split2;
 	

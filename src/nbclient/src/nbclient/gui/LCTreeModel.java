@@ -16,13 +16,11 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-import nbclient.data.Session;
 import nbclient.data.SessionHandler;
+import nbclient.data.SessionHandler.STATUS;
 import nbclient.data.Log;
-import nbclient.data.SessionMaster;
 import nbclient.io.FileIO;
 import nbclient.util.N;
-import nbclient.util.NBConstants;
 import nbclient.util.U;
 import nbclient.util.N.EVENT;
 import nbclient.util.N.NListener;
@@ -33,8 +31,24 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 	 * DataModel:
 	 * */
 	
+	private class Branch {
+		String name;
+		String dir; //if loading from FS, keep this around so that we can load log data later.
+		
+		ArrayList<Log> leaves;
+		
+		public Branch() {
+			leaves = new ArrayList<Log>();
+		}
+		
+		public String toString() {
+			return name;
+		}
+	}
+	
 	String root;
-	int curBranch;
+	ArrayList<Branch> branches;
+	Branch current;
 	JTree tree;
 	
 	public Log NS_macro = null;
@@ -42,10 +56,11 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 	
 	public LCTreeModel() {
 		root = "";
-		curBranch = -1;
+		branches = new ArrayList<Branch>();
+		current = null;
 		
 		N.listen(EVENT.STATUS, this);
-		N.listen(EVENT.LOG_FOUND, this);
+		N.listen(EVENT.LOGS_ADDED, this);
 	}
 	
 	public Object getRoot() {
@@ -54,19 +69,19 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 
 	public Object getChild(Object parent, int index) {
 		if (parent == root) {
-			return SessionMaster.INST.sessions.get(index);
+			return branches.get(index);
 		} else {
-			Session s = (Session) parent;
-			return s.logs_DO.get(index);
+			Branch b = (Branch) parent;
+			return b.leaves.get(index);
 		}
 	}
 
 	@Override
 	public int getChildCount(Object parent) {
 		if (parent == root) {
-			return SessionMaster.INST.sessions.size();
+			return branches.size();
 		} else {
-			return ((Session) parent).logs_DO.size();
+			return ((Branch) parent).leaves.size();
 		}
 	}
 
@@ -84,9 +99,9 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 	@Override
 	public int getIndexOfChild(Object parent, Object child) {
 		if (parent == root) {
-			return SessionMaster.INST.sessions.indexOf(child);
+			return branches.indexOf(child);
 		} else {
-			return ((Session) parent).logs_DO.indexOf(child);
+			return ((Branch) parent).leaves.indexOf(child);
 		}
 	}
 
@@ -118,14 +133,14 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 			
 			Object[] path_objs = path.getPath();
 			Log lg = (Log) path_objs[2];
-			Session b = (Session) path_objs[1];
+			Branch b = (Branch) path_objs[1];
 			
 			if (lg.bytes == null) {
 				try {
 					assert(b.dir != null && !b.dir.isEmpty());
 					FileIO.loadLog(lg, b.dir);
 					
-					N.notify(EVENT.LOG_LOAD, this, lg);
+					N.notify(EVENT.LOG_LOADED, this, lg);
 				} catch (IOException ex) {
 					ex.printStackTrace();
 					U.w("message: " + ex.getMessage());
@@ -136,14 +151,14 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 			
 			CS_macro = lg;
 			int index = this.getIndexOfChild(b, lg);
-			if (index + 1 < b.logs_DO.size()) {
-				NS_macro = b.logs_DO.get(index + 1);
+			if (index + 1 < b.leaves.size()) {
+				NS_macro = b.leaves.get(index + 1);
 			} else {
 				NS_macro = null;
 			}
 			
 			assert(lg != null);
-			N.notify(EVENT.LOG_SELECTION, this, lg);
+			N.notify(EVENT.SELECTION, this, lg);
 			break;
 		default:
 				U.w("ERROR: LCTreeModel path size was: " + path.getPathCount());
@@ -151,9 +166,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 	}
 
 	public void notified(EVENT e, Object src, Object... args) {
-		/*
 		switch (e) {
-		
 		case LOGS_ADDED:
 			assert(current != null);
 			
@@ -168,7 +181,6 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 			}
 			break;
 		case STATUS:
-			/*
 			SessionHandler hndlr = (SessionHandler) src;
 			if (hndlr.status == STATUS.RUNNING) {
 				Branch newb = new Branch();
@@ -183,14 +195,13 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 				for (TreeModelListener l : listeners) {
 					l.treeNodesInserted(tme2);
 				}
-			} */
+			}
 			
-		/*
 			break;
 			
 		default:
 			U.w("ERROR: LCTreeModel notified of unregistered event: " + e);
-		} */
+		}
 	}
 	
 	public Exporter EXPORT_HANDLER = new Exporter();
@@ -201,18 +212,18 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 			public Log tp;
 
 			public DataFlavor[] getTransferDataFlavors() {
-				return new DataFlavor[]{NBConstants.treeFlavor};
+				return new DataFlavor[]{U.treeFlavor};
 			}
 
 			@Override
 			public boolean isDataFlavorSupported(DataFlavor flavor) {
-				return flavor.equals(NBConstants.treeFlavor);
+				return flavor.equals(U.treeFlavor);
 			}
 
 			@Override
 			public Object getTransferData(DataFlavor flavor)
 					throws UnsupportedFlavorException, IOException {
-				if (!flavor.equals(NBConstants.treeFlavor)) throw new UnsupportedFlavorException(flavor);
+				if (!flavor.equals(U.treeFlavor)) throw new UnsupportedFlavorException(flavor);
 				else return tp;
 			}
 			
@@ -223,6 +234,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 		}
 
 		public Transferable createTransferable(JComponent c) {
+			
 			TreePath p = tree.getSelectionPath();
 			LogTransfer lt = new LogTransfer();
 			
