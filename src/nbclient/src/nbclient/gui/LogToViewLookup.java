@@ -3,7 +3,7 @@ package nbclient.gui;
 import java.util.ArrayList;
 
 import nbclient.data.Log;
-import nbclient.gui.logviews.parent.ViewParent;
+import nbclient.gui.logviews.misc.ViewParent;
 import nbclient.util.P;
 import nbclient.util.U;
 import static nbclient.util.NBConstants.*;

@@ -12,11 +12,15 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import javax.swing.JFileChooser;
 
 import nbclient.data.Log;
 import nbclient.data.Log.SOURCE;
+import nbclient.util.N;
+import nbclient.util.N.EVENT;
 import nbclient.util.U;
 
 public class FileIO implements Runnable {
@@ -35,7 +39,7 @@ public class FileIO implements Runnable {
 	}
 		
 	public static boolean checkLogFolder(String log_folder) {
-		if(!(log_folder != null && !log_folder.isEmpty()))
+		if(log_folder == null || log_folder.isEmpty())
 			return false;
 			
 		File f = new File(log_folder);
@@ -49,24 +53,6 @@ public class FileIO implements Runnable {
 		return true;
 	}
 	
-	public static String readDescription(File f) throws IOException {
-		assert(f.exists());
-		assert(f.getName().endsWith(".nblog"));
-		
-		FileInputStream fis = new FileInputStream(f);
-		BufferedInputStream bis = new BufferedInputStream(fis);
-		DataInputStream dis = new DataInputStream(bis);
-		
-		int dlen = dis.readInt();
-		byte[] bytes = new byte[dlen];
-		dis.readFully(bytes);
-		
-		String r = new String (bytes);
-		
-		dis.close();bis.close();fis.close();
-		return r;
-	}
-	
 	public static void loadLog(Log lg, String log_folder) throws IOException {
 		assert(checkLogFolder(log_folder));
 		assert(lg!=null);
@@ -74,40 +60,25 @@ public class FileIO implements Runnable {
 		
 		File logf = new File(log_folder.concat(lg.name));
 		assert(logf.exists());
-		long flen = logf.length();
 		
 		FileInputStream fis = new FileInputStream(logf);
 		BufferedInputStream bis = new BufferedInputStream(fis);
 		DataInputStream dis = new DataInputStream(bis);
 		
-		int dlen = dis.readInt();
-		dis.skip(dlen);
-		lg.bytes = new byte[(int)flen - dlen - 4]; //Extra 4 for the desc len int.
+		Log full = CommonIO.readLog(dis);
 		
-		dis.readFully(lg.bytes);
+		if (dis.available() != 0) {
+			U.wf("ERROR: log [%s] did not follow log format, CORRUPTION LIKELY\n");
+		}
+		
+		if (!(lg.description.equals(full.description))) {
+			U.wf("WARNING: log description found to be different upon load:\n\t%s\n\t%s\n",
+					lg.description, full.description);
+		}
+		
+		lg.bytes = full.bytes;
 		
 		dis.close();
-		bis.close();
-		fis.close();
-	}
-	
-	public static void writeLog(Log lg, String log_folder) throws IOException {
-		assert(checkLogFolder(log_folder)); 
-		assert(lg!=null);
-		assert(lg.name != null);
-		assert(lg.bytes != null);
-		
-		File logf;
-		if (!lg.name.endsWith(".nblog"))
-			logf = new File(log_folder.concat(lg.name) + ".nblog");
-		else logf = new File(log_folder.concat(lg.name));
-		
-		U.w("wl: " + logf.getAbsolutePath());
-		
-		if(!logf.exists())
-			logf.createNewFile();
-
-		_wlINTERNAL(logf, lg);
 	}
 	
 	public static void writeLogToPath(Log lg, String path) throws IOException {
@@ -118,27 +89,32 @@ public class FileIO implements Runnable {
 		if (!logf.exists())
 			logf.createNewFile();
 		
-		_wlINTERNAL(logf, lg);
-	}
-	
-	public static void _wlINTERNAL(File logf, Log lg) throws IOException {
 		FileOutputStream fos = new FileOutputStream(logf);
 		BufferedOutputStream bos = new BufferedOutputStream(fos);
 		DataOutputStream dos = new DataOutputStream(bos);
 		
-		byte[] dbytes = lg.description.getBytes(StandardCharsets.UTF_8);
-		dos.writeInt(dbytes.length + 1);
-		dos.write(dbytes);
-		dos.writeByte(0);
-		dos.write(lg.bytes);
+		CommonIO.writeLog(dos, lg);
 		
 		dos.close();
-		bos.close();
-		fos.close();
+	}
+	
+	public static String readDescriptionFromFile(File f) throws IOException {
+		assert(f.exists());
+		assert(f.getName().endsWith(".nblog"));
+		
+		FileInputStream fis = new FileInputStream(f);
+		BufferedInputStream bis = new BufferedInputStream(fis);
+		DataInputStream dis = new DataInputStream(bis);
+		
+		String r = CommonIO.readLogDescription(dis);
+		
+		dis.close();bis.close();fis.close();
+		return r;
 	}
 	
 	public static Log[] fetchLogs(String location) {
 		assert(checkLogFolder(location));
+		
 		File logd = new File(location);
 		File[] files = logd.listFiles(new FilenameFilter(){
 			public boolean accept(File dir, String name) {
@@ -151,7 +127,7 @@ public class FileIO implements Runnable {
 		for (int i = 0; i < files.length; ++i) {
 			String desc = null;
 			try {
-				desc = readDescription(files[i]);
+				desc = readDescriptionFromFile(files[i]);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -168,44 +144,52 @@ public class FileIO implements Runnable {
 		return logs;
 	}
 	
-	public static ArrayList<Log> logsToWrite;
+	
+	/**
+	 * ----------------------------------------------------------------------------
+	 * Asynchronous writing of logs via a FileIO object.
+	 * */
+	
+	public static Queue<Log> logsToWrite = null;
+	
 	public static synchronized void addObject(Log lg) {
 		if (logsToWrite != null) logsToWrite.add(lg);
 	}
 	
 	public static synchronized Log getObject() {
 		if (logsToWrite != null && logsToWrite.size() > 0) 
-			return (Log) logsToWrite.remove(0);
+			return logsToWrite.remove();
 		else return null;
 	}
 
-	public String log_folder;
-	public volatile boolean running;
+	private String log_folder;
+	private volatile boolean running;
+	private Boss boss;
 	
 	public FileIO(Boss b, String folder) {
 		boss = b; log_folder = folder;
+		running = false;
 	}
 	
-	private Boss boss;
+	public void stop() {
+		running = false;
+	}
+	
 	public void run() {		
-		logsToWrite = new ArrayList<Log>();
+		running = true;
+		logsToWrite = new LinkedList<Log>();
+		N.notifyEDT(EVENT.FIO_THREAD, this, true);
 		
-		while(true) {
-			if (!running) {
-				U.w("FileIO thread finishing because !running.");
-				boss.fileioThreadExiting();
-				return;
-			}
-			
-			Log lg = null;
-			if ((lg = getObject()) != null) {
+		while(running) {
+			Log lg  = getObject();
+			if (lg != null) {
 				if (lg.name == null) {
 					lg.setNameFromDesc();
 				} else if (!lg.name.endsWith(".nblog"))
 					lg.name = lg.name + ".nblog";
 				
 				try {		 
-					writeLog(lg, log_folder);
+					writeLogToPath(lg, log_folder + File.separator + lg.name);
 					U.w("FileIO: thread wrote log: " + lg.name);
 				} catch (IOException e) {
 					U.w("Error writing file to: " + log_folder);
@@ -220,6 +204,11 @@ public class FileIO implements Runnable {
 					e.printStackTrace();
 				}
 		}
+		
+		logsToWrite = null;
+		U.w("FileIO thread finishing because !running.");
+		N.notifyEDT(EVENT.FIO_THREAD, this, false);
+		boss.fileioThreadExiting();
 	}
 	
 	public interface Boss {

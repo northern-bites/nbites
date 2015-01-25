@@ -4,13 +4,17 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.Map;
 
+import nbclient.util.NBConstants;
 import nbclient.util.U;
 
 /*TODO:  if description changes, attributes is out of date.
  * */
 public class Log implements Serializable {
 	private static final long serialVersionUID = 5000703421741282261L;
+	
 	public String name; //File name, might be null
+	
+	//Core opaque log fields:
 	public String description;
 	public byte[] bytes;
 	
@@ -143,5 +147,9 @@ public class Log implements Serializable {
 			_version = Integer.parseInt(str);
 			return _version;
 		}
+	}
+	
+	public boolean isProtobuf() {
+		return type().startsWith(NBConstants.PROTOBUF_TYPE_PREFIX);
 	}
 }

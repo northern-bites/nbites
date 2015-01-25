@@ -5,7 +5,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import nbclient.data.Log;
-import nbclient.gui.logviews.parent.ViewParent;
+import nbclient.gui.logviews.misc.ViewParent;
 import nbclient.images.ImageParent;
 import nbclient.images.UV88image;
 import nbclient.images.Y16image;
