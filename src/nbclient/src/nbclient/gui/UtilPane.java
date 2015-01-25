@@ -16,13 +16,18 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
+import nbclient.data.SessionMaster;
 import nbclient.gui.utilitypanes.UtilityManager;
 import nbclient.gui.utilitypanes.UtilityParent;
+import nbclient.util.N;
+import nbclient.util.N.EVENT;
 import nbclient.util.P;
 import nbclient.util.U;
 
 
 public class UtilPane extends JPanel{
+	private static final long serialVersionUID = 1L;
+	
 	private Utils utils;
 	private Prefs prefs;
 	
@@ -96,7 +101,7 @@ public class UtilPane extends JPanel{
 	}
 	
 	private class Prefs extends JPanel implements ActionListener {
-		protected static final int REQ_HEIGHT = 90;
+		protected static final int REQ_HEIGHT = 150;
 		protected Prefs() {
 			
 			super();
@@ -113,10 +118,17 @@ public class UtilPane extends JPanel{
 			
 			copyMappingB = new JButton("recopy view mapping (must restart)");
 			copyMappingB.addActionListener(this);
-			
 			add(copyMappingB);
 			
-			maxMemoryUsage = new JTextField("300000");
+			copyExceptB = new JButton("recopy class excepts (must restart)");
+			copyExceptB.addActionListener(this);
+			add(copyExceptB);
+			
+			resetPrefB = new JButton("reset preferences (!bounds) (must restart)");
+			resetPrefB.addActionListener(this);
+			add(resetPrefB);
+			
+			maxMemoryUsage = new JTextField("" + P.getHeap());
 			maxMemoryUsage.addActionListener(this);
 			JLabel lbl = new JLabel("max memory: ");
 			mmuPanel = U.fieldWithlabel(lbl, maxMemoryUsage);
@@ -137,9 +149,20 @@ public class UtilPane extends JPanel{
 			height = copyMappingB.getPreferredSize().height;
 			copyMappingB.setBounds(ins.left, y, mw, height);
 			y += height;
+			
+			height = copyExceptB.getPreferredSize().height;
+			copyExceptB.setBounds(ins.left, y, mw, height);
+			y += height;
+			
+			height = resetPrefB.getPreferredSize().height;
+			resetPrefB.setBounds(ins.left, y, mw, height);
+			y += height;
 		}
 		
 		private JButton copyMappingB;
+		private JButton copyExceptB;
+		private JButton resetPrefB;
+		
 		private JTextField maxMemoryUsage;
 		private JPanel mmuPanel;
 		
@@ -150,8 +173,35 @@ public class UtilPane extends JPanel{
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
+			} else if (e.getSource() == copyExceptB){
+				try {
+					P.copyOrReplaceExceptions();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			} else if (e.getSource() == resetPrefB){
+				P.resetNonFilePreferences();
+			} 
+			else if (e.getSource() == maxMemoryUsage){
+				String ns = maxMemoryUsage.getText();
+				
+				int nv = -1;
+				
+				try {
+					nv = Integer.parseInt(ns);
+				} catch (NumberFormatException nfe) {
+					nfe.printStackTrace();
+				}
+				
+				if (nv > 1024) { //reasonable minimum value
+					P.putHeap(nv);
+					N.notify(EVENT.MAX_MEM_USAGE_CHANGED, this, nv);
+				} else {
+					maxMemoryUsage.setText("" + SessionMaster.INST.max_data_bytes);
+					U.w("Could not use new max memory value.");
+				}
 			} else {
-				U.w("" + e.getSource());
+				
 			}
 		}
 	}

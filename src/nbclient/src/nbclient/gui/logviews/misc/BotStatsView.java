@@ -1,4 +1,4 @@
-package nbclient.gui.logviews.parent;
+package nbclient.gui.logviews.misc;
 
 import java.awt.Dimension;
 import java.awt.Font;

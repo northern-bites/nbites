@@ -20,9 +20,8 @@ import nbclient.util.N.NListener;
 
 public class LogChooser extends JPanel {
 	private static final long serialVersionUID = 1L;
-	public LogChooser(SessionHandler handler) {
+	public LogChooser() {
 		setLayout(null);
-		dh = handler;
 		addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent e) {
 				useSize(e.getComponent().getSize());
@@ -42,6 +41,8 @@ public class LogChooser extends JPanel {
 		tree.setTransferHandler(model.EXPORT_HANDLER);
 		tree.setDragEnabled(true);
 		
+		sas = new SortAndSearch();
+		
 		sp = new JScrollPane(tree);
 		sp.setViewportView(tree);
 		
@@ -49,11 +50,14 @@ public class LogChooser extends JPanel {
 		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		//sp.setVerticalScrollBarPolicy();
 		
+		add(sas);
 		add(sp);
 	}
 	
 	private void useSize(Dimension size) {
-		sp.setBounds(0, 0, size.width, size.height);
+		Dimension d = sas.getPreferredSize();
+		sas.setBounds(0,0,d.width,d.height);
+		sp.setBounds(0, d.height, size.width, size.height);
 	}
 	
 	public Log currentlySelected() {
@@ -67,5 +71,6 @@ public class LogChooser extends JPanel {
 	private JScrollPane sp;
 	private JTree tree;
 	private LCTreeModel model;
-	private SessionHandler dh;	
+	
+	private SortAndSearch sas;
 }

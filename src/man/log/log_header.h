@@ -42,7 +42,7 @@ namespace nblog {
     
     //NBlog debug level.  undef to (almost) never hear from log code,
     //set higher to hear A LOT from log code
-#define NBlog_DB 6
+#define NBlog_DB 5
     
 //Logging code has no guarantee assertions will be on... want some form of yelp if something goes wrong
 #ifdef NBlog_DB
@@ -153,7 +153,7 @@ namespace nblog {
     //declared in log_main.cpp
     extern log_main_t * log_main;
     
-#define LOG_VERSION 3
+#define LOG_VERSION 4
     
 #define LOG_PORT (32000)
 #define CNC_PORT (32001)

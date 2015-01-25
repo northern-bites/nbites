@@ -38,7 +38,7 @@ namespace nbsf {
     
     const uint32_t NUM_CORES = (uint32_t) sysconf(_SC_NPROCESSORS_ONLN);
     
-    uint8_t flags[num_flags];
+    volatile uint8_t flags[num_flags];
 }
 
 namespace nblog {
@@ -81,7 +81,7 @@ namespace nblog {
         /*
          stats and flags
          */
-        bzero(nbsf::flags, nbsf::num_flags);
+        bzero( (uint8_t *) nbsf::flags, nbsf::num_flags);
         nbsf::flags[nbsf::servio] = true;
         nbsf::flags[nbsf::STATS] = true;
         
@@ -207,7 +207,7 @@ namespace nblog {
                     contig.size[i] = LOG_BUFFER_SIZES[i];
                 }
                 
-                memcpy(contig.flags, nbsf::flags, nbsf::num_flags);
+                memcpy( contig.flags,  (uint8_t *) nbsf::flags, nbsf::num_flags);
                 
                 //Set non-volatile items, convert everything to network order.
                 contig.cores = htonl(nbsf::NUM_CORES);

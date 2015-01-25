@@ -19,7 +19,7 @@ namespace nbsf {
      FLAGS
      */
     typedef enum {
-        serv_connected = 0,
+        serv_connected,
         cnc_connected,
         
         fileio,
@@ -38,10 +38,12 @@ namespace nbsf {
         IMAGES,
         VISION,
         
+        //Num_flags must be last!  it has int value (previous + 1) which, if it is last,
+        //is equivalent to the number of flags previous listed.
         num_flags
     } flag_e;
     
-    extern uint8_t flags[num_flags];
+    extern volatile uint8_t flags[num_flags];
     
     
     /*

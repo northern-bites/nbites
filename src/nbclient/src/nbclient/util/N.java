@@ -4,26 +4,33 @@ import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
 
+import nbclient.io.CppIO.CppFunc;
+
 //Notification center
 public class N {
 	
 	public static enum EVENT {
 		
-		CPP_CONNECTION, /*(true/false)*/ CPP_FUNCS_FOUNDS,
-		CNC_CONNECTION, /*(true/false)*/
-		SIO_THREAD, /*(true/false)*/
-		FIO_THREAD, /*(true/false)*/
+		CPP_CONNECTION, /*(true/false)*/ 	//From CPP thread
+		CPP_FUNCS_FOUND, /*(ArrayList<CppFunc>)*/	//From CPP thread
 		
-		LOG_LOAD,
-		LOG_FOUND,
-		LOG_DROP,
+		CNC_CONNECTION, /*(true/false)*/	//From CommandIO thread
+		SIO_THREAD, /*(true/false)*/	//From NetIO thread
+		FIO_THREAD, /*(true/false)*/	//From Fileio thread
 		
-		REL_BOTSTAT,
+		LOG_LOAD, /*(loaded log)*/	//From logchooser
+		LOG_FOUND, /*(found logs, as array)*/	//From SessionHandler
+		LOG_DROP, /*(dropped log) (long dropped bytes)*/	//From SessionMaster
 		
-		LOG_SELECTION,
-		SES_SELECTION,
+		REL_BOTSTAT, /*(new relevant botstat object)*/	//From SessionMaster
+		STATS,											//From Stats object
 		
-		STATUS; //(src) status mode
+		LOG_SELECTION, /*(selected log)*/				//From chooser gui
+		SES_SELECTION, /*(selected session)*/			//From chooser gui
+		
+		MAX_MEM_USAGE_CHANGED, /*(new value)*/			//From prefs
+		
+		STATUS; //(status) (mode)						//From SessionHandler
 				
 		protected int index;
 		private EVENT() {
@@ -61,7 +68,7 @@ public class N {
 		}
 	}
 	
-	public static synchronized int notify(final EVENT e, final Object src, final Object ... args) {
+	public static int notify(final EVENT e, final Object src, final Object ... args) {
 		ArrayList<NListener> list = listeners[e.index];
 		
 		synchronized (list) {

@@ -208,6 +208,8 @@ namespace nblog {
                         LOGDEBUG(1, "log_cnc got bad ping reply! %x\n", resp);
                         goto connection_died;
                     }
+                    
+                    usleep(SERVER_USLEEP_WAITING);
                 }
             }
             
