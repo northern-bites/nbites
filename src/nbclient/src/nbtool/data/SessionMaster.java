@@ -3,6 +3,8 @@ package nbtool.data;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.SwingUtilities;
+
 import nbtool.util.N;
 import nbtool.util.N.EVENT;
 import nbtool.util.N.NListener;
@@ -27,19 +29,18 @@ public class SessionMaster implements NListener {
 		
 		max_data_bytes = P.getHeap();
 		
-		N.listen(EVENT.LOG_FOUND, this);
 		N.listen(EVENT.MAX_MEM_USAGE_CHANGED, this);
 		N.listen(EVENT.STATUS, this);
 	}
 	
-	public void startSession(MODE m, String p, String s) {
+	public void startSession(MODE m, String fp, String addr) {
 		if (handler != null)
 			return;
 		
-		handler = new SessionHandler();
+		handler = new SessionHandler(this);
 		
-		if (handler.start(m, p, s)) {
-			Session news = new Session(sessions.size(), m, p, s);
+		if (handler.start(m, fp, addr)) {
+			Session news = new Session(sessions.size(), m, fp, addr);
 			sessions.add(news);
 			workingSession = news;
 		}
@@ -52,32 +53,6 @@ public class SessionMaster implements NListener {
 
 	public void notified(EVENT e, Object src, Object... args) {
 		switch(e) {
-		case LOG_FOUND:
-			assert(workingSession != null);
-			
-			Log lbs = null;
-			
-			for (Object o : args) {
-				Log l = (Log) o;
-				workingSession.addLog(l);
-				
-				if (l.type().equals("stats"))
-					lbs = l;
-			}
-			
-			if (lbs != null) {
-				try {
-					BotStats bs = new BotStats(lbs);
-					
-					workingSession.most_relevant = bs;
-					
-					N.notify(EVENT.REL_BOTSTAT, this, bs);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-			}
-			
-			break;
 		case MAX_MEM_USAGE_CHANGED:
 			Long nv = (Long) args[0];
 			this.max_data_bytes = nv;
@@ -91,6 +66,7 @@ public class SessionMaster implements NListener {
 				workingSession = null;
 				break;
 			case RUNNING:
+				assert(handler != null);
 				break;
 			case STARTING:
 				break;
@@ -105,6 +81,35 @@ public class SessionMaster implements NListener {
 		default:
 			break;
 		
+		}
+	}
+	
+	public boolean isIdle() {
+		return (handler == null);
+	}
+	
+	protected void deliver(Log ... logs) {
+		assert(workingSession != null);
+		
+		Log lbs = null;
+		
+		for (Log l : logs) {
+			workingSession.addLog(l);
+			
+			if (l.type().equals("stats"))
+				lbs = l;
+		}
+		
+		if (lbs != null) {
+			try {
+				BotStats bs = new BotStats(lbs);
+				
+				workingSession.most_relevant = bs;
+				
+				N.notify(EVENT.REL_BOTSTAT, this, bs);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 }

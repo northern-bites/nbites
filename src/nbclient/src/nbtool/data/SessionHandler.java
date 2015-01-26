@@ -18,7 +18,9 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
 	private NetIO netioRunnable;
 	private CommandIO cncRunnable;
 	
-	public SessionHandler() {
+	public SessionHandler(SessionMaster m) {
+		ms = m;
+		
 		fileioRunnable = null;
 		netioRunnable = null;
 		cncRunnable = null;
@@ -34,7 +36,8 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
 		
 		assert(log.bytes != null);
 				
-		N.notifyEDT(EVENT.LOG_FOUND, this, log);
+		//N.notifyEDT(EVENT.LOG_FOUND, this, log);
+		deliver(log);
 	}
 	
 	public synchronized void netThreadExiting() {
@@ -61,21 +64,21 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
 	
 	/*Try to start new data collection mode.*/
 	
-	public boolean start(MODE m, String p, String s) {
+	public boolean start(MODE m, String fp, String addr) {
 		assert(SwingUtilities.isEventDispatchThread());
-		String primary = p.trim();
+		String filepath = fp.trim();
 		//Expand tilde
-		primary = U.localizePath(primary) + "/";
+		filepath = U.localizePath(filepath) + "/";
 		
-		String address = s.trim();
+		String address = addr.trim();
 		
 		if (m == MODE.FILESYSTEM || m == MODE.NETWORK_SAVING) {
-			if (primary.isEmpty()) {
+			if (filepath.isEmpty()) {
 				U.w("SessionHandler.start(): Empty primary (log folder name) setting.  Could not start.");
 				return false;
 			}
 			
-			if (!FileIO.checkLogFolder(primary)) {
+			if (!FileIO.checkLogFolder(filepath)) {
 				U.w("SessionHandler.start(): Invalid log folder, could not start.");
 				return false;
 			} else {
@@ -98,7 +101,7 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
 		switch(m) {
 		case NETWORK_SAVING:
 			//start fileio thread, move to network_nosave
-			fileioRunnable = new FileIO(this, primary);
+			fileioRunnable = new FileIO(this, filepath);
 			
 			Thread fileioThread = new Thread(fileioRunnable);
 			fileioThread.start();
@@ -115,13 +118,15 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
 			
 			break;
 		case FILESYSTEM:
-			Log[] logArray = FileIO.fetchLogs(primary);
-			N.notify(EVENT.LOG_FOUND, this, (Object[]) logArray);
+			Log[] logArray = FileIO.fetchLogs(filepath);
+			//N.notify(EVENT.LOG_FOUND, this, (Object[]) logArray);
+			deliver(logArray);
 			
-			N.notify(EVENT.STATUS, this, STATUS.IDLE, m);
+			N.notifyEDT(EVENT.STATUS, this, STATUS.IDLE, m);
 			break;
 		default:{
 			U.w("SessionHandler.start(): Cannot start that mode:" + m.toString());
+			N.notifyEDT(EVENT.STATUS, this, STATUS.IDLE, m);
 			return false;
 			}
 		}
@@ -169,4 +174,14 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
 		}
 	}
 
+	
+	private SessionMaster ms;
+	private void deliver(Log... logs) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				if (ms != null)
+					ms.deliver(logs);
+			}
+		});
+	}
 }

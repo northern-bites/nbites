@@ -6,8 +6,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.nio.file.FileSystem;
 import java.util.Map.Entry;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -17,12 +19,17 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import nbtool.data.Log;
+import nbtool.data.SessionMaster;
 import nbtool.util.N;
 import nbtool.util.N.NListener;
 import nbtool.util.NBConstants;
 import nbtool.util.N.EVENT;
 import nbtool.util.NBConstants.FlagPair;
+import nbtool.util.NBConstants.MODE;
+import nbtool.util.NBConstants.STATUS;
 import nbtool.util.P;
+import nbtool.util.U;
 
 public class ControlPanel extends JPanel implements ActionListener, NListener {
 	private static final long serialVersionUID = 1L;
@@ -98,12 +105,6 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 		N.listen(EVENT.STATUS, this);
 	}
 	
-	public void actionPerformed(ActionEvent e) {
-		
-		
-	}
-
-	
 	private void useSize(Dimension s) {
 		sp.setBounds(0, 0, s.width, s.height);
 		
@@ -165,30 +166,132 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 	
 	private FlagPanel[] flags;
 
+	public void model_returnKeypress() {
+		ActionEvent e = new ActionEvent(go, ActionEvent.ACTION_PERFORMED, "start/stop from keyPress");
+		this.actionPerformed(e);
+	}
+	
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == go) {
+			
+			if (SessionMaster.INST.isIdle()) {
+				tryStart();
+			} else {
+				SessionMaster.INST.stopSession();
+			}
+			
+		} else if (e.getSource() == test) {
+			
+		} else if (e.getSource() == modes) {
+			int si = modes.getSelectedIndex();
+			if (si < 0) return;
+			
+			useMode(NBConstants.MODES[si]);
+		} else {
+			
+		}
+	}
 	
 	public void notified(EVENT e, Object src, Object... args) {
 		switch (e) {
 		case LOG_FOUND:
+			if (bstream.isSelected()) {
+				Log l = (Log) args[0];
+				if (l.description.contains(fstream.getText()))
+					N.notifyEDT(EVENT.LOG_SELECTION, this, l);
+			}
 			break;
 		case LOG_SELECTION:
 		case SES_SELECTION:
+			if (src != this)
+				bstream.setSelected(false);
 			break;
 		case STATUS:
+			STATUS s = (STATUS) args[0];
+			useStatus(s);
 			break;
 		}
 		
 	}
 	
-	private void startAction() {
+	private void tryStart() {
+		String fs_text = (String) fpath.getSelectedItem();
+		String addr_text = (String) faddr.getSelectedItem();
 		
+		if (fs_text == null)
+			fs_text = "";
+		if (addr_text == null)
+			addr_text = "";
+		
+		int cs = modes.getSelectedIndex();
+		if (cs < 0) 
+			return;
+		MODE m = NBConstants.MODES[cs];
+		
+		switch(m) {
+		case FILESYSTEM:
+			fpath.setModel(new DefaultComboBoxModel<String>( P.putPrimary(fs_text) ));
+			break;
+		case NETWORK_NOSAVE:
+			faddr.setModel(new DefaultComboBoxModel<String>( P.putSecondary(addr_text) ));
+			break;
+		case NETWORK_SAVING:
+			fpath.setModel(new DefaultComboBoxModel<String>( P.putPrimary(fs_text) ));
+			faddr.setModel(new DefaultComboBoxModel<String>( P.putSecondary(addr_text) ));
+			break;
+		case NONE:
+			U.w("ControlPanel: cannot start that mode.");
+			return;
+		default:
+			break;
+		}
+		
+		SessionMaster.INST.startSession(m, fs_text, addr_text);
 	}
 	
-	private void stopAction() {
+	private void useMode(MODE m) {
+		switch(m) {
+		case FILESYSTEM:
+			faddr.setEnabled(false);
+			fpath.setEnabled(true);
+			break;
+		case NETWORK_NOSAVE:
+			faddr.setEnabled(true);
+			fpath.setEnabled(false);
+			break;
+		case NETWORK_SAVING:
+			faddr.setEnabled(true);
+			fpath.setEnabled(true);
+			break;
+		case NONE:
+			faddr.setEnabled(false);
+			fpath.setEnabled(false);
+			break;
+		default:
+			break;
 		
+		}
 	}
 	
-	private boolean starting;
-	private void setStartBText() {
-		go.setText(starting ? "go" : "stop");
+	private void useStatus(STATUS s) {
+		switch (s) {
+		case IDLE:
+			go.setText("go");
+			go.setEnabled(true);
+			break;
+		case RUNNING:
+			go.setText("stop");
+			go.setEnabled(true);
+			break;
+		case STARTING:
+			go.setEnabled(false);
+			break;
+		case STOPPING:
+			go.setEnabled(false);
+			break;
+		default:
+			break;
+		
+		}
 	}
 }

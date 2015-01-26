@@ -19,9 +19,10 @@ public class NBConstants {
 	public static final String USER_LOG_TO_VIEW_MAP = "~/.nbtool-views.properties";
 	
 	public static final String DEFAULT_S = "PT_default";
-	public static final String IMAGE_S = "PT_UVImage";
 	public static final String PROTOBUF_S = "PT_protobuf";
-	public static final String STATS_S = "PT_stats";
+
+	public static final String IMAGE_S = "YUVImage";
+	public static final String STATS_S = "stats";
 	
 	public static final int VERSION = 4;
 	
@@ -38,13 +39,17 @@ public class NBConstants {
 		NETWORK_SAVING(0), NETWORK_NOSAVE(1), FILESYSTEM(2), NONE(3);
 		
 		public final int index;
-		private MODE(int i) {
+		private MODE(final int i) {
 			this.index = i;
 		}
 	}
 	
 	public static final String[] mode_strings = {
 		"from net to fs", "from net", "from fs", "none"
+	};
+	
+	public static final MODE[] MODES = new MODE[] {
+		MODE.NETWORK_SAVING, MODE.NETWORK_NOSAVE, MODE.FILESYSTEM, MODE.NONE
 	};
 	
 	public static enum STATUS {
@@ -62,6 +67,10 @@ public class NBConstants {
 	
 	public static final String[] status_strings = {
 		"idle", "starting", "running", "stopping"
+	};
+	
+	public static final STATUS[] STATUSES = new STATUS[] {
+		STATUS.IDLE, STATUS.STARTING, STATUS.RUNNING, STATUS.STOPPING
 	};
 	
 	public static final ArrayList<FlagPair> flags = _setupFlags();

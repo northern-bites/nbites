@@ -14,20 +14,22 @@ public class LogToViewLookup {
 		ArrayList<Class<? extends ViewParent>> ret = new ArrayList<Class<? extends ViewParent>>();
 		
 		//Try to list most specific views first
-		String type = (String) lg.getAttributes().get("type");
+		String type = lg.type();
+		assert(type != null);
 		
-		if (type.startsWith(TEST_S)) {
-			//Don't want this going in with the protobufs.
-			//No specific views atm.
-		} else if (type.equalsIgnoreCase(STATS_S)) { 
-			ret.addAll(P.LTVIEW_MAP.get(STATS_S));
-		} else if (type.equalsIgnoreCase(IMAGE_S)) {
-			ret.addAll(P.LTVIEW_MAP.get(IMAGE_S));
-		} else {
-			//Assume some type of protobuf
-			ArrayList<Class<? extends ViewParent>> specific = P.LTVIEW_MAP.get(type);
-			if (specific != null) 
-				ret.addAll(specific);
+		ArrayList<Class<? extends ViewParent>> specific = P.LTVIEW_MAP.get(type);
+		if (specific != null)
+			ret.addAll(specific);
+		
+		if (type.startsWith(PROTOBUF_TYPE_PREFIX)) {
+			/*
+			String ptype = type.substring(PROTOBUF_TYPE_PREFIX.length());
+			
+			specific = P.LTVIEW_MAP.get(ptype);
+			if (specific != null)
+				ret.addAll(specific); */
+			
+			//Add views for generic protobufs
 			ret.addAll(P.LTVIEW_MAP.get(PROTOBUF_S));
 		}
 		

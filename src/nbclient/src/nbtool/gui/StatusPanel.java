@@ -25,6 +25,9 @@ import nbtool.data.Stats;
 import nbtool.util.N;
 import nbtool.util.N.EVENT;
 import nbtool.util.N.NListener;
+import nbtool.util.NBConstants;
+import nbtool.util.NBConstants.MODE;
+import nbtool.util.NBConstants.STATUS;
 
 public class StatusPanel extends JPanel implements NListener{
 
@@ -42,8 +45,9 @@ public class StatusPanel extends JPanel implements NListener{
 		canvas = new JPanel();
 		canvas.setLayout(null);
 		
-		Font msf = new Font("monospace", Font.PLAIN, 12);
-		Font bsf = msf.deriveFont(Font.BOLD, 14);
+		Font msf = new Font("monospace", Font.PLAIN, 14);
+		Font sf = new Font("monospace", Font.PLAIN, 12);
+		Font bsf = msf.deriveFont(Font.BOLD, 18);
 		
 		serv = new JLabel("[serv]");
 		serv.setFont(bsf);
@@ -54,11 +58,20 @@ public class StatusPanel extends JPanel implements NListener{
 		fst = new JLabel("[fst]");
 		fst.setFont(bsf);
 		
+		serv.setForeground(Color.GRAY);
+		cnc.setForeground(Color.GRAY);
+		cpp.setForeground(Color.GRAY);
+		fst.setForeground(Color.GRAY);
+		
 		up_container = lineAxisContainer();
 		up_container.add(serv);
 		up_container.add(cnc);
 		up_container.add(cpp);
 		up_container.add(fst);
+		
+		mode_status = new JLabel(":");
+		mode_status.setFont(msf);
+		canvas.add(mode_status);
 		
 		jvm_heap = new JLabel();
 		jvm_heap.setFont(msf);
@@ -96,7 +109,7 @@ public class StatusPanel extends JPanel implements NListener{
 		canvas.add(typeArea);
 		
 		botStatA = new JTextArea();
-		botStatA.setFont(msf);
+		botStatA.setFont(sf);
 		botStatA.setEditable(false);
 		botStatA.setText("<no STATS logs found>");
 		canvas.add(botStatA);
@@ -121,6 +134,7 @@ public class StatusPanel extends JPanel implements NListener{
 		N.listen(EVENT.LOG_FOUND, this);
 		N.listen(EVENT.STATS, this);
 		N.listen(EVENT.REL_BOTSTAT, this);
+		N.listen(EVENT.STATUS, this);
 	}
 	
 	private void useSize(Dimension s) {
@@ -133,6 +147,10 @@ public class StatusPanel extends JPanel implements NListener{
 		d1 = up_container.getPreferredSize();
 		up_container.setBounds(x, y, s.width, d1.height);
 		
+		y += d1.height + 5;
+		
+		d1 = mode_status.getPreferredSize();
+		mode_status.setBounds(x, y, d1.width, d1.height);
 		y += d1.height + 5;
 		
 		d1 = jvm_heap.getPreferredSize();
@@ -186,11 +204,6 @@ public class StatusPanel extends JPanel implements NListener{
 	}
 	
 	private void set() {
-		serv.setForeground(Color.GRAY);
-		cnc.setForeground(Color.GRAY);
-		cpp.setForeground(Color.GRAY);
-		fst.setForeground(Color.GRAY);
-		
 		setJVM_labels();
 		
 		l_found.setText("# logs found: " + Stats.INST.l_found);
@@ -219,6 +232,9 @@ public class StatusPanel extends JPanel implements NListener{
 	
 	private JLabel serv, cnc, cpp, fst;
 	private JPanel up_container;
+	
+	private JLabel mode_status;
+	
 	private JLabel jvm_heap, jvm_max;
 	private JLabel l_found, s_found, db_found;
 	private JLabel db_cur, db_dropped;
@@ -273,6 +289,20 @@ public class StatusPanel extends JPanel implements NListener{
 			serv.setForeground(c);
 			break;
 		case STATS:
+			
+			set();
+			
+			break;
+		case STATUS:
+			STATUS s = (STATUS) args[0];
+			MODE m = (MODE) args[1];
+			
+			mode_status.setText(
+					String.format("[M/S] %s: %s", 
+							NBConstants.mode_strings[m.index],
+							NBConstants.status_strings[s.index]));
+			
+			
 			
 			set();
 			

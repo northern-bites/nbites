@@ -46,18 +46,9 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 	}
 	
 	public Display() {
-		super("nbtool");
-		setTitle("nbtool");
+		super("nbtool v." + NBConstants.VERSION);
 		setMinimumSize(MIN_SIZE);
 		setBounds(P.getBounds());
-		
-		/*
-		setLayout(null);
-		addComponentListener(new ComponentAdapter() {
-			public void componentResized(ComponentEvent e) {
-				useSize(e.getComponent().getSize());
-			}
-		}); */
 		
 		Runnable r = new Runnable() {
 			public void run() {
@@ -73,7 +64,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		
 		cntrlp = new ControlPanel();
 		lc = new LogChooser();
-		left.addTab("status", cntrlp);
+		left.addTab("control", cntrlp);
 		left.addTab("logs", lc);
 		
 		statusp = new StatusPanel();
@@ -83,7 +74,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		right.addTab("c++", cp);
 		
 		up = new UtilPane();
-		right.addTab("prefs/utils", up);
+		right.addTab("utility", up);
 		
 		split1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, left, ldp);
 		split2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, split1, right);
@@ -106,18 +97,6 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 	
 	public void saveBounds() {
 		P.putBounds(this.getBounds());
-	}
-	
-	public void useSize(Dimension size) {
-		/*
-		Insets is = new Insets(5,5,25,5);
-	
-		int height = size.height - is.top - is.bottom;
-		int width = size.width - is.left - is.right;
-		
-		int x_offset = is.left;
-		
-		split2.setBounds(is.left, is.top, width, height); */
 	}
 	
 	public boolean postProcessKeyEvent(KeyEvent e) {
