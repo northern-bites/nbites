@@ -42,8 +42,10 @@ namespace nblog {
         int flags = fcntl(connfd, F_GETFL, 0);
         fcntl(connfd, F_SETFL, flags | O_NONBLOCK);
         
+#ifdef __APPLE__
         int set = 1;
         setsockopt(connfd, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
+#endif
         
         return connfd;
     }
