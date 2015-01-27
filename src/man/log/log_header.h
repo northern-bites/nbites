@@ -76,6 +76,17 @@ namespace nblog {
 #define LOGDEBUG(lev, ...) 
 #endif
     
+/*
+ htonll(x) is not defined on most ubuntu systems, so give a replacement.
+ */
+    
+#ifndef __APPLE__
+#ifdef  htonll
+#error "HTONLL DEFINED ON NON APPLE SYSTEM, COMPILE IMPOSSIBLE"
+#endif
+#define htonll(x) htobe64(x)
+#endif
+    
     /*
      Data is given to the logging system via the thread-safe NBlog function.
      
