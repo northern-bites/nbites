@@ -12,6 +12,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.prefs.BackingStoreException;
@@ -31,6 +32,9 @@ public class P {
 	 * 	control primary values (up to 5)
 	 * 	control secondary values (up to 5)
 	 * 
+	 * control pathes (up to 5)
+	 * control addresses (up to 5)
+	 * 
 	 * 	max log data storage
 	 * */
 		
@@ -41,10 +45,12 @@ public class P {
 	private static final String wName = "NBClient_W_w";
 	private static final String hName = "NBClient_W_h";
 	
-	private static final String primName = "NBClient_prim";
-	private static final String secoName = "NBClient_seco";
-	
 	private static final String heapName = "NBClient_heap";
+	
+	private static final String lastModeName = "NBClient_mode";
+	
+	private static final String pathsName = "NBClient_paths";
+	private static final String addrsName = "NBClient_addrs";
 	
 	public static long getHeap() {
 		return p.getLong(heapName, NBConstants.DEFAULT_MAX_MEMORY_USAGE);
@@ -52,6 +58,76 @@ public class P {
 	
 	public static void putHeap(long nval) {
 		p.putLong(heapName, nval);
+	}
+	
+	public static int getLastMode() {
+		return p.getInt(lastModeName, 0);
+	}
+	
+	public static void putLastMode(int i) {
+		if (i >= NBConstants.MODE.values().length)
+			throw new IllegalArgumentException("mode index " + i + " is larger than possible mode indices.");
+		p.putInt(lastModeName, i);
+	}
+	
+	private static LinkedList<String> getOrderedSet(String name) {
+		LinkedList<String> set = new LinkedList<String>();
+		
+		for (int i = 0; i < 5; ++i) {
+			String opt = p.get(name + i, null);
+			if (opt == null) break;
+			if (set.contains(opt)) continue;
+			set.add(opt);
+		}
+		
+		return set;
+	}
+	
+	private static String[] putOrderedSet(String name, String newv) {
+		LinkedList<String> set = getOrderedSet(name);
+		if (set.contains(newv)) {
+			set.remove(newv);
+			set.addFirst(newv);
+		} else {
+			set.addFirst(newv);
+		}
+		
+		int bound = Math.min(5, set.size());
+		for (int i = 0; i < bound; ++i) {
+			p.put(name + i, set.get(i));
+		}
+		
+		return set.toArray(new String[0]);
+	}
+	
+	private static void clearOrderedSet(String name) {
+		String[] keys = new String[0];
+		try {
+			keys = p.keys();
+		} catch (BackingStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		for (String k : keys) {
+			if (k.startsWith(name))
+				p.remove(k);
+		}
+	}
+	
+	public static String[] getPaths() {
+		return getOrderedSet(pathsName).toArray(new String[0]);
+	}
+	
+	public static String[] putPaths(String pth) {
+		return putOrderedSet(pathsName, pth);
+	}
+	
+	public static String[] getAddrs() {
+		return getOrderedSet(addrsName).toArray(new String[0]);
+	}
+	
+	public static String[] putAddrs(String a) {
+		return putOrderedSet(addrsName, a);
 	}
 	
 	public static Rectangle getBounds() {
@@ -70,74 +146,12 @@ public class P {
 		p.putInt(hName, r.height);
 	}
 	
-	private static HashSet<String> getSet(String name) {
-		HashSet<String> set = new HashSet<String>();
-		for (int i = 0;; ++i) {
-			String opt = p.get(name + i, null);
-			if (opt == null) break;
-			else set.add(opt);
-		}
-		
-		return set;
-	}
-	
-	private static String[] getArray(String name) {
-		return getSet(name).toArray(new String[0]);
-	}
-	
-	private static String[] putTo(String v, String name) {
-		HashSet<String> set = getSet(name);
-		set.add(v);
-		
-		String[] a = (String[]) set.toArray();
-		for (int i = 0; i < a.length; ++i) {
-			p.put(name + i, a[i]);
-		}
-		
-		return a;
-	}
-	
-	public static String[] getPrimaries() {
-		return getArray(primName);
-	}
-	
-	public static String[] putPrimary(String newv) {
-		return putTo(newv, primName);
-	}
-	
-	public static String[] getSecondaries() {
-		return getArray(secoName);
-	}
-	
-	public static String[] putSecondary(String newv) {
-		return putTo(newv, secoName);
-	}
-	
-	public static void clearSet(String name) {
-		try {
-			ArrayList<String> toRemove = new ArrayList<String>();
-			for (String k : p.keys()) {
-				if (k.startsWith(name))
-					toRemove.add(k);
-			}
-			
-			for (String k : toRemove) {
-				p.remove(k);
-			}
-			
-		} catch (BackingStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
 	//Doesn't change window size atm.
 	public static void resetNonFilePreferences() {
 		putHeap(NBConstants.DEFAULT_MAX_MEMORY_USAGE);
-		clearSet(primName);
-		clearSet(secoName);
+		clearOrderedSet(pathsName);
+		clearOrderedSet(addrsName);
 	}
-	
 	
 	/*****
 	 * .nbtool-views

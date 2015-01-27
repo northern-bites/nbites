@@ -2,6 +2,7 @@ package nbtool.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ComponentAdapter;
@@ -17,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.text.DefaultCaret;
 
 import nbtool.data.BotStats;
 import nbtool.data.Log;
@@ -45,9 +47,9 @@ public class StatusPanel extends JPanel implements NListener{
 		canvas = new JPanel();
 		canvas.setLayout(null);
 		
-		Font msf = new Font("monospace", Font.PLAIN, 14);
-		Font sf = new Font("monospace", Font.PLAIN, 12);
-		Font bsf = msf.deriveFont(Font.BOLD, 18);
+		Font msf = new Font("monospaced", Font.PLAIN, 14);
+		Font sf = new Font("monospaced", Font.PLAIN, 12);
+		Font bsf = msf.deriveFont(Font.BOLD, 15);
 		
 		serv = new JLabel("[serv]");
 		serv.setFont(bsf);
@@ -112,6 +114,10 @@ public class StatusPanel extends JPanel implements NListener{
 		botStatA.setFont(sf);
 		botStatA.setEditable(false);
 		botStatA.setText("<no STATS logs found>");
+		
+		DefaultCaret caret = (DefaultCaret)botStatA.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+		
 		canvas.add(botStatA);
 		
 		canvas.add(up_container);
@@ -124,6 +130,8 @@ public class StatusPanel extends JPanel implements NListener{
 		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		sp.setViewportView(canvas);
+		
+		canvas.setAutoscrolls(false);
 		
 		add(sp);
 		
@@ -222,7 +230,10 @@ public class StatusPanel extends JPanel implements NListener{
 	
 	public static JPanel lineAxisContainer() {
 		JPanel ret = new JPanel();
-		ret.setLayout(new GridLayout(1, 0));
+		//ret.setLayout(new GridLayout(1, 0));
+		
+		FlowLayout fl = new FlowLayout(FlowLayout.LEFT);
+		ret.setLayout(fl);
 		
 		return ret;
 	}
@@ -302,8 +313,6 @@ public class StatusPanel extends JPanel implements NListener{
 							NBConstants.mode_strings[m.index],
 							NBConstants.status_strings[s.index]));
 			
-			
-			
 			set();
 			
 			break;
@@ -311,5 +320,7 @@ public class StatusPanel extends JPanel implements NListener{
 			break;
 		 
 		}
+		
+		useSize(this.getSize());
 	}
 }

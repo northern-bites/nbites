@@ -7,6 +7,7 @@
 #include "Camera.h"
 
 #include "log/log_header.h"
+#include "log/log_sf.h"
 
 #ifndef OFFLINE
 SET_POOL_SIZE(messages::WorldModel,  24);
@@ -201,76 +202,76 @@ namespace man {
          SPECIFIC MODULE LOGGING
          */
 //#ifdef LOG_SENSORS
-        sensorsThread.log<messages::JointAngles>(&(nblog::log_flags->SENSORS), &sensors.jointsOutput_,
-                                                 "JointAngles from=jointsOutput");
-        sensorsThread.log<messages::JointAngles>(&(nblog::log_flags->SENSORS), &sensors.temperatureOutput_,
-                                                 "JointAngles from=temperatureOutput");
-        sensorsThread.log<messages::ButtonState>(&(nblog::log_flags->SENSORS), &sensors.chestboardButtonOutput_,
-                                                 "ButtonState from=chestboardButtonOutput");
-        sensorsThread.log<messages::FootBumperState>(&(nblog::log_flags->SENSORS), &sensors.footbumperOutput_,
-                                                     "FootBumperState from=footbumperOutput");
-        sensorsThread.log<messages::InertialState>(&(nblog::log_flags->SENSORS), &sensors.inertialsOutput_,
-                                                   "InertialState from=inertialsOutput");
-        sensorsThread.log<messages::SonarState>(&(nblog::log_flags->SENSORS), &sensors.sonarsOutput_,
-                                                "SonarState from=sonarsOutput");
-        sensorsThread.log<messages::FSR>(&(nblog::log_flags->SENSORS), &sensors.fsrOutput_,
-                                         "FSR from=fsrOutput");
-        sensorsThread.log<messages::BatteryState>(&(nblog::log_flags->SENSORS), &sensors.batteryOutput_,
-                                                  "BatteryState from=batteryOutput");
+        sensorsThread.log<messages::JointAngles>((nbsf::SENSORS), &sensors.jointsOutput_,
+                                                 "proto-JointAngles from=jointsOutput");
+        sensorsThread.log<messages::JointAngles>((nbsf::SENSORS), &sensors.temperatureOutput_,
+                                                 "proto-JointAngles from=temperatureOutput");
+        sensorsThread.log<messages::ButtonState>((nbsf::SENSORS), &sensors.chestboardButtonOutput_,
+                                                 "proto-ButtonState from=chestboardButtonOutput");
+        sensorsThread.log<messages::FootBumperState>((nbsf::SENSORS), &sensors.footbumperOutput_,
+                                                     "proto-FootBumperState from=footbumperOutput");
+        sensorsThread.log<messages::InertialState>((nbsf::SENSORS), &sensors.inertialsOutput_,
+                                                   "proto-InertialState from=inertialsOutput");
+        sensorsThread.log<messages::SonarState>((nbsf::SENSORS), &sensors.sonarsOutput_,
+                                                "proto-SonarState from=sonarsOutput");
+        sensorsThread.log<messages::FSR>((nbsf::SENSORS), &sensors.fsrOutput_,
+                                         "proto-FSR from=fsrOutput");
+        sensorsThread.log<messages::BatteryState>((nbsf::SENSORS), &sensors.batteryOutput_,
+                                                  "proto-BatteryState from=batteryOutput");
 //#endif
         
 //#ifdef LOG_GUARDIAN
-        guardianThread.log<messages::StiffnessControl>(&(nblog::log_flags->GUARDIAN), &guardian.stiffnessControlOutput,
-                                                       "StiffnessControl from=stiffnessControlOutput");
-        guardianThread.log<messages::FeetOnGround>(&(nblog::log_flags->GUARDIAN), &guardian.feetOnGroundOutput,
-                                                   "FeetOnGround from=feetOnGroundOutput");
-        guardianThread.log<messages::FallStatus>(&(nblog::log_flags->GUARDIAN), &guardian.fallStatusOutput,
-                                                 "FallStatus from=fallStatusOutput");
-        guardianThread.log<messages::AudioCommand>(&(nblog::log_flags->GUARDIAN), &guardian.audioOutput,
-                                                   "AudioCommand from=audioOutput");
+        guardianThread.log<messages::StiffnessControl>((nbsf::GUARDIAN), &guardian.stiffnessControlOutput,
+                                                       "proto-StiffnessControl from=stiffnessControlOutput");
+        guardianThread.log<messages::FeetOnGround>((nbsf::GUARDIAN), &guardian.feetOnGroundOutput,
+                                                   "proto-FeetOnGround from=feetOnGroundOutput");
+        guardianThread.log<messages::FallStatus>((nbsf::GUARDIAN), &guardian.fallStatusOutput,
+                                                 "proto-FallStatus from=fallStatusOutput");
+        guardianThread.log<messages::AudioCommand>((nbsf::GUARDIAN), &guardian.audioOutput,
+                                                   "proto-AudioCommand from=audioOutput");
 //#endif
         
 //#ifdef LOG_LOCATION
-        cognitionThread.log<messages::RobotLocation>(&(nblog::log_flags->LOCATION), &localization.output, "RobotLocation from=cognition");
+        cognitionThread.log<messages::RobotLocation>((nbsf::LOCATION), &localization.output, "proto-RobotLocation from=cognition");
 //#endif
         
 //#ifdef LOG_ODOMETRY
-        cognitionThread.log<messages::RobotLocation>(&(nblog::log_flags->ODOMETRY), &motion.odometryOutput_, "RobotLocation from=odometryOutput");
+        cognitionThread.log<messages::RobotLocation>((nbsf::ODOMETRY), &motion.odometryOutput_, "proto-RobotLocation from=odometryOutput");
 //#endif
         
 //#ifdef LOG_OBSERVATIONS
-        cognitionThread.log<messages::VisionField>(&(nblog::log_flags->OBSERVATIONS), &vision.vision_field, "VisionField from=observations");
+        cognitionThread.log<messages::VisionField>((nbsf::OBSERVATIONS), &vision.vision_field, "proto-VisionField from=observations");
 //#endif
         
 //#ifdef LOG_LOCALIZATION
-        cognitionThread.log<messages::ParticleSwarm>(&(nblog::log_flags->LOCALIZATION), &localization.particleOutput, "ParticleSwarm from=localization");
+        cognitionThread.log<messages::ParticleSwarm>((nbsf::LOCALIZATION), &localization.particleOutput, "proto-ParticleSwarm from=localization");
 //#endif
         
 //#ifdef LOG_BALLTRACK
-        cognitionThread.log<messages::FilteredBall>(&(nblog::log_flags->BALLTRACK), &ballTrack.ballLocationOutput, "FilteredBall from=ballLocationOutput");
-        cognitionThread.log<messages::VisionBall>(&(nblog::log_flags->BALLTRACK), &vision.vision_ball, "VisionBall from=vision_ball");
+        cognitionThread.log<messages::FilteredBall>((nbsf::BALLTRACK), &ballTrack.ballLocationOutput, "proto-FilteredBall from=ballLocationOutput");
+        cognitionThread.log<messages::VisionBall>((nbsf::BALLTRACK), &vision.vision_ball, "proto-VisionBall from=vision_ball");
 //#endif
         
 //#ifdef LOG_IMAGES
-        cognitionThread.log<messages::YUVImage>(&(nblog::log_flags->IMAGES), &topTranscriber.imageOut,
+        cognitionThread.log<messages::YUVImage>((nbsf::IMAGES), &topTranscriber.imageOut,
                                                 "YUVImage from=top");
-        cognitionThread.log<messages::YUVImage>(&(nblog::log_flags->IMAGES), &bottomTranscriber.imageOut,
+        cognitionThread.log<messages::YUVImage>((nbsf::IMAGES), &bottomTranscriber.imageOut,
                                                 "YUVImage from=bot");
 //#endif
         
 //#ifdef LOG_VISION
-        cognitionThread.log<messages::VisionField>(&(nblog::log_flags->VISION), &vision.vision_field,
-                                                   "VisionField from=vision");
-        cognitionThread.log<messages::VisionBall>(&(nblog::log_flags->VISION), &vision.vision_ball,
-                                                  "VisionBall from=vision");
-        cognitionThread.log<messages::VisionRobot>(&(nblog::log_flags->VISION), &vision.vision_robot,
-                                                   "VisionRobot from=vision");
-        cognitionThread.log<messages::VisionObstacle>(&(nblog::log_flags->VISION), &vision.vision_obstacle,
-                                                      "VisionObstacle from=vision");
-        cognitionThread.log<messages::JointAngles>(&(nblog::log_flags->VISION), &vision.joint_angles_out,
-                                                   "JointAngles from=vision");
-        cognitionThread.log<messages::InertialState>(&(nblog::log_flags->VISION), &vision.inertial_state_out,
-                                                     "InertialState from=vision");
+        cognitionThread.log<messages::VisionField>((nbsf::VISION), &vision.vision_field,
+                                                   "proto-VisionField from=vision");
+        cognitionThread.log<messages::VisionBall>((nbsf::VISION), &vision.vision_ball,
+                                                  "proto-VisionBall from=vision");
+        cognitionThread.log<messages::VisionRobot>((nbsf::VISION), &vision.vision_robot,
+                                                   "proto-VisionRobot from=vision");
+        cognitionThread.log<messages::VisionObstacle>((nbsf::VISION), &vision.vision_obstacle,
+                                                      "proto-VisionObstacle from=vision");
+        cognitionThread.log<messages::JointAngles>((nbsf::VISION), &vision.joint_angles_out,
+                                                   "proto-JointAngles from=vision");
+        cognitionThread.log<messages::InertialState>((nbsf::VISION), &vision.inertial_state_out,
+                                                     "proto-InertialState from=vision");
 //#endif
         
         

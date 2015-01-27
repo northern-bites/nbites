@@ -81,7 +81,7 @@ namespace nblog {
         //Accepting connections on this socket, backqueue of size 1.
         listen(listenfd, 1);
         
-        LOGDEBUG(2, "log_serverio listening...\n");
+        LOGDEBUG(2, "log_serverio listening...port=%i\n", LOG_PORT);
         nbsf::flags[nbsf::serv_connected] = false;
         
         for (;;) {

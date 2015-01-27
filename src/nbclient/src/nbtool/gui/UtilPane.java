@@ -180,6 +180,7 @@ public class UtilPane extends JPanel{
 					e1.printStackTrace();
 				}
 			} else if (e.getSource() == resetPrefB){
+				U.w("Prefs: reseting preferences.");
 				P.resetNonFilePreferences();
 			} 
 			else if (e.getSource() == maxMemoryUsage){

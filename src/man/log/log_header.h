@@ -155,8 +155,8 @@ namespace nblog {
     
 #define LOG_VERSION 4
     
-#define LOG_PORT (32000)
-#define CNC_PORT (32001)
+#define LOG_PORT (30000)
+#define CNC_PORT (30001)
 
 #define USLEEP_EXPECTING (1000)
 #define IO_SEC_TO_BREAK (5.0)

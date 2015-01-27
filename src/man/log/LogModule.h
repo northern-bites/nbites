@@ -14,6 +14,7 @@
 #include <unistd.h>
 
 #include "log_header.h"
+#include "log_sf.h"
 
 namespace man {
     namespace log {
@@ -26,14 +27,12 @@ namespace man {
             LogBase(std::string name);
             virtual ~LogBase();
             
-            
         protected:
             // Note that inheriting classes still need to implement this!
             virtual void run_() = 0;
             
             //encodes type and from fields usually.  Currently the only way the client/server can tell what kind of data we've sent.
             std::string description;
-            uint8_t * module_flag;
         };
         
         //Different types store their data different ways.
@@ -67,9 +66,9 @@ namespace man {
              * @brief Takes an OutPortal and wires it to this new module so that
              *        we can log its output.
              */
-            LogModule(uint8_t * flag, portals::OutPortal<T>* out, std::string name) : LogBase(name)
+            LogModule(int fi, portals::OutPortal<T>* out, std::string name) : LogBase(name)
             {
-                module_flag = flag;
+                f_index = fi;
                 input.wireTo(out);
             }
             
@@ -79,13 +78,14 @@ namespace man {
             
             //Called at the end of every diagram run.
             virtual void run_() {
-                if (*module_flag) {
+                if (nbsf::flags[f_index]) {
                     input.latch();
                     logMessage<T>(input.message(), description);
                 }
             }
             
             portals::InPortal<T> input;
+            int f_index;
         };
         
     }

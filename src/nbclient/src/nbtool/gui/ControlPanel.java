@@ -19,6 +19,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import nbtool.data.BotStats;
 import nbtool.data.Log;
 import nbtool.data.SessionMaster;
 import nbtool.util.N;
@@ -64,11 +65,11 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 		cnc = new JLabel("CNC:");
 		cnc.setFont(cnc.getFont().deriveFont(Font.BOLD));
 		
-		faddr = new JComboBox<String>(P.getPrimaries());
+		faddr = new JComboBox<String>(P.getAddrs());
 		faddr.setToolTipText("robot address");
 		faddr.setEditable(true);
 		
-		fpath = new JComboBox<String>(P.getSecondaries());
+		fpath = new JComboBox<String>(P.getPaths());
 		fpath.setToolTipText("directory path");
 		fpath.setEditable(true);
 		
@@ -97,6 +98,10 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		sp.setViewportView(canvas);
 		
+		modes.setSelectedIndex(P.getLastMode());
+		for (FlagPanel fp : flags)
+			fp.setUnknown();
+		
 		add(sp);
 		
 		N.listen(EVENT.LOG_FOUND, this);
@@ -122,12 +127,12 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 		
 		d2 = faddr.getPreferredSize();
 		addr.setBounds(0, y, d1.width, d1.height);
-		faddr.setBounds(d1.width + 3, y, d2.width, d2.height);
+		faddr.setBounds(d1.width + 3, y, s.width - d1.width - 10, d2.height);
 		y += (d1.height > d2.height ? d1.height : d2.height) + 3;
 		
 		d2 = fpath.getPreferredSize();
 		path.setBounds(0, y, d1.width, d1.height);
-		fpath.setBounds(d1.width + 3, y, d2.width, d2.height);
+		fpath.setBounds(d1.width + 3, y, s.width - d1.width - 10, d2.height);
 		y += (d1.height > d2.height ? d1.height : d2.height) + 5;
 		
 		
@@ -186,7 +191,7 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 			int si = modes.getSelectedIndex();
 			if (si < 0) return;
 			
-			useMode(NBConstants.MODES[si]);
+			useMode(NBConstants.MODE.values()[si]);
 		} else {
 			
 		}
@@ -194,6 +199,27 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 	
 	public void notified(EVENT e, Object src, Object... args) {
 		switch (e) {
+		case REL_BOTSTAT:
+			BotStats bs= (BotStats) args[0];
+			if (connected) {
+				for (int i = 0; i < flags.length; ++i) {
+					
+				}
+			}
+			
+			break;
+		case CNC_CONNECTION:
+			Boolean c = (Boolean) args[0];
+			
+			if (c) {
+				connected = true;
+			} else {
+				connected = false;
+				for (FlagPanel fp : flags)
+					fp.setUnknown();
+			}
+			
+			break;
 		case LOG_FOUND:
 			if (bstream.isSelected()) {
 				Log l = (Log) args[0];
@@ -224,20 +250,22 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 			addr_text = "";
 		
 		int cs = modes.getSelectedIndex();
+		P.putLastMode(cs);
+		
 		if (cs < 0) 
 			return;
-		MODE m = NBConstants.MODES[cs];
+		MODE m = NBConstants.MODE.values()[cs];
 		
 		switch(m) {
 		case FILESYSTEM:
-			fpath.setModel(new DefaultComboBoxModel<String>( P.putPrimary(fs_text) ));
+			fpath.setModel(new DefaultComboBoxModel<String>( P.putPaths(fs_text) ));
 			break;
 		case NETWORK_NOSAVE:
-			faddr.setModel(new DefaultComboBoxModel<String>( P.putSecondary(addr_text) ));
+			faddr.setModel(new DefaultComboBoxModel<String>( P.putAddrs(addr_text) ));
 			break;
 		case NETWORK_SAVING:
-			fpath.setModel(new DefaultComboBoxModel<String>( P.putPrimary(fs_text) ));
-			faddr.setModel(new DefaultComboBoxModel<String>( P.putSecondary(addr_text) ));
+			fpath.setModel(new DefaultComboBoxModel<String>( P.putPaths(fs_text) ));
+			faddr.setModel(new DefaultComboBoxModel<String>( P.putAddrs(addr_text) ));
 			break;
 		case NONE:
 			U.w("ControlPanel: cannot start that mode.");
@@ -294,4 +322,10 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 		
 		}
 	}
+	
+	/*
+	 * CNC
+	 * */
+	
+	private boolean connected = false;
 }

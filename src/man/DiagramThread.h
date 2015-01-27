@@ -53,9 +53,9 @@ namespace man{
          * @param desc Fields describing the logged data.
          */
         template<class T>
-        void log(uint8_t * flag, portals::OutPortal<T>* out, std::string desc)
+        void log(int findex, portals::OutPortal<T>* out, std::string desc)
         {
-            logs.push_back(new log::LogModule<T>(flag, out, desc));
+            logs.push_back(new log::LogModule<T>(findex, out, desc));
             diagram.addModule(*logs.back());
         }
         

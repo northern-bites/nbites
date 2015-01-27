@@ -20,9 +20,11 @@ import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
 public class SortAndSearch extends JPanel implements ActionListener {
-	public SortAndSearch() {
+	public SortAndSearch(LCTreeModel lcm) {
 		super();
 		setLayout(null);
+		
+		this.lcm = lcm;
 		
 		sort_l = new JLabel("sort by:");
 		sort_l.setBorder(BorderFactory.createEmptyBorder( 3, 0, 0, 0 ));
@@ -120,4 +122,6 @@ public class SortAndSearch extends JPanel implements ActionListener {
 	public boolean searchPasses(Object o) {
 		return false;
 	}
+	
+	private LCTreeModel lcm;
 }

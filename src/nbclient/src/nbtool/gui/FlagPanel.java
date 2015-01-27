@@ -51,13 +51,17 @@ public class FlagPanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == jrb[0]) {
 			System.out.println("0 " + jrb[0].isSelected());
+			
 		} else if (e.getSource() == jrb[1]) {
 			System.out.println("1 " + jrb[1].isSelected());
+			
 		} else if (e.getSource() == jrb[2]) {
 			System.out.println("2 " + jrb[2].isSelected());
 		} else {
 			
 		}
+		
+		this.setUnknown();
 	}
 	
 	public void setUnknown() {

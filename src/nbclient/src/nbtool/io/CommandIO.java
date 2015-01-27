@@ -95,6 +95,7 @@ public class CommandIO implements Runnable{
 					U.wf("CommandIO: [%s] got ret [%d]\n", l.description, ret);
 				} else {
 					out.writeInt(0);
+					out.flush();
 					recv = in.readInt();
 					if (recv != 0)
 						throw new SequenceErrorException(0, recv);

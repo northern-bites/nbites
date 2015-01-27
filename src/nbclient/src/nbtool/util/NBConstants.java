@@ -48,10 +48,6 @@ public class NBConstants {
 		"from net to fs", "from net", "from fs", "none"
 	};
 	
-	public static final MODE[] MODES = new MODE[] {
-		MODE.NETWORK_SAVING, MODE.NETWORK_NOSAVE, MODE.FILESYSTEM, MODE.NONE
-	};
-	
 	public static enum STATUS {
 		IDLE(0),		//No io or IO threads active.  No active SessionHandler.  Ready to start.
 		STARTING(1),	//Setting up IO or threads in a SessionHandler (usually very short)
@@ -67,10 +63,6 @@ public class NBConstants {
 	
 	public static final String[] status_strings = {
 		"idle", "starting", "running", "stopping"
-	};
-	
-	public static final STATUS[] STATUSES = new STATUS[] {
-		STATUS.IDLE, STATUS.STARTING, STATUS.RUNNING, STATUS.STOPPING
 	};
 	
 	public static final ArrayList<FlagPair> flags = _setupFlags();

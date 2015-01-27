@@ -18,8 +18,11 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
 	private NetIO netioRunnable;
 	private CommandIO cncRunnable;
 	
+	private MODE workingMode;
+	
 	public SessionHandler(SessionMaster m) {
 		ms = m;
+		workingMode = null;
 		
 		fileioRunnable = null;
 		netioRunnable = null;
@@ -97,6 +100,7 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
 		N.notify(EVENT.STATUS, this, STATUS.RUNNING, m);
 		trying_to_stop = false;
 		U.w("SessionHandler.start(): settings good, starting.");
+		workingMode = m;
 		
 		switch(m) {
 		case NETWORK_SAVING:
@@ -140,7 +144,7 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
 	public void stop() {
 		assert(SwingUtilities.isEventDispatchThread());
 
-		N.notify(EVENT.STATUS, this, STATUS.STOPPING, MODE.NONE);
+		N.notify(EVENT.STATUS, this, STATUS.STOPPING, workingMode);
 		trying_to_stop = true;
 		
 		if (fileioRunnable != null)
@@ -156,7 +160,7 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
 	public synchronized void updateStopping() {
 		if (!trying_to_stop) {
 			//One of the IO threads encountered an error.  End the session.
-			N.notifyEDT(EVENT.STATUS, this, STATUS.STOPPING, MODE.NONE);
+			N.notifyEDT(EVENT.STATUS, this, STATUS.STOPPING, workingMode);
 			trying_to_stop = true;
 			
 			if (fileioRunnable != null)
@@ -170,11 +174,10 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
 		if (fileioRunnable == null && 
 				netioRunnable == null &&
 				cncRunnable == null) {
-			N.notifyEDT(EVENT.STATUS, this, STATUS.IDLE, MODE.NONE);
+			N.notifyEDT(EVENT.STATUS, this, STATUS.IDLE, workingMode);
 		}
 	}
 
-	
 	private SessionMaster ms;
 	private void deliver(Log... logs) {
 		SwingUtilities.invokeLater(new Runnable() {

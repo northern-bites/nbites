@@ -144,6 +144,7 @@ public class NetIO implements Runnable {
 			nase.printStackTrace();
 			U.w("NetIO got negative incoming data size!");
 		}
+		
 		catch(SequenceErrorException see) {
 			U.w("NetIO thread got out of sequence, exiting!" +
 					"\n\texpected:" + see.expected + " was:" + see.was);

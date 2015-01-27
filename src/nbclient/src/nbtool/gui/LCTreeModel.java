@@ -234,4 +234,8 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 
 		public void exportDone(JComponent c, Transferable t, int action) {}
 	}
+	
+	protected void SSchanged(SortAndSearch ss) {
+		
+	}
 }

@@ -41,7 +41,7 @@ public class LogChooser extends JPanel {
 		tree.setTransferHandler(model.EXPORT_HANDLER);
 		tree.setDragEnabled(true);
 		
-		sas = new SortAndSearch();
+		sas = new SortAndSearch(model);
 		
 		sp = new JScrollPane(tree);
 		sp.setViewportView(tree);

@@ -146,7 +146,7 @@ namespace nblog {
         //Accepting connections on this socket, backqueue of size 1.
         listen(listenfd, 1);
         
-        LOGDEBUG(2, "log_cnc listening...\n");
+        LOGDEBUG(2, "log_cnc listening... port = %i\n", CNC_PORT);
         
         for (;;) {
             connfd = block_accept(listenfd);

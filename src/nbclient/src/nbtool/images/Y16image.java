@@ -18,5 +18,4 @@ public final class Y16image extends ImageParent {
 		// TODO Auto-generated method stub
 		return "[Y16]";
 	}
-
 }

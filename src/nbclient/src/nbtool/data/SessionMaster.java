@@ -11,6 +11,7 @@ import nbtool.util.N.NListener;
 import nbtool.util.NBConstants.MODE;
 import nbtool.util.NBConstants.STATUS;
 import nbtool.util.P;
+import nbtool.util.U;
 
 public class SessionMaster implements NListener {
 	public static final SessionMaster INST = new SessionMaster();
@@ -34,6 +35,7 @@ public class SessionMaster implements NListener {
 	}
 	
 	public void startSession(MODE m, String fp, String addr) {
+		U.wf("SessionMaster.startSession(m=%s, fp=%s, addr=%s)\n", m.toString(), fp, addr);
 		if (handler != null)
 			return;
 		
@@ -43,10 +45,14 @@ public class SessionMaster implements NListener {
 			Session news = new Session(sessions.size(), m, fp, addr);
 			sessions.add(news);
 			workingSession = news;
+		} else {
+			U.w("SessionMaster.startSession(failed)");
+			handler = null;
 		}
 	}
 	
 	public void stopSession() {
+		U.w("SessionMaster.stopSession()");
 		if (handler != null)
 			handler.stop();
 	}
@@ -111,5 +117,7 @@ public class SessionMaster implements NListener {
 				e1.printStackTrace();
 			}
 		}
+		
+		N.notifyEDT(EVENT.LOG_FOUND, this, (Object[]) logs);
 	}
 }
