@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BIN=$NBITES_DIR/build/nbclient
+BIN=$NBITES_DIR/build/nbtool
 
 rm -rf $BIN
 mkdir $BIN
@@ -8,5 +8,5 @@ mkdir $BIN
 find ./src -name *.java > _tempFiles
 javac -d $BIN @_tempFiles
 
-cp ./src/nbclient/util/*.properties $BIN/nbclient/util
+cp ./src/nbtool/util/*.properties $BIN/nbtool/util
 rm _tempFiles
