@@ -97,7 +97,7 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
 			}
 		}
 		
-		N.notify(EVENT.STATUS, this, STATUS.RUNNING, m);
+		N.notifyEDT(EVENT.STATUS, this, STATUS.RUNNING, m);
 		trying_to_stop = false;
 		U.w("SessionHandler.start(): settings good, starting.");
 		workingMode = m;
@@ -144,7 +144,7 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
 	public void stop() {
 		assert(SwingUtilities.isEventDispatchThread());
 
-		N.notify(EVENT.STATUS, this, STATUS.STOPPING, workingMode);
+		N.notifyEDT(EVENT.STATUS, this, STATUS.STOPPING, workingMode);
 		trying_to_stop = true;
 		
 		if (fileioRunnable != null)

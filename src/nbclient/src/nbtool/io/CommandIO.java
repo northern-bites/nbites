@@ -88,6 +88,11 @@ public class CommandIO implements Runnable{
 				if (l != null) {
 					U.w("CommandIO: sending command: " + l.description);
 					out.writeInt(1);
+					out.flush();
+					
+					recv = in.readInt();
+					if (recv != 0)
+						throw new SequenceErrorException(0, recv);
 					
 					CommonIO.writeLog(out, l);
 					
@@ -179,7 +184,7 @@ public class CommandIO implements Runnable{
 	
 	public static boolean tryAddSetFlag(int findex, boolean fval) {
 		byte[] bytes = new byte[2];
-		bytes[0] = (byte) (findex & 0xFF);
+		bytes[0] = (byte) findex;
 		bytes[1] = (byte) (fval ? 1 : 0);
 		
 		Log cmnd = new Log("cmnd=setFlag", bytes);

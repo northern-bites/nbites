@@ -22,6 +22,7 @@ import javax.swing.SwingConstants;
 import nbtool.data.BotStats;
 import nbtool.data.Log;
 import nbtool.data.SessionMaster;
+import nbtool.io.CommandIO;
 import nbtool.util.N;
 import nbtool.util.N.NListener;
 import nbtool.util.NBConstants;
@@ -52,6 +53,7 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 		
 		test = new JButton("test");
 		test.addActionListener(this);
+		test.setEnabled(false);
 		canvas.add(test);
 		
 		modes = new JComboBox<String>(NBConstants.mode_strings);
@@ -108,6 +110,9 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 		N.listen(EVENT.LOG_SELECTION, this);
 		N.listen(EVENT.SES_SELECTION, this);
 		N.listen(EVENT.STATUS, this);
+		
+		N.listen(EVENT.CNC_CONNECTION, this);
+		N.listen(EVENT.REL_BOTSTAT, this);
 	}
 	
 	private void useSize(Dimension s) {
@@ -186,7 +191,8 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 			}
 			
 		} else if (e.getSource() == test) {
-			
+			boolean success = CommandIO.tryAddTest();
+			U.w("ControlPanel: CommandIO.tryAddTest() returned " + success);
 		} else if (e.getSource() == modes) {
 			int si = modes.getSelectedIndex();
 			if (si < 0) return;
@@ -203,7 +209,9 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 			BotStats bs= (BotStats) args[0];
 			if (connected) {
 				for (int i = 0; i < flags.length; ++i) {
+					boolean val = bs.flags.bFlags[i + 2]; //2 for connection flags
 					
+					flags[i].setKnown(val);
 				}
 			}
 			
@@ -213,10 +221,14 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 			
 			if (c) {
 				connected = true;
+				test.setEnabled(true);
 			} else {
+				
 				connected = false;
 				for (FlagPanel fp : flags)
 					fp.setUnknown();
+				
+				test.setEnabled(false);
 			}
 			
 			break;

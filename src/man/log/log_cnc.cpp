@@ -54,8 +54,15 @@ namespace nblog {
     //flag index
     //new flag value
     uint32_t cnc_setFlag(std::string s, size_t u, uint8_t * p) {
-        if (u != 2) return 1; //need (index, value)
-        if (p[0] >= nbsf::num_flags) return 1;
+        printf("cnc_setFlag() len=%lu\n", u);
+        if (u != 2) { //need (index, value)
+            printf("cnc_setFlag() wrong number of bytes.\n");
+            return 1;
+        }
+        if (p[0] >= nbsf::num_flags) {
+            printf("cnc_setFlag() flag index OOB: %i\n", p[0]);
+            return 1;
+        }
         
         switch (p[0]) {
             case nbsf::serv_connected:
@@ -171,11 +178,21 @@ namespace nblog {
                     CHECK_RET(recv_exactly(connfd, 4, (uint8_t *) &resp, IO_SEC_TO_BREAK))
                     size_t data_len = ntohl(resp);
                     uint8_t dbuf[data_len];
+                    uint8_t * dptr;
                     
-                    uint8_t * dptr = (data_len) ? dbuf : NULL;
+                    if (data_len) {
+                        CHECK_RET(recv_exactly(connfd, data_len, (uint8_t *) dbuf, IO_SEC_TO_BREAK))
+                        dptr = dbuf;
+                    } else {
+                        dptr = NULL;
+                    }
                     
                     //Parse description
                     std::string desc(cbuf, desc_len);
+                    size_t nullstart = desc.find('\0');
+                    if (nullstart != desc.npos)
+                        desc = desc.substr(0, nullstart);
+                    
                     std::vector<std::string> kvps = split(desc, ' ');
                     if (kvps.size() == 0) {
                         LOGDEBUG(1, "log_cnc got bad desc string: %s\n", desc.data());
@@ -198,14 +215,23 @@ namespace nblog {
                         goto connection_died;
                     }
                     
-                    uint32_t ret = htonl(fmap[cmnd[1]](desc, data_len, dptr));
+                    LOGDEBUG(1, "log_cnc called [desc = %s, dlen = %lu]\n", cbuf, data_len);
                     
-                    CHECK_RET(send_exactly(connfd, 4, &ret))
+                    if (fmap.find(cmnd[1]) == fmap.end()) {
+                        LOGDEBUG(1, "log_cnc could not find command[%s] in fmap!\n", cmnd[1].c_str());
+                        goto connection_died;
+                    }
                     
-                    LOGDEBUG(1, "log_cnc called %s with data_len:%lu\n", cmnd[1].data(), data_len);
+                    uint32_t ret = fmap[cmnd[1]](desc, data_len, dptr);
+                    LOGDEBUG(1, "log_cnc command returned %i\n", ret);
+                    
+                    uint32_t nret = htonl(ret);
+                    CHECK_RET(send_exactly(connfd, 4, &nret))
+                    
+                    LOGDEBUG(1, "log_cnc call finished.\n\n");
                 } else {
                     if (resp != 0) {
-                        LOGDEBUG(1, "log_cnc got bad ping reply! %x\n", resp);
+                        LOGDEBUG(1, "log_cnc got bad ping reply! %i\n", resp);
                         goto connection_died;
                     }
                     

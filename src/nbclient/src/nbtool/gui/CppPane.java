@@ -252,7 +252,7 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 			
 			int index = ((JList) e.getSource()).getSelectedIndex();
 			Log l = der_data.get(index);
-			N.notify(EVENT.LOG_SELECTION, this, l);
+			N.notifyEDT(EVENT.LOG_SELECTION, this, l);
 		}
 	}
 	

@@ -46,7 +46,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 	}
 	
 	public Display() {
-		super("nbtool v." + NBConstants.VERSION);
+		super("nbtool v" + NBConstants.VERSION);
 		setMinimumSize(MIN_SIZE);
 		setBounds(P.getBounds());
 		
@@ -89,7 +89,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventPostProcessor(this);
 		
-		N.notify(EVENT.STATUS, this, NBConstants.STATUS.IDLE, NBConstants.MODE.NONE);
+		N.notifyEDT(EVENT.STATUS, this, NBConstants.STATUS.IDLE, NBConstants.MODE.NONE);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);

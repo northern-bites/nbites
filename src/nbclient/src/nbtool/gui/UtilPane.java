@@ -196,7 +196,7 @@ public class UtilPane extends JPanel{
 				
 				if (nv > 1024) { //reasonable minimum value
 					P.putHeap(nv);
-					N.notify(EVENT.MAX_MEM_USAGE_CHANGED, this, nv);
+					N.notifyEDT(EVENT.MAX_MEM_USAGE_CHANGED, this, nv);
 				} else {
 					maxMemoryUsage.setText("" + SessionMaster.INST.max_data_bytes);
 					U.w("Could not use new max memory value.");

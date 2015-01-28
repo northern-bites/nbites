@@ -94,30 +94,35 @@ public class SessionMaster implements NListener {
 		return (handler == null);
 	}
 	
-	protected void deliver(Log ... logs) {
+	protected void deliver(final Log ... logs) {
 		assert(workingSession != null);
-		
+		assert(SwingUtilities.isEventDispatchThread());
+
+		Session destination = workingSession;
+
+
+
 		Log lbs = null;
-		
+
 		for (Log l : logs) {
-			workingSession.addLog(l);
-			
+			destination.addLog(l);
+
 			if (l.type().equals("stats"))
 				lbs = l;
 		}
-		
+
 		if (lbs != null) {
 			try {
 				BotStats bs = new BotStats(lbs);
-				
-				workingSession.most_relevant = bs;
-				
-				N.notify(EVENT.REL_BOTSTAT, this, bs);
+
+				destination.most_relevant = bs;
+
+				N.notifyEDT(EVENT.REL_BOTSTAT, this, bs);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
 		}
-		
+
 		N.notifyEDT(EVENT.LOG_FOUND, this, (Object[]) logs);
 	}
 }

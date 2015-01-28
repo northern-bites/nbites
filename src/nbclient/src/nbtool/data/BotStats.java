@@ -73,27 +73,9 @@ public class BotStats {
 		cores = is.readInt();
 		
 		//FLAGS
-		flags = new Flags();
+		flags = new Flags(is);
 		
 		//set flags
-		flags.serv_connected = (is.readByte() != 0);
-		flags.cnc_connected = (is.readByte() != 0);
-		
-		flags.fileio = (is.readByte() != 0);
-		flags.servio = (is.readByte() != 0);
-		
-		flags.STATS = (is.readByte() != 0);
-		
-		flags.SENSORS = (is.readByte() != 0);
-		flags.GUARDIAN = (is.readByte() != 0);
-		flags.COMM = (is.readByte() != 0);
-		flags.LOCATION = (is.readByte() != 0);
-		flags.ODOMETRY = (is.readByte() != 0);
-		flags.OBSERVATIONS = (is.readByte() != 0);
-		flags.LOCALIZATION = (is.readByte() != 0);
-		flags.BALLTRACK = (is.readByte() != 0);
-		flags.IMAGES = (is.readByte() != 0);
-		flags.VISION = (is.readByte() != 0);
 		
 		assert(is.available() == 0);
 		is.close();
@@ -162,39 +144,40 @@ public class BotStats {
 		}
 	}
 
-	private class Flags {
-		boolean serv_connected;
-        boolean cnc_connected;
-        
-        //log to
-        boolean fileio;
-        boolean servio;
-        
-        //what to log
-        boolean STATS;
-        
-        //SPECIFIC modules
-        boolean SENSORS;
-        boolean GUARDIAN;
-        boolean COMM;
-        boolean LOCATION;
-        boolean ODOMETRY;
-        boolean OBSERVATIONS;
-        boolean LOCALIZATION;
-        boolean BALLTRACK;
-        boolean IMAGES;
-        boolean VISION;
+	public class Flags {
         
         public String toString() {
-        	return String.format("\n\tFlags:\n%-20s %B\n%-20s %B\n%-20s %B\n%-20s %B\n%-20s %B\n" +
-        			"%-20s %B\n%-20s %B\n%-20s %B\n%-20s %B\n%-20s %B\n%-20s %B\n%-20s %B\n"
-        			+ "%-20s %B\n%-20s %B\n", "serv_connected", serv_connected,
-        			"cnc_connected", cnc_connected, "fileio", fileio, "servio", servio, "STATS", STATS,
-        			"GUARDIAN", GUARDIAN, "COMM", COMM, "LOCATION", LOCATION, "ODOMETRY", ODOMETRY,
-        			"OBSERVATIONS", OBSERVATIONS, "LOCALIZATION", LOCALIZATION, "BALLTRACK", BALLTRACK,
-        			"IMAGES", IMAGES, "VISION", VISION);
+        	String[] parts = new String[flag_names.length];
+        	
+        	for (int i = 0; i < parts.length; ++i) {
+        		parts[i] = String.format("%-20s %B\n", flag_names[i], bFlags[i]);
+        	}
+        	
+        	String start = "\n\tFlags:\n";
+        	int len = start.length();
+    		for (String s : parts) len += s.length();
+    		StringBuilder buf = new StringBuilder(len);
+    		
+    		buf.append(start);
+    		for (String s : parts) buf.append(s);
+    		return buf.toString();
+        }
+        
+        public boolean[] bFlags;
+        
+        public Flags(DataInputStream dis) throws IOException {
+        	bFlags = new boolean[flag_names.length];
+        	for (int i = 0; i < bFlags.length; ++i) {
+        		bFlags[i] = (dis.readByte() != 0);
+        	}
         }
 	}
+	
+	public static final String[] flag_names = {"serv_connected",
+		"cnc_connected", "fileio", "servio", "STATS", "SENSORS",
+		"GUARDIAN", "COMM", "LOCATION", "ODOMETRY",
+		"OBSERVATIONS", "LOCALIZATION", "BALLTRACK",
+		"IMAGES", "VISION"};
 	
 	public String toString() {
 		String[] parts = new String[7 + (5 * NUM_LOG_BUFFERS)];

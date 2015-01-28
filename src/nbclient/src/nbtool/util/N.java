@@ -68,7 +68,7 @@ public class N {
 		}
 	}
 	
-	public static int notify(final EVENT e, final Object src, final Object ... args) {
+	private static int notify(final EVENT e, final Object src, final Object ... args) {
 		ArrayList<NListener> list = listeners[e.index];
 		
 		synchronized (list) {

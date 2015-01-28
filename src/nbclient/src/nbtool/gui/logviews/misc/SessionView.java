@@ -14,7 +14,7 @@ public class SessionView extends JPanel {
 		
 		f1 = new JTextField("Session:: " + s.name);
 		f2 = new JTextField(String.format("showing %d logs of %d total.", 
-				s.logs_DO.size(), s.logs_TO.size()));
+				s.logs_DO.size(), s.logs_ALL.size()));
 		
 		setLayout(new GridLayout(2, 1));
 		

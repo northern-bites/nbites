@@ -12,6 +12,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import nbtool.io.CommandIO;
+import nbtool.util.U;
+
 public class FlagPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private JRadioButton jrb[] = new JRadioButton[3];
@@ -50,16 +53,18 @@ public class FlagPanel extends JPanel implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == jrb[0]) {
-			System.out.println("0 " + jrb[0].isSelected());
+			boolean success =
+					CommandIO.tryAddSetFlag(index, false);
+			U.wf("FlagPanel[%s] CommandIO.tryAddSetFlag(%i, false) returned %B\n", flag_name, index, success);
 			
 		} else if (e.getSource() == jrb[1]) {
-			System.out.println("1 " + jrb[1].isSelected());
-			
+			U.w("ERROR: FlagPanel " + flag_name + " got action from MIDDLE switch!");
 		} else if (e.getSource() == jrb[2]) {
 			System.out.println("2 " + jrb[2].isSelected());
-		} else {
-			
-		}
+			boolean success =
+					CommandIO.tryAddSetFlag(index, true);
+			U.wf("FlagPanel[%s] CommandIO.tryAddSetFlag(%d, true) returned %B\n", flag_name, index, success);
+		} else {}
 		
 		this.setUnknown();
 	}
