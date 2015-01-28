@@ -20,13 +20,9 @@ public class Stats implements NListener{
 	public long db_found, db_cur, db_dropped;
 	
 	public void notified(EVENT e, Object src, Object... args) {
-		
-		U.wf("STATS GOT NOTIFY: %s\n\t%s\n\t%s\n\t%d\n", e.toString(), src.toString(), args.toString(), args.length);
-		
+				
 		switch (e) {
 		case LOG_LOAD:{
-			U.w("DEBUG: " + args.toString());
-			System.out.flush();
 			Log[] logs = (Log[]) args;
 			for (Log l : logs) {
 				db_found += l.bytes.length;

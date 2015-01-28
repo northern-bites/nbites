@@ -72,7 +72,7 @@ public class N {
 		ArrayList<NListener> list = listeners[e.index];
 		
 		synchronized (list) {
-			U.w(">>notify: " + e.toString() + " from " + src.toString() + " " + args.toString());
+			U.w(">>notify: " + e.toString() + " from " + src.toString() + " args: " + args.toString());
 			for (NListener nl : list)
 				nl.notified(e, src, args);
 		}
