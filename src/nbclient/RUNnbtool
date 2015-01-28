@@ -1,7 +1,0 @@
-#!/bin/bash
-
-./BUILDnbtool
-
-cd $NBITES_DIR/build/nbtool
-
-java -ea nbclient.gui.Display
