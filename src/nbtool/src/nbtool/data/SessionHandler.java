@@ -179,7 +179,7 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
 	}
 
 	private SessionMaster ms;
-	private void deliver(Log... logs) {
+	private void deliver(final Log... logs) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				if (ms != null)

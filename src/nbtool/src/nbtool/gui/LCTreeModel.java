@@ -17,7 +17,6 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import nbtool.data.Session;
-import nbtool.data.SessionHandler;
 import nbtool.data.Log;
 import nbtool.data.SessionMaster;
 import nbtool.io.FileIO;
@@ -122,7 +121,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 			//LOG SELECTED.
 			
 			path_objs = path.getPath();
-			Log lg = (Log) path_objs[2];
+			final Log lg = (Log) path_objs[2];
 			b = (Session) path_objs[1];
 			
 			if (lg.bytes == null) {
@@ -130,7 +129,8 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 					assert(b.dir != null && !b.dir.isEmpty());
 					FileIO.loadLog(lg, b.dir);
 					
-					N.notifyEDT(EVENT.LOG_LOAD, this, lg);
+					assert(lg.getClass().equals(Log.class));
+					N.notifyEDT(EVENT.LOG_LOAD, this, new Log[]{lg});
 				} catch (IOException ex) {
 					ex.printStackTrace();
 					U.w("message: " + ex.getMessage());
@@ -159,6 +159,12 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 		TreeModelEvent tme = null;
 		Session cur = SessionMaster.INST.workingSession;
 		
+		//This is a hack, it needs to change.
+		int size = SessionMaster.INST.sessions.size();
+		if (cur == null && size > 0)
+			cur = SessionMaster.INST.sessions.get(
+					size - 1
+					);
 		switch(e) {
 		case LOG_FOUND:
 			

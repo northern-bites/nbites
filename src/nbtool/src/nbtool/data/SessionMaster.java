@@ -111,7 +111,7 @@ public class SessionMaster implements NListener {
 				lbs = l;
 		}
 
-		if (lbs != null) {
+		if (lbs != null && lbs.bytes != null) {
 			try {
 				BotStats bs = new BotStats(lbs);
 
