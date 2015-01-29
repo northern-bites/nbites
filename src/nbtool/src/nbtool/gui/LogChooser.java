@@ -58,7 +58,7 @@ public class LogChooser extends JPanel {
 	private void useSize(Dimension size) {
 		Dimension d = sas.getPreferredSize();
 		sas.setBounds(0,0,d.width,d.height);
-		sp.setBounds(0, d.height, size.width, size.height);
+		sp.setBounds(0, d.height, size.width, size.height - d.height);
 	}
 	
 	public Log currentlySelected() {

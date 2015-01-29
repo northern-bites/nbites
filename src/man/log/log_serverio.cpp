@@ -88,6 +88,7 @@ namespace nblog {
         
         for (;;) {
             connfd = block_accept(listenfd);
+            log_object_t * obj = NULL;
             
             LOGDEBUG(3, "log_serverio FOUND CLIENT [%i]\n", connfd);
             memcpy(nbsf::cio_start, nbsf::total, sizeof(nbsf::io_state_t) * NUM_LOG_BUFFERS);
@@ -133,7 +134,6 @@ namespace nblog {
                 }
                 
                 //we're writing.
-                log_object_t * obj;
                 uint8_t ws = false;
                 
                 for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
@@ -170,6 +170,8 @@ namespace nblog {
             close(connfd);
             LOGDEBUG(1, "log_serverio loop broken, connection closed.\n");
             nbsf::flags[nbsf::serv_connected] = false;
+            if (obj)
+                release(obj, true);
         }
         
         return NULL;

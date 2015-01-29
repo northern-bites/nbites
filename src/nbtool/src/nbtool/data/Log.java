@@ -54,7 +54,8 @@ public class Log implements Serializable {
 	}
 	
 	public String toString() {
-		return description;
+		if (name != null) return name;
+		else return description;
 	}
 	
 	public static enum SOURCE {
