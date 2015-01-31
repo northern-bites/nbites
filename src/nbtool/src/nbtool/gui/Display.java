@@ -28,6 +28,13 @@ import nbtool.util.N.EVENT;
 public final class Display extends JFrame implements KeyEventPostProcessor {
 	private static final long serialVersionUID = 1L;
 	public static void main(String[] args) {
+		
+		if (!Display.class.desiredAssertionStatus()) {
+			System.out.println("nbtool should always be run with assertions ON (vm argument -ea)");
+			System.out.println("if you want to disable this, you'll have to edit the source code.");
+			return;
+		}
+		
 		//Run static setup.
 		U.w("static singleton Stats..." + Stats.INST.toString());
 		U.w("static singleton SessionMaster..." + SessionMaster.INST.toString());
