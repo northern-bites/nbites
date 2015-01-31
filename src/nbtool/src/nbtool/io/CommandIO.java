@@ -58,9 +58,8 @@ public class CommandIO implements Runnable{
 		try {
 			U.w("CommandIO: thread created with sa=" + cnc_address + " sp=" + cnc_port);
 			assert(cnc_address != null && cnc_port != 0 && boss != null);
-			socket = new Socket(this.cnc_address, this.cnc_port);
 			
-			socket.setSoTimeout(NBConstants.SOCKET_TIMEOUT);
+			socket = CommonIO.setupNetSocket(cnc_address, cnc_port);
 			
 			BufferedOutputStream _out =  new BufferedOutputStream(socket.getOutputStream());
 			BufferedInputStream _in = new BufferedInputStream(socket.getInputStream());

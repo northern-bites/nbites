@@ -106,7 +106,6 @@ public class CppIO implements Runnable {
 			
 			/*connection to c++ process died.*/
 		}
-		
 	}
 	
 	private void findFunctions(DataInputStream dis, DataOutputStream dos) throws IOException {

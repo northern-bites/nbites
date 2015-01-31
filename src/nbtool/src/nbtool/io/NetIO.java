@@ -73,9 +73,8 @@ public class NetIO implements Runnable {
 		try {
 			U.w("NetIO: thread created with sa=" + server_address + " sp=" + server_port);
 			assert(server_address != null && server_port != 0 && boss != null);
-			socket = new Socket(this.server_address, this.server_port);
-			
-			socket.setSoTimeout(NBConstants.SOCKET_TIMEOUT);
+
+			socket = CommonIO.setupNetSocket(server_address, server_port);
 			
 			BufferedOutputStream _out =  new BufferedOutputStream(socket.getOutputStream());
 			BufferedInputStream _in = new BufferedInputStream(socket.getInputStream());
