@@ -22,6 +22,7 @@ public abstract class ViewParent extends JPanel {
 	public static Boolean shouldLoadInParallel(){return false;}
 	
 	//Set up log independent objects here.
+	//Please call the super (i.e., ViewParent() ) in case this ever becomes non-empty...
 	public ViewParent() {
 		super();
 	}
