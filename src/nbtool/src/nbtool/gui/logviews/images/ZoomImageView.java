@@ -3,6 +3,8 @@ package nbtool.gui.logviews.images;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -38,6 +40,13 @@ public class ZoomImageView extends ViewParent {
 	
 	public ZoomImageView() {
 		super();
+		
+		addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent e) {
+				useSize(e.getComponent().getSize());
+			}
+		});
+		setLayout(null);
 		
 		iv = new BIWithZoom();
 		sp = new JScrollPane(iv);

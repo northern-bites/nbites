@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import nbtool.data.Log;
+import nbtool.util.U;
 
 public class CommonIO {
 	
@@ -33,6 +34,7 @@ public class CommonIO {
 		String desc = readLogDescription(dis);
 		
 		int len = dis.readInt();
+		//U.w("COMMON IO: data len " + len);
 		byte[] dbytes = new byte[len];
 		dis.readFully(dbytes);
 				
@@ -42,6 +44,7 @@ public class CommonIO {
 	public static String readLogDescription(DataInputStream dis) throws IOException {
 		int len = -1;
 		len = dis.readInt();
+		//U.w("COMMON IO: desc len " + len);
 		byte[] cbytes = new byte[len];
 		dis.readFully(cbytes);
 		

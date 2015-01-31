@@ -2,6 +2,8 @@ package nbtool.gui.logviews.images;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 
 import nbtool.data.Log;
@@ -30,6 +32,13 @@ public class ImageView extends ViewParent{
 	
 	public ImageView() {
 		super();
+		
+		addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent e) {
+				useSize(e.getComponent().getSize());
+			}
+		});
+		setLayout(null);
 	}
 
 	protected void useSize(Dimension s) {

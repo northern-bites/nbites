@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -23,6 +25,7 @@ class BIWithZoom extends JPanel {
 	public BIWithZoom() {
 		full = part = null;
 		sub_rect = null;
+		
 		setLayout(null);
 		
 		slider = new JSlider(JSlider.HORIZONTAL);

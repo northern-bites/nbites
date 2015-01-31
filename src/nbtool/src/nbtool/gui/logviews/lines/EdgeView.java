@@ -2,6 +2,8 @@ package nbtool.gui.logviews.lines;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 
 import nbtool.data.Log;
@@ -32,12 +34,19 @@ public class EdgeView extends ViewParent{
 	}
 
 	
-	protected void useSize(Dimension s) {}
+	private void useSize(Dimension s) {}
 	
 	public static Boolean shouldLoadInParallel(){return true;}
 	
 	public EdgeView() {
 		super();
+		
+		addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent e) {
+				useSize(e.getComponent().getSize());
+			}
+		});
+		setLayout(null);
 	}
 
 }

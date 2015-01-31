@@ -2,6 +2,8 @@ package nbtool.gui.logviews.misc;
 
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.IOException;
 
 import javax.swing.JPanel;
@@ -38,14 +40,20 @@ public class BotStatsView extends ViewParent {
 		sp.setViewportView(area);
 	}
 
-	@Override
-	protected void useSize(Dimension s) {
+	private void useSize(Dimension s) {
 		// TODO Auto-generated method stub
 		sp.setBounds(0, 0, s.width, s.height);
 	}
 	
 	public BotStatsView() {
 		super();
+		
+		addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent e) {
+				useSize(e.getComponent().getSize());
+			}
+		});
+		setLayout(null);
 		
 		sp = new JScrollPane();
 		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
