@@ -53,7 +53,7 @@ public:
      * thru the vision system. Joint angles are taken at around 100 hz, but 
      * images are taken at 30 hz, but by passing joint angles thru vision we 
      * get joint angles at 30 hz. */
-#ifdef LOG_VISION
+#ifdef USE_LOGGING
     portals::OutPortal<messages::JointAngles> joint_angles_out;
     portals::OutPortal<messages::InertialState> inertial_state_out;
 #endif

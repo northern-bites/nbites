@@ -29,95 +29,80 @@
 #include "log/LogModule.h"
 
 namespace man{
-
-class DiagramThread
-{
-public:
-    // Requires a name; helps in with tracking the different threads' running
-    DiagramThread(std::string name_, long long frame);
-    virtual ~DiagramThread();
-
-    // How modules are passed to the diagram
-    void addModule(portals::Module& mod);
-
-    std::string getName() { return diagram.name; }
-
-    // Thread control
-    int start();
-    void stop();
-
-    /*
-     * @brief Adds a LogModule that will log the output of
-     *        the specified OutPortal.
-     * @param out The OutPortal that will be providing data
-     * @param name The name of the file that will be ceated by the logger
-     */
-    template<class T>
-    void log(portals::OutPortal<T>* out, std::string name)
+    
+    class DiagramThread
     {
-// Only let us do this if we really intend to log
-#ifdef USE_LOGGING
-        logs.push_back(new log::LogModule<T>(out, name));
-        diagram.addModule(*logs.back());
-#endif
-    }
-
-    template<class T>
-    void logImage(portals::OutPortal<T>* out, std::string name)
-    {
-// Only let us do this if we really intend to log
-#ifdef USE_LOGGING
-        logs.push_back(new log::ImageLogModule<T>(out, name));
-        // THIS HAS TO BE SET TO 1 IF WE ARE LOGGING FROM THE TRANSCRIBER
-        // BECAUSE IT ONLY HAS 4 BUFFERS TOTAL AND WE DON'T WANT TO KEEP THEM
-        logs.back()->setMaxWrites(1);
-        diagram.addModule(*logs.back());
-#endif
-    }
-
-private:
-    /*
-     * @class RobotDiagram
-     *
-     * This is private to DiagramThread because nothing else should use
-     * it. It extends a typical diagram by giving a diagram a desired frame
-     * length. If the diagram's processing takes less time than the frame
-     * length, which is what we want, it sleeps for the rest of the frame.
-     * Turning on DEBUG_THREADS should help us figure out if a thread is
-     * always overrunning its frames.
-     */
-    class RobotDiagram : public portals::RoboGram
-    {
-        // Just so that we can get things without getters
-        friend class DiagramThread;
     public:
-        // Holds the name of the thread
-        RobotDiagram(std::string name_, long long frame);
-        // Overrides RoboGram::run() but also calls it
-        void run();
-
+        // Requires a name; helps in with tracking the different threads' running
+        DiagramThread(std::string name_, long long frame);
+        virtual ~DiagramThread();
+        
+        // How modules are passed to the diagram
+        void addModule(portals::Module& mod);
+        
+        std::string getName() { return diagram.name; }
+        
+        // Thread control
+        int start();
+        void stop();
+        
+        /*
+         * @brief Adds a LogModule that will log the output of
+         *        the specified OutPortal.
+         * @param out The OutPortal that will be providing data
+         * @param desc Fields describing the logged data.
+         */
+        template<class T>
+        void log(int findex, portals::OutPortal<T>* out, std::string desc)
+        {
+            logs.push_back(new log::LogModule<T>(findex, out, desc));
+            diagram.addModule(*logs.back());
+        }
+        
+        
     private:
-        // The name given to this thread
-        std::string name;
-        // The length of a processing frame for this thread
-        long long frameLengthMicro;
-        // Used for making nanosleep calls
-        struct timespec interval, remainder;
+        /*
+         * @class RobotDiagram
+         *
+         * This is private to DiagramThread because nothing else should use
+         * it. It extends a typical diagram by giving a diagram a desired frame
+         * length. If the diagram's processing takes less time than the frame
+         * length, which is what we want, it sleeps for the rest of the frame.
+         * Turning on DEBUG_THREADS should help us figure out if a thread is
+         * always overrunning its frames.
+         */
+        class RobotDiagram : public portals::RoboGram
+        {
+            // Just so that we can get things without getters
+            friend class DiagramThread;
+        public:
+            // Holds the name of the thread
+            RobotDiagram(std::string name_, long long frame);
+            // Overrides RoboGram::run() but also calls it
+            void run();
+            
+        private:
+            // The name given to this thread
+            std::string name;
+            // The length of a processing frame for this thread
+            long long frameLengthMicro;
+            // Used for making nanosleep calls
+            struct timespec interval, remainder;
+        };
+        
+        // We need a method with this signature to pass to pthread_create
+        static void* runDiagram(void* _this);
+        
+        // Hold all of the LogModules
+        std::vector<log::LogBase*> logs;
+        
+        // The diagram that will be run in this thread
+        RobotDiagram diagram;
+        
+        pthread_t thread;
+        
+        // Keeps track of whether this thread's main method should be going
+        bool running;
     };
-
-    // We need a method with this signature to pass to pthread_create
-    static void* runDiagram(void* _this);
-
-    // Hold all of the LogModules
-    std::vector<log::LogBase*> logs;
-
-    // The diagram that will be run in this thread
-    RobotDiagram diagram;
-
-    pthread_t thread;
-
-    // Keeps track of whether this thread's main method should be going
-    bool running;
-};
-
+    
 }

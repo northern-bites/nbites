@@ -25,7 +25,7 @@ VisionModule::VisionModule() : Module(),
                                vision_obstacle(base()),
                                topOutPic(base()),
                                botOutPic(base()),
-#ifdef LOG_VISION
+#ifdef USE_LOGGING
                                joint_angles_out(base()),
                                inertial_state_out(base()),
 #endif
@@ -80,7 +80,7 @@ void VisionModule::run_()
      * thru the vision system. Joint angles are taken at around 100 hz, but
      * images are taken at 30 hz, but by passing joint angles thru vision we
      * get joint angles at 30 hz. */
-#ifdef LOG_VISION
+#ifdef USE_LOGGING
     joint_angles_out.setMessage(portals::Message<messages::JointAngles>(
                                 &joint_angles.message()));
     inertial_state_out.setMessage(portals::Message<messages::InertialState>(
