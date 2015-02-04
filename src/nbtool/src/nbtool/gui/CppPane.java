@@ -250,7 +250,7 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 			if (e.getValueIsAdjusting())
 				return;
 			
-			int index = ((JList) e.getSource()).getSelectedIndex();
+			int index = ((JList<String>) e.getSource()).getSelectedIndex();
 			Log l = der_data.get(index);
 			N.notifyEDT(EVENT.LOG_SELECTION, this, l);
 		}

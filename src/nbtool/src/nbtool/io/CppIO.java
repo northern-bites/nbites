@@ -29,7 +29,7 @@ public class CppIO implements Runnable {
 
 	public static CppIO init() {
 		CppIO io = new CppIO();
-		thread = new Thread(io);
+		thread = new Thread(io, "nbtool-cppio");
 		thread.start();
 
 		return io;

@@ -13,6 +13,8 @@
 #include <iostream>
 #include <vector>
 
+#include "../man/log/logio.h"
+
 typedef struct nbfunc_s {
     char * name;
     int (*func)(void) ;

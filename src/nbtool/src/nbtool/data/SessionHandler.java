@@ -107,17 +107,17 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
 			//start fileio thread, move to network_nosave
 			fileioRunnable = new FileIO(this, filepath);
 			
-			Thread fileioThread = new Thread(fileioRunnable);
+			Thread fileioThread = new Thread(fileioRunnable, "fileio");
 			fileioThread.start();
 			
 		case NETWORK_NOSAVE:
 			//start net thread
 			netioRunnable = new NetIO(address, NBConstants.SERVER_PORT, this);
-			Thread netioThread = new Thread(netioRunnable);			
+			Thread netioThread = new Thread(netioRunnable, "netio");			
 			netioThread.start();
 			
 			cncRunnable = new CommandIO(address, NBConstants.CNC_PORT, this);
-			Thread cncThread = new Thread(cncRunnable);
+			Thread cncThread = new Thread(cncRunnable, "cnc");
 			cncThread.start();
 			
 			break;
