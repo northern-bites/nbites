@@ -111,9 +111,8 @@ namespace nblog {
         
         sanity_checks();
         
-        log_main->log_main_thread = (pthread_t *) malloc(sizeof(pthread_t));
-        
-        pthread_create(log_main->log_main_thread, NULL, &log_main_loop, NULL);
+        pthread_create(&(log_main->log_main_thread), NULL, &log_main_loop, NULL);
+        pthread_detach(log_main->log_main_thread);
         //server thread is live...
         LOGDEBUG(1, "log_main thread running...\n");
     }
@@ -281,129 +280,7 @@ namespace nblog {
         return n_written;
     }
     
-    int _put_exactly(ssize_t (* wfunc)(int, const void *, size_t), int sofd, size_t nb, uint8_t * data) {
-        NBLassert(wfunc && data && nb);
-        NBLassert(sofd >= 0);
-        
-        size_t written = 0;
-        while (written < nb) {
-            ssize_t ret = wfunc(sofd,
-                                  data + written,
-                                  nb - written);
-            if (ret == 0) {
-                usleep(USLEEP_EXPECTING);
-            } else if (ret < 0) {
-                int saved_err = errno;
-                
-                if (saved_err == EAGAIN) {
-                    usleep(USLEEP_EXPECTING);
-                } else {
-                    char buf[256];
-                    strerror_r(saved_err, buf, 256);
-                    printf("\n\n****_put_exactly****:  %s\n", buf);
-                    return 2;
-                }
-            } else {
-                written += ret;
-            }
-        }
-        
-        assert(written == nb);
-        return 0;
-    }
     
-    int write_exactly(int fd, size_t nbytes, void * adata) {
-        return _put_exactly(&write, fd, nbytes, (uint8_t *) adata);
-    }
-    
-    ssize_t send_stub(int sck, const void * data, size_t nbytes) {
-#ifndef __APPLE__
-        return send(sck, data, nbytes, MSG_NOSIGNAL);
-#else
-        return send(sck, data, nbytes, 0);
-#endif
-    }
-    
-    int send_exactly(int socket, size_t nbytes, void * adata) {
-        return _put_exactly(&send_stub, socket, nbytes, (uint8_t *) adata);
-    }
-    
-    int recv_exactly(int sck, size_t nbytes, void * abuffer, double max_wait) {
-        uint8_t * buffer = (uint8_t *) abuffer;
-        
-        NBLassert(max_wait >= 1);
-        NBLassert(buffer);
-        
-        time_t last = time(NULL);
-        
-        size_t rbytes = 0;
-        while (rbytes < nbytes) {
-            if (difftime(time(NULL), last) >= max_wait)
-                return 1;
-#ifndef __APPLE__
-            ssize_t ret = recv(sck, buffer + rbytes, nbytes - rbytes, MSG_NOSIGNAL);
-#else
-            ssize_t ret = recv(sck, buffer + rbytes, nbytes - rbytes, 0);
-#endif
-            
-            if (ret == 0) {
-                usleep(USLEEP_EXPECTING);
-            } else if (ret < 0) {
-                int err_saved = errno;
-                if (err_saved == EAGAIN) {
-                    usleep(USLEEP_EXPECTING);
-                } else {
-                    char buf[256];
-                    strerror_r(err_saved, buf, 256);
-                    printf("\n\n****recv_exactly****:  %s\n", buf);
-                    return 2;
-                }
-            } else {
-                rbytes += ret;
-                last = time(NULL);
-            }
-        }
-        
-        return 0;
-    }
-    
-    int _put_log( int (*exacter)(int, size_t, void *), int sofd, log_object_t * log) {
-        NBLassert(sofd >= 0);
-        NBLassert(log);
-        
-        char desc[MAX_LOG_DESC_SIZE];
-        description(desc, MAX_LOG_DESC_SIZE, log);
-        uint32_t desc_hlen = strlen(desc);
-        uint32_t data_hlen = log->n_bytes;
-        
-        uint32_t desc_nlen = htonl(desc_hlen);
-        uint32_t data_nlen = htonl(data_hlen);
-        
-        if (exacter(sofd, 4, &desc_nlen)) {
-            return 1;
-        }
-        if (exacter(sofd, desc_hlen, desc)) {
-            return 2;
-        }
-        if (exacter(sofd, 4, &data_nlen)) {
-            return 3;
-        }
-        if (log->n_bytes) {
-            if (exacter(sofd, data_hlen, log->data)) {
-                return 4;
-            }
-        }
-        
-        return 0;
-    }
-    
-    int send_log(int sock, log_object_t * log) {
-        return _put_log(&send_exactly, sock, log);
-    }
-    
-    int write_log(int fd, log_object_t * log) {
-        return _put_log(&write_exactly, fd, log);
-    }
     
     //Not thread safe.
     void log_object_free(log_object_t * obj) {

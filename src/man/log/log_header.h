@@ -26,6 +26,8 @@
 
 #include <assert.h>
 
+#include "logio.h"
+
 namespace nblog {
     
 //#define NBDB_USECOLOR
@@ -110,10 +112,12 @@ namespace nblog {
         size_t image_index;     //associated image id
         clock_t creation_time;
         
+        /*
         const char * type;      //variable length string encoding data specifics.
-        
         size_t n_bytes;
-        uint8_t * data;
+        uint8_t * data; */
+        
+        logio::log_t log;
         
         //For memory management.
         uint8_t references;
@@ -154,10 +158,10 @@ namespace nblog {
     typedef struct _log_main_s {
         log_buffer_t * buffers[NUM_LOG_BUFFERS];
         
-        pthread_t * log_main_thread;
-        pthread_t * log_serverio_thread;
-        pthread_t * log_fileio_thread;
-        pthread_t * log_cnc_thread;
+        pthread_t log_main_thread;
+        pthread_t log_serverio_thread;
+        pthread_t log_fileio_thread;
+        pthread_t log_cnc_thread;
     } log_main_t;
     
     //global reference to the (singleton) log process object
@@ -204,16 +208,6 @@ namespace nblog {
     log_object_t * acquire(int buffer_index, uint32_t * relevant_nextr);
     void release(log_object_t * obj, bool lock);
     
-    
-    //net stuff
-    int write_exactly(int fd, size_t nbytes, void * data);
-    int send_exactly(int sck, size_t nbytes, void * data);
-    //time() had 1 sec granularity, max_wait fractions are pointless
-    int recv_exactly(int sck, size_t nbytes, void * buffer, double max_wait);
-    
-    //Both use same format, just different _exactly functions
-    int send_log(int sock, log_object_t * log);
-    int write_log(int fd, log_object_t * log);
     
     //Generates a string w/ generic type specs encoded.
     int description(char * buf, size_t size, log_object_t * obj);

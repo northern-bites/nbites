@@ -21,9 +21,9 @@ namespace nblog {
     
     void log_fileio_init() {
         LOGDEBUG(1, "log_fileio_init()\n");
-        log_main->log_fileio_thread = (pthread_t *) malloc(sizeof(pthread_t));
         
-        pthread_create(log_main->log_fileio_thread, NULL, &file_io_loop, NULL);
+        pthread_create(&(log_main->log_fileio_thread), NULL, &file_io_loop, NULL);
+        pthread_detach(log_main->log_fileio_thread);
     }
     
     int write_to_fs(log_object_t * obj);

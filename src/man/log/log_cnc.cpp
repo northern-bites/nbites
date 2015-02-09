@@ -7,6 +7,7 @@
 
 #include "log_header.h"
 #include "log_sf.h"
+
 #include <stdio.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -109,9 +110,9 @@ namespace nblog {
     
     void log_cnc_init() {
         LOGDEBUG(1, "log_cnc_init() with %i functions.\n", fmap.size());
-        log_main->log_cnc_thread = (pthread_t *) malloc(sizeof(pthread_t));
         
-        pthread_create(log_main->log_cnc_thread, NULL, &cnc_loop, NULL);
+        pthread_create(&(log_main->log_cnc_thread), NULL, &cnc_loop, NULL);
+        pthread_detach(log_main->log_cnc_thread);
     }
     
     std::vector<std::string> split(const std::string &s, char delim) {

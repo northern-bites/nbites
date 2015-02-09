@@ -24,8 +24,8 @@ namespace nblog {
     void log_serverio_init() {
         LOGDEBUG(1, "log_serverio_init()\n");
         
-        log_main->log_serverio_thread = (pthread_t *) malloc(sizeof(pthread_t));
-        pthread_create((log_main->log_serverio_thread), NULL, &server_io_loop, NULL);
+        pthread_create(&(log_main->log_serverio_thread), NULL, &server_io_loop, NULL);
+        pthread_detach(log_main->log_serverio_thread);
     }
     
     //Block thread unti client has attempted to connect.
