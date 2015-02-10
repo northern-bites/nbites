@@ -3,13 +3,12 @@
 
 #include <sys/types.h>
 #include <stdint.h>
-#include "log_header.h"
 
 namespace logio {
     
     typedef struct {
         char * desc;
-        int dlen;
+        size_t dlen;
         uint8_t * data;
     } log_t;
     
@@ -20,7 +19,7 @@ namespace logio {
     //Intended for use with net sockets
     int recv_exact(int sck, size_t nbytes, void * buffer, double max_wait);
     int recv_log(int sck, log_t * log, double max_wait);
-    int send_exact(int sck, size_t nbytes, void * buffer);
+    int send_exact(int sck, size_t nbytes, const void * buffer);
     int send_log(int sck, log_t * log);
     
     /*

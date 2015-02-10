@@ -66,7 +66,7 @@ namespace nblog {
         int fd;
         char buf[MAX_LOG_DESC_SIZE];
         
-        int nw = description(buf, MAX_LOG_DESC_SIZE, obj);
+        int nw = strlen(obj->log.desc);
         
         char * ss;
         int len;
@@ -94,7 +94,7 @@ namespace nblog {
             return 1;
         }
         
-        if (write_log(fd, obj)) {
+        if (logio::write_log(fd, &(obj->log))) {
             printf("*************NB_Log file_io COULD NOT WRITE LOG \n\t%s\n\n", path.c_str());
             
             return 2;
