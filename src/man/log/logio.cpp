@@ -11,6 +11,8 @@
 
 #include <inttypes.h>
 
+#include <sstream>
+
 #include "log_header.h"
 
 namespace logio {
@@ -221,6 +223,50 @@ namespace logio {
     
     int recv_log(int sck, log_t * log, double max_wait) {
         return get_log(recv_exact, sck, log, max_wait);
+    }
+    
+    ///=============================================
+    
+    std::vector<std::string> split(const std::string &s, char delim) {
+        std::vector<std::string> elems;
+        std::stringstream ss(s);
+        std::string item;
+        
+        while (std::getline(ss, item, delim)) {
+            if (!item.empty())
+                elems.push_back(item);
+        }
+        
+        return elems;
+    }
+    
+    std::vector<std::string> pairs(const char * desc) {
+        std::string d(desc);
+        size_t nullstart = d.find('\0');
+        if (nullstart != d.npos)
+            d = d.substr(0, nullstart);
+        
+        return split(d, ' ');
+    }
+    
+    bool isType(log_t * log, const char * type) {
+        std::string need = "type=";
+        need.append(type, strlen(type));
+        
+        std::string d(log->desc);
+        if (d.find(need) == std::string::npos) return false;
+        else return true;
+    }
+    
+    log_t copyLog(log_t * log) {
+        log_t newl;
+        newl.desc = (char *) malloc(strlen(log->desc));
+        strcpy(newl.desc, log->desc);
+        newl.dlen = log->dlen;
+        newl.data = (uint8_t *) malloc(newl.dlen);
+        bcopy(log->data, newl.data, newl.dlen);
+        
+        return newl;
     }
     
 }

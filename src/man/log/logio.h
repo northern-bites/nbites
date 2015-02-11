@@ -4,6 +4,9 @@
 #include <sys/types.h>
 #include <stdint.h>
 
+#include <string>
+#include <vector>
+
 namespace logio {
     
     typedef struct {
@@ -26,7 +29,9 @@ namespace logio {
      For parsing log descriptions
      */
     
-    
+    std::vector<std::string> pairs(const char * desc);
+    bool isType(log_t * log, const char * type);
+    log_t copyLog(log_t * log);
 }
 
 #endif //NBlog_logio
