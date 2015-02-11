@@ -43,6 +43,21 @@ int arg_test_func() {
     return 0;
 }
 
+int CrossBright_func() {
+    assert(args.size() == 1);
+    printf("CrossBright_func()\n");
+    //work on a copy of the arg so we can safely push to rets.
+    logio::log_t log = logio::copyLog(&args[0]);
+    for (int i = 0; i < log.dlen; i += 2) {
+        *(log.data + i) = 240;
+    }
+    
+    printf("[%s] modified.\n", log.desc);
+    rets.push_back(log);
+    
+    return 0;
+}
+
 void register_funcs() {
     
     /*test func 1*/
@@ -58,4 +73,13 @@ void register_funcs() {
     arg_test.args = {sYUVImage, sYUVImage};
     arg_test.func = arg_test_func;
     FUNCS.push_back(arg_test);
+    
+    //CrossBright
+    nbfunc_t CrossBright;
+    CrossBright.name = "CrossBright";
+    CrossBright.args = {sYUVImage};
+    CrossBright.func = CrossBright_func;
+    FUNCS.push_back(CrossBright);
 }
+
+

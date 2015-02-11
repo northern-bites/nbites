@@ -234,6 +234,16 @@ public class CppIO implements Runnable {
 		return true;
 	}
 	
+	public int indexOfFunc(String name) {
+		if (foundFuncs == null) return -1;
+		for (int i = 0; i < foundFuncs.size(); ++i) {
+			if (foundFuncs.get(i).name.startsWith(name))
+				return i;
+		}
+		
+		return -1;
+	}
+	
 	private class CppIOException extends IOException {
 		private static final long serialVersionUID = 1L;
 		String message;
