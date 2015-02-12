@@ -192,7 +192,7 @@ public class CppIO implements Runnable {
 				});
 				
 			} 
-			else Thread.sleep(400); //No calls waiting
+			else Thread.sleep(10); //No calls waiting
 		}
 	}
 

@@ -106,7 +106,7 @@ int main(int argc, const char * argv[]) {
         if (ntohl(net_order) == 0) {
             host_order = 0;
             CHECK_RET(logio::send_exact(fd, 4, &host_order));
-            usleep(200000);
+            usleep(10000);
             continue;
         } else if (ntohl(net_order) != 1) {
             printf("java sent wrong function call request: 0x%x\n", net_order);
