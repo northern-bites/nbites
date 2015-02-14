@@ -10,6 +10,10 @@
 #include <assert.h>
 #include <vector>
 
+#include "Images.h"
+#include "image/ImageConverterModule.cpp"
+#include "RoboGrams.h"
+
 std::vector<nbfunc_t> FUNCS;
 
 std::vector<logio::log_t> args;
@@ -58,6 +62,45 @@ int CrossBright_func() {
     return 0;
 }
 
+int ImageConverter_func() {
+    assert(args.size() == 1);
+
+    printf("ImageConverter_func()\n");
+
+    logio::log_t arg1 = args[0];
+    std::vector<std::string> kvp = logio::pairs(arg1.desc);
+    int width = 640;
+    int height = 480;
+
+    messages::YUVImage image(arg1.data, width, height, width);
+    portals::Message<messages::YUVImage> message(&image);
+    man::image::ImageConverterModule module;
+
+    module.imageIn.setMessage(message);
+    module.run();
+
+    const messages::PackedImage<short unsigned int>* yImage = module.yImage.getMessage(true).get();
+
+    logio::log_t ret1;
+
+    std::string name = "type=YUVImage2 encoding=[Y16] width=";
+    name += yImage->width();
+    name += " height=";
+    name += yImage->height();
+
+    ret1.desc = (char*)malloc(name.size()+1);
+    memcpy(ret1.desc, name.c_str(), name.size() + 1);
+
+    ret1.dlen = yImage->width() * yImage->height();
+    ret1.data = (uint8_t*)malloc(ret1.dlen);
+    memcpy(ret1.data, yImage->pixelAddress(0, 0), ret1.dlen);
+
+    rets.push_back(ret1);
+
+    printf("ImageConverter module ran!\n");
+    return 0;
+}
+
 void register_funcs() {
     
     /*test func 1*/
@@ -80,6 +123,14 @@ void register_funcs() {
     CrossBright.args = {sYUVImage};
     CrossBright.func = CrossBright_func;
     FUNCS.push_back(CrossBright);
+
+    //
+    nbfunc_t ImageConverter;
+    ImageConverter.name = "ImageConverter";
+    ImageConverter.args = {sYUVImage};
+    ImageConverter.func = ImageConverter_func;
+    FUNCS.push_back(ImageConverter);
+
 }
 
 
