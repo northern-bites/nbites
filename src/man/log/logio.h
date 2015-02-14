@@ -6,6 +6,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 namespace logio {
     
@@ -29,9 +30,22 @@ namespace logio {
      For parsing log descriptions
      */
     
+    //Split desc into key-value pairs.
     std::vector<std::string> pairs(const char * desc);
+    //Key-value pairs in a map.
+    std::map<std::string, std::string> kvp(const char * desc);
+    
+    //Returns -1 if key not found.
+    int widthOf(log_t log);
+    int heightOf(log_t log);
+    
+    //true if log has key 'type' with value equal to passed type.
     bool isType(log_t * log, const char * type);
+    
+    //Copy log, result's pointers on heap.
     log_t copyLog(log_t * log);
+    //return log struct with pointers copied to heap.
+    log_t heapLog(const char * desc, size_t dlen, void * data);
 }
 
 #endif //NBlog_logio
