@@ -77,7 +77,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		statusp = new StatusPanel();
 		right.addTab("status", statusp);
 		
-		cp = new CppPane(lc);
+		cp = new CppPane();
 		right.addTab("c++", cp);
 		
 		up = new UtilPane();
