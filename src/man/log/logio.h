@@ -42,7 +42,7 @@ namespace logio {
     //true if log has key 'type' with value equal to passed type.
     bool isType(log_t * log, const char * type);
     
-    //Copy log, result's pointers on heap.
+    //Copy log, result's pointers are on heap.
     log_t copyLog(log_t * log);
     //return log struct with pointers copied to heap.
     log_t heapLog(const char * desc, size_t dlen, void * data);
