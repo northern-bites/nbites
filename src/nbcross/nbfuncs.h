@@ -15,7 +15,7 @@
 
 #include "../man/log/logio.h"
 
-typedef struct nbfunc_s {
+typedef struct {
     const char * name;
     int (*func)(void) ;
     
