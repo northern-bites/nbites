@@ -83,21 +83,21 @@ int ImageConverter_func() {
 
     logio::log_t ret1;
 
-    std::string name = "type=YUVImage2 encoding=[Y16] width=";
-    name += yImage->width();
+    std::string name = "type=YUVImage encoding=[Y16] width=";
+    name += std::to_string(yImage->width());
     name += " height=";
-    name += yImage->height();
+    name += std::to_string(yImage->height());
 
     ret1.desc = (char*)malloc(name.size()+1);
     memcpy(ret1.desc, name.c_str(), name.size() + 1);
 
-    ret1.dlen = yImage->width() * yImage->height();
+    ret1.dlen = yImage->width() * yImage->height() * 2;
     ret1.data = (uint8_t*)malloc(ret1.dlen);
     memcpy(ret1.data, yImage->pixelAddress(0, 0), ret1.dlen);
 
     rets.push_back(ret1);
 
-    printf("ImageConverter module ran!\n");
+    printf("ImageConverter module ran! W: %d, H: %d\n", yImage->width(), yImage->height());
     return 0;
 }
 
