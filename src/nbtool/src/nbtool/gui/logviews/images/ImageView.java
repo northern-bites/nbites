@@ -14,7 +14,7 @@ import nbtool.images.Y16image;
 import nbtool.images.YUYV8888image;
 import nbtool.util.U;
 
-public class ImageView extends ViewParent{
+public class ImageView extends ViewParent {
 	BufferedImage img;
 	
 	public void paintComponent(Graphics g) {

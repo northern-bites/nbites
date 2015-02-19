@@ -86,7 +86,7 @@ public class U {
 	}
 	
 	//Almost all image logs will have null or [Y8(U8/V8)] encoding, but this method should be extended if that changes.
-	public static BufferedImage biFromLog(Log log) {
+	public static ImageParent imageFromLog(Log log) {
 		assert(log.type().equalsIgnoreCase(NBConstants.IMAGE_S));
 		int width = log.width();
 		int height = log.height();
@@ -97,7 +97,7 @@ public class U {
 			//old image
 			ip = new YUYV8888image(width / 2, height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[Y8(U8/V8)]")) {
-			ip = new YUYV8888image(width , height, log.bytes);
+			ip = new YUYV8888image(2*width, height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[Y16]")) {
 			ip = new Y16image(width , height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[U8V8]")) {
@@ -107,9 +107,13 @@ public class U {
 			return null;
 		}
 		
-		return ip.toBufferedImage(); 
+		return ip;
 	}
-
+	
+	public static BufferedImage biFromLog(Log log) {
+		return imageFromLog(log).toBufferedImage(); 
+	}
+	
 	public static final char[] hexArray = "0123456789ABCDEF".toCharArray();
 	public static String bytesToHexString(byte[] bytes) {
 		char[] hexChars = new char[bytes.length * 2];
