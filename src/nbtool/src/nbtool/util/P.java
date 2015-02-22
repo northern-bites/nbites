@@ -5,11 +5,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -32,7 +34,7 @@ public class P {
 	 * 	control primary values (up to 5)
 	 * 	control secondary values (up to 5)
 	 * 
-	 * control pathes (up to 5)
+	 * control paths (up to 5)
 	 * control addresses (up to 5)
 	 * 
 	 * 	max log data storage
@@ -252,4 +254,9 @@ public class P {
 			return null;
 		}
 	}
+	
+	
+	//
+	//ltv2
+	
 }
