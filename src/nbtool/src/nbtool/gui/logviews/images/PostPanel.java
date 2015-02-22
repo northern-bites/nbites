@@ -17,9 +17,9 @@ import nbtool.util.U;
 
 // TODO add via layouts?
 // TODO refactor GradientCalculator into a Gradient class
+// TODO refactor PostPanel into a detector that returns detections and a view
 // TODO rename PostPanel
 // TODO directory structure
-// TODO more refactoring
 
 public class PostPanel extends ViewParent {
 	YUYV8888image original;
@@ -53,7 +53,7 @@ public class PostPanel extends ViewParent {
 		field = mm.opening(field);
         
         FuzzyThreshold sigma = new FuzzyThreshold(100, 150);
-        post = GrayscaleLib.threshold(GrayscaleLib.subtract(GrayscaleLib.add(gradient, yellow), field), sigma);
+        post = GrayscaleLib.threshold(GrayscaleLib.add(GrayscaleLib.add(gradient, yellow), field), sigma);
         
         scores = buildHistogram(post);
         line = detectPeaks(scores);
@@ -68,18 +68,18 @@ public class PostPanel extends ViewParent {
 		BufferedImage bOriginal = original.toBufferedImage();
 		g.drawImage(bOriginal, bOriginal.getWidth(), 0, null);
 		g.drawImage(gradient, 0, 0, null);
-		//g.drawImage(yellow, 0, 2*bOriginal.getHeight(), null);
-		g.drawImage(field, bOriginal.getWidth(), bOriginal.getHeight(), null);
+		//g.drawImage(yellow, 0, 0, null);
+		//g.drawImage(field, 0, 0, null);
 		g.drawImage(post, 0, bOriginal.getHeight(), null);
 		
-//        int barWidth = bOriginal.getWidth() / scores.length;
-//        for(int i = 0; i < scores.length; i++){
-//            int barHeight = (int)(scores[i]);
-//            g.fillRect(bOriginal.getWidth() + i*barWidth, 
-//            		   bOriginal.getHeight() + (int)(bOriginal.getHeight()-scores[i]), 
-//            		   barWidth,
-//            		   barHeight);
-//        }
+        int barWidth = bOriginal.getWidth() / scores.length;
+        for(int i = 0; i < scores.length; i++){
+            int barHeight = (int)(scores[i]);
+            g.fillRect(bOriginal.getWidth() + i*barWidth, 
+            		   bOriginal.getHeight() + (int)(bOriginal.getHeight()-scores[i]), 
+            		   barWidth,
+            		   barHeight);
+        }
     }
 	
 	protected void useSize(Dimension s) {}
@@ -152,9 +152,11 @@ public class PostPanel extends ViewParent {
 	}
 	
 	private double calculateFieldScore(int yMode, int y) {
-		int diff = java.lang.Math.abs(y - yMode);
-		FuzzyThreshold sigma = new FuzzyThreshold(20, 40);
-		return -1*(sigma.f((double)diff) - 1);
+		int diff = y - yMode;
+		if (diff < 0)
+			return 0.0;
+		FuzzyThreshold sigma = new FuzzyThreshold(40, 60);
+		return sigma.f(diff);
 	}
 	
 	private int calculateYMode(YUYV8888image yuvImg) {
@@ -237,9 +239,9 @@ public class PostPanel extends ViewParent {
 				else if (inPeak) {
 					inPeak = false;
 					peaks.get(peakIndex)[1] = j;
-					if (peaks.get(peakIndex)[2] / totalDensity >= 0.02) {
+					if (peaks.get(peakIndex)[2] / totalDensity >= 0.05) {
 						stop = true;
-					} else if (peaks.get(peakIndex)[2] / totalDensity < 0.003) {
+					} else if (peaks.get(peakIndex)[2] / totalDensity < 0.01) {
 						peaks.remove(peakIndex);
 						peakIndex--;
 					}
