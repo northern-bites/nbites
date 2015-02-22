@@ -72,6 +72,7 @@ public class PostPanel extends ViewParent {
 		//g.drawImage(field, 0, 0, null);
 		g.drawImage(post, 0, bOriginal.getHeight(), null);
 		
+        g.setColor(Color.black);
         int barWidth = bOriginal.getWidth() / scores.length;
         for(int i = 0; i < scores.length; i++){
             int barHeight = (int)(scores[i]);
@@ -79,6 +80,15 @@ public class PostPanel extends ViewParent {
             		   bOriginal.getHeight() + (int)(bOriginal.getHeight()-scores[i]), 
             		   barWidth,
             		   barHeight);
+        }
+        g.setColor(Color.red);
+        for (int x = 0; x < scores.length; x++) {
+			double m = line.getFirstPrincipalAxisV() / line.getFirstPrincipalAxisU();
+			int y = (int)(m*x - m*line.getCenterX() + line.getCenterY());
+	        g.fillRect(bOriginal.getWidth() + x*barWidth, 
+	        		   bOriginal.getHeight() + (bOriginal.getHeight() - y), 
+	        		   5, 
+	        		   5);
         }
     }
 	
