@@ -2,7 +2,6 @@ package nbtool.gui.logviews.images;
 
 import java.awt.image.WritableRaster;
 
-// TODO include function for scaling up or down a structuring element
 public class StructuringElement {
 	int[][] indices;
 	

@@ -14,11 +14,11 @@ public final class YUYV8888image extends ImageParent {
 	}
 	
 	public int uPixelAt(int x, int y) {
-		return pixelAt(4*x + 1, y);
+		return pixelAt(2*x + 1, y);
 	}
 	
 	public int vPixelAt(int x, int y) {
-		return pixelAt(4*x + 4, y);
+		return pixelAt(2*x + 3, y);
 	}
 	
 	public int[] yPixelsCenteredAt(int x, int y) {

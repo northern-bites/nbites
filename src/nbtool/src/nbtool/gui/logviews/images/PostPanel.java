@@ -1,5 +1,6 @@
 package nbtool.gui.logviews.images;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ComponentAdapter;
@@ -14,19 +15,22 @@ import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.images.YUYV8888image;
 import nbtool.util.U;
 
-// TODO add other jpanels
+// TODO add via layouts?
 // TODO refactor GradientCalculator into a Gradient class
-// TODO rename
+// TODO rename PostPanel
 // TODO directory structure
+// TODO more refactoring
 
 public class PostPanel extends ViewParent {
 	YUYV8888image original;
+	
 	BufferedImage gradient;
 	BufferedImage yellow;
 	BufferedImage field;
 	BufferedImage post;
-	// TODO include hist
-	// TODO include line fit
+	
+	double[] scores;
+	WeightedFit line;
 	
 	public void setLog(Log newlog) {
 		log = newlog;
@@ -51,15 +55,31 @@ public class PostPanel extends ViewParent {
         FuzzyThreshold sigma = new FuzzyThreshold(100, 150);
         post = GrayscaleLib.threshold(GrayscaleLib.subtract(GrayscaleLib.add(gradient, yellow), field), sigma);
         
-        double[] scores = buildHistogram(post);
-        WeightedFit line = detectPeaks(scores);
+        scores = buildHistogram(post);
+        line = detectPeaks(scores);
 		
 		repaint();
 	}
 	
 	public void paintComponent(Graphics g) {
-		if (post != null)
-			g.drawImage(yellow, 0, 0, null);
+		if (original == null)
+			return;
+		
+		BufferedImage bOriginal = original.toBufferedImage();
+		g.drawImage(bOriginal, bOriginal.getWidth(), 0, null);
+		g.drawImage(gradient, 0, 0, null);
+		//g.drawImage(yellow, 0, 2*bOriginal.getHeight(), null);
+		g.drawImage(field, bOriginal.getWidth(), bOriginal.getHeight(), null);
+		g.drawImage(post, 0, bOriginal.getHeight(), null);
+		
+//        int barWidth = bOriginal.getWidth() / scores.length;
+//        for(int i = 0; i < scores.length; i++){
+//            int barHeight = (int)(scores[i]);
+//            g.fillRect(bOriginal.getWidth() + i*barWidth, 
+//            		   bOriginal.getHeight() + (int)(bOriginal.getHeight()-scores[i]), 
+//            		   barWidth,
+//            		   barHeight);
+//        }
     }
 	
 	protected void useSize(Dimension s) {}
@@ -91,7 +111,7 @@ public class PostPanel extends ViewParent {
 	}
 
 	private BufferedImage buildYellowImg(YUYV8888image yuvImg) {
-		BufferedImage yellowImg = new BufferedImage(yuvImg.width / 2 - 1, yuvImg.height - 1, 10); // TYPE_BYTE_GRAY
+		BufferedImage yellowImg = new BufferedImage(yuvImg.width / 2 - 1, yuvImg.height - 1, BufferedImage.TYPE_BYTE_GRAY);
     	WritableRaster raster = yellowImg.getRaster();
         for (int i = 1; i < yuvImg.height - 1; i++) {
 			for (int j = 1; j < (yuvImg.width / 2 - 1); j += 1) {
@@ -118,7 +138,7 @@ public class PostPanel extends ViewParent {
 	}
 	
 	private BufferedImage buildGradientImg(YUYV8888image yuvImg) {
-		BufferedImage gradientImg = new BufferedImage(yuvImg.width / 2 - 1, yuvImg.height - 1, 10); // TYPE_BYTE_GRAY
+		BufferedImage gradientImg = new BufferedImage(yuvImg.width / 2 - 1, yuvImg.height - 1, BufferedImage.TYPE_BYTE_GRAY);
 		WritableRaster raster = gradientImg.getRaster();
         for (int i = 1; i < yuvImg.height - 1; i++) {
 			for (int j = 1; j < (yuvImg.width / 2 - 1); j += 1) {
@@ -156,7 +176,7 @@ public class PostPanel extends ViewParent {
 	}
 	
 	private BufferedImage buildFieldImg(YUYV8888image yuvImg) {
-		BufferedImage gradientImg = new BufferedImage(yuvImg.width / 2 - 1, yuvImg.height - 1, 10); // TYPE_BYTE_GRAY
+		BufferedImage gradientImg = new BufferedImage(yuvImg.width / 2 - 1, yuvImg.height - 1, BufferedImage.TYPE_BYTE_GRAY);
 		int yMode = calculateYMode(yuvImg);
 		WritableRaster raster = gradientImg.getRaster();
         for (int i = 1; i < yuvImg.height - 1; i++) {
