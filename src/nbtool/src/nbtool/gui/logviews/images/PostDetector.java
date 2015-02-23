@@ -1,27 +1,17 @@
 package nbtool.gui.logviews.images;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.util.Vector;
 
-import nbtool.data.Log;
-import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.images.YUYV8888image;
-import nbtool.util.U;
 
-// TODO add via layouts?
+// TODO better logic when there are more than two detected peaks
+// TODO provide more information on the detection to caller
 // TODO refactor GradientCalculator into a Gradient class
-// TODO refactor PostPanel into a detector that returns detections and a view
-// TODO rename PostPanel
-// TODO directory structure
 
-public class PostPanel extends ViewParent {
+public class PostDetector {
 	YUYV8888image original;
 	
 	BufferedImage gradient;
@@ -32,79 +22,32 @@ public class PostPanel extends ViewParent {
 	double[] scores;
 	WeightedFit line;
 	
-	public void setLog(Log newlog) {
-		log = newlog;
+	int leftPost;
+	int rightPost;
+	
+	public PostDetector(YUYV8888image original_) {
+		original = original_;
 		
-		original = (YUYV8888image) U.imageFromLog(newlog);
-		        
-        gradient = buildGradientImg(original);
+		buildGradientImg(original);
 		StructuringElement cross = new StructuringElement(0);
         MathMorphology mm = new MathMorphology(cross); 
-        gradient = mm.opening(gradient);
+        mm.opening(gradient);
         
-		yellow = buildYellowImg(original);
+		buildYellowImg(original);
 		StructuringElement verticalBandOf5Pixels = new StructuringElement(2);
 		mm.setStructuringElement(verticalBandOf5Pixels);
-		yellow = mm.opening(yellow);
+		mm.opening(yellow);
         
-        field = buildFieldImg(original);
+        buildFieldImg(original);
         StructuringElement square = new StructuringElement(4);
 		mm.setStructuringElement(square);
-		field = mm.opening(field);
+		mm.opening(field);
         
         FuzzyThreshold sigma = new FuzzyThreshold(100, 150);
         post = GrayscaleLib.threshold(GrayscaleLib.add(GrayscaleLib.add(gradient, yellow), field), sigma);
         
-        scores = buildHistogram(post);
-        line = detectPeaks(scores);
-		
-		repaint();
-	}
-	
-	public void paintComponent(Graphics g) {
-		if (original == null)
-			return;
-		
-		BufferedImage bOriginal = original.toBufferedImage();
-		g.drawImage(bOriginal, bOriginal.getWidth(), 0, null);
-		g.drawImage(gradient, 0, 0, null);
-		//g.drawImage(yellow, 0, 0, null);
-		//g.drawImage(field, 0, 0, null);
-		g.drawImage(post, 0, bOriginal.getHeight(), null);
-		
-        g.setColor(Color.black);
-        int barWidth = bOriginal.getWidth() / scores.length;
-        for(int i = 0; i < scores.length; i++){
-            int barHeight = (int)(scores[i]);
-            g.fillRect(bOriginal.getWidth() + i*barWidth, 
-            		   bOriginal.getHeight() + (int)(bOriginal.getHeight()-scores[i]), 
-            		   barWidth,
-            		   barHeight);
-        }
-        g.setColor(Color.red);
-        for (int x = 0; x < scores.length; x++) {
-			double m = line.getFirstPrincipalAxisV() / line.getFirstPrincipalAxisU();
-			int y = (int)(m*x - m*line.getCenterX() + line.getCenterY());
-	        g.fillRect(bOriginal.getWidth() + x*barWidth, 
-	        		   bOriginal.getHeight() + (bOriginal.getHeight() - y), 
-	        		   5, 
-	        		   5);
-        }
-    }
-	
-	protected void useSize(Dimension s) {}
-	
-	public static Boolean shouldLoadInParallel() { return true; }
-	
-	public PostPanel() {
-		super();
-		
-		addComponentListener(new ComponentAdapter() {
-			public void componentResized(ComponentEvent e) {
-				useSize(e.getComponent().getSize());
-			}
-		});
-		setLayout(null);
+        buildHistogram(post);
+        detectPeaks(scores);
 	}
 
 	private double calculateColorScore(int idealU, int idealV, int u, int v) {
@@ -120,7 +63,7 @@ public class PostPanel extends ViewParent {
 		return -1*(sigmaColor.f((double)diff) - 1);
 	}
 
-	private BufferedImage buildYellowImg(YUYV8888image yuvImg) {
+	private void buildYellowImg(YUYV8888image yuvImg) {
 		BufferedImage yellowImg = new BufferedImage(yuvImg.width / 2 - 1, yuvImg.height - 1, BufferedImage.TYPE_BYTE_GRAY);
     	WritableRaster raster = yellowImg.getRaster();
         for (int i = 1; i < yuvImg.height - 1; i++) {
@@ -132,7 +75,7 @@ public class PostPanel extends ViewParent {
 				raster.setPixel(j-1, i-1, pixel);
 			}
 		}
-        return yellowImg;
+        yellow = yellowImg;
 	}
 	
 	private double calculateGradientScore(double[] grad) {
@@ -147,7 +90,7 @@ public class PostPanel extends ViewParent {
 		return sigmaMagnitude.f(magn)*sigmaDirection.f(dir);
 	}
 	
-	private BufferedImage buildGradientImg(YUYV8888image yuvImg) {
+	private void buildGradientImg(YUYV8888image yuvImg) {
 		BufferedImage gradientImg = new BufferedImage(yuvImg.width / 2 - 1, yuvImg.height - 1, BufferedImage.TYPE_BYTE_GRAY);
 		WritableRaster raster = gradientImg.getRaster();
         for (int i = 1; i < yuvImg.height - 1; i++) {
@@ -158,7 +101,7 @@ public class PostPanel extends ViewParent {
 				raster.setPixel(j-1, i-1, pixel);
 			}
 		}
-        return gradientImg;
+        gradient = gradientImg;
 	}
 	
 	private double calculateFieldScore(int yMode, int y) {
@@ -187,10 +130,10 @@ public class PostPanel extends ViewParent {
         return mode;
 	}
 	
-	private BufferedImage buildFieldImg(YUYV8888image yuvImg) {
-		BufferedImage gradientImg = new BufferedImage(yuvImg.width / 2 - 1, yuvImg.height - 1, BufferedImage.TYPE_BYTE_GRAY);
+	private void buildFieldImg(YUYV8888image yuvImg) {
+		BufferedImage fieldImg = new BufferedImage(yuvImg.width / 2 - 1, yuvImg.height - 1, BufferedImage.TYPE_BYTE_GRAY);
 		int yMode = calculateYMode(yuvImg);
-		WritableRaster raster = gradientImg.getRaster();
+		WritableRaster raster = fieldImg.getRaster();
         for (int i = 1; i < yuvImg.height - 1; i++) {
 			for (int j = 1; j < (yuvImg.width / 2 - 1); j += 1) {
 				int[] pixel = new int[1];
@@ -199,10 +142,10 @@ public class PostPanel extends ViewParent {
 				raster.setPixel(j-1, i-1, pixel);
 			}
 		}
-        return gradientImg;
+        field = fieldImg;
 	}
 	
-	private double[] buildHistogram(BufferedImage postImg) {
+	private void buildHistogram(BufferedImage postImg) {
 		Raster raster = postImg.getData();
 		int width = postImg.getWidth();
 		int height = postImg.getHeight();
@@ -215,16 +158,17 @@ public class PostPanel extends ViewParent {
 			}
 			hist[x] /= height;
 		}
-		return hist;
+		scores = hist;
 	}
 	
-	private WeightedFit detectPeaks(double[] scores) {
+	private void detectPeaks(double[] scores) {
 		double totalDensity = 0;
-		WeightedFit line = new WeightedFit();
+		WeightedFit line_ = new WeightedFit();
 		for (int i = 0; i < scores.length - 1; i++) {
 			totalDensity += scores[i];
-			line.add(i, scores[i]);
+			line_.add(i, scores[i]);
 		}
+		line = line_;
 		double m = line.getFirstPrincipalAxisV() / line.getFirstPrincipalAxisU();
 		
 		boolean stop = false;
@@ -244,7 +188,7 @@ public class PostPanel extends ViewParent {
 					peakIndex++;
 				}
 				else if (inPeak && scores[j] > yOnLine) {
-					peaks.get(peakIndex)[2] += (int)scores[j] - yOnLine;
+					peaks.get(peakIndex)[2] += (int) scores[j] - yOnLine;
 				}
 				else if (inPeak) {
 					inPeak = false;
@@ -258,13 +202,13 @@ public class PostPanel extends ViewParent {
 				}
 			}
 			if (stop) {
-				for (int k = 0; k < peaks.size(); k++) {
-					scores[peaks.get(k)[0]] = 100000;
-					scores[peaks.get(k)[1]] = 100000;
-				}
-				return line;
+				leftPost = (peaks.get(0)[0] + peaks.get(0)[1]) / 2;
+				if (peaks.size() > 1)
+					rightPost = (peaks.get(1)[0] + peaks.get(1)[1]) / 2;
+				else
+					rightPost = -1;
+				return;
 			}
 		}
-		return line;
 	}
 }
