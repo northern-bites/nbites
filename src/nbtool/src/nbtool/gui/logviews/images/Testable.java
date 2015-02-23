@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nbtool.data.Log;
-import nbtool.util.U;
 
 public class Testable {
 	Log log;
@@ -15,7 +14,7 @@ public class Testable {
 	
 	Map<String, Double> calculateError() throws IllegalArgumentException, IllegalAccessException {
 		HashMap<String, Double> error = new HashMap<String, Double>();
-		Map<String, String> attributes = U.attributes(log.description);
+		Map<String, String> attributes = log.getAttributes();
 		
 		java.lang.reflect.Field[] fields = getClass().getDeclaredFields();
 		for (java.lang.reflect.Field f : fields) {

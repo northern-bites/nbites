@@ -16,7 +16,6 @@ import nbtool.util.U;
 // TODO directory structure
 
 public class PostView extends ViewParent {
-	Log log;
 	PostDetector d;
 	
 	public PostView() {

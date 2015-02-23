@@ -37,6 +37,11 @@ public class Log implements Serializable {
 		return dictionary;
 	}
 	
+	public void addAttribute(String name, String value) {
+		description = description.concat(" " + name + "=" + value);
+		dumpAttributes();
+	}
+	
 	public void dumpAttributes() {
 		dictionary = null;
 		_index = null;
