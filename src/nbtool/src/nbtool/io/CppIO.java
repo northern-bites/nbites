@@ -27,9 +27,9 @@ public class CppIO implements Runnable {
 	
 	public static void ref(){} //Force the JRE to init CppIO by statically referencing the class.
 
-	public static CppIO init() {
+	private static CppIO init() {
 		CppIO io = new CppIO();
-		thread = new Thread(io);
+		thread = new Thread(io, "nbtool-cppio");
 		thread.start();
 
 		return io;
@@ -39,7 +39,6 @@ public class CppIO implements Runnable {
 	public static Thread thread;
 	
 	private ArrayList<CppFunc> foundFuncs;
-	
 	private Queue<CppFuncCall> calls;
 
 	public void run() {
@@ -86,7 +85,15 @@ public class CppIO implements Runnable {
 				findFunctions(dis, dos);
 				
 				N.notifyEDT(EVENT.CPP_FUNCS_FOUND, this, foundFuncs);
-				U.w("CppIO: got function list.");
+				U.w("CppIO: got function list:");
+				for (CppFunc f: foundFuncs) {
+					U.wf("\t%s(", f.name);
+					for (String a : f.args) {
+						U.wf(" [%s] ", a);
+					}
+					
+					U.w(")");
+				}
 				
 				dos.writeInt(foundFuncs.size());
 				dos.flush();
@@ -95,14 +102,16 @@ public class CppIO implements Runnable {
 
 			} catch(CppIOException cie) {
 				U.w("Malformed communication with m: " + cie.message);
+				cie.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			
-			
 			N.notifyEDT(EVENT.CPP_CONNECTION, this, false);
+			foundFuncs = null;
+			calls = null;
 			
 			/*connection to c++ process died.*/
 		}
@@ -110,28 +119,24 @@ public class CppIO implements Runnable {
 	
 	private void findFunctions(DataInputStream dis, DataOutputStream dos) throws IOException {
 		U.w("CppIO: getting function list.");
-		int nfuncs = dis.readInt();
-		for (int i = 0; i < nfuncs; ++i) {
-			int nlen = dis.readInt();
-			byte[] nb = new byte[nlen];
-			dis.readFully(nb);
-			String name = new String(nb);
+		int nfuncs_1 = dis.readInt();
+		Log funcLog = CommonIO.readLog(dis);
+		int nfuncs_2 = Integer.parseInt(funcLog.getAttributes().get("fn"));
+		
+		String funcstr = new String(funcLog.bytes);
+		String[] funcs = funcstr.split("\n");
+		int nfuncs_3 = funcs.length;
+		
+		if (nfuncs_1 != nfuncs_2 || nfuncs_2 != nfuncs_3) 
+			throw new CppIOException(String.format("nfuncs: %d %d %d",
+					nfuncs_1, nfuncs_2, nfuncs_3));
+		
+		for (String f : funcs) {
+			String[] parts = f.split("=");
+			assert(parts.length == 2);
+			String[] args = parts[1].trim().split(" ");
 			
-			int nargs = dis.readInt();
-			
-			CppFunc f = new CppFunc();
-			f.name = name;
-			f.args = new String[nargs]; 
-			
-			for (int j = 0; j < nargs; ++j) {
-				int alen = dis.readInt();
-				byte[] ab = new byte[alen];
-				dis.readFully(ab);
-				
-				f.args[j] = new String(ab);
-			}
-			
-			foundFuncs.add(f);
+			foundFuncs.add(new CppFunc(parts[0].trim(), args));
 		}
 	}
 	
@@ -157,18 +162,7 @@ public class CppIO implements Runnable {
 				dos.writeInt(1);
 				dos.flush();
 				
-				//In case there are any remaining pings in the system...
-				for (int r = dis.readInt(); r != 1; r = dis.readInt()) {
-					if (r != 1 && r != 0)
-						throw new CppIOException("trying to call function, got bad response: " + r);
-				}
-				
-				U.w("got call response, sending call.");
-				
 				dos.writeInt(c.index);
-				dos.writeInt(c.name.length());
-				dos.write(c.name.getBytes());
-				dos.writeInt(c.args.size());
 				
 				for (Log l : c.args) {
 					CommonIO.writeLog(dos, l);
@@ -176,17 +170,6 @@ public class CppIO implements Runnable {
 				dos.flush();
 				
 				U.w("Sent call.");
-				
-				int nrecvd = dis.readInt();
-				if (nrecvd != c.args.size())
-					throw new CppIOException("confirmation of sent args wrong: " + nrecvd);
-				
-				int out_ready = dis.readInt();
-				if (out_ready != 2)
-					throw new CppIOException("bad return confirmation: " + out_ready);
-				dos.writeInt(2);
-				dos.flush();
-				
 				
 				final int ret = dis.readInt();
 				int num_out = dis.readInt();
@@ -199,9 +182,7 @@ public class CppIO implements Runnable {
 					outs.add(nl);
 				}
 				
-				dos.writeInt(0);
-				if (dis.readInt() != 0) 
-					throw new CppIOException("bad function call finish confirmation value.");
+				dos.writeInt(outs.size());
 				
 				//Done calling function.
 				SwingUtilities.invokeLater(new Runnable(){
@@ -210,8 +191,8 @@ public class CppIO implements Runnable {
 					}
 				});
 				
-			} else Thread.sleep(400); //No calls waiting
-			
+			} 
+			else Thread.sleep(10); //No calls waiting
 		}
 	}
 
@@ -219,9 +200,14 @@ public class CppIO implements Runnable {
 	public class CppFunc {
 		public String name;
 		public String[] args;
+		
+		public CppFunc(String n, String[] a) {
+			name = n;
+			args = a;
+		}
 	}
 	
-	public class CppFuncCall {
+	public static class CppFuncCall {
 		public int index;
 		public String name;
 		public ArrayList<Log> args;
@@ -237,12 +223,25 @@ public class CppIO implements Runnable {
 			return false;
 		if (!(c.args.size() == foundFuncs.get(c.index).args.length))
 			return false;
+		if (c.listener == null)
+			return false;
 		
 		synchronized(calls) {
 			calls.add(c);
 		}
+		
 		U.w("CppIO: added call to function: " + c.name);
 		return true;
+	}
+	
+	public int indexOfFunc(String name) {
+		if (foundFuncs == null) return -1;
+		for (int i = 0; i < foundFuncs.size(); ++i) {
+			if (foundFuncs.get(i).name.startsWith(name))
+				return i;
+		}
+		
+		return -1;
 	}
 	
 	private class CppIOException extends IOException {

@@ -13,6 +13,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -130,6 +131,14 @@ public class U {
 		return p;
 	}
 	
+	public static JPanel fieldWithButton(JTextField f, JButton b) {
+		JPanel p = new JPanel(new BorderLayout());
+		p.add(b,BorderLayout.EAST);
+		p.add(f,BorderLayout.CENTER);
+		
+		return p;
+	}
+	
 	/*
 	 * Can't (to my knowledge) search for classes in the JVM except by trying to find specific ones.
 	 * 
@@ -216,7 +225,7 @@ public class U {
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		}
-		
+				
 		return ret;
 	}
 	

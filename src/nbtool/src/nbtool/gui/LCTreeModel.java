@@ -130,7 +130,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 					FileIO.loadLog(lg, b.dir);
 					
 					assert(lg.getClass().equals(Log.class));
-					N.notifyEDT(EVENT.LOG_LOAD, this, new Log[]{lg});
+					N.notifyEDT(EVENT.LOG_LOAD, this, (Object[]) new Log[]{lg});
 				} catch (IOException ex) {
 					ex.printStackTrace();
 					U.w("message: " + ex.getMessage());

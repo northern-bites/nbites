@@ -22,6 +22,7 @@ public final class ProtoBufView extends nbtool.gui.logviews.misc.ViewParent {
 		
 		String t = (String) newlog.type();
 		Class<? extends com.google.protobuf.GeneratedMessage> lClass = U.protobufClassFromType(t);
+		U.wf("ProtoBufView: using class %s for type %s.\n", lClass.getName(), t);
 		com.google.protobuf.Message msg = U.protobufInstanceForClassWithData(lClass, newlog.bytes);
 
 		

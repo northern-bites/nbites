@@ -1,167 +1,267 @@
 package nbtool.gui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
-import javax.swing.DropMode;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
 import javax.swing.TransferHandler;
-import javax.swing.border.BevelBorder;
+import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.border.Border;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.tree.TreePath;
 
 import nbtool.data.Log;
 import nbtool.io.CppIO;
+import nbtool.io.CppIO.CppFunc;
+import nbtool.io.CppIO.CppFuncCall;
 import nbtool.io.CppIO.CppFuncListener;
 import nbtool.util.N;
+import nbtool.util.NBConstants;
+import nbtool.util.U;
 import nbtool.util.N.EVENT;
 import nbtool.util.N.NListener;
-import nbtool.util.U;
-
-import nbtool.util.NBConstants;
 
 public class CppPane extends JPanel implements ActionListener, NListener, CppFuncListener {
-	private static final long serialVersionUID = 1L;
 
-	protected CppPane(LogChooser lc) {
-		super();
+	private static void exact(Dimension d, Component c) {
+		c.setMinimumSize(d);
+		c.setMaximumSize(d);
+		c.setPreferredSize(d);
+	}
+
+	private void upEnable() {
+		status.setText("[connected]");
+		status.setForeground(Color.GREEN);
 		
-		setLayout(null);
-		addComponentListener(new ComponentAdapter() {
-			public void componentResized(ComponentEvent e) {
-				useSize(e.getComponent().getSize());
-			}
-		});
+		functions.removeAllItems();
+		for (CppIO.CppFunc f : found)
+			functions.addItem(f.name);
+		functions.setEnabled(true);
+		functions.setSelectedIndex(-1);
+		selected = null;
 		
-		this.lc = lc;
+		macros.setEnabled(false);
+		call.setEnabled(true);
+		clear.setEnabled(true);
 		
-		connect_status = new JLabel("status: bad    ");
-		connect_status.setForeground(Color.RED);
+		arg_list.setEnabled(true);
+		arg_model.reload();
+		out_list.setEnabled(true);
+		out_model.reload();
+	}
+
+	private void downDisable() {
+		status.setText("[down]");
+		status.setForeground(Color.BLACK);
 		
-		funcName = new JComboBox<String>();
-		funcName.addActionListener(this);
-		funcName.setEnabled(false);
+		functions.removeAllItems();
+		functions.setEnabled(false);
+		functions.setSelectedIndex(-1);
+		found = null;
+		selected = null;
 		
-		arg_data = new ArrayList<Log>();
-		der_data = new ArrayList<Log>();
-		arg_model = new MODEL(arg_data);
-		der_model = new MODEL(der_data);
+		macros.setEnabled(false);
+		call.setEnabled(false);
+		clear.setEnabled(false);
 		
-		Border line = BorderFactory.createBevelBorder(BevelBorder.RAISED, Color.BLACK, Color.DARK_GRAY);
-				
-		macros = new JList<String>(new String[]{CA_S, NA_S});
+		arg_list.setEnabled(false);
+		arg_model.reload();
+		out_list.setEnabled(false);
+		out_model.reload();
+	}
+
+	public CppPane() {
+		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		Border b = BorderFactory.createLineBorder(Color.BLACK);
+		status = new JLabel("[placeholder...]");
+		status.setForeground(Color.GRAY);
+		status.setAlignmentX(Component.LEFT_ALIGNMENT);
+		add(status);
+
+		//add(Box.createRigidArea(new Dimension(200,5)));
+		functions = new JComboBox<String>();
+		functions.setEditable(false);
+		functions.addActionListener(this);
+		functions.setAlignmentY(Component.TOP_ALIGNMENT);
+		functions.setBorder(BorderFactory.createTitledBorder(b, "functions"));
+		functions.setMaximumSize(new Dimension(Short.MAX_VALUE,
+				this.getPreferredSize().height));
+		add(functions);
+		add(Box.createRigidArea(new Dimension(0,10)));
+		//add(Box.createRigidArea(new Dimension(200,5)));
+		macros = new JList<String>(new String[]{CA_S,NA_S});
 		macros.setDragEnabled(true);
 		macros.setLayoutOrientation(JList.VERTICAL);
 		macros.setVisibleRowCount(2);
-		macros.setBorder(BorderFactory.createTitledBorder(line, "macros"));
-		macros.setEnabled(false);
+		macros.setAlignmentX(Component.LEFT_ALIGNMENT);
+		macros.setBorder(BorderFactory.createTitledBorder(b, "macros"));
+		add(macros);
+		add(Box.createRigidArea(new Dimension(0,10)));
+
+		args = new ArrayList<Log>();
+		arg_list = new JList<String>();
+		arg_model = new ArgModel(arg_list);
+		arg_list.setLayoutOrientation(JList.VERTICAL);
+		arg_list.setVisibleRowCount(5);
+		arg_list.setBorder(BorderFactory.createTitledBorder(b, "args"));
+		arg_list.setMinimumSize(new Dimension(200,50));
+		arg_list.setTransferHandler(new ArgImporter());
+		add(arg_list);
 		
-		handler = new HANDLER();
-		
-		args = new JList<String>(arg_model);
-		args.setLayoutOrientation(JList.VERTICAL);
-		args.setVisibleRowCount(5);
-		args.setTransferHandler(handler);
-		args.setBorder(BorderFactory.createTitledBorder(line, "arguments"));
-		args.setEnabled(false);
-		
-		derived = new JList<String>(der_model);
-		derived.addListSelectionListener(der_model);
-		derived.setLayoutOrientation(JList.VERTICAL);
-		derived.setVisibleRowCount(5);
-		derived.setBorder(BorderFactory.createTitledBorder(line, "derived"));
-		derived.setEnabled(false);
-		
-		go = new JButton("GO");
-		clear = new JButton("CLEAR");
-		go.addActionListener(this);
+		out = new ArrayList<Log>();
+		out_list = new JList<String>();
+		out_model = new OutModel(out_list);
+		out_list.setLayoutOrientation(JList.VERTICAL);
+		out_list.setVisibleRowCount(5);
+		out_list.setBorder(BorderFactory.createTitledBorder(b, "out"));
+		out_list.setMinimumSize(new Dimension(200, 50));
+		add(out_list);
+
+		call = new JButton("call");
+		call.setAlignmentX(CENTER_ALIGNMENT);
+		call.addActionListener(this);
+		clear = new JButton("clear");
+		clear.setAlignmentX(CENTER_ALIGNMENT);
 		clear.addActionListener(this);
+		add(call);
+		add(clear);
+		add(Box.createVerticalGlue());
+		
+		downDisable();
 		
 		N.listen(EVENT.CPP_CONNECTION, this);
 		N.listen(EVENT.CPP_FUNCS_FOUND, this);
-		
-		add(funcName);
-		add(macros);add(args);add(derived);add(go);add(clear);
-		add(connect_status);
 	}
-	
-	private void useSize(Dimension size) {
-		int y_offset = 0;
-		
-		Dimension p = connect_status.getPreferredSize();
-		connect_status.setBounds(size.width - p.width, 0,
-				p.width, p.height);
-		y_offset += p.height;
-		
-		p = funcName.getPreferredSize();
-		funcName.setBounds(5, y_offset, size.width, p.height);
-		y_offset += p.height + 10;
-		
-		p = macros.getPreferredSize();
-		macros.setBounds(0, y_offset, size.width - 5, p.height);
-		y_offset += p.height + 10;
-		
-		p = args.getPreferredScrollableViewportSize();
-		args.setBounds(0, y_offset, size.width, p.height);
-		y_offset += p.height + 20;
-		
-		p = derived.getPreferredScrollableViewportSize();
-		derived.setBounds(0, y_offset, size.width, p.height);
-		y_offset += p.height + 20;
-		
-		p = clear.getPreferredSize();
-		clear.setBounds(size.width / 2 - p.width / 2, y_offset, p.width, p.height);
-		y_offset += p.height ;
-		
-		p = go.getPreferredSize();
-		go.setBounds(size.width / 2 - p.width / 2, y_offset, p.width, p.height);
-	}
-	
-	private JComboBox<String> funcName;
-		
-	private JLabel connect_status;
-	private JButton go, clear;
-	
+
+	private JLabel status;
+	private JComboBox<String> functions;
+
+	private JButton call, clear;
+
 	private JList<String> macros;
-	private JList<String> args;
-	private JList<String> derived;
-	private HANDLER handler;
+
+	private JList<String> arg_list;
+	private ArgModel arg_model;
+	private ArrayList<Log> args;
+
+	private JList<String> out_list;
+	private OutModel out_model;
 	
-	private MODEL arg_model;
-	private MODEL der_model;
+	private ArrayList<CppIO.CppFunc> found;
+	private CppFunc selected;
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object source = e.getSource();
+		if (source == functions) {
+			int i = functions.getSelectedIndex();
+			if (i >= 0) {
+				selected = found.get(i);
+				args = new ArrayList<Log>();
+				arg_model.reload();
+			}
+		} else if (source == call) {
+			if (selected == null)
+				return;
+			if (args.size() != selected.args.length)
+				return;
+			CppFuncCall call = new CppFuncCall();
+			call.index = found.indexOf(selected);
+			call.name = selected.name;
+			call.args = args;
+			call.listener = this;
+			CppIO.current.tryAddCall(call);
+		} else if (source == clear) {
+			args = new ArrayList<Log>();
+			arg_model.reload();
+		}
+	}
 	
-	private ArrayList<Log> arg_data;
-	private ArrayList<Log> der_data;
+	@Override
+	public void notified(EVENT e, Object src, Object... args) {
+		switch(e){
+		case CPP_CONNECTION:
+			Boolean con = (Boolean) args[0];
+			if (!con)
+				this.downDisable();
+			break;
+		case CPP_FUNCS_FOUND:
+			found = (ArrayList<CppFunc>) args[0];
+			this.upEnable();
+			break;
+		}
+		
+	}
+
+	private static final String NA_S = "::next selection::";
+	private static final String CA_S = "::current selection::";
+	private static final Log NEXT_ALIAS = new Log(NA_S, null);
+	private static final Log CUR_ALIAS = new Log(CA_S, null);
+
+	private class ArgModel extends AbstractListModel<String>
+	implements ListSelectionListener {
+
+		protected ArgModel(JList<String> l) {
+			super();
+			l.setModel(this);
+			l.addListSelectionListener(this);
+		}
+
+		@Override
+		public int getSize() {
+			if (selected != null)
+				return selected.args.length;
+			else return 0;
+		}
+
+		@Override
+		public String getElementAt(int index) {
+			if (index < args.size())
+				return args.get(index).toString();
+			else return selected.args[index];
+		}
+
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			if (e.getValueIsAdjusting())
+				return;
+			
+			int index = ((JList<String>) e.getSource()).getSelectedIndex();
+			if (index >= args.size() || index < 0)
+				return;
+			
+			Log l = args.get(index);
+			N.notifyEDT(EVENT.LOG_SELECTION, this, l);
+		}
+		
+		public void reload() {
+			this.fireContentsChanged(this, 0, getSize());
+		}
+	}
 	
-	private class HANDLER extends TransferHandler {		
+	private class ArgImporter extends TransferHandler {		
 		private static final long serialVersionUID = 1L;
 		
 		public boolean canImport(TransferSupport p) {
+			if (args.size() == selected.args.length)
+				return false;
 			return p.isDataFlavorSupported(DataFlavor.stringFlavor)
 					|| p.isDataFlavorSupported(NBConstants.treeFlavor);
 		}
@@ -192,220 +292,68 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 			}
 			
 			
+			args.add(imp);
+			arg_model.reload();
+			return true;
 			
-			for (int i = 0; i < arg_data.size(); ++i) {
-				Log cur = arg_data.get(i);
-				if (cur.description.startsWith("::") || cur.bytes != null) 
-					continue;
-				else if (imp.description.startsWith("::")) {
-					arg_data.set(i, imp);
-					U.wf("CppPane: args: import for [%s] is MACRO\n", cur.description);
-					arg_model.reload();
-					return true;
-				} else {
-					String req_type = cur.description;
-					String imp_type = (String) imp.getAttributes().get("type");
-					assert(imp_type != null);
-					if (req_type.equalsIgnoreCase(imp_type)) {
-						U.wf("CppPane: args: import for [%s] exact: %s\n", req_type, imp_type);
-						arg_data.set(i, imp);
-						arg_model.reload();
-						return true;
-					}
-				}
-			}
-			
-			U.w("CppPane: args: could not import: " + imp);
-			return false; 
+			//U.w("CppPane: args: could not import: " + imp);
+			//return false; 
 		}
 	}
-	
-	private class MODEL extends AbstractListModel<String> implements ListSelectionListener {
-		private static final long serialVersionUID = 1L;
-		private ArrayList<Log> data;
-		protected MODEL(ArrayList<Log> l) {this.data = l;}
+
+	private ArrayList<Log> out;
+	private class OutModel extends AbstractListModel<String>
+	implements ListSelectionListener {
+
+		protected OutModel(JList<String> l) {
+			super();
+			l.setModel(this);
+			l.addListSelectionListener(this);
+		}
 
 		@Override
 		public int getSize() {
-			return this.data.size();
+			return out.size();
 		}
 
 		@Override
 		public String getElementAt(int index) {
-			return this.data.get(index).description;
-		}
-		
-		/*
-		public void addString(String s) {
-			data.add(s);
-			fireIntervalAdded(this, data.size() - 1, data.size() - 1);
-		} */
-		
-		
-		public void reload() {
-			this.fireContentsChanged(this, 0, data.size());
+			return out.get(index).toString();
 		}
 
+		@Override
 		public void valueChanged(ListSelectionEvent e) {
 			if (e.getValueIsAdjusting())
 				return;
 			
-			int index = ((JList) e.getSource()).getSelectedIndex();
-			Log l = der_data.get(index);
+			int index = ((JList<String>) e.getSource()).getSelectedIndex();
+			Log l = out.get(index);
 			N.notifyEDT(EVENT.LOG_SELECTION, this, l);
 		}
-	}
-	
-	private String tryCall() {
-		int i = funcName.getSelectedIndex();
-		if (i < 0) return "no function selected";
-		CppIO.CppFunc f = fFuncs.get(i);
-		
-		if (f.args.length != arg_data.size())
-			return "not enough arguments";
-		
-		Log[] ARGS = new Log[f.args.length];
-		arg_data.toArray(ARGS);
-		
-		//Get listing of arguments (I.e. convert macro to log)
-		for (int j = 0; j < f.args.length; ++j) {
-			Log a = arg_data.get(i);
-			
-			if (a.description.equalsIgnoreCase(NA_S)) {
-				a = lc.nextSelection();
-				ARGS[j] = a;
-			}
-			
-			if (a.description.equalsIgnoreCase(CA_S)) {
-				a = lc.currentlySelected();
-				ARGS[j] = a;
-			}
-			
-			if (a == null) {
-				return "arg " + j + " was null.";
-			}
-			
-			if (a.bytes == null) {
-				return "arg " + j + " had null bytes.";
-			}
-			
-			String atype = (String) a.getAttributes().get("type");
-			String rtype = f.args[j];
-			
-			if (!atype.equalsIgnoreCase(rtype)) {
-				return "arg had type [" + atype + "] wanted [" + rtype + "].";
-			}
-		}
-		
-		CppIO.CppFuncCall call = CppIO.current.new CppFuncCall();
-		call.args = new ArrayList<Log>(Arrays.asList(ARGS));
-		call.listener = this;
-		call.index = funcName.getSelectedIndex(); assert(call.index >= 0);
-		call.name = f.name;
-		
-		U.wf("CppPane: call to %s (%d)\n", call.name, call.index);
-		for (Log a : call.args) 
-			U.wf("\t%s\n", a.description);
-		
-		if (!CppIO.current.tryAddCall(call)) {
-			return "CppIO rejected call with name: " + call.name;
-		}
-		
-		return null;
-	}
-	
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == go) {
-			String msg = tryCall();
-			if (msg != null) {
-				JOptionPane.showMessageDialog(this, msg, "error", JOptionPane.ERROR_MESSAGE);
-			}
-			
-			return;
-		}
-		
-		if (e.getSource() == clear) {
-			//data = new ArrayList<String>();
-			arg_data.clear();
-			arg_model.reload();
-		}
-		
-		//Need to reload func args.
-		if (e.getSource() == funcName || e.getSource() == clear){
-			//Change args...
-			int i = funcName.getSelectedIndex();
-			if (i < 0) return;
-			
-			CppIO.CppFunc f = fFuncs.get(i);
-			
-			arg_data.clear();
-			
-			for (String s : f.args) {
-				arg_data.add(new Log(s, null));
-			}
-			
-			arg_model.reload();
-			this.useSize(this.getSize());
-		} else {
-			U.w("ERROR: unknown source! " + e.getSource());
-		}
-	}
-	
-	public void notified(EVENT e, Object src, Object... argArray) {
-		switch(e) {
-		case CPP_CONNECTION:
-			Boolean b = (Boolean) argArray[0];
-			String n = b ? "status: good" : "status: bad";
-			Color nc = b ? Color.GREEN : Color.RED;
-			connect_status.setText(n);
-			connect_status.setForeground(nc);;
-			
-			if (b) {
-				args.setEnabled(true);
-				//macros.setEnabled(true);
-			} else {
-				args.setEnabled(false);
-				macros.setEnabled(false);
-				funcName.setEnabled(false);
-			}
-			break;
-		case CPP_FUNCS_FOUND:
-			fFuncs = (ArrayList<CppIO.CppFunc>) argArray[0];
-			funcName.removeAllItems();
-			for (CppIO.CppFunc f : fFuncs) {
-				funcName.addItem(f.name);
-			}
-			
-			funcName.setEnabled(true);
-			arg_data.clear();
-			arg_model.reload();
-			this.useSize(this.getSize());
-			
-			break;
-		default: {U.w("CppPane notified of event it did not listen for! " + e);}
-		}
-		
-		this.repaint();
-	}
-	
-	//CppIO.CppCallListener
-	public void returned(int ret, Log... out) {
-		
-		U.w("CppPane: function returned with ret:" + ret + " and " + out.length + " out.");
-		
-		der_data.clear();
-		der_data.addAll(Arrays.asList(out));
-		der_model.reload();
-		derived.setEnabled(true);
-	}
-	
-	private ArrayList<CppIO.CppFunc> fFuncs = new ArrayList<CppIO.CppFunc>();
-	
-	private LogChooser lc;
-	private static final String NA_S = "::next selection::";
-	private static final String CA_S = "::current selection::";
-	private static final Log NEXT_ALIAS = new Log(NA_S, null);
-	private static final Log CUR_ALIAS = new Log(CA_S, null);
 
-	
+		public void reload() {
+			this.fireContentsChanged(this, 0, getSize());
+		}
+	}
+
+	//For testing...
+	public static void main(String[] args) {
+		JFrame frame = new JFrame("test");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(200, 600);
+
+		CppPane pane = new CppPane();
+		frame.add(pane);
+		pane.setBounds(0,20,200,580);
+
+		frame.setVisible(true);
+	}
+
+	@Override
+	public void returned(int ret, Log... out) {
+		U.wf("CppPane returned: %d with %d logs\n", ret, out.length);
+		
+		this.out.addAll(Arrays.asList(out));
+		out_model.reload();
+	}
 }
