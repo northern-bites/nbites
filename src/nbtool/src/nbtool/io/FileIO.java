@@ -68,7 +68,15 @@ public class FileIO implements Runnable {
 		Log full = CommonIO.readLog(dis);
 		
 		if (dis.available() != 0) {
-			U.wf("ERROR: log [%s] did not follow log format, CORRUPTION LIKELY\n");
+			U.wf("WARNING: log [%s] did not follow log format – %d bytes left, CORRUPTION LIKELY\n", logf.getCanonicalPath(),
+					dis.available());
+			/*
+			int av = dis.available();
+			byte[] left = new byte[av];
+			dis.readFully(left);
+			String text = U.bytesToHexString(left);
+			
+			U.wf("%d bytes left, hex:\n%s\n", av, text); */
 		}
 		
 		if (!(lg.description.equals(full.description))) {
