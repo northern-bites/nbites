@@ -10,6 +10,5 @@ add_library(
 target_link_libraries(
   sound
   log
-  portals
-  messages
+  ${ALCOMMON_LIBRARIES}
 )

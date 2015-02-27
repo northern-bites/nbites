@@ -18,13 +18,21 @@ namespace sound {
 
 void Recorder::init()
 {
+    /*
+     
+     */
+    
     SOUNDO("Recorder init!");
+    
+    
     audioDevice->callVoid("setClientPreferences",
                           getName(),                //Name of this module
                           48000,                    //48000 Hz requested
-                          (int)ALLCHANNELS,         //4 Channels requested
+                          (int)AL::ALLCHANNELS,         //4 Channels requested
                           1                         //Deinterleaving requested
                           );
+    
+    
     
     startDetection();
 }
@@ -39,8 +47,8 @@ Recorder::~Recorder()
 /// method is automatically called by the AudioDevice Module.
 void Recorder::process(const int & nbOfChannels,
                                 const int & nbOfSamplesByChannel,
-                                const AL_SOUND_FORMAT * buffer,
-                                const ALValue & timeStamp)
+                       const AL::AL_SOUND_FORMAT * buffer,
+                       const AL::ALValue & timeStamp)
 {
     SOUNDO("Recorder asked to process!\n");
 }
