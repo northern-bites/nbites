@@ -11,7 +11,7 @@
 #define SOUND_NRM  "\x1B[0m"
 #define SOUND_MRK   "\x1B[31m"
 
-#define SOUNDO(format, ...) printf(SOUND_MRK format SOUND_NRM, __VA_ARGS__)
+#define SOUNDO(format, ...) printf(SOUND_MRK format SOUND_NRM, ## __VA_ARGS__ )
 
 namespace sound {
     
