@@ -5,7 +5,8 @@ set(SOUND_SRC Recorder.cpp)
 add_library(
   sound
   STATIC
-  ${SOUND_SRC} )
+  ${SOUND_SRC} 
+)
 
 target_link_libraries(
   sound
