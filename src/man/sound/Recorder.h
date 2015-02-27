@@ -29,7 +29,7 @@ public:
 public:
     void process(const int & nbOfChannels,
                  const int & nbrOfSamplesByChannel,
-                 const AL::AL_SOUND_FORMAT * buffer,
+                 const AL_SOUND_FORMAT * buffer,
                  const AL::ALValue & timeStamp);
 };
     

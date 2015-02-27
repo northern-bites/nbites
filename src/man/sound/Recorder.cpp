@@ -47,7 +47,7 @@ Recorder::~Recorder()
 /// method is automatically called by the AudioDevice Module.
 void Recorder::process(const int & nbOfChannels,
                                 const int & nbOfSamplesByChannel,
-                       const AL::AL_SOUND_FORMAT * buffer,
+                       const AL_SOUND_FORMAT * buffer,
                        const AL::ALValue & timeStamp)
 {
     SOUNDO("Recorder asked to process!\n");
