@@ -47,9 +47,12 @@ namespace man {
     gamestate(teamNum, playerNum),
     behaviors(teamNum, playerNum),
     leds(broker),
-    sharedBall(playerNum)
+    sharedBall(playerNum),
+    recorder(broker, "sound::Recorder")
     {
         setModuleDescription("The Northern Bites' soccer player.");
+        
+        recorder.init();
         
         /** Sensors **/
         sensorsThread.addModule(sensors);
