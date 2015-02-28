@@ -55,6 +55,16 @@ public class P {
 	private static final String pathsName = "NBClient_paths";
 	private static final String addrsName = "NBClient_addrs";
 	
+	private static final String mapsDirName = "NBClient_mapsDir";
+	
+	public static String getMapsDir() {
+		return p.get(mapsDirName, "");
+	}
+	
+	public static void setMapsDir(String path) {
+		p.put(mapsDirName, path);
+	}
+
 	private static final String verbName = "NBTool_verbose";
 	
 	public static boolean getVerbose() {
@@ -165,6 +175,7 @@ public class P {
 		putHeap(NBConstants.DEFAULT_MAX_MEMORY_USAGE);
 		clearOrderedSet(pathsName);
 		clearOrderedSet(addrsName);
+		setMapsDir("");
 	}
 	
 	/*****
