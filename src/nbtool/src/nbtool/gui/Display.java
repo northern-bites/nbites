@@ -80,7 +80,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		cp = new CppPane();
 		right.addTab("c++", cp);
 		
-		up = new UtilPane();
+		up = new PrefsnUtils();
 		right.addTab("utility", up);
 		
 		split1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, left, ldp);
@@ -150,7 +150,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 	private LogDisplayPanel ldp;
 	
 	private CppPane cp;	
-	private UtilPane up;
+	private PrefsnUtils up;
 		
 	private JSplitPane split1;
 	private JSplitPane split2;
