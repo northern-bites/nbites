@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
 
+import nbtool.data.BotStats;
 import nbtool.io.CppIO.CppFunc;
 
 //Notification center
@@ -72,7 +73,9 @@ public class N {
 		ArrayList<NListener> list = listeners[e.index];
 		
 		synchronized (list) {
-			U.w(">>notify: " + e.toString() + " from " + src.toString() + " args: " + args.toString());
+			if (P.VERBOSE)
+				U.w(">>notify: " + e.toString() + " from " + src.getClass().getCanonicalName() + " args: " + represent(args));
+			
 			for (NListener nl : list)
 				nl.notified(e, src, args);
 		}
@@ -90,4 +93,37 @@ public class N {
 		
 		return listeners[e.index].size();
 	}
+	
+	
+	private static String represent(Object ... objs) {
+		
+		if (objs.length == 0)
+			return "()";
+		
+		String ret = "(" + represent(objs[0]);
+		
+		for (int i = 1; i < objs.length; ++i) {
+			ret += ", " + represent(objs[i]);
+		}
+		
+		if (ret.length() > 200)
+			return ret.substring(0, 200) + "... TRUNC )";
+		
+		return ret + ")";
+	}
+	
+	private static String represent(Object o) {
+		
+		if (o instanceof Boolean)
+			return String.format("%B", o);
+		
+		if (o instanceof BotStats)
+			return String.format("[BotStats from ut %d]", ((BotStats) o).log_uptime);
+		
+		if (o instanceof ArrayList)
+			return String.format("[ArrayList of size %d]", ((ArrayList) o).size());
+		
+		return "[" + o.toString() + "]";
+	}
+
 }

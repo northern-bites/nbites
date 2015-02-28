@@ -38,9 +38,10 @@ public class P {
 	 * control addresses (up to 5)
 	 * 
 	 * 	max log data storage
-	 * */
-		
+	 * */		
 	public static Preferences p = java.util.prefs.Preferences.userRoot().node(P.class.getName());
+	public static boolean VERBOSE = getVerbose();
+
 	
 	private static final String xName = "NBClient_W_x";
 	private static final String yName = "NBClient_W_y";
@@ -53,6 +54,17 @@ public class P {
 	
 	private static final String pathsName = "NBClient_paths";
 	private static final String addrsName = "NBClient_addrs";
+	
+	private static final String verbName = "NBTool_verbose";
+	
+	public static boolean getVerbose() {
+		return VERBOSE = p.getBoolean(verbName, false);
+	}
+	
+	public static void setVerbose(boolean val) {
+		VERBOSE = val;
+		p.putBoolean(verbName, val);
+	}
 	
 	public static long getHeap() {
 		return p.getLong(heapName, NBConstants.DEFAULT_MAX_MEMORY_USAGE);
