@@ -3,7 +3,6 @@
 //  nbcross
 //
 //  Created by Philip Koch on 11/28/14.
-//  Copyright (c) 2014 pkoch. All rights reserved.
 //
 
 #ifndef __nbcross__nbfuncs__
@@ -15,7 +14,7 @@
 
 #include "../man/log/logio.h"
 
-typedef struct nbfunc_s {
+typedef struct {
     const char * name;
     int (*func)(void) ;
     

@@ -249,6 +249,42 @@ namespace logio {
         return split(d, ' ');
     }
     
+    std::map<std::string, std::string> kvp(const char * desc) {
+        std::map<std::string, std::string> ret;
+        
+        std::vector<std::string> kp = pairs(desc);
+        
+        for (int i = 0; i < kp.size(); ++i) {
+            assert(kp[i].find('=') != std::string::npos);
+            std::vector<std::string> splitted = split(kp[i], '=');
+            assert(splitted.size() == 2);
+            
+            ret[splitted[0]] = splitted[1];
+        }
+        
+        return ret;
+    }
+    
+    int widthOf(log_t log) {
+        std::map<std::string, std::string> keys = kvp(log.desc);
+        
+        if (keys.find("width") != keys.end()) {
+            return atoi(keys["width"].c_str());
+        } else {
+            return -1;
+        }
+    }
+    
+    int heightOf(log_t log) {
+        std::map<std::string, std::string> keys = kvp(log.desc);
+        
+        if (keys.find("height") != keys.end()) {
+            return atoi(keys["height"].c_str());
+        } else {
+            return -1;
+        }
+    }
+    
     bool isType(log_t * log, const char * type) {
         std::string need = "type=";
         need.append(type, strlen(type));
@@ -267,6 +303,19 @@ namespace logio {
         bcopy(log->data, newl.data, newl.dlen);
         
         return newl;
+    }
+    
+    log_t heapLog(const char * desc, size_t dlen, void * data) {
+        log_t ret;
+        size_t desclen = strlen(desc) + 1;
+        ret.desc = (char *) malloc(desclen);
+        ret.data = (uint8_t *) malloc(dlen);
+        ret.dlen = dlen;
+        
+        memcpy(ret.desc, desc, desclen + 1);
+        memcpy(ret.data, data, dlen);
+        
+        return ret;
     }
     
 }

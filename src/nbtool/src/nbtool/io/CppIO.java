@@ -27,7 +27,7 @@ public class CppIO implements Runnable {
 	
 	public static void ref(){} //Force the JRE to init CppIO by statically referencing the class.
 
-	public static CppIO init() {
+	private static CppIO init() {
 		CppIO io = new CppIO();
 		thread = new Thread(io, "nbtool-cppio");
 		thread.start();
