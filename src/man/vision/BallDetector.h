@@ -8,6 +8,7 @@
 
 namespace man {
 namespace vision {
+
 class BallDetector {
 public:
     BallDetector(messages::PackedImage8* orangeImage_);

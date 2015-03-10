@@ -16,7 +16,7 @@ void BallDetector::findBalls() {
     Blobber<uint8_t> b(orangeImage->pixelAddress(0, 0), orangeImage->width(),
                        orangeImage->height(), 1, orangeImage->width());
 
-    b.run(NeighborRule::eight, 90, 100, 100);
+    b.run(NeighborRule::eight, 90, 100, 100, 100);
 
     blobs = b.getResult();
 }

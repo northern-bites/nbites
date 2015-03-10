@@ -105,7 +105,6 @@ add_subdirectory( obstacle )
 add_subdirectory( sensors )
 add_subdirectory( sharedball )
 add_subdirectory( vision )
-add_subdirectory( new_vision )
 
 set( MAN_SRCS main.cpp
   Man.cpp
@@ -142,7 +141,6 @@ target_link_libraries(
   sharedball
   support
   vision
-  new_vision
 )
 
 install( TARGETS man

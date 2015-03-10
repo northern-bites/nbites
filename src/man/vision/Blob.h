@@ -1,88 +1,62 @@
-#ifndef Blob_h_defined
-#define Blob_h_defined
+#pragma once
 
-#include "Common.h"
-#include "VisionStructs.h"
-#include "VisionHelpers.h"
-#include <stdlib.h>
+#include <vector>
 
 namespace man {
 namespace vision {
 
-class Blob {
-public:
-    Blob();
-    virtual ~Blob() {}
-
-    // SETTERS
-    void setLeftTop(point <int> lt)
-        {leftTop.x = lt.x; leftTop.y = lt.y;}
-    void setRightTop(point <int> rt)
-        {rightTop.x = rt.x; rightTop.y = rt.y;}
-    void setLeftBottom(point <int> lb)
-        {leftBottom.x = lb.x; leftBottom.y = lb.y;}
-    void setRightBottom(point <int> rb)
-        {rightBottom.x = rb.x; rightBottom.y = rb.y;}
-    void setBlob(point <int> tl, point <int> tr, point <int> bl,
-                 point <int> br) {setLeftTop(tl); setRightTop(tr);
-                 setLeftBottom(bl); setRightBottom(br);}
-    void setLeftTopX(int x) {leftTop.x = x;}
-    void setLeftTopY(int y) {leftTop.y = y;}
-    void setRightTopX(int x) {rightTop.x = x;}
-    void setRightTopY(int y) {rightTop.y = y;}
-    void setLeftBottomX(int x) {leftBottom.x = x;}
-    void setLeftBottomY(int y) {leftBottom.y = y;}
-    void setRightBottomX(int x) {rightBottom.x = x;}
-    void setRightBottomY(int y) {rightBottom.y = y;}
-    void setLeft(int x) {setLeftTopX(x); setLeftBottomX(x);}
-    void setRight(int x) {setRightTopX(x); setRightBottomX(x);}
-    void setTop(int y) {setLeftTopY(y); setRightTopY(y);}
-    void setBottom(int y) {setLeftBottomY(y); setRightBottomY(y);}
-    void setArea(int a) {area = a;}
-    void setPixels(int p) {pixels = p;}
-    void shift(int deltax, int deltay);
-
-    // GETTERS
-    point<int> getLeftTop() const {return leftTop;}
-    int getLeftTopX() const {return leftTop.x;}
-    int getLeftTopY() const {return leftTop.y;}
-    point<int> getRightTop() const {return rightTop;}
-    int getRightTopX() const {return rightTop.x;}
-    int getRightTopY() const {return rightTop.y;}
-    point<int> getLeftBottom() const {return leftBottom;}
-    int getLeftBottomX() const {return leftBottom.x;}
-    int getLeftBottomY() const {return leftBottom.y;}
-    point<int> getRightBottom() const {return rightBottom;}
-    int getRightBottomX() const {return rightBottom.x;}
-    int getRightBottomY() const {return rightBottom.y;}
-    int getLeft() const {return std::min(leftTop.x, leftBottom.x);}
-    int getRight() const {return std::max(rightTop.x, rightBottom.x);}
-    int getTop() const {return std::min(leftTop.y, rightTop.y);}
-    int getBottom() const {return std::max(leftBottom.y, rightBottom.y);}
-    int getMidBottomX() const {return (leftBottom.x + rightBottom.x) / 2;}
-    int getMidBottomY() const {return (leftBottom.y + rightBottom.y) / 2;}
-    int width() const;
-    int height() const;
-    int getArea() const;
-    int getPixels() const {return pixels;}
-
-    // blobbing
-    void init();
-    void merge(Blob other);
-    void printBlob() const;
-    bool isAligned(Blob other);
-    bool contains(Blob other);
-
-private:
-    // bounding coordinates of the blob
-    point <int> leftTop;
-    point <int> rightTop;
-    point <int> leftBottom;
-    point <int> rightBottom;
-    int pixels; // the total number of correctly colored pixels in our blob
-    int area;
+struct point {
+    double x;
+    double y;
 };
 
+class Blob {
+public:
+    Blob() : sw(0), sx(0), sy(0), sx2(0), sy2(0), sxy(0),
+             mx(0), my(0), mxy(0), len(0), solved(false) {}
+    inline void add(double w, double x, double y);
+    inline void addPerimeter(double x, double y);
+    inline void clearPerimeter() { perimeter.clear(); }
+    double area() const { return sw; }
+    double xCenter() const { return sx / sw; }
+    double yCenter() const { return sy / sw; }
+    double density() const { return sw / count; }
+    double angle();
+    double principalLength1();
+    double principalLength2();
+    void setRating(double r) { rating = r; }
+    double getRating() { return rating; }
+
+private:
+    void solve();
+
+    double sw, sx, sy, sx2, sy2, sxy;
+    double mx, my, mxy;
+    double len;
+    bool solved;
+    int count;
+    double rating;
+    std::vector<point> perimeter;
+
+};
+
+inline void Blob::add(double w, double x, double y)
+{
+    sw += w;
+    sx += w * x;
+    sy += w * y;
+    sx2 += w * x * x;
+    sy2 += w * y * y;
+    sxy += w * x * y;
+    count++;
+    solved = false;
+}
+
+inline void Blob::addPerimeter(double x, double y)
+{
+    point p = {x, y};
+    perimeter.push_back(p);
+}
+
 }
 }
-#endif // Blob_h_defined
