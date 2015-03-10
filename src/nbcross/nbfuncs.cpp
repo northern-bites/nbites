@@ -3,7 +3,6 @@
 //  nbcross
 //
 //  Created by Philip Koch on 11/28/14.
-//  Copyright (c) 2014 pkoch. All rights reserved.
 //
 
 #include "nbfuncs.h"
@@ -73,7 +72,7 @@ int BlobTest_func() {
     // Hardcoded for now. TODO
     man::vision::Blobber<uint8_t> b(arg1.data, 640, 480, 2, 640*2);
     printf("about to run\n");
-    b.run(man::vision::NeighborRule::eight, 180, 200, 50);
+    b.run(man::vision::NeighborRule::eight, 180, 200, 50, 500);
 
     logio::log_t ret1;
 

@@ -3,7 +3,6 @@
 //  nbcross
 //
 //  Created by Philip Koch on 11/27/14.
-//  Copyright (c) 2014 pkoch. All rights reserved.
 //
 
 #include <sstream>
