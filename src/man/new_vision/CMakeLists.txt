@@ -11,12 +11,14 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.8.3 )
 
 SET( NEW_VISION_SRCS
   Blob.cpp
+  BallDetector.cpp
   )
 
 SET( NEW_VISION_HEADERS
   Blob.h
   Blobber.h
   FuzzyLogic.h
+  BallDetector.h
 )
 
 # Add static library target

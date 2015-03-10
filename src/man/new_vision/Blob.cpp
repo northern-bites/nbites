@@ -23,7 +23,7 @@ double Blob::principalLength1()
 
 double Blob::principalLength2()
 {
-    if (!solved) 
+    if (!solved)
         solve();
 
     return sqrt((mx + my - len) / 2) / sw;

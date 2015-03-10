@@ -11,10 +11,14 @@ public:
     double area() const { return sw; }
     double xCenter() const { return sx / sw; }
     double yCenter() const { return sy / sw; }
+    double density() const { return sw / count; }
     double angle();
     double principalLength1();
     double principalLength2();
-     
+
+
+    void setRating(double r) { rating = r; }
+    double getRating() { return rating; }
 private:
     void solve();
 
@@ -22,6 +26,9 @@ private:
     double mx, my, mxy;
     double len;
     bool solved;
+
+    int count;
+    double rating;
 };
 
 inline void Blob::add(double w, double x, double y)
@@ -32,6 +39,7 @@ inline void Blob::add(double w, double x, double y)
     sx2 += w * x * x;
     sy2 += w * y * y;
     sxy += w * x * y;
+    count++;
     solved = false;
 }
 

@@ -7,17 +7,18 @@
 #include <vector>
 
 namespace man {
-namespace newVision {
+namespace vision {
 class BallDetector {
 public:
-    Ball(PackedImage8* orangeImage);
-    ~Ball() {};
+    BallDetector(messages::PackedImage8* orangeImage_);
+    ~BallDetector();
 
-private:
     void findBalls();
+private:
+    void rateBlob(Blob b);
 
-    PackedImage8* orangeImage;
-    std::vector<Blob>* blobs;
+    messages::PackedImage8* orangeImage;
+    std::vector<Blob> blobs;
 
 };
 
