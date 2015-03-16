@@ -1,5 +1,6 @@
 package nbtool.gui.logviews.images;
 
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -19,8 +20,8 @@ import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.io.FileIO;
 import nbtool.util.U;
 
+// TODO save automatically
 public class PostLabeler extends ViewParent implements MouseListener, ItemListener, ActionListener {
-
 	ImagePanel imgPanel;
 	JToggleButton jtb;
 	JButton save;
@@ -28,12 +29,14 @@ public class PostLabeler extends ViewParent implements MouseListener, ItemListen
 	
 	public PostLabeler() {
 		super();
+		
+		setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 				
 		addMouseListener(this);
 		
 		imgPanel = new ImagePanel();
 		
-		jtb = new JToggleButton("Label right post");
+		jtb = new JToggleButton("label right post");
 		jtb.addItemListener(this);
 		
 		save = new JButton("save");
@@ -54,6 +57,7 @@ public class PostLabeler extends ViewParent implements MouseListener, ItemListen
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		// TODO append
 		String name = rightPost ? "rightPost" : "singlePost";
 		log.addAttribute(name, Integer.toString(e.getX()));
 		Map<String, String> map = log.getAttributes();
