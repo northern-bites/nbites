@@ -20,7 +20,6 @@ import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.io.FileIO;
 import nbtool.util.U;
 
-// TODO save automatically
 public class PostLabeler extends ViewParent implements MouseListener, ItemListener, ActionListener {
 	ImagePanel imgPanel;
 	JToggleButton jtb;
@@ -57,12 +56,13 @@ public class PostLabeler extends ViewParent implements MouseListener, ItemListen
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// TODO append
-		String name = rightPost ? "rightPost" : "singlePost";
-		log.addAttribute(name, Integer.toString(e.getX()));
 		Map<String, String> map = log.getAttributes();
-		System.out.println(map.get("singlePost"));
-		System.out.println(map.get("rightPost"));
+		String name = rightPost ? "rightPost" : "singlePost";
+		String value = Integer.toString(e.getX());
+		if (map.get(name) == null)
+			log.addAttribute(name, value);
+		else
+			log.updateAttribute(name, value);
 	}
 
 	@Override

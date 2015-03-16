@@ -42,6 +42,11 @@ public class Log implements Serializable {
 		dumpAttributes();
 	}
 	
+	public void updateAttribute(String name, String value) {
+		description = description.replaceFirst(name + "=\\S+", name + "=" + value);
+		dumpAttributes();
+	}
+	
 	public void dumpAttributes() {
 		dictionary = null;
 		_index = null;
