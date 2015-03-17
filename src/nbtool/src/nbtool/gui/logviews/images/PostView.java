@@ -8,8 +8,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 import nbtool.data.Log;
 import nbtool.gui.logviews.misc.ViewParent;
-import nbtool.images.YUYV8888image;
-import nbtool.util.U;
 
 // TODO add via layouts?
 // TODO include all relevant images?
@@ -32,7 +30,7 @@ public class PostView extends ViewParent {
 	public void setLog(Log log_) {
 		log = log_;
 		
-		d = new PostDetector((YUYV8888image) U.imageFromLog(log));
+		d = new PostDetector(log);
 		
 		repaint();
 	}

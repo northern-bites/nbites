@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 public class UtilityManager {
-	public static Class[] utilities = {HardlyWorking.class, YUVColors.class};
+	public static Class[] utilities = {HardlyWorking.class, YUVColors.class, AutomatedPostTester.class};
 	
 	private static HashMap<Class<? extends UtilityParent>, UtilityParent> map = setupMap();
 	private static HashMap<Class<? extends UtilityParent>, UtilityParent> setupMap() {

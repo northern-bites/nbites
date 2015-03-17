@@ -12,7 +12,7 @@ public class Testable {
 		log = log_;
 	}
 	
-	Map<String, Double> calculateError() throws IllegalArgumentException, IllegalAccessException {
+	public Map<String, Double> calculateError() throws IllegalArgumentException, IllegalAccessException {
 		HashMap<String, Double> error = new HashMap<String, Double>();
 		Map<String, String> attributes = log.getAttributes();
 		
@@ -22,12 +22,10 @@ public class Testable {
 			if (valueInDescAsString != null) {
 				int valueInDesc = Integer.parseInt(valueInDescAsString);
 				Class<?> t = f.getType();
-				if (t.isInstance(0)) {
-					Object v = f.get(this);
-					int valueInClass = ((Number) v).intValue(); 
-					double percentDiff = (double)Math.abs(valueInClass - valueInDesc) / valueInDesc;
-					error.put(f.getName(), percentDiff);
-				}
+				Object v = f.get(this);
+				int valueInClass = ((Number) v).intValue(); 
+				double percentDiff = (double)Math.abs(valueInClass - valueInDesc) / valueInDesc;
+				error.put(f.getName(), percentDiff);
 			}
 		}
 			   
