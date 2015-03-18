@@ -1,11 +1,13 @@
 package nbtool.gui.utilitypanes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+
 import nbtool.data.Log;
 import nbtool.gui.logviews.images.PostDetector;
 
@@ -17,9 +19,13 @@ public class AutomatedPostTester extends UtilityParent {
 		ArrayList<String> postLabels = new ArrayList<String>();
 		postLabels.add("singlePost");
 		
-		tester = new AutomatedTester(postLabels, PostDetector.class);
+		Map<String, Double> tolerance = new HashMap<String, Double>();
+		tolerance.put("singlePost", 0.02);
+		tolerance.put("rightPost", 0.02);
 		
-		String formattedResults = new String();
+		tester = new AutomatedTester(postLabels, tolerance, PostDetector.class);
+		
+		String formattedResults = new String("POST DETECTION TESTS:\n\n");
 		for (Entry<Log, Map<String, Double>> testResult : tester.results.entrySet()) {
 			formattedResults = formattedResults.concat(testResult.getKey().name);
 			formattedResults = formattedResults.concat("->");
@@ -30,6 +36,10 @@ public class AutomatedPostTester extends UtilityParent {
 			}
 			formattedResults = formattedResults.concat("\n");
 		}
+		formattedResults = formattedResults.concat("\nfalsePositives->");
+		formattedResults = formattedResults.concat(Integer.toString(tester.falsePositives));
+		formattedResults = formattedResults.concat(", falseNegatives->");
+		formattedResults = formattedResults.concat(Integer.toString(tester.falseNegatives));
 		
 		JTextArea display = new JTextArea (formattedResults);
 		JScrollPane scroll = new JScrollPane (display, 

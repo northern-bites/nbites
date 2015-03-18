@@ -9,6 +9,7 @@ import nbtool.data.Log;
 import nbtool.images.YUYV8888image;
 import nbtool.util.U;
 
+// TODO use difference of Gaussians filter to detect peaks
 // TODO better logic when there are more than two detected peaks
 // TODO provide more information on the detection to caller
 // TODO refactor GradientCalculator into a Gradient class
