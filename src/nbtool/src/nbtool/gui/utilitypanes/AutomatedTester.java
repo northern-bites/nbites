@@ -14,7 +14,6 @@ import nbtool.gui.logviews.images.Detector;
 // TODO fix multiple logs in session bug
 // TODO produce more than results, automate false positive and false negative counting
 // TODO refactor vision, post, and testing system into packages
-// TODO rename?
 public class AutomatedTester {	
 	Map<Log, Map<String, Double>> results;
 	
@@ -24,11 +23,11 @@ public class AutomatedTester {
 		
 		ArrayList<Log> logsToTest = new ArrayList<Log>();
 		for (Log log : session.logs_DO) {
-			System.out.println(log.name);
 			Map<String, String> attributes = log.getAttributes();
 			for (String attribute : attributesInDescString) {
-				if (attributes.get(attribute) != null)
+				if (attributes.get(attribute) != null) {
 					logsToTest.add(log);
+				}
 			}
 		}
 		
