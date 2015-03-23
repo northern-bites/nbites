@@ -11,22 +11,20 @@ import javax.swing.JTextArea;
 import nbtool.data.Log;
 import nbtool.gui.logviews.images.PostDetector;
 
-// TODO expand gui capabilities
 public class AutomatedPostTester extends UtilityParent {
 	AutomatedTester tester;
 	
 	public AutomatedPostTester() {
 		ArrayList<String> postLabels = new ArrayList<String>();
-		postLabels.add("singlePost");
+		postLabels.add("from"); // TODO attributes and keys
 		
 		Map<String, Double> tolerance = new HashMap<String, Double>();
-		tolerance.put("singlePost", 0.02);
-		tolerance.put("rightPost", 0.02);
+		tolerance.put("colInImage", 0.05);
 		
 		tester = new AutomatedTester(postLabels, tolerance, PostDetector.class);
 		
 		String formattedResults = new String("POST DETECTION TESTS:\n\n");
-		for (Entry<Log, Map<String, Double>> testResult : tester.results.entrySet()) {
+		for (Entry<Log, Map<String, Double>> testResult : tester.logsToPercentErrors.entrySet()) {
 			formattedResults = formattedResults.concat(testResult.getKey().name);
 			formattedResults = formattedResults.concat("->");
 			for (Entry<String, Double> attributeResult : testResult.getValue().entrySet()) {

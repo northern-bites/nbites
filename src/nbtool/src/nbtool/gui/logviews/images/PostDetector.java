@@ -206,17 +206,15 @@ public class PostDetector extends Detector {
 				}
 			}
 			if (stop) {
-				// TODO cleanup
 				leftPost = (peaks.get(0)[0] + peaks.get(0)[1]) / 2;
-				if (peaks.size() > 1)
+				if (peaks.size() > 1) {
 					rightPost = (peaks.get(1)[0] + peaks.get(1)[1]) / 2;
-				else
-					rightPost = -1;
-				
-				if (rightPost == -1)
-					detection = new PostDetection(log, leftPost);
-				else
-					detection = new PostDetection(log, leftPost, rightPost);
+					detections.put("singlePost", new PostDetection(log, leftPost));
+					detections.put("rightPost", new PostDetection(log, rightPost));
+				} else {
+					detections.put("singlePost", new PostDetection(log, leftPost));
+					detections.put("rightPost", new PostDetection(log));
+				}
 				return;
 			}
 		}

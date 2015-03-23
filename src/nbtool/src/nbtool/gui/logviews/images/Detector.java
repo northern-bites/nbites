@@ -1,16 +1,20 @@
 package nbtool.gui.logviews.images;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import nbtool.data.Log;
 
 public class Detector {
 	Log log;
-	Testable detection;
+	Map<String, Testable> detections;
 	
 	Detector(Log log_) {
 		log = log_;
+		detections = new HashMap<String, Testable>();
 	}
 	
-	public Testable getDetection() {
-		return detection;
+	public Map<String, Testable> getDetections() {
+		return detections;
 	}
 }

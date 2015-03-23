@@ -57,7 +57,7 @@ public class PostLabeler extends ViewParent implements MouseListener, ItemListen
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		Map<String, String> map = log.getAttributes();
-		String name = rightPost ? "rightPost" : "singlePost";
+		String name = rightPost ? "rightPostcolInImage" : "singlePostcolInImage";
 		String value = Integer.toString(e.getX());
 		if (map.get(name) == null)
 			log.addAttribute(name, value);
