@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
 
-import nbtool.data.BotStats;
+import nbtool.data.RobotStats;
 import nbtool.io.CppIO.CppFunc;
 
 //Notification center
@@ -117,8 +117,8 @@ public class N {
 		if (o instanceof Boolean)
 			return String.format("%B", o);
 		
-		if (o instanceof BotStats)
-			return String.format("[BotStats from ut %d]", ((BotStats) o).log_uptime);
+		if (o instanceof RobotStats)
+			return String.format("[BotStats from ut %d]", ((RobotStats) o).log_uptime);
 		
 		if (o instanceof ArrayList)
 			return String.format("[ArrayList of size %d]", ((ArrayList) o).size());

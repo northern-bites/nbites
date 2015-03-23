@@ -6,9 +6,9 @@ import java.io.IOException;
 
 import nbtool.util.U;
 
-public class BotStats {
+public class RobotStats {
 	public static final int STAT_DATA_LENGTH = 339; //bytes
-	public BotStats(Log log) throws IOException {
+	public RobotStats(Log log) throws IOException {
 		assert(log.type().equalsIgnoreCase("stats"));
 		assert(log.getAttributes().containsKey("nbuffers"));
 		assert(log.bytes.length == STAT_DATA_LENGTH);

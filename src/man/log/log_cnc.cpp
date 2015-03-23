@@ -46,16 +46,23 @@
 
 namespace nblog {
     
-    uint32_t cnc_test(std::string s, size_t u, uint8_t * p) {
-        printf("\tcnc_test:[%s] %lu %lu %p\n", s.data(), s.size(), u, p);
+    uint32_t cnc_test(logio::log_t arg) {
+        printf("\tcnc_test:[%s] %lu %lu %p\n", arg.desc, strlen(arg.desc), arg.dlen, arg.data);
+        
         return 0;
     }
     
     //expects two bytes of data:
     //flag index
     //new flag value
-    uint32_t cnc_setFlag(std::string s, size_t u, uint8_t * p) {
-        printf("cnc_setFlag() len=%lu\n", u);
+    uint32_t cnc_setFlag(logio::log_t arg) {
+        
+        std::string s(arg.desc);
+        size_t u = arg.dlen;
+        uint8_t * p = arg.data;
+        
+         printf("cnc_setFlag() len=%lu\n", u);
+        
         if (u != 2) { //need (index, value)
             printf("cnc_setFlag() wrong number of bytes.\n");
             return 1;
@@ -96,15 +103,15 @@ namespace nblog {
         return 0;
     }
     
-    std::map<std::string, uint32_t (*)(std::string, size_t, uint8_t *)> init_fmap() {
-        std::map<std::string, uint32_t (*)(std::string, size_t, uint8_t *)> ret;
+    std::map<std::string, uint32_t (*)(logio::log_t)> init_fmap() {
+        std::map<std::string, uint32_t (*)(logio::log_t)> ret;
         
         ret["test"] = &cnc_test;
         ret["setFlag"] = &cnc_setFlag;
         
         return ret;
     }
-    std::map<std::string, uint32_t (*)(std::string, size_t, uint8_t *)> fmap = init_fmap();
+    std::map<std::string, uint32_t (*)(logio::log_t)> fmap = init_fmap();
 
     void * cnc_loop(void * cntxt);
     
@@ -211,7 +218,7 @@ namespace nblog {
                         goto connection_died;
                     }
                     
-                    uint32_t ret = fmap[cmnd[1]](log.desc, log.dlen, log.data);
+                    uint32_t ret = fmap[cmnd[1]](log);
                     LOGDEBUG(1, "log_cnc command returned %i\n", ret);
                     
                     uint32_t nret = htonl(ret);
@@ -220,7 +227,9 @@ namespace nblog {
                     LOGDEBUG(1, "log_cnc call finished.\n\n");
                     
                     free(log.desc); log.desc = NULL;
-                    free(log.data); log.data = NULL;
+                    if (log.dlen && log.data) {
+                        free(log.data); log.data = NULL;
+                    }
                 } else {
                     if (resp != 0) {
                         LOGDEBUG(1, "log_cnc got bad ping reply! %i\n", resp);

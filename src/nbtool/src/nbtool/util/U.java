@@ -149,7 +149,7 @@ public class U {
 	 * files so that protoc does not feel it needs to generate semi-arbitrary class names.
 	 * */
 	
-	
+	@SuppressWarnings("unchecked")
 	public static Class<? extends com.google.protobuf.GeneratedMessage> protobufClassFromType(String _type) {
 		assert(_type.startsWith(NBConstants.PROTOBUF_TYPE_PREFIX));
 		String type = _type.substring(NBConstants.PROTOBUF_TYPE_PREFIX.length()); //Remove prefix.

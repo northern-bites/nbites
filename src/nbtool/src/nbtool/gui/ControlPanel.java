@@ -19,7 +19,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import nbtool.data.BotStats;
+import nbtool.data.RobotStats;
 import nbtool.data.Log;
 import nbtool.data.SessionMaster;
 import nbtool.io.CommandIO;
@@ -206,7 +206,7 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 	public void notified(EVENT e, Object src, Object... args) {
 		switch (e) {
 		case REL_BOTSTAT:
-			BotStats bs= (BotStats) args[0];
+			RobotStats bs= (RobotStats) args[0];
 			if (connected) {
 				for (int i = 0; i < flags.length; ++i) {
 					boolean val = bs.flags.bFlags[i + 2]; //2 for connection flags

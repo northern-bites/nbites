@@ -11,13 +11,10 @@ public class Session {
 	public String dir;
 	public String name;
 	
-	public BotStats most_relevant;
+	public RobotStats most_relevant;
 	
 	public ArrayList<Log> logs_ALL; //Logs in the order they arrived.  Only grows, does not change order.
 	public ArrayList<Log> logs_DO; //All the same logs in logs_TO, but in sorted order.
-	
-	private String part = null;
-	private Comparator<Log> cmp = null;
 	
 	protected Session(int i, MODE m, String p, String s) {
 		logs_ALL = new ArrayList<Log>();
