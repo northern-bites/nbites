@@ -80,22 +80,27 @@ int ImageConverter_func() {
     module.run();
 
     const messages::PackedImage<short unsigned int>* yImage = module.yImage.getMessage(true).get();
+    const
 
-    logio::log_t ret1;
+
+    logio::log_t yRet;
+    logio::log_t whiteRet;
+    logio::log_t orangeRet;
+    logio::log_t greenRet;
 
     std::string name = "type=YUVImage encoding=[Y16] width=";
     name += std::to_string(yImage->width());
     name += " height=";
     name += std::to_string(yImage->height());
 
-    ret1.desc = (char*)malloc(name.size()+1);
-    memcpy(ret1.desc, name.c_str(), name.size() + 1);
+    yRet.desc = (char*)malloc(name.size()+1);
+    memcpy(yRet.desc, name.c_str(), name.size() + 1);
 
-    ret1.dlen = yImage->width() * yImage->height() * 2;
-    ret1.data = (uint8_t*)malloc(ret1.dlen);
-    memcpy(ret1.data, yImage->pixelAddress(0, 0), ret1.dlen);
+    yRet.dlen = yImage->width() * yImage->height() * 2;
+    yRet.data = (uint8_t*)malloc(yRet.dlen);
+    memcpy(yRet.data, yImage->pixelAddress(0, 0), yRet.dlen);
 
-    rets.push_back(ret1);
+    rets.push_back(yRet);
 
     printf("ImageConverter module ran! W: %d, H: %d\n", yImage->width(), yImage->height());
     return 0;
@@ -124,7 +129,7 @@ void register_funcs() {
     CrossBright.func = CrossBright_func;
     FUNCS.push_back(CrossBright);
 
-    //
+    //ImageConverter
     nbfunc_t ImageConverter;
     ImageConverter.name = "ImageConverter";
     ImageConverter.args = {sYUVImage};
