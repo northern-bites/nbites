@@ -42,43 +42,40 @@ public class PostView extends ViewParent {
 		// Display local feature images
 		BufferedImage bOriginal = d.original.toBufferedImage();
 		g.drawImage(bOriginal, bOriginal.getWidth(), 0, null);
-		g.drawImage(d.gradient, 0, 0, null);
+		//g.drawImage(d.gradient, 0, 0, null);
 		//g.drawImage(d.yellow, 0, 0, null);
 		//g.drawImage(d.field, 0, 0, null);
-		g.drawImage(d.post, 0, bOriginal.getHeight(), null);
+		g.drawImage(d.post, 0, 0, null);
 		
-		// Display histogram
+		// Display raw scores
         g.setColor(Color.black);
-        int barWidth = bOriginal.getWidth() / d.scores.length;
-        for(int i = 0; i < d.scores.length; i++){
-            int barHeight = (int)(d.scores[i]);
+        int barWidth = bOriginal.getWidth() / d.rawScores.length;
+        for(int i = 0; i < d.rawScores.length; i++){
+            int barHeight = (int)(d.rawScores[i]);
             g.fillRect(bOriginal.getWidth() + i*barWidth, 
-            		   bOriginal.getHeight() + (int)(bOriginal.getHeight()-d.scores[i]), 
+            		   bOriginal.getHeight() + (int)(bOriginal.getHeight()-d.rawScores[i]), 
             		   barWidth,
             		   barHeight);
         }
         
-        // Display line using to do peak detection
-        g.setColor(Color.red);
-        for (int x = 0; x < d.scores.length; x++) {
-			double m = d.line.getFirstPrincipalAxisV() / d.line.getFirstPrincipalAxisU();
-			int y = (int)(m*x - m*d.line.getCenterX() + d.line.getCenterY());
-	        g.fillRect(bOriginal.getWidth() + x*barWidth, 
-	        		   bOriginal.getHeight() + (bOriginal.getHeight() - y), 
-	        		   2, 
-	        		   2);
+        // Display processed scores
+        g.setColor(Color.black);
+        for(int i = 0; i < d.processedScores.length; i++){
+            int barHeight = (int)(d.processedScores[i]);
+            g.fillRect(i*barWidth, 
+            		   bOriginal.getHeight() + (int)(bOriginal.getHeight()-d.processedScores[i]), 
+            		   barWidth,
+            		   barHeight);
         }
         
-        // Mark goalposts
-        g.fillRect(bOriginal.getWidth() + d.leftPost*barWidth, 
-     		   	   0, 
-     		       2, 
-     		       2*bOriginal.getHeight());
-        if (d.rightPost > 0)
-        	g.fillRect(bOriginal.getWidth() + d.rightPost*barWidth, 
-  		   	   	       0, 
-  		               2, 
-  		               2*bOriginal.getHeight());
+        // Mark goalpost candidates
+        g.setColor(Color.red);
+        for (int i = 0; i < d.candidates.size(); i++) {
+        	g.fillRect(bOriginal.getWidth() + d.candidates.get(i)*barWidth, 
+     		   	       0, 
+     		           2, 
+     		           2*bOriginal.getHeight());
+        }
     }
 	
 	protected void useSize(Dimension s) {}

@@ -3,6 +3,7 @@ package nbtool.gui.logviews.images;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import nbtool.data.Log;
@@ -11,7 +12,6 @@ import nbtool.util.U;
 
 // TODO use difference of Gaussians filter to detect peaks
 // TODO better logic when there are more than two detected peaks
-// TODO provide more information on the detection to caller
 // TODO refactor GradientCalculator into a Gradient class
 public class PostDetector extends Detector {
 	YUYV8888image original;
@@ -21,28 +21,27 @@ public class PostDetector extends Detector {
 	BufferedImage field;
 	BufferedImage post;
 	
-	double[] scores;
-	WeightedFit line;
+	double[] rawScores;
+	double[] processedScores;
 	
-	int leftPost;
-	int rightPost;
+	ArrayList<Integer> candidates;
 	
 	public PostDetector(Log log_) {
 		super(log_);
 								
 		original = (YUYV8888image) U.imageFromLog(log);
 		
-		buildGradientImg(original);
+		buildGradientImg();
 		StructuringElement cross = new StructuringElement(0);
         MathMorphology mm = new MathMorphology(cross); 
         mm.opening(gradient);
         
-		buildYellowImg(original);
+		buildYellowImg();
 		StructuringElement verticalBandOf5Pixels = new StructuringElement(2);
 		mm.setStructuringElement(verticalBandOf5Pixels);
 		mm.opening(yellow);
         
-        buildFieldImg(original);
+        buildFieldImg();
         StructuringElement square = new StructuringElement(4);
 		mm.setStructuringElement(square);
 		mm.opening(field);
@@ -50,8 +49,9 @@ public class PostDetector extends Detector {
         FuzzyThreshold sigma = new FuzzyThreshold(100, 150);
         post = GrayscaleLib.threshold(GrayscaleLib.add(GrayscaleLib.add(gradient, yellow), field), sigma);
         
-        buildHistogram(post);
-        detectPeaks(scores);
+        buildHistogram();
+        processHistogram();
+        detectPeaks();
 	}
 
 	private double calculateColorScore(int idealU, int idealV, int u, int v) {
@@ -67,14 +67,14 @@ public class PostDetector extends Detector {
 		return -1*(sigmaColor.f((double)diff) - 1);
 	}
 
-	private void buildYellowImg(YUYV8888image yuvImg) {
-		BufferedImage yellowImg = new BufferedImage(yuvImg.width / 2 - 1, yuvImg.height - 1, BufferedImage.TYPE_BYTE_GRAY);
+	private void buildYellowImg() {
+		BufferedImage yellowImg = new BufferedImage(original.width / 2 - 1, original.height - 1, BufferedImage.TYPE_BYTE_GRAY);
     	WritableRaster raster = yellowImg.getRaster();
-        for (int i = 1; i < yuvImg.height - 1; i++) {
-			for (int j = 1; j < (yuvImg.width / 2 - 1); j += 1) {
+        for (int i = 1; i < original.height - 1; i++) {
+			for (int j = 1; j < (original.width / 2 - 1); j += 1) {
 				int[] pixel = new int[1];
-				int u = yuvImg.uPixelAt(j, i);
-				int v = yuvImg.vPixelAt(j, i);
+				int u = original.uPixelAt(j, i);
+				int v = original.vPixelAt(j, i);
 				pixel[0] = (int)(255*calculateColorScore(-80, 10, u, v));
 				raster.setPixel(j-1, i-1, pixel);
 			}
@@ -94,13 +94,13 @@ public class PostDetector extends Detector {
 		return sigmaMagnitude.f(magn)*sigmaDirection.f(dir);
 	}
 	
-	private void buildGradientImg(YUYV8888image yuvImg) {
-		BufferedImage gradientImg = new BufferedImage(yuvImg.width / 2 - 1, yuvImg.height - 1, BufferedImage.TYPE_BYTE_GRAY);
+	private void buildGradientImg() {
+		BufferedImage gradientImg = new BufferedImage(original.width / 2 - 1, original.height - 1, BufferedImage.TYPE_BYTE_GRAY);
 		WritableRaster raster = gradientImg.getRaster();
-        for (int i = 1; i < yuvImg.height - 1; i++) {
-			for (int j = 1; j < (yuvImg.width / 2 - 1); j += 1) {
+        for (int i = 1; i < original.height - 1; i++) {
+			for (int j = 1; j < (original.width / 2 - 1); j += 1) {
 				int[] pixel = new int[1];
-				double[] grad = GradientCalculator.calculateGrad(yuvImg.yPixelsCenteredAt(j, i));
+				double[] grad = GradientCalculator.calculateGrad(original.yPixelsCenteredAt(j, i));
 				pixel[0] = (int)(255*calculateGradientScore(grad));
 				raster.setPixel(j-1, i-1, pixel);
 			}
@@ -116,11 +116,11 @@ public class PostDetector extends Detector {
 		return sigma.f(diff);
 	}
 	
-	private int calculateYMode(YUYV8888image yuvImg) {
+	private int calculateYMode() {
 		int[] frequencies = new int[256];
-        for (int i = yuvImg.height / 2; i < yuvImg.height; i++) {
-			for (int j = 0; j < (yuvImg.width / 2); j += 1) {
-				frequencies[yuvImg.yPixelAt(j, i)] += 1;
+        for (int i = original.height / 2; i < original.height; i++) {
+			for (int j = 0; j < (original.width / 2); j += 1) {
+				frequencies[original.yPixelAt(j, i)] += 1;
 			}
         }
         
@@ -134,14 +134,14 @@ public class PostDetector extends Detector {
         return mode;
 	}
 	
-	private void buildFieldImg(YUYV8888image yuvImg) {
-		BufferedImage fieldImg = new BufferedImage(yuvImg.width / 2 - 1, yuvImg.height - 1, BufferedImage.TYPE_BYTE_GRAY);
-		int yMode = calculateYMode(yuvImg);
+	private void buildFieldImg() {
+		BufferedImage fieldImg = new BufferedImage(original.width / 2 - 1, original.height - 1, BufferedImage.TYPE_BYTE_GRAY);
+		int yMode = calculateYMode();
 		WritableRaster raster = fieldImg.getRaster();
-        for (int i = 1; i < yuvImg.height - 1; i++) {
-			for (int j = 1; j < (yuvImg.width / 2 - 1); j += 1) {
+        for (int i = 1; i < original.height - 1; i++) {
+			for (int j = 1; j < (original.width / 2 - 1); j += 1) {
 				int[] pixel = new int[1];
-				int y = yuvImg.yPixelAt(j, i);
+				int y = original.yPixelAt(j, i);
 				pixel[0] = (int)(255*calculateFieldScore(yMode, y));
 				raster.setPixel(j-1, i-1, pixel);
 			}
@@ -149,10 +149,10 @@ public class PostDetector extends Detector {
         field = fieldImg;
 	}
 	
-	private void buildHistogram(BufferedImage postImg) {
-		Raster raster = postImg.getData();
-		int width = postImg.getWidth();
-		int height = postImg.getHeight();
+	private void buildHistogram() {
+		Raster raster = post.getData();
+		int width = post.getWidth();
+		int height = post.getHeight();
 		double[] hist = new double[width];
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
@@ -162,61 +162,48 @@ public class PostDetector extends Detector {
 			}
 			hist[x] /= height;
 		}
-		scores = hist;
+		rawScores = hist;
 	}
 	
-	private void detectPeaks(double[] scores) {
-		double totalDensity = 0;
-		WeightedFit line_ = new WeightedFit();
-		for (int i = 0; i < scores.length - 1; i++) {
-			totalDensity += scores[i];
-			line_.add(i, scores[i]);
-		}
-		line = line_;
-		double m = line.getFirstPrincipalAxisV() / line.getFirstPrincipalAxisU();
+	private void processHistogram() {
+		double narrowGaussian[] = new double[] {0.066414, 0.079465, 0.091364, 0.100939, 0.107159, 0.109317, 0.107159, 0.100939, 0.091364, 0.091364, 0.066414};
+		double wideGaussian[] = new double[] {0.01554, 0.015969, 0.016392, 0.016807, 0.017213, 0.017609, 0.017995, 0.018369, 0.018729, 0.019076, 0.019407,
+										      0.019722, 0.020021, 0.0203, 0.020562, 0.020803, 0.021024, 0.021223, 0.021401, 0.021556, 0.021688, 0.021796,
+										      0.021881, 0.021942, 0.021979, 0.021991, 0.021979, 0.021942, 0.021881, 0.021796, 0.021688, 0.021556, 0.021401,
+										      0.021223, 0.021024, 0.020803, 0.020562, 0.0203, 0.020021, 0.019722, 0.019407, 0.019076, 0.018729, 0.018369,
+										      0.017995, 0.017609, 0.017213, 0.016807, 0.016392, 0.015969, 0.01554};
 		
-		boolean stop = false;
-		for (int i = 255; i >= 0; i--) {
-			Vector<int[]> peaks = new Vector<int[]>();
-			boolean inPeak = false;
-			int peakIndex = -1;
-			for (int j = 0; j < scores.length - 1; j++) {
-				int yOnLine = (int)(m*j - m*line.getCenterX() + line.getCenterY() + i);
-				if (!inPeak && scores[j] > yOnLine) {
-					inPeak = true;
-					int[] peak = new int[3];
-					peak[0] = j;
-					peak[2] = 0;
-					peak[2] += (int)scores[j] - yOnLine;
-					peaks.add(peak);
-					peakIndex++;
-				}
-				else if (inPeak && scores[j] > yOnLine) {
-					peaks.get(peakIndex)[2] += (int) scores[j] - yOnLine;
-				}
-				else if (inPeak) {
-					inPeak = false;
-					peaks.get(peakIndex)[1] = j;
-					if (peaks.get(peakIndex)[2] / totalDensity >= 0.05) {
-						stop = true;
-					} else if (peaks.get(peakIndex)[2] / totalDensity < 0.01) {
-						peaks.remove(peakIndex);
-						peakIndex--;
-					}
-				}
-			}
-			if (stop) {
-				leftPost = (peaks.get(0)[0] + peaks.get(0)[1]) / 2;
-				if (peaks.size() > 1) {
-					rightPost = (peaks.get(1)[0] + peaks.get(1)[1]) / 2;
-					detections.put("singlePost", new PostDetection(log, leftPost));
-					detections.put("rightPost", new PostDetection(log, rightPost));
-				} else {
-					detections.put("singlePost", new PostDetection(log, leftPost));
-					detections.put("rightPost", new PostDetection(log));
-				}
-				return;
+		processedScores = new double[rawScores.length];
+		for (int i = 0; i < processedScores.length; i++) {
+			processedScores[i] = convolve(rawScores, narrowGaussian, i) - convolve(rawScores, wideGaussian, i);
+		}
+	}
+	
+	private void detectPeaks() {
+		candidates = new ArrayList<Integer>();
+		int threshold = 15;
+		int leftLimit = 0;
+		boolean inPeak = false;
+		
+		for (int i = 0; i < processedScores.length; i++) {
+			if (processedScores[i] >= threshold & !inPeak) {
+				inPeak = true;
+				leftLimit = i;
+			} else if (processedScores[i] < threshold && inPeak) {
+				candidates.add((leftLimit + i) / 2);
+				inPeak = false;
 			}
 		}
+	}
+	
+	// TODO rename
+	private double convolve(double[] array, double[] kernel, int index) {
+		double sum = 0;
+		for (int i = 0; i < kernel.length; i++) {
+			int j = index - kernel.length / 2 + i;
+			if (j >= 0 && j < array.length)
+				sum += array[j]*kernel[i];
+		}
+		return sum;
 	}
 }
