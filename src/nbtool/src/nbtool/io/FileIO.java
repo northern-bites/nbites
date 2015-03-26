@@ -39,27 +39,27 @@ public class FileIO implements Runnable {
 	}
 		
 	public static boolean checkLogFolder(String log_folder) {
-		U.wf("checking %s", log_folder);
+		U.wf("checking [%s]\n", log_folder);
 		if(log_folder == null || log_folder.isEmpty()) {
-			U.wf("problem with log folder string");
+			U.wf("problem with log folder string\n");
 			return false;
 		}
 			
 		File f = new File(log_folder);
 		if (!f.exists()) {
-			U.wf("file does not exist!");
+			U.wf("file does not exist!\n");
 			return false;
 		}
 		if (!f.isDirectory()) {
-			U.wf("file is not directory");
+			U.wf("file is not directory\n");
 			return false;
 		}
 		if (!f.canRead() || !f.canWrite()) {
-			U.wf("permissions errors.");
+			U.wf("permissions errors.\n");
 			return false;
 		}
 		
-		U.wf("all good!");
+		U.wf("all good!\n");
 		return true;
 	}
 	

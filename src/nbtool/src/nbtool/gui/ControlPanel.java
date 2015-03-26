@@ -258,8 +258,11 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 		
 		if (fs_text == null)
 			fs_text = "";
+		else fs_text = fs_text.trim();
+		
 		if (addr_text == null)
 			addr_text = "";
+		else addr_text = addr_text.trim();
 		
 		int cs = modes.getSelectedIndex();
 		P.putLastMode(cs);
