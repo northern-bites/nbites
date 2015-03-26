@@ -19,8 +19,9 @@ public final class Y16image extends ImageParent {
 		    for (int c = 0; c < width; c++) {
 			//int y = (data[r*width*2 + 2*c]) & 0xFF;//<< 8 + data[r*width + c + 1];
 			int y = (data[r*width*2 + 2*c] & 0xFF) + (data[r*width*2 + 2*c + 1] << 8);
+			
 			y = y >> 2;
-
+			// y must but in the range 0-255
 			Color color = new Color(y, y, y);
 			ret.setRGB(c, r, color.getRGB());
 		    }

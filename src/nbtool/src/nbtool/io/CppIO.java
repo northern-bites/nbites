@@ -63,7 +63,7 @@ public class CppIO implements Runnable {
 			Socket socket = null;
 			try {
 				socket = server.accept();
-				socket.setSoTimeout(SOCKET_TIMEOUT);
+				socket.setSoTimeout(100000);
 				N.notifyEDT(EVENT.CPP_CONNECTION, this, true);
 				U.w("CppIO: found c++ sister process.");
 				

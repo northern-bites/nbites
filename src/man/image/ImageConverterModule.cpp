@@ -49,8 +49,8 @@ void ImageConverterModule::run_()
 
     /* ^^ tempBuffer now holds one 320*240 16-bit image and three 320*240 8-bit images */
     HeapPixelBuffer *tempBuffer = new HeapPixelBuffer(320*240*2*1 + 320*240*1*3);
-    PackedImage16 tempOutput16(tempBuffer, 320, 3*240, 320);
-    PackedImage8 tempOutput8(tempBuffer, 320, (3*2 + 1)*240, 320);
+    PackedImage16 tempOutput16(tempBuffer, 320, 1*240, 320);
+    PackedImage8 tempOutput8(tempBuffer, 320, (1*2 + 3)*240, 320);
 
     PROF_ENTER(P_ACQUIRE_IMAGE);
     ImageAcquisition::acquire_image(240, 320, 320,
@@ -63,16 +63,16 @@ void ImageConverterModule::run_()
     yImage.setMessage(Message<PackedImage16>(&image));
 
     // Second 320x240 image = all the whiteness rating values in imageIn.message()
-    ThresholdImage thr = tempOutput8.window(0, 240, 320, 240);
-    whiteImage.setMessage(Message<ThresholdImage>(&thr));
+    PackedImage8 image8 = tempOutput8.window(0, 2*240, 320, 240);
+    whiteImage.setMessage(Message<PackedImage8>(&image8));
 
     // Third 320x240 image = all orangeness rating values in imageIn.message()
-    thr = tempOutput8.window(0, 480, 320, 240);
-    orangeImage.setMessage(Message<ThresholdImage>(&thr));
+    image8 = tempOutput8.window(0, (2+1)*240, 320, 240);
+    orangeImage.setMessage(Message<PackedImage8>(&image8));
 
     // Last 320x240 image = all greeness rating values in imageIn.message()
-    thr = tempOutput8.window(0, 3*2*240, 320, 240);
-    greenImage.setMessage(Message<ThresholdImage>(&thr));
+    image8 = tempOutput8.window(0, (3+1)*240, 320, 240);
+    greenImage.setMessage(Message<PackedImage8>(&image8));
 }
 
 // Read a color table into memory from pathname

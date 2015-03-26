@@ -22,9 +22,9 @@ public:
     portals::InPortal<messages::YUVImage> imageIn;
     // Outs four images for vision, YUV split up and a color segmented image
     portals::OutPortal<messages::PackedImage16> yImage;
-    portals::OutPortal<messages::ThresholdImage> whiteImage; // to orange
-    portals::OutPortal<messages::ThresholdImage> orangeImage;
-    portals::OutPortal<messages::ThresholdImage> greenImage;
+    portals::OutPortal<messages::PackedImage8> whiteImage; // to orange
+    portals::OutPortal<messages::PackedImage8> orangeImage;
+    portals::OutPortal<messages::PackedImage8> greenImage;
 
     // For offline use, allows table to change after construction
  /*   void changeTable(unsigned char *newTable);

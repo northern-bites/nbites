@@ -191,6 +191,7 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 		} else if (source == clear) {
 			args = new ArrayList<Log>();
 			arg_model.reload();
+			out_model.clear();
 		}
 	}
 	
@@ -333,6 +334,13 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 
 		public void reload() {
 			this.fireContentsChanged(this, 0, getSize());
+		}
+
+		public void clear() {
+			out.clear();
+			reload();
+
+
 		}
 	}
 

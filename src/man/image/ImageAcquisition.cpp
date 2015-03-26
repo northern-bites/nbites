@@ -6,27 +6,22 @@
 
 #define CPP_ACQUIRE 0
 
-#define MAX_ORANGE_U_MIN 100
-#define MAX_ORANGE_U_MAX 130
+#define O_WIDTH 30
+#define O_MAX_U 170 - O_WIDTH
+#define O_MIN_V 150
+#define O_COEF  0.1
 
-#define MIN_ORANGE_V_MIN 110
-#define MIN_ORANGE_V_MAX 150
+#define G_WIDTH 30
+#define G_MAX_U 155 - G_WIDTH
+#define G_MAX_V 155 - G_WIDTH
+#define G_COEF  -0.12
 
-#define MAX_GREEN_U_MIN 90
-#define MAX_GREEN_U_MAX 120
-
-#define MAX_GREEN_V_MIN 140
-#define MAX_GREEN_V_MAX 150
-
-/*
-TODO before sending to bill
-change outs to 8 bit (oragnge and white)
-uncomment out pointer adds
-delete #if #elses
-change line 40 orange++ to +2. same with white
-make changes for 244 mode
-delete * 2 on 70
- */
+#define W_WIDTH 20
+#define W_MAX_U 128 - W_WIDTH
+#define W_MIN_U 128
+#define W_MAX_V 128 - W_WIDTH
+#define W_MIN_V 128
+#define W_COEF .2
 
 int ImageAcquisition::acquire_image(int rowCount,
 									int colCount,
@@ -38,54 +33,95 @@ int ImageAcquisition::acquire_image(int rowCount,
 //	_acquire_image (rowCount, colCount, rowPitch, yuv, out);
 #else
 
-	uint16_t *yOut = (uint16_t*)out;
-	uint16_t *whiteOut  = (uint16_t*)out /*+ rowPitch*rowCount*2 */;
-	uint16_t *orangeOut = (uint16_t*)out /*+ rowPitch*rowCount */ ;
-	uint16_t *greenOut  = (uint16_t*)out /*+rowPitch*rowCount */  ;
-	
+	uint16_t *yOut      = (uint16_t*)out;
+	uint8_t  *whiteOut  = out       + rowPitch*rowCount * 2;
+	uint8_t  *orangeOut = whiteOut  + rowPitch*rowCount;
+	uint8_t  *greenOut  = orangeOut + rowPitch*rowCount;
+
+	unsigned short orangeWidth = O_WIDTH;
+	unsigned short orangeWidth1 = (unsigned short)((255 << 8) / orangeWidth); // w1 = 255/w 	u16.8
+	double orangeCoefV = -O_COEF;
+	double orangeCoefU = O_COEF;
+
+	unsigned short greenWidth = G_WIDTH;
+	unsigned short greenWidth1 = (unsigned short)((255 << 8) / greenWidth);
+	double greenCoefV = G_COEF;
+	double greenCoefU = G_COEF;
+
+	unsigned short whiteWidth = W_WIDTH;
+	unsigned short whiteWidth1 = (unsigned short)((255 << 8) / whiteWidth);
+	double whiteMaxCoef = W_COEF;
+	double whiteMinCoef = -W_COEF;
 
 	int y;
-	bool newRow = false;
 
 	for (int i=0; i < rowCount; i ++, yuv += rowPitch*4){
-		if (newRow)
-			newRow = false;
-		else newRow = true;
-
-		for (int j=0; j < colCount; j++, yuv += 4, yOut++, orangeOut++, whiteOut++){
+		for (int j=0; j < colCount; j++, yuv += 4, yOut++, whiteOut++, orangeOut++, greenOut++){
 			// Y Averaging
-			if (newRow) {
-				*yOut = *(yOut + rowPitch) = y = yuv[YOFFSET1] + yuv[rowPitch*4 + YOFFSET1] +
+			*yOut = y = yuv[YOFFSET1] + yuv[rowPitch*4 + YOFFSET1] +
 		    	yuv[YOFFSET2] + yuv[rowPitch*4 + YOFFSET2];
+		   
+		    // Variable used for color calcs
+			y >>= 2;
+
+			short unsigned u0, u = yuv[UOFFSET];
+			short unsigned v0, v = yuv[VOFFSET];
+		    
+		    unsigned short f1, f2;
+
+		    // WHITE CALCS
+		    // find f1 for when u is right of the midway line
+		    if (u > 127) {
+		    	u0 = W_MAX_U;
+		    	u0 += (short unsigned)(y * whiteMaxCoef);
+		    	f1 = (std::min(std::max((int)(u0 + whiteWidth - u), 0), (int)whiteWidth) * whiteWidth1) >> 8;
+		    } else {	// find f1 for when u is left of the midway line
+		    	u0 = W_MIN_U;
+		    	u0 += (short unsigned)(y * whiteMinCoef);
+		    	f1 = (std::min(std::max((int)(u - u0), 0), (int)whiteWidth) * whiteWidth1) >> 8;
 		    }
-#if 0
-			//  Orange and Green Calcs
-			double u = yuv[UOFFSET];
-			double v = yuv[VOFFSET];
 
-			double orangeU_width = MAX_ORANGE_U_MAX - MAX_ORANGE_U_MIN;
-			double orangeV_width = MIN_ORANGE_V_MAX - MIN_ORANGE_V_MIN;
-			double greenU_width = MAX_GREEN_U_MAX - MAX_GREEN_U_MIN;
-			double greenV_width = MAX_GREEN_V_MAX - MAX_GREEN_V_MIN;
+		    // find f2 for when v is above the midway point
+		    if (v > 127) {
+		    	v0 = W_MAX_V;
+		    	v0 += (short unsigned)(y * whiteMaxCoef);
+		    	f2 = (std::min(std::max((int)(v0 + whiteWidth - v), 0), (int)whiteWidth) * whiteWidth1) >> 8;
+		    } else {	// find f2 for when v is below the midway point
+		    	v0 = W_MIN_V;
+		    	v0 += (short unsigned)(y * whiteMinCoef);
+		    	f2 = (std::min(std::max((int)(v - v0), 0), (int)whiteWidth) * whiteWidth1) >> 8;
+		    }
 
-			double orange = std::min(std::min(std::max(MAX_ORANGE_U_MAX - u, 0.0), orangeU_width) / orangeU_width, std::min(std::max(v - MIN_ORANGE_V_MIN, 0.0), orangeV_width) / orangeV_width) * 256 * 2;
-			
+		    *whiteOut = std::min(f1, f2);
+		    
+			// ORANGE CALCS
+		    u0 = O_MAX_U;
+	        v0 = O_MIN_V;
 
-			double first = std::min(std::max(MAX_ORANGE_U_MAX - u, 0.0), orangeU_width) / orangeU_width;
-			double second = std::min(std::max(v - MIN_ORANGE_V_MIN, 0.0), orangeV_width) / orangeV_width;
+			v0 += (short unsigned)(y * orangeCoefV);
+			f1 = (std::min(std::max((int)(v - v0), 0),
+				                    (int)orangeWidth) * orangeWidth1) >> 8;
 
-			if (first > 0 && second > 0)
-				std::cout << "u: " << u << " v: " << v << " orange out: " << orange << " first: " << first << " second: " << second << std::endl;
-			
-			*orangeOut = orange;
+			u0 += (short unsigned)(y * orangeCoefU);
+			f2 = (std::min(std::max((int)(u0 + orangeWidth - u), 0), 
+				                                   (int)orangeWidth) * orangeWidth1) >> 8;
 
-#endif
+			// Write out 8 bit value
+			*orangeOut = std::min(f1, f2);
 
+			// GREEN CALCS
+			u0 = G_MAX_U;
+			v0 = G_MAX_V;
 
-#if 0
-			// White Calc
+			v0 += (short unsigned)(y * greenCoefV);
+			f1 = (std::min(std::max((int)(v0 + greenWidth - v), 0),
+				                    (int)greenWidth) * greenWidth1) >> 8;
 
-#endif
+			u0 += (short unsigned)(y * greenCoefU);
+			f2 = (std::min(std::max((int)(u0 + greenWidth - u), 0),
+				                    (int)greenWidth) * greenWidth1) >> 8; 
+			*greenOut = std::min(f1, f2);
+
 		}
 	}
 #endif
