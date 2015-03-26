@@ -39,6 +39,7 @@ public class FileIO implements Runnable {
 	}
 		
 	public static boolean checkLogFolder(String log_folder) {
+		U.wf("checking %s", log_folder);
 		if(log_folder == null || log_folder.isEmpty()) {
 			U.wf("problem with log folder string");
 			return false;
