@@ -5,41 +5,37 @@
 namespace man {
 namespace vision {
 
-// NOTE Daniel, this has not been compiled or tested! Just wrote it based on Bill's C# stuff!
-
 class Fool {
 public:
     Fool(double value_) : value(value_) {}
     double get() const { return value; }
-    inline Fool operator&(const Fool& f1, const Fool& f2) const;
-    inline Fool operator|(const Fool& f1, const Fool& f2) const;
-    inline Fool operator!(const Fool& f) const;
+    inline Fool operator&(const Fool& f) const;
+    inline Fool operator|(const Fool& f) const;
+    inline Fool operator!() const;
 
 private:
     double value;
 };
 
-inline Fool Fool::operator&(const Fool& f1, const Fool& f2) const
+inline Fool Fool::operator&(const Fool& f) const
 {
-    return Fool(std::min(f1.get(), f2.get())); 
+    return Fool(std::min(f.get(), get()));
 }
 
-inline Fool Fool::operator|(const Fool& f1, const Fool& f2) const
+inline Fool Fool::operator|(const Fool& f) const
 {
-    return Fool(std::max(f1.get(), f2.get())); 
+    return Fool(std::max(f.get(), get()));
 }
 
-inline Fool Fool::operator!(const Fool& f) const
+inline Fool Fool::operator!() const
 {
-    return Fool(1 - f.get());
+    return Fool(1 - get());
 }
 
 class FuzzyThr {
 public:
     FuzzyThr(double t0_, double t1_) : t0(t0_), t1(t1_) {}
-    inline double weight(double x) const; 
-    inline Fool operator>(double x, const FuzzyThr& thr) const { return Fool(weight(x)); }
-    inline Fool operator<(double x, const FuzzyThr& thr) const { return !(x > thr); }
+    inline double weight(double x) const;
 
 private:
     double t0;
@@ -51,17 +47,17 @@ inline double FuzzyThr::weight(double x) const
 {
     if (t0 == t1)
         return (x >= t0 ? 1. : 0.);
-    return std::max(std::min((x - t0) / (t1 - t0), 0.), 1.);
+    return std::min(std::max((x - t0) / (t1 - t0), 0.), 1.);
 }
 
-inline Fool operator>(double x, const FuzzyThr& thr) const 
-{ 
-    return Fool(weight(x)); 
+inline Fool operator>(double x, const FuzzyThr& thr)
+{
+    return Fool(thr.weight(x));
 }
 
-inline Fool operator<(double x, const FuzzyThr& thr) const 
-{ 
-    return !(x > thr); 
+inline Fool operator<(double x, const FuzzyThr& thr)
+{
+    return !(x > thr);
 }
 
 }

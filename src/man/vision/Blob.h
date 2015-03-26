@@ -18,12 +18,16 @@ public:
     inline void addPerimeter(double x, double y);
     inline void clearPerimeter() { perimeter.clear(); }
     double area() const { return sw; }
+    int    getCount () const { return count; }
     double xCenter() const { return sx / sw; }
     double yCenter() const { return sy / sw; }
     double density() const { return sw / count; }
     double angle();
     double principalLength1();
     double principalLength2();
+
+    int getPerimeter() { return perimeter.size(); }
+    std::vector<point> getPerimeterPoints() { return perimeter; }
     void setRating(double r) { rating = r; }
     double getRating() { return rating; }
 

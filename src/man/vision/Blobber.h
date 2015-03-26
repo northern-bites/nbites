@@ -54,7 +54,7 @@ private:
     int rowPitch;
 
     // Trinary data type
-    // 0 is unexplored, 1 is edge of the mark, all else is part of blob
+    // 0 is unexplored, 1 is explored non-blob, all else is part of blob
     uint8_t *mark;
 
     uint16_t *blobImage;

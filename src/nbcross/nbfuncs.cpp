@@ -11,8 +11,8 @@
 
 #include "Images.h"
 #include "image/ImageConverterModule.h"
-#include "new_vision/Blobber.h"
-#include "new_vision/Blob.h"
+#include "vision/Blobber.h"
+#include "vision/Blob.h"
 #include "RoboGrams.h"
 
 std::vector<nbfunc_t> FUNCS;
