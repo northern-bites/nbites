@@ -130,24 +130,81 @@ int ImageConverter_func() {
     module.imageIn.setMessage(message);
     module.run();
 
+    // Y image name and data
     const messages::PackedImage<short unsigned int>* yImage = module.yImage.getMessage(true).get();
+    logio::log_t yRet;
 
-    logio::log_t ret1;
+    std::string yName = "type=YUVImage encoding=[Y16] width=";
+    yName += std::to_string(yImage->width());
+    yName += " height=";
+    yName += std::to_string(yImage->height());
 
-    std::string name = "type=YUVImage encoding=[Y16] width=";
-    name += std::to_string(yImage->width());
-    name += " height=";
-    name += std::to_string(yImage->height());
+    yRet.desc = (char*)malloc(yName.size()+1);
+    memcpy(yRet.desc, yName.c_str(), yName.size() + 1);
 
-    ret1.desc = (char*)malloc(name.size()+1);
-    memcpy(ret1.desc, name.c_str(), name.size() + 1);
+    yRet.dlen = yImage->width() * yImage->height() * 2;
+    yRet.data = (uint8_t*)malloc(yRet.dlen);
+    memcpy(yRet.data, yImage->pixelAddress(0, 0), yRet.dlen);
 
-    ret1.dlen = yImage->width() * yImage->height() * 2;
-    ret1.data = (uint8_t*)malloc(ret1.dlen);
-    memcpy(ret1.data, yImage->pixelAddress(0, 0), ret1.dlen);
+    rets.push_back(yRet);
 
-    rets.push_back(ret1);
+    // White image retreval, description, and data
+    const messages::PackedImage<unsigned char>* whiteImage = module.whiteImage.getMessage(true).get();
+    logio::log_t whiteRet;
 
+    std::string whiteName = "type=YUVImage encoding=[Y8] width=";
+    whiteName += std::to_string(whiteImage->width());
+    whiteName += " height=";
+    whiteName += std::to_string(whiteImage->height());
+
+    whiteRet.desc = (char*)malloc(whiteName.size()+1);
+    memcpy(whiteRet.desc, whiteName.c_str(), whiteName.size()+1);
+
+    whiteRet.dlen = whiteImage->width() * whiteImage->height();
+    whiteRet.data = (uint8_t*)malloc(whiteRet.dlen);
+    memcpy(whiteRet.data, whiteImage->pixelAddress(0, 0), whiteRet.dlen);
+
+    rets.push_back(whiteRet);
+
+    // Orange image retreval, description, and data
+    const messages::PackedImage<unsigned char>* orangeImage = module.orangeImage.getMessage(true).get();
+    logio::log_t orangeRet;
+
+    std::string orangeName = "type=YUVImage encoding=[Y8] width=";
+    orangeName += std::to_string(orangeImage->width());
+    orangeName += " height=";
+    orangeName += std::to_string(orangeImage->height());
+
+    orangeRet.desc = (char*)malloc(orangeName.size()+1);
+    memcpy(orangeRet.desc, orangeName.c_str(), orangeName.size()+1);
+
+    orangeRet.dlen = orangeImage->width() * orangeImage->height();
+    orangeRet.data = (uint8_t*)malloc(orangeRet.dlen);
+    memcpy(orangeRet.data, orangeImage->pixelAddress(0, 0), orangeRet.dlen);
+
+    rets.push_back(orangeRet);
+
+    // Green image retreval, description, and data
+    const messages::PackedImage<unsigned char>* greenImage = module.greenImage.getMessage(true).get();
+    logio::log_t greenRet;
+
+    std::cout << "Green width: " << greenImage->width() <<  std::endl;
+
+    std::string greenName = "type=YUVImage encoding=[Y8] width=";
+    greenName += std::to_string(greenImage->width());
+    greenName += " height=";
+    greenName += std::to_string(greenImage->height());
+
+    greenRet.desc = (char*)malloc(greenName.size()+1);
+    memcpy(greenRet.desc, greenName.c_str(), greenName.size()+1);
+
+    greenRet.dlen = greenImage->width() * greenImage->height();
+    greenRet.data = (uint8_t*)malloc(greenRet.dlen);
+    memcpy(greenRet.data, greenImage->pixelAddress(0, 0), greenRet.dlen);
+
+    rets.push_back(greenRet);
+    
+    // Done
     printf("ImageConverter module ran! W: %d, H: %d\n", yImage->width(), yImage->height());
     return 0;
 }
