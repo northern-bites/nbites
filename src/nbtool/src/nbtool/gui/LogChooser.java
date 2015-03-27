@@ -36,7 +36,7 @@ public class LogChooser extends JPanel {
 		tree.setEditable(false);
 		tree.setRootVisible(false);
 		tree.setScrollsOnExpand(true);
-		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		tree.addTreeSelectionListener(model);
 		tree.setTransferHandler(model.EXPORT_HANDLER);
 		tree.setDragEnabled(true);

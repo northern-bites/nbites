@@ -3,8 +3,10 @@ package nbtool.gui.logviews.misc;
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
+import javax.swing.tree.TreePath;
 
 import nbtool.data.Log;
 
@@ -17,6 +19,8 @@ public abstract class ViewParent extends JPanel {
 	
 	//Use newlog to populate view.
 	public abstract void setLog(Log newlog);
+	//Override if necessary.
+	public void alsoSelected(ArrayList<TreePath> pathes){}
 	
 	//Override if you want it to load in parallel.
 	public static Boolean shouldLoadInParallel(){return false;}
@@ -26,5 +30,4 @@ public abstract class ViewParent extends JPanel {
 	public ViewParent() {
 		super();
 	}
-	
 }

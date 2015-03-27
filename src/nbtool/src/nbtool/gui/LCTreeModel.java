@@ -5,6 +5,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.JComponent;
 import javax.swing.JTree;
@@ -95,7 +96,17 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 	}
 	
 	public void valueChanged(TreeSelectionEvent e) {
-		TreePath path = e.getPath();
+		
+		if (!e.isAddedPath())
+			return;
+		
+		//TreePath path = e.getPath();
+		TreePath path = tree.getSelectionPath();
+		ArrayList<TreePath> pathes = new ArrayList<TreePath>(Arrays.asList(tree.getSelectionPaths()));
+		assert(path == pathes.get(0));
+		
+		pathes.remove(path);
+		
 		Session b;
 		Object[] path_objs;
 		
@@ -148,7 +159,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 			}
 			
 			assert(lg != null);
-			N.notifyEDT(EVENT.LOG_SELECTION, this, lg);
+			N.notifyEDT(EVENT.LOG_SELECTION, this, lg, pathes);
 			break;
 		default:
 				U.w("ERROR: LCTreeModel path size was: " + path.getPathCount());
