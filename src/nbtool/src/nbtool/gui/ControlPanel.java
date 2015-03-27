@@ -181,14 +181,18 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 		this.actionPerformed(e);
 	}
 	
+	public void goAction() {
+		if (SessionMaster.INST.isIdle()) {
+			tryStart();
+		} else {
+			SessionMaster.INST.stopSession();
+		}
+	}
+	
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == go) {
 			
-			if (SessionMaster.INST.isIdle()) {
-				tryStart();
-			} else {
-				SessionMaster.INST.stopSession();
-			}
+			goAction();
 			
 		} else if (e.getSource() == test) {
 			boolean success = CommandIO.tryAddTest();

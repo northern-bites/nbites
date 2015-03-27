@@ -116,7 +116,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 			}
 	
 			if (c == '\n' && left.getSelectedIndex() == 0) {
-				//cntrlp.modelReturnAction();
+				cntrlp.goAction();
 			}
 			
 			if (Character.isLetter(c)) {
@@ -132,6 +132,9 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 					break;
 				case 'r':
 					right.setSelectedIndex(1);
+					break;
+				case 't':
+					right.setSelectedIndex(2);
 					break;
 				}
 			}
