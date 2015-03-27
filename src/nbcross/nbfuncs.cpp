@@ -97,6 +97,22 @@ int BlobTest_func() {
     rets.push_back(ret1);
 }
 
+int BallImage_func() {
+    assert(args.size() == 1);
+    printf("BallImage_func()\n");
+
+    logio::log_t log = logio::copyLog(&args[0]);
+
+    std::string name = "type=YUVImage encoding=[Ball] width=640 height=480";
+    name += " ball0={50,50,50,50} ball1={250,250,100,60}";
+
+    free(log.desc);
+    log.desc = (char*)malloc(name.size() + 1);
+    memcpy(log.desc, name.c_str(), name.size() +1);
+
+    rets.push_back(log);
+}
+
 int ImageConverter_func() {
     assert(args.size() == 1);
 
@@ -165,6 +181,13 @@ void register_funcs() {
     BlobTest.args = {sYUVImage};
     BlobTest.func = BlobTest_func;
     FUNCS.push_back(BlobTest);
+
+    //BallImage
+    nbfunc_t BallImage;
+    BallImage.name = "BallImage";
+    BallImage.args = {sYUVImage};
+    BallImage.func = BallImage_func;
+    FUNCS.push_back(BallImage);
 
     //ImageConverter
     nbfunc_t ImageConverter;
