@@ -92,14 +92,18 @@ public class PostDetector extends Detector {
 	
 	private double calculateGradientScore(double[] grad) {
 		FuzzyThreshold sigmaMagnitude = new FuzzyThreshold(3, 7);
-		FuzzyThreshold sigmaDirection = new FuzzyThreshold(-55, -35);
+		FuzzyThreshold sigmaDirection = new FuzzyThreshold(-60, -35);
 		
 		double magn = GradientCalculator.calculateGradMagn(grad);
 		double dir = GradientCalculator.calculateGradDir(grad);
 		if (dir > 90) dir -= 180;
 		if (dir > 0) dir *= -1;
 		
-		return sigmaMagnitude.f(magn)*sigmaDirection.f(dir);
+		double magnScore = sigmaMagnitude.f(magn);
+		double dirScore = sigmaDirection.f(dir);
+		if (magnScore < dirScore)
+			return magnScore;
+		return dirScore;
 	}
 	
 	private void buildGradientImg() {
@@ -174,7 +178,7 @@ public class PostDetector extends Detector {
 	}
 	
 	private void processHistogram() {
-		double narrowGaussian[] = new double[] {0.066414, 0.079465, 0.091364, 0.100939, 0.107159, 0.109317, 0.107159, 0.100939, 0.091364, 0.091364, 0.066414};
+		double narrowGaussian[] = new double[] {0.000003,	0.000229,	0.005977,	0.060598,	0.24173,	0.382925,	0.24173,	0.060598,	0.005977,	0.000229,	0.000003};
 		double wideGaussian[] = new double[] {0.01554, 0.015969, 0.016392, 0.016807, 0.017213, 0.017609, 0.017995, 0.018369, 0.018729, 0.019076, 0.019407,
 										      0.019722, 0.020021, 0.0203, 0.020562, 0.020803, 0.021024, 0.021223, 0.021401, 0.021556, 0.021688, 0.021796,
 										      0.021881, 0.021942, 0.021979, 0.021991, 0.021979, 0.021942, 0.021881, 0.021796, 0.021688, 0.021556, 0.021401,
