@@ -191,6 +191,8 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 		} else if (source == clear) {
 			args = new ArrayList<Log>();
 			arg_model.reload();
+			out = new ArrayList<Log>();
+			out_model.reload();
 		}
 	}
 	

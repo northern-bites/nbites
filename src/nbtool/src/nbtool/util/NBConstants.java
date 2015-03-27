@@ -31,6 +31,7 @@ public class NBConstants {
 	public static final int CPP_PORT = 30002;
 	
 	public static final int SOCKET_TIMEOUT = 5000; //Milliseconds
+	public static final int CPP_CALL_TIMEOUT = 0;	//i.e., infinite
 	
 	//Who names a class DataFlavor?  That's just so... Idk. Fllaavvvooorr.  Data Fllaaavoor. MMM, gimme some'o that DataFlav
 	public static DataFlavor treeFlavor = new DataFlavor(Log.class, "NB-OpaqueLog");
