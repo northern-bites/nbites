@@ -54,17 +54,24 @@ public class PostDetector extends Detector {
         detectPeaks();
 	}
 
-	private double calculateColorScore(int idealU, int idealV, int u, int v) {
-		FuzzyThreshold sigmaColor = new FuzzyThreshold(30, 50);
+	private double calculateColorScore(int y, int u, int v) {
+		FuzzyThreshold sigmaY = new FuzzyThreshold(70, 100);
+		FuzzyThreshold sigmaU = new FuzzyThreshold(110, 150);
+		FuzzyThreshold sigmaV = new FuzzyThreshold(125, 150);
 		
-		u -= 128;
-		v -= 128;
+		double yScore = sigmaY.f((double) y);
+		double uScore = 1 - sigmaU.f((double) u);
+		double vScore = sigmaV.f((double) v);
 		
-		int uDiff = java.lang.Math.abs(idealU - u);
-		int vDiff = java.lang.Math.abs(idealV - v);
-		int diff = (int) java.lang.Math.sqrt(uDiff*uDiff + vDiff*vDiff);
+		double smallestScore = uScore;
+		if (yScore < uScore) {
+			smallestScore = yScore;
+		}
+		if (vScore < smallestScore) {
+			smallestScore = vScore;
+		}
 		
-		return -1*(sigmaColor.f((double)diff) - 1);
+		return smallestScore;
 	}
 
 	private void buildYellowImg() {
@@ -73,9 +80,10 @@ public class PostDetector extends Detector {
         for (int i = 1; i < original.height - 1; i++) {
 			for (int j = 1; j < (original.width / 2 - 1); j += 1) {
 				int[] pixel = new int[1];
+				int y = original.yPixelAt(j, i);
 				int u = original.uPixelAt(j, i);
 				int v = original.vPixelAt(j, i);
-				pixel[0] = (int)(255*calculateColorScore(-80, 10, u, v));
+				pixel[0] = (int)(255*calculateColorScore(y, u, v));
 				raster.setPixel(j-1, i-1, pixel);
 			}
 		}
@@ -187,8 +195,8 @@ public class PostDetector extends Detector {
 		
 		for (int i = 0; i < processedScores.length; i++) {
 			if (processedScores[i] >= threshold & !inPeak) {
-				inPeak = true;
 				leftLimit = i;
+				inPeak = true;
 			} else if (processedScores[i] < threshold && inPeak) {
 				candidates.add((leftLimit + i) / 2);
 				inPeak = false;
