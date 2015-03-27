@@ -39,9 +39,8 @@ public class FileIO implements Runnable {
 	}
 		
 	public static boolean checkLogFolder(String log_folder) {
-		U.wf("checking [%s]\n", log_folder);
 		if(log_folder == null || log_folder.isEmpty()) {
-			U.wf("problem with log folder string\n");
+			U.wf("path string null or empty!\n");
 			return false;
 		}
 			
@@ -51,15 +50,14 @@ public class FileIO implements Runnable {
 			return false;
 		}
 		if (!f.isDirectory()) {
-			U.wf("file is not directory\n");
+			U.wf("file is not a directory!\n");
 			return false;
 		}
 		if (!f.canRead() || !f.canWrite()) {
-			U.wf("permissions errors.\n");
+			U.wf("permissions errors!\n");
 			return false;
 		}
 		
-		U.wf("all good!\n");
 		return true;
 	}
 	
