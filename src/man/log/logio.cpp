@@ -296,7 +296,7 @@ namespace logio {
     
     log_t copyLog(log_t * log) {
         log_t newl;
-        newl.desc = (char *) malloc(strlen(log->desc));
+        newl.desc = (char *) malloc(strlen(log->desc) + 1);
         strcpy(newl.desc, log->desc);
         newl.dlen = log->dlen;
         newl.data = (uint8_t *) malloc(newl.dlen);
