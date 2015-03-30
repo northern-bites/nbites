@@ -105,10 +105,14 @@ void Blobber<T>::initializeMark()
 {
     for (int i = 0; i < height + 2; i++) {
         for (int j = 0; j < width + 2; j++) {
-            if (i == 0 || j == 0 || i == height + 1 || j == width + 1)
+            if (i == 0 || j == 0 || i == height + 1 || j == width + 1) {
                 mark[i*(width+2) + j] = 1;
-            else
+
+            }
+            else {
                 mark[i*(width+2) + j] = 0;
+                blobImage[i*(width+2) + j - 1] = 0;
+            }
         }
     }
 }
@@ -183,7 +187,7 @@ inline void Blobber<T>::explore(Blob &blob, T const *p, uint8_t *m,
             int x = calculateXIndex(p);
 
             // TODO! get rid of this!
-            blobImage[x + width*y] = 250;
+            blobImage[x + width*y] = 1000;
             blob.add(w, static_cast<double>(x), static_cast<double>(y));
             list.push_front(p);
         }

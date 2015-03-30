@@ -116,7 +116,6 @@ public class U {
 			    if(location == null) break;
 			    ballLocs.add(location);
 			}
-
 			ip = new Ballimage(width, height, log.bytes, ballLocs);
 		} else {
 			U.w("WARNING:  Cannot use image with encoding:" + encoding);

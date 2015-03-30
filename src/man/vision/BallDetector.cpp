@@ -3,11 +3,13 @@
 #include <math.h>
 #include <algorithm>
 #include <time.h>
+#include <stdio.h>
+#include <iostream>
 
 namespace man {
 namespace vision {
 
-BallDetector::BallDetector(messages::PackedImage8* orangeImage_):
+BallDetector::BallDetector(const messages::PackedImage8* orangeImage_):
 orangeImage(orangeImage_)
 {
 
@@ -15,13 +17,19 @@ orangeImage(orangeImage_)
 
 BallDetector::~BallDetector() { }
 
-void BallDetector::findBalls() {
+std::vector<std::pair<Circle,double> >& BallDetector::findBalls() {
     Blobber<uint8_t> b(orangeImage->pixelAddress(0, 0), orangeImage->width(),
                        orangeImage->height(), 1, orangeImage->width());
 
     b.run(NeighborRule::eight, 90, 100, 100, 100);
 
-    blobs = b.getResult();
+    std::vector<Blob> blobs = b.getResult();
+
+    for(std::vector<Blob>::iterator i=blobs.begin(); i!=blobs.end(); i++) {
+        rateBlob(*i);
+    }
+
+    return balls;
 }
 
 void BallDetector::rateBlob(Blob b) {
@@ -36,28 +44,37 @@ void BallDetector::rateBlob(Blob b) {
     std::pair<Circle, int> fit = fitCircle(b);
     double circleFit = fit.second / b.getPerimeter();
 
-    b.setRating(aspectRatio * b.density() * circleFit);
+    double rating = aspectRatio * b.density() * circleFit;
+    b.setRating(rating);
+
+    if (rating > .7) {
+        std::pair<Circle, double> ball;
+        ball.first = fit.first;
+        ball.second = rating;
+        balls.push_back(ball);
+    }
 }
 
 std::pair<Circle, int> BallDetector::fitCircle(Blob b)
 {
     point centerMass = {b.xCenter(), b.yCenter()};
 
-    Circle best = {centerMass, b.principalLength1()/2.0};
+    Circle best = {centerMass, b.maxX - b.minX};
 
     std::vector<point> perimeter = b.getPerimeterPoints();
     int numEdge = perimeter.size();
+
     // Maybe right here we should do a least-squares on the points
     // It might give us an idea of how many outliers there are and
     // how many times we need to run ransac.
 
-    int delta = 4;
+    int delta = 2;
 
     int bestRating = rateCircle(best, perimeter, delta);
 
     // seed rand with current time
     srand(time(NULL));
-    // TODO: this needs to be better!
+    // TODO: this needs to be better!!!!
     for (int i=0; i<numEdge / 2; i++) {
         point one = perimeter.at(rand()%numEdge);
         point two = perimeter.at(rand()%numEdge);

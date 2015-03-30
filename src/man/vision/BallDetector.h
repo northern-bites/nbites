@@ -18,10 +18,10 @@ typedef struct circle_{
 
 class BallDetector {
 public:
-    BallDetector(messages::PackedImage8* orangeImage_);
+    BallDetector(const messages::PackedImage8* orangeImage_);
     ~BallDetector();
 
-    void findBalls();
+    std::vector<std::pair<Circle,double> >& findBalls();
 
 private:
     void rateBlob(Blob b);
@@ -29,8 +29,8 @@ private:
     int rateCircle(Circle c, std::vector<point> p, int delta);
     Circle circleFromPoints(point a, point b, point c);
 
-    messages::PackedImage8* orangeImage;
-    std::vector<Blob> blobs;
+    const messages::PackedImage8* orangeImage;
+    std::vector<std::pair<Circle,double> > balls;
 
 };
 

@@ -8,11 +8,13 @@
 #include "nbfuncs.h"
 #include <assert.h>
 #include <string.h>
+#include <sstream>
 
 #include "Images.h"
 #include "image/ImageConverterModule.h"
 #include "vision/Blobber.h"
 #include "vision/Blob.h"
+#include "vision/BallDetector.h"
 #include "RoboGrams.h"
 
 std::vector<nbfunc_t> FUNCS;
@@ -67,21 +69,34 @@ int BlobTest_func() {
     assert(args.size() == 1);
     printf("BlobTest_func()\n");
 
-    const logio::log_t arg1 = args[0];
+    const logio::log_t log = args[0];
 
     // Hardcoded for now. TODO
-    man::vision::Blobber<uint8_t> b(arg1.data, 640, 480, 2, 640*2);
-    printf("about to run\n");
-    b.run(man::vision::NeighborRule::eight, 180, 200, 50, 500);
+    int width = 640;
+    int height = 480;
+
+    messages::YUVImage image(log.data, width, height, width);
+    portals::Message<messages::YUVImage> message(&image);
+    man::image::ImageConverterModule module;
+
+    module.imageIn.setMessage(message);
+    module.run();
+
+    const messages::PackedImage8* orangeImage = module.orangeImage.getMessage(true).get();
+
+    man::vision::Blobber<uint8_t> b(orangeImage->pixelAddress(0, 0), orangeImage->width(),
+                                    orangeImage->height(), 1, orangeImage->width());
+
+    b.run(man::vision::NeighborRule::eight, 90, 100, 100, 100);
 
     logio::log_t ret1;
 
-    std::string name = "type=YUVImage encoding=[Y16] width=640 height=480";
+    std::string name = "type=YUVImage encoding=[Y16] width=320 height=240";
 
     ret1.desc = (char*)malloc(name.size() + 1);
     memcpy(ret1.desc, name.c_str(), name.size() + 1);
 
-    ret1.dlen = 640 * 480 * sizeof(short unsigned int);
+    ret1.dlen = 320 * 240 * sizeof(short unsigned int);
     ret1.data = (uint8_t*)malloc(640*480* sizeof(short unsigned int));
     memcpy(ret1.data, b.getImage(), ret1.dlen);
 
@@ -103,8 +118,31 @@ int BallImage_func() {
 
     logio::log_t log = logio::copyLog(&args[0]);
 
+    int width = 640;
+    int height = 480;
+
+    messages::YUVImage image(log.data, width, height, width);
+    portals::Message<messages::YUVImage> message(&image);
+    man::image::ImageConverterModule module;
+
+    module.imageIn.setMessage(message);
+    module.run();
+
+    const messages::PackedImage8* orangeImage = module.orangeImage.getMessage(true).get();
+
+    man::vision::BallDetector detector(orangeImage);
+    std::vector<std::pair<man::vision::Circle ,double> > balls = detector.findBalls();
+    printf("found: %d balls!\n", balls.size());
     std::string name = "type=YUVImage encoding=[Ball] width=640 height=480";
-    name += " ball0={50,50,50,50} ball1={250,250,100,60}";
+
+    for(int i=0; i<balls.size(); i++) {
+        std::pair<man::vision::Circle, double> ball = balls.at(i);
+        std::stringstream stream;
+        stream << " ball" << i << "={" << ball.first.center.x * 2 << "," << ball.first.center.y * 2 << ",";
+        stream << ball.first.radius * 2 << "," << ball.second << "}";
+        name += stream.str();
+        printf("   %s\n", stream.str().c_str());
+    }
 
     free(log.desc);
     log.desc = (char*)malloc(name.size() + 1);

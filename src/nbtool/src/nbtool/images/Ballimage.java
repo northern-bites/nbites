@@ -15,7 +15,6 @@ public final class Ballimage extends ImageParent {
 
     public Ballimage(int w, int h, byte[] d, Vector<String> ballLocs) {
 	super(w, h, d);
-
 	for(String s: ballLocs) {
 	    // Strip leading and trailing braces
 	    String toAdd = s.substring(1, s.length() - 1);
@@ -28,7 +27,7 @@ public final class Ballimage extends ImageParent {
 	BufferedImage intermediate = yuv.toBufferedImage();
 
 	Graphics2D g = intermediate.createGraphics();
-	g.setStroke(new BasicStroke(5));
+	g.setStroke(new BasicStroke(1));
 
 	for(String ball: balls) {
 	    String[] split = ball.split(",");
@@ -41,7 +40,7 @@ public final class Ballimage extends ImageParent {
 	    double radius = Double.parseDouble(split[2]);
 	    double rating = Double.parseDouble(split[3]);
 
-	    g.draw(new Ellipse2D.Double(radius, radius, centerX, centerY));
+	    g.draw(new Ellipse2D.Double(centerX - radius, centerY - radius, radius * 2, radius * 2));
 	}
 
 	return intermediate;

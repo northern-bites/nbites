@@ -13,7 +13,8 @@ struct point {
 class Blob {
 public:
     Blob() : sw(0), sx(0), sy(0), sx2(0), sy2(0), sxy(0),
-             mx(0), my(0), mxy(0), len(0), solved(false) {}
+             mx(0), my(0), mxy(0), len(0), solved(false), count(0),
+             minX(10000), maxX(0), minY(10000), maxY(0) {}
     inline void add(double w, double x, double y);
     inline void addPerimeter(double x, double y);
     inline void clearPerimeter() { perimeter.clear(); }
@@ -31,6 +32,7 @@ public:
     void setRating(double r) { rating = r; }
     double getRating() { return rating; }
 
+    double minX, maxX, minY, maxY;
 private:
     void solve();
 
@@ -40,6 +42,7 @@ private:
     bool solved;
     int count;
     double rating;
+
     std::vector<point> perimeter;
 
 };
@@ -60,6 +63,10 @@ inline void Blob::addPerimeter(double x, double y)
 {
     point p = {x, y};
     perimeter.push_back(p);
+    if(x < minX) minX = x;
+    if(x > maxX) maxX = x;
+    if(y < minY) minY = y;
+    if(y > maxY) maxY = y;
 }
 
 }
