@@ -219,17 +219,60 @@ public class PostDetector extends Detector {
 	
 	private void detectPeaks() {
 		candidates = new ArrayList<Integer>();
-		int threshold = 15;
-		int leftLimit = 0;
-		boolean inPeak = false;
 		
-		for (int i = 0; i < processedScores.length; i++) {
-			if (processedScores[i] >= threshold & !inPeak) {
-				leftLimit = i;
-				inPeak = true;
-			} else if (processedScores[i] < threshold && inPeak) {
-				candidates.add((leftLimit + i) / 2);
-				inPeak = false;
+//		int threshold = 15;
+//		int leftLimit = 0;
+//		boolean inPeak = false;
+//		
+//		for (int i = 0; i < processedScores.length; i++) {
+//			if (processedScores[i] >= threshold & !inPeak) {
+//				leftLimit = i;
+//				inPeak = true;
+//			} else if (processedScores[i] < threshold && inPeak) {
+//				candidates.add((leftLimit + i) / 2);
+//				inPeak = false;
+//			}
+//		}
+		
+		double totalDensity = 0;
+		WeightedFit line = new WeightedFit();
+		for (int i = 25; i < processedScores.length - 25; i++) {
+			totalDensity += processedScores[i];
+			line.add(i, processedScores[i]);
+		}
+		double m = line.getFirstPrincipalAxisV() / line.getFirstPrincipalAxisU();
+		
+		boolean stop = false;
+		for (int i = 255; i >= 0; i--) {
+			Vector<int[]> peaks = new Vector<int[]>();
+			boolean inPeak = false;
+			int peakIndex = -1;
+			for (int j = 25; j < processedScores.length - 25; j++) {
+				int yOnLine = (int)(m*j - m*line.getCenterX() + line.getCenterY() + i);
+				if (!inPeak && processedScores[j] > yOnLine) {
+					inPeak = true;
+					int[] peak = new int[3];
+					peak[0] = j;
+					peak[2] = 0;
+					peak[2] += (int)processedScores[j] - yOnLine;
+					peaks.add(peak);
+					peakIndex++;
+				} else if (inPeak && processedScores[j] > yOnLine) {
+					peaks.get(peakIndex)[2] += (int) processedScores[j] - yOnLine;
+				}
+				else if (inPeak) {
+					inPeak = false;
+					peaks.get(peakIndex)[1] = j;
+					if (peaks.get(peakIndex)[2] / totalDensity >= 0.0) {
+						stop = true;
+					}
+				}
+			}
+			if (stop) {
+				for (int j = 0; j < peaks.size(); j++) {
+					candidates.add((peaks.get(j)[0] + peaks.get(j)[1]) / 2);
+				}
+				return;
 			}
 		}
 	}
