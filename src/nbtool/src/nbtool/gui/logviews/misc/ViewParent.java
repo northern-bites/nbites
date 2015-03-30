@@ -11,7 +11,8 @@ import javax.swing.tree.TreePath;
 import nbtool.data.Log;
 
 /**
- * Construction and setLog() are sometimes called in a separate thread.
+ * Construction and setLog() are sometimes called in a separate thread,
+ *  depending on the value returned by shoudLoadInParallel().
  * */
 public abstract class ViewParent extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -20,7 +21,7 @@ public abstract class ViewParent extends JPanel {
 	//Use newlog to populate view.
 	public abstract void setLog(Log newlog);
 	//Override if necessary.
-	public void alsoSelected(ArrayList<TreePath> pathes){}
+	public void alsoSelected(ArrayList<Log> also){}
 	
 	//Override if you want it to load in parallel.
 	public static Boolean shouldLoadInParallel(){return false;}

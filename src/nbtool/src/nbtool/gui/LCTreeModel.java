@@ -6,6 +6,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Vector;
 
 import javax.swing.JComponent;
 import javax.swing.JTree;
@@ -36,9 +37,6 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 	
 	String root;
 	JTree tree;
-	
-	public Log NS_macro = null;
-	public Log CS_macro = null;
 	
 	public LCTreeModel() {
 		root = "ROOT PLACEHOLDER";
@@ -101,68 +99,61 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 			return;
 		
 		//TreePath path = e.getPath();
-		TreePath path = tree.getSelectionPath();
-		ArrayList<TreePath> pathes = new ArrayList<TreePath>(Arrays.asList(tree.getSelectionPaths()));
-		assert(path == pathes.get(0));
+		TreePath first = tree.getSelectionPath();
+		TreePath[] all = tree.getSelectionPaths();
+		assert(first == all[0]);
 		
-		pathes.remove(path);
-		
-		Session b;
-		Object[] path_objs;
-		
-		switch (path.getPathCount()) {
+		switch (first.getPathCount()) {
 		case 0:
 			//??
-			U.w("ERROR: LCTreeModel path size was: " + path.getPathCount());
+			U.w("ERROR: LCTreeModel path size was: " + first.getPathCount());
 			break;
 		case 1:
 			//Root selected
-			U.w("ERROR: LCTreeModel path size was: " + path.getPathCount() + "ROOT SHOULD NOT BE VISIBLE");
+			U.w("ERROR: LCTreeModel path size was: " + first.getPathCount() + "ROOT SHOULD NOT BE VISIBLE");
 			break;
 		case 2:
-			//Branch selected, 
-			NS_macro = CS_macro = null;
-			path_objs = path.getPath();
-			b = (Session) path_objs[1];
-			
-			N.notifyEDT(EVENT.SES_SELECTION, this, b);
+			//Branch selected, 			
+			N.notifyEDT(EVENT.SES_SELECTION, this,
+					(Session) first.getPath()[1]);
 			
 			break;
 		case 3:
 			//LOG SELECTED.
+			ArrayList<Log> selected = new ArrayList<Log>();
 			
-			path_objs = path.getPath();
-			final Log lg = (Log) path_objs[2];
-			b = (Session) path_objs[1];
-			
-			if (lg.bytes == null) {
-				try {
-					assert(b.dir != null && !b.dir.isEmpty());
-					FileIO.loadLog(lg, b.dir);
+			for (TreePath p : all) {
+				if (p.getPathCount() != 3)	//Skip selected items that can't be logs.
+					continue;
+				
+				Session ses = (Session)p.getPath()[1];
+				Log sel = (Log) p.getPath()[2];
+				
+				sel.lastSeen = p;
+				
+				if (sel.bytes == null) {
+					assert(ses.dir != null && !ses.dir.isEmpty());
+					try {
+						FileIO.loadLog(sel, ses.dir);
+					} catch (IOException e1) {
+						U.w("Could not load log data!");
+						e1.printStackTrace();
+						
+						return;
+					}
 					
-					assert(lg.getClass().equals(Log.class));
-					N.notifyEDT(EVENT.LOG_LOAD, this, (Object[]) new Log[]{lg});
-				} catch (IOException ex) {
-					ex.printStackTrace();
-					U.w("message: " + ex.getMessage());
-					U.w("Could not load log data.");
-					return;
+					N.notifyEDT(EVENT.LOG_LOAD, this, (Object[]) new Log[]{sel});
 				}
+				
+				assert(sel.bytes != null);
+				selected.add(sel);
 			}
 			
-			CS_macro = lg;
-			int index = this.getIndexOfChild(b, lg);
-			if (index + 1 < b.logs_DO.size()) {
-				NS_macro = b.logs_DO.get(index + 1);
-			} else {
-				NS_macro = null;
-			}
-			
-			assert(lg != null);
-			N.notifyEDT(EVENT.LOG_SELECTION, this, lg, pathes);
+			N.notifyEDT(EVENT.LOG_SELECTION, this,
+					selected.remove(0), selected);
 			break;
 		default:
-				U.w("ERROR: LCTreeModel path size was: " + path.getPathCount());
+				U.w("ERROR: LCTreeModel path size was: " + first.getPathCount());
 		}
 	}
 

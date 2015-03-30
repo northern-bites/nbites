@@ -61,14 +61,6 @@ public class LogChooser extends JPanel {
 		sp.setBounds(0, d.height, size.width, size.height - d.height);
 	}
 	
-	public Log currentlySelected() {
-		return model.CS_macro;
-	}
-	
-	public Log nextSelection() {
-		return model.NS_macro;
-	}
-	
 	private JScrollPane sp;
 	private JTree tree;
 	private LCTreeModel model;

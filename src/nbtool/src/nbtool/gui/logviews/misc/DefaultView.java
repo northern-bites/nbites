@@ -8,6 +8,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.jar.Attributes;
 
@@ -139,4 +140,12 @@ public class DefaultView extends ViewParent implements ActionListener {
 			}
 		}
 	}	
+	
+	@Override
+	public void alsoSelected(ArrayList<Log> also) {
+		U.w("also selected...");
+		for (Log a: also) {
+			U.wf("\t%s\n", a.toString());
+		}
+	}
 }

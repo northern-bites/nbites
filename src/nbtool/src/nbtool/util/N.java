@@ -26,7 +26,7 @@ public class N {
 		REL_BOTSTAT, /*(new relevant botstat object)*/	//From SessionMaster
 		STATS,											//From Stats object
 		
-		LOG_SELECTION, /*(selected log)(array of tree pathes)*/				//From chooser gui
+		LOG_SELECTION, /*(selected log)(arraylist of other selected logs)*/				//From chooser gui
 		SES_SELECTION, /*(selected session)*/			//From chooser gui
 		
 		MAX_MEM_USAGE_CHANGED, /*(new value)*/			//From prefs
