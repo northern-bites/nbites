@@ -10,6 +10,8 @@ import nbtool.data.Log;
 
 public class NBConstants {
 	
+	public static final int VERSION = 6;
+	
 	public static final String PROTOBUF_TYPE_PREFIX = "proto-";
 	
 	public static final Rectangle DEFAULT_BOUNDS = new Rectangle(0,0,900,600);
@@ -23,8 +25,6 @@ public class NBConstants {
 
 	public static final String IMAGE_S = "YUVImage";
 	public static final String STATS_S = "stats";
-	
-	public static final int VERSION = 5;
 	
 	public static final int SERVER_PORT = 30000;
 	public static final int CNC_PORT = 30001;
@@ -45,7 +45,7 @@ public class NBConstants {
 		}
 	}
 	
-	public static final String[] mode_strings = {
+	public static final String[] MODE_STRINGS = {
 		"from net to fs", "from net", "from fs", "none"
 	};
 	
@@ -62,7 +62,7 @@ public class NBConstants {
 		}
 	}
 	
-	public static final String[] status_strings = {
+	public static final String[] STATUS_STRINGS = {
 		"idle", "starting", "running", "stopping"
 	};
 	

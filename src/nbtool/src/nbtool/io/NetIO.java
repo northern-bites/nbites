@@ -39,7 +39,8 @@ import nbtool.util.U;
  * 
  * 	catching an exception, indicating some error in finding the host or the stability of the connection
  * 
- * netThreadExiting() should always be called when run() will return, meaning all exceptions should be handled.
+ * netThreadExiting() should always (read: if you change this class, make sure this happens)
+ * 	 be called when run() will return, meaning all exceptions need to be handled inside the run loop.
  * */
 
 public class NetIO implements Runnable {

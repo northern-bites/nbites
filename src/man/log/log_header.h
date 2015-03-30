@@ -160,7 +160,7 @@ namespace nblog {
     //declared in log_main.cpp
     extern log_main_t * log_main;
     
-#define LOG_VERSION 5
+#define LOG_VERSION 6
     
 #define LOG_PORT (30000)
 #define CNC_PORT (30001)

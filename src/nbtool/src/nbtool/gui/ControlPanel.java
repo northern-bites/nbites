@@ -56,7 +56,7 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 		test.setEnabled(false);
 		canvas.add(test);
 		
-		modes = new JComboBox<String>(NBConstants.mode_strings);
+		modes = new JComboBox<String>(NBConstants.MODE_STRINGS);
 		modes.setSelectedIndex(0);
 		modes.addActionListener(this);
 		canvas.add(modes);
