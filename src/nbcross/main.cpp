@@ -119,8 +119,8 @@ int main(int argc, const char * argv[]) {
         assert(findex >= 0);
         assert(findex < FUNCS.size());
         
-        for (int i = 0; i < args.size(); ++i) {free(args[i].desc); free(args[i].data);}
-        args.clear();
+        assert(args.size() == 0);
+        assert(rets.size() == 0);
         
         int na = FUNCS[findex].args.size();
         
@@ -144,9 +144,7 @@ int main(int argc, const char * argv[]) {
         assert(args.size() == FUNCS[findex].args.size());
         printf("calling function [%s]"
                "\n-------------------------------------------\n", FUNCS[findex].name);
-        //Clear ret logs, call function.
-        for (int i = 0; i < rets.size(); ++i) {free(rets[i].desc); free(rets[i].data);}
-        rets.clear();
+        
         int ret = FUNCS[findex].func();
         
         printf("\n-------------------------------------------\n");
@@ -167,6 +165,16 @@ int main(int argc, const char * argv[]) {
             printf("java sent bad confirmation of end function call (wanted %lu, got %i)\n", rets.size(), ntohl(net_order));
             return 1;
         }
+        
+        printf("cleaning up function... ");
+        
+        for (int i = 0; i < args.size(); ++i) {free(args[i].desc); free(args[i].data);}
+        args.clear();
+        
+        for (int i = 0; i < rets.size(); ++i) {free(rets[i].desc); free(rets[i].data);}
+        rets.clear();
+        
+        printf("done\n");
         
         printf("function call completed\n");
     }
