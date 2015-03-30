@@ -167,8 +167,7 @@ public class PostDetector extends Detector {
 		int height = post.getHeight();
 				
 		double[] hist = new double[width];		
-		for (int x = 0; x < width; x++) {
-			int numInRun = 0;
+		for (int x = 25; x < width - 25; x++) {
 			boolean inRun = false;
 			double score = 0;
 			
@@ -177,33 +176,27 @@ public class PostDetector extends Detector {
 				raster.getPixel(x, y, pixel);
 				
 				if (pixel[0] > 100) {
-					numInRun++;
-					if (numInRun > 50) {
-						if (!inRun) {
-							inRun = true;
-							score += (double) pixel[0];
-						} else {
-							score += (double) pixel[0];
-						}
+					if (!inRun) {
+						inRun = true;
+						score += (double) pixel[0];
+					} else {
+						score += (double) pixel[0];
 					}
 				} else if (inRun) {
 					inRun = false;
 					if (score > hist[x])
 						hist[x] = score;
 					score = 0;
-					numInRun = 0;
-				} else {
-					numInRun = 0;
 				}
 			}
 		}
 		
 		double maxScore = 0;
-		for (int i = 0; i < width; i++) {
+		for (int i = 25; i < width - 25; i++) {
 			if (hist[i] > maxScore)
 				maxScore = hist[i];
 		}
-		for (int i = 0; i < width; i++) {
+		for (int i = 25; i < width - 25; i++) {
 			hist[i] = hist[i] / maxScore * 255;
 		}
 		
@@ -219,7 +212,7 @@ public class PostDetector extends Detector {
 										      0.017995, 0.017609, 0.017213, 0.016807, 0.016392, 0.015969, 0.01554};
 		
 		processedScores = new double[rawScores.length];
-		for (int i = 0; i < processedScores.length; i++) {
+		for (int i = 25; i < processedScores.length - 25; i++) {
 			processedScores[i] = convolve(rawScores, narrowGaussian, i) - convolve(rawScores, wideGaussian, i);
 		}
 	}
