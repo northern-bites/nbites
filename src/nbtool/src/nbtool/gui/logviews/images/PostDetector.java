@@ -165,15 +165,48 @@ public class PostDetector extends Detector {
 		Raster raster = post.getData();
 		int width = post.getWidth();
 		int height = post.getHeight();
-		double[] hist = new double[width];
+				
+		double[] hist = new double[width];		
 		for (int x = 0; x < width; x++) {
+			int numInRun = 0;
+			boolean inRun = false;
+			double score = 0;
+			
 			for (int y = 0; y < height; y++) {
 				int[] pixel = new int[1];
 				raster.getPixel(x, y, pixel);
-				hist[x] += pixel[0];
+				
+				if (pixel[0] > 100) {
+					numInRun++;
+					if (numInRun > 50) {
+						if (!inRun) {
+							inRun = true;
+							score += (double) pixel[0];
+						} else {
+							score += (double) pixel[0];
+						}
+					}
+				} else if (inRun) {
+					inRun = false;
+					if (score > hist[x])
+						hist[x] = score;
+					score = 0;
+					numInRun = 0;
+				} else {
+					numInRun = 0;
+				}
 			}
-			hist[x] /= height;
 		}
+		
+		double maxScore = 0;
+		for (int i = 0; i < width; i++) {
+			if (hist[i] > maxScore)
+				maxScore = hist[i];
+		}
+		for (int i = 0; i < width; i++) {
+			hist[i] = hist[i] / maxScore * 255;
+		}
+		
 		rawScores = hist;
 	}
 	
