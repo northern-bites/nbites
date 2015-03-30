@@ -22,7 +22,7 @@ public class Log implements Serializable {
 	public SOURCE source;
 	
 	//Set by GUI when selected.
-	public TreePath lastSeen = null;
+	public transient TreePath lastSeen = null;
 
 	private Map<String, String> dictionary;
 	
