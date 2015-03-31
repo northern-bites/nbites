@@ -91,7 +91,7 @@ public class PostDetector extends Detector {
 	}
 	
 	private double calculateGradientScore(double[] grad) {
-		FuzzyThreshold sigmaMagnitude = new FuzzyThreshold(3, 7);
+		FuzzyThreshold sigmaMagnitudeLow = new FuzzyThreshold(3, 7);
 		FuzzyThreshold sigmaDirection = new FuzzyThreshold(-60, -35);
 		
 		double magn = GradientCalculator.calculateGradMagn(grad);
@@ -99,10 +99,14 @@ public class PostDetector extends Detector {
 		if (dir > 90) dir -= 180;
 		if (dir > 0) dir *= -1;
 		
-		double magnScore = sigmaMagnitude.f(magn);
+		double magnScoreLow = sigmaMagnitudeLow.f(magn);
 		double dirScore = sigmaDirection.f(dir);
-		if (magnScore < dirScore)
-			return magnScore;
+		
+		if (magn > 80)
+			return 0;
+		
+		if (magnScoreLow < dirScore)
+			return magnScoreLow;
 		return dirScore;
 	}
 	
