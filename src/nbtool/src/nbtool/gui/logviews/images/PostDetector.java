@@ -46,8 +46,7 @@ public class PostDetector extends Detector {
 		mm.setStructuringElement(square);
 		mm.opening(field);
         
-        FuzzyThreshold sigma = new FuzzyThreshold(100, 150);
-        post = GrayscaleLib.threshold(GrayscaleLib.add(GrayscaleLib.add(gradient, yellow), field), sigma);
+        post = GrayscaleLib.and(gradient, yellow);
         
         buildHistogram();
         processHistogram();
@@ -180,7 +179,7 @@ public class PostDetector extends Detector {
 				int[] pixel = new int[1];
 				raster.getPixel(x, y, pixel);
 				
-				if (pixel[0] > 100) {
+				if (pixel[0] > 0) {
 					if (!inRun) {
 						inRun = true;
 						score += (double) pixel[0];
@@ -238,51 +237,6 @@ public class PostDetector extends Detector {
 				inPeak = false;
 			}
 		}
-		
-//		double totalDensity = 0;
-//		WeightedFit line = new WeightedFit();
-//		for (int i = 25; i < processedScores.length - 25; i++) {
-//			totalDensity += processedScores[i];
-//			line.add(i, processedScores[i]);
-//		}
-//		double m = line.getFirstPrincipalAxisV() / line.getFirstPrincipalAxisU();
-//		
-//		boolean stop = false;
-//		for (int i = 255; i >= 0; i--) {
-//			Vector<int[]> peaks = new Vector<int[]>();
-//			boolean inPeak = false;
-//			int peakIndex = -1;
-//			for (int j = 25; j < processedScores.length - 25; j++) {
-//				int yOnLine = (int)(m*j - m*line.getCenterX() + line.getCenterY() + i);
-//				if (!inPeak && processedScores[j] > yOnLine) {
-//					inPeak = true;
-//					int[] peak = new int[3];
-//					peak[0] = j;
-//					peak[2] = 0;
-//					peak[2] += (int)processedScores[j] - yOnLine;
-//					peaks.add(peak);
-//					peakIndex++;
-//				} else if (inPeak && processedScores[j] > yOnLine) {
-//					peaks.get(peakIndex)[2] += (int) processedScores[j] - yOnLine;
-//				}
-//				else if (inPeak) {
-//					inPeak = false;
-//					peaks.get(peakIndex)[1] = j;
-//					if (peaks.get(peakIndex)[2] / totalDensity >= 0.05) {
-//						stop = true;
-//					} else if (peaks.get(peakIndex)[2] / totalDensity < 0.01) {
-//						peaks.remove(peakIndex);
-//						peakIndex--;
-//					}
-//				}
-//			}
-//			if (stop) {
-//				for (int j = 0; j < peaks.size(); j++) {
-//					candidates.add((peaks.get(j)[0] + peaks.get(j)[1]) / 2);
-//				}
-//				return;
-//			}
-//		}
 	}
 	
 	// TODO rename

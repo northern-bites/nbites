@@ -13,6 +13,44 @@ public class GrayscaleLib {
         return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	}
 
+	public static BufferedImage and(BufferedImage img1, BufferedImage img2) {
+		BufferedImage anded = copy(img1);
+		WritableRaster andedRaster = anded.getRaster();
+		Raster img1Raster = img1.getRaster();
+		Raster img2Raster = img2.getRaster();
+		for (int i = 0; i < img1.getHeight(); i++) {
+			for (int j = 0; j < img1.getWidth(); j += 1) {
+				int[] img1Pixel = new int[1];
+				img1Pixel = img1Raster.getPixel(j, i, img1Pixel);
+				int[] img2Pixel = new int[1];
+				img2Pixel = img2Raster.getPixel(j, i, img2Pixel);
+				int[] newPixel = new int[1];
+				newPixel[0] = Math.min(img1Pixel[0], img2Pixel[0]);
+				andedRaster.setPixel(j, i, newPixel);
+			}
+		}
+        return anded;
+	}
+	
+	public static BufferedImage or(BufferedImage img1, BufferedImage img2) {
+		BufferedImage ored = copy(img1);
+		WritableRaster oredRaster = ored.getRaster();
+		Raster img1Raster = img1.getRaster();
+		Raster img2Raster = img2.getRaster();
+		for (int i = 0; i < img1.getHeight(); i++) {
+			for (int j = 0; j < img1.getWidth(); j += 1) {
+				int[] img1Pixel = new int[1];
+				img1Pixel = img1Raster.getPixel(j, i, img1Pixel);
+				int[] img2Pixel = new int[1];
+				img2Pixel = img2Raster.getPixel(j, i, img2Pixel);
+				int[] newPixel = new int[1];
+				newPixel[0] = Math.max(img1Pixel[0], img2Pixel[0]);
+				oredRaster.setPixel(j, i, newPixel);
+			}
+		}
+        return ored;
+	}
+	
 	public static BufferedImage add(BufferedImage img1, BufferedImage img2) {
 		BufferedImage added = copy(img1);
 		WritableRaster addedRaster = added.getRaster();
