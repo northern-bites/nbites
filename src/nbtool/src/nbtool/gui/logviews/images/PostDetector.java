@@ -10,7 +10,6 @@ import nbtool.data.Log;
 import nbtool.images.YUYV8888image;
 import nbtool.util.U;
 
-// TODO use difference of Gaussians filter to detect peaks
 // TODO better logic when there are more than two detected peaks
 // TODO refactor GradientCalculator into a Gradient class
 public class PostDetector extends Detector {
@@ -18,7 +17,7 @@ public class PostDetector extends Detector {
 	
 	BufferedImage gradient;
 	BufferedImage yellow;
-	BufferedImage field;
+//	BufferedImage field;
 	BufferedImage post;
 	
 	double[] rawScores;
@@ -32,19 +31,19 @@ public class PostDetector extends Detector {
 		original = (YUYV8888image) U.imageFromLog(log);
 		
 		buildGradientImg();
-		StructuringElement cross = new StructuringElement(0);
-        MathMorphology mm = new MathMorphology(cross); 
-        mm.opening(gradient);
+//		StructuringElement cross = new StructuringElement(0);
+//      MathMorphology mm = new MathMorphology(cross); 
+//      mm.opening(gradient);
         
 		buildYellowImg();
 		StructuringElement verticalBandOf5Pixels = new StructuringElement(2);
-		mm.setStructuringElement(verticalBandOf5Pixels);
+        MathMorphology mm = new MathMorphology(verticalBandOf5Pixels); 
 		mm.opening(yellow);
         
-        buildFieldImg();
-        StructuringElement square = new StructuringElement(4);
-		mm.setStructuringElement(square);
-		mm.opening(field);
+//      buildFieldImg();
+//      StructuringElement square = new StructuringElement(4);
+//		mm.setStructuringElement(square);
+//		mm.opening(field);
         
         post = GrayscaleLib.and(gradient, yellow);
         
@@ -123,46 +122,46 @@ public class PostDetector extends Detector {
         gradient = gradientImg;
 	}
 	
-	private double calculateFieldScore(int yMode, int y) {
-		int diff = y - yMode;
-		if (diff < 0)
-			return 0.0;
-		FuzzyThreshold sigma = new FuzzyThreshold(40, 60);
-		return sigma.f(diff);
-	}
-	
-	private int calculateYMode() {
-		int[] frequencies = new int[256];
-        for (int i = original.height / 2; i < original.height; i++) {
-			for (int j = 0; j < (original.width / 2); j += 1) {
-				frequencies[original.yPixelAt(j, i)] += 1;
-			}
-        }
-        
-        int mode = 0, frequencyOfMode = 0;
-        for (int i = 0; i < 256; i++) {
-        	if (frequencies[i] > frequencyOfMode) {
-        		mode = i;
-        		frequencyOfMode = frequencies[i];
-        	}
-        }
-        return mode;
-	}
-	
-	private void buildFieldImg() {
-		BufferedImage fieldImg = new BufferedImage(original.width / 2 - 1, original.height - 1, BufferedImage.TYPE_BYTE_GRAY);
-		int yMode = calculateYMode();
-		WritableRaster raster = fieldImg.getRaster();
-        for (int i = 1; i < original.height - 1; i++) {
-			for (int j = 1; j < (original.width / 2 - 1); j += 1) {
-				int[] pixel = new int[1];
-				int y = original.yPixelAt(j, i);
-				pixel[0] = (int)(255*calculateFieldScore(yMode, y));
-				raster.setPixel(j-1, i-1, pixel);
-			}
-		}
-        field = fieldImg;
-	}
+//	private double calculateFieldScore(int yMode, int y) {
+//		int diff = y - yMode;
+//		if (diff < 0)
+//			return 0.0;
+//		FuzzyThreshold sigma = new FuzzyThreshold(40, 60);
+//		return sigma.f(diff);
+//	}
+//	
+//	private int calculateYMode() {
+//		int[] frequencies = new int[256];
+//        for (int i = original.height / 2; i < original.height; i++) {
+//			for (int j = 0; j < (original.width / 2); j += 1) {
+//				frequencies[original.yPixelAt(j, i)] += 1;
+//			}
+//        }
+//        
+//        int mode = 0, frequencyOfMode = 0;
+//        for (int i = 0; i < 256; i++) {
+//        	if (frequencies[i] > frequencyOfMode) {
+//        		mode = i;
+//        		frequencyOfMode = frequencies[i];
+//        	}
+//        }
+//        return mode;
+//	}
+//	
+//	private void buildFieldImg() {
+//		BufferedImage fieldImg = new BufferedImage(original.width / 2 - 1, original.height - 1, BufferedImage.TYPE_BYTE_GRAY);
+//		int yMode = calculateYMode();
+//		WritableRaster raster = fieldImg.getRaster();
+//        for (int i = 1; i < original.height - 1; i++) {
+//			for (int j = 1; j < (original.width / 2 - 1); j += 1) {
+//				int[] pixel = new int[1];
+//				int y = original.yPixelAt(j, i);
+//				pixel[0] = (int)(255*calculateFieldScore(yMode, y));
+//				raster.setPixel(j-1, i-1, pixel);
+//			}
+//		}
+//        field = fieldImg;
+//	}
 	
 	private void buildHistogram() {
 		Raster raster = post.getData();
@@ -172,26 +171,27 @@ public class PostDetector extends Detector {
 		double[] hist = new double[width];
 		
 		for (int x = 25; x < width - 25; x++) {
-			boolean inRun = false;
-			double score = 0;
+//			boolean inRun = false;
+//			double score = 0;
 			
 			for (int y = 0; y < height; y++) {
 				int[] pixel = new int[1];
 				raster.getPixel(x, y, pixel);
+				hist[x] += pixel[0];
 				
-				if (pixel[0] > 0) {
-					if (!inRun) {
-						inRun = true;
-						score += (double) pixel[0];
-					} else {
-						score += (double) pixel[0];
-					}
-				} else if (inRun) {
-					inRun = false;
-					if (score > hist[x])
-						hist[x] = score;
-					score = 0;
-				}
+//				if (pixel[0] > 0) {
+//					if (!inRun) {
+//						inRun = true;
+//						score += (double) pixel[0];
+//					} else {
+//						score += (double) pixel[0];
+//					}
+//				} else if (inRun) {
+//					inRun = false;
+//					if (score > hist[x])
+//						hist[x] = score;
+//					score = 0;
+//				}
 			}
 		}
 		
