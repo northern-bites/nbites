@@ -1,304 +1,267 @@
 /* -*- mode: asm; indent-tabs-mode: nil -*- */
 .intel_syntax noprefix
-# *********************************
-# *                               *
-# *  Image Acquisition Front-End  *
-# *                               *
-# *********************************
+# **************************************
+# *                                    *
+# *  Image Acquisition Pre-processing  *
+# *                                    *
+# **************************************
+#
+#  Takes as input a YUV image and its dimentions and row pitch, outputs
+#  - 16 bit Y image
+#  - 8 bit white image
+#  - 8 bit orange image
+#  - 8 bit green image
 #
 #  General registers
 #       eax     working register
-#       ebx     address of color conversion table
+#       ebx     row pitch
 #       ecx     loop counter and offset into source and destination rows
-#                 for (ecx = -320; ecx < 0; ecx += 2)
-#       edx     address of struct ColorParams, defined below
+#                 for (ecx = -cols; ecx < 0; ecx += 2)
+#       edx     address of end of current White output image row
 #       esi     address of end of current yuv source image row
-#       edi     address of end of current output image row in the y value section
-#
-#  The mapping from y pixel values to y table indicies is:
-#
-#            y index
-#               |             _____________
-#       (yn-1) -|            /
-#               |           /
-#               |          /
-#               |         /
-#            0 -| _______/
-#                -----------------------------  y
-#                 |      |    |            |
-#                 0     y0   y1           255
-#
-# The mapping for u and v is similar. The values yn, un, and vn give the table size
-# in each of the three dimensions. The total table size is yn * un * vn. These values
-# need not be powers of 2. The slopes of the active segment of the maps are given by
-#
-#       yk = (yn << 14) / (y1 - y0)
-#       uk = (un << 15) / (u1 - u0)
-#       vk = (vn << 15) / (v1 - v0)
-#
-
-#  Parameters structure:
-#
-#    struct ColorParams
-#    {                     // words:      3         2         1         0
-#      Int64  yZero;              // | y0 << 2 | y0 << 2 | y0 << 2 | y0 << 2 |
-#      Int64  ySlope;             // |    0    |   yk    |    0    |   yk    |
-#      Int64  yLimit;             // |  yn-1   |  yn-1   |  yn-1   |  yn-1   |
-
-#      Int64  uvZero;             // | v0 << 1 | u0 << 1 | v0 << 1 | u0 << 1 |
-#      Int64  uvSlope;            // |   vk    |   uk    |   vk    |   uk    |
-#      Int64  uvLimit;            // |  vn-1   |  un-1   |  vn-1   |  un-1   |
-#      Int64  uvDim;              // | un * yn |   yn    | un * yn |   yn    |
-#    };
+#       edi     address of end of current Y output image row
 
 .globl _acquire_image
 
 .section .data
 
-.equiv INIT_LOOP_COUNT, -320
-.equiv OUT_IMG_WIDTH, 320
-.equiv OUT_IMG_HEIGHT, 240
-.equiv Y_IMG_BYTE_SIZE, OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 2
 
 ## STACK STRUCTURE, esp offsets
         .struct 0
-row_count:      .skip 4
+row_count:      .skip 4        
+col_count:	.skip 4         
+row_pitch:	.skip 4
+out_row_count:  .skip 4         # out_row_count = row_count/2 
 rdtsc_output:   .skip 4
 y_out_img:      .skip 4
-color_out_img:  .skip 1280
-                .skip 4         # make color_out_row qword aligned
-color_stack_row_end:
+output_size:    .skip 4
+stack_end:
 
-.equiv end_of_stack, color_stack_row_end
+## ARGUMENT OFFSETS, ebp offsets
+        .struct 0
+saved_ebp:      .skip 4
+ret_address:    .skip 4
+int_rows:       .skip 4
+int_cols:       .skip 4
+int_rowPitch:   .skip 4
+ptr_yuvImage:   .skip 4
+ptr_output:     .skip 4
 
 .section .text
 
-## Inner loop of the color processing
-.macro COLOR_LOOP phase
-
-        ## Load the color address from the stack
-        mov     eax, dword ptr[esp+ color_stack_row_end +ecx*4 + \phase * 4]
-
-        ## Lookup color in table
-        movzx   eax, byte ptr[ebx+eax]          # movzx may be faster than
-                                                # just moving a byte to al
-        mov     byte ptr[edi+ecx+\phase], al
-                                # color image is just after y image in memory,
-                                # Y values are 16 bits, color are bytes
-.endm
-
-        ## The inner loop of the image copy, averaging, and color segmentation
-        ## Performs all the averaging, and calculates all the table indices, but
-        ## leaves the table lookups to another loop.
+   #
+   ##
+###### 
+####### INNER LOOP
+######
+   ##       Executes averaging and image copying for 8 pixels.
+   #        Called four times per inner loop. 
+#
+#
+#    
+#
+#
 .macro LOOP phase
-        # Fetch next 8 pixels from upper (0) source row, split into y and uv words
-        # mm0:  | y30 | y20 | y10 | y00 |
-        # mm1:  | v20 | u20 | v00 | u00 |
-        movq    mm0, [esi+ecx*4 + (\phase * 8)]
-        movq    mm1, mm0
-        pand    mm0, mm7
-        psrlw   mm1, 8
 
-        # Fetch next 8 pixels from lower (1) source row, split into y and uv words
-        # mm2:  | y31 | y21 | y11 | y01 |
-        # mm3:  | v21 | u21 | v01 | u01 |
-        movq    mm2, [esi+ecx*4+ (\phase * 8)+(640*2)]  # row = 640 pixels * 2 bytes per pixel
-        movq    mm3, mm2
-        pand    mm2, mm7
-        psrlw   mm3, 8
+####### IF PHASE 0, prefetch next 32 bytes of source image and writes to output (to be tested)
+# TODO: PREFETCHING
+ #       .ifeq (\phase)
+  #      prefetch [eax+64] 
+   #     prefetchw [edi + ecx*2]
+    #    prefetchw [edx+ ecx*2]
+     #   .endif
+   
+####### Fetch next 16 bytes from source row and split into Y and UV words
+      #  Starting format: |vA3,yA7|uA3,yA6|vA3,yA5|uA2,yA4|vA1,yA3|uA1,yA2|vA0,yA1|uA0,yA0|
+        movdqu  xmm0, [eax + (\phase * 16)]   #eax == esi + ecx*4.                      # should be movdqa? i.e. add alignment checking?
+        movdqu  xmm1, xmm0            # xmm0: xmm1: |vA3,yA7|uA3,yA6|vA3,yA5|uA2,yA4||vA1,yA3|uA1,yA2|vA0,yA1|uA0,yA0|
+        pand    xmm0, xmm7                  # xmm0: |    yA7|    yA6|    yA5|    yA4||    yA3|    yA2|    yA1|    yA0|  
+        psrlw   xmm1, 8                     # xmm1: |    vA3|    uA3|    vA2|    uA2||    vA1|    uA1|    vA0|    uA0|
+       
+      #  Fetch from from the next row down. 
+	    movdqu	xmm2, [eax + ebx*4 + (\phase * 16)] #eax == esi + ecx*4. ebx == row pitch.
+        movdqu  xmm3, xmm2            # xmm2: xmm3: |vB3,yB7|uB3,yB6|vB3,yB5|uB2,yB4||vB1,yB3|uB1,yB2|vB0,yB1|uB0,yB0|
+        pand    xmm2, xmm7                  # xmm2: |    yB7|    yB6|    yB5|    yB4||    yB3|    yB2|    yB1|    yB0|  
+        psrlw   xmm3, 8                     # xmm3: |    vB3|    uB3|    vB2|    uB2||    vB1|    uB1|    vB0|    uB0|
+		
+      #  First and second Y sums
+        paddw   xmm0, xmm2                  # xmm0: | A7+B7 | A6+B6 | A5+B5 | A4+B4 || A3+B3 | A2+B2 | A1+B1 | A0+B0 |     (all Ys)
+        pshufhw xmm2, xmm0, 0b01001110      # xmm2: | A6+B6 | A7+B7 | A4+B4 | A5+B5 || A3+B3 | A2+B2 | A1+B1 | A0+B0 |     (all Ys)
+        pshufhw xmm2, xmm2, 0b01001110      # xmm2: | A6+B6 | A7+B7 | A4+B4 | A5+B5 || A2+B2 | A3+B3 | A0+B0 | A1+B1 |     (all Ys)
+        paddw   xmm0, xmm2                  # xmm2: |A67+B67|A67+B67|A45+B45|A45+B45||A23+B23|A23+B23|A01+B01|A01+B01|     (all Ys)
+        psrld   xmm0, 16                    # xmm2: |   |A6+A7+B6+B7|   |A4+A5+B4+B5||   |A2+A3+B2+B3|   |A0+B0+A1+B1|     (all Ys)
 
-        ##
-        ##
-        ## Y AVERAGING SECTION
-        ##
-        ##
-
-        # Sum 2x2 y values (words, 10 bits used)
-        # mm0: | xxx | y20 + y30 + y21 + y31 | xxx | y00 + y10 + y01 + y11 |
-        paddw   mm0, mm2
-        pshufw  mm2, mm0, 0xB1
-        paddw   mm0, mm2
-
-        ## mm0: | 0000 | sum1 | 0000 | sum0 |
-        pand    mm0, mm6
-
-        .ifeq (\phase)
-        movq    mm4, mm0
+      # U and V average
+        paddw   xmm1, xmm3                  # xmm1: |vA3+vB3|uA3+uB3|vA2+vB2|uA2+uB2||vA1+vB1|uA1+uB1|vA0+vB0|uA0+uB0|
+        psrlw   xmm1, 1                     # xmm1: |   v3  |   u3  |    v2 |   u2  ||   v1  |   u1  |   v0  |   u0  |
+       
+####### IF PHASE 0: Store
+        .if (\phase == 0)
+        movdqu  xmm4, xmm0                  # xmm4: |   |A6+A7+B6+B7|   |A4+A5+B4+B5||   |A2+A3+B2+B3|   |A0+B0+A1+B1|     (all Ys)
+        packsswb    xmm5, xmm1              # xmm5: | v3 u3 | v2 u2 | v1 u1 | v0 u0 ||       |       |       |       |
         .endif
 
-
-        .ifeq (\phase - 1)
-        movq    mm2, mm0
-
-        ## Pack values from first two phases together as 4 words in mm4
-        ## mm4 after pack: | y3 | y2 | y1 | y0 |
-        packssdw mm4, mm2
-        movntq [edi+ecx*2], mm4
+####### IF PHASE 1: Pack and Write Y, Pack UV values into xmm5
+        .if (\phase == 1)
+        packssdw xmm4, xmm0                 # xmm0: |A&B 6&7|A&B 4&5|A&B 3&2|A&B 0&1||C&D 6&7|C&D 4&5|C&D 2&3|C&D 0&1|     (all Ys)
+        movdqu [edi + ecx*2 + (\phase-1)*8], xmm4      ## Non-temporal instruction causing seg fault???
+        
+        packsswb    xmm1, xmm1              # xmm1: | v7 u7 | v6 u6 | v5 u5 | v4 u4 || v7 u7 | v6 u6 | v5 u5 | v4 u4 |
+        psrldq      xmm1, 64                # xmm1: |       |       |       |       || v7 u7 | v6 u6 | v5 u5 | v4 u4 |
+        pand        xmm5, xmm1              # xmm1: | v3 u3 | v2 u2 | v1 u1 | v0 u0 || v7 u7 | v6 u6 | v5 u5 | v4 u4 |
         .endif
 
-        .ifeq (\phase - 2)
-        movq    mm5, mm0
+####### IF PHASE 2: Store
+        .if (\phase == 2)
+        movdqu      xmm4, xmm0                  # xmm4: |   |A6+A7+B6+B7|   |A4+A5+B4+B5||   |A2+A3+B2+B3|   |A0+B0+A1+B1|     (all Ys)
+        packsswb    xmm6, xmm1              # xmm6: | vB uB | vA uA | v9 u9 | v8 u8 ||       |       |       |       |
         .endif
 
-        ## Last phase, pack phase 2 & 3 into an array, then pack all 8
-        ## bytes together and write them out
-        .ifeq (\phase - 3)
-        movq     mm2, mm0
+####### IF PHASE 3: Pack and Wirte Y, Pack UV values in xmm6 then separate V and U vals into four registers
+        .if (\phase == 3)
+        packssdw xmm4, xmm0                 # xmm4: |A&B 6&7|A&B 4&5|A&B 3&2|A&B 0&1||C&D 6&7|C&D 4&5|C&D 2&3|C&D 0&1|     (all Ys)
+        movdqu [edi + ecx*2 + (\phase-1)*8], xmm4      ## Non-temporal instruction causing seg fault???
 
-        ## mm2 before: | 0 | y7 | 0 | y6|
-        ## mm5 after:  | y7 | y6 | y5 | y4 | all 16 bit words
-        packssdw mm5, mm2
-        movntq [edi+ecx*2+8], mm5
+        # Pack and unpack for U and V registers
+        packsswb    xmm1, xmm1              # xmm1: | vF uF | vE uE | vD uD | vC uC || vF uF | vE uE | vD uD | vC uC |
+        psrldq      xmm1, 64                # xmm1: |       |       |       |       || vF uF | vE uE | vD uD | vC uC |      
+        por        xmm6, xmm1              # xmm6: | vB uB | vA uA | v9 u9 | v8 u8 || vF uF | vE uE | vD uD | vC uC |
+
+        movdqu      xmm0, xmm6
+
+        movdqu      xmm3, xmm5              
+        psrlw       xmm5, 8                 # xmm5: |   v3  |   v2  |   v1  |   v0  ||   v7  |   v6  |   v5  |   v4  |
+        pand        xmm3, xmm7              # xmm3: |   u3  |   u2  |   u1  |   u0  ||   u7  |   u6  |   u5  |   u4  |
+  
+        movdqu      xmm4, xmm6
+        psrlw       xmm6, 8                 # xmm6: |   vB  |   vA  |   v9  |   v8  ||   vF  |   vE  |   vD  |   vC  |  
+        pand        xmm4, xmm7              # xmm4: |   uB  |   uA  |   u9  |   u8  ||   uF  |   uE  |   uD  |   uC  |
+
+
+        # xmm0 to be t0 replicated 8 times
+        # xmm1 to be w replicated 8 times
+        # xmm2 to be w1 replicated 8 times
+
+        # TODO: White, orange, and green calcs using registers xmm0-6
+
+        # for now, just writes white and black images to test addressing
+        #  addressing works but isn't the fastest
+       # pcmpeqd xmm0, xmm0
+        movdqu  [edx + ecx], xmm0
+
+        psrlw   xmm0, 16
+        sub     edx, [esp + output_size]
+        movdqu  [edx + ecx], xmm0
+
+        pcmpeqd xmm0, xmm0
+        sub     edx, [esp + output_size]
+        movdqu  [edx + ecx], xmm0
+
+        # reset edx back to white image
+        add     edx, [esp + output_size]
+        add     edx, [esp + output_size]          # can't lea beacuse output size is kept on stack. thoughts?
+
         .endif
-
-        ##
-        ##
-        ## UV-COLOR SECTION
-        ##
-        ##
-
-        # Sum 1x2 uv values (words, 9 bits used)
-        # mm1: | v20 + v21 | u20 + u21 | v00 + v01 | u00 + u01 |
-        paddw   mm1, mm3
-
-        # Convert two y sums in words 0 and 2 to two table indicies
-        psubusw mm0, [edx]                      # zero point
-        pmulhw mm0, [edx+8]                    # slope
-        pminsw  mm0, [edx+16]                   # limit to maximum value
-
-        # Convert four u,v sums to four table indicies
-        psubusw mm1, [edx+24]                   # zero point
-        pmulhw mm1, [edx+32]                   # slope
-        pminsw  mm1, [edx+40]                   # limit to maximum value
-
-        # Calculate two table offsets from y, u, and v table indicies (dwords)
-        # mm0: | table offset 1 | table offset 0 |
-        pmaddwd mm1, [edx+48]                   # combine u and v indicies
-        paddd   mm0, mm1                        # add y index
-
-        ## Write color address for 2 pixels to the stack, we'll look
-        ## it up in the table later
-        movq    [esp + color_stack_row_end + ecx*4 + \phase * 8], mm0
 .endm
 
-# acquire_image arguments ( byte* colorTable, ColorParams* params, byte* yuvImage, byte* outputImage)
+   #
+   ##
+######
+####### _acquire_image (int row_count, 
+######		        int col_count,
+   ##			    int row_pitch,			
+   #			    byte* yuvImage,
+#			        byte* outputImage)
 _acquire_image:
 
-# Preserve the required registers: ebp, ebx, esi, edi
+# Preserve required registers: epb, ebx, esi, edi
         push    ebp
-        mov     ebp, esp
-
+        mov     ebp, esp    #ebp now contains address of top of stack
         push    ebx
         push    esi
         push    edi
 
-        # Move stack pointer and push rowCount to it
-        sub     esp, end_of_stack       # 4 bytes for rdtsc, 4 for rowCount
-                                        # 320 * 4 bytes per color addresses
+        # Move stack pointer to allocate space for parameters
+        sub     esp, stack_end
+        and     esp, 0xFFFFFFF8         #clear low-order three bits to ensure sp is qw aligned
 
-        # Ensure that the stack pointer is 8 byte aligned
-        and     esp, 0xFFFFFFF8
-
-        mov     dword ptr[esp + row_count], OUT_IMG_HEIGHT      # Row Count is only 240 bc it skips every other row.
+        # Preserve stamp counter
         rdtsc
-        mov     [esp + rdtsc_output],eax
+        mov [esp + rdtsc_output], eax
 
-        # Load arguments into registers
-        mov     ebx, [ebp+8]    # Color table
-        mov     edx, [ebp+12]   # Color params
+# Read and manage arguments  
+        # Load arguments into registers and stack 
+        mov     eax, [ebp + int_rows]
+        mov     [esp + row_count], eax          # set rows
 
-        mov     esi, [ebp+16]   # Input YUV Image address
-        add     esi, 640*2      # Move to end of source image row
+        mov     [esp + out_row_count], eax      # set row count
 
-        mov     edi, [ebp+20]   # Output (color segmented) image address
-        add     edi, OUT_IMG_WIDTH*2    # Move to end of y row, 640 = 320 pixels * 2 bytes per Y value
+        mov     eax, [ebp + int_cols]
+        mov     [esp + col_count], eax
 
-        ## Put end of row pointers on stack
+        mov     esi, [ebp + ptr_yuvImage]       # set esi to start of yuv input image
+        lea     esi, [esi + eax * 4]            # move esi to end of first row
+
+        mov     edi, [ebp + ptr_output]
+        lea     edi, [edi + eax * 2]
+
+        mov     ebx, [ebp + int_rowPitch]
+        mov     [esp + row_pitch], ebx   
+        
+        # Put end-of-output-row pointer on stack
         mov     [esp + y_out_img], edi
 
-        ## Move forward entire y image, then back half a y-image row
-        add     edi, Y_IMG_BYTE_SIZE - 320
-        mov     [esp + color_out_img], edi
+        # Set output UV image to one output image more than the current edi
+        imul    eax, [esp + row_count]
+        lea     edx, [edi + eax * 2]
+        sub     edx, [esp + col_count]
+        imul    eax, -1
+        mov    [esp + output_size], eax
+        
+       
+# Set pixel masks  # TODO: masks
+        pcmpeqd xmm7, xmm7        # set to all 1s
+        psrlw   xmm7, 8           # set high 8 bits of each word to 0 
 
-        # set mm7 to 0x00FF00FF00FF00FF for y pixel mask
-        pcmpeqb mm7, mm7                        # set to all 1s
-        psrlw   mm7, 8                          # set high 8 bits of each word to 0
-
-        ## set mm6 to 0x0000FFFF0000FFFF for y packing mask
-        pcmpeqb mm6, mm6
-        psrldw  mm6, 16
-
-# Start of outer (y) loop
+## Start of outer loop (y loop)
 yLoop:
-        mov     ecx, INIT_LOOP_COUNT                       # x loop count
-        mov     edi, [esp + y_out_img]
+        mov     ecx, [esp + col_count]   # ecx = -col_count
+        imul    ecx, -1
 
-# Start of inner (x) loop
-#
-# Processes 8 pixels total in each xLoop.
-# Y Values get written to memory, color values are written to the stack then processed.
+## Start of inner loop (x loop)
+
+# Processes 8 pixels (bytes) in two rows (16 total) in each LOOP call (64 per xLoop).
+# Y values, white, orange, and green values are written to memory
 xLoop:
-        ## Calculate the offset for the pixel accesses
-        # ecx * 2 bytes/pixel * 2 pixels (-320 <= ecx< 0)
-        # Only perform once since ecx only changes at the end of the loop
+        lea     eax, [esi+ecx*4]
+
         LOOP 0
         LOOP 1
         LOOP 2
         LOOP 3
-
+        
         # Update loop/offset counter, test for end of row
-        add     ecx, 8
+        add     ecx, 16
         jne     xLoop
-
-        mov     edi, [esp + color_out_img]
-
-## Lookup and write color pixels to output image
-## Loop from 0 to 320 in ecx
-        mov     ecx, INIT_LOOP_COUNT
-colorLoop:
-        ## Load pixel color address
-        COLOR_LOOP 0
-        COLOR_LOOP 1
-        COLOR_LOOP 2
-        COLOR_LOOP 3
-        COLOR_LOOP 4
-        COLOR_LOOP 5
-        COLOR_LOOP 6
-        COLOR_LOOP 7
-        COLOR_LOOP 8
-        COLOR_LOOP 9
-
-        add     ecx, 10
-        jne     colorLoop
-
-
-
-        # End of x loop. Decrement outer loop counter, update row pointers,
-        # test for end of image
-        add     esi, 640*2*2                    # next source rows
-
-        ## Move pointers to end of next output image rows
-        add     dword ptr[esp + y_out_img], OUT_IMG_WIDTH * 2
-        add     dword ptr[esp + color_out_img], OUT_IMG_WIDTH
-
-        dec     dword ptr[esp + row_count]
+        
+# End of xLoop. Decrement outer loop counter, update row pointers, test for end of image
+        lea     esi, [esi + ebx * 8]                        # point to next row of source image
+        lea     edi, [edi + ebx * 2]
+        lea     edx, [edx + ebx]
+        
+        # Update outloop counter        
+        dec     dword ptr[esp + out_row_count]        
         jne     yLoop
 
+# Finish
         rdtsc
         sub     eax, [esp + rdtsc_output]
 
-        # Restore esp to original position
         mov     esp, ebp
-
-        # We still need to pop 3 bytes from the stack
-        sub     esp, 12
-
-        # Restore necessary _cdecl calling convention registers
+        sub     esp, 12         # pop edi, ebp, esi, and ebx from stack
         pop     edi
         pop     esi
         pop     ebx
-
-        # Restore ebp
         pop     ebp
 
         emms

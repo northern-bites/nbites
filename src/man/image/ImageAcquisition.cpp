@@ -29,7 +29,7 @@ int ImageAcquisition::acquire_image(int rowCount,
 									const uint8_t *yuv,
 									uint8_t *out )
 {
-#if 0 
+#if 1 
 	_acquire_image (rowCount, colCount, rowPitch, yuv, out);
 #else
 
@@ -59,10 +59,10 @@ int ImageAcquisition::acquire_image(int rowCount,
 		for (int j=0; j < colCount; j++, yuv += 4, yOut++, whiteOut++, orangeOut++, greenOut++){
 
 			// Y Averaging
-			*yOut = y = yuv[YOFFSET1] + yuv[rowPitch*4 + YOFFSET1] +
+			y = yuv[YOFFSET1] + yuv[rowPitch*4 + YOFFSET1] +
 		    	yuv[YOFFSET2] + yuv[rowPitch*4 + YOFFSET2];
 		   
-		    // Variable used for color calcs
+		    // Variables used for color calcs
 			y >>= 2;
 
 			short unsigned u0, u = (yuv[UOFFSET] + yuv[rowPitch*4 + UOFFSET]) >> 1;
@@ -93,7 +93,7 @@ int ImageAcquisition::acquire_image(int rowCount,
 		    	f2 = (std::min(std::max((int)(v - v0), 0), (int)whiteWidth) * whiteWidth1) >> 8;
 		    }
 
-		    *whiteOut = std::min(f1, f2);
+		//    *whiteOut = std::min(f1, f2);
 		    
 			// ORANGE CALCS
 		    u0 = O_MAX_U;
@@ -106,7 +106,7 @@ int ImageAcquisition::acquire_image(int rowCount,
 			v0 += (short unsigned)(y * orangeCoefU);
 			f1 = (std::min(std::max((int)(v - v0), 0),
 				                    (int)orangeWidth) * orangeWidth1) >> 8;
-			*orangeOut = std::min(f1, f2);
+		//	*orangeOut = std::min(f1, f2);
 
 			// GREEN CALCS
 			u0 = G_MAX_U;
@@ -119,7 +119,7 @@ int ImageAcquisition::acquire_image(int rowCount,
 			v0 += (short unsigned)(y * greenCoefV);
 			f2 = (std::min(std::max((int)(v0 + greenWidth - v), 0),
 				                    (int)greenWidth) * greenWidth1) >> 8;
-			*greenOut = std::min(f1, f2);
+			//*greenOut = std::min(f1, f2);
 		}
 	}
 #endif
