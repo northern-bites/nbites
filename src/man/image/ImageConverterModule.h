@@ -15,25 +15,25 @@ public:
     // For tool, doesn't load color table at converter construction time
     ImageConverterModule();
     // For robots, load color table at converter construction time
-    ImageConverterModule(char *table_pathname);
+  /*  ImageConverterModule(char *table_pathname);
     virtual ~ImageConverterModule() {}
-
+*/
     // Gets an image from the Transcriber module (from the camera)
     portals::InPortal<messages::YUVImage> imageIn;
     // Outs four images for vision, YUV split up and a color segmented image
     portals::OutPortal<messages::PackedImage16> yImage;
-    portals::OutPortal<messages::PackedImage16> uImage;
-    portals::OutPortal<messages::PackedImage16> vImage;
-    portals::OutPortal<messages::ThresholdImage> thrImage;
+    portals::OutPortal<messages::PackedImage8> whiteImage; // to orange
+    portals::OutPortal<messages::PackedImage8> orangeImage;
+    portals::OutPortal<messages::PackedImage8> greenImage;
 
     // For offline use, allows table to change after construction
-    void changeTable(unsigned char *newTable);
+ /*   void changeTable(unsigned char *newTable);
 	void loadTable(unsigned char *newTable);
-
+*/
 protected:
     virtual void run_();
 
-    void initTable(char *filename);
+  //  void initTable(char *filename);
 
     ColorParams params;
     unsigned char *table;

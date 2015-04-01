@@ -24,7 +24,7 @@ public class NBConstants {
 	public static final String IMAGE_S = "YUVImage";
 	public static final String STATS_S = "stats";
 	
-	public static final int VERSION = 4;
+	public static final int VERSION = 5;
 	
 	public static final int SERVER_PORT = 30000;
 	public static final int CNC_PORT = 30001;

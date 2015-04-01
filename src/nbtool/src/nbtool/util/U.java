@@ -1,29 +1,27 @@
 package nbtool.util;
 
 import java.awt.BorderLayout;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
-import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.tree.TreePath;
 
 import nbtool.data.Log;
 import nbtool.images.ImageParent;
 import nbtool.images.UV88image;
 import nbtool.images.Y16image;
+import nbtool.images.Y8image;
 import nbtool.images.YUYV8888image;
-
+import nbtool.images.BallImage;
 
 public class U {
 	
@@ -102,6 +100,17 @@ public class U {
 			ip = new Y16image(width , height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[U8V8]")) {
 			ip = new UV88image(width , height, log.bytes);
+		} else if (encoding.equalsIgnoreCase("[Y8]")) {
+			ip = new Y8image(width , height, log.bytes);
+		} else if (encoding.equalsIgnoreCase("[Ball]")) {
+			Map<String, String> dict = log.getAttributes();
+			Vector<String> ballLocs = new Vector<String>();
+			for (int numBalls=0; ; numBalls++) {
+			    String location = dict.get("ball"+numBalls);
+			    if(location == null) break;
+			    ballLocs.add(location);
+			}
+			ip = new BallImage(width, height, log.bytes, ballLocs);
 		} else {
 			U.w("WARNING:  Cannot use image with encoding:" + encoding);
 			return null;
@@ -129,6 +138,14 @@ public class U {
 	public static JPanel fieldWithlabel(JLabel l, JTextField f) {
 		JPanel p = new JPanel(new BorderLayout());
 		p.add(l,BorderLayout.WEST);
+		p.add(f,BorderLayout.CENTER);
+		
+		return p;
+	}
+	
+	public static JPanel fieldWithButton(JTextField f, JButton b) {
+		JPanel p = new JPanel(new BorderLayout());
+		p.add(b,BorderLayout.EAST);
 		p.add(f,BorderLayout.CENTER);
 		
 		return p;
@@ -220,7 +237,7 @@ public class U {
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		}
-		
+				
 		return ret;
 	}
 	

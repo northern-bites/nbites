@@ -7,6 +7,7 @@
 
 #include "log_header.h"
 #include "log_sf.h"
+
 #include <stdio.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -109,9 +110,9 @@ namespace nblog {
     
     void log_cnc_init() {
         LOGDEBUG(1, "log_cnc_init() with %i functions.\n", fmap.size());
-        log_main->log_cnc_thread = (pthread_t *) malloc(sizeof(pthread_t));
         
-        pthread_create(log_main->log_cnc_thread, NULL, &cnc_loop, NULL);
+        pthread_create(&(log_main->log_cnc_thread), NULL, &cnc_loop, NULL);
+        pthread_detach(log_main->log_cnc_thread);
     }
     
     std::vector<std::string> split(const std::string &s, char delim) {
@@ -154,6 +155,9 @@ namespace nblog {
         listen(listenfd, 1);
         
         LOGDEBUG(2, "log_cnc listening... port = %i\n", CNC_PORT);
+        logio::log_t log;
+        log.data = NULL;
+        log.desc = NULL;
         
         for (;;) {
             connfd = block_accept(listenfd);
@@ -165,30 +169,15 @@ namespace nblog {
                 uint32_t ping = 0;
                 uint32_t resp;
                 
-                CHECK_RET(send_exactly(connfd, 4, (uint8_t *) &ping) )
-                CHECK_RET(recv_exactly(connfd, 4, (uint8_t *) &resp, IO_SEC_TO_BREAK))
+                CHECK_RET(logio::send_exact(connfd, 4, (uint8_t *) &ping) )
+                CHECK_RET(logio::recv_exact(connfd, 4, (uint8_t *) &resp, IO_SEC_TO_BREAK))
                 
                 if (ntohl(resp) == 1) {
                     //cnc call coming in:
-                    CHECK_RET(recv_exactly(connfd, 4, (uint8_t *) &resp, IO_SEC_TO_BREAK))
-                    size_t desc_len = ntohl(resp);
-                    char cbuf[desc_len];
-                    CHECK_RET(recv_exactly(connfd, desc_len, (uint8_t *) cbuf, IO_SEC_TO_BREAK))
-                    
-                    CHECK_RET(recv_exactly(connfd, 4, (uint8_t *) &resp, IO_SEC_TO_BREAK))
-                    size_t data_len = ntohl(resp);
-                    uint8_t dbuf[data_len];
-                    uint8_t * dptr;
-                    
-                    if (data_len) {
-                        CHECK_RET(recv_exactly(connfd, data_len, (uint8_t *) dbuf, IO_SEC_TO_BREAK))
-                        dptr = dbuf;
-                    } else {
-                        dptr = NULL;
-                    }
+                    CHECK_RET(logio::recv_log(connfd, &log, IO_SEC_TO_BREAK));
                     
                     //Parse description
-                    std::string desc(cbuf, desc_len);
+                    std::string desc(log.desc);
                     size_t nullstart = desc.find('\0');
                     if (nullstart != desc.npos)
                         desc = desc.substr(0, nullstart);
@@ -215,20 +204,23 @@ namespace nblog {
                         goto connection_died;
                     }
                     
-                    LOGDEBUG(1, "log_cnc called [desc = %s, dlen = %lu]\n", cbuf, data_len);
+                    LOGDEBUG(1, "log_cnc called [desc = %s, dlen = %lu]\n", log.desc, log.dlen);
                     
                     if (fmap.find(cmnd[1]) == fmap.end()) {
                         LOGDEBUG(1, "log_cnc could not find command[%s] in fmap!\n", cmnd[1].c_str());
                         goto connection_died;
                     }
                     
-                    uint32_t ret = fmap[cmnd[1]](desc, data_len, dptr);
+                    uint32_t ret = fmap[cmnd[1]](log.desc, log.dlen, log.data);
                     LOGDEBUG(1, "log_cnc command returned %i\n", ret);
                     
                     uint32_t nret = htonl(ret);
-                    CHECK_RET(send_exactly(connfd, 4, &nret))
+                    CHECK_RET(logio::send_exact(connfd, 4, &nret))
                     
                     LOGDEBUG(1, "log_cnc call finished.\n\n");
+                    
+                    free(log.desc); log.desc = NULL;
+                    free(log.data); log.data = NULL;
                 } else {
                     if (resp != 0) {
                         LOGDEBUG(1, "log_cnc got bad ping reply! %i\n", resp);
@@ -243,6 +235,11 @@ namespace nblog {
         connection_died:
             nbsf::flags[nbsf::cnc_connected] = 0;
             close(connfd);
+            
+            if (log.desc)
+                free(log.desc);
+            if (log.data)
+                free(log.data);
             LOGDEBUG(1, "log_cnc loop broken, connection closed.\n");
         }
         

@@ -40,7 +40,7 @@ namespace man {
     bottomTranscriber(*new image::ImageTranscriber(Camera::BOTTOM)),
     topConverter(TOP_TABLE_PATHNAME),
     bottomConverter(BOTTOM_TABLE_PATHNAME),
-    vision(),
+      //vision(),
     localization(),
     ballTrack(),
     obstacle(),
@@ -108,7 +108,7 @@ namespace man {
         cognitionThread.addModule(bottomTranscriber);
         cognitionThread.addModule(topConverter);
         cognitionThread.addModule(bottomConverter);
-        cognitionThread.addModule(vision);
+        //cognitionThread.addModule(vision);
         cognitionThread.addModule(localization);
         cognitionThread.addModule(ballTrack);
         cognitionThread.addModule(obstacle);
@@ -125,27 +125,27 @@ namespace man {
         topConverter.imageIn.wireTo(&topTranscriber.imageOut);
         bottomConverter.imageIn.wireTo(&bottomTranscriber.imageOut);
         
-        vision.topThrImage.wireTo(&topConverter.thrImage);
-        vision.topYImage.wireTo(&topConverter.yImage);
-        vision.topUImage.wireTo(&topConverter.uImage);
-        vision.topVImage.wireTo(&topConverter.vImage);
+        // vision.topThrImage.wireTo(&topConverter.thrImage);
+        // vision.topYImage.wireTo(&topConverter.yImage);
+        // vision.topUImage.wireTo(&topConverter.uImage);
+        // vision.topVImage.wireTo(&topConverter.vImage);
         
-        vision.botThrImage.wireTo(&bottomConverter.thrImage);
-        vision.botYImage.wireTo(&bottomConverter.yImage);
-        vision.botUImage.wireTo(&bottomConverter.uImage);
-        vision.botVImage.wireTo(&bottomConverter.vImage);
+        // vision.botThrImage.wireTo(&bottomConverter.thrImage);
+        // vision.botYImage.wireTo(&bottomConverter.yImage);
+        // vision.botUImage.wireTo(&bottomConverter.uImage);
+        // vision.botVImage.wireTo(&bottomConverter.vImage);
         
-        vision.joint_angles.wireTo(&topTranscriber.jointsOut, true);
-        vision.inertial_state.wireTo(&topTranscriber.inertsOut, true);
+        // vision.joint_angles.wireTo(&topTranscriber.jointsOut, true);
+        // vision.inertial_state.wireTo(&topTranscriber.inertsOut, true);
         
-        localization.visionInput.wireTo(&vision.vision_field);
+        //localization.visionInput.wireTo(&vision.vision_field);
         localization.motionInput.wireTo(&motion.odometryOutput_, true);
         localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
         localization.resetInput[1].wireTo(&sharedBall.sharedBallReset, true);
         localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
         localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
         
-        ballTrack.visionBallInput.wireTo(&vision.vision_ball);
+        //ballTrack.visionBallInput.wireTo(&vision.vision_ball);
         ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
         ballTrack.localizationInput.wireTo(&localization.output, true);
         
@@ -157,7 +157,7 @@ namespace man {
         sharedBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
         
         obstacle.armContactIn.wireTo(&arms.contactOut, true);
-        obstacle.visionIn.wireTo(&vision.vision_obstacle, true);
+        //obstacle.visionIn.wireTo(&vision.vision_obstacle, true);
         obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
         
         gamestate.commInput.wireTo(&comm._gameStateOutput, true);
@@ -169,9 +169,9 @@ namespace man {
         behaviors.localizationIn.wireTo(&localization.output);
         behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
         behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
-        behaviors.visionFieldIn.wireTo(&vision.vision_field);
-        behaviors.visionRobotIn.wireTo(&vision.vision_robot);
-        behaviors.visionObstacleIn.wireTo(&vision.vision_obstacle);
+        // behaviors.visionFieldIn.wireTo(&vision.vision_field);
+        // behaviors.visionRobotIn.wireTo(&vision.vision_robot);
+        // behaviors.visionObstacleIn.wireTo(&vision.vision_obstacle);
         behaviors.fallStatusIn.wireTo(&guardian.fallStatusOutput, true);
         behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
         behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
@@ -201,7 +201,6 @@ namespace man {
         /*
          SPECIFIC MODULE LOGGING
          */
-//#ifdef LOG_SENSORS
         sensorsThread.log<messages::JointAngles>((nbsf::SENSORS), &sensors.jointsOutput_,
                                                  "proto-JointAngles from=jointsOutput");
         sensorsThread.log<messages::JointAngles>((nbsf::SENSORS), &sensors.temperatureOutput_,
@@ -218,9 +217,7 @@ namespace man {
                                          "proto-FSR from=fsrOutput");
         sensorsThread.log<messages::BatteryState>((nbsf::SENSORS), &sensors.batteryOutput_,
                                                   "proto-BatteryState from=batteryOutput");
-//#endif
-        
-//#ifdef LOG_GUARDIAN
+
         guardianThread.log<messages::StiffnessControl>((nbsf::GUARDIAN), &guardian.stiffnessControlOutput,
                                                        "proto-StiffnessControl from=stiffnessControlOutput");
         guardianThread.log<messages::FeetOnGround>((nbsf::GUARDIAN), &guardian.feetOnGroundOutput,
@@ -229,37 +226,23 @@ namespace man {
                                                  "proto-FallStatus from=fallStatusOutput");
         guardianThread.log<messages::AudioCommand>((nbsf::GUARDIAN), &guardian.audioOutput,
                                                    "proto-AudioCommand from=audioOutput");
-//#endif
-        
-//#ifdef LOG_LOCATION
+
         cognitionThread.log<messages::RobotLocation>((nbsf::LOCATION), &localization.output, "proto-RobotLocation from=cognition");
-//#endif
-        
-//#ifdef LOG_ODOMETRY
+
         cognitionThread.log<messages::RobotLocation>((nbsf::ODOMETRY), &motion.odometryOutput_, "proto-RobotLocation from=odometryOutput");
-//#endif
-        
-//#ifdef LOG_OBSERVATIONS
+
         cognitionThread.log<messages::VisionField>((nbsf::OBSERVATIONS), &vision.vision_field, "proto-VisionField from=observations");
-//#endif
-        
-//#ifdef LOG_LOCALIZATION
+
         cognitionThread.log<messages::ParticleSwarm>((nbsf::LOCALIZATION), &localization.particleOutput, "proto-ParticleSwarm from=localization");
-//#endif
-        
-//#ifdef LOG_BALLTRACK
+
         cognitionThread.log<messages::FilteredBall>((nbsf::BALLTRACK), &ballTrack.ballLocationOutput, "proto-FilteredBall from=ballLocationOutput");
         cognitionThread.log<messages::VisionBall>((nbsf::BALLTRACK), &vision.vision_ball, "proto-VisionBall from=vision_ball");
-//#endif
-        
-//#ifdef LOG_IMAGES
+
         cognitionThread.log<messages::YUVImage>((nbsf::IMAGES), &topTranscriber.imageOut,
                                                 "YUVImage from=top");
         cognitionThread.log<messages::YUVImage>((nbsf::IMAGES), &bottomTranscriber.imageOut,
                                                 "YUVImage from=bot");
-//#endif
-        
-//#ifdef LOG_VISION
+
         cognitionThread.log<messages::VisionField>((nbsf::VISION), &vision.vision_field,
                                                    "proto-VisionField from=vision");
         cognitionThread.log<messages::VisionBall>((nbsf::VISION), &vision.vision_ball,
@@ -272,9 +255,7 @@ namespace man {
                                                    "proto-JointAngles from=vision");
         cognitionThread.log<messages::InertialState>((nbsf::VISION), &vision.inertial_state_out,
                                                      "proto-InertialState from=vision");
-//#endif
-        
-        
+
 #endif //USE_LOGGING
         
 #ifdef USE_TIME_PROFILING
