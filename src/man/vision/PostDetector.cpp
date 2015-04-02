@@ -105,7 +105,7 @@ void PostDetector::buildHistogram()
     for (int y = 0; y < ht; y++) {
         unsigned char* row = postImage.pixelAddress(0, y);
         for (int x = 0; x < wd; x++, row += postImage.pixelPitch()) {
-            unfilteredHistogram[x] += *row;
+            unfilteredHistogram[x] += static_cast<double>(*row) / 255;
         }
     }
 }

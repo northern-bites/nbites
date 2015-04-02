@@ -277,19 +277,33 @@ int PostDetector_func() {
     const messages::PackedImage8& postImage(detector.getPostImage());
     logio::log_t postImageRet;
 
-    std::string desc = "type=YUVImage encoding=[Y8] width=";
-    desc += std::to_string(postImage.width());
-    desc += " height=";
-    desc += std::to_string(postImage.height());
+    std::string postImageDesc = "type=YUVImage encoding=[Y8] width=";
+    postImageDesc += std::to_string(postImage.width());
+    postImageDesc += " height=";
+    postImageDesc += std::to_string(postImage.height());
 
-    postImageRet.desc = (char*)malloc(desc.size()+1);
-    memcpy(postImageRet.desc, desc.c_str(), desc.size()+1);
+    postImageRet.desc = (char*)malloc(postImageDesc.size()+1);
+    memcpy(postImageRet.desc, postImageDesc.c_str(), postImageDesc.size()+1);
 
     postImageRet.dlen = postImage.width() * postImage.height();
     postImageRet.data = (uint8_t*)malloc(postImageRet.dlen);
     memcpy(postImageRet.data, postImage.pixelAddress(0, 0), postImageRet.dlen);
 
     rets.push_back(postImageRet);
+
+    double const* unfiltHist = detector.getUnfilteredHistogram();
+    logio::log_t unfiltHistRet;
+    
+    std::string unfiltHistDesc = "type=Histogram";
+
+    unfiltHistRet.desc = (char*)malloc(unfiltHistDesc.size()+1);
+    memcpy(unfiltHistRet.desc, unfiltHistDesc.c_str(), unfiltHistDesc.size()+1);
+
+    unfiltHistRet.dlen = 8 * detector.getLengthOfHistogram();
+    unfiltHistRet.data = (uint8_t*)malloc(unfiltHistRet.dlen);
+    memcpy(unfiltHistRet.data, detector.getUnfilteredHistogram(), unfiltHistRet.dlen);
+
+    rets.push_back(unfiltHistRet);
 }
 
 void register_funcs() {

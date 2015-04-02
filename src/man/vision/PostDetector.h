@@ -15,6 +15,7 @@ public:
                  const messages::PackedImage8& whiteImage);
     ~PostDetector();
 
+    int getLengthOfHistogram() const { return wd; }
     const messages::PackedImage8& getPostImage() const { return postImage; }
     double const* getUnfilteredHistogram() const { return unfilteredHistogram; }
     double const* getfilteredHistogram() const { return filteredHistogram; }
