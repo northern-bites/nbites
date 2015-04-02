@@ -255,12 +255,14 @@ namespace man {
         cognitionThread.log<messages::VisionBall>((nbsf::BALLTRACK), &vision.vision_ball, "proto-VisionBall from=vision_ball");
 //#endif
         
+        //Superseded by logging code in ImageTranscriber.
+        /*
 //#ifdef LOG_IMAGES
         cognitionThread.log<messages::YUVImage>((nbsf::IMAGES), &topTranscriber.imageOut,
                                                 "YUVImage from=top");
         cognitionThread.log<messages::YUVImage>((nbsf::IMAGES), &bottomTranscriber.imageOut,
                                                 "YUVImage from=bot");
-//#endif
+//#endif */
         
 //#ifdef LOG_VISION
         cognitionThread.log<messages::VisionField>((nbsf::VISION), &vision.vision_field,
