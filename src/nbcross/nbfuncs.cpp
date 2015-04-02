@@ -15,6 +15,7 @@
 #include "vision/Blobber.h"
 #include "vision/Blob.h"
 #include "vision/BallDetector.h"
+#include "vision/PostDetector.h"
 #include "RoboGrams.h"
 
 std::vector<nbfunc_t> FUNCS;
@@ -247,6 +248,33 @@ int ImageConverter_func() {
     return 0;
 }
 
+int PostDetector_func() {
+    assert(args.size() == 1);
+    printf("PostDetector_func()\n");
+
+    logio::log_t log = logio::copyLog(&args[0]);
+
+    int width = 640;
+    int height = 480;
+
+    messages::YUVImage image(log.data, width, height, width);
+    portals::Message<messages::YUVImage> message(&image);
+    man::image::ImageConverterModule imageConverter;
+
+    imageConverter.imageIn.setMessage(message);
+    imageConverter.run();
+
+    const messages::PackedImage16* yImage = imageConverter.yImage.getMessage(true).get();
+    const messages::PackedImage8* whiteImage = imageConverter.orangeImage.getMessage(true).get();
+
+    man::vision::PostDetector detector(*yImage, *whiteImage);
+    const std::vector<int>& posts = detector.getCandidates();
+    printf("Found %d candidate posts.\n", posts.size());
+
+    for(int i = 0; i < posts.size(); i++)
+        printf("Found post at %d column.\n", posts[i]);
+}
+
 void register_funcs() {
     
     /*test func 1*/
@@ -291,6 +319,12 @@ void register_funcs() {
     ImageConverter.func = ImageConverter_func;
     FUNCS.push_back(ImageConverter);
 
+    //PostDetector
+    nbfunc_t PostDetector;
+    PostDetector.name = "PostDetector";
+    PostDetector.args = {sYUVImage};
+    PostDetector.func = PostDetector_func;
+    FUNCS.push_back(PostDetector);
 }
 
 

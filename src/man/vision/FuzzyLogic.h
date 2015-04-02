@@ -32,9 +32,9 @@ inline Fool Fool::operator!() const
     return Fool(1 - get());
 }
 
-class FuzzyThr {
+class FuzzyThreshold {
 public:
-    FuzzyThr(double t0_, double t1_) : t0(t0_), t1(t1_) {}
+    FuzzyThreshold(double t0_, double t1_) : t0(t0_), t1(t1_) {}
     inline double weight(double x) const;
 
 private:
@@ -43,19 +43,19 @@ private:
 };
 
 // TODO could be made more efficient, in particular are std::max and std::min efficient?
-inline double FuzzyThr::weight(double x) const
+inline double FuzzyThreshold::weight(double x) const
 {
     if (t0 == t1)
         return (x >= t0 ? 1. : 0.);
     return std::min(std::max((x - t0) / (t1 - t0), 0.), 1.);
 }
 
-inline Fool operator>(double x, const FuzzyThr& thr)
+inline Fool operator>(double x, const FuzzyThreshold& thr)
 {
     return Fool(thr.weight(x));
 }
 
-inline Fool operator<(double x, const FuzzyThr& thr)
+inline Fool operator<(double x, const FuzzyThreshold& thr)
 {
     return !(x > thr);
 }

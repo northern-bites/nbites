@@ -38,7 +38,7 @@ public class PostDetector extends Detector {
 		buildYellowImg();
 		StructuringElement verticalBandOf5Pixels = new StructuringElement(2);
         MathMorphology mm = new MathMorphology(verticalBandOf5Pixels); 
-		mm.opening(yellow);
+		//mm.opening(yellow);
         
 //      buildFieldImg();
 //      StructuringElement square = new StructuringElement(4);
