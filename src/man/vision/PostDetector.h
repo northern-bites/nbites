@@ -15,7 +15,7 @@ public:
                  const messages::PackedImage8& whiteImage);
     ~PostDetector();
 
-    const messages::PackedImage<double>& getPostImage() const { return postImage; }
+    const messages::PackedImage8& getPostImage() const { return postImage; }
     double const* getUnfilteredHistogram() const { return unfilteredHistogram; }
     double const* getfilteredHistogram() const { return filteredHistogram; }
     const std::vector<int>& getCandidates() const { return candidates; }
@@ -30,7 +30,7 @@ private:
     void findPeaks();
 
     int wd;
-    messages::PackedImage<double> postImage;
+    messages::PackedImage8 postImage;
     double* unfilteredHistogram;
     double* filteredHistogram;
     std::vector<int> candidates;

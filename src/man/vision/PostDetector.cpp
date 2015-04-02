@@ -8,8 +8,8 @@ namespace vision {
 
 PostDetector::PostDetector(const messages::PackedImage16& yImage, 
                            const messages::PackedImage8& whiteImage)
-    : wd(whiteImage.width()-2),
-      postImage(wd, whiteImage.height()-2),
+    : wd(whiteImage.width()),
+      postImage(wd, whiteImage.height()),
       candidates()
 {
     unfilteredHistogram = new double[wd];
@@ -32,14 +32,15 @@ void PostDetector::buildPostImage(const messages::PackedImage16& yImage,
 {
     int ht = postImage.height();
 
-    for (int y = 0; y < ht; y++) {
-        uint16_t* yRow = yImage.pixelAddress(1, y+1);
-        unsigned char* whiteRow = whiteImage.pixelAddress(1, y+1);
-        double* postRow = postImage.pixelAddress(0, y);
-        for (int x = 0; x < wd; x++) {
+    // TODO find pointer bug
+    for (int y = 1; y < ht-1; y++) {
+        uint16_t* yRow = yImage.pixelAddress(1, y);
+        unsigned char* whiteRow = whiteImage.pixelAddress(1, y);
+        unsigned char* postRow = postImage.pixelAddress(0, y-1);
+        for (int x = 1; x < wd-1; x++) {
             Fool gradScore(calculateGradScore(yRow, yImage.rowPitch(), yImage.pixelPitch()));
             Fool whiteScore(static_cast<double>(*whiteRow) / 255);
-            *postRow = (gradScore & whiteScore).get();
+            *postRow = static_cast<unsigned char>(255*(gradScore & whiteScore).get());
 
             yRow += yImage.pixelPitch();
             whiteRow += whiteImage.pixelPitch(); 
@@ -102,7 +103,7 @@ void PostDetector::buildHistogram()
     int ht = postImage.height();
 
     for (int y = 0; y < ht; y++) {
-        double* row = postImage.pixelAddress(0, y);
+        unsigned char* row = postImage.pixelAddress(0, y);
         for (int x = 0; x < wd; x++, row += postImage.pixelPitch()) {
             unfilteredHistogram[x] += *row;
         }

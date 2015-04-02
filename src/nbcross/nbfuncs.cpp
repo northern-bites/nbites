@@ -273,6 +273,23 @@ int PostDetector_func() {
 
     for(int i = 0; i < posts.size(); i++)
         printf("Found post at %d column.\n", posts[i]);
+
+    const messages::PackedImage8& postImage(detector.getPostImage());
+    logio::log_t postImageRet;
+
+    std::string desc = "type=YUVImage encoding=[Y8] width=";
+    desc += std::to_string(postImage.width());
+    desc += " height=";
+    desc += std::to_string(postImage.height());
+
+    postImageRet.desc = (char*)malloc(desc.size()+1);
+    memcpy(postImageRet.desc, desc.c_str(), desc.size()+1);
+
+    postImageRet.dlen = postImage.width() * postImage.height();
+    postImageRet.data = (uint8_t*)malloc(postImageRet.dlen);
+    memcpy(postImageRet.data, postImage.pixelAddress(0, 0), postImageRet.dlen);
+
+    rets.push_back(postImageRet);
 }
 
 void register_funcs() {
