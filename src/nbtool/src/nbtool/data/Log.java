@@ -13,6 +13,19 @@ import nbtool.util.U;
 public class Log implements Serializable {
 	private static final long serialVersionUID = 5000703421741282261L;
 	
+	private static Long class_index = new Long(0);
+	
+	private static long getID() {
+		long ret;
+		synchronized(class_index) {
+			ret = class_index++;
+		}
+		
+		return ret;
+	}
+	
+	public long unique_id;
+	
 	public String name; //File name, might be null
 	
 	//Core opaque log fields:
@@ -26,7 +39,13 @@ public class Log implements Serializable {
 
 	private Map<String, String> dictionary;
 	
+	public Log() {
+		this.unique_id = getID();
+	}
+	
 	public Log(String d, byte[] b) {
+		this();
+		
 		this.name = null;
 		this.description = d;
 		this.bytes = b;
