@@ -1,5 +1,7 @@
 package nbtool.data;
 
+import java.io.File;
+
 import javax.swing.SwingUtilities;
 
 import nbtool.io.CommandIO;
@@ -83,7 +85,16 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
 			
 			if (!FileIO.checkLogFolder(filepath)) {
 				U.w("SessionHandler.start(): Invalid log folder, could not start.");
-				return false;
+				try {
+					U.w("SessionHandler.start(): Creating a new folder");
+					File newDir = new File(filepath);
+					newDir.mkdirs();
+					U.w("SessionHandler.start(): Set log folder.");
+				}
+				catch(SecurityException se) {
+					U.w("SessionHandler.start(): Encountered Security Exception");
+					return false;
+				}
 			} else {
 				U.w("SessionHandler.start(): Set log folder.");
 			}

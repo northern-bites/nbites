@@ -77,6 +77,10 @@ public class Log implements Serializable {
 	public String encoding() {
 		return getAttributes().get("encoding");
 	}
+	//what is this attribute going to return?
+	public String protoRobotLocation() {
+		return getAttributes().get("proto-RobotLocation");
+	}
 	
 	private Integer _index = null;
 	public Integer index() {
