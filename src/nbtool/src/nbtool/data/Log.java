@@ -1,8 +1,9 @@
 package nbtool.data;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.Map;
+
+import javax.swing.tree.TreePath;
 
 import nbtool.util.NBConstants;
 import nbtool.util.U;
@@ -19,6 +20,9 @@ public class Log implements Serializable {
 	public byte[] bytes;
 	
 	public SOURCE source;
+	
+	//Set by GUI when selected.
+	public transient TreePath lastSeen = null;
 
 	private Map<String, String> dictionary;
 	

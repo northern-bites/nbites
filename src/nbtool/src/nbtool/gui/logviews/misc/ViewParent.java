@@ -3,13 +3,16 @@ package nbtool.gui.logviews.misc;
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
+import javax.swing.tree.TreePath;
 
 import nbtool.data.Log;
 
 /**
- * Construction and setLog() are sometimes called in a separate thread.
+ * Construction and setLog() are sometimes called in a separate thread,
+ *  depending on the value returned by shoudLoadInParallel().
  * */
 public abstract class ViewParent extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -17,24 +20,15 @@ public abstract class ViewParent extends JPanel {
 	
 	//Use newlog to populate view.
 	public abstract void setLog(Log newlog);
-	
-	//(ONLY CALLED IF CHILDREN CALL SUPER() )
-	//Determine proper size of all internal components here.  Note, feel free to simply add a JPanel as the only child of this view,
-	//use a java layout therein, and simply yourjpanel.setBounds(0,0,s.width,s.height);
-	protected abstract void useSize(Dimension s);
+	//Override if necessary.
+	public void alsoSelected(ArrayList<Log> also){}
 	
 	//Override if you want it to load in parallel.
 	public static Boolean shouldLoadInParallel(){return false;}
 	
 	//Set up log independent objects here.
+	//Please call the super (i.e., ViewParent() ) in case this ever becomes non-empty...
 	public ViewParent() {
 		super();
-		addComponentListener(new ComponentAdapter() {
-			public void componentResized(ComponentEvent e) {
-				useSize(e.getComponent().getSize());
-			}
-		});
-		setLayout(null);
 	}
-	
 }

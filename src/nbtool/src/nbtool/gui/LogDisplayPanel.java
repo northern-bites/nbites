@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.TreePath;
 
 import nbtool.data.SessionHandler;
 import nbtool.data.Log;
@@ -53,13 +54,19 @@ public class LogDisplayPanel extends JPanel implements NListener {
 		views.setBounds(0,0, size.width, size.height);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void notified(EVENT e, Object src, Object... args) {
 		if (e == EVENT.LOG_SELECTION) {
-			setContents((Log) args[0]);
+			ArrayList<Log> also = null;
+			if (args.length == 2) {
+				also =(ArrayList<Log>) args[1];
+			}
+			
+			setContents((Log) args[0], also);
 		}
 	}
 	
-	protected void setContents(Log l) {
+	protected void setContents(Log l, ArrayList<Log> also) {
 		U.w("LDP.setContents() type: " + l.getAttributes().get("type"));
 		ArrayList<Class<? extends ViewParent>> list = LogToViewLookup.viewsForLog(l);
 		views.removeAll();
@@ -91,7 +98,7 @@ public class LogDisplayPanel extends JPanel implements NListener {
 				waitLabel.setForeground(Color.LIGHT_GRAY);
 				
 				views.addTab(ttype.getSimpleName(), waitLabel);
-				CreateViewRunnable cvr = new CreateViewRunnable(i, ttype, l);
+				CreateViewRunnable cvr = new CreateViewRunnable(i, ttype, l, also);
 				Thread thr = new Thread(cvr);
 				thr.start();
 			} else {
@@ -99,6 +106,9 @@ public class LogDisplayPanel extends JPanel implements NListener {
 				try {
 					view = ttype.getDeclaredConstructor().newInstance();
 					view.setLog(l);
+					
+					if (also != null)
+						view.alsoSelected(also);
 					
 					views.addTab(ttype.getSimpleName(), view);
 				} catch (InstantiationException e) {
@@ -138,14 +148,17 @@ public class LogDisplayPanel extends JPanel implements NListener {
 		ViewParent view;
 		Class<? extends ViewParent> nlClass;
 		Log log;
+		ArrayList<Log> also;
 		boolean done;
 		
-		protected CreateViewRunnable(int tabIndex, Class<? extends ViewParent> cls, Log lg) {
+		protected CreateViewRunnable(int tabIndex, Class<? extends ViewParent> cls, Log lg,  ArrayList<Log> p) {
 			index = tabIndex;
 			view = null;
 			nlClass = cls;
 			log = lg;
 			done = false;
+			
+			also = p;
 		}
 		
 		public void run() {
@@ -158,6 +171,9 @@ public class LogDisplayPanel extends JPanel implements NListener {
 				try {
 					view = nlClass.getDeclaredConstructor().newInstance();
 					view.setLog(log);
+					
+					if (also != null)
+						view.alsoSelected(also);
 					
 				} catch (IllegalArgumentException e) {
 					U.w(e.getMessage());

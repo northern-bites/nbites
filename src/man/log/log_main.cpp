@@ -111,9 +111,8 @@ namespace nblog {
         
         sanity_checks();
         
-        log_main->log_main_thread = (pthread_t *) malloc(sizeof(pthread_t));
-        
-        pthread_create(log_main->log_main_thread, NULL, &log_main_loop, NULL);
+        pthread_create(&(log_main->log_main_thread), NULL, &log_main_loop, NULL);
+        pthread_detach(log_main->log_main_thread);
         //server thread is live...
         LOGDEBUG(1, "log_main thread running...\n");
     }
@@ -267,153 +266,38 @@ namespace nblog {
      Definitions for log lib functions.
      */
     
-    int description(char * buf, size_t size, log_object_t * obj)
+    int description(char * buf, size_t size,
+                    size_t dl,
+                    uint8_t * data,
+                    
+                    const char * type,
+                    size_t image_index,
+                    clock_t creation_time
+                    )
     {
         int32_t checksum = 0;
-        if (obj->data) {
-            for (int i = 0; i < obj->n_bytes; ++i)
-                checksum += obj->data[i];
+        if (data ) {
+            for (int i = 0; i < dl; ++i)
+                checksum += data[i];
         }
         
-        int n_written = snprintf(buf, size, "type=%s checksum=%i index=%li time=%lu version=%i", obj->type, checksum, obj->image_index, obj->creation_time, LOG_VERSION);
+        int n_written = snprintf(buf, size, "type=%s checksum=%i index=%li time=%lu version=%i", type, checksum, image_index, creation_time, LOG_VERSION);
         NBLassert(n_written < size);
         
         return n_written;
     }
     
-    int _put_exactly(ssize_t (* wfunc)(int, const void *, size_t), int sofd, size_t nb, uint8_t * data) {
-        NBLassert(wfunc && data && nb);
-        NBLassert(sofd >= 0);
-        
-        size_t written = 0;
-        while (written < nb) {
-            ssize_t ret = wfunc(sofd,
-                                  data + written,
-                                  nb - written);
-            if (ret == 0) {
-                usleep(USLEEP_EXPECTING);
-            } else if (ret < 0) {
-                int saved_err = errno;
-                
-                if (saved_err == EAGAIN) {
-                    usleep(USLEEP_EXPECTING);
-                } else {
-                    char buf[256];
-                    strerror_r(saved_err, buf, 256);
-                    printf("\n\n****_put_exactly****:  %s\n", buf);
-                    return 2;
-                }
-            } else {
-                written += ret;
-            }
-        }
-        
-        assert(written == nb);
-        return 0;
-    }
     
-    int write_exactly(int fd, size_t nbytes, void * adata) {
-        return _put_exactly(&write, fd, nbytes, (uint8_t *) adata);
-    }
-    
-    ssize_t send_stub(int sck, const void * data, size_t nbytes) {
-#ifndef __APPLE__
-        return send(sck, data, nbytes, MSG_NOSIGNAL);
-#else
-        return send(sck, data, nbytes, 0);
-#endif
-    }
-    
-    int send_exactly(int socket, size_t nbytes, void * adata) {
-        return _put_exactly(&send_stub, socket, nbytes, (uint8_t *) adata);
-    }
-    
-    int recv_exactly(int sck, size_t nbytes, void * abuffer, double max_wait) {
-        uint8_t * buffer = (uint8_t *) abuffer;
-        
-        NBLassert(max_wait >= 1);
-        NBLassert(buffer);
-        
-        time_t last = time(NULL);
-        
-        size_t rbytes = 0;
-        while (rbytes < nbytes) {
-            if (difftime(time(NULL), last) >= max_wait)
-                return 1;
-#ifndef __APPLE__
-            ssize_t ret = recv(sck, buffer + rbytes, nbytes - rbytes, MSG_NOSIGNAL);
-#else
-            ssize_t ret = recv(sck, buffer + rbytes, nbytes - rbytes, 0);
-#endif
-            
-            if (ret == 0) {
-                usleep(USLEEP_EXPECTING);
-            } else if (ret < 0) {
-                int err_saved = errno;
-                if (err_saved == EAGAIN) {
-                    usleep(USLEEP_EXPECTING);
-                } else {
-                    char buf[256];
-                    strerror_r(err_saved, buf, 256);
-                    printf("\n\n****recv_exactly****:  %s\n", buf);
-                    return 2;
-                }
-            } else {
-                rbytes += ret;
-                last = time(NULL);
-            }
-        }
-        
-        return 0;
-    }
-    
-    int _put_log( int (*exacter)(int, size_t, void *), int sofd, log_object_t * log) {
-        NBLassert(sofd >= 0);
-        NBLassert(log);
-        
-        char desc[MAX_LOG_DESC_SIZE];
-        description(desc, MAX_LOG_DESC_SIZE, log);
-        uint32_t desc_hlen = strlen(desc);
-        uint32_t data_hlen = log->n_bytes;
-        
-        uint32_t desc_nlen = htonl(desc_hlen);
-        uint32_t data_nlen = htonl(data_hlen);
-        
-        if (exacter(sofd, 4, &desc_nlen)) {
-            return 1;
-        }
-        if (exacter(sofd, desc_hlen, desc)) {
-            return 2;
-        }
-        if (exacter(sofd, 4, &data_nlen)) {
-            return 3;
-        }
-        if (log->n_bytes) {
-            if (exacter(sofd, data_hlen, log->data)) {
-                return 4;
-            }
-        }
-        
-        return 0;
-    }
-    
-    int send_log(int sock, log_object_t * log) {
-        return _put_log(&send_exactly, sock, log);
-    }
-    
-    int write_log(int fd, log_object_t * log) {
-        return _put_log(&write_exactly, fd, log);
-    }
     
     //Not thread safe.
     void log_object_free(log_object_t * obj) {
         NBLassert(obj);
         NBLassert(obj->references == 0);
         
-        free((char *) obj->type);
+        free((char *) obj->log.desc);
         
-        if (obj->data)
-            free(obj->data);
+        if (obj->log.data)
+            free(obj->log.data);
         
         free(obj);
     }
@@ -429,7 +313,7 @@ namespace nblog {
             nbsf::total[bi].l_freed += 1;
             if (!obj->was_written) {
                 nbsf::total[bi].l_lost += 1;
-                nbsf::total[bi].b_lost += obj->n_bytes;
+                nbsf::total[bi].b_lost += obj->log.dlen;
             }
             
             log_object_free(obj);
@@ -464,7 +348,7 @@ namespace nblog {
             ret->was_written = 1;
             ++(ret->references);
             nbsf::total[buffer_index].l_writ += 1;
-            nbsf::total[buffer_index].b_writ += ret->n_bytes;
+            nbsf::total[buffer_index].b_writ += ret->log.dlen;
         }
         
         LOGDEBUG(6, "\t\t%i [filenr=%i servnr=%i nextw=%i]\n", *relevant_nextr,
@@ -484,7 +368,7 @@ namespace nblog {
         LOGDEBUG(6, "put(%i):\tfilenr=%i servnr=%i nextw=%i\n", bi, buf->fileio_nextr, buf->servio_nextr, buf->next_write);
         
         nbsf::total[bi].l_given += 1;
-        nbsf::total[bi].b_given += newp->n_bytes;
+        nbsf::total[bi].b_given += newp->log.dlen;
         
         uint32_t old_i = buf->next_write;
         log_object_t * old = buf->objects[(old_i % LOG_BUFFER_SIZES[bi])];
@@ -518,21 +402,16 @@ namespace nblog {
         log_object_t * newp = (log_object_t *) malloc(sizeof(log_object_t));
         memset(newp, 0, sizeof(log_object_t));
         
-        newp->image_index = index;
-        newp->creation_time = creation_time;
-
-        //Extra byte is to ensure null character.
-        size_t ts = strlen(type) + 1;
-        newp->type = (char *) malloc(ts);
-        memcpy((void *) newp->type, type, ts);
+        newp->log.desc = (char *) malloc(MAX_LOG_DESC_SIZE);
+        description(newp->log.desc, MAX_LOG_DESC_SIZE, bytes, data, type, index, creation_time);
         
         if (data) {
-            newp->n_bytes = bytes;
-            newp->data = (uint8_t *) malloc(bytes);
-            memcpy(newp->data, data, bytes);
+            newp->log.dlen = bytes;
+            newp->log.data = (uint8_t *) malloc(bytes);
+            memcpy(newp->log.data, data, bytes);
         } else {
-            newp->data = NULL;
-            newp->n_bytes = 0;
+            newp->log.data = NULL;
+            newp->log.dlen = 0;
         }
         
         newp->references = 1;

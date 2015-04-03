@@ -39,7 +39,8 @@ import nbtool.util.U;
  * 
  * 	catching an exception, indicating some error in finding the host or the stability of the connection
  * 
- * netThreadExiting() should always be called when run() will return, meaning all exceptions should be handled.
+ * netThreadExiting() should always (read: if you change this class, make sure this happens)
+ * 	 be called when run() will return, meaning all exceptions need to be handled inside the run loop.
  * */
 
 public class NetIO implements Runnable {
@@ -73,9 +74,8 @@ public class NetIO implements Runnable {
 		try {
 			U.w("NetIO: thread created with sa=" + server_address + " sp=" + server_port);
 			assert(server_address != null && server_port != 0 && boss != null);
-			socket = new Socket(this.server_address, this.server_port);
-			
-			socket.setSoTimeout(NBConstants.SOCKET_TIMEOUT);
+
+			socket = CommonIO.setupNetSocket(server_address, server_port);
 			
 			BufferedOutputStream _out =  new BufferedOutputStream(socket.getOutputStream());
 			BufferedInputStream _in = new BufferedInputStream(socket.getInputStream());

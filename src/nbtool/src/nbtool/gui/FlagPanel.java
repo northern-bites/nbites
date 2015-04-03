@@ -55,7 +55,7 @@ public class FlagPanel extends JPanel implements ActionListener {
 		if (e.getSource() == jrb[0]) {
 			boolean success =
 					CommandIO.tryAddSetFlag(index, false);
-			U.wf("FlagPanel[%s] CommandIO.tryAddSetFlag(%i, false) returned %B\n", flag_name, index, success);
+			U.wf("FlagPanel[%s] CommandIO.tryAddSetFlag(%d, false) returned %B\n", flag_name, index, success);
 			
 		} else if (e.getSource() == jrb[1]) {
 			U.w("ERROR: FlagPanel " + flag_name + " got action from MIDDLE switch!");

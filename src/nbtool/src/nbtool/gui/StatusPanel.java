@@ -20,7 +20,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.text.DefaultCaret;
 
-import nbtool.data.BotStats;
+import nbtool.data.RobotStats;
 import nbtool.data.Log;
 import nbtool.data.SessionMaster;
 import nbtool.data.Stats;
@@ -288,7 +288,7 @@ public class StatusPanel extends JPanel implements NListener{
 			}
 			break;
 		case REL_BOTSTAT:
-			BotStats a = (BotStats) args[0];
+			RobotStats a = (RobotStats) args[0];
 			botStatA.setText(a.toString());
 			
 			break;
@@ -310,8 +310,8 @@ public class StatusPanel extends JPanel implements NListener{
 			
 			mode_status.setText(
 					String.format("[M/S] %s: %s", 
-							NBConstants.mode_strings[m.index],
-							NBConstants.status_strings[s.index]));
+							NBConstants.MODE_STRINGS[m.index],
+							NBConstants.STATUS_STRINGS[s.index]));
 			
 			set();
 			

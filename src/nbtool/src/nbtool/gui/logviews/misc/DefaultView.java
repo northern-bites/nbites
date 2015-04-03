@@ -4,8 +4,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.jar.Attributes;
 
@@ -54,7 +57,7 @@ public class DefaultView extends ViewParent implements ActionListener {
 		this.repaint();
 	}
 	
-	protected void useSize(Dimension s) {
+	private void useSize(Dimension s) {
 		int y_offset = 0;
 		Dimension d = desc.getPreferredSize();
 		desc.setBounds(0, 0, d.width, d.height);
@@ -72,6 +75,14 @@ public class DefaultView extends ViewParent implements ActionListener {
 	
 	public DefaultView() {
 		super();
+		
+		addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent e) {
+				useSize(e.getComponent().getSize());
+			}
+		});
+		setLayout(null);
+		
 		desc = new JTextField("desc");
 		desc.addActionListener(this);
 		size = new JLabel("size");
@@ -129,4 +140,12 @@ public class DefaultView extends ViewParent implements ActionListener {
 			}
 		}
 	}	
+	
+	@Override
+	public void alsoSelected(ArrayList<Log> also) {
+		U.w("also selected...");
+		for (Log a: also) {
+			U.wf("\t%s\n", a.toString());
+		}
+	}
 }

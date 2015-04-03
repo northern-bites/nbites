@@ -24,8 +24,8 @@ namespace nblog {
     void log_serverio_init() {
         LOGDEBUG(1, "log_serverio_init()\n");
         
-        log_main->log_serverio_thread = (pthread_t *) malloc(sizeof(pthread_t));
-        pthread_create((log_main->log_serverio_thread), NULL, &server_io_loop, NULL);
+        pthread_create(&(log_main->log_serverio_thread), NULL, &server_io_loop, NULL);
+        pthread_detach(log_main->log_serverio_thread);
     }
     
     //Block thread unti client has attempted to connect.
@@ -99,18 +99,18 @@ namespace nblog {
             uint32_t seq_num = 0;
             uint32_t recvd;
             
-            CHECK_RET(send_exactly(connfd, 4, (uint8_t *) &seq_num))
+            CHECK_RET(logio::send_exact(connfd, 4, (uint8_t *) &seq_num))
             
-            CHECK_RET(recv_exactly(connfd, 4, (uint8_t *) &recvd, IO_SEC_TO_BREAK));
+            CHECK_RET(logio::recv_exact(connfd, 4, (uint8_t *) &recvd, IO_SEC_TO_BREAK));
             
             if (recvd != 0) {
                 LOGDEBUG(1, "log_serverio got bad ping initiation: %u\n", ntohl(recvd));
                 goto connection_died;
             }
             
-            CHECK_RET(send_exactly(connfd, 4, (uint8_t *) &version))
+            CHECK_RET(logio::send_exact(connfd, 4, (uint8_t *) &version))
             
-            CHECK_RET(recv_exactly(connfd, 4, (uint8_t *) &recvd, IO_SEC_TO_BREAK));
+            CHECK_RET(logio::recv_exact(connfd, 4, (uint8_t *) &recvd, IO_SEC_TO_BREAK));
             
             LOGDEBUG(1, "log_serverio starting connection; server version: %u, client version: %u\n", ntohl(version), ntohl(recvd));
             
@@ -120,9 +120,9 @@ namespace nblog {
                 if (!(nbsf::flags[nbsf::servio])) {
                     uint32_t ping = 0;
                     
-                    CHECK_RET(send_exactly(connfd, 4, (uint8_t *) &ping))
+                    CHECK_RET(logio::send_exact(connfd, 4, (uint8_t *) &ping))
                     
-                    CHECK_RET(recv_exactly(connfd, 4, (uint8_t *) &recvd, IO_SEC_TO_BREAK));
+                    CHECK_RET(logio::recv_exact(connfd, 4, (uint8_t *) &recvd, IO_SEC_TO_BREAK));
                     
                     if (recvd != 0) {
                         LOGDEBUG(1, "log_serverio got bad ping while waiting: %u\n", ntohl(recvd));
@@ -149,9 +149,9 @@ namespace nblog {
                             
                             uint32_t msg_seq_n = htonl(seq_num++);
                             
-                            CHECK_RET(send_exactly(connfd, 4, (uint8_t *) &msg_seq_n));
+                            CHECK_RET(logio::send_exact(connfd, 4, (uint8_t *) &msg_seq_n));
                             
-                            CHECK_RET(send_log(connfd, obj));
+                            CHECK_RET(logio::send_log(connfd, &(obj->log)));
                             
                             release(obj, true);
                         } else {

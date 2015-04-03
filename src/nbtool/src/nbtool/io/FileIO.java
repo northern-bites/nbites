@@ -39,16 +39,24 @@ public class FileIO implements Runnable {
 	}
 		
 	public static boolean checkLogFolder(String log_folder) {
-		if(log_folder == null || log_folder.isEmpty())
+		if(log_folder == null || log_folder.isEmpty()) {
+			U.wf("path string null or empty!\n");
 			return false;
+		}
 			
 		File f = new File(log_folder);
-		if (!f.exists())
+		if (!f.exists()) {
+			U.wf("file does not exist!\n");
 			return false;
-		if (!f.isDirectory())
+		}
+		if (!f.isDirectory()) {
+			U.wf("file is not a directory!\n");
 			return false;
-		if (!f.canRead() || !f.canWrite())
+		}
+		if (!f.canRead() || !f.canWrite()) {
+			U.wf("permissions errors!\n");
 			return false;
+		}
 		
 		return true;
 	}
@@ -68,7 +76,15 @@ public class FileIO implements Runnable {
 		Log full = CommonIO.readLog(dis);
 		
 		if (dis.available() != 0) {
-			U.wf("ERROR: log [%s] did not follow log format, CORRUPTION LIKELY\n");
+			U.wf("WARNING: log [%s] did not follow log format – %d bytes left, CORRUPTION LIKELY\n", logf.getCanonicalPath(),
+					dis.available());
+			/*
+			int av = dis.available();
+			byte[] left = new byte[av];
+			dis.readFully(left);
+			String text = U.bytesToHexString(left);
+			
+			U.wf("%d bytes left, hex:\n%s\n", av, text); */
 		}
 		
 		if (!(lg.description.equals(full.description))) {

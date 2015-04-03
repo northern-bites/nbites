@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -25,13 +26,13 @@ import nbtool.util.P;
 import nbtool.util.U;
 
 
-public class UtilPane extends JPanel{
+public class PrefsnUtils extends JPanel{
 	private static final long serialVersionUID = 1L;
 	
 	private Utils utils;
 	private Prefs prefs;
 	
-	protected UtilPane() {
+	protected PrefsnUtils() {
 		super();
 		setLayout(null);
 		addComponentListener(new ComponentAdapter() {
@@ -101,7 +102,7 @@ public class UtilPane extends JPanel{
 	}
 	
 	private class Prefs extends JPanel implements ActionListener {
-		protected static final int REQ_HEIGHT = 150;
+		protected static final int REQ_HEIGHT = 170;
 		protected Prefs() {
 			
 			super();
@@ -135,6 +136,10 @@ public class UtilPane extends JPanel{
 			
 			add(mmuPanel);
 			
+			verbosity = new JCheckBox("verbose tool");
+			verbosity.setSelected(P.getVerbose());
+			verbosity.addActionListener(this);
+			add(verbosity);
 		}
 		
 		private void prefUseSize(Dimension size) {
@@ -157,6 +162,10 @@ public class UtilPane extends JPanel{
 			height = resetPrefB.getPreferredSize().height;
 			resetPrefB.setBounds(ins.left, y, mw, height);
 			y += height;
+			
+			height = verbosity.getPreferredSize().height;
+			verbosity.setBounds(ins.left, y, mw, height);
+			y += height;
 		}
 		
 		private JButton copyMappingB;
@@ -165,6 +174,8 @@ public class UtilPane extends JPanel{
 		
 		private JTextField maxMemoryUsage;
 		private JPanel mmuPanel;
+		
+		private JCheckBox verbosity;
 		
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() == copyMappingB) {
@@ -201,6 +212,8 @@ public class UtilPane extends JPanel{
 					maxMemoryUsage.setText("" + SessionMaster.INST.max_data_bytes);
 					U.w("Could not use new max memory value.");
 				}
+			} else if (e.getSource() == verbosity){
+				P.setVerbose(verbosity.isSelected());
 			} else {
 				
 			}

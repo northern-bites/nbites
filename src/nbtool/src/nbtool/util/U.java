@@ -13,6 +13,8 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -130,6 +132,14 @@ public class U {
 		return p;
 	}
 	
+	public static JPanel fieldWithButton(JTextField f, JButton b) {
+		JPanel p = new JPanel(new BorderLayout());
+		p.add(b,BorderLayout.EAST);
+		p.add(f,BorderLayout.CENTER);
+		
+		return p;
+	}
+	
 	/*
 	 * Can't (to my knowledge) search for classes in the JVM except by trying to find specific ones.
 	 * 
@@ -139,7 +149,7 @@ public class U {
 	 * files so that protoc does not feel it needs to generate semi-arbitrary class names.
 	 * */
 	
-	
+	@SuppressWarnings("unchecked")
 	public static Class<? extends com.google.protobuf.GeneratedMessage> protobufClassFromType(String _type) {
 		assert(_type.startsWith(NBConstants.PROTOBUF_TYPE_PREFIX));
 		String type = _type.substring(NBConstants.PROTOBUF_TYPE_PREFIX.length()); //Remove prefix.
@@ -216,7 +226,7 @@ public class U {
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		}
-		
+				
 		return ret;
 	}
 	

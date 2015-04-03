@@ -19,7 +19,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import nbtool.data.BotStats;
+import nbtool.data.RobotStats;
 import nbtool.data.Log;
 import nbtool.data.SessionMaster;
 import nbtool.io.CommandIO;
@@ -56,7 +56,7 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 		test.setEnabled(false);
 		canvas.add(test);
 		
-		modes = new JComboBox<String>(NBConstants.mode_strings);
+		modes = new JComboBox<String>(NBConstants.MODE_STRINGS);
 		modes.setSelectedIndex(0);
 		modes.addActionListener(this);
 		canvas.add(modes);
@@ -181,14 +181,18 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 		this.actionPerformed(e);
 	}
 	
+	public void goAction() {
+		if (SessionMaster.INST.isIdle()) {
+			tryStart();
+		} else {
+			SessionMaster.INST.stopSession();
+		}
+	}
+	
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == go) {
 			
-			if (SessionMaster.INST.isIdle()) {
-				tryStart();
-			} else {
-				SessionMaster.INST.stopSession();
-			}
+			goAction();
 			
 		} else if (e.getSource() == test) {
 			boolean success = CommandIO.tryAddTest();
@@ -206,7 +210,7 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 	public void notified(EVENT e, Object src, Object... args) {
 		switch (e) {
 		case REL_BOTSTAT:
-			BotStats bs= (BotStats) args[0];
+			RobotStats bs= (RobotStats) args[0];
 			if (connected) {
 				for (int i = 0; i < flags.length; ++i) {
 					boolean val = bs.flags.bFlags[i + 2]; //2 for connection flags
@@ -258,8 +262,11 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 		
 		if (fs_text == null)
 			fs_text = "";
+		else fs_text = fs_text.trim();
+		
 		if (addr_text == null)
 			addr_text = "";
+		else addr_text = addr_text.trim();
 		
 		int cs = modes.getSelectedIndex();
 		P.putLastMode(cs);

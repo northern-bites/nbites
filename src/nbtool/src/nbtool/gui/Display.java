@@ -28,6 +28,13 @@ import nbtool.util.N.EVENT;
 public final class Display extends JFrame implements KeyEventPostProcessor {
 	private static final long serialVersionUID = 1L;
 	public static void main(String[] args) {
+		
+		if (!Display.class.desiredAssertionStatus()) {
+			System.out.println("nbtool should always be run with assertions ON (vm argument -ea)");
+			System.out.println("if you want to disable this, you'll have to edit the source code.");
+			return;
+		}
+		
 		//Run static setup.
 		U.w("static singleton Stats..." + Stats.INST.toString());
 		U.w("static singleton SessionMaster..." + SessionMaster.INST.toString());
@@ -70,10 +77,10 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		statusp = new StatusPanel();
 		right.addTab("status", statusp);
 		
-		cp = new CppPane(lc);
+		cp = new CppPane();
 		right.addTab("c++", cp);
 		
-		up = new UtilPane();
+		up = new PrefsnUtils();
 		right.addTab("utility", up);
 		
 		split1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, left, ldp);
@@ -109,7 +116,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 			}
 	
 			if (c == '\n' && left.getSelectedIndex() == 0) {
-				//cntrlp.modelReturnAction();
+				cntrlp.goAction();
 			}
 			
 			if (Character.isLetter(c)) {
@@ -125,6 +132,9 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 					break;
 				case 'r':
 					right.setSelectedIndex(1);
+					break;
+				case 't':
+					right.setSelectedIndex(2);
 					break;
 				}
 			}
@@ -143,7 +153,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 	private LogDisplayPanel ldp;
 	
 	private CppPane cp;	
-	private UtilPane up;
+	private PrefsnUtils up;
 		
 	private JSplitPane split1;
 	private JSplitPane split2;
