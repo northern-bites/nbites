@@ -146,7 +146,7 @@ ptr_output:     .skip 4
 
         # for now, just writes white and black images to test addressing
         #  addressing works but isn't the fastest
-       # pcmpeqd xmm0, xmm0
+        pcmpeqd xmm0, xmm0
         movdqu  [edx + ecx], xmm0
 
         psrlw   xmm0, 16
@@ -171,7 +171,8 @@ ptr_output:     .skip 4
 ######		        int col_count,
    ##			    int row_pitch,			
    #			    byte* yuvImage,
-#			        byte* outputImage)
+#			        byte* outputImage
+#                   byte* colorValues)
 _acquire_image:
 
 # Preserve required registers: epb, ebx, esi, edi
