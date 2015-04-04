@@ -27,10 +27,10 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import nbtool.data.Log;
-import nbtool.io.CppIO;
-import nbtool.io.CppIO.CppFunc;
-import nbtool.io.CppIO.CppFuncCall;
-import nbtool.io.CppIO.CppFuncListener;
+import nbtool.io.CrossIO;
+import nbtool.io.CrossIO.CppFunc;
+import nbtool.io.CrossIO.CppFuncCall;
+import nbtool.io.CrossIO.CppFuncListener;
 import nbtool.util.N;
 import nbtool.util.NBConstants;
 import nbtool.util.U;
@@ -50,7 +50,7 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 		status.setForeground(Color.GREEN);
 		
 		functions.removeAllItems();
-		for (CppIO.CppFunc f : found)
+		for (CrossIO.CppFunc f : found)
 			functions.addItem(f.name);
 		functions.setEnabled(true);
 		functions.setSelectedIndex(-1);
@@ -163,7 +163,7 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 	private JList<String> out_list;
 	private OutModel out_model;
 	
-	private ArrayList<CppIO.CppFunc> found;
+	private ArrayList<CrossIO.CppFunc> found;
 	private CppFunc selected;
 
 	@Override
@@ -186,7 +186,7 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 			call.name = selected.name;
 			call.args = args;
 			call.listener = this;
-			CppIO.current.tryAddCall(call);
+			CrossIO.current.tryAddCall(call);
 		} else if (source == clear) {
 			args = new ArrayList<Log>();
 			arg_model.reload();

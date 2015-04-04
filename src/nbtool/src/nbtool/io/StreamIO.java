@@ -43,7 +43,7 @@ import nbtool.util.U;
  * 	 be called when run() will return, meaning all exceptions need to be handled inside the run loop.
  * */
 
-public class NetIO implements Runnable {
+public class StreamIO implements Runnable {
 	private String server_address;
 	private int server_port;
 	
@@ -55,7 +55,7 @@ public class NetIO implements Runnable {
 	
 	private volatile boolean running;
 	
-	public NetIO(String addr, int p, Boss b) {
+	public StreamIO(String addr, int p, Boss b) {
 		server_address = addr;
 		server_port = p;
 		boss = b;

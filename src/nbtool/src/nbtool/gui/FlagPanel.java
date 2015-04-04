@@ -12,7 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import nbtool.io.CommandIO;
+import nbtool.io.ControlIO;
 import nbtool.util.U;
 
 public class FlagPanel extends JPanel implements ActionListener {
@@ -54,7 +54,7 @@ public class FlagPanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == jrb[0]) {
 			boolean success =
-					CommandIO.tryAddSetFlag(index, false);
+					ControlIO.tryAddSetFlag(index, false);
 			U.wf("FlagPanel[%s] CommandIO.tryAddSetFlag(%d, false) returned %B\n", flag_name, index, success);
 			
 		} else if (e.getSource() == jrb[1]) {
@@ -62,7 +62,7 @@ public class FlagPanel extends JPanel implements ActionListener {
 		} else if (e.getSource() == jrb[2]) {
 			System.out.println("2 " + jrb[2].isSelected());
 			boolean success =
-					CommandIO.tryAddSetFlag(index, true);
+					ControlIO.tryAddSetFlag(index, true);
 			U.wf("FlagPanel[%s] CommandIO.tryAddSetFlag(%d, true) returned %B\n", flag_name, index, success);
 		} else {}
 		

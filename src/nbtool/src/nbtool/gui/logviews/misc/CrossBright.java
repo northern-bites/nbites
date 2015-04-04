@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import nbtool.data.Log;
-import nbtool.io.CppIO;
-import nbtool.io.CppIO.CppFuncCall;
-import nbtool.io.CppIO.CppFuncListener;
+import nbtool.io.CrossIO;
+import nbtool.io.CrossIO.CppFuncCall;
+import nbtool.io.CrossIO.CppFuncListener;
 import nbtool.util.U;
 
 public class CrossBright extends ViewParent implements CppFuncListener{
@@ -23,7 +23,7 @@ public class CrossBright extends ViewParent implements CppFuncListener{
 	public void setLog(Log newlog) {
 		log = newlog;
 		
-		int fi = CppIO.current.indexOfFunc("CrossBright");
+		int fi = CrossIO.current.indexOfFunc("CrossBright");
 		if (fi < 0) return;
 		
 		CppFuncCall fc = new CppFuncCall();
@@ -33,7 +33,7 @@ public class CrossBright extends ViewParent implements CppFuncListener{
 		fc.args = new ArrayList<Log>(Arrays.asList(log));
 		fc.listener = this;
 		
-		CppIO.current.tryAddCall(fc);
+		CrossIO.current.tryAddCall(fc);
 	}
 	
 	public CrossBright() {

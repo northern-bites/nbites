@@ -22,10 +22,10 @@ import nbtool.util.N.EVENT;
  * Astute observers will notice this code is remarkably similar to the netIO code
  * */
 
-public class CommandIO implements Runnable{
+public class ControlIO implements Runnable{
 	
 	//Set by any creator if they want their CommandIO instance to be publicly used.
-	public static CommandIO INSTANCE;
+	public static ControlIO INSTANCE;
 	
 	private String cnc_address;
 	private int cnc_port;
@@ -37,7 +37,7 @@ public class CommandIO implements Runnable{
 	
 	private volatile boolean running;
 	
-	public CommandIO(String addr, int p, Boss b) {
+	public ControlIO(String addr, int p, Boss b) {
 		cnc_address = addr;
 		cnc_port = p;
 		boss = b;

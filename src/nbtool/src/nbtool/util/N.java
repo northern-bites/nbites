@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import javax.swing.SwingUtilities;
 
 import nbtool.data.RobotStats;
-import nbtool.io.CppIO.CppFunc;
+import nbtool.io.CrossIO.CppFunc;
 
 //Notification center
 public class N {

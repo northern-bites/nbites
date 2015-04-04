@@ -23,19 +23,19 @@ import nbtool.util.NBConstants;
 import nbtool.util.U;
 import static nbtool.util.NBConstants.*;
 
-public class CppIO implements Runnable {
+public class CrossIO implements Runnable {
 	
 	public static void ref(){} //Force the JRE to init CppIO by statically referencing the class.
 
-	private static CppIO init() {
-		CppIO io = new CppIO();
+	private static CrossIO init() {
+		CrossIO io = new CrossIO();
 		thread = new Thread(io, "nbtool-cppio");
 		thread.start();
 
 		return io;
 	}
 
-	public static final CppIO current = init();
+	public static final CrossIO current = init();
 	public static Thread thread;
 	
 	private ArrayList<CppFunc> foundFuncs;

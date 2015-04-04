@@ -1,11 +1,11 @@
 package nbtool.test;
 
-import nbtool.io.CppIO;
+import nbtool.io.CrossIO;
 
 public class testmain {
 	
 	public static void main(String[] args) {
-		CppIO.ref();
+		CrossIO.ref();
 		
 		
 		while(true) {

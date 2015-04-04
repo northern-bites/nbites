@@ -22,7 +22,7 @@ import javax.swing.SwingConstants;
 import nbtool.data.RobotStats;
 import nbtool.data.Log;
 import nbtool.data.SessionMaster;
-import nbtool.io.CommandIO;
+import nbtool.io.ControlIO;
 import nbtool.util.N;
 import nbtool.util.N.NListener;
 import nbtool.util.NBConstants;
@@ -195,7 +195,7 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 			goAction();
 			
 		} else if (e.getSource() == test) {
-			boolean success = CommandIO.tryAddTest();
+			boolean success = ControlIO.tryAddTest();
 			U.w("ControlPanel: CommandIO.tryAddTest() returned " + success);
 		} else if (e.getSource() == modes) {
 			int si = modes.getSelectedIndex();
