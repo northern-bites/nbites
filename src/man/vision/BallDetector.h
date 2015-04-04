@@ -26,11 +26,13 @@ public:
 private:
     void rateBlob(Blob b);
     std::pair<Circle, int> fitCircle(Blob b);
-    int rateCircle(Circle c, std::vector<point> p, int delta);
+    std::vector<point> rateCircle(Circle c, std::vector<point> p, int delta);
     Circle circleFromPoints(point a, point b, point c);
+    Circle leastSquares(std::vector<point> points);
 
     const messages::PackedImage8* orangeImage;
     std::vector<std::pair<Circle,double> > balls;
+
 
 };
 

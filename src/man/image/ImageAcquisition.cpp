@@ -7,8 +7,8 @@
 #define CPP_ACQUIRE 0
 
 #define O_WIDTH 30   // Widths apply to all Max and Min values of that color
-#define O_MAX_U 170 - O_WIDTH
-#define O_MIN_V 140                
+#define O_MAX_U 155
+#define O_MIN_V 125                
 #define O_COEF  0.15 // Increase coefs to make y values more influential
 
 #define G_WIDTH 30
