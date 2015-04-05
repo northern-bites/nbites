@@ -18,7 +18,7 @@ public:
     int getLengthOfHistogram() const { return wd; }
     const messages::PackedImage8& getPostImage() const { return postImage; }
     double const* getUnfilteredHistogram() const { return unfilteredHistogram; }
-    double const* getfilteredHistogram() const { return filteredHistogram; }
+    double const* getFilteredHistogram() const { return filteredHistogram; }
     const std::vector<int>& getCandidates() const { return candidates; }
 
 private:

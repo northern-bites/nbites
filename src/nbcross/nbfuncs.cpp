@@ -291,9 +291,8 @@ int PostDetector_func() {
 
     rets.push_back(postImageRet);
 
-    double const* unfiltHist = detector.getUnfilteredHistogram();
+    // TODO fix saving old histogram bug
     logio::log_t unfiltHistRet;
-    
     std::string unfiltHistDesc = "type=Histogram";
 
     unfiltHistRet.desc = (char*)malloc(unfiltHistDesc.size()+1);
@@ -304,6 +303,18 @@ int PostDetector_func() {
     memcpy(unfiltHistRet.data, detector.getUnfilteredHistogram(), unfiltHistRet.dlen);
 
     rets.push_back(unfiltHistRet);
+
+    logio::log_t filtHistRet;
+    std::string filtHistDesc = "type=Histogram";
+
+    filtHistRet.desc = (char*)malloc(filtHistDesc.size()+1);
+    memcpy(filtHistRet.desc, filtHistDesc.c_str(), filtHistDesc.size()+1);
+
+    filtHistRet.dlen = 8 * detector.getLengthOfHistogram();
+    filtHistRet.data = (uint8_t*)malloc(filtHistRet.dlen);
+    memcpy(filtHistRet.data, detector.getFilteredHistogram(), filtHistRet.dlen);
+
+    rets.push_back(filtHistRet);
 }
 
 void register_funcs() {

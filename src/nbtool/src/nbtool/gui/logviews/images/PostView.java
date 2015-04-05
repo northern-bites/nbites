@@ -45,7 +45,7 @@ public class PostView extends ViewParent {
 		//g.drawImage(d.gradient, 0, 0, null);
 		//g.drawImage(d.yellow, 0, 0, null);
 		//g.drawImage(d.field, 0, 0, null);
-		g.drawImage(d.post, 0, 0, null);
+		g.drawImage(d.gradient, 0, 0, null);
 		
 		// Display raw scores
         g.setColor(Color.black);

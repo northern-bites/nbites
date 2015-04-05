@@ -6,6 +6,7 @@
 namespace man {
 namespace vision {
 
+// TODO shrink post image by one
 PostDetector::PostDetector(const messages::PackedImage16& yImage, 
                            const messages::PackedImage8& whiteImage)
     : wd(whiteImage.width()),
@@ -32,7 +33,8 @@ void PostDetector::buildPostImage(const messages::PackedImage16& yImage,
 {
     int ht = postImage.height();
 
-    // TODO find pointer bug
+    // TODO are gradient calculations correct?
+    // TODO post image should store doubles
     for (int y = 1; y < ht-1; y++) {
         uint16_t* yRow = yImage.pixelAddress(1, y);
         unsigned char* whiteRow = whiteImage.pixelAddress(1, y);
@@ -81,21 +83,21 @@ Fool PostDetector::calculateGradScore(uint16_t* pt, int rowPitch, int pixelPitch
                 angle = -1*angle;
         }
     }
-    
-    FuzzyThreshold sigmaMagnitudeLow(3, 7);
-    FuzzyThreshold sigmaMagnitudeHigh(60, 80);
-	FuzzyThreshold sigmaDirection(-60, -35);
-		
+
     if (angle > 90) 
         angle -= 180;
     if (angle > 0) 
         angle *= -1;
     
+    // TODO constants should be static variables
+    // TODO sigmaMagnitudeHigh
+    FuzzyThreshold sigmaMagnitudeLow(3, 7);
+	FuzzyThreshold sigmaDirection(-60, -35);
+		
     Fool magnLowScore(magn > sigmaMagnitudeLow);
-    Fool magnHighScore(magn < sigmaMagnitudeHigh);
     Fool dirScore(angle > sigmaDirection);
     
-    return magnLowScore & magnHighScore & dirScore;
+    return magnLowScore & dirScore;
 }
 
 void PostDetector::buildHistogram()
@@ -110,6 +112,10 @@ void PostDetector::buildHistogram()
     }
 }
 
+// TODO Difference of Gaussian filtering class?
+// TODO multi-kernel approach
+// TODO kernel normalization
+// TODO partial kernels for dealing with edges of signal
 void PostDetector::filterHistogram()
 {
     double narrow[43];
@@ -214,6 +220,7 @@ void PostDetector::convolve(double const* in, double const* kernel,
                             int klength, double* out)
 {
     int halfklength = klength / 2;
+    out += halfklength;
     for (int i = halfklength; i < wd - halfklength; i++, out++) {
         int offset = i - halfklength;
         for (int j = 0; j < klength; j++) {
@@ -222,6 +229,7 @@ void PostDetector::convolve(double const* in, double const* kernel,
     }
 }
 
+// TODO asymmetrical peak test?
 void PostDetector::findPeaks()
 {
     int leftLimit = 0;
