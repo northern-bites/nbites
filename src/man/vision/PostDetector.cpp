@@ -33,7 +33,6 @@ void PostDetector::buildPostImage(const messages::PackedImage16& yImage,
 {
     int ht = postImage.height();
 
-    // TODO are gradient calculations correct?
     // TODO post image should store doubles
     for (int y = 1; y < ht-1; y++) {
         uint16_t* yRow = yImage.pixelAddress(1, y);

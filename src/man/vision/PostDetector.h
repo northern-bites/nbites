@@ -36,7 +36,7 @@ private:
     double* filteredHistogram;
     std::vector<int> candidates;
 
-    static const int peakThreshold = 40;
+    static const int peakThreshold = 10;
 };
 
 }

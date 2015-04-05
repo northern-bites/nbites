@@ -315,6 +315,20 @@ int PostDetector_func() {
     memcpy(filtHistRet.data, detector.getFilteredHistogram(), filtHistRet.dlen);
 
     rets.push_back(filtHistRet);
+
+    logio::log_t postsRet;
+    std::string postsRetDesc = "type=DetectedGoalposts";
+
+    postsRet.desc = (char*)malloc(postsRetDesc.size()+1);
+    memcpy(postsRet.desc, postsRetDesc.c_str(), postsRetDesc.size()+1);
+
+    postsRet.dlen = 4 * posts.size();
+    postsRet.data = (uint8_t*)malloc(postsRet.dlen);
+    int* dataAsIntPt = reinterpret_cast<int*>(postsRet.data);
+    for (int i = 0; i < posts.size(); i++)
+        dataAsIntPt[i] = posts[i]; 
+
+    rets.push_back(postsRet);
 }
 
 void register_funcs() {
