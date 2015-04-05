@@ -1,6 +1,7 @@
 #include "PostDetector.h"
 
 #include <cmath>
+#include <cstring>
 #include <iostream>
 
 namespace man {
@@ -15,6 +16,9 @@ PostDetector::PostDetector(const messages::PackedImage16& yImage,
 {
     unfilteredHistogram = new double[wd];
     filteredHistogram = new double[wd];
+
+    memset(unfilteredHistogram, 0, wd*sizeof(double));
+    memset(filteredHistogram, 0, wd*sizeof(double));
 
     buildPostImage(yImage, whiteImage);
     buildHistogram();

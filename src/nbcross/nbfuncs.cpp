@@ -291,7 +291,6 @@ int PostDetector_func() {
 
     rets.push_back(postImageRet);
 
-    // TODO fix saving old histogram bug
     logio::log_t unfiltHistRet;
     std::string unfiltHistDesc = "type=Histogram";
 
@@ -323,10 +322,14 @@ int PostDetector_func() {
     memcpy(postsRet.desc, postsRetDesc.c_str(), postsRetDesc.size()+1);
 
     postsRet.dlen = 4 * posts.size();
-    postsRet.data = (uint8_t*)malloc(postsRet.dlen);
-    int* dataAsIntPt = reinterpret_cast<int*>(postsRet.data);
-    for (int i = 0; i < posts.size(); i++)
-        dataAsIntPt[i] = posts[i]; 
+    if (postsRet.dlen) {
+        postsRet.data = (uint8_t*)malloc(postsRet.dlen);
+        int* dataAsIntPt = reinterpret_cast<int*>(postsRet.data);
+        for (int i = 0; i < posts.size(); i++)
+            dataAsIntPt[i] = posts[i]; 
+    } else {
+        postsRet.data = NULL;
+    }
 
     rets.push_back(postsRet);
 }
