@@ -13,6 +13,7 @@ SET( VISION_SRCS
   Blob.cpp
   BallDetector.cpp
   PostDetector.cpp
+  DiffOfGaussianFilter.cpp
   )
 
 SET( VISION_HEADERS
@@ -21,6 +22,7 @@ SET( VISION_HEADERS
   FuzzyLogic.h
   BallDetector.h
   PostDetector.h
+  DiffOfGaussianFilter.h
 )
 
 # Add static library target
