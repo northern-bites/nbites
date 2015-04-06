@@ -56,9 +56,9 @@ int ImageAcquisition::acquire_image(int rowCount,
 
 	int y;
 
-    man::vision::FuzzyThreshold sigmaY(70, 100);
+    man::vision::FuzzyThreshold sigmaY(65, 100);
     man::vision::FuzzyThreshold sigmaU(110, 150);
-    man::vision::FuzzyThreshold sigmaV(125, 150);
+    man::vision::FuzzyThreshold sigmaV(105, 130);
 
 	for (int i=0; i < rowCount; i ++, yuv += rowPitch*4){
 		for (int j=0; j < colCount; j++, yuv += 4, yOut++, whiteOut++, orangeOut++, greenOut++){

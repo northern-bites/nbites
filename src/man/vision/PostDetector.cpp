@@ -117,7 +117,6 @@ void PostDetector::buildHistogram()
 
 // TODO Difference of Gaussian filtering class?
 // TODO multi-kernel approach
-// TODO kernel normalization
 // TODO partial kernels for dealing with edges of signal
 void PostDetector::filterHistogram()
 {
