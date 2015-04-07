@@ -117,10 +117,10 @@ void PostDetector::buildHistogram()
     }
 }
 
-// TODO multi-kernel approach
 void PostDetector::filterHistogram()
 {
-    DiffOfGaussianFilter filter(25, 7, 50);
+    // TODO constants should be static variables
+    DiffOfGaussianFilter filter(81, 4, 40);
     filter.convolve(wd, unfilteredHistogram, filteredHistogram);
 }
 
