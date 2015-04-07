@@ -2,50 +2,74 @@
 
 #include <cmath>
 #include <iostream>
+#include <limits>
 
 namespace man {
 namespace vision {
 
 // TODO throw exception if ksize is even
+// TODO precompute Difference of Gaussian kernels?
 DiffOfGaussianFilter::DiffOfGaussianFilter(int ksize, double narrowSigma, double wideSigma)
     : size(ksize)
 {
-    kernel = new double[size];
+    // TODO refactor, copy and paste
+    narrow = new double[size];
+    wide = new double[size];
+    nweights = new double[size];
+    wweights = new double[size];
 
-    double sumNarrow = 0;
-    double sumWide = 0;
-
-    double* narrow = new double[size];
-    double* wide = new double[size];
+    // TODO eliminate unused space
+    nweights[size-1] = 0;
+    wweights[size-1] = 0;
 
     for (int i = 0; i < size; i++) {
         int x = i - (ksize/2);
         narrow[i] = DiffOfGaussianFilter::gaussianAt(static_cast<double>(x), narrowSigma);
         wide[i] = DiffOfGaussianFilter::gaussianAt(static_cast<double>(x), wideSigma);
-        sumNarrow += narrow[i];
-        sumWide += wide[i];
+        nweights[size-1] += narrow[i];
+        wweights[size-1] += wide[i];
     }
 
-    for (int i = 0; i < size; i++)
-        kernel[i] = (narrow[i] / sumNarrow) - (wide[i] / sumWide);
-
-    delete[] narrow;
-    delete[] wide;
+    for (int i = size-2; i >= 0; i--) {
+        nweights[i] = nweights[i+1] - narrow[size-2-i];
+        wweights[i] = wweights[i+1] - wide[size-2-i];
+    }
 }
 
 DiffOfGaussianFilter::~DiffOfGaussianFilter()
 {
-    delete[] kernel;
+    delete[] narrow;
+    delete[] wide;
+    delete[] nweights;
+    delete[] wweights;
 }
 
 void DiffOfGaussianFilter::convolve(int inSize, double const* in, double* out)
 {
     int halfsize = size / 2;
-    out += halfsize;
-    for (int i = halfsize; i < inSize - halfsize; i++, out++) {
+    for (int i = 0; i < inSize; i++, out++) {
         int offset = i - halfsize;
+
+        double nweight = 0;
+        double wweight = 0;
+
+        if (i >= halfsize && i < inSize - halfsize) {
+            nweight = nweights[size-1];
+            wweight = wweights[size-1];
+        } else if (i < halfsize) {
+            nweight = nweights[(size-1) - (halfsize-i)];
+            wweight = wweights[(size-1) - (halfsize-i)];
+        } else {
+            nweight = nweights[(size-1) - (i - inSize + 1 + halfsize)];
+            wweight = wweights[(size-1) - (i - inSize + 1 + halfsize)];
+        }
+
         for (int j = 0; j < size; j++) {
-            *out += in[offset+j]*kernel[j];
+            int index = offset + j;
+            if (index >= 0 && index < inSize) {
+                double kernelAtJ = (narrow[j]/nweight) - (wide[j]/wweight);
+                *out += in[index]*kernelAtJ;
+            }
         }
     }
 }
