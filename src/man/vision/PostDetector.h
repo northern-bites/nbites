@@ -26,6 +26,7 @@ private:
                         const messages::PackedImage8& whiteImage);
     Fool calculateGradScore(uint16_t* pt, int rowPitch, int pixelPitch);
     void buildHistogram();
+    void applyMathMorphology();
     void filterHistogram();
     void convolve(double const* in, double const* kernel, int klength, double* out);
     void findPeaks();

@@ -4,6 +4,7 @@
 #include <cstring>
 #include <iostream>
 
+#include "MathMorphology.h"
 #include "DiffOfGaussianFilter.h"
 
 namespace man {
@@ -23,6 +24,7 @@ PostDetector::PostDetector(const messages::PackedImage16& yImage,
     memset(filteredHistogram, 0, wd*sizeof(double));
 
     buildPostImage(yImage, whiteImage);
+    applyMathMorphology();
     buildHistogram();
     filterHistogram();
     findPeaks();
@@ -95,7 +97,7 @@ Fool PostDetector::calculateGradScore(uint16_t* pt, int rowPitch, int pixelPitch
         angle *= -1;
     
     // TODO constants should be static variables
-    // TODO sigmaMagnitudeHigh
+    // TODO ignore gradient with high magnitude
     FuzzyThreshold sigmaMagnitudeLow(3, 7);
 	FuzzyThreshold sigmaDirection(-60, -35);
 		
@@ -103,6 +105,31 @@ Fool PostDetector::calculateGradScore(uint16_t* pt, int rowPitch, int pixelPitch
     Fool dirScore(angle > sigmaDirection);
     
     return magnLowScore & dirScore;
+}
+
+void PostDetector::applyMathMorphology()
+{
+    // TODO more cache efficient structuring element
+    std::pair<int, int> se[7];
+    se[0].first = 0;
+    se[0].second = 0;
+    se[1].first = 0;
+    se[1].second = 1;
+    se[2].first = 0;
+    se[2].second = -1;
+    se[3].first = 0;
+    se[3].second = -2;
+    se[4].first = 0;
+    se[4].second = 2;
+    se[5].first = -1;
+    se[5].second = 0;
+    se[6].first = 1;
+    se[6].second = 0;
+
+    messages::PackedImage<unsigned char> postMorph;
+    MathMorphology<unsigned char> morph(5, se);
+    morph.opening(postImage, postMorph);
+    postImage = postMorph;
 }
 
 void PostDetector::buildHistogram()
