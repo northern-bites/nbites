@@ -25,7 +25,7 @@ public:
              double highThreshold, double minArea, double walkThresh);
     std::vector<Blob>& getResult() { return results; }
     //TODO get rid of this
-    short unsigned int* getImage() { return blobImage; }
+    uint16_t* getImage() { return blobImage; }
 
 private:
     void initializeMark();
@@ -111,7 +111,7 @@ void Blobber<T>::initializeMark()
             }
             else {
                 mark[i*(width+2) + j] = 0;
-                blobImage[i*(width+2) + j - 1] = 0;
+                blobImage[(i-1)*(width) + j - 1] = 0;
             }
         }
     }
