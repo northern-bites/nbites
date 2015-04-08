@@ -133,22 +133,38 @@ int BallImage_func() {
     man::vision::BallDetector detector(orangeImage);
     std::vector<std::pair<man::vision::Circle ,double> > balls = detector.findBalls();
     printf("found: %d balls!\n", balls.size());
-    std::string name = "type=YUVImage encoding=[Ball] width=640 height=480";
 
+    logio::log_t orange;
+    std::string orangeDesc = "type=YUVImage encoding=[Y8] width=320 height=240";
+    orange.desc = (char*)malloc(orangeDesc.size() + 1);
+    memcpy(orange.desc, orangeDesc.c_str(), orangeDesc.size() + 1);
+
+    orange.dlen = orangeImage->width() * orangeImage->height();
+    orange.data = (uint8_t*)malloc(orange.dlen);
+    memcpy(orange.data, orangeImage->pixelAddress(0, 0), orange.dlen);
+    rets.push_back(orange);
+
+    std::string ballStr = "";
     for(int i=0; i<balls.size(); i++) {
         std::pair<man::vision::Circle, double> ball = balls.at(i);
         std::stringstream stream;
-        stream << " ball" << i << "={" << ball.first.center.x * 2 << "," << ball.first.center.y * 2 << ",";
-        stream << ball.first.radius * 2 << "," << ball.second << "}";
-        name += stream.str();
+        stream << "{" << ball.first.center.x * 2 << "," << ball.first.center.y * 2 << ",";
+        stream << ball.first.radius * 2 << "," << ball.second << "} ";
+        ballStr += stream.str();
         printf("   %s\n", stream.str().c_str());
     }
 
-    free(log.desc);
-    log.desc = (char*)malloc(name.size() + 1);
-    memcpy(log.desc, name.c_str(), name.size() +1);
+    logio::log_t ball;
+    std::string ballDesc = "type=[Ball]";
+    ball.desc = (char*)malloc(ballDesc.size() + 1);
+    memcpy(ball.desc, ballDesc.c_str(), ballDesc.size() + 1);
 
-    rets.push_back(log);
+    ball.dlen = ballStr.size() + 1;
+    ball.data = (uint8_t*)malloc(ball.dlen);
+    memcpy(ball.data, ballStr.c_str(), ball.dlen);
+    rets.push_back(ball);
+
+    return 0;
 }
 
 int ImageConverter_func() {
