@@ -17,48 +17,62 @@ orangeImage(orangeImage_)
 
 BallDetector::~BallDetector() { }
 
-std::vector<std::pair<Circle,double> >& BallDetector::findBalls() {
+std::vector<Ball>& BallDetector::findBalls() {
     Blobber<uint8_t> b(orangeImage->pixelAddress(0, 0), orangeImage->width(),
                        orangeImage->height(), 1, orangeImage->width());
 
-    b.run(NeighborRule::eight, 90, 100, 10, 10);
+    b.run(NeighborRule::eight, 90, 120, 10, 10);
 
     std::vector<Blob> blobs = b.getResult();
 
+    // First look for non-occluded balls. Making heavier use of aspect ratio
     for(std::vector<Blob>::iterator i=blobs.begin(); i!=blobs.end(); i++) {
-        rateBlob(*i);
+        Ball b = makeBall(*i, false);
+        if (sanityCheck(b)) {
+            balls.push_back(b);
+        }
+    }
+
+    if (balls.size() == 0) {
+        std::cout << "Didn't find any balls.. Let's lower our standards" << std::endl;
+        for(std::vector<Blob>::iterator i=blobs.begin(); i!=blobs.end(); i++) {
+            Ball b = makeBall(*i, true);
+            if (sanityCheck(b)) {
+                balls.push_back(b);
+            }
+        }
     }
 
     return balls;
 }
 
-void BallDetector::rateBlob(Blob b) {
+Ball BallDetector::makeBall(Blob b, bool occluded) {
     // One rough measure of roundness
     double aspectRatio =  b.principalLength2() / b.principalLength1();
 
-    double area = M_PI * pow(b.principalLength1(), 2);
-
-    // HMM... Think about this
-    double circumToArea = b.getPerimeter() / area;
 
     std::pair<Circle, int> fit = fitCircle(b);
-    std::cout << fit.second << " was fit out of " << b.getPerimeter() <<std::endl;
+
     double circleFit = ((double)fit.second) / b.getPerimeter();
-    if(circleFit == 0) {
-        std::cout << "LITERALLY couldn't fit a circle" << std::endl;
+
+    if (occluded) {
+        aspectRatio *= 1.5;
+        circleFit *= 1.5;
     }
 
     double rating = aspectRatio * b.density() * circleFit;
-    b.setRating(rating);
+
+    double dist = distanceFromRadius(fit.first.radius);
+
+    Ball ball(fit.first, rating, dist, b);
 
     std::cout << "BallDetector rated blob as: " << rating << std::endl;
+    std::cout << "\tBecause aspectRatio: " << aspectRatio << " fit: " << circleFit
+              << " density: " << b.density() << std::endl;
 
-    if (rating > .20) {
-        std::pair<Circle, double> ball;
-        ball.first = fit.first;
-        ball.second = rating;
-        balls.push_back(ball);
-    }
+    // TODO: put distance estimations in here
+
+    return ball;
 }
 
 std::pair<Circle, int> BallDetector::fitCircle(Blob b)
@@ -106,8 +120,6 @@ std::pair<Circle, int> BallDetector::fitCircle(Blob b)
     return ret;
 }
 
-// Should be better, currently only returns count of points within delta of
-// circle. TODO
 std::vector<point> BallDetector::rateCircle(Circle c, std::vector<point> p, int delta)
 {
     int count = 0;
@@ -124,6 +136,17 @@ std::vector<point> BallDetector::rateCircle(Circle c, std::vector<point> p, int 
     }
 
     return rets;
+}
+
+double BallDetector::distanceFromRadius(double rad) {
+    double trig = 1 / tan(rad * VERT_FOV_RAD / 240);
+    return BALL_RADIUS * trig;
+}
+
+// Returns true if ball is reasonable size, distance, etc.
+// Implement more!
+bool BallDetector::sanityCheck(Ball& b) {
+    return b.getRating() > .6;
 }
 
 // Calculates the circle which intersects the three given points
@@ -145,7 +168,7 @@ Circle BallDetector::circleFromPoints(point a, point b, point c)
     return circle;
 }
 
-Circle BallDetector::leastSquares(std::vector<point> points)
+Circle BallDetector::leastSquares(std::vector<point>& points)
 {
     double mx = 0;
     double my = 0;

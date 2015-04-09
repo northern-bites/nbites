@@ -3,6 +3,8 @@
 #include "Images.h"
 #include "Blobber.h"
 #include "Blob.h"
+#include "structs.h"
+#include "Ball.h"
 
 #include <vector>
 
@@ -10,28 +12,25 @@
 namespace man {
 namespace vision {
 
-// TODO: This needs to be better
-typedef struct circle_{
-    point center;
-    double radius;
-} Circle;
-
 class BallDetector {
 public:
     BallDetector(const messages::PackedImage8* orangeImage_);
     ~BallDetector();
 
-    std::vector<std::pair<Circle,double> >& findBalls();
+    std::vector<Ball>& findBalls();
 
 private:
-    void rateBlob(Blob b);
+    Ball makeBall(Blob b, bool occluded);
     std::pair<Circle, int> fitCircle(Blob b);
     std::vector<point> rateCircle(Circle c, std::vector<point> p, int delta);
     Circle circleFromPoints(point a, point b, point c);
-    Circle leastSquares(std::vector<point> points);
+    Circle leastSquares(std::vector<point>& points);
+    double distanceFromRadius(double rad);
+
+    bool sanityCheck(Ball& b);
 
     const messages::PackedImage8* orangeImage;
-    std::vector<std::pair<Circle,double> > balls;
+    std::vector<Ball> balls;
 
 
 };

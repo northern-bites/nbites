@@ -108,15 +108,6 @@ public class U {
 			ip = new UV88image(width , height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[Y8]")) {
 			ip = new Y8image(width , height, log.bytes);
-		} else if (encoding.equalsIgnoreCase("[Ball]")) {
-			Map<String, String> dict = log.getAttributes();
-			Vector<String> ballLocs = new Vector<String>();
-			for (int numBalls=0; ; numBalls++) {
-			    String location = dict.get("ball"+numBalls);
-			    if(location == null) break;
-			    ballLocs.add(location);
-			}
-			ip = new Ballimage(width, height, log.bytes, ballLocs);
 		} else {
 			U.w("WARNING:  Cannot use image with encoding:" + encoding);
 			return null;

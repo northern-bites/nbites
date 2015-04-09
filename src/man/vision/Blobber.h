@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Blob.h"
+#include "structs.h"
 
 // TODO add histeresis thresholding
 // TODO more serious testing
@@ -207,11 +208,11 @@ void Blobber<T>::walkPerimeter(int x, int y, Blob* b)
     do {
         b->addPerimeter(currentX, currentY);
         dir = nextDirection(currentX, currentY, dir);
-        blobImage[currentX + width*currentY] = 500;
 
-        if(currentY == height)
+
+        if(currentY < height)
         {
-            std::cout << "We're at the edge of the mark!" << std::endl;
+            blobImage[currentX + width*currentY] = 500;
         }
 
         switch(dir)

@@ -15,6 +15,7 @@
 #include "vision/Blobber.h"
 #include "vision/Blob.h"
 #include "vision/BallDetector.h"
+#include "vision/Ball.h"
 #include "RoboGrams.h"
 
 std::vector<nbfunc_t> FUNCS;
@@ -131,7 +132,7 @@ int BallImage_func() {
     const messages::PackedImage8* orangeImage = module.orangeImage.getMessage(true).get();
 
     man::vision::BallDetector detector(orangeImage);
-    std::vector<std::pair<man::vision::Circle ,double> > balls = detector.findBalls();
+    std::vector<man::vision::Ball> balls = detector.findBalls();
     printf("found: %d balls!\n", balls.size());
 
     logio::log_t orange;
@@ -146,10 +147,11 @@ int BallImage_func() {
 
     std::string ballStr = "";
     for(int i=0; i<balls.size(); i++) {
-        std::pair<man::vision::Circle, double> ball = balls.at(i);
+        man::vision::Ball ball = balls.at(i);
+        man::vision::Circle c = ball.getFit();
         std::stringstream stream;
-        stream << "{" << ball.first.center.x * 2 << "," << ball.first.center.y * 2 << ",";
-        stream << ball.first.radius * 2 << "," << ball.second << "} ";
+        stream << "{" << c.center.x * 2 << "," << c.center.y * 2 << ",";
+        stream << c.radius * 2 << "," << ball.getRating() << "," << ball.getDist() << "} ";
         ballStr += stream.str();
         printf("   %s\n", stream.str().c_str());
     }

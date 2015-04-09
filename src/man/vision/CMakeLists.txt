@@ -12,6 +12,7 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.8.3 )
 SET( VISION_SRCS
   Blob.cpp
   BallDetector.cpp
+  Ball.cpp
   )
 
 SET( VISION_HEADERS
@@ -19,6 +20,7 @@ SET( VISION_HEADERS
   Blobber.h
   FuzzyLogic.h
   BallDetector.h
+  Ball.h
 )
 
 # Add static library target

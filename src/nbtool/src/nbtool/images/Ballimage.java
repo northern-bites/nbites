@@ -32,9 +32,10 @@ public final class Ballimage extends ImageParent {
         Graphics2D g = intermediate.createGraphics();
         g.setStroke(new BasicStroke(1));
 
+        int count = 0;
         for(String ball: balls) {
             String[] split = ball.split(",");
-            if (split.length != 4) {
+            if (split.length != 5) {
                 System.out.println("Ballimage had malformed ball in it: " + ball);
                      continue;
             }
@@ -42,8 +43,13 @@ public final class Ballimage extends ImageParent {
 	        double centerY = Double.parseDouble(split[1]);
 	        double radius = Double.parseDouble(split[2]);
 	        double rating = Double.parseDouble(split[3]);
+	        double distance = Double.parseDouble(split[4]);
 
-	        g.draw(new Ellipse2D.Double(centerX - radius, centerY - radius, radius * 2, radius * 2));
+	        g.draw(new Ellipse2D.Double(centerX - radius, centerY - radius,
+	               radius * 2, radius * 2));
+	        g.drawString(Integer.toString(count), (int)(centerX + radius) + 2, 
+	                     (int)(centerY + radius) + 2);
+	        count++;
         }
 
         return intermediate;
