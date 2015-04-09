@@ -8,7 +8,8 @@ if [ $# -ne 1 ]; then
 fi
 
 naoqi_version=$1
-robocup=http://robocup.bowdoin.edu/public
+server=dover
+robocup=/mnt/research/robocup
 nbites_dir=$PWD/../..
 lib_dir=$nbites_dir/lib
 
@@ -21,24 +22,25 @@ atom_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$atom
 naoqi_local=$lib_dir/naoqi-sdk-$naoqi_version-linux32
 atom_local=$lib_dir/atomtoolchain
 
-echo "Downloading NaoQi"
-wget $naoqi_robocup -P $lib_dir/
+echo "Downloading NaoQi & Atom toolchain"
+echo "Please enter your Bowdoin username"
+read username
 
-echo "Downloading Atomtoolchain"
-wget $atom_robocup -P $lib_dir/
+scp -r $username@$server:$software $lib_dir
 
 echo "Unpacking NaoQi"
 
 pushd $lib_dir
-tar -xzf $naoqi
-rm $naoqi
+tar -xzf $naoqi_version/$naoqi -C .
 
 echo "Unpacking Atomtoolchain"
 
 mv $atom_local oldAtom
 mkdir $atom_local
-tar -xzf $atom -C $atom_local --strip-components 1
-rm $atom
+tar -xzf $naoqi_version/$atom -C $atom_local --strip-components 1
+
+rm -r $naoqi_version
+
 echo "Sudo privileges required to remove old atomtoolchain"
 sudo rm -rf oldAtom
 

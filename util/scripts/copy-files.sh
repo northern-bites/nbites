@@ -8,7 +8,7 @@ fi
 
 ROBOT=$1
 ROBOT_UNAME=$2
-ROBOCUP=robocup.bowdoin.edu:/mnt/research/robocup
+ROBOCUP=dover:/mnt/research/robocup
 FOLDER=nao_files
 WIFI_CONFIG=wireless_config
 
