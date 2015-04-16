@@ -265,7 +265,7 @@ int PostDetector_func() {
     imageConverter.run();
 
     const messages::PackedImage16* yImage = imageConverter.yImage.getMessage(true).get();
-    const messages::PackedImage8* whiteImage = imageConverter.orangeImage.getMessage(true).get();
+    const messages::PackedImage8* whiteImage = imageConverter.whiteImage.getMessage(true).get();
 
     man::vision::PostDetector detector(*yImage, *whiteImage);
     const std::vector<int>& posts = detector.getCandidates();

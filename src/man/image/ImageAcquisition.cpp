@@ -1,6 +1,5 @@
 #include "ImageAcquisition.h"
 #include "VisionDef.h"
-#include "../vision/FuzzyLogic.h"
 
 #include <tgmath.h> 
 #include <algorithm>
@@ -56,10 +55,6 @@ int ImageAcquisition::acquire_image(int rowCount,
 
 	int y;
 
-    man::vision::FuzzyThreshold sigmaY(65, 100);
-    man::vision::FuzzyThreshold sigmaU(110, 150);
-    man::vision::FuzzyThreshold sigmaV(105, 130);
-
 	for (int i=0; i < rowCount; i ++, yuv += rowPitch*4){
 		for (int j=0; j < colCount; j++, yuv += 4, yOut++, whiteOut++, orangeOut++, greenOut++){
 
@@ -73,20 +68,58 @@ int ImageAcquisition::acquire_image(int rowCount,
 			short unsigned u0, u = (yuv[UOFFSET] + yuv[rowPitch*4 + UOFFSET]) >> 1;
 			short unsigned v0, v = (yuv[VOFFSET] + yuv[rowPitch*4 + VOFFSET]) >> 1;
 
-            // NOTE detects yellow using three fuzzy threshold for testing purposes
-            double yScore = sigmaY.weight(y);
-            double uScore = 1 - sigmaU.weight(u);
-            double vScore = sigmaV.weight(v);
-            
-            double smallestScore = uScore;
-            if (yScore < uScore) {
-                smallestScore = yScore;
-            }
-            if (vScore < smallestScore) {
-                smallestScore = vScore;
-            }
-            
-			*orangeOut = static_cast<int>(255*smallestScore);
+		    unsigned short f1, f2;
+
+		    // WHITE CALCS
+		    // find f1 for when u is right of the midway line
+		    if (u > 127) {
+		    	u0 = W_MAX_U;
+		    	u0 += (short unsigned)(y * whiteMaxCoef);
+		    	f1 = (std::min(std::max((int)(u0 + whiteWidth - u), 0), (int)whiteWidth) * whiteWidth1) >> 8;
+		    } else {	// find f1 for when u is left of the midway line
+		    	u0 = W_MIN_U;
+		    	u0 += (short unsigned)(y * whiteMinCoef);
+		    	f1 = (std::min(std::max((int)(u - u0), 0), (int)whiteWidth) * whiteWidth1) >> 8;
+		    }
+
+		    // find f2 for when v is above the midway point
+		    if (v > 127) {
+		    	v0 = W_MAX_V;
+		    	v0 += (short unsigned)(y * whiteMaxCoef);
+		    	f2 = (std::min(std::max((int)(v0 + whiteWidth - v), 0), (int)whiteWidth) * whiteWidth1) >> 8;
+		    } else {	// find f2 for when v is below the midway point
+		    	v0 = W_MIN_V;
+		    	v0 += (short unsigned)(y * whiteMinCoef);
+		    	f2 = (std::min(std::max((int)(v - v0), 0), (int)whiteWidth) * whiteWidth1) >> 8;
+		    }
+
+		    *whiteOut = std::min(f1, f2);
+		    
+			// ORANGE CALCS
+		    u0 = O_MAX_U;
+	        v0 = O_MIN_V;
+
+			u0 += (short unsigned)(y * orangeCoefV);
+			f2 = (std::min(std::max((int)(u0 + orangeWidth - u), 0), 
+				                                   (int)orangeWidth) * orangeWidth1) >> 8;
+
+			v0 += (short unsigned)(y * orangeCoefU);
+			f1 = (std::min(std::max((int)(v - v0), 0),
+				                    (int)orangeWidth) * orangeWidth1) >> 8;
+			*orangeOut = std::min(f1, f2);
+
+			// GREEN CALCS
+			u0 = G_MAX_U;
+			v0 = G_MAX_V;
+
+			u0 += (short unsigned)(y * greenCoefU);
+			f1 = (std::min(std::max((int)(u0 + greenWidth - u), 0),
+				                    (int)greenWidth) * greenWidth1) >> 8; 
+
+			v0 += (short unsigned)(y * greenCoefV);
+			f2 = (std::min(std::max((int)(v0 + greenWidth - v), 0),
+				                    (int)greenWidth) * greenWidth1) >> 8;
+			*greenOut = std::min(f1, f2);
 		}
 	}
 #endif
