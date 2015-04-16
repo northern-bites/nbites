@@ -8,11 +8,13 @@
 #include "nbfuncs.h"
 #include <assert.h>
 #include <vector>
+#include <string>
+#include <iostream>
 
 std::vector<nbfunc_t> FUNCS;
 
-std::vector<logio::log_t> args;
-std::vector<logio::log_t> rets;
+std::vector<log::Log *> args;
+std::vector<log::Log *> rets;
 
 //Common arg types -- used to check arg types and for human readability.
 const char sYUVImage[] = "YUVImage";
@@ -25,7 +27,7 @@ const char stext[] = "text";//No current sources for this data type.
 int test_func() {
     assert(args.size() == 2);
     for (int i = 0; i < args.size(); ++i) {
-        printf("test_func(): %s\n", args[i].desc);
+        printf("test_func(): %s\n", args[i]->description().c_str());
     }
     
     return 0;
@@ -35,8 +37,8 @@ int arg_test_func() {
     printf("arg_test_func()\n");
     assert(args.size() == 2);
     for (int i = 0; i < 2; ++i) {
-        printf("\t%s\n", args[i].desc);
-        rets.push_back(logio::copyLog(&args[i]));
+        printf("\t%s\n", args[i]->description().c_str());
+        rets.push_back(new log::Log(args[i]));
     }
     
     return 0;
@@ -46,13 +48,20 @@ int CrossBright_func() {
     assert(args.size() == 1);
     printf("CrossBright_func()\n");
     //work on a copy of the arg so we can safely push to rets.
-    logio::log_t log = logio::copyLog(&args[0]);
-    for (int i = 0; i < log.dlen; i += 2) {
-        *(log.data + i) = 240;
-    }
     
-    printf("[%s] modified.\n", log.desc);
-    rets.push_back(log);
+    log::Log * copy = new log::Log(args[0]);
+    size_t length = copy->data().size();
+    uint8_t buf[length];
+    memcpy(buf, copy->data().data(), length);
+    
+    for (int i = 0; i < length; i += 2) {
+        *(buf + i) = 240;
+    }
+    std::string buffer((const char *) buf, length);
+    copy->setData(buffer);
+    
+    printf("[%s] modified.\n", copy->description().c_str());
+    rets.push_back(copy);
     
     return 0;
 }
@@ -82,3 +91,8 @@ void register_funcs() {
 }
 
 
+
+
+#if __LINE__ > 100
+#error "USE YOUR OWN FILES FOR FUNCTIONS!"
+#endif

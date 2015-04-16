@@ -136,7 +136,7 @@ public class StatusPanel extends JPanel implements NListener{
 		add(sp);
 		
 		N.listen(EVENT.CNC_CONNECTION, this);
-		N.listen(EVENT.CPP_CONNECTION, this);
+		N.listen(EVENT.NBCROSS_CONNECTION, this);
 		N.listen(EVENT.FIO_THREAD, this);
 		N.listen(EVENT.SIO_THREAD, this);
 		N.listen(EVENT.LOG_FOUND, this);
@@ -265,7 +265,7 @@ public class StatusPanel extends JPanel implements NListener{
 			
 			cnc.setForeground(c);
 			break;
-		case CPP_CONNECTION:
+		case NBCROSS_CONNECTION:
 			b = (Boolean) args[0];
 			
 			c = b ? Color.GREEN : Color.RED;

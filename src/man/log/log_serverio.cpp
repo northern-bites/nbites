@@ -1,12 +1,15 @@
 //
-//  log_serverio.c
+//  log_streamio.c
 //  NB_log_server
 //
 //  Created by Philip Koch on 10/4/14.
 //
 
-#include "log_header.h"
-#include "log_sf.h"
+#include "logging.h"
+#include "control.h"
+#include "nbdebug.h"
+#include "exactio.h"
+
 #include <stdio.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -22,32 +25,10 @@ namespace nblog {
     void * server_io_loop(void * context);
     
     void log_serverio_init() {
-        LOGDEBUG(1, "log_serverio_init()\n");
+        NBDEBUG("log_serverio_init()\n");
         
-        pthread_create(&(log_main->log_serverio_thread), NULL, &server_io_loop, NULL);
-        pthread_detach(log_main->log_serverio_thread);
-    }
-    
-    //Block thread unti client has attempted to connect.
-    /*
-     NOTE: the cnc server uses this function as well, so editors should ensure their changes do not break that code.
-     */
-    int block_accept(int lfd) {
-        int connfd = -1;
-        
-        for (; connfd < 0; usleep(SERVER_USLEEP_WAITING))
-            connfd = accept(lfd, (struct sockaddr*)NULL, NULL);
-        
-        //Set the socket to non-blocking.
-        int flags = fcntl(connfd, F_GETFL, 0);
-        fcntl(connfd, F_SETFL, flags | O_NONBLOCK);
-        
-#ifdef __APPLE__
-        int set = 1;
-        setsockopt(connfd, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
-#endif
-        
-        return connfd;
+        pthread_create(&(log_main.log_serverio_thread), NULL, &server_io_loop, NULL);
+        pthread_detach(log_main.log_serverio_thread);
     }
     
     /*
@@ -60,6 +41,7 @@ namespace nblog {
     } */
     
 #define CHECK_RET(r) {if (r) goto connection_died;}
+//#define CHECK_RET(r) {if (r) {printf("failed at line %d\n", __LINE__); goto connection_died;}}
     
     void * server_io_loop(void * arg) {
         int listenfd = -1, connfd = -1;
@@ -67,7 +49,7 @@ namespace nblog {
         
         //Network socket, TCP streaming protocol, default options
         listenfd = socket(AF_INET, SOCK_STREAM, 0);
-        LOGDEBUG(1, "log_servio listenfd=[%i]\n", listenfd);
+        NBDEBUG( "log_streamio listenfd=[%i]\n", listenfd);
         //memset(&serv_addr, '0', sizeof(serv_addr));
         memset(&serv_addr, 0, sizeof(serv_addr));
         
@@ -83,95 +65,85 @@ namespace nblog {
         //Accepting connections on this socket, backqueue of size 1.
         listen(listenfd, 1);
         
-        LOGDEBUG(2, "log_serverio listening...port=%i\n", LOG_PORT);
-        nbsf::flags[nbsf::serv_connected] = false;
+        NBDEBUG("log_streamio listening...port=%i\n", LOG_PORT);
+        control::flags[control::serv_connected] = false;
         
         for (;;) {
-            connfd = block_accept(listenfd);
-            log_object_t * obj = NULL;
+            connfd = block_accept(listenfd, STREAM_USLEEP_WAITING);
+            log::Log * obj = NULL;
+            int obj_bi = -1;
             
-            LOGDEBUG(3, "log_serverio FOUND CLIENT [%i]\n", connfd);
-            memcpy(nbsf::cio_start, nbsf::total, sizeof(nbsf::io_state_t) * NUM_LOG_BUFFERS);
-            nbsf::cio_upstart = time(NULL);
-            nbsf::flags[nbsf::serv_connected] = true;
+            NBDEBUG("log_streamio FOUND CLIENT [%i]\n", connfd);
+            memcpy(cio_start, total, sizeof(io_state_t) * NUM_LOG_BUFFERS);
+            cio_upstart = time(NULL);
+            control::flags[control::serv_connected] = true;
             
             uint32_t version = htonl(LOG_VERSION);
             uint32_t seq_num = 0;
             uint32_t recvd;
             
-            CHECK_RET(logio::send_exact(connfd, 4, (uint8_t *) &seq_num))
+            CHECK_RET(send_exact(connfd, 4, (uint8_t *) &seq_num))
             
-            CHECK_RET(logio::recv_exact(connfd, 4, (uint8_t *) &recvd, IO_SEC_TO_BREAK));
+            CHECK_RET(recv_exact(connfd, 4, (uint8_t *) &recvd, IO_SEC_TO_BREAK));
             
             if (recvd != 0) {
-                LOGDEBUG(1, "log_serverio got bad ping initiation: %u\n", ntohl(recvd));
+                NBDEBUG( "log_streamio got bad ping initiation: %u\n", ntohl(recvd));
                 goto connection_died;
             }
             
-            CHECK_RET(logio::send_exact(connfd, 4, (uint8_t *) &version))
+            CHECK_RET(send_exact(connfd, 4, (uint8_t *) &version))
             
-            CHECK_RET(logio::recv_exact(connfd, 4, (uint8_t *) &recvd, IO_SEC_TO_BREAK));
+            CHECK_RET(recv_exact(connfd, 4, (uint8_t *) &recvd, IO_SEC_TO_BREAK));
             
-            LOGDEBUG(1, "log_serverio starting connection; server version: %u, client version: %u\n", ntohl(version), ntohl(recvd));
+            NBDEBUG( "log_streamio starting connection; server version: %u, client version: %u\n", ntohl(version), ntohl(recvd));
             
             ++seq_num;
-            LOGDEBUG(1, "log_servio client connection ready...\n");
             for (;;) {
-                if (!(nbsf::flags[nbsf::servio])) {
-                    uint32_t ping = 0;
-                    
-                    CHECK_RET(logio::send_exact(connfd, 4, (uint8_t *) &ping))
-                    
-                    CHECK_RET(logio::recv_exact(connfd, 4, (uint8_t *) &recvd, IO_SEC_TO_BREAK));
-                    
-                    if (recvd != 0) {
-                        LOGDEBUG(1, "log_serverio got bad ping while waiting: %u\n", ntohl(recvd));
-                        goto connection_died;
-                    }
-                    
-                    usleep(SERVER_USLEEP_WAITING);
-                    continue;
-                }
-                
                 //we're writing.
                 uint8_t ws = false;
                 
                 for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+                    obj_bi = i;
+                    
                     for (int r = 0; r < LOG_RATIO[i]; ++r) {
-                        if (!(nbsf::flags[nbsf::servio])) {
-                            break;
-                        }
                         
-                        obj = acquire(i, &(log_main->buffers[i]->servio_nextr));
+                        obj = acquire(i, &(log_main.buffers[i].servio_nextr));
                         
                         if (obj) {
                             ws = true;
                             
                             uint32_t msg_seq_n = htonl(seq_num++);
                             
-                            CHECK_RET(logio::send_exact(connfd, 4, (uint8_t *) &msg_seq_n));
+                            CHECK_RET(send_exact(connfd, 4, (uint8_t *) &msg_seq_n));
                             
-                            CHECK_RET(logio::send_log(connfd, &(obj->log)));
+                            CHECK_RET(!obj->send(connfd));
                             
-                            release(obj, true);
+                            releaseWrapper(i, obj, true);
                         } else {
                             break;
                         }
+                        
+                        obj = NULL;
                     }
                 }
                 
+                printf("looped\n");
+                
                 if (!ws) {
-                    usleep(SERVER_USLEEP_WAITING);
+                    printf("waiting...\n");
+                    usleep(STREAM_USLEEP_WAITING);
                 }
             }
             
             //Acts like a c exception.
         connection_died:
             close(connfd);
-            LOGDEBUG(1, "log_serverio loop broken, connection closed.\n");
-            nbsf::flags[nbsf::serv_connected] = false;
+            NBDEBUG( "log_streamio loop broken, connection closed.\n");
+            control::flags[control::serv_connected] = false;
+            
             if (obj)
-                release(obj, true);
+                releaseWrapper(obj_bi, obj, true);
+            obj = NULL;
         }
         
         return NULL;

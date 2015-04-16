@@ -20,7 +20,7 @@ public class EdgeView extends ViewParent{
 	
 	public void setLog(Log newlog) {
 		log = newlog;
-		String encoding = (String) log.getAttributes().get("encoding");
+		String encoding = (String) log.encoding();
 		
 		//|| because could be old log, see U.biFromLog
 		if (encoding == null || encoding.equalsIgnoreCase(YUYV8888image.INSTANCE.encoding())) {

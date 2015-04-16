@@ -26,12 +26,13 @@ public class NBConstants {
 	public static final String IMAGE_S = "YUVImage";
 	public static final String STATS_S = "stats";
 	
-	public static final int SERVER_PORT = 30000;
-	public static final int CNC_PORT = 30001;
-	public static final int CPP_PORT = 30002;
+	public static final int STREAM_PORT = 30000;
+	public static final int CONTROL_PORT = 30001;
+	public static final int NBCROSS_PORT = 30002;
 	
-	public static final int SOCKET_TIMEOUT = 5000; //Milliseconds
-	public static final int CPP_CALL_TIMEOUT = 0;	//i.e., infinite
+	public static final int SOCKET_TIMEOUT = 5000; 		//Milliseconds
+	public static final int NBCROSS_CALL_TIMEOUT = 0;	//interpreted as infinite.  Note, since these calls are local
+														//we worry less about dead sockets.
 	
 	//Who names a class DataFlavor?  That's just so... Idk. Fllaavvvooorr.  Data Fllaaavoor. MMM, gimme some'o that DataFlav
 	public static DataFlavor treeFlavor = new DataFlavor(Log.class, "NB-OpaqueLog");

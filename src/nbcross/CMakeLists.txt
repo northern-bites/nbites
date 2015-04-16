@@ -81,6 +81,10 @@ include_directories( ${SHARE_DIR}/include )
 add_subdirectory( ${SHARE_DIR}/portals ${CMAKE_CURRENT_BINARY_DIR}/portals )
 include_directories( ${SHARE_DIR}/portals )
 
+# Compile logshare into logshare folder
+add_subdirectory( ${SHARE_DIR}/logshare ${CMAKE_CURRENT_BINARY_DIR}/logshare )
+include_directories( ${SHARE_DIR}/logshare )
+
 # Compile messages into messages folder
 add_subdirectory( ${SHARE_DIR}/messages ${CMAKE_CURRENT_BINARY_DIR}/messages )
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages )
@@ -134,4 +138,5 @@ target_link_libraries( nbcross_tool
   comm # man comm
   sharedball # man sharedball
   log
+  logshare
   )

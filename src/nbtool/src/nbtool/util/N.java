@@ -12,8 +12,8 @@ public class N {
 	
 	public static enum EVENT {
 		
-		CPP_CONNECTION, /*(true/false)*/ 	//From CPP thread
-		CPP_FUNCS_FOUND, /*(ArrayList<CppFunc>)*/	//From CPP thread
+		NBCROSS_CONNECTION, /*(true/false)*/ 	//From CPP thread
+		NBCROSS_FUNCS_FOUND, /*(ArrayList<CppFunc>)*/	//From CPP thread
 		
 		CNC_CONNECTION, /*(true/false)*/	//From CommandIO thread
 		SIO_THREAD, /*(true/false)*/	//From NetIO thread

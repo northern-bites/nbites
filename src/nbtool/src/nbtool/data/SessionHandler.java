@@ -112,11 +112,11 @@ public class SessionHandler implements StreamIO.Boss, FileIO.Boss, ControlIO.Bos
 			
 		case NETWORK_NOSAVE:
 			//start net thread
-			netioRunnable = new StreamIO(address, NBConstants.SERVER_PORT, this);
+			netioRunnable = new StreamIO(address, NBConstants.STREAM_PORT, this);
 			Thread netioThread = new Thread(netioRunnable, "netio");			
 			netioThread.start();
 			
-			cncRunnable = new ControlIO(address, NBConstants.CNC_PORT, this);
+			cncRunnable = new ControlIO(address, NBConstants.CONTROL_PORT, this);
 			Thread cncThread = new Thread(cncRunnable, "cnc");
 			cncThread.start();
 			

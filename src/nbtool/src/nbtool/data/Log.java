@@ -24,7 +24,7 @@ public class Log implements Serializable {
 		return ret;
 	}
 	
-	public long unique_id;
+	public final long unique_id = getID();
 	
 	public String name; //File name, might be null
 	
@@ -37,11 +37,9 @@ public class Log implements Serializable {
 	//Set by GUI when selected.
 	public transient TreePath lastSeen = null;
 
-	private Map<String, String> dictionary;
+	public SExpr tree;
 	
-	public Log() {
-		this.unique_id = getID();
-	}
+	public Log() {}
 	
 	public Log(String d, byte[] b) {
 		this();
@@ -49,25 +47,12 @@ public class Log implements Serializable {
 		this.name = null;
 		this.description = d;
 		this.bytes = b;
-		dictionary = null;
-	}
-	
-	//We cache the attributes which may be a bad idea.
-	public Map<String, String> getAttributes() {
-		if (dictionary != null) return dictionary;
 		
-		dictionary = U.attributes(description);
-		return dictionary;
+		this.tree = SExpr.deserializeFrom(description);
 	}
 	
 	public void dumpAttributes() {
-		dictionary = null;
-		_index = null;
-		_time = null;
-		_height = null;
-		_width = null;
-		_checksum = null;
-		_version = null;
+		
 	}
 	
 	public void setNameFromDesc() {
@@ -86,91 +71,64 @@ public class Log implements Serializable {
 	}
 	
 	/*
-	 * Some standard attributes parsed/cached.
+	 * Some standard attributes parsed.
 	 * */
 	
 	public String type() {
-		return getAttributes().get("type");
+		SExpr type = tree.find("contents").get(1).find("type").get(1);
+		if (type.exists() && type.isAtom())
+			return type.value();
+		else return null;
 	}
 	
 	public String from() {
-		return getAttributes().get("from");
+		SExpr from = tree.find("created").get(1);
+		if (from.exists() && from.isAtom())
+			return from.value();
+		else return null;
 	}
 	
 	public String encoding() {
-		return getAttributes().get("encoding");
+		return null;
 	}
 	
-	private Integer _index = null;
 	public Integer index() {
-		if (_index != null) return _index;
-		
-		String str = getAttributes().get("index");
-		if (str == null) return null;
-		else {
-			_index = Integer.parseInt(str);
-			return _index;
-		}
+		return 0;
 	}
 	
-	private Long _time = null;
 	public Long time() {
-		if (_time != null) return _time;
-		
-		String str = getAttributes().get("time");
-		if (str == null) return null;
-		else {
-			_time = Long.parseLong(str);
-			return _time;
-		}
+		return 0L;
 	}
 	
-	private Integer _height = null;
+	
 	public Integer height() {
-		if (_height != null) return _height;
+		SExpr height = tree.find("contents").get(1).find("height").get(1);
 		
-		String str = getAttributes().get("height");
-		if (str == null) return null;
-		else {
-			_height = Integer.parseInt(str);
-			return _height;
-		}
+		if (height.exists() && height.isAtom())
+			return height.valueAsInt();
+		else return null;
 	}
 	
-	private Integer _width = null;
 	public Integer width() {
-		if (_width != null) return _width;
+		SExpr width = tree.find("contents").get(1).find("width").get(1);
 		
-		String str = getAttributes().get("width");
-		if (str == null) return null;
-		else {
-			_width = Integer.parseInt(str);
-			return _width;
-		}
+		if (width.exists() && width.isAtom())
+			return width.valueAsInt();
+		else return null;
 	}
 	
-	private Integer _checksum = null;
 	public Integer checksum() {
-		if (_checksum != null) return _checksum;
-		
-		String str = getAttributes().get("checksum");
-		if (str == null) return null;
-		else {
-			_checksum = Integer.parseInt(str);
-			return _checksum;
-		}
+		SExpr cs = tree.find("checksum").get(1);
+		if (cs.exists() && cs.isAtom())
+			return cs.valueAsInt();
+		else return null;
 	}
 	
-	private Integer _version = null;
 	public Integer version() {
-		if (_version != null) return _version;
-		
-		String str = getAttributes().get("version");
-		if (str == null) return null;
-		else {
-			_version = Integer.parseInt(str);
-			return _version;
-		}
+		SExpr v = tree.find("version").get(1);
+		if (v.exists() && v.isAtom())
+			return v.valueAsInt();
+		else return null;
 	}
 	
 	public boolean isProtobuf() {

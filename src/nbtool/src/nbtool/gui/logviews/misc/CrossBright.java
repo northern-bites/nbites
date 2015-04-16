@@ -8,10 +8,10 @@ import java.util.Arrays;
 import nbtool.data.Log;
 import nbtool.io.CrossIO;
 import nbtool.io.CrossIO.CppFuncCall;
-import nbtool.io.CrossIO.CppFuncListener;
+import nbtool.io.CrossIO.CrossFuncListener;
 import nbtool.util.U;
 
-public class CrossBright extends ViewParent implements CppFuncListener{
+public class CrossBright extends ViewParent implements CrossFuncListener{
 	BufferedImage img;
 	
 	public void paintComponent(Graphics g) {

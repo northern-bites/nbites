@@ -5,12 +5,13 @@
 //  Created by Philip Koch on 10/4/14.
 //
 
-#include "log_header.h"
-#include "log_sf.h"
+#include "logging.h"
+#include "nbdebug.h"
+#include "control.h"
+
 #include <string>
 #include <algorithm>
 #include <netinet/in.h>
-
 
 namespace nblog {
     
@@ -20,34 +21,41 @@ namespace nblog {
     void * file_io_loop(void * context);
     
     void log_fileio_init() {
-        LOGDEBUG(1, "log_fileio_init()\n");
+        NBDEBUG("log_fileio_init()\n");
         
-        pthread_create(&(log_main->log_fileio_thread), NULL, &file_io_loop, NULL);
-        pthread_detach(log_main->log_fileio_thread);
+        pthread_create(&(log_main.log_fileio_thread), NULL, &file_io_loop, NULL);
+        pthread_detach(log_main.log_fileio_thread);
     }
     
-    int write_to_fs(log_object_t * obj);
+    int write_to_fs(log::Log * obj);
     
     void * file_io_loop(void * context) {
         uint8_t wrote_something = 0;
-        log_object_t * obj = NULL;
+        log::Log * obj = NULL;
+        int cur_bi;
         
         for (;;
-             (wrote_something) ? (wrote_something = 0) : usleep(FILE_USLEEP_ON_NTD)
+             (wrote_something) ? (wrote_something = 0) : usleep(FILEIO_USLEEP_ON_NTD)
              )
         {
-            if (!(nbsf::flags[nbsf::fileio])) {continue;}
+            if (!(control::flags[control::fileio])) {continue;}
             
-            for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+            for (cur_bi = 0; cur_bi < NUM_LOG_BUFFERS; ++cur_bi) {
                 
-                for (int r = 0; r < LOG_RATIO[i]; ++r) {
-                    obj = acquire(i, &(log_main->buffers[i]->fileio_nextr));
+                for (int r = 0; r < LOG_RATIO[cur_bi]; ++r) {
+                    obj = acquire(cur_bi, &(log_main.buffers[cur_bi].fileio_nextr));
                     
                     if (obj) {
                         wrote_something = 1;
-                        write_to_fs(obj);
+                        if (write_to_fs(obj) > 0) {
+                            printf("**********\nERROR!\n**********\n"
+                                   "could not write log to file!\n\n");
+                            releaseWrapper(cur_bi, obj, true);
+                            return NULL;
+                        } else {
+                            releaseWrapper(cur_bi, obj, true);
+                        }
                         
-                        release(obj, true);
                     } else {
                         break;
                     }
@@ -62,29 +70,15 @@ namespace nblog {
      fileio
      */
     
-    int write_to_fs(log_object_t * obj) {
+    int write_to_fs(log::Log * obj) {
         int fd;
-        char buf[MAX_LOG_DESC_SIZE];
         
-        int nw = strlen(obj->log.desc);
-        
-        char * ss;
-        int len;
-        
-        //240 is ~ what we can put in a file name
-        if (nw < 240) {
-            len = nw;
-            ss = buf;
-        } else {
-            len = 240;
-            ss = buf + (nw - 240);
-        }
-        
-        std::string cpp_s(ss);
-        std::replace(cpp_s.begin(), cpp_s.end(), ' ', '_');
-        cpp_s.append(".nblog");
+        std::string desc = obj->description();
+        desc = desc.substr(0, 100);
+        std::replace(desc.begin(), desc.end(), ' ', '_');
+        desc.append(".nblog");
         std::string path(LOG_FOLDER);
-        path.append(cpp_s);
+        path.append(desc);
         
         fd = open(path.c_str(), O_WRONLY | O_TRUNC | O_CREAT, S_IRWXG | S_IRWXU);
         
@@ -94,7 +88,7 @@ namespace nblog {
             return 1;
         }
         
-        if (logio::write_log(fd, &(obj->log))) {
+        if (!obj->write(fd)) {
             printf("*************NB_Log file_io COULD NOT WRITE LOG \n\t%s\n\n", path.c_str());
             
             return 2;

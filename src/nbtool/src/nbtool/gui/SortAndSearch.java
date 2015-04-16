@@ -185,7 +185,8 @@ public class SortAndSearch extends JPanel implements ActionListener {
 		};
 	
 	public void actionPerformed(ActionEvent e) {
-		U.wf("SortAndSearch: new specs: [%s, %s]\n", sortNames[sortBy.getSelectedIndex()], search_f.getText());
+		U.wf("SortAndSearch: new specs: [sort=%s, search=%s, order=%s]\n", sortNames[sortBy.getSelectedIndex()],
+				search_f.getText(), reverse.isSelected() ? "reverse" : "normal");
 		
 		lcm.ssChanged();
 	}

@@ -12,7 +12,10 @@
 #include <iostream>
 #include <vector>
 
-#include "../man/log/logio.h"
+#include "Log.h"
+#include "nbdebug.h"
+
+#define NBCROSS_VERSION 6
 
 typedef struct {
     const char * name;
@@ -23,8 +26,8 @@ typedef struct {
 
 extern std::vector<nbfunc_t> FUNCS;
 
-extern std::vector<logio::log_t> args;
-extern std::vector<logio::log_t> rets;
+extern std::vector<log::Log *> args;
+extern std::vector<log::Log *> rets;
 
 void register_funcs();
 void check_arguments(int func_index); //Checks that the arguments in <std::vector args> match

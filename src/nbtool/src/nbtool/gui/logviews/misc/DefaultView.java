@@ -42,7 +42,7 @@ public class DefaultView extends ViewParent implements ActionListener {
 			data.setText(U.bytesToHexString(log.bytes));
 		else data.setText(U.bytesToHexString(U.subArray(log.bytes, 0, 1000)) + "...");
 		
-		if (log.getAttributes().get("checksum") != null) {
+		if (log.checksum() != null) {
 			int recv_checksum = log.checksum();
 			int checksum = 0;
 			for (byte b : log.bytes)
@@ -111,7 +111,6 @@ public class DefaultView extends ViewParent implements ActionListener {
 				} else {
 					log.dumpAttributes();
 					log.description = newdesc;
-					log.getAttributes(); 
 				} 
 			} catch(Exception ex) {
 				U.w("Cannot use new description: " + newdesc);

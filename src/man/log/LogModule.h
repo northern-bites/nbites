@@ -13,7 +13,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "log_header.h"
+#include "logging.h"
 #include "log_sf.h"
 
 namespace man {

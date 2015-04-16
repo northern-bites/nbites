@@ -7,79 +7,10 @@ import java.io.IOException;
 import nbtool.util.U;
 
 public class RobotStats {
-	public static final int STAT_DATA_LENGTH = 339; //bytes
 	public RobotStats(Log log) throws IOException {
-		assert(log.type().equalsIgnoreCase("stats"));
-		assert(log.getAttributes().containsKey("nbuffers"));
-		assert(log.bytes.length == STAT_DATA_LENGTH);
 		
-		int nb = NUM_LOG_BUFFERS = Integer.parseInt(log.getAttributes().get("nbuffers"));
-		ByteArrayInputStream bais = new ByteArrayInputStream(log.bytes);
-		DataInputStream is = new DataInputStream(bais);
-		
-		fio_stat = new BufStat[nb];
-		cio_stat = new BufStat[nb];
-		tot_stat = new BufStat[nb];
-		
-		manage = new BufManage[nb];
-		ratio = new int[nb];
-		size = new int[nb];
-		
-		//U.w("start: " + (STAT_DATA_LENGTH - bais.available()) + " " + (STAT_DATA_LENGTH - is.available()));
-		
-		fio_uptime = is.readLong();
-		sio_uptime = is.readLong();
-		
-		con_uptime = is.readLong();
-		cnc_uptime = is.readLong();
-		
-		log_uptime = is.readLong();
-			
-		for (int i = 0; i < nb; ++i) {
-			fio_stat[i] = new BufStat(is);
-		}
-		
-		//U.w("after fio: " + (STAT_DATA_LENGTH - bais.available()) + " " + (STAT_DATA_LENGTH - is.available()));
-		
-		for (int i = 0; i < nb; ++i) {
-			cio_stat[i] = new BufStat(is);
-		}
-		
-		//U.w("after cio: " + (STAT_DATA_LENGTH - bais.available()) + " " + (STAT_DATA_LENGTH - is.available()));
-		
-		for (int i = 0; i < nb; ++i) {
-			BufStat b = tot_stat[i] = new BufStat(is);
-		}
-		
-		//U.w("after tot: " + (STAT_DATA_LENGTH - bais.available()) + " " + (STAT_DATA_LENGTH - is.available()));
-		
-		for (int i = 0; i < nb; ++i) {
-			BufManage m = manage[i] = new BufManage();
-			m.servnr = is.readInt();
-			m.filenr = is.readInt();
-			m.nextw = is.readInt();
-		}
-		
-		//U.w("after manage: " + (STAT_DATA_LENGTH - bais.available()) + " " + (STAT_DATA_LENGTH - is.available()));
-		
-		for (int i = 0; i < nb; ++i) {
-			ratio[i] = is.readInt();
-		}
-		
-		for (int i = 0; i < nb; ++i) {
-			size[i] = is.readInt();
-		}
-		
-		cores = is.readInt();
-		
-		//FLAGS
-		flags = new Flags(is);
-		
-		//set flags
-		
-		assert(is.available() == 0);
-		is.close();
 	}
+	
 	public int NUM_LOG_BUFFERS;
 	public int cores;
 	
@@ -183,7 +114,7 @@ public class RobotStats {
 		String[] parts = new String[7 + (5 * NUM_LOG_BUFFERS)];
 		int pindex = 0;
 		
-		parts[pindex++] = String.format("stat_len=%d nbuffers=%d num_cores=%d\n", STAT_DATA_LENGTH, NUM_LOG_BUFFERS, cores);
+		parts[pindex++] = String.format("nbuffers=%d num_cores=%d\n", NUM_LOG_BUFFERS, cores);
 		parts[pindex++] = String.format("\n\t%10s%10s\n", "ratio", "size");
 		for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
 			parts[pindex++] = i + String.format("\t%10d%10d\n", ratio[i], size[i]);

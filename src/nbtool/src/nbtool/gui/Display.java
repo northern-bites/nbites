@@ -77,8 +77,8 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		statusp = new StatusPanel();
 		right.addTab("status", statusp);
 		
-		cp = new CppPane();
-		right.addTab("c++", cp);
+		cp = new NBCrossPane();
+		right.addTab("nbcross", cp);
 		
 		up = new PrefsnUtils();
 		right.addTab("utility", up);
@@ -152,7 +152,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		
 	private LogDisplayPanel ldp;
 	
-	private CppPane cp;	
+	private NBCrossPane cp;	
 	private PrefsnUtils up;
 		
 	private JSplitPane split1;

@@ -1,16 +1,14 @@
 cmake_minimum_required( VERSION 2.8.3 )
 
-set(LOG_SRCS LogModule.cpp log_fileio.cpp log_main.cpp log_streamio.cpp)
+set(CONTROL_SRCS control.cpp)
 
 add_library(
-  log
+  control
   STATIC
-  ${LOG_SRCS} )
+  ${CONTROL_SRCS} )
 
 target_link_libraries(
   control
-  log
   logshare
-  portals
   messages
 )
