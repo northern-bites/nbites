@@ -3,6 +3,7 @@
 #include "Profiler.h"
 #include <iostream>
 
+
 namespace man {
 namespace image {
 
@@ -40,10 +41,13 @@ void ImageConverterModule::run_()
     PackedImage16 tempOutput16(tempBuffer, 320, 1*240, 320);
     PackedImage8 tempOutput8(tempBuffer, 320, (1*2 + 3)*240, 320);
 
+    ColorClassificationValues color;
+
     PROF_ENTER(P_ACQUIRE_IMAGE);
     ImageAcquisition::acquire_image(240, 320, 320,
                     yuv.pixelAddress(0, 0),
-                    (uint8_t*)tempOutput16.pixelAddress(0, 0));
+                    (uint8_t*)tempOutput16.pixelAddress(0, 0),
+                    &color);
     PROF_EXIT(P_ACQUIRE_IMAGE);
 
     // First 320x240 image = all the Y values in imageIn.message()
