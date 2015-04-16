@@ -50,7 +50,6 @@ void PostDetector::buildPostImage(const messages::PackedImage16& yImage,
             Fool gradScore(calculateGradScore(yRow, yImage.rowPitch(), yImage.pixelPitch()));
             Fool whiteScore(static_cast<double>(*whiteRow) / 255);
             *postRow = static_cast<unsigned char>(255*(gradScore & whiteScore).get());
-            // *postRow = static_cast<unsigned char>(255*(whiteScore).get());
 
             yRow += yImage.pixelPitch();
             whiteRow += whiteImage.pixelPitch(); 
