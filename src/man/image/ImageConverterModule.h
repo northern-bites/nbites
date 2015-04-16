@@ -6,6 +6,8 @@
 #include "Camera.h"
 #include "ColorParams.h"
 
+// TODO: Generalize
+
 namespace man {
 namespace image {
 

@@ -3,6 +3,7 @@
 #include "Profiler.h"
 #include <iostream>
 
+
 namespace man {
 namespace image {
 
@@ -15,23 +16,11 @@ ImageConverterModule::ImageConverterModule()
       whiteImage(base()),
       orangeImage(base()),
       greenImage(base()),
-      params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit)//,
-  //    table(new unsigned char[tableByteSize])
+      params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit)
 {}
 
-/*
-ImageConverterModule::ImageConverterModule(char *table_pathname)
-    : Module(),
-      yImage(base()),
-      uImage(base()),
-      vImage(base()),
-      thrImage(base()),
-      params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit),
-      table(new unsigned char[tableByteSize])
-{
-    initTable(table_pathname);
-}
-*/
+// TODO: Generalize
+
 void ImageConverterModule::run_()
 {
     std::cout << "ImageConverterMod Running" << std::endl;
@@ -52,10 +41,13 @@ void ImageConverterModule::run_()
     PackedImage16 tempOutput16(tempBuffer, 320, 1*240, 320);
     PackedImage8 tempOutput8(tempBuffer, 320, (1*2 + 3)*240, 320);
 
+    ColorClassificationValues color;
+
     PROF_ENTER(P_ACQUIRE_IMAGE);
     ImageAcquisition::acquire_image(240, 320, 320,
                     yuv.pixelAddress(0, 0),
-                    (uint8_t*)tempOutput16.pixelAddress(0, 0));
+                    (uint8_t*)tempOutput16.pixelAddress(0, 0),
+                    &color);
     PROF_EXIT(P_ACQUIRE_IMAGE);
 
     // First 320x240 image = all the Y values in imageIn.message()
@@ -74,44 +66,6 @@ void ImageConverterModule::run_()
     image8 = tempOutput8.window(0, (3+1)*240, 320, 240);
     greenImage.setMessage(Message<PackedImage8>(&image8));
 }
-
-// Read a color table into memory from pathname
-/*void ImageConverterModule::initTable(char *filename)
-{
-    FILE *fp = fopen(filename, "r");   //open table for reading
-
-    if (fp == NULL) {
-        printf("CAMERA::ERROR::initTable() FAILED to open filename: %s\n", filename);
-        return;
-    }
-
-    // actually read the table into memory
-    // color table is in VUY ordering
-    int rval;
-    for(int v=0; v < vLimit; ++v) {
-        for(int u=0; u< uLimit; ++u) {
-            rval = fread(&table[v * uLimit * yLimit + u * yLimit],
-                         sizeof(unsigned char), yLimit, fp);
-        }
-    }
-
-    printf("CAMERA::Loaded colortable %s.\n",filename);
-    fclose(fp);
-}
-
-// Read a color table already in memory
-void ImageConverterModule::changeTable(unsigned char *newTable)
-{
-    table = newTable;
-  run_();
-}
-
-void ImageConverterModule::loadTable(unsigned char *newTable)
-{
-  table = newTable;
-}
-
-*/
 
 }
 }
