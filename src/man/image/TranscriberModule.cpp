@@ -490,7 +490,7 @@ void TranscriberModule::run_()
         SExpr("height", image.height()),
     };
     
-    NBLog(NBL_IMAGE_BUFFER, "magic", time(NULL), {SExpr(image_c)}, im_buf);   //no data with it.
+    nblog::NBLog(NBL_IMAGE_BUFFER, "magic", time(NULL), {SExpr(image_c)}, im_buf);   //no data with it.
 }
 
 }
