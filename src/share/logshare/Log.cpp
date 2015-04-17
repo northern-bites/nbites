@@ -1,6 +1,6 @@
 #include "Log.h"
 
-namespace log {
+namespace logshare {
     
     Log::Log(const std::string& lfrom, int32_t checksum, clock_t created, int version, SExpr contents) : _written(false), _refs(0) {
         std::vector<SExpr> list = {

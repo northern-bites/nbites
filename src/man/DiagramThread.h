@@ -55,7 +55,7 @@ namespace man{
         template<class T>
         void log(int findex, portals::OutPortal<T>* out, std::string desc)
         {
-            logs.push_back(new log::LogModule<T>(findex, out, desc));
+            logs.push_back(new logshare::LogModule<T>(findex, out, desc));
             diagram.addModule(*logs.back());
         }
         
@@ -94,7 +94,7 @@ namespace man{
         static void* runDiagram(void* _this);
         
         // Hold all of the LogModules
-        std::vector<log::LogBase*> logs;
+        std::vector<logshare::LogBase*> logs;
         
         // The diagram that will be run in this thread
         RobotDiagram diagram;

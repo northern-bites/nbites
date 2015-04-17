@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <assert.h>
 
-namespace log {
+namespace logshare {
     
     const char SExpr::special[] = {' ', '(', ')', '\r', '\n', '\t'};
     

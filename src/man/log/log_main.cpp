@@ -23,8 +23,8 @@
 //#include <unistd.h>
 //#include <fcntl.h>
 
-using log::Log;
-using log::SExpr;
+using logshare::Log;
+using logshare::SExpr;
 
 namespace nblog {
     
@@ -180,7 +180,7 @@ namespace nblog {
         return sum;
     }
     
-    void releaseWrapper(int bi, log::Log * lg, bool lock) {
+    void releaseWrapper(int bi, logshare::Log * lg, bool lock) {
         NBLassert(bi >= 0 && bi < NUM_LOG_BUFFERS);
         NBLassert(lg);
         
@@ -306,7 +306,7 @@ namespace nblog {
         pthread_mutex_unlock(&(buf->lock));
     } */
     
-    void NBLog(int BI, log::SExpr& desc, const std::string& data) {
+    void NBLog(int BI, logshare::SExpr& desc, const std::string& data) {
         
         NBDEBUGs(SECTION_LOGM, "NBlog(buffer_index=%i)\n", BI);
         NBLassert(BI < NUM_LOG_BUFFERS);
@@ -324,7 +324,7 @@ namespace nblog {
         pthread_mutex_unlock(&(log_main.buffers[BI].lock));
     }
     
-    void NBLog(int BI, const std::string where_made, time_t when_made, std::vector<log::SExpr> contents, const std::string& data) {
+    void NBLog(int BI, const std::string where_made, time_t when_made, std::vector<logshare::SExpr> contents, const std::string& data) {
         
         time_t now = time(NULL);
         tm * ptm = localtime(&now);

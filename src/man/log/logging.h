@@ -45,7 +45,7 @@ namespace nblog {
         uint32_t next_write;
         
         pthread_mutex_t lock;
-        log::Log ** objects;
+        logshare::Log ** objects;
     } log_buffer_t;
     
 #define NUM_LOG_BUFFERS 2
@@ -101,15 +101,15 @@ namespace nblog {
      */
     
 
-    void NBLog(int BI, log::SExpr& desc, const std::string& data);
-    void NBLog(int BI, const std::string where_made, time_t when_made, std::vector<log::SExpr> contents, const std::string& data);
+    void NBLog(int BI, logshare::SExpr& desc, const std::string& data);
+    void NBLog(int BI, const std::string where_made, time_t when_made, std::vector<logshare::SExpr> contents, const std::string& data);
     
     //init log_main thread
     void log_main_init();
     
     //for io threads.
-    log::Log * acquire(int bi, uint32_t * relevant_nextr);
-    void releaseWrapper(int bi, log::Log * lg, bool lock);
+    logshare::Log * acquire(int bi, uint32_t * relevant_nextr);
+    void releaseWrapper(int bi, logshare::Log * lg, bool lock);
     
     /*
      STATISTICS

@@ -19,13 +19,13 @@
 #include <vector>
 #include <sstream>
 
-using log::SExpr;
+using logshare::SExpr;
 
 namespace control {
     
     pthread_t control_thread;
     
-    uint32_t cnc_test(log::Log * arg) {
+    uint32_t cnc_test(logshare::Log * arg) {
         printf("\tcnc_test:[%s] %lu bytes of data.\n", arg->description().c_str(),
                arg->data().size());
         return 0;
@@ -35,7 +35,7 @@ namespace control {
     //expects two bytes of data:
     //  flag index
     //  new flag value
-    uint32_t cnc_setFlag(log::Log * arg) {
+    uint32_t cnc_setFlag(logshare::Log * arg) {
         
         size_t u = arg->data().size();
         
@@ -79,15 +79,15 @@ namespace control {
         return 0;
     }
     
-    std::map<std::string, uint32_t (*)(log::Log *)> init_fmap() {
-        std::map<std::string, uint32_t (*)(log::Log *)> ret;
+    std::map<std::string, uint32_t (*)(logshare::Log *)> init_fmap() {
+        std::map<std::string, uint32_t (*)(logshare::Log *)> ret;
         
         ret["test"] = &cnc_test;
         ret["setFlag"] = &cnc_setFlag;
         
         return ret;
     }
-    std::map<std::string, uint32_t (*)(log::Log *)> fmap = init_fmap();
+    std::map<std::string, uint32_t (*)(logshare::Log *)> fmap = init_fmap();
     
     std::vector<std::string> split(const std::string &s, char delim) {
         std::vector<std::string> elems;
@@ -143,7 +143,7 @@ namespace control {
                 if (ntohl(resp) == 1) {
                     //cnc call coming in:
                     
-                    log::Log * found = log::Log::recv(connfd, IO_SEC_TO_BREAK);
+                    logshare::Log * found = logshare::Log::recv(connfd, IO_SEC_TO_BREAK);
                     if (!found)
                         goto connection_died;
                     SExpr& desc = found->tree();

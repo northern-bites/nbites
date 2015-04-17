@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace log {
+namespace logshare {
     
     /*
      an sexpr is either an atom or a list of sexprs.  Therefore only one of the two fields {value, list} is ever relevant.

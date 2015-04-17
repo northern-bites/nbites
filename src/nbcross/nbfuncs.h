@@ -26,8 +26,8 @@ typedef struct {
 
 extern std::vector<nbfunc_t> FUNCS;
 
-extern std::vector<log::Log *> args;
-extern std::vector<log::Log *> rets;
+extern std::vector<logshare::Log *> args;
+extern std::vector<logshare::Log *> rets;
 
 void register_funcs();
 void check_arguments(int func_index); //Checks that the arguments in <std::vector args> match

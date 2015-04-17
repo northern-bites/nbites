@@ -13,8 +13,8 @@
 
 std::vector<nbfunc_t> FUNCS;
 
-std::vector<log::Log *> args;
-std::vector<log::Log *> rets;
+std::vector<logshare::Log *> args;
+std::vector<logshare::Log *> rets;
 
 //Common arg types -- used to check arg types and for human readability.
 const char sYUVImage[] = "YUVImage";
@@ -38,7 +38,7 @@ int arg_test_func() {
     assert(args.size() == 2);
     for (int i = 0; i < 2; ++i) {
         printf("\t%s\n", args[i]->description().c_str());
-        rets.push_back(new log::Log(args[i]));
+        rets.push_back(new logshare::Log(args[i]));
     }
     
     return 0;
@@ -49,7 +49,7 @@ int CrossBright_func() {
     printf("CrossBright_func()\n");
     //work on a copy of the arg so we can safely push to rets.
     
-    log::Log * copy = new log::Log(args[0]);
+    logshare::Log * copy = new logshare::Log(args[0]);
     size_t length = copy->data().size();
     uint8_t buf[length];
     memcpy(buf, copy->data().data(), length);

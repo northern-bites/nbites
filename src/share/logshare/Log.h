@@ -12,7 +12,7 @@
  In this class, the internal representation of the description is always an sexpr tree, though it may be updated with either format.
  */
 
-namespace log {
+namespace logshare {
     
     class Log {
     public:

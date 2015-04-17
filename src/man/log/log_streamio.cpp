@@ -70,7 +70,7 @@ namespace nblog {
         
         for (;;) {
             connfd = block_accept(listenfd, STREAM_USLEEP_WAITING);
-            log::Log * obj = NULL;
+            logshare::Log * obj = NULL;
             int obj_bi = -1;
             
             NBDEBUG("log_streamio FOUND CLIENT [%i]\n", connfd);
