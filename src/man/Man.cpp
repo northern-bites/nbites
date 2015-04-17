@@ -50,9 +50,7 @@ namespace man {
     sharedBall(playerNum)
     {
         setModuleDescription("The Northern Bites' soccer player.");
-        
-        recorder.init();
-        
+                
         /** Sensors **/
         sensorsThread.addModule(sensors);
 
