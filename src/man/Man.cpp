@@ -48,7 +48,6 @@ namespace man {
     behaviors(teamNum, playerNum),
     leds(broker),
     sharedBall(playerNum),
-    recorder(broker, "sound::Recorder")
     {
         setModuleDescription("The Northern Bites' soccer player.");
         
