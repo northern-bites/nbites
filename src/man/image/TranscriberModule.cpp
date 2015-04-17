@@ -10,7 +10,7 @@
 #include <bn/i2c/i2c-dev.h>
 
 #include "Profiler.h"
-#include "../log/logging"
+#include "../log/logging.h"
 using log::SExpr;
 #include <vector>
 
