@@ -47,7 +47,7 @@ namespace man {
     gamestate(teamNum, playerNum),
     behaviors(teamNum, playerNum),
     leds(broker),
-    sharedBall(playerNum),
+    sharedBall(playerNum)
     {
         setModuleDescription("The Northern Bites' soccer player.");
         
