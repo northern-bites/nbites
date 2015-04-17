@@ -8,8 +8,8 @@ add_library(
   ${LOG_SRCS} )
 
 target_link_libraries(
-  control
   log
+  control
   logshare
   portals
   messages
