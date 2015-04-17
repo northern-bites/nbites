@@ -13,6 +13,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "../control/control.h"
 #include "logging.h"
 #include "Log.h"
 
@@ -81,7 +82,7 @@ namespace man {
             
             //Called at the end of every diagram run.
             virtual void run_() {
-                if (nbsf::flags[f_index]) {
+                if (control::flags[f_index]) {
                     input.latch();
                     logMessage<T>(input.message(), description);
                 }
