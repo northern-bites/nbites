@@ -19,8 +19,8 @@ public class FlagPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private JRadioButton jrb[] = new JRadioButton[3];
 	private ButtonGroup bg;
-	private String flag_name;
-	private int index;
+	public String flag_name;
+	public int index;
 	
 	public FlagPanel(String name, int i) {
 		this.flag_name = name;

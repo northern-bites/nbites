@@ -210,16 +210,21 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 	public void notified(EVENT e, Object src, Object... args) {
 		switch (e) {
 		case REL_BOTSTAT:
-			RobotStats bs= (RobotStats) args[0];
+			RobotStats bs = (RobotStats) args[0];
+			
 			if (connected) {
-				for (int i = 0; i < flags.length; ++i) {
-					boolean val = bs.flags.bFlags[i + 2]; //2 for connection flags
-					
-					flags[i].setKnown(val);
+				for (FlagPanel fp : flags) {
+					String n = fp.flag_name;
+					Boolean b = bs.flags.flags.get(n);
+					if (b == null)
+						fp.setUnknown();
+					else 
+						fp.setKnown(b);
 				}
 			}
 			
 			break;
+			
 		case CNC_CONNECTION:
 			Boolean c = (Boolean) args[0];
 			

@@ -10,6 +10,9 @@
 #include <bn/i2c/i2c-dev.h>
 
 #include "Profiler.h"
+#include "../log/logging"
+using log::SExpr;
+#include <vector>
 
 #define V4L2_MT9M114_FADE_TO_BLACK (V4L2_CID_PRIVATE_BASE)
 
@@ -473,6 +476,21 @@ void TranscriberModule::run_()
     messages::YUVImage image = it.getNextImage();
     portals::Message<messages::YUVImage> imageOutMessage(&image);
     imageOut.setMessage(imageOutMessage);
+    
+    size_t im_size = (image.width() * image.height() * 1);
+    std::string im_buf( (char *) image.pixelAddress(0, 0), im_size);
+    std::string jo_buf;
+    jointsIn.message().SerializeToString(&jo_buf);
+    im_buf.append(jo_buf);
+    
+    std::vector<SExpr> image_c {
+        SExpr("type", "YUVImage"),
+        SExpr("time", time(NULL)),
+        SExpr("width", image.width() / 2);
+        SExpr("height", image.height());
+    };
+    
+    NBLog(NBL_IMAGE_BUFFER, "magic", time(NULL), {SExpr(image_c)}, im_buf);   //no data with it.
 }
 
 }

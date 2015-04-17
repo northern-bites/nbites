@@ -21,13 +21,14 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import nbtool.data.Log;
+import nbtool.data.SExpr;
 import nbtool.io.FileIO;
 import nbtool.util.U;
 
 public class DefaultView extends ViewParent implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private JLabel size;
-	private JTextField desc;
+	private JTextArea desc;
 	private JTextArea data;
 	private JButton save;
 	
@@ -58,10 +59,11 @@ public class DefaultView extends ViewParent implements ActionListener {
 	}
 	
 	private void useSize(Dimension s) {
+		int mw = 0;
 		int y_offset = 0;
 		Dimension d = desc.getPreferredSize();
-		desc.setBounds(0, 0, d.width, d.height);
-		y_offset += d.height;
+		desc.setBounds(0, 0, d.width + 50, d.height + 50);
+		y_offset += d.height + 50;
 		
 		d = size.getPreferredSize();
 		size.setBounds(0, y_offset, d.width, d.height);
@@ -83,8 +85,7 @@ public class DefaultView extends ViewParent implements ActionListener {
 		});
 		setLayout(null);
 		
-		desc = new JTextField("desc");
-		desc.addActionListener(this);
+		desc = new JTextArea("desc");
 		size = new JLabel("size");
 		
 		data = new JTextArea("data in hex");
@@ -103,15 +104,16 @@ public class DefaultView extends ViewParent implements ActionListener {
 			String newdesc = desc.getText();
 			
 			try {
-				Map<String, String> a = U.attributes(newdesc);
-
-				if (a == null || a.size() < 2) {
+				
+				SExpr s = SExpr.deserializeFrom(newdesc);
+				if (s == null || s.count() < 1) {
 					U.w("Cannot use new description: " + newdesc);
 					desc.setText(log.description);
 				} else {
-					log.dumpAttributes();
 					log.description = newdesc;
-				} 
+					log.tree = s;
+				}
+				
 			} catch(Exception ex) {
 				U.w("Cannot use new description: " + newdesc);
 				desc.setText(log.description);

@@ -1,14 +1,17 @@
 package nbtool.data;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import nbtool.util.U;
 
 public class RobotStats {
 	public RobotStats(Log log) throws IOException {
-		
+		SExpr fc = log.tree.find("contents").get(1).find("flags");
+		this.flags = new Flags(fc);
 	}
 	
 	public int NUM_LOG_BUFFERS;
@@ -76,12 +79,12 @@ public class RobotStats {
 	}
 
 	public class Flags {
-        
         public String toString() {
-        	String[] parts = new String[flag_names.length];
+        	String[] parts = new String[flags.size()];
         	
-        	for (int i = 0; i < parts.length; ++i) {
-        		parts[i] = String.format("%-20s %B\n", flag_names[i], bFlags[i]);
+        	int i = 0;
+        	for (Entry<String, Boolean> e : flags.entrySet()) {
+        		parts[i++] = String.format("%-20s %B\n", e.getKey(), e.getValue());
         	}
         	
         	String start = "\n\tFlags:\n";
@@ -94,21 +97,25 @@ public class RobotStats {
     		return buf.toString();
         }
         
-        public boolean[] bFlags;
+        public Map<String, Boolean> flags;
         
-        public Flags(DataInputStream dis) throws IOException {
-        	bFlags = new boolean[flag_names.length];
-        	for (int i = 0; i < bFlags.length; ++i) {
-        		bFlags[i] = (dis.readByte() != 0);
+        public Flags(SExpr fc) {
+        	flags = new HashMap<String, Boolean>();
+        	assert(!fc.isAtom() && fc.exists());
+        	
+        	//Skipping the flags atom, serv_con, and control_con
+        	for (int i = 3; i < fc.count(); ++i) {
+        		SExpr flag = fc.get(i);
+        		assert(!flag.isAtom() && flag.exists());
+        		assert(flag.count() == 2);
+        		
+        		String n = flag.get(0).value();
+        		int b = flag.get(1).valueAsInt();
+        		
+        		flags.put(n, b != 0);
         	}
         }
 	}
-	
-	public static final String[] flag_names = {"serv_connected",
-		"cnc_connected", "fileio", "servio", "STATS", "SENSORS",
-		"GUARDIAN", "COMM", "LOCATION", "ODOMETRY",
-		"OBSERVATIONS", "LOCALIZATION", "BALLTRACK",
-		"IMAGES", "VISION"};
 	
 	public String toString() {
 		String[] parts = new String[7 + (5 * NUM_LOG_BUFFERS)];

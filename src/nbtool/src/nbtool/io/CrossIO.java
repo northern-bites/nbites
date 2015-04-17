@@ -121,7 +121,8 @@ public class CrossIO implements Runnable {
 		U.w("CrossIO: getting function list.");
 		int nfuncs_1 = dis.readInt();
 		Log funcLog = CommonIO.readLog(dis);
-		int nfuncs_2 = Integer.parseInt(funcLog.getAttributes().get("fn"));
+		//int nfuncs_2 = //Integer.parseInt(funcLog.getAttributes().get("fn"));
+		int nfuncs_2 = -1;
 		
 		String funcstr = new String(funcLog.bytes);
 		String[] funcs = funcstr.split("\n");

@@ -127,10 +127,7 @@ namespace nblog {
                     }
                 }
                 
-                printf("looped\n");
-                
                 if (!ws) {
-                    printf("waiting...\n");
                     usleep(STREAM_USLEEP_WAITING);
                 }
             }

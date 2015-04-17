@@ -136,6 +136,8 @@ namespace nblog {
             
             //Log state.
             
+            SExpr type("type", "STATS");
+            
             std::vector<SExpr> fvector = {
                 SExpr("flags"),
                 SExpr("serv_connected", control::flags[control::serv_connected]),
@@ -152,17 +154,15 @@ namespace nblog {
                 SExpr("IMAGES", control::flags[control::IMAGES]),
                 SExpr("VISION", control::flags[control::VISION]),
             };
-            
             SExpr flags(fvector);
             
             //... all the other stats stuff...
             
-            std::vector<SExpr> cvector = { flags };
-            SExpr contents = SExpr(cvector);
-            
+            std::vector<SExpr> c1 = { type, flags };
+            SExpr contents = SExpr(c1);
             
             //printf("stats...\n");
-            NBLog(NBL_SMALL_BUFFER, "log_main", time(NULL), contents, std::string());   //no data with it.
+            NBLog(NBL_SMALL_BUFFER, "log_main", time(NULL), {contents}, std::string());   //no data with it.
         }
         
         return NULL;
@@ -324,7 +324,7 @@ namespace nblog {
         pthread_mutex_unlock(&(log_main.buffers[BI].lock));
     }
     
-    void NBLog(int BI, const std::string where_made, time_t when_made, log::SExpr& content_list, const std::string& data) {
+    void NBLog(int BI, const std::string where_made, time_t when_made, std::vector<log::SExpr> contents, const std::string& data) {
         
         time_t now = time(NULL);
         tm * ptm = localtime(&now);
@@ -338,12 +338,16 @@ namespace nblog {
             SExpr(time)
         };
         
+        std::vector<SExpr> cont_list;
+        cont_list.push_back(SExpr("contents"));
+        cont_list.insert(cont_list.end(), contents.begin(), contents.end());
+        
         std::vector<SExpr> top_list =  {
             SExpr("nblog"),
             SExpr(made_list),
             SExpr("version", LOG_VERSION),
             SExpr("checksum", checksum(data)),
-            SExpr("contents", content_list)
+            SExpr(cont_list)
         };
         
         SExpr desc(top_list);

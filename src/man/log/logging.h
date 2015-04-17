@@ -102,7 +102,7 @@ namespace nblog {
     
 
     void NBLog(int BI, log::SExpr& desc, const std::string& data);
-    void NBLog(int BI, const std::string where_made, time_t when_made, log::SExpr& content_list, const std::string& data);
+    void NBLog(int BI, const std::string where_made, time_t when_made, std::vector<log::SExpr> contents, const std::string& data);
     
     //init log_main thread
     void log_main_init();

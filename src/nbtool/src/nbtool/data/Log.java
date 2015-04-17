@@ -13,8 +13,11 @@ import nbtool.util.U;
 public class Log implements Serializable {
 	private static final long serialVersionUID = 5000703421741282261L;
 	
-	private static Long class_index = new Long(0);
 	
+	/*
+	 * Unique number for every log found during this execution.
+	 * */
+	private static Long class_index = new Long(0);
 	private static long getID() {
 		long ret;
 		synchronized(class_index) {
@@ -23,7 +26,6 @@ public class Log implements Serializable {
 		
 		return ret;
 	}
-	
 	public final long unique_id = getID();
 	
 	public String name; //File name, might be null
@@ -51,12 +53,8 @@ public class Log implements Serializable {
 		this.tree = SExpr.deserializeFrom(description);
 	}
 	
-	public void dumpAttributes() {
-		
-	}
-	
 	public void setNameFromDesc() {
-		this.name = String.format("type=%s_from=%s_time=%d_v=%d", type(), from(), time(), version());
+		this.name = String.format("made-%s_%s_type-%s_from-%s_v-%d", madeWhere(), madeWhen(), pType(), pFrom(), version());
 		this.name = this.name
 				.substring(Math.max(0, this.name.length() - 240)).replace('/', '-') + ".nblog";
 	}
@@ -69,51 +67,23 @@ public class Log implements Serializable {
 	public static enum SOURCE {
 		DERIVED, FILE, NETWORK
 	}
+	/* ALL ATTRIBUTES MUST BE OBJECTS SO THAT NULL CAN BE RETURNED IF THEY'RE NOT FOUND */
 	
 	/*
-	 * Some standard attributes parsed.
-	 * */
+	 * Attributes relating to the log whole
+	 */
 	
-	public String type() {
-		SExpr type = tree.find("contents").get(1).find("type").get(1);
-		if (type.exists() && type.isAtom())
-			return type.value();
+	public String madeWhere() {
+		SExpr where = tree.find("created").get(1);
+		if (where.exists() && where.isAtom())
+			return where.value();
 		else return null;
 	}
 	
-	public String from() {
-		SExpr from = tree.find("created").get(1);
-		if (from.exists() && from.isAtom())
-			return from.value();
-		else return null;
-	}
-	
-	public String encoding() {
-		return null;
-	}
-	
-	public Integer index() {
-		return 0;
-	}
-	
-	public Long time() {
-		return 0L;
-	}
-	
-	
-	public Integer height() {
-		SExpr height = tree.find("contents").get(1).find("height").get(1);
-		
-		if (height.exists() && height.isAtom())
-			return height.valueAsInt();
-		else return null;
-	}
-	
-	public Integer width() {
-		SExpr width = tree.find("contents").get(1).find("width").get(1);
-		
-		if (width.exists() && width.isAtom())
-			return width.valueAsInt();
+	public String madeWhen() {
+		SExpr when = tree.find("created").get(2);
+		if (when.exists() && when.isAtom())
+			return when.value();
 		else return null;
 	}
 	
@@ -131,7 +101,66 @@ public class Log implements Serializable {
 		else return null;
 	}
 	
-	public boolean isProtobuf() {
-		return type().startsWith(NBConstants.PROTOBUF_TYPE_PREFIX);
+	public int contentCount() {
+		SExpr v = tree.find("contents");
+		if (v.exists())
+			return v.count();
+		return -1;
+	}
+	
+	/*
+	 * Most logs have content count 1.  This returns attributes of the first content.
+	 * (the "primary" content)
+	 * */
+	
+	public int pBytes() {
+		SExpr c = tree.find("contents").get(1).find("bytes").get(1);
+		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
+	}
+	
+	public String pType() {
+		SExpr c = tree.find("contents").get(1).find("type").get(1);
+		return c.exists() && c.isAtom() ? c.value() : null;
+	}
+	
+	public String pFrom() {
+		SExpr c = tree.find("contents").get(1).find("from").get(1);
+		return c.exists() && c.isAtom() ? c.value() : null;
+	}
+	
+	public int pI_Index() {
+		SExpr c = tree.find("contents").get(1).find("i_index").get(1);
+		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
+	}
+	
+	public Long pTime() {
+		SExpr c = tree.find("contents").get(1).find("time").get(1);
+		return c.exists() && c.isAtom() ? c.valueAsLong() : null;
+	}
+	
+	public boolean pIsProtobuf() {
+		String t = pType();
+		if (t == null)
+			return false;
+		return t.startsWith(NBConstants.PROTOBUF_TYPE_PREFIX);
+	}
+	
+	/*
+	 * Attributes relating to possible image content.
+	 */
+	
+	public String pEncoding() {
+		SExpr c = tree.find("contents").get(1).find("encoding").get(1);
+		return c.exists() && c.isAtom() ? c.value() : null;
+	}
+	
+	public int pWidth() {
+		SExpr c = tree.find("contents").get(1).find("width").get(1);
+		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
+	}
+	
+	public int pHeight() {
+		SExpr c = tree.find("contents").get(1).find("height").get(1);
+		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
 	}
 }

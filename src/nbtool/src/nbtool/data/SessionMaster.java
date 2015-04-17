@@ -100,14 +100,13 @@ public class SessionMaster implements NListener {
 
 		Session destination = workingSession;
 
-
-
 		Log lbs = null;
 
 		for (Log l : logs) {
 			destination.addLog(l);
 
-			if (l.type().equals("stats"))
+			U.wf("ERROR: Still using that flags hack in SessionMaster!\n");
+			if (l.tree.find("contents").get(1).find("flags").exists())
 				lbs = l;
 		}
 

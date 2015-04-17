@@ -51,34 +51,6 @@ public class U {
 		System.out.printf(f, a);
 	}
 	
-	public static Map<String, String> attributes(String desc) {
-		if (desc.trim().isEmpty()) return null;
-		HashMap<String, String> map = new HashMap<String, String>();
-		
-		String[] attrs = desc.trim().split(" ");
-		for (String a : attrs) {
-			if (a.trim().isEmpty()) continue;
-			
-			String[] parts = a.split("=");
-			if (parts.length != 2)
-				return null;	//Don't attempt to reconstruct malformed descriptions.
-			
-			String type = parts[0].trim();
-			if (type.isEmpty())
-				return null;	//empty key is an error.  Empty value is NOT error, though parsing it may throw one later.
-			
-			if (map.containsKey(type)) {
-				U.wf("ERROR: description\n\t%s\ncontains multiple key: %s\n", desc, type);
-				return null;
-			}
-			
-			map.put(type, parts[1]);
-		}
-		
-		if (map.size() > 0) return map; //If description contains no k/v pairs, explicitly indicate that with null return.
-		else return null;
-	}
-	
 	public static byte[] subArray(byte[] ar, int start, int len) {
 		byte[] ret = new byte[len];
 		
@@ -89,10 +61,10 @@ public class U {
 	
 	//Almost all image logs will have null or [Y8(U8/V8)] encoding, but this method should be extended if that changes.
 	public static BufferedImage biFromLog(Log log) {
-		assert(log.type().equalsIgnoreCase(NBConstants.IMAGE_S));
-		int width = log.width();
-		int height = log.height();
-		String encoding = log.encoding();
+		assert(log.pType().equalsIgnoreCase(NBConstants.IMAGE_S));
+		int width = log.pWidth();
+		int height = log.pHeight();
+		String encoding = log.pEncoding();
 		
 		ImageParent ip = null;
 		if (encoding == null ) {

@@ -282,7 +282,7 @@ public class StatusPanel extends JPanel implements NListener{
 		case LOG_FOUND:
 			for (Object o : args) {
 				Log l = (Log) o;
-				types.add(l.type());
+				types.add(l.pType());
 				
 				set();
 			}

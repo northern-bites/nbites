@@ -200,6 +200,7 @@ namespace man {
          */
         printf("nblog::log_main_init()\n");
         nblog::log_main_init();
+        control::control_init();
         
         /*
          SPECIFIC MODULE LOGGING

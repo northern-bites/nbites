@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import nbtool.util.U;
+
 /*
  * The general contract is that read operations such as get and find will succeed, but the result may not exist.
  * 
@@ -44,7 +46,7 @@ public abstract class SExpr implements Serializable{
 	        ++p.val;
 	      
 	      if (p.val >= s.length())
-	        return null;
+	        return NOT_FOUND;
 
 	      int q;
 	      SExpr se;
@@ -61,7 +63,7 @@ public abstract class SExpr implements Serializable{
 	            q = s.indexOf('"', ++p.val);
 	            if (q < 0)
 	              q = s.length();
-	            name += s.substring(p.val, q - p.val);
+	            name += s.substring(p.val, q);
 	            if (q < s.length())
 	              ++q;
 	            p.val = q;
@@ -94,7 +96,7 @@ public abstract class SExpr implements Serializable{
 	          q = indexOfFirstFrom(SPECIAL, s, p.val);
 	          if (q < 0)
 	            q = s.length();
-	          se = SExpr.newAtom(s.substring(p.val, q - p.val));
+	          se = SExpr.newAtom(s.substring(p.val, q));
 	          p.val = q;
 	          return se;
 	      }
@@ -346,5 +348,16 @@ public abstract class SExpr implements Serializable{
 		MutRef() {
 			val = 0;
 		}
+	}
+	
+	
+	public static void main(String[] args) {
+		String ser = "(the list goes (on and on and \"what?()\" ()))";
+		
+		SExpr s = SExpr.deserializeFrom(ser);
+		
+		U.w("done...");
+		
+		U.wf("%s\n",s.print());
 	}
 }

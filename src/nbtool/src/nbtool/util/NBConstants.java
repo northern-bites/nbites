@@ -71,20 +71,17 @@ public class NBConstants {
 	private static ArrayList<FlagPair> _setupFlags() {
 		ArrayList<FlagPair> ret = new ArrayList<FlagPair>();
 		ret.add(new FlagPair("fileio      ", 2));
-		ret.add(new FlagPair("servio      ", 3));
-		
-		ret.add(new FlagPair("STATS       ", 4));
-		
-		ret.add(new FlagPair("SENSORS     ", 5));
-		ret.add(new FlagPair("GUARDIAN    ", 6));
-		ret.add(new FlagPair("COMM        ", 7));
-		ret.add(new FlagPair("LOCATION    ", 8));
-		ret.add(new FlagPair("ODOMETRY    ", 9));
-		ret.add(new FlagPair("OBSERVATIONS", 10));
-		ret.add(new FlagPair("LOCALIZATION", 11));
-		ret.add(new FlagPair("BALLTRACK   ", 12));
-		ret.add(new FlagPair("IMAGES      ", 13));
-		ret.add(new FlagPair("VISION      ", 14));
+				
+		ret.add(new FlagPair("SENSORS     ", 3));
+		ret.add(new FlagPair("GUARDIAN    ", 4));
+		ret.add(new FlagPair("COMM        ", 5));
+		ret.add(new FlagPair("LOCATION    ", 6));
+		ret.add(new FlagPair("ODOMETRY    ", 7));
+		ret.add(new FlagPair("OBSERVATIONS", 8));
+		ret.add(new FlagPair("LOCALIZATION", 9));
+		ret.add(new FlagPair("BALLTRACK   ", 10));
+		ret.add(new FlagPair("IMAGES      ", 11));
+		ret.add(new FlagPair("VISION      ", 12));
 		return ret;
 	}
 	

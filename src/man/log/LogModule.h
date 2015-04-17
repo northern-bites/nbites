@@ -14,7 +14,7 @@
 #include <unistd.h>
 
 #include "logging.h"
-#include "log_sf.h"
+#include "Log.h"
 
 namespace man {
     namespace log {
@@ -42,9 +42,11 @@ namespace man {
             std::string buffer;
             msg.SerializeToString(&buffer);
             
-            nblog::NBlog(NBL_SMALL_BUFFER, 0, clock(), description.c_str(), buffer.length(), (uint8_t *) buffer.data());
+            /*
+            nblog::NBlog(NBL_SMALL_BUFFER, 0, clock(), description.c_str(), buffer.length(), (uint8_t *) buffer.data()); */
             //printf("[%i]", buffer.length());
         }
+        
         template<> inline void logMessage<messages::YUVImage>(messages::YUVImage msg, std::string description) {
             
             size_t bytes = (msg.width() * msg.height() * 1);
@@ -52,7 +54,8 @@ namespace man {
             char buf[1000];
             snprintf(buf, 1000, "%s width=%i height=%i encoding=[Y8(U8/V8)]", description.c_str(), msg.width()/2, msg.height());
             
-            nblog::NBlog(NBL_IMAGE_BUFFER, 0, clock(), buf, bytes, (uint8_t *) msg.pixelAddress(0, 0));
+            /*
+            nblog::NBlog(NBL_IMAGE_BUFFER, 0, clock(), buf, bytes, (uint8_t *) msg.pixelAddress(0, 0)); */
             
             //printf("[i%i]", bytes);
 
