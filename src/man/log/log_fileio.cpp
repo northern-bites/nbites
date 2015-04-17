@@ -7,7 +7,7 @@
 
 #include "logging.h"
 #include "nbdebug.h"
-#include "control.h"
+#include "../control/control.h"
 
 #include <string>
 #include <algorithm>

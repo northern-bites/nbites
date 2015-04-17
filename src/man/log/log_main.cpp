@@ -6,7 +6,7 @@
 //
 
 #include "logging.h"
-#include "control.h"
+#include "../control/control.h"
 #include "nbdebug.h"
 
 #include <string.h>
