@@ -486,8 +486,8 @@ void TranscriberModule::run_()
     std::vector<SExpr> image_c {
         SExpr("type", "YUVImage"),
         SExpr("time", time(NULL)),
-        SExpr("width", image.width() / 2);
-        SExpr("height", image.height());
+        SExpr("width", image.width() / 2),
+        SExpr("height", image.height()),
     };
     
     NBLog(NBL_IMAGE_BUFFER, "magic", time(NULL), {SExpr(image_c)}, im_buf);   //no data with it.
