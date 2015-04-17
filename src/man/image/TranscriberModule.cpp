@@ -11,7 +11,7 @@
 
 #include "Profiler.h"
 #include "../log/logging.h"
-using log::SExpr;
+using logshare::SExpr;
 #include <vector>
 
 #define V4L2_MT9M114_FADE_TO_BLACK (V4L2_CID_PRIVATE_BASE)
