@@ -21,7 +21,6 @@ import nbtool.images.UV88image;
 import nbtool.images.Y16image;
 import nbtool.images.Y8image;
 import nbtool.images.YUYV8888image;
-import nbtool.images.BallImage;
 
 public class U {
 	
@@ -102,15 +101,6 @@ public class U {
 			ip = new UV88image(width , height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[Y8]")) {
 			ip = new Y8image(width , height, log.bytes);
-		} else if (encoding.equalsIgnoreCase("[Ball]")) {
-			Map<String, String> dict = log.getAttributes();
-			Vector<String> ballLocs = new Vector<String>();
-			for (int numBalls=0; ; numBalls++) {
-			    String location = dict.get("ball"+numBalls);
-			    if(location == null) break;
-			    ballLocs.add(location);
-			}
-			ip = new BallImage(width, height, log.bytes, ballLocs);
 		} else {
 			U.w("WARNING:  Cannot use image with encoding:" + encoding);
 			return null;

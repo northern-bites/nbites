@@ -12,6 +12,7 @@ ADD_DEFINITIONS( -mmmx )
 SET( VISION_SRCS
   Blob.cpp
   BallDetector.cpp
+  Ball.cpp
   PostDetector.cpp
   DiffOfGaussianFilter.cpp
   EdgeDetector.cpp
@@ -23,6 +24,7 @@ SET( VISION_HEADERS
   Blobber.h
   FuzzyLogic.h
   BallDetector.h
+  Ball.h
   PostDetector.h
   DiffOfGaussianFilter.h
   EdgeDetector.h

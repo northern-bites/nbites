@@ -48,8 +48,8 @@ public class DefaultView extends ViewParent implements ActionListener {
 				checksum += (b & 0xFF); //NEED AND.  Forces java to treat the byte as an UNSIGNED value.
 			
 			if (recv_checksum != checksum) {
-				JOptionPane.showMessageDialog(null, "log checksum did not match, expected "
-						+ recv_checksum + " but calculated " + checksum + ".");
+			    //JOptionPane.showMessageDialog(null, "log checksum did not match, expected "
+			    //+ recv_checksum + " but calculated " + checksum + ".");
 			}
 		}
 		

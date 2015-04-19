@@ -1,14 +1,10 @@
 #pragma once
 
 #include <vector>
+#include "structs.h"
 
 namespace man {
 namespace vision {
-
-struct point {
-    double x;
-    double y;
-};
 
 class Blob {
 public:
