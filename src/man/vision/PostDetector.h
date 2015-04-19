@@ -5,13 +5,14 @@
 
 #include "Images.h"
 #include "FuzzyLogic.h"
+#include "Gradient.h"
 
 namespace man {
 namespace vision {
 
 class PostDetector {
 public:
-    PostDetector(const messages::PackedImage16& yImage, 
+    PostDetector(const Gradient& gradient,
                  const messages::PackedImage8& whiteImage);
     ~PostDetector();
 
@@ -22,11 +23,11 @@ public:
     const std::vector<int>& getCandidates() const { return candidates; }
 
 private:
-    void buildPostImage(const messages::PackedImage16& yImage, 
+    void buildPostImage(const Gradient& gradient,
                         const messages::PackedImage8& whiteImage);
-    Fool calculateGradScore(uint16_t* pt, int rowPitch, int pixelPitch);
-    void buildHistogram();
+    inline Fool calculateGradScore(int16_t gradX, int16_t gradY) const;
     void applyMathMorphology();
+    void buildHistogram();
     void filterHistogram();
     void convolve(double const* in, double const* kernel, int klength, double* out);
     void findPeaks();

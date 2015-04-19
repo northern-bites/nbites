@@ -5,15 +5,17 @@
 PROJECT( VISION )
 CMAKE_MINIMUM_REQUIRED( VERSION 2.8.3 )
 
+ADD_DEFINITIONS( -mmmx )
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
-
 SET( VISION_SRCS
   Blob.cpp
   BallDetector.cpp
   PostDetector.cpp
   DiffOfGaussianFilter.cpp
+  EdgeDetector.cpp
+  Gradient.cpp
   )
 
 SET( VISION_HEADERS
@@ -23,7 +25,18 @@ SET( VISION_HEADERS
   BallDetector.h
   PostDetector.h
   DiffOfGaussianFilter.h
+  EdgeDetector.h
+  Gradient.h
 )
+
+# Add the assembly files if we're not on Mac OSX
+IF (UNIX AND NOT APPLE)
+  SET( ASM_SRCS
+    EdgeDetection.s
+    )
+  LIST( APPEND VISION_SRCS ${ASM_SRCS})
+  SET_PROPERTY(SOURCE ${ASM_SRCS} PROPERTY LANGUAGE C)
+ENDIF()
 
 # Add static library target
 ADD_LIBRARY(

@@ -16,6 +16,8 @@
 #include "vision/Blob.h"
 #include "vision/BallDetector.h"
 #include "vision/PostDetector.h"
+#include "vision/Gradient.h"
+#include "vision/EdgeDetector.h"
 #include "RoboGrams.h"
 
 std::vector<nbfunc_t> FUNCS;
@@ -267,14 +269,19 @@ int PostDetector_func() {
     const messages::PackedImage16* yImage = imageConverter.yImage.getMessage(true).get();
     const messages::PackedImage8* whiteImage = imageConverter.whiteImage.getMessage(true).get();
 
-    man::vision::PostDetector detector(*yImage, *whiteImage);
-    const std::vector<int>& posts = detector.getCandidates();
-    printf("Found %d candidate posts.\n", posts.size());
+    man::vision::Gradient* gradient = new man::vision::Gradient();
 
+    man::vision::EdgeDetector edgeDetector;
+    edgeDetector.sobelOperator(0, yImage->pixelAddress(0, 0), *gradient);
+
+    man::vision::PostDetector detector(*gradient, *whiteImage);
+    const std::vector<int>& posts = detector.getCandidates();
+
+    printf("Found %d candidate posts.\n", posts.size());
     for(int i = 0; i < posts.size(); i++)
         printf("Found post at %d column.\n", posts[i]);
 
-    const messages::PackedImage8& postImage(detector.getPostImage());
+    const messages::PackedImage8& postImage = detector.getPostImage();
     logio::log_t postImageRet;
 
     std::string postImageDesc = "type=YUVImage encoding=[Y8] width=";
@@ -332,6 +339,8 @@ int PostDetector_func() {
     }
 
     rets.push_back(postsRet);
+
+    delete gradient;
 }
 
 void register_funcs() {
