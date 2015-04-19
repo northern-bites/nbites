@@ -25,7 +25,7 @@ public:
 private:
     void buildPostImage(const Gradient& gradient,
                         const messages::PackedImage8& whiteImage);
-    inline Fool calculateGradScore(int16_t gradX, int16_t gradY) const;
+    inline Fool calculateGradScore(int16_t magnitude, int16_t gradX, int16_t gradY) const;
     void applyMathMorphology();
     void buildHistogram();
     void filterHistogram();

@@ -46,7 +46,7 @@ void PostDetector::buildPostImage(const Gradient& gradient,
         unsigned char* whiteRow = whiteImage.pixelAddress(1, y);
         unsigned char* postRow = postImage.pixelAddress(0, y-1);
         for (int x = 1; x < wd-1; x++) {
-            Fool gradScore(calculateGradScore(gradient.getX(y, x), gradient.getY(y, x)));
+            Fool gradScore(calculateGradScore(gradient.getMagnitude(y, x), gradient.getX(y, x), gradient.getY(y, x)));
             Fool whiteScore(static_cast<double>(*whiteRow) / 255);
             *postRow = static_cast<unsigned char>(255*(gradScore & whiteScore).get());
 
@@ -56,36 +56,34 @@ void PostDetector::buildPostImage(const Gradient& gradient,
     }
 }
 
-inline Fool PostDetector::calculateGradScore(int16_t gradX, int16_t gradY) const {
+inline Fool PostDetector::calculateGradScore(int16_t magnitude, int16_t gradX, int16_t gradY) const {
+    double magn = static_cast<double>(magnitude);
     double x = static_cast<double>(gradX);
     double y = static_cast<double>(gradY);
     double cosSquaredAngle = x*x / (x*x + y*y);
 
-    // TODO check magnitude of gradient vector
-    return Fool(cosSquaredAngle);
+    // TODO throw away low magn vectors?
+    // FuzzyThreshold sigmaMagnHigh(80, 100);
+    // Fool magnHighScore(magn < sigmaMagnHigh);
+
+    Fool angleScore(cosSquaredAngle);
+
+    return angleScore;
 }
 
 void PostDetector::applyMathMorphology()
 {
-    // TODO more cache efficient structuring element
-    std::pair<int, int> se[7];
+    // TODO more cache efficient structuring element?
+    std::pair<int, int> se[3];
     se[0].first = 0;
     se[0].second = 0;
     se[1].first = 0;
     se[1].second = 1;
     se[2].first = 0;
     se[2].second = -1;
-    se[3].first = 0;
-    se[3].second = -2;
-    se[4].first = 0;
-    se[4].second = 2;
-    se[5].first = -1;
-    se[5].second = 0;
-    se[6].first = 1;
-    se[6].second = 0;
 
     messages::PackedImage<unsigned char> postMorph;
-    MathMorphology<unsigned char> morph(5, se);
+    MathMorphology<unsigned char> morph(3, se);
     morph.opening(postImage, postMorph);
     postImage = postMorph;
 }
