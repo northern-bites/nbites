@@ -18,6 +18,7 @@ SET( VISION_SRCS
   DiffOfGaussianFilter.cpp
   EdgeDetector.cpp
   Gradient.cpp
+  HighResTimer.cpp
   )
 
 SET( VISION_HEADERS
@@ -31,6 +32,7 @@ SET( VISION_HEADERS
   DiffOfGaussianFilter.h
   EdgeDetector.h
   Gradient.h
+  HighResTimer.h
 )
 
 # Add the assembly files if we're not on Mac OSX

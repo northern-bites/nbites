@@ -1,8 +1,10 @@
 #include "VisionModule.h"
 
 #include <iostream>
+#include <chrono>
 
 #include "Profiler.h"
+#include "HighResTimer.h"
 #include "BallDetector.h"
 #include "EdgeDetector.h"
 #include "PostDetector.h"
@@ -47,17 +49,27 @@ void VisionModule::run_()
 
     PROF_ENTER(P_VISION);
 
+    HighResTimer timer("Top ball");
+   
     BallDetector topBallDetector(&topOrangeImage.message());
     topBallDetector.findBalls();
 
+    timer.end("Bottom ball");
+
     BallDetector bottomBallDetector(&bottomOrangeImage.message());
     bottomBallDetector.findBalls();
+
+    timer.end("Gradient");
 
     gradient->reset();
     EdgeDetector edgeDetector;
     edgeDetector.sobelOperator(0, topYImage.message().pixelAddress(0, 0), *gradient);
 
+    timer.end("Post");
+
     PostDetector postDetector(*gradient, topWhiteImage.message());
+
+    timer.lap();
 
     PROF_EXIT(P_VISION);
 }

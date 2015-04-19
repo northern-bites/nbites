@@ -6,6 +6,7 @@
 
 #include "MathMorphology.h"
 #include "DiffOfGaussianFilter.h"
+#include "HighResTimer.h"
 
 namespace man {
 namespace vision {
@@ -23,11 +24,17 @@ PostDetector::PostDetector(const Gradient& gradient,
     memset(unfilteredHistogram, 0, wd*sizeof(double));
     memset(filteredHistogram, 0, wd*sizeof(double));
 
+    HighResTimer timer("Post image");
     buildPostImage(gradient, whiteImage);
+    timer.end("Morphology");
     applyMathMorphology();
+    timer.end("Histogram");
     buildHistogram();
+    timer.end("Filtering");
     filterHistogram();
+    timer.end("Peaks");
     findPeaks();
+    timer.lap();
 }
 
 PostDetector::~PostDetector()
