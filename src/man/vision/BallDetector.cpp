@@ -55,6 +55,7 @@ Ball BallDetector::makeBall(Blob b, bool occluded) {
 
     double circleFit = ((double)fit.second) / b.getPerimeter();
 
+    // TODO, this needs to be better
     if (occluded) {
         aspectRatio *= 1.5;
         circleFit *= 1.5;
@@ -83,10 +84,10 @@ std::pair<Circle, int> BallDetector::fitCircle(Blob b)
 
     std::vector<point> perimeter = b.getPerimeterPoints();
     int numEdge = perimeter.size();
-    std::cout << numEdge << " total edges" << std::endl;
+
     // Maybe right here we should do a least-squares on the points
     // It might give us an idea of how many outliers there are and
-    // how many times we need to run ransac.
+    // how many iterations we need to run RANSAC for?
 
     int delta = 2;
     std::vector<point> inliers = rateCircle(best, perimeter, delta);
@@ -94,6 +95,7 @@ std::pair<Circle, int> BallDetector::fitCircle(Blob b)
 
     // seed rand with current time
     srand(time(NULL));
+
     // TODO: this needs to be better!!!!
     for (int i=0; i<numEdge / 2; i++) {
         point one = perimeter.at(rand()%numEdge);
@@ -104,7 +106,6 @@ std::pair<Circle, int> BallDetector::fitCircle(Blob b)
         std::vector<point> tmp = rateCircle(candidate, perimeter, delta);
         int rating = tmp.size();
         if (rating > bestRating) {
-            //std::cout << "Rating changed from " << bestRating << " to " << rating << std::endl;
             best = candidate;
             bestRating = rating;
             inliers = tmp;
@@ -120,6 +121,8 @@ std::pair<Circle, int> BallDetector::fitCircle(Blob b)
     return ret;
 }
 
+// Returns the points which were in agreement with the given circle,
+// returned points should be used in least-squares (assume they're inliers)
 std::vector<point> BallDetector::rateCircle(Circle c, std::vector<point> p, int delta)
 {
     int count = 0;
@@ -189,7 +192,6 @@ Circle BallDetector::leastSquares(std::vector<point>& points)
         point p = points[i];
         mx += p.x;
         my += p.y;
-        //std::cout << mx << std::endl;
     }
     mx = mx / n;
     my = my / n;
@@ -214,9 +216,6 @@ Circle BallDetector::leastSquares(std::vector<point>& points)
         suvv += u*v*v;
         svuu += v*u*u;
     }
-    // std::cout << n << " " << mx << " " << my << std::endl;
-    // std::cout << suu << " " << suv << " " << svv << std::endl;
-    // std::cout << suuu << " " << svvv << " " << suvv << " " << svuu << std::endl;
 
     double detBase = suu*svv - suv*suv;
     double ca = .5 * (suuu + suvv);
@@ -231,7 +230,6 @@ Circle BallDetector::leastSquares(std::vector<point>& points)
     point c = {xc, yc};
     Circle ret = {c, r};
     return ret;
-    std::cout << "LEAST SQUARES: (" << xc << ", " << yc << ") " << r << std::endl;
 }
 
 

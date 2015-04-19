@@ -66,53 +66,6 @@ int CrossBright_func() {
     return 0;
 }
 
-int BlobTest_func() {
-    assert(args.size() == 1);
-    printf("BlobTest_func()\n");
-
-    const logio::log_t log = args[0];
-
-    // Hardcoded for now. TODO
-    int width = 640;
-    int height = 480;
-
-    messages::YUVImage image(log.data, width, height, width);
-    portals::Message<messages::YUVImage> message(&image);
-    man::image::ImageConverterModule module;
-
-    module.imageIn.setMessage(message);
-    module.run();
-
-    const messages::PackedImage8* orangeImage = module.orangeImage.getMessage(true).get();
-
-    man::vision::Blobber<uint8_t> b(orangeImage->pixelAddress(0, 0), orangeImage->width(),
-                                    orangeImage->height(), 1, orangeImage->width());
-
-    b.run(man::vision::NeighborRule::eight, 90, 100, 100, 100);
-
-    logio::log_t ret1;
-
-    std::string name = "type=YUVImage encoding=[Y16] width=320 height=240";
-
-    ret1.desc = (char*)malloc(name.size() + 1);
-    memcpy(ret1.desc, name.c_str(), name.size() + 1);
-
-    ret1.dlen = 320 * 240 * sizeof(short unsigned int);
-    ret1.data = (uint8_t*)malloc(640*480* sizeof(short unsigned int));
-    memcpy(ret1.data, b.getImage(), ret1.dlen);
-
-    std::vector<man::vision::Blob> results = b.getResult();
-
-    for(int i=0; i<results.size(); i++){
-        man::vision::Blob found = results.at(i);
-        printf("Blob of size:%f, centered at:(%f, %f), with lengths: %f, %f\n",
-               found.area(), found.xCenter(), found.yCenter(),
-               found.principalLength1(), found.principalLength2());
-    }
-
-    rets.push_back(ret1);
-}
-
 int BallImage_func() {
     assert(args.size() == 1);
     printf("BallImage_func()\n");
@@ -287,13 +240,6 @@ void register_funcs() {
     CrossBright.args = {sYUVImage};
     CrossBright.func = CrossBright_func;
     FUNCS.push_back(CrossBright);
-
-    //BlobTest
-    nbfunc_t BlobTest;
-    BlobTest.name = "BlobTest";
-    BlobTest.args = {sYUVImage};
-    BlobTest.func = BlobTest_func;
-    FUNCS.push_back(BlobTest);
 
     //BallImage
     nbfunc_t BallImage;

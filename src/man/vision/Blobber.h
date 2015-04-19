@@ -25,8 +25,6 @@ public:
     void run(NeighborRule rule, double lowThreshold,
              double highThreshold, double minArea, double walkThresh);
     std::vector<Blob>& getResult() { return results; }
-    //TODO get rid of this
-    uint16_t* getImage() { return blobImage; }
 
 private:
     void initializeMark();
@@ -58,8 +56,6 @@ private:
     // 0 is unexplored, 1 is explored non-blob, all else is part of blob
     uint8_t *mark;
 
-    uint16_t *blobImage;
-
     // TODO stop using stl::list
     // TODO stop using stl::vector
     std::list<T const *> list;
@@ -82,8 +78,6 @@ Blobber<T>::Blobber(T const *pixels_, int width_, int height_,
 {
     mark = new uint8_t[(width + 2)*(height + 2)];
 
-    blobImage = new uint16_t[(width)*(height)];
-
     table[0] = -pixelPitch;
     table[1] = pixelPitch;
     table[2] = -rowPitch;
@@ -98,7 +92,6 @@ template <typename T>
 Blobber<T>::~Blobber()
 {
     delete[] mark;
-    delete[] blobImage;
 }
 
 template <typename T>
@@ -112,7 +105,6 @@ void Blobber<T>::initializeMark()
             }
             else {
                 mark[i*(width+2) + j] = 0;
-                blobImage[(i-1)*(width) + j - 1] = 0;
             }
         }
     }
@@ -187,8 +179,6 @@ inline void Blobber<T>::explore(Blob &blob, T const *p, uint8_t *m,
             int y = calculateYIndex(p);
             int x = calculateXIndex(p);
 
-            // TODO! get rid of this!
-            blobImage[x + width*y] = 1000;
             blob.add(w, static_cast<double>(x), static_cast<double>(y));
             list.push_front(p);
         }
@@ -209,12 +199,6 @@ void Blobber<T>::walkPerimeter(int x, int y, Blob* b)
         b->addPerimeter(currentX, currentY);
         dir = nextDirection(currentX, currentY, dir);
 
-
-        if(currentY < height)
-        {
-            blobImage[currentX + width*currentY] = 500;
-        }
-
         switch(dir)
         {
         case N:
@@ -230,8 +214,9 @@ void Blobber<T>::walkPerimeter(int x, int y, Blob* b)
             currentX -= 1;
             break;
         default:
-            std::cout << "BAD THINGS!! :O" << std::endl;
+            std::cout << "BUG IN PERIMETER WALKING" << std::endl;
             b->clearPerimeter();
+            return;
         }
     } while(currentX != startX || currentY != startY);
 
@@ -255,7 +240,7 @@ int Blobber<T>::nextDirection(int x, int y, int prevDir)
     int state = neighborhoodState(x, y);
 
     switch(state){
-    case 0: std::cout << "State was 0\n";
+    case 0:
         return -1;
     case 1: return W;
     case 2: return N;
@@ -265,21 +250,19 @@ int Blobber<T>::nextDirection(int x, int y, int prevDir)
     case 6:
         if(prevDir == E) return N;
         if(prevDir == W) return S;
-        std::cout << "State was 6\n";
         return -1;
     case 7: return S;
     case 8: return E;
     case 9:
         if(prevDir == S) return E;
         if(prevDir == N) return W;
-        std::cout << "State was 9\n";
         return -1;
     case 10: return N;
     case 11: return W;
     case 12: return E;
     case 13: return E;
     case 14: return N;
-    default: std::cout << "State was too BIG\n";
+    default:
         return -1;
     }
 }
