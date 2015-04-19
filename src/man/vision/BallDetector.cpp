@@ -34,7 +34,7 @@ std::vector<Ball>& BallDetector::findBalls() {
     }
 
     if (balls.size() == 0) {
-        std::cout << "Didn't find any balls.. Let's lower our standards" << std::endl;
+        // std::cout << "Didn't find any balls.. Let's lower our standards" << std::endl;
         for(std::vector<Blob>::iterator i=blobs.begin(); i!=blobs.end(); i++) {
             Ball b = makeBall(*i, true);
             if (sanityCheck(b)) {
@@ -67,9 +67,9 @@ Ball BallDetector::makeBall(Blob b, bool occluded) {
 
     Ball ball(fit.first, rating, dist, b);
 
-    std::cout << "BallDetector rated blob as: " << rating << std::endl;
-    std::cout << "\tBecause aspectRatio: " << aspectRatio << " fit: " << circleFit
-              << " density: " << b.density() << std::endl;
+    // std::cout << "BallDetector rated blob as: " << rating << std::endl;
+    // std::cout << "\tBecause aspectRatio: " << aspectRatio << " fit: " << circleFit
+    //           << " density: " << b.density() << std::endl;
 
     // TODO: put distance estimations in here
 
@@ -113,7 +113,7 @@ std::pair<Circle, int> BallDetector::fitCircle(Blob b)
     }
     Circle ls = leastSquares(inliers);
     std::vector<point> lsResult = rateCircle(ls, perimeter, delta);
-    std::cout << "RANSAC found: " << bestRating << " While LS found: " << lsResult.size() << std::endl;
+    // std::cout << "RANSAC found: " << bestRating << " While LS found: " << lsResult.size() << std::endl;
 
     std::pair<Circle, int> ret;
     ret.first = ls;

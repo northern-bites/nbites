@@ -24,7 +24,7 @@ PostDetector::PostDetector(const Gradient& gradient,
     memset(filteredHistogram, 0, wd*sizeof(double));
 
     buildPostImage(gradient, whiteImage);
-    applyMathMorphology();
+    // applyMathMorphology();
     buildHistogram();
     filterHistogram();
     findPeaks();

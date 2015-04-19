@@ -43,59 +43,57 @@ void EdgeDetector::sobelOperator(int upperBound,
                                  Gradient& gradient)
 {
 
-#ifdef USE_MMX
-    std::cout << "ASSEMBLY" << std::endl;
+// #ifdef USE_MMX
     _sobel_operator(upperBound, threshold,
                     &channel[0], &gradient.values[0][0]);
-#else
-    std::cout << "C++" << std::endl;
-    for (int i=1+upperBound; i < Gradient::rows-1; ++i){
-        for (int j=1; j < Gradient::cols-1; ++j) {
-
-            int xGrad = (
-                // Column j+1
-                (channel[(i-1) * IMAGE_WIDTH + (j+1)] +
-                 2 * channel[(i) * IMAGE_WIDTH + (j+1)] +
-                 channel[(i+1) * IMAGE_WIDTH + (j+1)]) -
-                // Column j-1
-                (channel[(i-1) * IMAGE_WIDTH + (j-1)] +
-                 2 * channel[(i) * IMAGE_WIDTH + (j-1)] +
-                 channel[(i+1) * IMAGE_WIDTH + (j-1)]));
-
-            int yGrad = (
-                // Row i+1
-                (channel[(i+1) * IMAGE_WIDTH + (j-1)] +
-                 2 * channel[(i+1) * IMAGE_WIDTH + (j)] +
-                 channel[(i+1) * IMAGE_WIDTH + (j+1)]) -
-                // Row i -1
-                (channel[(i-1) * IMAGE_WIDTH + (j-1)] +
-                 2 * channel[(i-1) * IMAGE_WIDTH + (j)] +
-                 channel[(i-1) * IMAGE_WIDTH + (j+1)])
-                );
-
-            xGrad = -xGrad;
-            yGrad = -yGrad;
-
-            gradient.setX(static_cast<int16_t>(xGrad), i, j);
-            gradient.setY(static_cast<int16_t>(yGrad), i, j);
-
-            xGrad = xGrad << 3;
-            yGrad = yGrad << 3;
-
-            xGrad = xGrad * xGrad;
-            yGrad = yGrad * yGrad;
-
-            xGrad = xGrad >> 16;
-            yGrad = yGrad >> 16;
-
-            int mag = xGrad + yGrad;
-
-            // All non above threshold points are zero
-            mag = max(0, mag-((threshold*threshold) >> 10));
-            gradient.setMagnitude(static_cast<uint16_t>(mag), i, j);
-        }
-    }
-#endif /* USE_MMX */
+// #else
+//     for (int i=1+upperBound; i < Gradient::rows-1; ++i){
+//         for (int j=1; j < Gradient::cols-1; ++j) {
+// 
+//             int xGrad = (
+//                 // Column j+1
+//                 (channel[(i-1) * IMAGE_WIDTH + (j+1)] +
+//                  2 * channel[(i) * IMAGE_WIDTH + (j+1)] +
+//                  channel[(i+1) * IMAGE_WIDTH + (j+1)]) -
+//                 // Column j-1
+//                 (channel[(i-1) * IMAGE_WIDTH + (j-1)] +
+//                  2 * channel[(i) * IMAGE_WIDTH + (j-1)] +
+//                  channel[(i+1) * IMAGE_WIDTH + (j-1)]));
+// 
+//             int yGrad = (
+//                 // Row i+1
+//                 (channel[(i+1) * IMAGE_WIDTH + (j-1)] +
+//                  2 * channel[(i+1) * IMAGE_WIDTH + (j)] +
+//                  channel[(i+1) * IMAGE_WIDTH + (j+1)]) -
+//                 // Row i -1
+//                 (channel[(i-1) * IMAGE_WIDTH + (j-1)] +
+//                  2 * channel[(i-1) * IMAGE_WIDTH + (j)] +
+//                  channel[(i-1) * IMAGE_WIDTH + (j+1)])
+//                 );
+// 
+//             xGrad = -xGrad;
+//             yGrad = -yGrad;
+// 
+//             gradient.setX(static_cast<int16_t>(xGrad), i, j);
+//             gradient.setY(static_cast<int16_t>(yGrad), i, j);
+// 
+//             xGrad = xGrad << 3;
+//             yGrad = yGrad << 3;
+// 
+//             xGrad = xGrad * xGrad;
+//             yGrad = yGrad * yGrad;
+// 
+//             xGrad = xGrad >> 16;
+//             yGrad = yGrad >> 16;
+// 
+//             int mag = xGrad + yGrad;
+// 
+//             // All non above threshold points are zero
+//             mag = max(0, mag-((threshold*threshold) >> 10));
+//             gradient.setMagnitude(static_cast<uint16_t>(mag), i, j);
+//         }
+//     }
+// #endif /* USE_MMX */
 
 }
 
