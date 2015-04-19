@@ -10,6 +10,7 @@ ADD_DEFINITIONS( -mmmx )
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
 SET( VISION_SRCS
+  VisionModule.cpp
   Blob.cpp
   BallDetector.cpp
   Ball.cpp
@@ -20,6 +21,7 @@ SET( VISION_SRCS
   )
 
 SET( VISION_HEADERS
+  VisionModule.h
   Blob.h
   Blobber.h
   FuzzyLogic.h

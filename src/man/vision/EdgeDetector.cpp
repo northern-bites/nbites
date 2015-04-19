@@ -44,9 +44,11 @@ void EdgeDetector::sobelOperator(int upperBound,
 {
 
 #ifdef USE_MMX
+    std::cout << "ASSEMBLY" << std::endl;
     _sobel_operator(upperBound, threshold,
                     &channel[0], &gradient.values[0][0]);
 #else
+    std::cout << "C++" << std::endl;
     for (int i=1+upperBound; i < Gradient::rows-1; ++i){
         for (int j=1; j < Gradient::cols-1; ++j) {
 

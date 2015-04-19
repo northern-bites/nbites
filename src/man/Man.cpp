@@ -38,9 +38,9 @@ namespace man {
     cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
     topTranscriber(*new image::ImageTranscriber(Camera::TOP)),
     bottomTranscriber(*new image::ImageTranscriber(Camera::BOTTOM)),
-    topConverter(TOP_TABLE_PATHNAME),
-    bottomConverter(BOTTOM_TABLE_PATHNAME),
-      //vision(),
+    topConverter(),
+    bottomConverter(),
+    vision(),
     localization(),
     ballTrack(),
     obstacle(),
@@ -108,7 +108,7 @@ namespace man {
         cognitionThread.addModule(bottomTranscriber);
         cognitionThread.addModule(topConverter);
         cognitionThread.addModule(bottomConverter);
-        //cognitionThread.addModule(vision);
+        cognitionThread.addModule(vision);
         cognitionThread.addModule(localization);
         cognitionThread.addModule(ballTrack);
         cognitionThread.addModule(obstacle);
@@ -125,18 +125,18 @@ namespace man {
         topConverter.imageIn.wireTo(&topTranscriber.imageOut);
         bottomConverter.imageIn.wireTo(&bottomTranscriber.imageOut);
         
-        // vision.topThrImage.wireTo(&topConverter.thrImage);
-        // vision.topYImage.wireTo(&topConverter.yImage);
-        // vision.topUImage.wireTo(&topConverter.uImage);
-        // vision.topVImage.wireTo(&topConverter.vImage);
+        vision.topYImage.wireTo(&topConverter.yImage);
+        vision.topWhiteImage.wireTo(&topConverter.whiteImage);
+        vision.topOrangeImage.wireTo(&topConverter.orangeImage);
+        vision.topGreenImage.wireTo(&topConverter.greenImage);
         
-        // vision.botThrImage.wireTo(&bottomConverter.thrImage);
-        // vision.botYImage.wireTo(&bottomConverter.yImage);
-        // vision.botUImage.wireTo(&bottomConverter.uImage);
-        // vision.botVImage.wireTo(&bottomConverter.vImage);
+        vision.bottomYImage.wireTo(&bottomConverter.yImage);
+        vision.bottomWhiteImage.wireTo(&bottomConverter.whiteImage);
+        vision.bottomOrangeImage.wireTo(&bottomConverter.orangeImage);
+        vision.bottomGreenImage.wireTo(&bottomConverter.greenImage);
         
-        // vision.joint_angles.wireTo(&topTranscriber.jointsOut, true);
-        // vision.inertial_state.wireTo(&topTranscriber.inertsOut, true);
+        vision.joints.wireTo(&topTranscriber.jointsOut);
+        vision.inertials.wireTo(&topTranscriber.inertsOut);
         
         //localization.visionInput.wireTo(&vision.vision_field);
         localization.motionInput.wireTo(&motion.odometryOutput_, true);
@@ -231,30 +231,16 @@ namespace man {
 
         cognitionThread.log<messages::RobotLocation>((nbsf::ODOMETRY), &motion.odometryOutput_, "proto-RobotLocation from=odometryOutput");
 
-        cognitionThread.log<messages::VisionField>((nbsf::OBSERVATIONS), &vision.vision_field, "proto-VisionField from=observations");
 
         cognitionThread.log<messages::ParticleSwarm>((nbsf::LOCALIZATION), &localization.particleOutput, "proto-ParticleSwarm from=localization");
 
         cognitionThread.log<messages::FilteredBall>((nbsf::BALLTRACK), &ballTrack.ballLocationOutput, "proto-FilteredBall from=ballLocationOutput");
-        cognitionThread.log<messages::VisionBall>((nbsf::BALLTRACK), &vision.vision_ball, "proto-VisionBall from=vision_ball");
 
         cognitionThread.log<messages::YUVImage>((nbsf::IMAGES), &topTranscriber.imageOut,
                                                 "YUVImage from=top");
         cognitionThread.log<messages::YUVImage>((nbsf::IMAGES), &bottomTranscriber.imageOut,
                                                 "YUVImage from=bot");
 
-        cognitionThread.log<messages::VisionField>((nbsf::VISION), &vision.vision_field,
-                                                   "proto-VisionField from=vision");
-        cognitionThread.log<messages::VisionBall>((nbsf::VISION), &vision.vision_ball,
-                                                  "proto-VisionBall from=vision");
-        cognitionThread.log<messages::VisionRobot>((nbsf::VISION), &vision.vision_robot,
-                                                   "proto-VisionRobot from=vision");
-        cognitionThread.log<messages::VisionObstacle>((nbsf::VISION), &vision.vision_obstacle,
-                                                      "proto-VisionObstacle from=vision");
-        cognitionThread.log<messages::JointAngles>((nbsf::VISION), &vision.joint_angles_out,
-                                                   "proto-JointAngles from=vision");
-        cognitionThread.log<messages::InertialState>((nbsf::VISION), &vision.inertial_state_out,
-                                                     "proto-InertialState from=vision");
 
 #endif //USE_LOGGING
         

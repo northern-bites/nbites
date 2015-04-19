@@ -11,6 +11,7 @@
 #include "comm/CommModule.h"
 #include "image/TranscriberModule.h"
 #include "image/ImageConverterModule.h"
+#include "vision/VisionModule.h"
 #include "guardian/GuardianModule.h"
 #include "audio/AudioEnactorModule.h"
 #include "led/LedEnactorModule.h"
@@ -60,7 +61,7 @@ private:
     image::TranscriberModule bottomTranscriber;
     image::ImageConverterModule topConverter;
     image::ImageConverterModule bottomConverter;
-    //vision::VisionModule vision;
+    vision::VisionModule vision;
     localization::LocalizationModule localization;
     balltrack::BallTrackModule ballTrack;
     obstacle::ObstacleModule obstacle;
