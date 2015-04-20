@@ -12,18 +12,18 @@ namespace vision {
 
 PostDetector::PostDetector(const Gradient& gradient,
                            const messages::PackedImage8& whiteImage)
-    : wd(whiteImage.width()),
+    : len(whiteImage.width() - 2),
 #ifdef OFFLINE
-      postImage(wd, whiteImage.height()),
+      postImage(whiteImage.width(), whiteImage.height()),
 #endif
       candidates()
 {
     HighResTimer timer("Constructor");
-    unfilteredHistogram = new double[wd];
-    filteredHistogram = new double[wd];
+    unfilteredHistogram = new double[len];
+    filteredHistogram = new double[len];
 
-    memset(unfilteredHistogram, 0, wd*sizeof(double));
-    memset(filteredHistogram, 0, wd*sizeof(double));
+    memset(unfilteredHistogram, 0, len*sizeof(double));
+    memset(filteredHistogram, 0, len*sizeof(double));
 
 #ifdef OFFLINE
     buildPostImage(gradient, whiteImage);
@@ -64,6 +64,7 @@ inline Fool PostDetector::calculateGradScore(int16_t magnitude, int16_t gradX, i
 void PostDetector::buildPostImage(const Gradient& gradient,
                                   const messages::PackedImage8& whiteImage)
 {
+    int wd = postImage.width();
     int ht = postImage.height();
 
     // TODO shrink post image by one
@@ -85,8 +86,10 @@ void PostDetector::buildPostImage(const Gradient& gradient,
 void PostDetector::buildHistogram(const Gradient& gradient,
                                   const messages::PackedImage8& whiteImage)
 {
+    int wd = whiteImage.width();
     int ht = whiteImage.height();
 
+    // TODO avoid branching in fuzzy logic
     for (int y = 1; y < ht-1; y++) {
         unsigned char* whiteRow = whiteImage.pixelAddress(1, y);
         for (int x = 1; x < wd-1; x++, whiteRow += whiteImage.pixelPitch()) {
@@ -101,7 +104,7 @@ void PostDetector::filterHistogram()
 {
     // TODO constants should be static variables
     DiffOfGaussianFilter filter(81, 4, 40);
-    filter.convolve(wd, unfilteredHistogram, filteredHistogram);
+    filter.convolve(len, unfilteredHistogram, filteredHistogram);
 }
 
 // TODO asymmetrical peak test?
@@ -109,7 +112,7 @@ void PostDetector::findPeaks()
 {
     int leftLimit = 0;
     bool inPeak = false;
-    for (int i = 0; i < wd; i++) {
+    for (int i = 0; i < len; i++) {
         if (filteredHistogram[i] >= PostDetector::peakThreshold && !inPeak) {
             leftLimit = i;
             inPeak = true;

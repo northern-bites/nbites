@@ -15,7 +15,7 @@ public:
                  const messages::PackedImage8& whiteImage);
     ~PostDetector();
 
-    int getLengthOfHistogram() const { return wd; }
+    int getLengthOfHistogram() const { return len; }
 #ifdef OFFLINE
     const messages::PackedImage8& getPostImage() const { return postImage; }
 #endif
@@ -35,7 +35,7 @@ private:
     void convolve(double const* in, double const* kernel, int klength, double* out);
     void findPeaks();
 
-    int wd;
+    int len;
 #ifdef OFFLINE
     messages::PackedImage8 postImage;
 #endif

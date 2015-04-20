@@ -55,17 +55,11 @@ void VisionModule::run_()
     BallDetector bottomBallDetector(&bottomOrangeImage.message());
     bottomBallDetector.findBalls();
 
-    HighResTimer timer("Gradient");
-
     gradient->reset();
     EdgeDetector edgeDetector;
     edgeDetector.sobelOperator(0, topYImage.message().pixelAddress(0, 0), *gradient);
 
-    timer.end("Post");
-
     PostDetector postDetector(*gradient, topWhiteImage.message());
-
-    timer.lap();
 
     PROF_EXIT(P_VISION);
 }
