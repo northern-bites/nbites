@@ -18,7 +18,7 @@ PostDetector::PostDetector(const Gradient& gradient,
 #endif
       candidates()
 {
-    HighResTimer timer("Constructor");
+    // HighResTimer timer("Constructor");
     unfilteredHistogram = new double[len];
     filteredHistogram = new double[len];
 
@@ -29,13 +29,13 @@ PostDetector::PostDetector(const Gradient& gradient,
     buildPostImage(gradient, whiteImage);
 #endif
 
-    timer.end("Histogram");
+    // timer.end("Histogram");
     buildHistogram(gradient, whiteImage);
-    timer.end("Filtering");
+    // timer.end("Filtering");
     filterHistogram();
-    timer.end("Peaks");
+    // timer.end("Peaks");
     findPeaks();
-    timer.lap();
+    // timer.lap();
 }
 
 PostDetector::~PostDetector()
