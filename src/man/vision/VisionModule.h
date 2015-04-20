@@ -6,6 +6,10 @@
 #include "InertialState.pb.h"
 #include "Gradient.h"
 
+#include "VisionField.pb.h"
+#include "BallModel.pb.h"
+#include "VisionRobot.pb.h"
+
 namespace man {
 namespace vision {
 
@@ -27,6 +31,11 @@ public:
 
     portals::InPortal<messages::JointAngles> joints;
     portals::InPortal<messages::InertialState> inertials;
+
+    portals::OutPortal<messages::VisionField> vision_field;
+    portals::OutPortal<messages::VisionBall> vision_ball;
+    portals::OutPortal<messages::VisionRobot> vision_robot;
+    portals::OutPortal<messages::VisionObstacle> vision_obstacle;
 
 protected:
     virtual void run_();

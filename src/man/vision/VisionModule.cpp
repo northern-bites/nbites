@@ -24,7 +24,11 @@ VisionModule::VisionModule() : Module(),
                                bottomWhiteImage(),
                                bottomGreenImage(),
                                joints(),
-                               inertials()
+                               inertials(),
+                               vision_field(base()),
+                               vision_ball(base()),
+                               vision_robot(base()),
+                               vision_obstacle(base())
 {
     gradient = new Gradient();
 }
@@ -49,11 +53,11 @@ void VisionModule::run_()
 
     PROF_ENTER(P_VISION);
 
-    BallDetector topBallDetector(&topOrangeImage.message());
-    topBallDetector.findBalls();
+    // BallDetector topBallDetector(&topOrangeImage.message());
+    // topBallDetector.findBalls();
 
-    BallDetector bottomBallDetector(&bottomOrangeImage.message());
-    bottomBallDetector.findBalls();
+    // BallDetector bottomBallDetector(&bottomOrangeImage.message());
+    // bottomBallDetector.findBalls();
 
     gradient->reset();
     EdgeDetector edgeDetector;
@@ -61,7 +65,19 @@ void VisionModule::run_()
 
     PostDetector postDetector(*gradient, topWhiteImage.message());
 
-    PROF_EXIT(P_VISION);
+    PROF_EXIT(P_VISION);    
+    
+    portals::Message<messages::VisionField> field_data(0);
+    vision_field.setMessage(field_data);
+
+    portals::Message<messages::VisionBall> ball_data(0);
+    vision_ball.setMessage(ball_data);
+
+    portals::Message<messages::VisionRobot> robot_data(0);
+    vision_robot.setMessage(robot_data);
+
+    portals::Message<messages::VisionObstacle> obstacle_data(0);
+    vision_obstacle.setMessage(obstacle_data);
 }
 
 }
