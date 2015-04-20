@@ -19,12 +19,12 @@ private:
 
 inline Fool Fool::operator&(const Fool& f) const
 {
-    return Fool(std::min(f.get(), get()));
+    return Fool((f.get() > get() ? get() : f.get()));
 }
 
 inline Fool Fool::operator|(const Fool& f) const
 {
-    return Fool(std::max(f.get(), get()));
+    return Fool((f.get() > get() ? f.get() : get()));
 }
 
 inline Fool Fool::operator!() const
@@ -42,7 +42,7 @@ private:
     double t1;
 };
 
-// TODO could be made more efficient, in particular are std::max and std::min efficient?
+// TODO optimize
 inline double FuzzyThreshold::weight(double x) const
 {
     if (t0 == t1)
