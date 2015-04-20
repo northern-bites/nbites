@@ -4,32 +4,33 @@
 #include <cstring>
 #include <iostream>
 
-#include "MathMorphology.h"
 #include "DiffOfGaussianFilter.h"
 #include "HighResTimer.h"
 
 namespace man {
 namespace vision {
 
-// TODO shrink post image by one
 PostDetector::PostDetector(const Gradient& gradient,
                            const messages::PackedImage8& whiteImage)
     : wd(whiteImage.width()),
+#ifdef OFFLINE
       postImage(wd, whiteImage.height()),
+#endif
       candidates()
 {
+    HighResTimer timer("Constructor");
     unfilteredHistogram = new double[wd];
     filteredHistogram = new double[wd];
 
     memset(unfilteredHistogram, 0, wd*sizeof(double));
     memset(filteredHistogram, 0, wd*sizeof(double));
 
-    HighResTimer timer("Post image");
+#ifdef OFFLINE
     buildPostImage(gradient, whiteImage);
-    timer.end("Morphology");
-    applyMathMorphology();
+#endif
+
     timer.end("Histogram");
-    buildHistogram();
+    buildHistogram(gradient, whiteImage);
     timer.end("Filtering");
     filterHistogram();
     timer.end("Peaks");
@@ -43,12 +44,29 @@ PostDetector::~PostDetector()
     delete[] filteredHistogram;
 }
 
+inline Fool PostDetector::calculateGradScore(int16_t magnitude, int16_t gradX, int16_t gradY) const {
+    double magn = static_cast<double>(magnitude);
+    double x = static_cast<double>(gradX);
+    double y = static_cast<double>(gradY);
+    double cosSquaredAngle = x*x / (x*x + y*y);
+
+    // TODO throw away low magn vectors?
+    // TODO throw away high magn vectors?
+    // FuzzyThreshold sigmaMagnHigh(80, 100);
+    // Fool magnHighScore(magn < sigmaMagnHigh);
+
+    Fool angleScore(cosSquaredAngle);
+
+    return angleScore;
+}
+
+#ifdef OFFLINE
 void PostDetector::buildPostImage(const Gradient& gradient,
                                   const messages::PackedImage8& whiteImage)
 {
     int ht = postImage.height();
 
-    // TODO post image should store doubles
+    // TODO shrink post image by one
     for (int y = 1; y < ht-1; y++) {
         unsigned char* whiteRow = whiteImage.pixelAddress(1, y);
         unsigned char* postRow = postImage.pixelAddress(0, y-1);
@@ -62,47 +80,19 @@ void PostDetector::buildPostImage(const Gradient& gradient,
         }
     }
 }
+#endif
 
-inline Fool PostDetector::calculateGradScore(int16_t magnitude, int16_t gradX, int16_t gradY) const {
-    double magn = static_cast<double>(magnitude);
-    double x = static_cast<double>(gradX);
-    double y = static_cast<double>(gradY);
-    double cosSquaredAngle = x*x / (x*x + y*y);
-
-    // TODO throw away low magn vectors?
-    // FuzzyThreshold sigmaMagnHigh(80, 100);
-    // Fool magnHighScore(magn < sigmaMagnHigh);
-
-    Fool angleScore(cosSquaredAngle);
-
-    return angleScore;
-}
-
-void PostDetector::applyMathMorphology()
+void PostDetector::buildHistogram(const Gradient& gradient,
+                                  const messages::PackedImage8& whiteImage)
 {
-    // TODO more cache efficient structuring element?
-    std::pair<int, int> se[3];
-    se[0].first = 0;
-    se[0].second = 0;
-    se[1].first = 0;
-    se[1].second = 1;
-    se[2].first = 0;
-    se[2].second = -1;
+    int ht = whiteImage.height();
 
-    messages::PackedImage<unsigned char> postMorph;
-    MathMorphology<unsigned char> morph(3, se);
-    morph.opening(postImage, postMorph);
-    postImage = postMorph;
-}
-
-void PostDetector::buildHistogram()
-{
-    int ht = postImage.height();
-
-    for (int y = 0; y < ht; y++) {
-        unsigned char* row = postImage.pixelAddress(0, y);
-        for (int x = 0; x < wd; x++, row += postImage.pixelPitch()) {
-            unfilteredHistogram[x] += static_cast<double>(*row) / 255;
+    for (int y = 1; y < ht-1; y++) {
+        unsigned char* whiteRow = whiteImage.pixelAddress(1, y);
+        for (int x = 1; x < wd-1; x++, whiteRow += whiteImage.pixelPitch()) {
+            Fool gradScore(calculateGradScore(gradient.getMagnitude(y, x), gradient.getX(y, x), gradient.getY(y, x)));
+            Fool whiteScore(static_cast<double>(*whiteRow) / 255);
+            unfilteredHistogram[x-1] += (gradScore & whiteScore).get();
         }
     }
 }
