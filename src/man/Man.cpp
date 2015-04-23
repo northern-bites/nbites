@@ -197,6 +197,7 @@ namespace man {
          */
         printf("nblog::log_main_init()\n");
         nblog::log_main_init();
+        printf("control::control_init()\n");
         control::control_init();
         
         /*
@@ -204,77 +205,77 @@ namespace man {
          */
 //#ifdef LOG_SENSORS
         sensorsThread.log<messages::JointAngles>((control::SENSORS), &sensors.jointsOutput_,
-                                                 "proto-JointAngles from=jointsOutput");
+                                                 "proto-JointAngles", "jointsOutput");
         sensorsThread.log<messages::JointAngles>((control::SENSORS), &sensors.temperatureOutput_,
-                                                 "proto-JointAngles from=temperatureOutput");
+                                                 "proto-JointAngles", "temperatureOutput");
         sensorsThread.log<messages::ButtonState>((control::SENSORS), &sensors.chestboardButtonOutput_,
-                                                 "proto-ButtonState from=chestboardButtonOutput");
+                                                 "proto-ButtonState", "chestboardButtonOutput");
         sensorsThread.log<messages::FootBumperState>((control::SENSORS), &sensors.footbumperOutput_,
-                                                     "proto-FootBumperState from=footbumperOutput");
+                                                     "proto-FootBumperState", "footbumperOutput");
         sensorsThread.log<messages::InertialState>((control::SENSORS), &sensors.inertialsOutput_,
-                                                   "proto-InertialState from=inertialsOutput");
+                                                   "proto-InertialState", "inertialsOutput");
         sensorsThread.log<messages::SonarState>((control::SENSORS), &sensors.sonarsOutput_,
-                                                "proto-SonarState from=sonarsOutput");
+                                                "proto-SonarState", "sonarsOutput");
         sensorsThread.log<messages::FSR>((control::SENSORS), &sensors.fsrOutput_,
-                                         "proto-FSR from=fsrOutput");
+                                         "proto-FSR", "fsrOutput");
         sensorsThread.log<messages::BatteryState>((control::SENSORS), &sensors.batteryOutput_,
-                                                  "proto-BatteryState from=batteryOutput");
+                                                  "proto-BatteryState", "batteryOutput");
 //#endif
         
 //#ifdef LOG_GUARDIAN
         guardianThread.log<messages::StiffnessControl>((control::GUARDIAN), &guardian.stiffnessControlOutput,
-                                                       "proto-StiffnessControl from=stiffnessControlOutput");
+                                                       "proto-StiffnessControl", "stiffnessControlOutput");
         guardianThread.log<messages::FeetOnGround>((control::GUARDIAN), &guardian.feetOnGroundOutput,
-                                                   "proto-FeetOnGround from=feetOnGroundOutput");
+                                                   "proto-FeetOnGround", "feetOnGroundOutput");
         guardianThread.log<messages::FallStatus>((control::GUARDIAN), &guardian.fallStatusOutput,
-                                                 "proto-FallStatus from=fallStatusOutput");
+                                                 "proto-FallStatus", "fallStatusOutput");
         guardianThread.log<messages::AudioCommand>((control::GUARDIAN), &guardian.audioOutput,
-                                                   "proto-AudioCommand from=audioOutput");
+                                                   "proto-AudioCommand", "audioOutput");
 //#endif
         
 //#ifdef LOG_LOCATION
-        cognitionThread.log<messages::RobotLocation>((control::LOCATION), &localization.output, "proto-RobotLocation from=cognition");
+        cognitionThread.log<messages::RobotLocation>((control::LOCATION), &localization.output, "proto-RobotLocation", "cognition");
 //#endif
         
 //#ifdef LOG_ODOMETRY
-        cognitionThread.log<messages::RobotLocation>((control::ODOMETRY), &motion.odometryOutput_, "proto-RobotLocation from=odometryOutput");
+        cognitionThread.log<messages::RobotLocation>((control::ODOMETRY), &motion.odometryOutput_, "proto-RobotLocation", "odometryOutput");
 //#endif
         
 //#ifdef LOG_OBSERVATIONS
-        cognitionThread.log<messages::VisionField>((control::OBSERVATIONS), &vision.vision_field, "proto-VisionField from=observations");
+        cognitionThread.log<messages::VisionField>((control::OBSERVATIONS), &vision.vision_field, "proto-VisionField", "observations");
 //#endif
         
 //#ifdef LOG_LOCALIZATION
-        cognitionThread.log<messages::ParticleSwarm>((control::LOCALIZATION), &localization.particleOutput, "proto-ParticleSwarm from=localization");
+        cognitionThread.log<messages::ParticleSwarm>((control::LOCALIZATION), &localization.particleOutput, "proto-ParticleSwarm", "localization");
 //#endif
         
 //#ifdef LOG_BALLTRACK
-        cognitionThread.log<messages::FilteredBall>((control::BALLTRACK), &ballTrack.ballLocationOutput, "proto-FilteredBall from=ballLocationOutput");
-        cognitionThread.log<messages::VisionBall>((control::BALLTRACK), &vision.vision_ball, "proto-VisionBall from=vision_ball");
+        cognitionThread.log<messages::FilteredBall>((control::BALLTRACK), &ballTrack.ballLocationOutput, "proto-FilteredBall", "ballLocationOutput");
+        cognitionThread.log<messages::VisionBall>((control::BALLTRACK), &vision.vision_ball, "proto-VisionBall", "vision_ball");
 //#endif
         
         //Superseded by logging code in ImageTranscriber.
         /*
 //#ifdef LOG_IMAGES
         cognitionThread.log<messages::YUVImage>((control::IMAGES), &topTranscriber.imageOut,
-                                                "YUVImage from=top");
+                                                "YUVImage ", "top");
         cognitionThread.log<messages::YUVImage>((control::IMAGES), &bottomTranscriber.imageOut,
-                                                "YUVImage from=bot");
+                                                "YUVImage ", "bot");
 //#endif */
         
 //#ifdef LOG_VISION
         cognitionThread.log<messages::VisionField>((control::VISION), &vision.vision_field,
-                                                   "proto-VisionField from=vision");
+                                                   "proto-VisionField", "vision");
         cognitionThread.log<messages::VisionBall>((control::VISION), &vision.vision_ball,
-                                                  "proto-VisionBall from=vision");
+                                                  "proto-VisionBall", "vision");
         cognitionThread.log<messages::VisionRobot>((control::VISION), &vision.vision_robot,
-                                                   "proto-VisionRobot from=vision");
+                                                   "proto-VisionRobot", "vision");
         cognitionThread.log<messages::VisionObstacle>((control::VISION), &vision.vision_obstacle,
-                                                      "proto-VisionObstacle from=vision");
+                                                      "proto-VisionObstacle", "vision");
         cognitionThread.log<messages::JointAngles>((control::VISION), &vision.joint_angles_out,
-                                                   "proto-JointAngles from=vision");
+                                                   "proto-JointAngles", "vision");
         cognitionThread.log<messages::InertialState>((control::VISION), &vision.inertial_state_out,
-                                                     "proto-InertialState from=vision");
+                                                     "proto-InertialState", "vision");
 //#endif
         
         

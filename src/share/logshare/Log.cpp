@@ -1,17 +1,52 @@
 #include "Log.h"
 
-namespace logshare {
+namespace nblog {
     
-    Log::Log(const std::string& lfrom, int32_t checksum, clock_t created, int version, SExpr contents) : _written(false), _refs(0) {
-        std::vector<SExpr> list = {
-            SExpr("nblog"),
-            SExpr("from", lfrom),
-            SExpr("checksum", checksum),
-            SExpr("created", (long) created),
-            SExpr("version", version),
-            contents
+    int32_t getChecksum(const std::string& data) {
+        int32_t sum = 0;
+        for (int i = 0; i < data.size(); ++i)
+            sum += (uint8_t) data[i];
+        
+        return sum;
+    }
+    
+    Log::Log(const std::string& log_class,
+             const std::string& where_made,
+             time_t when_made,
+             int version,
+             const std::vector<SExpr>& contents_list,
+             const std::string& contents_data) :
+    _written(false),
+    _refs(0)
+    {
+        _data = contents_data;
+        int32_t cs = getChecksum(contents_data);
+        
+        tm * ptm = localtime(&when_made);
+        char buffer[100];
+        strftime(buffer, 100, "%d.%m.%Y %H:%M:%S", ptm);
+        std::string time(buffer);
+        
+        std::vector<SExpr> made_list = {
+            SExpr("created"),
+            SExpr(where_made),
+            SExpr(time)
         };
-        _tree = SExpr(list);
+        
+        std::vector<SExpr> clist = {
+            SExpr("contents")
+        };
+        clist.insert(clist.end(), contents_list.begin(), contents_list.end());
+        
+        std::vector<SExpr> keys = {
+            SExpr(log_class),           //atom
+            SExpr(made_list),           //list
+            SExpr("version", version),  //key-value list
+            SExpr("checksum", cs),      //key-value list
+            SExpr(clist)                //list, first is "contents" atom
+        };
+        
+        _tree = SExpr(keys);
     }
     
     Log::Log(std::string& desc) : _written(false), _refs(0) {

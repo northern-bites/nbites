@@ -11,7 +11,9 @@
 
 #include "Profiler.h"
 #include "../log/logging.h"
-using logshare::SExpr;
+using nblog::SExpr;
+using nblog::NBLog;
+
 #include <vector>
 
 #define V4L2_MT9M114_FADE_TO_BLACK (V4L2_CID_PRIVATE_BASE)
@@ -489,8 +491,79 @@ void TranscriberModule::run_()
         SExpr("width", image.width() / 2),
         SExpr("height", image.height()),
     };
-    
-    nblog::NBLog(NBL_IMAGE_BUFFER, "magic", time(NULL), {SExpr(image_c)}, im_buf);   //no data with it.
+        
+#ifdef USE_LOGGING
+    if (control::flags[control::tripoint]) {
+        
+        /*
+         // Raw accelerometer data.
+         optional float acc_x = 1;
+         optional float acc_y = 2;
+         optional float acc_z = 3;
+         
+         // Raw gyrometer data.
+         optional float gyr_x = 4;
+         optional float gyr_y = 5;
+         
+         // Filtered angle data.
+         optional float angle_x = 6;
+         optional float angle_y = 7;
+         */
+        
+        std::vector<SExpr> inerts_vec = {
+            SExpr("type", "virtual-InertialState"),
+            SExpr("bytes", 0)
+        };
+        
+        /*
+         // Head angles.
+         optional float head_yaw = 1;
+         optional float head_pitch = 2;
+         
+         // Left arm angles.
+         optional float l_shoulder_pitch = 3;
+         optional float l_shoulder_roll = 4;
+         optional float l_elbow_yaw = 5;
+         optional float l_elbow_roll = 6;
+         optional float l_wrist_yaw = 7;
+         optional float l_hand = 8;
+         
+         // Right arm angles.
+         optional float r_shoulder_pitch = 9;
+         optional float r_shoulder_roll = 10;
+         optional float r_elbow_yaw = 11;
+         optional float r_elbow_roll = 12;
+         optional float r_wrist_yaw = 13;
+         optional float r_hand = 14;
+         
+         // Pelvis angles.
+         optional float l_hip_yaw_pitch = 15;
+         optional float r_hip_yaw_pitch = 16;
+         
+         // Left leg angles.
+         optional float l_hip_roll = 17;
+         optional float l_hip_pitch = 18;
+         optional float l_knee_pitch = 19;
+         optional float l_ankle_pitch = 20;
+         optional float l_ankle_roll = 21;
+         
+         // Right leg angles.
+         optional float r_hip_roll = 22;
+         optional float r_hip_pitch = 23;
+         optional float r_knee_pitch = 24;
+         optional float r_ankle_pitch = 25;
+         optional float r_ankle_roll = 26;
+         */
+        
+        std::vector<SExpr> joints_vec = {
+            SExpr("type", "JointAngles-InertialState"),
+            SExpr("bytes", 0)
+        };
+        
+        jointsIn.message().
+        
+    }
+#endif
 }
 
 }

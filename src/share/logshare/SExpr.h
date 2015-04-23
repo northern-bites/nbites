@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace logshare {
+namespace nblog {
     
     /*
      an sexpr is either an atom or a list of sexprs.  Therefore only one of the two fields {value, list} is ever relevant.
@@ -19,6 +19,13 @@ namespace logshare {
     
     class SExpr {
     public:
+        
+        //Constructor for a generic content item.
+        //use .append() to add more specific keys
+        SExpr(const std::string& type,
+              const std::string& from, clock_t created,
+              size_t image_index, size_t nbytes);
+        
         //list node with elements in l
         SExpr(const std::vector<SExpr>& l);
         //atom with value n
@@ -27,6 +34,7 @@ namespace logshare {
         SExpr();
         
         //key-value constructors
+        //these make a LIST with two atoms, (key val)
         SExpr(const std::string& key, SExpr& val);
         SExpr(const std::string& key, const std::string& val);
         SExpr(const std::string& key, int val);

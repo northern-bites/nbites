@@ -5,9 +5,24 @@
 #include <algorithm>
 #include <assert.h>
 
-namespace logshare {
+namespace nblog {
     
     const char SExpr::special[] = {' ', '(', ')', '\r', '\n', '\t'};
+    
+    SExpr::SExpr(const std::string& type,
+          const std::string& from, clock_t created,
+                 size_t image_index, size_t nbytes) :
+    _atom(false),
+    _value("")
+    {
+        _list = {
+            SExpr("type", type),
+            SExpr("from", from),
+            SExpr("when", (long) created),
+            SExpr("iindex", (long) image_index),
+            SExpr("nbytes", (long) nbytes)
+        };
+    }
     
     SExpr::SExpr(const std::vector<SExpr>& l) :
     _atom(false),
@@ -151,7 +166,7 @@ namespace logshare {
             else
                 s += e.substr(indent * level + 1);
         }
-        s += ')';
+        s += "\n)";
         return s;
     }
     

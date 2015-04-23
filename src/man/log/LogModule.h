@@ -15,7 +15,9 @@
 
 #include "../control/control.h"
 #include "logging.h"
-#include "Log.h"
+
+using nblog::SExpr;
+using nblog::NBLog;
 
 namespace man {
     namespace log {
@@ -24,42 +26,47 @@ namespace man {
         class LogBase : public portals::Module
         {
         public:
-            // The name is used as the filename
-            LogBase(std::string name);
+            LogBase(std::string logtype, std::string wherefrom);
             virtual ~LogBase();
             
         protected:
             // Note that inheriting classes still need to implement this!
             virtual void run_() = 0;
             
-            //encodes type and from fields usually.  Currently the only way the client/server can tell what kind of data we've sent.
-            std::string description;
+            std::string logtype;
+            std::string from;
         };
         
         //Different types store their data different ways.
         //Further, different types need to be sent with different descriptive fields
         //If this is the case, define a specific templated logMessage for your type.
-        template<typename T> inline void logMessage(T msg, std::string description) {
+        template<typename T> inline void logMessage(T msg, std::string type, std::string from) {
+            
             std::string buffer;
             msg.SerializeToString(&buffer);
             
-            /*
-            nblog::NBlog(NBL_SMALL_BUFFER, 0, clock(), description.c_str(), buffer.length(), (uint8_t *) buffer.data()); */
-            //printf("[%i]", buffer.length());
+            std::vector<SExpr> sc = {
+                SExpr(type, from, clock(), -1, buffer.length())
+            };
+            
+            NBLog(NBL_SMALL_BUFFER, "LogModule", sc, buffer);
         }
         
-        template<> inline void logMessage<messages::YUVImage>(messages::YUVImage msg, std::string description) {
+        template<> inline void logMessage<messages::YUVImage>(messages::YUVImage msg, std::string type, std::string from) {
             
             size_t bytes = (msg.width() * msg.height() * 1);
+            std::string buffer((char *) msg.pixelAddress(0,0), bytes);
             
-            char buf[1000];
-            snprintf(buf, 1000, "%s width=%i height=%i encoding=[Y8(U8/V8)]", description.c_str(), msg.width()/2, msg.height());
+            SExpr image_desc(type, from, clock(), -1, buffer.length());
+            image_desc.append(SExpr("width", msg.width() / 2));
+            image_desc.append(SExpr("height", msg.height() / 2));
+            image_desc.append(SExpr("encoding", "[Y8(U8/V8)]"));
             
-            /*
-            nblog::NBlog(NBL_IMAGE_BUFFER, 0, clock(), buf, bytes, (uint8_t *) msg.pixelAddress(0, 0)); */
+            std::vector<SExpr> sc = {
+                image_desc
+            };
             
-            //printf("[i%i]", bytes);
-
+            nblog::NBLog(NBL_IMAGE_BUFFER, "LogModule", sc, buffer);
         }
         
         // Template Class
@@ -70,7 +77,7 @@ namespace man {
              * @brief Takes an OutPortal and wires it to this new module so that
              *        we can log its output.
              */
-            LogModule(int fi, portals::OutPortal<T>* out, std::string name) : LogBase(name)
+            LogModule(int fi, portals::OutPortal<T>* out, std::string lt, std::string wf) : LogBase(lt , wf)
             {
                 f_index = fi;
                 input.wireTo(out);
@@ -84,7 +91,7 @@ namespace man {
             virtual void run_() {
                 if (control::flags[f_index]) {
                     input.latch();
-                    logMessage<T>(input.message(), description);
+                    logMessage<T>(input.message(), logtype, from);
                 }
             }
             

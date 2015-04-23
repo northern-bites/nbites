@@ -29,6 +29,8 @@ namespace control {
         IMAGES,
         VISION,
         
+        tripoint,
+        
         //Num_flags must be last!  it has int value (previous + 1)
         //which, if it is last,
         //is equivalent to the number of flags previous listed.

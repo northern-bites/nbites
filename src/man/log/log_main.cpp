@@ -23,9 +23,6 @@
 //#include <unistd.h>
 //#include <fcntl.h>
 
-using logshare::Log;
-using logshare::SExpr;
-
 namespace nblog {
     
     uint64_t fio_upstart;
@@ -162,7 +159,7 @@ namespace nblog {
             SExpr contents = SExpr(c1);
             
             //printf("stats...\n");
-            NBLog(NBL_SMALL_BUFFER, "log_main", time(NULL), {contents}, std::string());   //no data with it.
+           // NBLog(NBL_SMALL_BUFFER, "log_main", time(NULL), {contents}, std::string());   //no data with it.
         }
         
         return NULL;
@@ -172,15 +169,7 @@ namespace nblog {
      Definitions for log lib functions.
      */
     
-    int32_t checksum(const std::string& data) {
-        int32_t sum = 0;
-        for (int i = 0; i < data.size(); ++i)
-            sum += (uint8_t) data[i];
-        
-        return sum;
-    }
-    
-    void releaseWrapper(int bi, logshare::Log * lg, bool lock) {
+    void releaseWrapper(int bi, Log * lg, bool lock) {
         NBLassert(bi >= 0 && bi < NUM_LOG_BUFFERS);
         NBLassert(lg);
         
@@ -306,7 +295,7 @@ namespace nblog {
         pthread_mutex_unlock(&(buf->lock));
     } */
     
-    void NBLog(int BI, logshare::SExpr& desc, const std::string& data) {
+    void NBLog(int BI, SExpr& desc, const std::string& data) {
         
         NBDEBUGs(SECTION_LOGM, "NBlog(buffer_index=%i)\n", BI);
         NBLassert(BI < NUM_LOG_BUFFERS);
@@ -324,7 +313,7 @@ namespace nblog {
         pthread_mutex_unlock(&(log_main.buffers[BI].lock));
     }
     
-    void NBLog(int BI, const std::string where_made, time_t when_made, std::vector<logshare::SExpr> contents, const std::string& data) {
+    void NBLog(int BI, const std::string where_made, time_t when_made, std::vector<SExpr> contents, const std::string& data) {
         
         time_t now = time(NULL);
         tm * ptm = localtime(&now);
@@ -346,7 +335,7 @@ namespace nblog {
             SExpr("nblog"),
             SExpr(made_list),
             SExpr("version", LOG_VERSION),
-            SExpr("checksum", checksum(data)),
+            SExpr("checksum", 475687980),
             SExpr(cont_list)
         };
         

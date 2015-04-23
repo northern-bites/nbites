@@ -27,8 +27,8 @@
 
 #define CHECK_RET(v) if(v) {printf("BAD RET: [%s](%i) at line %i.\n", #v, v, __LINE__); return 2;}
 
-using logshare::Log;
-using logshare::SExpr;
+using nblog::Log;
+using nblog::SExpr;
 
 int main(int argc, const char * argv[]) {
     

@@ -12,21 +12,26 @@
  In this class, the internal representation of the description is always an sexpr tree, though it may be updated with either format.
  */
 
-namespace logshare {
+namespace nblog {
     
     class Log {
     public:
         
-        /*
-         class manipulators.
-         
-         constructors
-         */
-        Log(const std::string& lfrom, int32_t checksum, clock_t created, int version, SExpr contents);
+        //Generic log constructor with standard values.
+        Log(const std::string& log_class,
+            const std::string& where_made,
+            time_t when_made,
+            int version,
+            const std::vector<SExpr>& contents_list,
+            const std::string& contents_data);
         
+        
+        //Parses the SExpr expected to be in description.
         Log(std::string& description);
+        //Uses expr as new tree
         Log(const SExpr& expr);
-        Log(Log * old); //copies argument
+        //copies argument
+        Log(Log * old);
         
         bool setTree(std::string desc);
         bool setTree(const SExpr& expr);

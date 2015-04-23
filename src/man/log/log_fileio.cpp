@@ -27,11 +27,11 @@ namespace nblog {
         pthread_detach(log_main.log_fileio_thread);
     }
     
-    int write_to_fs(logshare::Log * obj);
+    int write_to_fs(Log * obj);
     
     void * file_io_loop(void * context) {
         uint8_t wrote_something = 0;
-        logshare::Log * obj = NULL;
+        Log * obj = NULL;
         int cur_bi;
         
         for (;;
@@ -70,7 +70,7 @@ namespace nblog {
      fileio
      */
     
-    int write_to_fs(logshare::Log * obj) {
+    int write_to_fs(Log * obj) {
         int fd;
         
         std::string desc = obj->description();
