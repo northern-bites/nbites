@@ -9,6 +9,7 @@ namespace nblog {
     
     const char SExpr::special[] = {' ', '(', ')', '\r', '\n', '\t'};
     
+    //standard content item initializer
     SExpr::SExpr(const std::string& type,
           const std::string& from, clock_t created,
                  size_t image_index, size_t nbytes) :
@@ -24,24 +25,56 @@ namespace nblog {
         };
     }
     
+    //list sexpr from vector
     SExpr::SExpr(const std::vector<SExpr>& l) :
     _atom(false),
     _value(""),
     _list(l)
     { }
     
+    //atom sexpr from string
     SExpr::SExpr(const std::string& v) :
     _atom(true),
     _value(v),
     _list()
     { }
-    
-    // Constructor for empty sexpr
+
+    //emtpy list
     SExpr::SExpr() :
     _atom(false),
     _value(""),
     _list()
     { }
+    
+    //atom from int
+    SExpr::SExpr(int v) :
+    _atom(true),
+    _list()
+    {
+        char buf[100];
+        snprintf(buf, 100, "%i", v);
+        _value = std::string(buf);
+    }
+    
+    //atom from long
+    SExpr::SExpr(long v) :
+    _atom(true),
+    _list()
+    {
+        char buf[100];
+        snprintf(buf, 100, "%li", v);
+        _value = std::string(buf);
+    }
+    
+    //atom from double
+    SExpr::SExpr(double v) :
+    _atom(true),
+    _list()
+    {
+        char buf[100];
+        snprintf(buf, 100, "%f", v);
+        _value = std::string(buf);
+    }
     
     SExpr::SExpr(const std::string& key, SExpr& val) :
     _atom(false),
@@ -61,27 +94,28 @@ namespace nblog {
     _atom(false),
     _value("")
     {
-        char buf[100];
-        snprintf(buf, 100, "%i", val);
-        _list = {SExpr(key), SExpr(std::string(buf))};
+        _list = {SExpr(key), SExpr(val)};
     }
     
     SExpr::SExpr(const std::string& key, long val)  :
     _atom(false),
     _value("")
     {
-        char buf[100];
-        snprintf(buf, 100, "%li", val);
-        _list = {SExpr(key), SExpr(std::string(buf))};
+        _list = {SExpr(key), SExpr(val)};
     }
     
     SExpr::SExpr(const std::string& key, double val)  :
     _atom(false),
     _value("")
     {
-        char buf[100];
-        snprintf(buf, 100, "%f", val);
-        _list = {SExpr(key), SExpr(std::string(buf))};
+        _list = {SExpr(key), SExpr(val)};
+    }
+    
+    SExpr::SExpr(const std::string& key, int index, int cval) :
+    _atom(false),
+    _value("")
+    {
+        _list = {SExpr(key), SExpr(index), SExpr(cval)};
     }
     
     SExpr * SExpr::get(int i)

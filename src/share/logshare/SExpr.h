@@ -28,10 +28,15 @@ namespace nblog {
         
         //list node with elements in l
         SExpr(const std::vector<SExpr>& l);
+        //empty LIST.
+        SExpr();
         //atom with value n
         SExpr(const std::string& n);
-        //atom with empty value.
-        SExpr();
+        
+        //more atoms.
+        SExpr(int v);
+        SExpr(long v);
+        SExpr(double v);
         
         //key-value constructors
         //these make a LIST with two atoms, (key val)
@@ -40,6 +45,9 @@ namespace nblog {
         SExpr(const std::string& key, int val);
         SExpr(const std::string& key, long val);
         SExpr(const std::string& key, double val);
+        
+        //double value for use in log_main.
+        SExpr(const std::string& key, int index, int cval);
         
         bool isAtom() { return _atom; }
         ssize_t count() { return _atom ? -1 : _list.size(); }

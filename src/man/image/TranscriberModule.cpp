@@ -458,7 +458,8 @@ TranscriberModule::TranscriberModule(ImageTranscriber& trans)
     : imageOut(base()),
       jointsOut(base()),
       inertsOut(base()),
-      it(trans)
+      it(trans),
+      image_index(0)
 {
 }
 
@@ -478,22 +479,34 @@ void TranscriberModule::run_()
     messages::YUVImage image = it.getNextImage();
     portals::Message<messages::YUVImage> imageOutMessage(&image);
     imageOut.setMessage(imageOutMessage);
-    
-    size_t im_size = (image.width() * image.height() * 1);
-    std::string im_buf( (char *) image.pixelAddress(0, 0), im_size);
-    std::string jo_buf;
-    jointsIn.message().SerializeToString(&jo_buf);
-    im_buf.append(jo_buf);
-    
-    std::vector<SExpr> image_c {
-        SExpr("type", "YUVImage"),
-        SExpr("time", time(NULL)),
-        SExpr("width", image.width() / 2),
-        SExpr("height", image.height()),
-    };
         
 #ifdef USE_LOGGING
     if (control::flags[control::tripoint]) {
+        
+        ++image_index;
+        
+        long im_size = (image.width() * image.height() * 1);
+        int im_width = image.width() / 2;
+        int im_height= image.height();
+        
+        messages::JointAngles ja_pb = jointsIn.message();
+        messages::InertialState is_pb = inertsIn.message();
+        
+        std::string ja_buf;
+        std::string is_buf;
+        std::string im_buf((char *) image.pixelAddress(0, 0), im_size);
+        ja_pb.SerializeToString(&ja_buf);
+        is_buf.SerializeToString(&is_buf);
+        
+        im_buf.append(is_buf);
+        im_buf.append(ja_buf);
+        
+        std::vector<SExpr> contents;
+        
+        SExpr imageinfo("YUVImage", "Transcriber", clock(), image_index, im_size);
+        imageinfo.append("width", im_width);
+        imageinfo.append("height", im_height);
+        contents.push_back(image_info);
         
         /*
          // Raw accelerometer data.
@@ -510,10 +523,17 @@ void TranscriberModule::run_()
          optional float angle_y = 7;
          */
         
-        std::vector<SExpr> inerts_vec = {
-            SExpr("type", "virtual-InertialState"),
-            SExpr("bytes", 0)
-        };
+        SExpr inerts("InertialState", "module", clock(), image_index, is_buf.length());
+        inerts.append(SExpr("acc_x", is_pb.acc_x()));
+        inerts.append(SExpr("acc_y", is_pb.acc_y()));
+        inerts.append(SExpr("acc_z", is_pb.acc_z()));
+        
+        inerts.append(SExpr("gyr_x", is_pb.gyr_x()));
+        inerts.append(SExpr("gyr_y", is_pb.gyr_y()));
+        
+        inerts.append(SExpr("angle_x", is_pb.angle_x()));
+        inerts.append(SExpr("angle_y", is_pb.angle_y()));
+        contents.push_back(inerts);
         
         /*
          // Head angles.
@@ -555,13 +575,42 @@ void TranscriberModule::run_()
          optional float r_ankle_roll = 26;
          */
         
-        std::vector<SExpr> joints_vec = {
-            SExpr("type", "JointAngles-InertialState"),
-            SExpr("bytes", 0)
-        };
+        SExpr joints("JointAngles", "module", clock(), image_index, ja_buf.length());
+        joints.append(SExpr("head_yaw", ja_pb.head_yaw()));
+        joints.append(SExpr("head_pitch", ja_pb.head_pitch()));
+
+        joints.append(SExpr("l_shoulder_pitch", ja_pb.l_shoulder_pitch()));
+        joints.append(SExpr("l_shoulder_roll", ja_pb.l_shoulder_roll()));
+        joints.append(SExpr("l_elbow_yaw", ja_pb.l_elbow_yaw()));
+        joints.append(SExpr("l_elbow_roll", ja_pb.l_elbow_roll()));
+        joints.append(SExpr("l_wrist_yaw", ja_pb.l_wrist_yaw()));
+        joints.append(SExpr("l_hand", ja_pb.l_hand()));
+
+        joints.append(SExpr("r_shoulder_pitch", ja_pb.r_shoulder_pitch()));
+        joints.append(SExpr("r_shoulder_roll", ja_pb.r_shoulder_roll()));
+        joints.append(SExpr("r_elbow_yaw", ja_pb.r_elbow_yaw()));
+        joints.append(SExpr("r_elbow_roll", ja_pb.r_elbow_roll()));
+        joints.append(SExpr("r_wrist_yaw", ja_pb.r_wrist_yaw()));
+        joints.append(SExpr("r_hand", ja_pb.r_hand()));
+
+        joints.append(SExpr("l_hip_yaw_pitch", ja_pb.l_hip_yaw_pitch()));
+        joints.append(SExpr("r_hip_yaw_pitch", ja_pb.r_hip_yaw_pitch()));
+
+        joints.append(SExpr("l_hip_roll", ja_pb.l_hip_roll()));
+        joints.append(SExpr("l_hip_pitch", ja_pb.l_hip_pitch()));
+        joints.append(SExpr("l_knee_pitch", ja_pb.l_knee_pitch()));
+        joints.append(SExpr("l_ankle_pitch", ja_pb.l_ankle_pitch()));
+        joints.append(SExpr("l_ankle_roll", ja_pb.l_ankle_roll()));
+
+        joints.append(SExpr("r_hip_roll", ja_pb.r_hip_roll() ));
+        joints.append(SExpr("r_hip_pitch", ja_pb.r_hip_pitch() ));
+        joints.append(SExpr("r_knee_pitch", ja_pb.r_knee_pitch() ));
+        joints.append(SExpr("r_ankle_pitch", ja_pb.r_ankle_pitch() ));
+        joints.append(SExpr("r_ankle_roll", ja_pb.r_ankle_roll() ));
+        contents.push_back(joints);
         
-        jointsIn.message().
-        
+        NBLog(NBL_IMAGE_BUFFER, "tripoint",
+                   contents, im_buf);
     }
 #endif
 }

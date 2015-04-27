@@ -133,8 +133,8 @@ namespace nblog {
             
             //Log state.
             
-            SExpr type("type", "STATS");
-            
+            std::vector<SExpr> fields;
+            fields.push_back(SExpr("type", "STATS"));
             std::vector<SExpr> fvector = {
                 SExpr("flags"),
                 SExpr("serv_connected", control::flags[control::serv_connected]),
@@ -150,13 +150,33 @@ namespace nblog {
                 SExpr("BALLTRACK", control::flags[control::BALLTRACK]),
                 SExpr("IMAGES", control::flags[control::IMAGES]),
                 SExpr("VISION", control::flags[control::VISION]),
+                
+                SExpr("tripoint", control::flags[control::tripoint])
             };
-            SExpr flags(fvector);
+            fields.push_back(SExpr(fvector));
             
-            //... all the other stats stuff...
             
-            std::vector<SExpr> c1 = { type, flags };
-            SExpr contents = SExpr(c1);
+            fields.push_back(SExpr("num_buffers", NUM_LOG_BUFFERS));
+            fields.push_back(SExpr("num_cores", (int) NUM_CORES));
+            
+            SExpr ratios;
+            ratios.append(SExpr("ratio"));
+            for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+                ratios.append(SExpr(LOG_RATIO[i]));
+            }
+            fields.push_back(ratios);
+            
+            SExpr sizes;
+            sizes.append(SExpr("size"));
+            for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+                sizes.append(SExpr(LOG_BUFFER_SIZES[i]));
+            }
+            fields.push_back(sizes);
+            
+            time_t NOW = time(NULL);
+            fields.push_back(SExpr("con_uptime", control::flags[control::serv_connected] ? difftime(cio_upstart, NOW) : 0));
+            
+            
             
             //printf("stats...\n");
            // NBLog(NBL_SMALL_BUFFER, "log_main", time(NULL), {contents}, std::string());   //no data with it.
@@ -269,80 +289,26 @@ namespace nblog {
         NBDEBUGs(SECTION_LOGM, "\t\tfilenr=%i servnr=%i nextw=%i\n", buf.fileio_nextr, buf.servio_nextr, buf.next_write);
     }
     
-    /*
-    void NBlog(int buffer_index, size_t image_index, clock_t creation_time, const char * type, size_t n_bytes, uint8_t * data)
-    {
-        LOGDEBUG(8, "NBlog(buffer_index=%i, image_index=%li, type=%s, bytes=%li)\n", buffer_index, image_index, type, n_bytes);
-        
+    void NBLog(int buffer_index, Log * log) {
+        NBDEBUGs(SECTION_LOGM, "NBlog(buffer_index=%i)\n", buffer_index);
         NBLassert(buffer_index < NUM_LOG_BUFFERS);
-        //Can't log if the server's not running...
-        if (!log_main || !(log_main->log_main_thread)) {
-            NBDEBUG( "NBlog returning because !log_main || !log_main->log_main_thread\n");
-            return;
-        }
-        log_object_t * newp = log_object_create( image_index,  creation_time, type, n_bytes,  data);
-        newp->buffer = buffer_index;
-        
-        log_buffer_t * buf = log_main->buffers[buffer_index];
-        
-        pthread_mutex_lock(&(buf->lock));
-        
-        log_object_t * old = put(newp, buf, buffer_index);
-        if (old) {
-            release(old, false);
-        }
-        
-        pthread_mutex_unlock(&(buf->lock));
-    } */
-    
-    void NBLog(int BI, SExpr& desc, const std::string& data) {
-        
-        NBDEBUGs(SECTION_LOGM, "NBlog(buffer_index=%i)\n", BI);
-        NBLassert(BI < NUM_LOG_BUFFERS);
         //Can't log if the server's not running...
         if (!log_running) {
             NBDEBUG("NBlog returning because !log_running\n");
+            delete log;
             return;
         }
         
-        Log * log = new Log(desc);
-        log->setData(data);
-        
-        pthread_mutex_lock(&(log_main.buffers[BI].lock));
-        put(log, BI);
-        pthread_mutex_unlock(&(log_main.buffers[BI].lock));
+        pthread_mutex_lock(&(log_main.buffers[buffer_index].lock));
+        put(log, buffer_index);
+        pthread_mutex_unlock(&(log_main.buffers[buffer_index].lock));
     }
     
-    void NBLog(int BI, const std::string where_made, time_t when_made, std::vector<SExpr> contents, const std::string& data) {
+    void NBLog(int buffer_index, const std::string& where_called,
+               const std::vector<SExpr>& items, const std::string& data ) {
+        Log * newl = new Log("nblog", where_called, time(NULL), LOG_VERSION,
+                             items, data);
         
-        time_t now = time(NULL);
-        tm * ptm = localtime(&now);
-        char buffer[100];
-        strftime(buffer, 100, "%d.%m.%Y %H:%M:%S", ptm);
-        std::string time(buffer);
-        
-        std::vector<SExpr> made_list = {
-            SExpr("created"),
-            SExpr(where_made),
-            SExpr(time)
-        };
-        
-        std::vector<SExpr> cont_list;
-        cont_list.push_back(SExpr("contents"));
-        cont_list.insert(cont_list.end(), contents.begin(), contents.end());
-        
-        std::vector<SExpr> top_list =  {
-            SExpr("nblog"),
-            SExpr(made_list),
-            SExpr("version", LOG_VERSION),
-            SExpr("checksum", 475687980),
-            SExpr(cont_list)
-        };
-        
-        SExpr desc(top_list);
-        
-        //printf("%s\n", desc.print().c_str());
-        
-        NBLog(BI, desc, data);
+        NBLog(buffer_index, newl);
     }
 }

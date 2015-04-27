@@ -102,7 +102,7 @@ namespace nblog {
     
     void NBLog(int buffer_index, Log * log);
     void NBLog(int buffer_index, const std::string& where_called,
-               const std::vector<SExpr> items, const std::string& data );
+               const std::vector<SExpr>& items, const std::string& data );
     
     
     //init log_main thread

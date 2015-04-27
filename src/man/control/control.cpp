@@ -198,6 +198,8 @@ namespace control {
     
     void control_init() {
         NBDEBUG("control_init() with %i functions.\n", fmap.size());
+        bzero((void *) flags, num_flags);
+        flags[tripoint] = 1;
         
         pthread_create(&control_thread, NULL, &cnc_loop, NULL);
         pthread_detach(control_thread);

@@ -86,8 +86,11 @@ int main(int argc, const char * argv[]) {
     char buf[100];
     snprintf(buf, 100, "type=functionlist fn=%lu", FUNCS.size());
     
-    Log functions("nbcross", 0, (clock_t) 0, NBCROSS_VERSION, SExpr("nfuncs", (int) FUNCS.size()) );
-    functions.setData(funcstr);
+    std::vector<SExpr> contents= {
+        SExpr("nfuncs", (int) FUNCS.size())
+    };
+    
+    Log functions("nbcross", "nbcross/main", time(NULL), NBCROSS_VERSION, contents, funcstr);
     
     CHECK_RET(functions.send(fd));
     
