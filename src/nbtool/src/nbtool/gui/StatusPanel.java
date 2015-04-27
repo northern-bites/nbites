@@ -113,6 +113,7 @@ public class StatusPanel extends JPanel implements NListener{
 		botStatA = new JTextArea();
 		botStatA.setFont(sf);
 		botStatA.setEditable(false);
+		botStatA.setAutoscrolls(false);
 		botStatA.setText("<no STATS logs found>");
 		
 		DefaultCaret caret = (DefaultCaret)botStatA.getCaret();

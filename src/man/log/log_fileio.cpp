@@ -17,10 +17,14 @@ namespace nblog {
     
     static const char * LOG_FOLDER = "/home/nao/nbites/log/";
     //const char * LOG_FOLDER = "/Users/pkoch/Desktop/LOGS/";
+    static bool STARTED = false;
     
     void * file_io_loop(void * context);
     
     void log_fileio_init() {
+        NBLassert(!STARTED);
+        STARTED = true;
+        
         NBDEBUG("log_fileio_init()\n");
         
         pthread_create(&(log_main.log_fileio_thread), NULL, &file_io_loop, NULL);
@@ -91,9 +95,11 @@ namespace nblog {
         if (!obj->write(fd)) {
             printf("*************NB_Log file_io COULD NOT WRITE LOG \n\t%s\n\n", path.c_str());
             
+            close(fd);
             return 2;
         }
         
+        close(fd);
         return 0;
     }
     

@@ -32,6 +32,8 @@ using nblog::SExpr;
 
 int main(int argc, const char * argv[]) {
     
+#error ADD SUPPORT FOR NAMES!
+    
     register_funcs();
     printf("using %li functions:\n", FUNCS.size());
     for (int i = 0; i < FUNCS.size(); ++i)

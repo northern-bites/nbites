@@ -485,8 +485,14 @@ void TranscriberModule::run_()
         
 #ifdef USE_LOGGING
     if (control::flags[control::tripoint]) {
-        NBDEBUG("TranscriberModule loop()\n");
         ++image_index;
+        
+        std::string image_from;
+        if (it.type() == Camera::TOP) {
+            image_from = "camera_TOP";
+        } else {
+            image_from = "camera_BOT";
+        }
         
         long im_size = (image.width() * image.height() * 1);
         int im_width = image.width() / 2;
@@ -506,7 +512,7 @@ void TranscriberModule::run_()
         
         std::vector<SExpr> contents;
         
-        SExpr imageinfo("YUVImage", "Transcriber", clock(), image_index, im_size);
+        SExpr imageinfo("YUVImage", image_from, clock(), image_index, im_size);
         imageinfo.append(SExpr("width", im_width)   );
         imageinfo.append(SExpr("height", im_height) );
         contents.push_back(imageinfo);
@@ -526,7 +532,7 @@ void TranscriberModule::run_()
          optional float angle_y = 7;
          */
         
-        SExpr inerts("InertialState", "module", clock(), image_index, is_buf.length());
+        SExpr inerts("InertialState", "tripoint", clock(), image_index, is_buf.length());
         inerts.append(SExpr("acc_x", is_pb.acc_x()));
         inerts.append(SExpr("acc_y", is_pb.acc_y()));
         inerts.append(SExpr("acc_z", is_pb.acc_z()));
@@ -578,7 +584,7 @@ void TranscriberModule::run_()
          optional float r_ankle_roll = 26;
          */
         
-        SExpr joints("JointAngles", "module", clock(), image_index, ja_buf.length());
+        SExpr joints("JointAngles", "tripoint", clock(), image_index, ja_buf.length());
         joints.append(SExpr("head_yaw", ja_pb.head_yaw()));
         joints.append(SExpr("head_pitch", ja_pb.head_pitch()));
 
@@ -612,7 +618,6 @@ void TranscriberModule::run_()
         joints.append(SExpr("r_ankle_roll", ja_pb.r_ankle_roll() ));
         contents.push_back(joints);
         
-        NBDEBUG("TranscriberModule loop logging...\n");
         NBLog(NBL_IMAGE_BUFFER, "tripoint",
                    contents, im_buf);
     }

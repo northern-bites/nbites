@@ -189,6 +189,7 @@ namespace man {
         leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
         
 #ifdef USE_LOGGING
+        {   //brackets let us hide logging code in certain IDEs.
         /*
          log threads should have low CPU time if nothing is being logged.
          
@@ -205,40 +206,40 @@ namespace man {
          */
 //#ifdef LOG_SENSORS
         sensorsThread.log<messages::JointAngles>((control::SENSORS), &sensors.jointsOutput_,
-                                                 "proto-JointAngles", "jointsOutput");
+                                                 "proto-JointAngles", "sensorsThread");
         sensorsThread.log<messages::JointAngles>((control::SENSORS), &sensors.temperatureOutput_,
-                                                 "proto-JointAngles", "temperatureOutput");
+                                                 "proto-JointAngles", "sensorsThread");
         sensorsThread.log<messages::ButtonState>((control::SENSORS), &sensors.chestboardButtonOutput_,
-                                                 "proto-ButtonState", "chestboardButtonOutput");
+                                                 "proto-ButtonState", "sensorsThread");
         sensorsThread.log<messages::FootBumperState>((control::SENSORS), &sensors.footbumperOutput_,
-                                                     "proto-FootBumperState", "footbumperOutput");
+                                                     "proto-FootBumperState", "sensorsThread");
         sensorsThread.log<messages::InertialState>((control::SENSORS), &sensors.inertialsOutput_,
-                                                   "proto-InertialState", "inertialsOutput");
+                                                   "proto-InertialState", "sensorsThread");
         sensorsThread.log<messages::SonarState>((control::SENSORS), &sensors.sonarsOutput_,
-                                                "proto-SonarState", "sonarsOutput");
+                                                "proto-SonarState", "sensorsThread");
         sensorsThread.log<messages::FSR>((control::SENSORS), &sensors.fsrOutput_,
-                                         "proto-FSR", "fsrOutput");
+                                         "proto-FSR", "sensorsThread");
         sensorsThread.log<messages::BatteryState>((control::SENSORS), &sensors.batteryOutput_,
-                                                  "proto-BatteryState", "batteryOutput");
+                                                  "proto-BatteryState", "sensorsThread");
 //#endif
         
 //#ifdef LOG_GUARDIAN
         guardianThread.log<messages::StiffnessControl>((control::GUARDIAN), &guardian.stiffnessControlOutput,
-                                                       "proto-StiffnessControl", "stiffnessControlOutput");
+                                                       "proto-StiffnessControl", "guardianThread");
         guardianThread.log<messages::FeetOnGround>((control::GUARDIAN), &guardian.feetOnGroundOutput,
-                                                   "proto-FeetOnGround", "feetOnGroundOutput");
+                                                   "proto-FeetOnGround", "guardianThread");
         guardianThread.log<messages::FallStatus>((control::GUARDIAN), &guardian.fallStatusOutput,
-                                                 "proto-FallStatus", "fallStatusOutput");
+                                                 "proto-FallStatus", "guardianThread");
         guardianThread.log<messages::AudioCommand>((control::GUARDIAN), &guardian.audioOutput,
-                                                   "proto-AudioCommand", "audioOutput");
+                                                   "proto-AudioCommand", "guardianThread");
 //#endif
         
 //#ifdef LOG_LOCATION
-        cognitionThread.log<messages::RobotLocation>((control::LOCATION), &localization.output, "proto-RobotLocation", "cognition");
+        cognitionThread.log<messages::RobotLocation>((control::LOCATION), &localization.output, "proto-RobotLocation", "location");
 //#endif
         
 //#ifdef LOG_ODOMETRY
-        cognitionThread.log<messages::RobotLocation>((control::ODOMETRY), &motion.odometryOutput_, "proto-RobotLocation", "odometryOutput");
+        cognitionThread.log<messages::RobotLocation>((control::ODOMETRY), &motion.odometryOutput_, "proto-RobotLocation", "odometry");
 //#endif
         
 //#ifdef LOG_OBSERVATIONS
@@ -250,8 +251,8 @@ namespace man {
 //#endif
         
 //#ifdef LOG_BALLTRACK
-        cognitionThread.log<messages::FilteredBall>((control::BALLTRACK), &ballTrack.ballLocationOutput, "proto-FilteredBall", "ballLocationOutput");
-        cognitionThread.log<messages::VisionBall>((control::BALLTRACK), &vision.vision_ball, "proto-VisionBall", "vision_ball");
+        cognitionThread.log<messages::FilteredBall>((control::BALLTRACK), &ballTrack.ballLocationOutput, "proto-FilteredBall", "balltrack");
+        cognitionThread.log<messages::VisionBall>((control::BALLTRACK), &vision.vision_ball, "proto-VisionBall", "balltrack");
 //#endif
         
         //Superseded by logging code in ImageTranscriber.
@@ -278,7 +279,7 @@ namespace man {
                                                      "proto-InertialState", "vision");
 //#endif
         
-        
+    }
 #endif //USE_LOGGING
         
 #ifdef USE_TIME_PROFILING

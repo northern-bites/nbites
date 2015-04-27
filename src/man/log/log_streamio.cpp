@@ -23,9 +23,12 @@
 namespace nblog {
     
     void * server_io_loop(void * context);
+    static bool STARTED = false;
     
     void log_serverio_init() {
         NBDEBUG("log_serverio_init()\n");
+        NBLassert(!STARTED);
+        STARTED = true;
         
         pthread_create(&(log_main.log_serverio_thread), NULL, &server_io_loop, NULL);
         pthread_detach(log_main.log_serverio_thread);
@@ -33,7 +36,7 @@ namespace nblog {
     
     /*
     //Available bytes on socket fd.
-    //deprecated?
+    //permanently deprecated?
     static inline int available(int fd) {
         int a;
         ioctl(fd, FIONREAD, &a);
@@ -55,17 +58,14 @@ namespace nblog {
         
         serv_addr.sin_family = AF_INET;
         serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-        serv_addr.sin_port = htons(LOG_PORT);
+        serv_addr.sin_port = htons(STREAM_PORT);
         
         bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
         
-        //We don't want to crash the server if the pipe dies...
-        //signal(SIGPIPE, SIG_IGN);
+        //Accepting connections on this socket, no backqueue
+        listen(listenfd, 0);
         
-        //Accepting connections on this socket, backqueue of size 1.
-        listen(listenfd, 1);
-        
-        NBDEBUG("log_streamio listening...port=%i\n", LOG_PORT);
+        NBDEBUG("log_streamio listening...port=%i\n", STREAM_PORT);
         control::flags[control::serv_connected] = false;
         
         for (;;) {

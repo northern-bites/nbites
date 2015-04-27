@@ -48,10 +48,10 @@ namespace nblog {
         Log ** objects;
     } log_buffer_t;
     
-#define NUM_LOG_BUFFERS 2
+#define NUM_LOG_BUFFERS     2
     //Not final... but used for now to make code clearer.
-#define NBL_IMAGE_BUFFER 0
-#define NBL_SMALL_BUFFER 1
+#define NBL_IMAGE_BUFFER    0
+#define NBL_SMALL_BUFFER    1
     
     //declared in log_main.cpp
     const extern int LOG_BUFFER_SIZES[NUM_LOG_BUFFERS];
@@ -78,7 +78,7 @@ namespace nblog {
     
 #define LOG_VERSION 6
     
-#define LOG_PORT (30000)
+#define STREAM_PORT (30000)
     
 #define STREAM_USLEEP_WAITING (100000)
     
@@ -115,15 +115,7 @@ namespace nblog {
     /*
      STATISTICS
      */
-    typedef struct {
-        uint32_t servnr;
-        uint32_t filenr;
-        uint32_t nextw;
-    } buf_state_t;
     
-    /*
-     even number of 32 bit fields should result in 64 bit alignment w/o padding.
-     */
     typedef struct {
         uint64_t b_given;
         uint64_t b_lost;

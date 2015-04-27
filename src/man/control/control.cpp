@@ -25,6 +25,7 @@ using nblog::Log;
 namespace control {
     
     pthread_t control_thread;
+    static bool STARTED = false;
     
     uint32_t cnc_test(Log * arg) {
         printf("\tcnc_test:[%s] %lu bytes of data.\n", arg->description().c_str(),
@@ -35,7 +36,7 @@ namespace control {
     volatile uint8_t flags[num_flags];
     //expects two bytes of data:
     //  flag index
-    //  new flag value
+    //  new flag value (0 or 1)
     uint32_t cnc_setFlag(Log * arg) {
         
         size_t u = arg->data().size();
@@ -51,8 +52,13 @@ namespace control {
         uint8_t value = arg->data()[1];
         
         if (index >= num_flags) {
-            printf("cnc_setFlag() flag index OOB: %i\n", arg->data()[0]);
-            return 1;
+            printf("cnc_setFlag() flag index OOB: %i\n", index);
+            return 2;
+        }
+        
+        if (value > 1) {
+            printf("cnc_setFlag() flag value OOB: %i\n", value);
+            return 3;
         }
         
         switch (index) {
@@ -80,6 +86,11 @@ namespace control {
         return 0;
     }
     
+    /*
+     THIS IS WHERE YOU PUT NEW CONTROL FUNCTIONS!
+     
+     note that the function prototype must exacty match what's listed below.
+     */
     std::map<std::string, uint32_t (*)(Log *)> init_fmap() {
         std::map<std::string, uint32_t (*)(Log *)> ret;
         
@@ -89,19 +100,6 @@ namespace control {
         return ret;
     }
     std::map<std::string, uint32_t (*)(Log *)> fmap = init_fmap();
-    
-    std::vector<std::string> split(const std::string &s, char delim) {
-        std::vector<std::string> elems;
-        std::stringstream ss(s);
-        std::string item;
-        
-        while (std::getline(ss, item, delim)) {
-            if (!item.empty())
-                elems.push_back(item);
-        }
-        
-        return elems;
-    }
     
 #define CHECK_RET(r) {if (r) goto connection_died;}
     
@@ -120,11 +118,9 @@ namespace control {
         serv_addr.sin_port = htons(CONTROL_PORT);
         
         bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
-        
-        //We don't want to crash the server if the pipe dies...
-        
-        //Accepting connections on this socket, backqueue of size 1.
-        listen(listenfd, 1);
+                
+        //Accepting connections on this socket, no queue.
+        listen(listenfd, 0);
         
         NBDEBUG("control listening... port = %i\n", CONTROL_PORT);
         
@@ -151,7 +147,9 @@ namespace control {
                     
                     if (desc.count() < 2 ||
                         !(desc.get(0)->isAtom()) ||
-                        !(desc.get(0)->value() == "command")) {
+                        !(desc.get(0)->value() == "command") ||
+                        !(desc.get(1)->isAtom())    //command name
+                        ) {
                         NBDEBUG("control: INVALID COMMAND LOG!\n");
                         delete found;
                         goto connection_died;
@@ -198,8 +196,10 @@ namespace control {
     
     void control_init() {
         NBDEBUG("control_init() with %i functions.\n", fmap.size());
+        NBLassert(!STARTED);
+        STARTED = true;
+        
         bzero((void *) flags, num_flags);
-        flags[tripoint] = 1;
         
         pthread_create(&control_thread, NULL, &cnc_loop, NULL);
         pthread_detach(control_thread);

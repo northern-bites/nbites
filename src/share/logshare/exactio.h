@@ -20,7 +20,7 @@
 #define USLEEP_EXPECTING (1000)
 #define IO_SEC_TO_BREAK (5.0)
 
-//write can just use the write function
+//fileio can just use the write function
 #define WRITE_STUB write
 
 //specify system-dependent args to send function
@@ -32,6 +32,7 @@ static inline ssize_t send_stub(int sck, const void * data, size_t nbytes) {
 #endif
 }
 
+//network output io uses the above stub.
 #define SEND_STUB send_stub
 
 //specify system dependent args to recv function
@@ -43,8 +44,14 @@ static inline ssize_t recv_stub(int sck, void * data, size_t nbytes) {
 #endif
 }
 
+//network input io uses the above stub.
 #define RECV_STUB recv_stub
 
+//NOTE: this framework currently does not support file input.
+//So no 4th stub.
+
+//Uses a supplied put stub to write exactly nb bytes of data to sofd
+//i.e., socket-or-filedescriptor
 static inline int put_exact(ssize_t (* pstub)(int, const void *, size_t),
               int sofd,
               size_t nb,
@@ -122,7 +129,7 @@ static inline int get_exact(ssize_t (*gstub)(int, void *,size_t),
     return 0;
 }
 
-//put exactly using standard write()
+//put exactly using write_stub which currently translates to simple write()
 static inline int write_exact(int fd, size_t nbytes, const void * data) {
     return put_exact(&WRITE_STUB, fd, nbytes, (uint8_t *) data);
 }
@@ -137,10 +144,7 @@ static inline int recv_exact(int sck, size_t nbytes, void * buffer, double max_w
     return get_exact(&RECV_STUB, sck, nbytes, buffer, max_wait);
 }
 
-//Block thread unti client has attempted to connect.
-/*
- NOTE: the cnc server uses this function as well, so editors should ensure their changes do not break that code.
- */
+//Block thread until client has attempted to connect.
 static inline int block_accept(int lfd, int timeout) {
     int connfd = -1;
     

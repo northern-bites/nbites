@@ -26,21 +26,17 @@
 namespace nblog {
     
     uint64_t fio_upstart;
-    uint64_t sio_upstart;
     
     uint64_t cio_upstart;
     uint64_t cnc_upstart;
     
     uint64_t main_upstart;
     
-    //Effectively 64 bit fields
     io_state_t fio_start[NUM_LOG_BUFFERS];
     io_state_t cio_start[NUM_LOG_BUFFERS];
     io_state_t total[NUM_LOG_BUFFERS];
     
-    /*
-     32 bit fields
-     */
+    int nlog_assoc[NUM_LOG_BUFFERS];
     
     const uint32_t NUM_CORES = (uint32_t) sysconf(_SC_NPROCESSORS_ONLN);
 
@@ -68,6 +64,7 @@ namespace nblog {
         
         NBLassert(control::control_connected == 1);
         NBLassert(control::fileio == 2);
+        NBLassert(!log_running);
         //...
         
         NBDEBUG("sane.\n");
@@ -77,11 +74,12 @@ namespace nblog {
         NBDEBUG("log_main_init()\n");
         
         main_upstart = time(NULL);
-        sio_upstart = time(NULL);
         
         bzero(fio_start, sizeof(io_state_t) * NUM_LOG_BUFFERS);
         bzero(cio_start, sizeof(io_state_t) * NUM_LOG_BUFFERS);
         bzero(total, sizeof(io_state_t) * NUM_LOG_BUFFERS);
+        
+        bzero(nlog_assoc, sizeof(int) * NUM_LOG_BUFFERS);
         
         bzero(&log_main, sizeof(log_main_t));
         
@@ -123,6 +121,33 @@ namespace nblog {
         }
     } */
     
+    SExpr makeBufManage(int bi) {
+        std::vector<SExpr> vals = {
+            SExpr("servio_nextr", (int) log_main.buffers[bi].servio_nextr),
+            SExpr("fileio_nextr", (int) log_main.buffers[bi].fileio_nextr),
+            SExpr("next_write", (int) log_main.buffers[bi].next_write),
+            
+            SExpr("nl_assoc", (int) nlog_assoc[bi])
+        };
+        return SExpr(vals);
+    }
+    
+    SExpr makeBufState(io_state_t * start, io_state_t * end) {
+        std::vector<SExpr> vals = {
+            SExpr("l_given", (long) (end->l_given - start->l_given)),
+            SExpr("b_given", (long) (end->b_given - start->b_given)),
+            
+            SExpr("l_freed", (long) (end->l_freed - start->l_freed)),
+            SExpr("l_lost", (long) (end->l_lost - start->l_lost)),
+            SExpr("b_lost", (long) (end->b_lost - start->b_lost)),
+            
+            SExpr("l_writ", (long) (end->l_writ - start->l_writ)),
+            SExpr("b_writ", (long) (end->b_writ - start->b_writ)),
+        };
+        
+        return SExpr(vals);
+    }
+    
     void * log_main_loop(void * context) {
         
         log_serverio_init();
@@ -132,9 +157,9 @@ namespace nblog {
             sleep(1);
             
             //Log state.
-            
             std::vector<SExpr> fields;
             fields.push_back(SExpr("type", "STATS"));
+            
             std::vector<SExpr> fvector = {
                 SExpr("flags"),
                 SExpr("serv_connected", control::flags[control::serv_connected]),
@@ -174,12 +199,56 @@ namespace nblog {
             fields.push_back(sizes);
             
             time_t NOW = time(NULL);
-            fields.push_back(SExpr("con_uptime", control::flags[control::serv_connected] ? difftime(cio_upstart, NOW) : 0));
             
+            fields.push_back(SExpr("con_uptime", control::flags[control::serv_connected] ? difftime(NOW, cio_upstart) : 0));
+            fields.push_back(SExpr("cnc_uptime", control::flags[control::control_connected] ? difftime(NOW, cnc_upstart) : 0));
+            fields.push_back(SExpr("fio_uptime", control::flags[control::fileio] ? difftime(NOW, fio_upstart) : 0));
             
+            fields.push_back(SExpr("log_uptime", difftime(NOW, main_upstart)));
             
-            //printf("stats...\n");
-           // NBLog(NBL_SMALL_BUFFER, "log_main", time(NULL), {contents}, std::string());   //no data with it.
+            SExpr manages;
+            manages.append(SExpr("bufmanage"));
+            for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+                manages.append(makeBufManage(i));
+            }
+            fields.push_back(manages);
+            
+            /*
+             This system of grabbing io state is subject to multi-threading accuracy drift.
+             It is therefore only for estimates.
+             */
+            io_state_t zerostate;
+            bzero(&zerostate, sizeof(io_state_t));
+            
+            SExpr state_total;
+            state_total.append(SExpr("total-state"));
+            for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+                state_total.append(makeBufState(&zerostate, total + i));
+            }
+            fields.push_back(state_total);
+            
+            if (control::flags[control::fileio]) {
+                SExpr state_file;
+                state_file.append(SExpr("file-state"));
+                for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+                    state_file.append(makeBufState(fio_start + i, total + i));
+                }
+                fields.push_back(state_file);
+            }
+            
+            if (control::flags[control::serv_connected]) {
+                SExpr state_serv;
+                state_serv.append(SExpr("serv-state"));
+                for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+                    state_serv.append(makeBufState(cio_start + i, total + i));
+                }
+                fields.push_back(state_serv);
+            }
+            
+            std::vector<SExpr> contents = {SExpr(fields)};
+            
+            //NBDEBUG("logged state...");
+            NBLog(NBL_SMALL_BUFFER, "main_loop", contents, "");
         }
         
         return NULL;
@@ -202,6 +271,9 @@ namespace nblog {
                 total[bi].l_lost += 1;
                 total[bi].b_lost += lg->fullSize();
             }
+            
+            --nlog_assoc[bi];
+            NBLassert(nlog_assoc[bi] >= 0);
             
             delete lg;
         }
@@ -250,9 +322,7 @@ namespace nblog {
      */
     
     void put(Log * nstored, int bi) {
-        
-        NBDEBUG("put...\n");
-        
+                
         NBLassert(nstored);
         log_buffer_t& buf = log_main.buffers[bi];
         
@@ -265,20 +335,22 @@ namespace nblog {
         uint32_t old_i = buf.next_write;
         Log * old = buf.objects[old_i % LOG_BUFFER_SIZES[bi]];
         
-        if (old && old->release()) {
-            delete old;
+        if (old) {
+            releaseWrapper(bi, old, false);
         }
         
         buf.objects[(old_i % LOG_BUFFER_SIZES[bi])] = nstored;
         
-        //If IO is very slow, we need to update IO 'next_*'
+        /*If IO is very slow, we need to update IO 'next_*' */
+        
+        //fileio
         NBLassert(buf.fileio_nextr <= buf.next_write);
         uint32_t dif = buf.next_write - buf.fileio_nextr;
         NBLassert(dif <= LOG_BUFFER_SIZES[bi]);
         if (dif == LOG_BUFFER_SIZES[bi]) {
             ++(buf.fileio_nextr);
         }
-        
+        //servio
         NBLassert(buf.servio_nextr <= buf.next_write);
         dif = buf.next_write - buf.servio_nextr;
         NBLassert(dif <= LOG_BUFFER_SIZES[bi]);
@@ -287,6 +359,10 @@ namespace nblog {
         }
         
         ++(buf.next_write);
+        
+        ++nlog_assoc[bi];
+        //1 log could possibly be in the hands of each io.
+        NBLassert(nlog_assoc[bi] <= LOG_BUFFER_SIZES[bi] + 2);
         
         NBDEBUGs(SECTION_LOGM, "\t\tfilenr=%i servnr=%i nextw=%i\n", buf.fileio_nextr, buf.servio_nextr, buf.next_write);
     }

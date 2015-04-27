@@ -55,9 +55,9 @@ namespace nblog {
         bool send(int sock);//sock is socket
         
         //io stuff
-        size_t fullSize();
+        size_t fullSize();  //serialize.length() + data.length()
         void acquire();
-        bool release(); //returns true if ( (--_refs) == 0 )
+        bool release();     //returns true if ( (--_refs) == 0 )
         bool written();
         
         //returns NULL on failure.
