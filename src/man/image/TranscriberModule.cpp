@@ -11,7 +11,8 @@
 
 #include "Profiler.h"
 #include "../log/logging.h"
-#include "control.h"
+#include "../control/control.h"
+#include "nbdebug.h"
 
 using nblog::SExpr;
 using nblog::NBLog;
@@ -484,7 +485,7 @@ void TranscriberModule::run_()
         
 #ifdef USE_LOGGING
     if (control::flags[control::tripoint]) {
-        
+        NBDEBUG("TranscriberModule loop()\n");
         ++image_index;
         
         long im_size = (image.width() * image.height() * 1);
@@ -611,6 +612,7 @@ void TranscriberModule::run_()
         joints.append(SExpr("r_ankle_roll", ja_pb.r_ankle_roll() ));
         contents.push_back(joints);
         
+        NBDEBUG("TranscriberModule loop logging...\n");
         NBLog(NBL_IMAGE_BUFFER, "tripoint",
                    contents, im_buf);
     }

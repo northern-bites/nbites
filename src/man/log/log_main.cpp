@@ -251,6 +251,8 @@ namespace nblog {
     
     void put(Log * nstored, int bi) {
         
+        NBDEBUG("put...\n");
+        
         NBLassert(nstored);
         log_buffer_t& buf = log_main.buffers[bi];
         
