@@ -11,6 +11,8 @@
 
 #include "Profiler.h"
 #include "../log/logging.h"
+#include "control.h"
+
 using nblog::SExpr;
 using nblog::NBLog;
 
@@ -496,7 +498,7 @@ void TranscriberModule::run_()
         std::string is_buf;
         std::string im_buf((char *) image.pixelAddress(0, 0), im_size);
         ja_pb.SerializeToString(&ja_buf);
-        is_buf.SerializeToString(&is_buf);
+        is_pb.SerializeToString(&is_buf);
         
         im_buf.append(is_buf);
         im_buf.append(ja_buf);
@@ -504,9 +506,9 @@ void TranscriberModule::run_()
         std::vector<SExpr> contents;
         
         SExpr imageinfo("YUVImage", "Transcriber", clock(), image_index, im_size);
-        imageinfo.append("width", im_width);
-        imageinfo.append("height", im_height);
-        contents.push_back(image_info);
+        imageinfo.append(SExpr("width", im_width)   );
+        imageinfo.append(SExpr("height", im_height) );
+        contents.push_back(imageinfo);
         
         /*
          // Raw accelerometer data.
