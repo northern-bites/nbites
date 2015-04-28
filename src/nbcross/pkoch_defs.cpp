@@ -1,10 +1,3 @@
-//
-//  nbfuncs.cpp
-//  nbcross
-//
-//  Created by Philip Koch on 11/28/14.
-//
-
 #include "nbfuncs.h"
 #include <assert.h>
 #include <vector>
@@ -13,19 +6,6 @@
 
 using nblog::Log;
 using nblog::SExpr;
-
-std::vector<nbfunc_t> FUNCS;
-
-std::vector<Log *> args;
-std::vector<Log *> rets;
-
-//Common arg types -- used to check arg types and for human readability.
-const char sYUVImage[] = "YUVImage";
-const char sParticleSwarm_pbuf[] = "ParticleSwarm";
-const char sParticle_pbuf[] = "Particle";
-const char sTest[] = "test";
-
-const char stext[] = "text";//No current sources for this data type.
 
 int test_func() {
     assert(args.size() == 2);
@@ -68,34 +48,3 @@ int CrossBright_func() {
     
     return 0;
 }
-
-void register_funcs() {
-    
-    /*test func 1*/
-    nbfunc_t test;
-    test.name = (const char *) "simple test";
-    test.args = {sTest, sTest};
-    test.func = test_func;
-    FUNCS.push_back(test);
-    
-    /*test func 2*/
-    nbfunc_t arg_test;
-    arg_test.name = (char *) "arg test";
-    arg_test.args = {sYUVImage, sYUVImage};
-    arg_test.func = arg_test_func;
-    FUNCS.push_back(arg_test);
-    
-    //CrossBright
-    nbfunc_t CrossBright;
-    CrossBright.name = "CrossBright";
-    CrossBright.args = {sYUVImage};
-    CrossBright.func = CrossBright_func;
-    FUNCS.push_back(CrossBright);
-}
-
-
-
-
-#if __LINE__ > 100
-#error "USE YOUR OWN FILES FOR FUNCTIONS!"
-#endif

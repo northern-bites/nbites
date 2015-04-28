@@ -111,7 +111,8 @@ add_subdirectory( ${MAN_DIR}/log ${CMAKE_CURRENT_BINARY_DIR}/man/log)
 
 set( NBCROSS_SRCS
   main.cpp
-  nbfuncs.cpp
+  misc_defs.cpp
+  pkoch_defs.cpp
 )
 
 set( NBCROSS_HEADERS

@@ -13,6 +13,7 @@ import java.util.Queue;
 
 import nbtool.data.Log;
 import nbtool.data.Log.SOURCE;
+import nbtool.data.SExpr;
 import nbtool.util.N;
 import nbtool.util.NBConstants;
 import nbtool.util.U;
@@ -160,7 +161,12 @@ public class ControlIO implements Runnable{
 		synchronized(commands) {
 			if (commands == null || cmnd == null)
 				return false;
-			if (!cmnd.description.startsWith("cmnd="))
+			
+			SExpr cc = cmnd.tree().get(0);
+			if (!cc.exists() ||
+					!cc.isAtom() ||
+					!cc.value().equals("command")
+					)
 				return false;
 			
 			commands.add(cmnd);
@@ -186,13 +192,15 @@ public class ControlIO implements Runnable{
 		bytes[0] = (byte) findex;
 		bytes[1] = (byte) (fval ? 1 : 0);
 		
-		Log cmnd = new Log("cmnd=setFlag", bytes);
+		SExpr commandTree = SExpr.newList(SExpr.newAtom("command"), SExpr.newAtom("setFlag"));
+		Log cmnd = new Log(commandTree, bytes);
 		
 		return tryAddCall(cmnd);
 	}
 	
 	public static boolean tryAddTest() {
-		Log cmnd = new Log("cmnd=test", null);
+		SExpr commandTree = SExpr.newList(SExpr.newAtom("command"), SExpr.newAtom("test"));
+		Log cmnd = new Log(commandTree, null);
 		
 		return tryAddCall(cmnd);
 	}

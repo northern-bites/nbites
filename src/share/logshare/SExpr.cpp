@@ -184,6 +184,7 @@ namespace nblog {
     std::string SExpr::print(int indent, int lineLimit, int level)
     {
         std::string prefix(indent * level, ' ');
+        
         std::string s = serialize();
         if (_atom || (int) s.length() + indent * level <= lineLimit)
             return prefix + s;
@@ -200,7 +201,9 @@ namespace nblog {
             else
                 s += e.substr(indent * level + 1);
         }
-        s += "\n)";
+        s += "\n";
+        s += prefix;
+        s += ")";
         return s;
     }
     

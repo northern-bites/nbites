@@ -15,7 +15,6 @@ public class NBConstants {
 	public static final String PROTOBUF_TYPE_PREFIX = "proto-";
 	
 	public static final Rectangle DEFAULT_BOUNDS = new Rectangle(0,0,900,600);
-	public static final long DEFAULT_MAX_MEMORY_USAGE = 300000l;
 	
 	public static final String USER_CLASS_EXCEPTIONS = "~/.nbtool-exceptions.properties";
 	public static final String USER_LOG_TO_VIEW_MAP = "~/.nbtool-views.properties";
@@ -66,30 +65,4 @@ public class NBConstants {
 	public static final String[] STATUS_STRINGS = {
 		"idle", "starting", "running", "stopping"
 	};
-	
-	public static final ArrayList<FlagPair> flags = _setupFlags();
-	private static ArrayList<FlagPair> _setupFlags() {
-		ArrayList<FlagPair> ret = new ArrayList<FlagPair>();
-		ret.add(new FlagPair("fileio      ", 2));
-				
-		ret.add(new FlagPair("SENSORS     ", 3));
-		ret.add(new FlagPair("GUARDIAN    ", 4));
-		ret.add(new FlagPair("COMM        ", 5));
-		ret.add(new FlagPair("LOCATION    ", 6));
-		ret.add(new FlagPair("ODOMETRY    ", 7));
-		ret.add(new FlagPair("OBSERVATIONS", 8));
-		ret.add(new FlagPair("LOCALIZATION", 9));
-		ret.add(new FlagPair("BALLTRACK   ", 10));
-		ret.add(new FlagPair("IMAGES      ", 11));
-		ret.add(new FlagPair("VISION      ", 12));
-		return ret;
-	}
-	
-	public static class FlagPair {
-		public String name;
-		public int index;
-		protected FlagPair(String s, int i) {
-			name = s; index = i;
-		}
-	}
 }

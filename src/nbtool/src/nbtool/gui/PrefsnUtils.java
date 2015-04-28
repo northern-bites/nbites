@@ -128,14 +128,7 @@ public class PrefsnUtils extends JPanel{
 			resetPrefB = new JButton("reset preferences (!bounds) (must restart)");
 			resetPrefB.addActionListener(this);
 			add(resetPrefB);
-			
-			maxMemoryUsage = new JTextField("" + P.getHeap());
-			maxMemoryUsage.addActionListener(this);
-			JLabel lbl = new JLabel("max memory: ");
-			mmuPanel = U.fieldWithlabel(lbl, maxMemoryUsage);
-			
-			add(mmuPanel);
-			
+					
 			verbosity = new JCheckBox("verbose tool");
 			verbosity.setSelected(P.getVerbose());
 			verbosity.addActionListener(this);
@@ -147,9 +140,7 @@ public class PrefsnUtils extends JPanel{
 			int y = ins.top;
 			int mw = size.width - ins.left - ins.right;
 			
-			int height = mmuPanel.getPreferredSize().height;
-			mmuPanel.setBounds(ins.left, y, mw, height);
-			y += height;
+			int height = 0;
 			
 			height = copyMappingB.getPreferredSize().height;
 			copyMappingB.setBounds(ins.left, y, mw, height);
@@ -171,10 +162,7 @@ public class PrefsnUtils extends JPanel{
 		private JButton copyMappingB;
 		private JButton copyExceptB;
 		private JButton resetPrefB;
-		
-		private JTextField maxMemoryUsage;
-		private JPanel mmuPanel;
-		
+				
 		private JCheckBox verbosity;
 		
 		public void actionPerformed(ActionEvent e) {
@@ -194,27 +182,7 @@ public class PrefsnUtils extends JPanel{
 				U.w("Prefs: reseting preferences.");
 				P.resetNonFilePreferences();
 			} 
-			else if (e.getSource() == maxMemoryUsage){
-				String ns = maxMemoryUsage.getText();
-				
-				int nv = -1;
-				
-				try {
-					nv = Integer.parseInt(ns);
-				} catch (NumberFormatException nfe) {
-					nfe.printStackTrace();
-				}
-				
-				if (nv > 1024) { //reasonable minimum value
-					P.putHeap(nv);
-					N.notifyEDT(EVENT.MAX_MEM_USAGE_CHANGED, this, nv);
-				} else {
-					maxMemoryUsage.setText("" + SessionMaster.INST.max_data_bytes);
-					U.w("Could not use new max memory value.");
-				}
-			} else if (e.getSource() == verbosity){
-				P.setVerbose(verbosity.isSelected());
-			} else {
+			else {
 				
 			}
 		}

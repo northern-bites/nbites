@@ -14,6 +14,7 @@ import java.net.UnknownHostException;
 
 import nbtool.data.Log;
 import nbtool.data.Log.SOURCE;
+import nbtool.data.SExpr;
 import nbtool.util.N;
 import nbtool.util.N.EVENT;
 import nbtool.util.NBConstants;
@@ -112,6 +113,8 @@ public class StreamIO implements Runnable {
 					out.flush();
 				} else if (recv == seq_num) {
 					Log nl = CommonIO.readLog(in);
+					
+					nl.tree().append(SExpr.newKeyValue("from_address", server_address));
 					U.w("NetIO: thread got packet of data size: " + nl.bytes.length + " desc: " + nl.description);
 					
 					nl.source = SOURCE.NETWORK;

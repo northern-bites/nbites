@@ -28,9 +28,7 @@ public class N {
 		
 		LOG_SELECTION, /*(selected log)(arraylist of other selected logs)*/				//From chooser gui
 		SES_SELECTION, /*(selected session)*/			//From chooser gui
-		
-		MAX_MEM_USAGE_CHANGED, /*(new value)*/			//From prefs
-		
+				
 		STATUS; //(status) (mode)						//From SessionHandler
 				
 		protected int index;
@@ -118,7 +116,7 @@ public class N {
 			return String.format("%B", o);
 		
 		if (o instanceof RobotStats)
-			return String.format("[BotStats from ut %d]", ((RobotStats) o).log_uptime);
+			return String.format("[BotStats nflags %d]", ((RobotStats) o).flags.size());
 		
 		if (o instanceof ArrayList)
 			return String.format("[ArrayList of size %d]", ((ArrayList) o).size());

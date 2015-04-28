@@ -119,6 +119,10 @@ public abstract class SExpr implements Serializable{
 		return new Found(Arrays.asList(contents));
 	}
 	
+	public static SExpr newKeyValue(String key, String value) {
+		return newList(new Found(key), new Found(value));
+	}
+	
 	public abstract boolean isAtom();
 	public abstract boolean exists();
 	
@@ -130,6 +134,7 @@ public abstract class SExpr implements Serializable{
 	public abstract int valueAsInt() throws NumberFormatException;
 	public abstract long valueAsLong() throws NumberFormatException;
 	public abstract double valueAsDouble() throws NumberFormatException;
+	public abstract boolean valueAsBoolean();
 	
 	public abstract String print();
 	public abstract String print(int level);
@@ -202,6 +207,19 @@ public abstract class SExpr implements Serializable{
 		public double valueAsDouble() throws NumberFormatException {
 			return Double.parseDouble(value);
 		}
+		
+		@Override
+		public boolean valueAsBoolean() {
+			if (value.trim().equalsIgnoreCase("true"))
+				return true;
+			if (value.trim().equalsIgnoreCase("false"))
+				return false;
+			if (value.trim().equalsIgnoreCase("1"))
+				return true;
+			if (value.trim().equalsIgnoreCase("0"))
+				return false;
+			throw new NumberFormatException();
+		}
 
 		private final int indent = 2;
 		private final int linelimit = 64;
@@ -231,6 +249,8 @@ public abstract class SExpr implements Serializable{
 					s += e.substring(indent * level + 1);
 			}
 
+			s += "\n";
+			s += prefix;
 			s += ")";
 			return s;
 		}
@@ -317,6 +337,11 @@ public abstract class SExpr implements Serializable{
 
 		@Override
 		public double valueAsDouble() throws NumberFormatException {
+			throw new DoesNotExistException();
+		}
+		
+		@Override
+		public boolean valueAsBoolean() {
 			throw new DoesNotExistException();
 		}
 

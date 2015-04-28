@@ -13,7 +13,6 @@ import nbtool.util.U;
 public class Log implements Serializable {
 	private static final long serialVersionUID = 5000703421741282261L;
 	
-	
 	/*
 	 * Unique number for every log found during this execution.
 	 * */
@@ -39,7 +38,17 @@ public class Log implements Serializable {
 	//Set by GUI when selected.
 	public transient TreePath lastSeen = null;
 
-	public SExpr tree;
+	private SExpr tree = null;
+	public SExpr tree() {
+		if (tree == null)
+			tree = SExpr.deserializeFrom(description);
+		return tree;
+	}
+	
+	public void setTree(SExpr nt) {
+		this.tree = nt;
+		this.description = nt.serialize();
+	}
 	
 	public Log() {}
 	
@@ -47,10 +56,18 @@ public class Log implements Serializable {
 		this();
 		
 		this.name = null;
+		this.tree = null;
 		this.description = d;
-		this.bytes = b;
+		this.bytes = b;		
+	}
+	
+	public Log(SExpr t, byte[] d) {
+		this();
 		
-		this.tree = SExpr.deserializeFrom(description);
+		this.name = null;
+		this.tree = t;
+		this.description = t.serialize();
+		this.bytes = d;
 	}
 	
 	public void setNameFromDesc() {
@@ -74,35 +91,35 @@ public class Log implements Serializable {
 	 */
 	
 	public String madeWhere() {
-		SExpr where = tree.find("created").get(1);
+		SExpr where = tree().find("created").get(1);
 		if (where.exists() && where.isAtom())
 			return where.value();
 		else return null;
 	}
 	
 	public String madeWhen() {
-		SExpr when = tree.find("created").get(2);
+		SExpr when = tree().find("created").get(2);
 		if (when.exists() && when.isAtom())
 			return when.value();
 		else return null;
 	}
 	
 	public Integer checksum() {
-		SExpr cs = tree.find("checksum").get(1);
+		SExpr cs = tree().find("checksum").get(1);
 		if (cs.exists() && cs.isAtom())
 			return cs.valueAsInt();
 		else return null;
 	}
 	
 	public Integer version() {
-		SExpr v = tree.find("version").get(1);
+		SExpr v = tree().find("version").get(1);
 		if (v.exists() && v.isAtom())
 			return v.valueAsInt();
 		else return null;
 	}
 	
 	public int contentCount() {
-		SExpr v = tree.find("contents");
+		SExpr v = tree().find("contents");
 		if (v.exists())
 			return v.count();
 		return -1;
@@ -114,27 +131,27 @@ public class Log implements Serializable {
 	 * */
 	
 	public int pBytes() {
-		SExpr c = tree.find("contents").get(1).find("bytes").get(1);
+		SExpr c = tree().find("contents").get(1).find("bytes").get(1);
 		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
 	}
 	
 	public String pType() {
-		SExpr c = tree.find("contents").get(1).find("type").get(1);
+		SExpr c = tree().find("contents").get(1).find("type").get(1);
 		return c.exists() && c.isAtom() ? c.value() : null;
 	}
 	
 	public String pFrom() {
-		SExpr c = tree.find("contents").get(1).find("from").get(1);
+		SExpr c = tree().find("contents").get(1).find("from").get(1);
 		return c.exists() && c.isAtom() ? c.value() : null;
 	}
 	
 	public int pI_Index() {
-		SExpr c = tree.find("contents").get(1).find("i_index").get(1);
+		SExpr c = tree().find("contents").get(1).find("i_index").get(1);
 		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
 	}
 	
 	public Long pTime() {
-		SExpr c = tree.find("contents").get(1).find("time").get(1);
+		SExpr c = tree().find("contents").get(1).find("time").get(1);
 		return c.exists() && c.isAtom() ? c.valueAsLong() : null;
 	}
 	
@@ -150,17 +167,17 @@ public class Log implements Serializable {
 	 */
 	
 	public String pEncoding() {
-		SExpr c = tree.find("contents").get(1).find("encoding").get(1);
+		SExpr c = tree().find("contents").get(1).find("encoding").get(1);
 		return c.exists() && c.isAtom() ? c.value() : null;
 	}
 	
 	public int pWidth() {
-		SExpr c = tree.find("contents").get(1).find("width").get(1);
+		SExpr c = tree().find("contents").get(1).find("width").get(1);
 		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
 	}
 	
 	public int pHeight() {
-		SExpr c = tree.find("contents").get(1).find("height").get(1);
+		SExpr c = tree().find("contents").get(1).find("height").get(1);
 		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
 	}
 }

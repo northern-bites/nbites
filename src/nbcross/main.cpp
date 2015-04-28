@@ -30,14 +30,24 @@
 using nblog::Log;
 using nblog::SExpr;
 
+std::vector<Log *> args;
+std::vector<Log *> rets;
+
 int main(int argc, const char * argv[]) {
+    CrossFunc("e", NULL, {"a", "b"});
     
-#error ADD SUPPORT FOR NAMES!
+    std::string instance_name;
     
-    register_funcs();
+    if (argc > 1) {
+        printf("using name: [%s]\n", argv[1]);
+        instance_name = std::string(argv[1]);
+    } else {
+        printf("using null name.\n");
+    }
+    
     printf("using %li functions:\n", FUNCS.size());
     for (int i = 0; i < FUNCS.size(); ++i)
-        printf("\t%s(%lu)\n", FUNCS[i].name, FUNCS[i].args.size());
+        printf("\t%s(%lu)\n", FUNCS[i].name.c_str(), FUNCS[i].args.size());
     printf("\n\n-----------------------------------------\n");
     
     struct sockaddr_in server;
@@ -72,6 +82,7 @@ int main(int argc, const char * argv[]) {
     net_order = htonl(FUNCS.size());
     CHECK_RET(send_exact(fd, 4, &net_order));
     
+    //Could put this in SExprs, but it's already working like this...
     std::ostringstream format;
     for (int i = 0; i < FUNCS.size(); ++i) {
         format << FUNCS[i].name << '=';
@@ -83,13 +94,9 @@ int main(int argc, const char * argv[]) {
     }
     
     std::string funcstr = format.str();
-    //printf("\"\n%s\"\n", funcstr.c_str());
-    
-    char buf[100];
-    snprintf(buf, 100, "type=functionlist fn=%lu", FUNCS.size());
-    
     std::vector<SExpr> contents= {
-        SExpr("nfuncs", (int) FUNCS.size())
+        SExpr("nfuncs", (int) FUNCS.size()),
+        SExpr("name", instance_name)
     };
     
     Log functions("nbcross", "nbcross/main", time(NULL), NBCROSS_VERSION, contents, funcstr);
@@ -143,7 +150,7 @@ int main(int argc, const char * argv[]) {
             
             std::string type = contents->get(0)->value();
             if (type != FUNCS[findex].args[i]) {
-                printf("arg %i [%s] did NOT match type=%s!\n", i, type.c_str(), FUNCS[findex].args[i]);
+                printf("arg %i [%s] did NOT match type=%s!\n", i, type.c_str(), FUNCS[findex].args[i].c_str());
                 return 1;
             }
             
@@ -152,7 +159,7 @@ int main(int argc, const char * argv[]) {
         
         assert(args.size() == FUNCS[findex].args.size());
         printf("calling function [%s]"
-               "\n-------------------------------------------\n", FUNCS[findex].name);
+               "\n-------------------------------------------\n", FUNCS[findex].name.c_str());
         
         int ret = FUNCS[findex].func();
         
@@ -176,13 +183,11 @@ int main(int argc, const char * argv[]) {
         }
         
         printf("cleaning up function... ");
-        
         for (int i = 0; i < args.size(); ++i) {delete args[i];}
         args.clear();
         
         for (int i = 0; i < rets.size(); ++i) {delete rets[i];}
         rets.clear();
-        
         printf("done\n");
         
         printf("function call completed\n");

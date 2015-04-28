@@ -18,16 +18,23 @@ import nbtool.util.U;
 public class FlagPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private JRadioButton jrb[] = new JRadioButton[3];
+	private JLabel lbl;
+	
 	private ButtonGroup bg;
 	public String flag_name;
 	public int index;
+
 	
-	public FlagPanel(String name, int i) {
-		this.flag_name = name;
-		this.index = i;
+	public FlagPanel() {
+		this.flag_name = "null";
+		int nspace = 20 - flag_name.length();
+		//even out lengths.
+		this.flag_name += new String(new char[nspace]).replace("\0", " ");
+		this.index = -1;
+		
 		this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 		
-		JLabel lbl = new JLabel(this.flag_name);
+		lbl = new JLabel(this.flag_name);
 		lbl.setFont(new Font("monospaced", Font.PLAIN, 12));
 		add(lbl);
 		bg = new ButtonGroup();
@@ -79,5 +86,15 @@ public class FlagPanel extends JPanel implements ActionListener {
 		jrb[v ? 2 : 0].setSelected(true);
 		jrb[0].setEnabled(true);
 		jrb[2].setEnabled(true);
+	}
+	
+	public void setInfo(String name, int index) {
+		this.flag_name = name;
+		int nspace = 20 - name.length();
+		//even out lengths.
+		this.flag_name += new String(new char[nspace]).replace("\0", " ");
+		this.index = index;
+		
+		lbl.setText(flag_name);
 	}
 }

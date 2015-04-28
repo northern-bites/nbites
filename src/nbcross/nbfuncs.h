@@ -17,20 +17,38 @@
 
 #define NBCROSS_VERSION 6
 
-typedef struct {
-    const char * name;
-    int (*func)(void) ;
+class CrossFunc {
     
-    std::vector<const char * > args;
-} nbfunc_t;
+public:
+    std::string name;
+    int (*func)(void);
+    std::vector<std::string> args;
+    
+    CrossFunc(std::string n,  int (*f)(void), std::vector<std::string> a) :
+    name(n),
+    func(f),
+    args(a)
+    { }
+    
+};
 
-extern std::vector<nbfunc_t> FUNCS;
+//defined in pkoch_defs.cpp
+int test_func();
+int arg_test_func();
+int CrossBright_func();
+
+//defined in misc_defs.cpp
+/* none so far */
+
+//etc...
+
+static const std::vector<CrossFunc> FUNCS = {
+    CrossFunc("test", test_func, {}),
+    CrossFunc("arg_test", arg_test_func, {"YUVImage", "YUVImage"}),
+    CrossFunc("CrossBright", CrossBright_func, {"YUVImage"})
+};
 
 extern std::vector<nblog::Log *> args;
 extern std::vector<nblog::Log *> rets;
-
-void register_funcs();
-void check_arguments(int func_index); //Checks that the arguments in <std::vector args> match
-        //those listed in the func declaration FUNCS[func_index]
 
 #endif /* defined(__nbcross__nbfuncs__) */

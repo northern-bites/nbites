@@ -20,17 +20,12 @@ public class SessionMaster implements NListener {
 	public Session workingSession;
 	
 	private SessionHandler handler;
-	
-	public volatile long max_data_bytes;
-	
+		
 	private SessionMaster() {
 		sessions = new ArrayList<Session>();
 		handler = null;
 		workingSession = null;
-		
-		max_data_bytes = P.getHeap();
-		
-		N.listen(EVENT.MAX_MEM_USAGE_CHANGED, this);
+				
 		N.listen(EVENT.STATUS, this);
 	}
 	
@@ -59,10 +54,6 @@ public class SessionMaster implements NListener {
 
 	public void notified(EVENT e, Object src, Object... args) {
 		switch(e) {
-		case MAX_MEM_USAGE_CHANGED:
-			Long nv = (Long) args[0];
-			this.max_data_bytes = nv;
-			break;
 		case STATUS:
 		{
 			STATUS s = (STATUS) args[0];
@@ -105,8 +96,8 @@ public class SessionMaster implements NListener {
 		for (Log l : logs) {
 			destination.addLog(l);
 
-			U.wf("ERROR: Still using that flags hack in SessionMaster!\n");
-			if (l.tree.find("contents").get(1).find("flags").exists())
+			//U.wf("ERROR: Still using that flags hack in SessionMaster!\n");
+			if (l.tree().find("contents").get(1).find("flags").exists())
 				lbs = l;
 		}
 

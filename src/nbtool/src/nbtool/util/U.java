@@ -7,8 +7,10 @@ import java.io.File;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.KeyPair;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -21,6 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.tree.TreePath;
 
 import nbtool.data.Log;
+import nbtool.data.SExpr;
 import nbtool.images.ImageParent;
 import nbtool.images.UV88image;
 import nbtool.images.Y16image;
@@ -210,5 +213,89 @@ public class U {
 			return System.getProperty("user.home") 
 					+ p.substring(1);
 		} else return p;
+	}
+	
+	
+	
+	public static boolean is_v6Log(Log tocheck) {
+		return (tocheck.description.trim().startsWith("(nblog"));
+	}
+	
+	/* Modifies the description field of old */
+	public static boolean v6Convert(Log old) {
+		if (is_v6Log(old))
+			return true;	//nothing to do
+		
+		HashMap<String, String> map = new HashMap<String, String>();
+		String[] attrs = old.description.trim().split(" ");
+		for (String a : attrs) {
+			if (a.trim().isEmpty()) continue;
+			
+			String[] parts = a.split("=");
+			if (parts.length != 2)
+				return false;	//Don't attempt to reconstruct malformed descriptions.
+			
+			String type = parts[0].trim();
+			if (type.isEmpty())
+				return false;
+			
+			String value = parts[1].trim();
+			if (value.isEmpty())
+				return false;
+			
+			if (map.containsKey(type)) {
+				return false;
+			}
+			
+			map.put(type, value);
+		}
+		
+		if (map.containsKey("checksum")) {
+			int found_sum = checksum(old.bytes);
+			int read_sum = Integer.parseInt(map.get("checksum"));
+			if (found_sum != read_sum)
+				return false;
+		}
+		
+		//Ok, we can convert this.
+		map.remove("checksum");
+		map.remove("version");
+		
+		SExpr top_level = SExpr.newList();
+		top_level.append(SExpr.newAtom("nblog"));
+		top_level.append(SExpr.newList(
+				SExpr.newAtom("created"),
+				SExpr.newAtom("CONVERTED"),
+				SExpr.newAtom("null")
+				));
+		
+		top_level.append(SExpr.newKeyValue("version", 6 + ""));
+		
+		SExpr c1 = SExpr.newList();
+		c1.append(SExpr.newKeyValue("nbytes", old.bytes.length + ""));
+		if (map.containsKey("index")) {
+			c1.append(SExpr.newKeyValue("iindex", map.get("index")));
+			map.remove("index");
+		}
+		
+		for (Entry<String, String> kp : map.entrySet()) {
+			c1.append(SExpr.newKeyValue(kp.getKey(), kp.getValue()));
+		}
+		
+		SExpr clist = SExpr.newList();
+		clist.append(SExpr.newAtom("contents"));
+		clist.append(c1);
+		
+		top_level.append(clist);
+		
+		old.description = top_level.serialize();
+		return true;
+	}
+	
+	public static int checksum(byte[] data) {
+		int checksum = 0;
+		for (byte b : data)
+			checksum += (b & 0xFF);
+		return checksum;
 	}
 }
