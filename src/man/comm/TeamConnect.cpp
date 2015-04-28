@@ -74,7 +74,7 @@ PROF_ENTER(P_COMM_BUILD_PACKET);
     strncpy(splMessage.header, SPL_STANDARD_MESSAGE_STRUCT_HEADER, sizeof(splMessage.header));
     splMessage.version = SPL_STANDARD_MESSAGE_STRUCT_VERSION;
     splMessage.playerNum = (uint8_t)arbData->player_number();
-    splMessage.team = (uint8_t)arbData->team_number();
+    splMessage.teamNum = (uint8_t)arbData->team_number();
     splMessage.fallen = (uint8_t)model.fallen();
     
     splMessage.pose[0] = (model.my_x()-CENTER_FIELD_X)*CM_TO_MM;
