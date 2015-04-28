@@ -32,6 +32,7 @@ namespace nblog {
         SExpr();
         //atom with value n
         SExpr(const std::string& n);
+        SExpr(const char * n);
         
         //more atoms.
         SExpr(int v);

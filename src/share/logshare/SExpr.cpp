@@ -38,6 +38,12 @@ namespace nblog {
     _value(v),
     _list()
     { }
+    
+    SExpr::SExpr(const char * n) :
+    _atom(true),
+    _value(n),
+    _list()
+    { }
 
     //emtpy list
     SExpr::SExpr() :

@@ -65,7 +65,10 @@ namespace nblog {
         NBLassert(control::control_connected == 1);
         NBLassert(control::fileio == 2);
         NBLassert(!log_running);
+        
         //...
+        SExpr aString("thisstring");
+        printf("%s\n", aString.serialize().c_str());
         
         NBDEBUG("sane.\n");
     }
