@@ -1,4 +1,5 @@
 #include "SExpr.h"
+#include "nbdebug.h"
 
 #include <ctype.h>
 #include <iostream>
@@ -9,9 +10,67 @@ namespace nblog {
     
     const char SExpr::special[] = {' ', '(', ')', '\r', '\n', '\t'};
     
+    /*
+     ATOM CONSTRUCTORS
+     */
+    
+    //atom sexpr from string
+    SExpr::SExpr(const std::string& v) :
+    _atom(true),
+    _value(v),
+    _list()
+    {
+        NBDEBUGs(SECTION_SEXPR, "atom SExpr(const std::string& v)\n");
+    }
+    
+    SExpr::SExpr(const char * n) :
+    _atom(true),
+    _value(n),
+    _list()
+    {
+        NBDEBUGs(SECTION_SEXPR, "atom SExpr(const char * n)\n");
+    }
+    
+    //atom from int
+    SExpr::SExpr(int v) :
+    _atom(true),
+    _list()
+    {
+        NBDEBUGs(SECTION_SEXPR, "atom SExpr(int v)\n");
+        char buf[100];
+        snprintf(buf, 100, "%i", v);
+        _value = std::string(buf);
+    }
+    
+    //atom from long
+    SExpr::SExpr(long v) :
+    _atom(true),
+    _list()
+    {
+        NBDEBUGs(SECTION_SEXPR, "atom SExpr(long v)\n");
+        char buf[100];
+        snprintf(buf, 100, "%li", v);
+        _value = std::string(buf);
+    }
+    
+    //atom from double
+    SExpr::SExpr(double v) :
+    _atom(true),
+    _list()
+    {
+        NBDEBUGs(SECTION_SEXPR, "atom SExpr(double v)\n");
+        char buf[100];
+        snprintf(buf, 100, "%f", v);
+        _value = std::string(buf);
+    }
+    
+    /*
+     LIST CONSTRUCTORS
+     */
+    
     //standard content item initializer
     SExpr::SExpr(const std::string& type,
-          const std::string& from, clock_t created,
+                 const std::string& from, clock_t created,
                  size_t image_index, size_t nbytes) :
     _atom(false),
     _value("")
@@ -30,56 +89,17 @@ namespace nblog {
     _atom(false),
     _value(""),
     _list(l)
-    { }
+    {
+        NBDEBUGs(SECTION_SEXPR, "SExpr(const std::vector<SExpr>& l)\n");
+    }
     
-    //atom sexpr from string
-    SExpr::SExpr(const std::string& v) :
-    _atom(true),
-    _value(v),
-    _list()
-    { }
-    
-    SExpr::SExpr(const char * n) :
-    _atom(true),
-    _value(n),
-    _list()
-    { }
-
     //emtpy list
     SExpr::SExpr() :
     _atom(false),
     _value(""),
     _list()
-    { }
-    
-    //atom from int
-    SExpr::SExpr(int v) :
-    _atom(true),
-    _list()
     {
-        char buf[100];
-        snprintf(buf, 100, "%i", v);
-        _value = std::string(buf);
-    }
-    
-    //atom from long
-    SExpr::SExpr(long v) :
-    _atom(true),
-    _list()
-    {
-        char buf[100];
-        snprintf(buf, 100, "%li", v);
-        _value = std::string(buf);
-    }
-    
-    //atom from double
-    SExpr::SExpr(double v) :
-    _atom(true),
-    _list()
-    {
-        char buf[100];
-        snprintf(buf, 100, "%f", v);
-        _value = std::string(buf);
+        NBDEBUGs(SECTION_SEXPR, "SExpr()\n");
     }
     
     SExpr::SExpr(const std::string& key, SExpr& val) :
@@ -123,6 +143,10 @@ namespace nblog {
     {
         _list = {SExpr(key), SExpr(index), SExpr(cval)};
     }
+    
+    /*
+     Instance methods
+     */
     
     SExpr * SExpr::get(int i)
     {
@@ -228,6 +252,10 @@ namespace nblog {
         
         return NULL;
     }
+    
+    /*
+     Class method to read from string.
+     */
     
     SExpr * SExpr::read(std::string s, ssize_t& p)
     {

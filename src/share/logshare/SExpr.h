@@ -104,7 +104,6 @@ namespace nblog {
         std::string _value;
         // List of nested expressions, only non-empty if not atom
         std::vector<SExpr> _list;
-        
     };
     
 }
