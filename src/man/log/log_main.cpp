@@ -85,6 +85,7 @@ namespace nblog {
         
         for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
             log_main.buffers[i].objects = (Log **) malloc(LOG_BUFFER_SIZES[i] * sizeof(Log *));
+            bzero(log_main.buffers[i].objects, LOG_BUFFER_SIZES[i] * sizeof(Log *));
             
             pthread_mutex_init(&(log_main.buffers[i].lock), NULL);
         }
