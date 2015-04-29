@@ -81,6 +81,10 @@ include_directories( ${SHARE_DIR}/include )
 add_subdirectory( ${SHARE_DIR}/portals ${CMAKE_CURRENT_BINARY_DIR}/portals )
 include_directories( ${SHARE_DIR}/portals )
 
+# Compile logshare into logshare folder
+add_subdirectory( ${SHARE_DIR}/logshare ${CMAKE_CURRENT_BINARY_DIR}/logshare )
+include_directories( ${SHARE_DIR}/logshare )
+
 # Compile messages into messages folder
 add_subdirectory( ${SHARE_DIR}/messages ${CMAKE_CURRENT_BINARY_DIR}/messages )
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages )
@@ -107,7 +111,8 @@ add_subdirectory( ${MAN_DIR}/log ${CMAKE_CURRENT_BINARY_DIR}/man/log)
 
 set( NBCROSS_SRCS
   main.cpp
-  nbfuncs.cpp
+  misc_defs.cpp
+  pkoch_defs.cpp
 )
 
 set( NBCROSS_HEADERS
@@ -134,4 +139,5 @@ target_link_libraries( nbcross_tool
   comm # man comm
   sharedball # man sharedball
   log
+  logshare
   )

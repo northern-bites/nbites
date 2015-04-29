@@ -4,15 +4,16 @@ import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
 
-import nbtool.io.CppIO.CppFunc;
+import nbtool.data.RobotStats;
+import nbtool.io.CrossIO.CppFunc;
 
 //Notification center
 public class N {
 	
 	public static enum EVENT {
 		
-		CPP_CONNECTION, /*(true/false)*/ 	//From CPP thread
-		CPP_FUNCS_FOUND, /*(ArrayList<CppFunc>)*/	//From CPP thread
+		NBCROSS_CONNECTION, /*(true/false)*/ 	//From CPP thread
+		NBCROSS_FUNCS_FOUND, /*(ArrayList<CppFunc>)*/	//From CPP thread
 		
 		CNC_CONNECTION, /*(true/false)*/	//From CommandIO thread
 		SIO_THREAD, /*(true/false)*/	//From NetIO thread
@@ -25,11 +26,9 @@ public class N {
 		REL_BOTSTAT, /*(new relevant botstat object)*/	//From SessionMaster
 		STATS,											//From Stats object
 		
-		LOG_SELECTION, /*(selected log)*/				//From chooser gui
+		LOG_SELECTION, /*(selected log)(arraylist of other selected logs)*/				//From chooser gui
 		SES_SELECTION, /*(selected session)*/			//From chooser gui
-		
-		MAX_MEM_USAGE_CHANGED, /*(new value)*/			//From prefs
-		
+				
 		STATUS; //(status) (mode)						//From SessionHandler
 				
 		protected int index;
@@ -72,7 +71,9 @@ public class N {
 		ArrayList<NListener> list = listeners[e.index];
 		
 		synchronized (list) {
-			U.w(">>notify: " + e.toString() + " from " + src.toString() + " args: " + args.toString());
+			if (P.VERBOSE)
+				U.w(">>notify: " + e.toString() + " from " + src.getClass().getCanonicalName() + " args: " + represent(args));
+			
 			for (NListener nl : list)
 				nl.notified(e, src, args);
 		}
@@ -90,4 +91,37 @@ public class N {
 		
 		return listeners[e.index].size();
 	}
+	
+	
+	private static String represent(Object ... objs) {
+		
+		if (objs.length == 0)
+			return "()";
+		
+		String ret = "(" + represent(objs[0]);
+		
+		for (int i = 1; i < objs.length; ++i) {
+			ret += ", " + represent(objs[i]);
+		}
+		
+		if (ret.length() > 200)
+			return ret.substring(0, 200) + "... TRUNC )";
+		
+		return ret + ")";
+	}
+	
+	private static String represent(Object o) {
+		
+		if (o instanceof Boolean)
+			return String.format("%B", o);
+		
+		if (o instanceof RobotStats)
+			return String.format("[BotStats nflags %d]", ((RobotStats) o).flags.size());
+		
+		if (o instanceof ArrayList)
+			return String.format("[ArrayList of size %d]", ((ArrayList) o).size());
+		
+		return "[" + o.toString() + "]";
+	}
+
 }

@@ -13,6 +13,7 @@ import java.util.Queue;
 
 import nbtool.data.Log;
 import nbtool.data.Log.SOURCE;
+import nbtool.data.SExpr;
 import nbtool.util.N;
 import nbtool.util.NBConstants;
 import nbtool.util.U;
@@ -22,10 +23,10 @@ import nbtool.util.N.EVENT;
  * Astute observers will notice this code is remarkably similar to the netIO code
  * */
 
-public class CommandIO implements Runnable{
+public class ControlIO implements Runnable{
 	
 	//Set by any creator if they want their CommandIO instance to be publicly used.
-	public static CommandIO INSTANCE;
+	public static ControlIO INSTANCE;
 	
 	private String cnc_address;
 	private int cnc_port;
@@ -37,7 +38,7 @@ public class CommandIO implements Runnable{
 	
 	private volatile boolean running;
 	
-	public CommandIO(String addr, int p, Boss b) {
+	public ControlIO(String addr, int p, Boss b) {
 		cnc_address = addr;
 		cnc_port = p;
 		boss = b;
@@ -160,7 +161,12 @@ public class CommandIO implements Runnable{
 		synchronized(commands) {
 			if (commands == null || cmnd == null)
 				return false;
-			if (!cmnd.description.startsWith("cmnd="))
+			
+			SExpr cc = cmnd.tree().get(0);
+			if (!cc.exists() ||
+					!cc.isAtom() ||
+					!cc.value().equals("command")
+					)
 				return false;
 			
 			commands.add(cmnd);
@@ -186,13 +192,15 @@ public class CommandIO implements Runnable{
 		bytes[0] = (byte) findex;
 		bytes[1] = (byte) (fval ? 1 : 0);
 		
-		Log cmnd = new Log("cmnd=setFlag", bytes);
+		SExpr commandTree = SExpr.newList(SExpr.newAtom("command"), SExpr.newAtom("setFlag"));
+		Log cmnd = new Log(commandTree, bytes);
 		
 		return tryAddCall(cmnd);
 	}
 	
 	public static boolean tryAddTest() {
-		Log cmnd = new Log("cmnd=test", null);
+		SExpr commandTree = SExpr.newList(SExpr.newAtom("command"), SExpr.newAtom("test"));
+		Log cmnd = new Log(commandTree, null);
 		
 		return tryAddCall(cmnd);
 	}

@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -25,13 +26,13 @@ import nbtool.util.P;
 import nbtool.util.U;
 
 
-public class UtilPane extends JPanel{
+public class PrefsnUtils extends JPanel{
 	private static final long serialVersionUID = 1L;
 	
 	private Utils utils;
 	private Prefs prefs;
 	
-	protected UtilPane() {
+	protected PrefsnUtils() {
 		super();
 		setLayout(null);
 		addComponentListener(new ComponentAdapter() {
@@ -101,7 +102,7 @@ public class UtilPane extends JPanel{
 	}
 	
 	private class Prefs extends JPanel implements ActionListener {
-		protected static final int REQ_HEIGHT = 150;
+		protected static final int REQ_HEIGHT = 170;
 		protected Prefs() {
 			
 			super();
@@ -127,14 +128,11 @@ public class UtilPane extends JPanel{
 			resetPrefB = new JButton("reset preferences (!bounds) (must restart)");
 			resetPrefB.addActionListener(this);
 			add(resetPrefB);
-			
-			maxMemoryUsage = new JTextField("" + P.getHeap());
-			maxMemoryUsage.addActionListener(this);
-			JLabel lbl = new JLabel("max memory: ");
-			mmuPanel = U.fieldWithlabel(lbl, maxMemoryUsage);
-			
-			add(mmuPanel);
-			
+					
+			verbosity = new JCheckBox("verbose tool");
+			verbosity.setSelected(P.getVerbose());
+			verbosity.addActionListener(this);
+			add(verbosity);
 		}
 		
 		private void prefUseSize(Dimension size) {
@@ -142,9 +140,7 @@ public class UtilPane extends JPanel{
 			int y = ins.top;
 			int mw = size.width - ins.left - ins.right;
 			
-			int height = mmuPanel.getPreferredSize().height;
-			mmuPanel.setBounds(ins.left, y, mw, height);
-			y += height;
+			int height = 0;
 			
 			height = copyMappingB.getPreferredSize().height;
 			copyMappingB.setBounds(ins.left, y, mw, height);
@@ -157,14 +153,17 @@ public class UtilPane extends JPanel{
 			height = resetPrefB.getPreferredSize().height;
 			resetPrefB.setBounds(ins.left, y, mw, height);
 			y += height;
+			
+			height = verbosity.getPreferredSize().height;
+			verbosity.setBounds(ins.left, y, mw, height);
+			y += height;
 		}
 		
 		private JButton copyMappingB;
 		private JButton copyExceptB;
 		private JButton resetPrefB;
-		
-		private JTextField maxMemoryUsage;
-		private JPanel mmuPanel;
+				
+		private JCheckBox verbosity;
 		
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() == copyMappingB) {
@@ -183,25 +182,7 @@ public class UtilPane extends JPanel{
 				U.w("Prefs: reseting preferences.");
 				P.resetNonFilePreferences();
 			} 
-			else if (e.getSource() == maxMemoryUsage){
-				String ns = maxMemoryUsage.getText();
-				
-				int nv = -1;
-				
-				try {
-					nv = Integer.parseInt(ns);
-				} catch (NumberFormatException nfe) {
-					nfe.printStackTrace();
-				}
-				
-				if (nv > 1024) { //reasonable minimum value
-					P.putHeap(nv);
-					N.notifyEDT(EVENT.MAX_MEM_USAGE_CHANGED, this, nv);
-				} else {
-					maxMemoryUsage.setText("" + SessionMaster.INST.max_data_bytes);
-					U.w("Could not use new max memory value.");
-				}
-			} else {
+			else {
 				
 			}
 		}

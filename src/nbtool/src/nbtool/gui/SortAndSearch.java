@@ -102,8 +102,8 @@ public class SortAndSearch extends JPanel implements ActionListener {
 		TIME(0, new Comparator<Log>(){
 
 			public int compare(Log o1, Log o2) {
-				Long s1 = o1.time();
-				Long s2 = o2.time();
+				Long s1 = o1.pTime();
+				Long s2 = o2.pTime();
 				
 				if (s1 == null && s2 == null)
 					return 0;
@@ -119,8 +119,8 @@ public class SortAndSearch extends JPanel implements ActionListener {
 		TYPE(1, new Comparator<Log>(){
 
 			public int compare(Log o1, Log o2) {
-				String s1 = o1.type();
-				String s2 = o2.type();
+				String s1 = o1.pType();
+				String s2 = o2.pType();
 				
 				if (s1 == null && s2 == null)
 					return 0;
@@ -136,8 +136,8 @@ public class SortAndSearch extends JPanel implements ActionListener {
 		IMAGE(2, new Comparator<Log>(){
 
 			public int compare(Log o1, Log o2) {
-				Integer s1 = o1.index();
-				Integer s2 = o2.index();
+				Integer s1 = o1.pI_Index();
+				Integer s2 = o2.pI_Index();
 				
 				if (s1 == null && s2 == null)
 					return 0;
@@ -153,8 +153,8 @@ public class SortAndSearch extends JPanel implements ActionListener {
 		FROM(3, new Comparator<Log>(){
 
 			public int compare(Log o1, Log o2) {
-				String s1 = o1.from();
-				String s2 = o2.from();
+				String s1 = o1.pFrom();
+				String s2 = o2.pFrom();
 				
 				if (s1 == null && s2 == null)
 					return 0;
@@ -185,7 +185,8 @@ public class SortAndSearch extends JPanel implements ActionListener {
 		};
 	
 	public void actionPerformed(ActionEvent e) {
-		U.wf("SortAndSearch: new specs: [%s, %s]\n", sortNames[sortBy.getSelectedIndex()], search_f.getText());
+		U.wf("SortAndSearch: new specs: [sort=%s, search=%s, order=%s]\n", sortNames[sortBy.getSelectedIndex()],
+				search_f.getText(), reverse.isSelected() ? "reverse" : "normal");
 		
 		lcm.ssChanged();
 	}

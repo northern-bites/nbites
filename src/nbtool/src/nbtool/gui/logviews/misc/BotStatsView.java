@@ -11,7 +11,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 
-import nbtool.data.BotStats;
+import nbtool.data.RobotStats;
 import nbtool.data.Log;
 import nbtool.util.U;
 
@@ -20,10 +20,10 @@ public class BotStatsView extends ViewParent {
 	@Override
 	public void setLog(Log newlog) {
 		this.log = newlog;
-		BotStats bs = null;
+		RobotStats bs = null;
 		
 		try {
-			bs = new BotStats(newlog);
+			bs = new RobotStats(newlog);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
