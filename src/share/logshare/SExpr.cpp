@@ -192,9 +192,11 @@ namespace nblog {
                     lpos = replaced.find_first_of("\"", lpos + 2);
                 }
                 
+                NBDEBUGs(SECTION_SEXPR, "replaced to [%s]\n", replaced.c_str());
+                
                 //Now, wrap in more quotes!
                 char buffer[replaced.size() + 2 + 1];
-                assert(snprintf(buffer, replaced.size() + 2 + 1,
+                NBLassert(snprintf(buffer, replaced.size() + 2 + 1,
                                 "\"%s\"", replaced.c_str())
                        == replaced.size() + 2);
                 
