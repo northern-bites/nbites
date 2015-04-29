@@ -59,7 +59,7 @@ namespace man {
             
             SExpr image_desc(type, from, clock(), -1, buffer.length());
             image_desc.append(SExpr("width", msg.width() / 2));
-            image_desc.append(SExpr("height", msg.height() / 2));
+            image_desc.append(SExpr("height", msg.height()));
             image_desc.append(SExpr("encoding", "[Y8(U8/V8)]"));
             
             std::vector<SExpr> sc = {

@@ -515,6 +515,7 @@ void TranscriberModule::run_()
         SExpr imageinfo("YUVImage", image_from, clock(), image_index, im_size);
         imageinfo.append(SExpr("width", im_width)   );
         imageinfo.append(SExpr("height", im_height) );
+        imageinfo.append(SExpr("encoding", "[Y8(U8/V8)]"));
         contents.push_back(imageinfo);
         
         /*
