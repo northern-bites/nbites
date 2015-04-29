@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd $NBITES_DIR/build/nbtool
+java -ea nbtool.gui.Display

@@ -86,7 +86,7 @@ public:
      * Camera Parameters Go Here
      */
 
-    // BRAZIL CAMERA PARAMETERS
+    // SEARLES CAMERA PARAMETERS
     // TOP SETTINGS
 #ifdef NAOQI_2
     static const bool TOP_H_FLIP = 1;
