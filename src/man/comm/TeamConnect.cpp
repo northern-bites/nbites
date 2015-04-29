@@ -242,7 +242,7 @@ bool TeamConnect::verify(SPLStandardMessage* splMessage, int seqNumber, int64_t 
         return false;
     }
 
-    if (splMessage->team != team)
+    if (splMessage->teamNum != team)
     {
 #ifdef DEBUG_COMM
         std::cout << "Received packet with bad teamNumber"
