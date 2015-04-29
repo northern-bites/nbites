@@ -256,13 +256,13 @@ namespace man {
 //#endif
         
         //Superseded by logging code in ImageTranscriber.
-        /*
+        
 //#ifdef LOG_IMAGES
         cognitionThread.log<messages::YUVImage>((control::IMAGES), &topTranscriber.imageOut,
-                                                "YUVImage ", "top");
+                                                "YUVImage", "cameraTOP");
         cognitionThread.log<messages::YUVImage>((control::IMAGES), &bottomTranscriber.imageOut,
-                                                "YUVImage ", "bot");
-//#endif */
+                                                "YUVImage", "cameraBOT");
+//#endif
         
 //#ifdef LOG_VISION
         cognitionThread.log<messages::VisionField>((control::VISION), &vision.vision_field,
