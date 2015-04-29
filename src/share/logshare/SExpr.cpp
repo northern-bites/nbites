@@ -8,8 +8,6 @@
 
 namespace nblog {
     
-    const char SExpr::special[] = {' ', '(', ')', '\r', '\n', '\t'};
-    
     /*
      ATOM CONSTRUCTORS
      */
@@ -171,13 +169,16 @@ namespace nblog {
         _list.push_back(s);
     }
     
+    const char SExpr::special[] = {' ', '(', ')', '\r', '\n', '\t'};
+    
     std::string SExpr::serialize()
     {
         if (_atom)
         {
-            if (_value.find_first_of(special) == std::string::npos)
+            if (_value.find_first_of(special) == std::string::npos) {
+                NBDEBUGs(SECTION_SEXPR, "%i: returning [%s]\n", __LINE__, _value.c_str());
                 return _value;
-            else {
+            } else {
                 //Handle internal quotes.
                 std::string replaced = _value;
                 size_t lpos = replaced.find_first_of("\"", 0);
@@ -195,7 +196,9 @@ namespace nblog {
                                 "\"%s\"", replaced.c_str())
                        == replaced.size() + 2);
                 
-                return std::string(buffer);
+                std::string returned(buffer);
+                NBDEBUGs(SECTION_SEXPR, "%i: returning [%s]\n", __LINE__, returned.c_str());
+                return returned;
             }
         }
         
@@ -208,6 +211,7 @@ namespace nblog {
         }
         s += ")";
         
+        NBDEBUGs(SECTION_SEXPR, "%i: returning [%s]\n", __LINE__, s.c_str());
         return s;
     }
     
