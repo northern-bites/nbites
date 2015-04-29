@@ -169,7 +169,7 @@ namespace nblog {
         _list.push_back(s);
     }
     
-    const char SExpr::special[] = {' ', '(', ')', '\r', '\n', '\t'};
+    const char SExpr::special[] = {' ', '(', ')', '\r', '\n', '\t', '\0'};
     
     std::string SExpr::serialize()
     {
@@ -179,6 +179,8 @@ namespace nblog {
                 NBDEBUGs(SECTION_SEXPR, "%i: returning [%s]\n", __LINE__, _value.c_str());
                 return _value;
             } else {
+                NBDEBUGs(SECTION_SEXPR, "special at %i\n", _value.find_first_of(special));
+                
                 //Handle internal quotes.
                 std::string replaced = _value;
                 size_t lpos = replaced.find_first_of("\"", 0);
