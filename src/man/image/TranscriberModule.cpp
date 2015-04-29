@@ -10,6 +10,7 @@
 #include <bn/i2c/i2c-dev.h>
 
 #include "Profiler.h"
+#include "DebugConfig.h"
 
 #define V4L2_MT9M114_FADE_TO_BLACK (V4L2_CID_PRIVATE_BASE)
 

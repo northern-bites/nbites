@@ -1,6 +1,8 @@
 #include "JointEnactorModule.h"
 #include "Profiler.h"
 
+#include "DebugConfig.h"
+
 namespace man {
 namespace jointenactor{
 
@@ -34,7 +36,11 @@ void JointEnactorModule::start()
     try
     {
         // Get the DCM proxy.
+#ifdef NAOQI_2
+        dcmProxy_ = broker_->getSpecialisedProxy<AL::DCMProxy>("DCM");
+#else
         dcmProxy_ = broker_->getDcmProxy();
+#endif
     }
     catch (AL::ALError& e)
     {

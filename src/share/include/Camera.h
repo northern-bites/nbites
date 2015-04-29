@@ -6,6 +6,7 @@
  */
 
 #pragma once
+
 #include "DebugConfig.h"
 
 class Camera {
@@ -87,24 +88,21 @@ public:
 
     // BRAZIL CAMERA PARAMETERS
     // TOP SETTINGS
+#ifdef NAOQI_2
     static const bool TOP_H_FLIP = 1;
     static const bool TOP_V_FLIP = 1;
     static const bool TOP_AUTO_EXPOSURE = 0;
     static const int TOP_BRIGHTNESS = 180;
     static const int TOP_CONTRAST = 58;
-    static const int TOP_SATURATION = 150;
+    static const int TOP_SATURATION = 134;
     static const int TOP_HUE = 0;
     static const int TOP_SHARPNESS = 3;
     static const int TOP_GAMMA = 220;
     static const bool TOP_AUTO_WHITEBALANCE = 0;
     static const int TOP_BACKLIGHT_COMPENSATION = 0x00;
-#ifdef NAOQI_2
-    static const int TOP_EXPOSURE = 250;
-#else
-    static const int TOP_EXPOSURE = 50;
-#endif
-    static const int TOP_GAIN = 53;
-    static const int TOP_WHITE_BALANCE = 3300;
+    static const int TOP_EXPOSURE = 160;
+    static const int TOP_GAIN = 70;
+    static const int TOP_WHITE_BALANCE = 4500;
     static const bool TOP_FADE_TO_BLACK = 0;
 
     // // BOTTOM SETTINGS
@@ -119,15 +117,44 @@ public:
     static const int BOTTOM_GAMMA = 220;
     static const bool BOTTOM_AUTO_WHITEBALANCE = 0;
     static const int BOTTOM_BACKLIGHT_COMPENSATION = 0x00;
-#ifdef NAOQI_2
-    static const int BOTTOM_EXPOSURE = 250;
-#else
-    static const int BOTTOM_EXPOSURE = 50;
-#endif
+    static const int BOTTOM_EXPOSURE = 160;
     static const int BOTTOM_GAIN = 62;
-    static const int BOTTOM_WHITE_BALANCE = 3200;
+    static const int BOTTOM_WHITE_BALANCE = 4200;
     static const bool BOTTOM_FADE_TO_BLACK = 0;
+#else
+    static const bool TOP_H_FLIP = 1;
+    static const bool TOP_V_FLIP = 1;
+    static const bool TOP_AUTO_EXPOSURE = 0;
+    static const int TOP_BRIGHTNESS = 92;
+    static const int TOP_CONTRAST = 45;
+    static const int TOP_SATURATION = 145;
+    static const int TOP_HUE = 0;
+    static const int TOP_SHARPNESS = 3;
+    static const int TOP_GAMMA = 220; // Not used
+    static const bool TOP_AUTO_WHITEBALANCE = 0;
+    static const int TOP_BACKLIGHT_COMPENSATION = 0x00;
+    static const int TOP_EXPOSURE = 43;
+    static const int TOP_GAIN = 62;
+    static const int TOP_WHITE_BALANCE = 6300;
+    static const bool TOP_FADE_TO_BLACK = 0;
 
+    // // BOTTOM SETTINGS
+    static const bool BOTTOM_H_FLIP = 0;
+    static const bool BOTTOM_V_FLIP = 0;
+    static const bool BOTTOM_AUTO_EXPOSURE = 0;
+    static const int BOTTOM_BRIGHTNESS = 96;
+    static const int BOTTOM_CONTRAST = 45;
+    static const int BOTTOM_SATURATION = 124;
+    static const int BOTTOM_HUE = 0;
+    static const int BOTTOM_SHARPNESS = 3;
+    static const int BOTTOM_GAMMA = 220; // Not used
+    static const bool BOTTOM_AUTO_WHITEBALANCE = 0;
+    static const int BOTTOM_BACKLIGHT_COMPENSATION = 0x00;
+    static const int BOTTOM_EXPOSURE = 43;
+    static const int BOTTOM_GAIN = 65;
+    static const int BOTTOM_WHITE_BALANCE = 5500;
+    static const bool BOTTOM_FADE_TO_BLACK = 0;
+#endif
     // // WATSON 2014 CAMERA PARAMETERS
     // // TOP SETTINGS
     // static const bool TOP_H_FLIP = 1;
