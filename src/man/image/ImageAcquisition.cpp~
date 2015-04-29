@@ -1,0 +1,36 @@
+#include "ImageAcquisition.h"
+#include "VisionDef.h"
+#include "ColorParams.h"
+
+/**
+ * ImageAcquisition in c++, only Y and UV implemented. Averages y pixels
+ * and writes them back out in 320x240. Does not output color-segmented image
+ * For variable sized images.
+ *
+ * Evan Hoyt 10/9/14
+ */
+#define CPP_AQUIRE 0
+int ImageAcquisition::acquire_image_fast(uint8_t *table,
+					const ColorParam &params,
+					const uint8_t *yuv, uint16_t *out)
+{
+#if defined( __linux__) && !CPP_ACQUIRE
+   acquire_image_fast(table, yuv, out); // pass height and width here
+#else
+	uint16_t *yOut = out;
+	uint16_t *uvOut = out + AVERAGED_IMAGE_SIZE;
+	
+	// Y averaging (i->240, j->320)
+	for (int i = 0; i < AVERAGED_IMAGE_HEIGHT; i++, yuv += NAO_IMAGE_ROW_OFFSET){
+		
+		for (int j =0; j < AVERAGED_IMAGE_WIDTH; j++, yuv+=4, yOut++, uvOut++) {
+
+			//half avergae version YOFFSET1 = 0, YOFFSET2 = 2
+			*yOut = yuv[YOFFSET1] + yuv[YOFFSET2];
+			*uvOut = yuv[UOFFSET];
+			*(uvOut+1) = yuv[VOFFSET];
+		}
+	}
+#endif
+	return 0;
+}

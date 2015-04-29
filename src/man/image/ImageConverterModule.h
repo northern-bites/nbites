@@ -5,6 +5,7 @@
 #include "RoboGrams.h"
 #include "Camera.h"
 #include "ColorParams.h"
+#include "RatingParams.h"
 
 // TODO: Generalize
 

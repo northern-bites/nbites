@@ -1,94 +1,61 @@
 #include "ImageAcquisition.h"
 #include "VisionDef.h"
+#include "ColorParams.h"
+#include "RatingParams.h"
 
-#include <tgmath.h> 
-#include <algorithm>
+using namespace std;  // delete later
 
 #define CPP_ACQUIRE 0
 
-int ImageAcquisition::acquire_image(int rowCount,           // Row count of each of the output images
-                                    int colCount,           // Column count of each of the output images
-                                    int rowPitch,           // Number of [y,u,y,v] quadruplets in each input row (usually 320)
-                                    const uint8_t *yuv,     // Pointer to first byte of input image
-                                    uint8_t *out,           // Pointer to first byte of output images destination
-                                    ColorClassificationValues *colors )       // Pointer to first byte of ColorParameters struct
+// The ASM and C++ have identical function signatures.
+// The source is a YUYV image. There are no pixel alignment requirements, although
+// operation may be faster if source is QWORD or DQWORD aligned.
+// width and height refer to the output images. The low three bits of width are ignored and
+// assumed to be zero.
+// pitch is source image row pitch in bytes, and can be >= width
+// The destination is four or five images, concatenated with no padding:
+//    Y image, 16-bit pixels
+//    white image, 8-bit pixels
+//    green image, 8-bit pixels
+//    orange image, 8-bit pixels
+//    optional image reulting from color table lookup
+int ImageAcquisition::acquire_image(const unsigned char* source,
+                                    int width, int height, int pitch,
+                                    const Colors* colors,
+                                    unsigned char* dest,
+                                    unsigned char* colorTable)
 {
 
 #if 0 
-    _acquire_image (rowCount, colCount, rowPitch, yuv, out, colors);
+    _acquire_image (source, width, hieght, pitch, colors, dest, colorTable);
 #else
+ // Ignore low three bits of width
+    width &= ~7;
 
-    ColorClassificationValues *color = (ColorClassificationValues*) colors;
-    uint16_t *yOut      = (uint16_t*)out;
-    uint8_t  *whiteOut  = out       + colCount*rowCount * 2;
-    uint8_t  *orangeOut = whiteOut  + colCount*rowCount;
-    uint8_t  *greenOut  = orangeOut + colCount*rowCount;
+    // destination pointers
+    short* py = (short*)dest;
+    unsigned char* pw = dest + 2 * width * height;
+    unsigned char* pg = pw + width * height;
+    unsigned char* po = pg + width * height;
+    unsigned char* pc = po + width * height;
 
-    short orangeWidth1 = (short)((255 << 8) / color->orangeWidth); // w1 = 255/w     u16.8
-    short greenWidth1 = (short)((255 << 8) / color->greenWidth);
-    short whiteWidth1 = (short)((255 << 8) / color->whiteWidth);
+    for (int j = 0; j < height; ++j) {
+        const unsigned char* ps = source + 2 * pitch * j;
+        for (int i = 0; i < width; ++i, ps += 4) {
+            int y = ps[0] + ps[2] + ps[pitch] + ps[pitch + 2];
+            int u = ps[1] + ps[pitch + 1];
+            int v = ps[3] + ps[pitch + 3];
 
-    int y;
+            *py++ = (short)y;
+            *pw++ = colors->white .scoreMax(y, abs(u - UVZero) + UVZero, abs(v - UVZero) + UVZero);
+            *pg++ = colors->green .scoreMax(y, u, v);
+            *po++ = colors->orange.scoreMax(y, u, v ^ UVMask);
 
-    for (int i=0; i < rowCount; i ++, yuv += 4 * (2 * rowPitch - colCount)){ 
-        for (int j=0; j < colCount; j++, yuv += 4, yOut++, whiteOut++, orangeOut++, greenOut++){
-
-            // Y Averaging
-            *yOut = y = yuv[YOFFSET1] + yuv[rowPitch*4 + YOFFSET1] +
-                        yuv[YOFFSET2] + yuv[rowPitch*4 + YOFFSET2];
-               
-            // Variables used for color calcs
-            short u0, u = yuv[UOFFSET] + yuv[rowPitch*4 + UOFFSET] - 256;
-            short v0, v = yuv[VOFFSET] + yuv[rowPitch*4 + VOFFSET] - 256;
-            short f1, f2;
-
-            short absU = u > 0 ? u : -u;
-            short absV = v > 0 ? v : -v;
-
-            // WHITE CALCS
-            u0 = color->whiteU;
-
-            u0 += (short)((y * color->whiteCoef) >> 16);
-
-            f1 = (std::min(std::max((int)(u0 - absU), 0),
-                                    (int)color->whiteWidth) * whiteWidth1) >> 8;
-
-            v0 = color->whiteV;
-            v0 += (short)((y * color->whiteCoef) >> 16);
-
-            f2 = (std::min(std::max((int)(v0 - absV), 0),
-                                    (int)color->whiteWidth) * whiteWidth1) >> 8;
-
-            *whiteOut = std::min(f1, f2);
-                
-            // ORANGE CALCS
-            u0 = color->orangeMaxU;
-            v0 = color->orangeMinV;
-
-            u0 += (short)((y * color->orangeCoefU) >> 16);
-            f1 = (std::min(std::max((int)(u0 - u), 0), 
-                                    (int)color->orangeWidth) * orangeWidth1) >> 8;
-
-            v0 += (short)((y * color->orangeCoefV) >> 16);
-            f2 = (std::min(std::max((int)(v - v0), 0),
-                                    (int)color->orangeWidth) * orangeWidth1) >> 8;
-            *orangeOut = std::min(f1, f2);
-
-            // GREEN CALCS
-            u0 = color->greenMaxU;
-            v0 = color->greenMaxV;
-
-            u0 += (short)((y * color->greenCoef) >> 16);
-            f1 = (std::min(std::max((int)(u0 - u), 0),
-                                    (int)color->greenWidth) * greenWidth1) >> 8; 
-
-            v0 += (short)((y * color->greenCoef) >> 16);
-            f2 = (std::min(std::max((int)(v0 - v), 0),
-                                    (int)color->greenWidth) * greenWidth1) >> 8;
-
-            *greenOut = std::min(f1, f2);
+            if (colorTable)
+                *pc++ = colorTable[(u >> (UVBits - 7) << 14) + (v >> (UVBits - 7) << 7) + (y >> (YBits - 7))];
         }
     }
+
 #endif
     return 0;
 }
