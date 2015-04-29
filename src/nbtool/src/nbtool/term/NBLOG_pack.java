@@ -9,6 +9,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -49,6 +52,8 @@ public class NBLOG_pack {
 				U.wf("\t... could not get reasonable value for file size.\n");
 				continue;
 			}
+			
+			ByteBuffer bb;
 			
 			DataInputStream dis = null;
 			try {
@@ -94,66 +99,82 @@ public class NBLOG_pack {
 		}
 		
 		{
-			String topName = String.format("concat_%d_TOP_images.old", top.size()); 
+			String topName = String.format("top.log"); 
 			File logf = new File(topName);
 			if (!logf.exists())
 				logf.createNewFile();
-
-			FileOutputStream fos = new FileOutputStream(logf);
-			BufferedOutputStream bos = new BufferedOutputStream(fos);
-			DataOutputStream dos = new DataOutputStream(bos);
 			
 			Header head = Header.newBuilder().setName("messages.YUVImage")
 					.setVersion(3).setTimestamp(0).setTopCamera(true).build();
 			byte[] headBytes = head.toByteArray();
-			dos.writeInt(headBytes.length);
-			dos.write(headBytes);
+			
+			int length = 4 + headBytes.length;
+			for (Log l : top)
+				length += l.bytes.length + (4 * 3);
+			
+			ByteBuffer bb = ByteBuffer.allocate(length);
+			bb.order(ByteOrder.LITTLE_ENDIAN);
+			
+			bb.putInt(headBytes.length);
+			bb.put(headBytes);
 			
 			for (Log l : top) {
 				SExpr c1 = l.tree().find("contents").get(1);
 				int size = c1.find("nbytes").get(1).valueAsInt();
-				int width = c1.find("width").get(1).valueAsInt();
+				int width = c1.find("width").get(1).valueAsInt() * 2;
 				int height = c1.find("height").get(1).valueAsInt();
 				
-				dos.writeInt(size);
-				dos.writeInt(width);
-				dos.writeInt(height);
-				dos.write(l.bytes, 0, size);
+				bb.putInt(size);
+				bb.putInt(width);
+				bb.putInt(height);
+				bb.put(l.bytes, 0, size);
 			}
 			
-			dos.close();
+			bb.flip();
+			FileChannel fc = new FileOutputStream(logf).getChannel();
+			fc.write(bb);
+			fc.close();
+			
 			U.wf("Wrote %d logs to %s.\n", top.size(), topName);
 		}
 		
 		{
-			String botName = String.format("concat_%d_BOT_images.old", bot.size()); 
+			String botName = String.format("bottom.log"); 
 			File logf = new File(botName);
 			if (!logf.exists())
 				logf.createNewFile();
-
-			FileOutputStream fos = new FileOutputStream(logf);
-			BufferedOutputStream bos = new BufferedOutputStream(fos);
-			DataOutputStream dos = new DataOutputStream(bos);
 			
 			Header head = Header.newBuilder().setName("messages.YUVImage")
 					.setVersion(3).setTimestamp(0).setTopCamera(false).build();
 			byte[] headBytes = head.toByteArray();
-			dos.writeInt(headBytes.length);
-			dos.write(headBytes);
+			
+			int length = 4 + headBytes.length;
+			for (Log l : top)
+				length += l.bytes.length + (4 * 3);
+			
+			ByteBuffer bb = ByteBuffer.allocate(length);
+			bb.order(ByteOrder.LITTLE_ENDIAN);
+			
+			bb.putInt(headBytes.length);
+			bb.put(headBytes);
 			
 			for (Log l : bot) {
 				SExpr c1 = l.tree().find("contents").get(1);
 				int size = c1.find("nbytes").get(1).valueAsInt();
-				int width = c1.find("width").get(1).valueAsInt();
+				int width = c1.find("width").get(1).valueAsInt() * 2;
 				int height = c1.find("height").get(1).valueAsInt();
 				
-				dos.writeInt(size);
-				dos.writeInt(width);
-				dos.writeInt(height);
-				dos.write(l.bytes, 0, size);
+				bb.putInt(size);
+				bb.putInt(width);
+				bb.putInt(height);
+				bb.put(l.bytes, 0, size);
 			}
 			
-			dos.close();
+			bb.flip();
+			FileChannel fc = new FileOutputStream(logf).getChannel();
+			fc.write(bb);
+			fc.close();
+			
 			U.wf("Wrote %d logs to %s.\n", top.size(), botName);
 		}
 	}

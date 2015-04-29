@@ -73,7 +73,7 @@ public class Log implements Serializable {
 	public void setNameFromDesc() {
 		this.name = String.format("made-%s_%s_type-%s_from-%s_v-%d", madeWhere(), madeWhen(), pType(), pFrom(), version());
 		this.name = this.name
-				.substring(Math.max(0, this.name.length() - 240)).replace('/', '-') + ".nblog";
+				.substring(Math.max(0, this.name.length() - 240)).replace('/', '-').replace(' ', '_') + ".nblog";
 	}
 	
 	public String toString() {
