@@ -23,9 +23,9 @@
 //Print everything
 //#define NB_DEBUG  SECTION_ALL
 //Print only what isn't tied to a section
-//#define NB_DEBUG  0
+#define NB_DEBUG  0
 
-#define NB_DEBUG    SECTION_SEXPR
+//#define NB_DEBUG    SECTION_SEXPR
 
 #ifndef __APPLE__
 #define NBDB_USECOLOR

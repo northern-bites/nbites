@@ -67,8 +67,9 @@ namespace nblog {
         NBLassert(!log_running);
         
         //...
+        /*
         SExpr aString("thisstring");
-        printf("%s\n", aString.serialize().c_str());
+        printf("%s\n", aString.serialize().c_str()); */
         
         NBDEBUG("sane.\n");
     }
