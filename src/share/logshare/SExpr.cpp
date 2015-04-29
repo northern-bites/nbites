@@ -25,9 +25,9 @@ namespace nblog {
     
     SExpr::SExpr(const char * n) :
     _atom(true),
-    _value(n),
     _list()
     {
+        _value = std::string(n);
         NBDEBUGs(SECTION_SEXPR, "atom SExpr(const char * n)\n");
     }
     
@@ -67,7 +67,7 @@ namespace nblog {
     /*
      LIST CONSTRUCTORS
      */
-    
+
     //standard content item initializer
     SExpr::SExpr(const std::string& type,
                  const std::string& from, clock_t created,
