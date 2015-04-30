@@ -433,7 +433,7 @@ void Threshold::findGoals(int column, int topEdge) {
         }
 		if (Utility::isBlue(pixel)) {
 			blue++;
-			if (blue > 2) {
+			if (blue > 2 && yellows < 35) {
 				yellowOK = false;
 			}
 			goodPix = false;

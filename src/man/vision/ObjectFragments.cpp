@@ -2513,6 +2513,7 @@ bool ObjectFragments::rightBlobColor(Blob tempobj, float minpercent) {
     int y = tempobj.getLeftTopY();
     int spanX = tempobj.width();
     int spanY = tempobj.height();
+	int blue = 0;
     int goal = static_cast<int>(static_cast<float>(spanX * spanY) * minpercent);
     if (spanX < 1 || spanY < 1) {
         if (POSTDEBUG) {
@@ -2522,26 +2523,39 @@ bool ObjectFragments::rightBlobColor(Blob tempobj, float minpercent) {
     }
     int ny, nx, starty, startx;
     int good = 0, total = 0;
-    for (int i = 0; i < spanY; i++) {
+    for (int i = 1; i < spanY - 2; i++) {
         starty = y + i;
         startx = xProject(x, y, starty);
-        for (int j = 0; j < spanX; j++) {
+        for (int j = 1; j < spanX - 2; j++) {
             nx = startx + j;
             ny = yProject(startx, starty, nx);
             if (ny > -1 && nx > -1 && ny < IMAGE_HEIGHT && nx < IMAGE_WIDTH) {
                 total++;
+				unsigned char pixel = thresh->getThresholded(ny, nx);
                 if (Utility::colorsEqual(thresh->getExpandedColor(nx, ny, color),
 										 color)) {
                     good++;
-                    if (good > goal) {
+                    if (good > goal && blue == 0) {
                         return true;
                     }
-                }
+                } else if (Utility::isBlue(pixel)) {
+					blue++;
+					good--;
+					vision->drawPoint(nx, ny, RED);
+					/*if (blue > 30) {
+						if (POSTDEBUG) {
+							cout << "Too much blue " << total << endl;
+						}
+						return false;
+						} */
+				}
             }
         }
     }
     float percent = (float)good / (float) (total);
-    cout << "Color check " << percent << " " << minpercent << endl;
+	if (POSTDEBUG) {
+		cout << "Color check " << percent << " " << minpercent << endl;
+	}
     if (percent > minpercent) {
         return true;
     }
@@ -2699,6 +2713,13 @@ bool ObjectFragments::locationOk(Blob b)
 	if (spanY < 50 && !greenCheck(b)) {
 		if (SANITY) {
 			cout << "Short blob without enough green underneath - robot arm?" << endl;
+			drawBlob(b, RED);
+			return false;
+		}
+	}
+	if (spanY < 50 && !rightBlobColor(b, 0.56)) {
+		if (SANITY) {
+			cout << "Short blob not enough of the right color" << endl;
 			drawBlob(b, RED);
 			return false;
 		}
