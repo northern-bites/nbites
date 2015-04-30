@@ -89,9 +89,9 @@ public class NBLOG_pack {
 			assert(fromField.exists() && fromField.count() == 2);
 			String from = fromField.get(1).value();
 			
-			if (from.equalsIgnoreCase("cameraTOP"))
+			if (from.contains("TOP"))
 				top.add(l);
-			else if (from.equalsIgnoreCase("cameraBOT"))
+			else if (from.contains("BOT"))
 				bot.add(l);
 			else {
 				U.wf("Image Log %s [%s] UNKNOWN FROM FIELD!\n", l.name, l.description);
