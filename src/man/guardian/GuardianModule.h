@@ -10,6 +10,7 @@
 #include "Common.h"
 
 #include "ClickableButton.h"
+#include "DebugConfig.h"
 
 #include "RoboGrams.h"
 #include "PMotion.pb.h"

@@ -14,6 +14,7 @@ import java.net.UnknownHostException;
 
 import nbtool.data.Log;
 import nbtool.data.Log.SOURCE;
+import nbtool.data.SExpr;
 import nbtool.util.N;
 import nbtool.util.N.EVENT;
 import nbtool.util.NBConstants;
@@ -39,10 +40,11 @@ import nbtool.util.U;
  * 
  * 	catching an exception, indicating some error in finding the host or the stability of the connection
  * 
- * netThreadExiting() should always be called when run() will return, meaning all exceptions should be handled.
+ * netThreadExiting() should always (read: if you change this class, make sure this happens)
+ * 	 be called when run() will return, meaning all exceptions need to be handled inside the run loop.
  * */
 
-public class NetIO implements Runnable {
+public class StreamIO implements Runnable {
 	private String server_address;
 	private int server_port;
 	
@@ -54,7 +56,7 @@ public class NetIO implements Runnable {
 	
 	private volatile boolean running;
 	
-	public NetIO(String addr, int p, Boss b) {
+	public StreamIO(String addr, int p, Boss b) {
 		server_address = addr;
 		server_port = p;
 		boss = b;
@@ -111,6 +113,8 @@ public class NetIO implements Runnable {
 					out.flush();
 				} else if (recv == seq_num) {
 					Log nl = CommonIO.readLog(in);
+					
+					nl.tree().append(SExpr.newKeyValue("from_address", server_address));
 					U.w("NetIO: thread got packet of data size: " + nl.bytes.length + " desc: " + nl.description);
 					
 					nl.source = SOURCE.NETWORK;

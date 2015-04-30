@@ -23,19 +23,19 @@ import nbtool.util.NBConstants;
 import nbtool.util.U;
 import static nbtool.util.NBConstants.*;
 
-public class CppIO implements Runnable {
+public class CrossIO implements Runnable {
 	
 	public static void ref(){} //Force the JRE to init CppIO by statically referencing the class.
 
-	private static CppIO init() {
-		CppIO io = new CppIO();
-		thread = new Thread(io, "nbtool-cppio");
+	private static CrossIO init() {
+		CrossIO io = new CrossIO();
+		thread = new Thread(io, "nbtool-crossio");
 		thread.start();
 
 		return io;
 	}
 
-	public static final CppIO current = init();
+	public static final CrossIO current = init();
 	public static Thread thread;
 	
 	private ArrayList<CppFunc> foundFuncs;
@@ -46,10 +46,10 @@ public class CppIO implements Runnable {
 		foundFuncs = null;
 		calls = null;
 		
-		N.notifyEDT(EVENT.CPP_CONNECTION, this, false);
+		N.notifyEDT(EVENT.NBCROSS_CONNECTION, this, false);
 		
 		try {
-			server = new ServerSocket(CPP_PORT, 1, InetAddress.getByName("127.0.0.1"));
+			server = new ServerSocket(NBCROSS_PORT, 1, InetAddress.getByName("127.0.0.1"));
 		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
 			return;
@@ -59,13 +59,13 @@ public class CppIO implements Runnable {
 		}
 
 		for(;;) {
-			U.w("CppIO: server looking for client...");
+			U.w("CrossIO: server looking for client...");
 			Socket socket = null;
 			try {
 				socket = server.accept();
-				socket.setSoTimeout(SOCKET_TIMEOUT);
-				N.notifyEDT(EVENT.CPP_CONNECTION, this, true);
-				U.w("CppIO: found c++ sister process.");
+				socket.setSoTimeout(NBCROSS_CALL_TIMEOUT);
+				N.notifyEDT(EVENT.NBCROSS_CONNECTION, this, true);
+				U.w("CrossIO: found c++ sister process.");
 				
 				BufferedOutputStream _os = new BufferedOutputStream(socket.getOutputStream());
 				BufferedInputStream _is = new BufferedInputStream(socket.getInputStream());
@@ -80,12 +80,12 @@ public class CppIO implements Runnable {
 				dos.flush();
 				int init = dis.readInt();
 				if (init != 0)
-					throw new CppIOException("bad initiation ping:" + init);
+					throw new CrossIOException("bad initiation ping:" + init);
 				
 				findFunctions(dis, dos);
 				
-				N.notifyEDT(EVENT.CPP_FUNCS_FOUND, this, foundFuncs);
-				U.w("CppIO: got function list:");
+				N.notifyEDT(EVENT.NBCROSS_FUNCS_FOUND, this, foundFuncs);
+				U.w("CrossIO: got function list:");
 				for (CppFunc f: foundFuncs) {
 					U.wf("\t%s(", f.name);
 					for (String a : f.args) {
@@ -100,7 +100,7 @@ public class CppIO implements Runnable {
 				
 				callLoop(dis, dos);
 
-			} catch(CppIOException cie) {
+			} catch(CrossIOException cie) {
 				U.w("Malformed communication with m: " + cie.message);
 				cie.printStackTrace();
 			} catch (IOException e) {
@@ -109,7 +109,7 @@ public class CppIO implements Runnable {
 				e.printStackTrace();
 			}
 			
-			N.notifyEDT(EVENT.CPP_CONNECTION, this, false);
+			N.notifyEDT(EVENT.NBCROSS_CONNECTION, this, false);
 			foundFuncs = null;
 			calls = null;
 			
@@ -118,17 +118,18 @@ public class CppIO implements Runnable {
 	}
 	
 	private void findFunctions(DataInputStream dis, DataOutputStream dos) throws IOException {
-		U.w("CppIO: getting function list.");
+		U.w("CrossIO: getting function list.");
 		int nfuncs_1 = dis.readInt();
 		Log funcLog = CommonIO.readLog(dis);
-		int nfuncs_2 = Integer.parseInt(funcLog.getAttributes().get("fn"));
+		//int nfuncs_2 = //Integer.parseInt(funcLog.getAttributes().get("fn"));
+		int nfuncs_2 = -1;
 		
 		String funcstr = new String(funcLog.bytes);
 		String[] funcs = funcstr.split("\n");
 		int nfuncs_3 = funcs.length;
 		
 		if (nfuncs_1 != nfuncs_2 || nfuncs_2 != nfuncs_3) 
-			throw new CppIOException(String.format("nfuncs: %d %d %d",
+			throw new CrossIOException(String.format("nfuncs: %d %d %d",
 					nfuncs_1, nfuncs_2, nfuncs_3));
 		
 		for (String f : funcs) {
@@ -148,7 +149,7 @@ public class CppIO implements Runnable {
 			dos.flush();
 			int ping = dis.readInt();
 			if (ping != 0)
-				throw new CppIOException("bad wait ping:" + ping);
+				throw new CrossIOException("bad wait ping:" + ping);
 			
 			//Check calls.
 			CppFuncCall _c = null;
@@ -157,7 +158,7 @@ public class CppIO implements Runnable {
 			}
 			
 			if (_c != null) {
-				U.w("CppIO: beginning call to: " + _c.name);
+				U.w("CrossIO: beginning call to: " + _c.name);
 				final CppFuncCall c = _c;
 				dos.writeInt(1);
 				dos.flush();
@@ -173,12 +174,12 @@ public class CppIO implements Runnable {
 				
 				final int ret = dis.readInt();
 				int num_out = dis.readInt();
-				U.w("CppIO: function finished call, num out: " + num_out);
+				U.w("CrossIO: function finished call, num out: " + num_out);
 				final ArrayList<Log> outs = new ArrayList<Log>();
 				for (int i = 0; i < num_out; ++i) {
 					Log nl = CommonIO.readLog(dis);
 					nl.source = SOURCE.DERIVED;
-					U.w("CppIO: got out: " + nl.description);
+					U.w("CrossIO: got out: " + nl.description);
 					outs.add(nl);
 				}
 				
@@ -211,7 +212,7 @@ public class CppIO implements Runnable {
 		public int index;
 		public String name;
 		public ArrayList<Log> args;
-		public CppFuncListener listener;
+		public CrossFuncListener listener;
 	}
 	
 	public boolean tryAddCall(CppFuncCall c) {
@@ -230,7 +231,7 @@ public class CppIO implements Runnable {
 			calls.add(c);
 		}
 		
-		U.w("CppIO: added call to function: " + c.name);
+		U.w("CrossIO: added call to function: " + c.name);
 		return true;
 	}
 	
@@ -244,17 +245,17 @@ public class CppIO implements Runnable {
 		return -1;
 	}
 	
-	private class CppIOException extends IOException {
+	private class CrossIOException extends IOException {
 		private static final long serialVersionUID = 1L;
 		String message;
-		protected CppIOException(String m) {message = m;}
+		protected CrossIOException(String m) {message = m;}
 	}
 	
 	/*
 	 * Not using the N notifiation center because different parts of the client might want to call c++ funcs, 
 	 * and this makes it much easier to differentiate between the calls.
 	 * */
-	public static interface CppFuncListener {
+	public static interface CrossFuncListener {
 		public void returned(int ret, Log ... out);
 	}
 }

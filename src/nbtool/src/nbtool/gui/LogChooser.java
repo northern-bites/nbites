@@ -36,7 +36,7 @@ public class LogChooser extends JPanel {
 		tree.setEditable(false);
 		tree.setRootVisible(false);
 		tree.setScrollsOnExpand(true);
-		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		tree.addTreeSelectionListener(model);
 		tree.setTransferHandler(model.EXPORT_HANDLER);
 		tree.setDragEnabled(true);
@@ -59,14 +59,6 @@ public class LogChooser extends JPanel {
 		Dimension d = sas.getPreferredSize();
 		sas.setBounds(0,0,d.width,d.height);
 		sp.setBounds(0, d.height, size.width, size.height - d.height);
-	}
-	
-	public Log currentlySelected() {
-		return model.CS_macro;
-	}
-	
-	public Log nextSelection() {
-		return model.NS_macro;
 	}
 	
 	private JScrollPane sp;

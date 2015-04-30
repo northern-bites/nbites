@@ -4,6 +4,7 @@
 #include <string>
 #include "alvalue/alvalue.h"
 #include "ALLedNames.h"
+#include <iostream>
 
 class NaoRGBLight{
  public:

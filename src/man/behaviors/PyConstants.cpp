@@ -5,6 +5,8 @@
 
 #include <boost/python.hpp>
 
+#include "DebugConfig.h"
+
 using namespace boost::python;
 using namespace man::behaviors;
 using namespace man;
@@ -16,6 +18,12 @@ BOOST_PYTHON_MODULE(noggin_constants)
     scope().attr("USE_LAB_FIELD") = true;
 #else
     scope().attr("USE_LAB_FIELD") = false;
+#endif
+
+#ifdef NAOQI_2
+    scope().attr("NAOQI_2") = true;
+#else
+    scope().attr("NAOQI_2") = false;
 #endif
 
     // Walk time

@@ -59,9 +59,8 @@ public class CommonIO {
 		return desc;
 	}
 	
-	/**
-	 * 'loading' a log should be done by reading the log in fully, then checking that the description matches the log's original description.
-	 * @throws IOException 
+	/*
+	 * If you're wondering why there's no explicit load log function: 'loading' a log should be done by reading the log in fully, then checking that the description matches the log's original description.
 	 * */
 	
 	

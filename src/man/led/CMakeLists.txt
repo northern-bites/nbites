@@ -1,3 +1,4 @@
+cmake_minimum_required( VERSION 2.8.3 )
 
 # Set source files here that need to be compiled.
 set(LEDS_SRCS LedEnactorModule

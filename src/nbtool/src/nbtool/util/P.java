@@ -38,38 +38,32 @@ public class P {
 	 * control addresses (up to 5)
 	 * 
 	 * 	max log data storage
-	 * */
-		
+	 * */		
 	public static Preferences p = java.util.prefs.Preferences.userRoot().node(P.class.getName());
+	public static boolean VERBOSE = getVerbose();
+
 	
 	private static final String xName = "NBClient_W_x";
 	private static final String yName = "NBClient_W_y";
 	private static final String wName = "NBClient_W_w";
 	private static final String hName = "NBClient_W_h";
-	
-	private static final String heapName = "NBClient_heap";
-	
+		
 	private static final String lastModeName = "NBClient_mode";
 	
 	private static final String pathsName = "NBClient_paths";
 	private static final String addrsName = "NBClient_addrs";
 	
 	private static final String mapsDirName = "NBClient_mapsDir";
+
+	private static final String verbName = "NBTool_verbose";
 	
-	public static String getMapsDir() {
-		return p.get(mapsDirName, "");
+	public static boolean getVerbose() {
+		return VERBOSE = p.getBoolean(verbName, false);
 	}
 	
-	public static void setMapsDir(String path) {
-		p.put(mapsDirName, path);
-	}
-	
-	public static long getHeap() {
-		return p.getLong(heapName, NBConstants.DEFAULT_MAX_MEMORY_USAGE);
-	}
-	
-	public static void putHeap(long nval) {
-		p.putLong(heapName, nval);
+	public static void setVerbose(boolean val) {
+		VERBOSE = val;
+		p.putBoolean(verbName, val);
 	}
 	
 	public static int getLastMode() {
@@ -160,10 +154,8 @@ public class P {
 	
 	//Doesn't change window size atm.
 	public static void resetNonFilePreferences() {
-		putHeap(NBConstants.DEFAULT_MAX_MEMORY_USAGE);
 		clearOrderedSet(pathsName);
 		clearOrderedSet(addrsName);
-		setMapsDir("");
 	}
 	
 	/*****
