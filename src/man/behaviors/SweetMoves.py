@@ -178,7 +178,7 @@ STAND_UP_FRONT = (#Initial
                   INITIAL_POS[0][1],
                   INITIAL_POS[0][2],
                   INITIAL_POS[0][3],
-                  1,0, stiff.STANDUP_STIFFNESSES)
+                  2,0, stiff.STANDUP_STIFFNESSES)
                  )
 
 # new robots
