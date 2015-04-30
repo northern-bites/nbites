@@ -46,11 +46,13 @@ static const robot_ip_pair ringo   = {"ringo"  , "10.0.14.18"};
 static const robot_ip_pair beyonce = {"beyonce", "10.0.14.19"};
 static const robot_ip_pair ozzy    = {"ozzy"   , "10.0.14.20"};
 static const robot_ip_pair avril   = {"avril"  , "10.0.14.21"};
+static const robot_ip_pair batman  = {"batman" , "10.0.14.22"};
+static const robot_ip_pair she-hulk= {"she-hulk" , "10.0.14.23"};
 
 static const robot_ip_pair robotIPs[NUM_ROBOTS] = {wash, river, jayne,
                                                    simon, inara, kaylee,
-                                                   vera, mal, zoe,
-                                                   ringo, beyonce, ozzy, avril};
+                                                   vera, mal, zoe, ringo, beyonce,
+                                                   ozzy, avril, batman, she-hulk};
 
 //
 // Comm constants and MACRO definitions
