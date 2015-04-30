@@ -175,7 +175,7 @@ public class NBLOG_pack {
 			fc.write(bb);
 			fc.close();
 			
-			U.wf("Wrote %d logs to %s.\n", top.size(), botName);
+			U.wf("Wrote %d logs to %s.\n", bot.size(), botName);
 		}
 	}
 }

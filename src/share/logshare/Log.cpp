@@ -2,6 +2,8 @@
 
 namespace nblog {
     
+    nbhost_e HOST_TYPE = UNKNOWN;
+    
     int32_t getChecksum(const std::string& data) {
         int32_t sum = 0;
         for (int i = 0; i < data.size(); ++i)
@@ -45,6 +47,14 @@ namespace nblog {
             SExpr("checksum", cs),      //key-value list
             SExpr(clist)                //list, first is "contents" atom
         };
+        
+        if (HOST_TYPE == V5ROBOT) {
+            keys.push_back(SExpr("host_type", "V5ROBOT"));
+        } else if (HOST_TYPE == V4ROBOT) {
+            keys.push_back(SExpr("host_type", "V4ROBOT"));
+        } else {
+            keys.push_back(SExpr("host_type", "unknown"));
+        }
         
         _tree = SExpr(keys);
     }

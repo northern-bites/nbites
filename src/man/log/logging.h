@@ -100,14 +100,6 @@ namespace nblog {
      nbytes/data: encapsulated opaque log data.
      */
     
-    enum host_e {
-        V5ROBOT,
-        V4ROBOT,
-        UNKNOWN
-    };
-    
-    extern host_e HOST_TYPE;
-    
     void NBLog(int buffer_index, Log * log);
     void NBLog(int buffer_index, const std::string& where_called,
                const std::vector<SExpr>& items, const std::string& data );

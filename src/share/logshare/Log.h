@@ -14,6 +14,14 @@
 
 namespace nblog {
     
+    enum nbhost_e {
+        V5ROBOT,
+        V4ROBOT,
+        UNKNOWN
+    };
+    
+    extern nbhost_e HOST_TYPE;
+    
     class Log {
     public:
         
