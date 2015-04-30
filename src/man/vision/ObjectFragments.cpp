@@ -2073,7 +2073,8 @@ int ObjectFragments::classifyFirstPost(unsigned char c, Blob pole)
 
     // Our first test is whether we see a big blob of the same color
     // somewhere else
-    int post = classifyByCrossbar(pole);		  // look for the crossbar
+	// US OPEN: 2015 - dropped this since the whole back wall looks like a crossbar
+    int post = NOPOST; //classifyByCrossbar(pole);		  // look for the crossbar
     if (post != NOPOST) {
         if (POSTLOGIC) {
             cout << "Found crossbar " << post << endl;
@@ -2145,7 +2146,7 @@ bool ObjectFragments::isPostReasonableSizeShapeAndPlace(Blob post) {
         return false;
     }
     // make sure we have some size to our post
-    if (post.height() == 0) {
+    if (post.height() < 40) {
         return false;
     }
 
@@ -2236,6 +2237,11 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
         return;
     }
 
+	if (PRINTOBJS) {
+		cout << "Passed size/shape sanity check " << endl;
+		printBlob(pole);
+	}
+
     updateRunsAfterFirstPost(pole, LEFT);
     Blob secondPost;
     // ready to grab the potential post
@@ -2288,12 +2294,17 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
         // if we have a big post and no idea what it is, then stop
         // we'll mark it as uncertain for the localization system
         updateObject(right, pole, NOT_SURE, dc);
+		if (PRINTOBJS) {
+			cout << "First post found - about to look for second " << endl;
+			printBlob(pole);
+		}
         if (POSTLOGIC) {
             cout << "Post not classified" << endl;
         }
         return;
     }
 	if (PRINTOBJS) {
+		cout << "First post found - about to look for second " << endl;
 		printBlob(pole);
 	}
     lookForSecondPost(pole, post, left, right, mid, c);
@@ -2350,6 +2361,9 @@ void ObjectFragments::lookForSecondPost(Blob pole, int post,
         return;
     } else {
         // we managed to grab a second post - lets do more sanity checks
+		if (POSTDEBUG) {
+			cout << "Have a potential second post " << secondPost.getLeftBottomX() << endl;
+		}
         dc = checkDist(secondPost);
 		if (secondPost.getLeftBottomY() < horizonAt(secondPost.getLeftBottomX())) {
 			// project the two bottoms down to the field edge
@@ -2373,10 +2387,10 @@ void ObjectFragments::lookForSecondPost(Blob pole, int post,
         // also its size relative to the other post must be ok
         if (ratOk && secondPostFarEnough(pole, secondPost,
                                                            post) &&
-            relativeSizesOk(pole, secondPost)) {
+            relativeSizesOk(pole, secondPost) && greenCheck(secondPost)) {
 			// check if we have an unclassified post
 			if (post == LEFT && right->getIDCertainty() != SURE) {
-				if (secondPost.getLeftTopX() > pole.getLeftTopX()) {
+				if (secondPost.getLeftTopX() > pole.getLeftTopX() && POSTLOGIC) {
 					cout << "Second is left" << endl;
 				} else {
 					cout << "Second is right" << endl;
@@ -2390,6 +2404,9 @@ void ObjectFragments::lookForSecondPost(Blob pole, int post,
                 updateObject(right, secondPost, _SURE, dc);
                 left->setIDCertainty(_SURE);
             }
+			if (PRINTOBJS) {
+				printBlob(secondPost);
+			}
         } else {
             // we failed at least one sanity check
             if (SANITY) {
@@ -2613,6 +2630,16 @@ bool ObjectFragments::badDistance(Blob b) {
             }
             return true;
         }
+		if (diste > 500 && choose < 250) {
+            if (POSTDEBUG) {
+                cout << "Throwing out post.	 Distance estimate is " << e.dist
+                     << endl;
+                cout << "Dist from height width " << disth << " " << distw
+                     << endl;
+                cout << "Post at " << x << " " << y << endl;
+            }
+            return true;
+		}
 		if (b.getTop() > IMAGE_HEIGHT / 3 && diste < 100.0f) {
 			if (POSTDEBUG) {
 				cout << "Close post, but in bottom of image " << diste << endl;
@@ -2657,11 +2684,24 @@ bool ObjectFragments::locationOk(Blob b)
     int spanX = b.width();
     int spanY = b.height();
     int mh = min(horizonLeft, horizonRight);
-	if (trueTop > mh && trueTop > 3) {
+	if (trueTop + 10 > mh && trueTop > 3) {
 		if (SANITY) {
 			cout << "Top was less than horizon " << trueTop << " " << mh << endl;
 		}
 		return false;
+	}
+	/*if (spanX > 2 * (trueBottom - horizonLeft)) {
+		if (SANITY) {
+			cout << "Too much post under the horizon " << spanX << " " << (trueBottom - horizonLeft) << endl;
+			return false;
+		}
+		} */
+	if (spanY < 50 && !greenCheck(b)) {
+		if (SANITY) {
+			cout << "Short blob without enough green underneath - robot arm?" << endl;
+			drawBlob(b, RED);
+			return false;
+		}
 	}
     /*if (!horizonBottomOk(spanX, spanY, mh, trueLeft, trueRight, trueBottom,
                          trueTop)) {

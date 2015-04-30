@@ -374,8 +374,9 @@ void Threshold::lowerRuns() {
  */
 
 void Threshold::findGoals(int column, int topEdge) {
-    const int BADSIZE = 15;
+    const int BADSIZE = 5;
     const int GAP = BADSIZE;
+	const int MINLENGTH = 20;
     // scan up for goals
     int bad = 0, yellows = 0, pinks = 0, navy = 0;
     int firstYellow = topEdge, lastNavy = topEdge, firstNavy = topEdge,
@@ -386,7 +387,11 @@ void Threshold::findGoals(int column, int topEdge) {
     bool faceDown2 = pose->getHorizonY(0) < -100;
 	bool yellowOK = true;
 	bool goodPix = true;
+	int topYellow = 0;
     int j;
+	if (topEdge > IMAGE_HEIGHT - 10) {
+		return;
+	}
     for (j = topEdge; bad < BADSIZE && j >= 0; j--) {
         // get the next pixel
         unsigned char pixel = getThresholded(j,column);
@@ -409,6 +414,9 @@ void Threshold::findGoals(int column, int topEdge) {
         if (Utility::isNavy(pixel)) {
             lastNavy = j;
             navy++;
+			if (navy > 3) {
+				yellowOK = false;
+			}
             if (firstNavy == topEdge) {
                 firstNavy = j;
             }
@@ -416,13 +424,16 @@ void Threshold::findGoals(int column, int topEdge) {
         if (Utility::isRed(pixel)) {
             lastPink = j;
             pinks++;
+			if (pinks > 3) {
+				yellowOK = false;
+			}
             if (firstPink == topEdge) {
                 firstPink = j;
             }
         }
 		if (Utility::isBlue(pixel)) {
 			blue++;
-			if (blue > 5) {
+			if (blue > 2) {
 				yellowOK = false;
 			}
 			goodPix = false;
@@ -447,12 +458,15 @@ void Threshold::findGoals(int column, int topEdge) {
     // now do the same going down from the horizon
     bad = 0;
     int greens = 0;
+	topYellow = yellows;
+	int bottomYellow = 0;
     for (j = topEdge + 1; bad < BADSIZE && j < lowerBound[column]; j++) {
         // note:  These were thresholded in the findBallsCrosses loop
         unsigned char pixel = getThresholded(j,column);
         bool found = false;
         if (Utility::isYellow(pixel)) {
             firstYellow = j;
+			bottomYellow++;
             yellows++;
             found = true;
         }
@@ -477,7 +491,17 @@ void Threshold::findGoals(int column, int topEdge) {
             bad++;
         }
     }
-    if (yellows > 10) {
+	if (bottomYellow > topYellow && topYellow < 25) {
+		yellowOK = false;
+	}
+	if (yellowOK && yellows > MINLENGTH) {
+		if (bottomYellow > 3) {
+			vision->drawPoint(column, IMAGE_HEIGHT - 3, BLUE);
+		} else {
+			vision->drawPoint(column, IMAGE_HEIGHT - 3, BLACK);
+		}
+	}
+    if (yellows > MINLENGTH && yellowOK && bottomYellow > 3) {
         yellow->newRun(column, lastYellow, firstYellow - lastYellow);
     }
 
