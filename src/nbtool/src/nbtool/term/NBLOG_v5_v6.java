@@ -18,6 +18,7 @@ import nbtool.util.U;
 public class NBLOG_v5_v6 {
 	public static void main(String[] args) throws IOException {
 		U.wf("Attempting to convert %d logs to version6 format...\n\n", args.length);
+		long cindex = 0;
 		
 		for (String f : args) {
 			U.wf("file %s\n", f);
@@ -54,7 +55,7 @@ public class NBLOG_v5_v6 {
 				Log fnd = CommonIO.readLog(dis);
 				
 				if (U.is_v6Log(fnd)) {
-					U.wf("\tFile %f already v6 log!\n", f);
+					U.wf("\tFile %s already v6 log!\n", f);
 					continue;
 				}
 				
@@ -63,13 +64,15 @@ public class NBLOG_v5_v6 {
 					continue;
 				}
 				
+				fnd.setNameFromDesc();
+				String n2 = "n"+ (++cindex) + fnd.name;
 				DataOutputStream dos = new DataOutputStream(
-						new FileOutputStream(lf)
+						new FileOutputStream(n2)
 						);
 				CommonIO.writeLog(dos, fnd);
 				dos.close();
 				
-				U.wf("\tConverted.\n");
+				U.wf("\tConverted to %s\n", n2);
 
 			} catch (Exception e) {
 				e.printStackTrace();

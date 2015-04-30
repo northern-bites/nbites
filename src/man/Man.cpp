@@ -259,9 +259,9 @@ namespace man {
         
 //#ifdef LOG_IMAGES
         cognitionThread.log<messages::YUVImage>((control::IMAGES), &topTranscriber.imageOut,
-                                                "YUVImage", "cameraTOP");
+                                                "YUVImage", "camera_TOP");
         cognitionThread.log<messages::YUVImage>((control::IMAGES), &bottomTranscriber.imageOut,
-                                                "YUVImage", "cameraBOT");
+                                                "YUVImage", "camera_BOT");
 //#endif
         
 //#ifdef LOG_VISION

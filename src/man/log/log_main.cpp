@@ -406,6 +406,8 @@ namespace nblog {
         Log * newl = new Log("nblog", where_called, time(NULL), LOG_VERSION,
                              items, data);
         
+        //newl->tree().append(SExpr("", ""));
+        
         NBLog(buffer_index, newl);
     }
 }
