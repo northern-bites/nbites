@@ -94,7 +94,7 @@ public class NBLOG_pack {
 			else if (from.contains("BOT") || from.contains("bot"))
 				bot.add(l);
 			else {
-				U.wf("Image Log %s [%s] UNKNOWN FROM FIELD!\n", l.name, l.description);
+				U.wf("Image Log %s [%s] UNKNOWN FROM FIELD!: %s\n", l.name, l.description, from);
 			}
 		}
 		
