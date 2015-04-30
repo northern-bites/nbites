@@ -23,7 +23,7 @@ typedef unsigned char byte;
 #define ERROR_DATATYPE "Unexpected data type read from socket connection."
 #define ERROR_DATASIZE "Unexpected amount of data read from socket connection."
 
-static const int NUM_ROBOTS = 13;    // Total number of robots we have
+static const int NUM_ROBOTS = 15;    // Total number of robots we have
 
 typedef struct robot_ip_pair_t
 {
@@ -47,12 +47,12 @@ static const robot_ip_pair beyonce = {"beyonce", "10.0.14.19"};
 static const robot_ip_pair ozzy    = {"ozzy"   , "10.0.14.20"};
 static const robot_ip_pair avril   = {"avril"  , "10.0.14.21"};
 static const robot_ip_pair batman  = {"batman" , "10.0.14.22"};
-static const robot_ip_pair she-hulk= {"she-hulk" , "10.0.14.23"};
+static const robot_ip_pair shehulk= {"she-hulk" , "10.0.14.23"};
 
 static const robot_ip_pair robotIPs[NUM_ROBOTS] = {wash, river, jayne,
                                                    simon, inara, kaylee,
                                                    vera, mal, zoe, ringo, beyonce,
-                                                   ozzy, avril, batman, she-hulk};
+                                                   ozzy, avril, batman, shehulk};
 
 //
 // Comm constants and MACRO definitions
