@@ -47,6 +47,13 @@ GuardianModule::GuardianModule()
       rightFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       frameCount(0),
       useFallProtection(true),
+      falling(0),
+      fallen(0),
+      feetOnGround(0),
+      lastAdvance(0),
+      lastPrint(0),
+      lastTeamSwitch(0),
+      lastKickOffSwitch(0),
       audioQueue()
 {
 }
