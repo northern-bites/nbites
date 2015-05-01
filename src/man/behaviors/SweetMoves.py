@@ -150,10 +150,11 @@ STAND_UP_FRONT = (#Initial
                   (-28,-31,-87,80,52,0),
                   (120,-33,-4,0.4),
                   .6,1, stiff.STANDUP_STIFFNESSES),
-                 # turns to right a little and stands with one arm on ground
+                 # turns to right a little and stands with 
+                 # one arm on ground
 
                   ((42,28,5,-47),
-                  (-49,-16,0,101,-70,-5),
+                  (-49,-16,27,101,-70,-5),
                   (-49,-32,-110,61,39,-7),
                   (91,-20,-4,0),
                   0.8,1, stiff.STANDUP_STIFFNESSES),
@@ -180,7 +181,7 @@ STAND_UP_FRONT = (#Initial
                   INITIAL_POS[0][1],
                   INITIAL_POS[0][2],
                   INITIAL_POS[0][3],
-                  2,0, stiff.STANDUP_STIFFNESSES)
+                  1,0, stiff.STANDUP_STIFFNESSES)
                  )
 
 # new robots
