@@ -110,7 +110,7 @@ def afterPenalty(player):
         player.post_r_sightings = 0
         player.reset_loc = 0
 
-    if fabs(player.goal_right) > 5:
+    if fabs(player.goal_right) > 5 or player.stateTime > 15:
         if DEBUG_PENALTY_STATES:
             print "Consensus reached! Resetting loc. Is the goal to our right? " + str(player.goal_right < 0)
         # Yes, when goal_right is less than 0, our goal is to our right.

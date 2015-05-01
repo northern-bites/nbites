@@ -156,8 +156,8 @@ def waitForKickoff(player):
         waitForKickoff.ballRelY = player.brain.ball.rel_y
 
     if (player.brain.gameController.timeSincePlaying > 10 or
-        fabs(player.brain.ball.rel_x - waitForKickoff.ballRelX) > 10 or
-        fabs(player.brain.ball.rel_y - waitForKickoff.ballRelY) > 10):
+        fabs(player.brain.ball.rel_x - waitForKickoff.ballRelX) > 20 or
+        fabs(player.brain.ball.rel_y - waitForKickoff.ballRelY) > 20):
         return player.goNow('playOffBall')
 
     return player.stay()
