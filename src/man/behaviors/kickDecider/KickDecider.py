@@ -36,8 +36,8 @@ class KickDecider(object):
         self.brain.player.motionKick = False
 
         self.kicks = []
-        self.kicks.append(kicks.ZELLVARRO_LEFT_KICK)
-        self.kicks.append(kicks.ZELLVARRO_RIGHT_KICK)
+        self.kicks.append(kicks.LEFT_STRAIGHT_KICK)
+        self.kicks.append(kicks.RIGHT_STRAIGHT_KICK)
         # self.kicks.append(kicks.LEFT_SIDE_KICK)
         # self.kicks.append(kicks.RIGHT_SIDE_KICK)
 
@@ -272,8 +272,8 @@ class KickDecider(object):
 
     def allKicksAsap(self):
         self.kicks = []
-        self.kicks.append(kicks.LEFT_KICK)
-        self.kicks.append(kicks.RIGHT_KICK)
+        self.kicks.append(kicks.LEFT_STRAIGHT_KICK)
+        self.kicks.append(kicks.RIGHT_STRAIGHT_KICK)
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
         self.kicks.append(kicks.M_RIGHT_STRAIGHT)
         self.kicks.append(kicks.M_LEFT_SIDE)
@@ -433,7 +433,7 @@ class KickDecider(object):
 
     ### HIGH LEVEL PLANNERS ###
     def attacker(self):
-        frontKicks = self.sweetMovesOrbit()
+        frontKicks = self.frontKicksOrbitIfSmall()
         if frontKicks: 
             return frontKicks
 
@@ -677,7 +677,7 @@ class KickDecider(object):
         return -40 <= kick.setupH <= 40
 
     def isShortOrbit(self, kick):
-        return math.fabs(self.brain.loc.h - kick.setupH) < 70
+        return math.fabs(self.brain.loc.h - kick.setupH) < 50
 
     ### HELPER FUNCTIONS ###
     def fromCartesianToPolarCoordinates(self, x, y):
