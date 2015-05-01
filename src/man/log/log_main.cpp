@@ -75,7 +75,8 @@ namespace nblog {
     }
     
     void log_main_init() {
-        NBDEBUG("log_main_init()\n");
+        NBDEBUG("log_main_init()\n\t"
+                "nbuffers=%i version=%i\n");
         
         main_upstart = time(NULL);
         
