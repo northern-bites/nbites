@@ -7,6 +7,7 @@ import ChaseBallTransitions as transitions
 import RoleConstants as roleConstants
 from math import copysign, fabs
 from objects import RelRobotLocation
+from ..navigator import Navigator
 from ..util import *
 
 DEBUG_PENALTY_STATES = False
@@ -117,9 +118,18 @@ def afterPenalty(player):
         # It seems counter intuitive, but that's how it works. -Josh Z
         player.brain.resetLocalizationFromPenalty(player.goal_right < 0)
         if not roleConstants.isGoalie(player.role):
-            return player.goNow('determineRole')
+            return player.goNow('walkOut')
         return player.goLater(player.gameState)
 
+    return player.stay()
+
+@superState('gameControllerResponder')
+def walkOut(player):
+    player.brain.nav.destinationWalkTo(RelRobotLocation(100, 0, 0),
+                                       Navigator.BRISK_SPEED)
+    
+    if player.stateTime > 5:
+        return player.goNow('determineRole')
     return player.stay()
 
 @superState('gameControllerResponder')
