@@ -1119,7 +1119,8 @@ LEFT_STRAIGHT_KICK = (
      .14,0, stiff.NORMAL_STIFFNESSES),
 
     # Recover
-    ((80.,30.,-50.,-70.),
+    # ((80.,30.,-50.,-70.),
+    ((90.,10.,-90.,-10.),
      (0.,25.,-27.,43.5,-21.2,-20.),
      (0.,15,-27,45.,-22.5,-18.),
      (80.,-30.,50.,74.),
@@ -1129,7 +1130,7 @@ LEFT_STRAIGHT_KICK = (
      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
      (90.,-10.,82.,13.2),
-     .7,0,stiff.NORMAL_STIFFNESSES),
+     .7,0,stiff.NORMAL_STIFFNESSES)
     )
 
 RIGHT_STRAIGHT_KICK = mirrorMove(LEFT_STRAIGHT_KICK)
