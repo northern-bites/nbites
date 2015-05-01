@@ -36,10 +36,10 @@ class KickDecider(object):
         self.brain.player.motionKick = False
 
         self.kicks = []
-        self.kicks.append(kicks.LEFT_KICK)
-        self.kicks.append(kicks.RIGHT_KICK)
-        self.kicks.append(kicks.LEFT_SIDE_KICK)
-        self.kicks.append(kicks.RIGHT_SIDE_KICK)
+        self.kicks.append(kicks.ZELLVARRO_LEFT_KICK)
+        self.kicks.append(kicks.ZELLVARRO_RIGHT_KICK)
+        # self.kicks.append(kicks.LEFT_SIDE_KICK)
+        # self.kicks.append(kicks.RIGHT_SIDE_KICK)
 
         self.scoreKick = self.minimizeOrbitTime
 
@@ -433,7 +433,7 @@ class KickDecider(object):
 
     ### HIGH LEVEL PLANNERS ###
     def attacker(self):
-        frontKicks = self.frontKicksOrbitIfSmall()
+        frontKicks = self.sweetMovesOrbit()
         if frontKicks: 
             return frontKicks
 
