@@ -85,6 +85,14 @@ def gameSet(player):
     if not player.brain.motion.calibrated:
         return player.stay()
     
+    # US Open 2015 hack -- not on kickoff, jump on whistle if ball is close
+    ball = player.brain.ball
+    if not player.brain.gameController.ownKickOff:
+        if roleConstants.isChaser(player.role): 
+            if player.stateTime > 25 and ball.vis.frames_on > 2 and ball.distance < 230:
+                print "JUMPING EARLY!"
+                return player.goNow('approachBall')
+
     return player.stay()
 
 @superState('gameControllerResponder')
