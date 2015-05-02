@@ -73,6 +73,8 @@ def gameSet(player):
     if player.firstFrame():
         player.inKickingState = False
         player.brain.fallController.enabled = True
+        player.gainsOn()
+        player.stand()
         player.brain.nav.stand()
         player.brain.tracker.performBasicPan()
 
@@ -148,6 +150,7 @@ def gamePenalized(player):
     if player.firstFrame():
         player.inKickingState = False
         player.brain.fallController.enabled = False
+        player.gainsOn()
         player.stand()
         player.penalizeHeads()
         player.wasPenalized = True
