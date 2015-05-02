@@ -54,8 +54,8 @@ class KickDecider(object):
         self.brain.player.motionKick = False
         
         self.kicks = []
-        self.kicks.append(kicks.LEFT_KICK)
-        self.kicks.append(kicks.RIGHT_KICK)
+        self.kicks.append(kicks.M_LEFT_STRAIGHT)
+        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
 
         self.scoreKick = self.minimizeOrbitTime
 
@@ -89,8 +89,8 @@ class KickDecider(object):
         self.brain.player.motionKick = False
 
         self.kicks = []
-        self.kicks.append(kicks.LEFT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_STRAIGHT_KICK)
+        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
 
         self.scoreKick = self.minimizeOrbitTime
 
@@ -272,8 +272,8 @@ class KickDecider(object):
 
     def allKicksAsap(self):
         self.kicks = []
-        self.kicks.append(kicks.LEFT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_STRAIGHT_KICK)
+        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
         self.kicks.append(kicks.M_RIGHT_STRAIGHT)
         self.kicks.append(kicks.M_LEFT_SIDE)
@@ -433,9 +433,9 @@ class KickDecider(object):
 
     ### HIGH LEVEL PLANNERS ###
     def attacker(self):
-        # frontKicks = self.frontKicksOrbitIfSmall()
-        # if frontKicks: 
-        #     return frontKicks
+        frontKicks = self.frontKicksOrbitIfSmall()
+        if frontKicks: 
+            return frontKicks
 
         asap = self.motionKicksAsap()
         if asap:
@@ -444,9 +444,9 @@ class KickDecider(object):
         return self.frontKickCrosses()
 
     def defender(self):
-        # asap = self.allKicksAsap()
-        # if asap:
-        #     return asap
+        asap = self.allKicksAsap()
+        if asap:
+            return asap
 
         asap = self.motionKicksAsap()
         if asap:
