@@ -78,17 +78,6 @@ def gameSet(player):
     if not player.brain.motion.calibrated:
         return player.stay()
     
-    # US Open 2015 hack -- on kickoff, jump on whistle if playing uPenn
-    gameState = player.brain.interface.gameState
-    uPenn = 22
-    if (gameState.team(0).team_number == uPenn or
-        gameState.team(1).team_number == uPenn):
-        if roleConstants.isFirstChaser(player.role): 
-            if player.brain.gameController.ownKickOff:
-                if player.stateTime > 30:
-                    print "JUMPING EARLY!"
-                    return player.goNow('gamePlaying')
-
     # US Open 2015 hack -- not on kickoff, jump on whistle if ball is close
     ball = player.brain.ball
     if not player.brain.gameController.ownKickOff:
