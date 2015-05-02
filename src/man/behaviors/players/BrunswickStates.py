@@ -26,7 +26,12 @@ def gameInitial(player):
         player.lastStiffStatus = True
         #Reset role to player number
         player.role = player.brain.playerNumber
-        roleConstants.setRoleConstants(player, player.role)
+        # US OPEN HACK
+        if player.brain.game:
+            oppTeam = player.brain.game.team(1).team_number
+        else:
+            oppTeam = -1
+        roleConstants.setRoleConstants(player, player.role, oppTeam)
 
     # If stiffnesses were JUST turned on, then stand up.
     if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:

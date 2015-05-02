@@ -149,13 +149,23 @@ def determineRole(player):
 
     for i in range(4):
         if openSpaces[i] and roleConstants.canRoleSwitchTo(i+2):
-            roleConstants.setRoleConstants(player, i+2)
+            # US Open hack
+            if player.brain.game:
+                oppTeam = player.brain.game.team(1).team_number
+            else:
+                oppTeam = -1
+            roleConstants.setRoleConstants(player, i+2, oppTeam)
             return player.goLater(player.gameState)
         elif openSpaces[i]:
             position = i+2
 
     if position == 0:
         print "Came out of penalty and found no open spaces!!!"
-    roleConstants.setRoleConstants(player, position)
+    # US Open hack
+    if player.brain.game:
+        oppTeam = player.brain.game.team(1).team_number
+    else:
+        oppTeam = -1
+    roleConstants.setRoleConstants(player, i+2, oppTeam)
     return player.goLater(player.gameState)
 
