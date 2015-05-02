@@ -75,18 +75,18 @@ void ObstacleModule::run_()
     //     sonars = processSonar(sonarIn.message());
 
     // Process vision in all three sections of frame separately
-    FieldObstacles::Obstacle::ObstaclePosition
-        visionL = processVision(visionIn.message().left_dist(),
-                                visionIn.message().left_bearing());
-    FieldObstacles::Obstacle::ObstaclePosition
-        visionM = processVision(visionIn.message().mid_dist(),
-                                visionIn.message().mid_bearing());
-    FieldObstacles::Obstacle::ObstaclePosition
-        visionR = processVision(visionIn.message().right_dist(),
-                                visionIn.message().right_bearing());
+    // FieldObstacles::Obstacle::ObstaclePosition
+    //     visionL = processVision(visionIn.message().left_dist(),
+    //                             visionIn.message().left_bearing());
+    // FieldObstacles::Obstacle::ObstaclePosition
+    //     visionM = processVision(visionIn.message().mid_dist(),
+    //                             visionIn.message().mid_bearing());
+    // FieldObstacles::Obstacle::ObstaclePosition
+    //     visionR = processVision(visionIn.message().right_dist(),
+    //                             visionIn.message().right_bearing());
 
     // update obstacle buffer with new information from vision
-    updateObstacleBuffer(visionL, visionM, visionR);
+    // updateObstacleBuffer(visionL, visionM, visionR);
 
     // Decide arms
     FieldObstacles::Obstacle::ObstaclePosition
@@ -99,17 +99,17 @@ void ObstacleModule::run_()
     // std::cout<<"OBSTACLE: ";
 
     // ignore "NONE" direction, start at 1
-    for (int i = 1; i < NUM_DIRECTIONS; i++)
-    {
-        if (obstacleBuffer[i] != 0)
-        {
-            FieldObstacles::Obstacle* temp = current.get()->add_obstacle();
-            temp->set_position(obstaclesList[i]);
-            temp->set_distance(obstacleDistances[i]);
-            // std::cout<<obstacleDistances[i]<<", ";
-            didReturn = true;
-        }
-    }
+    // for (int i = 1; i < NUM_DIRECTIONS; i++)
+    // {
+    //     if (obstacleBuffer[i] != 0)
+    //     {
+    //         FieldObstacles::Obstacle* temp = current.get()->add_obstacle();
+    //         temp->set_position(obstaclesList[i]);
+    //         temp->set_distance(obstacleDistances[i]);
+    //         // std::cout<<obstacleDistances[i]<<", ";
+    //         didReturn = true;
+    //     }
+    // }
     // std::cout<<std::endl;
 
     FieldObstacles::Obstacle*temp = current.get()->add_obstacle();
