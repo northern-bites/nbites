@@ -433,9 +433,9 @@ class KickDecider(object):
 
     ### HIGH LEVEL PLANNERS ###
     def attacker(self):
-        frontKicks = self.frontKicksOrbitIfSmall()
-        if frontKicks: 
-            return frontKicks
+        # frontKicks = self.frontKicksOrbitIfSmall()
+        # if frontKicks: 
+        #     return frontKicks
 
         asap = self.motionKicksAsap()
         if asap:
@@ -444,7 +444,11 @@ class KickDecider(object):
         return self.frontKickCrosses()
 
     def defender(self):
-        asap = self.allKicksAsap()
+        # asap = self.allKicksAsap()
+        # if asap:
+        #     return asap
+
+        asap = self.motionKicksAsap()
         if asap:
             return asap
 
