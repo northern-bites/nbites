@@ -114,18 +114,18 @@ def gamePlaying(player):
     if not player.brain.motion.calibrated:
         return player.stay()
 
-    # US Open 2015 hack -- not detecting whistle
-    # if player.brain.gameController.timeSincePlaying < 10:
-    #     if player.brain.gameController.ownKickOff:
-    if (roleConstants.isChaser(player.role) or roleConstants.isCherryPicker(player.role)
-       and player.brain.ball.vis.on):
-        player.shouldKickOff = True
-        return player.goNow('approachBall')
-    else:
-        return player.goNow('playOffBall')
-    #     else:
-    #         return player.goNow('waitForKickoff')
-    # return player.goNow('playOffBall')
+    if player.brain.gameController.timeSincePlaying < 10:
+        if player.brain.gameController.ownKickOff:
+            if (roleConstants.isChaser(player.role) or roleConstants.isCherryPicker(player.role)
+               and player.brain.ball.vis.on):
+                player.shouldKickOff = True
+                return player.goNow('approachBall')
+            else:
+                return player.goNow('playOffBall')
+        else:
+            return player.goNow('waitForKickoff')
+    return player.goNow('playOffBall')
+
 
 @superState('gameControllerResponder')
 def gameFinished(player):
