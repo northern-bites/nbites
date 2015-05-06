@@ -36,6 +36,7 @@ public:
 int test_func();
 int arg_test_func();
 int CrossBright_func();
+int PostDetector_func();
 
 //defined in misc_defs.cpp
 /* none so far */
@@ -45,7 +46,8 @@ int CrossBright_func();
 static const std::vector<CrossFunc> FUNCS = {
     CrossFunc("test", test_func, {}),
     CrossFunc("arg_test", arg_test_func, {"YUVImage", "YUVImage"}),
-    CrossFunc("CrossBright", CrossBright_func, {"YUVImage"})
+    CrossFunc("CrossBright", CrossBright_func, {"YUVImage"}),
+    CrossFunc("PostDetector", PostDetector_func, {"YUVImage"})
 };
 
 extern std::vector<nblog::Log *> args;

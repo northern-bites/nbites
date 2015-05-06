@@ -8,13 +8,6 @@
 #include "vision/Gradient.h"
 #include "vision/EdgeDetector.h"
 
-    //PostDetector
-    // nbfunc_t PostDetector;
-    // PostDetector.name = "PostDetector";
-    // PostDetector.args = {sYUVImage};
-    // PostDetector.func = PostDetector_func;
-    // FUNCS.push_back(PostDetector);
-
 using nblog::Log;
 using nblog::SExpr;
 
@@ -64,12 +57,12 @@ int PostDetector_func() {
     assert(args.size() == 1);
     printf("PostDetector_func()\n");
 
-    logio::log_t log = logio::copyLog(&args[0]);
+    Log* log = new Log(args[0]);
 
     int width = 640;
     int height = 480;
 
-    messages::YUVImage image(log.data, width, height, width);
+    messages::YUVImage image((unsigned char)log->data().c_str(), width, height, width);
     portals::Message<messages::YUVImage> message(&image);
     man::image::ImageConverterModule imageConverter;
 
@@ -91,64 +84,46 @@ int PostDetector_func() {
     for(int i = 0; i < posts.size(); i++)
         printf("Found post at %d column.\n", posts[i]);
 
+    // Post image
     const messages::PackedImage8& postImage = detector.getPostImage();
-    logio::log_t postImageRet;
-
     std::string postImageDesc = "type=YUVImage encoding=[Y8] width=";
     postImageDesc += std::to_string(postImage.width());
     postImageDesc += " height=";
     postImageDesc += std::to_string(postImage.height());
+    Log* postImageRet = new Log(postImageDesc);
 
-    postImageRet.desc = (char*)malloc(postImageDesc.size()+1);
-    memcpy(postImageRet.desc, postImageDesc.c_str(), postImageDesc.size()+1);
-
-    postImageRet.dlen = postImage.width() * postImage.height();
-    postImageRet.data = (uint8_t*)malloc(postImageRet.dlen);
-    memcpy(postImageRet.data, postImage.pixelAddress(0, 0), postImageRet.dlen);
-
+    postImageRet->setData(std::string((const char *)postImage.pixelAddress(0, 0), postImage.width()*postImage.height()));
     rets.push_back(postImageRet);
 
-    logio::log_t unfiltHistRet;
+    // Unfiltered histogram
     std::string unfiltHistDesc = "type=Histogram";
+    Log* unfiltHistRet = new Log(unfiltHistDesc);
 
-    unfiltHistRet.desc = (char*)malloc(unfiltHistDesc.size()+1);
-    memcpy(unfiltHistRet.desc, unfiltHistDesc.c_str(), unfiltHistDesc.size()+1);
-
-    unfiltHistRet.dlen = 8 * detector.getLengthOfHistogram();
-    unfiltHistRet.data = (uint8_t*)malloc(unfiltHistRet.dlen);
-    memcpy(unfiltHistRet.data, detector.getUnfilteredHistogram(), unfiltHistRet.dlen);
-
+    unfiltHistRet->setData(std::string((const char *)detector.getUnfilteredHistogram(), 8*detector.getLengthOfHistogram()));
     rets.push_back(unfiltHistRet);
 
-    logio::log_t filtHistRet;
+    // Filtered histogram
     std::string filtHistDesc = "type=Histogram";
+    Log* filtHistRet = new Log(filtHistDesc);
 
-    filtHistRet.desc = (char*)malloc(filtHistDesc.size()+1);
-    memcpy(filtHistRet.desc, filtHistDesc.c_str(), filtHistDesc.size()+1);
-
-    filtHistRet.dlen = 8 * detector.getLengthOfHistogram();
-    filtHistRet.data = (uint8_t*)malloc(filtHistRet.dlen);
-    memcpy(filtHistRet.data, detector.getFilteredHistogram(), filtHistRet.dlen);
-
+    filtHistRet->setData(std::string((const char *)detector.getFilteredHistogram(), 8*detector.getLengthOfHistogram()));
     rets.push_back(filtHistRet);
 
-    logio::log_t postsRet;
+    // Goalpost candidates
     std::string postsRetDesc = "type=DetectedGoalposts";
+    Log* postsRet = new Log(postsRetDesc);
 
-    postsRet.desc = (char*)malloc(postsRetDesc.size()+1);
-    memcpy(postsRet.desc, postsRetDesc.c_str(), postsRetDesc.size()+1);
-
-    postsRet.dlen = 4 * posts.size();
-    if (postsRet.dlen) {
-        postsRet.data = (uint8_t*)malloc(postsRet.dlen);
-        int* dataAsIntPt = reinterpret_cast<int*>(postsRet.data);
+    int size = 4 * posts.size();
+    if (size) {
+        uint8_t* temp = (uint8_t*)malloc(postsRet.dlen);
+        int* dataAsIntPt = reinterpret_cast<int*>(temp);
         for (int i = 0; i < posts.size(); i++)
             dataAsIntPt[i] = posts[i]; 
-    } else {
-        postsRet.data = NULL;
+        postsRet->setData((const char *)dataAsIntPt, size);
+        free(temp);
     }
-
     rets.push_back(postsRet);
 
+    // Cleanup
     delete gradient;
 }
