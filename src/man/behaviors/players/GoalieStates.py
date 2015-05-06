@@ -37,8 +37,9 @@ def gameReady(player):
         player.penaltyKicking = False
         player.stand()
         player.brain.tracker.lookToAngle(0)
-        if player.lastDiffState != 'gameInitial':
-            return player.goLater('spinToWalkOffField')
+        # Rule change, we can't do this anymore...
+        # if player.lastDiffState != 'gameInitial':
+        #    return player.goLater('spinToWalkOffField')
 
     # Wait until the sensors are calibrated before moving.
     if(not player.brain.motion.calibrated):

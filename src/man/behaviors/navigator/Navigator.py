@@ -60,7 +60,7 @@ class Navigator(FSA.FSA):
             self.atLocPositionTransition : NavStates.atPosition,
 
             Transition.CountTransition(navTrans.shouldDodge,
-                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OCCASIONALLY,
                                        Transition.LOW_PRECISION)
             : NavStates.dodge
 

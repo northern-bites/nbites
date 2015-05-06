@@ -1,5 +1,3 @@
-
-
 ############################ PROJECT NAME
 # The name of this cmake project
 PROJECT( VISION )

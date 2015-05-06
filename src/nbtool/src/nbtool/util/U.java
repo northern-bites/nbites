@@ -5,17 +5,21 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.KeyPair;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.Map.Entry;
 import java.util.MissingResourceException;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import nbtool.data.Log;
+import nbtool.data.SExpr;
 import nbtool.images.ImageParent;
 import nbtool.images.UV88image;
 import nbtool.images.Y16image;
@@ -46,34 +50,6 @@ public class U {
 		System.out.printf(f, a);
 	}
 	
-	public static Map<String, String> attributes(String desc) {
-		if (desc.trim().isEmpty()) return null;
-		HashMap<String, String> map = new HashMap<String, String>();
-		
-		String[] attrs = desc.trim().split(" ");
-		for (String a : attrs) {
-			if (a.trim().isEmpty()) continue;
-			
-			String[] parts = a.split("=");
-			if (parts.length != 2)
-				return null;	//Don't attempt to reconstruct malformed descriptions.
-			
-			String type = parts[0].trim();
-			if (type.isEmpty())
-				return null;	//empty key is an error.  Empty value is NOT error, though parsing it may throw one later.
-			
-			if (map.containsKey(type)) {
-				U.wf("ERROR: description\n\t%s\ncontains multiple key: %s\n", desc, type);
-				return null;
-			}
-			
-			map.put(type, parts[1]);
-		}
-		
-		if (map.size() > 0) return map; //If description contains no k/v pairs, explicitly indicate that with null return.
-		else return null;
-	}
-	
 	public static byte[] subArray(byte[] ar, int start, int len) {
 		byte[] ret = new byte[len];
 		
@@ -83,11 +59,11 @@ public class U {
 	}
 	
 	//Almost all image logs will have null or [Y8(U8/V8)] encoding, but this method should be extended if that changes.
-	public static ImageParent imageFromLog(Log log) {
-		assert(log.type().equalsIgnoreCase(NBConstants.IMAGE_S));
-		int width = log.width();
-		int height = log.height();
-		String encoding = log.encoding();
+	public static BufferedImage biFromLog(Log log) {
+		assert(log.pType().equalsIgnoreCase(NBConstants.IMAGE_S));
+		int width = log.pWidth();
+		int height = log.pHeight();
+		String encoding = log.pEncoding();
 		
 		ImageParent ip = null;
 		if (encoding == null ) {
@@ -106,11 +82,7 @@ public class U {
 			return null;
 		}
 		
-		return ip;
-	}
-	
-	public static BufferedImage biFromLog(Log log) {
-		return imageFromLog(log).toBufferedImage(); 
+		return ip.toBufferedImage();
 	}
 	
 	public static final char[] hexArray = "0123456789ABCDEF".toCharArray();
@@ -150,7 +122,7 @@ public class U {
 	 * files so that protoc does not feel it needs to generate semi-arbitrary class names.
 	 * */
 	
-	
+	@SuppressWarnings("unchecked")
 	public static Class<? extends com.google.protobuf.GeneratedMessage> protobufClassFromType(String _type) {
 		assert(_type.startsWith(NBConstants.PROTOBUF_TYPE_PREFIX));
 		String type = _type.substring(NBConstants.PROTOBUF_TYPE_PREFIX.length()); //Remove prefix.
@@ -239,5 +211,89 @@ public class U {
 			return System.getProperty("user.home") 
 					+ p.substring(1);
 		} else return p;
+	}
+	
+	
+	
+	public static boolean is_v6Log(Log tocheck) {
+		return (tocheck.description.trim().startsWith("(nblog"));
+	}
+	
+	/* Modifies the description field of old */
+	public static boolean v6Convert(Log old) {
+		if (is_v6Log(old))
+			return true;	//nothing to do
+		
+		HashMap<String, String> map = new HashMap<String, String>();
+		String[] attrs = old.description.trim().split(" ");
+		for (String a : attrs) {
+			if (a.trim().isEmpty()) continue;
+			
+			String[] parts = a.split("=");
+			if (parts.length != 2)
+				return false;	//Don't attempt to reconstruct malformed descriptions.
+			
+			String type = parts[0].trim();
+			if (type.isEmpty())
+				return false;
+			
+			String value = parts[1].trim();
+			if (value.isEmpty())
+				return false;
+			
+			if (map.containsKey(type)) {
+				return false;
+			}
+			
+			map.put(type, value);
+		}
+		
+		if (map.containsKey("checksum")) {
+			int found_sum = checksum(old.bytes);
+			int read_sum = Integer.parseInt(map.get("checksum"));
+			if (found_sum != read_sum)
+				return false;
+		}
+		
+		//Ok, we can convert this.
+		map.remove("checksum");
+		map.remove("version");
+		
+		SExpr top_level = SExpr.newList();
+		top_level.append(SExpr.newAtom("nblog"));
+		top_level.append(SExpr.newList(
+				SExpr.newAtom("created"),
+				SExpr.newAtom("CONVERTED"),
+				SExpr.newAtom("null")
+				));
+		
+		top_level.append(SExpr.newKeyValue("version", 6 + ""));
+		
+		SExpr c1 = SExpr.newList();
+		c1.append(SExpr.newKeyValue("nbytes", old.bytes.length + ""));
+		if (map.containsKey("index")) {
+			c1.append(SExpr.newKeyValue("iindex", map.get("index")));
+			map.remove("index");
+		}
+		
+		for (Entry<String, String> kp : map.entrySet()) {
+			c1.append(SExpr.newKeyValue(kp.getKey(), kp.getValue()));
+		}
+		
+		SExpr clist = SExpr.newList();
+		clist.append(SExpr.newAtom("contents"));
+		clist.append(c1);
+		
+		top_level.append(clist);
+		
+		old.description = top_level.serialize();
+		return true;
+	}
+	
+	public static int checksum(byte[] data) {
+		int checksum = 0;
+		for (byte b : data)
+			checksum += (b & 0xFF);
+		return checksum;
 	}
 }

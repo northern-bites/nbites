@@ -26,7 +26,12 @@ def gameInitial(player):
         player.lastStiffStatus = True
         #Reset role to player number
         player.role = player.brain.playerNumber
-        roleConstants.setRoleConstants(player, player.role)
+        # US OPEN HACK
+        if player.brain.game:
+            oppTeam = player.brain.game.team(1).team_number
+        else:
+            oppTeam = -1
+        roleConstants.setRoleConstants(player, player.role, oppTeam)
 
     # If stiffnesses were JUST turned on, then stand up.
     if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
@@ -68,6 +73,8 @@ def gameSet(player):
     if player.firstFrame():
         player.inKickingState = False
         player.brain.fallController.enabled = True
+        player.gainsOn()
+        player.stand()
         player.brain.nav.stand()
         player.brain.tracker.performBasicPan()
 
@@ -143,6 +150,7 @@ def gamePenalized(player):
     if player.firstFrame():
         player.inKickingState = False
         player.brain.fallController.enabled = False
+        player.gainsOn()
         player.stand()
         player.penalizeHeads()
         player.wasPenalized = True
@@ -156,8 +164,8 @@ def waitForKickoff(player):
         waitForKickoff.ballRelY = player.brain.ball.rel_y
 
     if (player.brain.gameController.timeSincePlaying > 10 or
-        fabs(player.brain.ball.rel_x - waitForKickoff.ballRelX) > 10 or
-        fabs(player.brain.ball.rel_y - waitForKickoff.ballRelY) > 10):
+        fabs(player.brain.ball.rel_x - waitForKickoff.ballRelX) > 20 or
+        fabs(player.brain.ball.rel_y - waitForKickoff.ballRelY) > 20):
         return player.goNow('playOffBall')
 
     return player.stay()

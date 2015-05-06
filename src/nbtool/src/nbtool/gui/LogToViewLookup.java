@@ -14,7 +14,7 @@ public class LogToViewLookup {
 		ArrayList<Class<? extends ViewParent>> ret = new ArrayList<Class<? extends ViewParent>>();
 		
 		//Try to list most specific views first
-		String type = lg.type();
+		String type = lg.pType();
 		assert(type != null);
 		
 		ArrayList<Class<? extends ViewParent>> specific = P.LTVIEW_MAP.get(type);

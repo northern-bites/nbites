@@ -121,6 +121,7 @@ protected :
     virtual void run_();
 private :
     ImageTranscriber& it;
+    size_t image_index;
 };
 
 }

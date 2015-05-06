@@ -12,22 +12,29 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import nbtool.io.CommandIO;
+import nbtool.io.ControlIO;
 import nbtool.util.U;
 
 public class FlagPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private JRadioButton jrb[] = new JRadioButton[3];
-	private ButtonGroup bg;
-	private String flag_name;
-	private int index;
+	private JLabel lbl;
 	
-	public FlagPanel(String name, int i) {
-		this.flag_name = name;
-		this.index = i;
+	private ButtonGroup bg;
+	public String flag_name;
+	public int index;
+
+	
+	public FlagPanel() {
+		this.flag_name = "null";
+		int nspace = 20 - flag_name.length();
+		//even out lengths.
+		this.flag_name += new String(new char[nspace]).replace("\0", " ");
+		this.index = -1;
+		
 		this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 		
-		JLabel lbl = new JLabel(this.flag_name);
+		lbl = new JLabel(this.flag_name);
 		lbl.setFont(new Font("monospaced", Font.PLAIN, 12));
 		add(lbl);
 		bg = new ButtonGroup();
@@ -54,7 +61,7 @@ public class FlagPanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == jrb[0]) {
 			boolean success =
-					CommandIO.tryAddSetFlag(index, false);
+					ControlIO.tryAddSetFlag(index, false);
 			U.wf("FlagPanel[%s] CommandIO.tryAddSetFlag(%d, false) returned %B\n", flag_name, index, success);
 			
 		} else if (e.getSource() == jrb[1]) {
@@ -62,7 +69,7 @@ public class FlagPanel extends JPanel implements ActionListener {
 		} else if (e.getSource() == jrb[2]) {
 			System.out.println("2 " + jrb[2].isSelected());
 			boolean success =
-					CommandIO.tryAddSetFlag(index, true);
+					ControlIO.tryAddSetFlag(index, true);
 			U.wf("FlagPanel[%s] CommandIO.tryAddSetFlag(%d, true) returned %B\n", flag_name, index, success);
 		} else {}
 		
@@ -79,5 +86,15 @@ public class FlagPanel extends JPanel implements ActionListener {
 		jrb[v ? 2 : 0].setSelected(true);
 		jrb[0].setEnabled(true);
 		jrb[2].setEnabled(true);
+	}
+	
+	public void setInfo(String name, int index) {
+		this.flag_name = name;
+		int nspace = 20 - name.length();
+		//even out lengths.
+		this.flag_name += new String(new char[nspace]).replace("\0", " ");
+		this.index = index;
+		
+		lbl.setText(flag_name);
 	}
 }

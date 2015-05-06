@@ -10,12 +10,12 @@ import java.util.Arrays;
 
 import nbtool.data.Log;
 import nbtool.gui.logviews.misc.ViewParent;
-import nbtool.io.CppIO;
-import nbtool.io.CppIO.CppFuncCall;
-import nbtool.io.CppIO.CppFuncListener;
+import nbtool.io.CrossIO;
+import nbtool.io.CrossIO.CppFuncCall;
+import nbtool.io.CrossIO.CrossFuncListener;
 import nbtool.util.U;
 
-public class PostViewCross extends ViewParent implements CppFuncListener{
+public class PostViewCross extends ViewParent implements CrossFuncListener {
 	BufferedImage img;
 	double[] unfilteredHistogram;
 	double[] filteredHistogram;
@@ -61,7 +61,7 @@ public class PostViewCross extends ViewParent implements CppFuncListener{
 	public void setLog(Log newlog) {
 		log = newlog;
 		
-		int fi = CppIO.current.indexOfFunc("PostDetector");
+		int fi = CrossIO.current.indexOfFunc("PostDetector");
 		
 		if (fi < 0) return;
 		
@@ -72,7 +72,7 @@ public class PostViewCross extends ViewParent implements CppFuncListener{
 		fc.args = new ArrayList<Log>(Arrays.asList(log));
 		fc.listener = this;
 		
-		CppIO.current.tryAddCall(fc);
+		CrossIO.current.tryAddCall(fc);
 	}
 	
 	public PostViewCross() {

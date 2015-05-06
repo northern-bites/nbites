@@ -86,7 +86,7 @@ class GameController():
         # reset field for change
         self.kickOffChanged = False
 
-        if (gameState.kick_off_team == self.teamColor):
+        if (gameState.kick_off_team == gameState.team(teamIndex).team_number):
             # It is currently our kick off
             if not self.ownKickOff:
                 self.kickOffChanged = True

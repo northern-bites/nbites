@@ -69,11 +69,10 @@ def prepareForKick(player):
             player.shouldKickOff = False
             player.kick = player.decider.kicksBeforeBallIsFree()
         else:
-            # if transitions.shouldChangeKickingStrategy(player):
-            #     print "Time for some heroics!"
-            #     player.kick = player.decider.timeForSomeHeroics()
-            # else:
-            player.kick = player.decider.obstacleAware(roleConstants.isDefender(player.role))
+            if roleConstants.isDefender(player.role):
+                player.kick = player.decider.defender()
+            else:
+                player.kick = player.decider.attacker()
         player.inKickingState = True
 
     elif player.finishedPlay:
