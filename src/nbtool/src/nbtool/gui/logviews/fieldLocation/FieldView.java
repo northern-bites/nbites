@@ -21,6 +21,9 @@ public class FieldView extends ViewParent {
 	public float robotLocX;
 	public float robotLocY;
 	
+	public static final Dimension fieldDimension = new Dimension((int)FieldConstants.FIELD_WIDTH+(int)FieldConstants.GREEN_PAD_X,
+			(int)FieldConstants.FIELD_HEIGHT+(int)FieldConstants.GREEN_PAD_X);
+	
 //	public void paintComponent(Graphics g) {
 //		System.out.println("FieldView PaintComponent");
 //		Graphics2D g2 = (Graphics2D) g;
@@ -59,11 +62,12 @@ public class FieldView extends ViewParent {
 		super();
 		
 		dPane = new DrawPane();
+		dPane.setPreferredSize(fieldDimension);
+		
 		sp = new JScrollPane(dPane);
 		sp.setVisible(true);
-		JScrollBar scrollBar = new JScrollBar();
-		scrollBar.setUnitIncrement(20);
-		sp.setVerticalScrollBar(scrollBar);
+		sp.setPreferredSize(new Dimension(800,800));
+	
 		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
@@ -88,7 +92,6 @@ public class FieldView extends ViewParent {
 		
 		@Override
 		public void paintComponent(Graphics g) {
-			System.out.println("FieldView PaintComponent");
 			Graphics2D g2 = (Graphics2D) g;
 			myField.drawField(g2);
 			myPlayer.draw(g2);

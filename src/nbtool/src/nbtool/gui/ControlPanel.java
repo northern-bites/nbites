@@ -9,6 +9,7 @@ import java.awt.event.ComponentEvent;
 import java.nio.file.FileSystem;
 import java.util.Map.Entry;
 
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;

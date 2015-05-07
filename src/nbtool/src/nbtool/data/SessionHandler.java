@@ -127,6 +127,7 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
 			Thread netioThread = new Thread(netioRunnable, "netio");			
 			netioThread.start();
 			
+			//CommandIO is to the robot
 			cncRunnable = new CommandIO(address, NBConstants.CNC_PORT, this);
 			Thread cncThread = new Thread(cncRunnable, "cnc");
 			cncThread.start();
