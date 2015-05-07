@@ -10,8 +10,9 @@ import nbtool.util.*;
 import nbtool.util.N.EVENT;
 import nbtool.util.N.NListener;
 import nbtool.io.ControlIO;
-
 import nbtool.util.NBConstants.*;
+import messages.CameraParamsOuterClass;
+import messages.CameraParamsOuterClass.CameraParams;
 
 
 public class StreamingPanel extends JPanel implements ActionListener, NListener {
@@ -97,6 +98,7 @@ public class StreamingPanel extends JPanel implements ActionListener, NListener 
 			 */
 			topCameraParams = topCameraPrefs.getParameterValues();
 			bottomCameraParams = bottomCameraPrefs.getParameterValues();
+			
 			tryStart(topCameraParams, bottomCameraParams);
 		}
 	}
@@ -107,8 +109,41 @@ public class StreamingPanel extends JPanel implements ActionListener, NListener 
 		
 	}
 	
-	private void tryStart(Integer[] topCamera, Integer[] bottomCamera) {
+	private void tryStart(Integer[] topCameraParams, Integer[] bottomCameraParams) {
+		CameraParams topCamera = CameraParams.newBuilder()
+				.setHFLIP(topCameraParams[0])
+				.setVFLIP(topCameraParams[1])
+				.setAutoExposure(topCameraParams[2])
+				.setBrightness(topCameraParams[3])
+				.setContrast(topCameraParams[4])
+				.setSaturation(topCameraParams[5])
+				.setHue(topCameraParams[6])
+				.setSharpness(topCameraParams[7])
+				.setAutoWhiteBalance(topCameraParams[8])
+				.setExposure(topCameraParams[9])
+				.setGain(topCameraParams[10])
+				.setWhiteBalance(topCameraParams[11])
+				.setFadeToBlack(topCameraParams[12])
+				.build();
 		
+		CameraParams bottomCamera = CameraParams.newBuilder()
+				.setHFLIP(bottomCameraParams[0])
+				.setVFLIP(bottomCameraParams[1])
+				.setAutoExposure(bottomCameraParams[2])
+				.setBrightness(bottomCameraParams[3])
+				.setContrast(bottomCameraParams[4])
+				.setSaturation(bottomCameraParams[5])
+				.setHue(bottomCameraParams[6])
+				.setSharpness(bottomCameraParams[7])
+				.setAutoWhiteBalance(bottomCameraParams[8])
+				.setExposure(bottomCameraParams[9])
+				.setGain(bottomCameraParams[10])
+				.setWhiteBalance(bottomCameraParams[11])
+				.setFadeToBlack(bottomCameraParams[12])
+				.build();
+		
+		String topProto = bottomCamera.toString();
+		System.out.println("TopProto: "+topProto);
 	}
 	
 	private void useStatus(STATUS s) {
