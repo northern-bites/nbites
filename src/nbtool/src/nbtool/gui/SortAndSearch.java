@@ -102,8 +102,8 @@ public class SortAndSearch extends JPanel implements ActionListener {
 		TIME(0, new Comparator<Log>(){
 
 			public int compare(Log o1, Log o2) {
-				Long s1 = o1.pTime();
-				Long s2 = o2.pTime();
+				Long s1 = o1.primaryTime();
+				Long s2 = o2.primaryTime();
 				
 				if (s1 == null && s2 == null)
 					return 0;
@@ -119,8 +119,8 @@ public class SortAndSearch extends JPanel implements ActionListener {
 		TYPE(1, new Comparator<Log>(){
 
 			public int compare(Log o1, Log o2) {
-				String s1 = o1.pType();
-				String s2 = o2.pType();
+				String s1 = o1.primaryType();
+				String s2 = o2.primaryType();
 				
 				if (s1 == null && s2 == null)
 					return 0;
@@ -136,8 +136,8 @@ public class SortAndSearch extends JPanel implements ActionListener {
 		IMAGE(2, new Comparator<Log>(){
 
 			public int compare(Log o1, Log o2) {
-				Integer s1 = o1.pI_Index();
-				Integer s2 = o2.pI_Index();
+				Integer s1 = o1.primaryI_Index();
+				Integer s2 = o2.primaryI_Index();
 				
 				if (s1 == null && s2 == null)
 					return 0;
@@ -153,8 +153,8 @@ public class SortAndSearch extends JPanel implements ActionListener {
 		FROM(3, new Comparator<Log>(){
 
 			public int compare(Log o1, Log o2) {
-				String s1 = o1.pFrom();
-				String s2 = o2.pFrom();
+				String s1 = o1.primaryFrom();
+				String s2 = o2.primaryFrom();
 				
 				if (s1 == null && s2 == null)
 					return 0;

@@ -41,7 +41,6 @@ public class P {
 	 * */		
 	public static Preferences p = java.util.prefs.Preferences.userRoot().node(P.class.getName());
 	public static boolean VERBOSE = getVerbose();
-
 	
 	private static final String xName = "NBClient_W_x";
 	private static final String yName = "NBClient_W_y";

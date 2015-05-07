@@ -64,10 +64,10 @@ public class U {
 	
 	//Almost all image logs will have null or [Y8(U8/V8)] encoding, but this method should be extended if that changes.
 	public static BufferedImage biFromLog(Log log) {
-		assert(log.pType().equalsIgnoreCase(NBConstants.IMAGE_S));
-		int width = log.pWidth();
-		int height = log.pHeight();
-		String encoding = log.pEncoding();
+		assert(log.primaryType().equalsIgnoreCase(NBConstants.IMAGE_S));
+		int width = log.primaryWidth();
+		int height = log.primaryHeight();
+		String encoding = log.primaryEncoding();
 		
 		ImageParent ip = null;
 		if (encoding == null ) {

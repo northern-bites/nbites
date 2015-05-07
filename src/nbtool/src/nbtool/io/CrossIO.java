@@ -101,7 +101,7 @@ public class CrossIO implements Runnable {
 				callLoop(dis, dos);
 
 			} catch(CrossIOException cie) {
-				U.w("Malformed communication with m: " + cie.message);
+				U.w("Malformed communication with msg: " + cie.message);
 				cie.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -122,7 +122,7 @@ public class CrossIO implements Runnable {
 		int nfuncs_1 = dis.readInt();
 		Log funcLog = CommonIO.readLog(dis);
 		//int nfuncs_2 = //Integer.parseInt(funcLog.getAttributes().get("fn"));
-		int nfuncs_2 = -1;
+		int nfuncs_2 = funcLog.tree().find("contents").get(1).get(1).valueAsInt();
 		
 		String funcstr = new String(funcLog.bytes);
 		String[] funcs = funcstr.split("\n");

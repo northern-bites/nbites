@@ -71,7 +71,7 @@ public class Log implements Serializable {
 	}
 	
 	public void setNameFromDesc() {
-		this.name = String.format("i%d_type-%s_from-%s_v-%d", unique_id, pType(), pFrom(), version());
+		this.name = String.format("i%d_type=%s_from=%s_v=%d", unique_id, primaryType(), primaryFrom(), version());
 		this.name = this.name
 				.substring(Math.max(0, this.name.length() - 240))
 				.replace('/', '_').replace(' ', '_').replace(':', '-').replace('.', '-') + ".nblog";
@@ -131,33 +131,33 @@ public class Log implements Serializable {
 	 * (the "primary" content)
 	 * */
 	
-	public int pBytes() {
+	public int primaryBytes() {
 		SExpr c = tree().find("contents").get(1).find("bytes").get(1);
 		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
 	}
 	
-	public String pType() {
+	public String primaryType() {
 		SExpr c = tree().find("contents").get(1).find("type").get(1);
 		return c.exists() && c.isAtom() ? c.value() : null;
 	}
 	
-	public String pFrom() {
+	public String primaryFrom() {
 		SExpr c = tree().find("contents").get(1).find("from").get(1);
 		return c.exists() && c.isAtom() ? c.value() : null;
 	}
 	
-	public int pI_Index() {
+	public int primaryI_Index() {
 		SExpr c = tree().find("contents").get(1).find("i_index").get(1);
 		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
 	}
 	
-	public Long pTime() {
+	public Long primaryTime() {
 		SExpr c = tree().find("contents").get(1).find("time").get(1);
 		return c.exists() && c.isAtom() ? c.valueAsLong() : null;
 	}
 	
-	public boolean pIsProtobuf() {
-		String t = pType();
+	public boolean primaryIsProtobuf() {
+		String t = primaryType();
 		if (t == null)
 			return false;
 		return t.startsWith(NBConstants.PROTOBUF_TYPE_PREFIX);
@@ -167,17 +167,17 @@ public class Log implements Serializable {
 	 * Attributes relating to possible image content.
 	 */
 	
-	public String pEncoding() {
+	public String primaryEncoding() {
 		SExpr c = tree().find("contents").get(1).find("encoding").get(1);
 		return c.exists() && c.isAtom() ? c.value() : null;
 	}
 	
-	public int pWidth() {
+	public int primaryWidth() {
 		SExpr c = tree().find("contents").get(1).find("width").get(1);
 		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
 	}
 	
-	public int pHeight() {
+	public int primaryHeight() {
 		SExpr c = tree().find("contents").get(1).find("height").get(1);
 		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
 	}

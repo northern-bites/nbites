@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nbtool.data.Log;
+import nbtool.gui.logviews.misc.ViewParent;
 
 public class NBConstants {
 	
@@ -34,7 +35,7 @@ public class NBConstants {
 														//we worry less about dead sockets.
 	
 	//Who names a class DataFlavor?  That's just so... Idk. Fllaavvvooorr.  Data Fllaaavoor. MMM, gimme some'o that DataFlav
-	public static DataFlavor treeFlavor = new DataFlavor(Log.class, "NB-OpaqueLog");
+	public static final DataFlavor treeFlavor = new DataFlavor(Log.class, "NB-OpaqueLog");
 	
 	public static enum MODE {
 		NETWORK_SAVING(0), NETWORK_NOSAVE(1), FILESYSTEM(2), NONE(3);
@@ -65,4 +66,6 @@ public class NBConstants {
 	public static final String[] STATUS_STRINGS = {
 		"idle", "starting", "running", "stopping"
 	};
+	
+	public static final Map<String, Class<? extends ViewParent>[]> POSSIBLE_VIEWS = null;
 }

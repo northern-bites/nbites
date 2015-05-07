@@ -61,7 +61,7 @@ public class NBLOG_pack {
 				dis = new DataInputStream(new BufferedInputStream(fis));
 
 				Log found = CommonIO.readLog(dis);
-				if (U.is_v6Log(found) && found.pType().equals("YUVImage")) {
+				if (U.is_v6Log(found) && found.primaryType().equals("YUVImage")) {
 					found.name = f;
 					accepted.add(found);
 				}

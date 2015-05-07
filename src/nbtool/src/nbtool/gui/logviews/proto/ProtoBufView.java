@@ -20,7 +20,7 @@ public final class ProtoBufView extends nbtool.gui.logviews.misc.ViewParent {
 	public static Boolean shouldLoadInParallel() {return true;}
 	public void setLog(Log newlog) {
 		
-		String t = (String) newlog.pType();
+		String t = (String) newlog.primaryType();
 		Class<? extends com.google.protobuf.GeneratedMessage> lClass = U.protobufClassFromType(t);
 		U.wf("ProtoBufView: using class %s for type %s.\n", lClass.getName(), t);
 		com.google.protobuf.Message msg = U.protobufInstanceForClassWithData(lClass, newlog.bytes);
