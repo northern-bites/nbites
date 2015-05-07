@@ -38,7 +38,6 @@ public class Session {
 			break;
 		default:
 			break;
-		
 		}
 	}
 	

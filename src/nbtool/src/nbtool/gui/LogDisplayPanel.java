@@ -67,7 +67,7 @@ public class LogDisplayPanel extends JPanel implements NListener {
 	}
 	
 	protected void setContents(Log l, ArrayList<Log> also) {
-		U.w("LDP.setContents() type: " + l.getAttributes().get("type"));
+		U.w("LDP.setContents() type: " + l.pType());
 		ArrayList<Class<? extends ViewParent>> list = LogToViewLookup.viewsForLog(l);
 		views.removeAll();
 		

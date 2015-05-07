@@ -3,19 +3,19 @@ package nbtool.term;
 import java.util.ArrayList;
 
 import nbtool.data.Log;
-import nbtool.io.NetIO;
-import nbtool.io.NetIO.Boss;
+import nbtool.io.StreamIO;
+import nbtool.io.StreamIO.Boss;
 import nbtool.util.U;
 
-public class term implements NetIO.Boss{
+public class term implements StreamIO.Boss{
 	
-	NetIO netio;
+	StreamIO netio;
 	ArrayList<Log> logs;
 	
 	public static void main(String[] args) throws InterruptedException {
 		//System.out.println(args.length);
 		term t = new term();
-		t.netio = new NetIO(args[0], Integer.parseInt(args[1]), t);
+		t.netio = new StreamIO(args[0], Integer.parseInt(args[1]), t);
 		
 		Thread thrd = new Thread(t.netio);
 		

@@ -23,16 +23,31 @@
 #define MAX_WAIT 1 //seconds
 
 #include "nbfuncs.h"
+#include "exactio.h"
 
 #define CHECK_RET(v) if(v) {printf("BAD RET: [%s](%i) at line %i.\n", #v, v, __LINE__); return 2;}
 
+using nblog::Log;
+using nblog::SExpr;
+
+std::vector<Log *> args;
+std::vector<Log *> rets;
 
 int main(int argc, const char * argv[]) {
+    CrossFunc("e", NULL, {"a", "b"});
     
-    register_funcs();
+    std::string instance_name;
+    
+    if (argc > 1) {
+        printf("using name: [%s]\n", argv[1]);
+        instance_name = std::string(argv[1]);
+    } else {
+        printf("using null name.\n");
+    }
+    
     printf("using %li functions:\n", FUNCS.size());
     for (int i = 0; i < FUNCS.size(); ++i)
-        printf("\t%s(%lu)\n", FUNCS[i].name, FUNCS[i].args.size());
+        printf("\t%s(%lu)\n", FUNCS[i].name.c_str(), FUNCS[i].args.size());
     printf("\n\n-----------------------------------------\n");
     
     struct sockaddr_in server;
@@ -54,8 +69,8 @@ int main(int argc, const char * argv[]) {
     uint32_t host_order = 0; //Host order
     uint32_t net_order = 0; //Network order
     
-    CHECK_RET(logio::send_exact(fd, 4, &net_order));
-    CHECK_RET(logio::recv_exact(fd, 4, &net_order, MAX_WAIT));
+    CHECK_RET(send_exact(fd, 4, &net_order));
+    CHECK_RET(recv_exact(fd, 4, &net_order, MAX_WAIT));
     
     if (net_order != 0) {
         printf("malformed init val: 0x%x\n", net_order);
@@ -65,8 +80,9 @@ int main(int argc, const char * argv[]) {
     printf("sending functions...\n");
     
     net_order = htonl(FUNCS.size());
-    CHECK_RET(logio::send_exact(fd, 4, &net_order));
+    CHECK_RET(send_exact(fd, 4, &net_order));
     
+    //Could put this in SExprs, but it's already working like this...
     std::ostringstream format;
     for (int i = 0; i < FUNCS.size(); ++i) {
         format << FUNCS[i].name << '=';
@@ -78,20 +94,17 @@ int main(int argc, const char * argv[]) {
     }
     
     std::string funcstr = format.str();
-    //printf("\"\n%s\"\n", funcstr.c_str());
+    std::vector<SExpr> contents= {
+        SExpr("nfuncs", (int) FUNCS.size()),
+        SExpr("name", instance_name)
+    };
     
-    char buf[100];
-    snprintf(buf, 100, "type=functionlist fn=%lu", FUNCS.size());
+    Log functions("nbcross", "nbcross/main", time(NULL), NBCROSS_VERSION, contents, funcstr);
     
-    logio::log_t functionsLog;
-    functionsLog.desc = buf;
-    functionsLog.dlen = funcstr.size();
-    functionsLog.data = (uint8_t *) funcstr.data();
-    
-    CHECK_RET(logio::send_log(fd, &functionsLog));
+    CHECK_RET(functions.send(fd));
     
     //Confirm java got the right number of functions.
-    CHECK_RET(logio::recv_exact(fd, 4, &net_order, MAX_WAIT));
+    CHECK_RET(recv_exact(fd, 4, &net_order, MAX_WAIT));
     host_order = ntohl(net_order);
     if (host_order != FUNCS.size()) {
         printf("java sent wrong confirmation of FUNCS.size(): %i\n", host_order);
@@ -99,12 +112,11 @@ int main(int argc, const char * argv[]) {
     }
     
     printf("functions sent... waiting for calculation requests.\n");
-    
     for (;;) {
-        CHECK_RET(logio::recv_exact(fd, 4, &net_order, MAX_WAIT));
+        CHECK_RET(recv_exact(fd, 4, &net_order, MAX_WAIT));
         if (ntohl(net_order) == 0) {
             host_order = 0;
-            CHECK_RET(logio::send_exact(fd, 4, &host_order));
+            CHECK_RET(send_exact(fd, 4, &host_order));
             usleep(10000);
             continue;
         } else if (ntohl(net_order) != 1) {
@@ -113,7 +125,7 @@ int main(int argc, const char * argv[]) {
         }
         
         uint32_t findex;
-        CHECK_RET(logio::recv_exact(fd, 4, &findex, MAX_WAIT));
+        CHECK_RET(recv_exact(fd, 4, &findex, MAX_WAIT));
         findex = ntohl(findex);
     
         assert(findex >= 0);
@@ -125,25 +137,29 @@ int main(int argc, const char * argv[]) {
         int na = FUNCS[findex].args.size();
         
         for (int i = 0; i < na; ++i) {
-            logio::log_t arg;
-            logio::recv_log(fd, &arg, MAX_WAIT);
             
-            const char * type = FUNCS[findex].args[i];
-            std::string need = "type=";
-            need.append(type, strlen(type));
-            std::string got(arg.desc);
+            Log * recvd = Log::recv(fd, MAX_WAIT);
+            CHECK_RET(recvd != NULL);
             
-            if (got.find(need) == std::string::npos) {
-                printf("arg %i [%s] did NOT match type=%s!\n", i, arg.desc, type);
+            SExpr * contents = recvd->tree().find("contents");
+            
+            if (!contents || !contents->get(0)->isAtom()) {
+                printf("arg %i wrong format!\n", i);
                 return 1;
             }
             
-            args.push_back(arg);
+            std::string type = contents->get(0)->value();
+            if (type != FUNCS[findex].args[i]) {
+                printf("arg %i [%s] did NOT match type=%s!\n", i, type.c_str(), FUNCS[findex].args[i].c_str());
+                return 1;
+            }
+            
+            args.push_back(recvd);
         }
         
         assert(args.size() == FUNCS[findex].args.size());
         printf("calling function [%s]"
-               "\n-------------------------------------------\n", FUNCS[findex].name);
+               "\n-------------------------------------------\n", FUNCS[findex].name.c_str());
         
         int ret = FUNCS[findex].func();
         
@@ -151,15 +167,15 @@ int main(int argc, const char * argv[]) {
         
         printf("function returned with ret:%i, sending %lu output logs.\n", ret, rets.size());
         net_order = htonl(ret);
-        CHECK_RET(logio::send_exact(fd, 4, &net_order));
+        CHECK_RET(send_exact(fd, 4, &net_order));
         net_order = htonl(rets.size());
-        CHECK_RET(logio::send_exact(fd, 4, &net_order));
+        CHECK_RET(send_exact(fd, 4, &net_order));
         
         for (int i = 0; i < rets.size(); ++i) {
-            CHECK_RET(logio::send_log(fd, &(rets[i])));
+            CHECK_RET(rets[i]->send(fd));
         }
         
-        CHECK_RET(logio::recv_exact(fd, 4, &net_order, MAX_WAIT));
+        CHECK_RET(recv_exact(fd, 4, &net_order, MAX_WAIT));
         
         if (ntohl(net_order) != rets.size()) {
             printf("java sent bad confirmation of end function call (wanted %lu, got %i)\n", rets.size(), ntohl(net_order));
@@ -167,13 +183,11 @@ int main(int argc, const char * argv[]) {
         }
         
         printf("cleaning up function... ");
-        
-        for (int i = 0; i < args.size(); ++i) {free(args[i].desc); free(args[i].data);}
+        for (int i = 0; i < args.size(); ++i) {delete args[i];}
         args.clear();
         
-        for (int i = 0; i < rets.size(); ++i) {free(rets[i].desc); free(rets[i].data);}
+        for (int i = 0; i < rets.size(); ++i) {delete rets[i];}
         rets.clear();
-        
         printf("done\n");
         
         printf("function call completed\n");

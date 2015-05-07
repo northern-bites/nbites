@@ -4,9 +4,9 @@ import java.io.File;
 
 import javax.swing.SwingUtilities;
 
-import nbtool.io.CommandIO;
+import nbtool.io.ControlIO;
 import nbtool.io.FileIO;
-import nbtool.io.NetIO;
+import nbtool.io.StreamIO;
 import nbtool.util.N;
 import nbtool.util.N.EVENT;
 import nbtool.util.NBConstants;
@@ -14,11 +14,11 @@ import nbtool.util.NBConstants.MODE;
 import nbtool.util.NBConstants.STATUS;
 import nbtool.util.U;
 
-public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
+public class SessionHandler implements StreamIO.Boss, FileIO.Boss, ControlIO.Boss{
 			
 	private FileIO fileioRunnable;
-	private NetIO netioRunnable;
-	private CommandIO cncRunnable;
+	private StreamIO netioRunnable;
+	private ControlIO cncRunnable;
 	
 	private MODE workingMode;
 	
@@ -123,12 +123,12 @@ public class SessionHandler implements NetIO.Boss, FileIO.Boss, CommandIO.Boss{
 			
 		case NETWORK_NOSAVE:
 			//start net thread
-			netioRunnable = new NetIO(address, NBConstants.SERVER_PORT, this);
+			netioRunnable = new StreamIO(address, NBConstants.STREAM_PORT, this);
 			Thread netioThread = new Thread(netioRunnable, "netio");			
 			netioThread.start();
 			
-			//CommandIO is to the robot
-			cncRunnable = new CommandIO(address, NBConstants.CNC_PORT, this);
+			cncRunnable = new ControlIO(address, NBConstants.CONTROL_PORT, this);
+
 			Thread cncThread = new Thread(cncRunnable, "cnc");
 			cncThread.start();
 			

@@ -37,8 +37,8 @@ public class FieldView extends ViewParent {
 
 	public void setLog(Log newlog) {
 		log = newlog;
-		if(log.isProtobuf()) {
-			assert(log.type().equalsIgnoreCase(
+		if(log.pIsProtobuf()) {
+			assert(log.pType().equalsIgnoreCase(
 					nbtool.util.NBConstants.PROTOBUF_TYPE_PREFIX +
 					"RobotLocation"));
 		}

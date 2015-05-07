@@ -26,8 +26,6 @@
 #include "obstacle/ObstacleModule.h"
 #include "ParamReader.h"
 
-#include "sound/Recorder.h"
-
 #include <vector>
 
 namespace man {
@@ -71,8 +69,6 @@ private:
     behaviors::BehaviorsModule behaviors;
     led::LedEnactorModule leds;
     context::SharedBallModule sharedBall;
-    
-    sound::Recorder recorder;
 };
 
 }

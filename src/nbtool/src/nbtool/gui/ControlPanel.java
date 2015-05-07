@@ -22,13 +22,13 @@ import javax.swing.SwingConstants;
 
 import nbtool.data.RobotStats;
 import nbtool.data.Log;
+import nbtool.data.RobotStats.Flag;
 import nbtool.data.SessionMaster;
-import nbtool.io.CommandIO;
+import nbtool.io.ControlIO;
 import nbtool.util.N;
 import nbtool.util.N.NListener;
 import nbtool.util.NBConstants;
 import nbtool.util.N.EVENT;
-import nbtool.util.NBConstants.FlagPair;
 import nbtool.util.NBConstants.MODE;
 import nbtool.util.NBConstants.STATUS;
 import nbtool.util.P;
@@ -88,12 +88,12 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 		bstream = new JCheckBox("objects w/ desc:");
 		canvas.add(bstream);
 		
-		flags = new FlagPanel[NBConstants.flags.size()];
-		int i = 0;
-		for (FlagPair f : NBConstants.flags) {
-			FlagPanel fp = new FlagPanel(f.name, f.index);
-			flags[i++] = fp;
-			canvas.add(fp);
+		flags = new FlagPanel[16];
+		for (int i = 0; i < flags.length; ++i) {
+			flags[i] = new FlagPanel();
+			canvas.add(flags[i]);
+			
+			flags[i].setUnknown();		
 		}
 		
 		sp = new JScrollPane();
@@ -196,7 +196,7 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 			goAction();
 			
 		} else if (e.getSource() == test) {
-			boolean success = CommandIO.tryAddTest();
+			boolean success = ControlIO.tryAddTest();
 			U.w("ControlPanel: CommandIO.tryAddTest() returned " + success);
 		} else if (e.getSource() == modes) {
 			int si = modes.getSelectedIndex();
@@ -211,16 +211,14 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 	public void notified(EVENT e, Object src, Object... args) {
 		switch (e) {
 		case REL_BOTSTAT:
-			RobotStats bs= (RobotStats) args[0];
+			RobotStats bs = (RobotStats) args[0];
+			
 			if (connected) {
-				for (int i = 0; i < flags.length; ++i) {
-					boolean val = bs.flags.bFlags[i + 2]; //2 for connection flags
-					
-					flags[i].setKnown(val);
-				}
+				setFlagPanel(bs);
 			}
 			
 			break;
+			
 		case CNC_CONNECTION:
 			Boolean c = (Boolean) args[0];
 			
@@ -348,4 +346,15 @@ public class ControlPanel extends JPanel implements ActionListener, NListener {
 	 * */
 	
 	private boolean connected = false;
+	
+	private void setFlagPanel(RobotStats rs) {		
+		for (int i = 0; i < rs.flags.size() && i < 16; ++i) {
+			Flag f = rs.flags.get(i);
+			flags[i].setInfo(f.name, f.index);			
+			
+			flags[i].setKnown(f.value);			
+		}
+		
+		repaint();
+	}
 }

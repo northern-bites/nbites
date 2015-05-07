@@ -13,5 +13,5 @@ message InertialState
 
     // Filtered angle data.
     optional float angle_x = 6;
-    optional float angle_y = 7;
+    optional float angle_y = 7;   
 }

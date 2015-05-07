@@ -18,7 +18,7 @@ import javax.swing.SwingUtilities;
 import nbtool.data.SessionHandler;
 import nbtool.data.SessionMaster;
 import nbtool.data.Stats;
-import nbtool.io.CppIO;
+import nbtool.io.CrossIO;
 import nbtool.util.N;
 import nbtool.util.NBConstants;
 import nbtool.util.P;
@@ -39,7 +39,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		U.w("static singleton Stats..." + Stats.INST.toString());
 		U.w("static singleton SessionMaster..." + SessionMaster.INST.toString());
 		U.w("static singleton CppIO server ..." + 
-				CppIO.current.toString() + " live:" + CppIO.thread.isAlive()); 
+				CrossIO.current.toString() + " live:" + CrossIO.thread.isAlive()); 
 		
 		SwingUtilities.invokeLater(new Runnable(){
 
@@ -79,8 +79,8 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		statusp = new StatusPanel();
 		right.addTab("status", statusp);
 		
-		cp = new CppPane();
-		right.addTab("c++", cp);
+		cp = new NBCrossPane();
+		right.addTab("nbcross", cp);
 		
 		up = new PrefsnUtils();
 		right.addTab("utility", up);
@@ -157,7 +157,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		
 	private LogDisplayPanel ldp;
 	
-	private CppPane cp;	
+	private NBCrossPane cp;	
 	private PrefsnUtils up;
 		
 	private JSplitPane split1;

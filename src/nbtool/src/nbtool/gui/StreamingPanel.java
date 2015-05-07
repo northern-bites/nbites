@@ -9,7 +9,7 @@ import nbtool.data.*;
 import nbtool.util.*;
 import nbtool.util.N.EVENT;
 import nbtool.util.N.NListener;
-import nbtool.io.CommandIO;
+import nbtool.io.ControlIO;
 
 import nbtool.util.NBConstants.*;
 
