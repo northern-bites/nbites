@@ -107,13 +107,13 @@ add_subdirectory( control )
 add_subdirectory( gamestate )
 add_subdirectory( guardian )
 add_subdirectory( image )
-add_subdirectory( jointenactor )
-add_subdirectory( led )
+#add_subdirectory( jointenactor )
+#add_subdirectory( led )
 add_subdirectory( localization )
 add_subdirectory( log )
 add_subdirectory( motion )
 add_subdirectory( obstacle )
-add_subdirectory( sensors )
+#add_subdirectory( sensors )
 add_subdirectory( sharedball )
 add_subdirectory( vision )
 
@@ -123,9 +123,8 @@ set( MAN_SRCS main.cpp
   ParamReader.cpp
 )
 
-add_library(
+add_executable(
   man
-  SHARED
   ${MAN_SRCS}
 )
 
@@ -141,8 +140,8 @@ target_link_libraries(
   gamestate
   guardian
   image
-  jointenactor
-  led
+  #jointenactor
+  #led
   localization
   log
   messages
@@ -150,12 +149,12 @@ target_link_libraries(
   obstacle
   portals
   logshare
-  sensors
+  #sensors
   sharedball
   support
   vision
 )
 
 install( TARGETS man
-  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION lib
 )
