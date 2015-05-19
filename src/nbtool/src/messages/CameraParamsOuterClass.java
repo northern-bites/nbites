@@ -13,119 +13,133 @@ public final class CameraParamsOuterClass {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>optional int32 H_FLIP = 1;</code>
+     * <code>optional string whichCamera = 1;</code>
+     */
+    boolean hasWhichCamera();
+    /**
+     * <code>optional string whichCamera = 1;</code>
+     */
+    java.lang.String getWhichCamera();
+    /**
+     * <code>optional string whichCamera = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getWhichCameraBytes();
+
+    /**
+     * <code>optional int32 H_FLIP = 2;</code>
      */
     boolean hasHFLIP();
     /**
-     * <code>optional int32 H_FLIP = 1;</code>
+     * <code>optional int32 H_FLIP = 2;</code>
      */
     int getHFLIP();
 
     /**
-     * <code>optional int32 V_FLIP = 2;</code>
+     * <code>optional int32 V_FLIP = 3;</code>
      */
     boolean hasVFLIP();
     /**
-     * <code>optional int32 V_FLIP = 2;</code>
+     * <code>optional int32 V_FLIP = 3;</code>
      */
     int getVFLIP();
 
     /**
-     * <code>optional int32 autoExposure = 3;</code>
+     * <code>optional int32 autoExposure = 4;</code>
      */
     boolean hasAutoExposure();
     /**
-     * <code>optional int32 autoExposure = 3;</code>
+     * <code>optional int32 autoExposure = 4;</code>
      */
     int getAutoExposure();
 
     /**
-     * <code>optional int32 brightness = 4;</code>
+     * <code>optional int32 brightness = 5;</code>
      */
     boolean hasBrightness();
     /**
-     * <code>optional int32 brightness = 4;</code>
+     * <code>optional int32 brightness = 5;</code>
      */
     int getBrightness();
 
     /**
-     * <code>optional int32 contrast = 5;</code>
+     * <code>optional int32 contrast = 6;</code>
      */
     boolean hasContrast();
     /**
-     * <code>optional int32 contrast = 5;</code>
+     * <code>optional int32 contrast = 6;</code>
      */
     int getContrast();
 
     /**
-     * <code>optional int32 saturation = 6;</code>
+     * <code>optional int32 saturation = 7;</code>
      */
     boolean hasSaturation();
     /**
-     * <code>optional int32 saturation = 6;</code>
+     * <code>optional int32 saturation = 7;</code>
      */
     int getSaturation();
 
     /**
-     * <code>optional int32 hue = 7;</code>
+     * <code>optional int32 hue = 8;</code>
      */
     boolean hasHue();
     /**
-     * <code>optional int32 hue = 7;</code>
+     * <code>optional int32 hue = 8;</code>
      */
     int getHue();
 
     /**
-     * <code>optional int32 sharpness = 8;</code>
+     * <code>optional int32 sharpness = 9;</code>
      */
     boolean hasSharpness();
     /**
-     * <code>optional int32 sharpness = 8;</code>
+     * <code>optional int32 sharpness = 9;</code>
      */
     int getSharpness();
 
     /**
-     * <code>optional int32 autoWhiteBalance = 9;</code>
+     * <code>optional int32 autoWhiteBalance = 10;</code>
      */
     boolean hasAutoWhiteBalance();
     /**
-     * <code>optional int32 autoWhiteBalance = 9;</code>
+     * <code>optional int32 autoWhiteBalance = 10;</code>
      */
     int getAutoWhiteBalance();
 
     /**
-     * <code>optional int32 exposure = 10;</code>
+     * <code>optional int32 exposure = 11;</code>
      */
     boolean hasExposure();
     /**
-     * <code>optional int32 exposure = 10;</code>
+     * <code>optional int32 exposure = 11;</code>
      */
     int getExposure();
 
     /**
-     * <code>optional int32 gain = 11;</code>
+     * <code>optional int32 gain = 12;</code>
      */
     boolean hasGain();
     /**
-     * <code>optional int32 gain = 11;</code>
+     * <code>optional int32 gain = 12;</code>
      */
     int getGain();
 
     /**
-     * <code>optional int32 whiteBalance = 12;</code>
+     * <code>optional int32 whiteBalance = 13;</code>
      */
     boolean hasWhiteBalance();
     /**
-     * <code>optional int32 whiteBalance = 12;</code>
+     * <code>optional int32 whiteBalance = 13;</code>
      */
     int getWhiteBalance();
 
     /**
-     * <code>optional int32 fadeToBlack = 13;</code>
+     * <code>optional int32 fadeToBlack = 14;</code>
      */
     boolean hasFadeToBlack();
     /**
-     * <code>optional int32 fadeToBlack = 13;</code>
+     * <code>optional int32 fadeToBlack = 14;</code>
      */
     int getFadeToBlack();
   }
@@ -181,68 +195,74 @@ public final class CameraParamsOuterClass {
               }
               break;
             }
-            case 8: {
+            case 10: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
-              hFLIP_ = input.readInt32();
+              whichCamera_ = bs;
               break;
             }
             case 16: {
               bitField0_ |= 0x00000002;
-              vFLIP_ = input.readInt32();
+              hFLIP_ = input.readInt32();
               break;
             }
             case 24: {
               bitField0_ |= 0x00000004;
-              autoExposure_ = input.readInt32();
+              vFLIP_ = input.readInt32();
               break;
             }
             case 32: {
               bitField0_ |= 0x00000008;
-              brightness_ = input.readInt32();
+              autoExposure_ = input.readInt32();
               break;
             }
             case 40: {
               bitField0_ |= 0x00000010;
-              contrast_ = input.readInt32();
+              brightness_ = input.readInt32();
               break;
             }
             case 48: {
               bitField0_ |= 0x00000020;
-              saturation_ = input.readInt32();
+              contrast_ = input.readInt32();
               break;
             }
             case 56: {
               bitField0_ |= 0x00000040;
-              hue_ = input.readInt32();
+              saturation_ = input.readInt32();
               break;
             }
             case 64: {
               bitField0_ |= 0x00000080;
-              sharpness_ = input.readInt32();
+              hue_ = input.readInt32();
               break;
             }
             case 72: {
               bitField0_ |= 0x00000100;
-              autoWhiteBalance_ = input.readInt32();
+              sharpness_ = input.readInt32();
               break;
             }
             case 80: {
               bitField0_ |= 0x00000200;
-              exposure_ = input.readInt32();
+              autoWhiteBalance_ = input.readInt32();
               break;
             }
             case 88: {
               bitField0_ |= 0x00000400;
-              gain_ = input.readInt32();
+              exposure_ = input.readInt32();
               break;
             }
             case 96: {
               bitField0_ |= 0x00000800;
-              whiteBalance_ = input.readInt32();
+              gain_ = input.readInt32();
               break;
             }
             case 104: {
               bitField0_ |= 0x00001000;
+              whiteBalance_ = input.readInt32();
+              break;
+            }
+            case 112: {
+              bitField0_ |= 0x00002000;
               fadeToBlack_ = input.readInt32();
               break;
             }
@@ -286,202 +306,245 @@ public final class CameraParamsOuterClass {
     }
 
     private int bitField0_;
-    public static final int H_FLIP_FIELD_NUMBER = 1;
-    private int hFLIP_;
+    public static final int WHICHCAMERA_FIELD_NUMBER = 1;
+    private java.lang.Object whichCamera_;
     /**
-     * <code>optional int32 H_FLIP = 1;</code>
+     * <code>optional string whichCamera = 1;</code>
      */
-    public boolean hasHFLIP() {
+    public boolean hasWhichCamera() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional int32 H_FLIP = 1;</code>
+     * <code>optional string whichCamera = 1;</code>
+     */
+    public java.lang.String getWhichCamera() {
+      java.lang.Object ref = whichCamera_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          whichCamera_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string whichCamera = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getWhichCameraBytes() {
+      java.lang.Object ref = whichCamera_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        whichCamera_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int H_FLIP_FIELD_NUMBER = 2;
+    private int hFLIP_;
+    /**
+     * <code>optional int32 H_FLIP = 2;</code>
+     */
+    public boolean hasHFLIP() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional int32 H_FLIP = 2;</code>
      */
     public int getHFLIP() {
       return hFLIP_;
     }
 
-    public static final int V_FLIP_FIELD_NUMBER = 2;
+    public static final int V_FLIP_FIELD_NUMBER = 3;
     private int vFLIP_;
     /**
-     * <code>optional int32 V_FLIP = 2;</code>
+     * <code>optional int32 V_FLIP = 3;</code>
      */
     public boolean hasVFLIP() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional int32 V_FLIP = 2;</code>
+     * <code>optional int32 V_FLIP = 3;</code>
      */
     public int getVFLIP() {
       return vFLIP_;
     }
 
-    public static final int AUTOEXPOSURE_FIELD_NUMBER = 3;
+    public static final int AUTOEXPOSURE_FIELD_NUMBER = 4;
     private int autoExposure_;
     /**
-     * <code>optional int32 autoExposure = 3;</code>
+     * <code>optional int32 autoExposure = 4;</code>
      */
     public boolean hasAutoExposure() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional int32 autoExposure = 3;</code>
+     * <code>optional int32 autoExposure = 4;</code>
      */
     public int getAutoExposure() {
       return autoExposure_;
     }
 
-    public static final int BRIGHTNESS_FIELD_NUMBER = 4;
+    public static final int BRIGHTNESS_FIELD_NUMBER = 5;
     private int brightness_;
     /**
-     * <code>optional int32 brightness = 4;</code>
+     * <code>optional int32 brightness = 5;</code>
      */
     public boolean hasBrightness() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>optional int32 brightness = 4;</code>
+     * <code>optional int32 brightness = 5;</code>
      */
     public int getBrightness() {
       return brightness_;
     }
 
-    public static final int CONTRAST_FIELD_NUMBER = 5;
+    public static final int CONTRAST_FIELD_NUMBER = 6;
     private int contrast_;
     /**
-     * <code>optional int32 contrast = 5;</code>
+     * <code>optional int32 contrast = 6;</code>
      */
     public boolean hasContrast() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
+      return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional int32 contrast = 5;</code>
+     * <code>optional int32 contrast = 6;</code>
      */
     public int getContrast() {
       return contrast_;
     }
 
-    public static final int SATURATION_FIELD_NUMBER = 6;
+    public static final int SATURATION_FIELD_NUMBER = 7;
     private int saturation_;
     /**
-     * <code>optional int32 saturation = 6;</code>
+     * <code>optional int32 saturation = 7;</code>
      */
     public boolean hasSaturation() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
+      return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
-     * <code>optional int32 saturation = 6;</code>
+     * <code>optional int32 saturation = 7;</code>
      */
     public int getSaturation() {
       return saturation_;
     }
 
-    public static final int HUE_FIELD_NUMBER = 7;
+    public static final int HUE_FIELD_NUMBER = 8;
     private int hue_;
     /**
-     * <code>optional int32 hue = 7;</code>
+     * <code>optional int32 hue = 8;</code>
      */
     public boolean hasHue() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
+      return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
-     * <code>optional int32 hue = 7;</code>
+     * <code>optional int32 hue = 8;</code>
      */
     public int getHue() {
       return hue_;
     }
 
-    public static final int SHARPNESS_FIELD_NUMBER = 8;
+    public static final int SHARPNESS_FIELD_NUMBER = 9;
     private int sharpness_;
     /**
-     * <code>optional int32 sharpness = 8;</code>
+     * <code>optional int32 sharpness = 9;</code>
      */
     public boolean hasSharpness() {
-      return ((bitField0_ & 0x00000080) == 0x00000080);
+      return ((bitField0_ & 0x00000100) == 0x00000100);
     }
     /**
-     * <code>optional int32 sharpness = 8;</code>
+     * <code>optional int32 sharpness = 9;</code>
      */
     public int getSharpness() {
       return sharpness_;
     }
 
-    public static final int AUTOWHITEBALANCE_FIELD_NUMBER = 9;
+    public static final int AUTOWHITEBALANCE_FIELD_NUMBER = 10;
     private int autoWhiteBalance_;
     /**
-     * <code>optional int32 autoWhiteBalance = 9;</code>
+     * <code>optional int32 autoWhiteBalance = 10;</code>
      */
     public boolean hasAutoWhiteBalance() {
-      return ((bitField0_ & 0x00000100) == 0x00000100);
+      return ((bitField0_ & 0x00000200) == 0x00000200);
     }
     /**
-     * <code>optional int32 autoWhiteBalance = 9;</code>
+     * <code>optional int32 autoWhiteBalance = 10;</code>
      */
     public int getAutoWhiteBalance() {
       return autoWhiteBalance_;
     }
 
-    public static final int EXPOSURE_FIELD_NUMBER = 10;
+    public static final int EXPOSURE_FIELD_NUMBER = 11;
     private int exposure_;
     /**
-     * <code>optional int32 exposure = 10;</code>
+     * <code>optional int32 exposure = 11;</code>
      */
     public boolean hasExposure() {
-      return ((bitField0_ & 0x00000200) == 0x00000200);
+      return ((bitField0_ & 0x00000400) == 0x00000400);
     }
     /**
-     * <code>optional int32 exposure = 10;</code>
+     * <code>optional int32 exposure = 11;</code>
      */
     public int getExposure() {
       return exposure_;
     }
 
-    public static final int GAIN_FIELD_NUMBER = 11;
+    public static final int GAIN_FIELD_NUMBER = 12;
     private int gain_;
     /**
-     * <code>optional int32 gain = 11;</code>
+     * <code>optional int32 gain = 12;</code>
      */
     public boolean hasGain() {
-      return ((bitField0_ & 0x00000400) == 0x00000400);
+      return ((bitField0_ & 0x00000800) == 0x00000800);
     }
     /**
-     * <code>optional int32 gain = 11;</code>
+     * <code>optional int32 gain = 12;</code>
      */
     public int getGain() {
       return gain_;
     }
 
-    public static final int WHITEBALANCE_FIELD_NUMBER = 12;
+    public static final int WHITEBALANCE_FIELD_NUMBER = 13;
     private int whiteBalance_;
     /**
-     * <code>optional int32 whiteBalance = 12;</code>
+     * <code>optional int32 whiteBalance = 13;</code>
      */
     public boolean hasWhiteBalance() {
-      return ((bitField0_ & 0x00000800) == 0x00000800);
+      return ((bitField0_ & 0x00001000) == 0x00001000);
     }
     /**
-     * <code>optional int32 whiteBalance = 12;</code>
+     * <code>optional int32 whiteBalance = 13;</code>
      */
     public int getWhiteBalance() {
       return whiteBalance_;
     }
 
-    public static final int FADETOBLACK_FIELD_NUMBER = 13;
+    public static final int FADETOBLACK_FIELD_NUMBER = 14;
     private int fadeToBlack_;
     /**
-     * <code>optional int32 fadeToBlack = 13;</code>
+     * <code>optional int32 fadeToBlack = 14;</code>
      */
     public boolean hasFadeToBlack() {
-      return ((bitField0_ & 0x00001000) == 0x00001000);
+      return ((bitField0_ & 0x00002000) == 0x00002000);
     }
     /**
-     * <code>optional int32 fadeToBlack = 13;</code>
+     * <code>optional int32 fadeToBlack = 14;</code>
      */
     public int getFadeToBlack() {
       return fadeToBlack_;
     }
 
     private void initFields() {
+      whichCamera_ = "";
       hFLIP_ = 0;
       vFLIP_ = 0;
       autoExposure_ = 0;
@@ -510,43 +573,46 @@ public final class CameraParamsOuterClass {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt32(1, hFLIP_);
+        output.writeBytes(1, getWhichCameraBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeInt32(2, vFLIP_);
+        output.writeInt32(2, hFLIP_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeInt32(3, autoExposure_);
+        output.writeInt32(3, vFLIP_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeInt32(4, brightness_);
+        output.writeInt32(4, autoExposure_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeInt32(5, contrast_);
+        output.writeInt32(5, brightness_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeInt32(6, saturation_);
+        output.writeInt32(6, contrast_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeInt32(7, hue_);
+        output.writeInt32(7, saturation_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        output.writeInt32(8, sharpness_);
+        output.writeInt32(8, hue_);
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        output.writeInt32(9, autoWhiteBalance_);
+        output.writeInt32(9, sharpness_);
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
-        output.writeInt32(10, exposure_);
+        output.writeInt32(10, autoWhiteBalance_);
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
-        output.writeInt32(11, gain_);
+        output.writeInt32(11, exposure_);
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
-        output.writeInt32(12, whiteBalance_);
+        output.writeInt32(12, gain_);
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
-        output.writeInt32(13, fadeToBlack_);
+        output.writeInt32(13, whiteBalance_);
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        output.writeInt32(14, fadeToBlack_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -559,55 +625,59 @@ public final class CameraParamsOuterClass {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, hFLIP_);
+          .computeBytesSize(1, getWhichCameraBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, vFLIP_);
+          .computeInt32Size(2, hFLIP_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(3, autoExposure_);
+          .computeInt32Size(3, vFLIP_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(4, brightness_);
+          .computeInt32Size(4, autoExposure_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(5, contrast_);
+          .computeInt32Size(5, brightness_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(6, saturation_);
+          .computeInt32Size(6, contrast_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(7, hue_);
+          .computeInt32Size(7, saturation_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(8, sharpness_);
+          .computeInt32Size(8, hue_);
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(9, autoWhiteBalance_);
+          .computeInt32Size(9, sharpness_);
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(10, exposure_);
+          .computeInt32Size(10, autoWhiteBalance_);
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(11, gain_);
+          .computeInt32Size(11, exposure_);
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(12, whiteBalance_);
+          .computeInt32Size(12, gain_);
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(13, fadeToBlack_);
+          .computeInt32Size(13, whiteBalance_);
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(14, fadeToBlack_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -726,32 +796,34 @@ public final class CameraParamsOuterClass {
 
       public Builder clear() {
         super.clear();
-        hFLIP_ = 0;
+        whichCamera_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
-        vFLIP_ = 0;
+        hFLIP_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
-        autoExposure_ = 0;
+        vFLIP_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
-        brightness_ = 0;
+        autoExposure_ = 0;
         bitField0_ = (bitField0_ & ~0x00000008);
-        contrast_ = 0;
+        brightness_ = 0;
         bitField0_ = (bitField0_ & ~0x00000010);
-        saturation_ = 0;
+        contrast_ = 0;
         bitField0_ = (bitField0_ & ~0x00000020);
-        hue_ = 0;
+        saturation_ = 0;
         bitField0_ = (bitField0_ & ~0x00000040);
-        sharpness_ = 0;
+        hue_ = 0;
         bitField0_ = (bitField0_ & ~0x00000080);
-        autoWhiteBalance_ = 0;
+        sharpness_ = 0;
         bitField0_ = (bitField0_ & ~0x00000100);
-        exposure_ = 0;
+        autoWhiteBalance_ = 0;
         bitField0_ = (bitField0_ & ~0x00000200);
-        gain_ = 0;
+        exposure_ = 0;
         bitField0_ = (bitField0_ & ~0x00000400);
-        whiteBalance_ = 0;
+        gain_ = 0;
         bitField0_ = (bitField0_ & ~0x00000800);
-        fadeToBlack_ = 0;
+        whiteBalance_ = 0;
         bitField0_ = (bitField0_ & ~0x00001000);
+        fadeToBlack_ = 0;
+        bitField0_ = (bitField0_ & ~0x00002000);
         return this;
       }
 
@@ -783,53 +855,57 @@ public final class CameraParamsOuterClass {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.hFLIP_ = hFLIP_;
+        result.whichCamera_ = whichCamera_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.vFLIP_ = vFLIP_;
+        result.hFLIP_ = hFLIP_;
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.autoExposure_ = autoExposure_;
+        result.vFLIP_ = vFLIP_;
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
         }
-        result.brightness_ = brightness_;
+        result.autoExposure_ = autoExposure_;
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000010;
         }
-        result.contrast_ = contrast_;
+        result.brightness_ = brightness_;
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
         }
-        result.saturation_ = saturation_;
+        result.contrast_ = contrast_;
         if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
           to_bitField0_ |= 0x00000040;
         }
-        result.hue_ = hue_;
+        result.saturation_ = saturation_;
         if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
           to_bitField0_ |= 0x00000080;
         }
-        result.sharpness_ = sharpness_;
+        result.hue_ = hue_;
         if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
           to_bitField0_ |= 0x00000100;
         }
-        result.autoWhiteBalance_ = autoWhiteBalance_;
+        result.sharpness_ = sharpness_;
         if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
           to_bitField0_ |= 0x00000200;
         }
-        result.exposure_ = exposure_;
+        result.autoWhiteBalance_ = autoWhiteBalance_;
         if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
           to_bitField0_ |= 0x00000400;
         }
-        result.gain_ = gain_;
+        result.exposure_ = exposure_;
         if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
           to_bitField0_ |= 0x00000800;
         }
-        result.whiteBalance_ = whiteBalance_;
+        result.gain_ = gain_;
         if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
           to_bitField0_ |= 0x00001000;
+        }
+        result.whiteBalance_ = whiteBalance_;
+        if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
+          to_bitField0_ |= 0x00002000;
         }
         result.fadeToBlack_ = fadeToBlack_;
         result.bitField0_ = to_bitField0_;
@@ -848,6 +924,11 @@ public final class CameraParamsOuterClass {
 
       public Builder mergeFrom(messages.CameraParamsOuterClass.CameraParams other) {
         if (other == messages.CameraParamsOuterClass.CameraParams.getDefaultInstance()) return this;
+        if (other.hasWhichCamera()) {
+          bitField0_ |= 0x00000001;
+          whichCamera_ = other.whichCamera_;
+          onChanged();
+        }
         if (other.hasHFLIP()) {
           setHFLIP(other.getHFLIP());
         }
@@ -914,33 +995,109 @@ public final class CameraParamsOuterClass {
       }
       private int bitField0_;
 
-      private int hFLIP_ ;
+      private java.lang.Object whichCamera_ = "";
       /**
-       * <code>optional int32 H_FLIP = 1;</code>
+       * <code>optional string whichCamera = 1;</code>
        */
-      public boolean hasHFLIP() {
+      public boolean hasWhichCamera() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional int32 H_FLIP = 1;</code>
+       * <code>optional string whichCamera = 1;</code>
+       */
+      public java.lang.String getWhichCamera() {
+        java.lang.Object ref = whichCamera_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            whichCamera_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string whichCamera = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getWhichCameraBytes() {
+        java.lang.Object ref = whichCamera_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          whichCamera_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string whichCamera = 1;</code>
+       */
+      public Builder setWhichCamera(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        whichCamera_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string whichCamera = 1;</code>
+       */
+      public Builder clearWhichCamera() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        whichCamera_ = getDefaultInstance().getWhichCamera();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string whichCamera = 1;</code>
+       */
+      public Builder setWhichCameraBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        whichCamera_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int hFLIP_ ;
+      /**
+       * <code>optional int32 H_FLIP = 2;</code>
+       */
+      public boolean hasHFLIP() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional int32 H_FLIP = 2;</code>
        */
       public int getHFLIP() {
         return hFLIP_;
       }
       /**
-       * <code>optional int32 H_FLIP = 1;</code>
+       * <code>optional int32 H_FLIP = 2;</code>
        */
       public Builder setHFLIP(int value) {
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000002;
         hFLIP_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 H_FLIP = 1;</code>
+       * <code>optional int32 H_FLIP = 2;</code>
        */
       public Builder clearHFLIP() {
-        bitField0_ = (bitField0_ & ~0x00000001);
+        bitField0_ = (bitField0_ & ~0x00000002);
         hFLIP_ = 0;
         onChanged();
         return this;
@@ -948,31 +1105,31 @@ public final class CameraParamsOuterClass {
 
       private int vFLIP_ ;
       /**
-       * <code>optional int32 V_FLIP = 2;</code>
+       * <code>optional int32 V_FLIP = 3;</code>
        */
       public boolean hasVFLIP() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional int32 V_FLIP = 2;</code>
+       * <code>optional int32 V_FLIP = 3;</code>
        */
       public int getVFLIP() {
         return vFLIP_;
       }
       /**
-       * <code>optional int32 V_FLIP = 2;</code>
+       * <code>optional int32 V_FLIP = 3;</code>
        */
       public Builder setVFLIP(int value) {
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         vFLIP_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 V_FLIP = 2;</code>
+       * <code>optional int32 V_FLIP = 3;</code>
        */
       public Builder clearVFLIP() {
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
         vFLIP_ = 0;
         onChanged();
         return this;
@@ -980,31 +1137,31 @@ public final class CameraParamsOuterClass {
 
       private int autoExposure_ ;
       /**
-       * <code>optional int32 autoExposure = 3;</code>
+       * <code>optional int32 autoExposure = 4;</code>
        */
       public boolean hasAutoExposure() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional int32 autoExposure = 3;</code>
+       * <code>optional int32 autoExposure = 4;</code>
        */
       public int getAutoExposure() {
         return autoExposure_;
       }
       /**
-       * <code>optional int32 autoExposure = 3;</code>
+       * <code>optional int32 autoExposure = 4;</code>
        */
       public Builder setAutoExposure(int value) {
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         autoExposure_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 autoExposure = 3;</code>
+       * <code>optional int32 autoExposure = 4;</code>
        */
       public Builder clearAutoExposure() {
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000008);
         autoExposure_ = 0;
         onChanged();
         return this;
@@ -1012,31 +1169,31 @@ public final class CameraParamsOuterClass {
 
       private int brightness_ ;
       /**
-       * <code>optional int32 brightness = 4;</code>
+       * <code>optional int32 brightness = 5;</code>
        */
       public boolean hasBrightness() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>optional int32 brightness = 4;</code>
+       * <code>optional int32 brightness = 5;</code>
        */
       public int getBrightness() {
         return brightness_;
       }
       /**
-       * <code>optional int32 brightness = 4;</code>
+       * <code>optional int32 brightness = 5;</code>
        */
       public Builder setBrightness(int value) {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         brightness_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 brightness = 4;</code>
+       * <code>optional int32 brightness = 5;</code>
        */
       public Builder clearBrightness() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         brightness_ = 0;
         onChanged();
         return this;
@@ -1044,31 +1201,31 @@ public final class CameraParamsOuterClass {
 
       private int contrast_ ;
       /**
-       * <code>optional int32 contrast = 5;</code>
+       * <code>optional int32 contrast = 6;</code>
        */
       public boolean hasContrast() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
+        return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional int32 contrast = 5;</code>
+       * <code>optional int32 contrast = 6;</code>
        */
       public int getContrast() {
         return contrast_;
       }
       /**
-       * <code>optional int32 contrast = 5;</code>
+       * <code>optional int32 contrast = 6;</code>
        */
       public Builder setContrast(int value) {
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         contrast_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 contrast = 5;</code>
+       * <code>optional int32 contrast = 6;</code>
        */
       public Builder clearContrast() {
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
         contrast_ = 0;
         onChanged();
         return this;
@@ -1076,31 +1233,31 @@ public final class CameraParamsOuterClass {
 
       private int saturation_ ;
       /**
-       * <code>optional int32 saturation = 6;</code>
+       * <code>optional int32 saturation = 7;</code>
        */
       public boolean hasSaturation() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
-       * <code>optional int32 saturation = 6;</code>
+       * <code>optional int32 saturation = 7;</code>
        */
       public int getSaturation() {
         return saturation_;
       }
       /**
-       * <code>optional int32 saturation = 6;</code>
+       * <code>optional int32 saturation = 7;</code>
        */
       public Builder setSaturation(int value) {
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         saturation_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 saturation = 6;</code>
+       * <code>optional int32 saturation = 7;</code>
        */
       public Builder clearSaturation() {
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
         saturation_ = 0;
         onChanged();
         return this;
@@ -1108,31 +1265,31 @@ public final class CameraParamsOuterClass {
 
       private int hue_ ;
       /**
-       * <code>optional int32 hue = 7;</code>
+       * <code>optional int32 hue = 8;</code>
        */
       public boolean hasHue() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
+        return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
-       * <code>optional int32 hue = 7;</code>
+       * <code>optional int32 hue = 8;</code>
        */
       public int getHue() {
         return hue_;
       }
       /**
-       * <code>optional int32 hue = 7;</code>
+       * <code>optional int32 hue = 8;</code>
        */
       public Builder setHue(int value) {
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         hue_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 hue = 7;</code>
+       * <code>optional int32 hue = 8;</code>
        */
       public Builder clearHue() {
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000080);
         hue_ = 0;
         onChanged();
         return this;
@@ -1140,31 +1297,31 @@ public final class CameraParamsOuterClass {
 
       private int sharpness_ ;
       /**
-       * <code>optional int32 sharpness = 8;</code>
+       * <code>optional int32 sharpness = 9;</code>
        */
       public boolean hasSharpness() {
-        return ((bitField0_ & 0x00000080) == 0x00000080);
+        return ((bitField0_ & 0x00000100) == 0x00000100);
       }
       /**
-       * <code>optional int32 sharpness = 8;</code>
+       * <code>optional int32 sharpness = 9;</code>
        */
       public int getSharpness() {
         return sharpness_;
       }
       /**
-       * <code>optional int32 sharpness = 8;</code>
+       * <code>optional int32 sharpness = 9;</code>
        */
       public Builder setSharpness(int value) {
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         sharpness_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 sharpness = 8;</code>
+       * <code>optional int32 sharpness = 9;</code>
        */
       public Builder clearSharpness() {
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000100);
         sharpness_ = 0;
         onChanged();
         return this;
@@ -1172,31 +1329,31 @@ public final class CameraParamsOuterClass {
 
       private int autoWhiteBalance_ ;
       /**
-       * <code>optional int32 autoWhiteBalance = 9;</code>
+       * <code>optional int32 autoWhiteBalance = 10;</code>
        */
       public boolean hasAutoWhiteBalance() {
-        return ((bitField0_ & 0x00000100) == 0x00000100);
+        return ((bitField0_ & 0x00000200) == 0x00000200);
       }
       /**
-       * <code>optional int32 autoWhiteBalance = 9;</code>
+       * <code>optional int32 autoWhiteBalance = 10;</code>
        */
       public int getAutoWhiteBalance() {
         return autoWhiteBalance_;
       }
       /**
-       * <code>optional int32 autoWhiteBalance = 9;</code>
+       * <code>optional int32 autoWhiteBalance = 10;</code>
        */
       public Builder setAutoWhiteBalance(int value) {
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000200;
         autoWhiteBalance_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 autoWhiteBalance = 9;</code>
+       * <code>optional int32 autoWhiteBalance = 10;</code>
        */
       public Builder clearAutoWhiteBalance() {
-        bitField0_ = (bitField0_ & ~0x00000100);
+        bitField0_ = (bitField0_ & ~0x00000200);
         autoWhiteBalance_ = 0;
         onChanged();
         return this;
@@ -1204,31 +1361,31 @@ public final class CameraParamsOuterClass {
 
       private int exposure_ ;
       /**
-       * <code>optional int32 exposure = 10;</code>
+       * <code>optional int32 exposure = 11;</code>
        */
       public boolean hasExposure() {
-        return ((bitField0_ & 0x00000200) == 0x00000200);
+        return ((bitField0_ & 0x00000400) == 0x00000400);
       }
       /**
-       * <code>optional int32 exposure = 10;</code>
+       * <code>optional int32 exposure = 11;</code>
        */
       public int getExposure() {
         return exposure_;
       }
       /**
-       * <code>optional int32 exposure = 10;</code>
+       * <code>optional int32 exposure = 11;</code>
        */
       public Builder setExposure(int value) {
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000400;
         exposure_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 exposure = 10;</code>
+       * <code>optional int32 exposure = 11;</code>
        */
       public Builder clearExposure() {
-        bitField0_ = (bitField0_ & ~0x00000200);
+        bitField0_ = (bitField0_ & ~0x00000400);
         exposure_ = 0;
         onChanged();
         return this;
@@ -1236,31 +1393,31 @@ public final class CameraParamsOuterClass {
 
       private int gain_ ;
       /**
-       * <code>optional int32 gain = 11;</code>
+       * <code>optional int32 gain = 12;</code>
        */
       public boolean hasGain() {
-        return ((bitField0_ & 0x00000400) == 0x00000400);
+        return ((bitField0_ & 0x00000800) == 0x00000800);
       }
       /**
-       * <code>optional int32 gain = 11;</code>
+       * <code>optional int32 gain = 12;</code>
        */
       public int getGain() {
         return gain_;
       }
       /**
-       * <code>optional int32 gain = 11;</code>
+       * <code>optional int32 gain = 12;</code>
        */
       public Builder setGain(int value) {
-        bitField0_ |= 0x00000400;
+        bitField0_ |= 0x00000800;
         gain_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 gain = 11;</code>
+       * <code>optional int32 gain = 12;</code>
        */
       public Builder clearGain() {
-        bitField0_ = (bitField0_ & ~0x00000400);
+        bitField0_ = (bitField0_ & ~0x00000800);
         gain_ = 0;
         onChanged();
         return this;
@@ -1268,31 +1425,31 @@ public final class CameraParamsOuterClass {
 
       private int whiteBalance_ ;
       /**
-       * <code>optional int32 whiteBalance = 12;</code>
+       * <code>optional int32 whiteBalance = 13;</code>
        */
       public boolean hasWhiteBalance() {
-        return ((bitField0_ & 0x00000800) == 0x00000800);
+        return ((bitField0_ & 0x00001000) == 0x00001000);
       }
       /**
-       * <code>optional int32 whiteBalance = 12;</code>
+       * <code>optional int32 whiteBalance = 13;</code>
        */
       public int getWhiteBalance() {
         return whiteBalance_;
       }
       /**
-       * <code>optional int32 whiteBalance = 12;</code>
+       * <code>optional int32 whiteBalance = 13;</code>
        */
       public Builder setWhiteBalance(int value) {
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00001000;
         whiteBalance_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 whiteBalance = 12;</code>
+       * <code>optional int32 whiteBalance = 13;</code>
        */
       public Builder clearWhiteBalance() {
-        bitField0_ = (bitField0_ & ~0x00000800);
+        bitField0_ = (bitField0_ & ~0x00001000);
         whiteBalance_ = 0;
         onChanged();
         return this;
@@ -1300,31 +1457,31 @@ public final class CameraParamsOuterClass {
 
       private int fadeToBlack_ ;
       /**
-       * <code>optional int32 fadeToBlack = 13;</code>
+       * <code>optional int32 fadeToBlack = 14;</code>
        */
       public boolean hasFadeToBlack() {
-        return ((bitField0_ & 0x00001000) == 0x00001000);
+        return ((bitField0_ & 0x00002000) == 0x00002000);
       }
       /**
-       * <code>optional int32 fadeToBlack = 13;</code>
+       * <code>optional int32 fadeToBlack = 14;</code>
        */
       public int getFadeToBlack() {
         return fadeToBlack_;
       }
       /**
-       * <code>optional int32 fadeToBlack = 13;</code>
+       * <code>optional int32 fadeToBlack = 14;</code>
        */
       public Builder setFadeToBlack(int value) {
-        bitField0_ |= 0x00001000;
+        bitField0_ |= 0x00002000;
         fadeToBlack_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 fadeToBlack = 13;</code>
+       * <code>optional int32 fadeToBlack = 14;</code>
        */
       public Builder clearFadeToBlack() {
-        bitField0_ = (bitField0_ & ~0x00001000);
+        bitField0_ = (bitField0_ & ~0x00002000);
         fadeToBlack_ = 0;
         onChanged();
         return this;
@@ -1355,14 +1512,14 @@ public final class CameraParamsOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\022CameraParams.proto\022\010messages\"\203\002\n\014Camer" +
-      "aParams\022\016\n\006H_FLIP\030\001 \001(\005\022\016\n\006V_FLIP\030\002 \001(\005\022" +
-      "\024\n\014autoExposure\030\003 \001(\005\022\022\n\nbrightness\030\004 \001(" +
-      "\005\022\020\n\010contrast\030\005 \001(\005\022\022\n\nsaturation\030\006 \001(\005\022" +
-      "\013\n\003hue\030\007 \001(\005\022\021\n\tsharpness\030\010 \001(\005\022\030\n\020autoW" +
-      "hiteBalance\030\t \001(\005\022\020\n\010exposure\030\n \001(\005\022\014\n\004g" +
-      "ain\030\013 \001(\005\022\024\n\014whiteBalance\030\014 \001(\005\022\023\n\013fadeT" +
-      "oBlack\030\r \001(\005"
+      "\n\022CameraParams.proto\022\010messages\"\230\002\n\014Camer" +
+      "aParams\022\023\n\013whichCamera\030\001 \001(\t\022\016\n\006H_FLIP\030\002" +
+      " \001(\005\022\016\n\006V_FLIP\030\003 \001(\005\022\024\n\014autoExposure\030\004 \001" +
+      "(\005\022\022\n\nbrightness\030\005 \001(\005\022\020\n\010contrast\030\006 \001(\005" +
+      "\022\022\n\nsaturation\030\007 \001(\005\022\013\n\003hue\030\010 \001(\005\022\021\n\tsha" +
+      "rpness\030\t \001(\005\022\030\n\020autoWhiteBalance\030\n \001(\005\022\020" +
+      "\n\010exposure\030\013 \001(\005\022\014\n\004gain\030\014 \001(\005\022\024\n\014whiteB" +
+      "alance\030\r \001(\005\022\023\n\013fadeToBlack\030\016 \001(\005"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1381,7 +1538,7 @@ public final class CameraParamsOuterClass {
     internal_static_messages_CameraParams_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_CameraParams_descriptor,
-        new java.lang.String[] { "HFLIP", "VFLIP", "AutoExposure", "Brightness", "Contrast", "Saturation", "Hue", "Sharpness", "AutoWhiteBalance", "Exposure", "Gain", "WhiteBalance", "FadeToBlack", });
+        new java.lang.String[] { "WhichCamera", "HFLIP", "VFLIP", "AutoExposure", "Brightness", "Contrast", "Saturation", "Hue", "Sharpness", "AutoWhiteBalance", "Exposure", "Gain", "WhiteBalance", "FadeToBlack", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

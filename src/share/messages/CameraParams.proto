@@ -2,17 +2,18 @@ package messages;
 
 message CameraParams
 {
-	optional int32 H_FLIP = 1;
-	optional int32 V_FLIP = 2;
-	optional int32 autoExposure = 3;
-	optional int32 brightness = 4;
-	optional int32 contrast = 5;
-	optional int32 saturation = 6;
-	optional int32 hue = 7;
-	optional int32 sharpness = 8;
-	optional int32 autoWhiteBalance = 9;
-	optional int32 exposure = 10;
-	optional int32 gain = 11;
-	optional int32 whiteBalance = 12;
-	optional int32 fadeToBlack = 13;
+	optional string whichCamera = 1; 
+	optional int32 H_FLIP = 2;
+	optional int32 V_FLIP = 3;
+	optional int32 autoExposure = 4;
+	optional int32 brightness = 5;
+	optional int32 contrast = 6;
+	optional int32 saturation = 7;
+	optional int32 hue = 8;
+	optional int32 sharpness = 9;
+	optional int32 autoWhiteBalance = 10;
+	optional int32 exposure = 11;
+	optional int32 gain = 12;
+	optional int32 whiteBalance = 13;
+	optional int32 fadeToBlack = 14;
 }

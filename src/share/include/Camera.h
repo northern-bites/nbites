@@ -32,6 +32,23 @@ public:
         bool fade_to_black;
     };
 
+    static const Settings& setTopSettings(bool hflip, bool vflip, bool autoexposure,
+                                          int brightness, int contrast, int saturation,
+                                          int hue, int sharpness, bool autowb, int exposure,
+                                          int gain, int wb, bool fade_to_black) {
+
+        static const Settings newTopSettings = {
+
+        }
+
+    }
+
+    static const Settings& setBottomSettings() {
+        static const Settings newTopSettings = {
+
+        }
+    }
+
     static const Settings& getSettings(Type type)
         {
             if(type == TOP) return getTopSettings();

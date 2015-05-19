@@ -111,6 +111,7 @@ public class StreamingPanel extends JPanel implements ActionListener, NListener 
 	
 	private void tryStart(Integer[] topCameraParams, Integer[] bottomCameraParams) {
 		CameraParams topCamera = CameraParams.newBuilder()
+				.setWhichCamera("TOP")
 				.setHFLIP(topCameraParams[0])
 				.setVFLIP(topCameraParams[1])
 				.setAutoExposure(topCameraParams[2])
@@ -127,6 +128,7 @@ public class StreamingPanel extends JPanel implements ActionListener, NListener 
 				.build();
 		
 		CameraParams bottomCamera = CameraParams.newBuilder()
+				.setWhichCamera("BOTTOM")
 				.setHFLIP(bottomCameraParams[0])
 				.setVFLIP(bottomCameraParams[1])
 				.setAutoExposure(bottomCameraParams[2])
@@ -142,8 +144,6 @@ public class StreamingPanel extends JPanel implements ActionListener, NListener 
 				.setFadeToBlack(bottomCameraParams[12])
 				.build();
 		
-		String topProto = bottomCamera.toString();
-		System.out.println("TopProto: "+topProto);
 	}
 	
 	private void useStatus(STATUS s) {
