@@ -12,7 +12,8 @@ import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 
 import nbtool.data.Log;
-import nbtool.util.U;
+import nbtool.util.Logger;
+import nbtool.util.Utility;
 
 public final class ProtoBufView extends nbtool.gui.logviews.misc.ViewParent {
 	private static final long serialVersionUID = -541524730464912737L;
@@ -21,9 +22,9 @@ public final class ProtoBufView extends nbtool.gui.logviews.misc.ViewParent {
 	public void setLog(Log newlog) {
 		
 		String t = (String) newlog.primaryType();
-		Class<? extends com.google.protobuf.GeneratedMessage> lClass = U.protobufClassFromType(t);
-		U.wf("ProtoBufView: using class %s for type %s.\n", lClass.getName(), t);
-		com.google.protobuf.Message msg = U.protobufInstanceForClassWithData(lClass, newlog.bytes);
+		Class<? extends com.google.protobuf.GeneratedMessage> lClass = Utility.protobufClassFromType(t);
+		Logger.logf(Logger.INFO, "ProtoBufView: using class %s for type %s.\n", lClass.getName(), t);
+		com.google.protobuf.Message msg = Utility.protobufInstanceForClassWithData(lClass, newlog.bytes);
 
 		
 		Map<FieldDescriptor, Object> fields = msg.getAllFields();

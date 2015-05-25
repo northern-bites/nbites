@@ -22,14 +22,15 @@ import nbtool.data.Session;
 import nbtool.data.Log;
 import nbtool.data.SessionMaster;
 import nbtool.io.FileIO;
-import nbtool.util.N;
+import nbtool.util.Center;
+import nbtool.util.Events;
+import nbtool.util.Logger;
 import nbtool.util.NBConstants;
 import nbtool.util.NBConstants.STATUS;
-import nbtool.util.U;
-import nbtool.util.N.EVENT;
-import nbtool.util.N.NListener;
+import nbtool.util.Utility;
+import nbtool.util.Events.*;
 
-public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
+public class LCTreeModel implements TreeModel, TreeSelectionListener, Events.LogsFound, Events.ToolStatus {
 
 	/*
 	 * DataModel:
@@ -41,8 +42,8 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 	public LCTreeModel() {
 		root = "ROOT PLACEHOLDER";
 		
-		N.listen(EVENT.STATUS, this);
-		N.listen(EVENT.LOG_FOUND, this);
+		Center.listen(Events.LogsFound.class, this, true);
+		Center.listen(Events.ToolStatus.class, this, true);
 	}
 	
 	public Object getRoot() {
@@ -73,7 +74,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 
 	@Override
 	public void valueForPathChanged(TreePath path, Object newValue) {
-		U.w("ERROR: TCTreeModel asked to change value, TREE SHOULD NOT BE EDITABLE.");
+		Logger.logf(Logger.ERROR, "ERROR: TCTreeModel asked to change value, TREE SHOULD NOT BE EDITABLE.");
 	}
 
 	@Override
@@ -106,17 +107,18 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 		switch (first.getPathCount()) {
 		case 0:
 			//??
-			U.w("ERROR: LCTreeModel path size was: " + first.getPathCount());
+			Logger.logf(Logger.ERROR, "ERROR: LCTreeModel path size was: " + first.getPathCount());
 			break;
 		case 1:
 			//Root selected
-			U.w("ERROR: LCTreeModel path size was: " + first.getPathCount() + "ROOT SHOULD NOT BE VISIBLE");
+			Logger.logf(Logger.ERROR, "ERROR: LCTreeModel path size was: " + first.getPathCount() + "ROOT SHOULD NOT BE VISIBLE");
 			break;
 		case 2:
 			//Branch selected, 			
-			N.notifyEDT(EVENT.SES_SELECTION, this,
-					(Session) first.getPath()[1]);
-			
+			//N.notifyEDT(OLDEVENT.SES_SELECTION, this,
+			//		(Session) first.getPath()[1]);
+			Session session = (Session) first.getPath()[1];
+			Events.SessionSelected.generate(this, session);
 			break;
 		case 3:
 			//LOG SELECTED.
@@ -132,70 +134,50 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 				sel.lastSeen = p;
 				
 				if (sel.bytes == null) {
-					assert(ses.dir != null && !ses.dir.isEmpty());
+					assert(ses.directoryFrom != null && !ses.directoryFrom.isEmpty());
 					try {
-						FileIO.loadLog(sel, ses.dir);
+						FileIO.loadLog(sel, ses.directoryFrom);
 					} catch (IOException e1) {
-						U.w("Could not load log data!");
+						Logger.logf(Logger.ERROR, "Could not load log data!");
 						e1.printStackTrace();
 						
 						return;
 					}
-					
-					N.notifyEDT(EVENT.LOG_LOAD, this, (Object[]) new Log[]{sel});
+					Events.LogLoaded.generate(this, sel);
 				}
 				
 				assert(sel.bytes != null);
 				selected.add(sel);
 			}
 			
-			N.notifyEDT(EVENT.LOG_SELECTION, this,
-					selected.remove(0), selected);
+			Events.LogSelected.generate(this, selected.remove(0), selected);
 			break;
 		default:
-				U.w("ERROR: LCTreeModel path size was: " + first.getPathCount());
+			Logger.logf(Logger.ERROR, "ERROR: LCTreeModel path size was: " + first.getPathCount());
+		}
+	}
+	
+	@Override
+	public void toolStatus(Object source, STATUS s, String desc) {
+		Session relevant = SessionMaster.get().getLatestSession();
+		
+		TreeModelEvent tme = new TreeModelEvent(this, new Object[]{root},
+				new int[]{SessionMaster.get().sessions.indexOf(relevant)},
+				new Object[]{relevant});
+		for (TreeModelListener l : listeners) {
+			l.treeNodesInserted(tme);
 		}
 	}
 
-	public void notified(EVENT e, Object src, Object... args) {
-		TreeModelEvent tme = null;
-		Session cur = SessionMaster.INST.workingSession;
+	@Override
+	public void logsFound(Object source, Log... found) {
+		Session relevant = SessionMaster.get().getLatestSession();
+		Logger.logf(Logger.INFO, "TreeModel: rel=%s size=%d", relevant.toString(), relevant.logs_ALL.size());
+		sas.sort(relevant);
 		
-		//This is a hack, it needs to change.
-		int size = SessionMaster.INST.sessions.size();
-		if (cur == null && size > 0)
-			cur = SessionMaster.INST.sessions.get(
-					size - 1
-					);
-		switch(e) {
-		case LOG_FOUND:
-			
-			sas.sort(cur);
-			
-			tme = new TreeModelEvent(this, new Object[]{root, cur});
-			for (TreeModelListener l : listeners) {
-				l.treeStructureChanged(tme);
-			}
-			break;
-		
-		case STATUS:
-			STATUS s = (STATUS) args[0];
-			if (s == STATUS.RUNNING) {
-				//New session
-				
-				tme = new TreeModelEvent(this, new Object[]{root},
-						new int[]{SessionMaster.INST.sessions.indexOf(cur)},
-						new Object[]{cur});
-				for (TreeModelListener l : listeners) {
-					l.treeNodesInserted(tme);
-				}
-			}
-			
-			break;
-			
-		default:
-			break;
-		
+		TreeModelEvent tme = new TreeModelEvent(this, new Object[]{root, relevant});
+		for (TreeModelListener l : listeners) {
+			l.treeStructureChanged(tme);
 		}
 	}
 	

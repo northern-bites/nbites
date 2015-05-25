@@ -18,9 +18,11 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <float.h>
 
 #define PORTNUM 30002
-#define MAX_WAIT 1 //seconds
+//#define MAX_WAIT 1 //seconds
+#define MAX_WAIT DBL_MAX
 
 #include "nbfuncs.h"
 #include "exactio.h"
@@ -34,21 +36,39 @@ std::vector<Log *> args;
 std::vector<Log *> rets;
 
 int main(int argc, const char * argv[]) {
-    CrossFunc("e", NULL, {"a", "b"});
-    
     std::string instance_name;
     
     if (argc > 1) {
         printf("using name: [%s]\n", argv[1]);
         instance_name = std::string(argv[1]);
     } else {
-        printf("using null name.\n");
+        printf("using default name.\n");
     }
     
     printf("using %li functions:\n", FUNCS.size());
     for (int i = 0; i < FUNCS.size(); ++i)
         printf("\t%s(%lu)\n", FUNCS[i].name.c_str(), FUNCS[i].args.size());
     printf("\n\n-----------------------------------------\n");
+    
+    
+    std::vector<SExpr> flist;
+    for (int i = 0; i < FUNCS.size(); ++i) {
+        std::vector<SExpr> func;
+        func.push_back(SExpr(FUNCS[i].name));
+        for (int j = 0; j < FUNCS[i].args.size(); ++j) {
+            func.push_back(SExpr(FUNCS[i].args[j]));
+        }
+        
+        flist.push_back(SExpr(func));
+    }
+    SExpr sflist = SExpr(flist);
+    std::vector<SExpr> contents= {
+        SExpr("nfuncs", (int) FUNCS.size()),
+        SExpr("functions", sflist),
+        SExpr("name", instance_name)
+    };
+    
+    //printf("%s\n", SExpr(contents).print().c_str());
     
     struct sockaddr_in server;
     bzero(&server, sizeof(server));
@@ -79,29 +99,9 @@ int main(int argc, const char * argv[]) {
     
     printf("sending functions...\n");
     
-    net_order = htonl(FUNCS.size());
-    CHECK_RET(send_exact(fd, 4, &net_order));
+    Log functions("nbcross", "nbcross/main", time(NULL), NBCROSS_VERSION, contents, std::string());
     
-    //Could put this in SExprs, but it's already working like this...
-    std::ostringstream format;
-    for (int i = 0; i < FUNCS.size(); ++i) {
-        format << FUNCS[i].name << '=';
-        for (int j = 0; j < FUNCS[i].args.size(); ++j) {
-            format << ' ' << FUNCS[i].args[j];
-        }
-        
-        format << '\n';
-    }
-    
-    std::string funcstr = format.str();
-    std::vector<SExpr> contents= {
-        SExpr("nfuncs", (int) FUNCS.size()),
-        SExpr("name", instance_name)
-    };
-    
-    Log functions("nbcross", "nbcross/main", time(NULL), NBCROSS_VERSION, contents, funcstr);
-    
-    CHECK_RET(functions.send(fd));
+    CHECK_RET(!functions.send(fd));
     
     //Confirm java got the right number of functions.
     CHECK_RET(recv_exact(fd, 4, &net_order, MAX_WAIT));
@@ -117,13 +117,13 @@ int main(int argc, const char * argv[]) {
         if (ntohl(net_order) == 0) {
             host_order = 0;
             CHECK_RET(send_exact(fd, 4, &host_order));
-            usleep(10000);
             continue;
         } else if (ntohl(net_order) != 1) {
             printf("java sent wrong function call request: 0x%x\n", net_order);
             return 1;
         }
         
+        //java sent 1, so Cross call incoming.
         uint32_t findex;
         CHECK_RET(recv_exact(fd, 4, &findex, MAX_WAIT));
         findex = ntohl(findex);
@@ -134,12 +134,12 @@ int main(int argc, const char * argv[]) {
         assert(args.size() == 0);
         assert(rets.size() == 0);
         
-        int na = FUNCS[findex].args.size();
+        int na = (int) FUNCS[findex].args.size();
         
         for (int i = 0; i < na; ++i) {
             
             Log * recvd = Log::recv(fd, MAX_WAIT);
-            CHECK_RET(recvd != NULL);
+            CHECK_RET(recvd == NULL);
             
             SExpr * contents = recvd->tree().find("contents");
             
@@ -148,7 +148,7 @@ int main(int argc, const char * argv[]) {
                 return 1;
             }
             
-            std::string type = contents->get(0)->value();
+            std::string type = contents->get(1)->find("type")->get(1)->value();
             if (type != FUNCS[findex].args[i]) {
                 printf("arg %i [%s] did NOT match type=%s!\n", i, type.c_str(), FUNCS[findex].args[i].c_str());
                 return 1;

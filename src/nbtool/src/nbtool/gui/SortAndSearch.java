@@ -23,7 +23,8 @@ import javax.swing.border.LineBorder;
 import nbtool.data.Log;
 import nbtool.data.Session;
 import nbtool.test.TestUtils;
-import nbtool.util.U;
+import nbtool.util.Logger;
+import nbtool.util.Utility;
 
 public class SortAndSearch extends JPanel implements ActionListener {
 	public SortAndSearch(LCTreeModel lcm) {
@@ -185,7 +186,7 @@ public class SortAndSearch extends JPanel implements ActionListener {
 		};
 	
 	public void actionPerformed(ActionEvent e) {
-		U.wf("SortAndSearch: new specs: [sort=%s, search=%s, order=%s]\n", sortNames[sortBy.getSelectedIndex()],
+		Logger.logf(Logger.INFO, "SortAndSearch: new specs: [sort=%s, search=%s, order=%s]\n", sortNames[sortBy.getSelectedIndex()],
 				search_f.getText(), reverse.isSelected() ? "reverse" : "normal");
 		
 		lcm.ssChanged();

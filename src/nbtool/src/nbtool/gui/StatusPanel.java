@@ -23,15 +23,18 @@ import javax.swing.text.DefaultCaret;
 import nbtool.data.RobotStats;
 import nbtool.data.Log;
 import nbtool.data.SessionMaster;
-import nbtool.data.Stats;
-import nbtool.util.N;
-import nbtool.util.N.EVENT;
-import nbtool.util.N.NListener;
+import nbtool.data.ToolStats;
+import nbtool.io.ControlIO.ControlInstance;
+import nbtool.io.CrossIO.CrossInstance;
+import nbtool.io.FileIO.FileInstance;
+import nbtool.io.StreamIO.StreamInstance;
+import nbtool.util.Center;
+import nbtool.util.Events;
 import nbtool.util.NBConstants;
-import nbtool.util.NBConstants.MODE;
 import nbtool.util.NBConstants.STATUS;
 
-public class StatusPanel extends JPanel implements NListener{
+public class StatusPanel extends JPanel implements Events.ControlStatus, Events.CrossStatus, Events.FileIOStatus,
+	Events.StreamIOStatus, Events.LogsFound, Events.ToolStats, Events.ToolStatus, Events.RelevantRobotStats{
 
 	public StatusPanel() {
 		super();
@@ -136,14 +139,14 @@ public class StatusPanel extends JPanel implements NListener{
 		
 		add(sp);
 		
-		N.listen(EVENT.CNC_CONNECTION, this);
-		N.listen(EVENT.NBCROSS_CONNECTION, this);
-		N.listen(EVENT.FIO_THREAD, this);
-		N.listen(EVENT.SIO_THREAD, this);
-		N.listen(EVENT.LOG_FOUND, this);
-		N.listen(EVENT.STATS, this);
-		N.listen(EVENT.REL_BOTSTAT, this);
-		N.listen(EVENT.STATUS, this);
+		Center.listen(Events.ControlStatus.class, this, true);
+		Center.listen(Events.CrossStatus.class, this, true);
+		Center.listen(Events.FileIOStatus.class, this, true);
+		Center.listen(Events.StreamIOStatus.class, this, true);
+		Center.listen(Events.LogsFound.class, this, true);
+		Center.listen(Events.ToolStatus.class, this, true);
+		Center.listen(Events.ToolStats.class, this, true);
+		Center.listen(Events.RelevantRobotStats.class, this, true);
 	}
 	
 	private void useSize(Dimension s) {
@@ -215,11 +218,11 @@ public class StatusPanel extends JPanel implements NListener{
 	private void set() {
 		setJVM_labels();
 		
-		l_found.setText("# logs found: " + Stats.INST.l_found);
+		l_found.setText("# logs found: " + ToolStats.INST.l_found);
 		s_found.setText("# sessions: " + SessionMaster.INST.sessions.size());
-		db_found.setText("Total bytes of data found: " + Stats.INST.db_found);
-		db_cur.setText("Current data bytes retained: " + Stats.INST.db_cur);
-		db_dropped.setText("Total released data: " + Stats.INST.db_dropped);
+		db_found.setText("Total bytes of data found: " + ToolStats.INST.db_found);
+		db_cur.setText("Current data bytes retained: " + ToolStats.INST.db_cur);
+		db_dropped.setText("Total released data: " + ToolStats.INST.db_dropped);
 		
 		String ts = "Log types found: ";
 		for (String t : types) {
@@ -256,72 +259,66 @@ public class StatusPanel extends JPanel implements NListener{
 	
 	private JTextArea botStatA;
 
-	
-	public void notified(EVENT e, Object src, Object... args) {
-		switch(e) {
-		case CNC_CONNECTION:
-			Boolean b = (Boolean) args[0];
+	@Override
+	public void relRobotStats(Object source, RobotStats bs) {
+		botStatA.setText(bs.toString());
+		useSize(this.getSize());
+	}
+
+	@Override
+	public void toolStatus(Object source, STATUS s, String desc) {
 			
-			Color c = b ? Color.GREEN : Color.RED;
-			
-			cnc.setForeground(c);
-			break;
-		case NBCROSS_CONNECTION:
-			b = (Boolean) args[0];
-			
-			c = b ? Color.GREEN : Color.RED;
-			
-			cpp.setForeground(c);
-			break;
-		case FIO_THREAD:
-			b = (Boolean) args[0];
-			
-			c = b ? Color.GREEN : Color.RED;
-			
-			fst.setForeground(c);
-			break;
-		case LOG_FOUND:
-			for (Object o : args) {
-				Log l = (Log) o;
-				types.add(l.primaryType());
-				
-				set();
-			}
-			break;
-		case REL_BOTSTAT:
-			RobotStats a = (RobotStats) args[0];
-			botStatA.setText(a.toString());
-			
-			break;
-		case SIO_THREAD:
-			b = (Boolean) args[0];
-			
-			c = b ? Color.GREEN : Color.RED;
-			
-			serv.setForeground(c);
-			break;
-		case STATS:
-			
-			set();
-			
-			break;
-		case STATUS:
-			STATUS s = (STATUS) args[0];
-			MODE m = (MODE) args[1];
-			
-			mode_status.setText(
-					String.format("[M/S] %s: %s", 
-							NBConstants.MODE_STRINGS[m.index],
-							NBConstants.STATUS_STRINGS[s.index]));
-			
-			set();
-			
-			break;
-		default:
-			break;
-		 
-		}
+		mode_status.setText(
+				String.format("[Status] %s: %s", 
+						NBConstants.STATUS_STRINGS[s.index],
+						desc));
 		
+		set();
+		useSize(this.getSize());
+	}
+
+	@Override
+	public void toolStats(Object source, ToolStats s) {
+		set();
+		useSize(this.getSize());
+	}
+
+	@Override
+	public void logsFound(Object source, Log... found) {
+		for (Object o : found) {
+			Log l = (Log) o;
+			types.add(l.primaryType());
+			
+			set();
+		}
+		useSize(this.getSize());
+	}
+
+	@Override
+	public void streamStatus(StreamInstance inst, boolean up) {		
+		Color c = up ? Color.GREEN : Color.RED;
+		serv.setForeground(c);
+		useSize(this.getSize());
+	}
+
+	@Override
+	public void fileioStatus(FileInstance fi, boolean up) {
+		Color c = up ? Color.GREEN : Color.RED;
+		fst.setForeground(c);
+		useSize(this.getSize());
+	}
+
+	@Override
+	public void nbCrossFound(CrossInstance inst, boolean up) {		
+		Color c = up ? Color.GREEN : Color.RED;
+		cpp.setForeground(c);
+		useSize(this.getSize());
+	}
+
+	@Override
+	public void controlStatus(ControlInstance inst, boolean up) {
+		Color c = up ? Color.GREEN : Color.RED;
+		cnc.setForeground(c);
 		useSize(this.getSize());
 	}
 }

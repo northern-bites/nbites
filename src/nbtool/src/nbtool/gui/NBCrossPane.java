@@ -28,17 +28,11 @@ import javax.swing.event.ListSelectionListener;
 
 import nbtool.data.Log;
 import nbtool.io.CrossIO;
-import nbtool.io.CrossIO.CppFunc;
-import nbtool.io.CrossIO.CppFuncCall;
-import nbtool.io.CrossIO.CrossFuncListener;
-import nbtool.util.N;
 import nbtool.util.NBConstants;
-import nbtool.util.U;
-import nbtool.util.N.EVENT;
-import nbtool.util.N.NListener;
+import nbtool.util.Utility;
 
-public class NBCrossPane extends JPanel implements ActionListener, NListener, CrossFuncListener {
-
+public class NBCrossPane extends JPanel {
+/*
 	private static void exact(Dimension d, Component c) {
 		c.setMinimumSize(d);
 		c.setMaximumSize(d);
@@ -145,8 +139,8 @@ public class NBCrossPane extends JPanel implements ActionListener, NListener, Cr
 		
 		downDisable();
 		
-		N.listen(EVENT.NBCROSS_CONNECTION, this);
-		N.listen(EVENT.NBCROSS_FUNCS_FOUND, this);
+		N.listen(OLDEVENT.NBCROSS_CONNECTION, this);
+		N.listen(OLDEVENT.NBCROSS_FUNCS_FOUND, this);
 	}
 
 	private JLabel status;
@@ -196,7 +190,7 @@ public class NBCrossPane extends JPanel implements ActionListener, NListener, Cr
 	}
 	
 	@Override
-	public void notified(EVENT e, Object src, Object... args) {
+	public void notified(OLDEVENT e, Object src, Object... args) {
 		switch(e){
 		case NBCROSS_CONNECTION:
 			Boolean con = (Boolean) args[0];
@@ -249,7 +243,7 @@ public class NBCrossPane extends JPanel implements ActionListener, NListener, Cr
 				return;
 			
 			Log l = args.get(index);
-			N.notifyEDT(EVENT.LOG_SELECTION, this, l);
+			N.notifyEDT(OLDEVENT.LOG_SELECTION, this, l);
 		}
 		
 		public void reload() {
@@ -281,10 +275,10 @@ public class NBCrossPane extends JPanel implements ActionListener, NListener, Cr
 					} else if (mcro.equalsIgnoreCase(NA_S)) {
 						imp = NEXT_ALIAS;
 					} else {
-						U.w("CppPane: Handler: Unknown import: " + mcro);
+						Utility.w("CppPane: Handler: Unknown import: " + mcro);
 					}
 				} else {
-					U.w("Unknown import type.");
+					Utility.w("Unknown import type.");
 				}
 			} catch (UnsupportedFlavorException e) {
 				e.printStackTrace();
@@ -329,7 +323,7 @@ public class NBCrossPane extends JPanel implements ActionListener, NListener, Cr
 			
 			int index = ((JList<String>) e.getSource()).getSelectedIndex();
 			Log l = out.get(index);
-			N.notifyEDT(EVENT.LOG_SELECTION, this, l);
+			N.notifyEDT(OLDEVENT.LOG_SELECTION, this, l);
 		}
 
 		public void reload() {
@@ -352,9 +346,9 @@ public class NBCrossPane extends JPanel implements ActionListener, NListener, Cr
 
 	@Override
 	public void returned(int ret, Log... out) {
-		U.wf("CppPane returned: %d with %d logs\n", ret, out.length);
+		Utility.wf("CppPane returned: %d with %d logs\n", ret, out.length);
 		
 		this.out.addAll(Arrays.asList(out));
 		out_model.reload();
-	}
+	} */
 }

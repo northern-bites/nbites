@@ -4,204 +4,203 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
 import java.util.LinkedList;
-import java.util.Queue;
 
 import nbtool.data.Log;
-import nbtool.data.Log.SOURCE;
 import nbtool.data.SExpr;
-import nbtool.util.N;
-import nbtool.util.NBConstants;
-import nbtool.util.U;
-import nbtool.util.N.EVENT;
+import nbtool.io.CommonIO.IOFirstResponder;
+import nbtool.io.CommonIO.IOState;
+import nbtool.io.CommonIO.SequenceErrorException;
+import nbtool.util.Events;
+import nbtool.util.Logger;
 
 /*
  * Astute observers will notice this code is remarkably similar to the netIO code
  * */
 
-public class ControlIO implements Runnable{
-	
-	//Set by any creator if they want their CommandIO instance to be publicly used.
-	public static ControlIO INSTANCE;
-	
-	private String cnc_address;
-	private int cnc_port;
-	
-	public interface Boss {
-		void cncThreadExiting();
-	}
-	private Boss boss;
-	
-	private volatile boolean running;
-	
-	public ControlIO(String addr, int p, Boss b) {
-		cnc_address = addr;
-		cnc_port = p;
-		boss = b;
+public class ControlIO {
 		
-		running = false;
-	}
-	
-	//Intended to be called from another thread, presumably by the boss.
-	public void stop() {
-		running = false;
-	}
-	
-	public void run() {
-		running = true;
-		Socket socket = null;
-		commands = new LinkedList<Log>();
-		
-		try {
-			U.w("CommandIO: thread created with sa=" + cnc_address + " sp=" + cnc_port);
-			assert(cnc_address != null && cnc_port != 0 && boss != null);
-			
-			socket = CommonIO.setupNetSocket(cnc_address, cnc_port);
-			
-			BufferedOutputStream _out =  new BufferedOutputStream(socket.getOutputStream());
-			BufferedInputStream _in = new BufferedInputStream(socket.getInputStream());
-			
-			DataOutputStream out = new DataOutputStream(_out);
-			DataInputStream in = new DataInputStream(_in);
-			
-			U.w("CommandIO: thread connected.");
-			N.notifyEDT(EVENT.CNC_CONNECTION, this, true);
-
-			//Init connection.
-			out.writeInt(0);
-			out.flush();
-			
-			int recv = in.readInt();
-			if (recv != 0)
-				throw new SequenceErrorException(0, recv);
-			
-			while(running) {
-				Log l = null;
-				synchronized (commands) {
-					l = commands.poll();
-				}
-				
-				if (l != null) {
-					U.w("CommandIO: sending command: " + l.description);
-					out.writeInt(1);
-					out.flush();
-					
-					recv = in.readInt();
-					if (recv != 0)
-						throw new SequenceErrorException(0, recv);
-					
-					CommonIO.writeLog(out, l);
-					
-					int ret = in.readInt();
-					U.wf("CommandIO: [%s] got ret [%d]\n", l.description, ret);
-				} else {
-					out.writeInt(0);
-					out.flush();
-					recv = in.readInt();
-					if (recv != 0)
-						throw new SequenceErrorException(0, recv);
-					
-					Thread.sleep(400);
-				}
-			}
-		}
-		catch (UnknownHostException uke) {
-			uke.printStackTrace();
-			U.w("CommandIO thread:" + uke.getMessage());
-		}
-		catch(SocketTimeoutException ste) {
-			ste.printStackTrace();
-			U.w("CommandIO thread: socket TIMEOUT.");
-		}
-		catch (IOException ie) {
-			ie.printStackTrace();
-			U.w("CommandIO thread:" + ie.getMessage());
-		}
-		catch(OutOfMemoryError e) {
-			e.printStackTrace();
-			U.w("CommandIO thread got OutOfMemoryError.");
-		}
-		catch(NegativeArraySizeException nase) {
-			nase.printStackTrace();
-			U.w("CommandIO got negative incoming data size!");
-		}
-		catch(SequenceErrorException see) {
-			U.w("CommandIO thread got out of sequence, exiting!" +
-					"\n\texpected:" + see.expected + " was:" + see.was);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
-		commands = null;
-		
-		U.w("CommandIO thread exiting...");
-		if (running) {
-			U.w("WARNING: CommandIO thread exiting ATYPICALLY! (running == true)");
-		}
-		
-		if (socket != null) {
-			try {
-				socket.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		N.notifyEDT(EVENT.CNC_CONNECTION, this, false);
-		boss.cncThreadExiting();
-	}
-	
-	public static Queue<Log> commands = null;
-	
-	public static boolean tryAddCall(Log cmnd) {
-		synchronized(commands) {
-			if (commands == null || cmnd == null)
-				return false;
-			
-			SExpr cc = cmnd.tree().get(0);
-			if (!cc.exists() ||
-					!cc.isAtom() ||
-					!cc.value().equals("command")
-					)
-				return false;
-			
-			commands.add(cmnd);
-		}
-		
-		return true;
-	}
-	
-	private static class SequenceErrorException extends Exception {
-		private static final long serialVersionUID = 1L;
-		public int expected, was;
-		SequenceErrorException(int e, int w) {
-			super();
-			expected = e; was = w;
-		}
-	}
-	
-	//A few simple commands
-	//--------------------------------------------- 
-	
-	public static boolean tryAddSetFlag(int findex, boolean fval) {
+	public static Log createCmndSetFlag(int flagi, boolean val) {
 		byte[] bytes = new byte[2];
-		bytes[0] = (byte) findex;
-		bytes[1] = (byte) (fval ? 1 : 0);
+		bytes[0] = (byte) flagi;
+		bytes[1] = (byte) (val ? 1 : 0);
 		
 		SExpr commandTree = SExpr.newList(SExpr.newAtom("command"), SExpr.newAtom("setFlag"));
 		Log cmnd = new Log(commandTree, bytes);
-		
-		return tryAddCall(cmnd);
+		return cmnd;
 	}
 	
-	public static boolean tryAddTest() {
+	public static Log createCmndTest() {
 		SExpr commandTree = SExpr.newList(SExpr.newAtom("command"), SExpr.newAtom("test"));
 		Log cmnd = new Log(commandTree, null);
+		return cmnd;
+	}
+	
+	public static Log createCmndExit() {
+		SExpr commandTree = SExpr.newList(SExpr.newAtom("command"), SExpr.newAtom("exit"));
+		Log cmnd = new Log(commandTree, null);
+		return cmnd;
+	}
+	
+	private static final LinkedList<ControlInstance> instances = new LinkedList<>();
+
+	public static ControlInstance create(IOFirstResponder ifr, String host, int port) {
+		ControlInstance si = new ControlInstance(host, port);
+		si.ifr = ifr;
 		
-		return tryAddCall(cmnd);
+		synchronized(instances) {
+			instances.add(si);
+		}
+		
+		Thread t = new Thread(si, String.format("thread-%s", si.name()));
+		t.setDaemon(true);
+		t.start();
+
+		return si;
+	}
+
+	public static ControlInstance getByIndex(int index) {
+		synchronized(instances) {
+			if (index < instances.size())
+				return instances.get(index);
+			else return null;
+		}
+	}
+
+	public static ControlInstance getByHost(String host) {
+		synchronized(instances) {
+			for (ControlInstance si : instances) {
+				if (si.host.equals(host))
+					return si;
+			}
+
+			return null;
+		}
+	}
+
+	public static ControlInstance[] getAll() {
+		synchronized(instances) {
+			return instances.toArray(new ControlInstance[0]);
+		}
+	}
+
+	private static void remove(ControlInstance toRem) {
+		synchronized(instances) {
+			if (instances.contains(toRem))
+				instances.remove(toRem);
+		}
+	}
+
+
+	public static class ControlInstance extends CommonIO.IOInstance {
+		
+		private final LinkedList<Log> commands = new LinkedList<>();
+		
+		public boolean tryAddCmnd(Log cmnd) {
+			if (cmnd == null ||
+					cmnd.tree().count() < 2 ||
+					!cmnd.tree().get(0).isAtom() ||
+					!cmnd.tree().get(1).isAtom() ||
+					!cmnd.tree().get(0).value().equals("command")) {
+				Logger.logf(Logger.ERROR, "invalid format for command log: %s", cmnd.toString());
+				return false;
+			}
+			
+			synchronized(commands) {
+				commands.add(cmnd);
+			}
+			
+			return true;
+		}
+
+		protected ControlInstance(String host, int port) {
+			this.host = host;
+			this.port = port;
+		}
+
+		@Override
+		public void run() {
+
+			assert(socket == null);
+
+			try {
+				//Setup Socket
+				Logger.logf(Logger.INFO, "%s starting.", name());
+				this.socket = CommonIO.setupNetSocket(host, port);
+
+				//Initialize
+				BufferedOutputStream _out =  new BufferedOutputStream(socket.getOutputStream());
+				BufferedInputStream _in = new BufferedInputStream(socket.getInputStream());
+
+				DataOutputStream out = new DataOutputStream(_out);
+				DataInputStream in = new DataInputStream(_in);
+
+				out.writeInt(0);
+				out.flush();
+
+				int recv = in.readInt();
+				if (recv != 0)
+					throw new SequenceErrorException(0, recv);
+
+				synchronized(this) {
+					if (this.state != IOState.STARTING)
+						return;
+					this.state = IOState.RUNNING;
+				}
+
+				//control...
+				while (state() == IOState.RUNNING) {
+					Log l = null;
+					synchronized (commands) {
+						l = commands.poll();
+					}
+					
+					if (l != null) {
+						Logger.log(Logger.INFO, name() + ": sending command: " + l.description);
+						out.writeInt(1);
+						out.flush();
+						
+						recv = in.readInt();
+						if (recv != 0)
+							throw new SequenceErrorException(0, recv);
+						
+						CommonIO.writeLog(out, l);
+						
+						int ret = in.readInt();
+						IOFirstResponder.generateReceived(this, ifr, ret, new Log[0]);
+						Logger.logf(Logger.INFO, "%s: [%s] got ret [%d]\n", name(), l.description, ret);
+					} else {
+						out.writeInt(0);
+						out.flush();
+						recv = in.readInt();
+						if (recv != 0)
+							throw new SequenceErrorException(0, recv);
+						
+						Thread.sleep(400);
+					}
+				}
+
+			} catch (Throwable t) {
+				if (t instanceof SequenceErrorException) {
+					Logger.logf(Logger.ERROR, "%s", ((SequenceErrorException) t).toString());
+				}
+
+				Logger.logf(Logger.INFO, "throwable message: %s", t.getMessage());
+				t.printStackTrace();
+			} finally {
+				Logger.logf(Logger.INFO, "%s cleaning up...", name());
+
+				this.finish();
+
+				ControlIO.remove(this);
+				IOFirstResponder.generateFinished(this, this.ifr);
+				Events.ControlStatus.generate(this, false);
+			}
+		}
+
+		@Override
+		public String name() {
+			return String.format("ControlInstance{%s:%d}", this.host, this.port);
+		}
 	}
 }

@@ -42,6 +42,7 @@ int CrossBright_func();
 
 //etc...
 
+/* add all functions to publish to this vector */
 static const std::vector<CrossFunc> FUNCS = {
     CrossFunc("test", test_func, {}),
     CrossFunc("arg_test", arg_test_func, {"YUVImage", "YUVImage"}),

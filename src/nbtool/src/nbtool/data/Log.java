@@ -6,7 +6,7 @@ import java.util.Map;
 import javax.swing.tree.TreePath;
 
 import nbtool.util.NBConstants;
-import nbtool.util.U;
+import nbtool.util.Utility;
 
 /*TODO:  if description changes, attributes is out of date.
  * */
@@ -16,10 +16,11 @@ public class Log implements Serializable {
 	/*
 	 * Unique number for every log found during this execution.
 	 * */
-	private static Long class_index = new Long(0);
+	private static final Object indexLock = new Object();
+	private static long class_index = 0;
 	private static long getID() {
 		long ret;
-		synchronized(class_index) {
+		synchronized(indexLock) {
 			ret = class_index++;
 		}
 		
