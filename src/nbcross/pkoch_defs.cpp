@@ -4,6 +4,8 @@
 #include <string>
 #include <iostream>
 
+#include "RoboGrams.h"
+#include "image/ImageConverterModule.h"
 #include "vision/PostDetector.h"
 #include "vision/Gradient.h"
 #include "vision/EdgeDetector.h"
@@ -62,7 +64,7 @@ int PostDetector_func() {
     int width = 640;
     int height = 480;
 
-    messages::YUVImage image((unsigned char)log->data().c_str(), width, height, width);
+    messages::YUVImage image((unsigned char*)log->data().data(), width, height, width);
     portals::Message<messages::YUVImage> message(&image);
     man::image::ImageConverterModule imageConverter;
 
@@ -86,40 +88,43 @@ int PostDetector_func() {
 
     // Post image
     const messages::PackedImage8& postImage = detector.getPostImage();
-    std::string postImageDesc = "type=YUVImage encoding=[Y8] width=";
-    postImageDesc += std::to_string(postImage.width());
-    postImageDesc += " height=";
-    postImageDesc += std::to_string(postImage.height());
-    Log* postImageRet = new Log(postImageDesc);
+    std::string imageData((const char *)postImage.pixelAddress(0, 0), (size_t)postImage.width()*postImage.height());
+    SExpr expr("YUVImage", "fuck it", clock(), 0, imageData.size());
+    expr.append(SExpr("width", postImage.width()));
+    expr.append(SExpr("height", postImage.height()));
+    expr.append(SExpr("encoding", "[Y8]"));
+    std::vector<SExpr> contents = { expr };
 
-    postImageRet->setData(std::string((const char *)postImage.pixelAddress(0, 0), postImage.width()*postImage.height()));
+    Log* postImageRet = new Log("nblog",
+                                "josh",
+                                0,
+                                10,
+                                contents,
+                                imageData);
     rets.push_back(postImageRet);
 
     // Unfiltered histogram
-    std::string unfiltHistDesc = "type=Histogram";
-    Log* unfiltHistRet = new Log(unfiltHistDesc);
+    Log* unfiltHistRet = new Log(SExpr("roger"));
 
     unfiltHistRet->setData(std::string((const char *)detector.getUnfilteredHistogram(), 8*detector.getLengthOfHistogram()));
     rets.push_back(unfiltHistRet);
 
     // Filtered histogram
-    std::string filtHistDesc = "type=Histogram";
-    Log* filtHistRet = new Log(filtHistDesc);
+    Log* filtHistRet = new Log(SExpr("roger"));
 
     filtHistRet->setData(std::string((const char *)detector.getFilteredHistogram(), 8*detector.getLengthOfHistogram()));
     rets.push_back(filtHistRet);
 
     // Goalpost candidates
-    std::string postsRetDesc = "type=DetectedGoalposts";
-    Log* postsRet = new Log(postsRetDesc);
+    Log* postsRet = new Log(SExpr("roger"));
 
     int size = 4 * posts.size();
     if (size) {
-        uint8_t* temp = (uint8_t*)malloc(postsRet.dlen);
+        uint8_t* temp = (uint8_t*)malloc(size);
         int* dataAsIntPt = reinterpret_cast<int*>(temp);
         for (int i = 0; i < posts.size(); i++)
             dataAsIntPt[i] = posts[i]; 
-        postsRet->setData((const char *)dataAsIntPt, size);
+        postsRet->setData(std::string((const char *)dataAsIntPt, size));
         free(temp);
     }
     rets.push_back(postsRet);

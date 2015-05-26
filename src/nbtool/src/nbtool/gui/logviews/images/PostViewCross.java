@@ -39,7 +39,7 @@ public class PostViewCross extends ViewParent implements CrossFuncListener {
 	        g.setColor(Color.red);
 	        for (int i = 0; i < candidates.size(); i++) {
 	        	g.fillRect(PostViewCross.scale*candidates.get(i),
-	     		   	       0,
+	     		           PostViewCross.scale*img.getHeight(),
 	     		           2, 
 	     		           2*PostViewCross.scale*img.getHeight());
 	        }

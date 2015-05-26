@@ -101,7 +101,7 @@ int main(int argc, const char * argv[]) {
     
     Log functions("nbcross", "nbcross/main", time(NULL), NBCROSS_VERSION, contents, funcstr);
     
-    CHECK_RET(functions.send(fd));
+    CHECK_RET(!functions.send(fd));
     
     //Confirm java got the right number of functions.
     CHECK_RET(recv_exact(fd, 4, &net_order, MAX_WAIT));
@@ -139,7 +139,7 @@ int main(int argc, const char * argv[]) {
         for (int i = 0; i < na; ++i) {
             
             Log * recvd = Log::recv(fd, MAX_WAIT);
-            CHECK_RET(recvd != NULL);
+            CHECK_RET(recvd == NULL);
             
             SExpr * contents = recvd->tree().find("contents");
             
@@ -148,7 +148,7 @@ int main(int argc, const char * argv[]) {
                 return 1;
             }
             
-            std::string type = contents->get(0)->value();
+            std::string type = contents->get(1)->find("type")->get(1)->value();
             if (type != FUNCS[findex].args[i]) {
                 printf("arg %i [%s] did NOT match type=%s!\n", i, type.c_str(), FUNCS[findex].args[i].c_str());
                 return 1;
@@ -172,7 +172,7 @@ int main(int argc, const char * argv[]) {
         CHECK_RET(send_exact(fd, 4, &net_order));
         
         for (int i = 0; i < rets.size(); ++i) {
-            CHECK_RET(rets[i]->send(fd));
+            CHECK_RET(!rets[i]->send(fd));
         }
         
         CHECK_RET(recv_exact(fd, 4, &net_order, MAX_WAIT));

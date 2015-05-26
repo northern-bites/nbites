@@ -122,7 +122,8 @@ public class CrossIO implements Runnable {
 		int nfuncs_1 = dis.readInt();
 		Log funcLog = CommonIO.readLog(dis);
 		//int nfuncs_2 = //Integer.parseInt(funcLog.getAttributes().get("fn"));
-		int nfuncs_2 = -1;
+		/* int nfuncs_2 = -1; */
+        int nfuncs_2 = funcLog.tree().find("contents").get(1).get(1).valueAsInt();
 		
 		String funcstr = new String(funcLog.bytes);
 		String[] funcs = funcstr.split("\n");
@@ -133,11 +134,18 @@ public class CrossIO implements Runnable {
 					nfuncs_1, nfuncs_2, nfuncs_3));
 		
 		for (String f : funcs) {
+
 			String[] parts = f.split("=");
-			assert(parts.length == 2);
+
+            if (parts.length == 2) {         
 			String[] args = parts[1].trim().split(" ");
-			
 			foundFuncs.add(new CppFunc(parts[0].trim(), args));
+            } else if (parts.length == 1) {
+                foundFuncs.add(new CppFunc(parts[0].trim(), new String[0]));
+            } else {
+                U.w("fuck\n");
+                System.exit(1);
+            }
 		}
 	}
 	

@@ -106,6 +106,7 @@ add_subdirectory( ${MAN_DIR}/image ${CMAKE_CURRENT_BINARY_DIR}/man/image)
 add_subdirectory( ${MAN_DIR}/localization ${CMAKE_CURRENT_BINARY_DIR}/man/localization)
 add_subdirectory( ${MAN_DIR}/vision ${CMAKE_CURRENT_BINARY_DIR}/man/vision)
 add_subdirectory( ${MAN_DIR}/log ${CMAKE_CURRENT_BINARY_DIR}/man/log)
+add_subdirectory( ${MAN_DIR}/control ${CMAKE_CURRENT_BINARY_DIR}/man/control)
 
 ## SOURCES ##
 
@@ -140,4 +141,5 @@ target_link_libraries( nbcross_tool
   sharedball # man sharedball
   log
   logshare
+  control
   )
