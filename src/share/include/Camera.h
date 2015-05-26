@@ -86,30 +86,30 @@ public:
      * Camera Parameters Go Here
      */
 
-    // SEARLES CAMERA PARAMETERS
+    // STATION CAMERA PARAMS
     // TOP SETTINGS
 #ifdef NAOQI_2
     static const bool TOP_H_FLIP = 1;
     static const bool TOP_V_FLIP = 1;
     static const bool TOP_AUTO_EXPOSURE = 0;
-    static const int TOP_BRIGHTNESS = 180;
-    static const int TOP_CONTRAST = 58;
-    static const int TOP_SATURATION = 134;
+    static const int TOP_BRIGHTNESS = 250;
+    static const int TOP_CONTRAST = 43;
+    static const int TOP_SATURATION = 144;
     static const int TOP_HUE = 0;
-    static const int TOP_SHARPNESS = 3;
+    static const int TOP_SHARPNESS = 4;
     static const int TOP_GAMMA = 220;
     static const bool TOP_AUTO_WHITEBALANCE = 0;
     static const int TOP_BACKLIGHT_COMPENSATION = 0x00;
-    static const int TOP_EXPOSURE = 160;
-    static const int TOP_GAIN = 70;
-    static const int TOP_WHITE_BALANCE = 4500;
+    static const int TOP_EXPOSURE = 250;
+    static const int TOP_GAIN = 53;
+    static const int TOP_WHITE_BALANCE = 3300;
     static const bool TOP_FADE_TO_BLACK = 0;
 
     // // BOTTOM SETTINGS
     static const bool BOTTOM_H_FLIP = 0;
     static const bool BOTTOM_V_FLIP = 0;
     static const bool BOTTOM_AUTO_EXPOSURE = 0;
-    static const int BOTTOM_BRIGHTNESS = 160;
+    static const int BOTTOM_BRIGHTNESS = 200;
     static const int BOTTOM_CONTRAST = 56;
     static const int BOTTOM_SATURATION = 122;
     static const int BOTTOM_HUE = 0;
@@ -117,9 +117,9 @@ public:
     static const int BOTTOM_GAMMA = 220;
     static const bool BOTTOM_AUTO_WHITEBALANCE = 0;
     static const int BOTTOM_BACKLIGHT_COMPENSATION = 0x00;
-    static const int BOTTOM_EXPOSURE = 160;
+    static const int BOTTOM_EXPOSURE = 250;
     static const int BOTTOM_GAIN = 62;
-    static const int BOTTOM_WHITE_BALANCE = 4200;
+    static const int BOTTOM_WHITE_BALANCE = 3200;
     static const bool BOTTOM_FADE_TO_BLACK = 0;
 #else
     static const bool TOP_H_FLIP = 1;
