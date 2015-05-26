@@ -2,9 +2,13 @@
 
 using namespace std;
 
-RatingParams::RatingParams()
+// Convert a floating point color parameter to an integer
+int RatingParams::fix(float uv, int zero, bool invert)
 {
-
+  int w = limit((int)(UVRange * uv + zero + 0.5), UVBits);
+  if (invert)
+    w ^= UVMask;
+  return w;
 }
 
 void RatingParams::load(float darkU0, float darkV0, float lightU0, float lightV0, float fuzzyU, float fuzzyV)
@@ -25,13 +29,4 @@ void RatingParams::load(float darkU0, float darkV0, float lightU0, float lightV0
   yCoeff.load(((lu0 - du0) << YCoeffBits) / YMax, ((lv0 - dv0) << YCoeffBits) / YMax);
   fuzzySpread.load(fu, fv);
   inverseFuzzy.load((255 << 8) / fu, (255 << 8) / fv);
-}
-
-// Convert a floating point color parameter to an integer
-int fix(float uv, int zero, bool invert)
-{
-  int w = limit((int)(UVRange * uv + zero + 0.5), UVBits);
-  if (invert)
-    w ^= UVMask;
-  return w;
 }

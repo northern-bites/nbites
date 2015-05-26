@@ -136,18 +136,29 @@ struct RatingParams
     return (unsigned char)min(fuzzyMax(0, y, u), fuzzyMax(1, y, v));
     }
 
+    int fix(float uv, int zero, bool invert);
+
+    
     // Load this color parameter from the indicated values. The fuzzy spreads are
     // positive if the threshold is a minimum value and negative if the threshold
     // is a maximum value.
     void load(float darkU0, float darkV0, float lightU0, float lightV0, float fuzzyU, float fuzzyV);
+
+
 };
 
 
 // A complete set of color parameters
 struct Colors
 {
-  RatingParams white;            // ???
+  RatingParams white;   
   RatingParams green;
   RatingParams orange;
+
+  Colors() {
+    white .load(-0.04f, -0.04f,  0.12f,  0.12f, -0.05f, -0.04f);
+    green .load( 0.077f,  0.010f, -0.057f, -0.230f, -0.06f, -0.06f);
+    orange.load( 0.133f,  0.053f, -0.133f,  0.107f, -0.06f,  0.06f);
+  }
 };
 

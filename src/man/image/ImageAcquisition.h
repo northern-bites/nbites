@@ -6,7 +6,7 @@
 
 struct Colors;
 
-extern "C" int _aquire_image(   const unsigned char* source,
+extern "C" int _acquire_image(   const unsigned char* source,
                                 int width, int height, int pitch,
                                 const Colors* colors,
                                 unsigned char* dest,

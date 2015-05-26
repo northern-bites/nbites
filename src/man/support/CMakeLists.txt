@@ -15,6 +15,7 @@ set( COMMON_SRCS
   ALLedNames
   NogginStructs
   ColorParams.cpp
+  RatingParams.cpp
   )
 
 add_library(
