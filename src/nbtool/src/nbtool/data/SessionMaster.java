@@ -163,7 +163,7 @@ public final class SessionMaster implements IOFirstResponder {
 						fileio.add(log);
 					}
 					
-					if (keepMod != 0 && (log.unique_id % saveMod == 0)) {
+					if (keepMod != 0 && (log.unique_id % keepMod == 0)) {
 						workingSession.addLog(log);
 					}	
 				}

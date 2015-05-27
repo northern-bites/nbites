@@ -19,6 +19,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <float.h>
+#include <stdarg.h>
 
 #define PORTNUM 30002
 //#define MAX_WAIT 1 //seconds
@@ -35,20 +36,39 @@ using nblog::SExpr;
 std::vector<Log *> args;
 std::vector<Log *> rets;
 
+bool crossprintout = true;
+
+static inline void nbcprintf(const char * format, ...) {
+    
+    va_list arguments;
+    va_start(arguments, format);
+    
+    if (crossprintout) {
+        vprintf(format, arguments);
+    }
+    
+    va_end(arguments);
+}
+
 int main(int argc, const char * argv[]) {
     std::string instance_name;
     
     if (argc > 1) {
-        printf("using name: [%s]\n", argv[1]);
+        nbcprintf("using name: [%s]\n", argv[1]);
         instance_name = std::string(argv[1]);
     } else {
-        printf("using default name.\n");
+        nbcprintf("using default name.\n");
     }
     
-    printf("using %li functions:\n", FUNCS.size());
+    if (argc > 2) {
+        printf("3 or more arguments, disabling status printfs\n");
+        crossprintout = false;
+    }
+    
+    nbcprintf("using %li functions:\n", FUNCS.size());
     for (int i = 0; i < FUNCS.size(); ++i)
-        printf("\t%s(%lu)\n", FUNCS[i].name.c_str(), FUNCS[i].args.size());
-    printf("\n\n-----------------------------------------\n");
+        nbcprintf("\t%s(%lu)\n", FUNCS[i].name.c_str(), FUNCS[i].args.size());
+    nbcprintf("\n\n-----------------------------------------\n");
     
     
     std::vector<SExpr> flist;
@@ -68,7 +88,7 @@ int main(int argc, const char * argv[]) {
         SExpr("name", instance_name)
     };
     
-    //printf("%s\n", SExpr(contents).print().c_str());
+    //nbcprintf("%s\n", SExpr(contents).print().c_str());
     
     struct sockaddr_in server;
     bzero(&server, sizeof(server));
@@ -79,10 +99,10 @@ int main(int argc, const char * argv[]) {
     struct hostent * host = gethostbyname("127.0.0.1");
     bcopy(host->h_addr, &server.sin_addr.s_addr, host->h_length);
     
-    printf("sock fd\t= %i\n", fd);
+    nbcprintf("sock fd\t= %i\n", fd);
     
     int ret = connect(fd, (struct sockaddr *) &server, (socklen_t) sizeof(struct sockaddr_in) );
-    printf("connect\t= %i\n",ret);
+    nbcprintf("connect\t= %i\n",ret);
     if (ret < 0) return ret;
     
     //Init ping.
@@ -93,11 +113,11 @@ int main(int argc, const char * argv[]) {
     CHECK_RET(recv_exact(fd, 4, &net_order, MAX_WAIT));
     
     if (net_order != 0) {
-        printf("malformed init val: 0x%x\n", net_order);
+        nbcprintf("malformed init val: 0x%x\n", net_order);
         return 1;
     }
     
-    printf("sending functions...\n");
+    nbcprintf("sending functions...\n");
     
     Log functions("nbcross", "nbcross/main", time(NULL), NBCROSS_VERSION, contents, std::string());
     
@@ -107,11 +127,11 @@ int main(int argc, const char * argv[]) {
     CHECK_RET(recv_exact(fd, 4, &net_order, MAX_WAIT));
     host_order = ntohl(net_order);
     if (host_order != FUNCS.size()) {
-        printf("java sent wrong confirmation of FUNCS.size(): %i\n", host_order);
+        nbcprintf("java sent wrong confirmation of FUNCS.size(): %i\n", host_order);
         return 1;
     }
     
-    printf("functions sent... waiting for calculation requests.\n");
+    nbcprintf("functions sent... waiting for calculation requests.\n");
     for (;;) {
         CHECK_RET(recv_exact(fd, 4, &net_order, MAX_WAIT));
         if (ntohl(net_order) == 0) {
@@ -119,7 +139,7 @@ int main(int argc, const char * argv[]) {
             CHECK_RET(send_exact(fd, 4, &host_order));
             continue;
         } else if (ntohl(net_order) != 1) {
-            printf("java sent wrong function call request: 0x%x\n", net_order);
+            nbcprintf("java sent wrong function call request: 0x%x\n", net_order);
             return 1;
         }
         
@@ -144,13 +164,13 @@ int main(int argc, const char * argv[]) {
             SExpr * contents = recvd->tree().find("contents");
             
             if (!contents || !contents->get(0)->isAtom()) {
-                printf("arg %i wrong format!\n", i);
+                nbcprintf("arg %i wrong format!\n", i);
                 return 1;
             }
             
             std::string type = contents->get(1)->find("type")->get(1)->value();
             if (type != FUNCS[findex].args[i]) {
-                printf("arg %i [%s] did NOT match type=%s!\n", i, type.c_str(), FUNCS[findex].args[i].c_str());
+                nbcprintf("arg %i [%s] did NOT match type=%s!\n", i, type.c_str(), FUNCS[findex].args[i].c_str());
                 return 1;
             }
             
@@ -158,14 +178,14 @@ int main(int argc, const char * argv[]) {
         }
         
         assert(args.size() == FUNCS[findex].args.size());
-        printf("calling function [%s]"
+        nbcprintf("calling function [%s]"
                "\n-------------------------------------------\n", FUNCS[findex].name.c_str());
         
         int ret = FUNCS[findex].func();
         
-        printf("\n-------------------------------------------\n");
+        nbcprintf("\n-------------------------------------------\n");
         
-        printf("function returned with ret:%i, sending %lu output logs.\n", ret, rets.size());
+        nbcprintf("function returned with ret:%i, sending %lu output logs.\n", ret, rets.size());
         net_order = htonl(ret);
         CHECK_RET(send_exact(fd, 4, &net_order));
         net_order = htonl(rets.size());
@@ -178,19 +198,19 @@ int main(int argc, const char * argv[]) {
         CHECK_RET(recv_exact(fd, 4, &net_order, MAX_WAIT));
         
         if (ntohl(net_order) != rets.size()) {
-            printf("java sent bad confirmation of end function call (wanted %lu, got %i)\n", rets.size(), ntohl(net_order));
+            nbcprintf("java sent bad confirmation of end function call (wanted %lu, got %i)\n", rets.size(), ntohl(net_order));
             return 1;
         }
         
-        printf("cleaning up function... ");
+        nbcprintf("cleaning up function... ");
         for (int i = 0; i < args.size(); ++i) {delete args[i];}
         args.clear();
         
         for (int i = 0; i < rets.size(); ++i) {delete rets[i];}
         rets.clear();
-        printf("done\n");
+        nbcprintf("done\n");
         
-        printf("function call completed\n");
+        nbcprintf("function call completed\n");
     }
     
     return 0;

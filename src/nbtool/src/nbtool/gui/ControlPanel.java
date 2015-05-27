@@ -270,11 +270,15 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 	
 	private FlagPanel[] flags = null;
 	
+	private boolean controlling = false;
 	@Override
 	public void relRobotStats(Object source, RobotStats bs) {
-		flags = new FlagPanel[bs.flags.size()];
+		if (!controlling)
+			return;
+		
+		flags = new FlagPanel[bs.flags.size() - 2];
 		for (int i = 0; i < flags.length; ++i) {
-			Flag f = bs.flags.get(i);
+			Flag f = bs.flags.get(i + 2);	//Skip two for the connected flags.
 			
 			flags[i] = new FlagPanel();
 			flags[i].setInfo(f.name, f.index);
@@ -295,9 +299,11 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 	@Override
 	public void controlStatus(ControlInstance inst, boolean up) {
 		if(up) {
+			controlling = true;
 			controlTestButton.setEnabled(true);
 			controlExitButton.setEnabled(true);
 		} else {
+			controlling = false;
 			controlTestButton.setEnabled(false);
 			controlExitButton.setEnabled(false);
 			
@@ -358,8 +364,8 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 					break;
 				}
 			}
-			
-			Events.GLogSelected.generate(this, streamLog, new ArrayList<Log>());
+			if (streamLog != null)
+				Events.GLogSelected.generate(this, streamLog, new ArrayList<Log>());
 		}
 	}
 	
@@ -443,7 +449,7 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 
         streamCB.setText("stream");
 
-        streamField.setText("jTextField1");
+        streamField.setText("(from camera_TOP)");
 
         writeSlider.setMaximum(5);
         writeSlider.setPaintLabels(true);

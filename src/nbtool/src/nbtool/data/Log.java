@@ -28,11 +28,16 @@ public class Log implements Serializable {
 	}
 	public final long unique_id = getID();
 	
-	public String name; //File name, might be null
+	//user supplied name, often null.  Used as file name.
+	public String name; 
 	
 	//Core opaque log fields:
 	public String description;
 	public byte[] bytes;
+	
+	public static enum SOURCE {
+		DERIVED, FILE, NETWORK
+	}
 	
 	public SOURCE source;
 	
@@ -50,6 +55,17 @@ public class Log implements Serializable {
 		this.tree = nt;
 		this.description = nt.serialize();
 	}
+	/*
+	public static Log logWithType(String type) {
+		SExpr typeField = SExpr.newKeyValue("type", type);
+		SExpr fieldList = SExpr.newList(typeField);
+		
+		SExpr topLevel = SExpr.newList(SExpr.newKeyValue(key, value));
+	}
+	
+	public static Log logWithType(String type, byte[] b) {
+		
+	} */
 	
 	public Log() {}
 	
@@ -83,9 +99,8 @@ public class Log implements Serializable {
 		else return description;
 	}
 	
-	public static enum SOURCE {
-		DERIVED, FILE, NETWORK
-	}
+	
+	
 	/* ALL ATTRIBUTES MUST BE OBJECTS SO THAT NULL CAN BE RETURNED IF THEY'RE NOT FOUND */
 	
 	/*

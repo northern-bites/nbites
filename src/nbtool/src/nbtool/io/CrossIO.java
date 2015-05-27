@@ -88,7 +88,7 @@ public class CrossIO {
 		public boolean tryAddCall(CrossCall call) {
 			if (call == TIMER_CALL) {
 				//If we have calls don't need TIMER_CALL
-				if (!instances.isEmpty()) return true;
+				if (!calls.isEmpty()) return true;
 			}
 			else if (call.listener == null ||
 					!functions.contains(call.function) ||
