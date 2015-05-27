@@ -8,6 +8,7 @@ import java.util.LinkedList;
 
 import nbtool.data.Log;
 import nbtool.data.SExpr;
+import nbtool.io.CommonIO.GIOFirstResponder;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOState;
 import nbtool.io.CommonIO.SequenceErrorException;
@@ -167,7 +168,7 @@ public class ControlIO {
 						CommonIO.writeLog(out, l);
 						
 						int ret = in.readInt();
-						IOFirstResponder.generateReceived(this, ifr, ret, new Log[0]);
+						GIOFirstResponder.generateReceived(this, ifr, ret, new Log[0]);
 						Logger.logf(Logger.INFO, "%s: [%s] got ret [%d]\n", name(), l.description, ret);
 					} else {
 						out.writeInt(0);
@@ -193,8 +194,8 @@ public class ControlIO {
 				this.finish();
 
 				ControlIO.remove(this);
-				IOFirstResponder.generateFinished(this, this.ifr);
-				Events.ControlStatus.generate(this, false);
+				GIOFirstResponder.generateFinished(this, this.ifr);
+				Events.GControlStatus.generate(this, false);
 			}
 		}
 

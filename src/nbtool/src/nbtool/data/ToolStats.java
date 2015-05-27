@@ -27,7 +27,7 @@ public class ToolStats implements Events.LogLoaded, Events.LogsFound{
 			}
 		}
 
-		Events.ToolStats.generate(this, this);
+		Events.GToolStats.generate(this, this);
 	}
 
 	@Override
@@ -37,6 +37,6 @@ public class ToolStats implements Events.LogLoaded, Events.LogsFound{
 			db_cur += l.bytes.length;
 		}
 		
-		Events.ToolStats.generate(this, this);
+		Events.GToolStats.generate(this, this);
 	}
 }

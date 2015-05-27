@@ -359,7 +359,7 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 				}
 			}
 			
-			Events.LogSelected.generate(this, streamLog, new ArrayList<Log>());
+			Events.GLogSelected.generate(this, streamLog, new ArrayList<Log>());
 		}
 	}
 	

@@ -168,7 +168,9 @@ public class CommonIO {
 		
 		/* !CALLED ASYNCHRONOUSLY! */
 		public boolean ioMayRespondOnCenterThread(IOInstance inst);
-		
+	}
+	
+	public static final class GIOFirstResponder {
 		public static void generateReceived(IOInstance instance, IOFirstResponder responder, int ret, Log ... logs) {
 			if (instance == null || responder == null)
 				return;
@@ -193,7 +195,6 @@ public class CommonIO {
 			Center.addEvent(iof);
 		}
 	}
-	
 	
 	protected static class IOReceived extends Center.ToolEvent {
 		

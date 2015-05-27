@@ -19,9 +19,11 @@ import javax.swing.JFileChooser;
 
 import nbtool.data.Log;
 import nbtool.data.Log.SOURCE;
+import nbtool.io.CommonIO.GIOFirstResponder;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOState;
 import nbtool.util.Events.FileIOStatus;
+import nbtool.util.Events.GFileIOStatus;
 import nbtool.util.Logger;
 import nbtool.util.Utility;
 
@@ -204,7 +206,7 @@ public class FileIO {
 
 		@Override
 		public void run() {
-			FileIOStatus.generate(this, true);
+			GFileIOStatus.generate(this, true);
 			
 			while(this.state == IOState.RUNNING) {
 				Log lg  = remove();
@@ -234,8 +236,8 @@ public class FileIO {
 			
 			Logger.logf(Logger.INFO, "%s finishing.", this.name());			
 			this.finish();
-			IOFirstResponder.generateFinished(this, ifr);
-			FileIOStatus.generate(this, false);
+			GIOFirstResponder.generateFinished(this, ifr);
+			GFileIOStatus.generate(this, false);
 		}
 
 		@Override

@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import nbtool.data.Log;
 import nbtool.data.Log.SOURCE;
 import nbtool.data.SExpr;
+import nbtool.io.CommonIO.GIOFirstResponder;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOState;
 import nbtool.io.CommonIO.SequenceErrorException;
@@ -163,7 +164,7 @@ public class StreamIO {
 
 						nl.source = SOURCE.NETWORK;
 
-						IOFirstResponder.generateReceived(this, ifr, 0, nl);
+						GIOFirstResponder.generateReceived(this, ifr, 0, nl);
 						++seq_num;
 					} else {
 						throw new SequenceErrorException(seq_num, recv);
@@ -183,8 +184,8 @@ public class StreamIO {
 				this.finish();
 
 				StreamIO.remove(this);
-				IOFirstResponder.generateFinished(this, this.ifr);
-				Events.StreamIOStatus.generate(this, false);
+				GIOFirstResponder.generateFinished(this, this.ifr);
+				Events.GStreamIOStatus.generate(this, false);
 			}
 		}
 

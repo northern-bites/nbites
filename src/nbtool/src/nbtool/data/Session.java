@@ -59,7 +59,7 @@ public class Session {
 		}
 		
 		if (newBS) {
-			Events.RelevantRobotStats.generate(this, most_relevant);
+			Events.GRelevantRobotStats.generate(this, most_relevant);
 		}
 	}
 	

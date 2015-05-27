@@ -66,9 +66,9 @@ public final class SessionMaster implements IOFirstResponder {
 		newsess.addLog(logArray);
 		
 		sessions.add(newsess);
-		Events.ToolStatus.generate(this, STATUS.RUNNING, newsess.name);
-		Events.LogsFound.generate(this, logArray);
-		Events.ToolStatus.generate(this, STATUS.IDLE, "idle");
+		Events.GToolStatus.generate(this, STATUS.RUNNING, newsess.name);
+		Events.GLogsFound.generate(this, logArray);
+		Events.GToolStatus.generate(this, STATUS.IDLE, "idle");
 	}
 	
 	public synchronized void streamSession(String addr, String path) {
@@ -90,7 +90,7 @@ public final class SessionMaster implements IOFirstResponder {
 		workingSession = new Session(null, addr);
 		
 		sessions.add(workingSession);
-		Events.ToolStatus.generate(this, STATUS.RUNNING, workingSession.name);
+		Events.GToolStatus.generate(this, STATUS.RUNNING, workingSession.name);
 		
 		Logger.log(Logger.WARN, "SessionMaster setting up stream.");
 		control = ControlIO.create(this, addr, NBConstants.CONTROL_PORT);
@@ -99,10 +99,10 @@ public final class SessionMaster implements IOFirstResponder {
 	
 	public synchronized void stopWorkingSession() {
 		if (isIdle()) {
-			Events.ToolStatus.generate(this, STATUS.IDLE, "idle");
+			Events.GToolStatus.generate(this, STATUS.IDLE, "idle");
 			return;
 		} else {
-			Events.ToolStatus.generate(this, STATUS.STOPPING, workingSession.name);
+			Events.GToolStatus.generate(this, STATUS.STOPPING, workingSession.name);
 			
 			if (control != null)
 				control.kill();
@@ -126,7 +126,7 @@ public final class SessionMaster implements IOFirstResponder {
 	private synchronized void updateStopping() {
 		if (control == null && fileio == null && streamio == null) {
 			workingSession = null;
-			Events.ToolStatus.generate(this, STATUS.IDLE, "idle");
+			Events.GToolStatus.generate(this, STATUS.IDLE, "idle");
 		}
 	}
 
@@ -168,7 +168,7 @@ public final class SessionMaster implements IOFirstResponder {
 					}	
 				}
 				
-				Events.LogsFound.generate(this, out);
+				Events.GLogsFound.generate(this, out);
 			}
 		} else {
 			Logger.logf(Logger.WARN, "SessionMaster got surprising logs from %s.", inst.name());

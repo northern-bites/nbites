@@ -111,7 +111,9 @@ public class Events {
 	//Get functions from instance.
 	public static interface CrossStatus extends EventListener {
 		public void nbCrossFound(CrossInstance inst, boolean up);
-		
+	}
+	
+	public static final class GCrossStatus {
 		public static void generate(final CrossInstance inst, final boolean up) {
 			
 			Center.addEvent(new SimpleForEach(CrossStatus.class){
@@ -134,7 +136,9 @@ public class Events {
 	/* STREAM EVENTS */
 	public static interface StreamIOStatus extends EventListener {
 		public void streamStatus(StreamInstance inst, boolean up);
-
+	}
+	
+	public static final class GStreamIOStatus {
 		public static void generate(final StreamInstance inst, final boolean up) {
 			Center.addEvent(new SimpleForEach(StreamIOStatus.class) {
 
@@ -156,7 +160,9 @@ public class Events {
 	/* CONTROL EVENTS */
 	public static interface ControlStatus extends EventListener {
 		public void controlStatus(ControlInstance inst, boolean up);
-		
+	}
+	
+	public static final class GControlStatus {
 		public static void generate(final ControlInstance inst, final boolean up) {
 			Center.addEvent(new SimpleForEach(ControlStatus.class) {
 
@@ -178,7 +184,9 @@ public class Events {
 	/* FILEIO EVENTS */
 	public static interface FileIOStatus extends EventListener {
 		public void fileioStatus(FileInstance fi, boolean up);
-		
+	}
+	
+	public static final class GFileIOStatus {
 		public static void generate(final FileInstance inst, final boolean up) {
 			Center.addEvent(new SimpleForEach(FileIOStatus.class) {
 
@@ -199,7 +207,9 @@ public class Events {
 	
 	public static interface LogLoaded extends EventListener {
 		public void logLoaded(Object source, Log ... loaded);//SOURCE NULL if combined.
-		
+	}
+	
+	public static final class GLogLoaded {
 		public static void generate(final Object source, final Log ... loaded) {
 			Center.addEvent(new SimpleCombine(LogLoaded.class, source, loaded){
 
@@ -243,7 +253,9 @@ public class Events {
 	
 	public static interface LogsFound extends EventListener {
 		public void logsFound(Object source, Log ... found);
-		
+	}
+	
+	public static final class GLogsFound {
 		public static void generate(final Object source, final Log ... found) {
 			Center.addEvent(new SimpleCombine(LogsFound.class, source, found){
 
@@ -287,7 +299,9 @@ public class Events {
 	
 	public static interface RelevantRobotStats extends EventListener {
 		public void relRobotStats(Object source, RobotStats bs);
-		
+	}
+	
+	public static final class GRelevantRobotStats {
 		public static void generate(final Object source, final RobotStats bs) {
 			Center.addEvent(new SimpleCombine(RelevantRobotStats.class, source, bs){
 				@Override
@@ -322,7 +336,9 @@ public class Events {
 	
 	public static interface ToolStats extends EventListener {
 		public void toolStats(Object source, nbtool.data.ToolStats s);
-
+	}
+	
+	public static final class GToolStats {
 		public static void generate(final Object source, final nbtool.data.ToolStats ts) {
 			Center.addEvent(new SimpleCombine(ToolStats.class, source, ts){
 				@Override
@@ -355,8 +371,10 @@ public class Events {
 	}
 	
 	public static interface ToolStatus extends EventListener {
-		public void toolStatus(Object source, STATUS s, String desc);
-
+		public void toolStatus(Object source, STATUS s, String desc);	
+	}
+	
+	public static final class GToolStatus {
 		public static void generate(final Object source, final STATUS s, final String desc) {
 			Center.addEvent(new SimpleForEach(ToolStatus.class) {
 
@@ -376,7 +394,9 @@ public class Events {
 	
 	public static interface LogSelected extends EventListener {
 		public void logSelected(Object source, Log first, ArrayList<Log> alsoSelected);
-		
+	}
+	
+	public static final class GLogSelected {
 		public static void generate(Object source, Log first, ArrayList<Log> alsoSelected) {
 			Center.addEvent(new SimpleCombine(LogSelected.class, source, first, alsoSelected){
 
@@ -415,7 +435,9 @@ public class Events {
 	
 	public static interface SessionSelected extends EventListener {
 		public void sessionSelected(Object source, Session s);
-		
+	}
+	
+	public static final class GSessionSelected {
 		public static void generate(final Object source, final Session s) {
 			Center.addEvent(new SimpleCombine(SessionSelected.class, source, s){
 

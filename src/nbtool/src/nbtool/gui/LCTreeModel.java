@@ -118,7 +118,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, Events.Log
 			//N.notifyEDT(OLDEVENT.SES_SELECTION, this,
 			//		(Session) first.getPath()[1]);
 			Session session = (Session) first.getPath()[1];
-			Events.SessionSelected.generate(this, session);
+			Events.GSessionSelected.generate(this, session);
 			break;
 		case 3:
 			//LOG SELECTED.
@@ -143,14 +143,14 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, Events.Log
 						
 						return;
 					}
-					Events.LogLoaded.generate(this, sel);
+					Events.GLogLoaded.generate(this, sel);
 				}
 				
 				assert(sel.bytes != null);
 				selected.add(sel);
 			}
 			
-			Events.LogSelected.generate(this, selected.remove(0), selected);
+			Events.GLogSelected.generate(this, selected.remove(0), selected);
 			break;
 		default:
 			Logger.logf(Logger.ERROR, "ERROR: LCTreeModel path size was: " + first.getPathCount());
