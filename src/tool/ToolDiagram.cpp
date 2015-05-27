@@ -57,9 +57,9 @@ ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent)
 
 bool ToolDiagram::unlogFrom(std::string path)
 {
-    unlog::UnlogModule<Header> check(path);
+    unlog::UnlogModule<messages::Header> check(path);
     check.openFile();
-    Header head = check.readNextMessage();
+    messages::Header head = check.readNextMessage();
     check.closeFile();
 
     if(typeMap.find(head.name()) == typeMap.end())
