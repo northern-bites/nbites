@@ -161,6 +161,24 @@ set( loc_headers
   LocTool.h
 )
 
+# WorldviewTool
+set( worldview_srcs worldview_main.cpp
+  EmptyTool.cpp
+  ToolDiagram.cpp
+  DataSelector.cpp
+  ${MAN_DIR}/DiagramThread.cpp # Needed for worldview
+
+  WorldviewTool.cpp
+  )
+
+set( worldview_headers
+  EmptyTool.h
+  ToolDiagram.h
+  DataSelector.h
+
+  WorldviewTool.h
+)
+
 #BallTool
 set( ball_srcs ball_main.cpp
   EmptyTool.cpp
@@ -252,6 +270,7 @@ set( installer_headers
 # Qt4 goodness (aka moc the headers)
 Qt4_wrap_cpp( tool_headers_moc ${tool_headers} )
 Qt4_wrap_cpp( loc_headers_moc ${loc_headers} )
+Qt4_wrap_cpp( worldview_headers_moc ${worldview_headers} )
 Qt4_wrap_cpp( ball_headers_moc ${ball_headers} )
 Qt4_wrap_cpp( vision_headers_moc ${vision_headers} )
 Qt4_wrap_cpp( calibrate_headers_moc ${calibrate_headers} )
@@ -301,6 +320,27 @@ target_link_libraries(
   logview
   sharedball
   sharedview
+  fieldview
+  worldview
+  tool_common
+  localization
+  ${QT_LIBRARIES}
+  )
+
+# The WorldView executable
+add_executable( worldview_tool
+  ${worldview_srcs}
+  ${worldview_headers_moc} )
+
+target_link_libraries(
+  worldview_tool
+  portals
+  messages
+  unlog
+  image_display
+  logview
+  # sharedball
+  # sharedview
   fieldview
   worldview
   tool_common
