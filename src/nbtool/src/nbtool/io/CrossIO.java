@@ -224,6 +224,9 @@ public class CrossIO {
 		
 		private void parseFunctions(Log funclog) {
 			SExpr tree = funclog.tree();
+			tree = tree.find("contents");
+			
+			//System.out.printf("%s\n", tree.print());
 			if (!tree.find("name").exists() ||
 					tree.find("name").count() < 2 ||
 					tree.find("name").get(1).value().trim().isEmpty()) {
@@ -346,10 +349,6 @@ public class CrossIO {
 					} catch (Exception e) {
 						Logger.log(Logger.ERROR, "Exception in CrossServer while accepting connection.");
 						e.printStackTrace();
-					} finally {
-						if (socket != null) {
-							socket.close();
-						}
 					}
 				}
 				

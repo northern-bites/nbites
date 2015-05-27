@@ -6,7 +6,7 @@ import java.util.HashMap;
 import static nbtool.util.Logger.*;
 
 public class UtilityManager {
-	public static Class[] utilities = {LogToViewUtility.class, HardlyWorking.class, YUVColors.class};
+	public static Class[] utilities = {LogToViewUtility.class, ThreadStateUtility.class, HardlyWorking.class, YUVColors.class};
 	
 	private static HashMap<Class<? extends UtilityParent>, UtilityParent> map = setupMap();
 	private static HashMap<Class<? extends UtilityParent>, UtilityParent> setupMap() {

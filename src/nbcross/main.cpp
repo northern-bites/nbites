@@ -172,7 +172,7 @@ int main(int argc, const char * argv[]) {
         CHECK_RET(send_exact(fd, 4, &net_order));
         
         for (int i = 0; i < rets.size(); ++i) {
-            CHECK_RET(rets[i]->send(fd));
+            CHECK_RET(!rets[i]->send(fd));
         }
         
         CHECK_RET(recv_exact(fd, 4, &net_order, MAX_WAIT));
