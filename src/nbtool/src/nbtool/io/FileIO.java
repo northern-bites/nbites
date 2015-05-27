@@ -91,9 +91,9 @@ public class FileIO {
 			U.wf("%d bytes left, hex:\n%s\n", av, text); */
 		}
 		
-		if (!(lg.description.equals(full.description))) {
+		if (!(lg.description().equals(full.description()))) {
 			Logger.logf(Logger.WARN, "WARNING: log description found to be different upon load:\n\t%s\n\t%s\n",
-					lg.description, full.description);
+					lg.description(), full.description());
 		}
 		
 		lg.bytes = full.bytes;
@@ -149,12 +149,17 @@ public class FileIO {
 			try {
 				desc = readDescriptionFromFile(files[i]);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return null;
 			}
+			if (Utility.isv6Description(desc)) {
+				logs[i] = new Log();
+				logs[i]._olddesc_ = desc;
+				assert(Utility.v6Convert(logs[i]));
+			} else {
+				logs[i] = new Log(desc, null);
+			}
 			
-			logs[i] = new Log(desc, null);
 			logs[i].name = files[i].getName();
 			logs[i].source = SOURCE.FILE;
 		}

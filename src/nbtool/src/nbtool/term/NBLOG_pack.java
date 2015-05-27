@@ -53,18 +53,21 @@ public class NBLOG_pack {
 				Logger.logf(Logger.INFO, "\t... could not get reasonable value for file size.\n");
 				continue;
 			}
-			
-			ByteBuffer bb;
-			
+						
 			DataInputStream dis = null;
 			try {
 				FileInputStream fis = new FileInputStream(lf);
 				dis = new DataInputStream(new BufferedInputStream(fis));
-
-				Log found = CommonIO.readLog(dis);
-				if (Utility.is_v6Log(found) && found.primaryType().equals("YUVImage")) {
-					found.name = f;
-					accepted.add(found);
+				
+				Log found = CommonIO.simpleReadLog(dis);
+				
+				if (Utility.isv6Description(found._olddesc_)) {
+					found.setTree(SExpr.deserializeFrom(found._olddesc_));
+					
+					if (found.primaryType().equals("YUVImage")) {
+						found.name = f;
+						accepted.add(found);
+					}
 				}
 				
 			} catch (Exception e) {
@@ -95,7 +98,7 @@ public class NBLOG_pack {
 			else if (from.contains("BOT") || from.contains("bot"))
 				bot.add(l);
 			else {
-				Logger.logf(Logger.INFO, "Image Log %s [%s] UNKNOWN FROM FIELD!: %s\n", l.name, l.description, from);
+				Logger.logf(Logger.INFO, "Image Log %s [%s] UNKNOWN FROM FIELD!: %s\n", l.name, l.description(), from);
 			}
 		}
 		

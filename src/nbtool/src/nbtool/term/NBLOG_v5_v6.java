@@ -53,9 +53,10 @@ public class NBLOG_v5_v6 {
 				FileInputStream fis = new FileInputStream(lf);
 				dis = new DataInputStream(new BufferedInputStream(fis));
 
-				Log fnd = CommonIO.readLog(dis);
 				
-				if (Utility.is_v6Log(fnd)) {
+				Log fnd = CommonIO.simpleReadLog(dis);
+				
+				if (fnd._olddesc_ != null && Utility.isv6Description(fnd._olddesc_)) {
 					Logger.logf(Logger.INFO, "\tFile %s already v6 log!\n", f);
 					continue;
 				}

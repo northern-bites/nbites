@@ -359,7 +359,7 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 			Log streamLog = null;
 			
 			for (Log l : found) {
-				if (l.description.contains(streamField.getText())) {
+				if (l.description().contains(streamField.getText())) {
 					streamLog = l;
 					break;
 				}
