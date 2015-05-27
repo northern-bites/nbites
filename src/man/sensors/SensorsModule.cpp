@@ -370,9 +370,11 @@ void SensorsModule::updateInertialsMessage()
 
     inertialsMessage.get()->set_gyr_x(sensorValues_[GyrX]);
     inertialsMessage.get()->set_gyr_y(sensorValues_[GyrY]);
+    inertialsMessage.get()->set_gyr_z(sensorValues_[GyrZ]);
 
     inertialsMessage.get()->set_angle_x(sensorValues_[AngleX]);
     inertialsMessage.get()->set_angle_y(sensorValues_[AngleY]);
+    inertialsMessage.get()->set_angle_z(sensorValues_[AngleZ]);
 
     inertialsOutput_.setMessage(inertialsMessage);
 }

@@ -65,7 +65,6 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     // set updated vision to determine if resampling necessary
     updatedVision = visionSystem->update(particles, visionInput);
 
-
     float avgErr = -1;
     // Resample if vision update
     if(updatedVision)
