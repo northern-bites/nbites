@@ -200,8 +200,11 @@ public class Utility {
 	
 	/* creates tree for old out of _olddesc_ */
 	public static boolean v6Convert(Log old) {
-		if (!(old._olddesc_ != null && !isv6Description(old._olddesc_)))
+		if (old._olddesc_ != null && isv6Description(old._olddesc_)) {
+			old.setTree(SExpr.deserializeFrom(old._olddesc_));
 			return true;
+		}
+		if (old._olddesc_ == null) return false;
 		
 		assert(old._olddesc_ != null);
 		

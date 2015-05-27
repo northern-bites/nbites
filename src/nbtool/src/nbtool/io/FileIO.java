@@ -31,13 +31,24 @@ public class FileIO {
 	
 	//Should only be accessed from the EDT (since it's a GUI element, this 
 	//is logical on several levels.)
-	public static final JFileChooser chooser = initChooser();
-	private static JFileChooser initChooser() {
+	public static final JFileChooser fileChooser = initFileChooser();
+	private static JFileChooser initFileChooser() {
 		JFileChooser r = new JFileChooser();
 		r.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		r.setCurrentDirectory(new File(Utility.localizePath("~/")));
 		r.setMultiSelectionEnabled(false);
-		r.setFileHidingEnabled(false);
+		r.setFileHidingEnabled(true);
+		
+		return r;
+	}
+	
+	public static final JFileChooser dirChooser = initDirChooser();
+	private static JFileChooser initDirChooser() {
+		JFileChooser r = new JFileChooser();
+		r.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		r.setCurrentDirectory(new File(Utility.localizePath("~/")));
+		r.setMultiSelectionEnabled(false);
+		r.setFileHidingEnabled(true);
 		
 		return r;
 	}
@@ -128,7 +139,7 @@ public class FileIO {
 		
 		String r = CommonIO.readLogDescription(dis);
 		
-		dis.close();bis.close();fis.close();
+		dis.close();
 		return r;
 	}
 	
@@ -152,7 +163,9 @@ public class FileIO {
 				e.printStackTrace();
 				return null;
 			}
-			if (Utility.isv6Description(desc)) {
+			
+			assert(desc != null);
+			if (!Utility.isv6Description(desc)) {
 				logs[i] = new Log();
 				logs[i]._olddesc_ = desc;
 				assert(Utility.v6Convert(logs[i]));

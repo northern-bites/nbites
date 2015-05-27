@@ -12,6 +12,28 @@ namespace nblog {
         return sum;
     }
     
+    Log Log::simple(const std::string type, const std::string data) {
+        SExpr sc(std::vector<SExpr>{
+            SExpr("type", type)
+        });
+        
+        SExpr contents(std::vector<SExpr>{
+            SExpr("contents"),
+            sc
+        });
+        
+        SExpr top(std::vector<SExpr>{
+            SExpr("nblog"),
+            contents
+        });
+        
+        Log ret;
+        ret.setTree(top);
+        ret.setData(data);
+       
+        return ret;
+    }
+    
     Log::Log() :
     _written(false),
     _refs(0)

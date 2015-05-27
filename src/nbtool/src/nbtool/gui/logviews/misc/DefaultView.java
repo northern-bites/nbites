@@ -180,10 +180,10 @@ public class DefaultView extends ViewParent implements ActionListener {
 				descArea.setText(log.description());
 			}
 		} else if (e.getSource() == saveButton) {
-			int rVal = FileIO.chooser.showSaveDialog(this);
+			int rVal = FileIO.fileChooser.showSaveDialog(this);
 			
 			if (rVal == JFileChooser.APPROVE_OPTION) {
-				File f = FileIO.chooser.getSelectedFile();
+				File f = FileIO.fileChooser.getSelectedFile();
 				if (f.isDirectory()) {
 					Logger.log(Logger.INFO, "Cannot overwrite directory with log.");
 					return;

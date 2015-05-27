@@ -25,6 +25,8 @@ namespace nblog {
     class Log {
     public:
         
+        static Log simple(const std::string type, const std::string data);
+        
         //default constructor
         Log();
         

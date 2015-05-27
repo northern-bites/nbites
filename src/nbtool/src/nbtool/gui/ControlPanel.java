@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Set;
+import java.util.Vector;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
@@ -30,62 +31,62 @@ import nbtool.util.Prefs;
 import nbtool.util.Utility;
 
 public class ControlPanel extends JPanel implements Events.LogsFound, Events.LogSelected,
-	Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.RelevantRobotStats {
-	
-	private String[] setToArray(Set<String> set) {
-		return set.toArray(new String[0]);
+Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.RelevantRobotStats {
+
+	private Vector<String> setToArray(Set<String> set) {
+		return new Vector<String>(set);
 	}
-	
-	private String[] addToSet(Set<String> set, String a) {
+
+	private Vector<String> addToSet(Set<String> set, String a) {
 		set.add(a);
-		return  set.toArray(new String[0]);
+		return new Vector<String>(set);
 	}
-	
+
 	public ControlPanel() {
 		super();
 		initComponents();
-		
+
 		loadButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                loadButtonActionPerformed(evt);
-            }
-        });
-		
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				loadButtonActionPerformed(evt);
+			}
+		});
+
 		chooseButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chooseButtonActionPerformed(evt);
-            }
-        });
-		
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				chooseButtonActionPerformed(evt);
+			}
+		});
+
 		clearButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                clearButtonActionPerformed(evt);
-            }
-        });
-		
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				clearButtonActionPerformed(evt);
+			}
+		});
+
 		connectButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-               connectButtonActionPerformed(evt);
-            }
-        });
-		
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				connectButtonActionPerformed(evt);
+			}
+		});
+
 		controlTestButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-               testButtonActionPerformed(evt);
-            }
-        });
-		
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				testButtonActionPerformed(evt);
+			}
+		});
+
 		controlExitButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exitButtonActionPerformed(evt);
-            }
-        });
-		
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				exitButtonActionPerformed(evt);
+			}
+		});
+
 		this.controlStatus(null, false);
-		
+
 		dirBox.setModel(new DefaultComboBoxModel<String>( setToArray(Prefs.filepaths)));
 		addrBox.setModel(new DefaultComboBoxModel<String>( setToArray(Prefs.addresses)));
-		
+
 		Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
 		labelTable.put( new Integer( 0 ), new JLabel("0.0") );
 		labelTable.put( new Integer( 1 ), new JLabel("0.01") );
@@ -93,7 +94,7 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 		labelTable.put( new Integer( 3 ), new JLabel("0.2") );
 		labelTable.put( new Integer( 4 ), new JLabel("0.5") );
 		labelTable.put( new Integer( 5 ), new JLabel("1.0") );
-		
+
 		writeSlider.setSnapToTicks(true);
 		writeSlider.setMinimum(0);
 		writeSlider.setMaximum(5);
@@ -101,13 +102,13 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 		writeSlider.setPaintLabels(true);
 		writeSlider.setPaintTicks(true);
 		writeSlider.setValue(5);
-		
+
 		writeSlider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				if (writeSlider.getValueIsAdjusting())
 					return;
-				
+
 				int val = writeSlider.getValue();
 				switch(val) {
 				case 0: SessionMaster.saveMod = 0; break;
@@ -121,7 +122,7 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 				}
 			}
 		});
-		
+
 		keepSlider.setSnapToTicks(true);
 		keepSlider.setMinimum(0);
 		keepSlider.setMaximum(5);
@@ -129,13 +130,13 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 		keepSlider.setPaintLabels(true);
 		keepSlider.setPaintTicks(true);
 		keepSlider.setValue(5);
-		
+
 		keepSlider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				if (keepSlider.getValueIsAdjusting())
 					return;
-				
+
 				int val = keepSlider.getValue();
 				switch(val) {
 				case 0: SessionMaster.keepMod = 0; break;
@@ -149,9 +150,9 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 				}
 			}
 		});
-		
+
 		//...
-		
+
 		//Events.LogsFound, Events.LogSelected, Events.SessionSelected,
 		//Events.ToolStatus, Events.ControlStatus, Events.RelevantRobotStats
 		Center.listen(Events.LogsFound.class, this, true);
@@ -161,138 +162,133 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 		Center.listen(Events.ControlStatus.class, this, true);
 		Center.listen(Events.RelevantRobotStats.class, this, true);
 	}
-	
+
 	private void loadButtonActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        if (SessionMaster.get().isIdle()) {
-        	String dpath = (String) dirBox.getSelectedItem();
-        	
-        	if (dpath == null || dpath.trim().isEmpty()) {
-        		JOptionPane.showMessageDialog(this, String.format("empty path"));
-        		return;
-        	}
-        	
-        	String absolute = Utility.localizePath(dpath.trim()) + File.separator;
-        	
-        	if (FileIO.checkLogFolder(absolute)) {
-        		 SessionMaster.get().loadSession(absolute);
-        		 dirBox.setModel(new DefaultComboBoxModel<String>( addToSet(Prefs.filepaths, dpath)));
-        	} else {
-        		JOptionPane.showMessageDialog(this, String.format("bad path: {%s}", absolute));
-        	}
-        	
-        } else {
-        	JOptionPane.showMessageDialog(this, "cannot load logs while not idle");
-        }
-    }       
-	
-	private final JFileChooser dirChooser = initChooser();
-	private JFileChooser initChooser(){
-		JFileChooser r = new JFileChooser();
-		r.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		r.setCurrentDirectory(new File(Utility.localizePath("~/")));
-		r.setMultiSelectionEnabled(false);
-		r.setFileHidingEnabled(false);
-		
-		return r;
-	};
-	
+		if (SessionMaster.get().isIdle()) {
+			String dpath = (String) dirBox.getSelectedItem();
+
+			if (dpath == null || dpath.trim().isEmpty()) {
+				JOptionPane.showMessageDialog(this, String.format("empty path"));
+				return;
+			}
+
+			String absolute = Utility.localizePath(dpath.trim()) + File.separator;
+
+			if (FileIO.checkLogFolder(absolute)) {
+				SessionMaster.get().loadSession(absolute);
+				Vector<String> pathes = addToSet(Prefs.filepaths, dpath);
+				dirBox.setModel(new DefaultComboBoxModel<String>(pathes));
+				dirBox.setSelectedIndex(pathes.indexOf(dpath));
+			} else {
+				JOptionPane.showMessageDialog(this, String.format("bad path: {%s}", absolute));
+			}
+
+		} else {
+			JOptionPane.showMessageDialog(this, "cannot load logs while not idle");
+		}
+	}       
+
 	private void chooseButtonActionPerformed(java.awt.event.ActionEvent evt) {                                           
-       int ret = dirChooser.showOpenDialog(this);
-       if (ret == JFileChooser.APPROVE_OPTION) {
-    	   dirBox.setSelectedItem(dirChooser.getSelectedFile().getAbsolutePath());
-       }
-    }       
-	
+		int ret = FileIO.dirChooser.showOpenDialog(this);
+		if (ret == JFileChooser.APPROVE_OPTION) {
+			dirBox.setSelectedItem( FileIO.dirChooser.getSelectedFile().getAbsolutePath());
+		}
+	}       
+
 	private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        dirBox.setSelectedItem("");
-    }       
-	
+		dirBox.setSelectedItem("");
+	}       
+
 	private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        if (connectButton.getText().equals("connect")) {
-        	Logger.log(Logger.INFO, "ControlPanel: connect action.");
-        	
-        	String filepath = null;
-        	String address = ((String) addrBox.getSelectedItem()).trim();
-        	
-        	if (address == null || address.isEmpty()) {
-        		Logger.log(Logger.INFO, "ControlPanel: cannot use address: " + address);
-        		JOptionPane.showMessageDialog(this, String.format("bad address: %s", address));
-        		return;
-        	} else {
-        		addrBox.setModel(new DefaultComboBoxModel<String>( addToSet(Prefs.addresses, address)));
-        		Logger.log(Logger.INFO, "ControlPanel: using address " + address);
-        	}
-        	
-        	String dpath = (String) dirBox.getSelectedItem();
-        	if (dpath == null || dpath.trim().isEmpty()) {
-        		Logger.log(Logger.INFO, "ControlPanel: not using file writer.");
-        	} else {
-        		String absolute = Utility.localizePath(dpath.trim()) + File.separator;
-        		if (FileIO.checkLogFolder(absolute)) {
-        			dirBox.setModel(new DefaultComboBoxModel<String>( addToSet(Prefs.filepaths, dpath)));
-        			Logger.log(Logger.INFO, "ControlPanel: using directory " + absolute);
-        			filepath = absolute;
-        		} else {
-        			JOptionPane.showMessageDialog(this, String.format("cannot connect with bad path {%s}.  Fix path or clear it.", absolute));
-        			return;
-        		}
-        	}
-        	
-        	SessionMaster.get().streamSession(address, filepath);
-        	
-        } else {
-        	Logger.log(Logger.INFO, "ControlPanel: stop action.");
-        	if (!SessionMaster.get().isIdle()) {
-        		SessionMaster.get().stopWorkingSession();
-        	}
-        }
-    }       
-	
+		if (connectButton.getText().equals("connect")) {
+			Logger.log(Logger.INFO, "ControlPanel: connect action.");
+
+			String filepath = null;
+			String address = ((String) addrBox.getSelectedItem()).trim();
+
+			if (address == null || address.isEmpty()) {
+				Logger.log(Logger.INFO, "ControlPanel: cannot use address: " + address);
+				JOptionPane.showMessageDialog(this, String.format("bad address: %s", address));
+				return;
+			} else {
+				Vector<String> addrs =  addToSet(Prefs.addresses, address);
+				addrBox.setModel(new DefaultComboBoxModel<String>(addrs));
+				addrBox.setSelectedIndex(addrs.indexOf(address));
+				Logger.log(Logger.INFO, "ControlPanel: using address " + address);
+			}
+
+			String dpath = (String) dirBox.getSelectedItem();
+			if (dpath == null || dpath.trim().isEmpty()) {
+				Logger.log(Logger.INFO, "ControlPanel: not using file writer.");
+			} else {
+				String absolute = Utility.localizePath(dpath.trim()) + File.separator;
+				if (FileIO.checkLogFolder(absolute)) {
+					Vector<String> pathes = addToSet(Prefs.filepaths, dpath);
+					dirBox.setModel(new DefaultComboBoxModel<String>(pathes));
+					dirBox.setSelectedIndex(pathes.indexOf(dpath));
+					Logger.log(Logger.INFO, "ControlPanel: using directory " + absolute);
+					filepath = absolute;
+				} else {
+					JOptionPane.showMessageDialog(this, String.format("cannot connect with bad path {%s}.  Fix path or clear it.", absolute));
+					return;
+				}
+			}
+
+			SessionMaster.get().streamSession(address, filepath);
+
+		} else {
+			Logger.log(Logger.INFO, "ControlPanel: stop action.");
+			if (!SessionMaster.get().isIdle()) {
+				SessionMaster.get().stopWorkingSession();
+			}
+		}
+	}       
+
 	private void testButtonActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        ControlInstance inst = ControlIO.getByIndex(0);
-        if (inst == null)
-        	return;
-        
-        Logger.log(Logger.INFO, "ControlPane: sending test cmnd");
-        inst.tryAddCmnd(ControlIO.createCmndTest());
-    }       
-	
+		ControlInstance inst = ControlIO.getByIndex(0);
+		if (inst == null)
+			return;
+
+		Logger.log(Logger.INFO, "ControlPane: sending test cmnd");
+		inst.tryAddCmnd(ControlIO.createCmndTest());
+	}       
+
 	private void exitButtonActionPerformed(java.awt.event.ActionEvent evt) {                                           
 		ControlInstance inst = ControlIO.getByIndex(0);
-        if (inst == null)
-        	return;
-        
-        Logger.log(Logger.INFO, "ControlPane: sending exit cmnd");
-        inst.tryAddCmnd(ControlIO.createCmndExit());
-    }        
-	
+		if (inst == null)
+			return;
+
+		Logger.log(Logger.INFO, "ControlPane: sending exit cmnd");
+		inst.tryAddCmnd(ControlIO.createCmndExit());
+	}        
+
 	/*INTERFACES*/
-	
+
 	private FlagPanel[] flags = null;
-	
+
 	private boolean controlling = false;
 	@Override
 	public void relRobotStats(Object source, RobotStats bs) {
 		if (!controlling)
 			return;
-		
+
 		flags = new FlagPanel[bs.flags.size() - 2];
 		for (int i = 0; i < flags.length; ++i) {
 			Flag f = bs.flags.get(i + 2);	//Skip two for the connected flags.
-			
+
 			flags[i] = new FlagPanel();
 			flags[i].setInfo(f.name, f.index);
 			flags[i].setKnown(f.value);
 		}
-		
+
 		JPanel container = new JPanel();
 		container.setLayout(new GridLayout(flags.length, 1));
 		for (FlagPanel fp : flags) {
 			container.add(fp);
 		}
-		
+
 		container.setMinimumSize(container.getPreferredSize());
-		
+
 		flagScrollPanel.setViewportView(container);
 	}
 
@@ -306,7 +302,7 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 			controlling = false;
 			controlTestButton.setEnabled(false);
 			controlExitButton.setEnabled(false);
-			
+
 			flagScrollPanel.setViewportView(new JLabel("no control instance connected"));
 		}
 	}
@@ -336,7 +332,7 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 			break;
 		default:
 			break;
-		
+
 		}
 	}
 
@@ -357,9 +353,10 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 	public void logsFound(Object source, Log... found) {
 		if (streamCB.isSelected()) {
 			Log streamLog = null;
-			
+
 			for (Log l : found) {
-				if (l.description().contains(streamField.getText())) {
+				if (l.description().contains(streamField.getText()) &&
+						l.source == Log.SOURCE.NETWORK) {
 					streamLog = l;
 					break;
 				}
@@ -368,228 +365,228 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 				Events.GLogSelected.generate(this, streamLog, new ArrayList<Log>());
 		}
 	}
-	
+
 	/*GENERATED CODE*/
-	
-    private void initComponents() {
 
-        //jScrollPane1 = new javax.swing.JScrollPane();
-        //jTextArea1 = new javax.swing.JTextArea();
-        jLabel3 = new javax.swing.JLabel();
-        dirpanel = new javax.swing.JPanel();
-        dirBox = new javax.swing.JComboBox<String>();
-        loadButton = new javax.swing.JButton();
-        chooseButton = new javax.swing.JButton();
-        clearButton = new javax.swing.JButton();
-        robotPanel = new javax.swing.JPanel();
-        addrBox = new javax.swing.JComboBox<String>();
-        connectButton = new javax.swing.JButton();
-        streamCB = new javax.swing.JCheckBox();
-        streamField = new javax.swing.JTextField();
-        writeSlider = new javax.swing.JSlider();
-        keepSlider = new javax.swing.JSlider();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        controlPanel = new javax.swing.JPanel();
-        controlTestButton = new javax.swing.JButton();
-        controlExitButton = new javax.swing.JButton();
-        flagScrollPanel = new javax.swing.JScrollPane();
+	private void initComponents() {
 
-        //jTextArea1.setColumns(20);
-        //jTextArea1.setRows(5);
-        //jScrollPane1.setViewportView(jTextArea1);
+		//jScrollPane1 = new javax.swing.JScrollPane();
+		//jTextArea1 = new javax.swing.JTextArea();
+		jLabel3 = new javax.swing.JLabel();
+		dirpanel = new javax.swing.JPanel();
+		dirBox = new javax.swing.JComboBox<String>();
+		loadButton = new javax.swing.JButton();
+		chooseButton = new javax.swing.JButton();
+		clearButton = new javax.swing.JButton();
+		robotPanel = new javax.swing.JPanel();
+		addrBox = new javax.swing.JComboBox<String>();
+		connectButton = new javax.swing.JButton();
+		streamCB = new javax.swing.JCheckBox();
+		streamField = new javax.swing.JTextField();
+		writeSlider = new javax.swing.JSlider();
+		keepSlider = new javax.swing.JSlider();
+		jLabel1 = new javax.swing.JLabel();
+		jLabel2 = new javax.swing.JLabel();
+		controlPanel = new javax.swing.JPanel();
+		controlTestButton = new javax.swing.JButton();
+		controlExitButton = new javax.swing.JButton();
+		flagScrollPanel = new javax.swing.JScrollPane();
 
-        jLabel3.setText("jLabel3");
+		//jTextArea1.setColumns(20);
+		//jTextArea1.setRows(5);
+		//jScrollPane1.setViewportView(jTextArea1);
 
-        dirpanel.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED), "directory"));
+		jLabel3.setText("jLabel3");
 
-        dirBox.setEditable(true);
-        //dirBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+		dirpanel.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED), "directory"));
 
-        loadButton.setText("load");
+		dirBox.setEditable(true);
+		//dirBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        chooseButton.setText("choose");
+		loadButton.setText("load");
 
-        clearButton.setText("clear");
+		chooseButton.setText("choose");
 
-        javax.swing.GroupLayout dirpanelLayout = new javax.swing.GroupLayout(dirpanel);
-        dirpanel.setLayout(dirpanelLayout);
-        dirpanelLayout.setHorizontalGroup(
-            dirpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(dirpanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(dirpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(dirBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(dirpanelLayout.createSequentialGroup()
-                        .addComponent(loadButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(chooseButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(clearButton)))
-                .addContainerGap())
-        );
-        dirpanelLayout.setVerticalGroup(
-            dirpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(dirpanelLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(dirBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(dirpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(loadButton)
-                    .addComponent(chooseButton)
-                    .addComponent(clearButton)))
-        );
+		clearButton.setText("clear");
 
-        robotPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED), "robot"));
+		javax.swing.GroupLayout dirpanelLayout = new javax.swing.GroupLayout(dirpanel);
+		dirpanel.setLayout(dirpanelLayout);
+		dirpanelLayout.setHorizontalGroup(
+				dirpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(dirpanelLayout.createSequentialGroup()
+						.addContainerGap()
+						.addGroup(dirpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+								.addComponent(dirBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addGroup(dirpanelLayout.createSequentialGroup()
+										.addComponent(loadButton)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+										.addComponent(chooseButton)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+										.addComponent(clearButton)))
+										.addContainerGap())
+				);
+		dirpanelLayout.setVerticalGroup(
+				dirpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(dirpanelLayout.createSequentialGroup()
+						.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(dirBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+						.addGroup(dirpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+								.addComponent(loadButton)
+								.addComponent(chooseButton)
+								.addComponent(clearButton)))
+				);
 
-        addrBox.setEditable(true);
-        //addrBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+		robotPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED), "robot"));
 
-        connectButton.setText("connect");
+		addrBox.setEditable(true);
+		//addrBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        streamCB.setText("stream");
+		connectButton.setText("connect");
 
-        streamField.setText("(from camera_TOP)");
+		streamCB.setText("stream");
 
-        writeSlider.setMaximum(5);
-        writeSlider.setPaintLabels(true);
-        writeSlider.setPaintTicks(true);
-        writeSlider.setSnapToTicks(true);
+		streamField.setText("(from camera_TOP)");
 
-        keepSlider.setMaximum(5);
-        keepSlider.setPaintLabels(true);
-        keepSlider.setPaintTicks(true);
-        keepSlider.setSnapToTicks(true);
+		writeSlider.setMaximum(5);
+		writeSlider.setPaintLabels(true);
+		writeSlider.setPaintTicks(true);
+		writeSlider.setSnapToTicks(true);
 
-        jLabel1.setText("write fraction");
+		keepSlider.setMaximum(5);
+		keepSlider.setPaintLabels(true);
+		keepSlider.setPaintTicks(true);
+		keepSlider.setSnapToTicks(true);
 
-        jLabel2.setText("keep fraction");
+		jLabel1.setText("write fraction");
 
-        javax.swing.GroupLayout robotPanelLayout = new javax.swing.GroupLayout(robotPanel);
-        robotPanel.setLayout(robotPanelLayout);
-        robotPanelLayout.setHorizontalGroup(
-            robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(robotPanelLayout.createSequentialGroup()
-                .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(robotPanelLayout.createSequentialGroup()
-                        .addComponent(connectButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(addrBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(robotPanelLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(streamCB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(streamField)
-                            .addGroup(robotPanelLayout.createSequentialGroup()
-                                .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(keepSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(writeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(0, 0, Short.MAX_VALUE)))))
-                .addContainerGap())
-        );
-        robotPanelLayout.setVerticalGroup(
-            robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(robotPanelLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(addrBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(connectButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(streamCB)
-                    .addComponent(streamField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(writeSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(keepSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-        );
+		jLabel2.setText("keep fraction");
 
-        controlPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED), "control"));
+		javax.swing.GroupLayout robotPanelLayout = new javax.swing.GroupLayout(robotPanel);
+		robotPanel.setLayout(robotPanelLayout);
+		robotPanelLayout.setHorizontalGroup(
+				robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(robotPanelLayout.createSequentialGroup()
+						.addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+								.addGroup(robotPanelLayout.createSequentialGroup()
+										.addComponent(connectButton)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(addrBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+										.addGroup(robotPanelLayout.createSequentialGroup()
+												.addContainerGap()
+												.addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+														.addComponent(streamCB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+														.addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+														.addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+														.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+														.addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+																.addComponent(streamField)
+																.addGroup(robotPanelLayout.createSequentialGroup()
+																		.addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+																				.addComponent(keepSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+																				.addComponent(writeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+																				.addGap(0, 0, Short.MAX_VALUE)))))
+																				.addContainerGap())
+				);
+		robotPanelLayout.setVerticalGroup(
+				robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(robotPanelLayout.createSequentialGroup()
+						.addGap(0, 0, Short.MAX_VALUE)
+						.addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+								.addComponent(addrBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+								.addComponent(connectButton))
+								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+								.addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+										.addComponent(streamCB)
+										.addComponent(streamField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+												.addComponent(writeSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+												.addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+												.addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+														.addComponent(keepSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+														.addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+				);
 
-        controlTestButton.setText("test");
+		controlPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED), "control"));
 
-        controlExitButton.setText("exit");
+		controlTestButton.setText("test");
 
-        javax.swing.GroupLayout controlPanelLayout = new javax.swing.GroupLayout(controlPanel);
-        controlPanel.setLayout(controlPanelLayout);
-        controlPanelLayout.setHorizontalGroup(
-            controlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(controlPanelLayout.createSequentialGroup()
-                .addComponent(controlTestButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(controlExitButton)
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(controlPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(flagScrollPanel)
-                .addContainerGap())
-        );
-        controlPanelLayout.setVerticalGroup(
-            controlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(controlPanelLayout.createSequentialGroup()
-                .addGroup(controlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(controlTestButton)
-                    .addComponent(controlExitButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(flagScrollPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+		controlExitButton.setText("exit");
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(controlPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(dirpanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(robotPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(dirpanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(robotPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(controlPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-    }// </editor-fold>                                                          
+		javax.swing.GroupLayout controlPanelLayout = new javax.swing.GroupLayout(controlPanel);
+		controlPanel.setLayout(controlPanelLayout);
+		controlPanelLayout.setHorizontalGroup(
+				controlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(controlPanelLayout.createSequentialGroup()
+						.addComponent(controlTestButton)
+						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+						.addComponent(controlExitButton)
+						.addGap(0, 0, Short.MAX_VALUE))
+						.addGroup(controlPanelLayout.createSequentialGroup()
+								.addContainerGap()
+								.addComponent(flagScrollPanel)
+								.addContainerGap())
+				);
+		controlPanelLayout.setVerticalGroup(
+				controlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(controlPanelLayout.createSequentialGroup()
+						.addGroup(controlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+								.addComponent(controlTestButton)
+								.addComponent(controlExitButton))
+								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+								.addComponent(flagScrollPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+								.addContainerGap())
+				);
+
+		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+		this.setLayout(layout);
+		layout.setHorizontalGroup(
+				layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+						.addContainerGap()
+						.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+								.addComponent(controlPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(dirpanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(robotPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+				);
+		layout.setVerticalGroup(
+				layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(layout.createSequentialGroup()
+						.addContainerGap()
+						.addComponent(dirpanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+						.addComponent(robotPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+						.addComponent(controlPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addContainerGap())
+				);
+	}// </editor-fold>                                                          
 
 
-    // Variables declaration - do not modify                     
-    private javax.swing.JComboBox<String> addrBox;
-    private javax.swing.JButton chooseButton;
-    private javax.swing.JButton clearButton;
-    private javax.swing.JButton connectButton;
-    private javax.swing.JButton controlExitButton;
-    private javax.swing.JPanel controlPanel;
-    private javax.swing.JButton controlTestButton;
-    private javax.swing.JComboBox<String> dirBox;
-    private javax.swing.JPanel dirpanel;
-    private javax.swing.JScrollPane flagScrollPanel;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    //private javax.swing.JScrollPane jScrollPane1;
-    //private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JSlider keepSlider;
-    private javax.swing.JButton loadButton;
-    private javax.swing.JPanel robotPanel;
-    private javax.swing.JCheckBox streamCB;
-    private javax.swing.JTextField streamField;
-    private javax.swing.JSlider writeSlider;
-    // End of variables declaration                   
+	// Variables declaration - do not modify                     
+	private javax.swing.JComboBox<String> addrBox;
+	private javax.swing.JButton chooseButton;
+	private javax.swing.JButton clearButton;
+	private javax.swing.JButton connectButton;
+	private javax.swing.JButton controlExitButton;
+	private javax.swing.JPanel controlPanel;
+	private javax.swing.JButton controlTestButton;
+	private javax.swing.JComboBox<String> dirBox;
+	private javax.swing.JPanel dirpanel;
+	private javax.swing.JScrollPane flagScrollPanel;
+	private javax.swing.JLabel jLabel1;
+	private javax.swing.JLabel jLabel2;
+	private javax.swing.JLabel jLabel3;
+	//private javax.swing.JScrollPane jScrollPane1;
+	//private javax.swing.JTextArea jTextArea1;
+	private javax.swing.JSlider keepSlider;
+	private javax.swing.JButton loadButton;
+	private javax.swing.JPanel robotPanel;
+	private javax.swing.JCheckBox streamCB;
+	private javax.swing.JTextField streamField;
+	private javax.swing.JSlider writeSlider;
+	// End of variables declaration                   
 }
 

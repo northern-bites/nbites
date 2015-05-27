@@ -33,7 +33,7 @@ public class Log implements Serializable {
 	
 	//Core opaque log fields:
 	public byte[] bytes;
-	private SExpr tree = null;
+	private SExpr tree;
 	
 	public String _olddesc_;
 	

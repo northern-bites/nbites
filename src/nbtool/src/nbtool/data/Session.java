@@ -52,6 +52,7 @@ public class Session {
 		
 		boolean newBS = false;
 		for (Log log : l) {
+			//System.out.println(log.description());
 			if (log.primaryType().equals("STATS")) {
 				this.most_relevant = new RobotStats(log);
 				newBS = true;

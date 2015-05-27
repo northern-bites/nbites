@@ -61,7 +61,7 @@ public class NBLOG_pack {
 				
 				Log found = CommonIO.simpleReadLog(dis);
 				
-				if (Utility.isv6Description(found._olddesc_)) {
+				if (!Utility.isv6Description(found._olddesc_)) {
 					found.setTree(SExpr.deserializeFrom(found._olddesc_));
 					
 					if (found.primaryType().equals("YUVImage")) {
@@ -79,6 +79,11 @@ public class NBLOG_pack {
 			}
 		}
 		
+		
+		packTo(null, accepted);
+	}
+	
+	public static void packTo(String path, LinkedList<Log> accepted) throws IOException {
 		Logger.logf(Logger.INFO, "Found %d acceptable logs for concatenation.\n", accepted.size());
 		//... concatenate...
 		
@@ -103,7 +108,7 @@ public class NBLOG_pack {
 		}
 		
 		{
-			String topName = String.format("top.log"); 
+			String topName = path == null ? "top.log" : String.format("%s/top.log", path); 
 			File logf = new File(topName);
 			if (!logf.exists())
 				logf.createNewFile();
@@ -143,7 +148,7 @@ public class NBLOG_pack {
 		}
 		
 		{
-			String botName = String.format("bottom.log"); 
+			String botName = path == null ? "bottom.log": String.format("%s/bottom.log", path); 
 			File logf = new File(botName);
 			if (!logf.exists())
 				logf.createNewFile();
