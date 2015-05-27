@@ -51,7 +51,7 @@ void ImageConverterModule::run_()
        IMPORTANT check out acquire_image_fast for more information on this image */
 
     /* ^^ tempBuffer now holds one 320*240 16-bit image and three 320*240 8-bit images */
-    HeapPixelBuffer *tempBuffer = new HeapPixelBuffer(320*240*2*1 + 320*240*1*3 + 320*241*1);
+    HeapPixelBuffer *tempBuffer = new HeapPixelBuffer(320*240*2*1 + 320*240*1*3 + 320*240*1);
     PackedImage16 tempOutput16(tempBuffer, 320, 1*240, 320);
     PackedImage8 tempOutput8(tempBuffer, 320, (1*2 + 3)*240, 320);
 

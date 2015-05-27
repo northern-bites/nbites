@@ -26,7 +26,7 @@ int ImageAcquisition::acquire_image(const unsigned char* source,
                                     unsigned char* colorTable)
 {
 
-#if 1
+#if 0
     _acquire_image(source, width, height, pitch, colors, dest, colorTable);
 #else
  // Ignore low three bits of width

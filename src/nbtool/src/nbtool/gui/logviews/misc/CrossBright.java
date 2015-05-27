@@ -27,12 +27,14 @@ public class CrossBright extends ViewParent implements IOFirstResponder {
 		CrossInstance inst = CrossIO.instanceByIndex(0);
 		if (inst == null)
 			return;
+
 		CrossFunc func = inst.functionWithName("CrossBright");
 		if (func == null)
 			return;
 		
 		CrossCall call = new CrossCall(this, func, this.log);
 		inst.tryAddCall(call);
+
 	}
 	
 	public CrossBright() {
