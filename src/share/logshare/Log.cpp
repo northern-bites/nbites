@@ -12,6 +12,13 @@ namespace nblog {
         return sum;
     }
     
+    Log::Log() :
+    _written(false),
+    _refs(0)
+    {
+        
+    }
+    
     Log::Log(const std::string& log_class,
              const std::string& where_made,
              time_t when_made,

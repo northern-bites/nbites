@@ -25,6 +25,9 @@ namespace nblog {
     class Log {
     public:
         
+        //default constructor
+        Log();
+        
         //Generic log constructor with standard values.
         Log(const std::string& log_class,
             const std::string& where_made,
