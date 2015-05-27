@@ -25,7 +25,7 @@ import nbtool.util.Utility;
 public class CommonIO {
 
 	public static void writeLog(DataOutputStream dos, Log l) throws IOException {
-		byte[] cbytes = l.description.getBytes(StandardCharsets.UTF_8);
+		byte[] cbytes = l.description().getBytes(StandardCharsets.UTF_8);
 		byte[] dbytes = l.bytes;
 
 		//Ensure string is null-terminated.
@@ -52,6 +52,19 @@ public class CommonIO {
 		dis.readFully(dbytes);
 
 		return new Log(desc, dbytes);
+	}
+	
+	public static Log simpleReadLog(DataInputStream dis) throws IOException {
+		String desc = readLogDescription(dis);
+
+		int len = dis.readInt();
+		byte[] dbytes = new byte[len];
+		dis.readFully(dbytes);
+
+		Log ret = new Log();
+		ret.bytes = dbytes;
+		ret._olddesc_ = desc;
+		return ret;
 	}
 
 	public static String readLogDescription(DataInputStream dis) throws IOException {

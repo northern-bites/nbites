@@ -148,6 +148,8 @@ public class ControlIO {
 						return;
 					this.state = IOState.RUNNING;
 				}
+				
+				Events.GControlStatus.generate(this, true);
 
 				//control...
 				while (state() == IOState.RUNNING) {
@@ -157,7 +159,7 @@ public class ControlIO {
 					}
 					
 					if (l != null) {
-						Logger.log(Logger.INFO, name() + ": sending command: " + l.description);
+						Logger.log(Logger.INFO, name() + ": sending command: " + l.description());
 						out.writeInt(1);
 						out.flush();
 						
@@ -169,7 +171,7 @@ public class ControlIO {
 						
 						int ret = in.readInt();
 						GIOFirstResponder.generateReceived(this, ifr, ret, new Log[0]);
-						Logger.logf(Logger.INFO, "%s: [%s] got ret [%d]\n", name(), l.description, ret);
+						Logger.logf(Logger.INFO, "%s: [%s] got ret [%d]\n", name(), l.description(), ret);
 					} else {
 						out.writeInt(0);
 						out.flush();

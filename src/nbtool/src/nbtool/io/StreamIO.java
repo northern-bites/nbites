@@ -146,6 +146,8 @@ public class StreamIO {
 						return;
 					this.state = IOState.RUNNING;
 				}
+				
+				Events.GStreamIOStatus.generate(this, true);
 
 				//Stream
 				int seq_num = 1;
@@ -160,7 +162,7 @@ public class StreamIO {
 						Log nl = CommonIO.readLog(in);
 
 						nl.tree().append(SExpr.newKeyValue("from_address", this.host));
-						Logger.log(Logger.INFO, this.name() + ": thread got packet of data size: " + nl.bytes.length + " desc: " + nl.description);
+						Logger.log(Logger.INFO, this.name() + ": thread got packet of data size: " + nl.bytes.length + " desc: " + nl.description());
 
 						nl.source = SOURCE.NETWORK;
 

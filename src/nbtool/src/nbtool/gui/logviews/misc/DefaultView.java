@@ -138,7 +138,7 @@ public class DefaultView extends ViewParent implements ActionListener {
 		id.setText("id: " + log.unique_id);
 		source.setText("src: " + log.source);
 		dataSize.setText("data b: " + log.bytes.length);
-		descSize.setText("desc c: " + log.description.length());
+		descSize.setText("desc c: " + log.description().length());
 	}
 
 	// Variables declaration - do not modify                     
@@ -170,21 +170,20 @@ public class DefaultView extends ViewParent implements ActionListener {
 				SExpr s = SExpr.deserializeFrom(newdesc);
 				if (s == null || s.count() < 1) {
 					Logger.log(Logger.INFO, "Cannot use new description: " + newdesc);
-					descArea.setText(log.description);
+					descArea.setText(log.description());
 				} else {
-					log.description = newdesc;
 					log.setTree(s);
 				}
 				
 			} catch(Exception ex) {
 				Logger.log(Logger.INFO, "Cannot use new description: " + newdesc);
-				descArea.setText(log.description);
+				descArea.setText(log.description());
 			}
 		} else if (e.getSource() == saveButton) {
-			int rVal = FileIO.chooser.showSaveDialog(this);
+			int rVal = FileIO.fileChooser.showSaveDialog(this);
 			
 			if (rVal == JFileChooser.APPROVE_OPTION) {
-				File f = FileIO.chooser.getSelectedFile();
+				File f = FileIO.fileChooser.getSelectedFile();
 				if (f.isDirectory()) {
 					Logger.log(Logger.INFO, "Cannot overwrite directory with log.");
 					return;

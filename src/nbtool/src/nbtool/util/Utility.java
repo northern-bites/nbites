@@ -197,18 +197,22 @@ public class Utility {
 	}
 	
 	
-	
-	public static boolean is_v6Log(Log tocheck) {
-		return (tocheck.description.trim().startsWith("(nblog"));
+	public static boolean isv6Description(String desc) {
+		return (desc != null && desc.trim().startsWith("(nblog"));
 	}
 	
-	/* Modifies the description field of old */
+	/* creates tree for old out of _olddesc_ */
 	public static boolean v6Convert(Log old) {
-		if (is_v6Log(old))
-			return true;	//nothing to do
+		if (old._olddesc_ != null && isv6Description(old._olddesc_)) {
+			old.setTree(SExpr.deserializeFrom(old._olddesc_));
+			return true;
+		}
+		if (old._olddesc_ == null) return false;
+		
+		assert(old._olddesc_ != null);
 		
 		HashMap<String, String> map = new HashMap<String, String>();
-		String[] attrs = old.description.trim().split(" ");
+		String[] attrs = old._olddesc_.trim().split(" ");
 		for (String a : attrs) {
 			if (a.trim().isEmpty()) continue;
 			
@@ -269,7 +273,7 @@ public class Utility {
 		
 		top_level.append(clist);
 		
-		old.description = top_level.serialize();
+		old.setTree(top_level);
 		return true;
 	}
 	

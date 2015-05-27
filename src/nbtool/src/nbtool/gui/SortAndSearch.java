@@ -212,7 +212,7 @@ public class SortAndSearch extends JPanel implements ActionListener {
 		if (mustContain.isEmpty())
 			s.logs_DO.addAll(s.logs_ALL);
 		else for (Log l : s.logs_ALL)
-				if (l.description.contains(mustContain)) s.logs_DO.add(l);
+				if (l.description().contains(mustContain)) s.logs_DO.add(l);
 		
 		if (cmp != null)
 			Collections.sort(s.logs_DO, cmp);
