@@ -29,7 +29,6 @@ public:
     func(f),
     args(a)
     { }
-    
 };
 
 //defined in pkoch_defs.cpp
