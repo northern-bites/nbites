@@ -165,7 +165,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, Events.Log
 				new int[]{SessionMaster.get().sessions.indexOf(relevant)},
 				new Object[]{relevant});
 		for (TreeModelListener l : listeners) {
-			l.treeNodesInserted(tme);
+			l.treeStructureChanged(tme);
 		}
 	}
 
