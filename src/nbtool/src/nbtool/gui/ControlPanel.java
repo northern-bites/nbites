@@ -1,343 +1,595 @@
 package nbtool.gui;
 
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.nio.file.FileSystem;
-import java.util.Map.Entry;
+import java.awt.GridLayout;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
-import nbtool.data.BotStats;
 import nbtool.data.Log;
+import nbtool.data.RobotStats;
+import nbtool.data.RobotStats.Flag;
+import nbtool.data.Session;
 import nbtool.data.SessionMaster;
-import nbtool.io.CommandIO;
-import nbtool.util.N;
-import nbtool.util.N.NListener;
-import nbtool.util.NBConstants;
-import nbtool.util.N.EVENT;
-import nbtool.util.NBConstants.FlagPair;
-import nbtool.util.NBConstants.MODE;
+import nbtool.io.ControlIO;
+import nbtool.io.ControlIO.ControlInstance;
+import nbtool.io.FileIO;
+import nbtool.util.Center;
+import nbtool.util.Events;
+import nbtool.util.Logger;
 import nbtool.util.NBConstants.STATUS;
-import nbtool.util.P;
-import nbtool.util.U;
+import nbtool.util.Prefs;
+import nbtool.util.Utility;
 
-public class ControlPanel extends JPanel implements ActionListener, NListener {
-	private static final long serialVersionUID = 1L;
-
+public class ControlPanel extends JPanel implements Events.LogsFound, Events.LogSelected,
+	Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.RelevantRobotStats {
+	
+	private String[] setToArray(Set<String> set) {
+		return set.toArray(new String[0]);
+	}
+	
+	private String[] addToSet(Set<String> set, String a) {
+		set.add(a);
+		return  set.toArray(new String[0]);
+	}
+	
 	public ControlPanel() {
 		super();
-		setLayout(null);
-		addComponentListener(new ComponentAdapter() {
-			public void componentResized(ComponentEvent e) {
-				useSize(e.getComponent().getSize());
-			}
-		});
-		canvas = new JPanel();
-		canvas.setLayout(null);
+		initComponents();
 		
-		go = new JButton("start");
-		go.addActionListener(this);
-		canvas.add(go);
+		loadButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadButtonActionPerformed(evt);
+            }
+        });
 		
-		test = new JButton("test");
-		test.addActionListener(this);
-		test.setEnabled(false);
-		canvas.add(test);
+		chooseButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chooseButtonActionPerformed(evt);
+            }
+        });
 		
-		modes = new JComboBox<String>(NBConstants.mode_strings);
-		modes.setSelectedIndex(0);
-		modes.addActionListener(this);
-		canvas.add(modes);
+		clearButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearButtonActionPerformed(evt);
+            }
+        });
 		
-		addr = new JLabel(" address:");
-		path = new JLabel(" path:");
-		stream = new JLabel(" stream");
-		cnc = new JLabel("CNC:");
-		cnc.setFont(cnc.getFont().deriveFont(Font.BOLD));
+		connectButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+               connectButtonActionPerformed(evt);
+            }
+        });
 		
-		faddr = new JComboBox<String>(P.getAddrs());
-		faddr.setToolTipText("robot address");
-		faddr.setEditable(true);
+		controlTestButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+               testButtonActionPerformed(evt);
+            }
+        });
 		
-		fpath = new JComboBox<String>(P.getPaths());
-		fpath.setToolTipText("directory path");
-		fpath.setEditable(true);
+		controlExitButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exitButtonActionPerformed(evt);
+            }
+        });
 		
-		canvas.add(addr);
-		canvas.add(path);
-		canvas.add(stream);
-		canvas.add(cnc);
-		canvas.add(faddr);
-		canvas.add(fpath);
+		this.controlStatus(null, false);
 		
-		fstream = new JTextField(15);
-		canvas.add(fstream);
-		bstream = new JCheckBox("objects w/ desc:");
-		canvas.add(bstream);
+		dirBox.setModel(new DefaultComboBoxModel<String>( setToArray(Prefs.filepaths)));
+		addrBox.setModel(new DefaultComboBoxModel<String>( setToArray(Prefs.addresses)));
 		
-		flags = new FlagPanel[NBConstants.flags.size()];
-		int i = 0;
-		for (FlagPair f : NBConstants.flags) {
-			FlagPanel fp = new FlagPanel(f.name, f.index);
-			flags[i++] = fp;
-			canvas.add(fp);
-		}
+		Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
+		labelTable.put( new Integer( 0 ), new JLabel("0.0") );
+		labelTable.put( new Integer( 1 ), new JLabel("0.01") );
+		labelTable.put( new Integer( 2 ), new JLabel("0.1") );
+		labelTable.put( new Integer( 3 ), new JLabel("0.2") );
+		labelTable.put( new Integer( 4 ), new JLabel("0.5") );
+		labelTable.put( new Integer( 5 ), new JLabel("1.0") );
 		
-		sp = new JScrollPane();
-		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		sp.setViewportView(canvas);
+		writeSlider.setSnapToTicks(true);
+		writeSlider.setMinimum(0);
+		writeSlider.setMaximum(5);
+		writeSlider.setLabelTable( labelTable );
+		writeSlider.setPaintLabels(true);
+		writeSlider.setPaintTicks(true);
+		writeSlider.setValue(5);
 		
-		modes.setSelectedIndex(P.getLastMode());
-		for (FlagPanel fp : flags)
-			fp.setUnknown();
-		
-		add(sp);
-		
-		N.listen(EVENT.LOG_FOUND, this);
-		N.listen(EVENT.LOG_SELECTION, this);
-		N.listen(EVENT.SES_SELECTION, this);
-		N.listen(EVENT.STATUS, this);
-		
-		N.listen(EVENT.CNC_CONNECTION, this);
-		N.listen(EVENT.REL_BOTSTAT, this);
-	}
-	
-	private void useSize(Dimension s) {
-		sp.setBounds(0, 0, s.width, s.height);
-		
-		//update component sizes...
-		Dimension d1, d2, d3;
-		int y = 0;
-		int max_x = 260;
-		
-		d1 = go.getPreferredSize();
-		go.setBounds(0, y, d1.width, d1.height);
-		d2 = modes.getPreferredSize();
-		modes.setBounds(d1.width + 3, y, d2.width, d2.height);
-		y += (d1.height > d2.height ? d1.height : d2.height) + 3;
-		
-		
-		d2 = faddr.getPreferredSize();
-		addr.setBounds(0, y, d1.width, d1.height);
-		faddr.setBounds(d1.width + 3, y, s.width - d1.width - 10, d2.height);
-		y += (d1.height > d2.height ? d1.height : d2.height) + 3;
-		
-		d2 = fpath.getPreferredSize();
-		path.setBounds(0, y, d1.width, d1.height);
-		fpath.setBounds(d1.width + 3, y, s.width - d1.width - 10, d2.height);
-		y += (d1.height > d2.height ? d1.height : d2.height) + 5;
-		
-		
-		d2 = stream.getPreferredSize();
-		stream.setBounds(0, y + 3, d2.width, d2.height);
-		d3 = bstream.getPreferredSize();
-		bstream.setBounds(d2.width, y, d3.width, d3.height);
-		y += d3.height;
-		d3 = fstream.getPreferredSize();
-		fstream.setBounds(d2.width, y, d3.width, d3.height);
-		y += d3.height + 5;
-		
-		cnc.setBounds(0, y, d1.width, d1.height);
-		d2 = test.getPreferredSize();
-		test.setBounds(d1.width, y, d2.width, d2.height);
-		y += d2.height;
-		
-		for (int i = 0; i < flags.length; ++i) {
-			d1 = flags[i].getPreferredSize();
-			flags[i].setBounds(0, y, d1.width, d1.height);
-			y += d1.height;
-		}
-		
-		canvas.setPreferredSize(new Dimension(max_x, y));
-	}
-	
-	private JScrollPane sp;
-	private JPanel canvas;
-	
-	private JButton go, test;
-	private JComboBox<String> modes, faddr, fpath;
-	private JLabel addr, path, stream, cnc;
-	
-	private JTextField fstream;
-	private JCheckBox bstream;
-	
-	private FlagPanel[] flags;
-
-	public void model_returnKeypress() {
-		ActionEvent e = new ActionEvent(go, ActionEvent.ACTION_PERFORMED, "start/stop from keyPress");
-		this.actionPerformed(e);
-	}
-	
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == go) {
-			
-			if (SessionMaster.INST.isIdle()) {
-				tryStart();
-			} else {
-				SessionMaster.INST.stopSession();
-			}
-			
-		} else if (e.getSource() == test) {
-			boolean success = CommandIO.tryAddTest();
-			U.w("ControlPanel: CommandIO.tryAddTest() returned " + success);
-		} else if (e.getSource() == modes) {
-			int si = modes.getSelectedIndex();
-			if (si < 0) return;
-			
-			useMode(NBConstants.MODE.values()[si]);
-		} else {
-			
-		}
-	}
-	
-	public void notified(EVENT e, Object src, Object... args) {
-		switch (e) {
-		case REL_BOTSTAT:
-			BotStats bs= (BotStats) args[0];
-			if (connected) {
-				for (int i = 0; i < flags.length; ++i) {
-					boolean val = bs.flags.bFlags[i + 2]; //2 for connection flags
-					
-					flags[i].setKnown(val);
+		writeSlider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (writeSlider.getValueIsAdjusting())
+					return;
+				
+				int val = writeSlider.getValue();
+				switch(val) {
+				case 0: SessionMaster.saveMod = 0; break;
+				case 1: SessionMaster.saveMod = 100; break;
+				case 2: SessionMaster.saveMod = 10; break;
+				case 3: SessionMaster.saveMod = 5; break;
+				case 4: SessionMaster.saveMod = 2; break;
+				case 5: SessionMaster.saveMod = 1; break;
+				default:
+					Logger.log(Logger.ERROR, "bad slider value in ControlPanel! " + val);
 				}
 			}
-			
-			break;
-		case CNC_CONNECTION:
-			Boolean c = (Boolean) args[0];
-			
-			if (c) {
-				connected = true;
-				test.setEnabled(true);
-			} else {
+		});
+		
+		keepSlider.setSnapToTicks(true);
+		keepSlider.setMinimum(0);
+		keepSlider.setMaximum(5);
+		keepSlider.setLabelTable( labelTable );
+		keepSlider.setPaintLabels(true);
+		keepSlider.setPaintTicks(true);
+		keepSlider.setValue(5);
+		
+		keepSlider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (keepSlider.getValueIsAdjusting())
+					return;
 				
-				connected = false;
-				for (FlagPanel fp : flags)
-					fp.setUnknown();
-				
-				test.setEnabled(false);
+				int val = keepSlider.getValue();
+				switch(val) {
+				case 0: SessionMaster.keepMod = 0; break;
+				case 1: SessionMaster.keepMod = 100; break;
+				case 2: SessionMaster.keepMod = 10; break;
+				case 3: SessionMaster.keepMod = 5; break;
+				case 4: SessionMaster.keepMod = 2; break;
+				case 5: SessionMaster.keepMod = 1; break;
+				default:
+					Logger.log(Logger.ERROR, "bad slider value in ControlPanel! " + val);
+				}
 			}
+		});
+		
+		//...
+		
+		//Events.LogsFound, Events.LogSelected, Events.SessionSelected,
+		//Events.ToolStatus, Events.ControlStatus, Events.RelevantRobotStats
+		Center.listen(Events.LogsFound.class, this, true);
+		Center.listen(Events.LogSelected.class, this, true);
+		Center.listen(Events.SessionSelected.class, this, true);
+		Center.listen(Events.ToolStatus.class, this, true);
+		Center.listen(Events.ControlStatus.class, this, true);
+		Center.listen(Events.RelevantRobotStats.class, this, true);
+	}
+	
+	private void loadButtonActionPerformed(java.awt.event.ActionEvent evt) {                                           
+        if (SessionMaster.get().isIdle()) {
+        	String dpath = (String) dirBox.getSelectedItem();
+        	
+        	if (dpath == null || dpath.trim().isEmpty()) {
+        		JOptionPane.showMessageDialog(this, String.format("empty path"));
+        		return;
+        	}
+        	
+        	String absolute = Utility.localizePath(dpath.trim()) + File.separator;
+        	
+        	if (FileIO.checkLogFolder(absolute)) {
+        		 SessionMaster.get().loadSession(absolute);
+        		 dirBox.setModel(new DefaultComboBoxModel<String>( addToSet(Prefs.filepaths, dpath)));
+        	} else {
+        		JOptionPane.showMessageDialog(this, String.format("bad path: {%s}", absolute));
+        	}
+        	
+        } else {
+        	JOptionPane.showMessageDialog(this, "cannot load logs while not idle");
+        }
+    }       
+	
+	private final JFileChooser dirChooser = initChooser();
+	private JFileChooser initChooser(){
+		JFileChooser r = new JFileChooser();
+		r.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		r.setCurrentDirectory(new File(Utility.localizePath("~/")));
+		r.setMultiSelectionEnabled(false);
+		r.setFileHidingEnabled(false);
+		
+		return r;
+	};
+	
+	private void chooseButtonActionPerformed(java.awt.event.ActionEvent evt) {                                           
+       int ret = dirChooser.showOpenDialog(this);
+       if (ret == JFileChooser.APPROVE_OPTION) {
+    	   dirBox.setSelectedItem(dirChooser.getSelectedFile().getAbsolutePath());
+       }
+    }       
+	
+	private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {                                           
+        dirBox.setSelectedItem("");
+    }       
+	
+	private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {                                           
+        if (connectButton.getText().equals("connect")) {
+        	Logger.log(Logger.INFO, "ControlPanel: connect action.");
+        	
+        	String filepath = null;
+        	String address = ((String) addrBox.getSelectedItem()).trim();
+        	
+        	if (address == null || address.isEmpty()) {
+        		Logger.log(Logger.INFO, "ControlPanel: cannot use address: " + address);
+        		JOptionPane.showMessageDialog(this, String.format("bad address: %s", address));
+        		return;
+        	} else {
+        		addrBox.setModel(new DefaultComboBoxModel<String>( addToSet(Prefs.addresses, address)));
+        		Logger.log(Logger.INFO, "ControlPanel: using address " + address);
+        	}
+        	
+        	String dpath = (String) dirBox.getSelectedItem();
+        	if (dpath == null || dpath.trim().isEmpty()) {
+        		Logger.log(Logger.INFO, "ControlPanel: not using file writer.");
+        	} else {
+        		String absolute = Utility.localizePath(dpath.trim()) + File.separator;
+        		if (FileIO.checkLogFolder(absolute)) {
+        			dirBox.setModel(new DefaultComboBoxModel<String>( addToSet(Prefs.filepaths, dpath)));
+        			Logger.log(Logger.INFO, "ControlPanel: using directory " + absolute);
+        			filepath = absolute;
+        		} else {
+        			JOptionPane.showMessageDialog(this, String.format("cannot connect with bad path {%s}.  Fix path or clear it.", absolute));
+        			return;
+        		}
+        	}
+        	
+        	SessionMaster.get().streamSession(address, filepath);
+        	
+        } else {
+        	Logger.log(Logger.INFO, "ControlPanel: stop action.");
+        	if (!SessionMaster.get().isIdle()) {
+        		SessionMaster.get().stopWorkingSession();
+        	}
+        }
+    }       
+	
+	private void testButtonActionPerformed(java.awt.event.ActionEvent evt) {                                           
+        ControlInstance inst = ControlIO.getByIndex(0);
+        if (inst == null)
+        	return;
+        
+        Logger.log(Logger.INFO, "ControlPane: sending test cmnd");
+        inst.tryAddCmnd(ControlIO.createCmndTest());
+    }       
+	
+	private void exitButtonActionPerformed(java.awt.event.ActionEvent evt) {                                           
+		ControlInstance inst = ControlIO.getByIndex(0);
+        if (inst == null)
+        	return;
+        
+        Logger.log(Logger.INFO, "ControlPane: sending exit cmnd");
+        inst.tryAddCmnd(ControlIO.createCmndExit());
+    }        
+	
+	/*INTERFACES*/
+	
+	private FlagPanel[] flags = null;
+	
+	private boolean controlling = false;
+	@Override
+	public void relRobotStats(Object source, RobotStats bs) {
+		if (!controlling)
+			return;
+		
+		flags = new FlagPanel[bs.flags.size() - 2];
+		for (int i = 0; i < flags.length; ++i) {
+			Flag f = bs.flags.get(i + 2);	//Skip two for the connected flags.
 			
-			break;
-		case LOG_FOUND:
-			if (bstream.isSelected()) {
-				Log l = (Log) args[0];
-				if (l.description.contains(fstream.getText()))
-					N.notifyEDT(EVENT.LOG_SELECTION, this, l);
-			}
-			break;
-		case LOG_SELECTION:
-		case SES_SELECTION:
-			if (src != this)
-				bstream.setSelected(false);
-			break;
-		case STATUS:
-			STATUS s = (STATUS) args[0];
-			useStatus(s);
-			break;
+			flags[i] = new FlagPanel();
+			flags[i].setInfo(f.name, f.index);
+			flags[i].setKnown(f.value);
 		}
 		
-	}
-	
-	private void tryStart() {
-		String fs_text = (String) fpath.getSelectedItem();
-		String addr_text = (String) faddr.getSelectedItem();
-		
-		if (fs_text == null)
-			fs_text = "";
-		if (addr_text == null)
-			addr_text = "";
-		
-		int cs = modes.getSelectedIndex();
-		P.putLastMode(cs);
-		
-		if (cs < 0) 
-			return;
-		MODE m = NBConstants.MODE.values()[cs];
-		
-		switch(m) {
-		case FILESYSTEM:
-			fpath.setModel(new DefaultComboBoxModel<String>( P.putPaths(fs_text) ));
-			break;
-		case NETWORK_NOSAVE:
-			faddr.setModel(new DefaultComboBoxModel<String>( P.putAddrs(addr_text) ));
-			break;
-		case NETWORK_SAVING:
-			fpath.setModel(new DefaultComboBoxModel<String>( P.putPaths(fs_text) ));
-			faddr.setModel(new DefaultComboBoxModel<String>( P.putAddrs(addr_text) ));
-			break;
-		case NONE:
-			U.w("ControlPanel: cannot start that mode.");
-			return;
-		default:
-			break;
+		JPanel container = new JPanel();
+		container.setLayout(new GridLayout(flags.length, 1));
+		for (FlagPanel fp : flags) {
+			container.add(fp);
 		}
 		
-		SessionMaster.INST.startSession(m, fs_text, addr_text);
-	}
-	
-	private void useMode(MODE m) {
-		switch(m) {
-		case FILESYSTEM:
-			faddr.setEnabled(false);
-			fpath.setEnabled(true);
-			break;
-		case NETWORK_NOSAVE:
-			faddr.setEnabled(true);
-			fpath.setEnabled(false);
-			break;
-		case NETWORK_SAVING:
-			faddr.setEnabled(true);
-			fpath.setEnabled(true);
-			break;
-		case NONE:
-			faddr.setEnabled(false);
-			fpath.setEnabled(false);
-			break;
-		default:
-			break;
+		container.setMinimumSize(container.getPreferredSize());
 		
+		flagScrollPanel.setViewportView(container);
+	}
+
+	@Override
+	public void controlStatus(ControlInstance inst, boolean up) {
+		if(up) {
+			controlling = true;
+			controlTestButton.setEnabled(true);
+			controlExitButton.setEnabled(true);
+		} else {
+			controlling = false;
+			controlTestButton.setEnabled(false);
+			controlExitButton.setEnabled(false);
+			
+			flagScrollPanel.setViewportView(new JLabel("no control instance connected"));
 		}
 	}
-	
-	private void useStatus(STATUS s) {
+
+	@Override
+	public void toolStatus(Object source, STATUS s, String desc) {
 		switch (s) {
 		case IDLE:
-			go.setText("go");
-			go.setEnabled(true);
+			connectButton.setEnabled(true);
+			connectButton.setText("connect");
+			loadButton.setEnabled(true);
 			break;
 		case RUNNING:
-			go.setText("stop");
-			go.setEnabled(true);
+			connectButton.setEnabled(true);
+			connectButton.setText("stop");
+			loadButton.setEnabled(false);
 			break;
 		case STARTING:
-			go.setEnabled(false);
+			connectButton.setEnabled(false);
+			connectButton.setText("stop");
+			loadButton.setEnabled(false);
 			break;
 		case STOPPING:
-			go.setEnabled(false);
+			connectButton.setEnabled(false);
+			connectButton.setText("stop");
+			loadButton.setEnabled(false);
 			break;
 		default:
 			break;
 		
 		}
 	}
+
+	@Override
+	public void sessionSelected(Object source, Session s) {
+		if (source != this)
+			streamCB.setSelected(false);
+	}
+
+	@Override
+	public void logSelected(Object source, Log first,
+			ArrayList<Log> alsoSelected) {
+		if (source != this)
+			streamCB.setSelected(false);
+	}
+
+	@Override
+	public void logsFound(Object source, Log... found) {
+		if (streamCB.isSelected()) {
+			Log streamLog = null;
+			
+			for (Log l : found) {
+				if (l.description.contains(streamField.getText())) {
+					streamLog = l;
+					break;
+				}
+			}
+			if (streamLog != null)
+				Events.GLogSelected.generate(this, streamLog, new ArrayList<Log>());
+		}
+	}
 	
-	/*
-	 * CNC
-	 * */
+	/*GENERATED CODE*/
 	
-	private boolean connected = false;
+    private void initComponents() {
+
+        //jScrollPane1 = new javax.swing.JScrollPane();
+        //jTextArea1 = new javax.swing.JTextArea();
+        jLabel3 = new javax.swing.JLabel();
+        dirpanel = new javax.swing.JPanel();
+        dirBox = new javax.swing.JComboBox<String>();
+        loadButton = new javax.swing.JButton();
+        chooseButton = new javax.swing.JButton();
+        clearButton = new javax.swing.JButton();
+        robotPanel = new javax.swing.JPanel();
+        addrBox = new javax.swing.JComboBox<String>();
+        connectButton = new javax.swing.JButton();
+        streamCB = new javax.swing.JCheckBox();
+        streamField = new javax.swing.JTextField();
+        writeSlider = new javax.swing.JSlider();
+        keepSlider = new javax.swing.JSlider();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        controlPanel = new javax.swing.JPanel();
+        controlTestButton = new javax.swing.JButton();
+        controlExitButton = new javax.swing.JButton();
+        flagScrollPanel = new javax.swing.JScrollPane();
+
+        //jTextArea1.setColumns(20);
+        //jTextArea1.setRows(5);
+        //jScrollPane1.setViewportView(jTextArea1);
+
+        jLabel3.setText("jLabel3");
+
+        dirpanel.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED), "directory"));
+
+        dirBox.setEditable(true);
+        //dirBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        loadButton.setText("load");
+
+        chooseButton.setText("choose");
+
+        clearButton.setText("clear");
+
+        javax.swing.GroupLayout dirpanelLayout = new javax.swing.GroupLayout(dirpanel);
+        dirpanel.setLayout(dirpanelLayout);
+        dirpanelLayout.setHorizontalGroup(
+            dirpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(dirpanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(dirpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(dirBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(dirpanelLayout.createSequentialGroup()
+                        .addComponent(loadButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(chooseButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(clearButton)))
+                .addContainerGap())
+        );
+        dirpanelLayout.setVerticalGroup(
+            dirpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(dirpanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(dirBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(dirpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(loadButton)
+                    .addComponent(chooseButton)
+                    .addComponent(clearButton)))
+        );
+
+        robotPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED), "robot"));
+
+        addrBox.setEditable(true);
+        //addrBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        connectButton.setText("connect");
+
+        streamCB.setText("stream");
+
+        streamField.setText("(from camera_TOP)");
+
+        writeSlider.setMaximum(5);
+        writeSlider.setPaintLabels(true);
+        writeSlider.setPaintTicks(true);
+        writeSlider.setSnapToTicks(true);
+
+        keepSlider.setMaximum(5);
+        keepSlider.setPaintLabels(true);
+        keepSlider.setPaintTicks(true);
+        keepSlider.setSnapToTicks(true);
+
+        jLabel1.setText("write fraction");
+
+        jLabel2.setText("keep fraction");
+
+        javax.swing.GroupLayout robotPanelLayout = new javax.swing.GroupLayout(robotPanel);
+        robotPanel.setLayout(robotPanelLayout);
+        robotPanelLayout.setHorizontalGroup(
+            robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(robotPanelLayout.createSequentialGroup()
+                .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(robotPanelLayout.createSequentialGroup()
+                        .addComponent(connectButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(addrBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(robotPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(streamCB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(streamField)
+                            .addGroup(robotPanelLayout.createSequentialGroup()
+                                .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(keepSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(writeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 0, Short.MAX_VALUE)))))
+                .addContainerGap())
+        );
+        robotPanelLayout.setVerticalGroup(
+            robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(robotPanelLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(addrBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(connectButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(streamCB)
+                    .addComponent(streamField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(writeSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(keepSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+        );
+
+        controlPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED), "control"));
+
+        controlTestButton.setText("test");
+
+        controlExitButton.setText("exit");
+
+        javax.swing.GroupLayout controlPanelLayout = new javax.swing.GroupLayout(controlPanel);
+        controlPanel.setLayout(controlPanelLayout);
+        controlPanelLayout.setHorizontalGroup(
+            controlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(controlPanelLayout.createSequentialGroup()
+                .addComponent(controlTestButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(controlExitButton)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(controlPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(flagScrollPanel)
+                .addContainerGap())
+        );
+        controlPanelLayout.setVerticalGroup(
+            controlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(controlPanelLayout.createSequentialGroup()
+                .addGroup(controlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(controlTestButton)
+                    .addComponent(controlExitButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(flagScrollPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(controlPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(dirpanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(robotPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(dirpanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(robotPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(controlPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+    }// </editor-fold>                                                          
+
+
+    // Variables declaration - do not modify                     
+    private javax.swing.JComboBox<String> addrBox;
+    private javax.swing.JButton chooseButton;
+    private javax.swing.JButton clearButton;
+    private javax.swing.JButton connectButton;
+    private javax.swing.JButton controlExitButton;
+    private javax.swing.JPanel controlPanel;
+    private javax.swing.JButton controlTestButton;
+    private javax.swing.JComboBox<String> dirBox;
+    private javax.swing.JPanel dirpanel;
+    private javax.swing.JScrollPane flagScrollPanel;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    //private javax.swing.JScrollPane jScrollPane1;
+    //private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JSlider keepSlider;
+    private javax.swing.JButton loadButton;
+    private javax.swing.JPanel robotPanel;
+    private javax.swing.JCheckBox streamCB;
+    private javax.swing.JTextField streamField;
+    private javax.swing.JSlider writeSlider;
+    // End of variables declaration                   
 }
+

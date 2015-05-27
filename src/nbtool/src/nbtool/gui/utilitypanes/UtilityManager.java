@@ -3,8 +3,10 @@ package nbtool.gui.utilitypanes;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
+import static nbtool.util.Logger.*;
+
 public class UtilityManager {
-	public static Class[] utilities = {HardlyWorking.class, YUVColors.class};
+	public static Class[] utilities = {LogToViewUtility.class, ThreadStateUtility.class, HardlyWorking.class, YUVColors.class};
 	
 	private static HashMap<Class<? extends UtilityParent>, UtilityParent> map = setupMap();
 	private static HashMap<Class<? extends UtilityParent>, UtilityParent> setupMap() {
@@ -13,6 +15,8 @@ public class UtilityManager {
 		for (Class c : utilities) {
 			 if (UtilityParent.class.isAssignableFrom(c)) {
 				 ret.put(c, null);
+			 } else {
+				 logf(ERROR, "UtilityManager asked to manage non-UtilityParent class %s", c.getName());
 			 }
 		}
 		
@@ -21,7 +25,8 @@ public class UtilityManager {
 	
 	public static UtilityParent instanceOf(Class<? extends UtilityParent> cls) {
 		if (!UtilityParent.class.isAssignableFrom(cls)) {
-			 return null;
+			logf(ERROR, "UtilityManager asked for instance of non-UtilityParent class %s", cls.getName());
+			return null;
 		 }
 		
 		if (map.containsKey(cls)) {
@@ -32,28 +37,30 @@ public class UtilityManager {
 				map.put(cls, instance);
 				return instance;
 			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (NoSuchMethodException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} 
 			
 			return null;
 		} else {
+			logf(ERROR, "UtilityManager asked for instance of class NOT IN MAP: %s", cls.getName());
 			return null;
 		}
+	}
+	
+	public static LogToViewUtility instanceOfLTV() {
+		UtilityParent up = instanceOf(LogToViewUtility.class);
+		assert(up instanceof LogToViewUtility);
+		
+		return (LogToViewUtility) up;
 	}
 }

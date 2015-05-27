@@ -19,11 +19,15 @@ import javax.swing.JFileChooser;
 
 import nbtool.data.Log;
 import nbtool.data.Log.SOURCE;
-import nbtool.util.N;
-import nbtool.util.N.EVENT;
-import nbtool.util.U;
+import nbtool.io.CommonIO.GIOFirstResponder;
+import nbtool.io.CommonIO.IOFirstResponder;
+import nbtool.io.CommonIO.IOState;
+import nbtool.util.Events.FileIOStatus;
+import nbtool.util.Events.GFileIOStatus;
+import nbtool.util.Logger;
+import nbtool.util.Utility;
 
-public class FileIO implements Runnable {
+public class FileIO {
 	
 	//Should only be accessed from the EDT (since it's a GUI element, this 
 	//is logical on several levels.)
@@ -31,7 +35,7 @@ public class FileIO implements Runnable {
 	private static JFileChooser initChooser() {
 		JFileChooser r = new JFileChooser();
 		r.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		r.setCurrentDirectory(new File(U.localizePath("~/")));
+		r.setCurrentDirectory(new File(Utility.localizePath("~/")));
 		r.setMultiSelectionEnabled(false);
 		r.setFileHidingEnabled(false);
 		
@@ -39,16 +43,24 @@ public class FileIO implements Runnable {
 	}
 		
 	public static boolean checkLogFolder(String log_folder) {
-		if(log_folder == null || log_folder.isEmpty())
+		if(log_folder == null || log_folder.isEmpty()) {
+			Logger.logf(Logger.ERROR, "path string null or empty!\n");
 			return false;
+		}
 			
 		File f = new File(log_folder);
-		if (!f.exists())
+		if (!f.exists()) {
+			Logger.logf(Logger.ERROR, "file does not exist!\n");
 			return false;
-		if (!f.isDirectory())
+		}
+		if (!f.isDirectory()) {
+			Logger.logf(Logger.ERROR, "file is not a directory!\n");
 			return false;
-		if (!f.canRead() || !f.canWrite())
+		}
+		if (!f.canRead() || !f.canWrite()) {
+			Logger.logf(Logger.ERROR, "permissions errors!\n");
 			return false;
+		}
 		
 		return true;
 	}
@@ -68,11 +80,19 @@ public class FileIO implements Runnable {
 		Log full = CommonIO.readLog(dis);
 		
 		if (dis.available() != 0) {
-			U.wf("ERROR: log [%s] did not follow log format, CORRUPTION LIKELY\n");
+			Logger.logf(Logger.WARN, "WARNING: log [%s] did not follow log format – %d bytes left, CORRUPTION LIKELY\n", logf.getCanonicalPath(),
+					dis.available());
+			/*
+			int av = dis.available();
+			byte[] left = new byte[av];
+			dis.readFully(left);
+			String text = U.bytesToHexString(left);
+			
+			U.wf("%d bytes left, hex:\n%s\n", av, text); */
 		}
 		
 		if (!(lg.description.equals(full.description))) {
-			U.wf("WARNING: log description found to be different upon load:\n\t%s\n\t%s\n",
+			Logger.logf(Logger.WARN, "WARNING: log description found to be different upon load:\n\t%s\n\t%s\n",
 					lg.description, full.description);
 		}
 		
@@ -139,7 +159,7 @@ public class FileIO implements Runnable {
 			logs[i].source = SOURCE.FILE;
 		}
 		
-		U.w("FileIO: found " + logs.length + " logs in filesystem.");
+		Logger.logf(Logger.INFO, "FileIO: found " + logs.length + " logs in filesystem.");
 		
 		return logs;
 	}
@@ -150,68 +170,80 @@ public class FileIO implements Runnable {
 	 * Asynchronous writing of logs via a FileIO object.
 	 * */
 	
-	public static Queue<Log> logsToWrite = null;
-	
-	public static synchronized void addObject(Log lg) {
-		if (logsToWrite != null) logsToWrite.add(lg);
-	}
-	
-	public static synchronized Log getObject() {
-		if (logsToWrite != null && logsToWrite.size() > 0) 
-			return logsToWrite.remove();
-		else return null;
-	}
-
-	private String log_folder;
-	private volatile boolean running;
-	private Boss boss;
-	
-	public FileIO(Boss b, String folder) {
-		boss = b; log_folder = folder;
-		running = false;
-	}
-	
-	public void stop() {
-		running = false;
-	}
-	
-	public void run() {		
-		running = true;
-		logsToWrite = new LinkedList<Log>();
-		N.notifyEDT(EVENT.FIO_THREAD, this, true);
+	public static FileInstance makeFileWriter(String path, IOFirstResponder ifr) {
+		FileInstance fi = new FileInstance();
+		fi.path = path;
+		fi.ifr = ifr;
+		fi.state = IOState.RUNNING;
 		
-		while(running) {
-			Log lg  = getObject();
-			if (lg != null) {
-				if (lg.name == null) {
-					lg.setNameFromDesc();
-				} else if (!lg.name.endsWith(".nblog"))
-					lg.name = lg.name + ".nblog";
-				
-				try {		 
-					writeLogToPath(lg, log_folder + File.separator + lg.name);
-					U.w("FileIO: thread wrote log: " + lg.name);
-				} catch (IOException e) {
-					U.w("Error writing file to: " + log_folder);
-					U.w("msg: " + e.getMessage());
-					e.printStackTrace();
-				}
-				
-			} else
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+		Thread fithrd = new Thread(fi, String.format("thread-%s", fi.name()));
+		fithrd.setDaemon(true);
+		fithrd.start();
+		
+		return fi;
+	}
+	
+	public static class FileInstance extends CommonIO.IOInstance {
+		
+		protected FileInstance() { super(); }
+		protected String path;
+		
+		private final Queue<Log> toWrite = new LinkedList<Log>();
+		
+		public void add(Log log) {
+			synchronized(toWrite) {
+				toWrite.add(log);
+			}
 		}
 		
-		logsToWrite = null;
-		U.w("FileIO thread finishing because !running.");
-		N.notifyEDT(EVENT.FIO_THREAD, this, false);
-		boss.fileioThreadExiting();
-	}
-	
-	public interface Boss {
-		public void fileioThreadExiting();
+		private Log remove() {
+			synchronized(toWrite) {
+				if (toWrite.isEmpty())
+					return null;
+				else return toWrite.remove();
+			}
+		}
+
+		@Override
+		public void run() {
+			GFileIOStatus.generate(this, true);
+			
+			while(this.state == IOState.RUNNING) {
+				Log lg  = remove();
+				
+				if (lg != null) {
+					if (lg.name == null) {
+						lg.setNameFromDesc();
+					} else if (!lg.name.endsWith(".nblog"))
+						lg.name = lg.name + ".nblog";
+					
+					try {		 
+						writeLogToPath(lg, this.path + File.separator + lg.name);
+						Logger.log(Logger.EVENT, "FileIO: thread wrote log: " + lg.name);
+					} catch (IOException e) {
+						Logger.log(Logger.ERROR, "Error writing file to: " + this.path);
+						Logger.log(Logger.ERROR, "msg: " + e.getMessage());
+						e.printStackTrace();
+					}
+					
+				} else
+					try {
+						Thread.sleep(200);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+			}
+			
+			Logger.logf(Logger.INFO, "%s finishing.", this.name());			
+			this.finish();
+			GIOFirstResponder.generateFinished(this, ifr);
+			GFileIOStatus.generate(this, false);
+		}
+
+		@Override
+		public String name() {
+			return String.format("FileInstance{%s}", path);
+		}
+		
 	}
 }

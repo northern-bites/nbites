@@ -12,11 +12,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import nbtool.data.SessionHandler;
 import nbtool.data.Log;
-import nbtool.util.N;
-import nbtool.util.N.EVENT;
-import nbtool.util.N.NListener;
 
 public class LogChooser extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -27,16 +23,14 @@ public class LogChooser extends JPanel {
 				useSize(e.getComponent().getSize());
 			}
 		});
-		
-		//N.listen(EVENT.LOGS_ADDED, this);
-		
+				
 		model = new LCTreeModel();
 		tree = new JTree(model);
 		model.tree = tree;
 		tree.setEditable(false);
 		tree.setRootVisible(false);
 		tree.setScrollsOnExpand(true);
-		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		tree.addTreeSelectionListener(model);
 		tree.setTransferHandler(model.EXPORT_HANDLER);
 		tree.setDragEnabled(true);
@@ -59,14 +53,6 @@ public class LogChooser extends JPanel {
 		Dimension d = sas.getPreferredSize();
 		sas.setBounds(0,0,d.width,d.height);
 		sp.setBounds(0, d.height, size.width, size.height - d.height);
-	}
-	
-	public Log currentlySelected() {
-		return model.CS_macro;
-	}
-	
-	public Log nextSelection() {
-		return model.NS_macro;
 	}
 	
 	private JScrollPane sp;

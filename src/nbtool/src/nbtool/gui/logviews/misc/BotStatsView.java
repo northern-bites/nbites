@@ -11,23 +11,16 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 
-import nbtool.data.BotStats;
+import nbtool.data.RobotStats;
 import nbtool.data.Log;
-import nbtool.util.U;
+import nbtool.util.Utility;
 
 public class BotStatsView extends ViewParent {
 
 	@Override
 	public void setLog(Log newlog) {
 		this.log = newlog;
-		BotStats bs = null;
-		
-		try {
-			bs = new BotStats(newlog);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
+		RobotStats bs = new RobotStats(newlog);
 		
 		if (area != null) {
 			sp.remove(area);

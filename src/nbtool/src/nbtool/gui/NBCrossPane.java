@@ -22,24 +22,17 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.TransferHandler;
-import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import nbtool.data.Log;
-import nbtool.io.CppIO;
-import nbtool.io.CppIO.CppFunc;
-import nbtool.io.CppIO.CppFuncCall;
-import nbtool.io.CppIO.CppFuncListener;
-import nbtool.util.N;
+import nbtool.io.CrossIO;
 import nbtool.util.NBConstants;
-import nbtool.util.U;
-import nbtool.util.N.EVENT;
-import nbtool.util.N.NListener;
+import nbtool.util.Utility;
 
-public class CppPane extends JPanel implements ActionListener, NListener, CppFuncListener {
-
+public class NBCrossPane extends JPanel {
+/*
 	private static void exact(Dimension d, Component c) {
 		c.setMinimumSize(d);
 		c.setMaximumSize(d);
@@ -51,7 +44,7 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 		status.setForeground(Color.GREEN);
 		
 		functions.removeAllItems();
-		for (CppIO.CppFunc f : found)
+		for (CrossIO.CppFunc f : found)
 			functions.addItem(f.name);
 		functions.setEnabled(true);
 		functions.setSelectedIndex(-1);
@@ -87,7 +80,7 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 		out_model.reload();
 	}
 
-	public CppPane() {
+	public NBCrossPane() {
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		Border b = BorderFactory.createLineBorder(Color.BLACK);
 		status = new JLabel("[placeholder...]");
@@ -146,8 +139,8 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 		
 		downDisable();
 		
-		N.listen(EVENT.CPP_CONNECTION, this);
-		N.listen(EVENT.CPP_FUNCS_FOUND, this);
+		N.listen(OLDEVENT.NBCROSS_CONNECTION, this);
+		N.listen(OLDEVENT.NBCROSS_FUNCS_FOUND, this);
 	}
 
 	private JLabel status;
@@ -164,7 +157,7 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 	private JList<String> out_list;
 	private OutModel out_model;
 	
-	private ArrayList<CppIO.CppFunc> found;
+	private ArrayList<CrossIO.CppFunc> found;
 	private CppFunc selected;
 
 	@Override
@@ -187,23 +180,24 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 			call.name = selected.name;
 			call.args = args;
 			call.listener = this;
-			CppIO.current.tryAddCall(call);
+			CrossIO.current.tryAddCall(call);
 		} else if (source == clear) {
 			args = new ArrayList<Log>();
 			arg_model.reload();
-			out_model.clear();
+			out = new ArrayList<Log>();
+			out_model.reload();
 		}
 	}
 	
 	@Override
-	public void notified(EVENT e, Object src, Object... args) {
+	public void notified(OLDEVENT e, Object src, Object... args) {
 		switch(e){
-		case CPP_CONNECTION:
+		case NBCROSS_CONNECTION:
 			Boolean con = (Boolean) args[0];
 			if (!con)
 				this.downDisable();
 			break;
-		case CPP_FUNCS_FOUND:
+		case NBCROSS_FUNCS_FOUND:
 			found = (ArrayList<CppFunc>) args[0];
 			this.upEnable();
 			break;
@@ -249,7 +243,7 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 				return;
 			
 			Log l = args.get(index);
-			N.notifyEDT(EVENT.LOG_SELECTION, this, l);
+			N.notifyEDT(OLDEVENT.LOG_SELECTION, this, l);
 		}
 		
 		public void reload() {
@@ -281,10 +275,10 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 					} else if (mcro.equalsIgnoreCase(NA_S)) {
 						imp = NEXT_ALIAS;
 					} else {
-						U.w("CppPane: Handler: Unknown import: " + mcro);
+						Utility.w("CppPane: Handler: Unknown import: " + mcro);
 					}
 				} else {
-					U.w("Unknown import type.");
+					Utility.w("Unknown import type.");
 				}
 			} catch (UnsupportedFlavorException e) {
 				e.printStackTrace();
@@ -329,7 +323,7 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 			
 			int index = ((JList<String>) e.getSource()).getSelectedIndex();
 			Log l = out.get(index);
-			N.notifyEDT(EVENT.LOG_SELECTION, this, l);
+			N.notifyEDT(OLDEVENT.LOG_SELECTION, this, l);
 		}
 
 		public void reload() {
@@ -350,7 +344,7 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(200, 600);
 
-		CppPane pane = new CppPane();
+		NBCrossPane pane = new NBCrossPane();
 		frame.add(pane);
 		pane.setBounds(0,20,200,580);
 
@@ -359,9 +353,9 @@ public class CppPane extends JPanel implements ActionListener, NListener, CppFun
 
 	@Override
 	public void returned(int ret, Log... out) {
-		U.wf("CppPane returned: %d with %d logs\n", ret, out.length);
+		Utility.wf("CppPane returned: %d with %d logs\n", ret, out.length);
 		
 		this.out.addAll(Arrays.asList(out));
 		out_model.reload();
-	}
+	} */
 }

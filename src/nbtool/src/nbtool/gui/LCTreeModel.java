@@ -5,6 +5,8 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Vector;
 
 import javax.swing.JComponent;
 import javax.swing.JTree;
@@ -20,14 +22,15 @@ import nbtool.data.Session;
 import nbtool.data.Log;
 import nbtool.data.SessionMaster;
 import nbtool.io.FileIO;
-import nbtool.util.N;
+import nbtool.util.Center;
+import nbtool.util.Events;
+import nbtool.util.Logger;
 import nbtool.util.NBConstants;
 import nbtool.util.NBConstants.STATUS;
-import nbtool.util.U;
-import nbtool.util.N.EVENT;
-import nbtool.util.N.NListener;
+import nbtool.util.Utility;
+import nbtool.util.Events.*;
 
-public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
+public class LCTreeModel implements TreeModel, TreeSelectionListener, Events.LogsFound, Events.ToolStatus {
 
 	/*
 	 * DataModel:
@@ -36,14 +39,11 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 	String root;
 	JTree tree;
 	
-	public Log NS_macro = null;
-	public Log CS_macro = null;
-	
 	public LCTreeModel() {
 		root = "ROOT PLACEHOLDER";
 		
-		N.listen(EVENT.STATUS, this);
-		N.listen(EVENT.LOG_FOUND, this);
+		Center.listen(Events.LogsFound.class, this, true);
+		Center.listen(Events.ToolStatus.class, this, true);
 	}
 	
 	public Object getRoot() {
@@ -74,7 +74,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 
 	@Override
 	public void valueForPathChanged(TreePath path, Object newValue) {
-		U.w("ERROR: TCTreeModel asked to change value, TREE SHOULD NOT BE EDITABLE.");
+		Logger.logf(Logger.ERROR, "ERROR: TCTreeModel asked to change value, TREE SHOULD NOT BE EDITABLE.");
 	}
 
 	@Override
@@ -95,105 +95,89 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, NListener{
 	}
 	
 	public void valueChanged(TreeSelectionEvent e) {
-		TreePath path = e.getPath();
-		Session b;
-		Object[] path_objs;
 		
-		switch (path.getPathCount()) {
+		if (!e.isAddedPath())
+			return;
+		
+		//TreePath path = e.getPath();
+		TreePath first = tree.getSelectionPath();
+		TreePath[] all = tree.getSelectionPaths();
+		assert(first == all[0]);
+		
+		switch (first.getPathCount()) {
 		case 0:
 			//??
-			U.w("ERROR: LCTreeModel path size was: " + path.getPathCount());
+			Logger.logf(Logger.ERROR, "ERROR: LCTreeModel path size was: " + first.getPathCount());
 			break;
 		case 1:
 			//Root selected
-			U.w("ERROR: LCTreeModel path size was: " + path.getPathCount() + "ROOT SHOULD NOT BE VISIBLE");
+			Logger.logf(Logger.ERROR, "ERROR: LCTreeModel path size was: " + first.getPathCount() + "ROOT SHOULD NOT BE VISIBLE");
 			break;
 		case 2:
-			//Branch selected, 
-			NS_macro = CS_macro = null;
-			path_objs = path.getPath();
-			b = (Session) path_objs[1];
-			
-			N.notifyEDT(EVENT.SES_SELECTION, this, b);
-			
+			//Branch selected, 			
+			//N.notifyEDT(OLDEVENT.SES_SELECTION, this,
+			//		(Session) first.getPath()[1]);
+			Session session = (Session) first.getPath()[1];
+			Events.GSessionSelected.generate(this, session);
 			break;
 		case 3:
 			//LOG SELECTED.
+			ArrayList<Log> selected = new ArrayList<Log>();
 			
-			path_objs = path.getPath();
-			final Log lg = (Log) path_objs[2];
-			b = (Session) path_objs[1];
-			
-			if (lg.bytes == null) {
-				try {
-					assert(b.dir != null && !b.dir.isEmpty());
-					FileIO.loadLog(lg, b.dir);
-					
-					assert(lg.getClass().equals(Log.class));
-					N.notifyEDT(EVENT.LOG_LOAD, this, new Log[]{lg});
-				} catch (IOException ex) {
-					ex.printStackTrace();
-					U.w("message: " + ex.getMessage());
-					U.w("Could not load log data.");
-					return;
+			for (TreePath p : all) {
+				if (p.getPathCount() != 3)	//Skip selected items that can't be logs.
+					continue;
+				
+				Session ses = (Session)p.getPath()[1];
+				Log sel = (Log) p.getPath()[2];
+				
+				sel.lastSeen = p;
+				
+				if (sel.bytes == null) {
+					assert(ses.directoryFrom != null && !ses.directoryFrom.isEmpty());
+					try {
+						FileIO.loadLog(sel, ses.directoryFrom);
+					} catch (IOException e1) {
+						Logger.logf(Logger.ERROR, "Could not load log data!");
+						e1.printStackTrace();
+						
+						return;
+					}
+					Events.GLogLoaded.generate(this, sel);
 				}
+				
+				assert(sel.bytes != null);
+				selected.add(sel);
 			}
 			
-			CS_macro = lg;
-			int index = this.getIndexOfChild(b, lg);
-			if (index + 1 < b.logs_DO.size()) {
-				NS_macro = b.logs_DO.get(index + 1);
-			} else {
-				NS_macro = null;
-			}
-			
-			assert(lg != null);
-			N.notifyEDT(EVENT.LOG_SELECTION, this, lg);
+			Events.GLogSelected.generate(this, selected.remove(0), selected);
 			break;
 		default:
-				U.w("ERROR: LCTreeModel path size was: " + path.getPathCount());
+			Logger.logf(Logger.ERROR, "ERROR: LCTreeModel path size was: " + first.getPathCount());
+		}
+	}
+	
+	@Override
+	public void toolStatus(Object source, STATUS s, String desc) {
+		Session relevant = SessionMaster.get().getLatestSession();
+		
+		TreeModelEvent tme = new TreeModelEvent(this, new Object[]{root},
+				new int[]{SessionMaster.get().sessions.indexOf(relevant)},
+				new Object[]{relevant});
+		for (TreeModelListener l : listeners) {
+			l.treeNodesInserted(tme);
 		}
 	}
 
-	public void notified(EVENT e, Object src, Object... args) {
-		TreeModelEvent tme = null;
-		Session cur = SessionMaster.INST.workingSession;
+	@Override
+	public void logsFound(Object source, Log... found) {
+		Session relevant = SessionMaster.get().getLatestSession();
+		Logger.logf(Logger.INFO, "TreeModel: rel=%s size=%d", relevant.toString(), relevant.logs_ALL.size());
+		sas.sort(relevant);
 		
-		//This is a hack, it needs to change.
-		int size = SessionMaster.INST.sessions.size();
-		if (cur == null && size > 0)
-			cur = SessionMaster.INST.sessions.get(
-					size - 1
-					);
-		switch(e) {
-		case LOG_FOUND:
-			
-			sas.sort(cur);
-			
-			tme = new TreeModelEvent(this, new Object[]{root, cur});
-			for (TreeModelListener l : listeners) {
-				l.treeStructureChanged(tme);
-			}
-			break;
-		
-		case STATUS:
-			STATUS s = (STATUS) args[0];
-			if (s == STATUS.RUNNING) {
-				//New session
-				
-				tme = new TreeModelEvent(this, new Object[]{root},
-						new int[]{SessionMaster.INST.sessions.indexOf(cur)},
-						new Object[]{cur});
-				for (TreeModelListener l : listeners) {
-					l.treeNodesInserted(tme);
-				}
-			}
-			
-			break;
-			
-		default:
-			break;
-		
+		TreeModelEvent tme = new TreeModelEvent(this, new Object[]{root, relevant});
+		for (TreeModelListener l : listeners) {
+			l.treeStructureChanged(tme);
 		}
 	}
 	
