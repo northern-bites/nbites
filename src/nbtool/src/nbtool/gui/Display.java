@@ -72,7 +72,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		lc = new LogChooser();
 		left.addTab("control", cntrlp);
 		left.addTab("logs", lc);
-		
+				
 		statusp = new StatusPanel();
 		right.addTab("status", statusp);
 		
@@ -90,7 +90,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		split2.setDividerSize(5);
 		
 		add(split2);
-		split1.setResizeWeight(.2);
+		split1.setResizeWeight(.08);
 		split2.setResizeWeight(.85);
 		
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventPostProcessor(this);
