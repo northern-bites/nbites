@@ -69,3 +69,7 @@ message SharedBall {
     optional bool ball_on  = 3;
     optional int32 reliability = 4;
 }
+
+message NaiveBall {
+    optional float velocity = 1;
+}
