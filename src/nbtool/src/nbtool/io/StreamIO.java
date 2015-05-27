@@ -146,6 +146,8 @@ public class StreamIO {
 						return;
 					this.state = IOState.RUNNING;
 				}
+				
+				Events.GStreamIOStatus.generate(this, true);
 
 				//Stream
 				int seq_num = 1;

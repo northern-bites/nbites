@@ -148,6 +148,8 @@ public class ControlIO {
 						return;
 					this.state = IOState.RUNNING;
 				}
+				
+				Events.GControlStatus.generate(this, true);
 
 				//control...
 				while (state() == IOState.RUNNING) {

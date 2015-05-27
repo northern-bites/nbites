@@ -13,20 +13,24 @@ namespace nblog {
     }
     
     Log Log::simple(const std::string type, const std::string data) {
-        SExpr sc(std::vector<SExpr>{
+        std::vector<SExpr> scv = {
             SExpr("type", type)
-        });
+        };
+        SExpr sc(scv);
         
-        SExpr contents(std::vector<SExpr>{
+        std::vector<SExpr> contv = {
             SExpr("contents"),
             sc
-        });
+        };
+        SExpr contents(contv);
         
-        SExpr top(std::vector<SExpr>{
+        std::vector<SExpr> tv = {
             SExpr("nblog"),
             contents
-        });
+        };
         
+        SExpr top(tv);
+      
         Log ret;
         ret.setTree(top);
         ret.setData(data);
