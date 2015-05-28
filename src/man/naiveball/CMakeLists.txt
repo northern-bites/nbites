@@ -10,6 +10,7 @@ add_library(
 
 target_link_libraries(
   naiveball
+  support
   portals
   messages
 )

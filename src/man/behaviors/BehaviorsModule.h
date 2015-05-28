@@ -94,6 +94,8 @@ public:
     portals::InPortal<messages::SharedBall> sharedBallIn;
     portals::InPortal<messages::RobotLocation> sharedFlipIn;
 
+    portals::InPortal<messages::NaiveBall> naiveBallIn;
+
     portals::OutPortal<messages::LedCommand> ledCommandOut;
     portals::OutPortal<messages::MotionRequest> motionRequestOut;
     portals::OutPortal<messages::MotionCommand> bodyMotionCommandOut;

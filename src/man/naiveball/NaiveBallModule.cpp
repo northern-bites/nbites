@@ -5,8 +5,7 @@ namespace context {
 
 NaiveBallModule::NaiveBallModule() :
     portals::Module(),
-    naiveBallOutput(base()),
-    naiveBallBase(base())
+    naiveBallOutput(base())
 {
     velocityEst = 0.f;
     frameOffCount = 0;
@@ -41,6 +40,10 @@ void NaiveBallModule::run_()
         clearBuffer();
     } else if (bufferFull) {
         naiveCheck();
+    }
+
+    if (currentIndex > 19) {
+        print();
     }
 
     portals::Message<messages::NaiveBall> naiveBallMessage(0);
@@ -102,6 +105,19 @@ BallState avgFrames(int startingIndex) {
         }
     }
     return BallState(x_sum / AVGING_FRAMES, y_sum / AVGING_FRAMES, dist_sum / AVGING_FRAMES, bearing_sum / AVGING_FRAMES);
+}
+
+void print() {
+    BallState x = ballStateBuffer[currentIndex];
+    printf("%s\n", bufferFull ? "BufferFull" : "Buffer not full");
+    printf("Current ball state:\nrel_xy: (%f, %f)\ndistance:%f\nbearing:%f\n", x.rel_x, x.rel_y, x.distance, x.bearing);
+    printf("VelocityEst = %f\n", velocityEst);
+    if (velocityEst > 0.f) {
+        printf("BALL IS MOVING\n");
+    } else {
+        printf("NOT moving\n");
+    }
+
 }
 
 } // namespace man

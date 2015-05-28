@@ -76,6 +76,7 @@ class Brain(object):
         self.motion = None
         self.game = None
         self.locUncert = 0
+        self.naiveBall = None
 
         # FSAs
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
@@ -225,6 +226,7 @@ class Brain(object):
             or self.player.gameState == 'gameSet'):
             self.ball.x = Constants.CENTER_FIELD_X
             self.ball.y = Constants.CENTER_FIELD_Y
+        self.naiveBall = self.interface.naiveBall
 
         self.yglp = self.interface.visionField.goal_post_l.visual_detection
         self.ygrp = self.interface.visionField.goal_post_r.visual_detection

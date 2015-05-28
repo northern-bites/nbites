@@ -47,7 +47,8 @@ namespace man {
     gamestate(teamNum, playerNum),
     behaviors(teamNum, playerNum),
     leds(broker),
-    sharedBall(playerNum)
+    sharedBall(playerNum),
+    naiveBall()
     {
         setModuleDescription("The Northern Bites' soccer player.");
         
@@ -116,6 +117,7 @@ namespace man {
         cognitionThread.addModule(behaviors);
         cognitionThread.addModule(leds);
         cognitionThread.addModule(sharedBall);
+        cognitionThread.addModule(naiveBall);
         
         topTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
         topTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
@@ -155,6 +157,8 @@ namespace man {
         }
         sharedBall.locIn.wireTo(&localization.output);
         sharedBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
+
+        naiveBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
         
         obstacle.armContactIn.wireTo(&arms.contactOut, true);
         obstacle.visionIn.wireTo(&vision.vision_obstacle, true);
@@ -180,6 +184,7 @@ namespace man {
         behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
         behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
         behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);
+        behaviors.naiveBallIn.wireTo(&naiveBall.naiveBallOutput);
         
         for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
         {

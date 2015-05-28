@@ -4,7 +4,7 @@
 
 #include "RoboGrams.h"
 #include "Common.h"
-
+#include <math.h>
 #include "FieldConstants.h"
 
 #include <iostream>
@@ -21,8 +21,10 @@
 namespace man {
 namespace context {
 
-const int NUM_FRAMES = 20;
+const float ALPHA = .7f;
+const int NUM_FRAMES = 30;
 const int MAX_FRAMES_OFF = 5;
+const int AVGING_FRAMES = 5; // Number of frames to take an avg position estimate from
 // Magic numbers...
 // TODO how many frames per second?
 
@@ -34,8 +36,8 @@ public:
 
     virtual void run_();
 
-    portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
-    portals::InPortal<messages::RobotLocation> locIn;
+    // portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
+    // portals::InPortal<messages::RobotLocation> locIn;
     portals::InPortal<messages::FilteredBall> ballIn;
 
     portals::OutPortal<messages::NaiveBall> naiveBallOutput;
@@ -43,10 +45,10 @@ public:
 private:
     struct BallState{
         BallState(float rel_x_, float rel_y_, float distance_, float bearing_) : rel_x(rel_x_), rel_y(rel_y_), distance(distance_), bearing(bearing_) {}
-        float distance;
-        float bearing;
         float rel_x;
         float rel_y;
+        float distance;
+        float bearing;
     };
 
     void updateBuffer();
