@@ -1,4 +1,4 @@
-project( man )
+project( boss )
 cmake_minimum_required( VERSION 2.8.3 )
 
 # Make sure we can find the shared files
@@ -42,11 +42,11 @@ endif()
 include_directories( ${PROJECT_BINARY_DIR} )
 
 # Option to turn rebuilding our protobuf libs on/off
-# option( BUILD_PROTOBUF "Rebuild the protobuf libraries." OFF )
-# if( BUILD_PROTOBUF )
-#   # Only build them if the user wants to
-#   include( ${SHARE_DIR}/cmake/BuildProtobuf.cmake )
-# endif()
+option( BUILD_PROTOBUF "Rebuild the protobuf libraries." OFF )
+if( BUILD_PROTOBUF )
+  # Only build them if the user wants to
+  include( ${SHARE_DIR}/cmake/BuildProtobuf.cmake )
+endif()
 
 # testing set up
 # if ( OFFLINE )
@@ -57,8 +57,8 @@ include_directories( ${PROJECT_BINARY_DIR} )
 find_package(ALCOMMON REQUIRED)
 include_directories( ${ALCOMMON_INCLUDE_DIR} )
 
-# find_package( PROTOBUF REQUIRED )
-# include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
+find_package( PROTOBUF REQUIRED )
+include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
 
 # # For Python
 find_package( PythonLibs REQUIRED)
@@ -82,15 +82,15 @@ include_directories( ${SHARE_DIR}/include )
 # include_directories( ${SHARE_DIR}/logshare )
 
 # Also messages
-#add_subdirectory( ${SHARE_DIR}/messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
+add_subdirectory( ${SHARE_DIR}/messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
-#include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
-#include_directories( ${SHARE_DIR}/messages )
+include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
+include_directories( ${SHARE_DIR}/messages )
 
-# If protobuf libs don't exist yet, make sure they build before man
-# if( BUILD_PROTOBUF )
-# add_dependencies(messages protobuf_libs)
-# endif()
+# If protobuf libs don't exist yet, make sure they build before boss
+if( BUILD_PROTOBUF )
+add_dependencies(messages protobuf_libs)
+endif()
 
 # Actual subdirectories
 # include_directories( support )
@@ -117,20 +117,21 @@ include_directories( ${SHARE_DIR}/include )
 # add_subdirectory( sharedball )
 # add_subdirectory( vision )
 
-set( WOMAN_SRCS main.cpp
-  #Woman.cpp
+set( BOSS_SRCS main.cpp
+  Boss.cpp
 )
 
 add_library(
-  woman
+  boss
   SHARED
-  ${WOMAN_SRCS}
+  ${BOSS_SRCS}
 )
 
-#target_link_libraries(
+target_link_libraries( boss
+  messages
+  ${ALCOMMON_LIBRARIES}
+)
 
-#)
-
-install( TARGETS woman
+install( TARGETS boss
   LIBRARY DESTINATION lib
 )

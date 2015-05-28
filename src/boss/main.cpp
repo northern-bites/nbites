@@ -2,12 +2,13 @@
  * Specified in http://www.aldebaran-robotics.com/documentation/dev/cpp/tutos/create_module.html#how-to-create-a-local-module
  **/
 
-//#include "Woman.h"
 #include <alcommon/almodule.h>
 #include <alcommon/albroker.h>
 #include <alcommon/albrokermanager.h>
 
 #include <stdio.h>
+
+#include "Boss.h"
 
 extern "C"
 {
@@ -18,13 +19,15 @@ extern "C"
         AL::ALBrokerManager::setInstance(broker->fBrokerManager.lock());
         AL::ALBrokerManager::getInstance()->addBroker(broker);
         // create module instances
-        //AL::ALModule::createModule<man::Man>(broker, "nbitesman");
         printf("NEW NAOQI MODULE!\n");
+        AL::ALModule::createModule<boss::Boss>(broker, "nbitesman");
+        printf("Successfully created module!\n");
         return 0;
     }
 
     int _closeModule()
     {
+        printf("CLOSING MODULE\n");
         return 0;
     }
 }

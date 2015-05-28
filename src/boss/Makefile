@@ -6,9 +6,9 @@ ATOM_TOOLCHAIN = ../share/cmake/atom.cmake
 STRAIGHT_TOOLCHAIN = ../share/cmake/generic.cmake
 
 # Where the build output will be placed relative to here
-BUILD_DIR = ../../build/woman
+BUILD_DIR = ../../build/boss
 # Here relative to the build dir
-SRC_DIR = ../../src/woman
+SRC_DIR = ../../src/boss
 
 # Where the files will be installed
 INSTALL_PREFIX = install/
