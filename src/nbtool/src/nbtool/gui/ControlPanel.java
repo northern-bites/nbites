@@ -441,7 +441,7 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
 
         addrBox.setEditable(true);
 
-        connectButton.setText("jButton1");
+        connectButton.setText("connect");
 
         streamCB.setText("stream");
 
