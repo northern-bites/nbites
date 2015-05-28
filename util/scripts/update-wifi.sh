@@ -29,6 +29,8 @@ if [[ $DOALL -eq 1 ]]; then
     scp $WPA_SUPPLICANT_CONFIG $ROBOT_UNAME@beyonce.local:/etc/wpa_supplicant
     scp $WPA_SUPPLICANT_CONFIG $ROBOT_UNAME@ozzy.local:/etc/wpa_supplicant
     scp $WPA_SUPPLICANT_CONFIG $ROBOT_UNAME@avril.local:/etc/wpa_supplicant
+    scp $WPA_SUPPLICANT_CONFIG $ROBOT_UNAME@batman.local:/etc/wpa_supplicant
+    scp $WPA_SUPPLICANT_CONFIG $ROBOT_UNAME@she-hulk.local:/etc/wpa_supplicant
 else
     scp $WPA_SUPPLICANT_CONFIG $ROBOT_UNAME@$ROBOT:/etc/wpa_supplicant
 fi

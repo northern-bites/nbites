@@ -2,7 +2,7 @@
 
 This is the GameController developed by team B-Human for the RoboCup SPL and Humanoid League.
 
-If there are any questions, please contact seba@informatik.uni-bremen.de .
+If there are any questions, please contact fthielke@informatik.uni-bremen.de .
 
 Follow @BHumanOpenSrc on Twitter to get notifications about recent activity.
 
@@ -13,17 +13,7 @@ https://github.com/bhuman/GameController .
 ## 1. Building from Source
 
 To build it from the source code you may use Apache Ant.
-There are some ant targets:
-
-- clean
-	cleans up the project folder
-
-- compile
-	compiles the code and stores files in /build/classes
-	
-- jar
-	creates a jar package and stores it in /build/jar
-
+Just call "ant" in the main directory.
 	
 ## 2. Executing the Jar
 
@@ -74,26 +64,30 @@ only roll back to a certain state of the game. Click the oldest decision in the 
 you want to undo. After that all decisions that would be undone will be marked. Click the
 decision again to actually undo it together with all decisions that followed.
 
-To penalize a robot, first press the penalty button, then the robot button. For
-unpenalizing a robot, just press the robot button. A robot can only be unpenalized, when
-its penalty time is over or when the game state changes (SPL only). Ten seconds before
-the penalty time is over, the robot's button starts flashing yellow. For regular penalties,
-it continues to flash until the button is pressed. Only buttons of robots that were
-requested for pickup stop flashing after ten seconds and simply stay yellow until they are
-pressed, as a reminder that the robot can return as soon as it is ready.
+To penalize a robot, first press the penalty button, then the robot button. The only 
+exception is the state "Set" in playoff games, in which the "Motion in Set" penalty is
+preselected and robots can be penalized by simply clicking on them (selecting other 
+penalties is still possible). For unpenalizing a robot, just press the robot button.
+A robot can only be unpenalized, when its penalty time is over or when the game state
+changes (SPL only). Ten seconds before the penalty time is over, the robot's button
+starts flashing yellow. For regular penalties, it continues to flash until the button is
+pressed. Only buttons of robots that were requested for pickup stop flashing after ten
+seconds and simply stay yellow until they are pressed, as a reminder that the robot can
+return as soon as it is ready. Robots with a "Motion in Set" penalty stay on the field
+and will be automatically unpenalized 15 seconds after pressing the button "Play". 
 
-Before unpenalizing a robot, please make sure that it was put back on the field by the
-assistant referees. For that reason, robots are never unpenalized automatically.
+Before unpenalizing a robot that was taken off the field, please make sure that it was
+put back on the field by the assistant referees. For that reason, robots are never
+unpenalized automatically.
 
 To substitute a robot, press "Substitute" and then the robot that should leave the field.
-Afterwards, any of the substitutes can be be activated. If the robot that is replaced is
+Afterwards, any of the substitutes can be activated. If the robot that is replaced is
 already penalized, its substitute inherits the penalty. If it is not, the substitute can
 immediately enter the field in the HL, but gets a "request for pickup" penalty before it
 can enter the field in the SPL.
 
-When pressing the big "+" (goal), "Timeout", "Kickoff Goal", or "Global Game Stuck", the
-other team gets the next kick-off. "Kickoff Goal" and "Global Game Stuck" share the same
-button.
+When pressing the big "+" (goal), "Timeout", or "Global Game Stuck", the
+other team gets the next kick-off.
 
 SPL: When the referee decides that too much game time has been lost, use the thin "+" next
 to the clock to increase the game time in one-minute steps. This is only available during
@@ -104,9 +98,9 @@ stoppages of play.
 
 While the GameController is running, you may use the following keys on the keyboard instead of pushing buttons:
 
-    Esc		    - press it twice to close the GameController
-    Delete		- toggle test-mode (everything is legal, every button is visible and enabled)
-    Backspace	- undo last action
+    Esc	      - press it twice to close the GameController
+    Delete    - toggle test-mode (everything is legal, every button is visible and enabled)
+    Backspace - undo last action
 
 only SPL
 
@@ -115,11 +109,10 @@ only SPL
 
     P	- pushing
     L	- leaving the field
-    F	- fallen robot
-    I	- inactive robot
+    I	- fallen / inactive / local game stuck
     D	- illegal defender
-    O	- ball holding
-    H	- playing with hands
+    G   - kickoff goal 
+    O	- illegal ball contact
     U	- request for pickup
     C   - coach motion
     T   - teammate pushing
@@ -148,7 +141,8 @@ buttons and LEDs according to the rules (with a few additions).
 ### Installation
 
 Put the file libgamectrl.so somewhere on your NAO and add the library to your 
-file "autoload.ini" so that NAOqi can find it. 
+file "autoload.ini" so that NAOqi can find it. The binary provided was built
+for NAOqi 2.1.
 
 It is also possible to build the library from source using Aldebaran's qibuild
 framework. The qiproject.xml and CMakeList.txt have been placed in 
@@ -168,6 +162,9 @@ The team number must be non-zero. Setting the team number will reset
 libgamectrl (i.e. go back to the initial state). libgamectrl will also set 
 "GameCtrl/teamNumber" back to zero, so it will recognize the next time your 
 application is started.
+
+Setting the default team color can actually be omitted now. In that case, it
+is black, i.e. the corresponding foot LED is switched off.
 
 You can receive the current GameController packet with:
 
@@ -193,50 +190,32 @@ the Initial state. An active GameController will overwrite these settings.
 The coach broadcasts messages as defined in SPLCoachMessage.h to the UDP port
 SPL_COACH_MESSAGE_PORT through the wireless network. Players are not permitted
 to listen to this port. The GameController will integrate the coach messages
-into the RoboCupGameControlData packet with a delay and forward them to the
-players according to the SPL rules. Since coach messages must be human readable,
-it is assumed that they are a zero-terminated string and all data after the
-first zero character is zeroed, too.
+into the RoboCupGameControlData packet and forward them to the players according
+to the SPL rules. Since coach messages must be human readable, it is assumed
+that they are a zero-terminated string and all data after the first zero
+character is zeroed, too.
 
 The GameStateVisualizer also displays the coach messages.
 
-Please note that the field "team" now contains the team number, not its color.
+Please note that the field "team" now contains the team number, not the color.
 
 
 ## 7. Misc
 
 The format of the packets the GameController broadcasts and receives at port
 GAMECONTROLLER_PORT is defined in the file RoboCupGameControlData.h. It differs
-from the version used in 2013 in several ways:
+from the version used in 2014 in several ways:
 
-- Each TeamInfo now contains information about the coach and its current message
-  (coach, coachMessage).
-  
-- The field goalColour was removed, since all goals are yellow.
+- SPLCoachMessage as well as TeamInfo now have a sequence number of 1 byte which
+  is set by the coach.
 
-- Information for the GameStateVisualizer is part of the packet now (penaltyShot,
-  singleShots, secondaryTime).
-  
-- A counter that is increased for each packet sent (packetNumber) was added. It 
-  allows determining whether a new packet arrived even when using libgamectrl.
-  
-- The PENALTY_SUBSTITUTE is now also used in the SPL for a robot that is a 
-  substitute. Player number 6 is penalized this way right from the beginning,
-  waiting for being substituted for another player.
+- Coach messages now have a data packet size of 80 bytes instead of 40 (actually
+  it is 81 bytes, but only for memory alignment reasons). 
 
-- Because of the substitute, playersPerTeam is 6 now in regular SPL games, but
-  not in drop-in player games.
-
-- The new PENALTY_SPL_COACH_MOTION was added.
-
-- There is a new secondary game state STATE2_TIMEOUT.
-  
-- The custom types uint8, uint16, and uint32 were replaced by the standard types
-  uint8_t, uint16_t, and uint32_t defined in <stdint.h> (or <cstdint>). Please
-  note that including RoboCupGameControlData.h inside a namespace now has strange
-  effects. They can avoided by including <stdint.h> before opening the namespace.
-  
-- Many fields use smaller data types now.
+- RoboCupGameControlData now has the gameType flag, which indicates whether the
+  current game is a round-robin game (time does not stop + no whistles) or a
+  play-off game, i.e. a (quarter / semi) final (whistle is used + time is
+  stopped).
 
 
 ## 8. Known Issues
@@ -245,7 +224,8 @@ There are still a number of issues left:
 
 - When running on the same PC, the GameStateVisualizer sometimes does not
   receive the GameController packets anymore. This error is hard to reproduce,
-  but it happened quite often in Eindhoven.
+  but it happened quite often in Eindhoven. It did not in João Pessoa, but there 
+  the GameStateVisualizer was never running for a long time in a row.
   
 - The qibuild file for libgamectrl is untested.
 

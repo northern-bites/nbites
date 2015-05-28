@@ -43,25 +43,22 @@ void SensorsModule::initializeSensorFastAccess()
         sensorKeys_[i] = std::string("Device/SubDeviceList/") +
             SensorNames[i] + std::string("/Position/Sensor/Value");
     }
-    i++;
 
     // Joint Currents
     for(; i < END_CURRENTS; ++i)
     {
-        // Subtract 27 from index in SensorsNames[] to get correct value.
+        // Subtract 25 from index in SensorsNames[] to get correct value.
         sensorKeys_[i] = std::string("Device/SubDeviceList/") +
-            SensorNames[i-27] + std::string("/ElectricCurrent/Sensor/Value");
+            SensorNames[i-25] + std::string("/ElectricCurrent/Sensor/Value");
     }
-    i++;
 
     // Temperatures
     for(; i < END_TEMPERATURES; ++i)
     {
         // Subtract 2*27 from index in SensorsNames[] to get correct value.
         sensorKeys_[i] = std::string("Device/SubDeviceList/") +
-            SensorNames[i-2*27] + std::string("/Temperature/Sensor/Value");
+            SensorNames[i-2*25] + std::string("/Temperature/Sensor/Value");
     }
-    i++;
 
     // FSR (Left foot)
     for(; i < END_FSRS_LEFT; ++i)
@@ -69,7 +66,6 @@ void SensorsModule::initializeSensorFastAccess()
         sensorKeys_[i] = std::string("Device/SubDeviceList/LFoot/FSR/") +
             SensorNames[i] + std::string("/Sensor/Value");
     }
-    i++;
 
     // FSR (Right foot)
     for(; i < END_FSRS_RIGHT; ++i)
@@ -77,22 +73,21 @@ void SensorsModule::initializeSensorFastAccess()
         sensorKeys_[i] = std::string("Device/SubDeviceList/RFoot/FSR/") +
             SensorNames[i] + std::string("/Sensor/Value");
     }
-    i++;
 
     // Inertial Sensors
-    for(; i < END_INTERTIALS; ++i)
+    for(; i < END_INERTIALS; ++i)
     {
         sensorKeys_[i] = std::string("Device/SubDeviceList/InertialSensor/") +
             SensorNames[i] + std::string("/Sensor/Value");
     }
-    i++;
 
     // There are 2 battery values.
     sensorKeys_[i] = std::string("Device/SubDeviceList/Battery/Charge/Sensor/Value");
     i++;
     /* IMPORTANT for some reason, battery charge cannot be read correctly unless
      * battery current is read also, who knows why, bad aldebaran code?
-     * NOT ACTUALLY OUTPORTALED OR USED AT ALL, current is needed for bug fix */
+     * NOT ACTUALLY OUTPORTALED OR USED AT ALL, current is needed for bug fix
+     * TODO: Determine if this is still the case */
     sensorKeys_[i] = std::string("Device/SubDeviceList/Battery/Current/Sensor/Value");
     i++;
     // There are 2 important sonars.
@@ -152,8 +147,6 @@ void SensorsModule::initializeSensorFastAccess()
     sensorKeys_[i] = std::string("Device/SubDeviceList/RHand/Hardness/Actuator/Value");
     i++;
     sensorKeys_[i] = std::string("Device/SubDeviceList/RHipPitch/Hardness/Actuator/Value");
-    i++;
-    sensorKeys_[i] = std::string("Device/SubDeviceList/RHipYawPitch/Hardness/Actuator/Value");
     i++;
     sensorKeys_[i] = std::string("Device/SubDeviceList/RHipRoll/Hardness/Actuator/Value");
     i++;
@@ -250,8 +243,10 @@ void SensorsModule::updateJointsMessage()
     jointsMessage.get()->set_r_elbow_roll(sensorValues_[RElbowRoll]);
     jointsMessage.get()->set_r_wrist_yaw(sensorValues_[RWristYaw]);
     jointsMessage.get()->set_r_hand(sensorValues_[RHand]);
+    // Hip yaw pitches have ALWAYS been the same, only now Aldebaran isn't
+    // allowing you to access it from the right
     jointsMessage.get()->set_l_hip_yaw_pitch(sensorValues_[LHipYawPitch]);
-    jointsMessage.get()->set_r_hip_yaw_pitch(sensorValues_[RHipYawPitch]);
+    jointsMessage.get()->set_r_hip_yaw_pitch(sensorValues_[LHipYawPitch]);
     jointsMessage.get()->set_l_hip_roll(sensorValues_[LHipRoll]);
     jointsMessage.get()->set_l_hip_pitch(sensorValues_[LHipPitch]);
     jointsMessage.get()->set_l_knee_pitch(sensorValues_[LKneePitch]);
@@ -285,7 +280,7 @@ void SensorsModule::updateCurrentsMessage()
     jointsMessage.get()->set_r_wrist_yaw(sensorValues_[RWristYawCurrent]);
     jointsMessage.get()->set_r_hand(sensorValues_[RHandCurrent]);
     jointsMessage.get()->set_l_hip_yaw_pitch(sensorValues_[LHipYawPitchCurrent]);
-    jointsMessage.get()->set_r_hip_yaw_pitch(sensorValues_[RHipYawPitchCurrent]);
+    jointsMessage.get()->set_r_hip_yaw_pitch(sensorValues_[LHipYawPitchCurrent]);
     jointsMessage.get()->set_l_hip_roll(sensorValues_[LHipRollCurrent]);
     jointsMessage.get()->set_l_hip_pitch(sensorValues_[LHipPitchCurrent]);
     jointsMessage.get()->set_l_knee_pitch(sensorValues_[LKneePitchCurrent]);
@@ -318,7 +313,7 @@ void SensorsModule::updateTemperatureMessage()
     temperaturesMessage.get()->set_r_wrist_yaw(sensorValues_[RWristYawTemp]);
     temperaturesMessage.get()->set_r_hand(sensorValues_[RHandTemp]);
     temperaturesMessage.get()->set_l_hip_yaw_pitch(sensorValues_[LHipYawPitchTemp]);
-    temperaturesMessage.get()->set_r_hip_yaw_pitch(sensorValues_[RHipYawPitchTemp]);
+    temperaturesMessage.get()->set_r_hip_yaw_pitch(sensorValues_[LHipYawPitchTemp]);
     temperaturesMessage.get()->set_l_hip_roll(sensorValues_[LHipRollTemp]);
     temperaturesMessage.get()->set_l_hip_pitch(sensorValues_[LHipPitchTemp]);
     temperaturesMessage.get()->set_l_knee_pitch(sensorValues_[LKneePitchTemp]);
@@ -444,7 +439,6 @@ void SensorsModule::updateStiffMessage()
         sensorValues_[RElbowYawStiff] > 0 ||
         sensorValues_[RHandStiff] > 0 ||
         sensorValues_[RHipPitchStiff] > 0 ||
-        sensorValues_[RHipYawPitchStiff] > 0 ||
         sensorValues_[RHipRollStiff] > 0 ||
         sensorValues_[RKneePitchStiff] > 0 ||
         sensorValues_[RShoulderPitchStiff] > 0 ||
@@ -478,7 +472,7 @@ std::string makeSweetMoveTuple(const messages::JointAngles* angles)
             TO_DEG*angles->l_knee_pitch(),
             TO_DEG*angles->l_ankle_pitch(),
             TO_DEG*angles->l_ankle_roll(),
-            TO_DEG*angles->r_hip_yaw_pitch(),
+            TO_DEG*angles->l_hip_yaw_pitch(),
             TO_DEG*angles->r_hip_roll(),
             TO_DEG*angles->r_hip_pitch(),
             TO_DEG*angles->r_knee_pitch(),
