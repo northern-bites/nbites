@@ -61,7 +61,7 @@ public class NBLOG_pack {
 				
 				Log found = CommonIO.simpleReadLog(dis);
 				
-				if (!Utility.isv6Description(found._olddesc_)) {
+				if (Utility.isv6Description(found._olddesc_)) {
 					found.setTree(SExpr.deserializeFrom(found._olddesc_));
 					
 					if (found.primaryType().equals("YUVImage")) {
@@ -114,7 +114,7 @@ public class NBLOG_pack {
 				logf.createNewFile();
 			
 			Header head = Header.newBuilder().setName("messages.YUVImage")
-					.setVersion(3).setTimestamp(0).setTopCamera(true).build();
+					.setVersion(3).setTimestamp(42).setTopCamera(true).build();
 			byte[] headBytes = head.toByteArray();
 			
 			int length = 4 + headBytes.length;
@@ -140,9 +140,11 @@ public class NBLOG_pack {
 			}
 			
 			bb.flip();
-			FileChannel fc = new FileOutputStream(logf).getChannel();
+			FileOutputStream fos = new FileOutputStream(logf);
+			FileChannel fc = fos.getChannel();
 			fc.write(bb);
 			fc.close();
+			fos.close();
 			
 			Logger.logf(Logger.INFO, "Wrote %d logs to %s.\n", top.size(), topName);
 		}
@@ -154,7 +156,7 @@ public class NBLOG_pack {
 				logf.createNewFile();
 			
 			Header head = Header.newBuilder().setName("messages.YUVImage")
-					.setVersion(3).setTimestamp(0).setTopCamera(false).build();
+					.setVersion(3).setTimestamp(42).setTopCamera(false).build();
 			byte[] headBytes = head.toByteArray();
 			
 			int length = 4 + headBytes.length;
@@ -179,10 +181,11 @@ public class NBLOG_pack {
 				bb.put(l.bytes, 0, size);
 			}
 			
-			bb.flip();
-			FileChannel fc = new FileOutputStream(logf).getChannel();
+			FileOutputStream fos = new FileOutputStream(logf);
+			FileChannel fc = fos.getChannel();
 			fc.write(bb);
 			fc.close();
+			fos.close();
 			
 			Logger.logf(Logger.INFO, "Wrote %d logs to %s.\n", bot.size(), botName);
 		}

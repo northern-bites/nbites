@@ -35,9 +35,9 @@ public class NBTool_v6 {
 		System.out.println("Generating Center instance..."); Center.startCenter();
 		System.out.println("Generating ToolStats instance: " + ToolStats.INST.toString());
 		System.out.println("Generating SessionMaster instance: " + SessionMaster.get().toString());
-		System.out.print("Generating CrossServer instance ... live:");
+		System.out.println("Generating CrossServer instance ...");
 		CrossIO.startCrossServer();
-		System.out.printf("%b\n", CrossIO.crossServerLive());
+		System.out.printf("CrossServer live:%b\n", CrossIO.crossServerLive());
 		
 		try {
 			Logger.log(Logger.INFO, "loading preferences...");

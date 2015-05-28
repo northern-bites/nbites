@@ -32,7 +32,7 @@ import nbtool.util.NBConstants;
 import nbtool.util.Utility;
 
 public class NBCrossPane extends JPanel {
-/*
+
 	private static void exact(Dimension d, Component c) {
 		c.setMinimumSize(d);
 		c.setMaximumSize(d);
@@ -350,5 +350,5 @@ public class NBCrossPane extends JPanel {
 		
 		this.out.addAll(Arrays.asList(out));
 		out_model.reload();
-	} */
+	}
 }
