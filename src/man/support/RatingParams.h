@@ -47,7 +47,7 @@ inline int max(int x, int y)
   return x >= y ? x : y;
 }
 
-inline int limit(int x, int bits)               // ???
+inline int limit(int x, int bits)        
 {
   return min(max(x, 0), (1 << bits) - 1);
 }
@@ -152,13 +152,13 @@ struct RatingParams
 struct Colors
 {
   RatingParams white;   
-  RatingParams green;
   RatingParams orange;
+  RatingParams green;
 
   Colors() {
-    white .load(-0.04f, -0.04f,  0.12f,  0.12f, -0.05f, -0.04f);
-    green .load( 0.077f,  0.010f, -0.057f, -0.230f, -0.06f, -0.06f);
+    white .load(-0.02f, -0.02f,  0.25f,  0.25f, -0.055f, -0.055f);
     orange.load( 0.133f,  0.053f, -0.133f,  0.107f, -0.06f,  0.06f);
+    green .load( 0.077f,  0.010f, -0.057f, -0.230f, -0.06f, -0.06f);
   }
 };
 

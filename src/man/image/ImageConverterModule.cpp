@@ -13,8 +13,8 @@ ImageConverterModule::ImageConverterModule()
     : Module(),
       yImage(base()),
       whiteImage(base()),
-      orangeImage(base()),
       greenImage(base()),
+      orangeImage(base()),
       thrImage(base()),
       params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit),
       table(new unsigned char[tableByteSize])
@@ -73,11 +73,11 @@ void ImageConverterModule::run_()
     PackedImage8 image8 = tempOutput8.window(0, 2*240, 320, 240);
     whiteImage.setMessage(Message<PackedImage8>(&image8));
 
-    // Third 320x240 image = all orangeness rating values in imageIn.message()
+    // Third 320x240 image = greenness rating values in imageIn.message()
     image8 = tempOutput8.window(0, (2+1)*240, 320, 240);
     orangeImage.setMessage(Message<PackedImage8>(&image8));
 
-    // Last 320x240 image = all greeness rating values in imageIn.message()
+    // Last 320x240 image = orange rating values in imageIn.message()
     image8 = tempOutput8.window(0, (3+1)*240, 320, 240);
     greenImage.setMessage(Message<PackedImage8>(&image8));
 

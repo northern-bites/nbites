@@ -26,8 +26,8 @@ public:
     // Outs four images for vision, YUV split up and a color segmented image
     portals::OutPortal<messages::PackedImage16> yImage;
     portals::OutPortal<messages::PackedImage8> whiteImage; 
-    portals::OutPortal<messages::PackedImage8> orangeImage;
     portals::OutPortal<messages::PackedImage8> greenImage;
+    portals::OutPortal<messages::PackedImage8> orangeImage;
     portals::OutPortal<messages::ThresholdImage> thrImage;
 
     // For offline use, allows table to change after construction

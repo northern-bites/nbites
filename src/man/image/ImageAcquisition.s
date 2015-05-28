@@ -22,7 +22,7 @@
 #// ***************************
 
 # Local variables on stack
-    .struct 0
+    .struct 0  
 # White parameters
 whiteDark0:     .skip 16
 whiteYCoeff:    .skip 16

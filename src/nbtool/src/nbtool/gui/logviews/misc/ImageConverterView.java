@@ -18,8 +18,8 @@ import nbtool.util.Utility;
 public class ImageConverterView extends ViewParent implements IOFirstResponder {
     BufferedImage yImage;
     BufferedImage whiteImage;
-    BufferedImage orangeImage;
     BufferedImage greenImage;
+    BufferedImage orangeImage;
 
     public void paintComponent(Graphics g) {
         if (yImage != null) {
@@ -28,11 +28,11 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         if (whiteImage != null) {
             g.drawImage(whiteImage, 325, 0, null);
         }
+        if (greenImage != null) {
+            g.drawImage(greenImage, 325, 245, null);
+        }
         if (orangeImage != null) {
             g.drawImage(orangeImage, 0, 245, null);
-        }
-        if (greenImage != null) {
-            g.drawImage(whiteImage, 325, 245, null);
         }
     }
 
@@ -70,10 +70,10 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         this.whiteImage = pixelImg.toBufferedImage();
 
         pixelImg = new Y8image(320, 240, out[2].bytes);
-        this.orangeImage = pixelImg.toBufferedImage();
+        this.greenImage = pixelImg.toBufferedImage();
 
         pixelImg = new Y8image(320, 240, out[3].bytes);
-        this.greenImage = pixelImg.toBufferedImage();
+        this.orangeImage = pixelImg.toBufferedImage();
 
         repaint();
     }
