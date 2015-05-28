@@ -31,6 +31,8 @@ import nbtool.io.CrossIO;
 import nbtool.util.NBConstants;
 import nbtool.util.Utility;
 
+/*
+
 public class NBCrossPane extends JPanel {
 
 	private static void exact(Dimension d, Component c) {
@@ -351,4 +353,4 @@ public class NBCrossPane extends JPanel {
 		this.out.addAll(Arrays.asList(out));
 		out_model.reload();
 	}
-}
+} */
