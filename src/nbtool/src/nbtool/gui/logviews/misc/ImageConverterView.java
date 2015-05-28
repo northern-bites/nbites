@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 
 import nbtool.images.Y8image;
 import nbtool.images.Y16image;
+import nbtool.images.ColorSegmentedImage;
 
 import nbtool.data.Log;
 import nbtool.io.CommonIO.IOFirstResponder;
@@ -20,6 +21,7 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
     BufferedImage whiteImage;
     BufferedImage greenImage;
     BufferedImage orangeImage;
+    BufferedImage segmentedImage;
 
     public void paintComponent(Graphics g) {
         if (yImage != null) {
@@ -29,10 +31,14 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
             g.drawImage(whiteImage, 325, 0, null);
         }
         if (greenImage != null) {
-            g.drawImage(greenImage, 325, 245, null);
+            g.drawImage(greenImage, 0, 245, null);
         }
-        if (orangeImage != null) {
-            g.drawImage(orangeImage, 0, 245, null);
+        // if (orangeImage != null) {
+        //     g.drawImage(orangeImage, 325, 245, null);
+        // }
+
+        if (segmentedImage != null) {
+            g.drawImage(segmentedImage, 324, 245, null);
         }
     }
 
@@ -74,6 +80,9 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
 
         pixelImg = new Y8image(320, 240, out[3].bytes);
         this.orangeImage = pixelImg.toBufferedImage();
+
+        ColorSegmentedImage colorSegImg = new ColorSegmentedImage(320, 240, out[4].bytes);
+        this.segmentedImage = colorSegImg.toBufferedImage();
 
         repaint();
     }

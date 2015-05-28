@@ -116,6 +116,24 @@ int ImageConverter_func() {
 
     rets.push_back(orangeRet);
 
+    //-------------------
+    //  SEGMENTED IMAGE
+    //-------------------
+    Log* colorSegRet = new Log();
+    int colorSegLength = 240*320;
+
+    // Get segmented image from module message
+    const messages::PackedImage<unsigned char>* colorSegImage = module.thrImage.getMessage(true).get();
+
+    // Create temp buffer and fill with segmented image
+    uint8_t segBuf[colorSegLength];
+    memcpy(segBuf, colorSegImage->pixelAddress(0, 0), colorSegLength);
+
+    // Convert to string and set log
+    std::string segBuffer((const char*)segBuf, colorSegLength);
+    colorSegRet->setData(segBuffer);
+
+    rets.push_back(colorSegRet);
 
     // Done
     printf("ImageConverter module ran! W: %d, H: %d\n", yImage->width(), yImage->height());

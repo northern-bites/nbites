@@ -57,12 +57,15 @@ void ImageConverterModule::run_()
 
     Colors color;
 
+    char tableAddrr[] = "/home/evanhoyt/nbites/data/tables/station15v4.mtb";
+    initTable(tableAddrr);
+
     PROF_ENTER(P_ACQUIRE_IMAGE);
     ImageAcquisition::acquire_image(yuv.pixelAddress(0, 0),
                                     320, 240, 1280,
                                     &color,
                                     (uint8_t*)tempOutput16.pixelAddress(0, 0),
-                                    NULL);
+                                    table);
     PROF_EXIT(P_ACQUIRE_IMAGE);
 
     // First 320x240 image = all the Y values in imageIn.message()
@@ -75,11 +78,11 @@ void ImageConverterModule::run_()
 
     // Third 320x240 image = greenness rating values in imageIn.message()
     image8 = tempOutput8.window(0, (2+1)*240, 320, 240);
-    orangeImage.setMessage(Message<PackedImage8>(&image8));
+    greenImage.setMessage(Message<PackedImage8>(&image8));
 
     // Last 320x240 image = orange rating values in imageIn.message()
     image8 = tempOutput8.window(0, (3+1)*240, 320, 240);
-    greenImage.setMessage(Message<PackedImage8>(&image8));
+    orangeImage.setMessage(Message<PackedImage8>(&image8));
 
     // Color Segmented Image
     ThresholdImage thr = tempOutput8.window(0, (4+1)*240, 320, 240);
@@ -89,6 +92,8 @@ void ImageConverterModule::run_()
 // Read a color table into memory from pathname
 void ImageConverterModule::initTable(char *filename)
 {
+    printf("CAMERA::Starting colortable load\n");
+
     FILE *fp = fopen(filename, "r");   //open table for reading
 
     if (fp == NULL) {

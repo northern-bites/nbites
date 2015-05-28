@@ -51,8 +51,11 @@ int ImageAcquisition::acquire_image(const unsigned char* source,
             *pg++ = colors->green .scoreMax(y, u, v);
             *po++ = colors->orange.scoreMax(y, u, v ^ UVMask);
 
-            if (colorTable)
-                *pc++ = colorTable[(u >> (UVBits - 7) << 14) + (v >> (UVBits - 7) << 7) + (y >> (YBits - 7))];
+            if (colorTable) {
+               *pc++ = colorTable[(u >> (UVBits - 7) << 14) + (v >> (UVBits - 7) << 7) + (y >> (YBits - 7))];
+            //    printf("U: %d V: %d Y: %d. Looking for value %d. Found %d\n", u >> 1, v >> 1, y >> 2,
+             //       (u >> (UVBits - 7) << 14) + (v >> (UVBits - 7) << 7) + (y >> (YBits - 7)), *(pc-1)); 
+            }
         }
     }
 
