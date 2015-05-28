@@ -28,12 +28,14 @@ def shouldDodge(nav):
         return False
 
     for i in range(1, len(nav.brain.obstacles)):
-        if nav.brain.obstacles[i] == 1.0:
+        if nav.brain.obstacles[i] == 0.0:
             states.dodge.armPosition = i
             doneDodging.timer = 0
             doneDodging.armPosition = i
+            print("true")
             return True
 
+    print("false")
     return False
 
     # TODO: HACK BRAZIL - TURNED OFF WAY TO PROCESS VISION OBSTACLES
@@ -88,7 +90,7 @@ def doneDodging(nav):
     if doneDodging.timer > 90:
         timerDone = True
 
-    if nav.brain.obstacles[doneDodging.armPosition] == 1.0:
+    if nav.brain.obstacles[doneDodging.armPosition] == 0.0:
         obstacles = True
 
     return timerDone and not obstacles

@@ -61,7 +61,7 @@ class Navigator(FSA.FSA):
 
             Transition.CountTransition(navTrans.shouldDodge,
                                        Transition.OCCASIONALLY,
-                                       Transition.LOW_PRECISION)
+                                       Transition.OK_PRECISION)
             : NavStates.dodge
 
             }
