@@ -22,7 +22,7 @@ using namespace std;  // delete later
 int ImageAcquisition::acquire_image(const unsigned char* source,
                                     int width, int height, int pitch,
                                     const Colors* colors,
-                                    unsigned char* dest,
+                                     unsigned char* dest,
                                     unsigned char* colorTable)
 {
 

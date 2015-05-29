@@ -115,12 +115,13 @@ copy:  movdqu  xmm0, [esi + ecx + endOfColors]
 
 # Make the color table index constant. 128*128 in U words, 128 in V words
 .if (colorTable)
-    pcmpeqb xmm0, xmm0
-    psrld   xmm0, 31
-    movdqa  xmm1, xmm0
-    pslld   xmm0, 14
-    pslld   xmm1, 23
-    por xmm0, xmm1
+    pcmpeqb xmm0, xmm0          # all 1s
+    psrld   xmm0, 31            # four dw of value 1
+    movdqa  xmm1, xmm0      
+    pslld   xmm0, 6             # four dw of value 0b00000000 00000000 01000000 00000000
+    pslld   xmm1, 30            # four dw of value 0b00000000 01000000 00000000 00000000
+    por xmm0, xmm1              # four dw of calue 0b00000000 01000000 01000000 00000000
+                                                #  0b01000000 00000000 00000000 01000000
     movdqa  [esp + tableK], xmm0
 .endif
 
@@ -315,9 +316,9 @@ copy:  movdqu  xmm0, [esi + ecx + endOfColors]
 .if (colorTable == 1)
     psrld   xmm0, 19            # high 7 bits of 4 Y values in dwords
     psrlw   xmm1, 2             # high 7 bits of 4 U and 4 V values in words
-    pmaddwd xmm1, [esp + tableK] # combine U and U
+    pmaddwd xmm1, [esp + tableK] # multiply U by 128, V by 128*128, and add
     paddd   xmm0, xmm1          # and Y for 3D table index
-    movdqu  [esp + (ecx*4) + (localsStackEnd + 16) * \phase], xmm0    # save on stack for later
+    movdqa  [esp + (ecx*4) + localsStackEnd + (16 * \phase)], xmm0    # save on stack for later
 .endif
 
 .endm
@@ -384,7 +385,7 @@ xLoop:
 # edx   -> end of current output row
 # 
 .macro cGroup phase
-    mov     eax, [esp + dPitch] #+ ecx*4 + \phase*4]  # Load the color address from the stack
+    mov     eax, [esp + localsStackEnd + ecx*4 + \phase*4]  # Load the color address from the stack
     movzx   eax, BYTE PTR[ebx + eax]        # Lookup color in table
     mov     BYTE PTR[edx + ecx + \phase], al     # write it out
 .endm
