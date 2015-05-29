@@ -1,7 +1,7 @@
 #include "NaiveBallModule.h"
 
 namespace man {
-namespace context {
+namespace naive {
 
 NaiveBallModule::NaiveBallModule() :
     portals::Module(),
@@ -23,10 +23,10 @@ void NaiveBallModule::run_()
     // Add observation (ball distance/position, ball bearing) to buffer
 
     // get myInfo:
-    locIn.latch();
-    myX = locIn.message().x();
-    myY = locIn.message().y();
-    myH = locIn.message().h();
+    // locIn.latch();
+    // myX = locIn.message().x();
+    // myY = locIn.message().y();
+    // myH = locIn.message().h();
     ballIn.latch();
     myBall = ballIn.message();
 
@@ -41,7 +41,7 @@ void NaiveBallModule::run_()
     } else if (bufferFull) {
         naiveCheck();
     }
-
+    // printf("Hella");
     if (currentIndex > 19) {
         print();
     }

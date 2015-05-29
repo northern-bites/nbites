@@ -70,7 +70,7 @@ private:
     behaviors::BehaviorsModule behaviors;
     led::LedEnactorModule leds;
     context::SharedBallModule sharedBall;
-    context::NaiveBallModule naiveBall;
+    naive::NaiveBallModule naiveBall;
 };
 
 }

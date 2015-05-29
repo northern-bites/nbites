@@ -19,7 +19,7 @@
  */
 
 namespace man {
-namespace context {
+namespace naive {
 
 const float ALPHA = .7f;
 const int NUM_FRAMES = 30;
@@ -60,7 +60,7 @@ private:
     int buffSize;
     int frameOffCount;
     float velocityEst;
-    bool buffFull;
+    bool bufferFull;
 
     messages::WorldModel worldMessages[NUM_PLAYERS_PER_TEAM];
     messages::FilteredBall myBall;

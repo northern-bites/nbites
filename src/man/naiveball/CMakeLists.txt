@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 
-set(NAIVEBALL_SRCS NaiveBallModule)
+set(NAIVEBALL_SRCS NaiveBallModule
+)
 
 add_library(
   naiveball
