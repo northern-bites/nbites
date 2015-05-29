@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Tools/Module/Module.h"
+#include "Representations/Infrastructure/SensorData.h"
 #include "Representations/Configuration/RobotDimensions.h"
 #include "Representations/Sensing/OrientationData.h"
 #include "Representations/Sensing/RobotModel.h"
@@ -15,6 +16,7 @@
 #include "Representations/MotionControl/OdometryData.h"
 
 MODULE(TorsoMatrixProvider)
+  REQUIRES(SensorDataBH)
   REQUIRES(OrientationDataBH)
   REQUIRES(RobotModelBH)
   REQUIRES(RobotDimensionsBH)
@@ -40,15 +42,9 @@ public:
 
   /** Updates the OdometryDataBH representation.
   * @param odometryData The odometry data representation which is updated by this module.
+  * @note Northern Bites addition, uses z-axis gyro to calculate heading offset
   */
   void update(OdometryDataBH& odometryData);
-
-  /** Updates the OdometryDataBH representation.
-  * @param odometryData The odometry data representation which is updated by this module.
-  * @param angleZ The angle measured using z-gyro by Aldebaran on board
-  * @note Northern Bites addition
-  */
-  void update(OdometryDataBH& odometryData, float angleZ);
 
 private:
   float lastLeftFootZRotation; /**< The last z-rotation of the left foot. */
