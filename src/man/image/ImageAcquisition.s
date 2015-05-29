@@ -118,7 +118,7 @@ copy:  movdqu  xmm0, [esi + ecx + endOfColors]
     pcmpeqb xmm0, xmm0          # all 1s
     psrld   xmm0, 31            # four dw of value 1
     movdqa  xmm1, xmm0      
-    pslld   xmm0, 6             # four dw of value 0b00000000 00000000 01000000 00000000
+    pslld   xmm0, 7            # four dw of value 0b00000000 00000000 01000000 00000000
     pslld   xmm1, 30            # four dw of value 0b00000000 01000000 00000000 00000000
     por xmm0, xmm1              # four dw of calue 0b00000000 01000000 01000000 00000000
                                                 #  0b01000000 00000000 00000000 01000000
@@ -316,7 +316,7 @@ copy:  movdqu  xmm0, [esi + ecx + endOfColors]
 .if (colorTable == 1)
     psrld   xmm0, 19            # high 7 bits of 4 Y values in dwords
     psrlw   xmm1, 2             # high 7 bits of 4 U and 4 V values in words
-    pmaddwd xmm1, [esp + tableK] # multiply U by 128, V by 128*128, and add
+    pmaddwd xmm1, [esp + tableK] # combine U and U
     paddd   xmm0, xmm1          # and Y for 3D table index
     movdqa  [esp + (ecx*4) + localsStackEnd + (16 * \phase)], xmm0    # save on stack for later
 .endif

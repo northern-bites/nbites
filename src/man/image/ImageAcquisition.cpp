@@ -3,8 +3,6 @@
 #include "ColorParams.h"
 #include "RatingParams.h"
 
-using namespace std;  // delete later
-
 #define CPP_ACQUIRE 0
 
 // The ASM and C++ have identical function signatures.
@@ -22,11 +20,11 @@ using namespace std;  // delete later
 int ImageAcquisition::acquire_image(const unsigned char* source,
                                     int width, int height, int pitch,
                                     const Colors* colors,
-                                     unsigned char* dest,
+                                    unsigned char* dest,
                                     unsigned char* colorTable)
 {
 
-#if 1
+#if 0
     _acquire_image(source, width, height, pitch, colors, dest, colorTable);
 #else
  // Ignore low three bits of width

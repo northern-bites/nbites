@@ -21,6 +21,7 @@ int ImageConverter_func() {
     assert(args.size() == 1);
 
     printf("ImageConverter_func()\n");
+    printf("******* If you want to use a color table, define in nbcross/ched_defs.cpp *******\n");
 
 
     int width = 640;
