@@ -12,6 +12,9 @@
 #include "StiffnessControl.pb.h"
 #include "LedCommand.pb.h"
 
+#define MEMORY_NAME "/nbites-memory"
+#define SEMAPHORE_NAME "/nbites-semaphore"
+
 struct JointCommand {
     messages::JointAngles stiffnessCommand;
     messages::JointAngles JointsCommand;

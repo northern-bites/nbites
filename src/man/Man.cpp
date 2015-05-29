@@ -19,10 +19,9 @@ SET_POOL_SIZE(messages::RobotLocation, 16);
 #endif
 
 namespace man {
-    
 //Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 //: //AL::ALModule(broker, name),
-Man::Man(const std::string &name) :
+Man::Man() :
     param("/home/nao/nbites/lib/parameters.json"),
     playerNum(param.getParam<int>("playerNumber")),
     teamNum(param.getParam<int>("teamNumber")),

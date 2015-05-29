@@ -34,7 +34,7 @@ class Man// : public AL::ALModule
 {
 public:
     //Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name);
-    Man(const std::string &name);
+    Man();
     virtual ~Man();
 
 

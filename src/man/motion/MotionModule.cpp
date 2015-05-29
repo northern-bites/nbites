@@ -60,8 +60,8 @@ void MotionModule::run_()
     requestInput_.latch();
     fallInput_.latch();
 
-    sensorAngles   = toJointAngles(jointsInput_.message());
-    sensorCurrents = toJointAngles(currentsInput_.message());
+    sensorAngles   = Kinematics::toJointAngles(jointsInput_.message());
+    sensorCurrents = Kinematics::toJointAngles(currentsInput_.message());
 
     newInputJoints = false;
 

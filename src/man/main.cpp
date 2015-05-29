@@ -26,6 +26,7 @@
 // }
 
 int main() {
-    printf("IM BEING EXECUTED ON A ROBOT!!!!!!!!!\n");
+    // Constructs an instance of man
+    man::Man man; // lol man man man
     return 1;
 }
