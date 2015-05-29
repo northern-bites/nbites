@@ -21,16 +21,16 @@ struct JointCommand {
 };
 
 struct SensorValues {
-    messages::JointAngles jointsOut;
-    messages::JointAngles currentsOut;
-    messages::JointAngles temperatureOut;
-    messages::ButtonState chestButtonOut;
-    messages::FootBumperState footBumperOut;
-    messages::InertialState inertialsOut;
-    messages::SonarState sonarsOut;
-    messages::FSR fsrOut;
-    messages::BatteryState batteryOut;
-    messages::StiffStatus stiffStatusOut;
+    messages::JointAngles joints;
+    messages::JointAngles currents;
+    messages::JointAngles temperature;
+    messages::ButtonState chestButton;
+    messages::FootBumperState footBumper;
+    messages::InertialState inertials;
+    messages::SonarState sonars;
+    messages::FSR fsr;
+    messages::BatteryState battery;
+    messages::StiffStatus stiffStatus;
 };
 
 struct SharedData {
@@ -39,9 +39,8 @@ struct SharedData {
     volatile uint8_t commandsRead;
     volatile uint8_t commandsLatest;
 
-    JointCommand commands[3];
-    SensorValues sensors[3];
-    messages::LedCommand Leds[3];
+    JointCommand commands[2];
+    messages::LedCommand Leds[2];
 
-    pthread_mutex_t lock;
+    SensorValues sensors[2];
 };

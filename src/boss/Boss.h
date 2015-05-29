@@ -6,7 +6,6 @@
 #include <alcommon/almodule.h>
 #include <alcommon/albroker.h>
 #include <alproxies/dcmproxy.h>
-#include <almemoryfastaccess/almemoryfastaccess.h>
 #include <althread/alprocesssignals.h>
 
 // Because naoqi gives us the broker as a shared_ptr
@@ -14,10 +13,17 @@
 #include <vector>
 
 // fork(), pid_t, etc.
-#include <unistd.h>
-#include <sys/signal.h>
+#include <unistd.h> // fork(), pid_t, etc
+#include <sys/signal.h> // SIG_TERM
+//#include <sys/types.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
 
 #include "PMotion.pb.h"
+#include "Sensor.h"
+#include "Enactor.h"
 
 namespace boss {
 
@@ -43,20 +49,14 @@ private:
     AL::ALProcessSignals::ProcessSignalConnection dcmPreProcessConnection;
     AL::ALProcessSignals::ProcessSignalConnection dcmPostProcessConnection;
 
-    std::vector<float> sensorValues;
-    std::vector<std::string> sensorKeys;
-
-    messages::JointAngles latestJointAngles;
-    messages::JointAngles lattestStiffnesses;
-
-    AL::ALValue jointCommand;
-    AL::ALValue stiffnessCommand;
-    AL::ALMemoryFastAccess* fastAccess;
+    sensor::Sensor sensor;
+    enactor::Enactor enactor;
 
     // Vars relating to Man
     pid_t manPID;
     bool manRunning;
 
+    SharedData* sharedMem;
 };
 
 }

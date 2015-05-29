@@ -92,33 +92,10 @@ if( BUILD_PROTOBUF )
 add_dependencies(messages protobuf_libs)
 endif()
 
-# Actual subdirectories
-# include_directories( support )
-# add_subdirectory( support )
-# include_directories( motion/bhwalk ) # @todo hack?
-
-# Actual modules
-# add_subdirectory( arms )
-# add_subdirectory( audio )
-# add_subdirectory( balltrack )
-# add_subdirectory( behaviors )
-# add_subdirectory( comm )
-# add_subdirectory( control )
-# add_subdirectory( gamestate )
-# add_subdirectory( guardian )
-# add_subdirectory( image )
-#add_subdirectory( jointenactor )
-#add_subdirectory( led )
-# add_subdirectory( localization )
-# add_subdirectory( log )
-# add_subdirectory( motion )
-# add_subdirectory( obstacle )
-#add_subdirectory( sensors )
-# add_subdirectory( sharedball )
-# add_subdirectory( vision )
-
 set( BOSS_SRCS main.cpp
   Boss.cpp
+  Enactor.cpp
+  Sensor.cpp
 )
 
 add_library(
