@@ -21,17 +21,17 @@ ImageConverterModule::ImageConverterModule()
 {}
 
 
-// ImageConverterModule::ImageConverterModule(char *table_pathname)
-//     : Module(),
-//       yImage(base()),
-//       uImage(base()),
-//       vImage(base()),
-//       thrImage(base()),
-//       params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit),
-//       table(new unsigned char[tableByteSize])
-// {
-//     initTable(table_pathname);
-// }
+ImageConverterModule::ImageConverterModule(char *table_pathname)
+    : Module(),
+      yImage(base()),
+      uImage(base()),
+      vImage(base()),
+      thrImage(base()),
+      params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit),
+      table(new unsigned char[tableByteSize])
+{
+    initTable(table_pathname);
+}
 
 // TODO: Generalize
 

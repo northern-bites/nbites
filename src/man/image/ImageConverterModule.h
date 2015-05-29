@@ -18,9 +18,9 @@ public:
     // For tool, doesn't load color table at converter construction time
     ImageConverterModule();
     // For robots, load color table at converter construction time
-  /*  ImageConverterModule(char *table_pathname);
+    ImageConverterModule(char *table_pathname);
     virtual ~ImageConverterModule() {}
-*/
+
     // Gets an image from the Transcriber module (from the camera)
     portals::InPortal<messages::YUVImage> imageIn;
     // Outs four images for vision, YUV split up and a color segmented image
