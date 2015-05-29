@@ -31,6 +31,7 @@ const int AVGING_FRAMES = 5; // Number of frames to take an avg position estimat
 class NaiveBallModule : public portals::Module
 {
 public:
+    struct BallState;
     NaiveBallModule();
     virtual ~NaiveBallModule();
 
@@ -43,17 +44,12 @@ public:
     portals::OutPortal<messages::NaiveBall> naiveBallOutput;
 
 private:
-    struct BallState{
-        BallState(float rel_x_, float rel_y_, float distance_, float bearing_) : rel_x(rel_x_), rel_y(rel_y_), distance(distance_), bearing(bearing_) {}
-        float rel_x;
-        float rel_y;
-        float distance;
-        float bearing;
-    };
-
     void updateBuffer();
     void clearBuffer();
     void naiveCheck();
+    BallState avgFrames(int startingIndex);
+    void print();
+    void printBallState(BallState x);
 
     BallState *ballStateBuffer;
     int currentIndex;
@@ -61,7 +57,7 @@ private:
     int frameOffCount;
     float velocityEst;
     bool bufferFull;
-
+    int count;
     messages::WorldModel worldMessages[NUM_PLAYERS_PER_TEAM];
     messages::FilteredBall myBall;
 

@@ -3,10 +3,20 @@
 namespace man {
 namespace naive {
 
+struct NaiveBallModule::BallState{
+        BallState(){}
+        BallState(float rel_x_, float rel_y_, float distance_, float bearing_) : rel_x(rel_x_), rel_y(rel_y_), distance(distance_), bearing(bearing_) {}
+        float rel_x;
+        float rel_y;
+        float distance;
+        float bearing;
+};
+
 NaiveBallModule::NaiveBallModule() :
     portals::Module(),
     naiveBallOutput(base())
 {
+    count = 0;
     velocityEst = 0.f;
     frameOffCount = 0;
     currentIndex = 0;
@@ -32,7 +42,7 @@ void NaiveBallModule::run_()
 
 
     // If can see the ball, update the buffer
-    if (myBall.on()) {
+    if (myBall.vis().on()) {
         updateBuffer();
     } else { frameOffCount++; }
 
@@ -41,10 +51,13 @@ void NaiveBallModule::run_()
     } else if (bufferFull) {
         naiveCheck();
     }
-    // printf("Hella");
-    if (currentIndex > 19) {
-        print();
-    }
+    // if (currentIndex > 19) {
+    //     print();
+    //     // count = 0;
+    // }
+    // count++;
+
+    printf("velocity: %f\n", velocityEst);
 
     portals::Message<messages::NaiveBall> naiveBallMessage(0);
 
@@ -67,6 +80,7 @@ void NaiveBallModule::clearBuffer() {
     currentIndex = 0;
     velocityEst = 0.f;
     bufferFull = false;
+    frameOffCount = 0;
 }
 
 // Check if ball is moving, and if so, in what direction, how fast, etc.
@@ -81,14 +95,21 @@ void NaiveBallModule::naiveCheck() {
 
     BallState start_avgs = avgFrames(startIndex);
     BallState end_avgs = avgFrames(endIndex);
-    float dist = sqrt(pow((end_avgs.rel_x - start_avgs.rel_x), 2.f) + pow((end_avgs.rel_y - start_avgs.rel_y), 2.f));
+    float dist = (float)sqrt(pow((end_avgs.rel_x - start_avgs.rel_x), 2.f) + pow((end_avgs.rel_y - start_avgs.rel_y), 2.f));
     // velocityEst = (dist / NUM_FRAMES) * ALPHA + velocityEst * (1-ALPHA);
     velocityEst = (dist / NUM_FRAMES);
+    if (velocityEst > 500) {
+        printf("\n\n WEIRD: avgs: \n");
+        printBallState(start_avgs);
+        printBallState(end_avgs);
+        printf("\n");
+
+    }
     // TODO possibly take into account (possibly as in probably) previous estimates
 
 }
 
-BallState avgFrames(int startingIndex) {
+NaiveBallModule::BallState NaiveBallModule::avgFrames(int startingIndex) {
     float x_sum = 0.f;
     float y_sum = 0.f;
     float dist_sum = 0.f;
@@ -107,7 +128,7 @@ BallState avgFrames(int startingIndex) {
     return BallState(x_sum / AVGING_FRAMES, y_sum / AVGING_FRAMES, dist_sum / AVGING_FRAMES, bearing_sum / AVGING_FRAMES);
 }
 
-void print() {
+void NaiveBallModule::print() {
     BallState x = ballStateBuffer[currentIndex];
     printf("%s\n", bufferFull ? "BufferFull" : "Buffer not full");
     printf("Current ball state:\nrel_xy: (%f, %f)\ndistance:%f\nbearing:%f\n", x.rel_x, x.rel_y, x.distance, x.bearing);
@@ -118,6 +139,10 @@ void print() {
         printf("NOT moving\n");
     }
 
+}
+
+void NaiveBallModule::printBallState(NaiveBallModule::BallState x) {
+    printf("::BALL STATE::\nrel_xy: (%f, %f)\ndistance:%f\nbearing:%f\n", x.rel_x, x.rel_y, x.distance, x.bearing);
 }
 
 } // namespace man
