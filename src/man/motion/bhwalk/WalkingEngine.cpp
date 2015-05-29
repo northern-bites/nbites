@@ -227,7 +227,7 @@ void WalkingEngine::update(WalkingEngineOutputBH& walkingEngineOutput)
     inertiaSensorFilter->update(theOrientationDataBH);
     sensorFilter->update(theFilteredSensorDataBH);
     fallDownStateDetector->update(theFallDownStateBH);
-    torsoMatrixProvider->update(theOdometryDataBH);
+    torsoMatrixProvider->update(theOdometryDataBH, -theSensorDataBH.data[SensorDataBH::angleZ]);
     torsoMatrixProvider->update(theTorsoMatrixBH);
     motionSelector->update(theMotionSelectionBH);
 
