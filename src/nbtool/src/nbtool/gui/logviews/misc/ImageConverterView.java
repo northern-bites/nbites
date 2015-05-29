@@ -33,20 +33,13 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         if (greenImage != null) {
             g.drawImage(greenImage, 0, 245, null);
         }
-        // if (orangeImage != null) {
-        //     g.drawImage(orangeImage, 325, 245, null);
-        // }
-
-        System.out.printf("about to draw: ");
+        if (orangeImage != null) {
+            g.drawImage(orangeImage, 325, 245, null);
+        }
 
         if (segmentedImage != null) {
-             System.out.printf("not nul\n");
-
-            g.drawImage(segmentedImage, 324, 245, null);
-        } else System.out.printf("null\n");
-
-        System.out.printf("dont drawing\n");
-
+            g.drawImage(segmentedImage, 162, 490, null);
+        }
     }
 
     @Override

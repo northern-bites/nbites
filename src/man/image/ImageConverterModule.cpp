@@ -24,8 +24,9 @@ ImageConverterModule::ImageConverterModule()
 ImageConverterModule::ImageConverterModule(char *table_pathname)
     : Module(),
       yImage(base()),
-      uImage(base()),
-      vImage(base()),
+      whiteImage(base()),
+      greenImage(base()),
+      orangeImage(base()),
       thrImage(base()),
       params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit),
       table(new unsigned char[tableByteSize])
@@ -56,9 +57,6 @@ void ImageConverterModule::run_()
     PackedImage8 tempOutput8(tempBuffer, 320, (1*2 + 3)*240, 320);
 
     Colors color;
-
-    char tableAddrr[] = "/home/evanhoyt/nbites/data/tables/station15v4.mtb";
-    initTable(tableAddrr);
 
     PROF_ENTER(P_ACQUIRE_IMAGE);
     ImageAcquisition::acquire_image(yuv.pixelAddress(0, 0),
@@ -92,8 +90,6 @@ void ImageConverterModule::run_()
 // Read a color table into memory from pathname
 void ImageConverterModule::initTable(char *filename)
 {
-    printf("CAMERA::Starting colortable load\n");
-
     FILE *fp = fopen(filename, "r");   //open table for reading
 
     if (fp == NULL) {

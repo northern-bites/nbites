@@ -13,7 +13,7 @@
  multiPhase  = 1 # enable two-phase processing (significant improvement)
  ntStore     = 0 # enable non-temporal stores, only for Y values in multiPhase mode (unclear improvement)
  prefetchSrc = 1 # enable prefetching (significant improvement)
- colorTable  = 0 # enable color table lookup
+ colorTable  = 1 # enable color table lookup
 
 #// ***************************
 #// *                         *
@@ -97,7 +97,7 @@ _acquire_image:
     mov ecx, endOfColors
     neg ecx
 copy:  movdqu  xmm0, [esi + ecx + endOfColors]
-    movdqa  [edi + ecx + endOfColors], xmm0        # CHANED TO UNALIGNED??
+    movdqa  [edi + ecx + endOfColors], xmm0 
     add ecx, 16
     jne copy
 
@@ -313,7 +313,7 @@ copy:  movdqu  xmm0, [esi + ecx + endOfColors]
 
 # Compute and save color table indicies
 .if (colorTable == 1)
-    psrld   xmm0, 19            # high 7 bits of 4 Y values in dowrds
+    psrld   xmm0, 19            # high 7 bits of 4 Y values in dwords
     psrlw   xmm1, 2             # high 7 bits of 4 U and 4 V values in words
     pmaddwd xmm1, [esp + tableK] # combine U and U
     paddd   xmm0, xmm1          # and Y for 3D table index
@@ -384,7 +384,7 @@ xLoop:
 # edx   -> end of current output row
 # 
 .macro cGroup phase
-    mov     eax, [esp + localsStackEnd + ecx*4 + \phase*4]  # Load the color address from the stack
+    mov     eax, [esp + dPitch] #+ ecx*4 + \phase*4]  # Load the color address from the stack
     movzx   eax, BYTE PTR[ebx + eax]        # Lookup color in table
     mov     BYTE PTR[edx + ecx + \phase], al     # write it out
 .endm

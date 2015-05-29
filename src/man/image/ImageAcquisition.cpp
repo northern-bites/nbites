@@ -26,7 +26,7 @@ int ImageAcquisition::acquire_image(const unsigned char* source,
                                     unsigned char* colorTable)
 {
 
-#if 0
+#if 1
     _acquire_image(source, width, height, pitch, colors, dest, colorTable);
 #else
  // Ignore low three bits of width
@@ -52,9 +52,7 @@ int ImageAcquisition::acquire_image(const unsigned char* source,
             *po++ = colors->orange.scoreMax(y, u, v ^ UVMask);
 
             if (colorTable) {
-               *pc++ = colorTable[(v >> (UVBits - 7) << 14) + (u >> (UVBits - 7) << 7) + (y >> (YBits - 7))];
-            //    printf("U: %d V: %d Y: %d. Looking for value %d. Found %d\n", u >> 1, v >> 1, y >> 2,
-             //       (u >> (UVBits - 7) << 14) + (v >> (UVBits - 7) << 7) + (y >> (YBits - 7)), *(pc-1)); 
+               *pc++ = colorTable[(v >> (UVBits - 7) << 14) + (u >> (UVBits - 7) << 7) + (y >> (YBits - 7))]; 
             }
         }
     }

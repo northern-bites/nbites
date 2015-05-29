@@ -34,7 +34,8 @@ int ImageConverter_func() {
     
     messages::YUVImage image(buf, width, height, pitch);
     portals::Message<messages::YUVImage> message(&image);
-    man::image::ImageConverterModule module;
+    char tableAddrr[] = "/home/evanhoyt/nbites/data/tables/evanStation15V5.mtb";
+    man::image::ImageConverterModule module = man::image::ImageConverterModule(tableAddrr);
 
     module.imageIn.setMessage(message);
     module.run();
