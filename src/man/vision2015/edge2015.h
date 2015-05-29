@@ -170,10 +170,12 @@ public:
 
 template <class T>
   AngleBinsIterator<T>::AngleBinsIterator(AngleBins<T>& angleBins)
-    : ab(&angleBins), current(0)
+    : ab(&angleBins)
   {
-    for (binIndex = 0; binIndex < 256 && !current; ++binIndex)
-      current = ab->binList(binIndex);
+    binIndex= 0;
+    current = ab->binList(0);
+    while (binIndex < 256 && !current)
+      current = ab->binList(++binIndex);
   }
 
 

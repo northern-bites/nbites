@@ -82,6 +82,10 @@ EdgeDetector::EdgeDetector(const EdgeDetector& ed)
   dstBlock = 0;
   _dstPitch = _dstWd = _dstHt = 0;
   dstAllocated = 0;
+
+  runs = 0;
+  runSize = 0;
+
   *this = ed;
 }
 
