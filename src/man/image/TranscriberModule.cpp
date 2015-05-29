@@ -209,6 +209,9 @@ void ImageTranscriber::initQueueAllBuffers() {
 }
 void ImageTranscriber::initSettings()
 {
+    std::ifstream parametersFile("path/to/file.json");
+    
+
     // DO NOT SCREW UP THE ORDER BELOW
     setControlSetting(V4L2_CID_HFLIP, settings.hflip);
     setControlSetting(V4L2_CID_VFLIP, settings.vflip);

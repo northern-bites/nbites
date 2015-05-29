@@ -60,6 +60,8 @@ public:
     uint64_t getTimestamp() const;
     Camera::Type type() { return cameraType; }
 
+    void initSettings(); //one of the magical init methods
+
 private:
     enum
     {
@@ -70,7 +72,6 @@ private:
     };
 
     // All of the (magical) init methods
-    void initSettings();
     void initOpenI2CAdapter();
     void initSelectCamera();
     void initOpenVideoDevice();
