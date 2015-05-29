@@ -7,9 +7,10 @@
 #ifndef _fastBlob_
 #define _fastBlob_
 
-#include "stdafx.h"
+#include "Stdafx.h"
+#include "Vision2015.h"
+
 #include <list>
-#include "vision2015.h"
 
 using namespace std;
 

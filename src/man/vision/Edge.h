@@ -4,11 +4,11 @@
 // *                       *
 // *************************
 
-#ifndef _edge2015_
-#define _edge2015_
+#ifndef _edge_
+#define _edge_
 
-#include "stdafx.h"
-#include "vision2015.h"
+#include "Stdafx.h"
+#include "Vision.h"
 
 // ******************************************************
 // *                                                    *
@@ -18,7 +18,7 @@
 
 // ************************
 // *                      *
-// *  AngleELement Class  *
+// *  AngleElement Class  *
 // *                      *
 // ************************
 

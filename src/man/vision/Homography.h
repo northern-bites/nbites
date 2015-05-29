@@ -4,15 +4,15 @@
 // *                              *
 // ********************************
 
-#ifndef _homography2015_
-#define _homography2015_
+#ifndef _homography_
+#define _homography_
 
-#include "stdafx.h"
-#include <stdlib.h>
+#include "Stdafx.h"
+#include "Vision.h"
+
 #define _USE_MATH_DEFINES
 #include <math.h>
-
-#include "vision2015.h"
+#include <stdlib.h>
 
 class GeoLine;
 

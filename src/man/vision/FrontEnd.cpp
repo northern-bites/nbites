@@ -4,9 +4,10 @@
 // *                                       *
 // *****************************************
 
-#include "stdafx.h"
-#include <stdlib.h>
 #include "FrontEnd.h"
+#include "Stdafx.h"
+
+#include <stdlib.h>
 
 // *********************
 // *                   *

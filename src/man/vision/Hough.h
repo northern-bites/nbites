@@ -4,13 +4,13 @@
 // *                                                 *
 // ***************************************************
 
-#ifndef _hough2015_
-#define _hough2015_
+#ifndef _hough_
+#define _hough_
 
-#include "stdafx.h"
-#include "vision2015.h"
-#include "edge2015.h"
-#include "homography2015.h"
+#include "Stdafx.h"
+#include "Vision.h"
+#include "Edge.h"
+#include "Homography.h"
 
 #include <list>
 #include <vector>

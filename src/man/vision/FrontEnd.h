@@ -7,8 +7,8 @@
 #ifndef _FrontEnd_
 #define _FrontEnd_
 
-#include "stdafx.h"
-#include "vision2015.h"
+#include "Stdafx.h"
+#include "Vision.h"
 
 using namespace std;
 

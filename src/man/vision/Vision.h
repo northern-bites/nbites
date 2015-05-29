@@ -4,10 +4,11 @@
 // *                                          *
 // ********************************************
 
-#ifndef _vision2015_
-#define _vision2015_
+#ifndef _vision_
+#define _vision_
 
-#include "stdafx.h"
+#include "Stdafx.h"
+
 #include <stdlib.h>
 #define _USE_MATH_DEFINES
 #include <math.h>

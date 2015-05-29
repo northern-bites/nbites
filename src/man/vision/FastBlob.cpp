@@ -4,9 +4,9 @@
 // *                              *
 // ********************************
 
-#include "stdafx.h"
-#include "fastBlob.h"
-#include "vision2015.h"
+#include "FastBlob.h"
+#include "Stdafx.h"
+#include "Vision.h"
 
 string Blob::print() const
 {
