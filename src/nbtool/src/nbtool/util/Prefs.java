@@ -57,8 +57,8 @@ public class Prefs {
 	}
 
 	public static Rectangle bounds = NBConstants.DEFAULT_BOUNDS;
-	public static Set<String> addresses = new HashSet<String>();
-	public static Set<String> filepaths = new HashSet<String>();
+	public static LinkedList<String> addresses = new LinkedList<String>();
+	public static LinkedList<String> filepaths = new LinkedList<String>();
 	public static LogLevel logLevel = LogLevel.levelINFO;
 	public static int lastMode = 0;
 
@@ -148,7 +148,7 @@ public class Prefs {
 
 		if (prefs.find("addresses").exists()) {
 			SExpr pnode = prefs.find("addresses");
-			HashSet<String> nr = new HashSet<String>();
+			LinkedList<String> nr = new LinkedList<String>();
 			for (int i = 1; i < pnode.count(); ++i) {
 				nr.add(pnode.get(i).value());
 			}
@@ -158,7 +158,7 @@ public class Prefs {
 
 		if (prefs.find("filepaths").exists()) {
 			SExpr pnode = prefs.find("filepaths");
-			HashSet<String> nr = new HashSet<String>();
+			LinkedList<String> nr = new LinkedList<String>();
 			for (int i = 1; i < pnode.count(); ++i) {
 				nr.add(pnode.get(i).value());
 			}

@@ -109,7 +109,7 @@ public class Log implements Serializable {
 	
 	public String toString() {
 		if (name != null) return name;
-		else return description();
+		else return description(100);
 	}
 	
 	

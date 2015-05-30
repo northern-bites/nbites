@@ -32,8 +32,6 @@ public class LogChooser extends JPanel {
 		tree.setScrollsOnExpand(true);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		tree.addTreeSelectionListener(model);
-		tree.setTransferHandler(model.EXPORT_HANDLER);
-		tree.setDragEnabled(true);
 		
 		sas = new SortAndSearch(model);
 		model.sas = sas;
@@ -47,6 +45,8 @@ public class LogChooser extends JPanel {
 		
 		add(sas);
 		add(sp);
+		
+		//tree.getS
 	}
 	
 	private void useSize(Dimension size) {
@@ -60,4 +60,8 @@ public class LogChooser extends JPanel {
 	private LCTreeModel model;
 	
 	private SortAndSearch sas;
+	
+	public TreePath[] selection() {
+		return tree.getSelectionPaths();
+	}
 }

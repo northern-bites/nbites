@@ -28,7 +28,7 @@
 #include "nbfuncs.h"
 #include "exactio.h"
 
-#define CHECK_RET(v) if(v) {printf("BAD RET: [%s](%i) at line %i.\n", #v, v, __LINE__); return 2;}
+#define CHECK_RET(v) if(v) {printf("NBCROSS: BAD RET: [%s](%i) at line %i.\n", #v, v, __LINE__); return 2;}
 
 using nblog::Log;
 using nblog::SExpr;
@@ -38,12 +38,19 @@ std::vector<Log *> rets;
 
 bool crossprintout = true;
 
+static inline void nbcprintbreak() {
+    if (crossprintout) {
+        printf("\n\n-----------------------------------------\n");
+    }
+}
+
 static inline void nbcprintf(const char * format, ...) {
     
     va_list arguments;
     va_start(arguments, format);
     
     if (crossprintout) {
+        printf("NBCROSS: ");
         vprintf(format, arguments);
     }
     
@@ -61,15 +68,14 @@ int main(int argc, const char * argv[]) {
     }
     
     if (argc > 2) {
-        printf("3 or more arguments, disabling status printfs\n");
+        nbcprintf("3 or more arguments, disabling status printfs\n");
         crossprintout = false;
     }
     
     nbcprintf("using %li functions:\n", FUNCS.size());
     for (int i = 0; i < FUNCS.size(); ++i)
         nbcprintf("\t%s(%lu)\n", FUNCS[i].name.c_str(), FUNCS[i].args.size());
-    nbcprintf("\n\n-----------------------------------------\n");
-    
+    nbcprintbreak();
     
     std::vector<SExpr> flist;
     for (int i = 0; i < FUNCS.size(); ++i) {
@@ -178,13 +184,12 @@ int main(int argc, const char * argv[]) {
         }
         
         assert(args.size() == FUNCS[findex].args.size());
-        nbcprintf("calling function [%s]"
-               "\n-------------------------------------------\n", FUNCS[findex].name.c_str());
+        nbcprintf("calling function [%s]", FUNCS[findex].name.c_str());
+        nbcprintbreak();
         
         int ret = FUNCS[findex].func();
         
-        nbcprintf("\n-------------------------------------------\n");
-        
+        nbcprintbreak();
         nbcprintf("function returned with ret:%i, sending %lu output logs.\n", ret, rets.size());
         net_order = htonl(ret);
         CHECK_RET(send_exact(fd, 4, &net_order));

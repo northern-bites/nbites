@@ -181,47 +181,6 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, Events.Log
 		}
 	}
 	
-	private class LogTransfer implements Transferable {
-		
-		public Log tp;
-
-		public DataFlavor[] getTransferDataFlavors() {
-			return new DataFlavor[]{NBConstants.treeFlavor};
-		}
-
-		
-		public boolean isDataFlavorSupported(DataFlavor flavor) {
-			return flavor.equals(NBConstants.treeFlavor);
-		}
-
-		public Object getTransferData(DataFlavor flavor)
-				throws UnsupportedFlavorException, IOException {
-			if (!flavor.equals(NBConstants.treeFlavor)) throw new UnsupportedFlavorException(flavor);
-			else return tp;
-		}
-		
-	}
-	
-	public Exporter EXPORT_HANDLER = new Exporter();
-	private class Exporter extends TransferHandler {
-			
-		public int getSourceActions(JComponent c) {
-		    return LINK;
-		}
-
-		public Transferable createTransferable(JComponent c) {
-			TreePath p = tree.getSelectionPath();
-			LogTransfer lt = new LogTransfer();
-			
-			if (p.getPathCount() != 3) return null;
-			lt.tp = (Log) p.getLastPathComponent();
-			
-		    return lt;
-		}
-
-		public void exportDone(JComponent c, Transferable t, int action) {}
-	}
-	
 	protected SortAndSearch sas;
 	protected void ssChanged() {
 		

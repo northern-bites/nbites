@@ -158,6 +158,14 @@ public class CommonIO {
 			}
 		}
 		
+		public String host() {
+			return host;
+		}
+		
+		public int port() {
+			return port;
+		}
+		
 		public abstract String name();
 	}
 

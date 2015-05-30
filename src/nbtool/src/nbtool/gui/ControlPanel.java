@@ -4,6 +4,7 @@ import java.awt.GridLayout;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.Vector;
 
@@ -32,14 +33,18 @@ import nbtool.util.Utility;
 
 public class ControlPanel extends JPanel implements Events.LogsFound, Events.LogSelected,
 Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.RelevantRobotStats {
-
-	private Vector<String> setToVector(Set<String> set) {
-		return new Vector<String>(set);
-	}
-
-	private Vector<String> setToVector(Set<String> set, String a) {
-		set.add(a);
-		return new Vector<String>(set);
+	
+	private Vector<String> updateList(LinkedList<String> pref, String nv) {
+		if (nv != null) {
+			String put = nv.trim();
+			if (pref.contains(put)) {
+				pref.remove(put);
+			}
+			
+			pref.addFirst(put);
+		}
+		
+		return new Vector<String>(pref);
 	}
 
 	public ControlPanel() {
@@ -84,8 +89,8 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
 
 		this.controlStatus(null, false);
 
-		dirBox.setModel(new DefaultComboBoxModel<String>( setToVector(Prefs.filepaths)));
-		addrBox.setModel(new DefaultComboBoxModel<String>( setToVector(Prefs.addresses)));
+		dirBox.setModel(new DefaultComboBoxModel<String>( updateList(Prefs.filepaths, null)));
+		addrBox.setModel(new DefaultComboBoxModel<String>( updateList(Prefs.addresses, null)));
 
 		Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
 		labelTable.put( new Integer( 0 ), new JLabel("0.0") );
@@ -175,7 +180,7 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
 			String absolute = Utility.localizePath(dpath.trim()) + File.separator;
 
 			if (FileIO.checkLogFolder(absolute)) {
-				Vector<String> pathes = setToVector(Prefs.filepaths, dpath);
+				Vector<String> pathes = updateList(Prefs.filepaths, dpath);
 				dirBox.setModel(new DefaultComboBoxModel<String>(pathes));
 				dirBox.setSelectedIndex(pathes.indexOf(dpath));
 				SessionMaster.get().loadSession(absolute);
@@ -211,7 +216,7 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
 				JOptionPane.showMessageDialog(this, String.format("bad address: %s", address));
 				return;
 			} else {
-				Vector<String> addrs =  setToVector(Prefs.addresses, address);
+				Vector<String> addrs =  updateList(Prefs.addresses, address);
 				addrBox.setModel(new DefaultComboBoxModel<String>(addrs));
 				addrBox.setSelectedIndex(addrs.indexOf(address));
 				Logger.log(Logger.INFO, "ControlPanel: using address " + address);
@@ -223,7 +228,7 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
 			} else {
 				String absolute = Utility.localizePath(dpath.trim()) + File.separator;
 				if (FileIO.checkLogFolder(absolute)) {
-					Vector<String> pathes = setToVector(Prefs.filepaths, dpath);
+					Vector<String> pathes = updateList(Prefs.filepaths, dpath);
 					dirBox.setModel(new DefaultComboBoxModel<String>(pathes));
 					dirBox.setSelectedIndex(pathes.indexOf(dpath));
 					Logger.log(Logger.INFO, "ControlPanel: using directory " + absolute);
