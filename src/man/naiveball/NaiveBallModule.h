@@ -44,6 +44,7 @@ public:
     portals::OutPortal<messages::NaiveBall> naiveBallOutput;
 
 private:
+    float calcSumSquaresSQRT(float a, float b);
     void updateBuffer();
     void clearBuffer();
     void naiveCheck();
@@ -55,9 +56,9 @@ private:
     int currentIndex;
     int buffSize;
     int frameOffCount;
+    int count;
     float velocityEst;
     bool bufferFull;
-    int count;
     messages::WorldModel worldMessages[NUM_PLAYERS_PER_TEAM];
     messages::FilteredBall myBall;
 

@@ -3,7 +3,8 @@
 namespace man {
 namespace naive {
 
-struct NaiveBallModule::BallState{
+struct NaiveBallModule::BallState
+{
         BallState(){}
         BallState(float rel_x_, float rel_y_, float distance_, float bearing_) : rel_x(rel_x_), rel_y(rel_y_), distance(distance_), bearing(bearing_) {}
         float rel_x;
@@ -76,7 +77,8 @@ void NaiveBallModule::updateBuffer()
     }
 }
 
-void NaiveBallModule::clearBuffer() {
+void NaiveBallModule::clearBuffer()
+{
     currentIndex = 0;
     velocityEst = 0.f;
     bufferFull = false;
@@ -95,7 +97,7 @@ void NaiveBallModule::naiveCheck() {
 
     BallState start_avgs = avgFrames(startIndex);
     BallState end_avgs = avgFrames(endIndex);
-    float dist = (float)sqrt(pow((end_avgs.rel_x - start_avgs.rel_x), 2.f) + pow((end_avgs.rel_y - start_avgs.rel_y), 2.f));
+    float dist = calcSumSquaresSQRT((end_avgs.rel_x - start_avgs.rel_x), (end_avgs.rel_y - start_avgs.rel_y));
     // velocityEst = (dist / NUM_FRAMES) * ALPHA + velocityEst * (1-ALPHA);
     velocityEst = (dist / NUM_FRAMES);
     if (velocityEst > 500) {
@@ -109,7 +111,13 @@ void NaiveBallModule::naiveCheck() {
 
 }
 
-NaiveBallModule::BallState NaiveBallModule::avgFrames(int startingIndex) {
+float NaiveBallModule::calcSumSquaresSQRT(float a, float b)
+{
+    return sqrt(a*a + b*b);
+}
+
+NaiveBallModule::BallState NaiveBallModule::avgFrames(int startingIndex)
+{
     float x_sum = 0.f;
     float y_sum = 0.f;
     float dist_sum = 0.f;
