@@ -9,6 +9,8 @@
  * A module that takes input from the various places that we get data about
  * objects around us and decides if there is an obstacle. Currently outputs
  * a : the position of the obstacle relative to the robot.
+ * b : the rough distance estimate of the obstacle for vision and sonars
+ * c : which method detected the obstacle
  * @see Obstacle.proto for actual names. This is what they mean:
  *
  *        -----------------------------
@@ -22,23 +24,33 @@
  *        |  SW    |    S    |   SE   |
  *        -----------------------------
  *
- * Clearly this is not very sophisticated--a more complete model with actual
- * distances might be helpful. However, since behavior just wants this info
- * to make a simple decision, I'm trying to give it the most straightforward
- * information possible.
  *
  * Right now the decision is made based on ARM CONTACT
- * (@see arms/ArmContactModule) and SONARS (from sensors). Arm contact info
- * is pretty well filtered and processed in its own module, so we trust
- * its values straight up. Sonars aren't, so we keep a running average here
- * and use that value instead of the unfiltered data straight from sensors.
+ * (@see arms/ArmContactModule) and/or SONARS (from sensors) and/or
+ * vision. What is used is determined by boolean constants set below.
+ * Arm contact info is pretty well filtered and processed in its own module, 
+ * so we trust its values straight up. Sonars aren't, so we keep a running 
+ * average here and use that value instead of the unfiltered data straight 
+ * from sensors. Vision is not yet reliable, so we have kept that boolean 
+ * set to false. 
  *
  * Basically, sonars catches us before we hit things, most of the time, but
  * arms tell us if we're walking into something from a direction that sonars
- * won't get. Arms can also provide backup, refinement for sonars.
+ * won't get. Arms can also provide backup, refinement for sonars. 
  *
- * There is a lot more that you could do with this module (EKF anyone?) but
- * this is a start.
+ * In what is implemented in vision thusfar, when we decide to use it, we keep
+ * a running buffer for all directions in which the robot can see, which holds
+ * the closest seen obstacle in that direction. Vision has the ability to pick 
+ * up multiple obstacles clearly, but this is not very tested, so we are leaving
+ * vision toggled out.
+ *
+ * Our obstacle message, FieldObstacles (@see Obstacle.proto) has a list of 
+ * detected obstacles (closest in detected direction).
+ * 
+ * There is a lot to add to this module... but this is a basic framework.
+ *      - foot bumper detection (walking into poles)
+ *      - EKF sonars
+ *      - better combination of different obstacle inputs
  */
 
 #pragma once
@@ -46,8 +58,8 @@
 #include "RoboGrams.h"
 #include "NBMath.h"
 
-#include "ArmContactState.pb.h"
 #include "VisionRobot.pb.h"
+#include "ArmContactState.pb.h"
 #include "SonarState.pb.h"
 
 #include "Obstacle.pb.h"
@@ -80,6 +92,12 @@ class ObstacleModule : public portals::Module
     // We say the time it takes to do a full pan: 3-4 seconds
     static const int VISION_FRAMES_TO_HAVE_OBSTACLE = 30;
 
+    // How do we want to detect the obstacles?
+    static const bool USING_VISION = false;
+    static const bool USING_ARMS = false;
+    static const bool USING_SONARS = true;
+    
+
 public:
     ObstacleModule();
 
@@ -93,23 +111,31 @@ public:
 protected:
     virtual void run_();
 
+    // Makes a decision based on vision
+    void processVision(float distance, float bearing);
+
     // Makes a decision based on arm contact
     messages::FieldObstacles::Obstacle::ObstaclePosition
     processArms(const messages::ArmContactState& input);
-
-    // Makes a decision based on vision
-    messages::FieldObstacles::Obstacle::ObstaclePosition
-    processVision(float distance, float bearing);
 
     // Makes a decision based on sonars, not using right now
     messages::FieldObstacles::Obstacle::ObstaclePosition
     processSonar(const messages::SonarState& input);
 
+    void updateVisionBuffer(messages::FieldObstacles::Obstacle::ObstaclePosition pos, 
+                            std::list<float> dists, 
+                            float distance);
+
+    // Updates how long we've held
+    void updateObstacleBuffer();
+
     // Updates vision buffer with info from last frame of vision
-    void updateObstacleBuffer
-    (messages::FieldObstacles::Obstacle::ObstaclePosition visionL,
-     messages::FieldObstacles::Obstacle::ObstaclePosition visionM,
-     messages::FieldObstacles::Obstacle::ObstaclePosition visionR);
+    void updateObstacleArrays(std::string setter, 
+                              messages::FieldObstacles::Obstacle::ObstaclePosition pos, 
+                              float dist);
+
+    void combineArmsAndSonars(messages::FieldObstacles::Obstacle::ObstaclePosition arms,
+                              messages::FieldObstacles::Obstacle::ObstaclePosition sonars);
 
     // Checks average of the appropriate buffer and acts accordingly
     messages::FieldObstacles::Obstacle::ObstaclePosition
@@ -117,6 +143,9 @@ protected:
                  std::list<float> distances);
 
 private:
+    // sonar value
+    float lastSonar;
+
     // Sonar value buffers
     std::list<float> rightSonars, leftSonars;
 
@@ -129,6 +158,9 @@ private:
 
     // Global array that keeps avg distance of obstacle in given direction
     float obstacleDistances[NUM_DIRECTIONS];
+
+    // Global array that keeps track of who last set the obstacle
+    std::string obstacleSetters[NUM_DIRECTIONS];
 
     // Keeps a list of the obstacle message type locations
     messages::FieldObstacles::Obstacle::ObstaclePosition

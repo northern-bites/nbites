@@ -28,7 +28,7 @@ def shouldDodge(nav):
         return False
 
     for i in range(1, len(nav.brain.obstacles)):
-        if nav.brain.obstacles[i] == 0.0:
+        if nav.brain.obstacles[i] == -1.0:
             states.dodge.armPosition = i
             doneDodging.timer = 0
             doneDodging.armPosition = i
