@@ -113,18 +113,19 @@ namespace man {
         bottomTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
         bottomTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
         
-        vision.imageIn.wireTo(&topTranscriber.imageOut);
+        vision.topIn.wireTo(&topTranscriber.imageOut);
+        vision.bottomIn.wireTo(&bottomTranscriber.imageOut);
         vision.joint_angles.wireTo(&topTranscriber.jointsOut, true);
         vision.inertial_state.wireTo(&topTranscriber.inertsOut, true);
         
-        localization.visionInput.wireTo(&vision.vision_field);
+        // localization.visionInput.wireTo(&vision.vision_field);
         localization.motionInput.wireTo(&motion.odometryOutput_, true);
         localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
         localization.resetInput[1].wireTo(&sharedBall.sharedBallReset, true);
         localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
         localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
         
-        ballTrack.visionBallInput.wireTo(&vision.vision_ball);
+        // ballTrack.visionBallInput.wireTo(&vision.vision_ball);
         ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
         ballTrack.localizationInput.wireTo(&localization.output, true);
         
@@ -136,7 +137,7 @@ namespace man {
         sharedBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
         
         obstacle.armContactIn.wireTo(&arms.contactOut, true);
-        obstacle.visionIn.wireTo(&vision.vision_obstacle, true);
+        // obstacle.visionIn.wireTo(&vision.vision_obstacle, true);
         obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
         
         gamestate.commInput.wireTo(&comm._gameStateOutput, true);
@@ -148,9 +149,9 @@ namespace man {
         behaviors.localizationIn.wireTo(&localization.output);
         behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
         behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
-        behaviors.visionFieldIn.wireTo(&vision.vision_field);
-        behaviors.visionRobotIn.wireTo(&vision.vision_robot);
-        behaviors.visionObstacleIn.wireTo(&vision.vision_obstacle);
+        // behaviors.visionFieldIn.wireTo(&vision.vision_field);
+        // behaviors.visionRobotIn.wireTo(&vision.vision_robot);
+        // behaviors.visionObstacleIn.wireTo(&vision.vision_obstacle);
         behaviors.fallStatusIn.wireTo(&guardian.fallStatusOutput, true);
         behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
         behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);

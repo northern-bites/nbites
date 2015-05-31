@@ -6,7 +6,8 @@ namespace vision {
 
 VisionModule::VisionModule()
     : Module(),
-      imageIn(),
+      topIn(),
+      bottomIn(),
       jointsIn(),
       inertialsIn()
 {
@@ -32,33 +33,45 @@ VisionModule::~VisionModule()
 void VisionModule::run_()
 {
     // Get messages from inPortals
-    imageIn.latch();
+    topIn.latch();
+    bottomIn.latch();
     jointsIn.latch();
     inertialsIn.latch();
 
-    ::messages::YUVImage image(imageIn.message());
+    ::messages::YUVImage top(topIn.message());
+    ::messages::YUVImage bottom(bottomIn.message());
     ::messages::JointAngles joints(jointsIn.message());
     ::messages::InertialState inertials(inertialsIn.message());
 
-    // Construct YuvLite object for use in vision system
-    YuvLite yuvImage(image.width(),
-                     image.height(),
-                     image.rowPitch(),
-                     image.pixelAddress(0, 0));
-
-    // Run front end
-    frontEnd->run(yuvImage, colorParams);
-    ImageLiteU16 yImage(frontEnd->yImage());
-    ImageLiteU8 greenImage(frontEnd->greenImage());
-
-    // Run edge detection
-    edgeDetector->gradient(yImage);
-    edges->reset();
-    edgeDetector->edgeDetect(greenImage, *edges);
-
-    // Run hough line detection
+    // Setup pre runnning vision system
+    std::vector< ::messages::YUVImage> images { top, bottom };
     houghLines->clear();
-    hough->run(*edges, *houghLines);
+
+    // Loop over top and bottom image and run line detection system
+    for (int i = 0; i < images.size(); i++) {
+        // Get image
+        ::messages::YUVImage image(images[i]);
+
+        // Construct YuvLite object for use in vision system
+        YuvLite yuvLite(image.width(),
+                        image.height(),
+                        image.rowPitch(),
+                        image.pixelAddress(0, 0));
+
+        // Run front end
+        frontEnd->run(yuvLite, colorParams);
+        ImageLiteU16 yImage(frontEnd->yImage());
+        ImageLiteU8 greenImage(frontEnd->greenImage());
+
+        // Run edge detection
+        edgeDetector->gradient(yImage);
+        edges->reset();
+        edgeDetector->edgeDetect(greenImage, *edges);
+
+        // Run hough line detection
+        // TODO duplicate lines in houghLines?
+        hough->run(*edges, *houghLines);
+    }
 }
 
 }

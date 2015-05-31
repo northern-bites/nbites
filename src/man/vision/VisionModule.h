@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RoboGrams.h"
+#include "Camera.h"
 #include "Images.h"
 #include "PMotion.pb.h"
 #include "InertialState.pb.h"
@@ -11,7 +12,6 @@
 namespace man {
 namespace vision {
 
-// TODO top and bottom camera
 // TODO namespace
 // TODO fast bool
 // TODO compiles on both ubuntu and windows
@@ -20,8 +20,9 @@ public:
     VisionModule();
     virtual ~VisionModule();
 
-    // TODO why reference to messages is ambiguous?
-    portals::InPortal< ::messages::YUVImage> imageIn;
+    // TODO reference to messages is ambiguous?
+    portals::InPortal< ::messages::YUVImage> topIn;
+    portals::InPortal< ::messages::YUVImage> bottomIn;
     portals::InPortal< ::messages::JointAngles> jointsIn;
     portals::InPortal< ::messages::InertialState> inertialsIn;
 
