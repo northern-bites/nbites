@@ -6,7 +6,6 @@ namespace vision {
 class VisionModule : public portals::Module {
 public:
     VisionModule();
-    VisionModule(char* tablePathname);
     virtual ~VisionModule();
 
     portals::InPortal<messages::PackedImage16> yImageIn;
@@ -19,6 +18,12 @@ public:
 
 protected:
     virtual void run_();
+
+private:
+    EdgeDetector* edgeDetector;
+    EdgeList* edges;
+    HoughLineList* houghLines;
+    HoughSpace* hough;
 };
 
 }

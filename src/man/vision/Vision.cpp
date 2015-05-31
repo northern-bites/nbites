@@ -7,7 +7,9 @@
 #include "Vision.h"
 #include "Stdafx.h"
 
+#include <stdio.h>
 #include <stdarg.h>
+// #include <stdlib.h>
 
 // ***************
 // *             *
@@ -20,7 +22,7 @@ string strPrintf(const char* format, ...)
   char buf[1024];
   va_list ap;
   va_start(ap, format);
-  vsprintf_s(buf, sizeof(buf), format, ap);
+  vsprintf(buf, format, ap);
   va_end (ap);
   return buf;
 }

@@ -67,8 +67,10 @@ bool FieldHomography::fieldCoords(double ix, double iy, double& wx, double& wy) 
   wy = h21 * cx + h22 * cy + h23 * cz + h24;
 
   double wz = h31 * cx + h32 * cy + h33 * cz + h34;
-  if (fabs(wz) > 1.0e-6)
-    throw exception("Internal error in FieldHomography");
+  if (fabs(wz) > 1.0e-6) {
+    // TODO call exception "Internal error in FieldHomography"
+    throw exception();
+  }
 
   return cz > 0;
 }

@@ -8,6 +8,8 @@
 #include "Stdafx.h"
 #include "Vision.h"
 
+#include <cstring>
+
 string Blob::print() const
 {
   return strPrintf("%4d %6.1f %6.1f %6.1f\n", areaAboveFirst(), area(),
@@ -307,7 +309,8 @@ bool Connectivity::test(string& message)
         fabs(b.centerX() - e.cmx ) > epsilon ||
         fabs(b.centerY() - e.cmy ) > epsilon)
     {
-      message += strPrintf("Unexpected blob result for\n  %s", b.print());
+      // TODO make compile
+      // message += strPrintf("Unexpected blob result for\n  %s", b.print());
       ok = false;
     }
   }

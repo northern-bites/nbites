@@ -161,11 +161,11 @@ class AngleBinsConstIterator : AngleBinsIterator<T>
 {
 public:
   AngleBinsConstIterator(const AngleBins<T>& angleBins)
-    : AngleBinsIterator((AngleBins<T>&)angleBins)
+    : AngleBinsIterator<T>((AngleBins<T>&)angleBins)
   {}
 
-  const T* operator*() { return **((AngleBinsIterator*)this); }
-  AngleBinsConstIterator& operator++() { return (AngleBinsConstIterator&)AngleBinsIterator::operator++(); }
+  const T* operator*() { return **((AngleBinsIterator<T>*)this); }
+  AngleBinsConstIterator& operator++() { return (AngleBinsConstIterator&)AngleBinsIterator<T>::operator++(); }
 };
 
 template <class T>
