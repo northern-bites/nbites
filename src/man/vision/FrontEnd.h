@@ -10,8 +10,6 @@
 #include "Stdafx.h"
 #include "Vision.h"
 
-using namespace std;
-
 // ***************
 // *             *
 // *  Constants  *

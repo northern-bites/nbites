@@ -38,19 +38,19 @@ void VisionModule::run_()
     jointsIn.latch();
     inertialsIn.latch();
 
-    ::messages::YUVImage top(topIn.message());
-    ::messages::YUVImage bottom(bottomIn.message());
-    ::messages::JointAngles joints(jointsIn.message());
-    ::messages::InertialState inertials(inertialsIn.message());
+    messages::YUVImage top(topIn.message());
+    messages::YUVImage bottom(bottomIn.message());
+    messages::JointAngles joints(jointsIn.message());
+    messages::InertialState inertials(inertialsIn.message());
 
     // Setup pre runnning vision system
-    std::vector< ::messages::YUVImage> images { top, bottom };
+    std::vector<messages::YUVImage> images { top, bottom };
     houghLines->clear();
 
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
         // Get image
-        ::messages::YUVImage image(images[i]);
+        messages::YUVImage image(images[i]);
 
         // Construct YuvLite object for use in vision system
         YuvLite yuvLite(image.width(),

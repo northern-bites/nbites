@@ -115,8 +115,8 @@ namespace man {
         
         vision.topIn.wireTo(&topTranscriber.imageOut);
         vision.bottomIn.wireTo(&bottomTranscriber.imageOut);
-        vision.joint_angles.wireTo(&topTranscriber.jointsOut, true);
-        vision.inertial_state.wireTo(&topTranscriber.inertsOut, true);
+        vision.jointsIn.wireTo(&topTranscriber.jointsOut, true);
+        vision.inertialsIn.wireTo(&topTranscriber.inertsOut, true);
         
         // localization.visionInput.wireTo(&vision.vision_field);
         localization.motionInput.wireTo(&motion.odometryOutput_, true);

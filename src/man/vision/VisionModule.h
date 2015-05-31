@@ -20,11 +20,10 @@ public:
     VisionModule();
     virtual ~VisionModule();
 
-    // TODO reference to messages is ambiguous?
-    portals::InPortal< ::messages::YUVImage> topIn;
-    portals::InPortal< ::messages::YUVImage> bottomIn;
-    portals::InPortal< ::messages::JointAngles> jointsIn;
-    portals::InPortal< ::messages::InertialState> inertialsIn;
+    portals::InPortal<messages::YUVImage> topIn;
+    portals::InPortal<messages::YUVImage> bottomIn;
+    portals::InPortal<messages::JointAngles> jointsIn;
+    portals::InPortal<messages::InertialState> inertialsIn;
 
 protected:
     virtual void run_();

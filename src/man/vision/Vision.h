@@ -14,8 +14,6 @@
 #include <math.h>
 #include <string>
 
-using namespace std;
-
 // Scan array of unsigned bytes or words for values above the specified
 // threshold. Place in the runs array the offset of each such byte/word found,
 // terminated by -1.
@@ -87,7 +85,7 @@ inline void unitVec(double x, double y, double& u, double& v)
   v = y / g;
 }
 
-string strPrintf(const char* format, ...);
+std::string strPrintf(const char* format, ...);
 
 
 // ************

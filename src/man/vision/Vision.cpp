@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+using namespace std;
+
 // ***************
 // *             *
 // *  Utilities  *

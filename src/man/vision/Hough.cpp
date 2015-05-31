@@ -7,6 +7,8 @@
 #include "Hough.h"
 #include "FrontEnd.h"
 
+using namespace std;
+
 // *******************************
 // *                             *
 // *  Line from Hough Transform  *

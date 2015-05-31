@@ -101,11 +101,11 @@ public:
   //
   // If diagnostics is not null, set the string to a report of convergence.
   bool visualTiltPerpendicular(const GeoLine& a, const GeoLine& b, double& tilt,
-                               string* diagnostics) const;
+                               std::string* diagnostics) const;
   
   // Same as above, but for lines known to be parallel in world coordinates.
   bool visualTiltParallel(const GeoLine& a, const GeoLine& b, double& tilt,
-                          string* diagnostics) const;
+                          std::string* diagnostics) const;
 };
 
 // ********************
@@ -210,7 +210,7 @@ public:
   // Map this image line to field coordinates.  Preserve polarity and endpoints.
   void imageToField(const FieldHomography&);
 
-  string print() const;
+  std::string print() const;
 };
 
 #endif

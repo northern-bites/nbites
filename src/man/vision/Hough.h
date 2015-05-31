@@ -100,10 +100,10 @@ public:
   // For sorting lines in decreasing order of score. 
   bool operator<(const HoughLine& hl) { return score() > hl.score(); }
 
-  string print() const;
+  std::string print() const;
 };
 
-class HoughLineList : public list<HoughLine>
+class HoughLineList : public std::list<HoughLine>
 {
 public:
   HoughLineList(int size) : list(size) {}
