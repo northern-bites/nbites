@@ -114,7 +114,7 @@ set( NBCROSS_SRCS
   main.cpp
   misc_defs.cpp
   pkoch_defs.cpp
-  ched_defs.cpp
+  vision_defs.cpp
 )
 
 set( NBCROSS_HEADERS
