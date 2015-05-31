@@ -13,7 +13,6 @@
 SET_POOL_SIZE(messages::WorldModel,  24);
 SET_POOL_SIZE(messages::JointAngles, 24);
 SET_POOL_SIZE(messages::InertialState, 16);
-SET_POOL_SIZE(messages::PackedImage16, 16);
 SET_POOL_SIZE(messages::YUVImage, 16);
 SET_POOL_SIZE(messages::RobotLocation, 16);
 #endif
@@ -38,8 +37,6 @@ namespace man {
     cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
     topTranscriber(*new image::ImageTranscriber(Camera::TOP)),
     bottomTranscriber(*new image::ImageTranscriber(Camera::BOTTOM)),
-    topConverter(TOP_TABLE_PATHNAME),
-    bottomConverter(BOTTOM_TABLE_PATHNAME),
     vision(),
     localization(),
     ballTrack(),
@@ -53,7 +50,6 @@ namespace man {
                 
         /** Sensors **/
         sensorsThread.addModule(sensors);
-
         sensorsThread.addModule(jointEnactor);
         sensorsThread.addModule(motion);
         sensorsThread.addModule(arms);
@@ -88,16 +84,13 @@ namespace man {
         guardian.batteryInput.wireTo(&sensors.batteryOutput_, true);
         guardian.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
         audio.audioIn.wireTo(&guardian.audioOutput);
-
         
         /** Comm **/
         commThread.addModule(comm);
         comm._worldModelInput.wireTo(&behaviors.myWorldModelOut, true);
         comm._gcResponseInput.wireTo(&gamestate.gcResponseOutput, true);
-
         
         /** Cognition **/
-        
         // Turn ON the finalize method for images, which we've specialized
         portals::Message<messages::YUVImage>::setFinalize(true);
         portals::Message<messages::ThresholdImage>::setFinalize(true);
@@ -106,8 +99,6 @@ namespace man {
         
         cognitionThread.addModule(topTranscriber);
         cognitionThread.addModule(bottomTranscriber);
-        cognitionThread.addModule(topConverter);
-        cognitionThread.addModule(bottomConverter);
         cognitionThread.addModule(vision);
         cognitionThread.addModule(localization);
         cognitionThread.addModule(ballTrack);
@@ -122,19 +113,7 @@ namespace man {
         bottomTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
         bottomTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
         
-        topConverter.imageIn.wireTo(&topTranscriber.imageOut);
-        bottomConverter.imageIn.wireTo(&bottomTranscriber.imageOut);
-        
-        vision.topThrImage.wireTo(&topConverter.thrImage);
-        vision.topYImage.wireTo(&topConverter.yImage);
-        vision.topUImage.wireTo(&topConverter.uImage);
-        vision.topVImage.wireTo(&topConverter.vImage);
-        
-        vision.botThrImage.wireTo(&bottomConverter.thrImage);
-        vision.botYImage.wireTo(&bottomConverter.yImage);
-        vision.botUImage.wireTo(&bottomConverter.uImage);
-        vision.botVImage.wireTo(&bottomConverter.vImage);
-        
+        vision.imageIn.wireTo(&topTranscriber.imageOut);
         vision.joint_angles.wireTo(&topTranscriber.jointsOut, true);
         vision.inertial_state.wireTo(&topTranscriber.inertsOut, true);
         
@@ -290,8 +269,7 @@ namespace man {
     }
     
     Man::~Man()
-    {
-    }
+    {}
     
     void Man::startSubThreads()
     {
@@ -309,5 +287,4 @@ namespace man {
             std::endl;
         }
     }
-    
 }

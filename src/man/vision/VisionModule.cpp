@@ -11,6 +11,8 @@ VisionModule::VisionModule()
       inertialsIn()
 {
     // TODO constants
+    colorParams = new Colors();
+    frontEnd = new ImageFrontEnd();
     edgeDetector = new EdgeDetector();
     edges = new EdgeList(3200);
     houghLines = new HoughLineList(128);
@@ -19,6 +21,8 @@ VisionModule::VisionModule()
 
 VisionModule::~VisionModule()
 {
+    delete colorParams;
+    delete frontEnd;
     delete edgeDetector;
     delete edges;
     delete houghLines;
@@ -27,29 +31,32 @@ VisionModule::~VisionModule()
 
 void VisionModule::run_()
 {
-    yImageIn.latch();
-    whiteImageIn.latch();
-    greenImageIn.latch();
-    whiteImageIn.latch();
-
+    // Get messages from inPortals
+    imageIn.latch();
     jointsIn.latch();
     inertialsIn.latch();
 
-    messages::PackedImage16 yImage(yImageIn.message());
-    messages::PackedImage8 whiteImage(whiteImageIn.message());
-    messages::PackedImage8 greenImage(greenImageIn.message());
-    messages::PackedImage8 orangeImage(orangeImageIn.message());
+    ::messages::YUVImage image(imageIn.message());
+    ::messages::JointAngles joints(jointsIn.message());
+    ::messages::InertialState inertials(inertialsIn.message());
 
-    messages::JointAngles joints(jointsIn.message());
-    messages::InertialState inertials(inertialsIn.message());
+    // Construct YuvLite object for use in vision system
+    YuvLite yuvImage(image.width(),
+                     image.height(),
+                     image.rowPitch(),
+                     image.pixelAddress(0, 0));
 
-    edgeDetector->gradient(yImage.pixelAddress(0, 0), yImage.width(),
-                           yImage.height(), yImage.width());
+    // Run front end
+    frontEnd->run(yuvImage, colorParams);
+    ImageLiteU16 yImage(frontEnd->yImage());
+    ImageLiteU8 greenImage(frontEnd->greenImage());
+
+    // Run edge detection
+    edgeDetector->gradient(yImage);
     edges->reset();
-    edgeDetector->edgeDetect(greenImage.pixelAddress(0, 0), 
-                             greenImage.width(),
-                             *edges);
+    edgeDetector->edgeDetect(greenImage, *edges);
 
+    // Run hough line detection
     houghLines->clear();
     hough->run(*edges, *houghLines);
 }

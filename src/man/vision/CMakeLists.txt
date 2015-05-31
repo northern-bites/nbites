@@ -6,6 +6,7 @@ ADD_DEFINITIONS( -mmmx )
 
 ############################ PROJECT SOURCES FILES
 SET( VISION_SRCS 
+  VisionModule.cpp
   Edge.cpp
   FastBlob.cpp
   FrontEnd.cpp
@@ -14,7 +15,6 @@ SET( VISION_SRCS
   Vision.cpp
   )
 
-# Add the assembly files if we're not on Mac OSX
 IF (UNIX AND NOT APPLE)
   SET( ASM_SRCS
     Acquire.s
