@@ -1,8 +1,5 @@
 # required libraries for python
 
-set(Boost_NO_BOOST_CMAKE true)
-find_package(Boost COMPONENTS python REQUIRED)
-
 find_package( PythonLibs   REQUIRED )
 include_directories( ${PYTHON_INCLUDE_DIR} )
 

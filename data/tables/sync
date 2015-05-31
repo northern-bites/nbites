@@ -19,7 +19,7 @@ fi
 echo "Type username for RoboCup server, followed by [ENTER]"
 read username
 
-SERVER=$username@robocup.bowdoin.edu
+SERVER=$username@dover
 ROBOCUP_DIR=mnt/research/robocup
 TABLES_DIR=tables
 DEST=.
