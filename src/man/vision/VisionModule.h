@@ -25,6 +25,8 @@ public:
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::InertialState> inertialsIn;
 
+    ImageFrontEnd* getFrontEnd() const { return frontEnd; }
+
 protected:
     virtual void run_();
 

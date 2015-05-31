@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "Images.h"
-#include "image/ImageConverterModule.cpp"
+#include "vision/VisionModule.cpp"
 #include "RoboGrams.h"
 
 using nblog::Log;
@@ -35,11 +35,14 @@ int ImageConverter_func() {
     
     messages::YUVImage image(buf, width, height, pitch);
     portals::Message<messages::YUVImage> message(&image);
-    char tableAddrr[] = "/home/evanhoyt/nbites/data/tables/evanStation15V5.mtb";
-    man::image::ImageConverterModule module = man::image::ImageConverterModule(tableAddrr);
+   // char tableAddrr[] = "/home/evanhoyt/nbites/data/tables/evanStation15V5.mtb";
+    //man::image::ImageConverterModule module = man::image::ImageConverterModule(tableAddrr);
 
-    module.imageIn.setMessage(message);
+    man::vision::VisionModule module;
+
+    module.bottomIn.setMessage(message);
     module.run();
+    ImageFrontEnd* frontEnd = module.getFrontEnd();
 
     // -----------
     //   Y IMAGE
@@ -48,11 +51,11 @@ int ImageConverter_func() {
     int yLength = 240*320*2;
 
     // Get yImage from module message
-    const messages::PackedImage<short unsigned int>* yImage = module.yImage.getMessage(true).get();
+   // const messages::PackedImage<short unsigned int>* yImage = module.yImage.getMessage(true).get();
 
     // Create temp buffer and fill with yImage 
     uint8_t yBuf[yLength];
-    memcpy(yBuf, yImage->pixelAddress(0, 0), yLength);
+    memcpy(yBuf, frontEnd->yImage().pixelAddress(0, 0), yLength);
 
     // Convert to string and set log
     std::string yBuffer((const char*)yBuf, yLength);
@@ -64,78 +67,78 @@ int ImageConverter_func() {
     // ---------------
     //   WHITE IMAGE
     // ---------------
-    Log* whiteRet = new Log();
-    int whiteLength = 240*320;
+    // Log* whiteRet = new Log();
+    // int whiteLength = 240*320;
 
-    // Get white image from module message
-    const messages::PackedImage<unsigned char>* whiteImage = module.whiteImage.getMessage(true).get();
+    // // Get white image from module message
+    // const messages::PackedImage<unsigned char>* whiteImage = module.whiteImage.getMessage(true).get();
 
-    // Create temp buffer and fill with white image 
-    uint8_t whiteBuf[whiteLength];
-    memcpy(whiteBuf, whiteImage->pixelAddress(0, 0), whiteLength);
+    // // Create temp buffer and fill with white image 
+    // uint8_t whiteBuf[whiteLength];
+    // memcpy(whiteBuf, whiteImage->pixelAddress(0, 0), whiteLength);
 
-    // Convert to string and set log
-    std::string whiteBuffer((const char*)whiteBuf, whiteLength);
-    whiteRet->setData(whiteBuffer);
+    // // Convert to string and set log
+    // std::string whiteBuffer((const char*)whiteBuf, whiteLength);
+    // whiteRet->setData(whiteBuffer);
 
-    rets.push_back(whiteRet);
+    // rets.push_back(whiteRet);
 
-    // ---------------
-    //   GREEN IMAGE
-    // ---------------
-    Log* greenRet = new Log();
-    int greenLength = 240*320;
+    // // ---------------
+    // //   GREEN IMAGE
+    // // ---------------
+    // Log* greenRet = new Log();
+    // int greenLength = 240*320;
 
-    // Get gree image from module message
-    const messages::PackedImage<unsigned char>* greenImage = module.greenImage.getMessage(true).get();
+    // // Get gree image from module message
+    // const messages::PackedImage<unsigned char>* greenImage = module.greenImage.getMessage(true).get();
 
-    // Create temp buffer and fill with gree image 
-    uint8_t greenBuf[greenLength];
-    memcpy(greenBuf, greenImage->pixelAddress(0, 0), greenLength);
+    // // Create temp buffer and fill with gree image 
+    // uint8_t greenBuf[greenLength];
+    // memcpy(greenBuf, greenImage->pixelAddress(0, 0), greenLength);
 
-    // Convert to string and set log
-    std::string greenBuffer((const char*)greenBuf, greenLength);
-    greenRet->setData(greenBuffer);
+    // // Convert to string and set log
+    // std::string greenBuffer((const char*)greenBuf, greenLength);
+    // greenRet->setData(greenBuffer);
 
-    rets.push_back(greenRet);
+    // rets.push_back(greenRet);
 
-    // ----------------
-    //   ORANGE IMAGE
-    // ----------------
-    Log* orangeRet = new Log();
-    int orangeLength = 240*320;
+    // // ----------------
+    // //   ORANGE IMAGE
+    // // ----------------
+    // Log* orangeRet = new Log();
+    // int orangeLength = 240*320;
 
-    // Get orange image from module message
-    const messages::PackedImage<unsigned char>* orangeImage = module.orangeImage.getMessage(true).get();
+    // // Get orange image from module message
+    // const messages::PackedImage<unsigned char>* orangeImage = module.orangeImage.getMessage(true).get();
 
-    // Create temp buffer and fill with orange image 
-    uint8_t orangeBuf[orangeLength];
-    memcpy(orangeBuf, orangeImage->pixelAddress(0, 0), orangeLength);
+    // // Create temp buffer and fill with orange image 
+    // uint8_t orangeBuf[orangeLength];
+    // memcpy(orangeBuf, orangeImage->pixelAddress(0, 0), orangeLength);
 
-    // Convert to string and set log
-    std::string orangeBuffer((const char*)orangeBuf, orangeLength);
-    orangeRet->setData(orangeBuffer);
+    // // Convert to string and set log
+    // std::string orangeBuffer((const char*)orangeBuf, orangeLength);
+    // orangeRet->setData(orangeBuffer);
 
-    rets.push_back(orangeRet);
+    // rets.push_back(orangeRet);
 
-    //-------------------
-    //  SEGMENTED IMAGE
-    //-------------------
-    Log* colorSegRet = new Log();
-    int colorSegLength = 240*320;
+    // //-------------------
+    // //  SEGMENTED IMAGE
+    // //-------------------
+    // Log* colorSegRet = new Log();
+    // int colorSegLength = 240*320;
 
-    // Get segmented image from module message
-    const messages::PackedImage<unsigned char>* colorSegImage = module.thrImage.getMessage(true).get();
+    // // Get segmented image from module message
+    // const messages::PackedImage<unsigned char>* colorSegImage = module.thrImage.getMessage(true).get();
 
-    // Create temp buffer and fill with segmented image
-    uint8_t segBuf[colorSegLength];
-    memcpy(segBuf, colorSegImage->pixelAddress(0, 0), colorSegLength);
+    // // Create temp buffer and fill with segmented image
+    // uint8_t segBuf[colorSegLength];
+    // memcpy(segBuf, colorSegImage->pixelAddress(0, 0), colorSegLength);
 
-    // Convert to string and set log
-    std::string segBuffer((const char*)segBuf, colorSegLength);
-    colorSegRet->setData(segBuffer);
+    // // Convert to string and set log
+    // std::string segBuffer((const char*)segBuf, colorSegLength);
+    // colorSegRet->setData(segBuffer);
 
-    rets.push_back(colorSegRet);
+    // rets.push_back(colorSegRet);
 
     // Done
     printf("ImageConverter module ran! W: %d, H: %d\n", yImage->width(), yImage->height());

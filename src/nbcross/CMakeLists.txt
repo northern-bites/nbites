@@ -104,7 +104,6 @@ add_subdirectory( ${MAN_DIR}/comm ${CMAKE_CURRENT_BINARY_DIR}/man/comm)
 add_subdirectory( ${MAN_DIR}/sharedball ${CMAKE_CURRENT_BINARY_DIR}/man/sharedball)
 add_subdirectory( ${MAN_DIR}/image ${CMAKE_CURRENT_BINARY_DIR}/man/image)
 add_subdirectory( ${MAN_DIR}/localization ${CMAKE_CURRENT_BINARY_DIR}/man/localization)
-add_subdirectory( ${MAN_DIR}/vision ${CMAKE_CURRENT_BINARY_DIR}/man/vision)
 
 add_subdirectory( ${MAN_DIR}/log ${CMAKE_CURRENT_BINARY_DIR}/man/log)
 add_subdirectory( ${MAN_DIR}/control ${CMAKE_CURRENT_BINARY_DIR}/man/control)
@@ -137,7 +136,6 @@ add_executable( nbcross_tool
 target_link_libraries( nbcross_tool
   portals
   messages
-  image # man image
   vision # man vision
   comm # man comm
   sharedball # man sharedball
