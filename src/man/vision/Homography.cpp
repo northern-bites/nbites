@@ -6,6 +6,8 @@
 
 #include "Homography.h"
 
+using namespace std;
+
 double FieldHomography::tiltSensitivity   = 0.08;   // min dE/dt for Newton's method
 double FieldHomography::tiltConvergeLimit = 1.0e-6; // Newton can stop when error is < this
 double FieldHomography::tiltConvergeRate  = 4;      // Error must be reduced by this factor each iteration

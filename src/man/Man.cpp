@@ -14,7 +14,6 @@
 SET_POOL_SIZE(messages::WorldModel,  24);
 SET_POOL_SIZE(messages::JointAngles, 24);
 SET_POOL_SIZE(messages::InertialState, 16);
-SET_POOL_SIZE(messages::PackedImage16, 16);
 SET_POOL_SIZE(messages::YUVImage, 16);
 SET_POOL_SIZE(messages::RobotLocation, 16);
 #endif
@@ -39,8 +38,6 @@ namespace man {
     cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
     topTranscriber(*new image::ImageTranscriber(Camera::TOP)),
     bottomTranscriber(*new image::ImageTranscriber(Camera::BOTTOM)),
-    topConverter(TOP_TABLE_PATHNAME),
-    bottomConverter(BOTTOM_TABLE_PATHNAME),
     vision(),
     localization(),
     ballTrack(),
@@ -54,7 +51,6 @@ namespace man {
                 
         /** Sensors **/
         sensorsThread.addModule(sensors);
-
         sensorsThread.addModule(jointEnactor);
         sensorsThread.addModule(motion);
         sensorsThread.addModule(arms);
@@ -89,16 +85,13 @@ namespace man {
         guardian.batteryInput.wireTo(&sensors.batteryOutput_, true);
         guardian.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
         audio.audioIn.wireTo(&guardian.audioOutput);
-
         
         /** Comm **/
         commThread.addModule(comm);
         comm._worldModelInput.wireTo(&behaviors.myWorldModelOut, true);
         comm._gcResponseInput.wireTo(&gamestate.gcResponseOutput, true);
-
         
         /** Cognition **/
-        
         // Turn ON the finalize method for images, which we've specialized
         portals::Message<messages::YUVImage>::setFinalize(true);
         portals::Message<messages::ThresholdImage>::setFinalize(true);
@@ -107,8 +100,6 @@ namespace man {
         
         cognitionThread.addModule(topTranscriber);
         cognitionThread.addModule(bottomTranscriber);
-        cognitionThread.addModule(topConverter);
-        cognitionThread.addModule(bottomConverter);
         cognitionThread.addModule(vision);
         cognitionThread.addModule(localization);
         cognitionThread.addModule(ballTrack);
@@ -123,30 +114,19 @@ namespace man {
         bottomTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
         bottomTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
         
-        topConverter.imageIn.wireTo(&topTranscriber.imageOut);
-        bottomConverter.imageIn.wireTo(&bottomTranscriber.imageOut);
+        vision.topIn.wireTo(&topTranscriber.imageOut);
+        vision.bottomIn.wireTo(&bottomTranscriber.imageOut);
+        vision.jointsIn.wireTo(&topTranscriber.jointsOut, true);
+        vision.inertialsIn.wireTo(&topTranscriber.inertsOut, true);
         
-        vision.topThrImage.wireTo(&topConverter.thrImage);
-        vision.topYImage.wireTo(&topConverter.yImage);
-        vision.topUImage.wireTo(&topConverter.uImage);
-        vision.topVImage.wireTo(&topConverter.vImage);
-        
-        vision.botThrImage.wireTo(&bottomConverter.thrImage);
-        vision.botYImage.wireTo(&bottomConverter.yImage);
-        vision.botUImage.wireTo(&bottomConverter.uImage);
-        vision.botVImage.wireTo(&bottomConverter.vImage);
-        
-        vision.joint_angles.wireTo(&topTranscriber.jointsOut, true);
-        vision.inertial_state.wireTo(&topTranscriber.inertsOut, true);
-        
-        localization.visionInput.wireTo(&vision.vision_field);
+        // localization.visionInput.wireTo(&vision.vision_field);
         localization.motionInput.wireTo(&motion.odometryOutput_, true);
         localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
         localization.resetInput[1].wireTo(&sharedBall.sharedBallReset, true);
         localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
         localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
         
-        ballTrack.visionBallInput.wireTo(&vision.vision_ball);
+        // ballTrack.visionBallInput.wireTo(&vision.vision_ball);
         ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
         ballTrack.localizationInput.wireTo(&localization.output, true);
         
@@ -158,7 +138,7 @@ namespace man {
         sharedBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
         
         obstacle.armContactIn.wireTo(&arms.contactOut, true);
-        obstacle.visionIn.wireTo(&vision.vision_obstacle, true);
+        // obstacle.visionIn.wireTo(&vision.vision_obstacle, true);
         obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
         
         gamestate.commInput.wireTo(&comm._gameStateOutput, true);
@@ -170,9 +150,9 @@ namespace man {
         behaviors.localizationIn.wireTo(&localization.output);
         behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
         behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
-        behaviors.visionFieldIn.wireTo(&vision.vision_field);
-        behaviors.visionRobotIn.wireTo(&vision.vision_robot);
-        behaviors.visionObstacleIn.wireTo(&vision.vision_obstacle);
+        // behaviors.visionFieldIn.wireTo(&vision.vision_field);
+        // behaviors.visionRobotIn.wireTo(&vision.vision_robot);
+        // behaviors.visionObstacleIn.wireTo(&vision.vision_obstacle);
         behaviors.fallStatusIn.wireTo(&guardian.fallStatusOutput, true);
         behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
         behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
@@ -297,8 +277,7 @@ namespace man {
     }
     
     Man::~Man()
-    {
-    }
+    {}
     
     void Man::startSubThreads()
     {
@@ -316,5 +295,4 @@ namespace man {
             std::endl;
         }
     }
-    
 }

@@ -10,8 +10,6 @@
 #include "Stdafx.h"
 #include "Vision.h"
 
-using namespace std;
-
 // ***************
 // *             *
 // *  Constants  *
@@ -130,32 +128,53 @@ struct Colors
   ColorParams white;
   ColorParams green;
   ColorParams orange;
+
+  // TODO parameters should not be hard coded and at compile time
+  Colors() {
+    white .load(-0.02f, -0.02f, 0.25f, 0.25f, -0.055f, -0.055f);
+    orange.load( 0.133f, 0.053f, -0.133f, 0.107f, -0.06f, 0.06f);
+    green .load( 0.077f, 0.010f, -0.057f, -0.230f, -0.06f, -0.06f);
+  }
 };
 
-// ***************************************
-// *                                     *
-// *  Front End Image Acquire Functions  *
-// *                                     *
-// ***************************************
-//
-// The ASM and C++ have identical function signatures.
-// The source is a YUYV image. There are no pixel alignment requirements, although
-// operation may be faster if source is QWORD or DQWORD aligned.
-// width and height refer to the output images. The low three bits of width are ignored and
-// assumed to be zero.
-// pitch is source image row pitch in bytes, and can be >= width
-// The destination is four or five images, concatenated with no padding:
-//    Y image, 16-bit pixels
-//    white image, 8-bit pixels
-//    green image, 8-bit pixels
-//    orange image, 8-bit pixels
-//    optional image reulting from color table lookup
-extern "C" uint32_t
-  newAcquire(const uint8_t* source, int width, int height, int pitch, const Colors* colors,
-             uint8_t* dest, uint8_t* colorTable = 0);
+// ********************************
+// *                              *
+// *  Front End Image Processing  *
+// *                              *
+// ********************************
 
-uint32_t
-  testAcquire(const uint8_t* source, int width, int height, int pitch, const Colors* colors,
-              uint8_t* dest, uint8_t* colorTable = 0);
+class ImageFrontEnd
+{
+  bool _fast;
+
+  void* memBlock;
+  int dstAllocated;
+  uint8_t* dstImages;
+  int dstOffset;
+
+  ImageLiteBase dstBase;
+
+  int imagePitch() { return dstBase.pitch() * dstBase.height(); }
+
+  uint32_t _time;
+
+public:
+  uint32_t time() const { return _time; }
+
+  // Use fast (ASM) version
+  bool fast() const { return _fast;}
+  void fast(bool b) { _fast = b;}
+
+  ImageFrontEnd();
+  ~ImageFrontEnd();
+
+  ImageLiteU16 yImage() { return ImageLiteU16(dstBase, (uint16_t*)dstImages + dstOffset);}
+  ImageLiteU8 whiteImage () { return ImageLiteU8(dstBase, dstImages + 2 * imagePitch() + dstOffset); }
+  ImageLiteU8 greenImage () { return ImageLiteU8(dstBase, dstImages + 3 * imagePitch() + dstOffset); }
+  ImageLiteU8 orangeImage() { return ImageLiteU8(dstBase, dstImages + 4 * imagePitch() + dstOffset); }
+  ImageLiteU8 colorImage () { return ImageLiteU8(dstBase, dstImages + 5 * imagePitch() + dstOffset); }
+
+  void run(const YuvLite& src, const Colors* colors, uint8_t* colorTable = 0);
+};
 
 #endif

@@ -10,6 +10,8 @@
 
 #include <cstring>
 
+using namespace std;
+
 string Blob::print() const
 {
   return strPrintf("%4d %6.1f %6.1f %6.1f\n", areaAboveFirst(), area(),

@@ -12,8 +12,6 @@
 
 #include <list>
 
-using namespace std;
-
 // *****************
 // *               *
 // *  Blob Result  *
@@ -43,7 +41,7 @@ public:
 
   double area() const { return LineFit::area() / _w1; }
 
-  string print() const;
+  std::string print() const;
 };
 
 // ***************************
@@ -137,7 +135,7 @@ public:
   void fast(bool b) { _fast = b; }
 
   // List of blobs found by last run
-  list<Blob> blobs;
+  std::list<Blob> blobs;
 
   // Execution time of last run in clock ticks
   uint32_t ticks() const { return _ticks; }
@@ -163,9 +161,9 @@ public:
 
   // Generate synthetic test image, run connectivity, check results. Return true if
   // test passes.
-  bool test(string& message);
+  bool test(std::string& message);
 
-  string print() const;
+  std::string print() const;
 };
 
 #endif
