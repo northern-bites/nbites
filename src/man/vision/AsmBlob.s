@@ -1,3 +1,5 @@
+/* -*- mode: asm; indent-tabs-mode: nil -*- */
+.intel_syntax noprefix
 #// *********************************
 #// *                               *
 #// *  Pixel Marking for Fast Blob  *
@@ -82,15 +84,15 @@ _connectMark:
 	push	ebp
 	mov		ebp, esp
 	sub		esp, local_stack_end 	
-	and		esp, 0FFFFFFF0h
+	and		esp, 0x0FFFFFFF0
 	pxor	xmm0, xmm0		# xmm0 = 0 for pshufb to copy low byte to all bytes
 
-	mov		eax, 0FEh		# FC mask
+	mov		eax, 0x0FE		# FC mask
 	movd	xmm2, eax
 	pshufb	xmm2, xmm0
 
 	mov	eax, 	[ebp + thr]	# threshold
-	xor	eax, 	80h
+	xor	eax, 	0x80
 	movd		xmm3, eax
 	pshufb		xmm3, xmm0
 
@@ -98,7 +100,7 @@ _connectMark:
 	movd	xmm5, eax
 	pshufb	xmm5, xmm0
 
-	mov		eax, 80h		# 80 for excess-128
+	mov		eax, 0x80		# 80 for excess-128
 	movd	xmm6, eax
 	pshufb	xmm6, xmm0
 
@@ -163,7 +165,7 @@ inner:	mark	[eax + ecx], xmm2, xmm5
 # End of outer loop, mark right partial group
 oEnd:	mark	[eax], [esp + maskR1], [esp + maskR2]
 	add	eax, [ebp + pitch]
-	dec	[ebp + ht]
+	dec	DWORD PTR[ebp + ht]
 	jg	outer
 
 # return

@@ -1,4 +1,5 @@
-
+/* -*- mode: asm; indent-tabs-mode: nil -*- */
+.intel_syntax noprefix
 # ************************
 # *                      *
 # *  Smooth Hough Space  *
@@ -9,9 +10,9 @@
 #
 # In-place smooth Hough space using kernel:
 #
-#	1 2 1
-#	2 4 2
-#	1 2 1
+#   1 2 1
+#   2 4 2
+#   1 2 1
 #
 # image, dstWd, and dstHt specify the result image, which will contain valid
 # smoothed values. pitch must be a multiple of 16, but there are no other
@@ -25,8 +26,8 @@
 # undefined values. The overwriting is OK because the active region of
 # the Hough space is smaller than the allocated bins.
 
-#	PUBLIC	_houghSmooth
-#	.MODEL	FLAT
+#   PUBLIC   _houghSmooth
+#   .MODEL   FLAT
 .globl _houghSmooth
 .section .data
 
@@ -37,17 +38,17 @@
 # *                             *
 # *******************************
 
-	.struct 0 			#
-rowBufs		.skip 16	# This is unused
-local_stack_end: 		#
+   .struct 0    #
+  rowBufs:   .skip 16   # This is unused
+  local_stack_end:    #
 
-	.struct 0
-saves	20		# 4 saved registers (16 bytes) plus return address
-image	4
-dstWd	4
-dstHt	4
-pitch	4
-args_stack_end:
+   .struct 0
+  saves:  .skip 20   # 4 saved registers (16 bytes) plus return address
+  image:  .skip 4
+  dstWd:  .skip 4
+  dstHt:  .skip 4
+  pitch:  .skip 4
+  args_stack_end:
 
 # *****************
 # *               *
@@ -56,52 +57,52 @@ args_stack_end:
 # *****************
 
 .section .text
+
 _houghSmooth:
 # Preserve the required registers: ebp, ebx, esi, edi
-        push    ebp
-        push    ebx
-        push    esi
-        push    edi
-        mov     ebp, esp
-
+  push    ebp
+  push    ebx
+  push    esi
+  push    edi
+  mov     ebp, esp    
 # Make width and source address DQ aligned
-	mov	esi, [ebp + image]
-	mov	ecx, esi
-	and	ecx, 0Fh
-	sub	esi, ecx
-	shr	ecx, 1
-	add	ecx, [ebp + dstWd]
-	add	ecx, 7
-	and	ecx, 0FFFFFFF8h
-	mov	[ebp + dstWd], ecx
+  mov   esi, [ebp + image]
+  mov   ecx, esi
+  and   ecx, 0x0F
+  sub   esi, ecx
+  shr   ecx, 1
+  add   ecx, [ebp + dstWd]
+  add   ecx, 7
+  and   ecx, 0x0FFFFFFF8
+  mov   [ebp + dstWd], ecx
 
 # Allocate local variables, ensure that the stack pointer is DQ aligned
-	neg	ecx
-    lea	esp, [esp + ecx*4]
-    and esp, 0FFFFFFF0h
+  neg   ecx
+  lea   esp, [esp + ecx*4]
+  and esp, 0x0FFFFFFF0
 
 # Top and mid row addresses (point to end of buffers)
-	mov	eax, [ebp + dstWd]
-	lea	edx, [esp + eax*2]
-	lea	edi, [esp + eax*4]
+  mov   eax, [ebp + dstWd]
+  lea   edx, [esp + eax*2]
+  lea   edi, [esp + eax*4]
 
 # pitch
-	mov	eax, [ebp + pitch]
-	add	eax, eax
-	neg	eax
+  mov   eax, [ebp + pitch]
+  add   eax, eax
+  neg   eax
 
 # Prefill top
-	add	esi, eax
-fill:	movdqa	xmm0, [esi]
-	movdqu	xmm1, [esi - 2]
-	movdqu	xmm2, [esi + 2]
-	add	esi, 16
-	paddw	xmm0, xmm0
-	paddw	xmm1, xmm2
-	paddw	xmm0, xmm1
-	movdqa	[edi + ecx*2], xmm0
-	add	ecx, 8
-	jl	fill
+  add   esi, eax
+fill:   movdqa   xmm0, [esi]
+  movdqu   xmm1, [esi - 2]
+  movdqu   xmm2, [esi + 2]
+  add   esi, 16
+  paddw   xmm0, xmm0
+  paddw   xmm1, xmm2
+  paddw   xmm0, xmm1
+  movdqa   [edi + ecx*2], xmm0
+  add   ecx, 8
+  jl   fill
 
 # **********************
 # *                    *
@@ -109,36 +110,36 @@ fill:	movdqa	xmm0, [esi]
 # *                    *
 # **********************
 #
-#  eax	-pitch
+#  eax   -pitch
 #  ebx
-#  ecx	inner loop counter
-#  edx	top buffer address
-#  esi	source address
-#  edi	mid buffer address
-yLoop:
-	sub	esi, eax
-	mov	ecx, [ebp + dstWd]
-	neg	ecx
-	lea	esi, [esi + ecx*2]
+#  ecx   inner loop counter
+#  edx   top buffer address
+#  esi   source address
+#  edi   mid buffer address
+yLoop:    
+  sub   esi, eax
+  mov   ecx, [ebp + dstWd]
+  neg   ecx 
+  lea   esi, [esi + ecx*2]
 
 xLoop:
 # Next 121 smooth in x, bottom row
-	movdqa	xmm0, [esi]
-	movdqu	xmm1, [esi - 2]
-	movdqu	xmm2, [esi + 2]
-	paddw	xmm0, xmm0
-	paddw	xmm1, xmm2
-	paddw	xmm0, xmm1
+  movdqa   xmm0, [esi]
+  movdqu   xmm1, [esi - 2]
+  movdqu   xmm2, [esi + 2]
+  paddw   xmm0, xmm0
+  paddw   xmm1, xmm2
+  paddw   xmm0, xmm1
 
-	movdqa	xmm1, [edx + ecx * 2]
-	movdqa	[edx + ecx * 2], xmm0
-	paddw	xmm0, xmm1
-	movdqa	xmm1, [edi + ecx * 2]
-	paddw	xmm1, xmm1
-	paddw	xmm0, xmm1
+  movdqa   xmm1, [edx + ecx * 2]
+  movdqa   [edx + ecx * 2], xmm0
+  paddw   xmm0, xmm1
+  movdqa   xmm1, [edi + ecx * 2]
+  paddw   xmm1, xmm1
+  paddw   xmm0, xmm1
 
-	movdqa	[esi + eax], xmm0
-	add	esi, 16
+  movdqa   [esi + eax], xmm0
+  add   esi, 16
 
 # ******************
 # *                *
@@ -146,16 +147,16 @@ xLoop:
 # *                *
 # ******************
 
-	add	ecx, 8
-	jl	xLoop
+  add   ecx, 8
+  jl   xLoop
 
 # swap top and mid pointers
-	xor	edx, edi
-	xor	edi, edx
-	xor	edx, edi
+  xor   edx, edi
+  xor   edi, edx
+  xor   edx, edi
 
-	dec	[ebp + dstHt]
-	jge	yLoop
+  dec   DWORD PTR[ebp + dstHt]
+  jge   yLoop
 
 # **********
 # *        *
@@ -164,10 +165,10 @@ xLoop:
 # **********
 
 # Restore necessary _cdecl calling convention registers
-    mov     esp, ebp
-    pop     edi
-    pop     esi
-    pop     ebx
-    pop     ebp
+  mov     esp, ebp
+  pop     edi
+  pop     esi
+  pop     ebx
+  pop     ebp
 
-	ret
+  ret

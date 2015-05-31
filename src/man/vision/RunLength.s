@@ -1,3 +1,5 @@
+/* -*- mode: asm; indent-tabs-mode: nil -*- */
+.intel_syntax noprefix
 # ***********************
 # *                     *
 # *  Run-length Coding  *
@@ -32,11 +34,11 @@
 # *******************************
 
 	.struct 0
-saves	DWORD 4 dup (?)		# 3 saved registers plus return address
-source	DWORD ?
-count	DWORD ?
-thresh	DWORD ?
-runs	DWORD ?
+saves:	.skip 12		# 3 saved registers plus return address
+source:	.skip 4
+count:	.skip 4
+thresh:	.skip 4
+runs:	.skip 4
 args_stack_end: 
 
 # ***************************************
@@ -45,7 +47,10 @@ args_stack_end:
 # *                                     *
 # ***************************************
 
+# local vairable declarations??
+.altmacro
 .macro 	rlc	setup, getBits
+LOCAL rlc16, nxtBit, noBits, over, done
 
 # Preserve the required registers: ebx, esi, edi. Not using ebp.
 	push	ebx
@@ -63,13 +68,13 @@ args_stack_end:
 	xor	edx, edx
 
 # process next 16 values
-__local__ rlc16:	getBits
+    rlc16:	getBits
 
 # Scan the bits for run-length coding
 	or	eax, eax		# any bits set?
 	je	noBits
 	lea	ebx, [edx - 1]		# yes, ebx counts bit position
-__local__ nxtBit:	bsf	ecx, eax		# find next bit set
+    nxtBit:	bsf	ecx, eax		# find next bit set
 	add	ecx, 1
 	add	ebx, ecx		# get index of corresponding word
 	mov	[edi], ebx		# write it to runs
@@ -77,12 +82,12 @@ __local__ nxtBit:	bsf	ecx, eax		# find next bit set
 	shr	eax, cl			# shift out the bit and all 0's before it
 	jne	nxtBit			# continue if any 1's left
 
-__local__ noBits:	add	edx, 16			# update base index
+    noBits:	add	edx, 16			# update base index
 	cmp	edx, [esp + count]	# done?
 	jl	rlc16
 
 # Remove indices beyond count
-__local__ over:	cmp	edi, [esp + runs]
+    over:	cmp	edi, [esp + runs]
 	je	done
 	mov	eax, [edi - 4]
 	cmp	eax, [esp + count]
@@ -91,7 +96,7 @@ __local__ over:	cmp	edi, [esp + runs]
 	jmp	over
 
 # write terminator
-__local__ done:	mov	eax, -1
+    done:	mov	eax, -1
 	mov	[edi], eax
 
 # Restore necessary _cdecl calling convention registers
