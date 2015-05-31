@@ -18,6 +18,15 @@ VisionModule::VisionModule()
     edges = new EdgeList(3200);
     houghLines = new HoughLineList(128);
     hough = new HoughSpace(320, 240);
+
+#ifdef USE_MMX
+    bool fast = true;
+#else
+    bool fast = false;
+#endif
+    frontEnd->fast(fast);
+    edgeDetector->fast(fast);
+    hough->fast(fast);
 }
 
 VisionModule::~VisionModule()
@@ -43,7 +52,7 @@ void VisionModule::run_()
     messages::JointAngles joints(jointsIn.message());
     messages::InertialState inertials(inertialsIn.message());
 
-    // Setup pre runnning vision system
+    // Setup
     std::vector<messages::YUVImage> images { top, bottom };
     houghLines->clear();
 

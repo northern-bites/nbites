@@ -12,7 +12,7 @@
 namespace man {
 namespace vision {
 
-// TODO fast bool
+// TODO test using nbtool
 // TODO compiles on both ubuntu and windows
 class VisionModule : public portals::Module {
 public:
