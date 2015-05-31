@@ -53,9 +53,8 @@ void EdgeDetector::init()
 
 EdgeDetector::EdgeDetector()
 {
-  dstBlock = 0;
-  _dstPitch = _dstWd = _dstHt = 0;
-  dstAllocated = 0;
+  gradMem = 0;
+  gradAllocated = 0;
 
   runs = 0;
   runSize = 0;
@@ -79,9 +78,8 @@ EdgeDetector& EdgeDetector::operator= (const EdgeDetector& ed)
 
 EdgeDetector::EdgeDetector(const EdgeDetector& ed)
 {
-  dstBlock = 0;
-  _dstPitch = _dstWd = _dstHt = 0;
-  dstAllocated = 0;
+  gradMem = 0;
+  gradAllocated = 0;
 
   runs = 0;
   runSize = 0;
@@ -144,30 +142,31 @@ void EdgeDetector::cToP(int x, int y, int& mag, int& dir)
 }
 
 extern "C" uint32_t
-  gradient(short* sourceImage, int width, int height, int pitch,
+  gradient(uint16_t* sourceImage, int width, int height, int pitch,
            uint16_t* gradientImage, int gradientThreshold);
 
-uint32_t EdgeDetector::gradient(short* source, int width, int height, int pitch)
+uint32_t EdgeDetector::gradient(const ImageLiteU16& source)
 {
   // Compute destination images (gradient and edge) size, pitch, and offset. See the ASM
   // for more information. 
-  _dstPitch = ((((long)source >> 1) + width + 7) & ~7) - (((long)source >> 1) & ~7);
-  dstOffset = (((long)source >> 1) & 7) + 2;
-  _dstWd = width - 2;
-  _dstHt = height - 2;
+  long addr = (long)(source.pixelAddr()) >> 1;
+  int pitch = ((addr + source.width() + 7) & ~7) - (addr & ~7);
+  int offset = (addr & 7) + 2;
 
   // If we don't have enough room for the destination images (from previous runs),
   // get more
-  int dstSize = dstPitch() * dstHeight();
-  if (dstSize > dstAllocated)
+  int size = pitch * (source.height() - 2);
+  if (size > gradAllocated)
   {
-    delete[] dstBlock;
-    _gradImage = (uint16_t*)alignedAlloc(dstSize * 2, 4, dstBlock);
-    dstAllocated = dstSize;
+    delete[] gradMem;
+    gradPixels = (uint16_t*)alignedAlloc(size * 2, 4, gradMem);
+    gradAllocated = size;
   }
 
+  _gradImage = ImageLiteU16(source, 2, pitch, gradPixels + offset);
+
   // Allocate runs for later edge detection
-  int runSizeNeeded = ((dstWidth() + 15) & ~15) + 1;
+  int runSizeNeeded = ((_gradImage.width() + 15) & ~15) + 1;
   if (runSizeNeeded > runSize)
   {
     delete[] runs;
@@ -179,13 +178,15 @@ uint32_t EdgeDetector::gradient(short* source, int width, int height, int pitch)
 
   // Run ASM or C++ grdient
   if (fast())
-    ::gradient(source, width, height, 2 * pitch, _gradImage, gradientThreshold());
+    ::gradient(source.pixelAddr(), source.width(), source.height(), 2 * source.pitch(),
+               gradPixels, gradientThreshold());
   else
   {
-    for (int y = 1; y < height - 1; ++y)
-      for (int x = 1; x < width - 1; ++x)
+    int pitch = source.pitch();
+    for (int y = 1; y < source.height() - 1; ++y)
+      for (int x = 1; x < source.width() - 1; ++x)
       {
-        short* p = source + y * pitch + x;
+        uint16_t* p = source.pixelAddr(x, y);
         int u = (p[-pitch + 1] + 2 * p[+1    ] + p[ pitch + 1]) -
                 (p[-pitch - 1] + 2 * p[-1    ] + p[ pitch - 1]);
         int v = (p[ pitch - 1] + 2 * p[ pitch] + p[ pitch + 1]) -
@@ -196,8 +197,7 @@ uint32_t EdgeDetector::gradient(short* source, int width, int height, int pitch)
 
         uint16_t grad = (uint16_t)(mag > gradientThreshold() ? (mag << 8) + dir : 0);
 
-        int i = (y - 1) * dstPitch() + x - 1;
-        gradientImage()[i] = grad;
+        *gradientImage().pixelAddr(x - 1, y - 1) = grad;
       }
   }
 
@@ -211,7 +211,7 @@ uint32_t EdgeDetector::gradient(short* source, int width, int height, int pitch)
 // *                  *
 // ********************
 
-uint32_t EdgeDetector::edgeDetect(uint8_t* green, int greenPitch, EdgeList& edgeList)
+uint32_t EdgeDetector::edgeDetect(const ImageLiteU8& green, EdgeList& edgeList)
 {
   static int8_t edgeDirCorrection[64] =
   {  0,  0,  0,  0,  0,  0,  0,  0,    0,  1,  1,  1,  1,  1,  1,  1,
@@ -231,28 +231,32 @@ uint32_t EdgeDetector::edgeDetect(uint8_t* green, int greenPitch, EdgeList& edge
   int greenNeighbors[10];
   for (int i = 0; i < 8; ++i)
   {
-    gradNeighbors[i] = 2 * (dstPitch() * dyTab[i] + dxTab[i]);
+    gradNeighbors[i] = 2 * (gradientImage().pitch() * dyTab[i] + dxTab[i]);
     int j = (i + 3) & 7;
-    greenNeighbors[i] = greenPitch * dyTab[j] + dxTab[j];
+    greenNeighbors[i] = green.pitch() * dyTab[j] + dxTab[j];
   }
   greenNeighbors[8] = greenNeighbors[0];
   greenNeighbors[9] = greenNeighbors[1];
 
-  uint16_t* gradRow = gradientImage();
-  if (green)
-    green += greenPitch;
+  uint16_t* gradRow = gradientImage().pixelAddr();
+  uint8_t* greenRow = green.pixelAddr();
+  if (greenRow)
+    greenRow += green.pitch();
 
-  int x0 = dstWidth() / 2;
-  int y0 = dstHeight() / 2;
+  //int x0 = dstWidth() / 2;
+  //int y0 = dstHeight() / 2;
+  // "-1" since gradient is shifted by 1 from source
+  int x0 = gradientImage().x0() >> 1;
+  int y0 = gradientImage().y0() >> 1;
 
   if (fast())
-    for (int y = 1; y < dstHeight() - 1; ++y)
+    for (int y = 1; y < gradientImage().height() - 1; ++y)
     {
-      gradRow += dstPitch();
-      if (green)
-        green += greenPitch;
+      gradRow += gradientImage().pitch();
+      if (greenRow)
+        greenRow += green.pitch();
 
-      runLengthU16(gradRow + 1, dstWidth() - 2, (edgeThreshold() << 8) | 0xFF, runs);
+      runLengthU16(gradRow + 1, gradientImage().width() - 2, (edgeThreshold() << 8) | 0xFF, runs);
 
       int ri = 0;
       for (int x = runs[0]; x >= 0; x = runs[++ri])
@@ -265,9 +269,9 @@ uint32_t EdgeDetector::edgeDetect(uint8_t* green, int greenPitch, EdgeList& edge
         int nbr = gradNeighbors[octant];
         if (mag > pmag[nbr] && mag >= pmag[-nbr])
         {
-          if (green)
+          if (greenRow)
           {
-            uint8_t* pg = green + x;
+            uint8_t* pg = greenRow + x;
             nbr = greenNeighbors[octant];
             int g = pg[nbr] - pg[-nbr];
             nbr = greenNeighbors[octant + 1];
@@ -286,13 +290,13 @@ uint32_t EdgeDetector::edgeDetect(uint8_t* green, int greenPitch, EdgeList& edge
       }
     }
   else
-    for (int y = 1; y < dstHeight() - 1; ++y)
+    for (int y = 1; y < gradientImage().height() - 1; ++y)
     {
-      gradRow += dstPitch();
-      if (green)
-        green += greenPitch;
+      gradRow += gradientImage().pitch();
+      if (greenRow)
+        greenRow += green.pitch();
 
-      for (int x = 1; x < dstWidth() - 1; ++x)
+      for (int x = 1; x < gradientImage().width() - 1; ++x)
       {
         uint8_t* pmag = (uint8_t*)(gradRow + x) + 1;
         int mag = *pmag;
@@ -303,9 +307,9 @@ uint32_t EdgeDetector::edgeDetect(uint8_t* green, int greenPitch, EdgeList& edge
           int nbr = gradNeighbors[octant];
           if (mag > pmag[nbr] && mag >= pmag[-nbr])
           {
-            if (green)
+            if (greenRow)
             {
-              uint8_t* pg = green + x;
+              uint8_t* pg = greenRow + x;
               nbr = greenNeighbors[octant];
               int g = pg[nbr] - pg[-nbr];
               nbr = greenNeighbors[octant + 1];

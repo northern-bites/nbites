@@ -269,16 +269,15 @@ class EdgeDetector
   int _greenThr;
 
   // Gradient and edge image data
-  uint16_t* _gradImage;
-  void* dstBlock;
-  int _dstPitch, dstOffset;
-  int _dstWd, _dstHt;
-  int dstAllocated;
-  bool _correctEdgeDir;
+  ImageLiteU16 _gradImage;
+  void* gradMem;
+  uint16_t* gradPixels;
+  int gradAllocated;
 
   uint32_t _gradTime, _edgeTime;
 
   bool _fast;
+  bool _correctEdgeDir;
 
   int32_t* runs;  // run-length buffer for edge detection
   int runSize;
@@ -294,7 +293,7 @@ public:
 
   ~EdgeDetector()
   {
-    delete[] dstBlock;
+    delete[] gradMem;
     delete[] runs;
   }
 
@@ -337,31 +336,23 @@ public:
   // All pixels where gradient magnitude is less than the gradientThreshold() are
   // set to 0 (all 16 bits).
   //
-  // Produce an edge image (used in edge detection) with 8-bit pixels, set to 0
-  // for magnitudes below the edgeThreshold() and set to the nearest octant
-  // (1 - 8) otherwise.
-  //
-  // Pitch must be a multiple of 16 (bytes). There are no other alignment requirements.
-  uint32_t gradient(int16_t* source, int width, int height, int pitch);
+  // Pitch must be a multiple of 16 (bytes), which is enforced by ImageFrontEnd. There
+  // are no other alignment requirements.
+  uint32_t gradient(const ImageLiteU16&);
 
   // Execution time of last run in clocks
   uint32_t gradientTime() const { return _gradTime;}
 
-  // Gradient and edge images from last call to gradient. 
-  uint16_t* gradientImage() const { return _gradImage + dstOffset; };
-  int dstPitch() const { return _dstPitch;}
+  // Gradient image from last call to gradient. 
+  const ImageLiteU16& gradientImage() const { return _gradImage; };
 
-  // Size of gradient and edge images.
-  int dstWidth () const { return _dstWd;}
-  int dstHeight() const { return _dstHt;}
-
-  // Get individual pixels from gradient and edge images
-  uint16_t gradPixel(int x, int y) const { return gradientImage()[y * dstPitch() + x];}
+  // Get individual pixels from gradient image
+  uint16_t gradPixel(int x, int y) const { return *gradientImage().pixelAddr(x, y);}
   uint8_t mag(int x, int y) const { return gradPixel(x, y) >> 8;}
   uint8_t dir(int x, int y) const { return gradPixel(x, y) & 0xFF;}
 
   // Edge detection
-  uint32_t edgeDetect(uint8_t* green, int greenPitch, EdgeList& edgeList);
+  uint32_t edgeDetect(const ImageLiteU8& green, EdgeList& edgeList);
 
   // Execution time of last run in clocks
   uint32_t edgeTime() const { return _edgeTime;}
