@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import javax.swing.AbstractListModel;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;

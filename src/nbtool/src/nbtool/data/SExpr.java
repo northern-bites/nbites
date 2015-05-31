@@ -126,6 +126,10 @@ public abstract class SExpr implements Serializable{
 		return newList(new Found(key), value);
 	}
 	
+	public static SExpr newKeyValue(String key, int value) {
+		return newList(new Found(key), new Found(Integer.toString(value)));
+	}
+	
 	public abstract boolean isAtom();
 	public abstract boolean exists();
 	
