@@ -24,6 +24,8 @@ public:
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::InertialState> inertialsIn;
 
+    EdgeList* getEdges() const { return edges; }
+
 protected:
     virtual void run_();
 
