@@ -12,7 +12,6 @@
 namespace man {
 namespace vision {
 
-// TODO namespace
 // TODO fast bool
 // TODO compiles on both ubuntu and windows
 class VisionModule : public portals::Module {

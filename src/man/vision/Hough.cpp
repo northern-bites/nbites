@@ -9,6 +9,9 @@
 
 using namespace std;
 
+namespace man {
+namespace vision {
+
 // *******************************
 // *                             *
 // *  Line from Hough Transform  *
@@ -397,4 +400,7 @@ void HoughSpace::run(EdgeList& edges, HoughLineList& hlList)
   adjust(edges, hlList);
 
   times[5] = timer.time32();
+}
+
+}
 }

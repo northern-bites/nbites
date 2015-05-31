@@ -12,6 +12,9 @@
 
 using namespace std;
 
+namespace man {
+namespace vision {
+
 string Blob::print() const
 {
   return strPrintf("%4d %6.1f %6.1f %6.1f\n", areaAboveFirst(), area(),
@@ -329,4 +332,7 @@ string Connectivity::print() const
     s += it->print();
   s += strPrintf("%d ticks = %.1f us; alignment = %d\n", ticks(), ticks() / 1600.0, alignment());
   return s;
+}
+
+}
 }

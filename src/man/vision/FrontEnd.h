@@ -10,6 +10,9 @@
 #include "Stdafx.h"
 #include "Vision.h"
 
+namespace man {
+namespace vision {
+
 // ***************
 // *             *
 // *  Constants  *
@@ -176,5 +179,8 @@ public:
 
   void run(const YuvLite& src, const Colors* colors, uint8_t* colorTable = 0);
 };
+
+}
+}
 
 #endif

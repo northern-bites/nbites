@@ -6,6 +6,9 @@
 
 #include "Edge.h"
 
+namespace man {
+namespace vision {
+
 // ******************************************************
 // *                                                    *
 // *  Hash Table of Objects Indexed by 8-bit Direction  *
@@ -178,8 +181,8 @@ uint32_t EdgeDetector::gradient(const ImageLiteU16& source)
 
   // Run ASM or C++ grdient
   if (fast())
-    ::gradient(source.pixelAddr(), source.width(), source.height(), 2 * source.pitch(),
-               gradPixels, gradientThreshold());
+    man::vision::gradient(source.pixelAddr(), source.width(), source.height(), 
+                          2 * source.pitch(), gradPixels, gradientThreshold());
   else
   {
     int pitch = source.pitch();
@@ -331,4 +334,7 @@ uint32_t EdgeDetector::edgeDetect(const ImageLiteU8& green, EdgeList& edgeList)
 
   _edgeTime = (uint32_t)timer.time();
   return edgeTime();
+}
+
+}
 }

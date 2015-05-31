@@ -8,6 +8,9 @@
 
 using namespace std;
 
+namespace man {
+namespace vision {
+
 double FieldHomography::tiltSensitivity   = 0.08;   // min dE/dt for Newton's method
 double FieldHomography::tiltConvergeLimit = 1.0e-6; // Newton can stop when error is < this
 double FieldHomography::tiltConvergeRate  = 4;      // Error must be reduced by this factor each iteration
@@ -428,4 +431,7 @@ void GeoLine::imageToField(const FieldHomography& h)
 string GeoLine::print() const
 {
   return strPrintf("%.8g,%.8g,%.8g,%.8g,", r(), t(), ep0(), ep1());
+}
+
+}
 }

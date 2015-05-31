@@ -9,6 +9,9 @@
 
 #include <stdlib.h>
 
+namespace man {
+namespace vision {
+
 // *********************
 // *                   *
 // *  Computed Colors  *
@@ -65,11 +68,11 @@ void* alignedAlloc(size_t size, int alignBits, void*& block)
   return (void*)(((size_t)block + extra) & ~extra);
 }
 
-// ********************************
-// *                              *
-// *  Front End Image Processing  *
-// *                              *
-// ********************************
+// *******************************
+// *                              
+// *  Front End Image Processing  
+// *                              
+// *******************************
 //
 // The ASM and C++ have identical function signatures.
 // The source is a YUYV image. There are no pixel alignment requirements, although
@@ -157,9 +160,13 @@ void ImageFrontEnd::run(const YuvLite& src, const Colors* colors, uint8_t* color
   }
 
   if (fast())
-    _time = newAcquire(src.pixelAddr(), dstBase.pitch(), dstBase.height(), src.pitch(),
-                       colors, dstImages, colorTable);
+    _time = man::vision::newAcquire(src.pixelAddr(), dstBase.pitch(), 
+                                    dstBase.height(), src.pitch(),
+                                    colors, dstImages, colorTable);
   else
     _time = testAcquire(src.pixelAddr(), dstBase.pitch(), dstBase.height(), src.pitch(),
                         colors, dstImages, colorTable);
+}
+
+}
 }
