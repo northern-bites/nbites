@@ -59,8 +59,9 @@ bool HoughLine::adjust(EdgeList& edges, const AdjustParams& p, bool capture)
   float uHistogram[UHistSize];
   LineFit fit;
 
-  for (int i = 0; i < UHistSize; ++i)
-    uHistogram[i] = 0;
+  if (capture)
+    for (int i = 0; i < UHistSize; ++i)
+      uHistogram[i] = 0;
 
   int lineAngle = binaryAngle();
 
@@ -84,12 +85,15 @@ bool HoughLine::adjust(EdgeList& edges, const AdjustParams& p, bool capture)
         float w = (angle < p.angleThr & distance < p.distanceThr & (float)e->mag() > p.magnitudeThr).f();
         if (w > 0)
         {
-          double q = qDist(x, y);
-          uAdd(q, w, uHistogram);
+          if (capture)
+          {
+            double q = qDist(x, y);
+            uAdd(q, w, uHistogram);
+          }
           fit.add(w, x, y);
         }
 
-        if (w > 0.5 && capture)
+        if (capture && w > 0.5)
         {
           e->memberOf(this);
           e->nextMember(members);
@@ -107,31 +111,34 @@ bool HoughLine::adjust(EdgeList& edges, const AdjustParams& p, bool capture)
 
   _fitError = fit.rmsError();
 
-  // Find first endpoint
-  float tw = 0;
-  double u0 = 0, u1 = 0;
-  for (int i = 0; i < UHistSize; ++i)
+  if (capture)
   {
-    tw += uHistogram[i];
-    if (tw >= p.lineEndWeight)
+    // Find first endpoint
+    float tw = 0;
+    double u0 = 0, u1 = 0;
+    for (int i = 0; i < UHistSize; ++i)
     {
-      u0 = uBin(i) - p.lineEndWeight;
-      break;
+      tw += uHistogram[i];
+      if (tw >= p.lineEndWeight)
+      {
+        u0 = uBin(i) - p.lineEndWeight;
+        break;
+      }
     }
-  }
 
-  // Find second endpoint
-  tw = 0;
-  for (int i = UHistSize - 1; i >= 0; --i)
-  {
-    tw += uHistogram[i];
-    if (tw >= p.lineEndWeight)
+    // Find second endpoint
+    tw = 0;
+    for (int i = UHistSize - 1; i >= 0; --i)
     {
-      u1 = uBin(i) + p.lineEndWeight;
-      break;
+      tw += uHistogram[i];
+      if (tw >= p.lineEndWeight)
+      {
+        u1 = uBin(i) + p.lineEndWeight;
+        break;
+      }
     }
+    setEndPoints(u0, u1);
   }
-  setEndPoints(u0, u1);
 
   // Adjust (R,T)
   r(fit.centerX() * fit.secondPrinciaplAxisU() + fit.centerY() * fit.secondPrinciaplAxisV());

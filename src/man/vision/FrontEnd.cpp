@@ -49,6 +49,44 @@ void ColorParams::load(float darkU0, float darkV0, float lightU0, float lightV0,
   inverseFuzzy.load((255 << 8) / fu, (255 << 8) / fv);
 }
 
+// *******************************
+// *                             *
+// *  Aligned Memory Allocation  *
+// *                             *
+// *******************************
+//
+// Allocate bytes using operator new. Place a pointer to the allocated buffer in block
+// for operator delete. Return a pointer to at least the requested size and aligned as
+// specified.
+void* alignedAlloc(size_t size, int alignBits, void*& block)
+{
+  size_t extra = (1 << alignBits) - 1;
+  block = new char[size + extra];
+  return (void*)(((size_t)block + extra) & ~extra);
+}
+
+// ********************************
+// *                              *
+// *  Front End Image Processing  *
+// *                              *
+// ********************************
+//
+// The ASM and C++ have identical function signatures.
+// The source is a YUYV image. There are no pixel alignment requirements, although
+// operation may be faster if source is QWORD or DQWORD aligned.
+// width and height refer to the output images. The low three bits of width are ignored and
+// assumed to be zero.
+// pitch is source image row pitch in bytes, and can be >= width
+// The destination is four or five images, concatenated with no padding:
+//    Y image, 16-bit pixels
+//    white image, 8-bit pixels
+//    green image, 8-bit pixels
+//    orange image, 8-bit pixels
+//    optional image reulting from color table lookup
+extern "C" uint32_t
+  newAcquire(const uint8_t* source, int width, int height, int pitch, const Colors* colors,
+             uint8_t* dest, uint8_t* colorTable = 0);
+
 uint32_t
   testAcquire(const uint8_t* source, int width, int height, int pitch, const Colors* colors,
               uint8_t* dest, uint8_t* colorTable)
@@ -87,18 +125,41 @@ uint32_t
   return (uint32_t)timer.time();;
 }
 
-// *******************************
-// *                             *
-// *  Aligned Memory Allocation  *
-// *                             *
-// *******************************
-//
-// Allocate bytes using operator new. Place a pointer to the allocated buffer in block
-// for operator delete. Return a pointer to at least the requested size and aligned as
-// specified.
-void* alignedAlloc(size_t size, int alignBits, void*& block)
+ImageFrontEnd::ImageFrontEnd()
 {
-  size_t extra = (1 << alignBits) - 1;
-  block = new char[size + extra];
-  return (void*)(((size_t)block + extra) & ~extra);
+  memBlock = 0;
+  dstAllocated = 0;
+  dstImages = 0;
+  dstOffset = 0;
+
+  fast(true);
+}
+
+ImageFrontEnd::~ImageFrontEnd()
+{
+  delete [] memBlock;
+}
+
+void ImageFrontEnd::run(const YuvLite& src, const Colors* colors, uint8_t* colorTable)
+{
+  dstBase = ImageLiteBase(src.x0(), src.y0(), src.width(), src.height(),
+                          (src.width() + 15) & ~15);
+
+  int size = 5 * imagePitch();
+  if (colorTable)
+    size += imagePitch();
+
+  if (size > dstAllocated)
+  {
+    delete[] memBlock;
+    dstImages = (uint8_t*)alignedAlloc(size, 4, memBlock);
+    dstAllocated = size;
+  }
+
+  if (fast())
+    _time = newAcquire(src.pixelAddr(), dstBase.pitch(), dstBase.height(), src.pitch(),
+                       colors, dstImages, colorTable);
+  else
+    _time = testAcquire(src.pixelAddr(), dstBase.pitch(), dstBase.height(), src.pitch(),
+                        colors, dstImages, colorTable);
 }

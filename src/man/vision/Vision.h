@@ -104,19 +104,13 @@ class TickTimer
   uint64_t read()
   {
     uint32_t lo, hi;
-#ifdef USE_WINDOWS
-    __asm
-    {
-      rdtsc
-      mov lo, eax
-      mov hi, edx
-    }
-#else
     // TODO convert inline assembly
-    // asm("rdtsc;\n"
-    //     "mov lo, eax;\n" 
-    //     "mov hi, edx;\n");
-#endif
+    // __asm
+    // {
+    //   rdtsc;
+    //   mov lo, eax
+    //   mov hi, edx
+    // }
     return ((uint64_t)hi << 32) | lo;
   }
 
@@ -285,5 +279,153 @@ public:
   }
 };
 
+// ****************************
+// *                           
+// *  Simple Images in Memory  
+// *                           
+// ****************************
+//
+// Very lightweight images in memory.
+
+class ImageLiteBase
+{
+  int _x0, _y0;
+
+  int _wd, _ht;
+
+  int _pitch;
+
+public:
+  // Copy/assign OK
+
+  // The point (x0, y0) specifies the physical center of the image, e.g. as
+  // acquired from a camera. It is necessary to know this point to compute
+  // image/field mappings (homography). As images are derived from others, by
+  // windowing or by neighborhood processing (e.g. gradient), this center point
+  // moves relative to image pixel (0,0) and this shift is accounted for.
+  //
+  // (x0, y0) are in half-pixel units, i.e. s32.1 (signed 32-bit integers, one
+  // bit to the right of the binary point). There are several reasons that a
+  // half-pixel shift may occur:
+  //    * The original source image (e.g. from a camera) may be of odd width
+  //      or height (unlikely, od course).
+  //    * A neighborhood processing operation may use an odd-diameter neighborhood
+  //    * Features (e.g. edges) can be detected with half-pixel resolution.
+  int x0() const { return _x0; }
+  int y0() const { return _y0; }
+
+  // Size of the image in whole pixels
+  int width() const { return _wd;}
+  int height() const { return _ht; }
+
+  // Amount to add to an address to move +1 in y, in units of pixel size
+  int pitch() const { return _pitch; }
+
+  // Default construct zero size image
+  ImageLiteBase() { _wd = _ht = 0; }
+
+  // Construct, specifying all parameters
+  ImageLiteBase(int x0, int y0, int wd, int ht, int pitch)
+  {
+    _x0 = x0;
+    _y0 = y0;
+    _wd = wd;
+    _ht = ht;
+    _pitch = pitch;
+  }
+
+  // Construct, placing (x0, y0) at the center. 
+  ImageLiteBase(int wd, int ht, int pitch)
+  {
+    _x0 = wd;   // This is wd/2 because x0 is in half-pixel units
+    _y0 = ht;
+    _wd = wd;
+    _ht = ht;
+    _pitch = pitch;
+  }
+
+  // Construct an image that results from neighborhood processing src with
+  // specified neighborhood diameter
+  ImageLiteBase(const ImageLiteBase& src, int diam, int pitch)
+  {
+    _x0 = src.x0() - diam;
+    _y0 = src.y0() - diam;
+    _wd = src.width() - diam;
+    _ht = src.height() - diam;
+    _pitch = pitch;
+  }
+
+  // Construct a window of src
+  ImageLiteBase(const ImageLiteBase& src, int x0, int y0, int wd, int ht)
+  {
+    _x0 = src.x0() - (x0 << 1);
+    _y0 = src.y0() - (y0 << 1);
+    _wd = wd;
+    _ht = ht;
+    _pitch = src.pitch();
+  }
+};
+
+// This template class adds pixels of type T to the base
+template <class T>
+class ImageLite : public ImageLiteBase
+{
+  T* _pixels;
+
+public:
+  ImageLite() { _pixels = 0; }
+
+  ImageLite(int x0, int y0, int wd, int ht, int pitch, T* pixels)
+    : ImageLiteBase(x0, y0, wd, ht, pitch), _pixels(pixels)
+  {}
+
+  ImageLite(int wd, int ht, int pitch, T* pixels)
+    : ImageLiteBase(wd, ht, pitch), _pixels(pixels)
+  {}
+
+  ImageLite(const ImageLiteBase& src, int diam, int pitch, T* pixels)
+    : ImageLiteBase(src, diam, pitch), _pixels(pixels)
+  {}
+
+  ImageLite(const ImageLiteBase& src, T* pixels)
+    : ImageLiteBase(src), _pixels(pixels)
+  {}
+
+  ImageLite(const ImageLite& src, int x0, int y0, int wd, int ht)
+    : ImageLiteBase(src, x0, y0, wd, ht)
+  {
+    _pixels = src.pixelAddr(x0, y0);
+  }
+
+  bool isNull() const { return _pixels == 0; }
+
+  T* pixelAddr(int x, int y) const { return _pixels + y * pitch() + x; }
+  T* pixelAddr() const { return _pixels; }
+};
+
+typedef ImageLite<uint8_t > ImageLiteU8;
+typedef ImageLite<uint16_t> ImageLiteU16;
+
+// A Yuv image is a special case.
+class YuvLite : public ImageLiteBase
+{
+  uint8_t* _pixels;
+
+public:
+  YuvLite() {}
+
+  YuvLite(int wd, int ht, int pitch, uint8_t* pixels)
+    : ImageLiteBase(wd, ht, pitch), _pixels(pixels)
+  {}
+
+  YuvLite(const YuvLite& src, int x0, int y0, int wd, int ht)
+    : ImageLiteBase(src, x0, y0, wd, ht)
+  {
+    _pixels = src.pixelAddr(x0, y0);
+  }
+
+  uint8_t* pixelAddr(int x, int y) const { return _pixels + 2 * y * pitch() + 4 * x; }
+  uint8_t* pixelAddr() const { return _pixels; }
+};
 
 #endif
