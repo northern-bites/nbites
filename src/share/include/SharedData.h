@@ -12,12 +12,12 @@
 #include "StiffnessControl.pb.h"
 #include "LedCommand.pb.h"
 
-#define MEMORY_NAME "/nbites-memory"
-#define SEMAPHORE_NAME "/nbites-semaphore"
+#define NBITES_MEM "/nbites-memory"
+#define NBITES_SEM "/nbites-semaphore"
 
 struct JointCommand {
+    messages::JointAngles jointsCommand;
     messages::JointAngles stiffnessCommand;
-    messages::JointAngles JointsCommand;
 };
 
 struct SensorValues {
@@ -34,13 +34,12 @@ struct SensorValues {
 };
 
 struct SharedData {
-    volatile uint8_t sensorsRead;
-    volatile uint8_t sensorsLatest;
-    volatile uint8_t commandsRead;
-    volatile uint8_t commandsLatest;
+    volatile int sensorsRead;
+    volatile int sensorsLatest;
+    volatile int commandsRead;
+    volatile int commandsLatest;
 
-    JointCommand commands[2];
-    messages::LedCommand Leds[2];
-
-    SensorValues sensors[2];
+    volatile JointCommand commands[2];
+    volatile SensorValues sensors[2];
+    volatile messages::LedCommand leds[2];
 };

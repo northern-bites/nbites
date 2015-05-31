@@ -53,7 +53,7 @@ if ( OFFLINE )
   include ( ${SHARE_DIR}/cmake/BuildGTest.cmake )
 endif()
 
-# For Aldebaran's headers
+# For Aldebaran's headers (actually just for the cross-compiled boost lib)
 find_package(ALCOMMON REQUIRED)
 include_directories( ${ALCOMMON_INCLUDE_DIR} )
 
@@ -107,13 +107,13 @@ add_subdirectory( control )
 add_subdirectory( gamestate )
 add_subdirectory( guardian )
 add_subdirectory( image )
-#add_subdirectory( jointenactor )
+add_subdirectory( jointenactor )
 #add_subdirectory( led )
 add_subdirectory( localization )
 add_subdirectory( log )
 add_subdirectory( motion )
 add_subdirectory( obstacle )
-#add_subdirectory( sensors )
+add_subdirectory( sensors )
 add_subdirectory( sharedball )
 add_subdirectory( vision )
 
@@ -140,7 +140,7 @@ target_link_libraries(
   gamestate
   guardian
   image
-  #jointenactor
+  jointenactor
   #led
   localization
   log
@@ -149,7 +149,7 @@ target_link_libraries(
   obstacle
   portals
   logshare
-  #sensors
+  sensors
   sharedball
   support
   vision

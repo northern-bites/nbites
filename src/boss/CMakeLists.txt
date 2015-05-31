@@ -71,17 +71,7 @@ include_directories( ${Boost_INCLUDE_DIR} )
 # Our core includes come from here
 include_directories( ${SHARE_DIR}/include )
 
-# Compile portals, which is outside the source tree so specify a destination
-# add_subdirectory( ${SHARE_DIR}/portals ${CMAKE_CURRENT_BINARY_DIR}/portals/ )
-# Make portals available to everything
-#include_directories( ${SHARE_DIR}/portals )
-
-# Compile logshare
-# add_subdirectory( ${SHARE_DIR}/logshare ${CMAKE_CURRENT_BINARY_DIR}/logshare/ )
-# # Make logshare available to everything
-# include_directories( ${SHARE_DIR}/logshare )
-
-# Also messages
+# Compile messages
 add_subdirectory( ${SHARE_DIR}/messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
@@ -91,6 +81,8 @@ include_directories( ${SHARE_DIR}/messages )
 if( BUILD_PROTOBUF )
 add_dependencies(messages protobuf_libs)
 endif()
+
+add_subdirectory( led )
 
 set( BOSS_SRCS main.cpp
   Boss.cpp
@@ -106,6 +98,7 @@ add_library(
 
 target_link_libraries( boss
   messages
+  led
   ${ALCOMMON_LIBRARIES}
 )
 

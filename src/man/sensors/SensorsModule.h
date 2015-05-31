@@ -11,9 +11,11 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <semaphore.h>
 
 #include "RoboGrams.h"
 #include "SensorTypes.h"
+#include "SharedData.h"
 
 #include "PMotion.pb.h"
 #include "ButtonState.pb.h"
@@ -24,13 +26,6 @@
 #include "Toggle.pb.h"
 #include "StiffnessControl.pb.h"
 
-#include <alcommon/albroker.h>
-#include <alproxies/almemoryproxy.h>
-#include <alproxies/dcmproxy.h>
-#include <almemoryfastaccess/almemoryfastaccess.h>
-
-#include <boost/shared_ptr.hpp>
-
 namespace man {
 namespace sensors {
 
@@ -40,15 +35,10 @@ namespace sensors {
 class SensorsModule : public portals::Module
 {
 public:
-    /**
-     * @brief Constructor must take a pointer to the broker
-     *        passed to Man in order to communicate via
-     *        proxies to the DCM and ALMemory.
-     */
-    SensorsModule(boost::shared_ptr<AL::ALBroker> broker);
-
+    SensorsModule();
     virtual ~SensorsModule();
 
+    std::string makeSweetMoveTuple(const messages::JointAngles* angles);
     /*
      * These portals enable other modules to get sensory
      * information.
@@ -67,94 +57,14 @@ public:
     portals::OutPortal<messages::StiffStatus>     stiffStatusOutput_;
 
 private:
-    /*
-     * Methods used to communicate with the NAO hardware
-     * through the NAOqi software interface.
-     */
-
-    /**
-     * @brief Initialize sensor aliases for fast access.
-     */
-    void initializeSensorFastAccess();
-
-    /**
-     * @brief By default, the DCM does not write ultrasonic
-     *        sensor values to ALMemory, so we must notify
-     *        it to do so if we need sonar readings.
-     */
-    void initializeSonarValues();
-
-    /**
-     * @brief Updates the sensor readings. All readings are
-     *        stored and indexed appropriately in a vector.
-     */
+    void run_();
     void updateSensorValues();
 
-    /*
-     * Methods to update the messages provided by the
-     * out portals.
-     */
+    SensorValues values;
 
-    /**
-     * @brief Updates the joint angles message.
-     */
-    void updateJointsMessage();
-
-    /**
-     * @brief Updates the joint currents message.
-     */
-    void updateCurrentsMessage();
-
-    /**
-     * @brief Updates the temperatures message.
-     */
-    void updateTemperatureMessage();
-
-    /**
-     * @brief Updates the chestboard button message.
-     */
-    void updateChestboardButtonMessage();
-
-    /**
-     * @brief Updates the footbumper button message.
-     */
-    void updateFootbumperMessage();
-
-    /**
-     * @brief Updates the inertial sensors message.
-     */
-    void updateInertialsMessage();
-
-    /**
-     * @brief Updates the sonars message.
-     */
-    void updateSonarsMessage();
-
-    /**
-     * @brief Updates the FSR message.
-     */
-    void updateFSRMessage();
-
-    /**
-     * @brief Updates the Battery message.
-     */
-    void updateBatteryMessage();
-
-    /**
-     * @brief Updates the Stiffness message.
-     */
-    void updateStiffMessage();
-
-    /**
-     * @brief The main run routine, primarily updates sensor
-     *        readings.
-     */
-    void run_();
-
-    boost::shared_ptr<AL::ALBroker>           broker_;
-    boost::shared_ptr<AL::ALMemoryFastAccess> fastMemoryAccess_;
-    std::vector<float>                        sensorValues_;
-    std::vector<std::string>                  sensorKeys_;
+    int shared_fd;
+    SharedData* shared;
+    sem_t* semaphore;
 
     bool lastPrint;
 };

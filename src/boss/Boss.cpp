@@ -15,14 +15,12 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     dcm(broker->getSpecialisedProxy<AL::DCMProxy>("DCM")),
     sensor(broker),
     enactor(dcm),
+    led(broker),
     manPID(-1),
     manRunning(false),
     sharedMem(NULL)
 {
     std::cout << "Boss Constructor" << std::endl;
-
-    initEnactor();
-    initSensorAccess();
 
     try {
         dcmPreProcessConnection = broker_->getProxy("DCM")->getModule()->atPreProcess(
@@ -39,6 +37,7 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
         std::cout << "Tried to bind postprocess, but failed, because " + e.toString() << std::endl;
     }
 
+    constructSharedMem();
 
     std::cout << "Boss Constructed successfully!" << std::endl;
 }
@@ -48,6 +47,11 @@ Boss::~Boss()
     std::cout << "Deconstructing" << std::endl;
     dcmPreProcessConnection.disconnect();
     dcmPostProcessConnection.disconnect();
+
+    // Close shared memory
+    munmap(shared, sizeof(SharedData));
+    close(shared_fd);
+    sem_close(semaphore);
 }
 
 int Boss::startMan() {
@@ -75,7 +79,7 @@ int Boss::killMan() {
 
 int Boss::constructSharedMem()
 {
-    int shared_fd = shm_open(MEMORY_NAME, O_RDWR | O_CREAT, 0600);
+    shared_fd = shm_open(NBITES_MEM, O_RDWR | O_CREAT, 0600);
     if (shared_fd < 0) {
         // TODO error
     }
@@ -94,34 +98,36 @@ int Boss::constructSharedMem()
     memset(shared, 0, sizeof(SharedData));
 
     sharedMem = shared;
-}
 
-void writeSensors()
-{
+    semaphore = sem_open(NBITES_SEM, O_RDWR | O_CREAT, 0600, 0);
 
-    int i = 0;
-
-    // if (sharedMem->sensorsRead != sharedMem->sensorsLatest) {
-    //     // Man missed a frame of sensors
-    //     // TODO notify?
-    // }
-
+    if (semaphore == SEM_FAILED) {
+        // TODO error
+    }
 }
 
 void Boss::DCMPreProcessCallback()
 {
-    // Read in Joints to write from shared memory
-    // Write them to the DCM
-    // Needs to be FAST!
-    messages::JointAngles angles;
-    enactor.command(angles, angles);
+    // Start sem here
+    int index;
+    JointCommand angles = sharedMem->commands[index];
+    messages::LedCommand leds = sharedMem->leds[index];
+    sharedMem->commandsRead = index;
+    // End sem
+
+    enactor.command(angles.jointsCommand, angles.stiffnessCommand);
+    led.setLeds(leds);
 }
 
 void Boss::DCMPostProcessCallback()
 {
     SensorValues values = sensor.getSensors();
-    // Do something with the sensor values here!
-    //std::cout << "l_shoulder_roll is: " << sensorValues[sensors::LElbowRoll] << std::endl;
+
+    // Start Semaphore here!
+    int index;
+    sharedMem->sensors[index] = values;
+    sharedMem->sensorsLatest = index;
+    // End Semaphore here!
 }
 
 }

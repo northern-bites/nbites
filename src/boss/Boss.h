@@ -15,15 +15,16 @@
 // fork(), pid_t, etc.
 #include <unistd.h> // fork(), pid_t, etc
 #include <sys/signal.h> // SIG_TERM
-//#include <sys/types.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <semaphore.h>
 
 #include "PMotion.pb.h"
 #include "Sensor.h"
 #include "Enactor.h"
+#include "led/LedEnactor.h"
 
 namespace boss {
 
@@ -36,9 +37,9 @@ public:
 private:
     void DCMPreProcessCallback();
     void DCMPostProcessCallback();
-    void initEnactor();
-    void initSensorAccess();
+
     int constructSharedMem();
+
     int startMan();
     int killMan();
 
@@ -51,12 +52,15 @@ private:
 
     sensor::Sensor sensor;
     enactor::Enactor enactor;
+    led::LedEnactor led;
 
     // Vars relating to Man
     pid_t manPID;
     bool manRunning;
 
+    int shared_fd;
     SharedData* sharedMem;
+    sem_t* semaphore;
 };
 
 }
