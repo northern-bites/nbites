@@ -19,63 +19,72 @@ import messages.HeaderOuterClass.Header;
 import nbtool.data.Log;
 import nbtool.data.SExpr;
 import nbtool.io.CommonIO;
-import nbtool.util.U;
+import nbtool.util.Logger;
+import nbtool.util.Utility;
 
 public class NBLOG_pack {
 	public static void main(String[] args) throws IOException {
-		U.wf("Attempting pack %d logs into OLD format...\n\n", args.length);
+		Logger.logf(Logger.INFO, "Attempting pack %d logs into OLD format...\n\n", args.length);
 		
 		LinkedList<Log> accepted = new LinkedList<Log>();
 		
 		for (String f : args) {
-			U.wf("file %s\n", f);
+			Logger.logf(Logger.INFO, "file %s\n", f);
 			
 			File lf = new File(f);
 			
 			if (!lf.exists() ) {
-				U.wf("\t... file does not exist.\n");
+				Logger.logf(Logger.INFO, "\t... file does not exist.\n");
 				continue;
 			}
 			
 			if (lf.isDirectory()) {
-				U.wf("\t... is directory.\n");
+				Logger.logf(Logger.INFO, "\t... is directory.\n");
 				continue;
 			}
 			
 			if (!f.endsWith(".nblog") ) {
-				U.wf("\t... file isn't nblog.\n");
+				Logger.logf(Logger.INFO, "\t... file isn't nblog.\n");
 				continue;
 			}
 			
 			long tlen = lf.length();
 			if (tlen < 8 ) { //min size
-				U.wf("\t... could not get reasonable value for file size.\n");
+				Logger.logf(Logger.INFO, "\t... could not get reasonable value for file size.\n");
 				continue;
 			}
-			
-			ByteBuffer bb;
-			
+						
 			DataInputStream dis = null;
 			try {
 				FileInputStream fis = new FileInputStream(lf);
 				dis = new DataInputStream(new BufferedInputStream(fis));
-
-				Log found = CommonIO.readLog(dis);
-				if (U.is_v6Log(found) && found.pType().equals("YUVImage")) {
-					found.name = f;
-					accepted.add(found);
+				
+				Log found = CommonIO.simpleReadLog(dis);
+				
+				if (!Utility.isv6Description(found._olddesc_)) {
+					found.setTree(SExpr.deserializeFrom(found._olddesc_));
+					
+					if (found.primaryType().equals("YUVImage")) {
+						found.name = f;
+						accepted.add(found);
+					}
 				}
 				
 			} catch (Exception e) {
 				e.printStackTrace();
-				U.wf("\tError loading file %f!\n", f);
+				Logger.logf(Logger.INFO, "\tError loading file %f!\n", f);
 			} finally {
 				if (dis != null)
 					dis.close();
 			}
 		}
 		
-		U.wf("Found %d acceptable logs for concatenation.\n", accepted.size());
+		
+		packTo(null, accepted);
+	}
+	
+	public static void packTo(String path, LinkedList<Log> accepted) throws IOException {
+		Logger.logf(Logger.INFO, "Found %d acceptable logs for concatenation.\n", accepted.size());
 		//... concatenate...
 		
 		if (accepted.size() == 0)
@@ -89,17 +98,17 @@ public class NBLOG_pack {
 			assert(fromField.exists() && fromField.count() == 2);
 			String from = fromField.get(1).value();
 			
-			if (from.contains("TOP"))
+			if (from.contains("TOP") || from.contains("top"))
 				top.add(l);
-			else if (from.contains("BOT"))
+			else if (from.contains("BOT") || from.contains("bot"))
 				bot.add(l);
 			else {
-				U.wf("Image Log %s [%s] UNKNOWN FROM FIELD!\n", l.name, l.description);
+				Logger.logf(Logger.INFO, "Image Log %s [%s] UNKNOWN FROM FIELD!: %s\n", l.name, l.description(), from);
 			}
 		}
 		
 		{
-			String topName = String.format("top.log"); 
+			String topName = path == null ? "top.log" : String.format("%s/top.log", path); 
 			File logf = new File(topName);
 			if (!logf.exists())
 				logf.createNewFile();
@@ -135,11 +144,11 @@ public class NBLOG_pack {
 			fc.write(bb);
 			fc.close();
 			
-			U.wf("Wrote %d logs to %s.\n", top.size(), topName);
+			Logger.logf(Logger.INFO, "Wrote %d logs to %s.\n", top.size(), topName);
 		}
 		
 		{
-			String botName = String.format("bottom.log"); 
+			String botName = path == null ? "bottom.log": String.format("%s/bottom.log", path); 
 			File logf = new File(botName);
 			if (!logf.exists())
 				logf.createNewFile();
@@ -175,7 +184,7 @@ public class NBLOG_pack {
 			fc.write(bb);
 			fc.close();
 			
-			U.wf("Wrote %d logs to %s.\n", top.size(), botName);
+			Logger.logf(Logger.INFO, "Wrote %d logs to %s.\n", bot.size(), botName);
 		}
 	}
 }

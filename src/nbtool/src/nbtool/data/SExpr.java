@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import nbtool.util.U;
+import nbtool.util.Utility;
 
 /*
  * The general contract is that read operations such as get and find will succeed, but the result may not exist.
@@ -102,7 +102,6 @@ public abstract class SExpr implements Serializable{
 	      }
 	}
 	
-	
 	public static SExpr newAtom(String val) {
 		return new Found(val);
 	}
@@ -121,6 +120,10 @@ public abstract class SExpr implements Serializable{
 	
 	public static SExpr newKeyValue(String key, String value) {
 		return newList(new Found(key), new Found(value));
+	}
+	
+	public static SExpr newKeyValue(String key, SExpr value) {
+		return newList(new Found(key), value);
 	}
 	
 	public abstract boolean isAtom();
@@ -381,8 +384,7 @@ public abstract class SExpr implements Serializable{
 		
 		SExpr s = SExpr.deserializeFrom(ser);
 		
-		U.w("done...");
-		
-		U.wf("%s\n",s.print());
+		System.out.println("done...");
+		System.out.printf("%s\n",s.print());
 	}
 }

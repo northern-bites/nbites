@@ -2,16 +2,17 @@ package nbtool.gui.logviews.misc;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import nbtool.data.Log;
+import nbtool.io.CommonIO.IOFirstResponder;
+import nbtool.io.CommonIO.IOInstance;
 import nbtool.io.CrossIO;
-import nbtool.io.CrossIO.CppFuncCall;
-import nbtool.io.CrossIO.CrossFuncListener;
-import nbtool.util.U;
+import nbtool.io.CrossIO.CrossCall;
+import nbtool.io.CrossIO.CrossFunc;
+import nbtool.io.CrossIO.CrossInstance;
+import nbtool.util.Utility;
 
-public class CrossBright extends ViewParent implements CrossFuncListener{
+public class CrossBright extends ViewParent implements IOFirstResponder {
 	BufferedImage img;
 	
 	public void paintComponent(Graphics g) {
@@ -23,17 +24,17 @@ public class CrossBright extends ViewParent implements CrossFuncListener{
 	public void setLog(Log newlog) {
 		log = newlog;
 		
-		int fi = CrossIO.current.indexOfFunc("CrossBright");
-		if (fi < 0) return;
+		CrossInstance inst = CrossIO.instanceByIndex(0);
+		if (inst == null)
+			return;
+
+		CrossFunc func = inst.functionWithName("CrossBright");
+		if (func == null)
+			return;
 		
-		CppFuncCall fc = new CppFuncCall();
-		
-		fc.index = fi;
-		fc.name = "CrossBright";
-		fc.args = new ArrayList<Log>(Arrays.asList(log));
-		fc.listener = this;
-		
-		CrossIO.current.tryAddCall(fc);
+		CrossCall call = new CrossCall(this, func, this.log);
+		inst.tryAddCall(call);
+
 	}
 	
 	public CrossBright() {
@@ -41,8 +42,16 @@ public class CrossBright extends ViewParent implements CrossFuncListener{
 	}
 
 	@Override
-	public void returned(int ret, Log... out) {
-		this.img = U.biFromLog(out[0]);
+	public void ioFinished(IOInstance instance) {}
+
+	@Override
+	public void ioReceived(IOInstance inst, int ret, Log... out) {
+		this.img = Utility.biFromLog(out[0]);
 		repaint();
+	}
+
+	@Override
+	public boolean ioMayRespondOnCenterThread(IOInstance inst) {
+		return false;
 	}
 }

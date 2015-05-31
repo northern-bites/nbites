@@ -8,10 +8,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -20,19 +22,19 @@ import javax.swing.border.Border;
 import nbtool.data.SessionMaster;
 import nbtool.gui.utilitypanes.UtilityManager;
 import nbtool.gui.utilitypanes.UtilityParent;
-import nbtool.util.N;
-import nbtool.util.N.EVENT;
-import nbtool.util.P;
-import nbtool.util.U;
+import nbtool.util.Logger;
+import nbtool.util.Logger.LogLevel;
+import nbtool.util.Prefs;
+import nbtool.util.Utility;
 
 
-public class PrefsnUtils extends JPanel{
+public class OptionsAndUtilities extends JPanel{
 	private static final long serialVersionUID = 1L;
 	
 	private Utils utils;
-	private Prefs prefs;
+	private Options opts;
 	
-	protected PrefsnUtils() {
+	protected OptionsAndUtilities() {
 		super();
 		setLayout(null);
 		addComponentListener(new ComponentAdapter() {
@@ -42,14 +44,14 @@ public class PrefsnUtils extends JPanel{
 		});
 		
 		utils = new Utils();
-		prefs = new Prefs();
+		opts = new Options();
 		
-		add(utils); add(prefs);
+		add(utils); add(opts);
 	}
 
 	protected void useSize(Dimension size) {
-		prefs.setBounds(0, 0, size.width, Prefs.REQ_HEIGHT);
-		utils.setBounds(0, Prefs.REQ_HEIGHT + 20, size.width, size.height - Prefs.REQ_HEIGHT - 20);
+		opts.setBounds(0, 0, size.width, Options.REQ_HEIGHT);
+		utils.setBounds(0, Options.REQ_HEIGHT + 20, size.width, size.height - Options.REQ_HEIGHT - 20);
 	}
 	
 	private class Utils extends JPanel implements ActionListener {
@@ -101,9 +103,9 @@ public class PrefsnUtils extends JPanel{
 		}
 	}
 	
-	private class Prefs extends JPanel implements ActionListener {
-		protected static final int REQ_HEIGHT = 170;
-		protected Prefs() {
+	private class Options extends JPanel implements ActionListener {
+		protected static final int REQ_HEIGHT = 80;
+		protected Options() {
 			
 			super();
 			
@@ -115,24 +117,22 @@ public class PrefsnUtils extends JPanel{
 			});
 			
 			Border b = BorderFactory.createLineBorder(Color.BLACK);
-			setBorder(BorderFactory.createTitledBorder(b, "Preferences"));
-			
-			copyMappingB = new JButton("recopy view mapping (must restart)");
-			copyMappingB.addActionListener(this);
-			add(copyMappingB);
-			
-			copyExceptB = new JButton("recopy class excepts (must restart)");
-			copyExceptB.addActionListener(this);
-			add(copyExceptB);
+			setBorder(BorderFactory.createTitledBorder(b, "Options"));
 			
 			resetPrefB = new JButton("reset preferences (!bounds) (must restart)");
 			resetPrefB.addActionListener(this);
 			add(resetPrefB);
+			
+			LogLevel[] levels = Logger.LogLevel.values();
+			String [] model = new String[levels.length];
+			for (int i = 0; i < levels.length; ++i)
+				model[i] = levels[i].toString();
+			logLevel = new JComboBox<String>(model);
+			logLevel.setEditable(false);
+			logLevel.setSelectedIndex(Arrays.asList(levels).indexOf(Logger.level));
+			logLevel.addActionListener(this);
 					
-			verbosity = new JCheckBox("verbose tool");
-			verbosity.setSelected(P.getVerbose());
-			verbosity.addActionListener(this);
-			add(verbosity);
+			add(logLevel);
 		}
 		
 		private void prefUseSize(Dimension size) {
@@ -142,49 +142,27 @@ public class PrefsnUtils extends JPanel{
 			
 			int height = 0;
 			
-			height = copyMappingB.getPreferredSize().height;
-			copyMappingB.setBounds(ins.left, y, mw, height);
-			y += height;
-			
-			height = copyExceptB.getPreferredSize().height;
-			copyExceptB.setBounds(ins.left, y, mw, height);
-			y += height;
-			
 			height = resetPrefB.getPreferredSize().height;
 			resetPrefB.setBounds(ins.left, y, mw, height);
 			y += height;
 			
-			height = verbosity.getPreferredSize().height;
-			verbosity.setBounds(ins.left, y, mw, height);
+			height = logLevel.getPreferredSize().height;
+			logLevel.setBounds(ins.left, y, mw, height);
 			y += height;
 		}
 		
-		private JButton copyMappingB;
-		private JButton copyExceptB;
 		private JButton resetPrefB;
-				
-		private JCheckBox verbosity;
+		private JComboBox<String> logLevel;
 		
 		public void actionPerformed(ActionEvent e) {
-			if (e.getSource() == copyMappingB) {
-				try {
-					P.copyOrReplaceMapping();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-			} else if (e.getSource() == copyExceptB){
-				try {
-					P.copyOrReplaceExceptions();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-			} else if (e.getSource() == resetPrefB){
-				U.w("Prefs: reseting preferences.");
-				P.resetNonFilePreferences();
+			
+			if (e.getSource() == resetPrefB){
+				Logger.log(Logger.WARN, "can't reset preferences right now.");
+			} else {
+				int sel = logLevel.getSelectedIndex();
+				Logger.level = Logger.LogLevel.values()[sel];
+				Prefs.logLevel = Logger.level;
 			} 
-			else {
-				
-			}
 		}
 	}
 }

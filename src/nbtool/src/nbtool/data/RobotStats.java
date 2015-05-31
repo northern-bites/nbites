@@ -7,13 +7,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import nbtool.util.U;
+import nbtool.util.Utility;
 
 public class RobotStats {
 	
 	private SExpr tree = null;
 	
-	public RobotStats(Log log) throws IOException {
+	public RobotStats(Log log) {
 		assert(log != null);
 		tree = log.tree();
 		assert(tree != null);

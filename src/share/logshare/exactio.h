@@ -57,7 +57,7 @@ static inline int put_exact(ssize_t (* pstub)(int, const void *, size_t),
               size_t nb,
               uint8_t * data)
 {
-    NBLassert(pstub && data && nb);
+    NBLassert(pstub && data && (nb >= 0) );
     NBLassert(sofd >= 0);
     
     size_t written = 0;

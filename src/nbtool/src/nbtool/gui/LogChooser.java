@@ -12,11 +12,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import nbtool.data.SessionHandler;
 import nbtool.data.Log;
-import nbtool.util.N;
-import nbtool.util.N.EVENT;
-import nbtool.util.N.NListener;
 
 public class LogChooser extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -27,9 +23,7 @@ public class LogChooser extends JPanel {
 				useSize(e.getComponent().getSize());
 			}
 		});
-		
-		//N.listen(EVENT.LOGS_ADDED, this);
-		
+				
 		model = new LCTreeModel();
 		tree = new JTree(model);
 		model.tree = tree;

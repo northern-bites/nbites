@@ -14,8 +14,21 @@
 
 namespace nblog {
     
+    enum nbhost_e {
+        V5ROBOT,
+        V4ROBOT,
+        UNKNOWN
+    };
+    
+    extern nbhost_e HOST_TYPE;
+    
     class Log {
     public:
+        
+        static Log simple(const std::string type, const std::string data);
+        
+        //default constructor
+        Log();
         
         //Generic log constructor with standard values.
         Log(const std::string& log_class,
