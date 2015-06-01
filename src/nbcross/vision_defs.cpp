@@ -4,6 +4,7 @@
 #include "Images.h"
 #include "vision/VisionModule.h"
 
+#include <netinet/in.h>
 #include <assert.h>
 #include <vector>
 #include <string>
@@ -11,6 +12,8 @@
 
 using nblog::Log;
 using nblog::SExpr;
+
+// TODO using namespace man::vision
 
 int ImageConverter_func() {
     assert(args.size() == 1);
@@ -153,5 +156,23 @@ int Edges_func() {
     man::vision::VisionModule module = man::vision::VisionModule();
     module.topIn.setMessage(message);
     module.bottomIn.setMessage(message);
+
     module.run();
+    man::vision::EdgeList* edgeList = module.getEdges();
+
+    Log* edges = new Log();
+    std::string data;
+
+    man::vision::AngleBinsIterator<man::vision::Edge> abi(*edgeList);
+    for (const man::vision::Edge* e = *abi; e; e = *++abi) {
+        data.append((const char*)htonl(e->x()), 4);
+        data.append((const char*)htonl(e->y()), 4);
+        data.append((const char*)htonl(e->mag()), 4);
+        data.append((const char*)htonl(e->angle()), 4);
+    }
+
+    edges->setData(data);
+    rets.push_back(edges);
+
+    return 0;
 }
