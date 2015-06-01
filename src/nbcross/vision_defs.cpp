@@ -37,7 +37,7 @@ int ImageConverter_func() {
 
     module.bottomIn.setMessage(message);
     module.run();
-    ImageFrontEnd* frontEnd = module.getFrontEnd();
+    man::vision::ImageFrontEnd* frontEnd = module.getFrontEnd();
 
     // -----------
     //   Y IMAGE
@@ -50,7 +50,7 @@ int ImageConverter_func() {
 
     // Create temp buffer and fill with yImage 
     uint8_t yBuf[yLength];
-    memcpy(yBuf, frontEnd->yImage().pixelAddress(0, 0), yLength);
+    memcpy(yBuf, frontEnd->yImage().pixelAddr(), yLength);
 
     // Convert to string and set log
     std::string yBuffer((const char*)yBuf, yLength);
@@ -136,7 +136,6 @@ int ImageConverter_func() {
     // rets.push_back(colorSegRet);
 
     // Done
-    printf("ImageConverter module ran! W: %d, H: %d\n", yImage->width(), yImage->height());
     return 0;
 }
 

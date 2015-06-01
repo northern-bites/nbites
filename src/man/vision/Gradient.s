@@ -35,7 +35,7 @@
 # regardless of the specified address and width. This supports running on
 # arbitrary windows of images.
 
-.globl _acquire_image
+.globl _gradient
 .section .data
 
 # ***************

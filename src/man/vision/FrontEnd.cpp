@@ -87,8 +87,8 @@ void* alignedAlloc(size_t size, int alignBits, void*& block)
 //    orange image, 8-bit pixels
 //    optional image reulting from color table lookup
 extern "C" uint32_t
-  newAcquire(const uint8_t* source, int width, int height, int pitch, const Colors* colors,
-             uint8_t* dest, uint8_t* colorTable = 0);
+  _acquire_image(const uint8_t* source, int width, int height, int pitch, const Colors* colors,
+                 uint8_t* dest, uint8_t* colorTable = 0);
 
 uint32_t
   testAcquire(const uint8_t* source, int width, int height, int pitch, const Colors* colors,
@@ -160,9 +160,9 @@ void ImageFrontEnd::run(const YuvLite& src, const Colors* colors, uint8_t* color
   }
 
   if (fast())
-    _time = man::vision::newAcquire(src.pixelAddr(), dstBase.pitch(), 
-                                    dstBase.height(), src.pitch(),
-                                    colors, dstImages, colorTable);
+    _time = man::vision::_acquire_image(src.pixelAddr(), dstBase.pitch(), 
+                                        dstBase.height(), src.pitch(),
+                                        colors, dstImages, colorTable);
   else
     _time = testAcquire(src.pixelAddr(), dstBase.pitch(), dstBase.height(), src.pitch(),
                         colors, dstImages, colorTable);

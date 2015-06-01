@@ -162,7 +162,7 @@ void Connectivity::run(uint8_t* image, int width, int height, int pitch)
     for (int y = 1; y < height - 1; ++y)
     {
       uint8_t* row = image + y * pitch + 1;
-      runLengthU8(row, width - 2, t1, runs);
+      _runLengthU8(row, width - 2, t1, runs);
       int ri = 0;
       for (int x = runs[0]; x >= 0; x = runs[++ri])
       {

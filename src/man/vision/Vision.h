@@ -34,8 +34,8 @@ namespace vision {
 //
 // Signed versions can be produced with trivial effort using the macros in
 // runLength.s.
-extern "C" void runLengthU8 (uint8_t * source, int count, int thresh, int32_t* runs);
-extern "C" void runLengthU16(uint16_t* source, int count, int thresh, int32_t* runs);
+extern "C" void _runLengthU8 (uint8_t * source, int count, int thresh, int32_t* runs);
+extern "C" void _runLengthU16(uint16_t* source, int count, int thresh, int32_t* runs);
 
 // *************
 // *           *
