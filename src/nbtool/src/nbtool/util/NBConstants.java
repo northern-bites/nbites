@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nbtool.data.Log;
-import nbtool.gui.logviews.images.EdgeView;
 import nbtool.gui.logviews.images.ImageView;
 import nbtool.gui.logviews.images.ZoomImageView;
 import nbtool.gui.logviews.misc.BotStatsView;
