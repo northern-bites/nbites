@@ -3,7 +3,6 @@ package nbtool.images;
 import java.awt.image.BufferedImage;
 
 public final class YUYV8888image extends ImageParent {
-	public static final YUYV8888image INSTANCE = new YUYV8888image(0,0, null);
 	public int pixelSize() {return 2;}
 
 	public YUYV8888image(int w, int h, byte[] d) {
