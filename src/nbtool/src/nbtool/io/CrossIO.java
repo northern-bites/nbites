@@ -73,7 +73,7 @@ public class CrossIO {
 						try {
 							
 							for (Process p : children) {
-								p.destroyForcibly();
+								p.destroy();
 							}
 							
 						} catch (Exception e) {
