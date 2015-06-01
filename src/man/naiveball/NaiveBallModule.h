@@ -58,6 +58,7 @@ private:
     int buffSize;
     int frameOffCount;
     int count;
+    int direction;
     float velocityEst;
     bool bufferFull;
     messages::WorldModel worldMessages[NUM_PLAYERS_PER_TEAM];
