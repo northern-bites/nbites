@@ -96,6 +96,7 @@ namespace control {
         
         ret["test"] = &cnc_test;
         ret["setFlag"] = &cnc_setFlag;
+        //ret["setCameraParams"]
         
         return ret;
     }

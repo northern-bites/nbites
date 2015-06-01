@@ -209,35 +209,51 @@ void ImageTranscriber::initQueueAllBuffers() {
 }
 void ImageTranscriber::initSettings()
 {
-    std::ifstream parametersFile("path/to/file.json");
-    
+    param("path to file.json");
 
+    static NewSettings updated_settings {
+        param.getParam<bool>("H_FLIP"),
+        param.getParam<bool>("V_FLIP"),
+        param.getParam<int>("autoExposure"),
+        param.getParam<int>("brightness"),
+        param.getParam<int>("contrast"),
+        param.getParam<int>("saturation"),
+        param.getParam<int>("hue"),
+        param.getParam<int>("sharpness"),
+        param.getParam<int>("autoWhiteBalance"),
+        /*backlight compensation = 0xff*/
+        param.getParam<int>("exposure"),
+        param.getParam<int>("gain"),
+        param.getParam<int>("whiteBalance"),
+        param.getParam<int>("fadeToBlack")
+    };
+    
     // DO NOT SCREW UP THE ORDER BELOW
-    setControlSetting(V4L2_CID_HFLIP, settings.hflip);
-    setControlSetting(V4L2_CID_VFLIP, settings.vflip);
+    setControlSetting(V4L2_CID_HFLIP, updated_settings.hflip);
+    setControlSetting(V4L2_CID_VFLIP, updated_settings.vflip);
 
     // Still need to turn this on to change brightness, grumble grumble
-    setControlSetting(V4L2_CID_EXPOSURE_AUTO, 1);
+    setControlSetting(V4L2_CID_EXPOSURE_AUTO, updated_settings.auto_exposure);
 
-    setControlSetting(V4L2_CID_BRIGHTNESS, settings.brightness);
-    setControlSetting(V4L2_CID_CONTRAST, settings.contrast);
-    setControlSetting(V4L2_CID_SATURATION, settings.saturation);
-    setControlSetting(V4L2_CID_HUE, settings.hue);
-    setControlSetting(V4L2_CID_SHARPNESS, settings.sharpness);
+    setControlSetting(V4L2_CID_BRIGHTNESS, updated_settings.brightness);
+    setControlSetting(V4L2_CID_CONTRAST, updated_settings.contrast);
+    setControlSetting(V4L2_CID_SATURATION, updated_settings.saturation);
+    setControlSetting(V4L2_CID_HUE, updated_settings.hue);
+    setControlSetting(V4L2_CID_SHARPNESS, updated_settings.sharpness);
 
     // Auto white balance, exposure,  and backlight comp off!
     setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE,
-                      settings.auto_whitebalance);
+                      updated_settings.auto_whitebalance);
     setControlSetting(V4L2_CID_BACKLIGHT_COMPENSATION,
-                      settings.backlight_compensation);
-    setControlSetting(V4L2_CID_EXPOSURE_AUTO, settings.auto_exposure);
+                      updated_settings.backlight_compensation);
+    setControlSetting(V4L2_CID_EXPOSURE_AUTO, updated_settings.auto_exposure);
 
-    setControlSetting(V4L2_CID_EXPOSURE, settings.exposure);
-    setControlSetting(V4L2_CID_GAIN, settings.gain);
+    setControlSetting(V4L2_CID_EXPOSURE, updated_settings.exposure);
+    setControlSetting(V4L2_CID_GAIN, updated_settings.gain);
 
     // This is actually just the white balance setting!
-    setControlSetting(V4L2_CID_DO_WHITE_BALANCE, settings.white_balance);
-    setControlSetting(V4L2_MT9M114_FADE_TO_BLACK, settings.fade_to_black);
+    setControlSetting(V4L2_CID_DO_WHITE_BALANCE, updated_settings.white_balance);
+    setControlSetting(V4L2_MT9M114_FADE_TO_BLACK, updated_settings.fade_to_black);
 }
 
 int ImageTranscriber::getControlSetting(unsigned int id) {
@@ -472,6 +488,18 @@ TranscriberModule::TranscriberModule(ImageTranscriber& trans)
 // Get image from Transcriber and outportal it
 void TranscriberModule::run_()
 {
+    time_t old_mod_time;
+    struct stat file_stats;
+    int err = stat("path to file",&file_stats);
+    if(err != 0) {
+        std::perror("[file has been modified] stat");
+    }
+    int time_diff = std::difftime(file_stats.st_mtime, old_mod_time);
+    if(time_diff > 0.0) {
+        old_mod_time = file_stats.st_mtime;
+        initSettings();
+    }
+
     jointsIn.latch();
     inertsIn.latch();
 
