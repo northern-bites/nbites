@@ -36,21 +36,25 @@ public class CrossIO {
 		//testing...
 		
 		String path = "~/Documents/testdir/cross";
-		startNBCrossAt(path, "hello", true, true).waitFor();
+		startNBCrossAt(path, "hello", true, false, true).waitFor();
 	}
 	
 	private static ArrayList<Process> children = null;
 		
 	public static synchronized Process startNBCrossAt(String pathToExecutable, String instName,
-			boolean useNBCrossOutput, boolean killOnJVMexit) throws IOException {
+			boolean pipeNBCrossOutput, boolean silenceNBCross,
+			boolean killOnJVMexit) throws IOException {
 		String execPath = Utility.localizePath(pathToExecutable);
 		ProcessBuilder cross = new ProcessBuilder();
-		if (useNBCrossOutput) {
+		
+		if (pipeNBCrossOutput) {
 			cross.inheritIO();
-			cross.command(execPath, instName);
-		} else {
-			//Default is not to use the process's output.
+		}
+		
+		if (silenceNBCross) {
 			cross.command(execPath, instName, "silent");
+		} else {
+			cross.command(execPath, instName);
 		}
 		
 		Process process = cross.start();
