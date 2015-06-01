@@ -18,7 +18,7 @@ VisionModule::VisionModule()
     colorParams = new Colors();
     frontEnd = new ImageFrontEnd();
     edgeDetector = new EdgeDetector();
-    edges = new EdgeList(4500);
+    edges = new EdgeList(32000);
     houghLines = new HoughLineList(128);
     hough = new HoughSpace(320, 240);
 
