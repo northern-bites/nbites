@@ -64,6 +64,10 @@ include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
 find_package( PythonLibs REQUIRED)
 include_directories( ${PYTHON_INCLUDE_DIR} )
 
+set(Boost_NO_BOOST_CMAKE true)
+find_package(Boost COMPONENTS python REQUIRED)
+include_directories( ${Boost_INCLUDE_DIR} )
+
 # Our core includes come from here
 include_directories( ${SHARE_DIR}/include )
 
@@ -71,6 +75,12 @@ include_directories( ${SHARE_DIR}/include )
 add_subdirectory( ${SHARE_DIR}/portals ${CMAKE_CURRENT_BINARY_DIR}/portals/ )
 # Make portals available to everything
 include_directories( ${SHARE_DIR}/portals )
+
+# Compile logshare
+add_subdirectory( ${SHARE_DIR}/logshare ${CMAKE_CURRENT_BINARY_DIR}/logshare/ )
+# Make logshare available to everything
+include_directories( ${SHARE_DIR}/logshare )
+
 # Also messages
 add_subdirectory( ${SHARE_DIR}/messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
@@ -93,6 +103,7 @@ add_subdirectory( audio )
 add_subdirectory( balltrack )
 add_subdirectory( behaviors )
 add_subdirectory( comm )
+add_subdirectory( control )
 add_subdirectory( gamestate )
 add_subdirectory( guardian )
 add_subdirectory( image )
@@ -127,6 +138,7 @@ target_link_libraries(
   behaviors
   bhwalk
   comm
+  control
   gamestate
   guardian
   image
@@ -138,6 +150,7 @@ target_link_libraries(
   motion
   obstacle
   portals
+  logshare
   sensors
   sharedball
   naiveball

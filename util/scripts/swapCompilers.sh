@@ -19,6 +19,7 @@ if [[ $line == *1.14.5* ]]; then
     NEW_TOOLCHAIN_DIR=$NEW
     VERSION=2.1.0.19
     OLDVERSION=1.14.5
+
 elif [[ $line == *2.1.0.19* ]]; then
     echo "current version is 2.1.0.19"
     echo "Is this correct? (y/n)"
@@ -26,6 +27,7 @@ elif [[ $line == *2.1.0.19* ]]; then
     NEW_TOOLCHAIN_DIR=$OLD
     VERSION=1.14.5
     OLDVERSION=2.1.0.19
+
 else
     echo "COULDN'T FIND NAOQI VERSION"
     exit 1
@@ -43,6 +45,7 @@ mv $LIB_DIR/$NEW_TOOLCHAIN_DIR $LIB_DIR/$TOOLCHAIN
 
 # Sets nbites.bash correctly
 sed -i "s/$OLDVERSION/$VERSION/g" nbites.bash
+
 
 pushd $NBITES_DIR/src/man
 echo "making clean"

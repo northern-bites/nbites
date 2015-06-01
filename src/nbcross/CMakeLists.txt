@@ -63,13 +63,6 @@ endif()
 include_directories( ${PROJECT_BINARY_DIR} )
 include_directories( ${CMAKE_SOURCE_DIR} )
 
-# Dependencies
-find_package( Qt4 REQUIRED )
-
-include( ${QT_USE_FILE} )
-add_definitions( ${QT_DEFINITIONS} )
-
-mark_as_advanced( QT_QMAKE_EXECUTABLE )
 
 find_package( PROTOBUF REQUIRED )
 include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
@@ -80,6 +73,10 @@ include_directories( ${SHARE_DIR}/include )
 # Compile portals into portals folder
 add_subdirectory( ${SHARE_DIR}/portals ${CMAKE_CURRENT_BINARY_DIR}/portals )
 include_directories( ${SHARE_DIR}/portals )
+
+# Compile logshare into logshare folder
+add_subdirectory( ${SHARE_DIR}/logshare ${CMAKE_CURRENT_BINARY_DIR}/logshare )
+include_directories( ${SHARE_DIR}/logshare )
 
 # Compile messages into messages folder
 add_subdirectory( ${SHARE_DIR}/messages ${CMAKE_CURRENT_BINARY_DIR}/messages )
@@ -101,13 +98,16 @@ add_subdirectory( ${MAN_DIR}/sharedball ${CMAKE_CURRENT_BINARY_DIR}/man/sharedba
 add_subdirectory( ${MAN_DIR}/image ${CMAKE_CURRENT_BINARY_DIR}/man/image)
 add_subdirectory( ${MAN_DIR}/localization ${CMAKE_CURRENT_BINARY_DIR}/man/localization)
 add_subdirectory( ${MAN_DIR}/vision ${CMAKE_CURRENT_BINARY_DIR}/man/vision)
+
 add_subdirectory( ${MAN_DIR}/log ${CMAKE_CURRENT_BINARY_DIR}/man/log)
+add_subdirectory( ${MAN_DIR}/control ${CMAKE_CURRENT_BINARY_DIR}/man/control)
 
 ## SOURCES ##
 
 set( NBCROSS_SRCS
   main.cpp
-  nbfuncs.cpp
+  misc_defs.cpp
+  pkoch_defs.cpp
 )
 
 set( NBCROSS_HEADERS
@@ -134,4 +134,6 @@ target_link_libraries( nbcross_tool
   comm # man comm
   sharedball # man sharedball
   log
+  logshare
+  control
   )
