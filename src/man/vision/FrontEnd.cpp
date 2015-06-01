@@ -95,11 +95,7 @@ uint32_t
               uint8_t* dest, uint8_t* colorTable)
 {
   TickTimer timer;
-
-  width /= 2;
-  height /= 2;
-  pitch *= 2;
-
+  
   // Ignore low three bits of width
   width &= ~7;
 

@@ -13,7 +13,7 @@ namespace man {
 namespace vision {
 
 // TODO test using nbtool
-// TODO compiles on both ubuntu and windows
+// TODO compile on both ubuntu and windows
 class VisionModule : public portals::Module {
 public:
     VisionModule();
