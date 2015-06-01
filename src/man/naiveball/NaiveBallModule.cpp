@@ -99,14 +99,14 @@ void NaiveBallModule::naiveCheck() {
     BallState end_avgs = avgFrames(endIndex);
     float dist = calcSumSquaresSQRT((end_avgs.rel_x - start_avgs.rel_x), (end_avgs.rel_y - start_avgs.rel_y));
     // velocityEst = (dist / NUM_FRAMES) * ALPHA + velocityEst * (1-ALPHA);
-    velocityEst = (dist / NUM_FRAMES);
-    if (velocityEst > 500) {
-        printf("\n\n WEIRD: avgs: \n");
-        printBallState(start_avgs);
-        printBallState(end_avgs);
-        printf("\n");
+    velocityEst = (dist / 1.f);
+    // if (velocityEst > 500) {
+    //     printf("\n\n WEIRD: avgs: \n");
+    //     printBallState(start_avgs);
+    //     printBallState(end_avgs);
+    //     printf("\n");
 
-    }
+    // }
     // TODO possibly take into account (possibly as in probably) previous estimates
 
 }
@@ -123,16 +123,30 @@ NaiveBallModule::BallState NaiveBallModule::avgFrames(int startingIndex)
     float dist_sum = 0.f;
     float bearing_sum = 0.f;
     for (int i = 0; i < AVGING_FRAMES; i++) {
+        startingIndex = startingIndex % buffSize;
         x_sum += ballStateBuffer[startingIndex].rel_x;
         y_sum += ballStateBuffer[startingIndex].rel_y;
         dist_sum += ballStateBuffer[startingIndex].distance;
         bearing_sum += ballStateBuffer[startingIndex].bearing;
-        if (startingIndex + 1 == buffSize) {
-            startingIndex = 0;
-        } else {
-            startingIndex += 1;
-        }
+
+        startingIndex += 1;
     }
+    // if (dist_sum/AVGING_FRAMES > 10000.f) {
+    //     printf("SOMETHING WRONG\n");
+    //     printf("STARTED AT %i\n", p);
+    //     for (int i = 0; i < AVGING_FRAMES; i++) {
+    //         printf("\nAt index: %i\n", startingIndex);
+    //         printf("x: %f\n", ballStateBuffer[startingIndex].rel_x);
+    //         printf("y: %f\n", ballStateBuffer[startingIndex].rel_y);
+    //         printf("dist: %f\n", ballStateBuffer[startingIndex].distance);
+    //         printf("bear: %f\n", ballStateBuffer[startingIndex].bearing);
+    //         if (startingIndex + 1 == buffSize) {
+    //             startingIndex = 0;
+    //         } else {
+    //             startingIndex += 1;
+    //         }
+    //     }
+    // }
     return BallState(x_sum / AVGING_FRAMES, y_sum / AVGING_FRAMES, dist_sum / AVGING_FRAMES, bearing_sum / AVGING_FRAMES);
 }
 
@@ -140,7 +154,7 @@ void NaiveBallModule::print() {
     BallState x = ballStateBuffer[currentIndex];
     printf("%s\n", bufferFull ? "BufferFull" : "Buffer not full");
     printf("Current ball state:\nrel_xy: (%f, %f)\ndistance:%f\nbearing:%f\n", x.rel_x, x.rel_y, x.distance, x.bearing);
-    printf("VelocityEst = %f\n", velocityEst);
+    printf("VelocityEst = %f cm/sec\n", velocityEst);
     if (velocityEst > 0.f) {
         printf("BALL IS MOVING\n");
     } else {
@@ -151,6 +165,14 @@ void NaiveBallModule::print() {
 
 void NaiveBallModule::printBallState(NaiveBallModule::BallState x) {
     printf("::BALL STATE::\nrel_xy: (%f, %f)\ndistance:%f\nbearing:%f\n", x.rel_x, x.rel_y, x.distance, x.bearing);
+}
+
+void NaiveBallModule::printBuffer() {
+    printf("WHOLE BUFFER: \n");
+    for (int i = 0; i < buffSize; i++) {
+        printf("i = %i, value = ", i);
+        printBallState(ballStateBuffer[i]);
+    }
 }
 
 } // namespace man

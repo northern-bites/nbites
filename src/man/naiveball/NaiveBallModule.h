@@ -51,6 +51,7 @@ private:
     BallState avgFrames(int startingIndex);
     void print();
     void printBallState(BallState x);
+    void printBuffer();
 
     BallState *ballStateBuffer;
     int currentIndex;
