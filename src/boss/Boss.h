@@ -59,7 +59,11 @@ private:
     bool manRunning;
 
     int shared_fd;
-    SharedData* sharedMem;
+    SharedData* shared;
+
+    uint64_t commandIndex;
+    uint64_t sensorIndex;
+
     sem_t* semaphore;
 };
 

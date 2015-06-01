@@ -11,7 +11,6 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include <semaphore.h>
 
 #include "RoboGrams.h"
 #include "SensorTypes.h"
@@ -64,7 +63,8 @@ private:
 
     int shared_fd;
     SharedData* shared;
-    sem_t* semaphore;
+
+    uint64_t sensorIndex;
 
     bool lastPrint;
 };

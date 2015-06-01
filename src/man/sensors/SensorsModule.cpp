@@ -32,19 +32,11 @@ SensorsModule::SensorsModule()
         // TODO error
     }
 
-    SharedData* sharedMem = (SharedData*) mmap(NULL, sizeof(SharedData),
-                                            PROT_READ | PROT_WRITE,
-                                            MAP_SHARED, shared_fd, 0);
+    shared = (SharedData*) mmap(NULL, sizeof(SharedData),
+                                PROT_READ | PROT_WRITE,
+                                MAP_SHARED, shared_fd, 0);
 
     if (shared == MAP_FAILED) {
-        // TODO error
-    }
-
-    shared = sharedMem;
-
-    semaphore = sem_open(NBITES_SEM, O_RDWR, 0600, 0);
-
-    if(semaphore == SEM_FAILED) {
         // TODO error
     }
 }
@@ -54,7 +46,7 @@ SensorsModule::~SensorsModule()
     // Close shared memory
     munmap(shared, sizeof(SharedData));
     close(shared_fd);
-    sem_close(semaphore);
+    //sem_close(semaphore);
 }
 
 
@@ -92,9 +84,10 @@ std::string SensorsModule::makeSweetMoveTuple(const messages::JointAngles* angle
 void SensorsModule::updateSensorValues()
 {
     // TODO grab semaphore
-    int index;
+    uint8_t index = shared->sensorSwitch;
     values = shared->sensors[index];
-    shared->sensorsRead = index;
+    sensorIndex = values.writeIndex;
+    shared->sensorReadIndex = sensorIndex;
     // TODO Release semaphore
 
     portals::Message<messages::JointAngles> joints(&(values.joints));

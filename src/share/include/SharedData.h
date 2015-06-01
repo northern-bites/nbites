@@ -13,14 +13,15 @@
 #include "LedCommand.pb.h"
 
 #define NBITES_MEM "/nbites-memory"
-#define NBITES_SEM "/nbites-semaphore"
 
 struct JointCommand {
+    uint64_t writeIndex;
     messages::JointAngles jointsCommand;
     messages::JointAngles stiffnessCommand;
 };
 
 struct SensorValues {
+    uint64_t writeIndex;
     messages::JointAngles joints;
     messages::JointAngles currents;
     messages::JointAngles temperature;
@@ -34,12 +35,17 @@ struct SensorValues {
 };
 
 struct SharedData {
-    volatile int sensorsRead;
-    volatile int sensorsLatest;
-    volatile int commandsRead;
-    volatile int commandsLatest;
+    volatile uint8_t commandSwitch;
+    volatile uint8_t sensorSwitch;
 
-    volatile JointCommand commands[2];
-    volatile SensorValues sensors[2];
-    volatile messages::LedCommand leds[2];
+    volatile uint64_t commandReadIndex;
+    volatile uint64_t sensorReadIndex;
+
+    JointCommand commands[2];
+    SensorValues sensors[2];
+    messages::LedCommand leds[2];
+
+    // seperate mutexes for commands and sensors
+    pthread_mutex_t command;
+    pthread_mutex_t sense;
 };

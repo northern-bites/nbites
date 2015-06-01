@@ -18,7 +18,7 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     led(broker),
     manPID(-1),
     manRunning(false),
-    sharedMem(NULL)
+    shared(NULL)
 {
     std::cout << "Boss Constructor" << std::endl;
 
@@ -87,7 +87,7 @@ int Boss::constructSharedMem()
         // TODO error
     }
 
-    SharedData* shared = (SharedData*) mmap(NULL, sizeof(SharedData),
+    shared = (SharedData*) mmap(NULL, sizeof(SharedData),
                                             PROT_READ | PROT_WRITE,
                                             MAP_SHARED, shared_fd, 0);
 
@@ -97,22 +97,17 @@ int Boss::constructSharedMem()
 
     memset(shared, 0, sizeof(SharedData));
 
-    sharedMem = shared;
-
-    semaphore = sem_open(NBITES_SEM, O_RDWR | O_CREAT, 0600, 0);
-
-    if (semaphore == SEM_FAILED) {
-        // TODO error
-    }
+    //sharedMem->command = PTHREAD_MUTEX_INITALIZER;
+    //sharedMem->sense = PTHREAD_MUTEX_INITALIZER;
 }
 
 void Boss::DCMPreProcessCallback()
 {
     // Start sem here
-    int index;
-    JointCommand angles = sharedMem->commands[index];
-    messages::LedCommand leds = sharedMem->leds[index];
-    sharedMem->commandsRead = index;
+    uint8_t index = shared->commandSwitch;
+    JointCommand angles = shared->commands[index];
+    messages::LedCommand leds = shared->leds[index];
+    shared->commandReadIndex = shared->commands[index].writeIndex;
     // End sem
 
     enactor.command(angles.jointsCommand, angles.stiffnessCommand);
@@ -122,11 +117,12 @@ void Boss::DCMPreProcessCallback()
 void Boss::DCMPostProcessCallback()
 {
     SensorValues values = sensor.getSensors();
+    values.writeIndex = ++sensorIndex;
 
     // Start Semaphore here!
-    int index;
-    sharedMem->sensors[index] = values;
-    sharedMem->sensorsLatest = index;
+    uint8_t index = shared->sensorReadIndex % 2;
+    shared->sensors[index] = values;
+    shared->sensorSwitch = index;
     // End Semaphore here!
 }
 

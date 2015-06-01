@@ -21,19 +21,11 @@ JointEnactorModule::JointEnactorModule()
         // TODO error
     }
 
-    SharedData* sharedMem = (SharedData*) mmap(NULL, sizeof(SharedData),
+    shared = (SharedData*) mmap(NULL, sizeof(SharedData),
                                             PROT_READ | PROT_WRITE,
                                             MAP_SHARED, shared_fd, 0);
 
     if (shared == MAP_FAILED) {
-        // TODO error
-    }
-
-    shared = sharedMem;
-
-    semaphore = sem_open(NBITES_SEM, O_RDWR, 0600, 0);
-
-    if (semaphore == SEM_FAILED) {
         // TODO error
     }
 }
@@ -43,7 +35,7 @@ JointEnactorModule::~JointEnactorModule()
     // Close shared memory
     munmap(shared, sizeof(SharedData));
     close(shared_fd);
-    sem_close(semaphore);
+    //sem_close(semaphore);
 }
 
 void JointEnactorModule::writeCommand()
@@ -51,11 +43,13 @@ void JointEnactorModule::writeCommand()
     JointCommand command;
     command.jointsCommand = latestJointAngles_;
     command.stiffnessCommand = latestStiffness_;
+    command.writeIndex = ++commandIndex;
+
     // TODO grab semaphore
-    int index;
+    uint8_t index = shared->commandReadIndex % 2;
     shared->commands[index] = command;
     shared->leds[index] = latestLeds_;
-    shared->commandsLatest = index;
+    shared->commandSwitch = index;
     // TODO release semaphore
 }
 

@@ -9,7 +9,6 @@
 
 #include <string>
 #include <iostream>
-#include <semaphore.h>
 
 #include "RoboGrams.h"
 #include "SharedData.h"
@@ -19,36 +18,39 @@
 
 namespace man
 {
-    namespace jointenactor
-    {
-    /**
-     * @class JointEnactorModule
-     */
-    class JointEnactorModule : public portals::Module
-    {
-    public:
-        JointEnactorModule();
-        virtual ~JointEnactorModule();
+namespace jointenactor
+{
 
-        // Allows clients to set the stiffnesses of all joints.
-        portals::InPortal<messages::JointAngles> stiffnessInput_;
+/**
+ * @class JointEnactorModule
+ */
+class JointEnactorModule : public portals::Module
+{
+public:
+    JointEnactorModule();
+    virtual ~JointEnactorModule();
 
-        // Accepts motion commands (i.e. joint angles.)
-        portals::InPortal<messages::JointAngles> jointsInput_;
+    // Allows clients to set the stiffnesses of all joints.
+    portals::InPortal<messages::JointAngles> stiffnessInput_;
 
-        portals::InPortal<messages::LedCommand> ledsInput_;
+    // Accepts motion commands (i.e. joint angles.)
+    portals::InPortal<messages::JointAngles> jointsInput_;
 
-    private:
-        void run_();
-        void writeCommand();
+    portals::InPortal<messages::LedCommand> ledsInput_;
 
-        int shared_fd;
-        SharedData* shared;
-        sem_t* semaphore;
+private:
+    void run_();
+    void writeCommand();
 
-        messages::JointAngles latestJointAngles_;
-        messages::JointAngles latestStiffness_;
-        messages::LedCommand latestLeds_;
-    };
-    } // namespace jointenactor
+    int shared_fd;
+    SharedData* shared;
+
+    uint64_t commandIndex;
+
+    messages::JointAngles latestJointAngles_;
+    messages::JointAngles latestStiffness_;
+    messages::LedCommand latestLeds_;
+};
+
+} // namespace jointenactor
 } // namespace man
