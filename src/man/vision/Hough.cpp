@@ -9,6 +9,9 @@
 
 using namespace std;
 
+namespace man {
+namespace vision {
+
 // *******************************
 // *                             *
 // *  Line from Hough Transform  *
@@ -266,7 +269,7 @@ void HoughSpace::wrapAround()
   }
 }
 
-extern "C" void houghSmooth(uint16_t* image, int dstWd, int dstHt, int pitch);
+extern "C" void _houghSmooth(uint16_t* image, int dstWd, int dstHt, int pitch);
 
 void HoughSpace::smooth()
 {
@@ -275,7 +278,7 @@ void HoughSpace::smooth()
   wrapAround();
 
   if (fast())
-    houghSmooth(spaceUL() + 1, rWidth() - 2, TSpan, rPitch());
+    _houghSmooth(spaceUL() + 1, rWidth() - 2, TSpan, rPitch());
   else
   {
     uint16_t* buf = new uint16_t[2 * rWidth()];
@@ -324,7 +327,7 @@ void HoughSpace::peaks(HoughLineList& hlList)
     uint16_t* row = spaceUL() + 1;
     for (int t = 0; t < TSpan; ++t, row += rPitch())
     {
-      runLengthU16(row, rWidth() - 2, accept - 1, runs);
+      _runLengthU16(row, rWidth() - 2, accept - 1, runs);
       int ri = 0;
       for (int r = runs[0]; r >= 0; r = runs[++ri])
       {
@@ -397,4 +400,7 @@ void HoughSpace::run(EdgeList& edges, HoughLineList& hlList)
   adjust(edges, hlList);
 
   times[5] = timer.time32();
+}
+
+}
 }

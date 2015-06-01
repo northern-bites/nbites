@@ -6,6 +6,9 @@
 
 #include "Edge.h"
 
+namespace man {
+namespace vision {
+
 // ******************************************************
 // *                                                    *
 // *  Hash Table of Objects Indexed by 8-bit Direction  *
@@ -142,8 +145,8 @@ void EdgeDetector::cToP(int x, int y, int& mag, int& dir)
 }
 
 extern "C" uint32_t
-  gradient(uint16_t* sourceImage, int width, int height, int pitch,
-           uint16_t* gradientImage, int gradientThreshold);
+  _gradient(uint16_t* sourceImage, int width, int height, int pitch,
+            uint16_t* gradientImage, int gradientThreshold);
 
 uint32_t EdgeDetector::gradient(const ImageLiteU16& source)
 {
@@ -178,8 +181,8 @@ uint32_t EdgeDetector::gradient(const ImageLiteU16& source)
 
   // Run ASM or C++ grdient
   if (fast())
-    ::gradient(source.pixelAddr(), source.width(), source.height(), 2 * source.pitch(),
-               gradPixels, gradientThreshold());
+    _gradient(source.pixelAddr(), source.width(), source.height(), 
+                           2 * source.pitch(), gradPixels, gradientThreshold());
   else
   {
     int pitch = source.pitch();
@@ -256,7 +259,8 @@ uint32_t EdgeDetector::edgeDetect(const ImageLiteU8& green, EdgeList& edgeList)
       if (greenRow)
         greenRow += green.pitch();
 
-      runLengthU16(gradRow + 1, gradientImage().width() - 2, (edgeThreshold() << 8) | 0xFF, runs);
+      man::vision::_runLengthU16(gradRow + 1, gradientImage().width() - 2, 
+                                 (edgeThreshold() << 8) | 0xFF, runs);
 
       int ri = 0;
       for (int x = runs[0]; x >= 0; x = runs[++ri])
@@ -331,4 +335,7 @@ uint32_t EdgeDetector::edgeDetect(const ImageLiteU8& green, EdgeList& edgeList)
 
   _edgeTime = (uint32_t)timer.time();
   return edgeTime();
+}
+
+}
 }

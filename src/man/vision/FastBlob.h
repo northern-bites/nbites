@@ -12,6 +12,9 @@
 
 #include <list>
 
+namespace man {
+namespace vision {
+
 // *****************
 // *               *
 // *  Blob Result  *
@@ -165,5 +168,8 @@ public:
 
   std::string print() const;
 };
+
+}
+}
 
 #endif

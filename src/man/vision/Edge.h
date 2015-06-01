@@ -22,6 +22,9 @@
 // *                      *
 // ************************
 
+namespace man {
+namespace vision {
+
 class AngleElement
 {
   AngleElement* _next;
@@ -373,5 +376,8 @@ public:
     EdgeDetector::init();
   }
 };
+
+}
+}
 
 #endif

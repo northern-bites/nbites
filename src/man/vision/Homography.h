@@ -14,6 +14,9 @@
 #include <math.h>
 #include <stdlib.h>
 
+namespace man {
+namespace vision {
+
 class GeoLine;
 
 class FieldHomography
@@ -212,5 +215,8 @@ public:
 
   std::string print() const;
 };
+
+}
+}
 
 #endif

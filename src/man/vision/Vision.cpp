@@ -12,6 +12,9 @@
 
 using namespace std;
 
+namespace man {
+namespace vision {
+
 // ***************
 // *             *
 // *  Utilities  *
@@ -94,4 +97,7 @@ void LineFit::solve()
   ssError = max(ssError, 0.0);
 
   solved = true;
+}
+
+}
 }

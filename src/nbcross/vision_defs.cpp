@@ -1,21 +1,16 @@
-//
-//  nbfuncs.cpp
-//  nbcross
-//
-//  Created by Philip Koch on 11/28/14.
-//  Copyright (c) 2014 pkoch. All rights reserved.
-//
-
 #include "nbfuncs.h"
+
+#include "RoboGrams.h"
+#include "Images.h"
+#include "vision/VisionModule.h"
+
 #include <assert.h>
 #include <vector>
-
-#include "Images.h"
-#include "vision/VisionModule.cpp"
-#include "RoboGrams.h"
+#include <string>
+#include <iostream>
 
 using nblog::Log;
-
+using nblog::SExpr;
 
 int ImageConverter_func() {
     assert(args.size() == 1);
@@ -42,7 +37,7 @@ int ImageConverter_func() {
 
     module.bottomIn.setMessage(message);
     module.run();
-    ImageFrontEnd* frontEnd = module.getFrontEnd();
+    man::vision::ImageFrontEnd* frontEnd = module.getFrontEnd();
 
     // -----------
     //   Y IMAGE
@@ -55,7 +50,7 @@ int ImageConverter_func() {
 
     // Create temp buffer and fill with yImage 
     uint8_t yBuf[yLength];
-    memcpy(yBuf, frontEnd->yImage().pixelAddr(0, 0), yLength);
+    memcpy(yBuf, frontEnd->yImage().pixelAddr(), yLength);
 
     // Convert to string and set log
     std::string yBuffer((const char*)yBuf, yLength);
@@ -141,6 +136,22 @@ int ImageConverter_func() {
     // rets.push_back(colorSegRet);
 
     // Done
-    printf("ImageConverter module ran!");
     return 0;
+}
+
+int Edges_func() {
+    assert(args.size() == 1);
+    printf("Edges_func()\n");
+
+    size_t length = args[0]->data().size();
+    uint8_t buf[length];
+    memcpy(buf, args[0]->data().data(), length);
+
+    messages::YUVImage image(buf, 640, 480, 640);
+    portals::Message<messages::YUVImage> message(&image);
+
+    man::vision::VisionModule module = man::vision::VisionModule();
+    module.topIn.setMessage(message);
+    module.bottomIn.setMessage(message);
+    module.run();
 }

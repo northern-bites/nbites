@@ -14,6 +14,9 @@
 #include <math.h>
 #include <string>
 
+namespace man {
+namespace vision {
+
 // Scan array of unsigned bytes or words for values above the specified
 // threshold. Place in the runs array the offset of each such byte/word found,
 // terminated by -1.
@@ -31,8 +34,8 @@
 //
 // Signed versions can be produced with trivial effort using the macros in
 // runLength.s.
-extern "C" void runLengthU8 (uint8_t * source, int count, int thresh, int32_t* runs);
-extern "C" void runLengthU16(uint16_t* source, int count, int thresh, int32_t* runs);
+extern "C" void _runLengthU8 (uint8_t * source, int count, int thresh, int32_t* runs);
+extern "C" void _runLengthU16(uint16_t* source, int count, int thresh, int32_t* runs);
 
 // *************
 // *           *
@@ -425,5 +428,8 @@ public:
   uint8_t* pixelAddr(int x, int y) const { return _pixels + 2 * y * pitch() + 4 * x; }
   uint8_t* pixelAddr() const { return _pixels; }
 };
+
+}
+}
 
 #endif

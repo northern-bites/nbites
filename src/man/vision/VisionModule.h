@@ -12,8 +12,7 @@
 namespace man {
 namespace vision {
 
-// TODO namespace
-// TODO fast bool
+// TODO test using nbtool
 // TODO compiles on both ubuntu and windows
 class VisionModule : public portals::Module {
 public:
@@ -26,6 +25,7 @@ public:
     portals::InPortal<messages::InertialState> inertialsIn;
 
     ImageFrontEnd* getFrontEnd() const { return frontEnd; }
+    EdgeList* getEdges() const { return edges; }
 
 protected:
     virtual void run_();

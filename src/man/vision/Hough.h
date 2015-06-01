@@ -15,6 +15,9 @@
 #include <list>
 #include <vector>
 
+namespace man {
+namespace vision {
+
 // *******************************
 // *                             *
 // *  Line from Hough Transform  *
@@ -207,5 +210,8 @@ public:
 
   void run(EdgeList&, HoughLineList&);
 };
+
+}
+}
 
 #endif
