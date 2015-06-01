@@ -74,14 +74,12 @@ public class EdgeImage extends ImageParent {
 			Logger.logf(Logger.INFO, "%d edges expected.", n_edges);
 			
 			for (int i = 0; i < n_edges; ++i) {
-				int x = dis.readInt();
-				int y = dis.readInt();
+				int x = dis.readInt() + 320;
+				int y = -dis.readInt() + 240;
 				int mag = dis.readInt();
 				int ang = dis.readInt();
                 System.out.println("x: " + x);
                 System.out.println("y: " + y);
-                System.out.println("mag: " + mag);
-                System.out.println("ang: " + ang);
 				
 				Color base = angleMap[ang];
 				ret.setRGB(x, y, base.getRGB());

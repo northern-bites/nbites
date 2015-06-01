@@ -173,13 +173,14 @@ int Edges_func() {
     Log* edges = new Log();
     std::string data;
 
+    // TODO convert from relative to image center to normal image
     std::cout << "Number of edges: " << edgeList->count() << std::endl;
     man::vision::AngleBinsIterator<man::vision::Edge> abi(*edgeList);
     for (const man::vision::Edge* e = *abi; e; e = *++abi) {
-        uint32_t x = htonl(e->x()/2 + 160);
+        uint32_t x = htonl(e->x());
         std::cout << "x: " << e->x() << std::endl;
         data.append((const char*) &x, 4);
-        uint32_t y = htonl(e->y()/2 + 120);
+        uint32_t y = htonl(e->y());
         std::cout << "y: " << e->y() << std::endl;
         data.append((const char*) &y, 4);
         uint32_t mag = htonl(e->mag());

@@ -18,8 +18,8 @@ import nbtool.util.Utility;
 
 public class EdgeView extends ViewParent implements IOFirstResponder {
 	
-	final int width = 320;
-	final int height = 240;
+	final int width = 640;
+	final int height = 480;
 	
 	final int displayw = 640;
 	final int displayh = 480;
