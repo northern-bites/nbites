@@ -55,9 +55,9 @@ void NaiveBallModule::run_()
         naiveCheck();
     }
 
-    printf("velocity: %f\n", velocityEst);
-    if (direction == -1) {printf("going LEFT"); }
-    else if (direction == 1) {printf("going RIGHT")}
+    // printf("velocity: %f\n", velocityEst);
+    // if (direction == -1) {printf("going LEFT\n"); }
+    // else if (direction == 1) {printf("going RIGHT\n"); }
 
     portals::Message<messages::NaiveBall> naiveBallMessage(0);
     naiveBallMessage.get()->set_velocity(velocityEst);
@@ -98,8 +98,10 @@ void NaiveBallModule::naiveCheck()
     BallState end_avgs = avgFrames(endIndex);
     float dist = calcSumSquaresSQRT((end_avgs.rel_x - start_avgs.rel_x), (end_avgs.rel_y - start_avgs.rel_y));
     float bear = end_avgs.bearing - start_avgs.bearing;
-    if (bear < 0.0) { direction = -1; }
-    velocityEst = (dist / 1.f) * ALPHA + velocityEst * (1-ALPHA);
+    printf("bearing: %f\n", bear);
+    if (bear < 0.0) { direction = 1; }
+    else if (bear > 0.0) {direction = -1; }
+    velocityEst = (direction * dist / 1.f) * ALPHA + velocityEst * (1-ALPHA);
     // velocityEst = (dist / 1.f);
     // TODO possibly take into account (possibly as in probably) previous estimates
 
@@ -125,9 +127,6 @@ NaiveBallModule::BallState NaiveBallModule::avgFrames(int startingIndex)
 
         startingIndex += 1;
 
-        if (startingIndex >= buffSize) {
-            printf("ERROR\n");
-        }
     }
     // if (dist_sum/AVGING_FRAMES > 10000.f) {
     //     printf("SOMETHING WRONG\n");
