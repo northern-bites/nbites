@@ -77,8 +77,9 @@ class ObstacleModule : public portals::Module
     static const int NUM_DIRECTIONS = 9;
 
     // How close do our sonar readings need to get for us to decide obstacle?
-    static constexpr float SONAR_THRESH = 0.4f;
-    static constexpr float SONAR_FRONT_THRESH = 0.5f;
+    static constexpr float SONAR_THRESH_UPPER = 0.45f;
+    static constexpr float SONAR_FRONT_THRESH_UPPER = 0.45f;
+    static constexpr float SONAR_THRESH_LOWER = 0.15f;
     // How many frames do we consider in our average of sonar values?
     static const unsigned int SONAR_FRAMES_TO_BUFFER = 20;
 
@@ -130,7 +131,7 @@ protected:
     void updateObstacleBuffer();
 
     // Updates vision buffer with info from last frame of vision
-    void updateObstacleArrays(std::string setter, 
+    void updateObstacleArrays(messages::FieldObstacles::Obstacle::ObstacleDetector detector, 
                               messages::FieldObstacles::Obstacle::ObstaclePosition pos, 
                               float dist);
 
@@ -160,7 +161,8 @@ private:
     float obstacleDistances[NUM_DIRECTIONS];
 
     // Global array that keeps track of who last set the obstacle
-    std::string obstacleSetters[NUM_DIRECTIONS];
+    messages::FieldObstacles::Obstacle::ObstacleDetector
+    obstacleDetectors[NUM_DIRECTIONS];
 
     // Keeps a list of the obstacle message type locations
     messages::FieldObstacles::Obstacle::ObstaclePosition

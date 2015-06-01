@@ -38,7 +38,7 @@ ObstacleModule::ObstacleModule() : obstacleOut(base())
 {
     memset(obstacleBuffer, 0, sizeof(obstacleBuffer));
     memset(obstacleDistances, 0, sizeof(obstacleDistances));
-    memset(obstacleSetters, 0, sizeof(obstacleSetters));
+    memset(obstacleDetectors, 0, sizeof(obstacleDetectors));
 
     obstaclesList[0] = FieldObstacles::Obstacle::NONE;
     obstaclesList[1] = FieldObstacles::Obstacle::NORTH;
@@ -60,7 +60,12 @@ void ObstacleModule::run_()
     sonarIn.latch();
 
     // Don't need this kind of buffer when we aren't using vision
-    if (!USING_VISION) { memset(obstacleBuffer, 0, sizeof(obstacleBuffer)); }
+    if (!USING_VISION)
+    { 
+        for (int i = 0; i < NUM_DIRECTIONS; i++) {
+            obstacleBuffer[i] = 0;
+        }
+    }
     
     FieldObstacles::Obstacle::ObstaclePosition sonars, arms;
 
@@ -78,13 +83,13 @@ void ObstacleModule::run_()
     if (USING_ARMS) { arms = processArms( armContactIn.message()); }
     else { arms = FieldObstacles::Obstacle::NONE; }
     // if not combining arms and sonars
-    // updateObstacleArrays("arms", arms, -1.f);
+    // updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, -1.f);
 
     // Decide sonars
     if (USING_SONARS) { sonars = processSonar(sonarIn.message()); } 
     else { sonars = FieldObstacles::Obstacle::NONE; }
     // if not combining arms and sonars:
-    // updateObstacleArrays("sonars", sonars, lastSonar); 
+    // updateObstacleArrays(FieldObstacles::Obstacle::SONARS, sonars, lastSonar); 
 
 #ifdef USE_LAB_FIELD // Walls are too close to field for sonar use
     sonars = FieldObstacles::Obstacle::NONE;
@@ -105,7 +110,7 @@ void ObstacleModule::run_()
         FieldObstacles::Obstacle* temp = current.get()->add_obstacle();
         temp->set_position(obstaclesList[i]);
         temp->set_distance(obstacleDistances[i]);
-        temp->set_setter(obstacleSetters[i]);
+        temp->set_detector(obstacleDetectors[i]);
     }
 
     obstacleOut.setMessage(current);
@@ -251,20 +256,20 @@ ObstacleModule::processSonar(const messages::SonarState& input)
     // std::cout<<"RIGHT = "<<right<<" , LEFT = "<<left<<std::endl;
 
     // Both sonars picking up an obstacle? It's probably in front
-    if (right < SONAR_FRONT_THRESH && left < SONAR_FRONT_THRESH &&
-        right != 0.f && left!= 0.f)
+    if (right < SONAR_FRONT_THRESH_UPPER && left < SONAR_FRONT_THRESH_UPPER &&
+        right > SONAR_THRESH_LOWER && left> SONAR_THRESH_LOWER)
     {
         lastSonar = .5f * (right + left);
         return FieldObstacles::Obstacle::NORTH;
     }
     // Otherwise to right side...
-    else if (right < SONAR_THRESH && right != 0.f)
+    else if (right < SONAR_THRESH_UPPER && right > SONAR_THRESH_LOWER)
     {
         lastSonar = right;
         return FieldObstacles::Obstacle::NORTHEAST;
     }
     // ... left side ...
-    else if (left < SONAR_THRESH && left != 0.f)
+    else if (left < SONAR_THRESH_UPPER && left > SONAR_THRESH_LOWER)
     {
         lastSonar = left;
         return FieldObstacles::Obstacle::NORTHWEST;
@@ -286,32 +291,30 @@ void ObstacleModule::combineArmsAndSonars
     // If they agree, easy
     if (arms == sonars)
     {
-        updateObstacleArrays("arms", arms, -1.f);
+        updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, -1.f);
     }
     // Trust sonars before we get any arm input
     else if (arms == FieldObstacles::Obstacle::NONE)
     {
-        std::cout<<"SONARS: ";
-        updateObstacleArrays("sonars", sonars, -1.f);
+        updateObstacleArrays(FieldObstacles::Obstacle::SONARS, sonars, lastSonar);
     }
     // If they sort of agree, use the value that gives us better dodging info
     else if (sonars == FieldObstacles::Obstacle::NORTH && 
              (arms == FieldObstacles::Obstacle::NORTHWEST ||
               arms == FieldObstacles::Obstacle::NORTHEAST)) 
     {
-        updateObstacleArrays("arms", arms, -1.f);
+        updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, -1.f);
     }
     else if (arms == FieldObstacles::Obstacle::NORTH &&
              (sonars == FieldObstacles::Obstacle::NORTHWEST || 
               sonars == FieldObstacles::Obstacle::NORTHEAST))
     {
-        std::cout<<"SONARS: ";
-        updateObstacleArrays("sonars", sonars, -1.f);
+        updateObstacleArrays(FieldObstacles::Obstacle::SONARS, sonars, lastSonar);
     }
     // If they don't agree or get no sonars, trust the arms
     else
     {
-        updateObstacleArrays("arms", arms, -1.f);
+        updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, -1.f);
     }
 
 }
@@ -327,7 +330,7 @@ void ObstacleModule::updateVisionBuffer
     }
 
     float avg = average(dists);
-    updateObstacleArrays("vision", pos, avg);
+    updateObstacleArrays(FieldObstacles::Obstacle::VISION, pos, avg);
 }
 
 void ObstacleModule::processVision(float distance, float bearing)
@@ -375,12 +378,15 @@ void ObstacleModule::processVision(float distance, float bearing)
 }
 
 void ObstacleModule::updateObstacleArrays
-(std::string setter, FieldObstacles::Obstacle::ObstaclePosition pos, float dist)
+(FieldObstacles::Obstacle::ObstacleDetector detector, 
+ FieldObstacles::Obstacle::ObstaclePosition pos, float dist)
 {
+    if (detector==FieldObstacles::Obstacle::SONARS)
+        std::cout<<"SONARS "<<dist<<std::endl;
     // start the buffer count
     obstacleBuffer[int(pos)] = 1;
     obstacleDistances[int(pos)] = dist;
-    obstacleSetters[int(pos)] = setter;
+    obstacleDetectors[int(pos)] = detector;
 }
 
 void ObstacleModule::updateObstacleBuffer()
