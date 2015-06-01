@@ -6,6 +6,7 @@
 
 #include "Hough.h"
 #include "FrontEnd.h"
+#include <iostream>
 
 using namespace std;
 

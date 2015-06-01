@@ -1,5 +1,6 @@
 #include "VisionModule.h"
 #include "Edge.h"
+#include "HighResTimer.h"
 
 #include <iostream>
 
@@ -17,15 +18,12 @@ VisionModule::VisionModule()
     colorParams = new Colors();
     frontEnd = new ImageFrontEnd();
     edgeDetector = new EdgeDetector();
-    edges = new EdgeList(3200);
+    edges = new EdgeList(4500);
     houghLines = new HoughLineList(128);
     hough = new HoughSpace(320, 240);
 
-#ifdef USE_MMX
-    bool fast = true;
-#else
+    // TODO flag
     bool fast = false;
-#endif
     frontEnd->fast(fast);
     edgeDetector->fast(fast);
     hough->fast(fast);
@@ -43,6 +41,9 @@ VisionModule::~VisionModule()
 
 void VisionModule::run_()
 {
+    // Time vision module
+    HighResTimer timer("Vision 2015");
+
     // Get messages from inPortals
     topIn.latch();
     bottomIn.latch();
@@ -83,6 +84,8 @@ void VisionModule::run_()
         // TODO duplicate lines in houghLines?
         hough->run(*edges, *houghLines);
     }
+
+    timer.lap();
 }
 
 }

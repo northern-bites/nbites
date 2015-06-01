@@ -13,6 +13,7 @@ SET( VISION_SRCS
   Homography.cpp
   Hough.cpp
   Vision.cpp
+  HighResTimer.cpp
   )
 
 IF (UNIX AND NOT APPLE)
