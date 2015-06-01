@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nbtool.data.Log;
+import nbtool.gui.logviews.fieldLocation.FieldView;
 import nbtool.gui.logviews.images.EdgeView;
 import nbtool.gui.logviews.images.ImageView;
 import nbtool.gui.logviews.images.ZoomImageView;
@@ -67,6 +68,7 @@ public class NBConstants {
 		
 		map.put("YUVImage", new Class[]{ImageView.class, ZoomImageView.class, CrossBright.class, EdgeView.class});
 		map.put("STATS", new Class[]{BotStatsView.class});
+		map.put("prot-RobotLocation", new Class[]{FieldView.class});
 		map.put(DEFAULT_S, new Class[]{DefaultView.class});
 		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
 		

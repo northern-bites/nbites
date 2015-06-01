@@ -123,6 +123,10 @@ public class Log {
 			return cs.valueAsInt();
 		else return null;
 	}
+	//what is this attribute going to return?
+	//public String protoRobotLocation() {
+		//return getAttributes().get("proto-RobotLocation");
+	//}
 	
 	public Integer version() {
 		SExpr v = tree().find("version").get(1);
