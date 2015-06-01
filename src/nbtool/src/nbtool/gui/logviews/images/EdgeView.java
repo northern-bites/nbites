@@ -24,7 +24,7 @@ public class EdgeView extends ViewParent implements IOFirstResponder {
 	final int displayw = 640;
 	final int displayh = 480;
 	
-	final String crossFuncName = "edges_func";
+	final String crossFuncName = "Edges";
 
 	@Override
 	public void setLog(Log newlog) {

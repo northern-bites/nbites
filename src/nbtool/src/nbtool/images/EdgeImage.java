@@ -34,10 +34,10 @@ public class EdgeImage extends ImageParent {
 		assert(top.length == 8);
 		
 		for (int i = 0; i < 256; ++i) {
-			int bi = i / 8;
+			int bi = i / 32;
 			int ni = (bi + 1) % 8;
 			
-			int dist = i % 8;
+			int dist = i % 32;
 			
 			Color bc = top[bi];
 			Color nc = top[ni];
@@ -47,9 +47,9 @@ public class EdgeImage extends ImageParent {
 			int db = nc.getBlue() - bc.getBlue();
 			
 			Color tc = new Color(
-					bc.getRed() + (dist * dr) / 8,
-					bc.getGreen() + (dist * dg) / 8,
-					bc.getBlue() + (dist * db) / 8
+					bc.getRed() + (dist * dr) / 32,
+					bc.getGreen() + (dist * dg) / 32,
+					bc.getBlue() + (dist * db) / 32
 					);
 			ret[i] = tc;
 		}
@@ -78,6 +78,10 @@ public class EdgeImage extends ImageParent {
 				int y = dis.readInt();
 				int mag = dis.readInt();
 				int ang = dis.readInt();
+                System.out.println("x: " + x);
+                System.out.println("y: " + y);
+                System.out.println("mag: " + mag);
+                System.out.println("ang: " + ang);
 				
 				Color base = angleMap[ang];
 				ret.setRGB(x, y, base.getRGB());

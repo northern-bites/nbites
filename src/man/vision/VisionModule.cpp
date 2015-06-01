@@ -1,6 +1,8 @@
 #include "VisionModule.h"
 #include "Edge.h"
 
+#include <iostream>
+
 namespace man {
 namespace vision {
 

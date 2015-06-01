@@ -151,11 +151,21 @@ int Edges_func() {
     memcpy(buf, args[0]->data().data(), length);
 
     messages::YUVImage image(buf, 640, 480, 640);
-    portals::Message<messages::YUVImage> message(&image);
+    portals::Message<messages::YUVImage> imageMessage(&image);
+
+    messages::YUVImage emptyImage;
+    messages::JointAngles emptyJoints;
+    messages::InertialState emptyInertials;
+
+    portals::Message<messages::YUVImage> emptyImageMessage(&emptyImage);
+    portals::Message<messages::JointAngles> emptyJointsMessage(&emptyJoints);
+    portals::Message<messages::InertialState> emptyInertialsMessage(&emptyInertials);
 
     man::vision::VisionModule module = man::vision::VisionModule();
-    module.topIn.setMessage(message);
-    module.bottomIn.setMessage(message);
+    module.topIn.setMessage(emptyImageMessage);
+    module.bottomIn.setMessage(imageMessage);
+    module.jointsIn.setMessage(emptyJointsMessage);
+    module.inertialsIn.setMessage(emptyInertialsMessage);
 
     module.run();
     man::vision::EdgeList* edgeList = module.getEdges();
@@ -163,12 +173,19 @@ int Edges_func() {
     Log* edges = new Log();
     std::string data;
 
+    std::cout << "Number of edges: " << edgeList->count() << std::endl;
     man::vision::AngleBinsIterator<man::vision::Edge> abi(*edgeList);
     for (const man::vision::Edge* e = *abi; e; e = *++abi) {
-        data.append((const char*)htonl(e->x()), 4);
-        data.append((const char*)htonl(e->y()), 4);
-        data.append((const char*)htonl(e->mag()), 4);
-        data.append((const char*)htonl(e->angle()), 4);
+        uint32_t x = htonl(e->x()/2 + 160);
+        std::cout << "x: " << e->x() << std::endl;
+        data.append((const char*) &x, 4);
+        uint32_t y = htonl(e->y()/2 + 120);
+        std::cout << "y: " << e->y() << std::endl;
+        data.append((const char*) &y, 4);
+        uint32_t mag = htonl(e->mag());
+        data.append((const char*) &mag, 4);
+        uint32_t angle = htonl(e->angle());
+        data.append((const char*) &angle, 4);
     }
 
     edges->setData(data);
