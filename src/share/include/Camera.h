@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "DebugConfig.h"
+
 class Camera {
 
 public:
@@ -24,6 +26,7 @@ public:
         int saturation;
         int hue;
         int sharpness;
+        int gamma;
         bool auto_whitebalance;
         int backlight_compensation;
         int exposure;
@@ -31,23 +34,6 @@ public:
         int white_balance;
         bool fade_to_black;
     };
-
-    static const Settings& setTopSettings(bool hflip, bool vflip, bool autoexposure,
-                                          int brightness, int contrast, int saturation,
-                                          int hue, int sharpness, bool autowb, int exposure,
-                                          int gain, int wb, bool fade_to_black) {
-
-        static const Settings newTopSettings = {
-
-        }
-
-    }
-
-    static const Settings& setBottomSettings() {
-        static const Settings newTopSettings = {
-
-        }
-    }
 
     static const Settings& getSettings(Type type)
         {
@@ -65,6 +51,7 @@ public:
             TOP_SATURATION,
             TOP_HUE,
             TOP_SHARPNESS,
+            TOP_GAMMA,
             TOP_AUTO_WHITEBALANCE,
             TOP_BACKLIGHT_COMPENSATION,
             TOP_EXPOSURE,
@@ -85,6 +72,7 @@ public:
             BOTTOM_SATURATION,
             BOTTOM_HUE,
             BOTTOM_SHARPNESS,
+            BOTTOM_GAMMA,
             BOTTOM_AUTO_WHITEBALANCE,
             BOTTOM_BACKLIGHT_COMPENSATION,
             BOTTOM_EXPOSURE,
@@ -98,71 +86,76 @@ public:
      * Camera Parameters Go Here
      */
 
-    // SEARLES CAMERA PARAMETERS
+    // STATION CAMERA PARAMS
+#ifdef NAOQI_2 // FOR NAOQI 2.x
     // TOP SETTINGS
     static const bool TOP_H_FLIP = 1;
     static const bool TOP_V_FLIP = 1;
     static const bool TOP_AUTO_EXPOSURE = 0;
-    static const int TOP_BRIGHTNESS = 128;
-    static const int TOP_CONTRAST = 58;
-    static const int TOP_SATURATION = 134;
+    static const int TOP_BRIGHTNESS = 250;
+    static const int TOP_CONTRAST = 43;
+    static const int TOP_SATURATION = 144;
     static const int TOP_HUE = 0;
-    static const int TOP_SHARPNESS = 3;
+    static const int TOP_SHARPNESS = 4;
+    static const int TOP_GAMMA = 220;
     static const bool TOP_AUTO_WHITEBALANCE = 0;
     static const int TOP_BACKLIGHT_COMPENSATION = 0x00;
-    static const int TOP_EXPOSURE = 36;
+    static const int TOP_EXPOSURE = 250;
     static const int TOP_GAIN = 53;
     static const int TOP_WHITE_BALANCE = 3300;
     static const bool TOP_FADE_TO_BLACK = 0;
 
-    // // BOTTOM SETTINGS
+    // BOTTOM SETTINGS
     static const bool BOTTOM_H_FLIP = 0;
     static const bool BOTTOM_V_FLIP = 0;
     static const bool BOTTOM_AUTO_EXPOSURE = 0;
-    static const int BOTTOM_BRIGHTNESS = 124;
+    static const int BOTTOM_BRIGHTNESS = 200;
     static const int BOTTOM_CONTRAST = 56;
     static const int BOTTOM_SATURATION = 122;
     static const int BOTTOM_HUE = 0;
     static const int BOTTOM_SHARPNESS = 3;
+    static const int BOTTOM_GAMMA = 220;
     static const bool BOTTOM_AUTO_WHITEBALANCE = 0;
     static const int BOTTOM_BACKLIGHT_COMPENSATION = 0x00;
-    static const int BOTTOM_EXPOSURE = 35;
+    static const int BOTTOM_EXPOSURE = 250;
     static const int BOTTOM_GAIN = 62;
     static const int BOTTOM_WHITE_BALANCE = 3200;
     static const bool BOTTOM_FADE_TO_BLACK = 0;
+#else // FOR NAOQI 1.14
+    // TOP SETTINGS
+    static const bool TOP_H_FLIP = 1;
+    static const bool TOP_V_FLIP = 1;
+    static const bool TOP_AUTO_EXPOSURE = 0;
+    static const int TOP_BRIGHTNESS = 92;
+    static const int TOP_CONTRAST = 45;
+    static const int TOP_SATURATION = 145;
+    static const int TOP_HUE = 0;
+    static const int TOP_SHARPNESS = 3;
+    static const int TOP_GAMMA = 220; // Not used
+    static const bool TOP_AUTO_WHITEBALANCE = 0;
+    static const int TOP_BACKLIGHT_COMPENSATION = 0x00;
+    static const int TOP_EXPOSURE = 50;
+    static const int TOP_GAIN = 62;
+    static const int TOP_WHITE_BALANCE = 3300;
+    static const bool TOP_FADE_TO_BLACK = 0;
 
-    // // WATSON 2014 CAMERA PARAMETERS
-    // // TOP SETTINGS
-    // static const bool TOP_H_FLIP = 1;
-    // static const bool TOP_V_FLIP = 1;
-    // static const bool TOP_AUTO_EXPOSURE = 0;
-    // static const int TOP_BRIGHTNESS = 84;
-    // static const int TOP_CONTRAST = 45;
-    // static const int TOP_SATURATION = 120;
-    // static const int TOP_HUE = 0;
-    // static const int TOP_SHARPNESS = 3;
-    // static const bool TOP_AUTO_WHITEBALANCE = 0;
-    // static const int TOP_BACKLIGHT_COMPENSATION = 0x00;
-    // static const int TOP_EXPOSURE = 43;
-    // static const int TOP_GAIN = 62;
-    // static const int TOP_WHITE_BALANCE = 5500;
-    // static const bool TOP_FADE_TO_BLACK = 0;
-
-    // // BOTTOM SETTINGS
-    // static const bool BOTTOM_H_FLIP = 0;
-    // static const bool BOTTOM_V_FLIP = 0;
-    // static const bool BOTTOM_AUTO_EXPOSURE = 0;
-    // static const int BOTTOM_BRIGHTNESS = 96;
-    // static const int BOTTOM_CONTRAST = 45;
-    // static const int BOTTOM_SATURATION = 124;
-    // static const int BOTTOM_HUE = 0;
-    // static const int BOTTOM_SHARPNESS = 3;
-    // static const bool BOTTOM_AUTO_WHITEBALANCE = 0;
-    // static const int BOTTOM_BACKLIGHT_COMPENSATION = 0x00;
-    // static const int BOTTOM_EXPOSURE = 43;
-    // static const int BOTTOM_GAIN = 65;
-    // static const int BOTTOM_WHITE_BALANCE = 5500;
-    // static const bool BOTTOM_FADE_TO_BLACK = 0;
+    // BOTTOM SETTINGS
+    static const bool BOTTOM_H_FLIP = 0;
+    static const bool BOTTOM_V_FLIP = 0;
+    static const bool BOTTOM_AUTO_EXPOSURE = 0;
+    static const int BOTTOM_BRIGHTNESS = 96;
+    static const int BOTTOM_CONTRAST = 45;
+    static const int BOTTOM_SATURATION = 124;
+    static const int BOTTOM_HUE = 0;
+    static const int BOTTOM_SHARPNESS = 3;
+    static const int BOTTOM_GAMMA = 220; // Not used
+    static const bool BOTTOM_AUTO_WHITEBALANCE = 0;
+    static const int BOTTOM_BACKLIGHT_COMPENSATION = 0x00;
+    static const int BOTTOM_EXPOSURE = 70;
+    static const int BOTTOM_GAIN = 65;
+    static const int BOTTOM_WHITE_BALANCE = 3300;
+    static const bool BOTTOM_FADE_TO_BLACK = 0;
+#endif
 
     static const Type getOtherCameraType(Type type) {
 

@@ -8,8 +8,11 @@
 #include <iostream>
 #include <linux/version.h>
 #include <bn/i2c/i2c-dev.h>
+#include <vector>
 
 #include "Profiler.h"
+#include "DebugConfig.h"
+
 #include "../log/logging.h"
 #include "../control/control.h"
 #include "nbdebug.h"
@@ -17,7 +20,8 @@
 using nblog::SExpr;
 using nblog::NBLog;
 
-#include <vector>
+
+
 
 #define V4L2_MT9M114_FADE_TO_BLACK (V4L2_CID_PRIVATE_BASE)
 
@@ -220,6 +224,7 @@ void ImageTranscriber::initSettings()
         param.getParam<int>("saturation"),
         param.getParam<int>("hue"),
         param.getParam<int>("sharpness"),
+        param.getParam<int>("gamma")
         param.getParam<int>("autoWhiteBalance"),
         /*backlight compensation = 0xff*/
         param.getParam<int>("exposure"),
@@ -241,7 +246,13 @@ void ImageTranscriber::initSettings()
     setControlSetting(V4L2_CID_HUE, updated_settings.hue);
     setControlSetting(V4L2_CID_SHARPNESS, updated_settings.sharpness);
 
+#ifdef NAOQI_2
+    setControlSetting(V4L2_CID_GAMMA, updated_settings.gamma);
+#endif
+
     // Auto white balance, exposure,  and backlight comp off!
+    // The first two are both for white balance. The docs don't make
+    // it clear what the difference is...
     setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE,
                       updated_settings.auto_whitebalance);
     setControlSetting(V4L2_CID_BACKLIGHT_COMPENSATION,
@@ -253,6 +264,17 @@ void ImageTranscriber::initSettings()
 
     // This is actually just the white balance setting!
     setControlSetting(V4L2_CID_DO_WHITE_BALANCE, updated_settings.white_balance);
+    setControlSetting(V4L2_MT9M114_FADE_TO_BLACK, updated_settings.fade_to_black);
+
+#ifdef NAOQI_2
+    setControlSetting(V4L2_CID_DO_WHITE_BALANCE, 0);
+#endif
+    // This is actually just the white balance setting!
+#ifdef NAOQI_2
+    setControlSetting(V4L2_CID_WHITE_BALANCE_TEMPERATURE, updated_settings.white_balance);
+#else
+    setControlSetting(V4L2_CID_DO_WHITE_BALANCE, updated_settings.white_balance);
+#endif
     setControlSetting(V4L2_MT9M114_FADE_TO_BLACK, updated_settings.fade_to_black);
 }
 
@@ -283,13 +305,13 @@ bool ImageTranscriber::setControlSetting(unsigned int id, int value) {
                 std::endl;
             return false;
         }
-    counter++;
-    if(counter > 10)
-      {
-          std::cerr << "CAMERA::Warning::Timeout while setting a parameter."
-                    << std::endl;
-        return false;
-      }
+        counter++;
+        if(counter > 10)
+        {
+            std::cerr << "CAMERA::Warning::Timeout while setting a parameter."
+                      << std::endl;
+            return false;
+        }
     }
     return true;
 }
@@ -324,7 +346,11 @@ void ImageTranscriber::assertCameraSettings() {
     int sharpness = getControlSetting(V4L2_CID_SHARPNESS);
     int gain = getControlSetting(V4L2_CID_GAIN);
     int exposure = getControlSetting(V4L2_CID_EXPOSURE);
+#ifdef NAOQI_2
+    int whitebalance = getControlSetting(V4L2_CID_WHITE_BALANCE_TEMPERATURE);
+#else
     int whitebalance = getControlSetting(V4L2_CID_DO_WHITE_BALANCE);
+#endif
     int fade = getControlSetting(V4L2_MT9M114_FADE_TO_BLACK);
 
     //std::cerr << "Done checking driver settings" << std::endl;
@@ -473,7 +499,7 @@ messages::YUVImage ImageTranscriber::getNextImage()
     return messages::YUVImage(new TranscriberBuffer(mem[requestBuff.index],
                                                     fd,
                                                     requestBuff),
-                              2*WIDTH, HEIGHT, 2*WIDTH);
+                                                    2*WIDTH, HEIGHT, 2*WIDTH);
 }
 
 TranscriberModule::TranscriberModule(ImageTranscriber& trans)

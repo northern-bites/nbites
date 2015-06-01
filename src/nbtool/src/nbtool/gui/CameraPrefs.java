@@ -13,8 +13,6 @@ import java.io.IOException;
 
 import nbtool.data.*;
 import nbtool.gui.utilitypanes.*;
-import nbtool.util.N.*;
-import nbtool.util.P.*;
 
 public class CameraPrefs extends JPanel {
 	private static final long serialVersionUID = 1L;

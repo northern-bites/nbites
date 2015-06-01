@@ -61,38 +61,42 @@ sudo apt-mark hold $OLDPACKAGES
 sudo apt-get -y install $PACKAGES
 
 naoqi_version=$1
-robocup=http://robocup.bowdoin.edu/public
+server=dover
+robocup=/mnt/research/robocup
 nbites_dir=$PWD/../..
 lib_dir=$nbites_dir/lib
 
 naoqi=naoqi-sdk-$naoqi_version-linux32.tar.gz
 atom=nbites-atom-toolchain-$naoqi_version.tar.gz
 
-naoqi_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$naoqi
-atom_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$atom
+software=$robocup/web.old/files/software/nao/NaoQi/$naoqi_version
+naoqi_robocup=$robocup/web.old/files/software/nao/NaoQi/$naoqi_version/$naoqi
+atom_robocup=$robocup/web.old/files/software/nao/NaoQi/$naoqi_version/$atom
 
 naoqi_local=$lib_dir/naoqi-sdk-$naoqi_version-linux32
 atom_local=$lib_dir/atomtoolchain
 
 echo ""
-echo "Downloading and unpacking NBites files."
+echo "Downloading NaoQi & Atom toolchain"
+echo "Please enter your Bowdoin username"
+read username
 
-echo "Downloading NaoQi"
 mkdir -p $lib_dir
-wget $naoqi_robocup -P $lib_dir/
+scp -r $username@$server:$software $lib_dir
+#wget $naoqi_robocup -P $lib_dir/
 
-echo "Downloading Atom toolchain"
-wget $atom_robocup -P $lib_dir/
+# echo "Downloading Atom toolchain"
+# wget $atom_robocup -P $lib_dir/
 
 echo "Unpacking NaoQi"
 
 pushd $lib_dir
-tar -xzf $naoqi
-rm $naoqi
+tar -xzf $naoqi_version/$naoqi -C .
 
 mkdir $atom_local
-tar -xzf $atom -C $atom_local --strip-components 1
-rm $atom
+tar -xzf $naoqi_version/$atom -C $atom_local --strip-components 1
+
+rm -r $naoqi_version
 
 popd
 

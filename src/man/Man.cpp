@@ -197,6 +197,8 @@ namespace man {
          That being said, should probably not init (i.e. start threads)
          if not necessary.
          */
+            
+            
 #ifdef NAOQI_2
             nblog::HOST_TYPE = nblog::V5ROBOT;
 #else

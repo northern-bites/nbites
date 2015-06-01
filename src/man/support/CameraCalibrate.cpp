@@ -49,8 +49,8 @@ void CameraCalibrate::UpdateByName(std::string name)
     } else if (name == "zoe") {
         paramsTop[ROLL] = -0.03f;
         paramsTop[PITCH] = 0.0f;
-        paramsBottom[ROLL] = -0.01f;
-        paramsBottom[PITCH] = -0.01f;
+        paramsBottom[ROLL] = -0.03f;
+        paramsBottom[PITCH] = 0.03f;
     } else if (name == "jayne") {
         paramsTop[ROLL] = 0.03f;
         paramsTop[PITCH] = 0.02f;
@@ -82,25 +82,35 @@ void CameraCalibrate::UpdateByName(std::string name)
         paramsBottom[ROLL] = 0.0f;
         paramsBottom[PITCH] = 0.09f;
     } else if (name == "ringo") {
-        paramsTop[ROLL] = 0.0f;
-        paramsTop[PITCH] = 0.0f;
-        paramsBottom[ROLL] = 0.0f;
-        paramsBottom[PITCH] = 0.0f;
+        paramsTop[ROLL] = 0.01f;
+        paramsTop[PITCH] = 0.08f;
+        paramsBottom[ROLL] = -0.03f;
+        paramsBottom[PITCH] = -.01f;
     } else if (name == "ozzy") {
-        paramsTop[ROLL] = 0.04f;
-        paramsTop[PITCH] = 0.04f;
-        paramsBottom[ROLL] = 0.03f;
-        paramsBottom[PITCH] = -0.02f;
+        paramsTop[ROLL] = 0.02f;
+        paramsTop[PITCH] = 0.05f;
+        paramsBottom[ROLL] = -0.02f;
+        paramsBottom[PITCH] = -0.00f;
     } else if (name == "avril") {
-        paramsTop[ROLL] = 0.0f;
-        paramsTop[PITCH] = 0.04f;
-        paramsBottom[ROLL] = -0.07f;
-        paramsBottom[PITCH] = -0.02f;
+        paramsTop[ROLL] = 0.02f;
+        paramsTop[PITCH] = -.08f;
+        paramsBottom[ROLL] = -0.02f;
+        paramsBottom[PITCH] = -0.01f;
     } else if (name == "beyonce") {
-        paramsTop[ROLL] = 0.0f;
-        paramsTop[PITCH] = 0.0f;
+        paramsTop[ROLL] = 0.02f;
+        paramsTop[PITCH] = 0.05f;
         paramsBottom[ROLL] = 0.0f;
         paramsBottom[PITCH] = 0.0f;
+    } else if (name == "batman") {
+        paramsTop[ROLL] = -0.02f;
+        paramsTop[PITCH] = 0.02f;
+        paramsBottom[ROLL] = -0.02f;
+        paramsBottom[PITCH] = 0.03f;
+    } else if (name == "she-hulk") {
+        paramsTop[ROLL] = 0.01f;
+        paramsTop[PITCH] = 0.04f;
+        paramsBottom[ROLL] = -0.05f;
+        paramsBottom[PITCH] = 0.03f;
     }
     UpdateWithParams(paramsTop, paramsBottom);
 }

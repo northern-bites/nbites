@@ -7,6 +7,7 @@ import ChaseBallTransitions as transitions
 import RoleConstants as roleConstants
 from math import copysign, fabs
 from objects import RelRobotLocation
+from ..navigator import Navigator
 from ..util import *
 
 DEBUG_PENALTY_STATES = False
@@ -110,16 +111,25 @@ def afterPenalty(player):
         player.post_r_sightings = 0
         player.reset_loc = 0
 
-    if fabs(player.goal_right) > 5:
+    if fabs(player.goal_right) > 5 or player.stateTime > 15:
         if DEBUG_PENALTY_STATES:
             print "Consensus reached! Resetting loc. Is the goal to our right? " + str(player.goal_right < 0)
         # Yes, when goal_right is less than 0, our goal is to our right.
         # It seems counter intuitive, but that's how it works. -Josh Z
         player.brain.resetLocalizationFromPenalty(player.goal_right < 0)
         if not roleConstants.isGoalie(player.role):
-            return player.goNow('determineRole')
+            return player.goNow('walkOut')
         return player.goLater(player.gameState)
 
+    return player.stay()
+
+@superState('gameControllerResponder')
+def walkOut(player):
+    player.brain.nav.destinationWalkTo(RelRobotLocation(100, 0, 0),
+                                       Navigator.BRISK_SPEED)
+    
+    if player.stateTime > 5:
+        return player.goNow('determineRole')
     return player.stay()
 
 @superState('gameControllerResponder')
@@ -139,13 +149,23 @@ def determineRole(player):
 
     for i in range(4):
         if openSpaces[i] and roleConstants.canRoleSwitchTo(i+2):
-            roleConstants.setRoleConstants(player, i+2)
+            # US Open hack
+            if player.brain.game:
+                oppTeam = player.brain.game.team(1).team_number
+            else:
+                oppTeam = -1
+            roleConstants.setRoleConstants(player, i+2, oppTeam)
             return player.goLater(player.gameState)
         elif openSpaces[i]:
             position = i+2
 
     if position == 0:
         print "Came out of penalty and found no open spaces!!!"
-    roleConstants.setRoleConstants(player, position)
+    # US Open hack
+    if player.brain.game:
+        oppTeam = player.brain.game.team(1).team_number
+    else:
+        oppTeam = -1
+    roleConstants.setRoleConstants(player, i+2, oppTeam)
     return player.goLater(player.gameState)
 

@@ -5,6 +5,9 @@ file(GLOB PROTO_FILES
   RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
   "*.proto")
 
+find_package(Boost COMPONENTS python REQUIRED)
+include_directories( ${Boost_INCLUDE_DIR} )
+
 #protobuf compiler
 set(PROTOC_C_OUT_FLAG --cpp_out)
 

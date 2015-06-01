@@ -7,15 +7,13 @@ import javax.swing.*;
 
 import nbtool.data.*;
 import nbtool.util.*;
-import nbtool.util.N.EVENT;
-import nbtool.util.N.NListener;
 import nbtool.io.ControlIO;
 import nbtool.util.NBConstants.*;
 import messages.CameraParamsOuterClass;
 import messages.CameraParamsOuterClass.CameraParams;
 
 
-public class StreamingPanel extends JPanel implements ActionListener, NListener {
+public class StreamingPanel extends JPanel implements ActionListener {
 	
 	static final long serialVersionUID = 1L;
 
@@ -101,12 +99,6 @@ public class StreamingPanel extends JPanel implements ActionListener, NListener 
 			
 			tryStart(topCameraParams, bottomCameraParams);
 		}
-	}
-
-	@Override
-	public void notified(EVENT e, Object src, Object... args) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	private void tryStart(Integer[] topCameraParams, Integer[] bottomCameraParams) {

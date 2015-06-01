@@ -22,6 +22,11 @@ def switchRoles(player):
     """
     State to decide who on the team should become the new chaser and switch accordingly.
     """
-    roleConstants.setRoleConstants(player, player.openChaser)
+    # US Open Hack
+    if player.brain.game:
+        oppTeam = player.brain.game.team(1).team_number
+    else:
+        oppTeam = -1
+    roleConstants.setRoleConstants(player, player.openChaser, oppTeam)
 
     return player.goLater(player.gameState)

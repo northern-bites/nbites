@@ -85,6 +85,10 @@ namespace control {
         
         return 0;
     }
+
+    uint32_t cnc_setCameraParams(Log * arg) {
+        return 0;
+    }
     
     /*
      THIS IS WHERE YOU PUT NEW CONTROL FUNCTIONS!
@@ -96,7 +100,7 @@ namespace control {
         
         ret["test"] = &cnc_test;
         ret["setFlag"] = &cnc_setFlag;
-        //ret["setCameraParams"]
+        ret["setCameraParams"] = &cnc_setCameraParams;
         
         return ret;
     }
