@@ -17,6 +17,7 @@ import javax.swing.tree.TreePath;
 
 import nbtool.data.Log;
 import nbtool.data.Session;
+import nbtool.gui.logviews.misc.ErrorView;
 import nbtool.gui.logviews.misc.SessionView;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.utilitypanes.UtilityManager;
@@ -77,6 +78,15 @@ public class LogDisplayPanel extends JPanel implements Events.LogSelected, Event
 		views.removeAll();
 		
 		this.current = l;
+		
+		if (this.current.bytes == null) {
+			Logger.logf(Logger.ERROR, "Could not load log data: %s", l.toString());
+			ErrorView ev = new ErrorView();
+			ev.setLog(l);
+			views.addTab("error loading", ev);
+			return;
+		}
+		
 		for (int i = 0; i < list.length; ++i) {
 			Class<? extends ViewParent> ttype = list[i];
 
