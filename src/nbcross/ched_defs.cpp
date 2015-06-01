@@ -55,7 +55,7 @@ int ImageConverter_func() {
 
     // Create temp buffer and fill with yImage 
     uint8_t yBuf[yLength];
-    memcpy(yBuf, frontEnd->yImage().pixelAddress(0, 0), yLength);
+    memcpy(yBuf, frontEnd->yImage().pixelAddr(0, 0), yLength);
 
     // Convert to string and set log
     std::string yBuffer((const char*)yBuf, yLength);
@@ -141,6 +141,6 @@ int ImageConverter_func() {
     // rets.push_back(colorSegRet);
 
     // Done
-    printf("ImageConverter module ran! W: %d, H: %d\n", yImage->width(), yImage->height());
+    printf("ImageConverter module ran!");
     return 0;
 }
