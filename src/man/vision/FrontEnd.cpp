@@ -96,6 +96,10 @@ uint32_t
 {
   TickTimer timer;
 
+  width /= 2;
+  height /= 2;
+  pitch *= 2;
+
   // Ignore low three bits of width
   width &= ~7;
 

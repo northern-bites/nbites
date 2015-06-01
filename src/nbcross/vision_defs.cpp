@@ -16,7 +16,7 @@ int ImageConverter_func() {
     assert(args.size() == 1);
 
     printf("ImageConverter_func()\n");
-    printf("******* If you want to use a color table, define in nbcross/ched_defs.cpp *******\n");
+    printf("******* If you want to use a color table, define in nbcross/vision_defs.cpp *******\n");
 
 
     int width = 640;
@@ -29,13 +29,25 @@ int ImageConverter_func() {
     memcpy(buf, copy->data().data(), length);
     
     messages::YUVImage image(buf, width, height, pitch);
+    messages::YUVImage emptyImage;
+    messages::JointAngles emptyJoints;
+    messages::InertialState emptyInertials;
+
+    portals::Message<messages::YUVImage> emptyImageMessage(&emptyImage);
     portals::Message<messages::YUVImage> message(&image);
+    portals::Message<messages::JointAngles> emptyJointsMessage(&emptyJoints);
+    portals::Message<messages::InertialState> emptyInertialsMessage(&emptyInertials);
    // char tableAddrr[] = "/home/evanhoyt/nbites/data/tables/evanStation15V5.mtb";
     //man::image::ImageConverterModule module = man::image::ImageConverterModule(tableAddrr);
 
     man::vision::VisionModule module;
 
+
+    module.topIn.setMessage(emptyImageMessage);
     module.bottomIn.setMessage(message);
+    module.jointsIn.setMessage(emptyJointsMessage);
+    module.inertialsIn.setMessage(emptyInertialsMessage);
+
     module.run();
     man::vision::ImageFrontEnd* frontEnd = module.getFrontEnd();
 

@@ -19,11 +19,11 @@ VisionModule::VisionModule()
     houghLines = new HoughLineList(128);
     hough = new HoughSpace(320, 240);
 
-#ifdef USE_MMX
-    bool fast = true;
-#else
+//#ifdef USE_MMX
+   // bool fast = true;
+//#else
     bool fast = false;
-#endif
+//#endif
     frontEnd->fast(fast);
     edgeDetector->fast(fast);
     hough->fast(fast);
