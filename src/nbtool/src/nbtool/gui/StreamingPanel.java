@@ -120,11 +120,12 @@ public class StreamingPanel extends JPanel implements ActionListener, NListener 
 				.setSaturation(topCameraParams[5])
 				.setHue(topCameraParams[6])
 				.setSharpness(topCameraParams[7])
-				.setAutoWhiteBalance(topCameraParams[8])
-				.setExposure(topCameraParams[9])
-				.setGain(topCameraParams[10])
-				.setWhiteBalance(topCameraParams[11])
-				.setFadeToBlack(topCameraParams[12])
+				.setGamma(topCameraParams[8])
+				.setAutoWhiteBalance(topCameraParams[9])
+				.setExposure(topCameraParams[10])
+				.setGain(topCameraParams[11])
+				.setWhiteBalance(topCameraParams[12])
+				.setFadeToBlack(topCameraParams[13])
 				.build();
 		
 		CameraParams bottomCamera = CameraParams.newBuilder()
@@ -137,12 +138,15 @@ public class StreamingPanel extends JPanel implements ActionListener, NListener 
 				.setSaturation(bottomCameraParams[5])
 				.setHue(bottomCameraParams[6])
 				.setSharpness(bottomCameraParams[7])
-				.setAutoWhiteBalance(bottomCameraParams[8])
-				.setExposure(bottomCameraParams[9])
-				.setGain(bottomCameraParams[10])
-				.setWhiteBalance(bottomCameraParams[11])
-				.setFadeToBlack(bottomCameraParams[12])
+				.setGamma(bottomCameraParams[8])
+				.setAutoWhiteBalance(bottomCameraParams[9])
+				.setExposure(bottomCameraParams[10])
+				.setGain(bottomCameraParams[11])
+				.setWhiteBalance(bottomCameraParams[12])
+				.setFadeToBlack(bottomCameraParams[13])
 				.build();
+		
+		
 		
 	}
 	

@@ -99,47 +99,56 @@ public final class CameraParamsOuterClass {
     int getSharpness();
 
     /**
-     * <code>optional int32 autoWhiteBalance = 10;</code>
+     * <code>optional int32 gamma = 10;</code>
+     */
+    boolean hasGamma();
+    /**
+     * <code>optional int32 gamma = 10;</code>
+     */
+    int getGamma();
+
+    /**
+     * <code>optional int32 autoWhiteBalance = 11;</code>
      */
     boolean hasAutoWhiteBalance();
     /**
-     * <code>optional int32 autoWhiteBalance = 10;</code>
+     * <code>optional int32 autoWhiteBalance = 11;</code>
      */
     int getAutoWhiteBalance();
 
     /**
-     * <code>optional int32 exposure = 11;</code>
+     * <code>optional int32 exposure = 12;</code>
      */
     boolean hasExposure();
     /**
-     * <code>optional int32 exposure = 11;</code>
+     * <code>optional int32 exposure = 12;</code>
      */
     int getExposure();
 
     /**
-     * <code>optional int32 gain = 12;</code>
+     * <code>optional int32 gain = 13;</code>
      */
     boolean hasGain();
     /**
-     * <code>optional int32 gain = 12;</code>
+     * <code>optional int32 gain = 13;</code>
      */
     int getGain();
 
     /**
-     * <code>optional int32 whiteBalance = 13;</code>
+     * <code>optional int32 whiteBalance = 14;</code>
      */
     boolean hasWhiteBalance();
     /**
-     * <code>optional int32 whiteBalance = 13;</code>
+     * <code>optional int32 whiteBalance = 14;</code>
      */
     int getWhiteBalance();
 
     /**
-     * <code>optional int32 fadeToBlack = 14;</code>
+     * <code>optional int32 fadeToBlack = 15;</code>
      */
     boolean hasFadeToBlack();
     /**
-     * <code>optional int32 fadeToBlack = 14;</code>
+     * <code>optional int32 fadeToBlack = 15;</code>
      */
     int getFadeToBlack();
   }
@@ -243,26 +252,31 @@ public final class CameraParamsOuterClass {
             }
             case 80: {
               bitField0_ |= 0x00000200;
-              autoWhiteBalance_ = input.readInt32();
+              gamma_ = input.readInt32();
               break;
             }
             case 88: {
               bitField0_ |= 0x00000400;
-              exposure_ = input.readInt32();
+              autoWhiteBalance_ = input.readInt32();
               break;
             }
             case 96: {
               bitField0_ |= 0x00000800;
-              gain_ = input.readInt32();
+              exposure_ = input.readInt32();
               break;
             }
             case 104: {
               bitField0_ |= 0x00001000;
-              whiteBalance_ = input.readInt32();
+              gain_ = input.readInt32();
               break;
             }
             case 112: {
               bitField0_ |= 0x00002000;
+              whiteBalance_ = input.readInt32();
+              break;
+            }
+            case 120: {
+              bitField0_ |= 0x00004000;
               fadeToBlack_ = input.readInt32();
               break;
             }
@@ -468,76 +482,91 @@ public final class CameraParamsOuterClass {
       return sharpness_;
     }
 
-    public static final int AUTOWHITEBALANCE_FIELD_NUMBER = 10;
-    private int autoWhiteBalance_;
+    public static final int GAMMA_FIELD_NUMBER = 10;
+    private int gamma_;
     /**
-     * <code>optional int32 autoWhiteBalance = 10;</code>
+     * <code>optional int32 gamma = 10;</code>
      */
-    public boolean hasAutoWhiteBalance() {
+    public boolean hasGamma() {
       return ((bitField0_ & 0x00000200) == 0x00000200);
     }
     /**
-     * <code>optional int32 autoWhiteBalance = 10;</code>
+     * <code>optional int32 gamma = 10;</code>
+     */
+    public int getGamma() {
+      return gamma_;
+    }
+
+    public static final int AUTOWHITEBALANCE_FIELD_NUMBER = 11;
+    private int autoWhiteBalance_;
+    /**
+     * <code>optional int32 autoWhiteBalance = 11;</code>
+     */
+    public boolean hasAutoWhiteBalance() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>optional int32 autoWhiteBalance = 11;</code>
      */
     public int getAutoWhiteBalance() {
       return autoWhiteBalance_;
     }
 
-    public static final int EXPOSURE_FIELD_NUMBER = 11;
+    public static final int EXPOSURE_FIELD_NUMBER = 12;
     private int exposure_;
     /**
-     * <code>optional int32 exposure = 11;</code>
+     * <code>optional int32 exposure = 12;</code>
      */
     public boolean hasExposure() {
-      return ((bitField0_ & 0x00000400) == 0x00000400);
+      return ((bitField0_ & 0x00000800) == 0x00000800);
     }
     /**
-     * <code>optional int32 exposure = 11;</code>
+     * <code>optional int32 exposure = 12;</code>
      */
     public int getExposure() {
       return exposure_;
     }
 
-    public static final int GAIN_FIELD_NUMBER = 12;
+    public static final int GAIN_FIELD_NUMBER = 13;
     private int gain_;
     /**
-     * <code>optional int32 gain = 12;</code>
+     * <code>optional int32 gain = 13;</code>
      */
     public boolean hasGain() {
-      return ((bitField0_ & 0x00000800) == 0x00000800);
+      return ((bitField0_ & 0x00001000) == 0x00001000);
     }
     /**
-     * <code>optional int32 gain = 12;</code>
+     * <code>optional int32 gain = 13;</code>
      */
     public int getGain() {
       return gain_;
     }
 
-    public static final int WHITEBALANCE_FIELD_NUMBER = 13;
+    public static final int WHITEBALANCE_FIELD_NUMBER = 14;
     private int whiteBalance_;
     /**
-     * <code>optional int32 whiteBalance = 13;</code>
+     * <code>optional int32 whiteBalance = 14;</code>
      */
     public boolean hasWhiteBalance() {
-      return ((bitField0_ & 0x00001000) == 0x00001000);
+      return ((bitField0_ & 0x00002000) == 0x00002000);
     }
     /**
-     * <code>optional int32 whiteBalance = 13;</code>
+     * <code>optional int32 whiteBalance = 14;</code>
      */
     public int getWhiteBalance() {
       return whiteBalance_;
     }
 
-    public static final int FADETOBLACK_FIELD_NUMBER = 14;
+    public static final int FADETOBLACK_FIELD_NUMBER = 15;
     private int fadeToBlack_;
     /**
-     * <code>optional int32 fadeToBlack = 14;</code>
+     * <code>optional int32 fadeToBlack = 15;</code>
      */
     public boolean hasFadeToBlack() {
-      return ((bitField0_ & 0x00002000) == 0x00002000);
+      return ((bitField0_ & 0x00004000) == 0x00004000);
     }
     /**
-     * <code>optional int32 fadeToBlack = 14;</code>
+     * <code>optional int32 fadeToBlack = 15;</code>
      */
     public int getFadeToBlack() {
       return fadeToBlack_;
@@ -553,6 +582,7 @@ public final class CameraParamsOuterClass {
       saturation_ = 0;
       hue_ = 0;
       sharpness_ = 0;
+      gamma_ = 0;
       autoWhiteBalance_ = 0;
       exposure_ = 0;
       gain_ = 0;
@@ -600,19 +630,22 @@ public final class CameraParamsOuterClass {
         output.writeInt32(9, sharpness_);
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
-        output.writeInt32(10, autoWhiteBalance_);
+        output.writeInt32(10, gamma_);
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
-        output.writeInt32(11, exposure_);
+        output.writeInt32(11, autoWhiteBalance_);
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
-        output.writeInt32(12, gain_);
+        output.writeInt32(12, exposure_);
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
-        output.writeInt32(13, whiteBalance_);
+        output.writeInt32(13, gain_);
       }
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
-        output.writeInt32(14, fadeToBlack_);
+        output.writeInt32(14, whiteBalance_);
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        output.writeInt32(15, fadeToBlack_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -661,23 +694,27 @@ public final class CameraParamsOuterClass {
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(10, autoWhiteBalance_);
+          .computeInt32Size(10, gamma_);
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(11, exposure_);
+          .computeInt32Size(11, autoWhiteBalance_);
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(12, gain_);
+          .computeInt32Size(12, exposure_);
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(13, whiteBalance_);
+          .computeInt32Size(13, gain_);
       }
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(14, fadeToBlack_);
+          .computeInt32Size(14, whiteBalance_);
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(15, fadeToBlack_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -814,16 +851,18 @@ public final class CameraParamsOuterClass {
         bitField0_ = (bitField0_ & ~0x00000080);
         sharpness_ = 0;
         bitField0_ = (bitField0_ & ~0x00000100);
-        autoWhiteBalance_ = 0;
+        gamma_ = 0;
         bitField0_ = (bitField0_ & ~0x00000200);
-        exposure_ = 0;
+        autoWhiteBalance_ = 0;
         bitField0_ = (bitField0_ & ~0x00000400);
-        gain_ = 0;
+        exposure_ = 0;
         bitField0_ = (bitField0_ & ~0x00000800);
-        whiteBalance_ = 0;
+        gain_ = 0;
         bitField0_ = (bitField0_ & ~0x00001000);
-        fadeToBlack_ = 0;
+        whiteBalance_ = 0;
         bitField0_ = (bitField0_ & ~0x00002000);
+        fadeToBlack_ = 0;
+        bitField0_ = (bitField0_ & ~0x00004000);
         return this;
       }
 
@@ -891,21 +930,25 @@ public final class CameraParamsOuterClass {
         if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
           to_bitField0_ |= 0x00000200;
         }
-        result.autoWhiteBalance_ = autoWhiteBalance_;
+        result.gamma_ = gamma_;
         if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
           to_bitField0_ |= 0x00000400;
         }
-        result.exposure_ = exposure_;
+        result.autoWhiteBalance_ = autoWhiteBalance_;
         if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
           to_bitField0_ |= 0x00000800;
         }
-        result.gain_ = gain_;
+        result.exposure_ = exposure_;
         if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
           to_bitField0_ |= 0x00001000;
         }
-        result.whiteBalance_ = whiteBalance_;
+        result.gain_ = gain_;
         if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
           to_bitField0_ |= 0x00002000;
+        }
+        result.whiteBalance_ = whiteBalance_;
+        if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
+          to_bitField0_ |= 0x00004000;
         }
         result.fadeToBlack_ = fadeToBlack_;
         result.bitField0_ = to_bitField0_;
@@ -952,6 +995,9 @@ public final class CameraParamsOuterClass {
         }
         if (other.hasSharpness()) {
           setSharpness(other.getSharpness());
+        }
+        if (other.hasGamma()) {
+          setGamma(other.getGamma());
         }
         if (other.hasAutoWhiteBalance()) {
           setAutoWhiteBalance(other.getAutoWhiteBalance());
@@ -1327,33 +1373,65 @@ public final class CameraParamsOuterClass {
         return this;
       }
 
-      private int autoWhiteBalance_ ;
+      private int gamma_ ;
       /**
-       * <code>optional int32 autoWhiteBalance = 10;</code>
+       * <code>optional int32 gamma = 10;</code>
        */
-      public boolean hasAutoWhiteBalance() {
+      public boolean hasGamma() {
         return ((bitField0_ & 0x00000200) == 0x00000200);
       }
       /**
-       * <code>optional int32 autoWhiteBalance = 10;</code>
+       * <code>optional int32 gamma = 10;</code>
+       */
+      public int getGamma() {
+        return gamma_;
+      }
+      /**
+       * <code>optional int32 gamma = 10;</code>
+       */
+      public Builder setGamma(int value) {
+        bitField0_ |= 0x00000200;
+        gamma_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 gamma = 10;</code>
+       */
+      public Builder clearGamma() {
+        bitField0_ = (bitField0_ & ~0x00000200);
+        gamma_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int autoWhiteBalance_ ;
+      /**
+       * <code>optional int32 autoWhiteBalance = 11;</code>
+       */
+      public boolean hasAutoWhiteBalance() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      /**
+       * <code>optional int32 autoWhiteBalance = 11;</code>
        */
       public int getAutoWhiteBalance() {
         return autoWhiteBalance_;
       }
       /**
-       * <code>optional int32 autoWhiteBalance = 10;</code>
+       * <code>optional int32 autoWhiteBalance = 11;</code>
        */
       public Builder setAutoWhiteBalance(int value) {
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000400;
         autoWhiteBalance_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 autoWhiteBalance = 10;</code>
+       * <code>optional int32 autoWhiteBalance = 11;</code>
        */
       public Builder clearAutoWhiteBalance() {
-        bitField0_ = (bitField0_ & ~0x00000200);
+        bitField0_ = (bitField0_ & ~0x00000400);
         autoWhiteBalance_ = 0;
         onChanged();
         return this;
@@ -1361,31 +1439,31 @@ public final class CameraParamsOuterClass {
 
       private int exposure_ ;
       /**
-       * <code>optional int32 exposure = 11;</code>
+       * <code>optional int32 exposure = 12;</code>
        */
       public boolean hasExposure() {
-        return ((bitField0_ & 0x00000400) == 0x00000400);
+        return ((bitField0_ & 0x00000800) == 0x00000800);
       }
       /**
-       * <code>optional int32 exposure = 11;</code>
+       * <code>optional int32 exposure = 12;</code>
        */
       public int getExposure() {
         return exposure_;
       }
       /**
-       * <code>optional int32 exposure = 11;</code>
+       * <code>optional int32 exposure = 12;</code>
        */
       public Builder setExposure(int value) {
-        bitField0_ |= 0x00000400;
+        bitField0_ |= 0x00000800;
         exposure_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 exposure = 11;</code>
+       * <code>optional int32 exposure = 12;</code>
        */
       public Builder clearExposure() {
-        bitField0_ = (bitField0_ & ~0x00000400);
+        bitField0_ = (bitField0_ & ~0x00000800);
         exposure_ = 0;
         onChanged();
         return this;
@@ -1393,31 +1471,31 @@ public final class CameraParamsOuterClass {
 
       private int gain_ ;
       /**
-       * <code>optional int32 gain = 12;</code>
+       * <code>optional int32 gain = 13;</code>
        */
       public boolean hasGain() {
-        return ((bitField0_ & 0x00000800) == 0x00000800);
+        return ((bitField0_ & 0x00001000) == 0x00001000);
       }
       /**
-       * <code>optional int32 gain = 12;</code>
+       * <code>optional int32 gain = 13;</code>
        */
       public int getGain() {
         return gain_;
       }
       /**
-       * <code>optional int32 gain = 12;</code>
+       * <code>optional int32 gain = 13;</code>
        */
       public Builder setGain(int value) {
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00001000;
         gain_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 gain = 12;</code>
+       * <code>optional int32 gain = 13;</code>
        */
       public Builder clearGain() {
-        bitField0_ = (bitField0_ & ~0x00000800);
+        bitField0_ = (bitField0_ & ~0x00001000);
         gain_ = 0;
         onChanged();
         return this;
@@ -1425,31 +1503,31 @@ public final class CameraParamsOuterClass {
 
       private int whiteBalance_ ;
       /**
-       * <code>optional int32 whiteBalance = 13;</code>
+       * <code>optional int32 whiteBalance = 14;</code>
        */
       public boolean hasWhiteBalance() {
-        return ((bitField0_ & 0x00001000) == 0x00001000);
+        return ((bitField0_ & 0x00002000) == 0x00002000);
       }
       /**
-       * <code>optional int32 whiteBalance = 13;</code>
+       * <code>optional int32 whiteBalance = 14;</code>
        */
       public int getWhiteBalance() {
         return whiteBalance_;
       }
       /**
-       * <code>optional int32 whiteBalance = 13;</code>
+       * <code>optional int32 whiteBalance = 14;</code>
        */
       public Builder setWhiteBalance(int value) {
-        bitField0_ |= 0x00001000;
+        bitField0_ |= 0x00002000;
         whiteBalance_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 whiteBalance = 13;</code>
+       * <code>optional int32 whiteBalance = 14;</code>
        */
       public Builder clearWhiteBalance() {
-        bitField0_ = (bitField0_ & ~0x00001000);
+        bitField0_ = (bitField0_ & ~0x00002000);
         whiteBalance_ = 0;
         onChanged();
         return this;
@@ -1457,31 +1535,31 @@ public final class CameraParamsOuterClass {
 
       private int fadeToBlack_ ;
       /**
-       * <code>optional int32 fadeToBlack = 14;</code>
+       * <code>optional int32 fadeToBlack = 15;</code>
        */
       public boolean hasFadeToBlack() {
-        return ((bitField0_ & 0x00002000) == 0x00002000);
+        return ((bitField0_ & 0x00004000) == 0x00004000);
       }
       /**
-       * <code>optional int32 fadeToBlack = 14;</code>
+       * <code>optional int32 fadeToBlack = 15;</code>
        */
       public int getFadeToBlack() {
         return fadeToBlack_;
       }
       /**
-       * <code>optional int32 fadeToBlack = 14;</code>
+       * <code>optional int32 fadeToBlack = 15;</code>
        */
       public Builder setFadeToBlack(int value) {
-        bitField0_ |= 0x00002000;
+        bitField0_ |= 0x00004000;
         fadeToBlack_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 fadeToBlack = 14;</code>
+       * <code>optional int32 fadeToBlack = 15;</code>
        */
       public Builder clearFadeToBlack() {
-        bitField0_ = (bitField0_ & ~0x00002000);
+        bitField0_ = (bitField0_ & ~0x00004000);
         fadeToBlack_ = 0;
         onChanged();
         return this;
@@ -1512,14 +1590,15 @@ public final class CameraParamsOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\022CameraParams.proto\022\010messages\"\230\002\n\014Camer" +
+      "\n\022CameraParams.proto\022\010messages\"\247\002\n\014Camer" +
       "aParams\022\023\n\013whichCamera\030\001 \001(\t\022\016\n\006H_FLIP\030\002" +
       " \001(\005\022\016\n\006V_FLIP\030\003 \001(\005\022\024\n\014autoExposure\030\004 \001" +
       "(\005\022\022\n\nbrightness\030\005 \001(\005\022\020\n\010contrast\030\006 \001(\005" +
       "\022\022\n\nsaturation\030\007 \001(\005\022\013\n\003hue\030\010 \001(\005\022\021\n\tsha" +
-      "rpness\030\t \001(\005\022\030\n\020autoWhiteBalance\030\n \001(\005\022\020" +
-      "\n\010exposure\030\013 \001(\005\022\014\n\004gain\030\014 \001(\005\022\024\n\014whiteB" +
-      "alance\030\r \001(\005\022\023\n\013fadeToBlack\030\016 \001(\005"
+      "rpness\030\t \001(\005\022\r\n\005gamma\030\n \001(\005\022\030\n\020autoWhite" +
+      "Balance\030\013 \001(\005\022\020\n\010exposure\030\014 \001(\005\022\014\n\004gain\030" +
+      "\r \001(\005\022\024\n\014whiteBalance\030\016 \001(\005\022\023\n\013fadeToBla" +
+      "ck\030\017 \001(\005"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1538,7 +1617,7 @@ public final class CameraParamsOuterClass {
     internal_static_messages_CameraParams_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_CameraParams_descriptor,
-        new java.lang.String[] { "WhichCamera", "HFLIP", "VFLIP", "AutoExposure", "Brightness", "Contrast", "Saturation", "Hue", "Sharpness", "AutoWhiteBalance", "Exposure", "Gain", "WhiteBalance", "FadeToBlack", });
+        new java.lang.String[] { "WhichCamera", "HFLIP", "VFLIP", "AutoExposure", "Brightness", "Contrast", "Saturation", "Hue", "Sharpness", "Gamma", "AutoWhiteBalance", "Exposure", "Gain", "WhiteBalance", "FadeToBlack", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

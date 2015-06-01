@@ -32,6 +32,7 @@ public class CameraPrefs extends JPanel {
 		"Saturation",
 		"Hue",
 		"Sharpness",
+		"Gamma",
 		"Auto-Whitebalance",
 		"Exposure",
 		"Gain",
@@ -40,6 +41,7 @@ public class CameraPrefs extends JPanel {
 	};
 	//all params except for BackLight-Compensation.
 	JTextField[] fields = new JTextField[] {
+		new JTextField(4),
 		new JTextField(4),
 		new JTextField(4),
 		new JTextField(4),
@@ -96,11 +98,12 @@ public class CameraPrefs extends JPanel {
 			fields[5] = new JTextField("134",4);
 			fields[6] = new JTextField("0",4);
 			fields[7] = new JTextField("3",4);
-			fields[8] = new JTextField("0",4);
-			fields[9] = new JTextField("36",4);
-			fields[10] = new JTextField("53",4);
-			fields[11] = new JTextField("3300",4);
-			fields[12] = new JTextField("0",4);
+			fields[8] = new JTextField("220",4);
+			fields[9] = new JTextField("0",4);
+			fields[10] = new JTextField("36",4);
+			fields[11] = new JTextField("53",4);
+			fields[12] = new JTextField("3300",4);
+			fields[13] = new JTextField("0",4);
 		} else {
 			fields[0] = new JTextField("0",4);
 			fields[1] = new JTextField("0",4);
@@ -110,11 +113,12 @@ public class CameraPrefs extends JPanel {
 			fields[5] = new JTextField("122",4);
 			fields[6] = new JTextField("0",4);
 			fields[7] = new JTextField("3",4);
-			fields[8] = new JTextField("0",4);
-			fields[9] = new JTextField("35",4);
-			fields[10] = new JTextField("62",4);
-			fields[11] = new JTextField("3200",4);
-			fields[12] = new JTextField("0",4);
+			fields[8] = new JTextField("220",4);
+			fields[9] = new JTextField("0",4);
+			fields[10] = new JTextField("35",4);
+			fields[11] = new JTextField("62",4);
+			fields[12] = new JTextField("3200",4);
+			fields[13] = new JTextField("0",4);
 		}
 	}
 	
