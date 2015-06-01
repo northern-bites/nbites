@@ -75,7 +75,7 @@ BALL_ON_LEDS = ((BALL_LED, RED, NOW),)
 BALL_OFF_LEDS = ((BALL_LED, BLUE, NOW),)
 
 ##### Roles #####
-ROLE_ONE      = ((ROLE_LED, RED, NOW),)
+ROLE_ONE      = ((ROLE_LED, GREEN, NOW),)
 ROLE_TWO      = ((ROLE_LED, EYE_YELLOW, NOW),)
 ROLE_THREE    = ((ROLE_LED, CYAN, NOW),)
 ROLE_FOUR     = ((ROLE_LED, BLUE, NOW),)
