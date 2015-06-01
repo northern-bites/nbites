@@ -63,13 +63,6 @@ endif()
 include_directories( ${PROJECT_BINARY_DIR} )
 include_directories( ${CMAKE_SOURCE_DIR} )
 
-# Dependencies
-# find_package( Qt4 REQUIRED )
-
-# include( ${QT_USE_FILE} )
-# add_definitions( ${QT_DEFINITIONS} )
-
-# mark_as_advanced( QT_QMAKE_EXECUTABLE )
 
 find_package( PROTOBUF REQUIRED )
 include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
