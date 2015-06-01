@@ -1,3 +1,3 @@
 [submodule "tables"]
 	path = tables
-	url = robocup@robocup.bowdoin.edu:git/tables.git
+	url = robocup@dover:git/tables.git

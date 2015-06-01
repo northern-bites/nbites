@@ -15,6 +15,7 @@
 #include "InertialState.pb.h"
 #include "Images.h"
 #include "RoboGrams.h"
+#include "../ParamReader.h"
 
 namespace portals {
 
@@ -60,6 +61,25 @@ public:
     uint64_t getTimestamp() const;
     Camera::Type type() { return cameraType; }
 
+    void initSettings(); //one of the magical init methods
+
+    struct NewSettings {
+        bool hflip;
+        bool vflip;
+        bool auto_exposure;
+        int brightness;
+        int contrast;
+        int saturation;
+        int hue;
+        int sharpness;
+        bool auto_whitebalance;
+        int backlight_compensation;
+        int exposure;
+        int gain;
+        int white_balance;
+        bool fade_to_black;
+    };
+
 private:
     enum
     {
@@ -70,7 +90,6 @@ private:
     };
 
     // All of the (magical) init methods
-    void initSettings();
     void initOpenI2CAdapter();
     void initSelectCamera();
     void initOpenVideoDevice();
@@ -102,6 +121,8 @@ private:
     struct v4l2_buffer requestBuff;
 
     uint64_t timeStamp;
+
+    ParamReader param;
 };
 
 // Module that wraps Transcriber's functionality

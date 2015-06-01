@@ -1,0 +1,3 @@
+6.1
+
+Finished nbcross stuff and various log content helpers.

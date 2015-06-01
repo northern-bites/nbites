@@ -13,36 +13,37 @@ import java.io.IOException;
 import nbtool.data.Log;
 import nbtool.data.SExpr;
 import nbtool.io.CommonIO;
-import nbtool.util.U;
+import nbtool.util.Logger;
+import nbtool.util.Utility;
 
 public class NBLOG_v5_v6 {
 	public static void main(String[] args) throws IOException {
-		U.wf("Attempting to convert %d logs to version6 format...\n\n", args.length);
+		Logger.logf(Logger.INFO, "Attempting to convert %d logs to version6 format...\n\n", args.length);
 		long cindex = 0;
 		
 		for (String f : args) {
-			U.wf("file %s\n", f);
+			Logger.logf(Logger.INFO, "file %s\n", f);
 			
 			File lf = new File(f);
 			
 			if (!lf.exists() ) {
-				U.wf("\t... file does not exist.\n");
+				Logger.logf(Logger.INFO, "\t... file does not exist.\n");
 				continue;
 			}
 			
 			if (lf.isDirectory()) {
-				U.wf("\t... is directory.\n");
+				Logger.logf(Logger.INFO, "\t... is directory.\n");
 				continue;
 			}
 			
 			if (!f.endsWith(".nblog") ) {
-				U.wf("\t... file isn't nblog.\n");
+				Logger.logf(Logger.INFO, "\t... file isn't nblog.\n");
 				continue;
 			}
 			
 			long tlen = lf.length();
 			if (tlen < 8 ) { //min size
-				U.wf("\t... could not get reasonable value for file size.\n");
+				Logger.logf(Logger.INFO, "\t... could not get reasonable value for file size.\n");
 				continue;
 			}
 			
@@ -52,15 +53,16 @@ public class NBLOG_v5_v6 {
 				FileInputStream fis = new FileInputStream(lf);
 				dis = new DataInputStream(new BufferedInputStream(fis));
 
-				Log fnd = CommonIO.readLog(dis);
 				
-				if (U.is_v6Log(fnd)) {
-					U.wf("\tFile %s already v6 log!\n", f);
+				Log fnd = CommonIO.simpleReadLog(dis);
+				
+				if (fnd._olddesc_ != null && !Utility.isv6Description(fnd._olddesc_)) {
+					Logger.logf(Logger.INFO, "\tFile %s already v6 log!\n", f);
 					continue;
 				}
 				
-				if (!U.v6Convert(fnd)) {
-					U.wf("\tCOULD NOT CONVERT FILE %f!\n", f);
+				if (!Utility.v6Convert(fnd)) {
+					Logger.logf(Logger.INFO, "\tCOULD NOT CONVERT FILE %f!\n", f);
 					continue;
 				}
 				
@@ -72,11 +74,11 @@ public class NBLOG_v5_v6 {
 				CommonIO.writeLog(dos, fnd);
 				dos.close();
 				
-				U.wf("\tConverted to %s\n", n2);
+				Logger.logf(Logger.INFO, "\tConverted to %s\n", n2);
 
 			} catch (Exception e) {
 				e.printStackTrace();
-				U.wf("\tError loading file %f!\n", f);
+				Logger.logf(Logger.INFO, "\tError loading file %f!\n", f);
 			} finally {
 				if (dis != null)
 					dis.close();

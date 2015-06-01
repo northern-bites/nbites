@@ -4,7 +4,7 @@ BIN=$NBITES_DIR/build/nbtool
 
 rm -rf $BIN
 #might need to make build dir too on some systems
-mkdir $BIN
+mkdir -pv $BIN
 
 find ./src -name *.java > _tempFiles
 javac -d $BIN @_tempFiles

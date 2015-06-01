@@ -64,6 +64,10 @@ include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
 find_package( PythonLibs REQUIRED)
 include_directories( ${PYTHON_INCLUDE_DIR} )
 
+set(Boost_NO_BOOST_CMAKE true)
+find_package(Boost COMPONENTS python REQUIRED)
+include_directories( ${Boost_INCLUDE_DIR} )
+
 # Our core includes come from here
 include_directories( ${SHARE_DIR}/include )
 

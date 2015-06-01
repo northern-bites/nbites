@@ -89,6 +89,30 @@ boxBuffer = 100 # Used for the buffered box when approach ball is potentially
                 # going to transition out and into 'positionAtHome'
 
 ### HOME POSITIONS
+
+oddDefenderHomePenn = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
+                                    NogginConstants.MY_GOALBOX_BOTTOM_Y + 40,
+                                    0)
+
+evenDefenderHomePenn = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
+                                    NogginConstants.MY_GOALBOX_TOP_Y - 40,
+                                    0)
+
+oddDefenderHomeMiami = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 40,
+                                    NogginConstants.MY_GOALBOX_BOTTOM_Y + 40,
+                                    0)
+
+evenDefenderHomeMiami = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 40,
+                                    NogginConstants.MY_GOALBOX_TOP_Y - 40,
+                                    0)
+oddDefenderHomeTexas = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 75,
+                                    NogginConstants.MY_GOALBOX_BOTTOM_Y + 15,
+                                    0)
+
+evenDefenderHomeTexas = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 75,
+                                 NogginConstants.MY_GOALBOX_TOP_Y - 15,
+                                 0)
+
 oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 50,
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 0)
@@ -165,14 +189,37 @@ cherryPickerBox = (((0.5*NogginConstants.FIELD_GREEN_WIDTH + 0.25*NogginConstant
                     NogginConstants.FIELD_HEIGHT)
 
 ### SETS PLAYER STATE PER ROLE
-def setRoleConstants(player, role):
+### US Open Hack
+def setRoleConstants(player, role, oppTeam):
     player.role = role
+
+    PENN = 22
+    TEXAS = 1
+    MIAMI = 16
+
     if isLeftDefender(role):
-        player.homePosition = evenDefenderHome
+        if oppTeam == PENN:
+            player.homePosition = evenDefenderHomePenn
+        elif oppTeam == TEXAS:
+            player.homePosition = evenDefenderHomeTexas
+        elif oppTeam == MIAMI:
+            player.homePosition = evenDefenderHomeMiami
+        else:
+            player.homePosition = evenDefenderHome
+
         player.kickoffPosition = evenDefenderHome
         player.box = evenDefenderBox
         player.isKickingOff = False
     elif isRightDefender(role):
+        if oppTeam == PENN:
+            player.homePosition = oddDefenderHomePenn
+        elif oppTeam == TEXAS:
+            player.homePosition = oddDefenderHomeTexas
+        elif oppTeam == MIAMI:
+            player.homePosition = oddDefenderHomeMiami
+        else:
+            player.homePosition = oddDefenderHome
+
         player.homePosition = oddDefenderHome
         player.kickoffPosition = oddDefenderHome
         player.box = oddDefenderBox
