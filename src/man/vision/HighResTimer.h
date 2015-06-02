@@ -10,8 +10,8 @@ namespace vision {
 class HighResTimer {
 public:
     HighResTimer(std::string name_) : name(name_), start(std::chrono::high_resolution_clock::now()) {}
-    void lap() const;
-    void end(std::string name_);
+    double lap() const;
+    double end(std::string name_);
 
 private:
     std::string name;

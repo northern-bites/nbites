@@ -113,6 +113,7 @@ class TickTimer
       mov hi, edx
     }
 #else
+    // TODO fix
     asm("rdtsc;\n"
         "mov %%eax, %0;\n"
         "mov %%edx, %1;\n"

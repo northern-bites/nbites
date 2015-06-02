@@ -22,6 +22,7 @@ VisionModule::VisionModule()
     houghLines = new HoughLineList(128);
     hough = new HoughSpace(320, 240);
 
+    // TODO flag
     bool fast = true;
     frontEnd->fast(fast);
     edgeDetector->fast(fast);
@@ -38,6 +39,7 @@ VisionModule::~VisionModule()
     delete hough;
 }
 
+// TODO run on lowres bottom image
 void VisionModule::run_()
 {
     // Get messages from inPortals
@@ -47,11 +49,13 @@ void VisionModule::run_()
     inertialsIn.latch();
 
     // Setup
-    std::vector<const messages::YUVImage*> images { &topIn.message(), 
+    std::vector<const messages::YUVImage*> images { &topIn.message(),
                                                     &bottomIn.message() };
 
     // Time vision module
-    HighResTimer timer("Vision");
+    // TODO clean up timer
+    HighResTimer timer("Front end");
+    double times[4];
 
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
@@ -69,19 +73,31 @@ void VisionModule::run_()
         ImageLiteU16 yImage(frontEnd->yImage());
         ImageLiteU8 greenImage(frontEnd->greenImage());
 
+        times[0] = timer.end("Gradient");
+
         // Approximate brightness gradient
         edgeDetector->gradient(yImage);
+        
+        times[1] = timer.end("Edge detection");
 
         // Run edge detection
         edges->reset();
         edgeDetector->edgeDetect(greenImage, *edges);
 
+        times[2] = timer.end("Hough");
+
         // Run hough line detection
         houghLines->clear();
         hough->run(*edges, *houghLines);
+
+        times[3] = timer.end("Done");
     }
 
-    timer.lap();
+    std::cout << "Front end: " << times[0] << std::endl;
+    std::cout << "Gradient: " << times[1] << std::endl;
+    std::cout << "Edge detection: " << times[2] << std::endl;
+    std::cout << "Hough: " << times[3] << std::endl;
+
 }
 
 }

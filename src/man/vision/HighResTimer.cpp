@@ -5,19 +5,21 @@ namespace vision {
 
 using namespace std::chrono;
 
-void HighResTimer::lap() const 
+double HighResTimer::lap() const 
 {
     high_resolution_clock::time_point end = high_resolution_clock::now();
     duration<double> timeSpan = duration_cast<duration<double>>(end - start);
-    std::cout << name << " timed at: " << 1000*timeSpan.count() << " milliseconds." << std::endl;
+    return 1000*timeSpan.count();
 }
 
-void HighResTimer::end(std::string name_)
+double HighResTimer::end(std::string name_)
 {
-    lap();
+    double time = lap();
 
     name = name_;
     start = high_resolution_clock::now();
+
+    return time;
 }
 
 }
