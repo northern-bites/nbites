@@ -168,6 +168,14 @@ public class FileIO {
 			if (!Utility.isv6Description(desc)) {
 				logs[i] = new Log();
 				logs[i]._olddesc_ = desc;
+				
+				try {
+					FileIO.loadLog(logs[i], location);
+				} catch (IOException e) {
+					e.printStackTrace();
+					continue;
+				}
+				
 				assert(Utility.v6Convert(logs[i]));
 			} else {
 				logs[i] = new Log(desc, null);
