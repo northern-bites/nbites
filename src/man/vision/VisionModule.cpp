@@ -47,12 +47,12 @@ void VisionModule::run_()
     jointsIn.latch();
     inertialsIn.latch();
 
-    HighResTimer timer("Setup");
-
     // Setup
-    houghLines->clear();
     std::vector<const messages::YUVImage*> images { &topIn.message(), 
                                                     &bottomIn.message() };
+
+    // Time vision module
+    HighResTimer timer("Vision");
 
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
@@ -60,33 +60,25 @@ void VisionModule::run_()
         const messages::YUVImage* image = images[i];
 
         // Construct YuvLite object for use in vision system
-        YuvLite yuvLite(image->width(),
-                        image->height(),
+        YuvLite yuvLite(image->width() / 4,
+                        image->height() / 2,
                         image->rowPitch(),
                         image->pixelAddress(0, 0));
-
-        timer.end("Front end");
 
         // Run front end
         frontEnd->run(yuvLite, colorParams);
         ImageLiteU16 yImage(frontEnd->yImage());
         ImageLiteU8 greenImage(frontEnd->greenImage());
 
-        timer.end("Gradient");
-
         // Approximate brightness gradient
         edgeDetector->gradient(yImage);
-
-        timer.end("Edge detection");
 
         // Run edge detection
         edges->reset();
         edgeDetector->edgeDetect(greenImage, *edges);
 
-        timer.end("Hough");
-
         // Run hough line detection
-        // TODO duplicate lines in houghLines?
+        houghLines->clear();
         hough->run(*edges, *houghLines);
     }
 

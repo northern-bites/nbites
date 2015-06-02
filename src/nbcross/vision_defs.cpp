@@ -17,22 +17,30 @@ int ImageConverter_func() {
     assert(args.size() == 1);
 
     printf("ImageConverter_func()\n");
-    printf("******* If you want to use a color table, define in nbcross/ched_defs.cpp *******\n");
+    printf("******* If you want to use a color table, define in nbcross/vision_defs.cpp *******\n");
 
-    int width = 640;
-    int height = 480;
-    int pitch = 640;
-
-    Log * copy = new Log(args[0]);
+    Log* copy = new Log(args[0]);
     size_t length = copy->data().size();
     uint8_t buf[length];
     memcpy(buf, copy->data().data(), length);
     
-    messages::YUVImage image(buf, width, height, pitch);
+    messages::YUVImage image(buf, 2*640, 480, 2*640);
+    messages::YUVImage emptyImage;
+    messages::JointAngles emptyJoints;
+    messages::InertialState emptyInertials;
+
+    portals::Message<messages::YUVImage> emptyImageMessage(&emptyImage);
     portals::Message<messages::YUVImage> message(&image);
+    portals::Message<messages::JointAngles> emptyJointsMessage(&emptyJoints);
+    portals::Message<messages::InertialState> emptyInertialsMessage(&emptyInertials);
+
     man::vision::VisionModule module;
 
+    module.topIn.setMessage(emptyImageMessage);
     module.bottomIn.setMessage(message);
+    module.jointsIn.setMessage(emptyJointsMessage);
+    module.inertialsIn.setMessage(emptyInertialsMessage);
+
     module.run();
     man::vision::ImageFrontEnd* frontEnd = module.getFrontEnd();
 
@@ -42,7 +50,7 @@ int ImageConverter_func() {
     Log* yRet = new Log();
     int yLength = 240*320*2;
 
-    // Create temp buffer and fill with yImage 
+    // Create temp buffer and fill with yImage from FrontEnd
     uint8_t yBuf[yLength];
     memcpy(yBuf, frontEnd->yImage().pixelAddr(), yLength);
 
@@ -55,78 +63,66 @@ int ImageConverter_func() {
     // ---------------
     //   WHITE IMAGE
     // ---------------
-    // Log* whiteRet = new Log();
-    // int whiteLength = 240*320;
+    Log* whiteRet = new Log();
+    int whiteLength = 240*320;;
 
-    // // Get white image from module message
-    // const messages::PackedImage<unsigned char>* whiteImage = module.whiteImage.getMessage(true).get();
+    // Create temp buffer and fill with white image 
+    uint8_t whiteBuf[whiteLength];
+    memcpy(whiteBuf, frontEnd->whiteImage().pixelAddr(), whiteLength);
 
-    // // Create temp buffer and fill with white image 
-    // uint8_t whiteBuf[whiteLength];
-    // memcpy(whiteBuf, whiteImage->pixelAddress(0, 0), whiteLength);
+    // Convert to string and set log
+    std::string whiteBuffer((const char*)whiteBuf, whiteLength);
+    whiteRet->setData(whiteBuffer);
 
-    // // Convert to string and set log
-    // std::string whiteBuffer((const char*)whiteBuf, whiteLength);
-    // whiteRet->setData(whiteBuffer);
+    rets.push_back(whiteRet);
 
-    // rets.push_back(whiteRet);
+    // ---------------
+    //   GREEN IMAGE
+    // ---------------
+    Log* greenRet = new Log();
+    int greenLength = 240*320;
 
-    // // ---------------
-    // //   GREEN IMAGE
-    // // ---------------
-    // Log* greenRet = new Log();
-    // int greenLength = 240*320;
+    // Create temp buffer and fill with gree image 
+    uint8_t greenBuf[greenLength];
+    memcpy(greenBuf, frontEnd->greenImage().pixelAddr(), greenLength);
 
-    // // Get gree image from module message
-    // const messages::PackedImage<unsigned char>* greenImage = module.greenImage.getMessage(true).get();
+    // Convert to string and set log
+    std::string greenBuffer((const char*)greenBuf, greenLength);
+    greenRet->setData(greenBuffer);
 
-    // // Create temp buffer and fill with gree image 
-    // uint8_t greenBuf[greenLength];
-    // memcpy(greenBuf, greenImage->pixelAddress(0, 0), greenLength);
+    rets.push_back(greenRet);
 
-    // // Convert to string and set log
-    // std::string greenBuffer((const char*)greenBuf, greenLength);
-    // greenRet->setData(greenBuffer);
+    // ----------------
+    //   ORANGE IMAGE
+    // ----------------
+    Log* orangeRet = new Log();
+    int orangeLength = 240*320;
 
-    // rets.push_back(greenRet);
+    // Create temp buffer and fill with orange image 
+    uint8_t orangeBuf[orangeLength];
+    memcpy(orangeBuf, frontEnd->orangeImage().pixelAddr(), orangeLength);
 
-    // // ----------------
-    // //   ORANGE IMAGE
-    // // ----------------
-    // Log* orangeRet = new Log();
-    // int orangeLength = 240*320;
+    // Convert to string and set log
+    std::string orangeBuffer((const char*)orangeBuf, orangeLength);
+    orangeRet->setData(orangeBuffer);
 
-    // // Get orange image from module message
-    // const messages::PackedImage<unsigned char>* orangeImage = module.orangeImage.getMessage(true).get();
+    rets.push_back(orangeRet);
 
-    // // Create temp buffer and fill with orange image 
-    // uint8_t orangeBuf[orangeLength];
-    // memcpy(orangeBuf, orangeImage->pixelAddress(0, 0), orangeLength);
+    //-------------------
+    //  SEGMENTED IMAGE
+    //-------------------
+    Log* colorSegRet = new Log();
+    int colorSegLength = 240*320;
 
-    // // Convert to string and set log
-    // std::string orangeBuffer((const char*)orangeBuf, orangeLength);
-    // orangeRet->setData(orangeBuffer);
+    // Create temp buffer and fill with segmented image
+    uint8_t segBuf[colorSegLength];
+    memcpy(segBuf, frontEnd->colorImage().pixelAddr(), colorSegLength);
 
-    // rets.push_back(orangeRet);
+    // Convert to string and set log
+    std::string segBuffer((const char*)segBuf, colorSegLength);
+    colorSegRet->setData(segBuffer);
 
-    // //-------------------
-    // //  SEGMENTED IMAGE
-    // //-------------------
-    // Log* colorSegRet = new Log();
-    // int colorSegLength = 240*320;
-
-    // // Get segmented image from module message
-    // const messages::PackedImage<unsigned char>* colorSegImage = module.thrImage.getMessage(true).get();
-
-    // // Create temp buffer and fill with segmented image
-    // uint8_t segBuf[colorSegLength];
-    // memcpy(segBuf, colorSegImage->pixelAddress(0, 0), colorSegLength);
-
-    // // Convert to string and set log
-    // std::string segBuffer((const char*)segBuf, colorSegLength);
-    // colorSegRet->setData(segBuffer);
-
-    // rets.push_back(colorSegRet);
+    rets.push_back(colorSegRet);
 
     // Done
     return 0;
@@ -140,7 +136,7 @@ int Edges_func() {
     uint8_t buf[length];
     memcpy(buf, args[0]->data().data(), length);
 
-    messages::YUVImage image(buf, 640, 480, 640);
+    messages::YUVImage image(buf, 2*640, 480, 2*640);
     portals::Message<messages::YUVImage> imageMessage(&image);
 
     messages::YUVImage emptyImage;

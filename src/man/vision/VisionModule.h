@@ -31,6 +31,8 @@ protected:
     virtual void run_();
 
 private:
+    // TODO on stack
+    // TODO arrays of two
     Colors* colorParams;
     ImageFrontEnd* frontEnd;
     EdgeDetector* edgeDetector;
