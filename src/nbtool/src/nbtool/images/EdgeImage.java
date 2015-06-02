@@ -78,8 +78,6 @@ public class EdgeImage extends ImageParent {
 				int y = -dis.readInt() + 240;
 				int mag = dis.readInt();
 				int ang = dis.readInt();
-                System.out.println("x: " + x);
-                System.out.println("y: " + y);
 				
 				Color base = angleMap[ang];
 				ret.setRGB(x, y, base.getRGB());

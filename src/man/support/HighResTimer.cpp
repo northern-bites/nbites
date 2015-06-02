@@ -1,8 +1,5 @@
 #include "HighResTimer.h"
 
-namespace man {
-namespace vision {
-
 using namespace std::chrono;
 
 double HighResTimer::lap() const 
@@ -12,16 +9,9 @@ double HighResTimer::lap() const
     return 1000*timeSpan.count();
 }
 
-double HighResTimer::end(std::string name_)
+double HighResTimer::end()
 {
     double time = lap();
-
-    name = name_;
     start = high_resolution_clock::now();
-
     return time;
 }
-
-}
-}
-

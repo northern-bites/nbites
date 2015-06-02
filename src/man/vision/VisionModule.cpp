@@ -53,8 +53,7 @@ void VisionModule::run_()
                                                     &bottomIn.message() };
 
     // Time vision module
-    // TODO clean up timer
-    HighResTimer timer("Front end");
+    HighResTimer timer;
     double times[4];
 
     // Loop over top and bottom image and run line detection system
@@ -73,31 +72,30 @@ void VisionModule::run_()
         ImageLiteU16 yImage(frontEnd->yImage());
         ImageLiteU8 greenImage(frontEnd->greenImage());
 
-        times[0] = timer.end("Gradient");
+        times[0] = timer.end();
 
         // Approximate brightness gradient
         edgeDetector->gradient(yImage);
         
-        times[1] = timer.end("Edge detection");
+        times[1] = timer.end();
 
         // Run edge detection
         edges->reset();
         edgeDetector->edgeDetect(greenImage, *edges);
 
-        times[2] = timer.end("Hough");
+        times[2] = timer.end();
 
         // Run hough line detection
         houghLines->clear();
         hough->run(*edges, *houghLines);
 
-        times[3] = timer.end("Done");
+        times[3] = timer.end();
     }
 
     std::cout << "Front end: " << times[0] << std::endl;
     std::cout << "Gradient: " << times[1] << std::endl;
     std::cout << "Edge detection: " << times[2] << std::endl;
     std::cout << "Hough: " << times[3] << std::endl;
-
 }
 
 }

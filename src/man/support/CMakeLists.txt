@@ -16,6 +16,7 @@ set( COMMON_SRCS
   NogginStructs
   ColorParams.cpp
   RatingParams.cpp
+  HighResTimer.cpp
   )
 
 add_library(
