@@ -14,6 +14,7 @@ import nbtool.gui.logviews.misc.CrossBright;
 import nbtool.gui.logviews.misc.DefaultView;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.logviews.proto.ProtoBufView;
+import nbtool.gui.logviews.proto.ProtoBallView;
 
 public class NBConstants {
 	
@@ -67,7 +68,7 @@ public class NBConstants {
 		map.put("YUVImage", new Class[]{ImageView.class, ZoomImageView.class, CrossBright.class});
 		map.put("STATS", new Class[]{BotStatsView.class});
 		map.put(DEFAULT_S, new Class[]{DefaultView.class});
-		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
+		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class, ProtoBallView.class});
 		
 		return map;
 	}
