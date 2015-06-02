@@ -19,11 +19,17 @@ NaiveBallModule::NaiveBallModule() :
 {
     count = 0;
     velocityEst = 0.f;
+    xVelocityEst = 0.f;
+    yVelocityEst = 0.f;
+    ballDestX = 0.f;
+    ballDestY = 0.f;
     frameOffCount = 0;
     currentIndex = 0;
     direction = 0;
     buffSize = NUM_FRAMES;
     ballStateBuffer = new BallState[buffSize];
+
+    yIntercept = 0.f;
 }
 
 NaiveBallModule::~NaiveBallModule()
@@ -55,12 +61,15 @@ void NaiveBallModule::run_()
         naiveCheck();
     }
 
-    // printf("velocity: %f\n", velocityEst);
-    // if (direction == -1) {printf("going LEFT\n"); }
-    // else if (direction == 1) {printf("going RIGHT\n"); }
+    printf("Velocity: %f\n", velocityEst);
+    printf("yIntercept: %f\n", yIntercept);
+    checkIfStationary() ? printf("Stationary\n") : printf("moving\n");
+    (direction < 0) ? printf("GOING LEFT\n") : printf("going right\n");
 
     portals::Message<messages::NaiveBall> naiveBallMessage(0);
     naiveBallMessage.get()->set_velocity(velocityEst);
+    naiveBallMessage.get()->set_stationary(checkIfStationary());
+    naiveBallMessage.get()->set_yIntercept(yIntercept);
     naiveBallOutput.setMessage(naiveBallMessage);
 
 }
@@ -96,15 +105,68 @@ void NaiveBallModule::naiveCheck()
 
     BallState start_avgs = avgFrames(startIndex);
     BallState end_avgs = avgFrames(endIndex);
-    float dist = calcSumSquaresSQRT((end_avgs.rel_x - start_avgs.rel_x), (end_avgs.rel_y - start_avgs.rel_y));
-    float bear = end_avgs.bearing - start_avgs.bearing;
-    printf("bearing: %f\n", bear);
-    if (bear < 0.0) { direction = 1; }
-    else if (bear > 0.0) {direction = -1; }
-    velocityEst = (direction * dist / 1.f) * ALPHA + velocityEst * (1-ALPHA);
-    // velocityEst = (dist / 1.f);
-    // TODO possibly take into account (possibly as in probably) previous estimates
+    xVelocityEst = end_avgs.rel_x - start_avgs.rel_x;
+    yVelocityEst = end_avgs.rel_y - start_avgs.rel_y;
 
+    float dist = calcSumSquaresSQRT((xVelocityEst), (yVelocityEst));
+    float bearChange = end_avgs.bearing - start_avgs.bearing;
+
+    if (bearChange < 0.0) { direction = 1; }
+    else if (bearChange > 0.0) {direction = -1; }
+    velocityEst = (direction * dist / 1.f) * ALPHA + velocityEst * (1-ALPHA);
+
+    if (xVelocityEst < 0.f && !checkIfStationary()) { naivePredict(); }
+
+
+    // velocityEst = (dist / 1.f);
+    // TODO possibly take into account (possibly -as in probably) previous estimates
+
+}
+
+void NaiveBallModule::naivePredict(NaiveBallModule::BallState b)
+{
+    // predict at what y position the ball will hit the robot's x==0
+    float x = b.rel_x;
+    float y = b.rel_y;
+    float x_dest = 5.f; // want to see when ball is at 0 TODO probably do something higher
+
+    float t = (x_dest - x) / xVelocityEst; // calculate time until ball is at dest
+
+    yIntercept = y + t * yVelocityEst;
+    printf("I think my yIntercept is: %f\n", yIntercept);
+
+    // if(stationary)
+    // {
+    //     relXDest = x(0);
+    //     relyIntercept = x(1);
+    // }
+    // else // moving
+    // {
+    //     float speed = getSpeed();
+
+    //     //Calculate time until stop
+    //     float timeToStop = std::abs(speed / params.ballFriction);
+
+    //     //Calculate deceleration in each direction
+    //     float decelX = (x(2)/speed) * params.ballFriction;
+    //     float decelY = (x(3)/speed) * params.ballFriction;
+
+    //     // Calculate end position
+    //     relXDest = x(0) + x(2)*timeToStop + .5f*decelX*timeToStop*timeToStop;
+    //     relyIntercept = x(1) + x(3)*timeToStop + .5f*decelY*timeToStop*timeToStop;
+
+    //     //Calculate the time until intersects with robots y axis
+    //     float timeToIntersect = NBMath::getLargestMagRoot(x(0),x(2),.5f*decelX);
+    //     // Use quadratic :(
+    //     relYIntersectDest = x(1) + x(3)*timeToStop + .5f*decelY*timeToStop*timeToStop;
+    // }
+
+}
+
+bool NaiveBallModule::checkIfStationary()
+{
+    if (xVelocityEst < STATIONARY_THRESHOLD && yVelocityEst < STATIONARY_THRESHOLD) { return true; }
+    return false;
 }
 
 float NaiveBallModule::calcSumSquaresSQRT(float a, float b)

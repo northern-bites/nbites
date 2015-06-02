@@ -5274,6 +5274,559 @@ public final class BallModel {
     // @@protoc_insertion_point(class_scope:messages.SharedBall)
   }
 
+  public interface NaiveBallOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:messages.NaiveBall)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional float velocity = 1;</code>
+     */
+    boolean hasVelocity();
+    /**
+     * <code>optional float velocity = 1;</code>
+     */
+    float getVelocity();
+
+    /**
+     * <code>optional bool stationary = 2;</code>
+     */
+    boolean hasStationary();
+    /**
+     * <code>optional bool stationary = 2;</code>
+     */
+    boolean getStationary();
+
+    /**
+     * <code>optional float yIntercept = 3;</code>
+     */
+    boolean hasYIntercept();
+    /**
+     * <code>optional float yIntercept = 3;</code>
+     */
+    float getYIntercept();
+  }
+  /**
+   * Protobuf type {@code messages.NaiveBall}
+   */
+  public static final class NaiveBall extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:messages.NaiveBall)
+      NaiveBallOrBuilder {
+    // Use NaiveBall.newBuilder() to construct.
+    private NaiveBall(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private NaiveBall(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final NaiveBall defaultInstance;
+    public static NaiveBall getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public NaiveBall getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private NaiveBall(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 13: {
+              bitField0_ |= 0x00000001;
+              velocity_ = input.readFloat();
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              stationary_ = input.readBool();
+              break;
+            }
+            case 29: {
+              bitField0_ |= 0x00000004;
+              yIntercept_ = input.readFloat();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return messages.BallModel.internal_static_messages_NaiveBall_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return messages.BallModel.internal_static_messages_NaiveBall_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              messages.BallModel.NaiveBall.class, messages.BallModel.NaiveBall.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<NaiveBall> PARSER =
+        new com.google.protobuf.AbstractParser<NaiveBall>() {
+      public NaiveBall parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new NaiveBall(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<NaiveBall> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    public static final int VELOCITY_FIELD_NUMBER = 1;
+    private float velocity_;
+    /**
+     * <code>optional float velocity = 1;</code>
+     */
+    public boolean hasVelocity() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional float velocity = 1;</code>
+     */
+    public float getVelocity() {
+      return velocity_;
+    }
+
+    public static final int STATIONARY_FIELD_NUMBER = 2;
+    private boolean stationary_;
+    /**
+     * <code>optional bool stationary = 2;</code>
+     */
+    public boolean hasStationary() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional bool stationary = 2;</code>
+     */
+    public boolean getStationary() {
+      return stationary_;
+    }
+
+    public static final int YINTERCEPT_FIELD_NUMBER = 3;
+    private float yIntercept_;
+    /**
+     * <code>optional float yIntercept = 3;</code>
+     */
+    public boolean hasYIntercept() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional float yIntercept = 3;</code>
+     */
+    public float getYIntercept() {
+      return yIntercept_;
+    }
+
+    private void initFields() {
+      velocity_ = 0F;
+      stationary_ = false;
+      yIntercept_ = 0F;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeFloat(1, velocity_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBool(2, stationary_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeFloat(3, yIntercept_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(1, velocity_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(2, stationary_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(3, yIntercept_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static messages.BallModel.NaiveBall parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static messages.BallModel.NaiveBall parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static messages.BallModel.NaiveBall parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static messages.BallModel.NaiveBall parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static messages.BallModel.NaiveBall parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static messages.BallModel.NaiveBall parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static messages.BallModel.NaiveBall parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static messages.BallModel.NaiveBall parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static messages.BallModel.NaiveBall parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static messages.BallModel.NaiveBall parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(messages.BallModel.NaiveBall prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code messages.NaiveBall}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:messages.NaiveBall)
+        messages.BallModel.NaiveBallOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return messages.BallModel.internal_static_messages_NaiveBall_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return messages.BallModel.internal_static_messages_NaiveBall_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                messages.BallModel.NaiveBall.class, messages.BallModel.NaiveBall.Builder.class);
+      }
+
+      // Construct using messages.BallModel.NaiveBall.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        velocity_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        stationary_ = false;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        yIntercept_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return messages.BallModel.internal_static_messages_NaiveBall_descriptor;
+      }
+
+      public messages.BallModel.NaiveBall getDefaultInstanceForType() {
+        return messages.BallModel.NaiveBall.getDefaultInstance();
+      }
+
+      public messages.BallModel.NaiveBall build() {
+        messages.BallModel.NaiveBall result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public messages.BallModel.NaiveBall buildPartial() {
+        messages.BallModel.NaiveBall result = new messages.BallModel.NaiveBall(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.velocity_ = velocity_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.stationary_ = stationary_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.yIntercept_ = yIntercept_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof messages.BallModel.NaiveBall) {
+          return mergeFrom((messages.BallModel.NaiveBall)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(messages.BallModel.NaiveBall other) {
+        if (other == messages.BallModel.NaiveBall.getDefaultInstance()) return this;
+        if (other.hasVelocity()) {
+          setVelocity(other.getVelocity());
+        }
+        if (other.hasStationary()) {
+          setStationary(other.getStationary());
+        }
+        if (other.hasYIntercept()) {
+          setYIntercept(other.getYIntercept());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        messages.BallModel.NaiveBall parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (messages.BallModel.NaiveBall) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private float velocity_ ;
+      /**
+       * <code>optional float velocity = 1;</code>
+       */
+      public boolean hasVelocity() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional float velocity = 1;</code>
+       */
+      public float getVelocity() {
+        return velocity_;
+      }
+      /**
+       * <code>optional float velocity = 1;</code>
+       */
+      public Builder setVelocity(float value) {
+        bitField0_ |= 0x00000001;
+        velocity_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float velocity = 1;</code>
+       */
+      public Builder clearVelocity() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        velocity_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private boolean stationary_ ;
+      /**
+       * <code>optional bool stationary = 2;</code>
+       */
+      public boolean hasStationary() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional bool stationary = 2;</code>
+       */
+      public boolean getStationary() {
+        return stationary_;
+      }
+      /**
+       * <code>optional bool stationary = 2;</code>
+       */
+      public Builder setStationary(boolean value) {
+        bitField0_ |= 0x00000002;
+        stationary_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool stationary = 2;</code>
+       */
+      public Builder clearStationary() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        stationary_ = false;
+        onChanged();
+        return this;
+      }
+
+      private float yIntercept_ ;
+      /**
+       * <code>optional float yIntercept = 3;</code>
+       */
+      public boolean hasYIntercept() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional float yIntercept = 3;</code>
+       */
+      public float getYIntercept() {
+        return yIntercept_;
+      }
+      /**
+       * <code>optional float yIntercept = 3;</code>
+       */
+      public Builder setYIntercept(float value) {
+        bitField0_ |= 0x00000004;
+        yIntercept_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float yIntercept = 3;</code>
+       */
+      public Builder clearYIntercept() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        yIntercept_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:messages.NaiveBall)
+    }
+
+    static {
+      defaultInstance = new NaiveBall(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:messages.NaiveBall)
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_VisionBall_descriptor;
   private static
@@ -5289,6 +5842,11 @@ public final class BallModel {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_SharedBall_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_messages_NaiveBall_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_messages_NaiveBall_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -5324,7 +5882,9 @@ public final class BallModel {
       "bearing\030\033 \001(\002\022\021\n\tmov_vel_x\030\034 \001(\002\022\021\n\tmov_" +
       "vel_y\030\035 \001(\002\022\021\n\tmov_speed\030\036 \001(\002\"H\n\nShared" +
       "Ball\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\022\017\n\007ball_on\030\003 " +
-      "\001(\010\022\023\n\013reliability\030\004 \001(\005"
+      "\001(\010\022\023\n\013reliability\030\004 \001(\005\"E\n\tNaiveBall\022\020\n" +
+      "\010velocity\030\001 \001(\002\022\022\n\nstationary\030\002 \001(\010\022\022\n\ny" +
+      "Intercept\030\003 \001(\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -5356,6 +5916,12 @@ public final class BallModel {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_SharedBall_descriptor,
         new java.lang.String[] { "X", "Y", "BallOn", "Reliability", });
+    internal_static_messages_NaiveBall_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_messages_NaiveBall_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_NaiveBall_descriptor,
+        new java.lang.String[] { "Velocity", "Stationary", "YIntercept", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
