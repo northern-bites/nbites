@@ -13,14 +13,11 @@
 using nblog::Log;
 using nblog::SExpr;
 
-// TODO using namespace man::vision
-
 int ImageConverter_func() {
     assert(args.size() == 1);
 
     printf("ImageConverter_func()\n");
     printf("******* If you want to use a color table, define in nbcross/ched_defs.cpp *******\n");
-
 
     int width = 640;
     int height = 480;
@@ -33,9 +30,6 @@ int ImageConverter_func() {
     
     messages::YUVImage image(buf, width, height, pitch);
     portals::Message<messages::YUVImage> message(&image);
-   // char tableAddrr[] = "/home/evanhoyt/nbites/data/tables/evanStation15V5.mtb";
-    //man::image::ImageConverterModule module = man::image::ImageConverterModule(tableAddrr);
-
     man::vision::VisionModule module;
 
     module.bottomIn.setMessage(message);
@@ -48,9 +42,6 @@ int ImageConverter_func() {
     Log* yRet = new Log();
     int yLength = 240*320*2;
 
-    // Get yImage from module message
-   // const messages::PackedImage<short unsigned int>* yImage = module.yImage.getMessage(true).get();
-
     // Create temp buffer and fill with yImage 
     uint8_t yBuf[yLength];
     memcpy(yBuf, frontEnd->yImage().pixelAddr(), yLength);
@@ -60,7 +51,6 @@ int ImageConverter_func() {
     yRet->setData(yBuffer);
 
     rets.push_back(yRet);
-
 
     // ---------------
     //   WHITE IMAGE
@@ -178,10 +168,8 @@ int Edges_func() {
     man::vision::AngleBinsIterator<man::vision::Edge> abi(*edgeList);
     for (const man::vision::Edge* e = *abi; e; e = *++abi) {
         uint32_t x = htonl(e->x());
-        std::cout << "x: " << e->x() << std::endl;
         data.append((const char*) &x, 4);
         uint32_t y = htonl(e->y());
-        std::cout << "y: " << e->y() << std::endl;
         data.append((const char*) &y, 4);
         uint32_t mag = htonl(e->mag());
         data.append((const char*) &mag, 4);

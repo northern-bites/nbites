@@ -13,7 +13,7 @@
  multiPhase  = 1 # enable two-phase processing (significant improvement)
  ntStore     = 0 # enable non-temporal stores, only for Y values in multiPhase mode (unclear improvement)
  prefetchSrc = 1 # enable prefetching (significant improvement)
- colorTable  = 1 # enable color table lookup
+ colorTable  = 0 # enable color table lookup
 
 #// ***************************
 #// *                         *

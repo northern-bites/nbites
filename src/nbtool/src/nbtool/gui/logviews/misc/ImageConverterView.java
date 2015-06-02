@@ -69,20 +69,30 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
 
     @Override
     public void ioReceived(IOInstance inst, int ret, Log... out) {
-        Y16image yImg = new Y16image(320, 240, out[0].bytes);
-        this.yImage = yImg.toBufferedImage();
+        if (out.length > 0) {
+            Y16image yImg = new Y16image(320, 240, out[0].bytes);
+            this.yImage = yImg.toBufferedImage();
+        }
 
-        Y8image pixelImg = new Y8image(320, 240, out[1].bytes);
-        this.whiteImage = pixelImg.toBufferedImage();
+        if (out.length > 1) {
+            Y8image white8 = new Y8image(320, 240, out[1].bytes);
+            this.whiteImage = white8.toBufferedImage();
+        }
 
-        pixelImg = new Y8image(320, 240, out[2].bytes);
-        this.greenImage = pixelImg.toBufferedImage();
+        if (out.length > 2) {
+            Y8image green8 = new Y8image(320, 240, out[2].bytes);
+            this.greenImage = green8.toBufferedImage();
+        }
 
-        pixelImg = new Y8image(320, 240, out[3].bytes);
-        this.orangeImage = pixelImg.toBufferedImage();
+        if (out.length > 3) {
+            Y8image orange8 = new Y8image(320, 240, out[3].bytes);
+            this.orangeImage = orange8.toBufferedImage();
+        }
 
-        ColorSegmentedImage colorSegImg = new ColorSegmentedImage(320, 240, out[4].bytes);
-        this.segmentedImage = colorSegImg.toBufferedImage();
+        if (out.length > 4) {
+            ColorSegmentedImage colorSegImg = new ColorSegmentedImage(320, 240, out[4].bytes);
+            this.segmentedImage = colorSegImg.toBufferedImage();
+        }
 
         repaint();
     }

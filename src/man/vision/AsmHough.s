@@ -6,7 +6,7 @@
 # *                      *
 # ************************
 #
-# void houghSmooth(uint16_t* image, int dstWd, int dstHt, int pitch)#
+# void houghSmooth(uint16_t* image, int dstWd, int dstHt, int pitch);
 #
 # In-place smooth Hough space using kernel:
 #
@@ -26,8 +26,6 @@
 # undefined values. The overwriting is OK because the active region of
 # the Hough space is smaller than the allocated bins.
 
-#   PUBLIC   _houghSmooth
-#   .MODEL   FLAT
 .globl _houghSmooth
 .section .data
 
