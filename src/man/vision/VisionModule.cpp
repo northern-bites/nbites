@@ -23,7 +23,7 @@ VisionModule::VisionModule()
     hough = new HoughSpace(320, 240);
 
     frontEnd->fast(true);
-    edgeDetector->fast(false);
+    edgeDetector->fast(true);
     hough->fast(false);
 }
 

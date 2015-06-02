@@ -34,7 +34,7 @@
 # *******************************
 
 	.struct 0
-saves:	.skip 12		# 3 saved registers plus return address
+saves:	.skip 16		# 3 saved registers plus return address
 source:	.skip 4
 count:	.skip 4
 thresh:	.skip 4
