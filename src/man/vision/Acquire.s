@@ -232,12 +232,13 @@ copy:  movdqu  xmm0, [esi + ecx + endOfColors]
     pabsw   xmm3, xmm3                  # absolute value
     paddw   xmm3, [esp + uvZero]         # recenter around uvZero for fuzzy calcs
     psubusw xmm2, xmm3                  # max(t0 - |UV|, 0)
-    pminuw  xmm2, [esp + whiteFuzzy]    # min(max(t0 - |UV|, 0), fuzzy)
+    pminsw  xmm2, [esp + whiteFuzzy]    # min(max(t0 - |UV|, 0), fuzzy)
     pmullw  xmm2, [esp + whiteInvFuz]   # min(max(t0 - |UV|, 0), fuzzy) * invFuz) >> 8
     pshuflw xmm3, xmm2, 0b10110001               # swap U and V for fuzzy AND (min)
     pshufhw xmm3, xmm3, 0b10110001
-    pminuw  xmm2, xmm3                  # Fuzzy AND
     psrld   xmm2, 24                    # this is the >> 8, but extra 16 for alignment
+    psrld   xmm3, 24                    # this is the >> 8, but extra 16 for alignment
+    pminsw  xmm2, xmm3                  # Fuzzy AND
 
 .if (multiPhase == 1)
     .if (\phase == 0)
@@ -259,12 +260,13 @@ copy:  movdqu  xmm0, [esi + ecx + endOfColors]
     pmulhw  xmm2, [esp + greenYCoeff]
     paddsw  xmm2, [esp + greenDark0]    # new dark0
     psubusw xmm2, xmm1                  # max(t0 - |UV|, 0)
-    pminuw  xmm2, [esp + greenFuzzy]    # min(max(t0 - |UV|, 0), fuzzy)
+    pminsw  xmm2, [esp + greenFuzzy]    # min(max(t0 - |UV|, 0), fuzzy)
     pmullw  xmm2, [esp + greenInvFuz]   # min(max(t0 - |UV|, 0), fuzzy) * invFuz) >> 8
     pshuflw xmm3, xmm2, 0b10110001               # swap U and V for fuzzy AND (min)
     pshufhw xmm3, xmm3, 0b10110001
-    pminuw  xmm2, xmm3                  # Fuzzy AND
     psrld   xmm2, 24                    # this is the >> 8, but extra 16 for alignment
+    psrld   xmm3, 24                    # this is the >> 8, but extra 16 for alignment
+    pminsw  xmm2, xmm3                  # Fuzzy AND
 
 .if (multiPhase == 1)
     .if (\phase == 0)
@@ -288,12 +290,13 @@ copy:  movdqu  xmm0, [esi + ecx + endOfColors]
     movdqa  xmm3, xmm1                  # invert V to make it max instead of min
     pxor    xmm3, [esp + orInvV]
     psubusw xmm2, xmm3                  # max(t0 - |UV|, 0)
-    pminuw  xmm2, [esp + orangeFuzzy]   # min(max(t0 - |UV|, 0), fuzzy)
+    pminsw  xmm2, [esp + orangeFuzzy]   # min(max(t0 - |UV|, 0), fuzzy)
     pmullw  xmm2, [esp + orangeInvFuz]  # min(max(t0 - |UV|, 0), fuzzy) * invFuz) >> 8
     pshuflw xmm3, xmm2, 0b10110001               # swap U and V for fuzzy AND (min)
     pshufhw xmm3, xmm3, 0b10110001
-    pminuw  xmm2, xmm3                  # Fuzzy AND
     psrld   xmm2, 24                    # this is the >> 8, but extra 16 for alignment
+    psrld   xmm3, 24                    # this is the >> 8, but extra 16 for alignment
+    pminsw  xmm2, xmm3                  # Fuzzy AND
 
 .if (multiPhase == 1)
     .if (\phase == 0)
