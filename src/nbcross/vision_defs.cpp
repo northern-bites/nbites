@@ -36,7 +36,7 @@ int ImageConverter_func() {
 
     man::vision::VisionModule module;
 
-    module.topIn.setMessage(emptyImageMessage);
+    module.topIn.setMessage(message);
     module.bottomIn.setMessage(message);
     module.jointsIn.setMessage(emptyJointsMessage);
     module.inertialsIn.setMessage(emptyInertialsMessage);
@@ -148,7 +148,7 @@ int Edges_func() {
     portals::Message<messages::InertialState> emptyInertialsMessage(&emptyInertials);
 
     man::vision::VisionModule module = man::vision::VisionModule();
-    module.topIn.setMessage(emptyImageMessage);
+    module.topIn.setMessage(imageMessage);
     module.bottomIn.setMessage(imageMessage);
     module.jointsIn.setMessage(emptyJointsMessage);
     module.inertialsIn.setMessage(emptyInertialsMessage);

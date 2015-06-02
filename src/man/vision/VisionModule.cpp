@@ -22,11 +22,9 @@ VisionModule::VisionModule()
     houghLines = new HoughLineList(128);
     hough = new HoughSpace(320, 240);
 
-    // TODO flag
-    bool fast = false;
-    frontEnd->fast(fast);
-    edgeDetector->fast(fast);
-    hough->fast(fast);
+    frontEnd->fast(true);
+    edgeDetector->fast(false);
+    hough->fast(false);
 }
 
 VisionModule::~VisionModule()
