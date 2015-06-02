@@ -61,6 +61,12 @@ INITIAL_POS_KEYFRAME = ((90.,10.,-90.,-10.),
 			(90.,-10.,82.,13.2),
 			2,0,stiff.NORMAL_STIFFNESSES)
 
+INITIAL_POS_BACK_ARMS = ((103.9, 1.6, 10, -11.6),
+      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+      (103.9, -1.6, -10, -11.6),
+      2,0,stiff.NORMAL_STIFFNESSES)
+
 #Keyframe that moves the joints to a stable, standing position quickly.
 QUICK_INITIAL_POS_KEYFRAME = ((90.,10.,-90.,-10.),
 			(0.0,0.0,-22.3,43.5,-21.2, 0.0),
