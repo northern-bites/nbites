@@ -36,6 +36,21 @@ public class Log {
 		return new Log(topLevel, b);
 	}
 	
+	public static Log logWithTypePlus(String type, byte[] b, SExpr... fields) {
+		SExpr typeField = SExpr.newKeyValue("type", type);
+		SExpr fieldList = SExpr.newList(typeField);
+		fieldList.append(fields);
+		
+		SExpr topLevel = SExpr.newList(SExpr.newAtom("nblog"), SExpr.newKeyValue("contents", fieldList));
+		return new Log(topLevel, b);
+	}
+	
+	public static Log simpleCommandLog(String cmndName, byte[] bytes) {
+		SExpr commandTree = SExpr.newList(SExpr.newAtom("command"), SExpr.newAtom(cmndName));
+		Log cmnd = new Log(commandTree, bytes);
+		return cmnd;
+	}
+	
 	/*
 	 * Unique number for every log found during this execution.
 	 * */
