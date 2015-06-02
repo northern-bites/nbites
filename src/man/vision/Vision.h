@@ -105,13 +105,22 @@ class TickTimer
   uint64_t read()
   {
     uint32_t lo, hi;
-    // TODO convert inline assembly
-    // __asm
-    // {
-    //   rdtsc;
-    //   mov lo, eax
-    //   mov hi, edx
-    // }
+#ifdef USE_WINDOWS
+    __asm
+    {
+      rdtsc;
+      mov lo, eax
+      mov hi, edx
+    }
+#else
+    asm("rdtsc;\n"
+        "mov %%eax, %0;\n"
+        "mov %%edx, %1;\n"
+        :"=r" (lo), "=r" (hi)
+        :
+        :"%eax", "%edx"
+        );
+#endif
     return ((uint64_t)hi << 32) | lo;
   }
 

@@ -22,7 +22,7 @@ VisionModule::VisionModule()
     houghLines = new HoughLineList(128);
     hough = new HoughSpace(320, 240);
 
-    // TODO flag
+    // TODO compile time flag
     bool fast = false;
     frontEnd->fast(fast);
     edgeDetector->fast(fast);
@@ -41,44 +41,49 @@ VisionModule::~VisionModule()
 
 void VisionModule::run_()
 {
-    // Time vision module
-    HighResTimer timer("Vision 2015");
-
     // Get messages from inPortals
     topIn.latch();
     bottomIn.latch();
     jointsIn.latch();
     inertialsIn.latch();
 
-    messages::YUVImage top(topIn.message());
-    messages::YUVImage bottom(bottomIn.message());
-    messages::JointAngles joints(jointsIn.message());
-    messages::InertialState inertials(inertialsIn.message());
+    HighResTimer timer("Setup");
 
     // Setup
-    std::vector<messages::YUVImage> images { top, bottom };
     houghLines->clear();
+    std::vector<const messages::YUVImage*> images { &topIn.message(), 
+                                                    &bottomIn.message() };
 
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
         // Get image
-        messages::YUVImage image(images[i]);
+        const messages::YUVImage* image = images[i];
 
         // Construct YuvLite object for use in vision system
-        YuvLite yuvLite(image.width(),
-                        image.height(),
-                        image.rowPitch(),
-                        image.pixelAddress(0, 0));
+        YuvLite yuvLite(image->width(),
+                        image->height(),
+                        image->rowPitch(),
+                        image->pixelAddress(0, 0));
+
+        timer.end("Front end");
 
         // Run front end
         frontEnd->run(yuvLite, colorParams);
         ImageLiteU16 yImage(frontEnd->yImage());
         ImageLiteU8 greenImage(frontEnd->greenImage());
 
-        // Run edge detection
+        timer.end("Gradient");
+
+        // Approximate brightness gradient
         edgeDetector->gradient(yImage);
+
+        timer.end("Edge detection");
+
+        // Run edge detection
         edges->reset();
         edgeDetector->edgeDetect(greenImage, *edges);
+
+        timer.end("Hough");
 
         // Run hough line detection
         // TODO duplicate lines in houghLines?
