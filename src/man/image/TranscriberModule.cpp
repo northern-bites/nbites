@@ -655,55 +655,48 @@ void TranscriberModule::run_()
     }
 
     if (control::flags[control::multiball]) {
-        ++image_index;
+        // ++image_index;
 
-        std::string image_from;
-        if (it.type() == Camera::TOP) {
-            image_from = "camera_TOP";
-        } else {
-            image_from = "camera_BOT";
-        }
+        // std::string image_from;
+        // if (it.type() == Camera::TOP) {
+        //     image_from = "camera_TOP";
+        // } else {
+        //     image_from = "camera_BOT";
+        // }
 
-        long im_size = (image.width() * image.height() * 1);
-        int im_width = image.width() / 2;
-        int im_height= image.height();
+        // long im_size = (image.width() * image.height() * 1);
+        // int im_width = image.width() / 2;
+        // int im_height= image.height();
 
         messages::NaiveBall nb_pb = naiveBallIn.message();
         messages::FilteredBall fb_pb = filteredBallIn.message();
 
         std::string nb_buf;
         std::string fb_buf;
-        std::string im_buf((char *) image.pixelAddress(0, 0), im_size);
+        // std::string im_buf((char *) image.pixelAddress(0, 0), im_size);
         nb_pb.SerializeToString(&nb_buf);
         fb_pb.SerializeToString(&fb_buf);
 
-        im_buf.append(nb_buf);
-        im_buf.append(nb_buf);
+        nb_buf.append(fb_buf);
+        // im_buf.append(nb_buf);
 
         std::vector<SExpr> contents;
 
-        SExpr imageinfo("YUVImage", image_from, clock(), image_index, im_size);
-        imageinfo.append(SExpr("width", im_width)   );
-        imageinfo.append(SExpr("height", im_height) );
-        imageinfo.append(SExpr("encoding", "[Y8(U8/V8)]"));
-        contents.push_back(imageinfo);
+        // SExpr imageinfo("YUVImage", image_from, clock(), image_index, im_size);
+        // imageinfo.append(SExpr("width", im_width)   );
+        // imageinfo.append(SExpr("height", im_height) );
+        // imageinfo.append(SExpr("encoding", "[Y8(U8/V8)]"));
+        // contents.push_back(imageinfo);
 
-        /*
-         // Raw accelerometer data.
-         optional float acc_x = 1;
-         optional float acc_y = 2;
-         optional float acc_z = 3;
+        SExpr naive("NaiveBall", "multiball", clock(), -1, nb_buf.length());
+        naive.append(SExpr("velocity", nb_pb.velocity()));
+        naive.append(SExpr("stationary", nb_pb.stationary()));
+        naive.append(SExpr("yintercept", nb_pb.yintercept()));
 
-         // Raw gyrometer data.
-         optional float gyr_x = 4;
-         optional float gyr_y = 5;
+        contents.push_back(naive);
 
-         // Filtered angle data.
-         optional float angle_x = 6;
-         optional float angle_y = 7;
-         */
-
-        SExpr filter("FilteredBall", "multiball", clock(), image_index, fb_buf.length());
+        SExpr filter("FilteredBall", "multiball", clock(), -1, fb_buf.length());
+        // filter.append(SExpr("vis", fb_pb.vis()));
         filter.append(SExpr("distance", fb_pb.distance()));
         filter.append(SExpr("bearing", fb_pb.bearing()));
         filter.append(SExpr("rel_x", fb_pb.rel_x()));
@@ -740,56 +733,8 @@ void TranscriberModule::run_()
 
         contents.push_back(filter);
 
-        /*
-         // Head angles.
-         optional float head_yaw = 1;
-         optional float head_pitch = 2;
-
-         // Left arm angles.
-         optional float l_shoulder_pitch = 3;
-         optional float l_shoulder_roll = 4;
-         optional float l_elbow_yaw = 5;
-         optional float l_elbow_roll = 6;
-         optional float l_wrist_yaw = 7;
-         optional float l_hand = 8;
-
-         // Right arm angles.
-         optional float r_shoulder_pitch = 9;
-         optional float r_shoulder_roll = 10;
-         optional float r_elbow_yaw = 11;
-         optional float r_elbow_roll = 12;
-         optional float r_wrist_yaw = 13;
-         optional float r_hand = 14;
-
-         // Pelvis angles.
-         optional float l_hip_yaw_pitch = 15;
-         optional float r_hip_yaw_pitch = 16;
-
-         // Left leg angles.
-         optional float l_hip_roll = 17;
-         optional float l_hip_pitch = 18;
-         optional float l_knee_pitch = 19;
-         optional float l_ankle_pitch = 20;
-         optional float l_ankle_roll = 21;
-
-         // Right leg angles.
-         optional float r_hip_roll = 22;
-         optional float r_hip_pitch = 23;
-         optional float r_knee_pitch = 24;
-         optional float r_ankle_pitch = 25;
-         optional float r_ankle_roll = 26;
-         */
-
-        SExpr naive("NaiveBall", "tripoint", clock(), image_index, nb_buf.length());
-        naive.append(SExpr("velocity", nb_pb.velocity()));
-        naive.append(SExpr("stationary", nb_pb.stationary()));
-
-        naive.append(SExpr("yintercept", nb_pb.yintercept()));
-
-        contents.push_back(naive);
-
         NBLog(NBL_IMAGE_BUFFER, "multiball",
-                   contents, im_buf);
+                   contents, nb_buf);
     }
 #endif
 }

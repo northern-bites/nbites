@@ -64,7 +64,6 @@ void NaiveBallModule::run_()
     //printf("Velocity: %f\n", velocityEst);
     //printf("yIntercept: %f\n", yIntercept);
     // checkIfStationary() ? printf("Stationary\n") : printf("moving\n");
-    // (direction < 0) ? printf("GOING LEFT\n") : printf("going right\n");
 
     portals::Message<messages::NaiveBall> naiveBallMessage(0);
     naiveBallMessage.get()->set_velocity(velocityEst);
