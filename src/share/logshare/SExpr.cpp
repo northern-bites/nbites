@@ -146,6 +146,27 @@ namespace nblog {
      Instance methods
      */
     
+    std::string SExpr::value() {
+        if (!_atom) throw std::domain_error("sexpr is atom");
+        return _value;
+    }
+    
+    int SExpr::valueAsInt() {
+        if (!_atom) throw std::domain_error("sexpr is atom");
+        return std::stoi(_value);
+;
+    }
+    
+    long SExpr::valueAsLong() {
+        if (!_atom) throw std::domain_error("sexpr is atom");
+        return std::stol(_value);
+    }
+    
+    double SExpr::valueAsDouble() {
+        if (!_atom) throw std::domain_error("sexpr is atom");
+        return std::stod(_value);
+    }
+    
     SExpr * SExpr::get(int i)
     {
         if (i < _list.size())

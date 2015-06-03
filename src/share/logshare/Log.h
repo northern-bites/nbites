@@ -2,6 +2,7 @@
 #define nbites_Log
 
 #include <string>
+#include <initializer_list>
 #include "SExpr.h"
 
 /*
@@ -26,6 +27,10 @@ namespace nblog {
     public:
         
         static Log simple(const std::string type, const std::string data);
+        static Log ofType(const std::string type, const std::string data);
+        static Log ofTypeWithFields(const std::string type, const std::string data, std::initializer_list<SExpr> fields);
+        
+        static Log withContentItems(std::initializer_list<SExpr> items, const std::string data);
         
         //default constructor
         Log();
@@ -37,7 +42,6 @@ namespace nblog {
             int version,
             const std::vector<SExpr>& contents_list,
             const std::string& contents_data);
-        
         
         //Parses the SExpr expected to be in description.
         Log(std::string& description);

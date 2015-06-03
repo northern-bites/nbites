@@ -24,7 +24,7 @@ public class LogChooser extends JPanel {
 			}
 		});
 				
-		model = new LCTreeModel();
+		model = new LogChooserModel();
 		tree = new JTree(model);
 		model.tree = tree;
 		tree.setEditable(false);
@@ -51,13 +51,13 @@ public class LogChooser extends JPanel {
 	
 	private void useSize(Dimension size) {
 		Dimension d = sas.getPreferredSize();
-		sas.setBounds(0,0,d.width,d.height);
+		sas.setBounds(0,0,size.width,d.height);
 		sp.setBounds(0, d.height, size.width, size.height - d.height);
 	}
 	
 	private JScrollPane sp;
 	private JTree tree;
-	private LCTreeModel model;
+	private LogChooserModel model;
 	
 	private SortAndSearch sas;
 	

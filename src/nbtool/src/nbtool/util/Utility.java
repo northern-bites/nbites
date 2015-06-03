@@ -1,26 +1,18 @@
 package nbtool.util;
 
 import java.awt.BorderLayout;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.security.KeyPair;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.tree.TreePath;
 
 import nbtool.data.Log;
 import nbtool.data.SExpr;
@@ -204,7 +196,7 @@ public class Utility {
 			old.setTree(SExpr.deserializeFrom(old._olddesc_));
 			return true;
 		}
-		if (old._olddesc_ == null) return false;
+		if (old._olddesc_ == null) return false;	//nothing to work with.
 				
 		HashMap<String, String> map = new HashMap<String, String>();
 		String[] attrs = old._olddesc_.trim().split(" ");

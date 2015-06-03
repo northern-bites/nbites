@@ -13,7 +13,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
-import javax.swing.tree.TreePath;
 
 import nbtool.data.Log;
 import nbtool.data.Session;
@@ -24,11 +23,11 @@ import nbtool.gui.utilitypanes.UtilityManager;
 import nbtool.util.Center;
 import nbtool.util.Events;
 import nbtool.util.Logger;
-import nbtool.util.Utility;
 
 
 public class LogDisplayPanel extends JPanel implements Events.LogSelected, Events.SessionSelected {
 	private static final long serialVersionUID = 1L;
+	
 	protected LogDisplayPanel() {
 		super();
 		setLayout(null);
@@ -61,6 +60,9 @@ public class LogDisplayPanel extends JPanel implements Events.LogSelected, Event
 	
 	@Override
 	public void sessionSelected(Object source, Session s) {
+		if (!this.isEnabled())
+			return;
+		
 		views.removeAll();
 		SessionView sv = new SessionView(s);
 		views.addTab(s.toString(), sv);
@@ -69,6 +71,9 @@ public class LogDisplayPanel extends JPanel implements Events.LogSelected, Event
 	@Override
 	public void logSelected(Object source, Log first,
 			ArrayList<Log> alsoSelected) {
+		if (!this.isEnabled())
+			return;
+		
 		setContents(first, alsoSelected);
 	}
 	

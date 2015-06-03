@@ -17,7 +17,6 @@ import nbtool.util.Center;
 import nbtool.util.Logger;
 import nbtool.util.NBConstants;
 import nbtool.util.Prefs;
-import nbtool.util.Utility;
 
 public class NBTool_v6 {
 	
@@ -87,6 +86,7 @@ public class NBTool_v6 {
 				}
 				
 				Logger.logf(INFO, "Creating Display instance...");
+				@SuppressWarnings("unused")
 				final Display disp = new Display();
 			}
 			
