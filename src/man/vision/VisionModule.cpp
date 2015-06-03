@@ -7,7 +7,7 @@
 namespace man {
 namespace vision {
 
-// TODO constants
+// TODO constants and parameters
 VisionModule::VisionModule()
     : Module(),
       topIn(),

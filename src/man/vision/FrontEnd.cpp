@@ -12,7 +12,6 @@
 namespace man {
 namespace vision {
 
-
 // *********************
 // *                   *
 // *  Computed Colors  *
@@ -161,10 +160,13 @@ void ImageFrontEnd::run(const YuvLite& src, const Colors* colors, uint8_t* color
   }
 
   if (fast())
-    _time = man::vision::_acquire_image(src.pixelAddr(), dstBase.pitch(), 
+    _time = man::vision::_acquire_image(src.pixelAddr(), dstBase.pitch(),
                                         dstBase.height(), src.pitch(),
                                         colors, dstImages, colorTable);
   else
-    _time = testAcquire(src.pixelAddr(), dstBase.pitch(), dstBase.height(), src.pitch(),
-                        colors, dstImages, colorTable);
+    _time = testAcquire(src.pixelAddr(), dstBase.pitch(), dstBase.height(), 
+                        src.pitch(), colors, dstImages, colorTable);
+}
+
+}
 }

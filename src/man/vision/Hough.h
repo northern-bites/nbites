@@ -140,11 +140,11 @@ public:
   double fy0() const { return _fy0; }
 };
 
-// *****************
-// *               *
-// *  Field Lines  *
-// *               *
-// *****************
+// ****************
+// *               
+// *  Field Lines  
+// *               
+// ****************
 
 class FieldLine
 {
@@ -162,7 +162,7 @@ public:
 // Either list or vector could be used here. Generally a field line list is not
 // edited (insert/delete) after being created. Mostly just need a collection that
 // grows as needed. I prefer vector because list iteration is awkward.
-class FieldLineList : public vector<FieldLine>
+class FieldLineList : public std::vector<FieldLine>
 {
   float _maxLineAngle;
   float _maxLineSeparation;
@@ -190,7 +190,7 @@ public:
   void find(HoughLineList&);
 
   // Calibrate tilt if possible.
-  bool TiltCalibrate(FieldHomography&, string* message = 0);
+  bool TiltCalibrate(FieldHomography&, std::string* message = 0);
 
 };
 
