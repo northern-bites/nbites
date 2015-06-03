@@ -61,8 +61,6 @@ public:
     uint64_t getTimestamp() const;
     Camera::Type type() { return cameraType; }
 
-    void initSettings(); //one of the magical init methods
-
     struct NewSettings {
         bool hflip;
         bool vflip;
@@ -72,6 +70,7 @@ public:
         int saturation;
         int hue;
         int sharpness;
+        int gamma;
         bool auto_whitebalance;
         int backlight_compensation;
         int exposure;
@@ -79,6 +78,10 @@ public:
         int white_balance;
         bool fade_to_black;
     };
+
+    void initSettings(); //one of the magical init methods
+
+    man::ParamReader param;
 
 private:
     enum
@@ -122,7 +125,6 @@ private:
 
     uint64_t timeStamp;
 
-    ParamReader param;
 };
 
 // Module that wraps Transcriber's functionality
@@ -138,6 +140,7 @@ public :
     portals::OutPortal<messages::YUVImage> imageOut;
     portals::OutPortal<messages::JointAngles> jointsOut;
     portals::OutPortal<messages::InertialState> inertsOut;
+
 protected :
     virtual void run_();
 private :

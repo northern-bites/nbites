@@ -20,9 +20,6 @@
 using nblog::SExpr;
 using nblog::NBLog;
 
-
-
-
 #define V4L2_MT9M114_FADE_TO_BLACK (V4L2_CID_PRIVATE_BASE)
 
 namespace man {
@@ -56,7 +53,8 @@ TranscriberBuffer::~TranscriberBuffer()
 ImageTranscriber::ImageTranscriber(Camera::Type which) :
     settings(Camera::getSettings(which)),
     cameraType(which),
-    timeStamp(0)
+    timeStamp(0),
+    param(std::string("/home/nao/nbites/Config/") + (which == Camera::TOP ? "top" : "bottom") + "CameraParams.json")
 {
     initOpenI2CAdapter();
     initSelectCamera();
@@ -213,27 +211,53 @@ void ImageTranscriber::initQueueAllBuffers() {
 }
 void ImageTranscriber::initSettings()
 {
-    param("path to file.json");
+    std::string filepath;
+    if(cameraType == Camera::TOP) {
+        filepath = "/home/nao/nbites/Config/topCameraParams.json";
+    } else {
+        filepath = "/home/nao/nbites/Config/bottomCameraParams.json";
+    }
+    static NewSettings updated_settings;
+    if(FILE *file = fopen(filepath.c_str(),"r")) {
+        fclose(file);
+        updated_settings.hflip = param.getParam<bool>("hflip");
+        std::cout<<"Trying to get HFLIP"<<std::endl;
+        std::cout<<param.getParam<bool>("hflip");
+        updated_settings.vflip = param.getParam<bool>("vflip");
+        updated_settings.auto_exposure = param.getParam<bool>("autoexposure");
+        updated_settings.brightness = param.getParam<int>("brightness");
+        updated_settings.contrast = param.getParam<int>("contrast");
+        updated_settings.saturation = param.getParam<int>("saturation");
+        updated_settings.hue = param.getParam<int>("hue");
+        updated_settings.sharpness = param.getParam<int>("sharpness");
+        updated_settings.gamma = param.getParam<int>("gamma");
+        updated_settings.auto_whitebalance = param.getParam<int>("auto_whitebalance");
+        updated_settings.backlight_compensation = 0x00;
+        updated_settings.exposure = param.getParam<int>("exposure");
+        updated_settings.gain = param.getParam<int>("gain");
+        updated_settings.white_balance = param.getParam<int>("white_balance");
+        updated_settings.fade_to_black = param.getParam<int>("fade_to_black");
+    } else {
+        updated_settings.gamma = settings.hflip;
+        updated_settings.gamma = settings.vflip;
+        updated_settings.gamma = settings.auto_exposure;
+        updated_settings.gamma = settings.brightness;
+        updated_settings.gamma = settings.contrast;
+        updated_settings.gamma = settings.saturation;
+        updated_settings.gamma = settings.hue;
+        updated_settings.gamma = settings.sharpness;
+        updated_settings.gamma = settings.gamma;
+        updated_settings.auto_whitebalance = settings.auto_whitebalance;
+        updated_settings.backlight_compensation = settings.backlight_compensation;
+        updated_settings.exposure = settings.exposure;
+        updated_settings.gain = settings.gain;
+        updated_settings.white_balance = settings.white_balance;
+        updated_settings.fade_to_black = settings.fade_to_black;
+    }
 
-    static NewSettings updated_settings {
-        param.getParam<bool>("H_FLIP"),
-        param.getParam<bool>("V_FLIP"),
-        param.getParam<int>("autoExposure"),
-        param.getParam<int>("brightness"),
-        param.getParam<int>("contrast"),
-        param.getParam<int>("saturation"),
-        param.getParam<int>("hue"),
-        param.getParam<int>("sharpness"),
-        param.getParam<int>("gamma")
-        param.getParam<int>("autoWhiteBalance"),
-        /*backlight compensation = 0xff*/
-        param.getParam<int>("exposure"),
-        param.getParam<int>("gain"),
-        param.getParam<int>("whiteBalance"),
-        param.getParam<int>("fadeToBlack")
-    };
-    
+    std::cout<<"Setting Control Setting: HFLIP"<<std::endl;
     // DO NOT SCREW UP THE ORDER BELOW
+    std::cout<<"HFLIP: "<<updated_settings.hflip<<std::endl;
     setControlSetting(V4L2_CID_HFLIP, updated_settings.hflip);
     setControlSetting(V4L2_CID_VFLIP, updated_settings.vflip);
 
@@ -516,14 +540,27 @@ void TranscriberModule::run_()
 {
     time_t old_mod_time;
     struct stat file_stats;
-    int err = stat("path to file",&file_stats);
-    if(err != 0) {
-        std::perror("[file has been modified] stat");
+    std::string filepath;
+    if(it.type() == Camera::TOP) {
+        filepath = "/home/nao/nbites/Config/topCameraParams.json";
+    } else {
+        filepath = "/home/nao/nbites/Config/bottomCameraParams.json";
     }
-    int time_diff = std::difftime(file_stats.st_mtime, old_mod_time);
-    if(time_diff > 0.0) {
-        old_mod_time = file_stats.st_mtime;
-        initSettings();
+    //std::string filepath = "/home/nao/nbites/Config/cameraParams.json";
+    if(FILE *file = fopen(filepath.c_str(),"r")) {
+        fclose(file);
+        int err = stat(filepath.c_str(),&file_stats);
+        if(err != 0) {
+            std::perror("[file has been modified] stat");
+        }
+        int time_diff = std::difftime(file_stats.st_mtime, old_mod_time);
+        if(time_diff > 0.0) {
+            old_mod_time = file_stats.st_mtime;
+            std::cout<<"Calling initSettings() now"<<std::endl;
+            it.initSettings();
+        }
+    } else {
+        std::cout<<"File Does Not Exist"<<std::endl;
     }
 
     jointsIn.latch();
