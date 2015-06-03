@@ -25,8 +25,10 @@ namespace nblog {
             SExpr("type", type)
         };
         
-        for (auto v : fields) {
-            scv.push_back(v);
+        for (auto it = fields.begin();
+             it != fields.end();
+             ++it) {
+            scv.push_back(*it);
         }
         
         SExpr sc(scv);
@@ -56,9 +58,12 @@ namespace nblog {
             SExpr("contents"),
         };
         
-        for (auto v : items) {
-            contv.push_back(v);
+        for (auto it = items.begin();
+             it != items.end();
+             ++it) {
+            contv.push_back(*it);
         }
+
         
         SExpr contents(contv);
         
