@@ -13,6 +13,7 @@
 #include "Images.h"
 #include "PMotion.pb.h"
 #include "InertialState.pb.h"
+#include "BallModel.pb.h"
 #include "Images.h"
 #include "RoboGrams.h"
 
@@ -114,9 +115,15 @@ public :
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::InertialState> inertsIn;
 
+    portals::InPortal<messages::FilteredBall> filteredBallIn;
+    portals::InPortal<messages::NaiveBall> naiveBallIn;
+
     portals::OutPortal<messages::YUVImage> imageOut;
     portals::OutPortal<messages::JointAngles> jointsOut;
     portals::OutPortal<messages::InertialState> inertsOut;
+
+    portals::OutPortal<messages::FilteredBall> filteredBallOut;
+    portals::OutPortal<messages::NaiveBall> naiveBallOut;
 protected :
     virtual void run_();
 private :

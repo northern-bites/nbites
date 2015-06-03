@@ -196,7 +196,10 @@ namespace nblog {
                       control::flags[control::VISION]),
                 
                 SExpr("tripoint", control::tripoint,
-                      control::flags[control::tripoint])
+                      control::flags[control::tripoint]),
+
+                SExpr("multiball", control::multiball,
+                      control::flags[control::multiball])
             };
             fields.push_back(SExpr(fvector));
             
