@@ -13,39 +13,41 @@
 using nblog::Log;
 using nblog::SExpr;
 
-int ImageConverter_func() {
+int Vision_func() {
     assert(args.size() == 1);
 
-    printf("ImageConverter_func()\n");
+    printf("Vision_func()\n");
 
     Log* copy = new Log(args[0]);
     size_t length = copy->data().size();
     uint8_t buf[length];
     memcpy(buf, copy->data().data(), length);
+
+    int width = 2*640;
+    int height = 480;
     
-    messages::YUVImage image(buf, 2*640, 480, 2*640);
-    messages::YUVImage emptyImage;
+    messages::YUVImage image(buf, width, height, width);
     messages::JointAngles emptyJoints;
     messages::InertialState emptyInertials;
 
-    portals::Message<messages::YUVImage> emptyImageMessage(&emptyImage);
-    portals::Message<messages::YUVImage> message(&image);
+    portals::Message<messages::YUVImage> imageMessage(&image);
     portals::Message<messages::JointAngles> emptyJointsMessage(&emptyJoints);
     portals::Message<messages::InertialState> emptyInertialsMessage(&emptyInertials);
 
     man::vision::VisionModule module;
 
-    module.topIn.setMessage(message);
-    module.bottomIn.setMessage(message);
+    module.topIn.setMessage(imageMessage);
+    module.bottomIn.setMessage(imageMessage);
     module.jointsIn.setMessage(emptyJointsMessage);
     module.inertialsIn.setMessage(emptyInertialsMessage);
 
     module.run();
-    man::vision::ImageFrontEnd* frontEnd = module.getFrontEnd();
 
     // -----------
     //   Y IMAGE
     // -----------
+    man::vision::ImageFrontEnd* frontEnd = module.getFrontEnd();
+
     Log* yRet = new Log();
     int yLength = 240*320*2;
 
@@ -122,37 +124,10 @@ int ImageConverter_func() {
     colorSegRet->setData(segBuffer);
 
     rets.push_back(colorSegRet);
-
-    // Done
-    return 0;
-}
-
-int Edges_func() {
-    assert(args.size() == 1);
-    printf("Edges_func()\n");
-
-    size_t length = args[0]->data().size();
-    uint8_t buf[length];
-    memcpy(buf, args[0]->data().data(), length);
-
-    messages::YUVImage image(buf, 2*640, 480, 2*640);
-    portals::Message<messages::YUVImage> imageMessage(&image);
-
-    messages::YUVImage emptyImage;
-    messages::JointAngles emptyJoints;
-    messages::InertialState emptyInertials;
-
-    portals::Message<messages::YUVImage> emptyImageMessage(&emptyImage);
-    portals::Message<messages::JointAngles> emptyJointsMessage(&emptyJoints);
-    portals::Message<messages::InertialState> emptyInertialsMessage(&emptyInertials);
-
-    man::vision::VisionModule module = man::vision::VisionModule();
-    module.topIn.setMessage(imageMessage);
-    module.bottomIn.setMessage(imageMessage);
-    module.jointsIn.setMessage(emptyJointsMessage);
-    module.inertialsIn.setMessage(emptyInertialsMessage);
-
-    module.run();
+    
+    //-------------------
+    //  EDGES
+    //-------------------
     man::vision::EdgeList* edgeList = module.getEdges();
 
     Log* edges = new Log();

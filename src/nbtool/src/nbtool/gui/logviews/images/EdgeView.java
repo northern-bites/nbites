@@ -24,15 +24,12 @@ public class EdgeView extends ViewParent implements IOFirstResponder {
 	final int displayw = 640;
 	final int displayh = 480;
 	
-	final String crossFuncName = "Edges";
-
 	@Override
 	public void setLog(Log newlog) {
-		
 		CrossInstance ci = CrossIO.instanceByIndex(0);
 		if (ci == null)
 			return;
-		CrossFunc func = ci.functionWithName(crossFuncName);
+		CrossFunc func = ci.functionWithName("Vision");
 		assert(func != null);
 		
 		CrossCall cc = new CrossCall(this, func, newlog);
@@ -52,11 +49,11 @@ public class EdgeView extends ViewParent implements IOFirstResponder {
 	}
 
 	@Override
-	public void ioFinished(IOInstance instance) {		}
+	public void ioFinished(IOInstance instance) {}
 
 	@Override
 	public void ioReceived(IOInstance inst, int ret, Log... out) {
-		EdgeImage ei = new EdgeImage(width, height,  out[0].bytes);
+		EdgeImage ei = new EdgeImage(width, height,  out[5].bytes);
 		img = ei.toBufferedImage();
 		repaint();
 	}

@@ -39,16 +39,14 @@ int CrossBright_func();
 // Defined in misc_defs.cpp
 
 // Defined in vision_defs.cpp
-int ImageConverter_func();
-int Edges_func();
+int Vision_func();
 
 /* add all functions to publish to this vector */
 static const std::vector<CrossFunc> FUNCS = {
     CrossFunc("test", test_func, {}),
     CrossFunc("arg_test", arg_test_func, {"YUVImage", "YUVImage"}),
     CrossFunc("CrossBright", CrossBright_func, {"YUVImage"}),
-    CrossFunc("ImageConverter", ImageConverter_func, {"YUVImage"}),
-    CrossFunc("Edges", Edges_func, {"YUVImage"})
+    CrossFunc("Vision", Vision_func, {"YUVImage"})
 };
 
 extern std::vector<nblog::Log *> args;

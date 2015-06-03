@@ -50,13 +50,12 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         if (inst == null)
             return;
 
-        CrossFunc func = inst.functionWithName("ImageConverter");
+        CrossFunc func = inst.functionWithName("Vision");
         if (func == null)
             return;
         
         CrossCall call = new CrossCall(this, func, this.log);
         inst.tryAddCall(call);
-        System.out.println("Called!");
         
     }
     
