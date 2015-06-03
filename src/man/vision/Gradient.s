@@ -163,8 +163,8 @@ _gradient:
 # *                    *
 # **********************
 
-yLoop:  neg ecx
-
+    neg ecx
+yLoop:
 xLoop:
 # Fetch next set of 8 pixels from top, middle, and bottom rows
     movdqa  xmm0, [esi]
@@ -309,6 +309,11 @@ xLoop:
 
     mov ecx, [ebp + srcWd]
     lea edi, [edi + ecx*2]
+
+    neg ecx
+    lea esi, [esi + ecx*2]
+    add esi, eax
+
     dec DWORD PTR[ebp + srcHt]
     jg  yLoop
 
