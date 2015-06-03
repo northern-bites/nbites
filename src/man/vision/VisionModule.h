@@ -12,7 +12,6 @@
 namespace man {
 namespace vision {
 
-// TODO test using nbtool
 // TODO compile on both ubuntu and windows
 class VisionModule : public portals::Module {
 public:
@@ -24,21 +23,20 @@ public:
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::InertialState> inertialsIn;
 
-    ImageFrontEnd* getFrontEnd() const { return frontEnd; }
-    EdgeList* getEdges() const { return edges; }
+    // TODO better debug
+    ImageFrontEnd* getFrontEnd() const { return frontEnd[1]; }
+    EdgeList* getEdges() const { return edges[1]; }
 
 protected:
     virtual void run_();
 
 private:
-    // TODO on stack
-    // TODO arrays of two
-    Colors* colorParams;
-    ImageFrontEnd* frontEnd;
-    EdgeDetector* edgeDetector;
-    EdgeList* edges;
-    HoughLineList* houghLines;
-    HoughSpace* hough;
+    Colors* colorParams[2];
+    ImageFrontEnd* frontEnd[2];
+    EdgeDetector* edgeDetector[2];
+    EdgeList* edges[2];
+    HoughLineList* houghLines[2];
+    HoughSpace* hough[2];
 };
 
 }

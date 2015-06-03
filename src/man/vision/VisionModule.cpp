@@ -7,6 +7,7 @@
 namespace man {
 namespace vision {
 
+// TODO constants
 VisionModule::VisionModule()
     : Module(),
       topIn(),
@@ -14,29 +15,37 @@ VisionModule::VisionModule()
       jointsIn(),
       inertialsIn()
 {
-    // TODO constants
-    colorParams = new Colors();
-    frontEnd = new ImageFrontEnd();
-    edgeDetector = new EdgeDetector();
-    edges = new EdgeList(32000);
-    houghLines = new HoughLineList(128);
-    hough = new HoughSpace(320, 240);
+    // NOTE constructed on heap because some of the objects below do
+    //      not have default constructors, all class members must be initialized
+    //      after the initializer list is run, which requires calling default
+    //      constructors in the case of C-style arrays, limitation theoretically
+    //      removed in C++11
+    for (int i = 0; i < 2; i++) {
+        colorParams[i] = new Colors();
+        frontEnd[i] = new ImageFrontEnd();
+        edgeDetector[i] = new EdgeDetector();
+        edges[i] = new EdgeList(32000);
+        houghLines[i] = new HoughLineList(128);
+        hough[i] = new HoughSpace(320, 240);
 
-    // TODO flag
-    bool fast = true;
-    frontEnd->fast(fast);
-    edgeDetector->fast(fast);
-    hough->fast(fast);
+        // TODO flag
+        bool fast = true;
+        frontEnd[i]->fast(fast);
+        edgeDetector[i]->fast(fast);
+        hough[i]->fast(fast);
+    }
 }
 
 VisionModule::~VisionModule()
 {
-    delete colorParams;
-    delete frontEnd;
-    delete edgeDetector;
-    delete edges;
-    delete houghLines;
-    delete hough;
+    for (int i = 0; i < 2; i++) {
+        delete colorParams[i];
+        delete frontEnd[i];
+        delete edgeDetector[i];
+        delete edges[i];
+        delete houghLines[i];
+        delete hough[i];
+    }
 }
 
 // TODO run on lowres bottom image
@@ -53,8 +62,9 @@ void VisionModule::run_()
                                                     &bottomIn.message() };
 
     // Time vision module
-    HighResTimer timer;
-    double times[4];
+    double topTimes[4];
+    double bottomTimes[4];
+    double* times[2] = { topTimes, bottomTimes };
 
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
@@ -67,35 +77,42 @@ void VisionModule::run_()
                         image->rowPitch(),
                         image->pixelAddress(0, 0));
 
-        // Run front end
-        frontEnd->run(yuvLite, colorParams);
-        ImageLiteU16 yImage(frontEnd->yImage());
-        ImageLiteU8 greenImage(frontEnd->greenImage());
+        HighResTimer timer;
 
-        times[0] = timer.end();
+        // Run front end
+        frontEnd[i]->run(yuvLite, colorParams[i]);
+        ImageLiteU16 yImage(frontEnd[i]->yImage());
+        ImageLiteU8 greenImage(frontEnd[i]->greenImage());
+
+        times[i][0] = timer.end();
 
         // Approximate brightness gradient
-        edgeDetector->gradient(yImage);
+        edgeDetector[i]->gradient(yImage);
         
-        times[1] = timer.end();
+        times[i][1] = timer.end();
 
         // Run edge detection
-        edges->reset();
-        edgeDetector->edgeDetect(greenImage, *edges);
+        edgeDetector[i]->edgeDetect(greenImage, *(edges[i]));
 
-        times[2] = timer.end();
+        times[i][2] = timer.end();
 
         // Run hough line detection
-        houghLines->clear();
-        hough->run(*edges, *houghLines);
+        hough[i]->run(*(edges[i]), *(houghLines[i]));
 
-        times[3] = timer.end();
+        times[i][3] = timer.end();
     }
 
-    std::cout << "Front end: " << times[0] << std::endl;
-    std::cout << "Gradient: " << times[1] << std::endl;
-    std::cout << "Edge detection: " << times[2] << std::endl;
-    std::cout << "Hough: " << times[3] << std::endl;
+    for (int i = 0; i < 2; i++) {
+        if (i == 0)
+            std::cout << "From top camera..." << std::endl;
+        else
+            std::cout << "From bottom camera..." << std::endl;
+        std::cout << "Front end: " << times[i][0] << std::endl;
+        std::cout << "Gradient: " << times[i][1] << std::endl;
+        std::cout << "Edge detection: " << times[i][2] << std::endl;
+        std::cout << "Hough: " << times[i][3] << std::endl;
+    }
+
 }
 
 }

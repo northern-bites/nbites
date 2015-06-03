@@ -17,7 +17,6 @@ int ImageConverter_func() {
     assert(args.size() == 1);
 
     printf("ImageConverter_func()\n");
-    printf("******* If you want to use a color table, define in nbcross/vision_defs.cpp *******\n");
 
     Log* copy = new Log(args[0]);
     size_t length = copy->data().size();
@@ -160,7 +159,6 @@ int Edges_func() {
     std::string data;
 
     // TODO convert from relative to image center to normal image
-    std::cout << "Number of edges: " << edgeList->count() << std::endl;
     man::vision::AngleBinsIterator<man::vision::Edge> abi(*edgeList);
     for (const man::vision::Edge* e = *abi; e; e = *++abi) {
         uint32_t x = htonl(e->x());
