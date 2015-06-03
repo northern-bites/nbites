@@ -28,6 +28,9 @@ public:
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
     FieldLineList* getFieldLines(bool topCamera = true) const { return fieldLines[!topCamera]; }
 
+    // For use by Image nbcross func
+    void setBottomColorParams(Colors* colors) { colorParams[1] = colors; }
+
 protected:
     virtual void run_();
 

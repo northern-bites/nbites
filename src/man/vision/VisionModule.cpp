@@ -1,6 +1,7 @@
 #include "VisionModule.h"
 #include "Edge.h"
 #include "HighResTimer.h"
+#include "ParamReader.h"
 
 #include <iostream>
 
@@ -20,8 +21,14 @@ VisionModule::VisionModule()
     //      after the initializer list is run, which requires calling default
     //      constructors in the case of C-style arrays, limitation theoretically
     //      removed in C++11
+    std::string path = "ColorParams.json";
+    boost::property_tree::ptree tree;
+    boost::property_tree::read_json(path, tree);
+
     for (int i = 0; i < 2; i++) {
-        colorParams[i] = new Colors();
+        // colorParams[i] = new Colors();
+        colorParams[0] = tree.getNumber("topColors");
+        colorParams[1] = tree.getNumber("bottomColors");
         frontEnd[i] = new ImageFrontEnd();
         edgeDetector[i] = new EdgeDetector();
         edges[i] = new EdgeList(32000);
@@ -124,6 +131,10 @@ void VisionModule::run_()
         std::cout << "Field lines: " << times[i][4] << std::endl;
     }
 
+}
+
+Colors getColorsFromJson(bool top) {
+    
 }
 
 }
