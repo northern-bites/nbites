@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #include "Log.h"
 #include "nbdebug.h"
@@ -51,5 +52,14 @@ static const std::vector<CrossFunc> FUNCS = {
 
 extern std::vector<nblog::Log *> args;
 extern std::vector<nblog::Log *> rets;
+
+// Templated helper function for converting from big endian representation
+// to little endian representation and vice versa.
+template <class T>
+void endswap(T *objp)
+{
+    unsigned char *memp = reinterpret_cast<unsigned char*>(objp);
+    std::reverse(memp, memp + sizeof(T));
+}
 
 #endif /* defined(__nbcross__nbfuncs__) */

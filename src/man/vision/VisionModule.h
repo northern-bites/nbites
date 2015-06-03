@@ -24,9 +24,9 @@ public:
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::InertialState> inertialsIn;
 
-    // TODO better debug
-    ImageFrontEnd* getFrontEnd() const { return frontEnd[1]; }
-    EdgeList* getEdges() const { return edges[1]; }
+    ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
+    EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
+    FieldLineList* getFieldLines(bool topCamera = true) const { return fieldLines[!topCamera]; }
 
 protected:
     virtual void run_();

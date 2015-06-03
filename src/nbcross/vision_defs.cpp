@@ -130,23 +130,57 @@ int Vision_func() {
     //-------------------
     man::vision::EdgeList* edgeList = module.getEdges();
 
-    Log* edges = new Log();
-    std::string data;
+    Log* edgeRet = new Log();
+    std::string edgeBuf;
 
     man::vision::AngleBinsIterator<man::vision::Edge> abi(*edgeList);
     for (const man::vision::Edge* e = *abi; e; e = *++abi) {
         uint32_t x = htonl(e->x() + 160);
-        data.append((const char*) &x, 4);
+        edgeBuf.append((const char*) &x, sizeof(uint32_t));
         uint32_t y = htonl(-e->y() + 120);
-        data.append((const char*) &y, 4);
+        edgeBuf.append((const char*) &y, sizeof(uint32_t));
         uint32_t mag = htonl(e->mag());
-        data.append((const char*) &mag, 4);
+        edgeBuf.append((const char*) &mag, sizeof(uint32_t));
         uint32_t angle = htonl(e->angle());
-        data.append((const char*) &angle, 4);
+        edgeBuf.append((const char*) &angle, sizeof(uint32_t));
     }
 
-    edges->setData(data);
-    rets.push_back(edges);
+    edgeRet->setData(edgeBuf);
+    rets.push_back(edgeRet);
+
+    //-------------------
+    //  LINES
+    //-------------------
+    man::vision::FieldLineList* lineList = module.getFieldLines();
+
+    Log* lineRet = new Log();
+    std::string lineBuf;
+
+    for (int i = 0; i < lineList->size(); i++) {
+        for (int j = 0; j < 2; j++) {
+            man::vision::HoughLine& line = (*lineList)[i].lines(j);
+            double r = line.r();
+            double t = line.t();
+            std::cout << r << std::endl;
+            std::cout << t << std::endl;
+            double ep0 = line.ep0();
+            double ep1 = line.ep1();
+            
+            // In Java, doubles are stored in big endian representation
+            endswap<double>(&r);
+            endswap<double>(&t);
+            endswap<double>(&ep0);
+            endswap<double>(&ep1);
+
+            lineBuf.append((const char*) &r, sizeof(double));
+            lineBuf.append((const char*) &t, sizeof(double));
+            lineBuf.append((const char*) &ep0, sizeof(double));
+            lineBuf.append((const char*) &ep1, sizeof(double));
+        }
+    }
+
+    lineRet->setData(lineBuf);
+    rets.push_back(lineRet);
 
     return 0;
 }
