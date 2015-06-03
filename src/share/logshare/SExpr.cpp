@@ -23,9 +23,9 @@ namespace nblog {
     
     SExpr::SExpr(const char * n) :
     _atom(true),
-    _list()
+    _list(),
+    _value(n)
     {
-        _value = std::string(n);
         NBDEBUGs(SECTION_SEXPR, "atom SExpr(const char * n)\n");
     }
     
