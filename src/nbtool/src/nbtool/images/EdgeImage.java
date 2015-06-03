@@ -74,15 +74,14 @@ public class EdgeImage extends ImageParent {
 			Logger.logf(Logger.INFO, "%d edges expected.", n_edges);
 			
 			for (int i = 0; i < n_edges; ++i) {
-				int x = dis.readInt() + 320;
-				int y = -dis.readInt() + 240;
+				int x = dis.readInt();
+				int y = dis.readInt();
 				int mag = dis.readInt();
 				int ang = dis.readInt();
 				
 				Color base = angleMap[ang];
 				ret.setRGB(x, y, base.getRGB());
 			}
-
 		} catch (Exception e) {
 			Logger.logf(Logger.ERROR, "Conversion from bytes to EdgeImage to BufferedImage failed.");
 			e.printStackTrace();
