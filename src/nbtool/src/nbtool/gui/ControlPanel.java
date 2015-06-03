@@ -226,16 +226,41 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
 				Logger.log(Logger.INFO, "ControlPanel: not using file writer.");
 			} else {
 				String absolute = Utility.localizePath(dpath.trim()) + File.separator;
-				if (FileIO.checkLogFolder(absolute)) {
-					Vector<String> pathes = updateList(Prefs.filepaths, dpath);
-					dirBox.setModel(new DefaultComboBoxModel<String>(pathes));
-					dirBox.setSelectedIndex(pathes.indexOf(dpath));
-					Logger.log(Logger.INFO, "ControlPanel: using directory " + absolute);
-					filepath = absolute;
-				} else {
-					JOptionPane.showMessageDialog(this, String.format("cannot connect with bad path {%s}.  Fix path or clear it.", absolute));
-					return;
+				
+				if (!FileIO.checkLogFolder(absolute)) {
+					
+					int ret = JOptionPane.showConfirmDialog(this,
+							"would you like to create it?",
+							String.format("bad path {%s}", absolute),
+							JOptionPane.YES_NO_OPTION);
+					
+					if (ret == JOptionPane.YES_OPTION) {
+						File pathCreator = new File(absolute);
+						try {
+							pathCreator.mkdirs();
+							pathCreator.setReadable(true);
+							pathCreator.setWritable(true);
+						} catch (Exception e) {
+							Logger.logf(Logger.ERROR, "could not make full path: %s", absolute);
+							return;
+						}
+						
+						if (!FileIO.checkLogFolder(absolute)) {
+							Logger.logf(Logger.ERROR, "could not verify path: %s", absolute);
+							return;
+						}
+						
+					} else {
+						return;
+					}
 				}
+				
+				assert(FileIO.checkLogFolder(absolute));
+				Vector<String> pathes = updateList(Prefs.filepaths, dpath);
+				dirBox.setModel(new DefaultComboBoxModel<String>(pathes));
+				dirBox.setSelectedIndex(pathes.indexOf(dpath));
+				Logger.log(Logger.INFO, "ControlPanel: using directory " + absolute);
+				filepath = absolute;
 			}
 
 			SessionMaster.get().streamSession(address, filepath);
