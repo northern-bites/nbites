@@ -146,7 +146,6 @@ public final class SessionMaster implements IOFirstResponder {
 			return;
 		
 		if (inst == streamio) {
-			
 			synchronized(this) {
 				
 				for (Log log : out) {
@@ -164,7 +163,8 @@ public final class SessionMaster implements IOFirstResponder {
 				Events.GLogsFound.generate(this, out);
 			}
 		} else {
-			Logger.logf(Logger.WARN, "SessionMaster got surprising logs from %s.", inst.name());
+			if (!(inst == control && out.length == 0))
+				Logger.logf(Logger.WARN, "SessionMaster got surprising %d logs from %s.", out.length, inst.name());
 		}
 		
 	}
