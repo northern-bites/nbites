@@ -61,15 +61,15 @@ void NaiveBallModule::run_()
         naiveCheck();
     }
 
-    printf("Velocity: %f\n", velocityEst);
-    printf("yIntercept: %f\n", yIntercept);
-    checkIfStationary() ? printf("Stationary\n") : printf("moving\n");
-    (direction < 0) ? printf("GOING LEFT\n") : printf("going right\n");
+    //printf("Velocity: %f\n", velocityEst);
+    //printf("yIntercept: %f\n", yIntercept);
+    // checkIfStationary() ? printf("Stationary\n") : printf("moving\n");
+    // (direction < 0) ? printf("GOING LEFT\n") : printf("going right\n");
 
     portals::Message<messages::NaiveBall> naiveBallMessage(0);
     naiveBallMessage.get()->set_velocity(velocityEst);
     naiveBallMessage.get()->set_stationary(checkIfStationary());
-    naiveBallMessage.get()->set_yIntercept(yIntercept);
+    naiveBallMessage.get()->set_yintercept(yIntercept);
     naiveBallOutput.setMessage(naiveBallMessage);
 
 }
@@ -115,7 +115,7 @@ void NaiveBallModule::naiveCheck()
     else if (bearChange > 0.0) {direction = -1; }
     velocityEst = (direction * dist / 1.f) * ALPHA + velocityEst * (1-ALPHA);
 
-    if (xVelocityEst < 0.f && !checkIfStationary()) { naivePredict(); }
+    if (xVelocityEst < 0.f && !checkIfStationary()) { naivePredict(end_avgs); }
 
 
     // velocityEst = (dist / 1.f);
@@ -133,7 +133,7 @@ void NaiveBallModule::naivePredict(NaiveBallModule::BallState b)
     float t = (x_dest - x) / xVelocityEst; // calculate time until ball is at dest
 
     yIntercept = y + t * yVelocityEst;
-    printf("I think my yIntercept is: %f\n", yIntercept);
+    //printf("I think my yIntercept is: %f\n", yIntercept);
 
     // if(stationary)
     // {
@@ -191,14 +191,14 @@ NaiveBallModule::BallState NaiveBallModule::avgFrames(int startingIndex)
 
     }
     // if (dist_sum/AVGING_FRAMES > 10000.f) {
-    //     printf("SOMETHING WRONG\n");
-    //     printf("STARTED AT %i\n", p);
+    //     //printf("SOMETHING WRONG\n");
+    //     //printf("STARTED AT %i\n", p);
     //     for (int i = 0; i < AVGING_FRAMES; i++) {
-    //         printf("\nAt index: %i\n", startingIndex);
-    //         printf("x: %f\n", ballStateBuffer[startingIndex].rel_x);
-    //         printf("y: %f\n", ballStateBuffer[startingIndex].rel_y);
-    //         printf("dist: %f\n", ballStateBuffer[startingIndex].distance);
-    //         printf("bear: %f\n", ballStateBuffer[startingIndex].bearing);
+    //         //printf("\nAt index: %i\n", startingIndex);
+    //         //printf("x: %f\n", ballStateBuffer[startingIndex].rel_x);
+    //         //printf("y: %f\n", ballStateBuffer[startingIndex].rel_y);
+    //         //printf("dist: %f\n", ballStateBuffer[startingIndex].distance);
+    //         //printf("bear: %f\n", ballStateBuffer[startingIndex].bearing);
     //         if (startingIndex + 1 == buffSize) {
     //             startingIndex = 0;
     //         } else {

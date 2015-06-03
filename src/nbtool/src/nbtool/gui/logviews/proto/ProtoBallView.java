@@ -29,6 +29,7 @@ import nbtool.util.Utility;
 
 public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 	private static final long serialVersionUID = -541524730464912737L;
+	private static final int OFFSET = 2;
 	private Map<String, Object> filteredBall;
 	private Map<String, Object> visionBall;
 	private Boolean ball_on;
@@ -58,8 +59,8 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 		g.drawLine(robotX-10,robotY+10,robotX+10,robotY-10);
 
 		if (!ball_on) {return;}
-		int ballX = (robotX + ((Float)filteredBall.get("rel_x")).intValue());
-		int ballY = (robotY - ((Float)filteredBall.get("rel_y")).intValue());
+		int ballX = (robotY - OFFSET*((Float)filteredBall.get("rel_y")).intValue());
+		int ballY = (robotX - OFFSET*((Float)filteredBall.get("rel_x")).intValue());
 
 		g.setColor(Color.red);
 		g.drawOval(ballX - 5, ballY - 5, 17, 17);

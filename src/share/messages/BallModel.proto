@@ -73,5 +73,5 @@ message SharedBall {
 message NaiveBall {
     optional float velocity = 1;
     optional bool stationary = 2;
-    optional float yIntercept = 3;
+    optional float yintercept = 3;
 }
