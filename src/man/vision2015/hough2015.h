@@ -59,6 +59,8 @@ struct AdjustSet
   AdjustSet();
 };
 
+class FieldLine;
+
 class HoughLine : public GeoLine
 {
   int _rIndex;
@@ -67,6 +69,8 @@ class HoughLine : public GeoLine
   double _fitError;
 
   GeoLine _field;
+
+  int _fieldLine;
 
   Edge* members;
 
@@ -82,13 +86,18 @@ public:
   double score() const { return _score; }
   double fitError() const { return _fitError; }
 
+  // The line in field coordinates
   const GeoLine& field() const { return _field; }
 
-  // effect   Set field line
+  // effect   Map image line to field coordinates
   void setField(const FieldHomography& h) { _field = *this; _field.imageToField(h); }
 
-  // Which field line is this line a part of, or -1 if none.
-  int fieldLineIndex;
+  // Index of field line that this line a part of, or -1 if none.
+  int fieldLine() const { return _fieldLine; }
+  void fieldLine(int fl) { _fieldLine = fl; }
+
+  // List of edges that are members of this line
+  Edge* edgeMembers() const { return members; }
 
   // effect   Set image line from specified data
   void set(int rIndex, int tIndex, double r, double t, double score);
@@ -103,8 +112,13 @@ public:
   string print() const;
 };
 
+// The list<T> container is used primarily to be able to sort. vector<T>
+// does not have a sort member. Secondarily, we use erase(), which is
+// faster with lists but can be done with vectors. 
 class HoughLineList : public list<HoughLine>
 {
+  double _fx0, _fy0;
+
 public:
   HoughLineList(int size) : list(size) {}
 
@@ -115,7 +129,66 @@ public:
     push_back(hl);
   }
 
+  // Map all lines on the list to field coordinates
   void mapToField(const FieldHomography&);
+
+  // The field coordinates of the robot at the time mapToField was called.
+  double fx0() const { return _fx0; }
+  double fy0() const { return _fy0; }
+};
+
+// *****************
+// *               *
+// *  Field Lines  *
+// *               *
+// *****************
+
+class FieldLine
+{
+  HoughLine* _lines[2];
+
+public:
+  // Copy/assign OK
+
+  // lines(0) is closest to robot
+  HoughLine& lines(int index) { return *_lines[index]; }
+
+  FieldLine(HoughLine& line1, HoughLine& line2, double fx0 = 0, double fy0 = 0);
+};
+
+// Either list or vector could be used here. Generally a field line list is not
+// edited (insert/delete) after being created. Mostly just need a collection that
+// grows as needed. I prefer vector because list iteration is awkward.
+class FieldLineList : public vector<FieldLine>
+{
+  float _maxLineAngle;
+  float _maxLineSeparation;
+  float _maxCalAngle;
+
+public:
+  // Maximum angle between two Hough lines, in degrees as mapped to field coordinates,
+  // for the pair to be considered a candidate field line
+  float maxLineAngle() const { return _maxLineAngle; }
+  void maxLineAngle(float t) { _maxLineAngle = t; }
+
+  // Maximum separation between two Hough lines, in centimeters, for the pair to be
+  // considered a candidate field line.
+  float maxLineSeparation() const { return _maxLineSeparation; }
+  void maxLineSeparation(float t) { _maxLineSeparation = t; }
+
+  // Max deviation in degrees from parallel or perpendicular for calibration
+  float maxCalibrateAngle() const { return _maxCalAngle; }
+  void maxCalibrateAngle(float a) { _maxCalAngle = a; }
+
+  // Construct with default parameters
+  FieldLineList();
+
+  // Find field lines
+  void find(HoughLineList&);
+
+  // Calibrate tilt if possible.
+  bool TiltCalibrate(FieldHomography&, string* message = 0);
+
 };
 
 // *****************

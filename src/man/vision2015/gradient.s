@@ -27,11 +27,10 @@
 ; row contains width - 2 valid pixels. There are height - 2 output rows in
 ; each image.
 ;
-; Best practice is for gradientImage to be DQ aligned (multiple of 16), and
-; edgeImage Q aligned (multiple of 8), but neither is required. The output
-; image pitch requirement allows all source accesses to be DQ aligned,
-; regardless of the specified address and width. This supports running on
-; arbitrary windows of images.
+; Best practice is for gradientImage to be DQ aligned (multiple of 16), but is
+; not required. The output image pitch requirement allows all source accesses to
+; be DQ aligned, regardless of the specified address and width. This supports
+; running on arbitrary windows of images.
 
 	PUBLIC	_gradient
 	.MODEL	FLAT
@@ -147,8 +146,8 @@ _gradient:
 ; *                    *
 ; **********************
 
-yLoop:	neg	ecx
-
+	neg	ecx
+yLoop:
 xLoop:
 ; Fetch next set of 8 pixels from top, middle, and bottom rows
 	movdqa	xmm0, [esi]
@@ -293,6 +292,11 @@ ArcTan1	MACRO	bit
 
 	mov	ecx, [ebp + Args.srcWd]
 	lea	edi, [edi + ecx*2]
+
+	neg	ecx
+	lea	esi, [esi + ecx*2]
+	add	esi, eax
+
 	dec	[ebp + Args.srcHt]
 	jg	yLoop
 

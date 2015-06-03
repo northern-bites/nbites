@@ -229,12 +229,13 @@ xGroup	MACRO	phase
 	pabsw	xmm3, xmm3					; absolute value
 	paddw	xmm3, [esp + Locals.uvZero]			; recenter around uvZero for fuzzy calcs
 	psubusw	xmm2, xmm3					; max(t0 - |UV|, 0)
-	pminuw	xmm2, [esp + Locals.cParams.white.fuzzy]	; min(max(t0 - |UV|, 0), fuzzy)
+	pminsw	xmm2, [esp + Locals.cParams.white.fuzzy]	; min(max(t0 - |UV|, 0), fuzzy)
 	pmullw	xmm2, [esp + Locals.cParams.white.invFuz]	; min(max(t0 - |UV|, 0), fuzzy) * invFuz) >> 8
 	pshuflw	xmm3, xmm2, 10110001b				; swap U and V for fuzzy AND (min)
 	pshufhw	xmm3, xmm3, 10110001b
-	pminuw	xmm2, xmm3					; Fuzzy AND
 	psrld	xmm2, 24					; this is the >> 8, but extra 16 for alignment
+	psrld	xmm3, 24					; this is the >> 8, but extra 16 for alignment
+	pminsw	xmm2, xmm3					; Fuzzy AND
 
   IF	multiPhase
     IF	phase eq 0
@@ -255,12 +256,13 @@ xGroup	MACRO	phase
 	pmulhw	xmm2, [esp + Locals.cParams.green.yCoeff]
 	paddsw	xmm2, [esp + Locals.cParams.green.dark0]	; new dark0
 	psubusw	xmm2, xmm1					; max(t0 - |UV|, 0)
-	pminuw	xmm2, [esp + Locals.cParams.green.fuzzy]	; min(max(t0 - |UV|, 0), fuzzy)
+	pminsw	xmm2, [esp + Locals.cParams.green.fuzzy]	; min(max(t0 - |UV|, 0), fuzzy)
 	pmullw	xmm2, [esp + Locals.cParams.green.invFuz]	; min(max(t0 - |UV|, 0), fuzzy) * invFuz) >> 8
 	pshuflw	xmm3, xmm2, 10110001b				; swap U and V for fuzzy AND (min)
 	pshufhw	xmm3, xmm3, 10110001b
-	pminuw	xmm2, xmm3					; Fuzzy AND
 	psrld	xmm2, 24					; this is the >> 8, but extra 16 for alignment
+	psrld	xmm3, 24					; this is the >> 8, but extra 16 for alignment
+	pminsw	xmm2, xmm3					; Fuzzy AND
 
   IF	multiPhase
     IF	phase eq 0
@@ -283,12 +285,13 @@ xGroup	MACRO	phase
 	movdqa	xmm3, xmm1					; invert V to make it max instead of min
 	pxor	xmm3, [esp + Locals.orInvV]
 	psubusw	xmm2, xmm3					; max(t0 - |UV|, 0)
-	pminuw	xmm2, [esp + Locals.cParams.orange.fuzzy]	; min(max(t0 - |UV|, 0), fuzzy)
+	pminsw	xmm2, [esp + Locals.cParams.orange.fuzzy]	; min(max(t0 - |UV|, 0), fuzzy)
 	pmullw	xmm2, [esp + Locals.cParams.orange.invFuz]	; min(max(t0 - |UV|, 0), fuzzy) * invFuz) >> 8
 	pshuflw	xmm3, xmm2, 10110001b				; swap U and V for fuzzy AND (min)
 	pshufhw	xmm3, xmm3, 10110001b
-	pminuw	xmm2, xmm3					; Fuzzy AND
 	psrld	xmm2, 24					; this is the >> 8, but extra 16 for alignment
+	psrld	xmm3, 24					; this is the >> 8, but extra 16 for alignment
+	pminsw	xmm2, xmm3					; Fuzzy AND
 
   IF	multiPhase
     IF	phase eq 0
