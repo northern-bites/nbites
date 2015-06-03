@@ -3,6 +3,8 @@
 #include "SensorTypes.h"
 #include "JointNames.h"
 
+#include <iostream>
+
 namespace boss {
 namespace sensor {
 
@@ -27,6 +29,7 @@ SensorValues Sensor::getSensors()
     v.currents = buildCurrentsMessage();
     v.temperature = buildTemperatureMessage();
     v.chestButton = buildChestboardButtonMessage();
+    v.footBumper = buildFootbumperMessage();
     v.inertials = buildInertialsMessage();
     v.sonars = buildSonarsMessage();
     v.fsr = buildFSRMessage();

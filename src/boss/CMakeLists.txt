@@ -48,6 +48,16 @@ if( BUILD_PROTOBUF )
   include( ${SHARE_DIR}/cmake/BuildProtobuf.cmake )
 endif()
 
+# Enable C++11 features for bhuman
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+if(COMPILER_SUPPORTS_CXX0X)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+else()
+    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
+
 # testing set up
 # if ( OFFLINE )
 #   include ( ${SHARE_DIR}/cmake/BuildGTest.cmake )
@@ -59,6 +69,8 @@ include_directories( ${ALCOMMON_INCLUDE_DIR} )
 
 find_package( PROTOBUF REQUIRED )
 include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
+
+message(STATUS ${PROTOBUF_INCLUDE_DIR})
 
 # # For Python
 find_package( PythonLibs REQUIRED)

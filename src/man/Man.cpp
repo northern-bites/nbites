@@ -1,6 +1,8 @@
 #include "Man.h"
 
 #include <iostream>
+#include <sys/file.h>
+#include <errno.h>
 
 #include "Common.h"
 #include "Profiler.h"
@@ -45,8 +47,12 @@ Man::Man() :
     obstacle(),
     gamestate(teamNum, playerNum),
     behaviors(teamNum, playerNum),
-    sharedBall(playerNum)
+    sharedBall(playerNum),
+    lockFD(0)
     {
+        // Make sure another instance of man isn't running
+        establishLock();
+
         /** Sensors **/
         sensorsThread.addModule(sensors);
 
@@ -254,7 +260,7 @@ Man::Man() :
         cognitionThread.log<messages::InertialState>((control::VISION), &vision.inertial_state_out,
                                                      "proto-InertialState", "vision");
 
-    }
+        }
 #endif //USE_LOGGING
 
 #ifdef USE_TIME_PROFILING
@@ -264,25 +270,47 @@ Man::Man() :
         startSubThreads();
     }
 
-    Man::~Man()
-    {
-    }
+Man::~Man()
+{
+    std::cout << "Man destructor" << std::endl;
 
-    void Man::startSubThreads()
-    {
-        startAndCheckThread(sensorsThread);
-        startAndCheckThread(guardianThread);
-        startAndCheckThread(commThread);
-        startAndCheckThread(cognitionThread);
-    }
-
-    void Man::startAndCheckThread(DiagramThread& thread)
-    {
-        if(thread.start())
-        {
-            std::cout << thread.getName() << "thread failed to start." <<
-            std::endl;
-        }
-    }
-
+    // Terminating the process should release this also
+    flock(lockFD, LOCK_UN);
 }
+
+void Man::establishLock()
+{
+    lockFD = open("/home/nao/nbites/nbites.lock", O_CREAT | O_RDWR, 0666);
+    if (lockFD < 0) {
+        int err = errno;
+        perror("NO");
+        std::cout << "Could not open lockfile" << std::endl;
+        std::cout << "Errno is: " << err << std::endl;
+        std::cout << "FUCK JOSHYPOOP" << strerror(err) << std::endl;
+        exit(0);
+    }
+
+    int result = flock(lockFD, LOCK_EX | LOCK_NB);
+    if (result == -1) {
+        std::cout << "Could not establish lock on lock file. Is man running?" << std::endl;
+        exit(0);
+    }
+}
+
+void Man::startSubThreads()
+{
+    startAndCheckThread(sensorsThread);
+    startAndCheckThread(guardianThread);
+    startAndCheckThread(commThread);
+    startAndCheckThread(cognitionThread);
+}
+
+void Man::startAndCheckThread(DiagramThread& thread)
+{
+    if(thread.start())
+    {
+        std::cout << thread.getName() << "thread failed to start." << std::endl;
+    }
+}
+
+} // namespace man

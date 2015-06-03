@@ -28,5 +28,10 @@
 int main() {
     // Constructs an instance of man
     man::Man man; // lol man man man
+//    while (1) pause();
+    while (1) {
+        std::cout << "In main!" << std::endl;
+        sleep(5);
+    }
     return 1;
 }

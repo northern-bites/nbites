@@ -12,7 +12,12 @@
 #include "StiffnessControl.pb.h"
 #include "LedCommand.pb.h"
 
+#include "serializer.h"
+
 #define NBITES_MEM "/nbites-memory"
+
+const int COMMAND_SIZE = 2048;
+const int SENSOR_SIZE = 1024;
 
 struct JointCommand {
     uint64_t writeIndex;
@@ -35,17 +40,16 @@ struct SensorValues {
 };
 
 struct SharedData {
-    volatile uint8_t commandSwitch;
-    volatile uint8_t sensorSwitch;
+    volatile int commandSwitch;
+    volatile int sensorSwitch;
 
     volatile uint64_t commandReadIndex;
     volatile uint64_t sensorReadIndex;
 
-    JointCommand commands[2];
-    SensorValues sensors[2];
-    messages::LedCommand leds[2];
+    uint8_t command[2][COMMAND_SIZE];
+    uint8_t sensors[2][SENSOR_SIZE];
 
     // seperate mutexes for commands and sensors
-    pthread_mutex_t command;
-    pthread_mutex_t sense;
+    //pthread_mutex_t command;
+    //pthread_mutex_t sense;
 };

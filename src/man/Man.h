@@ -33,11 +33,13 @@ public:
 
 
 private:
+    void establishLock();
     void startSubThreads();
     void startAndCheckThread(DiagramThread& thread);
 
     ParamReader param;
     int playerNum, teamNum;
+
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
     jointenactor::JointEnactorModule jointEnactor;
@@ -62,8 +64,9 @@ private:
     obstacle::ObstacleModule obstacle;
     gamestate::GameStateModule gamestate;
     behaviors::BehaviorsModule behaviors;
-    //led::LedEnactorModule leds;
     context::SharedBallModule sharedBall;
+
+    int lockFD;
 };
 
 }

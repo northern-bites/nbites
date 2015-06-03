@@ -14,6 +14,11 @@ Enactor::Enactor(boost::shared_ptr<AL::DCMProxy> dcm_) :
     initEnactor();
 }
 
+Enactor::~Enactor()
+{
+    // TODO
+}
+
 void Enactor::command(messages::JointAngles angles, messages::JointAngles stiffness)
 {
     std::vector<float> jointAngles = Kinematics::toJointAngles(angles);

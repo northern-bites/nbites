@@ -26,9 +26,8 @@ SensorsModule::SensorsModule()
 {
     shared_fd = shm_open(NBITES_MEM, O_RDWR, 0600);
     if (shared_fd < 0) {
-        // TODO error
-    }
-    if (ftruncate(shared_fd, sizeof(SharedData)) == -1) {
+        std::cout << "sensorsModule couldn't open shared fd!" << std::endl;
+        exit(0);
         // TODO error
     }
 
@@ -37,6 +36,8 @@ SensorsModule::SensorsModule()
                                 MAP_SHARED, shared_fd, 0);
 
     if (shared == MAP_FAILED) {
+        std::cout << "sensorsModule couldn't map to pointer!" << std::endl;
+        exit(0);
         // TODO error
     }
 }
@@ -83,12 +84,49 @@ std::string SensorsModule::makeSweetMoveTuple(const messages::JointAngles* angle
 
 void SensorsModule::updateSensorValues()
 {
+    std::string jointsS;
+    std::string currentsS;
+    std::string tempsS;
+    std::string chestButtonS;
+    std::string footBumperS;
+    std::string inertialsS;
+    std::string sonarsS;
+    std::string fsrS;
+    std::string batteryS;
+    std::string stiffStatusS;
+
     // TODO grab semaphore
-    uint8_t index = shared->sensorSwitch;
-    values = shared->sensors[index];
-    sensorIndex = values.writeIndex;
+    int index = shared->sensorSwitch;
+    Deserialize des(shared->sensors[index]);
+    des.parse();
+
+    jointsS = des.stringNext();
+    currentsS = des.stringNext();
+    tempsS = des.stringNext();
+    chestButtonS = des.stringNext();
+    footBumperS = des.stringNext();
+    inertialsS = des.stringNext();
+    sonarsS = des.stringNext();
+    fsrS = des.stringNext();
+    batteryS = des.stringNext();
+    stiffStatusS = des.string();
+
+    sensorIndex = des.dataIndex();
     shared->sensorReadIndex = sensorIndex;
     // TODO Release semaphore
+
+    values.joints.ParseFromString(jointsS);
+    values.currents.ParseFromString(currentsS);
+    values.temperature.ParseFromString(tempsS);
+    values.chestButton.ParseFromString(chestButtonS);
+    values.footBumper.ParseFromString(footBumperS);
+    values.inertials.ParseFromString(inertialsS);
+    values.sonars.ParseFromString(sonarsS);
+    values.fsr.ParseFromString(fsrS);
+    values.battery.ParseFromString(batteryS);
+    values.stiffStatus.ParseFromString(stiffStatusS);
+
+    std::cout << "l_shoulder_pitch: " << values.joints.l_shoulder_pitch() << std::endl;
 
     portals::Message<messages::JointAngles> joints(&(values.joints));
     portals::Message<messages::JointAngles> currents(&(values.currents));

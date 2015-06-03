@@ -19,7 +19,7 @@ extern "C"
         AL::ALBrokerManager::setInstance(broker->fBrokerManager.lock());
         AL::ALBrokerManager::getInstance()->addBroker(broker);
         // create module instances
-        printf("NEW NAOQI MODULE!\n");
+        printf("Creating module\n");
         AL::ALModule::createModule<boss::Boss>(broker, "nbitesman");
         printf("Successfully created module!\n");
         return 0;

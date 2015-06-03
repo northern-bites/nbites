@@ -5,11 +5,13 @@
 // Aldebaran headers
 #include <alcommon/almodule.h>
 #include <alcommon/albroker.h>
+#include <alcommon/alproxy.h>
 #include <alproxies/dcmproxy.h>
 #include <althread/alprocesssignals.h>
 
 // Because naoqi gives us the broker as a shared_ptr
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/thread.hpp>
 #include <vector>
 
 // fork(), pid_t, etc.

@@ -46,6 +46,7 @@ private:
     SharedData* shared;
 
     uint64_t commandIndex;
+    uint64_t lastRead;
 
     messages::JointAngles latestJointAngles_;
     messages::JointAngles latestStiffness_;
