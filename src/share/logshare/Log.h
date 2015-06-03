@@ -86,8 +86,8 @@ namespace nblog {
         std::string _data;
         
         //io stuff
-        volatile int _refs;
         volatile bool _written;
+        volatile int _refs;
     };
 }
 
