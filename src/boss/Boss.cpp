@@ -8,6 +8,8 @@
 
 #include <iostream>
 
+#define assert(X) if(!(X)) std::cout << "Assertion " << #X << "did not pass" << std::endl;
+
 
 namespace boss {
 
@@ -49,7 +51,7 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
 
     std::cout << "Boss Constructed successfully!" << std::endl;
 
-    startMan();
+    //startMan();
 }
 
 Boss::~Boss()
@@ -133,38 +135,143 @@ int Boss::constructSharedMem()
 
 void Boss::DCMPreProcessCallback()
 {
-    //std::cout << "Preprocess!" << std::endl;
+    std::string jointsS;
+    std::string currentsS;
+    std::string tempsS;
+    std::string chestButtonS;
+    std::string footBumperS;
+    std::string inertialsS;
+    std::string sonarsS;
+    std::string fsrS;
+    std::string batteryS;
+    std::string stiffStatusS;
 
-    std::string joints;
-    std::string stiffs;
-    std::string leds;
-
-    // Start sem here
-    int index = shared->commandSwitch;
-    uint64_t write = 0;//shared->commands[index].writeIndex;
-
-    if (index != -1) {
-        //std::cout << "Trying to access!!!" << std::endl;
-        Deserialize des(shared->command[index]);
+    // TODO grab semaphore
+    int index = shared->sensorSwitch;
+    if (index != -1)
+    {
+        Deserialize des(shared->sensors[index]);
         des.parse();
-        joints = des.stringNext();
-        stiffs = des.stringNext();
-        leds = des.string();
-    }
-    // End sem
-    if (index == -1) return;
-    return;
 
-    JointCommand results;
-    results.jointsCommand.ParseFromString(joints);
-    results.stiffnessCommand.ParseFromString(stiffs);
-    messages::LedCommand ledResults;
-    ledResults.ParseFromString(leds);
+        jointsS = des.stringNext();
+        currentsS = des.stringNext();
+        tempsS = des.stringNext();
+        chestButtonS = des.stringNext();
+        footBumperS = des.stringNext();
+        inertialsS = des.stringNext();
+        sonarsS = des.stringNext();
+        fsrS = des.stringNext();
+        batteryS = des.stringNext();
+        stiffStatusS = des.string();
+
+        sensorIndex = des.dataIndex();
+        shared->sensorReadIndex = sensorIndex;
+    }
+    else {
+        std::cout << "didn't grab because index -1" << std::endl;
+    }
+    // TODO Release semaphore
+
+    if (index == -1) return;
+
+    SensorValues values;
+
+    values.joints.ParseFromString(jointsS);
+    values.currents.ParseFromString(currentsS);
+    values.temperature.ParseFromString(tempsS);
+    values.chestButton.ParseFromString(chestButtonS);
+    values.footBumper.ParseFromString(footBumperS);
+    values.inertials.ParseFromString(inertialsS);
+    values.sonars.ParseFromString(sonarsS);
+    values.fsr.ParseFromString(fsrS);
+    values.battery.ParseFromString(batteryS);
+    values.stiffStatus.ParseFromString(stiffStatusS);
+    // // //std::cout << "Preprocess!" << std::endl;
+
+    // // std::string joints;
+    // // std::string stiffs;
+    // // std::string leds;
+
+    // // // Start sem here
+    // // int index = shared->commandSwitch;
+    // // uint64_t write = 0;//shared->commands[index].writeIndex;
+
+    // // if (index != -1) {
+    // //     //std::cout << "Trying to access!!!" << std::endl;
+    // //     Deserialize des(shared->command[index]);
+    // //     des.parse();
+    // //     joints = des.stringNext();
+    // //     stiffs = des.stringNext();
+    // //     leds = des.string();
+    // // }
+    // // // End sem
+    // // if (index == -1) return;
+    // // return;
+
+    // // JointCommand results;
+    // // results.jointsCommand.ParseFromString(joints);
+    // // results.stiffnessCommand.ParseFromString(stiffs);
+    // // messages::LedCommand ledResults;
+    // // ledResults.ParseFromString(leds);
 
     //enactor.command(angles.jointsCommand, angles.stiffnessCommand);
     //led.setLeds(leds);
 }
 
+void assertValuesEqual()
+{
+
+}
+
+void assertJointsEqual(messages::JointAngles one, messages::JointAngles two)
+{
+    assert(one.head_yaw() == two.head_yaw());
+    assert(one.head_pitch() == two.head_pitch());
+    assert(one.l_shoulder_pitch() == two.l_shoulder_pitch());
+    assert(one.l_shoulder_roll() == two.l_shoulder_roll());
+    assert(one.l_elbow_roll() == two.l_elbow_roll());
+    assert(one.l_elbow_yaw() == two.l_elbow_yaw());
+    assert(one.l_wrist_yaw() == two.l_wrist_yaw());
+    assert(one.l_hand() == two.l_hand());
+    assert(one.r_shoulder_pitch() == two.r_shoulder_pitch());
+    assert(one.r_shoulder_roll() == two.r_shoulder_roll());
+    assert(one.r_elbow_yaw() == two.r_elbow_yaw());
+    assert(one.r_elbow_roll() == two.r_elbow_roll());
+    assert(one.r_wrist_yaw() == two.r_wrist_yaw());
+    assert(one.r_hand() == two.r_hand());
+    assert(one.l_hip_yaw_pitch() == two.l_hip_yaw_pitch());
+    assert(one.r_hip_yaw_pitch() == two.r_hip_yaw_pitch());
+    assert(one.l_hip_roll() == two.l_hip_roll());
+    assert(one.l_hip_pitch() == two.l_hip_pitch());
+    assert(one.l_knee_pitch() == two.l_knee_pitch());
+    assert(one.l_ankle_pitch() == two.l_ankle_pitch());
+    assert(one.l_ankle_roll() == two.l_ankle_roll());
+    assert(one.r_hip_roll() == two.r_hip_roll());
+    assert(one.r_hip_pitch() == two.r_hip_pitch());
+    assert(one.r_knee_pitch() == two.r_knee_pitch());
+    assert(one.r_ankle_pitch() == two.r_ankle_pitch());
+    assert(one.r_ankle_roll() == two.r_ankle_roll());
+}
+
+void assertButtonsEqual(messages::ButtonState one, messages::ButtonState two)
+{
+
+}
+
+void assertBumpersEqual(messages::FootBumperState one, messages::FootBumperState two)
+{
+
+}
+
+void assertFSREqual(messages::FSR one, messages::FSR two)
+{
+
+}
+
+void assertStiffEqual(messages::StiffStatus one, messages::StiffStatus two)
+{
+
+}
 
         // The following is for deserializing sensor data
         // Deserialize deserialz(shared->stiffCommand[index], 1024);
@@ -227,7 +334,7 @@ void Boss::DCMPostProcessCallback()
     // values.stiffStatus.SerializeToString(&serial);
     // std::cout << "stiffstatus serial is::: " << serial.size() << std::endl << std::endl << std::endl;
 
-    //std::cout << "L shoulder: " << values.joints.l_shoulder_pitch() << std::endl;
+    //std::cout << "POST l_shoulder_pitch " << values.joints.l_shoulder_pitch() << std::endl;
 }
 
 }

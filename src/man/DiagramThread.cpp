@@ -45,6 +45,10 @@ void DiagramThread::RobotDiagram::run()
         PROF_ENTER(P_GUARDIAN_THREAD);
     }
 
+#ifdef DEBUG_THREADS
+    std::cout << "Running thread " << name << std::endl;
+#endif
+
     RoboGram::run();
 
     if (name == "cognition")

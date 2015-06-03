@@ -40,6 +40,7 @@ SensorsModule::SensorsModule()
         exit(0);
         // TODO error
     }
+    std::cout << "Inited sensors module~~~~~~~~~~~~~~~~~~~~~~~~~~`" << std::endl;
 }
 
 SensorsModule::~SensorsModule()
@@ -97,23 +98,31 @@ void SensorsModule::updateSensorValues()
 
     // TODO grab semaphore
     int index = shared->sensorSwitch;
-    Deserialize des(shared->sensors[index]);
-    des.parse();
+    if (index != -1)
+    {
+        Deserialize des(shared->sensors[index]);
+        des.parse();
 
-    jointsS = des.stringNext();
-    currentsS = des.stringNext();
-    tempsS = des.stringNext();
-    chestButtonS = des.stringNext();
-    footBumperS = des.stringNext();
-    inertialsS = des.stringNext();
-    sonarsS = des.stringNext();
-    fsrS = des.stringNext();
-    batteryS = des.stringNext();
-    stiffStatusS = des.string();
+        jointsS = des.stringNext();
+        currentsS = des.stringNext();
+        tempsS = des.stringNext();
+        chestButtonS = des.stringNext();
+        footBumperS = des.stringNext();
+        inertialsS = des.stringNext();
+        sonarsS = des.stringNext();
+        fsrS = des.stringNext();
+        batteryS = des.stringNext();
+        stiffStatusS = des.string();
 
-    sensorIndex = des.dataIndex();
-    shared->sensorReadIndex = sensorIndex;
+        sensorIndex = des.dataIndex();
+        shared->sensorReadIndex = sensorIndex;
+    }
+    else {
+        std::cout << "didn't grab because index -1" << std::endl;
+    }
     // TODO Release semaphore
+
+    if (index == -1) return;
 
     values.joints.ParseFromString(jointsS);
     values.currents.ParseFromString(currentsS);
@@ -126,7 +135,7 @@ void SensorsModule::updateSensorValues()
     values.battery.ParseFromString(batteryS);
     values.stiffStatus.ParseFromString(stiffStatusS);
 
-    std::cout << "l_shoulder_pitch: " << values.joints.l_shoulder_pitch() << std::endl;
+    //std::cout << "l_shoulder_pitch: " << values.joints.l_shoulder_pitch() << std::endl; 
 
     portals::Message<messages::JointAngles> joints(&(values.joints));
     portals::Message<messages::JointAngles> currents(&(values.currents));
