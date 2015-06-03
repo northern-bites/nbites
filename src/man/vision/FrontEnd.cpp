@@ -12,6 +12,7 @@
 namespace man {
 namespace vision {
 
+
 // *********************
 // *                   *
 // *  Computed Colors  *
@@ -68,11 +69,11 @@ void* alignedAlloc(size_t size, int alignBits, void*& block)
   return (void*)(((size_t)block + extra) & ~extra);
 }
 
-// *******************************
-// *                              
-// *  Front End Image Processing  
-// *                              
-// *******************************
+// ********************************
+// *                              *
+// *  Front End Image Processing  *
+// *                              *
+// ********************************
 //
 // The ASM and C++ have identical function signatures.
 // The source is a YUYV image. There are no pixel alignment requirements, although
@@ -95,7 +96,7 @@ uint32_t
               uint8_t* dest, uint8_t* colorTable)
 {
   TickTimer timer;
-  
+
   // Ignore low three bits of width
   width &= ~7;
 
@@ -166,7 +167,4 @@ void ImageFrontEnd::run(const YuvLite& src, const Colors* colors, uint8_t* color
   else
     _time = testAcquire(src.pixelAddr(), dstBase.pitch(), dstBase.height(), src.pitch(),
                         colors, dstImages, colorTable);
-}
-
-}
 }

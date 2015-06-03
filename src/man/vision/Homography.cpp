@@ -430,7 +430,7 @@ void GeoLine::imageToField(const FieldHomography& h)
 
 string GeoLine::print() const
 {
-  return strPrintf("%.8g,%.8g,%.8g,%.8g,", r(), t(), ep0(), ep1());
+  return strPrintf("%.8g %.8g %.8g %.8g", r(), t(), ep0(), ep1());
 }
 
 }

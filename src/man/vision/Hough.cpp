@@ -42,6 +42,7 @@ void HoughLine::set(int rIndex, int tIndex, double r, double t, double score)
   _score = score;
   _fitError = -1;
   members = 0;
+  fieldLine(-1);
 }
 
 enum
@@ -166,10 +167,138 @@ string HoughLine::print() const
                    fitError(), ep0(), ep1());
 }
 
+// *********************
+// *                   *
+// *  Hough Line List  *
+// *                   *
+// *********************
+
 void HoughLineList::mapToField(const FieldHomography& h)
 {
   for (list<HoughLine>::iterator hl = begin(); hl != end(); ++hl)
     hl->setField(h);
+
+  _fx0 = -h.wx0();
+  _fy0 = -h.wy0();
+}
+
+// **************************
+// *                        *
+// *  Field Lines and List  *
+// *                        *
+// **************************
+
+FieldLine::FieldLine(HoughLine& line1, HoughLine& line2, double fx0, double fy0)
+{
+  double d1 = fabs(line1.field().pDist(fx0, fy0));
+  double d2 = fabs(line2.field().pDist(fx0, fy0));
+  int i = (int)(d2 < d1);
+  _lines[i    ] = &line1;
+  _lines[i ^ 1] = &line2;
+}
+
+FieldLineList::FieldLineList()
+{
+  maxLineAngle(5.0f);
+  maxLineSeparation(10.0f);
+  maxCalibrateAngle(5.0f);
+}
+
+void FieldLineList::find(HoughLineList& houghLines)
+{
+  // Check max angle by dot product of unit vectors. Since lines must have opposite
+  // polarity, dot product must be below a negative threshold.
+  double maxCosAngle = -cos(maxLineAngle() * (M_PI / 180));
+
+  clear();
+
+  for (HoughLineList::iterator hl1 = houghLines.begin(); hl1 != houghLines.end(); ++hl1)
+  {
+    HoughLineList::iterator hl2 = hl1;
+    for (++hl2; hl2 != houghLines.end(); ++hl2)
+      // Here is the dot product 
+      if (hl1->field().ux() * hl2->field().ux() + hl1->field().uy() * hl2->field().uy() <= maxCosAngle)
+      {
+        // Separation is sum of the two r values (distance of line to origin).
+        // This is well defined and sensible for lines that may not be perfectly
+        // parallel. For field lines the polarities are pointing towards each
+        // other, which makes the sum of r's negative. A pair of nearly parallel
+        // lines with the right separation but with polarities pointing away from
+        // each other is not a field line. 
+        double separation = -(hl1->field().r() + hl2->field().r());
+        if (0.0 < separation && separation <= maxLineSeparation())
+        {
+          hl1->fieldLine((int)size());
+          hl2->fieldLine((int)size());
+          push_back(FieldLine(*hl1, *hl2, houghLines.fx0(), houghLines.fy0()));
+        }
+      }
+  }
+}
+
+// *****************
+// *               *
+// *  Calibration  *
+// *               *
+// *****************
+
+bool FieldLineList::TiltCalibrate(FieldHomography& h, string* s)
+{
+#if 0
+  if (s)
+    s = "\n";
+  //Stats tiltStats = new Stats();
+
+  for (int i = 0; i < size() - 1; ++i)
+    for (int j = i + 1; j < size(); ++j)
+    {
+      if (fsbs(lines[i].Ca * lines[j].Ca + lines[i].Sa * lines[j].Sa) < 0.33)
+      {
+        s += string.Format("Perpendicular field lines {0} and {1}:\n", i, j);
+        for (int a = 0; a < 2; ++a)
+          for (int b = 0; b < 2; ++b)
+          {
+            double t;
+            string diag;
+            bool ok = VisualTiltPerpendicular(lines[i].Lines(a), lines[j].Lines(b), out t, out diag);
+            if (ok)
+            {
+              t *= 180 / Math.PI;
+              tiltStats.Add(t);
+              s += string.Format("  {0,4:f1},", t);
+            }
+            else
+              s += "  ----,";
+            s += string.Format(" | {0}\n", diag);
+          }
+      }
+      else if (Math.Abs(lines[i].Ca * lines[j].Sa - lines[i].Sa * lines[j].Ca) < 0.33)
+      {
+        s += string.Format("Parallel field lines {0} and {1}:\n", i, j);
+        for (int a = 0; a < 2; ++a)
+          for (int b = 0; b < 2; ++b)
+          {
+            double t;
+            string diag;
+            bool ok = VisualTiltParallel(lines[i].Lines(a), lines[j].Lines(b), out t, out diag);
+            if (ok)
+            {
+              t *= 180 / Math.PI;
+              tiltStats.Add(t);
+              s += string.Format("  {0,4:f1},", t);
+            }
+            else
+              s += "  ----,";
+            s += string.Format(" | {0}\n", diag);
+          }
+      }
+    }
+
+  s += string.Format("Mean tilt = {0:f2}, stDev = {1:f2}\n", tiltStats.Mean, tiltStats.StDev);
+  return s;
+#endif
+
+  return false;
 }
 
 // *****************
