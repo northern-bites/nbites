@@ -44,7 +44,7 @@ class FieldHomography
 
 public:
   // Construct with default values;
-  FieldHomography();
+  FieldHomography(bool topCamera = true);
 
   // Image coordinates of optical axis, relative to the center of the image
   double ix0() const { return _ix0; }

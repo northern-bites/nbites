@@ -15,17 +15,23 @@ double FieldHomography::tiltSensitivity   = 0.08;   // min dE/dt for Newton's me
 double FieldHomography::tiltConvergeLimit = 1.0e-6; // Newton can stop when error is < this
 double FieldHomography::tiltConvergeRate  = 4;      // Error must be reduced by this factor each iteration
 
-FieldHomography::FieldHomography()
+FieldHomography::FieldHomography(bool topCamera)
 {
   ix0(0);
   iy0(0);
   roll(0);
-  tilt(70 * (M_PI / 180));
   azimuth(0);
-  flen(272);
   wx0(0);
   wy0(0);
   wz0(52);
+
+  if (topCamera) {
+      tilt(70 * (M_PI / 180));
+      flen(272);
+  } else {
+      tilt((70 - 39.7) * (M_PI / 180));
+      flen(272 / 2);
+  }
 }
 
 void FieldHomography::compute()

@@ -8,6 +8,7 @@
 #include "FrontEnd.h"
 #include "Edge.h"
 #include "Hough.h"
+#include "Homography.h"
 
 namespace man {
 namespace vision {
@@ -37,6 +38,8 @@ private:
     EdgeList* edges[2];
     HoughLineList* houghLines[2];
     HoughSpace* hough[2];
+    FieldHomography* homography[2];
+    FieldLineList* fieldLines[2];
 };
 
 }

@@ -27,6 +27,8 @@ VisionModule::VisionModule()
         edges[i] = new EdgeList(32000);
         houghLines[i] = new HoughLineList(128);
         hough[i] = new HoughSpace(320, 240);
+        homography[i] = new FieldHomography(i == 0);
+        fieldLines[i] = new FieldLineList();
 
         // TODO flag
         bool fast = true;
@@ -45,9 +47,12 @@ VisionModule::~VisionModule()
         delete edges[i];
         delete houghLines[i];
         delete hough[i];
+        delete homography[i];
+        delete fieldLines[i];
     }
 }
 
+// TODO gradient fix
 // TODO use horizon on top image
 void VisionModule::run_()
 {
@@ -62,8 +67,8 @@ void VisionModule::run_()
                                                     &bottomIn.message() };
 
     // Time vision module
-    double topTimes[4];
-    double bottomTimes[4];
+    double topTimes[5];
+    double bottomTimes[5];
     double* times[2] = { topTimes, bottomTimes };
 
     // Loop over top and bottom image and run line detection system
@@ -100,6 +105,12 @@ void VisionModule::run_()
         hough[i]->run(*(edges[i]), *(houghLines[i]));
 
         times[i][3] = timer.end();
+
+        // Find field lines
+        houghLines[i]->mapToField(*(homography[i]));
+        fieldLines[i]->find(*(houghLines[i]));
+
+        times[i][4] = timer.end();
     }
 
     for (int i = 0; i < 2; i++) {
@@ -111,6 +122,7 @@ void VisionModule::run_()
         std::cout << "Gradient: " << times[i][1] << std::endl;
         std::cout << "Edge detection: " << times[i][2] << std::endl;
         std::cout << "Hough: " << times[i][3] << std::endl;
+        std::cout << "Field lines: " << times[i][4] << std::endl;
     }
 
 }
