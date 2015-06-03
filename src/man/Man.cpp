@@ -20,7 +20,7 @@ SET_POOL_SIZE(messages::RobotLocation, 16);
 
 namespace man {
     
-    Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
+Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     : AL::ALModule(broker, name),
     param("/home/nao/nbites/lib/parameters.json"),
     playerNum(param.getParam<int>("playerNumber")),
@@ -222,24 +222,24 @@ namespace man {
 //#endif
         
 //#ifdef LOG_LOCATION
-        cognitionThread.log<messages::RobotLocation>((control::LOCATION), &localization.output, "proto-RobotLocation", "location");
-//#endif
-        
-//#ifdef LOG_ODOMETRY
-        cognitionThread.log<messages::RobotLocation>((control::ODOMETRY), &motion.odometryOutput_, "proto-RobotLocation", "odometry");
-//#endif
-        
-//#ifdef LOG_OBSERVATIONS
-        cognitionThread.log<messages::VisionField>((control::OBSERVATIONS), &vision.vision_field, "proto-VisionField", "observations");
-//#endif
-        
-//#ifdef LOG_LOCALIZATION
-        cognitionThread.log<messages::ParticleSwarm>((control::LOCALIZATION), &localization.particleOutput, "proto-ParticleSwarm", "localization");
-//#endif
-        
-//#ifdef LOG_BALLTRACK
-        cognitionThread.log<messages::FilteredBall>((control::BALLTRACK), &ballTrack.ballLocationOutput, "proto-FilteredBall", "balltrack");
-        cognitionThread.log<messages::VisionBall>((control::BALLTRACK), &vision.vision_ball, "proto-VisionBall", "balltrack");
+//         cognitionThread.log<messages::RobotLocation>((control::LOCATION), &localization.output, "proto-RobotLocation", "location");
+// //#endif
+//         
+// //#ifdef LOG_ODOMETRY
+//         cognitionThread.log<messages::RobotLocation>((control::ODOMETRY), &motion.odometryOutput_, "proto-RobotLocation", "odometry");
+// //#endif
+//         
+// //#ifdef LOG_OBSERVATIONS
+//         cognitionThread.log<messages::VisionField>((control::OBSERVATIONS), &vision.vision_field, "proto-VisionField", "observations");
+// //#endif
+//         
+// //#ifdef LOG_LOCALIZATION
+//         cognitionThread.log<messages::ParticleSwarm>((control::LOCALIZATION), &localization.particleOutput, "proto-ParticleSwarm", "localization");
+// //#endif
+//         
+// //#ifdef LOG_BALLTRACK
+//         cognitionThread.log<messages::FilteredBall>((control::BALLTRACK), &ballTrack.ballLocationOutput, "proto-FilteredBall", "balltrack");
+        // cognitionThread.log<messages::VisionBall>((control::BALLTRACK), &vision.vision_ball, "proto-VisionBall", "balltrack");
 //#endif
         
         //Superseded by logging code in ImageTranscriber.
@@ -252,18 +252,18 @@ namespace man {
 //#endif
         
 //#ifdef LOG_VISION
-        cognitionThread.log<messages::VisionField>((control::VISION), &vision.vision_field,
-                                                   "proto-VisionField", "vision");
-        cognitionThread.log<messages::VisionBall>((control::VISION), &vision.vision_ball,
-                                                  "proto-VisionBall", "vision");
-        cognitionThread.log<messages::VisionRobot>((control::VISION), &vision.vision_robot,
-                                                   "proto-VisionRobot", "vision");
-        cognitionThread.log<messages::VisionObstacle>((control::VISION), &vision.vision_obstacle,
-                                                      "proto-VisionObstacle", "vision");
-        cognitionThread.log<messages::JointAngles>((control::VISION), &vision.joint_angles_out,
-                                                   "proto-JointAngles", "vision");
-        cognitionThread.log<messages::InertialState>((control::VISION), &vision.inertial_state_out,
-                                                     "proto-InertialState", "vision");
+        // cognitionThread.log<messages::VisionField>((control::VISION), &vision.vision_field,
+        //                                            "proto-VisionField", "vision");
+        // cognitionThread.log<messages::VisionBall>((control::VISION), &vision.vision_ball,
+        //                                           "proto-VisionBall", "vision");
+        // cognitionThread.log<messages::VisionRobot>((control::VISION), &vision.vision_robot,
+        //                                            "proto-VisionRobot", "vision");
+        // cognitionThread.log<messages::VisionObstacle>((control::VISION), &vision.vision_obstacle,
+        //                                               "proto-VisionObstacle", "vision");
+        // cognitionThread.log<messages::JointAngles>((control::VISION), &vision.joint_angles_out,
+        //                                            "proto-JointAngles", "vision");
+        // cognitionThread.log<messages::InertialState>((control::VISION), &vision.inertial_state_out,
+                                                     // "proto-InertialState", "vision");
 //#endif
         
     }

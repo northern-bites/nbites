@@ -48,7 +48,7 @@ VisionModule::~VisionModule()
     }
 }
 
-// TODO run on lowres bottom image
+// TODO use horizon on top image
 void VisionModule::run_()
 {
     // Get messages from inPortals
