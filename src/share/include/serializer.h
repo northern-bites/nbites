@@ -8,6 +8,9 @@
 #include <assert.h>
 #include "google/protobuf/message.h"
 
+/*
+ Common abstract base so that serializeTo doesn't need to worry about specific object types.
+ */
 class SerializableBase {
 public:
     virtual int32_t length() = 0;
@@ -52,7 +55,7 @@ public:
 
 //true on success, false on failure (null pointer, <= 0 length, oversized)
 // **** DELETES POINTERS IN >objects< AFTER SERIALIZING ****
-inline bool serializeTo(std::vector<SerializableBase *> objects, uint64_t objectIndex, void * destStart, size_t maxSize, size_t * usedReturn) {
+inline bool serializeTo(std::vector<SerializableBase *> objects, uint64_t dataIndex, void * destStart, size_t maxSize, size_t * usedReturn) {
 
     if (maxSize > (size_t)INT32_MAX) {
         printf("ERROR: serializeTo() designed for 32 bit size values!  maxSize %zu exceeds INT32_MAX %u!\n",
@@ -64,7 +67,7 @@ inline bool serializeTo(std::vector<SerializableBase *> objects, uint64_t object
     uint8_t * bytePointer = (uint8_t *) destStart;
 
     uint64_t * indexPointer = (uint64_t *) bytePointer;
-    *indexPointer = objectIndex;
+    *indexPointer = dataIndex;
     loc += sizeof(uint64_t);
 
     int32_t * intPointer = (int32_t *) (bytePointer + loc);
@@ -95,7 +98,7 @@ inline bool serializeTo(std::vector<SerializableBase *> objects, uint64_t object
         delete objects[i];
     }
 
-    *intPointer = (int32_t) loc;
+    *intPointer = (int32_t) loc;    //Store bytes used.
     *usedReturn = loc;              //Return bytes used by pointer
     return true;
 }
@@ -134,7 +137,7 @@ public:
     }
 
     bool parse() {
-        if (askIndex >= 0) {
+        if (parsed()) {
             printf("ERROR: Deserialize object already parsed!\n");
             return false;
         }

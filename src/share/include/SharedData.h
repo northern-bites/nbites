@@ -14,8 +14,7 @@
 
 #include "serializer.h"
 
-#define NBITES_MEM "/nbites-memory"
-
+const char * NBITES_MEM = "/nbites-memory";
 const int COMMAND_SIZE = 2048;
 const int SENSOR_SIZE = 1024;
 
