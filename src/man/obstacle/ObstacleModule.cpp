@@ -381,8 +381,8 @@ void ObstacleModule::updateObstacleArrays
 (FieldObstacles::Obstacle::ObstacleDetector detector, 
  FieldObstacles::Obstacle::ObstaclePosition pos, float dist)
 {
-    if (detector==FieldObstacles::Obstacle::SONARS)
-        std::cout<<"SONARS "<<dist<<std::endl;
+    // if (detector==FieldObstacles::Obstacle::SONARS)
+    //     std::cout<<"SONARS "<<dist<<std::endl;
     // start the buffer count
     obstacleBuffer[int(pos)] = 1;
     obstacleDistances[int(pos)] = dist;

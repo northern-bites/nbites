@@ -175,8 +175,8 @@ def dodge(nav):
         else:
             return
 
-    print(nav.brain.obstacles)
-    print(nav.brain.obstacleDetectors)
+    # print(nav.brain.obstacles)
+    # print(nav.brain.obstacleDetectors)
 
     dest = RelRobotLocation(dodge.dest.relX + random(),
                             dodge.dest.relY + random(),
