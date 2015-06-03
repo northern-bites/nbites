@@ -98,7 +98,7 @@ public class LogToViewUtility extends UtilityParent implements TreeModel, TreeSe
 		}
 		
 		for (Class<? extends ViewParent> cls : pset) {
-			ret[i++] = new ViewState(false, cls);
+			ret[i++] = new ViewState(true, cls);
 		}
 		
 		return ret;
