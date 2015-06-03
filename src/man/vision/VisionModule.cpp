@@ -52,7 +52,6 @@ VisionModule::~VisionModule()
     }
 }
 
-// TODO gradient fix
 // TODO use horizon on top image
 void VisionModule::run_()
 {

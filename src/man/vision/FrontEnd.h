@@ -132,7 +132,7 @@ struct Colors
   ColorParams green;
   ColorParams orange;
 
-  // TODO parameters should not be hard coded and at compile time
+  // TODO parameters should not be hard coded
   Colors() {
     //         (Dark U, Dark V, LightU, LightV, FuzzyU, FuzzyV)
     white .load(-0.02f, -0.02f, 0.25f, 0.25f, -0.055f, -0.055f);
