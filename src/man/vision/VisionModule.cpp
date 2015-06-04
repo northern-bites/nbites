@@ -53,9 +53,7 @@ VisionModule::~VisionModule()
 }
 
 // TODO bug in assembly front end green image
-// TODO edges that don't go from green to white
 // TODO false negative field lines, probably result of bad homography
-// TODO false positive field lines, frequently the center circle
 // TODO use horizon on top image
 void VisionModule::run_()
 {
