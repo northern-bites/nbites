@@ -32,7 +32,7 @@ VisionModule::VisionModule()
 
         // TODO flag
         bool fast = true;
-        frontEnd[i]->fast(fast);
+        frontEnd[i]->fast(false);
         edgeDetector[i]->fast(fast);
         hough[i]->fast(fast);
     }
