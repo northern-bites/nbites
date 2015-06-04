@@ -3,6 +3,10 @@
 namespace man {
 namespace naive {
 
+using messages::NaiveBall;
+// using messages::BallModel;
+
+
 struct NaiveBallModule::BallState
 {
         BallState(){}
@@ -66,6 +70,20 @@ void NaiveBallModule::run_()
     // checkIfStationary() ? printf("Stationary\n") : printf("moving\n");
 
     portals::Message<messages::NaiveBall> naiveBallMessage(0);
+
+    naiveBallMessage.get()->clear_position();
+    if (bufferFull) {
+        int p = currentIndex;
+        for (int i = 0; i < buffSize; i++) {
+            currentIndex = currentIndex % buffSize;
+            NaiveBall::Position* temp = naiveBallMessage.get()->add_position();
+            temp->set_x(ballStateBuffer[currentIndex].rel_x);
+            temp->set_y(ballStateBuffer[currentIndex].rel_y);
+            currentIndex++;
+        }
+
+    }
+
     naiveBallMessage.get()->set_velocity(velocityEst);
     naiveBallMessage.get()->set_stationary(checkIfStationary());
     naiveBallMessage.get()->set_yintercept(yIntercept);
