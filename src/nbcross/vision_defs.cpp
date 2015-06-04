@@ -151,30 +151,31 @@ int Vision_func() {
     //-------------------
     //  LINES
     //-------------------
-    man::vision::FieldLineList* lineList = module.getFieldLines();
+    man::vision::HoughLineList* lineList = module.getLines();
 
     Log* lineRet = new Log();
     std::string lineBuf;
 
-    for (int i = 0; i < lineList->size(); i++) {
-        for (int j = 0; j < 2; j++) {
-            man::vision::HoughLine& line = (*lineList)[i].lines(j);
-            double r = line.r();
-            double t = line.t();
-            double ep0 = line.ep0();
-            double ep1 = line.ep1();
-            
-            // In Java, doubles are stored in big endian representation
-            endswap<double>(&r);
-            endswap<double>(&t);
-            endswap<double>(&ep0);
-            endswap<double>(&ep1);
+    for (auto it = lineList->begin(); it != lineList->end(); it++) {
+        man::vision::HoughLine& line = *it;
+        double r = line.r();
+        double t = line.t();
+        double ep0 = line.ep0();
+        double ep1 = line.ep1();
+        int lineIndex = line.fieldLine();
+        
+        // Java uses big endian representation
+        endswap<double>(&r);
+        endswap<double>(&t);
+        endswap<double>(&ep0);
+        endswap<double>(&ep1);
+        endswap<int>(&lineIndex);
 
-            lineBuf.append((const char*) &r, sizeof(double));
-            lineBuf.append((const char*) &t, sizeof(double));
-            lineBuf.append((const char*) &ep0, sizeof(double));
-            lineBuf.append((const char*) &ep1, sizeof(double));
-        }
+        lineBuf.append((const char*) &r, sizeof(double));
+        lineBuf.append((const char*) &t, sizeof(double));
+        lineBuf.append((const char*) &ep0, sizeof(double));
+        lineBuf.append((const char*) &ep1, sizeof(double));
+        lineBuf.append((const char*) &lineIndex, sizeof(int));
     }
 
     lineRet->setData(lineBuf);

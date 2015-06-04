@@ -26,7 +26,7 @@ public:
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
-    FieldLineList* getFieldLines(bool topCamera = true) const { return fieldLines[!topCamera]; }
+    HoughLineList* getLines(bool topCamera = true) const { return houghLines[!topCamera]; }
 
 protected:
     virtual void run_();

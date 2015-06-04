@@ -53,12 +53,17 @@ public class LineView extends ViewParent implements IOFirstResponder {
 			g.drawImage(originalImage, 0, 0, displayw, displayh, null);
 			g.drawImage(edgeImage, 0, 480, displayw, displayh, null);
 
-            g.setColor(Color.red);
-            for (int i = 0; i < lines.size(); i += 4) {
+            for (int i = 0; i < lines.size(); i += 5) {
                 double r = lines.get(i);
                 double t = lines.get(i + 1);
                 double end0 = lines.get(i + 2);
                 double end1 = lines.get(i + 3);
+                double lineIndex = lines.get(i + 4);
+
+                if (lineIndex == -1)
+                    g.setColor(Color.blue);
+                else
+                    g.setColor(Color.red);
 
                 double x0 = 2*r * Math.cos(t) + originalImage.getWidth() / 2;
                 double y0 = -2*r * Math.sin(t) + originalImage.getHeight() / 2;
@@ -87,9 +92,9 @@ public class LineView extends ViewParent implements IOFirstResponder {
 		edgeImage = ei.toBufferedImage();
 		repaint();
 
-        // TODO hough line class
+        // TODO refactor into hough line class
         byte[] lineBytes = out[6].bytes;
-        int numLines = lineBytes.length / (8 * 4);
+        int numLines = lineBytes.length / (9 * 4);
         Logger.logf(Logger.INFO, "%d field lines expected.", numLines);
 		try {
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(lineBytes));
@@ -98,6 +103,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 lines.add(dis.readDouble()); // t
                 lines.add(dis.readDouble()); // ep0
                 lines.add(dis.readDouble()); // ep1
+                lines.add((double)dis.readInt()); // field line index
             }
 		} catch (Exception e) {
 			Logger.logf(Logger.ERROR, "Conversion from bytes to hough lines in LineView failed.");
