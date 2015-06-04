@@ -236,11 +236,11 @@ void FieldLineList::find(HoughLineList& houghLines)
   }
 }
 
-// *****************
-// *               *
-// *  Calibration  *
-// *               *
-// *****************
+// ****************
+// *               
+// *  Calibration  
+// *               
+// ****************
 
 bool FieldLineList::TiltCalibrate(FieldHomography& h, string* s)
 {
