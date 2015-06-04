@@ -1,9 +1,11 @@
 /**
- * @brief The joint enactor module communicates synchronously with the
- *        DCM to control the angles and stiffnesses of the joint
- *        actuators.
- * @author Ellis Ratner <eratner@bowdoin.edu>
- * @date   January 2013
+ * @brief The Joint Enactor Module recieves commands from
+ *        behaviors (LED commands) and motion (Joint Angles)
+ *        and then passes them along to the Boss process using
+ *        a segment of shared memory (Defined in SharedData.h)
+ *
+ * @author Daniel Zeller (Tore apart Ellis Ratners original Module)
+ * @date   June 2015
  */
 #pragma once
 

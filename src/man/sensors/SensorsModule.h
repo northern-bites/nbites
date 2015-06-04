@@ -1,10 +1,8 @@
 /**
- * @brief  Module that serves as an interface between the low-level
- *         NAOQi sensor data acquisition, and responsible for retrieving
- *         and maintaining information about the state of the sonar,
- *         joints, inertia, FSRs, and buttons.
- * @author Ellis Ratner <eratner@bowdoin.edu>
- * @date   January 2013
+ * @brief  Module that reads Sensor data (such as joint angles, inertials etc)
+ *         from shared memory, provided by Boss process
+ * @author Daniel Zeller (Tore apart Ellis Ratners original Module)
+ * @date   June 2015
  */
 #pragma once
 

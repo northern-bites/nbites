@@ -76,10 +76,14 @@ inline bool serializeTo(std::vector<SerializableBase *> objects, uint64_t object
         int32_t size = objects[i]->length();
         const void * data = objects[i]->data();
 
-        if (size <= 0)
+        if (size <= 0) {
+            printf("Size 0!\n");
             return false;
-        if (data == NULL)
+        }
+        if (data == NULL) {
+            printf("Data Null\n");
             return false;
+        }
 
         if (loc + sizeof(int32_t) + size > maxSize) {
             printf("ERROR: serialize.h:%i not enough space for serialization! (was given %zu bytes)\n", __LINE__, maxSize);

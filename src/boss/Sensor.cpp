@@ -176,6 +176,38 @@ void Sensor::initSensor()
     std::cout << "\tSensor keys initialized." << std::endl;
 }
 
+void Sensor::initSonarValues()
+{
+    // Get a proxy to the DCM.
+    boost::shared_ptr<AL::DCMProxy> dcmProxy = broker->getDcmProxy();
+    if(dcmProxy != 0)
+    {
+        try
+        {
+            // For DCM::set() see:
+            // http://www.aldebaran-robotics.com/documentation/naoqi/sensors/dcm-api.html#DCMProxy::set__AL::ALValueCR
+            AL::ALValue dcmSonarCommand;
+
+            dcmSonarCommand.arraySetSize(3);
+            dcmSonarCommand[0] = std::string("Device/SubDeviceList/US/Actuator/Value"); // Device name.
+            dcmSonarCommand[1] = std::string("ClearAll"); // Delete all timed commands before adding this one.
+
+            dcmSonarCommand[2].arraySetSize(1); // A list of (1) timed-commands.
+            dcmSonarCommand[2][0].arraySetSize(2);
+            dcmSonarCommand[2][0][0] = 68.0; // The command itself.
+            dcmSonarCommand[2][0][1] = dcmProxy->getTime(0); // The DCM time for the command to be applied.
+
+            // Send the timed command to the sonars.
+            dcmProxy->set(dcmSonarCommand);
+        }
+        catch(AL::ALError& e)
+        {
+            std::cout << "SensorsModule : Failed to initialize sonars, "
+                      << e.toString() << std::endl;
+        }
+    }
+}
+
 messages::JointAngles Sensor::buildJointsMessage()
 {
     messages::JointAngles jointsMessage;
