@@ -19,7 +19,7 @@
 ; image. Note that because cache lines are larger than and aligned with DQ, those pixels are
 ; guaranteed to exist and so can be read and written. We just have to avoid modifying them.
 
-        public _connectMark
+        public __connectMark
         .model flat
 
 ; Arguments accessed via esp
@@ -75,7 +75,7 @@ mark	MACRO address, clearMask, setMask
 ;// *****************
 
 	.CODE
-_connectMark:
+__connectMark:
 	push	ebp
 	mov	ebp, esp
 	sub	esp, SIZEOF Locals

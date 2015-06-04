@@ -26,7 +26,7 @@ string strPrintf(const char* format, ...)
   char buf[1024];
   va_list ap;
   va_start(ap, format);
-  vsprintf(buf, format, ap);
+  vsprintf_s(buf, format, ap);
   va_end (ap);
   return buf;
 }

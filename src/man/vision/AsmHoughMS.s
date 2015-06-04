@@ -25,7 +25,7 @@
 ; undefined values. The overwriting is OK because the active region of
 ; the Hough space is smaller than the allocated bins.
 
-	PUBLIC	_houghSmooth
+	PUBLIC	__houghSmooth
 	.MODEL	FLAT
 
 
@@ -54,7 +54,7 @@ Args	ENDS
 ; *****************
 
 	.CODE
-_houghSmooth:
+__houghSmooth:
 ; Preserve the required registers: ebp, ebx, esi, edi
         push    ebp
         push    ebx

@@ -7,11 +7,12 @@
 #ifndef _main_
 #define _main_
 
-#include "stdafx.h"
+#include "Stdafx.h"
 #include <stdlib.h>
-#include "vision2015.h"
+#include "Vision.h"
 
 using namespace std;
+using namespace man::vision;
 
 // ************
 // *          *

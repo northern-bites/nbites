@@ -34,7 +34,7 @@ Connectivity::Connectivity()
   runSize = 0;
 }
 
-extern "C" void connectMark(uint8_t* image, int width, int height, int pitch, int t2);
+extern "C" void _connectMark(uint8_t* image, int width, int height, int pitch, int t2);
 
 void slowMark(uint8_t* image, int width, int height, int pitch, int t2)
 {
@@ -138,8 +138,8 @@ void Connectivity::run(uint8_t* image, int width, int height, int pitch)
   if (fast())
   {
     // ASM pixel marking
-    connectMark(image + pitch + 1, width - 2, height - 2, pitch, secondThreshold());
-    connectMark(image, width, 2, pitch * (height - 1), 255);
+    _connectMark(image + pitch + 1, width - 2, height - 2, pitch, secondThreshold());
+    _connectMark(image, width, 2, pitch * (height - 1), 255);
 
     // Mark first and last columns. This could be outside the conditional and shared
     // between fast and slow, but cache performance is much better here. Not sure why.
@@ -254,7 +254,7 @@ bool Connectivity::test(string& message)
   // Test pixel marking
   uint8_t* imageCopy = new uint8_t[width * height];
   memcpy(imageCopy, image, width * height);
-  connectMark(image     + 5, width - 10, height, width, secondThreshold());
+  _connectMark(image     + 5, width - 10, height, width, secondThreshold());
   slowMark   (imageCopy + 5, width - 10, height, width, secondThreshold());
   int err = 0;
   for (int i = 0; i < width * height; ++i)

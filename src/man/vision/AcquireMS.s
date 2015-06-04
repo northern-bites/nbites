@@ -6,7 +6,7 @@
 ;
 ; Microsoft MASM syntax
 
-        public _newAcquire
+        public __acquire_image
         .model flat
         .data
 
@@ -75,7 +75,7 @@ Args	ENDS
 
 	.CODE
 
-_newAcquire:
+__acquire_image:
 ; Preserve the required registers: ebp, ebx, esi, edi
         push    ebp
         push    ebx

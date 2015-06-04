@@ -4,7 +4,7 @@
 // *                                              *
 // ************************************************
 
-#include "stdafx.h"
+#include "Stdafx.h"
 #include <stdlib.h>
 #include <math.h>
 #include <list>
@@ -12,9 +12,9 @@
 #include <fstream>
 #include "main.h"
 #include "FrontEnd.h"
-#include "fastBlob.h"
-#include "edge2015.h"
-#include "hough2015.h"
+#include "FastBlob.h"
+#include "Edge.h"
+#include "Hough.h"
 
 // ************
 // *          *

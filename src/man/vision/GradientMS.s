@@ -32,7 +32,7 @@
 ; be DQ aligned, regardless of the specified address and width. This supports
 ; running on arbitrary windows of images.
 
-	PUBLIC	_gradient
+	PUBLIC	__gradient
 	.MODEL	FLAT
 
 ; ***************
@@ -88,7 +88,7 @@ Args	ENDS
 ; *****************
 
 	.CODE
-_gradient:
+__gradient:
 ; Preserve the required registers: ebp, ebx, esi, edi
         push    ebp
         push    ebx

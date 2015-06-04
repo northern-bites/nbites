@@ -20,7 +20,7 @@
 ; runs will not have any garbage due to the overreading, but some data in runs
 ; beyond the terminator may be overwritten if count is not a multiple of 16.
 
-	PUBLIC	_runLengthU16, _runLengthU8
+	PUBLIC	__runLengthU16, __runLengthU8
 	.MODEL	FLAT
 
 ; *******************************
@@ -130,7 +130,7 @@ u16Bits	MACRO
 	pmovmskb eax, xmm0		; copy sign bits to eax
 	ENDM
 
-_runLengthU16:
+__runLengthU16:
 	rlc	setu16, u16Bits
 
 ; ********************
@@ -158,7 +158,7 @@ u8Bits	MACRO
 	pmovmskb eax, xmm0		; copy sign bits to eax
 	ENDM
 
-_runLengthU8:
+__runLengthU8:
 	rlc	setu8, u8Bits
 
 	END
