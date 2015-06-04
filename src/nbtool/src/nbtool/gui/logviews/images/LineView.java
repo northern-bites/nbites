@@ -1,11 +1,13 @@
 package nbtool.gui.logviews.images;
 
 import java.awt.Graphics;
+import java.awt.Color;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.util.Vector;
 
 import nbtool.util.Logger;
 import nbtool.data.Log;
@@ -27,6 +29,10 @@ public class LineView extends ViewParent implements IOFirstResponder {
 	final int displayw = 640;
 	final int displayh = 480;
 	
+	BufferedImage originalImage;
+	BufferedImage edgeImage;
+    Vector<Double> lines;
+
 	@Override
 	public void setLog(Log newlog) {
 		CrossInstance ci = CrossIO.instanceByIndex(0);
@@ -35,20 +41,41 @@ public class LineView extends ViewParent implements IOFirstResponder {
 		CrossFunc func = ci.functionWithName("Vision");
 		assert(func != null);
 		
-		CrossCall cc = new CrossCall(this, func, newlog);
-		
+        CrossCall cc = new CrossCall(this, func, newlog);
+
 		assert(ci.tryAddCall(cc));
+
+		originalImage = Utility.biFromLog(newlog);
 	}
 	
-	BufferedImage img;
 	public void paintComponent(Graphics g) {
-		if (img != null)
-			g.drawImage(img, 0, 0, displayw, displayh, null);
+		if (edgeImage != null) {
+			g.drawImage(originalImage, 0, 0, displayw, displayh, null);
+			g.drawImage(edgeImage, 0, 480, displayw, displayh, null);
+
+            g.setColor(Color.red);
+            for (int i = 0; i < lines.size(); i += 4) {
+                double r = lines.get(i);
+                double t = lines.get(i + 1);
+                double end0 = lines.get(i + 2);
+                double end1 = lines.get(i + 3);
+
+                double x0 = 2*r * Math.cos(t) + originalImage.getWidth() / 2;
+                double y0 = -2*r * Math.sin(t) + originalImage.getHeight() / 2;
+                int x1 = (int)Math.round(x0 + 2*end0 * Math.sin(t));
+                int y1 = (int)Math.round(y0 + 2*end0 * Math.cos(t));
+                int x2 = (int)Math.round(x0 + 2*end1 * Math.sin(t));
+                int y2 = (int)Math.round(y0 + 2*end1 * Math.cos(t));
+
+                g.drawLine(x1, y1, x2, y2);
+            }
+        }
     }
 	
 	public LineView() {
 		super();
 		setLayout(null);
+        lines = new Vector<Double>();
 	}
 
 	@Override
@@ -57,21 +84,20 @@ public class LineView extends ViewParent implements IOFirstResponder {
 	@Override
 	public void ioReceived(IOInstance inst, int ret, Log... out) {
 		EdgeImage ei = new EdgeImage(width, height,  out[5].bytes);
-		img = ei.toBufferedImage();
+		edgeImage = ei.toBufferedImage();
 		repaint();
 
-        byte[] lines = out[6].bytes;
-        int numLines = lines.length / (8 * 4);
+        // TODO hough line class
+        byte[] lineBytes = out[6].bytes;
+        int numLines = lineBytes.length / (8 * 4);
         Logger.logf(Logger.INFO, "%d field lines expected.", numLines);
 		try {
-			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(lines));
+			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(lineBytes));
 			for (int i = 0; i < numLines; ++i) {
-                double r = dis.readDouble();
-                double t = dis.readDouble();
-                System.out.println("r: " + r);
-                System.out.println("t: " + t);
-                double ep0 = dis.readDouble();
-                double ep1 = dis.readDouble();
+                lines.add(dis.readDouble()); // r
+                lines.add(dis.readDouble()); // t
+                lines.add(dis.readDouble()); // ep0
+                lines.add(dis.readDouble()); // ep1
             }
 		} catch (Exception e) {
 			Logger.logf(Logger.ERROR, "Conversion from bytes to hough lines in LineView failed.");

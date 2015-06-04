@@ -161,8 +161,6 @@ int Vision_func() {
             man::vision::HoughLine& line = (*lineList)[i].lines(j);
             double r = line.r();
             double t = line.t();
-            std::cout << r << std::endl;
-            std::cout << t << std::endl;
             double ep0 = line.ep0();
             double ep1 = line.ep1();
             
