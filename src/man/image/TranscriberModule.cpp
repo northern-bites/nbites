@@ -663,24 +663,36 @@ void TranscriberModule::run_()
         nb_pb.SerializeToString(&nb_buf);
         fb_pb.SerializeToString(&fb_buf);
 
+        int nb_length = nb_buf.length();
+        int fb_length = fb_buf.length();
+
         nb_buf.append(fb_buf);
 
         std::vector<SExpr> contents;
 
+        SExpr naive("MULTIBALL", "multiball", clock(), -1, nb_buf.length());
+        naive.append(SExpr("nb_length", nb_length));
+        naive.append(SExpr("fb_length", fb_length));
+        naive.append(SExpr("velocity", nb_pb.velocity()));
+        naive.append(SExpr("stationary", nb_pb.stationary()));
+        naive.append(SExpr("yintercept", nb_pb.yintercept()));
+        // for (int i = 0; i < 30; i++) {
+        //     char[] temp = "position_" + i;
+        // }
+        // naive.append(SExpr("position", nb_pb.position(1).x()));
 
-        // SExpr naive("NaiveBall", "multiball", clock(), -1, nb_buf.length());
-        // naive.append(SExpr("velocity", nb_pb.velocity()));
-        // naive.append(SExpr("stationary", nb_pb.stationary()));
-        // naive.append(SExpr("yintercept", nb_pb.yintercept()));
+        contents.push_back(naive);
 
-        // contents.push_back(naive);
-
-        // SExpr filter("FilteredBall", "multiball", clock(), -1, fb_buf.length());
-        // // filter.append(SExpr("vis", fb_pb.vis()));
-        // filter.append(SExpr("distance", fb_pb.distance()));
-        // filter.append(SExpr("bearing", fb_pb.bearing()));
-        // filter.append(SExpr("rel_x", fb_pb.rel_x()));
-        // filter.append(SExpr("rel_y", fb_pb.rel_y()));
+        SExpr filter("FilteredBall", "multiball", clock(), -1, fb_buf.length());
+        filter.append(SExpr("vis_distance", fb_pb.vis().distance()));
+        filter.append(SExpr("vis_bearing", fb_pb.vis().bearing()));
+        filter.append(SExpr("vis_on", fb_pb.vis().on()));
+        filter.append(SExpr("vis_x", fb_pb.vis().x()));
+        filter.append(SExpr("vis_y", fb_pb.vis().y()));
+        filter.append(SExpr("distance", fb_pb.distance()));
+        filter.append(SExpr("bearing", fb_pb.bearing()));
+        filter.append(SExpr("rel_x", fb_pb.rel_x()));
+        filter.append(SExpr("rel_y", fb_pb.rel_y()));
 
         // filter.append(SExpr("vel_x", fb_pb.vel_x()));
         // filter.append(SExpr("vel_y", fb_pb.vel_y()));
@@ -691,8 +703,8 @@ void TranscriberModule::run_()
         // filter.append(SExpr("var_vel_y", fb_pb.var_vel_y()));
         // filter.append(SExpr("is_stationary", fb_pb.is_stationary()));
         // filter.append(SExpr("bearing_deg", fb_pb.bearing_deg()));
-        // filter.append(SExpr("x", fb_pb.x()));
-        // filter.append(SExpr("y", fb_pb.y()));
+        filter.append(SExpr("x", fb_pb.x()));
+        filter.append(SExpr("y", fb_pb.y()));
 
         // filter.append(SExpr("rel_x_dest", fb_pb.var_rel_x()));
         // filter.append(SExpr("rel_y_dest", fb_pb.rel_y_dest()));
@@ -711,7 +723,7 @@ void TranscriberModule::run_()
         // filter.append(SExpr("mov_vel_y", fb_pb.mov_vel_y()));
         // filter.append(SExpr("mov_speed", fb_pb.mov_speed()));
 
-        // contents.push_back(filter);
+        contents.push_back(filter);
 
         NBLog(NBL_IMAGE_BUFFER, "multiball",
                    contents, nb_buf);

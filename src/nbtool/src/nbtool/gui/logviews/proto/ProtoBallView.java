@@ -12,6 +12,7 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 import java.util.List;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.lang.Float;
@@ -74,25 +75,41 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 
 	public void setLog(Log newlog) {
 		String t = (String) newlog.primaryType();
-		Class<? extends com.google.protobuf.GeneratedMessage> lClass = Utility.protobufClassFromType(t);
-		Logger.logf(Logger.INFO, "ProtoBufView: using class %s for type %s.\n", lClass.getName(), t);
-		com.google.protobuf.Message msg = Utility.protobufInstanceForClassWithData(lClass, newlog.bytes);
-		ball_on = false;
-		if (!t.equals("proto-FilteredBall")) { return; }
-		ball_on = true;
-		Map<FieldDescriptor, Object> fields = msg.getAllFields();
+
+		byte[] nb = Arrays.copyOfRange(newlog.bytes,0,12);
+		byte[] fb = Arrays.copyOfRange(newlog.bytes,12,newlog.bytes.length);
+
+		System.out.println("OMG");
+		Class<? extends com.google.protobuf.GeneratedMessage> nbClass = Utility.protobufClassFromType("proto-NaiveBall");
+		Class<? extends com.google.protobuf.GeneratedMessage> fbClass = Utility.protobufClassFromType("proto-FilteredBall");
+
+		// Logger.logf(Logger.INFO, "ProtoBufView: using class %s for type %s.\n", lClass.getName(), t);
+		com.google.protobuf.Message nbMsg = Utility.protobufInstanceForClassWithData(nbClass, nb);
+		com.google.protobuf.Message fbMsg = Utility.protobufInstanceForClassWithData(fbClass, fb);
+
+		Map<FieldDescriptor, Object> fields = fbMsg.getAllFields();
 		for (Map.Entry<FieldDescriptor, Object> entry : fields.entrySet()) {
-			if (entry.getKey().getName().equals("vis")) {
-				Map<FieldDescriptor, Object> visFields = ((com.google.protobuf.Message)entry.getValue()).getAllFields();
-				for (Map.Entry<FieldDescriptor, Object> visEntry : visFields.entrySet()) {
-					visionBall.put(entry.getKey().getName(), visEntry.getValue());
-				}
-			} else {
-				filteredBall.put(entry.getKey().getName(), entry.getValue());
-			}
+			System.out.println(entry.getKey().getName());
 		}
 
-		repaint();
+
+
+		// ball_on = false;
+		// if (!t.equals("proto-FilteredBall")) { return; }
+		// ball_on = true;
+		// Map<FieldDescriptor, Object> fields = msg.getAllFields();
+		// for (Map.Entry<FieldDescriptor, Object> entry : fields.entrySet()) {
+		// 	if (entry.getKey().getName().equals("vis")) {
+		// 		Map<FieldDescriptor, Object> visFields = ((com.google.protobuf.Message)entry.getValue()).getAllFields();
+		// 		for (Map.Entry<FieldDescriptor, Object> visEntry : visFields.entrySet()) {
+		// 			visionBall.put(entry.getKey().getName(), visEntry.getValue());
+		// 		}
+		// 	} else {
+		// 		filteredBall.put(entry.getKey().getName(), entry.getValue());
+		// 	}
+		// }
+
+		// repaint();
 
 
 	}

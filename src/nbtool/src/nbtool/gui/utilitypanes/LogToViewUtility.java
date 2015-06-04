@@ -122,7 +122,6 @@ public class LogToViewUtility extends UtilityParent implements TreeModel, TreeSe
 				types[i++] = s;
 			}
 		}
-		
 		states = new ViewState[types.length][];
 		Map<String, Class<? extends ViewParent>[]> lastShown = Prefs.last_shown;
 		
@@ -149,7 +148,7 @@ public class LogToViewUtility extends UtilityParent implements TreeModel, TreeSe
 		
 		//this.setContentPane(tree);
 		this.getContentPane().setLayout(new BorderLayout());
-		this.getContentPane().add(tree, BorderLayout.CENTER);		
+		this.getContentPane().add(tree, BorderLayout.CENTER);
 	}
 
 	@Override

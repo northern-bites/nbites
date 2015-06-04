@@ -69,6 +69,7 @@ public class NBConstants {
 		map.put("STATS", new Class[]{BotStatsView.class});
 		map.put(DEFAULT_S, new Class[]{DefaultView.class});
 		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class, ProtoBallView.class});
+		map.put("MULTIBALL", new Class[]{ProtoBallView.class});
 		
 		return map;
 	}
