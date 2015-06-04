@@ -23,6 +23,9 @@ int Vision_func() {
     uint8_t buf[length];
     memcpy(buf, copy->data().data(), length);
 
+    bool topCamera = copy->tree().find("contents")->get(1)->
+                                  find("from")->get(1)->value() == "camera_TOP";
+
     int width = 2*640;
     int height = 480;
     
@@ -46,7 +49,7 @@ int Vision_func() {
     // -----------
     //   Y IMAGE
     // -----------
-    man::vision::ImageFrontEnd* frontEnd = module.getFrontEnd();
+    man::vision::ImageFrontEnd* frontEnd = module.getFrontEnd(topCamera);
 
     Log* yRet = new Log();
     int yLength = 240*320*2;
@@ -128,7 +131,7 @@ int Vision_func() {
     //-------------------
     //  EDGES
     //-------------------
-    man::vision::EdgeList* edgeList = module.getEdges();
+    man::vision::EdgeList* edgeList = module.getEdges(topCamera);
 
     Log* edgeRet = new Log();
     std::string edgeBuf;
@@ -151,7 +154,7 @@ int Vision_func() {
     //-------------------
     //  LINES
     //-------------------
-    man::vision::HoughLineList* lineList = module.getLines();
+    man::vision::HoughLineList* lineList = module.getLines(topCamera);
 
     Log* lineRet = new Log();
     std::string lineBuf;
