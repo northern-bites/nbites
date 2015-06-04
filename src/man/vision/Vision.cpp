@@ -26,7 +26,11 @@ string strPrintf(const char* format, ...)
   char buf[1024];
   va_list ap;
   va_start(ap, format);
+#ifdef WIN32
   vsprintf_s(buf, format, ap);
+#else
+  vsprintf(buf, format, ap);
+#endif
   va_end (ap);
   return buf;
 }
