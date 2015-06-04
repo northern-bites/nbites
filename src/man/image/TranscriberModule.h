@@ -64,24 +64,25 @@ public:
     struct NewSettings {
         bool hflip;
         bool vflip;
-        bool auto_exposure;
+        int auto_exposure;
         int brightness;
         int contrast;
         int saturation;
         int hue;
         int sharpness;
         int gamma;
-        bool auto_whitebalance;
+        int auto_whitebalance;
         int backlight_compensation;
         int exposure;
         int gain;
         int white_balance;
-        bool fade_to_black;
+        int fade_to_black;
     };
 
     void initSettings(); //one of the magical init methods
 
     man::ParamReader param;
+    NewSettings updated_settings;
 
 private:
     enum

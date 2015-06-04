@@ -95,7 +95,7 @@ namespace control {
             std::cerr<<"Failed to Parse Params\n";
         } else {
             boost::property_tree::ptree pt;
-            pt.put("whichcamera",receivedParams.whichcamera());
+            pt.put<std::string>("whichcamera",receivedParams.whichcamera());
             pt.put<bool>("hflip",receivedParams.h_flip());
             pt.put<bool>("vflip",receivedParams.v_flip());
             pt.put<bool>("autoexposure",receivedParams.auto_exposure());
