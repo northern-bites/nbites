@@ -9,6 +9,7 @@
 
 #include "stdafx.h"
 #include <stdlib.h>
+#include "vision2015.h"
 
 using namespace std;
 
@@ -77,11 +78,10 @@ public:
   {
     width = 320,
     height = 240,
-    pitch = width * 4
   };
 
   string path;
-  uint8_t* source;
+  YuvLite source;
 
   TestImage();
   ~TestImage();

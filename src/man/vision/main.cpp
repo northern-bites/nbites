@@ -69,14 +69,10 @@ string CodeTimer::print(int pixelCount, bool noAsm)
 // This reads a standard .nblog image and returns the attributes string
 TestImage::TestImage()
 {
-  // Allocate source and output images for the ASM code aligned to 256-byte boundry.
-  // This allows the code to use movdqa, and also provides L1 and L2 cache line
-  // alignment in an attempt to yield more consistent timing tests. Note that movdqa
-  // was for timing tests and found not to be much of an improvement, and it makes
-  // the code harder to use on windows (subsets) of images. Note also that
-  // aligning the memory to cache line boundaries did not make the timing more
-  // consistent.
-  source = (uint8_t*)alignedAlloc(width * height * 14, 8, allocBlock);
+  // Allocate space for Yuv image. On the robot this comes from a camera.
+  uint8_t* src = (uint8_t*)
+    alignedAlloc(TestImage::width * TestImage::height * 8, 4, allocBlock);
+  source = YuvLite(TestImage::width, TestImage::height, TestImage::width * 4, src);
 }
 
 TestImage::~TestImage()
@@ -117,7 +113,7 @@ string TestImage::read(const string& path)
   {
     char c;
     image.get(c);
-    source[i] = (uint8_t)c;
+    source.pixelAddr()[i] = (uint8_t)c;
   }
 
   image.close();
@@ -128,7 +124,7 @@ void TestImage::next()
 {
   if (path.length() == 0)
     for (int i = 0; i < width * height * 8; ++i)
-      source[i] = (uint8_t)(rand() >> 7);
+      source.pixelAddr()[i] = (uint8_t)(rand() >> 7);
 }
 
 // This writes the output images for display by another program
@@ -140,13 +136,20 @@ void writeFile(const string& path, uint8_t* src, int count)
   image.close();
 }
 
-void writeRows(const string& path, uint8_t* src, int width, int height, int pitch)
+template <class T>
+void writeImage(const ImageLite<T>& image, ofstream& file)
 {
-  ofstream image;
-  image.open(path, ios_base::binary);
-  for (int r = 0; r < height; ++r)
-    image.write((const char*)(src + r * pitch), width);
-  image.close();
+  for (int r = 0; r < image.height(); ++r)
+    file.write((const char*)image.pixelAddr(0, r), image.width() * sizeof(T));
+}
+
+template <class T>
+void writeImage(const ImageLite<T>& image, const string& path)
+{
+  ofstream file;
+  file.open(path, ios_base::binary);
+  writeImage(image, file);
+  file.close();
 }
 
 // *********************************************
@@ -156,6 +159,7 @@ void writeRows(const string& path, uint8_t* src, int width, int height, int pitc
 // *********************************************
 
 static Colors colors;
+static ImageFrontEnd frontEnd;
 static EdgeDetector ed;
 static TestImage image;
 static HoughSpace hs(TestImage::width, TestImage::height);
@@ -164,15 +168,17 @@ static FieldHomography fh;
 
 static int iterationCount = 1;
 static bool useColorTable = false;
+static uint8_t* colorTable = 0;
 static bool fieldEdges = true;
 
-// ********************
-// *                  *
-// *  Test Functions  *
-// *                  *
-// ********************
+// window
+static int winX0 = 0, winY0 = 0, winWd = TestImage::width, winHt = TestImage::height;
 
-const char* testImagePath = "C:\\Users\\bill\\Documents\\life\\Bowdoin\\RoboCup\\Vision 2014\\FrontEnd\\test.xxx";
+// *****************************
+// *                           *
+// *  Vision Helper Functions  *
+// *                           *
+// *****************************
 
 int flushCache()
 {
@@ -189,31 +195,33 @@ int flushCache()
   return sum;
 }
 
-uint8_t* getSourceImage(void*& memBlock, int& size)
+void getSourceImage(ImageFrontEnd& ife = frontEnd)
 {
-  size = TestImage::width * TestImage::height;
-  uint8_t* source = (uint8_t*)alignedAlloc(size * 6, 4, memBlock);
-  newAcquire(image.source, TestImage::width, TestImage::height, TestImage::pitch, &colors,
-             source, 0);
-  return source;
+  YuvLite source(image.source, winX0, winY0, winWd, winHt);
+  ife.run(source, &colors, useColorTable ? colorTable : 0);
 }
 
-uint8_t* getGradient(void*& memBlock, int& size)
+void getGradient()
 {
-  uint8_t* source = getSourceImage(memBlock, size);
-  ed.gradient((int16_t*)source, TestImage::width, TestImage::height, TestImage::width);
-  return source;
+  getSourceImage();
+  ed.gradient(frontEnd.yImage());
 }
 
 void getEdges(EdgeList& edges)
 {
-  void* memBlock;
-  int size;
-  uint8_t* source = getGradient(memBlock, size);
-  uint8_t* gImg = fieldEdges ? source + 3 * size : 0;
-  ed.edgeDetect(gImg, TestImage::width, edges);
-  delete[] memBlock;
+  getGradient();
+  ImageLiteU8 green;
+  if (fieldEdges)
+    green = frontEnd.greenImage();
+  ed.edgeDetect(green, edges);
 }
+
+// ********************
+// *                  *
+// *  Test Functions  *
+// *                  *
+// ********************
+
 
 void blobTest()
 {
@@ -242,25 +250,15 @@ void blobTest()
 
 void frontTest()
 {
-  void* allocBlock;
-  int size = TestImage::width * TestImage::height;
-  uint8_t* dest = (uint8_t*)alignedAlloc(size * 6, 8, allocBlock);
-  uint8_t* test = new uint8_t[size * 6];
-
-  // Color lookup table, filled with random values.
-  uint8_t* colorTable = 0;
-  if (useColorTable)
-  {
-    colorTable = new uint8_t[0x200000];
-    for (int i = 0; i < 0x200000; ++i)
-      colorTable[i] = (uint8_t)(rand() >> 7);
-  }
+  ImageFrontEnd slow;
+  slow.fast(false);
 
   // Count errors (disagreements between C++ and ASM)
   int64_t errors[5];
   const char* errorNames[5] = {"Y", "White", "Green", "Orange", "Table"};
   for (int i = 0; i < 5; ++i)
     errors[i] = 0;
+  int maxErrorIndex = useColorTable ? 5 : 4;
 
   // ASM execution time stats. Times are in clock ticks.
   CodeTimer ct;
@@ -275,34 +273,39 @@ void frontTest()
 
     // Generate ASM and C++ results
     uint32_t t[2];
-    t[0] = newAcquire (image.source, TestImage::width, TestImage::height, TestImage::pitch, &colors, dest, colorTable);
-    t[1] = testAcquire(image.source, TestImage::width, TestImage::height, TestImage::pitch, &colors, test, colorTable);
+    getSourceImage();
+    t[0] = frontEnd.time();
+    getSourceImage(slow);
+    t[1] = slow.time();
 
     // Keep ASM timing stats
     ct.add(t);
 
     // Count errors
-    int i = 0;
-    for (int e = 0; e < 5; ++e)
-      for (; i < size * (e + 2); ++i)
-        errors[e] += (int)(dest[i] != test[i]);
+    ImageLiteU16 yFast = frontEnd.yImage();
+    ImageLiteU16 ySlow = slow.yImage();
+    ImageLiteU8 wFast = frontEnd.whiteImage();
+    ImageLiteU8 wSlow = slow.whiteImage();
+    for (int y = 0; y < yFast.height(); ++y)
+      for (int x = 0; x < yFast.width(); ++x)
+      {
+        errors[0] += (int)(*yFast.pixelAddr(x, y) != *ySlow.pixelAddr(x, y));
+        for (int e = 1; e < maxErrorIndex; ++e)
+        {
+          int y2 = y + (e - 1) * wFast.height();
+          errors[e] += (int)(*wFast.pixelAddr(x, y2) != *wSlow.pixelAddr(x, y2));
+        }
+      }
   }
 
   // Print error counts
   printf("\n");
-  for (int e = 0; e < 5; ++e)
+  for (int e = 0; e < maxErrorIndex; ++e)
     printf("%8s %10lld errors\n", errorNames[e], errors[e]);
 
   // Print timing stats
   if (iterationCount > 1)
-    cout << ct.print(size).c_str();
-
-  // Save output for later display
-  writeFile(testImagePath, dest, size * 5);
-
-  delete[] colorTable;
-  delete[] test;
-  delete[] allocBlock;
+    cout << ct.print(frontEnd.yImage().width() * frontEnd.yImage().height()).c_str();
 }
 
 void gradientTest()
@@ -311,9 +314,8 @@ void gradientTest()
   slowEd.fast(false);
 
   // Get source image
-  void* allocBlock;
-  int size;
-  uint8_t* source = getSourceImage(allocBlock, size);
+  getSourceImage();
+  ImageLiteU16 yImage = frontEnd.yImage();
 
   // ASM execution time stats. Times are in clock ticks.
   CodeTimer ct;
@@ -329,43 +331,40 @@ void gradientTest()
 
     // Generate ASM and C++ results
     uint32_t t[2];
-    t[0] = ed    .gradient((int16_t*)source, TestImage::width, TestImage::height, TestImage::width);
-    t[1] = slowEd.gradient((int16_t*)source, TestImage::width, TestImage::height, TestImage::width);
+    t[0] = ed    .gradient(yImage);
+    t[1] = slowEd.gradient(yImage);
 
     // Keep ASM timing stats
     ct.add(t);
 
     // Count errors
-    for (int y = 0; y < ed.dstHeight(); ++y)
-      for (int x = 0; x < ed.dstWidth(); ++x)
+    for (int y = 0; y < ed.gradientImage().height(); ++y)
+      for (int x = 0; x < ed.gradientImage().width(); ++x)
       {
         magErrors += ed.mag(x, y) != slowEd.mag(x, y);
         dirErrors += ed.dir(x, y) != slowEd.dir(x, y);
       }
   }
 
-  printf("\nGradient image %d x %d, pitch = %d\n", ed.dstWidth(), ed.dstHeight(), ed.dstPitch());
+  ImageLiteU16 grad = ed.gradientImage();
+  printf("\nGradient image %d x %d, pitch = %d, src pitch = %d\n",
+         grad.width(), grad.height(), grad.pitch(), yImage.pitch());
 
   // Print error counts
   printf("\n%lld mag errors, %lld direction errors\n", magErrors, dirErrors);
 
   // Print timing stats
   if (iterationCount > 1)
-    cout << ct.print(size).c_str();
-
-  // Save output for later display
-  writeFile(testImagePath, (uint8_t*)ed.gradientImage(), ed.dstPitch() * ed.dstHeight() * 2);
-
-  delete[] allocBlock;
+    cout << ct.print(yImage.width() * yImage.height()).c_str();
 }
 
 void edgeTest()
 {
   // Get source image and gradient
-  void* allocBlock;
-  int size;
-  uint8_t* source = getGradient(allocBlock, size);
-  uint8_t* gImg = fieldEdges ? source + 3 * size : 0;
+  getGradient();
+  ImageLiteU8 green;
+  if (fieldEdges)
+    green = frontEnd.greenImage();
 
   // ASM execution time stats. Times are in clock ticks.
   CodeTimer ct;
@@ -383,9 +382,9 @@ void edgeTest()
     // Generate ASM and C++ results
     uint32_t t[2];
     ed.fast(true);
-    t[0] = ed.edgeDetect(gImg, TestImage::width, fastEdges);
+    t[0] = ed.edgeDetect(green, fastEdges);
     ed.fast(false);
-    t[1] = ed.edgeDetect(gImg, TestImage::width, slowEdges);
+    t[1] = ed.edgeDetect(green, slowEdges);
 
     AngleBinsIterator<Edge> abf(fastEdges), abs(slowEdges);
     while (*abf || *abs)
@@ -411,29 +410,7 @@ void edgeTest()
 
   // Print timing stats
   if (iterationCount > 1)
-    cout << ct.print(size).c_str();
-
-  // Save output for later display
-  struct SimpleEdge
-  {
-    int x, y;
-    int mag, dir;
-  }
-  *edgeArray = new SimpleEdge[fastEdges.count()];
-  AngleBinsIterator<Edge> abi(fastEdges);
-  int i = 0;
-  for (Edge* e = *abi; e; e = *++abi, ++i)
-  {
-    edgeArray[i].x = e->x();
-    edgeArray[i].y = e->y();
-    edgeArray[i].mag = e->mag();
-    edgeArray[i].dir = e->angle();
-  }
-
-  writeFile(testImagePath, (uint8_t*)edgeArray, fastEdges.count() * sizeof(SimpleEdge));
-  delete[] edgeArray;
-
-  delete[] allocBlock;
+    cout << ct.print(ed.gradientImage().width() * ed.gradientImage().height()).c_str();
 }
 
 void houghTest()
@@ -484,23 +461,94 @@ void houghTest()
       printf("\n%s:%s", HoughSpace::timeNames[i],
              ct[i].print(TestImage::width * TestImage::height, noAsm[i]).c_str());
   }
+}
 
-  fastList.mapToField(fh);
+// ***********************************
+// *                                 *
+// *  Get Processing Results for C#  *
+// *                                 *
+// ***********************************
+
+const char* testImagePath = "C:\\Users\\bill\\Documents\\life\\Bowdoin\\RoboCup\\Vision 2014\\FrontEnd\\test.xxx";
+
+void runColors()
+{
+  getSourceImage();
+
+  ofstream file;
+  file.open(testImagePath, ios_base::binary);
+  writeImage(frontEnd.     yImage(), file);
+  writeImage(frontEnd. whiteImage(), file);
+  writeImage(frontEnd. greenImage(), file);
+  writeImage(frontEnd.orangeImage(), file);
+  file.close();
+}
+
+void runGradient()
+{
+  getGradient();
+  writeImage(ed.gradientImage(), testImagePath);
+}
+
+void runEdges()
+{
+  EdgeList edges(24000);
+  getEdges(edges);
+
+  struct SimpleEdge
+  {
+    int x, y;
+    int mag, dir;
+  }
+  *edgeArray = new SimpleEdge[edges.count()];
+  AngleBinsIterator<Edge> abi(edges);
+  int i = 0;
+  for (Edge* e = *abi; e; e = *++abi, ++i)
+  {
+    edgeArray[i].x = e->x();
+    edgeArray[i].y = e->y();
+    edgeArray[i].mag = e->mag();
+    edgeArray[i].dir = e->angle();
+  }
+
+  writeFile(testImagePath, (uint8_t*)edgeArray, edges.count() * sizeof(SimpleEdge));
+  delete[] edgeArray;
+}
+
+void runHough()
+{
+  EdgeList edges(24000);
+  getEdges(edges);
+
+  HoughLineList lines(128);
+  hs.run(edges, lines);
+  lines.mapToField(fh);
+
+  FieldLineList fLines;
+  fLines.find(lines);
+  string cal;
+  fLines.TiltCalibrate(fh, &cal);
+
+  string s = "((lines";
+  for (list<HoughLine>::iterator hl = lines.begin(); hl != lines.end(); ++hl)
+  {
+    int fieldLineSide = -1;
+    if (hl->fieldLine() >= 0)
+      fieldLineSide = (int)(&fLines.at(hl->fieldLine()).lines(1) == &*hl);
+    s += strPrintf(" ((rt %d %d) (score %.2f) (fit %.3f) (fIndex %d %d) (image %s) (field %s))",
+                   hl->rIndex(), hl->tIndex(),
+                   hl->score(), hl->fitError(),
+                   hl->fieldLine(), fieldLineSide,
+                   hl->GeoLine::print().c_str(), hl->field().print().c_str());
+  }
+  s += "))";
 
   ofstream f;
   f.open(testImagePath, ios_base::binary);
-
-  string s = strPrintf("%d,", fastList.size());
-  for (list<HoughLine>::iterator hl = fastList.begin(); hl != fastList.end(); ++hl)
-  {
-    s += hl->GeoLine::print();
-    s += hl->field().print();
-  }
   f.write(s.c_str(), s.length() + 1);
 
-  const char* p = (const char*)(hs.pSpace(-hs.rRadius(), 0));
-  for (int t = 0; t < 256; ++t)
-    f.write(p + 2 * t * hs.rPitch(), 2 * hs.rWidth());
+  ImageLiteU16 hSpace(2 * hs.rWidth(), 256, hs.rPitch(), (uint16_t*)hs.pSpace(-hs.rRadius(), 0));
+  writeImage(hSpace, f);
 
   f.close();
 }
@@ -543,6 +591,11 @@ int main(int argc, char* argv[])
   colors.white .load(-0.04f, -0.04f,  0.12f,  0.12f, -0.06f, -0.06f);
   colors.green .load( 0.08f,  0.01f, -0.02f, -0.23f, -0.06f, -0.06f);
   colors.orange.load( 0.13f,  0.05f, -0.13f,  0.11f, -0.06f,  0.06f);
+
+  // Color lookup table, filled with random values.
+  colorTable = new uint8_t[0x200000];
+  for (int i = 0; i < 0x200000; ++i)
+    colorTable[i] = (uint8_t)(rand() >> 7);
 
   try
   {
@@ -671,6 +724,21 @@ int main(int argc, char* argv[])
         fh.wz0(floatArg(argIndex, argc, argv));
         break;
 
+        // Window
+      case 'wind':
+        int x0, y0, wd, ht;
+        if (sscanf_s(argv[argIndex], "%d,%d,%d,%d", &x0, &y0, &wd, &ht) == 4)
+        {
+          winX0 = max(x0, 0);
+          winY0 = max(y0, 0);
+          winWd = min(x0 + wd, TestImage::width) - winX0;
+          winHt = min(y0 + ht, TestImage::height) - winY0;
+          ++argIndex;
+        }
+        else
+          throw strPrintf("Bad window parameters %s", argv[argIndex]); 
+        break;
+
         // Test functions
       case 'blob':
         blobTest();
@@ -690,6 +758,23 @@ int main(int argc, char* argv[])
 
       case 'ht':
         houghTest();
+        break;
+
+        // Run functions
+      case 'rcl':
+        runColors();
+        break;
+
+      case 'rgr':
+        runGradient();
+        break;
+
+      case 'red':
+        runEdges();
+        break;
+
+      case 'rht':
+        runHough();
         break;
 
       default:
