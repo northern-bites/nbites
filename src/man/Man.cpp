@@ -55,7 +55,6 @@ Man::Man() :
 
         /** Sensors **/
         sensorsThread.addModule(sensors);
-
         sensorsThread.addModule(jointEnactor);
         sensorsThread.addModule(motion);
         sensorsThread.addModule(arms);
@@ -74,7 +73,7 @@ Man::Man() :
 
         jointEnactor.jointsInput_.wireTo(&motion.jointsOutput_);
         jointEnactor.stiffnessInput_.wireTo(&motion.stiffnessOutput_);
-        jointEnactor.ledsInput_.wireTo(&behaviors.ledCommandOut);
+        jointEnactor.ledsInput_.wireTo(&behaviors.ledCommandOut, true);
 
         arms.actualJointsIn.wireTo(&sensors.jointsOutput_);
         arms.expectedJointsIn.wireTo(&motion.jointsOutput_);
@@ -286,7 +285,6 @@ void Man::establishLock()
         perror("NO");
         std::cout << "Could not open lockfile" << std::endl;
         std::cout << "Errno is: " << err << std::endl;
-        std::cout << "FUCK JOSHYPOOP" << strerror(err) << std::endl;
         exit(0);
     }
 

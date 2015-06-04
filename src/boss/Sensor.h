@@ -5,6 +5,7 @@
 
 #include <alcommon/albroker.h>
 #include <almemoryfastaccess/almemoryfastaccess.h>
+#include <alproxies/dcmproxy.h>
 
 #include "PMotion.pb.h"
 #include "ButtonState.pb.h"
@@ -29,6 +30,7 @@ public:
 
 private:
     void initSensor();
+    void initSonarValues();
 
     messages::JointAngles buildJointsMessage();
     messages::JointAngles buildCurrentsMessage();

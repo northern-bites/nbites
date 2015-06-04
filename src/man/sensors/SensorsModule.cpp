@@ -1,5 +1,6 @@
 #include "SensorsModule.h"
 #include "Common.h"
+#include "HighResTimer.h"
 
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -28,7 +29,6 @@ SensorsModule::SensorsModule()
     if (shared_fd < 0) {
         std::cout << "sensorsModule couldn't open shared fd!" << std::endl;
         exit(0);
-        // TODO error
     }
 
     shared = (SharedData*) mmap(NULL, sizeof(SharedData),
@@ -38,9 +38,7 @@ SensorsModule::SensorsModule()
     if (shared == MAP_FAILED) {
         std::cout << "sensorsModule couldn't map to pointer!" << std::endl;
         exit(0);
-        // TODO error
     }
-    std::cout << "Inited sensors module~~~~~~~~~~~~~~~~~~~~~~~~~~`" << std::endl;
 }
 
 SensorsModule::~SensorsModule()
@@ -96,6 +94,7 @@ void SensorsModule::updateSensorValues()
     std::string batteryS;
     std::string stiffStatusS;
 
+    HighResTimer timer;
     // TODO grab semaphore
     int index = shared->sensorSwitch;
     if (index != -1)
@@ -117,10 +116,10 @@ void SensorsModule::updateSensorValues()
         sensorIndex = des.dataIndex();
         shared->sensorReadIndex = sensorIndex;
     }
-    else {
-        std::cout << "didn't grab because index -1" << std::endl;
-    }
+
     // TODO Release semaphore
+    double time = timer.end();
+    std::cout << "Sensors critical section took: " << time << std::endl;
 
     if (index == -1) return;
 
@@ -134,6 +133,17 @@ void SensorsModule::updateSensorValues()
     values.fsr.ParseFromString(fsrS);
     values.battery.ParseFromString(batteryS);
     values.stiffStatus.ParseFromString(stiffStatusS);
+
+    // std::cout << values.joints.DebugString();
+    // std::cout << values.currents.DebugString();
+    // std::cout << values.temperature.DebugString();
+    // std::cout << values.chestButton.DebugString();
+    // std::cout << values.footBumper.DebugString();
+    // std::cout << values.inertials.DebugString();
+    // std::cout << values.sonars.DebugString();
+    // std::cout << values.fsr.DebugString();
+    // std::cout << values.battery.DebugString();
+    // std::cout << values.stiffStatus.DebugString();
 
     //std::cout << "l_shoulder_pitch: " << values.joints.l_shoulder_pitch() << std::endl; 
 
