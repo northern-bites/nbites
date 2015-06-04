@@ -223,6 +223,7 @@ void ImageTranscriber::initSettings()
     //static NewSettings updated_settings;
     if(FILE *file = fopen(filepath.c_str(),"r")) {
         fclose(file);
+        std::cout<<"[ERR] About to crash cause hflip"<<std::endl;
         updated_settings.hflip = param.getParam<bool>("hflip");
         std::cout<<"Trying to get HFLIP"<<std::endl;
         std::cout<<param.getParam<bool>("hflip");
@@ -266,7 +267,8 @@ void ImageTranscriber::initSettings()
 
     // Still need to turn this on to change brightness, grumble grumble
     setControlSetting(V4L2_CID_EXPOSURE_AUTO, updated_settings.auto_exposure);
-
+    std::cout<<"Setting Brightness"<<std::endl;
+    std::cout<<"Brightness: "<<updated_settings.brightness<<std::endl;
     setControlSetting(V4L2_CID_BRIGHTNESS, updated_settings.brightness);
     setControlSetting(V4L2_CID_CONTRAST, updated_settings.contrast);
     setControlSetting(V4L2_CID_SATURATION, updated_settings.saturation);
@@ -537,14 +539,16 @@ TranscriberModule::TranscriberModule(ImageTranscriber& trans)
       jointsOut(base()),
       inertsOut(base()),
       it(trans),
-      image_index(0)
+      image_index(0),
+      file_mod_time()
 {
 }
 
 // Get image from Transcriber and outportal it
 void TranscriberModule::run_()
 {
-    time_t old_mod_time;
+    //time_t old_mod_time;
+    std::cout<<"[INFO] FILE LAST MODDED @ "<<file_mod_time<<std::endl;
     struct stat file_stats;
     std::string filepath;
     if(it.type() == Camera::TOP) {
@@ -557,16 +561,18 @@ void TranscriberModule::run_()
         fclose(file);
         int err = stat(filepath.c_str(),&file_stats);
         if(err != 0) {
-            std::perror("[file has been modified] stat");
+            std::cout<<"[INFO] FILE HAS BEEN MODIFIED"<<std::endl;
         }
-        int time_diff = std::difftime(file_stats.st_mtime, old_mod_time);
+        int time_diff = std::difftime(file_stats.st_mtime, file_mod_time);
         if(time_diff > 0.0) {
-            old_mod_time = file_stats.st_mtime;
-            std::cout<<"Calling initSettings() now"<<std::endl;
+            std::cout<<"[INFO] Old Mod. Time: "<<file_mod_time<<std::endl;
+            file_mod_time = file_stats.st_mtime;
+            std::cout<<"[INFO] New Mod. Time: "<<file_mod_time<<std::endl;
+            std::cout<<"[INFO] Calling initSettings() now"<<std::endl;
             it.initSettings();
         }
     } else {
-        std::cout<<"File Does Not Exist"<<std::endl;
+        std::cout<<"[ERR]File Does Not Exist"<<std::endl;
     }
 
     jointsIn.latch();

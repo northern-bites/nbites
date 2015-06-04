@@ -10,7 +10,7 @@ ParamReader::ParamReader(std::string filename)
 		fclose(file);
 		boost::property_tree::read_json(filename, tree);
 	} else {
-		std::cout<<"File Does Not Exist"<<std::endl;
+		std::cout<<"[ERR] File Does Not Exist"<<std::endl;
 	}
 }
 }

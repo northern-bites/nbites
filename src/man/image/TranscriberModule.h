@@ -142,6 +142,8 @@ public :
     portals::OutPortal<messages::JointAngles> jointsOut;
     portals::OutPortal<messages::InertialState> inertsOut;
 
+    time_t file_mod_time;
+
 protected :
     virtual void run_();
 private :
