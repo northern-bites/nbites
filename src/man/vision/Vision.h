@@ -55,6 +55,16 @@ inline int max(int x, int y)
   return x >= y ? x : y;
 }
 
+inline float min(float x, float y)
+{
+  return x <= y ? x : y;
+}
+
+inline float max(float x, float y)
+{
+  return x >= y ? x : y;
+}
+
 inline double min(double x, double y)
 {
   return x <= y ? x : y;
@@ -105,7 +115,7 @@ class TickTimer
   uint64_t read()
   {
     uint32_t lo, hi;
-#ifdef USE_WINDOWS
+#ifdef WIN32
     __asm
     {
       rdtsc;
