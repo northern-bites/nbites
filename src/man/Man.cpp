@@ -122,8 +122,14 @@ namespace man {
         
         topTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
         topTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
+        topTranscriber.naiveBallIn.wireTo(&naiveBall.naiveBallOutput, true);
+        topTranscriber.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
+
         bottomTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
         bottomTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
+        bottomTranscriber.naiveBallIn.wireTo(&naiveBall.naiveBallOutput, true);
+        bottomTranscriber.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
+
         
         topConverter.imageIn.wireTo(&topTranscriber.imageOut);
         bottomConverter.imageIn.wireTo(&bottomTranscriber.imageOut);
@@ -140,7 +146,7 @@ namespace man {
         
         vision.joint_angles.wireTo(&topTranscriber.jointsOut, true);
         vision.inertial_state.wireTo(&topTranscriber.inertsOut, true);
-        
+
         localization.visionInput.wireTo(&vision.vision_field);
         localization.motionInput.wireTo(&motion.odometryOutput_, true);
         localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
@@ -267,6 +273,7 @@ namespace man {
 //#ifdef LOG_BALLTRACK
         cognitionThread.log<messages::FilteredBall>((control::BALLTRACK), &ballTrack.ballLocationOutput, "proto-FilteredBall", "balltrack");
         cognitionThread.log<messages::VisionBall>((control::BALLTRACK), &vision.vision_ball, "proto-VisionBall", "balltrack");
+
 //#endif
         
         //Superseded by logging code in ImageTranscriber.
@@ -291,6 +298,10 @@ namespace man {
                                                    "proto-JointAngles", "vision");
         cognitionThread.log<messages::InertialState>((control::VISION), &vision.inertial_state_out,
                                                      "proto-InertialState", "vision");
+        // cognitionThread.log<messages::FilteredBall>((control::VISION), &vision.filtered_ball_out,
+        //                                            "proto-JointAngles", "vision");
+        // cognitionThread.log<messages::NaiveBall>((control::VISION), &vision.naive_ball_out,
+        //                                              "proto-InertialState", "vision");
 //#endif
         
     }

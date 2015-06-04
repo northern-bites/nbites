@@ -481,8 +481,6 @@ TranscriberModule::TranscriberModule(ImageTranscriber& trans)
     : imageOut(base()),
       jointsOut(base()),
       inertsOut(base()),
-      filteredBallOut(base()),
-      naiveBallOut(base()),
       it(trans),
       image_index(0)
 {
@@ -497,10 +495,10 @@ void TranscriberModule::run_()
     filteredBallIn.latch();
     naiveBallIn.latch();
 
-    filteredBallOut.setMessage(portals::Message<messages::FilteredBall>(
-                         &filteredBallIn.message()));
-    naiveBallOut.setMessage(portals::Message<messages::NaiveBall>(
-                         &naiveBallIn.message()));
+    // filteredBallOut.setMessage(portals::Message<messages::FilteredBall>(
+    //                      &filteredBallIn.message()));
+    // naiveBallOut.setMessage(portals::Message<messages::NaiveBall>(
+    //                      &naiveBallIn.message()));
 
     /* Pass the most recent joints and inerts thru transcriber and outportal,
      * so that vision has synced images, joints, and inerts to process. */
@@ -655,83 +653,65 @@ void TranscriberModule::run_()
     }
 
     if (control::flags[control::multiball]) {
-        // ++image_index;
-
-        // std::string image_from;
-        // if (it.type() == Camera::TOP) {
-        //     image_from = "camera_TOP";
-        // } else {
-        //     image_from = "camera_BOT";
-        // }
-
-        // long im_size = (image.width() * image.height() * 1);
-        // int im_width = image.width() / 2;
-        // int im_height= image.height();
 
         messages::NaiveBall nb_pb = naiveBallIn.message();
         messages::FilteredBall fb_pb = filteredBallIn.message();
 
         std::string nb_buf;
         std::string fb_buf;
-        // std::string im_buf((char *) image.pixelAddress(0, 0), im_size);
+
         nb_pb.SerializeToString(&nb_buf);
         fb_pb.SerializeToString(&fb_buf);
 
         nb_buf.append(fb_buf);
-        // im_buf.append(nb_buf);
 
         std::vector<SExpr> contents;
 
-        // SExpr imageinfo("YUVImage", image_from, clock(), image_index, im_size);
-        // imageinfo.append(SExpr("width", im_width)   );
-        // imageinfo.append(SExpr("height", im_height) );
-        // imageinfo.append(SExpr("encoding", "[Y8(U8/V8)]"));
-        // contents.push_back(imageinfo);
 
-        SExpr naive("NaiveBall", "multiball", clock(), -1, nb_buf.length());
-        naive.append(SExpr("velocity", nb_pb.velocity()));
-        naive.append(SExpr("stationary", nb_pb.stationary()));
-        naive.append(SExpr("yintercept", nb_pb.yintercept()));
+        // SExpr naive("NaiveBall", "multiball", clock(), -1, nb_buf.length());
+        // naive.append(SExpr("velocity", nb_pb.velocity()));
+        // naive.append(SExpr("stationary", nb_pb.stationary()));
+        // naive.append(SExpr("yintercept", nb_pb.yintercept()));
 
-        contents.push_back(naive);
+        // contents.push_back(naive);
 
-        SExpr filter("FilteredBall", "multiball", clock(), -1, fb_buf.length());
-        // filter.append(SExpr("vis", fb_pb.vis()));
-        filter.append(SExpr("distance", fb_pb.distance()));
-        filter.append(SExpr("bearing", fb_pb.bearing()));
-        filter.append(SExpr("rel_x", fb_pb.rel_x()));
-        filter.append(SExpr("rel_y", fb_pb.rel_y()));
+        // SExpr filter("FilteredBall", "multiball", clock(), -1, fb_buf.length());
+        // // filter.append(SExpr("vis", fb_pb.vis()));
+        // filter.append(SExpr("distance", fb_pb.distance()));
+        // filter.append(SExpr("bearing", fb_pb.bearing()));
+        // filter.append(SExpr("rel_x", fb_pb.rel_x()));
+        // filter.append(SExpr("rel_y", fb_pb.rel_y()));
 
-        filter.append(SExpr("vel_x", fb_pb.vel_x()));
-        filter.append(SExpr("vel_y", fb_pb.vel_y()));
+        // filter.append(SExpr("vel_x", fb_pb.vel_x()));
+        // filter.append(SExpr("vel_y", fb_pb.vel_y()));
 
-        filter.append(SExpr("var_rel_x", fb_pb.var_rel_x()));
-        filter.append(SExpr("var_rel_y", fb_pb.var_rel_y()));
-        filter.append(SExpr("var_vel_x", fb_pb.var_vel_x()));
-        filter.append(SExpr("var_vel_y", fb_pb.var_vel_y()));
-        filter.append(SExpr("is_stationary", fb_pb.is_stationary()));
-        filter.append(SExpr("bearing_deg", fb_pb.bearing_deg()));
-        filter.append(SExpr("x", fb_pb.x()));
-        filter.append(SExpr("y", fb_pb.y()));
+        // filter.append(SExpr("var_rel_x", fb_pb.var_rel_x()));
+        // filter.append(SExpr("var_rel_y", fb_pb.var_rel_y()));
+        // filter.append(SExpr("var_vel_x", fb_pb.var_vel_x()));
+        // filter.append(SExpr("var_vel_y", fb_pb.var_vel_y()));
+        // filter.append(SExpr("is_stationary", fb_pb.is_stationary()));
+        // filter.append(SExpr("bearing_deg", fb_pb.bearing_deg()));
+        // filter.append(SExpr("x", fb_pb.x()));
+        // filter.append(SExpr("y", fb_pb.y()));
 
-        filter.append(SExpr("rel_x_dest", fb_pb.var_rel_x()));
-        filter.append(SExpr("rel_y_dest", fb_pb.rel_y_dest()));
-        filter.append(SExpr("speed", fb_pb.speed()));
-        filter.append(SExpr("rel_y_intersect_dest", fb_pb.rel_y_intersect_dest()));
-        filter.append(SExpr("stat_rel_x", fb_pb.stat_rel_x()));
-        filter.append(SExpr("stat_rel_y", fb_pb.stat_rel_y()));
+        // filter.append(SExpr("rel_x_dest", fb_pb.var_rel_x()));
+        // filter.append(SExpr("rel_y_dest", fb_pb.rel_y_dest()));
+        // filter.append(SExpr("speed", fb_pb.speed()));
+        // filter.append(SExpr("rel_y_intersect_dest", fb_pb.rel_y_intersect_dest()));
+        // filter.append(SExpr("stat_rel_x", fb_pb.stat_rel_x()));
+        // filter.append(SExpr("stat_rel_y", fb_pb.stat_rel_y()));
 
-        filter.append(SExpr("stat_distance", fb_pb.stat_distance()));
-        filter.append(SExpr("stat_bearing", fb_pb.stat_bearing()));
-        filter.append(SExpr("mov_rel_x", fb_pb.mov_rel_x()));
-        filter.append(SExpr("mov_rel_y", fb_pb.mov_rel_y()));
-        filter.append(SExpr("mov_distance", fb_pb.mov_distance()));
-        filter.append(SExpr("mov_bearing", fb_pb.mov_bearing()));
-        filter.append(SExpr("mov_vel_x", fb_pb.mov_vel_x()));
-        filter.append(SExpr("mov_vel_y", fb_pb.mov_vel_y()));
-        filter.append(SExpr("mov_speed", fb_pb.mov_speed()));
+        // filter.append(SExpr("stat_distance", fb_pb.stat_distance()));
+        // filter.append(SExpr("stat_bearing", fb_pb.stat_bearing()));
+        // filter.append(SExpr("mov_rel_x", fb_pb.mov_rel_x()));
+        // filter.append(SExpr("mov_rel_y", fb_pb.mov_rel_y()));
+        // filter.append(SExpr("mov_distance", fb_pb.mov_distance()));
+        // filter.append(SExpr("mov_bearing", fb_pb.mov_bearing()));
+        // filter.append(SExpr("mov_vel_x", fb_pb.mov_vel_x()));
+        // filter.append(SExpr("mov_vel_y", fb_pb.mov_vel_y()));
+        // filter.append(SExpr("mov_speed", fb_pb.mov_speed()));
 
-        contents.push_back(filter);
+        // contents.push_back(filter);
 
         NBLog(NBL_IMAGE_BUFFER, "multiball",
                    contents, nb_buf);

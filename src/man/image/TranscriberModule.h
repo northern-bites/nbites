@@ -122,8 +122,8 @@ public :
     portals::OutPortal<messages::JointAngles> jointsOut;
     portals::OutPortal<messages::InertialState> inertsOut;
 
-    portals::OutPortal<messages::FilteredBall> filteredBallOut;
-    portals::OutPortal<messages::NaiveBall> naiveBallOut;
+    // portals::OutPortal<messages::FilteredBall> filteredBallOut;
+    // portals::OutPortal<messages::NaiveBall> naiveBallOut;
 protected :
     virtual void run_();
 private :
