@@ -159,6 +159,8 @@ int Vision_func() {
     Log* lineRet = new Log();
     std::string lineBuf;
 
+    std::cout << std::endl << "In image coordinates:" << std::endl;
+    int i = 0;
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
         double r = line.r();
@@ -179,6 +181,15 @@ int Vision_func() {
         lineBuf.append((const char*) &ep0, sizeof(double));
         lineBuf.append((const char*) &ep1, sizeof(double));
         lineBuf.append((const char*) &lineIndex, sizeof(int));
+
+        std::cout << i++ << ", " << line.print() << std::endl;
+    }
+
+    std::cout << std::endl << "In field coordinates:" << std::endl;
+    i = 0;
+    for (auto it = lineList->begin(); it != lineList->end(); it++) {
+        man::vision::HoughLine& line = *it;
+        std::cout << i++ << ", " << line.field().print() << std::endl;
     }
 
     lineRet->setData(lineBuf);

@@ -13,7 +13,6 @@
 namespace man {
 namespace vision {
 
-// TODO compile on both ubuntu and windows
 class VisionModule : public portals::Module {
 public:
     VisionModule();

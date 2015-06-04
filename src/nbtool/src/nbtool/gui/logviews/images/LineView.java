@@ -67,12 +67,16 @@ public class LineView extends ViewParent implements IOFirstResponder {
 
                 double x0 = 2*r * Math.cos(t) + originalImage.getWidth() / 2;
                 double y0 = -2*r * Math.sin(t) + originalImage.getHeight() / 2;
-                int x1 = (int)Math.round(x0 + 2*end0 * Math.sin(t));
-                int y1 = (int)Math.round(y0 + 2*end0 * Math.cos(t));
-                int x2 = (int)Math.round(x0 + 2*end1 * Math.sin(t));
-                int y2 = (int)Math.round(y0 + 2*end1 * Math.cos(t));
+                int x1 = (int) Math.round(x0 + 2*end0 * Math.sin(t));
+                int y1 = (int) Math.round(y0 + 2*end0 * Math.cos(t));
+                int x2 = (int) Math.round(x0 + 2*end1 * Math.sin(t));
+                int y2 = (int) Math.round(y0 + 2*end1 * Math.cos(t));
+
+                int xmid = (x1 + x2) / 2;
+                int ymid = (y1 + y2) / 2;
 
                 g.drawLine(x1, y1, x2, y2);
+                g.drawString(Integer.toString(i / 5), (int) xmid, (int) ymid + (r > 0 ? 10 : -10));
             }
         }
     }
