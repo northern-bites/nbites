@@ -82,6 +82,7 @@ public:
     void initSettings(); //one of the magical init methods
 
     man::ParamReader param;
+    //man::ParamReader actualParams;
     NewSettings updated_settings;
 
 private:

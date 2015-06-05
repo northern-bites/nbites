@@ -124,9 +124,6 @@ namespace control {
                 file << stringToSend;
                 file.close();
             }
-            //std::ofstream file("/home/nao/nbites/Config/cameraParams.json");
-            //file << stringToSend;
-            //file.close();
         }
         return 0;
     }

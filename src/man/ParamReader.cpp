@@ -6,11 +6,10 @@ namespace man{
 
 ParamReader::ParamReader(std::string filename)
 {
+	std::cout<<"JSON Path: "<<filename<<std::endl;
 	if(FILE *file = fopen(filename.c_str(),"r")) {
 		fclose(file);
 		boost::property_tree::read_json(filename, tree);
-	} else {
-		std::cout<<"[ERR] File Does Not Exist"<<std::endl;
 	}
 }
 }

@@ -54,9 +54,9 @@ ImageTranscriber::ImageTranscriber(Camera::Type which) :
     settings(Camera::getSettings(which)),
     cameraType(which),
     timeStamp(0),
-    param(std::string("/home/nao/nbites/Config/") + (which == Camera::TOP ? "top" : "bottom") + "CameraParams.json"),
-    updated_settings()
+    param(std::string("/home/nao/nbites/Config/") + (which == Camera::TOP ? "top" : "bottom") + "CameraParams.json")
 {
+
     initOpenI2CAdapter();
     initSelectCamera();
     initOpenVideoDevice();
@@ -220,28 +220,53 @@ void ImageTranscriber::initSettings()
         filepath = "/home/nao/nbites/Config/bottomCameraParams.json";
         std::cout<<"Camera::BOTTOM"<<std::endl;
     }
+    ParamReader temp(filepath);
+    param = temp;
     //static NewSettings updated_settings;
     if(FILE *file = fopen(filepath.c_str(),"r")) {
         fclose(file);
-        std::cout<<"[ERR] About to crash cause hflip"<<std::endl;
-        updated_settings.hflip = param.getParam<bool>("hflip");
-        std::cout<<"Trying to get HFLIP"<<std::endl;
-        std::cout<<param.getParam<bool>("hflip");
-        updated_settings.vflip = param.getParam<bool>("vflip");
-        updated_settings.auto_exposure = param.getParam<bool>("autoexposure");
-        updated_settings.brightness = param.getParam<int>("brightness");
-        updated_settings.contrast = param.getParam<int>("contrast");
-        updated_settings.saturation = param.getParam<int>("saturation");
-        updated_settings.hue = param.getParam<int>("hue");
-        updated_settings.sharpness = param.getParam<int>("sharpness");
-        updated_settings.gamma = param.getParam<int>("gamma");
-        updated_settings.auto_whitebalance = param.getParam<int>("auto_whitebalance");
-        updated_settings.backlight_compensation = 0x00;
-        updated_settings.exposure = param.getParam<int>("exposure");
-        updated_settings.gain = param.getParam<int>("gain");
-        updated_settings.white_balance = param.getParam<int>("white_balance");
-        updated_settings.fade_to_black = param.getParam<int>("fade_to_black");
+        if(!param.isEmpty()) {
+            std::cout<<"[INFO] Reading from JSON"<<std::endl;
+
+            updated_settings.hflip = param.getParam<bool>("hflip");
+            updated_settings.vflip = param.getParam<bool>("vflip");
+            updated_settings.auto_exposure = param.getParam<bool>("autoexposure");
+            updated_settings.brightness = param.getParam<int>("brightness");
+            updated_settings.contrast = param.getParam<int>("contrast");
+            updated_settings.saturation = param.getParam<int>("saturation");
+            updated_settings.hue = param.getParam<int>("hue");
+            updated_settings.sharpness = param.getParam<int>("sharpness");
+            updated_settings.gamma = param.getParam<int>("gamma");
+            updated_settings.auto_whitebalance = param.getParam<int>("auto_whitebalance");
+            updated_settings.backlight_compensation = 0x00;
+            updated_settings.exposure = param.getParam<int>("exposure");
+            updated_settings.gain = param.getParam<int>("gain");
+            updated_settings.white_balance = param.getParam<int>("white_balance");
+            updated_settings.fade_to_black = param.getParam<int>("fade_to_black");
+
+            /*
+            std::cout<<"-----UPDATED SETTINGS-----"<<std::endl;
+            std::cout<<"HFLIP: "+updated_settings.hflip<<std::endl;
+            std::cout<<"VFLIP: "+updated_settings.vflip<<std::endl;
+            std::cout<<"AutoExposure: "+updated_settings.auto_exposure<<std::endl;
+            std::cout<<"Brightness: "+updated_settings.brightness<<std::endl;
+            std::cout<<"Contrast: "+updated_settings.contrast<<std::endl;
+            std::cout<<"Saturation: "+updated_settings.saturation<<std::endl;
+            std::cout<<"Hue: "+updated_settings.hue<<std::endl;
+            std::cout<<"Sharpness: "+updated_settings.sharpness<<std::endl;
+            std::cout<<"Gamma: "+updated_settings.gamma<<std::endl;
+            std::cout<<"AutoWB: "+updated_settings.auto_whitebalance<<std::endl;
+            std::cout<<"BLComp: "+updated_settings.backlight_compensation<<std::endl;
+            std::cout<<"Exposure: "+updated_settings.exposure<<std::endl;
+            std::cout<<"Gain: "+updated_settings.gain<<std::endl;
+            std::cout<<"WB: "+updated_settings.white_balance<<std::endl;
+            std::cout<<"FTB "+updated_settings.fade_to_black<<std::endl; */
+        } else {
+            std::cout<<"[ERR] No Children"<<std::endl;     
+        }
     } else {
+        std::cout<<"[INFO] Setting Params from Camera.h"<<std::endl;
+
         updated_settings.hflip = settings.hflip;
         updated_settings.vflip = settings.vflip;
         updated_settings.auto_exposure = settings.auto_exposure;
@@ -259,16 +284,12 @@ void ImageTranscriber::initSettings()
         updated_settings.fade_to_black = settings.fade_to_black;
     }
 
-    std::cout<<"Setting Control Setting: HFLIP"<<std::endl;
     // DO NOT SCREW UP THE ORDER BELOW
-    std::cout<<"HFLIP: "<<updated_settings.hflip<<std::endl;
     setControlSetting(V4L2_CID_HFLIP, updated_settings.hflip);
     setControlSetting(V4L2_CID_VFLIP, updated_settings.vflip);
 
     // Still need to turn this on to change brightness, grumble grumble
     setControlSetting(V4L2_CID_EXPOSURE_AUTO, updated_settings.auto_exposure);
-    std::cout<<"Setting Brightness"<<std::endl;
-    std::cout<<"Brightness: "<<updated_settings.brightness<<std::endl;
     setControlSetting(V4L2_CID_BRIGHTNESS, updated_settings.brightness);
     setControlSetting(V4L2_CID_CONTRAST, updated_settings.contrast);
     setControlSetting(V4L2_CID_SATURATION, updated_settings.saturation);
@@ -325,8 +346,8 @@ bool ImageTranscriber::setControlSetting(unsigned int id, int value) {
 
     int counter = 0;
 
-    std::cout<<"VALUE ON DRIVER: "<<getControlSetting(id)<<std::endl;
-    std::cout<<"VALUE PASSED IN: "<<value<<std::endl;
+    //std::cout<<"VALUE ON DRIVER: "<<getControlSetting(id)<<std::endl;
+    //std::cout<<"VALUE PASSED IN: "<<value<<std::endl;
 
     // Have to make sure the setting "sticks"
     while(getControlSetting(id) != value)
@@ -391,7 +412,7 @@ void ImageTranscriber::assertCameraSettings() {
     {
         std::cerr << "CAMERA::WARNING::Horizontal flip setting is wrong:"
                   << std::endl;
-        std::cerr << " is " << hflip << " not " << settings.hflip <<
+        std::cerr << " is " << hflip << " not " << updated_settings.hflip <<
             std::endl;
         allFine = false;
     }
@@ -399,7 +420,7 @@ void ImageTranscriber::assertCameraSettings() {
     {
         std::cerr << "CAMERA::WARNING::Vertical flip setting is wrong:"
                   << std::endl;
-        std::cerr << " is " << vflip  << " not " << settings.vflip <<
+        std::cerr << " is " << vflip  << " not " << updated_settings.vflip <<
             std::endl;
         allFine = false;
     }
@@ -407,7 +428,7 @@ void ImageTranscriber::assertCameraSettings() {
     {
         std::cerr << "CAMERA::WARNING::Brightness setting is wrong:"
                   << std::endl;
-        std::cerr << " is " <<  brightness << " not " << settings.brightness
+        std::cerr << " is " <<  brightness << " not " << updated_settings.brightness
                   << std::endl;
         allFine = false;
     }
@@ -415,7 +436,7 @@ void ImageTranscriber::assertCameraSettings() {
     {
         std::cerr << "CAMERA::WARNING::Contrast setting is wrong:"
                   << std::endl;
-        std::cerr << " is " <<  contrast << " not " << settings.contrast
+        std::cerr << " is " <<  contrast << " not " << updated_settings.contrast
                   << std::endl;
         allFine = false;
     }
@@ -423,7 +444,7 @@ void ImageTranscriber::assertCameraSettings() {
     {
         std::cerr << "CAMERA::WARNING::Saturation setting is wrong:"
                   << std::endl;
-        std::cerr << " is " <<  saturation << " not " << settings.saturation
+        std::cerr << " is " <<  saturation << " not " << updated_settings.saturation
                   << std::endl;
         allFine = false;
     }
@@ -431,7 +452,7 @@ void ImageTranscriber::assertCameraSettings() {
     {
         std::cerr << "CAMERA::WARNING::Hue setting is wrong:"
                   << std::endl;
-        std::cerr << " is " <<  hue << " not " << settings.hue
+        std::cerr << " is " <<  hue << " not " << updated_settings.hue
                   << std::endl;
         allFine = false;
     }
@@ -439,7 +460,7 @@ void ImageTranscriber::assertCameraSettings() {
     {
         std::cerr << "CAMERA::WARNING::Sharpness setting is wrong:"
                   << std::endl;
-        std::cerr << " is " <<  sharpness << " not " << settings.sharpness
+        std::cerr << " is " <<  sharpness << " not " << updated_settings.sharpness
                   << std::endl;
         allFine = false;
     }
@@ -447,7 +468,7 @@ void ImageTranscriber::assertCameraSettings() {
     {
         std::cerr << "CAMERA::WARNING::Gain setting is wrong:"
                   << std::endl;
-        std::cerr << " is " <<  gain << " not " << settings.gain
+        std::cerr << " is " <<  gain << " not " << updated_settings.gain
                   << std::endl;
         allFine = false;
     }
@@ -455,7 +476,7 @@ void ImageTranscriber::assertCameraSettings() {
     {
         std::cerr << "CAMERA::WARNING::Exposure setting is wrong:"
                   << std::endl;
-        std::cerr << " is " <<  exposure << " not " << settings.exposure
+        std::cerr << " is " <<  exposure << " not " << updated_settings.exposure
                   << std::endl;
         allFine = false;
     }
@@ -463,7 +484,7 @@ void ImageTranscriber::assertCameraSettings() {
     {
         std::cerr << "CAMERA::WARNING::Whitebalance setting is wrong:"
                   << std::endl;
-        std::cerr << " is " <<  whitebalance << " not " << settings.white_balance
+        std::cerr << " is " <<  whitebalance << " not " << updated_settings.white_balance
                   << std::endl;
         allFine = false;
     }
@@ -471,7 +492,7 @@ void ImageTranscriber::assertCameraSettings() {
    {
         std::cerr << "CAMERA::WARNING::Fade to black setting is wrong:"
                   << std::endl;
-        std::cerr << " is " <<  fade << " not " << settings.fade_to_black
+        std::cerr << " is " <<  fade << " not " << updated_settings.fade_to_black
                   << std::endl;
         allFine = false;
    }
@@ -547,8 +568,6 @@ TranscriberModule::TranscriberModule(ImageTranscriber& trans)
 // Get image from Transcriber and outportal it
 void TranscriberModule::run_()
 {
-    //time_t old_mod_time;
-    std::cout<<"[INFO] FILE LAST MODDED @ "<<file_mod_time<<std::endl;
     struct stat file_stats;
     std::string filepath;
     if(it.type() == Camera::TOP) {
@@ -556,7 +575,6 @@ void TranscriberModule::run_()
     } else {
         filepath = "/home/nao/nbites/Config/bottomCameraParams.json";
     }
-    //std::string filepath = "/home/nao/nbites/Config/cameraParams.json";
     if(FILE *file = fopen(filepath.c_str(),"r")) {
         fclose(file);
         int err = stat(filepath.c_str(),&file_stats);
@@ -565,14 +583,13 @@ void TranscriberModule::run_()
         }
         int time_diff = std::difftime(file_stats.st_mtime, file_mod_time);
         if(time_diff > 0.0) {
-            std::cout<<"[INFO] Old Mod. Time: "<<file_mod_time<<std::endl;
             file_mod_time = file_stats.st_mtime;
             std::cout<<"[INFO] New Mod. Time: "<<file_mod_time<<std::endl;
             std::cout<<"[INFO] Calling initSettings() now"<<std::endl;
             it.initSettings();
         }
     } else {
-        std::cout<<"[ERR]File Does Not Exist"<<std::endl;
+        //std::cout<<"[ERR] File Does Not Exist"<<std::endl;
     }
 
     jointsIn.latch();
