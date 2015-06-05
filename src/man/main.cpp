@@ -4,31 +4,24 @@
 
 #include "Man.h"
 
-// #include <alcommon/albrokermanager.h>
+man::Man* instance;
 
-// extern "C"
-// {
-//     int _createModule(boost::shared_ptr<AL::ALBroker> broker)
-//     {
-//         // init broker with the main broker instance
-//         // from the parent executable
-//         AL::ALBrokerManager::setInstance(broker->fBrokerManager.lock());
-//         AL::ALBrokerManager::getInstance()->addBroker(broker);
-//         // create module instances
-//         AL::ALModule::createModule<man::Man>(broker, "nbitesman");
-//         return 0;
-//     }
-
-//     int _closeModule()
-//     {
-//         return 0;
-//     }
-// }
+void handler(int signal)
+{
+    if (signal == SIGTERM)
+    {
+        // Give man a chance to clean up behind it
+        instance->stopMan();
+    }
+}
 
 int main() {
+
+    signal(SIGTERM, handler);
+
     // Constructs an instance of man
-    man::Man man; // lol man man man
-//    while (1) pause();
+    instance = new man::Man();
+
     while (1) {
         std::cout << "In main!" << std::endl;
         sleep(5);

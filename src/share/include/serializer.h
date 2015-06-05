@@ -76,11 +76,12 @@ inline bool serializeTo(std::vector<SerializableBase *> objects, uint64_t object
         int32_t size = objects[i]->length();
         const void * data = objects[i]->data();
 
-        if (size <= 0) {
-            printf("Size 0!\n");
+        if (size < 0) {
+            printf("Size < 0!\n");
             return false;
         }
-        if (data == NULL) {
+
+        if (size > 0 && data == NULL) {
             printf("Data Null\n");
             return false;
         }
@@ -93,14 +94,17 @@ inline bool serializeTo(std::vector<SerializableBase *> objects, uint64_t object
         int32_t * sp = (int32_t *) (bytePointer + loc);
         void * dp = (void *) (bytePointer + loc + sizeof(int32_t));
         *sp = size;
-        memcpy(dp, data, size);
+        if (size > 0) {
+            memcpy(dp, data, size);
+        }
 
         loc += size + sizeof(int32_t);
         delete objects[i];
     }
 
     *intPointer = (int32_t) loc;
-    *usedReturn = loc;              //Return bytes used by pointer
+    if (usedReturn)
+        *usedReturn = loc;           //Return bytes used by pointer
     return true;
 }
 
@@ -123,16 +127,18 @@ class Deserialize {
     }
 
     const std::string _string() {
-        return std::string((char *) _data(), (size_t) _length());
+        int32_t length = _length();
+        if (length > 0) return std::string((char *) _data(), (size_t) length);
+        else return std::string();
     }
 
 public:
 
     Deserialize(void * start) :
-        base(NULL),
-        loc(-1),
-        askIndex(-1),
-        _dataIndex(-1)
+    base(NULL),
+    loc(-1),
+    askIndex(-1),
+    _dataIndex(-1)
     {
         base = (uint8_t *) start;
     }
@@ -147,7 +153,7 @@ public:
 
         size_t nobjs, tbytes;
 
-        _dataIndex = * ((uint64_t *) (base + loc));
+        _dataIndex = *((uint64_t *) (base + loc));
         loc += sizeof(uint64_t);
 
         nobjs = * ((uint32_t *) (base + loc));

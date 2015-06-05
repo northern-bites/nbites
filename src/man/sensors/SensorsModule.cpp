@@ -119,7 +119,7 @@ void SensorsModule::updateSensorValues()
 
     // TODO Release semaphore
     double time = timer.end();
-    std::cout << "Sensors critical section took: " << time << std::endl;
+    //std::cout << "Sensors critical section took: " << time << std::endl;
 
     if (index == -1) return;
 

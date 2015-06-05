@@ -295,6 +295,16 @@ void Man::establishLock()
     }
 }
 
+void Man::stopMan()
+{
+        std::cout << "Man is being killed" << std::endl;
+        // Release semaphores
+
+        // Also release our lock
+        flock(lockFD, LOCK_UN);
+        exit(0);
+}
+
 void Man::startSubThreads()
 {
     startAndCheckThread(sensorsThread);
