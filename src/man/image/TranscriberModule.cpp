@@ -673,13 +673,6 @@ void TranscriberModule::run_()
         SExpr naive("MULTIBALL", "multiball", clock(), -1, nb_buf.length());
         naive.append(SExpr("nb_length", nb_length));
         naive.append(SExpr("fb_length", fb_length));
-        naive.append(SExpr("velocity", nb_pb.velocity()));
-        naive.append(SExpr("stationary", nb_pb.stationary()));
-        naive.append(SExpr("yintercept", nb_pb.yintercept()));
-        // for (int i = 0; i < 30; i++) {
-        //     char[] temp = "position_" + i;
-        // }
-        // naive.append(SExpr("position", nb_pb.position(1).x()));
 
         contents.push_back(naive);
 

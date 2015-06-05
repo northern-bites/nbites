@@ -32,6 +32,8 @@ import nbtool.util.Utility;
 public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 	private static final long serialVersionUID = -541524730464912737L;
 	private static final int OFFSET = 2;
+	private static final int BALL_RADIUS = 17;
+
 	private Map<String, Object> filteredBall;
 	private Map<String, Object> visionBall;
 	private Map<String, Object> naiveBall;
@@ -67,16 +69,35 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 		int ballY = (robotX - OFFSET*((Float)filteredBall.get("rel_x")).intValue());
 
 		g.setColor(Color.red);
-		g.drawOval(ballX - 5, ballY - 5, 17, 17);
-		g.fillOval(ballX - 5, ballY - 5, 17, 17);
+		g.drawOval(ballX - 5, ballY - 5, BALL_RADIUS, BALL_RADIUS);
+		g.fillOval(ballX - 5, ballY - 5, BALL_RADIUS, BALL_RADIUS);
+
 
 		g.setColor(Color.black);
 		g.drawString("rel_x: " + filteredBall.get("rel_x"), 10, height + 20);
 		g.drawString("rel_y: " + filteredBall.get("rel_y"), 10, height + 40);
 
+		ArrayList<Float> nbX = (ArrayList<Float>)naiveBall.get("position_x");
+		ArrayList<Float> nbY = (ArrayList<Float>)naiveBall.get("position_y");
+		if (nbX == null || nbY.isEmpty()) { return; }
+		int nBallX = (robotY - OFFSET*((Float) nbY.get(0)).intValue());
+		int nBallY = (robotX - OFFSET*((Float) nbX.get(0)).intValue());
+
+		g.setColor(Color.blue);
+		g.drawOval(nBallX - 5, nBallY - 5, BALL_RADIUS, BALL_RADIUS);
+		g.fillOval(nBallX - 5, nBallY - 5, BALL_RADIUS, BALL_RADIUS);
+
+
+	}
+
+	private void clear() {
+		filteredBall.clear();
+		visionBall.clear();
+		naiveBall.clear();
 	}
 
 	public void setLog(Log newlog) {
+		clear();
 		String t = (String) newlog.primaryType();
 		ball_on = false;
 		if (!t.equals("MULTIBALL")) return;
@@ -97,7 +118,7 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 			if (entry.getKey().getName().equals("vis")) {
 				Map<FieldDescriptor, Object> visFields = ((com.google.protobuf.Message)entry.getValue()).getAllFields();
 				for (Map.Entry<FieldDescriptor, Object> visEntry : visFields.entrySet()) {
-					visionBall.put(entry.getKey().getName(), visEntry.getValue());
+					visionBall.put(visEntry.getKey().getName(), visEntry.getValue());
 				}
 			} else {
 				filteredBall.put(entry.getKey().getName(), entry.getValue());
@@ -105,11 +126,27 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 		}
 		Map<FieldDescriptor, Object> nbFields = nbMsg.getAllFields();
 		for (Map.Entry<FieldDescriptor, Object> entry : nbFields.entrySet()) {
-			naiveBall.put(entry.getKey().getName(), entry.getValue());
+			if (entry.getKey().getName().equals("position") && entry.getKey().isRepeated()) {
+				ArrayList<Float> position_x = new ArrayList();
+				ArrayList<Float> position_y = new ArrayList();
+				List<Object> vals = (List<Object>) entry.getValue();
+				int i = 0;
+				for (Object v : vals) {
+					Map<FieldDescriptor, Object> posFields = ((com.google.protobuf.Message)v).getAllFields();
+					for (Map.Entry<FieldDescriptor, Object> posEntry : posFields.entrySet()) {
+						if (posEntry.getKey().getName().equals("x")) {position_x.add((float)posEntry.getValue());}
+						else {position_y.add((float)posEntry.getValue());}
+					}
+				}
+				naiveBall.put("position_x", position_x);
+				naiveBall.put("position_y", position_y);
+			}
+			else { naiveBall.put(entry.getKey().getName(), entry.getValue()); }
 		}
 
-		repaint();
 
+		System.out.println(naiveBall.toString());
+		repaint();
 	}
 
 	protected void useSize(Dimension s) {

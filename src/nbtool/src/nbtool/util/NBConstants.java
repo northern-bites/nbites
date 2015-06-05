@@ -68,7 +68,7 @@ public class NBConstants {
 		map.put("YUVImage", new Class[]{ImageView.class, ZoomImageView.class, CrossBright.class});
 		map.put("STATS", new Class[]{BotStatsView.class});
 		map.put(DEFAULT_S, new Class[]{DefaultView.class});
-		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class, ProtoBallView.class});
+		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
 		map.put("MULTIBALL", new Class[]{ProtoBallView.class});
 		
 		return map;

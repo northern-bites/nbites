@@ -73,6 +73,7 @@ void NaiveBallModule::run_()
 
     naiveBallMessage.get()->clear_position();
     if (bufferFull) {
+        printf("HERE! Setting position!\n");
         int p = currentIndex;
         for (int i = 0; i < buffSize; i++) {
             currentIndex = currentIndex % buffSize;
