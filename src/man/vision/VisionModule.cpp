@@ -27,6 +27,7 @@ VisionModule::VisionModule()
         edges[i] = new EdgeList(32000);
         houghLines[i] = new HoughLineList(128);
         hough[i] = new HoughSpace(320, 240);
+        kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography(i == 0);
         fieldLines[i] = new FieldLineList();
 
@@ -47,6 +48,7 @@ VisionModule::~VisionModule()
         delete edges[i];
         delete houghLines[i];
         delete hough[i];
+        delete kinematics[i];
         delete homography[i];
         delete fieldLines[i];
     }
@@ -91,6 +93,11 @@ void VisionModule::run_()
         ImageLiteU8 greenImage(frontEnd[i]->greenImage());
 
         times[i][0] = timer.end();
+
+        // Calculate kinematics and adjust homography
+        kinematics[i]->setJointAngles(jointsIn.message());
+        homography[i]->wz0(kinematics[i]->wz0());
+        homography[i]->tilt(kinematics[i]->tilt());
 
         // Approximate brightness gradient
         edgeDetector[i]->gradient(yImage);

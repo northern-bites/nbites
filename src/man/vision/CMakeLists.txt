@@ -10,6 +10,7 @@ SET( VISION_SRCS
   Edge.cpp
   FastBlob.cpp
   FrontEnd.cpp
+  Kinematics.cpp
   Homography.cpp
   Hough.cpp
   Vision.cpp

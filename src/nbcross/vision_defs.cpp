@@ -4,6 +4,7 @@
 #include "Images.h"
 #include "vision/VisionModule.h"
 
+#include <cstdlib>
 #include <netinet/in.h>
 #include <assert.h>
 #include <vector>
@@ -26,22 +27,30 @@ int Vision_func() {
     bool topCamera = copy->tree().find("contents")->get(1)->
                                   find("from")->get(1)->value() == "camera_TOP";
 
+    // TODO should read from description string
     int width = 2*640;
     int height = 480;
+
+    int numBytes[3];
+    for (int i = 0; i < 3; i++)
+        numBytes[i] = atoi(copy->tree().find("contents")->get(i+1)->
+                                        find("nbytes")->get(1)->value().c_str());
+    uint8_t* ptToJoints = buf + (numBytes[0] + numBytes[1]);
     
     messages::YUVImage image(buf, width, height, width);
-    messages::JointAngles emptyJoints;
+    messages::JointAngles joints;
+    joints.ParseFromArray((void *) ptToJoints, numBytes[2]);
     messages::InertialState emptyInertials;
 
     portals::Message<messages::YUVImage> imageMessage(&image);
-    portals::Message<messages::JointAngles> emptyJointsMessage(&emptyJoints);
+    portals::Message<messages::JointAngles> jointsMessage(&joints);
     portals::Message<messages::InertialState> emptyInertialsMessage(&emptyInertials);
 
     man::vision::VisionModule module;
 
     module.topIn.setMessage(imageMessage);
     module.bottomIn.setMessage(imageMessage);
-    module.jointsIn.setMessage(emptyJointsMessage);
+    module.jointsIn.setMessage(jointsMessage);
     module.inertialsIn.setMessage(emptyInertialsMessage);
 
     module.run();

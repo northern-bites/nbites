@@ -8,6 +8,7 @@
 #include "FrontEnd.h"
 #include "Edge.h"
 #include "Hough.h"
+#include "Kinematics.h"
 #include "Homography.h"
 
 namespace man {
@@ -21,7 +22,7 @@ public:
     portals::InPortal<messages::YUVImage> topIn;
     portals::InPortal<messages::YUVImage> bottomIn;
     portals::InPortal<messages::JointAngles> jointsIn;
-    portals::InPortal<messages::InertialState> inertialsIn;
+    portals::InPortal<messages::InertialState> inertialsIn; // TODO eliminate?
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
@@ -37,6 +38,7 @@ private:
     EdgeList* edges[2];
     HoughLineList* houghLines[2];
     HoughSpace* hough[2];
+    Kinematics* kinematics[2];
     FieldHomography* homography[2];
     FieldLineList* fieldLines[2];
 };
