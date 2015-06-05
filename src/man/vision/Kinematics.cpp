@@ -12,7 +12,8 @@ Kinematics::Kinematics(bool topCamera)
       constants(topCamera),
       joints_(),
       tilt_(0),
-      wz0_(0)
+      wz0_(0),
+      azimuth_(0)
 {}
 
 void Kinematics::joints(const messages::JointAngles& newJoints)
@@ -36,17 +37,18 @@ void Kinematics::compute()
     double rk = joints_.r_knee_pitch();
     double rh = joints_.r_hip_pitch();
 
-    double h = joints_.head_pitch();
+    double hp = joints_.head_pitch();
+    double hy = joints_.head_yaw();
 
     // Compute kinematics for left and right leg
-    std::pair<double, double> leftLeg = computeForLeg(la, lk, lh, h);
-    std::pair<double, double> rightLeg = computeForLeg(ra, rk, rh, h);
+    std::pair<double, double> leftLeg = computeForLeg(la, lk, lh, hp);
+    std::pair<double, double> rightLeg = computeForLeg(ra, rk, rh, hp);
     double leftTilt = leftLeg.first;
     double rightTilt = rightLeg.first;
     double leftCameraHeight = leftLeg.second;
     double rightCameraHeight = rightLeg.second;
 
-    // Compute tilt and wz0 for whatever leg we are standing on
+    // Compute tilt, wz0, and azimuth for whatever leg we are standing on
     if (leftCameraHeight > rightCameraHeight) {
         tilt_ = leftTilt;
         wz0_ = leftCameraHeight;
@@ -54,9 +56,11 @@ void Kinematics::compute()
         tilt_ = rightTilt;
         wz0_ = rightCameraHeight;
     }
+    azimuth_ = -hy;
 
     std::cout << "Tilt: " << tilt_*TO_DEG << std::endl;
-    std::cout << "Height: " << wz0_ << std::endl << std::endl;
+    std::cout << "Wz0: " << wz0_ << std::endl;
+    std::cout << "Azimuth: " << azimuth_*TO_DEG << std::endl << std::endl;
 }
 
 std::pair<double, double> Kinematics::computeForLeg(double anklePitch,

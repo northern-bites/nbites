@@ -199,8 +199,8 @@ FieldLine::FieldLine(HoughLine& line1, HoughLine& line2, double fx0, double fy0)
 
 FieldLineList::FieldLineList()
 {
-  maxLineAngle(5.0f);
-  maxLineSeparation(10.0f);
+  maxLineAngle(10.0f);
+  maxLineSeparation(20.0f);
   maxCalibrateAngle(5.0f);
 }
 

@@ -54,7 +54,6 @@ VisionModule::~VisionModule()
 }
 
 // TODO bug in assembly front end green image
-// TODO false negative field lines, probably result of bad homography
 // TODO use horizon on top image
 void VisionModule::run_()
 {
@@ -97,6 +96,7 @@ void VisionModule::run_()
         kinematics[i]->joints(jointsIn.message());
         homography[i]->wz0(kinematics[i]->wz0());
         homography[i]->tilt(kinematics[i]->tilt());
+        homography[i]->azimuth(kinematics[i]->azimuth());
 
         // Approximate brightness gradient
         edgeDetector[i]->gradient(yImage);
@@ -122,9 +122,9 @@ void VisionModule::run_()
 
     for (int i = 0; i < 2; i++) {
         if (i == 0)
-            std::cout << "From top camera..." << std::endl;
+            std::cout << "From top camera:" << std::endl;
         else
-            std::cout << "From bottom camera..." << std::endl;
+            std::cout << std::endl << "From bottom camera:" << std::endl;
         std::cout << "Front end: " << times[i][0] << std::endl;
         std::cout << "Gradient: " << times[i][1] << std::endl;
         std::cout << "Edge detection: " << times[i][2] << std::endl;

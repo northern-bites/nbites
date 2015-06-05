@@ -9,12 +9,14 @@ namespace man {
 namespace vision {
  
 // TODO documentation
+// TODO add aperature to torso center Y computation
 class Kinematics {
 public:
     Kinematics(bool topCamera = true);
     void joints(const messages::JointAngles& newJoints);
     double tilt() { compute(); return tilt_; } 
     double wz0() { compute(); return wz0_; } 
+    double azimuth() { compute(); return azimuth_; } 
 
 private:
     void compute();
@@ -54,6 +56,7 @@ private:
 
     double tilt_;
     double wz0_;
+    double azimuth_;
 };
 
 }
