@@ -4,7 +4,6 @@
 #include "Camera.h"
 #include "Images.h"
 #include "PMotion.pb.h"
-#include "InertialState.pb.h"
 #include "FrontEnd.h"
 #include "Edge.h"
 #include "Hough.h"
@@ -22,7 +21,6 @@ public:
     portals::InPortal<messages::YUVImage> topIn;
     portals::InPortal<messages::YUVImage> bottomIn;
     portals::InPortal<messages::JointAngles> jointsIn;
-    portals::InPortal<messages::InertialState> inertialsIn; // TODO eliminate?
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }

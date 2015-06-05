@@ -12,7 +12,7 @@ namespace vision {
 class Kinematics {
 public:
     Kinematics(bool topCamera = true);
-    void setJointAngles(const messages::JointAngles& joints_);
+    void joints(const messages::JointAngles& newJoints);
     double tilt() { compute(); return tilt_; } 
     double wz0() { compute(); return wz0_; } 
 
@@ -50,7 +50,7 @@ private:
 
     bool needCompute;
     NaoConstants constants;
-    messages::JointAngles joints;
+    messages::JointAngles joints_;
 
     double tilt_;
     double wz0_;

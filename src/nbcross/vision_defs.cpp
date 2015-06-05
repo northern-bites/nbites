@@ -43,19 +43,16 @@ int Vision_func() {
     messages::YUVImage image(buf, width, height, width);
     messages::JointAngles joints;
     joints.ParseFromArray((void *) ptToJoints, numBytes[2]);
-    messages::InertialState emptyInertials;
 
     // Setup and run module
     portals::Message<messages::YUVImage> imageMessage(&image);
     portals::Message<messages::JointAngles> jointsMessage(&joints);
-    portals::Message<messages::InertialState> emptyInertialsMessage(&emptyInertials);
 
     man::vision::VisionModule module;
 
     module.topIn.setMessage(imageMessage);
     module.bottomIn.setMessage(imageMessage);
     module.jointsIn.setMessage(jointsMessage);
-    module.inertialsIn.setMessage(emptyInertialsMessage);
 
     module.run();
 

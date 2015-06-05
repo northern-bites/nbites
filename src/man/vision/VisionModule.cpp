@@ -12,8 +12,7 @@ VisionModule::VisionModule()
     : Module(),
       topIn(),
       bottomIn(),
-      jointsIn(),
-      inertialsIn()
+      jointsIn()
 {
     // NOTE constructed on heap because some of the objects below do
     //      not have default constructors, all class members must be initialized
@@ -63,7 +62,6 @@ void VisionModule::run_()
     topIn.latch();
     bottomIn.latch();
     jointsIn.latch();
-    inertialsIn.latch();
 
     // Setup
     std::vector<const messages::YUVImage*> images { &topIn.message(),
@@ -95,7 +93,8 @@ void VisionModule::run_()
         times[i][0] = timer.end();
 
         // Calculate kinematics and adjust homography
-        kinematics[i]->setJointAngles(jointsIn.message());
+        std::cout << "Top camera: " << (i == 0) << std::endl;
+        kinematics[i]->joints(jointsIn.message());
         homography[i]->wz0(kinematics[i]->wz0());
         homography[i]->tilt(kinematics[i]->tilt());
 

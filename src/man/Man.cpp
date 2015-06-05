@@ -117,7 +117,6 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         vision.topIn.wireTo(&topTranscriber.imageOut);
         vision.bottomIn.wireTo(&bottomTranscriber.imageOut);
         vision.jointsIn.wireTo(&topTranscriber.jointsOut, true);
-        vision.inertialsIn.wireTo(&topTranscriber.inertsOut, true);
         
         // localization.visionInput.wireTo(&vision.vision_field);
         // localization.motionInput.wireTo(&motion.odometryOutput_, true);
