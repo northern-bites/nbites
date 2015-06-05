@@ -24,24 +24,28 @@ int Vision_func() {
     uint8_t buf[length];
     memcpy(buf, copy->data().data(), length);
 
+    // Parse YUVImage S-expression
     bool topCamera = copy->tree().find("contents")->get(1)->
                                   find("from")->get(1)->value() == "camera_TOP";
+    int width = 2*atoi(copy->tree().find("contents")->get(1)->
+                                        find("width")->get(1)->value().c_str());
+    int height = atoi(copy->tree().find("contents")->get(1)->
+                                        find("height")->get(1)->value().c_str());
 
-    // TODO should read from description string
-    int width = 2*640;
-    int height = 480;
-
+    // Read number of bytes of image, inertials, and joints
     int numBytes[3];
     for (int i = 0; i < 3; i++)
         numBytes[i] = atoi(copy->tree().find("contents")->get(i+1)->
                                         find("nbytes")->get(1)->value().c_str());
     uint8_t* ptToJoints = buf + (numBytes[0] + numBytes[1]);
     
+    // Create messages
     messages::YUVImage image(buf, width, height, width);
     messages::JointAngles joints;
     joints.ParseFromArray((void *) ptToJoints, numBytes[2]);
     messages::InertialState emptyInertials;
 
+    // Setup and run module
     portals::Message<messages::YUVImage> imageMessage(&image);
     portals::Message<messages::JointAngles> jointsMessage(&joints);
     portals::Message<messages::InertialState> emptyInertialsMessage(&emptyInertials);

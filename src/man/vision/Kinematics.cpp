@@ -29,21 +29,14 @@ void Kinematics::compute()
 
     // Convert to radians
     double la = joints.l_ankle_pitch();
-    std::cout << la << std::endl;
     double lk = joints.l_knee_pitch();
-    std::cout << lk << std::endl;
     double lh = joints.l_hip_pitch();
-    std::cout << lh << std::endl;
 
     double ra = joints.r_ankle_pitch();
-    std::cout << ra << std::endl;
     double rk = joints.r_knee_pitch();
-    std::cout << rk << std::endl;
     double rh = joints.r_hip_pitch();
-    std::cout << rh << std::endl;
 
     double h = joints.head_pitch();
-    std::cout << h << std::endl;
 
     // Compute kinematics for left and right leg
     std::pair<double, double> leftLeg = computeForLeg(la, lk, lh, h);
@@ -59,6 +52,9 @@ void Kinematics::compute()
         tilt_ = 0.5 * M_PI - (rightLeg.first + constants.opticalAxisOffset);
         wz0_ = rightCameraHeight;
     }
+
+    std::cout << "Tilt: " << tilt_ << std::endl;
+    std::cout << "Height: " << wz0_ << std::endl;
 }
 
 std::pair<double, double> Kinematics::computeForLeg(double anklePitch,
