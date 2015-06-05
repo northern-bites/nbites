@@ -22,7 +22,7 @@ namespace vision {
 AdjustParams::AdjustParams()
   : angleThr(0.10f, 0.15f), distanceThr(2.00f, 4.00f), magnitudeThr(12, 20)
 {
-  lineEndWeight = 3.0f;
+  lineEndWeight = 8.0f;
   fitThresold = -1;
   scoreThreshold = 32;
 }
