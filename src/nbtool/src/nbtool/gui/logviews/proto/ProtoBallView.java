@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.lang.Float;
+import java.lang.Integer;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -33,6 +34,7 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 	private static final int OFFSET = 2;
 	private Map<String, Object> filteredBall;
 	private Map<String, Object> visionBall;
+	private Map<String, Object> naiveBall;
 	private Boolean ball_on;
 
 	public static Boolean shouldLoadInParallel() {return true;}
@@ -42,6 +44,7 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 		ball_on = false;
 		filteredBall = new HashMap();
 		visionBall = new HashMap();
+		naiveBall = new HashMap();
 	}
 
 	public void paintComponent(Graphics g){
@@ -75,42 +78,37 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 
 	public void setLog(Log newlog) {
 		String t = (String) newlog.primaryType();
+		ball_on = false;
+		if (!t.equals("MULTIBALL")) return;
+		ball_on = true;
 
-		byte[] nb = Arrays.copyOfRange(newlog.bytes,0,12);
-		byte[] fb = Arrays.copyOfRange(newlog.bytes,12,newlog.bytes.length);
+		int nb_length = Integer.parseInt(newlog.tree().find("contents").get(1).find("nb_length").get(1).value());
+		byte[] nb = Arrays.copyOfRange(newlog.bytes,0,nb_length);
+		byte[] fb = Arrays.copyOfRange(newlog.bytes,nb_length,newlog.bytes.length);
 
 		System.out.println("OMG");
 		Class<? extends com.google.protobuf.GeneratedMessage> nbClass = Utility.protobufClassFromType("proto-NaiveBall");
 		Class<? extends com.google.protobuf.GeneratedMessage> fbClass = Utility.protobufClassFromType("proto-FilteredBall");
-
-		// Logger.logf(Logger.INFO, "ProtoBufView: using class %s for type %s.\n", lClass.getName(), t);
 		com.google.protobuf.Message nbMsg = Utility.protobufInstanceForClassWithData(nbClass, nb);
 		com.google.protobuf.Message fbMsg = Utility.protobufInstanceForClassWithData(fbClass, fb);
 
-		Map<FieldDescriptor, Object> fields = fbMsg.getAllFields();
-		for (Map.Entry<FieldDescriptor, Object> entry : fields.entrySet()) {
-			System.out.println(entry.getKey().getName());
+		Map<FieldDescriptor, Object> fbFields = fbMsg.getAllFields();
+		for (Map.Entry<FieldDescriptor, Object> entry : fbFields.entrySet()) {
+			if (entry.getKey().getName().equals("vis")) {
+				Map<FieldDescriptor, Object> visFields = ((com.google.protobuf.Message)entry.getValue()).getAllFields();
+				for (Map.Entry<FieldDescriptor, Object> visEntry : visFields.entrySet()) {
+					visionBall.put(entry.getKey().getName(), visEntry.getValue());
+				}
+			} else {
+				filteredBall.put(entry.getKey().getName(), entry.getValue());
+			}
+		}
+		Map<FieldDescriptor, Object> nbFields = nbMsg.getAllFields();
+		for (Map.Entry<FieldDescriptor, Object> entry : nbFields.entrySet()) {
+			naiveBall.put(entry.getKey().getName(), entry.getValue());
 		}
 
-
-
-		// ball_on = false;
-		// if (!t.equals("proto-FilteredBall")) { return; }
-		// ball_on = true;
-		// Map<FieldDescriptor, Object> fields = msg.getAllFields();
-		// for (Map.Entry<FieldDescriptor, Object> entry : fields.entrySet()) {
-		// 	if (entry.getKey().getName().equals("vis")) {
-		// 		Map<FieldDescriptor, Object> visFields = ((com.google.protobuf.Message)entry.getValue()).getAllFields();
-		// 		for (Map.Entry<FieldDescriptor, Object> visEntry : visFields.entrySet()) {
-		// 			visionBall.put(entry.getKey().getName(), visEntry.getValue());
-		// 		}
-		// 	} else {
-		// 		filteredBall.put(entry.getKey().getName(), entry.getValue());
-		// 	}
-		// }
-
-		// repaint();
-
+		repaint();
 
 	}
 
