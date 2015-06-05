@@ -23,6 +23,9 @@ int Vision_func() {
     uint8_t buf[length];
     memcpy(buf, copy->data().data(), length);
 
+    bool top;
+    top = copy->description().find("from camera_TOP") != std::string::npos;
+
     int width = 2*640;
     int height = 480;
     
@@ -41,15 +44,17 @@ int Vision_func() {
     module.jointsIn.setMessage(emptyJointsMessage);
     module.inertialsIn.setMessage(emptyInertialsMessage);
 
-    module.run();
+    man::vision::ImageFrontEnd* frontEnd = module.runAndGetFrontEnd(top);
 
     // -----------
     //   Y IMAGE
     // -----------
-    man::vision::ImageFrontEnd* frontEnd = module.getFrontEnd();
 
     Log* yRet = new Log();
     int yLength = 240*320*2;
+
+    std::cout << "EVAN" << std::endl;
+    std::cout << "Desc: " <<  copy->description() << std::endl;
 
     // Create temp buffer and fill with yImage from FrontEnd
     uint8_t yBuf[yLength];

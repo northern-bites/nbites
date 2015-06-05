@@ -9,6 +9,8 @@
 #include "Edge.h"
 #include "Hough.h"
 #include "Homography.h"
+#include "ParamReader.h"
+
 
 namespace man {
 namespace vision {
@@ -24,12 +26,13 @@ public:
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::InertialState> inertialsIn;
 
-    ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
     FieldLineList* getFieldLines(bool topCamera = true) const { return fieldLines[!topCamera]; }
 
     // For use by Image nbcross func
-    void setBottomColorParams(Colors* colors) { colorParams[1] = colors; }
+    void setColorParams(Colors* colors, bool top) { colorParams};
+    ImageFrontEnd* runAndGetFrontEnd(bool top);
+
 
 protected:
     virtual void run_();
@@ -43,6 +46,12 @@ private:
     HoughSpace* hough[2];
     FieldHomography* homography[2];
     FieldLineList* fieldLines[2];
+
+    // Json tree with color params saved
+    boost::property_tree::ptree tree;
+
+    // Method to convert from Json to Colors type
+    Colors* getColorsFromJson(bool top);
 };
 
 }

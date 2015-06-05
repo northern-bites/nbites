@@ -1,7 +1,6 @@
 #include "VisionModule.h"
 #include "Edge.h"
 #include "HighResTimer.h"
-#include "ParamReader.h"
 
 #include <iostream>
 
@@ -21,14 +20,13 @@ VisionModule::VisionModule()
     //      after the initializer list is run, which requires calling default
     //      constructors in the case of C-style arrays, limitation theoretically
     //      removed in C++11
-    std::string path = "ColorParams.json";
-    boost::property_tree::ptree tree;
+    std::string path = "/home/evanhoyt/Desktop/ColorParams.json";
     boost::property_tree::read_json(path, tree);
 
     for (int i = 0; i < 2; i++) {
         // colorParams[i] = new Colors();
-        colorParams[0] = tree.getNumber("topColors");
-        colorParams[1] = tree.getNumber("bottomColors");
+        colorParams[0] = getColorsFromJson(true);
+        colorParams[1] = getColorsFromJson(false);
         frontEnd[i] = new ImageFrontEnd();
         edgeDetector[i] = new EdgeDetector();
         edges[i] = new EdgeList(32000);
@@ -133,8 +131,49 @@ void VisionModule::run_()
 
 }
 
-Colors getColorsFromJson(bool top) {
+ImageFrontEnd* VisionModule::runAndGetFrontEnd(bool top) {
+    topIn.latch();
+    bottomIn.latch();
+    jointsIn.latch();
+    inertialsIn.latch();
+
+    const messages::YUVImage* image = &topIn.message();
     
+    YuvLite yuvLite(image->width() / 4,
+                        image->height() / 2,
+                        image->rowPitch(),
+                        image->pixelAddress(0, 0));
+
+    // Run front end
+    if (top) 
+        frontEnd[0]->run(yuvLite, colorParams[0]);
+    else 
+        frontEnd[0]->run(yuvLite, colorParams[1]);
+
+    return frontEnd[0];
+}
+
+
+Colors* VisionModule::getColorsFromJson(bool top) {
+    Colors* ret = new Colors;
+    boost::property_tree::ptree params;
+    if (top) 
+        params = tree.get_child("colorParams.topColors");
+    else
+        params = tree.get_child("colorParams.bottomColors");
+    ret->white.load(params.get<float>("white.darkU"), params.get<float>("white.darkV"),
+                  params.get<float>("white.lightU"), params.get<float>("white.lightV"),
+                  params.get<float>("white.fuzzyU"), params.get<float>("white.fuzzyV"));
+
+    ret->green.load(params.get<float>("green.darkU"), params.get<float>("green.darkV"),
+                  params.get<float>("green.lightU"), params.get<float>("green.lightV"),
+                  params.get<float>("green.fuzzyU"), params.get<float>("green.fuzzyV"));
+    
+    ret->orange.load(params.get<float>("orange.darkU"), params.get<float>("orange.darkV"),
+                  params.get<float>("orange.lightU"), params.get<float>("orange.lightV"),
+                  params.get<float>("orange.fuzzyU"), params.get<float>("orange.fuzzyV"));
+
+    return ret;
 }
 
 }
