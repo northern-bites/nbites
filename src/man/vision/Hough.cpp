@@ -238,63 +238,115 @@ void FieldLineList::find(HoughLineList& houghLines)
   }
 }
 
+// GOOD IDEAS
 // TODO cross detection for midline
-// TODO rewrite based on a corner object
+// TODO stream with a robot to see what fields of view are possible
+// TODO add debug tools
+
+// QUESTIONABLE IDEAS
+// TODO two T corners, corner.second == line for both lines -> classify as midline
+// TODO detect corners that are off image
+// TODO convex and T -> classify as side goalbox
 void FieldLineList::classify()
 {
-  // Run goalbox and corner detector on all pairs of field lines
-  FieldLine* topGoalbox = NULL;
-  FieldLine* endline = NULL;
+  // Run goalbox detector
+  bool boxFound = boxDetector.lines(*this);
+  bool topBoxFound = boxFound;
+  bool endlineFound = boxFound;
 
-  std::vector<int> concave(size(), 0);
-  std::vector<int> convex(size(), 0);
-  std::vector<int> t(size(), 0);
+  // Run corner detector and save results
+  cornerDetector.lines(*this);
+  const std::vector<Corner> concave = corners.concave();
+  const std::vector<Corner> convex = corners.convex();
+  const std::vector<Corner> t = corners.t();
 
-  // TODO shouldn't run twice on pairs
+  // Look for lines with two corners and classify
   for (int i = 0; i < size(); i++) {
-    for (int j = 0; i < size(); i++) {
-      // Unpack
-      const FieldLine& line1 = (*this)[i];
-      const FieldLine& line2 = (*this)[j];  
+    FieldLine& line = (*this)[i];
+    std::vector<const Corner *> corners = line.corners();
 
-      // Goalbox
-      boxDetector.fieldLines(line1, line2);
-      if (boxDetector.box()) {
-        topGoalbox = &boxDetector.closeLine();
-        endline = &boxDetector.farLine();
-        topGoalbox.classification(FieldLine::Classification::TopGoalBox);
-        endline.farLine().classification(FieldLine::Classification::Endline);
+    bool oneConcave = false;
+    bool oneConvex = false;
+    bool oneT = false;
+
+    for (int j = 0; j < corners.size(); j++) {
+      // Concave
+      if (corners[j]->id() == Corner::Classification::Concave) {
+        if (oneConcave)
+          line.classification(FieldLine::Classification::endline);
+        else
+          oneConcave = true;
       }
-
-      // Corner
-      cornerDetector.fieldLines(line1, line2);
-      concave[i] += cornerDetector.concave();
-      convex[i]  += cornerDetector.convex();
-      t[i]       += cornerDetector.t();  
+      // Convex
+      if (corners[j]->id() == Corner::Classification::Convex) {
+        if (oneConvex)
+          line.classification(FieldLine::Classification::TopGoalbox);
+        else
+          oneConvex = true;
+      }
+      // T
+      if (corners[j]->id() == Corner::Classification::T &&
+          *(corners[j]->first()) == line) {
+        if (oneT)
+          line.classification(FieldLine::Classification::endline);
+        else
+          oneT = true;
+      }
     }
   }
 
-  // Classify based on goalbox and corner detections
-  for (int i = 0; i < size(); i++) {
-    const FieldLine& line = (*this)[i];
+  // If we have found either top goalbox or endline, classification is simpler
+  // TODO possible to loop through lines instead?
+  if (topBoxFound) { 
+    for (int i = 0; i < convex.size(); i++) {
+      // Only two convex corners on half, classify the line that is not top goalbox (side of goalbox)
+      if (convex[i].first().classification() == FieldLine::Classification::TopGoalbox)
+        convex[i].second().classification(FieldLine::Classification::SideGoalbox);
+      else
+        convex[i].first().classification(FieldLine::Classification::SideGoalbox);
+    }
+  }
 
-    if (topGoalbox) {
-      if (convex[i] && line != *topGoalbox)
-        line.classification(Classification::SideGoalbox);
-      else if (concave[i] && line != *endline)
-        line.classification(Classification::Sideline);
+  if (endlineFound) {
+    for (int i = 0; i < concave.size(); i++) {
+      // Classify line that makes concave with endline (sideline)
+      if (concave[i].first().classification() == FieldLine::Classification::Endline)
+        concave[i].second().classification(FieldLine::Classification::Sideline);
+      else if (concave[i].second().classification() == FieldLine::Classification::Endline)
+        concave[i].first().classification(FieldLine::Classification::Sideline);
     }
 
-    if (t[i] >= 2 || concave[i] > 2)
-      line.classification(Classification::Endline);
-    else if (convex[i] > 2)
-      line.classification(Classification::TopGoalbox);
-    else if (t[i] && convex[i])
-      line.classification(Classification::SideGoalbox);
-    else if (t[i] || concave[i])
-      line.classification(Classificaiton::EndlineOrSideline);
-    else if (convex[i])
-      line.classification(Classification::TopGoalboxOrSideGoalbox);
+    for (int i = 0; i < t.size(); i++) {
+      // Classify line that makes t with endline (side of goalbox)
+      if (t[i].first().classification() == FieldLine::Classification::Endline)
+        t[i].second().classification(FieldLine::Classification::SideGoalbox);
+      // Classify line that makes t with sideline
+      else if (t[i].first().classification() == FieldLine::Classification::Sideline)
+        t[i].second().classification(FieldLine::Classification::Midline);
+    }
+  }
+
+  // Classify less specifically, note that changing classification only
+  // takes affect if new class is more specific than old class
+  for (int i = 0; i < size(); i++) {
+    FieldLine& line = (*this)[i];
+    std::vector<const Corner *> corners = line.corners();
+
+    for (int j = 0; j < corners.size(); j++) {
+      // Only two lines connected to convex corner
+      if (corners[j]->id() == Corner::Classification::Convex)
+        line.classification(FieldLine::Classification::TopGoalboxOrSideGoalbox);
+      // Only two lines connected to concave corner
+      else if (corners[j]->id() == Corner::Classification::Concave)
+        line.classification(FieldLine::Classification::EndlineOrSideline);
+      // Only four lines connected to T corner
+      else if (corners[j]->id() == Corner::Classification::T) {
+        if (*(corners[j].first()) == line)
+          line.classification(FieldLine::Classification::EndlineOrSideline);
+        else
+          line.classification(FieldLine::Classification::SideGoalboxOrMidline);
+      }
+    }
   }
 }
 

@@ -155,8 +155,11 @@ public:
   // lines(0) is closest to robot
   HoughLine& lines(int index) { return *_lines[index]; }
 
+  // TODO don't change classification to something less specific
   int classification() const { return class_; }
   void classification(Classification newClass) { class_ = newClass; }
+
+  // TODO store vector of corners
 
   FieldLine(HoughLine& line1, HoughLine& line2, double fx0 = 0, double fy0 = 0);
 
@@ -169,15 +172,14 @@ public:
     TopGoalboxOrSideGoalbox,
     SideGoalboxOrMidline,
 
+    // More specific
+    Sideline,
+    SideGoalbox,
+
     // Most specific
     Endline,
-    Sideline,
     TopGoalbox,
-    SideGoalbox,
-    Midline,
-    Sideline,
-    CenterCircle, // TODO
-    OffField      // TODO
+    Midline
   }
 };
 
