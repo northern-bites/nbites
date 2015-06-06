@@ -22,9 +22,7 @@ namespace vision {
 // *                             *
 // *  Line from Hough Transform  *
 // *                             *
-// *******************************
-//
-// Hough lines use centered image coordinates
+// ******************************* // // Hough lines use centered image coordinates
 
 // The adjustment algorithm considers all edges and for each computes a fuzzy logic value
 // for the confidence that the edge belongs to the line. The fuzzy logic value is then
@@ -149,6 +147,7 @@ public:
 class FieldLine
 {
   HoughLine* _lines[2];
+  int class_;
 
 public:
   // Copy/assign OK
@@ -156,7 +155,30 @@ public:
   // lines(0) is closest to robot
   HoughLine& lines(int index) { return *_lines[index]; }
 
+  int classification() const { return class_; }
+  void classification(Classification newClass) { class_ = newClass; }
+
   FieldLine(HoughLine& line1, HoughLine& line2, double fx0 = 0, double fy0 = 0);
+
+  enum class Classification {
+    // Most general
+    Line,
+
+    // Two possibilities
+    EndlineOrSideline,
+    TopGoalboxOrSideGoalbox,
+    SideGoalboxOrMidline,
+
+    // Most specific
+    Endline,
+    Sideline,
+    TopGoalbox,
+    SideGoalbox,
+    Midline,
+    Sideline,
+    CenterCircle, // TODO
+    OffField      // TODO
+  }
 };
 
 // Either list or vector could be used here. Generally a field line list is not
@@ -164,6 +186,10 @@ public:
 // grows as needed. I prefer vector because list iteration is awkward.
 class FieldLineList : public std::vector<FieldLine>
 {
+  // TODO implement
+  GoalboxDetector boxDetector;
+  CornerDetector cornerDetector;
+
   float _maxLineAngle;
   float _maxLineSeparation;
   float _maxCalAngle;
@@ -188,6 +214,9 @@ public:
 
   // Find field lines
   void find(HoughLineList&);
+
+  // Classify field lines
+  void classify();
 
   // Calibrate tilt if possible.
   bool TiltCalibrate(FieldHomography&, std::string* message = 0);

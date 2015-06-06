@@ -189,6 +189,7 @@ void HoughLineList::mapToField(const FieldHomography& h)
 // **************************
 
 FieldLine::FieldLine(HoughLine& line1, HoughLine& line2, double fx0, double fy0)
+  : class_(Classification::Line)
 {
   double d1 = fabs(line1.field().pDist(fx0, fy0));
   double d2 = fabs(line2.field().pDist(fx0, fy0));
@@ -198,6 +199,7 @@ FieldLine::FieldLine(HoughLine& line1, HoughLine& line2, double fx0, double fy0)
 }
 
 FieldLineList::FieldLineList()
+  : cornerDetector(), boxDetector()
 {
   maxLineAngle(10.0f);
   maxLineSeparation(20.0f);
@@ -233,6 +235,66 @@ void FieldLineList::find(HoughLineList& houghLines)
           push_back(FieldLine(*hl1, *hl2, houghLines.fx0(), houghLines.fy0()));
         }
       }
+  }
+}
+
+// TODO cross detection for midline
+// TODO rewrite based on a corner object
+void FieldLineList::classify()
+{
+  // Run goalbox and corner detector on all pairs of field lines
+  FieldLine* topGoalbox = NULL;
+  FieldLine* endline = NULL;
+
+  std::vector<int> concave(size(), 0);
+  std::vector<int> convex(size(), 0);
+  std::vector<int> t(size(), 0);
+
+  // TODO shouldn't run twice on pairs
+  for (int i = 0; i < size(); i++) {
+    for (int j = 0; i < size(); i++) {
+      // Unpack
+      const FieldLine& line1 = (*this)[i];
+      const FieldLine& line2 = (*this)[j];  
+
+      // Goalbox
+      boxDetector.fieldLines(line1, line2);
+      if (boxDetector.box()) {
+        topGoalbox = &boxDetector.closeLine();
+        endline = &boxDetector.farLine();
+        topGoalbox.classification(FieldLine::Classification::TopGoalBox);
+        endline.farLine().classification(FieldLine::Classification::Endline);
+      }
+
+      // Corner
+      cornerDetector.fieldLines(line1, line2);
+      concave[i] += cornerDetector.concave();
+      convex[i]  += cornerDetector.convex();
+      t[i]       += cornerDetector.t();  
+    }
+  }
+
+  // Classify based on goalbox and corner detections
+  for (int i = 0; i < size(); i++) {
+    const FieldLine& line = (*this)[i];
+
+    if (topGoalbox) {
+      if (convex[i] && line != *topGoalbox)
+        line.classification(Classification::SideGoalbox);
+      else if (concave[i] && line != *endline)
+        line.classification(Classification::Sideline);
+    }
+
+    if (t[i] >= 2 || concave[i] > 2)
+      line.classification(Classification::Endline);
+    else if (convex[i] > 2)
+      line.classification(Classification::TopGoalbox);
+    else if (t[i] && convex[i])
+      line.classification(Classification::SideGoalbox);
+    else if (t[i] || concave[i])
+      line.classification(Classificaiton::EndlineOrSideline);
+    else if (convex[i])
+      line.classification(Classification::TopGoalboxOrSideGoalbox);
   }
 }
 
