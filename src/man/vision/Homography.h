@@ -18,6 +18,7 @@ namespace man {
 namespace vision {
 
 class GeoLine;
+class FieldLineList;
 
 class FieldHomography
 {

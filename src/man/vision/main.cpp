@@ -447,8 +447,18 @@ void houghTest()
   printf("\n%d edges\n", edges.count());
 
   printf("\n%d fast lines:\n", fastList.size());
+  fastList.mapToField(fh);
+  int i = 0;
+  double a;
   for (list<HoughLine>::iterator hl = fastList.begin(); hl != fastList.end(); ++hl)
-    printf("  %s\n", hl->print().c_str());
+  {
+    printf("  %s | %s\n", hl->print().c_str(), hl->field().print().c_str());
+    if (i == 2)
+      a = hl->field().t();
+    if (i == 4)
+      printf("%8.2f\n", (hl->field().t() - a) * (180 / M_PI) - 180);
+    ++i;
+  }
 
   printf("\n%d slow lines:\n", slowList.size());
   for (list<HoughLine>::iterator hl = slowList.begin(); hl != slowList.end(); ++hl)
@@ -526,28 +536,34 @@ void runHough()
 
   FieldLineList fLines;
   fLines.find(lines);
+
   string cal;
-  fLines.TiltCalibrate(fh, &cal);
+  fLines.tiltCalibrate(fh, &cal);
+  cout << cal.c_str();
 
   string s = "((lines";
   for (list<HoughLine>::iterator hl = lines.begin(); hl != lines.end(); ++hl)
   {
     int fieldLineSide = -1;
     if (hl->fieldLine() >= 0)
-      fieldLineSide = (int)(&fLines.at(hl->fieldLine()).lines(1) == &*hl);
+      fieldLineSide = (int)(&fLines.at(hl->fieldLine())[1] == &*hl);
     s += strPrintf(" ((rt %d %d) (score %.2f) (fit %.3f) (fIndex %d %d) (image %s) (field %s))",
                    hl->rIndex(), hl->tIndex(),
                    hl->score(), hl->fitError(),
                    hl->fieldLine(), fieldLineSide,
                    hl->GeoLine::print().c_str(), hl->field().print().c_str());
   }
-  s += "))";
+
+  const double ticksPerUs = 1600;
+  s += strPrintf(") (times %.1f %.1f %.1f %.1f))",
+                 frontEnd.time() / ticksPerUs, ed.gradientTime() / ticksPerUs,
+                 ed.edgeTime() / ticksPerUs, hs.time(HoughSpace::NumTimes - 1) / ticksPerUs);
 
   ofstream f;
   f.open(testImagePath, ios_base::binary);
   f.write(s.c_str(), s.length() + 1);
 
-  ImageLiteU16 hSpace(2 * hs.rWidth(), 256, hs.rPitch(), (uint16_t*)hs.pSpace(-hs.rRadius(), 0));
+  ImageLiteU16 hSpace(hs.rWidth(), 256, hs.rPitch(), (uint16_t*)hs.pSpace(-hs.rRadius(), 0));
   writeImage(hSpace, f);
 
   f.close();

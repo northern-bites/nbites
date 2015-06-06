@@ -140,11 +140,11 @@ public:
   double fy0() const { return _fy0; }
 };
 
-// ****************
-// *               
-// *  Field Lines  
-// *               
-// ****************
+// *****************
+// *               *
+// *  Field Lines  *
+// *               *
+// *****************
 
 class FieldLine
 {
@@ -153,8 +153,8 @@ class FieldLine
 public:
   // Copy/assign OK
 
-  // lines(0) is closest to robot
-  HoughLine& lines(int index) { return *_lines[index]; }
+  HoughLine& operator[](int index) { return *_lines[index]; }
+  const HoughLine& operator[](int index) const  { return *_lines[index]; }
 
   FieldLine(HoughLine& line1, HoughLine& line2, double fx0 = 0, double fy0 = 0);
 };
@@ -190,7 +190,7 @@ public:
   void find(HoughLineList&);
 
   // Calibrate tilt if possible.
-  bool TiltCalibrate(FieldHomography&, std::string* message = 0);
+  bool tiltCalibrate(FieldHomography&, std::string* message = 0);
 
 };
 

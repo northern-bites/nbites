@@ -236,69 +236,69 @@ void FieldLineList::find(HoughLineList& houghLines)
   }
 }
 
-// ****************
-// *               
-// *  Calibration  
-// *               
-// ****************
+// *****************
+// *               *
+// *  Calibration  *
+// *               *
+// *****************
 
-bool FieldLineList::TiltCalibrate(FieldHomography& h, string* s)
+bool FieldLineList::tiltCalibrate(FieldHomography& h, string* diagnostics)
 {
-#if 0
-  if (s)
-    s = "\n";
-  //Stats tiltStats = new Stats();
+  string s = "\n";
+  LineFit tiltStats;
 
-  for (int i = 0; i < size() - 1; ++i)
-    for (int j = i + 1; j < size(); ++j)
+  for (unsigned int i = 0; i < size() - 1; ++i)
+    for (unsigned int j = i + 1; j < size(); ++j)
     {
-      if (fsbs(lines[i].Ca * lines[j].Ca + lines[i].Sa * lines[j].Sa) < 0.33)
+      const FieldLine& fl1 = at(i);
+      const FieldLine& fl2 = at(j);
+      if (fabs(fl1[0].field().ux() * fl2[0].field().ux() + fl1[0].field().uy() * fl2[0].field().uy()) < 0.33)
       {
-        s += string.Format("Perpendicular field lines {0} and {1}:\n", i, j);
+        s += strPrintf("Perpendicular field lines %d and %d:\n", i, j);
         for (int a = 0; a < 2; ++a)
           for (int b = 0; b < 2; ++b)
           {
             double t;
             string diag;
-            bool ok = VisualTiltPerpendicular(lines[i].Lines(a), lines[j].Lines(b), out t, out diag);
+            bool ok = h.visualTiltPerpendicular(fl1[a], fl2[b], t, &diag);
             if (ok)
             {
-              t *= 180 / Math.PI;
-              tiltStats.Add(t);
-              s += string.Format("  {0,4:f1},", t);
+              t *= 180 / M_PI;
+              tiltStats.add(t, 0);
+              s += strPrintf("  %4.1f,", t);
             }
             else
               s += "  ----,";
-            s += string.Format(" | {0}\n", diag);
+            s += strPrintf(" | %s\n", diag.c_str());
           }
       }
-      else if (Math.Abs(lines[i].Ca * lines[j].Sa - lines[i].Sa * lines[j].Ca) < 0.33)
+      else if (fabs(fl1[0].field().ux() * fl2[0].field().uy() - fl1[0].field().uy() * fl2[0].field().ux()) < 0.33)
       {
-        s += string.Format("Parallel field lines {0} and {1}:\n", i, j);
+        s += strPrintf("Parallel field lines %d and %d:\n", i, j);
         for (int a = 0; a < 2; ++a)
           for (int b = 0; b < 2; ++b)
           {
             double t;
             string diag;
-            bool ok = VisualTiltParallel(lines[i].Lines(a), lines[j].Lines(b), out t, out diag);
+            bool ok = h.visualTiltParallel(fl1[a], fl2[b], t, &diag);
             if (ok)
             {
-              t *= 180 / Math.PI;
-              tiltStats.Add(t);
-              s += string.Format("  {0,4:f1},", t);
+              t *= 180 / M_PI;
+              tiltStats.add(t, 0);
+              s += strPrintf("  %4.1f,", t);
             }
             else
               s += "  ----,";
-            s += string.Format(" | {0}\n", diag);
+            s += strPrintf(" | %s\n", diag.c_str());
           }
       }
     }
 
-  s += string.Format("Mean tilt = {0:f2}, stDev = {1:f2}\n", tiltStats.Mean, tiltStats.StDev);
-  return s;
-#endif
-
-  return false;
+  s += strPrintf("Mean tilt = %.2f, stDev = %.2f\n",
+                 tiltStats.centerX(), tiltStats.firstPrincipalLength() / sqrt(3.0));
+  if (diagnostics != 0)
+    *diagnostics = s;
+  return tiltStats.area() >= 3;
 }
 
 // *****************
