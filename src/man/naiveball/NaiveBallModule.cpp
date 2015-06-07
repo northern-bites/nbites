@@ -29,10 +29,13 @@ NaiveBallModule::NaiveBallModule() :
     ballDestY = 0.f;
     frameOffCount = 0;
     currentIndex = 0;
+    currentSecIndex = 0;
+    secCounter = 0;
     direction = 0;
-    buffSize = NUM_FRAMES;
-    ballStateBuffer = new BallState[buffSize];
-
+    ballStateBuffer = new BallState[NUM_FRAMES];
+    bufferOfNSeconds = new BallState[10];
+    bufferFull = false;
+    secBufferFull = false;
     yIntercept = 0.f;
 }
 
@@ -45,13 +48,8 @@ void NaiveBallModule::run_()
     // Add observation (ball distance/position, ball bearing) to buffer
 
     // get myInfo:
-    // locIn.latch();
-    // myX = locIn.message().x();
-    // myY = locIn.message().y();
-    // myH = locIn.message().h();
     ballIn.latch();
     myBall = ballIn.message();
-
 
     // If can see the ball, update the buffer
     // Make sure no weird ball estimates
@@ -72,17 +70,28 @@ void NaiveBallModule::run_()
     portals::Message<messages::NaiveBall> naiveBallMessage(0);
 
     naiveBallMessage.get()->clear_position();
+    naiveBallMessage.get()->clear_sec_buffer();
     if (bufferFull) {
-        printf("HERE! Setting position!\n");
+        printf("Buffer is full; setting the position");
         int p = currentIndex;
-        for (int i = 0; i < buffSize; i++) {
-            currentIndex = currentIndex % buffSize;
+        for (int i = 0; i < NUM_FRAMES; i++) {
+            p = p % NUM_FRAMES;
             NaiveBall::Position* temp = naiveBallMessage.get()->add_position();
-            temp->set_x(ballStateBuffer[currentIndex].rel_x);
-            temp->set_y(ballStateBuffer[currentIndex].rel_y);
-            currentIndex++;
+            temp->set_x(ballStateBuffer[p].rel_x);
+            temp->set_y(ballStateBuffer[p].rel_y);
+            p++;
         }
-
+    }
+    if (secBufferFull) {
+        printf("Sec buffer full, writing\n");
+        int p = currentSecIndex;
+        for (int i = 0; i < 10; i++) {
+            p = p % 10;
+            NaiveBall::Position* temp = naiveBallMessage.get()->add_sec_buffer();
+            temp->set_x(bufferOfNSeconds[p].rel_x);
+            temp->set_y(bufferOfNSeconds[p].rel_y);
+            p++;
+        }
     }
 
     naiveBallMessage.get()->set_velocity(velocityEst);
@@ -95,18 +104,23 @@ void NaiveBallModule::run_()
 // Add new ball observation to the buffer
 void NaiveBallModule::updateBuffer()
 {
-    currentIndex = (currentIndex + 1) % buffSize;
+    currentIndex = (currentIndex + 1) % NUM_FRAMES;
     ballStateBuffer[currentIndex] = BallState(myBall.rel_x(), myBall.rel_y(), myBall.distance(), myBall.bearing());
-    if (currentIndex == buffSize - 1) {
+    if (currentIndex == NUM_FRAMES - 1) {
         bufferFull = true;
+        bufferOfNSeconds[currentSecIndex] = avgFrames(currentIndex - AVGING_FRAMES);
+        currentSecIndex = (currentSecIndex + 1) % 10;
+        if (currentSecIndex == 9) { secBufferFull = true; }
     }
 }
 
 void NaiveBallModule::clearBuffer()
 {
     currentIndex = 0;
+    currentSecIndex = 0;
     velocityEst = 0.f;
     bufferFull = false;
+    secBufferFull = false;
     frameOffCount = 0;
 }
 
@@ -116,10 +130,8 @@ void NaiveBallModule::naiveCheck()
     // Get average of first and last x number of frames to get a position estimate
     // at beginning and end
     int startIndex = currentIndex+1;
-    int endIndex = currentIndex - AVGING_FRAMES;
-    if (endIndex < 0) {
-        endIndex = endIndex + buffSize;
-    }
+    int endIndex = currentIndex - AVGING_FRAMES - 1;
+    if (endIndex < 0) endIndex = endIndex + NUM_FRAMES;
 
     BallState start_avgs = avgFrames(startIndex);
     BallState end_avgs = avgFrames(endIndex);
@@ -129,12 +141,11 @@ void NaiveBallModule::naiveCheck()
     float dist = calcSumSquaresSQRT((xVelocityEst), (yVelocityEst));
     float bearChange = end_avgs.bearing - start_avgs.bearing;
 
-    if (bearChange < 0.0) { direction = 1; }
-    else if (bearChange > 0.0) {direction = -1; }
+    if (bearChange < 0.0) { direction = -1; }
+    else if (bearChange > 0.0) {direction = 1; }
     velocityEst = (direction * dist / 1.f) * ALPHA + velocityEst * (1-ALPHA);
 
     if (xVelocityEst < 0.f && !checkIfStationary()) { naivePredict(end_avgs); }
-
 
     // velocityEst = (dist / 1.f);
     // TODO possibly take into account (possibly -as in probably) previous estimates
@@ -151,6 +162,14 @@ void NaiveBallModule::naivePredict(NaiveBallModule::BallState b)
     float t = (x_dest - x) / xVelocityEst; // calculate time until ball is at dest
 
     yIntercept = y + t * yVelocityEst;
+
+// --------------------
+
+
+// ----------------
+
+
+
     //printf("I think my yIntercept is: %f\n", yIntercept);
 
     // if(stationary)
@@ -199,7 +218,7 @@ NaiveBallModule::BallState NaiveBallModule::avgFrames(int startingIndex)
     float dist_sum = 0.f;
     float bearing_sum = 0.f;
     for (int i = 0; i < AVGING_FRAMES; i++) {
-        startingIndex = startingIndex % buffSize;
+        startingIndex = startingIndex % NUM_FRAMES;
         x_sum += ballStateBuffer[startingIndex].rel_x;
         y_sum += ballStateBuffer[startingIndex].rel_y;
         dist_sum += ballStateBuffer[startingIndex].distance;
@@ -208,22 +227,7 @@ NaiveBallModule::BallState NaiveBallModule::avgFrames(int startingIndex)
         startingIndex += 1;
 
     }
-    // if (dist_sum/AVGING_FRAMES > 10000.f) {
-    //     //printf("SOMETHING WRONG\n");
-    //     //printf("STARTED AT %i\n", p);
-    //     for (int i = 0; i < AVGING_FRAMES; i++) {
-    //         //printf("\nAt index: %i\n", startingIndex);
-    //         //printf("x: %f\n", ballStateBuffer[startingIndex].rel_x);
-    //         //printf("y: %f\n", ballStateBuffer[startingIndex].rel_y);
-    //         //printf("dist: %f\n", ballStateBuffer[startingIndex].distance);
-    //         //printf("bear: %f\n", ballStateBuffer[startingIndex].bearing);
-    //         if (startingIndex + 1 == buffSize) {
-    //             startingIndex = 0;
-    //         } else {
-    //             startingIndex += 1;
-    //         }
-    //     }
-    // }
+
     return BallState(x_sum / AVGING_FRAMES, y_sum / AVGING_FRAMES, dist_sum / AVGING_FRAMES, bearing_sum / AVGING_FRAMES);
 }
 
@@ -248,7 +252,7 @@ void NaiveBallModule::printBallState(NaiveBallModule::BallState x) {
 
 void NaiveBallModule::printBuffer() {
     printf("WHOLE BUFFER: \n");
-    for (int i = 0; i < buffSize; i++) {
+    for (int i = 0; i < NUM_FRAMES; i++) {
         printf("i = %i, value = ", i);
         printBallState(ballStateBuffer[i]);
     }

@@ -5328,6 +5328,30 @@ public final class BallModel {
      */
     messages.BallModel.NaiveBall.PositionOrBuilder getPositionOrBuilder(
         int index);
+
+    /**
+     * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+     */
+    java.util.List<messages.BallModel.NaiveBall.Position> 
+        getSecBufferList();
+    /**
+     * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+     */
+    messages.BallModel.NaiveBall.Position getSecBuffer(int index);
+    /**
+     * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+     */
+    int getSecBufferCount();
+    /**
+     * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+     */
+    java.util.List<? extends messages.BallModel.NaiveBall.PositionOrBuilder> 
+        getSecBufferOrBuilderList();
+    /**
+     * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+     */
+    messages.BallModel.NaiveBall.PositionOrBuilder getSecBufferOrBuilder(
+        int index);
   }
   /**
    * Protobuf type {@code messages.NaiveBall}
@@ -5404,6 +5428,14 @@ public final class BallModel {
               position_.add(input.readMessage(messages.BallModel.NaiveBall.Position.PARSER, extensionRegistry));
               break;
             }
+            case 42: {
+              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+                secBuffer_ = new java.util.ArrayList<messages.BallModel.NaiveBall.Position>();
+                mutable_bitField0_ |= 0x00000010;
+              }
+              secBuffer_.add(input.readMessage(messages.BallModel.NaiveBall.Position.PARSER, extensionRegistry));
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -5414,6 +5446,9 @@ public final class BallModel {
       } finally {
         if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
           position_ = java.util.Collections.unmodifiableList(position_);
+        }
+        if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+          secBuffer_ = java.util.Collections.unmodifiableList(secBuffer_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -6002,11 +6037,47 @@ public final class BallModel {
       return position_.get(index);
     }
 
+    public static final int SEC_BUFFER_FIELD_NUMBER = 5;
+    private java.util.List<messages.BallModel.NaiveBall.Position> secBuffer_;
+    /**
+     * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+     */
+    public java.util.List<messages.BallModel.NaiveBall.Position> getSecBufferList() {
+      return secBuffer_;
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+     */
+    public java.util.List<? extends messages.BallModel.NaiveBall.PositionOrBuilder> 
+        getSecBufferOrBuilderList() {
+      return secBuffer_;
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+     */
+    public int getSecBufferCount() {
+      return secBuffer_.size();
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+     */
+    public messages.BallModel.NaiveBall.Position getSecBuffer(int index) {
+      return secBuffer_.get(index);
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+     */
+    public messages.BallModel.NaiveBall.PositionOrBuilder getSecBufferOrBuilder(
+        int index) {
+      return secBuffer_.get(index);
+    }
+
     private void initFields() {
       velocity_ = 0F;
       stationary_ = false;
       yintercept_ = 0F;
       position_ = java.util.Collections.emptyList();
+      secBuffer_ = java.util.Collections.emptyList();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -6033,6 +6104,9 @@ public final class BallModel {
       for (int i = 0; i < position_.size(); i++) {
         output.writeMessage(4, position_.get(i));
       }
+      for (int i = 0; i < secBuffer_.size(); i++) {
+        output.writeMessage(5, secBuffer_.get(i));
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -6057,6 +6131,10 @@ public final class BallModel {
       for (int i = 0; i < position_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, position_.get(i));
+      }
+      for (int i = 0; i < secBuffer_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, secBuffer_.get(i));
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -6168,6 +6246,7 @@ public final class BallModel {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getPositionFieldBuilder();
+          getSecBufferFieldBuilder();
         }
       }
       private static Builder create() {
@@ -6187,6 +6266,12 @@ public final class BallModel {
           bitField0_ = (bitField0_ & ~0x00000008);
         } else {
           positionBuilder_.clear();
+        }
+        if (secBufferBuilder_ == null) {
+          secBuffer_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000010);
+        } else {
+          secBufferBuilder_.clear();
         }
         return this;
       }
@@ -6237,6 +6322,15 @@ public final class BallModel {
         } else {
           result.position_ = positionBuilder_.build();
         }
+        if (secBufferBuilder_ == null) {
+          if (((bitField0_ & 0x00000010) == 0x00000010)) {
+            secBuffer_ = java.util.Collections.unmodifiableList(secBuffer_);
+            bitField0_ = (bitField0_ & ~0x00000010);
+          }
+          result.secBuffer_ = secBuffer_;
+        } else {
+          result.secBuffer_ = secBufferBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -6285,6 +6379,32 @@ public final class BallModel {
                    getPositionFieldBuilder() : null;
             } else {
               positionBuilder_.addAllMessages(other.position_);
+            }
+          }
+        }
+        if (secBufferBuilder_ == null) {
+          if (!other.secBuffer_.isEmpty()) {
+            if (secBuffer_.isEmpty()) {
+              secBuffer_ = other.secBuffer_;
+              bitField0_ = (bitField0_ & ~0x00000010);
+            } else {
+              ensureSecBufferIsMutable();
+              secBuffer_.addAll(other.secBuffer_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.secBuffer_.isEmpty()) {
+            if (secBufferBuilder_.isEmpty()) {
+              secBufferBuilder_.dispose();
+              secBufferBuilder_ = null;
+              secBuffer_ = other.secBuffer_;
+              bitField0_ = (bitField0_ & ~0x00000010);
+              secBufferBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getSecBufferFieldBuilder() : null;
+            } else {
+              secBufferBuilder_.addAllMessages(other.secBuffer_);
             }
           }
         }
@@ -6651,6 +6771,246 @@ public final class BallModel {
         return positionBuilder_;
       }
 
+      private java.util.List<messages.BallModel.NaiveBall.Position> secBuffer_ =
+        java.util.Collections.emptyList();
+      private void ensureSecBufferIsMutable() {
+        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+          secBuffer_ = new java.util.ArrayList<messages.BallModel.NaiveBall.Position>(secBuffer_);
+          bitField0_ |= 0x00000010;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          messages.BallModel.NaiveBall.Position, messages.BallModel.NaiveBall.Position.Builder, messages.BallModel.NaiveBall.PositionOrBuilder> secBufferBuilder_;
+
+      /**
+       * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+       */
+      public java.util.List<messages.BallModel.NaiveBall.Position> getSecBufferList() {
+        if (secBufferBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(secBuffer_);
+        } else {
+          return secBufferBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+       */
+      public int getSecBufferCount() {
+        if (secBufferBuilder_ == null) {
+          return secBuffer_.size();
+        } else {
+          return secBufferBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+       */
+      public messages.BallModel.NaiveBall.Position getSecBuffer(int index) {
+        if (secBufferBuilder_ == null) {
+          return secBuffer_.get(index);
+        } else {
+          return secBufferBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+       */
+      public Builder setSecBuffer(
+          int index, messages.BallModel.NaiveBall.Position value) {
+        if (secBufferBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureSecBufferIsMutable();
+          secBuffer_.set(index, value);
+          onChanged();
+        } else {
+          secBufferBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+       */
+      public Builder setSecBuffer(
+          int index, messages.BallModel.NaiveBall.Position.Builder builderForValue) {
+        if (secBufferBuilder_ == null) {
+          ensureSecBufferIsMutable();
+          secBuffer_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          secBufferBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+       */
+      public Builder addSecBuffer(messages.BallModel.NaiveBall.Position value) {
+        if (secBufferBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureSecBufferIsMutable();
+          secBuffer_.add(value);
+          onChanged();
+        } else {
+          secBufferBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+       */
+      public Builder addSecBuffer(
+          int index, messages.BallModel.NaiveBall.Position value) {
+        if (secBufferBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureSecBufferIsMutable();
+          secBuffer_.add(index, value);
+          onChanged();
+        } else {
+          secBufferBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+       */
+      public Builder addSecBuffer(
+          messages.BallModel.NaiveBall.Position.Builder builderForValue) {
+        if (secBufferBuilder_ == null) {
+          ensureSecBufferIsMutable();
+          secBuffer_.add(builderForValue.build());
+          onChanged();
+        } else {
+          secBufferBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+       */
+      public Builder addSecBuffer(
+          int index, messages.BallModel.NaiveBall.Position.Builder builderForValue) {
+        if (secBufferBuilder_ == null) {
+          ensureSecBufferIsMutable();
+          secBuffer_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          secBufferBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+       */
+      public Builder addAllSecBuffer(
+          java.lang.Iterable<? extends messages.BallModel.NaiveBall.Position> values) {
+        if (secBufferBuilder_ == null) {
+          ensureSecBufferIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, secBuffer_);
+          onChanged();
+        } else {
+          secBufferBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+       */
+      public Builder clearSecBuffer() {
+        if (secBufferBuilder_ == null) {
+          secBuffer_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000010);
+          onChanged();
+        } else {
+          secBufferBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+       */
+      public Builder removeSecBuffer(int index) {
+        if (secBufferBuilder_ == null) {
+          ensureSecBufferIsMutable();
+          secBuffer_.remove(index);
+          onChanged();
+        } else {
+          secBufferBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+       */
+      public messages.BallModel.NaiveBall.Position.Builder getSecBufferBuilder(
+          int index) {
+        return getSecBufferFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+       */
+      public messages.BallModel.NaiveBall.PositionOrBuilder getSecBufferOrBuilder(
+          int index) {
+        if (secBufferBuilder_ == null) {
+          return secBuffer_.get(index);  } else {
+          return secBufferBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+       */
+      public java.util.List<? extends messages.BallModel.NaiveBall.PositionOrBuilder> 
+           getSecBufferOrBuilderList() {
+        if (secBufferBuilder_ != null) {
+          return secBufferBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(secBuffer_);
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+       */
+      public messages.BallModel.NaiveBall.Position.Builder addSecBufferBuilder() {
+        return getSecBufferFieldBuilder().addBuilder(
+            messages.BallModel.NaiveBall.Position.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+       */
+      public messages.BallModel.NaiveBall.Position.Builder addSecBufferBuilder(
+          int index) {
+        return getSecBufferFieldBuilder().addBuilder(
+            index, messages.BallModel.NaiveBall.Position.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position sec_buffer = 5;</code>
+       */
+      public java.util.List<messages.BallModel.NaiveBall.Position.Builder> 
+           getSecBufferBuilderList() {
+        return getSecBufferFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          messages.BallModel.NaiveBall.Position, messages.BallModel.NaiveBall.Position.Builder, messages.BallModel.NaiveBall.PositionOrBuilder> 
+          getSecBufferFieldBuilder() {
+        if (secBufferBuilder_ == null) {
+          secBufferBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              messages.BallModel.NaiveBall.Position, messages.BallModel.NaiveBall.Position.Builder, messages.BallModel.NaiveBall.PositionOrBuilder>(
+                  secBuffer_,
+                  ((bitField0_ & 0x00000010) == 0x00000010),
+                  getParentForChildren(),
+                  isClean());
+          secBuffer_ = null;
+        }
+        return secBufferBuilder_;
+      }
+
       // @@protoc_insertion_point(builder_scope:messages.NaiveBall)
     }
 
@@ -6722,11 +7082,12 @@ public final class BallModel {
       "bearing\030\033 \001(\002\022\021\n\tmov_vel_x\030\034 \001(\002\022\021\n\tmov_" +
       "vel_y\030\035 \001(\002\022\021\n\tmov_speed\030\036 \001(\002\"H\n\nShared" +
       "Ball\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\022\017\n\007ball_on\030\003 " +
-      "\001(\010\022\023\n\013reliability\030\004 \001(\005\"\227\001\n\tNaiveBall\022\020" +
+      "\001(\010\022\023\n\013reliability\030\004 \001(\005\"\311\001\n\tNaiveBall\022\020" +
       "\n\010velocity\030\001 \001(\002\022\022\n\nstationary\030\002 \001(\010\022\022\n\n" +
       "yintercept\030\003 \001(\002\022.\n\010position\030\004 \003(\0132\034.mes" +
-      "sages.NaiveBall.Position\032 \n\010Position\022\t\n\001",
-      "x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002"
+      "sages.NaiveBall.Position\0220\n\nsec_buffer\030\005",
+      " \003(\0132\034.messages.NaiveBall.Position\032 \n\010Po" +
+      "sition\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -6763,7 +7124,7 @@ public final class BallModel {
     internal_static_messages_NaiveBall_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_NaiveBall_descriptor,
-        new java.lang.String[] { "Velocity", "Stationary", "Yintercept", "Position", });
+        new java.lang.String[] { "Velocity", "Stationary", "Yintercept", "Position", "SecBuffer", });
     internal_static_messages_NaiveBall_Position_descriptor =
       internal_static_messages_NaiveBall_descriptor.getNestedTypes().get(0);
     internal_static_messages_NaiveBall_Position_fieldAccessorTable = new

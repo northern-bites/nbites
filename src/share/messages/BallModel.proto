@@ -79,4 +79,5 @@ message NaiveBall {
     optional bool stationary = 2;
     optional float yintercept = 3;
     repeated Position position = 4;
+    repeated Position sec_buffer = 5;
 }

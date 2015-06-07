@@ -58,12 +58,14 @@ private:
     void printBuffer();
 
     BallState *ballStateBuffer;
+    BallState *bufferOfNSeconds;
 
     int currentIndex;
-    int buffSize;
+    int currentSecIndex;
     int frameOffCount;
     int count;
     int direction;
+    int secCounter;
 
     float velocityEst;
     float xVelocityEst;
@@ -73,6 +75,7 @@ private:
     float yIntercept;
 
     bool bufferFull;
+    bool secBufferFull;
 
     messages::WorldModel worldMessages[NUM_PLAYERS_PER_TEAM];
     messages::FilteredBall myBall;

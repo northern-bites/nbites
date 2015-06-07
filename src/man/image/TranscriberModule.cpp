@@ -677,15 +677,15 @@ void TranscriberModule::run_()
         contents.push_back(naive);
 
         SExpr filter("FilteredBall", "multiball", clock(), -1, fb_buf.length());
-        filter.append(SExpr("vis_distance", fb_pb.vis().distance()));
-        filter.append(SExpr("vis_bearing", fb_pb.vis().bearing()));
-        filter.append(SExpr("vis_on", fb_pb.vis().on()));
-        filter.append(SExpr("vis_x", fb_pb.vis().x()));
-        filter.append(SExpr("vis_y", fb_pb.vis().y()));
-        filter.append(SExpr("distance", fb_pb.distance()));
-        filter.append(SExpr("bearing", fb_pb.bearing()));
-        filter.append(SExpr("rel_x", fb_pb.rel_x()));
-        filter.append(SExpr("rel_y", fb_pb.rel_y()));
+        // filter.append(SExpr("vis_distance", fb_pb.vis().distance()));
+        // filter.append(SExpr("vis_bearing", fb_pb.vis().bearing()));
+        // filter.append(SExpr("vis_on", fb_pb.vis().on()));
+        // filter.append(SExpr("vis_x", fb_pb.vis().x()));
+        // filter.append(SExpr("vis_y", fb_pb.vis().y()));
+        // filter.append(SExpr("distance", fb_pb.distance()));
+        // filter.append(SExpr("bearing", fb_pb.bearing()));
+        // filter.append(SExpr("rel_x", fb_pb.rel_x()));
+        // filter.append(SExpr("rel_y", fb_pb.rel_y()));
 
         // filter.append(SExpr("vel_x", fb_pb.vel_x()));
         // filter.append(SExpr("vel_y", fb_pb.vel_y()));
