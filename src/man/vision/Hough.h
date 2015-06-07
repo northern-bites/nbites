@@ -157,6 +157,8 @@ public:
   const HoughLine& operator[](int index) const  { return *_lines[index]; }
 
   FieldLine(HoughLine& line1, HoughLine& line2, double fx0 = 0, double fy0 = 0);
+
+  double separation() const { return _lines[0]->field().separation(_lines[1]->field()); }
 };
 
 // Either list or vector could be used here. Generally a field line list is not

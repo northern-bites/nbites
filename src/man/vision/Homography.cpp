@@ -320,6 +320,16 @@ void GeoLine::rawEndPoints(double x0, double y0,
   y2 = y0 - y2;
 }
 
+double GeoLine::separation(const GeoLine& other) const
+{
+  double x1, y1, x2, y2, x3, y3, x4, y4;
+  endPoints(x1, y1, x2, y2);
+  other.endPoints(x3, y3, x4, y4);
+  double x0 = (x1 + x2 + x3 + x4) / 4;
+  double y0 = (y1 + y2 + y3 + y4) / 4;
+  return pDist(x0, y0) + other.pDist(x0, y0);
+}
+
 void GeoLine::imageToField(const FieldHomography& h)
 {
   // Get field coordinates of the line origin (any point on the line will do),

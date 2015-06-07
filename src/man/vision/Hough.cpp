@@ -200,7 +200,7 @@ FieldLine::FieldLine(HoughLine& line1, HoughLine& line2, double fx0, double fy0)
 FieldLineList::FieldLineList()
 {
   maxLineAngle(5.0f);
-  maxLineSeparation(10.0f);
+  maxLineSeparation(30.0f);
   maxCalibrateAngle(5.0f);
 }
 
@@ -225,7 +225,7 @@ void FieldLineList::find(HoughLineList& houghLines)
         // other, which makes the sum of r's negative. A pair of nearly parallel
         // lines with the right separation but with polarities pointing away from
         // each other is not a field line. 
-        double separation = -(hl1->field().r() + hl2->field().r());
+        double separation = hl1->field().separation(hl2->field());
         if (0.0 < separation && separation <= maxLineSeparation())
         {
           hl1->fieldLine((int)size());
@@ -247,8 +247,8 @@ bool FieldLineList::tiltCalibrate(FieldHomography& h, string* diagnostics)
   string s = "\n";
   LineFit tiltStats;
 
-  for (unsigned int i = 0; i < size() - 1; ++i)
-    for (unsigned int j = i + 1; j < size(); ++j)
+  for (int i = 0; i < (int)size() - 1; ++i)
+    for (int j = i + 1; j < (int)size(); ++j)
     {
       const FieldLine& fl1 = at(i);
       const FieldLine& fl2 = at(j);
