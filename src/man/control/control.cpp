@@ -90,7 +90,7 @@ namespace control {
 
     uint32_t cnc_setCameraParams(Log * arg) {
         size_t u = arg->data().size();
-        bool success = receivedParams.ParseFromString(arg->data());//get this checked
+        bool success = receivedParams.ParseFromString(arg->data());
         if(!success) {
             std::cerr<<"Failed to Parse Params\n";
         } else {
@@ -118,7 +118,7 @@ namespace control {
             if(receivedParams.whichcamera() == "TOP"){
                 std::ofstream file("/home/nao/nbites/Config/topCameraParams.json");
                 file << stringToSend;
-                file.close();
+                file.close(); //different name based on camera specified in the protobuf
             } else {
                 std::ofstream file("/home/nao/nbites/Config/bottomCameraParams.json");
                 file << stringToSend;

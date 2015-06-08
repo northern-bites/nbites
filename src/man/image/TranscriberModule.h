@@ -81,9 +81,8 @@ public:
 
     void initSettings(); //one of the magical init methods
 
-    man::ParamReader param;
-    //man::ParamReader actualParams;
-    NewSettings updated_settings;
+    man::ParamReader param; //json param reader
+    NewSettings updated_settings; //struct containing updated settings
 
 private:
     enum

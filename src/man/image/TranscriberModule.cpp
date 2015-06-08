@@ -222,10 +222,10 @@ void ImageTranscriber::initSettings()
     }
     ParamReader temp(filepath);
     param = temp;
-    //static NewSettings updated_settings;
+
     if(FILE *file = fopen(filepath.c_str(),"r")) {
         fclose(file);
-        if(!param.isEmpty()) {
+        if(!param.isEmpty()) { //check if JSON contains anything/is properly formatted
             std::cout<<"[INFO] Reading from JSON"<<std::endl;
 
             updated_settings.hflip = param.getParam<bool>("hflip");
@@ -243,28 +243,11 @@ void ImageTranscriber::initSettings()
             updated_settings.gain = param.getParam<int>("gain");
             updated_settings.white_balance = param.getParam<int>("white_balance");
             updated_settings.fade_to_black = param.getParam<int>("fade_to_black");
-
-            /*
-            std::cout<<"-----UPDATED SETTINGS-----"<<std::endl;
-            std::cout<<"HFLIP: "+updated_settings.hflip<<std::endl;
-            std::cout<<"VFLIP: "+updated_settings.vflip<<std::endl;
-            std::cout<<"AutoExposure: "+updated_settings.auto_exposure<<std::endl;
-            std::cout<<"Brightness: "+updated_settings.brightness<<std::endl;
-            std::cout<<"Contrast: "+updated_settings.contrast<<std::endl;
-            std::cout<<"Saturation: "+updated_settings.saturation<<std::endl;
-            std::cout<<"Hue: "+updated_settings.hue<<std::endl;
-            std::cout<<"Sharpness: "+updated_settings.sharpness<<std::endl;
-            std::cout<<"Gamma: "+updated_settings.gamma<<std::endl;
-            std::cout<<"AutoWB: "+updated_settings.auto_whitebalance<<std::endl;
-            std::cout<<"BLComp: "+updated_settings.backlight_compensation<<std::endl;
-            std::cout<<"Exposure: "+updated_settings.exposure<<std::endl;
-            std::cout<<"Gain: "+updated_settings.gain<<std::endl;
-            std::cout<<"WB: "+updated_settings.white_balance<<std::endl;
-            std::cout<<"FTB "+updated_settings.fade_to_black<<std::endl; */
         } else {
             std::cout<<"[ERR] No Children"<<std::endl;     
         }
-    } else {
+    } else { //if file does not exist obtain settings specified in Camera.h 
+             //(this will be deprecated soon)
         std::cout<<"[INFO] Setting Params from Camera.h"<<std::endl;
 
         updated_settings.hflip = settings.hflip;
@@ -570,19 +553,19 @@ void TranscriberModule::run_()
 {
     struct stat file_stats;
     std::string filepath;
-    if(it.type() == Camera::TOP) {
+    if(it.type() == Camera::TOP) { //set path according to camera
         filepath = "/home/nao/nbites/Config/topCameraParams.json";
     } else {
         filepath = "/home/nao/nbites/Config/bottomCameraParams.json";
     }
-    if(FILE *file = fopen(filepath.c_str(),"r")) {
+    if(FILE *file = fopen(filepath.c_str(),"r")) { //existence check
         fclose(file);
         int err = stat(filepath.c_str(),&file_stats);
         if(err != 0) {
             std::cout<<"[INFO] FILE HAS BEEN MODIFIED"<<std::endl;
         }
         int time_diff = std::difftime(file_stats.st_mtime, file_mod_time);
-        if(time_diff > 0.0) {
+        if(time_diff > 0.0) { //check if the file has been modified
             file_mod_time = file_stats.st_mtime;
             std::cout<<"[INFO] New Mod. Time: "<<file_mod_time<<std::endl;
             std::cout<<"[INFO] Calling initSettings() now"<<std::endl;
