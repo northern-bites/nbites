@@ -237,7 +237,7 @@ STAND_UP_BACK = (
                  ((120.5, 19.4, 21.7, -39.7),
                   (-34.9, 46.1, -94.2, 105.4, 34.6, 10.7),
                   (-34.9, -34.1, -92.9, 122.5, 18.4, 13.9),
-                  (125.4, 3.1, 25.7, 1.7),
+                  (125.4, 3.1, -50, 1.7),
                   0.4,1, stiff.STANDUP_STIFFNESSES),
                  #take a seat
 
@@ -247,7 +247,7 @@ STAND_UP_BACK = (
                   (-62.93,9.06,-84.64,116.72,21.88,23.73),
                   (-62.93,-29.44,-82.62,103.71,30.85,-10.11),
                   (115.93,17.58,-90.62,3.34),
-                  0.6,1, stiff.STANDUP_STIFFNESSES),
+                  0.4,1, stiff.STANDUP_STIFFNESSES),
                  #sitting legs spread hands behind facing forward
 
                  # makes elbow straight
@@ -256,7 +256,7 @@ STAND_UP_BACK = (
                   (-28,-31,-87,80,52,0),
                   # (120,-33,-4,0.4),
                   (123.1, -28.0, -1.7, 6.9),
-                  .7,1, stiff.STANDUP_STIFFNESSES),
+                  0.4,1, stiff.STANDUP_STIFFNESSES),
                  # turns to right a little and stands with one arm on ground
 
                   ((40,50,4,-34),
@@ -276,14 +276,14 @@ STAND_UP_BACK = (
                   (-30.23,-10.19,-45.86,122.78,-67.68,8.44),
                   (-30.23,-26.72,-70.78,54.41,34.99,10.69),
                   (54.85,-45.62,-0.27,24.35),
-                 0.4,1, stiff.STANDUP_STIFFNESSES),
+                 0.6,1, stiff.STANDUP_STIFFNESSES),
                  #pulls right leg in a little
 
                  ((77.5, 28.9, 5.6, -40.7),
                   (-30.1, -2.2, -32.6, 123.5, -69.4, 3.1),
                   (-30.1, -14.2, -61.5, 123.2, -42.8, 8.6),
                   (88.1, -22.6, -1.0, 23.0),
-                  0.4, 1, stiff.STANDUP_STIFFNESSES),
+                  0.5, 1, stiff.STANDUP_STIFFNESSES),
                  # pulls both legs in, squat
 
                  #stands up
