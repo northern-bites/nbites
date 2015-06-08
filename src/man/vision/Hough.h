@@ -144,10 +144,16 @@ public:
 // *               
 // ****************
 
+// Forward declerations
+class Corner;
+class GoalboxDetector;
+class CornerDetector;
+
 class FieldLine
 {
   HoughLine* _lines[2];
-  int class_;
+  Classification id_;
+  std::vector<Corner> corners_;
 
 public:
   // Copy/assign OK
@@ -155,14 +161,11 @@ public:
   // lines(0) is closest to robot
   HoughLine& lines(int index) { return *_lines[index]; }
 
-  // TODO don't change classification to something less specific
-  int classification() const { return class_; }
-  void classification(Classification newClass) { class_ = newClass; }
-
-  // TODO store vector of corners
-
   FieldLine(HoughLine& line1, HoughLine& line2, double fx0 = 0, double fy0 = 0);
 
+  // TODO don't change classification to something less specific
+  int id() const { return id_; }
+  void id(Classification newId) { id_ = newId; }
   enum class Classification {
     // Most general
     Line,
@@ -181,6 +184,8 @@ public:
     TopGoalbox,
     Midline
   }
+
+  std::vector<Corner> corners() const { return corners_; }
 };
 
 // Either list or vector could be used here. Generally a field line list is not
@@ -222,8 +227,61 @@ public:
 
   // Calibrate tilt if possible.
   bool TiltCalibrate(FieldHomography&, std::string* message = 0);
-
 };
+
+// Corner object used in corner detection and field line classification
+struct Corner : public std::pair<FieldLine *, FieldLine *>
+{
+  Corner(FieldLine* first_, FieldLine* second_, Classification id_);
+
+  Classification id;
+  enum class Classification {
+    None,
+    Concave,
+    Convex,
+    T
+  }
+}
+
+// TODO
+class GoalboxDetector
+{
+}
+
+// TODO logical const
+class CornerDetector
+{
+  FieldLineList* lineList;
+  std::vector<Corner> concave_;
+  std::vector<Corner> convex_;
+  std::vector<Corner> t_;
+
+  double angleThreshold_;
+  double closeThreshold_;
+  double farThreshold_;
+
+  void compute();
+  Corner::Classification findCorner(HoughLine& line1, HoughLine& line2); 
+
+public:
+  // TODO defaults for thresholds
+  CornerDetector();
+
+  // TODO redesign API?
+  void lines(FieldLineList* lineList_) { lineList = lineList_; }
+  std::vector<Corner> concave() { compute(); return concave; }
+  std::vector<Corner> convex() { compute(); return convex; }
+  std::vector<Corner> t() { compute(); return t; }
+
+  double angleThreshold() const { return angleThreshold_; }
+  double angleThreshold(double newThreshold) { angleThreshold_ = newThreshold; }
+
+  double closeThreshold() const { return closeThreshold_; }
+  double closeThreshold(double newThreshold) { closeThreshold_ = newThreshold; }
+
+  double farThreshold() const { return farThreshold_; }
+  double farThreshold(double newThreshold) { farThreshold_ = newThreshold; }
+}
 
 // *****************
 // *               *

@@ -189,7 +189,7 @@ void HoughLineList::mapToField(const FieldHomography& h)
 // **************************
 
 FieldLine::FieldLine(HoughLine& line1, HoughLine& line2, double fx0, double fy0)
-  : class_(Classification::Line)
+  : id_(Classification::Line), corners()
 {
   double d1 = fabs(line1.field().pDist(fx0, fy0));
   double d2 = fabs(line2.field().pDist(fx0, fy0));
@@ -236,15 +236,22 @@ void FieldLineList::find(HoughLineList& houghLines)
         }
       }
   }
+
+  // Once all field lines are found, classify the lines
+  classify();
 }
 
 // GOOD IDEAS
+// TODO ignore corners in edge of screen
 // TODO cross detection for midline
+// TODO lots of green detection for midline
+// TODO use field edge
+// TODO use length of lines
+// TODO goalie and the goalbox
 // TODO stream with a robot to see what fields of view are possible
 // TODO add debug tools
 
 // QUESTIONABLE IDEAS
-// TODO two T corners, corner.second == line for both lines -> classify as midline
 // TODO detect corners that are off image
 // TODO convex and T -> classify as side goalbox
 void FieldLineList::classify()
@@ -254,7 +261,7 @@ void FieldLineList::classify()
   bool topBoxFound = boxFound;
   bool endlineFound = boxFound;
 
-  // Run corner detector and save results
+  // Run corner detector
   cornerDetector.lines(*this);
   const std::vector<Corner> concave = corners.concave();
   const std::vector<Corner> convex = corners.convex();
@@ -263,34 +270,44 @@ void FieldLineList::classify()
   // Look for lines with two corners and classify
   for (int i = 0; i < size(); i++) {
     FieldLine& line = (*this)[i];
-    std::vector<const Corner *> corners = line.corners();
+    std::vector<Corner> corners = line.corners();
 
     bool oneConcave = false;
     bool oneConvex = false;
-    bool oneT = false;
+    bool oneTLong = false;
+    bool oneTShort = false;
 
     for (int j = 0; j < corners.size(); j++) {
       // Concave
-      if (corners[j]->id() == Corner::Classification::Concave) {
+      if (corners[j].id == Corner::Classification::Concave) {
         if (oneConcave)
-          line.classification(FieldLine::Classification::endline);
+          line.id(FieldLine::Classification::endline);
         else
           oneConcave = true;
       }
       // Convex
-      if (corners[j]->id() == Corner::Classification::Convex) {
+      if (corners[j].id == Corner::Classification::Convex) {
         if (oneConvex)
-          line.classification(FieldLine::Classification::TopGoalbox);
+          line.id(FieldLine::Classification::TopGoalbox);
         else
           oneConvex = true;
       }
-      // T
-      if (corners[j]->id() == Corner::Classification::T &&
-          *(corners[j]->first()) == line) {
-        if (oneT)
-          line.classification(FieldLine::Classification::endline);
+      // T, long part
+      if (corners[j].id == Corner::Classification::T &&
+          *(corners[j].first) == line) {
+        if (oneTLong)
+          line.id(FieldLine::Classification::endline);
         else
-          oneT = true;
+          oneTLong = true;
+      }
+      // T, short part
+      // TODO use in next section
+      if (corners[j].id == Corner::Classification::T &&
+          *(corners[j].second) == line) {
+        if (oneTShort)
+          line.id(FieldLine::Classification::midline);
+        else
+          oneTShort = true;
       }
     }
   }
@@ -300,29 +317,29 @@ void FieldLineList::classify()
   if (topBoxFound) { 
     for (int i = 0; i < convex.size(); i++) {
       // Only two convex corners on half, classify the line that is not top goalbox (side of goalbox)
-      if (convex[i].first().classification() == FieldLine::Classification::TopGoalbox)
-        convex[i].second().classification(FieldLine::Classification::SideGoalbox);
+      if (convex[i].first->id() == FieldLine::Classification::TopGoalbox)
+        convex[i].second->id(FieldLine::Classification::SideGoalbox);
       else
-        convex[i].first().classification(FieldLine::Classification::SideGoalbox);
+        convex[i].first->id(FieldLine::Classification::SideGoalbox);
     }
   }
 
   if (endlineFound) {
     for (int i = 0; i < concave.size(); i++) {
       // Classify line that makes concave with endline (sideline)
-      if (concave[i].first().classification() == FieldLine::Classification::Endline)
-        concave[i].second().classification(FieldLine::Classification::Sideline);
-      else if (concave[i].second().classification() == FieldLine::Classification::Endline)
-        concave[i].first().classification(FieldLine::Classification::Sideline);
+      if (concave[i].first->id() == FieldLine::Classification::Endline)
+        concave[i].second->id(FieldLine::Classification::Sideline);
+      else if (concave[i].second->id() == FieldLine::Classification::Endline)
+        concave[i].first->id(FieldLine::Classification::Sideline);
     }
 
     for (int i = 0; i < t.size(); i++) {
       // Classify line that makes t with endline (side of goalbox)
-      if (t[i].first().classification() == FieldLine::Classification::Endline)
-        t[i].second().classification(FieldLine::Classification::SideGoalbox);
+      if (t[i].first->id() == FieldLine::Classification::Endline)
+        t[i].second->id(FieldLine::Classification::SideGoalbox);
       // Classify line that makes t with sideline
-      else if (t[i].first().classification() == FieldLine::Classification::Sideline)
-        t[i].second().classification(FieldLine::Classification::Midline);
+      else if (t[i].first->id() == FieldLine::Classification::Sideline)
+        t[i].second->id(FieldLine::Classification::Midline);
     }
   }
 
@@ -330,21 +347,104 @@ void FieldLineList::classify()
   // takes affect if new class is more specific than old class
   for (int i = 0; i < size(); i++) {
     FieldLine& line = (*this)[i];
-    std::vector<const Corner *> corners = line.corners();
+    std::vector<Corner> corners = line.corners();
 
     for (int j = 0; j < corners.size(); j++) {
       // Only two lines connected to convex corner
-      if (corners[j]->id() == Corner::Classification::Convex)
-        line.classification(FieldLine::Classification::TopGoalboxOrSideGoalbox);
+      if (corners[j].id == Corner::Classification::Convex)
+        line.id(FieldLine::Classification::TopGoalboxOrSideGoalbox);
       // Only two lines connected to concave corner
-      else if (corners[j]->id() == Corner::Classification::Concave)
-        line.classification(FieldLine::Classification::EndlineOrSideline);
+      else if (corners[j].id == Corner::Classification::Concave)
+        line.id(FieldLine::Classification::EndlineOrSideline);
       // Only four lines connected to T corner
-      else if (corners[j]->id() == Corner::Classification::T) {
-        if (*(corners[j].first()) == line)
-          line.classification(FieldLine::Classification::EndlineOrSideline);
+      else if (corners[j].id == Corner::Classification::T) {
+        if (*(corners[j].first) == line)
+          line.id(FieldLine::Classification::EndlineOrSideline);
         else
-          line.classification(FieldLine::Classification::SideGoalboxOrMidline);
+          line.id(FieldLine::Classification::SideGoalboxOrMidline);
+      }
+    }
+  }
+}
+
+void CornerDetector::compute()
+{
+  for (int i = 0; i < lineList->size(); i++) {
+    for (int j = 0; i < lineList->size(); j++) {
+      // Consider each pair once
+      if (i <= j) continue;
+
+      // Get pair of lines
+      FieldLine& line1 = (*lineList)[i];
+      FieldLine& line2 = (*lineList)[j];
+
+      // Find corners
+      // NOTE since there are two hough lines in each field line, we try
+      //      to find corners in all valid pairings of hough lines
+      // TODO simplify loop
+      Corner::Classification id = Corner::Classification::None;
+      for (int k = 0; k < 2; k++) {
+        for (int l = 0; l < 2; l++) {
+          if (id == Corner::Classification::None) {
+            id = findCorner(line1.lines(k), line2.lines(l));
+            // TODO set line1 and line2 corner if appropriate
+          }
+        }
+      }
+    }
+  }
+}
+
+// TODO require that lines are orthogonal
+// TODO return corner?
+Corner::Classification findCorner(HoughLine& line1, HoughLine& line2)
+{
+  // Use world coordinates
+  const GeoLine& field1 = line1.field();
+  const GeoLine& field2 = line2.field();
+
+  // Find intersection point
+  double intersectX;
+  double intersectY;
+
+  bool intersects = field1.intersect(field2, intersectX, intersectY);
+  if (!intersects) return Corner::Classification::None;
+
+  // Find endpoints
+  double field1End1X;
+  double field1End1Y;
+  double field1End2X;
+  double field1End2Y;
+
+  double field2End1X;
+  double field2End1Y;
+  double field2End2X;
+  double field2End2Y;
+
+  field1.endPoints(field1Endpoint1X, field1Endpoint1Y, field1Endpoint2X, field1Endpoint2Y);
+  field2.endPoints(field2Endpoint1X, field2Endpoint1Y, field2Endpoint2X, field2Endpoint2Y);
+
+  // Calculate distance
+  double dist1[2];
+  dist1[0] = dist(field1End1X, field1End1Y, intersectX, intersectY);
+  dist1[1] = dist(field1End2X, field1End2Y, intersectX, intersectY);
+
+  double dist2[2];
+  dist2[0] = dist(field2End1X, field2End1Y, intersectX, intersectY);
+  dist2[1] = dist(field2End2X, field2End2Y, intersectX, intersectY);
+
+  // Find and classify corner
+  for (int i = 0; i < 2; i++) {
+    for (int j = 0; j < 2; j++) {
+      // Concave or convex corners have both endpoints on the intersection point
+      if (dist1[i] < closeThreshold() && dist2[j] < closeThreshold()) {
+        // Found concave or convex
+        // TODO
+      } else if ((dist1[i] < closeThreshold() && dist2[j] > farThreshold()) ||
+                 (dist2[j] < closeThreshold() && dist1[i] > farThreshold())) {
+        // Found t
+        // TODO require both lines to pass far threshold
+        return Corner::Classification::T;
       }
     }
   }
