@@ -18,6 +18,8 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <iostream>
+#include <fstream>
 
 using nblog::SExpr;
 using nblog::Log;
@@ -87,6 +89,45 @@ namespace control {
     }
 
     uint32_t cnc_setCameraParams(Log * arg) {
+<<<<<<< HEAD
+=======
+        size_t u = arg->data().size();
+        bool success = receivedParams.ParseFromString(arg->data());
+        if(!success) {
+            std::cerr<<"Failed to Parse Params\n";
+        } else {
+            boost::property_tree::ptree pt;
+            pt.put<std::string>("whichcamera",receivedParams.whichcamera());
+            pt.put<bool>("hflip",receivedParams.h_flip());
+            pt.put<bool>("vflip",receivedParams.v_flip());
+            pt.put<bool>("autoexposure",receivedParams.auto_exposure());
+            pt.put<int>("brightness",receivedParams.brightness());
+            pt.put<int>("contrast",receivedParams.contrast());
+            pt.put<int>("saturation",receivedParams.saturation());
+            pt.put<int>("hue",receivedParams.hue());
+            pt.put<int>("sharpness",receivedParams.sharpness());
+            pt.put<int>("gamma",receivedParams.gamma());
+            pt.put<int>("auto_whitebalance",receivedParams.autowhitebalance());
+            pt.put<int>("exposure",receivedParams.exposure());
+            pt.put<int>("gain",receivedParams.gain());
+            pt.put<int>("white_balance",receivedParams.whitebalance());
+            pt.put<int>("fade_to_black",receivedParams.fadetoblack());
+
+            std::stringstream ss;
+            boost::property_tree::json_parser::write_json(ss,pt);
+            std::string stringToSend = ss.str();
+            std::cout<<stringToSend<<std::endl;
+            if(receivedParams.whichcamera() == "TOP"){
+                std::ofstream file("/home/nao/nbites/Config/topCameraParams.json");
+                file << stringToSend;
+                file.close(); //different name based on camera specified in the protobuf
+            } else {
+                std::ofstream file("/home/nao/nbites/Config/bottomCameraParams.json");
+                file << stringToSend;
+                file.close();
+            }
+        }
+>>>>>>> c85b8bab84bad82db2721e02932a224727d928e5
         return 0;
     }
     

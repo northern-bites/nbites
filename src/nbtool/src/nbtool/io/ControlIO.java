@@ -14,9 +14,12 @@ import nbtool.io.CommonIO.IOState;
 import nbtool.io.CommonIO.SequenceErrorException;
 import nbtool.util.Events;
 import nbtool.util.Logger;
+<<<<<<< HEAD
 
 import messages.CameraParamsOuterClass;
 import messages.CameraParamsOuterClass.CameraParams;
+=======
+>>>>>>> c85b8bab84bad82db2721e02932a224727d928e5
 
 /*
  * Astute observers will notice this code is remarkably similar to the netIO code
@@ -33,6 +36,7 @@ public class ControlIO {
 		Log cmnd = new Log(commandTree, bytes);
 		return cmnd;
 	}
+<<<<<<< HEAD
 	
 	public static Log createCmndSetCameraParams(CameraParams cam) {
 		byte[] paramsSerialized = cam.toByteArray();
@@ -40,6 +44,8 @@ public class ControlIO {
 		Log cmnd = new Log(commandTree,paramsSerialized);
 		return cmnd;
 	}
+=======
+>>>>>>> c85b8bab84bad82db2721e02932a224727d928e5
 	
 	public static Log createCmndTest() {
 		SExpr commandTree = SExpr.newList(SExpr.newAtom("command"), SExpr.newAtom("test"));
