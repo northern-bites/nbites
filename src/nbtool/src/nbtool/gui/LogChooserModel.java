@@ -1,16 +1,9 @@
 package nbtool.gui;
 
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Vector;
 
-import javax.swing.JComponent;
 import javax.swing.JTree;
-import javax.swing.TransferHandler;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -18,19 +11,16 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-import nbtool.data.Session;
 import nbtool.data.Log;
+import nbtool.data.Session;
 import nbtool.data.SessionMaster;
 import nbtool.io.FileIO;
 import nbtool.util.Center;
 import nbtool.util.Events;
 import nbtool.util.Logger;
-import nbtool.util.NBConstants;
 import nbtool.util.NBConstants.STATUS;
-import nbtool.util.Utility;
-import nbtool.util.Events.*;
 
-public class LCTreeModel implements TreeModel, TreeSelectionListener, Events.LogsFound, Events.ToolStatus {
+public class LogChooserModel implements TreeModel, TreeSelectionListener, Events.LogsFound, Events.ToolStatus {
 
 	/*
 	 * DataModel:
@@ -39,7 +29,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, Events.Log
 	String root;
 	JTree tree;
 	
-	public LCTreeModel() {
+	public LogChooserModel() {
 		root = "ROOT PLACEHOLDER";
 		
 		Center.listen(Events.LogsFound.class, this, true);
@@ -99,28 +89,23 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, Events.Log
 		if (!e.isAddedPath())
 			return;
 		
-		//TreePath path = e.getPath();
 		TreePath first = tree.getSelectionPath();
 		TreePath[] all = tree.getSelectionPaths();
 		assert(first == all[0]);
 		
 		switch (first.getPathCount()) {
 		case 0:
-			//??
 			Logger.logf(Logger.ERROR, "ERROR: LCTreeModel path size was: " + first.getPathCount());
 			break;
 		case 1:
-			//Root selected
 			Logger.logf(Logger.ERROR, "ERROR: LCTreeModel path size was: " + first.getPathCount() + "ROOT SHOULD NOT BE VISIBLE");
 			break;
-		case 2:
-			//Branch selected, 			
-			//N.notifyEDT(OLDEVENT.SES_SELECTION, this,
-			//		(Session) first.getPath()[1]);
+		case 2: {
 			Session session = (Session) first.getPath()[1];
 			Events.GSessionSelected.generate(this, session);
 			break;
-		case 3:
+		}
+		case 3: {
 			//LOG SELECTED.
 			ArrayList<Log> selected = new ArrayList<Log>();
 			
@@ -130,9 +115,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, Events.Log
 				
 				Session ses = (Session)p.getPath()[1];
 				Log sel = (Log) p.getPath()[2];
-				
-				sel.lastSeen = p;
-				
+								
 				if (sel.bytes == null) {
 					assert(ses.directoryFrom != null && !ses.directoryFrom.isEmpty());
 					try {
@@ -152,6 +135,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, Events.Log
 			
 			Events.GLogSelected.generate(this, selected.remove(0), selected);
 			break;
+		}
 		default:
 			Logger.logf(Logger.ERROR, "ERROR: LCTreeModel path size was: " + first.getPathCount());
 		}
@@ -165,7 +149,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, Events.Log
 				new int[]{SessionMaster.get().sessions.indexOf(relevant)},
 				new Object[]{relevant});
 		for (TreeModelListener l : listeners) {
-			l.treeNodesInserted(tme);
+			l.treeStructureChanged(tme);
 		}
 	}
 
@@ -179,47 +163,6 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, Events.Log
 		for (TreeModelListener l : listeners) {
 			l.treeStructureChanged(tme);
 		}
-	}
-	
-	private class LogTransfer implements Transferable {
-		
-		public Log tp;
-
-		public DataFlavor[] getTransferDataFlavors() {
-			return new DataFlavor[]{NBConstants.treeFlavor};
-		}
-
-		
-		public boolean isDataFlavorSupported(DataFlavor flavor) {
-			return flavor.equals(NBConstants.treeFlavor);
-		}
-
-		public Object getTransferData(DataFlavor flavor)
-				throws UnsupportedFlavorException, IOException {
-			if (!flavor.equals(NBConstants.treeFlavor)) throw new UnsupportedFlavorException(flavor);
-			else return tp;
-		}
-		
-	}
-	
-	public Exporter EXPORT_HANDLER = new Exporter();
-	private class Exporter extends TransferHandler {
-			
-		public int getSourceActions(JComponent c) {
-		    return LINK;
-		}
-
-		public Transferable createTransferable(JComponent c) {
-			TreePath p = tree.getSelectionPath();
-			LogTransfer lt = new LogTransfer();
-			
-			if (p.getPathCount() != 3) return null;
-			lt.tp = (Log) p.getLastPathComponent();
-			
-		    return lt;
-		}
-
-		public void exportDone(JComponent c, Transferable t, int action) {}
 	}
 	
 	protected SortAndSearch sas;
