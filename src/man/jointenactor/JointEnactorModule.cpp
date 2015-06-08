@@ -72,9 +72,13 @@ void JointEnactorModule::writeCommand()
     //std::cout << "Enactor critical section took: " << time << std::endl;
     //exit(0);
 
+    if (commandIndex - lastRead > 1) {
+        std::cout << "BOSS missed a frame" << std::endl;
+    }
+
     if (commandIndex - lastRead > 10 && (lastRead < commandIndex)) {
         std::cout << "Commands aren't getting read! Did Boss die?" << std::endl;
-        std::cout << "commandIndex: " << commandIndex << " lastRead: " << lastRead << std::endl;
+        // std::cout << "commandIndex: " << commandIndex << " lastRead: " << lastRead << std::endl;
         exit(0);
     }
 }

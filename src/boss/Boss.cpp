@@ -15,7 +15,7 @@ namespace boss {
 Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     AL::ALModule(broker_, name),
     broker(broker_),
-    dcm(broker->getDcmProxy()),//getSpecialisedProxy<AL::DCMProxy>("DCM")),
+    dcm(broker->getDcmProxy()),
     sensor(broker),
     enactor(dcm),
     led(broker),
@@ -162,14 +162,15 @@ int Boss::constructSharedMem()
 
 void Boss::DCMPreProcessCallback()
 {
-    //std::cout << "Pre process" << std::endl;
+    if (!manRunning) return;
+
     std::string joints;
     std::string stiffs;
     std::string leds;
 
     // Start sem here
     int index = shared->commandSwitch;
-    uint64_t write = 0;//shared->commands[index].writeIndex;
+    uint64_t write = 0;
 
     if (index != -1) {
         Deserialize des(shared->command[index]);
@@ -177,21 +178,17 @@ void Boss::DCMPreProcessCallback()
         joints = des.stringNext();
         stiffs = des.stringNext();
         leds = des.string();
+        commandIndex = des.dataIndex();
         shared->commandReadIndex = des.dataIndex();
     }
     // End sem
     if (index == -1) return;
 
     JointCommand results;
-    //std::cout << "Boss joints" << std::endl;
     results.jointsCommand.ParseFromString(joints);
-    //std::cout << results.jointsCommand.DebugString() << std::endl;
     results.stiffnessCommand.ParseFromString(stiffs);
-    //std::cout << results.stiffnessCommand.DebugString() << std::endl;
     messages::LedCommand ledResults;
     ledResults.ParseFromString(leds);
-    //std::cout << ledResults.DebugString() << std::endl;
-    //std::cout << "Boss joints done " << std::endl;
 
     //enactor.command(results.jointsCommand, results.stiffnessCommand);
     led.setLeds(ledResults);
@@ -199,7 +196,8 @@ void Boss::DCMPreProcessCallback()
 
 void Boss::DCMPostProcessCallback()
 {
-    //std::cout << "Post process!" << std::endl;
+    if (!manRunning) return;
+
     SensorValues values = sensor.getSensors();
 
     std::vector<SerializableBase*> objects = {
@@ -215,18 +213,29 @@ void Boss::DCMPostProcessCallback()
         new ProtoSer(&values.stiffStatus),
     };
 
-    ++sensorIndex; // TODO
+    ++sensorIndex;
+
     // Start Semaphore here! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     int index = shared->sensorSwitch ? 0 : 1;
     size_t usedSpace;
     bool returned = serializeTo(objects, sensorIndex, shared->sensors[index], SENSOR_SIZE, &usedSpace);
     shared->sensorSwitch = index;
+    int lastRead = shared->sensorReadIndex;
     // End Semaphore here! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~``
 
-    //std::cout << "We used this much space for sensors " << usedSpace << std::endl;
+    if (sensorIndex - lastRead > 2) {
+        std::cout << "MAN missed a frame" << std::endl;
+    }
+
+    if (sensorIndex - lastRead > 10) {
+        std::cout << "Sensors aren't getting read! Did Man die?" << std::endl;
+        //std::cout << "commandIndex: " << sensorIndex << " lastRead: " << lastRead << std::endl;
+        //manRunning = false; // TODO
+    }
 }
 
 void Boss::checkFIFO() {
+    // Command is going to be a single char, reading two characters consumes '\0'
     char command[2];
 
     size_t amt = read(fifo_fd, &command, 2);
