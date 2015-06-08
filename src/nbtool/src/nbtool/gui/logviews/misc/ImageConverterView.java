@@ -13,6 +13,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import nbtool.data.Log;
+import nbtool.data.SExpr;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.io.CrossIO;
@@ -50,25 +51,18 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
     private JSlider oFuzzyU;
     private JSlider oFuzzyV;
 
-    private ColorLoader whiteColor;
-    private ColorLoader greenColor;
-    private ColorLoader orangeColor;
+    // private ColorLoader whiteColor;
+    // private ColorLoader greenColor;
+    // private ColorLoader orangeColor;
 
-    private ColorLoader[] colors;
+
+    private boolean firstLoad;
 
     public ImageConverterView() {
         super();
+        firstLoad = true;
 
-        // TODO init ColorLoaders from ???
-        whiteColor = new ColorLoader(-0.02f, -0.02f, 0.25f, 0.25f, -0.055f, -0.055f);
-        greenColor = new ColorLoader( 0.077f, 0.010f, -0.057f, -0.230f, -0.06f, -0.06f);
-        orangeColor = new ColorLoader( 0.133f, 0.053f, -0.133f, 0.107f, -0.06f, 0.06f);
-
-
-        colors =  new ColorLoader[3];
-        colors[0] = whiteColor;
-        colors[1] = greenColor;
-        colors[2] = orangeColor;
+        System.out.printf("CONSTRUCTING\n");
 
         // TODO save button: pass color params back to nbfunc (how?)
             // have it rewrite the json data
@@ -81,13 +75,13 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
 
         // TODO fix slider glitch
 
-        // Init and add white sliders. TODO: init val from ColorLoaders
-        wDarkU  = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(whiteColor.getDarkU() * 100));
-        wDarkV  = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(whiteColor.getDarkV() * 100));
-        wLightU = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(whiteColor.getLightU() * 100));
-        wLightV = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(whiteColor.getLightV() * 100));
-        wFuzzyU = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(whiteColor.getFuzzyU() * 100));
-        wFuzzyV = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(whiteColor.getFuzzyV() * 100));
+        // Init and add white sliders. TODO: init val to 0
+        wDarkU  = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
+        wDarkV  = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
+        wLightU = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
+        wLightV = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
+        wFuzzyU = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
+        wFuzzyV = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
 
         wDarkU.addChangeListener(slide);
         wDarkV.addChangeListener(slide);
@@ -103,13 +97,13 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         add(wFuzzyU);
         add(wFuzzyV);
 
-        // Init and add green sliders. TODO: init val from ColorLoaders
-        gDarkU  = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(greenColor.getDarkU() * 100));
-        gDarkV  = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(greenColor.getDarkV() * 100));
-        gLightU = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(greenColor.getLightU() * 100));
-        gLightV = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(greenColor.getLightV() * 100));
-        gFuzzyU = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(greenColor.getFuzzyU() * 100));
-        gFuzzyV = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(greenColor.getFuzzyV() * 100));
+        // Init and add green sliders.
+        gDarkU  = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
+        gDarkV  = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
+        gLightU = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
+        gLightV = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
+        gFuzzyU = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
+        gFuzzyV = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
 
         gDarkU.addChangeListener(slide);
         gDarkV.addChangeListener(slide);
@@ -125,13 +119,13 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         add(gFuzzyU);
         add(gFuzzyV);
 
-        // Init and add green sliders. TODO: init val from ColorLoaders
-        oDarkU  = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(orangeColor.getDarkU() * 100));
-        oDarkV  = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(orangeColor.getDarkV() * 100));
-        oLightU = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(orangeColor.getLightU() * 100));
-        oLightV = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(orangeColor.getLightV() * 100));
-        oFuzzyU = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(orangeColor.getFuzzyU() * 100));
-        oFuzzyV = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(orangeColor.getFuzzyV() * 100));
+        // Init and add green sliders.
+        oDarkU  = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
+        oDarkV  = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
+        oLightU = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
+        oLightV = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
+        oFuzzyU = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
+        oFuzzyV = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
 
         oDarkU.addChangeListener(slide);
         oDarkV.addChangeListener(slide);
@@ -148,32 +142,41 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         add(oFuzzyV);
     }
 
-    public void stateChanged(ChangeEvent e) {
-        adjustParams();
-    }
-
     public void adjustParams() {
 
-        whiteColor. setDarkU( (float)wDarkU. getValue() / 100);
-        whiteColor. setDarkV( (float)wDarkV. getValue() / 100);
-        whiteColor. setLightU((float)wLightU.getValue() / 100);
-        whiteColor. setLightV((float)wLightV.getValue() / 100);
-        whiteColor. setFuzzyU((float)wFuzzyU.getValue() / 100);
-        whiteColor. setFuzzyV((float)wFuzzyV.getValue() / 100);
+        SExpr newParams = SExpr.newList(
+                        SExpr.newAtom("Params"),
+                        SExpr.newAtom("White"),
+                        SExpr.newKeyValue("dark_u",  (float)(wDarkU. getValue()) / 100.00),
+                        SExpr.newKeyValue("dark_v",  (float)(wDarkV. getValue()) / 100.00),
+                        SExpr.newKeyValue("light_u", (float)(wLightU.getValue()) / 100.00),
+                        SExpr.newKeyValue("light_v", (float)(wLightV.getValue()) / 100.00),
+                        SExpr.newKeyValue("fuzzy_u", (float)(wFuzzyU.getValue()) / 100.00),
+                        SExpr.newKeyValue("fuzzy_v", (float)(wFuzzyV.getValue()) / 100.00)
+        );
 
-        greenColor. setDarkU( (float)gDarkU. getValue() / 100);
-        greenColor. setDarkV( (float)gDarkV. getValue() / 100);
-        greenColor. setLightU((float)gLightU.getValue() / 100);
-        greenColor. setLightV((float)gLightV.getValue() / 100);
-        greenColor. setFuzzyU((float)gFuzzyU.getValue() / 100);
-        greenColor. setFuzzyV((float)gFuzzyV.getValue() / 100);
+        System.out.printf("NEW PARAMS: %d\n", (newParams.serialize()));    
+
+        // whiteColor. setDarkU( (float)wDarkU. getValue() / 100);
+        // whiteColor. setDarkV( (float)wDarkV. getValue() / 100);
+        // whiteColor. setLightU((float)wLightU.getValue() / 100);
+        // whiteColor. setLightV((float)wLightV.getValue() / 100);
+        // whiteColor. setFuzzyU((float)wFuzzyU.getValue() / 100);
+        // whiteColor. setFuzzyV((float)wFuzzyV.getValue() / 100);
+
+        // greenColor. setDarkU( (float)gDarkU. getValue() / 100);
+        // greenColor. setDarkV( (float)gDarkV. getValue() / 100);
+        // greenColor. setLightU((float)gLightU.getValue() / 100);
+        // greenColor. setLightV((float)gLightV.getValue() / 100);
+        // greenColor. setFuzzyU((float)gFuzzyU.getValue() / 100);
+        // greenColor. setFuzzyV((float)gFuzzyV.getValue() / 100);
     
-        orangeColor.setDarkU( (float)oDarkU. getValue() / 100);
-        orangeColor.setDarkV( (float)oDarkV. getValue() / 100);
-        orangeColor.setLightU((float)oLightU.getValue() / 100);
-        orangeColor.setLightV((float)oLightV.getValue() / 100);
-        orangeColor.setFuzzyU((float)oFuzzyU.getValue() / 100);
-        orangeColor.setFuzzyV((float)oFuzzyV.getValue() / 100);
+        // orangeColor.setDarkU( (float)oDarkU. getValue() / 100);
+        // orangeColor.setDarkV( (float)oDarkV. getValue() / 100);
+        // orangeColor.setLightU((float)oLightU.getValue() / 100);
+        // orangeColor.setLightV((float)oLightV.getValue() / 100);
+        // orangeColor.setFuzzyU((float)oFuzzyU.getValue() / 100);
+        // orangeColor.setFuzzyV((float)oFuzzyV.getValue() / 100);
 
         CrossInstance inst = CrossIO.instanceByIndex(0);
         if (inst == null)
@@ -183,9 +186,10 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         if (func == null)
             return;
         
-        // TODO passing color params back to c++?
-        // Call to nbfunc has the json color params overrided by new params
-        CrossCall call = new CrossCall(this, func, this.log);//, colors);
+        // TODO great sexpresion of 3 param sets, each field from slider vals, add to this.log
+
+
+        CrossCall call = new CrossCall(this, func, this.log);
         inst.tryAddCall(call);
 
     }
@@ -216,21 +220,19 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
             g.drawImage(segmentedImage, width + vB,  height + sH*6 + tB*3, null);
         }
 
-        // // Set demension of 16 sliders
+        wDarkU. setBounds(width*0 + vB*1, height + sH*0 + tB*1, width - vB*2, sH);
+        wDarkV. setBounds(width*0 + vB*1, height + sH*1 + tB*1, width - vB*2, sH);
+        wLightU.setBounds(width*0 + vB*1, height + sH*2 + tB*2, width - vB*2, sH);
+        wLightV.setBounds(width*0 + vB*1, height + sH*3 + tB*2, width - vB*2, sH);
+        wFuzzyU.setBounds(width*0 + vB*1, height + sH*4 + tB*3, width - vB*2, sH);
+        wFuzzyV.setBounds(width*0 + vB*1, height + sH*5 + tB*3, width - vB*2, sH);
 
-        wDarkU. setBounds(vB, height + sH*0 + tB*1, width - vB*2, sH);
-        wDarkV. setBounds(vB, height + sH*1 + tB*1, width - vB*2, sH);
-        wLightU.setBounds(vB, height + sH*2 + tB*2, width - vB*2, sH);
-        wLightV.setBounds(vB, height + sH*3 + tB*2, width - vB*2, sH);
-        wFuzzyU.setBounds(vB, height + sH*4 + tB*3, width - vB*2, sH);
-        wFuzzyV.setBounds(vB, height + sH*5 + tB*3, width - vB*2, sH);
-
-        gDarkU. setBounds(width + vB*2, height + sH*0 + tB*1, width - vB*2, sH);
-        gDarkV. setBounds(width + vB*2, height + sH*1 + tB*1, width - vB*2, sH);
-        gLightU.setBounds(width + vB*2, height + sH*2 + tB*2, width - vB*2, sH);
-        gLightV.setBounds(width + vB*2, height + sH*3 + tB*2, width - vB*2, sH);
-        gFuzzyU.setBounds(width + vB*2, height + sH*4 + tB*3, width - vB*2, sH);
-        gFuzzyV.setBounds(width + vB*2, height + sH*5 + tB*3, width - vB*2, sH);
+        gDarkU. setBounds(width*1 + vB*2, height + sH*0 + tB*1, width - vB*2, sH);
+        gDarkV. setBounds(width*1 + vB*2, height + sH*1 + tB*1, width - vB*2, sH);
+        gLightU.setBounds(width*1 + vB*2, height + sH*2 + tB*2, width - vB*2, sH);
+        gLightV.setBounds(width*1 + vB*2, height + sH*3 + tB*2, width - vB*2, sH);
+        gFuzzyU.setBounds(width*1 + vB*2, height + sH*4 + tB*3, width - vB*2, sH);
+        gFuzzyV.setBounds(width*1 + vB*2, height + sH*5 + tB*3, width - vB*2, sH);
 
         oDarkU. setBounds(width*2 + vB*3, height + sH*0 + tB*1, width - vB*2, sH);
         oDarkV. setBounds(width*2 + vB*3, height + sH*1 + tB*1, width - vB*2, sH);
@@ -244,6 +246,8 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
     public void setLog(Log newlog) {
         log = newlog;
         
+    //    System.out.printf("DESC STRING: %s\n", log.description());
+        
         CrossInstance inst = CrossIO.instanceByIndex(0);
         if (inst == null)
             return;
@@ -251,10 +255,9 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         CrossFunc func = inst.functionWithName("Vision");
         if (func == null)
             return;
-        
+
         CrossCall call = new CrossCall(this, func, this.log);
         inst.tryAddCall(call);
-        
     }
     
 
@@ -288,8 +291,55 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
             this.segmentedImage = colorSegImg.toBufferedImage();
         }
 
+        if (firstLoad) {
+            firstIoReceived(out);
+            firstLoad = false;
+        }
+
         repaint();
     }
+
+    private void firstIoReceived(Log... out) {
+        
+        // Set sliders to positions based on white, green, then orange images descriptions' s-exps
+        SExpr colors = out[1].tree();
+
+        wDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(1).value()) * 100));
+        wDarkV. setValue((int)(Float.parseFloat(colors.get(2).get(1).value()) * 100));
+        wLightU.setValue((int)(Float.parseFloat(colors.get(3).get(1).value()) * 100));
+        wLightV.setValue((int)(Float.parseFloat(colors.get(4).get(1).value()) * 100));
+        wFuzzyU.setValue((int)(Float.parseFloat(colors.get(5).get(1).value()) * 100));
+        wFuzzyV.setValue((int)(Float.parseFloat(colors.get(6).get(1).value()) * 100));
+
+        colors = out[2].tree();
+
+        gDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(1).value()) * 100));
+        gDarkV. setValue((int)(Float.parseFloat(colors.get(2).get(1).value()) * 100));
+        gLightU.setValue((int)(Float.parseFloat(colors.get(3).get(1).value()) * 100));
+        gLightV.setValue((int)(Float.parseFloat(colors.get(4).get(1).value()) * 100));
+        gFuzzyU.setValue((int)(Float.parseFloat(colors.get(5).get(1).value()) * 100));
+        gFuzzyV.setValue((int)(Float.parseFloat(colors.get(6).get(1).value()) * 100));
+
+        colors = out[3].tree();
+
+        oDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(1).value()) * 100));
+        oDarkV. setValue((int)(Float.parseFloat(colors.get(2).get(1).value()) * 100));
+        oLightU.setValue((int)(Float.parseFloat(colors.get(3).get(1).value()) * 100));
+        oLightV.setValue((int)(Float.parseFloat(colors.get(4).get(1).value()) * 100));
+        oFuzzyU.setValue((int)(Float.parseFloat(colors.get(5).get(1).value()) * 100));
+        oFuzzyV.setValue((int)(Float.parseFloat(colors.get(6).get(1).value()) * 100));
+        
+    }
+
+ //   private SExpr getColorSExpFromSliders(int color) {
+    //     if (color == 0) {
+
+    //     } else if (color == 1) {    // Green
+
+    //     } else {                    // Orange
+
+    //     }
+    // }
 
     @Override
     public boolean ioMayRespondOnCenterThread(IOInstance inst) {

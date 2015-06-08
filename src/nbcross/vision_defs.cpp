@@ -15,9 +15,10 @@
 using nblog::Log;
 using nblog::SExpr;
 
-// Helper funcs forward declarations
 man::vision::Colors* getColorsFromSliderValues(float* params);
 void updateSavedColorParams(std::string jsonPath, float* params, bool top);
+SExpr getSExprFromSavedParams(int color, std::string jsonPath, bool top);
+std::string getSExprStringFromColorJSonNode(boost::property_tree::ptree tree);
 
 int Vision_func() {
     assert(args.size() > 0);
@@ -34,6 +35,8 @@ int Vision_func() {
 
     int width = 2*640;
     int height = 480;
+
+    std::string jsonPath = "/home/evanhoyt/Desktop/ColorParams.json";
     
     messages::YUVImage image(buf, width, height, width);
     messages::JointAngles emptyJoints;
@@ -51,15 +54,15 @@ int Vision_func() {
     module.jointsIn.setMessage(emptyJointsMessage);
     module.inertialsIn.setMessage(emptyInertialsMessage);
 
-    // If func call included colors, update color params, but leave json data
+    // If log included colors in description, update color params, but leave json data
     if (args.size() > 1) {
         man::vision::Colors* newParams = getColorsFromSliderValues((float*)args[1]);
         module.setColorParams(newParams, top);
     }
 
-    // If func call included third arg, save current params to json file
+    // If log says to save, save current params to json file
     if (args.size() > 2) {
-        updateSavedColorParams("/home/evanhoyt/Desktop/ColorParams.json", (float*)args[1], top);
+        updateSavedColorParams(jsonPath, (float*)args[1], top);
     }
 
     man::vision::ImageFrontEnd* frontEnd = module.runAndGetFrontEnd(top);
@@ -95,6 +98,9 @@ int Vision_func() {
     std::string whiteBuffer((const char*)whiteBuf, whiteLength);
     whiteRet->setData(whiteBuffer);
 
+    // Read params from JSon and attach to image 
+    whiteRet->setTree(getSExprFromSavedParams(0, jsonPath, top));
+
     rets.push_back(whiteRet);
 
     // ---------------
@@ -111,6 +117,9 @@ int Vision_func() {
     std::string greenBuffer((const char*)greenBuf, greenLength);
     greenRet->setData(greenBuffer);
 
+    // Read params from JSon and attach to image 
+    greenRet->setTree(getSExprFromSavedParams(1, jsonPath, top));
+
     rets.push_back(greenRet);
 
     // ----------------
@@ -126,6 +135,9 @@ int Vision_func() {
     // Convert to string and set log
     std::string orangeBuffer((const char*)orangeBuf, orangeLength);
     orangeRet->setData(orangeBuffer);
+
+    // Read params from JSon and attach to image 
+    orangeRet->setTree(getSExprFromSavedParams(2, jsonPath, top));
 
     rets.push_back(orangeRet);
 
@@ -217,28 +229,65 @@ man::vision::Colors* getColorsFromSliderValues(float* params) {
 }
 
 void updateSavedColorParams(std::string jsonPath, float* params, bool top) {
-    boost::property_tree::ptree tree, color, set;
+
+    // TODO make this work. Covert to string and write/replace
+
+    boost::property_tree::ptree tree;
     boost::property_tree::read_json(jsonPath, tree);
 
     if (top) {
-        color = tree.get_child("colorParams.topColors");
+        tree = tree.get_child("colorParams.topColors");
     } else {
-        color = tree.get_child("colorParams.bottomColors");
+        tree = tree.get_child("colorParams.bottomColors");
     }
 
     for (int i = 0; i < 3; i++) {
         switch (i) {
-            case 0 : set = color.get_child("white");
-            case 1 : set = color.get_child("green");
-            case 2 : set = color.get_child("orange");
+            case 0 : tree = tree.get_child("white");
+            case 1 : tree = tree.get_child("green");
+            case 2 : tree = tree.get_child("orange");
         }
 
-        set.put<float>("darkU",  params[i*6 + 0]);
-        set.get<float>("darkV",  params[i*6 + 1]);
-        set.get<float>("lightU", params[i*6 + 2]);
-        set.get<float>("lightV", params[i*6 + 3]);
-        set.get<float>("fuzzyU", params[i*6 + 4]);
-        set.get<float>("fuzzyV", params[i*6 + 5]);
+        tree.put<float>("darkU",  params[i*6 + 0]);
+        tree.put<float>("darkV",  params[i*6 + 1]);
+        tree.put<float>("lightU", params[i*6 + 2]);
+        tree.put<float>("lightV", params[i*6 + 3]);
+        tree.put<float>("fuzzyU", params[i*6 + 4]);
+        tree.put<float>("fuzzyV", params[i*6 + 5]);
     }
 }
 
+SExpr getSExprFromSavedParams(int color, std::string jsonPath, bool top) {
+//    std::string sexp = "(";
+    boost::property_tree::ptree tree;
+    boost::property_tree::read_json(jsonPath, tree);
+
+    if (top) {
+        tree = tree.get_child("colorParams.topColors");
+    } else {
+        tree = tree.get_child("colorParams.bottomColors");
+    }
+
+    if (color == 0) {               // White
+        tree = tree.get_child("white");
+    //    sexp.newAtom("WhiteParams");
+    } else if (color == 1) {    // Green
+        tree = tree.get_child("green");
+    //    sexp.newAtom("GreenParams");
+    } else {                    // Orange
+        tree = tree.get_child("orange");
+    //    sexp.newAtom("OrangeParams");
+    }
+
+    std::vector<SExpr> atoms = { 
+        SExpr::atom("Params"),
+        SExpr::keyValue("dark_u", (float)tree.get<float>("darkU")),
+        SExpr::keyValue( "dark_v", (float)tree.get<float>("darkV")),
+        SExpr::keyValue("light_u", (float)tree.get<float>("lightU")),
+        SExpr::keyValue("light_v", (float)tree.get<float>("lightV")),
+        SExpr::keyValue("fuzzy_u", (float)tree.get<float>("fuzzyU")),
+        SExpr::keyValue("fuzzy_v", (float)tree.get<float>("fuzzyV"))
+    };
+    
+    return SExpr(atoms);
+}
