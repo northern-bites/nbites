@@ -185,7 +185,7 @@ void HoughLineList::mapToField(const FieldHomography& h)
 
 // **********************************
 // *                                *
-// *  Goalbox and Corner Detectoin  *
+// *  Goalbox and Corner Detection  *
 // *                                *
 // **********************************
 
@@ -194,7 +194,7 @@ Corner::Corner(FieldLine* first_, FieldLine* second_, CornerID id_)
 {}
 
 GoalboxDetector::GoalboxDetector()
-  : parallelThreshold_(10), seperationThreshold_(15)
+  : parallelThreshold_(10), seperationThreshold_(20)
 {}
 
 bool GoalboxDetector::find(FieldLineList& list)
@@ -202,11 +202,13 @@ bool GoalboxDetector::find(FieldLineList& list)
   for (int i = 0; i < list.size(); i++) {
     for (int j = 0; j < list.size(); j++) {
       // Consider each pair once
-      if (i < j) continue;
+      if (i <= j) continue;
 
       // Get pair of lines
       FieldLine& line1 = list[i];
       FieldLine& line2 = list[j];
+
+      std::cout << "Are " << i << " and " << j << " the goalbox?" << std::endl;
 
       // Find goalbox
       // NOTE since there are two hough lines in each field line, we require
@@ -245,11 +247,18 @@ bool GoalboxDetector::validBox(HoughLine& line1, HoughLine& line2) const
 
   // Goalbox = two field lines that are (1) parallel and (2) seperated by 60 cm
   // Parallel
-  bool parallel = fabs(field1.t() - field2.t()) < parallelThreshold();
+  double field1PosT = field1.t();
+  double field2PosT = field2.t();
+  std::cout << "Angle: " << field1PosT << std::endl;
+  std::cout << "Angle: " << field2PosT << std::endl;
+  bool parallel = fabs(field1PosT - field2PosT) < parallelThreshold();
+  std::cout << "Parallel: " << parallel << std::endl;
 
   // Seperated by 60 cm
-  double distBetween = field1.pDist(field2.r()*cos(field2.t()), field2.r()*sin(field2.t()));
+  double distBetween = fabs(field1.pDist(field2.r()*cos(field2.t()), field2.r()*sin(field2.t())));
+  std::cout << "Dist: " << distBetween << std::endl;
   bool seperation = fabs(distBetween - GOALBOX_DEPTH) < seperationThreshold();
+  std::cout << "Seperation: " << seperation << std::endl;
 
   return parallel && seperation;
 }
@@ -406,6 +415,7 @@ void FieldLineList::find(HoughLineList& houghLines)
 
   // Once all field lines are found, classify the lines
   classify();
+  std::cout << std::endl;
 }
 
 // YES

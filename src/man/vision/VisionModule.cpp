@@ -72,7 +72,7 @@ void VisionModule::run_()
     double* times[2] = { topTimes, bottomTimes };
 
     // Loop over top and bottom image and run line detection system
-    for (int i = 0; i < images.size(); i++) {
+    for (int i = 0; i < 1; i++) {
         // Get image
         const messages::YUVImage* image = images[i];
 

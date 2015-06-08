@@ -154,7 +154,7 @@ enum class CornerID {
 };
 
 // Corner object used in corner detection and field line classification
-struct Corner : public std::pair<FieldLine *, FieldLine *>
+struct Corner : public std::pair<FieldLine*, FieldLine*>
 {
   Corner(FieldLine* first_, FieldLine* second_, CornerID id_);
 
