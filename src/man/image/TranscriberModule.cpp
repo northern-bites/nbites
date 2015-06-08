@@ -696,8 +696,8 @@ void TranscriberModule::run_()
         // filter.append(SExpr("var_vel_y", fb_pb.var_vel_y()));
         // filter.append(SExpr("is_stationary", fb_pb.is_stationary()));
         // filter.append(SExpr("bearing_deg", fb_pb.bearing_deg()));
-        filter.append(SExpr("x", fb_pb.x()));
-        filter.append(SExpr("y", fb_pb.y()));
+        // filter.append(SExpr("x", fb_pb.x()));
+        // filter.append(SExpr("y", fb_pb.y()));
 
         // filter.append(SExpr("rel_x_dest", fb_pb.var_rel_x()));
         // filter.append(SExpr("rel_y_dest", fb_pb.rel_y_dest()));

@@ -10,7 +10,7 @@ using messages::NaiveBall;
 struct NaiveBallModule::BallState
 {
         BallState(){}
-        BallState(float x, float y) : rel_x(x), rel_y(x), distance(0.f), bearing(0.f) {}
+        BallState(float x, float y) : rel_x(x), rel_y(y), distance(0.f), bearing(0.f) {}
         BallState(float rel_x_, float rel_y_, float distance_, float bearing_) : rel_x(rel_x_), rel_y(rel_y_), distance(distance_), bearing(bearing_) {}
         float rel_x;
         float rel_y;
@@ -67,20 +67,21 @@ void NaiveBallModule::run_()
     naiveBallMessage.get()->clear_position();
     naiveBallMessage.get()->clear_dest_buffer();
 
-    int p, end;
     if (bufferFull) {
-        p = currentIndex + 1;
-        end = currentIndex;
+        int p = currentIndex + 1;
+        for (int i = 0; i < NUM_FRAMES; i++) {
+            p = p % NUM_FRAMES;
+            NaiveBall::Position* temp = naiveBallMessage.get()->add_position();
+            temp->set_x(position_buffer[p].rel_x);
+            temp->set_y(position_buffer[p].rel_y);
+            p++;
+        }
     } else {
-        p = 0;
-        end = currentIndex + 1;
-    }
-    while (p != end) {
-        p = p % NUM_FRAMES;
-        NaiveBall::Position* temp = naiveBallMessage.get()->add_position();
-        temp->set_x(position_buffer[p].rel_x);
-        temp->set_y(position_buffer[p].rel_y);
-        p++;
+        for (int i = 0; i++; i < currentIndex) {
+            NaiveBall::Position* temp = naiveBallMessage.get()->add_position();
+            temp->set_x(position_buffer[i].rel_x);
+            temp->set_y(position_buffer[i].rel_y);
+        }
     }
 
     if (velBufferFull) {
@@ -162,6 +163,7 @@ void NaiveBallModule::calcPath()
         float x = (.5)*accx*t*t + vel_x_buffer[currentIndex]*t + position_buffer[currentIndex].rel_x;
         float y = (.5)*accy*t*t + vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y;
         dest_buffer[i] = BallState(x, y);
+        t += .5;
     }
 
     if (vel_x_buffer[currentIndex] < 0) {

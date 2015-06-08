@@ -32,7 +32,7 @@ import nbtool.util.Utility;
 public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 	private static final long serialVersionUID = -541524730464912737L;
 	private static final int OFFSET = 2;
-	private static final int BALL_RADIUS = 18;
+	private static final int BALL_SIZE = 18;
 
 	private Map<String, Object> filteredBall;
 	private Map<String, Object> visionBall;
@@ -64,20 +64,24 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 		g.drawLine(robotX-10,robotY-10,robotX+10,robotY+10);
 		g.drawLine(robotX-10,robotY+10,robotX+10,robotY-10);
 
+		// if (1 > 0) return;
+
 		if (!ball_on) {return;}
 		int ballX = (robotX - OFFSET*((Float)filteredBall.get("rel_y")).intValue());
 		int ballY = (robotY - OFFSET*((Float)filteredBall.get("rel_x")).intValue());
 
+		System.out.println("BALLX: " + filteredBall.get("rel_x"));
+		System.out.println("BALLy: " + filteredBall.get("rel_y"));
 		int intX = (robotX - OFFSET*((Float)naiveBall.get("yintercept")).intValue());
 		int intY = robotY;
 
 		g.setColor(Color.black);
 		g.drawString("Velocity: " + naiveBall.get("velocity"), ballX + 10, ballY - 10);
 		g.setColor(Color.red);
-		g.drawOval(ballX - (BALL_RADIUS/2), ballY - (BALL_RADIUS/2), BALL_RADIUS, BALL_RADIUS);
-		g.fillOval(ballX - (BALL_RADIUS/2), ballY - (BALL_RADIUS/2), BALL_RADIUS, BALL_RADIUS);
+		g.drawOval(ballX - (BALL_SIZE/2), ballY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
+		g.fillOval(ballX - (BALL_SIZE/2), ballY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 		g.setColor(Color.pink);
-		g.fillOval(intX - (BALL_RADIUS/2), intY - (BALL_RADIUS/2), BALL_RADIUS, BALL_RADIUS);
+		g.fillOval(intX - (BALL_SIZE/2), intY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 
 		g.setColor(Color.black);
 		g.drawString("yintercept: " + naiveBall.get("yintercept"), 160, height + 20);
@@ -95,8 +99,8 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 			int nBallY = (robotY - OFFSET*((Float) nbX.get(i)).intValue());
 
 			g.setColor(new Color(0.f,0.f,.9f,(float)(.2 + .2*(i/nbX.size()))));
-			g.drawOval(nBallX - (BALL_RADIUS/2), nBallY - (BALL_RADIUS/2), BALL_RADIUS, BALL_RADIUS);
-			g.fillOval(nBallX - (BALL_RADIUS/2), nBallY - (BALL_RADIUS/2), BALL_RADIUS, BALL_RADIUS);
+			g.drawOval(nBallX - (BALL_SIZE/2), nBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
+			g.fillOval(nBallX - (BALL_SIZE/2), nBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 
 		}
 
@@ -121,12 +125,14 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 		if (bufX == null || bufY == null) return;
 
 		for (int i = 0; i < bufX.size(); i++) {
+			System.out.println("BuffX: " + bufX.get(i));
+			System.out.println("BuffY: " + bufY.get(i));
 			int nBallX = (robotX - OFFSET*((Float) bufY.get(i)).intValue());
 			int nBallY = (robotY - OFFSET*((Float) bufX.get(i)).intValue());
 
-			g.setColor(new Color(0.9f,0.6f,0.0f,.8f));
-			g.drawOval(nBallX - (BALL_RADIUS/2), nBallY - (BALL_RADIUS/2), BALL_RADIUS, BALL_RADIUS);
-			g.fillOval(nBallX - (BALL_RADIUS/2), nBallY - (BALL_RADIUS/2), BALL_RADIUS, BALL_RADIUS);
+			g.setColor(new Color(0.9f,0.8f,0.0f,.8f));
+			g.drawOval(nBallX - (BALL_SIZE/2), nBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
+			g.fillOval(nBallX - (BALL_SIZE/2), nBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 
 		}
 
@@ -143,6 +149,7 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 		String t = (String) newlog.primaryType();
 		ball_on = false;
 		if (!t.equals("MULTIBALL")) return;
+
 		ball_on = true;
 
 		int nb_length = Integer.parseInt(newlog.tree().find("contents").get(1).find("nb_length").get(1).value());
@@ -170,7 +177,6 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 		Map<FieldDescriptor, Object> nbFields = nbMsg.getAllFields();
 		for (Map.Entry<FieldDescriptor, Object> entry : nbFields.entrySet()) {
 			if (entry.getKey().getName().equals("position")) {
-				System.out.println("FOUND POSITION");
 				ArrayList<Float> position_x = new ArrayList();
 				ArrayList<Float> position_y = new ArrayList();
 				List<Object> vals = (List<Object>) entry.getValue();
@@ -192,6 +198,7 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 				for (Object v : vals) {
 					Map<FieldDescriptor, Object> posFields = ((com.google.protobuf.Message)v).getAllFields();
 					for (Map.Entry<FieldDescriptor, Object> posEntry : posFields.entrySet()) {
+						System.out.println("Val: " + posEntry.getValue());
 						if (posEntry.getKey().getName().equals("x")) {buf_x.add((float)posEntry.getValue());}
 						else {buf_y.add((float)posEntry.getValue());}
 					}
