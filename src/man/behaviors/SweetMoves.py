@@ -61,11 +61,11 @@ INITIAL_POS_KEYFRAME = ((90.,10.,-90.,-10.),
 			(90.,-10.,82.,13.2),
 			2,0,stiff.NORMAL_STIFFNESSES)
 
-INITIAL_POS_BACK_ARMS = ((103.9, 1.6, 10, -11.6),
+BRING_ARMS_FORWARD = ((105.,10.,15.,-11.6),
       (0.0,0.0,-22.3,43.5,-21.2, 0.0),
       (0.0,0.0,-22.3,43.5,-21.2, 0.0),
-      (103.9, -1.6, -10, -11.6),
-      2,0,stiff.NORMAL_STIFFNESSES)
+      (105.,-10.,-15.,-11.6),
+      0.5,0,stiff.NORMAL_STIFFNESSES)
 
 #Keyframe that moves the joints to a stable, standing position quickly.
 QUICK_INITIAL_POS_KEYFRAME = ((90.,10.,-90.,-10.),
@@ -1194,12 +1194,14 @@ LEFT_QUICK_STRAIGHT_KICK = (
 RIGHT_QUICK_STRAIGHT_KICK = mirrorMove(LEFT_QUICK_STRAIGHT_KICK)
 
 LEFT_SHORT_STRAIGHT_KICK = (
+    BRING_ARMS_FORWARD,
+
     #stand for a bit
     ((90.,10.,-90.,-10.),
      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
      (90.,-10.,82.,13.2),
-     .5,0,stiff.NORMAL_STIFFNESSES),
+     .3,0,stiff.NORMAL_STIFFNESSES),
 
     #lean right/lift leg
     ((20.,30.,0.,0.),
