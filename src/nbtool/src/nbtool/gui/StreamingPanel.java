@@ -14,6 +14,11 @@ import nbtool.util.Logger;
 import messages.CameraParamsOuterClass;
 import messages.CameraParamsOuterClass.CameraParams;
 
+import java.io.FileWriter;
+import java.io.IOException;
+//import org.json.simple.JSONArray;
+//import org.json.simple.JSONObject;
+
 
 public class StreamingPanel extends JPanel implements ActionListener {
 	
@@ -43,10 +48,15 @@ public class StreamingPanel extends JPanel implements ActionListener {
 		canvas.add(topCameraPrefs);
 		canvas.add(bottomCameraPrefs);
 		
-		startStreaming = new JButton("Start");
+		startStreaming = new JButton("Stream");
 		startStreaming.addActionListener(this);
-		startStreaming.setPreferredSize(new Dimension(60,20));
+		startStreaming.setPreferredSize(new Dimension(80,20));
 		canvas.add(startStreaming);
+
+		saveParams = new JButton("Save");
+		saveParams.addActionListener(this);
+		saveParams.setPreferredSize(new Dimension(60,20));
+		canvas.add(saveParams);
 		
 		sp = new JScrollPane();
 		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -60,7 +70,7 @@ public class StreamingPanel extends JPanel implements ActionListener {
 	
 	private void useSize(Dimension s) {
 		sp.setBounds(0, 0, s.width, s.height);
-		Dimension d1, d2, d3;
+		Dimension d1, d2, d3, d4;
 		int y=0;
 		int x = 0;
 		d1 = topCameraPrefs.getPreferredSize();
@@ -74,6 +84,10 @@ public class StreamingPanel extends JPanel implements ActionListener {
 		d3 = startStreaming.getPreferredSize();
 		startStreaming.setBounds(2,y,d3.width,d3.height);
 		y += d3.height+3;
+
+		d4 = saveParams.getPreferredSize();
+		saveParams.setBounds(84,y-3-d3.height,d4.width,d4.height);
+		y += d4.height+3;
 		
 		canvas.setPreferredSize(new Dimension(250,y));
 	}
@@ -82,6 +96,7 @@ public class StreamingPanel extends JPanel implements ActionListener {
 	private JPanel canvas;
 	
 	private JButton startStreaming;
+	private JButton saveParams;
 	
 	private CameraPrefs topCameraPrefs;
 	private CameraPrefs bottomCameraPrefs;
@@ -91,19 +106,18 @@ public class StreamingPanel extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
+		
+		topCameraParams = topCameraPrefs.getParameterValues();
+		bottomCameraParams = bottomCameraPrefs.getParameterValues();
+
 		if(e.getSource() == startStreaming) {
-			/*gets all params except for BackLight-Compensation
-			 0x00 for both cameras
-			 */
-			topCameraParams = topCameraPrefs.getParameterValues();
-			bottomCameraParams = bottomCameraPrefs.getParameterValues();
-			
-			tryStart(topCameraParams, bottomCameraParams);
+			tryStream(topCameraParams, bottomCameraParams);
+		} else if(e.getSource() == saveParams) {
+			trySave(topCameraParams, bottomCameraParams);
 		}
 	}
 	
-	private void tryStart(Integer[] topCameraParams, Integer[] bottomCameraParams) {
+	private void tryStream(Integer[] topCameraParams, Integer[] bottomCameraParams) {
 		CameraParams topCamera = CameraParams.newBuilder()
 				.setWhichCamera("TOP")
 				.setHFLIP(topCameraParams[0])
@@ -147,6 +161,59 @@ public class StreamingPanel extends JPanel implements ActionListener {
 		}
 		second.tryAddCmnd(ControlIO.createCmndSetCameraParams(topCamera));
 		second.tryAddCmnd(ControlIO.createCmndSetCameraParams(bottomCamera));
+	}
+
+	private void trySave(Integer[] topCameraPar, Integer[] bottomCameraPar) {
+		JSONObject topCameraParams = new JSONObject();
+		JSONObject bottomCameraParams = new JSONObject();
+
+		topCameraParams.put("whichcamera","TOP");
+		bottomCameraParams.put("whichcamera","BOTTOM");
+
+		topCameraParams.put("hflip",topCameraPar[0]);
+		topCameraParams.put("vflip",topCameraPar[1]);
+		topCameraParams.put("autoexposure",topCameraPar[2]);
+		topCameraParams.put("brightness",topCameraPar[3]);
+		topCameraParams.put("contrast",topCameraPar[4]);
+		topCameraParams.put("saturation",topCameraPar[5]);
+		topCameraParams.put("hue",topCameraPar[6]);
+		topCameraParams.put("sharpness",topCameraPar[7]);
+		topCameraParams.put("gamma",topCameraPar[8]);
+		topCameraParams.put("auto_whitebalance",topCameraPar[9]);
+		topCameraParams.put("exposure",topCameraPar[10]);
+		topCameraParams.put("gain",topCameraPar[11]);
+		topCameraParams.put("white_balance",topCameraPar[12]);
+		topCameraParams.put("fade_to_black",topCameraPar[13]);
+
+		bottomCameraParams.put("hflip",bottomCameraPar[0]);
+		bottomCameraParams.put("vflip",bottomCameraPar[1]);
+		bottomCameraParams.put("autoexposure",bottomCameraPar[2]);
+		bottomCameraParams.put("brightness",bottomCameraPar[3]);
+		bottomCameraParams.put("contrast",bottomCameraPar[4]);
+		bottomCameraParams.put("saturation",bottomCameraPar[5]);
+		bottomCameraParams.put("hue",bottomCameraPar[6]);
+		bottomCameraParams.put("sharpness",bottomCameraPar[7]);
+		bottomCameraParams.put("gamma",bottomCameraPar[8]);
+		bottomCameraParams.put("auto_whitebalance",bottomCameraPar[9]);
+		bottomCameraParams.put("exposure",bottomCameraPar[10]);
+		bottomCameraParams.put("gain",bottomCameraPar[11]);
+		bottomCameraParams.put("white_balance",bottomCameraPar[12]);
+		bottomCameraParams.put("fade_to_black",bottomCameraPar[13]);
+
+		try {
+			FileWriter topFile = new FileWriter("~/nbites/src/man/config/topCameraParams.json");
+			FileWriter bottomFile = new FileWriter("~/nbites/src/man/config/bottomCameraParams.json");
+
+			topFile.write(topCameraParams.toJSONString());
+			topFile.flush();
+			topFile.close();
+
+			bottomFile.write(bottomCameraParams.toJSONString());
+			bottomFile.flush();
+			bottomFile.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void useStatus(STATUS s) {
