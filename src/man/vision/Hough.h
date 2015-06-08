@@ -163,7 +163,6 @@ public:
 
   FieldLine(HoughLine& line1, HoughLine& line2, double fx0 = 0, double fy0 = 0);
 
-  // TODO don't change classification to something less specific
   int id() const { return id_; }
   void id(Classification newId) { id_ = newId; }
   enum class Classification {
@@ -185,6 +184,7 @@ public:
     Midline
   }
 
+  void addCorner(Corner newCorner) { corners_.push_back(newCorner); }
   std::vector<Corner> corners() const { return corners_; }
 };
 
@@ -193,7 +193,6 @@ public:
 // grows as needed. I prefer vector because list iteration is awkward.
 class FieldLineList : public std::vector<FieldLine>
 {
-  // TODO implement
   GoalboxDetector boxDetector;
   CornerDetector cornerDetector;
 
@@ -241,37 +240,39 @@ struct Corner : public std::pair<FieldLine *, FieldLine *>
     Convex,
     T
   }
-}
+};
 
-// TODO
+// Detects goalbox by looking for two parallel lines seperated by 60 cm
 class GoalboxDetector
 {
-}
+  double parallelThreshold_;
+  double seperationThreshold_;
 
-// TODO logical const
+  bool validBox(HoughLine& line1, HoughLine& line2) const;
+
+public:
+  GoalboxDetector();
+  void find(FieldLineList& list);
+
+  double parallelThreshold() const { return parallelThreshold_; }
+  double parallelThreshold(double newThreshold) { parallelThreshold_ = newThreshold; }
+
+  double seperationThreshold() const { return seperationThreshold_; }
+  double seperationThreshold(double newThreshold) { seperationThreshold_ = newThreshold; }
+};
+
+// Detects corners
 class CornerDetector
 {
-  FieldLineList* lineList;
-  std::vector<Corner> concave_;
-  std::vector<Corner> convex_;
-  std::vector<Corner> t_;
-
-  double angleThreshold_;
+  double orthogonalThreshold_;
   double closeThreshold_;
   double farThreshold_;
 
-  void compute();
-  Corner::Classification findCorner(HoughLine& line1, HoughLine& line2); 
+  Corner::Classification classify(HoughLine& line1, HoughLine& line2) const; 
 
 public:
-  // TODO defaults for thresholds
   CornerDetector();
-
-  // TODO redesign API?
-  void lines(FieldLineList* lineList_) { lineList = lineList_; }
-  std::vector<Corner> concave() { compute(); return concave; }
-  std::vector<Corner> convex() { compute(); return convex; }
-  std::vector<Corner> t() { compute(); return t; }
+  void findCorners(FieldLineList& list);
 
   double angleThreshold() const { return angleThreshold_; }
   double angleThreshold(double newThreshold) { angleThreshold_ = newThreshold; }
@@ -281,7 +282,7 @@ public:
 
   double farThreshold() const { return farThreshold_; }
   double farThreshold(double newThreshold) { farThreshold_ = newThreshold; }
-}
+};
 
 // *****************
 // *               *
