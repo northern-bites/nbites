@@ -104,6 +104,7 @@ private:
     void initQueueAllBuffers();
     void startCapturing();
     void assertCameraSettings();
+    void testControlSettings();
 
     // Helpers for controlling the camera's settings
     int getControlSetting(unsigned int id);

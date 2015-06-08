@@ -309,6 +309,42 @@ void ImageTranscriber::initSettings()
     setControlSetting(V4L2_CID_DO_WHITE_BALANCE, updated_settings.white_balance);
 #endif
     setControlSetting(V4L2_MT9M114_FADE_TO_BLACK, updated_settings.fade_to_black);
+
+    testControlSettings();
+}
+
+void ImageTranscriber::testControlSettings() {
+    int hflip = getControlSetting(V4L2_CID_HFLIP);
+    int vflip = getControlSetting(V4L2_CID_VFLIP);
+    int brightness = getControlSetting(V4L2_CID_BRIGHTNESS);
+    int contrast = getControlSetting(V4L2_CID_CONTRAST);
+    int saturation = getControlSetting(V4L2_CID_SATURATION);
+    int hue = getControlSetting(V4L2_CID_HUE);
+    int sharpness = getControlSetting(V4L2_CID_SHARPNESS);
+    int gain = getControlSetting(V4L2_CID_GAIN);
+    int exposure = getControlSetting(V4L2_CID_EXPOSURE);
+
+#ifdef NAOQI_2
+    int whitebalance = getControlSetting(V4L2_CID_WHITE_BALANCE_TEMPERATURE);
+#else
+    int whitebalance = getControlSetting(V4L2_CID_DO_WHITE_BALANCE);
+#endif
+    int fade = getControlSetting(V4L2_MT9M114_FADE_TO_BLACK);
+
+
+    std::cout<<"***Settings from Driver***"<<std::endl;
+    std::cout<<"Camera: "<<cameraType<<std::endl;
+    std::cout<<"HFLIP: "<<hflip<<"\n"
+             <<"VFLIP: "<<vflip<<"\n"
+             <<"Brightness: "<<brightness<<"\n"
+             <<"Contrast: "<<contrast<<"\n"
+             <<"Saturation: "<<saturation<<"\n"
+             <<"Hue: "<<hue<<"\n"
+             <<"Sharpness: "<<sharpness<<"\n"
+             <<"Gain: "<<gain<<"\n"
+             <<"Exposure: "<<exposure<<"\n"
+             <<"Whitebalance: "<<whitebalance<<"\n"
+             <<"Fade: "<<fade<<"\n"<<std::endl;
 }
 
 int ImageTranscriber::getControlSetting(unsigned int id) {
