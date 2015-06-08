@@ -97,10 +97,11 @@ class ObstacleModule : public portals::Module
     static const bool USING_VISION = false;
     static const bool USING_ARMS = false;
     static const bool USING_SONARS = true;
-    
+
 
 public:
-    ObstacleModule();
+    ObstacleModule(bool arm, bool vision);
+    void setSonars(bool sonarL, bool sonarR);
 
     portals::InPortal<messages::ArmContactState> armContactIn;
     portals::InPortal<messages::VisionObstacle> visionIn;
@@ -123,16 +124,16 @@ protected:
     messages::FieldObstacles::Obstacle::ObstaclePosition
     processSonar(const messages::SonarState& input);
 
-    void updateVisionBuffer(messages::FieldObstacles::Obstacle::ObstaclePosition pos, 
-                            std::list<float> dists, 
+    void updateVisionBuffer(messages::FieldObstacles::Obstacle::ObstaclePosition pos,
+                            std::list<float> dists,
                             float distance);
 
     // Updates how long we've held
     void updateObstacleBuffer();
 
     // Updates vision buffer with info from last frame of vision
-    void updateObstacleArrays(messages::FieldObstacles::Obstacle::ObstacleDetector detector, 
-                              messages::FieldObstacles::Obstacle::ObstaclePosition pos, 
+    void updateObstacleArrays(messages::FieldObstacles::Obstacle::ObstacleDetector detector,
+                              messages::FieldObstacles::Obstacle::ObstaclePosition pos,
                               float dist);
 
     void combineArmsAndSonars(messages::FieldObstacles::Obstacle::ObstaclePosition arms,
@@ -146,6 +147,9 @@ protected:
 private:
     // sonar value
     float lastSonar;
+
+    // How do we want to detect the obstacles? Read in from JSON.
+    bool usingArms, usingLeftSonar, usingRightSonar, usingVision;
 
     // Sonar value buffers
     std::list<float> rightSonars, leftSonars;

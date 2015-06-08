@@ -1,0 +1,7 @@
+{
+	"arms" : true,
+	"vision" : false,
+	"set_all_sonar" : false,
+	"all_left_sonar" : true,
+    "all_right_sonar" : true
+}

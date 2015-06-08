@@ -19,12 +19,14 @@ SET_POOL_SIZE(messages::RobotLocation, 16);
 #endif
 
 namespace man {
-    
+
     Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     : AL::ALModule(broker, name),
     param("/home/nao/nbites/lib/parameters.json"),
     playerNum(param.getParam<int>("playerNumber")),
     teamNum(param.getParam<int>("teamNumber")),
+    robotName(param.getParam<std::string>("robotName")),
+    obstacleParam("/home/nao/nbites/lib/obstacleParams.json"),
     sensorsThread("sensors", SENSORS_FRAME_LENGTH_uS),
     sensors(broker),
     jointEnactor(broker),
@@ -43,23 +45,39 @@ namespace man {
     vision(),
     localization(),
     ballTrack(),
-    obstacle(),
+    obstacle(obstacleParam.getParam<bool>("arms"),
+             obstacleParam.getParam<bool>("vision")),
     gamestate(teamNum, playerNum),
     behaviors(teamNum, playerNum),
     leds(broker),
     sharedBall(playerNum)
     {
         setModuleDescription("The Northern Bites' soccer player.");
-                
+
+        /** Process json for obstacle sonars **/
+        if (obstacleParam.getParam<bool>("set_all_sonar")) {
+            obstacle.setSonars(obstacleParam.getParam<bool>("all_left_sonar"),
+                               obstacleParam.getParam<bool>("all_right_sonar"));
+        } else {
+            std::string url ("/home/nao/nbites/lib/robotParams/");
+            url.append(robotName);
+            url.append("/sonarParams.json");
+            std::cout<<url<<std::endl;
+            ParamReader robotParam(url);
+
+            obstacle.setSonars(robotParam.getParam<bool>("left_sonar"),
+                               robotParam.getParam<bool>("right_sonar"));
+        }
+
         /** Sensors **/
         sensorsThread.addModule(sensors);
 
         sensorsThread.addModule(jointEnactor);
         sensorsThread.addModule(motion);
         sensorsThread.addModule(arms);
-        
+
         sensors.printInput.wireTo(&guardian.printJointsOutput, true);
-        
+
         motion.jointsInput_.wireTo(&sensors.jointsOutput_);
         motion.currentsInput_.wireTo(&sensors.currentsOutput_);
         motion.inertialsInput_.wireTo(&sensors.inertialsOutput_);
@@ -69,14 +87,14 @@ namespace man {
         motion.headCommandInput_.wireTo(&behaviors.headMotionCommandOut, true);
         motion.requestInput_.wireTo(&behaviors.motionRequestOut, true);
         motion.fallInput_.wireTo(&guardian.fallStatusOutput, true);
-        
+
         jointEnactor.jointsInput_.wireTo(&motion.jointsOutput_);
         jointEnactor.stiffnessInput_.wireTo(&motion.stiffnessOutput_);
-        
+
         arms.actualJointsIn.wireTo(&sensors.jointsOutput_);
         arms.expectedJointsIn.wireTo(&motion.jointsOutput_);
         arms.handSpeedsIn.wireTo(&motion.handSpeedsOutput_);
-        
+
         /** Guardian **/
         guardianThread.addModule(guardian);
         guardianThread.addModule(audio);
@@ -89,15 +107,15 @@ namespace man {
         guardian.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
         audio.audioIn.wireTo(&guardian.audioOutput);
 
-        
+
         /** Comm **/
         commThread.addModule(comm);
         comm._worldModelInput.wireTo(&behaviors.myWorldModelOut, true);
         comm._gcResponseInput.wireTo(&gamestate.gcResponseOutput, true);
 
-        
+
         /** Cognition **/
-        
+
         // Turn ON the finalize method for images, which we've specialized
         portals::Message<messages::YUVImage>::setFinalize(true);
         portals::Message<messages::ThresholdImage>::setFinalize(true);
