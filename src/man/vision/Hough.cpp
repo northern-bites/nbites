@@ -188,6 +188,11 @@ void HoughLineList::mapToField(const FieldHomography& h)
 // *  Goalbox and Corner Detectoin  *
 // *                                *
 // **********************************
+
+Corner::Corner(FieldLine* first_, FieldLine* second_, CornerID id_)
+  : std::pair<FieldLine*, FieldLine*>(first_, second_), id(id_) 
+{}
+
 GoalboxDetector::GoalboxDetector()
   : parallelThreshold_(10), seperationThreshold_(15)
 {}
@@ -195,9 +200,9 @@ GoalboxDetector::GoalboxDetector()
 bool GoalboxDetector::find(FieldLineList& list)
 {
   for (int i = 0; i < list.size(); i++) {
-    for (int j = 0; i < list.size(); j++) {
+    for (int j = 0; j < list.size(); j++) {
       // Consider each pair once
-      if (i <= j) continue;
+      if (i < j) continue;
 
       // Get pair of lines
       FieldLine& line1 = list[i];
@@ -256,7 +261,7 @@ CornerDetector::CornerDetector()
 void CornerDetector::findCorners(FieldLineList& list)
 {
   for (int i = 0; i < list.size(); i++) {
-    for (int j = 0; i < list.size(); j++) {
+    for (int j = 0; j < list.size(); j++) {
       // Consider each pair once
       if (i <= j) continue;
 
