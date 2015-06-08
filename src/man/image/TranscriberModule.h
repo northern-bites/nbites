@@ -61,40 +61,22 @@ public:
     uint64_t getTimestamp() const;
     Camera::Type type() { return cameraType; }
 
-<<<<<<< HEAD
-    void initSettings(); //one of the magical init methods
-
-    struct NewSettings {
-        bool hflip;
-        bool vflip;
-        bool auto_exposure;
-=======
     struct NewSettings {
         bool hflip;
         bool vflip;
         int auto_exposure;
->>>>>>> c85b8bab84bad82db2721e02932a224727d928e5
         int brightness;
         int contrast;
         int saturation;
         int hue;
         int sharpness;
-<<<<<<< HEAD
-        bool auto_whitebalance;
-=======
         int gamma;
-        int auto_whitebalance;
->>>>>>> c85b8bab84bad82db2721e02932a224727d928e5
+        bool auto_whitebalance;
         int backlight_compensation;
         int exposure;
         int gain;
         int white_balance;
-<<<<<<< HEAD
         bool fade_to_black;
-    };
-
-=======
-        int fade_to_black;
     };
 
     void initSettings(); //one of the magical init methods
@@ -102,7 +84,6 @@ public:
     man::ParamReader param; //json param reader
     NewSettings updated_settings; //struct containing updated settings
 
->>>>>>> c85b8bab84bad82db2721e02932a224727d928e5
 private:
     enum
     {
@@ -146,10 +127,6 @@ private:
 
     uint64_t timeStamp;
 
-<<<<<<< HEAD
-    ParamReader param;
-=======
->>>>>>> c85b8bab84bad82db2721e02932a224727d928e5
 };
 
 // Module that wraps Transcriber's functionality

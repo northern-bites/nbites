@@ -220,6 +220,7 @@ void ImageTranscriber::initSettings()
         filepath = "/home/nao/nbites/Config/bottomCameraParams.json";
         std::cout<<"Camera::BOTTOM"<<std::endl;
     }
+    
     ParamReader temp(filepath);
     param = temp;
 
@@ -346,7 +347,6 @@ void ImageTranscriber::testControlSettings() {
              <<"Exposure: "<<exposure<<"\n"
              <<"Whitebalance: "<<whitebalance<<"\n"
              <<"Fade: "<<fade<<"\n"<<std::endl;
->>>>>>> c85b8bab84bad82db2721e02932a224727d928e5
 }
 
 int ImageTranscriber::getControlSetting(unsigned int id) {
@@ -589,18 +589,6 @@ TranscriberModule::TranscriberModule(ImageTranscriber& trans)
 // Get image from Transcriber and outportal it
 void TranscriberModule::run_()
 {
-<<<<<<< HEAD
-    time_t old_mod_time;
-    struct stat file_stats;
-    int err = stat("path to file",&file_stats);
-    if(err != 0) {
-        std::perror("[file has been modified] stat");
-    }
-    int time_diff = std::difftime(file_stats.st_mtime, old_mod_time);
-    if(time_diff > 0.0) {
-        old_mod_time = file_stats.st_mtime;
-        initSettings();
-=======
     struct stat file_stats;
     std::string filepath;
     if(it.type() == Camera::TOP) { //set path according to camera
@@ -623,7 +611,6 @@ void TranscriberModule::run_()
         }
     } else {
         //std::cout<<"[ERR] File Does Not Exist"<<std::endl;
->>>>>>> c85b8bab84bad82db2721e02932a224727d928e5
     }
 
     jointsIn.latch();

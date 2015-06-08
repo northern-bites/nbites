@@ -89,8 +89,6 @@ namespace control {
     }
 
     uint32_t cnc_setCameraParams(Log * arg) {
-<<<<<<< HEAD
-=======
         size_t u = arg->data().size();
         bool success = receivedParams.ParseFromString(arg->data());
         if(!success) {
@@ -127,7 +125,6 @@ namespace control {
                 file.close();
             }
         }
->>>>>>> c85b8bab84bad82db2721e02932a224727d928e5
         return 0;
     }
     
