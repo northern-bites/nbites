@@ -46,10 +46,11 @@ volatile struct SharedData {
     pthread_mutex_t cmnd_mutex;
     
     uint8_t sensorSwitch;
+    uint64_t latestSensorWritten;
+    uint64_t latestSensorRead;
     
-    uint64_t latestCommandIndex;
-    uint64_t latestSensorIndex;
-    
+    uint64_t latestCommandWritten;
+    uint64_t latestCommandRead;
 /*
     volatile int commandSwitch;
     volatile int sensorSwitch;

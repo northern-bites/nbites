@@ -61,8 +61,7 @@ private:
 
     int shared_fd;
     SharedData* shared;
-
-    uint64_t sensorIndex;
+    uint8_t sensorsStage[SENSOR_SIZE];
 
     bool lastPrint;
 };

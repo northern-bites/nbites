@@ -64,10 +64,11 @@ private:
     int shared_fd;
     SharedData* shared;
     
-    uint8_t sensorStaging[SENSOR_SIZE];
+    uint8_t cmndStaging[COMMAND_SIZE];
+    uint64_t commandSkips;
     
-    uint64_t lastCommandRecvd;
-    uint64_t lastSensorSent;
+    uint8_t sensorStaging[SENSOR_SIZE];
+    uint64_t sensorSkips;
 
     int fifo_fd;
 

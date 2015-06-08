@@ -80,6 +80,11 @@ std::string SensorsModule::makeSweetMoveTuple(const messages::JointAngles* angle
 
     return std::string(output);
 }
+    
+bool sensorSyncRead(SharedData * sd, uint8_t * stage)
+{
+    
+}
 
 void SensorsModule::updateSensorValues()
 {

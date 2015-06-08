@@ -54,7 +54,10 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     }
 
     std::cout << "Boss Constructed successfully!" << std::endl;
-
+    
+    commandSkips = 0;
+    sensorSkips = 0;
+    
     startMan();
 
     // This will not return.
@@ -70,6 +73,7 @@ Boss::~Boss()
     // Close shared memory
     munmap(shared, sizeof(SharedData));
     close(shared_fd);
+    close(fifo_fd);
 }
 
 void Boss::listener()
@@ -95,7 +99,10 @@ int Boss::startMan() {
         manRunning = true;
     }
     else if (child == 0) {
+        //replace this child process with an instance of man.
         execl("/home/nao/nbites/lib/man", "", NULL);
+        printf("CHILD PROCESS FAILED TO EXECL MAN!\n");
+        exit(-1);
     }
     else {
         std::cout << "COULD NOT DETACH MAN" << std::endl;
@@ -124,12 +131,10 @@ int Boss::constructSharedMem()
     shared_fd = shm_open(NBITES_MEM, O_RDWR | O_CREAT | O_TRUNC, 0600);
     if (shared_fd <= 0) {
         int err = errno;
-        std::cout << "Couldn't open shared FD\n\tErrno: " << err << std::endl;
-        if (err == EACCES) std::cout << "EACCES: " << EACCES << "\n";
-        if (err == EEXIST) std::cout << "EEXIST: " << EEXIST << "\n";
-        if (err == EINVAL) std::cout << "EINVAL: " << EINVAL << "\n";
-        if (err == EMFILE) std::cout << "EMFILE: " << EMFILE << "\n";
-        if (err == ENFILE) std::cout << "ENFILE: " << ENFILE << "\n";
+        char buf[100];
+        strerror_s(buf, 100, err);
+        std::cout << "Couldn't open shared FD\n\tErrno: " << err << ": " << buf << std::endl;
+        
         return -1;
         // TODO error
     }
@@ -149,15 +154,26 @@ int Boss::constructSharedMem()
     }
 
     memset(shared, 0, sizeof(SharedData));
-
-    shared->commandSwitch = -1;
-    shared->sensorSwitch = -1;
-    shared->commandReadIndex = 0;
-    shared->sensorReadIndex = 0;
-
-    //sharedMem->command = PTHREAD_MUTEX_INITALIZER;
-    //sharedMem->sense = PTHREAD_MUTEX_INITALIZER;
+    shared->sensorSwitch = 0;
+    
+    shared->sensor_mutex[0] = PTHREAD_MUTEX_INITIALIZER;
+    shared->sensor_mutex[1] = PTHREAD_MUTEX_INITIALIZER;
+    shared->cmnd_mutex = PTHREAD_MUTEX_INITIALIZER;
     return 1;
+}
+    
+bool bossSyncRead(SharedData * sd, uint8_t * stage) {
+    //We know there exists new data in >sd<,
+    //now we just need to safely read it out.
+    
+    int lockret = pthread_mutex_trylock(&(sd->cmnd_mutex));
+    if (lockret) {
+        return false;
+    }
+    
+    memcpy(stage, sd->command, COMMAND_SIZE);
+    pthread_mutex_unlock(&(sd->cmnd_mutex));
+    return true;
 }
 
 void Boss::DCMPreProcessCallback()
@@ -167,31 +183,65 @@ void Boss::DCMPreProcessCallback()
     std::string joints;
     std::string stiffs;
     std::string leds;
+    
+    if (shared->latestCommandWritten > shared->latestCommandRead) {
+        if (bossSyncRead(shared, cmndStaging) {
+            Deserialize des(cmndStaging);
+            
+            if (!des.parse()) {
+                return;
+            }
+            
+            sd->latestCommandRead = des.dataIndex();
 
-    // Start sem here
-    int index = shared->commandSwitch;
-    uint64_t write = 0;
-
-    if (index != -1) {
-        Deserialize des(shared->command[index]);
-        des.parse();
-        joints = des.stringNext();
-        stiffs = des.stringNext();
-        leds = des.string();
-        commandIndex = des.dataIndex();
-        shared->commandReadIndex = des.dataIndex();
+            joints = des.stringNext();
+            stiffs = des.stringNext();
+            leds = des.string();
+            
+            JointCommand results;
+            results.jointsCommand.ParseFromString(joints);
+            results.stiffnessCommand.ParseFromString(stiffs);
+            messages::LedCommand ledResults;
+            ledResults.ParseFromString(leds);
+            
+            //enactor.command(results.jointsCommand, results.stiffnessCommand);
+            led.setLeds(ledResults);
+            
+        } else {
+            printf("Boss::DCMPreProcessCallback COULD NOT READ FRESH COMMAND (skip)\n");
+            ++commandSkips;
+        }
+    } else {
+        //No new data to read.
+        // ...
     }
-    // End sem
-    if (index == -1) return;
+}
+            
+bool bossSyncWrite(SharedData * sd, uint8_t * stage, uint64_t index)
+{
+    uint8_t& newest = (sd->sensorSwitch);
+    pthread_mutex_t * oldestLock = &sd->sensor_mutex[!(newest)];
+    pthread_mutex_t * newestLock = &sd->sensor_mutex[ (newest)];
 
-    JointCommand results;
-    results.jointsCommand.ParseFromString(joints);
-    results.stiffnessCommand.ParseFromString(stiffs);
-    messages::LedCommand ledResults;
-    ledResults.ParseFromString(leds);
-
-    //enactor.command(results.jointsCommand, results.stiffnessCommand);
-    led.setLeds(ledResults);
+    if (
+        pthread_mutex_trylock(oldestLock) == 0 //locked
+        )
+    {
+        memcpy(sd->sensors[!newest], stage, SENSORS_SIZE);
+        newest = !newest;
+        sd->latestSensorWritten = index;
+        pthread_mutex_unlock(oldestLock);
+        
+    } else if (
+        pthread_mutex_trylock(newestLock) == 0
+        ) {
+        memcpy(sd->sensors[newest], stage, SENSORS_SIZE);
+        //newest = newest!
+        sd->latestSensorWritten = index;
+        pthread_mutex_unlock(newestLock);
+    } else {
+        return false;
+    }
 }
 
 void Boss::DCMPostProcessCallback()
@@ -201,33 +251,34 @@ void Boss::DCMPostProcessCallback()
     SensorValues values = sensor.getSensors();
 
     std::vector<SerializableBase*> objects = {
+        // serializer deletes these
         new ProtoSer(&values.joints),
         new ProtoSer(&values.currents),
         new ProtoSer(&values.temperature),
         new ProtoSer(&values.chestButton),
         new ProtoSer(&values.footBumper),
-        new ProtoSer(&values.inertials),      // serializer deletes these
+        new ProtoSer(&values.inertials),
         new ProtoSer(&values.sonars),
         new ProtoSer(&values.fsr),
         new ProtoSer(&values.battery),
         new ProtoSer(&values.stiffStatus),
     };
-
-    ++sensorIndex;
-
-    // Start Semaphore here! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    int index = shared->sensorSwitch ? 0 : 1;
-    size_t usedSpace;
-    bool returned = serializeTo(objects, sensorIndex, shared->sensors[index], SENSOR_SIZE, &usedSpace);
-    shared->sensorSwitch = index;
-    int lastRead = shared->sensorReadIndex;
-    // End Semaphore here! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~``
-
-    if (sensorIndex - lastRead > 2) {
+    uint64_t nextSensorIndex = (shared->latestSensorWritten + 1);
+    if (!serializeTo(objects, nextSensorIndex, sensorStaging, SENSOR_SIZE, NULL)) {
+        return;
+    }
+    
+    if (!bossSyncWrite(shared, sensorStaging, nextSensorIndex)) {
+        printf("Boss::DCMPostProcessCallback COULD NOT POST FRESH SENSORS (skip)\n");
+        ++sensorSkips;
+    }
+    
+    uint64_t lastRead = shared->latestSensorRead;
+    if (nextSensorIndex - lastRead > 2) {
         std::cout << "MAN missed a frame" << std::endl;
     }
 
-    if (sensorIndex - lastRead > 10) {
+    if (nextSensorIndex - lastRead > 10) {
         std::cout << "Sensors aren't getting read! Did Man die?" << std::endl;
         //std::cout << "commandIndex: " << sensorIndex << " lastRead: " << lastRead << std::endl;
         //manRunning = false; // TODO
