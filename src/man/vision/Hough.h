@@ -60,8 +60,6 @@ struct AdjustSet
   AdjustSet();
 };
 
-class FieldLine;
-
 class HoughLine : public GeoLine
 {
   int _rIndex;
@@ -145,14 +143,89 @@ public:
 // ****************
 
 // Forward declerations
-class Corner;
-class GoalboxDetector;
-class CornerDetector;
+class FieldLine;
+class FieldLineList;
+
+enum class CornerID {
+  None,
+  Concave,
+  Convex,
+  T
+};
+
+// Corner object used in corner detection and field line classification
+struct Corner : public std::pair<FieldLine *, FieldLine *>
+{
+  Corner(FieldLine* first_, FieldLine* second_, CornerID id_);
+
+  CornerID id;
+};
+
+// Detects goalbox
+class GoalboxDetector
+{
+  double parallelThreshold_;
+  double seperationThreshold_;
+
+  bool validBox(HoughLine& line1, HoughLine& line2) const;
+
+public:
+  GoalboxDetector();
+  bool find(FieldLineList& list);
+
+  double parallelThreshold() const { return parallelThreshold_; }
+  void parallelThreshold(double newThreshold) { parallelThreshold_ = newThreshold; }
+
+  double seperationThreshold() const { return seperationThreshold_; }
+  void seperationThreshold(double newThreshold) { seperationThreshold_ = newThreshold; }
+};
+
+// Detects corners
+class CornerDetector
+{
+  double orthogonalThreshold_;
+  double closeThreshold_;
+  double farThreshold_;
+
+  CornerID classify(HoughLine& line1, HoughLine& line2) const; 
+
+public:
+  CornerDetector();
+  void findCorners(FieldLineList& list);
+
+  double orthogonalThreshold() const { return orthogonalThreshold_; }
+  void orthogonalThreshold(double newThreshold) { orthogonalThreshold_ = newThreshold; }
+
+  double closeThreshold() const { return closeThreshold_; }
+  void closeThreshold(double newThreshold) { closeThreshold_ = newThreshold; }
+
+  double farThreshold() const { return farThreshold_; }
+  void farThreshold(double newThreshold) { farThreshold_ = newThreshold; }
+};
+
+enum class LineID {
+  // Most general
+  Line,
+
+  // Two possibilities
+  EndlineOrSideline,
+  TopGoalboxOrSideGoalbox,
+  SideGoalboxOrMidline,
+  
+  // More specific
+  Sideline,
+  SideGoalbox,
+
+  // Most specific
+  Endline,
+  TopGoalbox,
+  Midline
+};
 
 class FieldLine
 {
   HoughLine* _lines[2];
-  Classification id_;
+  LineID id_;
   std::vector<Corner> corners_;
 
 public:
@@ -163,26 +236,8 @@ public:
 
   FieldLine(HoughLine& line1, HoughLine& line2, double fx0 = 0, double fy0 = 0);
 
-  int id() const { return id_; }
-  void id(Classification newId) { id_ = newId; }
-  enum class Classification {
-    // Most general
-    Line,
-
-    // Two possibilities
-    EndlineOrSideline,
-    TopGoalboxOrSideGoalbox,
-    SideGoalboxOrMidline,
-
-    // More specific
-    Sideline,
-    SideGoalbox,
-
-    // Most specific
-    Endline,
-    TopGoalbox,
-    Midline
-  }
+  LineID id() const { return id_; }
+  void id(LineID newId) { id_ = newId; }
 
   void addCorner(Corner newCorner) { corners_.push_back(newCorner); }
   std::vector<Corner> corners() const { return corners_; }
@@ -226,62 +281,6 @@ public:
 
   // Calibrate tilt if possible.
   bool TiltCalibrate(FieldHomography&, std::string* message = 0);
-};
-
-// Corner object used in corner detection and field line classification
-struct Corner : public std::pair<FieldLine *, FieldLine *>
-{
-  Corner(FieldLine* first_, FieldLine* second_, Classification id_);
-
-  Classification id;
-  enum class Classification {
-    None,
-    Concave,
-    Convex,
-    T
-  }
-};
-
-// Detects goalbox by looking for two parallel lines seperated by 60 cm
-class GoalboxDetector
-{
-  double parallelThreshold_;
-  double seperationThreshold_;
-
-  bool validBox(HoughLine& line1, HoughLine& line2) const;
-
-public:
-  GoalboxDetector();
-  void find(FieldLineList& list);
-
-  double parallelThreshold() const { return parallelThreshold_; }
-  double parallelThreshold(double newThreshold) { parallelThreshold_ = newThreshold; }
-
-  double seperationThreshold() const { return seperationThreshold_; }
-  double seperationThreshold(double newThreshold) { seperationThreshold_ = newThreshold; }
-};
-
-// Detects corners
-class CornerDetector
-{
-  double orthogonalThreshold_;
-  double closeThreshold_;
-  double farThreshold_;
-
-  Corner::Classification classify(HoughLine& line1, HoughLine& line2) const; 
-
-public:
-  CornerDetector();
-  void findCorners(FieldLineList& list);
-
-  double angleThreshold() const { return angleThreshold_; }
-  double angleThreshold(double newThreshold) { angleThreshold_ = newThreshold; }
-
-  double closeThreshold() const { return closeThreshold_; }
-  double closeThreshold(double newThreshold) { closeThreshold_ = newThreshold; }
-
-  double farThreshold() const { return farThreshold_; }
-  double farThreshold(double newThreshold) { farThreshold_ = newThreshold; }
 };
 
 // *****************
