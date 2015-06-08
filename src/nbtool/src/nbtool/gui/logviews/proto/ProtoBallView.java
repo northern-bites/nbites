@@ -67,9 +67,12 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 		if (!ball_on) {return;}
 		int ballX = (robotX - OFFSET*((Float)filteredBall.get("rel_y")).intValue());
 		int ballY = (robotY - OFFSET*((Float)filteredBall.get("rel_x")).intValue());
+
 		int intX = (robotX - OFFSET*((Float)naiveBall.get("yintercept")).intValue());
 		int intY = robotY;
 
+		g.setColor(Color.black);
+		g.drawString("Velocity: " + naiveBall.get("velocity"), ballX + 10, ballY - 10);
 		g.setColor(Color.red);
 		g.drawOval(ballX - (BALL_RADIUS/2), ballY - (BALL_RADIUS/2), BALL_RADIUS, BALL_RADIUS);
 		g.fillOval(ballX - (BALL_RADIUS/2), ballY - (BALL_RADIUS/2), BALL_RADIUS, BALL_RADIUS);
@@ -181,7 +184,7 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 				}
 				naiveBall.put("position_x", position_x);
 				naiveBall.put("position_y", position_y);
-			} else if (entry.getKey().getName().equals("sec_buffer")) {
+			} else if (entry.getKey().getName().equals("dest_buffer")) {
 				ArrayList<Float> buf_x = new ArrayList();
 				ArrayList<Float> buf_y = new ArrayList();
 				List<Object> vals = (List<Object>) entry.getValue();

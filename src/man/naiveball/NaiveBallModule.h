@@ -48,34 +48,34 @@ public:
 private:
     float calcSumSquaresSQRT(float a, float b);
     bool checkIfStationary();
-    void updateBuffer();
-    void clearBuffer();
+    void updateBuffers();
+    void clearBuffers();
     void naiveCheck();
     void naivePredict(BallState b);
     BallState avgFrames(int startingIndex);
+    void calcPath();
+    float calculateVelocity(bool x);
+
     void print();
     void printBallState(BallState x);
     void printBuffer();
 
-    BallState *ballStateBuffer;
-    BallState *bufferOfNSeconds;
+    BallState *position_buffer;
+    BallState *dest_buffer;
+    float *vel_x_buffer;
+    float *vel_y_buffer;
 
     int currentIndex;
-    int currentSecIndex;
     int frameOffCount;
-    int count;
-    int direction;
-    int secCounter;
+    float direction;
 
     float velocityEst;
     float xVelocityEst;
     float yVelocityEst;
-    float ballDestX;
-    float ballDestY;
     float yIntercept;
 
     bool bufferFull;
-    bool secBufferFull;
+    bool velBufferFull;
 
     messages::WorldModel worldMessages[NUM_PLAYERS_PER_TEAM];
     messages::FilteredBall myBall;
