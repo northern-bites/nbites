@@ -13,9 +13,24 @@ namespace nblog {
     }
     
     Log Log::simple(const std::string type, const std::string data) {
+        return Log::ofTypeWithFields(type, data, {});
+    }
+    
+    Log Log::ofType(const std::string type, const std::string data) {
+        return Log::ofTypeWithFields(type, data, {});
+    }
+    
+    Log Log::ofTypeWithFields(const std::string type, const std::string data, std::initializer_list<SExpr> fields) {
         std::vector<SExpr> scv = {
             SExpr("type", type)
         };
+        
+        for (auto it = fields.begin();
+             it != fields.end();
+             ++it) {
+            scv.push_back(*it);
+        }
+        
         SExpr sc(scv);
         
         std::vector<SExpr> contv = {
@@ -30,11 +45,39 @@ namespace nblog {
         };
         
         SExpr top(tv);
-      
+        
         Log ret;
         ret.setTree(top);
         ret.setData(data);
-       
+        
+        return ret;
+    }
+    
+    Log Log::withContentItems(std::initializer_list<SExpr> items, const std::string data) {
+        std::vector<SExpr> contv = {
+            SExpr("contents"),
+        };
+        
+        for (auto it = items.begin();
+             it != items.end();
+             ++it) {
+            contv.push_back(*it);
+        }
+
+        
+        SExpr contents(contv);
+        
+        std::vector<SExpr> tv = {
+            SExpr("nblog"),
+            contents
+        };
+        
+        SExpr top(tv);
+        
+        Log ret;
+        ret.setTree(top);
+        ret.setData(data);
+        
         return ret;
     }
     

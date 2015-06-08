@@ -36,6 +36,23 @@ public class Log {
 		return new Log(topLevel, b);
 	}
 	
+	
+	
+	public static Log logWithTypePlus(String type, byte[] b, SExpr... fields) {
+		SExpr typeField = SExpr.newKeyValue("type", type);
+		SExpr fieldList = SExpr.newList(typeField);
+		fieldList.append(fields);
+		
+		SExpr topLevel = SExpr.newList(SExpr.newAtom("nblog"), SExpr.newKeyValue("contents", fieldList));
+		return new Log(topLevel, b);
+	}
+	
+	public static Log simpleCommandLog(String cmndName, byte[] bytes) {
+		SExpr commandTree = SExpr.newList(SExpr.newAtom("command"), SExpr.newAtom(cmndName));
+		Log cmnd = new Log(commandTree, bytes);
+		return cmnd;
+	}
+	
 	/*
 	 * Unique number for every log found during this execution.
 	 * */
@@ -87,7 +104,8 @@ public class Log {
 	}
 	
 	public void setNameFromDesc() {
-		this.name = String.format("i%d_type=%s_from=%s_v=%d", unique_id, primaryType(), primaryFrom(), version());
+		this.name = String.format("type=%s_from=%s_v=%d_i%d_c%d", primaryType(), primaryFrom(), version(),
+				this.unique_id, this.checksum());
 		this.name = this.name
 				.substring(Math.max(0, this.name.length() - 240))
 				.replace('/', '_').replace(' ', '_').replace(':', '-').replace('.', '-') + ".nblog";
@@ -163,8 +181,8 @@ public class Log {
 		return c.exists() && c.isAtom() ? c.value() : null;
 	}
 	
-	public Integer primaryI_Index() {
-		SExpr c = tree().find("contents").get(1).find("i_index").get(1);
+	public Integer primaryImgIndex() {
+		SExpr c = tree().find("contents").get(1).find("iindex").get(1);
 		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
 	}
 	

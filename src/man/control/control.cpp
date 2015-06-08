@@ -20,6 +20,7 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <exception>
 
 using nblog::SExpr;
 using nblog::Log;
@@ -205,8 +206,13 @@ namespace control {
                         delete found;
                         goto connection_died;
                     }
-                    
-                    uint32_t ret = fmap[name](found);
+                    uint32_t ret = -1;
+                    try {
+                        ret = fmap[name](found);
+                    } catch (...) {
+                        printf("ERROR: Caught exception while running control function %s!\n",
+                               name.c_str());
+                    }
                     NBDEBUG( "control command returned %i\n", ret);
                     delete found;
                     

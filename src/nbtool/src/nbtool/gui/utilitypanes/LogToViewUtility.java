@@ -91,10 +91,12 @@ public class LogToViewUtility extends UtilityParent implements TreeModel, TreeSe
 		HashSet<Class<? extends ViewParent>> pset = new HashSet<Class<? extends ViewParent>>(Arrays.asList(possible));
 		
 		int i = 0;
-		for (Class<? extends ViewParent> cls : lastShown) {
-			if (pset.contains(cls)) {
-				ret[i++] = new ViewState(true, cls);
-				pset.remove(cls);
+		if (lastShown != null) {
+			for (Class<? extends ViewParent> cls : lastShown) {
+				if (pset.contains(cls)) {
+					ret[i++] = new ViewState(true, cls);
+					pset.remove(cls);
+				}
 			}
 		}
 		
@@ -128,7 +130,7 @@ public class LogToViewUtility extends UtilityParent implements TreeModel, TreeSe
 		Map<String, Class<? extends ViewParent>[]> lastShown = Prefs.last_shown;
 		
 		for (int i = 0; i < states.length; ++i)
-			states[i] = resolve(types[i], constPossible.get(types[i]),lastShown.get(types[i]));
+			states[i] = resolve(types[i], constPossible.get(types[i]), lastShown.get(types[i]));
 		
 		setLayout(null);
 		setSize(600, 400);

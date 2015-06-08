@@ -20,7 +20,7 @@ import nbtool.util.Events;
 import nbtool.util.Logger;
 import nbtool.util.NBConstants.STATUS;
 
-public class LCTreeModel implements TreeModel, TreeSelectionListener, Events.LogsFound, Events.ToolStatus {
+public class LogChooserModel implements TreeModel, TreeSelectionListener, Events.LogsFound, Events.ToolStatus {
 
 	/*
 	 * DataModel:
@@ -29,7 +29,7 @@ public class LCTreeModel implements TreeModel, TreeSelectionListener, Events.Log
 	String root;
 	JTree tree;
 	
-	public LCTreeModel() {
+	public LogChooserModel() {
 		root = "ROOT PLACEHOLDER";
 		
 		Center.listen(Events.LogsFound.class, this, true);

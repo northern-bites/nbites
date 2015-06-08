@@ -6,12 +6,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -22,7 +19,6 @@ import nbtool.data.Log.SOURCE;
 import nbtool.io.CommonIO.GIOFirstResponder;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOState;
-import nbtool.util.Events.FileIOStatus;
 import nbtool.util.Events.GFileIOStatus;
 import nbtool.util.Logger;
 import nbtool.util.Utility;
@@ -168,6 +164,14 @@ public class FileIO {
 			if (!Utility.isv6Description(desc)) {
 				logs[i] = new Log();
 				logs[i]._olddesc_ = desc;
+				
+				try {
+					FileIO.loadLog(logs[i], location);
+				} catch (IOException e) {
+					e.printStackTrace();
+					continue;
+				}
+				
 				assert(Utility.v6Convert(logs[i]));
 			} else {
 				logs[i] = new Log(desc, null);
@@ -234,7 +238,6 @@ public class FileIO {
 						lg.setNameFromDesc();
 					} else if (!lg.name.endsWith(".nblog"))
 						lg.name = lg.name + ".nblog";
-					
 					try {		 
 						writeLogToPath(lg, this.path + File.separator + lg.name);
 						Logger.log(Logger.EVENT, "FileIO: thread wrote log: " + lg.name);
