@@ -3,6 +3,8 @@
 #include "RoboGrams.h"
 #include "Images.h"
 #include "vision/VisionModule.h"
+#include "vision/FrontEnd.h"
+#include "ParamReader.h"
 
 #include <netinet/in.h>
 #include <assert.h>
@@ -13,8 +15,12 @@
 using nblog::Log;
 using nblog::SExpr;
 
+// Helper funcs forward declarations
+man::vision::Colors* getColorsFromSliderValues(float* params);
+void updateSavedColorParams(std::string jsonPath, float* params, bool top);
+
 int Vision_func() {
-    assert(args.size() == 1);
+    assert(args.size() > 0);
 
     printf("Vision_func()\n");
 
@@ -37,12 +43,24 @@ int Vision_func() {
     portals::Message<messages::JointAngles> emptyJointsMessage(&emptyJoints);
     portals::Message<messages::InertialState> emptyInertialsMessage(&emptyInertials);
 
+    // Init module to color params from JSON file
     man::vision::VisionModule module;
 
     module.topIn.setMessage(imageMessage);
     module.bottomIn.setMessage(imageMessage);
     module.jointsIn.setMessage(emptyJointsMessage);
     module.inertialsIn.setMessage(emptyInertialsMessage);
+
+    // If func call included colors, update color params, but leave json data
+    if (args.size() > 1) {
+        man::vision::Colors* newParams = getColorsFromSliderValues((float*)args[1]);
+        module.setColorParams(newParams, top);
+    }
+
+    // If func call included third arg, save current params to json file
+    if (args.size() > 2) {
+        updateSavedColorParams("/home/evanhoyt/Desktop/ColorParams.json", (float*)args[1], top);
+    }
 
     man::vision::ImageFrontEnd* frontEnd = module.runAndGetFrontEnd(top);
 
@@ -52,9 +70,6 @@ int Vision_func() {
 
     Log* yRet = new Log();
     int yLength = 240*320*2;
-
-    std::cout << "EVAN" << std::endl;
-    std::cout << "Desc: " <<  copy->description() << std::endl;
 
     // Create temp buffer and fill with yImage from FrontEnd
     uint8_t yBuf[yLength];
@@ -189,3 +204,41 @@ int Vision_func() {
 
     return 0;
 }
+
+man::vision::Colors* getColorsFromSliderValues(float* params) {
+    man::vision::Colors* ret = new man::vision::Colors;
+    ret->white. load(params[0], params[1], params[2],
+                     params[3], params[4], params[5]);
+    ret->green. load(params[6], params[7], params[8],
+                     params[9], params[10],params[11]);
+    ret->orange.load(params[12],params[13],params[14],
+                     params[15],params[16],params[17]);
+    return ret;
+}
+
+void updateSavedColorParams(std::string jsonPath, float* params, bool top) {
+    boost::property_tree::ptree tree, color, set;
+    boost::property_tree::read_json(jsonPath, tree);
+
+    if (top) {
+        color = tree.get_child("colorParams.topColors");
+    } else {
+        color = tree.get_child("colorParams.bottomColors");
+    }
+
+    for (int i = 0; i < 3; i++) {
+        switch (i) {
+            case 0 : set = color.get_child("white");
+            case 1 : set = color.get_child("green");
+            case 2 : set = color.get_child("orange");
+        }
+
+        set.put<float>("darkU",  params[i*6 + 0]);
+        set.get<float>("darkV",  params[i*6 + 1]);
+        set.get<float>("lightU", params[i*6 + 2]);
+        set.get<float>("lightV", params[i*6 + 3]);
+        set.get<float>("fuzzyU", params[i*6 + 4]);
+        set.get<float>("fuzzyV", params[i*6 + 5]);
+    }
+}
+

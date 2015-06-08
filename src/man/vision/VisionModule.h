@@ -30,7 +30,7 @@ public:
     FieldLineList* getFieldLines(bool topCamera = true) const { return fieldLines[!topCamera]; }
 
     // For use by Image nbcross func
-    void setColorParams(Colors* colors, bool top) { colorParams};
+    void setColorParams(Colors* colors, bool top) { colorParams[!top] = colors; }
     ImageFrontEnd* runAndGetFrontEnd(bool top);
 
 

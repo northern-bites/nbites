@@ -1,6 +1,7 @@
 package nbtool.gui.logviews.misc;
 
 import java.awt.Graphics;
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 
 import nbtool.images.Y8image;
@@ -53,11 +54,98 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
     private ColorLoader greenColor;
     private ColorLoader orangeColor;
 
+    private ColorLoader[] colors;
+
     public ImageConverterView() {
         super();
 
-        wDarkU = new JSlider(JSlider.HORIZONTAL, 0, 30, 15);
+        // TODO init ColorLoaders from ???
+        whiteColor = new ColorLoader(-0.02f, -0.02f, 0.25f, 0.25f, -0.055f, -0.055f);
+        greenColor = new ColorLoader( 0.077f, 0.010f, -0.057f, -0.230f, -0.06f, -0.06f);
+        orangeColor = new ColorLoader( 0.133f, 0.053f, -0.133f, 0.107f, -0.06f, 0.06f);
 
+
+        colors =  new ColorLoader[3];
+        colors[0] = whiteColor;
+        colors[1] = greenColor;
+        colors[2] = orangeColor;
+
+        // TODO save button: pass color params back to nbfunc (how?)
+            // have it rewrite the json data
+
+        ChangeListener slide = new ChangeListener(){
+            public void stateChanged(ChangeEvent e) {
+                adjustParams();
+            }
+        };
+
+        // TODO fix slider glitch
+
+        // Init and add white sliders. TODO: init val from ColorLoaders
+        wDarkU  = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(whiteColor.getDarkU() * 100));
+        wDarkV  = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(whiteColor.getDarkV() * 100));
+        wLightU = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(whiteColor.getLightU() * 100));
+        wLightV = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(whiteColor.getLightV() * 100));
+        wFuzzyU = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(whiteColor.getFuzzyU() * 100));
+        wFuzzyV = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(whiteColor.getFuzzyV() * 100));
+
+        wDarkU.addChangeListener(slide);
+        wDarkV.addChangeListener(slide);
+        wLightU.addChangeListener(slide);
+        wLightV.addChangeListener(slide);
+        wFuzzyU.addChangeListener(slide);
+        wFuzzyV.addChangeListener(slide);
+
+        add(wDarkU);
+        add(wDarkV);
+        add(wLightU);
+        add(wLightV);
+        add(wFuzzyU);
+        add(wFuzzyV);
+
+        // Init and add green sliders. TODO: init val from ColorLoaders
+        gDarkU  = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(greenColor.getDarkU() * 100));
+        gDarkV  = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(greenColor.getDarkV() * 100));
+        gLightU = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(greenColor.getLightU() * 100));
+        gLightV = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(greenColor.getLightV() * 100));
+        gFuzzyU = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(greenColor.getFuzzyU() * 100));
+        gFuzzyV = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(greenColor.getFuzzyV() * 100));
+
+        gDarkU.addChangeListener(slide);
+        gDarkV.addChangeListener(slide);
+        gLightU.addChangeListener(slide);
+        gLightV.addChangeListener(slide);
+        gFuzzyU.addChangeListener(slide);
+        gFuzzyV.addChangeListener(slide);
+
+        add(gDarkU);
+        add(gDarkV);
+        add(gLightU);
+        add(gLightV);
+        add(gFuzzyU);
+        add(gFuzzyV);
+
+        // Init and add green sliders. TODO: init val from ColorLoaders
+        oDarkU  = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(orangeColor.getDarkU() * 100));
+        oDarkV  = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(orangeColor.getDarkV() * 100));
+        oLightU = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(orangeColor.getLightU() * 100));
+        oLightV = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(orangeColor.getLightV() * 100));
+        oFuzzyU = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(orangeColor.getFuzzyU() * 100));
+        oFuzzyV = new JSlider(JSlider.HORIZONTAL, -100, 100, (int)(orangeColor.getFuzzyV() * 100));
+
+        oDarkU.addChangeListener(slide);
+        oDarkV.addChangeListener(slide);
+        oLightU.addChangeListener(slide);
+        oLightV.addChangeListener(slide);
+        oFuzzyU.addChangeListener(slide);
+        oFuzzyV.addChangeListener(slide);
+
+        add(oDarkU);
+        add(oDarkV);
+        add(oLightU);
+        add(oLightV);
+        add(oFuzzyU);
+        add(oFuzzyV);
     }
 
     public void stateChanged(ChangeEvent e) {
@@ -65,6 +153,7 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
     }
 
     public void adjustParams() {
+
         whiteColor. setDarkU( (float)wDarkU. getValue() / 100);
         whiteColor. setDarkV( (float)wDarkV. getValue() / 100);
         whiteColor. setLightU((float)wLightU.getValue() / 100);
@@ -94,27 +183,61 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         if (func == null)
             return;
         
-        CrossCall call = new CrossCall(this, func, this.log);
+        // TODO passing color params back to c++?
+        // Call to nbfunc has the json color params overrided by new params
+        CrossCall call = new CrossCall(this, func, this.log);//, colors);
         inst.tryAddCall(call);
 
     }
 
     public void paintComponent(Graphics g) {
+       
+        int vB = 5;  // verticle buffer
+        int sH = 15; // slider height
+        int tB = 20; // text buffer
+
+        int width = 320;
+        int height = 240;
+
+        // Draw five output image
         if (whiteImage != null) {
             g.drawImage(whiteImage, 0, 0, null);
         }
         if (greenImage != null) {
-            g.drawImage(greenImage, 325, 0, null);
+            g.drawImage(greenImage, width + vB, 0, null);
         }
         if (orangeImage != null) {
-            g.drawImage(orangeImage, 650, 0, null);
+            g.drawImage(orangeImage, width*2 + vB*2, 0, null);
         }
         if (yImage != null) {
-            g.drawImage(yImage, 0, 450, null);
+            g.drawImage(yImage, 0, height + sH*6 + tB*3, null);
         }
         if (segmentedImage != null) {
-            g.drawImage(segmentedImage, 325, 450, null);
+            g.drawImage(segmentedImage, width + vB,  height + sH*6 + tB*3, null);
         }
+
+        // // Set demension of 16 sliders
+
+        wDarkU. setBounds(vB, height + sH*0 + tB*1, width - vB*2, sH);
+        wDarkV. setBounds(vB, height + sH*1 + tB*1, width - vB*2, sH);
+        wLightU.setBounds(vB, height + sH*2 + tB*2, width - vB*2, sH);
+        wLightV.setBounds(vB, height + sH*3 + tB*2, width - vB*2, sH);
+        wFuzzyU.setBounds(vB, height + sH*4 + tB*3, width - vB*2, sH);
+        wFuzzyV.setBounds(vB, height + sH*5 + tB*3, width - vB*2, sH);
+
+        gDarkU. setBounds(width + vB*2, height + sH*0 + tB*1, width - vB*2, sH);
+        gDarkV. setBounds(width + vB*2, height + sH*1 + tB*1, width - vB*2, sH);
+        gLightU.setBounds(width + vB*2, height + sH*2 + tB*2, width - vB*2, sH);
+        gLightV.setBounds(width + vB*2, height + sH*3 + tB*2, width - vB*2, sH);
+        gFuzzyU.setBounds(width + vB*2, height + sH*4 + tB*3, width - vB*2, sH);
+        gFuzzyV.setBounds(width + vB*2, height + sH*5 + tB*3, width - vB*2, sH);
+
+        oDarkU. setBounds(width*2 + vB*3, height + sH*0 + tB*1, width - vB*2, sH);
+        oDarkV. setBounds(width*2 + vB*3, height + sH*1 + tB*1, width - vB*2, sH);
+        oLightU.setBounds(width*2 + vB*3, height + sH*2 + tB*2, width - vB*2, sH);
+        oLightV.setBounds(width*2 + vB*3, height + sH*3 + tB*2, width - vB*2, sH);
+        oFuzzyU.setBounds(width*2 + vB*3, height + sH*4 + tB*3, width - vB*2, sH);
+        oFuzzyV.setBounds(width*2 + vB*3, height + sH*5 + tB*3, width - vB*2, sH);
     }
 
     @Override
