@@ -140,14 +140,13 @@ public class StreamingPanel extends JPanel implements ActionListener {
 				.setFadeToBlack(bottomCameraParams[13])
 				.build();
 		
-		ControlInstance second = ControlIO.getByIndex(1);
+		ControlInstance second = ControlIO.getByIndex(0);
 		if (second == null) {
 			Logger.log(Logger.WARN, "CameraParams clicked when no ControlIO instance available");
 			return;
 		}
 		second.tryAddCmnd(ControlIO.createCmndSetCameraParams(topCamera));
 		second.tryAddCmnd(ControlIO.createCmndSetCameraParams(bottomCamera));
-		//can we do this twice?
 	}
 	
 	private void useStatus(STATUS s) {
