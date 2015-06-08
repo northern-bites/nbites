@@ -47,8 +47,7 @@ private:
     int shared_fd;
     SharedData* shared;
 
-    uint64_t commandIndex;
-    uint64_t lastRead;
+    uiint8_t cmndStaging[COMMAND_SIZE];
 
     messages::JointAngles latestJointAngles_;
     messages::JointAngles latestStiffness_;

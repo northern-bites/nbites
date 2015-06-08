@@ -83,7 +83,14 @@ std::string SensorsModule::makeSweetMoveTuple(const messages::JointAngles* angle
     
 bool sensorSyncRead(SharedData * sd, uint8_t * stage)
 {
+    uint8_t bufi = sd->sensorSwitch;
+    pthread_mutex_t * lock = sd->sensor_mutex[bufi];
     
+    pthread_mutex_lock(lock);
+    memcpy(stage, sd->sensors[bufi], SENSOR_SIZE);
+    pthread_mutex_unlock(lock);
+    
+    return true;
 }
 
 void SensorsModule::updateSensorValues()
@@ -98,35 +105,27 @@ void SensorsModule::updateSensorValues()
     std::string fsrS;
     std::string batteryS;
     std::string stiffStatusS;
-
-    HighResTimer timer;
-    // TODO grab semaphore
-    int index = shared->sensorSwitch;
-    if (index != -1)
-    {
-        Deserialize des(shared->sensors[index]);
-        des.parse();
-
-        jointsS = des.stringNext();
-        currentsS = des.stringNext();
-        tempsS = des.stringNext();
-        chestButtonS = des.stringNext();
-        footBumperS = des.stringNext();
-        inertialsS = des.stringNext();
-        sonarsS = des.stringNext();
-        fsrS = des.stringNext();
-        batteryS = des.stringNext();
-        stiffStatusS = des.string();
-
-        sensorIndex = des.dataIndex();
-        shared->sensorReadIndex = sensorIndex;
+    
+    if (!sensorSyncRead(shared, sensorsStage)) {
+        printf("SensorsModule::updateSensorValues could not sensorSyncRead()\n");
+        return;
     }
-
-    // TODO Release semaphore
-    double time = timer.end();
-    //std::cout << "Sensors critical section took: " << time << std::endl;
-
-    if (index == -1) return;
+    
+    Deserialize des(sensorsStage);
+    des.parse();
+    
+    jointsS = des.stringNext();
+    currentsS = des.stringNext();
+    tempsS = des.stringNext();
+    chestButtonS = des.stringNext();
+    footBumperS = des.stringNext();
+    inertialsS = des.stringNext();
+    sonarsS = des.stringNext();
+    fsrS = des.stringNext();
+    batteryS = des.stringNext();
+    stiffStatusS = des.string();
+    
+    shared->latestSensorRead = des.dataIndex();
 
     values.joints.ParseFromString(jointsS);
     values.currents.ParseFromString(currentsS);

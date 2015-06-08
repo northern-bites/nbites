@@ -38,6 +38,11 @@ JointEnactorModule::~JointEnactorModule()
     munmap(shared, sizeof(SharedData));
     close(shared_fd);
 }
+    
+bool syncCmndWrite(SharedData * sd, uint8_t * stage)
+{
+    
+}
 
 void JointEnactorModule::writeCommand()
 {
