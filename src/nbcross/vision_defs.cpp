@@ -164,7 +164,7 @@ int Vision_func() {
     //-------------------
     //  LINES
     //-------------------
-    man::vision::HoughLineList* lineList = module.getLines(topCamera);
+    man::vision::HoughLineList* lineList = module.getHoughLines(topCamera);
 
     Log* lineRet = new Log();
     std::string lineBuf;
@@ -200,6 +200,13 @@ int Vision_func() {
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
         std::cout << i++ << ", " << line.field().print() << std::endl;
+    }
+
+    std::cout << std::endl << "Field line classification:" << std::endl;
+    man::vision::FieldLineList* fieldLineList = module.getFieldLines(topCamera);
+    for (int i = 0; i < fieldLineList->size(); i++) {
+        man::vision::FieldLine& line = (*fieldLineList)[i];
+        std::cout << i << ", " << (int) line.id() << std::endl;
     }
 
     lineRet->setData(lineBuf);
