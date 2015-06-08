@@ -38,9 +38,11 @@ public:
 private:
     void DCMPreProcessCallback();
     void DCMPostProcessCallback();
+    void checkFIFO();
 
     int constructSharedMem();
 
+    void listener();
     int startMan();
     int killMan();
 
@@ -66,6 +68,11 @@ private:
     
     uint64_t lastCommandRecvd;
     uint64_t lastSensorSent;
+
+    int fifo_fd;
+
+    //uint64_t commandIndex;
+    //uint64_t sensorIndex;
 };
 
 }

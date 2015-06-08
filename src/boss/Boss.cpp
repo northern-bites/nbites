@@ -6,18 +6,24 @@
 
 #include <iostream>
 
+#define MAN_RESTART 'r'
+#define MAN_KILL    'k'
+#define MAN_START   's'
+
 namespace boss {
 
 Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     AL::ALModule(broker_, name),
     broker(broker_),
-    dcm(broker->getDcmProxy()),//getSpecialisedProxy<AL::DCMProxy>("DCM")),
+    dcm(broker->getDcmProxy()),
     sensor(broker),
     enactor(dcm),
     led(broker),
     manPID(-1),
     manRunning(false),
-    shared(NULL)
+    shared_fd(-1),
+    shared(NULL),
+    fifo_fd(-1)
 {
     std::cout << "Boss Constructor" << std::endl;
 
@@ -42,9 +48,17 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
         std::cout << "Tried to bind postprocess, but failed, because " + e.toString() << std::endl;
     }
 
+    fifo_fd = open("/home/nao/nbites/nbitesFIFO", O_RDONLY | O_NONBLOCK);
+    if (fifo_fd <= 0) {
+        std::cout << "FIFO ERROR" << std::endl;
+    }
+
     std::cout << "Boss Constructed successfully!" << std::endl;
 
     startMan();
+
+    // This will not return.
+    listener();
 }
 
 Boss::~Boss()
@@ -56,11 +70,24 @@ Boss::~Boss()
     // Close shared memory
     munmap(shared, sizeof(SharedData));
     close(shared_fd);
-    sem_close(semaphore);
+}
+
+void Boss::listener()
+{
+    while(1)
+    {
+        checkFIFO();
+        sleep(2);
+    }
 }
 
 int Boss::startMan() {
     // TODO make sure man isn't running yet
+    if (manRunning) {
+        std::cout << "Man is already running. Will not start." << std::endl;
+        return -1;
+    }
+
     std::cout << "Building man!" << std::endl;
     pid_t child = fork();
     if (child > 0) {
@@ -73,14 +100,21 @@ int Boss::startMan() {
     else {
         std::cout << "COULD NOT DETACH MAN" << std::endl;
         manRunning = false;
+        return -1;
     }
-    std::cout << "\t\t\tMan built!" << std::endl;
+    std::cout << "\tMan built!" << std::endl;
+    return 1;
 }
 
 int Boss::killMan() {
     // TODO make sure man is actually running
+    if (!manRunning) {
+        std::cout << "BOSS: Man is not running. Cannot kill" << std::endl;
+        return -1;
+    }
 
     kill(manPID, SIGTERM);
+    manRunning = false;
     return 0; // TODO actually return something
 }
 
@@ -128,47 +162,42 @@ int Boss::constructSharedMem()
 
 void Boss::DCMPreProcessCallback()
 {
+    if (!manRunning) return;
+
     std::string joints;
     std::string stiffs;
     std::string leds;
 
     // Start sem here
     int index = shared->commandSwitch;
-    uint64_t write = 0;//shared->commands[index].writeIndex;
+    uint64_t write = 0;
 
     if (index != -1) {
         Deserialize des(shared->command[index]);
         des.parse();
-        std::cout << des.nObjects() <<" objects in this many bytes: " << des.totalSize() << std::endl;
         joints = des.stringNext();
-        std::cout << "joints" << std::endl;
         stiffs = des.stringNext();
-        std::cout << "stiffs" << std::endl;
         leds = des.string();
-        std::cout << "leds" << std::endl;
+        commandIndex = des.dataIndex();
         shared->commandReadIndex = des.dataIndex();
-        std::cout << "Read 'em" << std::endl;
     }
     // End sem
     if (index == -1) return;
-    return;
 
     JointCommand results;
     results.jointsCommand.ParseFromString(joints);
-    std::cout << results.jointsCommand.DebugString() << std::endl;
     results.stiffnessCommand.ParseFromString(stiffs);
-    std::cout << results.stiffnessCommand.DebugString() << std::endl;
     messages::LedCommand ledResults;
     ledResults.ParseFromString(leds);
-    std::cout << ledResults.DebugString() << std::endl;
 
-    //enactor.command(angles.jointsCommand, angles.stiffnessCommand);
-    //led.setLeds(leds);
+    //enactor.command(results.jointsCommand, results.stiffnessCommand);
+    led.setLeds(ledResults);
 }
 
 void Boss::DCMPostProcessCallback()
 {
-    std::cout << "Post process!" << std::endl;
+    if (!manRunning) return;
+
     SensorValues values = sensor.getSensors();
 
     std::vector<SerializableBase*> objects = {
@@ -184,14 +213,51 @@ void Boss::DCMPostProcessCallback()
         new ProtoSer(&values.stiffStatus),
     };
 
-    ++sensorIndex; // TODO
+    ++sensorIndex;
+
     // Start Semaphore here! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     int index = shared->sensorSwitch ? 0 : 1;
     size_t usedSpace;
     bool returned = serializeTo(objects, sensorIndex, shared->sensors[index], SENSOR_SIZE, &usedSpace);
     shared->sensorSwitch = index;
+    int lastRead = shared->sensorReadIndex;
     // End Semaphore here! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~``
 
-    //std::cout << "We used this much space for sensors " << usedSpace << std::endl;
+    if (sensorIndex - lastRead > 2) {
+        std::cout << "MAN missed a frame" << std::endl;
+    }
+
+    if (sensorIndex - lastRead > 10) {
+        std::cout << "Sensors aren't getting read! Did Man die?" << std::endl;
+        //std::cout << "commandIndex: " << sensorIndex << " lastRead: " << lastRead << std::endl;
+        //manRunning = false; // TODO
+    }
+}
+
+void Boss::checkFIFO() {
+    // Command is going to be a single char, reading two characters consumes '\0'
+    char command[2];
+
+    size_t amt = read(fifo_fd, &command, 2);
+
+    if (amt == 0) {
+        return; // Read nothing
+    }
+
+    switch(command[0]) {
+    case MAN_RESTART:
+        std::cout << "MAN_RESTART" << std::endl;
+        killMan();
+        startMan();
+        break;
+    case MAN_KILL:
+        std::cout << "MAN_KILL" << std::endl;
+        killMan();
+        break;
+    case MAN_START:
+        std::cout << "MAN_START" << std::endl;
+        startMan();
+        break;
+    }
 }
 }

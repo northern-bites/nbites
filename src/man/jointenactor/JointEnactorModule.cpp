@@ -41,18 +41,17 @@ JointEnactorModule::~JointEnactorModule()
 
 void JointEnactorModule::writeCommand()
 {
-    std::cout << "Joint Enactor~~~~~~~~~~~~~~~~~~~" << std::endl;
-    std::cout << "Joints " << latestJointAngles_.DebugString() << std::endl; 
-    std::cout << "Stiff " << latestStiffness_.DebugString() << std::endl; 
-    std::cout << "Leds " << latestLeds_.DebugString() << std::endl; 
-    std::cout << "done~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+    // std::cout << "Joint Enactor~~~~~~~~~~~~~~~~~~~" << std::endl;
+    // std::cout << "Joints " << latestJointAngles_.DebugString() << std::endl; 
+    // std::cout << "Stiff " << latestStiffness_.DebugString() << std::endl; 
+    // std::cout << "Leds " << latestLeds_.DebugString() << std::endl; 
+    // std::cout << "done~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 
     std::vector<SerializableBase*> objects = {
         new ProtoSer(&latestJointAngles_),
         new ProtoSer(&latestStiffness_),
         new ProtoSer(&latestLeds_)
     };
-    std::cout << "Objects size: " << objects.size() << std::endl;
 
     commandIndex++;
 
@@ -66,16 +65,20 @@ void JointEnactorModule::writeCommand()
     if (!returned) {
         std::cout << "Serialization failed!!" << std::endl;
     }
-    std::cout << "JointModule used: " << usedSpace << "bytes, to index: " << index << std::endl;
+    //std::cout << "JointModule used: " << usedSpace << "bytes, to index: " << index << std::endl;
     shared->commandSwitch = index;
     // TODO release semaphore
     double time = timer.end();
-    std::cout << "Enactor critical section took: " << time << std::endl;
-    exit(0);
+    //std::cout << "Enactor critical section took: " << time << std::endl;
+    //exit(0);
+
+    if (commandIndex - lastRead > 1) {
+        std::cout << "BOSS missed a frame" << std::endl;
+    }
 
     if (commandIndex - lastRead > 10 && (lastRead < commandIndex)) {
         std::cout << "Commands aren't getting read! Did Boss die?" << std::endl;
-        std::cout << "commandIndex: " << commandIndex << " lastRead: " << lastRead << std::endl;
+        // std::cout << "commandIndex: " << commandIndex << " lastRead: " << lastRead << std::endl;
         exit(0);
     }
 }

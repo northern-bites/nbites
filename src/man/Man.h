@@ -30,10 +30,11 @@ class Man
 public:
     Man();
     virtual ~Man();
-
+    void stopMan();
 
 private:
     void establishLock();
+
     void startSubThreads();
     void startAndCheckThread(DiagramThread& thread);
 
