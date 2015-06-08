@@ -73,7 +73,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		lc = new LogChooser();
 		left.addTab("control", cntrlp);
 		left.addTab("logs", lc);
-		left.addTab("CameraStrm",camstrmp);
+		left.addTab("camera",camstrmp);
 		
 		statusp = new StatusPanel();
 		right.addTab("status", statusp);

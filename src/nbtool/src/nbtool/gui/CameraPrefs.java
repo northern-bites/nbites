@@ -22,18 +22,18 @@ public class CameraPrefs extends JPanel {
 	private CameraPrefsField prefsField;
 	
 	String[] listOfParams = new String[] {
-		"H_FLIP",
-		"V_FLIP",
-		"Auto-Exposure",
-		"Brightness",
-		"Contrast",
-		"Saturation",
-		"Hue",
-		"Sharpness",
-		"Gamma",
-		"Auto-Whitebalance",
-		"Exposure",
-		"Gain",
+		"H_FLIP [0/1]",
+		"V_FLIP [0/1]",
+		"Auto-Exposure [0/1]",
+		"Brightness [0..255]",
+		"Contrast [16..64]",
+		"Saturation [0..255]",
+		"Hue [-22..22]",
+		"Sharpness [0..255]",
+		"Gamma [0..1000]",
+		"Auto-Whitebalance [0/1]",
+		"Exposure [1..1000]",
+		"Gain [0..255]",
 		"White Balance",
 		"Fade-To-Black"
 	};
