@@ -15,8 +15,8 @@
 #include "serializer.h"
 
 const char * NBITES_MEM = "/nbites-memory";
-const int COMMAND_SIZE = 2048;
-const int SENSOR_SIZE = 1024;
+const int COMMAND_SIZE = (1 << 11);
+const int SENSOR_SIZE = (1 << 10);
 
 struct JointCommand {
     uint64_t writeIndex;
@@ -38,17 +38,23 @@ struct SensorValues {
     messages::StiffStatus stiffStatus;
 };
 
-struct SharedData {
+volatile struct SharedData {
+    uint8_t sensors[2][SENSOR_SIZE];
+    uint8_t command[COMMAND_SIZE];
+
+    pthread_mutex_t sensor_mutex[2];
+    pthread_mutex_t cmnd_mutex;
+    
+    uint8_t sensorSwitch;
+    
+    uint64_t latestCommandIndex;
+    uint64_t latestSensorIndex;
+    
+/*
     volatile int commandSwitch;
     volatile int sensorSwitch;
 
     volatile uint64_t commandReadIndex;
     volatile uint64_t sensorReadIndex;
-
-    uint8_t command[2][COMMAND_SIZE];
-    uint8_t sensors[2][SENSOR_SIZE];
-
-    // seperate mutexes for commands and sensors
-    //pthread_mutex_t command;
-    //pthread_mutex_t sense;
+ */
 };

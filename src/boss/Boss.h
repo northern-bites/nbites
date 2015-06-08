@@ -14,7 +14,6 @@
 #include <boost/thread/thread.hpp>
 #include <vector>
 
-// fork(), pid_t, etc.
 #include <unistd.h> // fork(), pid_t, etc
 #include <sys/signal.h> // SIG_TERM
 #include <sys/mman.h>
@@ -62,11 +61,11 @@ private:
 
     int shared_fd;
     SharedData* shared;
-
-    uint64_t commandIndex;
-    uint64_t sensorIndex;
-
-    sem_t* semaphore;
+    
+    uint8_t sensorStaging[SENSOR_SIZE];
+    
+    uint64_t lastCommandRecvd;
+    uint64_t lastSensorSent;
 };
 
 }
