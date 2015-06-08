@@ -34,6 +34,7 @@ ADD_LIBRARY(
   vision
   STATIC
   ${VISION_SRCS}
+  ${VISION_HEADERS}
   )
 
 ############################ SET LIBRARIES TO LINK WITH

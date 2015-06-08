@@ -167,7 +167,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         // }
         // 
         // leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
-        
+
 #ifdef USE_LOGGING
         {   //brackets let us hide logging code in certain IDEs.
         /*

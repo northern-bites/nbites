@@ -3,6 +3,12 @@
 #include "HighResTimer.h"
 
 #include <iostream>
+#include <chrono>
+
+#include "Profiler.h"
+#include "HighResTimer.h"
+//#include "BallDetector.h"
+//#include "PostDetector.h"
 
 namespace man {
 namespace vision {
@@ -131,7 +137,6 @@ void VisionModule::run_()
         std::cout << "Hough: " << times[i][3] << std::endl;
         std::cout << "Field lines: " << times[i][4] << std::endl;
     }
-
 }
 
 }

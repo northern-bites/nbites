@@ -53,7 +53,6 @@ public class ZoomImageView extends ViewParent {
 		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		
-		
 		this.add(sp);
 	}
 	
