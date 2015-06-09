@@ -194,11 +194,12 @@ Corner::Corner(FieldLine* first_, FieldLine* second_, CornerID id_)
 {}
 
 GoalboxDetector::GoalboxDetector()
-  : parallelThreshold_(10), seperationThreshold_(20)
+  : parallelThreshold_(5), seperationThreshold_(20)
 {}
 
 bool GoalboxDetector::find(FieldLineList& list)
 {
+  std::cout << "Goalbox and corners:" << std::endl;
   for (int i = 0; i < list.size(); i++) {
     for (int j = 0; j < list.size(); j++) {
       // Consider each pair once
@@ -207,8 +208,6 @@ bool GoalboxDetector::find(FieldLineList& list)
       // Get pair of lines
       FieldLine& line1 = list[i];
       FieldLine& line2 = list[j];
-
-      std::cout << "Are " << i << " and " << j << " the goalbox?" << std::endl;
 
       // Find goalbox
       // NOTE since there are two hough lines in each field line, we require
@@ -225,9 +224,11 @@ bool GoalboxDetector::find(FieldLineList& list)
       // TODO just store?
       if (foundGoalbox) {
         if (fabs(line1[0].field().r()) < fabs(line2[0].field().r())) {
+          std::cout << "Box, " << j << ", " << i << std::endl;
           line1.id(LineID::TopGoalbox);
           line2.id(LineID::Endline);
         } else {
+          std::cout << "Box, " << i << ", " << j << std::endl;
           line2.id(LineID::TopGoalbox);
           line1.id(LineID::Endline);
         }
@@ -249,16 +250,11 @@ bool GoalboxDetector::validBox(HoughLine& line1, HoughLine& line2) const
   // Parallel
   double field1PosT = field1.t();
   double field2PosT = field2.t();
-  std::cout << "Angle: " << field1PosT << std::endl;
-  std::cout << "Angle: " << field2PosT << std::endl;
   bool parallel = fabs(field1PosT - field2PosT) < parallelThreshold();
-  std::cout << "Parallel: " << parallel << std::endl;
 
   // Seperated by 60 cm
   double distBetween = fabs(field1.pDist(field2.r()*cos(field2.t()), field2.r()*sin(field2.t())));
-  std::cout << "Dist: " << distBetween << std::endl;
   bool seperation = fabs(distBetween - GOALBOX_DEPTH) < seperationThreshold();
-  std::cout << "Seperation: " << seperation << std::endl;
 
   return parallel && seperation;
 }
@@ -278,18 +274,14 @@ void CornerDetector::findCorners(FieldLineList& list)
       FieldLine& line1 = list[i];
       FieldLine& line2 = list[j];
 
-      std::cout << "Are " << i << " and " << j << " connected by a corner?" << std::endl;
-
       // Find corners
       // NOTE since there are two hough lines in each field line, we require
       //      finding the same corner in all pairings of hough lines
       CornerID firstId = classify(line1[0], line2[0]);
-      std::cout << "ID: " << (int) firstId << std::endl;
       bool foundCorner = !(firstId == CornerID::None);
       for (int k = 1; k < 2; k++) {
         for (int l = 0; l < 2; l++) {
           CornerID newId = classify(line1[k], line2[l]);
-          std::cout << "ID: " << (int) newId << std::endl;
           if (firstId != newId)
             foundCorner = false;
         }
@@ -297,7 +289,7 @@ void CornerDetector::findCorners(FieldLineList& list)
 
       // Create corner object and add to field lines
       if (foundCorner) {
-        std::cout << (int) firstId << " corner found!" << std::endl;
+        std::cout << "Corner, " << i << ", " << j << ", " << (int) firstId << std::endl;
         Corner newCorner;
         if (firstId == CornerID::TSecond)
           newCorner = Corner(&line2, &line1, CornerID::T);
@@ -323,13 +315,8 @@ CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
   double intersectX;
   double intersectY;
 
-  std::cout << "F1: " << field1.print() << std::endl;
-  std::cout << "F2: " << field2.print() << std::endl;
-
   bool intersects = field1.intersect(field2, intersectX, intersectY);
   if (!intersects) return CornerID::None;
-
-  std::cout << "IntersectX: " << intersectX << ", intersectY: " << intersectY << std::endl;
 
   // Find endpoints
   // TODO refactor
@@ -346,11 +333,6 @@ CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
   field1.endPoints(field1End1X, field1End1Y, field1End2X, field1End2Y);
   field2.endPoints(field2End1X, field2End1Y, field2End2X, field2End2Y);
 
-  std::cout << "X: " << field1End1X << ", Y: " << field1End1Y << std::endl;
-  std::cout << "X: " << field1End2X << ", Y: " << field1End2Y << std::endl;
-  std::cout << "X: " << field2End1X << ", Y: " << field2End1Y << std::endl;
-  std::cout << "X: " << field2End2X << ", Y: " << field2End2Y << std::endl;
-
   // Calculate distance
   double dist1[2];
   dist1[0] = dist(field1End1X, field1End1Y, intersectX, intersectY);
@@ -360,17 +342,9 @@ CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
   dist2[0] = dist(field2End1X, field2End1Y, intersectX, intersectY);
   dist2[1] = dist(field2End2X, field2End2Y, intersectX, intersectY);
 
-  std::cout << "Dist1[0]: " << (int) dist1[0] << std::endl;
-  std::cout << "Dist1[1]: " << (int) dist1[1] << std::endl;
-  std::cout << "Dist2[0]: " << (int) dist2[0] << std::endl;
-  std::cout << "Dist2[1]: " << (int) dist2[1] << std::endl;
-
   // Find and classify concave and convex corners
   for (int i = 0; i < 2; i++) {
     for (int j = 0; j < 2; j++) {
-      std::cout << i <<  " - " << j << std::endl;
-      std::cout << "Dist1[1]: " << (int) dist1[i] << std::endl;
-      std::cout << "Dist2[0]: " << (int) dist2[j] << std::endl;
       // Concave or convex corners have both endpoints on the intersection point
       if (dist1[i] < closeThreshold() && dist2[j] < closeThreshold()) {
         // Found concave or convex
