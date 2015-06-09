@@ -137,11 +137,10 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
 
     public void adjustParams() {
 
-        if (firstLoad)
+        if (firstLoad || zeroParam())
             return;
 
-        SExpr newParams = SExpr.newKeyValue(
-            "Params", SExpr.newList(
+        SExpr newParams = SExpr.newList(
             SExpr.newKeyValue("White", SExpr.newList(
             SExpr.newKeyValue("dark_u",  (float)(wDarkU. getValue()) / 100.00),
             SExpr.newKeyValue("dark_v",  (float)(wDarkV. getValue()) / 100.00),
@@ -165,8 +164,7 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
             SExpr.newKeyValue("light_v", (float)(oLightV.getValue()) / 100.00),
             SExpr.newKeyValue("fuzzy_u", (float)(oFuzzyU.getValue()) / 100.00),
             SExpr.newKeyValue("fuzzy_v", (float)(oFuzzyV.getValue()) / 100.00)))
-            )
-        );
+            );
 
         System.out.printf("NEW PARAMS: %s\n\n", (newParams.serialize()));   
 
@@ -174,36 +172,39 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
 
         if (oldParams.exists()) {
             
+            oldParams.setList( SExpr.atom("Params"), newParams); 
             // TODO: use new funcitonality to swap old params for new params
 
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 6; j++) {
-                    oldColor = this.log.tree().find("Params").get(1).get(i).get(1).get(j);
-                    System.out.printf("Old Color: %s\n", oldColor.serialize());   
-                    newColor = newParams.get(1).get(i).get(1).get(j);
-                    System.out.printf("New Color: %s\n", newColor.serialize());
+            // for (int i = 0; i < 3; i++) {
+            //     for (int j = 0; j < 6; j++) {
+            //         oldColor = this.log.tree().find("Params").get(1).get(i).get(1).get(j);
+            //         System.out.printf("Old Color: %s\n", oldColor.serialize());   
+            //         newColor = newParams.get(1).get(i).get(1).get(j);
+            //         System.out.printf("New Color: %s\n", newColor.serialize());
 
-                    // oldColor  = this.log.tree().find("Params").get(1).get(i).get(1).get(j).get(1);
-                    // oldColor = newColor.get(1);
+            //         // oldColor  = this.log.tree().find("Params").get(1).get(i).get(1).get(j).get(1);
+            //         // oldColor = newColor.get(1);
 
-                    oldColor = newColor;
+            //         oldColor.setList(newColor.getList());
 
-                    System.out.printf("N/O Color: %s\n", (oldColor.serialize()));   
+            //         System.out.printf("TEST: %s\n", oldColor.list().serialize());
 
-                    System.out.printf("LOG Color: %s\n\n", this.log.tree().find("Params").get(1).get(i).get(1).get(j).serialize());
+            //         System.out.printf("N/O Color: %s\n", (oldColor.serialize()));   
 
-                }
-            }
+            //         System.out.printf("LOG Color: %s\n\n", this.log.tree().find("Params").get(1).get(i).get(1).get(j).serialize());
+
+            //     }
+            // }
 
             
         } else {
 
             System.out.printf("NOT FOUND: %s\n\n", (this.log.tree().serialize()));    
 
-            this.log.tree().append(newParams);
+            this.log.tree().append(SExpr.pair("Params", newParams));
         }
 
-        System.out.printf("Thos.Log description: %s\n\n", (this.log.tree().serialize()));   
+        System.out.printf("Thos.Log description: %s\n\n", (this.log.tree().print()));   
 
 
         CrossInstance inst = CrossIO.instanceByIndex(0);
@@ -217,6 +218,32 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         CrossCall call = new CrossCall(this, func, this.log);
         inst.tryAddCall(call);
 
+    }
+
+    private boolean zeroParam() {
+        if (wDarkU. getValue() == 0 ||
+            wDarkV. getValue() == 0 ||
+            wLightU.getValue() == 0 ||
+            wLightV.getValue() == 0 ||
+            wFuzzyU.getValue() == 0 ||
+            wFuzzyV.getValue() == 0 ||
+
+            gDarkU. getValue() == 0 ||
+            gDarkV. getValue() == 0 ||
+            gLightU.getValue() == 0 ||
+            gLightV.getValue() == 0 ||
+            gFuzzyU.getValue() == 0 ||
+            gFuzzyV.getValue() == 0 ||
+
+            oDarkU. getValue() == 0 ||
+            oDarkV. getValue() == 0 ||
+            oLightU.getValue() == 0 ||
+            oLightV.getValue() == 0 ||
+            oFuzzyU.getValue() == 0 ||
+            oFuzzyV.getValue() == 0) {
+
+            return true;
+        } else return false;
     }
 
     public void paintComponent(Graphics g) {

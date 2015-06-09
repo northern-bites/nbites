@@ -187,7 +187,17 @@ public class Prefs {
 				ArrayList<Class> classes = new ArrayList<Class>();
 				
 				for (int j = 1; j < cmap.count(); ++j) {
-					classes.add(Class.forName(cmap.get(j).value()));
+					Class c = null;
+					try {
+						c = Class.forName(cmap.get(j).value());
+					} catch (Exception e) {
+						Logger.log(Logger.ERROR, "_____ PREVIOUSLY LOADED CLASS COULD NOT BE FOUND! _____");
+						e.printStackTrace();
+					}
+					
+					if (c != null) {
+						classes.add(c);
+					}
 				}
 				
 				loaded.put(type, classes.toArray(new Class[0]));

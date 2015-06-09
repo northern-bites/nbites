@@ -36,7 +36,7 @@ VisionModule::VisionModule()
         fieldLines[i] = new FieldLineList();
 
         // TODO flag
-        bool fast = true;
+        bool fast = false;
         frontEnd[i]->fast(fast);
         edgeDetector[i]->fast(fast);
         hough[i]->fast(fast);
@@ -145,10 +145,7 @@ ImageFrontEnd* VisionModule::runAndGetFrontEnd(bool top) {
                         image->pixelAddress(0, 0));
 
     // Run front end
-    if (top) 
-        frontEnd[0]->run(yuvLite, colorParams[0]);
-    else 
-        frontEnd[0]->run(yuvLite, colorParams[1]);
+    frontEnd[0]->run(yuvLite, colorParams[!top]);
 
     return frontEnd[0];
 }

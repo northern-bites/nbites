@@ -249,6 +249,29 @@ man::vision::Colors* getColorsFromSliderSExpr(SExpr* params) {
                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));
 
+    i = j = 0;
+
+    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
+    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
+    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
+    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
+    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
+    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << "\n" << std::endl; 
+
+    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
+    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
+    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
+    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
+    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
+    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << "\n" << std::endl;  
+
+    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
+    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
+    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
+    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
+    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
+    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << "\n" << std::endl;
+
     return ret;
 }
 

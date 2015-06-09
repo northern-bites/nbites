@@ -54,4 +54,16 @@ public class Logger {
 			println(String.format("[%-5s] %s", l, String.format(f, args)));
 		}
 	}
+	
+	public static void warnf(String f, Object ... args) {
+		logf(WARN, f, args);
+	}
+	
+	public static void infof(String f, Object ... args) {
+		logf(INFO, f, args);
+	}
+	
+	public static void errorf(String f, Object ... args) {
+		logf(ERROR, f, args);
+	}
 }
