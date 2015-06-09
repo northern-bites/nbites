@@ -58,7 +58,6 @@ ImageTranscriber::ImageTranscriber(Camera::Type which) :
     settings(Camera::getSettings(which)),
     cameraType(which),
     timeStamp(0)
-    //param(std::string("/home/nao/nbites/Config/") + (which == Camera::TOP ? "top" : "bottom") + "CameraParams.txt")
 {
 
     initOpenI2CAdapter();
@@ -763,22 +762,3 @@ void TranscriberModule::run_()
 
 }
 }
-
-
-            /*
-            updated_settings.hflip = param.getParam<bool>("hflip");
-            updated_settings.vflip = param.getParam<bool>("vflip");
-            updated_settings.auto_exposure = param.getParam<bool>("autoexposure");
-            updated_settings.brightness = param.getParam<int>("brightness");
-            updated_settings.contrast = param.getParam<int>("contrast");
-            updated_settings.saturation = param.getParam<int>("saturation");
-            updated_settings.hue = param.getParam<int>("hue");
-            updated_settings.sharpness = param.getParam<int>("sharpness");
-            updated_settings.gamma = param.getParam<int>("gamma");
-            updated_settings.auto_whitebalance = param.getParam<int>("auto_whitebalance");
-            updated_settings.backlight_compensation = 0x00;
-            updated_settings.exposure = param.getParam<int>("exposure");
-            updated_settings.gain = param.getParam<int>("gain");
-            updated_settings.white_balance = param.getParam<int>("white_balance");
-            updated_settings.fade_to_black = param.getParam<int>("fade_to_black");
-            */

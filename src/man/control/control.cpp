@@ -271,22 +271,3 @@ namespace control {
     }
     
 }
-
-            /*
-            boost::property_tree::ptree pt;
-            pt.put<std::string>("whichcamera",receivedParams.whichcamera());
-            pt.put<bool>("hflip",receivedParams.h_flip());
-            pt.put<bool>("vflip",receivedParams.v_flip());
-            pt.put<bool>("autoexposure",receivedParams.auto_exposure());
-            pt.put<int>("brightness",receivedParams.brightness());
-            pt.put<int>("contrast",receivedParams.contrast());
-            pt.put<int>("saturation",receivedParams.saturation());
-            pt.put<int>("hue",receivedParams.hue());
-            pt.put<int>("sharpness",receivedParams.sharpness());
-            pt.put<int>("gamma",receivedParams.gamma());
-            pt.put<int>("auto_whitebalance",receivedParams.autowhitebalance());
-            pt.put<int>("exposure",receivedParams.exposure());
-            pt.put<int>("gain",receivedParams.gain());
-            pt.put<int>("white_balance",receivedParams.whitebalance());
-            pt.put<int>("fade_to_black",receivedParams.fadetoblack());
-            */
