@@ -253,27 +253,11 @@ void ImageTranscriber::initSettings()
             updated_settings.white_balance = params.find("white_balance")->get(1)->valueAsInt();
             updated_settings.fade_to_black = params.find("fade_to_black")->get(1)->valueAsInt();
         } else {
-            std::cout<<"[ERR] Invalid SExpr"<<std::endl;     
+            std::cout<<"[ERR] Invalid SExpr"<<std::endl;   
+            std::cout<<"[ERR] Check /nbites/Config/ for them"<<std::endl;  
         }
-    } else { //if file does not exist obtain settings specified in Camera.h 
-             //(this will be deprecated soon)
-        std::cout<<"[INFO] Setting Params from Camera.h"<<std::endl;
-
-        updated_settings.hflip = settings.hflip;
-        updated_settings.vflip = settings.vflip;
-        updated_settings.auto_exposure = settings.auto_exposure;
-        updated_settings.brightness = settings.brightness;
-        updated_settings.contrast = settings.contrast;
-        updated_settings.saturation = settings.saturation;
-        updated_settings.hue = settings.hue;
-        updated_settings.sharpness = settings.sharpness;
-        updated_settings.gamma = settings.gamma;
-        updated_settings.auto_whitebalance = settings.auto_whitebalance;
-        updated_settings.backlight_compensation = settings.backlight_compensation;
-        updated_settings.exposure = settings.exposure;
-        updated_settings.gain = settings.gain;
-        updated_settings.white_balance = settings.white_balance;
-        updated_settings.fade_to_black = settings.fade_to_black;
+    } else {
+        std::cout<<"[ERR] Config files not found."<<std::endl;
     }
 
     // DO NOT SCREW UP THE ORDER BELOW
