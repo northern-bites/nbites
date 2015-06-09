@@ -104,6 +104,7 @@ int Boss::startMan() {
         //replace this child process with an instance of man.
         execl("/home/nao/nbites/lib/man", "", NULL);
         printf("CHILD PROCESS FAILED TO EXECL MAN!\n");
+        //exit(1);
         int val = *((int *) 0); //FORCE SEG FAULT
     }
     else {
@@ -178,6 +179,7 @@ bool bossSyncRead(volatile SharedData * sd, uint8_t * stage) {
     if (lockret) {
         return false;
     }
+    //locked...
     
     memcpy(stage, (void *) sd->command, COMMAND_SIZE);
     pthread_mutex_unlock((pthread_mutex_t *) &(sd->cmnd_mutex));
@@ -240,7 +242,7 @@ bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, uint64_t index)
         newest = !newest;
         sd->latestSensorWritten = index;
         pthread_mutex_unlock(oldestLock);
-        
+        return true;
     } else if (
         pthread_mutex_trylock(newestLock) == 0
         ) {
@@ -248,6 +250,7 @@ bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, uint64_t index)
         //newest = newest!
         sd->latestSensorWritten = index;
         pthread_mutex_unlock(newestLock);
+        return true;
     } else {
         return false;
     }
