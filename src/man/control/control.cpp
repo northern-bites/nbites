@@ -21,6 +21,7 @@
 #include <iostream>
 #include <fstream>
 #include <exception>
+#include "../../share/logshare/SExpr.h"
 
 using nblog::SExpr;
 using nblog::Log;
@@ -95,34 +96,49 @@ namespace control {
         if(!success) {
             std::cerr<<"Failed to Parse Params\n";
         } else {
-            boost::property_tree::ptree pt;
-            pt.put<std::string>("whichcamera",receivedParams.whichcamera());
-            pt.put<bool>("hflip",receivedParams.h_flip());
-            pt.put<bool>("vflip",receivedParams.v_flip());
-            pt.put<bool>("autoexposure",receivedParams.auto_exposure());
-            pt.put<int>("brightness",receivedParams.brightness());
-            pt.put<int>("contrast",receivedParams.contrast());
-            pt.put<int>("saturation",receivedParams.saturation());
-            pt.put<int>("hue",receivedParams.hue());
-            pt.put<int>("sharpness",receivedParams.sharpness());
-            pt.put<int>("gamma",receivedParams.gamma());
-            pt.put<int>("auto_whitebalance",receivedParams.autowhitebalance());
-            pt.put<int>("exposure",receivedParams.exposure());
-            pt.put<int>("gain",receivedParams.gain());
-            pt.put<int>("white_balance",receivedParams.whitebalance());
-            pt.put<int>("fade_to_black",receivedParams.fadetoblack());
+            SExpr s;
 
-            std::stringstream ss;
-            boost::property_tree::json_parser::write_json(ss,pt);
-            std::string stringToSend = ss.str();
-            std::cout<<stringToSend<<std::endl;
+            SExpr w = SExpr("whichcamera",receivedParams.whichcamera());
+            SExpr h = SExpr("hflip",receivedParams.h_flip());
+            SExpr v = SExpr("vflip",receivedParams.v_flip());
+            SExpr ae = SExpr("autoexposure",receivedParams.auto_exposure());
+            SExpr b = SExpr("brightness",receivedParams.brightness());
+            SExpr c = SExpr("contrast",receivedParams.contrast());
+            SExpr sat = SExpr("saturation",receivedParams.saturation());
+            SExpr hue = SExpr("hue",receivedParams.hue());
+            SExpr sharp = SExpr("sharpness",receivedParams.sharpness());
+            SExpr gamma = SExpr("gamma",receivedParams.gamma());
+            SExpr awb = SExpr("auto_whitebalance",receivedParams.autowhitebalance());
+            SExpr expo = SExpr("exposure",receivedParams.exposure());
+            SExpr gain = SExpr("gain",receivedParams.gain());
+            SExpr wb = SExpr("white_balance",receivedParams.whitebalance());
+            SExpr ftb = SExpr("fade_to_black",receivedParams.fadetoblack());
+
+            s.append(w);
+            s.append(h);
+            s.append(v);
+            s.append(ae);
+            s.append(b);
+            s.append(c);
+            s.append(sat);
+            s.append(hue);
+            s.append(sharp);
+            s.append(gamma);
+            s.append(awb);
+            s.append(expo);
+            s.append(gain);
+            s.append(wb);
+            s.append(ftb);
+
+            std::string stringToWrite = s.serialize();
+
             if(receivedParams.whichcamera() == "TOP"){
-                std::ofstream file("/home/nao/nbites/Config/topCameraParams.json");
-                file << stringToSend;
+                std::ofstream file("/home/nao/nbites/Config/topCameraParams.txt");
+                file << stringToWrite;
                 file.close(); //different name based on camera specified in the protobuf
             } else {
-                std::ofstream file("/home/nao/nbites/Config/bottomCameraParams.json");
-                file << stringToSend;
+                std::ofstream file("/home/nao/nbites/Config/bottomCameraParams.txt");
+                file << stringToWrite;
                 file.close();
             }
         }
@@ -255,3 +271,22 @@ namespace control {
     }
     
 }
+
+            /*
+            boost::property_tree::ptree pt;
+            pt.put<std::string>("whichcamera",receivedParams.whichcamera());
+            pt.put<bool>("hflip",receivedParams.h_flip());
+            pt.put<bool>("vflip",receivedParams.v_flip());
+            pt.put<bool>("autoexposure",receivedParams.auto_exposure());
+            pt.put<int>("brightness",receivedParams.brightness());
+            pt.put<int>("contrast",receivedParams.contrast());
+            pt.put<int>("saturation",receivedParams.saturation());
+            pt.put<int>("hue",receivedParams.hue());
+            pt.put<int>("sharpness",receivedParams.sharpness());
+            pt.put<int>("gamma",receivedParams.gamma());
+            pt.put<int>("auto_whitebalance",receivedParams.autowhitebalance());
+            pt.put<int>("exposure",receivedParams.exposure());
+            pt.put<int>("gain",receivedParams.gain());
+            pt.put<int>("white_balance",receivedParams.whitebalance());
+            pt.put<int>("fade_to_black",receivedParams.fadetoblack());
+            */

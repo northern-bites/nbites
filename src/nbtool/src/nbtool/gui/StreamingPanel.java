@@ -14,10 +14,11 @@ import nbtool.util.Logger;
 import messages.CameraParamsOuterClass;
 import messages.CameraParamsOuterClass.CameraParams;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
-//import org.json.simple.JSONArray;
-//import org.json.simple.JSONObject;
 
 
 public class StreamingPanel extends JPanel implements ActionListener {
@@ -48,12 +49,12 @@ public class StreamingPanel extends JPanel implements ActionListener {
 		canvas.add(topCameraPrefs);
 		canvas.add(bottomCameraPrefs);
 		
-		startStreaming = new JButton("Stream");
+		startStreaming = new JButton("stream");
 		startStreaming.addActionListener(this);
 		startStreaming.setPreferredSize(new Dimension(80,20));
 		canvas.add(startStreaming);
 
-		saveParams = new JButton("Save");
+		saveParams = new JButton("save");
 		saveParams.addActionListener(this);
 		saveParams.setPreferredSize(new Dimension(60,20));
 		canvas.add(saveParams);
@@ -154,76 +155,81 @@ public class StreamingPanel extends JPanel implements ActionListener {
 				.setFadeToBlack(bottomCameraParams[13])
 				.build();
 		
-		ControlInstance second = ControlIO.getByIndex(0);
-		if (second == null) {
+		ControlInstance first = ControlIO.getByIndex(0);
+		if (first == null) {
 			Logger.log(Logger.WARN, "CameraParams clicked when no ControlIO instance available");
 			return;
 		}
-		second.tryAddCmnd(ControlIO.createCmndSetCameraParams(topCamera));
-		second.tryAddCmnd(ControlIO.createCmndSetCameraParams(bottomCamera));
+		first.tryAddCmnd(ControlIO.createCmndSetCameraParams(topCamera));
+		first.tryAddCmnd(ControlIO.createCmndSetCameraParams(bottomCamera));
 	}
 
 	private void trySave(Integer[] topCameraPar, Integer[] bottomCameraPar) {
-		JSONObject topCameraParams = new JSONObject();
-		JSONObject bottomCameraParams = new JSONObject();
+		SExpr top;
+		SExpr bot;
 
-		topCameraParams.put("whichcamera","TOP");
-		bottomCameraParams.put("whichcamera","BOTTOM");
+		top = SExpr.list(
+			SExpr.newKeyValue("whichcamera","TOP"),
+			SExpr.newKeyValue("hflip",topCameraPar[0]),
+			SExpr.newKeyValue("vflip",topCameraPar[1]),
+			SExpr.newKeyValue("autoexposure",topCameraPar[2]),
+			SExpr.newKeyValue("brightness",topCameraPar[3]),
+			SExpr.newKeyValue("contrast",topCameraPar[4]),
+			SExpr.newKeyValue("saturation",topCameraPar[5]),
+			SExpr.newKeyValue("hue",topCameraPar[6]),
+			SExpr.newKeyValue("sharpness",topCameraPar[7]),
+			SExpr.newKeyValue("gamma",topCameraPar[8]),
+			SExpr.newKeyValue("auto_whitebalance",topCameraPar[9]),
+			SExpr.newKeyValue("exposure",topCameraPar[10]),
+			SExpr.newKeyValue("gain",topCameraPar[11]),
+			SExpr.newKeyValue("white_balance",topCameraPar[12]),
+			SExpr.newKeyValue("fade_to_black",topCameraPar[13])
+			);
 
-		topCameraParams.put("hflip",topCameraPar[0]);
-		topCameraParams.put("vflip",topCameraPar[1]);
-		topCameraParams.put("autoexposure",topCameraPar[2]);
-		topCameraParams.put("brightness",topCameraPar[3]);
-		topCameraParams.put("contrast",topCameraPar[4]);
-		topCameraParams.put("saturation",topCameraPar[5]);
-		topCameraParams.put("hue",topCameraPar[6]);
-		topCameraParams.put("sharpness",topCameraPar[7]);
-		topCameraParams.put("gamma",topCameraPar[8]);
-		topCameraParams.put("auto_whitebalance",topCameraPar[9]);
-		topCameraParams.put("exposure",topCameraPar[10]);
-		topCameraParams.put("gain",topCameraPar[11]);
-		topCameraParams.put("white_balance",topCameraPar[12]);
-		topCameraParams.put("fade_to_black",topCameraPar[13]);
+		bot = SExpr.list(
+			SExpr.newKeyValue("whichcamera","TOP"),
+			SExpr.newKeyValue("hflip",bottomCameraPar[0]),
+			SExpr.newKeyValue("vflip",bottomCameraPar[1]),
+			SExpr.newKeyValue("autoexposure",bottomCameraPar[2]),
+			SExpr.newKeyValue("brightness",bottomCameraPar[3]),
+			SExpr.newKeyValue("contrast",bottomCameraPar[4]),
+			SExpr.newKeyValue("saturation",bottomCameraPar[5]),
+			SExpr.newKeyValue("hue",bottomCameraPar[6]),
+			SExpr.newKeyValue("sharpness",bottomCameraPar[7]),
+			SExpr.newKeyValue("gamma",bottomCameraPar[8]),
+			SExpr.newKeyValue("auto_whitebalance",bottomCameraPar[9]),
+			SExpr.newKeyValue("exposure",bottomCameraPar[10]),
+			SExpr.newKeyValue("gain",bottomCameraPar[11]),
+			SExpr.newKeyValue("white_balance",bottomCameraPar[12]),
+			SExpr.newKeyValue("fade_to_black",bottomCameraPar[13])
+			);
+			
+			String topContent = top.serialize();
+			String botContent = bot.serialize();
+			File topFile = new File("../../src/man/config/topCameraParams.txt");
+			File botFile = new File("../../src/man/config/bottomCameraParams.txt");
 
-		bottomCameraParams.put("hflip",bottomCameraPar[0]);
-		bottomCameraParams.put("vflip",bottomCameraPar[1]);
-		bottomCameraParams.put("autoexposure",bottomCameraPar[2]);
-		bottomCameraParams.put("brightness",bottomCameraPar[3]);
-		bottomCameraParams.put("contrast",bottomCameraPar[4]);
-		bottomCameraParams.put("saturation",bottomCameraPar[5]);
-		bottomCameraParams.put("hue",bottomCameraPar[6]);
-		bottomCameraParams.put("sharpness",bottomCameraPar[7]);
-		bottomCameraParams.put("gamma",bottomCameraPar[8]);
-		bottomCameraParams.put("auto_whitebalance",bottomCameraPar[9]);
-		bottomCameraParams.put("exposure",bottomCameraPar[10]);
-		bottomCameraParams.put("gain",bottomCameraPar[11]);
-		bottomCameraParams.put("white_balance",bottomCameraPar[12]);
-		bottomCameraParams.put("fade_to_black",bottomCameraPar[13]);
+			try {
+				BufferedWriter topOut = new BufferedWriter(new FileWriter(topFile));
+				topOut.write(topContent);
+				topOut.close();
 
-		try {
-			FileWriter topFile = new FileWriter("~/nbites/src/man/config/topCameraParams.json");
-			FileWriter bottomFile = new FileWriter("~/nbites/src/man/config/bottomCameraParams.json");
-
-			topFile.write(topCameraParams.toJSONString());
-			topFile.flush();
-			topFile.close();
-
-			bottomFile.write(bottomCameraParams.toJSONString());
-			bottomFile.flush();
-			bottomFile.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+				BufferedWriter botOut = new BufferedWriter(new FileWriter(botFile));
+				botOut.write(botContent);
+				botOut.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 	}
 	
 	private void useStatus(STATUS s) {
 		switch (s) {
 		case IDLE:
-			startStreaming.setText("Start");
+			startStreaming.setText("stream");
 			startStreaming.setEnabled(true);
 			break;
 		case RUNNING:
-			startStreaming.setText("Running");
+			startStreaming.setText("streaming");
 			startStreaming.setEnabled(false);
 			break;
 		default:

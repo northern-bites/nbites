@@ -6,6 +6,9 @@
 #include <sys/mman.h>
 #include <cerrno>
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <streambuf>
 #include <linux/version.h>
 #include <bn/i2c/i2c-dev.h>
 #include <vector>
@@ -16,6 +19,7 @@
 #include "../log/logging.h"
 #include "../control/control.h"
 #include "nbdebug.h"
+#include "../../share/logshare/SExpr.h"
 
 using nblog::SExpr;
 using nblog::NBLog;
@@ -53,8 +57,8 @@ TranscriberBuffer::~TranscriberBuffer()
 ImageTranscriber::ImageTranscriber(Camera::Type which) :
     settings(Camera::getSettings(which)),
     cameraType(which),
-    timeStamp(0),
-    param(std::string("/home/nao/nbites/Config/") + (which == Camera::TOP ? "top" : "bottom") + "CameraParams.json")
+    timeStamp(0)
+    //param(std::string("/home/nao/nbites/Config/") + (which == Camera::TOP ? "top" : "bottom") + "CameraParams.txt")
 {
 
     initOpenI2CAdapter();
@@ -214,38 +218,42 @@ void ImageTranscriber::initSettings()
 {
     std::string filepath;
     if(cameraType == Camera::TOP) {
-        filepath = "/home/nao/nbites/Config/topCameraParams.json";
-        std::cout<<"Camera::TOP"<<std::endl;
+        filepath = "/home/nao/nbites/Config/topCameraParams.txt";
+        std::cout<<"[INFO] Camera::TOP"<<std::endl;
     } else {
-        filepath = "/home/nao/nbites/Config/bottomCameraParams.json";
-        std::cout<<"Camera::BOTTOM"<<std::endl;
+        filepath = "/home/nao/nbites/Config/bottomCameraParams.txt";
+        std::cout<<"[INFO] Camera::BOTTOM"<<std::endl;
     }
     
-    ParamReader temp(filepath);
-    param = temp;
-
     if(FILE *file = fopen(filepath.c_str(),"r")) {
         fclose(file);
-        if(!param.isEmpty()) { //check if JSON contains anything/is properly formatted
-            std::cout<<"[INFO] Reading from JSON"<<std::endl;
+        
+        std::ifstream inputFile(filepath);
+        std::string readInFile((std::istreambuf_iterator<char>(inputFile)),
+                                std::istreambuf_iterator<char>());
 
-            updated_settings.hflip = param.getParam<bool>("hflip");
-            updated_settings.vflip = param.getParam<bool>("vflip");
-            updated_settings.auto_exposure = param.getParam<bool>("autoexposure");
-            updated_settings.brightness = param.getParam<int>("brightness");
-            updated_settings.contrast = param.getParam<int>("contrast");
-            updated_settings.saturation = param.getParam<int>("saturation");
-            updated_settings.hue = param.getParam<int>("hue");
-            updated_settings.sharpness = param.getParam<int>("sharpness");
-            updated_settings.gamma = param.getParam<int>("gamma");
-            updated_settings.auto_whitebalance = param.getParam<int>("auto_whitebalance");
-            updated_settings.backlight_compensation = 0x00;
-            updated_settings.exposure = param.getParam<int>("exposure");
-            updated_settings.gain = param.getParam<int>("gain");
-            updated_settings.white_balance = param.getParam<int>("white_balance");
-            updated_settings.fade_to_black = param.getParam<int>("fade_to_black");
+        int i=0;
+        SExpr params = *SExpr::read(readInFile,i);
+
+        if(params.count() >= 2) {
+            std::cout<<"[INFO] Reading from SExpr"<<std::endl;
+
+            updated_settings.hflip = params.find("hflip")->get(1)->valueAsInt();
+            updated_settings.vflip = params.find("vflip")->get(1)->valueAsInt();
+            updated_settings.auto_exposure = params.find("autoexposure")->get(1)->valueAsInt();
+            updated_settings.brightness = params.find("brightness")->get(1)->valueAsInt();
+            updated_settings.contrast = params.find("contrast")->get(1)->valueAsInt();
+            updated_settings.saturation = params.find("saturation")->get(1)->valueAsInt();
+            updated_settings.hue = params.find("hue")->get(1)->valueAsInt();
+            updated_settings.sharpness = params.find("sharpness")->get(1)->valueAsInt();
+            updated_settings.gamma = params.find("gamma")->get(1)->valueAsInt();
+            updated_settings.auto_whitebalance = params.find("auto_whitebalance")->get(1)->valueAsInt();
+            updated_settings.exposure = params.find("exposure")->get(1)->valueAsInt();
+            updated_settings.gain = params.find("gain")->get(1)->valueAsInt();
+            updated_settings.white_balance = params.find("white_balance")->get(1)->valueAsInt();
+            updated_settings.fade_to_black = params.find("fade_to_black")->get(1)->valueAsInt();
         } else {
-            std::cout<<"[ERR] No Children"<<std::endl;     
+            std::cout<<"[ERR] Invalid SExpr"<<std::endl;     
         }
     } else { //if file does not exist obtain settings specified in Camera.h 
              //(this will be deprecated soon)
@@ -592,9 +600,9 @@ void TranscriberModule::run_()
     struct stat file_stats;
     std::string filepath;
     if(it.type() == Camera::TOP) { //set path according to camera
-        filepath = "/home/nao/nbites/Config/topCameraParams.json";
+        filepath = "/home/nao/nbites/Config/topCameraParams.txt";
     } else {
-        filepath = "/home/nao/nbites/Config/bottomCameraParams.json";
+        filepath = "/home/nao/nbites/Config/bottomCameraParams.txt";
     }
     if(FILE *file = fopen(filepath.c_str(),"r")) { //existence check
         fclose(file);
@@ -771,3 +779,22 @@ void TranscriberModule::run_()
 
 }
 }
+
+
+            /*
+            updated_settings.hflip = param.getParam<bool>("hflip");
+            updated_settings.vflip = param.getParam<bool>("vflip");
+            updated_settings.auto_exposure = param.getParam<bool>("autoexposure");
+            updated_settings.brightness = param.getParam<int>("brightness");
+            updated_settings.contrast = param.getParam<int>("contrast");
+            updated_settings.saturation = param.getParam<int>("saturation");
+            updated_settings.hue = param.getParam<int>("hue");
+            updated_settings.sharpness = param.getParam<int>("sharpness");
+            updated_settings.gamma = param.getParam<int>("gamma");
+            updated_settings.auto_whitebalance = param.getParam<int>("auto_whitebalance");
+            updated_settings.backlight_compensation = 0x00;
+            updated_settings.exposure = param.getParam<int>("exposure");
+            updated_settings.gain = param.getParam<int>("gain");
+            updated_settings.white_balance = param.getParam<int>("white_balance");
+            updated_settings.fade_to_black = param.getParam<int>("fade_to_black");
+            */
