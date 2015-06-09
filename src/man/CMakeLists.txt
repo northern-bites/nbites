@@ -159,3 +159,10 @@ target_link_libraries(
 install( TARGETS man
   LIBRARY DESTINATION lib
 )
+
+file( GLOB configFiles
+  "config/*"
+)
+
+install( FILES ${configFiles}
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/Config )
