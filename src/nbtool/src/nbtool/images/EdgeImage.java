@@ -13,10 +13,6 @@ public class EdgeImage extends ImageParent {
 		super(w, h, d);
 	}
 
-	@Override
-	public int pixelSize() {
-		return -1;
-	}
 	
 	private static final Color[] angleMap = initColorMap();
 	
