@@ -1065,13 +1065,11 @@ std::vector<BodyJointCommand::ptr> MotionModule::generateNextArmProviderTransiti
     std::vector<float> stiffness(Kinematics::NUM_JOINTS, 0.75f);
 
     std::vector<float> empty(0);
-    if (time > MOTION_FRAME_LENGTH_S * 30){
-        commands.push_back(
-            BodyJointCommand::ptr (
-                new BodyJointCommand(.5f,safe_larm, empty,empty,safe_rarm,
-                                     stiffness,
-                                     Kinematics::INTERPOLATION_SMOOTH)) );
-    }
+    commands.push_back(
+        BodyJointCommand::ptr (
+            new BodyJointCommand(.5f,safe_larm, empty,empty,safe_rarm,
+                                 stiffness,
+                                 Kinematics::INTERPOLATION_SMOOTH)) );
 
     return commands;
 }
