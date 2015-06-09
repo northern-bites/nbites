@@ -114,8 +114,6 @@ void GuardianModule::countButtonPushes()
  */
 void GuardianModule::checkFalling()
 {
-    falling = false;
-    return;
     if (!useFallProtection)
     {
         return;
