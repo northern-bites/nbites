@@ -15,7 +15,7 @@
 using nblog::Log;
 using nblog::SExpr;
 
-man::vision::Colors* getColorsFromSliderValues(float* params);
+man::vision::Colors* getColorsFromSliderSExpr(SExpr* params);
 void updateSavedColorParams(std::string jsonPath, float* params, bool top);
 SExpr getSExprFromSavedParams(int color, std::string jsonPath, bool top);
 std::string getSExprStringFromColorJSonNode(boost::property_tree::ptree tree);
@@ -55,10 +55,16 @@ int Vision_func() {
     module.inertialsIn.setMessage(emptyInertialsMessage);
 
     // If log included colors in description, update color params, but leave json data
-    if (args.size() > 1) {
-        man::vision::Colors* newParams = getColorsFromSliderValues((float*)args[1]);
-        module.setColorParams(newParams, top);
-    }
+    SExpr* params = args[0]->tree().find("Params");
+    if (params != NULL) {
+        std::cout << "FOUND PARAMS: " << params->serialize() <<  std::endl;
+        module.setColorParams(getColorsFromSliderSExpr(params), top);
+    } else { std::cout << "NO PARAMS" << std::endl; }
+
+    // if (args.size() > 1) {
+    //     man::vision::Colors* newParams = getColorsFromSliderValues((float*)args[1]);
+    //     module.setColorParams(newParams, top);
+    // }
 
     // If log says to save, save current params to json file
     if (args.size() > 2) {
@@ -217,14 +223,32 @@ int Vision_func() {
     return 0;
 }
 
-man::vision::Colors* getColorsFromSliderValues(float* params) {
+man::vision::Colors* getColorsFromSliderSExpr(SExpr* params) {
     man::vision::Colors* ret = new man::vision::Colors;
-    ret->white. load(params[0], params[1], params[2],
-                     params[3], params[4], params[5]);
-    ret->green. load(params[6], params[7], params[8],
-                     params[9], params[10],params[11]);
-    ret->orange.load(params[12],params[13],params[14],
-                     params[15],params[16],params[17]);
+    
+    int i, j = 0;
+
+    ret->white.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize())); 
+
+    ret->green.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));  
+
+    ret->orange.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));
+
     return ret;
 }
 

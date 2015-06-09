@@ -21,7 +21,6 @@ import nbtool.io.CrossIO.CrossCall;
 import nbtool.io.CrossIO.CrossFunc;
 import nbtool.io.CrossIO.CrossInstance;
 import nbtool.util.Utility;
-import nbtool.util.ColorLoader;
 
 public class ImageConverterView extends ViewParent implements IOFirstResponder {
     private BufferedImage yImage;
@@ -51,18 +50,11 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
     private JSlider oFuzzyU;
     private JSlider oFuzzyV;
 
-    // private ColorLoader whiteColor;
-    // private ColorLoader greenColor;
-    // private ColorLoader orangeColor;
-
-
     private boolean firstLoad;
 
     public ImageConverterView() {
         super();
         firstLoad = true;
-
-        System.out.printf("CONSTRUCTING\n");
 
         // TODO save button: pass color params back to nbfunc (how?)
             // have it rewrite the json data
@@ -70,6 +62,7 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         ChangeListener slide = new ChangeListener(){
             public void stateChanged(ChangeEvent e) {
                 adjustParams();
+                repaint();
             }
         };
 
@@ -144,39 +137,74 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
 
     public void adjustParams() {
 
-        SExpr newParams = SExpr.newList(
-                        SExpr.newAtom("Params"),
-                        SExpr.newAtom("White"),
-                        SExpr.newKeyValue("dark_u",  (float)(wDarkU. getValue()) / 100.00),
-                        SExpr.newKeyValue("dark_v",  (float)(wDarkV. getValue()) / 100.00),
-                        SExpr.newKeyValue("light_u", (float)(wLightU.getValue()) / 100.00),
-                        SExpr.newKeyValue("light_v", (float)(wLightV.getValue()) / 100.00),
-                        SExpr.newKeyValue("fuzzy_u", (float)(wFuzzyU.getValue()) / 100.00),
-                        SExpr.newKeyValue("fuzzy_v", (float)(wFuzzyV.getValue()) / 100.00)
+        if (firstLoad)
+            return;
+
+        SExpr newParams = SExpr.newKeyValue(
+            "Params", SExpr.newList(
+            SExpr.newKeyValue("White", SExpr.newList(
+            SExpr.newKeyValue("dark_u",  (float)(wDarkU. getValue()) / 100.00),
+            SExpr.newKeyValue("dark_v",  (float)(wDarkV. getValue()) / 100.00),
+            SExpr.newKeyValue("light_u", (float)(wLightU.getValue()) / 100.00),
+            SExpr.newKeyValue("light_v", (float)(wLightV.getValue()) / 100.00),
+            SExpr.newKeyValue("fuzzy_u", (float)(wFuzzyU.getValue()) / 100.00),
+            SExpr.newKeyValue("fuzzy_v", (float)(wFuzzyV.getValue()) / 100.00))),
+
+            SExpr.newKeyValue("Green", SExpr.newList(
+            SExpr.newKeyValue("dark_u",  (float)(gDarkU. getValue()) / 100.00),
+            SExpr.newKeyValue("dark_v",  (float)(gDarkV. getValue()) / 100.00),
+            SExpr.newKeyValue("light_u", (float)(gLightU.getValue()) / 100.00),
+            SExpr.newKeyValue("light_v", (float)(gLightV.getValue()) / 100.00),
+            SExpr.newKeyValue("fuzzy_u", (float)(gFuzzyU.getValue()) / 100.00),
+            SExpr.newKeyValue("fuzzy_v", (float)(gFuzzyV.getValue()) / 100.00))),
+
+            SExpr.newKeyValue("Orange", SExpr.newList(
+            SExpr.newKeyValue("dark_u",  (float)(oDarkU. getValue()) / 100.00),
+            SExpr.newKeyValue("dark_v",  (float)(oDarkV. getValue()) / 100.00),
+            SExpr.newKeyValue("light_u", (float)(oLightU.getValue()) / 100.00),
+            SExpr.newKeyValue("light_v", (float)(oLightV.getValue()) / 100.00),
+            SExpr.newKeyValue("fuzzy_u", (float)(oFuzzyU.getValue()) / 100.00),
+            SExpr.newKeyValue("fuzzy_v", (float)(oFuzzyV.getValue()) / 100.00)))
+            )
         );
 
-        System.out.printf("NEW PARAMS: %d\n", (newParams.serialize()));    
+        System.out.printf("NEW PARAMS: %s\n\n", (newParams.serialize()));   
 
-        // whiteColor. setDarkU( (float)wDarkU. getValue() / 100);
-        // whiteColor. setDarkV( (float)wDarkV. getValue() / 100);
-        // whiteColor. setLightU((float)wLightU.getValue() / 100);
-        // whiteColor. setLightV((float)wLightV.getValue() / 100);
-        // whiteColor. setFuzzyU((float)wFuzzyU.getValue() / 100);
-        // whiteColor. setFuzzyV((float)wFuzzyV.getValue() / 100);
+       SExpr oldColor, newColor, oldParams = this.log.tree().find("Params");
 
-        // greenColor. setDarkU( (float)gDarkU. getValue() / 100);
-        // greenColor. setDarkV( (float)gDarkV. getValue() / 100);
-        // greenColor. setLightU((float)gLightU.getValue() / 100);
-        // greenColor. setLightV((float)gLightV.getValue() / 100);
-        // greenColor. setFuzzyU((float)gFuzzyU.getValue() / 100);
-        // greenColor. setFuzzyV((float)gFuzzyV.getValue() / 100);
-    
-        // orangeColor.setDarkU( (float)oDarkU. getValue() / 100);
-        // orangeColor.setDarkV( (float)oDarkV. getValue() / 100);
-        // orangeColor.setLightU((float)oLightU.getValue() / 100);
-        // orangeColor.setLightV((float)oLightV.getValue() / 100);
-        // orangeColor.setFuzzyU((float)oFuzzyU.getValue() / 100);
-        // orangeColor.setFuzzyV((float)oFuzzyV.getValue() / 100);
+        if (oldParams.exists()) {
+            
+            // TODO: use new funcitonality to swap old params for new params
+
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 6; j++) {
+                    oldColor = this.log.tree().find("Params").get(1).get(i).get(1).get(j);
+                    System.out.printf("Old Color: %s\n", oldColor.serialize());   
+                    newColor = newParams.get(1).get(i).get(1).get(j);
+                    System.out.printf("New Color: %s\n", newColor.serialize());
+
+                    // oldColor  = this.log.tree().find("Params").get(1).get(i).get(1).get(j).get(1);
+                    // oldColor = newColor.get(1);
+
+                    oldColor = newColor;
+
+                    System.out.printf("N/O Color: %s\n", (oldColor.serialize()));   
+
+                    System.out.printf("LOG Color: %s\n\n", this.log.tree().find("Params").get(1).get(i).get(1).get(j).serialize());
+
+                }
+            }
+
+            
+        } else {
+
+            System.out.printf("NOT FOUND: %s\n\n", (this.log.tree().serialize()));    
+
+            this.log.tree().append(newParams);
+        }
+
+        System.out.printf("Thos.Log description: %s\n\n", (this.log.tree().serialize()));   
+
 
         CrossInstance inst = CrossIO.instanceByIndex(0);
         if (inst == null)
@@ -185,9 +213,6 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         CrossFunc func = inst.functionWithName("Vision");
         if (func == null)
             return;
-        
-        // TODO great sexpresion of 3 param sets, each field from slider vals, add to this.log
-
 
         CrossCall call = new CrossCall(this, func, this.log);
         inst.tryAddCall(call);
@@ -199,6 +224,7 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         int vB = 5;  // verticle buffer
         int sH = 15; // slider height
         int tB = 20; // text buffer
+        int lB = 5;  // little buffer
 
         int width = 320;
         int height = 240;
@@ -219,6 +245,18 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         if (segmentedImage != null) {
             g.drawImage(segmentedImage, width + vB,  height + sH*6 + tB*3, null);
         }
+
+        g.drawString("white U and V thresholds for when Y is 0",    width*0 + tB*0, height + tB*1 + sH*0 - lB);
+        g.drawString("white U and V thresholds for when Y is 255",  width*0 + tB*0, height + tB*2 + sH*2 - lB);
+        g.drawString("width of fuzzy threshold for U and V",        width*0 + tB*0, height + tB*3 + sH*4 - lB);
+
+        g.drawString("green U and V thresholds for when Y is 0",    width*1 + vB*1, height + tB*1 + sH*0 - lB);
+        g.drawString("green U and V thresholds for when Y is 255",  width*1 + vB*1, height + tB*2 + sH*2 - lB);
+        g.drawString("width of fuzzy threshold for U and V",        width*1 + vB*1, height + tB*3 + sH*4 - lB);
+
+        g.drawString("orange U and V thresholds for when Y is 0",   width*2 + vB*2, height + tB*1 + sH*0 - lB);
+        g.drawString("orange U and V thresholds for when Y is 255", width*2 + vB*2, height + tB*2 + sH*2 - lB);
+        g.drawString("width of fuzzy threshold for U and V",        width*2 + vB*2, height + tB*3 + sH*4 - lB);
 
         wDarkU. setBounds(width*0 + vB*1, height + sH*0 + tB*1, width - vB*2, sH);
         wDarkV. setBounds(width*0 + vB*1, height + sH*1 + tB*1, width - vB*2, sH);
@@ -293,7 +331,6 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
 
         if (firstLoad) {
             firstIoReceived(out);
-            firstLoad = false;
         }
 
         repaint();
@@ -328,6 +365,8 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         oLightV.setValue((int)(Float.parseFloat(colors.get(4).get(1).value()) * 100));
         oFuzzyU.setValue((int)(Float.parseFloat(colors.get(5).get(1).value()) * 100));
         oFuzzyV.setValue((int)(Float.parseFloat(colors.get(6).get(1).value()) * 100));
+
+        firstLoad = false;
         
     }
 
