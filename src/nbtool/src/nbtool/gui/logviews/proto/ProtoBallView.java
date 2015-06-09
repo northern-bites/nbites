@@ -100,9 +100,6 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 			int nBallX = (robotX - OFFSET*((Float) nbY.get(i)).intValue());
 			int nBallY = (robotY - OFFSET*((Float) nbX.get(i)).intValue());
 
-			lineEndX = (lineEndX > width) ? width - 10 : lineEndX;
-			lineEndY = (lineEndY > height) ? height - 10 : lineEndY;
-
 			g.setColor(new Color(0.f,0.f,.9f,(float)(.2 + .2*(i/nbX.size()))));
 			g.drawOval(nBallX - (BALL_SIZE/2), nBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 			g.fillOval(nBallX - (BALL_SIZE/2), nBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
@@ -110,11 +107,7 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 		}
 
 		g.setColor(Color.black);
-		g.drawString("nb_x_start: " + nbX.get(1), 10, height + 60);
-		g.drawString("nb_y_start: " + nbY.get(1), 10, height + 80);
-		g.setColor(Color.black);
-		g.drawString("nb_x_end: " + nbX.get(0), 10, height + 100);
-		g.drawString("nb_y_end: " + nbY.get(0), 10, height + 120);
+		g.drawString("stationary: " + naiveBall.get("stationary"), 10, height + 70);
 
 		ArrayList<Float> dest_buf_x = (ArrayList<Float>)naiveBall.get("buf_x");
 		ArrayList<Float> dest_buf_y = (ArrayList<Float>)naiveBall.get("buf_y");
@@ -129,12 +122,14 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 		lineEndY = (lineEndY > height) ? height - 10 : lineEndY;
 
 		for (int i = 0; i < dest_buf_x.size(); i++) {
-			int nBallX = (robotX - OFFSET*((Float) dest_buf_y.get(i)).intValue());
-			int nBallY = (robotY - OFFSET*((Float) dest_buf_x.get(i)).intValue());
+			int dBallX = (robotX - OFFSET*((Float) dest_buf_y.get(i)).intValue());
+			int dBallY = (robotY - OFFSET*((Float) dest_buf_x.get(i)).intValue());
+
+			if (dBallX > width || dBallY > height) break;
 
 			g.setColor(new Color(0.9f,0.8f,0.0f,.8f));
-			g.drawOval(nBallX - (BALL_SIZE/2), nBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
-			g.fillOval(nBallX - (BALL_SIZE/2), nBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
+			g.drawOval(dBallX - (BALL_SIZE/2), dBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
+			g.fillOval(dBallX - (BALL_SIZE/2), dBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 		}
 
 		g.setColor(Color.black);

@@ -227,7 +227,7 @@ void NaiveBallModule::naivePredict(NaiveBallModule::BallState b)
 
 bool NaiveBallModule::checkIfStationary()
 {
-    if (xVelocityEst < STATIONARY_THRESHOLD && yVelocityEst < STATIONARY_THRESHOLD) { return true; }
+    if (fabs(xVelocityEst) < STATIONARY_THRESHOLD && fabs(yVelocityEst) < STATIONARY_THRESHOLD) { return true; }
     return false;
 }
 
