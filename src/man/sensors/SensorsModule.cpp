@@ -84,7 +84,7 @@ std::string SensorsModule::makeSweetMoveTuple(const messages::JointAngles* angle
 bool sensorSyncRead(volatile SharedData * sd, uint8_t * stage)
 {
     uint8_t bufi = sd->sensorSwitch;
-    pthread_mutex_t * lock = sd->sensor_mutex[bufi];
+    pthread_mutex_t * lock = (pthread_mutex_t *) sd->sensor_mutex[bufi];
     
     pthread_mutex_lock(lock);
     memcpy(stage, sd->sensors[bufi], SENSOR_SIZE);
