@@ -1,26 +1,18 @@
 package nbtool.util;
 
 import java.awt.BorderLayout;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.security.KeyPair;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.tree.TreePath;
 
 import nbtool.data.Log;
 import nbtool.data.SExpr;
@@ -30,29 +22,7 @@ import nbtool.images.Y16image;
 import nbtool.images.YUYV8888image;
 
 
-public class U {
-	
-	/*
-	 * Currently synchronized to avoid output interleaving.
-	 * 
-	 * If the code becomes sluggish, behaves erratically, this is a good place to start looking...
-	 * */
-	
-	/*
-	 * Also: synch methods sync on the class.  So while it makes sense for these three to be synchronized, if other static U methods
-	 * need to be synchronized it should be with a different locking object.
-	 * */
-	public static synchronized void w(String s) {
-		System.out.println(s);
-	}
-	
-	public static synchronized void wnl(String s) {
-		System.out.print(s);
-	}
-	
-	public static synchronized void wf(String f, Object ... a) {
-		System.out.printf(f, a);
-	}
+public class Utility {
 	
 	public static byte[] subArray(byte[] ar, int start, int len) {
 		byte[] ret = new byte[len];
@@ -64,10 +34,10 @@ public class U {
 	
 	//Almost all image logs will have null or [Y8(U8/V8)] encoding, but this method should be extended if that changes.
 	public static BufferedImage biFromLog(Log log) {
-		assert(log.pType().equalsIgnoreCase(NBConstants.IMAGE_S));
-		int width = log.pWidth();
-		int height = log.pHeight();
-		String encoding = log.pEncoding();
+		assert(log.primaryType().equalsIgnoreCase(NBConstants.IMAGE_S));
+		int width = log.primaryWidth();
+		int height = log.primaryHeight();
+		String encoding = log.primaryEncoding();
 		
 		ImageParent ip = null;
 		if (encoding == null ) {
@@ -80,7 +50,7 @@ public class U {
 		} else if (encoding.equalsIgnoreCase("[U8V8]")) {
 			ip = new UV88image(width , height, log.bytes);
 		} else {
-			U.w("WARNING:  Cannot use image with encoding:" + encoding);
+			Logger.log(Logger.WARN, "Cannot use image with encoding:" + encoding);
 			return null;
 		}
 		
@@ -132,7 +102,7 @@ public class U {
 		String except;
 		
 		try {
-			except = P.CLASS_EXCEPTIONS_MAP.get(type);
+			except = Prefs.CLASS_EXCEPTIONS_MAP.get(type);
 		} catch(MissingResourceException mre) {
 			except = null;
 		}
@@ -216,18 +186,20 @@ public class U {
 	}
 	
 	
-	
-	public static boolean is_v6Log(Log tocheck) {
-		return (tocheck.description.trim().startsWith("(nblog"));
+	public static boolean isv6Description(String desc) {
+		return (desc != null && desc.trim().startsWith("(nblog"));
 	}
 	
-	/* Modifies the description field of old */
+	/* creates tree for param old out of old._olddesc_ */
 	public static boolean v6Convert(Log old) {
-		if (is_v6Log(old))
-			return true;	//nothing to do
-		
+		if (old._olddesc_ != null && isv6Description(old._olddesc_)) {
+			old.setTree(SExpr.deserializeFrom(old._olddesc_));
+			return true;
+		}
+		if (old._olddesc_ == null) return false;	//nothing to work with.
+				
 		HashMap<String, String> map = new HashMap<String, String>();
-		String[] attrs = old.description.trim().split(" ");
+		String[] attrs = old._olddesc_.trim().split(" ");
 		for (String a : attrs) {
 			if (a.trim().isEmpty()) continue;
 			
@@ -235,19 +207,20 @@ public class U {
 			if (parts.length != 2)
 				return false;	//Don't attempt to reconstruct malformed descriptions.
 			
-			String type = parts[0].trim();
-			if (type.isEmpty())
+			String key = parts[0].trim();
+			if (key.isEmpty())
 				return false;
 			
 			String value = parts[1].trim();
 			if (value.isEmpty())
 				return false;
 			
-			if (map.containsKey(type)) {
+			if (map.containsKey(key)) {
+				//we never allowed duplicate keys
 				return false;
 			}
 			
-			map.put(type, value);
+			map.put(key, value);
 		}
 		
 		if (map.containsKey("checksum")) {
@@ -288,7 +261,7 @@ public class U {
 		
 		top_level.append(clist);
 		
-		old.description = top_level.serialize();
+		old.setTree(top_level);
 		return true;
 	}
 	

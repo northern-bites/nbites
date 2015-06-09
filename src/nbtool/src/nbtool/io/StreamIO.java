@@ -11,15 +11,21 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 import nbtool.data.Log;
 import nbtool.data.Log.SOURCE;
 import nbtool.data.SExpr;
-import nbtool.util.N;
-import nbtool.util.N.EVENT;
+import nbtool.io.CommonIO.GIOFirstResponder;
+import nbtool.io.CommonIO.IOFirstResponder;
+import nbtool.io.CommonIO.IOState;
+import nbtool.io.CommonIO.SequenceErrorException;
+import nbtool.util.Events;
+import nbtool.util.Logger;
 import nbtool.util.NBConstants;
-import nbtool.util.P;
-import nbtool.util.U;
+import nbtool.util.Prefs;
+import nbtool.util.Utility;
 
 /**
  * NetIO objects are connections to a single robot.  They are intended to constitute the run loop of their own thread.
@@ -44,138 +50,151 @@ import nbtool.util.U;
  * 	 be called when run() will return, meaning all exceptions need to be handled inside the run loop.
  * */
 
-public class StreamIO implements Runnable {
-	private String server_address;
-	private int server_port;
+public class StreamIO {
 	
-	public interface Boss {
-		void takeDelivery(Log log);
-		void netThreadExiting();
-	}
-	private Boss boss;
-	
-	private volatile boolean running;
-	
-	public StreamIO(String addr, int p, Boss b) {
-		server_address = addr;
-		server_port = p;
-		boss = b;
-		
-		running = false;
-	}
-	
-	//Intended to be called from another thread, presumably by the boss.
-	public void stop() {
-		running = false;
-	}
-	
-	public void run() {
-		running = true;
-		Socket socket = null;
-		try {
-			U.w("NetIO: thread created with sa=" + server_address + " sp=" + server_port);
-			assert(server_address != null && server_port != 0 && boss != null);
+	private static final LinkedList<StreamInstance> instances = new LinkedList<>();
 
-			socket = CommonIO.setupNetSocket(server_address, server_port);
-			
-			BufferedOutputStream _out =  new BufferedOutputStream(socket.getOutputStream());
-			BufferedInputStream _in = new BufferedInputStream(socket.getInputStream());
-			
-			DataOutputStream out = new DataOutputStream(_out);
-			DataInputStream in = new DataInputStream(_in);
-			
-			U.w("NetIO: thread connected.");
-			N.notifyEDT(EVENT.SIO_THREAD, this, true);
+	public static StreamInstance create(IOFirstResponder ifr, String host, int port) {
+		StreamInstance si = new StreamInstance(host, port);
+		si.ifr = ifr;
+		
+		synchronized(instances) {
+			instances.add(si);
+		}
+		
+		Thread t = new Thread(si, String.format("thread-%s", si.name()));
+		t.setDaemon(true);
+		t.start();
 
-			//Init connection.
-			out.writeInt(0);
-			out.flush();
-			
-			int recv = in.readInt();
-			if (recv != 0)
-				throw new SequenceErrorException(0, recv);
-			
-			out.writeInt(NBConstants.VERSION);
-			out.flush();
-			recv = in.readInt();
-			if (recv != NBConstants.VERSION) {
-				U.w("WARNING: NetIO connected to robot with version " + recv + 
-						" but client is running version " + NBConstants.VERSION + " !!\n");
+		return si;
+	}
+
+	public static StreamInstance getByIndex(int index) {
+		synchronized(instances) {
+			if (index < instances.size())
+				return instances.get(index);
+			else return null;
+		}
+	}
+
+	public static StreamInstance getByHost(String host) {
+		synchronized(instances) {
+			for (StreamInstance si : instances) {
+				if (si.host.equals(host))
+					return si;
 			}
-			
-			int seq_num = 1;
-			while(running) {
-				recv = in.readInt();
-				
-				if (recv == 0) {
-					//Pinged, no logs to receive.
-					out.writeInt(0);
-					out.flush();
-				} else if (recv == seq_num) {
-					Log nl = CommonIO.readLog(in);
-					
-					nl.tree().append(SExpr.newKeyValue("from_address", server_address));
-					U.w("NetIO: thread got packet of data size: " + nl.bytes.length + " desc: " + nl.description);
-					
-					nl.source = SOURCE.NETWORK;
-					
-					boss.takeDelivery(nl);
-					++seq_num;
-				} else {
-					throw new SequenceErrorException(seq_num, recv);
-				}
-			}
+
+			return null;
 		}
-		
-		catch (UnknownHostException uke) {
-			uke.printStackTrace();
-			U.w("NetIO thread:" + uke.getMessage());
+	}
+
+	public static StreamInstance[] getAll() {
+		synchronized(instances) {
+			return instances.toArray(new StreamInstance[0]);
 		}
-		catch(SocketTimeoutException ste) {
-			ste.printStackTrace();
-			U.w("NetIO thread: socket TIMEOUT.");
+	}
+
+	private static void remove(StreamInstance toRem) {
+		synchronized(instances) {
+			if (instances.contains(toRem))
+				instances.remove(toRem);
 		}
-		catch (IOException ie) {
-			ie.printStackTrace();
-			U.w("NetIO thread:" + ie.getMessage());
+	}
+
+
+	public static class StreamInstance extends CommonIO.IOInstance {
+
+		protected StreamInstance(String host, int port) {
+			this.host = host;
+			this.port = port;
 		}
-		catch(OutOfMemoryError e) {
-			e.printStackTrace();
-			U.w("NetIO thread got OutOfMemoryError.");
-		}
-		catch(NegativeArraySizeException nase) {
-			nase.printStackTrace();
-			U.w("NetIO got negative incoming data size!");
-		}
-		
-		catch(SequenceErrorException see) {
-			U.w("NetIO thread got out of sequence, exiting!" +
-					"\n\texpected:" + see.expected + " was:" + see.was);
-		}
-		
-		U.w("NetIO thread exiting...");
-		if (running) {
-			U.w("WARNING: NetIO thread exiting ATYPICALLY! (running == true)");
-		}
-		
-		if (socket != null) {
+
+		@Override
+		public void run() {
+
+			assert(socket == null);
+
 			try {
-				socket.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+				//Setup Socket
+				Logger.logf(Logger.INFO, "%s starting.", name());
+				this.socket = CommonIO.setupNetSocket(host, port);
+
+				//Initialize
+				BufferedOutputStream _out =  new BufferedOutputStream(socket.getOutputStream());
+				BufferedInputStream _in = new BufferedInputStream(socket.getInputStream());
+
+				DataOutputStream out = new DataOutputStream(_out);
+				DataInputStream in = new DataInputStream(_in);
+
+				out.writeInt(0);
+				out.flush();
+
+				int recv = in.readInt();
+				if (recv != 0)
+					throw new SequenceErrorException(0, recv);
+
+				out.writeInt(NBConstants.VERSION);
+				out.flush();
+				recv = in.readInt();
+				if (recv != NBConstants.VERSION) {
+					Logger.log(Logger.WARN,"WARNING: NetIO connected to robot with version " + recv + 
+							" but client is running version " + NBConstants.VERSION + " !!\n");
+				}
+
+				synchronized(this) {
+					if (this.state != IOState.STARTING)
+						return;
+					this.state = IOState.RUNNING;
+				}
+				
+				Events.GStreamIOStatus.generate(this, true);
+
+				//Stream
+				int seq_num = 1;
+				while (state() == IOState.RUNNING) {
+					recv = in.readInt();
+
+					if (recv == 0) {
+						//Pinged, no logs to receive.
+						out.writeInt(0);
+						out.flush();
+					} else if (recv == seq_num) {
+						Log nl = CommonIO.readLog(in);
+
+						nl.tree().append(SExpr.newKeyValue("from_address", this.host));
+						Logger.log(Logger.INFO, this.name() + ": thread got packet of data size: " + nl.bytes.length + " desc: " + nl.description());
+
+						nl.source = SOURCE.NETWORK;
+
+						GIOFirstResponder.generateReceived(this, ifr, 0, nl);
+						++seq_num;
+					} else {
+						throw new SequenceErrorException(seq_num, recv);
+					}
+
+				}
+
+			} catch (Throwable t) {
+				if (t instanceof SequenceErrorException) {
+					Logger.logf(Logger.ERROR, "%s", ((SequenceErrorException) t).toString());
+				}
+
+				t.printStackTrace();
+			} finally {
+				Logger.logf(Logger.INFO, "%s cleaning up...", name());
+
+				this.finish();
+
+				StreamIO.remove(this);
+				GIOFirstResponder.generateFinished(this, this.ifr);
+				Events.GStreamIOStatus.generate(this, false);
 			}
 		}
-		
-		N.notifyEDT(EVENT.SIO_THREAD, this, false);
-		boss.netThreadExiting();
-	}
-	
-	private static class SequenceErrorException extends Exception {
-		private static final long serialVersionUID = 1L;
-		public int expected, was;
-		SequenceErrorException(int e, int w) {
-			super();
-			expected = e; was = w;
+
+		@Override
+		public String name() {
+			return String.format("StreamInstance{%s:%d}", this.host, this.port);
 		}
+
 	}
 }

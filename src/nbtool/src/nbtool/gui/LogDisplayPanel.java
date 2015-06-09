@@ -13,19 +13,21 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
-import javax.swing.tree.TreePath;
 
-import nbtool.data.SessionHandler;
 import nbtool.data.Log;
+import nbtool.data.Session;
+import nbtool.gui.logviews.misc.ErrorView;
+import nbtool.gui.logviews.misc.SessionView;
 import nbtool.gui.logviews.misc.ViewParent;
-import nbtool.util.N;
-import nbtool.util.N.EVENT;
-import nbtool.util.N.NListener;
-import nbtool.util.U;
+import nbtool.gui.utilitypanes.UtilityManager;
+import nbtool.util.Center;
+import nbtool.util.Events;
+import nbtool.util.Logger;
 
 
-public class LogDisplayPanel extends JPanel implements NListener {
+public class LogDisplayPanel extends JPanel implements Events.LogSelected, Events.SessionSelected {
 	private static final long serialVersionUID = 1L;
+	
 	protected LogDisplayPanel() {
 		super();
 		setLayout(null);
@@ -39,7 +41,9 @@ public class LogDisplayPanel extends JPanel implements NListener {
 		views.setBackground(Color.DARK_GRAY);
 		add(views);
 		
-		N.listen(EVENT.LOG_SELECTION, this);
+		Center.listen(Events.LogSelected.class, this, true);
+		Center.listen(Events.SessionSelected.class, this, true);
+		
 		setVisible(true);
 	}
 	
@@ -54,26 +58,42 @@ public class LogDisplayPanel extends JPanel implements NListener {
 		views.setBounds(0,0, size.width, size.height);
 	}
 	
-	@SuppressWarnings("unchecked")
-	public void notified(EVENT e, Object src, Object... args) {
-		if (e == EVENT.LOG_SELECTION) {
-			ArrayList<Log> also = null;
-			if (args.length == 2) {
-				also =(ArrayList<Log>) args[1];
-			}
-			
-			setContents((Log) args[0], also);
-		}
+	@Override
+	public void sessionSelected(Object source, Session s) {
+		if (!this.isEnabled())
+			return;
+		
+		views.removeAll();
+		SessionView sv = new SessionView(s);
+		views.addTab(s.toString(), sv);
+	}
+
+	@Override
+	public void logSelected(Object source, Log first,
+			ArrayList<Log> alsoSelected) {
+		if (!this.isEnabled())
+			return;
+		
+		setContents(first, alsoSelected);
 	}
 	
 	protected void setContents(Log l, ArrayList<Log> also) {
-		U.w("LDP.setContents() type: " + l.pType());
-		ArrayList<Class<? extends ViewParent>> list = LogToViewLookup.viewsForLog(l);
+		Logger.log(Logger.INFO, "LDP.setContents() type: " + l.primaryType());
+		Class<? extends ViewParent>[] list = UtilityManager.instanceOfLTV().viewsForLog(l);
 		views.removeAll();
 		
 		this.current = l;
-		for (int i = 0; i < list.size(); ++i) {
-			Class<? extends ViewParent> ttype = list.get(i);
+		
+		if (this.current.bytes == null) {
+			Logger.logf(Logger.ERROR, "Could not load log data: %s", l.toString());
+			ErrorView ev = new ErrorView();
+			ev.setLog(l);
+			views.addTab("error loading", ev);
+			return;
+		}
+		
+		for (int i = 0; i < list.length; ++i) {
+			Class<? extends ViewParent> ttype = list[i];
 
 			Method m;
 			boolean slip = false;
@@ -112,22 +132,16 @@ public class LogDisplayPanel extends JPanel implements NListener {
 					
 					views.addTab(ttype.getSimpleName(), view);
 				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (InvocationTargetException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (NoSuchMethodException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (SecurityException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}	
 			}	
@@ -166,7 +180,7 @@ public class LogDisplayPanel extends JPanel implements NListener {
 				if (current == this.log)
 					finishedLoading(index, view, nlClass);
 				else
-					U.w("WARNING: LDP created new view thread before last finished!");
+					Logger.log(Logger.WARN, "WARNING: LDP created new view thread before last finished!");
 			} else {
 				try {
 					view = nlClass.getDeclaredConstructor().newInstance();
@@ -176,22 +190,22 @@ public class LogDisplayPanel extends JPanel implements NListener {
 						view.alsoSelected(also);
 					
 				} catch (IllegalArgumentException e) {
-					U.w(e.getMessage());
+					Logger.log(Logger.ERROR, e.getMessage());
 					e.printStackTrace();
 				} catch (SecurityException e) {
-					U.w(e.getMessage());
+					Logger.log(Logger.ERROR, e.getMessage());
 					e.printStackTrace();
 				} catch (InstantiationException e) {
-					U.w(e.getMessage());
+					Logger.log(Logger.ERROR, e.getMessage());
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {
-					U.w(e.getMessage());
+					Logger.log(Logger.ERROR, e.getMessage());
 					e.printStackTrace();
 				} catch (InvocationTargetException e) {
-					U.w(e.getMessage());
+					Logger.log(Logger.ERROR, e.getMessage());
 					e.printStackTrace();
 				} catch (NoSuchMethodException e) {
-					U.w(e.getMessage());
+					Logger.log(Logger.ERROR, e.getMessage());
 					e.printStackTrace();
 				}
 				finally {
