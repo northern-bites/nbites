@@ -29,6 +29,8 @@ VisionModule::VisionModule()
         kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography(i == 0);
         fieldLines[i] = new FieldLineList();
+        boxDetector[i] = new GoalboxDetector();
+        cornerDetector[i] = new CornerDetector();
 
         // TODO flag
         bool fast = true;
@@ -67,8 +69,8 @@ void VisionModule::run_()
                                                     &bottomIn.message() };
 
     // Time vision module
-    double topTimes[5];
-    double bottomTimes[5];
+    double topTimes[6];
+    double bottomTimes[6];
     double* times[2] = { topTimes, bottomTimes };
 
     // Loop over top and bottom image and run line detection system
@@ -118,6 +120,11 @@ void VisionModule::run_()
         fieldLines[i]->find(*(houghLines[i]));
 
         times[i][4] = timer.end();
+
+        // Classify field lines
+        fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
+
+        times[i][5] = timer.end();
     }
 
     for (int i = 0; i < 2; i++) {
@@ -129,7 +136,8 @@ void VisionModule::run_()
         std::cout << "Gradient: " << times[i][1] << std::endl;
         std::cout << "Edge detection: " << times[i][2] << std::endl;
         std::cout << "Hough: " << times[i][3] << std::endl;
-        std::cout << "Field lines: " << times[i][4] << std::endl;
+        std::cout << "Field lines detection: " << times[i][4] << std::endl;
+        std::cout << "Field lines classification: " << times[i][5] << std::endl;
     }
 
 }

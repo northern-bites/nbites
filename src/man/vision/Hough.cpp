@@ -189,17 +189,24 @@ void HoughLineList::mapToField(const FieldHomography& h)
 // *                                *
 // **********************************
 
-Corner::Corner(FieldLine* first_, FieldLine* second_, CornerID id_)
-  : std::pair<FieldLine*, FieldLine*>(first_, second_), id(id_) 
+Corner::Corner(FieldLine* first_, FieldLine* second_, int line1Id_, int line2Id_, CornerID id_)
+  : std::pair<FieldLine*, FieldLine*>(first_, second_), 
+    line1Id(line1Id_),
+    line2Id(line2Id_),
+    id(id_) 
 {}
 
 GoalboxDetector::GoalboxDetector()
-  : parallelThreshold_(5), seperationThreshold_(20)
+  : std::pair<int, int>(-1, -1), parallelThreshold_(5), seperationThreshold_(20)
 {}
 
 bool GoalboxDetector::find(FieldLineList& list)
 {
-  std::cout << "Goalbox and corners:" << std::endl;
+  // Reset detector
+  first = -1; 
+  second = -1;
+
+  // Loop thru field lines
   for (int i = 0; i < list.size(); i++) {
     for (int j = 0; j < list.size(); j++) {
       // Consider each pair once
@@ -221,16 +228,17 @@ bool GoalboxDetector::find(FieldLineList& list)
       }
 
       // Classify lines if box was detected
-      // TODO just store?
       if (foundGoalbox) {
         if (fabs(line1[0].field().r()) < fabs(line2[0].field().r())) {
-          std::cout << "Box, " << j << ", " << i << std::endl;
           line1.id(LineID::TopGoalbox);
           line2.id(LineID::Endline);
+          first = i;
+          second = j;
         } else {
-          std::cout << "Box, " << i << ", " << j << std::endl;
           line2.id(LineID::TopGoalbox);
           line1.id(LineID::Endline);
+          first = j;
+          second = i;
         }
         return true;
       }
@@ -265,6 +273,10 @@ CornerDetector::CornerDetector()
 
 void CornerDetector::findCorners(FieldLineList& list)
 {
+  // Reset detector
+  this->clear();
+
+  // Loop thru field lines
   for (int i = 0; i < list.size(); i++) {
     for (int j = 0; j < list.size(); j++) {
       // Consider each pair once
@@ -289,22 +301,23 @@ void CornerDetector::findCorners(FieldLineList& list)
 
       // Create corner object and add to field lines
       if (foundCorner) {
-        std::cout << "Corner, " << i << ", " << j << ", " << (int) firstId << std::endl;
         Corner newCorner;
         if (firstId == CornerID::TSecond)
-          newCorner = Corner(&line2, &line1, CornerID::T);
+          newCorner = Corner(&line2, &line1, j, i, CornerID::T);
         else if (firstId == CornerID::TFirst)
-          newCorner = Corner(&line1, &line2, CornerID::T);
+          newCorner = Corner(&line1, &line2, i, j, CornerID::T);
         else
-          newCorner = Corner(&line1, &line2, firstId);
+          newCorner = Corner(&line1, &line2, i, j, firstId);
         line1.addCorner(newCorner);
         line2.addCorner(newCorner);
+        this->push_back(newCorner);
       }
     }
   }
 }
 
 // TODO require that lines are orthogonal
+// TODO ignore corners in edge of screen
 CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
 {
   // Use world coordinates
@@ -383,7 +396,6 @@ FieldLine::FieldLine(HoughLine& line1, HoughLine& line2, double fx0, double fy0)
 }
 
 FieldLineList::FieldLineList()
-  : cornerDetector(), boxDetector()
 {
   maxLineAngle(5.0f);
   maxLineSeparation(30.0f);
@@ -420,27 +432,20 @@ void FieldLineList::find(HoughLineList& houghLines)
         }
       }
   }
-
-  // Once all field lines are found, classify the lines
-  classify();
-  std::cout << std::endl;
 }
 
 // YES
 // TODO convex and T -> classify as side goalbox
-// TODO ignore corners in edge of screen
 // TODO goalie and the goalbox
 // TODO stream with a robot to see what fields of view are possible
 // TODO add debug tools
 
 // MAYBE
+// TODO bill's simulator
 // TODO midline classification, cross detection, lots of green detection, etc.j
 // TODO use length of lines
 // TODO find and use field edge
-
-// NO
-// TODO detect corners that are off image
-void FieldLineList::classify()
+void FieldLineList::classify(GoalboxDetector& boxDetector, CornerDetector& cornerDetector)
 {
   // Run goalbox detector
   bool boxFound = boxDetector.find(*this);

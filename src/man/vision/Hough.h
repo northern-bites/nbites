@@ -159,13 +159,17 @@ enum class CornerID {
 struct Corner : public std::pair<FieldLine*, FieldLine*>
 {
   Corner() : std::pair<FieldLine*, FieldLine*>() {}
-  Corner(FieldLine* first_, FieldLine* second_, CornerID id_);
+  Corner(FieldLine* first_, FieldLine* second_, int line1Id_, int line2Id_, CornerID id_);
 
+  int line1Id;
+  int line2Id;
   CornerID id;
 };
 
 // Detects goalbox
-class GoalboxDetector
+// First is index of top goalbox line
+// Second is index of endline
+class GoalboxDetector : public std::pair<int, int>
 {
   double parallelThreshold_;
   double seperationThreshold_;
@@ -184,7 +188,8 @@ public:
 };
 
 // Detects corners
-class CornerDetector
+// Stores all detected corners in vector
+class CornerDetector : public std::vector<Corner>
 {
   double orthogonalThreshold_;
   double closeThreshold_;
@@ -253,9 +258,6 @@ public:
 // grows as needed. I prefer vector because list iteration is awkward.
 class FieldLineList : public std::vector<FieldLine>
 {
-  GoalboxDetector boxDetector;
-  CornerDetector cornerDetector;
-
   float _maxLineAngle;
   float _maxLineSeparation;
   float _maxCalAngle;
@@ -282,7 +284,7 @@ public:
   void find(HoughLineList&);
 
   // Classify field lines
-  void classify();
+  void classify(GoalboxDetector& boxDetector, CornerDetector& cornerDetector);
 
   // Calibrate tilt if possible.
   bool tiltCalibrate(FieldHomography&, std::string* message = 0);

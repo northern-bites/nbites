@@ -26,6 +26,8 @@ public:
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
     HoughLineList* getHoughLines(bool topCamera = true) const { return houghLines[!topCamera]; }
     FieldLineList* getFieldLines(bool topCamera = true) const { return fieldLines[!topCamera]; }
+    GoalboxDetector* getBox(bool topCamera = true) const { return boxDetector[!topCamera]; }
+    CornerDetector* getCorners(bool topCamera = true) const { return cornerDetector[!topCamera]; }
 
 protected:
     virtual void run_();
@@ -40,6 +42,8 @@ private:
     Kinematics* kinematics[2];
     FieldHomography* homography[2];
     FieldLineList* fieldLines[2];
+    GoalboxDetector* boxDetector[2];
+    CornerDetector* cornerDetector[2];
 };
 
 }
