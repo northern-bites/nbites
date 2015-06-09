@@ -98,7 +98,8 @@ public class FileIO {
 			U.wf("%d bytes left, hex:\n%s\n", av, text); */
 		}
 		
-		if (!(lg.description().equals(full.description()))) {
+		//Can't check description on old logs – their tree hasn't been created yet.
+		if ((lg._olddesc_ == null) && !(lg.description().equals(full.description()))) {
 			Logger.logf(Logger.WARN, "WARNING: log description found to be different upon load:\n\t%s\n\t%s\n",
 					lg.description(), full.description());
 		}
