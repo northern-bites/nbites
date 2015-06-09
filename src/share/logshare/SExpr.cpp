@@ -286,7 +286,7 @@ namespace nblog {
      Class method to read from string.
      */
     
-    SExpr * SExpr::read(std::string s, ssize_t& p)
+    SExpr * SExpr::read(const std::string s, ssize_t& p)
     {
         while (p < (int)s.length() && isspace(s[p]))
             p++;
