@@ -216,7 +216,7 @@ bool GoalboxDetector::find(FieldLineList& list)
       bool foundGoalbox = true;
       for (int k = 0; k < 2; k++) {
         for (int l = 0; l < 2; l++) {
-          if (!validBox(line1.lines(k), line2.lines(l)))
+          if (!validBox(line1[k], line2[l]))
             foundGoalbox = false;
         }
       }
@@ -224,7 +224,7 @@ bool GoalboxDetector::find(FieldLineList& list)
       // Classify lines if box was detected
       // TODO just store?
       if (foundGoalbox) {
-        if (fabs(line1.lines(0).field().r()) < fabs(line2.lines(0).field().r())) {
+        if (fabs(line1[0].field().r()) < fabs(line2[0].field().r())) {
           line1.id(LineID::TopGoalbox);
           line2.id(LineID::Endline);
         } else {
@@ -283,12 +283,12 @@ void CornerDetector::findCorners(FieldLineList& list)
       // Find corners
       // NOTE since there are two hough lines in each field line, we require
       //      finding the same corner in all pairings of hough lines
-      CornerID firstId = classify(line1.lines(0), line2.lines(0));
+      CornerID firstId = classify(line1[0], line2[0]);
       std::cout << "ID: " << (int) firstId << std::endl;
       bool foundCorner = !(firstId == CornerID::None);
       for (int k = 1; k < 2; k++) {
         for (int l = 0; l < 2; l++) {
-          CornerID newId = classify(line1.lines(k), line2.lines(l));
+          CornerID newId = classify(line1[k], line2[l]);
           std::cout << "ID: " << (int) newId << std::endl;
           if (firstId != newId)
             foundCorner = false;
@@ -397,8 +397,8 @@ FieldLine::FieldLine(HoughLine& line1, HoughLine& line2, double fx0, double fy0)
 FieldLineList::FieldLineList()
   : cornerDetector(), boxDetector()
 {
-  maxLineAngle(10.0f);
-  maxLineSeparation(20.0f);
+  maxLineAngle(5.0f);
+  maxLineSeparation(30.0f);
   maxCalibrateAngle(5.0f);
 }
 
@@ -423,7 +423,7 @@ void FieldLineList::find(HoughLineList& houghLines)
         // other, which makes the sum of r's negative. A pair of nearly parallel
         // lines with the right separation but with polarities pointing away from
         // each other is not a field line. 
-        double separation = -(hl1->field().r() + hl2->field().r());
+        double separation = hl1->field().separation(hl2->field());
         if (0.0 < separation && separation <= maxLineSeparation())
         {
           hl1->fieldLine((int)size());
@@ -593,69 +593,69 @@ void FieldLineList::classify()
   }
 }
 
-// ****************
-// *               
-// *  Calibration  
-// *               
-// ****************
+// *****************
+// *               *
+// *  Calibration  *
+// *               *
+// *****************
 
-bool FieldLineList::TiltCalibrate(FieldHomography& h, string* s)
+bool FieldLineList::tiltCalibrate(FieldHomography& h, string* diagnostics)
 {
-#if 0
-  if (s)
-    s = "\n";
-  //Stats tiltStats = new Stats();
+  string s = "\n";
+  LineFit tiltStats;
 
-  for (int i = 0; i < size() - 1; ++i)
-    for (int j = i + 1; j < size(); ++j)
+  for (int i = 0; i < (int)size() - 1; ++i)
+    for (int j = i + 1; j < (int)size(); ++j)
     {
-      if (fsbs(lines[i].Ca * lines[j].Ca + lines[i].Sa * lines[j].Sa) < 0.33)
+      const FieldLine& fl1 = at(i);
+      const FieldLine& fl2 = at(j);
+      if (fabs(fl1[0].field().ux() * fl2[0].field().ux() + fl1[0].field().uy() * fl2[0].field().uy()) < 0.33)
       {
-        s += string.Format("Perpendicular field lines {0} and {1}:\n", i, j);
+        s += strPrintf("Perpendicular field lines %d and %d:\n", i, j);
         for (int a = 0; a < 2; ++a)
           for (int b = 0; b < 2; ++b)
           {
             double t;
             string diag;
-            bool ok = VisualTiltPerpendicular(lines[i].Lines(a), lines[j].Lines(b), out t, out diag);
+            bool ok = h.visualTiltPerpendicular(fl1[a], fl2[b], t, &diag);
             if (ok)
             {
-              t *= 180 / Math.PI;
-              tiltStats.Add(t);
-              s += string.Format("  {0,4:f1},", t);
+              t *= 180 / M_PI;
+              tiltStats.add(t, 0);
+              s += strPrintf("  %4.1f,", t);
             }
             else
               s += "  ----,";
-            s += string.Format(" | {0}\n", diag);
+            s += strPrintf(" | %s\n", diag.c_str());
           }
       }
-      else if (Math.Abs(lines[i].Ca * lines[j].Sa - lines[i].Sa * lines[j].Ca) < 0.33)
+      else if (fabs(fl1[0].field().ux() * fl2[0].field().uy() - fl1[0].field().uy() * fl2[0].field().ux()) < 0.33)
       {
-        s += string.Format("Parallel field lines {0} and {1}:\n", i, j);
+        s += strPrintf("Parallel field lines %d and %d:\n", i, j);
         for (int a = 0; a < 2; ++a)
           for (int b = 0; b < 2; ++b)
           {
             double t;
             string diag;
-            bool ok = VisualTiltParallel(lines[i].Lines(a), lines[j].Lines(b), out t, out diag);
+            bool ok = h.visualTiltParallel(fl1[a], fl2[b], t, &diag);
             if (ok)
             {
-              t *= 180 / Math.PI;
-              tiltStats.Add(t);
-              s += string.Format("  {0,4:f1},", t);
+              t *= 180 / M_PI;
+              tiltStats.add(t, 0);
+              s += strPrintf("  %4.1f,", t);
             }
             else
               s += "  ----,";
-            s += string.Format(" | {0}\n", diag);
+            s += strPrintf(" | %s\n", diag.c_str());
           }
       }
     }
 
-  s += string.Format("Mean tilt = {0:f2}, stDev = {1:f2}\n", tiltStats.Mean, tiltStats.StDev);
-  return s;
-#endif
-
-  return false;
+  s += strPrintf("Mean tilt = %.2f, stDev = %.2f\n",
+                 tiltStats.centerX(), tiltStats.firstPrincipalLength() / sqrt(3.0));
+  if (diagnostics != 0)
+    *diagnostics = s;
+  return tiltStats.area() >= 3;
 }
 
 // *****************

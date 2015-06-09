@@ -5,6 +5,7 @@
 // ********************************
 
 #include "Homography.h"
+#include "Hough.h"
 
 #include <iostream>
 
@@ -273,64 +274,6 @@ bool FieldHomography::visualTiltParallel(const GeoLine& a, const GeoLine& b,
   return ok;
 }
 
-#if 0
-string TestVisualTilt(List<FieldLine> lines)
-{
-  string s = "\n";
-  Stats tiltStats = new Stats();
-
-  for (int i = 0; i < lines.Count - 1; ++i)
-    for (int j = i + 1; j < lines.Count; ++j)
-    {
-      if (Math.Abs(lines[i].Ca * lines[j].Ca + lines[i].Sa * lines[j].Sa) < 0.33)
-      {
-        s += string.Format("Perpendicular field lines {0} and {1}:\n", i, j);
-        for (int a = 0; a < 2; ++a)
-          for (int b = 0; b < 2; ++b)
-          {
-            double t;
-            string diag;
-            bool ok = VisualTiltPerpendicular(lines[i].Lines(a), lines[j].Lines(b), out t, out diag);
-            if (ok)
-            {
-              t *= 180 / Math.PI;
-              tiltStats.Add(t);
-              s += string.Format("  {0,4:f1},", t);
-            }
-            else
-              s += "  ----,";
-            s += string.Format(" | {0}\n", diag);
-          }
-      }
-      else if (Math.Abs(lines[i].Ca * lines[j].Sa - lines[i].Sa * lines[j].Ca) < 0.33)
-      {
-        s += string.Format("Parallel field lines {0} and {1}:\n", i, j);
-        for (int a = 0; a < 2; ++a)
-          for (int b = 0; b < 2; ++b)
-          {
-            double t;
-            string diag;
-            bool ok = VisualTiltParallel(lines[i].Lines(a), lines[j].Lines(b), out t, out diag);
-            if (ok)
-            {
-              t *= 180 / Math.PI;
-              tiltStats.Add(t);
-              s += string.Format("  {0,4:f1},", t);
-            }
-            else
-              s += "  ----,";
-            s += string.Format(" | {0}\n", diag);
-          }
-      }
-    }
-
-  s += string.Format("Mean tilt = {0:f2}, stDev = {1:f2}\n", tiltStats.Mean, tiltStats.StDev);
-  return s;
-}
-
-#endif
-
-
 // ********************
 // *                  *
 // *  Geometric Line  *
@@ -340,7 +283,7 @@ string TestVisualTilt(List<FieldLine> lines)
 void GeoLine::intersect(const GeoLine& other, double& px, double& py, double& pg) const
 {
   px =  other.uy() * r() - uy() * other.r();
-  px = -other.ux() * r() + ux() * other.r();
+  py = -other.ux() * r() + ux() * other.r();
   pg = ux() * other.uy() - uy() * other.ux();
 }
 
@@ -377,6 +320,16 @@ void GeoLine::rawEndPoints(double x0, double y0,
   x2 += x0;
   y1 = y0 - y1;
   y2 = y0 - y2;
+}
+
+double GeoLine::separation(const GeoLine& other) const
+{
+  double x1, y1, x2, y2, x3, y3, x4, y4;
+  endPoints(x1, y1, x2, y2);
+  other.endPoints(x3, y3, x4, y4);
+  double x0 = (x1 + x2 + x3 + x4) / 4;
+  double y0 = (y1 + y2 + y3 + y4) / 4;
+  return pDist(x0, y0) + other.pDist(x0, y0);
 }
 
 void GeoLine::imageToField(const FieldHomography& h)

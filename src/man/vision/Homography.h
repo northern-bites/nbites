@@ -18,6 +18,7 @@ namespace man {
 namespace vision {
 
 class GeoLine;
+class FieldLineList;
 
 class FieldHomography
 {
@@ -205,6 +206,17 @@ public:
   // the center of the image is at (x0, y0). Useful for drawing.
   void rawEndPoints(double x0, double y0,
                     double& x1, double& y1, double& x2, double& y2) const;
+
+  // The separation between two lines is the sum of the polarized distance from
+  // the center of all four endpoints to each line. For parallel lines, this is
+  // the correct geometric separation. For nearly parallel lines it is
+  // well-defined and reasonable. The center of all four endpoints is a point on
+  // the line that bisects the two lines. Separation is positive when said center
+  // is on the positive side of both lines (gradients pointing towards each
+  // other), and negative when the center is on the negative side of both lines
+  // (gradients pointing away from each other. Separation is approximately zero
+  // otherwise. 
+  double separation(const GeoLine& other) const;
 
   // Map this image line to what we would see if roll were 0 and the optical axis
   // was at the center of the image
