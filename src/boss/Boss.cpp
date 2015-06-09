@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <string.h>
+#include <cstdlib>
 
 #define MAN_RESTART 'r'
 #define MAN_KILL    'k'
@@ -133,7 +134,7 @@ int Boss::constructSharedMem()
     if (shared_fd <= 0) {
         int err = errno;
         char buf[100];
-        strerror_s(buf, 100, err);
+        strerror_r(err, buf, 100);
         std::cout << "Couldn't open shared FD\n\tErrno: " << err << ": " << buf << std::endl;
         
         return -1;
@@ -199,7 +200,7 @@ void Boss::DCMPreProcessCallback()
                 return;
             }
             
-            sd->latestCommandRead = des.dataIndex();
+            shared->latestCommandRead = des.dataIndex();
 
             joints = des.stringNext();
             stiffs = des.stringNext();
