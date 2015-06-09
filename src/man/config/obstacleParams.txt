@@ -1,0 +1,72 @@
+( obstacles
+	(arms true)
+	(vision false)
+	(set_all_sonar false)
+	(all_left_sonar true)
+	(all_right_sonar true)
+
+	(shehulk
+		(left_sonar true)
+		(right_sonar true)
+	)
+	(shehulk
+		(left_sonar true)
+		(right_sonar true)
+	)
+	(batman
+		(left_sonar true)
+		(right_sonar true)
+	)
+  (avril
+		(left_sonar true)
+		(right_sonar true)
+	)
+  (ozzy
+		(left_sonar true)
+		(right_sonar true)
+	)
+  (beyonce
+		(left_sonar true)
+		(right_sonar true)
+	)
+  (ringo
+		(left_sonar true)
+		(right_sonar true)
+	)
+  (zoe
+  	(left_sonar true)
+		(right_sonar true)
+	)
+	(mal
+  	(left_sonar true)
+		(right_snar true)
+	)
+  (vera
+		(left_sonar true)
+		(right_sonar true)
+	)
+  (kaylee
+		(left_sonar true)
+		(right_sonar true)
+	)
+  (inara
+		(left_sonar true)
+		(right_sonar true)
+	)
+  (simon
+		(left_sonar true)
+		(right_sonar true)
+	)
+  (jayne
+		(left_sonar true)
+		(right_sonar true)
+	)
+  (river
+		(left_sonar true)
+		(right_sonar true)
+	)
+  (wash
+		(left_sonar true)
+		(right_sonar true)
+	)
+)
