@@ -3,6 +3,7 @@ package nbtool.data;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 /*
@@ -77,12 +78,19 @@ public abstract class SExpr implements Serializable{
 	public static SExpr pair(String key, int value) {
 		return newList(new Found(key), new Found(Integer.toString(value)));
 	}
+	
+	/* modifying */
+	public abstract void setList(SExpr ... items);
+	public abstract void setAtom(String val);
+	public abstract void insert(int index, SExpr item);
+	public abstract boolean remove(SExpr item);
 
 	public abstract boolean isAtom();
 	public abstract boolean exists();
 
 	public abstract int count();
 	public abstract SExpr get(int i);
+	public abstract List<SExpr> getList();
 	public abstract void append(SExpr ... exprs);
 
 	public abstract String value();
@@ -96,6 +104,31 @@ public abstract class SExpr implements Serializable{
 	public abstract String serialize();
 
 	public abstract SExpr find(String key);
+	
+	/* checks for recursive trees,  */
+	public static SExpr deepCopy(SExpr node) {
+		HashSet<SExpr> seen = new HashSet<SExpr>();
+		return _deepCopy(node, seen);
+	}
+	
+	private static SExpr _deepCopy(SExpr node, HashSet<SExpr> seen) {
+		if (seen.contains(node)) {
+			throw new IllegalStateException("Cyclical tree.");
+		}
+		
+		if (node.isAtom()) {
+			return atom(node.value());
+		}
+		
+		//node is list, construct copy.
+		seen.add(node);
+		SExpr copiedList = list();
+		for (SExpr child : node.getList()) {
+			copiedList.append(_deepCopy(child, seen));
+		}
+				
+		return copiedList;
+	}
 
 	private static class Found extends SExpr {
 
@@ -246,6 +279,42 @@ public abstract class SExpr implements Serializable{
 
 			return NOT_FOUND;
 		}
+
+		@Override
+		public void setList(SExpr... items) {
+			atom = false;
+			value = null;
+			list = new ArrayList<>(Arrays.asList(items));
+		}
+
+		@Override
+		public void setAtom(String val) {
+			atom = true;
+			list = null;
+			value = val;
+		}
+
+		@Override
+		public void insert(int index, SExpr item) {
+			if (!atom) {
+				list.add(index, item);
+			}
+		}
+
+		@Override
+		public boolean remove(SExpr item) {
+			if (!atom && list.contains(item)) {
+				list.remove(item);
+				return true;
+			}
+			
+			return false;
+		}
+
+		@Override
+		public List<SExpr> getList() {
+			return atom ? null : list;
+		}
 	}
 
 	private static class NotFound extends SExpr {
@@ -318,6 +387,26 @@ public abstract class SExpr implements Serializable{
 		@Override
 		public SExpr find(String key) {
 			return this;
+		}
+
+		@Override
+		public void setList(SExpr... items) {}
+
+		@Override
+		public void setAtom(String val) {}
+
+		@Override
+		public void insert(int index, SExpr item) {}
+
+		@Override
+		public boolean remove(SExpr item) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public List<SExpr> getList() {
+			return null;
 		}
 	}
 
