@@ -61,9 +61,11 @@ int Vision_func() {
         module.setColorParams(getColorsFromSliderSExpr(params), top);
     } else { std::cout << "NO PARAMS" << std::endl; }
 
-    // if (args.size() > 1) {
-    //     man::vision::Colors* newParams = getColorsFromSliderValues((float*)args[1]);
-    //     module.setColorParams(newParams, top);
+    // If log says to save, write params to ColorParams.txt
+    SExpr* save = args[0]->tree().find("SaveParams");
+    if (save != NULL) {
+        std::cout << "SAVE PARAMS: " << params->serialize() <<  std::endl;
+        updateSavedColorParams(params)
     // }
 
     // If log says to save, save current params to json file
@@ -241,47 +243,24 @@ man::vision::Colors* getColorsFromSliderSExpr(SExpr* params) {
                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));  
-
-    ret->orange.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+ 
+   ret->orange.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));
 
-    i = j = 0;
-
-    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
-    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
-    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
-    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
-    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
-    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << "\n" << std::endl; 
-
-    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
-    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
-    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
-    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
-    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
-    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << "\n" << std::endl;  
-
-    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
-    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
-    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
-    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
-    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << std::endl;
-    std::cout << std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()) << "\n" << std::endl;
+   std::cout << params->serialize() << std::endl;
 
     return ret;
 }
 
-void updateSavedColorParams(std::string jsonPath, float* params, bool top) {
+void updateSavedColorParams(std::string jsonPath, SExpr* params, bool top) {
 
     // TODO make this work. Covert to string and write/replace
 
-    boost::property_tree::ptree tree;
-    boost::property_tree::read_json(jsonPath, tree);
-
+   
     if (top) {
         tree = tree.get_child("colorParams.topColors");
     } else {

@@ -3,12 +3,15 @@ package nbtool.gui.logviews.misc;
 import java.awt.Graphics;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import nbtool.images.Y8image;
 import nbtool.images.Y16image;
 import nbtool.images.ColorSegmentedImage;
 
 import javax.swing.JSlider;
+import javax.swing.JButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -28,6 +31,8 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
     private BufferedImage greenImage;
     private BufferedImage orangeImage;
     private BufferedImage segmentedImage;
+
+    private JButton saveButton;
 
     private JSlider wDarkU;
     private JSlider wDarkV;
@@ -66,7 +71,19 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
             }
         };
 
+        ActionListener press = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                saveParams();
+            }
+        };
+
         // TODO fix slider glitch
+
+        // Save button
+        saveButton = new JButton("Save color parameters");
+        saveButton.setToolTipText("Save current color parms to Vision/ColorParams.txt");
+        saveButton.addActionListener(press);
+        add(saveButton);
 
         // Init and add white sliders. TODO: init val to 0
         wDarkU  = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
@@ -135,6 +152,39 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         add(oFuzzyV);
     }
 
+    public void saveParams() {
+        // Tell NBCross to save command
+        this.log.tree().append(SExpr.pair("SaveParams", "true"));
+
+        System.out.printf("New tree: %s\n\n", this.log.tree().get(0).serialize());
+        
+        System.out.printf("New tree: %s\n\n", this.log.tree().get(1).serialize());
+
+        System.out.printf("New tree: %s\n\n", this.log.tree().get(2).serialize());
+
+        System.out.printf("New tree: %s\n\n", this.log.tree().get(3).serialize());
+
+        System.out.printf("New tree: %s\n\n", this.log.tree().get(4).serialize());
+
+
+        System.out.printf("New tree: %s\n\n", this.log.tree().get(5).serialize());
+
+        System.out.printf("New tree: %s\n\n", this.log.tree().get(6).serialize());
+
+        System.out.printf("New tree: %s\n\n", this.log.tree().print());
+
+
+        callNBFunction();
+        SExpr saveAtom = this.log.tree().find("SaveParams");
+        if (!saveAtom.exists()) {
+            System.out.println("Doesnt exist!");
+        }
+        boolean test = this.log.tree().remove(saveAtom);
+        if (!test) {
+            System.out.println("Not removed!");
+        }
+    }
+
     public void adjustParams() {
 
         if (firstLoad || zeroParam())
@@ -142,71 +192,46 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
 
         SExpr newParams = SExpr.newList(
             SExpr.newKeyValue("White", SExpr.newList(
-            SExpr.newKeyValue("dark_u",  (float)(wDarkU. getValue()) / 100.00),
-            SExpr.newKeyValue("dark_v",  (float)(wDarkV. getValue()) / 100.00),
-            SExpr.newKeyValue("light_u", (float)(wLightU.getValue()) / 100.00),
-            SExpr.newKeyValue("light_v", (float)(wLightV.getValue()) / 100.00),
-            SExpr.newKeyValue("fuzzy_u", (float)(wFuzzyU.getValue()) / 100.00),
-            SExpr.newKeyValue("fuzzy_v", (float)(wFuzzyV.getValue()) / 100.00))),
+                SExpr.newKeyValue("dark_u",  (float)(wDarkU. getValue()) / 100.00),
+                SExpr.newKeyValue("dark_v",  (float)(wDarkV. getValue()) / 100.00),
+                SExpr.newKeyValue("light_u", (float)(wLightU.getValue()) / 100.00),
+                SExpr.newKeyValue("light_v", (float)(wLightV.getValue()) / 100.00),
+                SExpr.newKeyValue("fuzzy_u", (float)(wFuzzyU.getValue()) / 100.00),
+                SExpr.newKeyValue("fuzzy_v", (float)(wFuzzyV.getValue()) / 100.00))),
 
             SExpr.newKeyValue("Green", SExpr.newList(
-            SExpr.newKeyValue("dark_u",  (float)(gDarkU. getValue()) / 100.00),
-            SExpr.newKeyValue("dark_v",  (float)(gDarkV. getValue()) / 100.00),
-            SExpr.newKeyValue("light_u", (float)(gLightU.getValue()) / 100.00),
-            SExpr.newKeyValue("light_v", (float)(gLightV.getValue()) / 100.00),
-            SExpr.newKeyValue("fuzzy_u", (float)(gFuzzyU.getValue()) / 100.00),
-            SExpr.newKeyValue("fuzzy_v", (float)(gFuzzyV.getValue()) / 100.00))),
+                SExpr.newKeyValue("dark_u",  (float)(gDarkU. getValue()) / 100.00),
+                SExpr.newKeyValue("dark_v",  (float)(gDarkV. getValue()) / 100.00),
+                SExpr.newKeyValue("light_u", (float)(gLightU.getValue()) / 100.00),
+                SExpr.newKeyValue("light_v", (float)(gLightV.getValue()) / 100.00),
+                SExpr.newKeyValue("fuzzy_u", (float)(gFuzzyU.getValue()) / 100.00),
+                SExpr.newKeyValue("fuzzy_v", (float)(gFuzzyV.getValue()) / 100.00))),
 
             SExpr.newKeyValue("Orange", SExpr.newList(
-            SExpr.newKeyValue("dark_u",  (float)(oDarkU. getValue()) / 100.00),
-            SExpr.newKeyValue("dark_v",  (float)(oDarkV. getValue()) / 100.00),
-            SExpr.newKeyValue("light_u", (float)(oLightU.getValue()) / 100.00),
-            SExpr.newKeyValue("light_v", (float)(oLightV.getValue()) / 100.00),
-            SExpr.newKeyValue("fuzzy_u", (float)(oFuzzyU.getValue()) / 100.00),
-            SExpr.newKeyValue("fuzzy_v", (float)(oFuzzyV.getValue()) / 100.00)))
+                SExpr.newKeyValue("dark_u",  (float)(oDarkU. getValue()) / 100.00),
+                SExpr.newKeyValue("dark_v",  (float)(oDarkV. getValue()) / 100.00),
+                SExpr.newKeyValue("light_u", (float)(oLightU.getValue()) / 100.00),
+                SExpr.newKeyValue("light_v", (float)(oLightV.getValue()) / 100.00),
+                SExpr.newKeyValue("fuzzy_u", (float)(oFuzzyU.getValue()) / 100.00),
+                SExpr.newKeyValue("fuzzy_v", (float)(oFuzzyV.getValue()) / 100.00)))
             );
 
-        System.out.printf("NEW PARAMS: %s\n\n", (newParams.serialize()));   
+  //      System.out.printf("NEW PARAMS: %s\n\n", (newParams.serialize()));   
 
        SExpr oldColor, newColor, oldParams = this.log.tree().find("Params");
 
         if (oldParams.exists()) {
-            
             oldParams.setList( SExpr.atom("Params"), newParams); 
-            // TODO: use new funcitonality to swap old params for new params
-
-            // for (int i = 0; i < 3; i++) {
-            //     for (int j = 0; j < 6; j++) {
-            //         oldColor = this.log.tree().find("Params").get(1).get(i).get(1).get(j);
-            //         System.out.printf("Old Color: %s\n", oldColor.serialize());   
-            //         newColor = newParams.get(1).get(i).get(1).get(j);
-            //         System.out.printf("New Color: %s\n", newColor.serialize());
-
-            //         // oldColor  = this.log.tree().find("Params").get(1).get(i).get(1).get(j).get(1);
-            //         // oldColor = newColor.get(1);
-
-            //         oldColor.setList(newColor.getList());
-
-            //         System.out.printf("TEST: %s\n", oldColor.list().serialize());
-
-            //         System.out.printf("N/O Color: %s\n", (oldColor.serialize()));   
-
-            //         System.out.printf("LOG Color: %s\n\n", this.log.tree().find("Params").get(1).get(i).get(1).get(j).serialize());
-
-            //     }
-            // }
-
-            
         } else {
-
-            System.out.printf("NOT FOUND: %s\n\n", (this.log.tree().serialize()));    
-
             this.log.tree().append(SExpr.pair("Params", newParams));
         }
 
-        System.out.printf("Thos.Log description: %s\n\n", (this.log.tree().print()));   
+//        System.out.printf("This.Log description: %s\n\n", (this.log.tree().print()));   
 
+        callNBFunction();
+    }
 
+    private void callNBFunction() {
         CrossInstance inst = CrossIO.instanceByIndex(0);
         if (inst == null)
             return;
@@ -273,6 +298,10 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
             g.drawImage(segmentedImage, width + vB,  height + sH*6 + tB*3, null);
         }
 
+        // Draw button
+        saveButton.setBounds(width*2 + vB*2,  height + sH*6 + tB*3, width, tB);
+
+        // Draw help text
         g.drawString("white U and V thresholds for when Y is 0",    width*0 + tB*0, height + tB*1 + sH*0 - lB);
         g.drawString("white U and V thresholds for when Y is 255",  width*0 + tB*0, height + tB*2 + sH*2 - lB);
         g.drawString("width of fuzzy threshold for U and V",        width*0 + tB*0, height + tB*3 + sH*4 - lB);
@@ -285,6 +314,7 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         g.drawString("orange U and V thresholds for when Y is 255", width*2 + vB*2, height + tB*2 + sH*2 - lB);
         g.drawString("width of fuzzy threshold for U and V",        width*2 + vB*2, height + tB*3 + sH*4 - lB);
 
+        // Draw 18 sliders
         wDarkU. setBounds(width*0 + vB*1, height + sH*0 + tB*1, width - vB*2, sH);
         wDarkV. setBounds(width*0 + vB*1, height + sH*1 + tB*1, width - vB*2, sH);
         wLightU.setBounds(width*0 + vB*1, height + sH*2 + tB*2, width - vB*2, sH);
@@ -310,19 +340,7 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
     @Override
     public void setLog(Log newlog) {
         log = newlog;
-        
-    //    System.out.printf("DESC STRING: %s\n", log.description());
-        
-        CrossInstance inst = CrossIO.instanceByIndex(0);
-        if (inst == null)
-            return;
-
-        CrossFunc func = inst.functionWithName("Vision");
-        if (func == null)
-            return;
-
-        CrossCall call = new CrossCall(this, func, this.log);
-        inst.tryAddCall(call);
+        callNBFunction();
     }
     
 
