@@ -184,9 +184,9 @@ void GameStateModule::reset()
     latest_data.Clear();
 
     latest_data.set_state(STATE_INITIAL);
-    latest_data.set_kick_off_team(TEAM_BLUE);
+    latest_data.set_kick_off_team(team_number);
     latest_data.set_secondary_state(STATE2_NORMAL);
-    latest_data.set_drop_in_team(TEAM_BLUE);
+    latest_data.set_drop_in_team(team_number);
 
     latest_data.set_have_remote_gc(false);
 
@@ -220,7 +220,7 @@ void GameStateModule::switchTeam()
 }
 void GameStateModule::switchKickOff()
 {
-    latest_data.set_kick_off_team(latest_data.kick_off_team() ? TEAM_BLUE : TEAM_RED);
+    latest_data.set_kick_off_team(latest_data.kick_off_team() ? team_number : team_number+1);
 }
 
 }

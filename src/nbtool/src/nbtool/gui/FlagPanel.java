@@ -13,7 +13,9 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import nbtool.io.ControlIO;
-import nbtool.util.U;
+import nbtool.io.ControlIO.ControlInstance;
+import nbtool.util.Logger;
+import nbtool.util.Utility;
 
 public class FlagPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
@@ -59,18 +61,22 @@ public class FlagPanel extends JPanel implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent e) {
+		
+		ControlInstance first = ControlIO.getByIndex(0);
+		if (first == null) {
+			Logger.log(Logger.WARN, "FlagPanel clicked while no ControlInstance available");
+			this.setUnknown();
+			return;
+		}
+		
 		if (e.getSource() == jrb[0]) {
-			boolean success =
-					ControlIO.tryAddSetFlag(index, false);
-			U.wf("FlagPanel[%s] CommandIO.tryAddSetFlag(%d, false) returned %B\n", flag_name, index, success);
-			
+			boolean success = first.tryAddCmnd(ControlIO.createCmndSetFlag(index, false));
+			Logger.logf(Logger.INFO, "FlagPanel[%s] CommandIO.tryAddSetFlag(%d, false) returned %B\n", flag_name, index, success);
 		} else if (e.getSource() == jrb[1]) {
-			U.w("ERROR: FlagPanel " + flag_name + " got action from MIDDLE switch!");
+			Logger.logf(Logger.ERROR, "ERROR: FlagPanel " + flag_name + " got action from MIDDLE switch!");
 		} else if (e.getSource() == jrb[2]) {
-			System.out.println("2 " + jrb[2].isSelected());
-			boolean success =
-					ControlIO.tryAddSetFlag(index, true);
-			U.wf("FlagPanel[%s] CommandIO.tryAddSetFlag(%d, true) returned %B\n", flag_name, index, success);
+			boolean success = first.tryAddCmnd(ControlIO.createCmndSetFlag(index, true));
+			Logger.logf(Logger.INFO, "FlagPanel[%s] CommandIO.tryAddSetFlag(%d, true) returned %B\n", flag_name, index, success);
 		} else {}
 		
 		this.setUnknown();

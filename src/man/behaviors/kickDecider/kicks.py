@@ -95,8 +95,8 @@ LEFT_KICK = LEFT_SHORT_STRAIGHT_KICK
 RIGHT_KICK = RIGHT_SHORT_STRAIGHT_KICK
 
 # Motion kicks
-M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 14, y = 3.6, dist = 70)
-M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 14, y = -3.6, dist = 70)
+M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 12.7, y = 3.6, dist = 70)
+M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 12.7, y = -3.6, dist = 70)
 
 M_LEFT_CHIP_SHOT =  Kick("M_Left_Chip_Shot", x = 12.3, y = -.3, h = 45, dist = 70)
 M_RIGHT_CHIP_SHOT =  Kick("M_Right_Chip_Shot", x = 12.3, y = .3, h = -45, dist = 70)

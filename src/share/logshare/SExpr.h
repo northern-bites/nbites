@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 namespace nblog {
     
@@ -19,6 +20,40 @@ namespace nblog {
     
     class SExpr {
     public:
+        
+        static SExpr atom(const std::string& n) {return SExpr(n);}
+        static SExpr atom(const char * n) {return SExpr(n);}
+        
+        //more atoms.
+        static SExpr atom(int v) {return SExpr(v);}
+        static SExpr atom(long v) {return SExpr(v);}
+        static SExpr atom(double v) {return SExpr(v);}
+        
+        static SExpr list() {return SExpr();}
+        static SExpr list(std::initializer_list<SExpr> exprs) {
+            std::vector<SExpr> vec(exprs);
+            return SExpr(vec);
+        }
+        
+        static SExpr keyValue(const std::string& key, SExpr& val) {
+            return SExpr(key, val);
+        }
+        
+        static SExpr keyValue(const std::string& key, const std::string& val) {
+            return SExpr(key, val);
+        }
+        
+        static SExpr keyValue(const std::string& key, int val) {
+            return SExpr(key, val);
+        }
+        
+        static SExpr keyValue(const std::string& key, long val) {
+            return SExpr(key, val);
+        }
+        
+        static SExpr keyValue(const std::string& key, double val) {
+            return SExpr(key, val);
+        }
         
         //Constructor for a generic content item.
         //use .append() to add more specific keys
@@ -47,13 +82,17 @@ namespace nblog {
         SExpr(const std::string& key, long val);
         SExpr(const std::string& key, double val);
         
-        //double value for use in log_main.
+        //key double value for use in log_main.
         SExpr(const std::string& key, int index, int cval);
         
         bool isAtom() { return _atom; }
         ssize_t count() { return _atom ? -1 : _list.size(); }
         
-        std::string value() { return _value; }
+        std::string value();
+        int valueAsInt();
+        long valueAsLong();
+        double valueAsDouble();
+        
         SExpr * get(int i);
         
         // Adds the given list/single of SExpressions to this list
@@ -91,7 +130,6 @@ namespace nblog {
         SExpr * find(std::string name);
         
         //Translate the given string into an SExpression
-        
         static SExpr * read(std::string s, ssize_t& p);
         
         // Special chars that we need to look out for

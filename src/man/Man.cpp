@@ -9,6 +9,7 @@
 #include "Camera.h"
 
 #include "log/logging.h"
+#include "Log.h"
 #include "control/control.h"
 
 #ifndef OFFLINE
@@ -195,6 +196,14 @@ Man::Man() :
          That being said, should probably not init (i.e. start threads)
          if not necessary.
          */
+            
+            
+#ifdef NAOQI_2
+            nblog::HOST_TYPE = nblog::V5ROBOT;
+#else
+            nblog::HOST_TYPE = nblog::V4ROBOT;
+#endif
+            
         printf("nblog::log_main_init()\n");
         nblog::log_main_init();
         printf("control::control_init()\n");
@@ -242,10 +251,9 @@ Man::Man() :
 
         //Superseded by logging code in ImageTranscriber.
         cognitionThread.log<messages::YUVImage>((control::IMAGES), &topTranscriber.imageOut,
-                                                "YUVImage", "cameraTOP");
+                                                "YUVImage", "camera_TOP");
         cognitionThread.log<messages::YUVImage>((control::IMAGES), &bottomTranscriber.imageOut,
-                                                "YUVImage", "cameraBOT");
-
+                                                "YUVImage", "camera_BOT");
         cognitionThread.log<messages::VisionField>((control::VISION), &vision.vision_field,
                                                    "proto-VisionField", "vision");
         cognitionThread.log<messages::VisionBall>((control::VISION), &vision.vision_ball,
