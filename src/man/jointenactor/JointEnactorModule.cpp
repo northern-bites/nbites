@@ -41,7 +41,14 @@ JointEnactorModule::~JointEnactorModule()
     
 bool syncCmndWrite(SharedData * sd, uint8_t * stage)
 {
+    pthread_mutex_t * cmutex = &sd->cmnd_mutex;
+    pthread_mutex_lock(cmutex);
     
+    memcpy(sd->command, stage, COMMAND_SIZE);
+    ++(sd->latestCommandWritten);
+    
+    pthread_mutex_unlock(cmutex);
+    return true;
 }
 
 void JointEnactorModule::writeCommand()
@@ -57,31 +64,25 @@ void JointEnactorModule::writeCommand()
         new ProtoSer(&latestStiffness_),
         new ProtoSer(&latestLeds_)
     };
-
-    commandIndex++;
-
-    HighResTimer timer;
-    // TODO grab semaphore
-    int index = shared->commandSwitch ? 0 : 1;
-    lastRead = shared->commandReadIndex;
-
-    size_t usedSpace = 0;
-    bool returned = serializeTo(objects, commandIndex, shared->command[index], COMMAND_SIZE, &usedSpace);
-    if (!returned) {
+    
+    if ( !serializeTo(objects, shared->latestCommandWritten + 1, cmndStaging, COMMAND_SIZE, NULL) ) {
         std::cout << "Serialization failed!!" << std::endl;
+        return;
     }
-    //std::cout << "JointModule used: " << usedSpace << "bytes, to index: " << index << std::endl;
-    shared->commandSwitch = index;
-    // TODO release semaphore
-    double time = timer.end();
-    //std::cout << "Enactor critical section took: " << time << std::endl;
-    //exit(0);
+    
+    if ( !syncCmndWrite(shared, cmndStaging) ) {
+        printf("Could not write out command!\n");
+        return;
+    }
 
-    if (commandIndex - lastRead > 1) {
+    uint64_t lw = shared->latestCommandWritten;
+    uint64_t lr = shared->latestCommandRead
+
+    if (lw - lr > 1) {
         std::cout << "BOSS missed a frame" << std::endl;
     }
 
-    if (commandIndex - lastRead > 10 && (lastRead < commandIndex)) {
+    if (lw - lr > 10 && (lr < lw)) {
         std::cout << "Commands aren't getting read! Did Boss die?" << std::endl;
         // std::cout << "commandIndex: " << commandIndex << " lastRead: " << lastRead << std::endl;
         exit(0);
