@@ -592,6 +592,7 @@ void MotionModule::swapBodyProvider()
         curProvider = nextProvider;
         break;
 
+    // this doesn't seem to be working at all
     case SCRIPTED_PROVIDER:
         if(noWalkTransitionCommand){//only enqueue one
             noWalkTransitionCommand = false;
@@ -1067,7 +1068,7 @@ std::vector<BodyJointCommand::ptr> MotionModule::generateNextArmProviderTransiti
     std::vector<float> empty(0);
     commands.push_back(
         BodyJointCommand::ptr (
-            new BodyJointCommand(.5f,safe_larm, empty,empty,safe_rarm,
+            new BodyJointCommand(.6f,safe_larm, empty,empty,safe_rarm,
                                  stiffness,
                                  Kinematics::INTERPOLATION_SMOOTH)) );
 

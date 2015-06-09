@@ -1561,7 +1561,7 @@ void WalkingEngine::PendulumPlayer::getPosture(Posture& stance)
     float TO_RAD = pi/180;
 
     stance.leftArmJointAngles[0] = -pi_2 + p.standArmJointAngles.y + leftArmAngle - TO_RAD*20;
-    stance.leftArmJointAngles[1] = p.standArmJointAngles.x - TO_RAD*10;
+    stance.leftArmJointAngles[1] = p.standArmJointAngles.x - TO_RAD*15;
     stance.leftArmJointAngles[2] = TO_RAD*60;
     stance.leftArmJointAngles[3] = -p.standArmJointAngles.y - leftArmAngle - halfArmRotation - TO_RAD*50;
     // }
@@ -1575,7 +1575,7 @@ void WalkingEngine::PendulumPlayer::getPosture(Posture& stance)
     // else
     // { // normal WalkingEngine arm movement
     stance.rightArmJointAngles[0] = -pi_2 + p.standArmJointAngles.y + rightArmAngle - TO_RAD*20;
-    stance.rightArmJointAngles[1] = p.standArmJointAngles.x - TO_RAD*10;
+    stance.rightArmJointAngles[1] = p.standArmJointAngles.x - TO_RAD*15;
     stance.rightArmJointAngles[2] = TO_RAD*60;
     stance.rightArmJointAngles[3] = -p.standArmJointAngles.y - rightArmAngle - halfArmRotation - TO_RAD*50;
     // }
