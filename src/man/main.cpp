@@ -11,7 +11,8 @@ void handler(int signal)
     if (signal == SIGTERM)
     {
         // Give man a chance to clean up behind it
-        instance->stopMan();
+        delete instance;
+        exit(0);
     }
 }
 

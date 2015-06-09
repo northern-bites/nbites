@@ -188,7 +188,11 @@ bool bossSyncRead(volatile SharedData * sd, uint8_t * stage) {
 
 void Boss::DCMPreProcessCallback()
 {
-    if (!manRunning) return;
+    if (!manRunning) {
+        enactor.noStiff();
+        // TODO: leds
+        return;
+    }
 
     std::string joints;
     std::string stiffs;
@@ -214,7 +218,7 @@ void Boss::DCMPreProcessCallback()
             messages::LedCommand ledResults;
             ledResults.ParseFromString(leds);
             
-            //enactor.command(results.jointsCommand, results.stiffnessCommand);
+            enactor.command(results.jointsCommand, results.stiffnessCommand);
             led.setLeds(ledResults);
             
         } else {
@@ -291,7 +295,8 @@ void Boss::DCMPostProcessCallback()
     }
 
     if (nextSensorIndex - lastRead > 10) {
-        std::cout << "Sensors aren't getting read! Did Man die?" << std::endl;
+        // TODO: Kill?
+        //std::cout << "Sensors aren't getting read! Did Man die?" << std::endl;
         //std::cout << "commandIndex: " << sensorIndex << " lastRead: " << lastRead << std::endl;
         //manRunning = false; // TODO
     }

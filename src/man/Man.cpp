@@ -271,7 +271,7 @@ Man::Man() :
 
 Man::~Man()
 {
-    std::cout << "Man destructor" << std::endl;
+    std::cout << "Man is being killed" << std::endl;
 
     // Terminating the process should release this also
     flock(lockFD, LOCK_UN);
@@ -293,16 +293,6 @@ void Man::establishLock()
         std::cout << "Could not establish lock on lock file. Is man running?" << std::endl;
         exit(0);
     }
-}
-
-void Man::stopMan()
-{
-        std::cout << "Man is being killed" << std::endl;
-        // Release semaphores
-
-        // Also release our lock
-        flock(lockFD, LOCK_UN);
-        exit(0);
 }
 
 void Man::startSubThreads()

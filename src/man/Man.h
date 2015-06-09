@@ -30,7 +30,6 @@ class Man
 public:
     Man();
     virtual ~Man();
-    void stopMan();
 
 private:
     void establishLock();

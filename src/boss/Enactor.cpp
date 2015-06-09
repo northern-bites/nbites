@@ -27,20 +27,16 @@ void Enactor::command(messages::JointAngles angles, messages::JointAngles stiffn
     jointAngles.erase(jointAngles.begin() + Kinematics::R_HIP_YAW_PITCH);
     jointStiffnesses.erase(jointStiffnesses.begin() + Kinematics::R_HIP_YAW_PITCH);
 
-    std::cout << "Preprocess!" << std::endl;
-    std::cout << jointAngles.size() << std::endl;
-
     for (unsigned int i = 0; i < jointAngles.size(); ++i)
     {
         jointCommand[5][i][0] = jointAngles[i];
         stiffnessCommand[5][i][0] = jointStiffnesses[i];
     }
-    return;
 
     try
     {
         jointCommand[4][0] = dcm->getTime(0);
-        //dcm->setAlias(jointCommand);
+        dcm->setAlias(jointCommand);
     }
     catch (AL::ALError e) {
         std::cout << "Couldn't set joint angles becasue: " << e.toString() << std::endl;
@@ -48,11 +44,29 @@ void Enactor::command(messages::JointAngles angles, messages::JointAngles stiffn
     try
     {
         stiffnessCommand[4][0] = dcm->getTime(0);
-        //dcm->setAlias(stiffnessCommand);
+        dcm->setAlias(stiffnessCommand);
     }
     catch (AL::ALError e) {
         std::cout << "Couldn't set stiffness becasue: " << e.toString() << std::endl;
     }
+}
+
+void Enactor::noStiff()
+{
+    for (unsigned int i = 0; i < 25; ++i)
+    {
+        stiffnessCommand[5][i][0] = -1.0;
+    }
+
+    try
+    {
+        stiffnessCommand[4][0] = dcm->getTime(0);
+        dcm->setAlias(stiffnessCommand);
+    }
+    catch (AL::ALError e) {
+        std::cout << "Couldn't kill stiffness becasue: " << e.toString() << std::endl;
+    }
+
 }
 
 // Based on (stolen from) the original JointEnactorModule by Ellis Ratner

@@ -12,8 +12,7 @@ public:
     ~Enactor();
 
     void command(messages::JointAngles angles, messages::JointAngles stiffness);
-    //void commandAngles(messages::JointAngles angles);
-    //void commandStiffness(messages::JointAngles stiffness);
+    void noStiff();
 
 private:
     void initEnactor();
