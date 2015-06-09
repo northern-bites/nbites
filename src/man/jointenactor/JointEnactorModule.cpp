@@ -12,9 +12,7 @@
 namespace man {
 namespace jointenactor{
 
-JointEnactorModule::JointEnactorModule() :
-    commandIndex(0),
-    lastRead(0)
+JointEnactorModule::JointEnactorModule()
 {
     shared_fd = shm_open(NBITES_MEM, O_RDWR, 0600);
     if (shared_fd < 0) {
