@@ -5,14 +5,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.security.KeyPair;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.MissingResourceException;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -196,16 +193,14 @@ public class Utility {
 		return (desc != null && desc.trim().startsWith("(nblog"));
 	}
 	
-	/* creates tree for old out of _olddesc_ */
+	/* creates tree for param old out of old._olddesc_ */
 	public static boolean v6Convert(Log old) {
 		if (old._olddesc_ != null && isv6Description(old._olddesc_)) {
 			old.setTree(SExpr.deserializeFrom(old._olddesc_));
 			return true;
 		}
-		if (old._olddesc_ == null) return false;
-		
-		assert(old._olddesc_ != null);
-		
+		if (old._olddesc_ == null) return false;	//nothing to work with.
+				
 		HashMap<String, String> map = new HashMap<String, String>();
 		String[] attrs = old._olddesc_.trim().split(" ");
 		for (String a : attrs) {
@@ -215,19 +210,20 @@ public class Utility {
 			if (parts.length != 2)
 				return false;	//Don't attempt to reconstruct malformed descriptions.
 			
-			String type = parts[0].trim();
-			if (type.isEmpty())
+			String key = parts[0].trim();
+			if (key.isEmpty())
 				return false;
 			
 			String value = parts[1].trim();
 			if (value.isEmpty())
 				return false;
 			
-			if (map.containsKey(type)) {
+			if (map.containsKey(key)) {
+				//we never allowed duplicate keys
 				return false;
 			}
 			
-			map.put(type, value);
+			map.put(key, value);
 		}
 		
 		if (map.containsKey("checksum")) {

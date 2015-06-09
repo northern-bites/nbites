@@ -209,7 +209,7 @@ public class DefaultView extends ViewParent implements ActionListener {
 	public void alsoSelected(ArrayList<Log> also) {
 		Logger.log(Logger.INFO, "DefaultView sees also selected:");
 		for (Log a: also) {
-			Logger.logf(Logger.INFO, "\t%s\n", a.toString());
+			Logger.logf(Logger.INFO, "\t%s", a.toString());
 		}
 	}
 }

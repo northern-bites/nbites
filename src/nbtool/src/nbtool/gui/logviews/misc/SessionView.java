@@ -92,7 +92,7 @@ public class SessionView extends JPanel implements ActionListener {
 					accepted.add(lg);
 					
 					if (lg.bytes == null) {
-						Logger.log(Logger.INFO, "... loading bytes for save op.");
+						Logger.log(Logger.INFO, "... loading bytes for pack op.");
 						try {
 							FileIO.loadLog(lg, session.directoryFrom);
 						} catch (IOException e1) {

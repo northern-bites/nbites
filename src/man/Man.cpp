@@ -176,6 +176,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
          That being said, should probably not init (i.e. start threads)
          if not necessary.
          */
+            
+            
 #ifdef NAOQI_2
             nblog::HOST_TYPE = nblog::V5ROBOT;
 #else

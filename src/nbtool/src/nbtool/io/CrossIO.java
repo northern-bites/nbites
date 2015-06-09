@@ -32,6 +32,63 @@ import static nbtool.util.NBConstants.*;
 
 public class CrossIO {
 	
+	public static void main(String[] args) throws InterruptedException, IOException {
+		//testing...
+		
+		String path = "~/Documents/testdir/cross";
+		startNBCrossAt(path, "hello", true, false, true).waitFor();
+	}
+	
+	private static ArrayList<Process> children = null;
+		
+	public static synchronized Process startNBCrossAt(String pathToExecutable, String instName,
+			boolean pipeNBCrossOutput, boolean silenceNBCross,
+			boolean killOnJVMexit) throws IOException {
+		String execPath = Utility.localizePath(pathToExecutable);
+		ProcessBuilder cross = new ProcessBuilder();
+		
+		if (pipeNBCrossOutput) {
+			cross.inheritIO();
+		}
+		
+		if (silenceNBCross) {
+			cross.command(execPath, instName, "silent");
+		} else {
+			cross.command(execPath, instName);
+		}
+		
+		Process process = cross.start();
+		
+		if (killOnJVMexit) {
+			if (children != null) {
+				children.add(process);
+			} else {
+				children = new ArrayList<>();
+				
+				Runtime.getRuntime().addShutdownHook(new Thread(new Runnable(){
+
+					@Override
+					public void run() {
+						Logger.logf(Logger.WARN, "CrossIO attempting to destroy child processes.");
+						try {
+							
+							for (Process p : children) {
+								p.destroy();
+							}
+							
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
+					}
+					
+				}));
+			}
+		}
+		
+		return process;
+	}
+		
 	public static class CrossFunc {
 		public String name;
 		public String[] args;
