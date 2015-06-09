@@ -108,6 +108,8 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 
 		g.setColor(Color.black);
 		g.drawString("stationary: " + naiveBall.get("stationary"), 10, height + 70);
+		g.drawString("x_vel: " + naiveBall.get("x_vel"), 10, height + 90);
+		g.drawString("y_vel: " + naiveBall.get("y_vel"), 10, height + 110);
 
 		ArrayList<Float> dest_buf_x = (ArrayList<Float>)naiveBall.get("buf_x");
 		ArrayList<Float> dest_buf_y = (ArrayList<Float>)naiveBall.get("buf_y");
@@ -130,6 +132,8 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 			g.setColor(new Color(0.9f,0.8f,0.0f,.8f));
 			g.drawOval(dBallX - (BALL_SIZE/2), dBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 			g.fillOval(dBallX - (BALL_SIZE/2), dBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
+			g.setColor(Color.black);
+			g.drawString("x: " + dest_buf_x.get(i) + " y: " + dest_buf_y.get(i), dBallX, dBallY);
 		}
 
 		g.setColor(Color.black);

@@ -5352,6 +5352,24 @@ public final class BallModel {
      */
     messages.BallModel.NaiveBall.PositionOrBuilder getDestBufferOrBuilder(
         int index);
+
+    /**
+     * <code>optional float x_vel = 6;</code>
+     */
+    boolean hasXVel();
+    /**
+     * <code>optional float x_vel = 6;</code>
+     */
+    float getXVel();
+
+    /**
+     * <code>optional float y_vel = 7;</code>
+     */
+    boolean hasYVel();
+    /**
+     * <code>optional float y_vel = 7;</code>
+     */
+    float getYVel();
   }
   /**
    * Protobuf type {@code messages.NaiveBall}
@@ -5434,6 +5452,16 @@ public final class BallModel {
                 mutable_bitField0_ |= 0x00000010;
               }
               destBuffer_.add(input.readMessage(messages.BallModel.NaiveBall.Position.PARSER, extensionRegistry));
+              break;
+            }
+            case 53: {
+              bitField0_ |= 0x00000008;
+              xVel_ = input.readFloat();
+              break;
+            }
+            case 61: {
+              bitField0_ |= 0x00000010;
+              yVel_ = input.readFloat();
               break;
             }
           }
@@ -6072,12 +6100,44 @@ public final class BallModel {
       return destBuffer_.get(index);
     }
 
+    public static final int X_VEL_FIELD_NUMBER = 6;
+    private float xVel_;
+    /**
+     * <code>optional float x_vel = 6;</code>
+     */
+    public boolean hasXVel() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional float x_vel = 6;</code>
+     */
+    public float getXVel() {
+      return xVel_;
+    }
+
+    public static final int Y_VEL_FIELD_NUMBER = 7;
+    private float yVel_;
+    /**
+     * <code>optional float y_vel = 7;</code>
+     */
+    public boolean hasYVel() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional float y_vel = 7;</code>
+     */
+    public float getYVel() {
+      return yVel_;
+    }
+
     private void initFields() {
       velocity_ = 0F;
       stationary_ = false;
       yintercept_ = 0F;
       position_ = java.util.Collections.emptyList();
       destBuffer_ = java.util.Collections.emptyList();
+      xVel_ = 0F;
+      yVel_ = 0F;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -6107,6 +6167,12 @@ public final class BallModel {
       for (int i = 0; i < destBuffer_.size(); i++) {
         output.writeMessage(5, destBuffer_.get(i));
       }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeFloat(6, xVel_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeFloat(7, yVel_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -6135,6 +6201,14 @@ public final class BallModel {
       for (int i = 0; i < destBuffer_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(5, destBuffer_.get(i));
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(6, xVel_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(7, yVel_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -6273,6 +6347,10 @@ public final class BallModel {
         } else {
           destBufferBuilder_.clear();
         }
+        xVel_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000020);
+        yVel_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
 
@@ -6331,6 +6409,14 @@ public final class BallModel {
         } else {
           result.destBuffer_ = destBufferBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.xVel_ = xVel_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.yVel_ = yVel_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -6407,6 +6493,12 @@ public final class BallModel {
               destBufferBuilder_.addAllMessages(other.destBuffer_);
             }
           }
+        }
+        if (other.hasXVel()) {
+          setXVel(other.getXVel());
+        }
+        if (other.hasYVel()) {
+          setYVel(other.getYVel());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -7011,6 +7103,70 @@ public final class BallModel {
         return destBufferBuilder_;
       }
 
+      private float xVel_ ;
+      /**
+       * <code>optional float x_vel = 6;</code>
+       */
+      public boolean hasXVel() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional float x_vel = 6;</code>
+       */
+      public float getXVel() {
+        return xVel_;
+      }
+      /**
+       * <code>optional float x_vel = 6;</code>
+       */
+      public Builder setXVel(float value) {
+        bitField0_ |= 0x00000020;
+        xVel_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float x_vel = 6;</code>
+       */
+      public Builder clearXVel() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        xVel_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float yVel_ ;
+      /**
+       * <code>optional float y_vel = 7;</code>
+       */
+      public boolean hasYVel() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>optional float y_vel = 7;</code>
+       */
+      public float getYVel() {
+        return yVel_;
+      }
+      /**
+       * <code>optional float y_vel = 7;</code>
+       */
+      public Builder setYVel(float value) {
+        bitField0_ |= 0x00000040;
+        yVel_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float y_vel = 7;</code>
+       */
+      public Builder clearYVel() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        yVel_ = 0F;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:messages.NaiveBall)
     }
 
@@ -7082,12 +7238,13 @@ public final class BallModel {
       "bearing\030\033 \001(\002\022\021\n\tmov_vel_x\030\034 \001(\002\022\021\n\tmov_" +
       "vel_y\030\035 \001(\002\022\021\n\tmov_speed\030\036 \001(\002\"H\n\nShared" +
       "Ball\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\022\017\n\007ball_on\030\003 " +
-      "\001(\010\022\023\n\013reliability\030\004 \001(\005\"\312\001\n\tNaiveBall\022\020" +
+      "\001(\010\022\023\n\013reliability\030\004 \001(\005\"\350\001\n\tNaiveBall\022\020" +
       "\n\010velocity\030\001 \001(\002\022\022\n\nstationary\030\002 \001(\010\022\022\n\n" +
       "yintercept\030\003 \001(\002\022.\n\010position\030\004 \003(\0132\034.mes" +
       "sages.NaiveBall.Position\0221\n\013dest_buffer\030",
-      "\005 \003(\0132\034.messages.NaiveBall.Position\032 \n\010P" +
-      "osition\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002"
+      "\005 \003(\0132\034.messages.NaiveBall.Position\022\r\n\005x" +
+      "_vel\030\006 \001(\002\022\r\n\005y_vel\030\007 \001(\002\032 \n\010Position\022\t\n" +
+      "\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -7124,7 +7281,7 @@ public final class BallModel {
     internal_static_messages_NaiveBall_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_NaiveBall_descriptor,
-        new java.lang.String[] { "Velocity", "Stationary", "Yintercept", "Position", "DestBuffer", });
+        new java.lang.String[] { "Velocity", "Stationary", "Yintercept", "Position", "DestBuffer", "XVel", "YVel", });
     internal_static_messages_NaiveBall_Position_descriptor =
       internal_static_messages_NaiveBall_descriptor.getNestedTypes().get(0);
     internal_static_messages_NaiveBall_Position_fieldAccessorTable = new

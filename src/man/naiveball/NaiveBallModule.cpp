@@ -58,9 +58,10 @@ void NaiveBallModule::run_()
 
     if (frameOffCount > MAX_FRAMES_OFF) {
         clearBuffers();
-    } else if (bufferFull) {
-        naiveCheck();
     }
+    //  else if (bufferFull) {
+    //     naiveCheck();
+    // }
 
     portals::Message<messages::NaiveBall> naiveBallMessage(0);
 
@@ -160,13 +161,15 @@ void NaiveBallModule::calcPath()
     accx = vel_x_buffer[currentIndex] - vel_x_buffer[(currentIndex + 1) % NUM_FRAMES];
     accy = vel_y_buffer[currentIndex] - vel_y_buffer[(currentIndex + 1) % NUM_FRAMES];
 
-    accx = (accx < 0.f ? accx * -FRICTION : accx * FRICTION);
-    accy = (accy < 0.f ? accy * -FRICTION : accy * FRICTION);
+    // accx = (accx < 0.f ? accx * -FRICTION : accx * FRICTION);
+    // accy = (accy < 0.f ? accy * -FRICTION : accy * FRICTION);
 
     float t = .5;
     for (int i = 0; i < 10; i ++) {
-        float x = (.5)*accx*t*t + vel_x_buffer[currentIndex]*t + position_buffer[currentIndex].rel_x;
-        float y = (.5)*accy*t*t + vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y;
+        // float x = (.5)*accx*t*t + vel_x_buffer[currentIndex]*t + position_buffer[currentIndex].rel_x;
+        // float y = (.5)*accy*t*t + vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y;
+        float x = vel_x_buffer[currentIndex]*t + position_buffer[currentIndex].rel_x;
+        float y = vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y;
         // float yvel = (vel_y_buffer[currentIndex] < 0.f ? vel_y_buffer[currentIndex] * -FRICTION : vel_y_buffer[currentIndex] * FRICTION);
         // float xvel = (vel_x_buffer[currentIndex] < 0.f ? vel_x_buffer[currentIndex] * -FRICTION : vel_x_buffer[currentIndex] * FRICTION);
         // float x = yvel*t + position_buffer[currentIndex].rel_x;
