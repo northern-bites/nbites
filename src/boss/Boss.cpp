@@ -171,7 +171,7 @@ bool bossSyncRead(volatile SharedData * sd, uint8_t * stage) {
         return false;
     }
     
-    memcpy(stage, sd->command, COMMAND_SIZE);
+    memcpy(stage, (void *) sd->command, COMMAND_SIZE);
     pthread_mutex_unlock((pthread_mutex_t *) &(sd->cmnd_mutex));
     return true;
 }
@@ -227,7 +227,7 @@ bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, uint64_t index)
         pthread_mutex_trylock(oldestLock) == 0 //locked
         )
     {
-        memcpy(sd->sensors[!newest], stage, SENSORS_SIZE);
+        memcpy((void *)sd->sensors[!newest], stage, SENSORS_SIZE);
         newest = !newest;
         sd->latestSensorWritten = index;
         pthread_mutex_unlock(oldestLock);
@@ -235,7 +235,7 @@ bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, uint64_t index)
     } else if (
         pthread_mutex_trylock(newestLock) == 0
         ) {
-        memcpy(sd->sensors[newest], stage, SENSORS_SIZE);
+        memcpy((void *)sd->sensors[newest], stage, SENSORS_SIZE);
         //newest = newest!
         sd->latestSensorWritten = index;
         pthread_mutex_unlock(newestLock);

@@ -87,7 +87,7 @@ bool sensorSyncRead(volatile SharedData * sd, uint8_t * stage)
     pthread_mutex_t * lock = (pthread_mutex_t *) sd->sensor_mutex[bufi];
     
     pthread_mutex_lock(lock);
-    memcpy(stage, sd->sensors[bufi], SENSOR_SIZE);
+    memcpy(stage,(void *) sd->sensors[bufi], SENSOR_SIZE);
     pthread_mutex_unlock(lock);
     
     return true;
