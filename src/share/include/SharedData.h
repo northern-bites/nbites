@@ -14,9 +14,9 @@
 
 #include "serializer.h"
 
-const char * NBITES_MEM = "/nbites-memory";
-const int COMMAND_SIZE = (1 << 11);
-const int SENSOR_SIZE = (1 << 10);
+static const char * NBITES_MEM = "/nbites-memory";
+static const int COMMAND_SIZE = (1 << 11);
+static const int SENSOR_SIZE = (1 << 10);
 
 struct JointCommand {
     uint64_t writeIndex;
