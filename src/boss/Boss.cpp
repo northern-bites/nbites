@@ -157,9 +157,14 @@ int Boss::constructSharedMem()
     memset((void *) shared, 0, sizeof(SharedData));
     shared->sensorSwitch = 0;
     
+    pthread_mutex_init( (pthread_mutex_t *) &shared->sensor_mutex[0], NULL);
+    pthread_mutex_init( (pthread_mutex_t *) &shared->sensor_mutex[1], NULL);
+    pthread_mutex_init( (pthread_mutex_t *) &shared->cmnd_mutex, NULL);
+    
+    /*
     shared->sensor_mutex[0] = (volatile pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
     shared->sensor_mutex[1] = (volatile pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
-    shared->cmnd_mutex = (volatile pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
+    shared->cmnd_mutex = (volatile pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER; */
     return 1;
 }
     
