@@ -6,6 +6,8 @@
 
 #include "Homography.h"
 
+#include <iostream>
+
 using namespace std;
 
 namespace man {
@@ -436,7 +438,7 @@ void GeoLine::imageToField(const FieldHomography& h)
 
 string GeoLine::print() const
 {
-  return strPrintf("%7.1f, %7.1f, %7.1f, %7.1f", r(), t()*(180 / M_PI), ep0(), ep1());
+  return strPrintf("%5.1f, %5.1f, %5.1f, %5.1f, %5.1f, %5.1f", r(), t()*(180 / M_PI), ep0(), ep1(), ux(), uy());
 }
 
 }

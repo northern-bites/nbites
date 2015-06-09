@@ -278,14 +278,18 @@ void CornerDetector::findCorners(FieldLineList& list)
       FieldLine& line1 = list[i];
       FieldLine& line2 = list[j];
 
+      std::cout << "Are " << i << " and " << j << " connected by a corner?" << std::endl;
+
       // Find corners
       // NOTE since there are two hough lines in each field line, we require
       //      finding the same corner in all pairings of hough lines
       CornerID firstId = classify(line1.lines(0), line2.lines(0));
+      std::cout << "ID: " << (int) firstId << std::endl;
       bool foundCorner = !(firstId == CornerID::None);
       for (int k = 1; k < 2; k++) {
         for (int l = 0; l < 2; l++) {
           CornerID newId = classify(line1.lines(k), line2.lines(l));
+          std::cout << "ID: " << (int) newId << std::endl;
           if (firstId != newId)
             foundCorner = false;
         }
@@ -293,6 +297,7 @@ void CornerDetector::findCorners(FieldLineList& list)
 
       // Create corner object and add to field lines
       if (foundCorner) {
+        std::cout << (int) firstId << " corner found!" << std::endl;
         Corner newCorner(&line1, &line2, firstId);
         line1.addCorner(newCorner);
         line2.addCorner(newCorner);
@@ -312,8 +317,13 @@ CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
   double intersectX;
   double intersectY;
 
+  std::cout << "F1: " << field1.print() << std::endl;
+  std::cout << "F2: " << field2.print() << std::endl;
+
   bool intersects = field1.intersect(field2, intersectX, intersectY);
   if (!intersects) return CornerID::None;
+
+  std::cout << "IntersectX: " << intersectX << ", intersectY: " << intersectY << std::endl;
 
   // Find endpoints
   // TODO refactor
@@ -330,6 +340,11 @@ CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
   field1.endPoints(field1End1X, field1End1Y, field1End2X, field1End2Y);
   field2.endPoints(field2End1X, field2End1Y, field2End2X, field2End2Y);
 
+  std::cout << "X: " << field1End1X << ", Y: " << field1End1Y << std::endl;
+  std::cout << "X: " << field1End2X << ", Y: " << field1End2Y << std::endl;
+  std::cout << "X: " << field2End1X << ", Y: " << field2End1Y << std::endl;
+  std::cout << "X: " << field2End2X << ", Y: " << field2End2Y << std::endl;
+
   // Calculate distance
   double dist1[2];
   dist1[0] = dist(field1End1X, field1End1Y, intersectX, intersectY);
@@ -338,6 +353,11 @@ CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
   double dist2[2];
   dist2[0] = dist(field2End1X, field2End1Y, intersectX, intersectY);
   dist2[1] = dist(field2End2X, field2End2Y, intersectX, intersectY);
+
+  std::cout << "Dist1[0]: " << (int) dist1[0] << std::endl;
+  std::cout << "Dist1[1]: " << (int) dist1[1] << std::endl;
+  std::cout << "Dist2[0]: " << (int) dist2[0] << std::endl;
+  std::cout << "Dist2[1]: " << (int) dist2[1] << std::endl;
 
   // Find and classify corner
   for (int i = 0; i < 2; i++) {
