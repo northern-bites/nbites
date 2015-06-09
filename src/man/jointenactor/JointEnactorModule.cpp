@@ -39,6 +39,7 @@ JointEnactorModule::~JointEnactorModule()
     
 bool syncCmndWrite(volatile SharedData * sd, uint8_t * stage)
 {
+    printf("jw\n");
     pthread_mutex_t * cmutex = (pthread_mutex_t *) &sd->cmnd_mutex;
     pthread_mutex_lock(cmutex);
     
