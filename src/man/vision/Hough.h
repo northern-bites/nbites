@@ -14,6 +14,7 @@
 
 #include <list>
 #include <vector>
+#include <iostream>
 
 namespace man {
 namespace vision {
@@ -73,6 +74,9 @@ class HoughLine : public GeoLine
 
   Edge* members;
 
+  // Used for debug print outs
+  int _index;
+
 public:
   int rIndex() const { return _rIndex; }
   int tIndex() const { return _tIndex; }
@@ -98,8 +102,11 @@ public:
   // List of edges that are members of this line
   Edge* edgeMembers() const { return members; }
 
+  // For debug
+  int index() const { return _index; }
+
   // effect   Set image line from specified data
-  void set(int rIndex, int tIndex, double r, double t, double score);
+  void set(int rIndex, int tIndex, double r, double t, double score, int index);
 
   // Copy/assign OK
 
@@ -124,7 +131,7 @@ public:
   void add(int rIndex, int tIndex, double score)
   {
     HoughLine hl;
-    hl.set(rIndex, tIndex, rIndex + 0.5, tIndex * (M_PI / 128), score / 16.0);
+    hl.set(rIndex, tIndex, rIndex + 0.5, tIndex * (M_PI / 128), score / 16.0, size());
     push_back(hl);
   }
 
@@ -159,17 +166,17 @@ enum class CornerID {
 struct Corner : public std::pair<FieldLine*, FieldLine*>
 {
   Corner() : std::pair<FieldLine*, FieldLine*>() {}
-  Corner(FieldLine* first_, FieldLine* second_, int line1Id_, int line2Id_, CornerID id_);
+  Corner(FieldLine* first_, FieldLine* second_, CornerID id_);
 
-  int line1Id;
-  int line2Id;
   CornerID id;
+
+  std::string print() const;
 };
 
 // Detects goalbox
 // First is index of top goalbox line
 // Second is index of endline
-class GoalboxDetector : public std::pair<int, int>
+class GoalboxDetector : public std::pair<FieldLine*, FieldLine*>
 {
   double parallelThreshold_;
   double seperationThreshold_;
@@ -185,6 +192,8 @@ public:
 
   double seperationThreshold() const { return seperationThreshold_; }
   void seperationThreshold(double newThreshold) { seperationThreshold_ = newThreshold; }
+
+  std::string print() const;
 };
 
 // Detects corners
@@ -235,6 +244,7 @@ class FieldLine
   HoughLine* _lines[2];
   LineID id_;
   std::vector<Corner> corners_;
+  int index_;
 
 public:
   // Copy/assign OK
@@ -242,15 +252,20 @@ public:
   HoughLine& operator[](int index) { return *_lines[index]; }
   const HoughLine& operator[](int index) const  { return *_lines[index]; }
 
-  FieldLine(HoughLine& line1, HoughLine& line2, double fx0 = 0, double fy0 = 0);
+  FieldLine(HoughLine& line1, HoughLine& line2, int index = -1, double fx0 = 0, double fy0 = 0);
 
   LineID id() const { return id_; }
   void id(LineID newId) { id_ = newId; }
+
+  // For debug
+  int index() const { return index_; }
 
   void addCorner(Corner newCorner) { corners_.push_back(newCorner); }
   std::vector<Corner> corners() const { return corners_; }
 
   double separation() const { return _lines[0]->field().separation(_lines[1]->field()); }
+
+  std::string print() const;
 };
 
 // Either list or vector could be used here. Generally a field line list is not

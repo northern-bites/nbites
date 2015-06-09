@@ -169,8 +169,7 @@ int Vision_func() {
     Log* lineRet = new Log();
     std::string lineBuf;
 
-    std::cout << std::endl << "In image coordinates:" << std::endl;
-    int i = 0;
+    std::cout << std::endl << "Hough lines in image coordinates:" << std::endl;
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
         double r = line.r();
@@ -192,34 +191,32 @@ int Vision_func() {
         lineBuf.append((const char*) &ep1, sizeof(double));
         lineBuf.append((const char*) &lineIndex, sizeof(int));
 
-        std::cout << i++ << ", " << line.print() << std::endl;
+        std::cout << line.print() << std::endl;
     }
 
-    std::cout << std::endl << "In field coordinates:" << std::endl;
-    i = 0;
+    std::cout << std::endl << "Hough lines in field coordinates:" << std::endl;
+    int i = 0;
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
-        std::cout << i++ << ", " << line.field().print() << std::endl;
+        std::cout << line.field().print() << std::endl;
     }
 
-    // TODO print field lines
-    // TODO refactor field line id code 
-    // TODO add print methods for corner and box
-    std::cout << std::endl << "Goalbox and corner detection:" << std::endl;
-    man::vision::GoalboxDetector* box = module.getBox(topCamera);
-    man::vision::CornerDetector* corners = module.getCorners(topCamera);
-    if (box->first >= 0)
-        std::cout << "Box, " << box->first << ", " << box->second << std::endl;
-    for (int i = 0; i < corners->size(); i++) {
-        const man::vision::Corner& corner = (*corners)[i];
-        std::cout << "Corner, " << corner.line1Id << ", " << corner.line2Id << ", " << (int) corner.id << std::endl;
-    }
-
-    std::cout << std::endl << "Field line classification:" << std::endl;
+    // TODO include index
+    std::cout << std::endl << "Field lines:" << std::endl;
     man::vision::FieldLineList* fieldLineList = module.getFieldLines(topCamera);
     for (int i = 0; i < fieldLineList->size(); i++) {
         man::vision::FieldLine& line = (*fieldLineList)[i];
-        std::cout << i << ", " << (int) line.id() << std::endl;
+        std::cout << line.print() << std::endl;
+    }
+
+    std::cout << std::endl << "Goalbox and corner detection:" << std::endl;
+    man::vision::GoalboxDetector* box = module.getBox(topCamera);
+    man::vision::CornerDetector* corners = module.getCorners(topCamera);
+    if (box->first != NULL)
+        std::cout << box->print() << std::endl;
+    for (int i = 0; i < corners->size(); i++) {
+        const man::vision::Corner& corner = (*corners)[i];
+        std::cout << corner.print() << std::endl;
     }
 
     lineRet->setData(lineBuf);

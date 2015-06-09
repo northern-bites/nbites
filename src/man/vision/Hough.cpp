@@ -35,7 +35,7 @@ AdjustSet::AdjustSet()
   params[1].fitThresold = 0.6;
 }
 
-void HoughLine::set(int rIndex, int tIndex, double r, double t, double score)
+void HoughLine::set(int rIndex, int tIndex, double r, double t, double score, int index)
 {
   GeoLine::set(r, t);
   _rIndex = rIndex;
@@ -44,6 +44,7 @@ void HoughLine::set(int rIndex, int tIndex, double r, double t, double score)
   _fitError = -1;
   members = 0;
   fieldLine(-1);
+  _index = index;
 }
 
 enum
@@ -163,9 +164,9 @@ bool HoughLine::adjust(EdgeList& edges, const AdjustParams& p, bool capture)
 
 string HoughLine::print() const
 {
-  return strPrintf("%4d, %02X (%6.1f, %02X) %4.0f %4.2f [%4.0f ..%4.0f] %4d",
+  return strPrintf("%4d, %02X, (%6.1f, %02X), %4.0f, %4.2f, [%4.0f ..%4.0f], %4d, %4d",
                    rIndex(), tIndex(), r(), binaryAngle(), score(),
-                   fitError(), ep0(), ep1(), fieldLine());
+                   fitError(), ep0(), ep1(), fieldLine(), index());
 }
 
 // *********************
@@ -189,22 +190,24 @@ void HoughLineList::mapToField(const FieldHomography& h)
 // *                                *
 // **********************************
 
-Corner::Corner(FieldLine* first_, FieldLine* second_, int line1Id_, int line2Id_, CornerID id_)
-  : std::pair<FieldLine*, FieldLine*>(first_, second_), 
-    line1Id(line1Id_),
-    line2Id(line2Id_),
-    id(id_) 
+Corner::Corner(FieldLine* first_, FieldLine* second_, CornerID id_)
+  : std::pair<FieldLine*, FieldLine*>(first_, second_), id(id_)
 {}
 
+string Corner::print() const
+{
+  return strPrintf("C, %4d, %4d, %4d", (int) id, first->index(), second->index());
+}
+
 GoalboxDetector::GoalboxDetector()
-  : std::pair<int, int>(-1, -1), parallelThreshold_(5), seperationThreshold_(20)
+  : std::pair<FieldLine*, FieldLine*>(NULL, NULL), parallelThreshold_(5), seperationThreshold_(20)
 {}
 
 bool GoalboxDetector::find(FieldLineList& list)
 {
   // Reset detector
-  first = -1; 
-  second = -1;
+  first = NULL;
+  second = NULL;
 
   // Loop thru field lines
   for (int i = 0; i < list.size(); i++) {
@@ -230,16 +233,14 @@ bool GoalboxDetector::find(FieldLineList& list)
       // Classify lines if box was detected
       if (foundGoalbox) {
         if (fabs(line1[0].field().r()) < fabs(line2[0].field().r())) {
-          line1.id(LineID::TopGoalbox);
-          line2.id(LineID::Endline);
-          first = i;
-          second = j;
+          first = &line1;
+          second = &line2;
         } else {
-          line2.id(LineID::TopGoalbox);
-          line1.id(LineID::Endline);
-          first = j;
-          second = i;
+          first = &line2;
+          second = &line1;
         }
+        first->id(LineID::TopGoalbox);
+        second->id(LineID::Endline);
         return true;
       }
     }
@@ -265,6 +266,11 @@ bool GoalboxDetector::validBox(HoughLine& line1, HoughLine& line2) const
   bool seperation = fabs(distBetween - GOALBOX_DEPTH) < seperationThreshold();
 
   return parallel && seperation;
+}
+
+string GoalboxDetector::print() const
+{
+  return strPrintf("B, %4d, %4d", first->index(), second->index());
 }
 
 CornerDetector::CornerDetector()
@@ -303,11 +309,11 @@ void CornerDetector::findCorners(FieldLineList& list)
       if (foundCorner) {
         Corner newCorner;
         if (firstId == CornerID::TSecond)
-          newCorner = Corner(&line2, &line1, j, i, CornerID::T);
+          newCorner = Corner(&line2, &line1, CornerID::T);
         else if (firstId == CornerID::TFirst)
-          newCorner = Corner(&line1, &line2, i, j, CornerID::T);
+          newCorner = Corner(&line1, &line2, CornerID::T);
         else
-          newCorner = Corner(&line1, &line2, i, j, firstId);
+          newCorner = Corner(&line1, &line2, firstId);
         line1.addCorner(newCorner);
         line2.addCorner(newCorner);
         this->push_back(newCorner);
@@ -385,14 +391,20 @@ CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
 // *                        *
 // **************************
 
-FieldLine::FieldLine(HoughLine& line1, HoughLine& line2, double fx0, double fy0)
-  : id_(LineID::Line), corners_()
+FieldLine::FieldLine(HoughLine& line1, HoughLine& line2, int index, double fx0, double fy0)
+  : id_(LineID::Line), index_(index), corners_()
 {
   double d1 = fabs(line1.field().pDist(fx0, fy0));
   double d2 = fabs(line2.field().pDist(fx0, fy0));
   int i = (int)(d2 < d1);
   _lines[i    ] = &line1;
   _lines[i ^ 1] = &line2;
+}
+
+std::string FieldLine::print() const
+{
+  return strPrintf("%4d, %4d, %4d, %4d",
+                   (*this)[0].index(), (*this)[1].index(), id(), index());
 }
 
 FieldLineList::FieldLineList()
@@ -426,9 +438,10 @@ void FieldLineList::find(HoughLineList& houghLines)
         double separation = hl1->field().separation(hl2->field());
         if (0.0 < separation && separation <= maxLineSeparation())
         {
-          hl1->fieldLine((int)size());
-          hl2->fieldLine((int)size());
-          push_back(FieldLine(*hl1, *hl2, houghLines.fx0(), houghLines.fy0()));
+          int index = size();
+          hl1->fieldLine(index);
+          hl2->fieldLine(index);
+          push_back(FieldLine(*hl1, *hl2, index, houghLines.fx0(), houghLines.fy0()));
         }
       }
   }
