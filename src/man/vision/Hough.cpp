@@ -264,7 +264,7 @@ bool GoalboxDetector::validBox(HoughLine& line1, HoughLine& line2) const
 }
 
 CornerDetector::CornerDetector()
-  : orthogonalThreshold_(10), closeThreshold_(10), farThreshold_(70)
+  : orthogonalThreshold_(10), closeThreshold_(30), farThreshold_(100)
 {}
 
 void CornerDetector::findCorners(FieldLineList& list)
@@ -298,7 +298,13 @@ void CornerDetector::findCorners(FieldLineList& list)
       // Create corner object and add to field lines
       if (foundCorner) {
         std::cout << (int) firstId << " corner found!" << std::endl;
-        Corner newCorner(&line1, &line2, firstId);
+        Corner newCorner;
+        if (firstId == CornerID::TSecond)
+          newCorner = Corner(&line2, &line1, CornerID::T);
+        else if (firstId == CornerID::TFirst)
+          newCorner = Corner(&line1, &line2, CornerID::T);
+        else
+          newCorner = Corner(&line1, &line2, firstId);
         line1.addCorner(newCorner);
         line2.addCorner(newCorner);
       }
@@ -359,21 +365,29 @@ CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
   std::cout << "Dist2[0]: " << (int) dist2[0] << std::endl;
   std::cout << "Dist2[1]: " << (int) dist2[1] << std::endl;
 
-  // Find and classify corner
+  // Find and classify concave and convex corners
   for (int i = 0; i < 2; i++) {
     for (int j = 0; j < 2; j++) {
+      std::cout << i <<  " - " << j << std::endl;
+      std::cout << "Dist1[1]: " << (int) dist1[i] << std::endl;
+      std::cout << "Dist2[0]: " << (int) dist2[j] << std::endl;
       // Concave or convex corners have both endpoints on the intersection point
       if (dist1[i] < closeThreshold() && dist2[j] < closeThreshold()) {
         // Found concave or convex
         if (field1.ep0() < 0 && field1.ep1() > 0 && field2.ep0() < 0 && field2.ep1() > 0)
           return CornerID::Concave;
         return CornerID::Convex;
-
-      } else if ((dist1[i] < closeThreshold() && dist2[j] > farThreshold()) ||
-                 (dist2[j] < closeThreshold() && dist1[i] > farThreshold())) {
-        // Found t
-        return CornerID::T;
       }
+    }
+  }
+  // Find and classify t corners
+  for (int i = 0; i < 2; i++) {
+    for (int j = 0; j < 2; j++) {
+      // Found t
+      if ((dist1[i] < closeThreshold() && dist2[j] > farThreshold()))
+        return CornerID::TSecond;
+      else if (dist2[j] < closeThreshold() && dist1[i] > farThreshold())
+        return CornerID::TFirst;
     }
   }
 }

@@ -150,12 +150,15 @@ enum class CornerID {
   None,
   Concave,
   Convex,
-  T
+  T,
+  TFirst, // TODO refactor
+  TSecond
 };
 
 // Corner object used in corner detection and field line classification
 struct Corner : public std::pair<FieldLine*, FieldLine*>
 {
+  Corner() : std::pair<FieldLine*, FieldLine*>() {}
   Corner(FieldLine* first_, FieldLine* second_, CornerID id_);
 
   CornerID id;
