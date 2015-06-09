@@ -80,4 +80,6 @@ message NaiveBall {
     optional float yintercept = 3;
     repeated Position position = 4;
     repeated Position dest_buffer = 5;
+    optional float x_vel = 6;
+    optional float y_vel = 7;
 }

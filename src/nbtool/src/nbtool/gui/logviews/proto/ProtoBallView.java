@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.lang.Float;
 import java.lang.Integer;
+import java.lang.Exception;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -50,6 +51,7 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 	}
 
 	public void paintComponent(Graphics g){
+
 		int height = (int) (this.getHeight() * .75);
 		int width = this.getWidth();
 
@@ -70,21 +72,21 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 		int ballX = (robotX - OFFSET*((Float)filteredBall.get("rel_y")).intValue());
 		int ballY = (robotY - OFFSET*((Float)filteredBall.get("rel_x")).intValue());
 
-		System.out.println("BALLX: " + filteredBall.get("rel_x"));
-		System.out.println("BALLy: " + filteredBall.get("rel_y"));
-		int intX = (robotX - OFFSET*((Float)naiveBall.get("yintercept")).intValue());
-		int intY = robotY;
+		int interceptX = (robotX - OFFSET*((Float)naiveBall.get("yintercept")).intValue());
+		int interceptY = robotY;
 
 		g.setColor(Color.black);
 		g.drawString("Velocity: " + naiveBall.get("velocity"), ballX + 10, ballY - 10);
 		g.setColor(Color.red);
 		g.drawOval(ballX - (BALL_SIZE/2), ballY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 		g.fillOval(ballX - (BALL_SIZE/2), ballY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
+
 		g.setColor(Color.pink);
-		g.fillOval(intX - (BALL_SIZE/2), intY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
+		g.fillOval(interceptX - (BALL_SIZE/2), interceptY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 
 		g.setColor(Color.black);
 		g.drawString("yintercept: " + naiveBall.get("yintercept"), 160, height + 20);
+		g.drawString(naiveBall.get("yintercept").toString(), interceptX - 10, interceptY + 30);
 		g.drawString("velocity: " + naiveBall.get("velocity"), 160, height + 40);
 		g.drawString("rel_x: " + filteredBall.get("rel_x"), 10, height + 20);
 		g.drawString("rel_y: " + filteredBall.get("rel_y"), 10, height + 40);
@@ -98,16 +100,14 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 			int nBallX = (robotX - OFFSET*((Float) nbY.get(i)).intValue());
 			int nBallY = (robotY - OFFSET*((Float) nbX.get(i)).intValue());
 
+			lineEndX = (lineEndX > width) ? width - 10 : lineEndX;
+			lineEndY = (lineEndY > height) ? height - 10 : lineEndY;
+
 			g.setColor(new Color(0.f,0.f,.9f,(float)(.2 + .2*(i/nbX.size()))));
 			g.drawOval(nBallX - (BALL_SIZE/2), nBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 			g.fillOval(nBallX - (BALL_SIZE/2), nBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 
 		}
-
-		int lineStartX = robotX - OFFSET*((Float) nbY.get(1)).intValue();
-		int lineStartY = robotY - OFFSET*((Float) nbX.get(1)).intValue();
-		int lineEndX = robotX - OFFSET*(((Float) nbY.get(0)).intValue());
-		int lineEndY = robotY - OFFSET*(((Float) nbX.get(0)).intValue());
 
 		g.setColor(Color.black);
 		g.drawString("nb_x_start: " + nbX.get(1), 10, height + 60);
@@ -116,25 +116,30 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 		g.drawString("nb_x_end: " + nbX.get(0), 10, height + 100);
 		g.drawString("nb_y_end: " + nbY.get(0), 10, height + 120);
 
-		g.setColor(Color.black);
-		g.drawLine(lineStartX, lineStartY, lineEndX, lineEndY);
-		g.drawLine(lineStartX, lineStartY-1, lineEndX, lineEndY-1);
+		ArrayList<Float> dest_buf_x = (ArrayList<Float>)naiveBall.get("buf_x");
+		ArrayList<Float> dest_buf_y = (ArrayList<Float>)naiveBall.get("buf_y");
+		if (dest_buf_x == null || dest_buf_y == null) return;
 
-		ArrayList<Float> bufX = (ArrayList<Float>)naiveBall.get("buf_x");
-		ArrayList<Float> bufY = (ArrayList<Float>)naiveBall.get("buf_y");
-		if (bufX == null || bufY == null) return;
+		int lineStartX = ballX;
+		int lineStartY = ballY;
+		int lineEndX = robotX - OFFSET*(((Float) dest_buf_y.get(4)).intValue());
+		int lineEndY = robotY - OFFSET*(((Float) dest_buf_x.get(4)).intValue());
 
-		for (int i = 0; i < bufX.size(); i++) {
-			System.out.println("BuffX: " + bufX.get(i));
-			System.out.println("BuffY: " + bufY.get(i));
-			int nBallX = (robotX - OFFSET*((Float) bufY.get(i)).intValue());
-			int nBallY = (robotY - OFFSET*((Float) bufX.get(i)).intValue());
+		lineEndX = (lineEndX > width) ? width - 10 : lineEndX;
+		lineEndY = (lineEndY > height) ? height - 10 : lineEndY;
+
+		for (int i = 0; i < dest_buf_x.size(); i++) {
+			int nBallX = (robotX - OFFSET*((Float) dest_buf_y.get(i)).intValue());
+			int nBallY = (robotY - OFFSET*((Float) dest_buf_x.get(i)).intValue());
 
 			g.setColor(new Color(0.9f,0.8f,0.0f,.8f));
 			g.drawOval(nBallX - (BALL_SIZE/2), nBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 			g.fillOval(nBallX - (BALL_SIZE/2), nBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
-
 		}
+
+		g.setColor(Color.black);
+		g.drawLine(lineStartX, lineStartY, lineEndX, lineEndY);
+		g.drawLine(lineStartX, lineStartY-1, lineEndX, lineEndY-1);
 
 	}
 
@@ -146,73 +151,77 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 
 	public void setLog(Log newlog) {
 		clear();
-		String t = (String) newlog.primaryType();
-		ball_on = false;
-		if (!t.equals("MULTIBALL")) return;
+		try {
+			String t = (String) newlog.primaryType();
+			ball_on = false;
+			if (!t.equals("MULTIBALL")) return;
 
-		ball_on = true;
+			ball_on = true;
 
-		int nb_length = Integer.parseInt(newlog.tree().find("contents").get(1).find("nb_length").get(1).value());
-		byte[] nb = Arrays.copyOfRange(newlog.bytes,0,nb_length);
-		byte[] fb = Arrays.copyOfRange(newlog.bytes,nb_length,newlog.bytes.length);
+			int nb_length = Integer.parseInt(newlog.tree().find("contents").get(1).find("nb_length").get(1).value());
+			byte[] nb = Arrays.copyOfRange(newlog.bytes,0,nb_length);
+			byte[] fb = Arrays.copyOfRange(newlog.bytes,nb_length,newlog.bytes.length);
 
-		System.out.println("OMG");
-		Class<? extends com.google.protobuf.GeneratedMessage> nbClass = Utility.protobufClassFromType("proto-NaiveBall");
-		Class<? extends com.google.protobuf.GeneratedMessage> fbClass = Utility.protobufClassFromType("proto-FilteredBall");
-		com.google.protobuf.Message nbMsg = Utility.protobufInstanceForClassWithData(nbClass, nb);
-		com.google.protobuf.Message fbMsg = Utility.protobufInstanceForClassWithData(fbClass, fb);
+			System.out.println("OMG");
+			Class<? extends com.google.protobuf.GeneratedMessage> nbClass = Utility.protobufClassFromType("proto-NaiveBall");
+			Class<? extends com.google.protobuf.GeneratedMessage> fbClass = Utility.protobufClassFromType("proto-FilteredBall");
+			com.google.protobuf.Message nbMsg = Utility.protobufInstanceForClassWithData(nbClass, nb);
+			com.google.protobuf.Message fbMsg = Utility.protobufInstanceForClassWithData(fbClass, fb);
 
-		Map<FieldDescriptor, Object> fbFields = fbMsg.getAllFields();
-		for (Map.Entry<FieldDescriptor, Object> entry : fbFields.entrySet()) {
-			if (entry.getKey().getName().equals("vis")) {
-				Map<FieldDescriptor, Object> visFields = ((com.google.protobuf.Message)entry.getValue()).getAllFields();
-				for (Map.Entry<FieldDescriptor, Object> visEntry : visFields.entrySet()) {
-					visionBall.put(visEntry.getKey().getName(), visEntry.getValue());
-				}
-			} else {
-				filteredBall.put(entry.getKey().getName(), entry.getValue());
-			}
-		}
-		System.out.println("OMGg");
-		Map<FieldDescriptor, Object> nbFields = nbMsg.getAllFields();
-		for (Map.Entry<FieldDescriptor, Object> entry : nbFields.entrySet()) {
-			if (entry.getKey().getName().equals("position")) {
-				ArrayList<Float> position_x = new ArrayList();
-				ArrayList<Float> position_y = new ArrayList();
-				List<Object> vals = (List<Object>) entry.getValue();
-				int i = 0;
-				for (Object v : vals) {
-					Map<FieldDescriptor, Object> posFields = ((com.google.protobuf.Message)v).getAllFields();
-					for (Map.Entry<FieldDescriptor, Object> posEntry : posFields.entrySet()) {
-						if (posEntry.getKey().getName().equals("x")) {position_x.add((float)posEntry.getValue());}
-						else {position_y.add((float)posEntry.getValue());}
+			Map<FieldDescriptor, Object> fbFields = fbMsg.getAllFields();
+			for (Map.Entry<FieldDescriptor, Object> entry : fbFields.entrySet()) {
+				if (entry.getKey().getName().equals("vis")) {
+					Map<FieldDescriptor, Object> visFields = ((com.google.protobuf.Message)entry.getValue()).getAllFields();
+					for (Map.Entry<FieldDescriptor, Object> visEntry : visFields.entrySet()) {
+						visionBall.put(visEntry.getKey().getName(), visEntry.getValue());
 					}
+				} else {
+					filteredBall.put(entry.getKey().getName(), entry.getValue());
 				}
-				naiveBall.put("position_x", position_x);
-				naiveBall.put("position_y", position_y);
-			} else if (entry.getKey().getName().equals("dest_buffer")) {
-				ArrayList<Float> buf_x = new ArrayList();
-				ArrayList<Float> buf_y = new ArrayList();
-				List<Object> vals = (List<Object>) entry.getValue();
-				int i = 0;
-				for (Object v : vals) {
-					Map<FieldDescriptor, Object> posFields = ((com.google.protobuf.Message)v).getAllFields();
-					for (Map.Entry<FieldDescriptor, Object> posEntry : posFields.entrySet()) {
-						System.out.println("Val: " + posEntry.getValue());
-						if (posEntry.getKey().getName().equals("x")) {buf_x.add((float)posEntry.getValue());}
-						else {buf_y.add((float)posEntry.getValue());}
-					}
-				}
-				naiveBall.put("buf_x", buf_x);
-				naiveBall.put("buf_y", buf_y);
 			}
-			else { naiveBall.put(entry.getKey().getName(), entry.getValue()); }
+			System.out.println("OMGg");
+			Map<FieldDescriptor, Object> nbFields = nbMsg.getAllFields();
+			for (Map.Entry<FieldDescriptor, Object> entry : nbFields.entrySet()) {
+				if (entry.getKey().getName().equals("position")) {
+					ArrayList<Float> position_x = new ArrayList();
+					ArrayList<Float> position_y = new ArrayList();
+					List<Object> vals = (List<Object>) entry.getValue();
+					int i = 0;
+					for (Object v : vals) {
+						Map<FieldDescriptor, Object> posFields = ((com.google.protobuf.Message)v).getAllFields();
+						for (Map.Entry<FieldDescriptor, Object> posEntry : posFields.entrySet()) {
+							if (posEntry.getKey().getName().equals("x")) {position_x.add((float)posEntry.getValue());}
+							else {position_y.add((float)posEntry.getValue());}
+						}
+					}
+					naiveBall.put("position_x", position_x);
+					naiveBall.put("position_y", position_y);
+				} else if (entry.getKey().getName().equals("dest_buffer")) {
+					ArrayList<Float> buf_x = new ArrayList();
+					ArrayList<Float> buf_y = new ArrayList();
+					List<Object> vals = (List<Object>) entry.getValue();
+					int i = 0;
+					for (Object v : vals) {
+						Map<FieldDescriptor, Object> posFields = ((com.google.protobuf.Message)v).getAllFields();
+						for (Map.Entry<FieldDescriptor, Object> posEntry : posFields.entrySet()) {
+							if (posEntry.getKey().getName().equals("x")) {buf_x.add((float)posEntry.getValue());}
+							else {buf_y.add((float)posEntry.getValue());}
+						}
+					}
+					naiveBall.put("buf_x", buf_x);
+					naiveBall.put("buf_y", buf_y);
+				}
+				else { naiveBall.put(entry.getKey().getName(), entry.getValue()); }
+			}
+
+			System.out.println("OMGw");
+
+			// System.out.println(naiveBall.toString());
+			repaint();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("FOUNDEXCEPTION");
 		}
-
-		System.out.println("OMGw");
-
-		// System.out.println(naiveBall.toString());
-		repaint();
 	}
 
 	protected void useSize(Dimension s) {
