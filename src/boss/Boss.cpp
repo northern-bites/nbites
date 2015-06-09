@@ -71,7 +71,7 @@ Boss::~Boss()
     dcmPostProcessConnection.disconnect();
 
     // Close shared memory
-    munmap(shared, sizeof(SharedData));
+    munmap((void *) shared, sizeof(SharedData));
     close(shared_fd);
     close(fifo_fd);
 }
@@ -143,7 +143,7 @@ int Boss::constructSharedMem()
         return -1;
         // TODO error
     }
-    shared = (SharedData*) mmap(NULL, sizeof(SharedData),
+    shared = (volatile SharedData*) mmap(NULL, sizeof(SharedData),
                                 PROT_READ | PROT_WRITE,
                                 MAP_SHARED, shared_fd, 0);
 
@@ -153,7 +153,7 @@ int Boss::constructSharedMem()
         // TODO error
     }
 
-    memset(shared, 0, sizeof(SharedData));
+    memset((void *) shared, 0, sizeof(SharedData));
     shared->sensorSwitch = 0;
     
     shared->sensor_mutex[0] = PTHREAD_MUTEX_INITIALIZER;
@@ -162,7 +162,7 @@ int Boss::constructSharedMem()
     return 1;
 }
     
-bool bossSyncRead(SharedData * sd, uint8_t * stage) {
+bool bossSyncRead(volatile SharedData * sd, uint8_t * stage) {
     //We know there exists new data in >sd<,
     //now we just need to safely read it out.
     
@@ -217,7 +217,7 @@ void Boss::DCMPreProcessCallback()
     }
 }
             
-bool bossSyncWrite(SharedData * sd, uint8_t * stage, uint64_t index)
+bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, uint64_t index)
 {
     uint8_t& newest = (sd->sensorSwitch);
     pthread_mutex_t * oldestLock = &sd->sensor_mutex[!(newest)];

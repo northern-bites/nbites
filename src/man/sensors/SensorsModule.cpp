@@ -31,7 +31,7 @@ SensorsModule::SensorsModule()
         exit(0);
     }
 
-    shared = (SharedData*) mmap(NULL, sizeof(SharedData),
+    shared = (volatile SharedData*) mmap(NULL, sizeof(SharedData),
                                 PROT_READ | PROT_WRITE,
                                 MAP_SHARED, shared_fd, 0);
 
@@ -44,7 +44,7 @@ SensorsModule::SensorsModule()
 SensorsModule::~SensorsModule()
 {
     // Close shared memory
-    munmap(shared, sizeof(SharedData));
+    munmap((void *)shared, sizeof(SharedData));
     close(shared_fd);
     //sem_close(semaphore);
 }
@@ -81,7 +81,7 @@ std::string SensorsModule::makeSweetMoveTuple(const messages::JointAngles* angle
     return std::string(output);
 }
     
-bool sensorSyncRead(SharedData * sd, uint8_t * stage)
+bool sensorSyncRead(volatile SharedData * sd, uint8_t * stage)
 {
     uint8_t bufi = sd->sensorSwitch;
     pthread_mutex_t * lock = sd->sensor_mutex[bufi];

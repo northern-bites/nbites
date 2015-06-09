@@ -20,7 +20,7 @@ JointEnactorModule::JointEnactorModule()
         exit(0);
     }
 
-    shared = (SharedData*) mmap(NULL, sizeof(SharedData),
+    shared = (volatile SharedData*) mmap(NULL, sizeof(SharedData),
                                             PROT_READ | PROT_WRITE,
                                             MAP_SHARED, shared_fd, 0);
 
@@ -33,11 +33,11 @@ JointEnactorModule::JointEnactorModule()
 JointEnactorModule::~JointEnactorModule()
 {
     // Close shared memory
-    munmap(shared, sizeof(SharedData));
+    munmap((void *)shared, sizeof(SharedData));
     close(shared_fd);
 }
     
-bool syncCmndWrite(SharedData * sd, uint8_t * stage)
+bool syncCmndWrite(volatile SharedData * sd, uint8_t * stage)
 {
     pthread_mutex_t * cmutex = &sd->cmnd_mutex;
     pthread_mutex_lock(cmutex);
