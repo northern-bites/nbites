@@ -80,8 +80,11 @@ public abstract class SExpr implements Serializable{
 	}
 	
 	/* modifying */
+	public abstract void setList(List<SExpr> list);
 	public abstract void setList(SExpr ... items);
 	public abstract void setAtom(String val);
+	
+	//list modifications
 	public abstract void insert(int index, SExpr item);
 	public abstract boolean remove(SExpr item);
 
@@ -286,6 +289,13 @@ public abstract class SExpr implements Serializable{
 			value = null;
 			list = new ArrayList<>(Arrays.asList(items));
 		}
+		
+		@Override
+		public void setList(List<SExpr> list) {
+			atom = false;
+			value = null;
+			list = new ArrayList<>(list);
+		}
 
 		@Override
 		public void setAtom(String val) {
@@ -408,6 +418,9 @@ public abstract class SExpr implements Serializable{
 		public List<SExpr> getList() {
 			return null;
 		}
+
+		@Override
+		public void setList(List<SExpr> list) {}
 	}
 
 	public static class DoesNotExistException extends RuntimeException {}
