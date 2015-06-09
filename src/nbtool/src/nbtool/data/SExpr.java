@@ -19,8 +19,8 @@ public abstract class SExpr implements Serializable{
 
 	private static final SExpr NOT_FOUND = new NotFound();
 
-	public static SExpr deserializeFrom(String serial) {
-		return _deserialize(serial, new MutRef());
+	public static SExpr deserializeFrom(String serializedSExpr) {
+		return _deserialize(serializedSExpr, new MutRef());
 	}
 
 	public static SExpr newAtom(String val) {
@@ -66,6 +66,14 @@ public abstract class SExpr implements Serializable{
 	public static SExpr newKeyValue(String key, int value) {
 		return newList(new Found(key), new Found(Integer.toString(value)));
 	}
+	
+	public static SExpr newKeyValue(String key, float value) {
+		return newList(new Found(key), new Found(Float.toString(value)));
+	}
+	
+	public static SExpr newKeyValue(String key, double value) {
+		return newList(new Found(key), new Found(Double.toString(value)));
+	}
 
 	public static SExpr pair(String key, String value) {
 		return newList(new Found(key), new Found(value));
@@ -79,7 +87,7 @@ public abstract class SExpr implements Serializable{
 		return newList(new Found(key), new Found(Integer.toString(value)));
 	}
 	
-	/* modifying */
+	/* modifying TYPE OF SEXPR (type after function is as specified)*/
 	public abstract void setList(List<SExpr> list);
 	public abstract void setList(SExpr ... items);
 	public abstract void setAtom(String val);

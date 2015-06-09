@@ -24,7 +24,7 @@ namespace nblog {
         //Translate the given string into an SExpression
         static SExpr * read(const std::string s, ssize_t& p);
         static SExpr * read(const std::string s) {
-            size_t start = 0;
+            ssize_t start = 0;
             return SExpr::read(s, start);
         }
         
@@ -105,13 +105,14 @@ namespace nblog {
         //key double value for use in log_main.
         SExpr(const std::string& key, int index, int cval);
         
-        /* MODIYFING AN EXISTING SEXPR */
-        void setList(std::vector<SExpr> newContents);
+        /* MODIYFING AN EXISTING SEXPR (may change type)*/
+        void setList(const std::vector<SExpr>& newContents);
         void setList(std::initializer_list<SExpr> exprs);
         void setAtom(std::string val);
         void setAtomAsCopy(SExpr atomToCopy);
         
-        
+        void insert(int index, SExpr& inserted);
+        bool remove(int index);
         
         bool isAtom() { return _atom; }
         ssize_t count() { return _atom ? -1 : _list.size(); }
@@ -121,7 +122,9 @@ namespace nblog {
         long valueAsLong();
         double valueAsDouble();
         
+        //returns NULL if doesn't exist.
         SExpr * get(int i);
+        std::vector<SExpr> * getList();
         
         // Adds the given list/single of SExpressions to this list
         // No effect if an atom
