@@ -173,7 +173,7 @@ int Boss::constructSharedMem()
 bool bossSyncRead(volatile SharedData * sd, uint8_t * stage) {
     //We know there exists new data in >sd<,
     //now we just need to safely read it out.
-    printf("br\n");
+    //printf("br\n");
     
     int lockret = pthread_mutex_trylock( (pthread_mutex_t *) &(sd->cmnd_mutex));
     if (lockret) {
@@ -229,7 +229,7 @@ void Boss::DCMPreProcessCallback()
             
 bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, uint64_t index)
 {
-    printf("bw\n");
+    //printf("bw\n");
     volatile uint8_t& newest = (sd->sensorSwitch);
     pthread_mutex_t * oldestLock = (pthread_mutex_t *) &sd->sensor_mutex[!(newest)];
     pthread_mutex_t * newestLock = (pthread_mutex_t *) &sd->sensor_mutex[ (newest)];
@@ -247,7 +247,7 @@ bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, uint64_t index)
         pthread_mutex_trylock(newestLock) == 0
         ) {
         memcpy((void *)sd->sensors[newest], stage, SENSOR_SIZE);
-        //newest = newest!
+        //newest = newest
         sd->latestSensorWritten = index;
         pthread_mutex_unlock(newestLock);
         return true;
