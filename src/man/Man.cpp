@@ -26,7 +26,7 @@ namespace man {
     playerNum(param.getParam<int>("playerNumber")),
     teamNum(param.getParam<int>("teamNumber")),
     robotName(param.getParam<std::string>("robotName")),
-    obstacleParam("/home/nao/nbites/lib/obstacleParams.json"),
+    obstParam("/home/nao/nbites/Config/obstacleParams.json"),
     sensorsThread("sensors", SENSORS_FRAME_LENGTH_uS),
     sensors(broker),
     jointEnactor(broker),
@@ -56,17 +56,11 @@ namespace man {
 
         /** Process json for obstacle sonars **/
         if (obstacleParam.getParam<bool>("set_all_sonar")) {
-            obstacle.setSonars(obstacleParam.getParam<bool>("all_left_sonar"),
-                               obstacleParam.getParam<bool>("all_right_sonar"));
+            obstacle.setSonars(obstParam.getParam<bool>("all_left_sonar"),
+                               obstParam.getParam<bool>("all_right_sonar"));
         } else {
-            std::string url ("/home/nao/nbites/lib/robotParams/");
-            url.append(robotName);
-            url.append("/sonarParams.json");
-            std::cout<<url<<std::endl;
-            ParamReader robotParam(url);
-
-            obstacle.setSonars(robotParam.getParam<bool>("left_sonar"),
-                               robotParam.getParam<bool>("right_sonar"));
+            obstacle.setSonars(obstParam.getChildParam<bool>(robotName, "left_sonar"),
+                               obstParam.getChildParam<bool>(robotName, "right_sonar"));
         }
 
         /** Sensors **/
