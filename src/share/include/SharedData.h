@@ -38,7 +38,7 @@ struct SensorValues {
     messages::StiffStatus stiffStatus;
 };
 
-volatile struct SharedData {
+struct SharedData {
     uint8_t sensors[2][SENSOR_SIZE];
     uint8_t command[COMMAND_SIZE];
 

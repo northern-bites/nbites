@@ -74,7 +74,7 @@ void JointEnactorModule::writeCommand()
     }
 
     uint64_t lw = shared->latestCommandWritten;
-    uint64_t lr = shared->latestCommandRead
+    uint64_t lr = shared->latestCommandRead;
 
     if (lw - lr > 1) {
         std::cout << "BOSS missed a frame" << std::endl;

@@ -62,7 +62,7 @@ private:
     bool manRunning;
 
     int shared_fd;
-    SharedData* shared;
+    volatile SharedData* shared;
     
     uint8_t cmndStaging[COMMAND_SIZE];
     uint64_t commandSkips;

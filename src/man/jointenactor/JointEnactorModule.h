@@ -45,9 +45,9 @@ private:
     void writeCommand();
 
     int shared_fd;
-    SharedData* shared;
+    volatile SharedData* shared;
 
-    uiint8_t cmndStaging[COMMAND_SIZE];
+    uint8_t cmndStaging[COMMAND_SIZE];
 
     messages::JointAngles latestJointAngles_;
     messages::JointAngles latestStiffness_;

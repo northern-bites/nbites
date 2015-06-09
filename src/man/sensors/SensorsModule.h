@@ -60,7 +60,7 @@ private:
     SensorValues values;
 
     int shared_fd;
-    SharedData* shared;
+    volatile SharedData* shared;
     uint8_t sensorsStage[SENSOR_SIZE];
 
     bool lastPrint;
