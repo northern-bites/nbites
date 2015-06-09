@@ -164,6 +164,7 @@ public class FileIO {
 			if (!Utility.isv6Description(desc)) {
 				logs[i] = new Log();
 				logs[i]._olddesc_ = desc;
+				logs[i].name = files[i].getName();
 				
 				try {
 					FileIO.loadLog(logs[i], location);
