@@ -14,6 +14,7 @@ public:
     virtual ~LedEnactor() {}
 
     void setLeds(messages::LedCommand command);
+    void noMan();
 
 protected:
     NaoLights naoLights;

@@ -19,5 +19,14 @@ void LedEnactor::setLeds(messages::LedCommand command)
     naoLights.sendLights();
 }
 
+void LedEnactor::noMan()
+{
+    for (int i=20; i<29; i++)
+    {
+        naoLights.setRGB(i, 0xFFFFFF);
+    }
+    naoLights.sendLights();
+}
+
 }
 }

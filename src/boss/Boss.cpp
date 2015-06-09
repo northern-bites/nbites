@@ -190,7 +190,7 @@ void Boss::DCMPreProcessCallback()
 {
     if (!manRunning) {
         enactor.noStiff();
-        // TODO: leds
+        led.noMan();
         return;
     }
 
