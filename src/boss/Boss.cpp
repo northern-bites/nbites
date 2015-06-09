@@ -5,6 +5,7 @@
 #include "JointNames.h"
 
 #include <iostream>
+#include <string.h>
 
 #define MAN_RESTART 'r'
 #define MAN_KILL    'k'
@@ -156,9 +157,9 @@ int Boss::constructSharedMem()
     memset((void *) shared, 0, sizeof(SharedData));
     shared->sensorSwitch = 0;
     
-    shared->sensor_mutex[0] = PTHREAD_MUTEX_INITIALIZER;
-    shared->sensor_mutex[1] = PTHREAD_MUTEX_INITIALIZER;
-    shared->cmnd_mutex = PTHREAD_MUTEX_INITIALIZER;
+    shared->sensor_mutex[0] = (volatile pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
+    shared->sensor_mutex[1] = (volatile pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
+    shared->cmnd_mutex = (volatile pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
     return 1;
 }
     
@@ -186,7 +187,7 @@ void Boss::DCMPreProcessCallback()
     std::string leds;
     
     if (shared->latestCommandWritten > shared->latestCommandRead) {
-        if (bossSyncRead(shared, cmndStaging) {
+        if (bossSyncRead(shared, cmndStaging)) {
             Deserialize des(cmndStaging);
             
             if (!des.parse()) {
@@ -221,7 +222,7 @@ void Boss::DCMPreProcessCallback()
 bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, uint64_t index)
 {
     printf("bw\n");
-    uint8_t& newest = (sd->sensorSwitch);
+    volatile uint8_t& newest = (sd->sensorSwitch);
     pthread_mutex_t * oldestLock = (pthread_mutex_t *) &sd->sensor_mutex[!(newest)];
     pthread_mutex_t * newestLock = (pthread_mutex_t *) &sd->sensor_mutex[ (newest)];
 
@@ -229,7 +230,7 @@ bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, uint64_t index)
         pthread_mutex_trylock(oldestLock) == 0 //locked
         )
     {
-        memcpy((void *)sd->sensors[!newest], stage, SENSORS_SIZE);
+        memcpy((void *)sd->sensors[!newest], stage, SENSOR_SIZE);
         newest = !newest;
         sd->latestSensorWritten = index;
         pthread_mutex_unlock(oldestLock);
@@ -237,7 +238,7 @@ bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, uint64_t index)
     } else if (
         pthread_mutex_trylock(newestLock) == 0
         ) {
-        memcpy((void *)sd->sensors[newest], stage, SENSORS_SIZE);
+        memcpy((void *)sd->sensors[newest], stage, SENSOR_SIZE);
         //newest = newest!
         sd->latestSensorWritten = index;
         pthread_mutex_unlock(newestLock);
