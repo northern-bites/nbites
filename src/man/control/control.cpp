@@ -1,6 +1,7 @@
 #include "Log.h"
 #include "exactio.h"
 #include "nbdebug.h"
+#include "DebugConfig.h"
 #include "control.h"
 #include "../log/logging.h"
 
@@ -98,7 +99,6 @@ namespace control {
         } else {
             SExpr s;
 
-            SExpr w = SExpr("whichcamera",receivedParams.whichcamera());
             SExpr h = SExpr("hflip",receivedParams.h_flip());
             SExpr v = SExpr("vflip",receivedParams.v_flip());
             SExpr ae = SExpr("autoexposure",receivedParams.auto_exposure());
@@ -114,7 +114,6 @@ namespace control {
             SExpr wb = SExpr("white_balance",receivedParams.whitebalance());
             SExpr ftb = SExpr("fade_to_black",receivedParams.fadetoblack());
 
-            s.append(w);
             s.append(h);
             s.append(v);
             s.append(ae);
@@ -132,15 +131,39 @@ namespace control {
 
             std::string stringToWrite = s.serialize();
 
-            if(receivedParams.whichcamera() == "TOP"){
-                std::ofstream file("/home/nao/nbites/Config/topCameraParams.txt");
-                file << stringToWrite;
-                file.close(); //different name based on camera specified in the protobuf
-            } else {
-                std::ofstream file("/home/nao/nbites/Config/bottomCameraParams.txt");
-                file << stringToWrite;
-                file.close();
-            }
+            #ifdef NAOQI_2
+                std::cout<<"Saving as V5"<<std::endl;
+                if(receivedParams.whichcamera() == "TOP"){
+                    std::cout<<"TOP Params Received"<<std::endl;
+                    std::ofstream file("/home/nao/nbites/Config/V5topCameraParams.txt");
+                    std::cout<<stringToWrite<<std::endl;
+                    file << stringToWrite;
+                    file.close();
+                    std::cout<<"Saving Done"<<std::endl;
+                } else  {
+                    std::cout<<"Bottom Params Received"<<std::endl;
+                    std::ofstream file("/home/nao/nbites/Config/V5bottomCameraParams.txt");
+                    std::cout<<stringToWrite<<std::endl;
+                    file << stringToWrite;
+                    file.close();
+                    std::cout<<"Saving Done"<<std::endl;
+                }
+            #else
+                std::cout<<"Saving as V4"<<std::endl;
+                if(receivedParams.whichcamera() == "TOP"){
+                    std::cout<<"TOP Params Received"<<std::endl;
+                    std::ofstream file("/home/nao/nbites/Config/V4topCameraParams.txt");
+                    file << stringToWrite;
+                    file.close();
+                    std::cout<<"Saving Done"<<std::endl;
+                } else  {
+                    std::cout<<"Bottom Params Received"<<std::endl;
+                    std::ofstream file("/home/nao/nbites/Config/V4bottomCameraParams.txt");
+                    file << stringToWrite;
+                    file.close();
+                    std::cout<<"Saving Done"<<std::endl;
+                }
+            #endif
         }
         return 0;
     }

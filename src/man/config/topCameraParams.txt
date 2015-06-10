@@ -1,1 +1,0 @@
-((whichcamera TOP) (hflip 1) (vflip 1) (autoexposure 0) (brightness 128) (contrast 58) (saturation 134) (hue 0) (sharpness 3) (gamma 220) (auto_whitebalance 0) (exposure 36) (gain 53) (white_balance 3300) (fade_to_black 0))

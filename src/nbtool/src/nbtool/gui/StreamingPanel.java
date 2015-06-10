@@ -54,10 +54,15 @@ public class StreamingPanel extends JPanel implements ActionListener {
 		startStreaming.setPreferredSize(new Dimension(80,25));
 		canvas.add(startStreaming);
 
-		saveParams = new JButton("save");
-		saveParams.addActionListener(this);
-		saveParams.setPreferredSize(new Dimension(60,25));
-		canvas.add(saveParams);
+		saveParamsV4 = new JButton("saveV4");
+		saveParamsV4.addActionListener(this);
+		saveParamsV4.setPreferredSize(new Dimension(80,25));
+		canvas.add(saveParamsV4);
+
+		saveParamsV5 = new JButton("saveV5");
+		saveParamsV5.addActionListener(this);
+		saveParamsV5.setPreferredSize(new Dimension(80,25));
+		canvas.add(saveParamsV5);
 		
 		sp = new JScrollPane();
 		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -71,7 +76,7 @@ public class StreamingPanel extends JPanel implements ActionListener {
 	
 	private void useSize(Dimension s) {
 		sp.setBounds(0, 0, s.width, s.height);
-		Dimension d1, d2, d3, d4;
+		Dimension d1, d2, d3, d4, d5;
 		int y=0;
 		int x = 0;
 		d1 = topCameraPrefs.getPreferredSize();
@@ -86,9 +91,12 @@ public class StreamingPanel extends JPanel implements ActionListener {
 		startStreaming.setBounds(10,y,d3.width,d3.height);
 		y += d3.height+3;
 
-		d4 = saveParams.getPreferredSize();
-		saveParams.setBounds(90,y-3-d3.height,d4.width,d4.height);
+		d4 = saveParamsV4.getPreferredSize();
+		saveParamsV4.setBounds(90,y-3-d3.height,d4.width,d4.height);
 		y += d4.height+3;
+
+		d5 = saveParamsV5.getPreferredSize();
+		saveParamsV5.setBounds(170,y-6-d3.height-d4.height,d4.width,d5.height);
 		
 		canvas.setPreferredSize(new Dimension(250,y));
 	}
@@ -97,7 +105,8 @@ public class StreamingPanel extends JPanel implements ActionListener {
 	private JPanel canvas;
 	
 	private JButton startStreaming;
-	private JButton saveParams;
+	private JButton saveParamsV4;
+	private JButton saveParamsV5;
 	
 	private CameraPrefs topCameraPrefs;
 	private CameraPrefs bottomCameraPrefs;
@@ -113,8 +122,10 @@ public class StreamingPanel extends JPanel implements ActionListener {
 
 		if(e.getSource() == startStreaming) {
 			tryStream(topCameraParams, bottomCameraParams);
-		} else if(e.getSource() == saveParams) {
-			trySave(topCameraParams, bottomCameraParams);
+		} else if(e.getSource() == saveParamsV4) {
+			trySave(topCameraParams, bottomCameraParams,4);
+		} else if(e.getSource() == saveParamsV5) {
+			trySave(topCameraParams,bottomCameraParams,5);
 		}
 	}
 	
@@ -164,62 +175,57 @@ public class StreamingPanel extends JPanel implements ActionListener {
 		first.tryAddCmnd(ControlIO.createCmndSetCameraParams(bottomCamera));
 	}
 
-	private void trySave(Integer[] topCameraPar, Integer[] bottomCameraPar) {
+	private void trySave(Integer[] topCameraPar, Integer[] bottomCameraPar, int naoVersion) {
 		SExpr top;
 		SExpr bot;
 
-		top = SExpr.list(
-			SExpr.newKeyValue("whichcamera","TOP"),
-			SExpr.newKeyValue("hflip",topCameraPar[0]),
-			SExpr.newKeyValue("vflip",topCameraPar[1]),
-			SExpr.newKeyValue("autoexposure",topCameraPar[2]),
-			SExpr.newKeyValue("brightness",topCameraPar[3]),
-			SExpr.newKeyValue("contrast",topCameraPar[4]),
-			SExpr.newKeyValue("saturation",topCameraPar[5]),
-			SExpr.newKeyValue("hue",topCameraPar[6]),
-			SExpr.newKeyValue("sharpness",topCameraPar[7]),
-			SExpr.newKeyValue("gamma",topCameraPar[8]),
-			SExpr.newKeyValue("auto_whitebalance",topCameraPar[9]),
-			SExpr.newKeyValue("exposure",topCameraPar[10]),
-			SExpr.newKeyValue("gain",topCameraPar[11]),
-			SExpr.newKeyValue("white_balance",topCameraPar[12]),
-			SExpr.newKeyValue("fade_to_black",topCameraPar[13])
-			);
-
-		bot = SExpr.list(
-			SExpr.newKeyValue("whichcamera","TOP"),
-			SExpr.newKeyValue("hflip",bottomCameraPar[0]),
-			SExpr.newKeyValue("vflip",bottomCameraPar[1]),
-			SExpr.newKeyValue("autoexposure",bottomCameraPar[2]),
-			SExpr.newKeyValue("brightness",bottomCameraPar[3]),
-			SExpr.newKeyValue("contrast",bottomCameraPar[4]),
-			SExpr.newKeyValue("saturation",bottomCameraPar[5]),
-			SExpr.newKeyValue("hue",bottomCameraPar[6]),
-			SExpr.newKeyValue("sharpness",bottomCameraPar[7]),
-			SExpr.newKeyValue("gamma",bottomCameraPar[8]),
-			SExpr.newKeyValue("auto_whitebalance",bottomCameraPar[9]),
-			SExpr.newKeyValue("exposure",bottomCameraPar[10]),
-			SExpr.newKeyValue("gain",bottomCameraPar[11]),
-			SExpr.newKeyValue("white_balance",bottomCameraPar[12]),
-			SExpr.newKeyValue("fade_to_black",bottomCameraPar[13])
-			);
+		top = buildSExprFromArray(topCameraPar);
+		bot = buildSExprFromArray(bottomCameraPar);
 			
-			String topContent = top.serialize();
-			String botContent = bot.serialize();
-			File topFile = new File("../../src/man/config/topCameraParams.txt");
-			File botFile = new File("../../src/man/config/bottomCameraParams.txt");
+		String topContent = top.serialize();
+		String botContent = bot.serialize();
 
-			try {
-				BufferedWriter topOut = new BufferedWriter(new FileWriter(topFile));
-				topOut.write(topContent);
-				topOut.close();
+		File topFile, botFile;
+		if(naoVersion == 4) {
+			topFile = new File("../../src/man/config/V4topCameraParams.txt");
+			botFile = new File("../../src/man/config/V4bottomCameraParams.txt");
+		} else {
+			topFile = new File("../../src/man/config/V5topCameraParams.txt");
+			botFile = new File("../../src/man/config/V5bottomCameraParams.txt");
+		}
+		
+		try {
+			BufferedWriter topOut = new BufferedWriter(new FileWriter(topFile));
+			topOut.write(topContent);
+			topOut.close();
 
-				BufferedWriter botOut = new BufferedWriter(new FileWriter(botFile));
-				botOut.write(botContent);
-				botOut.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			BufferedWriter botOut = new BufferedWriter(new FileWriter(botFile));
+			botOut.write(botContent);
+			botOut.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private SExpr buildSExprFromArray(Integer[] Params) {
+		SExpr s;
+		s = SExpr.list(
+			SExpr.newKeyValue("hflip",Params[0]),
+			SExpr.newKeyValue("vflip",Params[1]),
+			SExpr.newKeyValue("autoexposure",Params[2]),
+			SExpr.newKeyValue("brightness",Params[3]),
+			SExpr.newKeyValue("contrast",Params[4]),
+			SExpr.newKeyValue("saturation",Params[5]),
+			SExpr.newKeyValue("hue",Params[6]),
+			SExpr.newKeyValue("sharpness",Params[7]),
+			SExpr.newKeyValue("gamma",Params[8]),
+			SExpr.newKeyValue("auto_whitebalance",Params[9]),
+			SExpr.newKeyValue("exposure",Params[10]),
+			SExpr.newKeyValue("gain",Params[11]),
+			SExpr.newKeyValue("white_balance",Params[12]),
+			SExpr.newKeyValue("fade_to_black",Params[13])
+			);
+		return s;
 	}
 	
 	private void useStatus(STATUS s) {

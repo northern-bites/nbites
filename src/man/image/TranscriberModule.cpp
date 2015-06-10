@@ -216,13 +216,27 @@ void ImageTranscriber::initQueueAllBuffers() {
 void ImageTranscriber::initSettings()
 {
     std::string filepath;
+#ifdef NAOQI_2 //for NAOQI 2.x
     if(cameraType == Camera::TOP) {
-        filepath = "/home/nao/nbites/Config/topCameraParams.txt";
+        filepath = "/home/nao/nbites/Config/V5topCameraParams.txt";
         std::cout<<"[INFO] Camera::TOP"<<std::endl;
+        std::cout<<"[INFO] NAOQI: V5"<<std::endl;
     } else {
-        filepath = "/home/nao/nbites/Config/bottomCameraParams.txt";
+        filepath = "/home/nao/nbites/Config/V5bottomCameraParams.txt";
         std::cout<<"[INFO] Camera::BOTTOM"<<std::endl;
+        std::cout<<"[INFO] NAOQI: V5"<<std::endl;
     }
+#else //for NAOQI 1.14
+    if(cameraType == Camera::TOP) {
+        filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
+        std::cout<<"[INFO] Camera::TOP"<<std::endl;
+        std::cout<<"[INFO] NAOQI: V4"<<std::endl;
+    } else {
+        filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
+        std::cout<<"[INFO] Camera::BOTTOM"<<std::endl;
+        std::cout<<"[INFO] NAOQI: V4"<<std::endl;
+    }
+#endif
     
     if(FILE *file = fopen(filepath.c_str(),"r")) {
         fclose(file);
@@ -236,6 +250,7 @@ void ImageTranscriber::initSettings()
 
         if(params.count() >= 2) {
             std::cout<<"[INFO] Reading from SExpr"<<std::endl;
+            std::cout<<"[INFO] PATH: "<<filepath<<std::endl;
 
             updated_settings.hflip = params.find("hflip")->get(1)->valueAsInt();
             updated_settings.vflip = params.find("vflip")->get(1)->valueAsInt();
@@ -582,11 +597,20 @@ void TranscriberModule::run_()
 {
     struct stat file_stats;
     std::string filepath;
-    if(it.type() == Camera::TOP) { //set path according to camera
-        filepath = "/home/nao/nbites/Config/topCameraParams.txt";
-    } else {
-        filepath = "/home/nao/nbites/Config/bottomCameraParams.txt";
-    }
+    #ifdef NAOQI_2
+        if(it.type() == Camera::TOP) {
+            filepath = "/home/nao/nbites/Config/V5topCameraParams.txt";
+        } else {
+            filepath = "/home/nao/nbites/Config/V5bottomCameraParams.txt";
+        }
+    #else
+        if(it.type() == Camera::TOP) {
+            filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
+        } else {
+            filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
+        }
+    #endif
+
     if(FILE *file = fopen(filepath.c_str(),"r")) { //existence check
         fclose(file);
         int err = stat(filepath.c_str(),&file_stats);
@@ -601,7 +625,7 @@ void TranscriberModule::run_()
             it.initSettings();
         }
     } else {
-        //std::cout<<"[ERR] File Does Not Exist"<<std::endl;
+        std::cout<<"[ERR] File Does Not Exist"<<std::endl;
     }
 
     jointsIn.latch();
