@@ -51,12 +51,12 @@ public class StreamingPanel extends JPanel implements ActionListener {
 		
 		startStreaming = new JButton("stream");
 		startStreaming.addActionListener(this);
-		startStreaming.setPreferredSize(new Dimension(80,20));
+		startStreaming.setPreferredSize(new Dimension(80,25));
 		canvas.add(startStreaming);
 
 		saveParams = new JButton("save");
 		saveParams.addActionListener(this);
-		saveParams.setPreferredSize(new Dimension(60,20));
+		saveParams.setPreferredSize(new Dimension(60,25));
 		canvas.add(saveParams);
 		
 		sp = new JScrollPane();
@@ -83,11 +83,11 @@ public class StreamingPanel extends JPanel implements ActionListener {
 		y += d2.height+3;
 		
 		d3 = startStreaming.getPreferredSize();
-		startStreaming.setBounds(2,y,d3.width,d3.height);
+		startStreaming.setBounds(10,y,d3.width,d3.height);
 		y += d3.height+3;
 
 		d4 = saveParams.getPreferredSize();
-		saveParams.setBounds(84,y-3-d3.height,d4.width,d4.height);
+		saveParams.setBounds(90,y-3-d3.height,d4.width,d4.height);
 		y += d4.height+3;
 		
 		canvas.setPreferredSize(new Dimension(250,y));
