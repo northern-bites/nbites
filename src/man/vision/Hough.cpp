@@ -409,6 +409,7 @@ CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
   for (int i = 0; i < 2; i++) {
     for (int j = 0; j < 2; j++) {
       // Found t
+      // TODO for T corners, both endpoints outside of far threshold?
       if ((dist1[i] < closeThreshold() && dist2[j] > farThreshold()))
         return CornerID::TSecond;
       else if (dist2[j] < closeThreshold() && dist1[i] > farThreshold())
@@ -483,7 +484,6 @@ void FieldLineList::find(HoughLineList& houghLines)
 // TODO convex and T -> classify as side goalbox?
 // TODO midline classification? (cross detection, lots of green detection, etc.)
 // TODO find and use field edge?
-// TODO bill's simulator?
 void FieldLineList::classify(GoalboxDetector& boxDetector, CornerDetector& cornerDetector)
 {
   // Run goalbox detector
@@ -503,7 +503,7 @@ void FieldLineList::classify(GoalboxDetector& boxDetector, CornerDetector& corne
 
     bool oneConcave = false;
     bool oneConvex = false;
-    bool oneTLong = false;
+    bool oneTLong = false; // TODO change terminology
     bool oneTShort = false;
 
     for (int j = 0; j < corners.size(); j++) {

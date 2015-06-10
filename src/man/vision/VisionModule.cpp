@@ -104,7 +104,7 @@ void VisionModule::run_()
         kinematics[i]->joints(jointsIn.message());
         homography[i]->wz0(kinematics[i]->wz0());
         homography[i]->tilt(kinematics[i]->tilt());
-        homography[i]->azimuth(kinematics[i]->azimuth());
+        // homography[i]->azimuth(kinematics[i]->azimuth());
 
         // Approximate brightness gradient
         edgeDetector[i]->gradient(yImage);
