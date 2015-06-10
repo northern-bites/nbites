@@ -152,39 +152,6 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         add(oFuzzyV);
     }
 
-    public void saveParams() {
-        // Tell NBCross to save command
-        this.log.tree().append(SExpr.pair("SaveParams", "true"));
-
-        System.out.printf("New tree: %s\n\n", this.log.tree().get(0).serialize());
-        
-        System.out.printf("New tree: %s\n\n", this.log.tree().get(1).serialize());
-
-        System.out.printf("New tree: %s\n\n", this.log.tree().get(2).serialize());
-
-        System.out.printf("New tree: %s\n\n", this.log.tree().get(3).serialize());
-
-        System.out.printf("New tree: %s\n\n", this.log.tree().get(4).serialize());
-
-
-        System.out.printf("New tree: %s\n\n", this.log.tree().get(5).serialize());
-
-        System.out.printf("New tree: %s\n\n", this.log.tree().get(6).serialize());
-
-        System.out.printf("New tree: %s\n\n", this.log.tree().print());
-
-
-        callNBFunction();
-        SExpr saveAtom = this.log.tree().find("SaveParams");
-        if (!saveAtom.exists()) {
-            System.out.println("Doesnt exist!");
-        }
-        boolean test = this.log.tree().remove(saveAtom);
-        if (!test) {
-            System.out.println("Not removed!");
-        }
-    }
-
     public void adjustParams() {
 
         if (firstLoad || zeroParam())
@@ -216,19 +183,35 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
                 SExpr.newKeyValue("fuzzy_v", (float)(oFuzzyV.getValue()) / 100.00)))
             );
 
-  //      System.out.printf("NEW PARAMS: %s\n\n", (newParams.serialize()));   
-
        SExpr oldColor, newColor, oldParams = this.log.tree().find("Params");
 
         if (oldParams.exists()) {
+            SExpr saveAtom = oldParams.get(1).find("SaveParams");
+            this.log.tree().remove(saveAtom);
             oldParams.setList( SExpr.atom("Params"), newParams); 
         } else {
             this.log.tree().append(SExpr.pair("Params", newParams));
         }
 
-//        System.out.printf("This.Log description: %s\n\n", (this.log.tree().print()));   
+        callNBFunction();
+    }
+
+    public void saveParams() {
+        SExpr params = this.log.tree().find("Params");
+
+        if (!params.exists())
+            return;
+
+        params.get(1).append(SExpr.newKeyValue("SaveParams", "True"));
 
         callNBFunction();
+
+        // TODO:  how to manually remove?
+
+       // System.out.printf("Looking 0 %d\n", this.log.tree().find("Params").get(0).print());
+       // System.out.printf("Looking 1 %s\n", this.log.tree().find("Params").get(1).print());
+       // System.out.printf("Looking 2 %B\n", this.log.tree().find("Params").get(2).exists());
+
     }
 
     private void callNBFunction() {
@@ -239,6 +222,8 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         CrossFunc func = inst.functionWithName("Vision");
         if (func == null)
             return;
+
+        System.out.printf("Passing to nbcross: %s\n\n", this.log.tree().print());
 
         CrossCall call = new CrossCall(this, func, this.log);
         inst.tryAddCall(call);

@@ -11,12 +11,13 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <fstream>
 
 using nblog::Log;
 using nblog::SExpr;
 
 man::vision::Colors* getColorsFromSliderSExpr(SExpr* params);
-void updateSavedColorParams(std::string jsonPath, float* params, bool top);
+void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top);
 SExpr getSExprFromSavedParams(int color, std::string jsonPath, bool top);
 std::string getSExprStringFromColorJSonNode(boost::property_tree::ptree tree);
 
@@ -37,6 +38,7 @@ int Vision_func() {
     int height = 480;
 
     std::string jsonPath = "/home/evanhoyt/Desktop/ColorParams.json";
+    std::string lispPath = "/home/evanhoyt/Desktop/ColorParams.txt";
     
     messages::YUVImage image(buf, width, height, width);
     messages::JointAngles emptyJoints;
@@ -54,24 +56,23 @@ int Vision_func() {
     module.jointsIn.setMessage(emptyJointsMessage);
     module.inertialsIn.setMessage(emptyInertialsMessage);
 
+  //  std::cout << "LOG DESCRIPTION: " << args[0]->tree().print() <<  std::endl;
+    
     // If log included colors in description, update color params, but leave json data
     SExpr* params = args[0]->tree().find("Params");
     if (params != NULL) {
-        std::cout << "FOUND PARAMS: " << params->serialize() <<  std::endl;
         module.setColorParams(getColorsFromSliderSExpr(params), top);
+
+        std::cout << "Searching for Save: \n" << params->get(1)->print() << std::endl;
+
+        SExpr* save = params->get(1)->find("SaveParams");
+        if (save != NULL) {
+            std::cout << "SAVE PARAMS: " << params->serialize() <<  std::endl;
+            updateSavedColorParams(lispPath, params, top);
+        } else ( std::cout << "DON't SAVE");
     } else { std::cout << "NO PARAMS" << std::endl; }
 
     // If log says to save, write params to ColorParams.txt
-    SExpr* save = args[0]->tree().find("SaveParams");
-    if (save != NULL) {
-        std::cout << "SAVE PARAMS: " << params->serialize() <<  std::endl;
-        updateSavedColorParams(params)
-    // }
-
-    // If log says to save, save current params to json file
-    if (args.size() > 2) {
-        updateSavedColorParams(jsonPath, (float*)args[1], top);
-    }
 
     man::vision::ImageFrontEnd* frontEnd = module.runAndGetFrontEnd(top);
 
@@ -251,36 +252,53 @@ man::vision::Colors* getColorsFromSliderSExpr(SExpr* params) {
                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));
 
-   std::cout << params->serialize() << std::endl;
+  // std::cout << params->serialize() << std::endl;
 
     return ret;
 }
 
-void updateSavedColorParams(std::string jsonPath, SExpr* params, bool top) {
+void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top) {
+    std::ifstream textFile;
+    textFile.open(sexpPath);
 
-    // TODO make this work. Covert to string and write/replace
+    std::string sexpText;
+    char line[100];
 
-   
-    if (top) {
-        tree = tree.get_child("colorParams.topColors");
-    } else {
-        tree = tree.get_child("colorParams.bottomColors");
-    }
-
-    for (int i = 0; i < 3; i++) {
-        switch (i) {
-            case 0 : tree = tree.get_child("white");
-            case 1 : tree = tree.get_child("green");
-            case 2 : tree = tree.get_child("orange");
+    if (textFile.is_open()) {
+        while (!textFile.eof()){
+            textFile >> line;
+            sexpText += line;
         }
-
-        tree.put<float>("darkU",  params[i*6 + 0]);
-        tree.put<float>("darkV",  params[i*6 + 1]);
-        tree.put<float>("lightU", params[i*6 + 2]);
-        tree.put<float>("lightV", params[i*6 + 3]);
-        tree.put<float>("fuzzyU", params[i*6 + 4]);
-        tree.put<float>("fuzzyV", params[i*6 + 5]);
     }
+
+    SExpr* savedSExpr = SExpr::read((const std::string)sexpText);
+    
+    std::cout << "File Top: \n" << savedSExpr->get(1)->find("Top")->print() << std::endl;
+
+    std::cout << "New Top: \n" << params->print() << std::endl;
+
+    textFile.close();
+   
+    // if (top) {
+    //     tree = tree.get_child("colorParams.topColors");
+    // } else {
+    //     tree = tree.get_child("colorParams.bottomColors");
+    // }
+
+    // for (int i = 0; i < 3; i++) {
+    //     switch (i) {
+    //         case 0 : tree = tree.get_child("white");
+    //         case 1 : tree = tree.get_child("green");
+    //         case 2 : tree = tree.get_child("orange");
+    //     }
+
+    //     tree.put<float>("darkU",  params[i*6 + 0]);
+    //     tree.put<float>("darkV",  params[i*6 + 1]);
+    //     tree.put<float>("lightU", params[i*6 + 2]);
+    //     tree.put<float>("lightV", params[i*6 + 3]);
+    //     tree.put<float>("fuzzyU", params[i*6 + 4]);
+    //     tree.put<float>("fuzzyV", params[i*6 + 5]);
+    // }
 }
 
 SExpr getSExprFromSavedParams(int color, std::string jsonPath, bool top) {
