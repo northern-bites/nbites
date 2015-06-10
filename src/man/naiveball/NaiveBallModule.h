@@ -27,9 +27,7 @@ const float FRICTION = -20.f;
 const int NUM_FRAMES = 30;  // Num frames to keep a buffer of; 30 frames ~ 1 sec
 const int MAX_FRAMES_OFF = 5;   // If don't see the ball for 5 frames, clear buffer
 const int AVGING_FRAMES = 5; // Number of frames to take an avg position estimate from
-
-// Magic numbers...
-// TODO how many frames per second?
+const int NUM_DEST = 10;
 
 class NaiveBallModule : public portals::Module
 {
@@ -40,10 +38,7 @@ public:
 
     virtual void run_();
 
-    // portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
-    // portals::InPortal<messages::RobotLocation> locIn;
     portals::InPortal<messages::FilteredBall> ballIn;
-
     portals::OutPortal<messages::NaiveBall> naiveBallOutput;
 
 private:
@@ -53,9 +48,9 @@ private:
     void clearBuffers();
     void naiveCheck();
     void naivePredict(BallState b);
-    BallState avgFrames(int startingIndex);
     void calcPath();
     float calculateVelocity(bool x);
+    BallState avgFrames(int startingIndex);
 
     void print();
     void printBallState(BallState x);

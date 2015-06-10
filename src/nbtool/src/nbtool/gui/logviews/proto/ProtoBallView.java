@@ -34,6 +34,7 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 	private static final long serialVersionUID = -541524730464912737L;
 	private static final int OFFSET = 2;
 	private static final int BALL_SIZE = 18;
+	private static final int SPACE = 20;
 
 	private Map<String, Object> filteredBall;
 	private Map<String, Object> visionBall;
@@ -78,29 +79,29 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 		g.setColor(Color.black);
 		g.drawString("Velocity: " + naiveBall.get("velocity"), ballX + 10, ballY - 10);
 		g.setColor(Color.red);
-		g.drawOval(ballX - (BALL_SIZE/2), ballY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 		g.fillOval(ballX - (BALL_SIZE/2), ballY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 
 		g.setColor(Color.pink);
 		g.fillOval(interceptX - (BALL_SIZE/2), interceptY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 
 		g.setColor(Color.black);
-		g.drawString("yintercept: " + naiveBall.get("yintercept"), 160, height + 20);
+		g.drawString("yintercept: " + naiveBall.get("yintercept"), 160, height + SPACE);
 		g.drawString(naiveBall.get("yintercept").toString(), interceptX - 10, interceptY + 30);
 		g.drawString("velocity: " + naiveBall.get("velocity"), 160, height + 40);
-		g.drawString("rel_x: " + filteredBall.get("rel_x"), 10, height + 20);
-		g.drawString("rel_y: " + filteredBall.get("rel_y"), 10, height + 40);
+		g.drawString("rel_x: " + filteredBall.get("rel_x"), 10, height + SPACE);
+		g.drawString("rel_y: " + filteredBall.get("rel_y"), 10, height + 2*SPACE);
 
 		ArrayList<Float> nbX = (ArrayList<Float>)naiveBall.get("position_x");
 		ArrayList<Float> nbY = (ArrayList<Float>)naiveBall.get("position_y");
 
 		if (nbX == null || nbY == null) { return; }
 
-		for (int i = 0; i < nbX.size(); i++) {
+		for (int i = 0; i < nbX.size(); i+=2) {
 			int nBallX = (robotX - OFFSET*((Float) nbY.get(i)).intValue());
 			int nBallY = (robotY - OFFSET*((Float) nbX.get(i)).intValue());
+			float a = .4f * ((float)i / (float)nbX.size());
 
-			g.setColor(new Color(0.f,0.f,.9f,(float)(.2 + .2*(i/nbX.size()))));
+			g.setColor(new Color(0.f,0.f,.9f,a));
 			g.drawOval(nBallX - (BALL_SIZE/2), nBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 			g.fillOval(nBallX - (BALL_SIZE/2), nBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 
@@ -129,16 +130,22 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 
 			if (dBallX > width || dBallY > height) break;
 
-			g.setColor(new Color(0.9f,0.8f,0.0f,.8f));
+			float a = .7f * ((float)i / (float)dest_buf_x.size());
+
+			g.setColor(new Color(0.9f,0.8f,0.0f,(.9f - a)));
 			g.drawOval(dBallX - (BALL_SIZE/2), dBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 			g.fillOval(dBallX - (BALL_SIZE/2), dBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 			g.setColor(Color.black);
-			g.drawString("x: " + dest_buf_x.get(i) + " y: " + dest_buf_y.get(i), dBallX, dBallY);
+			// g.drawString("x: " + dest_buf_x.get(i) + " y: " + dest_buf_y.get(i), dBallX, dBallY);
 		}
 
 		g.setColor(Color.black);
 		g.drawLine(lineStartX, lineStartY, lineEndX, lineEndY);
 		g.drawLine(lineStartX, lineStartY-1, lineEndX, lineEndY-1);
+
+		if (naiveBall.get("stationary").toString().equals("true")) g.setColor(Color.darkGray);
+		else g.setColor(Color.red);
+		g.fillOval(ballX - (BALL_SIZE/2), ballY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
 
 	}
 
@@ -178,7 +185,7 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 					filteredBall.put(entry.getKey().getName(), entry.getValue());
 				}
 			}
-			System.out.println("OMGg");
+
 			Map<FieldDescriptor, Object> nbFields = nbMsg.getAllFields();
 			for (Map.Entry<FieldDescriptor, Object> entry : nbFields.entrySet()) {
 				if (entry.getKey().getName().equals("position")) {
@@ -213,10 +220,6 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 				else { naiveBall.put(entry.getKey().getName(), entry.getValue()); }
 			}
 
-			System.out.println("OMGw");
-
-			// System.out.println(naiveBall.toString());
-			repaint();
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("FOUNDEXCEPTION");

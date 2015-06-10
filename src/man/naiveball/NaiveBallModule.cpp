@@ -32,7 +32,7 @@ NaiveBallModule::NaiveBallModule() :
     position_buffer = new BallState[NUM_FRAMES];
     vel_x_buffer = new float[NUM_FRAMES];
     vel_y_buffer = new float[NUM_FRAMES];
-    dest_buffer = new BallState[10];
+    dest_buffer = new BallState[NUM_DEST];
     bufferFull = false;
     velBufferFull = false;
     yIntercept = 0.f;
@@ -55,13 +55,7 @@ void NaiveBallModule::run_()
     if (myBall.vis().on() && myBall.vis().distance() > 5 && myBall.vis().distance() < 800) {
         updateBuffers(); }
 
-
-    if (frameOffCount > MAX_FRAMES_OFF) {
-        clearBuffers();
-    }
-    //  else if (bufferFull) {
-    //     naiveCheck();
-    // }
+    if (frameOffCount > MAX_FRAMES_OFF) clearBuffers();
 
     portals::Message<messages::NaiveBall> naiveBallMessage(0);
 
@@ -87,7 +81,7 @@ void NaiveBallModule::run_()
 
     if (velBufferFull) {
         calcPath();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < NUM_DEST; i++) {
             NaiveBall::Position* temp = naiveBallMessage.get()->add_dest_buffer();
             temp->set_x(dest_buffer[i].rel_x);
             temp->set_y(dest_buffer[i].rel_y);
@@ -115,12 +109,7 @@ void NaiveBallModule::updateBuffers()
         if (currentIndex == (NUM_FRAMES - 1)) velBufferFull = true;
     }
 
-    if (currentIndex == NUM_FRAMES - 1) {
-        bufferFull = true;
-        // bufferOfNSeconds[currentSecIndex] = avgFrames(currentIndex - AVGING_FRAMES);
-        // currentSecIndex = (currentSecIndex + 1) % 10;
-        // if (currentSecIndex == 9) { secBufferFull = true; }
-    }
+    if (currentIndex == NUM_FRAMES - 1) bufferFull = true;
 }
 
 void NaiveBallModule::clearBuffers()
@@ -149,7 +138,8 @@ float NaiveBallModule::calculateVelocity(bool x)
     float bearChange = end_avgs.bearing - start_avgs.bearing;
     if (bearChange < 0.0) { direction = -1.f; }
     else if (bearChange > 0.0) {direction = 1.f; }
-    velocityEst = (direction * dist / 1.f) * ALPHA + velocityEst * (1-ALPHA);
+    float denominator = (float)NUM_FRAMES / 30.f;
+    velocityEst = (direction * dist / denominator) * ALPHA + velocityEst * (1-ALPHA);
 
     return (x ? xVelocityEst : yVelocityEst);
 }
@@ -165,7 +155,7 @@ void NaiveBallModule::calcPath()
     // accy = (accy < 0.f ? accy * -FRICTION : accy * FRICTION);
 
     float t = .5;
-    for (int i = 0; i < 10; i ++) {
+    for (int i = 0; i < NUM_DEST; i ++) {
         // float x = (.5)*accx*t*t + vel_x_buffer[currentIndex]*t + position_buffer[currentIndex].rel_x;
         // float y = (.5)*accy*t*t + vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y;
         float x = vel_x_buffer[currentIndex]*t + position_buffer[currentIndex].rel_x;
