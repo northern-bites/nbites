@@ -503,8 +503,8 @@ void FieldLineList::classify(GoalboxDetector& boxDetector, CornerDetector& corne
 
     bool oneConcave = false;
     bool oneConvex = false;
-    bool oneTLong = false; // TODO change terminology
-    bool oneTShort = false;
+    bool oneTHorizontal = false;
+    bool oneTVertical = false;
 
     for (int j = 0; j < corners.size(); j++) {
       // Concave
@@ -523,23 +523,23 @@ void FieldLineList::classify(GoalboxDetector& boxDetector, CornerDetector& corne
         } else
           oneConvex = true;
       }
-      // T, long part
+      // T, horizontal part
       if (corners[j].id == CornerID::T &&
           corners[j].first == &line) {
-        if (oneTLong) {
+        if (oneTHorizontal) {
           line.id(LineID::Endline);
           endlineFound = true;
         } else
-          oneTLong = true;
+          oneTHorizontal = true;
       }
-      // T, short part
+      // T, vertical part
       if (corners[j].id == CornerID::T &&
           corners[j].second == &line) {
-        if (oneTShort) {
+        if (oneTVertical) {
           line.id(LineID::Midline);
           midlineFound = true;
         } else
-          oneTShort = true;
+          oneTVertical = true;
       }
     }
   }
