@@ -6,7 +6,6 @@ namespace naive {
 using messages::NaiveBall;
 // using messages::BallModel;
 
-
 struct NaiveBallModule::BallState
 {
         BallState(){}
@@ -131,14 +130,14 @@ float NaiveBallModule::calculateVelocity(bool x)
     if (endIndex < 0) endIndex = endIndex + NUM_FRAMES;
     BallState start_avgs = avgFrames(startIndex);
     BallState end_avgs = avgFrames(endIndex);
-    xVelocityEst = end_avgs.rel_x - start_avgs.rel_x;
-    yVelocityEst = end_avgs.rel_y - start_avgs.rel_y;
+    float denominator = (float)NUM_FRAMES / 30.f;
+    xVelocityEst = (end_avgs.rel_x - start_avgs.rel_x) / denominator * ALPHA + xVelocityEst * (1 - ALPHA);
+    yVelocityEst = (end_avgs.rel_y - start_avgs.rel_y) / denominator * ALPHA + yVelocityEst * (1 - ALPHA);
 
     float dist = calcSumSquaresSQRT((xVelocityEst), (yVelocityEst));
     float bearChange = end_avgs.bearing - start_avgs.bearing;
     if (bearChange < 0.0) { direction = -1.f; }
     else if (bearChange > 0.0) {direction = 1.f; }
-    float denominator = (float)NUM_FRAMES / 30.f;
     velocityEst = (direction * dist / denominator) * ALPHA + velocityEst * (1-ALPHA);
 
     return (x ? xVelocityEst : yVelocityEst);
@@ -158,8 +157,8 @@ void NaiveBallModule::calcPath()
     for (int i = 0; i < NUM_DEST; i ++) {
         // float x = (.5)*accx*t*t + vel_x_buffer[currentIndex]*t + position_buffer[currentIndex].rel_x;
         // float y = (.5)*accy*t*t + vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y;
-        float x = vel_x_buffer[currentIndex]*t + position_buffer[currentIndex].rel_x;
-        float y = vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y;
+        float x = pow(.9, i) * vel_x_buffer[currentIndex]*t + position_buffer[currentIndex].rel_x;
+        float y = pow(.9, i) * vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y;
         // float yvel = (vel_y_buffer[currentIndex] < 0.f ? vel_y_buffer[currentIndex] * -FRICTION : vel_y_buffer[currentIndex] * FRICTION);
         // float xvel = (vel_x_buffer[currentIndex] < 0.f ? vel_x_buffer[currentIndex] * -FRICTION : vel_x_buffer[currentIndex] * FRICTION);
         // float x = yvel*t + position_buffer[currentIndex].rel_x;
@@ -168,7 +167,13 @@ void NaiveBallModule::calcPath()
         t += .5;
     }
 
-    if (vel_x_buffer[currentIndex] < 0) {
+    // Check if ball is coming towards robot, then calculate where it will intercept robot's ya-xis
+    if (velBufferFull && vel_x_buffer[currentIndex] < 0) {
+        // int p = (currentIndex == 0) ? NUM_FRAMES : currentIndex-1;
+        // float m = (position_buffer[currentIndex].rel_x - position_buffer[p].rel_x) / (position_buffer[currentIndex].rel_y - position_buffer[p].rel_y);
+        // float b = position_buffer[p].rel_x - m*position_buffer[p].rel_y;
+        // yIntercept = -b / m;
+
         t = -position_buffer[currentIndex].rel_x / vel_x_buffer[currentIndex];
         yIntercept = vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y;
     } else { yIntercept = 0.0; }
@@ -176,47 +181,6 @@ void NaiveBallModule::calcPath()
 }
 
 
-
-// Check if ball is moving, and if so, in what direction, how fast, etc.
-void NaiveBallModule::naiveCheck()
-{
-    // Get average of first and last x number of frames to get a position estimate
-    // at beginning and end
-    int startIndex = currentIndex+1;
-    int endIndex = currentIndex - AVGING_FRAMES - 1;
-    if (endIndex < 0) endIndex = endIndex + NUM_FRAMES;
-
-    BallState start_avgs = avgFrames(startIndex);
-    BallState end_avgs = avgFrames(endIndex);
-    xVelocityEst = end_avgs.rel_x - start_avgs.rel_x;
-    yVelocityEst = end_avgs.rel_y - start_avgs.rel_y;
-
-    float dist = calcSumSquaresSQRT((xVelocityEst), (yVelocityEst));
-    float bearChange = end_avgs.bearing - start_avgs.bearing;
-
-    if (bearChange < 0.0) { direction = -1; }
-    else if (bearChange > 0.0) {direction = 1; }
-    velocityEst = (direction * dist / 1.f) * ALPHA + velocityEst * (1-ALPHA);
-
-    if (xVelocityEst < 0.f && !checkIfStationary()) { naivePredict(end_avgs); }
-
-    // velocityEst = (dist / 1.f);
-    // TODO possibly take into account (possibly -as in probably) previous estimates
-
-}
-
-void NaiveBallModule::naivePredict(NaiveBallModule::BallState b)
-{
-    // predict at what y position the ball will hit the robot's x==0
-    float x = b.rel_x;
-    float y = b.rel_y;
-    float x_dest = 5.f; // want to see when ball is at 0 TODO probably do something higher
-
-    float t = (x_dest - x) / xVelocityEst; // calculate time until ball is at dest
-
-    yIntercept = y + t * yVelocityEst;
-
-}
 
 bool NaiveBallModule::checkIfStationary()
 {

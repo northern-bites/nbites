@@ -69,7 +69,7 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 
 		// if (1 > 0) return;
 
-		if (!ball_on) {return;}
+		if (!ball_on || visionBall.get("on").toString().equals("false")) {return;}
 		int ballX = (robotX - OFFSET*((Float)filteredBall.get("rel_y")).intValue());
 		int ballY = (robotY - OFFSET*((Float)filteredBall.get("rel_x")).intValue());
 
@@ -130,7 +130,7 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 
 			if (dBallX > width || dBallY > height) break;
 
-			float a = .7f * ((float)i / (float)dest_buf_x.size());
+			float a = .81f * ((float)i / (float)dest_buf_x.size());
 
 			g.setColor(new Color(0.9f,0.8f,0.0f,(.9f - a)));
 			g.drawOval(dBallX - (BALL_SIZE/2), dBallY - (BALL_SIZE/2), BALL_SIZE, BALL_SIZE);
