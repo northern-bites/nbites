@@ -199,7 +199,10 @@ public class Utility {
 			old.setTree(SExpr.deserializeFrom(old._olddesc_));
 			return true;
 		}
-		if (old._olddesc_ == null) return false;	//nothing to work with.
+		if (old._olddesc_ == null) {
+			Logger.log(Logger.WARN, "cannot convert old log without string description.");
+			return false;
+		}	//nothing to work with.
 				
 		HashMap<String, String> map = new HashMap<String, String>();
 		String[] attrs = old._olddesc_.trim().split(" ");
@@ -207,31 +210,41 @@ public class Utility {
 			if (a.trim().isEmpty()) continue;
 			
 			String[] parts = a.split("=");
-			if (parts.length != 2)
+			if (parts.length != 2){
+				Logger.warnf("conversion found invalid kvp");
 				return false;	//Don't attempt to reconstruct malformed descriptions.
+			}
 			
 			String key = parts[0].trim();
-			if (key.isEmpty())
+			if (key.isEmpty()) {
+				Logger.warnf("conversion found empty key");
 				return false;
+			}
 			
 			String value = parts[1].trim();
-			if (value.isEmpty())
+			if (value.isEmpty()) {
+				Logger.warnf("conversion found empty value");
 				return false;
+			}
 			
 			if (map.containsKey(key)) {
 				//we never allowed duplicate keys
+				Logger.warnf("conversion found duplicate key");
 				return false;
 			}
 			
 			map.put(key, value);
 		}
 		
+		/*
 		if (map.containsKey("checksum")) {
 			int found_sum = checksum(old.bytes);
 			int read_sum = Integer.parseInt(map.get("checksum"));
-			if (found_sum != read_sum)
+			if (found_sum != read_sum) {
+				Logger.warnf("conversion found wrong checksum");
 				return false;
-		}
+			}
+		} */
 		
 		//Ok, we can convert this.
 		map.remove("checksum");

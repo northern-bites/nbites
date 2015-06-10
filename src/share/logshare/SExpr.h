@@ -21,6 +21,27 @@ namespace nblog {
     class SExpr {
     public:
         
+        //Translate the given string into an SExpression
+        static SExpr * read(const std::string s, ssize_t& p);
+        static SExpr * read(const std::string s) {
+    //        return SExpr::read(s, (ssize_t&)start);
+            ssize_t start = 0;
+            return SExpr::read(s, start);
+        }
+        
+        /* copy constructor: same as what the compiler would provide */
+        
+        SExpr( const SExpr& other ) :
+            _atom( other._atom ), _list( other._list ), _value( other._value)
+        {}
+        
+        SExpr& operator=( const SExpr& other ) {
+            _atom = other._atom;
+            _value = other._value;
+            _list = other._list;
+            return *this;
+        }
+        
         static SExpr atom(const std::string& n) {return SExpr(n);}
         static SExpr atom(const char * n) {return SExpr(n);}
         
@@ -85,6 +106,15 @@ namespace nblog {
         //key double value for use in log_main.
         SExpr(const std::string& key, int index, int cval);
         
+        /* MODIYFING AN EXISTING SEXPR (may change type)*/
+        void setList(const std::vector<SExpr>& newContents);
+        void setList(std::initializer_list<SExpr> exprs);
+        void setAtom(std::string val);
+        void setAtomAsCopy(SExpr atomToCopy);
+        
+        void insert(int index, SExpr& inserted);
+        bool remove(int index);
+        
         bool isAtom() { return _atom; }
         ssize_t count() { return _atom ? -1 : _list.size(); }
         
@@ -93,7 +123,9 @@ namespace nblog {
         long valueAsLong();
         double valueAsDouble();
         
+        //returns NULL if doesn't exist.
         SExpr * get(int i);
+        std::vector<SExpr> * getList();
         
         // Adds the given list/single of SExpressions to this list
         // No effect if an atom
@@ -128,9 +160,6 @@ namespace nblog {
             the value could not be found.
          */
         SExpr * find(std::string name);
-        
-        //Translate the given string into an SExpression
-        static SExpr * read(std::string s, ssize_t& p);
         
         // Special chars that we need to look out for
         static const char special[];

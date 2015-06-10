@@ -251,9 +251,9 @@ public class Log {
 	public static void main(String[] args) {
 		SExpr clist = SExpr.newList(
 				SExpr.newAtom("contents"),
-				SExpr.newList(SExpr.newKeyValue("bytes", 10)),
-				SExpr.newList(SExpr.newKeyValue("bytes", 50)),
-				SExpr.newList(SExpr.newKeyValue("bytes", 100))
+				SExpr.newList(SExpr.newKeyValue("bytes", "10")),
+				SExpr.newList(SExpr.newKeyValue("bytes", "50")),
+				SExpr.newList(SExpr.newKeyValue("bytes", "100"))
 				);
 		
 		SExpr top = SExpr.newList(clist);

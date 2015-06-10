@@ -3,6 +3,7 @@ package nbtool.data;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 /*
@@ -18,8 +19,8 @@ public abstract class SExpr implements Serializable{
 
 	private static final SExpr NOT_FOUND = new NotFound();
 
-	public static SExpr deserializeFrom(String serial) {
-		return _deserialize(serial, new MutRef());
+	public static SExpr deserializeFrom(String serializedSExpr) {
+		return _deserialize(serializedSExpr, new MutRef());
 	}
 
 	public static SExpr newAtom(String val) {
@@ -65,6 +66,14 @@ public abstract class SExpr implements Serializable{
 	public static SExpr newKeyValue(String key, int value) {
 		return newList(new Found(key), new Found(Integer.toString(value)));
 	}
+	
+	public static SExpr newKeyValue(String key, float value) {
+		return newList(new Found(key), new Found(Float.toString(value)));
+	}
+	
+	public static SExpr newKeyValue(String key, double value) {
+		return newList(new Found(key), new Found(Double.toString(value)));
+	}
 
 	public static SExpr pair(String key, String value) {
 		return newList(new Found(key), new Found(value));
@@ -78,11 +87,22 @@ public abstract class SExpr implements Serializable{
 		return newList(new Found(key), new Found(Integer.toString(value)));
 	}
 
+	/* modifying TYPE OF SEXPR (type after function is as specified)*/
+
+	public abstract void setList(List<SExpr> list);
+	public abstract void setList(SExpr ... items);
+	public abstract void setAtom(String val);
+	
+	//list modifications
+	public abstract void insert(int index, SExpr item);
+	public abstract boolean remove(SExpr item);
+
 	public abstract boolean isAtom();
 	public abstract boolean exists();
 
 	public abstract int count();
 	public abstract SExpr get(int i);
+	public abstract List<SExpr> getList();
 	public abstract void append(SExpr ... exprs);
 
 	public abstract String value();
@@ -96,6 +116,31 @@ public abstract class SExpr implements Serializable{
 	public abstract String serialize();
 
 	public abstract SExpr find(String key);
+	
+	/* checks for recursive trees,  */
+	public static SExpr deepCopy(SExpr node) {
+		HashSet<SExpr> seen = new HashSet<SExpr>();
+		return _deepCopy(node, seen);
+	}
+	
+	private static SExpr _deepCopy(SExpr node, HashSet<SExpr> seen) {
+		if (seen.contains(node)) {
+			throw new IllegalStateException("Cyclical tree.");
+		}
+		
+		if (node.isAtom()) {
+			return atom(node.value());
+		}
+		
+		//node is list, construct copy.
+		seen.add(node);
+		SExpr copiedList = list();
+		for (SExpr child : node.getList()) {
+			copiedList.append(_deepCopy(child, seen));
+		}
+				
+		return copiedList;
+	}
 
 	private static class Found extends SExpr {
 
@@ -246,6 +291,49 @@ public abstract class SExpr implements Serializable{
 
 			return NOT_FOUND;
 		}
+
+		@Override
+		public void setList(SExpr... items) {
+			atom = false;
+			value = null;
+			list = new ArrayList<>(Arrays.asList(items));
+		}
+		
+		@Override
+		public void setList(List<SExpr> list) {
+			atom = false;
+			value = null;
+			list = new ArrayList<>(list);
+		}
+
+		@Override
+		public void setAtom(String val) {
+			atom = true;
+			list = null;
+			value = val;
+		}
+
+		@Override
+		public void insert(int index, SExpr item) {
+			if (!atom) {
+				list.add(index, item);
+			}
+		}
+
+		@Override
+		public boolean remove(SExpr item) {
+			if (!atom && list.contains(item)) {
+				list.remove(item);
+				return true;
+			}
+			
+			return false;
+		}
+
+		@Override
+		public List<SExpr> getList() {
+			return atom ? null : list;
+		}
 	}
 
 	private static class NotFound extends SExpr {
@@ -319,6 +407,29 @@ public abstract class SExpr implements Serializable{
 		public SExpr find(String key) {
 			return this;
 		}
+
+		@Override
+		public void setList(SExpr... items) {}
+
+		@Override
+		public void setAtom(String val) {}
+
+		@Override
+		public void insert(int index, SExpr item) {}
+
+		@Override
+		public boolean remove(SExpr item) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public List<SExpr> getList() {
+			return null;
+		}
+
+		@Override
+		public void setList(List<SExpr> list) {}
 	}
 
 	public static class DoesNotExistException extends RuntimeException {}

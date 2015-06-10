@@ -3,11 +3,11 @@
 #include "HighResTimer.h"
 
 #include <iostream>
+#include <fstream>
 #include <chrono>
 
 #include "Profiler.h"
-#include "HighResTimer.h"
-//#include "BallDetector.h"
+#include "DebugConfig.h"
 //#include "PostDetector.h"
 
 namespace man {
@@ -25,8 +25,34 @@ VisionModule::VisionModule()
     //      after the initializer list is run, which requires calling default
     //      constructors in the case of C-style arrays, limitation theoretically
     //      removed in C++11
+
+    std:: string sexpPath;
+#ifdef OFFLINE
+    sexpPath = std::string(getenv("NBITES_DIR"));
+    sexpPath += "/src/man/config/colorParams.txt";
+#else
+    sexpPath = "/home/nao/nbites/Config"; // TODO check this
+#endif
+
+    std::ifstream textFile;
+    textFile.open(sexpPath.c_str());
+
+    // Get size of file
+    textFile.seekg (0, textFile.end);
+    long size = textFile.tellg();
+    textFile.seekg(0);
+
+    // Read file into buffer and convert to string
+    char* buff = new char[size];
+    textFile.read(buff, size);
+    std::string sexpText(buff);
+
+    // Get SExpr from string
+    colors = *nblog::SExpr::read((const std::string)sexpText);
+
+    // Set module pointers for top then bottom images
     for (int i = 0; i < 2; i++) {
-        colorParams[i] = new Colors();
+        colorParams[i] = getColorsFromLisp(i == 0);
         frontEnd[i] = new ImageFrontEnd();
         edgeDetector[i] = new EdgeDetector();
         edges[i] = new EdgeList(32000);
@@ -144,6 +170,69 @@ void VisionModule::run_()
         std::cout << "Field lines: " << times[i][4] << std::endl;
         std::cout << "Ball: " << times[i][5] << std::endl;
     }
+}
+
+/*
+ Run only the frontEnd using the color parameters scecfied by bool "top".
+  Return the frontEnd that it ran it because it contains the output images,
+  which will be used by the nbcros function "Vision_func()".
+*/
+// ImageFrontEnd* VisionModule::runAndGetFrontEnd(bool top) {
+//     topIn.latch();
+//     bottomIn.latch();
+//     jointsIn.latch();
+
+//     const messages::YUVImage* image = &topIn.message();
+    
+//     YuvLite yuvLite(image->width() / 4,
+//                         image->height() / 2,
+//                         image->rowPitch(),
+//                         image->pixelAddress(0, 0));
+
+//     frontEnd[0]->run(yuvLite, colorParams[!top]);
+
+//     return frontEnd[0];
+// }
+
+/*
+ Lisp data in config/colorParams.txt stores 32 parameters. Read lisp and
+  load the three compoenets of a Colors struct, white, green, and orange,
+  from the 18 values for either the top or bottom image. 
+*/
+Colors* VisionModule::getColorsFromLisp(bool top) {
+    Colors* ret = new man::vision::Colors;
+    int i, j = 0;
+
+    nblog::SExpr* params;
+
+    if (top) {
+        params = colors.get(1)->find("Top");
+    } else {
+        params = colors.get(1)->find("Bottom");
+    }
+
+    ret->white.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize())); 
+
+    ret->green.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));  
+ 
+   ret->orange.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));
+
+    return ret;
 }
 
 }
