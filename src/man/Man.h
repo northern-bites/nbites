@@ -30,10 +30,10 @@ class Man
 public:
     Man();
     virtual ~Man();
+    // Let us close camera driver before destroying
+    void preClose();
 
 private:
-    void establishLock();
-
     void startSubThreads();
     void startAndCheckThread(DiagramThread& thread);
 
@@ -65,8 +65,6 @@ private:
     gamestate::GameStateModule gamestate;
     behaviors::BehaviorsModule behaviors;
     context::SharedBallModule sharedBall;
-
-    int lockFD;
 };
 
 }

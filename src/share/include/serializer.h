@@ -176,7 +176,8 @@ public:
             loc = obj_end;
         }
 
-        if (loc != tbytes) {
+        // If we try to parse memory which holds nothing (zero-set) we shouldn't error
+        if (loc != tbytes && loc > 16) {
             printf("ERROR: deserialization did not use entire frame! %zu / %i bytes\n",
                    loc, tbytes);
             return false;

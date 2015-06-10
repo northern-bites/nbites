@@ -46,7 +46,6 @@ SensorsModule::~SensorsModule()
     // Close shared memory
     munmap((void *)shared, sizeof(SharedData));
     close(shared_fd);
-    //sem_close(semaphore);
 }
 
 
@@ -83,7 +82,6 @@ std::string SensorsModule::makeSweetMoveTuple(const messages::JointAngles* angle
     
 bool sensorSyncRead(volatile SharedData * sd, uint8_t * stage)
 {
-    //printf("sr\n");
     uint8_t bufi = sd->sensorSwitch;
     pthread_mutex_t * lock = (pthread_mutex_t *) &sd->sensor_mutex[bufi];
     
@@ -112,9 +110,13 @@ void SensorsModule::updateSensorValues()
         return;
     }
     
+
     Deserialize des(sensorsStage);
-    des.parse();
-    
+    if (!des.parse() || des.nObjects() < 10) {
+        std::cout << "Sensors couldn't parse anything from shared memory! returning" << std::endl;
+        return;
+    }
+
     jointsS = des.stringNext();
     currentsS = des.stringNext();
     tempsS = des.stringNext();
@@ -125,7 +127,7 @@ void SensorsModule::updateSensorValues()
     fsrS = des.stringNext();
     batteryS = des.stringNext();
     stiffStatusS = des.string();
-    
+
     shared->latestSensorRead = des.dataIndex();
 
     values.joints.ParseFromString(jointsS);
@@ -138,19 +140,6 @@ void SensorsModule::updateSensorValues()
     values.fsr.ParseFromString(fsrS);
     values.battery.ParseFromString(batteryS);
     values.stiffStatus.ParseFromString(stiffStatusS);
-
-    // std::cout << values.joints.DebugString();
-    // std::cout << values.currents.DebugString();
-    // std::cout << values.temperature.DebugString();
-    // std::cout << values.chestButton.DebugString();
-    // std::cout << values.footBumper.DebugString();
-    // std::cout << values.inertials.DebugString();
-    // std::cout << values.sonars.DebugString();
-    // std::cout << values.fsr.DebugString();
-    // std::cout << values.battery.DebugString();
-    // std::cout << values.stiffStatus.DebugString();
-
-    //std::cout << "l_shoulder_pitch: " << values.joints.l_shoulder_pitch() << std::endl; 
 
     portals::Message<messages::JointAngles> joints(&(values.joints));
     portals::Message<messages::JointAngles> currents(&(values.currents));

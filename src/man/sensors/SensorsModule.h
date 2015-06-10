@@ -61,6 +61,7 @@ private:
 
     int shared_fd;
     volatile SharedData* shared;
+    // Temporary location for the sensor data
     uint8_t sensorsStage[SENSOR_SIZE];
 
     bool lastPrint;

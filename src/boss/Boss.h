@@ -63,17 +63,14 @@ private:
 
     int shared_fd;
     volatile SharedData* shared;
-    
+
     uint8_t cmndStaging[COMMAND_SIZE];
     uint64_t commandSkips;
-    
+
     uint8_t sensorStaging[SENSOR_SIZE];
     uint64_t sensorSkips;
 
     int fifo_fd;
-
-    //uint64_t commandIndex;
-    //uint64_t sensorIndex;
 };
 
 }

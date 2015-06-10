@@ -1,8 +1,6 @@
 #include "Man.h"
 
 #include <iostream>
-#include <sys/file.h>
-#include <errno.h>
 
 #include "Common.h"
 #include "Profiler.h"
@@ -48,12 +46,8 @@ Man::Man() :
     obstacle(),
     gamestate(teamNum, playerNum),
     behaviors(teamNum, playerNum),
-    sharedBall(playerNum),
-    lockFD(0)
+    sharedBall(playerNum)
     {
-        // Make sure another instance of man isn't running
-        establishLock();
-
         /** Sensors **/
         sensorsThread.addModule(sensors);
         sensorsThread.addModule(jointEnactor);
@@ -275,32 +269,18 @@ Man::Man() :
 #endif
 
         startSubThreads();
+        std::cout << "Man built" << std::endl;
     }
 
 Man::~Man()
 {
-    std::cout << "Man is being killed" << std::endl;
-
-    // Terminating the process should release this also
-    flock(lockFD, LOCK_UN);
+    std::cout << "MAN::Man is being killed" << std::endl;
 }
 
-void Man::establishLock()
+void Man::preClose()
 {
-    lockFD = open("/home/nao/nbites/nbites.lock", O_CREAT | O_RDWR, 0666);
-    if (lockFD < 0) {
-        int err = errno;
-        perror("NO");
-        std::cout << "Could not open lockfile" << std::endl;
-        std::cout << "Errno is: " << err << std::endl;
-        exit(0);
-    }
-
-    int result = flock(lockFD, LOCK_EX | LOCK_NB);
-    if (result == -1) {
-        std::cout << "Could not establish lock on lock file. Is man running?" << std::endl;
-        exit(0);
-    }
+    topTranscriber.closeTranscriber();
+    bottomTranscriber.closeTranscriber();
 }
 
 void Man::startSubThreads()

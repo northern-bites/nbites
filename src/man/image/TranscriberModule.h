@@ -60,6 +60,9 @@ public:
     uint64_t getTimestamp() const;
     Camera::Type type() { return cameraType; }
 
+    // Cleanly close the camera driver
+    void closeDriver();
+
 private:
     enum
     {
@@ -102,6 +105,9 @@ private:
     struct v4l2_buffer requestBuff;
 
     uint64_t timeStamp;
+
+    // True if this is about to be destroyed. So that we don't try to use driver after its closed
+    bool exiting;
 };
 
 // Module that wraps Transcriber's functionality
@@ -110,6 +116,8 @@ class TranscriberModule : public portals::Module
 {
 public :
     TranscriberModule(ImageTranscriber&);
+    ~TranscriberModule();
+    void closeTranscriber();
 
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::InertialState> inertsIn;

@@ -36,28 +36,21 @@ JointEnactorModule::~JointEnactorModule()
     munmap((void *)shared, sizeof(SharedData));
     close(shared_fd);
 }
-    
+
 bool syncCmndWrite(volatile SharedData * sd, uint8_t * stage)
 {
-    //printf("jw\n");
     pthread_mutex_t * cmutex = (pthread_mutex_t *) &sd->cmnd_mutex;
     pthread_mutex_lock(cmutex);
-    
+
     memcpy((void *)sd->command, stage, COMMAND_SIZE);
     ++(sd->latestCommandWritten);
-    
+
     pthread_mutex_unlock(cmutex);
-    return true;
+    return true; // Should we ever return anything but true?
 }
 
 void JointEnactorModule::writeCommand()
 {
-    // std::cout << "Joint Enactor~~~~~~~~~~~~~~~~~~~" << std::endl;
-    // std::cout << "Joints " << latestJointAngles_.DebugString() << std::endl; 
-    // std::cout << "Stiff " << latestStiffness_.DebugString() << std::endl; 
-    // std::cout << "Leds " << latestLeds_.DebugString() << std::endl; 
-    // std::cout << "done~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-
     std::vector<SerializableBase*> objects = {
         new ProtoSer(&latestJointAngles_),
         new ProtoSer(&latestStiffness_),

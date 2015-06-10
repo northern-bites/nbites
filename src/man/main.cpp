@@ -4,6 +4,10 @@
 
 #include "Man.h"
 
+#include <sys/file.h>
+#include <errno.h>
+
+int lockFD = 0;
 man::Man* instance;
 
 void handler(int signal)
@@ -11,21 +15,46 @@ void handler(int signal)
     if (signal == SIGTERM)
     {
         // Give man a chance to clean up behind it
+        // I.e. close camera driver gracefully
+        instance->preClose();
+        flock(lockFD, LOCK_UN);
+
         delete instance;
         exit(0);
     }
+}
+
+// Deal with lock file. To ensure that we only have ONE instance of man
+void establishLock()
+{
+    lockFD = open("/home/nao/nbites/nbites.lock", O_CREAT | O_RDWR, 0666);
+    if (lockFD < 0) {
+        int err = errno;
+        std::cout << "Could not open lockfile" << std::endl;
+        std::cout << "Errno is: " << err << std::endl;
+        exit(0);
+    }
+
+    int result = flock(lockFD, LOCK_EX | LOCK_NB);
+    if (result == -1) {
+        std::cout << "Could not establish lock on lock file. Is man already running?" << std::endl;
+        exit(0);
+    }
+
 }
 
 int main() {
 
     signal(SIGTERM, handler);
 
-    // Constructs an instance of man
+    establishLock();
+
+    // Constructs an instance of man. If we get here we have a lock
     instance = new man::Man();
 
     while (1) {
-        std::cout << "In main!" << std::endl;
-        sleep(5);
+        // Hack so that I don't have to modify DiagramThread
+        sleep(10);
     }
     return 1;
 }
