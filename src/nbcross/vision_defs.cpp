@@ -205,5 +205,11 @@ int Vision_func() {
     lineRet->setData(lineBuf);
     rets.push_back(lineRet);
 
+    //-----------
+    //  BALL
+    //-----------
+
+    man::vision::BallDetector* detector = module.getBallDetector(topCamera);
+
     return 0;
 }

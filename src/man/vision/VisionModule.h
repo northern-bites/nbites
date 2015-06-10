@@ -9,6 +9,7 @@
 #include "Hough.h"
 #include "Kinematics.h"
 #include "Homography.h"
+#include "BallDetector.h"
 
 namespace man {
 namespace vision {
@@ -25,6 +26,7 @@ public:
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
     HoughLineList* getLines(bool topCamera = true) const { return houghLines[!topCamera]; }
+    BallDetector* getBallDetector(bool topCamera = true) const { return ballDetector[!topCamera]; }
 
 protected:
     virtual void run_();
@@ -39,6 +41,7 @@ private:
     Kinematics* kinematics[2];
     FieldHomography* homography[2];
     FieldLineList* fieldLines[2];
+    BallDetector* ballDetector[2];
 };
 
 }
