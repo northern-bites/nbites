@@ -75,7 +75,8 @@ namespace nblog {
     }
     
     void log_main_init() {
-        NBDEBUG("log_main_init()\n");
+        NBDEBUG("log_main_init()\n\t"
+                "nbuffers=%i version=%i\n", NUM_LOG_BUFFERS, LOG_VERSION);
         
         main_upstart = time(NULL);
         
@@ -405,6 +406,7 @@ namespace nblog {
                const std::vector<SExpr>& items, const std::string& data ) {
         Log * newl = new Log("nblog", where_called, time(NULL), LOG_VERSION,
                              items, data);
+        
         
         NBLog(buffer_index, newl);
     }

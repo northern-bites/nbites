@@ -22,7 +22,7 @@ import nbtool.images.ImageParent;
 import nbtool.images.UV88image;
 import nbtool.images.Y16image;
 import nbtool.images.YUYV8888image;
-import nbtool.util.U;
+import nbtool.util.Utility;
 
 
 public class ZoomImageView extends ViewParent {
@@ -31,7 +31,7 @@ public class ZoomImageView extends ViewParent {
 	public void setLog(Log newlog) {
 		this.log = newlog;
 		
-		iv.useImage(U.biFromLog(newlog));
+		iv.useImage(Utility.biFromLog(newlog));
 	}
 
 	protected void useSize(Dimension s) {

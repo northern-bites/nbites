@@ -2,12 +2,90 @@
 
 namespace nblog {
     
+    nbhost_e HOST_TYPE = UNKNOWN;
+    
     int32_t getChecksum(const std::string& data) {
         int32_t sum = 0;
         for (int i = 0; i < data.size(); ++i)
             sum += (uint8_t) data[i];
         
         return sum;
+    }
+    
+    Log Log::simple(const std::string type, const std::string data) {
+        return Log::ofTypeWithFields(type, data, {});
+    }
+    
+    Log Log::ofType(const std::string type, const std::string data) {
+        return Log::ofTypeWithFields(type, data, {});
+    }
+    
+    Log Log::ofTypeWithFields(const std::string type, const std::string data, std::initializer_list<SExpr> fields) {
+        std::vector<SExpr> scv = {
+            SExpr("type", type)
+        };
+        
+        for (auto it = fields.begin();
+             it != fields.end();
+             ++it) {
+            scv.push_back(*it);
+        }
+        
+        SExpr sc(scv);
+        
+        std::vector<SExpr> contv = {
+            SExpr("contents"),
+            sc
+        };
+        SExpr contents(contv);
+        
+        std::vector<SExpr> tv = {
+            SExpr("nblog"),
+            contents
+        };
+        
+        SExpr top(tv);
+        
+        Log ret;
+        ret.setTree(top);
+        ret.setData(data);
+        
+        return ret;
+    }
+    
+    Log Log::withContentItems(std::initializer_list<SExpr> items, const std::string data) {
+        std::vector<SExpr> contv = {
+            SExpr("contents"),
+        };
+        
+        for (auto it = items.begin();
+             it != items.end();
+             ++it) {
+            contv.push_back(*it);
+        }
+
+        
+        SExpr contents(contv);
+        
+        std::vector<SExpr> tv = {
+            SExpr("nblog"),
+            contents
+        };
+        
+        SExpr top(tv);
+        
+        Log ret;
+        ret.setTree(top);
+        ret.setData(data);
+        
+        return ret;
+    }
+    
+    Log::Log() :
+    _written(false),
+    _refs(0)
+    {
+        
     }
     
     Log::Log(const std::string& log_class,
@@ -45,6 +123,14 @@ namespace nblog {
             SExpr("checksum", cs),      //key-value list
             SExpr(clist)                //list, first is "contents" atom
         };
+        
+        if (HOST_TYPE == V5ROBOT) {
+            keys.push_back(SExpr("host_type", "V5ROBOT"));
+        } else if (HOST_TYPE == V4ROBOT) {
+            keys.push_back(SExpr("host_type", "V4ROBOT"));
+        } else {
+            keys.push_back(SExpr("host_type", "unknown"));
+        }
         
         _tree = SExpr(keys);
     }

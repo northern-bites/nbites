@@ -20,7 +20,7 @@ set(TEAM_NUMBER ${@ROBOT_TEAM_NUMBER@})
 
 set(
   @REMOTE_ADDRESS@
-  "zoe"
+  "shehulk"
   CACHE STRING
   "The address to which the code will be installed."
 )
@@ -36,7 +36,7 @@ set(PYTHON_PLAYER ${@PYTHON_PLAYER@})
 
 set(
   @TABLE_TOP@
-  "../../data/tables/lab15.mtb"
+  "../../data/tables/station15.mtb"
   CACHE STRING
   "Path relative to man directory for the desired top camera color table"
 )
@@ -44,7 +44,7 @@ set(TABLE_TOP ${@TABLE_TOP@})
 
 set(
   @TABLE_BOTTOM@
-  "../../data/tables/lab15.mtb"
+  "../../data/tables/station15.mtb"
   CACHE STRING
   "Path relative to man directory for the desired bottom camera color table"
 )
