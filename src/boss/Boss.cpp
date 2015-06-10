@@ -56,6 +56,7 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     fifo_fd = open("/home/nao/nbites/nbitesFIFO", O_RDONLY | O_NONBLOCK);
     if (fifo_fd <= 0) {
         std::cout << "FIFO ERROR" << std::endl;
+        std::cout << "Boss will not be able to receive commands from terminal" << std::endl;
     }
 
     std::cout << "Boss Constructed successfully!" << std::endl;
@@ -100,6 +101,7 @@ int Boss::startMan() {
     if (child > 0) {
         manPID = child;
         manRunning = true;
+        std::cout << "\n\n\n=================================================\n\n\n" << std::endl;
     }
     else if (child == 0) {
         //replace this child process with an instance of man.
