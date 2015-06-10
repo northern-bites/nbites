@@ -7,6 +7,8 @@
 #include "Hough.h"
 #include "FrontEnd.h"
 #include "FieldConstants.h"
+#include "NBMath.h"
+
 #include <iostream>
 
 using namespace std;
@@ -196,11 +198,11 @@ Corner::Corner(FieldLine* first_, FieldLine* second_, CornerID id_)
 
 string Corner::print() const
 {
-  return strPrintf("C, %4d, %4d, %4d", (int) id, first->index(), second->index());
+  return strPrintf("C, %4d, %4d, %4d", first->index(), second->index(), (int) id);
 }
 
 GoalboxDetector::GoalboxDetector()
-  : std::pair<FieldLine*, FieldLine*>(NULL, NULL), parallelThreshold_(5), seperationThreshold_(20)
+  : std::pair<FieldLine*, FieldLine*>(NULL, NULL), parallelThreshold_(15), seperationThreshold_(20)
 {}
 
 bool GoalboxDetector::find(FieldLineList& list)
@@ -257,9 +259,9 @@ bool GoalboxDetector::validBox(HoughLine& line1, HoughLine& line2) const
 
   // Goalbox = two field lines that are (1) parallel and (2) seperated by 60 cm
   // Parallel
-  double field1PosT = field1.t();
-  double field2PosT = field2.t();
-  bool parallel = fabs(field1PosT - field2PosT) < parallelThreshold();
+  double normalizedT1 = (field1.r() > 0 ? field1.t() : field1.t() - M_PI);
+  double normalizedT2 = (field2.r() > 0 ? field2.t() : field2.t() - M_PI);
+  bool parallel = diffRadians(normalizedT1, normalizedT2) < parallelThreshold()*TO_RAD;
 
   // Seperated by 60 cm
   double distBetween = fabs(field1.pDist(field2.r()*cos(field2.t()), field2.r()*sin(field2.t())));
@@ -274,7 +276,7 @@ string GoalboxDetector::print() const
 }
 
 CornerDetector::CornerDetector()
-  : orthogonalThreshold_(10), closeThreshold_(30), farThreshold_(100)
+  : orthogonalThreshold_(40), closeThreshold_(30), farThreshold_(100)
 {}
 
 void CornerDetector::findCorners(FieldLineList& list)
@@ -322,13 +324,18 @@ void CornerDetector::findCorners(FieldLineList& list)
   }
 }
 
-// TODO require that lines are orthogonal
 // TODO ignore corners in edge of screen
 CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
 {
   // Use world coordinates
   const GeoLine& field1 = line1.field();
   const GeoLine& field2 = line2.field();
+
+  // Check that lines are close to orthogonal
+  double normalizedT1 = (field1.r() > 0 ? field1.t() : field1.t() - M_PI);
+  double normalizedT2 = (field2.r() > 0 ? field2.t() : field2.t() - M_PI);
+  bool orthogonal = diffRadians(normalizedT1, normalizedT2) - (M_PI / 2) < orthogonalThreshold()*TO_RAD;
+  if (!orthogonal) return CornerID::None;
 
   // Find intersection point
   double intersectX;
