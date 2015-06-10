@@ -20,13 +20,37 @@ VisionModule::VisionModule()
     //      after the initializer list is run, which requires calling default
     //      constructors in the case of C-style arrays, limitation theoretically
     //      removed in C++11
-    std::string path = "/home/evanhoyt/Desktop/ColorParams.json";
-    boost::property_tree::read_json(path, tree);
 
+    std:: string sexpPath;
+    // TODO: 
+    // if (on computer ) {
+        sexpPath = std::string(getenv("NBITES_DIR"));
+        sexpPath += "/src/man/config/colorParams.txt";
+    // } else (if on robot) {
+        // Get robot path
+   // }
+
+    std::ifstream textFile;
+    textFile.open(sexpPath);
+
+    // Get size of file
+    textFile.seekg (0, textFile.end);
+    long size = textFile.tellg();
+    textFile.seekg(0);
+    
+    // Read file into buffer and convert to string
+    char* buff = new char[size];
+    textFile.read(buff, size);
+    std::string sexpText(buff);
+
+    // Get SExpr from string
+    colors = *nblog::SExpr::read((const std::string)sexpText);
+    
+    // Set module pointers for top then bottom images
     for (int i = 0; i < 2; i++) {
         // colorParams[i] = new Colors();
-        colorParams[0] = getColorsFromJson(true);
-        colorParams[1] = getColorsFromJson(false);
+        colorParams[0] = getColorsFromLisp(true);
+        colorParams[1] = getColorsFromLisp(false);
         frontEnd[i] = new ImageFrontEnd();
         edgeDetector[i] = new EdgeDetector();
         edges[i] = new EdgeList(32000);
@@ -131,6 +155,11 @@ void VisionModule::run_()
 
 }
 
+/*
+ Run only the frontEnd using the color parameters scecfied by bool "top".
+  Return the frontEnd that it ran it because it contains the output images,
+  which will be used by the nbcros function "Vision_func()".
+*/
 ImageFrontEnd* VisionModule::runAndGetFrontEnd(bool top) {
     topIn.latch();
     bottomIn.latch();
@@ -150,25 +179,43 @@ ImageFrontEnd* VisionModule::runAndGetFrontEnd(bool top) {
     return frontEnd[0];
 }
 
+/*
+ Lisp data in config/colorParams.txt stores 32 parameters. Read lisp and
+  load the three compoenets of a Colors struct, white, green, and orange,
+  from the 18 values for either the top or bottom image. 
+*/
+Colors* VisionModule::getColorsFromLisp(bool top) {
+    man::vision::Colors* ret = new man::vision::Colors;
+    int i, j = 0;
 
-Colors* VisionModule::getColorsFromJson(bool top) {
-    Colors* ret = new Colors;
-    boost::property_tree::ptree params;
-    if (top) 
-        params = tree.get_child("colorParams.topColors");
-    else
-        params = tree.get_child("colorParams.bottomColors");
-    ret->white.load(params.get<float>("white.darkU"), params.get<float>("white.darkV"),
-                  params.get<float>("white.lightU"), params.get<float>("white.lightV"),
-                  params.get<float>("white.fuzzyU"), params.get<float>("white.fuzzyV"));
+     nblog::SExpr* params;
 
-    ret->green.load(params.get<float>("green.darkU"), params.get<float>("green.darkV"),
-                  params.get<float>("green.lightU"), params.get<float>("green.lightV"),
-                  params.get<float>("green.fuzzyU"), params.get<float>("green.fuzzyV"));
-    
-    ret->orange.load(params.get<float>("orange.darkU"), params.get<float>("orange.darkV"),
-                  params.get<float>("orange.lightU"), params.get<float>("orange.lightV"),
-                  params.get<float>("orange.fuzzyU"), params.get<float>("orange.fuzzyV"));
+    if (top) {
+        params = colors.get(1)->find("Top");
+    } else {
+        params = colors.get(1)->find("Bottom");
+    }
+
+    ret->white.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize())); 
+
+    ret->green.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));  
+ 
+   ret->orange.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));
 
     return ret;
 }

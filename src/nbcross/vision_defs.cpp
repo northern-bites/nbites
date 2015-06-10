@@ -16,13 +16,13 @@
 using nblog::Log;
 using nblog::SExpr;
 
-man::vision::Colors* getColorsFromSliderSExpr(SExpr* params);
+man::vision::Colors* getColorsFromSExpr(SExpr* params);
 void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top);
-SExpr getSExprFromSavedParams(int color, std::string jsonPath, bool top);
+SExpr getSExprFromSavedParams(int color, std::string sexpPath, bool top);
 std::string getSExprStringFromColorJSonNode(boost::property_tree::ptree tree);
 
 int Vision_func() {
-    assert(args.size() > 0);
+    assert(args.size() == 1);
 
     printf("Vision_func()\n");
 
@@ -31,17 +31,19 @@ int Vision_func() {
     uint8_t buf[length];
     memcpy(buf, copy->data().data(), length);
 
+    // Determine if we are looking at a top or bottom image from log description
     bool top;
     top = copy->description().find("from camera_TOP") != std::string::npos;
     std::cout << top << std::endl;
 
-
     int width = 2*640;
     int height = 480;
 
-    std::string jsonPath = "/home/evanhoyt/Desktop/ColorParams.json";
-    std::string lispPath = "/home/evanhoyt/Desktop/ColorParams.txt";
+    // Location of lisp text file with color params
+    std::string sexpPath = std::string(getenv("NBITES_DIR"));
+    sexpPath += "/src/man/config/colorParams.txt";
     
+    // Empty messages to pass to Vision Module so it doesn't freak
     messages::YUVImage image(buf, width, height, width);
     messages::JointAngles emptyJoints;
     messages::InertialState emptyInertials;
@@ -50,29 +52,31 @@ int Vision_func() {
     portals::Message<messages::JointAngles> emptyJointsMessage(&emptyJoints);
     portals::Message<messages::InertialState> emptyInertialsMessage(&emptyInertials);
 
-    // Init module to color params from JSON file
+    // VisionModule default constructor loads color params from Lisp in config/colorParms.txt
     man::vision::VisionModule module;
 
     module.topIn.setMessage(imageMessage);
     module.bottomIn.setMessage(imageMessage);
     module.jointsIn.setMessage(emptyJointsMessage);
     module.inertialsIn.setMessage(emptyInertialsMessage);
-
-  //  std::cout << "LOG DESCRIPTION: " << args[0]->tree().print() <<  std::endl;
     
-    // If log included colors in description, update color params, but leave json data
+    // If log included color parameters in description, have module use those
     SExpr* params = args[0]->tree().find("Params");
     if (params != NULL) {
-        module.setColorParams(getColorsFromSliderSExpr(params), top);
 
+        // Set new parameters as frontEnd colorParams
+        module.setColorParams(getColorsFromSExpr(params), top);
+
+        // Look for atom value "SaveParams", i.e. "save" button press
         SExpr* save = params->get(1)->find("SaveParams");
         if (save != NULL) {
-            updateSavedColorParams(lispPath, params, top);
-        } else ( std::cout << "DON't SAVE");
-    } else { std::cout << "NO PARAMS" << std::endl; }
 
-    // If log says to save, write params to ColorParams.txt
+            // Save attached parameters to txt file
+            updateSavedColorParams(sexpPath, params, top);
+        }
+    }
 
+    // Run and retrieve front end from vision module
     man::vision::ImageFrontEnd* frontEnd = module.runAndGetFrontEnd(top);
 
     // -----------
@@ -106,8 +110,8 @@ int Vision_func() {
     std::string whiteBuffer((const char*)whiteBuf, whiteLength);
     whiteRet->setData(whiteBuffer);
 
-    // Read params from JSon and attach to image 
-    whiteRet->setTree(getSExprFromSavedParams(0, jsonPath, top));
+    // Read params from Lisp and attach to image 
+    whiteRet->setTree(getSExprFromSavedParams(0, sexpPath, top));
 
     rets.push_back(whiteRet);
 
@@ -126,7 +130,7 @@ int Vision_func() {
     greenRet->setData(greenBuffer);
 
     // Read params from JSon and attach to image 
-    greenRet->setTree(getSExprFromSavedParams(1, jsonPath, top));
+    greenRet->setTree(getSExprFromSavedParams(1, sexpPath, top));
 
     rets.push_back(greenRet);
 
@@ -145,7 +149,7 @@ int Vision_func() {
     orangeRet->setData(orangeBuffer);
 
     // Read params from JSon and attach to image 
-    orangeRet->setTree(getSExprFromSavedParams(2, jsonPath, top));
+    orangeRet->setTree(getSExprFromSavedParams(2, sexpPath, top));
 
     rets.push_back(orangeRet);
 
@@ -225,9 +229,11 @@ int Vision_func() {
     return 0;
 }
 
-man::vision::Colors* getColorsFromSliderSExpr(SExpr* params) {
+/* Helper function to convert from SExpr to Colors type.
+    Use 18 parameters to intialize Colors struct.
+ */
+man::vision::Colors* getColorsFromSExpr(SExpr* params) {
     man::vision::Colors* ret = new man::vision::Colors;
-    
     int i, j = 0;
 
     ret->white.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
@@ -251,99 +257,89 @@ man::vision::Colors* getColorsFromSliderSExpr(SExpr* params) {
                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));
 
-  // std::cout << params->serialize() << std::endl;
-
     return ret;
 }
 
+// Save the new color params to the colorParams.txt file
 void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top) {
     std::ifstream textFile;
     textFile.open(sexpPath);
 
-    std::string sexpText;
-    char line[100];
-
-    if (textFile.is_open()) {
-        while (!textFile.eof()){
-            textFile >> line;
-            sexpText += line;
-        }
-    }
-
-    SExpr* savedParams;
-    SExpr* savedSExpr = SExpr::read((const std::string)sexpText);
+    // Get size of file
+    textFile.seekg (0, textFile.end);
+    long size = textFile.tellg();
+    textFile.seekg(0);
     
-    std::cout << "File: \n" << savedSExpr->print() << std::endl;
+    // Read file into buffer and convert to string
+    char* buff = new char[size];
+    textFile.read(buff, size);
+    std::string sexpText(buff);
 
+    // Get SExpr from string
+    SExpr* savedParams, * savedSExpr = SExpr::read((const std::string)sexpText);
+    
     if (top) {
         savedParams = savedSExpr->get(1)->find("Top");
     } else {
         savedParams = savedSExpr->get(1)->find("Bottom");
     }
 
-   // std::cout << "File Top: \n" << savedSExpr->get(1)->find("Top")->print() << std::endl;
-
     // Remove "SaveParams True" pair from expression
     params->get(1)->remove(3);
 
-   // std::cout << "New New Top: " << params->print() << std::endl;
-
-    std::vector<SExpr>& newParams = *params->get(1)->getList();
-    std::cout << "OldFile: \n" << savedSExpr->print() << std::endl;
-   
-
-    savedParams->get(1)->setList((const std::vector<SExpr>&) newParams);
-    
-    std::cout << "New File: \n" << savedSExpr->print() << std::endl;
-   
-    textFile.close();
-
+    const std::vector<SExpr>& newParams = *params->get(1)->getList();
+    savedParams->get(1)->setList(newParams);
+       
     // Write out
-    int size = savedSExpr->print().length();
+    size = savedSExpr->print().length();
     char* buffer = new char[size + 1];
     std::strcpy(buffer, savedSExpr->print().c_str());
     std::ofstream out;
     out.open(sexpPath);
-
     out.write(buffer, savedSExpr->print().length());
 
-
+    delete[] buff;
     delete[] buffer;
-
+    textFile.close();
     out.close();
 }
 
-SExpr getSExprFromSavedParams(int color, std::string jsonPath, bool top) {
-//    std::string sexp = "(";
-    boost::property_tree::ptree tree;
-    boost::property_tree::read_json(jsonPath, tree);
+SExpr getSExprFromSavedParams(int color, std::string sexpPath, bool top) {
+    std::ifstream textFile;
+    textFile.open(sexpPath);
 
-    if (top) {
-        tree = tree.get_child("colorParams.topColors");
-    } else {
-        tree = tree.get_child("colorParams.bottomColors");
-    }
+    // Get size of file
+    textFile.seekg (0, textFile.end);
+    long size = textFile.tellg();
+    textFile.seekg(0);
 
-    if (color == 0) {               // White
-        tree = tree.get_child("white");
-    //    sexp.newAtom("WhiteParams");
-    } else if (color == 1) {    // Green
-        tree = tree.get_child("green");
-    //    sexp.newAtom("GreenParams");
-    } else {                    // Orange
-        tree = tree.get_child("orange");
-    //    sexp.newAtom("OrangeParams");
-    }
+    // Read file into buffer and convert to string
+    char* buff = new char[size];
+    textFile.read(buff, size);
+    std::string sexpText(buff);
 
-    std::vector<SExpr> atoms = { 
-        SExpr::atom("Params"),
-        SExpr::keyValue("dark_u", (float)tree.get<float>("darkU")),
-        SExpr::keyValue( "dark_v", (float)tree.get<float>("darkV")),
-        SExpr::keyValue("light_u", (float)tree.get<float>("lightU")),
-        SExpr::keyValue("light_v", (float)tree.get<float>("lightV")),
-        SExpr::keyValue("fuzzy_u", (float)tree.get<float>("fuzzyU")),
-        SExpr::keyValue("fuzzy_v", (float)tree.get<float>("fuzzyV"))
-    };
+    // Get SExpr from string
+    SExpr* savedSExpr = SExpr::read((const std::string)sexpText);
+
+    // Point to required set of 6 params
+    if (top)
+        savedSExpr = savedSExpr->get(1)->find("Top");
+    else 
+        savedSExpr = savedSExpr->get(1)->find("Bottom");
     
+    if (color == 0)                                         // White
+        savedSExpr = savedSExpr->get(1)->find("White");
+    else if (color == 1)                                    // Green
+        savedSExpr = savedSExpr->get(1)->find("Green");
+    else                                                    // Orange
+        savedSExpr = savedSExpr->get(1)->find("Orange");    
+    
+
+    // Build SExpr from params
+    std::vector<SExpr> atoms; 
+    for (SExpr s : *(savedSExpr->getList()))
+        atoms.push_back(s);
+
     return SExpr(atoms);
 }
+

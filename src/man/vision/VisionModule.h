@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RoboGrams.h"
+#include "SExpr.h"
 #include "Camera.h"
 #include "Images.h"
 #include "PMotion.pb.h"
@@ -47,11 +48,11 @@ private:
     FieldHomography* homography[2];
     FieldLineList* fieldLines[2];
 
-    // Json tree with color params saved
-    boost::property_tree::ptree tree;
+    // Lisp tree with color params saved
+    nblog::SExpr colors;
 
-    // Method to convert from Json to Colors type
-    Colors* getColorsFromJson(bool top);
+    // Method to convert from Lisp to Colors type
+    Colors* getColorsFromLisp(bool top);
 };
 
 }

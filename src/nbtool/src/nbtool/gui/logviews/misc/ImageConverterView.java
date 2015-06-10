@@ -26,14 +26,18 @@ import nbtool.io.CrossIO.CrossInstance;
 import nbtool.util.Utility;
 
 public class ImageConverterView extends ViewParent implements IOFirstResponder {
+
+    // FrontEnd output images 
     private BufferedImage yImage;
     private BufferedImage whiteImage;
     private BufferedImage greenImage;
     private BufferedImage orangeImage;
     private BufferedImage segmentedImage;
 
+    // Save button
     private JButton saveButton;
 
+    // White sliders
     private JSlider wDarkU;
     private JSlider wDarkV;
     private JSlider wLightU;
@@ -41,6 +45,7 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
     private JSlider wFuzzyU;
     private JSlider wFuzzyV;
 
+    // Green sliders
     private JSlider gDarkU;
     private JSlider gDarkV;
     private JSlider gLightU;
@@ -48,6 +53,7 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
     private JSlider gFuzzyU;
     private JSlider gFuzzyV;
 
+    // Orange sliders
     private JSlider oDarkU;
     private JSlider oDarkV;
     private JSlider oLightU;
@@ -55,14 +61,12 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
     private JSlider oFuzzyU;
     private JSlider oFuzzyV;
 
+    // Some operations should only happen on first load
     private boolean firstLoad;
 
     public ImageConverterView() {
         super();
         firstLoad = true;
-
-        // TODO save button: pass color params back to nbfunc (how?)
-            // have it rewrite the json data
 
         ChangeListener slide = new ChangeListener(){
             public void stateChanged(ChangeEvent e) {
@@ -77,15 +81,14 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
             }
         };
 
-        // TODO fix slider glitch
 
         // Save button
         saveButton = new JButton("Save color parameters");
-        saveButton.setToolTipText("Save current color parms to Vision/ColorParams.txt");
+        saveButton.setToolTipText("Save current color parms to config/colorParams.txt");
         saveButton.addActionListener(press);
         add(saveButton);
 
-        // Init and add white sliders. TODO: init val to 0
+        // Init and add white sliders
         wDarkU  = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
         wDarkV  = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
         wLightU = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
@@ -152,8 +155,27 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         add(oFuzzyV);
     }
 
+    @Override
+    public void setLog(Log newlog) {
+        log = newlog;
+        callNBFunction();
+    }
+    @Override
+    public void ioFinished(IOInstance instance) {}
+
+    @Override
+    public boolean ioMayRespondOnCenterThread(IOInstance inst) {
+        return false;
+    }
+
+    /* Called upon slide of any of the 18 sliders. Make an SExpr from the psitions 
+        of each of the sliders. If this.log doesn't have Params saved, add them. Else,
+        replace them. Call nbfunction with updated log description.
+    */
     public void adjustParams() {
 
+        // This is called when the sliders are initialized, so dont run if it's first load,
+        //  or if any values are zero b/c devide by zero error in frontEnd processing
         if (firstLoad || zeroParam())
             return;
 
@@ -182,9 +204,11 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
                 SExpr.newKeyValue("fuzzy_u", (float)(oFuzzyU.getValue()) / 100.00),
                 SExpr.newKeyValue("fuzzy_v", (float)(oFuzzyV.getValue()) / 100.00)))
             );
+        
+        // Look for existing Params atom in current this.log description
+        SExpr oldColor, newColor, oldParams = this.log.tree().find("Params");
 
-       SExpr oldColor, newColor, oldParams = this.log.tree().find("Params");
-
+        // Add params or replace params
         if (oldParams.exists()) {
             SExpr saveAtom = oldParams.get(1).find("SaveParams");
             this.log.tree().remove(saveAtom);
@@ -199,19 +223,14 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
     public void saveParams() {
         SExpr params = this.log.tree().find("Params");
 
+        // Check to see if sliders have been moved (slider adjust would have saved params)
         if (!params.exists())
             return;
 
+        // Add flag for nbfunction to save the params
         params.get(1).append(SExpr.newKeyValue("SaveParams", "True"));
 
         callNBFunction();
-
-        // TODO:  how to manually remove?
-
-       // System.out.printf("Looking 0 %d\n", this.log.tree().find("Params").get(0).print());
-       // System.out.printf("Looking 1 %s\n", this.log.tree().find("Params").get(1).print());
-       // System.out.printf("Looking 2 %B\n", this.log.tree().find("Params").get(2).exists());
-
     }
 
     private void callNBFunction() {
@@ -223,13 +242,11 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         if (func == null)
             return;
 
-        System.out.printf("Passing to nbcross: %s\n\n", this.log.tree().print());
-
         CrossCall call = new CrossCall(this, func, this.log);
         inst.tryAddCall(call);
-
     }
 
+    // Check to see if any parameters are zero to avoid devide-by-zero error later
     private boolean zeroParam() {
         if (wDarkU. getValue() == 0 ||
             wDarkV. getValue() == 0 ||
@@ -253,9 +270,11 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
             oFuzzyV.getValue() == 0) {
 
             return true;
-        } else return false;
+        }
+        return false;
     }
 
+    // Draw 5 output images, 18 sliders, 6 texts, and a button
     public void paintComponent(Graphics g) {
        
         int vB = 5;  // verticle buffer
@@ -283,22 +302,7 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
             g.drawImage(segmentedImage, width + vB,  height + sH*6 + tB*3, null);
         }
 
-        // Draw button
-        saveButton.setBounds(width*2 + vB*2,  height + sH*6 + tB*3, width, tB);
-
-        // Draw help text
-        g.drawString("white U and V thresholds for when Y is 0",    width*0 + tB*0, height + tB*1 + sH*0 - lB);
-        g.drawString("white U and V thresholds for when Y is 255",  width*0 + tB*0, height + tB*2 + sH*2 - lB);
-        g.drawString("width of fuzzy threshold for U and V",        width*0 + tB*0, height + tB*3 + sH*4 - lB);
-
-        g.drawString("green U and V thresholds for when Y is 0",    width*1 + vB*1, height + tB*1 + sH*0 - lB);
-        g.drawString("green U and V thresholds for when Y is 255",  width*1 + vB*1, height + tB*2 + sH*2 - lB);
-        g.drawString("width of fuzzy threshold for U and V",        width*1 + vB*1, height + tB*3 + sH*4 - lB);
-
-        g.drawString("orange U and V thresholds for when Y is 0",   width*2 + vB*2, height + tB*1 + sH*0 - lB);
-        g.drawString("orange U and V thresholds for when Y is 255", width*2 + vB*2, height + tB*2 + sH*2 - lB);
-        g.drawString("width of fuzzy threshold for U and V",        width*2 + vB*2, height + tB*3 + sH*4 - lB);
-
+        // TODO fix slider glitch
         // Draw 18 sliders
         wDarkU. setBounds(width*0 + vB*1, height + sH*0 + tB*1, width - vB*2, sH);
         wDarkV. setBounds(width*0 + vB*1, height + sH*1 + tB*1, width - vB*2, sH);
@@ -320,17 +324,24 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         oLightV.setBounds(width*2 + vB*3, height + sH*3 + tB*2, width - vB*2, sH);
         oFuzzyU.setBounds(width*2 + vB*3, height + sH*4 + tB*3, width - vB*2, sH);
         oFuzzyV.setBounds(width*2 + vB*3, height + sH*5 + tB*3, width - vB*2, sH);
+
+        // Draw help text
+        g.drawString("white U and V thresholds for when Y is 0",    width*0 + tB*0, height + tB*1 + sH*0 - lB);
+        g.drawString("white U and V thresholds for when Y is 255",  width*0 + tB*0, height + tB*2 + sH*2 - lB);
+        g.drawString("width of fuzzy threshold for U and V",        width*0 + tB*0, height + tB*3 + sH*4 - lB);
+
+        g.drawString("green U and V thresholds for when Y is 0",    width*1 + vB*1, height + tB*1 + sH*0 - lB);
+        g.drawString("green U and V thresholds for when Y is 255",  width*1 + vB*1, height + tB*2 + sH*2 - lB);
+        g.drawString("width of fuzzy threshold for U and V",        width*1 + vB*1, height + tB*3 + sH*4 - lB);
+
+        g.drawString("orange U and V thresholds for when Y is 0",   width*2 + vB*2, height + tB*1 + sH*0 - lB);
+        g.drawString("orange U and V thresholds for when Y is 255", width*2 + vB*2, height + tB*2 + sH*2 - lB);
+        g.drawString("width of fuzzy threshold for U and V",        width*2 + vB*2, height + tB*3 + sH*4 - lB);
+       
+       // Draw button
+        saveButton.setBounds(width*2 + vB*2,  height + sH*6 + tB*3, width, tB);
     }
 
-    @Override
-    public void setLog(Log newlog) {
-        log = newlog;
-        callNBFunction();
-    }
-    
-
-    @Override
-    public void ioFinished(IOInstance instance) {}
 
     @Override
     public void ioReceived(IOInstance inst, int ret, Log... out) {
@@ -366,53 +377,39 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         repaint();
     }
 
+    // If and only if it is the first load, we need to set the positions of the sliders
     private void firstIoReceived(Log... out) {
         
         // Set sliders to positions based on white, green, then orange images descriptions' s-exps
         SExpr colors = out[1].tree();
 
-        wDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(1).value()) * 100));
-        wDarkV. setValue((int)(Float.parseFloat(colors.get(2).get(1).value()) * 100));
-        wLightU.setValue((int)(Float.parseFloat(colors.get(3).get(1).value()) * 100));
-        wLightV.setValue((int)(Float.parseFloat(colors.get(4).get(1).value()) * 100));
-        wFuzzyU.setValue((int)(Float.parseFloat(colors.get(5).get(1).value()) * 100));
-        wFuzzyV.setValue((int)(Float.parseFloat(colors.get(6).get(1).value()) * 100));
+        System.out.printf("White: %s\n", colors.get(1).get(1).print());
+
+        wDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(0).get(1).value()) * 100));
+        wDarkV. setValue((int)(Float.parseFloat(colors.get(1).get(1).get(1).value()) * 100));
+        wLightU.setValue((int)(Float.parseFloat(colors.get(1).get(2).get(1).value()) * 100));
+        wLightV.setValue((int)(Float.parseFloat(colors.get(1).get(3).get(1).value()) * 100));
+        wFuzzyU.setValue((int)(Float.parseFloat(colors.get(1).get(4).get(1).value()) * 100));
+        wFuzzyV.setValue((int)(Float.parseFloat(colors.get(1).get(5).get(1).value()) * 100));
 
         colors = out[2].tree();
 
-        gDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(1).value()) * 100));
-        gDarkV. setValue((int)(Float.parseFloat(colors.get(2).get(1).value()) * 100));
-        gLightU.setValue((int)(Float.parseFloat(colors.get(3).get(1).value()) * 100));
-        gLightV.setValue((int)(Float.parseFloat(colors.get(4).get(1).value()) * 100));
-        gFuzzyU.setValue((int)(Float.parseFloat(colors.get(5).get(1).value()) * 100));
-        gFuzzyV.setValue((int)(Float.parseFloat(colors.get(6).get(1).value()) * 100));
+        gDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(0).get(1).value()) * 100));
+        gDarkV. setValue((int)(Float.parseFloat(colors.get(1).get(1).get(1).value()) * 100));
+        gLightU.setValue((int)(Float.parseFloat(colors.get(1).get(2).get(1).value()) * 100));
+        gLightV.setValue((int)(Float.parseFloat(colors.get(1).get(3).get(1).value()) * 100));
+        gFuzzyU.setValue((int)(Float.parseFloat(colors.get(1).get(4).get(1).value()) * 100));
+        gFuzzyV.setValue((int)(Float.parseFloat(colors.get(1).get(5).get(1).value()) * 100));
 
         colors = out[3].tree();
 
-        oDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(1).value()) * 100));
-        oDarkV. setValue((int)(Float.parseFloat(colors.get(2).get(1).value()) * 100));
-        oLightU.setValue((int)(Float.parseFloat(colors.get(3).get(1).value()) * 100));
-        oLightV.setValue((int)(Float.parseFloat(colors.get(4).get(1).value()) * 100));
-        oFuzzyU.setValue((int)(Float.parseFloat(colors.get(5).get(1).value()) * 100));
-        oFuzzyV.setValue((int)(Float.parseFloat(colors.get(6).get(1).value()) * 100));
+        oDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(0).get(1).value()) * 100));
+        oDarkV. setValue((int)(Float.parseFloat(colors.get(1).get(1).get(1).value()) * 100));
+        oLightU.setValue((int)(Float.parseFloat(colors.get(1).get(2).get(1).value()) * 100));
+        oLightV.setValue((int)(Float.parseFloat(colors.get(1).get(3).get(1).value()) * 100));
+        oFuzzyU.setValue((int)(Float.parseFloat(colors.get(1).get(4).get(1).value()) * 100));
+        oFuzzyV.setValue((int)(Float.parseFloat(colors.get(1).get(5).get(1).value()) * 100));
 
         firstLoad = false;
-        
     }
-
- //   private SExpr getColorSExpFromSliders(int color) {
-    //     if (color == 0) {
-
-    //     } else if (color == 1) {    // Green
-
-    //     } else {                    // Orange
-
-    //     }
-    // }
-
-    @Override
-    public boolean ioMayRespondOnCenterThread(IOInstance inst) {
-        return false;
-    }
-
 }
