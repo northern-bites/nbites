@@ -60,7 +60,7 @@ VisionModule::VisionModule()
         fieldLines[i] = new FieldLineList();
 
         // TODO flag
-        bool fast = false;
+        bool fast = true;
         frontEnd[i]->fast(fast);
         edgeDetector[i]->fast(fast);
         hough[i]->fast(fast);
@@ -173,7 +173,6 @@ ImageFrontEnd* VisionModule::runAndGetFrontEnd(bool top) {
                         image->rowPitch(),
                         image->pixelAddress(0, 0));
 
-    // Run front end
     frontEnd[0]->run(yuvLite, colorParams[!top]);
 
     return frontEnd[0];
@@ -185,10 +184,10 @@ ImageFrontEnd* VisionModule::runAndGetFrontEnd(bool top) {
   from the 18 values for either the top or bottom image. 
 */
 Colors* VisionModule::getColorsFromLisp(bool top) {
-    man::vision::Colors* ret = new man::vision::Colors;
+    Colors* ret = new man::vision::Colors;
     int i, j = 0;
 
-     nblog::SExpr* params;
+    nblog::SExpr* params;
 
     if (top) {
         params = colors.get(1)->find("Top");
