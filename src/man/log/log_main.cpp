@@ -404,6 +404,11 @@ namespace nblog {
     
     void NBLog(int buffer_index, const std::string& where_called,
                const std::vector<SExpr>& items, const std::string& data ) {
+        if (!log_running) {
+            NBDEBUG("NBlog returning because !log_running\n");
+            return;
+        }
+        
         Log * newl = new Log("nblog", where_called, time(NULL), LOG_VERSION,
                              items, data);
         
