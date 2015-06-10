@@ -45,6 +45,8 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		Runnable savePrefsRunnable = new Runnable() {
 			public void run() {
 				Prefs.bounds = _display.getBounds();
+				Prefs.leftSplitLoc = split1.getDividerLocation();
+				Prefs.rightSplitLoc = split2.getDividerLocation();
 				
 				Map<String, Class<? extends ViewParent>[]> lshown = new HashMap<String, Class<? extends ViewParent>[]>();
 				LogToViewUtility ltvu = UtilityManager.instanceOfLTV();
@@ -92,6 +94,8 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		add(split2);
 		split1.setResizeWeight(.08);
 		split2.setResizeWeight(.85);
+		split1.setDividerLocation(Prefs.leftSplitLoc);
+		split2.setDividerLocation(Prefs.rightSplitLoc);
 		
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventPostProcessor(this);
 				

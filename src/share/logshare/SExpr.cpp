@@ -146,6 +146,49 @@ namespace nblog {
      Instance methods
      */
     
+    void SExpr::setList(const std::vector<SExpr>& newContents) {
+        _atom = false;
+        _value = "";
+        _list = newContents;
+    }
+    
+    void SExpr::setList(std::initializer_list<SExpr> exprs) {
+        _atom = false;
+        _value = "";
+        _list = std::vector<SExpr>(exprs);
+    }
+    
+    void SExpr::setAtom(std::string val) {
+        _atom = true;
+        _value = val;
+        _list = {};
+    }
+    
+    void SExpr::setAtomAsCopy(SExpr atomToCopy) {
+        _atom = true;
+        _value = atomToCopy.value();
+        _list = {};
+    }
+    
+    void SExpr::insert(int index, SExpr& inserted) {
+        if (_atom)
+            return;
+        
+        if (index < 0 || index > _list.size())
+            return;
+        
+        auto it = _list.begin() + index;
+        _list.insert(it, inserted);
+    }
+    
+    bool SExpr::remove(int index) {
+        if (_atom || index < 0 || index > _list.size())
+            return false;
+        
+        _list.erase(_list.begin() + index);
+        return true;
+    }
+
     std::string SExpr::value() {
         if (!_atom) throw std::domain_error("sexpr is atom");
         return _value;
@@ -174,6 +217,12 @@ namespace nblog {
             return &_list[i];
         }
         else return NULL;
+    }
+    
+    std::vector<SExpr> * SExpr::getList() {
+        if (_atom)
+            return NULL;
+        return &_list;
     }
     
     void SExpr::append(const std::vector<SExpr>& l)
