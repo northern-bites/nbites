@@ -176,20 +176,23 @@ int Vision_func() {
         double t = line.t();
         double ep0 = line.ep0();
         double ep1 = line.ep1();
-        int lineIndex = line.fieldLine();
+        int houghIndex = line.index();
+        int fieldIndex = line.fieldLine();
         
         // Java uses big endian representation
         endswap<double>(&r);
         endswap<double>(&t);
         endswap<double>(&ep0);
         endswap<double>(&ep1);
-        endswap<int>(&lineIndex);
+        endswap<int>(&houghIndex);
+        endswap<int>(&fieldIndex);
 
         lineBuf.append((const char*) &r, sizeof(double));
         lineBuf.append((const char*) &t, sizeof(double));
         lineBuf.append((const char*) &ep0, sizeof(double));
         lineBuf.append((const char*) &ep1, sizeof(double));
-        lineBuf.append((const char*) &lineIndex, sizeof(int));
+        lineBuf.append((const char*) &houghIndex, sizeof(int));
+        lineBuf.append((const char*) &fieldIndex, sizeof(int));
 
         std::cout << line.print() << std::endl;
     }
@@ -201,7 +204,6 @@ int Vision_func() {
         std::cout << line.field().print() << std::endl;
     }
 
-    // TODO include index
     std::cout << std::endl << "Field lines:" << std::endl;
     man::vision::FieldLineList* fieldLineList = module.getFieldLines(topCamera);
     for (int i = 0; i < fieldLineList->size(); i++) {

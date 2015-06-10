@@ -154,12 +154,15 @@ class FieldLine;
 class FieldLineList;
 
 enum class CornerID {
-  None,
   Concave,
   Convex,
   T,
-  TFirst, // NOTE detector uses TFirst and TSecond internally, the client will 
-  TSecond //      never see such a corner ID
+
+  // NOTE detector uses None, TFirst, and TSecond internally, the client will 
+  //      never see such a corner ID
+  None,
+  TFirst,
+  TSecond
 };
 
 // Corner object used in corner detection and field line classification.
