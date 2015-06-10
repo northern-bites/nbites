@@ -125,6 +125,10 @@ int Boss::killMan() {
         return -1;
     }
 
+    shared->sit = 1;
+    // A bit longer than it takes to sit down
+    sleep(7);
+
     kill(manPID, SIGTERM);
     manRunning = false;
 
@@ -139,6 +143,7 @@ int Boss::killMan() {
     shared->latestCommandRead = 0;
     shared->latestSensorWritten = 0;
     shared->latestSensorRead = 0;
+    shared->sit = 0;
     commandSkips = 0;
     sensorSkips = 0;
 

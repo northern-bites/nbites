@@ -25,6 +25,7 @@ extern "C" void initButtonState_proto();
 extern "C" void initFallStatus_proto();
 extern "C" void initStiffnessControl_proto();
 extern "C" void initObstacle_proto();
+extern "C" void initToggle_proto();
 extern "C" void initinterface();
 
 namespace man {
@@ -100,6 +101,7 @@ void BehaviorsModule::initializePython()
         initFallStatus_proto();
         initStiffnessControl_proto();
         initObstacle_proto();
+        initToggle_proto();
         // Init the interface as well
         initinterface();
     } catch (error_already_set) {
@@ -263,6 +265,9 @@ void BehaviorsModule::prepareMessages()
 
     visionObstacleIn.latch();
     pyInterface.setVisionObstacle_ptr(&visionObstacleIn.message());
+
+    sitDownIn.latch();
+    pyInterface.setSitDown_ptr(&sitDownIn.message());
 
     // Prepare potential out messages for python
     ledCommand = portals::Message<messages::LedCommand>(0);

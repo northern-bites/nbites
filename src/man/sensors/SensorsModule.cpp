@@ -23,7 +23,9 @@ SensorsModule::SensorsModule()
       fsrOutput_(base()),
       batteryOutput_(base()),
       stiffStatusOutput_(base()),
-      lastPrint(0)
+      sitDownOutput_(base()),
+      lastPrint(0),
+      sitDown(0)
 {
     shared_fd = shm_open(NBITES_MEM, O_RDWR, 0600);
     if (shared_fd < 0) {
@@ -152,6 +154,9 @@ void SensorsModule::updateSensorValues()
     portals::Message<messages::BatteryState> battery(&(values.battery));
     portals::Message<messages::StiffStatus> stiffness(&(values.stiffStatus));
 
+    portals::Message<messages::Toggle> sit(0);
+    sit.get()->set_toggle(shared->sit);
+
     jointsOutput_.setMessage(joints);
     currentsOutput_.setMessage(currents);
     temperatureOutput_.setMessage(temps);
@@ -162,6 +167,7 @@ void SensorsModule::updateSensorValues()
     fsrOutput_.setMessage(fsrs);
     batteryOutput_.setMessage(battery);
     stiffStatusOutput_.setMessage(stiffness);
+    sitDownOutput_.setMessage(sit);
 }
 
 void SensorsModule::run_()

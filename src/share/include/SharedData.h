@@ -51,4 +51,6 @@ struct SharedData {
 
     uint64_t latestCommandWritten;
     uint64_t latestCommandRead;
+
+    uint8_t sit;
 };

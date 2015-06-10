@@ -19,6 +19,7 @@
 #include "FallStatus.pb.h"
 #include "StiffnessControl.pb.h"
 #include "Obstacle.pb.h"
+#include "Toggle.pb.h"
 
 namespace man {
 namespace behaviors {
@@ -48,6 +49,7 @@ public:
     messages::VisionObstacle    const * visionObstacle_ptr;
     messages::SharedBall        const * sharedBall_ptr;
     messages::RobotLocation     const * sharedFlip_ptr;
+    messages::Toggle            const * sitDown_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -140,6 +142,10 @@ public:
     void setVisionObstacle_ptr(const messages::VisionObstacle* msg)
     {
         visionObstacle_ptr = msg;
+    }
+    void setSitDown_ptr(const messages::Toggle* msg)
+    {
+        sitDown_ptr = msg;
     }
 
 };

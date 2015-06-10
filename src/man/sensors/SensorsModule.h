@@ -52,6 +52,7 @@ public:
     portals::OutPortal<messages::FSR>             fsrOutput_;
     portals::OutPortal<messages::BatteryState>    batteryOutput_;
     portals::OutPortal<messages::StiffStatus>     stiffStatusOutput_;
+    portals::OutPortal<messages::Toggle>          sitDownOutput_;
 
 private:
     void run_();
@@ -65,6 +66,7 @@ private:
     uint8_t sensorsStage[SENSOR_SIZE];
 
     bool lastPrint;
+    bool sitDown;
 };
 
 } // namespace sensors

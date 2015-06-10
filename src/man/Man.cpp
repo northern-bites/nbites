@@ -17,6 +17,7 @@ SET_POOL_SIZE(messages::InertialState, 16);
 SET_POOL_SIZE(messages::PackedImage16, 16);
 SET_POOL_SIZE(messages::YUVImage, 16);
 SET_POOL_SIZE(messages::RobotLocation, 16);
+SET_POOL_SIZE(messages::Toggle, 16);
 #endif
 
 namespace man {
@@ -173,6 +174,7 @@ Man::Man() :
         behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
         behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
         behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
+        behaviors.sitDownIn.wireTo(&sensors.sitDownOutput_, true);
         behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
         behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
         behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);

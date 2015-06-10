@@ -15,6 +15,7 @@ from . import Leds
 from . import robots
 from . import GameController
 from . import FallController
+from . import SweetMoves
 
 # Packages and modules from sub-directories
 from .headTracker import HeadTracker
@@ -101,6 +102,9 @@ class Brain(object):
         self.ourScore = 0
         self.theirScore = 0
 
+        # So that we only try to sit down once upon receiving command
+        self.sitting = False
+
     def initTeamMembers(self):
         self.teamMembers = []
         for i in xrange(Constants.NUM_PLAYERS_PER_TEAM):
@@ -139,6 +143,14 @@ class Brain(object):
         """
         Main control loop
         """
+        # If we're being told to sit do that above all else
+        if self.interface.sitDown.toggle:
+            if self.sitting:
+                return
+            self.sitting = True
+            print "BEHAVIORS is starting to sit"
+            self.nav.performSweetMove(SweetMoves.SIT_POS)
+
         # Update Environment
         self.time = time.time()
 
