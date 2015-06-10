@@ -313,6 +313,14 @@ void CornerDetector::findCorners(FieldLineList& list)
         }
       }
 
+      // NOTE TFirst and TSecond are temporarily used to specify whether corner.first
+      //      or corner.second is the top of the T corner. If TFirst, then corner.first
+      //      is the vertical part of the T, otherwise, corner.second is 
+      //      vertical part of the T. Before the corner detector finishes 
+      //      finding corners, all references to TFirst and TSecond are replaced 
+      //      with T and the corner.first is the vertical part of the T. This happens 
+      //      below. Thus the client is not aware of TFirst and TSecond.
+
       // Create corner object and add to field lines
       if (foundCorner) {
         Corner newCorner;

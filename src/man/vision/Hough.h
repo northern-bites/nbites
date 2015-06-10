@@ -158,11 +158,13 @@ enum class CornerID {
   Concave,
   Convex,
   T,
-  TFirst, // TODO refactor
-  TSecond
+  TFirst, // NOTE detector uses TFirst and TSecond internally, the client will 
+  TSecond //      never see such a corner ID
 };
 
-// Corner object used in corner detection and field line classification
+// Corner object used in corner detection and field line classification.
+// If id == T, then corner.first is the horizontal part of the T and corner.second
+// is the vertical part of the T (assuming the T is written like the english letter).
 struct Corner : public std::pair<FieldLine*, FieldLine*>
 {
   Corner() : std::pair<FieldLine*, FieldLine*>() {}
@@ -173,9 +175,9 @@ struct Corner : public std::pair<FieldLine*, FieldLine*>
   std::string print() const;
 };
 
-// Detects goalbox
-// First is index of top goalbox line
-// Second is index of endline
+// Detects goalbox.
+// First is index of top goalbox line.
+// Second is index of endline.
 class GoalboxDetector : public std::pair<FieldLine*, FieldLine*>
 {
   double parallelThreshold_;

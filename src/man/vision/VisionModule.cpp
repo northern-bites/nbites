@@ -14,11 +14,11 @@ VisionModule::VisionModule()
       bottomIn(),
       jointsIn()
 {
-    // NOTE constructed on heap because some of the objects below do
+    // NOTE Constructed on heap because some of the objects below do
     //      not have default constructors, all class members must be initialized
     //      after the initializer list is run, which requires calling default
     //      constructors in the case of C-style arrays, limitation theoretically
-    //      removed in C++11
+    //      removed in C++11.
     for (int i = 0; i < 2; i++) {
         colorParams[i] = new Colors();
         frontEnd[i] = new ImageFrontEnd();
