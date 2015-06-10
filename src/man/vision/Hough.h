@@ -200,14 +200,17 @@ public:
 // Stores all detected corners in vector
 class CornerDetector : public std::vector<Corner>
 {
+  int width;
+  int height;
   double orthogonalThreshold_;
   double closeThreshold_;
   double farThreshold_;
+  double edgeImageThreshold_;
 
   CornerID classify(HoughLine& line1, HoughLine& line2) const; 
 
 public:
-  CornerDetector();
+  CornerDetector(int width_, int height_);
   void findCorners(FieldLineList& list);
 
   double orthogonalThreshold() const { return orthogonalThreshold_; }
@@ -218,6 +221,9 @@ public:
 
   double farThreshold() const { return farThreshold_; }
   void farThreshold(double newThreshold) { farThreshold_ = newThreshold; }
+
+  double edgeImageThreshold() const { return edgeImageThreshold_; }
+  void edgeImageThreshold(double newThreshold) { edgeImageThreshold_ = newThreshold; }
 };
 
 enum class LineID {

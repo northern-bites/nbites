@@ -275,8 +275,13 @@ string GoalboxDetector::print() const
   return strPrintf("B, %4d, %4d", first->index(), second->index());
 }
 
-CornerDetector::CornerDetector()
-  : orthogonalThreshold_(40), closeThreshold_(30), farThreshold_(100)
+CornerDetector::CornerDetector(int width_, int height_)
+  : width(width_), 
+    height(height_), 
+    orthogonalThreshold_(40), 
+    closeThreshold_(30), 
+    farThreshold_(100), 
+    edgeImageThreshold_(0.05)
 {}
 
 void CornerDetector::findCorners(FieldLineList& list)
@@ -299,8 +304,9 @@ void CornerDetector::findCorners(FieldLineList& list)
       //      finding the same corner in all pairings of hough lines
       CornerID firstId = classify(line1[0], line2[0]);
       bool foundCorner = !(firstId == CornerID::None);
-      for (int k = 1; k < 2; k++) {
+      for (int k = 0; k < 2; k++) {
         for (int l = 0; l < 2; l++) {
+          if (k == 0 && l == 0) continue;
           CornerID newId = classify(line1[k], line2[l]);
           if (firstId != newId)
             foundCorner = false;
@@ -324,9 +330,24 @@ void CornerDetector::findCorners(FieldLineList& list)
   }
 }
 
-// TODO ignore corners in edge of screen
 CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
 {
+  // If intersection is in edge of image, don't classify corner
+  double imageIntersectX;
+  double imageIntersectY;
+
+  bool intersects = line1.intersect(line2, imageIntersectX, imageIntersectY);
+  if (!intersects) return CornerID::None;
+
+  double xThreshold = (width / 2) - (width * edgeImageThreshold());
+  double yThreshold = (height / 2) - (height * edgeImageThreshold());
+
+  bool farEnoughFromImageEdge = (imageIntersectX >= -xThreshold &&
+                                 imageIntersectX <=  xThreshold &&
+                                 imageIntersectY >= -yThreshold &&
+                                 imageIntersectY <=  yThreshold);
+  if (!farEnoughFromImageEdge) return CornerID::None;
+
   // Use world coordinates
   const GeoLine& field1 = line1.field();
   const GeoLine& field2 = line2.field();
@@ -338,35 +359,31 @@ CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
   if (!orthogonal) return CornerID::None;
 
   // Find intersection point
-  double intersectX;
-  double intersectY;
+  double worldIntersectX;
+  double worldIntersectY;
 
-  bool intersects = field1.intersect(field2, intersectX, intersectY);
-  if (!intersects) return CornerID::None;
+  intersects = field1.intersect(field2, worldIntersectX, worldIntersectY);
+  if (!intersects) return CornerID::None; 
+  // NOTE should never happen since checked above in image coords
 
   // Find endpoints
-  // TODO refactor
-  double field1End1X;
-  double field1End1Y;
-  double field1End2X;
-  double field1End2Y;
+  double field1EndX[2];
+  double field1EndY[2];
 
-  double field2End1X;
-  double field2End1Y;
-  double field2End2X;
-  double field2End2Y;
+  double field2EndX[2];
+  double field2EndY[2];
 
-  field1.endPoints(field1End1X, field1End1Y, field1End2X, field1End2Y);
-  field2.endPoints(field2End1X, field2End1Y, field2End2X, field2End2Y);
+  field1.endPoints(field1EndX[0], field1EndY[0], field1EndX[1], field1EndY[1]);
+  field2.endPoints(field2EndX[0], field2EndY[0], field2EndX[1], field2EndY[1]);
 
   // Calculate distance
   double dist1[2];
-  dist1[0] = dist(field1End1X, field1End1Y, intersectX, intersectY);
-  dist1[1] = dist(field1End2X, field1End2Y, intersectX, intersectY);
+  for (int i = 0; i < 2; i++)
+    dist1[i] = dist(field1EndX[i], field1EndY[i], worldIntersectX, worldIntersectY);
 
   double dist2[2];
-  dist2[0] = dist(field2End1X, field2End1Y, intersectX, intersectY);
-  dist2[1] = dist(field2End2X, field2End2Y, intersectX, intersectY);
+  for (int i = 0; i < 2; i++)
+    dist2[i] = dist(field2EndX[i], field2EndY[i], worldIntersectX, worldIntersectY);
 
   // Find and classify concave and convex corners
   for (int i = 0; i < 2; i++) {
@@ -454,17 +471,11 @@ void FieldLineList::find(HoughLineList& houghLines)
   }
 }
 
-// YES
-// TODO convex and T -> classify as side goalbox
 // TODO goalie and the goalbox
-// TODO stream with a robot to see what fields of view are possible
-// TODO add debug tools
-
-// MAYBE
-// TODO bill's simulator
-// TODO midline classification, cross detection, lots of green detection, etc.j
-// TODO use length of lines
-// TODO find and use field edge
+// TODO convex and T -> classify as side goalbox?
+// TODO midline classification? (cross detection, lots of green detection, etc.)
+// TODO find and use field edge?
+// TODO bill's simulator?
 void FieldLineList::classify(GoalboxDetector& boxDetector, CornerDetector& cornerDetector)
 {
   // Run goalbox detector
@@ -506,7 +517,7 @@ void FieldLineList::classify(GoalboxDetector& boxDetector, CornerDetector& corne
       }
       // T, long part
       if (corners[j].id == CornerID::T &&
-          corners[j].first == &line) { // TODO correct?
+          corners[j].first == &line) {
         if (oneTLong) {
           line.id(LineID::Endline);
           endlineFound = true;

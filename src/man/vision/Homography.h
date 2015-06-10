@@ -44,7 +44,7 @@ class FieldHomography
   void compute() const { ((FieldHomography*)this)->compute(); }
 
 public:
-  // Construct with default values;
+  // Construct with default values
   FieldHomography(bool topCamera = true);
 
   // Image coordinates of optical axis, relative to the center of the image

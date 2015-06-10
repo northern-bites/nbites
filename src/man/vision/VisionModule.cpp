@@ -25,12 +25,18 @@ VisionModule::VisionModule()
         edgeDetector[i] = new EdgeDetector();
         edges[i] = new EdgeList(32000);
         houghLines[i] = new HoughLineList(128);
-        hough[i] = new HoughSpace(320, 240);
         kinematics[i] = new Kinematics(i == 0);
-        homography[i] = new FieldHomography(i == 0);
+        homography[i] = new FieldHomography();
         fieldLines[i] = new FieldLineList();
         boxDetector[i] = new GoalboxDetector();
-        cornerDetector[i] = new CornerDetector();
+
+        if (i == 0) {
+          hough[i] = new HoughSpace(320, 240);
+          cornerDetector[i] = new CornerDetector(320, 240);
+        } else {
+          hough[i] = new HoughSpace(160, 120);
+          cornerDetector[i] = new CornerDetector(160, 120);
+        }
 
         // TODO flag
         bool fast = true;
