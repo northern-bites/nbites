@@ -280,7 +280,7 @@ CornerDetector::CornerDetector(int width_, int height_)
     height(height_), 
     orthogonalThreshold_(40), 
     closeThreshold_(30), 
-    farThreshold_(100), 
+    farThreshold_(50), 
     edgeImageThreshold_(0.05)
 {}
 
@@ -350,6 +350,7 @@ CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
   double xThreshold = (width / 2) - (width * edgeImageThreshold());
   double yThreshold = (height / 2) - (height * edgeImageThreshold());
 
+  // TODO treat positive yThreshold differently because in image coordinates?
   bool farEnoughFromImageEdge = (imageIntersectX >= -xThreshold &&
                                  imageIntersectX <=  xThreshold &&
                                  imageIntersectY >= -yThreshold &&
@@ -363,7 +364,7 @@ CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
   // Check that lines are close to orthogonal
   double normalizedT1 = (field1.r() > 0 ? field1.t() : field1.t() - M_PI);
   double normalizedT2 = (field2.r() > 0 ? field2.t() : field2.t() - M_PI);
-  bool orthogonal = diffRadians(normalizedT1, normalizedT2) - (M_PI / 2) < orthogonalThreshold()*TO_RAD;
+  bool orthogonal = diffRadians(diffRadians(normalizedT1, normalizedT2), (M_PI / 2)) < orthogonalThreshold()*TO_RAD;
   if (!orthogonal) return CornerID::None;
 
   // Find intersection point
