@@ -251,7 +251,7 @@ bool GoalboxDetector::find(FieldLineList& list)
 }
 
 // TODO add length condition?
-bool GoalboxDetector::validBox(HoughLine& line1, HoughLine& line2) const
+bool GoalboxDetector::validBox(const HoughLine& line1, const HoughLine& line2) const
 {
   // Use world coordinates
   const GeoLine& field1 = line1.field();
@@ -338,7 +338,7 @@ void CornerDetector::findCorners(FieldLineList& list)
   }
 }
 
-CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
+CornerID CornerDetector::classify(const HoughLine& line1, const HoughLine& line2) const
 {
   // If intersection is in edge of image, don't classify corner
   double imageIntersectX;
@@ -400,7 +400,8 @@ CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
       // Concave or convex corners have both endpoints on the intersection point
       if (dist1[i] < closeThreshold() && dist2[j] < closeThreshold()) {
         // Found concave or convex
-        if (field1.ep0() < 0 && field1.ep1() > 0 && field2.ep0() < 0 && field2.ep1() > 0)
+        if (isConcave(field1EndX[!i], field1EndY[!i], field2EndX[!j], 
+                      field2EndY[!j], worldIntersectX, worldIntersectY))
           return CornerID::Concave;
         return CornerID::Convex;
       }
@@ -417,6 +418,36 @@ CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
         return CornerID::TFirst;
     }
   }
+}
+
+bool CornerDetector::isConcave(double end1X, double end1Y, 
+                               double end2X, double end2Y,
+                               double intersectX, double intersectY) const
+{
+  // Parallel lines -> convex corner
+  if (intersectX == 0 && (end1X - end2X) == 0)
+    return false;
+  // Check for divide by zero
+  else if (intersectX != 0 && (end1X - end2X) != 0) {
+    double m1 = (end1Y - end2Y) / (end1X - end2X);
+    double m2 = intersectY / intersectX;
+    // Parallel lines -> convex corner
+    if (fabs(m1 - m2) < 0.001)
+      return false;
+  }
+
+  // General case
+  return (ccw(end1X, end1Y, intersectX, intersectY, 0, 0) !=
+          ccw(end2X, end2Y, intersectX, intersectY, 0, 0) &&
+          ccw(end1X, end1Y, end2X, end2Y, intersectX, intersectY) !=
+          ccw(end1X, end1Y, end2X, end2Y, 0, 0));
+}
+
+bool CornerDetector::ccw(double ax, double ay, 
+                         double bx, double by, 
+                         double cx, double cy) const
+{
+  return (cy-ay)*(bx-ax) > (by-ay)*(cx-ax);
 }
 
 // **************************
