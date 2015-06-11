@@ -41,7 +41,7 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 	private Map<String, Object> naiveBall;
 	private Boolean ball_on;
 
-	public static Boolean shouldLoadInParallel() {return true;}
+	public static Boolean shouldLoadInParallel() {return false;}
 
 	public ProtoBallView() {
 		super();
@@ -111,6 +111,7 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 		g.drawString("stationary: " + naiveBall.get("stationary"), 10, height + 70);
 		g.drawString("x_vel: " + naiveBall.get("x_vel"), 10, height + 90);
 		g.drawString("y_vel: " + naiveBall.get("y_vel"), 10, height + 110);
+		g.drawString("distance: " + filteredBall.get("distance"), 10, height + 130);
 
 		ArrayList<Float> dest_buf_x = (ArrayList<Float>)naiveBall.get("buf_x");
 		ArrayList<Float> dest_buf_y = (ArrayList<Float>)naiveBall.get("buf_y");
@@ -168,7 +169,6 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 			byte[] nb = Arrays.copyOfRange(newlog.bytes,0,nb_length);
 			byte[] fb = Arrays.copyOfRange(newlog.bytes,nb_length,newlog.bytes.length);
 
-			System.out.println("OMG");
 			Class<? extends com.google.protobuf.GeneratedMessage> nbClass = Utility.protobufClassFromType("proto-NaiveBall");
 			Class<? extends com.google.protobuf.GeneratedMessage> fbClass = Utility.protobufClassFromType("proto-FilteredBall");
 			com.google.protobuf.Message nbMsg = Utility.protobufInstanceForClassWithData(nbClass, nb);

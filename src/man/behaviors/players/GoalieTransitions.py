@@ -167,6 +167,7 @@ def goodRightCornerObservation(player):
     return False
 
 def shouldMoveForward(player):
+    return False
     vision = player.brain.interface.visionField
 
     if (player.counter > 150 and
@@ -204,6 +205,7 @@ def shouldMoveForward(player):
     return False
 
 def shouldMoveBackwards(player):
+    return False
     vision = player.brain.interface.visionField
 
     if (vision.bottom_line_size() == 0 and
@@ -240,6 +242,7 @@ def facingBackwards(player):
     return player.brain.interface.visionField.visual_field_edge.distance_m < 110.0
 
 def shouldReposition(player):
+    return False
     return (badLeftCornerObservation(player) or
             badRightCornerObservation(player))
 
@@ -316,11 +319,19 @@ def shouldDiveRight(player):
     if not ball.vis.on:
         shouldDiveRight.lastFramesOff = ball.vis.frames_off
 
-    return (ball.mov_vel_x < -6.0 and
-            ball.mov_speed > 8.0 and
-            ball.rel_y_intersect_dest < -20.0 and
-            ball.distance < 150.0 and
-            sightOk)
+    nball = player.brain.naiveBall
+
+    return (nball.x_vel < -6.0 and
+        not nball.stationary and
+        nball.yintercept < -20.0 and
+        ball.distance < 150.0 and
+        sightOk)
+
+    # return (ball.mov_vel_x < -6.0 and
+    #         ball.mov_speed > 8.0 and
+    #         ball.rel_y_intersect_dest < -20.0 and
+    #         ball.distance < 150.0 and
+    #         sightOk)
 
 def shouldDiveLeft(player):
     if player.firstFrame():
@@ -335,11 +346,19 @@ def shouldDiveLeft(player):
     if not ball.vis.on:
         shouldDiveLeft.lastFramesOff = ball.vis.frames_off
 
-    return (ball.mov_vel_x < -6.0 and
-            ball.mov_speed > 8.0 and
-            ball.rel_y_intersect_dest > 20.0 and
-            ball.distance < 150.0 and
-            sightOk)
+    nball = player.brain.naiveBall
+
+    return (nball.x_vel < -6.0 and
+        not nball.stationary and
+        nball.yintercept < -20.0 and
+        ball.distance < 150.0 and
+        sightOk)
+
+    # return (ball.mov_vel_x < -6.0 and
+    #         ball.mov_speed > 8.0 and
+    #         ball.rel_y_intersect_dest > 20.0 and
+    #         ball.distance < 150.0 and
+    #         sightOk)
 
 def shouldSquat(player):
     if player.firstFrame():
@@ -354,13 +373,22 @@ def shouldSquat(player):
     if not ball.vis.on:
         shouldSquat.lastFramesOff = ball.vis.frames_off
 
-    return (ball.mov_vel_x < -4.0 and
-            ball.mov_speed > 8.0 and
-            abs(ball.rel_y_intersect_dest) < 40.0 and
-            ball.distance < 150.0 and
-            sightOk)
+    nball = player.brain.naiveBall
+
+    return (nball.x_vel < -4.0 and
+        not nball.stationary and
+        abs(nball.yintercept) < 30.0 and
+        ball.distance < 150.0 and
+        sightOk)
+
+    # return (ball.mov_vel_x < -4.0 and
+    #         ball.mov_speed > 8.0 and
+    #         abs(ball.rel_y_intersect_dest) < 40.0 and
+    #         ball.distance < 150.0 and
+    #         sightOk)
 
 def shouldClearDangerousBall(player):
+    return False
     # ball must be visible
     if player.brain.ball.vis.frames_off > 10:
         return False
@@ -379,6 +407,7 @@ def ballSafe(player):
     return math.fabs(player.brain.ball.bearing_deg) < 60.0
 
 def shouldClearBall(player):
+    return False
     """
     Checks that the ball is more or less in the goal box.
     """

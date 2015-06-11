@@ -26,8 +26,8 @@ NaiveBallModule::NaiveBallModule() :
     yVelocityEst = 0.f;
     frameOffCount = 0;
     currentIndex = -1;
+    stationaryOffFrameCount = 0;
 
-    direction = 0;
     position_buffer = new BallState[NUM_FRAMES];
     vel_x_buffer = new float[NUM_FRAMES];
     vel_y_buffer = new float[NUM_FRAMES];
@@ -43,9 +43,6 @@ NaiveBallModule::~NaiveBallModule()
 
 void NaiveBallModule::run_()
 {
-    // Add observation (ball distance/position, ball bearing) to buffer
-
-    // get myInfo:
     ballIn.latch();
     myBall = ballIn.message();
 
@@ -53,6 +50,7 @@ void NaiveBallModule::run_()
     // Make sure no weird ball estimates
     if (myBall.vis().on() && myBall.vis().distance() > 5 && myBall.vis().distance() < 800) {
         updateBuffers(); }
+    else frameOffCount++;
 
     if (frameOffCount > MAX_FRAMES_OFF) clearBuffers();
 
@@ -87,8 +85,15 @@ void NaiveBallModule::run_()
         }
     }
 
+    if (checkIfStationary() == true || stationaryOffFrameCount < STATIONARY_CHECK) {
+        naiveBallMessage.get()->set_stationary(true);
+        yIntercept = 0.f;
+    }
+    else {
+        naiveBallMessage.get()->set_stationary(false);
+    }
+
     naiveBallMessage.get()->set_velocity(velocityEst);
-    naiveBallMessage.get()->set_stationary(checkIfStationary());
     naiveBallMessage.get()->set_yintercept(yIntercept);
     naiveBallMessage.get()->set_x_vel(vel_x_buffer[currentIndex]);
     naiveBallMessage.get()->set_y_vel(vel_y_buffer[currentIndex]);
@@ -103,8 +108,9 @@ void NaiveBallModule::updateBuffers()
     position_buffer[currentIndex] = BallState(myBall.rel_x(), myBall.rel_y(), myBall.distance(), myBall.bearing());
 
     if (bufferFull) {
-        vel_x_buffer[currentIndex] = calculateVelocity(true);
-        vel_y_buffer[currentIndex] = calculateVelocity(false);
+        calculateVelocity();
+        vel_x_buffer[currentIndex] = xVelocityEst;
+        vel_y_buffer[currentIndex] = yVelocityEst;
         if (currentIndex == (NUM_FRAMES - 1)) velBufferFull = true;
     }
 
@@ -117,13 +123,14 @@ void NaiveBallModule::clearBuffers()
     velocityEst = 0.f;
     xVelocityEst = 0.f;
     yVelocityEst = 0.f;
-
+    yIntercept = 0.f;
     bufferFull = false;
     velBufferFull = false;
     frameOffCount = 0;
+    stationaryOffFrameCount = 0;
 }
 
-float NaiveBallModule::calculateVelocity(bool x)
+void NaiveBallModule::calculateVelocity()
 {
     int startIndex = currentIndex + 1;
     int endIndex = currentIndex - AVGING_FRAMES -1;
@@ -135,20 +142,14 @@ float NaiveBallModule::calculateVelocity(bool x)
     yVelocityEst = (end_avgs.rel_y - start_avgs.rel_y) / denominator * ALPHA + yVelocityEst * (1 - ALPHA);
 
     float dist = calcSumSquaresSQRT((xVelocityEst), (yVelocityEst));
-    float bearChange = end_avgs.bearing - start_avgs.bearing;
-    if (bearChange < 0.0) { direction = -1.f; }
-    else if (bearChange > 0.0) {direction = 1.f; }
-    velocityEst = (direction * dist / denominator) * ALPHA + velocityEst * (1-ALPHA);
-
-    return (x ? xVelocityEst : yVelocityEst);
+    velocityEst = (dist / denominator) * ALPHA + velocityEst * (1-ALPHA);
 }
 
 void NaiveBallModule::calcPath()
 {
-    float accx, accy;
-    // If buffer full, calculate acceleration
-    accx = vel_x_buffer[currentIndex] - vel_x_buffer[(currentIndex + 1) % NUM_FRAMES];
-    accy = vel_y_buffer[currentIndex] - vel_y_buffer[(currentIndex + 1) % NUM_FRAMES];
+    // float accx, accy;
+    // accx = vel_x_buffer[currentIndex] - vel_x_buffer[(currentIndex + 1) % NUM_FRAMES];
+    // accy = vel_y_buffer[currentIndex] - vel_y_buffer[(currentIndex + 1) % NUM_FRAMES];
 
     // accx = (accx < 0.f ? accx * -FRICTION : accx * FRICTION);
     // accy = (accy < 0.f ? accy * -FRICTION : accy * FRICTION);
@@ -175,16 +176,21 @@ void NaiveBallModule::calcPath()
         // yIntercept = -b / m;
 
         t = -position_buffer[currentIndex].rel_x / vel_x_buffer[currentIndex];
-        yIntercept = vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y;
-    } else { yIntercept = 0.0; }
+        if (yIntercept == 0.f) yIntercept = vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y;
+        else yIntercept = (vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y)*ALPHA + (1-ALPHA)*(yIntercept);
+
+    } else { yIntercept = 0.f; }
 
 }
 
 
-
+// Is in motion if checkIfStationary returns false x times in a row
 bool NaiveBallModule::checkIfStationary()
 {
-    if (fabs(xVelocityEst) < STATIONARY_THRESHOLD && fabs(yVelocityEst) < STATIONARY_THRESHOLD) { return true; }
+    if (fabs(xVelocityEst) < STATIONARY_THRESHOLD && fabs(yVelocityEst) < STATIONARY_THRESHOLD) {
+        stationaryOffFrameCount = 0;    // Reset to 0
+        return true; }
+    stationaryOffFrameCount++;
     return false;
 }
 
