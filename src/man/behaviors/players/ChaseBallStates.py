@@ -13,7 +13,7 @@ from ..util import *
 from objects import RelRobotLocation, Location, RobotLocation
 import noggin_constants as nogginConstants
 import time
-from math import fabs, degrees, cos, sin, atan2, pi, radians
+from math import fabs, degrees, cos, sin, pi, radians
 
 @superState('gameControllerResponder')
 @stay
@@ -47,7 +47,7 @@ def approachBall(player):
 
 @defaultState('prepareForKick')
 @superState('gameControllerResponder')
-# @ifSwitchLater(transitions.shouldSpinToBall, 'spinToBall')
+@ifSwitchLater(transitions.shouldSpinToBall, 'spinToBall')
 @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
 @ifSwitchNow(transitions.shouldSupport, 'positionAsSupporter')
 @ifSwitchLater(transitions.shouldFindBall, 'findBall')
@@ -78,8 +78,6 @@ def prepareForKick(player):
     elif player.finishedPlay:
         player.inKickOffPlay = False
 
-    player.motionKick = False
-    player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
     return player.goNow('followElectricField')
 
 @superState('positionAndKickBall')
@@ -90,42 +88,39 @@ def followElectricField(player):
     a repulsive force of smaller magnitude.
     """
     if player.firstFrame():
-        dest = RobotLocation(player.brain.loc.x, player.brain.loc.y, 0.)
-        player.brain.nav.goTo(dest, Navigator.GENERAL_AREA, Navigator.MEDIUM_SPEED,
-             False, False, False, False)
+        player.brain.tracker.trackBall()   
 
+    ball = player.brain.ball
+    heading = player.brain.loc.h
     # Calculate relative heading every frame
-    relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
+    relH = player.decider.normalizeAngle(player.kick.setupH - heading)
+    distToKick = ((ball.rel_x - player.kick.setupX)**2 + (ball.rel_y - player.kick.setupY)**2)**.5
 
     # Are we within the acceptable heading range?
-    # if (relH > -constants.ORBIT_GOOD_BEARING and
-    #     relH < constants.ORBIT_GOOD_BEARING):
-    #     print "STOPPED! Because relH is: ", relH
-    #     #player.stopWalking()
-    #     destinationX = player.kick.destinationX
-    #     destinationY = player.kick.destinationY
-    #     player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
-    #     player.kick.destinationX = destinationX
-    #     player.kick.destinationY = destinationY
-    #     return player.goNow('positionForKick')
+    if (fabs(relH) < constants.ORBIT_GOOD_BEARING and distToKick < 10):
+        print "STOPPED! Because relH is: ", relH
+        #player.stopWalking()
+        destinationX = player.kick.destinationX
+        destinationY = player.kick.destinationY
+        player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
+        player.kick.destinationX = destinationX
+        player.kick.destinationY = destinationY
+        return player.goNow('positionForKick')
 
-    if fabs(player.brain.loc.h) < 2:
-        ball = player.brain.ball
-
-        print player.brain.ball.distance
-
-        attractorX = ball.rel_x - constants.ATTRACTOR_BALL_DIST
-        attractorY = ball.rel_y
+    else:
+        attractorX = ball.rel_x - constants.ATTRACTOR_BALL_DIST*cos(radians(heading - player.kick.setupH))
+        attractorY = ball.rel_y - constants.ATTRACTOR_BALL_DIST*sin(-radians(heading - player.kick.setupH))
         attractorDist = (attractorX**2 + attractorY**2)**.5
         if attractorDist == 0:
             attractorDist = .00000000001
 
-        repulsorX = ball.rel_x - constants.REPULSOR_BALL_DIST
+        repulsorX = ball.rel_x - constants.REPULSOR_BALL_DIST*cos(radians(heading - player.kick.setupH))
         repulsorY = attractorY
         repulsorDist = (repulsorX**2 + repulsorY**2)**.5
         if repulsorDist == 0:
             repulsorDist = .00000000001
 
+        # super position of an attractive potential field and arepulsive one
         xComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorX/attractorDist**3 + -repulsorX/repulsorDist**3
         yComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorY/attractorDist**3 + -repulsorY/repulsorDist**3
 
@@ -135,9 +130,12 @@ def followElectricField(player):
         else:
             normalizer = Navigator.FAST_SPEED/(xComp**2 + yComp**2)**.5
 
-            hComp = 5*atan2(yComp, xComp)/pi
+            if ball.bearing_deg > constants.SHOULD_SPIN_TO_BALL_BEARING/2:
+                hComp = Navigator.QUICK_SPEED * ball.bearing_deg/fabs(ball.bearing_deg)
+            else:
+                hComp = ball.bearing
 
-            player.setWalk(normalizer*xComp, normalizer*yComp, 0)
+            player.setWalk(normalizer*xComp, normalizer*yComp, hComp)
 
     return player.stay()
 
