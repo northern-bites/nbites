@@ -172,35 +172,54 @@ int Vision_func() {
     std::cout << std::endl << "Hough lines in image coordinates:" << std::endl;
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
-        double r = line.r();
-        double t = line.t();
-        double ep0 = line.ep0();
-        double ep1 = line.ep1();
+
+        // Get image coordinates
+        double icR = line.r();
+        double icT = line.t();
+        double icEP0 = line.ep0();
+        double icEP1 = line.ep1();
+
         int houghIndex = line.index();
         int fieldIndex = line.fieldLine();
+
+        // Get field coordinates
+        double fcR = line.field().r();
+        double fcT = line.field().t();
+        double fcEP0 = line.field().ep0();
+        double fcEP1 = line.field().ep1();
         
         // Java uses big endian representation
-        endswap<double>(&r);
-        endswap<double>(&t);
-        endswap<double>(&ep0);
-        endswap<double>(&ep1);
+        endswap<double>(&icR);
+        endswap<double>(&icT);
+        endswap<double>(&icEP0);
+        endswap<double>(&icEP1);
         endswap<int>(&houghIndex);
         endswap<int>(&fieldIndex);
+        endswap<double>(&fcR);
+        endswap<double>(&fcT);
+        endswap<double>(&fcEP0);
+        endswap<double>(&fcEP1);
 
-        lineBuf.append((const char*) &r, sizeof(double));
-        lineBuf.append((const char*) &t, sizeof(double));
-        lineBuf.append((const char*) &ep0, sizeof(double));
-        lineBuf.append((const char*) &ep1, sizeof(double));
+
+        lineBuf.append((const char*) &icR, sizeof(double));
+        lineBuf.append((const char*) &icT, sizeof(double));
+        lineBuf.append((const char*) &icEP0, sizeof(double));
+        lineBuf.append((const char*) &icEP1, sizeof(double));
         lineBuf.append((const char*) &houghIndex, sizeof(int));
         lineBuf.append((const char*) &fieldIndex, sizeof(int));
+        lineBuf.append((const char*) &fcR, sizeof(double));
+        lineBuf.append((const char*) &fcT, sizeof(double));
+        lineBuf.append((const char*) &fcEP0, sizeof(double));
+        lineBuf.append((const char*) &fcEP1, sizeof(double));
 
         std::cout << line.print() << std::endl;
     }
 
     std::cout << std::endl << "Hough lines in field coordinates:" << std::endl;
-    int i = 0;
+    
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
+
         std::cout << line.field().print() << std::endl;
     }
 

@@ -31,7 +31,8 @@ public class LineView extends ViewParent implements IOFirstResponder {
 	
 	BufferedImage originalImage;
 	BufferedImage edgeImage;
-    Vector<Double> lines;
+    Vector<Double> houghCoordLines;
+    Vector<Double> fieldCoordLines;
 
 	@Override
 	public void setLog(Log newlog) {
@@ -51,20 +52,29 @@ public class LineView extends ViewParent implements IOFirstResponder {
 	public void paintComponent(Graphics g) {
 		if (edgeImage != null) {
 			g.drawImage(originalImage, 0, 0, displayw, displayh, null);
-			g.drawImage(edgeImage, 0, 480, displayw, displayh, null);
+			g.drawImage(edgeImage, 0, 485, displayw, displayh, null);
+            
+            // Field coordinate image
+            int fx0 = 645;
+            int fy0 = 0;
 
-            for (int i = 0; i < lines.size(); i += 6) {
-                double r = lines.get(i);
-                double t = lines.get(i + 1);
-                double end0 = lines.get(i + 2);
-                double end1 = lines.get(i + 3);
-                double houghIndex = lines.get(i + 4);
-                double fieldIndex = lines.get(i + 5);
+            g.setColor(new Color(90, 130, 90));
+            g.fillRect(645, 0, 640, 480);
+            g.setColor(Color.lightGray);
+            g.fillOval(645 + 320 - 30, 480 - 20, 60, 40);
+
+            for (int i = 0; i < houghCoordLines.size(); i += 6) {
+                double r = houghCoordLines.get(i);
+                double t = houghCoordLines.get(i + 1);
+                double end0 = houghCoordLines.get(i + 2);
+                double end1 = houghCoordLines.get(i + 3);
+                double houghIndex = houghCoordLines.get(i + 4);
+                double fieldIndex = houghCoordLines.get(i + 5);
 
                 if (fieldIndex == -1)
-                    g.setColor(Color.blue);
-                else
                     g.setColor(Color.red);
+                else
+                    g.setColor(Color.blue);
 
                 double x0 = 2*r * Math.cos(t) + originalImage.getWidth() / 2;
                 double y0 = -2*r * Math.sin(t) + originalImage.getHeight() / 2;
@@ -109,20 +119,24 @@ public class LineView extends ViewParent implements IOFirstResponder {
 
         // TODO refactor into hough line class
         byte[] lineBytes = out[6].bytes;
-        int numLines = lineBytes.length / (10 * 4);
+        int numLines = lineBytes.length / (18 * 4);
         Logger.logf(Logger.INFO, "%d field lines expected.", numLines);
 		try {
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(lineBytes));
 			for (int i = 0; i < numLines; ++i) {
-                lines.add(dis.readDouble()); // r
-                lines.add(dis.readDouble()); // t
-                lines.add(dis.readDouble()); // ep0
-                lines.add(dis.readDouble()); // ep1
+                lines.add(dis.readDouble()); // image coord r
+                lines.add(dis.readDouble()); // image coord t
+                lines.add(dis.readDouble()); // image coord ep0
+                lines.add(dis.readDouble()); // image coord ep1
                 lines.add((double)dis.readInt()); // hough index
                 lines.add((double)dis.readInt()); // fieldline index
+                lines.add(dis.readDouble()); // field coord r
+                lines.add(dis.readDouble()); // field coord t
+                lines.add(dis.readDouble()); // field coord ep0
+                lines.add(dis.readDouble()); // field coord ep1
             }
 		} catch (Exception e) {
-			Logger.logf(Logger.ERROR, "Conversion from bytes to hough lines in LineView failed.");
+			Logger.logf(Logger.ERROR, "Conversion from bytes to hough coord lines in LineView failed.");
 			e.printStackTrace();
 		}
 	}
