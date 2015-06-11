@@ -10,10 +10,10 @@ from ..navigator import Navigator
 from ..kickDecider import KickDecider
 from ..kickDecider import kicks
 from ..util import *
-from objects import RelRobotLocation, Location
+from objects import RelRobotLocation, Location, RobotLocation
 import noggin_constants as nogginConstants
 import time
-from math import fabs, degrees
+from math import fabs, degrees, cos, sin, atan2, pi, radians
 
 @superState('gameControllerResponder')
 @stay
@@ -47,7 +47,7 @@ def approachBall(player):
 
 @defaultState('prepareForKick')
 @superState('gameControllerResponder')
-@ifSwitchLater(transitions.shouldSpinToBall, 'spinToBall')
+# @ifSwitchLater(transitions.shouldSpinToBall, 'spinToBall')
 @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
 @ifSwitchNow(transitions.shouldSupport, 'positionAsSupporter')
 @ifSwitchLater(transitions.shouldFindBall, 'findBall')
@@ -78,7 +78,68 @@ def prepareForKick(player):
     elif player.finishedPlay:
         player.inKickOffPlay = False
 
-    return player.goNow('orbitBall')
+    player.motionKick = False
+    player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
+    return player.goNow('followElectricField')
+
+@superState('positionAndKickBall')
+def followElectricField(player):
+    """
+    This state is based on electric field potential vector paths. The ball is treated as an
+    attractive force where on the side that will be kicked. The opposite side is treated as 
+    a repulsive force of smaller magnitude.
+    """
+    if player.firstFrame():
+        dest = RobotLocation(player.brain.loc.x, player.brain.loc.y, 0.)
+        player.brain.nav.goTo(dest, Navigator.GENERAL_AREA, Navigator.MEDIUM_SPEED,
+             False, False, False, False)
+
+    # Calculate relative heading every frame
+    relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
+
+    # Are we within the acceptable heading range?
+    # if (relH > -constants.ORBIT_GOOD_BEARING and
+    #     relH < constants.ORBIT_GOOD_BEARING):
+    #     print "STOPPED! Because relH is: ", relH
+    #     #player.stopWalking()
+    #     destinationX = player.kick.destinationX
+    #     destinationY = player.kick.destinationY
+    #     player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
+    #     player.kick.destinationX = destinationX
+    #     player.kick.destinationY = destinationY
+    #     return player.goNow('positionForKick')
+
+    if fabs(player.brain.loc.h) < 2:
+        ball = player.brain.ball
+
+        print player.brain.ball.distance
+
+        attractorX = ball.rel_x - constants.ATTRACTOR_BALL_DIST
+        attractorY = ball.rel_y
+        attractorDist = (attractorX**2 + attractorY**2)**.5
+        if attractorDist == 0:
+            attractorDist = .00000000001
+
+        repulsorX = ball.rel_x - constants.REPULSOR_BALL_DIST
+        repulsorY = attractorY
+        repulsorDist = (repulsorX**2 + repulsorY**2)**.5
+        if repulsorDist == 0:
+            repulsorDist = .00000000001
+
+        xComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorX/attractorDist**3 + -repulsorX/repulsorDist**3
+        yComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorY/attractorDist**3 + -repulsorY/repulsorDist**3
+
+        if xComp == 0 and yComp == 0:
+            player.setWalk(0, 0, 0)
+
+        else:
+            normalizer = Navigator.FAST_SPEED/(xComp**2 + yComp**2)**.5
+
+            hComp = 5*atan2(yComp, xComp)/pi
+
+            player.setWalk(normalizer*xComp, normalizer*yComp, 0)
+
+    return player.stay()
 
 @superState('positionAndKickBall')
 def orbitBall(player):
