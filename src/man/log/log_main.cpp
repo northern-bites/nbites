@@ -397,6 +397,12 @@ namespace nblog {
             return;
         }
         
+        if (buffer_index >= NUM_LOG_BUFFERS || buffer_index < 0) {
+            printf("ERROR: NBlog(...) called with INVALID buffer index!  Deleting log and returning...\n");
+            delete log;
+            return;
+        }
+        
         pthread_mutex_lock(&(log_main.buffers[buffer_index].lock));
         put(log, buffer_index);
         pthread_mutex_unlock(&(log_main.buffers[buffer_index].lock));
