@@ -1,18 +1,20 @@
 #include "BallDetector.h"
 
-// #include <math.h>
-// #include <algorithm>
-// #include <time.h>
-// #include <stdio.h>
+#include <math.h>
+#include <algorithm>
 #include <iostream>
+
+const double BALL_RADIUS = 32.5;
+const double VERT_FOV_DEG = 47.64;
+const double VERT_FOV_RAD = 47.64 * M_PI / 180;
 
 namespace man {
 namespace vision {
 
-BallDetector::BallDetector(bool topCamera_):
+BallDetector::BallDetector(const FieldHomography& homography_):
     ballOn(0),
-    topCamera(topCamera_),
-    blobber()
+    blobber(),
+    homography(homography_)
 {
 
 }
@@ -21,12 +23,20 @@ BallDetector::~BallDetector() { }
 
 void BallDetector::findBall(ImageLiteU8 orange)
 {
-    std::cout << "Blobber about to run" << std::endl;
     blobber.run(orange.pixelAddr(), orange.width(), orange.height(), orange.width());
-    std::cout << "Found: " << blobber.blobs.size() << " blobs" << std::endl;
+
+    // TODO: Sort blobber list by size
 
     for (auto i=blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
-        std::cout << "Blob: " << (*i).print() << std::endl;
+        double x_rel, y_rel;
+        bool belowHoriz = homography.fieldCoords((*i).centerX(), (*i).centerY(),
+                                                 x_rel, y_rel);
+
+        // This blob is above the horizon. Can't be a ball
+        if (!belowHoriz) continue;
+
+        Ball b((*i), x_rel, y_rel, orange.height());
+        candidates.push_back(b);
     }
 }
 
@@ -239,11 +249,40 @@ void BallDetector::findBall(ImageLiteU8 orange)
 // }
 
 
-Ball::Ball(Blob& b)
-    : blob(b)
+Ball::Ball(const Blob& b, double x_, double y_, int imgHeight_) :
+    blob(b),
+    x_rel(x_),
+    y_rel(y_),
+    imgHeight(imgHeight_),
+    _confidence(-1)
 {
 
 }
+
+void Ball::compute()
+{
+    double density = blob.area() / blob.count();
+    double aspectRatio = (blob.secondPrincipalLength() /
+                          blob.firstPrincipalLength());
+
+    // Distance as estimated by homography in CM
+    double hdist = hypot(x_rel, y_rel);
+
+    double expectedDiam = pixDiameterFromDist(hdist);
+}
+
+// The expected diameter of ball in image at distance d in CM
+double Ball::pixDiameterFromDist(double d) const
+{
+    double trig = tan(VERT_FOV_RAD / 2.0);
+    return imgHeight * BALL_RADIUS / (2.0 * trig);
+}
+
+// double BallDetector::distanceFromRadius(double rad) {
+//     double trig = 1 / tan(rad * VERT_FOV_RAD / 240);
+//     return BALL_RADIUS * trig;
+// }
+
 
 }
 }

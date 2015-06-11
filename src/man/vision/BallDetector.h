@@ -1,15 +1,21 @@
 #pragma once
 
+#include <vector>
+
 #include "Images.h"
 #include "Camera.h"
 #include "FastBlob.h"
+#include "Homography.h"
+
 
 namespace man {
 namespace vision {
 
+class Ball;
+
 class BallDetector {
 public:
-    BallDetector(bool topCamera_);
+    BallDetector(const FieldHomography& homography_);
     ~BallDetector();
 
     void findBall(ImageLiteU8 orange);
@@ -17,8 +23,10 @@ public:
     int ballOn;
 
 private:
-    bool topCamera;
     Connectivity blobber;
+    const FieldHomography homography;
+
+    std::vector<Ball> candidates;
     //Ball makeBall(Blob b, bool occluded);
     //std::pair<Circle, int> fitCircle(Blob b);
     //std::vector<point> rateCircle(Circle c, std::vector<point> p, int delta);
@@ -32,11 +40,18 @@ private:
 
 class Ball {
 public:
-    Ball(Blob& b);
+    Ball(const Blob& b, double x_, double y_, int imgHeight_);
 
+    double confidence() const { return _confidence; }
 private:
-    Blob blob;
     void compute();
+
+    double pixDiameterFromDist(double d) const;
+
+    Blob blob;
+    double x_rel;
+    double y_rel;
+    int imgHeight;
 
     double _confidence;
 };

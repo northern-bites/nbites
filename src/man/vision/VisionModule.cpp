@@ -61,7 +61,7 @@ VisionModule::VisionModule()
         kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography(i == 0);
         fieldLines[i] = new FieldLineList();
-        ballDetector[i] = new BallDetector(i == 0);
+        ballDetector[i] = new BallDetector(*homography[i]);
 
         // TODO flag
         bool fast = true;
@@ -206,31 +206,35 @@ Colors* VisionModule::getColorsFromLisp(bool top) {
     nblog::SExpr* params;
 
     if (top) {
-        params = colors.get(1)->find("Top");
+        params = colors.get(1)->find("Top")->get(1);
     } else {
-        params = colors.get(1)->find("Bottom");
+        params = colors.get(1)->find("Bottom")->get(1);
     }
 
-    ret->white.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize())); 
+    nblog::SExpr* color = params->get(0)->get(1);
 
-    ret->green.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));  
- 
-   ret->orange.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));
+    ret->white.load(std::stof(params->get(0)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(1)->serialize()),
+                    std::stof(params->get(2)->get(1)->serialize()),
+                    std::stof(params->get(3)->get(1)->serialize()),
+                    std::stof(params->get(4)->get(1)->serialize()),
+                    std::stof(params->get(5)->get(1)->serialize()));
+
+    color = params->get(1)->get(1);
+    ret->green.load(std::stof(params->get(0)->get(1)->serialize()),
+                    std::stof(params->get(1)->get(1)->serialize()),
+                    std::stof(params->get(2)->get(1)->serialize()),
+                    std::stof(params->get(3)->get(1)->serialize()),
+                    std::stof(params->get(4)->get(1)->serialize()),
+                    std::stof(params->get(5)->get(1)->serialize()));
+
+    color = params->get(2)->get(1);
+    ret->orange.load(std::stof(params->get(0)->get(1)->serialize()),
+                     std::stof(params->get(1)->get(1)->serialize()),
+                     std::stof(params->get(2)->get(1)->serialize()),
+                     std::stof(params->get(3)->get(1)->serialize()),
+                     std::stof(params->get(4)->get(1)->serialize()),
+                     std::stof(params->get(5)->get(1)->serialize()));
 
     return ret;
 }
