@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BIN=$NBITES_DIR2/build/nbtool
+BIN=$NBITES_DIR/build/nbtool
 
 rm -rf $BIN
 #might need to make build dir too on some systems
