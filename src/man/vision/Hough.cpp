@@ -462,14 +462,18 @@ void FieldLineList::find(HoughLineList& houghLines)
       // Here is the dot product 
       if (hl1->field().ux() * hl2->field().ux() + hl1->field().uy() * hl2->field().uy() <= maxCosAngle)
       {
+        // We use image coordinates to check polarity. Converting to field 
+        // coordinates leads to crossed field lines if the homography is poor.
+        // Crosses field lines in world coordinates leads to polarity error.
+        bool correctPolarity = (hl1->r() + hl2->r() < 0);
         // Separation is sum of the two r values (distance of line to origin).
         // This is well defined and sensible for lines that may not be perfectly
         // parallel. For field lines the polarities are pointing towards each
         // other, which makes the sum of r's negative. A pair of nearly parallel
         // lines with the right separation but with polarities pointing away from
         // each other is not a field line. 
-        double separation = hl1->field().separation(hl2->field());
-        if (0.0 < separation && separation <= maxLineSeparation())
+        double separation = fabs(hl1->field().r() + hl2->field().r());
+        if (correctPolarity && separation <= maxLineSeparation())
         {
           int index = size();
           hl1->fieldLine(index);
