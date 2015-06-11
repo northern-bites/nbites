@@ -50,12 +50,11 @@ namespace man{
          * @brief Adds a LogModule that will log the output of
          *        the specified OutPortal.
          * @param out The OutPortal that will be providing data
-         * @param desc Fields describing the logged data.
          */
         template<class T>
-        void log(int findex, portals::OutPortal<T>* out, std::string desc)
+        void log(int findex, portals::OutPortal<T>* out, std::string lt, std::string wf)
         {
-            logs.push_back(new log::LogModule<T>(findex, out, desc));
+            logs.push_back(new log::LogModule<T>(findex, out, lt, wf));
             diagram.addModule(*logs.back());
         }
         

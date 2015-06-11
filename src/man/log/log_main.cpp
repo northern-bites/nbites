@@ -5,8 +5,10 @@
 //  Created by Philip Koch on 10/4/14.
 //
 
-#include "log_header.h"
-#include "log_sf.h"
+#include "logging.h"
+#include "../control/control.h"
+#include "nbdebug.h"
+
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -21,36 +23,25 @@
 //#include <unistd.h>
 //#include <fcntl.h>
 
-//Declared in order of size, largest to smallest.
-namespace nbsf {
-    /*
-     64 bit fields
-     */
+namespace nblog {
+    
     uint64_t fio_upstart;
-    uint64_t sio_upstart;
     
     uint64_t cio_upstart;
     uint64_t cnc_upstart;
     
     uint64_t main_upstart;
     
-    //Effectively 64 bit fields
     io_state_t fio_start[NUM_LOG_BUFFERS];
     io_state_t cio_start[NUM_LOG_BUFFERS];
     io_state_t total[NUM_LOG_BUFFERS];
     
-    /*
-     32 bit fields
-     */
+    int nlog_assoc[NUM_LOG_BUFFERS];
     
     const uint32_t NUM_CORES = (uint32_t) sysconf(_SC_NPROCESSORS_ONLN);
-    
-    volatile uint8_t flags[num_flags];
-}
 
-namespace nblog {
-    log_main_t _log_main;
-    log_main_t * log_main = &_log_main;
+    bool log_running = false;
+    log_main_t log_main;
     
     const int LOG_BUFFER_SIZES[NUM_LOG_BUFFERS] = {
         1 << 8,
@@ -65,59 +56,56 @@ namespace nblog {
     //io thread init functions defined in their own files.
     void log_serverio_init();
     void log_fileio_init();
-    void log_cnc_init();
     
     void * log_main_loop(void * context);
     
     void sanity_checks() {
-        LOGDEBUG(1, "sanity_checks()...\n");
+        NBDEBUG("sanity_checks()...\n");
         
-        NBLassert(sizeof(nbsf::io_state_t) == 40);
-        NBLassert(sizeof(nbsf::buf_state_t) == 12);
+        NBLassert(control::control_connected == 1);
+        NBLassert(control::fileio == 2);
+        NBLassert(!log_running);
         
-        NBLassert(nbsf::cnc_connected == 1);
-        NBLassert(nbsf::fileio == 2);
         //...
+        /*
+        SExpr aString("thisstring");
+        printf("%s\n", aString.serialize().c_str()); */
         
-        LOGDEBUG(1, "sane.\n");
+        NBDEBUG("sane.\n");
     }
     
     void log_main_init() {
-        LOGDEBUG(1, "log_main_init()\n");
+        NBDEBUG("log_main_init()\n\t"
+                "nbuffers=%i version=%i\n", NUM_LOG_BUFFERS, LOG_VERSION);
         
-        /*
-         stats and flags
-         */
-        bzero( (uint8_t *) nbsf::flags, nbsf::num_flags);
-        nbsf::flags[nbsf::servio] = true;
-        nbsf::flags[nbsf::STATS] = true;
+        main_upstart = time(NULL);
         
-        nbsf::main_upstart = time(NULL);
-        nbsf::sio_upstart = time(NULL);
+        bzero(fio_start, sizeof(io_state_t) * NUM_LOG_BUFFERS);
+        bzero(cio_start, sizeof(io_state_t) * NUM_LOG_BUFFERS);
+        bzero(total, sizeof(io_state_t) * NUM_LOG_BUFFERS);
         
-        bzero(nbsf::fio_start, sizeof(nbsf::io_state_t) * NUM_LOG_BUFFERS);
-        bzero(nbsf::cio_start, sizeof(nbsf::io_state_t) * NUM_LOG_BUFFERS);
-        bzero(nbsf::total, sizeof(nbsf::io_state_t) * NUM_LOG_BUFFERS);
+        bzero(nlog_assoc, sizeof(int) * NUM_LOG_BUFFERS);
         
-        bzero(log_main, sizeof(log_main_t));
+        bzero(&log_main, sizeof(log_main_t));
         
         for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
-            size_t buffer_size = sizeof(log_buffer_t) + LOG_BUFFER_SIZES[i] * sizeof(log_object_t *);
-            log_main->buffers[i] = (log_buffer_t *) malloc(buffer_size);
+            log_main.buffers[i].objects = (Log **) malloc(LOG_BUFFER_SIZES[i] * sizeof(Log *));
+            bzero(log_main.buffers[i].objects, LOG_BUFFER_SIZES[i] * sizeof(Log *));
             
-            bzero(log_main->buffers[i], buffer_size);
-            pthread_mutex_init(&(log_main->buffers[i]->lock), NULL);
+            pthread_mutex_init(&(log_main.buffers[i].lock), NULL);
         }
         
         sanity_checks();
         
-        pthread_create(&(log_main->log_main_thread), NULL, &log_main_loop, NULL);
-        pthread_detach(log_main->log_main_thread);
+        pthread_create(&(log_main.log_main_thread), NULL, &log_main_loop, NULL);
+        pthread_detach(log_main.log_main_thread);
         //server thread is live...
-        LOGDEBUG(1, "log_main thread running...\n");
+        
+        log_running = true;
+        NBDEBUG("log_main thread running...\n");
     }
     
-    
+    /*
     inline uint64_t net_time(time_t start, time_t end) {
         double dt = difftime(end, start);
         uint64_t hval = dt; // difftime has granulatiy of 1 sec, cast does not lose info
@@ -137,126 +125,150 @@ namespace nblog {
             dest[i].l_writ = htonl(cur[i].l_writ - start[i].l_writ);
             dest[i].b_writ = htonll(cur[i].b_writ - start[i].b_writ);
         }
+    } */
+    
+    SExpr makeBufManage(int bi) {
+        std::vector<SExpr> vals = {
+            SExpr("servio_nextr", (int) log_main.buffers[bi].servio_nextr),
+            SExpr("fileio_nextr", (int) log_main.buffers[bi].fileio_nextr),
+            SExpr("next_write", (int) log_main.buffers[bi].next_write),
+            
+            SExpr("nl_assoc", (int) nlog_assoc[bi])
+        };
+        return SExpr(vals);
+    }
+    
+    SExpr makeBufState(io_state_t * start, io_state_t * end) {
+        std::vector<SExpr> vals = {
+            SExpr("l_given", (long) (end->l_given - start->l_given)),
+            SExpr("b_given", (long) (end->b_given - start->b_given)),
+            
+            SExpr("l_freed", (long) (end->l_freed - start->l_freed)),
+            SExpr("l_lost", (long) (end->l_lost - start->l_lost)),
+            SExpr("b_lost", (long) (end->b_lost - start->b_lost)),
+            
+            SExpr("l_writ", (long) (end->l_writ - start->l_writ)),
+            SExpr("b_writ", (long) (end->b_writ - start->b_writ)),
+        };
+        
+        return SExpr(vals);
     }
     
     void * log_main_loop(void * context) {
         
         log_serverio_init();
         log_fileio_init();
-        log_cnc_init();
-        
-        bzero(zero_state, sizeof(nbsf::io_state_t) * NUM_LOG_BUFFERS);
-        
+
         while (1) {
             sleep(1);
             
-            if (nbsf::flags[nbsf::STATS]) {
+            //Log state.
+            std::vector<SExpr> fields;
+            fields.push_back(SExpr("type", "STATS"));
+            
+            std::vector<SExpr> fvector = {
+                SExpr("flags"),
+                SExpr("serv_connected", control::serv_connected,
+                      control::flags[control::serv_connected]),
+                SExpr("control_connected", control::control_connected,
+                      control::flags[control::control_connected]),
+                SExpr("fileio", control::fileio,
+                      control::flags[control::fileio]),
+                SExpr("SENSORS", control::SENSORS,
+                      control::flags[control::SENSORS]),
+                SExpr("GUARDIAN", control::GUARDIAN,
+                      control::flags[control::GUARDIAN]),
+                SExpr("COMM", control::COMM,
+                      control::flags[control::COMM]),
+                SExpr("LOCATION", control::LOCATION,
+                      control::flags[control::LOCATION]),
+                SExpr("ODOMETRY", control::ODOMETRY,
+                      control::flags[control::ODOMETRY]),
+                SExpr("OBSERVATIONS", control::OBSERVATIONS,
+                      control::flags[control::OBSERVATIONS]),
+                SExpr("LOCALIZATION", control::LOCALIZATION,
+                      control::flags[control::LOCALIZATION]),
+                SExpr("BALLTRACK", control::BALLTRACK,
+                      control::flags[control::BALLTRACK]),
+                SExpr("IMAGES", control::IMAGES,
+                      control::flags[control::IMAGES]),
+                SExpr("VISION", control::VISION,
+                      control::flags[control::VISION]),
                 
-                /*
-                 We're sending this over the network to a (presumably) java program.  So if the
-                 compiler puts padding in, it will screw up our parsing.  __packed__ *should* 
-                 prevent the compiler from putting padding/alignment stuff in.
-                 
-                 But a thought-out size check after is still a good idea.
-                 */
-                
-                struct __attribute__((__packed__)) {
-                    uint64_t fio_upstart;
-                    uint64_t sio_upstart;
-                    
-                    uint64_t cio_upstart;
-                    uint64_t cnc_upstart;
-                    
-                    uint64_t main_upstart;
-                    
-                    nbsf::io_state_t fio_start[NUM_LOG_BUFFERS];
-                    nbsf::io_state_t cio_start[NUM_LOG_BUFFERS];
-                    nbsf::io_state_t total[NUM_LOG_BUFFERS];
-                    
-                    nbsf::buf_state_t state[NUM_LOG_BUFFERS];
-                    
-                    uint32_t ratio[NUM_LOG_BUFFERS];
-                    uint32_t size[NUM_LOG_BUFFERS];
-                    
-                    uint32_t cores;
-                    
-                    uint8_t flags[nbsf::num_flags];
-                } contig;
-                
-                // 40 + (3 * n * 40) + (n * 12) + (2 * n * 4) + 4 + (nbsf::num_flags)
-                int packed_size = 40 + (3 * NUM_LOG_BUFFERS * 40) + (NUM_LOG_BUFFERS * 12) + (2 * NUM_LOG_BUFFERS * 4) + 4 + (nbsf::num_flags);
-                NBLassert(sizeof(contig) == packed_size);
-                LOGDEBUG(7, "stat struct size: %i\n", packed_size);
-                
-                const time_t CURRENT = time(NULL);
-                
-                //Copy volatile items as close to simultaneously as possible to minimize drift
-                contig.fio_upstart = nbsf::fio_upstart;
-                contig.sio_upstart = nbsf::sio_upstart;
-                contig.cio_upstart = nbsf::cio_upstart;
-                contig.cnc_upstart = nbsf::cnc_upstart;
-                contig.main_upstart = nbsf::main_upstart;
-                
-                memcpy(contig.fio_start, nbsf::fio_start, sizeof(nbsf::io_state_t) * NUM_LOG_BUFFERS);
-                memcpy(contig.cio_start, nbsf::cio_start, sizeof(nbsf::io_state_t) * NUM_LOG_BUFFERS);
-                memcpy(contig.total, nbsf::total, sizeof(nbsf::io_state_t) * NUM_LOG_BUFFERS);
-                
-                for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
-                    //memcpy(contig.state + i, log_main->buffers[i], sizeof(nbsf::buf_state_t));
-                    log_buffer_t * buf = log_main->buffers[i];
-                    
-                    contig.state[i].filenr = buf->fileio_nextr;
-                    contig.state[i].servnr = buf->servio_nextr;
-                    contig.state[i].nextw  = buf->next_write;
-                    
-                    contig.ratio[i] = LOG_RATIO[i];
-                    contig.size[i] = LOG_BUFFER_SIZES[i];
-                }
-                
-                memcpy( contig.flags,  (uint8_t *) nbsf::flags, nbsf::num_flags);
-                
-                //Set non-volatile items, convert everything to network order.
-                contig.cores = htonl(nbsf::NUM_CORES);
-                
-                if (contig.flags[nbsf::fileio]) {
-                    neterize(contig.fio_start, contig.fio_start, contig.total);
-                    contig.fio_upstart = net_time(contig.fio_upstart, CURRENT);
-                } else {
-                    bzero(contig.fio_start, sizeof(nbsf::io_state_t) * NUM_LOG_BUFFERS);
-                    contig.fio_upstart = 0;
-                }
-                
-                if (contig.flags[nbsf::serv_connected]) {
-                    neterize(contig.cio_start, contig.cio_start, contig.total);
-                    contig.cio_upstart = net_time(contig.cio_upstart, CURRENT);
-                } else {
-                    bzero(contig.cio_start, sizeof(nbsf::io_state_t) * NUM_LOG_BUFFERS);
-                    contig.cio_upstart = 0;
-                }
-                
-                neterize(contig.total, zero_state, contig.total);
-                
-                for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
-                    LOGDEBUG(6, "\t\tstat(%i): filenr=%i servnr=%i nextw=%i\n",
-                             i, contig.state[i].filenr, contig.state[i].servnr,
-                             contig.state[i].nextw);
-                    contig.state[i].filenr = htonl(contig.state[i].filenr);
-                    contig.state[i].servnr = htonl(contig.state[i].servnr);
-                    contig.state[i].nextw = htonl(contig.state[i].nextw);
-                    
-                    contig.size[i] = htonl(contig.size[i]);
-                    contig.ratio[i] = htonl(contig.ratio[i]);
-                }
-                
-                contig.sio_upstart = (contig.flags[nbsf::servio]) ? net_time(contig.sio_upstart, CURRENT) : 0;
-                contig.cnc_upstart = (contig.flags[nbsf::cnc_connected]) ? net_time(contig.cnc_upstart, CURRENT) : 0;
-                
-                contig.main_upstart = net_time(contig.main_upstart, CURRENT);
-                
-                char cbuf[100];
-                snprintf(cbuf, 100, "stats nbuffers=%i", NUM_LOG_BUFFERS);
-                NBlog(NBL_SMALL_BUFFER, 0, clock(), cbuf, packed_size, (uint8_t *) &contig);
+                SExpr("tripoint", control::tripoint,
+                      control::flags[control::tripoint])
+            };
+            fields.push_back(SExpr(fvector));
+            
+            
+            fields.push_back(SExpr("num_buffers", NUM_LOG_BUFFERS));
+            fields.push_back(SExpr("num_cores", (int) NUM_CORES));
+            
+            SExpr ratios;
+            ratios.append(SExpr("ratio"));
+            for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+                ratios.append(SExpr(LOG_RATIO[i]));
             }
+            fields.push_back(ratios);
+            
+            SExpr sizes;
+            sizes.append(SExpr("size"));
+            for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+                sizes.append(SExpr(LOG_BUFFER_SIZES[i]));
+            }
+            fields.push_back(sizes);
+            
+            time_t NOW = time(NULL);
+            
+            fields.push_back(SExpr("con_uptime", control::flags[control::serv_connected] ? difftime(NOW, cio_upstart) : 0));
+            fields.push_back(SExpr("cnc_uptime", control::flags[control::control_connected] ? difftime(NOW, cnc_upstart) : 0));
+            fields.push_back(SExpr("fio_uptime", control::flags[control::fileio] ? difftime(NOW, fio_upstart) : 0));
+            
+            fields.push_back(SExpr("log_uptime", difftime(NOW, main_upstart)));
+            
+            SExpr manages;
+            manages.append(SExpr("bufmanage"));
+            for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+                manages.append(makeBufManage(i));
+            }
+            fields.push_back(manages);
+            
+            /*
+             This system of grabbing io state is subject to multi-threading accuracy drift.
+             It is therefore only for estimates.
+             */
+            io_state_t zerostate;
+            bzero(&zerostate, sizeof(io_state_t));
+            
+            SExpr state_total;
+            state_total.append(SExpr("total-state"));
+            for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+                state_total.append(makeBufState(&zerostate, total + i));
+            }
+            fields.push_back(state_total);
+            
+            if (control::flags[control::fileio]) {
+                SExpr state_file;
+                state_file.append(SExpr("file-state"));
+                for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+                    state_file.append(makeBufState(fio_start + i, total + i));
+                }
+                fields.push_back(state_file);
+            }
+            
+            if (control::flags[control::serv_connected]) {
+                SExpr state_serv;
+                state_serv.append(SExpr("serv-state"));
+                for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+                    state_serv.append(makeBufState(cio_start + i, total + i));
+                }
+                fields.push_back(state_serv);
+            }
+            
+            std::vector<SExpr> contents = {SExpr(fields)};
+            
+            //NBDEBUG("logged state...");
+            NBLog(NBL_SMALL_BUFFER, "main_loop", contents, "");
         }
         
         return NULL;
@@ -266,77 +278,45 @@ namespace nblog {
      Definitions for log lib functions.
      */
     
-    int description(char * buf, size_t size,
-                    size_t dl,
-                    uint8_t * data,
-                    
-                    const char * type,
-                    size_t image_index,
-                    clock_t creation_time
-                    )
-    {
-        int32_t checksum = 0;
-        if (data ) {
-            for (int i = 0; i < dl; ++i)
-                checksum += data[i];
-        }
+    void releaseWrapper(int bi, Log * lg, bool lock) {
+        NBLassert(bi >= 0 && bi < NUM_LOG_BUFFERS);
+        NBLassert(lg);
         
-        int n_written = snprintf(buf, size, "type=%s checksum=%i index=%li time=%lu version=%i", type, checksum, image_index, creation_time, LOG_VERSION);
-        NBLassert(n_written < size);
+        if (lock) pthread_mutex_lock(&(log_main.buffers[bi].lock));
         
-        return n_written;
-    }
-    
-    
-    
-    //Not thread safe.
-    void log_object_free(log_object_t * obj) {
-        NBLassert(obj);
-        NBLassert(obj->references == 0);
-        
-        free((char *) obj->log.desc);
-        
-        if (obj->log.data)
-            free(obj->log.data);
-        
-        free(obj);
-    }
-    
-    void release(log_object_t * obj, bool lock) {
-        int bi = obj->buffer;
-        if (lock) pthread_mutex_lock(&(log_main->buffers[bi]->lock));
-        
-        NBLassert(obj->references > 0);
-        --obj->references;
-        if (obj->references == 0) {
+        if (lg->release()) {
             
-            nbsf::total[bi].l_freed += 1;
-            if (!obj->was_written) {
-                nbsf::total[bi].l_lost += 1;
-                nbsf::total[bi].b_lost += obj->log.dlen;
+            total[bi].l_freed += 1;
+            if (!lg->written()) {
+                total[bi].l_lost += 1;
+                total[bi].b_lost += lg->fullSize();
             }
             
-            log_object_free(obj);
+            --nlog_assoc[bi];
+            NBLassert(nlog_assoc[bi] >= 0);
+            
+            delete lg;
         }
         
-        if (lock) pthread_mutex_unlock(&(log_main->buffers[bi]->lock));
+        if (lock) pthread_mutex_unlock(&(log_main.buffers[bi].lock));
     }
     
-    log_object_t * acquire(int buffer_index, uint32_t * relevant_nextr)
+    Log * acquire(int buffer_index, uint32_t * relevant_nextr)
     {
         
-        log_buffer_t * buf = log_main->buffers[buffer_index];
-        LOGDEBUG(6, "acq(%i):\t%i [filenr=%i servnr=%i nextw=%i]\n", buffer_index, *relevant_nextr,
-                 buf->fileio_nextr, buf->servio_nextr, buf->next_write);
+        log_buffer_t& buf = log_main.buffers[buffer_index];
         
-        pthread_mutex_lock(&(buf->lock));
-        assert(*relevant_nextr <= buf->next_write);
-        log_object_t * ret;
+        NBDEBUGs(SECTION_LOGM, "acq(%i):\t%i [filenr=%i servnr=%i nextw=%i]\n", buffer_index, *relevant_nextr,
+                 buf.fileio_nextr, buf.servio_nextr, buf.next_write);
         
-        if (*relevant_nextr != buf->next_write) {
+        pthread_mutex_lock(&(buf.lock));
+        assert(*relevant_nextr <= buf.next_write);
+        Log * ret;
+        
+        if (*relevant_nextr != buf.next_write) {
             uint32_t rindex = (*relevant_nextr) % LOG_BUFFER_SIZES[buffer_index];
             
-            ret = buf->objects[rindex];
+            ret = buf.objects[rindex];
             assert(ret);
             
             ++(*relevant_nextr);
@@ -345,16 +325,15 @@ namespace nblog {
         }
         
         if (ret) {
-            ret->was_written = 1;
-            ++(ret->references);
-            nbsf::total[buffer_index].l_writ += 1;
-            nbsf::total[buffer_index].b_writ += ret->log.dlen;
+            ret->acquire();
+            total[buffer_index].l_writ += 1;
+            total[buffer_index].b_writ += ret->fullSize();
         }
         
-        LOGDEBUG(6, "\t\t%i [filenr=%i servnr=%i nextw=%i]\n", *relevant_nextr,
-                 buf->fileio_nextr, buf->servio_nextr, buf->next_write);
+        NBDEBUGs(SECTION_LOGM, "\t\t%i [filenr=%i servnr=%i nextw=%i]\n", *relevant_nextr,
+                 buf.fileio_nextr, buf.servio_nextr, buf.next_write);
         
-        pthread_mutex_unlock(&(buf->lock));
+        pthread_mutex_unlock(&(buf.lock));
         return ret;
     }
     
@@ -362,87 +341,73 @@ namespace nblog {
      NBlog and helper functions.
      */
     
-    log_object_t * put(log_object_t * newp, log_buffer_t * buf, int bi) {
+    void put(Log * nstored, int bi) {
+                
+        NBLassert(nstored);
+        log_buffer_t& buf = log_main.buffers[bi];
         
-        NBLassert(newp);
-        LOGDEBUG(6, "put(%i):\tfilenr=%i servnr=%i nextw=%i\n", bi, buf->fileio_nextr, buf->servio_nextr, buf->next_write);
+        NBDEBUGs(SECTION_LOGM, "put(%i):\tfilenr=%i servnr=%i nextw=%i\n", bi, buf.fileio_nextr, buf.servio_nextr, buf.next_write);
         
-        nbsf::total[bi].l_given += 1;
-        nbsf::total[bi].b_given += newp->log.dlen;
+        total[bi].l_given += 1;
+        total[bi].b_given += nstored->fullSize();
+        nstored->acquire(); //One reference for the buffer.
         
-        uint32_t old_i = buf->next_write;
-        log_object_t * old = buf->objects[(old_i % LOG_BUFFER_SIZES[bi])];
+        uint32_t old_i = buf.next_write;
+        Log * old = buf.objects[old_i % LOG_BUFFER_SIZES[bi]];
         
-        buf->objects[(old_i % LOG_BUFFER_SIZES[bi])] = newp;
+        if (old) {
+            releaseWrapper(bi, old, false);
+        }
         
-        NBLassert(buf->fileio_nextr <= buf->next_write);
-        uint32_t dif = buf->next_write - buf->fileio_nextr;
+        buf.objects[(old_i % LOG_BUFFER_SIZES[bi])] = nstored;
+        
+        /*If IO is very slow, we need to update IO 'next_*' */
+        
+        //fileio
+        NBLassert(buf.fileio_nextr <= buf.next_write);
+        uint32_t dif = buf.next_write - buf.fileio_nextr;
         NBLassert(dif <= LOG_BUFFER_SIZES[bi]);
         if (dif == LOG_BUFFER_SIZES[bi]) {
-            ++(buf->fileio_nextr);
+            ++(buf.fileio_nextr);
         }
-        
-        NBLassert(buf->servio_nextr <= buf->next_write);
-        dif = buf->next_write - buf->servio_nextr;
+        //servio
+        NBLassert(buf.servio_nextr <= buf.next_write);
+        dif = buf.next_write - buf.servio_nextr;
         NBLassert(dif <= LOG_BUFFER_SIZES[bi]);
         if (dif == LOG_BUFFER_SIZES[bi]) {
-            ++(buf->servio_nextr);
+            ++(buf.servio_nextr);
         }
         
-        ++(buf->next_write);
+        ++(buf.next_write);
         
-        LOGDEBUG(6, "\t\tfilenr=%i servnr=%i nextw=%i\n", buf->fileio_nextr, buf->servio_nextr, buf->next_write);
-        return old;
+        ++nlog_assoc[bi];
+        //1 log could possibly be in the hands of each io.
+        NBLassert(nlog_assoc[bi] <= LOG_BUFFER_SIZES[bi] + 2);
+        
+        NBDEBUGs(SECTION_LOGM, "\t\tfilenr=%i servnr=%i nextw=%i\n", buf.fileio_nextr, buf.servio_nextr, buf.next_write);
     }
     
-    //Does not set buffer index.
-    log_object_t * log_object_create(size_t index, clock_t creation_time, const char * type, size_t bytes, uint8_t * data)
-    {
-        NBLassert(type);
-        log_object_t * newp = (log_object_t *) malloc(sizeof(log_object_t));
-        memset(newp, 0, sizeof(log_object_t));
-        
-        newp->log.desc = (char *) malloc(MAX_LOG_DESC_SIZE);
-        description(newp->log.desc, MAX_LOG_DESC_SIZE, bytes, data, type, index, creation_time);
-        
-        if (data) {
-            newp->log.dlen = bytes;
-            newp->log.data = (uint8_t *) malloc(bytes);
-            memcpy(newp->log.data, data, bytes);
-        } else {
-            newp->log.data = NULL;
-            newp->log.dlen = 0;
-        }
-        
-        newp->references = 1;
-        //newp->was_written is 0 as part of memset
-        
-        return newp;
-    }
-    
-    
-    void NBlog(int buffer_index, size_t image_index, clock_t creation_time, const char * type, size_t n_bytes, uint8_t * data)
-    {
-        LOGDEBUG(8, "NBlog(buffer_index=%i, image_index=%li, type=%s, bytes=%li)\n", buffer_index, image_index, type, n_bytes);
-        
+    void NBLog(int buffer_index, Log * log) {
+        NBDEBUGs(SECTION_LOGM, "NBlog(buffer_index=%i)\n", buffer_index);
         NBLassert(buffer_index < NUM_LOG_BUFFERS);
         //Can't log if the server's not running...
-        if (!log_main || !(log_main->log_main_thread)) {
-            LOGDEBUG(1, "NBlog returning because !log_main || !log_main->log_main_thread\n");
+        if (!log_running) {
+            NBDEBUG("NBlog returning because !log_running\n");
+            delete log;
             return;
         }
-        log_object_t * newp = log_object_create( image_index,  creation_time, type, n_bytes,  data);
-        newp->buffer = buffer_index;
         
-        log_buffer_t * buf = log_main->buffers[buffer_index];
+        pthread_mutex_lock(&(log_main.buffers[buffer_index].lock));
+        put(log, buffer_index);
+        pthread_mutex_unlock(&(log_main.buffers[buffer_index].lock));
+    }
+    
+    void NBLog(int buffer_index, const std::string& where_called,
+               const std::vector<SExpr>& items, const std::string& data ) {
+        Log * newl = new Log("nblog", where_called, time(NULL), LOG_VERSION,
+                             items, data);
         
-        pthread_mutex_lock(&(buf->lock));
         
-        log_object_t * old = put(newp, buf, buffer_index);
-        if (old) {
-            release(old, false);
-        }
-        
-        pthread_mutex_unlock(&(buf->lock));
+        NBLog(buffer_index, newl);
     }
 }

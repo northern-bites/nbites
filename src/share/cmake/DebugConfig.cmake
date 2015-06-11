@@ -17,8 +17,14 @@ option(
 
 option(
   USE_SPL_COMM
-  "Use the SPL's Standard Message rather than protobufs for comm"
+  "Use the SPL Standard Message rather than protobufs for comm"
   OFF
+)
+
+option(
+  USE_NAOQI_2
+  "Installing using the Naoqi 2.1 cross compiler"
+  ON
 )
 
 if( NOT OFFLINE )

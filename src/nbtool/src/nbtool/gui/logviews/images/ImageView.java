@@ -12,7 +12,7 @@ import nbtool.images.ImageParent;
 import nbtool.images.UV88image;
 import nbtool.images.Y16image;
 import nbtool.images.YUYV8888image;
-import nbtool.util.U;
+import nbtool.util.Utility;
 
 public class ImageView extends ViewParent{
 	BufferedImage img;
@@ -25,7 +25,7 @@ public class ImageView extends ViewParent{
 	public void setLog(Log newlog) {
 		log = newlog;
 		
-		this.img = U.biFromLog(newlog);
+		this.img = Utility.biFromLog(newlog);
 		
 		repaint();
 	}

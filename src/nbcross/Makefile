@@ -17,6 +17,9 @@ EXECUTABLE = nbcross_tool
 #SIM_EXECUTABLE = sim_tool
 #INSTALLER_EXECUTABLE = installer_tool
 
+NBCROSS_NAME:=
+
+
 .PHONY: build_nbcross
 build_nbcross:
 	mkdir -p $(BUILD_DIR)
@@ -29,6 +32,12 @@ nbcross: build_nbcross
 	@echo "nbcross in da house!!"
 	@cd $(BUILD_DIR); \
 	./$(EXECUTABLE)
+
+.PHONY: nbcross_sim
+nbcross_sim: build_nbcross
+	@echo "nbcross in da house!!"
+	@cd $(BUILD_DIR); \
+	./$(EXECUTABLE) $(NBCROSS_NAME) silent
 
 .PHONY: config
 config:

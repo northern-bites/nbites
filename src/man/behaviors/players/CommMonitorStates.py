@@ -20,7 +20,12 @@ def commMonitor(player):
         RoleConstants.roleConfiguration = RoleConstants.cautious
         RoleConstants.oddDefenderBox = RoleConstants.oddDefenderBoxCautious
         RoleConstants.evenDefenderBox = RoleConstants.evenDefenderBoxCautious
-        RoleConstants.setRoleConstants(player, player.role)
+        # US Open Hack
+        if player.brain.game:
+            oppTeam = player.brain.game.team(1).team_number
+        else:
+            oppTeam = -1
+        RoleConstants.setRoleConstants(player, player.role, oppTeam)
         player.roleSwitching = False
         player.commMode = 2
     elif player.commMode != 1 and transitions.mediocreComm(player):
@@ -30,7 +35,12 @@ def commMonitor(player):
             RoleConstants.roleConfiguration = player.prevRoleConfig
         RoleConstants.oddDefenderBox = RoleConstants.defenderBox
         RoleConstants.evenDefenderBox = RoleConstants.defenderBox
-        RoleConstants.setRoleConstants(player, player.role)
+        # US Open Hack
+        if player.brain.game:
+            oppTeam = player.brain.game.team(1).team_number
+        else:
+            oppTeam = -1
+        RoleConstants.setRoleConstants(player, player.role, oppTeam)
         player.roleSwitching = False
         player.commMode = 1
     elif player.commMode != 0 and transitions.goodComm(player):
@@ -40,6 +50,11 @@ def commMonitor(player):
             RoleConstants.roleConfiguration = player.prevRoleConfig
         RoleConstants.oddDefenderBox = RoleConstants.defenderBox
         RoleConstants.evenDefenderBox = RoleConstants.defenderBox
-        RoleConstants.setRoleConstants(player, player.role)
+        # US Open Hack
+        if player.brain.game:
+            oppTeam = player.brain.game.team(1).team_number
+        else:
+            oppTeam = -1
+        RoleConstants.setRoleConstants(player, player.role, oppTeam)
         player.roleSwitching = True
         player.commMode = 0

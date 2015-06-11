@@ -252,7 +252,7 @@ protected:
         }
 
         // If we have actually read some bytes, treat them like a message
-        Header header;
+        messages::Header header;
 
         if (bytes) {
             // Parse into the message
