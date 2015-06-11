@@ -10,6 +10,7 @@
 #include "Stdafx.h"
 #include <stdlib.h>
 #include "Vision.h"
+#include "Homography.h"
 
 using namespace std;
 using namespace man::vision;
@@ -74,6 +75,8 @@ class TestImage
 {
   void* allocBlock;
 
+  bool random;
+
 public:
   enum
   {
@@ -89,7 +92,9 @@ public:
 
   string read(const string& path);
 
-  void setRandom() { path = string();}
+  void synthetic(const FieldHomography& fh);
+
+  void setRandom() { random = true;}
 
   void next();
 };
