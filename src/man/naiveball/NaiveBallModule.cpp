@@ -85,7 +85,7 @@ void NaiveBallModule::run_()
         }
     }
 
-    if (checkIfStationary() == true || stationaryOffFrameCount < STATIONARY_CHECK) {
+    if (checkIfStationary() == true) {
         naiveBallMessage.get()->set_stationary(true);
         yIntercept = 0.f;
     }
