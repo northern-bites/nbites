@@ -257,13 +257,13 @@ bool GoalboxDetector::validBox(const HoughLine& line1, const HoughLine& line2) c
   const GeoLine& field1 = line1.field();
   const GeoLine& field2 = line2.field();
 
-  // Goalbox = two field lines that are (1) parallel and (2) seperated by 60 cm
-  // Parallel
+  // Goalbox = two field lines that are parallel and seperated by 60 cm
+  // (1) Parallel
   double normalizedT1 = (field1.r() > 0 ? field1.t() : field1.t() - M_PI);
   double normalizedT2 = (field2.r() > 0 ? field2.t() : field2.t() - M_PI);
   bool parallel = diffRadians(normalizedT1, normalizedT2) < parallelThreshold()*TO_RAD;
 
-  // Seperated by 60 cm
+  // (2) Seperated by 60 cm
   double distBetween = fabs(field1.pDist(field2.r()*cos(field2.t()), field2.r()*sin(field2.t())));
   bool seperation = fabs(distBetween - GOALBOX_DEPTH) < seperationThreshold();
 
@@ -279,6 +279,7 @@ CornerDetector::CornerDetector(int width_, int height_)
   : width(width_), 
     height(height_), 
     orthogonalThreshold_(40), 
+    intersectThreshold_(5), 
     closeThreshold_(30), 
     farThreshold_(50), 
     edgeImageThreshold_(0.05)
@@ -301,15 +302,18 @@ void CornerDetector::findCorners(FieldLineList& list)
 
       // Find corners
       // NOTE since there are two hough lines in each field line, we require
-      //      finding the same corner in all pairings of hough lines
+      //      finding (1) at least one intersecting set of hough lines and 
+      //      (2) the same corner ID in all pairings of hough lines
+      bool foundCorner = isCorner(line1[0], line2[0]);
       CornerID firstId = classify(line1[0], line2[0]);
-      bool foundCorner = !(firstId == CornerID::None);
+      bool sameId = true;
       for (int k = 0; k < 2; k++) {
         for (int l = 0; l < 2; l++) {
           if (k == 0 && l == 0) continue;
+          foundCorner = foundCorner || isCorner(line1[k], line2[l]);
           CornerID newId = classify(line1[k], line2[l]);
           if (firstId != newId)
-            foundCorner = false;
+            sameId = false;
         }
       }
 
@@ -322,7 +326,7 @@ void CornerDetector::findCorners(FieldLineList& list)
       //      below. Thus the client is not aware of TFirst and TSecond.
 
       // Create corner object and add to field lines
-      if (foundCorner) {
+      if (sameId && foundCorner && firstId != CornerID::None) {
         Corner newCorner;
         if (firstId == CornerID::TSecond)
           newCorner = Corner(&line2, &line1, CornerID::T);
@@ -338,40 +342,55 @@ void CornerDetector::findCorners(FieldLineList& list)
   }
 }
 
-CornerID CornerDetector::classify(const HoughLine& line1, const HoughLine& line2) const
+bool CornerDetector::isCorner(const HoughLine& line1, const HoughLine& line2) const
 {
-  // If intersection is in edge of image, don't classify corner
+  // (1) Check that lines intersect
+  // NOTE done in image coords
   double imageIntersectX;
   double imageIntersectY;
 
   bool intersects = line1.intersect(line2, imageIntersectX, imageIntersectY);
-  if (!intersects) return CornerID::None;
+  if (intersects) {
+    double qIntersect1 = line1.qDist(imageIntersectX, imageIntersectY);
+    double qIntersect2 = line2.qDist(imageIntersectX, imageIntersectY);
+    intersects = (qIntersect1 >= line1.ep0() - intersectThreshold() && 
+                  qIntersect1 <= line1.ep1() + intersectThreshold() && 
+                  qIntersect2 >= line2.ep0() - intersectThreshold() && 
+                  qIntersect2 <= line2.ep1() + intersectThreshold());
+  }
 
+  // (2) If intersection is in edge of image, don't classify corner
   double xThreshold = (width / 2) - (width * edgeImageThreshold());
   double yThreshold = (height / 2) - (height * edgeImageThreshold());
 
-  // TODO treat positive yThreshold differently because in image coordinates?
   bool farEnoughFromImageEdge = (imageIntersectX >= -xThreshold &&
                                  imageIntersectX <=  xThreshold &&
                                  imageIntersectY >= -yThreshold &&
                                  imageIntersectY <=  yThreshold);
-  if (!farEnoughFromImageEdge) return CornerID::None;
 
-  // Use world coordinates
+  // (3) Check that lines are close to orthogonal
+  // NOTE done in world coords
   const GeoLine& field1 = line1.field();
   const GeoLine& field2 = line2.field();
 
-  // Check that lines are close to orthogonal
   double normalizedT1 = (field1.r() > 0 ? field1.t() : field1.t() - M_PI);
   double normalizedT2 = (field2.r() > 0 ? field2.t() : field2.t() - M_PI);
   bool orthogonal = diffRadians(diffRadians(normalizedT1, normalizedT2), (M_PI / 2)) < orthogonalThreshold()*TO_RAD;
-  if (!orthogonal) return CornerID::None;
+
+  return intersects && farEnoughFromImageEdge && orthogonal;
+}
+
+CornerID CornerDetector::classify(const HoughLine& line1, const HoughLine& line2) const
+{
+  // Use world coordinates
+  const GeoLine& field1 = line1.field();
+  const GeoLine& field2 = line2.field();
 
   // Find intersection point
   double worldIntersectX;
   double worldIntersectY;
 
-  intersects = field1.intersect(field2, worldIntersectX, worldIntersectY);
+  bool intersects = field1.intersect(field2, worldIntersectX, worldIntersectY);
   if (!intersects) return CornerID::None; 
   // NOTE should never happen since checked above in image coords
 
@@ -418,6 +437,9 @@ CornerID CornerDetector::classify(const HoughLine& line1, const HoughLine& line2
         return CornerID::TFirst;
     }
   }
+
+  // Return none if no classification found
+  return CornerID::None; 
 }
 
 bool CornerDetector::isConcave(double end1X, double end1Y, 
