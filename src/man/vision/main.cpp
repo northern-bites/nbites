@@ -73,6 +73,7 @@ TestImage::TestImage()
   uint8_t* src = (uint8_t*)
     alignedAlloc(TestImage::width * TestImage::height * 8, 4, allocBlock);
   source = YuvLite(TestImage::width, TestImage::height, TestImage::width * 4, src);
+  setRandom();
 }
 
 TestImage::~TestImage()
@@ -117,12 +118,19 @@ string TestImage::read(const string& path)
   }
 
   image.close();
+  random = false;
   return s;
+}
+
+void TestImage::synthetic(const FieldHomography& fh)
+{
+  syntheticField(source, fh);
+  random = false;
 }
 
 void TestImage::next()
 {
-  if (path.length() == 0)
+  if (random)
     for (int i = 0; i < width * height * 8; ++i)
       source.pixelAddr()[i] = (uint8_t)(rand() >> 7);
 }
@@ -150,6 +158,31 @@ void writeImage(const ImageLite<T>& image, const string& path)
   file.open(path, ios_base::binary);
   writeImage(image, file);
   file.close();
+}
+
+void writeNum(ofstream& f, uint32_t n)
+{
+  for (int i = 3; i >= 0; --i)
+    f.put((char)((n >> (8 * i)) & 0xFF));
+}
+
+void writeYuv(const YuvLite& image, const string& path)
+{
+  ofstream f;
+  f.open(path, ios_base::binary);
+
+  int32_t size = 8 * image.width() * image.height();
+  int sum = 0;
+  for (int i = 0; i < size; ++i)
+    sum += image.pixelAddr()[i];
+  string s = strPrintf("(nblog (version 6) (checksum %d) (contents ((type YUVImage) (from camera_TOP) (nbytes %d) (width %d) (height %d) (encoding \"[Y8(U8/V8)]\"))))",
+                       sum, size, 2 * image.width(), 2 * image.height());
+  writeNum(f, s.length());
+  f.write(s.c_str(), s.length());
+  writeNum(f, size);
+  f.write((const char*)image.pixelAddr(), size);
+
+  f.close();
 }
 
 // *********************************************
@@ -448,17 +481,8 @@ void houghTest()
 
   printf("\n%d fast lines:\n", fastList.size());
   fastList.mapToField(fh);
-  int i = 0;
-  double a;
   for (list<HoughLine>::iterator hl = fastList.begin(); hl != fastList.end(); ++hl)
-  {
     printf("  %s | %s\n", hl->print().c_str(), hl->field().print().c_str());
-    if (i == 2)
-      a = hl->field().t();
-    if (i == 4)
-      printf("%8.2f\n", (hl->field().t() - a) * (180 / M_PI) - 180);
-    ++i;
-  }
 
   printf("\n%d slow lines:\n", slowList.size());
   for (list<HoughLine>::iterator hl = slowList.begin(); hl != slowList.end(); ++hl)
@@ -644,6 +668,11 @@ int main(int argc, char* argv[])
         image.setRandom();
         break;
 
+      case 'syn':
+        image.synthetic(fh);
+        writeYuv(image.source, "syn.nblog");
+        break;
+
       case 'ic':
         iterationCount = intArg(argIndex, argc, argv);
         break;
@@ -736,8 +765,21 @@ int main(int argc, char* argv[])
         fh.azimuth(floatArg(argIndex, argc, argv) * (M_PI / 180));
         break;
 
+      case 'x0':
+        fh.wx0(floatArg(argIndex, argc, argv));
+        break;
+
+      case 'y0':
+        fh.wy0(floatArg(argIndex, argc, argv));
+        break;
+
+      case 'z0':
       case 'hght':
         fh.wz0(floatArg(argIndex, argc, argv));
+        break;
+
+      case 'flen':
+        fh.flen(floatArg(argIndex, argc, argv));
         break;
 
         // Window
