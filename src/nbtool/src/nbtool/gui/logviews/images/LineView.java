@@ -31,8 +31,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
 	
 	BufferedImage originalImage;
 	BufferedImage edgeImage;
-    Vector<Double> houghCoordLines;
-    Vector<Double> fieldCoordLines;
+    Vector<Double> lines;
 
 	@Override
 	public void setLog(Log newlog) {
@@ -59,45 +58,61 @@ public class LineView extends ViewParent implements IOFirstResponder {
             int fy0 = 0;
 
             g.setColor(new Color(90, 130, 90));
-            g.fillRect(645, 0, 640, 480);
+            g.fillRect(645, 0, displayw, displayh);
             g.setColor(Color.lightGray);
             g.fillOval(645 + 320 - 30, 480 - 20, 60, 40);
 
-            for (int i = 0; i < houghCoordLines.size(); i += 6) {
-                double r = houghCoordLines.get(i);
-                double t = houghCoordLines.get(i + 1);
-                double end0 = houghCoordLines.get(i + 2);
-                double end1 = houghCoordLines.get(i + 3);
-                double houghIndex = houghCoordLines.get(i + 4);
-                double fieldIndex = houghCoordLines.get(i + 5);
+            for (int i = 0; i < lines.size(); i += 10) {
+                double icR = lines.get(i);
+                double icT = lines.get(i + 1);
+                double icEP0 = lines.get(i + 2);
+                double icEP1 = lines.get(i + 3);
+                double houghIndex = lines.get(i + 4);
+                double fieldIndex = lines.get(i + 5);
+                double fcR = lines.get(i + 6);
+                double fcT = lines.get(i + 7);
+                double fcEP0 = lines.get(i + 8);
+                double fcEP1 = lines.get(i + 9);
 
                 if (fieldIndex == -1)
                     g.setColor(Color.red);
                 else
                     g.setColor(Color.blue);
 
-                double x0 = 2*r * Math.cos(t) + originalImage.getWidth() / 2;
-                double y0 = -2*r * Math.sin(t) + originalImage.getHeight() / 2;
-                int x1 = (int) Math.round(x0 + 2*end0 * Math.sin(t));
-                int y1 = (int) Math.round(y0 + 2*end0 * Math.cos(t));
-                int x2 = (int) Math.round(x0 + 2*end1 * Math.sin(t));
-                int y2 = (int) Math.round(y0 + 2*end1 * Math.cos(t));
+                // Draw it in image coordinates
+                double x0 = 2*icR * Math.cos(icT) + originalImage.getWidth() / 2;
+                double y0 = -2*icR * Math.sin(icT) + originalImage.getHeight() / 2;
+                int x1 = (int) Math.round(x0 + 2*icEP0 * Math.sin(icT));
+                int y1 = (int) Math.round(y0 + 2*icEP0 * Math.cos(icT));
+                int x2 = (int) Math.round(x0 + 2*icEP1 * Math.sin(icT));
+                int y2 = (int) Math.round(y0 + 2*icEP1 * Math.cos(icT));
 
                 double xstring = (x1 + x2) / 2;
                 double ystring = (y1 + y2) / 2;
 
                 double scale = 0;
-                if (r > 0)
+                if (icR > 0)
                     scale = 10;
                 else
                     scale = 3;
-                xstring += scale*Math.cos(t);
-                ystring += scale*Math.sin(t);
+                xstring += scale*Math.cos(icT);
+                ystring += scale*Math.sin(icT);
 
                 g.drawLine(x1, y1, x2, y2);
                 g.drawString(Integer.toString((int) houghIndex) + "/" + Integer.toString((int) fieldIndex), 
                              (int) xstring, 
                              (int) ystring);
+
+                // Draw it in field coordinates
+                x0 =  2*fcR * Math.cos(fcT) + displayw/2;
+                y0 = -2*fcR * Math.cos(fcT) + displayh/2;
+                x1 = (int) Math.round(x0 + 2*fcEP0 * Math.sin(fcT)) + displayw + 5;
+                y1 = (int) Math.round(y0 + 2*fcEP0 * Math.cos(fcT));
+                x2 = (int) Math.round(x0 + 2*fcEP1 * Math.sin(fcT)) + displayw + 5;
+                y2 = (int) Math.round(y0 + 2*fcEP1 * Math.cos(fcT));
+
+                g.drawLine(x1, y1, x2, y2);
+
             }
         }
     }
