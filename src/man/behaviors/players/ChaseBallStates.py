@@ -78,10 +78,10 @@ def prepareForKick(player):
     elif player.finishedPlay:
         player.inKickOffPlay = False
 
-    return player.goNow('followElectricField')
+    return player.goNow('followPotentialField')
 
 @superState('positionAndKickBall')
-def followElectricField(player):
+def followPotentialField(player):
     """
     This state is based on electric field potential vector paths. The ball is treated as an
     attractive force where on the side that will be kicked. The opposite side is treated as 
@@ -97,7 +97,7 @@ def followElectricField(player):
     distToKick = ((ball.rel_x - player.kick.setupX)**2 + (ball.rel_y - player.kick.setupY)**2)**.5
 
     # Are we within the acceptable heading range?
-    if (fabs(relH) < constants.ORBIT_GOOD_BEARING and distToKick < 10):
+    if (fabs(relH) < constants.ORBIT_GOOD_BEARING and distToKick < 20):
         print "STOPPED! Because relH is: ", relH
         #player.stopWalking()
         destinationX = player.kick.destinationX
