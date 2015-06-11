@@ -125,7 +125,7 @@ public class LogDisplayPanel extends JPanel implements Events.LogSelected, Event
 				ViewParent view = null;
 				try {
 					view = ttype.getDeclaredConstructor().newInstance();
-					view.setLog(l);
+					view._setLog(l);
 					
 					if (also != null)
 						view.alsoSelected(also);
@@ -184,7 +184,7 @@ public class LogDisplayPanel extends JPanel implements Events.LogSelected, Event
 			} else {
 				try {
 					view = nlClass.getDeclaredConstructor().newInstance();
-					view.setLog(log);
+					view._setLog(log);
 					
 					if (also != null)
 						view.alsoSelected(also);
