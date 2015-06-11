@@ -28,16 +28,16 @@ whiteDark0:     .skip 16
 whiteYCoeff:    .skip 16
 whiteFuzzy:     .skip 16
 whiteInvFuz:    .skip 16
-# Orange parameters
-orangeDark0:    .skip 16
-orangeYCoeff:   .skip 16
-orangeFuzzy:    .skip 16
-orangeInvFuz:   .skip 16
 # Green parameters struct
 greenDark0:     .skip 16
 greenYCoeff:    .skip 16
 greenFuzzy:     .skip 16
 greenInvFuz:    .skip 16
+# Orange parameters
+orangeDark0:    .skip 16
+orangeYCoeff:   .skip 16
+orangeFuzzy:    .skip 16
+orangeInvFuz:   .skip 16
 
 endOfColors:
 

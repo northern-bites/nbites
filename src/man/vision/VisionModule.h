@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RoboGrams.h"
+#include "SExpr.h"
 #include "Camera.h"
 #include "Images.h"
 #include "PMotion.pb.h"
@@ -9,6 +10,8 @@
 #include "Hough.h"
 #include "Kinematics.h"
 #include "Homography.h"
+#include "ParamReader.h"
+
 
 namespace man {
 namespace vision {
@@ -29,6 +32,10 @@ public:
     GoalboxDetector* getBox(bool topCamera = true) const { return boxDetector[!topCamera]; }
     CornerDetector* getCorners(bool topCamera = true) const { return cornerDetector[!topCamera]; }
 
+    // For use by Image nbcross func
+    void setColorParams(Colors* colors, bool topCamera) { colorParams[!topCamera] = colors; }
+
+
 protected:
     virtual void run_();
 
@@ -44,6 +51,9 @@ private:
     FieldLineList* fieldLines[2];
     GoalboxDetector* boxDetector[2];
     CornerDetector* cornerDetector[2];
+
+    // Method to convert from Lisp to Colors type
+    Colors* getColorsFromLisp(nblog::SExpr* colors, bool top);
 };
 
 }

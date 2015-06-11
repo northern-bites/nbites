@@ -1,6 +1,7 @@
 #include "VisionModule.h"
 #include "Edge.h"
 #include "HighResTimer.h"
+#include "NBMath.h"
 
 #include <iostream>
 
@@ -18,9 +19,38 @@ VisionModule::VisionModule()
     //      not have default constructors, all class members must be initialized
     //      after the initializer list is run, which requires calling default
     //      constructors in the case of C-style arrays, limitation theoretically
-    //      removed in C++11.
+
+    //      removed in C++11
+
+    std:: string sexpPath;
+    // TODO: 
+    // if (on computer ) { // #ifdef offline?
+        sexpPath = std::string(getenv("NBITES_DIR"));
+        sexpPath += "/src/man/config/colorParams.txt";
+    // } else (if on robot) {
+        // Get robot path
+   // }
+
+    std::ifstream textFile;
+    textFile.open(sexpPath);
+
+    // Get size of file
+    textFile.seekg (0, textFile.end);
+    long size = textFile.tellg();
+    textFile.seekg(0);
+    
+    // Read file into buffer and convert to string
+    char* buff = new char[size];
+    textFile.read(buff, size);
+    std::string sexpText(buff);
+
+    // Get SExpr from string
+    nblog::SExpr* colors = nblog::SExpr::read((const std::string)sexpText);
+    
+    // Set module pointers for top then bottom images
     for (int i = 0; i < 2; i++) {
-        colorParams[i] = new Colors();
+        // colorParams[i] = new Colors();
+        colorParams[i] = getColorsFromLisp(colors, i == 0);
         frontEnd[i] = new ImageFrontEnd();
         edgeDetector[i] = new EdgeDetector();
         edges[i] = new EdgeList(32000);
@@ -103,7 +133,10 @@ void VisionModule::run_()
         std::cout << "Top camera: " << (i == 0) << std::endl;
         kinematics[i]->joints(jointsIn.message());
         homography[i]->wz0(kinematics[i]->wz0());
-        homography[i]->tilt(kinematics[i]->tilt());
+        homography[i]->tilt(kinematics[i]->tilt() - 3.965*TO_RAD);
+
+        std::cout << "tilt: " << kinematics[i]->tilt() << std::endl;
+     //   homography[i]->roll(-2.21);
         // homography[i]->azimuth(kinematics[i]->azimuth());
 
         // Approximate brightness gradient
@@ -133,6 +166,7 @@ void VisionModule::run_()
         times[i][5] = timer.end();
     }
 
+    /*
     for (int i = 0; i < 2; i++) {
         if (i == 0)
             std::cout << "From top camera:" << std::endl;
@@ -145,7 +179,50 @@ void VisionModule::run_()
         std::cout << "Field lines detection: " << times[i][4] << std::endl;
         std::cout << "Field lines classification: " << times[i][5] << std::endl;
     }
+    */
 
+}
+
+/*
+ Lisp data in config/colorParams.txt stores 32 parameters. Read lisp and
+  load the three compoenets of a Colors struct, white, green, and orange,
+  from the 18 values for either the top or bottom image. 
+*/
+Colors* VisionModule::getColorsFromLisp(nblog::SExpr* colors, bool top) {
+    Colors* ret = new man::vision::Colors;
+    nblog::SExpr* params;
+
+    if (top) {
+        params = colors->get(1)->find("Top")->get(1);
+    } else {
+        params = colors->get(1)->find("Bottom")->get(1);
+    }
+
+    colors = params->get(0)->get(1);
+    ret->white.load(std::stof(colors->get(0)->get(1)->serialize()),
+                    std::stof(colors->get(1)->get(1)->serialize()),
+                    std::stof(colors->get(2)->get(1)->serialize()),
+                    std::stof(colors->get(3)->get(1)->serialize()),
+                    std::stof(colors->get(4)->get(1)->serialize()),
+                    std::stof(colors->get(5)->get(1)->serialize())); 
+    
+    colors = params->get(1)->get(1);
+    ret->green.load(std::stof(colors->get(0)->get(1)->serialize()),
+                    std::stof(colors->get(1)->get(1)->serialize()),
+                    std::stof(colors->get(2)->get(1)->serialize()),
+                    std::stof(colors->get(3)->get(1)->serialize()),
+                    std::stof(colors->get(4)->get(1)->serialize()),
+                    std::stof(colors->get(5)->get(1)->serialize()));  
+    
+    colors = params->get(2)->get(1);
+   ret->orange.load(std::stof(colors->get(0)->get(1)->serialize()),
+                    std::stof(colors->get(1)->get(1)->serialize()),
+                    std::stof(colors->get(2)->get(1)->serialize()),
+                    std::stof(colors->get(3)->get(1)->serialize()),
+                    std::stof(colors->get(4)->get(1)->serialize()),
+                    std::stof(colors->get(5)->get(1)->serialize()));
+
+    return ret;
 }
 
 }

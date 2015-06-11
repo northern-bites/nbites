@@ -4,6 +4,8 @@ import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -22,62 +24,68 @@ import nbtool.io.CrossIO.CrossCall;
 import nbtool.util.Utility;
 
 public class LineView extends ViewParent implements IOFirstResponder {
-	
-	final int width = 320;
-	final int height = 240;
-	
-	final int displayw = 640;
-	final int displayh = 480;
+    
+    final int width = 320;
+    final int height = 240;
+    
+    final int displayw = 640;
+    final int displayh = 480;
 
     final int fieldw = 640;
     final int fieldh = 554;
 
     final int buffer = 5;
-	
-	BufferedImage originalImage;
-	BufferedImage edgeImage;
+
+    double resize = 1;
+
+    // Field coordinate image upper left hand corder
+    int fx0 = displayw + buffer;
+    int fy0 = 0;
+
+    // Center of field cordinate system
+    int fxc = displayw + buffer + fieldw/2; 
+    int fyc = fieldh;
+    
+    BufferedImage originalImage;
+    BufferedImage edgeImage;
     Vector<Double> lines;
 
-	@Override
-	public void setLog(Log newlog) {
-		CrossInstance ci = CrossIO.instanceByIndex(0);
-		if (ci == null)
-			return;
-		CrossFunc func = ci.functionWithName("Vision");
-		assert(func != null);
-		
+
+    @Override
+    public void setLog(Log newlog) {
+        CrossInstance ci = CrossIO.instanceByIndex(0);
+        if (ci == null)
+            return;
+        CrossFunc func = ci.functionWithName("Vision");
+        assert(func != null);
+        
         CrossCall cc = new CrossCall(this, func, newlog);
 
-		assert(ci.tryAddCall(cc));
+        assert(ci.tryAddCall(cc));
 
-		originalImage = Utility.biFromLog(newlog);
-	}
-	
-	public void paintComponent(Graphics g) {
-		if (edgeImage != null) {
-			g.drawImage(originalImage, 0, 0, displayw, displayh, null);
-			g.drawImage(edgeImage, 0, displayh + buffer, displayw, displayh, null);
+        originalImage = Utility.biFromLog(newlog);
+    }
+    
+    public void paintComponent(Graphics g) {
+        if (edgeImage != null) { 
+            g.drawImage(originalImage, 0, 0, displayw, displayh, null);
+            g.drawImage(edgeImage, 0, displayh + buffer, displayw, displayh, null);
             
-            // Field coordinate image
-            int fx0 = displayw + buffer;
-            int fy0 = 0;
 
             g.setColor(new Color(90, 130, 90));
             g.fillRect(645, 0, fieldw, fieldh);
 
-            int[] xPoints1 = {0 + fx0, 0 + fx0, 320 + fx0};
-            int[] yPoints1 = {2, 554, 554};
-            int[] xPoints2 = {640 + fx0, 320 + fx0, 640 + fx0};
-            int[] yPoints2 = {2, 554, 554};
+            int[] xPoints1 = {0 + fx0, 0 + fx0, fieldw/2 + fx0};
+            int[] yPoints1 = {2, fieldh, fieldh};
+            int[] xPoints2 = {fieldw + fx0, fieldw/2 + fx0, fieldw + fx0};
+            int[] yPoints2 = {2, fieldh, fieldh};
             int n = 3;
             g.setColor(new Color(46, 99, 28));
             g.fillPolygon(xPoints1, yPoints1, n);
             g.fillPolygon(xPoints2, yPoints2, n);
 
             g.setColor(Color.lightGray);
-            g.fillOval(displayw + buffer + fieldw/2 - 30, fieldh - 20, 60, 40);
-
-            // GeneralPath path = new GeneralPath;
+            g.fillOval(fxc - 30, fyc - 20, 60, 40);
 
             for (int i = 0; i < lines.size(); i += 10) {
                 double icR = lines.get(i);
@@ -122,10 +130,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
                              (int) xstring, 
                              (int) ystring);
 
-                // Draw it in field coordinates
-                if (fieldIndex >= 0)
-                    g.setColor(Color.white);
-
+                // Calculate field coordinates to find resize value
                 x0 =  2*fcR * Math.cos(fcT) + displayw + buffer + fieldw/2;
                 y0 = -2*fcR * Math.sin(fcT) + fieldh;
                 x1 = (int) Math.round(x0 + 2*fcEP0 * Math.sin(fcT));
@@ -133,57 +138,88 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 x2 = (int) Math.round(x0 + 2*fcEP1 * Math.sin(fcT));
                 y2 = (int) Math.round(y0 + 2*fcEP1 * Math.cos(fcT));
 
+                if (y1 < 0 && y1 > -2500) {
+                    resize = Math.min(resize, (double)fieldh/(-y1 + fieldh));
+                }
+
+                if (y2 < 0 && y1 > -2500) {
+                    resize = Math.min(resize, (double)fieldh/(-y1 + fieldh));
+                }
+            }
+
+            for (int i = 0; i < lines.size(); i += 10) {
+                double houghIndex = lines.get(i + 4);
+                double fieldIndex = lines.get(i + 5);
+                double fcR = lines.get(i + 6);
+                double fcT = lines.get(i + 7);
+                double fcEP0 = lines.get(i + 8);
+                double fcEP1 = lines.get(i + 9);
+
+                // Draw it in field coordinates
+                if (fieldIndex >= 0)
+                    g.setColor(Color.white);
+                else
+                    g.setColor(Color.red);
+
+                // Recalculate with resize
+                double x0 =  2*resize*fcR * Math.cos(fcT) + displayw + buffer + fieldw/2;
+                double y0 = -2*resize*fcR * Math.sin(fcT) + fieldh;
+                int x1 = (int) Math.round(x0 + 2*resize*fcEP0 * Math.sin(fcT));
+                int y1 = (int) Math.round(y0 + 2*resize*fcEP0 * Math.cos(fcT));
+                int x2 = (int) Math.round(x0 + 2*resize*fcEP1 * Math.sin(fcT));
+                int y2 = (int) Math.round(y0 + 2*resize*fcEP1 * Math.cos(fcT));
+
                 g.drawLine(x1, y1, x2, y2);
 
-
-                // Field view line labels
-                int xCenter = (x1 + x2) / 2;
-                int yCenter = (y1 + y2) / 2;
-                if (fcR > 0)
-                    scale = 10;
-                else
-                    scale = 3;
-                System.out.printf("scale: %f\n", scale);
-                System.out.printf("adding: %f and %f\n", (int)scale*Math.cos(fcT), (int)scale*Math.sin(fcT));
-                
-                xstring = xCenter + scale*Math.cos(fcT);
-                ystring = yCenter + scale*Math.sin(fcT);
-
-                g.drawString(Integer.toString((int) houghIndex) + "/" + Integer.toString((int) fieldIndex), 
-                             (int) xCenter + fx0, 
-                             (int) yCenter + fy0);
-
-                System.out.printf("S: %s\n\n", Integer.toString((int) houghIndex) + "/" + Integer.toString((int) fieldIndex));
-
-                // Distance estimates for field view
-
-
+                g.setColor(Color.black);
+                g.drawLine(fxc, fyc, fxc, (int)(fyc - (200 * resize)));
             }
         }
     }
-	
+    
 	public LineView() {
 		super();
 		setLayout(null);
         lines = new Vector<Double>();
+
+        this.addMouseListener(new DistanceGetter());
 	}
 
-	@Override
-	public void ioFinished(IOInstance instance) {}
+    class DistanceGetter implements MouseListener {
 
-	@Override
-	public void ioReceived(IOInstance inst, int ret, Log... out) {
-		EdgeImage ei = new EdgeImage(width, height,  out[5].bytes);
-		edgeImage = ei.toBufferedImage();
-		repaint();
+      public void mouseClicked(MouseEvent e) {
+      }
+
+      public void mousePressed(MouseEvent e) {
+      }
+
+      public void mouseReleased(MouseEvent e) {
+      }
+
+      public void mouseEntered(MouseEvent e) {
+      }
+
+      public void mouseExited(MouseEvent e) {
+      }
+        
+    }
+
+    @Override
+    public void ioFinished(IOInstance instance) {}
+
+    @Override
+    public void ioReceived(IOInstance inst, int ret, Log... out) {
+        EdgeImage ei = new EdgeImage(width, height,  out[5].bytes);
+        edgeImage = ei.toBufferedImage();
+        repaint();
 
         // TODO refactor into hough line class
         byte[] lineBytes = out[6].bytes;
         int numLines = lineBytes.length / (18 * 4);
         Logger.logf(Logger.INFO, "%d field lines expected.", numLines);
-		try {
-			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(lineBytes));
-			for (int i = 0; i < numLines; ++i) {
+        try {
+            DataInputStream dis = new DataInputStream(new ByteArrayInputStream(lineBytes));
+            for (int i = 0; i < numLines; ++i) {
                 lines.add(dis.readDouble()); // image coord r
                 lines.add(dis.readDouble()); // image coord t
                 lines.add(dis.readDouble()); // image coord ep0
@@ -195,11 +231,11 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 lines.add(dis.readDouble()); // field coord ep0
                 lines.add(dis.readDouble()); // field coord ep1
             }
-		} catch (Exception e) {
-			Logger.logf(Logger.ERROR, "Conversion from bytes to hough coord lines in LineView failed.");
-			e.printStackTrace();
-		}
-	}
+        } catch (Exception e) {
+            Logger.logf(Logger.ERROR, "Conversion from bytes to hough coord lines in LineView failed.");
+            e.printStackTrace();
+        }
+    }
 
 	@Override
 	public boolean ioMayRespondOnCenterThread(IOInstance inst) {

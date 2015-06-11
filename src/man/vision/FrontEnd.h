@@ -135,9 +135,9 @@ struct Colors
   // TODO parameters should not be hard coded
   Colors() {
     //         (Dark U, Dark V, LightU, LightV, FuzzyU, FuzzyV)
-    white .load(-0.02f, -0.11f, 0.18f, 0.27f, -0.09f, -0.01f);
-    green.load( -0.01f, 0.01f, 0.01f, -0.01f, -0.01f, 0.11f);
-    orange .load( 0.06f, 0.03f, 0.01f, 0.1f, -0.02f, 0.01f);
+    white .load( 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+    green .load( 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+    orange.load( 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
   }
 };
 

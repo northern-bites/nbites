@@ -23,9 +23,9 @@ namespace nblog {
     
     SExpr::SExpr(const char * n) :
     _atom(true),
-    _list()
+    _list(),
+    _value(n)
     {
-        _value = std::string(n);
         NBDEBUGs(SECTION_SEXPR, "atom SExpr(const char * n)\n");
     }
     
@@ -146,6 +146,70 @@ namespace nblog {
      Instance methods
      */
     
+    void SExpr::setList(const std::vector<SExpr>& newContents) {
+        _atom = false;
+        _value = "";
+        _list = newContents;
+    }
+    
+    void SExpr::setList(std::initializer_list<SExpr> exprs) {
+        _atom = false;
+        _value = "";
+        _list = std::vector<SExpr>(exprs);
+    }
+    
+    void SExpr::setAtom(std::string val) {
+        _atom = true;
+        _value = val;
+        _list = {};
+    }
+    
+    void SExpr::setAtomAsCopy(SExpr atomToCopy) {
+        _atom = true;
+        _value = atomToCopy.value();
+        _list = {};
+    }
+    
+    void SExpr::insert(int index, SExpr& inserted) {
+        if (_atom)
+            return;
+        
+        if (index < 0 || index > _list.size())
+            return;
+        
+        auto it = _list.begin() + index;
+        _list.insert(it, inserted);
+    }
+    
+    bool SExpr::remove(int index) {
+        if (_atom || index < 0 || index > _list.size())
+            return false;
+        
+        _list.erase(_list.begin() + index);
+        return true;
+    }
+
+    std::string SExpr::value() {
+        if (!_atom) throw std::domain_error("sexpr is atom");
+        return _value;
+    }
+    
+    int SExpr::valueAsInt() {
+        if (!_atom) throw std::domain_error("sexpr is atom");
+        return std::stoi(_value);
+;
+    }
+    
+    long SExpr::valueAsLong() {
+        if (!_atom) throw std::domain_error("sexpr is atom");
+        return std::stol(_value);
+    }
+    
+    double SExpr::valueAsDouble() {
+        if (!_atom) throw std::domain_error("sexpr is atom");
+        return std::stod(_value);
+    }
+    
     SExpr * SExpr::get(int i)
     {
         if (i < _list.size())
@@ -153,6 +217,12 @@ namespace nblog {
             return &_list[i];
         }
         else return NULL;
+    }
+    
+    std::vector<SExpr> * SExpr::getList() {
+        if (_atom)
+            return NULL;
+        return &_list;
     }
     
     void SExpr::append(const std::vector<SExpr>& l)
@@ -265,7 +335,7 @@ namespace nblog {
      Class method to read from string.
      */
     
-    SExpr * SExpr::read(std::string s, ssize_t& p)
+    SExpr * SExpr::read(const std::string s, ssize_t& p)
     {
         while (p < (int)s.length() && isspace(s[p]))
             p++;

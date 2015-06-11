@@ -1,10 +1,6 @@
 package nbtool.data;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-
-import javax.swing.SwingUtilities;
 
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
@@ -18,12 +14,9 @@ import nbtool.util.Events;
 import nbtool.util.Logger;
 import nbtool.util.NBConstants;
 import nbtool.util.NBConstants.STATUS;
-import nbtool.util.Prefs;
-import nbtool.util.Utility;
 
 public final class SessionMaster implements IOFirstResponder {
 	
-	//--------------
 	public static SessionMaster get() {
 		return INST;
 	}
@@ -153,7 +146,6 @@ public final class SessionMaster implements IOFirstResponder {
 			return;
 		
 		if (inst == streamio) {
-			
 			synchronized(this) {
 				
 				for (Log log : out) {
@@ -171,7 +163,8 @@ public final class SessionMaster implements IOFirstResponder {
 				Events.GLogsFound.generate(this, out);
 			}
 		} else {
-			Logger.logf(Logger.WARN, "SessionMaster got surprising logs from %s.", inst.name());
+			if (!(inst == control && out.length == 0))
+				Logger.logf(Logger.WARN, "SessionMaster got surprising %d logs from %s.", out.length, inst.name());
 		}
 		
 	}
