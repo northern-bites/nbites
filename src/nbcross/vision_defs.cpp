@@ -33,17 +33,19 @@ int Vision_func() {
     int height = atoi(copy->tree().find("contents")->get(1)->
                                         find("height")->get(1)->value().c_str());
 
-    // Read number of bytes of image, inertials, and joints
-    int numBytes[3];
-    for (int i = 0; i < 3; i++)
-        numBytes[i] = atoi(copy->tree().find("contents")->get(i+1)->
-                                        find("nbytes")->get(1)->value().c_str());
-    uint8_t* ptToJoints = buf + (numBytes[0] + numBytes[1]);
+    // Read number of bytes of image, inertials, and joints if exist
+    messages::JointAngles joints;
+    if (copy->tree().find("contents")->get(2)) {
+        int numBytes[3];
+        for (int i = 0; i < 3; i++)
+            numBytes[i] = atoi(copy->tree().find("contents")->get(i+1)->
+                                            find("nbytes")->get(1)->value().c_str());
+        uint8_t* ptToJoints = buf + (numBytes[0] + numBytes[1]);
+        joints.ParseFromArray((void *) ptToJoints, numBytes[2]);
+    }
     
     // Create messages
     messages::YUVImage image(buf, width, height, width);
-    messages::JointAngles joints;
-    joints.ParseFromArray((void *) ptToJoints, numBytes[2]);
 
     // Setup and run module
     portals::Message<messages::YUVImage> imageMessage(&image);
@@ -251,6 +253,7 @@ int Synthetics_func() {
     homography.wx0(x);
     homography.wy0(y);
     homography.azimuth(h*TO_RAD);
+    homography.flen(flen);
 
     man::vision::syntheticField(synthetic, homography);
 
