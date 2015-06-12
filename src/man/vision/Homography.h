@@ -110,6 +110,10 @@ public:
   // Same as above, but for lines known to be parallel in world coordinates.
   bool visualTiltParallel(const GeoLine& a, const GeoLine& b, double& tilt,
                           std::string* diagnostics) const;
+
+  // Calibrate tilt and roll using "star target". If successful returns true and
+  // updates tilt and roll.
+  bool calibrateFromStar(const FieldLineList& lines);
 };
 
 // ********************

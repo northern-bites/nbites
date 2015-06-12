@@ -835,6 +835,24 @@ int main(int argc, char* argv[])
         runHough();
         break;
 
+      case 'cal':
+        {
+          EdgeList edges(24000);
+          getEdges(edges);
+          HoughLineList lines(12);
+          hs.run(edges, lines);
+          lines.mapToField(fh);
+          FieldLineList fLines;
+          fLines.find(lines);
+
+          if (fh.calibrateFromStar(fLines))
+            printf("Roll = %.2f, tilt = %.2f\n", fh.roll() * (180 / M_PI), fh.tilt() * (180 / M_PI));
+          else
+            printf("Can't find 3 legs of star target\n");
+        }
+        break;
+
+
       default:
         throw strPrintf("Unknown command %s\n", argv[argIndex - 1]);
       }
