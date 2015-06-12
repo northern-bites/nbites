@@ -588,7 +588,8 @@ TranscriberModule::TranscriberModule(ImageTranscriber& trans)
       inertsOut(base()),
       it(trans),
       image_index(0),
-      file_mod_time()
+      file_mod_time(),
+      first_time(1)
 {
 }
 
@@ -614,8 +615,10 @@ void TranscriberModule::run_()
     if(FILE *file = fopen(filepath.c_str(),"r")) { //existence check
         fclose(file);
         int err = stat(filepath.c_str(),&file_stats);
-        if(err != 0) {
-            std::cout<<"[INFO] FILE HAS BEEN MODIFIED"<<std::endl;
+        if(first_time == 1) { //prevent settings from initting twice on startup
+            std::cout<<"[INFO] First Time Running"<<std::endl;
+            file_mod_time = file_stats.st_mtime;
+            first_time = 0;
         }
         int time_diff = std::difftime(file_stats.st_mtime, file_mod_time);
         if(time_diff > 0.0) { //check if the file has been modified

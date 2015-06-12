@@ -142,6 +142,7 @@ public :
     portals::OutPortal<messages::InertialState> inertsOut;
 
     time_t file_mod_time;
+    int first_time;
 
 protected :
     virtual void run_();

@@ -212,8 +212,7 @@ namespace man {
         
         /*
          SPECIFIC MODULE LOGGING
-         */
-//#ifdef LOG_SENSORS
+         *///#ifdef LOG_SENSORS
         sensorsThread.log<messages::JointAngles>((control::SENSORS), &sensors.jointsOutput_,
                                                  "proto-JointAngles", "sensorsThread");
         sensorsThread.log<messages::JointAngles>((control::SENSORS), &sensors.temperatureOutput_,
