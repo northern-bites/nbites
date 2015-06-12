@@ -66,39 +66,47 @@ usingVision(false)
 
         int i=0;
         SExpr params = *SExpr::read(readInFile,i);
+        std::cout<<"[OBSTACLE ] num params = "<<params.count()<<std::endl;
 
         if(params.count() >= 2) {
-            std::cout<<"[INFO] Reading from SExpr"<<std::endl;
-            std::cout<<"[INFO] PATH: "<<filepath<<std::endl;
+            std::cout<<"[OBSTACLE ] Reading from SExpr"<<std::endl;
+            std::cout<<"[OBSTACLE ] PATH: "<<filepath<<std::endl;
 
             usingArms = params.find("arms")->get(1)->valueAsInt();
             usingVision = params.find("vision")->get(1)->valueAsInt();
             bool all_sonars = params.find("set_all_sonar")->get(1)->valueAsInt();
 
             if (all_sonars) {
+                std::cout<<"[OBSTACLE ] Setting all robots the same"<<std::endl;
                 usingLeftSonar = params.find("all_left_sonar")->get(1)->valueAsInt();
                 usingRightSonar = params.find("all_right_sonar")->get(1)->valueAsInt();
             } else {
-                usingLeftSonar = params.find(robotName).find("left_sonar")->get(1)->valueAsInt();
-                usingRightSonar = params.find(robotName).find("right_sonar")->get(1)->valueAsInt();
+                // this doesn't work yet...
+                // usingLeftSonar = params.find(robotName)->get(1).find("left_sonar")->get(1)->valueAsInt();
+                // usingRightSonar = params.find(robotName)->get(1).find("right_sonar")->get(1)->valueAsInt();
             }
         } else {
-            std::cout<<"[ERR] Invalid SExpr"<<std::endl;
-            std::cout<<"[ERR] Check /nbites/Config/ for them"<<std::endl;
+            std::cout<<"[ERR ] Invalid SExpr"<<std::endl;
+            std::cout<<"[ERR ] Check /nbites/Config/ for them"<<std::endl;
         }
     } else {
-        std::cout<<"[ERR] Config files not found."<<std::endl;
+        std::cout<<"[ERR ] Config files not found."<<std::endl;
     }
+    std::cout<<"[OBSTACLE ] VARS:";
+    if (usingArms) { std::cout<<" (ARMS)"; }
+    if (usingLeftSonar) { std::cout<<" (LEFT SONAR)"; }
+    if (usingRightSonar) { std::cout<<" (RIGHT SONAR)"; }
+    if (usingVision) { std::cout<<" (VISION)"; }
+    std::cout<<std::endl;
 }
 
 void ObstacleModule::run_()
 {
-    std::cout<<"obst"<<usingArms<<usingLeftSonar<<usingRightSonar<<usingVision<<std::endl;
     visionIn.latch();
     armContactIn.latch();
     sonarIn.latch();
 
-    // Don't need this kind of buffer when we aren't using vision
+    // Don't need this kind of buffer when we aren't using vision, so keep uninit'd
     if (!usingVision)
     {
         for (int i = 0; i < NUM_DIRECTIONS; i++) {

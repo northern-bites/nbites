@@ -44,7 +44,7 @@ namespace man {
     vision(),
     localization(),
     ballTrack(),
-    obstacle("/home/nao/nbites/Config/obstacleParams.json", robotName),
+    obstacle("/home/nao/nbites/Config/obstacleParams.txt", robotName),
     gamestate(teamNum, playerNum),
     behaviors(teamNum, playerNum),
     leds(broker),

@@ -41,7 +41,7 @@ private:
     void startSubThreads();
     void startAndCheckThread(DiagramThread& thread);
 
-    ParamReader param, obstParam;
+    ParamReader param;
     int playerNum, teamNum;
     std::string robotName;
     DiagramThread sensorsThread;
