@@ -2,13 +2,22 @@
 #include "Profiler.h"
 #include "RoboCupGameControlData.h"
 
+#include "DebugConfig.h"
+#include "../log/logging.h"
+#include "../control/control.h"
+#include "nbdebug.h"
+
+using nblog::SExpr;
+using nblog::NBLog;
+
 namespace man {
 namespace localization {
 
 LocalizationModule::LocalizationModule()
     : portals::Module(),
       output(base()),
-      particleOutput(base())
+      particleOutput(base()),
+      log_index(0)
 {
     particleFilter = new ParticleFilter();
     // Chooose on the field looking up as a random initial
@@ -62,6 +71,59 @@ void LocalizationModule::update()
 #endif
 
     output.setMessage(locMessage);
+
+#ifdef USE_LOGGING
+    if(control::flags[control::LOCALIZATION]) {
+        ++log_index;
+        std::string log_from = "loc";
+
+        messages::RobotLocation rl = *output.getMessage(true).get();
+        messages::ParticleSwarm ps = *particleOutput.getMessage(true).get();
+
+        std::string rl_buf;
+        std::string ps_buf;
+        std::string log_buf;
+
+        rl.SerializeToString(&rl_buf);
+        ps.SerializeToString(&ps_buf);
+
+        log_buf.append(rl_buf);
+        log_buf.append(ps_buf);
+
+        std::vector<SExpr> contents;
+
+        SExpr naoLocation("location", log_from, clock(), log_index, rl_buf.length());
+        naoLocation.append(SExpr("x",rl.x()));
+        naoLocation.append(SExpr("y",rl.y()));
+        naoLocation.append(SExpr("h",rl.h()));
+
+        std::cout<<"[DEBUG] LOCATION"<<std::endl;
+        std::cout<<naoLocation.print()<<std::endl;
+
+        contents.push_back(naoLocation);
+
+        SExpr naoSwarm("swarm",log_from,clock(),log_index,ps_buf.length());
+        std::vector<SExpr> pSwarmTemp;
+
+        for(int i=0; i < ps.particle().size(); ++i) {
+            SExpr iSwarm;
+            iSwarm.append(SExpr("weight",ps.particle(i).weight()));
+            iSwarm.append(SExpr("particle_x",ps.particle(i).loc().x()));
+            iSwarm.append(SExpr("particle_y",ps.particle(i).loc().y()));
+            iSwarm.append(SExpr("particle_h",ps.particle(i).loc().h()));
+            pSwarmTemp.push_back(iSwarm);
+        }
+        naoSwarm.append(pSwarmTemp);
+
+        std::cout<<"[DEBUG] SWARM"<<std::endl;
+        std::cout<<naoSwarm.print()<<std::endl;
+
+        contents.push_back(naoSwarm);
+        NBLog(NBL_SMALL_BUFFER,"LOCSWARM",contents,log_buf);
+
+    }
+#endif
+
 }
 
 void LocalizationModule::run_()
