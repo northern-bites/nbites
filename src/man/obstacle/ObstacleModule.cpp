@@ -66,7 +66,6 @@ usingVision(false)
 
         int i=0;
         SExpr params = *SExpr::read(readInFile,i);
-        std::cout<<"[OBSTACLE ] num params = "<<params.count()<<std::endl;
 
         if(params.count() >= 2) {
             std::cout<<"[OBSTACLE ] Reading from SExpr"<<std::endl;
@@ -81,9 +80,8 @@ usingVision(false)
                 usingLeftSonar = params.find("all_left_sonar")->get(1)->valueAsInt();
                 usingRightSonar = params.find("all_right_sonar")->get(1)->valueAsInt();
             } else {
-                // this doesn't work yet...
-                // usingLeftSonar = params.find(robotName)->get(1).find("left_sonar")->get(1)->valueAsInt();
-                // usingRightSonar = params.find(robotName)->get(1).find("right_sonar")->get(1)->valueAsInt();
+                usingLeftSonar = params.find(robotName)->get(1)->get(1)->valueAsInt();
+                usingRightSonar = params.find(robotName)->get(2)->get(1)->valueAsInt();
             }
         } else {
             std::cout<<"[ERR ] Invalid SExpr"<<std::endl;
