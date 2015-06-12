@@ -17,7 +17,7 @@
 using nblog::Log;
 using nblog::SExpr;
 
-man::vision::Colors* getColorsFromSExpr(SExpr* params);
+//man::vision::Colors* getColorsFromSExpr(SExpr* params);
 void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top);
 SExpr getSExprFromSavedParams(int color, std::string sexpPath, bool top);
 std::string getSExprStringFromColorJSonNode(boost::property_tree::ptree tree);
@@ -35,7 +35,7 @@ int Vision_func() {
     // Parse YUVImage S-expression
    
     // Determine if we are looking at a top or bottom image from log description
-    bool top = copy->description().find("from camera_TOP") != std::string::npos;
+    bool top = copy->description().find("TOP") != std::string::npos;
     
     int width = 2*atoi(copy->tree().find("contents")->get(1)->
                                         find("width")->get(1)->value().c_str());
@@ -75,7 +75,8 @@ int Vision_func() {
     if (params != NULL) {
 
         // Set new parameters as frontEnd colorParams
-        module.setColorParams(getColorsFromSExpr(params), top);
+        man::vision::Colors* c = module.getColorsFromLisp(params, 2);
+        module.setColorParams(c, top);
 
         // Look for atom value "SaveParams", i.e. "save" button press
         SExpr* save = params->get(1)->find("SaveParams");
@@ -288,33 +289,33 @@ int Vision_func() {
 /* Helper function to convert from SExpr to Colors type.
     Use 18 parameters to intialize Colors struct.
  */
-man::vision::Colors* getColorsFromSExpr(SExpr* params) {
-    man::vision::Colors* ret = new man::vision::Colors;
-    int i, j = 0;
+// man::vision::Colors* getColorsFromSExpr(SExpr* params) {
+//     man::vision::Colors* ret = new man::vision::Colors;
+//     int i, j = 0;
 
-    ret->white.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize())); 
+//     ret->white.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+//                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+//                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+//                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+//                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+//                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize())); 
 
-    ret->green.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));  
+//     ret->green.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+//                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+//                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+//                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+//                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+//                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));  
  
-   ret->orange.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));
+//    ret->orange.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+//                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+//                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+//                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+//                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
+//                     std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));
 
-    return ret;
-}
+//     return ret;
+// }
 
 // Save the new color params to the colorParams.txt file
 void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top) {

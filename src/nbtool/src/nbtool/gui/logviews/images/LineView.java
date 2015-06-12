@@ -38,6 +38,15 @@ public class LineView extends ViewParent implements IOFirstResponder {
 
     double resize = 1;
 
+    boolean click = false;
+    boolean drag = false;
+    
+    // Click and release values
+    int clickX1 = 0;
+    int clickY1 = 0;
+    int clickX2 = 0;
+    int clickY2 = 0;
+
     // Field coordinate image upper left hand corder
     int fx0 = displayw + buffer;
     int fy0 = 0;
@@ -131,77 +140,122 @@ public class LineView extends ViewParent implements IOFirstResponder {
                              (int) ystring);
 
                 // Calculate field coordinates to find resize value
-                x0 =  2*fcR * Math.cos(fcT) + displayw + buffer + fieldw/2;
-                y0 = -2*fcR * Math.sin(fcT) + fieldh;
-                x1 = (int) Math.round(x0 + 2*fcEP0 * Math.sin(fcT));
-                y1 = (int) Math.round(y0 + 2*fcEP0 * Math.cos(fcT));
-                x2 = (int) Math.round(x0 + 2*fcEP1 * Math.sin(fcT));
-                y2 = (int) Math.round(y0 + 2*fcEP1 * Math.cos(fcT));
+                x0 =  3*fcR * Math.cos(fcT) + displayw + buffer + fieldw/2;
+                y0 = -3*fcR * Math.sin(fcT) + fieldh;
+                x1 = (int) Math.round(x0 + 3*fcEP0 * Math.sin(fcT));
+                y1 = (int) Math.round(y0 + 3*fcEP0 * Math.cos(fcT));
+                x2 = (int) Math.round(x0 + 3*fcEP1 * Math.sin(fcT));
+                y2 = (int) Math.round(y0 + 3*fcEP1 * Math.cos(fcT));
 
-                if (y1 < 0 && y1 > -2500) {
+
+                if (y1 < 0 && y1 > -3500) {
                     resize = Math.min(resize, (double)fieldh/(-y1 + fieldh));
+                    if (y1 < -3500) {
+                        lines.set(i+4, -1.0);
+                    }
                 }
 
-                if (y2 < 0 && y1 > -2500) {
+                if (y2 < 0 && y2 > -3500) {
                     resize = Math.min(resize, (double)fieldh/(-y1 + fieldh));
+                    if (y1 < -3500) {
+                        lines.set(i+4, -1.0);
+                    }
                 }
             }
 
+            // Loop through again to draw lines in field space with calucluated resize value
             for (int i = 0; i < lines.size(); i += 10) {
                 double houghIndex = lines.get(i + 4);
-                double fieldIndex = lines.get(i + 5);
-                double fcR = lines.get(i + 6);
-                double fcT = lines.get(i + 7);
-                double fcEP0 = lines.get(i + 8);
-                double fcEP1 = lines.get(i + 9);
+                if (houghIndex != -1) {
+                    double fieldIndex = lines.get(i + 5);
+                    double fcR = lines.get(i + 6);
+                    double fcT = lines.get(i + 7);
+                    double fcEP0 = lines.get(i + 8);
+                    double fcEP1 = lines.get(i + 9);
 
-                // Draw it in field coordinates
-                if (fieldIndex >= 0)
-                    g.setColor(Color.white);
-                else
-                    g.setColor(Color.red);
 
-                // Recalculate with resize
-                double x0 =  2*resize*fcR * Math.cos(fcT) + displayw + buffer + fieldw/2;
-                double y0 = -2*resize*fcR * Math.sin(fcT) + fieldh;
-                int x1 = (int) Math.round(x0 + 2*resize*fcEP0 * Math.sin(fcT));
-                int y1 = (int) Math.round(y0 + 2*resize*fcEP0 * Math.cos(fcT));
-                int x2 = (int) Math.round(x0 + 2*resize*fcEP1 * Math.sin(fcT));
-                int y2 = (int) Math.round(y0 + 2*resize*fcEP1 * Math.cos(fcT));
+                    // Draw it in field coordinates
+                    if (fieldIndex >= 0)
+                        g.setColor(Color.white);
+                    else
+                        g.setColor(Color.red);
 
-                g.drawLine(x1, y1, x2, y2);
+                    // Recalculate with resize
+                    double x0 =  3*resize*fcR * Math.cos(fcT) + displayw + buffer + fieldw/2;
+                    double y0 = -3*resize*fcR * Math.sin(fcT) + fieldh;
+                    int x1 = (int) Math.round(x0 + 3*resize*fcEP0 * Math.sin(fcT));
+                    int y1 = (int) Math.round(y0 + 3*resize*fcEP0 * Math.cos(fcT));
+                    int x2 = (int) Math.round(x0 + 3*resize*fcEP1 * Math.sin(fcT));
+                    int y2 = (int) Math.round(y0 + 3*resize*fcEP1 * Math.cos(fcT));
 
-                g.setColor(Color.black);
-                g.drawLine(fxc, fyc, fxc, (int)(fyc - (200 * resize)));
+                    g.drawLine(x1, y1, x2, y2);
+                }
+            }
+
+            // Draw distance if click
+            g.setColor(Color.black);
+            if (click && clickX1 > fx0 && clickX1 < fx0+fieldw && clickY1 < fieldh) {
+                g.drawLine(fxc, fyc, clickX1, clickY1);
+                
+                double distanceCM = Math.sqrt((clickX1-fxc)*(clickX1-fxc) + (clickY1-fyc)*(clickY1-fyc));
+                distanceCM *= (1.0/3.0)*(1/resize);
+
+                g.drawString(Double.toString((double)Math.round(distanceCM* 1000)/1000) + "cm", (fxc+clickX1)/2 + 5, (fyc+clickY1)/2);
+
+                click = false;
+            }
+
+            // Draw distance if drag
+            if (drag && clickX1 > fx0 && clickX1 < fx0 + fieldw && clickY1 < fieldh &&
+                        clickX2 > fx0 && clickX2 < fx0 + fieldw && clickY2 < fieldh) {
+                g.drawLine(clickX1, clickY1, clickX2, clickY2);
+                double distanceCM = Math.sqrt((clickX1-clickX2)*(clickX1-clickX2) + (clickY1-clickY2)*(clickY1-clickY2));
+                distanceCM *= (1.0/3.0)*(1/resize);
+                double dString = (double)Math.round(distanceCM* 1000)/1000;
+                if (dString != 0) {
+                    g.drawString(Double.toString(dString) + "cm",
+                        (clickX1+clickX2)/2 + 5, (clickY1+clickY2)/2);
+                }
+                drag = false;
+
             }
         }
     }
     
-	public LineView() {
-		super();
-		setLayout(null);
+    public LineView() {
+        super();
+        setLayout(null);
         lines = new Vector<Double>();
 
         this.addMouseListener(new DistanceGetter());
-	}
+    }
 
     class DistanceGetter implements MouseListener {
 
       public void mouseClicked(MouseEvent e) {
+        clickX1 = e.getX();
+        clickY1 = e.getY();
+        click = true;
+        repaint();
       }
 
       public void mousePressed(MouseEvent e) {
+        clickX1 = e.getX();
+        clickY1 = e.getY();
       }
 
       public void mouseReleased(MouseEvent e) {
+        clickX2 = e.getX();
+        clickY2 = e.getY();
+        if (clickX1 != clickX2 || clickY1 != clickY2) {
+            drag = true;
+            repaint();
+        }
       }
 
-      public void mouseEntered(MouseEvent e) {
-      }
+      public void mouseEntered(MouseEvent e) {}
 
-      public void mouseExited(MouseEvent e) {
-      }
-        
+      public void mouseExited(MouseEvent e) {}
     }
 
     @Override

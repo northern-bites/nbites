@@ -35,6 +35,9 @@ public:
     // For use by Image nbcross func
     void setColorParams(Colors* colors, bool topCamera) { colorParams[!topCamera] = colors; }
 
+    // Method to convert from Lisp to Colors type
+    Colors* getColorsFromLisp(nblog::SExpr* colors, int camera);
+
 
 protected:
     virtual void run_();
@@ -51,9 +54,6 @@ private:
     FieldLineList* fieldLines[2];
     GoalboxDetector* boxDetector[2];
     CornerDetector* cornerDetector[2];
-
-    // Method to convert from Lisp to Colors type
-    Colors* getColorsFromLisp(nblog::SExpr* colors, bool top);
 };
 
 }
