@@ -30,12 +30,12 @@ public class Session {
 	public ArrayList<Log> logs_ALL; //Logs in the order they arrived.  Only grows, does not change order.
 	public ArrayList<Log> logs_DO; //All the same logs in logs_TO, but in sorted order.
 	
-	protected Session(String dir, String addr) {
+	public Session(String dir, String addr) {
 		logs_ALL = new ArrayList<Log>();
 		logs_DO = new ArrayList<Log>();
 		most_relevant = null;
 		
-		assert(dir != null || addr != null);
+		/* assert(dir != null || addr != null); */
 		assert(dir == null || addr == null);
 		
 		if (dir != null) {
