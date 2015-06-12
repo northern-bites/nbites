@@ -26,7 +26,6 @@ namespace man {
     playerNum(param.getParam<int>("playerNumber")),
     teamNum(param.getParam<int>("teamNumber")),
     robotName(param.getParam<std::string>("robotName")),
-    obstParam("/home/nao/nbites/Config/obstacleParams.json"),
     sensorsThread("sensors", SENSORS_FRAME_LENGTH_uS),
     sensors(broker),
     jointEnactor(broker),
@@ -45,23 +44,13 @@ namespace man {
     vision(),
     localization(),
     ballTrack(),
-    obstacle(obstacleParam.getParam<bool>("arms"),
-             obstacleParam.getParam<bool>("vision")),
+    obstacle("/home/nao/nbites/Config/obstacleParams.json", robotName),
     gamestate(teamNum, playerNum),
     behaviors(teamNum, playerNum),
     leds(broker),
     sharedBall(playerNum)
     {
         setModuleDescription("The Northern Bites' soccer player.");
-
-        /** Process json for obstacle sonars **/
-        if (obstacleParam.getParam<bool>("set_all_sonar")) {
-            obstacle.setSonars(obstParam.getParam<bool>("all_left_sonar"),
-                               obstParam.getParam<bool>("all_right_sonar"));
-        } else {
-            obstacle.setSonars(obstParam.getChildParam<bool>(robotName, "left_sonar"),
-                               obstParam.getChildParam<bool>(robotName, "right_sonar"));
-        }
 
         /** Sensors **/
         sensorsThread.addModule(sensors);

@@ -5,6 +5,7 @@ namespace obstacle {
 
 using messages::FieldObstacles;
 using messages::ArmContactState;
+using nblog::SExpr;
 
 // Helper method, used to get the average of the sonar value buffers
 float average(std::list<float>& buf)
@@ -34,7 +35,13 @@ float minimum(std::list<float>& buf)
     return min;
 }
 
-ObstacleModule::ObstacleModule(bool arm, bool vision) : obstacleOut(base())
+ObstacleModule::ObstacleModule(std::string filepath, std::string robotName)
+: obstacleOut(base()),
+lastSonar(0.f),
+usingArms(true),
+usingLeftSonar(true),
+usingRightSonar(true),
+usingVision(false)
 {
     memset(obstacleBuffer, 0, sizeof(obstacleBuffer));
     memset(obstacleDistances, 0, sizeof(obstacleDistances));
@@ -50,17 +57,38 @@ ObstacleModule::ObstacleModule(bool arm, bool vision) : obstacleOut(base())
     obstaclesList[7] = FieldObstacles::Obstacle::WEST;
     obstaclesList[8] = FieldObstacles::Obstacle::NORTHWEST;
 
-    lastSonar = 0.f;
+    if(FILE *file = fopen(filepath.c_str(),"r")) {
+        fclose(file);
 
-    usingArms = arm;
-    usingLeftSonar = true;
-    usingRightSonar = true;
-    usingVision = vision;
-}
+        std::ifstream inputFile(filepath);
+        std::string readInFile((std::istreambuf_iterator<char>(inputFile)),
+                                std::istreambuf_iterator<char>());
 
-void ObstacleModule::setSonars(bool sonarL, bool sonarR){
-    usingLeftSonar = sonarL;
-    usingRightSonar = sonarR;
+        int i=0;
+        SExpr params = *SExpr::read(readInFile,i);
+
+        if(params.count() >= 2) {
+            std::cout<<"[INFO] Reading from SExpr"<<std::endl;
+            std::cout<<"[INFO] PATH: "<<filepath<<std::endl;
+
+            usingArms = params.find("arms")->get(1)->valueAsInt();
+            usingVision = params.find("vision")->get(1)->valueAsInt();
+            bool all_sonars = params.find("set_all_sonar")->get(1)->valueAsInt();
+
+            if (all_sonars) {
+                usingLeftSonar = params.find("all_left_sonar")->get(1)->valueAsInt();
+                usingRightSonar = params.find("all_right_sonar")->get(1)->valueAsInt();
+            } else {
+                usingLeftSonar = params.find(robotName).find("left_sonar")->get(1)->valueAsInt();
+                usingRightSonar = params.find(robotName).find("right_sonar")->get(1)->valueAsInt();
+            }
+        } else {
+            std::cout<<"[ERR] Invalid SExpr"<<std::endl;
+            std::cout<<"[ERR] Check /nbites/Config/ for them"<<std::endl;
+        }
+    } else {
+        std::cout<<"[ERR] Config files not found."<<std::endl;
+    }
 }
 
 void ObstacleModule::run_()

@@ -28,25 +28,25 @@
  * Right now the decision is made based on ARM CONTACT
  * (@see arms/ArmContactModule) and/or SONARS (from sensors) and/or
  * vision. What is used is determined by boolean constants set below.
- * Arm contact info is pretty well filtered and processed in its own module, 
- * so we trust its values straight up. Sonars aren't, so we keep a running 
- * average here and use that value instead of the unfiltered data straight 
- * from sensors. Vision is not yet reliable, so we have kept that boolean 
- * set to false. 
+ * Arm contact info is pretty well filtered and processed in its own module,
+ * so we trust its values straight up. Sonars aren't, so we keep a running
+ * average here and use that value instead of the unfiltered data straight
+ * from sensors. Vision is not yet reliable, so we have kept that boolean
+ * set to false.
  *
  * Basically, sonars catches us before we hit things, most of the time, but
  * arms tell us if we're walking into something from a direction that sonars
- * won't get. Arms can also provide backup, refinement for sonars. 
+ * won't get. Arms can also provide backup, refinement for sonars.
  *
  * In what is implemented in vision thusfar, when we decide to use it, we keep
  * a running buffer for all directions in which the robot can see, which holds
- * the closest seen obstacle in that direction. Vision has the ability to pick 
+ * the closest seen obstacle in that direction. Vision has the ability to pick
  * up multiple obstacles clearly, but this is not very tested, so we are leaving
  * vision toggled out.
  *
- * Our obstacle message, FieldObstacles (@see Obstacle.proto) has a list of 
+ * Our obstacle message, FieldObstacles (@see Obstacle.proto) has a list of
  * detected obstacles (closest in detected direction).
- * 
+ *
  * There is a lot to add to this module... but this is a basic framework.
  *      - foot bumper detection (walking into poles)
  *      - EKF sonars
@@ -57,6 +57,7 @@
 
 #include "RoboGrams.h"
 #include "NBMath.h"
+#include "../../share/logshare/SExpr.h"
 
 #include "VisionRobot.pb.h"
 #include "ArmContactState.pb.h"
@@ -65,6 +66,7 @@
 #include "Obstacle.pb.h"
 
 #include <iostream>
+#include <fstream>
 #include <list>
 
 namespace man {
@@ -100,8 +102,7 @@ class ObstacleModule : public portals::Module
 
 
 public:
-    ObstacleModule(bool arm, bool vision);
-    void setSonars(bool sonarL, bool sonarR);
+    ObstacleModule(std::string filepath, std::string robotName);
 
     portals::InPortal<messages::ArmContactState> armContactIn;
     portals::InPortal<messages::VisionObstacle> visionIn;

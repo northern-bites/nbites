@@ -1,7 +1,7 @@
 ( obstacles
 	(arms true)
 	(vision false)
-	(set_all_sonar false)
+	(set_all_sonar true)
 	(all_left_sonar true)
 	(all_right_sonar true)
 
