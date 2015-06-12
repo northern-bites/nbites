@@ -307,6 +307,7 @@ def notTurnedAround(player):
 
 # Saving transitions....
 def shouldDiveRight(player):
+
     if player.firstFrame():
         shouldDiveRight.lastFramesOff = 21
 
@@ -321,6 +322,13 @@ def shouldDiveRight(player):
 
     nball = player.brain.naiveBall
 
+    if (nball.x_vel < -10.0 and
+        not nball.stationary and
+        nball.yintercept < -20.0 and
+        ball.distance < 150.0 and
+        sightOk):
+        print "DIVE RIGHT"
+
     return (nball.x_vel < -10.0 and
         not nball.stationary and
         nball.yintercept < -20.0 and
@@ -334,6 +342,7 @@ def shouldDiveRight(player):
     #         sightOk)
 
 def shouldDiveLeft(player):
+
     if player.firstFrame():
         shouldDiveLeft.lastFramesOff = 21
 
@@ -348,6 +357,13 @@ def shouldDiveLeft(player):
 
     nball = player.brain.naiveBall
 
+    if (nball.x_vel < -10.0 and
+        not nball.stationary and
+        nball.yintercept > 20.0 and
+        ball.distance < 150.0 and
+        sightOk):
+        print "DIVE LEFT"
+
     return (nball.x_vel < -10.0 and
         not nball.stationary and
         nball.yintercept > 20.0 and
@@ -361,6 +377,7 @@ def shouldDiveLeft(player):
     #         sightOk)
 
 def shouldSquat(player):
+
     if player.firstFrame():
         shouldSquat.lastFramesOff = 21
 
@@ -375,10 +392,18 @@ def shouldSquat(player):
 
     nball = player.brain.naiveBall
 
+    if (nball.x_vel < -10.0 and
+        not nball.stationary and
+        abs(nball.yintercept) < 30.0 and
+        nball.yintercept != 0.0 and
+        ball.distance < 150.0 and
+        sightOk):
+        print "SQUAT"
+
     # Lower threshold for fast balls
     # if nball.x_vel < -30.0 and abs(nball.yintercept)
 
-    return (nball.x_vel < -15.0 and
+    return (nball.x_vel < -10.0 and
         not nball.stationary and
         abs(nball.yintercept) < 30.0 and
         nball.yintercept != 0.0 and

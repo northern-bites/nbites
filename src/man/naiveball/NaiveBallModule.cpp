@@ -139,8 +139,8 @@ void NaiveBallModule::calculateVelocity()
     BallState start_avgs = avgFrames(startIndex);
     BallState end_avgs = avgFrames(endIndex);
     float denominator = (float)NUM_FRAMES / 30.f;
-    xVelocityEst = (end_avgs.rel_x - start_avgs.rel_x) / denominator * ALPHA + xVelocityEst * (1 - ALPHA);
-    yVelocityEst = (end_avgs.rel_y - start_avgs.rel_y) / denominator * ALPHA + yVelocityEst * (1 - ALPHA);
+    xVelocityEst = (end_avgs.rel_x - start_avgs.rel_x) / denominator * ALPHA + .9*xVelocityEst * (1 - ALPHA);
+    yVelocityEst = (end_avgs.rel_y - start_avgs.rel_y) / denominator * ALPHA + .9*yVelocityEst * (1 - ALPHA);
 
     float dist = calcSumSquaresSQRT((xVelocityEst), (yVelocityEst));
     velocityEst = (dist / denominator) * ALPHA + velocityEst * (1-ALPHA);
