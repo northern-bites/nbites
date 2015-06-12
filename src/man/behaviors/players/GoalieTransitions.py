@@ -321,7 +321,7 @@ def shouldDiveRight(player):
 
     nball = player.brain.naiveBall
 
-    return (nball.x_vel < -6.0 and
+    return (nball.x_vel < -10.0 and
         not nball.stationary and
         nball.yintercept < -20.0 and
         ball.distance < 150.0 and
@@ -348,9 +348,9 @@ def shouldDiveLeft(player):
 
     nball = player.brain.naiveBall
 
-    return (nball.x_vel < -6.0 and
+    return (nball.x_vel < -10.0 and
         not nball.stationary and
-        nball.yintercept < -20.0 and
+        nball.yintercept > 20.0 and
         ball.distance < 150.0 and
         sightOk)
 
@@ -375,9 +375,13 @@ def shouldSquat(player):
 
     nball = player.brain.naiveBall
 
-    return (nball.x_vel < -4.0 and
+    # Lower threshold for fast balls
+    # if nball.x_vel < -30.0 and abs(nball.yintercept)
+
+    return (nball.x_vel < -15.0 and
         not nball.stationary and
         abs(nball.yintercept) < 30.0 and
+        nball.yintercept != 0.0 and
         ball.distance < 150.0 and
         sightOk)
 

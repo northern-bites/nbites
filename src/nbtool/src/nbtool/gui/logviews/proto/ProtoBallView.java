@@ -111,7 +111,9 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 		g.drawString("stationary: " + naiveBall.get("stationary"), 10, height + 70);
 		g.drawString("x_vel: " + naiveBall.get("x_vel"), 10, height + 90);
 		g.drawString("y_vel: " + naiveBall.get("y_vel"), 10, height + 110);
-		g.drawString("distance: " + filteredBall.get("distance"), 10, height + 130);
+		g.drawString("distance: " + filteredBall.get("distance"), 10, height + 150);
+		g.drawString("bearing: " + filteredBall.get("bearing"), 10, height + 170);
+		g.drawString("bearing_deg: " + filteredBall.get("bearing_deg"), 10, height + 190);
 
 		ArrayList<Float> dest_buf_x = (ArrayList<Float>)naiveBall.get("buf_x");
 		ArrayList<Float> dest_buf_y = (ArrayList<Float>)naiveBall.get("buf_y");

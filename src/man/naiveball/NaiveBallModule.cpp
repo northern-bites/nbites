@@ -76,7 +76,8 @@ void NaiveBallModule::run_()
         }
     }
 
-    if (velBufferFull) {
+    // if (velBufferFull) {
+    if (bufferFull) {
         calcPath();
         for (int i = 0; i < NUM_DEST; i++) {
             NaiveBall::Position* temp = naiveBallMessage.get()->add_dest_buffer();
@@ -85,7 +86,7 @@ void NaiveBallModule::run_()
         }
     }
 
-    if (checkIfStationary() == true) {
+    if (checkIfStationary() == true || stationaryOffFrameCount < STATIONARY_CHECK) {
         naiveBallMessage.get()->set_stationary(true);
         yIntercept = 0.f;
     }
@@ -147,41 +148,57 @@ void NaiveBallModule::calculateVelocity()
 
 void NaiveBallModule::calcPath()
 {
-    // float accx, accy;
-    // accx = vel_x_buffer[currentIndex] - vel_x_buffer[(currentIndex + 1) % NUM_FRAMES];
-    // accy = vel_y_buffer[currentIndex] - vel_y_buffer[(currentIndex + 1) % NUM_FRAMES];
-
-    // accx = (accx < 0.f ? accx * -FRICTION : accx * FRICTION);
-    // accy = (accy < 0.f ? accy * -FRICTION : accy * FRICTION);
-
     float t = .5;
     for (int i = 0; i < NUM_DEST; i ++) {
-        // float x = (.5)*accx*t*t + vel_x_buffer[currentIndex]*t + position_buffer[currentIndex].rel_x;
-        // float y = (.5)*accy*t*t + vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y;
-        float x = pow(.9, i) * vel_x_buffer[currentIndex]*t + position_buffer[currentIndex].rel_x;
-        float y = pow(.9, i) * vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y;
-        // float yvel = (vel_y_buffer[currentIndex] < 0.f ? vel_y_buffer[currentIndex] * -FRICTION : vel_y_buffer[currentIndex] * FRICTION);
-        // float xvel = (vel_x_buffer[currentIndex] < 0.f ? vel_x_buffer[currentIndex] * -FRICTION : vel_x_buffer[currentIndex] * FRICTION);
-        // float x = yvel*t + position_buffer[currentIndex].rel_x;
-        // float y = xvel*t + position_buffer[currentIndex].rel_y;
+        float x = pow(.9, i) * xVelocityEst*t + position_buffer[currentIndex].rel_x;
+        float y = pow(.9, i) * yVelocityEst*t + position_buffer[currentIndex].rel_y;
         dest_buffer[i] = BallState(x, y);
         t += .5;
     }
 
-    // Check if ball is coming towards robot, then calculate where it will intercept robot's ya-xis
-    if (velBufferFull && vel_x_buffer[currentIndex] < 0) {
-        // int p = (currentIndex == 0) ? NUM_FRAMES : currentIndex-1;
-        // float m = (position_buffer[currentIndex].rel_x - position_buffer[p].rel_x) / (position_buffer[currentIndex].rel_y - position_buffer[p].rel_y);
-        // float b = position_buffer[p].rel_x - m*position_buffer[p].rel_y;
-        // yIntercept = -b / m;
-
-        t = -position_buffer[currentIndex].rel_x / vel_x_buffer[currentIndex];
-        if (yIntercept == 0.f) yIntercept = vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y;
-        else yIntercept = (vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y)*ALPHA + (1-ALPHA)*(yIntercept);
-
-    } else { yIntercept = 0.f; }
+    t = -position_buffer[currentIndex].rel_x / xVelocityEst;
+    if (yIntercept == 0.f) yIntercept = yVelocityEst*t + position_buffer[currentIndex].rel_y;
+    else yIntercept = (yVelocityEst*t + position_buffer[currentIndex].rel_y)*ALPHA + (1-ALPHA)*(yIntercept);
 
 }
+
+// void NaiveBallModule::calcPath()
+// {
+//     // float accx, accy;
+//     // accx = vel_x_buffer[currentIndex] - vel_x_buffer[(currentIndex + 1) % NUM_FRAMES];
+//     // accy = vel_y_buffer[currentIndex] - vel_y_buffer[(currentIndex + 1) % NUM_FRAMES];
+
+//     // accx = (accx < 0.f ? accx * -FRICTION : accx * FRICTION);
+//     // accy = (accy < 0.f ? accy * -FRICTION : accy * FRICTION);
+
+//     float t = .5;
+//     for (int i = 0; i < NUM_DEST; i ++) {
+//         // float x = (.5)*accx*t*t + vel_x_buffer[currentIndex]*t + position_buffer[currentIndex].rel_x;
+//         // float y = (.5)*accy*t*t + vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y;
+//         float x = pow(.9, i) * vel_x_buffer[currentIndex]*t + position_buffer[currentIndex].rel_x;
+//         float y = pow(.9, i) * vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y;
+//         // float yvel = (vel_y_buffer[currentIndex] < 0.f ? vel_y_buffer[currentIndex] * -FRICTION : vel_y_buffer[currentIndex] * FRICTION);
+//         // float xvel = (vel_x_buffer[currentIndex] < 0.f ? vel_x_buffer[currentIndex] * -FRICTION : vel_x_buffer[currentIndex] * FRICTION);
+//         // float x = yvel*t + position_buffer[currentIndex].rel_x;
+//         // float y = xvel*t + position_buffer[currentIndex].rel_y;
+//         dest_buffer[i] = BallState(x, y);
+//         t += .5;
+//     }
+
+//     // Check if ball is coming towards robot, then calculate where it will intercept robot's ya-xis
+//     if (velBufferFull && vel_x_buffer[currentIndex] < 0) {
+//         // int p = (currentIndex == 0) ? NUM_FRAMES : currentIndex-1;
+//         // float m = (position_buffer[currentIndex].rel_x - position_buffer[p].rel_x) / (position_buffer[currentIndex].rel_y - position_buffer[p].rel_y);
+//         // float b = position_buffer[p].rel_x - m*position_buffer[p].rel_y;
+//         // yIntercept = -b / m;
+
+//         t = -position_buffer[currentIndex].rel_x / vel_x_buffer[currentIndex];
+//         if (yIntercept == 0.f) yIntercept = vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y;
+//         else yIntercept = (vel_y_buffer[currentIndex]*t + position_buffer[currentIndex].rel_y)*ALPHA + (1-ALPHA)*(yIntercept);
+
+//     } else { yIntercept = 0.f; }
+
+// }
 
 
 // Is in motion if checkIfStationary returns false x times in a row
