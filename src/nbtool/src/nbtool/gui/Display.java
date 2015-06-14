@@ -49,7 +49,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 				Prefs.rightSplitLoc = split2.getDividerLocation();
 				
 				Map<String, Class<? extends ViewParent>[]> lshown = new HashMap<String, Class<? extends ViewParent>[]>();
-				LogToViewUtility ltvu = UtilityManager.instanceOfLTV();
+				LogToViewUtility ltvu = UtilityManager.LogToViewUtility;
 				for (String t : NBConstants.POSSIBLE_VIEWS.keySet()) {
 					lshown.put(t, (Class<? extends ViewParent>[]) ltvu.selected(t));
 				}

@@ -2,8 +2,6 @@ package nbtool.data;
 
 import nbtool.util.NBConstants;
 
-/*TODO:  if description changes, attributes is out of date.
- * */
 public class Log {	
 	
 	public Log() {}
@@ -54,7 +52,7 @@ public class Log {
 	}
 	
 	/*
-	 * Unique number for every log found during this execution.
+	 * Unique number for every log found in this process.
 	 * */
 	private static final Object indexLock = new Object();
 	private static long class_index = 0;
@@ -79,7 +77,7 @@ public class Log {
 	public String name; 
 	
 	public static enum SOURCE {
-		DERIVED, FILE, NETWORK
+		DERIVED, FILE, NETWORK, GENERATED
 	}
 	
 	public SOURCE source;
