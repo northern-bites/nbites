@@ -34,10 +34,12 @@ public:
 
     // For use by Image nbcross func
     void setColorParams(Colors* colors, bool topCamera) { colorParams[!topCamera] = colors; }
+    void setCameraParams(CameraParams* params, bool topCamera) { cameraParams[!topCamera] = params; }
 
     // Method to convert from Lisp to Colors type
     Colors* getColorsFromLisp(nblog::SExpr* colors, int camera);
 
+    const std::string getStringFromTxtFile(std::string path);
 
 protected:
     virtual void run_();
@@ -49,6 +51,7 @@ private:
     EdgeList* edges[2];
     HoughLineList* houghLines[2];
     HoughSpace* hough[2];
+    CameraParams* cameraParams[2];
     Kinematics* kinematics[2];
     FieldHomography* homography[2];
     FieldLineList* fieldLines[2];

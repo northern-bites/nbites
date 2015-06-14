@@ -105,6 +105,9 @@ namespace nblog {
         
         //key double value for use in log_main.
         SExpr(const std::string& key, int index, int cval);
+
+        //key double value for use by CameraParameters in VisionModule.cpp
+        SExpr(const std::string& key, double roll, double pitch);
         
         /* MODIYFING AN EXISTING SEXPR (may change type)*/
         void setList(const std::vector<SExpr>& newContents);

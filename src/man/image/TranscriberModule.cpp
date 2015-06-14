@@ -648,7 +648,12 @@ void TranscriberModule::run_()
         joints.append(SExpr("r_ankle_pitch", ja_pb.r_ankle_pitch() ));
         joints.append(SExpr("r_ankle_roll", ja_pb.r_ankle_roll() ));
         contents.push_back(joints);
-        
+
+        SExpr camParams("CameraParams", "tripoint", clock(), image_index, ja_buf.length());
+        camParams.append(SExpr("top", 5.01, 10.5));
+        camParams.append(SExpr("bottom", 69.0, 96.0));
+        contents.push_back(camParams);
+
         NBLog(NBL_IMAGE_BUFFER, "tripoint",
                    contents, im_buf);
     }

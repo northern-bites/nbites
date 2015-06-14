@@ -8,6 +8,7 @@
 namespace man {
 namespace vision {
 
+
 // TODO constants and parameters
 VisionModule::VisionModule()
     : Module(),
@@ -23,30 +24,20 @@ VisionModule::VisionModule()
     //      removed in C++11
 
     // TODO: RobotPath to config folder
-    std:: string sexpPath;
+    std:: string colorPath, cameraPath;
     #ifdef OFFLINE
-        sexpPath = std::string(getenv("NBITES_DIR"));
-        sexpPath += "/src/man/config/colorParams.txt";
+        colorPath =  cameraPath = std::string(getenv("NBITES_DIR"));
+        colorPath += "/src/man/config/colorParams.txt";
+        cameraPath += "/src/man/config/cameraParams.txt";
     #else
-        sexPath = ''; // TODO
+        colorPath = ''; // TODO
+        cameraPath = ''; // TODO
     #endif
 
-    std::ifstream textFile;
-    textFile.open(sexpPath);
-
-    // Get size of file
-    textFile.seekg (0, textFile.end);
-    long size = textFile.tellg();
-    textFile.seekg(0);
-    
-    // Read file into buffer and convert to string
-    char* buff = new char[size];
-    textFile.read(buff, size);
-    std::string sexpText(buff);
-
     // Get SExpr from string
-    nblog::SExpr* colors = nblog::SExpr::read((const std::string)sexpText);
-    
+    nblog::SExpr* colors = nblog::SExpr::read(getStringFromTxtFile(colorPath));
+    nblog::SExpr* cameraParams = nblog::SExpr::read(getStringFromTxtFile(cameraPath));
+
     // Set module pointers for top then bottom images
     for (int i = 0; i < 2; i++) {
         colorParams[i] = getColorsFromLisp(colors, i);
@@ -54,6 +45,7 @@ VisionModule::VisionModule()
         edgeDetector[i] = new EdgeDetector();
         edges[i] = new EdgeList(32000);
         houghLines[i] = new HoughLineList(128);
+        cameraParams[i] = getParamsFromLisp(cameraParams);
         kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography();
         fieldLines[i] = new FieldLineList();
@@ -134,9 +126,7 @@ void VisionModule::run_()
         kinematics[i]->joints(jointsIn.message());
         homography[i]->wz0(kinematics[i]->wz0());
         homography[i]->tilt(kinematics[i]->tilt() - 3.965*TO_RAD);
-
-        std::cout << "tilt: " << kinematics[i]->tilt() << std::endl;
-        homography[i]->roll(homography[i]->roll()-2.21*TO_RAD);
+        homography[i]->roll(homography[i]->roll() - 2.21*TO_RAD);
         // homography[i]->azimuth(kinematics[i]->azimuth());
 
         // Approximate brightness gradient
@@ -179,8 +169,24 @@ void VisionModule::run_()
         std::cout << "Field lines detection: " << times[i][4] << std::endl;
         std::cout << "Field lines classification: " << times[i][5] << std::endl;
     }
-    
+}
 
+const std::string VisionModule::getStringFromTxtFile(std::string path) {
+    std::ifstream textFile;
+    textFile.open(path);
+
+    // Get size of file
+    textFile.seekg (0, textFile.end);
+    long size = textFile.tellg();
+    textFile.seekg(0);
+    
+    // Read file into buffer and convert to string
+    char* buff = new char[size];
+    textFile.read(buff, size);
+    std::string sexpText(buff);
+
+    textFile.close();
+    return (const std::string)sexpText;
 }
 
 /*
@@ -229,6 +235,14 @@ Colors* VisionModule::getColorsFromLisp(nblog::SExpr* colors, int camera) {
                      std::stof(colors->get(5)->get(1)->serialize()));
 
     return ret;
+}
+
+CameraParams* VisionModule::getCameraParamsFromLisp(nblog::SExpr cameraParams) {
+    CameraParams* ret = new CameraParams;
+
+    // Check to see which robot we are using (?) read lisp
+    ret.setRoll(4.5);
+    ret.setPitch(6.7);
 }
 
 }

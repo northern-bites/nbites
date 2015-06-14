@@ -74,6 +74,8 @@ int Vision_func() {
     module.jointsIn.setMessage(jointsMessage);
 
     // If log included color parameters in description, have module use those
+    std::cout << args[0]->tree().print() << std::endl;
+
     SExpr* params = args[0]->tree().find("Params");
     if (params != NULL) {
 

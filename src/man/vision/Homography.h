@@ -228,6 +228,18 @@ public:
   std::string print() const;
 };
 
+class CameraParams {
+  double roll;
+  double pitch;
+
+public:
+  double getRoll() { return roll; }
+  void setRoll(double r) { roll = r; }
+  double getPitch() { return pitch; }
+  void setPitch(double p) { pitch = p; }
+
+};
+
 }
 }
 
