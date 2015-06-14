@@ -72,6 +72,8 @@ public class LineView extends ViewParent implements IOFirstResponder {
 
         assert(ci.tryAddCall(cc));
 
+        System.out.printf("Log: %s\n", newlog.tree().print());
+
         originalImage = Utility.biFromLog(newlog);
     }
     
@@ -147,32 +149,33 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 x2 = (int) Math.round(x0 + 3*fcEP1 * Math.sin(fcT));
                 y2 = (int) Math.round(y0 + 3*fcEP1 * Math.cos(fcT));
 
-
-                if (y1 < 0 && y1 > -3500) {
+                // Scale down if a line is outside the view, but not if its too far (false field line)
+                if (y1 < 0 && y1 > -2500) {
                     resize = Math.min(resize, (double)fieldh/(-y1 + fieldh));
-                    if (y1 < -3500) {
-                        lines.set(i+4, -1.0);
-                    }
+                }
+                if (y2 < 0 && y2 > -2500) {
+                    resize = Math.min(resize, (double)fieldh/(-y2 + fieldh));
                 }
 
-                if (y2 < 0 && y2 > -3500) {
-                    resize = Math.min(resize, (double)fieldh/(-y1 + fieldh));
-                    if (y1 < -3500) {
-                        lines.set(i+4, -1.0);
-                    }
+                // Don't draw it if it's way out
+                if (y1 < -3500) {
+                    lines.set(i+4, -1.0);
+                }
+                if (y2 < -3500) {
+                    lines.set(i+4, -1.0);
                 }
             }
 
             // Loop through again to draw lines in field space with calucluated resize value
             for (int i = 0; i < lines.size(); i += 10) {
                 double houghIndex = lines.get(i + 4);
+
                 if (houghIndex != -1) {
                     double fieldIndex = lines.get(i + 5);
                     double fcR = lines.get(i + 6);
                     double fcT = lines.get(i + 7);
                     double fcEP0 = lines.get(i + 8);
                     double fcEP1 = lines.get(i + 9);
-
 
                     // Draw it in field coordinates
                     if (fieldIndex >= 0)
