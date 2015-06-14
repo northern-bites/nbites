@@ -84,6 +84,10 @@ public class Log {
 	
 	public SOURCE source;
 	
+	public byte[] data() {
+		return bytes;
+	}
+	
 	public SExpr tree() {
 		return tree;
 	}
