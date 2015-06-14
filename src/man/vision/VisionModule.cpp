@@ -22,14 +22,14 @@ VisionModule::VisionModule()
 
     //      removed in C++11
 
+    // TODO: RobotPath to config folder
     std:: string sexpPath;
-    // TODO: 
-    // if (on computer ) { // #ifdef offline?
+    #ifdef OFFLINE
         sexpPath = std::string(getenv("NBITES_DIR"));
         sexpPath += "/src/man/config/colorParams.txt";
-    // } else (if on robot) {
-        // Get robot path
-   // }
+    #else
+        sexPath = ''; // TODO
+    #endif
 
     std::ifstream textFile;
     textFile.open(sexpPath);
@@ -49,7 +49,6 @@ VisionModule::VisionModule()
     
     // Set module pointers for top then bottom images
     for (int i = 0; i < 2; i++) {
-        // colorParams[i] = new Colors();
         colorParams[i] = getColorsFromLisp(colors, i);
         frontEnd[i] = new ImageFrontEnd();
         edgeDetector[i] = new EdgeDetector();
@@ -60,6 +59,7 @@ VisionModule::VisionModule()
         fieldLines[i] = new FieldLineList();
         boxDetector[i] = new GoalboxDetector();
 
+        // TODO set width and height dynamically
         if (i == 0) {
           hough[i] = new HoughSpace(320, 240);
           cornerDetector[i] = new CornerDetector(320, 240);
@@ -136,7 +136,7 @@ void VisionModule::run_()
         homography[i]->tilt(kinematics[i]->tilt() - 3.965*TO_RAD);
 
         std::cout << "tilt: " << kinematics[i]->tilt() << std::endl;
-     //   homography[i]->roll(-2.21);
+        homography[i]->roll(homography[i]->roll()-2.21*TO_RAD);
         // homography[i]->azimuth(kinematics[i]->azimuth());
 
         // Approximate brightness gradient

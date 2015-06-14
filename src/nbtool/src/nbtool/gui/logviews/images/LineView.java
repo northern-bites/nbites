@@ -25,11 +25,11 @@ import nbtool.util.Utility;
 
 public class LineView extends ViewParent implements IOFirstResponder {
     
-    final int width = 320;
-    final int height = 240;
+    int width;
+    int height;
     
-    final int displayw = 640;
-    final int displayh = 480;
+    int displayw;
+    int displayh;
 
     final int fieldw = 640;
     final int fieldh = 554;
@@ -48,8 +48,8 @@ public class LineView extends ViewParent implements IOFirstResponder {
     int clickY2 = 0;
 
     // Field coordinate image upper left hand corder
-    int fx0 = displayw + buffer;
-    int fy0 = 0;
+    int fx0;
+    int fy0;
 
     // Center of field cordinate system
     int fxc = displayw + buffer + fieldw/2; 
@@ -72,7 +72,18 @@ public class LineView extends ViewParent implements IOFirstResponder {
 
         assert(ci.tryAddCall(cc));
 
-        System.out.printf("Log: %s\n", newlog.tree().print());
+        // TODO: Don't hard code SExpr paths
+        width =  newlog.tree().get(4).get(1).get(5).get(1).valueAsInt() / 2;
+        height = newlog.tree().get(4).get(1).get(6).get(1).valueAsInt() / 2;
+
+        displayw = width*2;
+        displayh = height*2;
+
+        fx0 = displayw + buffer;
+        fy0 = 0;
+
+        fxc = displayw + buffer + fieldw/2; 
+        fyc = fieldh;
 
         originalImage = Utility.biFromLog(newlog);
     }
@@ -199,12 +210,10 @@ public class LineView extends ViewParent implements IOFirstResponder {
             g.setColor(Color.black);
             if (click && clickX1 > fx0 && clickX1 < fx0+fieldw && clickY1 < fieldh) {
                 g.drawLine(fxc, fyc, clickX1, clickY1);
-                
                 double distanceCM = Math.sqrt((clickX1-fxc)*(clickX1-fxc) + (clickY1-fyc)*(clickY1-fyc));
                 distanceCM *= (1.0/3.0)*(1/resize);
-
-                g.drawString(Double.toString((double)Math.round(distanceCM* 1000)/1000) + "cm", (fxc+clickX1)/2 + 5, (fyc+clickY1)/2);
-
+                g.drawString(Double.toString((double)Math.round(distanceCM* 1000)/1000) + "cm",
+                    (fxc+clickX1)/2 + 5, (fyc+clickY1)/2);
                 click = false;
             }
 
@@ -216,8 +225,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 distanceCM *= (1.0/3.0)*(1/resize);
                 double dString = (double)Math.round(distanceCM* 1000)/1000;
                 if (dString != 0) {
-                    g.drawString(Double.toString(dString) + "cm",
-                        (clickX1+clickX2)/2 + 5, (clickY1+clickY2)/2);
+                    g.drawString(Double.toString(dString) + "cm", (clickX1+clickX2)/2 + 5, (clickY1+clickY2)/2);
                 }
                 drag = false;
 
