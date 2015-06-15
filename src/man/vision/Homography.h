@@ -233,6 +233,8 @@ class CameraParams {
   double pitch;
 
 public:
+  CameraParams() {};
+  CameraParams(double r, double p) { roll = r; pitch = p; }
   double getRoll() { return roll; }
   void setRoll(double r) { roll = r; }
   double getPitch() { return pitch; }

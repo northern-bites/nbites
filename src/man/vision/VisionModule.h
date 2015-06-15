@@ -10,8 +10,7 @@
 #include "Hough.h"
 #include "Kinematics.h"
 #include "Homography.h"
-#include "ParamReader.h"
-
+#include "InertialState.pb.h"
 
 namespace man {
 namespace vision {
@@ -24,6 +23,7 @@ public:
     portals::InPortal<messages::YUVImage> topIn;
     portals::InPortal<messages::YUVImage> bottomIn;
     portals::InPortal<messages::JointAngles> jointsIn;
+    portals::InPortal<messages::InertialState> inertsIn;
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
@@ -32,19 +32,25 @@ public:
     GoalboxDetector* getBox(bool topCamera = true) const { return boxDetector[!topCamera]; }
     CornerDetector* getCorners(bool topCamera = true) const { return cornerDetector[!topCamera]; }
 
+    void setRobotName(std::string robotName) { robotName_ = robotName; }
+
+    Colors* getColorsFromLisp(nblog::SExpr* colors, int camera);
+    const std::string getStringFromTxtFile(std::string path);
+
     // For use by Image nbcross func
     void setColorParams(Colors* colors, bool topCamera) { colorParams[!topCamera] = colors; }
     void setCameraParams(CameraParams* params, bool topCamera) { cameraParams[!topCamera] = params; }
 
-    // Method to convert from Lisp to Colors type
-    Colors* getColorsFromLisp(nblog::SExpr* colors, int camera);
-
-    const std::string getStringFromTxtFile(std::string path);
+ 
 
 protected:
     virtual void run_();
 
 private:
+
+    void logImage(int i);
+    CameraParams* getCameraParamsFromLisp(nblog::SExpr* cameraLisp, int camera);
+    
     Colors* colorParams[2];
     ImageFrontEnd* frontEnd[2];
     EdgeDetector* edgeDetector[2];
@@ -57,6 +63,9 @@ private:
     FieldLineList* fieldLines[2];
     GoalboxDetector* boxDetector[2];
     CornerDetector* cornerDetector[2];
+
+    std::string robotName_;
+    size_t image_index;
 };
 
 }

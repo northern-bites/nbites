@@ -66,8 +66,16 @@ int Vision_func() {
     portals::Message<messages::YUVImage> imageMessage(&image);
     portals::Message<messages::JointAngles> jointsMessage(&joints);
 
-    // VisionModule default constructor loads color params from Lisp in config/colorParms.txt
+
+    SExpr* robotName = args[0]->tree().find("from_address");
+    std::string rname;
+    if (robotName != NULL) {
+        rname = robotName->get(1)->value();
+    }
+    std::cout << "NAME: " << rname << std::endl;
+
     man::vision::VisionModule module;
+    module.setRobotName(rname);
 
     module.topIn.setMessage(imageMessage);
     module.bottomIn.setMessage(imageMessage);

@@ -120,6 +120,7 @@ public :
     portals::OutPortal<messages::YUVImage> imageOut;
     portals::OutPortal<messages::JointAngles> jointsOut;
     portals::OutPortal<messages::InertialState> inertsOut;
+
 protected :
     virtual void run_();
 private :

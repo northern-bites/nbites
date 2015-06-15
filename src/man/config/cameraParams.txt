@@ -1,4 +1,4 @@
-( type CameraParams
+( CameraParams
   ( (shehulk (top 123 456) (bottom 321 654))
     (batman  (top 135 246) (bottom 343 545))
   ) 
