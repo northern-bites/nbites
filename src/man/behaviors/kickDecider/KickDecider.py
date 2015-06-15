@@ -466,6 +466,7 @@ class KickDecider(object):
         if nearOurGoal:
             out = self.kickOutOfBounds()
             if out:
+                self.brain.player.kickedOut = True
                 return out
             else:
                 return None

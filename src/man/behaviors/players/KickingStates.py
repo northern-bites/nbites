@@ -28,7 +28,10 @@ def executeMotionKick(player):
                                            player.kick)
     elif player.brain.ball.vis.on: # don't update if we don't see the ball
         player.brain.nav.updateDestinationWalkDest(executeMotionKick.kickPose)
-
+    elif player.kickedOut and not player.brain.ball.vis.on:
+        player.kickedOut = False
+        return player.goNow('spinSearch')
+        
     # TODO not ideal at all!
     if player.counter > 40:
         player.inKickingState = False
@@ -65,6 +68,7 @@ def afterKick(player):
     """
     State to follow up after a kick.
     """
+    print player.kickedOut
     if player.firstFrame():
         player.stand()        # stand up right, ready to walk
         player.brain.tracker.afterKickScan(player.kick.name)
@@ -79,6 +83,9 @@ def afterKick(player):
             return player.goNow('spinToBall')
         else:        
             return player.goNow('positionForKick')
+    elif player.kickedOut:
+        player.kickedOut = False
+        return player.goNow('spinSearch')
     elif transitions.shouldChaseBall(player):
         return player.goLater('approachBall')
     else:
