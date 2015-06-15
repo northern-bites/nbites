@@ -115,9 +115,7 @@ public class DefaultView extends ViewParent implements ActionListener {
 	@Override
 	public void setLog(Log newlog) {
 		assert(newlog.bytes != null);
-		
-		System.out.println("" + newlog.bytesForContentItem(2).length);
-		
+				
 		descArea.setText(log.tree().print());		
 		if (log.bytes.length < 1000)
 			dataArea.setText(Utility.bytesToHexString(log.bytes));
