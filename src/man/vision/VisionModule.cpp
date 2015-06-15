@@ -40,7 +40,7 @@ VisionModule::VisionModule()
 
         // TODO flag
         bool fast = true;
-        frontEnd[i]->fast(false);
+        frontEnd[i]->fast(fast);
         edgeDetector[i]->fast(fast);
         hough[i]->fast(fast);
     }
@@ -61,7 +61,6 @@ VisionModule::~VisionModule()
     }
 }
 
-// TODO bug in assembly front end green image
 // TODO use horizon on top image
 void VisionModule::run_()
 {
@@ -101,10 +100,10 @@ void VisionModule::run_()
 
         // Calculate kinematics and adjust homography
         std::cout << "Top camera: " << (i == 0) << std::endl;
-        // kinematics[i]->joints(jointsIn.message());
-        // homography[i]->wz0(kinematics[i]->wz0());
-        // homography[i]->tilt(kinematics[i]->tilt());
-        // homography[i]->azimuth(kinematics[i]->azimuth());
+        kinematics[i]->joints(jointsIn.message());
+        homography[i]->wz0(kinematics[i]->wz0());
+        homography[i]->tilt(kinematics[i]->tilt());
+        homography[i]->azimuth(kinematics[i]->azimuth());
 
         // Approximate brightness gradient
         edgeDetector[i]->gradient(yImage);
@@ -133,19 +132,18 @@ void VisionModule::run_()
         times[i][5] = timer.end();
     }
 
-    for (int i = 0; i < 2; i++) {
-        if (i == 0)
-            std::cout << "From top camera:" << std::endl;
-        else
-            std::cout << std::endl << "From bottom camera:" << std::endl;
-        std::cout << "Front end: " << times[i][0] << std::endl;
-        std::cout << "Gradient: " << times[i][1] << std::endl;
-        std::cout << "Edge detection: " << times[i][2] << std::endl;
-        std::cout << "Hough: " << times[i][3] << std::endl;
-        std::cout << "Field lines detection: " << times[i][4] << std::endl;
-        std::cout << "Field lines classification: " << times[i][5] << std::endl;
-    }
-
+    // for (int i = 0; i < 2; i++) {
+    //     if (i == 0)
+    //         std::cout << "From top camera:" << std::endl;
+    //     else
+    //         std::cout << std::endl << "From bottom camera:" << std::endl;
+    //     std::cout << "Front end: " << times[i][0] << std::endl;
+    //     std::cout << "Gradient: " << times[i][1] << std::endl;
+    //     std::cout << "Edge detection: " << times[i][2] << std::endl;
+    //     std::cout << "Hough: " << times[i][3] << std::endl;
+    //     std::cout << "Field lines detection: " << times[i][4] << std::endl;
+    //     std::cout << "Field lines classification: " << times[i][5] << std::endl;
+    // }
 }
 
 }
