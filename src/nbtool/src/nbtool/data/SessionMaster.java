@@ -59,6 +59,7 @@ public final class SessionMaster implements IOFirstResponder {
 		newsess.addLog(logArray);
 		
 		sessions.add(newsess);
+		Events.GSessionAdded.generate(this, workingSession);
 		Events.GToolStatus.generate(this, STATUS.RUNNING, newsess.name);
 		Events.GLogsFound.generate(this, logArray);
 		Events.GToolStatus.generate(this, STATUS.IDLE, "idle");
@@ -83,11 +84,19 @@ public final class SessionMaster implements IOFirstResponder {
 		workingSession = new Session(null, addr);
 		
 		sessions.add(workingSession);
+		Events.GSessionAdded.generate(this, workingSession);
 		Events.GToolStatus.generate(this, STATUS.RUNNING, workingSession.name);
 		
 		Logger.log(Logger.WARN, "SessionMaster setting up stream.");
 		control = ControlIO.create(this, addr, NBConstants.CONTROL_PORT);
 		streamio = StreamIO.create(this, addr, NBConstants.STREAM_PORT);
+	}
+	
+	public synchronized Session requestSession(String title) {
+		Session requested = new Session(title);
+		sessions.add(0, requested);
+		Events.GSessionAdded.generate(this, requested);
+		return requested;
 	}
 	
 	public synchronized void stopWorkingSession() {

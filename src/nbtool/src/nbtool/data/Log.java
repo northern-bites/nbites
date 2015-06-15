@@ -1,9 +1,8 @@
 package nbtool.data;
 
 import nbtool.util.NBConstants;
+import nbtool.util.Utility;
 
-/*TODO:  if description changes, attributes is out of date.
- * */
 public class Log {	
 	
 	public Log() {}
@@ -54,7 +53,7 @@ public class Log {
 	}
 	
 	/*
-	 * Unique number for every log found during this execution.
+	 * Unique number for every log found in this process.
 	 * */
 	private static final Object indexLock = new Object();
 	private static long class_index = 0;
@@ -79,10 +78,15 @@ public class Log {
 	public String name; 
 	
 	public static enum SOURCE {
-		DERIVED, FILE, NETWORK
+		DERIVED, FILE, NETWORK, GENERATED
 	}
 	
 	public SOURCE source;
+	public Session parent;
+	
+	public byte[] data() {
+		return bytes;
+	}
 	
 	public SExpr tree() {
 		return tree;
@@ -245,6 +249,15 @@ public class Log {
 		}
 		
 		return offset;
+	}
+	
+	public byte[] bytesForContentItem(int index) {
+		Integer offset = contentOffset(index);
+		Integer total = contentNumBytes(index);
+		if (offset == null || total == null)
+			return null;
+		
+		return Utility.subArray(bytes, offset, total);
 	}
 	
 	//TESTING

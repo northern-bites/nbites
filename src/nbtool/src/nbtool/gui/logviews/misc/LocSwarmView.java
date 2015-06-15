@@ -5,6 +5,10 @@ import java.awt.*;
 import java.awt.geom.*;
 import javax.swing.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import com.google.protobuf.Message;
 
 import messages.RobotLocationOuterClass.*;
@@ -32,11 +36,24 @@ public class LocSwarmView extends ViewParent {
 		SExpr location = logSExpressed.find("contents").get(1);
 		SExpr swarm = logSExpressed.find("contents").get(2);
 
-		float naoX  = location.get(5).get(1).valueAsFloat();
-		float naoY = location.get(6).get(1).valueAsFloat();
+		String locStr = location.get(1).serialize();
+		InputStream locStream = new ByteArrayInputStream(locStr.getBytes());
 
-		dPane.nao.moveTo(naoX,naoY);
+		RobotLocation naoLoc;
+		float naoX;
+		float naoY;
+		try {
+			naoLoc = RobotLocation.parseFrom(locStream);
+			naoX = naoLoc.getX();
+			naoY = naoLoc.getY();
+			dPane.nao.moveTo(naoX,naoY);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		//ParticleSwarm naoSwarm = swarm.get(1);
 
+		//float naoX  = location.get(5).get(1).valueAsFloat();
+		//float naoY = location.get(6).get(1).valueAsFloat();
 	}
 
 	public LocSwarmView() {
