@@ -92,11 +92,11 @@ namespace nblog {
     _value("")
     {
         _list = {
-            SExpr("type", type),
-            SExpr("from", from),
-            SExpr("when", (long) created),
-            SExpr("iindex", (long) image_index),
-            SExpr("nbytes", (long) nbytes)
+            SExpr(CONTENT_TYPE_S, type),
+            SExpr(CONTENT_FROM_S, from),
+            SExpr(CONTENT_WHEN_S, (long) created),
+            SExpr(CONTENT_IINDEX_S, (long) image_index),
+            SExpr(CONTENT_NBYTES_S, (long) nbytes)
         };
     }
     

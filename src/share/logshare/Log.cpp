@@ -22,7 +22,7 @@ namespace nblog {
     
     Log Log::ofTypeWithFields(const std::string type, const std::string data, std::initializer_list<SExpr> fields) {
         std::vector<SExpr> scv = {
-            SExpr("type", type)
+            SExpr(CONTENT_TYPE_S, type)
         };
         
         for (auto it = fields.begin();
@@ -34,13 +34,13 @@ namespace nblog {
         SExpr sc(scv);
         
         std::vector<SExpr> contv = {
-            SExpr("contents"),
+            SExpr(LOG_CONTENTS_S),
             sc
         };
         SExpr contents(contv);
         
         std::vector<SExpr> tv = {
-            SExpr("nblog"),
+            SExpr(LOG_FIRST_ATOM_S),
             contents
         };
         
@@ -55,7 +55,7 @@ namespace nblog {
     
     Log Log::withContentItems(std::initializer_list<SExpr> items, const std::string data) {
         std::vector<SExpr> contv = {
-            SExpr("contents"),
+            SExpr(LOG_CONTENTS_S),
         };
         
         for (auto it = items.begin();
@@ -68,7 +68,7 @@ namespace nblog {
         SExpr contents(contv);
         
         std::vector<SExpr> tv = {
-            SExpr("nblog"),
+            SExpr(LOG_FIRST_ATOM_S),
             contents
         };
         
@@ -106,30 +106,30 @@ namespace nblog {
         std::string time(buffer);
         
         std::vector<SExpr> made_list = {
-            SExpr("created"),
+            SExpr(LOG_CREATED_S),
             SExpr(where_made),
             SExpr(time)
         };
         
         std::vector<SExpr> clist = {
-            SExpr("contents")
+            SExpr(LOG_CONTENTS_S)
         };
         clist.insert(clist.end(), contents_list.begin(), contents_list.end());
         
         std::vector<SExpr> keys = {
             SExpr(log_class),           //atom
             SExpr(made_list),           //list
-            SExpr("version", version),  //key-value list
-            SExpr("checksum", cs),      //key-value list
+            SExpr(LOG_VERSION_S, version),  //key-value list
+            SExpr(LOG_CHECKSUM_S, cs),      //key-value list
             SExpr(clist)                //list, first is "contents" atom
         };
         
         if (HOST_TYPE == V5ROBOT) {
-            keys.push_back(SExpr("host_type", "V5ROBOT"));
+            keys.push_back(SExpr(LOG_HOST_TYPE_S, "V5ROBOT"));
         } else if (HOST_TYPE == V4ROBOT) {
-            keys.push_back(SExpr("host_type", "V4ROBOT"));
+            keys.push_back(SExpr(LOG_HOST_TYPE_S, "V4ROBOT"));
         } else {
-            keys.push_back(SExpr("host_type", "unknown"));
+            keys.push_back(SExpr(LOG_HOST_TYPE_S, "unknown"));
         }
         
         _tree = SExpr(keys);
