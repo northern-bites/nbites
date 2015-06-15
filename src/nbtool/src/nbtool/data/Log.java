@@ -1,6 +1,7 @@
 package nbtool.data;
 
 import nbtool.util.NBConstants;
+import nbtool.util.Utility;
 
 public class Log {	
 	
@@ -248,6 +249,15 @@ public class Log {
 		}
 		
 		return offset;
+	}
+	
+	public byte[] bytesForContentItem(int index) {
+		Integer offset = contentOffset(index);
+		Integer total = contentNumBytes(index);
+		if (offset == null || total == null)
+			return null;
+		
+		return Utility.subArray(bytes, offset, total);
 	}
 	
 	//TESTING
