@@ -15,16 +15,20 @@ class Ball;
 
 class BallDetector {
 public:
-    BallDetector(const FieldHomography& homography_);
+    BallDetector(FieldHomography& homography_, bool topCamera);
     ~BallDetector();
 
     void findBall(ImageLiteU8 orange);
 
     int ballOn;
 
+
+    // For tool
+    const std::vector<Ball>& getBalls() const { return candidates; }
 private:
     Connectivity blobber;
-    const FieldHomography homography;
+    FieldHomography homography;
+    bool topCamera;
 
     std::vector<Ball> candidates;
     //Ball makeBall(Blob b, bool occluded);
@@ -40,10 +44,13 @@ private:
 
 class Ball {
 public:
-    Ball(const Blob& b, double x_, double y_, int imgHeight_);
+    Ball(Blob& b, double x_, double y_, int imgHeight_);
 
     double confidence() const { return _confidence; }
-private:
+
+    // For tool
+    Blob& getBlob() { return blob; }
+//private: should be private. leaving public for now
     void compute();
 
     double pixDiameterFromDist(double d) const;
@@ -52,6 +59,7 @@ private:
     double x_rel;
     double y_rel;
     int imgHeight;
+    double expectedDiam;
 
     double _confidence;
 };

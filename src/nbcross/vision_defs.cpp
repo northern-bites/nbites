@@ -21,6 +21,8 @@ man::vision::Colors* getColorsFromSExpr(SExpr* params);
 void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top);
 SExpr getSExprFromSavedParams(int color, std::string sexpPath, bool top);
 std::string getSExprStringFromColorJSonNode(boost::property_tree::ptree tree);
+SExpr treeFromBall(man::vision::Ball& b);
+SExpr treeFromBlob(man::vision::Blob& b);
 
 int Vision_func() {
     assert(args.size() == 1);
@@ -32,7 +34,6 @@ int Vision_func() {
     uint8_t buf[length];
     memcpy(buf, copy->data().data(), length);
 
-//<<<<<<< HEAD
     // Parse YUVImage S-expression
     bool topCamera = copy->tree().find("contents")->get(1)->
                                   find("from")->get(1)->value() == "camera_TOP";
@@ -47,23 +48,12 @@ int Vision_func() {
         numBytes[i] = atoi(copy->tree().find("contents")->get(i+1)->
                                         find("nbytes")->get(1)->value().c_str());
     uint8_t* ptToJoints = buf + (numBytes[0] + numBytes[1]);
-    
-    // Create messages
-//=======
-    // Determine if we are looking at a top or bottom image from log description
-    // bool top;
-    // top = copy->description().find("from camera_TOP") != std::string::npos;
-    // std::cout << top << std::endl;
-
-    // int width = 2*640;
-    // int height = 480;
 
     // Location of lisp text file with color params
     std::string sexpPath = std::string(getenv("NBITES_DIR"));
     sexpPath += "/src/man/config/colorParams.txt";
     
     // Empty messages to pass to Vision Module so it doesn't freak
-//>>>>>>> evan/frontEnd_asm_fix
     messages::YUVImage image(buf, width, height, width);
     messages::JointAngles joints;
     joints.ParseFromArray((void *) ptToJoints, numBytes[2]);
@@ -77,12 +67,8 @@ int Vision_func() {
 
     module.topIn.setMessage(imageMessage);
     module.bottomIn.setMessage(imageMessage);
-//<<<<<<< HEAD
     module.jointsIn.setMessage(jointsMessage);
-//=======
-//    module.jointsIn.setMessage(emptyJointsMessage);
-//    module.inertialsIn.setMessage(emptyInertialsMessage);
-    
+
     // If log included color parameters in description, have module use those
     SExpr* params = args[0]->tree().find("Params");
     if (params != NULL) {
@@ -100,7 +86,6 @@ int Vision_func() {
     }
 
     module.run();
-//>>>>>>> evan/frontEnd_asm_fix
 
     // Run and retrieve front end from vision module
     //man::vision::ImageFrontEnd* frontEnd = module.runAndGetFrontEnd(topCamera);
@@ -108,10 +93,7 @@ int Vision_func() {
     // -----------
     //   Y IMAGE
     // -----------
-//<<<<<<< HEAD
-        man::vision::ImageFrontEnd* frontEnd = module.getFrontEnd(topCamera);
-//=======
-//>>>>>>> evan/frontEnd_asm_fix
+    man::vision::ImageFrontEnd* frontEnd = module.getFrontEnd(topCamera);
 
     Log* yRet = new Log();
     int yLength = 240*320*2;
@@ -230,7 +212,7 @@ int Vision_func() {
     Log* lineRet = new Log();
     std::string lineBuf;
 
-    std::cout << std::endl << "In image coordinates:" << std::endl;
+    //std::cout << std::endl << "In image coordinates:" << std::endl;
     int i = 0;
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
@@ -253,14 +235,14 @@ int Vision_func() {
         lineBuf.append((const char*) &ep1, sizeof(double));
         lineBuf.append((const char*) &lineIndex, sizeof(int));
 
-        std::cout << i++ << ", " << line.print() << std::endl;
+        //std::cout << i++ << ", " << line.print() << std::endl;
     }
 
-    std::cout << std::endl << "In field coordinates:" << std::endl;
+    //std::cout << std::endl << "In field coordinates:" << std::endl;
     i = 0;
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
-        std::cout << i++ << ", " << line.field().print() << std::endl;
+        //std::cout << i++ << ", " << line.field().print() << std::endl;
     }
 
     lineRet->setData(lineBuf);
@@ -269,8 +251,22 @@ int Vision_func() {
     //-----------
     //  BALL
     //-----------
-
     man::vision::BallDetector* detector = module.getBallDetector(topCamera);
+
+    Log* ballRet = new Log();
+    std::vector<man::vision::Ball> balls = detector->getBalls();
+
+    SExpr allBalls;
+    int count=0;
+    for (auto i=balls.begin(); i!=balls.end(); i++) {
+        SExpr ballTree = treeFromBall(*i);
+        SExpr next = SExpr::keyValue("ball" + std::to_string(count), ballTree);
+        allBalls.append(next);
+        count++;
+    }
+
+    ballRet->setTree(allBalls);
+    rets.push_back(ballRet);
 
     return 0;
 }
@@ -370,22 +366,54 @@ SExpr getSExprFromSavedParams(int color, std::string sexpPath, bool top) {
     // Point to required set of 6 params
     if (top)
         savedSExpr = savedSExpr->get(1)->find("Top");
-    else 
+    else
         savedSExpr = savedSExpr->get(1)->find("Bottom");
-    
+
     if (color == 0)                                         // White
         savedSExpr = savedSExpr->get(1)->find("White");
     else if (color == 1)                                    // Green
         savedSExpr = savedSExpr->get(1)->find("Green");
     else                                                    // Orange
-        savedSExpr = savedSExpr->get(1)->find("Orange");    
-    
+        savedSExpr = savedSExpr->get(1)->find("Orange");
+
 
     // Build SExpr from params
-    std::vector<SExpr> atoms; 
+    std::vector<SExpr> atoms;
     for (SExpr s : *(savedSExpr->getList()))
         atoms.push_back(s);
 
     return SExpr(atoms);
 }
 
+SExpr treeFromBall(man::vision::Ball& b)
+{
+    SExpr x(b.x_rel);
+    SExpr y(b.y_rel);
+    SExpr p = SExpr::list({x, y});
+    SExpr bl = treeFromBlob(b.getBlob());
+
+    SExpr rel = SExpr::keyValue("rel", p);
+    SExpr blob = SExpr::keyValue("blob", bl);
+    SExpr exDiam = SExpr::keyValue("expectedDiam", b.expectedDiam);
+    SExpr toRet = SExpr::list({rel, blob, exDiam});
+
+    return toRet;
+}
+
+SExpr treeFromBlob(man::vision::Blob& b)
+{
+    SExpr x(b.centerX());
+    SExpr y(b.centerY());
+    SExpr p = SExpr::list({x, y});
+
+    SExpr center = SExpr::keyValue("center", p);
+    SExpr area = SExpr::keyValue("area", b.area());
+    SExpr count = SExpr::keyValue("count", b.count());
+    SExpr len1 = SExpr::keyValue("len1", b.firstPrincipalLength());
+    SExpr len2 = SExpr::keyValue("len2", b.secondPrincipalLength());
+    SExpr ang1 = SExpr::keyValue("ang1", b.firstPrincipalAngle());
+    SExpr ang2 = SExpr::keyValue("ang2", b.secondPrincipalAngle());
+    SExpr toRet = SExpr::list({center, area, count, len1, len2, ang1, ang2});
+
+    return toRet;
+}

@@ -11,12 +11,12 @@ const double VERT_FOV_RAD = 47.64 * M_PI / 180;
 namespace man {
 namespace vision {
 
-BallDetector::BallDetector(const FieldHomography& homography_):
+BallDetector::BallDetector(FieldHomography& homography_, bool topCamera_):
     ballOn(0),
     blobber(),
-    homography(homography_)
+    homography(homography_),
+    topCamera(topCamera_)
 {
-
 }
 
 BallDetector::~BallDetector() { }
@@ -25,19 +25,41 @@ void BallDetector::findBall(ImageLiteU8 orange)
 {
     blobber.run(orange.pixelAddr(), orange.width(), orange.height(), orange.width());
 
-    // TODO: Sort blobber list by size
+    if (topCamera) std::cout << "Top camera ";
+    else std::cout << "Bottom camera ";
 
+    double prevFLen = homography.flen();
+    homography.flen(prevFLen/2);
+    std::cout << " found this many blobs: " << blobber.blobs.size() << std::endl;
+    // TODO: Sort blobber list by size
     for (auto i=blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
         double x_rel, y_rel;
-        bool belowHoriz = homography.fieldCoords((*i).centerX(), (*i).centerY(),
-                                                 x_rel, y_rel);
+
+        double ix0 = homography.ix0();
+        double iy0 = homography.iy0();
+
+
+        // blob image x & y. Scale by 2 since orange is downsized image
+        // double bIX = ((*i).centerX() - orange.width()/2);// * 2;
+        // double bIY = (orange.height()  - (*i).centerY() + (*i).firstPrincipalLength()) * 2;
+
+        double bIX = ((*i).centerX() - orange.width()/2);
+        double bIY = (orange.height() / 2 - (*i).centerY());// - (*i).firstPrincipalLength());
+        printf("bix: %f, biy: %f\n", bIX, bIY);
+
+        bool belowHoriz = homography.fieldCoords(bIX, bIY, x_rel, y_rel);
 
         // This blob is above the horizon. Can't be a ball
-        if (!belowHoriz) continue;
+        if (!belowHoriz) {
+            std::cout << "BLOB's above horizon:" << std::endl;
+            continue;// TODO. Homography seems to be messed up
+        }
 
         Ball b((*i), x_rel, y_rel, orange.height());
         candidates.push_back(b);
     }
+
+    homography.flen(prevFLen);
 }
 
 //void BallDetector::findBall() {
@@ -249,33 +271,48 @@ void BallDetector::findBall(ImageLiteU8 orange)
 // }
 
 
-Ball::Ball(const Blob& b, double x_, double y_, int imgHeight_) :
+Ball::Ball(Blob& b, double x_, double y_, int imgHeight_) :
     blob(b),
     x_rel(x_),
     y_rel(y_),
     imgHeight(imgHeight_),
     _confidence(-1)
 {
-
+    std::cout << "Ball constructor" << std::endl;
+    compute();
 }
 
 void Ball::compute()
 {
+    std::cout << "BALL::compute()" << std::endl;
+    printf("\tRelPos: (%f, %f)\n", x_rel, y_rel);
+    double hdist = hypot(x_rel, y_rel);
+    std::cout << "\tHomographyDist is: " << hdist << std::endl;
     double density = blob.area() / blob.count();
+    std::cout << "\tdensity is: " << density << std::endl;
+    std::cout << "\tand count : " << blob.count() << std::endl;
+    std::cout << "\tlocated: (" << blob.centerX() << ", " << blob.centerY()
+              << ")" << std::endl;
     double aspectRatio = (blob.secondPrincipalLength() /
                           blob.firstPrincipalLength());
-
+    std::cout << "\taspectR is: " << aspectRatio << std::endl;
+    std::cout << "\tbecause second: " << blob.secondPrincipalLength() <<
+        " and first: " << blob.firstPrincipalLength() << std::endl;
     // Distance as estimated by homography in CM
-    double hdist = hypot(x_rel, y_rel);
 
-    double expectedDiam = pixDiameterFromDist(hdist);
+
+    std::cout << "\thomography dist: " << hdist << std::endl;
+
+    expectedDiam = pixDiameterFromDist(hdist);
+
+    std::cout << "\texpect ball to be this many pix: " << expectedDiam << std::endl;
 }
 
 // The expected diameter of ball in image at distance d in CM
 double Ball::pixDiameterFromDist(double d) const
 {
     double trig = tan(VERT_FOV_RAD / 2.0);
-    return imgHeight * BALL_RADIUS / (2.0 * trig);
+    return imgHeight * BALL_RADIUS / (2.0 * d * trig);
 }
 
 // double BallDetector::distanceFromRadius(double rad) {

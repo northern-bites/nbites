@@ -33,7 +33,6 @@ VisionModule::VisionModule()
 #else
     sexpPath = "/home/nao/nbites/Config"; // TODO check this
 #endif
-
     std::ifstream textFile;
     textFile.open(sexpPath.c_str());
 
@@ -49,7 +48,6 @@ VisionModule::VisionModule()
 
     // Get SExpr from string
     colors = *nblog::SExpr::read((const std::string)sexpText);
-
     // Set module pointers for top then bottom images
     for (int i = 0; i < 2; i++) {
         colorParams[i] = getColorsFromLisp(i == 0);
@@ -61,7 +59,7 @@ VisionModule::VisionModule()
         kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography(i == 0);
         fieldLines[i] = new FieldLineList();
-        ballDetector[i] = new BallDetector(*homography[i]);
+        ballDetector[i] = new BallDetector(*homography[i], i == 0);
 
         // TODO flag
         bool fast = true;
@@ -126,7 +124,7 @@ void VisionModule::run_()
         times[i][0] = timer.end();
 
         // Calculate kinematics and adjust homography
-        std::cout << "Top camera: " << (i == 0) << std::endl;
+        //std::cout << "Top camera: " << (i == 0) << std::endl;
         kinematics[i]->joints(jointsIn.message());
         homography[i]->wz0(kinematics[i]->wz0());
         homography[i]->tilt(kinematics[i]->tilt());
@@ -134,7 +132,7 @@ void VisionModule::run_()
 
         // Approximate brightness gradient
         edgeDetector[i]->gradient(yImage);
-        
+
         times[i][1] = timer.end();
 
         // Run edge detection
@@ -159,6 +157,7 @@ void VisionModule::run_()
     }
 
     for (int i = 0; i < 2; i++) {
+        break;
         if (i == 0)
             std::cout << "From top camera:" << std::endl;
         else
@@ -213,28 +212,28 @@ Colors* VisionModule::getColorsFromLisp(bool top) {
 
     nblog::SExpr* color = params->get(0)->get(1);
 
-    ret->white.load(std::stof(params->get(0)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(1)->serialize()),
-                    std::stof(params->get(2)->get(1)->serialize()),
-                    std::stof(params->get(3)->get(1)->serialize()),
-                    std::stof(params->get(4)->get(1)->serialize()),
-                    std::stof(params->get(5)->get(1)->serialize()));
+    ret->white.load(std::stof(color->get(0)->get(1)->serialize()),
+                    std::stof(color->get(1)->get(1)->serialize()),
+                    std::stof(color->get(2)->get(1)->serialize()),
+                    std::stof(color->get(3)->get(1)->serialize()),
+                    std::stof(color->get(4)->get(1)->serialize()),
+                    std::stof(color->get(5)->get(1)->serialize()));
 
     color = params->get(1)->get(1);
-    ret->green.load(std::stof(params->get(0)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(1)->serialize()),
-                    std::stof(params->get(2)->get(1)->serialize()),
-                    std::stof(params->get(3)->get(1)->serialize()),
-                    std::stof(params->get(4)->get(1)->serialize()),
-                    std::stof(params->get(5)->get(1)->serialize()));
+    ret->green.load(std::stof(color->get(0)->get(1)->serialize()),
+                    std::stof(color->get(1)->get(1)->serialize()),
+                    std::stof(color->get(2)->get(1)->serialize()),
+                    std::stof(color->get(3)->get(1)->serialize()),
+                    std::stof(color->get(4)->get(1)->serialize()),
+                    std::stof(color->get(5)->get(1)->serialize()));
 
     color = params->get(2)->get(1);
-    ret->orange.load(std::stof(params->get(0)->get(1)->serialize()),
-                     std::stof(params->get(1)->get(1)->serialize()),
-                     std::stof(params->get(2)->get(1)->serialize()),
-                     std::stof(params->get(3)->get(1)->serialize()),
-                     std::stof(params->get(4)->get(1)->serialize()),
-                     std::stof(params->get(5)->get(1)->serialize()));
+    ret->orange.load(std::stof(color->get(0)->get(1)->serialize()),
+                     std::stof(color->get(1)->get(1)->serialize()),
+                     std::stof(color->get(2)->get(1)->serialize()),
+                     std::stof(color->get(3)->get(1)->serialize()),
+                     std::stof(color->get(4)->get(1)->serialize()),
+                     std::stof(color->get(5)->get(1)->serialize()));
 
     return ret;
 }
