@@ -12,7 +12,8 @@ import java.io.InputStream;
 import com.google.protobuf.Message;
 
 import messages.RobotLocationOuterClass.*;
-import messages.ParticleSwarmOuterClass.*;
+import messages.ParticleSwarmOuterClass.ParticleSwarm;
+import messages.ParticleSwarmOuterClass.Particle;
 
 import nbtool.data.Log;
 import nbtool.data.SExpr;
@@ -28,32 +29,30 @@ public class LocSwarmView extends ViewParent {
 	private JScrollPane sp;
 	private DrawPane dPane;
 
-
 	public void setLog(Log newlog) {
 		log = newlog;
-		SExpr logSExpressed = log.tree();
-
-		SExpr location = logSExpressed.find("contents").get(1);
-		SExpr swarm = logSExpressed.find("contents").get(2);
-
-		String locStr = location.get(1).serialize();
-		InputStream locStream = new ByteArrayInputStream(locStr.getBytes());
 
 		RobotLocation naoLoc;
+		ParticleSwarm naoSwarm;
+
 		float naoX;
 		float naoY;
+
 		try {
-			naoLoc = RobotLocation.parseFrom(locStream);
+			naoLoc = RobotLocation.parseFrom(log.bytesForContentItem(0));
 			naoX = naoLoc.getX();
 			naoY = naoLoc.getY();
-			dPane.nao.moveTo(naoX,naoY);
+			System.out.println("X and Y: "+naoX+", "+naoY);
+			dPane.naoPlayer.moveTo(naoX,naoY);
+
+			naoSwarm = ParticleSwarm.parseFrom(log.bytesForContentItem(1));
+			for(int i=0; i<naoSwarm.getParticleCount(); i++) {
+				RobotLocation currentNao = naoSwarm.getParticle(i).getLoc();
+				dPane.naoParticles[i].moveTo(currentNao.getX(),currentNao.getY());
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-		//ParticleSwarm naoSwarm = swarm.get(1);
-
-		//float naoX  = location.get(5).get(1).valueAsFloat();
-		//float naoY = location.get(6).get(1).valueAsFloat();
 	}
 
 	public LocSwarmView() {
@@ -79,30 +78,32 @@ public class LocSwarmView extends ViewParent {
 
 	private class DrawPane extends JPanel {
 		public Field f;
-		public NaoRobot nao;
-		public Particle p;
+		public NaoRobot naoPlayer;
+		public NaoParticle naoParticles[] = new NaoParticle[300];
 
 		public DrawPane() {
 			super();
 			f = new Field();
-			nao = new NaoRobot();
+			naoPlayer = new NaoRobot();
+			for(int i=0; i<naoParticles.length; i++) {
+				naoParticles[i] = new NaoParticle();
+			}
 		}
-
 		@Override
 		public void paintComponent(Graphics g) {
 			Graphics2D g2 = (Graphics2D) g;
 			f.drawField(g2);
-			nao.drawNao(g2);
+			naoPlayer.drawNao(g2);
+			for(int i=0; i<naoParticles.length; i++) {
+				naoParticles[i].drawParticle(g2);
+			}
 		}
-
 	}
-
-
 }
 
 class Field {
 	private static final long serialVersionUID = 1L;
-	//dimensions
+
 	public static final Dimension fieldDimension = new Dimension((int)FieldConstants.FIELD_WIDTH,(int)FieldConstants.FIELD_HEIGHT);
 	
     public static final int lineWidth = (int) FieldConstants.LINE_WIDTH;
@@ -145,14 +146,13 @@ class Field {
         //right penalty mark
         g2.fillRect(FieldConstants.RIGHT_PENALTY_MARK_X, fieldDimension.height/2, FieldConstants.PENALTY_MARK_WIDTH, FieldConstants.PENALTY_MARK_HEIGHT);
         g2.fillRect(FieldConstants.RIGHT_PENALTY_MARK_X-FieldConstants.PENALTY_MARK_WIDTH, fieldDimension.height/2+FieldConstants.PENALTY_MARK_WIDTH, 
-        		FieldConstants.PENALTY_MARK_HEIGHT, FieldConstants.PENALTY_MARK_WIDTH);
-        
+        		FieldConstants.PENALTY_MARK_HEIGHT, FieldConstants.PENALTY_MARK_WIDTH);        
     }
 }
 
 abstract class FieldObject {
 	protected float x,y,h,radius;
-	protected Color color;
+	protected Color naoColor;
 	
 	public FieldObject() {
 		x = 0.0f;
@@ -175,12 +175,12 @@ abstract class FieldObject {
 	
 	protected void FieldObject() {
 		radius = 40.0f;
-		color = Color.CYAN;
+		naoColor = Color.CYAN;
 	}
 
 	protected void setRadiusAndColor() {
 		radius = 40.0f;
-		color = Color.CYAN;
+		naoColor = Color.CYAN;
 	}
 	
 	public void moveTo(float xCoord, float yCoord) {
@@ -189,13 +189,14 @@ abstract class FieldObject {
 	}
 	
 	public void drawNao(Graphics2D g2) {
-		g2.setColor(color);
-		g2.fill(new Ellipse2D.Float(FieldConstants.GREEN_PAD_X+x-7, FieldConstants.GREEN_PAD_Y+y-7, 15.f, 15.f));
+		g2.setColor(naoColor);
+		g2.fill(new Ellipse2D.Float(x-7, FieldConstants.FIELD_HEIGHT-y-7, 15.f, 15.f));
 	}
 
 	public void drawParticle(Graphics2D g2) {
-		g2.setColor(color);
-		g2.fill(new Ellipse2D.Float(FieldConstants.GREEN_PAD_X+x-1, FieldConstants.GREEN_PAD_Y+y-1, 2.f, 2.f));
+		//want color based on particle weight
+		g2.setColor(Color.red);
+		g2.fill(new Ellipse2D.Float(x-1, FieldConstants.FIELD_HEIGHT-y-1, 2.f, 2.f));
 	}
 	
 	public float getX() { return x; }
@@ -214,7 +215,7 @@ class NaoRobot extends FieldObject {
 
 	public void setRadiusAndColor() {
 		radius = naoRobotSize;
-		color = Color.cyan;
+		naoColor = Color.cyan;
 	}
 
 	public void moveTo(float xCoord, float yCoord) {
@@ -222,18 +223,18 @@ class NaoRobot extends FieldObject {
 	}
 }
 
-class Particle extends FieldObject {
+class NaoParticle extends FieldObject {
 	private final static float particleSize = 2.f;
 
-	public Particle() { super(); }
+	public NaoParticle() { super(); }
 
-	Particle(float xCoord, float yCoord) {
+	NaoParticle(float xCoord, float yCoord) {
 		super(xCoord, yCoord);
 	}
 
 	public void setRadiusAndColor() {
 		radius = particleSize;
-		color = Color.red;
+		naoColor = Color.red;
 	}
 
 	public void moveTo(float xCoord, float yCoord) {

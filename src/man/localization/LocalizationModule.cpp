@@ -64,9 +64,10 @@ void LocalizationModule::update()
     // Update the locMessage and the swarm (if logging)
     portals::Message<messages::RobotLocation> locMessage(&particleFilter->
                                                          getCurrentEstimate());
-#if defined( LOG_LOCALIZATION) || defined(OFFLINE)
+#if defined(LOG_LOCALIZATION) || defined(OFFLINE)
     portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
                                                            getCurrentSwarm());
+    std::cout<<"SETTING SWARM MESSAGE"<<std::endl;
     particleOutput.setMessage(swarmMessage);
 #endif
 
@@ -76,6 +77,10 @@ void LocalizationModule::update()
     if(control::flags[control::LOCALIZATION]) {
         ++log_index;
         std::string log_from = "loc";
+
+        portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
+                                                           getCurrentSwarm());
+        particleOutput.setMessage(swarmMessage);
 
         messages::RobotLocation rl = *output.getMessage(true).get();
         messages::ParticleSwarm ps = *particleOutput.getMessage(true).get();
@@ -87,24 +92,22 @@ void LocalizationModule::update()
         rl.SerializeToString(&rl_buf);
         ps.SerializeToString(&ps_buf);
 
+        if(ps_buf.empty()) {
+            std::cout<<"PS EMPTY"<<std::endl;
+        } else {
+            std::cout<<"PS FULL"<<std::endl;
+        }
+
         log_buf.append(rl_buf);
         log_buf.append(ps_buf);
 
         std::vector<SExpr> contents;
 
         SExpr naoLocation("location", log_from, clock(), log_index, rl_buf.length());
-        naoLocation.append(SExpr("locProto",rl_buf));
-        //naoLocation.append(SExpr("x",rl.x()));
-        //naoLocation.append(SExpr("y",rl.y()));
-        //naoLocation.append(SExpr("h",rl.h()));
-
-        std::cout<<"[DEBUG] LOCATION"<<std::endl;
-        std::cout<<naoLocation.print()<<std::endl;
 
         contents.push_back(naoLocation);
 
         SExpr naoSwarm("swarm",log_from,clock(),log_index,ps_buf.length());
-        naoSwarm.append(SExpr("partProto",ps_buf));
 
         std::cout<<"[DEBUG] SWARM"<<std::endl;
         std::cout<<naoSwarm.print()<<std::endl;
