@@ -44,7 +44,7 @@ class FieldHomography
   void compute() const { ((FieldHomography*)this)->compute(); }
 
 public:
-  // Construct with default values;
+  // Construct with default values
   FieldHomography(bool topCamera = true);
 
   // Image coordinates of optical axis, relative to the center of the image
@@ -110,10 +110,6 @@ public:
   // Same as above, but for lines known to be parallel in world coordinates.
   bool visualTiltParallel(const GeoLine& a, const GeoLine& b, double& tilt,
                           std::string* diagnostics) const;
-
-  // Calibrate tilt and roll using "star target". If successful returns true and
-  // updates tilt and roll.
-  bool calibrateFromStar(const FieldLineList& lines);
 };
 
 // ********************

@@ -20,12 +20,6 @@ VisionModule::VisionModule()
       bottomIn(),
       jointsIn()
 {
-    // NOTE constructed on heap because some of the objects below do
-    //      not have default constructors, all class members must be initialized
-    //      after the initializer list is run, which requires calling default
-    //      constructors in the case of C-style arrays, limitation theoretically
-    //      removed in C++11
-
     std:: string sexpPath;
 #ifdef OFFLINE
     sexpPath = std::string(getenv("NBITES_DIR"));
@@ -48,18 +42,32 @@ VisionModule::VisionModule()
 
     // Get SExpr from string
     colors = *nblog::SExpr::read((const std::string)sexpText);
+
     // Set module pointers for top then bottom images
+    // NOTE Constructed on heap because some of the objects below do
+    //      not have default constructors, all class members must be initialized
+    //      after the initializer list is run, which requires calling default
+    //      constructors in the case of C-style arrays, limitation theoretically
+    //      removed in C++11.
     for (int i = 0; i < 2; i++) {
         colorParams[i] = getColorsFromLisp(i == 0);
         frontEnd[i] = new ImageFrontEnd();
         edgeDetector[i] = new EdgeDetector();
         edges[i] = new EdgeList(32000);
         houghLines[i] = new HoughLineList(128);
-        hough[i] = new HoughSpace(320, 240);
         kinematics[i] = new Kinematics(i == 0);
-        homography[i] = new FieldHomography(i == 0);
+        homography[i] = new FieldHomography();
         fieldLines[i] = new FieldLineList();
         ballDetector[i] = new BallDetector(*homography[i], i == 0);
+        boxDetector[i] = new GoalboxDetector();
+
+        if (i == 0) {
+          hough[i] = new HoughSpace(320, 240);
+          cornerDetector[i] = new CornerDetector(320, 240);
+        } else {
+          hough[i] = new HoughSpace(160, 120);
+          cornerDetector[i] = new CornerDetector(160, 120);
+        }
 
         // TODO flag
         bool fast = true;
@@ -98,8 +106,8 @@ void VisionModule::run_()
                                                     &bottomIn.message() };
 
     // Time vision module
-    double topTimes[6];
-    double bottomTimes[6];
+    double topTimes[7];
+    double bottomTimes[7];
     double* times[2] = { topTimes, bottomTimes };
 
     // Loop over top and bottom image and run line detection system
@@ -124,7 +132,7 @@ void VisionModule::run_()
         times[i][0] = timer.end();
 
         // Calculate kinematics and adjust homography
-        //std::cout << "Top camera: " << (i == 0) << std::endl;
+        std::cout << "Top camera: " << (i == 0) << std::endl;
         kinematics[i]->joints(jointsIn.message());
         homography[i]->wz0(kinematics[i]->wz0());
         homography[i]->tilt(kinematics[i]->tilt());
@@ -145,15 +153,22 @@ void VisionModule::run_()
 
         times[i][3] = timer.end();
 
+
+
         // Find field lines
         houghLines[i]->mapToField(*(homography[i]));
         fieldLines[i]->find(*(houghLines[i]));
 
         times[i][4] = timer.end();
 
-        ballDetector[i]->findBall(orangeImage);
+        // Classify field lines
+        fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
 
         times[i][5] = timer.end();
+
+        ballDetector[i]->findBall(orangeImage);
+
+        times[i][6] = timer.end();
     }
 
     for (int i = 0; i < 2; i++) {
@@ -166,8 +181,9 @@ void VisionModule::run_()
         std::cout << "Gradient: " << times[i][1] << std::endl;
         std::cout << "Edge detection: " << times[i][2] << std::endl;
         std::cout << "Hough: " << times[i][3] << std::endl;
-        std::cout << "Field lines: " << times[i][4] << std::endl;
-        std::cout << "Ball: " << times[i][5] << std::endl;
+        std::cout << "Field lines detection: " << times[i][4] << std::endl;
+        std::cout << "Field lines classification: " << times[i][5] << std::endl;
+        std::cout << "Ball: " << times[i][6] << std::endl;
     }
 }
 

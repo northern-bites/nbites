@@ -75,6 +75,14 @@ inline double max(double x, double y)
   return x >= y ? x : y;
 }
 
+inline double dist(double x1, double y1, double x2, double y2)
+{
+    double x = x1 - x2;
+    double y = y1 - y2;
+
+    return sqrt(pow(x, 2) + pow(y, 2));
+}
+
 inline double uMod(double x, double mod)
 {
   return x - floor(x / mod) * mod;

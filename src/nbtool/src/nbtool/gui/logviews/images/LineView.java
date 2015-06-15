@@ -53,14 +53,15 @@ public class LineView extends ViewParent implements IOFirstResponder {
 			g.drawImage(originalImage, 0, 0, displayw, displayh, null);
 			g.drawImage(edgeImage, 0, 480, displayw, displayh, null);
 
-            for (int i = 0; i < lines.size(); i += 5) {
+            for (int i = 0; i < lines.size(); i += 6) {
                 double r = lines.get(i);
                 double t = lines.get(i + 1);
                 double end0 = lines.get(i + 2);
                 double end1 = lines.get(i + 3);
-                double lineIndex = lines.get(i + 4);
+                double houghIndex = lines.get(i + 4);
+                double fieldIndex = lines.get(i + 5);
 
-                if (lineIndex == -1)
+                if (fieldIndex == -1)
                     g.setColor(Color.blue);
                 else
                     g.setColor(Color.red);
@@ -72,11 +73,21 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 int x2 = (int) Math.round(x0 + 2*end1 * Math.sin(t));
                 int y2 = (int) Math.round(y0 + 2*end1 * Math.cos(t));
 
-                int xmid = (x1 + x2) / 2;
-                int ymid = (y1 + y2) / 2;
+                double xstring = (x1 + x2) / 2;
+                double ystring = (y1 + y2) / 2;
+
+                double scale = 0;
+                if (r > 0)
+                    scale = 10;
+                else
+                    scale = 3;
+                xstring += scale*Math.cos(t);
+                ystring += scale*Math.sin(t);
 
                 g.drawLine(x1, y1, x2, y2);
-                g.drawString(Integer.toString(i / 5), (int) xmid, (int) ymid + (r > 0 ? 10 : -10));
+                g.drawString(Integer.toString((int) houghIndex) + "/" + Integer.toString((int) fieldIndex), 
+                             (int) xstring, 
+                             (int) ystring);
             }
         }
     }
@@ -98,7 +109,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
 
         // TODO refactor into hough line class
         byte[] lineBytes = out[6].bytes;
-        int numLines = lineBytes.length / (9 * 4);
+        int numLines = lineBytes.length / (10 * 4);
         Logger.logf(Logger.INFO, "%d field lines expected.", numLines);
 		try {
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(lineBytes));
@@ -107,7 +118,8 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 lines.add(dis.readDouble()); // t
                 lines.add(dis.readDouble()); // ep0
                 lines.add(dis.readDouble()); // ep1
-                lines.add((double)dis.readInt()); // field line index
+                lines.add((double)dis.readInt()); // hough index
+                lines.add((double)dis.readInt()); // fieldline index
             }
 		} catch (Exception e) {
 			Logger.logf(Logger.ERROR, "Conversion from bytes to hough lines in LineView failed.");

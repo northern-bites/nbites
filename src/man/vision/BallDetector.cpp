@@ -28,8 +28,8 @@ void BallDetector::findBall(ImageLiteU8 orange)
     if (topCamera) std::cout << "Top camera ";
     else std::cout << "Bottom camera ";
 
-    double prevFLen = homography.flen();
-    homography.flen(prevFLen/2);
+    //double prevFLen = homography.flen();
+    //homography.flen(prevFLen/2);
     std::cout << " found this many blobs: " << blobber.blobs.size() << std::endl;
     // TODO: Sort blobber list by size
     for (auto i=blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
@@ -58,8 +58,8 @@ void BallDetector::findBall(ImageLiteU8 orange)
         Ball b((*i), x_rel, y_rel, orange.height());
         candidates.push_back(b);
     }
-
-    homography.flen(prevFLen);
+    std::cout << "Flen: " << homography.flen() << std::endl;
+    //homography.flen(prevFLen);
 }
 
 //void BallDetector::findBall() {

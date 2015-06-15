@@ -5,6 +5,7 @@
 #include "vision/VisionModule.h"
 #include "vision/FrontEnd.h"
 #include "ParamReader.h"
+#include "NBMath.h"
 
 #include <cstdlib>
 #include <netinet/in.h>
@@ -42,21 +43,23 @@ int Vision_func() {
     int height = atoi(copy->tree().find("contents")->get(1)->
                                         find("height")->get(1)->value().c_str());
 
-    // Read number of bytes of image, inertials, and joints
-    int numBytes[3];
-    for (int i = 0; i < 3; i++)
-        numBytes[i] = atoi(copy->tree().find("contents")->get(i+1)->
-                                        find("nbytes")->get(1)->value().c_str());
-    uint8_t* ptToJoints = buf + (numBytes[0] + numBytes[1]);
-
     // Location of lisp text file with color params
     std::string sexpPath = std::string(getenv("NBITES_DIR"));
     sexpPath += "/src/man/config/colorParams.txt";
-    
+
+    // Read number of bytes of image, inertials, and joints if exist
+    messages::JointAngles joints;
+    if (copy->tree().find("contents")->get(2)) {
+        int numBytes[3];
+        for (int i = 0; i < 3; i++)
+            numBytes[i] = atoi(copy->tree().find("contents")->get(i+1)->
+                                            find("nbytes")->get(1)->value().c_str());
+        uint8_t* ptToJoints = buf + (numBytes[0] + numBytes[1]);
+        joints.ParseFromArray((void *) ptToJoints, numBytes[2]);
+    }
+
     // Empty messages to pass to Vision Module so it doesn't freak
     messages::YUVImage image(buf, width, height, width);
-    messages::JointAngles joints;
-    joints.ParseFromArray((void *) ptToJoints, numBytes[2]);
 
     // Setup and run module
     portals::Message<messages::YUVImage> imageMessage(&image);
@@ -207,42 +210,62 @@ int Vision_func() {
     //-------------------
     //  LINES
     //-------------------
-    man::vision::HoughLineList* lineList = module.getLines(topCamera);
+    man::vision::HoughLineList* lineList = module.getHoughLines(topCamera);
 
     Log* lineRet = new Log();
     std::string lineBuf;
 
-    //std::cout << std::endl << "In image coordinates:" << std::endl;
-    int i = 0;
+    //std::cout << std::endl << "Hough lines in image coordinates:" << std::endl;
+
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
         double r = line.r();
         double t = line.t();
         double ep0 = line.ep0();
         double ep1 = line.ep1();
-        int lineIndex = line.fieldLine();
-        
+        int houghIndex = line.index();
+        int fieldIndex = line.fieldLine();
+
         // Java uses big endian representation
         endswap<double>(&r);
         endswap<double>(&t);
         endswap<double>(&ep0);
         endswap<double>(&ep1);
-        endswap<int>(&lineIndex);
+        endswap<int>(&houghIndex);
+        endswap<int>(&fieldIndex);
 
         lineBuf.append((const char*) &r, sizeof(double));
         lineBuf.append((const char*) &t, sizeof(double));
         lineBuf.append((const char*) &ep0, sizeof(double));
         lineBuf.append((const char*) &ep1, sizeof(double));
-        lineBuf.append((const char*) &lineIndex, sizeof(int));
+        lineBuf.append((const char*) &houghIndex, sizeof(int));
+        lineBuf.append((const char*) &fieldIndex, sizeof(int));
 
-        //std::cout << i++ << ", " << line.print() << std::endl;
+        //std::cout << line.print() << std::endl;
     }
 
-    //std::cout << std::endl << "In field coordinates:" << std::endl;
-    i = 0;
+    //std::cout << std::endl << "Hough lines in field coordinates:" << std::endl;
+    int i = 0;
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
-        //std::cout << i++ << ", " << line.field().print() << std::endl;
+        //std::cout << line.field().print() << std::endl;
+    }
+
+    //std::cout << std::endl << "Field lines:" << std::endl;
+    man::vision::FieldLineList* fieldLineList = module.getFieldLines(topCamera);
+    for (int i = 0; i < fieldLineList->size(); i++) {
+        man::vision::FieldLine& line = (*fieldLineList)[i];
+        //std::cout << line.print() << std::endl;
+    }
+
+    //std::cout << std::endl << "Goalbox and corner detection:" << std::endl;
+    man::vision::GoalboxDetector* box = module.getBox(topCamera);
+    man::vision::CornerDetector* corners = module.getCorners(topCamera);
+    if (box->first != NULL)
+        //std::cout << box->print() << std::endl;
+    for (int i = 0; i < corners->size(); i++) {
+        const man::vision::Corner& corner = (*corners)[i];
+        //std::cout << corner.print() << std::endl;
     }
 
     lineRet->setData(lineBuf);
@@ -416,4 +439,44 @@ SExpr treeFromBlob(man::vision::Blob& b)
     SExpr toRet = SExpr::list({center, area, count, len1, len2, ang1, ang2});
 
     return toRet;
+}
+
+int Synthetics_func() {
+    assert(args.size() == 1);
+
+    printf("Synthetics_func()\n");
+
+    double x = std::stod(args[0]->tree().find("contents")->get(1)->find("params")->get(1)->value().c_str());
+    double y = std::stod(args[0]->tree().find("contents")->get(1)->find("params")->get(2)->value().c_str());
+    double h = std::stod(args[0]->tree().find("contents")->get(1)->find("params")->get(3)->value().c_str());
+    bool fullres = args[0]->tree().find("contents")->get(1)->find("params")->get(4)->value() == "true";
+    bool top = args[0]->tree().find("contents")->get(1)->find("params")->get(5)->value() == "true";
+
+    int wd = (fullres ? 320 : 160);
+    int ht = (fullres ? 240 : 120);
+    double flen = (fullres ? 544 : 272);
+
+    int size = wd*4*ht*2;
+    uint8_t* pixels = new uint8_t[size];
+    man::vision::YuvLite synthetic(wd, ht, wd*4, pixels);
+
+    man::vision::FieldHomography homography(top);
+    homography.wx0(x);
+    homography.wy0(y);
+    homography.azimuth(h*TO_RAD);
+    homography.flen(flen);
+
+    man::vision::syntheticField(synthetic, homography);
+
+    std::string sexpr("(nblog (version 6) (contents ((type YUVImage) (from camera_TOP) (nbytes ");
+    sexpr += std::to_string(size);
+    sexpr += ") (width " + std::to_string(2*wd);
+    sexpr += ") (height " + std::to_string(2*ht);
+    sexpr += ") (encoding \"[Y8(U8/V8)]\"))))";
+
+    Log* log = new Log(sexpr);
+    std::string buf((const char*)pixels, size);
+    log->setData(buf);
+
+    rets.push_back(log);
 }

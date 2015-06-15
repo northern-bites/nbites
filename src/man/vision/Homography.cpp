@@ -7,6 +7,8 @@
 #include "Homography.h"
 #include "Hough.h"
 
+#include <iostream>
+
 using namespace std;
 
 namespace man {
@@ -272,37 +274,6 @@ bool FieldHomography::visualTiltParallel(const GeoLine& a, const GeoLine& b,
   return ok;
 }
 
-bool FieldHomography::calibrateFromStar(const FieldLineList& lines)
-{
-  // The two paired image lines of a field line are parallel. Their intersection is on the
-  // horizon. The horizontal leg of the star target has its intersection too far away to be
-  // useful (maybe infinitely far). Find the other three points and fit a line.
-  LineFit fit;
-  for (int i = 0; i < lines.size(); ++i)
-  {
-    double vpx, vpy;
-    if (lines[i][0].intersect(lines[i][1], vpx, vpy) && fabs(lines[i][0].ux()) > 0.3)
-      fit.add(vpx - ix0(), vpy - iy0());  // relative to optical axis
-  }
-
-  // If we didn't find exactly three suitable field lines, fail
-  if (fit.area() != 3)
-    return false;
-
-  // The roll is the angle of the horizon. sMod puts it in the range [-PI/2 .. PI/2)
-  roll(sMod(fit.firstPrincipalAngle(), M_PI));
-
-  // The tilt is calculated from the distance from the optical axis to the horizon. That
-  // distance is the dot product of the unit vector normal to the line with a vector
-  // to any point on the line. The center of mass is on the line.
-  double imageDistanceToHorizon
-    = fit.secondPrinciaplAxisU() * fit.centerX() + fit.secondPrinciaplAxisV() * fit.centerY();
-  tilt((M_PI / 2) - atan(imageDistanceToHorizon / flen()));
-
-  return true;
-}
-
-
 // ********************
 // *                  *
 // *  Geometric Line  *
@@ -392,14 +363,14 @@ void GeoLine::imageToField(const FieldHomography& h)
 
 string GeoLine::print() const
 {
-  return strPrintf("%7.1f, %7.1f, %7.1f, %7.1f", r(), t()*(180 / M_PI), ep0(), ep1());
+  return strPrintf("%7.1f, %7.1f, %7.1f, %7.1f, %7.1f, %7.1f", r(), t()*(180 / M_PI), ep0(), ep1(), ux(), uy());
 }
 
-// *****************************
-// *                           *
-// *  Synthetic RoboCup Field  *
-// *                           *
-// *****************************
+// ****************************
+// *                           
+// *  Synthetic RoboCup Field  
+// *                           
+// ****************************
 
 void syntheticField(YuvLite& img, FieldHomography fh)
 {

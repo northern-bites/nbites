@@ -29,12 +29,14 @@ public:
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
     HoughLineList* getLines(bool topCamera = true) const { return houghLines[!topCamera]; }
     BallDetector* getBallDetector(bool topCamera = true) const { return ballDetector[!topCamera]; }
+    HoughLineList* getHoughLines(bool topCamera = true) const { return houghLines[!topCamera]; }
+    FieldLineList* getFieldLines(bool topCamera = true) const { return fieldLines[!topCamera]; }
+    GoalboxDetector* getBox(bool topCamera = true) const { return boxDetector[!topCamera]; }
+    CornerDetector* getCorners(bool topCamera = true) const { return cornerDetector[!topCamera]; }
 
 
     // For use by Image nbcross func
     void setColorParams(Colors* colors, bool top) { colorParams[!top] = colors; }
-
-
 
 protected:
     virtual void run_();
@@ -50,6 +52,8 @@ private:
     FieldHomography* homography[2];
     FieldLineList* fieldLines[2];
     BallDetector* ballDetector[2];
+    GoalboxDetector* boxDetector[2];
+    CornerDetector* cornerDetector[2];
 
     // Lisp tree with color params saved
     nblog::SExpr colors;

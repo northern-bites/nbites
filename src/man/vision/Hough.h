@@ -14,6 +14,7 @@
 
 #include <list>
 #include <vector>
+#include <iostream>
 
 namespace man {
 namespace vision {
@@ -22,9 +23,7 @@ namespace vision {
 // *                             *
 // *  Line from Hough Transform  *
 // *                             *
-// *******************************
-//
-// Hough lines use centered image coordinates
+// ******************************* // // Hough lines use centered image coordinates
 
 // The adjustment algorithm considers all edges and for each computes a fuzzy logic value
 // for the confidence that the edge belongs to the line. The fuzzy logic value is then
@@ -62,8 +61,6 @@ struct AdjustSet
   AdjustSet();
 };
 
-class FieldLine;
-
 class HoughLine : public GeoLine
 {
   int _rIndex;
@@ -76,6 +73,9 @@ class HoughLine : public GeoLine
   int _fieldLine;
 
   Edge* members;
+
+  // Used for debug print outs
+  int _index;
 
 public:
   int rIndex() const { return _rIndex; }
@@ -102,8 +102,11 @@ public:
   // List of edges that are members of this line
   Edge* edgeMembers() const { return members; }
 
+  // For debug
+  int index() const { return _index; }
+
   // effect   Set image line from specified data
-  void set(int rIndex, int tIndex, double r, double t, double score);
+  void set(int rIndex, int tIndex, double r, double t, double score, int index);
 
   // Copy/assign OK
 
@@ -128,7 +131,7 @@ public:
   void add(int rIndex, int tIndex, double score)
   {
     HoughLine hl;
-    hl.set(rIndex, tIndex, rIndex + 0.5, tIndex * (M_PI / 128), score / 16.0);
+    hl.set(rIndex, tIndex, rIndex + 0.5, tIndex * (M_PI / 128), score / 16.0, size());
     push_back(hl);
   }
 
@@ -146,9 +149,122 @@ public:
 // *               *
 // *****************
 
+// Forward declerations
+class FieldLine;
+class FieldLineList;
+
+enum class CornerID {
+  Concave,
+  Convex,
+  T,
+
+  // NOTE detector uses None, TFirst, and TSecond internally, the client will 
+  //      never see such a corner ID
+  None,
+  TFirst,
+  TSecond
+};
+
+// Corner object used in corner detection and field line classification.
+// If id == T, then corner.first is the horizontal part of the T and corner.second
+// is the vertical part of the T (assuming the T is written like the english letter).
+struct Corner : public std::pair<FieldLine*, FieldLine*>
+{
+  Corner() : std::pair<FieldLine*, FieldLine*>() {}
+  Corner(FieldLine* first_, FieldLine* second_, CornerID id_);
+
+  CornerID id;
+
+  std::string print() const;
+};
+
+// Detects goalbox.
+// First is index of top goalbox line.
+// Second is index of endline.
+class GoalboxDetector : public std::pair<FieldLine*, FieldLine*>
+{
+  double parallelThreshold_;
+  double seperationThreshold_;
+
+  bool validBox(const HoughLine& line1, const HoughLine& line2) const;
+
+public:
+  GoalboxDetector();
+  bool find(FieldLineList& list);
+
+  double parallelThreshold() const { return parallelThreshold_; }
+  void parallelThreshold(double newThreshold) { parallelThreshold_ = newThreshold; }
+
+  double seperationThreshold() const { return seperationThreshold_; }
+  void seperationThreshold(double newThreshold) { seperationThreshold_ = newThreshold; }
+
+  std::string print() const;
+};
+
+// Detects corners
+// Stores all detected corners in vector
+class CornerDetector : public std::vector<Corner>
+{
+  int width;
+  int height;
+  double orthogonalThreshold_;
+  double intersectThreshold_;
+  double closeThreshold_;
+  double farThreshold_;
+  double edgeImageThreshold_;
+
+  bool isCorner(const HoughLine& line1, const HoughLine& line2) const;
+  CornerID classify(const HoughLine& line1, const HoughLine& line2) const; 
+  bool isConcave(double end1X, double end1Y, 
+                 double end2X, double end2Y, 
+                 double intersectX, double intersectY) const;
+  bool ccw(double ax, double ay, double bx, double by, double cx, double cy) const;
+
+public:
+  CornerDetector(int width_, int height_);
+  void findCorners(FieldLineList& list);
+
+  double orthogonalThreshold() const { return orthogonalThreshold_; }
+  void orthogonalThreshold(double newThreshold) { orthogonalThreshold_ = newThreshold; }
+
+  double intersectThreshold() const { return intersectThreshold_; }
+  void intersectThreshold(double newThreshold) { intersectThreshold_ = newThreshold; }
+
+  double closeThreshold() const { return closeThreshold_; }
+  void closeThreshold(double newThreshold) { closeThreshold_ = newThreshold; }
+
+  double farThreshold() const { return farThreshold_; }
+  void farThreshold(double newThreshold) { farThreshold_ = newThreshold; }
+
+  double edgeImageThreshold() const { return edgeImageThreshold_; }
+  void edgeImageThreshold(double newThreshold) { edgeImageThreshold_ = newThreshold; }
+};
+
+enum class LineID {
+  // Most general
+  Line,
+
+  // Two possibilities
+  EndlineOrSideline,
+  TopGoalboxOrSideGoalbox,
+  SideGoalboxOrMidline,
+  
+  // More specific
+  Sideline,
+  SideGoalbox,
+
+  // Most specific
+  Endline,
+  TopGoalbox,
+  Midline
+};
+
 class FieldLine
 {
   HoughLine* _lines[2];
+  LineID id_;
+  std::vector<Corner> corners_;
+  int index_;
 
 public:
   // Copy/assign OK
@@ -156,9 +272,20 @@ public:
   HoughLine& operator[](int index) { return *_lines[index]; }
   const HoughLine& operator[](int index) const  { return *_lines[index]; }
 
-  FieldLine(HoughLine& line1, HoughLine& line2, double fx0 = 0, double fy0 = 0);
+  FieldLine(HoughLine& line1, HoughLine& line2, int index = -1, double fx0 = 0, double fy0 = 0);
+
+  LineID id() const { return id_; }
+  void id(LineID newId) { id_ = newId; }
+
+  // For debug
+  int index() const { return index_; }
+
+  void addCorner(Corner newCorner) { corners_.push_back(newCorner); }
+  std::vector<Corner> corners() const { return corners_; }
 
   double separation() const { return _lines[0]->field().separation(_lines[1]->field()); }
+
+  std::string print() const;
 };
 
 // Either list or vector could be used here. Generally a field line list is not
@@ -191,9 +318,11 @@ public:
   // Find field lines
   void find(HoughLineList&);
 
+  // Classify field lines
+  void classify(GoalboxDetector& boxDetector, CornerDetector& cornerDetector);
+
   // Calibrate tilt if possible.
   bool tiltCalibrate(FieldHomography&, std::string* message = 0);
-
 };
 
 // *****************
