@@ -99,11 +99,12 @@ void VisionModule::run_()
         times[i][0] = timer.end();
 
         // Calculate kinematics and adjust homography
-        std::cout << "Top camera: " << (i == 0) << std::endl;
-        kinematics[i]->joints(jointsIn.message());
-        homography[i]->wz0(kinematics[i]->wz0());
-        homography[i]->tilt(kinematics[i]->tilt());
-        homography[i]->azimuth(kinematics[i]->azimuth());
+        if (jointsIn.message().has_head_yaw()) {
+            kinematics[i]->joints(jointsIn.message());
+            homography[i]->wz0(kinematics[i]->wz0());
+            homography[i]->tilt(kinematics[i]->tilt());
+            homography[i]->azimuth(kinematics[i]->azimuth());
+        }
 
         // Approximate brightness gradient
         edgeDetector[i]->gradient(yImage);
