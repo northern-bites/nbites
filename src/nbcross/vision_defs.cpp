@@ -29,9 +29,9 @@ int Vision_func() {
     bool topCamera = copy->tree().find("contents")->get(1)->
                                   find("from")->get(1)->value() == "camera_TOP";
     int width = 2*atoi(copy->tree().find("contents")->get(1)->
-                                        find("width")->get(1)->value().c_str());
+                                    find("width")->get(1)->value().c_str());
     int height = atoi(copy->tree().find("contents")->get(1)->
-                                        find("height")->get(1)->value().c_str());
+                                   find("height")->get(1)->value().c_str());
 
     // Read number of bytes of image, inertials, and joints if exist
     messages::JointAngles joints;
@@ -51,7 +51,7 @@ int Vision_func() {
     portals::Message<messages::YUVImage> imageMessage(&image);
     portals::Message<messages::JointAngles> jointsMessage(&joints);
 
-    man::vision::VisionModule module;
+    man::vision::VisionModule module(width / 2, height);
 
     module.topIn.setMessage(imageMessage);
     module.bottomIn.setMessage(imageMessage);

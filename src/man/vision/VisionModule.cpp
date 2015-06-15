@@ -8,7 +8,7 @@ namespace man {
 namespace vision {
 
 // TODO constants and parameters
-VisionModule::VisionModule()
+VisionModule::VisionModule(int wd, int ht)
     : Module(),
       topIn(),
       bottomIn(),
@@ -31,11 +31,11 @@ VisionModule::VisionModule()
         boxDetector[i] = new GoalboxDetector();
 
         if (i == 0) {
-          hough[i] = new HoughSpace(320, 240);
-          cornerDetector[i] = new CornerDetector(320, 240);
+          hough[i] = new HoughSpace(wd / 2, ht / 2);
+          cornerDetector[i] = new CornerDetector(wd / 2, ht / 2);
         } else {
-          hough[i] = new HoughSpace(160, 120);
-          cornerDetector[i] = new CornerDetector(160, 120);
+          hough[i] = new HoughSpace(wd / 4, ht / 4);
+          cornerDetector[i] = new CornerDetector(wd / 4, ht / 4);
         }
 
         // TODO flag

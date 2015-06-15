@@ -15,7 +15,7 @@ namespace vision {
 
 class VisionModule : public portals::Module {
 public:
-    VisionModule();
+    VisionModule(int wd, int ht);
     virtual ~VisionModule();
 
     portals::InPortal<messages::YUVImage> topIn;
