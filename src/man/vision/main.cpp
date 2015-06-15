@@ -73,6 +73,7 @@ TestImage::TestImage()
   uint8_t* src = (uint8_t*)
     alignedAlloc(TestImage::width * TestImage::height * 8, 4, allocBlock);
   source = YuvLite(TestImage::width, TestImage::height, TestImage::width * 4, src);
+  setRandom();
 }
 
 TestImage::~TestImage()
@@ -117,12 +118,19 @@ string TestImage::read(const string& path)
   }
 
   image.close();
+  random = false;
   return s;
+}
+
+void TestImage::synthetic(const FieldHomography& fh)
+{
+  syntheticField(source, fh);
+  random = false;
 }
 
 void TestImage::next()
 {
-  if (path.length() == 0)
+  if (random)
     for (int i = 0; i < width * height * 8; ++i)
       source.pixelAddr()[i] = (uint8_t)(rand() >> 7);
 }
@@ -150,6 +158,31 @@ void writeImage(const ImageLite<T>& image, const string& path)
   file.open(path, ios_base::binary);
   writeImage(image, file);
   file.close();
+}
+
+void writeNum(ofstream& f, uint32_t n)
+{
+  for (int i = 3; i >= 0; --i)
+    f.put((char)((n >> (8 * i)) & 0xFF));
+}
+
+void writeYuv(const YuvLite& image, const string& path)
+{
+  ofstream f;
+  f.open(path, ios_base::binary);
+
+  int32_t size = 8 * image.width() * image.height();
+  int sum = 0;
+  for (int i = 0; i < size; ++i)
+    sum += image.pixelAddr()[i];
+  string s = strPrintf("(nblog (version 6) (checksum %d) (contents ((type YUVImage) (from camera_TOP) (nbytes %d) (width %d) (height %d) (encoding \"[Y8(U8/V8)]\"))))",
+                       sum, size, 2 * image.width(), 2 * image.height());
+  writeNum(f, s.length());
+  f.write(s.c_str(), s.length());
+  writeNum(f, size);
+  f.write((const char*)image.pixelAddr(), size);
+
+  f.close();
 }
 
 // *********************************************
@@ -447,8 +480,9 @@ void houghTest()
   printf("\n%d edges\n", edges.count());
 
   printf("\n%d fast lines:\n", fastList.size());
+  fastList.mapToField(fh);
   for (list<HoughLine>::iterator hl = fastList.begin(); hl != fastList.end(); ++hl)
-    printf("  %s\n", hl->print().c_str());
+    printf("  %s | %s\n", hl->print().c_str(), hl->field().print().c_str());
 
   printf("\n%d slow lines:\n", slowList.size());
   for (list<HoughLine>::iterator hl = slowList.begin(); hl != slowList.end(); ++hl)
@@ -526,28 +560,34 @@ void runHough()
 
   FieldLineList fLines;
   fLines.find(lines);
+
   string cal;
-  fLines.TiltCalibrate(fh, &cal);
+  fLines.tiltCalibrate(fh, &cal);
+  cout << cal.c_str();
 
   string s = "((lines";
   for (list<HoughLine>::iterator hl = lines.begin(); hl != lines.end(); ++hl)
   {
     int fieldLineSide = -1;
     if (hl->fieldLine() >= 0)
-      fieldLineSide = (int)(&fLines.at(hl->fieldLine()).lines(1) == &*hl);
+      fieldLineSide = (int)(&fLines.at(hl->fieldLine())[1] == &*hl);
     s += strPrintf(" ((rt %d %d) (score %.2f) (fit %.3f) (fIndex %d %d) (image %s) (field %s))",
                    hl->rIndex(), hl->tIndex(),
                    hl->score(), hl->fitError(),
                    hl->fieldLine(), fieldLineSide,
                    hl->GeoLine::print().c_str(), hl->field().print().c_str());
   }
-  s += "))";
+
+  const double ticksPerUs = 1600;
+  s += strPrintf(") (times %.1f %.1f %.1f %.1f))",
+                 frontEnd.time() / ticksPerUs, ed.gradientTime() / ticksPerUs,
+                 ed.edgeTime() / ticksPerUs, hs.time(HoughSpace::NumTimes - 1) / ticksPerUs);
 
   ofstream f;
   f.open(testImagePath, ios_base::binary);
   f.write(s.c_str(), s.length() + 1);
 
-  ImageLiteU16 hSpace(2 * hs.rWidth(), 256, hs.rPitch(), (uint16_t*)hs.pSpace(-hs.rRadius(), 0));
+  ImageLiteU16 hSpace(hs.rWidth(), 256, hs.rPitch(), (uint16_t*)hs.pSpace(-hs.rRadius(), 0));
   writeImage(hSpace, f);
 
   f.close();
@@ -626,6 +666,11 @@ int main(int argc, char* argv[])
 
       case 'rand':
         image.setRandom();
+        break;
+
+      case 'syn':
+        image.synthetic(fh);
+        writeYuv(image.source, "syn.nblog");
         break;
 
       case 'ic':
@@ -720,8 +765,21 @@ int main(int argc, char* argv[])
         fh.azimuth(floatArg(argIndex, argc, argv) * (M_PI / 180));
         break;
 
+      case 'x0':
+        fh.wx0(floatArg(argIndex, argc, argv));
+        break;
+
+      case 'y0':
+        fh.wy0(floatArg(argIndex, argc, argv));
+        break;
+
+      case 'z0':
       case 'hght':
         fh.wz0(floatArg(argIndex, argc, argv));
+        break;
+
+      case 'flen':
+        fh.flen(floatArg(argIndex, argc, argv));
         break;
 
         // Window
@@ -776,6 +834,24 @@ int main(int argc, char* argv[])
       case 'rht':
         runHough();
         break;
+
+      case 'cal':
+        {
+          EdgeList edges(24000);
+          getEdges(edges);
+          HoughLineList lines(12);
+          hs.run(edges, lines);
+          lines.mapToField(fh);
+          FieldLineList fLines;
+          fLines.find(lines);
+
+          if (fh.calibrateFromStar(fLines))
+            printf("Roll = %.2f, tilt = %.2f\n", fh.roll() * (180 / M_PI), fh.tilt() * (180 / M_PI));
+          else
+            printf("Can't find 3 legs of star target\n");
+        }
+        break;
+
 
       default:
         throw strPrintf("Unknown command %s\n", argv[argIndex - 1]);

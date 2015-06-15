@@ -18,6 +18,7 @@ namespace man {
 namespace vision {
 
 class GeoLine;
+class FieldLineList;
 
 class FieldHomography
 {
@@ -109,6 +110,10 @@ public:
   // Same as above, but for lines known to be parallel in world coordinates.
   bool visualTiltParallel(const GeoLine& a, const GeoLine& b, double& tilt,
                           std::string* diagnostics) const;
+
+  // Calibrate tilt and roll using "star target". If successful returns true and
+  // updates tilt and roll.
+  bool calibrateFromStar(const FieldLineList& lines);
 };
 
 // ********************
@@ -206,6 +211,17 @@ public:
   void rawEndPoints(double x0, double y0,
                     double& x1, double& y1, double& x2, double& y2) const;
 
+  // The separation between two lines is the sum of the polarized distance from
+  // the center of all four endpoints to each line. For parallel lines, this is
+  // the correct geometric separation. For nearly parallel lines it is
+  // well-defined and reasonable. The center of all four endpoints is a point on
+  // the line that bisects the two lines. Separation is positive when said center
+  // is on the positive side of both lines (gradients pointing towards each
+  // other), and negative when the center is on the negative side of both lines
+  // (gradients pointing away from each other. Separation is approximately zero
+  // otherwise. 
+  double separation(const GeoLine& other) const;
+
   // Map this image line to what we would see if roll were 0 and the optical axis
   // was at the center of the image
   void correctRollAndAxis(const FieldHomography&);
@@ -215,6 +231,23 @@ public:
 
   std::string print() const;
 };
+
+// *****************************
+// *                           *
+// *  Synthetic RoboCup Field  *
+// *                           *
+// *****************************
+
+// Fill in the specified image with a synthetically rendered regulation RoboCup field as
+// seen by a robot whose pose is specified by the specified homography. The image can
+// be of any size. Remember that a YuvLite image of size 320x240 corresponds to what is
+// more conventionally called 640x480 (see above comment with YuvLite). Remember to get
+// the focal length in the homography correct, which generally is a function of image
+// size (544 for 640x480, 272 for 320x240 as YUV is conventionally defined).
+//
+// Note that the fh argument is not a reference, but a copy because it is modified
+// internally.
+void syntheticField(YuvLite& img, FieldHomography fh);
 
 }
 }

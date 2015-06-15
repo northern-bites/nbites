@@ -430,7 +430,12 @@ public:
 typedef ImageLite<uint8_t > ImageLiteU8;
 typedef ImageLite<uint16_t> ImageLiteU16;
 
-// A Yuv image is a special case.
+// A Yuv image is a special case. The width and height is defined to be one-half of
+// the width and height of the Y pixels, and therefore the width and one-half the
+// height of the U and V pixels. For example, a 640x480 YUV image as conventionally
+// defined is 640x480 in Y and 320x480 in U and V. YuvLite calls this 320x240. This
+// guarantees that windows are valid YuvLite images, and that pixels are square. So
+// effectively each "pixel" of a YuvLite image has 2x2 Y values and 1x2 U and V values.
 class YuvLite : public ImageLiteBase
 {
   uint8_t* _pixels;
@@ -448,9 +453,103 @@ public:
     _pixels = src.pixelAddr(x0, y0);
   }
 
+  // Pixel address of a Y 2x2, UV 1x2 pixel block
   uint8_t* pixelAddr(int x, int y) const { return _pixels + 2 * y * pitch() + 4 * x; }
   uint8_t* pixelAddr() const { return _pixels; }
+
+  // Get and set Y pixels using conventional coordinates:
+  //    0 <= i < 2 * width()
+  //    0 <= j < 2 * height()
+  int y(int i, int j) const { return (pixelAddr() + j * pitch())[2 * i]; }
+  void y(int i, int j, uint8_t z) {  (pixelAddr() + j * pitch())[2 * i] = z; }
+
+  // Get and set U,V pixels using conventional coordinates:
+  //    0 <= i < width()
+  //    0 <= j < 2 * height()
+  int u(int i, int j) const { return (pixelAddr() + j * pitch())[4 * i + 1]; }
+  void u(int i, int j, uint8_t z) {  (pixelAddr() + j * pitch())[4 * i + 1] = z; }
+  int v(int i, int j) const { return (pixelAddr() + j * pitch())[4 * i + 3]; }
+  void v(int i, int j, uint8_t z) {  (pixelAddr() + j * pitch())[4 * i + 3] = z; }
 };
+
+// ***************
+// *             *
+// *  Rectangle  *
+// *             *
+// ***************
+
+template <class T>
+class Rectangle
+{
+  T _x0, _y0;
+  T _wd, _ht;
+
+public:
+  // Copy/assign OK
+
+  Rectangle() {}
+
+  Rectangle(T x0, T y0, T wd, T ht);
+
+  T x0() const { return _x0; }
+  T y0() const { return _y0; }
+  T wd() const { return _wd; }
+  T ht() const { return _ht; }
+  T x1() const { return x0() + wd(); }
+  T y1() const { return y0() + ht(); }
+
+  T area() const { return wd() * ht(); }
+
+  Rectangle& intersect(const Rectangle& r);
+  static Rectangle intersect(const Rectangle& r1, const Rectangle& r2)
+  {
+    return Rectangle(r1).intersect(r2);
+  }
+
+  T intersectArea(const Rectangle& r) const
+  {
+    T w = min(x1(), r.x1()) - max(x0(), r.x0());
+    T h = min(y1(), r.y1()) - max(y0(), r.y0());
+    if (w > 0 && h > 0)
+      return w * h;
+    else
+      return 0;
+  }
+};
+
+template <class T>
+Rectangle<T>::Rectangle(T x0, T y0, T wd, T ht)
+{
+  if (wd > 0 && ht > 0)
+  {
+    _x0 = x0;
+    _y0 = y0;
+    _wd = wd;
+    _ht = ht;
+  }
+  else
+  {
+    _x0 = 0;
+    _y0 = 0;
+    _wd = 0;
+    _ht = 0;
+  }
+}
+
+
+template <class T>
+Rectangle<T>& Rectangle<T>::intersect(const Rectangle& r)
+{
+  T x = max(x0(), r.x0());
+  T w = min(x1(), r.x1()) - x;
+  T y = max(y0(), r.y0());
+  T h = min(y1(), r.y1()) - y;
+  *this = Rectangle(x, y, w, h);
+}
+
+typedef Rectangle<int   > RectangleI;
+typedef Rectangle<float > RectangleF;
+typedef Rectangle<double> RectangleD;
 
 }
 }

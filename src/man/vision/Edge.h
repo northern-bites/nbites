@@ -315,12 +315,13 @@ public:
   void edgeThreshold(int t) { _edgeThr = t;}
   
   // Green differential must be >= this threshold for edges when green
-  // processing is being used. The green differential is the difference
-  // between the sum of three fuzzy green values on the darker side of
-  // the edge, and the sum of three fuzzy green values on the lighter
-  // side of the edge.
-  int greenThreshold() const { return _greenThr;}
-  void greenThreshold(int t) { _greenThr = t;}
+  // processing is being used. The green differential is the difference between
+  // fuzzy green values on the darker side of the edge, and fuzzy green values on
+  // the lighter side of the edge, in percent of max possible difference.
+  // Note that the getter rounds off to make sure the same value is read as
+  // was written.
+  int greenThreshold() const { return (_greenThr * 100 + 50) / (3 * 255);}
+  void greenThreshold(int t) { _greenThr = t * (3 * 255) / 100;}
 
   // Use fast (ASM) version
   bool fast() const { return _fast;}
