@@ -274,6 +274,37 @@ bool FieldHomography::visualTiltParallel(const GeoLine& a, const GeoLine& b,
   return ok;
 }
 
+bool FieldHomography::calibrateFromStar(const FieldLineList& lines)
+{
+  // The two paired image lines of a field line are parallel. Their intersection is on the
+  // horizon. The horizontal leg of the star target has its intersection too far away to be
+  // useful (maybe infinitely far). Find the other three points and fit a line.
+  LineFit fit;
+  for (int i = 0; i < lines.size(); ++i)
+  {
+    double vpx, vpy;
+    if (lines[i][0].intersect(lines[i][1], vpx, vpy) && fabs(lines[i][0].ux()) > 0.3)
+      fit.add(vpx - ix0(), vpy - iy0());  // relative to optical axis
+  }
+
+  // If we didn't find exactly three suitable field lines, fail
+  if (fit.area() != 3)
+    return false;
+
+  // The roll is the angle of the horizon. sMod puts it in the range [-PI/2 .. PI/2)
+  roll(sMod(fit.firstPrincipalAngle(), M_PI));
+
+  // The tilt is calculated from the distance from the optical axis to the horizon. That
+  // distance is the dot product of the unit vector normal to the line with a vector
+  // to any point on the line. The center of mass is on the line.
+  double imageDistanceToHorizon
+    = fit.secondPrinciaplAxisU() * fit.centerX() + fit.secondPrinciaplAxisV() * fit.centerY();
+  tilt((M_PI / 2) - atan(imageDistanceToHorizon / flen()));
+
+  return true;
+}
+
+
 // ********************
 // *                  *
 // *  Geometric Line  *
@@ -361,37 +392,112 @@ void GeoLine::imageToField(const FieldHomography& h)
   setEndPoints(qDist(x1, y1), qDist(x2, y2));
 }
 
-#if 0
-  // effect   Transform this line as specified by roll and (x0, y0) in fcp. Translate then rotate.
-  public void Transform(FixedCameraParams fcp)
-  {
-    // Rotate the line's unit vector, but don't set it yet
-    double cs = Math.Cos(fcp.Roll);
-    double sn = Math.Sin(fcp.Roll);
-    double ux = Ux * cs - Uy * sn;
-    double uy = Ux * sn + Uy * cs;
-
-    // Get a point on the new line by mapping with fcp, then get the new R by dot product
-    // with the new unit vector
-    double x0, y0;
-    fcp.ImageCoords(R * Ux, R * Uy, out x0, out y0);
-    R = ux * x0 + uy * y0;
-
-    // The endpoints move by the cross product of the old unit vector and the origin vector
-    // in fcp. This is because rotation does not affect the U values, and translation is done
-    // before rotation.
-    double du = fcp.X0 * Uy - fcp.Y0 * Ux;
-    U0 -= du;
-    U1 -= du;
-
-    // Now we can set the new unit vector
-    setUintVec(ux, uy);
-  }
-#endif
-
 string GeoLine::print() const
 {
   return strPrintf("%7.1f, %7.1f, %7.1f, %7.1f, %7.1f, %7.1f", r(), t()*(180 / M_PI), ep0(), ep1(), ux(), uy());
+}
+
+// *****************************
+// *                           *
+// *  Synthetic RoboCup Field  *
+// *                           *
+// *****************************
+
+void syntheticField(YuvLite& img, FieldHomography fh)
+{
+  // The field is defined by a list of non-intersecting oriented rectangles in millimeters.
+  static RectangleF fieldLines[] =
+  {
+    RectangleF(-3025, -4525,   50, 9050),   // left sideline
+    RectangleF( 2975, -4525,   50, 9050),   // right sideline
+    RectangleF(-2975,  4475, 5950,   50),   // back line
+    RectangleF(-2975,   -25, 5950,   50),   // center line
+    RectangleF(-1125,  3875, 2250,   50),   // front goal box line
+    RectangleF(-1125,  3925,   50,  550),   // left goal box line
+    RectangleF( 1075,  3925,   50,  550),   // right goal box line
+    RectangleF(  -75,  3175,  150,   50),   // penalty mark horizontal arm
+    RectangleF(  -25,  3225,   50,   50),   // penalty mark back vertical arm
+    RectangleF(  -25,  3125,   50,   50),   // penalty mark front vertical arm
+    RectangleF(  -25,    25,   50,   50),   // center mark back arm
+    RectangleF(  -25,   -75,   50,   50)    // center mark front arm
+  };
+
+  // Used to make center circle
+  RectangleF ccTangent = RectangleF(725, -50, 50, 100);
+
+  // Convert homography to mm (a metter of convenience in defining the field)
+  fh.wx0(fh.wx0() * 10);
+  fh.wy0(fh.wy0() * 10);
+  fh.wz0(fh.wz0() * 10);
+
+  // Loop over every image pixel
+  for (int j = 0; j < 2 * img.height(); ++j)
+    for (int i = 0; i < 2 * img.width(); ++i)
+    {
+      double ix = i - img.width(), iy = img.height() - j;
+      double wx, wy;
+      int i2 = i / 2;
+      if (fh.fieldCoords(ix, iy, wx, wy))
+      {
+        // Pixel below he horizon, get oriented rectangle in field coordinates that
+        // approximately corresponds to the pixel.
+        const double pixelRadius = 0.6;
+        double rxx, rxy, ryx, ryy;
+        fh.fieldVector(ix, iy, pixelRadius, 0, rxx, rxy);
+        fh.fieldVector(ix, iy, 0, pixelRadius, ryx, ryy);
+        double rx = max(fabs(rxx), fabs(ryx));
+        double ry = max(fabs(rxy), fabs(ryy));
+        RectangleF pixel((float)(wx - rx), (float)(wy - ry), (float)(2 * rx), (float)(2 * ry));
+
+        // Sum the areas of intersection of the pixel with each rectangle.
+        double z = 0;
+        for (int r = 0; r < sizeof(fieldLines) / sizeof(fieldLines[0]); ++r)
+          z += fieldLines[r].intersectArea(pixel);
+        z /= pixel.area();
+
+        // Center circle
+        double wr = sqrt(wx * wx + wy * wy);
+        double cs = wx / wr;
+        double sn = wy / wr;
+        double cxx = cs * rxx - sn * rxy;
+        double cxy = sn * rxx + cs * rxy;
+        double cyx = cs * ryx - sn * ryy;
+        double cyy = sn * ryx + cs * ryy;
+        rx = max(fabs(cxx), fabs(cyx));
+        ry = max(fabs(cxy), fabs(cyy));
+        pixel = RectangleF((float)(wr - rx), (float)(-ry), (float)(2 * rx), (float)(2 * ry));
+        double c = ccTangent.intersectArea(pixel) / pixel.area();
+        z = z + c - z * c;
+
+        // Convert area to brightness, store in image
+        uint8_t y = (uint8_t)((0.625 * z + 0.25) * 255);
+        img.y(i, j, y);
+
+        // Color the field green
+        if ((i & 1) == 0)
+          if (fabs(wx) <= 3700 && fabs(wy) <= 5200)
+          {
+            y = (uint8_t)(0.3 * (z - 1) * 128 + 128);
+            img.u(i2, j, y);
+            img.v(i2, j, y);
+          }
+          else
+          {
+            img.u(i2, j, 128);
+            img.v(i2, j, 128);
+          }
+      }
+      else
+      {
+        // Color the sky blue
+        img.y(i, j, 192);
+        if ((i & 1) == 0)
+        {
+          img.u(i2, j, 144);
+          img.v(i2, j, 112);
+        }
+      }
+    }
 }
 
 }

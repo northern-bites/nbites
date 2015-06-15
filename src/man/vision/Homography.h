@@ -110,6 +110,10 @@ public:
   // Same as above, but for lines known to be parallel in world coordinates.
   bool visualTiltParallel(const GeoLine& a, const GeoLine& b, double& tilt,
                           std::string* diagnostics) const;
+
+  // Calibrate tilt and roll using "star target". If successful returns true and
+  // updates tilt and roll.
+  bool calibrateFromStar(const FieldLineList& lines);
 };
 
 // ********************
@@ -227,6 +231,23 @@ public:
 
   std::string print() const;
 };
+
+// *****************************
+// *                           *
+// *  Synthetic RoboCup Field  *
+// *                           *
+// *****************************
+
+// Fill in the specified image with a synthetically rendered regulation RoboCup field as
+// seen by a robot whose pose is specified by the specified homography. The image can
+// be of any size. Remember that a YuvLite image of size 320x240 corresponds to what is
+// more conventionally called 640x480 (see above comment with YuvLite). Remember to get
+// the focal length in the homography correct, which generally is a function of image
+// size (544 for 640x480, 272 for 320x240 as YUV is conventionally defined).
+//
+// Note that the fh argument is not a reference, but a copy because it is modified
+// internally.
+void syntheticField(YuvLite& img, FieldHomography fh);
 
 class CameraParams {
   double roll;
