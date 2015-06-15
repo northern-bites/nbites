@@ -230,7 +230,7 @@ public class Log {
 		if (item.isAtom())
 			return null;
 		
-		SExpr bytes = item.find("bytes").get(1);
+		SExpr bytes = item.find("nbytes").get(1);
 		return bytes.exists() && bytes.isAtom() ? bytes.valueAsInt() : null;
 	}
 	
@@ -242,7 +242,7 @@ public class Log {
 		int offset = 0;
 		
 		for (int i = 0; i < index; ++i) {
-			SExpr bytes = cont.get(i + 1).find("bytes").get(1);
+			SExpr bytes = cont.get(i + 1).find("nbytes").get(1);
 			if (!bytes.exists() || !bytes.isAtom())
 				return null;
 			offset += bytes.valueAsInt();
