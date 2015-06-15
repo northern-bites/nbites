@@ -279,7 +279,7 @@ CornerDetector::CornerDetector(int width_, int height_)
   : width(width_), 
     height(height_), 
     orthogonalThreshold_(40), 
-    intersectThreshold_(5), 
+    intersectThreshold_(10), 
     closeThreshold_(30), 
     farThreshold_(50), 
     edgeImageThreshold_(0.05)
