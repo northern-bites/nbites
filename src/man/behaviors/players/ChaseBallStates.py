@@ -88,7 +88,7 @@ def followPotentialField(player):
     a repulsive force of smaller magnitude.
     """
     if player.firstFrame():
-        player.brain.tracker.trackBall()   
+        player.brain.tracker.trackBall()  
 
     ball = player.brain.ball
     heading = player.brain.loc.h
@@ -98,7 +98,6 @@ def followPotentialField(player):
 
     # Are we within the acceptable heading range?
     if (fabs(relH) < constants.ORBIT_GOOD_BEARING and distToKick < 20):
-        print "STOPPED! Because relH is: ", relH
         #player.stopWalking()
         destinationX = player.kick.destinationX
         destinationY = player.kick.destinationY
@@ -115,14 +114,15 @@ def followPotentialField(player):
             attractorDist = .00000000001
 
         repulsorX = ball.rel_x - constants.REPULSOR_BALL_DIST*cos(radians(heading - player.kick.setupH))
-        repulsorY = attractorY
+        repulsorY = ball.rel_y - constants.REPULSOR_BALL_DIST*sin(-radians(heading - player.kick.setupH))
         repulsorDist = (repulsorX**2 + repulsorY**2)**.5
+
         if repulsorDist == 0:
             repulsorDist = .00000000001
 
         # super position of an attractive potential field and arepulsive one
-        xComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorX/attractorDist**3 + -repulsorX/repulsorDist**3
-        yComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorY/attractorDist**3 + -repulsorY/repulsorDist**3
+        xComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorX/attractorDist**3 - repulsorX/repulsorDist**3
+        yComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorY/attractorDist**3 - repulsorY/repulsorDist**3
 
         if xComp == 0 and yComp == 0:
             player.setWalk(0, 0, 0)
