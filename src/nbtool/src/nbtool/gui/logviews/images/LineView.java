@@ -278,7 +278,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
         edgeImage = ei.toBufferedImage();
         repaint();
 
-        // TODO refactor into hough line class
+        // TODO refactor. Protobuff?
         byte[] lineBytes = out[6].bytes;
         int numLines = lineBytes.length / (18 * 4);
         Logger.logf(Logger.INFO, "%d field lines expected.", numLines);

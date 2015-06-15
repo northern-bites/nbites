@@ -28,18 +28,19 @@ public:
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
     HoughLineList* getHoughLines(bool topCamera = true) const { return houghLines[!topCamera]; }
+    // getter for homography
     FieldLineList* getFieldLines(bool topCamera = true) const { return fieldLines[!topCamera]; }
     GoalboxDetector* getBox(bool topCamera = true) const { return boxDetector[!topCamera]; }
     CornerDetector* getCorners(bool topCamera = true) const { return cornerDetector[!topCamera]; }
 
-    Colors* getColorsFromLisp(nblog::SExpr* colors, int camera);
     const std::string getStringFromTxtFile(std::string path);
+
     void setCameraParams(std::string robotName);
     void setCameraParams(int camera, std::string robotName);
     void setCameraParams(CameraParams* params, bool topCamera) { cameraParams[!topCamera] = params; }
 
-    // For use by Image nbcross func
     void setColorParams(Colors* colors, bool topCamera) { colorParams[!topCamera] = colors; }
+    Colors* getColorsFromLisp(nblog::SExpr* colors, int camera);
 
  
 

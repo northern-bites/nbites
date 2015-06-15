@@ -11,8 +11,6 @@
 namespace man {
 namespace vision {
 
-
-// TODO constants and parameters
 VisionModule::VisionModule()
     : Module(),
       topIn(),
@@ -26,15 +24,14 @@ VisionModule::VisionModule()
 
     //      removed in C++11
 
-    // TODO: RobotPath to config folder
     std:: string colorPath, cameraPath;
     #ifdef OFFLINE
         colorPath =  cameraPath = std::string(getenv("NBITES_DIR"));
         colorPath += "/src/man/config/colorParams.txt";
         cameraPath += "/src/man/config/cameraParams.txt";
     #else
-        colorPath = '0'; // TODO
-        cameraPath = '0'; // TODO
+        colorPath = "/home/nbites/config/colorParams.txt";
+        cameraPath = "/home/nbites/config/cameraParams.txt";
     #endif
 
     // Get SExpr from string
@@ -55,7 +52,6 @@ VisionModule::VisionModule()
         fieldLines[i] = new FieldLineList();
         boxDetector[i] = new GoalboxDetector();
 
-        // TODO set width and height dynamically
         if (i == 0) {
           hough[i] = new HoughSpace(320, 240);
           cornerDetector[i] = new CornerDetector(320, 240);
@@ -64,7 +60,6 @@ VisionModule::VisionModule()
           cornerDetector[i] = new CornerDetector(160, 120);
         }
 
-        // TODO flag
         bool fast = true;
         frontEnd[i]->fast(false);
         edgeDetector[i]->fast(fast);
@@ -87,7 +82,6 @@ VisionModule::~VisionModule()
     }
 }
 
-// TODO bug in assembly front end green image
 // TODO use horizon on top image
 void VisionModule::run_()
 {
@@ -131,10 +125,14 @@ void VisionModule::run_()
         kinematics[i]->joints(jointsIn.message());
         homography[i]->wz0(kinematics[i]->wz0());
 
-        // TODO use cameraParameter[i] to adjust homography
-        homography[i]->tilt(kinematics[i]->tilt() + cameraParams[i]->getTilt()*TO_RAD);
-        homography[i]->roll(homography[i]->roll() + cameraParams[i]->getRoll()*TO_RAD);
+        
+        // homography[i]->roll(homography[i]->roll() + cameraParams[i]->getRoll()*TO_RAD);
+        // homography[i]->tilt(kinematics[i]->tilt() + cameraParams[i]->getTilt()*TO_RAD);
         // homography[i]->azimuth(kinematics[i]->azimuth());
+
+        homography[i]->roll(homography[i]->roll());
+        homography[i]->tilt(kinematics[i]->tilt());
+
 
         // Approximate brightness gradient
         edgeDetector[i]->gradient(yImage);
@@ -154,6 +152,11 @@ void VisionModule::run_()
         // Find field lines
         houghLines[i]->mapToField(*(homography[i]));
         fieldLines[i]->find(*(houghLines[i]));
+
+        std::cout << "ORIGIONAL h.r: " << homography[i]->roll() << " h.t: " << homography[i]->tilt() << std::endl;
+        if (homography[i]->calibrateFromStar((const FieldLineList&) *fieldLines[i])) {
+            std::cout << "NEW h.r: " << homography[i]->roll() << " h.t: " << homography[i]->tilt() <<std::endl<<std::endl;
+        }
 
         times[i][4] = timer.end();
 
