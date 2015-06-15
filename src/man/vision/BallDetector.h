@@ -15,7 +15,7 @@ class Ball;
 
 class BallDetector {
 public:
-    BallDetector(FieldHomography& homography_, bool topCamera);
+    BallDetector(FieldHomography* homography_, bool topCamera);
     ~BallDetector();
 
     void findBall(ImageLiteU8 orange);
@@ -27,7 +27,7 @@ public:
     const std::vector<Ball>& getBalls() const { return candidates; }
 private:
     Connectivity blobber;
-    FieldHomography homography;
+    FieldHomography* homography;
     bool topCamera;
 
     std::vector<Ball> candidates;

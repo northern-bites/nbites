@@ -75,14 +75,12 @@ int Vision_func() {
     // If log included color parameters in description, have module use those
     SExpr* params = args[0]->tree().find("Params");
     if (params != NULL) {
-
         // Set new parameters as frontEnd colorParams
         module.setColorParams(getColorsFromSExpr(params), topCamera);
 
         // Look for atom value "SaveParams", i.e. "save" button press
         SExpr* save = params->get(1)->find("SaveParams");
         if (save != NULL) {
-
             // Save attached parameters to txt file
             updateSavedColorParams(sexpPath, params, topCamera);
         }
@@ -327,6 +325,7 @@ man::vision::Colors* getColorsFromSExpr(SExpr* params) {
 
 // Save the new color params to the colorParams.txt file
 void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top) {
+    std::cout << "Saving params!" << std::endl;
     std::ifstream textFile;
     textFile.open(sexpPath);
 

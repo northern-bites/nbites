@@ -58,7 +58,7 @@ VisionModule::VisionModule()
         kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography();
         fieldLines[i] = new FieldLineList();
-        ballDetector[i] = new BallDetector(*homography[i], i == 0);
+        ballDetector[i] = new BallDetector(homography[i], i == 0);
         boxDetector[i] = new GoalboxDetector();
 
         if (i == 0) {

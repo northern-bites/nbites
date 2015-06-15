@@ -11,7 +11,7 @@ const double VERT_FOV_RAD = 47.64 * M_PI / 180;
 namespace man {
 namespace vision {
 
-BallDetector::BallDetector(FieldHomography& homography_, bool topCamera_):
+BallDetector::BallDetector(FieldHomography* homography_, bool topCamera_):
     ballOn(0),
     blobber(),
     homography(homography_),
@@ -23,43 +23,32 @@ BallDetector::~BallDetector() { }
 
 void BallDetector::findBall(ImageLiteU8 orange)
 {
-    blobber.run(orange.pixelAddr(), orange.width(), orange.height(), orange.width());
+    blobber.run(orange.pixelAddr(), orange.width(), orange.height(), orange.pitch());
 
     if (topCamera) std::cout << "Top camera ";
     else std::cout << "Bottom camera ";
 
-    //double prevFLen = homography.flen();
-    //homography.flen(prevFLen/2);
     std::cout << " found this many blobs: " << blobber.blobs.size() << std::endl;
     // TODO: Sort blobber list by size
     for (auto i=blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
         double x_rel, y_rel;
 
-        double ix0 = homography.ix0();
-        double iy0 = homography.iy0();
-
-
-        // blob image x & y. Scale by 2 since orange is downsized image
-        // double bIX = ((*i).centerX() - orange.width()/2);// * 2;
-        // double bIY = (orange.height()  - (*i).centerY() + (*i).firstPrincipalLength()) * 2;
-
         double bIX = ((*i).centerX() - orange.width()/2);
-        double bIY = (orange.height() / 2 - (*i).centerY());// - (*i).firstPrincipalLength());
+        double bIY = (orange.height() / 2 - (*i).centerY()) - (*i).firstPrincipalLength();
+
         printf("bix: %f, biy: %f\n", bIX, bIY);
 
-        bool belowHoriz = homography.fieldCoords(bIX, bIY, x_rel, y_rel);
+        bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
 
         // This blob is above the horizon. Can't be a ball
         if (!belowHoriz) {
             std::cout << "BLOB's above horizon:" << std::endl;
-            continue;// TODO. Homography seems to be messed up
+            continue;
         }
 
         Ball b((*i), x_rel, y_rel, orange.height());
         candidates.push_back(b);
     }
-    std::cout << "Flen: " << homography.flen() << std::endl;
-    //homography.flen(prevFLen);
 }
 
 //void BallDetector::findBall() {
