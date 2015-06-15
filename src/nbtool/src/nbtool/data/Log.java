@@ -81,6 +81,7 @@ public class Log {
 	}
 	
 	public SOURCE source;
+	public Session parent;
 	
 	public byte[] data() {
 		return bytes;

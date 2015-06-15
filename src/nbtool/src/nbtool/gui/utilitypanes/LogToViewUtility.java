@@ -330,9 +330,7 @@ public class LogToViewUtility extends UtilityParent {
 	
 	
 	public LogToViewUtility() {
-		super();
-		log(INFO, "Creating LogToViewUtility...");
-		
+		super();		
 		types = new String[NBConstants.POSSIBLE_VIEWS.size()];
 		Map<String, Class<? extends ViewParent>[]> constPossible = NBConstants.POSSIBLE_VIEWS;
 		{
