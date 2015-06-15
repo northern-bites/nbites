@@ -65,7 +65,7 @@ int Vision_func() {
     man::vision::ImageFrontEnd* frontEnd = module.getFrontEnd(topCamera);
 
     Log* yRet = new Log();
-    int yLength = 240*320*2;
+    int yLength = (width / 4) * (height / 2) * 2;
 
     // Create temp buffer and fill with yImage from FrontEnd
     uint8_t yBuf[yLength];
@@ -81,7 +81,7 @@ int Vision_func() {
     //   WHITE IMAGE
     // ---------------
     Log* whiteRet = new Log();
-    int whiteLength = 240*320;;
+    int whiteLength = (width / 4) * (height / 2);
 
     // Create temp buffer and fill with white image 
     uint8_t whiteBuf[whiteLength];
@@ -97,7 +97,7 @@ int Vision_func() {
     //   GREEN IMAGE
     // ---------------
     Log* greenRet = new Log();
-    int greenLength = 240*320;
+    int greenLength = (width / 4) * (height / 2);
 
     // Create temp buffer and fill with gree image 
     uint8_t greenBuf[greenLength];
@@ -113,7 +113,7 @@ int Vision_func() {
     //   ORANGE IMAGE
     // ----------------
     Log* orangeRet = new Log();
-    int orangeLength = 240*320;
+    int orangeLength = (width / 4) * (height / 2);
 
     // Create temp buffer and fill with orange image 
     uint8_t orangeBuf[orangeLength];
@@ -129,7 +129,7 @@ int Vision_func() {
     //  SEGMENTED IMAGE
     //-------------------
     Log* colorSegRet = new Log();
-    int colorSegLength = 240*320;
+    int colorSegLength = (width / 4) * (height / 2);
 
     // Create temp buffer and fill with segmented image
     uint8_t segBuf[colorSegLength];
@@ -151,9 +151,9 @@ int Vision_func() {
 
     man::vision::AngleBinsIterator<man::vision::Edge> abi(*edgeList);
     for (const man::vision::Edge* e = *abi; e; e = *++abi) {
-        uint32_t x = htonl(e->x() + 160);
+        uint32_t x = htonl(e->x() + (width / 8));
         edgeBuf.append((const char*) &x, sizeof(uint32_t));
-        uint32_t y = htonl(-e->y() + 120);
+        uint32_t y = htonl(-e->y() + (height / 4));
         edgeBuf.append((const char*) &y, sizeof(uint32_t));
         uint32_t mag = htonl(e->mag());
         edgeBuf.append((const char*) &mag, sizeof(uint32_t));
@@ -235,12 +235,6 @@ int Synthetics_func() {
 
     printf("Synthetics_func()\n");
     
-    /*
-     Let me know if this doesn't work:
-     
-     args[0]->tree().firstValueOf("contents")->find("params")->get(1)->valueAsDouble();
-     */
-
     double x = std::stod(args[0]->tree().find("contents")->get(1)->find("params")->get(1)->value().c_str());
     double y = std::stod(args[0]->tree().find("contents")->get(1)->find("params")->get(2)->value().c_str());
     double h = std::stod(args[0]->tree().find("contents")->get(1)->find("params")->get(3)->value().c_str());
