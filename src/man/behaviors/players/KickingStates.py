@@ -31,7 +31,7 @@ def executeMotionKick(player):
     elif player.kickedOut and not player.brain.ball.vis.on:
         player.kickedOut = False
         return player.goNow('spinSearch')
-        
+
     # TODO not ideal at all!
     if player.counter > 40:
         player.inKickingState = False
@@ -68,7 +68,6 @@ def afterKick(player):
     """
     State to follow up after a kick.
     """
-    print player.kickedOut
     if player.firstFrame():
         player.stand()        # stand up right, ready to walk
         player.brain.tracker.afterKickScan(player.kick.name)
