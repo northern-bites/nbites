@@ -234,6 +234,12 @@ int Synthetics_func() {
     assert(args.size() == 1);
 
     printf("Synthetics_func()\n");
+    
+    /*
+     Let me know if this doesn't work:
+     
+     args[0]->tree().firstValueOf("contents")->find("params")->get(1)->valueAsDouble();
+     */
 
     double x = std::stod(args[0]->tree().find("contents")->get(1)->find("params")->get(1)->value().c_str());
     double y = std::stod(args[0]->tree().find("contents")->get(1)->find("params")->get(2)->value().c_str());

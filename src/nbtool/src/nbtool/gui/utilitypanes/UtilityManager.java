@@ -14,6 +14,7 @@ public class UtilityManager {
 	public static final LogToViewUtility LogToViewUtility = new LogToViewUtility();
 	public static final YUVColors YUVColors = new YUVColors();
 	public static final ThreadStateUtility ThreadStateUtility = new ThreadStateUtility();
+	public static final SyntheticImageUtility SyntheticImageUtility = new SyntheticImageUtility();
 	
 	public static final UtilityParent[] utilities = findUtilityFields(); 
 	private static UtilityParent[] findUtilityFields() {
