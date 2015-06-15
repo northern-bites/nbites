@@ -32,14 +32,14 @@ public:
     GoalboxDetector* getBox(bool topCamera = true) const { return boxDetector[!topCamera]; }
     CornerDetector* getCorners(bool topCamera = true) const { return cornerDetector[!topCamera]; }
 
-    void setRobotName(std::string robotName) { robotName_ = robotName; }
-
     Colors* getColorsFromLisp(nblog::SExpr* colors, int camera);
     const std::string getStringFromTxtFile(std::string path);
+    void setCameraParams(std::string robotName);
+    void setCameraParams(int camera, std::string robotName);
+    void setCameraParams(CameraParams* params, bool topCamera) { cameraParams[!topCamera] = params; }
 
     // For use by Image nbcross func
     void setColorParams(Colors* colors, bool topCamera) { colorParams[!topCamera] = colors; }
-    void setCameraParams(CameraParams* params, bool topCamera) { cameraParams[!topCamera] = params; }
 
  
 
@@ -49,7 +49,6 @@ protected:
 private:
 
     void logImage(int i);
-    CameraParams* getCameraParamsFromLisp(nblog::SExpr* cameraLisp, int camera);
     
     Colors* colorParams[2];
     ImageFrontEnd* frontEnd[2];
@@ -64,7 +63,7 @@ private:
     GoalboxDetector* boxDetector[2];
     CornerDetector* cornerDetector[2];
 
-    std::string robotName_;
+    nblog::SExpr* cameraLisp;
     size_t image_index;
 };
 

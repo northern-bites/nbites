@@ -230,15 +230,15 @@ public:
 
 class CameraParams {
   double roll;
-  double pitch;
+  double tilt;
 
 public:
-  CameraParams() {};
-  CameraParams(double r, double p) { roll = r; pitch = p; }
+  CameraParams() { roll = tilt = 0.0; }
+  CameraParams(double r, double t) { roll = r; tilt = t; }
   double getRoll() { return roll; }
   void setRoll(double r) { roll = r; }
-  double getPitch() { return pitch; }
-  void setPitch(double p) { pitch = p; }
+  double getTilt() { return tilt; }
+  void setTilt(double t) { tilt = t; }
 
 };
 

@@ -75,7 +75,7 @@ int Vision_func() {
     std::cout << "NAME: " << rname << std::endl;
 
     man::vision::VisionModule module;
-    module.setRobotName(rname);
+    module.setCameraParams(rname);
 
     module.topIn.setMessage(imageMessage);
     module.bottomIn.setMessage(imageMessage);

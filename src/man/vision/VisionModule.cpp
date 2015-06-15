@@ -39,7 +39,7 @@ VisionModule::VisionModule()
 
     // Get SExpr from string
     nblog::SExpr* colors = nblog::SExpr::read(getStringFromTxtFile(colorPath));
-    nblog::SExpr* camera = nblog::SExpr::read(getStringFromTxtFile(cameraPath));
+    cameraLisp = nblog::SExpr::read(getStringFromTxtFile(cameraPath));
 
 
     // Set module pointers for top then bottom images
@@ -49,7 +49,7 @@ VisionModule::VisionModule()
         edgeDetector[i] = new EdgeDetector();
         edges[i] = new EdgeList(32000);
         houghLines[i] = new HoughLineList(128);
-        cameraParams[i] = getCameraParamsFromLisp(camera, i);
+        cameraParams[i] = new CameraParams();
         kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography();
         fieldLines[i] = new FieldLineList();
@@ -132,8 +132,8 @@ void VisionModule::run_()
         homography[i]->wz0(kinematics[i]->wz0());
 
         // TODO use cameraParameter[i] to adjust homography
-        homography[i]->tilt(kinematics[i]->tilt() - 3.965*TO_RAD);
-        homography[i]->roll(homography[i]->roll() - 2.21*TO_RAD);
+        homography[i]->tilt(kinematics[i]->tilt() + cameraParams[i]->getTilt()*TO_RAD);
+        homography[i]->roll(homography[i]->roll() + cameraParams[i]->getRoll()*TO_RAD);
         // homography[i]->azimuth(kinematics[i]->azimuth());
 
         // Approximate brightness gradient
@@ -267,7 +267,7 @@ void VisionModule::logImage(int i) {
         contents.push_back(joints);
 
         nblog::SExpr camParams("CameraParams", "tripoint", clock(), image_index, ja_buf.length());
-        camParams.append(nblog::SExpr(image_from, cameraParams[i]->getRoll(), cameraParams[i]->getPitch()));
+        camParams.append(nblog::SExpr(image_from, cameraParams[i]->getRoll(), cameraParams[i]->getTilt()));
         contents.push_back(camParams);
 
         nblog::NBLog(NBL_IMAGE_BUFFER, "tripoint",
@@ -340,11 +340,21 @@ Colors* VisionModule::getColorsFromLisp(nblog::SExpr* colors, int camera) {
 
     return ret;
 }
+void VisionModule::setCameraParams(std::string robotName) {
+    setCameraParams(0, robotName);
+    setCameraParams(1, robotName);
+}
 
-CameraParams* VisionModule::getCameraParamsFromLisp(nblog::SExpr* cameraLisp, int camera) {
-    std::cout << "RoboNAME: " << robotName_  << std::endl;
-
-    std::cout << cameraLisp->print() << std::endl;
+void VisionModule::setCameraParams(int camera, std::string robotName) {
+    CameraParams* cp = new CameraParams;
+    std::string cam = camera == 0 ? "top" : "bottom";
+    if (robotName != "") {
+        double roll =  cameraLisp->get(1)->find(robotName)->find(cam)->get(1)->valueAsDouble();
+        double pitch = cameraLisp->get(1)->find(robotName)->find(cam)->get(2)->valueAsDouble();
+        cameraParams[camera] = new CameraParams(roll, pitch);
+    } else {
+        std::cout << "Could not set camera params: No Robot Name" << std::endl;
+    }
 }
 
 }
