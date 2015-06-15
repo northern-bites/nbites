@@ -533,9 +533,9 @@ void TranscriberModule::run_()
         std::vector<SExpr> contents;
         
         SExpr imageinfo("YUVImage", image_from, clock(), image_index, im_size);
-        imageinfo.append(SExpr("width", im_width)   );
-        imageinfo.append(SExpr("height", im_height) );
-        imageinfo.append(SExpr("encoding", "[Y8(U8/V8)]"));
+        imageinfo.append(SExpr(CONTENT_IMAGE_WIDTH_S, im_width)   );
+        imageinfo.append(SExpr(CONTENT_IMAGE_HEIGHT_S, im_height) );
+        imageinfo.append(SExpr(CONTENT_IMAGE_ENCODING_S, "[Y8(U8/V8)]"));
         contents.push_back(imageinfo);
         
         /*

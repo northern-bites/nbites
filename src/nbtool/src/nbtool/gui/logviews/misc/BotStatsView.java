@@ -19,7 +19,6 @@ public class BotStatsView extends ViewParent {
 
 	@Override
 	public void setLog(Log newlog) {
-		this.log = newlog;
 		RobotStats bs = new RobotStats(newlog);
 		
 		if (area != null) {

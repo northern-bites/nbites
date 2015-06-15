@@ -28,9 +28,7 @@ import nbtool.util.Utility;
 public class ZoomImageView extends ViewParent {
 	private static final long serialVersionUID = 1L;
 
-	public void setLog(Log newlog) {
-		this.log = newlog;
-		
+	public void setLog(Log newlog) {		
 		iv.useImage(Utility.biFromLog(newlog));
 	}
 

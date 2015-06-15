@@ -79,7 +79,8 @@ public class LogDisplayPanel extends JPanel implements Events.LogSelected, Event
 	
 	protected void setContents(Log l, ArrayList<Log> also) {
 		Logger.log(Logger.INFO, "LDP.setContents() type: " + l.primaryType());
-		Class<? extends ViewParent>[] list = UtilityManager.instanceOfLTV().viewsForLog(l);
+		//Class<? extends ViewParent>[] list = UtilityManager.instanceOfLTV().viewsForLog(l);
+		Class<? extends ViewParent>[] list = UtilityManager.LogToViewUtility.viewsForLog(l);
 		views.removeAll();
 		
 		this.current = l;
@@ -125,7 +126,7 @@ public class LogDisplayPanel extends JPanel implements Events.LogSelected, Event
 				ViewParent view = null;
 				try {
 					view = ttype.getDeclaredConstructor().newInstance();
-					view.setLog(l);
+					view._setLog(l);
 					
 					if (also != null)
 						view.alsoSelected(also);
@@ -184,7 +185,7 @@ public class LogDisplayPanel extends JPanel implements Events.LogSelected, Event
 			} else {
 				try {
 					view = nlClass.getDeclaredConstructor().newInstance();
-					view.setLog(log);
+					view._setLog(log);
 					
 					if (also != null)
 						view.alsoSelected(also);

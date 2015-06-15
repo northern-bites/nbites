@@ -164,7 +164,7 @@ namespace nblog {
             
             //Log state.
             std::vector<SExpr> fields;
-            fields.push_back(SExpr("type", "STATS"));
+            fields.push_back(SExpr(CONTENT_TYPE_S, "STATS"));
             
             std::vector<SExpr> fvector = {
                 SExpr("flags"),
@@ -190,8 +190,7 @@ namespace nblog {
                       control::flags[control::LOCALIZATION]),
                 SExpr("BALLTRACK", control::BALLTRACK,
                       control::flags[control::BALLTRACK]),
-                SExpr("IMAGES", control::IMAGES,
-                      control::flags[control::IMAGES]),
+                
                 SExpr("VISION", control::VISION,
                       control::flags[control::VISION]),
                 
@@ -397,6 +396,12 @@ namespace nblog {
             return;
         }
         
+        if (buffer_index >= NUM_LOG_BUFFERS || buffer_index < 0) {
+            printf("ERROR: NBlog(...) called with INVALID buffer index!  Deleting log and returning...\n");
+            delete log;
+            return;
+        }
+        
         pthread_mutex_lock(&(log_main.buffers[buffer_index].lock));
         put(log, buffer_index);
         pthread_mutex_unlock(&(log_main.buffers[buffer_index].lock));
@@ -404,7 +409,12 @@ namespace nblog {
     
     void NBLog(int buffer_index, const std::string& where_called,
                const std::vector<SExpr>& items, const std::string& data ) {
-        Log * newl = new Log("nblog", where_called, time(NULL), LOG_VERSION,
+        if (!log_running) {
+            NBDEBUG("NBlog returning because !log_running\n");
+            return;
+        }
+        
+        Log * newl = new Log(LOG_FIRST_ATOM_S, where_called, time(NULL), LOG_VERSION,
                              items, data);
         
         

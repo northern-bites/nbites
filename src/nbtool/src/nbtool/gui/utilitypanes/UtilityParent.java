@@ -5,19 +5,20 @@ import java.util.HashSet;
 
 import javax.swing.JFrame;
 
-public abstract class UtilityParent extends JFrame {
-	public UtilityParent() {
-		super();
-		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+public abstract class UtilityParent {
+	public final JFrame getDisplay() {
+		JFrame display = supplyDisplay();
+		/* force standard utility display options... */
+		display.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		return display;
 	}
 	
-	public abstract Object getCurrentValue();
+	/* get display for this utility – subclass may decide whether to supply new instance on each request */
+	public abstract JFrame supplyDisplay();
 	
-	//Implementations of UtilityParent can decide how and when to use this...
-	private HashSet<UtilityChangeListener> listeners = new HashSet<UtilityChangeListener>();
-	public void addListener(UtilityChangeListener l) {listeners.add(l);}
-	public void removeListener(UtilityChangeListener l) {listeners.remove(l);}
-	public interface UtilityChangeListener {
-		public void utilValueChanged(UtilityParent src, Object... new_values);
-	}
+	/* return brief description of utility's purpose */
+	public abstract String purpose();
+	
+	/* return preferred keybind – may not be honored */
+	public abstract char preferredMemnonic();
 }
