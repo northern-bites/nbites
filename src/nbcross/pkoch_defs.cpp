@@ -43,7 +43,6 @@ int CrossBright_func() {
     std::string buffer((const char *) buf, length);
     copy->setData(buffer);
     
-    printf("[%s] modified.\n", copy->description().c_str());
     rets.push_back(copy);
     
     return 0;

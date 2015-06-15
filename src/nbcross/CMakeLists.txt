@@ -91,23 +91,20 @@ endif()
 # Man modules that we need to use
 include_directories( ${MAN_DIR}/support )
 add_subdirectory( ${MAN_DIR}/support ${CMAKE_CURRENT_BINARY_DIR}/man/support)
-
+add_subdirectory( ${MAN_DIR}/vision ${CMAKE_CURRENT_BINARY_DIR}/man/vision)
 add_subdirectory( ${MAN_DIR}/balltrack ${CMAKE_CURRENT_BINARY_DIR}/man/balltrack)
 add_subdirectory( ${MAN_DIR}/comm ${CMAKE_CURRENT_BINARY_DIR}/man/comm)
 add_subdirectory( ${MAN_DIR}/sharedball ${CMAKE_CURRENT_BINARY_DIR}/man/sharedball)
-add_subdirectory( ${MAN_DIR}/image ${CMAKE_CURRENT_BINARY_DIR}/man/image)
 add_subdirectory( ${MAN_DIR}/localization ${CMAKE_CURRENT_BINARY_DIR}/man/localization)
-add_subdirectory( ${MAN_DIR}/vision ${CMAKE_CURRENT_BINARY_DIR}/man/vision)
-
 add_subdirectory( ${MAN_DIR}/log ${CMAKE_CURRENT_BINARY_DIR}/man/log)
 add_subdirectory( ${MAN_DIR}/control ${CMAKE_CURRENT_BINARY_DIR}/man/control)
 
 ## SOURCES ##
-
 set( NBCROSS_SRCS
   main.cpp
   misc_defs.cpp
   pkoch_defs.cpp
+  vision_defs.cpp
 )
 
 set( NBCROSS_HEADERS
@@ -121,7 +118,6 @@ add_library(nbcross
 )
 
 ## EXECUTABLE ##
-
 add_executable( nbcross_tool
   ${NBCROSS_SRCS}
   ${NBCROSS_HEADERS} )
@@ -129,10 +125,9 @@ add_executable( nbcross_tool
 target_link_libraries( nbcross_tool
   portals
   messages
-  image # man image
-  vision # man vision
-  comm # man comm
-  sharedball # man sharedball
+  vision
+  comm
+  sharedball
   log
   logshare
   control

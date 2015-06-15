@@ -72,8 +72,10 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		
 		cntrlp = new ControlPanel();
 		lc = new LogChooser();
+		si = new SyntheticImages();
 		left.addTab("control", cntrlp);
 		left.addTab("logs", lc);
+		left.addTab("synthetics", si);
 				
 		statusp = new StatusPanel();
 		right.addTab("status", statusp);
@@ -154,6 +156,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 	private ControlPanel cntrlp;
 	private StatusPanel statusp;
 	private LogChooser lc;
+	private SyntheticImages si;
 		
 	private LogDisplayPanel ldp;
 	

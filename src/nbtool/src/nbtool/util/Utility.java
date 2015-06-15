@@ -19,6 +19,7 @@ import nbtool.data.SExpr;
 import nbtool.images.ImageParent;
 import nbtool.images.UV88image;
 import nbtool.images.Y16image;
+import nbtool.images.Y8image;
 import nbtool.images.YUYV8888image;
 
 
@@ -49,6 +50,8 @@ public class Utility {
 			ip = new Y16image(width , height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[U8V8]")) {
 			ip = new UV88image(width , height, log.bytes);
+		} else if (encoding.equalsIgnoreCase("[Y8]")) {
+			ip = new Y8image(width , height, log.bytes);
 		} else {
 			Logger.log(Logger.WARN, "Cannot use image with encoding:" + encoding);
 			return null;
