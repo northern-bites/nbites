@@ -198,6 +198,7 @@ class KickDecider(object):
         
         self.filters = []
         self.filters.append(self.inBoundsOrGoal)
+        self.filters.append(self.notTowardOurGoal)
 
         self.clearPossibleKicks()
         self.addFastestPossibleKicks()
@@ -285,6 +286,7 @@ class KickDecider(object):
         
         self.filters = []
         self.filters.append(self.inBoundsOrGoal)
+        self.filters.append(self.notTowardOurGoal)
 
         self.clearPossibleKicks()
         self.addFastestPossibleKicks()
@@ -669,6 +671,26 @@ class KickDecider(object):
         if 0 <= scale <= 1:
             return (rightPostY <= kickVector[1]*scale <= leftPostY)
         return False
+
+    def notTowardOurGoal(self, kick):
+        # do not kick into our goalbox
+        ball = self.brain.ball
+
+        inBox = (ball.x > nogginC.GREEN_PAD_X and ball.x < nogginC.BLUE_GOALBOX_RIGHT_X and
+                    ball.y < nogginC.BLUE_GOALBOX_TOP_Y and ball.y > nogginC.BLUE_GOALBOX_BOTTOM_Y)
+        intoBox = (kick.destinationX > nogginC.GREEN_PAD_X and kick.destinationX < nogginC.BLUE_GOALBOX_RIGHT_X and
+                    kick.destinationY < nogginC.BLUE_GOALBOX_TOP_Y and kick.destinationY > nogginC.BLUE_GOALBOX_BOTTOM_Y)
+
+        if intoBox and not inBox:
+            return False
+
+        else:
+            goalCenter = Location(nogginC.FIELD_WHITE_LEFT_SIDELINE_X, nogginC.MIDFIELD_Y)
+            ball = Location(ball.x, ball.y)
+            kickDestination = Location(kick.destinationX, kick.destinationY)
+
+            return goalCenter.distTo(ball) < goalCenter.distTo(kickDestination)
+
 
     def forwardProgress(self, kick):
         goalCenter = Location(nogginC.FIELD_WHITE_RIGHT_SIDELINE_X, nogginC.MIDFIELD_Y)
