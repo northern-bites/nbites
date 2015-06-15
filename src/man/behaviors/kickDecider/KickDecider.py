@@ -270,6 +270,35 @@ class KickDecider(object):
 
         return self.frontKickCrosses()
 
+    def kickOutOfBounds(self):
+        self.kicks = []
+        self.kicks.append(kicks.M_LEFT_STRAIGHT)
+        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
+        self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
+        self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
+        self.kicks.append(kicks.M_LEFT_SIDE)
+        self.kicks.append(kicks.M_RIGHT_SIDE)
+        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+
+        self.filters = []
+        self.filters.append(self.outOfBounds)
+
+        self.scoreKick = self.minimizeKickTime
+
+        self.clearPossibleKicks()
+        self.addFastestPossibleKicks()
+
+        try:
+            k = (kick for kick in self.possibleKicks).next().next()
+            if k.sweetMove: 
+                self.brain.player.motionKick = False
+            else:
+                self.brain.player.motionKick = True
+            return k
+        except:
+            return None
+
     def allKicksAsap(self):
         self.kicks = []
         self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
@@ -431,8 +460,24 @@ class KickDecider(object):
         except:
             return None
 
+    def nearOurGoal(self):
+        nearOurGoal = (math.fabs(self.brain.loc.h) > 100 and 
+                                self.brain.ball.x < nogginC.LANDMARK_BLUE_GOAL_CROSS_X)
+        if nearOurGoal:
+            out = self.kickOutOfBounds()
+            if out:
+                return out
+            else:
+                return None
+        else:
+            return None
+
     ### HIGH LEVEL PLANNERS ###
     def attacker(self):
+        nearGoal = self.nearOurGoal()
+        if nearGoal:
+            return nearGoal
+
         frontKicks = self.frontKicksOrbitIfSmall()
         if frontKicks: 
             return frontKicks
@@ -444,6 +489,10 @@ class KickDecider(object):
         return self.frontKickCrosses()
 
     def defender(self):
+        nearGoal = self.nearOurGoal()
+        if nearGoal:
+            return nearGoal
+
         asap = self.allKicksAsap()
         if asap:
             return asap
@@ -626,6 +675,14 @@ class KickDecider(object):
         orbitTime = abs(self.normalizeAngle(kick.setupH - self.brain.loc.h))
         return -orbitTime
 
+    def minimizeKickTime(self, kick):
+        if kick.sweetMove:
+            t = 1
+        else:
+            t = 2   # prioritize motion kicks
+        
+        return t
+
     def minimizeDistanceToGoal(self, kick):
         if self.crossesGoalLine(kick):
             offset = 10000000 # TODO make less of a hack
@@ -638,6 +695,23 @@ class KickDecider(object):
                                    (kick.destinationY - goalCenter.y)**2))
 
     ### FILTERS ###
+
+    # can we kick it out of bounds behind our own goal without scoring an own goal?
+    def outOfBounds(self, kick):
+        bottomGoalline1 = (nogginC.FIELD_WHITE_LEFT_SIDELINE_X, nogginC.GREEN_PAD_X)
+        bottomGoalline2 = (nogginC.FIELD_WHITE_LEFT_SIDELINE_X, nogginC.BLUE_GOALBOX_BOTTOM_Y)
+        
+        topGoalline1 = (nogginC.FIELD_WHITE_LEFT_SIDELINE_X, nogginC.FIELD_WHITE_HEIGHT + nogginC.GREEN_PAD_X)
+        topGoalline2 = (nogginC.FIELD_WHITE_LEFT_SIDELINE_X, nogginC.BLUE_GOALBOX_TOP_Y)
+        
+        k1 = (self.brain.ball.x, self.brain.ball.y)
+        k2 = (kick.destinationX, kick.destinationY)
+
+        out = (self.intersects(bottomGoalline1, bottomGoalline2, k1, k2) or 
+                        self.intersects(topGoalline1, topGoalline2, k1, k2))
+        
+        return out
+
     def inBoundsOrGoal(self, kick):
         return self.inBounds(kick) or self.crossesGoalLine(kick)
 
@@ -699,3 +773,64 @@ class KickDecider(object):
     def checkObstacle(self, position, threshold):
         return (self.brain.obstacles[position] <= threshold and 
                 self.brain.obstacles[position] != 0.0)
+
+    ### Functions for determining if two line segments intersect
+    # adapted from http://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/ ###
+
+    # Given three colinear points p, q, r, the function checks if
+    # point q lies on line segment 'pr'
+    def onSegment(self, p, q, r):
+        if (q[0] <= max(p[0], r[0]) and q[0] >= min(p[0], r[0]) and
+            q[1] <= max(p[1], r[1]) and q[1] >= min(p[1], r[1])):
+           return True
+     
+        return False
+     
+    # To find orientation of ordered triplet (p, q, r).
+    # The function returns following values
+    # 0 --> p, q and r are colinear
+    # 1 --> Clockwise
+    # 2 --> Counterclockwise
+    def orientation(self, p, q, r):
+        # See 10th slides from following link for derivation of the formula
+        # http://www.dcs.gla.ac.uk/~pat/52233/slides/Geometry1x1.pdf
+        val = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1])
+     
+        if val == 0:
+            return 0  # colinear
+        if val > 0:   # clockwise
+            return 1
+        return 2      # counter clockwise
+
+    # The main function that returns true if line segment 'p1q1'
+    # and 'p2q2' intersect.
+    def intersects(self, p1, q1, p2, q2):
+        # Find the four orientations needed for general and
+        # special cases
+        o1 = self.orientation(p1, q1, p2);
+        o2 = self.orientation(p1, q1, q2);
+        o3 = self.orientation(p2, q2, p1);
+        o4 = self.orientation(p2, q2, q1);
+     
+        # General case
+        if (o1 != o2 and o3 != o4):
+            return True
+     
+        # Special Cases
+        # p1, q1 and p2 are colinear and p2 lies on segment p1q1
+        if (o1 == 0 and self.onSegment(p1, p2, q1)):
+            return True
+     
+        # p1, q1 and p2 are colinear and q2 lies on segment p1q1
+        if (o2 == 0 and self.onSegment(p1, q2, q1)):
+            return True
+     
+        # p2, q2 and p1 are colinear and p1 lies on segment p2q2
+        if (o3 == 0 and self.onSegment(p2, p1, q2)):
+            return True
+     
+        # p2, q2 and q1 are colinear and q1 lies on segment p2q2
+        if (o4 == 0 and self.onSegment(p2, q1, q2)):
+            return True
+     
+        return False # Doesn't fall in any of the above cases
