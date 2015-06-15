@@ -25,7 +25,7 @@ public:
     portals::InPortal<messages::YUVImage> bottomIn;
     portals::InPortal<messages::JointAngles> jointsIn;
 
-    ImageFrontEnd* getFrontEnd(bool topCamera) const { return frontEnd[!topCamera]; }
+    ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
     HoughLineList* getLines(bool topCamera = true) const { return houghLines[!topCamera]; }
     BallDetector* getBallDetector(bool topCamera = true) const { return ballDetector[!topCamera]; }
@@ -36,7 +36,10 @@ public:
 
 
     // For use by Image nbcross func
-    void setColorParams(Colors* colors, bool top) { colorParams[!top] = colors; }
+    void setColorParams(Colors* colors, bool topCamera) { colorParams[!topCamera] = colors; }
+
+    // Method to convert from Lisp to Colors type
+    Colors* getColorsFromLisp(nblog::SExpr* colors, int camera);
 
 protected:
     virtual void run_();
@@ -51,9 +54,9 @@ private:
     Kinematics* kinematics[2];
     FieldHomography* homography[2];
     FieldLineList* fieldLines[2];
-    BallDetector* ballDetector[2];
     GoalboxDetector* boxDetector[2];
     CornerDetector* cornerDetector[2];
+    BallDetector* ballDetector[2];
 
     // Lisp tree with color params saved
     nblog::SExpr colors;

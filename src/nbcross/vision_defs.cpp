@@ -18,7 +18,7 @@
 using nblog::Log;
 using nblog::SExpr;
 
-man::vision::Colors* getColorsFromSExpr(SExpr* params);
+//man::vision::Colors* getColorsFromSExpr(SExpr* params);
 void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top);
 SExpr getSExprFromSavedParams(int color, std::string sexpPath, bool top);
 std::string getSExprStringFromColorJSonNode(boost::property_tree::ptree tree);
@@ -38,10 +38,14 @@ int Vision_func() {
     // Parse YUVImage S-expression
     bool topCamera = copy->tree().find("contents")->get(1)->
                                   find("from")->get(1)->value() == "camera_TOP";
+
     int width = 2*atoi(copy->tree().find("contents")->get(1)->
                                         find("width")->get(1)->value().c_str());
     int height = atoi(copy->tree().find("contents")->get(1)->
-                                        find("height")->get(1)->value().c_str());
+                                        find("height")->get(1)->value().c_str());     
+
+    int outWidth = width/4;
+    int outHeight = height/2;
 
     // Location of lisp text file with color params
     std::string sexpPath = std::string(getenv("NBITES_DIR"));
@@ -76,7 +80,8 @@ int Vision_func() {
     SExpr* params = args[0]->tree().find("Params");
     if (params != NULL) {
         // Set new parameters as frontEnd colorParams
-        module.setColorParams(getColorsFromSExpr(params), topCamera);
+        man::vision::Colors* c = module.getColorsFromLisp(params, 2);
+        module.setColorParams(c, topCamera);
 
         // Look for atom value "SaveParams", i.e. "save" button press
         SExpr* save = params->get(1)->find("SaveParams");
@@ -88,16 +93,13 @@ int Vision_func() {
 
     module.run();
 
-    // Run and retrieve front end from vision module
-    //man::vision::ImageFrontEnd* frontEnd = module.runAndGetFrontEnd(topCamera);
-
     // -----------
     //   Y IMAGE
     // -----------
     man::vision::ImageFrontEnd* frontEnd = module.getFrontEnd(topCamera);
 
     Log* yRet = new Log();
-    int yLength = 240*320*2;
+    int yLength = outHeight*outWidth*2;
 
     // Create temp buffer and fill with yImage from FrontEnd
     uint8_t yBuf[yLength];
@@ -113,7 +115,7 @@ int Vision_func() {
     //   WHITE IMAGE
     // ---------------
     Log* whiteRet = new Log();
-    int whiteLength = 240*320;;
+    int whiteLength = outHeight*outWidth;;
 
     // Create temp buffer and fill with white image 
     uint8_t whiteBuf[whiteLength];
@@ -132,7 +134,7 @@ int Vision_func() {
     //   GREEN IMAGE
     // ---------------
     Log* greenRet = new Log();
-    int greenLength = 240*320;
+    int greenLength = outHeight*outWidth;
 
     // Create temp buffer and fill with gree image 
     uint8_t greenBuf[greenLength];
@@ -151,7 +153,7 @@ int Vision_func() {
     //   ORANGE IMAGE
     // ----------------
     Log* orangeRet = new Log();
-    int orangeLength = 240*320;
+    int orangeLength = outHeight*outWidth;
 
     // Create temp buffer and fill with orange image 
     uint8_t orangeBuf[orangeLength];
@@ -170,7 +172,7 @@ int Vision_func() {
     //  SEGMENTED IMAGE
     //-------------------
     Log* colorSegRet = new Log();
-    int colorSegLength = 240*320;
+    int colorSegLength = outHeight*outWidth;
 
     // Create temp buffer and fill with segmented image
     uint8_t segBuf[colorSegLength];
@@ -192,9 +194,9 @@ int Vision_func() {
 
     man::vision::AngleBinsIterator<man::vision::Edge> abi(*edgeList);
     for (const man::vision::Edge* e = *abi; e; e = *++abi) {
-        uint32_t x = htonl(e->x() + 160);
+        uint32_t x = htonl(e->x() + outWidth/2);
         edgeBuf.append((const char*) &x, sizeof(uint32_t));
-        uint32_t y = htonl(-e->y() + 120);
+        uint32_t y = htonl(-e->y() + outHeight/2);
         edgeBuf.append((const char*) &y, sizeof(uint32_t));
         uint32_t mag = htonl(e->mag());
         edgeBuf.append((const char*) &mag, sizeof(uint32_t));
@@ -217,27 +219,45 @@ int Vision_func() {
 
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
-        double r = line.r();
-        double t = line.t();
-        double ep0 = line.ep0();
-        double ep1 = line.ep1();
+
+        // Get image coordinates
+        double icR = line.r();
+        double icT = line.t();
+        double icEP0 = line.ep0();
+        double icEP1 = line.ep1();
+
         int houghIndex = line.index();
         int fieldIndex = line.fieldLine();
 
+        // Get field coordinates
+        double fcR = line.field().r();
+        double fcT = line.field().t();
+        double fcEP0 = line.field().ep0();
+        double fcEP1 = line.field().ep1();
+
         // Java uses big endian representation
-        endswap<double>(&r);
-        endswap<double>(&t);
-        endswap<double>(&ep0);
-        endswap<double>(&ep1);
+        endswap<double>(&icR);
+        endswap<double>(&icT);
+        endswap<double>(&icEP0);
+        endswap<double>(&icEP1);
         endswap<int>(&houghIndex);
         endswap<int>(&fieldIndex);
+        endswap<double>(&fcR);
+        endswap<double>(&fcT);
+        endswap<double>(&fcEP0);
+        endswap<double>(&fcEP1);
 
-        lineBuf.append((const char*) &r, sizeof(double));
-        lineBuf.append((const char*) &t, sizeof(double));
-        lineBuf.append((const char*) &ep0, sizeof(double));
-        lineBuf.append((const char*) &ep1, sizeof(double));
+
+        lineBuf.append((const char*) &icR, sizeof(double));
+        lineBuf.append((const char*) &icT, sizeof(double));
+        lineBuf.append((const char*) &icEP0, sizeof(double));
+        lineBuf.append((const char*) &icEP1, sizeof(double));
         lineBuf.append((const char*) &houghIndex, sizeof(int));
         lineBuf.append((const char*) &fieldIndex, sizeof(int));
+        lineBuf.append((const char*) &fcR, sizeof(double));
+        lineBuf.append((const char*) &fcT, sizeof(double));
+        lineBuf.append((const char*) &fcEP0, sizeof(double));
+        lineBuf.append((const char*) &fcEP1, sizeof(double));
 
         //std::cout << line.print() << std::endl;
     }
@@ -290,37 +310,6 @@ int Vision_func() {
     rets.push_back(ballRet);
 
     return 0;
-}
-
-/* Helper function to convert from SExpr to Colors type.
-    Use 18 parameters to intialize Colors struct.
- */
-man::vision::Colors* getColorsFromSExpr(SExpr* params) {
-    man::vision::Colors* ret = new man::vision::Colors;
-    int i, j = 0;
-
-    ret->white.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize())); 
-
-    ret->green.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));  
- 
-   ret->orange.load(std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()),
-                    std::stof(params->get(1)->get(j++ / 6)->get(1)->get(i++ % 6)->get(1)->serialize()));
-
-    return ret;
 }
 
 // Save the new color params to the colorParams.txt file

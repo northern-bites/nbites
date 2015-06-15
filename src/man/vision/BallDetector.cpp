@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <iostream>
 
-const double BALL_RADIUS = 32.5;
+const double BALL_RADIUS = 3.25;
 const double VERT_FOV_DEG = 47.64;
 const double VERT_FOV_RAD = 47.64 * M_PI / 180;
 
@@ -23,6 +23,7 @@ BallDetector::~BallDetector() { }
 
 void BallDetector::findBall(ImageLiteU8 orange)
 {
+    std::cout << "before blob" <<std::endl;
     blobber.run(orange.pixelAddr(), orange.width(), orange.height(), orange.pitch());
 
     if (topCamera) std::cout << "Top camera ";
@@ -35,8 +36,6 @@ void BallDetector::findBall(ImageLiteU8 orange)
 
         double bIX = ((*i).centerX() - orange.width()/2);
         double bIY = (orange.height() / 2 - (*i).centerY()) - (*i).firstPrincipalLength();
-
-        printf("bix: %f, biy: %f\n", bIX, bIY);
 
         bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
 
@@ -300,8 +299,8 @@ void Ball::compute()
 // The expected diameter of ball in image at distance d in CM
 double Ball::pixDiameterFromDist(double d) const
 {
-    double trig = tan(VERT_FOV_RAD / 2.0);
-    return imgHeight * BALL_RADIUS / (2.0 * d * trig);
+    double trig = atan(BALL_RADIUS / d);
+    return 2 * imgHeight * trig / VERT_FOV_RAD;
 }
 
 // double BallDetector::distanceFromRadius(double rad) {

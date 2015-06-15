@@ -1,6 +1,7 @@
 #include "VisionModule.h"
 #include "Edge.h"
 #include "HighResTimer.h"
+#include "NBMath.h"
 
 #include <iostream>
 #include <fstream>
@@ -20,7 +21,7 @@ VisionModule::VisionModule()
       bottomIn(),
       jointsIn()
 {
-    std:: string sexpPath;
+    std::string sexpPath;
 #ifdef OFFLINE
     sexpPath = std::string(getenv("NBITES_DIR"));
     sexpPath += "/src/man/config/colorParams.txt";
@@ -41,7 +42,7 @@ VisionModule::VisionModule()
     std::string sexpText(buff);
 
     // Get SExpr from string
-    colors = *nblog::SExpr::read((const std::string)sexpText);
+    nblog::SExpr* colors = nblog::SExpr::read((const std::string)sexpText);
 
     // Set module pointers for top then bottom images
     // NOTE Constructed on heap because some of the objects below do
@@ -50,7 +51,7 @@ VisionModule::VisionModule()
     //      constructors in the case of C-style arrays, limitation theoretically
     //      removed in C++11.
     for (int i = 0; i < 2; i++) {
-        colorParams[i] = getColorsFromLisp(i == 0);
+        colorParams[i] = getColorsFromLisp(colors, i);
         frontEnd[i] = new ImageFrontEnd();
         edgeDetector[i] = new EdgeDetector();
         edges[i] = new EdgeList(32000);
@@ -61,6 +62,7 @@ VisionModule::VisionModule()
         ballDetector[i] = new BallDetector(homography[i], i == 0);
         boxDetector[i] = new GoalboxDetector();
 
+        // TODO set width and height dynamically
         if (i == 0) {
           hough[i] = new HoughSpace(320, 240);
           cornerDetector[i] = new CornerDetector(320, 240);
@@ -135,8 +137,10 @@ void VisionModule::run_()
         std::cout << "Top camera: " << (i == 0) << std::endl;
         kinematics[i]->joints(jointsIn.message());
         homography[i]->wz0(kinematics[i]->wz0());
-        homography[i]->tilt(kinematics[i]->tilt());
-        homography[i]->azimuth(kinematics[i]->azimuth());
+        homography[i]->tilt(kinematics[i]->tilt() - 3.965*TO_RAD);
+
+        homography[i]->roll(homography[i]->roll()-2.21*TO_RAD);
+        // homography[i]->azimuth(kinematics[i]->azimuth());
 
         // Approximate brightness gradient
         edgeDetector[i]->gradient(yImage);
@@ -152,8 +156,6 @@ void VisionModule::run_()
         hough[i]->run(*(edges[i]), *(houghLines[i]));
 
         times[i][3] = timer.end();
-
-
 
         // Find field lines
         houghLines[i]->mapToField(*(homography[i]));
@@ -171,6 +173,7 @@ void VisionModule::run_()
         times[i][6] = timer.end();
     }
 
+    
     for (int i = 0; i < 2; i++) {
         break;
         if (i == 0)
@@ -188,68 +191,49 @@ void VisionModule::run_()
 }
 
 /*
- Run only the frontEnd using the color parameters scecfied by bool "top".
-  Return the frontEnd that it ran it because it contains the output images,
-  which will be used by the nbcros function "Vision_func()".
-*/
-// ImageFrontEnd* VisionModule::runAndGetFrontEnd(bool top) {
-//     topIn.latch();
-//     bottomIn.latch();
-//     jointsIn.latch();
-
-//     const messages::YUVImage* image = &topIn.message();
-    
-//     YuvLite yuvLite(image->width() / 4,
-//                         image->height() / 2,
-//                         image->rowPitch(),
-//                         image->pixelAddress(0, 0));
-
-//     frontEnd[0]->run(yuvLite, colorParams[!top]);
-
-//     return frontEnd[0];
-// }
-
-/*
  Lisp data in config/colorParams.txt stores 32 parameters. Read lisp and
   load the three compoenets of a Colors struct, white, green, and orange,
   from the 18 values for either the top or bottom image. 
 */
-Colors* VisionModule::getColorsFromLisp(bool top) {
+Colors* VisionModule::getColorsFromLisp(nblog::SExpr* colors, int camera) {
     Colors* ret = new man::vision::Colors;
-    int i, j = 0;
-
     nblog::SExpr* params;
 
-    if (top) {
-        params = colors.get(1)->find("Top")->get(1);
+    if (camera == 0) {
+        params = colors->get(1)->find("Top")->get(1);
+    } else if (camera == 1) {
+        params = colors->get(1)->find("Bottom")->get(1);
     } else {
-        params = colors.get(1)->find("Bottom")->get(1);
+        params = colors->get(1);
     }
 
-    nblog::SExpr* color = params->get(0)->get(1);
+    colors = params->get(0)->get(1);
 
-    ret->white.load(std::stof(color->get(0)->get(1)->serialize()),
-                    std::stof(color->get(1)->get(1)->serialize()),
-                    std::stof(color->get(2)->get(1)->serialize()),
-                    std::stof(color->get(3)->get(1)->serialize()),
-                    std::stof(color->get(4)->get(1)->serialize()),
-                    std::stof(color->get(5)->get(1)->serialize()));
+    
+    ret->white. load(std::stof(colors->get(0)->get(1)->serialize()),
+                     std::stof(colors->get(1)->get(1)->serialize()),
+                     std::stof(colors->get(2)->get(1)->serialize()),
+                     std::stof(colors->get(3)->get(1)->serialize()),
+                     std::stof(colors->get(4)->get(1)->serialize()),
+                     std::stof(colors->get(5)->get(1)->serialize())); 
+    
+    colors = params->get(1)->get(1);
 
-    color = params->get(1)->get(1);
-    ret->green.load(std::stof(color->get(0)->get(1)->serialize()),
-                    std::stof(color->get(1)->get(1)->serialize()),
-                    std::stof(color->get(2)->get(1)->serialize()),
-                    std::stof(color->get(3)->get(1)->serialize()),
-                    std::stof(color->get(4)->get(1)->serialize()),
-                    std::stof(color->get(5)->get(1)->serialize()));
+    ret->green. load(std::stof(colors->get(0)->get(1)->serialize()),
+                     std::stof(colors->get(1)->get(1)->serialize()),
+                     std::stof(colors->get(2)->get(1)->serialize()),
+                     std::stof(colors->get(3)->get(1)->serialize()),
+                     std::stof(colors->get(4)->get(1)->serialize()),
+                     std::stof(colors->get(5)->get(1)->serialize()));  
+    
+    colors = params->get(2)->get(1);
 
-    color = params->get(2)->get(1);
-    ret->orange.load(std::stof(color->get(0)->get(1)->serialize()),
-                     std::stof(color->get(1)->get(1)->serialize()),
-                     std::stof(color->get(2)->get(1)->serialize()),
-                     std::stof(color->get(3)->get(1)->serialize()),
-                     std::stof(color->get(4)->get(1)->serialize()),
-                     std::stof(color->get(5)->get(1)->serialize()));
+    ret->orange.load(std::stof(colors->get(0)->get(1)->serialize()),
+                     std::stof(colors->get(1)->get(1)->serialize()),
+                     std::stof(colors->get(2)->get(1)->serialize()),
+                     std::stof(colors->get(3)->get(1)->serialize()),
+                     std::stof(colors->get(4)->get(1)->serialize()),
+                     std::stof(colors->get(5)->get(1)->serialize()));
 
     return ret;
 }

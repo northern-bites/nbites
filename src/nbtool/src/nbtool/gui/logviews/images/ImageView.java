@@ -22,9 +22,7 @@ public class ImageView extends ViewParent{
 			g.drawImage(img, 0, 0, null);
     }
 	
-	public void setLog(Log newlog) {
-		log = newlog;
-		
+	public void setLog(Log newlog) {		
 		this.img = Utility.biFromLog(newlog);
 		
 		repaint();

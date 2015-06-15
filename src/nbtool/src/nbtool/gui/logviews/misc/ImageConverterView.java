@@ -64,6 +64,13 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
     // Some operations should only happen on first load
     private boolean firstLoad;
 
+    private int width;
+    private int height;
+
+    final double wPrecision = 200.0;
+    final double gPrecision = 300.0;
+    final double oPrecision = 100.0;
+
     public ImageConverterView() {
         super();
         firstLoad = true;
@@ -158,6 +165,8 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
     @Override
     public void setLog(Log newlog) {
         log = newlog;
+        width =  log.tree().get(4).get(1).get(5).get(1).valueAsInt() / 2;
+        height = log.tree().get(4).get(1).get(6).get(1).valueAsInt() / 2;
         callNBFunction();
     }
     @Override
@@ -176,33 +185,34 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
 
         // This is called when the sliders are initialized, so dont run if it's first load,
         //  or if any values are zero b/c devide by zero error in frontEnd processing
-        if (firstLoad || zeroParam())
+        if (firstLoad)
             return;
+        zeroParam();
 
         SExpr newParams = SExpr.newList(
             SExpr.newKeyValue("White", SExpr.newList(
-                SExpr.newKeyValue("dark_u",  (float)(wDarkU. getValue()) / 100.00),
-                SExpr.newKeyValue("dark_v",  (float)(wDarkV. getValue()) / 100.00),
-                SExpr.newKeyValue("light_u", (float)(wLightU.getValue()) / 100.00),
-                SExpr.newKeyValue("light_v", (float)(wLightV.getValue()) / 100.00),
-                SExpr.newKeyValue("fuzzy_u", (float)(wFuzzyU.getValue()) / 100.00),
-                SExpr.newKeyValue("fuzzy_v", (float)(wFuzzyV.getValue()) / 100.00))),
+                SExpr.newKeyValue("dark_u",  (float)(wDarkU. getValue()) / wPrecision),
+                SExpr.newKeyValue("dark_v",  (float)(wDarkV. getValue()) / wPrecision),
+                SExpr.newKeyValue("light_u", (float)(wLightU.getValue()) / wPrecision),
+                SExpr.newKeyValue("light_v", (float)(wLightV.getValue()) / wPrecision),
+                SExpr.newKeyValue("fuzzy_u", (float)(wFuzzyU.getValue()) / wPrecision),
+                SExpr.newKeyValue("fuzzy_v", (float)(wFuzzyV.getValue()) / wPrecision))),
 
             SExpr.newKeyValue("Green", SExpr.newList(
-                SExpr.newKeyValue("dark_u",  (float)(gDarkU. getValue()) / 100.00),
-                SExpr.newKeyValue("dark_v",  (float)(gDarkV. getValue()) / 100.00),
-                SExpr.newKeyValue("light_u", (float)(gLightU.getValue()) / 100.00),
-                SExpr.newKeyValue("light_v", (float)(gLightV.getValue()) / 100.00),
-                SExpr.newKeyValue("fuzzy_u", (float)(gFuzzyU.getValue()) / 100.00),
-                SExpr.newKeyValue("fuzzy_v", (float)(gFuzzyV.getValue()) / 100.00))),
+                SExpr.newKeyValue("dark_u",  (float)(gDarkU. getValue()) / gPrecision),
+                SExpr.newKeyValue("dark_v",  (float)(gDarkV. getValue()) / gPrecision),
+                SExpr.newKeyValue("light_u", (float)(gLightU.getValue()) / gPrecision),
+                SExpr.newKeyValue("light_v", (float)(gLightV.getValue()) / gPrecision),
+                SExpr.newKeyValue("fuzzy_u", (float)(gFuzzyU.getValue()) / gPrecision),
+                SExpr.newKeyValue("fuzzy_v", (float)(gFuzzyV.getValue()) / gPrecision))),
 
             SExpr.newKeyValue("Orange", SExpr.newList(
-                SExpr.newKeyValue("dark_u",  (float)(oDarkU. getValue()) / 100.00),
-                SExpr.newKeyValue("dark_v",  (float)(oDarkV. getValue()) / 100.00),
-                SExpr.newKeyValue("light_u", (float)(oLightU.getValue()) / 100.00),
-                SExpr.newKeyValue("light_v", (float)(oLightV.getValue()) / 100.00),
-                SExpr.newKeyValue("fuzzy_u", (float)(oFuzzyU.getValue()) / 100.00),
-                SExpr.newKeyValue("fuzzy_v", (float)(oFuzzyV.getValue()) / 100.00)))
+                SExpr.newKeyValue("dark_u",  (float)(oDarkU. getValue()) / oPrecision),
+                SExpr.newKeyValue("dark_v",  (float)(oDarkV. getValue()) / oPrecision),
+                SExpr.newKeyValue("light_u", (float)(oLightU.getValue()) / oPrecision),
+                SExpr.newKeyValue("light_v", (float)(oLightV.getValue()) / oPrecision),
+                SExpr.newKeyValue("fuzzy_u", (float)(oFuzzyU.getValue()) / oPrecision),
+                SExpr.newKeyValue("fuzzy_v", (float)(oFuzzyV.getValue()) / oPrecision)))
             );
         
         // Look for existing Params atom in current this.log description
@@ -247,31 +257,27 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
     }
 
     // Check to see if any parameters are zero to avoid devide-by-zero error later
-    private boolean zeroParam() {
-        if (wDarkU. getValue() == 0 ||
-            wDarkV. getValue() == 0 ||
-            wLightU.getValue() == 0 ||
-            wLightV.getValue() == 0 ||
-            wFuzzyU.getValue() == 0 ||
-            wFuzzyV.getValue() == 0 ||
+    private void zeroParam() {
+        if (wDarkU. getValue() == 0) wDarkU.setValue(1);
+        if (wDarkV. getValue() == 0) wDarkV.setValue(1);
+        if (wLightU.getValue() == 0) wLightU.setValue(1);
+        if (wLightV.getValue() == 0) wLightV.setValue(1);
+        if (wFuzzyU.getValue() == 0) wFuzzyU.setValue(1);
+        if (wFuzzyV.getValue() == 0) wFuzzyV.setValue(1);
 
-            gDarkU. getValue() == 0 ||
-            gDarkV. getValue() == 0 ||
-            gLightU.getValue() == 0 ||
-            gLightV.getValue() == 0 ||
-            gFuzzyU.getValue() == 0 ||
-            gFuzzyV.getValue() == 0 ||
+        if (gDarkU. getValue() == 0) gDarkU.setValue(1);
+        if (gDarkV. getValue() == 0) gDarkV.setValue(1);
+        if (gLightU.getValue() == 0) gLightU.setValue(1);
+        if (gLightV.getValue() == 0) gLightV.setValue(1);
+        if (gFuzzyU.getValue() == 0) gFuzzyU.setValue(1);
+        if (gFuzzyV.getValue() == 0) gFuzzyV.setValue(1);
 
-            oDarkU. getValue() == 0 ||
-            oDarkV. getValue() == 0 ||
-            oLightU.getValue() == 0 ||
-            oLightV.getValue() == 0 ||
-            oFuzzyU.getValue() == 0 ||
-            oFuzzyV.getValue() == 0) {
-
-            return true;
-        }
-        return false;
+        if (oDarkU. getValue() == 0) oDarkU.setValue(1);
+        if (oDarkV. getValue() == 0) oDarkV.setValue(1);
+        if (oLightU.getValue() == 0) oLightU.setValue(1);
+        if (oLightV.getValue() == 0) oLightV.setValue(1);
+        if (oFuzzyU.getValue() == 0) oFuzzyU.setValue(1);
+        if (oFuzzyV.getValue() == 0) oFuzzyV.setValue(1);
     }
 
     // Draw 5 output images, 18 sliders, 6 texts, and a button
@@ -281,9 +287,6 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         int sH = 15; // slider height
         int tB = 20; // text buffer
         int lB = 5;  // little buffer
-
-        int width = 320;
-        int height = 240;
 
         // Draw five output image
         if (whiteImage != null) {
@@ -338,35 +341,35 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         g.drawString("orange U and V thresholds for when Y is 255", width*2 + vB*2, height + tB*2 + sH*2 - lB);
         g.drawString("width of fuzzy threshold for U and V",        width*2 + vB*2, height + tB*3 + sH*4 - lB);
        
-       // Draw button
-        saveButton.setBounds(width*2 + vB*2,  height + sH*6 + tB*3, width, tB);
+        // Draw button
+        saveButton.setBounds(width*2 + vB*2,  height + sH*6 + tB*3, width, tB*3);
     }
 
 
     @Override
     public void ioReceived(IOInstance inst, int ret, Log... out) {
         if (out.length > 0) {
-            Y16image yImg = new Y16image(320, 240, out[0].bytes);
+            Y16image yImg = new Y16image(width, height, out[0].bytes);
             this.yImage = yImg.toBufferedImage();
         }
 
         if (out.length > 1) {
-            Y8image white8 = new Y8image(320, 240, out[1].bytes);
+            Y8image white8 = new Y8image(width, height, out[1].bytes);
             this.whiteImage = white8.toBufferedImage();
         }
 
         if (out.length > 2) {
-            Y8image green8 = new Y8image(320, 240, out[2].bytes);
+            Y8image green8 = new Y8image(width, height, out[2].bytes);
             this.greenImage = green8.toBufferedImage();
         }
 
         if (out.length > 3) {
-            Y8image orange8 = new Y8image(320, 240, out[3].bytes);
+            Y8image orange8 = new Y8image(width, height, out[3].bytes);
             this.orangeImage = orange8.toBufferedImage();
         }
 
         if (out.length > 4) {
-            ColorSegmentedImage colorSegImg = new ColorSegmentedImage(320, 240, out[4].bytes);
+            ColorSegmentedImage colorSegImg = new ColorSegmentedImage(width, height, out[4].bytes);
             this.segmentedImage = colorSegImg.toBufferedImage();
         }
 
@@ -383,32 +386,30 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         // Set sliders to positions based on white, green, then orange images descriptions' s-exps
         SExpr colors = out[1].tree();
 
-        System.out.printf("White: %s\n", colors.get(1).get(1).print());
-
-        wDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(0).get(1).value()) * 100));
-        wDarkV. setValue((int)(Float.parseFloat(colors.get(1).get(1).get(1).value()) * 100));
-        wLightU.setValue((int)(Float.parseFloat(colors.get(1).get(2).get(1).value()) * 100));
-        wLightV.setValue((int)(Float.parseFloat(colors.get(1).get(3).get(1).value()) * 100));
-        wFuzzyU.setValue((int)(Float.parseFloat(colors.get(1).get(4).get(1).value()) * 100));
-        wFuzzyV.setValue((int)(Float.parseFloat(colors.get(1).get(5).get(1).value()) * 100));
+        wDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(0).get(1).value()) * wPrecision));
+        wDarkV. setValue((int)(Float.parseFloat(colors.get(1).get(1).get(1).value()) * wPrecision));
+        wLightU.setValue((int)(Float.parseFloat(colors.get(1).get(2).get(1).value()) * wPrecision));
+        wLightV.setValue((int)(Float.parseFloat(colors.get(1).get(3).get(1).value()) * wPrecision));
+        wFuzzyU.setValue((int)(Float.parseFloat(colors.get(1).get(4).get(1).value()) * wPrecision));
+        wFuzzyV.setValue((int)(Float.parseFloat(colors.get(1).get(5).get(1).value()) * wPrecision));
 
         colors = out[2].tree();
 
-        gDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(0).get(1).value()) * 100));
-        gDarkV. setValue((int)(Float.parseFloat(colors.get(1).get(1).get(1).value()) * 100));
-        gLightU.setValue((int)(Float.parseFloat(colors.get(1).get(2).get(1).value()) * 100));
-        gLightV.setValue((int)(Float.parseFloat(colors.get(1).get(3).get(1).value()) * 100));
-        gFuzzyU.setValue((int)(Float.parseFloat(colors.get(1).get(4).get(1).value()) * 100));
-        gFuzzyV.setValue((int)(Float.parseFloat(colors.get(1).get(5).get(1).value()) * 100));
+        gDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(0).get(1).value()) * gPrecision));
+        gDarkV. setValue((int)(Float.parseFloat(colors.get(1).get(1).get(1).value()) * gPrecision));
+        gLightU.setValue((int)(Float.parseFloat(colors.get(1).get(2).get(1).value()) * gPrecision));
+        gLightV.setValue((int)(Float.parseFloat(colors.get(1).get(3).get(1).value()) * gPrecision));
+        gFuzzyU.setValue((int)(Float.parseFloat(colors.get(1).get(4).get(1).value()) * gPrecision));
+        gFuzzyV.setValue((int)(Float.parseFloat(colors.get(1).get(5).get(1).value()) * gPrecision));
 
         colors = out[3].tree();
 
-        oDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(0).get(1).value()) * 100));
-        oDarkV. setValue((int)(Float.parseFloat(colors.get(1).get(1).get(1).value()) * 100));
-        oLightU.setValue((int)(Float.parseFloat(colors.get(1).get(2).get(1).value()) * 100));
-        oLightV.setValue((int)(Float.parseFloat(colors.get(1).get(3).get(1).value()) * 100));
-        oFuzzyU.setValue((int)(Float.parseFloat(colors.get(1).get(4).get(1).value()) * 100));
-        oFuzzyV.setValue((int)(Float.parseFloat(colors.get(1).get(5).get(1).value()) * 100));
+        oDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(0).get(1).value()) * oPrecision));
+        oDarkV. setValue((int)(Float.parseFloat(colors.get(1).get(1).get(1).value()) * oPrecision));
+        oLightU.setValue((int)(Float.parseFloat(colors.get(1).get(2).get(1).value()) * oPrecision));
+        oLightV.setValue((int)(Float.parseFloat(colors.get(1).get(3).get(1).value()) * oPrecision));
+        oFuzzyU.setValue((int)(Float.parseFloat(colors.get(1).get(4).get(1).value()) * oPrecision));
+        oFuzzyV.setValue((int)(Float.parseFloat(colors.get(1).get(5).get(1).value()) * oPrecision));
 
         firstLoad = false;
     }
