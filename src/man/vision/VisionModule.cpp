@@ -19,7 +19,8 @@ VisionModule::VisionModule()
     : Module(),
       topIn(),
       bottomIn(),
-      jointsIn()
+      jointsIn(),
+      ballOut(base())
 {
     std::string sexpPath;
 #ifdef OFFLINE
@@ -112,6 +113,8 @@ void VisionModule::run_()
     double bottomTimes[7];
     double* times[2] = { topTimes, bottomTimes };
 
+    bool ballDetected = false;
+
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
         // Get image
@@ -167,13 +170,13 @@ void VisionModule::run_()
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
 
         times[i][5] = timer.end();
-
-        ballDetector[i]->findBall(orangeImage);
+        if (!ballDetected) {
+            ballDetected = ballDetector[i]->findBall(orangeImage);
+        }
 
         times[i][6] = timer.end();
     }
 
-    
     for (int i = 0; i < 2; i++) {
         break;
         if (i == 0)
@@ -237,6 +240,23 @@ Colors* VisionModule::getColorsFromLisp(nblog::SExpr* colors, int camera) {
 
     return ret;
 }
+
+// void VisionModule::updateVisionBall()
+// {
+//     portals::message<messages::VisionBall> ball_message(0);
+//     Ball ball;
+//     if (ballDetector[0]->ballOn()) {
+//         ball = ballDetector[0].getBalls()[0]; // TODO
+//     }
+//     else if (ballDetector[1]->ballOn()) {
+//         ball = ballDetector[1].getBalls()[0];
+//     }
+//     else {
+//         ball.get()->set_on(false);
+//         ballOut.setMessage(ball_message);
+//         return;
+//     }
+// }
 
 }
 }

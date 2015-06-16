@@ -11,7 +11,8 @@
 #include "Kinematics.h"
 #include "Homography.h"
 #include "BallDetector.h"
-//#include "ParamReader.h"
+
+#include "BallModel.pb.h"
 
 namespace man {
 namespace vision {
@@ -24,6 +25,8 @@ public:
     portals::InPortal<messages::YUVImage> topIn;
     portals::InPortal<messages::YUVImage> bottomIn;
     portals::InPortal<messages::JointAngles> jointsIn;
+
+    portals::OutPortal<messages::VisionBall> ballOut;
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
@@ -60,6 +63,9 @@ private:
 
     // Lisp tree with color params saved
     nblog::SExpr colors;
+
+    // void updateVisionBall();
+    int ballOn;
 
     // Method to convert from Lisp to Colors type
     Colors* getColorsFromLisp(bool top);

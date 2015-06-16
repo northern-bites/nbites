@@ -8,11 +8,12 @@ const double BALL_RADIUS = 3.25;
 const double VERT_FOV_DEG = 47.64;
 const double VERT_FOV_RAD = 47.64 * M_PI / 180;
 
+using std::to_string;
+
 namespace man {
 namespace vision {
 
 BallDetector::BallDetector(FieldHomography* homography_, bool topCamera_):
-    ballOn(0),
     blobber(),
     homography(homography_),
     topCamera(topCamera_)
@@ -21,15 +22,16 @@ BallDetector::BallDetector(FieldHomography* homography_, bool topCamera_):
 
 BallDetector::~BallDetector() { }
 
-void BallDetector::findBall(ImageLiteU8 orange)
+bool BallDetector::findBall(ImageLiteU8 orange)
 {
-    std::cout << "before blob" <<std::endl;
+    candidates.clear();
+
     blobber.run(orange.pixelAddr(), orange.width(), orange.height(), orange.pitch());
 
-    if (topCamera) std::cout << "Top camera ";
-    else std::cout << "Bottom camera ";
+    // if (topCamera) std::cout << "Top camera ";
+    // else std::cout << "Bottom camera ";
 
-    std::cout << " found this many blobs: " << blobber.blobs.size() << std::endl;
+    // std::cout << " found this many blobs: " << blobber.blobs.size() << std::endl;
     // TODO: Sort blobber list by size
     for (auto i=blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
         double x_rel, y_rel;
@@ -41,12 +43,24 @@ void BallDetector::findBall(ImageLiteU8 orange)
 
         // This blob is above the horizon. Can't be a ball
         if (!belowHoriz) {
-            std::cout << "BLOB's above horizon:" << std::endl;
+            //std::cout << "BLOB's above horizon:" << std::endl;
             continue;
         }
 
         Ball b((*i), x_rel, y_rel, orange.height());
-        candidates.push_back(b);
+        if (b.confidence() > .5) {
+            candidates.push_back(b);
+            //std::cout << "accepted ball because:\n" << b.properties() << std::endl;
+        }
+        else {
+            //std::cout << "declined ball because:\n" << b.properties() << std::endl;
+        }
+    }
+    if (candidates.size() > 1) {
+        return true;
+    }
+    else {
+        return false;
     }
 }
 
@@ -261,6 +275,8 @@ void BallDetector::findBall(ImageLiteU8 orange)
 
 Ball::Ball(Blob& b, double x_, double y_, int imgHeight_) :
     blob(b),
+    radThresh(.25, .5),
+    thresh(.5, .8),
     x_rel(x_),
     y_rel(y_),
     imgHeight(imgHeight_),
@@ -273,27 +289,53 @@ Ball::Ball(Blob& b, double x_, double y_, int imgHeight_) :
 void Ball::compute()
 {
     std::cout << "BALL::compute()" << std::endl;
-    printf("\tRelPos: (%f, %f)\n", x_rel, y_rel);
+
+    //printf("\tRelPos: (%f, %f)\n", x_rel, y_rel);
     double hdist = hypot(x_rel, y_rel);
-    std::cout << "\tHomographyDist is: " << hdist << std::endl;
+    //std::cout << "\tHomographyDist is: " << hdist << std::endl;
+
     double density = blob.area() / blob.count();
-    std::cout << "\tdensity is: " << density << std::endl;
-    std::cout << "\tand count : " << blob.count() << std::endl;
-    std::cout << "\tlocated: (" << blob.centerX() << ", " << blob.centerY()
-              << ")" << std::endl;
+    //std::cout << "\tdensity is: " << density << std::endl;
+    //std::cout << "\tand count : " << blob.count() << std::endl;
+//    std::cout << "\tlocated: (" << blob.centerX() << ", " << blob.centerY()
+    //             << ")" << std::endl;
     double aspectRatio = (blob.secondPrincipalLength() /
                           blob.firstPrincipalLength());
-    std::cout << "\taspectR is: " << aspectRatio << std::endl;
-    std::cout << "\tbecause second: " << blob.secondPrincipalLength() <<
-        " and first: " << blob.firstPrincipalLength() << std::endl;
+    //std::cout << "\taspectR is: " << aspectRatio << std::endl;
+    //std::cout << "\tbecause second: " << blob.secondPrincipalLength() <<
+//        " and first: " << blob.firstPrincipalLength() << std::endl;
+    //std::cout << "\thomography dist: " << hdist << std::endl;
+
     // Distance as estimated by homography in CM
-
-
-    std::cout << "\thomography dist: " << hdist << std::endl;
-
     expectedDiam = pixDiameterFromDist(hdist);
+    //std::cout << "\texpect ball to be this many pix: " << expectedDiam << std::endl;
 
-    std::cout << "\texpect ball to be this many pix: " << expectedDiam << std::endl;
+    diameterRatio;
+    if (expectedDiam > 2 * blob.firstPrincipalLength())
+        diameterRatio = 2*blob.firstPrincipalLength() / expectedDiam;
+    else
+        diameterRatio = expectedDiam / (2 * blob.firstPrincipalLength());
+
+    _confidence = (density > thresh).f() * (aspectRatio > thresh).f() * (diameterRatio > radThresh).f();
+
+    //std::cout << "\n\tConfidence is: " << _confidence << std::endl;
+}
+
+std::string Ball::properties()
+{
+    std::string d("====Ball properties:====\n");
+    d += "\tRelativePosition: " + to_string(x_rel) + " "+ to_string( y_rel) + "\n";
+    d += "\tHomographyDistance is: " + to_string(hypot(x_rel, y_rel)) + "\n";
+    d += "\tdensity is: " + to_string(blob.area() / blob.count()) + "\n";
+    d += "\tcount is: " + to_string(blob.count()) + "\n";
+    d += "\tlocated: (" + to_string(blob.centerX()) +  ", " +
+        to_string(blob.centerY()) + ")\n";
+    d += "\taspectR is: " + to_string(blob.secondPrincipalLength() /
+                                      blob.firstPrincipalLength()) + "\n";
+    d += "\texpect ball to be this many pix: " + to_string(expectedDiam) + "\n";
+    d += "\tdiamRatio: " + to_string(diameterRatio) + "\n";
+    d += "\n\tconfidence is: " + to_string(_confidence) + "\n====================\n";
+    return d;
 }
 
 // The expected diameter of ball in image at distance d in CM
