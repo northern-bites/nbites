@@ -160,16 +160,16 @@ void VisionModule::sendLinesOut()
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < fieldLines[i]->size(); j++) {
             messages::FieldLine* pLine = pLines.add_line();
-            FieldLine& line = (*fieldLines)[i][j];
+            FieldLine& line = (*(fieldLines[i]))[j];
 
             for (int k = 0; k < 2; k++) {
                 messages::HoughLine pHough;
                 HoughLine& hough = line[k];
 
-                pHough.set_r(hough.r());
-                pHough.set_t(hough.t());
-                pHough.set_ep0(hough.ep0());
-                pHough.set_ep1(hough.ep1());
+                pHough.set_r(hough.field().r());
+                pHough.set_t(hough.field().t());
+                pHough.set_ep0(hough.field().ep0());
+                pHough.set_ep1(hough.field().ep1());
 
                 if (k == 0)
                     pLine->mutable_first()->CopyFrom(pHough);
