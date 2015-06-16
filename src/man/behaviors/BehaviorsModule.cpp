@@ -89,8 +89,8 @@ void BehaviorsModule::initializePython()
     try{
         initLedCommand_proto();
         initGameState_proto();
-        initVisionField_proto();
-        initVisionRobot_proto();
+        // initVisionField_proto();
+        // initVisionRobot_proto();
         initWorldModel_proto();
         initBallModel_proto();
         initRobotLocation_proto();

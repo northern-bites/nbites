@@ -105,8 +105,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         // cognitionThread.addModule(ballTrack);
         // cognitionThread.addModule(obstacle);
         cognitionThread.addModule(gamestate);
-        // cognitionThread.addModule(behaviors);
-        // cognitionThread.addModule(leds);
+        cognitionThread.addModule(behaviors);
+        cognitionThread.addModule(leds);
         // cognitionThread.addModule(sharedBall);
         
         topTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
@@ -148,15 +148,15 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         // 
         // behaviors.localizationIn.wireTo(&localization.output);
         // behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
-        // behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
+        behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
         // behaviors.visionFieldIn.wireTo(&vision.vision_field);
         // behaviors.visionRobotIn.wireTo(&vision.vision_robot);
         // behaviors.visionObstacleIn.wireTo(&vision.vision_obstacle);
-        // behaviors.fallStatusIn.wireTo(&guardian.fallStatusOutput, true);
-        // behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
-        // behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
-        // behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
-        // behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
+        behaviors.fallStatusIn.wireTo(&guardian.fallStatusOutput, true);
+        behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
+        behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
+        behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
+        behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
         // behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
         // behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
         // behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);
@@ -166,7 +166,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         //     behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
         // }
         // 
-        // leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
+        leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
         
 #ifdef USE_LOGGING
         {   //brackets let us hide logging code in certain IDEs.

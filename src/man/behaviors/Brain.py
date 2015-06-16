@@ -32,8 +32,8 @@ import RobotLocation_proto
 import BallModel_proto
 import PMotion_proto
 import MotionStatus_proto
-import VisionRobot_proto
-import VisionField_proto
+# import VisionRobot_proto
+# import VisionField_proto
 import ButtonState_proto
 import FallStatus_proto
 import StiffnessControl_proto
@@ -143,11 +143,14 @@ class Brain(object):
         self.time = time.time()
 
         # Update objects
-        self.updateVisionObjects()
-        self.updateObstacles()
+        # self.updateVisionObjects()
+        # self.updateObstacles()
         self.updateMotion()
-        self.updateLoc()
+        # self.updateLoc()
         self.getCommUpdate()
+
+        # HACK stuff to make stuff work w/o ball or loc or old vision inputs
+        self.loc = RobotLocation(0.0, 0.0, 0.0)
 
         # Behavior stuff
         # Order here is very important
@@ -161,7 +164,7 @@ class Brain(object):
         self.flipLocFilter()
 
         # Set LED message
-        self.leds.processLeds()
+        # self.leds.processLeds()
 
         # Set myWorldModel for Comm
         self.updateComm()
@@ -197,7 +200,7 @@ class Brain(object):
         output.claimed_ball = me.claimedBall
 
     def getCommUpdate(self):
-        self.teamMembers[self.playerNumber - 1].updateMe()
+        # self.teamMembers[self.playerNumber - 1].updateMe()
         self.game = self.interface.gameState
         
         if self.game.have_remote_gc:
@@ -207,10 +210,10 @@ class Brain(object):
                 else:
                     self.theirScore = self.game.team(i).score
 
-        for i in range(len(self.teamMembers)):
-            if (i == self.playerNumber - 1):
-                continue
-            self.teamMembers[i].update(self.interface.worldModelList()[i])
+        # for i in range(len(self.teamMembers)):
+        #     if (i == self.playerNumber - 1):
+        #         continue
+        #     self.teamMembers[i].update(self.interface.worldModelList()[i])
 
     def updateMotion(self):
         self.motion = self.interface.motionStatus
