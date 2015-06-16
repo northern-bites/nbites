@@ -3,6 +3,7 @@ package nbtool.gui.logviews.misc;
 
 import java.awt.*;
 import java.awt.geom.*;
+import java.awt.event.*;
 import javax.swing.*;
 
 import java.io.ByteArrayInputStream;
@@ -19,17 +20,12 @@ import nbtool.data.Log;
 import nbtool.data.SExpr;
 import nbtool.gui.logviews.misc.ViewParent;
 
-public class LocSwarmView extends ViewParent {
+public class LocSwarmView extends ViewParent implements ActionListener {
 	private static final long serialVersionUID = 1L;
-	public static final Dimension fieldDimension = new Dimension(
-								(int)FieldConstants.FIELD_WIDTH+
-								(int)FieldConstants.GREEN_PAD_X,
-								(int)FieldConstants.FIELD_HEIGHT+
-								(int)FieldConstants.GREEN_PAD_X);
-	private JScrollPane sp;
-	private DrawPane dPane;
 
-	public static float pWeight;
+	public static final Dimension fieldDimension = new Dimension(
+								(int)FieldConstants.FIELD_WIDTH,
+								(int)FieldConstants.FIELD_HEIGHT);
 
 	public void setLog(Log newlog) {
 		log = newlog;
@@ -44,6 +40,7 @@ public class LocSwarmView extends ViewParent {
 			naoX = naoLoc.getX();
 			naoY = naoLoc.getY();
 			naoH = naoLoc.getH();
+			System.out.println("[PROTO] H: "+naoH);
 			dPane.naoPlayer.moveTo(naoX,naoY, naoH);
 
 			naoSwarm = ParticleSwarm.parseFrom(log.bytesForContentItem(1));
@@ -60,12 +57,17 @@ public class LocSwarmView extends ViewParent {
 	public LocSwarmView() {
 		super();
 
+		flip = new JButton("flip");
+		flip.addActionListener(this);
+		flip.setPreferredSize(new Dimension(50,25));
+		this.add(flip);
+
 		dPane = new DrawPane();
 		dPane.setPreferredSize(fieldDimension);
 
 		sp = new JScrollPane(dPane);
 		sp.setVisible(true);
-		sp.setPreferredSize(new Dimension(800,800));
+		sp.setPreferredSize(new Dimension(1039,780));
 
 		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -74,9 +76,26 @@ public class LocSwarmView extends ViewParent {
 	}
 
 	protected void useSize(Dimension s) {
-		dPane.setBounds(0,0,s.width,s.height);
-		sp.setBounds(0,0,s.width,s.height);
+		dPane.setBounds(0,0,1039,s.height);
+		sp.setBounds(0,0,1040,s.height);
 	}
+
+	public void actionPerformed(ActionEvent e) {
+		System.out.println("ACTION");
+		if(e.getSource() == flip) {
+			if(shouldFlip == true) {
+				shouldFlip = false;
+			} else { shouldFlip = true; }
+		}
+	}
+
+	private JScrollPane sp;
+	private DrawPane dPane;
+	private JButton flip;
+
+	public static float pWeight;
+	public static boolean shouldFlip = false;
+	
 
 	private class DrawPane extends JPanel {
 		public Field f;
@@ -95,10 +114,9 @@ public class LocSwarmView extends ViewParent {
 		public void paintComponent(Graphics g) {
 			Graphics2D g2 = (Graphics2D) g;
 			f.drawField(g2);
-			naoPlayer.drawNao(g2);
+			naoPlayer.drawNao(g2, shouldFlip);
 			for(int i=0; i<naoParticles.length; i++) {
-				System.out.println(pWeight);
-				naoParticles[i].drawParticle(g2,pWeight);
+				naoParticles[i].drawParticle(g2, pWeight, shouldFlip);
 			}
 		}
 	}
@@ -155,6 +173,8 @@ class Field {
 
 abstract class FieldObject {
 	protected float x,y,h,radius;
+	protected int xDist, yDist, xDistFoVR, yDistFoVR, xDistFoVL, yDistFoVL;
+	double halfViewAngle = Math.toRadians(31); //31 degrees on each side
 	protected Color naoColor;
 	protected final static float fieldObjRadius = 15.0f;
 	
@@ -198,34 +218,44 @@ abstract class FieldObject {
 		h = -heading;
 	}
 	
-	public void drawNao(Graphics2D g2) {
+	public void drawNao(Graphics2D g2, boolean shouldFlip) {
 		//nao
+		if(shouldFlip) {
+			x = FieldConstants.FIELD_WIDTH-x;
+			h += (float)Math.PI;
+		} else {
+			y = FieldConstants.FIELD_HEIGHT-y;
+		}
+
 		g2.setColor(naoColor);
-		g2.fill(new Ellipse2D.Float(x-7, FieldConstants.FIELD_HEIGHT-y-7, 15.f, 15.f));
+		g2.fill(new Ellipse2D.Float(x-7.5f, y-7.5f, 15.f, 15.f));
 
 		//heading
 		g2.setColor(Color.black);
-		int xDist = (int)(20 * Math.cos(h)+x);
-		int yDist = (int)(20 * Math.sin(h)+(int)(FieldConstants.FIELD_HEIGHT-y));
 		g2.setStroke(new BasicStroke(3));
-		g2.drawLine((int)x,(int)(FieldConstants.FIELD_HEIGHT-y),xDist,yDist);
+		xDist = (int)(20 * Math.cos(h)+x);
+		yDist = (int)(20 * Math.sin(h)+y);
+		g2.drawLine((int)x,(int)(y),xDist,yDist);
 
 		//field of view
 		g2.setColor(Color.red);
 		g2.setStroke(new BasicStroke(2));
-		double halfViewAngle = Math.toRadians(31); //31 degrees on each side
-
-		xDist = xDist = (int)(20 * Math.cos(h+halfViewAngle)+x);
-		yDist = (int)(20 * Math.sin(h + halfViewAngle) + (int)(FieldConstants.FIELD_HEIGHT-y));
-		g2.drawLine((int)x,(int)(FieldConstants.FIELD_HEIGHT-y),xDist,yDist);
-
-		xDist = xDist = (int)(20 * Math.cos(h-halfViewAngle)+x);
-		yDist = (int)(20 * Math.sin(h - halfViewAngle) + (int)(FieldConstants.FIELD_HEIGHT-y));
-		g2.drawLine((int)x,(int)(FieldConstants.FIELD_HEIGHT-y),xDist,yDist);
+		//right
+		xDist = (int)(20 * Math.cos(h+halfViewAngle)+x);
+		yDist = (int)(20 * Math.sin(h+halfViewAngle)+y);
+		g2.drawLine((int)x,(int)y,xDist,yDist);
+		//left
+		xDist = (int)(20 * Math.cos(h-halfViewAngle)+x);
+		yDist = (int)(20 * Math.sin(h-halfViewAngle)+y);
+		g2.drawLine((int)x,(int)y,xDist,yDist);
 	}
 
-	public void drawParticle(Graphics2D g2, float weight) {
-		//want color based on particle weight
+	public void drawParticle(Graphics2D g2, float weight, boolean shouldFlip) {
+		if(shouldFlip) {
+			x = FieldConstants.FIELD_WIDTH-x;
+		} else {
+			y = FieldConstants.FIELD_HEIGHT-y;
+		}
 		if(weight > 0.002f) {
 			g2.setColor(Color.magenta);
 		} else if(weight > 0.004f) {
@@ -233,7 +263,7 @@ abstract class FieldObject {
 		} else {
 			g2.setColor(Color.white);
 		}
-		g2.fill(new Ellipse2D.Float(x-1, FieldConstants.FIELD_HEIGHT-y-1, 2.f, 2.f));
+		g2.fill(new Ellipse2D.Float(x-1, y-1, 2.f, 2.f));
 	}
 	
 	public float getX() { return x; }
