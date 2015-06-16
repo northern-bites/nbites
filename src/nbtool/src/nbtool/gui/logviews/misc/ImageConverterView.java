@@ -69,7 +69,7 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
 
     final double wPrecision = 200.0;
     final double gPrecision = 300.0;
-    final double oPrecision = 100.0;
+    final double oPrecision = 200.0;
 
     public ImageConverterView() {
         super();

@@ -166,7 +166,7 @@ void VisionModule::run_()
         times[i][5] = timer.end();
         
         #ifdef USE_LOGGING
-        setLog(i);
+        logImage(i);
         #endif
     }
 
@@ -216,6 +216,8 @@ void VisionModule::logImage(int i) {
         im_buf.append(ja_buf);
         
         std::vector<nblog::SExpr> contents;
+
+        std::cout << "In Vision Mod ";
         
         nblog::SExpr imageinfo("YUVImage", image_from, clock(), image_index, im_size);
         imageinfo.append(nblog::SExpr("width", im_width)   );
