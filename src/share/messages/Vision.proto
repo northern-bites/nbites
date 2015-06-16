@@ -10,8 +10,8 @@ message HoughLine
 
 message FieldLine 
 {
-    optional HoughLine first = 1;
-    optional HoughLine second = 2;
+    optional HoughLine inner = 1;
+    optional HoughLine outer = 2;
     optional int32 id = 3;
 }
 
