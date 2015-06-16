@@ -95,7 +95,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
             
 
             g.setColor(new Color(90, 130, 90));
-            g.fillRect(645, 0, fieldw, fieldh);
+            g.fillRect(displayw + buffer, 0, fieldw, fieldh);
 
             int[] xPoints1 = {0 + fx0, 0 + fx0, fieldw/2 + fx0};
             int[] yPoints1 = {2, fieldh, fieldh};

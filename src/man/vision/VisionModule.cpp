@@ -311,7 +311,6 @@ Colors* VisionModule::getColorsFromLisp(nblog::SExpr* colors, int camera) {
 
     colors = params->get(0)->get(1);
 
-    
     ret->white. load(std::stof(colors->get(0)->get(1)->serialize()),
                      std::stof(colors->get(1)->get(1)->serialize()),
                      std::stof(colors->get(2)->get(1)->serialize()),
