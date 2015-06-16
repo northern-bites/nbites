@@ -70,14 +70,7 @@ int Vision_func() {
     SExpr* robotName = args[0]->tree().find("from_address");
     std::string rname;
     if (robotName != NULL) {
-        rname = robotName->get(1)->value();
-        if (std::string::npos != rname.find(".local")) {
-            std::cout << "FOUND LOCAL NAME\n";
-            rname.resize(rname.find("."));
-            if (rname == "she-hulk")
-                rname = "shehulk";
-            std::cout << "CHANGED NAME TO " <<rname << std::endl;
-        }
+        rname = robotName->get(1)->value();Z
     }
     std::cout << "NAME: " << rname << std::endl;
 

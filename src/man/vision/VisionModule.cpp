@@ -345,16 +345,24 @@ void VisionModule::setCameraParams(std::string robotName) {
 }
 
 void VisionModule::setCameraParams(int camera, std::string robotName) {
-    std::cout << "Here! lisp:\n" << cameraLisp->get(1)->print() << std::endl;
+    if (std::string::npos != robotName.find(".local")) {
+        robotName.resize(robotName.find("."));
+        if (robotName == "she-hulk")
+            robotName = "shehulk";
+    }
 
-    CameraParams* cp = new CameraParams;
-    std::string cam = camera == 0 ? "top" : "bottom";
-    if (robotName != "") {
-        double roll =  cameraLisp->get(1)->find(robotName)->find(cam)->get(1)->valueAsDouble();
-        double pitch = cameraLisp->get(1)->find(robotName)->find(cam)->get(2)->valueAsDouble();
-        cameraParams[camera] = new CameraParams(roll, pitch);
-    } else {
+    if (robotName == "") {
         std::cout << "Could not set camera params: No Robot Name" << std::endl;
+        return;
+    }
+    
+    nblog::SExpr* robot = cameraLisp->get(1)->find(robotName);
+
+    if (robot != NULL) {
+        std::string cam = camera == 0 ? "top" : "bottom";
+        double roll =  robot->find(cam)->get(1)->valueAsDouble();
+        double pitch = robot->find(cam)->get(2)->valueAsDouble();
+        cameraParams[camera] = new CameraParams(roll, pitch);
     }
 }
 
