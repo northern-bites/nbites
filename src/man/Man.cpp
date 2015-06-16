@@ -104,7 +104,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         // cognitionThread.addModule(localization);
         // cognitionThread.addModule(ballTrack);
         // cognitionThread.addModule(obstacle);
-        // cognitionThread.addModule(gamestate);
+        cognitionThread.addModule(gamestate);
         // cognitionThread.addModule(behaviors);
         // cognitionThread.addModule(leds);
         // cognitionThread.addModule(sharedBall);
@@ -140,11 +140,11 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         // obstacle.visionIn.wireTo(&vision.vision_obstacle, true);
         // obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
         // 
-        // gamestate.commInput.wireTo(&comm._gameStateOutput, true);
-        // gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
-        // gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
-        // gamestate.switchTeamInput.wireTo(&guardian.switchTeamOutput, true);
-        // gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
+        gamestate.commInput.wireTo(&comm._gameStateOutput, true);
+        gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
+        gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
+        gamestate.switchTeamInput.wireTo(&guardian.switchTeamOutput, true);
+        gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
         // 
         // behaviors.localizationIn.wireTo(&localization.output);
         // behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
