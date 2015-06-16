@@ -345,6 +345,8 @@ void VisionModule::setCameraParams(std::string robotName) {
 }
 
 void VisionModule::setCameraParams(int camera, std::string robotName) {
+    std::cout << "Here! lisp:\n" << cameraLisp->get(1)->print() << std::endl;
+
     CameraParams* cp = new CameraParams;
     std::string cam = camera == 0 ? "top" : "bottom";
     if (robotName != "") {

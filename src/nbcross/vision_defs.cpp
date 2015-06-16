@@ -71,6 +71,13 @@ int Vision_func() {
     std::string rname;
     if (robotName != NULL) {
         rname = robotName->get(1)->value();
+        if (std::string::npos != rname.find(".local")) {
+            std::cout << "FOUND LOCAL NAME\n";
+            rname.resize(rname.find("."));
+            if (rname == "she-hulk")
+                rname = "shehulk";
+            std::cout << "CHANGED NAME TO " <<rname << std::endl;
+        }
     }
     std::cout << "NAME: " << rname << std::endl;
 
