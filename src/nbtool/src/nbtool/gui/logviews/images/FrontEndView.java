@@ -1,4 +1,4 @@
-package nbtool.gui.logviews.misc;
+package nbtool.gui.logviews.images;
 
 import java.awt.Graphics;
 import java.awt.Dimension;
@@ -17,6 +17,7 @@ import javax.swing.event.ChangeListener;
 
 import nbtool.data.Log;
 import nbtool.data.SExpr;
+import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.io.CrossIO;
@@ -25,7 +26,7 @@ import nbtool.io.CrossIO.CrossFunc;
 import nbtool.io.CrossIO.CrossInstance;
 import nbtool.util.Utility;
 
-public class ImageConverterView extends ViewParent implements IOFirstResponder {
+public class FrontEndView extends ViewParent implements IOFirstResponder {
 
     // FrontEnd output images 
     private BufferedImage yImage;
@@ -71,7 +72,7 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
     final double gPrecision = 300.0;
     final double oPrecision = 200.0;
 
-    public ImageConverterView() {
+    public FrontEndView() {
         super();
         firstLoad = true;
 

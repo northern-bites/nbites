@@ -62,102 +62,6 @@ int CrossBright_func() {
     return 0;
 }
 
-int ImageConverter_func() {
-    assert(args.size() == 1);
-
-    printf("ImageConverter_func()\n");
-
-    logio::log_t arg1 = args[0];
-    std::vector<std::string> kvp = logio::pairs(arg1.desc);
-    int width = 640;
-    int height = 480;
-
-    messages::YUVImage image(arg1.data, width, height, width);
-    portals::Message<messages::YUVImage> message(&image);
-    man::image::ImageConverterModule module;
-
-    module.imageIn.setMessage(message);
-    module.run();
-
-    // Y image name and data
-    const messages::PackedImage<short unsigned int>* yImage = module.yImage.getMessage(true).get();
-    logio::log_t yRet;
-
-    std::string yName = "type=YUVImage encoding=[Y16] width=";
-    yName += std::to_string(yImage->width());
-    yName += " height=";
-    yName += std::to_string(yImage->height());
-
-    yRet.desc = (char*)malloc(yName.size()+1);
-    memcpy(yRet.desc, yName.c_str(), yName.size() + 1);
-
-    yRet.dlen = yImage->width() * yImage->height() * 2;
-    yRet.data = (uint8_t*)malloc(yRet.dlen);
-    memcpy(yRet.data, yImage->pixelAddress(0, 0), yRet.dlen);
-
-    rets.push_back(yRet);
-
-    // White image retreval, description, and data
-    const messages::PackedImage<unsigned char>* whiteImage = module.whiteImage.getMessage(true).get();
-    logio::log_t whiteRet;
-
-    std::string whiteName = "type=YUVImage encoding=[Y8] width=";
-    whiteName += std::to_string(whiteImage->width());
-    whiteName += " height=";
-    whiteName += std::to_string(whiteImage->height());
-
-    whiteRet.desc = (char*)malloc(whiteName.size()+1);
-    memcpy(whiteRet.desc, whiteName.c_str(), whiteName.size()+1);
-
-    whiteRet.dlen = whiteImage->width() * whiteImage->height();
-    whiteRet.data = (uint8_t*)malloc(whiteRet.dlen);
-    memcpy(whiteRet.data, whiteImage->pixelAddress(0, 0), whiteRet.dlen);
-
-    rets.push_back(whiteRet);
-
-    // Orange image retreval, description, and data
-    const messages::PackedImage<unsigned char>* orangeImage = module.orangeImage.getMessage(true).get();
-    logio::log_t orangeRet;
-
-    std::string orangeName = "type=YUVImage encoding=[Y8] width=";
-    orangeName += std::to_string(orangeImage->width());
-    orangeName += " height=";
-    orangeName += std::to_string(orangeImage->height());
-
-    orangeRet.desc = (char*)malloc(orangeName.size()+1);
-    memcpy(orangeRet.desc, orangeName.c_str(), orangeName.size()+1);
-
-    orangeRet.dlen = orangeImage->width() * orangeImage->height();
-    orangeRet.data = (uint8_t*)malloc(orangeRet.dlen);
-    memcpy(orangeRet.data, orangeImage->pixelAddress(0, 0), orangeRet.dlen);
-
-    rets.push_back(orangeRet);
-
-    // Green image retreval, description, and data
-    const messages::PackedImage<unsigned char>* greenImage = module.greenImage.getMessage(true).get();
-    logio::log_t greenRet;
-
-    std::cout << "Green width: " << greenImage->width() <<  std::endl;
-
-    std::string greenName = "type=YUVImage encoding=[Y8] width=";
-    greenName += std::to_string(greenImage->width());
-    greenName += " height=";
-    greenName += std::to_string(greenImage->height());
-
-    greenRet.desc = (char*)malloc(greenName.size()+1);
-    memcpy(greenRet.desc, greenName.c_str(), greenName.size()+1);
-
-    greenRet.dlen = greenImage->width() * greenImage->height();
-    greenRet.data = (uint8_t*)malloc(greenRet.dlen);
-    memcpy(greenRet.data, greenImage->pixelAddress(0, 0), greenRet.dlen);
-
-    rets.push_back(greenRet);
-    
-    // Done
-    printf("ImageConverter module ran! W: %d, H: %d\n", yImage->width(), yImage->height());
-    return 0;
-}
-
 void register_funcs() {
     
     /*test func 1*/
@@ -181,12 +85,12 @@ void register_funcs() {
     CrossBright.func = CrossBright_func;
     FUNCS.push_back(CrossBright);
 
-    //ImageConverter
-    nbfunc_t ImageConverter;
-    ImageConverter.name = "ImageConverter";
-    ImageConverter.args = {sYUVImage};
-    ImageConverter.func = ImageConverter_func;
-    FUNCS.push_back(ImageConverter);
+    //FrontEnd
+    nbfunc_t FrontEnd;
+    FrontEnd.name = "FrontEnd";
+    FrontEnd.args = {sYUVImage};
+    FrontEnd.func = FrontEnd_func;
+    FUNCS.push_back(FrontEnd);
 
 }
 
