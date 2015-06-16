@@ -13,7 +13,7 @@ from ..util import *
 from objects import RelRobotLocation, Location, RobotLocation
 import noggin_constants as nogginConstants
 import time
-from math import fabs, degrees, cos, sin, pi, radians
+from math import fabs, degrees, cos, sin, pi, radians, copysign
 
 @superState('gameControllerResponder')
 @stay
@@ -127,9 +127,9 @@ def followPotentialField(player):
             normalizer = Navigator.QUICK_SPEED/(xComp**2 + yComp**2)**.5
 
             if ball.bearing_deg > constants.SHOULD_SPIN_TO_BALL_BEARING/2:
-                hComp = Navigator.MEDIUM_SPEED * ball.bearing_deg/fabs(ball.bearing_deg)
+                hComp = copysign(Navigator.SLOW_SPEED, ball.bearing_deg)
             else:
-                hComp = ball.bearing
+                hComp = copysign(Navigator.SLOW_SPEED, ball.bearing_deg)
 
             player.setWalk(normalizer*xComp, normalizer*yComp, hComp)
 
