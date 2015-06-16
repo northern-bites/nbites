@@ -67,7 +67,7 @@ public class NBConstants {
 	private static Map<String, Class<? extends ViewParent>[]> setupPossible() {
 		Map<String, Class<? extends ViewParent>[]> map = new HashMap<String, Class<? extends ViewParent>[]>();
 		
-		map.put("YUVImage", new Class[]{ImageView.class, ZoomImageView.class, CrossBright.class, FrontEndView.class, LineView.class});
+		map.put("YUVImage", new Class[]{ImageView.class, ZoomImageView.class, FrontEndView.class, LineView.class});
 		map.put("STATS", new Class[]{BotStatsView.class});
 		map.put(DEFAULT_S, new Class[]{DefaultView.class});
 		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});

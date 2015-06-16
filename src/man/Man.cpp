@@ -248,13 +248,6 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         
         //Superseded by logging code in ImageTranscriber.
         
-//#ifdef LOG_IMAGES
-        cognitionThread.log<messages::YUVImage>((control::IMAGES), &topTranscriber.imageOut,
-                                                "YUVImage", "camera_TOP");
-        cognitionThread.log<messages::YUVImage>((control::IMAGES), &bottomTranscriber.imageOut,
-                                                "YUVImage", "camera_BOT");
-//#endif
-        
 //#ifdef LOG_VISION
         // cognitionThread.log<messages::VisionField>((control::VISION), &vision.vision_field,
         //                                            "proto-VisionField", "vision");

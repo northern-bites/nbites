@@ -164,7 +164,7 @@ namespace nblog {
             
             //Log state.
             std::vector<SExpr> fields;
-            fields.push_back(SExpr("type", "STATS"));
+            fields.push_back(SExpr(CONTENT_TYPE_S, "STATS"));
             
             std::vector<SExpr> fvector = {
                 SExpr("flags"),
@@ -190,8 +190,7 @@ namespace nblog {
                       control::flags[control::LOCALIZATION]),
                 SExpr("BALLTRACK", control::BALLTRACK,
                       control::flags[control::BALLTRACK]),
-                SExpr("IMAGES", control::IMAGES,
-                      control::flags[control::IMAGES]),
+                
                 SExpr("VISION", control::VISION,
                       control::flags[control::VISION]),
                 
@@ -415,7 +414,7 @@ namespace nblog {
             return;
         }
         
-        Log * newl = new Log("nblog", where_called, time(NULL), LOG_VERSION,
+        Log * newl = new Log(LOG_FIRST_ATOM_S, where_called, time(NULL), LOG_VERSION,
                              items, data);
         
         

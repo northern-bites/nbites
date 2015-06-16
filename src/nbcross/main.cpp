@@ -58,6 +58,8 @@ static inline void nbcprintf(const char * format, ...) {
 }
 
 int main(int argc, const char * argv[]) {
+    
+    //-------------------------------------
     std::string instance_name;
     
     if (argc > 1) {
@@ -167,14 +169,14 @@ int main(int argc, const char * argv[]) {
             Log * recvd = Log::recv(fd, MAX_WAIT);
             CHECK_RET(recvd == NULL);
             
-            SExpr * contents = recvd->tree().find("contents");
+            SExpr * contents = recvd->tree().find(nblog::LOG_CONTENTS_S);
             
             if (!contents || !contents->get(0)->isAtom()) {
                 nbcprintf("arg %i wrong format!\n", i);
                 return 1;
             }
             
-            std::string type = contents->get(1)->find("type")->get(1)->value();
+            std::string type = contents->get(1)->find(nblog::CONTENT_TYPE_S)->get(1)->value();
             if (type != FUNCS[findex].args[i]) {
                 nbcprintf("arg %i [%s] did NOT match type=%s!\n", i, type.c_str(), FUNCS[findex].args[i].c_str());
                 return 1;

@@ -81,9 +81,9 @@ namespace nblog {
         
         std::ostringstream ss;
         
-        std::string cr_loc = obj->tree().find("created")->get(1)->value();
-        std::string cr_date = obj->tree().find("created")->get(2)->value();
-        std::string type = obj->tree().find("contents")->get(1)->find("type")->get(1)->value();
+        std::string cr_loc = obj->tree().find(LOG_CREATED_S)->get(1)->value();
+        std::string cr_date = obj->tree().find(LOG_CREATED_S)->get(2)->value();
+        std::string type = obj->tree().find(LOG_CONTENTS_S)->get(1)->find(CONTENT_TYPE_S)->get(1)->value();
         
         ss << cr_loc << "_" << cr_date << "_" << type << "_i"
             << write_index++ << ".nblog";

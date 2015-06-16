@@ -83,23 +83,31 @@ int Vision_func() {
     // If log includes color parameters in description, have module use those
     std::cout << args[0]->tree().print() << std::endl;
 
-    SExpr* params = args[0]->tree().find("Params");
-    if (params != NULL) {
+    SExpr* colParams = args[0]->tree().find("Params");
+    if (colParams != NULL) {
 
         // Set new parameters as frontEnd colorParams
-        man::vision::Colors* c = module.getColorsFromLisp(params, 2);
+        man::vision::Colors* c = module.getColorsFromLisp(colParams, 2);
         module.setColorParams(c, top);
 
         // Look for atom value "SaveParams", i.e. "save" button press
-        SExpr* save = params->get(1)->find("SaveParams");
+        SExpr* save = colParams->get(1)->find("SaveParams");
         if (save != NULL) {
 
             // Save attached parameters to txt file
-            updateSavedColorParams(sexpPath, params, top);
+            updateSavedColorParams(sexpPath, colParams, top);
         }
     }
 
     // If log includes camera parameters in description, have madule use those
+    std::vector<SExpr* > camParamsVec = args[0]->tree().recursiveFind("CameraParams");
+    if (camParamsVec.size() != 0) {
+        SExpr* camParams = camParamsVec.at(camParamsVec.size()-2);
+        camParams = top ? camParams->find("camera_TOP") : camParams->find("camera_BOT");
+        std::cout << "found vec: " << camParams->print() << std::endl;
+    }
+
+
     module.run();
     man::vision::ImageFrontEnd* frontEnd = module.getFrontEnd(top);
     // -----------

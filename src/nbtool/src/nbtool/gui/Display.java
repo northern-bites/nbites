@@ -49,7 +49,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 				Prefs.rightSplitLoc = split2.getDividerLocation();
 				
 				Map<String, Class<? extends ViewParent>[]> lshown = new HashMap<String, Class<? extends ViewParent>[]>();
-				LogToViewUtility ltvu = UtilityManager.instanceOfLTV();
+				LogToViewUtility ltvu = UtilityManager.LogToViewUtility;
 				for (String t : NBConstants.POSSIBLE_VIEWS.keySet()) {
 					lshown.put(t, (Class<? extends ViewParent>[]) ltvu.selected(t));
 				}
@@ -101,6 +101,8 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 				
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
+		
+		System.out.println("----------------------------------\n\n");
 	}
 	
 	public boolean postProcessKeyEvent(final KeyEvent e) {
@@ -128,6 +130,16 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 					break;
 				case 't':
 					right.setSelectedIndex(2);
+					break;
+				case 's':
+					
+					break;
+				case 'l':
+					JFrame frame = UtilityManager.LogToViewUtility.supplyDisplay();
+					boolean vis = frame.isVisible();
+					frame.setVisible(!vis);
+					break;
+				case 'p':
 					break;
 				}
 			}

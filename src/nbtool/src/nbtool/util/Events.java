@@ -297,6 +297,26 @@ public class Events {
 		}
 	}
 	
+	public static interface SessionAdded extends EventListener {
+		public void sessionAdded(Object source, Session session);
+	}
+	
+	public static final class GSessionAdded {
+		public static void generate(final Object source, final Session session) {
+			Center.addEvent(new SimpleForEach(SessionAdded.class) {
+				@Override
+				protected void preface() {
+					Logger.logf(Logger.EVENT, "SessionAdded from %s (%s)", source, session);
+				}
+				
+				@Override
+				protected void inform(EventListener l) {
+					((SessionAdded) l).sessionAdded(source, session);
+				}
+			});
+		}
+	}
+	
 	public static interface RelevantRobotStats extends EventListener {
 		public void relRobotStats(Object source, RobotStats bs);
 	}
