@@ -70,11 +70,9 @@ def prepareForKick(player):
             player.kick = player.decider.kicksBeforeBallIsFree()
         else:
             if roleConstants.isDefender(player.role):
-                player.motionKick = False
-                player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
+                player.kick = player.decider.potentialsKicks()
             else:
-                player.motionKick = False
-                player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
+                player.kick = player.decider.potentialsKicks()
         player.inKickingState = True
 
     elif player.finishedPlay:
