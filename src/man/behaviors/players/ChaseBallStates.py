@@ -10,10 +10,10 @@ from ..navigator import Navigator
 from ..kickDecider import KickDecider
 from ..kickDecider import kicks
 from ..util import *
-from objects import RelRobotLocation, Location
+from objects import RelRobotLocation, Location, RobotLocation
 import noggin_constants as nogginConstants
 import time
-from math import fabs, degrees
+from math import fabs, degrees, cos, sin, pi, radians, copysign
 
 @superState('gameControllerResponder')
 @stay
@@ -70,15 +70,72 @@ def prepareForKick(player):
             player.kick = player.decider.kicksBeforeBallIsFree()
         else:
             if roleConstants.isDefender(player.role):
-                player.kick = player.decider.defender()
+                player.motionKick = False
+                player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
             else:
-                player.kick = player.decider.attacker()
+                player.motionKick = False
+                player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
         player.inKickingState = True
 
     elif player.finishedPlay:
         player.inKickOffPlay = False
 
-    return player.goNow('orbitBall')
+    return player.goNow('followPotentialField')
+
+@superState('positionAndKickBall')
+def followPotentialField(player):
+    """
+    This state is based on electric field potential vector paths. The ball is treated as an
+    attractive force where on the side that will be kicked. The opposite side is treated as 
+    a repulsive force of smaller magnitude.
+    """
+    if player.firstFrame():
+        player.brain.tracker.trackBall()  
+
+    ball = player.brain.ball
+    heading = player.brain.loc.h
+    relH = player.decider.normalizeAngle(player.kick.setupH - heading)
+
+    if (transitions.shouldPositionForKick(player, ball, relH)):
+        destinationX = player.kick.destinationX
+        destinationY = player.kick.destinationY
+        player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
+        player.kick.destinationX = destinationX
+        player.kick.destinationY = destinationY
+        return player.goNow('positionForKick')
+
+    else:
+        attractorX = ball.rel_x - constants.ATTRACTOR_BALL_DIST*cos(radians(heading - player.kick.setupH))
+        attractorY = ball.rel_y - constants.ATTRACTOR_BALL_DIST*sin(-radians(heading - player.kick.setupH))
+        attractorDist = (attractorX**2 + attractorY**2)**.5
+        if attractorDist == 0:
+            attractorDist = .00000000001
+
+        repulsorX = ball.rel_x - constants.REPULSOR_BALL_DIST*cos(radians(heading - player.kick.setupH))
+        repulsorY = ball.rel_y - constants.REPULSOR_BALL_DIST*sin(-radians(heading - player.kick.setupH))
+        repulsorDist = (repulsorX**2 + repulsorY**2)**.5
+
+        if repulsorDist == 0:
+            repulsorDist = .00000000001
+
+        # super position of an attractive potential field and arepulsive one
+        xComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorX/attractorDist**3 - repulsorX/repulsorDist**3
+        yComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorY/attractorDist**3 - repulsorY/repulsorDist**3
+
+        if xComp == 0 and yComp == 0:
+            player.setWalk(0, 0, 0)
+
+        else:
+            normalizer = Navigator.FAST_SPEED/(xComp**2 + yComp**2)**.5
+
+            if ball.bearing_deg > constants.SHOULD_SPIN_TO_BALL_BEARING/2:
+                hComp = copysign(Navigator.GRADUAL_SPEED, ball.bearing_deg)
+            else:
+                hComp = copysign(Navigator.GRADUAL_SPEED, ball.bearing_deg)
+
+            player.setWalk(normalizer*xComp, normalizer*yComp, hComp)
+
+    return player.stay()
 
 @superState('positionAndKickBall')
 def orbitBall(player):
