@@ -92,13 +92,9 @@ def followPotentialField(player):
 
     ball = player.brain.ball
     heading = player.brain.loc.h
-    # Calculate relative heading every frame
     relH = player.decider.normalizeAngle(player.kick.setupH - heading)
-    distToKick = ((ball.rel_x - player.kick.setupX)**2 + (ball.rel_y - player.kick.setupY)**2)**.5
 
-    # Are we within the acceptable heading range?
-    if (fabs(relH) < constants.ORBIT_GOOD_BEARING and distToKick < 20):
-        #player.stopWalking()
+    if (transitions.shouldPositionForKick(player, ball, relH)):
         destinationX = player.kick.destinationX
         destinationY = player.kick.destinationY
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
@@ -128,10 +124,10 @@ def followPotentialField(player):
             player.setWalk(0, 0, 0)
 
         else:
-            normalizer = Navigator.FAST_SPEED/(xComp**2 + yComp**2)**.5
+            normalizer = Navigator.QUICK_SPEED/(xComp**2 + yComp**2)**.5
 
             if ball.bearing_deg > constants.SHOULD_SPIN_TO_BALL_BEARING/2:
-                hComp = Navigator.QUICK_SPEED * ball.bearing_deg/fabs(ball.bearing_deg)
+                hComp = Navigator.MEDIUM_SPEED * ball.bearing_deg/fabs(ball.bearing_deg)
             else:
                 hComp = ball.bearing
 

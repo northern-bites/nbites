@@ -49,6 +49,10 @@ def shouldPrepareForKick(player):
     return (ball.vis.frames_on > 0 and
             ball.distance < constants.PREPARE_FOR_KICK_DIST)
 
+def shouldPositionForKick(player, ball, relH):
+    distToKick = ((ball.rel_x - player.kick.setupX)**2 + (ball.rel_y - player.kick.setupY)**2)**.5
+    return fabs(relH) < constants.ORBIT_GOOD_BEARING and distToKick < 20
+
 def shouldSpinToBall(player):
     """
     We're not facing the ball well enough
