@@ -282,19 +282,15 @@ bool FieldHomography::calibrateFromStar(const FieldLineList& lines)
   LineFit fit;
   for (int i = 0; i < lines.size(); ++i)
   {
-      std::cout << "A\n";
-  
     double vpx, vpy;
     if (lines[i][0].intersect(lines[i][1], vpx, vpy) && fabs(lines[i][0].ux()) > 0.3)
       fit.add(vpx - ix0(), vpy - iy0());  // relative to optical axis
   }
-  std::cout << "B\n";
 
   // If we didn't find exactly three suitable field lines, fail
   if (fit.area() != 3)
     return false;
 
-  std::cout << "C\n";
   // The roll is the angle of the horizon. sMod puts it in the range [-PI/2 .. PI/2)
   roll(sMod(fit.firstPrincipalAngle(), M_PI));
 

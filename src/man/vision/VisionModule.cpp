@@ -30,8 +30,8 @@ VisionModule::VisionModule()
         colorPath += "/src/man/config/colorParams.txt";
         cameraPath += "/src/man/config/cameraParams.txt";
     #else
-        colorPath = "/home/nbites/config/colorParams.txt";
-        cameraPath = "/home/nbites/config/cameraParams.txt";
+        colorPath = "/home/nao/nbites/Config/colorParams.txt";
+        cameraPath = "/home/nao/nbites/Config/cameraParams.txt";
     #endif
 
     // Get SExpr from string
@@ -89,6 +89,7 @@ void VisionModule::run_()
     topIn.latch();
     bottomIn.latch();
     jointsIn.latch();
+    inertsIn.latch();
 
     // std::cout << "RN: " << robotName_ << "\n"; 
     // Setup
@@ -121,7 +122,7 @@ void VisionModule::run_()
         times[i][0] = timer.end();
 
         // Calculate kinematics and adjust homography
-        std::cout << "Top camera: " << (i == 0) << std::endl;
+        // std::cout << "Top camera: " << (i == 0) << std::endl;
         kinematics[i]->joints(jointsIn.message());
         homography[i]->wz0(kinematics[i]->wz0());
 
@@ -153,11 +154,6 @@ void VisionModule::run_()
         houghLines[i]->mapToField(*(homography[i]));
         fieldLines[i]->find(*(houghLines[i]));
 
-        std::cout << "ORIGIONAL h.r: " << homography[i]->roll() << " h.t: " << homography[i]->tilt() << std::endl;
-        if (homography[i]->calibrateFromStar((const FieldLineList&) *fieldLines[i])) {
-            std::cout << "NEW h.r: " << homography[i]->roll() << " h.t: " << homography[i]->tilt() <<std::endl<<std::endl;
-        }
-
         times[i][4] = timer.end();
 
         // Classify field lines
@@ -171,18 +167,18 @@ void VisionModule::run_()
     }
 
     
-    for (int i = 0; i < 2; i++) {
-        if (i == 0)
-            std::cout << "From top camera:" << std::endl;
-        else
-            std::cout << std::endl << "From bottom camera:" << std::endl;
-        std::cout << "Front end: " << times[i][0] << std::endl;
-        std::cout << "Gradient: " << times[i][1] << std::endl;
-        std::cout << "Edge detection: " << times[i][2] << std::endl;
-        std::cout << "Hough: " << times[i][3] << std::endl;
-        std::cout << "Field lines detection: " << times[i][4] << std::endl;
-        std::cout << "Field lines classification: " << times[i][5] << std::endl;
-    }
+    // for (int i = 0; i < 2; i++) {
+    //     if (i == 0)
+    //         std::cout << "From top camera:" << std::endl;
+    //     else
+    //         std::cout << std::endl << "From bottom camera:" << std::endl;
+    //     std::cout << "Front end: " << times[i][0] << std::endl;
+    //     std::cout << "Gradient: " << times[i][1] << std::endl;
+    //     std::cout << "Edge detection: " << times[i][2] << std::endl;
+    //     std::cout << "Hough: " << times[i][3] << std::endl;
+    //     std::cout << "Field lines detection: " << times[i][4] << std::endl;
+    //     std::cout << "Field lines classification: " << times[i][5] << std::endl;
+    // }
 }
 
 void VisionModule::logImage(int i) {
@@ -216,8 +212,6 @@ void VisionModule::logImage(int i) {
         im_buf.append(ja_buf);
         
         std::vector<nblog::SExpr> contents;
-
-        std::cout << "In Vision Mod ";
         
         nblog::SExpr imageinfo("YUVImage", image_from, clock(), image_index, im_size);
         imageinfo.append(nblog::SExpr("width", im_width)   );
@@ -271,7 +265,7 @@ void VisionModule::logImage(int i) {
         joints.append(nblog::SExpr("r_ankle_roll", ja_pb.r_ankle_roll() ));
         contents.push_back(joints);
 
-        nblog::SExpr camParams("CameraParams", "tripoint", clock(), image_index, ja_buf.length());
+        nblog::SExpr camParams("CameraParams", "tripoint", clock(), image_index, 0);
         camParams.append(nblog::SExpr(image_from, cameraParams[i]->getRoll(), cameraParams[i]->getTilt()));
         contents.push_back(camParams);
 

@@ -58,9 +58,9 @@ void Kinematics::compute()
     }
     azimuth_ = -hy;
 
-    std::cout << "Tilt: " << tilt_*TO_DEG << std::endl;
-    std::cout << "Wz0: " << wz0_ << std::endl;
-    std::cout << "Azimuth: " << azimuth_*TO_DEG << std::endl << std::endl;
+    // std::cout << "Tilt: " << tilt_*TO_DEG << std::endl;
+    // std::cout << "Wz0: " << wz0_ << std::endl;
+    // std::cout << "Azimuth: " << azimuth_*TO_DEG << std::endl << std::endl;
 }
 
 std::pair<double, double> Kinematics::computeForLeg(double anklePitch,
