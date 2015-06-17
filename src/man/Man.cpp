@@ -254,6 +254,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 //#endif
         
 //#ifdef LOG_VISION
+        cognitionThread.log<messages::FieldLines>((control::VISION), &vision.linesOut,
+                                                   "proto-FieldLines", "vision");
         // cognitionThread.log<messages::VisionField>((control::VISION), &vision.vision_field,
         //                                            "proto-VisionField", "vision");
         // cognitionThread.log<messages::VisionBall>((control::VISION), &vision.vision_ball,
