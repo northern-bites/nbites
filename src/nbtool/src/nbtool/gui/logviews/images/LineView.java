@@ -136,6 +136,8 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 double fcEP0 = lines.get(i + 8);
                 double fcEP1 = lines.get(i + 9);
 
+                System.out.printf("icR, icT: %f, %f\nfcR, fcT: %f, %f\n\n", icR, icT, fcR, fcT);
+
                 // Draw it in image coordinates
                 if (fieldIndex == -1)
                     g.setColor(Color.red);
@@ -178,9 +180,11 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 // Scale down if a line is outside the view, but not if its too far (false field line)
                 if (y1 < 0 && y1 > -2500) {
                     resize = Math.min(resize, (double)fieldh/(-y1 + fieldh));
+                    System.out.printf("New resize: %f", resize);
                 }
                 if (y2 < 0 && y2 > -2500) {
                     resize = Math.min(resize, (double)fieldh/(-y2 + fieldh));
+                    System.out.printf("New resize: %f", resize);
                 }
 
                 // // Don't draw it if it's way out
@@ -202,6 +206,9 @@ public class LineView extends ViewParent implements IOFirstResponder {
                     double fcT = lines.get(i + 7);
                     double fcEP0 = lines.get(i + 8);
                     double fcEP1 = lines.get(i + 9);
+
+                    System.out.printf("fcR, fcT: %f, %f\n", fcR, fcT);
+
 
                     // Draw it in field coordinates
                     if (fieldIndex >= 0)

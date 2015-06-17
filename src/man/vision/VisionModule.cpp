@@ -132,10 +132,6 @@ void VisionModule::run_()
 #endif
         }
 
-        homography[i]->roll(homography[i]->roll());
-        homography[i]->tilt(kinematics[i]->tilt());
-
-
         // Approximate brightness gradient
         edgeDetector[i]->gradient(yImage);
         
