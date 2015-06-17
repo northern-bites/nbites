@@ -157,15 +157,16 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
         behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
         behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
+        behaviors.linesIn.wireTo(&vision.linesOut, true);
         // behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
         // behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
         // behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);
         // 
-        // for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
-        // {
-        //     behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
-        // }
-        // 
+        for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+        {
+            behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
+        }
+        
         leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
         
 #ifdef USE_LOGGING

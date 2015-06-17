@@ -37,6 +37,7 @@ import MotionStatus_proto
 import ButtonState_proto
 import FallStatus_proto
 import StiffnessControl_proto
+import Vision_proto
 
 class Brain(object):
     """
@@ -76,6 +77,9 @@ class Brain(object):
         self.motion = None
         self.game = None
         self.locUncert = 0
+
+        # New vision system...
+        self.visionLines = None
 
         # FSAs
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
@@ -160,8 +164,11 @@ class Brain(object):
         self.tracker.run()
         self.nav.run()
 
+        # for new vision stuff
+        self.updateVision()
+
         # HACK for dangerous ball flipping loc
-        self.flipLocFilter()
+        # self.flipLocFilter()
 
         # Set LED message
         # self.leds.processLeds()
@@ -217,6 +224,9 @@ class Brain(object):
 
     def updateMotion(self):
         self.motion = self.interface.motionStatus
+
+    def updateVision(self):
+        self.visionLines = self.interface.visionLines
 
     def updateVisionObjects(self):
         """
