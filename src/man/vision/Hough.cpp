@@ -251,19 +251,19 @@ bool GoalboxDetector::find(FieldLineList& list)
 }
 
 // TODO add length condition?
-bool GoalboxDetector::validBox(HoughLine& line1, HoughLine& line2) const
+bool GoalboxDetector::validBox(const HoughLine& line1, const HoughLine& line2) const
 {
   // Use world coordinates
   const GeoLine& field1 = line1.field();
   const GeoLine& field2 = line2.field();
 
-  // Goalbox = two field lines that are (1) parallel and (2) seperated by 60 cm
-  // Parallel
+  // Goalbox = two field lines that are parallel and seperated by 60 cm
+  // (1) Parallel
   double normalizedT1 = (field1.r() > 0 ? field1.t() : field1.t() - M_PI);
   double normalizedT2 = (field2.r() > 0 ? field2.t() : field2.t() - M_PI);
   bool parallel = diffRadians(normalizedT1, normalizedT2) < parallelThreshold()*TO_RAD;
 
-  // Seperated by 60 cm
+  // (2) Seperated by 60 cm
   double distBetween = fabs(field1.pDist(field2.r()*cos(field2.t()), field2.r()*sin(field2.t())));
   bool seperation = fabs(distBetween - GOALBOX_DEPTH) < seperationThreshold();
 
@@ -279,8 +279,9 @@ CornerDetector::CornerDetector(int width_, int height_)
   : width(width_), 
     height(height_), 
     orthogonalThreshold_(40), 
+    intersectThreshold_(10), 
     closeThreshold_(30), 
-    farThreshold_(100), 
+    farThreshold_(50), 
     edgeImageThreshold_(0.05)
 {}
 
@@ -301,15 +302,18 @@ void CornerDetector::findCorners(FieldLineList& list)
 
       // Find corners
       // NOTE since there are two hough lines in each field line, we require
-      //      finding the same corner in all pairings of hough lines
+      //      finding (1) at least one intersecting set of hough lines and 
+      //      (2) the same corner ID in all pairings of hough lines
+      bool foundCorner = isCorner(line1[0], line2[0]);
       CornerID firstId = classify(line1[0], line2[0]);
-      bool foundCorner = !(firstId == CornerID::None);
+      bool sameId = true;
       for (int k = 0; k < 2; k++) {
         for (int l = 0; l < 2; l++) {
           if (k == 0 && l == 0) continue;
+          foundCorner = foundCorner || isCorner(line1[k], line2[l]);
           CornerID newId = classify(line1[k], line2[l]);
           if (firstId != newId)
-            foundCorner = false;
+            sameId = false;
         }
       }
 
@@ -322,7 +326,7 @@ void CornerDetector::findCorners(FieldLineList& list)
       //      below. Thus the client is not aware of TFirst and TSecond.
 
       // Create corner object and add to field lines
-      if (foundCorner) {
+      if (sameId && foundCorner && firstId != CornerID::None) {
         Corner newCorner;
         if (firstId == CornerID::TSecond)
           newCorner = Corner(&line2, &line1, CornerID::T);
@@ -338,15 +342,24 @@ void CornerDetector::findCorners(FieldLineList& list)
   }
 }
 
-CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
+bool CornerDetector::isCorner(const HoughLine& line1, const HoughLine& line2) const
 {
-  // If intersection is in edge of image, don't classify corner
+  // (1) Check that lines intersect
+  // NOTE done in image coords
   double imageIntersectX;
   double imageIntersectY;
 
   bool intersects = line1.intersect(line2, imageIntersectX, imageIntersectY);
-  if (!intersects) return CornerID::None;
+  if (intersects) {
+    double qIntersect1 = line1.qDist(imageIntersectX, imageIntersectY);
+    double qIntersect2 = line2.qDist(imageIntersectX, imageIntersectY);
+    intersects = (qIntersect1 >= line1.ep0() - intersectThreshold() && 
+                  qIntersect1 <= line1.ep1() + intersectThreshold() && 
+                  qIntersect2 >= line2.ep0() - intersectThreshold() && 
+                  qIntersect2 <= line2.ep1() + intersectThreshold());
+  }
 
+  // (2) If intersection is in edge of image, don't classify corner
   double xThreshold = (width / 2) - (width * edgeImageThreshold());
   double yThreshold = (height / 2) - (height * edgeImageThreshold());
 
@@ -354,23 +367,30 @@ CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
                                  imageIntersectX <=  xThreshold &&
                                  imageIntersectY >= -yThreshold &&
                                  imageIntersectY <=  yThreshold);
-  if (!farEnoughFromImageEdge) return CornerID::None;
 
-  // Use world coordinates
+  // (3) Check that lines are close to orthogonal
+  // NOTE done in world coords
   const GeoLine& field1 = line1.field();
   const GeoLine& field2 = line2.field();
 
-  // Check that lines are close to orthogonal
   double normalizedT1 = (field1.r() > 0 ? field1.t() : field1.t() - M_PI);
   double normalizedT2 = (field2.r() > 0 ? field2.t() : field2.t() - M_PI);
-  bool orthogonal = diffRadians(normalizedT1, normalizedT2) - (M_PI / 2) < orthogonalThreshold()*TO_RAD;
-  if (!orthogonal) return CornerID::None;
+  bool orthogonal = diffRadians(diffRadians(normalizedT1, normalizedT2), (M_PI / 2)) < orthogonalThreshold()*TO_RAD;
+
+  return intersects && farEnoughFromImageEdge && orthogonal;
+}
+
+CornerID CornerDetector::classify(const HoughLine& line1, const HoughLine& line2) const
+{
+  // Use world coordinates
+  const GeoLine& field1 = line1.field();
+  const GeoLine& field2 = line2.field();
 
   // Find intersection point
   double worldIntersectX;
   double worldIntersectY;
 
-  intersects = field1.intersect(field2, worldIntersectX, worldIntersectY);
+  bool intersects = field1.intersect(field2, worldIntersectX, worldIntersectY);
   if (!intersects) return CornerID::None; 
   // NOTE should never happen since checked above in image coords
 
@@ -399,7 +419,8 @@ CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
       // Concave or convex corners have both endpoints on the intersection point
       if (dist1[i] < closeThreshold() && dist2[j] < closeThreshold()) {
         // Found concave or convex
-        if (field1.ep0() < 0 && field1.ep1() > 0 && field2.ep0() < 0 && field2.ep1() > 0)
+        if (isConcave(field1EndX[!i], field1EndY[!i], field2EndX[!j], 
+                      field2EndY[!j], worldIntersectX, worldIntersectY))
           return CornerID::Concave;
         return CornerID::Convex;
       }
@@ -410,12 +431,46 @@ CornerID CornerDetector::classify(HoughLine& line1, HoughLine& line2) const
     for (int j = 0; j < 2; j++) {
       // Found t
       // TODO for T corners, both endpoints outside of far threshold?
-      if ((dist1[i] < closeThreshold() && dist2[j] > farThreshold()))
+      if ((dist1[i] < closeThreshold() && dist2[j] >= farThreshold()))
         return CornerID::TSecond;
-      else if (dist2[j] < closeThreshold() && dist1[i] > farThreshold())
+      else if (dist2[j] < closeThreshold() && dist1[i] >= farThreshold())
         return CornerID::TFirst;
     }
   }
+
+  // Return none if no classification found
+  // NOTE if closeThreshold == farThreshold, classification will always be made
+  return CornerID::None; 
+}
+
+bool CornerDetector::isConcave(double end1X, double end1Y, 
+                               double end2X, double end2Y,
+                               double intersectX, double intersectY) const
+{
+  // Parallel lines -> convex corner
+  if (intersectX == 0 && (end1X - end2X) == 0)
+    return false;
+  // Check for divide by zero
+  else if (intersectX != 0 && (end1X - end2X) != 0) {
+    double m1 = (end1Y - end2Y) / (end1X - end2X);
+    double m2 = intersectY / intersectX;
+    // Parallel lines -> convex corner
+    if (fabs(m1 - m2) < 0.001)
+      return false;
+  }
+
+  // General case
+  return (ccw(end1X, end1Y, intersectX, intersectY, 0, 0) !=
+          ccw(end2X, end2Y, intersectX, intersectY, 0, 0) &&
+          ccw(end1X, end1Y, end2X, end2Y, intersectX, intersectY) !=
+          ccw(end1X, end1Y, end2X, end2Y, 0, 0));
+}
+
+bool CornerDetector::ccw(double ax, double ay, 
+                         double bx, double by, 
+                         double cx, double cy) const
+{
+  return (cy-ay)*(bx-ax) > (by-ay)*(cx-ax);
 }
 
 // **************************
@@ -462,14 +517,18 @@ void FieldLineList::find(HoughLineList& houghLines)
       // Here is the dot product 
       if (hl1->field().ux() * hl2->field().ux() + hl1->field().uy() * hl2->field().uy() <= maxCosAngle)
       {
+        // We use image coordinates to check polarity. Converting to field 
+        // coordinates leads to crossed field lines if the homography is poor.
+        // Crosses field lines in world coordinates leads to polarity error.
+        bool correctPolarity = (hl1->r() + hl2->r() < 0);
         // Separation is sum of the two r values (distance of line to origin).
         // This is well defined and sensible for lines that may not be perfectly
         // parallel. For field lines the polarities are pointing towards each
         // other, which makes the sum of r's negative. A pair of nearly parallel
         // lines with the right separation but with polarities pointing away from
         // each other is not a field line. 
-        double separation = hl1->field().separation(hl2->field());
-        if (0.0 < separation && separation <= maxLineSeparation())
+        double separation = fabs(hl1->field().r() + hl2->field().r());
+        if (correctPolarity && separation <= maxLineSeparation())
         {
           int index = size();
           hl1->fieldLine(index);
@@ -481,23 +540,31 @@ void FieldLineList::find(HoughLineList& houghLines)
 }
 
 // TODO goalie and the goalbox
-// TODO convex and T -> classify as side goalbox?
 // TODO midline classification? (cross detection, lots of green detection, etc.)
 // TODO find and use field edge?
 void FieldLineList::classify(GoalboxDetector& boxDetector, CornerDetector& cornerDetector)
 {
+  // If less than one field line, no classification possible
+  if (size() <= 1) return;
+
   // Run goalbox detector
-  bool boxFound = boxDetector.find(*this);
-  bool topBoxFound = boxFound;
-  bool endlineFound = boxFound;
+  bool topBoxFound = boxDetector.find(*this);
+  bool endlineFound = topBoxFound;
+  bool sideboxFound = false;
   bool midlineFound = false;
+  bool sidelineFound = false;
 
   // Run corner detector
   cornerDetector.findCorners(*this);
 
-  // Look for lines with two corners and classify
-  for (int i = 0; i < size(); i++) {
+  // Loop over lines until no more classifications possible
+  int i = 0;
+  int numStepsWithoutClassify = -1;
+  int numLines = static_cast<int>(size());
+  while (numStepsWithoutClassify < numLines) {
+    numStepsWithoutClassify++;
     FieldLine& line = (*this)[i];
+    i = (i + 1) % numLines;
     if (line.id() != LineID::Line) continue;
     std::vector<Corner> corners = line.corners();
 
@@ -507,101 +574,103 @@ void FieldLineList::classify(GoalboxDetector& boxDetector, CornerDetector& corne
     bool oneTVertical = false;
 
     for (int j = 0; j < corners.size(); j++) {
-      // Concave
+      // (1) Classifies lines based on seeing two corners connected to line
+      // Two concave -> endline
       if (corners[j].id == CornerID::Concave) {
         if (oneConcave) {
           line.id(LineID::Endline);
+          numStepsWithoutClassify = 0;
           endlineFound = true;
         } else
           oneConcave = true;
-      }
-      // Convex
-      if (corners[j].id == CornerID::Convex) {
+      // Two convex -> top goalbox
+      } else if (corners[j].id == CornerID::Convex) {
         if (oneConvex) {
           line.id(LineID::TopGoalbox);
+          numStepsWithoutClassify = 0;
           topBoxFound = true;
-        } else
+        } else {
           oneConvex = true;
-      }
-      // T, horizontal part
-      if (corners[j].id == CornerID::T &&
+          // One convex, one T (vertical) -> side goalbox
+          if (oneTVertical) {
+            line.id(LineID::SideGoalbox);
+            numStepsWithoutClassify = 0;
+            sideboxFound = true;
+          }
+        }
+      // Two t (horizontal) -> endline
+      } else if (corners[j].id == CornerID::T &&
           corners[j].first == &line) {
         if (oneTHorizontal) {
           line.id(LineID::Endline);
+          numStepsWithoutClassify = 0;
           endlineFound = true;
         } else
           oneTHorizontal = true;
-      }
-      // T, vertical part
-      if (corners[j].id == CornerID::T &&
+      // Two t (vertical) -> midline
+      } else if (corners[j].id == CornerID::T &&
           corners[j].second == &line) {
         if (oneTVertical) {
           line.id(LineID::Midline);
+          numStepsWithoutClassify = 0;
           midlineFound = true;
-        } else
+        } else {
           oneTVertical = true;
+          // One convex, one T (vertical) -> side goalbox
+          if (oneConvex) {
+            line.id(LineID::SideGoalbox);
+            numStepsWithoutClassify = 0;
+            sideboxFound = true;
+          }
+        }
       }
-    }
-  }
 
-  // If we have found either top goalbox, endline, or midline, classification is simpler
-  if (topBoxFound) { 
-    for (int i = 0; i < size(); i++) {
-      FieldLine& line = (*this)[i];
-      if (line.id() != LineID::Line) continue;
-      std::vector<Corner> corners = line.corners();
-
-      for (int j = 0; j < corners.size(); j++) {
-        // Convex corner -> line must be attached to top goalbox
-        if (corners[j].id == CornerID::Convex)
+      // (2) Classifies line based on looking for connections to already classified lines
+      if (topBoxFound) {
+        // Top box found and convex corner -> side goalbox
+        if (corners[j].id == CornerID::Convex) {
           line.id(LineID::SideGoalbox); 
-      }
-    }
-  }
-
-  if (endlineFound) {
-    for (int i = 0; i < size(); i++) {
-      FieldLine& line = (*this)[i];
-      if (line.id() != LineID::Line) continue;
-      std::vector<Corner> corners = line.corners();
-
-      for (int j = 0; j < corners.size(); j++) {
-        // Concave corner -> line must be attached to endline -> sideline
-        if (corners[j].id == CornerID::Concave)
+          numStepsWithoutClassify = 0;
+          sideboxFound = true;
+        }
+      } 
+      if (endlineFound) {
+        // Endline found and concave corner -> sideline
+        if (corners[j].id == CornerID::Concave) {
           line.id(LineID::Sideline); 
-      }
-      for (int j = 0; j < corners.size(); j++) {
-        // Concave corner -> line must be attached to endline -> sideline
-        if (corners[j].id == CornerID::Concave)
-          line.id(LineID::Sideline);
-        // T corner + corner.first is endline -> line must be the side goalbox
-        else if (corners[j].id == CornerID::T) {
-          if (corners[j].first->id() == LineID::Endline)
+          numStepsWithoutClassify = 0;
+          sidelineFound = true;
+        // Endline found, T, and corner.first is endline -> side goalbox
+        } else if (corners[j].id == CornerID::T) {
+          if (corners[j].first->id() == LineID::Endline) {
             line.id(LineID::SideGoalbox); 
+            numStepsWithoutClassify = 0;
+            sideboxFound = true;
+          }
         }
-      }
-    }
-  }
-
-  // TODO more logic possible?
-  if (midlineFound) { 
-    for (int i = 0; i < size(); i++) {
-      FieldLine& line = (*this)[i];
-      if (line.id() != LineID::Line) continue;
-      std::vector<Corner> corners = line.corners();
-
-      for (int j = 0; j < corners.size(); j++) {
-        // T corner + corner.second is midline -> line must be the sideline
+      } 
+      if (midlineFound) {
+        // Midline found, T, and corner.second is midline -> sideline
         if (corners[j].id == CornerID::T) {
-          if (corners[j].second->id() == LineID::Midline)
+          if (corners[j].second->id() == LineID::Midline) {
             line.id(LineID::Sideline); 
+            numStepsWithoutClassify = 0;
+            sidelineFound = true;
+          }
         }
+      }
+      // TODO
+      if (sidelineFound) {
+        ;
+      }
+      // TODO
+      if (sideboxFound) {
+        ;
       }
     }
   }
 
-  // Classify less specifically, note that changing classification only
-  // takes affect if new class is more specific than old class
+  // Classify less specifically
   for (int i = 0; i < size(); i++) {
     FieldLine& line = (*this)[i];
     if (line.id() != LineID::Line) continue;

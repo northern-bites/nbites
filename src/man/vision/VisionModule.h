@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "Images.h"
 #include "PMotion.pb.h"
+#include "Vision.pb.h"
 #include "FrontEnd.h"
 #include "Edge.h"
 #include "Hough.h"
@@ -17,13 +18,15 @@ namespace vision {
 
 class VisionModule : public portals::Module {
 public:
-    VisionModule();
+    VisionModule(int wd, int ht);
     virtual ~VisionModule();
 
     portals::InPortal<messages::YUVImage> topIn;
     portals::InPortal<messages::YUVImage> bottomIn;
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::InertialState> inertsIn;
+
+    portals::OutPortal<messages::FieldLines> linesOut;
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
@@ -50,7 +53,8 @@ protected:
 private:
 
     void logImage(int i);
-    
+    void sendLinesOut();
+
     Colors* colorParams[2];
     ImageFrontEnd* frontEnd[2];
     EdgeDetector* edgeDetector[2];

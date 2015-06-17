@@ -57,10 +57,6 @@ void Kinematics::compute()
         wz0_ = rightCameraHeight;
     }
     azimuth_ = -hy;
-
-    // std::cout << "Tilt: " << tilt_*TO_DEG << std::endl;
-    // std::cout << "Wz0: " << wz0_ << std::endl;
-    // std::cout << "Azimuth: " << azimuth_*TO_DEG << std::endl << std::endl;
 }
 
 std::pair<double, double> Kinematics::computeForLeg(double anklePitch,

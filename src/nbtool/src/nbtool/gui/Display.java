@@ -106,7 +106,6 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 	}
 	
 	public boolean postProcessKeyEvent(final KeyEvent e) {
-
 		if (!e.isConsumed() && (e.getID() == KeyEvent.KEY_TYPED)) {
 			
 			Character c = e.getKeyChar();

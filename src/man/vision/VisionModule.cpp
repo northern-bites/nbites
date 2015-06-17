@@ -11,11 +11,12 @@
 namespace man {
 namespace vision {
 
-VisionModule::VisionModule()
+VisionModule::VisionModule(int wd, int ht)
     : Module(),
       topIn(),
       bottomIn(),
-      jointsIn()
+      jointsIn(),
+      linesOut(base())
 {
     // NOTE Constructed on heap because some of the objects below do
     //      not have default constructors, all class members must be initialized
@@ -53,15 +54,15 @@ VisionModule::VisionModule()
         boxDetector[i] = new GoalboxDetector();
 
         if (i == 0) {
-          hough[i] = new HoughSpace(320, 240);
-          cornerDetector[i] = new CornerDetector(320, 240);
+          hough[i] = new HoughSpace(wd / 2, ht / 2);
+          cornerDetector[i] = new CornerDetector(wd / 2, ht / 2);
         } else {
-          hough[i] = new HoughSpace(160, 120);
-          cornerDetector[i] = new CornerDetector(160, 120);
+          hough[i] = new HoughSpace(wd / 4, ht / 4);
+          cornerDetector[i] = new CornerDetector(wd / 4, ht / 4);
         }
 
         bool fast = true;
-        frontEnd[i]->fast(false);
+        frontEnd[i]->fast(fast);
         edgeDetector[i]->fast(fast);
         hough[i]->fast(fast);
     }
@@ -97,9 +98,9 @@ void VisionModule::run_()
                                                     &bottomIn.message() };
 
     // Time vision module
-    double topTimes[6];
-    double bottomTimes[6];
-    double* times[2] = { topTimes, bottomTimes };
+    // double topTimes[6];
+    // double bottomTimes[6];
+    // double* times[2] = { topTimes, bottomTimes };
 
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
@@ -112,24 +113,24 @@ void VisionModule::run_()
                         image->rowPitch(),
                         image->pixelAddress(0, 0));
 
-        HighResTimer timer;
+        // HighResTimer timer;
 
         // Run front end
         frontEnd[i]->run(yuvLite, colorParams[i]);
         ImageLiteU16 yImage(frontEnd[i]->yImage());
         ImageLiteU8 greenImage(frontEnd[i]->greenImage());
 
-        times[i][0] = timer.end();
+        // times[i][0] = timer.end();
 
         // Calculate kinematics and adjust homography
-        // std::cout << "Top camera: " << (i == 0) << std::endl;
-        kinematics[i]->joints(jointsIn.message());
-        homography[i]->wz0(kinematics[i]->wz0());
-
-        
-        // homography[i]->roll(homography[i]->roll() + cameraParams[i]->getRoll()*TO_RAD);
-        // homography[i]->tilt(kinematics[i]->tilt() + cameraParams[i]->getTilt()*TO_RAD);
-        // homography[i]->azimuth(kinematics[i]->azimuth());
+        if (jointsIn.message().has_head_yaw()) {
+            kinematics[i]->joints(jointsIn.message());
+            homography[i]->wz0(kinematics[i]->wz0());
+            homography[i]->tilt(kinematics[i]->tilt());
+#ifndef OFFLINE
+            homography[i]->azimuth(kinematics[i]->azimuth());
+#endif
+        }
 
         homography[i]->roll(homography[i]->roll());
         homography[i]->tilt(kinematics[i]->tilt());
@@ -138,35 +139,37 @@ void VisionModule::run_()
         // Approximate brightness gradient
         edgeDetector[i]->gradient(yImage);
         
-        times[i][1] = timer.end();
+        // times[i][1] = timer.end();
 
         // Run edge detection
         edgeDetector[i]->edgeDetect(greenImage, *(edges[i]));
 
-        times[i][2] = timer.end();
+        // times[i][2] = timer.end();
 
         // Run hough line detection
         hough[i]->run(*(edges[i]), *(houghLines[i]));
 
-        times[i][3] = timer.end();
+        // times[i][3] = timer.end();
 
         // Find field lines
         houghLines[i]->mapToField(*(homography[i]));
         fieldLines[i]->find(*(houghLines[i]));
 
-        times[i][4] = timer.end();
+        // times[i][4] = timer.end();
 
         // Classify field lines
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
 
-        times[i][5] = timer.end();
+        //times[i][5] = timer.end();
         
-        #ifdef USE_LOGGING
+#ifdef USE_LOGGING
         logImage(i);
-        #endif
+#endif
     }
 
-    
+    // Send messages on outportals
+    sendLinesOut();
+
     // for (int i = 0; i < 2; i++) {
     //     if (i == 0)
     //         std::cout << "From top camera:" << std::endl;
@@ -269,9 +272,44 @@ void VisionModule::logImage(int i) {
         camParams.append(nblog::SExpr(image_from, cameraParams[i]->getRoll(), cameraParams[i]->getTilt()));
         contents.push_back(camParams);
 
-        nblog::NBLog(NBL_IMAGE_BUFFER, "tripoint",
-                   contents, im_buf);
+        nblog::NBLog(NBL_IMAGE_BUFFER, "tripoint", contents, im_buf);
     }
+}
+// TODO filter out repeat lines
+void VisionModule::sendLinesOut()
+{
+    messages::FieldLines pLines;
+
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < fieldLines[i]->size(); j++) {
+            messages::FieldLine* pLine = pLines.add_line();
+            FieldLine& line = (*(fieldLines[i]))[j];
+
+            for (int k = 0; k < 2; k++) {
+                messages::HoughLine pHough;
+                HoughLine& hough = line[k];
+
+                // Lines need not be polarized for localization and behaviors
+                if (hough.field().r() < 0) {
+                    pHough.set_r(-hough.field().r());
+                    pHough.set_t(diffRadians(hough.field().t(), 180));
+                    pHough.set_ep0(hough.field().ep0());
+                    pHough.set_ep1(hough.field().ep1());
+                    pLine->mutable_outer()->CopyFrom(pHough);
+                } else {
+                    pHough.set_r(hough.field().r());
+                    pHough.set_t(hough.field().t());
+                    pHough.set_ep0(hough.field().ep0());
+                    pHough.set_ep1(hough.field().ep1());
+                    pLine->mutable_inner()->CopyFrom(pHough);
+                }
+            }
+
+            pLine->set_id(static_cast<int>(line.id()));
+        }
+    }
+    portals::Message<messages::FieldLines> linesOutMessage(&pLines);
+    linesOut.setMessage(linesOutMessage);
 }
 
 const std::string VisionModule::getStringFromTxtFile(std::string path) {

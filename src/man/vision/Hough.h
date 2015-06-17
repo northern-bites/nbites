@@ -186,7 +186,7 @@ class GoalboxDetector : public std::pair<FieldLine*, FieldLine*>
   double parallelThreshold_;
   double seperationThreshold_;
 
-  bool validBox(HoughLine& line1, HoughLine& line2) const;
+  bool validBox(const HoughLine& line1, const HoughLine& line2) const;
 
 public:
   GoalboxDetector();
@@ -208,11 +208,17 @@ class CornerDetector : public std::vector<Corner>
   int width;
   int height;
   double orthogonalThreshold_;
+  double intersectThreshold_;
   double closeThreshold_;
   double farThreshold_;
   double edgeImageThreshold_;
 
-  CornerID classify(HoughLine& line1, HoughLine& line2) const; 
+  bool isCorner(const HoughLine& line1, const HoughLine& line2) const;
+  CornerID classify(const HoughLine& line1, const HoughLine& line2) const; 
+  bool isConcave(double end1X, double end1Y, 
+                 double end2X, double end2Y, 
+                 double intersectX, double intersectY) const;
+  bool ccw(double ax, double ay, double bx, double by, double cx, double cy) const;
 
 public:
   CornerDetector(int width_, int height_);
@@ -220,6 +226,9 @@ public:
 
   double orthogonalThreshold() const { return orthogonalThreshold_; }
   void orthogonalThreshold(double newThreshold) { orthogonalThreshold_ = newThreshold; }
+
+  double intersectThreshold() const { return intersectThreshold_; }
+  void intersectThreshold(double newThreshold) { intersectThreshold_ = newThreshold; }
 
   double closeThreshold() const { return closeThreshold_; }
   void closeThreshold(double newThreshold) { closeThreshold_ = newThreshold; }

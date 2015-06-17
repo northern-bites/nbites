@@ -6,6 +6,7 @@
 #include "vision/FrontEnd.h"
 #include "vision/Homography.h"
 #include "ParamReader.h"
+#include "NBMath.h"
 
 #include <cstdlib>
 #include <netinet/in.h>
@@ -39,36 +40,35 @@ int Vision_func() {
     bool top = copy->description().find("TOP") != std::string::npos;
     
     int width = 2*atoi(copy->tree().find("contents")->get(1)->
-                                        find("width")->get(1)->value().c_str());
+                                    find("width")->get(1)->value().c_str());
     int height = atoi(copy->tree().find("contents")->get(1)->
-                                        find("height")->get(1)->value().c_str());     
-
-    int outWidth = width/4;
-    int outHeight = height/2;
-
-    // Read number of bytes of image, inertials, and joints
-    int numBytes[3];
-    for (int i = 0; i < 3; i++)
-        numBytes[i] = atoi(copy->tree().find("contents")->get(i+1)->
-                                        find("nbytes")->get(1)->value().c_str());
-    uint8_t* ptToJoints = buf + (numBytes[0] + numBytes[1]);
+                                   find("height")->get(1)->value().c_str());
 
     // Location of lisp text file with color params
     std::string sexpPath = std::string(getenv("NBITES_DIR"));
     sexpPath += "/src/man/config/colorParams.txt";
+
+    // Read number of bytes of image, inertials, and joints if exist
+    messages::JointAngles joints;
+    if (copy->tree().find("contents")->get(2)) {
+        int numBytes[3];
+        for (int i = 0; i < 3; i++)
+            numBytes[i] = atoi(copy->tree().find("contents")->get(i+1)->
+                                            find("nbytes")->get(1)->value().c_str());
+        uint8_t* ptToJoints = buf + (numBytes[0] + numBytes[1]);
+        joints.ParseFromArray((void *) ptToJoints, numBytes[2]);
+    }
     
     // Create messages
     // Empty messages to pass to Vision Module so it doesn't freak
     messages::YUVImage image(buf, width, height, width);
-    messages::JointAngles joints;
-    joints.ParseFromArray((void *) ptToJoints, numBytes[2]);
 
     portals::Message<messages::YUVImage> imageMessage(&image);
     portals::Message<messages::JointAngles> jointsMessage(&joints);
 
-    man::vision::VisionModule module;
+    man::vision::VisionModule module(width / 2, height);
     
-    // Look for robot name 
+    // Look for robot name and pass to module if found
     SExpr* robotName = args[0]->tree().find("from_address");
     std::string rname;
     if (robotName != NULL) {
@@ -119,7 +119,7 @@ int Vision_func() {
     //   Y IMAGE
     // -----------
     Log* yRet = new Log();
-    int yLength = outHeight*outWidth*2;
+    int yLength = (width / 4) * (height / 2) * 2;
 
     // Create temp buffer and fill with yImage from FrontEnd
     uint8_t yBuf[yLength];
@@ -135,7 +135,7 @@ int Vision_func() {
     //   WHITE IMAGE
     // ---------------
     Log* whiteRet = new Log();
-    int whiteLength = outHeight*outWidth;;
+    int whiteLength = (width / 4) * (height / 2);
 
     // Create temp buffer and fill with white image 
     uint8_t whiteBuf[whiteLength];
@@ -154,7 +154,7 @@ int Vision_func() {
     //   GREEN IMAGE
     // ---------------
     Log* greenRet = new Log();
-    int greenLength = outHeight*outWidth;
+    int greenLength = (width / 4) * (height / 2);
 
     // Create temp buffer and fill with gree image 
     uint8_t greenBuf[greenLength];
@@ -173,7 +173,7 @@ int Vision_func() {
     //   ORANGE IMAGE
     // ----------------
     Log* orangeRet = new Log();
-    int orangeLength = outHeight*outWidth;
+    int orangeLength = (width / 4) * (height / 2);
 
     // Create temp buffer and fill with orange image 
     uint8_t orangeBuf[orangeLength];
@@ -192,7 +192,7 @@ int Vision_func() {
     //  SEGMENTED IMAGE
     //-------------------
     Log* colorSegRet = new Log();
-    int colorSegLength = outHeight*outWidth;
+    int colorSegLength = (width / 4) * (height / 2);
 
     // Create temp buffer and fill with segmented image
     uint8_t segBuf[colorSegLength];
@@ -214,9 +214,9 @@ int Vision_func() {
 
     man::vision::AngleBinsIterator<man::vision::Edge> abi(*edgeList);
     for (const man::vision::Edge* e = *abi; e; e = *++abi) {
-        uint32_t x = htonl(e->x() + outWidth/2);
+        uint32_t x = htonl(e->x() + (width / 8));
         edgeBuf.append((const char*) &x, sizeof(uint32_t));
-        uint32_t y = htonl(-e->y() + outHeight/2);
+        uint32_t y = htonl(-e->y() + (height / 4));
         edgeBuf.append((const char*) &y, sizeof(uint32_t));
         uint32_t mag = htonl(e->mag());
         edgeBuf.append((const char*) &mag, sizeof(uint32_t));
@@ -395,3 +395,42 @@ SExpr getSExprFromSavedParams(int color, std::string sexpPath, bool top) {
     return SExpr(atoms);
 }
 
+int Synthetics_func() {
+    assert(args.size() == 1);
+
+    printf("Synthetics_func()\n");
+    
+    double x = std::stod(args[0]->tree().find("contents")->get(1)->find("params")->get(1)->value().c_str());
+    double y = std::stod(args[0]->tree().find("contents")->get(1)->find("params")->get(2)->value().c_str());
+    double h = std::stod(args[0]->tree().find("contents")->get(1)->find("params")->get(3)->value().c_str());
+    bool fullres = args[0]->tree().find("contents")->get(1)->find("params")->get(4)->value() == "true";
+    bool top = args[0]->tree().find("contents")->get(1)->find("params")->get(5)->value() == "true";
+
+    int wd = (fullres ? 320 : 160);
+    int ht = (fullres ? 240 : 120);
+    double flen = (fullres ? 544 : 272);
+
+    int size = wd*4*ht*2;
+    uint8_t* pixels = new uint8_t[size];
+    man::vision::YuvLite synthetic(wd, ht, wd*4, pixels);
+
+    man::vision::FieldHomography homography(top);
+    homography.wx0(x);
+    homography.wy0(y);
+    homography.azimuth(h*TO_RAD);
+    homography.flen(flen);
+
+    man::vision::syntheticField(synthetic, homography);
+
+    std::string sexpr("(nblog (version 6) (contents ((type YUVImage) (from camera_TOP) (nbytes ");
+    sexpr += std::to_string(size);
+    sexpr += ") (width " + std::to_string(2*wd);
+    sexpr += ") (height " + std::to_string(2*ht);
+    sexpr += ") (encoding \"[Y8(U8/V8)]\"))))";
+
+    Log* log = new Log(sexpr);
+    std::string buf((const char*)pixels, size);
+    log->setData(buf);
+
+    rets.push_back(log);
+}

@@ -1,3 +1,4 @@
+
 // ********************************
 // *                              *
 // *  Perspective Transformation  *
@@ -110,10 +111,6 @@ public:
   // Same as above, but for lines known to be parallel in world coordinates.
   bool visualTiltParallel(const GeoLine& a, const GeoLine& b, double& tilt,
                           std::string* diagnostics) const;
-
-  // Calibrate tilt and roll using "star target". If successful returns true and
-  // updates tilt and roll.
-  bool calibrateFromStar(const FieldLineList& lines);
 };
 
 // ********************
@@ -247,6 +244,7 @@ public:
 //
 // Note that the fh argument is not a reference, but a copy because it is modified
 // internally.
+
 void syntheticField(YuvLite& img, FieldHomography fh);
 
 class CameraParams {
@@ -267,3 +265,4 @@ public:
 }
 
 #endif
+

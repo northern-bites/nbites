@@ -39,7 +39,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
     topTranscriber(*new image::ImageTranscriber(Camera::TOP)),
     bottomTranscriber(*new image::ImageTranscriber(Camera::BOTTOM)),
-    vision(),
+    vision(640, 480),
     localization(),
     ballTrack(),
     obstacle(),

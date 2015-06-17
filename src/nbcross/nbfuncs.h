@@ -41,13 +41,15 @@ int CrossBright_func();
 
 // Defined in vision_defs.cpp
 int Vision_func();
+int Synthetics_func();
 
 /* add all functions to publish to this vector */
 static const std::vector<CrossFunc> FUNCS = {
     CrossFunc("test", test_func, {}),
     CrossFunc("arg_test", arg_test_func, {"YUVImage", "YUVImage"}),
     CrossFunc("CrossBright", CrossBright_func, {"YUVImage"}),
-    CrossFunc("Vision", Vision_func, {"YUVImage"})
+    CrossFunc("Vision", Vision_func, {"YUVImage"}),
+    CrossFunc("Synthetics", Synthetics_func, {"SyntheticParams"})
 };
 
 extern std::vector<nblog::Log *> args;
