@@ -228,6 +228,15 @@ class Brain(object):
     def updateVision(self):
         self.visionLines = self.interface.visionLines
 
+        # if self.counter % 30 == 0:
+        #     print "Visionline size:"
+        #     print self.visionLines.line_size()
+
+        # for i in range(0, self.visionLines.line_size()):
+        #     print "Vision lines:"
+        #     print i
+        #     print self.visionLines.line(i).id
+
     def updateVisionObjects(self):
         """
         Update estimates of robot and ball positions on the field
