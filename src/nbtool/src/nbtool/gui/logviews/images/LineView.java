@@ -32,6 +32,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
 	BufferedImage originalImage;
 	BufferedImage edgeImage;
     Vector<Double> lines;
+    Vector<GeoLine> geoLines;
 
 	@Override
 	public void setLog(Log newlog) {
@@ -53,13 +54,14 @@ public class LineView extends ViewParent implements IOFirstResponder {
 			g.drawImage(originalImage, 0, 0, displayw, displayh, null);
 			g.drawImage(edgeImage, 0, 480, displayw, displayh, null);
 
-            for (int i = 0; i < lines.size(); i += 6) {
-                double r = lines.get(i);
-                double t = lines.get(i + 1);
-                double end0 = lines.get(i + 2);
-                double end1 = lines.get(i + 3);
-                double houghIndex = lines.get(i + 4);
-                double fieldIndex = lines.get(i + 5);
+            for (int i = 0; i < geoLines.size(); i++) {
+            	GeoLine tempGeoLine = geoLines.get(i);
+                double r = tempGeoLine.r;
+                double t = tempGeoLine.t;
+                double end0 = tempGeoLine.end0;
+                double end1 = tempGeoLine.end1;
+                double houghIndex = tempGeoLine.houghIndex;
+                double fieldIndex = tempGeoLine.fieldIndex;
 
                 if (fieldIndex == -1)
                     g.setColor(Color.blue);
@@ -95,7 +97,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
 	public LineView() {
 		super();
 		setLayout(null);
-        lines = new Vector<Double>();
+        geoLines = new Vector<GeoLine>();
 	}
 
 	@Override
@@ -113,13 +115,16 @@ public class LineView extends ViewParent implements IOFirstResponder {
         Logger.logf(Logger.INFO, "%d field lines expected.", numLines);
 		try {
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(lineBytes));
+			
 			for (int i = 0; i < numLines; ++i) {
-                lines.add(dis.readDouble()); // r
-                lines.add(dis.readDouble()); // t
-                lines.add(dis.readDouble()); // ep0
-                lines.add(dis.readDouble()); // ep1
-                lines.add((double)dis.readInt()); // hough index
-                lines.add((double)dis.readInt()); // fieldline index
+				GeoLine tempLine = new GeoLine();
+				tempLine.r = dis.readDouble();
+				tempLine.t = dis.readDouble();
+				tempLine.end0 = dis.readDouble();
+				tempLine.end1 = dis.readDouble();
+				tempLine.houghIndex = (double)dis.readInt();
+				tempLine.fieldIndex = (double)dis.readInt();
+                geoLines.add(tempLine);
             }
 		} catch (Exception e) {
 			Logger.logf(Logger.ERROR, "Conversion from bytes to hough lines in LineView failed.");
