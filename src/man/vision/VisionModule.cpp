@@ -387,8 +387,6 @@ void VisionModule::setCameraParams(int camera, std::string robotName) {
         if (robotName == "she-hulk")
             robotName = "shehulk";
     }
-
-    std::cerr << "SETTING ROBOT NAME TO " << robotName << std::endl;
     if (robotName == "") {
         std::cout << "Could not set camera params: No Robot Name" << std::endl;
         return;
