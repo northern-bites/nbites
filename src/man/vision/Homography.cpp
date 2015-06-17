@@ -334,11 +334,38 @@ double GeoLine::separation(const GeoLine& other) const
 
 double GeoLine::error(const GeoLine& other) const
 {
-  double rError = fabs(r() - other.r());
-  double tError = fabs(t() - other.t());
+  double rDiff = fabs(r() - other.r());
+  double tDiff = diffRadians(t(), other.t());
 
-  // TODO think more about this
-  return rError + tError;
+  // TODO load params from LineSystem
+  FuzzyThr rThr(0, 150);
+  FuzzyThr tThr(0, M_PI / 4);
+
+  Fool rError(rThr, rDiff);
+  Fool tError(tThr, tDiff);
+
+  return (rError & tError).f();
+}
+
+void GeoLine::translateRotate(double xTrans, double yTrans, double rotation)
+{
+    // Find point on line pre-transformation (use endpoints)
+    double x1, y1, x2, y2;
+    endPoints(x1, y1, x2, y2);
+
+    // Translate and rotate
+    double x1t, y1t, x2t, y2t;
+    man::vision::translateRotate(x1, y1, xTrans, yTrans, rotation, x1t, y1t);
+    man::vision::translateRotate(x2, y2, xTrans, yTrans, rotation, x2t, y2t);
+
+    // Calculate new t and unit vector
+    t(rotation + t());
+
+    // Dot product of point on line with new unit vector to find new r
+    r(ux() * x1t + uy() * y1t);
+
+    // Set endpoints
+    setEndPoints(qDist(x1t, y1t), qDist(x2t, y2t));
 }
 
 void GeoLine::imageToField(const FieldHomography& h)

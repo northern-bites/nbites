@@ -5,8 +5,9 @@
 namespace man {
 namespace localization {
 
-// TODO which line in field line
 // TODO add side goalbox lines
+// TODO line classification
+// TODO endpoint detection and corners
 LineSystem::LineSystem() 
 {
     // Add endlines
@@ -51,7 +52,13 @@ void LineSystem::addLine(float r, float t, float ep0, float ep1)
 vision::GeoLine LineSystem::fromRelRobotToGlobal(const messages::FieldLine& relRobotLine,
                                                  const Particle& particle) const
 {
+    const messages::HoughLine& relRobotInner = relRobotLine.inner();
+    const messages::RobotLocation& loc = particle.getLocation();
+
     vision::GeoLine globalLine;
+    globalLine.set(relRobotInner.r(), relRobotInner.t(), relRobotInner.ep0(), relRobotInner.ep1());
+    globalLine.translateRotate(loc.x(), loc.y(), loc.h() - (M_PI / 2));
+
     return globalLine;
 }
 
