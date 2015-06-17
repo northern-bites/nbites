@@ -332,6 +332,15 @@ double GeoLine::separation(const GeoLine& other) const
   return pDist(x0, y0) + other.pDist(x0, y0);
 }
 
+double GeoLine::error(const GeoLine& other) const
+{
+  double rError = fabs(r() - other.r());
+  double tError = fabs(t() - other.t());
+
+  // TODO think more about this
+  return rError + tError;
+}
+
 void GeoLine::imageToField(const FieldHomography& h)
 {
   // Get field coordinates of the line origin (any point on the line will do),

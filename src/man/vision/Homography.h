@@ -218,6 +218,9 @@ public:
   // otherwise. 
   double separation(const GeoLine& other) const;
 
+  // Calculate error for particle filter.
+  double error(const GeoLine& other) const;
+
   // Map this image line to what we would see if roll were 0 and the optical axis
   // was at the center of the image
   void correctRollAndAxis(const FieldHomography&);

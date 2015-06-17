@@ -101,7 +101,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         cognitionThread.addModule(topTranscriber);
         cognitionThread.addModule(bottomTranscriber);
         cognitionThread.addModule(vision);
-        // cognitionThread.addModule(localization);
+        cognitionThread.addModule(localization);
         // cognitionThread.addModule(ballTrack);
         // cognitionThread.addModule(obstacle);
         // cognitionThread.addModule(gamestate);
@@ -118,8 +118,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         vision.bottomIn.wireTo(&bottomTranscriber.imageOut);
         vision.jointsIn.wireTo(&topTranscriber.jointsOut, true);
         
-        // localization.visionInput.wireTo(&vision.vision_field);
-        // localization.motionInput.wireTo(&motion.odometryOutput_, true);
+        localization.visionInput.wireTo(&vision.linesOut);
+        localization.motionInput.wireTo(&motion.odometryOutput_, true);
         // localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
         // localization.resetInput[1].wireTo(&sharedBall.sharedBallReset, true);
         // localization.gameStateInput.wireTo(&gamestate.gameStateOutput);

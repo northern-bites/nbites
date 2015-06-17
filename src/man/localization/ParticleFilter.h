@@ -47,8 +47,8 @@ static const ParticleFilterParams DEFAULT_PARAMS =
     300,                        // Num Particles
     0.2f,                       // Exponential Filter alpha
     0.05f,                      //                    beta
-    0.1f,                    // Variance in x-y odometry
-    0.04f                    // Variance in h odometry
+    0.1f,                       // Variance in x-y odometry
+    0.04f                       // Variance in h odometry
 };
 
 /**
@@ -69,12 +69,12 @@ public:
      *  @brief Given a new motion and vision input, update the filter
      */
     void update(const messages::RobotLocation& motionInput,
-                const messages::VisionField&   visionInput);
+                const messages::FieldLines&    visionInput);
 
     // Overload to use ball info
-    void update(const messages::RobotLocation& motionInput,
-                const messages::VisionField&   visionInput,
-                const messages::FilteredBall&    ballInput);
+    // void update(const messages::RobotLocation& motionInput,
+    //             const messages::VisionField&   visionInput,
+    //             const messages::FilteredBall&    ballInput);
 
     float getMagnitudeError();
 
