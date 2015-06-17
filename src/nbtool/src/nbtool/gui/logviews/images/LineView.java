@@ -183,13 +183,13 @@ public class LineView extends ViewParent implements IOFirstResponder {
                     resize = Math.min(resize, (double)fieldh/(-y2 + fieldh));
                 }
 
-                // Don't draw it if it's way out
-                if (y1 < -3500) {
-                    lines.set(i+4, -1.0);
-                }
-                if (y2 < -3500) {
-                    lines.set(i+4, -1.0);
-                }
+                // // Don't draw it if it's way out
+                // if (y1 < -3500) {
+                //     lines.set(i+4, -1.0);
+                // }
+                // if (y2 < -3500) {
+                //     lines.set(i+4, -1.0);
+                // }
             }
 
             // Loop through again to draw lines in field space with calucluated resize value
