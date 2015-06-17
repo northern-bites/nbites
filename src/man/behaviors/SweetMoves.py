@@ -215,17 +215,23 @@ STAND_UP_FRONT = (#Initial
 
 # new robots
 STAND_UP_BACK = (
+                  ((121.6, 44.7, -5.5, -78.6),
+                  (4.7, 2.4, 29.4, 26.0, 52.6, 0.0),
+                  (4.7, 4.0, 29.6, 29.9, 50.3, 7.8),
+                  (119.9, -43.0, 2.6, 73.3),
+                  0.3,1, stiff.STANDUP_STIFFNESSES),
+
                  (INITIAL_POS[0][0],
                   INITIAL_POS[0][1],
                   INITIAL_POS[0][2],
                   INITIAL_POS[0][3],
-                  1,0, stiff.STANDUP_STIFFNESSES),
+                  0.6,0, stiff.STANDUP_STIFFNESSES),
 
                  ((100,0,0,0),
                   (0,0,0,0,0,0),
                   (0,0,0,0,0,0),
                   (100,0,0,0),
-                  0.6,0, stiff.STANDUP_STIFFNESSES),
+                  0.4,0, stiff.STANDUP_STIFFNESSES),
                  #arms at sides
 
                  ((109.9, 13.3, 15.3, -78.5),
@@ -274,7 +280,7 @@ STAND_UP_BACK = (
                   (-62.93,9.06,-84.64,116.72,21.88,23.73),
                   (-62.93,-29.44,-82.62,103.71,30.85,-10.11),
                   (115.93,17.58,-90.62,3.34),
-                  0.4,1, stiff.STANDUP_STIFFNESSES),
+                  0.3,1, stiff.STANDUP_STIFFNESSES),
                  #sitting legs spread hands behind facing forward
 
                  # makes elbow straight
@@ -296,14 +302,14 @@ STAND_UP_BACK = (
                   (-49,-16,27,101,-70,-5),
                   (-44.0, -32.9, -91.9, 88.7, 21.7, -3.5),
                   (101,-15,-4,3),
-                  0.6,1, stiff.STANDUP_STIFFNESSES),
+                  0.5,1, stiff.STANDUP_STIFFNESSES),
                  #gets hips up and over knees
 
                  ((59.76,29.35,4.39,-45.79),
                   (-30.23,-10.19,-45.86,122.78,-67.68,8.44),
                   (-30.23,-26.72,-70.78,54.41,34.99,10.69),
                   (54.85,-45.62,-0.27,24.35),
-                 0.6,1, stiff.STANDUP_STIFFNESSES),
+                 0.5,1, stiff.STANDUP_STIFFNESSES),
                  #pulls right leg in a little
 
                  ((77.5, 28.9, 5.6, -40.7),
