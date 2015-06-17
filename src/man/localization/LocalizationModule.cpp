@@ -64,10 +64,12 @@ void LocalizationModule::update()
     // Update the locMessage and the swarm (if logging)
     portals::Message<messages::RobotLocation> locMessage(&particleFilter->
                                                          getCurrentEstimate());
+//this is part of something old that never executes, check out
+//the ifdef below; same code but it is executed when we want to
+//to log localization
 #if defined(LOG_LOCALIZATION) || defined(OFFLINE)
     portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
                                                            getCurrentSwarm());
-    std::cout<<"SETTING SWARM MESSAGE"<<std::endl;
     particleOutput.setMessage(swarmMessage);
 #endif
 
@@ -108,9 +110,6 @@ void LocalizationModule::update()
         contents.push_back(naoLocation);
 
         SExpr naoSwarm("swarm",log_from,clock(),log_index,ps_buf.length());
-
-        std::cout<<"[DEBUG] SWARM"<<std::endl;
-        std::cout<<naoSwarm.print()<<std::endl;
 
         contents.push_back(naoSwarm);
         NBLog(NBL_SMALL_BUFFER,"LOCSWARM",contents,log_buf);
