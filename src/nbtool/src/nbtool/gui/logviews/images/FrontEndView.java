@@ -24,7 +24,10 @@ import nbtool.io.CrossIO;
 import nbtool.io.CrossIO.CrossCall;
 import nbtool.io.CrossIO.CrossFunc;
 import nbtool.io.CrossIO.CrossInstance;
+
 import nbtool.util.Utility;
+import java.util.Vector;
+
 
 public class FrontEndView extends ViewParent implements IOFirstResponder {
 
@@ -167,9 +170,24 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
     public void setLog(Log newlog) {
         log = newlog;
 
-        // TODO: hard coded paths == :(
-        width =  log.tree().get(4).get(1).get(5).get(1).valueAsInt() / 2;
-        height = log.tree().get(4).get(1).get(6).get(1).valueAsInt() / 2;
+        Vector<SExpr> vec = log.tree().recursiveFind("width");
+        if (vec.size() > 0) {
+            SExpr w = vec.get(vec.size()-1);
+            width =  w.get(1).valueAsInt() / 2;
+        } else {
+            System.out.printf("COULD NOT READ WIDTH FROM LOG DESC\n");
+            width = 320;
+        }
+
+        vec = log.tree().recursiveFind("height");
+        if (vec.size() > 0) {
+            SExpr h = vec.get(vec.size()-1);
+            height = h.get(1).valueAsInt() / 2;
+        } else {
+            System.out.printf("COULD NOT READ HEIGHT FROM LOG DESC\n");
+            height = 240;
+        }
+
         callNBFunction();
     }
     @Override

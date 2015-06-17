@@ -13,6 +13,7 @@ import java.util.Vector;
 
 import nbtool.util.Logger;
 import nbtool.data.Log;
+import nbtool.data.SExpr;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.images.EdgeImage;
 import nbtool.io.CommonIO.IOFirstResponder;
@@ -72,9 +73,23 @@ public class LineView extends ViewParent implements IOFirstResponder {
 
         assert(ci.tryAddCall(cc));
 
-        // TODO: Don't hard code SExpr paths
-        width =  newlog.tree().get(4).get(1).get(5).get(1).valueAsInt() / 2;
-        height = newlog.tree().get(4).get(1).get(6).get(1).valueAsInt() / 2;
+        Vector<SExpr> vec = newlog.tree().recursiveFind("width");
+        if (vec.size() > 0) {
+            SExpr w = vec.get(vec.size()-1);
+            width =  w.get(1).valueAsInt() / 2;
+        } else {
+            System.out.printf("COULD NOT READ WIDTH FROM LOG DESC\n");
+            width = 320;
+        }
+
+        vec = newlog.tree().recursiveFind("height");
+        if (vec.size() > 0) {
+            SExpr h = vec.get(vec.size()-1);
+            height = h.get(1).valueAsInt() / 2;
+        } else {
+            System.out.printf("COULD NOT READ HEIGHT FROM LOG DESC\n");
+            height = 240;
+        }
 
         displayw = width*2;
         displayh = height*2;
