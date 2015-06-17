@@ -105,6 +105,22 @@ class KickDecider(object):
         except:
             return None
 
+    def potentialsKicks(self):
+        self.brain.player.motionKick = False
+
+        self.kicks = []
+        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+
+        self.scoreKick = self.minimizeOrbitTime
+
+        self.filters = []
+
+        self.clearPossibleKicks()
+        self.addShotsOnGoal()
+
+        return (kick for kick in self.possibleKicks).next().next()
+
     def bigKicksOrbit(self):
         self.brain.player.motionKick = False
 
@@ -477,6 +493,9 @@ class KickDecider(object):
 
     ### HIGH LEVEL PLANNERS ###
     def attacker(self):
+        if self.brain.loc.x > nogginC.MIDFIELD_X:
+            return self.potentialsKicks()
+
         nearGoal = self.nearOurGoal()
         if nearGoal:
             return nearGoal
