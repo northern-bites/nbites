@@ -62,7 +62,25 @@ public class BasicLineView extends ViewParent implements IOFirstResponder {
 
     @Override
     public void setLog(Log newlog) {
-        originalImage = Utility.biFromLog(newlog);
+        String t = (String) newlog.primaryType();
+        Class<? extends com.google.protobuf.GeneratedMessage> lClass = Utility.protobufClassFromType(t);
+        Logger.logf(Logger.INFO, "ProtoBufView: using class %s for type %s.\n", lClass.getName(), t);
+        com.google.protobuf.Message msg = Utility.protobufInstanceForClassWithData(lClass, newlog.bytes);
+
+        Map<FieldDescriptor, Object> fields = msg.getAllFields();
+        
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(msg.getClass().getSimpleName());
+        for (Map.Entry<FieldDescriptor, Object> entry : fields.entrySet()) {
+            int index = 0;
+            if (entry.getKey().isRepeated()) {
+                List<Object> values = (List<Object>) entry.getValue();
+                for (Object v : values) {
+                    root.add(treeNodeForFD(index++, entry.getKey(), v));
+                }
+            }
+            else root.add(treeNodeForFD(index++, entry.getKey(), entry.getValue()));
+        }
+
         repaint();
 
 
@@ -93,6 +111,10 @@ public class BasicLineView extends ViewParent implements IOFirstResponder {
     }
     
     public void paintComponent(Graphics g) {
+
+        if (originalImage != null) g.drawImage(originalImage, 0, 0, null);
+
+
         if (edgeImage != null) { 
             g.drawImage(originalImage, 0, 0, displayw, displayh, null);
             g.drawImage(edgeImage, 0, displayh + buffer, displayw, displayh, null);
