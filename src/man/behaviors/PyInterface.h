@@ -13,7 +13,7 @@
 #include "WorldModel.pb.h"
 #include "PMotion.pb.h"
 #include "MotionStatus.pb.h"
-#include "VisionField.pb.h"
+#include "Vision.pb.h"
 #include "VisionRobot.pb.h"
 #include "ButtonState.pb.h"
 #include "FallStatus.pb.h"
@@ -30,7 +30,7 @@ public:
     messages::GameState         const * gameState_ptr;
     messages::RobotLocation     const * loc_ptr;
     messages::VisionRobot       const * visionRobot_ptr;
-    messages::VisionField       const * visionField_ptr;
+    messages::FieldLines        const * visionField_ptr;
     messages::FilteredBall      const * filteredBall_ptr;
     messages::LedCommand        const * ledCommand_ptr;
     messages::WorldModel        const * worldModel_ptr[NUM_PLAYERS_PER_TEAM];
@@ -61,7 +61,7 @@ public:
     {
         visionRobot_ptr = msg;
     }
-    void setVisionField_ptr(const messages::VisionField* msg)
+    void setVisionField_ptr(const messages::FieldLines* msg)
     {
         visionField_ptr = msg;
     }
