@@ -56,10 +56,11 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 
 	public LocSwarmView() {
 		super();
-
-		flip = new JButton("flip");
+		if(shouldFlip) {
+			flip = new JButton("unflip");
+		} else { flip = new JButton("flip"); }
 		flip.addActionListener(this);
-		flip.setPreferredSize(new Dimension(50,25));
+		flip.setPreferredSize(new Dimension(70,25));
 		this.add(flip);
 
 		dPane = new DrawPane();
@@ -81,11 +82,14 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		System.out.println("ACTION");
 		if(e.getSource() == flip) {
 			if(shouldFlip == true) {
 				shouldFlip = false;
-			} else { shouldFlip = true; }
+				flip.setText("flip");
+			} else { 
+				shouldFlip = true;
+				flip.setText("unflip");
+			}
 		}
 	}
 
