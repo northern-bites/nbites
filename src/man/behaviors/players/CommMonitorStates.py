@@ -73,5 +73,3 @@ def commMonitor(player):
         RoleConstants.setRoleConstants(player, player.role, oppTeam)
         player.roleSwitching = True
         player.commMode = 0
-
-    print player.commMode
