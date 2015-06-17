@@ -123,8 +123,9 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     // reset. We will wait until we're recalibrated to walk.
     // NOTE currentMotionType and requestMotionType are of type MotionType enum 
     // defined in WalkingEngine.h
+    walkingEngine->instability.init();
     if (walkingEngine->currentMotionType == 0 && tryingToWalk &&
-        walkingEngine->instability.getAverageFloat() > 5.f && calibrated())
+        walkingEngine->instability.getAverageFloat() > 20.f && calibrated())
     {
         std::cout << "We are stuck! Recalibrating." << std::endl;
         walkingEngine->inertiaSensorCalibrator->reset();
