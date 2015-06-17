@@ -493,6 +493,9 @@ class KickDecider(object):
 
     ### HIGH LEVEL PLANNERS ###
     def attacker(self):
+        if self.brain.loc.x > nogginC.MIDFIELD_X:
+            return self.potentialsKicks()
+
         nearGoal = self.nearOurGoal()
         if nearGoal:
             return nearGoal
