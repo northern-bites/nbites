@@ -4,6 +4,7 @@
 #include "Images.h"
 #include "vision/VisionModule.h"
 #include "vision/FrontEnd.h"
+#include "vision/Homography.h"
 #include "ParamReader.h"
 
 #include <cstdlib>
@@ -104,7 +105,13 @@ int Vision_func() {
     if (camParamsVec.size() != 0) {
         SExpr* camParams = camParamsVec.at(camParamsVec.size()-2);
         camParams = top ? camParams->find("camera_TOP") : camParams->find("camera_BOT");
-        std::cout << "found vec: " << camParams->print() << std::endl;
+        if (camParams != NULL) {
+            std::cout << "Found and using camera params in log description" << std::endl;
+            man::vision::CameraParams* ncp =
+             new man::vision::CameraParams(camParams->get(1)->valueAsDouble(),
+                                           camParams->get(2)->valueAsDouble());
+            module.setCameraParams(ncp, top);
+        }
     }
 
 
