@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nbtool.data.Log;
+import nbtool.gui.logviews.images.LineView;
 import nbtool.gui.logviews.images.ImageView;
 import nbtool.gui.logviews.images.ZoomImageView;
 import nbtool.gui.logviews.misc.BotStatsView;
@@ -14,7 +15,9 @@ import nbtool.gui.logviews.misc.CrossBright;
 import nbtool.gui.logviews.misc.DefaultView;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.logviews.misc.LocSwarmView;
+import nbtool.gui.logviews.misc.ImageConverterView;
 import nbtool.gui.logviews.proto.ProtoBufView;
+
 
 public class NBConstants {
 	
@@ -65,12 +68,14 @@ public class NBConstants {
 	private static Map<String, Class<? extends ViewParent>[]> setupPossible() {
 		Map<String, Class<? extends ViewParent>[]> map = new HashMap<String, Class<? extends ViewParent>[]>();
 		
-		map.put("YUVImage", new Class[]{ImageView.class, ZoomImageView.class});
+		map.put("YUVImage", new Class[]{ImageView.class, ZoomImageView.class, CrossBright.class, ImageConverterView.class, LineView.class});
 		map.put("STATS", new Class[]{BotStatsView.class});
 		map.put(DEFAULT_S, new Class[]{DefaultView.class});
 		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
 		map.put("location", new Class[]{LocSwarmView.class});
 		
+		
+
 		return map;
 	}
 }
