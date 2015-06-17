@@ -48,7 +48,7 @@ public class Center {
 	public static void startCenter() {
 		if (center_thread == null) {
 			center_thread = new Thread(new CenterRunnable());
-			center_thread.setName("center-thread");
+			center_thread.setName("nbtool-Center");
 			center_thread.setDaemon(true);
 
 			Logger.log(Logger.INFO, "Starting Center thread...");

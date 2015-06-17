@@ -200,7 +200,7 @@ public class FileIO {
 		fi.ifr = ifr;
 		fi.state = IOState.RUNNING;
 		
-		Thread fithrd = new Thread(fi, String.format("thread-%s", fi.name()));
+		Thread fithrd = new Thread(fi, String.format("nbtool-%s", fi.name()));
 		fithrd.setDaemon(true);
 		fithrd.start();
 		

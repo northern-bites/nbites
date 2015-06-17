@@ -22,6 +22,7 @@ public class YUVColors extends UtilityParent {
 			slider.setBounds(0, 0, s.width, s.height);
 			
 			slider.addChangeListener(this);
+	
 			add(slider);
 			setSize(800, 800);
 		}
@@ -69,7 +70,6 @@ public class YUVColors extends UtilityParent {
 	public String purpose() {
 		return "Show YUV colorspace";
 	}
-
 
 
 	@Override

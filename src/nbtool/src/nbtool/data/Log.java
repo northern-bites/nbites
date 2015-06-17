@@ -27,6 +27,9 @@ public class Log {
 	//command key
 	public static final String COMMAND_FIRST_ATOM_S = "command";
 	
+	//nbcross wildcard
+	public static final String NBCROSS_WILDCARD_TYPE = "__WILDCARD__";
+	
 	public Log() {}
 	
 	public Log(String d, byte[] b) {

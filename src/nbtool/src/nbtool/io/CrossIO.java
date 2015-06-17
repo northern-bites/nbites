@@ -399,7 +399,7 @@ public class CrossIO {
 							instances.add(ci);
 						}
 						
-						Thread t = new Thread(ci, String.format("thread-ci%d", ci.unique_id));
+						Thread t = new Thread(ci, String.format("nbtool-ci%d", ci.unique_id));
 						t.setDaemon(true);
 						t.start();
 						
@@ -452,9 +452,9 @@ public class CrossIO {
 			return;
 		}
 		
-		Logger.log(Logger.INFO, "starting thread-CrossServer...");
+		Logger.log(Logger.INFO, "starting nbtool-CrossServer...");
 		
-		serverThread = new Thread(new CrossServer(), "thread-CrossServer");
+		serverThread = new Thread(new CrossServer(), "nbtool-CrossServer");
 		serverThread.setDaemon(true);
 		serverThread.start();
 	}
