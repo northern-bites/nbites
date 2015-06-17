@@ -66,15 +66,15 @@ int Vision_func() {
     portals::Message<messages::YUVImage> imageMessage(&image);
     portals::Message<messages::JointAngles> jointsMessage(&joints);
 
-
+    man::vision::VisionModule module;
+    
+    // Look for robot name 
     SExpr* robotName = args[0]->tree().find("from_address");
     std::string rname;
     if (robotName != NULL) {
         rname = robotName->get(1)->value();
     }
-    std::cout << "NAME: " << rname << std::endl;
 
-    man::vision::VisionModule module;
     module.setCameraParams(rname);
 
     module.topIn.setMessage(imageMessage);
@@ -82,8 +82,6 @@ int Vision_func() {
     module.jointsIn.setMessage(jointsMessage);
 
     // If log includes color parameters in description, have module use those
-    std::cout << args[0]->tree().print() << std::endl;
-
     SExpr* colParams = args[0]->tree().find("Params");
     if (colParams != NULL) {
 
@@ -114,9 +112,9 @@ int Vision_func() {
         }
     }
 
-
     module.run();
     man::vision::ImageFrontEnd* frontEnd = module.getFrontEnd(top);
+
     // -----------
     //   Y IMAGE
     // -----------
