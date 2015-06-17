@@ -25,7 +25,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     param("/home/nao/nbites/lib/parameters.json"),
     playerNum(param.getParam<int>("playerNumber")),
     teamNum(param.getParam<int>("teamNumber")),
- //   robotName(param.getParam<std::string>("robotName")),
+    robotName(param.getParam<std::string>("robotName")),
     sensorsThread("sensors", SENSORS_FRAME_LENGTH_uS),
     sensors(broker),
     jointEnactor(broker),
@@ -119,7 +119,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         vision.bottomIn.wireTo(&bottomTranscriber.imageOut);
         vision.jointsIn.wireTo(&topTranscriber.jointsOut);
         vision.inertsIn.wireTo(&topTranscriber.inertsOut);
-    //    vision.setCameraParams(robotName);
+        vision.setCameraParams(robotName);
 
         // localization.visionInput.wireTo(&vision.vision_field);
         // localization.motionInput.wireTo(&motion.odometryOutput_, true);
