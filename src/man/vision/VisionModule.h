@@ -64,8 +64,10 @@ private:
     // Lisp tree with color params saved
     nblog::SExpr colors;
 
-    // void updateVisionBall();
-    int ballOn;
+    void updateVisionBall();
+    bool ballOn;
+    int ballOnCount;
+    int ballOffCount;
 
     // Method to convert from Lisp to Colors type
     Colors* getColorsFromLisp(bool top);

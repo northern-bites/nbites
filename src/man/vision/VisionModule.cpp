@@ -20,7 +20,10 @@ VisionModule::VisionModule()
       topIn(),
       bottomIn(),
       jointsIn(),
-      ballOut(base())
+      ballOut(base()),
+      ballOn(false),
+      ballOnCount(0),
+      ballOffCount(0)
 {
     std::string sexpPath;
 #ifdef OFFLINE
@@ -177,6 +180,9 @@ void VisionModule::run_()
         times[i][6] = timer.end();
     }
 
+    ballOn = ballDetected;
+
+
     for (int i = 0; i < 2; i++) {
         break;
         if (i == 0)
@@ -241,22 +247,58 @@ Colors* VisionModule::getColorsFromLisp(nblog::SExpr* colors, int camera) {
     return ret;
 }
 
-// void VisionModule::updateVisionBall()
-// {
-//     portals::message<messages::VisionBall> ball_message(0);
-//     Ball ball;
-//     if (ballDetector[0]->ballOn()) {
-//         ball = ballDetector[0].getBalls()[0]; // TODO
-//     }
-//     else if (ballDetector[1]->ballOn()) {
-//         ball = ballDetector[1].getBalls()[0];
-//     }
-//     else {
-//         ball.get()->set_on(false);
-//         ballOut.setMessage(ball_message);
-//         return;
-//     }
-// }
+void VisionModule::updateVisionBall()
+{
+    portals::Message<messages::VisionBall> ball_message(0);
+
+    Ball topBall = ballDetector[0]->best();
+    Ball botBall = ballDetector[1]->best();
+
+    bool top = false;
+    Ball best = botBall;
+
+    if (ballOn) {
+        ballOnCount++;
+        ballOffCount = 0;
+    }
+    else {
+        ballOnCount = 0;
+        ballOffCount++;
+    }
+
+    if (topBall.confidence() > botBall.confidence()) {
+        best = topBall;
+        top = true;
+    }
+
+    ball_message.get()->set_on(true);
+    ball_message.get()->set_frames_on(ballOnCount);
+    ball_message.get()->set_frames_off(ballOffCount);
+    ball_message.get()->set_intopcam(top);
+
+    if (ballOn)
+    {
+        ball_message.get()->set_distance(best.dist);
+
+        ball_message.get()->set_radius(best.blob.firstPrincipalLength());
+        double bearing = atan(best.x_rel / best.y_rel);
+        ball_message.get()->set_bearing(bearing);
+        ball_message.get()->set_bearing_deg(bearing * TO_DEG);
+
+        double angle_x = (best.imgWidth/2 - best.getBlob().centerX()) /
+            (best.imgWidth/2) * HORIZ_FOV_DEG;
+        double angle_y = (best.imgHeight/2 - best.getBlob().centerY()) /
+            (best.imgHeight/2) * VERT_FOV_DEG;
+        ball_message.get()->set_angle_x_deg(angle_x);
+        ball_message.get()->set_angle_y_deg(angle_y);
+
+        ball_message.get()->set_confidence(best.confidence());
+        ball_message.get()->set_x(static_cast<int>(best.blob.centerX()));
+        ball_message.get()->set_y(static_cast<int>(best.blob.centerY()));
+    }
+
+    ballOut.setMessage(ball_message);
+}
 
 }
 }
