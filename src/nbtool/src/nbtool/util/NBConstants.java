@@ -14,9 +14,9 @@ import nbtool.gui.logviews.misc.BotStatsView;
 import nbtool.gui.logviews.misc.CrossBright;
 import nbtool.gui.logviews.misc.DefaultView;
 import nbtool.gui.logviews.misc.ViewParent;
-import nbtool.gui.logviews.misc.LocSwarmView;
 import nbtool.gui.logviews.misc.ImageConverterView;
 import nbtool.gui.logviews.proto.ProtoBufView;
+import nbtool.gui.logviews.loc.LocSwarmView;
 
 
 public class NBConstants {
