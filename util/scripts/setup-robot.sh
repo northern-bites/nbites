@@ -53,7 +53,7 @@ mv $FOLDER/usr_autoload.ini naoqi/preferences/autoload.ini
 
 # Move the config files for wpa_supplicant
 echo "Moving config files for wpa_supplicant"
-mv $WIFI_CONFIG/wpa_supplicant.conf /etc/wpa_supplicant
+mv $FOLDER/wpa_supplicant.conf /etc/wpa_supplicant
 mv $WIFI_CONFIG/nbwired /etc/init.d
 mv $WIFI_CONFIG/nbwireless /etc/init.d
 chmod +x /etc/init.d/nbwired
