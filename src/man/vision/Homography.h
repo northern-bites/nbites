@@ -229,7 +229,9 @@ public:
   // Map this image line to field coordinates.  Preserve polarity and endpoints.
   void imageToField(const FieldHomography&);
 
-  std::string print() const;
+  // "pretty" is for human consumption. Not pretty is for a high-precision string
+  // that is easy to parse by another computer program, e.g. C#
+  std::string print(bool pretty = false) const;
 };
 
 // *****************************

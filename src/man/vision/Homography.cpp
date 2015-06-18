@@ -390,9 +390,13 @@ void GeoLine::imageToField(const FieldHomography& h)
   setEndPoints(qDist(x1, y1), qDist(x2, y2));
 }
 
-string GeoLine::print() const
+string GeoLine::print(bool pretty) const
 {
-  return strPrintf("%.8g %.8g %.8g %.8g", r(), t(), ep0(), ep1());
+  if (pretty)
+    return strPrintf("%8.2f,%7.2f  [%7.1f .. %7.1f]",
+                           r(), t() * (180 / M_PI), ep0(), ep1());
+  else
+    return strPrintf("%.8g %.8g %.8g %.8g", r(), t(), ep0(), ep1());
 }
 
 // *****************************
