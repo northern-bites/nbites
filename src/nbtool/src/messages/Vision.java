@@ -644,30 +644,30 @@ public final class Vision {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>optional .messages.HoughLine first = 1;</code>
+     * <code>optional .messages.HoughLine inner = 1;</code>
      */
-    boolean hasFirst();
+    boolean hasInner();
     /**
-     * <code>optional .messages.HoughLine first = 1;</code>
+     * <code>optional .messages.HoughLine inner = 1;</code>
      */
-    messages.Vision.HoughLine getFirst();
+    messages.Vision.HoughLine getInner();
     /**
-     * <code>optional .messages.HoughLine first = 1;</code>
+     * <code>optional .messages.HoughLine inner = 1;</code>
      */
-    messages.Vision.HoughLineOrBuilder getFirstOrBuilder();
+    messages.Vision.HoughLineOrBuilder getInnerOrBuilder();
 
     /**
-     * <code>optional .messages.HoughLine second = 2;</code>
+     * <code>optional .messages.HoughLine outer = 2;</code>
      */
-    boolean hasSecond();
+    boolean hasOuter();
     /**
-     * <code>optional .messages.HoughLine second = 2;</code>
+     * <code>optional .messages.HoughLine outer = 2;</code>
      */
-    messages.Vision.HoughLine getSecond();
+    messages.Vision.HoughLine getOuter();
     /**
-     * <code>optional .messages.HoughLine second = 2;</code>
+     * <code>optional .messages.HoughLine outer = 2;</code>
      */
-    messages.Vision.HoughLineOrBuilder getSecondOrBuilder();
+    messages.Vision.HoughLineOrBuilder getOuterOrBuilder();
 
     /**
      * <code>optional int32 id = 3;</code>
@@ -733,12 +733,12 @@ public final class Vision {
             case 10: {
               messages.Vision.HoughLine.Builder subBuilder = null;
               if (((bitField0_ & 0x00000001) == 0x00000001)) {
-                subBuilder = first_.toBuilder();
+                subBuilder = inner_.toBuilder();
               }
-              first_ = input.readMessage(messages.Vision.HoughLine.PARSER, extensionRegistry);
+              inner_ = input.readMessage(messages.Vision.HoughLine.PARSER, extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(first_);
-                first_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(inner_);
+                inner_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000001;
               break;
@@ -746,12 +746,12 @@ public final class Vision {
             case 18: {
               messages.Vision.HoughLine.Builder subBuilder = null;
               if (((bitField0_ & 0x00000002) == 0x00000002)) {
-                subBuilder = second_.toBuilder();
+                subBuilder = outer_.toBuilder();
               }
-              second_ = input.readMessage(messages.Vision.HoughLine.PARSER, extensionRegistry);
+              outer_ = input.readMessage(messages.Vision.HoughLine.PARSER, extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(second_);
-                second_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(outer_);
+                outer_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000002;
               break;
@@ -801,46 +801,46 @@ public final class Vision {
     }
 
     private int bitField0_;
-    public static final int FIRST_FIELD_NUMBER = 1;
-    private messages.Vision.HoughLine first_;
+    public static final int INNER_FIELD_NUMBER = 1;
+    private messages.Vision.HoughLine inner_;
     /**
-     * <code>optional .messages.HoughLine first = 1;</code>
+     * <code>optional .messages.HoughLine inner = 1;</code>
      */
-    public boolean hasFirst() {
+    public boolean hasInner() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional .messages.HoughLine first = 1;</code>
+     * <code>optional .messages.HoughLine inner = 1;</code>
      */
-    public messages.Vision.HoughLine getFirst() {
-      return first_;
+    public messages.Vision.HoughLine getInner() {
+      return inner_;
     }
     /**
-     * <code>optional .messages.HoughLine first = 1;</code>
+     * <code>optional .messages.HoughLine inner = 1;</code>
      */
-    public messages.Vision.HoughLineOrBuilder getFirstOrBuilder() {
-      return first_;
+    public messages.Vision.HoughLineOrBuilder getInnerOrBuilder() {
+      return inner_;
     }
 
-    public static final int SECOND_FIELD_NUMBER = 2;
-    private messages.Vision.HoughLine second_;
+    public static final int OUTER_FIELD_NUMBER = 2;
+    private messages.Vision.HoughLine outer_;
     /**
-     * <code>optional .messages.HoughLine second = 2;</code>
+     * <code>optional .messages.HoughLine outer = 2;</code>
      */
-    public boolean hasSecond() {
+    public boolean hasOuter() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional .messages.HoughLine second = 2;</code>
+     * <code>optional .messages.HoughLine outer = 2;</code>
      */
-    public messages.Vision.HoughLine getSecond() {
-      return second_;
+    public messages.Vision.HoughLine getOuter() {
+      return outer_;
     }
     /**
-     * <code>optional .messages.HoughLine second = 2;</code>
+     * <code>optional .messages.HoughLine outer = 2;</code>
      */
-    public messages.Vision.HoughLineOrBuilder getSecondOrBuilder() {
-      return second_;
+    public messages.Vision.HoughLineOrBuilder getOuterOrBuilder() {
+      return outer_;
     }
 
     public static final int ID_FIELD_NUMBER = 3;
@@ -859,8 +859,8 @@ public final class Vision {
     }
 
     private void initFields() {
-      first_ = messages.Vision.HoughLine.getDefaultInstance();
-      second_ = messages.Vision.HoughLine.getDefaultInstance();
+      inner_ = messages.Vision.HoughLine.getDefaultInstance();
+      outer_ = messages.Vision.HoughLine.getDefaultInstance();
       id_ = 0;
     }
     private byte memoizedIsInitialized = -1;
@@ -877,10 +877,10 @@ public final class Vision {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeMessage(1, first_);
+        output.writeMessage(1, inner_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeMessage(2, second_);
+        output.writeMessage(2, outer_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeInt32(3, id_);
@@ -896,11 +896,11 @@ public final class Vision {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, first_);
+          .computeMessageSize(1, inner_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, second_);
+          .computeMessageSize(2, outer_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
@@ -1015,8 +1015,8 @@ public final class Vision {
       }
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-          getFirstFieldBuilder();
-          getSecondFieldBuilder();
+          getInnerFieldBuilder();
+          getOuterFieldBuilder();
         }
       }
       private static Builder create() {
@@ -1025,16 +1025,16 @@ public final class Vision {
 
       public Builder clear() {
         super.clear();
-        if (firstBuilder_ == null) {
-          first_ = messages.Vision.HoughLine.getDefaultInstance();
+        if (innerBuilder_ == null) {
+          inner_ = messages.Vision.HoughLine.getDefaultInstance();
         } else {
-          firstBuilder_.clear();
+          innerBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000001);
-        if (secondBuilder_ == null) {
-          second_ = messages.Vision.HoughLine.getDefaultInstance();
+        if (outerBuilder_ == null) {
+          outer_ = messages.Vision.HoughLine.getDefaultInstance();
         } else {
-          secondBuilder_.clear();
+          outerBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000002);
         id_ = 0;
@@ -1070,18 +1070,18 @@ public final class Vision {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        if (firstBuilder_ == null) {
-          result.first_ = first_;
+        if (innerBuilder_ == null) {
+          result.inner_ = inner_;
         } else {
-          result.first_ = firstBuilder_.build();
+          result.inner_ = innerBuilder_.build();
         }
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        if (secondBuilder_ == null) {
-          result.second_ = second_;
+        if (outerBuilder_ == null) {
+          result.outer_ = outer_;
         } else {
-          result.second_ = secondBuilder_.build();
+          result.outer_ = outerBuilder_.build();
         }
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
@@ -1103,11 +1103,11 @@ public final class Vision {
 
       public Builder mergeFrom(messages.Vision.FieldLine other) {
         if (other == messages.Vision.FieldLine.getDefaultInstance()) return this;
-        if (other.hasFirst()) {
-          mergeFirst(other.getFirst());
+        if (other.hasInner()) {
+          mergeInner(other.getInner());
         }
-        if (other.hasSecond()) {
-          mergeSecond(other.getSecond());
+        if (other.hasOuter()) {
+          mergeOuter(other.getOuter());
         }
         if (other.hasId()) {
           setId(other.getId());
@@ -1139,236 +1139,236 @@ public final class Vision {
       }
       private int bitField0_;
 
-      private messages.Vision.HoughLine first_ = messages.Vision.HoughLine.getDefaultInstance();
+      private messages.Vision.HoughLine inner_ = messages.Vision.HoughLine.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
-          messages.Vision.HoughLine, messages.Vision.HoughLine.Builder, messages.Vision.HoughLineOrBuilder> firstBuilder_;
+          messages.Vision.HoughLine, messages.Vision.HoughLine.Builder, messages.Vision.HoughLineOrBuilder> innerBuilder_;
       /**
-       * <code>optional .messages.HoughLine first = 1;</code>
+       * <code>optional .messages.HoughLine inner = 1;</code>
        */
-      public boolean hasFirst() {
+      public boolean hasInner() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional .messages.HoughLine first = 1;</code>
+       * <code>optional .messages.HoughLine inner = 1;</code>
        */
-      public messages.Vision.HoughLine getFirst() {
-        if (firstBuilder_ == null) {
-          return first_;
+      public messages.Vision.HoughLine getInner() {
+        if (innerBuilder_ == null) {
+          return inner_;
         } else {
-          return firstBuilder_.getMessage();
+          return innerBuilder_.getMessage();
         }
       }
       /**
-       * <code>optional .messages.HoughLine first = 1;</code>
+       * <code>optional .messages.HoughLine inner = 1;</code>
        */
-      public Builder setFirst(messages.Vision.HoughLine value) {
-        if (firstBuilder_ == null) {
+      public Builder setInner(messages.Vision.HoughLine value) {
+        if (innerBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          first_ = value;
+          inner_ = value;
           onChanged();
         } else {
-          firstBuilder_.setMessage(value);
+          innerBuilder_.setMessage(value);
         }
         bitField0_ |= 0x00000001;
         return this;
       }
       /**
-       * <code>optional .messages.HoughLine first = 1;</code>
+       * <code>optional .messages.HoughLine inner = 1;</code>
        */
-      public Builder setFirst(
+      public Builder setInner(
           messages.Vision.HoughLine.Builder builderForValue) {
-        if (firstBuilder_ == null) {
-          first_ = builderForValue.build();
+        if (innerBuilder_ == null) {
+          inner_ = builderForValue.build();
           onChanged();
         } else {
-          firstBuilder_.setMessage(builderForValue.build());
+          innerBuilder_.setMessage(builderForValue.build());
         }
         bitField0_ |= 0x00000001;
         return this;
       }
       /**
-       * <code>optional .messages.HoughLine first = 1;</code>
+       * <code>optional .messages.HoughLine inner = 1;</code>
        */
-      public Builder mergeFirst(messages.Vision.HoughLine value) {
-        if (firstBuilder_ == null) {
+      public Builder mergeInner(messages.Vision.HoughLine value) {
+        if (innerBuilder_ == null) {
           if (((bitField0_ & 0x00000001) == 0x00000001) &&
-              first_ != messages.Vision.HoughLine.getDefaultInstance()) {
-            first_ =
-              messages.Vision.HoughLine.newBuilder(first_).mergeFrom(value).buildPartial();
+              inner_ != messages.Vision.HoughLine.getDefaultInstance()) {
+            inner_ =
+              messages.Vision.HoughLine.newBuilder(inner_).mergeFrom(value).buildPartial();
           } else {
-            first_ = value;
+            inner_ = value;
           }
           onChanged();
         } else {
-          firstBuilder_.mergeFrom(value);
+          innerBuilder_.mergeFrom(value);
         }
         bitField0_ |= 0x00000001;
         return this;
       }
       /**
-       * <code>optional .messages.HoughLine first = 1;</code>
+       * <code>optional .messages.HoughLine inner = 1;</code>
        */
-      public Builder clearFirst() {
-        if (firstBuilder_ == null) {
-          first_ = messages.Vision.HoughLine.getDefaultInstance();
+      public Builder clearInner() {
+        if (innerBuilder_ == null) {
+          inner_ = messages.Vision.HoughLine.getDefaultInstance();
           onChanged();
         } else {
-          firstBuilder_.clear();
+          innerBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
       }
       /**
-       * <code>optional .messages.HoughLine first = 1;</code>
+       * <code>optional .messages.HoughLine inner = 1;</code>
        */
-      public messages.Vision.HoughLine.Builder getFirstBuilder() {
+      public messages.Vision.HoughLine.Builder getInnerBuilder() {
         bitField0_ |= 0x00000001;
         onChanged();
-        return getFirstFieldBuilder().getBuilder();
+        return getInnerFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .messages.HoughLine first = 1;</code>
+       * <code>optional .messages.HoughLine inner = 1;</code>
        */
-      public messages.Vision.HoughLineOrBuilder getFirstOrBuilder() {
-        if (firstBuilder_ != null) {
-          return firstBuilder_.getMessageOrBuilder();
+      public messages.Vision.HoughLineOrBuilder getInnerOrBuilder() {
+        if (innerBuilder_ != null) {
+          return innerBuilder_.getMessageOrBuilder();
         } else {
-          return first_;
+          return inner_;
         }
       }
       /**
-       * <code>optional .messages.HoughLine first = 1;</code>
+       * <code>optional .messages.HoughLine inner = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           messages.Vision.HoughLine, messages.Vision.HoughLine.Builder, messages.Vision.HoughLineOrBuilder> 
-          getFirstFieldBuilder() {
-        if (firstBuilder_ == null) {
-          firstBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          getInnerFieldBuilder() {
+        if (innerBuilder_ == null) {
+          innerBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               messages.Vision.HoughLine, messages.Vision.HoughLine.Builder, messages.Vision.HoughLineOrBuilder>(
-                  getFirst(),
+                  getInner(),
                   getParentForChildren(),
                   isClean());
-          first_ = null;
+          inner_ = null;
         }
-        return firstBuilder_;
+        return innerBuilder_;
       }
 
-      private messages.Vision.HoughLine second_ = messages.Vision.HoughLine.getDefaultInstance();
+      private messages.Vision.HoughLine outer_ = messages.Vision.HoughLine.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
-          messages.Vision.HoughLine, messages.Vision.HoughLine.Builder, messages.Vision.HoughLineOrBuilder> secondBuilder_;
+          messages.Vision.HoughLine, messages.Vision.HoughLine.Builder, messages.Vision.HoughLineOrBuilder> outerBuilder_;
       /**
-       * <code>optional .messages.HoughLine second = 2;</code>
+       * <code>optional .messages.HoughLine outer = 2;</code>
        */
-      public boolean hasSecond() {
+      public boolean hasOuter() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional .messages.HoughLine second = 2;</code>
+       * <code>optional .messages.HoughLine outer = 2;</code>
        */
-      public messages.Vision.HoughLine getSecond() {
-        if (secondBuilder_ == null) {
-          return second_;
+      public messages.Vision.HoughLine getOuter() {
+        if (outerBuilder_ == null) {
+          return outer_;
         } else {
-          return secondBuilder_.getMessage();
+          return outerBuilder_.getMessage();
         }
       }
       /**
-       * <code>optional .messages.HoughLine second = 2;</code>
+       * <code>optional .messages.HoughLine outer = 2;</code>
        */
-      public Builder setSecond(messages.Vision.HoughLine value) {
-        if (secondBuilder_ == null) {
+      public Builder setOuter(messages.Vision.HoughLine value) {
+        if (outerBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          second_ = value;
+          outer_ = value;
           onChanged();
         } else {
-          secondBuilder_.setMessage(value);
+          outerBuilder_.setMessage(value);
         }
         bitField0_ |= 0x00000002;
         return this;
       }
       /**
-       * <code>optional .messages.HoughLine second = 2;</code>
+       * <code>optional .messages.HoughLine outer = 2;</code>
        */
-      public Builder setSecond(
+      public Builder setOuter(
           messages.Vision.HoughLine.Builder builderForValue) {
-        if (secondBuilder_ == null) {
-          second_ = builderForValue.build();
+        if (outerBuilder_ == null) {
+          outer_ = builderForValue.build();
           onChanged();
         } else {
-          secondBuilder_.setMessage(builderForValue.build());
+          outerBuilder_.setMessage(builderForValue.build());
         }
         bitField0_ |= 0x00000002;
         return this;
       }
       /**
-       * <code>optional .messages.HoughLine second = 2;</code>
+       * <code>optional .messages.HoughLine outer = 2;</code>
        */
-      public Builder mergeSecond(messages.Vision.HoughLine value) {
-        if (secondBuilder_ == null) {
+      public Builder mergeOuter(messages.Vision.HoughLine value) {
+        if (outerBuilder_ == null) {
           if (((bitField0_ & 0x00000002) == 0x00000002) &&
-              second_ != messages.Vision.HoughLine.getDefaultInstance()) {
-            second_ =
-              messages.Vision.HoughLine.newBuilder(second_).mergeFrom(value).buildPartial();
+              outer_ != messages.Vision.HoughLine.getDefaultInstance()) {
+            outer_ =
+              messages.Vision.HoughLine.newBuilder(outer_).mergeFrom(value).buildPartial();
           } else {
-            second_ = value;
+            outer_ = value;
           }
           onChanged();
         } else {
-          secondBuilder_.mergeFrom(value);
+          outerBuilder_.mergeFrom(value);
         }
         bitField0_ |= 0x00000002;
         return this;
       }
       /**
-       * <code>optional .messages.HoughLine second = 2;</code>
+       * <code>optional .messages.HoughLine outer = 2;</code>
        */
-      public Builder clearSecond() {
-        if (secondBuilder_ == null) {
-          second_ = messages.Vision.HoughLine.getDefaultInstance();
+      public Builder clearOuter() {
+        if (outerBuilder_ == null) {
+          outer_ = messages.Vision.HoughLine.getDefaultInstance();
           onChanged();
         } else {
-          secondBuilder_.clear();
+          outerBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
       /**
-       * <code>optional .messages.HoughLine second = 2;</code>
+       * <code>optional .messages.HoughLine outer = 2;</code>
        */
-      public messages.Vision.HoughLine.Builder getSecondBuilder() {
+      public messages.Vision.HoughLine.Builder getOuterBuilder() {
         bitField0_ |= 0x00000002;
         onChanged();
-        return getSecondFieldBuilder().getBuilder();
+        return getOuterFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .messages.HoughLine second = 2;</code>
+       * <code>optional .messages.HoughLine outer = 2;</code>
        */
-      public messages.Vision.HoughLineOrBuilder getSecondOrBuilder() {
-        if (secondBuilder_ != null) {
-          return secondBuilder_.getMessageOrBuilder();
+      public messages.Vision.HoughLineOrBuilder getOuterOrBuilder() {
+        if (outerBuilder_ != null) {
+          return outerBuilder_.getMessageOrBuilder();
         } else {
-          return second_;
+          return outer_;
         }
       }
       /**
-       * <code>optional .messages.HoughLine second = 2;</code>
+       * <code>optional .messages.HoughLine outer = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           messages.Vision.HoughLine, messages.Vision.HoughLine.Builder, messages.Vision.HoughLineOrBuilder> 
-          getSecondFieldBuilder() {
-        if (secondBuilder_ == null) {
-          secondBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          getOuterFieldBuilder() {
+        if (outerBuilder_ == null) {
+          outerBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               messages.Vision.HoughLine, messages.Vision.HoughLine.Builder, messages.Vision.HoughLineOrBuilder>(
-                  getSecond(),
+                  getOuter(),
                   getParentForChildren(),
                   isClean());
-          second_ = null;
+          outer_ = null;
         }
-        return secondBuilder_;
+        return outerBuilder_;
       }
 
       private int id_ ;
@@ -2116,10 +2116,10 @@ public final class Vision {
     java.lang.String[] descriptorData = {
       "\n\014Vision.proto\022\010messages\";\n\tHoughLine\022\t\n" +
       "\001r\030\001 \001(\002\022\t\n\001t\030\002 \001(\002\022\013\n\003ep0\030\003 \001(\002\022\013\n\003ep1\030" +
-      "\004 \001(\002\"`\n\tFieldLine\022\"\n\005first\030\001 \001(\0132\023.mess" +
-      "ages.HoughLine\022#\n\006second\030\002 \001(\0132\023.message" +
-      "s.HoughLine\022\n\n\002id\030\003 \001(\005\"/\n\nFieldLines\022!\n" +
-      "\004line\030\001 \003(\0132\023.messages.FieldLine"
+      "\004 \001(\002\"_\n\tFieldLine\022\"\n\005inner\030\001 \001(\0132\023.mess" +
+      "ages.HoughLine\022\"\n\005outer\030\002 \001(\0132\023.messages" +
+      ".HoughLine\022\n\n\002id\030\003 \001(\005\"/\n\nFieldLines\022!\n\004" +
+      "line\030\001 \003(\0132\023.messages.FieldLine"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2144,7 +2144,7 @@ public final class Vision {
     internal_static_messages_FieldLine_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_FieldLine_descriptor,
-        new java.lang.String[] { "First", "Second", "Id", });
+        new java.lang.String[] { "Inner", "Outer", "Id", });
     internal_static_messages_FieldLines_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_messages_FieldLines_fieldAccessorTable = new
