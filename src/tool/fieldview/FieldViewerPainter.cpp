@@ -149,12 +149,12 @@ void FieldViewerPainter::paintObservations(QPaintEvent* event,
                 painter.drawLine(obsvSt, obsvEnd);
 
                 // Get and paint the line it matches to
-                man::localization::LineErrorMatch match = lineSystem->scoreAndMatchObservation(postProcessLine, false);
+                // man::localization::LineErrorMatch match = lineSystem->scoreAndMatchObservation(postProcessLine, false);
 
-                QPoint matchStart(match.startMatch.x, match.startMatch.y);
-                QPoint matchEnd  (match.endMatch.x, match.endMatch.y);
-                painter.setBrush(Qt::magenta);
-                painter.drawLine(matchStart, matchEnd);
+                // QPoint matchStart(match.startMatch.x, match.startMatch.y);
+                // QPoint matchEnd  (match.endMatch.x, match.endMatch.y);
+                // painter.setBrush(Qt::magenta);
+                // painter.drawLine(matchStart, matchEnd);
            }
 
 

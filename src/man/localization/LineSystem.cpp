@@ -1,67 +1,75 @@
 #include "LineSystem.h"
 
+#include <limits>
+
 namespace man {
 namespace localization {
 
-LineSystem::LineSystem() {
-    //Note: this is hardcoded for the SPL league layout 2013 and may need to be updated
-    // Add the top and bottom lines
-    addLine(FIELD_WHITE_LEFT_SIDELINE_X,  FIELD_WHITE_BOTTOM_SIDELINE_Y,
-            FIELD_WHITE_RIGHT_SIDELINE_X, FIELD_WHITE_BOTTOM_SIDELINE_Y);
-    addLine(FIELD_WHITE_LEFT_SIDELINE_X,  FIELD_WHITE_TOP_SIDELINE_Y,
-            FIELD_WHITE_RIGHT_SIDELINE_X, FIELD_WHITE_TOP_SIDELINE_Y);
+// TODO add side goalbox lines
+// TODO line classification
+// TODO endpoint detection and corners
+// TODO rename Vision.pb.h to VisionField.pb.h
+LineSystem::LineSystem() 
+{
+    // Add endlines
+    addLine(GREEN_PAD_X, 0, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
+    addLine(GREEN_PAD_X + FIELD_WHITE_WIDTH, 0, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
 
-    // Add the left and right sidelines
-    addLine(FIELD_WHITE_LEFT_SIDELINE_X,  FIELD_WHITE_BOTTOM_SIDELINE_Y,
-            FIELD_WHITE_LEFT_SIDELINE_X,  FIELD_WHITE_TOP_SIDELINE_Y);
-    addLine(FIELD_WHITE_RIGHT_SIDELINE_X,  FIELD_WHITE_BOTTOM_SIDELINE_Y,
-            FIELD_WHITE_RIGHT_SIDELINE_X,  FIELD_WHITE_TOP_SIDELINE_Y);
+    // Add the midline
+    addLine(CENTER_FIELD_X, 0, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
 
-    // Add the middle line
-    addLine(CENTER_FIELD_X, FIELD_WHITE_BOTTOM_SIDELINE_Y,
-            CENTER_FIELD_X, FIELD_WHITE_TOP_SIDELINE_Y);
+    // Add top goalbox lines
+    addLine(GREEN_PAD_X + GOALBOX_DEPTH , 0, BLUE_GOALBOX_BOTTOM_Y, BLUE_GOALBOX_TOP_Y);
+    addLine(GREEN_PAD_X + GOALBOX_DEPTH , 0, YELLOW_GOALBOX_BOTTOM_Y, YELLOW_GOALBOX_TOP_Y);
 
-    // Add the two goalbox lines
-    addLine(BLUE_GOALBOX_RIGHT_X,  BLUE_GOALBOX_BOTTOM_Y,
-            BLUE_GOALBOX_RIGHT_X,  BLUE_GOALBOX_TOP_Y);
-
-    addLine(YELLOW_GOALBOX_LEFT_X, YELLOW_GOALBOX_BOTTOM_Y,
-            YELLOW_GOALBOX_LEFT_X, YELLOW_GOALBOX_TOP_Y);
+    // Add sidelines
+    addLine(GREEN_PAD_Y, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
+    addLine(GREEN_PAD_Y + FIELD_WHITE_HEIGHT, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
 }
 
 LineSystem::~LineSystem() {}
 
-void LineSystem::addLine(float startX, float startY, float endX, float endY) {
-    Point start(startX, startY);
-    Point end  (endX  , endY  );
+double LineSystem::scoreObservation(const messages::FieldLine& observation,
+                                    const Particle& particle)
+{
+    vision::GeoLine globalLine = fromRelRobotToGlobal(observation, particle);
+    int bestLine = -1;
 
-    lines.push_back( Line(start, end) );
-}
-
-float LineSystem::scoreObservation(Line globalObsv) {
-    //For each line score the observation and return the best of them all
-    float bestScore = 10000000.f;
-    LineIt iter;
-    for(iter = lines.begin(); iter != lines.end(); iter++) {
-        float curScore = (*iter).getError(globalObsv).error;
-        bestScore = ((curScore < bestScore) ? curScore : bestScore);
+    double bestScore = std::numeric_limits<double>::max();
+    for (int i = 0; i < lines.size(); i++) {
+        double curScore = lines[i].error(globalLine);
+        if (curScore < bestScore) {
+            bestScore = curScore;
+            bestLine = i;
+        }
     }
+
+    // if (bestScore >= 1)
+    //     std::cout << "NO MATCHING LINE FOUND, " << bestScore << std::endl;
+    // else
+    //     std::cout << "BEST LINE, " << bestLine << std::endl;
 
     return bestScore;
 }
 
-LineErrorMatch LineSystem::scoreAndMatchObservation(Line globalObsv, bool debug) {
-    //For each line score the observation and return the best of them all
-    LineErrorMatch bestMatch;
-    bestMatch.error = 1000000.f;
-    LineIt iter;
-    for(iter = lines.begin(); iter != lines.end(); iter++) {
-        LineErrorMatch curMatch = (*iter).getError(globalObsv, debug);
-        if (bestMatch.error > curMatch.error)
-            bestMatch = curMatch;
-    }
+void LineSystem::addLine(float r, float t, float ep0, float ep1)
+{
+    vision::GeoLine line;
+    line.set(r, t, ep0, ep1);
+    lines.push_back(line);
+}
 
-    return bestMatch;
+vision::GeoLine LineSystem::fromRelRobotToGlobal(const messages::FieldLine& relRobotLine,
+                                                 const Particle& particle) const
+{
+    const messages::HoughLine& relRobotInner = relRobotLine.inner();
+    const messages::RobotLocation& loc = particle.getLocation();
+
+    vision::GeoLine globalLine;
+    globalLine.set(relRobotInner.r(), relRobotInner.t(), relRobotInner.ep0(), relRobotInner.ep1());
+    globalLine.translateRotate(loc.x(), loc.y(), loc.h() - (M_PI / 2));
+
+    return globalLine;
 }
 
 } // namespace localization

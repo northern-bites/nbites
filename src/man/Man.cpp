@@ -101,12 +101,12 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         cognitionThread.addModule(topTranscriber);
         cognitionThread.addModule(bottomTranscriber);
         cognitionThread.addModule(vision);
-        // cognitionThread.addModule(localization);
+        cognitionThread.addModule(localization);
         // cognitionThread.addModule(ballTrack);
         // cognitionThread.addModule(obstacle);
-        // cognitionThread.addModule(gamestate);
-        // cognitionThread.addModule(behaviors);
-        // cognitionThread.addModule(leds);
+        cognitionThread.addModule(gamestate);
+        cognitionThread.addModule(behaviors);
+        cognitionThread.addModule(leds);
         // cognitionThread.addModule(sharedBall);
         
         topTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
@@ -118,11 +118,11 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         vision.bottomIn.wireTo(&bottomTranscriber.imageOut);
         vision.jointsIn.wireTo(&topTranscriber.jointsOut, true);
         
-        // localization.visionInput.wireTo(&vision.vision_field);
-        // localization.motionInput.wireTo(&motion.odometryOutput_, true);
-        // localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
+        localization.visionInput.wireTo(&vision.linesOut);
+        localization.motionInput.wireTo(&motion.odometryOutput_, true);
+        localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
         // localization.resetInput[1].wireTo(&sharedBall.sharedBallReset, true);
-        // localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
+        localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
         // localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
         
         // ballTrack.visionBallInput.wireTo(&vision.vision_ball);
@@ -140,33 +140,33 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         // obstacle.visionIn.wireTo(&vision.vision_obstacle, true);
         // obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
         // 
-        // gamestate.commInput.wireTo(&comm._gameStateOutput, true);
-        // gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
-        // gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
-        // gamestate.switchTeamInput.wireTo(&guardian.switchTeamOutput, true);
-        // gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
-        // 
-        // behaviors.localizationIn.wireTo(&localization.output);
+        gamestate.commInput.wireTo(&comm._gameStateOutput, true);
+        gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
+        gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
+        gamestate.switchTeamInput.wireTo(&guardian.switchTeamOutput, true);
+        gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
+        
+        behaviors.localizationIn.wireTo(&localization.output);
         // behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
-        // behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
-        // behaviors.visionFieldIn.wireTo(&vision.vision_field);
+        behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
+        // behaviors.visionFieldIn.wireTo(&vision.linesOut);
         // behaviors.visionRobotIn.wireTo(&vision.vision_robot);
         // behaviors.visionObstacleIn.wireTo(&vision.vision_obstacle);
-        // behaviors.fallStatusIn.wireTo(&guardian.fallStatusOutput, true);
-        // behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
-        // behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
-        // behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
-        // behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
+        behaviors.fallStatusIn.wireTo(&guardian.fallStatusOutput, true);
+        behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
+        behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
+        behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
+        behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
         // behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
         // behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
         // behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);
-        // 
-        // for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
-        // {
-        //     behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
-        // }
-        // 
-        // leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
+        
+        for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+        {
+            behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
+        }
+        
+        leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
         
 #ifdef USE_LOGGING
         {   //brackets let us hide logging code in certain IDEs.

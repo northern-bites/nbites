@@ -20,6 +20,7 @@ LocalizationModule::LocalizationModule()
       log_index(0)
 {
     particleFilter = new ParticleFilter();
+    // TODO delete?
     // Chooose on the field looking up as a random initial
     particleFilter->resetLocTo(110,658,-1.5);
 }
@@ -32,8 +33,7 @@ LocalizationModule::~LocalizationModule()
 void LocalizationModule::update()
 {
 #ifndef OFFLINE
-    // Modify based on control portal
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 1; i++) {
         if (lastReset[i] != resetInput[i].message().timestamp())
         {
             std::cout<<"RESET LOC ON "<<i<<std::endl;
@@ -46,33 +46,33 @@ void LocalizationModule::update()
     }
 #endif
 
+    // Save odometry
     curOdometry.set_x(motionInput.message().x());
     curOdometry.set_y(motionInput.message().y());
     curOdometry.set_h(motionInput.message().h());
 
 #ifndef OFFLINE
-    bool inSet = (STATE_SET == gameStateInput.message().state());
-    // Update the Particle Filter with the new observations/odometry
+    // bool inSet = (STATE_SET == gameStateInput.message().state());
+    // // Update the Particle Filter with the new observations/odometry
 
-    if (inSet && (!gameStateInput.message().have_remote_gc() || 
-        gameStateInput.message().secs_remaining() != 600))
-        particleFilter->update(curOdometry, visionInput.message(), ballInput.message());
-    else
+    // if (inSet && (!gameStateInput.message().have_remote_gc() || 
+    //     gameStateInput.message().secs_remaining() != 600))
+    //     particleFilter->update(curOdometry, visionInput.message(), ballInput.message());
+    // else
 #endif
-        particleFilter->update(curOdometry, visionInput.message());
 
-    // Update the locMessage and the swarm (if logging)
-    portals::Message<messages::RobotLocation> locMessage(&particleFilter->
-                                                         getCurrentEstimate());
+    // Update filter
+    particleFilter->update(curOdometry, visionInput.message());
+
 //this is part of something old that never executes, check out
 //the ifdef below; same code but it is executed when we want to
 //to log localization
-#if defined(LOG_LOCALIZATION) || defined(OFFLINE)
-    portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
-                                                           getCurrentSwarm());
+#if defined( LOG_LOCALIZATION) || defined(OFFLINE)
+    portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->getCurrentSwarm());
     particleOutput.setMessage(swarmMessage);
 #endif
 
+    portals::Message<messages::RobotLocation> locMessage(&particleFilter->getCurrentEstimate());
     output.setMessage(locMessage);
 
 #ifdef USE_LOGGING
@@ -122,21 +122,19 @@ void LocalizationModule::update()
 
 void LocalizationModule::run_()
 {
-    // Profiler
     PROF_ENTER(P_SELF_LOC);
 
     motionInput.latch();
     visionInput.latch();
 #ifndef OFFLINE
     gameStateInput.latch();
-    ballInput.latch();
+    // ballInput.latch();
     resetInput[0].latch();
-    resetInput[1].latch();
+    // resetInput[1].latch();
 #endif
 
     update();
 
-    // Profiler
     PROF_EXIT(P_SELF_LOC);
 }
 
