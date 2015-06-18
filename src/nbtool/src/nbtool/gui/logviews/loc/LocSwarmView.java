@@ -64,7 +64,7 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 			}
             /* numLines = 1; */
 			/* for(int i=0; i<1; i++) { */
-			/* 	naoLines[i].r = FIELD_CONSTANTS.CENTER_FIELD_X; */
+			/* 	naoLines[i].r = FieldConstants.CENTER_FIELD_X; */
 			/* 	naoLines[i].t = 0; */
 			/* 	naoLines[i].end0 = 100; */
 			/* 	naoLines[i].end1 = 200; */

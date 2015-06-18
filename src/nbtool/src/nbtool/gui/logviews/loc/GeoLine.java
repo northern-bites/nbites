@@ -75,10 +75,11 @@ public class GeoLine {
 		double y0 = r*Math.sin(t);
 
 		int x1 = (int) Math.round(x0 + end0 * Math.sin(t));
-		int y1 = (int) Math.round(y0 + end0 * Math.cos(t));
+		int y1 = (int) Math.round(y0 - end0 * Math.cos(t));
         int x2 = (int) Math.round(x0 + end1 * Math.sin(t));
-        int y2 = (int) Math.round(y0 + end1 * Math.cos(t));
+        int y2 = (int) Math.round(y0 - end1 * Math.cos(t));
 
+        /* g2.drawLine(x1,y1,x2,y2); */
         g2.drawLine(x1,(int)FieldConstants.FIELD_HEIGHT-y1,x2,(int)FieldConstants.FIELD_HEIGHT-y2);
 	}
 
