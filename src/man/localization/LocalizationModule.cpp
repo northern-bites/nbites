@@ -86,34 +86,32 @@ void LocalizationModule::update()
 
         messages::RobotLocation rl = *output.getMessage(true).get();
         messages::ParticleSwarm ps = *particleOutput.getMessage(true).get();
-        messages::VisionField vf = *visionInput.getMessage(true).get();
+        messages::FieldLines fl = *visionInput.getMessage(true).get();
 
         std::string rl_buf;
         std::string ps_buf;
-        std::string vf_buf;
+        std::string fl_buf;
         std::string log_buf;
 
         rl.SerializeToString(&rl_buf);
         ps.SerializeToString(&ps_buf);
-
-        if(ps_buf.empty()) {
-            std::cout<<"PS EMPTY"<<std::endl;
-        } else {
-            std::cout<<"PS FULL"<<std::endl;
-        }
+        fl.SerializeToString(&fl_buf);
 
         log_buf.append(rl_buf);
         log_buf.append(ps_buf);
+        log_buf.append(fl_buf);
 
         std::vector<SExpr> contents;
 
         SExpr naoLocation("location", log_from, clock(), log_index, rl_buf.length());
-
         contents.push_back(naoLocation);
 
         SExpr naoSwarm("swarm",log_from,clock(),log_index,ps_buf.length());
-
         contents.push_back(naoSwarm);
+
+        SExpr naoFieldLines("fieldlines",log_from,clocl(),log_index,fl_buf.length());
+        contents.push_back(naoFieldLines);
+
         NBLog(NBL_SMALL_BUFFER,"LOCSWARM",contents,log_buf);
     }
 #endif
