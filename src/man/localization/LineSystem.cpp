@@ -44,10 +44,10 @@ double LineSystem::scoreObservation(const messages::FieldLine& observation,
         }
     }
 
-    if (bestScore >= 1)
-        std::cout << "NO MATCHING LINE FOUND, " << bestScore << std::endl;
-    else
-        std::cout << "BEST LINE, " << bestLine << std::endl;
+    // if (bestScore >= 1)
+    //     std::cout << "NO MATCHING LINE FOUND, " << bestScore << std::endl;
+    // else
+    //     std::cout << "BEST LINE, " << bestLine << std::endl;
 
     return bestScore;
 }
