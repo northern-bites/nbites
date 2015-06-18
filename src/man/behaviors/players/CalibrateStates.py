@@ -27,20 +27,22 @@ def gameReady(player):
 @superState('gameControllerResponder')
 def gameSet(player):
     if player.firstFrame():
-        player.panIndex = 0
-        return player.goNow('panTop')
+        player.stand()
+        player.brain.tracker.lookToAngle(0)
     return player.stay()
 
 @superState('gameControllerResponder')
 def gamePlaying(player):
     if player.firstFrame():
         player.panIndex = 0
-        return player.goNow('panBottom')
+        return player.goNow('panTop')
     return player.stay()
-
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
+    if player.firstFrame():
+        player.panIndex = 0
+        return player.goNow('panBottom')
     return player.stay()
 
 @superState('gameControllerResponder')

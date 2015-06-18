@@ -9,8 +9,11 @@ def panTop(player):
 	# print "Got to pan"
 	if player.panIndex < constants.NUMBER_OF_PANS and player.firstFrame():
 		player.brain.tracker.helper.executeHeadMove(tracker.HeadMoves.CALIBRATION_TOP_PAN[player.panIndex])
+		player.panIndex += 1
+
 	elif player.stateTime >= constants.TIME_OF_PAN:
 		return player.goLater('logTop')
+
 	return player.stay()
 
 @superState('gameControllerResponder')
@@ -20,9 +23,10 @@ def logTop(player):
 		os.environ["LOG_THIS"] = 'top'
 		if player.panIndex == constants.NUMBER_OF_PANS:
 			player.panIndex = 0
+
 	elif player.stateTime >= constants.TIME_PER_LOG:
-		player.panIndex += 1
 		return player.goLater('panTop')
+
 	return player.stay()
 
 @superState('gameControllerResponder')
@@ -30,8 +34,11 @@ def panBottom(player):
 	# print "Got to pan"
 	if player.panIndex < constants.NUMBER_OF_PANS and player.firstFrame():
 		player.brain.tracker.helper.executeHeadMove(tracker.HeadMoves.CALIBRATION_BOTTOM_PAN[player.panIndex])
+		player.panIndex += 1
+
 	elif player.stateTime >= constants.TIME_OF_PAN:
 		return player.goLater('logBottom')
+
 	return player.stay()
 
 @superState('gameControllerResponder')
@@ -41,7 +48,8 @@ def logBottom(player):
 		os.environ["LOG_THIS"] = 'bottom'
 		if player.panIndex == constants.NUMBER_OF_PANS:
 			player.panIndex = 0
+
 	elif player.stateTime >= constants.TIME_PER_LOG:
-		player.panIndex += 1
 		return player.goLater('panBottom')
+		
 	return player.stay()
