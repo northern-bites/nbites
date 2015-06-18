@@ -33,12 +33,21 @@ double LineSystem::scoreObservation(const messages::FieldLine& observation,
                                     const Particle& particle)
 {
     vision::GeoLine globalLine = fromRelRobotToGlobal(observation, particle);
+    int bestLine = -1;
 
     double bestScore = std::numeric_limits<double>::max();
     for (int i = 0; i < lines.size(); i++) {
         double curScore = lines[i].error(globalLine);
-        bestScore = ((curScore < bestScore) ? curScore : bestScore);
+        if (curScore < bestScore) {
+            bestScore = curScore;
+            bestLine = i;
+        }
     }
+
+    if (bestScore >= 1)
+        std::cout << "NO MATCHING LINE FOUND, " << bestScore << std::endl;
+    else
+        std::cout << "BEST LINE, " << bestLine << std::endl;
 
     return bestScore;
 }

@@ -29,6 +29,8 @@ bool VisionSystem::update(ParticleSet& particles,
     float lowestParticleError = 10000000.f;
     float sumParticleError = 0.f;
 
+    // std::cout << "UPDATE, NUMLINES = " << lines.line_size() << std::endl;
+
     for(iter = particles.begin(); iter != particles.end(); iter++)
     {
         Particle* particle = &(*iter);

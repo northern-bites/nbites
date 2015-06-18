@@ -24,17 +24,17 @@ LocalizationModule::~LocalizationModule()
 void LocalizationModule::update()
 {
 #ifndef OFFLINE
-    // for (int i = 0; i < 2; i++) {
-    //     if (lastReset[i] != resetInput[i].message().timestamp())
-    //     {
-    //         std::cout<<"RESET LOC ON "<<i<<std::endl;
-    //         lastReset[i] = resetInput[i].message().timestamp();
-    //         particleFilter->resetLocTo(resetInput[i].message().x(),
-    //                                    resetInput[i].message().y(),
-    //                                    resetInput[i].message().h());
-    //         break;
-    //     }
-    // }
+    for (int i = 0; i < 1; i++) {
+        if (lastReset[i] != resetInput[i].message().timestamp())
+        {
+            std::cout<<"RESET LOC ON "<<i<<std::endl;
+            lastReset[i] = resetInput[i].message().timestamp();
+            particleFilter->resetLocTo(resetInput[i].message().x(),
+                                       resetInput[i].message().y(),
+                                       resetInput[i].message().h());
+            break;
+        }
+    }
 #endif
 
     // Save odometry
@@ -72,9 +72,9 @@ void LocalizationModule::run_()
     motionInput.latch();
     visionInput.latch();
 #ifndef OFFLINE
-    // gameStateInput.latch();
+    gameStateInput.latch();
     // ballInput.latch();
-    // resetInput[0].latch();
+    resetInput[0].latch();
     // resetInput[1].latch();
 #endif
 
