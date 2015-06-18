@@ -1,6 +1,7 @@
 package nbtool.gui.logviews.images;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -50,46 +51,14 @@ public class LineView extends ViewParent implements IOFirstResponder {
 	}
 	
 	public void paintComponent(Graphics g) {
+		Graphics2D g2 = (Graphics2D) g;
 		if (edgeImage != null) {
 			g.drawImage(originalImage, 0, 0, displayw, displayh, null);
 			g.drawImage(edgeImage, 0, 480, displayw, displayh, null);
 
             for (int i = 0; i < geoLines.size(); i++) {
             	GeoLine tempGeoLine = geoLines.get(i);
-                double r = tempGeoLine.r;
-                double t = tempGeoLine.t;
-                double end0 = tempGeoLine.end0;
-                double end1 = tempGeoLine.end1;
-                double houghIndex = tempGeoLine.houghIndex;
-                double fieldIndex = tempGeoLine.fieldIndex;
-
-                if (fieldIndex == -1)
-                    g.setColor(Color.blue);
-                else
-                    g.setColor(Color.red);
-
-                double x0 = 2*r * Math.cos(t) + originalImage.getWidth() / 2;
-                double y0 = -2*r * Math.sin(t) + originalImage.getHeight() / 2;
-                int x1 = (int) Math.round(x0 + 2*end0 * Math.sin(t));
-                int y1 = (int) Math.round(y0 + 2*end0 * Math.cos(t));
-                int x2 = (int) Math.round(x0 + 2*end1 * Math.sin(t));
-                int y2 = (int) Math.round(y0 + 2*end1 * Math.cos(t));
-
-                double xstring = (x1 + x2) / 2;
-                double ystring = (y1 + y2) / 2;
-
-                double scale = 0;
-                if (r > 0)
-                    scale = 10;
-                else
-                    scale = 3;
-                xstring += scale*Math.cos(t);
-                ystring += scale*Math.sin(t);
-
-                g.drawLine(x1, y1, x2, y2);
-                g.drawString(Integer.toString((int) houghIndex) + "/" + Integer.toString((int) fieldIndex), 
-                             (int) xstring, 
-                             (int) ystring);
+                tempGeoLine.draw(g2,originalImage);
             }
         }
     }
