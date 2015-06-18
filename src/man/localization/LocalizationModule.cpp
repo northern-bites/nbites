@@ -86,9 +86,11 @@ void LocalizationModule::update()
 
         messages::RobotLocation rl = *output.getMessage(true).get();
         messages::ParticleSwarm ps = *particleOutput.getMessage(true).get();
+        messages::VisionField vf = *visionInput.getMessage(true).get();
 
         std::string rl_buf;
         std::string ps_buf;
+        std::string vf_buf;
         std::string log_buf;
 
         rl.SerializeToString(&rl_buf);
