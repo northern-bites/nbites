@@ -87,26 +87,33 @@ public class BasicLineView extends ViewParent {
         Map<FieldDescriptor, Object> fields = msg.getAllFields();
 
         for (Map.Entry<FieldDescriptor, Object> entry : fields.entrySet()) {
-            Map<FieldDescriptor, Object> lineFields = ((com.google.protobuf.Message)entry.getValue()).getAllFields();
-            Line temp = new Line();
-            for (Map.Entry<FieldDescriptor, Object> lineEntry : lineFields.entrySet()) {
-                if (lineEntry.getKey().getName().equals("inner")) {
-                    Map<FieldDescriptor, Object> houghFields = ((com.google.protobuf.Message)lineEntry.getValue()).getAllFields();
-                    for (Map.Entry<FieldDescriptor, Object> houghEntry : houghFields.entrySet()) {
-                        if (houghEntry.getKey().getName().equals("r")) { temp.r = (float)houghEntry.getValue();}
-                        else if (houghEntry.getKey().getName().equals("t")) { temp.t = (float)houghEntry.getValue();}
-                        else if (houghEntry.getKey().getName().equals("ep0")) { temp.ep0 = (float)houghEntry.getValue();}
-                        else if (houghEntry.getKey().getName().equals("ep1")) { temp.ep1 = (float)houghEntry.getValue();}
-                    }
-                }
-                else if (lineEntry.getKey().getName().equals("id")) {
-                    temp.id = (int)lineEntry.getValue();
-                }
-            }
-            lines.add(temp);
+            String lineProps = entry.getValue().toString();
+            System.out.println(lineProps);
+            // if (entry.getKey().getName().equals("line")) {
+            //     Message linemsg = (Message) entry.getValue();
+            //     // Map<FieldDescriptor, Object> lineFields = linemsg.getAllFields();
+            //     // Line temp = new Line();
+            // }
+            // Map<FieldDescriptor, Object> lineFields = ((com.google.protobuf.Message)entry.getValue()).getAllFields();
+            // Line temp = new Line();
+            // for (Map.Entry<FieldDescriptor, Object> lineEntry : lineFields.entrySet()) {
+            //     if (lineEntry.getKey().getName().equals("first")) {
+            //         Map<FieldDescriptor, Object> houghFields = ((com.google.protobuf.Message)lineEntry.getValue()).getAllFields();
+            //         for (Map.Entry<FieldDescriptor, Object> houghEntry : houghFields.entrySet()) {
+            //             if (houghEntry.getKey().getName().equals("r")) { temp.r = (float)houghEntry.getValue();}
+            //             else if (houghEntry.getKey().getName().equals("t")) { temp.t = (float)houghEntry.getValue();}
+            //             else if (houghEntry.getKey().getName().equals("ep0")) { temp.ep0 = (float)houghEntry.getValue();}
+            //             else if (houghEntry.getKey().getName().equals("ep1")) { temp.ep1 = (float)houghEntry.getValue();}
+            //         }
+            //     }
+            //     else if (lineEntry.getKey().getName().equals("id")) {
+            //         temp.id = (int)lineEntry.getValue();
+            //     }
+            // }
+            // lines.add(temp);
         }
 
-        repaint();
+        // repaint();
 
 
         // CrossInstance ci = CrossIO.instanceByIndex(0);
