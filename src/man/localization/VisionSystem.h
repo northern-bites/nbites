@@ -43,7 +43,7 @@ public:
 
     // updates give particleset by reference, returns true if observations was nonempty
     bool update(ParticleSet& particles,
-                const messages::FieldLines& obsv);
+                messages::FieldLines& obsv);
 
     // overloaded to use ball observations
     bool update(ParticleSet& particles,

@@ -26,7 +26,7 @@ VisionModule::VisionModule(int wd, int ht)
         edges[i] = new EdgeList(32000);
         houghLines[i] = new HoughLineList(128);
         kinematics[i] = new Kinematics(i == 0);
-        homography[i] = new FieldHomography();
+        homography[i] = new FieldHomography(i == 0);
         fieldLines[i] = new FieldLineList();
         boxDetector[i] = new GoalboxDetector();
 

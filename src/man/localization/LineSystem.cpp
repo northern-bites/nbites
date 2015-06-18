@@ -5,6 +5,7 @@
 namespace man {
 namespace localization {
 
+// TODO repeat lines
 // TODO add side goalbox lines
 // TODO line classification
 // TODO endpoint detection and corners
@@ -29,11 +30,17 @@ LineSystem::LineSystem()
 
 LineSystem::~LineSystem() {}
 
-double LineSystem::scoreObservation(const messages::FieldLine& observation,
+double LineSystem::scoreObservation(messages::FieldLine& observation,
                                     const Particle& particle)
 {
     vision::GeoLine globalLine = fromRelRobotToGlobal(observation, particle);
     int bestLine = -1;
+
+    messages::HoughLine& innerObservation = *observation.mutable_inner();
+    innerObservation.set_r(globalLine.r());
+    innerObservation.set_t(globalLine.t());
+    innerObservation.set_ep0(globalLine.ep0());
+    innerObservation.set_ep1(globalLine.ep1());
 
     double bestScore = std::numeric_limits<double>::max();
     for (int i = 0; i < lines.size(); i++) {
@@ -42,18 +49,6 @@ double LineSystem::scoreObservation(const messages::FieldLine& observation,
             bestScore = curScore;
             bestLine = i;
         }
-    }
-
-    if (bestScore >= 1)
-        std::cout << "NO MATCHING LINE FOUND, " << bestScore << std::endl;
-    else {
-        std::cout << "BEST LINE, " << lines[bestLine].print() << std::endl;
-        const messages::HoughLine& relRobotInner = observation.inner();
-        vision::GeoLine relLine;
-        relLine.set(relRobotInner.r(), relRobotInner.t(), relRobotInner.ep0(), relRobotInner.ep1());
-        std::cout << relLine.print() << std::endl;
-        std::cout << globalLine.print() << std::endl;
-        std::cout << "DONE\n";
     }
 
     return bestScore;

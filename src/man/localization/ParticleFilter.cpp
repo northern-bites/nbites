@@ -57,7 +57,7 @@ ParticleFilter::~ParticleFilter()
 
 
 void ParticleFilter::update(const messages::RobotLocation& odometryInput,
-                            const messages::FieldLines&    visionInput)
+                            messages::FieldLines&          visionInput)
 {
     // Update motion and vision system
     motionSystem->update(particles, odometryInput, errorMagnitude);

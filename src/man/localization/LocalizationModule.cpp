@@ -46,10 +46,11 @@ void LocalizationModule::update()
     }
 #endif
 
-    // Save odometry
+    // Save odometry and lines
     curOdometry.set_x(motionInput.message().x());
     curOdometry.set_y(motionInput.message().y());
     curOdometry.set_h(motionInput.message().h());
+    curLines = visionInput.message();
 
 #ifndef OFFLINE
     // bool inSet = (STATE_SET == gameStateInput.message().state());
@@ -62,7 +63,7 @@ void LocalizationModule::update()
 #endif
 
     // Update filter
-    particleFilter->update(curOdometry, visionInput.message());
+    particleFilter->update(curOdometry, curLines);
 
 //this is part of something old that never executes, check out
 //the ifdef below; same code but it is executed when we want to
@@ -86,7 +87,7 @@ void LocalizationModule::update()
 
         messages::RobotLocation rl = *output.getMessage(true).get();
         messages::ParticleSwarm ps = *particleOutput.getMessage(true).get();
-        messages::FieldLines fl = *visionInput.getMessage(true).get();
+        messages::FieldLines fl = curLines;
 
         std::string rl_buf;
         std::string ps_buf;
@@ -109,7 +110,7 @@ void LocalizationModule::update()
         SExpr naoSwarm("swarm",log_from,clock(),log_index,ps_buf.length());
         contents.push_back(naoSwarm);
 
-        SExpr naoFieldLines("fieldlines",log_from,clocl(),log_index,fl_buf.length());
+        SExpr naoFieldLines("fieldlines",log_from,clock(),log_index,fl_buf.length());
         contents.push_back(naoFieldLines);
 
         NBLog(NBL_SMALL_BUFFER,"LOCSWARM",contents,log_buf);

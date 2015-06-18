@@ -69,6 +69,7 @@ protected:
     ParticleFilter * particleFilter;
     long long lastReset[2];
     messages::RobotLocation curOdometry;
+    messages::FieldLines curLines;
 
 private:
     size_t log_index;

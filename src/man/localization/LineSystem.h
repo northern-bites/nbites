@@ -21,7 +21,7 @@ public:
     LineSystem();
     ~LineSystem();
 
-    double scoreObservation(const messages::FieldLine& observation, const Particle& particle);
+    double scoreObservation(messages::FieldLine& observation, const Particle& particle);
 
 private:
     void addLine(float r, float t, float ep0, float ep1);
