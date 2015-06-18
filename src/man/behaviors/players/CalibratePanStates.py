@@ -1,0 +1,43 @@
+from ..headTracker import HeadTracker as tracker
+from ..headTracker import TrackingConstants as constants 
+from ..util import *
+
+@superState('gameControllerResponder')
+def panTop(player):
+	# print "Got to pan"
+	if player.panIndex < constants.NUMBER_OF_PANS and player.firstFrame():
+		player.brain.tracker.helper.executeHeadMove(tracker.HeadMoves.CALIBRATION_TOP_PAN[player.panIndex])
+	elif player.stateTime >= constants.TIME_OF_PAN:
+		return player.goLater('logTop')
+	return player.stay()
+
+@superState('gameControllerResponder')
+def logTop(player):
+	if player.firstFrame():
+		player.brain.tracker.stopHeadMoves()
+		if player.panIndex == constants.NUMBER_OF_PANS:
+			player.panIndex = 0
+	elif player.stateTime >= constants.TIME_PER_LOG:
+		player.panIndex += 1
+		return player.goLater('panTop')
+	return player.stay()
+
+
+@superState('gameControllerResponder')
+def panBottom(player):
+	# print "Got to pan"
+	if player.panIndex < constants.NUMBER_OF_PANS and player.firstFrame():
+		player.brain.tracker.helper.executeHeadMove(tracker.HeadMoves.CALIBRATION_BOTTOM_PAN[player.panIndex])
+	elif player.stateTime >= constants.TIME_OF_PAN:
+		return player.goLater('logBottom')
+	return player.stay()
+@superState('gameControllerResponder')
+def logBottom(player):
+	if player.firstFrame():
+		player.brain.tracker.stopHeadMoves()
+		if player.panIndex == constants.NUMBER_OF_PANS:
+			player.panIndex = 0
+	elif player.stateTime >= constants.TIME_PER_LOG:
+		player.panIndex += 1
+		return player.goLater('panBottom')
+	return player.stay()
