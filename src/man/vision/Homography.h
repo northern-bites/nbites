@@ -116,6 +116,47 @@ public:
   bool calibrateFromStar(const FieldLineList& lines);
 };
 
+// *****************************
+// *                           *
+// *  Star Target Calibration  *
+// *                           *
+// *****************************
+//
+// Calibrate roll and tilt from one or more field line lists, each derived from
+// an image of the star target.
+//
+// The two paired image lines of a field line are parallel. Their intersection
+// is on the horizon. The horizontal leg of the star target has its intersection
+// too far away to be useful (maybe infinitely far). Find the other three points
+// and fit a line. A field line list is ignored if all three field lines are not
+// present 
+
+// The roll is the angle of the horizon, in the range [-PI/2 .. PI/2)
+
+// The tilt is calculated from the distance from the optical axis to the horizon. That
+// distance is the dot product of the unit vector normal to the line with a vector
+// to any point on the line. The center of mass is on the line.
+
+class StarCal
+{
+  double ix0, iy0;   // optical axis relative to center of image
+  double f;          // focal length
+
+  LineFit fit;
+
+public:
+  StarCal(const FieldHomography& fh) : ix0(fh.ix0()), iy0(fh.iy0()), f(fh.flen()) {}
+
+  void clear() { fit.clear(); }
+
+  // Add another set of field lines from a star target image.
+  bool add(const FieldLineList&);
+
+  // Returns the roll and tilt from the field lines seen so far.
+  double tilt();
+  double roll();
+};
+
 // ********************
 // *                  *
 // *  Geometric Line  *

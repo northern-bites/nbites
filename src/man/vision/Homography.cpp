@@ -274,34 +274,46 @@ bool FieldHomography::visualTiltParallel(const GeoLine& a, const GeoLine& b,
 
 bool FieldHomography::calibrateFromStar(const FieldLineList& lines)
 {
-  // The two paired image lines of a field line are parallel. Their intersection is on the
-  // horizon. The horizontal leg of the star target has its intersection too far away to be
-  // useful (maybe infinitely far). Find the other three points and fit a line.
-  LineFit fit;
+  StarCal sc(*this);
+  if (sc.add(lines))
+  {
+    roll(sc.roll());
+    tilt(sc.tilt());
+    return true;
+  }
+  return false;
+}
+
+// *****************************
+// *                           *
+// *  Star Target Calibration  *
+// *                           *
+// *****************************
+
+bool StarCal::add(const FieldLineList& lines)
+{
   for (int i = 0; i < lines.size(); ++i)
   {
     double vpx, vpy;
     if (lines[i][0].intersect(lines[i][1], vpx, vpy) && fabs(lines[i][0].ux()) > 0.3)
-      fit.add(vpx - ix0(), vpy - iy0());  // relative to optical axis
+      fit.add(vpx - ix0, vpy - iy0);  // relative to optical axis
   }
 
   // If we didn't find exactly three suitable field lines, fail
-  if (fit.area() != 3)
-    return false;
-
-  // The roll is the angle of the horizon. sMod puts it in the range [-PI/2 .. PI/2)
-  roll(sMod(fit.firstPrincipalAngle(), M_PI));
-
-  // The tilt is calculated from the distance from the optical axis to the horizon. That
-  // distance is the dot product of the unit vector normal to the line with a vector
-  // to any point on the line. The center of mass is on the line.
-  double imageDistanceToHorizon
-    = fit.secondPrinciaplAxisU() * fit.centerX() + fit.secondPrinciaplAxisV() * fit.centerY();
-  tilt((M_PI / 2) - atan(imageDistanceToHorizon / flen()));
-
-  return true;
+  return fit.area() == 3;
 }
 
+double StarCal::roll()
+{
+  return sMod(fit.firstPrincipalAngle(), M_PI);
+}
+
+double StarCal::tilt()
+{
+  double imageDistanceToHorizon
+    = fit.secondPrinciaplAxisU() * fit.centerX() + fit.secondPrinciaplAxisV() * fit.centerY();
+  return (M_PI / 2) - atan(imageDistanceToHorizon / f);
+}
 
 // ********************
 // *                  *
