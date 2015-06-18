@@ -169,12 +169,6 @@ class Brain(object):
         # Flush the output
         sys.stdout.flush()
 
-        os.environ["LOG_THIS"] = 'false'
-        if (self.player.gameState == 'gamePlaying'):
-            os.environ["LOG_THIS"] = 'top'
-
-
-
     def updateComm(self):
         me = self.teamMembers[self.playerNumber - 1]
         output = self.interface.myWorldModel

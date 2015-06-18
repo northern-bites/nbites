@@ -1,3 +1,5 @@
+import os
+
 from ..headTracker import HeadTracker as tracker
 from ..headTracker import TrackingConstants as constants 
 from ..util import *
@@ -15,13 +17,13 @@ def panTop(player):
 def logTop(player):
 	if player.firstFrame():
 		player.brain.tracker.stopHeadMoves()
+		os.environ["LOG_THIS"] = 'top'
 		if player.panIndex == constants.NUMBER_OF_PANS:
 			player.panIndex = 0
 	elif player.stateTime >= constants.TIME_PER_LOG:
 		player.panIndex += 1
 		return player.goLater('panTop')
 	return player.stay()
-
 
 @superState('gameControllerResponder')
 def panBottom(player):
@@ -31,10 +33,12 @@ def panBottom(player):
 	elif player.stateTime >= constants.TIME_OF_PAN:
 		return player.goLater('logBottom')
 	return player.stay()
+
 @superState('gameControllerResponder')
 def logBottom(player):
 	if player.firstFrame():
 		player.brain.tracker.stopHeadMoves()
+		os.environ["LOG_THIS"] = 'bottom'
 		if player.panIndex == constants.NUMBER_OF_PANS:
 			player.panIndex = 0
 	elif player.stateTime >= constants.TIME_PER_LOG:

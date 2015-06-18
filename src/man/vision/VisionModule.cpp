@@ -170,13 +170,13 @@ void VisionModule::run_()
         } else if (strcmp(getenv("LOG_THIS"), std::string("bottom").c_str()) == 0) {
             logImage(1);
             setenv("LOG_THIS", "false", 1);
-        } else
-            std::cerr << "N "; 
+            std::cerr << "B ";
+        }// else
+           // std::cerr << "N "; 
     } else {
         logImage(0);
         logImage(1);
         std::cerr << "L ";
-
     }
 #endif
 
