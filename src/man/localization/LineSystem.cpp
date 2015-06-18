@@ -9,7 +9,7 @@ namespace localization {
 // TODO add side goalbox lines
 // TODO line classification
 // TODO endpoint detection and corners
-// TODO rename Vision.pb.h to VisionField.pb.h
+// TODO refactor Vision.pb.h
 LineSystem::LineSystem() 
 {
     // Add endlines

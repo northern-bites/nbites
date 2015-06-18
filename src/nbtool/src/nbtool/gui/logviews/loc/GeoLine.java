@@ -68,26 +68,20 @@ public class GeoLine {
 	}
 
 	public void draw(Graphics2D g2) {
-		int x,y;
 		float lineWidth = 5.0f;
-
 		g2.setStroke(new BasicStroke(lineWidth/2));
 
-		double x0 = 2*r*Math.cos(t);
-		double y0 = -2*r*Math.sin(t);
+		double x0 = r*Math.cos(t);
+		double y0 = r*Math.sin(t);
 
-		int x1 = (int) Math.round(x0 + 2*end0 * Math.sin(t));
-		int y1 = (int) Math.round(y0 + 2*end0 * Math.cos(t));
-        int x2 = (int) Math.round(x0 + 2*end1 * Math.sin(t));
-        int y2 = (int) Math.round(y0 + 2*end1 * Math.cos(t));
+		int x1 = (int) Math.round(x0 + end0 * Math.sin(t));
+		int y1 = (int) Math.round(y0 + end0 * Math.cos(t));
+        int x2 = (int) Math.round(x0 + end1 * Math.sin(t));
+        int y2 = (int) Math.round(y0 + end1 * Math.cos(t));
 
-        double scale = 0;
-        if (r > 0) {
-        	scale = 10;
-        } else { scale = 3; }
-
-        g2.drawLine(x1,y1,x2,y2);
+        g2.drawLine(x1,(int)FieldConstants.FIELD_HEIGHT-y1,x2,(int)FieldConstants.FIELD_HEIGHT-y2);
 	}
+
 	/*
 	public void endPoints(Double[] epoints) {
 		double x0 = r*ux;

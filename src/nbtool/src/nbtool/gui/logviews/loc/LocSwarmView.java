@@ -22,6 +22,9 @@ package nbtool.gui.logviews.loc;
 	import nbtool.gui.logviews.misc.ViewParent;
 
 public class LocSwarmView extends ViewParent implements ActionListener {
+
+    private int numLines;
+
 	@Override
 	public void setLog(Log newlog) {
 		log = newlog;
@@ -49,6 +52,7 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 			}
 
 			naoFieldLines = FieldLines.parseFrom(log.bytesForContentItem(2));
+            numLines = naoFieldLines.getLineCount();
 			for(int i=0; i<naoFieldLines.getLineCount(); i++) {
 				FieldLine curFieldLine = naoFieldLines.getLine(i);
 				naoLines[i].r = curFieldLine.getInner().getR();
@@ -58,7 +62,15 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 				naoLines[i].houghIndex = 0.0;
 				naoLines[i].fieldIndex = 0.0;
 			}
-			repaint(); //???????
+            /* numLines = 1; */
+			/* for(int i=0; i<1; i++) { */
+			/* 	naoLines[i].r = FIELD_CONSTANTS.CENTER_FIELD_X; */
+			/* 	naoLines[i].t = 0; */
+			/* 	naoLines[i].end0 = 100; */
+			/* 	naoLines[i].end1 = 200; */
+			/* 	naoLines[i].houghIndex = 0.0; */
+			/* 	naoLines[i].fieldIndex = 0.0; */
+			/* } */
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -126,7 +138,7 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 		for(int i=0; i<naoParticles.length; i++) {
 			naoParticles[i].drawParticle(g2,pWeight,shouldFlip);
 		}
-		for(int i=0; i<naoLines.length; i++) {
+		for(int i=0; i<numLines; i++) {
 			naoLines[i].draw(g2);
 		}
 	}
