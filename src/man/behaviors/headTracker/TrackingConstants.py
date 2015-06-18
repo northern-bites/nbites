@@ -21,7 +21,7 @@ LOOKTIME = 40
 PANTIME = 1
 
 # Calibrate Constants
-TIME_OF_PAN = 0.4
+TIME_OF_PAN = 0.2
 NUMBER_OF_PANS = 7
 TIME_PER_LOG = 1.0
 

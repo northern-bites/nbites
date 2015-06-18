@@ -11,7 +11,7 @@ def panTop(player):
 		player.brain.tracker.helper.executeHeadMove(tracker.HeadMoves.CALIBRATION_TOP_PAN[player.panIndex])
 		player.panIndex += 1
 
-	elif player.stateTime >= constants.TIME_OF_PAN:
+	elif player.stateTime >= constants.TIME_OF_PAN*2:
 		return player.goLater('logTop')
 
 	return player.stay()
@@ -36,7 +36,7 @@ def panBottom(player):
 		player.brain.tracker.helper.executeHeadMove(tracker.HeadMoves.CALIBRATION_BOTTOM_PAN[player.panIndex])
 		player.panIndex += 1
 
-	elif player.stateTime >= constants.TIME_OF_PAN:
+	elif player.stateTime >= constants.TIME_OF_PAN*2:
 		return player.goLater('logBottom')
 
 	return player.stay()
