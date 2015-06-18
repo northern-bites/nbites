@@ -70,6 +70,7 @@ private:
 
     nblog::SExpr* cameraLisp;
     size_t image_index;
+
 };
 
 }

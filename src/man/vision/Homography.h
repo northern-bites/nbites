@@ -219,6 +219,14 @@ public:
   // otherwise. 
   double separation(const GeoLine& other) const;
 
+  // Assuming this and other should be the same line, calculate the error.
+  // NOTE used in particle filter.
+  double error(const GeoLine& other) const;
+
+  // Translation rotation of line in plane. 
+  // NOTE used in particle filter.
+  void translateRotate(double xTrans, double yTrans, double rotation);
+
   // Map this image line to what we would see if roll were 0 and the optical axis
   // was at the center of the image
   void correctRollAndAxis(const FieldHomography&);

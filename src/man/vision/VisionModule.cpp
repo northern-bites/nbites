@@ -157,13 +157,28 @@ void VisionModule::run_()
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
 
         //times[i][5] = timer.end();
-        
-#ifdef USE_LOGGING
-       
-    logImage(i);
-        
-#endif
+
+
     }
+
+#ifdef USE_LOGGING
+    if (getenv("LOG_THIS") != NULL) {
+        if (strcmp(getenv("LOG_THIS"), std::string("top").c_str()) == 0) {
+            logImage(0);
+            setenv("LOG_THIS", "false", 1);
+            std::cerr << "T ";
+        } else if (strcmp(getenv("LOG_THIS"), std::string("bottom").c_str()) == 0) {
+            logImage(1);
+            setenv("LOG_THIS", "false", 1);
+        } else
+            std::cerr << "N "; 
+    } else {
+        logImage(0);
+        logImage(1);
+        std::cerr << "L ";
+
+    }
+#endif
 
     // Send messages on outportals
     sendLinesOut();
@@ -185,8 +200,9 @@ void VisionModule::run_()
 }
 
 void VisionModule::logImage(int i) {
-    if (control::flags[control::tripoint]) {//} && 
-        //getenv("LOG_THIS") != NULL && getenv("LOG_THIS") == "true") {
+    std::string t = "true";
+
+    if (control::flags[control::tripoint]) {
         ++image_index;
         
         messages::YUVImage image;
@@ -290,20 +306,15 @@ void VisionModule::sendLinesOut()
                 messages::HoughLine pHough;
                 HoughLine& hough = line[k];
 
-                // Lines need not be polarized for localization and behaviors
-                if (hough.field().r() < 0) {
-                    pHough.set_r(-hough.field().r());
-                    pHough.set_t(diffRadians(hough.field().t(), 180));
-                    pHough.set_ep0(hough.field().ep0());
-                    pHough.set_ep1(hough.field().ep1());
+                pHough.set_r(hough.field().r());
+                pHough.set_t(hough.field().t());
+                pHough.set_ep0(hough.field().ep0());
+                pHough.set_ep1(hough.field().ep1());
+
+                if (hough.field().r() < 0)
                     pLine->mutable_outer()->CopyFrom(pHough);
-                } else {
-                    pHough.set_r(hough.field().r());
-                    pHough.set_t(hough.field().t());
-                    pHough.set_ep0(hough.field().ep0());
-                    pHough.set_ep1(hough.field().ep1());
+                else
                     pLine->mutable_inner()->CopyFrom(pHough);
-                }
             }
 
             pLine->set_id(static_cast<int>(line.id()));

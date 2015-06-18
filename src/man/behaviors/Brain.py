@@ -1,6 +1,7 @@
 import time
 import sys
 import math
+import os
 
 # Redirect standard error to standard out
 _stderr = sys.stderr
@@ -47,9 +48,6 @@ class Brain(object):
         """
         Class constructor
         """
-        # Testing env variable
-        print "EVAN HOYT"
-
         # Parse arguments
         self.playerNumber = playerNum
         self.teamNumber = teamNum
@@ -171,6 +169,11 @@ class Brain(object):
         # Flush the output
         sys.stdout.flush()
 
+        os.environ["LOG_THIS"] = 'false'
+        if (self.player.gameState == 'gamePlaying'):
+            os.environ["LOG_THIS"] = 'top'
+
+
 
     def updateComm(self):
         me = self.teamMembers[self.playerNumber - 1]
@@ -222,24 +225,23 @@ class Brain(object):
         """
         Update estimates of robot and ball positions on the field
         """
-        self.ball = self.interface.filteredBall
+        # self.ball = self.interface.filteredBall
+        # self.sharedBall = self.interface.sharedBall
+        # if (self.player.gameState == 'gameReady'
+        #     or self.player.gameState == 'gameSet'):
+        #     self.ball.x = Constants.CENTER_FIELD_X
+        #     self.ball.y = Constants.CENTER_FIELD_Y
 
-        self.sharedBall = self.interface.sharedBall
-        if (self.player.gameState == 'gameReady'
-            or self.player.gameState == 'gameSet'):
-            self.ball.x = Constants.CENTER_FIELD_X
-            self.ball.y = Constants.CENTER_FIELD_Y
-
-        self.yglp = self.interface.visionField.goal_post_l.visual_detection
-        self.ygrp = self.interface.visionField.goal_post_r.visual_detection
+        # self.yglp = self.interface.visionField.goal_post_l.visual_detection
+        # self.ygrp = self.interface.visionField.goal_post_r.visual_detection
 
     def updateObstacles(self):
         self.obstacles = [0.] * 9
-        size = self.interface.fieldObstacles.obstacle_size()
-        for i in range(size):
-            curr_obst = self.interface.fieldObstacles.obstacle(i)
-            if curr_obst.position is not curr_obst.position.NONE:
-                self.obstacles[int(curr_obst.position)] = curr_obst.distance
+        # size = self.interface.fieldObstacles.obstacle_size()
+        # for i in range(size):
+        #     curr_obst = self.interface.fieldObstacles.obstacle(i)
+        #     if curr_obst.position is not curr_obst.position.NONE:
+        #         self.obstacles[int(curr_obst.position)] = curr_obst.distance
 
     def activeTeamMates(self):
         activeMates = 0

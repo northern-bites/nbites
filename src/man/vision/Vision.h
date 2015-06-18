@@ -106,8 +106,14 @@ inline void unitVec(double x, double y, double& u, double& v)
   v = y / g;
 }
 
-std::string strPrintf(const char* format, ...);
+inline void translateRotate(double x, double y, double transX, double transY, 
+                            double rotation, double& xTransformed, double& yTransformed)
+{
+    xTransformed = transX + x*cos(rotation);
+    yTransformed = transY + y*cos(rotation);
+}
 
+std::string strPrintf(const char* format, ...);
 
 // ************
 // *          *
