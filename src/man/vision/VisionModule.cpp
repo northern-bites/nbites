@@ -166,15 +166,20 @@ void VisionModule::sendLinesOut()
                 messages::HoughLine pHough;
                 HoughLine& hough = line[k];
 
-                pHough.set_r(hough.field().r());
-                pHough.set_t(hough.field().t());
-                pHough.set_ep0(hough.field().ep0());
-                pHough.set_ep1(hough.field().ep1());
-
-                if (k == 0)
-                    pLine->mutable_first()->CopyFrom(pHough);
-                else
-                    pLine->mutable_second()->CopyFrom(pHough);
+                // Lines need not be polarized for localization and behaviors
+                if (hough.field().r() < 0) {
+                    pHough.set_r(-hough.field().r());
+                    pHough.set_t(diffRadians(hough.field().t(), 180));
+                    pHough.set_ep0(hough.field().ep0());
+                    pHough.set_ep1(hough.field().ep1());
+                    pLine->mutable_outer()->CopyFrom(pHough);
+                } else {
+                    pHough.set_r(hough.field().r());
+                    pHough.set_t(hough.field().t());
+                    pHough.set_ep0(hough.field().ep0());
+                    pHough.set_ep1(hough.field().ep1());
+                    pLine->mutable_inner()->CopyFrom(pHough);
+                }
             }
 
             pLine->set_id(static_cast<int>(line.id()));
