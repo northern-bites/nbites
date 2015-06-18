@@ -14,6 +14,12 @@ public class Field extends JPanel {
     public static final int goalBoxWidth = 100;
     
     public static final Color fieldColor = new Color(0, 143, 56);
+
+    public Field() {
+        this.setMinimumSize(fieldDimension);
+        this.setPreferredSize(fieldDimension);
+        this.setMaximumSize(fieldDimension);
+    }
     
     public void drawField(Graphics2D g2) {
     	//drawing the green field

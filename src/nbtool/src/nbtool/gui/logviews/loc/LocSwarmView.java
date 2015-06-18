@@ -1,33 +1,32 @@
 package nbtool.gui.logviews.loc;
 
+//imports
+	import java.awt.*;
+	import java.awt.geom.*;
+	import java.awt.event.*;
+	import javax.swing.*;
 
-import java.awt.*;
-import java.awt.geom.*;
-import java.awt.event.*;
-import javax.swing.*;
+	import java.io.ByteArrayInputStream;
+	import java.io.IOException;
+	import java.io.InputStream;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+	import com.google.protobuf.Message;
 
-import com.google.protobuf.Message;
+	import messages.RobotLocationOuterClass.*;
+	import messages.ParticleSwarmOuterClass.ParticleSwarm;
+	import messages.ParticleSwarmOuterClass.Particle;
+	import messages.Vision.*;
 
-import messages.RobotLocationOuterClass.*;
-import messages.ParticleSwarmOuterClass.ParticleSwarm;
-import messages.ParticleSwarmOuterClass.Particle;
-import messages.Vision.*;
-
-import nbtool.data.Log;
-import nbtool.data.SExpr;
-import nbtool.gui.logviews.misc.ViewParent;
+	import nbtool.data.Log;
+	import nbtool.data.SExpr;
+	import nbtool.gui.logviews.misc.ViewParent;
 
 public class LocSwarmView extends ViewParent implements ActionListener {
-
 	@Override
 	public void setLog(Log newlog) {
 		log = newlog;
-
 		naoParticles = initParticles(naoParticles);
+		naoLines = initLines(naoLines);
 
 		RobotLocation naoLoc;
 		ParticleSwarm naoSwarm;
@@ -49,8 +48,17 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 				naoParticles[i].moveTo(currentNaoSwarm.getX(),currentNaoSwarm.getY());
 			}
 
-			//naoFieldLines = FieldLines.parseFrom(log.bytesForContentItem(2));
-
+			naoFieldLines = FieldLines.parseFrom(log.bytesForContentItem(2));
+			for(int i=0; i<naoFieldLines.getLineCount(); i++) {
+				FieldLine curFieldLine = naoFieldLines.getLine(i);
+				naoLines[i].r = curFieldLine.getInner().getR();
+				naoLines[i].t = curFieldLine.getInner().getT();
+				naoLines[i].end0 = curFieldLine.getInner().getEp0();
+				naoLines[i].end1 = curFieldLine.getInner().getEp1();
+				naoLines[i].houghIndex = 0.0;
+				naoLines[i].fieldIndex = 0.0;
+			}
+			repaint(); //???????
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -67,12 +75,15 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 
 		//this.add(f);
 
-		sp = new JScrollPane(f);
+		sp = new JScrollPane();
+		sp.setBounds(0,0,800,600);
 		sp.setVisible(true);
-		sp.setPreferredSize(new Dimension(800,600));
+		sp.setViewportView(f);
 
 		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+		//sp.getViewport().add(f);
 
 		//this.add(sp);
 	}
@@ -98,6 +109,7 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 	Field f = new Field();
 	NaoRobot naoPlayer = new NaoRobot();
 	NaoParticle naoParticles[] = new NaoParticle[300];
+	GeoLine naoLines[] = new GeoLine[100];
 	private JButton flip;
 	private JScrollPane sp;
 	public static float pWeight;
@@ -114,6 +126,9 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 		for(int i=0; i<naoParticles.length; i++) {
 			naoParticles[i].drawParticle(g2,pWeight,shouldFlip);
 		}
+		for(int i=0; i<naoLines.length; i++) {
+			naoLines[i].draw(g2);
+		}
 	}
 
 	public NaoParticle[] initParticles(NaoParticle[] p) {
@@ -121,5 +136,11 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 			p[i] = new NaoParticle();
 		}
 		return p;
+	}
+	public GeoLine[] initLines(GeoLine[] g) {
+		for(int i=0; i<g.length; i++) {
+			g[i] = new GeoLine();
+		}
+		return g;
 	}
 }

@@ -8,6 +8,7 @@ import javax.swing.*;
 
 public class GeoLine {
 	double r,t,end0,end1,houghIndex,fieldIndex;
+	double ux, uy;
 
 	public GeoLine() {
 		r = 0;
@@ -16,6 +17,8 @@ public class GeoLine {
 		end1 = 0;
 		houghIndex = 0;
 		fieldIndex = 0;
+		ux = Math.cos(0);
+		uy = Math.sin(0);
 	}
 
 	public GeoLine(double line_r, double line_t, double line_end0, 
@@ -26,6 +29,8 @@ public class GeoLine {
 		end1 = line_end1;
 		houghIndex = line_houghInd;
 		fieldIndex = line_fieldInd;
+		ux = Math.cos(t);
+		uy = Math.sin(t);
 	}
 
 	public void draw(Graphics2D g2, BufferedImage origImg) {
@@ -61,4 +66,48 @@ public class GeoLine {
         				+ Integer.toString((int) fieldIndex), 
                         (int) xstring, (int) ystring);
 	}
+
+	public void draw(Graphics2D g2) {
+		int x,y;
+		float lineWidth = 5.0f;
+
+		g2.setStroke(new BasicStroke(lineWidth/2));
+
+		double x0 = 2*r*Math.cos(t);
+		double y0 = -2*r*Math.sin(t);
+
+		int x1 = (int) Math.round(x0 + 2*end0 * Math.sin(t));
+		int y1 = (int) Math.round(y0 + 2*end0 * Math.cos(t));
+        int x2 = (int) Math.round(x0 + 2*end1 * Math.sin(t));
+        int y2 = (int) Math.round(y0 + 2*end1 * Math.cos(t));
+
+        double scale = 0;
+        if (r > 0) {
+        	scale = 10;
+        } else { scale = 3; }
+
+        g2.drawLine(x1,y1,x2,y2);
+	}
+	/*
+	public void endPoints(Double[] epoints) {
+		double x0 = r*ux;
+		double y0 = r*uy;
+		epoints[0] = x0+end0*uy;
+		epoints[1] = y0-end0*ux;
+		epoints[2] = x0+end1*uy;
+		epoints[3] = y0-end1*ux;
+	}
+
+	public void translateRotate(double xTrans, double yTrans, double rotation) {
+		Double ep[] = new Double[4];
+		endPoints(ep);
+
+		Double ep1t[] = new Double[2];
+		Double ep2t[] = new Double[2];
+
+		translateRotate(ep[0],ep[1],xTrans,yTrans,rotation,ep1t);
+		translateRotate(ep[2],ep[3],xTrans,yTrans,rotation,ep2t);
+
+
+	} */
 }
