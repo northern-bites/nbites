@@ -6,6 +6,7 @@
 
 #include "Homography.h"
 #include "Hough.h"
+#include "NBMath.h"
 
 #include <iostream>
 
@@ -359,7 +360,7 @@ void GeoLine::translateRotate(double xTrans, double yTrans, double rotation)
     man::vision::translateRotate(x2, y2, xTrans, yTrans, rotation, x2t, y2t);
 
     // Calculate new t and unit vector
-    t(rotation + t());
+    t(uMod(rotation + t(), M_PI));
 
     // Dot product of point on line with new unit vector to find new r
     r(ux() * x1t + uy() * y1t);

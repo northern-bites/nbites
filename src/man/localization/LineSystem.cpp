@@ -46,8 +46,15 @@ double LineSystem::scoreObservation(const messages::FieldLine& observation,
 
     if (bestScore >= 1)
         std::cout << "NO MATCHING LINE FOUND, " << bestScore << std::endl;
-    else
-        std::cout << "BEST LINE, " << bestLine << std::endl;
+    else {
+        std::cout << "BEST LINE, " << lines[bestLine].print() << std::endl;
+        const messages::HoughLine& relRobotInner = observation.inner();
+        vision::GeoLine relLine;
+        relLine.set(relRobotInner.r(), relRobotInner.t(), relRobotInner.ep0(), relRobotInner.ep1());
+        std::cout << relLine.print() << std::endl;
+        std::cout << globalLine.print() << std::endl;
+        std::cout << "DONE\n";
+    }
 
     return bestScore;
 }
@@ -67,7 +74,8 @@ vision::GeoLine LineSystem::fromRelRobotToGlobal(const messages::FieldLine& relR
 
     vision::GeoLine globalLine;
     globalLine.set(relRobotInner.r(), relRobotInner.t(), relRobotInner.ep0(), relRobotInner.ep1());
-    globalLine.translateRotate(loc.x(), loc.y(), loc.h() - (M_PI / 2));
+    globalLine.translateRotate(0, 0, -(M_PI / 2));
+    globalLine.translateRotate(loc.x(), loc.y(), loc.h());
 
     return globalLine;
 }

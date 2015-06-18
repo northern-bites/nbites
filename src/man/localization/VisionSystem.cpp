@@ -39,8 +39,8 @@ bool VisionSystem::update(ParticleSet& particles,
         int numObsv = 0;
 
         for (int i = 0; i < lines.line_size(); i++) {
-            // Skip lines that are short, e.g. false positives found in center circle
-            if (lines.line(i).inner().ep1() - lines.line(i).inner().ep0() < 80)
+            // Skip lines that are short, often false positives found in center circle
+            if (lines.line(i).inner().ep1() - lines.line(i).inner().ep0() < 55)
                 continue;
 
             // Otherwise the line system should score the observation
