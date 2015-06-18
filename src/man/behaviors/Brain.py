@@ -47,6 +47,8 @@ class Brain(object):
         """
         Class constructor
         """
+        # Testing env variable
+        print "EVAN HOYT"
 
         # Parse arguments
         self.playerNumber = playerNum
@@ -141,7 +143,7 @@ class Brain(object):
         """
         # Update Environment
         self.time = time.time()
-
+        
         # Update objects
         self.updateVisionObjects()
         self.updateObstacles()
@@ -168,6 +170,7 @@ class Brain(object):
 
         # Flush the output
         sys.stdout.flush()
+
 
     def updateComm(self):
         me = self.teamMembers[self.playerNumber - 1]
@@ -220,6 +223,7 @@ class Brain(object):
         Update estimates of robot and ball positions on the field
         """
         self.ball = self.interface.filteredBall
+
         self.sharedBall = self.interface.sharedBall
         if (self.player.gameState == 'gameReady'
             or self.player.gameState == 'gameSet'):

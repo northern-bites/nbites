@@ -175,6 +175,9 @@ void BehaviorsModule::getBrainInstance ()
 
 void BehaviorsModule::run_ ()
 {
+    // Testing env variable
+    std::cout << "EVAN HOYT" << std::endl;
+
     PROF_ENTER(P_BEHAVIORS);
     static unsigned int num_crashed = 0;
     if (error_state && num_crashed < NUM_PYTHON_RESTARTS_MAX) {

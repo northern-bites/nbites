@@ -159,13 +159,17 @@ void VisionModule::run_()
         //times[i][5] = timer.end();
         
 #ifdef USE_LOGGING
-        logImage(i);
+       
+    logImage(i);
+        
 #endif
     }
 
     // Send messages on outportals
     sendLinesOut();
 
+
+    // Print the VisMod run times
     // for (int i = 0; i < 2; i++) {
     //     if (i == 0)
     //         std::cout << "From top camera:" << std::endl;
@@ -181,7 +185,8 @@ void VisionModule::run_()
 }
 
 void VisionModule::logImage(int i) {
-    if (control::flags[control::tripoint]) {
+    if (control::flags[control::tripoint]) {//} && 
+        //getenv("LOG_THIS") != NULL && getenv("LOG_THIS") == "true") {
         ++image_index;
         
         messages::YUVImage image;
