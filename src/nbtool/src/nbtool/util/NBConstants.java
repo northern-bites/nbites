@@ -16,6 +16,7 @@ import nbtool.gui.logviews.misc.DefaultView;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.logviews.misc.ImageConverterView;
 import nbtool.gui.logviews.proto.ProtoBufView;
+import nbtool.gui.logviews.loc.LocSwarmView;
 
 
 public class NBConstants {
@@ -71,6 +72,7 @@ public class NBConstants {
 		map.put("STATS", new Class[]{BotStatsView.class});
 		map.put(DEFAULT_S, new Class[]{DefaultView.class});
 		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
+		map.put("location", new Class[]{LocSwarmView.class});
 		
 		
 

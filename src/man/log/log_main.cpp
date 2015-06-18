@@ -190,8 +190,7 @@ namespace nblog {
                       control::flags[control::LOCALIZATION]),
                 SExpr("BALLTRACK", control::BALLTRACK,
                       control::flags[control::BALLTRACK]),
-                SExpr("IMAGES", control::IMAGES,
-                      control::flags[control::IMAGES]),
+                
                 SExpr("VISION", control::VISION,
                       control::flags[control::VISION]),
                 

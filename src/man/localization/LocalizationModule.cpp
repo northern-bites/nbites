@@ -2,13 +2,22 @@
 #include "Profiler.h"
 #include "RoboCupGameControlData.h"
 
+#include "DebugConfig.h"
+#include "../log/logging.h"
+#include "../control/control.h"
+#include "nbdebug.h"
+
+using nblog::SExpr;
+using nblog::NBLog;
+
 namespace man {
 namespace localization {
 
 LocalizationModule::LocalizationModule()
     : portals::Module(),
       output(base()),
-      particleOutput(base())
+      particleOutput(base()),
+      log_index(0)
 {
     particleFilter = new ParticleFilter();
     // TODO delete?
@@ -55,7 +64,9 @@ void LocalizationModule::update()
     // Update filter
     particleFilter->update(curOdometry, visionInput.message());
 
-    // Update outportals
+//this is part of something old that never executes, check out
+//the ifdef below; same code but it is executed when we want to
+//to log localization
 #if defined( LOG_LOCALIZATION) || defined(OFFLINE)
     portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->getCurrentSwarm());
     particleOutput.setMessage(swarmMessage);
@@ -63,6 +74,48 @@ void LocalizationModule::update()
 
     portals::Message<messages::RobotLocation> locMessage(&particleFilter->getCurrentEstimate());
     output.setMessage(locMessage);
+
+#ifdef USE_LOGGING
+    if(control::flags[control::LOCALIZATION]) {
+        ++log_index;
+        std::string log_from = "loc";
+
+        portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
+                                                           getCurrentSwarm());
+        particleOutput.setMessage(swarmMessage);
+
+        messages::RobotLocation rl = *output.getMessage(true).get();
+        messages::ParticleSwarm ps = *particleOutput.getMessage(true).get();
+        messages::FieldLines fl = *visionInput.getMessage(true).get();
+
+        std::string rl_buf;
+        std::string ps_buf;
+        std::string fl_buf;
+        std::string log_buf;
+
+        rl.SerializeToString(&rl_buf);
+        ps.SerializeToString(&ps_buf);
+        fl.SerializeToString(&fl_buf);
+
+        log_buf.append(rl_buf);
+        log_buf.append(ps_buf);
+        log_buf.append(fl_buf);
+
+        std::vector<SExpr> contents;
+
+        SExpr naoLocation("location", log_from, clock(), log_index, rl_buf.length());
+        contents.push_back(naoLocation);
+
+        SExpr naoSwarm("swarm",log_from,clock(),log_index,ps_buf.length());
+        contents.push_back(naoSwarm);
+
+        SExpr naoFieldLines("fieldlines",log_from,clocl(),log_index,fl_buf.length());
+        contents.push_back(naoFieldLines);
+
+        NBLog(NBL_SMALL_BUFFER,"LOCSWARM",contents,log_buf);
+    }
+#endif
+
 }
 
 void LocalizationModule::run_()

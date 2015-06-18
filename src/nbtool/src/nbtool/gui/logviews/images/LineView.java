@@ -1,6 +1,7 @@
 package nbtool.gui.logviews.images;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -32,6 +33,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
 	BufferedImage originalImage;
 	BufferedImage edgeImage;
     Vector<Double> lines;
+    Vector<GeoLine> geoLines;
 
 	@Override
 	public void setLog(Log newlog) {
@@ -49,45 +51,14 @@ public class LineView extends ViewParent implements IOFirstResponder {
 	}
 	
 	public void paintComponent(Graphics g) {
+		Graphics2D g2 = (Graphics2D) g;
 		if (edgeImage != null) {
 			g.drawImage(originalImage, 0, 0, displayw, displayh, null);
 			g.drawImage(edgeImage, 0, 480, displayw, displayh, null);
 
-            for (int i = 0; i < lines.size(); i += 6) {
-                double r = lines.get(i);
-                double t = lines.get(i + 1);
-                double end0 = lines.get(i + 2);
-                double end1 = lines.get(i + 3);
-                double houghIndex = lines.get(i + 4);
-                double fieldIndex = lines.get(i + 5);
-
-                if (fieldIndex == -1)
-                    g.setColor(Color.blue);
-                else
-                    g.setColor(Color.red);
-
-                double x0 = 2*r * Math.cos(t) + originalImage.getWidth() / 2;
-                double y0 = -2*r * Math.sin(t) + originalImage.getHeight() / 2;
-                int x1 = (int) Math.round(x0 + 2*end0 * Math.sin(t));
-                int y1 = (int) Math.round(y0 + 2*end0 * Math.cos(t));
-                int x2 = (int) Math.round(x0 + 2*end1 * Math.sin(t));
-                int y2 = (int) Math.round(y0 + 2*end1 * Math.cos(t));
-
-                double xstring = (x1 + x2) / 2;
-                double ystring = (y1 + y2) / 2;
-
-                double scale = 0;
-                if (r > 0)
-                    scale = 10;
-                else
-                    scale = 3;
-                xstring += scale*Math.cos(t);
-                ystring += scale*Math.sin(t);
-
-                g.drawLine(x1, y1, x2, y2);
-                g.drawString(Integer.toString((int) houghIndex) + "/" + Integer.toString((int) fieldIndex), 
-                             (int) xstring, 
-                             (int) ystring);
+            for (int i = 0; i < geoLines.size(); i++) {
+            	GeoLine tempGeoLine = geoLines.get(i);
+                tempGeoLine.draw(g2,originalImage);
             }
         }
     }
@@ -95,7 +66,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
 	public LineView() {
 		super();
 		setLayout(null);
-        lines = new Vector<Double>();
+        geoLines = new Vector<GeoLine>();
 	}
 
 	@Override
@@ -113,13 +84,16 @@ public class LineView extends ViewParent implements IOFirstResponder {
         Logger.logf(Logger.INFO, "%d field lines expected.", numLines);
 		try {
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(lineBytes));
+			
 			for (int i = 0; i < numLines; ++i) {
-                lines.add(dis.readDouble()); // r
-                lines.add(dis.readDouble()); // t
-                lines.add(dis.readDouble()); // ep0
-                lines.add(dis.readDouble()); // ep1
-                lines.add((double)dis.readInt()); // hough index
-                lines.add((double)dis.readInt()); // fieldline index
+				GeoLine tempLine = new GeoLine();
+				tempLine.r = dis.readDouble();
+				tempLine.t = dis.readDouble();
+				tempLine.end0 = dis.readDouble();
+				tempLine.end1 = dis.readDouble();
+				tempLine.houghIndex = (double)dis.readInt();
+				tempLine.fieldIndex = (double)dis.readInt();
+                geoLines.add(tempLine);
             }
 		} catch (Exception e) {
 			Logger.logf(Logger.ERROR, "Conversion from bytes to hough lines in LineView failed.");
