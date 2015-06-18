@@ -1,7 +1,6 @@
 import time
 import sys
 import math
-import os
 
 # Redirect standard error to standard out
 _stderr = sys.stderr

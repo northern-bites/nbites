@@ -446,52 +446,32 @@ CAL_PAN_TIME = 1.0
 CAL_TOP_PITCH = 26.0
 CAL_BOTTOM_PITCH = -20.0
 
-CALIBRATION_TOP_PAN = (( ((0.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES),
-                           ((-6.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES) ),
+CALIBRATION_TOP_PAN = ( ( ((-6.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
                         
-                        ( ((-6.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES),
-                           ((-4.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES) ),
+                        ( ((-4.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
 
-                        ( ((-4.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES),
-                           ((-2.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES) ),
+                        ( ((-2.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
 
-                        ( ((-2.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES),
-                           ((0.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES) ),
+                        ( ((0.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
 
-                        ( ((0.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES),
-                           ((2.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES) ),
+                        ( ((2.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
 
-                        ( ((2.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES),
-                           ((4.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES) ),
+                        ( ((4.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
 
-                        ( ((4.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES),
-                           ((6.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES) ),
+                        ( ((6.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
+                    )
 
-                        ( ((6.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES),
-                           ((8.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES) ),
-                        )
-
-CALIBRATION_BOTTOM_PAN = (( ((0.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES),
-                           ((-6.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES) ),
+CALIBRATION_BOTTOM_PAN = ( ( ((-6.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
                         
-                        ( ((-6.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES),
-                           ((-4.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES) ),
+                           ( ((-4.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
 
-                        ( ((-4.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES),
-                           ((-2.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES) ),
+                           ( ((-2.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
 
-                        ( ((-2.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES),
-                           ((0.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES) ),
+                           ( ((0.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
 
-                        ( ((0.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES),
-                           ((2.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES) ),
+                           ( ((2.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
 
-                        ( ((2.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES),
-                           ((4.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES) ),
+                           ( ((4.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
 
-                        ( ((4.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES),
-                           ((6.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES) ),
-
-                        ( ((6.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES),
-                           ((8.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES) ),
+                           ( ((6.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
                         )
