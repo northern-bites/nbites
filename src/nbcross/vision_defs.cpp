@@ -254,9 +254,6 @@ int Vision_func() {
         double fcEP0 = line.field().ep0();
         double fcEP1 = line.field().ep1();
         
-        std::cout << "icR, icT: " << icR << ", " << icT << std::endl;
-        std::cout << "fcR, fcT: " << fcR << ", " << fcT << std::endl << std::endl;
-
         // Java uses big endian representation
         endswap<double>(&icR);
         endswap<double>(&icT);
