@@ -26,11 +26,11 @@ def tracking(tracker):
     #     tracker.brain.sharedBall.reliability >= 2 and tracker.counter > 15):
     #     return tracker.goLater('altTrackSharedBallAndPan')
 
-    # if not tracker.target.vis.on and tracker.counter > 15:
-    #     if DEBUG : tracker.printf("Missing object this frame",'cyan')
-    #     if (tracker.target.vis.frames_off >
-    #         constants.TRACKER_FRAMES_OFF_REFIND_THRESH):
-    return tracker.goLater('fullPan')
+    if not tracker.target.vis.on and tracker.counter > 15:
+        if DEBUG : tracker.printf("Missing object this frame",'cyan')
+        if (tracker.target.vis.frames_off >
+            constants.TRACKER_FRAMES_OFF_REFIND_THRESH):
+            return tracker.goLater('fullPan')
 
     return tracker.stay()
 
@@ -190,13 +190,13 @@ def fullPan(tracker):
         # Repeat the pan
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
 
-    # if not isinstance(tracker.target, BallModel.messages.FilteredBall):
-    #     if tracker.target.on:
-    #         return tracker.goLater('trackingFieldObject')
+    if not isinstance(tracker.target, BallModel.messages.FilteredBall):
+        if tracker.target.on:
+            return tracker.goLater('trackingFieldObject')
 
-    # if (isinstance(tracker.target, BallModel.messages.FilteredBall) and
-    #     tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH):
-    #     return tracker.goLater('tracking')
+    if (isinstance(tracker.target, BallModel.messages.FilteredBall) and
+        tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH):
+        return tracker.goLater('tracking')
 
     return tracker.stay()
 
