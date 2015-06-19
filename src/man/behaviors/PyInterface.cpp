@@ -27,10 +27,10 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::gameState_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
-        // .add_property("loc",
-        //               make_getter(&PyInterface::loc_ptr,
-        //                           return_value_policy
-        //                           <reference_existing_object>()))
+        .add_property("loc",
+                      make_getter(&PyInterface::loc_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
         // .add_property("visionRobot",
         //               make_getter(&PyInterface::visionRobot_ptr,
         //                           return_value_policy

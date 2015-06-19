@@ -150,11 +150,8 @@ class Brain(object):
         # self.updateVisionObjects()
         # self.updateObstacles()
         self.updateMotion()
-        # self.updateLoc()
+        self.updateLoc()
         self.getCommUpdate()
-
-        # HACK stuff to make stuff work w/o ball or loc or old vision inputs
-        self.loc = RobotLocation(0.0, 0.0, 0.0)
 
         # Behavior stuff
         # Order here is very important
