@@ -175,7 +175,7 @@ void VisionModule::sendLinesOut()
         for (int j = 0; j < fieldLines[i]->size(); j++) {
             messages::FieldLine* pLine = pLines.add_line();
             FieldLine& line = (*(fieldLines[i]))[j];
-            if (line.repeat()) { std::cout << "TEST\n"; continue; }
+            if (line.repeat()) continue;
 
             for (int k = 0; k < 2; k++) {
                 messages::HoughLine pHough;
