@@ -1,3 +1,4 @@
+
 // ********************************
 // *                              *
 // *  Perspective Transformation  *
@@ -6,8 +7,6 @@
 
 #include "Homography.h"
 #include "Hough.h"
-
-#include <iostream>
 
 using namespace std;
 
@@ -274,6 +273,49 @@ bool FieldHomography::visualTiltParallel(const GeoLine& a, const GeoLine& b,
   return ok;
 }
 
+bool FieldHomography::calibrateFromStar(const FieldLineList& lines)
+{
+  StarCal sc(*this);
+  if (sc.add(lines))
+  {
+    roll(sc.roll());
+    tilt(sc.tilt());
+    return true;
+  }
+  return false;
+}
+
+// *****************************
+// *                           *
+// *  Star Target Calibration  *
+// *                           *
+// *****************************
+
+bool StarCal::add(const FieldLineList& lines)
+{
+  for (int i = 0; i < lines.size(); ++i)
+  {
+    double vpx, vpy;
+    if (lines[i][0].intersect(lines[i][1], vpx, vpy) && fabs(lines[i][0].ux()) > 0.3)
+      fit.add(vpx - ix0, vpy - iy0);  // relative to optical axis
+  }
+
+  // If we didn't find exactly three suitable field lines, fail
+  return fit.area() == 3;
+}
+
+double StarCal::roll()
+{
+  return sMod(fit.firstPrincipalAngle(), M_PI);
+}
+
+double StarCal::tilt()
+{
+  double imageDistanceToHorizon
+    = fit.secondPrinciaplAxisU() * fit.centerX() + fit.secondPrinciaplAxisV() * fit.centerY();
+  return (M_PI / 2) - atan(imageDistanceToHorizon / f);
+}
+
 // ********************
 // *                  *
 // *  Geometric Line  *
@@ -332,42 +374,6 @@ double GeoLine::separation(const GeoLine& other) const
   return pDist(x0, y0) + other.pDist(x0, y0);
 }
 
-double GeoLine::error(const GeoLine& other) const
-{
-  double rDiff = fabs(r() - other.r());
-  double tDiff = diffRadians(t(), other.t());
-
-  // TODO load params from LineSystem
-  FuzzyThr rThr(0, 150);
-  FuzzyThr tThr(0, M_PI / 4);
-
-  Fool rError(rThr, rDiff);
-  Fool tError(tThr, tDiff);
-
-  return (rError & tError).f();
-}
-
-void GeoLine::translateRotate(double xTrans, double yTrans, double rotation)
-{
-    // Find point on line pre-transformation (use endpoints)
-    double x1, y1, x2, y2;
-    endPoints(x1, y1, x2, y2);
-
-    // Translate and rotate
-    double x1t, y1t, x2t, y2t;
-    man::vision::translateRotate(x1, y1, xTrans, yTrans, rotation, x1t, y1t);
-    man::vision::translateRotate(x2, y2, xTrans, yTrans, rotation, x2t, y2t);
-
-    // Calculate new t and unit vector
-    t(rotation + t());
-
-    // Dot product of point on line with new unit vector to find new r
-    r(ux() * x1t + uy() * y1t);
-
-    // Set endpoints
-    setEndPoints(qDist(x1t, y1t), qDist(x2t, y2t));
-}
-
 void GeoLine::imageToField(const FieldHomography& h)
 {
   // Get field coordinates of the line origin (any point on the line will do),
@@ -397,16 +403,20 @@ void GeoLine::imageToField(const FieldHomography& h)
   setEndPoints(qDist(x1, y1), qDist(x2, y2));
 }
 
-string GeoLine::print() const
+string GeoLine::print(bool pretty) const
 {
-  return strPrintf("%7.1f, %7.1f, %7.1f, %7.1f, %7.1f, %7.1f", r(), t()*(180 / M_PI), ep0(), ep1(), ux(), uy());
+  if (pretty)
+    return strPrintf("%8.2f,%7.2f  [%7.1f .. %7.1f]",
+                           r(), t() * (180 / M_PI), ep0(), ep1());
+  else
+    return strPrintf("%.8g %.8g %.8g %.8g", r(), t(), ep0(), ep1());
 }
 
-// ****************************
-// *                           
-// *  Synthetic RoboCup Field  
-// *                           
-// ****************************
+// *****************************
+// *                           *
+// *  Synthetic RoboCup Field  *
+// *                           *
+// *****************************
 
 void syntheticField(YuvLite& img, FieldHomography fh)
 {

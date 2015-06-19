@@ -312,6 +312,13 @@ int Vision_func() {
     return 0;
 }
 
+int CameraCalibration_func() {
+    printf("CameraCalibrate_func()\n");
+    printf("Received %d logs", args.size());
+
+
+}
+
 
 int Synthetics_func() {
     assert(args.size() == 1);

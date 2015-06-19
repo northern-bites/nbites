@@ -45,7 +45,7 @@ class FieldHomography
   void compute() const { ((FieldHomography*)this)->compute(); }
 
 public:
-  // Construct with default values
+  // Construct with default values;
   FieldHomography(bool topCamera = true);
 
   // Image coordinates of optical axis, relative to the center of the image
@@ -111,6 +111,51 @@ public:
   // Same as above, but for lines known to be parallel in world coordinates.
   bool visualTiltParallel(const GeoLine& a, const GeoLine& b, double& tilt,
                           std::string* diagnostics) const;
+
+  // Calibrate tilt and roll using "star target". If successful returns true and
+  // updates tilt and roll.
+  bool calibrateFromStar(const FieldLineList& lines);
+};
+
+// *****************************
+// *                           *
+// *  Star Target Calibration  *
+// *                           *
+// *****************************
+//
+// Calibrate roll and tilt from one or more field line lists, each derived from
+// an image of the star target.
+//
+// The two paired image lines of a field line are parallel. Their intersection
+// is on the horizon. The horizontal leg of the star target has its intersection
+// too far away to be useful (maybe infinitely far). Find the other three points
+// and fit a line. A field line list is ignored if all three field lines are not
+// present 
+
+// The roll is the angle of the horizon, in the range [-PI/2 .. PI/2)
+
+// The tilt is calculated from the distance from the optical axis to the horizon. That
+// distance is the dot product of the unit vector normal to the line with a vector
+// to any point on the line. The center of mass is on the line.
+
+class StarCal
+{
+  double ix0, iy0;   // optical axis relative to center of image
+  double f;          // focal length
+
+  LineFit fit;
+
+public:
+  StarCal(const FieldHomography& fh) : ix0(fh.ix0()), iy0(fh.iy0()), f(fh.flen()) {}
+
+  void clear() { fit.clear(); }
+
+  // Add another set of field lines from a star target image.
+  bool add(const FieldLineList&);
+
+  // Returns the roll and tilt from the field lines seen so far.
+  double tilt();
+  double roll();
 };
 
 // ********************
@@ -219,14 +264,6 @@ public:
   // otherwise. 
   double separation(const GeoLine& other) const;
 
-  // Assuming this and other should be the same line, calculate the error.
-  // NOTE used in particle filter.
-  double error(const GeoLine& other) const;
-
-  // Translation rotation of line in plane. 
-  // NOTE used in particle filter.
-  void translateRotate(double xTrans, double yTrans, double rotation);
-
   // Map this image line to what we would see if roll were 0 and the optical axis
   // was at the center of the image
   void correctRollAndAxis(const FieldHomography&);
@@ -234,7 +271,9 @@ public:
   // Map this image line to field coordinates.  Preserve polarity and endpoints.
   void imageToField(const FieldHomography&);
 
-  std::string print() const;
+  // "pretty" is for human consumption. Not pretty is for a high-precision string
+  // that is easy to parse by another computer program, e.g. C#
+  std::string print(bool pretty = false) const;
 };
 
 // *****************************
