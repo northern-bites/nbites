@@ -30,7 +30,7 @@ VisionModule::VisionModule(int wd, int ht)
     sexpPath = std::string(getenv("NBITES_DIR"));
     sexpPath += "/src/man/config/colorParams.txt";
 #else
-    sexpPath = "/home/nao/nbites/Config"; // TODO check this
+    sexpPath = "/home/nao/nbites/Config/colorParams.txt"; // TODO check this
 #endif
     std::ifstream textFile;
     textFile.open(sexpPath.c_str());
@@ -111,9 +111,9 @@ void VisionModule::run_()
                                                     &bottomIn.message() };
 
     // Time vision module
-    // double topTimes[6];
-    // double bottomTimes[6];
-    // double* times[2] = { topTimes, bottomTimes };
+    double topTimes[6];
+    double bottomTimes[6];
+    double* times[2] = { topTimes, bottomTimes };
 
     bool ballDetected = false;
 
@@ -128,7 +128,7 @@ void VisionModule::run_()
                         image->rowPitch(),
                         image->pixelAddress(0, 0));
 
-        // HighResTimer timer;
+        HighResTimer timer;
 
         // Run front end
         frontEnd[i]->run(yuvLite, colorParams[i]);
@@ -136,7 +136,7 @@ void VisionModule::run_()
         ImageLiteU8 greenImage(frontEnd[i]->greenImage());
         ImageLiteU8 orangeImage(frontEnd[i]->orangeImage());
 
-        // times[i][0] = timer.end();
+        times[i][0] = timer.end();
 
         // Calculate kinematics and adjust homography
         if (jointsIn.message().has_head_yaw()) {
@@ -151,34 +151,34 @@ void VisionModule::run_()
         // Approximate brightness gradient
         edgeDetector[i]->gradient(yImage);
         
-        // times[i][1] = timer.end();
+        times[i][1] = timer.end();
 
         // Run edge detection
         edgeDetector[i]->edgeDetect(greenImage, *(edges[i]));
 
-        // times[i][2] = timer.end();
+        times[i][2] = timer.end();
 
         // Run hough line detection
         hough[i]->run(*(edges[i]), *(houghLines[i]));
 
-        // times[i][3] = timer.end();
+        times[i][3] = timer.end();
 
         // Find field lines
         houghLines[i]->mapToField(*(homography[i]));
         fieldLines[i]->find(*(houghLines[i]));
 
-        // times[i][4] = timer.end();
+        times[i][4] = timer.end();
 
         // Classify field lines
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
 
-        //times[i][5] = timer.end();
+        times[i][5] = timer.end();
 
         if (!ballDetected) {
             ballDetected = ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
         }
 
-        // times[i][6] = timer.end();
+        times[i][6] = timer.end();
     }
 
     ballOn = ballDetected;
@@ -187,20 +187,19 @@ void VisionModule::run_()
     sendLinesOut();
     updateVisionBall();
 
-    // for (int i = 0; i < 2; i++) {
-    //     break;
-    //     if (i == 0)
-    //         std::cout << "From top camera:" << std::endl;
-    //     else
-    //         std::cout << std::endl << "From bottom camera:" << std::endl;
-    //     std::cout << "Front end: " << times[i][0] << std::endl;
-    //     std::cout << "Gradient: " << times[i][1] << std::endl;
-    //     std::cout << "Edge detection: " << times[i][2] << std::endl;
-    //     std::cout << "Hough: " << times[i][3] << std::endl;
-    //     std::cout << "Field lines detection: " << times[i][4] << std::endl;
-    //     std::cout << "Field lines classification: " << times[i][5] << std::endl;
-    //     std::cout << "Ball: " << times[i][6] << std::endl;
-    // }
+    for (int i = 0; i < 2; i++) {
+        if (i == 0)
+            std::cout << "From top camera:" << std::endl;
+        else
+            std::cout << std::endl << "From bottom camera:" << std::endl;
+        std::cout << "Front end: " << times[i][0] << std::endl;
+        std::cout << "Gradient: " << times[i][1] << std::endl;
+        std::cout << "Edge detection: " << times[i][2] << std::endl;
+        std::cout << "Hough: " << times[i][3] << std::endl;
+        std::cout << "Field lines detection: " << times[i][4] << std::endl;
+        std::cout << "Field lines classification: " << times[i][5] << std::endl;
+        std::cout << "Ball: " << times[i][6] << std::endl;
+    }
 }
 
 /*
