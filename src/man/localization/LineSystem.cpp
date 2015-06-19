@@ -45,7 +45,7 @@ double LineSystem::scoreObservation(const messages::FieldLine& observation,
         }
     }
 
-    return bestScore;
+    return (1 / globalLine.r()) * bestScore;
 }
 
 void LineSystem::projectOntoField(messages::FieldLine& observation,
