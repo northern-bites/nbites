@@ -65,6 +65,7 @@ public:
     // For tool
 #ifdef OFFLINE
     const std::vector<Ball>& getBalls() const { return candidates; }
+    Connectivity* getBlobber() { return &blobber; }
 #endif
 private:
     Connectivity blobber;

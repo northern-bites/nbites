@@ -304,12 +304,20 @@ int Vision_func() {
 
     Log* ballRet = new Log();
     std::vector<man::vision::Ball> balls = detector->getBalls();
+    std::list<man::vision::Blob> blobs = detector->getBlobber()->blobs;
 
     SExpr allBalls;
     int count=0;
     for (auto i=balls.begin(); i!=balls.end(); i++) {
         SExpr ballTree = treeFromBall(*i);
         SExpr next = SExpr::keyValue("ball" + std::to_string(count), ballTree);
+        allBalls.append(next);
+        count++;
+    }
+    count = 0;
+    for (auto i=blobs.begin(); i!=blobs.end(); i++) {
+        SExpr blobTree = treeFromBlob(*i);
+        SExpr next = SExpr::keyValue("blob" + std::to_string(count), blobTree);
         allBalls.append(next);
         count++;
     }

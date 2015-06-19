@@ -4,6 +4,8 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 
@@ -55,8 +57,30 @@ public class BallView extends ViewParent implements IOFirstResponder {
         if (orange == null) return;
         Graphics2D graph = orange.createGraphics();
         graph.setColor(Color.RED);
+        String b = "blob";
 
-        String b = "ball";
+        for (int i=0; ; i++)
+        {
+            SExpr tree = balls.tree();
+            SExpr bl = tree.find(b+i);
+            if (!bl.exists()) { 
+                break;
+            }
+
+            SExpr blob = bl.get(1);
+            drawBlob(graph, blob);
+            //SExpr loc = blob.find("center").get(1);
+
+            //int x = (int) Math.round(loc.get(0).valueAsDouble());
+            //int y = (int) Math.round(loc.get(1).valueAsDouble());
+            //double len1 = blob.find("len1").get(1).valueAsDouble();
+            //double len2 = blob.find("len2").get(1).valueAsDouble();
+        }
+
+
+        graph.setColor(Color.GREEN);
+
+        b = "ball";
 
         for(int i=0; ;i++)
         {
@@ -67,27 +91,54 @@ public class BallView extends ViewParent implements IOFirstResponder {
             }
             SExpr blob = ball.get(1).find("blob").get(1);
             double diam = ball.get(1). find("expectedDiam").get(1).valueAsDouble();
+            //drawBlob(graph, blob);
             SExpr loc = blob.find("center").get(1);
 
             int x = (int) Math.round(loc.get(0).valueAsDouble());
             int y = (int) Math.round(loc.get(1).valueAsDouble());
 
-            double len1 = blob.find("len1").get(1).valueAsDouble();
-            double len2 = blob.find("len2").get(1).valueAsDouble();
-            double ang1 = blob.find("ang1").get(1).valueAsDouble();
-            double ang2 = blob.find("ang2").get(1).valueAsDouble();
+            //double len1 = blob.find("len1").get(1).valueAsDouble();
+            //double len2 = blob.find("len2").get(1).valueAsDouble();
+            //double ang1 = blob.find("ang1").get(1).valueAsDouble();
+            //double ang2 = blob.find("ang2").get(1).valueAsDouble();
 
-            int firstXOff = (int)Math.round(len1 * Math.cos(ang1));
-            int firstYOff = (int)Math.round(len1 * Math.sin(ang1));
-            int secondXOff = (int)Math.round(len2 * Math.cos(ang2));
-            int secondYOff = (int)Math.round(len2 * Math.sin(ang2));
+            //int firstXOff = (int)Math.round(len1 * Math.cos(ang1));
+            //int firstYOff = (int)Math.round(len1 * Math.sin(ang1));
+            //int secondXOff = (int)Math.round(len2 * Math.cos(ang2));
+            //int secondYOff = (int)Math.round(len2 * Math.sin(ang2));
 
-            graph.drawLine(x - firstXOff, y - firstYOff,
-                           x + firstXOff, y + firstYOff);
-            graph.drawLine(x - secondXOff, y - secondYOff,
-                           x + secondXOff, y + secondYOff);
+            //graph.drawLine(x - firstXOff, y - firstYOff,
+                           //x + firstXOff, y + firstYOff);
+            //graph.drawLine(x - secondXOff, y - secondYOff,
+                           //x + secondXOff, y + secondYOff);
             graph.draw(new Ellipse2D.Double(x - diam/2, y - diam/2, diam, diam));
         }
+    }
+
+    private void drawBlob(Graphics2D g, SExpr blob)
+    {
+        SExpr loc = blob.find("center").get(1);
+
+        int x = (int) Math.round(loc.get(0).valueAsDouble());
+        int y = (int) Math.round(loc.get(1).valueAsDouble());
+
+        double len1 = blob.find("len1").get(1).valueAsDouble();
+        double len2 = blob.find("len2").get(1).valueAsDouble();
+        double ang1 = blob.find("ang1").get(1).valueAsDouble();
+        double ang2 = blob.find("ang2").get(1).valueAsDouble();
+
+        int firstXOff = (int)Math.round(len1 * Math.cos(ang1));
+        int firstYOff = (int)Math.round(len1 * Math.sin(ang1));
+        int secondXOff = (int)Math.round(len2 * Math.cos(ang2));
+        int secondYOff = (int)Math.round(len2 * Math.sin(ang2));
+
+        g.drawLine(x - firstXOff, y - firstYOff,
+                       x + firstXOff, y + firstYOff);
+        g.drawLine(x - secondXOff, y - secondYOff,
+                       x + secondXOff, y + secondYOff);
+        Ellipse2D.Double ellipse = new Ellipse2D.Double(x-len1, y-len2, len1*2, len2*2);
+        Shape rotated = (AffineTransform.getRotateInstance(ang1, x, y).createTransformedShape(ellipse));
+        g.draw(rotated);
     }
 
     @Override
