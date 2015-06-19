@@ -16,18 +16,24 @@
 namespace man {
 namespace localization {
 
-// HIGH PRIORITY
-// TODO LocLineID
-//
-// LOW PRIORITY
-// TODO refactor Vision.pb.h
-// TODO add side goalbox lines
+// TODO rename LineID as VisionLineID
+enum class LocLineID {
+    NotMatched,
+    OurEndline,
+    TheirEndline,
+    Midline,
+    OurTopGoalbox,
+    TheirTopGoalbox,
+    RightSideline,
+    LeftSideline
+};
+
 class LineSystem {
 public:
     LineSystem();
     ~LineSystem();
 
-    // LocLineID matchObservation(const messages::FieldLine& observation, const messages::RobotLocation& loc);
+    LocLineID matchObservation(const messages::FieldLine& observation, const messages::RobotLocation& loc);
     double scoreObservation(const messages::FieldLine& observation, const messages::RobotLocation& loc);
     // messages::RobotLocation constructPosition(const messages::FieldLine& observation, const messages::RobotLocation& loc);
 
@@ -35,9 +41,9 @@ public:
     static bool shouldUse(const messages::FieldLine& observation); 
 
 private:
-    void addLine(float r, float t, float ep0, float ep1);
+    void addLine(LocLineID id, float r, float t, float ep0, float ep1);
 
-    std::vector<vision::GeoLine> lines;
+    std::map<LocLineID, vision::GeoLine> lines;
 };
 
 } // namespace localization

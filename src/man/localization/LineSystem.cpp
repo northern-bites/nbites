@@ -6,39 +6,60 @@ namespace man {
 namespace localization {
 
 LineSystem::LineSystem() 
+    : lines()
 {
     // Add endlines
-    addLine(GREEN_PAD_X, 0, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
-    addLine(GREEN_PAD_X + FIELD_WHITE_WIDTH, 0, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
+    addLine(LocLineID::OurEndline, GREEN_PAD_X, 0, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
+    addLine(LocLineID::TheirEndline, GREEN_PAD_X + FIELD_WHITE_WIDTH, 0, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
 
     // Add the midline
-    addLine(CENTER_FIELD_X, 0, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
+    addLine(LocLineID::Midline, CENTER_FIELD_X, 0, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
 
     // Add top goalbox lines
-    addLine(GREEN_PAD_X + GOALBOX_DEPTH , 0, BLUE_GOALBOX_BOTTOM_Y, BLUE_GOALBOX_TOP_Y);
-    addLine(GREEN_PAD_X + GOALBOX_DEPTH , 0, YELLOW_GOALBOX_BOTTOM_Y, YELLOW_GOALBOX_TOP_Y);
+    addLine(LocLineID::OurTopGoalbox, GREEN_PAD_X + GOALBOX_DEPTH , 0, BLUE_GOALBOX_BOTTOM_Y, BLUE_GOALBOX_TOP_Y);
+    addLine(LocLineID::TheirTopGoalbox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH , 0, YELLOW_GOALBOX_BOTTOM_Y, YELLOW_GOALBOX_TOP_Y);
 
     // Add sidelines
-    addLine(GREEN_PAD_Y, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
-    addLine(GREEN_PAD_Y + FIELD_WHITE_HEIGHT, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
+    addLine(LocLineID::RightSideline, GREEN_PAD_Y, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
+    addLine(LocLineID::LeftSideline, GREEN_PAD_Y + FIELD_WHITE_HEIGHT, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
 }
 
 LineSystem::~LineSystem() {}
+
+// TODO check line overlap
+LocLineID LineSystem::matchObservation(const messages::FieldLine& observation, 
+                                       const messages::RobotLocation& loc)
+{
+    vision::GeoLine globalLine = LineSystem::relRobotToAbsolute(observation, loc);
+
+    LocLineID id = LocLineID::NotMatched;
+    double bestScore = std::numeric_limits<double>::max();
+
+    for (auto it = lines.begin(); it != lines.end(); it++) {
+        double curScore = it->second.error(globalLine);
+        if (curScore < bestScore) {
+            id = it->first;
+            bestScore = curScore;
+        }
+    }
+
+    return id;
+}
 
 double LineSystem::scoreObservation(const messages::FieldLine& observation,
                                     const messages::RobotLocation& loc)
 {
     vision::GeoLine globalLine = LineSystem::relRobotToAbsolute(observation, loc);
 
-    double bestScore = std::numeric_limits<double>::max();
-    for (int i = 0; i < lines.size(); i++) {
-        double curScore = lines[i].error(globalLine);
-        if (curScore < bestScore)
-            bestScore = curScore;
-    }
+    double errorBetweenObservationAndModel;
+    LocLineID id = matchObservation(observation, loc);
+    if (id == LocLineID::NotMatched)
+        errorBetweenObservationAndModel = 1;
+    else
+        errorBetweenObservationAndModel = lines[id].error(globalLine);
 
     double r = observation.inner().r();
-    return (1 / r) * bestScore;
+    return (1 / r) * errorBetweenObservationAndModel;
 }
 
 vision::GeoLine LineSystem::relRobotToAbsolute(const messages::FieldLine& observation,
@@ -54,6 +75,7 @@ vision::GeoLine LineSystem::relRobotToAbsolute(const messages::FieldLine& observ
     return globalLine;
 }
 
+// TODO parameters
 bool LineSystem::shouldUse(const messages::FieldLine& observation)
 {
     const messages::HoughLine& inner = observation.inner();
@@ -61,11 +83,11 @@ bool LineSystem::shouldUse(const messages::FieldLine& observation)
     return longEnough;
 }
 
-void LineSystem::addLine(float r, float t, float ep0, float ep1)
+void LineSystem::addLine(LocLineID id, float r, float t, float ep0, float ep1)
 {
     vision::GeoLine line;
     line.set(r, t, ep0, ep1);
-    lines.push_back(line);
+    lines[id] = line;
 }
 
 } // namespace localization
