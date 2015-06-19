@@ -18,6 +18,11 @@ public abstract class ViewParent extends JPanel {
 	private static final long serialVersionUID = 1L;
 	protected Log log;
 	
+	public final void _setLog(Log newLog) {
+		this.log = newLog;
+		setLog(log);
+	}
+	
 	//Use newlog to populate view.
 	public abstract void setLog(Log newlog);
 	//Override if necessary.

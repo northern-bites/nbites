@@ -77,8 +77,8 @@ FieldViewer::FieldViewer(QWidget* parent):
     this->setLayout(mainLayout);
 
     //Setup offline localization
-    locMod.motionInput.wireTo(&odometry, true);
-    locMod.visionInput.wireTo(&observations, true);
+    // locMod.motionInput.wireTo(&odometry, true);
+    // locMod.visionInput.wireTo(&observations, true);
 
     subdiagram.addModule(locMod);
     subdiagram.addModule(locListen);

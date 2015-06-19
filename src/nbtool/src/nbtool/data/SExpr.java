@@ -3,7 +3,13 @@ package nbtool.data;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Vector;
 
 /*
  * The general contract is that read operations such as get and find will succeed, but the result may not exist.
@@ -16,12 +22,17 @@ import java.util.List;
 
 public abstract class SExpr implements Serializable{
 
+	//singleton return when operation could not find valid return.
 	private static final SExpr NOT_FOUND = new NotFound();
 
-	public static SExpr deserializeFrom(String serial) {
-		return _deserialize(serial, new MutRef());
+	/**
+	 *  FACTORY METHODS */
+
+	public static SExpr deserializeFrom(String serializedSExpr) {
+		return _deserialize(serializedSExpr, new MutRef());
 	}
 
+	/* in java, fac-methods of form newAtom and atom are equivalent – all objects in java are passed by pointer. */
 	public static SExpr newAtom(String val) {
 		return new Found(val);
 	}
@@ -30,27 +41,11 @@ public abstract class SExpr implements Serializable{
 		return SExpr.newAtom(v.toString());
 	}
 
-	public static SExpr atom(String val) {
-		return SExpr.newAtom(val);
-	}
-
-	public static SExpr atom(Object v) {
-		return SExpr.newAtom(v.toString());
-	}
-
 	public static SExpr newList() {
 		return new Found(Arrays.asList(new SExpr[]{}));
 	}
 
 	public static SExpr newList(SExpr ... contents) {
-		return new Found(Arrays.asList(contents));
-	}
-
-	public static SExpr list() {
-		return new Found(Arrays.asList(new SExpr[]{}));
-	}
-
-	public static SExpr list(SExpr ... contents) {
 		return new Found(Arrays.asList(contents));
 	}
 
@@ -66,6 +61,30 @@ public abstract class SExpr implements Serializable{
 		return newList(new Found(key), new Found(Integer.toString(value)));
 	}
 
+	public static SExpr newKeyValue(String key, float value) {
+		return newList(new Found(key), new Found(Float.toString(value)));
+	}
+
+	public static SExpr newKeyValue(String key, double value) {
+		return newList(new Found(key), new Found(Double.toString(value)));
+	}
+
+	public static SExpr atom(String val) {
+		return SExpr.newAtom(val);
+	}
+
+	public static SExpr atom(Object v) {
+		return SExpr.newAtom(v.toString());
+	}
+
+	public static SExpr list() {
+		return new Found(Arrays.asList(new SExpr[]{}));
+	}
+
+	public static SExpr list(SExpr ... contents) {
+		return new Found(Arrays.asList(contents));
+	}
+
 	public static SExpr pair(String key, String value) {
 		return newList(new Found(key), new Found(value));
 	}
@@ -78,24 +97,73 @@ public abstract class SExpr implements Serializable{
 		return newList(new Found(key), new Found(Integer.toString(value)));
 	}
 
-	public abstract boolean isAtom();
-	public abstract boolean exists();
+	/* checks for recursive trees,  */
+	public static SExpr deepCopy(SExpr node) {
+		return node.deepCopy();
+	}
 
-	public abstract int count();
-	public abstract SExpr get(int i);
+	/* end factory methods */
+
+	/* instance methods */
+
+	/* modifying TYPE OF SEXPR (type of 'this' after function is as specified by method)*/
+	public abstract void setList(List<SExpr> list);
+	public abstract void setList(SExpr ... items);
+	public abstract void setAtom(String val);
+
+	//list modifications
+	public abstract void insert(int index, SExpr item);
+	public abstract boolean remove(SExpr item);
 	public abstract void append(SExpr ... exprs);
 
+	//list retrieval
+	public abstract int count();
+	public abstract SExpr get(int i);
+	public abstract List<SExpr> getList();
+
+	//Only looks at child elements of this, returns a child list
+	//whose first node is an atom w/ value 'key'
+	public abstract SExpr find(String key);
+
+	public abstract SExpr firstValueOf(String key);
+
+	/* Empty vector indicates not found.  Otherwise, return.firstElement() == this
+	 * 		 and return.lastElement() == <a list with *ANY* node being an atom of value 'key'>
+	 * 		 and intermediate elements representing the path.
+	 * 
+	 * May throw IllegalStateException if called on cyclical graph.
+	 * Uses BFS to return first shallowest valid SExpr.
+	 */
+	public abstract Vector<SExpr> recursiveFind(String key);
+	public abstract Vector<SExpr>[] recursiveFindAll(String key);
+
+	//atom value retrieval
 	public abstract String value();
 	public abstract int valueAsInt() throws NumberFormatException;
 	public abstract long valueAsLong() throws NumberFormatException;
 	public abstract double valueAsDouble() throws NumberFormatException;
+	public abstract float valueAsFloat() throws NumberFormatException;
 	public abstract boolean valueAsBoolean();
 
+	//type retrieval
+	public abstract boolean isAtom();
+	public abstract boolean exists();
+
+	//conversion to strings
 	public abstract String print();
-	public abstract String print(int level);
+	public abstract String print(int level);	//level refers to whitespace offset
 	public abstract String serialize();
 
-	public abstract SExpr find(String key);
+	public abstract SExpr deepCopy();
+
+	@Override
+	public abstract String toString();
+
+	/**
+	 * end functionality listing
+	 * -----------------------------
+	 * start implementation:
+	 */
 
 	private static class Found extends SExpr {
 
@@ -138,8 +206,12 @@ public abstract class SExpr implements Serializable{
 		@Override
 		public void append(SExpr... exprs) {
 			if (!atom) {
-				for (SExpr sexpr : exprs)
+				for (SExpr sexpr : exprs) {
+					if (!sexpr.exists())
+						throw new DoesNotExistException();
+					
 					list.add(sexpr);
+				}
 			}
 		}
 
@@ -161,6 +233,11 @@ public abstract class SExpr implements Serializable{
 		@Override
 		public double valueAsDouble() throws NumberFormatException {
 			return Double.parseDouble(value);
+		}
+
+		@Override
+		public float valueAsFloat() throws NumberFormatException {
+			return Float.parseFloat(value);
 		}
 
 		@Override
@@ -246,6 +323,142 @@ public abstract class SExpr implements Serializable{
 
 			return NOT_FOUND;
 		}
+
+		@Override
+		public SExpr firstValueOf(String key) {
+			return this.find(key).get(1);
+		}
+
+		@Override
+		public void setList(SExpr... items) {
+			atom = false;
+			value = null;
+			list = new ArrayList<>(Arrays.asList(items));
+		}
+
+		@Override
+		public void setList(List<SExpr> list) {
+			atom = false;
+			value = null;
+			list = new ArrayList<>(list);
+		}
+
+		@Override
+		public void setAtom(String val) {
+			atom = true;
+			list = null;
+			value = val;
+		}
+
+		@Override
+		public void insert(int index, SExpr item) {
+			if (!atom && item.exists()) {
+				list.add(index, item);
+			}
+		}
+
+		@Override
+		public boolean remove(SExpr item) {
+			if (!atom && list.contains(item)) {
+				list.remove(item);
+				return true;
+			}
+
+			return false;
+		}
+
+		@Override
+		public List<SExpr> getList() {
+			return atom ? null : list;
+		}
+
+		private Vector<SExpr> traverse(Map<SExpr, SExpr> parents, SExpr start) {
+			LinkedList<SExpr> ret = new LinkedList<SExpr>();
+			SExpr val = start;
+			while (val != null) {
+				ret.addFirst(val);
+				val = parents.get(val);
+			}
+
+			assert(ret.getFirst() == this);
+			return new Vector<SExpr>(ret);
+		}
+
+		private ArrayList<Vector<SExpr>> internalRecursiveFind(String key, int num) {
+			Map<SExpr, SExpr> parents = new HashMap<SExpr, SExpr>();
+			LinkedList<SExpr> queue = new LinkedList<SExpr>();
+			ArrayList<Vector<SExpr>> matches = new ArrayList<>();
+
+			assert(!atom);
+			assert(num > 0);
+
+			queue.add(this);
+			parents.put(this, null);
+
+			while (!queue.isEmpty()) {
+				SExpr current = queue.removeFirst();
+				assert(!current.isAtom());
+
+				for (SExpr child : current.getList()) {
+					if (child.isAtom()) {
+						if (child.value().equals(key)) {
+							matches.add(traverse(parents, current));
+
+							if (matches.size() == num) {
+								return matches;
+							} else {
+								continue;
+							}
+						}
+					} else {
+						//list
+						if (parents.containsKey(child)) {
+							throw new IllegalStateException("Cyclical tree.");
+						}
+
+						parents.put(child, current);
+						queue.addLast(child);
+					}
+				}
+			}
+
+			return matches;
+		}
+
+		@Override
+		public Vector<SExpr> recursiveFind(String key) {
+			if (atom || list.isEmpty())
+				return new Vector<SExpr>();
+
+			ArrayList<Vector<SExpr>> matches = internalRecursiveFind(key, 1);
+			assert(matches.size() <= 1);
+
+			if (matches.isEmpty()) {
+				return new Vector<SExpr>();
+			} else {
+				return matches.get(0);
+			}
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public Vector<SExpr>[] recursiveFindAll(String key) {
+			if (atom || list.isEmpty())
+				return new Vector[0];
+
+			ArrayList<Vector<SExpr>> matches = internalRecursiveFind(key, Integer.MAX_VALUE);
+			return matches.toArray(new Vector[matches.size()]);
+		}
+
+		@Override
+		public SExpr deepCopy() {
+			return _deepCopy(this, new HashSet<SExpr>());
+		}
+
+		@Override
+		public String toString() {
+			return atom ? String.format("SExpr.atom(\"%s\")", value) : String.format("SExpr.list(%d)", list.size());
+		}
 	}
 
 	private static class NotFound extends SExpr {
@@ -296,6 +509,11 @@ public abstract class SExpr implements Serializable{
 		}
 
 		@Override
+		public float valueAsFloat() throws NumberFormatException {
+			throw new DoesNotExistException();
+		}
+
+		@Override
 		public boolean valueAsBoolean() {
 			throw new DoesNotExistException();
 		}
@@ -319,8 +537,57 @@ public abstract class SExpr implements Serializable{
 		public SExpr find(String key) {
 			return this;
 		}
+
+		@Override
+		public void setList(SExpr... items) {}
+
+		@Override
+		public void setAtom(String val) {}
+
+		@Override
+		public void insert(int index, SExpr item) {}
+
+		@Override
+		public boolean remove(SExpr item) {
+			return false;
+		}
+
+		@Override
+		public List<SExpr> getList() {
+			return null;
+		}
+
+		@Override
+		public void setList(List<SExpr> list) {}
+
+		@Override
+		public Vector<SExpr> recursiveFind(String key) {
+			return new Vector<SExpr>();	//key not found.
+		}
+
+		@Override
+		public SExpr deepCopy() {
+			return NOT_FOUND;
+		}
+
+		@Override
+		public String toString() {
+			return "SExpr.NOTFOUND";
+		}
+
+		@Override
+		public SExpr firstValueOf(String key) {
+			return NOT_FOUND;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public Vector<SExpr>[] recursiveFindAll(String key) {
+			return new Vector[0];
+		}
 	}
 
+	//Doesn't require a throws.. or try/catch like non-Runtime exceptions.
 	public static class DoesNotExistException extends RuntimeException {}
 
 	private static class MutRef {
@@ -408,12 +675,54 @@ public abstract class SExpr implements Serializable{
 		}
 	}
 
+	private static SExpr _deepCopy(SExpr node, HashSet<SExpr> seen) {
+		if (seen.contains(node)) {
+			throw new IllegalStateException("Cyclical tree.");
+		}
+
+		if (node.isAtom()) {
+			return atom(node.value());
+		}
+
+		//node is list, construct copy.
+		seen.add(node);
+		SExpr copiedList = list();
+		for (SExpr child : node.getList()) {
+			copiedList.append(_deepCopy(child, seen));
+		}
+
+		return copiedList;
+	}
+
 	public static void main(String[] args) {
+		/*
 		String ser = "(the list goes (on and on and \"what?()\" ()))";
 
 		SExpr s = SExpr.deserializeFrom(ser);
 
 		System.out.println("done...");
-		System.out.printf("%s\n",s.print());
+		System.out.printf("%s\n",s.print()); */
+
+		SExpr top = list(
+				list(
+						atom("rqwe"),
+						list()
+						),
+						list(
+								pair("rawr", "sock"),
+								pair("wa", "r"),
+								atom("RAWR")
+								)
+				);
+
+		System.out.println("" + top.recursiveFind("rawr"));
+
+		for (SExpr s : top.recursiveFind("rawr")) {
+			System.out.println("------------------------------------------\n"
+					+ s.print());
+		}
+
+		top.append(top);
+		System.out.println("" + top.recursiveFind("rawr"));
 	}
 }

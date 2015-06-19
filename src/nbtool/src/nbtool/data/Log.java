@@ -1,9 +1,8 @@
 package nbtool.data;
 
 import nbtool.util.NBConstants;
+import nbtool.util.Utility;
 
-/*TODO:  if description changes, attributes is out of date.
- * */
 public class Log {	
 	
 	public Log() {}
@@ -54,7 +53,7 @@ public class Log {
 	}
 	
 	/*
-	 * Unique number for every log found during this execution.
+	 * Unique number for every log found in this process.
 	 * */
 	private static final Object indexLock = new Object();
 	private static long class_index = 0;
@@ -79,10 +78,15 @@ public class Log {
 	public String name; 
 	
 	public static enum SOURCE {
-		DERIVED, FILE, NETWORK
+		DERIVED, FILE, NETWORK, GENERATED
 	}
 	
 	public SOURCE source;
+	public Session parent;
+	
+	public byte[] data() {
+		return bytes;
+	}
 	
 	public SExpr tree() {
 		return tree;
@@ -167,7 +171,7 @@ public class Log {
 	 * */
 	
 	public Integer primaryBytes() {
-		SExpr c = tree().find("contents").get(1).find("bytes").get(1);
+		SExpr c = tree().find("contents").get(1).find("nbytes").get(1);
 		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
 	}
 	
@@ -230,7 +234,7 @@ public class Log {
 		if (item.isAtom())
 			return null;
 		
-		SExpr bytes = item.find("bytes").get(1);
+		SExpr bytes = item.find("nbytes").get(1);
 		return bytes.exists() && bytes.isAtom() ? bytes.valueAsInt() : null;
 	}
 	
@@ -242,7 +246,7 @@ public class Log {
 		int offset = 0;
 		
 		for (int i = 0; i < index; ++i) {
-			SExpr bytes = cont.get(i + 1).find("bytes").get(1);
+			SExpr bytes = cont.get(i + 1).find("nbytes").get(1);
 			if (!bytes.exists() || !bytes.isAtom())
 				return null;
 			offset += bytes.valueAsInt();
@@ -251,13 +255,23 @@ public class Log {
 		return offset;
 	}
 	
+	public byte[] bytesForContentItem(int index) {
+		Integer offset = contentOffset(index);
+		Integer total = contentNumBytes(index);
+
+		if (offset == null || total == null)
+			return null;
+		
+		return Utility.subArray(bytes, offset, total);
+	}
+	
 	//TESTING
 	public static void main(String[] args) {
 		SExpr clist = SExpr.newList(
 				SExpr.newAtom("contents"),
-				SExpr.newList(SExpr.newKeyValue("bytes", 10)),
-				SExpr.newList(SExpr.newKeyValue("bytes", 50)),
-				SExpr.newList(SExpr.newKeyValue("bytes", 100))
+				SExpr.newList(SExpr.newKeyValue("bytes", "10")),
+				SExpr.newList(SExpr.newKeyValue("bytes", "50")),
+				SExpr.newList(SExpr.newKeyValue("bytes", "100"))
 				);
 		
 		SExpr top = SExpr.newList(clist);

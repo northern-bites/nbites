@@ -59,6 +59,15 @@ ImageTranscriber::ImageTranscriber(Camera::Type which) :
     cameraType(which),
     timeStamp(0)
 {
+    // Bottom camera takes video at half the resolution of the top camera
+    if (which == Camera::TOP) {
+        width = WIDTH_TOP_CAMERA;
+        height = HEIGHT_TOP_CAMERA;
+    } else {
+        width = WIDTH_TOP_CAMERA / 2;
+        height = HEIGHT_TOP_CAMERA / 2;
+    }
+    size = 2*width*height;
 
     initOpenI2CAdapter();
     initSelectCamera();
@@ -133,7 +142,7 @@ void ImageTranscriber::initOpenVideoDevice() {
 }
 
 void ImageTranscriber::initSetCameraDefaults() {
-    v4l2_std_id esid0 = WIDTH == 320 ? 0x04000000UL : 0x08000000UL;
+    v4l2_std_id esid0 = width == 320 ? 0x04000000UL : 0x08000000UL;
     verify(ioctl(fd, VIDIOC_S_STD, &esid0),
            "Setting default parameters failed.");
     }
@@ -144,8 +153,8 @@ void ImageTranscriber::initSetImageFormat() {
     memset(&fmt, 0, sizeof(struct v4l2_format));
     fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     // We ask for a 640 by 480 image
-    fmt.fmt.pix.width = WIDTH;
-    fmt.fmt.pix.height = HEIGHT;
+    fmt.fmt.pix.width = width;
+    fmt.fmt.pix.height = height;
     //"In this format each four bytes is two pixels. Each four bytes is two
     //Y's, a Cb and a Cr. Each Y goes to one of the pixels, and the Cb and
     //Cr belong to both pixels. As you can see, the Cr and Cb components have
@@ -155,7 +164,7 @@ void ImageTranscriber::initSetImageFormat() {
     verify(ioctl(fd, VIDIOC_S_FMT, &fmt),
            "Setting image format failed.");
 
-    if(fmt.fmt.pix.sizeimage != (unsigned int)SIZE)
+    if(fmt.fmt.pix.sizeimage != (unsigned int)size)
         std::cerr << "CAMERA ERROR::Size setting is WRONG." << std::endl;
 }
 
@@ -566,7 +575,7 @@ messages::YUVImage ImageTranscriber::getNextImage()
         PROF_EXIT(P_BOT_DQBUF);
     }
 
-    if(requestBuff.bytesused != (unsigned int)SIZE)
+    if(requestBuff.bytesused != (unsigned int)size)
         std::cerr << "CAMERA::ERROR::Wrong buffer size!" << std::endl;
 
     static bool shout = true;
@@ -579,7 +588,8 @@ messages::YUVImage ImageTranscriber::getNextImage()
     return messages::YUVImage(new TranscriberBuffer(mem[requestBuff.index],
                                                     fd,
                                                     requestBuff),
-                                                    2*WIDTH, HEIGHT, 2*WIDTH);
+                              2*width, height, 2*width);
+
 }
 
 TranscriberModule::TranscriberModule(ImageTranscriber& trans)

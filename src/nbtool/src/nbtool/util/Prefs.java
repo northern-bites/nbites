@@ -57,6 +57,7 @@ public class Prefs {
 	}
 
 	public static Rectangle bounds = NBConstants.DEFAULT_BOUNDS;
+	public static int leftSplitLoc = -1, rightSplitLoc = -1;
 	public static LinkedList<String> addresses = new LinkedList<String>();
 	public static LinkedList<String> filepaths = new LinkedList<String>();
 	public static LogLevel logLevel = LogLevel.levelINFO;
@@ -79,6 +80,12 @@ public class Prefs {
 				SExpr.newAtom(bounds.y),
 				SExpr.newAtom(bounds.width),
 				SExpr.newAtom(bounds.height)
+				));
+		
+		top.append(SExpr.list(
+				SExpr.atom("split"),
+				SExpr.atom(leftSplitLoc),
+				SExpr.atom(rightSplitLoc)
 				));
 		
 		{
@@ -132,7 +139,9 @@ public class Prefs {
 				StandardCharsets.UTF_8);
 
 		SExpr prefs = SExpr.deserializeFrom(prefText);
-		if (prefs == null || prefs.count() < 1) {
+		if (prefs == null || prefs.count() < 1 || 
+				!(prefs.get(0).isAtom() && prefs.get(0).value().equals("nbtool-prefs") ) 
+				) {
 			Logger.log(Logger.WARN, "preferences file in invalid format.");
 			return;
 		}
@@ -144,6 +153,12 @@ public class Prefs {
 					pnode.get(3).valueAsInt(),
 					pnode.get(4).valueAsInt());
 			bounds = nr;
+		}
+		
+		if (prefs.find("split").exists()) {
+			SExpr pnode = prefs.find("split");
+			leftSplitLoc = pnode.get(1).valueAsInt();
+			rightSplitLoc = pnode.get(2).valueAsInt();
 		}
 
 		if (prefs.find("addresses").exists()) {
@@ -187,7 +202,17 @@ public class Prefs {
 				ArrayList<Class> classes = new ArrayList<Class>();
 				
 				for (int j = 1; j < cmap.count(); ++j) {
-					classes.add(Class.forName(cmap.get(j).value()));
+					Class c = null;
+					try {
+						c = Class.forName(cmap.get(j).value());
+					} catch (Exception e) {
+						Logger.log(Logger.ERROR, "_____ PREVIOUSLY LOADED CLASS COULD NOT BE FOUND! _____");
+						e.printStackTrace();
+					}
+					
+					if (c != null) {
+						classes.add(c);
+					}
 				}
 				
 				loaded.put(type, classes.toArray(new Class[0]));

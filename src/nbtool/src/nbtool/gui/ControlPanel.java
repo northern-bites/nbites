@@ -491,7 +491,7 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
 
         jLabel2.setText("keep fraction");
 
-        writeBox.setText("write");
+        writeBox.setText("write to fs (select before connect)");
 
         javax.swing.GroupLayout robotPanelLayout = new javax.swing.GroupLayout(robotPanel);
         robotPanel.setLayout(robotPanelLayout);

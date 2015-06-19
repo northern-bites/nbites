@@ -1,66 +1,46 @@
 package nbtool.gui.utilitypanes;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
+import java.util.Vector;
 
 import static nbtool.util.Logger.*;
 
 public class UtilityManager {
-	public static Class[] utilities = {LogToViewUtility.class, ThreadStateUtility.class, HardlyWorking.class, YUVColors.class};
 	
-	private static HashMap<Class<? extends UtilityParent>, UtilityParent> map = setupMap();
-	private static HashMap<Class<? extends UtilityParent>, UtilityParent> setupMap() {
-		HashMap<Class<? extends UtilityParent>, UtilityParent> ret = new HashMap<Class<? extends UtilityParent>, UtilityParent>();
+	/* adding a field here that extends UtilityParent is enough to get it displayed. */
+	public static final LogToViewUtility LogToViewUtility = new LogToViewUtility();
+	public static final YUVColors YUVColors = new YUVColors();
+	public static final ThreadStateUtility ThreadStateUtility = new ThreadStateUtility();
+	public static final SyntheticImageUtility SyntheticImageUtility = new SyntheticImageUtility();
+	
+	public static final UtilityParent[] utilities = findUtilityFields(); 
+	private static UtilityParent[] findUtilityFields() {
+		Field[] fields = UtilityManager.class.getDeclaredFields();
+		Vector<UtilityParent> found = new Vector<>();
 		
-		for (Class c : utilities) {
-			 if (UtilityParent.class.isAssignableFrom(c)) {
-				 ret.put(c, null);
-			 } else {
-				 logf(ERROR, "UtilityManager asked to manage non-UtilityParent class %s", c.getName());
-			 }
+		for (Field f : fields) {
+			int mod = f.getModifiers();
+			if (Modifier.isFinal(mod) &&
+					Modifier.isStatic(mod) &&
+					Modifier.isPublic(mod)) {
+				Object val = null;
+				try {
+					val = f.get(null);
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+				if (val instanceof UtilityParent) {
+					System.out.printf("UtilityManager found field of class %s...\n", val.getClass().getName());
+					found.add((UtilityParent) val);
+				}
+			}
 		}
 		
-		return ret;
-	}
-	
-	public static UtilityParent instanceOf(Class<? extends UtilityParent> cls) {
-		if (!UtilityParent.class.isAssignableFrom(cls)) {
-			logf(ERROR, "UtilityManager asked for instance of non-UtilityParent class %s", cls.getName());
-			return null;
-		 }
-		
-		if (map.containsKey(cls)) {
-			try {
-				if (map.get(cls) != null)
-					return map.get(cls);
-				UtilityParent instance = cls.getConstructor().newInstance();
-				map.put(cls, instance);
-				return instance;
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			} catch (NoSuchMethodException e) {
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			} 
-			
-			return null;
-		} else {
-			logf(ERROR, "UtilityManager asked for instance of class NOT IN MAP: %s", cls.getName());
-			return null;
-		}
-	}
-	
-	public static LogToViewUtility instanceOfLTV() {
-		UtilityParent up = instanceOf(LogToViewUtility.class);
-		assert(up instanceof LogToViewUtility);
-		
-		return (LogToViewUtility) up;
+		return found.toArray(new UtilityParent[0]);
 	}
 }

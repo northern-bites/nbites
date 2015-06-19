@@ -11,12 +11,13 @@
 
 #include <string>
 #include <algorithm>
+#include <sstream>
 #include <netinet/in.h>
 
 namespace nblog {
     
-    static const char * LOG_FOLDER = "/home/nao/nbites/log/";
-    //const char * LOG_FOLDER = "/Users/pkoch/Desktop/LOGS/";
+    //static const char * LOG_FOLDER = "/home/nao/nbites/log/";
+    static const char * LOG_FOLDER = "/Users/pkoch/Desktop/LOGS/";
     static bool STARTED = false;
     
     void * file_io_loop(void * context);
@@ -74,15 +75,31 @@ namespace nblog {
      fileio
      */
     
+    int write_index = 0;
     int write_to_fs(Log * obj) {
         int fd;
         
+        std::ostringstream ss;
+        
+        std::string cr_loc = obj->tree().find("created")->get(1)->value();
+        std::string cr_date = obj->tree().find("created")->get(2)->value();
+        std::string type = obj->tree().find("contents")->get(1)->find("type")->get(1)->value();
+        
+        ss << cr_loc << "_" << cr_date << "_" << type << "_i"
+            << write_index++ << ".nblog";
+        
+        /*
         std::string desc = obj->description();
         desc = desc.substr(0, 100);
         std::replace(desc.begin(), desc.end(), ' ', '_');
-        desc.append(".nblog");
+        desc.append(".nblog"); */
+        
         std::string path(LOG_FOLDER);
-        path.append(desc);
+        std::string name = ss.str();
+        std::replace(name.begin(), name.end(), ' ', '_');
+        std::replace(name.begin(), name.end(), '/', '-');
+        std::replace(name.begin(), name.end(), ':', '-');
+        path.append(name);
         
         fd = open(path.c_str(), O_WRONLY | O_TRUNC | O_CREAT, S_IRWXG | S_IRWXU);
         

@@ -28,9 +28,7 @@ import nbtool.util.Utility;
 public class ZoomImageView extends ViewParent {
 	private static final long serialVersionUID = 1L;
 
-	public void setLog(Log newlog) {
-		this.log = newlog;
-		
+	public void setLog(Log newlog) {		
 		iv.useImage(Utility.biFromLog(newlog));
 	}
 
@@ -52,7 +50,6 @@ public class ZoomImageView extends ViewParent {
 		sp = new JScrollPane(iv);
 		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		
 		
 		this.add(sp);
 	}

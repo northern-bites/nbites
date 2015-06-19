@@ -30,7 +30,6 @@ namespace control {
         OBSERVATIONS,
         LOCALIZATION,
         BALLTRACK,
-        IMAGES,
         VISION,
         
         tripoint,

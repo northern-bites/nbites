@@ -13,10 +13,6 @@ public class EdgeImage extends ImageParent {
 		super(w, h, d);
 	}
 
-	@Override
-	public int pixelSize() {
-		return -1;
-	}
 	
 	private static final Color[] angleMap = initColorMap();
 	
@@ -30,7 +26,7 @@ public class EdgeImage extends ImageParent {
 				Color.BLUE,
 				Color.MAGENTA,
 				Color.GRAY,
-				Color.PINK	};
+				Color.PINK};
 		assert(top.length == 8);
 		
 		for (int i = 0; i < 256; ++i) {
