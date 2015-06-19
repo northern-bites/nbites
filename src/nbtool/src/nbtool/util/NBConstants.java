@@ -72,8 +72,7 @@ public class NBConstants {
 		map.put("STATS", new Class[]{BotStatsView.class});
 		map.put(DEFAULT_S, new Class[]{DefaultView.class});
 		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class, BasicLineView.class});
-		
-		
+		map.put("proto-FieldLines", new Class[]{BasicLineView.class});
 
 		return map;
 	}
