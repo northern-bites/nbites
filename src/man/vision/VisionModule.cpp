@@ -152,15 +152,30 @@ void VisionModule::run_()
     // }
 }
 
-// TODO filter out repeat lines
 void VisionModule::sendLinesOut()
 {
-    messages::FieldLines pLines;
+    // Mark repeat lines (already found in bottom camera) in top camera
+    for (int i = 0; i < fieldLines[0]->size(); i++) {
+        for (int j = 0; j < fieldLines[1]->size(); j++) {
+            FieldLine& topField = (*(fieldLines[0]))[i];
+            FieldLine& botField = (*(fieldLines[1]))[j];
+            for (int k = 0; k < 2; k++) {
+                const GeoLine& topGeo = topField[k].field();
+                const GeoLine& botGeo = botField[k].field();
+                if (topGeo.error(botGeo) < 0.3) // TODO constant
+                    (*(fieldLines[0]))[i].repeat(true);
+            }
+        }
+    }
 
+    // Outportal results
+    // NOTE repeats are not outportaled
+    messages::FieldLines pLines;
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < fieldLines[i]->size(); j++) {
             messages::FieldLine* pLine = pLines.add_line();
             FieldLine& line = (*(fieldLines[i]))[j];
+            if (line.repeat()) { std::cout << "TEST\n"; continue; }
 
             for (int k = 0; k < 2; k++) {
                 messages::HoughLine pHough;

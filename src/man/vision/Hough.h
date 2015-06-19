@@ -265,6 +265,7 @@ class FieldLine
   LineID id_;
   std::vector<Corner> corners_;
   int index_;
+  bool repeat_;
 
 public:
   // Copy/assign OK
@@ -279,6 +280,9 @@ public:
 
   // For debug
   int index() const { return index_; }
+
+  bool repeat() const { return repeat_; }
+  void repeat(bool newRepeat) { repeat_ = newRepeat; }
 
   void addCorner(Corner newCorner) { corners_.push_back(newCorner); }
   std::vector<Corner> corners() const { return corners_; }
