@@ -47,8 +47,15 @@ public class CameraCalibrateUtility extends UtilityParent {
     }
 
     private class CCU_Frame extends JFrame implements IOFirstResponder, ActionListener {
-        final int windowW = 600;
-        final int windowH = 400;
+        private JButton top;
+        private JButton getOffsets;
+        private JButton save;
+
+        final int windowW = 400;
+        final int windowH = 300;
+
+        final int buf = 10;
+        final int col1 = 200;   // column 1
 
         Session sess;
 
@@ -57,15 +64,39 @@ public class CameraCalibrateUtility extends UtilityParent {
 
             this.setTitle("Camera Calibrator");
             this.setBounds(500, 0, windowW, windowH);
+
+            top = new JButton("Top");
+            top.setToolTipText("toggle calibrating top or bottom logs in session");
+            top.addActionListener(this);
+            top.setBounds(buf, 40, 100, 30);
+
+            getOffsets = new JButton("Get calibration offsets");
+            getOffsets.setToolTipText("calculate and display roll and pitch offsets");
+            getOffsets.addActionListener(this);
+            getOffsets.setBounds(buf*2 + 100, 40, 200, 30);
+            
+            save = new JButton("Save");
+            save.setToolTipText("save camera params to config/cameraParams.txt");
+            save.addActionListener(this);
+            save.setBounds(windowW/2 - 100/2, windowH - 40, 100, 30);
+            save.setEnabled(false);
+
             JPanel panel = new JPanel() {
                 @Override
                 public void paintComponent(Graphics g) {
                     super.paintComponent(g);
+                    g.drawString("Selected session: ", buf, buf*2);
 
                     g.fillRect(500, 300, 100, 100);
                 }                
             };
 
+
+
+
+            add(top);
+            add(getOffsets);
+            add(save);
             add(panel);
 
             sess = null;
@@ -75,7 +106,11 @@ public class CameraCalibrateUtility extends UtilityParent {
         }
          @Override
                 public void actionPerformed(ActionEvent e) {       
-                    
+                    if ("Top".equals(e.getActionCommand())) {
+                        top.setText("Bottom");
+                    } else if ("Bottom".equals(e.getActionCommand())) {
+                        top.setText("Top");
+                    }
                 }
 
         @Override
