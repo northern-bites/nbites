@@ -33,38 +33,8 @@ import com.google.protobuf.Message;
 import messages.Vision.*;
 
 public class BasicLineView extends ViewParent {
-    
+
     List<FieldLine> lines;
-
-    int width;
-    int height;
-    
-    int displayw;
-    int displayh;
-
-    final int fieldw = 640;
-    final int fieldh = 554;
-
-    final int buffer = 5;
-
-    double resize = 1;
-
-    boolean click = false;
-    boolean drag = false;
-    
-    // Click and release values
-    int clickX1 = 0;
-    int clickY1 = 0;
-    int clickX2 = 0;
-    int clickY2 = 0;
-
-    // Field coordinate image upper left hand corder
-    int fx0;
-    int fy0;
-
-    // Center of field cordinate system
-    int fxc = displayw + buffer + fieldw/2; 
-    int fyc = fieldh;
 
     @Override
     public void setLog(Log newlog) {
@@ -78,7 +48,6 @@ public class BasicLineView extends ViewParent {
         try {
             FieldLines msg = FieldLines.parseFrom(newlog.bytes);
             for (FieldLine line : msg.getLineList()) {
-                // System.out.println(line.toString());
                 lines.add(line);
             }
         } catch (Exception e) {
@@ -86,42 +55,20 @@ public class BasicLineView extends ViewParent {
         }
 
         repaint();
-
-
-        // CrossInstance ci = CrossIO.instanceByIndex(0);
-        // if (ci == null)
-        //     return;
-        // CrossFunc func = ci.functionWithName("Vision");
-        // assert(func != null);
-        
-        // CrossCall cc = new CrossCall(this, func, newlog);
-
-        // assert(ci.tryAddCall(cc));
-
-        // // TODO: Don't hard code SExpr paths
-        width =  120;
-        height = 240;
-
-        displayw = width*2;
-        displayh = height*2;
-
-        fx0 = displayw + buffer;
-        fy0 = 0;
-
-        fxc = displayw + buffer + fieldw/2; 
-        fyc = fieldh;
-
     }
-    
+
     public void paintComponent(Graphics g) {
 
         int offsetY = this.getHeight()/2 + 20;
         int offsetX = 10;
 
-        int multiplier = 1;
+        int multiplier = 2;
+        double resize = 1.0;
 
         int originX = this.getWidth()/2;
-        int originY = this.getHeight()/2 - 50;
+        int originY = this.getHeight()/2 - 100;
+        int height = this.getHeight()/2;
+        int width = this.getWidth();
 
         g.setColor(new Color(40, 140, 40));
         g.fillRect(0, 0, this.getWidth(), this.getHeight()/2);
@@ -129,41 +76,42 @@ public class BasicLineView extends ViewParent {
         g.setColor(Color.red);
         g.fillRect(originX-10, originY-10, 20, 20);
 
+        System.out.println("origin: " + originX + ", " + originY + "\nheight: " + height + "\nwidth: " + width);
+
         if (lines.size() < 1) return;
 
         for (int i = 0; i <lines.size(); i++) {
-            double icR = lines.get(i).getInner().getR();
-            double icT = lines.get(i).getInner().getT();
-            double icEP0 = lines.get(i).getInner().getEp0();
-            double icEP1 = lines.get(i).getInner().getEp1();
-            double mP = (icEP1 + icEP0) / 2.0;
+            double r = lines.get(i).getInner().getR();
+            double t = lines.get(i).getInner().getT();
+            double eP0 = lines.get(i).getInner().getEp0();
+            double eP1 = lines.get(i).getInner().getEp1();
+            double mP = (eP1 + eP0) / 2.0;
 
-            String stringr = "R: " + (double)Math.round(icR * 100000) / 100000;
-            String stringt = "t: " + (double)Math.round(icT * 100000) / 100000;
-            String stringep0 = "ep0: " + Math.round(icEP0);
-            String stringep1 = "ep1: " + Math.round(icEP1);
+            String stringr = "R: " + (double)Math.round(r * 100000) / 100000;
+            String stringt = "t: " + (double)Math.round(t * 100000) / 100000;
+            String stringep0 = "ep0: " + Math.round(eP0);
+            String stringep1 = "ep1: " + Math.round(eP1);
             String stringid = "id: " + lines.get(i).getId();
 
+            double x0 = originX + multiplier*r * Math.cos(t);
+            double y0 = originY + -multiplier*r * Math.sin(t);
+            int x1 = (int) Math.round(x0 + multiplier*eP0 * Math.sin(t));
+            int y1 = (int) Math.round(y0 + multiplier*eP0 * Math.cos(t));
+            int x2 = (int) Math.round(x0 + multiplier*eP1 * Math.sin(t));
+            int y2 = (int) Math.round(y0 + multiplier*eP1 * Math.cos(t));
+            int xm = (int) Math.round(x0 + multiplier*mP * Math.sin(t));
+            int ym = (int) Math.round(y0 + multiplier*mP * Math.cos(t));
+
+            if (x1 < 0 || y1 < 0 || x2 < 0 || y2 < 0) continue;
+
+            g.setColor(Color.blue);
+            g.drawString(stringr, offsetX, offsetY + 80);
             g.setColor(Color.black);
-            g.drawString(stringr, offsetX, offsetY + 160);
-            g.drawString(stringt, offsetX, offsetY + 180);
-            g.drawString(stringep0, offsetX, offsetY + 200);
-            g.drawString(stringep1, offsetX, offsetY + 220);
-            g.drawString(stringid, offsetX, offsetY + 240);
-
+            g.drawString(stringt, offsetX, offsetY + 100);
+            g.drawString(stringep0, offsetX, offsetY + 120);
+            g.drawString(stringep1, offsetX, offsetY + 140);
+            g.drawString(stringid, offsetX, offsetY + 160);
             g.setColor(Color.white);
-
-            double x0 = originX + multiplier*icR * Math.cos(icT);
-            double y0 = originY + -multiplier*icR * Math.sin(icT);
-            int x1 = (int) Math.round(x0 + multiplier*icEP0 * Math.sin(icT));
-            int y1 = (int) Math.round(y0 + multiplier*icEP0 * Math.cos(icT));
-            int x2 = (int) Math.round(x0 + multiplier*icEP1 * Math.sin(icT));
-            int y2 = (int) Math.round(y0 + multiplier*icEP1 * Math.cos(icT));
-            int xm = (int) Math.round(x0 + multiplier*mP * Math.sin(icT));
-            int ym = (int) Math.round(y0 + multiplier*mP * Math.cos(icT));
-
-            System.out.println("x0: " + x0);
-            System.out.println("y0: " + y0 + "\n");
 
             String string0 = "x0,y0: " + (int)x0 + ", " + (int)y0;
             String string1 = "x1,y1: " + x1 + ", " + y1;
@@ -173,9 +121,13 @@ public class BasicLineView extends ViewParent {
             g.drawLine(x1+2, y1+2, x2+2, y2+2);
             g.setColor(Color.yellow);
             g.fillRect(xm - 4, ym - 4, 8, 8);
+            g.setColor(Color.blue);
+            g.fillRect((int)x0 - 4, (int)y0 - 4, 8, 8);
 
             g.setColor(Color.pink);
             g.drawLine(originX, originY, xm, ym);
+            g.setColor(Color.blue);
+            g.drawLine(originX, originY, (int)x0, (int)y0);
 
             g.setColor(Color.black);
             g.drawString(string0, offsetX, offsetY);
@@ -217,4 +169,5 @@ enum class LineID {
   TopGoalbox,
   Midline
 };
+
 */
