@@ -49,7 +49,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 				Prefs.rightSplitLoc = split2.getDividerLocation();
 				
 				Map<String, Class<? extends ViewParent>[]> lshown = new HashMap<String, Class<? extends ViewParent>[]>();
-				LogToViewUtility ltvu = UtilityManager.instanceOfLTV();
+				LogToViewUtility ltvu = UtilityManager.LogToViewUtility;
 				for (String t : NBConstants.POSSIBLE_VIEWS.keySet()) {
 					lshown.put(t, (Class<? extends ViewParent>[]) ltvu.selected(t));
 				}
@@ -72,10 +72,8 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		
 		cntrlp = new ControlPanel();
 		lc = new LogChooser();
-		si = new SyntheticImages();
 		left.addTab("control", cntrlp);
 		left.addTab("logs", lc);
-		left.addTab("synthetics", si);
 				
 		statusp = new StatusPanel();
 		right.addTab("status", statusp);
@@ -103,10 +101,11 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 				
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
+		
+		System.out.println("----------------------------------\n\n");
 	}
 	
 	public boolean postProcessKeyEvent(final KeyEvent e) {
-
 		if (!e.isConsumed() && (e.getID() == KeyEvent.KEY_TYPED)) {
 			
 			Character c = e.getKeyChar();
@@ -131,6 +130,16 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 				case 't':
 					right.setSelectedIndex(2);
 					break;
+				case 's':
+					
+					break;
+				case 'l':
+					JFrame frame = UtilityManager.LogToViewUtility.supplyDisplay();
+					boolean vis = frame.isVisible();
+					frame.setVisible(!vis);
+					break;
+				case 'p':
+					break;
 				}
 			}
 		}
@@ -144,7 +153,6 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 	private ControlPanel cntrlp;
 	private StatusPanel statusp;
 	private LogChooser lc;
-	private SyntheticImages si;
 		
 	private LogDisplayPanel ldp;
 	

@@ -8,7 +8,6 @@
 #include "Stdafx.h"
 
 #include <stdlib.h>
-#include <iostream>
 
 namespace man {
 namespace vision {

@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "Images.h"
 #include "PMotion.pb.h"
+#include "Vision.pb.h"
 #include "FrontEnd.h"
 #include "Edge.h"
 #include "Hough.h"
@@ -19,13 +20,14 @@ namespace vision {
 
 class VisionModule : public portals::Module {
 public:
-    VisionModule();
+    VisionModule(int wd, int ht);
     virtual ~VisionModule();
 
     portals::InPortal<messages::YUVImage> topIn;
     portals::InPortal<messages::YUVImage> bottomIn;
     portals::InPortal<messages::JointAngles> jointsIn;
 
+    portals::OutPortal<messages::FieldLines> linesOut;
     portals::OutPortal<messages::VisionBall> ballOut;
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
@@ -48,6 +50,9 @@ protected:
     virtual void run_();
 
 private:
+    void sendLinesOut();
+    void updateVisionBall();
+
     Colors* colorParams[2];
     ImageFrontEnd* frontEnd[2];
     EdgeDetector* edgeDetector[2];
@@ -64,7 +69,7 @@ private:
     // Lisp tree with color params saved
     nblog::SExpr colors;
 
-    void updateVisionBall();
+    // Tracking ball stuff
     bool ballOn;
     int ballOnCount;
     int ballOffCount;

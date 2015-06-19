@@ -279,7 +279,7 @@ CornerDetector::CornerDetector(int width_, int height_)
   : width(width_), 
     height(height_), 
     orthogonalThreshold_(40), 
-    intersectThreshold_(5), 
+    intersectThreshold_(10), 
     closeThreshold_(30), 
     farThreshold_(50), 
     edgeImageThreshold_(0.05)
@@ -563,9 +563,7 @@ void FieldLineList::classify(GoalboxDetector& boxDetector, CornerDetector& corne
   int numLines = static_cast<int>(size());
   while (numStepsWithoutClassify < numLines) {
     numStepsWithoutClassify++;
-    std::cout << numStepsWithoutClassify << "," << i << std::endl;
     FieldLine& line = (*this)[i];
-    std::cout << (int) line.id() << std::endl;
     i = (i + 1) % numLines;
     if (line.id() != LineID::Line) continue;
     std::vector<Corner> corners = line.corners();

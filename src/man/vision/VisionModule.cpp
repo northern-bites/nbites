@@ -14,12 +14,12 @@
 namespace man {
 namespace vision {
 
-// TODO constants and parameters
-VisionModule::VisionModule()
+VisionModule::VisionModule(int wd, int ht)
     : Module(),
       topIn(),
       bottomIn(),
       jointsIn(),
+      linesOut(base()),
       ballOut(base()),
       ballOn(false),
       ballOnCount(0),
@@ -61,23 +61,23 @@ VisionModule::VisionModule()
         edges[i] = new EdgeList(32000);
         houghLines[i] = new HoughLineList(128);
         kinematics[i] = new Kinematics(i == 0);
-        homography[i] = new FieldHomography();
+        homography[i] = new FieldHomography(i == 0);
         fieldLines[i] = new FieldLineList();
         ballDetector[i] = new BallDetector(homography[i], i == 0);
         boxDetector[i] = new GoalboxDetector();
 
         // TODO set width and height dynamically
         if (i == 0) {
-          hough[i] = new HoughSpace(320, 240);
-          cornerDetector[i] = new CornerDetector(320, 240);
+          hough[i] = new HoughSpace(wd / 2, ht / 2);
+          cornerDetector[i] = new CornerDetector(wd / 2, ht / 2);
         } else {
-          hough[i] = new HoughSpace(160, 120);
-          cornerDetector[i] = new CornerDetector(160, 120);
+          hough[i] = new HoughSpace(wd / 4, ht / 4);
+          cornerDetector[i] = new CornerDetector(wd / 4, ht / 4);
         }
 
         // TODO flag
         bool fast = true;
-        frontEnd[i]->fast(false);
+        frontEnd[i]->fast(fast);
         edgeDetector[i]->fast(fast);
         hough[i]->fast(fast);
     }
@@ -98,7 +98,6 @@ VisionModule::~VisionModule()
     }
 }
 
-// TODO bug in assembly front end green image
 // TODO use horizon on top image
 void VisionModule::run_()
 {
@@ -112,9 +111,9 @@ void VisionModule::run_()
                                                     &bottomIn.message() };
 
     // Time vision module
-    double topTimes[7];
-    double bottomTimes[7];
-    double* times[2] = { topTimes, bottomTimes };
+    // double topTimes[6];
+    // double bottomTimes[6];
+    // double* times[2] = { topTimes, bottomTimes };
 
     bool ballDetected = false;
 
@@ -129,7 +128,7 @@ void VisionModule::run_()
                         image->rowPitch(),
                         image->pixelAddress(0, 0));
 
-        HighResTimer timer;
+        // HighResTimer timer;
 
         // Run front end
         frontEnd[i]->run(yuvLite, colorParams[i]);
@@ -137,66 +136,71 @@ void VisionModule::run_()
         ImageLiteU8 greenImage(frontEnd[i]->greenImage());
         ImageLiteU8 orangeImage(frontEnd[i]->orangeImage());
 
-        times[i][0] = timer.end();
+        // times[i][0] = timer.end();
 
         // Calculate kinematics and adjust homography
-        std::cout << "Top camera: " << (i == 0) << std::endl;
-        kinematics[i]->joints(jointsIn.message());
-        homography[i]->wz0(kinematics[i]->wz0());
-        homography[i]->tilt(kinematics[i]->tilt() - 3.965*TO_RAD);
-
-        homography[i]->roll(homography[i]->roll()-2.21*TO_RAD);
-        // homography[i]->azimuth(kinematics[i]->azimuth());
+        if (jointsIn.message().has_head_yaw()) {
+            kinematics[i]->joints(jointsIn.message());
+            homography[i]->wz0(kinematics[i]->wz0());
+            homography[i]->tilt(kinematics[i]->tilt());
+#ifndef OFFLINE
+            homography[i]->azimuth(kinematics[i]->azimuth());
+#endif
+        }
 
         // Approximate brightness gradient
         edgeDetector[i]->gradient(yImage);
-
-        times[i][1] = timer.end();
+        
+        // times[i][1] = timer.end();
 
         // Run edge detection
         edgeDetector[i]->edgeDetect(greenImage, *(edges[i]));
 
-        times[i][2] = timer.end();
+        // times[i][2] = timer.end();
 
         // Run hough line detection
         hough[i]->run(*(edges[i]), *(houghLines[i]));
 
-        times[i][3] = timer.end();
+        // times[i][3] = timer.end();
 
         // Find field lines
         houghLines[i]->mapToField(*(homography[i]));
         fieldLines[i]->find(*(houghLines[i]));
 
-        times[i][4] = timer.end();
+        // times[i][4] = timer.end();
 
         // Classify field lines
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
 
-        times[i][5] = timer.end();
+        //times[i][5] = timer.end();
+
         if (!ballDetected) {
             ballDetected = ballDetector[i]->findBall(orangeImage);
         }
 
-        times[i][6] = timer.end();
+        // times[i][6] = timer.end();
     }
 
     ballOn = ballDetected;
 
+    // Send messages on outportals
+    sendLinesOut();
+    updateVisionBall();
 
-    for (int i = 0; i < 2; i++) {
-        break;
-        if (i == 0)
-            std::cout << "From top camera:" << std::endl;
-        else
-            std::cout << std::endl << "From bottom camera:" << std::endl;
-        std::cout << "Front end: " << times[i][0] << std::endl;
-        std::cout << "Gradient: " << times[i][1] << std::endl;
-        std::cout << "Edge detection: " << times[i][2] << std::endl;
-        std::cout << "Hough: " << times[i][3] << std::endl;
-        std::cout << "Field lines detection: " << times[i][4] << std::endl;
-        std::cout << "Field lines classification: " << times[i][5] << std::endl;
-        std::cout << "Ball: " << times[i][6] << std::endl;
-    }
+    // for (int i = 0; i < 2; i++) {
+    //     break;
+    //     if (i == 0)
+    //         std::cout << "From top camera:" << std::endl;
+    //     else
+    //         std::cout << std::endl << "From bottom camera:" << std::endl;
+    //     std::cout << "Front end: " << times[i][0] << std::endl;
+    //     std::cout << "Gradient: " << times[i][1] << std::endl;
+    //     std::cout << "Edge detection: " << times[i][2] << std::endl;
+    //     std::cout << "Hough: " << times[i][3] << std::endl;
+    //     std::cout << "Field lines detection: " << times[i][4] << std::endl;
+    //     std::cout << "Field lines classification: " << times[i][5] << std::endl;
+    //     std::cout << "Ball: " << times[i][6] << std::endl;
+    // }
 }
 
 /*
@@ -298,6 +302,39 @@ void VisionModule::updateVisionBall()
     }
 
     ballOut.setMessage(ball_message);
+}
+
+// TODO filter out repeat lines
+void VisionModule::sendLinesOut()
+{
+    messages::FieldLines pLines;
+
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < fieldLines[i]->size(); j++) {
+            messages::FieldLine* pLine = pLines.add_line();
+            FieldLine& line = (*(fieldLines[i]))[j];
+
+            for (int k = 0; k < 2; k++) {
+                messages::HoughLine pHough;
+                HoughLine& hough = line[k];
+
+                pHough.set_r(hough.field().r());
+                pHough.set_t(hough.field().t());
+                pHough.set_ep0(hough.field().ep0());
+                pHough.set_ep1(hough.field().ep1());
+
+                if (hough.field().r() < 0)
+                    pLine->mutable_outer()->CopyFrom(pHough);
+                else
+                    pLine->mutable_inner()->CopyFrom(pHough);
+            }
+
+            pLine->set_id(static_cast<int>(line.id()));
+        }
+    }
+
+    portals::Message<messages::FieldLines> linesOutMessage(&pLines);
+    linesOut.setMessage(linesOutMessage);
 }
 
 }

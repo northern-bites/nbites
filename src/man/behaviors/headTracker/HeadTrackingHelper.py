@@ -125,6 +125,8 @@ class HeadTrackingHelper(object):
         target = self.tracker.target
         changeX, changeY = 0.0, 0.0
 
+        return
+
         # If we cannot see the target, abort.
         if not (target # target is null
                 or (target.rel_x == 0.0 and target.rel_y == 0.0) # target is under us (info error)

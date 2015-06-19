@@ -178,62 +178,62 @@ class Leds():
 
     def processLeds(self):
 
-        if BALL_LEDS:
-            if self.brain.ball.vis.frames_on == 1:
-                self.executeLeds(BALL_ON_LEDS)
-            elif self.brain.ball.vis.frames_off == 1:
-                self.executeLeds(BALL_OFF_LEDS)
+        # if BALL_LEDS:
+            # if self.brain.ball.vis.frames_on == 1:
+            #     self.executeLeds(BALL_ON_LEDS)
+            # elif self.brain.ball.vis.frames_off == 1:
+            #     self.executeLeds(BALL_OFF_LEDS)
 
-        if GOAL_LEDS:
-            newCertainty = self.brain.ygrp.certainty
+        # if GOAL_LEDS:
+        #     newCertainty = self.brain.ygrp.certainty
 
-            if (newCertainty == 0):
-                if (self.brain.ygrp.on and
-                    (self.brain.ygrp.frames_on == 1 or
-                     self.goalCertainty != newCertainty)):
-                    #we see an ambiguous post for the first time!
-                    self.executeLeds(LEFT_POST_AMBIGUOUS_LEDS)
-                    self.executeLeds(RIGHT_POST_AMBIGUOUS_LEDS)
-            if(newCertainty == 2 and
-               self.brain.ygrp.on and
-               (self.brain.ygrp.frames_on == 1 or
-                self.goalCertainty != newCertainty)):
-                #we see the right post for the first time!
-                self.executeLeds(RIGHT_POST_ON_LEDS)
-            if(self.brain.yglp.on and
-               (self.brain.yglp.frames_on == 1 or
-                self.goalCertainty != newCertainty)):
-                #we see the left post for the first time!
-                self.executeLeds(LEFT_POST_ON_LEDS)
-            if(self.brain.ygrp.frames_off == 1):
-                #we don't see the right post for the first time
-                self.executeLeds(RIGHT_POST_OFF_LEDS)
-            if((self.brain.yglp.frames_off == 1 and
-                (newCertainty != 1 and
-                 self.brain.ygrp.frames_off >= 1)) or
-               (self.brain.yglp.frames_off >=1 and
-                ((newCertainty != 1 and
-                  newCertainty != self.goalCertainty) or
-                 self.brain.ygrp.frames_off == 1))):
-                #we don't see the left post for the first time
-                self.executeLeds(LEFT_POST_OFF_LEDS)
+        #     if (newCertainty == 0):
+        #         if (self.brain.ygrp.on and
+        #             (self.brain.ygrp.frames_on == 1 or
+        #              self.goalCertainty != newCertainty)):
+        #             #we see an ambiguous post for the first time!
+        #             self.executeLeds(LEFT_POST_AMBIGUOUS_LEDS)
+        #             self.executeLeds(RIGHT_POST_AMBIGUOUS_LEDS)
+        #     if(newCertainty == 2 and
+        #        self.brain.ygrp.on and
+        #        (self.brain.ygrp.frames_on == 1 or
+        #         self.goalCertainty != newCertainty)):
+        #         #we see the right post for the first time!
+        #         self.executeLeds(RIGHT_POST_ON_LEDS)
+        #     if(self.brain.yglp.on and
+        #        (self.brain.yglp.frames_on == 1 or
+        #         self.goalCertainty != newCertainty)):
+        #         #we see the left post for the first time!
+        #         self.executeLeds(LEFT_POST_ON_LEDS)
+        #     if(self.brain.ygrp.frames_off == 1):
+        #         #we don't see the right post for the first time
+        #         self.executeLeds(RIGHT_POST_OFF_LEDS)
+        #     if((self.brain.yglp.frames_off == 1 and
+        #         (newCertainty != 1 and
+        #          self.brain.ygrp.frames_off >= 1)) or
+        #        (self.brain.yglp.frames_off >=1 and
+        #         ((newCertainty != 1 and
+        #           newCertainty != self.goalCertainty) or
+        #          self.brain.ygrp.frames_off == 1))):
+        #         #we don't see the left post for the first time
+        #         self.executeLeds(LEFT_POST_OFF_LEDS)
 
-            self.goalCertainty = newCertainty
+        #     self.goalCertainty = newCertainty
 
-            newFacingOpp = (-90 < self.brain.loc.h < 90)
-            if (newFacingOpp != self.facingOpp or
-                self.facingOpp == -1):
-                self.facingOpp = newFacingOpp
-                if -90 < self.brain.loc.h < 90:
-                    if self.brain.gameController.teamColor == NogginConstants.teamColor.TEAM_BLUE:
-                        self.executeLeds(PINK_GOAL_LEDS)
-                    else:
-                        self.executeLeds(BLUE_GOAL_LEDS)
-                else:
-                    if self.brain.gameController.teamColor == NogginConstants.teamColor.TEAM_BLUE:
-                        self.executeLeds(BLUE_GOAL_LEDS)
-                    else:
-                        self.executeLeds(PINK_GOAL_LEDS)
+        #     newFacingOpp = (-90 < self.brain.loc.h < 90)
+        #     if (newFacingOpp != self.facingOpp or
+        #         self.facingOpp == -1):
+        #         self.facingOpp = newFacingOpp
+        #         if -90 < self.brain.loc.h < 90:
+        #             if self.brain.gameController.teamColor == NogginConstants.teamColor.TEAM_BLUE:
+        #                 self.executeLeds(PINK_GOAL_LEDS)
+        #             else:
+        #                 self.executeLeds(BLUE_GOAL_LEDS)
+        #         else:
+        #             if self.brain.gameController.teamColor == NogginConstants.teamColor.TEAM_BLUE:
+        #                 self.executeLeds(BLUE_GOAL_LEDS)
+        #             else:
+        #                 self.executeLeds(PINK_GOAL_LEDS)
 
         if ROLESWITCH_LEDS:
             newRole = self.brain.player.role
@@ -272,37 +272,37 @@ class Leds():
             self.calibrationCount = self.calibrationCount + 1
 
         # TODO this is a hacky solution to using the same LEDs as calibration
-        if SHAREDFLIP_LEDS and self.brain.motion.calibrated:
-            if ((self.oldFlipTime != self.brain.interface.sharedFlip.timestamp
-                 or self.flashingCount < 150) and self.flippingCount % 20 < 10):
-                self.oldFlipTime = self.brain.interface.sharedFlip.timestamp
-                if self.flashingCount >= 150:
-                    self.flashingCount = 0
-                else:
-                    self.flashingCount = self.flashingCount + 1
+        # if SHAREDFLIP_LEDS and self.brain.motion.calibrated:
+        #     if ((self.oldFlipTime != self.brain.interface.sharedFlip.timestamp
+        #          or self.flashingCount < 150) and self.flippingCount % 20 < 10):
+        #         self.oldFlipTime = self.brain.interface.sharedFlip.timestamp
+        #         if self.flashingCount >= 150:
+        #             self.flashingCount = 0
+        #         else:
+        #             self.flashingCount = self.flashingCount + 1
 
-                self.executeLeds(LEFT_CALIBRATION_ONE_LEDS)
-                self.executeLeds(LEFT_CALIBRATION_TWO_LEDS)
-                self.executeLeds(LEFT_CALIBRATION_THREE_LEDS)
-                self.executeLeds(LEFT_CALIBRATION_FOUR_LEDS)
-                self.executeLeds(LEFT_CALIBRATION_FIVE_LEDS)
-                self.executeLeds(RIGHT_CALIBRATION_ONE_LEDS)
-                self.executeLeds(RIGHT_CALIBRATION_TWO_LEDS)
-                self.executeLeds(RIGHT_CALIBRATION_THREE_LEDS)
-                self.executeLeds(RIGHT_CALIBRATION_FOUR_LEDS)
-                self.executeLeds(RIGHT_CALIBRATION_FIVE_LEDS)
-            else:
-                self.executeLeds(LEFT_CALIBRATION_ONE_OFF_LEDS)
-                self.executeLeds(LEFT_CALIBRATION_TWO_OFF_LEDS)
-                self.executeLeds(LEFT_CALIBRATION_THREE_OFF_LEDS)
-                self.executeLeds(LEFT_CALIBRATION_FOUR_OFF_LEDS)
-                self.executeLeds(LEFT_CALIBRATION_FIVE_OFF_LEDS)
-                self.executeLeds(RIGHT_CALIBRATION_ONE_OFF_LEDS)
-                self.executeLeds(RIGHT_CALIBRATION_TWO_OFF_LEDS)
-                self.executeLeds(RIGHT_CALIBRATION_THREE_OFF_LEDS)
-                self.executeLeds(RIGHT_CALIBRATION_FOUR_OFF_LEDS)
-                self.executeLeds(RIGHT_CALIBRATION_FIVE_OFF_LEDS)
-            self.flippingCount = self.flippingCount + 1
+        #         self.executeLeds(LEFT_CALIBRATION_ONE_LEDS)
+        #         self.executeLeds(LEFT_CALIBRATION_TWO_LEDS)
+        #         self.executeLeds(LEFT_CALIBRATION_THREE_LEDS)
+        #         self.executeLeds(LEFT_CALIBRATION_FOUR_LEDS)
+        #         self.executeLeds(LEFT_CALIBRATION_FIVE_LEDS)
+        #         self.executeLeds(RIGHT_CALIBRATION_ONE_LEDS)
+        #         self.executeLeds(RIGHT_CALIBRATION_TWO_LEDS)
+        #         self.executeLeds(RIGHT_CALIBRATION_THREE_LEDS)
+        #         self.executeLeds(RIGHT_CALIBRATION_FOUR_LEDS)
+        #         self.executeLeds(RIGHT_CALIBRATION_FIVE_LEDS)
+        #     else:
+        #         self.executeLeds(LEFT_CALIBRATION_ONE_OFF_LEDS)
+        #         self.executeLeds(LEFT_CALIBRATION_TWO_OFF_LEDS)
+        #         self.executeLeds(LEFT_CALIBRATION_THREE_OFF_LEDS)
+        #         self.executeLeds(LEFT_CALIBRATION_FOUR_OFF_LEDS)
+        #         self.executeLeds(LEFT_CALIBRATION_FIVE_OFF_LEDS)
+        #         self.executeLeds(RIGHT_CALIBRATION_ONE_OFF_LEDS)
+        #         self.executeLeds(RIGHT_CALIBRATION_TWO_OFF_LEDS)
+        #         self.executeLeds(RIGHT_CALIBRATION_THREE_OFF_LEDS)
+        #         self.executeLeds(RIGHT_CALIBRATION_FOUR_OFF_LEDS)
+        #         self.executeLeds(RIGHT_CALIBRATION_FIVE_OFF_LEDS)
+        #     self.flippingCount = self.flippingCount + 1
 
         # If more teammates are added, consider making bottom of right
         # eye into localization uncertainty and using whole ear for comm

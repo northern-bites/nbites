@@ -5,16 +5,34 @@
 #include <iostream>
 #include <algorithm>
 #include <assert.h>
+#include <map>
+#include <queue>
 
 namespace nblog {
     
-    /*
-     ATOM CONSTRUCTORS
-     */
+    SExpr SExpr::createNotFound() {
+        
+        SExpr var;
+        var._type = SEXPR_NOTFOUND;
+        return var;
+    }
+    
+    SExpr SExpr::NOT_FOUND = SExpr::createNotFound();
+    
+    SExpr::SExpr( const SExpr& other ) :
+    _type(other._type), _list( other._list ), _value( other._value)
+    {}
+    
+    SExpr& SExpr::operator=( const SExpr& other ) {
+        _type = other._type;
+        _value = other._value;
+        _list = other._list;
+        return *this;
+    }
     
     //atom sexpr from string
     SExpr::SExpr(const std::string& v) :
-    _atom(true),
+    _type(SEXPR_ATOM),
     _value(v),
     _list()
     {
@@ -22,7 +40,7 @@ namespace nblog {
     }
     
     SExpr::SExpr(const char * n) :
-    _atom(true),
+    _type(SEXPR_ATOM),
     _list(),
     _value(n)
     {
@@ -31,7 +49,7 @@ namespace nblog {
     
     //atom from int
     SExpr::SExpr(int v) :
-    _atom(true),
+    _type(SEXPR_ATOM),
     _list()
     {
         NBDEBUGs(SECTION_SEXPR, "atom SExpr(int v)\n");
@@ -42,7 +60,7 @@ namespace nblog {
     
     //atom from long
     SExpr::SExpr(long v) :
-    _atom(true),
+    _type(SEXPR_ATOM),
     _list()
     {
         NBDEBUGs(SECTION_SEXPR, "atom SExpr(long v)\n");
@@ -53,7 +71,7 @@ namespace nblog {
     
     //atom from double
     SExpr::SExpr(double v) :
-    _atom(true),
+    _type(SEXPR_ATOM),
     _list()
     {
         NBDEBUGs(SECTION_SEXPR, "atom SExpr(double v)\n");
@@ -70,7 +88,7 @@ namespace nblog {
     SExpr::SExpr(const std::string& type,
                  const std::string& from, clock_t created,
                  size_t image_index, size_t nbytes) :
-    _atom(false),
+    _type(SEXPR_LIST),
     _value("")
     {
         _list = {
@@ -84,7 +102,7 @@ namespace nblog {
     
     //list sexpr from vector
     SExpr::SExpr(const std::vector<SExpr>& l) :
-    _atom(false),
+    _type(SEXPR_LIST),
     _value(""),
     _list(l)
     {
@@ -93,7 +111,7 @@ namespace nblog {
     
     //emtpy list
     SExpr::SExpr() :
-    _atom(false),
+    _type(SEXPR_LIST),
     _value(""),
     _list()
     {
@@ -101,42 +119,42 @@ namespace nblog {
     }
     
     SExpr::SExpr(const std::string& key, SExpr& val) :
-    _atom(false),
+    _type(SEXPR_LIST),
     _value("")
     {
         _list = {SExpr(key), val};
     }
     
     SExpr::SExpr(const std::string& key, const std::string& val) :
-    _atom(false),
+    _type(SEXPR_LIST),
     _value("")
     {
         _list = {SExpr(key), SExpr(val)};
     }
     
     SExpr::SExpr(const std::string& key, int val)  :
-    _atom(false),
+    _type(SEXPR_LIST),
     _value("")
     {
         _list = {SExpr(key), SExpr(val)};
     }
     
     SExpr::SExpr(const std::string& key, long val)  :
-    _atom(false),
+    _type(SEXPR_LIST),
     _value("")
     {
         _list = {SExpr(key), SExpr(val)};
     }
     
     SExpr::SExpr(const std::string& key, double val)  :
-    _atom(false),
+    _type(SEXPR_LIST),
     _value("")
     {
         _list = {SExpr(key), SExpr(val)};
     }
     
     SExpr::SExpr(const std::string& key, int index, int cval) :
-    _atom(false),
+    _type(SEXPR_LIST),
     _value("")
     {
         _list = {SExpr(key), SExpr(index), SExpr(cval)};
@@ -147,31 +165,43 @@ namespace nblog {
      */
     
     void SExpr::setList(const std::vector<SExpr>& newContents) {
-        _atom = false;
+        if (_type == SEXPR_NOTFOUND) {
+            throw std::domain_error("sexpr not found");
+        }
+        _type = SEXPR_LIST;
         _value = "";
         _list = newContents;
     }
     
     void SExpr::setList(std::initializer_list<SExpr> exprs) {
-        _atom = false;
+        if (_type == SEXPR_NOTFOUND) {
+            throw std::domain_error("sexpr not found");
+        }
+        _type = SEXPR_LIST;
         _value = "";
         _list = std::vector<SExpr>(exprs);
     }
     
     void SExpr::setAtom(std::string val) {
-        _atom = true;
+        if (_type == SEXPR_NOTFOUND) {
+            throw std::domain_error("sexpr not found");
+        }
+        _type = SEXPR_ATOM;
         _value = val;
         _list = {};
     }
     
     void SExpr::setAtomAsCopy(SExpr atomToCopy) {
-        _atom = true;
+        if (_type == SEXPR_NOTFOUND) {
+            throw std::domain_error("sexpr not found");
+        }
+        _type = SEXPR_ATOM;
         _value = atomToCopy.value();
         _list = {};
     }
     
     void SExpr::insert(int index, SExpr& inserted) {
-        if (_atom)
+        if ((_type != SEXPR_LIST) || !inserted.exists())
             return;
         
         if (index < 0 || index > _list.size())
@@ -182,68 +212,78 @@ namespace nblog {
     }
     
     bool SExpr::remove(int index) {
-        if (_atom || index < 0 || index > _list.size())
+        if ((_type != SEXPR_LIST) || index < 0 || index > _list.size())
             return false;
         
         _list.erase(_list.begin() + index);
         return true;
     }
 
-    std::string SExpr::value() {
-        if (!_atom) throw std::domain_error("sexpr is atom");
+    const std::string SExpr::value() {
+        if (_type != SEXPR_ATOM) throw std::domain_error("sexpr is not atom");
         return _value;
     }
     
     int SExpr::valueAsInt() {
-        if (!_atom) throw std::domain_error("sexpr is atom");
+        if (_type != SEXPR_ATOM) throw std::domain_error("sexpr is not atom");
         return std::stoi(_value);
 ;
     }
     
     long SExpr::valueAsLong() {
-        if (!_atom) throw std::domain_error("sexpr is atom");
+        if (_type != SEXPR_ATOM) throw std::domain_error("sexpr is not atom");
         return std::stol(_value);
     }
     
     double SExpr::valueAsDouble() {
-        if (!_atom) throw std::domain_error("sexpr is atom");
+        if (_type != SEXPR_ATOM) throw std::domain_error("sexpr is not atom");
         return std::stod(_value);
     }
     
     SExpr * SExpr::get(int i)
     {
-        if (i < _list.size())
+        if ( _type == SEXPR_LIST && i < _list.size())
         {
             return &_list[i];
         }
         else return NULL;
     }
     
+    SExpr & SExpr::safeGet(int i) {
+        SExpr * fnd = get(i);
+        if (fnd) return *fnd;
+        return NOT_FOUND;
+    }
+    
     std::vector<SExpr> * SExpr::getList() {
-        if (_atom)
+        if (_type != SEXPR_LIST)
             return NULL;
         return &_list;
     }
     
     void SExpr::append(const std::vector<SExpr>& l)
     {
-        if (_atom) return;
+        if (_type != SEXPR_LIST) return;
         
         _list.insert(_list.end(), l.begin(), l.end());
     }
     
     void SExpr::append(const SExpr s)
     {
-        if (_atom) return;
+        if (_type != SEXPR_LIST || !s.exists()) return;
         
         _list.push_back(s);
     }
     
     const char SExpr::special[] = {' ', '(', ')', '\r', '\n', '\t', '\0'};
     
-    std::string SExpr::serialize()
+    const std::string SExpr::serialize()
     {
-        if (_atom)
+        if (_type == SEXPR_NOTFOUND) {
+            return "NOT_FOUND";
+        }
+        
+        if (_type == SEXPR_ATOM)
         {
             if (_value.find_first_of(special) == std::string::npos) {
                 NBDEBUGs(SECTION_SEXPR, "%i: returning [%s]\n", __LINE__, _value.c_str());
@@ -289,12 +329,16 @@ namespace nblog {
         return s;
     }
     
-    std::string SExpr::print(int indent, int lineLimit, int level)
+    const std::string SExpr::print(int indent, int lineLimit, int level)
     {
+        if (_type == SEXPR_NOTFOUND) {
+            return "NOT_FOUND";
+        }
+        
         std::string prefix(indent * level, ' ');
         
         std::string s = serialize();
-        if (_atom || (int) s.length() + indent * level <= lineLimit)
+        if ((_type == SEXPR_ATOM) || (int) s.length() + indent * level <= lineLimit)
             return prefix + s;
         
         s = prefix + '(';
@@ -315,9 +359,9 @@ namespace nblog {
         return s;
     }
     
-    SExpr * SExpr::find(std::string name)
+    SExpr * SExpr::find(const std::string name)
     {
-        if (!_atom)
+        if (_type == SEXPR_LIST)
         {
             for (unsigned int i = 0; i < _list.size(); i++)
             {
@@ -331,10 +375,101 @@ namespace nblog {
         return NULL;
     }
     
+    SExpr& SExpr::safeFind(const std::string name) {
+        SExpr * fnd = find(name);
+        if (fnd)
+            return *fnd;
+        return NOT_FOUND;
+    }
+    
+    SExpr * SExpr::firstValueOf(const std::string name) {
+        SExpr * fnd = find(name);
+        if (fnd && fnd->count() > 1) {
+            return fnd->get(1);
+        }
+        
+        return NULL;
+    }
+    
+    SExpr & SExpr::safeFirstValueOf(const std::string name) {
+        SExpr * fnd = firstValueOf(name);
+        if (fnd)
+            return *fnd;
+        return NOT_FOUND;
+    }
+    
+    std::vector<SExpr *> traverse(std::map<SExpr *, SExpr *> & pmap, SExpr * start) {
+        std::vector<SExpr *> ret;
+        SExpr * cur = start;
+        while (cur) {
+            ret.insert(ret.begin(), cur);
+            cur = pmap[cur];
+        }
+        
+        return ret;
+    }
+ 
+    std::vector<std::vector<SExpr *>> internalRecursiveFind(const std::string key, int num, SExpr * start) {
+        std::map<SExpr *, SExpr *> pmap;
+        std::queue<SExpr *> queue;
+        std::vector<std::vector<SExpr *>> retv;
+        
+        queue.push(start);
+        pmap[start] = NULL;
+        
+        while (!queue.empty()) {
+            SExpr * current = queue.front();
+            queue.pop();
+            
+            for (int i = 0; i < current->count(); ++i) {
+                SExpr * child = current->get(i);
+                if (child->isAtom()) {
+                    if (child->value() == key) {
+                        retv.push_back(traverse(pmap, current));
+                        
+                        if (retv.size() == num)
+                            return retv;
+                    }
+                } else {
+                    pmap[child] = current;
+                    queue.push(child);
+                }
+            }
+        }
+        
+        return retv;
+    }
+    
+    
+    std::vector<SExpr *> SExpr::recursiveFind(const std::string name) {
+        std::vector<SExpr *> could_not_complete;
+        
+        if (_type != SEXPR_LIST || _list.empty()) {
+            return could_not_complete;
+        }
+        
+        std::vector<std::vector<SExpr *>> matches = internalRecursiveFind(name, 1, this);
+        
+        if (matches.empty()) {
+            return could_not_complete;
+        }
+        
+        return matches[0];
+    }
+    
+    std::vector<std::vector<SExpr *>> SExpr::recursiveFindAll(const std::string name) {
+        std::vector<std::vector<SExpr *>> could_not_complete;
+        
+        if (_type != SEXPR_LIST || _list.empty())
+            return could_not_complete;
+        
+        return internalRecursiveFind(name, INT32_MAX, this);
+    }
+    
+    
     /*
      Class method to read from string.
      */
-    
     SExpr * SExpr::read(const std::string s, ssize_t& p)
     {
         while (p < (int)s.length() && isspace(s[p]))
@@ -410,18 +545,5 @@ namespace nblog {
             }
         }
     }
-    
-    /*
-     int main(int argc, char** argv)
-     {
-     std::string test = "(image (height (hurry hurry 55) (\"W(HY)??? \" lolajk???sdalfjksd?? )) (width 99))";
-     int i = 0;
-     SExpr s = SExpr::read(test, i);
-     std::cout << "Finding" << std::endl;
-     SExpr found = s.find("height").find("\"W(HY)??? \"");
-     
-     std::cout << s.print() << std::endl << std::endl;
-     std::cout << found.print() << std::endl;
-     } */
     
 }

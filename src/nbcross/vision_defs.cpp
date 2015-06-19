@@ -40,12 +40,9 @@ int Vision_func() {
                                   find("from")->get(1)->value() == "camera_TOP";
 
     int width = 2*atoi(copy->tree().find("contents")->get(1)->
-                                        find("width")->get(1)->value().c_str());
+                                    find("width")->get(1)->value().c_str());
     int height = atoi(copy->tree().find("contents")->get(1)->
                                         find("height")->get(1)->value().c_str());     
-
-    int outWidth = width/4;
-    int outHeight = height/2;
 
     // Location of lisp text file with color params
     std::string sexpPath = std::string(getenv("NBITES_DIR"));
@@ -69,8 +66,7 @@ int Vision_func() {
     portals::Message<messages::YUVImage> imageMessage(&image);
     portals::Message<messages::JointAngles> jointsMessage(&joints);
 
-    // VisionModule default constructor loads color params from Lisp in config/colorParms.txt
-    man::vision::VisionModule module;
+    man::vision::VisionModule module(width / 2, height);
 
     module.topIn.setMessage(imageMessage);
     module.bottomIn.setMessage(imageMessage);
@@ -99,7 +95,7 @@ int Vision_func() {
     man::vision::ImageFrontEnd* frontEnd = module.getFrontEnd(topCamera);
 
     Log* yRet = new Log();
-    int yLength = outHeight*outWidth*2;
+    int yLength = (width / 4) * (height / 2) * 2;
 
     // Create temp buffer and fill with yImage from FrontEnd
     uint8_t yBuf[yLength];
@@ -115,7 +111,7 @@ int Vision_func() {
     //   WHITE IMAGE
     // ---------------
     Log* whiteRet = new Log();
-    int whiteLength = outHeight*outWidth;;
+    int whiteLength = (width / 4) * (height / 2);
 
     // Create temp buffer and fill with white image 
     uint8_t whiteBuf[whiteLength];
@@ -134,7 +130,7 @@ int Vision_func() {
     //   GREEN IMAGE
     // ---------------
     Log* greenRet = new Log();
-    int greenLength = outHeight*outWidth;
+    int greenLength = (width / 4) * (height / 2);
 
     // Create temp buffer and fill with gree image 
     uint8_t greenBuf[greenLength];
@@ -153,7 +149,7 @@ int Vision_func() {
     //   ORANGE IMAGE
     // ----------------
     Log* orangeRet = new Log();
-    int orangeLength = outHeight*outWidth;
+    int orangeLength = (width / 4) * (height / 2);
 
     // Create temp buffer and fill with orange image 
     uint8_t orangeBuf[orangeLength];
@@ -172,7 +168,7 @@ int Vision_func() {
     //  SEGMENTED IMAGE
     //-------------------
     Log* colorSegRet = new Log();
-    int colorSegLength = outHeight*outWidth;
+    int colorSegLength = (width / 4) * (height / 2);
 
     // Create temp buffer and fill with segmented image
     uint8_t segBuf[colorSegLength];
@@ -194,9 +190,9 @@ int Vision_func() {
 
     man::vision::AngleBinsIterator<man::vision::Edge> abi(*edgeList);
     for (const man::vision::Edge* e = *abi; e; e = *++abi) {
-        uint32_t x = htonl(e->x() + outWidth/2);
+        uint32_t x = htonl(e->x() + (width / 8));
         edgeBuf.append((const char*) &x, sizeof(uint32_t));
-        uint32_t y = htonl(-e->y() + outHeight/2);
+        uint32_t y = htonl(-e->y() + (height / 4));
         edgeBuf.append((const char*) &y, sizeof(uint32_t));
         uint32_t mag = htonl(e->mag());
         edgeBuf.append((const char*) &mag, sizeof(uint32_t));
@@ -308,6 +304,24 @@ int Vision_func() {
 
     ballRet->setTree(allBalls);
     rets.push_back(ballRet);
+
+    // std::cout << "SCRATCH" << std::endl;
+    // man::vision::GeoLine test1;
+    // test1.set(75, M_PI / 2, -45, 15);
+    // std::cout << test1.print() << std::endl;
+
+    // test1.translateRotate(0, 0, -(M_PI / 2));
+    // test1.translateRotate(300, 200, (M_PI));
+    // std::cout << test1.print() << std::endl;
+
+    // std::cout << "SCRATCH" << std::endl;
+    // man::vision::GeoLine test2;
+    // test2.set(100, M_PI / 2, -50, 50);
+    // std::cout << test2.print() << std::endl;
+
+    // test2.translateRotate(0, 0, -(M_PI / 2));
+    // test2.translateRotate(400, 200, (M_PI / 2));
+    // std::cout << test2.print() << std::endl;
 
     return 0;
 }
@@ -433,7 +447,7 @@ int Synthetics_func() {
     assert(args.size() == 1);
 
     printf("Synthetics_func()\n");
-
+    
     double x = std::stod(args[0]->tree().find("contents")->get(1)->find("params")->get(1)->value().c_str());
     double y = std::stod(args[0]->tree().find("contents")->get(1)->find("params")->get(2)->value().c_str());
     double h = std::stod(args[0]->tree().find("contents")->get(1)->find("params")->get(3)->value().c_str());
@@ -468,3 +482,5 @@ int Synthetics_func() {
 
     rets.push_back(log);
 }
+
+int Scratch_func() {}

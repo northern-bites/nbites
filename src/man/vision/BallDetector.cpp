@@ -73,7 +73,6 @@ Ball::Ball(Blob& b, double x_, double y_, int imgHeight_, int imgWidth_) :
     imgWidth(imgWidth_),
     _confidence(0)
 {
-    std::cout << "Ball constructor" << std::endl;
     compute();
 }
 
@@ -86,8 +85,6 @@ Ball::Ball() :
 
 void Ball::compute()
 {
-    std::cout << "BALL::compute()" << std::endl;
-
     dist = hypot(x_rel, y_rel);
     double density = blob.area() / blob.count();
     double aspectRatio = (blob.secondPrincipalLength() /

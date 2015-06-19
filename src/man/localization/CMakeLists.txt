@@ -27,6 +27,7 @@ add_library(
 
 # Link project to appropriate libraries.
 target_link_libraries(localization
+  vision
   support
   portals
   messages)

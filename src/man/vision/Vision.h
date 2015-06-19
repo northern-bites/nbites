@@ -13,6 +13,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <string>
+#include <iostream>
 
 namespace man {
 namespace vision {
@@ -106,8 +107,17 @@ inline void unitVec(double x, double y, double& u, double& v)
   v = y / g;
 }
 
-std::string strPrintf(const char* format, ...);
+inline void translateRotate(double x, double y, double transX, double transY, 
+                            double rotation, double& xTransformed, double& yTransformed)
+{
+    double xRotated = x*cos(rotation) - y*sin(rotation);
+    double yRotated = x*sin(rotation) + y*cos(rotation);
 
+    xTransformed = xRotated + transX;
+    yTransformed = yRotated + transY;
+}
+
+std::string strPrintf(const char* format, ...);
 
 // ************
 // *          *
