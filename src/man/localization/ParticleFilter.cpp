@@ -184,10 +184,16 @@ void ParticleFilter::updateEstimate()
 
 void ParticleFilter::projectObservationsOntoField(messages::FieldLines& visionInput)
 {
-    Particle estimateThisFrame(poseEstimate.x(), poseEstimate.y(), poseEstimate.h(), 0);
+    for (int i = 0; i < visionInput.line_size(); i++) {
+        vision::GeoLine projected = LineSystem::relRobotToAbsolute(visionInput.line(i), poseEstimate);
+        messages::FieldLine& field = *visionInput.mutable_line(i);
+        messages::HoughLine& hough = *field.mutable_inner();
 
-    for (int i = 0; i < visionInput.line_size(); i++)
-        LineSystem::projectOntoField(*visionInput.mutable_line(i), estimateThisFrame);
+        hough.set_r(projected.r());
+        hough.set_t(projected.t());
+        hough.set_ep0(projected.ep0());
+        hough.set_ep1(projected.ep1());
+    }
 }
 
 /**

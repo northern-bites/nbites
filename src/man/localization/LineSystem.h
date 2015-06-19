@@ -16,17 +16,26 @@
 namespace man {
 namespace localization {
 
+// HIGH PRIORITY
+// TODO LocLineID
+//
+// LOW PRIORITY
+// TODO refactor Vision.pb.h
+// TODO add side goalbox lines
 class LineSystem {
 public:
     LineSystem();
     ~LineSystem();
 
-    double scoreObservation(const messages::FieldLine& observation, const Particle& particle);
-    static void projectOntoField(messages::FieldLine& observation, const Particle& particle);
+    // LocLineID matchObservation(const messages::FieldLine& observation, const messages::RobotLocation& loc);
+    double scoreObservation(const messages::FieldLine& observation, const messages::RobotLocation& loc);
+    // messages::RobotLocation constructPosition(const messages::FieldLine& observation, const messages::RobotLocation& loc);
+
+    static vision::GeoLine relRobotToAbsolute(const messages::FieldLine& observation, const messages::RobotLocation& loc);
+    static bool shouldUse(const messages::FieldLine& observation); 
 
 private:
     void addLine(float r, float t, float ep0, float ep1);
-    static vision::GeoLine fromRelRobotToGlobal(const messages::FieldLine& relRobotLine, const Particle& particle);
 
     std::vector<vision::GeoLine> lines;
 };

@@ -5,11 +5,6 @@
 namespace man {
 namespace localization {
 
-// TODO repeat lines
-// TODO add side goalbox lines
-// TODO line classification
-// TODO endpoint detection and corners
-// TODO refactor Vision.pb.h
 LineSystem::LineSystem() 
 {
     // Add endlines
@@ -31,33 +26,39 @@ LineSystem::LineSystem()
 LineSystem::~LineSystem() {}
 
 double LineSystem::scoreObservation(const messages::FieldLine& observation,
-                                    const Particle& particle)
+                                    const messages::RobotLocation& loc)
 {
-    vision::GeoLine globalLine = LineSystem::fromRelRobotToGlobal(observation, particle);
-    int bestLine = -1;
+    vision::GeoLine globalLine = LineSystem::relRobotToAbsolute(observation, loc);
 
     double bestScore = std::numeric_limits<double>::max();
     for (int i = 0; i < lines.size(); i++) {
         double curScore = lines[i].error(globalLine);
-        if (curScore < bestScore) {
+        if (curScore < bestScore)
             bestScore = curScore;
-            bestLine = i;
-        }
     }
 
-    return (1 / globalLine.r()) * bestScore;
+    double r = observation.inner().r();
+    return (1 / r) * bestScore;
 }
 
-void LineSystem::projectOntoField(messages::FieldLine& observation,
-                                  const Particle& particle)
+vision::GeoLine LineSystem::relRobotToAbsolute(const messages::FieldLine& observation,
+                                               const messages::RobotLocation& loc)
 {
-    vision::GeoLine globalLine = LineSystem::fromRelRobotToGlobal(observation, particle);
+    const messages::HoughLine& inner = observation.inner();
 
-    messages::HoughLine& innerObservation = *observation.mutable_inner();
-    innerObservation.set_r(globalLine.r());
-    innerObservation.set_t(globalLine.t());
-    innerObservation.set_ep0(globalLine.ep0());
-    innerObservation.set_ep1(globalLine.ep1());
+    vision::GeoLine globalLine;
+    globalLine.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
+    globalLine.translateRotate(0, 0, -(M_PI / 2));
+    globalLine.translateRotate(loc.x(), loc.y(), loc.h());
+
+    return globalLine;
+}
+
+bool LineSystem::shouldUse(const messages::FieldLine& observation)
+{
+    const messages::HoughLine& inner = observation.inner();
+    bool longEnough = inner.ep1() - inner.ep0() > 60;
+    return longEnough;
 }
 
 void LineSystem::addLine(float r, float t, float ep0, float ep1)
@@ -65,20 +66,6 @@ void LineSystem::addLine(float r, float t, float ep0, float ep1)
     vision::GeoLine line;
     line.set(r, t, ep0, ep1);
     lines.push_back(line);
-}
-
-vision::GeoLine LineSystem::fromRelRobotToGlobal(const messages::FieldLine& relRobotLine,
-                                                 const Particle& particle)
-{
-    const messages::HoughLine& relRobotInner = relRobotLine.inner();
-    const messages::RobotLocation& loc = particle.getLocation();
-
-    vision::GeoLine globalLine;
-    globalLine.set(relRobotInner.r(), relRobotInner.t(), relRobotInner.ep0(), relRobotInner.ep1());
-    globalLine.translateRotate(0, 0, -(M_PI / 2));
-    globalLine.translateRotate(loc.x(), loc.y(), loc.h());
-
-    return globalLine;
 }
 
 } // namespace localization
