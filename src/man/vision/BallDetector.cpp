@@ -18,7 +18,7 @@ BallDetector::BallDetector(FieldHomography* homography_, bool topCamera_):
 
 BallDetector::~BallDetector() { }
 
-bool BallDetector::findBall(ImageLiteU8 orange)
+bool BallDetector::findBall(ImageLiteU8 orange, double cameraHeight)
 {
 #ifdef OFFLINE
     candidates.clear();
@@ -37,14 +37,17 @@ bool BallDetector::findBall(ImageLiteU8 orange)
 
         // This blob is above the horizon. Can't be a ball
         if (!belowHoriz) {
-            //std::cout << "BLOB's above horizon:" << std::endl;
+#ifdef OFFLINE
+            std::cout << "BLOB's above horizon:" << std::endl;
+#endif
             continue;
         }
 
-        Ball b((*i), x_rel, y_rel, orange.height(), orange.width());
+        Ball b((*i), x_rel, y_rel, cameraHeight, orange.height(), orange.width());
         if (b.confidence() > .5) {
 #ifdef OFFLINE
             candidates.push_back(b);
+            std::cout << "accepted ball because:\n" << b.properties() << std::endl;
 #endif
             if (b.confidence() > _best.confidence()) {
                 _best = b;
@@ -52,7 +55,9 @@ bool BallDetector::findBall(ImageLiteU8 orange)
         }
         else {
             // TODO: ball debug flag
-            //std::cout << "declined ball because:\n" << b.properties() << std::endl;
+#ifdef OFFLINE
+            std::cout << "declined ball because:\n" << b.properties() << std::endl;
+#endif
         }
     }
     if (best().confidence() > .5) {
@@ -63,12 +68,13 @@ bool BallDetector::findBall(ImageLiteU8 orange)
     }
 }
 
-Ball::Ball(Blob& b, double x_, double y_, int imgHeight_, int imgWidth_) :
+Ball::Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_, int imgWidth_) :
     blob(b),
     radThresh(.25, .5),
     thresh(.5, .8),
     x_rel(x_),
     y_rel(y_),
+    cameraH(cameraH_),
     imgHeight(imgHeight_),
     imgWidth(imgWidth_),
     _confidence(0)
@@ -90,7 +96,9 @@ void Ball::compute()
     double aspectRatio = (blob.secondPrincipalLength() /
                           blob.firstPrincipalLength());
 
-    expectedDiam = pixDiameterFromDist(dist);
+    double hypotDist = hypot(dist, cameraH);
+
+    expectedDiam = pixDiameterFromDist(hypotDist);
 
     diameterRatio;
     if (expectedDiam > 2 * blob.firstPrincipalLength())

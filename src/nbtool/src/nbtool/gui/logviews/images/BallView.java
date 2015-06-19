@@ -45,9 +45,9 @@ public class BallView extends ViewParent implements IOFirstResponder {
     @Override
     public void paintComponent(Graphics g) {
         if(orange == null) return;
-        g.drawImage(original, 0, 0, 640, 480, null);
+        g.drawImage(original, 0, 0, original.getWidth(), original.getHeight(), null);
         drawBlobs();
-        g.drawImage(orange, 0, 480, 320, 240, null);
+        g.drawImage(orange, 0, original.getHeight(), orange.getWidth(), orange.getHeight(), null);
     }
 
     public void drawBlobs()
@@ -96,7 +96,10 @@ public class BallView extends ViewParent implements IOFirstResponder {
     @Override
     public void ioReceived(IOInstance inst, int ret, Log... out)
     {
-        Y8image o = new Y8image(320, 240, out[3].bytes);
+        SExpr otree = out[3].tree();
+        Y8image o = new Y8image(otree.find("width").get(1).valueAsInt(),
+                                otree.find("height").get(1).valueAsInt(),
+                                out[3].bytes);
         orange = new BufferedImage(o.width, o.height, BufferedImage.TYPE_3BYTE_BGR);
         Graphics2D g = orange.createGraphics();
         g.drawImage(o.toBufferedImage(), 0, 0, null);

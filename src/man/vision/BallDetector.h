@@ -21,7 +21,7 @@ const double HORIZ_FOV_RAD = HORIZ_FOV_DEG * M_PI / 180;
 
 class Ball {
 public:
-    Ball(Blob& b, double x_, double y_, int imgHeight_, int imgWidth_);
+    Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_, int imgWidth_);
     Ball();
 
     std::string properties();
@@ -41,6 +41,7 @@ public:
 
     double x_rel;
     double y_rel;
+    double cameraH;
     double dist;
 
     int imgHeight, imgWidth;
@@ -57,7 +58,7 @@ public:
     BallDetector(FieldHomography* homography_, bool topCamera);
     ~BallDetector();
 
-    bool findBall(ImageLiteU8 orange);
+    bool findBall(ImageLiteU8 orange, double cameraHeight);
 
     Ball& best() { return _best; }
 

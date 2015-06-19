@@ -59,17 +59,25 @@ int Vision_func() {
         joints.ParseFromArray((void *) ptToJoints, numBytes[2]);
     }
 
-    // Empty messages to pass to Vision Module so it doesn't freak
-    messages::YUVImage image(buf, width, height, width);
+    // Empty Images to pass to vision module, top & bottom
+    messages::YUVImage realImage(buf, width, height, width);
+    messages::YUVImage emptyImage(width, height);
 
     // Setup and run module
-    portals::Message<messages::YUVImage> imageMessage(&image);
+    portals::Message<messages::YUVImage> rImageMessage(&realImage);
+    portals::Message<messages::YUVImage> eImageMessage(&emptyImage);
     portals::Message<messages::JointAngles> jointsMessage(&joints);
 
     man::vision::VisionModule module(width / 2, height);
 
-    module.topIn.setMessage(imageMessage);
-    module.bottomIn.setMessage(imageMessage);
+    if (topCamera) {
+        module.topIn.setMessage(rImageMessage);
+        module.bottomIn.setMessage(eImageMessage);
+    }
+    else {
+        module.topIn.setMessage(eImageMessage);
+        module.bottomIn.setMessage(rImageMessage);
+    }
     module.jointsIn.setMessage(jointsMessage);
 
     // If log included color parameters in description, have module use those
@@ -160,7 +168,11 @@ int Vision_func() {
     orangeRet->setData(orangeBuffer);
 
     // Read params from JSon and attach to image 
-    orangeRet->setTree(getSExprFromSavedParams(2, sexpPath, topCamera));
+    SExpr oTree = getSExprFromSavedParams(2, sexpPath, topCamera);
+    oTree.append(SExpr::keyValue("width", width / 4));
+    oTree.append(SExpr::keyValue("height", height / 2));
+
+    orangeRet->setTree(oTree);
 
     rets.push_back(orangeRet);
 

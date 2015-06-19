@@ -175,7 +175,7 @@ void VisionModule::run_()
         //times[i][5] = timer.end();
 
         if (!ballDetected) {
-            ballDetected = ballDetector[i]->findBall(orangeImage);
+            ballDetected = ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
         }
 
         // times[i][6] = timer.end();
