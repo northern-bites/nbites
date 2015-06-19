@@ -210,6 +210,4 @@ enum class LineID {
   Endline,
   TopGoalbox,
   Midline
-};
-
-*/
+}*/

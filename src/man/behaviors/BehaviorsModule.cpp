@@ -222,8 +222,8 @@ void BehaviorsModule::prepareMessages()
     gameStateIn.latch();
     pyInterface.setGameState_ptr(&gameStateIn.message());
 
-    // localizationIn.latch();
-    // pyInterface.setLoc_ptr(&localizationIn.message());
+    localizationIn.latch();
+    pyInterface.setLoc_ptr(&localizationIn.message());
 
     // visionFieldIn.latch();
     // pyInterface.setVisionField_ptr(&visionFieldIn.message());

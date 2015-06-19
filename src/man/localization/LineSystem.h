@@ -8,27 +8,27 @@
 
 #pragma once
 
+#include "Particle.h"
+#include "Vision.pb.h"
 #include "FieldConstants.h"
-#include "LocStructs.h"
+#include "../vision/Homography.h"
 
 namespace man {
 namespace localization {
 
-typedef std::vector<Line> LineSet;
-typedef LineSet::iterator LineIt;
-
 class LineSystem {
 public:
     LineSystem();
-    virtual ~LineSystem();
+    ~LineSystem();
 
-    void addLine(float startX, float startY, float endX, float endY);
-
-    float scoreObservation(Line globalObsv);
-    LineErrorMatch scoreAndMatchObservation(Line globalObsv, bool debug = false);
+    double scoreObservation(const messages::FieldLine& observation, const Particle& particle);
+    static void projectOntoField(messages::FieldLine& observation, const Particle& particle);
 
 private:
-    LineSet lines;
+    void addLine(float r, float t, float ep0, float ep1);
+    static vision::GeoLine fromRelRobotToGlobal(const messages::FieldLine& relRobotLine, const Particle& particle);
+
+    std::vector<vision::GeoLine> lines;
 };
 
 } // namespace localization

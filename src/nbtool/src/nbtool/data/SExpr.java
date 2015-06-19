@@ -142,6 +142,7 @@ public abstract class SExpr implements Serializable{
 	public abstract int valueAsInt() throws NumberFormatException;
 	public abstract long valueAsLong() throws NumberFormatException;
 	public abstract double valueAsDouble() throws NumberFormatException;
+	public abstract float valueAsFloat() throws NumberFormatException;
 	public abstract boolean valueAsBoolean();
 
 	//type retrieval
@@ -232,6 +233,11 @@ public abstract class SExpr implements Serializable{
 		@Override
 		public double valueAsDouble() throws NumberFormatException {
 			return Double.parseDouble(value);
+		}
+
+		@Override
+		public float valueAsFloat() throws NumberFormatException {
+			return Float.parseFloat(value);
 		}
 
 		@Override
@@ -499,6 +505,11 @@ public abstract class SExpr implements Serializable{
 
 		@Override
 		public double valueAsDouble() throws NumberFormatException {
+			throw new DoesNotExistException();
+		}
+
+		@Override
+		public float valueAsFloat() throws NumberFormatException {
 			throw new DoesNotExistException();
 		}
 

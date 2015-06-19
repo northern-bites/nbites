@@ -1,6 +1,7 @@
 package nbtool.data;
 
 import nbtool.util.NBConstants;
+import nbtool.util.Utility;
 
 public class Log {	
 	
@@ -166,7 +167,7 @@ public class Log {
 	 * */
 	
 	public Integer primaryBytes() {
-		SExpr c = tree().find("contents").get(1).find("bytes").get(1);
+		SExpr c = tree().find("contents").get(1).find("nbytes").get(1);
 		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
 	}
 	
@@ -229,7 +230,7 @@ public class Log {
 		if (item.isAtom())
 			return null;
 		
-		SExpr bytes = item.find("bytes").get(1);
+		SExpr bytes = item.find("nbytes").get(1);
 		return bytes.exists() && bytes.isAtom() ? bytes.valueAsInt() : null;
 	}
 	
@@ -241,13 +242,23 @@ public class Log {
 		int offset = 0;
 		
 		for (int i = 0; i < index; ++i) {
-			SExpr bytes = cont.get(i + 1).find("bytes").get(1);
+			SExpr bytes = cont.get(i + 1).find("nbytes").get(1);
 			if (!bytes.exists() || !bytes.isAtom())
 				return null;
 			offset += bytes.valueAsInt();
 		}
 		
 		return offset;
+	}
+	
+	public byte[] bytesForContentItem(int index) {
+		Integer offset = contentOffset(index);
+		Integer total = contentNumBytes(index);
+
+		if (offset == null || total == null)
+			return null;
+		
+		return Utility.subArray(bytes, offset, total);
 	}
 	
 	//TESTING

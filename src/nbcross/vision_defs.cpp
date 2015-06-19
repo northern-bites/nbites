@@ -227,6 +227,24 @@ int Vision_func() {
     lineRet->setData(lineBuf);
     rets.push_back(lineRet);
 
+    // std::cout << "SCRATCH" << std::endl;
+    // man::vision::GeoLine test1;
+    // test1.set(75, M_PI / 2, -45, 15);
+    // std::cout << test1.print() << std::endl;
+
+    // test1.translateRotate(0, 0, -(M_PI / 2));
+    // test1.translateRotate(300, 200, (M_PI));
+    // std::cout << test1.print() << std::endl;
+
+    // std::cout << "SCRATCH" << std::endl;
+    // man::vision::GeoLine test2;
+    // test2.set(100, M_PI / 2, -50, 50);
+    // std::cout << test2.print() << std::endl;
+
+    // test2.translateRotate(0, 0, -(M_PI / 2));
+    // test2.translateRotate(400, 200, (M_PI / 2));
+    // std::cout << test2.print() << std::endl;
+
     return 0;
 }
 
@@ -269,3 +287,5 @@ int Synthetics_func() {
 
     rets.push_back(log);
 }
+
+int Scratch_func() {}

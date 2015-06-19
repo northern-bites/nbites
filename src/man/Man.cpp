@@ -101,7 +101,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         cognitionThread.addModule(topTranscriber);
         cognitionThread.addModule(bottomTranscriber);
         cognitionThread.addModule(vision);
-        // cognitionThread.addModule(localization);
+        cognitionThread.addModule(localization);
         // cognitionThread.addModule(ballTrack);
         // cognitionThread.addModule(obstacle);
         cognitionThread.addModule(gamestate);
@@ -118,11 +118,11 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         vision.bottomIn.wireTo(&bottomTranscriber.imageOut);
         vision.jointsIn.wireTo(&topTranscriber.jointsOut, true);
         
-        // localization.visionInput.wireTo(&vision.vision_field);
-        // localization.motionInput.wireTo(&motion.odometryOutput_, true);
-        // localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
+        localization.visionInput.wireTo(&vision.linesOut);
+        localization.motionInput.wireTo(&motion.odometryOutput_, true);
+        localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
         // localization.resetInput[1].wireTo(&sharedBall.sharedBallReset, true);
-        // localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
+        localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
         // localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
         
         // ballTrack.visionBallInput.wireTo(&vision.vision_ball);
@@ -145,11 +145,11 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
         gamestate.switchTeamInput.wireTo(&guardian.switchTeamOutput, true);
         gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
-        // 
-        // behaviors.localizationIn.wireTo(&localization.output);
+        
+        behaviors.localizationIn.wireTo(&localization.output);
         // behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
         behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
-        // behaviors.visionFieldIn.wireTo(&vision.vision_field);
+        // behaviors.visionFieldIn.wireTo(&vision.linesOut);
         // behaviors.visionRobotIn.wireTo(&vision.vision_robot);
         // behaviors.visionObstacleIn.wireTo(&vision.vision_obstacle);
         behaviors.fallStatusIn.wireTo(&guardian.fallStatusOutput, true);
@@ -161,7 +161,6 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         // behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
         // behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
         // behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);
-        // 
         for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
         {
             behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
@@ -245,13 +244,6 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 //#endif
         
         //Superseded by logging code in ImageTranscriber.
-        
-//#ifdef LOG_IMAGES
-        cognitionThread.log<messages::YUVImage>((control::IMAGES), &topTranscriber.imageOut,
-                                                "YUVImage", "camera_TOP");
-        cognitionThread.log<messages::YUVImage>((control::IMAGES), &bottomTranscriber.imageOut,
-                                                "YUVImage", "camera_BOT");
-//#endif
         
 //#ifdef LOG_VISION
         cognitionThread.log<messages::FieldLines>((control::VISION), &vision.linesOut,
