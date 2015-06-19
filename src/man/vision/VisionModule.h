@@ -31,7 +31,7 @@ public:
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
     HoughLineList* getHoughLines(bool topCamera = true) const { return houghLines[!topCamera]; }
-    // getter for homography
+    FieldHomography* getFieldHomography(bool topCamera = true) const {return homography[!topCamera]; }
     FieldLineList* getFieldLines(bool topCamera = true) const { return fieldLines[!topCamera]; }
     GoalboxDetector* getBox(bool topCamera = true) const { return boxDetector[!topCamera]; }
     CornerDetector* getCorners(bool topCamera = true) const { return cornerDetector[!topCamera]; }

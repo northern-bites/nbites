@@ -20,9 +20,11 @@ using nblog::Log;
 using nblog::SExpr;
 
 //man::vision::Colors* getColorsFromSExpr(SExpr* params);
+void getCalibrationOffsets(Log* l, double* r, double* p, int w, int h, bool t);
 void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top);
 SExpr getSExprFromSavedParams(int color, std::string sexpPath, bool top);
 std::string getSExprStringFromColorJSonNode(boost::property_tree::ptree tree);
+
 
 int Vision_func() {
     assert(args.size() == 1);
@@ -314,9 +316,140 @@ int Vision_func() {
 
 int CameraCalibration_func() {
     printf("CameraCalibrate_func()\n");
-    printf("Received %d logs", args.size());
+    printf("Size: %d\n", args.size());
+
+    // printf("touching everythin\n");
+    // for (int i = 0; i < 7; ++i) {
+    //     Log * a = args[i];
+    //     std::cout << a->description() << std::endl << std::endl;
+
+    //     size_t sum = 0;
+    //     for (size_t j = 0; j < a->data().size(); ++j) {
+    //         sum += a->data()[j];
+    //     }
+
+    //     printf("%li\n\n", sum);
+    // }
+
+    // printf("DONE\n\n\n");
+
+    int failures = 0;
+    double totalR, totalT;
+
+// Repeat for each log
+    for (int i = 0; i < 1; i++) {
+
+        Log* l = new Log(args[i]);
+
+        std::cout << "Got log: " << l->description() << std::endl << std::endl;
 
 
+        size_t length = l->data().size();
+        uint8_t buf[length];
+        memcpy(buf, l->data().data(), length);
+
+        std::cout << "Got length: " << length << std::endl << std::endl;
+
+
+        // Determine description
+        bool top = l->description().find("from=camera_TOP") != std::string::npos;
+        
+        int width = 2*atoi(l->tree().find("contents")->get(1)->
+                                        find("width")->get(1)->value().c_str());
+        int height = atoi(l->tree().find("contents")->get(1)->
+                                       find("height")->get(1)->value().c_str());
+
+        double rollChange, pitchChange;
+        
+        std::cout << "Got top, w, h: " << top << " " << width << " " << height << std::endl << std::endl;
+
+        // Init vision module with offsets of 0.0
+        man::vision::VisionModule module(width / 2, height);
+        module.setCameraParams("none");
+
+        std::cout << "Set VisMod to robot name \'none\'\n";
+
+        
+        // Read number of bytes of image, inertials, and joints if exist
+        int numBytes[3];
+        std::vector<SExpr*> vec = l->tree().recursiveFind("YUVImage");
+        if (vec.size() != 0) {
+            SExpr* s = vec.at(vec.size()-2)->find("nbytes");
+            if (s != NULL) {
+                numBytes[0] = s->get(1)->valueAsInt();
+            }
+        }
+
+        vec = l->tree().recursiveFind("InertialState");
+        if (vec.size() != 0) {
+            SExpr* s = vec.at(vec.size()-2)->find("nbytes");
+            if (s != NULL) {
+                numBytes[1] = s->get(1)->valueAsInt();
+            }
+        }
+
+        messages::JointAngles joints;
+        vec = l->tree().recursiveFind("JointAngles");
+        if (vec.size() != 0) {
+            SExpr* s = vec.at(vec.size()-2)->find("nbytes");
+            if (s != NULL) {
+                numBytes[2] = s->get(1)->valueAsInt();
+                std::cout << "1. 2. 3. " << numBytes[0] << ". " << numBytes[1] << ". " << numBytes[2] << ". \n";
+                uint8_t* ptToJoints = buf + (numBytes[0] + numBytes[1]);
+                joints.ParseFromArray((void *) ptToJoints, numBytes[2]);
+            } else {
+                std::cout << "Could not load joins from description.\n";
+            }
+        }
+      
+        // Create messages
+        messages::YUVImage image(buf, width, height, width);
+        portals::Message<messages::YUVImage> imageMessage(&image);
+        portals::Message<messages::JointAngles> jointsMessage(&joints);
+
+        module.topIn.setMessage(imageMessage);
+        module.bottomIn.setMessage(imageMessage);
+        module.jointsIn.setMessage(jointsMessage);
+
+        module.run();
+
+        std::cout << "Ran VisionModule with robot name \'none\'\n";
+
+        man::vision::FieldHomography* fh = module.getFieldHomography(top);
+
+        double rollBefore, tiltBefore, rollAfter, tiltAfter;
+
+        rollBefore = fh->roll();
+        tiltBefore = fh->tilt();
+
+        std::cout << "Before: " << rollBefore << ", " << tiltBefore << std::endl;
+
+        bool success = fh->calibrateFromStar(*module.getFieldLines(top));
+
+        if (!success) {
+            failures++;
+            printf("FAILED!\n");        
+        }
+
+        rollAfter = fh->roll();
+        tiltAfter = fh->tilt();
+
+        totalR += rollAfter - rollBefore;
+        totalT += tiltAfter - tiltBefore;
+
+        std::cout << "After: " << rollAfter << ", " << tiltAfter << std::endl;
+    }
+
+    if (failures > 2) {
+        // Handle failure
+    }
+
+    totalR /= args.size() - failures;
+    totalT /= args.size() - failures;
+
+
+
+    // Pass back averaged offsets to Tool
 }
 
 
@@ -347,7 +480,9 @@ int Synthetics_func() {
 
     man::vision::syntheticField(synthetic, homography);
 
-    std::string sexpr("(nblog (version 6) (contents ((type YUVImage) (from camera_TOP) (nbytes ");
+    std::string sexpr("(nblog (version 6) (contents ((type YUVImage) ");
+    sexpr += top ? "(from camera_TOP) " : "(from camera_BOT) ";
+    sexpr += "(nbytes ";
     sexpr += std::to_string(size);
     sexpr += ") (width " + std::to_string(2*wd);
     sexpr += ") (height " + std::to_string(2*ht);

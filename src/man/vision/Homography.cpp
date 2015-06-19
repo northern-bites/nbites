@@ -300,6 +300,7 @@ bool StarCal::add(const FieldLineList& lines)
       fit.add(vpx - ix0, vpy - iy0);  // relative to optical axis
   }
 
+  std::cout << "~~Found " << fit.area() << " suitable lines~~\n";
   // If we didn't find exactly three suitable field lines, fail
   return fit.area() == 3;
 }

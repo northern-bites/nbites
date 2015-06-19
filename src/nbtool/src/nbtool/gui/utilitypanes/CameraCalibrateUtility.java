@@ -92,7 +92,7 @@ public class CameraCalibrateUtility extends UtilityParent {
             top = new JButton("Top");
             top.setToolTipText("toggle calibrating top or bottom logs in session");
             top.addActionListener(this);
-            top.setBounds(buf, 50, 70, 30);
+            top.setBounds(buf, 50, 85, 30);
 
             getOffsets = new JButton("Get calibration offsets");
             getOffsets.setToolTipText("calculate and display roll and pitch offsets");
@@ -113,7 +113,6 @@ public class CameraCalibrateUtility extends UtilityParent {
                     super.paintComponent(g);
                     g.drawString("Selected session: " + session.name, buf, buf*2);
                     g.drawString("Logs in session: " + session.logs_ALL.size(), buf, buf*4);
-                    g.fillRect(500, 300, 100, 100);
                 }                
             };
 
@@ -174,17 +173,28 @@ public class CameraCalibrateUtility extends UtilityParent {
                 return;
 
             CrossFunc func = inst.functionWithName("CameraCalibration");
-            if (func == null)
+            if (func == null) {
                 return;
-
-            Log[] logArray = new Log[7];
-            int i = 0;
-            for (Log l : logs) {
-                logArray[i++] = logs.get(i);
             }
 
+            System.out.printf("Converting from vector of size %d\n", logs.size());
+
+            Log[] logArray = new Log[7];
+            for (int i = 0; i < 7; i++) {
+                logArray[i] = logs.get(i);
+            }
+
+            int i = 0;
+            System.out.printf("\n%d: %s\n\n", i, logArray[i++].description());
+            System.out.printf("%d: %s\n\n", i, logArray[i++].description());
+            System.out.printf("%d: %s\n\n", i, logArray[i++].description());
+            System.out.printf("%d: %s\n\n", i, logArray[i++].description());
+            System.out.printf("%d: %s\n\n", i, logArray[i++].description());
+            System.out.printf("%d: %s\n\n", i, logArray[i++].description());
+            System.out.printf("%d: %s\n\n", i, logArray[i++].description());
+
             CrossCall call = new CrossCall(this, func, logArray);
-            inst.tryAddCall(call);
+            assert(inst.tryAddCall(call));
         }
 
         @Override

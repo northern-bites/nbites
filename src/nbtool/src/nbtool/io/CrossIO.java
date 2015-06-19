@@ -237,6 +237,8 @@ public class CrossIO {
 						Logger.logf(Logger.EVENT, "%s calling function %s", name(), call.function.name);
 						dos.writeInt(1);
 						dos.flush();
+
+						System.out.printf("\n%s calling function %s\n\n", name(), call.function.name);
 						
 						dos.writeInt(functions.indexOf(call.function));
 						
@@ -248,6 +250,7 @@ public class CrossIO {
 						final int ret = dis.readInt();
 						int num_out = dis.readInt();
 						
+
 						final Log[] outs = new Log[num_out];
 						for (int i = 0; i < num_out; ++i) {
 							Log nl = CommonIO.readLog(dis);

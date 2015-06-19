@@ -1,5 +1,6 @@
 ( CameraParams
-  ( (river   (top 0.0 0.0)     (bottom 0.0 0.0))
+  ( (none    (top 0.0 0.0)     (bottom 0.0 0.0))
+    (river   (top 0.0 0.0)     (bottom 0.0 0.0))
     (mal     (top 0.0 0.0)     (bottom 0.0 0.0))
     (zoe     (top 0.0 0.0)     (bottom 0.0 0.0))
     (jayne   (top 0.0 0.0)     (bottom 0.0 0.0))
