@@ -45,7 +45,7 @@ bool VisionSystem::update(ParticleSet& particles,
 
             // Otherwise the line system should score the observation
             madeObsv = true;
-            float newError = lineSystem->scoreObservation(*lines.mutable_line(i), *particle);
+            float newError = lineSystem->scoreObservation(lines.line(i), *particle);
             curParticleError += newError;
             numObsv++;
         }

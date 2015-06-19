@@ -30,17 +30,11 @@ LineSystem::LineSystem()
 
 LineSystem::~LineSystem() {}
 
-double LineSystem::scoreObservation(messages::FieldLine& observation,
+double LineSystem::scoreObservation(const messages::FieldLine& observation,
                                     const Particle& particle)
 {
-    vision::GeoLine globalLine = fromRelRobotToGlobal(observation, particle);
+    vision::GeoLine globalLine = LineSystem::fromRelRobotToGlobal(observation, particle);
     int bestLine = -1;
-
-    messages::HoughLine& innerObservation = *observation.mutable_inner();
-    innerObservation.set_r(globalLine.r());
-    innerObservation.set_t(globalLine.t());
-    innerObservation.set_ep0(globalLine.ep0());
-    innerObservation.set_ep1(globalLine.ep1());
 
     double bestScore = std::numeric_limits<double>::max();
     for (int i = 0; i < lines.size(); i++) {
@@ -54,6 +48,18 @@ double LineSystem::scoreObservation(messages::FieldLine& observation,
     return bestScore;
 }
 
+void LineSystem::projectOntoField(messages::FieldLine& observation,
+                                  const Particle& particle)
+{
+    vision::GeoLine globalLine = LineSystem::fromRelRobotToGlobal(observation, particle);
+
+    messages::HoughLine& innerObservation = *observation.mutable_inner();
+    innerObservation.set_r(globalLine.r());
+    innerObservation.set_t(globalLine.t());
+    innerObservation.set_ep0(globalLine.ep0());
+    innerObservation.set_ep1(globalLine.ep1());
+}
+
 void LineSystem::addLine(float r, float t, float ep0, float ep1)
 {
     vision::GeoLine line;
@@ -62,7 +68,7 @@ void LineSystem::addLine(float r, float t, float ep0, float ep1)
 }
 
 vision::GeoLine LineSystem::fromRelRobotToGlobal(const messages::FieldLine& relRobotLine,
-                                                 const Particle& particle) const
+                                                 const Particle& particle)
 {
     const messages::HoughLine& relRobotInner = relRobotLine.inner();
     const messages::RobotLocation& loc = particle.getLocation();

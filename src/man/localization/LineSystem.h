@@ -21,11 +21,12 @@ public:
     LineSystem();
     ~LineSystem();
 
-    double scoreObservation(messages::FieldLine& observation, const Particle& particle);
+    double scoreObservation(const messages::FieldLine& observation, const Particle& particle);
+    static void projectOntoField(messages::FieldLine& observation, const Particle& particle);
 
 private:
     void addLine(float r, float t, float ep0, float ep1);
-    vision::GeoLine fromRelRobotToGlobal(const messages::FieldLine& relRobotLine, const Particle& particle) const;
+    static vision::GeoLine fromRelRobotToGlobal(const messages::FieldLine& relRobotLine, const Particle& particle);
 
     std::vector<vision::GeoLine> lines;
 };

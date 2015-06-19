@@ -79,7 +79,6 @@ public class GeoLine {
         int x2 = (int) Math.round(x0 + end1 * Math.sin(t));
         int y2 = (int) Math.round(y0 - end1 * Math.cos(t));
 
-        /* g2.drawLine(x1,y1,x2,y2); */
         g2.drawLine(x1,(int)FieldConstants.FIELD_HEIGHT-y1,x2,(int)FieldConstants.FIELD_HEIGHT-y2);
 	}
 
