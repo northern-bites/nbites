@@ -14,6 +14,7 @@ BallDetector::BallDetector(FieldHomography* homography_, bool topCamera_):
     homography(homography_),
     topCamera(topCamera_)
 {
+    blobber.secondThreshold(115);
 }
 
 BallDetector::~BallDetector() { }
@@ -25,6 +26,9 @@ bool BallDetector::findBall(ImageLiteU8 orange, double cameraHeight)
 #endif
 
     blobber.run(orange.pixelAddr(), orange.width(), orange.height(), orange.pitch());
+
+    Ball reset;
+    _best = reset;
 
     // TODO: Sort blobber list by size
     for (auto i=blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
@@ -43,7 +47,7 @@ bool BallDetector::findBall(ImageLiteU8 orange, double cameraHeight)
             continue;
         }
 
-        Ball b((*i), x_rel, y_rel, cameraHeight, orange.height(), orange.width());
+        Ball b((*i), x_rel, -1 * y_rel, cameraHeight, orange.height(), orange.width());
         if (b.confidence() > .5) {
 #ifdef OFFLINE
             candidates.push_back(b);
@@ -60,7 +64,7 @@ bool BallDetector::findBall(ImageLiteU8 orange, double cameraHeight)
 #endif
         }
     }
-    if (best().confidence() > .5) {
+    if (_best.confidence() > .5) {
         return true;
     }
     else {

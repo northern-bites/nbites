@@ -141,6 +141,8 @@ void VisionModule::run_()
         // Calculate kinematics and adjust homography
         if (jointsIn.message().has_head_yaw()) {
             kinematics[i]->joints(jointsIn.message());
+            homography[i]->wx0(kinematics[i]->wx0());
+            homography[i]->wy0(kinematics[i]->wy0());
             homography[i]->wz0(kinematics[i]->wz0());
             homography[i]->tilt(kinematics[i]->tilt());
 #ifndef OFFLINE
@@ -264,6 +266,7 @@ void VisionModule::updateVisionBall()
     if (ballOn) {
         ballOnCount++;
         ballOffCount = 0;
+        std::cout << "Ball on this many frames: " << ballOnCount << std::endl;
     }
     else {
         ballOnCount = 0;
@@ -275,7 +278,7 @@ void VisionModule::updateVisionBall()
         top = true;
     }
 
-    ball_message.get()->set_on(true);
+    ball_message.get()->set_on(ballOn);
     ball_message.get()->set_frames_on(ballOnCount);
     ball_message.get()->set_frames_off(ballOffCount);
     ball_message.get()->set_intopcam(top);
