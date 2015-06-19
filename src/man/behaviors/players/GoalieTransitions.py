@@ -11,6 +11,82 @@ import VisualGoalieStates
 import GoalieStates
 from objects import RelRobotLocation
 
+# New vision system visual goalie
+def getLines(player):
+    # if not GoalieStates.watchWithLineChecks.recordingLines:
+    #     return
+    visionLines = player.brain.visionLines
+
+    for i in range(0, visionLines.line_size()):
+        GoalieStates.watchWithLineChecks.lines.append(visionLines.line(i).inner)
+        # r = line.inner.r
+        # t = line.inner.t
+        # x0 = r * math.cos(t)
+        # y0 = r * math.sin(t)
+        # x1 = x0 + line.inner.eP0 * math.sin(t)
+        # y1 = y0 + -line.inner.eP0 * math.cos(t)
+        # x2 = x0 + line.inner.eP1 * math.sin(t)
+        # y2 = y0 + -line.inner.eP1 * math.cos(t)
+
+
+def getFrontLine(player):
+    # Assume facing forward
+    for line in GoalieStates.watchWithLineChecks.lines:
+        r = line.r
+        t = line.t
+        # Assumptions: facing forward
+        # If have good t value and bad r value, reposition accordingly
+        if math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH \
+        and math.fabs(r - constants.EXPECTED_FRONT_LINE_R_BOTTOM_CAM) < constants.R_THRESH:
+            return line
+
+def lineCheckShouldReposition(player):
+    getLines(player)
+    x_dest = 0.0
+    y_dest = 0.0
+    h_dest = 0.0
+
+    for line in GoalieStates.watchWithLineChecks.lines:
+        r = line.r
+        t = math.degrees(line.t)
+
+        # Assumptions: facing forward
+        # If have good t value and bad r value, reposition accordingly
+        if math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH \
+        and math.fabs(r - constants.EXPECTED_FRONT_LINE_R_TOP_CAM) > constants.R_THRESH \
+        and r < 100.0:
+            x_dest = r - constants.EXPECTED_FRONT_LINE_R_TOP_CAM
+            print "Was TRUE"
+            print x_dest
+            print r
+            player.homeDirections += [RelRobotLocation(x_dest, y_dest, h_dest)]
+            return True
+
+    return False
+
+def getBearingFromRobot(x, y):
+    return math.degrees(math.atan2(x, -y));
+
+def getLineLength(line):
+    r = line.inner.r
+    t = line.inner.t
+    x0 = r * math.cos(t)
+    y0 = r * math.sin(t)
+    x1 = x0 + line.inner.eP0 * math.sin(t)
+    y1 = y0 + -line.inner.eP0 * math.cos(t)
+    x2 = x0 + line.inner.eP1 * math.sin(t)
+    y2 = y0 + -line.inner.eP1 * math.cos(t)
+
+    x = x2 - x1
+    y = y2 - y1
+    return math.sqrt(x*x + y*y)
+
+
+
+
+
+
+
 # Visual Goalie
 
 def getLeftGoalboxCorner(player):
@@ -70,6 +146,8 @@ def getCornerRelY(alpha, corner):
 def getRobotGlobalHeading(alpha, corner):
     return math.degrees(corner.physical_orientation + math.radians(alpha) -
                         corner.visual_detection.bearing)
+
+
 
 def badLeftCornerObservation(player):
     corner = getLeftGoalboxCorner(player)

@@ -93,7 +93,7 @@ def gamePlaying(player):
     if player.lastDiffState == 'fallen':
         return player.goLater('spinAtGoal')
 
-    return player.goLater('watch')
+    return player.goLater('watchWithLineChecks')
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
@@ -160,6 +160,36 @@ def standStill(player):
     return player.stay()
 
 @superState('gameControllerResponder')
+def watchWithLineChecks(player):
+    if player.firstFrame():
+        watchWithLineChecks.lines[:] = []
+        player.homeDirections = []
+
+        player.brain.tracker.performBasicPan()
+        watchWithLineChecks.recordingLines = True
+        player.brain.nav.stand()
+        player.returningFromPenalty = False
+
+    if player.brain.tracker.isStopped:
+        watchWithLineChecks.recordingLines = False
+        player.brain.tracker.repeatBasicPan()
+
+    return Transition.getNextState(player, watchWithLineChecks)
+
+watchWithLineChecks.lines = []
+
+@superState('gameControllerResponder')
+def lineCheckReposition(player):
+    if player.firstFrame():
+        player.brain.tracker.repeatBasicPan()
+        dest = average(player.homeDirections)
+        print "My home directions: "
+        print dest
+        player.brain.nav.walkTo(dest)
+
+    return Transition.getNextState(player, lineCheckReposition)
+
+@superState('gameControllerResponder')
 def watchWithCornerChecks(player):
     if player.firstFrame():
         # This is dumb, but...
@@ -199,7 +229,7 @@ def watchWithCornerChecks(player):
         watchWithCornerChecks.looking = False
         player.brain.tracker.trackBall()
 
-    return Transition.getNextState(player, watchWithCornerChecks)
+    return Transition.getNextStateu(player, watchWithCornerChecks)
 
 @superState('gameControllerResponder')
 def watch(player):
@@ -220,6 +250,9 @@ def average(locations):
         x += item.relX
         y += item.relY
         h += item.relH
+
+    if len(locations) == 0:
+        return RelRobotLocation(0.0, 0.0, 0.0)
 
     return RelRobotLocation(x/len(locations),
                             y/len(locations),

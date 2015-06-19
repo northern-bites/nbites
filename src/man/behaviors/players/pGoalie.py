@@ -306,6 +306,24 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             : GoalieStates.standStill
             }
 
+# ---------------------------------------------------------------------
+        GoalieStates.watchWithLineChecks.transitions = {
+            Transition.CountTransition(GoalieTransitions.lineCheckShouldReposition,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : GoalieStates.lineCheckReposition
+        }
+
+        GoalieStates.lineCheckReposition.transitions = {
+            Transition.CountTransition(GoalieTransitions.doneWalking,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.watchWithLineChecks
+            }
+
+
+
+# ---------------------------------------------------------------------
         GoalieStates.waitForPenaltySave.transitions = {
             Transition.CountTransition(GoalieTransitions.saveNow,
                                        Transition.MOST_OF_THE_TIME,

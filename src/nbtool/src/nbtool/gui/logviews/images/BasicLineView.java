@@ -61,9 +61,9 @@ public class BasicLineView extends ViewParent {
 
         int offsetY = this.getHeight()/2 + 20;
         int offsetX = 10;
+        int offset = 20;
 
         int multiplier = 2;
-        double resize = 1.0;
 
         int originX = this.getWidth()/2;
         int originY = this.getHeight()/2 - 100;
@@ -80,6 +80,32 @@ public class BasicLineView extends ViewParent {
 
         if (lines.size() < 1) return;
 
+        // Calculate all the lines & resize value
+        double resize = 1.0;
+        for (int i = 0; i <lines.size(); i++) {
+            double r = lines.get(i).getInner().getR();
+            double t = lines.get(i).getInner().getT();
+            double eP0 = lines.get(i).getInner().getEp0();
+            double eP1 = lines.get(i).getInner().getEp1();
+            double mP = (eP1 + eP0) / 2.0;
+
+            double x0 = originX + multiplier*r * Math.cos(t);
+            double y0 = originY + -multiplier*r * Math.sin(t);
+            int x1 = (int) Math.round(x0 + multiplier*eP0 * Math.sin(t));
+            int y1 = (int) Math.round(y0 + multiplier*eP0 * Math.cos(t));
+            int x2 = (int) Math.round(x0 + multiplier*eP1 * Math.sin(t));
+            int y2 = (int) Math.round(y0 + multiplier*eP1 * Math.cos(t));
+
+            if (y1 < 0 && y1 > -2000) {
+                resize = Math.min(resize, (double)height/(-y1 + height));
+            }
+            if (y2 < 0 && y2 > -2000) {
+                resize = Math.min(resize, (double)height/(-y2 + height));
+            }
+        }
+
+
+        // Draw the lines
         for (int i = 0; i <lines.size(); i++) {
             double r = lines.get(i).getInner().getR();
             double t = lines.get(i).getInner().getT();
@@ -88,34 +114,48 @@ public class BasicLineView extends ViewParent {
             double mP = (eP1 + eP0) / 2.0;
 
             String stringr = "R: " + (double)Math.round(r * 100000) / 100000;
-            String stringt = "t: " + (double)Math.round(t * 100000) / 100000;
+            String stringt = "t: " + (double)Math.round(t*180/Math.PI * 100000) / 100000;
             String stringep0 = "ep0: " + Math.round(eP0);
             String stringep1 = "ep1: " + Math.round(eP1);
-            String stringid = "id: " + lines.get(i).getId();
 
-            double x0 = originX + multiplier*r * Math.cos(t);
-            double y0 = originY + -multiplier*r * Math.sin(t);
-            int x1 = (int) Math.round(x0 + multiplier*eP0 * Math.sin(t));
-            int y1 = (int) Math.round(y0 + multiplier*eP0 * Math.cos(t));
-            int x2 = (int) Math.round(x0 + multiplier*eP1 * Math.sin(t));
-            int y2 = (int) Math.round(y0 + multiplier*eP1 * Math.cos(t));
-            int xm = (int) Math.round(x0 + multiplier*mP * Math.sin(t));
-            int ym = (int) Math.round(y0 + multiplier*mP * Math.cos(t));
+            double x0 = r * Math.cos(t);
+            double y0 = r * Math.sin(t);
+            double dx1 = x0 + eP0 * Math.sin(t);
+            double dy1 = y0 + -eP0 * Math.cos(t);
+            double dx2 = x0 + eP1 * Math.sin(t);
+            double dy2 = y0 + -eP1 * Math.cos(t);
+            double length = Math.sqrt((dy2-dy1)*(dy2-dy1) + (dx2-dx1)*(dx2-dx1));
+
+            String string0 = "x0,y0: " + ((double)Math.round(x0 * 100) / 100) + ", " + ((double)Math.round(y0 * 100) / 100);
+            String string1 = "x1,y1: " + ((double)Math.round(dx1 * 100) / 100) + ", " + ((double)Math.round(dy1 * 100) / 100);
+            String string2 = "x2,y2: " + ((double)Math.round(dx2 * 100) / 100) + ", " + ((double)Math.round(dy2 * 100) / 100);
+            String b1 = "bearing1: " + Math.round(Math.atan2(dx1, -dy1)*180/Math.PI);
+            String b2 = "bearing2: " + Math.round(Math.atan2(dx2, -dy2)*180/Math.PI);
+            String stringid = "Length: " + (Math.round(length * 100) / 100);
+
+            x0 = originX + multiplier*x0;
+            y0 = originY + -multiplier*y0;
+
+            int x1 = (int) Math.round(x0 + resize*multiplier*eP0 * Math.sin(t));
+            int y1 = (int) Math.round(y0 + resize*multiplier*eP0 * Math.cos(t));
+            int x2 = (int) Math.round(x0 + resize*multiplier*eP1 * Math.sin(t));
+            int y2 = (int) Math.round(y0 + resize*multiplier*eP1 * Math.cos(t));
+            int xm = (int) Math.round(x0 + resize*multiplier*mP * Math.sin(t));
+            int ym = (int) Math.round(y0 + resize*multiplier*mP * Math.cos(t));
 
             if (x1 < 0 || y1 < 0 || x2 < 0 || y2 < 0) continue;
 
+            g.setColor(Color.red);
+
             g.setColor(Color.blue);
-            g.drawString(stringr, offsetX, offsetY + 80);
+            g.drawString(stringr, offsetX, offsetY + 5*offset);
             g.setColor(Color.black);
-            g.drawString(stringt, offsetX, offsetY + 100);
-            g.drawString(stringep0, offsetX, offsetY + 120);
-            g.drawString(stringep1, offsetX, offsetY + 140);
-            g.drawString(stringid, offsetX, offsetY + 160);
+            g.drawString(stringt, offsetX, offsetY + 6*offset);
+            g.drawString(stringep0, offsetX, offsetY + 7*offset);
+            g.drawString(stringep1, offsetX, offsetY + 8*offset);
+            g.drawString(stringid, offsetX, offsetY + 9*offset);
             g.setColor(Color.white);
 
-            String string0 = "x0,y0: " + (int)x0 + ", " + (int)y0;
-            String string1 = "x1,y1: " + x1 + ", " + y1;
-            String string2 = "x2,y2: " + x2 + ", " + y2;
             g.drawLine(x1, y1, x2, y2);
             g.drawLine(x1+1, y1+1, x2+1, y2+1);
             g.drawLine(x1+2, y1+2, x2+2, y2+2);
@@ -131,8 +171,10 @@ public class BasicLineView extends ViewParent {
 
             g.setColor(Color.black);
             g.drawString(string0, offsetX, offsetY);
-            g.drawString(string1, offsetX, offsetY + 20);
-            g.drawString(string2, offsetX, offsetY + 40);
+            g.drawString(string1, offsetX, offsetY + offset);
+            g.drawString(string2, offsetX, offsetY + 2*offset);
+            g.drawString(b1, offsetX, offsetY + 3*offset);
+            g.drawString(b2, offsetX, offsetY + 4*offset);
             offsetX += 150;
         }
 
