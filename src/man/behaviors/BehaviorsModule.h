@@ -88,11 +88,12 @@ public:
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::FallStatus> fallStatusIn;
     portals::InPortal<messages::StiffStatus> stiffStatusIn;
-    portals::InPortal<messages::FieldObstacles> obstacleIn;
-    portals::InPortal<messages::VisionObstacle> visionObstacleIn;
+    // portals::InPortal<messages::FieldObstacles> obstacleIn;
+    // portals::InPortal<messages::VisionObstacle> visionObstacleIn;
+    portals::InPortal<messages::FieldLines> linesIn;
 
-    portals::InPortal<messages::SharedBall> sharedBallIn;
-    portals::InPortal<messages::RobotLocation> sharedFlipIn;
+    // portals::InPortal<messages::SharedBall> sharedBallIn;
+    // portals::InPortal<messages::RobotLocation> sharedFlipIn;
 
     portals::OutPortal<messages::LedCommand> ledCommandOut;
     portals::OutPortal<messages::MotionRequest> motionRequestOut;

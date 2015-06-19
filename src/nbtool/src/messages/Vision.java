@@ -8,10 +8,10 @@ public final class Vision {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  public interface HoughLineOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface HoughLineOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:messages.HoughLine)
+      com.google.protobuf.MessageOrBuilder {
 
-    // optional float r = 1;
     /**
      * <code>optional float r = 1;</code>
      */
@@ -21,7 +21,6 @@ public final class Vision {
      */
     float getR();
 
-    // optional float t = 2;
     /**
      * <code>optional float t = 2;</code>
      */
@@ -31,7 +30,6 @@ public final class Vision {
      */
     float getT();
 
-    // optional float ep0 = 3;
     /**
      * <code>optional float ep0 = 3;</code>
      */
@@ -41,7 +39,6 @@ public final class Vision {
      */
     float getEp0();
 
-    // optional float ep1 = 4;
     /**
      * <code>optional float ep1 = 4;</code>
      */
@@ -55,8 +52,9 @@ public final class Vision {
    * Protobuf type {@code messages.HoughLine}
    */
   public static final class HoughLine extends
-      com.google.protobuf.GeneratedMessage
-      implements HoughLineOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:messages.HoughLine)
+      HoughLineOrBuilder {
     // Use HoughLine.newBuilder() to construct.
     private HoughLine(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -162,7 +160,6 @@ public final class Vision {
     }
 
     private int bitField0_;
-    // optional float r = 1;
     public static final int R_FIELD_NUMBER = 1;
     private float r_;
     /**
@@ -178,7 +175,6 @@ public final class Vision {
       return r_;
     }
 
-    // optional float t = 2;
     public static final int T_FIELD_NUMBER = 2;
     private float t_;
     /**
@@ -194,7 +190,6 @@ public final class Vision {
       return t_;
     }
 
-    // optional float ep0 = 3;
     public static final int EP0_FIELD_NUMBER = 3;
     private float ep0_;
     /**
@@ -210,7 +205,6 @@ public final class Vision {
       return ep0_;
     }
 
-    // optional float ep1 = 4;
     public static final int EP1_FIELD_NUMBER = 4;
     private float ep1_;
     /**
@@ -235,7 +229,8 @@ public final class Vision {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       memoizedIsInitialized = 1;
       return true;
@@ -363,8 +358,9 @@ public final class Vision {
      * Protobuf type {@code messages.HoughLine}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements messages.Vision.HoughLineOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:messages.HoughLine)
+        messages.Vision.HoughLineOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return messages.Vision.internal_static_messages_HoughLine_descriptor;
@@ -504,7 +500,6 @@ public final class Vision {
       }
       private int bitField0_;
 
-      // optional float r = 1;
       private float r_ ;
       /**
        * <code>optional float r = 1;</code>
@@ -537,7 +532,6 @@ public final class Vision {
         return this;
       }
 
-      // optional float t = 2;
       private float t_ ;
       /**
        * <code>optional float t = 2;</code>
@@ -570,7 +564,6 @@ public final class Vision {
         return this;
       }
 
-      // optional float ep0 = 3;
       private float ep0_ ;
       /**
        * <code>optional float ep0 = 3;</code>
@@ -603,7 +596,6 @@ public final class Vision {
         return this;
       }
 
-      // optional float ep1 = 4;
       private float ep1_ ;
       /**
        * <code>optional float ep1 = 4;</code>
@@ -647,10 +639,10 @@ public final class Vision {
     // @@protoc_insertion_point(class_scope:messages.HoughLine)
   }
 
-  public interface FieldLineOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface FieldLineOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:messages.FieldLine)
+      com.google.protobuf.MessageOrBuilder {
 
-    // optional .messages.HoughLine inner = 1;
     /**
      * <code>optional .messages.HoughLine inner = 1;</code>
      */
@@ -664,7 +656,6 @@ public final class Vision {
      */
     messages.Vision.HoughLineOrBuilder getInnerOrBuilder();
 
-    // optional .messages.HoughLine outer = 2;
     /**
      * <code>optional .messages.HoughLine outer = 2;</code>
      */
@@ -678,7 +669,6 @@ public final class Vision {
      */
     messages.Vision.HoughLineOrBuilder getOuterOrBuilder();
 
-    // optional int32 id = 3;
     /**
      * <code>optional int32 id = 3;</code>
      */
@@ -692,8 +682,9 @@ public final class Vision {
    * Protobuf type {@code messages.FieldLine}
    */
   public static final class FieldLine extends
-      com.google.protobuf.GeneratedMessage
-      implements FieldLineOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:messages.FieldLine)
+      FieldLineOrBuilder {
     // Use FieldLine.newBuilder() to construct.
     private FieldLine(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -810,7 +801,6 @@ public final class Vision {
     }
 
     private int bitField0_;
-    // optional .messages.HoughLine inner = 1;
     public static final int INNER_FIELD_NUMBER = 1;
     private messages.Vision.HoughLine inner_;
     /**
@@ -832,7 +822,6 @@ public final class Vision {
       return inner_;
     }
 
-    // optional .messages.HoughLine outer = 2;
     public static final int OUTER_FIELD_NUMBER = 2;
     private messages.Vision.HoughLine outer_;
     /**
@@ -854,7 +843,6 @@ public final class Vision {
       return outer_;
     }
 
-    // optional int32 id = 3;
     public static final int ID_FIELD_NUMBER = 3;
     private int id_;
     /**
@@ -878,7 +866,8 @@ public final class Vision {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       memoizedIsInitialized = 1;
       return true;
@@ -999,8 +988,9 @@ public final class Vision {
      * Protobuf type {@code messages.FieldLine}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements messages.Vision.FieldLineOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:messages.FieldLine)
+        messages.Vision.FieldLineOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return messages.Vision.internal_static_messages_FieldLine_descriptor;
@@ -1149,7 +1139,6 @@ public final class Vision {
       }
       private int bitField0_;
 
-      // optional .messages.HoughLine inner = 1;
       private messages.Vision.HoughLine inner_ = messages.Vision.HoughLine.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           messages.Vision.HoughLine, messages.Vision.HoughLine.Builder, messages.Vision.HoughLineOrBuilder> innerBuilder_;
@@ -1258,7 +1247,7 @@ public final class Vision {
         if (innerBuilder_ == null) {
           innerBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               messages.Vision.HoughLine, messages.Vision.HoughLine.Builder, messages.Vision.HoughLineOrBuilder>(
-                  inner_,
+                  getInner(),
                   getParentForChildren(),
                   isClean());
           inner_ = null;
@@ -1266,7 +1255,6 @@ public final class Vision {
         return innerBuilder_;
       }
 
-      // optional .messages.HoughLine outer = 2;
       private messages.Vision.HoughLine outer_ = messages.Vision.HoughLine.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           messages.Vision.HoughLine, messages.Vision.HoughLine.Builder, messages.Vision.HoughLineOrBuilder> outerBuilder_;
@@ -1375,7 +1363,7 @@ public final class Vision {
         if (outerBuilder_ == null) {
           outerBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               messages.Vision.HoughLine, messages.Vision.HoughLine.Builder, messages.Vision.HoughLineOrBuilder>(
-                  outer_,
+                  getOuter(),
                   getParentForChildren(),
                   isClean());
           outer_ = null;
@@ -1383,7 +1371,6 @@ public final class Vision {
         return outerBuilder_;
       }
 
-      // optional int32 id = 3;
       private int id_ ;
       /**
        * <code>optional int32 id = 3;</code>
@@ -1427,10 +1414,10 @@ public final class Vision {
     // @@protoc_insertion_point(class_scope:messages.FieldLine)
   }
 
-  public interface FieldLinesOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface FieldLinesOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:messages.FieldLines)
+      com.google.protobuf.MessageOrBuilder {
 
-    // repeated .messages.FieldLine line = 1;
     /**
      * <code>repeated .messages.FieldLine line = 1;</code>
      */
@@ -1459,8 +1446,9 @@ public final class Vision {
    * Protobuf type {@code messages.FieldLines}
    */
   public static final class FieldLines extends
-      com.google.protobuf.GeneratedMessage
-      implements FieldLinesOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:messages.FieldLines)
+      FieldLinesOrBuilder {
     // Use FieldLines.newBuilder() to construct.
     private FieldLines(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -1556,7 +1544,6 @@ public final class Vision {
       return PARSER;
     }
 
-    // repeated .messages.FieldLine line = 1;
     public static final int LINE_FIELD_NUMBER = 1;
     private java.util.List<messages.Vision.FieldLine> line_;
     /**
@@ -1598,7 +1585,8 @@ public final class Vision {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       memoizedIsInitialized = 1;
       return true;
@@ -1705,8 +1693,9 @@ public final class Vision {
      * Protobuf type {@code messages.FieldLines}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements messages.Vision.FieldLinesOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:messages.FieldLines)
+        messages.Vision.FieldLinesOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return messages.Vision.internal_static_messages_FieldLines_descriptor;
@@ -1850,7 +1839,6 @@ public final class Vision {
       }
       private int bitField0_;
 
-      // repeated .messages.FieldLine line = 1;
       private java.util.List<messages.Vision.FieldLine> line_ =
         java.util.Collections.emptyList();
       private void ensureLineIsMutable() {
@@ -1992,7 +1980,8 @@ public final class Vision {
           java.lang.Iterable<? extends messages.Vision.FieldLine> values) {
         if (lineBuilder_ == null) {
           ensureLineIsMutable();
-          super.addAll(values, line_);
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, line_);
           onChanged();
         } else {
           lineBuilder_.addAllMessages(values);
@@ -2101,17 +2090,17 @@ public final class Vision {
     // @@protoc_insertion_point(class_scope:messages.FieldLines)
   }
 
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_HoughLine_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_HoughLine_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_FieldLine_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_FieldLine_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_FieldLines_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -2133,36 +2122,37 @@ public final class Vision {
       "line\030\001 \003(\0132\023.messages.FieldLine"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_messages_HoughLine_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_messages_HoughLine_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_HoughLine_descriptor,
-              new java.lang.String[] { "R", "T", "Ep0", "Ep1", });
-          internal_static_messages_FieldLine_descriptor =
-            getDescriptor().getMessageTypes().get(1);
-          internal_static_messages_FieldLine_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_FieldLine_descriptor,
-              new java.lang.String[] { "Inner", "Outer", "Id", });
-          internal_static_messages_FieldLines_descriptor =
-            getDescriptor().getMessageTypes().get(2);
-          internal_static_messages_FieldLines_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_FieldLines_descriptor,
-              new java.lang.String[] { "Line", });
-          return null;
-        }
-      };
+        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
+    internal_static_messages_HoughLine_descriptor =
+      getDescriptor().getMessageTypes().get(0);
+    internal_static_messages_HoughLine_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_HoughLine_descriptor,
+        new java.lang.String[] { "R", "T", "Ep0", "Ep1", });
+    internal_static_messages_FieldLine_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_messages_FieldLine_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_FieldLine_descriptor,
+        new java.lang.String[] { "Inner", "Outer", "Id", });
+    internal_static_messages_FieldLines_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_messages_FieldLines_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_FieldLines_descriptor,
+        new java.lang.String[] { "Line", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
 }
+

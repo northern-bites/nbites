@@ -157,10 +157,10 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
         behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
         behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
+        behaviors.linesIn.wireTo(&vision.linesOut, true);
         // behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
         // behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
         // behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);
-        
         for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
         {
             behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
@@ -246,6 +246,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         //Superseded by logging code in ImageTranscriber.
         
 //#ifdef LOG_VISION
+        cognitionThread.log<messages::FieldLines>((control::VISION), &vision.linesOut,
+                                                   "proto-FieldLines", "vision");
         // cognitionThread.log<messages::VisionField>((control::VISION), &vision.vision_field,
         //                                            "proto-VisionField", "vision");
         // cognitionThread.log<messages::VisionBall>((control::VISION), &vision.vision_ball,

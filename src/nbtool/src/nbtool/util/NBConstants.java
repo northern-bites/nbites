@@ -8,6 +8,7 @@ import java.util.Map;
 
 import nbtool.data.Log;
 import nbtool.gui.logviews.images.LineView;
+import nbtool.gui.logviews.images.BasicLineView;
 import nbtool.gui.logviews.images.ImageView;
 import nbtool.gui.logviews.images.ZoomImageView;
 import nbtool.gui.logviews.misc.BotStatsView;
@@ -73,8 +74,7 @@ public class NBConstants {
 		map.put(DEFAULT_S, new Class[]{DefaultView.class});
 		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
 		map.put("location", new Class[]{LocSwarmView.class});
-		
-		
+		map.put("proto-FieldLines", new Class[]{BasicLineView.class});
 
 		return map;
 	}
