@@ -5,10 +5,11 @@
 namespace man {
 namespace localization {
 
+// TODO repeat lines
 // TODO add side goalbox lines
 // TODO line classification
 // TODO endpoint detection and corners
-// TODO rename Vision.pb.h to VisionField.pb.h
+// TODO refactor Vision.pb.h
 LineSystem::LineSystem() 
 {
     // Add endlines
@@ -32,7 +33,7 @@ LineSystem::~LineSystem() {}
 double LineSystem::scoreObservation(const messages::FieldLine& observation,
                                     const Particle& particle)
 {
-    vision::GeoLine globalLine = fromRelRobotToGlobal(observation, particle);
+    vision::GeoLine globalLine = LineSystem::fromRelRobotToGlobal(observation, particle);
     int bestLine = -1;
 
     double bestScore = std::numeric_limits<double>::max();
@@ -44,12 +45,19 @@ double LineSystem::scoreObservation(const messages::FieldLine& observation,
         }
     }
 
-    // if (bestScore >= 1)
-    //     std::cout << "NO MATCHING LINE FOUND, " << bestScore << std::endl;
-    // else
-    //     std::cout << "BEST LINE, " << bestLine << std::endl;
+    return (1 / globalLine.r()) * bestScore;
+}
 
-    return bestScore;
+void LineSystem::projectOntoField(messages::FieldLine& observation,
+                                  const Particle& particle)
+{
+    vision::GeoLine globalLine = LineSystem::fromRelRobotToGlobal(observation, particle);
+
+    messages::HoughLine& innerObservation = *observation.mutable_inner();
+    innerObservation.set_r(globalLine.r());
+    innerObservation.set_t(globalLine.t());
+    innerObservation.set_ep0(globalLine.ep0());
+    innerObservation.set_ep1(globalLine.ep1());
 }
 
 void LineSystem::addLine(float r, float t, float ep0, float ep1)
@@ -60,14 +68,15 @@ void LineSystem::addLine(float r, float t, float ep0, float ep1)
 }
 
 vision::GeoLine LineSystem::fromRelRobotToGlobal(const messages::FieldLine& relRobotLine,
-                                                 const Particle& particle) const
+                                                 const Particle& particle)
 {
     const messages::HoughLine& relRobotInner = relRobotLine.inner();
     const messages::RobotLocation& loc = particle.getLocation();
 
     vision::GeoLine globalLine;
     globalLine.set(relRobotInner.r(), relRobotInner.t(), relRobotInner.ep0(), relRobotInner.ep1());
-    globalLine.translateRotate(loc.x(), loc.y(), loc.h() - (M_PI / 2));
+    globalLine.translateRotate(0, 0, -(M_PI / 2));
+    globalLine.translateRotate(loc.x(), loc.y(), loc.h());
 
     return globalLine;
 }

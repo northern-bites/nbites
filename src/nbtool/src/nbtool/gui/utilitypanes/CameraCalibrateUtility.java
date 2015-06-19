@@ -66,6 +66,9 @@ public class CameraCalibrateUtility extends UtilityParent {
         final int buf = 10;
         final int col1 = 200;   // column 1
 
+        private rollOffset = 0;
+        private pitchOffset = 0;
+
         Session sess;
 
         public CCU_Frame() {
@@ -211,9 +214,24 @@ public class CameraCalibrateUtility extends UtilityParent {
                 sess = master.requestSession("cameraCalibrate");
             }
 
-            System.out.println(out[0].description());
-            sess.addLog(out[0]);
-            Events.GLogsFound.generate(this, out);
+            System.out.printf("Log: %s\n", out[0].description());
+            SExpr* atom = out[0].tree().find("roll");
+            if (atom != null) {
+                rollOffset = atoms.get(1).valueAsDouble();
+            } else {
+                System.out.printf("IORecieved without roll offset!");
+            }
+            SExpr* atom = out[0].tree().find("pitch");
+
+            if (atom != null) {
+                pitchOffset = atoms.get(1).valueAsDouble();
+            } else {
+                System.out.printf("IORecieved without pitch offset!");
+            }
+
+            repaint();
+            // sess.addLog(out[0]);
+            // Events.GLogsFound.generate(this, out);
         }
 
         @Override

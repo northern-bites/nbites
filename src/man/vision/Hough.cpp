@@ -480,7 +480,7 @@ bool CornerDetector::ccw(double ax, double ay,
 // **************************
 
 FieldLine::FieldLine(HoughLine& line1, HoughLine& line2, int index, double fx0, double fy0)
-  : id_(LineID::Line), index_(index), corners_()
+  : id_(LineID::Line), corners_(), index_(index), repeat_(false)
 {
   double d1 = fabs(line1.field().pDist(fx0, fy0));
   double d2 = fabs(line2.field().pDist(fx0, fy0));

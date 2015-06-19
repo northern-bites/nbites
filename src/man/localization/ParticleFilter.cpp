@@ -1,5 +1,6 @@
 #include "ParticleFilter.h"
 
+#include "LineSystem.h"
 #include "DebugConfig.h"
 
 namespace man {
@@ -57,7 +58,7 @@ ParticleFilter::~ParticleFilter()
 
 
 void ParticleFilter::update(const messages::RobotLocation& odometryInput,
-                            const messages::FieldLines&    visionInput)
+                            messages::FieldLines&          visionInput)
 {
     // Update motion and vision system
     motionSystem->update(particles, odometryInput, errorMagnitude);
@@ -89,6 +90,7 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
 
     // Update filters estimate
     updateEstimate();
+    projectObservationsOntoField(visionInput); 
 }
 
 // void ParticleFilter::update(const messages::RobotLocation& odometryInput,
@@ -176,6 +178,16 @@ void ParticleFilter::updateEstimate()
     poseEstimate.set_h(NBMath::subPIAngle(sumH/parameters.numParticles));
 
     poseEstimate.set_uncert(errorMagnitude);
+
+
+}
+
+void ParticleFilter::projectObservationsOntoField(messages::FieldLines& visionInput)
+{
+    Particle estimateThisFrame(poseEstimate.x(), poseEstimate.y(), poseEstimate.h(), 0);
+
+    for (int i = 0; i < visionInput.line_size(); i++)
+        LineSystem::projectOntoField(*visionInput.mutable_line(i), estimateThisFrame);
 }
 
 /**

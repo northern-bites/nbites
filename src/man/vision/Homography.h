@@ -196,8 +196,8 @@ protected:
 
   void setEndPoints(double ep0, double ep1)
   {
-    _ep0 = ep0;
-    _ep1 = ep1;
+    _ep0 = min(ep0, ep1);
+    _ep1 = max(ep0, ep1);
   }
 
 public:
@@ -220,7 +220,7 @@ public:
   {
     this->r(r);
     this->t(t);
-    setEndPoints(min(ep0, ep1), max(ep0, ep1));
+    setEndPoints(ep0, ep1);
   }
 
   // Copy/assign OK
@@ -263,6 +263,14 @@ public:
   // (gradients pointing away from each other. Separation is approximately zero
   // otherwise. 
   double separation(const GeoLine& other) const;
+  
+  // Assuming this and other should be the same line, calculate the error.
+  // NOTE used in particle filter.
+  double error(const GeoLine& other) const;
+
+  // Translation rotation of line in plane. 
+  // NOTE used in particle filter.
+  void translateRotate(double xTrans, double yTrans, double rotation);
 
   // Map this image line to what we would see if roll were 0 and the optical axis
   // was at the center of the image

@@ -43,6 +43,7 @@ int CrossBright_func();
 int Vision_func();
 int CameraCalibration_func();
 int Synthetics_func();
+int Scratch_func();
 
 
 /* add all functions to publish to this vector */
@@ -53,7 +54,8 @@ static const std::vector<CrossFunc> FUNCS = {
     CrossFunc("Vision", Vision_func, {"YUVImage"}),
     CrossFunc("CameraCalibration", CameraCalibration_func, {"YUVImage", "YUVImage", "YUVImage", 
                                                 "YUVImage", "YUVImage", "YUVImage", "YUVImage"}),
-    CrossFunc("Synthetics", Synthetics_func, {"SyntheticParams"})
+    CrossFunc("Synthetics", Synthetics_func, {"SyntheticParams"}),
+    CrossFunc("Scratch", Scratch_func, {})
 };
 
 extern std::vector<nblog::Log *> args;

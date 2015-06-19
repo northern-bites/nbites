@@ -252,6 +252,7 @@ public class Log {
 		if (item.isAtom())
 			return null;
 		
+
 		SExpr bytes = item.find(CONTENT_NBYTES_S).get(1);
 		return bytes.exists() && bytes.isAtom() ? bytes.valueAsInt() : null;
 	}
@@ -276,6 +277,7 @@ public class Log {
 	public byte[] bytesForContentItem(int index) {
 		Integer offset = contentOffset(index);
 		Integer total = contentNumBytes(index);
+
 		if (offset == null || total == null)
 			return null;
 		

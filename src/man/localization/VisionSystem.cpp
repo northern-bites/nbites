@@ -16,7 +16,7 @@ VisionSystem::~VisionSystem() {}
  * @return if observations were made
  */
 bool VisionSystem::update(ParticleSet& particles,
-                          const messages::FieldLines& lines)
+                          messages::FieldLines& lines)
 {
     ParticleIt iter;
 
@@ -39,6 +39,11 @@ bool VisionSystem::update(ParticleSet& particles,
         int numObsv = 0;
 
         for (int i = 0; i < lines.line_size(); i++) {
+            // Skip lines that are short, often false positives found in center circle
+            if (lines.line(i).inner().ep1() - lines.line(i).inner().ep0() < 60)
+                continue;
+
+            // Otherwise the line system should score the observation
             madeObsv = true;
             float newError = lineSystem->scoreObservation(lines.line(i), *particle);
             curParticleError += newError;

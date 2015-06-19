@@ -40,11 +40,21 @@ int Vision_func() {
    
     // Determine if we are looking at a top or bottom image from log description
     bool top = copy->description().find("TOP") != std::string::npos;
-    
-    int width = 2*atoi(copy->tree().find("contents")->get(1)->
-                                    find("width")->get(1)->value().c_str());
-    int height = atoi(copy->tree().find("contents")->get(1)->
-                                   find("height")->get(1)->value().c_str());
+    int width, height;
+    std::vector<SExpr*> vec = copy->tree().recursiveFind("width");
+    if (vec.size() != 0) {
+        SExpr* s = vec.at(vec.size()-1);
+        width = 2*s->get(1)->valueAsInt();
+    } else {
+        std::cout << "Could not get width from description!\n";
+    }
+    vec = copy->tree().recursiveFind("height");
+    if (vec.size() != 0) {
+        SExpr* s = vec.at(vec.size()-1);
+        height = s->get(1)->valueAsInt();
+    } else {
+        std::cout << "Could not get height from description!\n";
+    }
 
     // Location of lisp text file with color params
     std::string sexpPath = std::string(getenv("NBITES_DIR"));
@@ -311,6 +321,24 @@ int Vision_func() {
     lineRet->setData(lineBuf);
     rets.push_back(lineRet);
 
+    // std::cout << "SCRATCH" << std::endl;
+    // man::vision::GeoLine test1;
+    // test1.set(75, M_PI / 2, -45, 15);
+    // std::cout << test1.print() << std::endl;
+
+    // test1.translateRotate(0, 0, -(M_PI / 2));
+    // test1.translateRotate(300, 200, (M_PI));
+    // std::cout << test1.print() << std::endl;
+
+    // std::cout << "SCRATCH" << std::endl;
+    // man::vision::GeoLine test2;
+    // test2.set(100, M_PI / 2, -50, 50);
+    // std::cout << test2.print() << std::endl;
+
+    // test2.translateRotate(0, 0, -(M_PI / 2));
+    // test2.translateRotate(400, 200, (M_PI / 2));
+    // std::cout << test2.print() << std::endl;
+
     return 0;
 }
 
@@ -334,22 +362,17 @@ int CameraCalibration_func() {
     // printf("DONE\n\n\n");
 
     int failures = 0;
-    double totalR, totalT;
+    double totalR = 0;
+    double totalT = 0;
 
-// Repeat for each log
-    for (int i = 0; i < 1; i++) {
+    // Repeat for each log
+    for (int i = 0; i < 7; i++) {
 
         Log* l = new Log(args[i]);
-
-        std::cout << "Got log: " << l->description() << std::endl << std::endl;
-
 
         size_t length = l->data().size();
         uint8_t buf[length];
         memcpy(buf, l->data().data(), length);
-
-        std::cout << "Got length: " << length << std::endl << std::endl;
-
 
         // Determine description
         bool top = l->description().find("from=camera_TOP") != std::string::npos;
@@ -361,13 +384,13 @@ int CameraCalibration_func() {
 
         double rollChange, pitchChange;
         
-        std::cout << "Got top, w, h: " << top << " " << width << " " << height << std::endl << std::endl;
+    //    std::cout << "Got top, w, h: " << top << " " << width << " " << height << std::endl << std::endl;
 
         // Init vision module with offsets of 0.0
         man::vision::VisionModule module(width / 2, height);
         module.setCameraParams("none");
 
-        std::cout << "Set VisMod to robot name \'none\'\n";
+    //    std::cout << "Set VisMod to robot name \'none\'\n";
 
         
         // Read number of bytes of image, inertials, and joints if exist
@@ -394,7 +417,7 @@ int CameraCalibration_func() {
             SExpr* s = vec.at(vec.size()-2)->find("nbytes");
             if (s != NULL) {
                 numBytes[2] = s->get(1)->valueAsInt();
-                std::cout << "1. 2. 3. " << numBytes[0] << ". " << numBytes[1] << ". " << numBytes[2] << ". \n";
+           //     std::cout << "1. 2. 3. " << numBytes[0] << ". " << numBytes[1] << ". " << numBytes[2] << ". \n";
                 uint8_t* ptToJoints = buf + (numBytes[0] + numBytes[1]);
                 joints.ParseFromArray((void *) ptToJoints, numBytes[2]);
             } else {
@@ -411,9 +434,12 @@ int CameraCalibration_func() {
         module.bottomIn.setMessage(imageMessage);
         module.jointsIn.setMessage(jointsMessage);
 
+    //    std::cout << "Width: " << width << " Height: " << height << std::endl;
+
+
         module.run();
 
-        std::cout << "Ran VisionModule with robot name \'none\'\n";
+//        std::cout << "Ran VisionModule with robot name \'none\'\n";
 
         man::vision::FieldHomography* fh = module.getFieldHomography(top);
 
@@ -428,28 +454,36 @@ int CameraCalibration_func() {
 
         if (!success) {
             failures++;
-            printf("FAILED!\n");        
+
+        } else {
+
+            rollAfter = fh->roll();
+            tiltAfter = fh->tilt();
+
+            totalR += rollAfter - rollBefore;
+            totalT += tiltAfter - tiltBefore;
+
+            std::cout << "After:  " << rollAfter << ", " << tiltAfter << std::endl;
+            std::cout << "Differ: " << rollAfter - rollBefore << ", " << tiltAfter-tiltBefore << std::endl << std::endl;
         }
-
-        rollAfter = fh->roll();
-        tiltAfter = fh->tilt();
-
-        totalR += rollAfter - rollBefore;
-        totalT += tiltAfter - tiltBefore;
-
-        std::cout << "After: " << rollAfter << ", " << tiltAfter << std::endl;
     }
 
     if (failures > 2) {
         // Handle failure
+        printf("FAILED: %d times\n", failures);
     }
+    
+    std::cout << "1 Ave roll: " << totalR << " Ave tilt: " << totalT << std::endl;
 
-    totalR /= args.size() - failures;
-    totalT /= args.size() - failures;
+    totalR /= (args.size() - failures);
+    totalT /= (args.size() - failures);
+    std::cout << "div: " << args.size() - failures << std::endl;
 
-
-
+    std::cout << "2 Ave roll: " << totalR << " Ave tilt: " << totalT << std::endl;
+    
     // Pass back averaged offsets to Tool
+    std::string sexp = "((roll " + std::to_string(totalR) + ")(tilt " + std::to_string(totalT) + "))";
+    rets.push_back(new Log(sexp));
 }
 
 
@@ -494,6 +528,9 @@ int Synthetics_func() {
 
     rets.push_back(log);
 }
+
+int Scratch_func() {}
+
 
 // Save the new color params to the colorParams.txt file
 void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top) {

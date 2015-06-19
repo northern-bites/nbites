@@ -19,6 +19,7 @@
 #include "FallStatus.pb.h"
 #include "StiffnessControl.pb.h"
 #include "Obstacle.pb.h"
+#include "Vision.pb.h"
 
 namespace man {
 namespace behaviors {
@@ -48,6 +49,7 @@ public:
     messages::VisionObstacle    const * visionObstacle_ptr;
     messages::SharedBall        const * sharedBall_ptr;
     messages::RobotLocation     const * sharedFlip_ptr;
+    messages::FieldLines     const * visionLines_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -80,6 +82,10 @@ public:
     void setLedCommand_ptr(const messages::LedCommand* msg)
     {
         ledCommand_ptr = msg;
+    }
+    void setVisionLines_ptr(const messages::FieldLines* msg)
+    {
+        visionLines_ptr = msg;
     }
     void setWorldModel_ptr(const messages::WorldModel* msg,int i)
     {
