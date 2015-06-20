@@ -159,6 +159,9 @@ def standStill(player):
 
     return player.stay()
 
+
+# -----------------------------------------------
+# NEW VISION
 @superState('gameControllerResponder')
 def watchWithLineChecks(player):
     if player.firstFrame():
@@ -188,6 +191,8 @@ def lineCheckReposition(player):
         player.brain.nav.walkTo(dest)
 
     return Transition.getNextState(player, lineCheckReposition)
+
+# -----------------------------------------------
 
 @superState('gameControllerResponder')
 def watchWithCornerChecks(player):

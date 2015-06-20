@@ -28,7 +28,6 @@ def getLines(player):
         # x2 = x0 + line.inner.eP1 * math.sin(t)
         # y2 = y0 + -line.inner.eP1 * math.cos(t)
 
-
 def getFrontLine(player):
     # Assume facing forward
     for line in GoalieStates.watchWithLineChecks.lines:
@@ -37,10 +36,10 @@ def getFrontLine(player):
         # Assumptions: facing forward
         # If have good t value and bad r value, reposition accordingly
         if math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH \
-        and math.fabs(r - constants.EXPECTED_FRONT_LINE_R_BOTTOM_CAM) < constants.R_THRESH:
+        and math.fabs(r - constants.EXPECTED_FRONT_LINE_R) < constants.R_THRESH:
             return line
 
-def lineCheckShouldReposition(player):
+def frontLineCheckShouldReposition(player):
     getLines(player)
     x_dest = 0.0
     y_dest = 0.0
@@ -51,13 +50,53 @@ def lineCheckShouldReposition(player):
         t = math.degrees(line.t)
 
         # Assumptions: facing forward
+        # If we find a line that, judging by its t value, is likely the front line of
+        # the goalbox, use the r value to correct the robot's y position
         # If have good t value and bad r value, reposition accordingly
+        # Additional r < 100 check to throw away the middle line
         if math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH \
-        and math.fabs(r - constants.EXPECTED_FRONT_LINE_R_TOP_CAM) > constants.R_THRESH \
+        and math.fabs(r - constants.EXPECTED_FRONT_LINE_R) > constants.R_THRESH \
         and r < 100.0:
-            x_dest = r - constants.EXPECTED_FRONT_LINE_R_TOP_CAM
-            print "Was TRUE"
+            x_dest = r - constants.EXPECTED_FRONT_LINE_R
+            print "Front was TRUE"
             print x_dest
+            print r
+            player.homeDirections += [RelRobotLocation(x_dest, y_dest, h_dest)]
+            return True
+
+    return False
+
+
+def sideLineCheckShouldReposition(player):
+    x_dest = 0.0
+    y_dest = 0.0
+    h_dest = 0.0
+
+    for line in GoalieStates.watchWithLineChecks.lines:
+        r = line.r
+        t = math.degrees(line.t)
+        # Assumptions: facing forward
+        # If we find a line that, judging by its t value, is likely the right line,
+        # of the goalbox, use the r value to correct the robot's x position
+        # Additional r < 200 check to throw away the side field lines
+        if math.fabs(t - constants.EXPECTED_RIGHT_LINE_T) < constants.T_THRESH \
+        and math.fabs(r - constants.EXPECTED_SIDE_LINE_R) > constants.R_THRESH \
+        and r < 170.0:
+            y_dest = constants.EXPECTED_SIDE_LINE_R - r
+            print "Right side was TRUE"
+            print y_dest
+            print r
+            player.homeDirections += [RelRobotLocation(x_dest, y_dest, h_dest)]
+            return True
+
+        # Assumptions: facing forward
+        # Same as above, except with the left side line
+        if math.fabs(t - constants.EXPECTED_LEFT_LINE_T) < constants.T_THRESH \
+        and math.fabs(r - constants.EXPECTED_SIDE_LINE_R) > constants.R_THRESH \
+        and r < 170.0:
+            y_dest = r - constants.EXPECTED_SIDE_LINE_R
+            print "Left side was TRUE"
+            print y_dest
             print r
             player.homeDirections += [RelRobotLocation(x_dest, y_dest, h_dest)]
             return True

@@ -143,7 +143,7 @@ public class BasicLineView extends ViewParent {
             int xm = (int) Math.round(x0 + resize*multiplier*mP * Math.sin(t));
             int ym = (int) Math.round(y0 + resize*multiplier*mP * Math.cos(t));
 
-            if (x1 < 0 || y1 < 0 || x2 < 0 || y2 < 0) continue;
+            if (x1 < 0 || y1 < 0 || x2 < 0 || y2 < 0 || r == 0.0) continue;
 
             g.setColor(Color.red);
 
