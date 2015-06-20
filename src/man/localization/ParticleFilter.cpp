@@ -460,11 +460,11 @@ void ParticleFilter::resample()
                                                     (*recLocIt).h,
                                                     1.f/250.f);
 
-                     for (int i = 0; i < 300; i++) {
+                     // for (int i = 0; i < 300; i++) {
                          newParticles.push_back(reconstructedParticle);
                          numReconParticlesAdded++;
-                     }
-                     break;
+                     // }
+                     // break;
             }
         }
 #ifdef DEBUG_LOC
@@ -474,7 +474,7 @@ void ParticleFilter::resample()
 
     // Sample numParticles particles with replacement according to the
     // normalized weights, and place them in a new particle set.
-    for(int i = 0; i < (parameters.numParticles - (float)300*numReconParticlesAdded); ++i)
+    for(int i = 0; i < (parameters.numParticles - (float)numReconParticlesAdded); ++i)
     {
         rand = (float)gen();
         if(cdf.upper_bound(rand) == cdf.end())
