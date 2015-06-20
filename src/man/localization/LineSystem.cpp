@@ -62,6 +62,40 @@ double LineSystem::scoreObservation(const messages::FieldLine& observation,
     return (1 / r) * errorBetweenObservationAndModel;
 }
 
+// NOTE method assumes that endpoints seen in observation are endpoints of line
+messages::RobotLocation LineSystem::reconstructPosition(LocLineID id, 
+                                                        const messages::FieldLine& observation)
+{
+    messages::RobotLocation position;
+    const messages::HoughLine& inner = observation.inner();
+    const vision::GeoLine& absolute = lines[id];
+
+    // Calculate heading in absolute coords
+    position.set_h(vision::addRadians(vision::diffRadians(M_PI / 2, inner.t()), absolute.t()));
+
+    // Calculate midpoint of line in relative coords
+    double rx1, ry1, rx2, ry2, rxm, rym;
+    vision::GeoLine relRobot;
+    relRobot.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
+    relRobot.translateRotate(0, 0, -(M_PI / 2));
+    relRobot.translateRotate(0, 0, position.h());
+    relRobot.endPoints(rx1, ry1, rx2, ry2);
+    rxm = (rx1 + rx2) / 2;
+    rym = (ry1 + ry2) / 2;
+
+    // Calculate midpoint of line in absolute coords
+    double ax1, ay1, ax2, ay2, axm, aym;
+    absolute.endPoints(ax1, ay1, ax2, ay2);
+    axm = (ax1 + ax2) / 2;
+    aym = (ay1 + ay2) / 2;
+
+    // Find x and y of reconstructed position
+    position.set_x(axm - rxm);
+    position.set_y(aym - rym);
+
+    return position;
+}
+
 vision::GeoLine LineSystem::relRobotToAbsolute(const messages::FieldLine& observation,
                                                const messages::RobotLocation& loc)
 {

@@ -94,11 +94,15 @@ inline double sMod(double x, double mod)
   return x - floor(x / mod + 0.5) * mod;
 }
 
+inline double addRadians(double a, double b)
+{
+  return fabs(sMod(a + b, 2 * M_PI));
+}
+
 inline double diffRadians(double a, double b)
 {
   return fabs(sMod(a - b, 2 * M_PI));
 }
-
 
 inline void unitVec(double x, double y, double& u, double& v)
 {
