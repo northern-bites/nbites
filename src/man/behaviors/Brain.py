@@ -225,7 +225,7 @@ class Brain(object):
             or self.player.gameState == 'gameSet'):
             self.ball.x = Constants.CENTER_FIELD_X
             self.ball.y = Constants.CENTER_FIELD_Y
-        #print self.ball
+
         # self.yglp = self.interface.visionField.goal_post_l.visual_detection
         # self.ygrp = self.interface.visionField.goal_post_r.visual_detection
 

@@ -266,7 +266,6 @@ void VisionModule::updateVisionBall()
     if (ballOn) {
         ballOnCount++;
         ballOffCount = 0;
-        std::cout << "Ball on this many frames: " << ballOnCount << std::endl;
     }
     else {
         ballOnCount = 0;
@@ -293,9 +292,9 @@ void VisionModule::updateVisionBall()
         ball_message.get()->set_bearing_deg(bearing * TO_DEG);
 
         double angle_x = (best.imgWidth/2 - best.getBlob().centerX()) /
-            (best.imgWidth/2) * HORIZ_FOV_DEG;
+            (best.imgWidth) * HORIZ_FOV_DEG;
         double angle_y = (best.imgHeight/2 - best.getBlob().centerY()) /
-            (best.imgHeight/2) * VERT_FOV_DEG;
+            (best.imgHeight) * VERT_FOV_DEG;
         ball_message.get()->set_angle_x_deg(angle_x);
         ball_message.get()->set_angle_y_deg(angle_y);
 
