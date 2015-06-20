@@ -1,5 +1,7 @@
 #include "VisionSystem.h"
 
+#include "../vision/Hough.h"
+
 namespace man {
 namespace localization {
 
@@ -95,15 +97,19 @@ bool VisionSystem::update(ParticleSet& particles,
     if (madeObsv)
         currentLowestError = lowestParticleError;
 
-    // // Clear out the reconstructed observation list
-    // reconstructedLocations.clear();
-
-    // // for each corner add the reconstructions
-    // for (int i=0; i<obsv.visual_corner_size(); i++)
-    // {
-    //     if(obsv.visual_corner(i).visual_detection().distance() > 0.f)
-    //         addCornerReconstructionsToList(obsv.visual_corner(i));
-    // }
+    // Add reconstructions if top goalbox
+    reconstructedLocations.clear();
+    for (int i = 0; i < lines.line_size(); i++) {
+        const messages::FieldLine& field = lines.line(i);
+        if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
+            // std::cout << "PUSHING BACK RECONSTRUCT" << std::endl;
+            const messages::HoughLine& inner = field.inner();
+            messages::RobotLocation pose = lineSystem->reconstructPosition(LocLineID::OurTopGoalbox,
+                                                                          field);
+            ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), true);
+            reconstructedLocations.push_back(reconstructed);
+        }
+    }
 
     // Succesfully updated particles with Vision!
     return true;

@@ -438,38 +438,43 @@ void ParticleFilter::resample()
     //std::cout << "Error " << errorMagnitude << std::endl;
 
     // First add reconstructed particles from corner observations
-//     int numReconParticlesAdded = 0;
-//     if (lost && badFrame)
-//     {
-//         std::list<ReconstructedLocation> reconLocs = visionSystem->getReconstructedLocations();
-//         std::list<ReconstructedLocation>::const_iterator recLocIt;
-//         for (recLocIt = reconLocs.begin();
-//              recLocIt != reconLocs.end();
-//              recLocIt ++)
-//         {
-//             // If the reconstructions is on the same side and not near midfield
-//             if ( ((*recLocIt).defSide == onDefendingSide())
-//                  && (fabs((*recLocIt).x - CENTER_FIELD_X) > 50)) {
-// //                std::cout << "Use reconstruction " << (*recLocIt).x << " " << (*recLocIt).y << std::endl;
-// 
-//                      Particle reconstructedParticle((*recLocIt).x,
-//                                                     (*recLocIt).y,
-//                                                     (*recLocIt).h,
-//                                                     1.f/250.f);
-// 
-//                      newParticles.push_back(reconstructedParticle);
-//                      numReconParticlesAdded++;
-//             }
-//         }
-// #ifdef DEBUG_LOC
-//         std::cout << "Injected " << numReconParticlesAdded << " particles" << std::endl;
-// #endif
-//     }
+    int numReconParticlesAdded = 0;
+    // if (lost && badFrame)
+    if (true)
+    {
+        // std::cout << "LOST AND BAD FRAME" << std::endl;
+        std::list<ReconstructedLocation> reconLocs = visionSystem->getReconstructedLocations();
+        std::list<ReconstructedLocation>::const_iterator recLocIt;
+        for (recLocIt = reconLocs.begin();
+             recLocIt != reconLocs.end();
+             recLocIt ++)
+        {
+            // std::cout << "ITER RECONSTRUCT" << std::endl;
+            // If the reconstructions is on the same side and not near midfield
+            // TODO sanity check particle is on field
+            if ( ((*recLocIt).defSide == onDefendingSide())
+                 && (fabs((*recLocIt).x - CENTER_FIELD_X) > 50)) {
+                     std::cout << "Use reconstruction " << (*recLocIt).x << " " << (*recLocIt).y << " " << (*recLocIt).h << std::endl;
+                     Particle reconstructedParticle((*recLocIt).x,
+                                                    (*recLocIt).y,
+                                                    (*recLocIt).h,
+                                                    1.f/250.f);
+
+                     for (int i = 0; i < 300; i++) {
+                         newParticles.push_back(reconstructedParticle);
+                         numReconParticlesAdded++;
+                     }
+                     break;
+            }
+        }
+#ifdef DEBUG_LOC
+        std::cout << "Injected " << numReconParticlesAdded << " particles" << std::endl;
+#endif
+    }
 
     // Sample numParticles particles with replacement according to the
     // normalized weights, and place them in a new particle set.
-    // for(int i = 0; i < (parameters.numParticles - (float)numReconParticlesAdded); ++i)
-    for(int i = 0; i < parameters.numParticles; ++i)
+    for(int i = 0; i < (parameters.numParticles - (float)300*numReconParticlesAdded); ++i)
     {
         rand = (float)gen();
         if(cdf.upper_bound(rand) == cdf.end())

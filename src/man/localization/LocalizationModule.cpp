@@ -76,6 +76,8 @@ void LocalizationModule::update()
     portals::Message<messages::RobotLocation> locMessage(&particleFilter->getCurrentEstimate());
     output.setMessage(locMessage);
 
+    std::cout << particleFilter->getCurrentEstimate().x() << " " << particleFilter->getCurrentEstimate().y() << " " << particleFilter->getCurrentEstimate().h() << std::endl;
+
 #ifdef USE_LOGGING
     if(control::flags[control::LOCALIZATION]) {
         ++log_index;
