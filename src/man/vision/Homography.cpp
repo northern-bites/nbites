@@ -345,7 +345,7 @@ double GeoLine::error(const GeoLine& other) const
   Fool rError(rThr, rDiff);
   Fool tError(tThr, tDiff);
 
-  return (rError & tError).f();
+  return (rError | tError).f();
 }
 
 void GeoLine::translateRotate(double xTrans, double yTrans, double rotation)

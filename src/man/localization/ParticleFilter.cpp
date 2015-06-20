@@ -81,7 +81,7 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
          errorMagnitude += (1.f/100.f);
 
      // std::cout << "Cur Error " << avgErr << std::endl;
-     std::cout << "Filtered Error:  " << errorMagnitude << std::endl;
+     // std::cout << "Filtered Error:  " << errorMagnitude << std::endl;
 
     // Determine if lost in frame or general
     lost = (errorMagnitude > LOST_THRESHOLD);
