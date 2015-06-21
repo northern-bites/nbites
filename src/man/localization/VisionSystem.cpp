@@ -100,6 +100,9 @@ bool VisionSystem::update(ParticleSet& particles,
     // Add reconstructions if top goalbox
     reconstructedLocations.clear();
     for (int i = 0; i < lines.line_size(); i++) {
+        if (!LineSystem::shouldUse(lines.line(i)))
+            continue;
+
         const messages::FieldLine& field = lines.line(i);
         if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
             // std::cout << "PUSHING BACK RECONSTRUCT" << std::endl;
