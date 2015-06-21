@@ -15,6 +15,7 @@ BallDetector::BallDetector(FieldHomography* homography_, bool topCamera_):
     topCamera(topCamera_)
 {
     blobber.secondThreshold(115);
+    blobber.minWeight(4);
 }
 
 BallDetector::~BallDetector() { }
@@ -74,7 +75,7 @@ bool BallDetector::findBall(ImageLiteU8 orange, double cameraHeight)
 
 Ball::Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_, int imgWidth_) :
     blob(b),
-    radThresh(.25, .5),
+    radThresh(.1, .5),
     thresh(.5, .8),
     x_rel(x_),
     y_rel(y_),
@@ -110,7 +111,8 @@ void Ball::compute()
     else
         diameterRatio = expectedDiam / (2 * blob.firstPrincipalLength());
 
-    _confidence = (density > thresh).f() * (aspectRatio > thresh).f() * (diameterRatio > radThresh).f();
+    //_confidence = (density > thresh).f() * (aspectRatio > thresh).f() * (diameterRatio > radThresh).f();
+    _confidence = ((density > thresh) & (aspectRatio > thresh) & (diameterRatio > radThresh)).f();
 }
 
 std::string Ball::properties()
@@ -126,6 +128,7 @@ std::string Ball::properties()
                                       blob.firstPrincipalLength()) + "\n";
     d += "\texpect ball to be this many pix: " + to_string(expectedDiam) + "\n";
     d += "\tdiamRatio: " + to_string(diameterRatio) + "\n";
+    d += "\tdiam Confidence: " + to_string((diameterRatio> radThresh).f()) + "\n";
     d += "\n\tconfidence is: " + to_string(_confidence) + "\n====================\n";
     return d;
 }

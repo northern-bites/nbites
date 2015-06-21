@@ -482,11 +482,11 @@ void houghTest()
   printf("\n%d fast lines:\n", fastList.size());
   fastList.mapToField(fh);
   for (list<HoughLine>::iterator hl = fastList.begin(); hl != fastList.end(); ++hl)
-    printf("  %s | %s\n", hl->print().c_str(), hl->field().print().c_str());
-
-  printf("\n%d slow lines:\n", slowList.size());
-  for (list<HoughLine>::iterator hl = slowList.begin(); hl != slowList.end(); ++hl)
     printf("  %s\n", hl->print().c_str());
+
+  //printf("\n%d slow lines:\n", slowList.size());
+  //for (list<HoughLine>::iterator hl = slowList.begin(); hl != slowList.end(); ++hl)
+  //  printf("  %s\n", hl->print().c_str());
 
   if (iterationCount > 1)
   {
