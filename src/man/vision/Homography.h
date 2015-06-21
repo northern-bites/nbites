@@ -34,6 +34,12 @@ class FieldHomography
   double ca, ct, cr;            // cosine azimuth, tilt, roll
   double sa, st, sr;            // cosine azimuth, tilt, roll
 
+  double _panRate;              // radians/pixel
+
+  // Rotate (x, y) by the azimuth difference due to the exposure time difference
+  // from the optical axis to iy that results from panRate
+  void panAzimuth(double iy, double x, double y, double& xp, double& yp) const;
+
   // The homogaphy matrix is set from client-visible parameters and is invisible
   // to the client. It is computed on demand, not when the parameters are changed.
   // This makes some member functions that the client sees as const actually non-
@@ -78,6 +84,26 @@ public:
   // Height above field of camera aperture
   double wz0() const { return -h34; }
   void wz0(double z) { h34 = -z; }
+
+  // Pan rate corrects for the rolling shutter when the robot head is panning, i.e.
+  // azimuth is changing at a constant rate. Pan rate is in radians/pixel, calculated
+  // as follows:
+  //
+  //                         radians/second
+  //   radians/pixel = ------------------------------
+  //                   frames/second * y-pixels/frame
+  //
+  // So if the robot head is panning at 2 radians/second, the camera is running at 30
+  // frames/second, and the image contans 240 y-pixels/frame, then
+  //
+  //                2
+  //   panRate = -------- = 0.000278
+  //             30 * 240
+  //
+  // panRate is positive for panning right to left, or maybe it's left to right, it's
+  // really hard to get ths right so you better test it.
+  double panRate() const { return _panRate; }
+  void panRate(double rpp) { _panRate = rpp; }
 
   // Map image coordinates to field coordinates.
   // Returns true if the point is below the horizon and therefore actually on the field

@@ -22,6 +22,7 @@ FieldHomography::FieldHomography(bool topCamera)
   iy0(0);
   roll(0);
   azimuth(0);
+  panRate(0);
   wx0(0);
   wy0(0);
   wz0(52);
@@ -60,6 +61,15 @@ void FieldHomography::compute()
   }
 }
 
+void FieldHomography::panAzimuth(double iy, double x, double y, double& xp, double& yp) const
+{
+  double panAz = -panRate() * iy;   // negative because +iy is earlier in rolling exposure
+  double cp = cos(panAz);           // Could make this faster with the small angle approx
+  double sp = sin(panAz);           //   cp = 1, sp = panAz
+  xp = x * cp - y * sp;
+  yp = x * sp + y * cp;
+}
+
 bool FieldHomography::fieldCoords(double ix, double iy, double& wx, double& wy) const
 {
   compute();
@@ -75,8 +85,9 @@ bool FieldHomography::fieldCoords(double ix, double iy, double& wx, double& wy) 
   cz *= flen();
 
   // World coordinates
-  wx = h11 * cx + h12 * cy + h13 * cz + h14;
-  wy = h21 * cx + h22 * cy + h23 * cz + h24;
+  panAzimuth(iy, h11 * cx + h12 * cy + h13 * cz, h21 * cx + h22 * cy + h23 * cz, wx, wy);
+  wx += h14;
+  wy += h24;
 
   double wz = h31 * cx + h32 * cy + h33 * cz + h34;
   if (fabs(wz) > 1.0e-6) {
@@ -91,14 +102,20 @@ void FieldHomography::fieldVector(double ix, double iy, double dix, double diy,
                                   double& dwx, double& dwy) const
 {
   compute();
+
   ix -= ix0();
   iy -= iy0();
-  double j11 =   ca * st * iy + ( sa * sr - ca * cr * ct) * flen();
-  double j12 = -(ca * st * ix + ( sa * cr + ca * sr * ct) * flen());
-  double j21 =  -sa * st * iy + ( ca * sr + sa * cr * ct) * flen();
-  double j22 =   sa * st * ix + (-ca * cr + sa * sr * ct) * flen();
+
+  double cp, sp;
+  panAzimuth(iy, ca, sa, cp, sp);
+
+  double j11 =   cp * st * iy + ( sp * sr - cp * cr * ct) * flen();
+  double j12 = -(cp * st * ix + ( sp * cr + cp * sr * ct) * flen());
+  double j21 =  -sp * st * iy + ( cp * sr + sp * cr * ct) * flen();
+  double j22 =   sp * st * ix + (-cp * cr + sp * sr * ct) * flen();
   double js = h31 * ix + h32 * iy + h33 * flen();
   js = h34 / (js * js);
+
   dwx = js * (dix * j11 + diy * j12);
   dwy = js * (dix * j21 + diy * j22);
 }
@@ -107,13 +124,19 @@ void FieldHomography::imageVector(double ix, double iy, double dwx, double dwy,
                                   double& dix, double& diy) const
 {
   compute();
+
   ix -= ix0();
   iy -= iy0();
-  double j11 = sa * st * ix + (-ca * cr + sa * sr * ct) * flen();
-  double j12 = ca * st * ix + ( sa * cr + ca * sr * ct) * flen();
-  double j21 = sa * st * iy - ( ca * sr + sa * cr * ct) * flen();
-  double j22 = ca * st * iy + ( sa * sr - ca * cr * ct) * flen();
+
+  double cp, sp;
+  panAzimuth(iy, ca, sa, cp, sp);
+
+  double j11 = sp * st * ix + (-cp * cr + sp * sr * ct) * flen();
+  double j12 = cp * st * ix + ( sp * cr + cp * sr * ct) * flen();
+  double j21 = sp * st * iy - ( cp * sr + sp * cr * ct) * flen();
+  double j22 = cp * st * iy + ( sp * sr - cp * cr * ct) * flen();
   double js = (h31 * ix + h32 * iy + h33 * flen()) / (flen() * h34);
+
   dix = js * (dwx * j11 + dwy * j12);
   diy = js * (dwx * j21 + dwy * j22);
 }
@@ -292,7 +315,7 @@ bool FieldHomography::calibrateFromStar(const FieldLineList& lines)
 
 bool StarCal::add(const FieldLineList& lines)
 {
-  for (int i = 0; i < lines.size(); ++i)
+  for (int i = 0; i < (int)lines.size(); ++i)
   {
     double vpx, vpy;
     if (lines[i][0].intersect(lines[i][1], vpx, vpy) && fabs(lines[i][0].ux()) > 0.3)
