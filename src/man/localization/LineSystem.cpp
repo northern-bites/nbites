@@ -72,7 +72,7 @@ messages::RobotLocation LineSystem::reconstructPosition(LocLineID id,
     const vision::GeoLine& absolute = lines[id];
 
     // Calculate heading in absolute coords
-    position.set_h(vision::addRadians((M_PI / 2) - inner.t(), absolute.t()));
+    position.set_h(vision::uMod((M_PI / 2) - inner.t() + absolute.t(), 2 * M_PI));
 
     // Calculate midpoint of line in relative coords
     double rx1, ry1, rx2, ry2, rxm, rym;
@@ -83,20 +83,23 @@ messages::RobotLocation LineSystem::reconstructPosition(LocLineID id,
     relRobot.endPoints(rx1, ry1, rx2, ry2);
     rxm = (rx1 + rx2) / 2;
     rym = (ry1 + ry2) / 2;
-    std::cout << "rxm: " << rxm << std::endl;
-    std::cout << "rym: " << rym << std::endl;
+
+    // std::cout << "rxm: " << rxm << std::endl;
+    // std::cout << "rym: " << rym << std::endl;
 
     // Calculate midpoint of line in absolute coords
     double ax1, ay1, ax2, ay2, axm, aym;
     absolute.endPoints(ax1, ay1, ax2, ay2);
-    std::cout << "ax1: " << ax1 << std::endl;
-    std::cout << "ay1: " << ay1 << std::endl;
-    std::cout << "ax2: " << ax2 << std::endl;
-    std::cout << "ay2: " << ay2 << std::endl;
+
+    // std::cout << "ax1: " << ax1 << std::endl;
+    // std::cout << "ay1: " << ay1 << std::endl;
+    // std::cout << "ax2: " << ax2 << std::endl;
+    // std::cout << "ay2: " << ay2 << std::endl;
     axm = (ax1 + ax2) / 2;
     aym = (ay1 + ay2) / 2;
-    std::cout << "axm: " << axm << std::endl;
-    std::cout << "aym: " << aym << std::endl;
+
+    // std::cout << "axm: " << axm << std::endl;
+    // std::cout << "aym: " << aym << std::endl;
 
     // Find x and y of reconstructed position
     position.set_x(axm - rxm);

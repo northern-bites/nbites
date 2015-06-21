@@ -94,13 +94,6 @@ inline double sMod(double x, double mod)
   return x - floor(x / mod + 0.5) * mod;
 }
 
-// TODO necessary?
-inline double addRadians(double a, double b)
-{
-  double sum = a + b;
-  return fmod(sum, (2 * M_PI));
-}
-
 inline double diffRadians(double a, double b)
 {
   return fabs(sMod(a - b, 2 * M_PI));

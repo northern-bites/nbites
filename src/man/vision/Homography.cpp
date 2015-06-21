@@ -336,9 +336,7 @@ double GeoLine::separation(const GeoLine& other) const
 double GeoLine::error(const GeoLine& other) const
 {
   double rDiff = fabs(fabs(r()) - fabs(other.r()));
-  double t1 = (t() >= 180 ? t() - 180 : t());
-  double t2 = (other.t() >= 180 ? other.t() - 180 : other.t());
-  double tDiff = diffRadians(t1, t2);
+  double tDiff = diffRadians(uMod(t(), M_PI), uMod(other.t(), M_PI));
 
   // TODO load params from LineSystem
   FuzzyThr rThr(0, 150);

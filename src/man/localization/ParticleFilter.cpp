@@ -454,7 +454,7 @@ void ParticleFilter::resample()
             // TODO sanity check particle is on field
             if ( ((*recLocIt).defSide == onDefendingSide())
                  && (fabs((*recLocIt).x - CENTER_FIELD_X) > 50)) {
-                     std::cout << "Use reconstruction " << (*recLocIt).x << " " << (*recLocIt).y << " " << (*recLocIt).h << std::endl;
+                     // std::cout << "Use reconstruction " << (*recLocIt).x << " " << (*recLocIt).y << " " << (*recLocIt).h << std::endl;
                      Particle reconstructedParticle((*recLocIt).x,
                                                     (*recLocIt).y,
                                                     (*recLocIt).h,
