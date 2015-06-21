@@ -165,9 +165,9 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         {
             behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
         }
-
+        
         leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
-
+        
 #ifdef USE_LOGGING
         {   //brackets let us hide logging code in certain IDEs.
         /*
@@ -191,7 +191,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         
         /*
          SPECIFIC MODULE LOGGING
-         *///#ifdef LOG_SENSORS
+         */
+//#ifdef LOG_SENSORS
         sensorsThread.log<messages::JointAngles>((control::SENSORS), &sensors.jointsOutput_,
                                                  "proto-JointAngles", "sensorsThread");
         sensorsThread.log<messages::JointAngles>((control::SENSORS), &sensors.temperatureOutput_,

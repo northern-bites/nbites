@@ -147,7 +147,7 @@ class Brain(object):
         self.time = time.time()
 
         # Update objects
-        # self.updateVisionObjects()
+        self.updateVisionObjects()
         # self.updateObstacles()
         self.updateMotion()
         self.updateLoc()
