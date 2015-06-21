@@ -145,6 +145,10 @@ public class Log {
 			return cs.valueAsInt();
 		else return null;
 	}
+	//what is this attribute going to return?
+	//public String protoRobotLocation() {
+		//return getAttributes().get("proto-RobotLocation");
+	//}
 	
 	public Integer version() {
 		SExpr v = tree().find("version").get(1);
@@ -265,9 +269,9 @@ public class Log {
 	public static void main(String[] args) {
 		SExpr clist = SExpr.newList(
 				SExpr.newAtom("contents"),
-				SExpr.newList(SExpr.newKeyValue("bytes", 10)),
-				SExpr.newList(SExpr.newKeyValue("bytes", 50)),
-				SExpr.newList(SExpr.newKeyValue("bytes", 100))
+				SExpr.newList(SExpr.newKeyValue("bytes", "10")),
+				SExpr.newList(SExpr.newKeyValue("bytes", "50")),
+				SExpr.newList(SExpr.newKeyValue("bytes", "100"))
 				);
 		
 		SExpr top = SExpr.newList(clist);

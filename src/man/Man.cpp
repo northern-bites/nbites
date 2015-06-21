@@ -102,7 +102,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         cognitionThread.addModule(bottomTranscriber);
         cognitionThread.addModule(vision);
         cognitionThread.addModule(localization);
-        // cognitionThread.addModule(ballTrack);
+        cognitionThread.addModule(ballTrack);
         // cognitionThread.addModule(obstacle);
         cognitionThread.addModule(gamestate);
         cognitionThread.addModule(behaviors);
@@ -125,9 +125,9 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
         // localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
         
-        // ballTrack.visionBallInput.wireTo(&vision.vision_ball);
-        // ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
-        // ballTrack.localizationInput.wireTo(&localization.output, true);
+        ballTrack.visionBallInput.wireTo(&vision.ballOut);
+        ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
+        ballTrack.localizationInput.wireTo(&localization.output, true);
         // 
         // for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
         // {
@@ -147,7 +147,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
         
         behaviors.localizationIn.wireTo(&localization.output);
-        // behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
+        behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
         behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
         // behaviors.visionFieldIn.wireTo(&vision.linesOut);
         // behaviors.visionRobotIn.wireTo(&vision.vision_robot);
@@ -165,9 +165,9 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         {
             behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
         }
-        
+
         leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
-        
+
 #ifdef USE_LOGGING
         {   //brackets let us hide logging code in certain IDEs.
         /*
@@ -191,8 +191,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         
         /*
          SPECIFIC MODULE LOGGING
-         */
-//#ifdef LOG_SENSORS
+         *///#ifdef LOG_SENSORS
         sensorsThread.log<messages::JointAngles>((control::SENSORS), &sensors.jointsOutput_,
                                                  "proto-JointAngles", "sensorsThread");
         sensorsThread.log<messages::JointAngles>((control::SENSORS), &sensors.temperatureOutput_,

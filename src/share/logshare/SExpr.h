@@ -26,9 +26,6 @@ namespace nblog {
     
     class SExpr {
     public:
-        
-        /**** standard constructors */
-        
         /* copy constructor: same as what the compiler would provide */
         
         SExpr( const SExpr& other );

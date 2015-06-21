@@ -9,6 +9,8 @@
 #include "../control/control.h"
 #include "nbdebug.h"
 
+#include "../../share/include/Camera.h"
+
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>

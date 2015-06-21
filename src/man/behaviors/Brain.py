@@ -238,12 +238,12 @@ class Brain(object):
         """
         Update estimates of robot and ball positions on the field
         """
-        # self.ball = self.interface.filteredBall
-        # self.sharedBall = self.interface.sharedBall
-        # if (self.player.gameState == 'gameReady'
-        #     or self.player.gameState == 'gameSet'):
-        #     self.ball.x = Constants.CENTER_FIELD_X
-        #     self.ball.y = Constants.CENTER_FIELD_Y
+        self.ball = self.interface.filteredBall
+        self.sharedBall = self.interface.sharedBall
+        if (self.player.gameState == 'gameReady'
+            or self.player.gameState == 'gameSet'):
+            self.ball.x = Constants.CENTER_FIELD_X
+            self.ball.y = Constants.CENTER_FIELD_Y
 
         # self.yglp = self.interface.visionField.goal_post_l.visual_detection
         # self.ygrp = self.interface.visionField.goal_post_r.visual_detection

@@ -178,11 +178,11 @@ class Leds():
 
     def processLeds(self):
 
-        # if BALL_LEDS:
-            # if self.brain.ball.vis.frames_on == 1:
-            #     self.executeLeds(BALL_ON_LEDS)
-            # elif self.brain.ball.vis.frames_off == 1:
-            #     self.executeLeds(BALL_OFF_LEDS)
+        if BALL_LEDS:
+            if self.brain.ball.vis.frames_on == 1:
+                self.executeLeds(BALL_ON_LEDS)
+            elif self.brain.ball.vis.frames_off == 1:
+                self.executeLeds(BALL_OFF_LEDS)
 
         # if GOAL_LEDS:
         #     newCertainty = self.brain.ygrp.certainty

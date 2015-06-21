@@ -60,16 +60,16 @@ local_stack_end:
 # xmm6	0x80 for conversion of pixels to excess-128
 
 .macro 	mark address, clearMask, setMask
-	movdqa	xmm0, address		# Fetch 16 pixels
-	pand	xmm0, clearMask		# Clear LSB
+	movdqa	xmm0, \address		# Fetch 16 pixels
+	pand	xmm0, \clearMask		# Clear LSB
 
 	movdqa	xmm1, xmm0		# Copy pixels
 	pxor	xmm1, xmm6		# Convert to excess-128 for signed compare
 	pcmpgtb	xmm1, xmm3		# Compare to threshold
-	pand	xmm1, setMask		# Keep just bit 0 of results
+	pand	xmm1, \setMask		# Keep just bit 0 of results
 	por	xmm0, xmm1		# Set bit 0 in source pixels
 	
-	movdqa	address, xmm0		# Update marked pixels
+	movdqa	\address, xmm0		# Update marked pixels
 
 .endm
 

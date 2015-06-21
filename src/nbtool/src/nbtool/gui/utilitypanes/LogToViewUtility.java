@@ -47,6 +47,7 @@ public class LogToViewUtility extends UtilityParent {
 		return sel.toArray(new Class[sel.size()]);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Class<? extends ViewParent>[] viewsForLog(Log log) {
 		ArrayList<Class<? extends ViewParent>> views = new ArrayList<Class<? extends ViewParent>>();
 		String ptype = log.primaryType();

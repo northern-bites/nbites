@@ -2,6 +2,10 @@
 #define nbcontrol_h
 
 #include <pthread.h>
+#include <CameraParams.pb.h>
+#include <google/protobuf/message_lite.h>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 #define CONTROL_USLEEP_WAITING (100000)
 
@@ -37,6 +41,7 @@ namespace control {
     } flag_e;
     
     extern volatile uint8_t flags[num_flags];
+    static messages::CameraParams receivedParams;
     
     void control_init();
     
