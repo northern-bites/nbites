@@ -250,15 +250,17 @@ bool GoalboxDetector::find(FieldLineList& list)
   return false;
 }
 
-// TODO add length condition?
 bool GoalboxDetector::validBox(const HoughLine& line1, const HoughLine& line2) const
 {
   // Use world coordinates
   const GeoLine& field1 = line1.field();
   const GeoLine& field2 = line2.field();
 
-  // Goalbox = two field lines that are parallel and seperated by 60 cm
+  // Goalbox = two field lines that are parallel, seperated by 60 cm, and both over 80 cm
+
   // (1) Parallel
+  // NOTE this check also requires that the robot is not in between the lines 
+  //      in order to simplify the classification problem
   double normalizedT1 = (field1.r() > 0 ? field1.t() : field1.t() - M_PI);
   double normalizedT2 = (field2.r() > 0 ? field2.t() : field2.t() - M_PI);
   bool parallel = diffRadians(normalizedT1, normalizedT2) < parallelThreshold()*TO_RAD;
@@ -267,7 +269,12 @@ bool GoalboxDetector::validBox(const HoughLine& line1, const HoughLine& line2) c
   double distBetween = fabs(field1.pDist(field2.r()*cos(field2.t()), field2.r()*sin(field2.t())));
   bool seperation = fabs(distBetween - GOALBOX_DEPTH) < seperationThreshold();
 
-  return parallel && seperation;
+  // (3) Both over 80 cm in length
+  bool length1 = field1.ep1() - field1.ep0() > 80;
+  bool length2 = field2.ep1() - field2.ep0() > 80;
+  bool length = length1 && length2;
+
+  return parallel && seperation && length;
 }
 
 string GoalboxDetector::print() const
