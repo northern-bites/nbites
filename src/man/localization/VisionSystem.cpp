@@ -107,7 +107,10 @@ bool VisionSystem::update(ParticleSet& particles,
             messages::RobotLocation pose = lineSystem->reconstructPosition(LocLineID::OurTopGoalbox,
                                                                           field);
             ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), true);
-            reconstructedLocations.push_back(reconstructed);
+            // Require that reconstructed location is on the field
+            if( (reconstructed.x >= 0 && reconstructed.y <= FIELD_GREEN_WIDTH) &&
+                (reconstructed.y >= 0 && reconstructed.y <= FIELD_GREEN_HEIGHT)  )
+                reconstructedLocations.push_back(reconstructed);
         }
     }
 
