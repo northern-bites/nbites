@@ -168,7 +168,7 @@ class Brain(object):
         # self.flipLocFilter()
 
         # Set LED message
-        # self.leds.processLeds()
+        self.leds.processLeds()
 
         # Set myWorldModel for Comm
         self.updateComm()
