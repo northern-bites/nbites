@@ -166,9 +166,9 @@ bool HoughLine::adjust(EdgeList& edges, const AdjustParams& p, bool capture)
 
 string HoughLine::print() const
 {
-  return strPrintf("%4d, %02X, (%6.1f, %02X), %4.0f, %4.2f, [%4.0f ..%4.0f], %4d, %4d",
-                   rIndex(), tIndex(), r(), binaryAngle(), score(),
-                   fitError(), ep0(), ep1(), fieldLine(), index());
+  return strPrintf("%4d, %02X  %4.0f %4.2f %s -> %s",
+                   rIndex(), tIndex(), score(), fitError(),
+                   GeoLine::print(true).c_str(), field().print(true).c_str());
 }
 
 // *********************
