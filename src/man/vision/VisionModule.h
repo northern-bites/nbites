@@ -38,9 +38,9 @@ public:
 
     const std::string getStringFromTxtFile(std::string path);
 
-    void setCameraParams(std::string robotName);
-    void setCameraParams(int camera, std::string robotName);
-    void setCameraParams(CameraParams* params, bool topCamera) { cameraParams[!topCamera] = params; }
+    void setCalibrationParams(std::string robotName);
+    void setCalibrationParams(int camera, std::string robotName);
+    void setCalibrationParams(CalibrationParams* params, bool topCamera) { calibrationParams[!topCamera] = params; }
 
     void setColorParams(Colors* colors, bool topCamera) { colorParams[!topCamera] = colors; }
     Colors* getColorsFromLisp(nblog::SExpr* colors, int camera);
@@ -61,14 +61,14 @@ private:
     EdgeList* edges[2];
     HoughLineList* houghLines[2];
     HoughSpace* hough[2];
-    CameraParams* cameraParams[2];
+    CalibrationParams* calibrationParams[2];
     Kinematics* kinematics[2];
     FieldHomography* homography[2];
     FieldLineList* fieldLines[2];
     GoalboxDetector* boxDetector[2];
     CornerDetector* cornerDetector[2];
 
-    nblog::SExpr* cameraLisp;
+    nblog::SExpr* calibrationLisp;
     size_t image_index;
 
 };

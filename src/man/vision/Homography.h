@@ -302,13 +302,13 @@ public:
 
 void syntheticField(YuvLite& img, FieldHomography fh);
 
-class CameraParams {
+class CalibrationParams {
   double roll;
   double tilt;
 
 public:
-  CameraParams() { roll = tilt = 0.0; }
-  CameraParams(double r, double t) { roll = r; tilt = t; }
+  CalibrationParams() { roll = tilt = 0.0; }
+  CalibrationParams(double r, double t) { roll = r; tilt = t; }
   double getRoll() { return roll; }
   void setRoll(double r) { roll = r; }
   double getTilt() { return tilt; }

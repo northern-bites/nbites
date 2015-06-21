@@ -25,19 +25,19 @@ VisionModule::VisionModule(int wd, int ht)
 
     //      removed in C++11
 
-    std:: string colorPath, cameraPath;
+    std:: string colorPath, calibrationPath;
     #ifdef OFFLINE
-        colorPath =  cameraPath = std::string(getenv("NBITES_DIR"));
+        colorPath =  calibrationPath = std::string(getenv("NBITES_DIR"));
         colorPath += "/src/man/config/colorParams.txt";
-        cameraPath += "/src/man/config/cameraParams.txt";
+        calibrationPath += "/src/man/config/calibrationParams.txt";
     #else
         colorPath = "/home/nao/nbites/Config/colorParams.txt";
-        cameraPath = "/home/nao/nbites/Config/cameraParams.txt";
+        calibrationPath = "/home/nao/nbites/Config/calibrationParams.txt";
     #endif
 
     // Get SExpr from string
     nblog::SExpr* colors = nblog::SExpr::read(getStringFromTxtFile(colorPath));
-    cameraLisp = nblog::SExpr::read(getStringFromTxtFile(cameraPath));
+    calibrationLisp = nblog::SExpr::read(getStringFromTxtFile(calibrationPath));
 
 
     // Set module pointers for top then bottom images
@@ -47,7 +47,7 @@ VisionModule::VisionModule(int wd, int ht)
         edgeDetector[i] = new EdgeDetector();
         edges[i] = new EdgeList(32000);
         houghLines[i] = new HoughLineList(128);
-        cameraParams[i] = new CameraParams();
+        calibrationParams[i] = new CalibrationParams();
         kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography(i == 0);
         fieldLines[i] = new FieldLineList();
@@ -166,17 +166,16 @@ void VisionModule::run_()
         if (strcmp(getenv("LOG_THIS"), std::string("top").c_str()) == 0) {
             logImage(0);
             setenv("LOG_THIS", "false", 1);
-            std::cerr << "T ";
+            std::cerr << "pCal logging top log\n";
         } else if (strcmp(getenv("LOG_THIS"), std::string("bottom").c_str()) == 0) {
             logImage(1);
             setenv("LOG_THIS", "false", 1);
-            std::cerr << "B ";
+            std::cerr << "pCal logging bot log\n";
         }// else
            // std::cerr << "N "; 
     } else {
         logImage(0);
         logImage(1);
-        std::cerr << "L ";
     }
 #endif
 
@@ -285,9 +284,9 @@ void VisionModule::logImage(int i) {
         joints.append(nblog::SExpr("r_ankle_roll", ja_pb.r_ankle_roll() ));
         contents.push_back(joints);
 
-        nblog::SExpr camParams("CameraParams", "tripoint", clock(), image_index, 0);
-        camParams.append(nblog::SExpr(image_from, cameraParams[i]->getRoll(), cameraParams[i]->getTilt()));
-        contents.push_back(camParams);
+        nblog::SExpr cal("CalibrationParams", "tripoint", clock(), image_index, 0);
+        cal.append(nblog::SExpr(image_from, calibrationParams[i]->getRoll(), calibrationParams[i]->getTilt()));
+        contents.push_back(cal);
 
         nblog::NBLog(NBL_IMAGE_BUFFER, "tripoint", contents, im_buf);
     }
@@ -404,30 +403,32 @@ Colors* VisionModule::getColorsFromLisp(nblog::SExpr* colors, int camera) {
 
     return ret;
 }
-void VisionModule::setCameraParams(std::string robotName) {
-    setCameraParams(0, robotName);
-    setCameraParams(1, robotName);
+void VisionModule::setCalibrationParams(std::string robotName) {
+    setCalibrationParams(0, robotName);
+    setCalibrationParams(1, robotName);
 }
 
-void VisionModule::setCameraParams(int camera, std::string robotName) {
+void VisionModule::setCalibrationParams(int camera, std::string robotName) {
     if (std::string::npos != robotName.find(".local")) {
         robotName.resize(robotName.find("."));
         if (robotName == "she-hulk")
             robotName = "shehulk";
     }
     if (robotName == "") {
-        std::cout << "Could not set camera params: No Robot Name" << std::endl;
+        std::cout << "Could not set calibration params: No Robot Name" << std::endl;
         return;
     }
     
-    nblog::SExpr* robot = cameraLisp->get(1)->find(robotName);
+    nblog::SExpr* robot = calibrationLisp->get(1)->find(robotName);
 
     if (robot != NULL) {
         std::string cam = camera == 0 ? "top" : "bottom";
         double roll =  robot->find(cam)->get(1)->valueAsDouble();
         double pitch = robot->find(cam)->get(2)->valueAsDouble();
-        cameraParams[camera] = new CameraParams(roll, pitch);
+        calibrationParams[camera] = new CalibrationParams(roll, pitch);
     }
+
+    std::cerr << "Found and set calibration patrams for " << robotName << std::endl;
 }
 
 }

@@ -191,6 +191,10 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 //     lines.set(i+4, -1.0);
                 // }
             }
+            /*
+                std::cout << "Width: " << width << " Height: " << height << std::endl;
+            
+            */
 
             // Loop through again to draw lines in field space with calucluated resize value
             for (int i = 0; i < lines.size(); i += 10) {

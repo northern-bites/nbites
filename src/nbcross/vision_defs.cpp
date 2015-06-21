@@ -87,7 +87,7 @@ int Vision_func() {
         rname = robotName->get(1)->value();
     }
 
-    module.setCameraParams(rname);
+    module.setCalibrationParams(rname);
 
     module.topIn.setMessage(imageMessage);
     module.bottomIn.setMessage(imageMessage);
@@ -110,17 +110,17 @@ int Vision_func() {
         }
     }
 
-    // If log includes camera parameters in description, have madule use those
-    std::vector<SExpr* > camParamsVec = args[0]->tree().recursiveFind("CameraParams");
-    if (camParamsVec.size() != 0) {
-        SExpr* camParams = camParamsVec.at(camParamsVec.size()-2);
-        camParams = top ? camParams->find("camera_TOP") : camParams->find("camera_BOT");
-        if (camParams != NULL) {
-            std::cout << "Found and using camera params in log description" << std::endl;
-            man::vision::CameraParams* ncp =
-             new man::vision::CameraParams(camParams->get(1)->valueAsDouble(),
-                                           camParams->get(2)->valueAsDouble());
-            module.setCameraParams(ncp, top);
+    // If log includes calibration parameters in description, have madule use those
+    std::vector<SExpr* > calParamsVec = args[0]->tree().recursiveFind("CalibrationParams");
+    if (calParamsVec.size() != 0) {
+        SExpr* calParams = calParamsVec.at(calParamsVec.size()-2);
+        calParams = top ? calParams->find("camera_TOP") : calParams->find("camera_BOT");
+        if (calParams != NULL) {
+            std::cout << "Found and using calibration params in log description" << std::endl;
+            man::vision::CalibrationParams* ncp =
+             new man::vision::CalibrationParams(calParams->get(1)->valueAsDouble(),
+                                           calParams->get(2)->valueAsDouble());
+            module.setCalibrationParams(ncp, top);
         }
     }
 
@@ -344,22 +344,6 @@ int Vision_func() {
 
 int CameraCalibration_func() {
     printf("CameraCalibrate_func()\n");
-    printf("Size: %d\n", args.size());
-
-    // printf("touching everythin\n");
-    // for (int i = 0; i < 7; ++i) {
-    //     Log * a = args[i];
-    //     std::cout << a->description() << std::endl << std::endl;
-
-    //     size_t sum = 0;
-    //     for (size_t j = 0; j < a->data().size(); ++j) {
-    //         sum += a->data()[j];
-    //     }
-
-    //     printf("%li\n\n", sum);
-    // }
-
-    // printf("DONE\n\n\n");
 
     int failures = 0;
     double totalR = 0;
@@ -384,15 +368,10 @@ int CameraCalibration_func() {
 
         double rollChange, pitchChange;
         
-    //    std::cout << "Got top, w, h: " << top << " " << width << " " << height << std::endl << std::endl;
-
         // Init vision module with offsets of 0.0
         man::vision::VisionModule module(width / 2, height);
-        module.setCameraParams("none");
+        module.setCalibrationParams("none");
 
-    //    std::cout << "Set VisMod to robot name \'none\'\n";
-
-        
         // Read number of bytes of image, inertials, and joints if exist
         int numBytes[3];
         std::vector<SExpr*> vec = l->tree().recursiveFind("YUVImage");
@@ -417,11 +396,12 @@ int CameraCalibration_func() {
             SExpr* s = vec.at(vec.size()-2)->find("nbytes");
             if (s != NULL) {
                 numBytes[2] = s->get(1)->valueAsInt();
-           //     std::cout << "1. 2. 3. " << numBytes[0] << ". " << numBytes[1] << ". " << numBytes[2] << ". \n";
                 uint8_t* ptToJoints = buf + (numBytes[0] + numBytes[1]);
                 joints.ParseFromArray((void *) ptToJoints, numBytes[2]);
             } else {
-                std::cout << "Could not load joins from description.\n";
+                std::cout << "Could not load joints from description.\n";
+                rets.push_back(new Log("((failure))"));
+                return 0;
             }
         }
       
@@ -434,12 +414,7 @@ int CameraCalibration_func() {
         module.bottomIn.setMessage(imageMessage);
         module.jointsIn.setMessage(jointsMessage);
 
-    //    std::cout << "Width: " << width << " Height: " << height << std::endl;
-
-
         module.run();
-
-//        std::cout << "Ran VisionModule with robot name \'none\'\n";
 
         man::vision::FieldHomography* fh = module.getFieldHomography(top);
 
@@ -448,42 +423,31 @@ int CameraCalibration_func() {
         rollBefore = fh->roll();
         tiltBefore = fh->tilt();
 
-        std::cout << "Before: " << rollBefore << ", " << tiltBefore << std::endl;
-
         bool success = fh->calibrateFromStar(*module.getFieldLines(top));
 
         if (!success) {
             failures++;
-
         } else {
-
             rollAfter = fh->roll();
             tiltAfter = fh->tilt();
 
             totalR += rollAfter - rollBefore;
             totalT += tiltAfter - tiltBefore;
-
-            std::cout << "After:  " << rollAfter << ", " << tiltAfter << std::endl;
-            std::cout << "Differ: " << rollAfter - rollBefore << ", " << tiltAfter-tiltBefore << std::endl << std::endl;
         }
     }
 
     if (failures > 2) {
         // Handle failure
         printf("FAILED: %d times\n", failures);
+        rets.push_back(new Log("(failure)"));
+    } else {
+        totalR /= (args.size() - failures);
+        totalT /= (args.size() - failures);
+
+        // Pass back averaged offsets to Tool
+        std::string sexp = "((roll " + std::to_string(totalR) + ")(tilt " + std::to_string(totalT) + "))";
+        rets.push_back(new Log(sexp));
     }
-    
-    std::cout << "1 Ave roll: " << totalR << " Ave tilt: " << totalT << std::endl;
-
-    totalR /= (args.size() - failures);
-    totalT /= (args.size() - failures);
-    std::cout << "div: " << args.size() - failures << std::endl;
-
-    std::cout << "2 Ave roll: " << totalR << " Ave tilt: " << totalT << std::endl;
-    
-    // Pass back averaged offsets to Tool
-    std::string sexp = "((roll " + std::to_string(totalR) + ")(tilt " + std::to_string(totalT) + "))";
-    rets.push_back(new Log(sexp));
 }
 
 

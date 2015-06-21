@@ -237,8 +237,6 @@ public class CrossIO {
 						Logger.logf(Logger.EVENT, "%s calling function %s", name(), call.function.name);
 						dos.writeInt(1);
 						dos.flush();
-
-						System.out.printf("\n%s calling function %s\n\n", name(), call.function.name);
 						
 						dos.writeInt(functions.indexOf(call.function));
 						
