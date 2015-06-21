@@ -229,21 +229,17 @@ void ImageTranscriber::initSettings()
     if(cameraType == Camera::TOP) {
         filepath = "/home/nao/nbites/Config/V5topCameraParams.txt";
         std::cout<<"[INFO] Camera::TOP"<<std::endl;
-        std::cout<<"[INFO] NAOQI: V5"<<std::endl;
     } else {
         filepath = "/home/nao/nbites/Config/V5bottomCameraParams.txt";
         std::cout<<"[INFO] Camera::BOTTOM"<<std::endl;
-        std::cout<<"[INFO] NAOQI: V5"<<std::endl;
     }
 #else //for NAOQI 1.14
     if(cameraType == Camera::TOP) {
         filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
         std::cout<<"[INFO] Camera::TOP"<<std::endl;
-        std::cout<<"[INFO] NAOQI: V4"<<std::endl;
     } else {
         filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
         std::cout<<"[INFO] Camera::BOTTOM"<<std::endl;
-        std::cout<<"[INFO] NAOQI: V4"<<std::endl;
     }
 #endif
     
@@ -258,8 +254,8 @@ void ImageTranscriber::initSettings()
         SExpr params = *SExpr::read(readInFile,i);
 
         if(params.count() >= 2) {
-            std::cout<<"[INFO] Reading from SExpr"<<std::endl;
-            std::cout<<"[INFO] PATH: "<<filepath<<std::endl;
+            std::cout << "[INFO] Reading from SExpr path: ";
+            std::cout << filepath << std::endl;
 
             updated_settings.hflip = params.find("hflip")->get(1)->valueAsInt();
             updated_settings.vflip = params.find("vflip")->get(1)->valueAsInt();
@@ -288,7 +284,7 @@ void ImageTranscriber::initSettings()
     setControlSetting(V4L2_CID_VFLIP, updated_settings.vflip);
 
     // Still need to turn this on to change brightness, grumble grumble
-    setControlSetting(V4L2_CID_EXPOSURE_AUTO, updated_settings.auto_exposure);
+    setControlSetting(V4L2_CID_EXPOSURE_AUTO, 1);
 
     setControlSetting(V4L2_CID_BRIGHTNESS, updated_settings.brightness);
     setControlSetting(V4L2_CID_CONTRAST, updated_settings.contrast);
@@ -299,7 +295,6 @@ void ImageTranscriber::initSettings()
 #ifdef NAOQI_2
     setControlSetting(V4L2_CID_GAMMA, updated_settings.gamma);
 #endif
-
     // Auto white balance, exposure,  and backlight comp off!
     // The first two are both for white balance. The docs don't make
     // it clear what the difference is...
@@ -308,26 +303,18 @@ void ImageTranscriber::initSettings()
     setControlSetting(V4L2_CID_BACKLIGHT_COMPENSATION,
                       updated_settings.backlight_compensation);
     setControlSetting(V4L2_CID_EXPOSURE_AUTO, updated_settings.auto_exposure);
-
     setControlSetting(V4L2_CID_EXPOSURE, updated_settings.exposure);
     setControlSetting(V4L2_CID_GAIN, updated_settings.gain);
 
-    // This is actually just the white balance setting!
-    setControlSetting(V4L2_CID_DO_WHITE_BALANCE, updated_settings.white_balance);
-    setControlSetting(V4L2_MT9M114_FADE_TO_BLACK, updated_settings.fade_to_black);
-
 #ifdef NAOQI_2
     setControlSetting(V4L2_CID_DO_WHITE_BALANCE, 0);
-#endif
-    // This is actually just the white balance setting!
-#ifdef NAOQI_2
     setControlSetting(V4L2_CID_WHITE_BALANCE_TEMPERATURE, updated_settings.white_balance);
 #else
     setControlSetting(V4L2_CID_DO_WHITE_BALANCE, updated_settings.white_balance);
 #endif
     setControlSetting(V4L2_MT9M114_FADE_TO_BLACK, updated_settings.fade_to_black);
 
-    testControlSettings();
+    //testControlSettings();
 }
 
 void ImageTranscriber::testControlSettings() {
@@ -388,10 +375,12 @@ bool ImageTranscriber::setControlSetting(unsigned int id, int value) {
     // Have to make sure the setting "sticks"
     while(getControlSetting(id) != value)
     {
+        errno = 0;
         if (ioctl(fd, VIDIOC_S_CTRL, &control_s) < 0)
         {
-            std::cerr << "CAMERA::Warning::Control setting failed." <<
-                std::endl;
+            int err = errno;
+            std::cerr << "CAMERA::Warning::Control setting failed with errno: " <<
+                strerror(err) << std::endl;
             return false;
         }
         counter++;
