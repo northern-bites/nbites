@@ -17,11 +17,13 @@ namespace man {
 namespace localization {
 
 // TODO rename LineID as VisionLineID
+// TODO document TheirMidline and OurMidline
 enum class LocLineID {
     NotMatched,
     OurEndline,
     TheirEndline,
-    Midline,
+    OurMidline,
+    TheirMidline,
     OurTopGoalbox,
     TheirTopGoalbox,
     RightSideline,

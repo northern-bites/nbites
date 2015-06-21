@@ -112,6 +112,7 @@ bool VisionSystem::update(ParticleSet& particles,
             for (int i = 0; i < ids.size(); i++) {
                 messages::RobotLocation pose = lineSystem->reconstructPosition(ids[i], field);
                 ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), ids[i] == LocLineID::OurTopGoalbox);
+                // std::cout << "TEST: " << pose.x() << "," << pose.y() << "," << pose.h() << std::endl;
                 if( (reconstructed.x >= 0 && reconstructed.y <= FIELD_GREEN_WIDTH) &&
                     (reconstructed.y >= 0 && reconstructed.y <= FIELD_GREEN_HEIGHT)  )
                     reconstructedLocations.push_back(reconstructed);

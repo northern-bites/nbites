@@ -8,19 +8,23 @@ namespace localization {
 LineSystem::LineSystem() 
     : lines()
 {
-    // TODO update for reconstruct
+    // TODO document sign conventions
     // Add endlines
-    addLine(LocLineID::OurEndline, GREEN_PAD_X, 0, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
-    addLine(LocLineID::TheirEndline, GREEN_PAD_X + FIELD_WHITE_WIDTH, 0, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
+    addLine(LocLineID::OurEndline, -GREEN_PAD_X, M_PI, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
+    addLine(LocLineID::TheirEndline, GREEN_PAD_X + FIELD_WHITE_WIDTH, 0, -GREEN_PAD_Y, -(GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
 
     // Add the midline
-    addLine(LocLineID::Midline, CENTER_FIELD_X, 0, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
+    // NOTE two midlines so that reconstructions can be handled gracefully from
+    //      either side of the field
+    addLine(LocLineID::OurMidline, -CENTER_FIELD_X, M_PI, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
+    addLine(LocLineID::TheirMidline, CENTER_FIELD_X, 0, -GREEN_PAD_Y, -(GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
 
     // Add top goalbox lines
     addLine(LocLineID::OurTopGoalbox, -(GREEN_PAD_X + GOALBOX_DEPTH) , M_PI, BLUE_GOALBOX_BOTTOM_Y, BLUE_GOALBOX_TOP_Y);
-    addLine(LocLineID::TheirTopGoalbox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH , 0, YELLOW_GOALBOX_BOTTOM_Y, YELLOW_GOALBOX_TOP_Y);
+    addLine(LocLineID::TheirTopGoalbox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH , 0, -YELLOW_GOALBOX_BOTTOM_Y, -YELLOW_GOALBOX_TOP_Y);
 
     // Add sidelines
+    // TODO polarity
     addLine(LocLineID::RightSideline, GREEN_PAD_Y, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
     addLine(LocLineID::LeftSideline, GREEN_PAD_Y + FIELD_WHITE_HEIGHT, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
 }
@@ -84,22 +88,11 @@ messages::RobotLocation LineSystem::reconstructPosition(LocLineID id,
     rxm = (rx1 + rx2) / 2;
     rym = (ry1 + ry2) / 2;
 
-    // std::cout << "rxm: " << rxm << std::endl;
-    // std::cout << "rym: " << rym << std::endl;
-
     // Calculate midpoint of line in absolute coords
     double ax1, ay1, ax2, ay2, axm, aym;
     absolute.endPoints(ax1, ay1, ax2, ay2);
-
-    // std::cout << "ax1: " << ax1 << std::endl;
-    // std::cout << "ay1: " << ay1 << std::endl;
-    // std::cout << "ax2: " << ax2 << std::endl;
-    // std::cout << "ay2: " << ay2 << std::endl;
     axm = (ax1 + ax2) / 2;
     aym = (ay1 + ay2) / 2;
-
-    // std::cout << "axm: " << axm << std::endl;
-    // std::cout << "aym: " << aym << std::endl;
 
     // Find x and y of reconstructed position
     position.set_x(axm - rxm);
