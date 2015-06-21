@@ -104,13 +104,15 @@ bool VisionSystem::update(ParticleSet& particles,
         if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
             // std::cout << "PUSHING BACK RECONSTRUCT" << std::endl;
             const messages::HoughLine& inner = field.inner();
-            messages::RobotLocation pose = lineSystem->reconstructPosition(LocLineID::OurTopGoalbox,
-                                                                          field);
-            ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), true);
-            // Require that reconstructed location is on the field
-            if( (reconstructed.x >= 0 && reconstructed.y <= FIELD_GREEN_WIDTH) &&
-                (reconstructed.y >= 0 && reconstructed.y <= FIELD_GREEN_HEIGHT)  )
-                reconstructedLocations.push_back(reconstructed);
+
+            std::vector<LocLineID> ids { LocLineID::OurTopGoalbox, LocLineID::TheirTopGoalbox };
+            for (int i = 0; i < ids.size(); i++) {
+                messages::RobotLocation pose = lineSystem->reconstructPosition(ids[i], field);
+                ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), ids[i] == LocLineID::OurTopGoalbox);
+                if( (reconstructed.x >= 0 && reconstructed.y <= FIELD_GREEN_WIDTH) &&
+                    (reconstructed.y >= 0 && reconstructed.y <= FIELD_GREEN_HEIGHT)  )
+                    reconstructedLocations.push_back(reconstructed);
+            }
         }
     }
 
