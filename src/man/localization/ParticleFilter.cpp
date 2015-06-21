@@ -443,7 +443,7 @@ void ParticleFilter::resample()
     if (true)
     {
         // std::cout << "LOST AND BAD FRAME" << std::endl;
-        std::list<ReconstructedLocation> reconLocs = visionSystem->getReconstructedLocations();
+        const std::list<ReconstructedLocation>& reconLocs = visionSystem->getInjections();
         std::list<ReconstructedLocation>::const_iterator recLocIt;
         for (recLocIt = reconLocs.begin();
              recLocIt != reconLocs.end();

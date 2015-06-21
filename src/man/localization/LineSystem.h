@@ -1,9 +1,11 @@
 /**
  * @brief A class responsible for maintaing knowedge of lines on the field
- *        and comparing projectinos and observations
+ *        and comparing projections and observations.
  *
  * @author EJ Googins <egoogins@bowdoin.edu>
  * @date   June 2013
+ * @author Josh Imhoff <joshimhoff13@gmail.com>
+ * @date   June 2015
  */
 
 #pragma once
@@ -17,7 +19,6 @@ namespace man {
 namespace localization {
 
 // TODO rename LineID as VisionLineID
-// TODO document TheirMidline and OurMidline
 enum class LocLineID {
     NotMatched,
     OurEndline,
