@@ -47,6 +47,7 @@ bool VisionSystem::update(ParticleSet& particles,
         }
 
         // Set the particle's weight (no golf scores)
+        // TODO divide by zero
         float avgErr = curParticleError / static_cast<float>(numObservations);
         particle->setWeight(1 / avgErr);
         totalWeight += particle->getWeight();
@@ -76,7 +77,6 @@ bool VisionSystem::update(ParticleSet& particles,
     injections.clear();
     for (int i = 0; i < lines.line_size(); i++) {
         const messages::FieldLine& field = lines.line(i);
-
         if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
             const messages::HoughLine& inner = field.inner();
 

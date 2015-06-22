@@ -256,7 +256,8 @@ bool GoalboxDetector::validBox(const HoughLine& line1, const HoughLine& line2) c
   const GeoLine& field1 = line1.field();
   const GeoLine& field2 = line2.field();
 
-  // Goalbox = two field lines that are parallel, seperated by 60 cm, and both over 80 cm
+  // Goalbox = two field lines that are parallel, seperated by 60 cm, 
+  // and both over 60 cm in length
 
   // (1) Parallel
   // NOTE this check also requires that the robot is not in between the lines 
@@ -269,9 +270,9 @@ bool GoalboxDetector::validBox(const HoughLine& line1, const HoughLine& line2) c
   double distBetween = fabs(field1.pDist(field2.r()*cos(field2.t()), field2.r()*sin(field2.t())));
   bool seperation = fabs(distBetween - GOALBOX_DEPTH) < seperationThreshold();
 
-  // (3) Both over 80 cm in length
-  bool length1 = field1.ep1() - field1.ep0() > 80;
-  bool length2 = field2.ep1() - field2.ep0() > 80;
+  // (3) Both over 60 cm in length
+  bool length1 = field1.ep1() - field1.ep0() > 60;
+  bool length2 = field2.ep1() - field2.ep0() > 60;
   bool length = length1 && length2;
 
   return parallel && seperation && length;
