@@ -13,10 +13,10 @@
     (ozzy (top 0.018572 0.28933) (bottom -0.008314 0.397873))
     (avril (top 0.0 0.0) (bottom 0.0 0.0))
     ( beyonce
-      (top 0.001286 0.286117)
-      (bottom -0.010264 0.511151)
+      (top 0.001727 -0.060179)
+      (bottom -0.001648 0.034398)
     )
     (batman (top 0.0 0.0) (bottom 0.0 0.0))
-    (shehulk (top -2.26 -3.96) (bottom 0.0 0.0))
+    (shehulk (top 0.038801 -0.06818) (bottom 0.0 0.0))
   )
 )

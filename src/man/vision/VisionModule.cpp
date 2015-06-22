@@ -129,14 +129,8 @@ void VisionModule::run_()
         if (jointsIn.message().has_head_yaw()) {
             kinematics[i]->joints(jointsIn.message());
             homography[i]->wz0(kinematics[i]->wz0());
-
-    //        std::cout << "Adjusting " << i << " with offsets r: " << calibrationParams[i]->getRoll() <<
-     //        " t: " << calibrationParams[i]->getTilt() << std::endl;
-
             homography[i]->roll(calibrationParams[i]->getRoll());
             homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt());
-         //   homography[i]->tilt(kinematics[i]->tilt());
-
 #ifndef OFFLINE
             homography[i]->azimuth(kinematics[i]->azimuth());
 #endif

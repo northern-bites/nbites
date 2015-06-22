@@ -360,7 +360,7 @@ int CameraCalibration_func() {
         memcpy(buf, l->data().data(), length);
 
         // Determine description
-        bool top = l->description().find("from=camera_TOP") != std::string::npos;
+        bool top = l->description().find("camera_TOP") != std::string::npos;
         
         int width = 2*atoi(l->tree().find("contents")->get(1)->
                                         find("width")->get(1)->value().c_str());
@@ -405,7 +405,7 @@ int CameraCalibration_func() {
                 return 0;
             }
         }
-      
+        
         // Create messages
         messages::YUVImage image(buf, width, height, width);
         portals::Message<messages::YUVImage> imageMessage(&image);
@@ -435,7 +435,7 @@ int CameraCalibration_func() {
             totalR += rollAfter - rollBefore;
             totalT += tiltAfter - tiltBefore;
 
-            std::cout << "Tilt before: " << tiltBefore << " Tilt after: " << tiltAfter << std::endl;
+        //    std::cout << "Tilt before: " << tiltBefore << " Tilt after: " << tiltAfter << std::endl;
         }
     }
 
