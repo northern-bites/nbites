@@ -659,7 +659,7 @@ void TranscriberModule::run_()
             SExpr ci1("YUVImage", "camera_TOP", 0, 0, ImageBufferSize[rTo]);
             ci1.append(SExpr::keyValue("width", ImageWidth[rTo]));
             ci1.append(SExpr::keyValue("height", ImageHeight[rTo]));
-            ci1.append(SExpr::keyValue("encoding", "YUV422"));
+            ci1.append(SExpr::keyValue("encoding", "[Y8(U8/V8)]"));
             
             std::vector<SExpr> contents = {ci1};
             NBLog(NBL_IMAGE_BUFFER, "thumbnail",
@@ -676,7 +676,7 @@ void TranscriberModule::run_()
             SExpr ci1("YUVImage", "camera_BOT", 0, 0, ImageBufferSize[rTo]);
             ci1.append(SExpr::keyValue("width", ImageWidth[rTo]));
             ci1.append(SExpr::keyValue("height", ImageHeight[rTo]));
-            ci1.append(SExpr::keyValue("encoding", "YUV422"));
+            ci1.append(SExpr::keyValue("encoding", "[Y8(U8/V8)]"));
             
             std::vector<SExpr> contents = {ci1};
             NBLog(NBL_IMAGE_BUFFER, "thumbnail",
