@@ -115,10 +115,12 @@ int Vision_func() {
         SExpr* calParams = calParamsVec.at(calParamsVec.size()-2);
         calParams = top ? calParams->find("camera_TOP") : calParams->find("camera_BOT");
         if (calParams != NULL) {
-            std::cout << "Found and using calibration params in log description" << std::endl;
+            std::cout << "Found and using calibration params in log description: "
+            << "Roll: " << calParams->get(1)->valueAsDouble() << " Tilt: " <<  calParams->get(2)->valueAsDouble()<< std::endl;
             man::vision::CalibrationParams* ncp =
-             new man::vision::CalibrationParams(calParams->get(1)->valueAsDouble(),
+            new man::vision::CalibrationParams(calParams->get(1)->valueAsDouble(),
                                            calParams->get(2)->valueAsDouble());
+
             module.setCalibrationParams(ncp, top);
         }
     }
@@ -432,6 +434,8 @@ int CameraCalibration_func() {
 
             totalR += rollAfter - rollBefore;
             totalT += tiltAfter - tiltBefore;
+
+            std::cout << "Tilt before: " << tiltBefore << " Tilt after: " << tiltAfter << std::endl;
         }
     }
 

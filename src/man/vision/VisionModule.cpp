@@ -130,6 +130,8 @@ void VisionModule::run_()
             homography[i]->wz0(kinematics[i]->wz0());
             homography[i]->roll(calibrationParams[i]->getRoll());
             homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt());
+         //   homography[i]->tilt(kinematics[i]->tilt());
+
 #ifndef OFFLINE
             homography[i]->azimuth(kinematics[i]->azimuth());
 #endif
@@ -426,10 +428,11 @@ void VisionModule::setCalibrationParams(int camera, std::string robotName) {
     if (robot != NULL) {
         std::string cam = camera == 0 ? "top" : "bottom";
         double roll =  robot->find(cam)->get(1)->valueAsDouble();
-        double pitch = robot->find(cam)->get(2)->valueAsDouble();
-        calibrationParams[camera] = new CalibrationParams(roll, pitch);
+        double tilt = robot->find(cam)->get(2)->valueAsDouble();
+        calibrationParams[camera] = new CalibrationParams(roll, tilt);
         
-        std::cerr << "Found and set calibration params for " << robotName << std::endl;
+        std::cerr << "Found and set calibration params for " << robotName;
+        std::cerr << "Top: " << roll << " Bottom: " << tilt << std::endl;
     }
 
 }
