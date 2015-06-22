@@ -12,7 +12,8 @@
 namespace man {
 namespace jointenactor{
 
-JointEnactorModule::JointEnactorModule()
+JointEnactorModule::JointEnactorModule() :
+    bossSlow(false)
 {
     shared_fd = shm_open(NBITES_MEM, O_RDWR, 0600);
     if (shared_fd < 0) {
@@ -76,7 +77,7 @@ void JointEnactorModule::writeCommand()
 
     if (lw - lr > 10 && (lr < lw)) {
         std::cout << "Commands aren't getting read! Did Boss die?" << std::endl;
-        // std::cout << "commandIndex: " << commandIndex << " lastRead: " << lastRead << std::endl;
+        std::cout << "commandIndex: " << lw << " lastRead: " << lr << std::endl;
         exit(0);
     }
 }

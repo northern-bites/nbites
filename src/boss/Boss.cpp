@@ -7,10 +7,63 @@
 #include <iostream>
 #include <string.h>
 #include <cstdlib>
+#include <chrono>
 
 #define MAN_RESTART 'r'
 #define MAN_KILL    'k'
 #define MAN_START   's'
+
+/*
+ Begin timing macros for debugging callbacks.
+ define DCM_TIMING_DEBUG 0
+    to hear when callbacks take > 10ms
+ define DCM_TIMING_DEBUG 1
+    to always hear about callback timing
+ don't define DCM_TIMING_DEBUG
+    to never hear from or call any code.
+ */
+#define DCM_TIMING_DEBUG 0
+//#define DCM_TIMING_DEBUG 1
+
+#ifdef DCM_TIMING_DEBUG
+
+
+
+std::chrono::time_point<std::chrono::high_resolution_clock> pre_start, post_start;
+void DCM_TIMING_DEBUG_PRE1() {
+    pre_start = std::chrono::high_resolution_clock::now();
+}
+
+void DCM_TIMING_DEBUG_PRE2() {
+    auto tpnow = std::chrono::high_resolution_clock::now();
+    long micros = std::chrono::duration_cast<std::chrono::microseconds>(tpnow - pre_start).count();
+    //if longer than 10 milliseconds, or DCM_TIMING_DEBUG > 0, shout.
+    if (micros > 10000 || DCM_TIMING_DEBUG) {
+        printf("WARNING: DCMPreCallback took %li microseconds!\n", micros);
+    }
+}
+
+void DCM_TIMING_DEBUG_POST1() {
+    post_start = std::chrono::high_resolution_clock::now();
+}
+
+void DCM_TIMING_DEBUG_POST2() {
+    auto tpnow = std::chrono::high_resolution_clock::now();
+    long micros = std::chrono::duration_cast<std::chrono::microseconds>(tpnow - post_start).count();
+    
+    if (micros > 10000 || DCM_TIMING_DEBUG) {
+        printf("WARNING: DCMPostCallback took %li microseconds!\n", micros);
+    }
+}
+#else
+
+#define DCM_TIMING_DEBUG_PRE1()
+#define DCM_TIMING_DEBUG_PRE2()
+#define DCM_TIMING_DEBUG_POST1()
+#define DCM_TIMING_DEBUG_POST2()
+
+#endif
+
 
 namespace boss {
 
@@ -23,6 +76,7 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     led(broker),
     manPID(-1),
     manRunning(false),
+    killingMan(false),
     shared_fd(-1),
     shared(NULL),
     commandSkips(0),
@@ -79,6 +133,8 @@ Boss::~Boss()
     close(fifo_fd);
 }
 
+
+
 void Boss::listener()
 {
     while(1)
@@ -133,7 +189,7 @@ int Boss::killMan() {
     manRunning = false;
 
     // Give man a bit to get itself together, kill isn't instantaneous
-    sleep(2);
+    sleep(5);
 
     // Clear the buffers
     memset((void*)shared->sensors[0], 0, SENSOR_SIZE);
@@ -194,6 +250,7 @@ int Boss::constructSharedMem()
     return 1;
 }
 
+
 bool bossSyncRead(volatile SharedData * sd, uint8_t * stage) {
     //We know there exists new data in >sd<,
     //now we just need to safely read it out.
@@ -212,10 +269,13 @@ bool bossSyncRead(volatile SharedData * sd, uint8_t * stage) {
 
 void Boss::DCMPreProcessCallback()
 {
+    DCM_TIMING_DEBUG_PRE1();
     // Make sure that we ONLY enact legitimate commands from Man
     if (!manRunning || shared->latestCommandWritten == 0) {
         enactor.noStiff();
         led.noMan();
+        shared->latestCommandRead = shared->latestCommandWritten;
+        DCM_TIMING_DEBUG_PRE2();
         return;
     }
 
@@ -231,6 +291,7 @@ void Boss::DCMPreProcessCallback()
             if (!des.parse()) {
                 // Couldn't parse anything from shared memory
                 // Could imply bad things?
+                DCM_TIMING_DEBUG_PRE2();
                 return;
             }
 
@@ -259,6 +320,7 @@ void Boss::DCMPreProcessCallback()
         //No new data to read.
         // ...
     }
+    DCM_TIMING_DEBUG_PRE2();
 }
 
 bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, uint64_t index)
@@ -291,8 +353,7 @@ bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, uint64_t index)
 
 void Boss::DCMPostProcessCallback()
 {
-    if (!manRunning) return;
-
+    DCM_TIMING_DEBUG_POST1();
     SensorValues values = sensor.getSensors();
 
     std::vector<SerializableBase*> objects = {
@@ -311,6 +372,7 @@ void Boss::DCMPostProcessCallback()
     uint64_t nextSensorIndex = (shared->latestSensorWritten + 1);
     // Serialize the protobufs to shared mem
     if (!serializeTo(objects, nextSensorIndex, sensorStaging, SENSOR_SIZE, NULL)) {
+        std::cout << "O HUCK! Couldn't serialize!" << std::endl;
         return;
     }
 
@@ -320,7 +382,7 @@ void Boss::DCMPostProcessCallback()
     }
 
     uint64_t lastRead = shared->latestSensorRead;
-    if (nextSensorIndex - lastRead > 2 && (lastRead != 0)) {
+    if (nextSensorIndex - lastRead > 2 && (lastRead != 0) && manRunning) {
         std::cout << "MAN missed a frame" << std::endl;
     }
 
@@ -330,6 +392,7 @@ void Boss::DCMPostProcessCallback()
         //std::cout << "commandIndex: " << sensorIndex << " lastRead: " << lastRead << std::endl;
         //manRunning = false; // TODO
     }
+    DCM_TIMING_DEBUG_POST2();
 }
 
 void Boss::checkFIFO() {

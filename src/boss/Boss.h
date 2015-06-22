@@ -60,6 +60,7 @@ private:
     // Vars relating to Man
     pid_t manPID;
     bool manRunning;
+    bool killingMan;
 
     int shared_fd;
     volatile SharedData* shared;
