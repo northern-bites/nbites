@@ -14,7 +14,6 @@
 #include "PMotion.pb.h"
 #include "MotionStatus.pb.h"
 #include "Vision.pb.h"
-#include "VisionRobot.pb.h"
 #include "ButtonState.pb.h"
 #include "FallStatus.pb.h"
 #include "StiffnessControl.pb.h"
@@ -30,7 +29,6 @@ class PyInterface
 public:
     messages::GameState         const * gameState_ptr;
     messages::RobotLocation     const * loc_ptr;
-    messages::VisionRobot       const * visionRobot_ptr;
     messages::FieldLines        const * visionField_ptr;
     messages::FilteredBall      const * filteredBall_ptr;
     messages::LedCommand        const * ledCommand_ptr;
@@ -58,10 +56,6 @@ public:
     void setLoc_ptr(const messages::RobotLocation* msg)
     {
         loc_ptr = msg;
-    }
-    void setVisionRobot_ptr(const messages::VisionRobot* msg)
-    {
-        visionRobot_ptr = msg;
     }
     void setVisionField_ptr(const messages::FieldLines* msg)
     {

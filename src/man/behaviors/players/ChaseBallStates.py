@@ -4,7 +4,6 @@ Here we house all of the state methods used for chasing the ball
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 import RoleConstants as roleConstants
-import DribbleTransitions as dr_trans
 import PlayOffBallTransitions as playOffTransitions
 from ..navigator import Navigator
 from ..kickDecider import KickDecider

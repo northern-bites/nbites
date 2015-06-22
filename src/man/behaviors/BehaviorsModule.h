@@ -15,7 +15,6 @@
 #include "PMotion.pb.h"
 #include "MotionStatus.pb.h"
 #include "Vision.pb.h"
-#include "VisionRobot.pb.h"
 #include "ButtonState.pb.h"
 #include "FallStatus.pb.h"
 #include "RobotLocation.pb.h"
@@ -82,8 +81,6 @@ public:
     portals::InPortal<messages::RobotLocation> odometryIn;
     portals::InPortal<messages::RobotLocation> localizationIn;
     portals::InPortal<messages::VisionBall> visionBallIn;
-    // portals::InPortal<messages::FieldLines> visionFieldIn;
-    // portals::InPortal<messages::VisionRobot> visionRobotIn;
     portals::InPortal<messages::FilteredBall> filteredBallIn;
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::FallStatus> fallStatusIn;

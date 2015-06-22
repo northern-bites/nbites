@@ -32,8 +32,6 @@ import RobotLocation_proto
 import BallModel_proto
 import PMotion_proto
 import MotionStatus_proto
-# import VisionRobot_proto
-# import VisionField_proto
 import ButtonState_proto
 import FallStatus_proto
 import StiffnessControl_proto
@@ -243,9 +241,6 @@ class Brain(object):
             or self.player.gameState == 'gameSet'):
             self.ball.x = Constants.CENTER_FIELD_X
             self.ball.y = Constants.CENTER_FIELD_Y
-
-        # self.yglp = self.interface.visionField.goal_post_l.visual_detection
-        # self.ygrp = self.interface.visionField.goal_post_r.visual_detection
 
     def updateObstacles(self):
         self.obstacles = [0.] * 9

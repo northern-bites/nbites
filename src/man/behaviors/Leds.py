@@ -12,7 +12,6 @@ import GameController
 GC_LEDS = True
 FOOT_LEDS = True
 BALL_LEDS = True
-GOAL_LEDS = True
 ROLESWITCH_LEDS = True
 CALIBRATION_LEDS = True
 SHAREDFLIP_LEDS = True
@@ -48,9 +47,6 @@ RIGHT_COMM_FOUR_LED,
 RIGHT_COMM_FIVE_LED,
 ROLE_LED,
 BALL_LED,
-LEFT_GOAL_LED,
-RIGHT_GOAL_LED,
-GOAL_ID_LED,
 CHEST_LED,
 LEFT_FOOT_LED,
 RIGHT_FOOT_LED,
@@ -87,18 +83,6 @@ ROLE_DICT = {1: ROLE_ONE,
              3: ROLE_THREE,
              4: ROLE_FOUR,
              5: ROLE_FIVE}
-
-##### GOAL ######
-LEFT_POST_ON_LEDS =   ((RIGHT_GOAL_LED, GREEN, NOW),)
-LEFT_POST_AMBIGUOUS_LEDS = ((RIGHT_GOAL_LED, EYE_YELLOW, NOW),)
-LEFT_POST_OFF_LEDS = ((RIGHT_GOAL_LED, BLUE, NOW),)
-RIGHT_POST_ON_LEDS =  ((LEFT_GOAL_LED, GREEN, NOW),)
-RIGHT_POST_AMBIGUOUS_LEDS = ((LEFT_GOAL_LED, EYE_YELLOW, NOW),)
-RIGHT_POST_OFF_LEDS = ((LEFT_GOAL_LED, BLUE, NOW),)
-
-BLUE_GOAL_LEDS = ((GOAL_ID_LED, BLUE, NOW),)
-PINK_GOAL_LEDS = ((GOAL_ID_LED, PINK, NOW),)
-NO_GOAL_LEDS =   ((GOAL_ID_LED, OFF, NOW),)
 
 ##### CALIBRATION #####
 LEFT_CALIBRATION_ONE_LEDS   = ((LEFT_CALIBRATION_ONE_LED, BLUE, NOW),)
@@ -167,7 +151,6 @@ class Leds():
         self.brain = brainPtr
         self.kickoffChange = True
         self.teamChange = True
-        self.goalCertainty = 0
         self.facingOpp = -1
         self.numActiveMates = 0
         self.role = -1
@@ -183,57 +166,6 @@ class Leds():
                 self.executeLeds(BALL_ON_LEDS)
             elif self.brain.ball.vis.frames_off == 1:
                 self.executeLeds(BALL_OFF_LEDS)
-
-        # if GOAL_LEDS:
-        #     newCertainty = self.brain.ygrp.certainty
-
-        #     if (newCertainty == 0):
-        #         if (self.brain.ygrp.on and
-        #             (self.brain.ygrp.frames_on == 1 or
-        #              self.goalCertainty != newCertainty)):
-        #             #we see an ambiguous post for the first time!
-        #             self.executeLeds(LEFT_POST_AMBIGUOUS_LEDS)
-        #             self.executeLeds(RIGHT_POST_AMBIGUOUS_LEDS)
-        #     if(newCertainty == 2 and
-        #        self.brain.ygrp.on and
-        #        (self.brain.ygrp.frames_on == 1 or
-        #         self.goalCertainty != newCertainty)):
-        #         #we see the right post for the first time!
-        #         self.executeLeds(RIGHT_POST_ON_LEDS)
-        #     if(self.brain.yglp.on and
-        #        (self.brain.yglp.frames_on == 1 or
-        #         self.goalCertainty != newCertainty)):
-        #         #we see the left post for the first time!
-        #         self.executeLeds(LEFT_POST_ON_LEDS)
-        #     if(self.brain.ygrp.frames_off == 1):
-        #         #we don't see the right post for the first time
-        #         self.executeLeds(RIGHT_POST_OFF_LEDS)
-        #     if((self.brain.yglp.frames_off == 1 and
-        #         (newCertainty != 1 and
-        #          self.brain.ygrp.frames_off >= 1)) or
-        #        (self.brain.yglp.frames_off >=1 and
-        #         ((newCertainty != 1 and
-        #           newCertainty != self.goalCertainty) or
-        #          self.brain.ygrp.frames_off == 1))):
-        #         #we don't see the left post for the first time
-        #         self.executeLeds(LEFT_POST_OFF_LEDS)
-
-        #     self.goalCertainty = newCertainty
-
-        #     newFacingOpp = (-90 < self.brain.loc.h < 90)
-        #     if (newFacingOpp != self.facingOpp or
-        #         self.facingOpp == -1):
-        #         self.facingOpp = newFacingOpp
-        #         if -90 < self.brain.loc.h < 90:
-        #             if self.brain.gameController.teamColor == NogginConstants.teamColor.TEAM_BLUE:
-        #                 self.executeLeds(PINK_GOAL_LEDS)
-        #             else:
-        #                 self.executeLeds(BLUE_GOAL_LEDS)
-        #         else:
-        #             if self.brain.gameController.teamColor == NogginConstants.teamColor.TEAM_BLUE:
-        #                 self.executeLeds(BLUE_GOAL_LEDS)
-        #             else:
-        #                 self.executeLeds(PINK_GOAL_LEDS)
 
         if ROLESWITCH_LEDS:
             newRole = self.brain.player.role
