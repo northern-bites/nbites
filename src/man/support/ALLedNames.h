@@ -32,6 +32,8 @@ enum LedOrientation{
     LEFT_LED = 0,
     RIGHT_LED
 };
+
+// NUM_FACE_LEDS refers to how many LEDS there are per eye
 static const unsigned int NUM_FACE_LEDS  = 8;
 static const unsigned int NUM_EAR_LEDS   = 10;
 static const unsigned int NUM_FOOT_LEDS  = 1;
@@ -50,47 +52,44 @@ static const unsigned int NUM_CHEST_LEDS = 1;
  */
 static const unsigned int NUM_COMM_LEDS = 1;
 static const unsigned int NUM_CALIBRATION_LEDS  = 1;
-static const unsigned int NUM_GOAL_LEDS = (NUM_FACE_LEDS >> 2);
-static const unsigned int NUM_GOAL_ID_LEDS = (NUM_FACE_LEDS >> 1) - 1;
-static const unsigned int NUM_BALL_LEDS = (NUM_FACE_LEDS >> 1) - 1;
-static const unsigned int NUM_ROLE_LEDS = NUM_FACE_LEDS - NUM_BALL_LEDS;
-static const unsigned int NUM_UNUSED_EYE_LEDS = 1; // For right eye
+static const unsigned int NUM_BALL_LEDS = 5;
+static const unsigned int NUM_GOALBOX_LEDS = NUM_FACE_LEDS - NUM_BALL_LEDS;
+static const unsigned int NUM_ROLE_LEDS = NUM_FACE_LEDS;
 
 static const unsigned int NUM_LED_COLORS = 3;
 static const unsigned int NUM_LED_ORIENTATIONS = 2;
 static const unsigned int NUM_ONE_EYE_LEDS = NUM_LED_COLORS * NUM_FACE_LEDS;
 
-static const unsigned int NUM_UNIQUE_LEDS = 29;
+static const unsigned int NUM_UNIQUE_LEDS = 26;
 static const unsigned int NUM_RGB_LEDS[NUM_UNIQUE_LEDS] ={
     NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,
     NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,
     NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,
     NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,
-    NUM_ROLE_LEDS,NUM_BALL_LEDS,
-    NUM_GOAL_LEDS,NUM_GOAL_LEDS,NUM_GOAL_ID_LEDS,
+    NUM_ROLE_LEDS,                                 // Left Eye
+    NUM_BALL_LEDS, NUM_GOALBOX_LEDS,               // Right Eye
     NUM_CHEST_LEDS,
-    NUM_FOOT_LEDS,NUM_FOOT_LEDS,
-    NUM_UNUSED_EYE_LEDS};
+    NUM_FOOT_LEDS,NUM_FOOT_LEDS};
+
 static const unsigned int LED_START_COLOR[NUM_UNIQUE_LEDS] ={
-    BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED, // Ear fronts
+    BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,  // Ear fronts
     BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,
-    BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED, // Ear backs
+    BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,  // Ear backs
     BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,
-    RED_LED,RED_LED,                              // Left Eye
-    RED_LED,RED_LED,RED_LED,                      // Right Eye
-    RED_LED,                                      // Chest
-    RED_LED,RED_LED,                              // Feet
-    RED_LED};                                     // Unused eyes
+    RED_LED,                                       // Left Eye
+    RED_LED, RED_LED,                              // Right Eye
+    RED_LED,                                       // Chest
+    RED_LED,RED_LED};                              // Feet
+
 static const unsigned int LED_END_COLOR[NUM_UNIQUE_LEDS] ={
     NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,
     NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,
     NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,
     NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,
-    NUM_LED_COLORS,NUM_LED_COLORS,
-    NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,
-    NUM_LED_COLORS,
-    NUM_LED_COLORS,NUM_LED_COLORS,
-    NUM_LED_COLORS};
+    NUM_LED_COLORS,                // Left Eye
+    NUM_LED_COLORS, NUM_LED_COLORS, // Right Eye
+    NUM_LED_COLORS,                // Chest
+    NUM_LED_COLORS,NUM_LED_COLORS}; // Feet
 
 static const std::string faceL[NUM_LED_ORIENTATIONS][NUM_LED_COLORS][NUM_FACE_LEDS] ={
 /*  Face Leds Left */
@@ -204,87 +203,70 @@ static const std::string chestL[NUM_LED_COLORS]={
 */
 static const std::string ballL[NUM_LED_COLORS][NUM_BALL_LEDS] ={
 /* Red*/
-    {faceL[LEFT_LED][RED_LED][3],
-     faceL[LEFT_LED][RED_LED][4],
-     faceL[LEFT_LED][RED_LED][5]},
+    {faceL[RIGHT_LED][RED_LED][2],
+     faceL[RIGHT_LED][RED_LED][3],
+     faceL[RIGHT_LED][RED_LED][4],
+     faceL[RIGHT_LED][RED_LED][5],
+     faceL[RIGHT_LED][RED_LED][6]},
 /* Green*/
-    {faceL[LEFT_LED][GREEN_LED][3],
-     faceL[LEFT_LED][GREEN_LED][4],
-     faceL[LEFT_LED][GREEN_LED][5]},
+    {faceL[RIGHT_LED][GREEN_LED][2],
+     faceL[RIGHT_LED][GREEN_LED][3],
+     faceL[RIGHT_LED][GREEN_LED][4],
+     faceL[RIGHT_LED][GREEN_LED][5],
+     faceL[RIGHT_LED][GREEN_LED][6]},
 /* Blue*/
-    {faceL[LEFT_LED][BLUE_LED][3],
-     faceL[LEFT_LED][BLUE_LED][4],
-     faceL[LEFT_LED][BLUE_LED][5]}
+    {faceL[RIGHT_LED][BLUE_LED][2],
+     faceL[RIGHT_LED][BLUE_LED][3],
+     faceL[RIGHT_LED][BLUE_LED][4],
+     faceL[RIGHT_LED][BLUE_LED][5],
+     faceL[RIGHT_LED][BLUE_LED][6]}
+};
+
+static const std::string goalBoxL[NUM_LED_COLORS][NUM_GOALBOX_LEDS] ={
+/* Red*/
+    {faceL[RIGHT_LED][RED_LED][0],
+     faceL[RIGHT_LED][RED_LED][1],
+     faceL[RIGHT_LED][RED_LED][7]},
+/* Green*/
+    {faceL[RIGHT_LED][GREEN_LED][0],
+     faceL[RIGHT_LED][GREEN_LED][1],
+     faceL[RIGHT_LED][GREEN_LED][7]},
+/* Blue*/
+    {faceL[RIGHT_LED][BLUE_LED][0],
+     faceL[RIGHT_LED][BLUE_LED][1],
+     faceL[RIGHT_LED][BLUE_LED][7]}
 };
 
 static const std::string roleL[NUM_LED_COLORS][NUM_ROLE_LEDS] ={
 /* Red*/
     {faceL[LEFT_LED][RED_LED][0],
-     faceL[LEFT_LED][RED_LED][2],
-     faceL[LEFT_LED][RED_LED][6],
      faceL[LEFT_LED][RED_LED][1],
+     faceL[LEFT_LED][RED_LED][2],
+     faceL[LEFT_LED][RED_LED][3],
+     faceL[LEFT_LED][RED_LED][4],
+     faceL[LEFT_LED][RED_LED][5],
+     faceL[LEFT_LED][RED_LED][6],
      faceL[LEFT_LED][RED_LED][7]},
 /* Green*/
     {faceL[LEFT_LED][GREEN_LED][0],
      faceL[LEFT_LED][GREEN_LED][1],
      faceL[LEFT_LED][GREEN_LED][2],
+     faceL[LEFT_LED][GREEN_LED][3],
+     faceL[LEFT_LED][GREEN_LED][4],
+     faceL[LEFT_LED][GREEN_LED][5],
      faceL[LEFT_LED][GREEN_LED][6],
      faceL[LEFT_LED][GREEN_LED][7]},
 /* Blue*/
     {faceL[LEFT_LED][BLUE_LED][0],
      faceL[LEFT_LED][BLUE_LED][1],
      faceL[LEFT_LED][BLUE_LED][2],
+     faceL[LEFT_LED][BLUE_LED][3],
+     faceL[LEFT_LED][BLUE_LED][4],
+     faceL[LEFT_LED][BLUE_LED][5],
      faceL[LEFT_LED][BLUE_LED][6],
-     faceL[LEFT_LED][BLUE_LED][7]}
+     faceL[LEFT_LED][BLUE_LED][7]},
 };
 
-/* UNUSED LEDS HACK... stupid aldebaran...*/
-static const std::string rightUnL[NUM_LED_COLORS][1] ={
-    {faceL[RIGHT_LED][RED_LED][7]},
-
-    {faceL[RIGHT_LED][GREEN_LED][7]},
-
-    {faceL[RIGHT_LED][BLUE_LED][7]}
-};
-
-static const std::string leftGoalL[NUM_LED_COLORS][NUM_GOAL_LEDS] ={
-/* Red*/
-    {faceL[RIGHT_LED][RED_LED][5],
-     faceL[RIGHT_LED][RED_LED][6]},
-/* Green*/
-    {faceL[RIGHT_LED][GREEN_LED][5],
-     faceL[RIGHT_LED][GREEN_LED][6]},
-/* Blue*/
-    {faceL[RIGHT_LED][BLUE_LED][5],
-     faceL[RIGHT_LED][BLUE_LED][6]}
-};
-
-static const std::string goalIDL[NUM_LED_COLORS][NUM_GOAL_ID_LEDS] ={
-/* Red*/
-    {faceL[RIGHT_LED][RED_LED][2],
-     faceL[RIGHT_LED][RED_LED][3],
-     faceL[RIGHT_LED][RED_LED][4]},
-/* Green*/
-    {faceL[RIGHT_LED][GREEN_LED][2],
-     faceL[RIGHT_LED][GREEN_LED][3],
-     faceL[RIGHT_LED][GREEN_LED][4]},
-/* Blue*/
-    {faceL[RIGHT_LED][BLUE_LED][2],
-     faceL[RIGHT_LED][BLUE_LED][3],
-     faceL[RIGHT_LED][BLUE_LED][4]}
-};
-
-static const std::string rightGoalL[NUM_LED_COLORS][NUM_GOAL_LEDS] ={
-/* Red*/
-    {faceL[RIGHT_LED][RED_LED][0],
-     faceL[RIGHT_LED][RED_LED][1]},
-/* Green*/
-    {faceL[RIGHT_LED][GREEN_LED][0],
-     faceL[RIGHT_LED][GREEN_LED][1]},
-/* Blue*/
-    {faceL[RIGHT_LED][BLUE_LED][0],
-     faceL[RIGHT_LED][BLUE_LED][1]}
-};
 
 static const std::string strPtr = footL[RIGHT_LED][0];
 static const std::string * RGB_LED_STRINGS[NUM_UNIQUE_LEDS] ={
@@ -310,13 +292,10 @@ static const std::string * RGB_LED_STRINGS[NUM_UNIQUE_LEDS] ={
     &earL[RIGHT_LED][0],            // 5
     &roleL[0][0],                   // Role
     &ballL[0][0],                   // Ball
-    &leftGoalL[0][0],               // Left Goal
-    &rightGoalL[0][0],              // Right Goal
-    &goalIDL[0][0],                 // My or Opp Goal
+    &goalBoxL[0][0],                // Goalbox
     &chestL[0],
     &footL[LEFT_LED][0],
     &footL[RIGHT_LED][0],
-    &rightUnL[0][0]
 };
 };
 
