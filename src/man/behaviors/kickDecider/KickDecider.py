@@ -281,8 +281,8 @@ class KickDecider(object):
         self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
         self.kicks.append(kicks.M_LEFT_SIDE)
         self.kicks.append(kicks.M_RIGHT_SIDE)
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        # self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
+        # self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
 
         self.filters = []
         self.filters.append(self.outOfBounds)
@@ -304,8 +304,8 @@ class KickDecider(object):
 
     def allKicksAsap(self):
         self.kicks = []
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        # self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
+        # self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
         self.kicks.append(kicks.M_RIGHT_STRAIGHT)
         self.kicks.append(kicks.M_LEFT_SIDE)
@@ -412,8 +412,8 @@ class KickDecider(object):
         self.kicks.append(kicks.M_RIGHT_SIDE)
         self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
         self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        # self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
+        # self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
 
         self.scoreKick = self.minimizeDistanceToGoal
         
