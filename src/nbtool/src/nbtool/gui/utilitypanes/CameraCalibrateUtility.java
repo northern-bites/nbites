@@ -98,6 +98,12 @@ public class CameraCalibrateUtility extends UtilityParent {
                 return;
             }
 
+            initiate();
+           
+        }
+
+        private void initiate() {
+
             final Session session = getSession;
 
             if (session.logs_ALL.size() < 7) {
@@ -127,6 +133,7 @@ public class CameraCalibrateUtility extends UtilityParent {
                 @Override
                 public void paintComponent(Graphics g) {
                     super.paintComponent(g);
+         //               System.out.printf("Sess1: %s\n", session);
                     g.drawString("Selected session: " + session.name, buf, buf*2);
                     g.drawString("Logs in session: " + session.logs_ALL.size(), buf, buf*4);
 
@@ -185,7 +192,7 @@ public class CameraCalibrateUtility extends UtilityParent {
                     for (Log l : usableLogs) {
                         if (l.bytes == null) {
                             try {
-                                FileIO.loadLog(l, getSession.directoryFrom); 
+                                FileIO.loadLog(l, getSession.directoryFrom);
                             } catch (IOException e1) {
                                 e1.printStackTrace();
                                 return;
@@ -210,6 +217,8 @@ public class CameraCalibrateUtility extends UtilityParent {
                 saveParamsToLisp();
             }
         }
+
+
 
         private void saveParamsToLisp() {
             String filePath = System.getenv().get("NBITES_DIR");
@@ -277,8 +286,13 @@ public class CameraCalibrateUtility extends UtilityParent {
 
         @Override
         public void sessionSelected(Object source, Session s) {
+            // TODO: make work
             if (!this.isEnabled())
                 return;
+            getSession = s;
+            initiate();
+         //   System.out.printf("Sess: %s\n",getSession);
+
             // TODO: change session when a new session is selected? UX choice
         }
 
