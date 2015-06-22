@@ -81,7 +81,7 @@ def sideLineCheckShouldReposition(player):
     y_dest = 0.0
     h_dest = 0.0
 
-    if GoalieStates.watchWithLineChecks.correctFacing == False:
+    if GoalieStates.watchWithLineChecks.numTurns < 1:
         return False
 
     for line in GoalieStates.watchWithLineChecks.lines:
@@ -117,7 +117,7 @@ def sideLineCheckShouldReposition(player):
 
 def shouldTurn(player):
 
-    if GoalieStates.watchWithLineChecks.numTurns > 0:
+    if GoalieStates.watchWithLineChecks.numTurns > 1:
         return False
     h_dest = 0.0
 
@@ -152,6 +152,19 @@ def shouldTurn(player):
             return True
 
     return False
+
+def shouldBackUp(player):
+    # If we cannot see any good lines, should probably back up!
+
+    for line in GoalieStates.watchWithLineChecks.lines:
+        r = line.r
+        t = math.degrees(line.t)
+
+        if r < 200.0 and r != 0.0:
+            return False
+
+    print "Couldn't find any good lines, backup TRUE"
+    return True
 
 def getBearingFromRobot(x, y):
     return math.degrees(math.atan2(x, -y));

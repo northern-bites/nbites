@@ -190,7 +190,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.doneWalking,
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : GoalieStates.watchWithCornerChecks,
+            : GoalieStates.watchWithLineChecks
 
             # Transition.CountTransition(GoalieTransitions.shouldClearBall,
             #                            Transition.SOME_OF_THE_TIME,
@@ -273,11 +273,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             : GoalieStates.kickBall
             }
 
+            #VISION CHANGE
         VisualGoalieStates.returnToGoal.transitions = {
             Transition.CountTransition(GoalieTransitions.doneWalking,
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.OK_PRECISION)
-            : GoalieStates.watchWithCornerChecks
+            : GoalieStates.watchWithLineChecks
             }
 
         VisualGoalieStates.didIKickIt.transitions = {
@@ -321,7 +322,22 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.shouldTurn,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.OK_PRECISION)
-            : GoalieStates.lineCheckTurn
+            : GoalieStates.lineCheckTurn,
+
+            Transition.CountTransition(GoalieTransitions.shouldClearBall,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION + 5)
+            : VisualGoalieStates.spinToFaceBall,
+
+            Transition.CountTransition(GoalieTransitions.shouldBackUp,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : GoalieStates.moveBackwards,
+
+            Transition.CountTransition(GoalieTransitions.shouldClearDangerousBall,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : VisualGoalieStates.backUpForDangerousBall
         }
 
         GoalieStates.lineCheckReposition.transitions = {

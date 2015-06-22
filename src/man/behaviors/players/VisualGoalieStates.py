@@ -148,6 +148,10 @@ def returnToGoal(player):
         if fabs(correctedDest.relH) < 5:
             correctedDest.relH = 0.0
 
+        print "I'm returning to goal now!"
+        print ("my correctedDest: ", correctedDest)
+        print ("My odometry: ", player.brain.interface.odometry)
+
         player.brain.nav.walkTo(correctedDest)
 
     return Transition.getNextState(player, returnToGoal)

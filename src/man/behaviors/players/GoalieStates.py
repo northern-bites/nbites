@@ -8,7 +8,7 @@ from ..headTracker import HeadMoves
 import GoalieConstants as constants
 import math
 
-SAVING = True
+SAVING = False
 
 @superState('gameControllerResponder')
 def gameInitial(player):
@@ -182,7 +182,7 @@ def watchWithLineChecks(player):
         else:
             watchWithLineChecks.numFixes += 1
 
-        player.brain.tracker.repeatBasicPan()
+        player.brain.tracker.trackBall()
         player.brain.nav.stand()
         player.returningFromPenalty = False
 
