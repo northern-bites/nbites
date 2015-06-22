@@ -78,7 +78,6 @@ int Vision_func() {
     portals::Message<messages::YUVImage> imageMessage(&image);
     portals::Message<messages::JointAngles> jointsMessage(&joints);
 
-    man::vision::VisionModule module(width / 2, height);
     
     // Look for robot name and pass to module if found
     SExpr* robotName = args[0]->tree().find("from_address");
@@ -87,7 +86,7 @@ int Vision_func() {
         rname = robotName->get(1)->value();
     }
 
-    module.setCalibrationParams(rname);
+    man::vision::VisionModule module(width / 2, height, rname);
 
     module.topIn.setMessage(imageMessage);
     module.bottomIn.setMessage(imageMessage);
@@ -370,7 +369,7 @@ int CameraCalibration_func() {
         
         // Init vision module with offsets of 0.0
         man::vision::VisionModule module(width / 2, height);
-        module.setCalibrationParams("none");
+
 
         // Read number of bytes of image, inertials, and joints if exist
         int numBytes[3];

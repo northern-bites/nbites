@@ -119,6 +119,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         vision.bottomIn.wireTo(&bottomTranscriber.imageOut);
         vision.jointsIn.wireTo(&topTranscriber.jointsOut, true);
         vision.inertsIn.wireTo(&topTranscriber.inertsOut, true);
+        vision.setCalibrationParams(robotName);
 
         localization.visionInput.wireTo(&vision.linesOut);
         localization.motionInput.wireTo(&motion.odometryOutput_, true);

@@ -11,7 +11,7 @@
 namespace man {
 namespace vision {
 
-VisionModule::VisionModule(int wd, int ht)
+VisionModule::VisionModule(int wd, int ht, std::string robotName)
     : Module(),
       topIn(),
       bottomIn(),
@@ -39,6 +39,8 @@ VisionModule::VisionModule(int wd, int ht)
     nblog::SExpr* colors = nblog::SExpr::read(getStringFromTxtFile(colorPath));
     calibrationLisp = nblog::SExpr::read(getStringFromTxtFile(calibrationPath));
 
+
+    setCalibrationParams(robotName);
 
     // Set module pointers for top then bottom images
     for (int i = 0; i < 2; i++) {
@@ -126,7 +128,8 @@ void VisionModule::run_()
         if (jointsIn.message().has_head_yaw()) {
             kinematics[i]->joints(jointsIn.message());
             homography[i]->wz0(kinematics[i]->wz0());
-            homography[i]->tilt(kinematics[i]->tilt());
+            homography[i]->roll(calibrationParams[i]->getRoll());
+            homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt());
 #ifndef OFFLINE
             homography[i]->azimuth(kinematics[i]->azimuth());
 #endif
@@ -415,7 +418,6 @@ void VisionModule::setCalibrationParams(int camera, std::string robotName) {
             robotName = "shehulk";
     }
     if (robotName == "") {
-        std::cout << "Could not set calibration params: No Robot Name" << std::endl;
         return;
     }
     
@@ -426,9 +428,10 @@ void VisionModule::setCalibrationParams(int camera, std::string robotName) {
         double roll =  robot->find(cam)->get(1)->valueAsDouble();
         double pitch = robot->find(cam)->get(2)->valueAsDouble();
         calibrationParams[camera] = new CalibrationParams(roll, pitch);
+        
+        std::cerr << "Found and set calibration params for " << robotName << std::endl;
     }
 
-    std::cerr << "Found and set calibration patrams for " << robotName << std::endl;
 }
 
 }

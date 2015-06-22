@@ -309,6 +309,7 @@ class CalibrationParams {
 public:
   CalibrationParams() { roll = tilt = 0.0; }
   CalibrationParams(double r, double t) { roll = r; tilt = t; }
+  
   double getRoll() { return roll; }
   void setRoll(double r) { roll = r; }
   double getTilt() { return tilt; }

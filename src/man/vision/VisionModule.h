@@ -18,7 +18,7 @@ namespace vision {
 
 class VisionModule : public portals::Module {
 public:
-    VisionModule(int wd, int ht);
+    VisionModule(int wd, int ht, std::string robotName = "");
     virtual ~VisionModule();
 
     portals::InPortal<messages::YUVImage> topIn;
