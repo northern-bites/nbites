@@ -92,11 +92,11 @@ namespace nblog {
     _value("")
     {
         _list = {
-            SExpr("type", type),
-            SExpr("from", from),
-            SExpr("when", (long) created),
-            SExpr("iindex", (long) image_index),
-            SExpr("nbytes", (long) nbytes)
+            SExpr(CONTENT_TYPE_S, type),
+            SExpr(CONTENT_FROM_S, from),
+            SExpr(CONTENT_WHEN_S, (long) created),
+            SExpr(CONTENT_IINDEX_S, (long) image_index),
+            SExpr(CONTENT_NBYTES_S, (long) nbytes)
         };
     }
     
@@ -160,6 +160,13 @@ namespace nblog {
         _list = {SExpr(key), SExpr(index), SExpr(cval)};
     }
     
+    SExpr::SExpr(const std::string& key, double roll, double pitch) :
+    _type(SEXPR_LIST),
+    _value("")
+    {
+        _list = {SExpr(key), SExpr(roll), SExpr(pitch)};
+    }
+
     /*
      Instance methods
      */

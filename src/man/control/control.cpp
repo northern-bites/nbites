@@ -230,7 +230,7 @@ namespace control {
                     
                     if (desc.count() < 2 ||
                         !(desc.get(0)->isAtom()) ||
-                        !(desc.get(0)->value() == "command") ||
+                        !(desc.get(0)->value() == nblog::COMMAND_FIRST_ATOM_S) ||
                         !(desc.get(1)->isAtom())    //command name
                         ) {
                         NBDEBUG("control: INVALID COMMAND LOG!\n");

@@ -48,7 +48,6 @@ class Brain(object):
         """
         Class constructor
         """
-
         # Parse arguments
         self.playerNumber = playerNum
         self.teamNumber = teamNum
@@ -145,7 +144,7 @@ class Brain(object):
         """
         # Update Environment
         self.time = time.time()
-
+        
         # Update objects
         self.updateVisionObjects()
         # self.updateObstacles()
