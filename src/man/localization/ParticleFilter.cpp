@@ -62,8 +62,7 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
 {
     // Update motion and vision system
     motionSystem->update(particles, odometryInput, errorMagnitude);
-    updatedVision = visionSystem->update(particles, visionInput);
-
+    updatedVision = visionSystem->update(particles, visionInput, poseEstimate);
 
     float avgErr = -1;
     // Resample if vision updated
@@ -454,17 +453,16 @@ void ParticleFilter::resample()
             // If the reconstructions is on the same side and not near midfield
             if ( ((*recLocIt).defSide == onDefendingSide())
                  && (fabs((*recLocIt).x - CENTER_FIELD_X) > 50)) {
-                     // std::cout << "Use reconstruction " << (*recLocIt).x << " " << (*recLocIt).y << " " << (*recLocIt).h << std::endl;
+                // Sanity check, reconstruction must be on field
+                if (((*recLocIt).x >= 0 && (*recLocIt).y <= FIELD_GREEN_WIDTH) &&
+                    ((*recLocIt).y >= 0 && (*recLocIt).y <= FIELD_GREEN_HEIGHT)) {
                      Particle reconstructedParticle((*recLocIt).x,
                                                     (*recLocIt).y,
                                                     (*recLocIt).h,
                                                     1.f/250.f);
-
-                     // for (int i = 0; i < 300; i++) {
-                         newParticles.push_back(reconstructedParticle);
-                         numReconParticlesAdded++;
-                     // }
-                     // break;
+                     newParticles.push_back(reconstructedParticle);
+                     numReconParticlesAdded++;
+                }
             }
         }
 #ifdef DEBUG_LOC

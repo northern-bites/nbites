@@ -38,7 +38,8 @@ public:
 
     LocLineID matchObservation(const messages::FieldLine& observation, const messages::RobotLocation& loc);
     double scoreObservation(const messages::FieldLine& observation, const messages::RobotLocation& loc);
-    messages::RobotLocation reconstructPosition(LocLineID id, const messages::FieldLine& observation);
+    messages::RobotLocation reconstructFromMidpoint(LocLineID id, const messages::FieldLine& observation);
+    messages::RobotLocation reconstructWoEndpoints(LocLineID id, const messages::FieldLine& observation);
 
     static vision::GeoLine relRobotToAbsolute(const messages::FieldLine& observation, const messages::RobotLocation& loc);
     static bool shouldUse(const messages::FieldLine& observation); 

@@ -19,7 +19,8 @@ VisionSystem::~VisionSystem()
 }
 
 bool VisionSystem::update(ParticleSet& particles,
-                          const messages::FieldLines& lines)
+                          const messages::FieldLines& lines,
+                          const messages::RobotLocation& currentEstimate)
 {
     numObservations = 0;
     lowestError = std::numeric_limits<float>::max();
@@ -61,8 +62,7 @@ bool VisionSystem::update(ParticleSet& particles,
 
     // Normalize the particle weights and calculate the weighted avg error
     weightedAvgError = 0.f;
-    for(iter = particles.begin(); iter != particles.end(); iter++)
-    {
+    for(iter = particles.begin(); iter != particles.end(); iter++) {
         Particle* particle = &(*iter);
         particle->normalizeWeight(totalWeight);
         weightedAvgError += particle->getWeight() * particle->getError();
@@ -84,17 +84,54 @@ bool VisionSystem::update(ParticleSet& particles,
             //      the side of the field that our estimate is on
             std::vector<LocLineID> ids { LocLineID::OurTopGoalbox, LocLineID::TheirTopGoalbox };
             for (int i = 0; i < ids.size(); i++) {
-                messages::RobotLocation pose = lineSystem->reconstructPosition(ids[i], field);
-                ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), ids[i] == LocLineID::OurTopGoalbox);
-
-                // Sanity check, reconstruction must be on field
-                if( (reconstructed.x >= 0 && reconstructed.y <= FIELD_GREEN_WIDTH) &&
-                    (reconstructed.y >= 0 && reconstructed.y <= FIELD_GREEN_HEIGHT)  )
-                    injections.push_back(reconstructed);
+                messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(ids[i], field);
+                ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h());
+                injections.push_back(reconstructed);
             }
         }
     }
 
+    // (2) Reconstruct pose by averaging reconstructions for all lines
+    // TODO only use close lines
+    // TODO weighted average
+    // TODO x and y if no reconstructs is one frame out of date as written
+    int numXReconstructs = 0;
+    int numYReconstructs = 0;
+    double xAverage = 0;
+    double yAverage = 0;
+    double hAverage = 0;
+
+    for (int i = 0; i < lines.line_size(); i++) {
+        const messages::FieldLine& field = lines.line(i);
+        const messages::HoughLine& inner = field.inner();
+
+        // TODO midline match
+        LocLineID bestMatch = lineSystem->matchObservation(field, currentEstimate);
+        messages::RobotLocation pose = lineSystem->reconstructWoEndpoints(bestMatch, field);
+
+        if (pose.x() >= 0) { 
+            numXReconstructs++;
+            xAverage += pose.x(); 
+        }
+        if (pose.y() >= 0) {
+            numYReconstructs++;
+            yAverage += pose.y();
+        }
+        hAverage += pose.h();
+    }
+
+    xAverage = xAverage / numXReconstructs;
+    yAverage = yAverage / numYReconstructs;
+    hAverage = hAverage / lines.line_size();
+
+    if (numXReconstructs)
+        xAverage = currentEstimate.x();
+    if (numYReconstructs)
+        yAverage = currentEstimate.y();
+    
+    ReconstructedLocation reconstructed(xAverage, yAverage, hAverage);
+    injections.push_back(reconstructed);
+    
     // Weights were adjusted so return true
     return true;
 }

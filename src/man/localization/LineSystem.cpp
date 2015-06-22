@@ -16,16 +16,15 @@ LineSystem::LineSystem()
     // Add the midline
     // NOTE two midlines so that reconstructions can be handled gracefully from
     //      either side of the field
-    addLine(LocLineID::OurMidline, -CENTER_FIELD_X, M_PI, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
-    addLine(LocLineID::TheirMidline, CENTER_FIELD_X, 0, -GREEN_PAD_Y, -(GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
+    addLine(LocLineID::TheirMidline, -CENTER_FIELD_X, M_PI, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
+    addLine(LocLineID::OurMidline, CENTER_FIELD_X, 0, -GREEN_PAD_Y, -(GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
 
     // Add top goalbox lines
     addLine(LocLineID::OurTopGoalbox, -(GREEN_PAD_X + GOALBOX_DEPTH) , M_PI, BLUE_GOALBOX_BOTTOM_Y, BLUE_GOALBOX_TOP_Y);
     addLine(LocLineID::TheirTopGoalbox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH , 0, -YELLOW_GOALBOX_BOTTOM_Y, -YELLOW_GOALBOX_TOP_Y);
 
     // Add sidelines
-    // TODO polarity
-    addLine(LocLineID::RightSideline, GREEN_PAD_Y, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
+    addLine(LocLineID::RightSideline, -GREEN_PAD_Y, 3 * M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
     addLine(LocLineID::LeftSideline, GREEN_PAD_Y + FIELD_WHITE_HEIGHT, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
 }
 
@@ -68,8 +67,8 @@ double LineSystem::scoreObservation(const messages::FieldLine& observation,
 }
 
 // NOTE method assumes that endpoints seen in observation are endpoints of line
-messages::RobotLocation LineSystem::reconstructPosition(LocLineID id, 
-                                                        const messages::FieldLine& observation)
+messages::RobotLocation LineSystem::reconstructFromMidpoint(LocLineID id, 
+                                                            const messages::FieldLine& observation)
 {
     messages::RobotLocation position;
     const messages::HoughLine& inner = observation.inner();
@@ -97,6 +96,38 @@ messages::RobotLocation LineSystem::reconstructPosition(LocLineID id,
     // Find x and y of reconstructed position
     position.set_x(axm - rxm);
     position.set_y(aym - rym);
+
+    return position;
+}
+
+messages::RobotLocation LineSystem::reconstructWoEndpoints(LocLineID id, 
+                                                           const messages::FieldLine& observation)
+{
+    messages::RobotLocation position;
+    const messages::HoughLine& inner = observation.inner();
+    const vision::GeoLine& absolute = lines[id];
+
+    // If cannot recover x or y, leave as -1, will be handled in VisionSystem
+    position.set_x(-1);
+    position.set_y(-1);
+
+    // Calculate heading in absolute coords
+    position.set_h(vision::uMod((M_PI / 2) - inner.t() + absolute.t(), 2 * M_PI));
+
+    // Calculate x or y depending on orientation of line
+    if (id == LocLineID::LeftSideline || id == LocLineID::RightSideline) {
+        // Sidelines -> calculate y
+        if (absolute.r() > 0)
+            position.set_y(absolute.r() - inner.r());
+        else
+            position.set_y(-absolute.r() + inner.r());
+    } else {
+        // All other lines -> calculate x
+        if (absolute.r() > 0)
+            position.set_x(absolute.r() - inner.r());
+        else
+            position.set_x(-absolute.r() + inner.r());
+    }
 
     return position;
 }

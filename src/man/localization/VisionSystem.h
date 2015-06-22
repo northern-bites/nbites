@@ -30,7 +30,9 @@ public:
     ~VisionSystem();
 
     bool update(ParticleSet& particles,
-                const messages::FieldLines& lines);
+                const messages::FieldLines& lines,
+                const messages::RobotLocation& currentEstimate);
+
     int getNumObservations() const { return numObservations; }
     float getLowestError() const { return lowestError; }
     float getAvgError() const { return avgError; }
