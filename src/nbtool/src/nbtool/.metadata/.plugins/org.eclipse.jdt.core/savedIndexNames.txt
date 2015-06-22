@@ -1,0 +1,1 @@
+INDEX VERSION 1.127+/home/joshimhoff/Code/nbites/src/nbtool/src/nbtool/.metadata/.plugins/org.eclipse.jdt.core

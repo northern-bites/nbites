@@ -64,29 +64,29 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     motionSystem->update(particles, odometryInput, errorMagnitude);
     updatedVision = visionSystem->update(particles, visionInput);
 
-    // float avgErr = -1;
+    float avgErr = -1;
     // Resample if vision updated
-    if(updatedVision)
+    if(updatedVision) {
         resample();
-        // updatedVision = false;
+        updatedVision = false;
+        avgErr = visionSystem->getAvgError();
+    }
 
-        /* avgErr = visionSystem->getAvgError(); */
-    // }
+     if (avgErr > 0) {
+         if (avgErr > 3*errorMagnitude)
+             avgErr = 3*errorMagnitude;
+         errorMagnitude = avgErr*ALPHA
+                          + errorMagnitude*(1-ALPHA);
+     } else
+         errorMagnitude += (1.f/100.f);
 
-    // if (avgErr > 0) {
-    //     if (avgErr > 3*errorMagnitude)
-    //         avgErr = 3*errorMagnitude;
-    //     errorMagnitude = avgErr*ALPHA
-    //                      + errorMagnitude*(1-ALPHA);
-    // } else
-    //     errorMagnitude += (1.f/100.f);
-
-    // std::cout << "Cur Error " << avgErr << std::endl;
-    // std::cout << "Filtered Error:  " << errorMagnitude << std::endl;
+     // std::cout << "Cur Error " << avgErr << std::endl;
+     // std::cout << "Filtered Error:  " << errorMagnitude << std::endl;
 
     // Determine if lost in frame or general
-    // lost = (errorMagnitude > LOST_THRESHOLD);
-    // badFrame = (avgErr > LOST_THRESHOLD);
+    lost = (errorMagnitude > LOST_THRESHOLD);
+    // std::cout << lost << std::endl;
+    badFrame = (avgErr > LOST_THRESHOLD);
 
     // Update filters estimate
     updateEstimate();
@@ -184,10 +184,16 @@ void ParticleFilter::updateEstimate()
 
 void ParticleFilter::projectObservationsOntoField(messages::FieldLines& visionInput)
 {
-    Particle estimateThisFrame(poseEstimate.x(), poseEstimate.y(), poseEstimate.h(), 0);
+    for (int i = 0; i < visionInput.line_size(); i++) {
+        vision::GeoLine projected = LineSystem::relRobotToAbsolute(visionInput.line(i), poseEstimate);
+        messages::FieldLine& field = *visionInput.mutable_line(i);
+        messages::HoughLine& hough = *field.mutable_inner();
 
-    for (int i = 0; i < visionInput.line_size(); i++)
-        LineSystem::projectOntoField(*visionInput.mutable_line(i), estimateThisFrame);
+        hough.set_r(projected.r());
+        hough.set_t(projected.t());
+        hough.set_ep0(projected.ep0());
+        hough.set_ep1(projected.ep1());
+    }
 }
 
 /**
@@ -432,38 +438,42 @@ void ParticleFilter::resample()
     //std::cout << "Error " << errorMagnitude << std::endl;
 
     // First add reconstructed particles from corner observations
-//     int numReconParticlesAdded = 0;
-//     if (lost && badFrame)
-//     {
-//         std::list<ReconstructedLocation> reconLocs = visionSystem->getReconstructedLocations();
-//         std::list<ReconstructedLocation>::const_iterator recLocIt;
-//         for (recLocIt = reconLocs.begin();
-//              recLocIt != reconLocs.end();
-//              recLocIt ++)
-//         {
-//             // If the reconstructions is on the same side and not near midfield
-//             if ( ((*recLocIt).defSide == onDefendingSide())
-//                  && (fabs((*recLocIt).x - CENTER_FIELD_X) > 50)) {
-// //                std::cout << "Use reconstruction " << (*recLocIt).x << " " << (*recLocIt).y << std::endl;
-// 
-//                      Particle reconstructedParticle((*recLocIt).x,
-//                                                     (*recLocIt).y,
-//                                                     (*recLocIt).h,
-//                                                     1.f/250.f);
-// 
-//                      newParticles.push_back(reconstructedParticle);
-//                      numReconParticlesAdded++;
-//             }
-//         }
-// #ifdef DEBUG_LOC
-//         std::cout << "Injected " << numReconParticlesAdded << " particles" << std::endl;
-// #endif
-//     }
+    int numReconParticlesAdded = 0;
+    // if (lost && badFrame)
+    if (true)
+    {
+        // std::cout << "LOST AND BAD FRAME" << std::endl;
+        const std::list<ReconstructedLocation>& reconLocs = visionSystem->getInjections();
+        std::list<ReconstructedLocation>::const_iterator recLocIt;
+        for (recLocIt = reconLocs.begin();
+             recLocIt != reconLocs.end();
+             recLocIt ++)
+        {
+            // std::cout << "ITER RECONSTRUCT" << std::endl;
+            // If the reconstructions is on the same side and not near midfield
+            if ( ((*recLocIt).defSide == onDefendingSide())
+                 && (fabs((*recLocIt).x - CENTER_FIELD_X) > 50)) {
+                     // std::cout << "Use reconstruction " << (*recLocIt).x << " " << (*recLocIt).y << " " << (*recLocIt).h << std::endl;
+                     Particle reconstructedParticle((*recLocIt).x,
+                                                    (*recLocIt).y,
+                                                    (*recLocIt).h,
+                                                    1.f/250.f);
+
+                     // for (int i = 0; i < 300; i++) {
+                         newParticles.push_back(reconstructedParticle);
+                         numReconParticlesAdded++;
+                     // }
+                     // break;
+            }
+        }
+#ifdef DEBUG_LOC
+        std::cout << "Injected " << numReconParticlesAdded << " particles" << std::endl;
+#endif
+    }
 
     // Sample numParticles particles with replacement according to the
     // normalized weights, and place them in a new particle set.
-    // for(int i = 0; i < (parameters.numParticles - (float)numReconParticlesAdded); ++i)
-    for(int i = 0; i < parameters.numParticles; ++i)
+    for(int i = 0; i < (parameters.numParticles - (float)numReconParticlesAdded); ++i)
     {
         rand = (float)gen();
         if(cdf.upper_bound(rand) == cdf.end())

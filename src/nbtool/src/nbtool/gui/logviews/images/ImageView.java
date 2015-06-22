@@ -18,6 +18,7 @@ public class ImageView extends ViewParent implements MouseMotionListener {
 	private String label = null;
 	
 	public void paintComponent(Graphics g) {
+	    super.paintComponent(g);
 		if (img != null)
 			g.drawImage(img, 0, 0, null);
 		if (label != null)

@@ -45,7 +45,7 @@ public class Utility {
 			//old image
 			ip = new YUYV8888image(width / 2, height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[Y8(U8/V8)]")) {
-			ip = new YUYV8888image(width , height, log.bytes);
+			ip = new YUYV8888image(2*width, height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[Y16]")) {
 			ip = new Y16image(width , height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[U8V8]")) {
@@ -57,7 +57,7 @@ public class Utility {
 			return null;
 		}
 		
-		return ip.toBufferedImage(); 
+		return ip.toBufferedImage();
 	}
 
 	public static final char[] hexArray = "0123456789ABCDEF".toCharArray();

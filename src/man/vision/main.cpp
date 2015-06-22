@@ -482,11 +482,11 @@ void houghTest()
   printf("\n%d fast lines:\n", fastList.size());
   fastList.mapToField(fh);
   for (list<HoughLine>::iterator hl = fastList.begin(); hl != fastList.end(); ++hl)
-    printf("  %s | %s\n", hl->print().c_str(), hl->field().print().c_str());
-
-  printf("\n%d slow lines:\n", slowList.size());
-  for (list<HoughLine>::iterator hl = slowList.begin(); hl != slowList.end(); ++hl)
     printf("  %s\n", hl->print().c_str());
+
+  //printf("\n%d slow lines:\n", slowList.size());
+  //for (list<HoughLine>::iterator hl = slowList.begin(); hl != slowList.end(); ++hl)
+  //  printf("  %s\n", hl->print().c_str());
 
   if (iterationCount > 1)
   {
@@ -834,6 +834,24 @@ int main(int argc, char* argv[])
       case 'rht':
         runHough();
         break;
+
+      case 'cal':
+        {
+          EdgeList edges(24000);
+          getEdges(edges);
+          HoughLineList lines(12);
+          hs.run(edges, lines);
+          lines.mapToField(fh);
+          FieldLineList fLines;
+          fLines.find(lines);
+
+          if (fh.calibrateFromStar(fLines))
+            printf("Roll = %.2f, tilt = %.2f\n", fh.roll() * (180 / M_PI), fh.tilt() * (180 / M_PI));
+          else
+            printf("Can't find 3 legs of star target\n");
+        }
+        break;
+
 
       default:
         throw strPrintf("Unknown command %s\n", argv[argIndex - 1]);

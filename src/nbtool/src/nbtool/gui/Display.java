@@ -71,10 +71,12 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		ldp = new LogDisplayPanel();
 		
 		cntrlp = new ControlPanel();
+		camstrmp = new StreamingPanel();
 		lc = new LogChooser();
 		left.addTab("control", cntrlp);
 		left.addTab("logs", lc);
-				
+		left.addTab("camera",camstrmp);
+		
 		statusp = new StatusPanel();
 		right.addTab("status", statusp);
 		
@@ -122,12 +124,15 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 					left.setSelectedIndex(1);
 					break;
 				case 'e':
-					right.setSelectedIndex(0);
+					left.setSelectedIndex(2);
 					break;
 				case 'r':
-					right.setSelectedIndex(1);
+					right.setSelectedIndex(0);
 					break;
 				case 't':
+					right.setSelectedIndex(1);
+					break;
+				case 'y':
 					right.setSelectedIndex(2);
 					break;
 				case 's':
@@ -151,6 +156,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 	private JTabbedPane right;
 	
 	private ControlPanel cntrlp;
+	private StreamingPanel camstrmp;
 	private StatusPanel statusp;
 	private LogChooser lc;
 		

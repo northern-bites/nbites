@@ -60,6 +60,28 @@ public:
     uint64_t getTimestamp() const;
     Camera::Type type() { return cameraType; }
 
+    struct NewSettings {
+        bool hflip;
+        bool vflip;
+        int auto_exposure;
+        int brightness;
+        int contrast;
+        int saturation;
+        int hue;
+        int sharpness;
+        int gamma;
+        bool auto_whitebalance;
+        int backlight_compensation;
+        int exposure;
+        int gain;
+        int white_balance;
+        bool fade_to_black;
+    };
+
+    void initSettings(); //one of the magical init methods
+
+    NewSettings updated_settings; //struct containing updated settings
+
 private:
     enum
     {
@@ -69,7 +91,6 @@ private:
     };
 
     // All of the (magical) init methods
-    void initSettings();
     void initOpenI2CAdapter();
     void initSelectCamera();
     void initOpenVideoDevice();
@@ -80,6 +101,7 @@ private:
     void initQueueAllBuffers();
     void startCapturing();
     void assertCameraSettings();
+    void testControlSettings();
 
     // Helpers for controlling the camera's settings
     int getControlSetting(unsigned int id);
@@ -105,6 +127,7 @@ private:
     struct v4l2_buffer requestBuff;
 
     uint64_t timeStamp;
+
 };
 
 // Module that wraps Transcriber's functionality
@@ -120,6 +143,10 @@ public :
     portals::OutPortal<messages::YUVImage> imageOut;
     portals::OutPortal<messages::JointAngles> jointsOut;
     portals::OutPortal<messages::InertialState> inertsOut;
+
+    time_t file_mod_time;
+    int first_time;
+
 protected :
     virtual void run_();
 private :

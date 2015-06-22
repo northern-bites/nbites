@@ -99,7 +99,6 @@ inline double diffRadians(double a, double b)
   return fabs(sMod(a - b, 2 * M_PI));
 }
 
-
 inline void unitVec(double x, double y, double& u, double& v)
 {
   double g = sqrt(x * x + y * y);
@@ -258,6 +257,7 @@ class LineFit
 {
   double sumW;
   double sumX, sumY, sumXY, sumX2, sumY2;
+  int _count;
 
   bool solved;
 
@@ -280,6 +280,8 @@ public:
   double centerX() const { return sumX / sumW;}
 
   double centerY() const { return sumY / sumW;}
+
+  int count() const { return _count; }
 
   double firstPrincipalLength() { solve(); return pLen1;}
 

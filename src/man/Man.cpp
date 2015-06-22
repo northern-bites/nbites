@@ -25,6 +25,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     param("/home/nao/nbites/lib/parameters.json"),
     playerNum(param.getParam<int>("playerNumber")),
     teamNum(param.getParam<int>("teamNumber")),
+    robotName(param.getParam<std::string>("robotName")),
     sensorsThread("sensors", SENSORS_FRAME_LENGTH_uS),
     sensors(broker),
     jointEnactor(broker),
@@ -102,12 +103,12 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         cognitionThread.addModule(bottomTranscriber);
         cognitionThread.addModule(vision);
         cognitionThread.addModule(localization);
-        // cognitionThread.addModule(ballTrack);
+        cognitionThread.addModule(ballTrack);
         // cognitionThread.addModule(obstacle);
         cognitionThread.addModule(gamestate);
         cognitionThread.addModule(behaviors);
         cognitionThread.addModule(leds);
-        // cognitionThread.addModule(sharedBall);
+        cognitionThread.addModule(sharedBall);
         
         topTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
         topTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
@@ -117,29 +118,31 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         vision.topIn.wireTo(&topTranscriber.imageOut);
         vision.bottomIn.wireTo(&bottomTranscriber.imageOut);
         vision.jointsIn.wireTo(&topTranscriber.jointsOut, true);
-        
+        vision.inertsIn.wireTo(&topTranscriber.inertsOut, true);
+        vision.setCalibrationParams(robotName);
+
         localization.visionInput.wireTo(&vision.linesOut);
         localization.motionInput.wireTo(&motion.odometryOutput_, true);
         localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
-        // localization.resetInput[1].wireTo(&sharedBall.sharedBallReset, true);
+        localization.resetInput[1].wireTo(&sharedBall.sharedBallReset, true);
         localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
         // localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
         
-        // ballTrack.visionBallInput.wireTo(&vision.vision_ball);
-        // ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
-        // ballTrack.localizationInput.wireTo(&localization.output, true);
-        // 
-        // for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
-        // {
-        //     sharedBall.worldModelIn[i].wireTo(comm._worldModels[i], true);
-        // }
-        // sharedBall.locIn.wireTo(&localization.output);
-        // sharedBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
-        // 
+        ballTrack.visionBallInput.wireTo(&vision.ballOut);
+        ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
+        ballTrack.localizationInput.wireTo(&localization.output, true);
+        
+        for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+        {
+            sharedBall.worldModelIn[i].wireTo(comm._worldModels[i], true);
+        }
+        sharedBall.locIn.wireTo(&localization.output);
+        sharedBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
+         
         // obstacle.armContactIn.wireTo(&arms.contactOut, true);
         // obstacle.visionIn.wireTo(&vision.vision_obstacle, true);
         // obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
-        // 
+         
         gamestate.commInput.wireTo(&comm._gameStateOutput, true);
         gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
         gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
@@ -147,7 +150,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
         
         behaviors.localizationIn.wireTo(&localization.output);
-        // behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
+        behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
         behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
         // behaviors.visionFieldIn.wireTo(&vision.linesOut);
         // behaviors.visionRobotIn.wireTo(&vision.vision_robot);
@@ -159,8 +162,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
         behaviors.linesIn.wireTo(&vision.linesOut, true);
         // behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
-        // behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
-        // behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);
+        behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
+        behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);
         for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
         {
             behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);

@@ -5,7 +5,7 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.8.3 )
 ADD_DEFINITIONS( -mmmx )
 
 ############################ PROJECT SOURCES FILES
-SET( VISION_SRCS 
+SET( VISION_SRCS
   VisionModule.cpp
   Edge.cpp
   FastBlob.cpp
@@ -14,6 +14,7 @@ SET( VISION_SRCS
   Homography.cpp
   Hough.cpp
   Vision.cpp
+  BallDetector.cpp
   )
 
 IF (UNIX AND NOT APPLE)
@@ -34,6 +35,7 @@ ADD_LIBRARY(
   vision
   STATIC
   ${VISION_SRCS}
+  ${VISION_HEADERS}
   )
 
 ############################ SET LIBRARIES TO LINK WITH

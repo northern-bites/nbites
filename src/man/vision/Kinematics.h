@@ -4,6 +4,7 @@
 #include "PMotion.pb.h"
 
 #include <utility>
+#include <tuple>
 
 namespace man {
 namespace vision {
@@ -14,14 +15,16 @@ class Kinematics {
 public:
     Kinematics(bool topCamera = true);
     void joints(const messages::JointAngles& newJoints);
-    double tilt() { compute(); return tilt_; } 
-    double wz0() { compute(); return wz0_; } 
-    double azimuth() { compute(); return azimuth_; } 
+    double tilt() { compute(); return tilt_; }
+    double wx0() { compute(); return wx0_; }
+    double wy0() { compute(); return wy0_; }
+    double wz0() { compute(); return wz0_; }
+    double azimuth() { compute(); return azimuth_; }
 
 private:
     void compute();
-    std::pair<double, double> computeForLeg(double anklePitch, double kneePitch,
-                                            double hipPitch, double neckPitch) const;
+    std::tuple<double, double, double> computeForLeg(double anklePitch, double kneePitch,
+                                                     double hipPitch, double neckPitch) const;
 
     struct NaoConstants {
         double groundToAnkle;
@@ -55,6 +58,8 @@ private:
     messages::JointAngles joints_;
 
     double tilt_;
+    double wx0_;
+    double wy0_;
     double wz0_;
     double azimuth_;
 };
