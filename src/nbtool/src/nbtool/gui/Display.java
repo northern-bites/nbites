@@ -36,7 +36,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 	private static final long serialVersionUID = 1L;
 	
 	public Display() {
-		super("nbtool v" + NBConstants.VERSION);
+		super("nbtool v" + NBConstants.VERSION + "." + NBConstants.MINOR_VERSION);
 		setMinimumSize(MIN_SIZE);
 		setBounds(Prefs.bounds);
 		
@@ -47,14 +47,6 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 				Prefs.bounds = _display.getBounds();
 				Prefs.leftSplitLoc = split1.getDividerLocation();
 				Prefs.rightSplitLoc = split2.getDividerLocation();
-				
-				Map<String, Class<? extends ViewParent>[]> lshown = new HashMap<String, Class<? extends ViewParent>[]>();
-				LogToViewUtility ltvu = UtilityManager.LogToViewUtility;
-				for (String t : NBConstants.POSSIBLE_VIEWS.keySet()) {
-					lshown.put(t, (Class<? extends ViewParent>[]) ltvu.selected(t));
-				}
-				
-				Prefs.last_shown = lshown;
 				
 				try {
 					Prefs.savePreferences();
@@ -68,7 +60,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		left = new JTabbedPane();
 		right = new JTabbedPane();
 		
-		ldp = new LogDisplayPanel();
+		ldp = new LogDisplayPanel(true);
 		
 		cntrlp = new ControlPanel();
 		lc = new LogChooser();
@@ -82,7 +74,10 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		right.addTab("nbcross", cp);
 		
 		up = new OptionsAndUtilities();
-		right.addTab("utility", up);
+		right.addTab("misc", up);
+		
+		right.setMinimumSize(new Dimension(0,0));
+		left.setMinimumSize(new Dimension(0,0));
 		
 		split1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, left, ldp);
 		split2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, split1, right);
@@ -102,7 +97,7 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 		
-		System.out.println("----------------------------------\n\n");
+		System.out.println("---------------------------------- <end initialization>\n\n");
 	}
 	
 	public boolean postProcessKeyEvent(final KeyEvent e) {

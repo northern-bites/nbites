@@ -12,8 +12,10 @@ public class UtilityManager {
 	
 	/* adding a field here that extends UtilityParent is enough to get it displayed. */
 	public static final LogToViewUtility LogToViewUtility = new LogToViewUtility();
-	public static final YUVColors YUVColors = new YUVColors();
+	public static final YUVColorUtility YUVColorUtility = new YUVColorUtility();
 	public static final ThreadStateUtility ThreadStateUtility = new ThreadStateUtility();
+	
+	public static final TestUtility TestUtility = new TestUtility();
 	
 	public static final UtilityParent[] utilities = findUtilityFields(); 
 	private static UtilityParent[] findUtilityFields() {

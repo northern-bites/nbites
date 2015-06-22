@@ -5,6 +5,9 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 
 public class ExternalLogDisplay extends JFrame {
+	//Somewhat arbitrary limit, the tool currently links one display with the number keys [1-9]
+	public static final int MAX_EXTERNAL = 9;
+	public static ExternalLogDisplay[] displays = new ExternalLogDisplay[9];
 	
 	public static void request() {
 		if (external == null) {
@@ -28,7 +31,7 @@ public class ExternalLogDisplay extends JFrame {
 		this.setSize(DEFAULT_SIZE);
 		this.setMinimumSize(DEFAULT_SIZE);
 		
-		ldp = new LogDisplayPanel();
+		ldp = new LogDisplayPanel(false);
 		this.setContentPane(ldp);
 		this.setVisible(true);
 	}

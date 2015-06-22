@@ -27,18 +27,8 @@ public class SortAndSearch extends JPanel implements ActionListener {
 		reverseBox.addActionListener(this);
 		searchField.addActionListener(this);
 		
-		windowButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	windowButtonActionPerformed(evt);
-            }
-        });
 		
-		
-	}
-	
-	private void windowButtonActionPerformed(java.awt.event.ActionEvent evt) {   
-		ExternalLogDisplay.request();
-    }                                                
+	}                                           
 	
 	public static enum SortType {
 		TIME(0, new Comparator<Log>(){
@@ -155,6 +145,8 @@ public class SortAndSearch extends JPanel implements ActionListener {
 		else for (Log l : s.logs_ALL)
 				if (l.description().contains(mustContain)) s.logs_DO.add(l);
 		
+		//System.out.printf("sort using %d of %d logs\n", s.logs_DO.size(), s.logs_ALL.size());
+		
 		if (cmp != null)
 			Collections.sort(s.logs_DO, cmp);
 		
@@ -178,8 +170,6 @@ public class SortAndSearch extends JPanel implements ActionListener {
         jLabel2 = new javax.swing.JLabel();
         searchField = new javax.swing.JTextField();
         reverseBox = new javax.swing.JCheckBox();
-        windowButton = new javax.swing.JButton();
-
         jCheckBox1.setText("jCheckBox1");
 
         jLabel1.setText("sort by:");
@@ -192,8 +182,6 @@ public class SortAndSearch extends JPanel implements ActionListener {
         reverseBox.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         reverseBox.setSelected(false);
         
-
-        windowButton.setText("window");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -209,7 +197,6 @@ public class SortAndSearch extends JPanel implements ActionListener {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(reverseBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(windowButton)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
@@ -224,7 +211,7 @@ public class SortAndSearch extends JPanel implements ActionListener {
                     .addComponent(jLabel1)
                     .addComponent(sortByBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(reverseBox)
-                    .addComponent(windowButton))
+                    )
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
@@ -240,6 +227,5 @@ public class SortAndSearch extends JPanel implements ActionListener {
     private javax.swing.JCheckBox reverseBox;
     private javax.swing.JTextField searchField;
     private javax.swing.JComboBox<String> sortByBox;
-    private javax.swing.JButton windowButton;
     // End of variables declaration   
 }

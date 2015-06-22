@@ -86,6 +86,9 @@ namespace nblog {
         //key double value for use in log_main.
         SExpr(const std::string& key, int index, int cval);
         
+        //used in camera calibration
+        SExpr(const std::string& key, double roll, double pitch);
+        
         /**** factory methods to stack */
         
         static SExpr atom(const std::string& n) {return SExpr(n);}

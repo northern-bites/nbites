@@ -160,6 +160,13 @@ namespace nblog {
         _list = {SExpr(key), SExpr(index), SExpr(cval)};
     }
     
+    SExpr::SExpr(const std::string& key, double roll, double pitch) :
+    _type(SEXPR_LIST),
+    _value("")
+    {
+        _list = {SExpr(key), SExpr(roll), SExpr(pitch)};
+    }
+    
     /*
      Instance methods
      */

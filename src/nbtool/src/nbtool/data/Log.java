@@ -1,5 +1,6 @@
 package nbtool.data;
 
+import nbtool.util.Logger;
 import nbtool.util.NBConstants;
 import nbtool.util.Utility;
 
@@ -103,11 +104,14 @@ public class Log {
 	public String name; 
 	
 	public static enum SOURCE {
-		DERIVED, FILE, NETWORK, GENERATED
+		DERIVED,	//created programmatically from other logs
+		FILE,		//loaded from filesystem
+		NETWORK,	//streamed from network during this process's lifetime
+		GENERATED	//totally synthetic
 	}
 	
 	public SOURCE source;
-	public Session parent;
+	public Session parent = null;	//enclosing Session instance.
 	
 	public byte[] data() {
 		return bytes;
@@ -124,14 +128,22 @@ public class Log {
 	public String description(int nchars) {
 		String ser = tree.serialize();
 		if (ser.length() > nchars) {
-			return ser.substring(0, nchars);
+			return ser.substring(0, nchars - 3) + "...";
 		} else return ser;
 	}
 	
 	public void setTree(SExpr nt) {
+		if (nt.isAtom()) {
+			Logger.warnf("log tree being set atom: %s", nt.serialize());
+		}
+		
 		this.tree = nt;
 	}
 	
+	/* this is typically used as a programmatically generated file name
+	 * so the most important quality of the created String is to be a valid and
+	 * unique file name on all systems.
+	 * */
 	public void setNameFromDesc() {
 		this.name = String.format("type=%s_from=%s_v=%d_i%d_c%d", primaryType(), primaryFrom(), version(),
 				this.unique_id, this.checksum());

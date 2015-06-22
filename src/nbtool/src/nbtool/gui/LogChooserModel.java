@@ -35,6 +35,8 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 	String root;
 	JTree tree;
 	
+	protected Log[] lastSelectedLogs;
+	
 	public LogChooserModel() {
 		root = "ROOT PLACEHOLDER";
 		
@@ -139,6 +141,7 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 				selected.add(sel);
 			}
 			
+			lastSelectedLogs = selected.toArray(new Log[0]);
 			Events.GLogSelected.generate(this, selected.remove(0), selected);
 			break;
 		}
@@ -157,6 +160,8 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 				sessions.add(log.parent);
 			}
 		}
+		
+		//System.out.println("BF1: logsFound " + sessions.size() + " sessions modified.");
 		
 		for (Session modified : sessions) {
 			sas.sort(modified);

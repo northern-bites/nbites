@@ -109,6 +109,10 @@ public class CrossIO {
 				String cs = call.arguments[i].primaryType();
 				String as = args[i];
 				
+				if (cs.equals(Log.NBCROSS_WILDCARD_TYPE) || 
+						as.equals(Log.NBCROSS_WILDCARD_TYPE))
+					continue;
+				
 				if (!cs.equals(as))
 					return false;
 			}
@@ -357,7 +361,6 @@ public class CrossIO {
 	private static class CrossServer implements Runnable, IOFirstResponder {
 		@Override
 		public void run() {
-			Logger.log(Logger.INFO, "CrossServer starting up.");
 			ServerSocket server = null;
 			Timer timer = new Timer(true);
 			TimerTask tt = new TimerTask() {
@@ -382,7 +385,8 @@ public class CrossIO {
 			}
 			
 			timer.schedule(tt, 5000, 1000);
-			
+			Logger.log(Logger.INFO, "CrossServer up.");
+
 			try {
 				
 				while (true) {

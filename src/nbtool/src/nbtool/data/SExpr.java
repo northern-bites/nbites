@@ -80,6 +80,15 @@ public abstract class SExpr implements Serializable{
 	public static SExpr list() {
 		return new Found(Arrays.asList(new SExpr[]{}));
 	}
+	
+	public static SExpr stringify(Object ... args) {
+		SExpr list = list();
+		for (Object o : args) {
+			list.append(SExpr.atom(o.toString()));
+		}
+		
+		return list;
+	}
 
 	public static SExpr list(SExpr ... contents) {
 		return new Found(Arrays.asList(contents));
@@ -95,6 +104,10 @@ public abstract class SExpr implements Serializable{
 
 	public static SExpr pair(String key, int value) {
 		return newList(new Found(key), new Found(Integer.toString(value)));
+	}
+	
+	public static SExpr pair(String key, double value) {
+		return newList(new Found(key), new Found(Double.toString(value)));
 	}
 
 	/* checks for recursive trees,  */
@@ -146,6 +159,7 @@ public abstract class SExpr implements Serializable{
 
 	//type retrieval
 	public abstract boolean isAtom();
+	public abstract boolean isList();
 	public abstract boolean exists();
 
 	//conversion to strings
@@ -183,6 +197,11 @@ public abstract class SExpr implements Serializable{
 		@Override
 		public boolean isAtom() {
 			return atom;
+		}
+		
+		@Override
+		public boolean isList() {
+			return !atom;
 		}
 
 		@Override
@@ -459,7 +478,12 @@ public abstract class SExpr implements Serializable{
 
 		@Override
 		public boolean isAtom() {
-			return true;	//Atom implies less.
+			return false;
+		}
+		
+		@Override
+		public boolean isList() {
+			return false;
 		}
 
 		@Override

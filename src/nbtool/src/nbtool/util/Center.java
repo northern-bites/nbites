@@ -66,6 +66,7 @@ public class Center {
 			
 			try {
 				while(true) {
+//					System.out.println("Center loop...");
 					ToolEvent head = null;
 					Class<? extends EventListener> eventClass = null;
 					LinkedList<ToolEvent> similar = null;

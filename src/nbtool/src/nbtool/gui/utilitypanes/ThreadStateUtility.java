@@ -8,6 +8,9 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.Timer;
 
+import nbtool.data.Log;
+import nbtool.gui.logdnd.LogDND;
+import nbtool.gui.logdnd.LogDND.LogDNDTarget;
 import nbtool.util.Logger;
 
 public class ThreadStateUtility extends UtilityParent {
@@ -28,6 +31,15 @@ public class ThreadStateUtility extends UtilityParent {
 			Timer swingTimer = new Timer(1000, this);
 			swingTimer.setInitialDelay(0);
 			swingTimer.start();
+			
+			LogDND.makeComponentTarget(listDisplay, new LogDNDTarget(){
+
+				@Override
+				public void takeLogsFromDrop(Log[] log) {
+					System.out.println("tsu dropped");
+				}
+				
+			});
 		}
 
 		@Override

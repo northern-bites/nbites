@@ -46,7 +46,7 @@ public class ZoomImageView extends ViewParent {
 		});
 		setLayout(null);
 		
-		iv = new BIWithZoom();
+		iv = new ZoomImageDisplay();
 		sp = new JScrollPane(iv);
 		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -58,5 +58,5 @@ public class ZoomImageView extends ViewParent {
 	
 	
 	private JScrollPane sp;
-	private BIWithZoom iv;
+	private ZoomImageDisplay iv;
 }

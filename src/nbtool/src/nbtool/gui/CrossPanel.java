@@ -231,22 +231,20 @@ public class CrossPanel extends JPanel implements Events.CrossStatus, IOFirstRes
 	}
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
-    private void initComponents() {
+	private void initComponents() {
 
         jScrollPane2 = new javax.swing.JScrollPane();
-        outList = new javax.swing.JList<Log>();
+        outList = new javax.swing.JList<>();
         jScrollPane3 = new javax.swing.JScrollPane();
-        instanceList = new javax.swing.JList<CrossInstance>();
-        functionBox = new javax.swing.JComboBox<CrossFunc>();
+        instanceList = new javax.swing.JList<>();
+        functionBox = new javax.swing.JComboBox<>();
         callButton = new javax.swing.JButton();
         clearOutButton = new javax.swing.JButton();
 
         outList.setBorder(javax.swing.BorderFactory.createTitledBorder("output"));
-        
         jScrollPane2.setViewportView(outList);
 
         instanceList.setBorder(javax.swing.BorderFactory.createTitledBorder("cross instances"));
-      
         jScrollPane3.setViewportView(instanceList);
 
         functionBox.setBorder(javax.swing.BorderFactory.createTitledBorder("functions"));
@@ -281,9 +279,9 @@ public class CrossPanel extends JPanel implements Events.CrossStatus, IOFirstRes
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(154, 154, 154)
-                .addComponent(functionBox, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(functionBox, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 366, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(callButton)
@@ -294,7 +292,7 @@ public class CrossPanel extends JPanel implements Events.CrossStatus, IOFirstRes
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addContainerGap(493, Short.MAX_VALUE)))
         );
-    }// </editor-fold>                        
+    }// </editor-fold>                                                         
 
 
     // Variables declaration - do not modify                     
@@ -305,5 +303,5 @@ public class CrossPanel extends JPanel implements Events.CrossStatus, IOFirstRes
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JList<Log> outList;
-    // End of variables declaration          
+    // End of variables declaration            
 }

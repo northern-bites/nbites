@@ -177,9 +177,11 @@ int main(int argc, const char * argv[]) {
             }
             
             std::string type = contents->get(1)->find(nblog::CONTENT_TYPE_S)->get(1)->value();
-            if (type != FUNCS[findex].args[i]) {
-                printf("arg %i [%s] did NOT match type=%s!\n", i, type.c_str(), FUNCS[findex].args[i].c_str());
-                return 1;
+            if (type != NBCROSS_WILDCARD_TYPE && FUNCS[findex].args[i] != NBCROSS_WILDCARD_TYPE) {
+                if (type != FUNCS[findex].args[i]) {
+                    printf("arg %i [%s] did NOT match type=%s!\n", i, type.c_str(), FUNCS[findex].args[i].c_str());
+                    return 1;
+                }
             }
             
             args.push_back(recvd);
