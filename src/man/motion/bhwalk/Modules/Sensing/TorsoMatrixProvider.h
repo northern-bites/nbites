@@ -43,18 +43,9 @@ public:
   */
   void update(OdometryDataBH& odometryData);
 
-  /** Updates the OdometryDataBH representation.
-  * @param odometryData The odometry data representation which is updated by this module.
-  * @param angleZ The angle measured using z-gyro by Aldebaran on board
-  * @note Northern Bites addition
-  */
-  void update(OdometryDataBH& odometryData, float angleZ);
-
 private:
   float lastLeftFootZRotation; /**< The last z-rotation of the left foot. */
   float lastRightFootZRotation; /**< The last z-rotation of the right foot. */
-
-  float lastAngleZ; /**< The last z-axis angle reading from IMU. */
 
   Vector3BH<> lastFootSpan; /**< The last span between both feet. */
   Pose3DBH lastTorsoMatrix; /**< The last torso matrix for calculating the odometry offset. */

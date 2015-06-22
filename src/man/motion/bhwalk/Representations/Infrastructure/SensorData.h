@@ -66,8 +66,7 @@ public:
     usR9 = us9,
     usREnd,
     angleX = usREnd,
-    angleY,
-    angleZ
+    angleY
   );
 
   enum {off = JointDataBH::off}; /**< A special value to indicate that the sensor is missing. */

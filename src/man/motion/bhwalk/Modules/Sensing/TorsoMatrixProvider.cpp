@@ -105,15 +105,7 @@ void TorsoMatrixProvider::update(FilteredOdometryOffset& odometryOffset)
   (Pose3DBH&)lastTorsoMatrix = theTorsoMatrixBH;
 }
 */
-
-// NOTE should not run, replaced with update method below that uses odometry
-//      cannot be removed from the class because of BH blackboard system
 void TorsoMatrixProvider::update(OdometryDataBH& odometryData)
-{
-    std::cout << "In TorsoMatrixProvider::update, this should not run, see man/motion/Modules/Sensing/TorsoProvider.cpp" << std::endl;
-}
-
-void TorsoMatrixProvider::update(OdometryDataBH& odometryData, float angleZ)
 {
   Pose2DBH odometryOffset;
 
@@ -125,11 +117,7 @@ void TorsoMatrixProvider::update(OdometryDataBH& odometryData, float angleZ)
 
     odometryOffset.translation.x = odometryOffset3D.translation.x;
     odometryOffset.translation.y = odometryOffset3D.translation.y;
-
-    // Northern Bites addition
-    // Calculate odometryOffset.rotation from the filtered Z-axis gyro data
-    odometryOffset.rotation = angleZ - lastAngleZ;
-    lastAngleZ = angleZ;
+    odometryOffset.rotation = odometryOffset3D.rotation.getZAngle();
   }
 
   PLOT("module:TorsoMatrixProvider:odometryOffsetX", odometryOffset.translation.x);
