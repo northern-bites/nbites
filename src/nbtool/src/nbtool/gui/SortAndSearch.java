@@ -15,7 +15,7 @@ import nbtool.test.TestUtils;
 import nbtool.util.Logger;
 
 public class SortAndSearch extends JPanel implements ActionListener {
-	public SortAndSearch(LogChooserModel lcm) {
+	public SortAndSearch(final LogChooserModel lcm) {
 		super();		
 		this.lcm = lcm;
 		
@@ -27,7 +27,12 @@ public class SortAndSearch extends JPanel implements ActionListener {
 		reverseBox.addActionListener(this);
 		searchField.addActionListener(this);
 		
-		
+		deleteLogButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				lcm.deleteCurrent();
+			}
+		});
 	}                                           
 	
 	public static enum SortType {
@@ -162,26 +167,22 @@ public class SortAndSearch extends JPanel implements ActionListener {
 	}
 	
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
-    private void initComponents() {
-
-        jCheckBox1 = new javax.swing.JCheckBox();
+	private void initComponents() {
         jLabel1 = new javax.swing.JLabel();
-        sortByBox = new javax.swing.JComboBox<String>(sortNames);
+        sortByBox = new javax.swing.JComboBox<>(sortNames);
         jLabel2 = new javax.swing.JLabel();
         searchField = new javax.swing.JTextField();
         reverseBox = new javax.swing.JCheckBox();
-        jCheckBox1.setText("jCheckBox1");
+        deleteLogButton = new javax.swing.JButton();
 
         jLabel1.setText("sort by:");
 
         jLabel2.setText("search:");
 
-        searchField.setText("");
-
         reverseBox.setText("reverse");
         reverseBox.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
-        reverseBox.setSelected(false);
-        
+
+        deleteLogButton.setText("delete log");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -197,6 +198,7 @@ public class SortAndSearch extends JPanel implements ActionListener {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(reverseBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(deleteLogButton)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
@@ -211,21 +213,20 @@ public class SortAndSearch extends JPanel implements ActionListener {
                     .addComponent(jLabel1)
                     .addComponent(sortByBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(reverseBox)
-                    )
+                    .addComponent(deleteLogButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
-    }// </editor-fold>                                                           
-
+    }// </editor-fold>                                                            
 
     // Variables declaration - do not modify                     
-    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JButton deleteLogButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JCheckBox reverseBox;
     private javax.swing.JTextField searchField;
     private javax.swing.JComboBox<String> sortByBox;
-    // End of variables declaration   
+    // End of variables declaration  
 }
