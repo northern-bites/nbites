@@ -288,7 +288,7 @@ public:
   // (gradients pointing away from each other. Separation is approximately zero
   // otherwise. 
   double separation(const GeoLine& other) const;
-
+  
   // Assuming this and other should be the same line, calculate the error.
   // NOTE used in particle filter.
   double error(const GeoLine& other) const;
@@ -325,6 +325,21 @@ public:
 // Note that the fh argument is not a reference, but a copy because it is modified
 // internally.
 void syntheticField(YuvLite& img, FieldHomography fh);
+
+class CalibrationParams {
+  double roll;
+  double tilt;
+
+public:
+  CalibrationParams() { roll = tilt = 0.0; }
+  CalibrationParams(double r, double t) { roll = r; tilt = t; }
+  
+  double getRoll() { return roll; }
+  void setRoll(double r) { roll = r; }
+  double getTilt() { return tilt; }
+  void setTilt(double t) { tilt = t; }
+
+};
 
 }
 }

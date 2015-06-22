@@ -33,7 +33,7 @@ LocalizationModule::~LocalizationModule()
 void LocalizationModule::update()
 {
 #ifndef OFFLINE
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 2; i++) {
         if (lastReset[i] != resetInput[i].message().timestamp())
         {
             std::cout<<"RESET LOC ON "<<i<<std::endl;
@@ -129,7 +129,7 @@ void LocalizationModule::run_()
     gameStateInput.latch();
     // ballInput.latch();
     resetInput[0].latch();
-    // resetInput[1].latch();
+    resetInput[1].latch();
 #endif
 
     update();

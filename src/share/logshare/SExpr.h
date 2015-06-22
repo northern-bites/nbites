@@ -18,6 +18,28 @@
 
 namespace nblog {
     
+    //Top-level keys
+    const std::string LOG_FIRST_ATOM_S = "nblog";
+    const std::string LOG_CONTENTS_S = "contents";
+    const std::string LOG_CREATED_S = "created";
+    const std::string LOG_VERSION_S = "version";
+    const std::string LOG_CHECKSUM_S = "checksum";
+    const std::string LOG_HOST_TYPE_S = "host_type";
+    const std::string LOG_FROM_ADDR_S = "from_address";
+    
+    //content item keys
+    const std::string CONTENT_TYPE_S = "type";
+    const std::string CONTENT_FROM_S = "from";
+    const std::string CONTENT_WHEN_S = "when";
+    const std::string CONTENT_IINDEX_S = "iindex";
+    const std::string CONTENT_NBYTES_S = "nbytes";
+    const std::string CONTENT_IMAGE_WIDTH_S = "width";
+    const std::string CONTENT_IMAGE_HEIGHT_S = "height";
+    const std::string CONTENT_IMAGE_ENCODING_S = "encoding";
+    
+    //command key
+    const std::string COMMAND_FIRST_ATOM_S = "command";
+    
     typedef enum {
         SEXPR_ATOM,
         SEXPR_LIST,
@@ -60,6 +82,10 @@ namespace nblog {
         
         //key double value for use in log_main.
         SExpr(const std::string& key, int index, int cval);
+
+        // key double value for use by camera parameters (VisionModule)
+        SExpr(const std::string& key, double roll, double pitch);
+
         
         /**** factory methods to stack */
         

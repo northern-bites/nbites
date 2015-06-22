@@ -1,4 +1,4 @@
-package nbtool.gui.logviews.misc;
+package nbtool.gui.logviews.images;
 
 import java.awt.Graphics;
 import java.awt.Dimension;
@@ -17,15 +17,19 @@ import javax.swing.event.ChangeListener;
 
 import nbtool.data.Log;
 import nbtool.data.SExpr;
+import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.io.CrossIO;
 import nbtool.io.CrossIO.CrossCall;
 import nbtool.io.CrossIO.CrossFunc;
 import nbtool.io.CrossIO.CrossInstance;
-import nbtool.util.Utility;
 
-public class ImageConverterView extends ViewParent implements IOFirstResponder {
+import nbtool.util.Utility;
+import java.util.Vector;
+
+
+public class FrontEndView extends ViewParent implements IOFirstResponder {
 
     // FrontEnd output images 
     private BufferedImage yImage;
@@ -69,9 +73,9 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
 
     final double wPrecision = 200.0;
     final double gPrecision = 300.0;
-    final double oPrecision = 100.0;
+    final double oPrecision = 200.0;
 
-    public ImageConverterView() {
+    public FrontEndView() {
         super();
         firstLoad = true;
 
@@ -165,8 +169,25 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
     @Override
     public void setLog(Log newlog) {
         log = newlog;
-        width =  log.tree().get(4).get(1).get(5).get(1).valueAsInt() / 2;
-        height = log.tree().get(4).get(1).get(6).get(1).valueAsInt() / 2;
+
+        Vector<SExpr> vec = log.tree().recursiveFind("width");
+        if (vec.size() > 0) {
+            SExpr w = vec.get(vec.size()-1);
+            width =  w.get(1).valueAsInt() / 2;
+        } else {
+            System.out.printf("COULD NOT READ WIDTH FROM LOG DESC\n");
+            width = 320;
+        }
+
+        vec = log.tree().recursiveFind("height");
+        if (vec.size() > 0) {
+            SExpr h = vec.get(vec.size()-1);
+            height = h.get(1).valueAsInt() / 2;
+        } else {
+            System.out.printf("COULD NOT READ HEIGHT FROM LOG DESC\n");
+            height = 240;
+        }
+
         callNBFunction();
     }
     @Override
@@ -288,6 +309,8 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
         int tB = 20; // text buffer
         int lB = 5;  // little buffer
 
+        if (width < 320) vB = 160;
+
         // Draw five output image
         if (whiteImage != null) {
             g.drawImage(whiteImage, 0, 0, null);
@@ -307,26 +330,26 @@ public class ImageConverterView extends ViewParent implements IOFirstResponder {
 
         // TODO fix slider glitch
         // Draw 18 sliders
-        wDarkU. setBounds(width*0 + vB*1, height + sH*0 + tB*1, width - vB*2, sH);
-        wDarkV. setBounds(width*0 + vB*1, height + sH*1 + tB*1, width - vB*2, sH);
-        wLightU.setBounds(width*0 + vB*1, height + sH*2 + tB*2, width - vB*2, sH);
-        wLightV.setBounds(width*0 + vB*1, height + sH*3 + tB*2, width - vB*2, sH);
-        wFuzzyU.setBounds(width*0 + vB*1, height + sH*4 + tB*3, width - vB*2, sH);
-        wFuzzyV.setBounds(width*0 + vB*1, height + sH*5 + tB*3, width - vB*2, sH);
+        wDarkU. setBounds(width*0 + vB*0 + lB, height + sH*0 + tB*1, width - lB*2, sH);
+        wDarkV. setBounds(width*0 + vB*0 + lB, height + sH*1 + tB*1, width - lB*2, sH);
+        wLightU.setBounds(width*0 + vB*0 + lB, height + sH*2 + tB*2, width - lB*2, sH);
+        wLightV.setBounds(width*0 + vB*0 + lB, height + sH*3 + tB*2, width - lB*2, sH);
+        wFuzzyU.setBounds(width*0 + vB*0 + lB, height + sH*4 + tB*3, width - lB*2, sH);
+        wFuzzyV.setBounds(width*0 + vB*0 + lB, height + sH*5 + tB*3, width - lB*2, sH);
 
-        gDarkU. setBounds(width*1 + vB*2, height + sH*0 + tB*1, width - vB*2, sH);
-        gDarkV. setBounds(width*1 + vB*2, height + sH*1 + tB*1, width - vB*2, sH);
-        gLightU.setBounds(width*1 + vB*2, height + sH*2 + tB*2, width - vB*2, sH);
-        gLightV.setBounds(width*1 + vB*2, height + sH*3 + tB*2, width - vB*2, sH);
-        gFuzzyU.setBounds(width*1 + vB*2, height + sH*4 + tB*3, width - vB*2, sH);
-        gFuzzyV.setBounds(width*1 + vB*2, height + sH*5 + tB*3, width - vB*2, sH);
+        gDarkU. setBounds(width*1 + vB*1 + lB, height + sH*0 + tB*1, width - lB*2, sH);
+        gDarkV. setBounds(width*1 + vB*1 + lB, height + sH*1 + tB*1, width - lB*2, sH);
+        gLightU.setBounds(width*1 + vB*1 + lB, height + sH*2 + tB*2, width - lB*2, sH);
+        gLightV.setBounds(width*1 + vB*1 + lB, height + sH*3 + tB*2, width - lB*2, sH);
+        gFuzzyU.setBounds(width*1 + vB*1 + lB, height + sH*4 + tB*3, width - lB*2, sH);
+        gFuzzyV.setBounds(width*1 + vB*1 + lB, height + sH*5 + tB*3, width - lB*2, sH);
 
-        oDarkU. setBounds(width*2 + vB*3, height + sH*0 + tB*1, width - vB*2, sH);
-        oDarkV. setBounds(width*2 + vB*3, height + sH*1 + tB*1, width - vB*2, sH);
-        oLightU.setBounds(width*2 + vB*3, height + sH*2 + tB*2, width - vB*2, sH);
-        oLightV.setBounds(width*2 + vB*3, height + sH*3 + tB*2, width - vB*2, sH);
-        oFuzzyU.setBounds(width*2 + vB*3, height + sH*4 + tB*3, width - vB*2, sH);
-        oFuzzyV.setBounds(width*2 + vB*3, height + sH*5 + tB*3, width - vB*2, sH);
+        oDarkU. setBounds(width*2 + vB*2 + lB, height + sH*0 + tB*1, width - lB*2, sH);
+        oDarkV. setBounds(width*2 + vB*2 + lB, height + sH*1 + tB*1, width - lB*2, sH);
+        oLightU.setBounds(width*2 + vB*2 + lB, height + sH*2 + tB*2, width - lB*2, sH);
+        oLightV.setBounds(width*2 + vB*2 + lB, height + sH*3 + tB*2, width - lB*2, sH);
+        oFuzzyU.setBounds(width*2 + vB*2 + lB, height + sH*4 + tB*3, width - lB*2, sH);
+        oFuzzyV.setBounds(width*2 + vB*2 + lB, height + sH*5 + tB*3, width - lB*2, sH);
 
         // Draw help text
         g.drawString("white U and V thresholds for when Y is 0",    width*0 + tB*0, height + tB*1 + sH*0 - lB);

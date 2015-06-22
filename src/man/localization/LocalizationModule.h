@@ -42,7 +42,7 @@ public:
     /** In Portals **/
     portals::InPortal<messages::RobotLocation> motionInput;
     portals::InPortal<messages::FieldLines>    visionInput;
-    portals::InPortal<messages::RobotLocation> resetInput[1];
+    portals::InPortal<messages::RobotLocation> resetInput[2];
     portals::InPortal<messages::GameState>     gameStateInput;
     // portals::InPortal<messages::FilteredBall>  ballInput;
 

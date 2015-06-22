@@ -1,9 +1,11 @@
 /**
  * @brief A class responsible for maintaing knowedge of lines on the field
- *        and comparing projectinos and observations
+ *        and comparing projections and observations.
  *
  * @author EJ Googins <egoogins@bowdoin.edu>
  * @date   June 2013
+ * @author Josh Imhoff <joshimhoff13@gmail.com>
+ * @date   June 2015
  */
 
 #pragma once
@@ -21,7 +23,8 @@ enum class LocLineID {
     NotMatched,
     OurEndline,
     TheirEndline,
-    Midline,
+    OurMidline,
+    TheirMidline,
     OurTopGoalbox,
     TheirTopGoalbox,
     RightSideline,

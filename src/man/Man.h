@@ -42,6 +42,7 @@ private:
 
     ParamReader param;
     int playerNum, teamNum;
+    std::string robotName;
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
     jointenactor::JointEnactorModule jointEnactor;

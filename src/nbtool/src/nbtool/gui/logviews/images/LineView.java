@@ -176,10 +176,10 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 y2 = (int) Math.round(y0 + 3*fcEP1 * Math.cos(fcT));
 
                 // Scale down if a line is outside the view, but not if its too far (false field line)
-                if (y1 < 0 && y1 > -2500) {
+                if (y1 < 0 && y1 > -2000) {
                     resize = Math.min(resize, (double)fieldh/(-y1 + fieldh));
                 }
-                if (y2 < 0 && y2 > -2500) {
+                if (y2 < 0 && y2 > -2000) {
                     resize = Math.min(resize, (double)fieldh/(-y2 + fieldh));
                 }
 
@@ -191,6 +191,10 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 //     lines.set(i+4, -1.0);
                 // }
             }
+            /*
+                std::cout << "Width: " << width << " Height: " << height << std::endl;
+            
+            */
 
             // Loop through again to draw lines in field space with calucluated resize value
             for (int i = 0; i < lines.size(); i += 10) {
@@ -318,8 +322,8 @@ public class LineView extends ViewParent implements IOFirstResponder {
         }
     }
 
-	@Override
-	public boolean ioMayRespondOnCenterThread(IOInstance inst) {
-		return false;
-	}
+    @Override
+    public boolean ioMayRespondOnCenterThread(IOInstance inst) {
+        return false;
+    }
 }

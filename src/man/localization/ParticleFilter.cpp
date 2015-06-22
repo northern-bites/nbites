@@ -443,7 +443,7 @@ void ParticleFilter::resample()
     if (true)
     {
         // std::cout << "LOST AND BAD FRAME" << std::endl;
-        std::list<ReconstructedLocation> reconLocs = visionSystem->getReconstructedLocations();
+        const std::list<ReconstructedLocation>& reconLocs = visionSystem->getInjections();
         std::list<ReconstructedLocation>::const_iterator recLocIt;
         for (recLocIt = reconLocs.begin();
              recLocIt != reconLocs.end();
@@ -451,7 +451,6 @@ void ParticleFilter::resample()
         {
             // std::cout << "ITER RECONSTRUCT" << std::endl;
             // If the reconstructions is on the same side and not near midfield
-            // TODO sanity check particle is on field
             if ( ((*recLocIt).defSide == onDefendingSide())
                  && (fabs((*recLocIt).x - CENTER_FIELD_X) > 50)) {
                      // std::cout << "Use reconstruction " << (*recLocIt).x << " " << (*recLocIt).y << " " << (*recLocIt).h << std::endl;

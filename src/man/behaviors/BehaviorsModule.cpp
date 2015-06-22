@@ -231,11 +231,11 @@ void BehaviorsModule::prepareMessages()
     // visionRobotIn.latch();
     // pyInterface.setVisionRobot_ptr(&visionRobotIn.message());
 
-    // sharedBallIn.latch();
-    // pyInterface.setSharedBall_ptr(&sharedBallIn.message());
+    sharedBallIn.latch();
+    pyInterface.setSharedBall_ptr(&sharedBallIn.message());
 
-    // sharedFlipIn.latch();
-    // pyInterface.setSharedFlip_ptr(&sharedFlipIn.message());
+    sharedFlipIn.latch();
+    pyInterface.setSharedFlip_ptr(&sharedFlipIn.message());
 
     filteredBallIn.latch();
     pyInterface.setFilteredBall_ptr(&filteredBallIn.message());

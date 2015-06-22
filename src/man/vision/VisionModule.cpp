@@ -2,7 +2,10 @@
 #include "Edge.h"
 #include "HighResTimer.h"
 #include "NBMath.h"
+#include "../control/control.h"
+#include "../log/logging.h"
 
+#include <fstream>
 #include <iostream>
 #include <fstream>
 #include <chrono>
@@ -14,7 +17,7 @@
 namespace man {
 namespace vision {
 
-VisionModule::VisionModule(int wd, int ht)
+VisionModule::VisionModule(int wd, int ht, std::string robotName)
     : Module(),
       topIn(),
       bottomIn(),
@@ -25,28 +28,19 @@ VisionModule::VisionModule(int wd, int ht)
       ballOnCount(0),
       ballOffCount(0)
 {
-    std::string sexpPath;
-#ifdef OFFLINE
-    sexpPath = std::string(getenv("NBITES_DIR"));
-    sexpPath += "/src/man/config/colorParams.txt";
-#else
-    sexpPath = "/home/nao/nbites/Config/colorParams.txt"; // TODO check this
-#endif
-    std::ifstream textFile;
-    textFile.open(sexpPath.c_str());
-
-    // Get size of file
-    textFile.seekg (0, textFile.end);
-    long size = textFile.tellg();
-    textFile.seekg(0);
-
-    // Read file into buffer and convert to string
-    char* buff = new char[size];
-    textFile.read(buff, size);
-    std::string sexpText(buff);
+    std:: string colorPath, calibrationPath;
+    #ifdef OFFLINE
+        colorPath =  calibrationPath = std::string(getenv("NBITES_DIR"));
+        colorPath += "/src/man/config/colorParams.txt";
+        calibrationPath += "/src/man/config/calibrationParams.txt";
+    #else
+        colorPath = "/home/nao/nbites/Config/colorParams.txt";
+        calibrationPath = "/home/nao/nbites/Config/calibrationParams.txt";
+    #endif
 
     // Get SExpr from string
-    nblog::SExpr* colors = nblog::SExpr::read((const std::string)sexpText);
+    nblog::SExpr* colors = nblog::SExpr::read(getStringFromTxtFile(colorPath));
+    calibrationLisp = nblog::SExpr::read(getStringFromTxtFile(calibrationPath));
 
     // Set module pointers for top then bottom images
     // NOTE Constructed on heap because some of the objects below do
@@ -60,13 +54,13 @@ VisionModule::VisionModule(int wd, int ht)
         edgeDetector[i] = new EdgeDetector();
         edges[i] = new EdgeList(32000);
         houghLines[i] = new HoughLineList(128);
+        calibrationParams[i] = new CalibrationParams();
         kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography(i == 0);
         fieldLines[i] = new FieldLineList();
         ballDetector[i] = new BallDetector(homography[i], i == 0);
         boxDetector[i] = new GoalboxDetector();
 
-        // TODO set width and height dynamically
         if (i == 0) {
           hough[i] = new HoughSpace(wd / 2, ht / 2);
           cornerDetector[i] = new CornerDetector(wd / 2, ht / 2);
@@ -75,12 +69,12 @@ VisionModule::VisionModule(int wd, int ht)
           cornerDetector[i] = new CornerDetector(wd / 4, ht / 4);
         }
 
-        // TODO flag
         bool fast = true;
         frontEnd[i]->fast(fast);
         edgeDetector[i]->fast(fast);
         hough[i]->fast(fast);
     }
+    setCalibrationParams(robotName);
 }
 
 VisionModule::~VisionModule()
@@ -92,6 +86,7 @@ VisionModule::~VisionModule()
         delete edges[i];
         delete houghLines[i];
         delete hough[i];
+        delete calibrationParams[i];
         delete kinematics[i];
         delete homography[i];
         delete fieldLines[i];
@@ -105,16 +100,11 @@ void VisionModule::run_()
     topIn.latch();
     bottomIn.latch();
     jointsIn.latch();
+    inertsIn.latch();
 
     // Setup
     std::vector<const messages::YUVImage*> images { &topIn.message(),
                                                     &bottomIn.message() };
-
-    // Time vision module
-    double topTimes[6];
-    double bottomTimes[6];
-    double* times[2] = { topTimes, bottomTimes };
-
     bool ballDetected = false;
 
     // Loop over top and bottom image and run line detection system
@@ -128,15 +118,11 @@ void VisionModule::run_()
                         image->rowPitch(),
                         image->pixelAddress(0, 0));
 
-        HighResTimer timer;
-
         // Run front end
         frontEnd[i]->run(yuvLite, colorParams[i]);
         ImageLiteU16 yImage(frontEnd[i]->yImage());
         ImageLiteU8 greenImage(frontEnd[i]->greenImage());
         ImageLiteU8 orangeImage(frontEnd[i]->orangeImage());
-
-        times[i][0] = timer.end();
 
         // Calculate kinematics and adjust homography
         if (jointsIn.message().has_head_yaw()) {
@@ -144,7 +130,8 @@ void VisionModule::run_()
             homography[i]->wx0(kinematics[i]->wx0());
             homography[i]->wy0(kinematics[i]->wy0());
             homography[i]->wz0(kinematics[i]->wz0());
-            homography[i]->tilt(kinematics[i]->tilt());
+            homography[i]->roll(calibrationParams[i]->getRoll());
+            homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt());
 #ifndef OFFLINE
             homography[i]->azimuth(kinematics[i]->azimuth());
 #endif
@@ -153,56 +140,209 @@ void VisionModule::run_()
         // Approximate brightness gradient
         edgeDetector[i]->gradient(yImage);
         
-        times[i][1] = timer.end();
-
         // Run edge detection
         edgeDetector[i]->edgeDetect(greenImage, *(edges[i]));
 
-        times[i][2] = timer.end();
-
         // Run hough line detection
         hough[i]->run(*(edges[i]), *(houghLines[i]));
-
-        times[i][3] = timer.end();
 
         // Find field lines
         houghLines[i]->mapToField(*(homography[i]));
         fieldLines[i]->find(*(houghLines[i]));
 
-        times[i][4] = timer.end();
-
         // Classify field lines
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
-
-        times[i][5] = timer.end();
 
         if (!ballDetected) {
             ballDetected = ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
         }
-
-        times[i][6] = timer.end();
     }
 
-    ballOn = ballDetected;
+// TODO move to logImage
+#ifdef USE_LOGGING
+    if (getenv("LOG_THIS") != NULL) {
+        if (strcmp(getenv("LOG_THIS"), std::string("top").c_str()) == 0) {
+            logImage(0);
+            setenv("LOG_THIS", "false", 1);
+            std::cerr << "pCal logging top log\n";
+        } else if (strcmp(getenv("LOG_THIS"), std::string("bottom").c_str()) == 0) {
+            logImage(1);
+            setenv("LOG_THIS", "false", 1);
+            std::cerr << "pCal logging bot log\n";
+        }// else
+           // std::cerr << "N "; 
+    } else {
+        logImage(0);
+        logImage(1);
+    }
+#endif
 
     // Send messages on outportals
     sendLinesOut();
+    ballOn = ballDetected;
     updateVisionBall();
+}
 
-    for (int i = 0; i < 2; i++) {
-        break;
-        if (i == 0)
-            std::cout << "From top camera:" << std::endl;
-        else
-            std::cout << std::endl << "From bottom camera:" << std::endl;
-        std::cout << "Front end: " << times[i][0] << std::endl;
-        std::cout << "Gradient: " << times[i][1] << std::endl;
-        std::cout << "Edge detection: " << times[i][2] << std::endl;
-        std::cout << "Hough: " << times[i][3] << std::endl;
-        std::cout << "Field lines detection: " << times[i][4] << std::endl;
-        std::cout << "Field lines classification: " << times[i][5] << std::endl;
-        std::cout << "Ball: " << times[i][6] << std::endl;
+void VisionModule::logImage(int i) 
+{
+    std::string t = "true";
+
+    if (control::flags[control::tripoint]) {
+        ++image_index;
+        
+        messages::YUVImage image;
+        std::string image_from;
+        if (!i) {
+            image = topIn.message();
+            image_from = "camera_TOP";
+        } else {
+            image = bottomIn.message();
+            image_from = "camera_BOT";
+        }
+        
+        long im_size = (image.width() * image.height() * 1);
+        int im_width = image.width() / 2;
+        int im_height= image.height();
+        
+        messages::JointAngles ja_pb = jointsIn.message();
+        messages::InertialState is_pb = inertsIn.message();
+        
+        std::string ja_buf;
+        std::string is_buf;
+        std::string im_buf((char *) image.pixelAddress(0, 0), im_size);
+        ja_pb.SerializeToString(&ja_buf);
+        is_pb.SerializeToString(&is_buf);
+        
+        im_buf.append(is_buf);
+        im_buf.append(ja_buf);
+        
+        std::vector<nblog::SExpr> contents;
+        
+        nblog::SExpr imageinfo("YUVImage", image_from, clock(), image_index, im_size);
+        imageinfo.append(nblog::SExpr("width", im_width)   );
+        imageinfo.append(nblog::SExpr("height", im_height) );
+        imageinfo.append(nblog::SExpr("encoding", "[Y8(U8/V8)]"));
+        contents.push_back(imageinfo);
+        
+        nblog::SExpr inerts("InertialState", "tripoint", clock(), image_index, is_buf.length());
+        inerts.append(nblog::SExpr("acc_x", is_pb.acc_x()));
+        inerts.append(nblog::SExpr("acc_y", is_pb.acc_y()));
+        inerts.append(nblog::SExpr("acc_z", is_pb.acc_z()));
+        
+        inerts.append(nblog::SExpr("gyr_x", is_pb.gyr_x()));
+        inerts.append(nblog::SExpr("gyr_y", is_pb.gyr_y()));
+        
+        inerts.append(nblog::SExpr("angle_x", is_pb.angle_x()));
+        inerts.append(nblog::SExpr("angle_y", is_pb.angle_y()));
+        contents.push_back(inerts);
+        
+        nblog::SExpr joints("JointAngles", "tripoint", clock(), image_index, ja_buf.length());
+        joints.append(nblog::SExpr("head_yaw", ja_pb.head_yaw()));
+        joints.append(nblog::SExpr("head_pitch", ja_pb.head_pitch()));
+
+        joints.append(nblog::SExpr("l_shoulder_pitch", ja_pb.l_shoulder_pitch()));
+        joints.append(nblog::SExpr("l_shoulder_roll", ja_pb.l_shoulder_roll()));
+        joints.append(nblog::SExpr("l_elbow_yaw", ja_pb.l_elbow_yaw()));
+        joints.append(nblog::SExpr("l_elbow_roll", ja_pb.l_elbow_roll()));
+        joints.append(nblog::SExpr("l_wrist_yaw", ja_pb.l_wrist_yaw()));
+        joints.append(nblog::SExpr("l_hand", ja_pb.l_hand()));
+
+        joints.append(nblog::SExpr("r_shoulder_pitch", ja_pb.r_shoulder_pitch()));
+        joints.append(nblog::SExpr("r_shoulder_roll", ja_pb.r_shoulder_roll()));
+        joints.append(nblog::SExpr("r_elbow_yaw", ja_pb.r_elbow_yaw()));
+        joints.append(nblog::SExpr("r_elbow_roll", ja_pb.r_elbow_roll()));
+        joints.append(nblog::SExpr("r_wrist_yaw", ja_pb.r_wrist_yaw()));
+        joints.append(nblog::SExpr("r_hand", ja_pb.r_hand()));
+
+        joints.append(nblog::SExpr("l_hip_yaw_pitch", ja_pb.l_hip_yaw_pitch()));
+        joints.append(nblog::SExpr("r_hip_yaw_pitch", ja_pb.r_hip_yaw_pitch()));
+
+        joints.append(nblog::SExpr("l_hip_roll", ja_pb.l_hip_roll()));
+        joints.append(nblog::SExpr("l_hip_pitch", ja_pb.l_hip_pitch()));
+        joints.append(nblog::SExpr("l_knee_pitch", ja_pb.l_knee_pitch()));
+        joints.append(nblog::SExpr("l_ankle_pitch", ja_pb.l_ankle_pitch()));
+        joints.append(nblog::SExpr("l_ankle_roll", ja_pb.l_ankle_roll()));
+
+        joints.append(nblog::SExpr("r_hip_roll", ja_pb.r_hip_roll() ));
+        joints.append(nblog::SExpr("r_hip_pitch", ja_pb.r_hip_pitch() ));
+        joints.append(nblog::SExpr("r_knee_pitch", ja_pb.r_knee_pitch() ));
+        joints.append(nblog::SExpr("r_ankle_pitch", ja_pb.r_ankle_pitch() ));
+        joints.append(nblog::SExpr("r_ankle_roll", ja_pb.r_ankle_roll() ));
+        contents.push_back(joints);
+
+        nblog::SExpr cal("CalibrationParams", "tripoint", clock(), image_index, 0);
+        cal.append(nblog::SExpr(image_from, calibrationParams[i]->getRoll(), calibrationParams[i]->getTilt()));
+        contents.push_back(cal);
+
+        nblog::NBLog(NBL_IMAGE_BUFFER, "tripoint", contents, im_buf);
     }
+}
+
+void VisionModule::sendLinesOut()
+{
+    // Mark repeat lines (already found in bottom camera) in top camera
+    for (int i = 0; i < fieldLines[0]->size(); i++) {
+        for (int j = 0; j < fieldLines[1]->size(); j++) {
+            FieldLine& topField = (*(fieldLines[0]))[i];
+            FieldLine& botField = (*(fieldLines[1]))[j];
+            for (int k = 0; k < 2; k++) {
+                const GeoLine& topGeo = topField[k].field();
+                const GeoLine& botGeo = botField[k].field();
+                if (topGeo.error(botGeo) < 0.3) // TODO constant
+                    (*(fieldLines[0]))[i].repeat(true);
+            }
+        }
+    }
+
+    // Outportal results
+    // NOTE repeats are not outportaled
+    messages::FieldLines pLines;
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < fieldLines[i]->size(); j++) {
+            messages::FieldLine* pLine = pLines.add_line();
+            FieldLine& line = (*(fieldLines[i]))[j];
+            if (line.repeat()) continue;
+
+            for (int k = 0; k < 2; k++) {
+                messages::HoughLine pHough;
+                HoughLine& hough = line[k];
+
+                pHough.set_r(hough.field().r());
+                pHough.set_t(hough.field().t());
+                pHough.set_ep0(hough.field().ep0());
+                pHough.set_ep1(hough.field().ep1());
+
+                if (hough.field().r() < 0)
+                    pLine->mutable_outer()->CopyFrom(pHough);
+                else
+                    pLine->mutable_inner()->CopyFrom(pHough);
+            }
+
+            pLine->set_id(static_cast<int>(line.id()));
+        }
+    }
+
+    portals::Message<messages::FieldLines> linesOutMessage(&pLines);
+    linesOut.setMessage(linesOutMessage);
+}
+
+const std::string VisionModule::getStringFromTxtFile(std::string path) 
+{
+    std::ifstream textFile;
+    textFile.open(path);
+
+    // Get size of file
+    textFile.seekg (0, textFile.end);
+    long size = textFile.tellg();
+    textFile.seekg(0);
+    
+    // Read file into buffer and convert to string
+    char* buff = new char[size];
+    textFile.read(buff, size);
+    std::string sexpText(buff);
+
+    textFile.close();
+    return (const std::string)sexpText;
 }
 
 /*
@@ -210,7 +350,8 @@ void VisionModule::run_()
   load the three compoenets of a Colors struct, white, green, and orange,
   from the 18 values for either the top or bottom image. 
 */
-Colors* VisionModule::getColorsFromLisp(nblog::SExpr* colors, int camera) {
+Colors* VisionModule::getColorsFromLisp(nblog::SExpr* colors, int camera) 
+{
     Colors* ret = new man::vision::Colors;
     nblog::SExpr* params;
 
@@ -224,7 +365,6 @@ Colors* VisionModule::getColorsFromLisp(nblog::SExpr* colors, int camera) {
 
     colors = params->get(0)->get(1);
 
-    
     ret->white. load(std::stof(colors->get(0)->get(1)->serialize()),
                      std::stof(colors->get(1)->get(1)->serialize()),
                      std::stof(colors->get(2)->get(1)->serialize()),
@@ -306,52 +446,34 @@ void VisionModule::updateVisionBall()
     ballOut.setMessage(ball_message);
 }
 
-void VisionModule::sendLinesOut()
+void VisionModule::setCalibrationParams(std::string robotName) 
 {
-    // Mark repeat lines (already found in bottom camera) in top camera
-    for (int i = 0; i < fieldLines[0]->size(); i++) {
-        for (int j = 0; j < fieldLines[1]->size(); j++) {
-            FieldLine& topField = (*(fieldLines[0]))[i];
-            FieldLine& botField = (*(fieldLines[1]))[j];
-            for (int k = 0; k < 2; k++) {
-                const GeoLine& topGeo = topField[k].field();
-                const GeoLine& botGeo = botField[k].field();
-                if (topGeo.error(botGeo) < 0.3) // TODO constant
-                    (*(fieldLines[0]))[i].repeat(true);
-            }
-        }
+    setCalibrationParams(0, robotName);
+    setCalibrationParams(1, robotName);
+}
+
+void VisionModule::setCalibrationParams(int camera, std::string robotName) 
+{
+    if (std::string::npos != robotName.find(".local")) {
+        robotName.resize(robotName.find("."));
+        if (robotName == "she-hulk")
+            robotName = "shehulk";
     }
-
-    // Outportal results
-    // NOTE repeats are not outportaled
-    messages::FieldLines pLines;
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < fieldLines[i]->size(); j++) {
-            messages::FieldLine* pLine = pLines.add_line();
-            FieldLine& line = (*(fieldLines[i]))[j];
-            if (line.repeat()) continue;
-
-            for (int k = 0; k < 2; k++) {
-                messages::HoughLine pHough;
-                HoughLine& hough = line[k];
-
-                pHough.set_r(hough.field().r());
-                pHough.set_t(hough.field().t());
-                pHough.set_ep0(hough.field().ep0());
-                pHough.set_ep1(hough.field().ep1());
-
-                if (hough.field().r() < 0)
-                    pLine->mutable_outer()->CopyFrom(pHough);
-                else
-                    pLine->mutable_inner()->CopyFrom(pHough);
-            }
-
-            pLine->set_id(static_cast<int>(line.id()));
-        }
+    if (robotName == "") {
+        return;
     }
+    
+    nblog::SExpr* robot = calibrationLisp->get(1)->find(robotName);
 
-    portals::Message<messages::FieldLines> linesOutMessage(&pLines);
-    linesOut.setMessage(linesOutMessage);
+    if (robot != NULL) {
+        std::string cam = camera == 0 ? "top" : "bottom";
+        double roll =  robot->find(cam)->get(1)->valueAsDouble();
+        double tilt = robot->find(cam)->get(2)->valueAsDouble();
+        calibrationParams[camera] = new CalibrationParams(roll, tilt);
+
+        std::cerr << "Found and set calibration params for " << robotName;
+        std::cerr << "Roll: " << roll << " Tilt: " << tilt << std::endl;
+    }
 }
 
 }
