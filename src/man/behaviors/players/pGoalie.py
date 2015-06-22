@@ -310,13 +310,18 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         GoalieStates.watchWithLineChecks.transitions = {
             Transition.CountTransition(GoalieTransitions.frontLineCheckShouldReposition,
                                        Transition.SOME_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
+                                       Transition.LOW_PRECISION)
             : GoalieStates.lineCheckReposition,
 
             Transition.CountTransition(GoalieTransitions.sideLineCheckShouldReposition,
-                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OCCASIONALLY,
                                        Transition.LOW_PRECISION)
-            : GoalieStates.lineCheckReposition
+            : GoalieStates.lineCheckReposition,
+
+            Transition.CountTransition(GoalieTransitions.shouldTurn,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : GoalieStates.lineCheckTurn
         }
 
         GoalieStates.lineCheckReposition.transitions = {

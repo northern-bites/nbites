@@ -162,20 +162,30 @@ def standStill(player):
 
 # -----------------------------------------------
 # NEW VISION
+
 @superState('gameControllerResponder')
 def watchWithLineChecks(player):
     if player.firstFrame():
         watchWithLineChecks.lines[:] = []
         player.homeDirections = []
 
-        player.brain.tracker.performBasicPan()
-        watchWithLineChecks.recordingLines = True
+        if player.lastDiffState is not 'lineCheckReposition' \
+        and player.lastDiffState is not 'lineCheckTurn':
+            print "My facing is not necessarily correct! I'm checking"
+            watchWithLineChecks.correctFacing = False
+            watchWithLineChecks.numFixes = 0
+            watchWithLineChecks.numTurns = 0
+        elif player.lastDiffState is 'lineCheckTurn':
+            print "I think I have correct facing now..."
+            watchWithLineChecks.correctFacing = True
+            watchWithLineChecks.numTurns += 1
+        else:
+            watchWithLineChecks.numFixes += 1
+
+        player.brain.tracker.repeatBasicPan()
         player.brain.nav.stand()
         player.returningFromPenalty = False
 
-    if player.brain.tracker.isStopped:
-        watchWithLineChecks.recordingLines = False
-        player.brain.tracker.repeatBasicPan()
 
     return Transition.getNextState(player, watchWithLineChecks)
 
@@ -183,6 +193,18 @@ watchWithLineChecks.lines = []
 
 @superState('gameControllerResponder')
 def lineCheckReposition(player):
+    if player.firstFrame():
+        player.brain.tracker.repeatBasicPan()
+        dest = average(player.homeDirections)
+        print "My home directions: "
+        print dest
+        player.brain.nav.walkTo(dest)
+
+    return Transition.getNextState(player, lineCheckReposition)
+
+
+@superState('gameControllerResponder')
+def lineCheckTurn(player):
     if player.firstFrame():
         player.brain.tracker.repeatBasicPan()
         dest = average(player.homeDirections)

@@ -13,12 +13,15 @@ from objects import RelRobotLocation
 
 # New vision system visual goalie
 def getLines(player):
-    # if not GoalieStates.watchWithLineChecks.recordingLines:
-    #     return
     visionLines = player.brain.visionLines
+    # Add in checks to not add repeat lines?
 
     for i in range(0, visionLines.line_size()):
         GoalieStates.watchWithLineChecks.lines.append(visionLines.line(i).inner)
+
+    if len(GoalieStates.watchWithLineChecks.lines) > constants.MEM_THRESH:
+        GoalieStates.watchWithLineChecks.lines = GoalieStates.watchWithLineChecks.lines[1:]
+
         # r = line.inner.r
         # t = line.inner.t
         # x0 = r * math.cos(t)
@@ -28,22 +31,25 @@ def getLines(player):
         # x2 = x0 + line.inner.eP1 * math.sin(t)
         # y2 = y0 + -line.inner.eP1 * math.cos(t)
 
-def getFrontLine(player):
-    # Assume facing forward
-    for line in GoalieStates.watchWithLineChecks.lines:
-        r = line.r
-        t = line.t
-        # Assumptions: facing forward
-        # If have good t value and bad r value, reposition accordingly
-        if math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH \
-        and math.fabs(r - constants.EXPECTED_FRONT_LINE_R) < constants.R_THRESH:
-            return line
+# def getFrontLine(player):
+#     # Assume facing forward
+#     for line in GoalieStates.watchWithLineChecks.lines:
+#         r = line.r
+#         t = line.t
+#         # Assumptions: facing forward
+#         # If have good t value and bad r value, reposition accordingly
+#         if math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH \
+#         and math.fabs(r - constants.EXPECTED_FRONT_LINE_R) < constants.R_THRESH:
+#             return line
 
 def frontLineCheckShouldReposition(player):
     getLines(player)
     x_dest = 0.0
     y_dest = 0.0
     h_dest = 0.0
+
+    if GoalieStates.watchWithLineChecks.correctFacing == False:
+        return False
 
     for line in GoalieStates.watchWithLineChecks.lines:
         r = line.r
@@ -64,6 +70,9 @@ def frontLineCheckShouldReposition(player):
             player.homeDirections += [RelRobotLocation(x_dest, y_dest, h_dest)]
             return True
 
+    if len(player.homeDirections) > constants.BUFFER_THRESH:
+        player.homeDirections = player.homeDirections[1:]
+
     return False
 
 
@@ -71,6 +80,9 @@ def sideLineCheckShouldReposition(player):
     x_dest = 0.0
     y_dest = 0.0
     h_dest = 0.0
+
+    if GoalieStates.watchWithLineChecks.correctFacing == False:
+        return False
 
     for line in GoalieStates.watchWithLineChecks.lines:
         r = line.r
@@ -84,8 +96,8 @@ def sideLineCheckShouldReposition(player):
         and r < 170.0:
             y_dest = constants.EXPECTED_SIDE_LINE_R - r
             print "Right side was TRUE"
-            print y_dest
-            print r
+            print ("ydest: ", y_dest)
+            print ("r: ",r)
             player.homeDirections += [RelRobotLocation(x_dest, y_dest, h_dest)]
             return True
 
@@ -96,9 +108,47 @@ def sideLineCheckShouldReposition(player):
         and r < 170.0:
             y_dest = r - constants.EXPECTED_SIDE_LINE_R
             print "Left side was TRUE"
-            print y_dest
-            print r
+            print ("ydest: ", y_dest)
+            print ("r: ",r)
             player.homeDirections += [RelRobotLocation(x_dest, y_dest, h_dest)]
+            return True
+
+    return False
+
+def shouldTurn(player):
+
+    if GoalieStates.watchWithLineChecks.numTurns > 0:
+        return False
+    h_dest = 0.0
+
+    for line in GoalieStates.watchWithLineChecks.lines:
+        r = line.r
+        t = math.degrees(line.t)
+
+        #Fix this..
+        if math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH:
+            h_dest = 0.0
+            print ("t: ", t)
+            print ("r: ", r)
+            return True
+
+        if math.fabs(t - constants.EXPECTED_RIGHT_LINE_T) < constants.T_THRESH \
+        or math.fabs(t - constants.EXPECTED_LEFT_LINE_T) < constants.T_THRESH \
+        or math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH \
+        or r > 100.0 or t == 0.0:
+            continue
+
+        # Assumptions: not facing forward....?
+        # Hopefully will find a line close by (r < 100) with an unusual t value
+        # and use the information to help correct itself
+        # Theoretically will usually be the long front line?
+        else:
+            h_dest = t - 90.0
+            player.homeDirections += [RelRobotLocation(0.0, 0.0, h_dest)]
+            print "Should turn was TRUE"
+            print ("hdest: ", h_dest)
+            print ("t was: ", t)
+            print ("r was:", r)
             return True
 
     return False
