@@ -44,7 +44,7 @@ public:
     messages::WorldModel        const * myWorldModel_ptr;
     messages::StiffStatus       const * stiffStatus_ptr;
     messages::FieldObstacles    const * obstacle_ptr;
-    messages::VisionObstacle    const * visionObstacle_ptr;
+    // messages::VisionObstacle    const * visionObstacle_ptr;
     messages::SharedBall        const * sharedBall_ptr;
     messages::RobotLocation     const * sharedFlip_ptr;
     messages::FieldLines     const * visionLines_ptr;
@@ -137,10 +137,10 @@ public:
     {
         obstacle_ptr = msg;
     }
-    void setVisionObstacle_ptr(const messages::VisionObstacle* msg)
-    {
-        visionObstacle_ptr = msg;
-    }
+    // void setVisionObstacle_ptr(const messages::VisionObstacle* msg)
+    // {
+    //     visionObstacle_ptr = msg;
+    // }
 
 };
 

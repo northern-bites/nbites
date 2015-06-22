@@ -26,6 +26,7 @@ def afterPenalty(player):
         
         # reset state specific counters
         afterPenalty.goalLeft = 0
+        afterPenalty.reset_loc = 0
 
     lines = player.brain.visionLines
 
@@ -35,7 +36,8 @@ def afterPenalty(player):
         if lines.line(i).id == 7:
             topGoalBox = lines.line(i).inner
             # Goalbox to the left = 1 else -1
-            toLeft = 1 if topGoalBox.t >= pi/2. else -1:
+            toLeft = 1 if topGoalBox.t >= pi/2. else -1
+            print toLeft
             afterPenalty.goalLeft += toLeft
 
     # If we've seen any landmark enough, reset localization.
@@ -56,6 +58,7 @@ def afterPenalty(player):
             print "Consensus reached! Resetting loc. Is the goal to our right? " + str(afterPenalty.goalLeft < 0)
         # Yes, when goal_right is less than 0, our goal is to our right.
         # It seems counter intuitive, but that's how it works. -Josh Z
+        print "GOAL IS TO LEFT", afterPenalty.goalLeft > 0
         player.brain.resetLocalizationFromPenalty(afterPenalty.goalLeft < 0)
         if not roleConstants.isGoalie(player.role):
             return player.goNow('walkOut')

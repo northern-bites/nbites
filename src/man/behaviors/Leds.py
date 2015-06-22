@@ -23,7 +23,7 @@ LED_ON = 1
 
 #The order here must match the order of the string defined in Lights.h
 # and in ALLedNames.h
-NUM_LED_GROUPS = 29
+NUM_LED_GROUPS = 26
 
 (LEFT_CALIBRATION_ONE_LED,
 LEFT_CALIBRATION_TWO_LED,
