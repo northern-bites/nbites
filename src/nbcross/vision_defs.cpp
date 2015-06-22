@@ -518,9 +518,6 @@ int Synthetics_func() {
     rets.push_back(log);
 }
 
-int Scratch_func() {}
-
-
 // Save the new color params to the colorParams.txt file
 void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top) {
     std::cout << "Saving params!" << std::endl;
@@ -636,46 +633,6 @@ SExpr treeFromBlob(man::vision::Blob& b)
     SExpr toRet = SExpr::list({center, area, count, len1, len2, ang1, ang2});
 
     return toRet;
-}
-
-int Synthetics_func() {
-    assert(args.size() == 1);
-
-    printf("Synthetics_func()\n");
-    
-    double x = std::stod(args[0]->tree().find("contents")->get(1)->find("params")->get(1)->value().c_str());
-    double y = std::stod(args[0]->tree().find("contents")->get(1)->find("params")->get(2)->value().c_str());
-    double h = std::stod(args[0]->tree().find("contents")->get(1)->find("params")->get(3)->value().c_str());
-    bool fullres = args[0]->tree().find("contents")->get(1)->find("params")->get(4)->value() == "true";
-    bool top = args[0]->tree().find("contents")->get(1)->find("params")->get(5)->value() == "true";
-
-    int wd = (fullres ? 320 : 160);
-    int ht = (fullres ? 240 : 120);
-    double flen = (fullres ? 544 : 272);
-
-    int size = wd*4*ht*2;
-    uint8_t* pixels = new uint8_t[size];
-    man::vision::YuvLite synthetic(wd, ht, wd*4, pixels);
-
-    man::vision::FieldHomography homography(top);
-    homography.wx0(x);
-    homography.wy0(y);
-    homography.azimuth(h*TO_RAD);
-    homography.flen(flen);
-
-    man::vision::syntheticField(synthetic, homography);
-
-    std::string sexpr("(nblog (version 6) (contents ((type YUVImage) (from camera_TOP) (nbytes ");
-    sexpr += std::to_string(size);
-    sexpr += ") (width " + std::to_string(2*wd);
-    sexpr += ") (height " + std::to_string(2*ht);
-    sexpr += ") (encoding \"[Y8(U8/V8)]\"))))";
-
-    Log* log = new Log(sexpr);
-    std::string buf((const char*)pixels, size);
-    log->setData(buf);
-
-    rets.push_back(log);
 }
 
 int Scratch_func() {}
