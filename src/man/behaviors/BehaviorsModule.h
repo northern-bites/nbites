@@ -82,8 +82,8 @@ public:
     portals::InPortal<messages::RobotLocation> odometryIn;
     portals::InPortal<messages::RobotLocation> localizationIn;
     portals::InPortal<messages::VisionBall> visionBallIn;
-    portals::InPortal<messages::FieldLines> visionFieldIn;
-    portals::InPortal<messages::VisionRobot> visionRobotIn;
+    // portals::InPortal<messages::FieldLines> visionFieldIn;
+    // portals::InPortal<messages::VisionRobot> visionRobotIn;
     portals::InPortal<messages::FilteredBall> filteredBallIn;
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::FallStatus> fallStatusIn;
@@ -91,9 +91,8 @@ public:
     // portals::InPortal<messages::FieldObstacles> obstacleIn;
     // portals::InPortal<messages::VisionObstacle> visionObstacleIn;
     portals::InPortal<messages::FieldLines> linesIn;
-
-    // portals::InPortal<messages::SharedBall> sharedBallIn;
-    // portals::InPortal<messages::RobotLocation> sharedFlipIn;
+    portals::InPortal<messages::SharedBall> sharedBallIn;
+    portals::InPortal<messages::RobotLocation> sharedFlipIn;
 
     portals::OutPortal<messages::LedCommand> ledCommandOut;
     portals::OutPortal<messages::MotionRequest> motionRequestOut;
