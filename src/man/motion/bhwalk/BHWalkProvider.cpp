@@ -123,8 +123,9 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     // reset. We will wait until we're recalibrated to walk.
     // NOTE currentMotionType and requestMotionType are of type MotionType enum 
     // defined in WalkingEngine.h
+    walkingEngine->instability.init();
     if (walkingEngine->currentMotionType == 0 && tryingToWalk &&
-        walkingEngine->instability.getAverageFloat() > 5.f && calibrated())
+        walkingEngine->instability.getAverageFloat() > 20.f && calibrated())
     {
         std::cout << "We are stuck! Recalibrating." << std::endl;
         walkingEngine->inertiaSensorCalibrator->reset();
@@ -294,6 +295,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
     bh_sensors.data[SensorDataBH::gyroX] = sensorInertials.gyr_x();
     bh_sensors.data[SensorDataBH::gyroY] = sensorInertials.gyr_y();
+    bh_sensors.data[SensorDataBH::gyroZ] = sensorInertials.gyr_z(); // NOTE not currently used by BH
 
     bh_sensors.data[SensorDataBH::accX] = sensorInertials.acc_x();
     bh_sensors.data[SensorDataBH::accY] = sensorInertials.acc_y();
@@ -301,6 +303,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
     bh_sensors.data[SensorDataBH::angleX] = sensorInertials.angle_x();
     bh_sensors.data[SensorDataBH::angleY] = sensorInertials.angle_y();
+    bh_sensors.data[SensorDataBH::angleZ] = sensorInertials.angle_z();
 
     bh_sensors.data[SensorDataBH::fsrLFL] = sensorFSRs.lfl();
     bh_sensors.data[SensorDataBH::fsrLFR] = sensorFSRs.lfr();
