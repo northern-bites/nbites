@@ -30,42 +30,4 @@ def positionReady(player):
         player.brain.tracker.trackBall()
         return player.stay()
 
-    # if player.brain.time - player.timeReadyBegan > 38:
-    #     return player.goNow('readyFaceMiddle')
-
     return player.stay()
-
-@superState('gameControllerResponder')
-def readyFaceMiddle(player):
-    """
-    If we didn't make it to our position, find the middle of the field
-    """
-    if player.firstFrame():
-        player.brain.tracker.lookToAngle(0)
-        player.stand()
-        readyFaceMiddle.startedSpinning = False
-        readyFaceMiddle.done = False
-
-    centerField = Location(NogginConstants.CENTER_FIELD_X,
-                           NogginConstants.CENTER_FIELD_Y)
-
-    if player.brain.nav.isStopped() and not readyFaceMiddle.startedSpinning:
-        readyFaceMiddle.startedSpinning = True
-        spinDir = player.brain.loc.spinDirToPoint(centerField)
-        player.setWalk(0,0,spinDir*0.3)
-
-    elif (not readyFaceMiddle.done and readyFaceMiddle.startedSpinning and
-        ((player.brain.ygrp.on and
-          player.brain.ygrp.distance > NogginConstants.MIDFIELD_X + 200) or
-        (player.brain.yglp.on and
-         player.brain.yglp.distance > NogginConstants.MIDFIELD_X + 200))):
-        print "Found a post at {0} or {1}".format(player.brain.ygrp.distance,
-                                                  player.brain.yglp.distance)
-        readyFaceMiddle.done = True
-        player.brain.tracker.repeatBasicPan()
-        player.stopWalking()
-
-    return player.stay()
-
-readyFaceMiddle.done = False
-readyFaceMiddle.startedSpinning = False

@@ -356,15 +356,8 @@ def penaltyKickSpin(player):
         print "Y: ", player.brain.ball.rel_y
         return player.stay()
 
-    postBearing = player.brain.yglp.bearing_deg
-
-    if not player.penaltyKickRight or player.brain.yglp.certainty == 0:
-        if player.brain.yglp.certainty == 0:
-            print "I MIGHT be using right gp for left"
-        postBearing = player.brain.ygrp.bearing_deg
-
     if player.penaltyKickRight:
-        if postBearing > -12:
+        if player.brain.loc.h < -20:
             penaltyKickSpin.threshCount += 1
             if penaltyKickSpin.threshCount == 3:
                 player.brain.nav.stand()
@@ -375,7 +368,7 @@ def penaltyKickSpin(player):
         else:
             penaltyKickSpin.threshCount = 0
     else:
-        if postBearing < 12:
+        if player.brain.loc.h > 20:
             penaltyKickSpin.threshCount += 1
             if penaltyKickSpin.threshCount == 3:
                 player.brain.nav.stand()
@@ -385,10 +378,6 @@ def penaltyKickSpin(player):
                 return player.goNow('positionForPenaltyKick')
         else:
             penaltyKickSpin.threshCount = 0
-
-    # print "Left post: ", player.brain.ygrp.bearing_deg
-    # print "Right post: ", player.brain.yglp.bearing_deg
-    # print "-----------------------------"
 
     return player.stay()
 
