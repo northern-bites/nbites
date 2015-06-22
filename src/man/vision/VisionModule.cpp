@@ -40,7 +40,6 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
     calibrationLisp = nblog::SExpr::read(getStringFromTxtFile(calibrationPath));
 
 
-    setCalibrationParams(robotName);
 
     // Set module pointers for top then bottom images
     for (int i = 0; i < 2; i++) {
@@ -68,6 +67,7 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         edgeDetector[i]->fast(fast);
         hough[i]->fast(fast);
     }
+    setCalibrationParams(robotName);
 }
 
 VisionModule::~VisionModule()
@@ -79,6 +79,7 @@ VisionModule::~VisionModule()
         delete edges[i];
         delete houghLines[i];
         delete hough[i];
+        delete calibrationParams[i];
         delete kinematics[i];
         delete homography[i];
         delete fieldLines[i];
@@ -128,6 +129,10 @@ void VisionModule::run_()
         if (jointsIn.message().has_head_yaw()) {
             kinematics[i]->joints(jointsIn.message());
             homography[i]->wz0(kinematics[i]->wz0());
+
+    //        std::cout << "Adjusting " << i << " with offsets r: " << calibrationParams[i]->getRoll() <<
+     //        " t: " << calibrationParams[i]->getTilt() << std::endl;
+
             homography[i]->roll(calibrationParams[i]->getRoll());
             homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt());
          //   homography[i]->tilt(kinematics[i]->tilt());
@@ -430,9 +435,9 @@ void VisionModule::setCalibrationParams(int camera, std::string robotName) {
         double roll =  robot->find(cam)->get(1)->valueAsDouble();
         double tilt = robot->find(cam)->get(2)->valueAsDouble();
         calibrationParams[camera] = new CalibrationParams(roll, tilt);
-        
+
         std::cerr << "Found and set calibration params for " << robotName;
-        std::cerr << "Top: " << roll << " Bottom: " << tilt << std::endl;
+        std::cerr << "Roll: " << roll << " Tilt: " << tilt << std::endl;
     }
 
 }

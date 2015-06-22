@@ -312,7 +312,7 @@ double StarCal::roll()
 double StarCal::tilt()
 {
   double imageDistanceToHorizon
-    = fit.secondPrinciaplAxisU() * fit.centerX() + fit.secondPrinciaplAxisV() * fit.centerY();
+    = fabs(fit.secondPrinciaplAxisU() * fit.centerX() + fit.secondPrinciaplAxisV() * fit.centerY());
   return (M_PI / 2) - atan(imageDistanceToHorizon / f);
 }
 

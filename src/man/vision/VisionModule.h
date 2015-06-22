@@ -40,18 +40,19 @@ public:
 
     void setCalibrationParams(std::string robotName);
     void setCalibrationParams(int camera, std::string robotName);
-    void setCalibrationParams(CalibrationParams* params, bool topCamera) { calibrationParams[!topCamera] = params; }
+    void setCalibrationParams(CalibrationParams* params, bool topCamera) { 
+        std::cout << "Overwriting\n";
+        calibrationParams[!topCamera] = params; }
 
     void setColorParams(Colors* colors, bool topCamera) { colorParams[!topCamera] = colors; }
     Colors* getColorsFromLisp(nblog::SExpr* colors, int camera);
 
- 
+
 
 protected:
     virtual void run_();
 
 private:
-
     void logImage(int i);
     void sendLinesOut();
 
