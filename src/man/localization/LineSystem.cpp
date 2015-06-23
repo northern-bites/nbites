@@ -47,6 +47,12 @@ LocLineID LineSystem::matchObservation(const messages::FieldLine& observation,
         }
     }
 
+    if (id == LocLineID::TheirMidline || id == LocLineID::OurMidline) {
+        if (loc.x() < CENTER_FIELD_X)
+            return LocLineID::OurMidline;
+        return LocLineID::TheirMidline;
+    }
+
     return id;
 }
 
