@@ -31,6 +31,13 @@ def getLines(player):
         # x2 = x0 + line.inner.eP1 * math.sin(t)
         # y2 = y0 + -line.inner.eP1 * math.cos(t)
 
+def findCorner(player):
+    visionLines = player.brain.visionLines
+
+    # for i in range(0, visionLines.line_size()):
+
+        
+
 # def getFrontLine(player):
 #     # Assume facing forward
 #     for line in GoalieStates.watchWithLineChecks.lines:

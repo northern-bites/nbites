@@ -175,6 +175,7 @@ def watchWithLineChecks(player):
             watchWithLineChecks.correctFacing = False
             watchWithLineChecks.numFixes = 0
             watchWithLineChecks.numTurns = 0
+            watchWithLineChecks.looking = False
         elif player.lastDiffState is 'lineCheckTurn':
             print "I think I have correct facing now..."
             watchWithLineChecks.correctFacing = True
@@ -186,6 +187,18 @@ def watchWithLineChecks(player):
         player.brain.nav.stand()
         player.returningFromPenalty = False
 
+    if (player.brain.ball.vis.frames_on > constants.BALL_ON_SAFE_THRESH \
+        and player.brain.ball.distance > constants.BALL_SAFE_DISTANCE_THRESH \
+        and not watchWithLineChecks.looking):
+        watchWithLineChecks.looking = True
+        player.brain.tracker.performBasicPan()
+
+    if player.brain.tracker.isStopped():
+        watchWithCornerChecks.looking = False
+        player.brain.tracker.trackBall()
+
+    # if player.counter > 200:
+    #     return player.goLater('watch')
 
     return Transition.getNextState(player, watchWithLineChecks)
 
@@ -261,8 +274,7 @@ def watchWithCornerChecks(player):
 @superState('gameControllerResponder')
 def watch(player):
     if player.firstFrame():
-        # player.brain.tracker.trackBall()
-        player.brain.tracker.repeatBasicPan()
+        player.brain.tracker.trackBall()
         player.brain.nav.stand()
         player.returningFromPenalty = False
 

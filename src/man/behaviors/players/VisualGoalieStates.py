@@ -146,8 +146,8 @@ def returnToGoal(player):
             correctedDest.relX = 0.0
         if fabs(correctedDest.relY) < 5:
             correctedDest.relY = 0.0
-        # if fabs(correctedDest.relH) < 5:
-        #     correctedDest.relH = 0.0
+        if fabs(correctedDest.relH) < 5:
+            correctedDest.relH = 0.0
 
         print "I'm returning to goal now!"
         print ("my correctedDest: ", correctedDest.relX, correctedDest.relY, correctedDest.relH)
