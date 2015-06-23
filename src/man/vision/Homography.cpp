@@ -403,8 +403,8 @@ double GeoLine::error(const GeoLine& other) const
   double tDiff = diffRadians(uMod(t(), M_PI), uMod(other.t(), M_PI));
 
   // TODO load params from LineSystem
-  FuzzyThr rThr(0, 150);
-  FuzzyThr tThr(0, M_PI / 4);
+  FuzzyThr rThr(0, 400);
+  FuzzyThr tThr(0, M_PI / 2);
 
   Fool rError(rThr, rDiff);
   Fool tError(tThr, tDiff);
