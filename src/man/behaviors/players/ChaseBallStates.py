@@ -78,7 +78,6 @@ def prepareForKick(player):
         player.inKickOffPlay = False
 
     player.motionKick = True
-
     return player.goNow('followPotentialField')
 
 @superState('positionAndKickBall')
