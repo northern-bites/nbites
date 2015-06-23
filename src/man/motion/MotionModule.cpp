@@ -1056,8 +1056,8 @@ std::vector<BodyJointCommand::ptr> MotionModule::generateNextArmProviderTransiti
         max_change = (float)std::max((double)max_change, fabs(sensorAngles[i + Kinematics::HEAD_JOINTS] - providerJoints[i]));
     }
 
-    float larm_angles[] = {1.9f, 0.2f,1.2f,-.6f};
-    float rarm_angles[] = {1.9f,-0.2f,-1.2f,.6f};
+    float larm_angles[] = {1.74f, 0.174f,1.31f,-.35f};
+    float rarm_angles[] = {1.74f,-0.174f,-1.31f,.35f};
 
     std::vector<float> safe_larm(larm_angles, &larm_angles[Kinematics::ARM_JOINTS]);
     std::vector<float> safe_rarm(rarm_angles, &rarm_angles[Kinematics::ARM_JOINTS]);
@@ -1068,7 +1068,7 @@ std::vector<BodyJointCommand::ptr> MotionModule::generateNextArmProviderTransiti
     std::vector<float> empty(0);
     commands.push_back(
         BodyJointCommand::ptr (
-            new BodyJointCommand(.6f,safe_larm, empty,empty,safe_rarm,
+            new BodyJointCommand(.7f,safe_larm, empty,empty,safe_rarm,
                                  stiffness,
                                  Kinematics::INTERPOLATION_SMOOTH)) );
 
