@@ -14,8 +14,6 @@ using namespace boost::python;
 
 extern "C" void initLedCommand_proto();
 extern "C" void initGameState_proto();
-// extern "C" void initVisionField_proto();
-// extern "C" void initVisionRobot_proto();
 extern "C" void initWorldModel_proto();
 extern "C" void initRobotLocation_proto();
 extern "C" void initBallModel_proto();
@@ -90,8 +88,6 @@ void BehaviorsModule::initializePython()
     try{
         initLedCommand_proto();
         initGameState_proto();
-        // initVisionField_proto();
-        // initVisionRobot_proto();
         initWorldModel_proto();
         initBallModel_proto();
         initRobotLocation_proto();
@@ -224,12 +220,6 @@ void BehaviorsModule::prepareMessages()
 
     localizationIn.latch();
     pyInterface.setLoc_ptr(&localizationIn.message());
-
-    // visionFieldIn.latch();
-    // pyInterface.setVisionField_ptr(&visionFieldIn.message());
-
-    // visionRobotIn.latch();
-    // pyInterface.setVisionRobot_ptr(&visionRobotIn.message());
 
     sharedBallIn.latch();
     pyInterface.setSharedBall_ptr(&sharedBallIn.message());

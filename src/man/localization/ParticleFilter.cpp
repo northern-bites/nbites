@@ -64,6 +64,7 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     motionSystem->update(particles, odometryInput, errorMagnitude);
     updatedVision = visionSystem->update(particles, visionInput);
 
+
     float avgErr = -1;
     // Resample if vision updated
     if(updatedVision) {

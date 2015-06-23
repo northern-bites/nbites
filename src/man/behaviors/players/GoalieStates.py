@@ -9,6 +9,7 @@ import GoalieConstants as constants
 import math
 
 SAVING = False
+DIVING = False
 
 @superState('gameControllerResponder')
 def gameInitial(player):
@@ -402,14 +403,14 @@ def saveRight(player):
     if player.firstFrame():
         player.brain.fallController.enabled = False
         player.brain.tracker.lookToAngle(0)
-        if SAVING:
+        if SAVING and DIVING:
             player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
             player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
         else:
             player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
 
     if player.counter > 80:
-        if SAVING:
+        if SAVING and DIVING:
             player.executeMove(SweetMoves.GOALIE_ROLL_OUT_RIGHT)
             return player.goLater('rollOut')
         else:
@@ -422,14 +423,14 @@ def saveLeft(player):
     if player.firstFrame():
         player.brain.fallController.enabled = False
         player.brain.tracker.lookToAngle(0)
-        if SAVING:
+        if SAVING and DIVING:
             player.executeMove(SweetMoves.GOALIE_DIVE_LEFT)
             player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
         else:
             player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
 
     if player.counter > 80:
-        if SAVING:
+        if SAVING and DIVING:
             player.executeMove(SweetMoves.GOALIE_ROLL_OUT_LEFT)
             return player.goLater('rollOut')
         else:

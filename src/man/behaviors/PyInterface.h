@@ -14,7 +14,6 @@
 #include "PMotion.pb.h"
 #include "MotionStatus.pb.h"
 #include "Vision.pb.h"
-#include "VisionRobot.pb.h"
 #include "ButtonState.pb.h"
 #include "FallStatus.pb.h"
 #include "StiffnessControl.pb.h"
@@ -30,7 +29,6 @@ class PyInterface
 public:
     messages::GameState         const * gameState_ptr;
     messages::RobotLocation     const * loc_ptr;
-    messages::VisionRobot       const * visionRobot_ptr;
     messages::FieldLines        const * visionField_ptr;
     messages::FilteredBall      const * filteredBall_ptr;
     messages::LedCommand        const * ledCommand_ptr;
@@ -46,7 +44,7 @@ public:
     messages::WorldModel        const * myWorldModel_ptr;
     messages::StiffStatus       const * stiffStatus_ptr;
     messages::FieldObstacles    const * obstacle_ptr;
-    messages::VisionObstacle    const * visionObstacle_ptr;
+    // messages::VisionObstacle    const * visionObstacle_ptr;
     messages::SharedBall        const * sharedBall_ptr;
     messages::RobotLocation     const * sharedFlip_ptr;
     messages::FieldLines     const * visionLines_ptr;
@@ -58,10 +56,6 @@ public:
     void setLoc_ptr(const messages::RobotLocation* msg)
     {
         loc_ptr = msg;
-    }
-    void setVisionRobot_ptr(const messages::VisionRobot* msg)
-    {
-        visionRobot_ptr = msg;
     }
     void setVisionField_ptr(const messages::FieldLines* msg)
     {
@@ -143,10 +137,10 @@ public:
     {
         obstacle_ptr = msg;
     }
-    void setVisionObstacle_ptr(const messages::VisionObstacle* msg)
-    {
-        visionObstacle_ptr = msg;
-    }
+    // void setVisionObstacle_ptr(const messages::VisionObstacle* msg)
+    // {
+    //     visionObstacle_ptr = msg;
+    // }
 
 };
 
