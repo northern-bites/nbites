@@ -20,9 +20,11 @@
 #include "../control/control.h"
 #include "nbdebug.h"
 #include "../../share/logshare/SExpr.h"
+#include "rescon.h"
 
 using nblog::SExpr;
 using nblog::NBLog;
+using namespace rescon;
 
 #define V4L2_MT9M114_FADE_TO_BLACK (V4L2_CID_PRIVATE_BASE)
 
@@ -641,6 +643,50 @@ void TranscriberModule::run_()
                          &inertsIn.message()));
 
     messages::YUVImage image = it.getNextImage();
+    
+#ifdef USE_LOGGING
+    if (control::flags[control::thumbnail]) {
+        int from_width = image.width() / 2;
+        
+        if (from_width == 640) {
+            ImageResolution rFrom = R640_480;
+            ImageResolution rTo = R080_060;
+            
+            char buffer[ImageBufferSize[rTo]];
+            resDownPck(rFrom, (const YUVSubPixel *) image.pixelAddress(0,0), rTo, (YUVSubPixel *) buffer);
+            std::string im_buf(buffer, ImageBufferSize[rTo]);
+            
+            SExpr ci1("YUVImage", "camera_TOP", 0, 0, ImageBufferSize[rTo]);
+            ci1.append(SExpr::keyValue("width", ImageWidth[rTo]));
+            ci1.append(SExpr::keyValue("height", ImageHeight[rTo]));
+            ci1.append(SExpr::keyValue("encoding", "[Y8(U8/V8)]"));
+            
+            std::vector<SExpr> contents = {ci1};
+            NBLog(NBL_IMAGE_BUFFER, "thumbnail",
+                  contents, im_buf);
+            
+        } else if (from_width == 320) {
+            ImageResolution rFrom = R320_240;
+            ImageResolution rTo = R080_060;
+            
+            char buffer[ImageBufferSize[rTo]];
+            resDownPck(rFrom, (const YUVSubPixel *) image.pixelAddress(0,0), rTo, (YUVSubPixel *) buffer);
+            std::string im_buf(buffer, ImageBufferSize[rTo]);
+            
+            SExpr ci1("YUVImage", "camera_BOT", 0, 0, ImageBufferSize[rTo]);
+            ci1.append(SExpr::keyValue("width", ImageWidth[rTo]));
+            ci1.append(SExpr::keyValue("height", ImageHeight[rTo]));
+            ci1.append(SExpr::keyValue("encoding", "[Y8(U8/V8)]"));
+            
+            std::vector<SExpr> contents = {ci1};
+            NBLog(NBL_IMAGE_BUFFER, "thumbnail",
+                  contents, im_buf);
+        } else {
+            printf("WARNING: thumbnail sees size its not prepared for!\n");
+        }
+    }
+#endif
+    
     portals::Message<messages::YUVImage> imageOutMessage(&image);
     imageOut.setMessage(imageOutMessage);
 }
