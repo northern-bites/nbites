@@ -8,7 +8,10 @@ namespace localization {
 LineSystem::LineSystem() 
     : lines()
 {
+    // Part I
+    // Add lines in absolute field coordinates to lines map
     // TODO document sign conventions
+    
     // Add endlines
     addLine(LocLineID::OurEndline, -GREEN_PAD_X, M_PI, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
     addLine(LocLineID::TheirEndline, GREEN_PAD_X + FIELD_WHITE_WIDTH, 0, -GREEN_PAD_Y, -(GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
@@ -26,11 +29,61 @@ LineSystem::LineSystem()
     // Add sidelines
     addLine(LocLineID::RightSideline, -GREEN_PAD_Y, 3 * M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
     addLine(LocLineID::LeftSideline, GREEN_PAD_Y + FIELD_WHITE_HEIGHT, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
+
+    // Part II
+    // Map LineID that vision computes to LocLineID for use in solving the 
+    // correspondence problem (see matchObservation)
+
+    std::vector<LocLineID> all { 
+        LocLineID::OurEndline, LocLineID::TheirEndline,
+        LocLineID::OurMidline, LocLineID::TheirMidline,
+        LocLineID::OurTopGoalbox, LocLineID::TheirTopGoalbox,
+        LocLineID::RightSideline, LocLineID::LeftSideline 
+    };
+    visionToLocIDs[vision::LineID::Line] = all;
+
+    std::vector<LocLineID> endlineOrSideline { 
+        LocLineID::OurEndline, LocLineID::TheirEndline,
+        LocLineID::RightSideline, LocLineID::LeftSideline 
+    };
+    visionToLocIDs[vision::LineID::EndlineOrSideline] = endlineOrSideline;
+
+    std::vector<LocLineID> topGoalboxOrSideGoalbox { 
+        LocLineID::OurTopGoalbox, LocLineID::TheirTopGoalbox
+    };
+    visionToLocIDs[vision::LineID::TopGoalboxOrSideGoalbox] = topGoalboxOrSideGoalbox;
+
+    std::vector<LocLineID> sideGoalboxOrMidline { 
+        LocLineID::OurMidline, LocLineID::TheirMidline
+    };
+    visionToLocIDs[vision::LineID::SideGoalboxOrMidline] = sideGoalboxOrMidline;
+
+    std::vector<LocLineID> sideline { 
+        LocLineID::RightSideline, LocLineID::LeftSideline 
+    };
+    visionToLocIDs[vision::LineID::Sideline] = sideline;
+
+    std::vector<LocLineID> sideGoalbox {};
+    visionToLocIDs[vision::LineID::SideGoalbox] = sideGoalbox;
+
+    std::vector<LocLineID> endline { 
+        LocLineID::OurEndline, LocLineID::TheirEndline 
+    };
+    visionToLocIDs[vision::LineID::Endline] = endline;
+
+    std::vector<LocLineID> topGoalbox { 
+        LocLineID::OurTopGoalbox, LocLineID::TheirTopGoalbox 
+    };
+    visionToLocIDs[vision::LineID::TopGoalbox] = topGoalbox;
+
+    std::vector<LocLineID> midline { 
+        LocLineID::OurMidline, LocLineID::TheirMidline 
+    };
+    visionToLocIDs[vision::LineID::Midline] = midline;
 }
 
 LineSystem::~LineSystem() {}
 
-// TODO check line overlap
 LocLineID LineSystem::matchObservation(const messages::FieldLine& observation, 
                                        const messages::RobotLocation& loc)
 {
@@ -39,10 +92,14 @@ LocLineID LineSystem::matchObservation(const messages::FieldLine& observation,
     LocLineID id = LocLineID::NotMatched;
     double bestScore = std::numeric_limits<double>::max();
 
-    for (auto it = lines.begin(); it != lines.end(); it++) {
-        double curScore = it->second.error(globalLine);
+    vision::LineID visionID = static_cast<vision::LineID>(observation.id());
+    const std::vector<LocLineID>& possibleLineIDs = visionToLocIDs[visionID];
+    for (int i = 0; i < possibleLineIDs.size(); i++) {
+        LocLineID possibleID = possibleLineIDs[i];
+
+        double curScore = lines[possibleID].error(globalLine);
         if (curScore < bestScore) {
-            id = it->first;
+            id = possibleID;
             bestScore = curScore;
         }
     }

@@ -14,6 +14,10 @@
 #include "Vision.pb.h"
 #include "FieldConstants.h"
 #include "../vision/Homography.h"
+#include "../vision/Hough.h"
+
+#include <map>
+#include <vector>
 
 namespace man {
 namespace localization {
@@ -48,6 +52,7 @@ private:
     void addLine(LocLineID id, float r, float t, float ep0, float ep1);
 
     std::map<LocLineID, vision::GeoLine> lines;
+    std::map<vision::LineID, std::vector<LocLineID>> visionToLocIDs;
 };
 
 } // namespace localization
