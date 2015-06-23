@@ -5,6 +5,7 @@ hard reset to one of the two possible post-penalty positions.
 
 import ChaseBallTransitions as transitions
 import RoleConstants as roleConstants
+from noggin_constants import LineID
 from math import copysign, fabs, pi
 from objects import RelRobotLocation
 from ..navigator import Navigator
@@ -33,8 +34,7 @@ def afterPenalty(player):
 
     # Do we see the top of the goalbox
     for i in range(0, lines.line_size()):
-        # TODO boost the enum from Hough.h. This is the top of the goalbox
-        if lines.line(i).id == 7:
+        if lines.line(i).id == LineID.TopGoalbox:
             topGoalBox = lines.line(i).inner
             leftAngle = fabs(topGoalBox.t - pi) < .25
             # Goalbox to the left = 1 to the right = -1
