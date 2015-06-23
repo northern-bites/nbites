@@ -270,9 +270,9 @@ bool GoalboxDetector::validBox(const HoughLine& line1, const HoughLine& line2) c
   double distBetween = fabs(field1.pDist(field2.r()*cos(field2.t()), field2.r()*sin(field2.t())));
   bool seperation = fabs(distBetween - GOALBOX_DEPTH) < seperationThreshold();
 
-  // (3) Both over 60 cm in length
-  bool length1 = field1.ep1() - field1.ep0() > 60;
-  bool length2 = field2.ep1() - field2.ep0() > 60;
+  // (3) Both over 70 cm in length
+  bool length1 = field1.ep1() - field1.ep0() > 70;
+  bool length2 = field2.ep1() - field2.ep0() > 70;
   bool length = length1 && length2;
 
   return parallel && seperation && length;
@@ -385,7 +385,12 @@ bool CornerDetector::isCorner(const HoughLine& line1, const HoughLine& line2) co
   double normalizedT2 = (field2.r() > 0 ? field2.t() : field2.t() - M_PI);
   bool orthogonal = diffRadians(diffRadians(normalizedT1, normalizedT2), (M_PI / 2)) < orthogonalThreshold()*TO_RAD;
 
-  return intersects && farEnoughFromImageEdge && orthogonal;
+  // (3) Check that lines are longer than 70 cms
+  bool length1 = field1.ep1() - field1.ep0() > 70;
+  bool length2 = field2.ep1() - field2.ep0() > 70;
+  bool length = length1 && length2;
+
+  return intersects && farEnoughFromImageEdge && orthogonal && length;
 }
 
 CornerID CornerDetector::classify(const HoughLine& line1, const HoughLine& line2) const

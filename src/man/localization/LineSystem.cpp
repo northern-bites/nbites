@@ -11,29 +11,23 @@ LineSystem::LineSystem()
     // Part I
     // Add lines in absolute field coordinates to lines map
     // TODO document sign conventions
-    
-    // Add endlines
     addLine(LocLineID::OurEndline, -GREEN_PAD_X, M_PI, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
     addLine(LocLineID::TheirEndline, GREEN_PAD_X + FIELD_WHITE_WIDTH, 0, -GREEN_PAD_Y, -(GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
 
-    // Add the midline
     // NOTE two midlines so that reconstructions can be handled gracefully from
     //      either side of the field
     addLine(LocLineID::TheirMidline, -CENTER_FIELD_X, M_PI, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
     addLine(LocLineID::OurMidline, CENTER_FIELD_X, 0, -GREEN_PAD_Y, -(GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
 
-    // Add top goalbox lines
     addLine(LocLineID::OurTopGoalbox, -(GREEN_PAD_X + GOALBOX_DEPTH) , M_PI, BLUE_GOALBOX_BOTTOM_Y, BLUE_GOALBOX_TOP_Y);
     addLine(LocLineID::TheirTopGoalbox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH , 0, -YELLOW_GOALBOX_BOTTOM_Y, -YELLOW_GOALBOX_TOP_Y);
 
-    // Add sidelines
     addLine(LocLineID::RightSideline, -GREEN_PAD_Y, 3 * M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
     addLine(LocLineID::LeftSideline, GREEN_PAD_Y + FIELD_WHITE_HEIGHT, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
 
     // Part II
     // Map LineID that vision computes to LocLineID for use in solving the 
     // correspondence problem (see matchObservation)
-
     std::vector<LocLineID> all { 
         LocLineID::OurEndline, LocLineID::TheirEndline,
         LocLineID::OurMidline, LocLineID::TheirMidline,

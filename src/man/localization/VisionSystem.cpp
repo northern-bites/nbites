@@ -92,10 +92,6 @@ bool VisionSystem::update(ParticleSet& particles,
     // }
 
     // (2) Reconstruct pose by averaging reconstructions for all lines
-    // TODO only use corners
-    // TODO only use close lines
-    // TODO weighted average
-    // TODO x and y if no reconstructs is one frame out of date as written
     // int numXReconstructs = 0;
     // int numYReconstructs = 0;
     // double xAverage = 0;
