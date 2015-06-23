@@ -55,7 +55,9 @@ protected:
     virtual void run_();
 
 private:
+#ifdef USE_LOGGING
     void logImage(int i);
+#endif
     void sendLinesOut();
     void updateVisionBall();
 

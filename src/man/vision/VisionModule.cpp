@@ -183,6 +183,7 @@ void VisionModule::run_()
     updateVisionBall();
 }
 
+#ifdef USE_LOGGING
 void VisionModule::logImage(int i) 
 {
     std::string t = "true";
@@ -277,6 +278,8 @@ void VisionModule::logImage(int i)
         nblog::NBLog(NBL_IMAGE_BUFFER, "tripoint", contents, im_buf);
     }
 }
+
+#endif
 
 void VisionModule::sendLinesOut()
 {
