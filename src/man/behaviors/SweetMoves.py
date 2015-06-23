@@ -67,6 +67,13 @@ BRING_ARMS_FORWARD = ((105.,10.,15.,-11.6),
       (105.,-10.,-15.,-11.6),
       0.5,0,stiff.NORMAL_STIFFNESSES)
 
+BRING_ARMS_FORWARD_SLOW = ((105.,10.,15.,-11.6),
+      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+      (105.,-10.,-15.,-11.6),
+      1,0,stiff.NORMAL_STIFFNESSES)
+
+
 #Keyframe that moves the joints to a stable, standing position quickly.
 QUICK_INITIAL_POS_KEYFRAME = ((90.,10.,-90.,-10.),
 			(0.0,0.0,-22.3,43.5,-21.2, 0.0),
@@ -1161,8 +1168,15 @@ LEFT_QUICK_STRAIGHT_KICK = (
 
 RIGHT_QUICK_STRAIGHT_KICK = mirrorMove(LEFT_QUICK_STRAIGHT_KICK)
 
+# ((RShoulderPitch, -RShoulderRoll, -RElbowYaw, -RElbowRoll),
+# (RHipYawPitch, -RHipRoll, RHipPitch, RKneePitch, RAnklePitch, -RAnkleRoll),
+# (LHipYawPitch, -LHipRoll, LHipPitch, LKneePitch, LAnklePitch, -LAnkleRoll),
+# (LShoulderPitch, -LShoulderRoll, -LElbowYaw, -LElbowRoll),
+# interp_time, interpolation, stiff.flipStiffness(stiffness)))
+
+
 LEFT_SHORT_STRAIGHT_KICK = (
-    BRING_ARMS_FORWARD,
+    BRING_ARMS_FORWARD_SLOW,
 
     #stand for a bit
     ((90.,10.,-90.,-10.),
@@ -1173,31 +1187,31 @@ LEFT_SHORT_STRAIGHT_KICK = (
 
     #lean right/lift leg
     ((20.,30.,0.,0.),
-     (0.,17.,-30,70,-50,-25.),
-     (0.,13.,-22.3,45,-22.5,-17),
+     (0.,20.,-30,70,-50,-25.),
+     (0.,20.,-22.3,50,-22.5,-17),
      (100.,-30.,0.,0),
      .6,0, stiff.NORMAL_STIFFNESSES),
 
-    #kick?
+    #kick
     ((43.,30.,0.,0.),
-     (0.,17.,-65,60,-10,-20.),
-     (0.,13.,-22.3,45,-22.5,-17),
+     (0.,20.,-60,70,-20,-18.),
+     (0.,20,-22.3,45,-22.5,-17),
      (40.,-30.,0.,0),
-     .18,0, stiff.NORMAL_STIFFNESSES),
+     0.18,0, stiff.NORMAL_STIFFNESSES),
 
-    #recover
-    ((35.,30.,0.,0.),
-     (0.,25.,-35,65,-30,-25.),
-     (0.,10.,-22.3,45,-22.5,-17),
-     (90.,-30.,0.,0),
-     .4,0, stiff.NORMAL_STIFFNESSES),
+    # recover
+    ((45.8, 28.7, -2.2, -2.4),
+     (0.3, 20.4, -41.9, 57.4, -10, -11.8),
+     (0.3, 21.2, -18.4, 45, -24.8, -16.0),
+     (52.6, -25.2, 2.4, 2.6),
+     0.5,0, stiff.NORMAL_STIFFNESSES),
 
     #back to normal
     ((40, 9, -80, -9),
      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
      (40, -9, 80, -9),
-     .7,0,stiff.NORMAL_STIFFNESSES),
+     0.6,0,stiff.NORMAL_STIFFNESSES),
 
     #stand for a bit
     ((90.,10.,-90.,-10.),
