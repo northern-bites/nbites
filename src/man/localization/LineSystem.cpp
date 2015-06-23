@@ -89,7 +89,6 @@ LocLineID LineSystem::matchObservation(const messages::FieldLine& observation,
     // TODO turn on line classifications
     vision::LineID visionID = static_cast<vision::LineID>(observation.id());
     const std::vector<LocLineID>& possibleLineIDs = visionToLocIDs[vision::LineID::Line];
-    std::cout << possibleLineIDs.size() << std::endl;
     for (int i = 0; i < possibleLineIDs.size(); i++) {
         LocLineID possibleID = possibleLineIDs[i];
 

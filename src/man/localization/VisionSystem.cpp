@@ -51,9 +51,8 @@ bool VisionSystem::update(ParticleSet& particles,
         }
 
         // Set the particle's weight (no golf scores)
-        // TODO divide by zero
         float avgErr = curParticleError / static_cast<float>(numObservations);
-        std::cout << curParticleError << std::endl;
+        // std::cout << curParticleError << std::endl;
         particle->setWeight(curParticleError);
         totalWeight += particle->getWeight();
 
