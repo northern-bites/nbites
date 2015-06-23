@@ -1,5 +1,7 @@
 #include "MotionSystem.h"
 
+#include <ctime>
+
 namespace man {
 namespace localization {
 
@@ -8,17 +10,13 @@ static const float FRICTION_FACTOR_Y = 1.f;
 static const float FRICTION_FACTOR_H = 1.f;
 
 MotionSystem::MotionSystem(float xAndYNoise_, float hNoise_)
+    : rng(time(0))
 {
     xAndYNoise = xAndYNoise_;
     hNoise = hNoise_;
 }
-MotionSystem::~MotionSystem(){}
 
-void MotionSystem::resetNoise(float xyNoise_, float hNoise_)
-{
-    xAndYNoise = xyNoise_;
-    hNoise = hNoise_;
-}
+MotionSystem::~MotionSystem() {}
 
 /**
  * Updates the particle set according to the motion.
@@ -63,8 +61,8 @@ void MotionSystem::update(ParticleSet& particles,
         dH = dH_R                    * FRICTION_FACTOR_H;
 
         particle->shift(dX, dY, dH);
-
-        noiseShiftWithOdo(particle, dX, dY, dH, error);
+        // noiseShiftWithOdo(particle, dX, dY, dH, error);
+        randomlyShiftParticle(particle, false);
     }
 }
 
@@ -155,6 +153,7 @@ void MotionSystem::randomlyShiftParticle(Particle* particle, bool nearMid)
     noise.set_x(coordNoise());
     noise.set_y(coordNoise());
     noise.set_h(NBMath::subPIAngle(headNoise()));
+
     particle->shift(noise);
 }
 
