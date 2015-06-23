@@ -44,13 +44,17 @@ bool VisionSystem::update(ParticleSet& particles,
         for (int i = 0; i < lines.line_size(); i++) {
             if (!LineSystem::shouldUse(lines.line(i)))
                 continue;
-            curParticleError += lineSystem->scoreObservation(lines.line(i), particle->getLocation());
+            if (i == 0)
+                curParticleError = lineSystem->scoreObservation(lines.line(i), particle->getLocation());
+            else
+                curParticleError = curParticleError*lineSystem->scoreObservation(lines.line(i), particle->getLocation());
         }
 
         // Set the particle's weight (no golf scores)
         // TODO divide by zero
         float avgErr = curParticleError / static_cast<float>(numObservations);
-        particle->setWeight(1 / avgErr);
+        std::cout << curParticleError << std::endl;
+        particle->setWeight(curParticleError);
         totalWeight += particle->getWeight();
 
         // Update the total swarm error

@@ -84,15 +84,17 @@ LocLineID LineSystem::matchObservation(const messages::FieldLine& observation,
     vision::GeoLine globalLine = LineSystem::relRobotToAbsolute(observation, loc);
 
     LocLineID id = LocLineID::NotMatched;
-    double bestScore = std::numeric_limits<double>::max();
+    double bestScore = std::numeric_limits<double>::min();
 
+    // TODO turn on line classifications
     vision::LineID visionID = static_cast<vision::LineID>(observation.id());
-    const std::vector<LocLineID>& possibleLineIDs = visionToLocIDs[visionID];
+    const std::vector<LocLineID>& possibleLineIDs = visionToLocIDs[vision::LineID::Line];
+    std::cout << possibleLineIDs.size() << std::endl;
     for (int i = 0; i < possibleLineIDs.size(); i++) {
         LocLineID possibleID = possibleLineIDs[i];
 
         double curScore = lines[possibleID].error(globalLine);
-        if (curScore < bestScore) {
+        if (curScore > bestScore) {
             id = possibleID;
             bestScore = curScore;
         }
@@ -107,6 +109,7 @@ LocLineID LineSystem::matchObservation(const messages::FieldLine& observation,
     return id;
 }
 
+// TODO rename to prob
 double LineSystem::scoreObservation(const messages::FieldLine& observation,
                                     const messages::RobotLocation& loc)
 {
@@ -115,12 +118,11 @@ double LineSystem::scoreObservation(const messages::FieldLine& observation,
     double errorBetweenObservationAndModel;
     LocLineID id = matchObservation(observation, loc);
     if (id == LocLineID::NotMatched)
-        errorBetweenObservationAndModel = 1;
+        errorBetweenObservationAndModel = 0;
     else
         errorBetweenObservationAndModel = lines[id].error(globalLine);
 
-    double r = observation.inner().r();
-    return (1 / r) * errorBetweenObservationAndModel;
+    return errorBetweenObservationAndModel;
 }
 
 // NOTE method assumes that endpoints seen in observation are endpoints of line

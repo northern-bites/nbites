@@ -8,6 +8,8 @@
 #include "Hough.h"
 #include "NBMath.h"
 
+#include <boost/math/distributions/normal.hpp>
+
 using namespace std;
 
 namespace man {
@@ -397,19 +399,19 @@ double GeoLine::separation(const GeoLine& other) const
   return pDist(x0, y0) + other.pDist(x0, y0);
 }
 
+// TODO params
 double GeoLine::error(const GeoLine& other) const
 {
   double rDiff = fabs(fabs(r()) - fabs(other.r()));
   double tDiff = diffRadians(uMod(t(), M_PI), uMod(other.t(), M_PI));
 
-  // TODO load params from LineSystem
-  FuzzyThr rThr(0, 400);
-  FuzzyThr tThr(0, M_PI / 2);
+  boost::math::normal_distribution<> rGaussian(0, 50);
+  boost::math::normal_distribution<> tGaussian(0, M_PI / 4);
 
-  Fool rError(rThr, rDiff);
-  Fool tError(tThr, tDiff);
+  double rProb = pdf(rGaussian, rDiff);
+  double tProb = pdf(tGaussian, tDiff);
 
-  return (rError | tError).f();
+  return rProb*tProb;
 }
 
 void GeoLine::translateRotate(double xTrans, double yTrans, double rotation)
