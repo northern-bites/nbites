@@ -4,7 +4,7 @@ import NavTransitions as navTrans
 from collections import deque
 from objects import RobotLocation, RelRobotLocation
 from ..util import Transition
-from math import fabs
+from math import fabs, degrees
 from random import random
 
 def scriptedMove(nav):
@@ -245,8 +245,11 @@ destinationWalkingTo.destQueue = deque()
 destinationWalkingTo.speed = 0
 
 def locationsMatch(odom, dest):
-    if (abs(odom.relX - dest.relX) < constants.ODOM_CLOSE_ENOUGH) and (abs(odom.relY - dest.relY) < constants.ODOM_CLOSE_ENOUGH):
+    if (abs(odom.relX - dest.relX) < constants.ODOM_CLOSE_ENOUGH) \
+    and (abs(odom.relY - dest.relY) < constants.ODOM_CLOSE_ENOUGH) \
+    and (abs(odom.relH - degrees(dest.relH)) < 30.0):
         return True
+
     return False
 
 def walkingTo(nav):

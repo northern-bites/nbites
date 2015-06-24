@@ -84,16 +84,19 @@ def gamePlaying(player):
     if (not player.brain.motion.calibrated):
         return player.stay()
 
-    if player.penalized:
-        player.penalized = False
-        return player.goLater('afterPenalty')
+    #TODO penalty handling
+    # if player.penalized:
+    #     player.penalized = False
+    #     return player.goLater('afterPenalty')
 
-    if player.lastDiffState == 'afterPenalty':
-        return player.goLater('walkToGoal')
+    # if player.lastDiffState == 'afterPenalty':
+    #     return player.goLater('walkToGoal')
 
     if player.lastDiffState == 'fallen':
-        return player.goLater('spinAtGoal')
+        return player.goLater('watchWithLineChecks')
 
+    #TODO before game/scrimmage change this to watch;
+    # this is better for testing purposes!
     return player.goLater('watchWithLineChecks')
 
 @superState('gameControllerResponder')
@@ -177,6 +180,7 @@ def watchWithLineChecks(player):
             watchWithLineChecks.numFixes = 0
             watchWithLineChecks.numTurns = 0
             watchWithLineChecks.looking = False
+
         elif player.lastDiffState is 'lineCheckTurn':
             print "I think I have correct facing now..."
             watchWithLineChecks.correctFacing = True
@@ -198,8 +202,8 @@ def watchWithLineChecks(player):
         watchWithCornerChecks.looking = False
         player.brain.tracker.trackBall()
 
-    # if player.counter > 200:
-    #     return player.goLater('watch')
+    if player.counter > 200:
+        return player.goLater('watch')
 
     return Transition.getNextState(player, watchWithLineChecks)
 
@@ -278,6 +282,7 @@ def watch(player):
         player.brain.tracker.trackBall()
         player.brain.nav.stand()
         player.returningFromPenalty = False
+        print ("I'm moving to watch! I think I'm in the right position")
 
     return Transition.getNextState(player, watch)
 

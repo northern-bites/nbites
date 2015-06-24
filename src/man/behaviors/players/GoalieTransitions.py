@@ -36,7 +36,6 @@ def findCorner(player):
 
     # for i in range(0, visionLines.line_size()):
 
-        
 
 # def getFrontLine(player):
 #     # Assume facing forward
@@ -55,7 +54,7 @@ def frontLineCheckShouldReposition(player):
     y_dest = 0.0
     h_dest = 0.0
 
-    if GoalieStates.watchWithLineChecks.correctFacing == False:
+    if not GoalieStates.watchWithLineChecks.correctFacing:
         return False
 
     for line in GoalieStates.watchWithLineChecks.lines:
@@ -88,7 +87,7 @@ def sideLineCheckShouldReposition(player):
     y_dest = 0.0
     h_dest = 0.0
 
-    if GoalieStates.watchWithLineChecks.numTurns < 1:
+    if not GoalieStates.watchWithLineChecks.correctFacing:
         return False
 
     for line in GoalieStates.watchWithLineChecks.lines:
@@ -124,17 +123,27 @@ def sideLineCheckShouldReposition(player):
 
 def shouldTurn(player):
 
-    if GoalieStates.watchWithLineChecks.numTurns > 1:
+    if GoalieStates.watchWithLineChecks.numTurns > 1 \
+    and GoalieStates.watchWithLineChecks.numFixes < 2:
         return False
+
+    if GoalieStates.watchWithLineChecks.numTurns == 2:
+        return False
+
     h_dest = 0.0
 
     for line in GoalieStates.watchWithLineChecks.lines:
         r = line.r
         t = math.degrees(line.t)
+        length = getLineLength(line)
+        if length < 30.0 and r > 30.0:
+            continue
 
-        #Fix this..
+        # Fix this.. very hacky: basically return that we DON'T need to turn
+        # if we see a reasonable front line
         if math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH:
             h_dest = 0.0
+            player.homeDirections += [RelRobotLocation(0.0, 0.0, h_dest)]
             print ("t: ", t)
             print ("r: ", r)
             return True
@@ -144,6 +153,7 @@ def shouldTurn(player):
         or math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH \
         or r > 100.0 or t == 0.0:
             continue
+
 
         # Assumptions: not facing forward....?
         # Hopefully will find a line close by (r < 100) with an unusual t value
@@ -160,6 +170,28 @@ def shouldTurn(player):
 
     return False
 
+def shouldGoForward(player):
+    # If we see two parallel lines in front of us, we're probably in the goal...
+    lines = player.brain.visionLines
+
+    for i in range(0, player.brain.visionLines.line_size()):
+        r = lines.line(i).inner.r
+        t = math.degrees(lines.line(i).inner.t)
+        for l in range(0, player.brain.visionLines.line_size()):
+            r2 = lines.line(l).inner.r
+            t2 = math.degrees(lines.line(l).inner.t)
+
+            if (l != i) and math.fabs(t - t2) < 6.0 \
+            and r2 < 120.0 and r < 120.0 and math.fabs(r - r2) > 35.0 \
+            and r != 0.0 and r2 != 0.0:
+                print "I'm seeing two lines, I should go forward"
+                print ("r1: ", r, "r2: ", r2, " t1: ", t, "t2: ", t2)
+                player.homeDirections += [RelRobotLocation(25.0, 0.0, 0.0)]
+                return True
+
+    return False
+
+
 def shouldBackUp(player):
     # If we cannot see any good lines, should probably back up!
 
@@ -167,8 +199,12 @@ def shouldBackUp(player):
         r = line.r
         t = math.degrees(line.t)
 
-        if r < 200.0 and r != 0.0:
+        if r < 220.0 and r != 0.0:
             return False
+
+    if player.brain.visionLines.line_size() == 0:
+        print "My brain sees no lines right now"
+        return True
 
     print "Couldn't find any good lines, backup TRUE"
     return True
@@ -177,14 +213,14 @@ def getBearingFromRobot(x, y):
     return math.degrees(math.atan2(x, -y));
 
 def getLineLength(line):
-    r = line.inner.r
-    t = line.inner.t
+    r = line.r
+    t = line.t
     x0 = r * math.cos(t)
     y0 = r * math.sin(t)
-    x1 = x0 + line.inner.eP0 * math.sin(t)
-    y1 = y0 + -line.inner.eP0 * math.cos(t)
-    x2 = x0 + line.inner.eP1 * math.sin(t)
-    y2 = y0 + -line.inner.eP1 * math.cos(t)
+    x1 = x0 + line.ep0 * math.sin(t)
+    y1 = y0 + -line.ep0 * math.cos(t)
+    x2 = x0 + line.ep1 * math.sin(t)
+    y2 = y0 + -line.ep1 * math.cos(t)
 
     x = x2 - x1
     y = y2 - y1

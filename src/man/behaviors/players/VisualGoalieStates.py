@@ -118,8 +118,8 @@ def spinToFaceBall(player):
                           nav.CLOSE_ENOUGH,
                           nav.CAREFUL_SPEED)
 
-    if player.counter > 180:
-        return player.goLater('spinAtGoal')
+    # if player.counter > 180:
+    #     return player.goLater('spinAtGoal')
 
     return Transition.getNextState(player, spinToFaceBall)
 
