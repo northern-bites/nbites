@@ -212,6 +212,7 @@ namespace control {
 #ifndef USE_LOGGING
 #error "option START_WITH_FILEIO defined WITHOUT option USE_LOGGING"
 #endif
+        printf("CONTROL: Starting with fileio flag set!\n");
         flags[fileio] = 1;
 #endif
         
@@ -219,6 +220,7 @@ namespace control {
 #ifndef USE_LOGGING
 #error "option START_WITH_THUMBNAIL defined WITHOUT option USE_LOGGING"
 #endif
+        printf("CONTROL: Starting with thumbnail flag set!\n");
         flags[thumbnail] = 1;
 #endif
 
