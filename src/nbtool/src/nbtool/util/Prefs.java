@@ -220,6 +220,8 @@ public class Prefs {
 			return;
 		}
 		
+		//Logger.println(prefs.print());
+		
 		SExpr staticPrefs = prefs.find(STATIC_PREFS_KEY);
 		staticPrefs = staticPrefs.exists() ? staticPrefs : prefs;
 		readStaticPrefs(staticPrefs);

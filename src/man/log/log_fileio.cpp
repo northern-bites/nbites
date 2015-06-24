@@ -16,9 +16,13 @@
 
 namespace nblog {
     
-    //static const char * LOG_FOLDER = "/home/nao/nbites/log/";
-    static const char * LOG_FOLDER = "/Users/pkoch/Desktop/LOGS/";
-    static bool STARTED = false;
+    const char * LOG_FOLDER = "/home/nao/nbites/log/";
+    //const char * LOG_FOLDER = "/Users/pkoch/Desktop/LOGS/";
+    bool STARTED = false;
+    
+    //TODO need more experimenting for optimal size.
+    const uint64_t MAX_WRITTEN_BYTES = 5 * (1<<24);
+    uint64_t total_written = 0;
     
     void * file_io_loop(void * context);
     
@@ -48,10 +52,20 @@ namespace nblog {
             for (cur_bi = 0; cur_bi < NUM_LOG_BUFFERS; ++cur_bi) {
                 
                 for (int r = 0; r < LOG_RATIO[cur_bi]; ++r) {
+                    
+                    if (total_written > MAX_WRITTEN_BYTES) {
+                        printf("\n\n\n**********************\nWARNING:\n"
+                               "\tfileio SHUTTING DOWN AFTER WRITING %llu BYTES"
+                               "\n**********************\n\n\n",
+                               total_written);
+                        return NULL;
+                    }
+                    
                     obj = acquire(cur_bi, &(log_main.buffers[cur_bi].fileio_nextr));
                     
                     if (obj) {
                         wrote_something = 1;
+                        total_written += obj->fullSize();
                         if (write_to_fs(obj) > 0) {
                             printf("**********\nERROR!\n**********\n"
                                    "could not write log to file!\n\n");

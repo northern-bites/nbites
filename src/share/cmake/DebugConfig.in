@@ -80,3 +80,17 @@
 #else
 #   undef USE_LOGGING
 #endif
+
+#define START_WITH_FILEIO_${START_WITH_FILEIO}
+#ifdef  START_WITH_FILEIO_ON
+#   define START_WITH_FILEIO
+#else
+#   undef START_WITH_FILEIO
+#endif
+
+#define START_WITH_THUMBNAIL_${START_WITH_THUMBNAIL}
+#ifdef  START_WITH_THUMBNAIL_ON
+#   define START_WITH_THUMBNAIL
+#else
+#   undef START_WITH_THUMBNAIL
+#endif

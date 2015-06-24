@@ -208,6 +208,20 @@ namespace control {
         
         bzero((void *) flags, num_flags);
         
+#ifdef START_WITH_FILEIO
+#ifndef USE_LOGGING
+#error "option START_WITH_FILEIO defined WITHOUT option USE_LOGGING"
+#endif
+        flags[fileio] = 1;
+#endif
+        
+#ifdef START_WITH_THUMBNAIL
+#ifndef USE_LOGGING
+#error "option START_WITH_THUMBNAIL defined WITHOUT option USE_LOGGING"
+#endif
+        flags[thumbnail] = 1;
+#endif
+
         pthread_create(&control_thread, NULL, &cnc_loop, NULL);
         pthread_detach(control_thread);
     }

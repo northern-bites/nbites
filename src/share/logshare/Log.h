@@ -43,6 +43,13 @@ namespace nblog {
             const std::vector<SExpr>& contents_list,
             const std::string& contents_data);
         
+        Log(const std::string& log_class,
+            const std::string& where_made,
+            time_t when_made,
+            int version,
+            const std::vector<SExpr>& contents_list,
+            const void * buffer, size_t nbytes);
+        
         //Parses the SExpr expected to be in description.
         Log(std::string& description);
         //Uses expr as new tree
@@ -88,6 +95,12 @@ namespace nblog {
         //io stuff
         volatile bool _written;
         volatile int _refs;
+        
+        void generic(const std::string& log_class,
+                      const std::string& where_made,
+                      time_t when_made,
+                      int version,
+                      const std::vector<SExpr>& contents_list);
     };
 }
 

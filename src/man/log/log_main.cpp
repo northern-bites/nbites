@@ -195,7 +195,10 @@ namespace nblog {
                       control::flags[control::VISION]),
                 
                 SExpr("tripoint", control::tripoint,
-                      control::flags[control::tripoint])
+                      control::flags[control::tripoint]),
+                
+                SExpr("thumbnail", control::thumbnail,
+                      control::flags[control::thumbnail])
             };
             fields.push_back(SExpr(fvector));
             
@@ -417,6 +420,18 @@ namespace nblog {
         Log * newl = new Log(LOG_FIRST_ATOM_S, where_called, time(NULL), LOG_VERSION,
                              items, data);
         
+        
+        NBLog(buffer_index, newl);
+    }
+    
+    void NBLog(int buffer_index, const std::string& where_called,
+               const std::vector<SExpr>& items, const void * buffer, size_t nbytes ) {
+        if (!log_running) {
+            NBDEBUG("NBlog returning because !log_running\n");
+            return;
+        }
+        
+        Log * newl = new Log(LOG_FIRST_ATOM_S, where_called, time(NULL), LOG_VERSION, items, buffer, nbytes);
         
         NBLog(buffer_index, newl);
     }
