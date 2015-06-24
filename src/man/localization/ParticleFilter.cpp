@@ -58,11 +58,12 @@ ParticleFilter::~ParticleFilter()
 
 
 void ParticleFilter::update(const messages::RobotLocation& odometryInput,
-                            messages::FieldLines&          visionInput)
+                            messages::FieldLines&          linesInput,
+                            messages::Corners&             cornersInput)
 {
     // Update motion and vision system
     motionSystem->update(particles, odometryInput, errorMagnitude);
-    updatedVision = visionSystem->update(particles, visionInput, poseEstimate);
+    updatedVision = visionSystem->update(particles, linesInput, cornersInput);
 
     float avgErr = -1;
     // Resample if vision updated
@@ -90,7 +91,7 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
 
     // Update filters estimate
     updateEstimate();
-    projectObservationsOntoField(visionInput); 
+    projectObservationsOntoField(linesInput); 
 }
 
 // void ParticleFilter::update(const messages::RobotLocation& odometryInput,

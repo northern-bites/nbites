@@ -69,7 +69,8 @@ public:
      *  @brief Given a new motion and vision input, update the filter
      */
     void update(const messages::RobotLocation& motionInput,
-                messages::FieldLines&          visionInput);
+                messages::FieldLines&          linesInput,
+                messages::Corners&             cornersInput);
 
     // Overload to use ball info
     // void update(const messages::RobotLocation& motionInput,

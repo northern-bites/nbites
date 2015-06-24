@@ -31,7 +31,7 @@ public:
 
     bool update(ParticleSet& particles,
                 const messages::FieldLines& lines,
-                const messages::RobotLocation& currentEstimate);
+                const messages::Corners& corners);
 
     int getNumObservations() const { return numObservations; }
     float getLowestError() const { return lowestError; }

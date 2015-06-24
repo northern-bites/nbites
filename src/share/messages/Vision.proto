@@ -19,3 +19,15 @@ message FieldLines
 {
     repeated FieldLine line = 1;
 }
+
+message Corner
+{
+    optional float x = 1;
+    optional float y = 2;
+    optional int32 id = 3;
+}
+
+message Corners
+{
+    repeated Corner corner = 1;
+}

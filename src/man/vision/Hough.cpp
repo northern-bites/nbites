@@ -194,7 +194,12 @@ void HoughLineList::mapToField(const FieldHomography& h)
 
 Corner::Corner(FieldLine* first_, FieldLine* second_, CornerID id_)
   : std::pair<FieldLine*, FieldLine*>(first_, second_), id(id_)
-{}
+{
+  const GeoLine& field1 = (*first)[0].field();
+  const GeoLine& field2 = (*second)[0].field();
+
+  field1.intersect(field2, x, y);
+}
 
 string Corner::print() const
 {

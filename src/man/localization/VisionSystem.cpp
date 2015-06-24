@@ -20,7 +20,7 @@ VisionSystem::~VisionSystem()
 
 bool VisionSystem::update(ParticleSet& particles,
                           const messages::FieldLines& lines,
-                          const messages::RobotLocation& currentEstimate)
+                          const messages::Corners& corners)
 {
     numObservations = 0;
     lowestError = std::numeric_limits<float>::max();
