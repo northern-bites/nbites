@@ -21,7 +21,7 @@ namespace nblog {
     bool STARTED = false;
     
     //TODO need more experimenting for optimal size.
-    const uint64_t MAX_WRITTEN_BYTES = 5 * (1<<24);
+    const uint64_t MAX_WRITTEN_BYTES = 5 * (1<<25);
     uint64_t total_written = 0;
     
     void * file_io_loop(void * context);
