@@ -51,7 +51,7 @@ public class Session {
 		logs_DO = new ArrayList<Log>();
 		most_relevant = null;
 		
-		assert(dir != null || addr != null);
+		/* assert(dir != null || addr != null); */
 		assert(dir == null || addr == null);
 		
 		if (dir != null) {

@@ -48,9 +48,6 @@ namespace nblog {
     
     class SExpr {
     public:
-        
-        /**** standard constructors */
-        
         /* copy constructor: same as what the compiler would provide */
         
         SExpr( const SExpr& other );
@@ -85,6 +82,10 @@ namespace nblog {
         
         //key double value for use in log_main.
         SExpr(const std::string& key, int index, int cval);
+
+        // key double value for use by camera parameters (VisionModule)
+        SExpr(const std::string& key, double roll, double pitch);
+
         
         //used in camera calibration
         SExpr(const std::string& key, double roll, double pitch);

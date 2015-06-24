@@ -58,6 +58,16 @@ ImageTranscriber::ImageTranscriber(Camera::Type which) :
     cameraType(which),
     timeStamp(0)
 {
+    // Bottom camera takes video at half the resolution of the top camera
+    if (which == Camera::TOP) {
+        width = WIDTH_TOP_CAMERA;
+        height = HEIGHT_TOP_CAMERA;
+    } else {
+        width = WIDTH_TOP_CAMERA / 2;
+        height = HEIGHT_TOP_CAMERA / 2;
+    }
+    size = 2*width*height;
+
     initOpenI2CAdapter();
     initSelectCamera();
     initOpenVideoDevice();
@@ -131,7 +141,7 @@ void ImageTranscriber::initOpenVideoDevice() {
 }
 
 void ImageTranscriber::initSetCameraDefaults() {
-    v4l2_std_id esid0 = WIDTH == 320 ? 0x04000000UL : 0x08000000UL;
+    v4l2_std_id esid0 = width == 320 ? 0x04000000UL : 0x08000000UL;
     verify(ioctl(fd, VIDIOC_S_STD, &esid0),
            "Setting default parameters failed.");
     }
@@ -142,8 +152,8 @@ void ImageTranscriber::initSetImageFormat() {
     memset(&fmt, 0, sizeof(struct v4l2_format));
     fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     // We ask for a 640 by 480 image
-    fmt.fmt.pix.width = WIDTH;
-    fmt.fmt.pix.height = HEIGHT;
+    fmt.fmt.pix.width = width;
+    fmt.fmt.pix.height = height;
     //"In this format each four bytes is two pixels. Each four bytes is two
     //Y's, a Cb and a Cr. Each Y goes to one of the pixels, and the Cb and
     //Cr belong to both pixels. As you can see, the Cr and Cb components have
@@ -153,7 +163,7 @@ void ImageTranscriber::initSetImageFormat() {
     verify(ioctl(fd, VIDIOC_S_FMT, &fmt),
            "Setting image format failed.");
 
-    if(fmt.fmt.pix.sizeimage != (unsigned int)SIZE)
+    if(fmt.fmt.pix.sizeimage != (unsigned int)size)
         std::cerr << "CAMERA ERROR::Size setting is WRONG." << std::endl;
 }
 
@@ -461,7 +471,7 @@ messages::YUVImage ImageTranscriber::getNextImage()
         PROF_EXIT(P_BOT_DQBUF);
     }
 
-    if(requestBuff.bytesused != (unsigned int)SIZE)
+    if(requestBuff.bytesused != (unsigned int)size)
         std::cerr << "CAMERA::ERROR::Wrong buffer size!" << std::endl;
 
     static bool shout = true;
@@ -474,7 +484,7 @@ messages::YUVImage ImageTranscriber::getNextImage()
     return messages::YUVImage(new TranscriberBuffer(mem[requestBuff.index],
                                                     fd,
                                                     requestBuff),
-                              2*WIDTH, HEIGHT, 2*WIDTH);
+                              2*width, height, 2*width);
 }
 
 TranscriberModule::TranscriberModule(ImageTranscriber& trans)
@@ -502,147 +512,6 @@ void TranscriberModule::run_()
     messages::YUVImage image = it.getNextImage();
     portals::Message<messages::YUVImage> imageOutMessage(&image);
     imageOut.setMessage(imageOutMessage);
-        
-#ifdef USE_LOGGING
-    if (control::flags[control::tripoint]) {
-        ++image_index;
-        
-        std::string image_from;
-        if (it.type() == Camera::TOP) {
-            image_from = "camera_TOP";
-        } else {
-            image_from = "camera_BOT";
-        }
-        
-        long im_size = (image.width() * image.height() * 1);
-        int im_width = image.width() / 2;
-        int im_height= image.height();
-        
-        messages::JointAngles ja_pb = jointsIn.message();
-        messages::InertialState is_pb = inertsIn.message();
-        
-        std::string ja_buf;
-        std::string is_buf;
-        std::string im_buf((char *) image.pixelAddress(0, 0), im_size);
-        ja_pb.SerializeToString(&ja_buf);
-        is_pb.SerializeToString(&is_buf);
-        
-        im_buf.append(is_buf);
-        im_buf.append(ja_buf);
-        
-        std::vector<SExpr> contents;
-        
-        SExpr imageinfo("YUVImage", image_from, clock(), image_index, im_size);
-        imageinfo.append(SExpr(CONTENT_IMAGE_WIDTH_S, im_width)   );
-        imageinfo.append(SExpr(CONTENT_IMAGE_HEIGHT_S, im_height) );
-        imageinfo.append(SExpr(CONTENT_IMAGE_ENCODING_S, "[Y8(U8/V8)]"));
-        contents.push_back(imageinfo);
-        
-        /*
-         // Raw accelerometer data.
-         optional float acc_x = 1;
-         optional float acc_y = 2;
-         optional float acc_z = 3;
-         
-         // Raw gyrometer data.
-         optional float gyr_x = 4;
-         optional float gyr_y = 5;
-         
-         // Filtered angle data.
-         optional float angle_x = 6;
-         optional float angle_y = 7;
-         */
-        
-        SExpr inerts("InertialState", "tripoint", clock(), image_index, is_buf.length());
-        inerts.append(SExpr("acc_x", is_pb.acc_x()));
-        inerts.append(SExpr("acc_y", is_pb.acc_y()));
-        inerts.append(SExpr("acc_z", is_pb.acc_z()));
-        
-        inerts.append(SExpr("gyr_x", is_pb.gyr_x()));
-        inerts.append(SExpr("gyr_y", is_pb.gyr_y()));
-        
-        inerts.append(SExpr("angle_x", is_pb.angle_x()));
-        inerts.append(SExpr("angle_y", is_pb.angle_y()));
-        contents.push_back(inerts);
-        
-        /*
-         // Head angles.
-         optional float head_yaw = 1;
-         optional float head_pitch = 2;
-         
-         // Left arm angles.
-         optional float l_shoulder_pitch = 3;
-         optional float l_shoulder_roll = 4;
-         optional float l_elbow_yaw = 5;
-         optional float l_elbow_roll = 6;
-         optional float l_wrist_yaw = 7;
-         optional float l_hand = 8;
-         
-         // Right arm angles.
-         optional float r_shoulder_pitch = 9;
-         optional float r_shoulder_roll = 10;
-         optional float r_elbow_yaw = 11;
-         optional float r_elbow_roll = 12;
-         optional float r_wrist_yaw = 13;
-         optional float r_hand = 14;
-         
-         // Pelvis angles.
-         optional float l_hip_yaw_pitch = 15;
-         optional float r_hip_yaw_pitch = 16;
-         
-         // Left leg angles.
-         optional float l_hip_roll = 17;
-         optional float l_hip_pitch = 18;
-         optional float l_knee_pitch = 19;
-         optional float l_ankle_pitch = 20;
-         optional float l_ankle_roll = 21;
-         
-         // Right leg angles.
-         optional float r_hip_roll = 22;
-         optional float r_hip_pitch = 23;
-         optional float r_knee_pitch = 24;
-         optional float r_ankle_pitch = 25;
-         optional float r_ankle_roll = 26;
-         */
-        
-        SExpr joints("JointAngles", "tripoint", clock(), image_index, ja_buf.length());
-        joints.append(SExpr("head_yaw", ja_pb.head_yaw()));
-        joints.append(SExpr("head_pitch", ja_pb.head_pitch()));
-
-        joints.append(SExpr("l_shoulder_pitch", ja_pb.l_shoulder_pitch()));
-        joints.append(SExpr("l_shoulder_roll", ja_pb.l_shoulder_roll()));
-        joints.append(SExpr("l_elbow_yaw", ja_pb.l_elbow_yaw()));
-        joints.append(SExpr("l_elbow_roll", ja_pb.l_elbow_roll()));
-        joints.append(SExpr("l_wrist_yaw", ja_pb.l_wrist_yaw()));
-        joints.append(SExpr("l_hand", ja_pb.l_hand()));
-
-        joints.append(SExpr("r_shoulder_pitch", ja_pb.r_shoulder_pitch()));
-        joints.append(SExpr("r_shoulder_roll", ja_pb.r_shoulder_roll()));
-        joints.append(SExpr("r_elbow_yaw", ja_pb.r_elbow_yaw()));
-        joints.append(SExpr("r_elbow_roll", ja_pb.r_elbow_roll()));
-        joints.append(SExpr("r_wrist_yaw", ja_pb.r_wrist_yaw()));
-        joints.append(SExpr("r_hand", ja_pb.r_hand()));
-
-        joints.append(SExpr("l_hip_yaw_pitch", ja_pb.l_hip_yaw_pitch()));
-        joints.append(SExpr("r_hip_yaw_pitch", ja_pb.r_hip_yaw_pitch()));
-
-        joints.append(SExpr("l_hip_roll", ja_pb.l_hip_roll()));
-        joints.append(SExpr("l_hip_pitch", ja_pb.l_hip_pitch()));
-        joints.append(SExpr("l_knee_pitch", ja_pb.l_knee_pitch()));
-        joints.append(SExpr("l_ankle_pitch", ja_pb.l_ankle_pitch()));
-        joints.append(SExpr("l_ankle_roll", ja_pb.l_ankle_roll()));
-
-        joints.append(SExpr("r_hip_roll", ja_pb.r_hip_roll() ));
-        joints.append(SExpr("r_hip_pitch", ja_pb.r_hip_pitch() ));
-        joints.append(SExpr("r_knee_pitch", ja_pb.r_knee_pitch() ));
-        joints.append(SExpr("r_ankle_pitch", ja_pb.r_ankle_pitch() ));
-        joints.append(SExpr("r_ankle_roll", ja_pb.r_ankle_roll() ));
-        contents.push_back(joints);
-        
-        NBLog(NBL_IMAGE_BUFFER, "tripoint",
-                   contents, im_buf);
-    }
-#endif
 }
 
 }

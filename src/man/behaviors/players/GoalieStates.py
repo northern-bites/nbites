@@ -204,7 +204,8 @@ def watchWithCornerChecks(player):
 @superState('gameControllerResponder')
 def watch(player):
     if player.firstFrame():
-        player.brain.tracker.trackBall()
+        # player.brain.tracker.trackBall()
+        player.brain.tracker.repeatBasicPan()
         player.brain.nav.stand()
         player.returningFromPenalty = False
 

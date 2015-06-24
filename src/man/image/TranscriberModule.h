@@ -63,9 +63,8 @@ public:
 private:
     enum
     {
-        WIDTH = NAO_IMAGE_WIDTH,
-        HEIGHT = NAO_IMAGE_HEIGHT,
-        SIZE = WIDTH * HEIGHT * 2,
+        WIDTH_TOP_CAMERA = NAO_IMAGE_WIDTH,
+        HEIGHT_TOP_CAMERA = NAO_IMAGE_HEIGHT,
         NUM_BUFFERS = 4
     };
 
@@ -89,6 +88,10 @@ private:
     // @see Camera.h
     Camera::Settings settings;
     Camera::Type cameraType;
+
+    int width;
+    int height;
+    int size;
 
     int cameraAdapterFd;
     int fd;
@@ -117,6 +120,7 @@ public :
     portals::OutPortal<messages::YUVImage> imageOut;
     portals::OutPortal<messages::JointAngles> jointsOut;
     portals::OutPortal<messages::InertialState> inertsOut;
+
 protected :
     virtual void run_();
 private :

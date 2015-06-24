@@ -267,6 +267,7 @@ public class Log {
 		if (item.isAtom())
 			return null;
 		
+
 		SExpr bytes = item.find(CONTENT_NBYTES_S).get(1);
 		return bytes.exists() && bytes.isAtom() ? bytes.valueAsInt() : null;
 	}
@@ -291,6 +292,7 @@ public class Log {
 	public byte[] bytesForContentItem(int index) {
 		Integer offset = contentOffset(index);
 		Integer total = contentNumBytes(index);
+
 		if (offset == null || total == null)
 			return null;
 		
@@ -301,9 +303,9 @@ public class Log {
 	public static void main(String[] args) {
 		SExpr clist = SExpr.newList(
 				SExpr.newAtom("contents"),
-				SExpr.newList(SExpr.newKeyValue("bytes", 10)),
-				SExpr.newList(SExpr.newKeyValue("bytes", 50)),
-				SExpr.newList(SExpr.newKeyValue("bytes", 100))
+				SExpr.newList(SExpr.newKeyValue("bytes", "10")),
+				SExpr.newList(SExpr.newKeyValue("bytes", "50")),
+				SExpr.newList(SExpr.newKeyValue("bytes", "100"))
 				);
 		
 		SExpr top = SExpr.newList(clist);

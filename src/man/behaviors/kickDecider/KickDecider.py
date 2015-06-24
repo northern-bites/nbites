@@ -51,7 +51,7 @@ class KickDecider(object):
         return (kick for kick in self.possibleKicks).next().next()
 
     def frontKickCrosses(self):
-        self.brain.player.motionKick = False
+        self.brain.player.motionKick = True
         
         self.kicks = []
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
