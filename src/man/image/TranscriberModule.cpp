@@ -24,7 +24,6 @@
 
 using nblog::SExpr;
 using nblog::NBLog;
-using namespace rescon;
 
 #define V4L2_MT9M114_FADE_TO_BLACK (V4L2_CID_PRIVATE_BASE)
 

@@ -86,10 +86,6 @@ namespace nblog {
         // key double value for use by camera parameters (VisionModule)
         SExpr(const std::string& key, double roll, double pitch);
 
-        
-        //used in camera calibration
-        SExpr(const std::string& key, double roll, double pitch);
-        
         /**** factory methods to stack */
         
         static SExpr atom(const std::string& n) {return SExpr(n);}
