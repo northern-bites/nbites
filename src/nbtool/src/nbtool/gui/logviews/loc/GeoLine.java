@@ -88,8 +88,7 @@ public class GeoLine {
         ystring += scale*Math.sin(t);
 
         g2.drawLine(x1,(int)FieldConstants.FIELD_HEIGHT-y1,x2,(int)FieldConstants.FIELD_HEIGHT-y2);
-        g2.drawString(Integer.toString((int) id) + "/" 
-        				+ Double.toString(prob), 
-                        (int) xstring, (int) ystring);
+        g2.drawString(Integer.toString((int) id) + "/" + Double.toString(prob), 
+                        (int) xstring, (int) (FieldConstants.FIELD_HEIGHT-ystring));
 	}
 }
