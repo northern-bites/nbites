@@ -146,7 +146,7 @@ private:
      */
     void updateEstimate();
 
-    void projectObservationsOntoField(messages::FieldLines& visionInput);
+    void updateLinesForDebug(messages::FieldLines& visionInput);
 
     /**
      * @brief - Return symmetric location from given one

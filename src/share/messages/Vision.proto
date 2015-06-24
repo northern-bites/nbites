@@ -9,10 +9,11 @@ message HoughLine
 }
 
 message FieldLine
- {
+{
     optional HoughLine inner = 1;
     optional HoughLine outer = 2;
     optional int32 id = 3;
+    optional float prob = 4;
 }
 
 message FieldLines

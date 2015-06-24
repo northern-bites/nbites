@@ -61,12 +61,12 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
                             messages::FieldLines&          linesInput,
                             messages::Corners&             cornersInput)
 {
-    // Update motion and vision system
+    // Motion system and vision system update step
     motionSystem->update(particles, odometryInput, errorMagnitude);
     updatedVision = visionSystem->update(particles, linesInput, cornersInput);
 
-    float avgErr = -1;
     // Resample if vision updated
+    float avgErr = -1;
     if(updatedVision) {
         resample();
         updatedVision = false;
@@ -91,7 +91,9 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
 
     // Update filters estimate
     updateEstimate();
-    projectObservationsOntoField(linesInput); 
+
+    // For debug tools, project lines onto field, set IDs, etc.
+    updateLinesForDebug(linesInput); 
 }
 
 // void ParticleFilter::update(const messages::RobotLocation& odometryInput,
@@ -183,9 +185,11 @@ void ParticleFilter::updateEstimate()
 
 }
 
-void ParticleFilter::projectObservationsOntoField(messages::FieldLines& visionInput)
+void ParticleFilter::updateLinesForDebug(messages::FieldLines& visionInput)
 {
+    LineSystem lineSystem;
     for (int i = 0; i < visionInput.line_size(); i++) {
+        // Project lines onto the field
         vision::GeoLine projected = LineSystem::relRobotToAbsolute(visionInput.line(i), poseEstimate);
         messages::FieldLine& field = *visionInput.mutable_line(i);
         messages::HoughLine& hough = *field.mutable_inner();
@@ -194,6 +198,16 @@ void ParticleFilter::projectObservationsOntoField(messages::FieldLines& visionIn
         hough.set_t(projected.t());
         hough.set_ep0(projected.ep0());
         hough.set_ep1(projected.ep1());
+
+        // Lines that the particle filter did not use are given -1 as ID
+        if (!LineSystem::shouldUse(visionInput.line(i))) {
+            field.set_id(-1);
+            continue;
+        }
+
+        // Otherwise line system handles classification and scoring
+        field.set_id(static_cast<int>(lineSystem.matchObservation(field, poseEstimate)));
+        field.set_prob(static_cast<int>(lineSystem.scoreObservation(field, poseEstimate)));
     }
 }
 

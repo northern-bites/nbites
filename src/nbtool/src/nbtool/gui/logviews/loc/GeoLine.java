@@ -7,8 +7,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.*;
 
 public class GeoLine {
-	double r,t,end0,end1,houghIndex,fieldIndex;
-	double ux, uy;
+	double r,t,end0,end1,houghIndex,fieldIndex,id,prob;
 
 	public GeoLine() {
 		r = 0;
@@ -17,8 +16,8 @@ public class GeoLine {
 		end1 = 0;
 		houghIndex = 0;
 		fieldIndex = 0;
-		ux = Math.cos(0);
-		uy = Math.sin(0);
+		id = 0;
+		prob = 0;
 	}
 
 	public GeoLine(double line_r, double line_t, double line_end0, 
@@ -29,8 +28,6 @@ public class GeoLine {
 		end1 = line_end1;
 		houghIndex = line_houghInd;
 		fieldIndex = line_fieldInd;
-		ux = Math.cos(t);
-		uy = Math.sin(t);
 	}
 
 	public void draw(Graphics2D g2, BufferedImage origImg) {
@@ -79,29 +76,20 @@ public class GeoLine {
         int x2 = (int) Math.round(x0 + end1 * Math.sin(t));
         int y2 = (int) Math.round(y0 - end1 * Math.cos(t));
 
+        double xstring = (x1 + x2) / 2;
+        double ystring = (y1 + y2) / 2;
+
+        double scale = 0;
+        if (r > 0) {
+        	scale = 10;
+        } else { scale = 3; }
+        
+        xstring += scale*Math.cos(t);
+        ystring += scale*Math.sin(t);
+
         g2.drawLine(x1,(int)FieldConstants.FIELD_HEIGHT-y1,x2,(int)FieldConstants.FIELD_HEIGHT-y2);
+        g2.drawString(Integer.toString((int) id) + "/" 
+        				+ Double.toString(prob), 
+                        (int) xstring, (int) ystring);
 	}
-
-	/*
-	public void endPoints(Double[] epoints) {
-		double x0 = r*ux;
-		double y0 = r*uy;
-		epoints[0] = x0+end0*uy;
-		epoints[1] = y0-end0*ux;
-		epoints[2] = x0+end1*uy;
-		epoints[3] = y0-end1*ux;
-	}
-
-	public void translateRotate(double xTrans, double yTrans, double rotation) {
-		Double ep[] = new Double[4];
-		endPoints(ep);
-
-		Double ep1t[] = new Double[2];
-		Double ep2t[] = new Double[2];
-
-		translateRotate(ep[0],ep[1],xTrans,yTrans,rotation,ep1t);
-		translateRotate(ep[2],ep[3],xTrans,yTrans,rotation,ep2t);
-
-
-	} */
 }

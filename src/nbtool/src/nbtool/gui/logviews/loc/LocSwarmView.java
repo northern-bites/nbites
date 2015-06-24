@@ -1,25 +1,24 @@
 package nbtool.gui.logviews.loc;
 
-//imports
-	import java.awt.*;
-	import java.awt.geom.*;
-	import java.awt.event.*;
-	import javax.swing.*;
+import java.awt.*;
+import java.awt.geom.*;
+import java.awt.event.*;
+import javax.swing.*;
 
-	import java.io.ByteArrayInputStream;
-	import java.io.IOException;
-	import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-	import com.google.protobuf.Message;
+import com.google.protobuf.Message;
 
-	import messages.RobotLocationOuterClass.*;
-	import messages.ParticleSwarmOuterClass.ParticleSwarm;
-	import messages.ParticleSwarmOuterClass.Particle;
-	import messages.Vision.*;
+import messages.RobotLocationOuterClass.*;
+import messages.ParticleSwarmOuterClass.ParticleSwarm;
+import messages.ParticleSwarmOuterClass.Particle;
+import messages.Vision.*;
 
-	import nbtool.data.Log;
-	import nbtool.data.SExpr;
-	import nbtool.gui.logviews.misc.ViewParent;
+import nbtool.data.Log;
+import nbtool.data.SExpr;
+import nbtool.gui.logviews.misc.ViewParent;
 
 public class LocSwarmView extends ViewParent implements ActionListener {
 
@@ -61,16 +60,9 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 				naoLines[i].end1 = curFieldLine.getInner().getEp1();
 				naoLines[i].houghIndex = 0.0;
 				naoLines[i].fieldIndex = 0.0;
+				naoLines[i].id = curFieldLine.getId();
+				naoLines[i].prob = curFieldLine.getProb();
 			}
-            /* numLines = 1; */
-			/* for(int i=0; i<1; i++) { */
-			/* 	naoLines[i].r = FieldConstants.CENTER_FIELD_X; */
-			/* 	naoLines[i].t = 0; */
-			/* 	naoLines[i].end0 = 100; */
-			/* 	naoLines[i].end1 = 200; */
-			/* 	naoLines[i].houghIndex = 0.0; */
-			/* 	naoLines[i].fieldIndex = 0.0; */
-			/* } */
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
