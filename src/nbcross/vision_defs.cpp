@@ -40,7 +40,7 @@ int Vision_func() {
 
     // Parse YUVImage S-expression
     // Determine if we are looking at a top or bottom image from log description
-    bool topCamera = copy->description().find("TOP") != std::string::npos;
+    bool topCamera = copy->description().find("camera_TOP") != std::string::npos;
     int width, height;
     std::vector<SExpr*> vec = copy->tree().recursiveFind("width");
     if (vec.size() != 0) {
