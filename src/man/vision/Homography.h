@@ -221,8 +221,8 @@ protected:
 
   void setEndPoints(double ep0, double ep1)
   {
-    _ep0 = ep0;
-    _ep1 = ep1;
+    _ep0 = min(ep0, ep1);
+    _ep1 = max(ep0, ep1);
   }
 
 public:
@@ -245,7 +245,7 @@ public:
   {
     this->r(r);
     this->t(t);
-    setEndPoints(min(ep0, ep1), max(ep0, ep1));
+    setEndPoints(ep0, ep1);
   }
 
   // Copy/assign OK

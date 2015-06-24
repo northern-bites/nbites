@@ -24,7 +24,7 @@ namespace localization {
 
 // TODO rename LineID as VisionLineID
 enum class LocLineID {
-    NotMatched,
+    NotMatched = 0,
     OurEndline,
     TheirEndline,
     OurMidline,
