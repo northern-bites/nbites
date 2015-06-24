@@ -8,7 +8,7 @@ namespace resconvert {
     typedef uint8_t YUVSubPixel;
     
     typedef enum {
-        R080_040 = 0,
+        R080_060 = 0,
         R160_120 = 1,
         R320_240 = 2,
         R640_480 = 3

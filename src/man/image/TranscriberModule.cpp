@@ -516,7 +516,7 @@ void TranscriberModule::run_()
             image_from = "camera_BOT";
         }
         
-        logThumbnail(image, image_from, ++index);
+        logThumbnail(image, image_from, ++image_index);
     }
 #endif
 }
