@@ -8,7 +8,7 @@ from ..headTracker import HeadMoves
 import GoalieConstants as constants
 import math
 
-SAVING = False
+SAVING = True
 DIVING = False
 
 @superState('gameControllerResponder')
@@ -97,7 +97,7 @@ def gamePlaying(player):
 
     #TODO before game/scrimmage change this to watch;
     # this is better for testing purposes!
-    return player.goLater('watchWithLineChecks')
+    return player.goLater('watch')
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
