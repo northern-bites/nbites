@@ -33,7 +33,7 @@ def approachBall(player):
         elif player.penaltyKicking:
             return player.goNow('prepareForPenaltyKick')
         else:
-            player.brain.nav.chaseBall(Navigator.FULL_SPEED, fast = True)
+            player.brain.nav.chaseBall(Navigator.QUICK_SPEED, fast = True)
 
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
@@ -42,7 +42,7 @@ def approachBall(player):
     elif transitions.shouldDecelerate(player):
         player.brain.nav.chaseBallDeceleratingSpeed()
     else:
-        player.brain.nav.chaseBall(Navigator.FULL_SPEED, fast = True)
+        player.brain.nav.chaseBall(Navigator.QUICK_SPEED, fast = True)
 
 
 @defaultState('prepareForKick')
