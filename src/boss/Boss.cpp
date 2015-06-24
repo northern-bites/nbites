@@ -29,7 +29,7 @@
 
 
 
-std::chrono::time_point<std::chrono::high_resolution_clock> pre_start, post_start;
+std::chrono::time_point<std::chrono::high_resolution_clock> pre_start, post_start, temp_start;
 void DCM_TIMING_DEBUG_PRE1() {
     pre_start = std::chrono::high_resolution_clock::now();
 }
@@ -55,12 +55,30 @@ void DCM_TIMING_DEBUG_POST2() {
         printf("WARNING: DCMPostCallback took %li microseconds!\n", micros);
     }
 }
+
+void DCM_TIMING_DEBUG_START() {
+    temp_start = std::chrono::high_resolution_clock::now();
+}
+
+bool DCM_TIMING_DEBUG_END() {
+    auto tpnow = std::chrono::high_resolution_clock::now();
+    long micros = std::chrono::duration_cast<std::chrono::microseconds>(tpnow - temp_start).count();
+    
+    if (micros > 10000 || DCM_TIMING_DEBUG) {
+        printf("WARNING: DCM_TIMING_DEBUG measured %li microseconds!\n", micros);
+        return true;
+    }
+    return false;
+}
 #else
 
 #define DCM_TIMING_DEBUG_PRE1()
 #define DCM_TIMING_DEBUG_PRE2()
 #define DCM_TIMING_DEBUG_POST1()
 #define DCM_TIMING_DEBUG_POST2()
+
+#define DCM_TIMING_DEBUG_START()
+#define DCM_TIMING_DEBUG_END() false
 
 #endif
 
@@ -354,8 +372,13 @@ bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, uint64_t index)
 void Boss::DCMPostProcessCallback()
 {
     DCM_TIMING_DEBUG_POST1();
+    DCM_TIMING_DEBUG_START();
     SensorValues values = sensor.getSensors();
+    if (DCM_TIMING_DEBUG_END()) {
+        std::cout << "getting sensor values was the problem!" << std::endl;
+    }
 
+    DCM_TIMING_DEBUG_START();
     std::vector<SerializableBase*> objects = {
         // serializer deletes these
         new ProtoSer(&values.joints),
@@ -371,27 +394,44 @@ void Boss::DCMPostProcessCallback()
     };
     uint64_t nextSensorIndex = (shared->latestSensorWritten + 1);
     // Serialize the protobufs to shared mem
+    if (DCM_TIMING_DEBUG_END()) {
+        std::cout << "vectorizing was the problem!" << std::endl;
+    }
+    DCM_TIMING_DEBUG_START();
     if (!serializeTo(objects, nextSensorIndex, sensorStaging, SENSOR_SIZE, NULL)) {
         std::cout << "O HUCK! Couldn't serialize!" << std::endl;
         return;
     }
-
+    if (DCM_TIMING_DEBUG_END()) {
+        std::cout << "serializeTo was the problem!" << std::endl;
+    }
+    DCM_TIMING_DEBUG_START();
     if (!bossSyncWrite(shared, sensorStaging, nextSensorIndex)) {
         printf("Boss::DCMPostProcessCallback COULD NOT POST FRESH SENSORS (skip)\n");
         ++sensorSkips;
     }
-
+    if (DCM_TIMING_DEBUG_END()) {
+        std::cout << "bossSyncWrite was the problem!" << std::endl;
+    }
+    DCM_TIMING_DEBUG_START();
     uint64_t lastRead = shared->latestSensorRead;
+    if (DCM_TIMING_DEBUG_END()) {
+        std::cout << "WTF?? How is that possible??" << std::endl;
+    }
+    DCM_TIMING_DEBUG_START();
     if (nextSensorIndex - lastRead > 2 && (lastRead != 0) && manRunning) {
         std::cout << "MAN missed a frame" << std::endl;
     }
+    if (DCM_TIMING_DEBUG_END()) {
+        std::cout << "IT WAS THIS FUCKING THING" << std::endl;
+    }
 
-    if (nextSensorIndex - lastRead > 10) {
+    //if (nextSensorIndex - lastRead > 10) {
         // TODO: Kill? If we get here man is (most likely) already dead
         //std::cout << "Sensors aren't getting read! Did Man die?" << std::endl;
         //std::cout << "commandIndex: " << sensorIndex << " lastRead: " << lastRead << std::endl;
         //manRunning = false; // TODO
-    }
+    //}
     DCM_TIMING_DEBUG_POST2();
 }
 
