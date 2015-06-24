@@ -64,10 +64,12 @@ public final class Display extends JFrame {
 		ldp = new LogDisplayPanel(true);
 		
 		cntrlp = new ControlPanel();
+		camstrmp = new StreamingPanel();
 		lc = new LogChooser();
 		left.addTab("control", cntrlp);
 		left.addTab("logs", lc);
-				
+		left.addTab("camera",camstrmp);
+		
 		statusp = new StatusPanel();
 		right.addTab("status", statusp);
 		
@@ -110,6 +112,7 @@ public final class Display extends JFrame {
 	private JTabbedPane right;
 	
 	private ControlPanel cntrlp;
+	private StreamingPanel camstrmp;
 	private StatusPanel statusp;
 	private LogChooser lc;
 		

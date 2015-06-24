@@ -6,6 +6,9 @@
 #include <sys/mman.h>
 #include <cerrno>
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <streambuf>
 #include <linux/version.h>
 #include <bn/i2c/i2c-dev.h>
 #include <vector>
@@ -17,12 +20,11 @@
 #include "../control/control.h"
 #include "nbdebug.h"
 #include "thumbnail.h"
+#include "../../share/logshare/SExpr.h"
 
 using nblog::SExpr;
 using nblog::NBLog;
-
-
-
+using namespace rescon;
 
 #define V4L2_MT9M114_FADE_TO_BLACK (V4L2_CID_PRIVATE_BASE)
 
@@ -59,6 +61,16 @@ ImageTranscriber::ImageTranscriber(Camera::Type which) :
     cameraType(which),
     timeStamp(0)
 {
+    // Bottom camera takes video at half the resolution of the top camera
+    if (which == Camera::TOP) {
+        width = WIDTH_TOP_CAMERA;
+        height = HEIGHT_TOP_CAMERA;
+    } else {
+        width = WIDTH_TOP_CAMERA / 2;
+        height = HEIGHT_TOP_CAMERA / 2;
+    }
+    size = 2*width*height;
+
     initOpenI2CAdapter();
     initSelectCamera();
     initOpenVideoDevice();
@@ -132,7 +144,7 @@ void ImageTranscriber::initOpenVideoDevice() {
 }
 
 void ImageTranscriber::initSetCameraDefaults() {
-    v4l2_std_id esid0 = WIDTH == 320 ? 0x04000000UL : 0x08000000UL;
+    v4l2_std_id esid0 = width == 320 ? 0x04000000UL : 0x08000000UL;
     verify(ioctl(fd, VIDIOC_S_STD, &esid0),
            "Setting default parameters failed.");
     }
@@ -143,8 +155,8 @@ void ImageTranscriber::initSetImageFormat() {
     memset(&fmt, 0, sizeof(struct v4l2_format));
     fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     // We ask for a 640 by 480 image
-    fmt.fmt.pix.width = WIDTH;
-    fmt.fmt.pix.height = HEIGHT;
+    fmt.fmt.pix.width = width;
+    fmt.fmt.pix.height = height;
     //"In this format each four bytes is two pixels. Each four bytes is two
     //Y's, a Cb and a Cr. Each Y goes to one of the pixels, and the Cb and
     //Cr belong to both pixels. As you can see, the Cr and Cb components have
@@ -154,7 +166,7 @@ void ImageTranscriber::initSetImageFormat() {
     verify(ioctl(fd, VIDIOC_S_FMT, &fmt),
            "Setting image format failed.");
 
-    if(fmt.fmt.pix.sizeimage != (unsigned int)SIZE)
+    if(fmt.fmt.pix.sizeimage != (unsigned int)size)
         std::cerr << "CAMERA ERROR::Size setting is WRONG." << std::endl;
 }
 
@@ -214,44 +226,131 @@ void ImageTranscriber::initQueueAllBuffers() {
 }
 void ImageTranscriber::initSettings()
 {
+    std::string filepath;
+#ifdef NAOQI_2 //for NAOQI 2.x
+    if(cameraType == Camera::TOP) {
+        filepath = "/home/nao/nbites/Config/V5topCameraParams.txt";
+        std::cout<<"[INFO] Camera::TOP"<<std::endl;
+    } else {
+        filepath = "/home/nao/nbites/Config/V5bottomCameraParams.txt";
+        std::cout<<"[INFO] Camera::BOTTOM"<<std::endl;
+    }
+#else //for NAOQI 1.14
+    if(cameraType == Camera::TOP) {
+        filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
+        std::cout<<"[INFO] Camera::TOP"<<std::endl;
+    } else {
+        filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
+        std::cout<<"[INFO] Camera::BOTTOM"<<std::endl;
+    }
+#endif
+    
+    if(FILE *file = fopen(filepath.c_str(),"r")) {
+        fclose(file);
+        
+        std::ifstream inputFile(filepath);
+        std::string readInFile((std::istreambuf_iterator<char>(inputFile)),
+                                std::istreambuf_iterator<char>());
+
+        int i=0;
+        SExpr params = *SExpr::read(readInFile,i);
+
+        if(params.count() >= 2) {
+            std::cout << "[INFO] Reading from SExpr path: ";
+            std::cout << filepath << std::endl;
+
+            updated_settings.hflip = params.find("hflip")->get(1)->valueAsInt();
+            updated_settings.vflip = params.find("vflip")->get(1)->valueAsInt();
+            updated_settings.auto_exposure = params.find("autoexposure")->get(1)->valueAsInt();
+            updated_settings.brightness = params.find("brightness")->get(1)->valueAsInt();
+            updated_settings.contrast = params.find("contrast")->get(1)->valueAsInt();
+            updated_settings.saturation = params.find("saturation")->get(1)->valueAsInt();
+            updated_settings.hue = params.find("hue")->get(1)->valueAsInt();
+            updated_settings.sharpness = params.find("sharpness")->get(1)->valueAsInt();
+            updated_settings.gamma = params.find("gamma")->get(1)->valueAsInt();
+            updated_settings.auto_whitebalance = params.find("auto_whitebalance")->get(1)->valueAsInt();
+            updated_settings.exposure = params.find("exposure")->get(1)->valueAsInt();
+            updated_settings.gain = params.find("gain")->get(1)->valueAsInt();
+            updated_settings.white_balance = params.find("white_balance")->get(1)->valueAsInt();
+            updated_settings.fade_to_black = params.find("fade_to_black")->get(1)->valueAsInt();
+        } else {
+            std::cout<<"[ERR] Invalid SExpr"<<std::endl;   
+            std::cout<<"[ERR] Check /nbites/Config/ for them"<<std::endl;  
+        }
+    } else {
+        std::cout<<"[ERR] Config files not found."<<std::endl;
+    }
+
     // DO NOT SCREW UP THE ORDER BELOW
-    setControlSetting(V4L2_CID_HFLIP, settings.hflip);
-    setControlSetting(V4L2_CID_VFLIP, settings.vflip);
+    setControlSetting(V4L2_CID_HFLIP, updated_settings.hflip);
+    setControlSetting(V4L2_CID_VFLIP, updated_settings.vflip);
 
     // Still need to turn this on to change brightness, grumble grumble
     setControlSetting(V4L2_CID_EXPOSURE_AUTO, 1);
 
-    setControlSetting(V4L2_CID_BRIGHTNESS, settings.brightness);
-    setControlSetting(V4L2_CID_CONTRAST, settings.contrast);
-    setControlSetting(V4L2_CID_SATURATION, settings.saturation);
-    setControlSetting(V4L2_CID_HUE, settings.hue);
-    setControlSetting(V4L2_CID_SHARPNESS, settings.sharpness);
-#ifdef NAOQI_2
-    setControlSetting(V4L2_CID_GAMMA, settings.gamma);
-#endif
+    setControlSetting(V4L2_CID_BRIGHTNESS, updated_settings.brightness);
+    setControlSetting(V4L2_CID_CONTRAST, updated_settings.contrast);
+    setControlSetting(V4L2_CID_SATURATION, updated_settings.saturation);
+    setControlSetting(V4L2_CID_HUE, updated_settings.hue);
+    setControlSetting(V4L2_CID_SHARPNESS, updated_settings.sharpness);
 
+#ifdef NAOQI_2
+    setControlSetting(V4L2_CID_GAMMA, updated_settings.gamma);
+#endif
     // Auto white balance, exposure,  and backlight comp off!
     // The first two are both for white balance. The docs don't make
     // it clear what the difference is...
     setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE,
-                      settings.auto_whitebalance);
+                      updated_settings.auto_whitebalance);
     setControlSetting(V4L2_CID_BACKLIGHT_COMPENSATION,
-                      settings.backlight_compensation);
-    setControlSetting(V4L2_CID_EXPOSURE_AUTO, settings.auto_exposure);
+                      updated_settings.backlight_compensation);
+    setControlSetting(V4L2_CID_EXPOSURE_AUTO, updated_settings.auto_exposure);
+    setControlSetting(V4L2_CID_EXPOSURE, updated_settings.exposure);
+    setControlSetting(V4L2_CID_GAIN, updated_settings.gain);
+
 #ifdef NAOQI_2
     setControlSetting(V4L2_CID_DO_WHITE_BALANCE, 0);
-#endif
-    setControlSetting(V4L2_CID_EXPOSURE, settings.exposure);
-    setControlSetting(V4L2_CID_GAIN, settings.gain);
-
-    // This is actually just the white balance setting!
-#ifdef NAOQI_2
-    setControlSetting(V4L2_CID_WHITE_BALANCE_TEMPERATURE,
-                      settings.white_balance);
+    setControlSetting(V4L2_CID_WHITE_BALANCE_TEMPERATURE, updated_settings.white_balance);
 #else
-    setControlSetting(V4L2_CID_DO_WHITE_BALANCE, settings.white_balance);
+    setControlSetting(V4L2_CID_DO_WHITE_BALANCE, updated_settings.white_balance);
 #endif
-    setControlSetting(V4L2_MT9M114_FADE_TO_BLACK, settings.fade_to_black);
+    setControlSetting(V4L2_MT9M114_FADE_TO_BLACK, updated_settings.fade_to_black);
+
+    //testControlSettings();
+}
+
+void ImageTranscriber::testControlSettings() {
+    int hflip = getControlSetting(V4L2_CID_HFLIP);
+    int vflip = getControlSetting(V4L2_CID_VFLIP);
+    int brightness = getControlSetting(V4L2_CID_BRIGHTNESS);
+    int contrast = getControlSetting(V4L2_CID_CONTRAST);
+    int saturation = getControlSetting(V4L2_CID_SATURATION);
+    int hue = getControlSetting(V4L2_CID_HUE);
+    int sharpness = getControlSetting(V4L2_CID_SHARPNESS);
+    int gain = getControlSetting(V4L2_CID_GAIN);
+    int exposure = getControlSetting(V4L2_CID_EXPOSURE);
+
+#ifdef NAOQI_2
+    int whitebalance = getControlSetting(V4L2_CID_WHITE_BALANCE_TEMPERATURE);
+#else
+    int whitebalance = getControlSetting(V4L2_CID_DO_WHITE_BALANCE);
+#endif
+    int fade = getControlSetting(V4L2_MT9M114_FADE_TO_BLACK);
+
+
+    std::cout<<"***Settings from Driver***"<<std::endl;
+    std::cout<<"Camera: "<<cameraType<<std::endl;
+    std::cout<<"HFLIP: "<<hflip<<"\n"
+             <<"VFLIP: "<<vflip<<"\n"
+             <<"Brightness: "<<brightness<<"\n"
+             <<"Contrast: "<<contrast<<"\n"
+             <<"Saturation: "<<saturation<<"\n"
+             <<"Hue: "<<hue<<"\n"
+             <<"Sharpness: "<<sharpness<<"\n"
+             <<"Gain: "<<gain<<"\n"
+             <<"Exposure: "<<exposure<<"\n"
+             <<"Whitebalance: "<<whitebalance<<"\n"
+             <<"Fade: "<<fade<<"\n"<<std::endl;
 }
 
 int ImageTranscriber::getControlSetting(unsigned int id) {
@@ -272,13 +371,18 @@ bool ImageTranscriber::setControlSetting(unsigned int id, int value) {
 
     int counter = 0;
 
+    //std::cout<<"VALUE ON DRIVER: "<<getControlSetting(id)<<std::endl;
+    //std::cout<<"VALUE PASSED IN: "<<value<<std::endl;
+
     // Have to make sure the setting "sticks"
     while(getControlSetting(id) != value)
     {
+        errno = 0;
         if (ioctl(fd, VIDIOC_S_CTRL, &control_s) < 0)
         {
-            std::cerr << "CAMERA::Warning::Control setting failed." <<
-                std::endl;
+            int err = errno;
+            std::cerr << "CAMERA::Warning::Control setting failed with errno: " <<
+                strerror(err) << std::endl;
             return false;
         }
         counter++;
@@ -331,91 +435,91 @@ void ImageTranscriber::assertCameraSettings() {
 
     //std::cerr << "Done checking driver settings" << std::endl;
 
-    if (hflip != settings.hflip)
+    if (hflip != updated_settings.hflip)
     {
         std::cerr << "CAMERA::WARNING::Horizontal flip setting is wrong:"
                   << std::endl;
-        std::cerr << " is " << hflip << " not " << settings.hflip <<
+        std::cerr << " is " << hflip << " not " << updated_settings.hflip <<
             std::endl;
         allFine = false;
     }
-    if (vflip != settings.vflip)
+    if (vflip != updated_settings.vflip)
     {
         std::cerr << "CAMERA::WARNING::Vertical flip setting is wrong:"
                   << std::endl;
-        std::cerr << " is " << vflip  << " not " << settings.vflip <<
+        std::cerr << " is " << vflip  << " not " << updated_settings.vflip <<
             std::endl;
         allFine = false;
     }
-    if (brightness != settings.brightness)
+    if (brightness != updated_settings.brightness)
     {
         std::cerr << "CAMERA::WARNING::Brightness setting is wrong:"
                   << std::endl;
-        std::cerr << " is " <<  brightness << " not " << settings.brightness
+        std::cerr << " is " <<  brightness << " not " << updated_settings.brightness
                   << std::endl;
         allFine = false;
     }
-    if (contrast != settings.contrast)
+    if (contrast != updated_settings.contrast)
     {
         std::cerr << "CAMERA::WARNING::Contrast setting is wrong:"
                   << std::endl;
-        std::cerr << " is " <<  contrast << " not " << settings.contrast
+        std::cerr << " is " <<  contrast << " not " << updated_settings.contrast
                   << std::endl;
         allFine = false;
     }
-    if (saturation != settings.saturation)
+    if (saturation != updated_settings.saturation)
     {
         std::cerr << "CAMERA::WARNING::Saturation setting is wrong:"
                   << std::endl;
-        std::cerr << " is " <<  saturation << " not " << settings.saturation
+        std::cerr << " is " <<  saturation << " not " << updated_settings.saturation
                   << std::endl;
         allFine = false;
     }
-    if (hue != settings.hue)
+    if (hue != updated_settings.hue)
     {
         std::cerr << "CAMERA::WARNING::Hue setting is wrong:"
                   << std::endl;
-        std::cerr << " is " <<  hue << " not " << settings.hue
+        std::cerr << " is " <<  hue << " not " << updated_settings.hue
                   << std::endl;
         allFine = false;
     }
-   if (sharpness != settings.sharpness)
+   if (sharpness != updated_settings.sharpness)
     {
         std::cerr << "CAMERA::WARNING::Sharpness setting is wrong:"
                   << std::endl;
-        std::cerr << " is " <<  sharpness << " not " << settings.sharpness
+        std::cerr << " is " <<  sharpness << " not " << updated_settings.sharpness
                   << std::endl;
         allFine = false;
     }
-   if (gain != settings.gain)
+   if (gain != updated_settings.gain)
     {
         std::cerr << "CAMERA::WARNING::Gain setting is wrong:"
                   << std::endl;
-        std::cerr << " is " <<  gain << " not " << settings.gain
+        std::cerr << " is " <<  gain << " not " << updated_settings.gain
                   << std::endl;
         allFine = false;
     }
-   if (exposure != settings.exposure)
+   if (exposure != updated_settings.exposure)
     {
         std::cerr << "CAMERA::WARNING::Exposure setting is wrong:"
                   << std::endl;
-        std::cerr << " is " <<  exposure << " not " << settings.exposure
+        std::cerr << " is " <<  exposure << " not " << updated_settings.exposure
                   << std::endl;
         allFine = false;
     }
-   if (whitebalance != settings.white_balance)
+   if (whitebalance != updated_settings.white_balance)
     {
         std::cerr << "CAMERA::WARNING::Whitebalance setting is wrong:"
                   << std::endl;
-        std::cerr << " is " <<  whitebalance << " not " << settings.white_balance
+        std::cerr << " is " <<  whitebalance << " not " << updated_settings.white_balance
                   << std::endl;
         allFine = false;
     }
-   if (fade != settings.fade_to_black)
+   if (fade != updated_settings.fade_to_black)
    {
         std::cerr << "CAMERA::WARNING::Fade to black setting is wrong:"
                   << std::endl;
-        std::cerr << " is " <<  fade << " not " << settings.fade_to_black
+        std::cerr << " is " <<  fade << " not " << updated_settings.fade_to_black
                   << std::endl;
         allFine = false;
    }
@@ -462,7 +566,7 @@ messages::YUVImage ImageTranscriber::getNextImage()
         PROF_EXIT(P_BOT_DQBUF);
     }
 
-    if(requestBuff.bytesused != (unsigned int)SIZE)
+    if(requestBuff.bytesused != (unsigned int)size)
         std::cerr << "CAMERA::ERROR::Wrong buffer size!" << std::endl;
 
     static bool shout = true;
@@ -475,7 +579,8 @@ messages::YUVImage ImageTranscriber::getNextImage()
     return messages::YUVImage(new TranscriberBuffer(mem[requestBuff.index],
                                                     fd,
                                                     requestBuff),
-                              2*WIDTH, HEIGHT, 2*WIDTH);
+                              2*width, height, 2*width);
+
 }
 
 TranscriberModule::TranscriberModule(ImageTranscriber& trans)
@@ -483,7 +588,9 @@ TranscriberModule::TranscriberModule(ImageTranscriber& trans)
       jointsOut(base()),
       inertsOut(base()),
       it(trans),
-      image_index(0)
+      image_index(0),
+      file_mod_time(),
+      first_time(1)
 {
 }
 
@@ -492,6 +599,41 @@ void logThumbnail(messages::YUVImage& image, std::string& ifrom, size_t iindex);
 // Get image from Transcriber and outportal it
 void TranscriberModule::run_()
 {
+    struct stat file_stats;
+    std::string filepath;
+    #ifdef NAOQI_2
+        if(it.type() == Camera::TOP) {
+            filepath = "/home/nao/nbites/Config/V5topCameraParams.txt";
+        } else {
+            filepath = "/home/nao/nbites/Config/V5bottomCameraParams.txt";
+        }
+    #else
+        if(it.type() == Camera::TOP) {
+            filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
+        } else {
+            filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
+        }
+    #endif
+
+    if(FILE *file = fopen(filepath.c_str(),"r")) { //existence check
+        fclose(file);
+        int err = stat(filepath.c_str(),&file_stats);
+        if(first_time == 1) { //prevent settings from initting twice on startup
+            std::cout<<"[INFO] First Time Running"<<std::endl;
+            file_mod_time = file_stats.st_mtime;
+            first_time = 0;
+        }
+        int time_diff = std::difftime(file_stats.st_mtime, file_mod_time);
+        if(time_diff > 0.0) { //check if the file has been modified
+            file_mod_time = file_stats.st_mtime;
+            std::cout<<"[INFO] New Mod. Time: "<<file_mod_time<<std::endl;
+            std::cout<<"[INFO] Calling initSettings() now"<<std::endl;
+            it.initSettings();
+        }
+    } else {
+        std::cout<<"[ERR] File Does Not Exist"<<std::endl;
+    }
+
     jointsIn.latch();
     inertsIn.latch();
 

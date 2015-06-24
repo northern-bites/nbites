@@ -9,6 +9,8 @@
 #include "../control/control.h"
 #include "nbdebug.h"
 
+#include "../../share/include/Camera.h"
+
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -196,7 +198,7 @@ namespace nblog {
                 
                 SExpr("tripoint", control::tripoint,
                       control::flags[control::tripoint]),
-                
+
                 SExpr("thumbnail", control::thumbnail,
                       control::flags[control::thumbnail])
             };

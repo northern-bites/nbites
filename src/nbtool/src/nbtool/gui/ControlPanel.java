@@ -12,6 +12,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Vector;
 
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;

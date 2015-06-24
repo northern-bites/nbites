@@ -185,6 +185,17 @@ BOOST_PYTHON_MODULE(noggin_constants)
                LANDMARK_OPP_GOAL_RIGHT_L_ID)
         ;
 
+    enum_<man::vision::LineID>("LineID")
+        .value("Line", man::vision::LineID::Line)
+        .value("EndlineOrSideline", man::vision::LineID::EndlineOrSideline)
+        .value("TopGoalboxOrSideGoalbox", man::vision::LineID::TopGoalboxOrSideGoalbox)
+        .value("SideGoalboxOrMidline", man::vision::LineID::SideGoalboxOrMidline)
+        .value("Sideline", man::vision::LineID::Sideline)
+        .value("SideGoalbox", man::vision::LineID::SideGoalbox)
+        .value("Endline", man::vision::LineID::Endline)
+        .value("TopGoalbox", man::vision::LineID::TopGoalbox)
+        .value("Midline", man::vision::LineID::Midline);
+
     scope().attr("LANDMARK_MY_GOAL_LEFT_POST") = make_tuple(
         LANDMARK_MY_GOAL_LEFT_POST[0],
         LANDMARK_MY_GOAL_LEFT_POST[1],

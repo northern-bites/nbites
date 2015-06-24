@@ -252,6 +252,7 @@ public class CrossIO {
 						final int ret = dis.readInt();
 						int num_out = dis.readInt();
 						
+
 						final Log[] outs = new Log[num_out];
 						for (int i = 0; i < num_out; ++i) {
 							Log nl = CommonIO.readLog(dis);

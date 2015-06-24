@@ -22,8 +22,11 @@ public class UtilityManager {
 	public static final LogToViewUtility LogToViewUtility = new LogToViewUtility();
 	public static final YUVColorUtility YUVColorUtility = new YUVColorUtility();
 	public static final ThreadStateUtility ThreadStateUtility = new ThreadStateUtility();
-		
-	public static final UtilityParent[] utilities = findUtilityFields(); 
+
+	public static final SyntheticImageUtility SyntheticImageUtility = new SyntheticImageUtility();
+	public static final CameraCalibrateUtility CameraCalibrateUtility = new CameraCalibrateUtility();
+
+	public static final UtilityParent[] utilities = findUtilityFields();
 	private static UtilityParent[] findUtilityFields() {
 		Field[] fields = UtilityManager.class.getDeclaredFields();
 		Vector<UtilityParent> found = new Vector<>();
