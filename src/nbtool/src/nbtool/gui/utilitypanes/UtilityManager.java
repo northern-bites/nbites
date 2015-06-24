@@ -24,9 +24,11 @@ public class UtilityManager {
 	public static final ThreadStateUtility ThreadStateUtility = new ThreadStateUtility();
 
 	public static final SyntheticImageUtility SyntheticImageUtility = new SyntheticImageUtility();
-	public static final CameraCalibrateUtility CameraCalibrateUtility = new CameraCalibrateUtility();
+	//public static final CameraCalibrateUtility CameraCalibrateUtility = new CameraCalibrateUtility();
+	public static final CameraCalibrateUtility2 CameraCalibrateUtility2 = new CameraCalibrateUtility2();
 
 	public static final UtilityParent[] utilities = findUtilityFields();
+
 	private static UtilityParent[] findUtilityFields() {
 		Field[] fields = UtilityManager.class.getDeclaredFields();
 		Vector<UtilityParent> found = new Vector<>();
