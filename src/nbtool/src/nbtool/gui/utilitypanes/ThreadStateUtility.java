@@ -8,6 +8,9 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.Timer;
 
+import nbtool.data.Log;
+import nbtool.gui.logdnd.LogDND;
+import nbtool.gui.logdnd.LogDND.LogDNDTarget;
 import nbtool.util.Logger;
 
 public class ThreadStateUtility extends UtilityParent {
@@ -69,6 +72,6 @@ public class ThreadStateUtility extends UtilityParent {
 
 	@Override
 	public char preferredMemnonic() {
-		return 't';
+		return 'k';
 	}
 }

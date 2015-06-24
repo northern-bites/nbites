@@ -18,11 +18,11 @@ import javax.swing.event.ChangeListener;
 
 import nbtool.util.Utility;
 
-class BIWithZoom extends JPanel {
+class ZoomImageDisplay extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 
-	public BIWithZoom() {
+	public ZoomImageDisplay() {
 		full = part = null;
 		sub_rect = null;
 		

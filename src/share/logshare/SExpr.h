@@ -86,7 +86,6 @@ namespace nblog {
         // key double value for use by camera parameters (VisionModule)
         SExpr(const std::string& key, double roll, double pitch);
 
-        
         /**** factory methods to stack */
         
         static SExpr atom(const std::string& n) {return SExpr(n);}
@@ -159,7 +158,7 @@ namespace nblog {
         }
         
         /**** list retrieval */
-        ssize_t count() { return (_type == SEXPR_LIST) ? _list.size() : -1; }
+        ssize_t count()  const { return (_type == SEXPR_LIST) ? _list.size() : -1; }
         SExpr * get(int i);
         SExpr & safeGet(int i);
         std::vector<SExpr> * getList();
@@ -177,29 +176,60 @@ namespace nblog {
         std::vector<std::vector<SExpr *>> recursiveFindAll(const std::string name);
         
         /**** atom value retrieval */
-        const std::string value();
-        int valueAsInt();
-        long valueAsLong();
-        double valueAsDouble();
+        const std::string value() const;
+        int valueAsInt() const;
+        long valueAsLong() const;
+        double valueAsDouble() const;
         
         /**** type retrieval */
-        bool isAtom() { return _type == SEXPR_ATOM; }
-        bool isList() { return _type == SEXPR_LIST; }
+        bool isAtom() const { return _type == SEXPR_ATOM; }
+        bool isList() const { return _type == SEXPR_LIST; }
         bool exists() const {return _type != SEXPR_NOTFOUND;}
         
-        SExprType type() {return _type;}
+        SExprType type() const {return _type;}
+        
+        bool operator==(const SExpr &other) const {
+            if (other.type() != type())
+                return false;
+            
+            if (isAtom()) {
+                return other.value() == value();
+            }
+            
+            if (isList()) {
+                if (other.count() != count())
+                    return false;
+                for (int i = 0; i < count(); ++i) {
+                    if (_get(i) != other._get(i))
+                        return false;
+                }
+                
+                return true;
+            }
+            
+            return false;
+        }
+        
+        bool operator!=(const SExpr &other) const {
+            return !(*this == other);
+        }
         
         /**** conversion to strings */
         
         // String representation of this SExpression (and nested ones)
-        const std::string serialize();
+        const std::string serialize() const;
         
         // Nicely formatted SExpression (more human-readable)
-        const std::string print(int indent = 2, int lineLimit = 64, int level = 0);
+        const std::string print (int indent = 2, int lineLimit = 64, int level = 0)  const;
         
         // Special chars that we need to look out for
         static const char special[];
     private:
+        //only for use in == operator, get is inherently non-const
+        const SExpr& _get(int i) const {
+            return _list[i];
+        }
+        
         SExprType _type;
         // Describes the expression, only non-empty if atom
         std::string _value;

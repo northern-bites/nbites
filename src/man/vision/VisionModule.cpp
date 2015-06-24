@@ -153,10 +153,13 @@ void VisionModule::run_()
         // Classify field lines
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
 
-        if (!ballDetected) {
-            ballDetected = ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
-        }
+        ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
     }
+
+    // Send messages on outportals
+    sendLinesOut();
+    ballOn = ballDetected;
+    updateVisionBall();
 
 // TODO move to logImage
 #ifdef USE_LOGGING
@@ -176,13 +179,9 @@ void VisionModule::run_()
         logImage(1);
     }
 #endif
-
-    // Send messages on outportals
-    sendLinesOut();
-    ballOn = ballDetected;
-    updateVisionBall();
 }
 
+#ifdef USE_LOGGING
 void VisionModule::logImage(int i) 
 {
     std::string t = "true";
@@ -277,6 +276,8 @@ void VisionModule::logImage(int i)
         nblog::NBLog(NBL_IMAGE_BUFFER, "tripoint", contents, im_buf);
     }
 }
+
+#endif
 
 void VisionModule::sendLinesOut()
 {

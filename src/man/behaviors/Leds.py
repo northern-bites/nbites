@@ -12,6 +12,7 @@ import GameController
 GC_LEDS = True
 FOOT_LEDS = True
 BALL_LEDS = True
+GOALBOX_LEDS = True
 ROLESWITCH_LEDS = True
 CALIBRATION_LEDS = True
 SHAREDFLIP_LEDS = True
@@ -47,10 +48,10 @@ RIGHT_COMM_FOUR_LED,
 RIGHT_COMM_FIVE_LED,
 ROLE_LED,
 BALL_LED,
+GOALBOX_LED,
 CHEST_LED,
 LEFT_FOOT_LED,
-RIGHT_FOOT_LED,
-RIGHT_UNUSED_LED) = range(NUM_LED_GROUPS)
+RIGHT_FOOT_LED) = range(NUM_LED_GROUPS)
 
 ###COLORS
 RED   = 0xFF0000
@@ -68,7 +69,11 @@ NOW = 0.0
 
 ##### Ball  #####
 BALL_ON_LEDS = ((BALL_LED, RED, NOW),)
-BALL_OFF_LEDS = ((BALL_LED, BLUE, NOW),)
+BALL_OFF_LEDS = ((BALL_LED, OFF, NOW),)
+
+##### GoalBox #####
+GOALBOX_ON_LEDS = ((GOALBOX_LED, GREEN, NOW),)
+GOALBOX_OFF_LEDS = ((GOALBOX_LED, OFF, NOW),)
 
 ##### Roles #####
 ROLE_ONE      = ((ROLE_LED, GREEN, NOW),)
@@ -166,6 +171,16 @@ class Leds():
                 self.executeLeds(BALL_ON_LEDS)
             elif self.brain.ball.vis.frames_off == 1:
                 self.executeLeds(BALL_OFF_LEDS)
+
+        if GOALBOX_LEDS:
+            gbOn = False
+            for i in range(0, self.brain.visionLines.line_size()):
+                if self.brain.visionLines.line(i).id == 7:
+                    self.executeLeds(GOALBOX_ON_LEDS)
+                    gbOn = True
+                    break
+            if not gbOn:
+                self.executeLeds(GOALBOX_OFF_LEDS)
 
         if ROLESWITCH_LEDS:
             newRole = self.brain.player.role

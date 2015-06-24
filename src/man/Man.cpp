@@ -191,6 +191,22 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         nblog::log_main_init();
         printf("control::control_init()\n");
         control::control_init();
+            
+#ifdef START_WITH_FILEIO
+#ifndef USE_LOGGING
+#error "option START_WITH_FILEIO defined WITHOUT option USE_LOGGING"
+#endif
+            printf("CONTROL: Starting with fileio flag set!\n");
+            control::flags[control::fileio] = 1;
+#endif
+            
+#ifdef START_WITH_THUMBNAIL
+#ifndef USE_LOGGING
+#error "option START_WITH_THUMBNAIL defined WITHOUT option USE_LOGGING"
+#endif
+            printf("CONTROL: Starting with thumbnail flag set!\n");
+            control::flags[control::thumbnail] = 1;
+#endif
         
         /*
          SPECIFIC MODULE LOGGING

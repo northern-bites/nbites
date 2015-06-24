@@ -1,4 +1,6 @@
 #!/bin/bash
 
+echo "RUNnbtool (no build)"
+
 cd $NBITES_DIR/build/nbtool
-java -ea -Xms200m -Xmx200m nbtool.gui.Display
+java -ea -Xms200m -Xmx200m nbtool.term.NBTool_v6

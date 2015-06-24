@@ -107,18 +107,19 @@ def didIKickIt(player):
 @superState('gameControllerResponder')
 def spinToFaceBall(player):
     facingDest = RelRobotLocation(0.0, 0.0, 0.0)
-    if player.brain.ball.bearing_deg < 0.0:
-        player.side = RIGHT
-        facingDest.relH = -90
-    else:
-        player.side = LEFT
-        facingDest.relH = 90
+    # if player.brain.ball.bearing_deg < 0.0:
+    #     player.side = RIGHT
+    #     facingDest.relH = -90
+    # else:
+    #     player.side = LEFT
+    #     facingDest.relH = 90
+    facingDest.relH = player.brain.ball.bearing_deg
     player.brain.nav.goTo(facingDest,
                           nav.CLOSE_ENOUGH,
                           nav.CAREFUL_SPEED)
 
-    if player.counter > 180:
-        return player.goLater('spinAtGoal')
+    # if player.counter > 180:
+    #     return player.goLater('spinAtGoal')
 
     return Transition.getNextState(player, spinToFaceBall)
 
@@ -147,6 +148,10 @@ def returnToGoal(player):
             correctedDest.relY = 0.0
         if fabs(correctedDest.relH) < 5:
             correctedDest.relH = 0.0
+
+        print "I'm returning to goal now!"
+        print ("my correctedDest: ", correctedDest.relX, correctedDest.relY, correctedDest.relH)
+        print ("My odometry: ", player.brain.interface.odometry.x, player.brain.interface.odometry.y, player.brain.interface.odometry.h )
 
         player.brain.nav.walkTo(correctedDest)
 
