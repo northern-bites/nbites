@@ -10,11 +10,15 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.UIManager;
 import javax.swing.event.TreeModelEvent;
@@ -28,145 +32,74 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import nbtool.data.Log;
+import nbtool.data.ViewProfile;
+import nbtool.data.ViewProfile.ViewState;
 import nbtool.gui.logviews.misc.ViewParent;
+import nbtool.util.Events;
 import nbtool.util.NBConstants;
 import nbtool.util.Prefs;
 import static nbtool.util.Logger.*;
 
-public class LogToViewUtility extends UtilityParent {
-	
-	public Class<? extends ViewParent>[] selected(String type) {
-		int tindex = Arrays.asList(types).indexOf(type);
-		
-		ArrayList<Class<? extends ViewParent>> sel = new ArrayList<Class<? extends ViewParent>>();
-		for (ViewState vs : states[tindex]) {
-			if (vs.showing)
-				sel.add(vs.viewClass);
-		}
-		
-		return sel.toArray(new Class[sel.size()]);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public Class<? extends ViewParent>[] viewsForLog(Log log) {
-		ArrayList<Class<? extends ViewParent>> views = new ArrayList<Class<? extends ViewParent>>();
-		String ptype = log.primaryType();
-		assert(ptype != null);
+public class LogToViewUtility extends UtilityParent {	
 
-		int tindex = Arrays.asList(types).indexOf(ptype);
-		if (tindex >= 0) {
-			for (ViewState vs : states[tindex]) {
-				if (vs.showing)
-					views.add(vs.viewClass);
-			}
+	public LogToViewUtility() {
+		super();		
+	}
+
+	private LogToViewFrame display = null;
+
+	@Override
+	public JFrame supplyDisplay() {
+		if (display == null) {
+			return (display = new LogToViewFrame());
 		}
 
-		if (ptype.startsWith("proto-")) {
-			views.addAll(Arrays.asList(this.selected(NBConstants.PROTOBUF_S)));
-		}
-		
-		views.addAll(Arrays.asList(this.selected(NBConstants.DEFAULT_S)));
-		
-		logf(INFO, "LogToViewUtility found %d views for log of type %s.", views.size(), ptype);
-		
-		return views.toArray(new Class[views.size()]);		
+		return display;
 	}
-	
-	
-	private class ViewState {
-		boolean showing;
-		Class<? extends ViewParent> viewClass;
-		
-		ViewState(boolean s, Class<? extends ViewParent> cls) {
-			showing = s;
-			viewClass = cls;
-		}
-		
-		public String toString() {
-			return viewClass.getName();
-		}
+
+	@Override
+	public String purpose() {
+		return "Manage views displayed for a given log";
 	}
-	
-	private ViewState[] resolve(String typename, Class<? extends ViewParent>[] possible, Class<? extends ViewParent>[] lastShown) {
-		ViewState[] ret = new ViewState[possible.length];
-		HashSet<Class<? extends ViewParent>> pset = new HashSet<Class<? extends ViewParent>>(Arrays.asList(possible));
-		
-		int i = 0;
-		if (lastShown != null) {
-			for (Class<? extends ViewParent> cls : lastShown) {
-				if (pset.contains(cls)) {
-					ret[i++] = new ViewState(true, cls);
-					pset.remove(cls);
-				}
-			}
-		}
-		
-		for (Class<? extends ViewParent> cls : pset) {
-			ret[i++] = new ViewState(false, cls);
-		}
-		
-		return ret;
+
+	@Override
+	public char preferredMemnonic() {
+		return 'l';
 	}
-	
-	private String[] types;
-	private ViewState[][] states;
-	
-	private class LTVU_Frame extends JFrame implements TreeModel, TreeSelectionListener, MouseListener, KeyListener {
-		private JTree tree;
-		
-		protected LTVU_Frame() {
-			setLayout(null);
-			setSize(600, 400);
-			this.setResizable(true);
-			
-			tree = new JTree(this);
-			tree.setEditable(false);
-			tree.setRootVisible(false);
-			tree.setScrollsOnExpand(true);
-			
-			tree.addMouseListener(this);
-			tree.addKeyListener(this);
-			
-			tree.setCellRenderer(new LTVCellRenderer());
-			tree.addTreeSelectionListener(this);
-			tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-			
-			tree.setDragEnabled(false);
-			
-			//this.setContentPane(tree);
-			this.getContentPane().setLayout(new BorderLayout());
-			this.getContentPane().add(tree, BorderLayout.CENTER);	
-		}
-		
-		/* Tree methods */
+
+	/* NEW STUFF */
+	public class LogToViewFrame extends javax.swing.JFrame implements TreeModel, MouseListener, KeyListener  {
+
+		private final Object root = new Object();
+		protected ViewProfile vp = ViewProfile.DEFAULT_PROFILE;
 
 		@Override
 		public Object getRoot() {
-			return states;
+			return root;
 		}
 
 		@Override
 		public Object getChild(Object parent, int index) {
-			if (parent == states) {
-				return types[index];
+			if (parent == root) {
+				return ViewProfile.TYPES[index];
 			}
-			
-			int i2 = Arrays.asList(types).indexOf(parent);
-			return states[i2][index];
+
+			int i2 = Arrays.asList(ViewProfile.TYPES).indexOf(parent);
+			return vp.states[i2][index];
 		}
 
 		@Override
 		public int getChildCount(Object parent) {
-			if (parent == states)
-				return states.length;
-			
-			int i2 = Arrays.asList(types).indexOf(parent);
-			return states[i2].length;
+			if (parent == root)
+				return ViewProfile.TYPES.length;
+
+			int i2 = Arrays.asList(ViewProfile.TYPES).indexOf(parent);
+			return vp.states[i2].length;
 		}
 
 		@Override
 		public boolean isLeaf(Object node) {
-			return node instanceof ViewState;
+			return (node instanceof ViewState);
 		}
 
 		@Override
@@ -176,32 +109,32 @@ public class LogToViewUtility extends UtilityParent {
 
 		@Override
 		public int getIndexOfChild(Object parent, Object child) {
-			if (parent == states) {
-				Arrays.asList(states).indexOf(child);	
+			if (parent == root) {
+				return Arrays.asList(ViewProfile.TYPES).indexOf(child);	
 			}
-			
+
 			return Arrays.asList((ViewState[]) parent).indexOf(child);
 		}
 
-		
+
 		private ArrayList<TreeModelListener> listeners = new ArrayList<TreeModelListener>();
 		public void addTreeModelListener(TreeModelListener l) {
 			listeners.add(l);
 		}
-		
+
 		public void removeTreeModelListener(TreeModelListener l) {
 			listeners.remove(l);
 		}
-		
+
 		/*Rendering code from "Definitive Guide to Swing for Java 2, Second Edition"*/
 		private class LTVCellRenderer implements TreeCellRenderer {
-			
+
 			private JCheckBox leafRenderer = new JCheckBox();
 			private DefaultTreeCellRenderer nonLeafRenderer = new DefaultTreeCellRenderer();
 
-			Color selectionBorderColor, selectionForeground, selectionBackground,
+			Color selectionForeground, selectionBackground,
 			textForeground, textBackground;
-			
+
 			LTVCellRenderer(){
 				Font fontValue;
 				fontValue = UIManager.getFont("Tree.font");
@@ -213,7 +146,6 @@ public class LogToViewUtility extends UtilityParent {
 				leafRenderer.setFocusPainted((booleanValue != null)
 						&& (booleanValue.booleanValue()));
 
-				selectionBorderColor = UIManager.getColor("Tree.selectionBorderColor");
 				selectionForeground = UIManager.getColor("Tree.selectionForeground");
 				selectionBackground = UIManager.getColor("Tree.selectionBackground");
 				textForeground = UIManager.getColor("Tree.textForeground");
@@ -224,12 +156,12 @@ public class LogToViewUtility extends UtilityParent {
 			public Component getTreeCellRendererComponent(JTree tree, Object value,
 					boolean selected, boolean expanded, boolean leaf, int row,
 					boolean hasFocus) {
-				
+
 				Component returnValue;
 				if (leaf) {
 					assert(value instanceof ViewState);
 					ViewState vs = (ViewState) value;
-					
+
 					leafRenderer.setText(vs.toString());
 					leafRenderer.setSelected(vs.showing);
 
@@ -248,26 +180,21 @@ public class LogToViewUtility extends UtilityParent {
 					returnValue = nonLeafRenderer.getTreeCellRendererComponent(tree,
 							value, selected, expanded, leaf, row, hasFocus);
 				}
-				
+
 				return returnValue;
 			}
-			
-		}
 
-		@Override
-		public void valueChanged(TreeSelectionEvent e) {
-			//tree.clearSelection();
 		}
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			TreePath tp = tree.getClosestPathForLocation(e.getX(), e.getY());
-		
+
 			if (tp.getLastPathComponent() != null &&
 					tp.getLastPathComponent() instanceof ViewState) {
 				ViewState changed = (ViewState) tp.getLastPathComponent();
 				changed.showing = !changed.showing;
-				
+
 				TreeModelEvent tme = new TreeModelEvent(this,
 						tp.getParentPath(),
 						new int[0],
@@ -275,7 +202,7 @@ public class LogToViewUtility extends UtilityParent {
 				for (TreeModelListener l : listeners) {
 					l.treeNodesChanged(tme);
 				}
-				
+
 			}	
 		}
 
@@ -294,27 +221,28 @@ public class LogToViewUtility extends UtilityParent {
 		@Override
 		public void keyTyped(KeyEvent e) {
 			TreePath path = tree.getSelectionPath();
-			int toIndex = e.getKeyChar() - '1';
-			
+			//int toIndex = e.getKeyChar() - '1';
+			int toIndex = Character.getNumericValue(e.getKeyChar());
+
 			if (path == null || toIndex < 0 || toIndex > 8) {
 				return;
 			}
-			
+
 			if (path.getPathCount() == 3) {
-				
+
 				ViewState vs = (ViewState) path.getPathComponent(2);
 				String type = (String) path.getPathComponent(1);
-				
-				int tindex = Arrays.asList(types).indexOf(type);
-				int fromIndex = Arrays.asList(states[tindex]).indexOf(vs);
-				
-				if (toIndex < states[tindex].length) {
+
+				int tindex = Arrays.asList(ViewProfile.TYPES).indexOf(type);
+				int fromIndex = Arrays.asList(vp.states[tindex]).indexOf(vs);
+
+				if (toIndex < vp.states[tindex].length) {
 					logf(INFO, "swapping %s %d to %d", type, fromIndex, toIndex);
-					states[tindex][fromIndex] = states[tindex][toIndex];
-					states[tindex][toIndex] = vs;
-					
+					vp.states[tindex][fromIndex] = vp.states[tindex][toIndex];
+					vp.states[tindex][toIndex] = vs;
+
 					TreeModelEvent tme = new TreeModelEvent(this,
-							new Object[]{states, type});
+							new Object[]{root, type});
 					for (TreeModelListener l : listeners) {
 						l.treeStructureChanged(tme);
 					}
@@ -327,45 +255,172 @@ public class LogToViewUtility extends UtilityParent {
 
 		@Override
 		public void keyReleased(KeyEvent e) {}
-	}
-	
-	
-	public LogToViewUtility() {
-		super();		
-		types = new String[NBConstants.POSSIBLE_VIEWS.size()];
-		Map<String, Class<? extends ViewParent>[]> constPossible = NBConstants.POSSIBLE_VIEWS;
-		{
-			int i = 0;
-			for (String s : constPossible.keySet()) {
-				types[i++] = s;
+
+		private void resetProfileBoxModel() {
+			Collection<ViewProfile> set = ViewProfile.PROFILES.values();
+			profileComboBox.setModel(new DefaultComboBoxModel<>(
+					set.toArray(new ViewProfile[0])));
+			
+			if (set.contains(vp)) {
+				profileComboBox.setSelectedItem(vp);
+			} else {
+				ViewProfile def = ViewProfile.DEFAULT_PROFILE;
+				profileComboBox.setSelectedItem(def);
+			}
+		}
+
+		private void profileComboBoxActionPerformed(java.awt.event.ActionEvent evt) {                                                
+			ViewProfile sel = (ViewProfile) profileComboBox.getSelectedItem();
+			if (sel == null) return;
+			
+			vp = sel;
+			profileChanged();
+		}
+		
+		private void deleteAction() {
+			if (vp == ViewProfile.DEFAULT_PROFILE) {
+				JOptionPane.showMessageDialog(this, String.format("cannot delete default profile"));
+			} else {
+				ViewProfile.PROFILES.remove(vp.name);
+				vp = ViewProfile.DEFAULT_PROFILE;
+				resetProfileBoxModel();
+				profileChanged();
+				
+				Events.GViewProfileSetChanged.generate(this);
 			}
 		}
 		
-		states = new ViewState[types.length][];
-		Map<String, Class<? extends ViewParent>[]> lastShown = Prefs.last_shown;
-		
-		for (int i = 0; i < states.length; ++i)
-			states[i] = resolve(types[i], constPossible.get(types[i]), lastShown.get(types[i]));	
-	}
-
-	private LTVU_Frame display = null;
-	
-	@Override
-	public JFrame supplyDisplay() {
-		if (display == null) {
-			return (display = new LTVU_Frame());
+		private void createAction() {
+			String name = nameField.getText();
+			if (name.isEmpty() || name.equals(ViewProfile.DEFAULT_PROFILE_NAME)) {
+				JOptionPane.showMessageDialog(this, String.format("cannot use that name: {%s}", name));
+				return;
+			}
+			
+			vp = ViewProfile.addWithName(name);
+			resetProfileBoxModel();
+			profileChanged();
+			
+			Events.GViewProfileSetChanged.generate(this);
 		}
 		
-		return display;
-	}
+		private void profileChanged() {
+			TreeModelEvent tme = new TreeModelEvent(this,
+					new Object[]{root});
+			for (TreeModelListener l : listeners) {
+				l.treeStructureChanged(tme);
+			}
+		}
 
-	@Override
-	public String purpose() {
-		return "Manage views displayed for a given log";
-	}
+		/**
+		 * Creates new form LogToViewFrame
+		 */
+		public LogToViewFrame() {
+			initComponents();
 
-	@Override
-	public char preferredMemnonic() {
-		return 'l';
+			tree.setEditable(false);
+			tree.setRootVisible(false);
+			tree.setScrollsOnExpand(true);
+
+			tree.addMouseListener(this);
+			tree.addKeyListener(this);
+
+			tree.setCellRenderer(new LTVCellRenderer());
+			tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+
+			tree.setDragEnabled(false);
+			
+			resetProfileBoxModel();
+			
+			createButton.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                createAction();
+	            }
+	        });
+			
+			deleteButton.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                deleteAction();
+	            }
+	        });
+		}
+
+		/**
+	     * This method is called from within the constructor to initialize the form.
+	     * WARNING: Do NOT modify this code. The content of this method is always
+	     * regenerated by the Form Editor.
+	     */
+	    @SuppressWarnings("unchecked")
+	    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+	    private void initComponents() {
+
+	        profileComboBox = new javax.swing.JComboBox<>();
+	        deleteButton = new javax.swing.JButton();
+	        createButton = new javax.swing.JButton();
+	        jScrollPane1 = new javax.swing.JScrollPane();
+	        tree = new javax.swing.JTree(this);
+	        nameField = new javax.swing.JTextField();
+
+	        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+	        profileComboBox.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                profileComboBoxActionPerformed(evt);
+	            }
+	        });
+
+	        deleteButton.setText("delete this");
+
+	        createButton.setText("create new");
+
+	        jScrollPane1.setViewportView(tree);
+
+	        nameField.setText("a name");
+
+	        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+	        getContentPane().setLayout(layout);
+	        layout.setHorizontalGroup(
+	            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+	            .addGroup(layout.createSequentialGroup()
+	                .addContainerGap()
+	                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+	                    .addGroup(layout.createSequentialGroup()
+	                        .addComponent(jScrollPane1)
+	                        .addContainerGap())
+	                    .addGroup(layout.createSequentialGroup()
+	                        .addComponent(profileComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+	                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 147, Short.MAX_VALUE)
+	                        .addComponent(createButton)
+	                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+	                        .addComponent(nameField, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+	                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 73, Short.MAX_VALUE)
+	                        .addComponent(deleteButton))))
+	        );
+	        layout.setVerticalGroup(
+	            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+	            .addGroup(layout.createSequentialGroup()
+	                .addContainerGap()
+	                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+	                    .addComponent(profileComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+	                    .addComponent(deleteButton)
+	                    .addComponent(createButton)
+	                    .addComponent(nameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+	                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
+	                .addContainerGap())
+	        );
+
+	        pack();
+	    }// </editor-fold>                        
+
+
+	    // Variables declaration - do not modify                     
+	    private javax.swing.JButton createButton;
+	    private javax.swing.JButton deleteButton;
+	    private javax.swing.JScrollPane jScrollPane1;
+	    private javax.swing.JTextField nameField;
+	    private javax.swing.JComboBox<ViewProfile> profileComboBox;
+	    private javax.swing.JTree tree;
+	    // End of variables declaration                  
 	}
 }

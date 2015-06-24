@@ -303,6 +303,8 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
 
     // Draw 5 output images, 18 sliders, 6 texts, and a button
     public void paintComponent(Graphics g) {
+    	
+    	super.paintComponent(g);
        
         int vB = 5;  // verticle buffer
         int sH = 15; // slider height

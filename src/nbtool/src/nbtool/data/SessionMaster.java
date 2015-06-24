@@ -29,12 +29,16 @@ public final class SessionMaster implements IOFirstResponder {
 	public Session getLatestSession() {
 		Session link = workingSession;
 		if (link != null)
-			return workingSession;
-		return link != null ? link : sessions.get(sessions.size() - 1);
+			return link;
+		if (sessions.isEmpty())
+			return null;
+		else return sessions.get(sessions.size() - 1);
 	}
 	
 	public static volatile int saveMod = 1;
 	public static volatile int keepMod = 1;
+	
+	public static volatile boolean dropSTATS = false;
 		
 	private ControlInstance control = null;
 	private FileInstance fileio = null;
@@ -56,6 +60,7 @@ public final class SessionMaster implements IOFirstResponder {
 		
 		Log[] logArray = FileIO.fetchLogs(fullPath);
 		Session newsess = new Session(fullPath, null);
+		//Use loading addLog
 		newsess.addLog(logArray);
 		
 		sessions.add(newsess);
@@ -131,6 +136,22 @@ public final class SessionMaster implements IOFirstResponder {
 			Events.GToolStatus.generate(this, STATUS.IDLE, "idle");
 		}
 	}
+	
+	public synchronized void lateStartFileWriting(String path) {
+		if (!isIdle() && streamio != null) {
+			Logger.infof("SessionMaster latestarting a FileInstance...");
+			
+			assert(FileIO.checkLogFolder(path));
+			fileio = FileIO.makeFileWriter(path, this);
+		}
+	}
+	
+	public synchronized void earlyStopFileWriting() {
+		if (fileio != null) {
+			Logger.warnf("SessionMaster stopping a FileInstance early...");
+			fileio.kill();
+		}
+	}
 
 	/* IOFirstResponder methods */
 	
@@ -160,20 +181,27 @@ public final class SessionMaster implements IOFirstResponder {
 				for (Log log : out) {
 					
 					if (saveMod != 0 && fileio != null && 
-							(log.unique_id % saveMod == 0)) {
-						fileio.add(log);
+							(log.unique_id % saveMod == 0)) 
+					{
+						if (!log.primaryType().equals("STATS"))
+							fileio.add(log);
+						else if (!dropSTATS) {
+							fileio.add(log);
+						} else {
+							//Drop it.
+						}
 					}
 					
-					if (keepMod != 0 && (log.unique_id % keepMod == 0)) {
-						workingSession.addLog(log);
-					}	
+					//Add via streaming addLog
+					workingSession.addLog(log,
+							keepMod != 0 && (log.unique_id % keepMod == 0));
 				}
 				
 				Events.GLogsFound.generate(this, out);
 			}
 		} else {
 			if (!(inst == control && out.length == 0))
-				Logger.logf(Logger.WARN, "SessionMaster got surprising %d logs from %s.", out.length, inst.name());
+				Logger.logf(Logger.WARN, "SessionMaster got %d surprising logs from %s.", out.length, inst.name());
 		}
 		
 	}

@@ -38,7 +38,7 @@ public class Events {
 		protected void combine(LinkedList<ToolEvent> others) {}
 
 		@Override
-		protected Class<? extends EventListener> listenerClass() {
+		protected Class<? extends EventListener> listenerClass() { 
 			return eclass;
 		}
 
@@ -493,4 +493,33 @@ public class Events {
 		}
 	}
 	
+	public static interface ViewProfileSetChanged extends EventListener {
+		//Get new profiles via ViewProfile.PROFILES
+		public void viewProfileSetChanged(Object changer);
+	}
+	
+	public static final class GViewProfileSetChanged {
+		public static void generate(final Object source) {
+			Center.addEvent(new SimpleCombine(ViewProfileSetChanged.class, source) {
+				@Override
+				protected void combine(LinkedList<ToolEvent> others) {
+					if (others.isEmpty())
+						return;
+					
+					SimpleCombine sc = (SimpleCombine) others.getLast();
+					payload[0] = sc.payload[0];
+				}
+
+				@Override
+				protected void preface() {
+					Logger.logf(Logger.EVENT, "ViewProfileSetChanged{%s}", payload[0]);
+				}
+
+				@Override
+				protected void inform(EventListener l) {
+					((ViewProfileSetChanged) l).viewProfileSetChanged(payload[0]);
+				}
+			});
+		}
+	}
 }

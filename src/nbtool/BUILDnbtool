@@ -2,6 +2,8 @@
 
 BIN=$NBITES_DIR/build/nbtool
 
+echo "BUILDnbtool"
+
 rm -rf $BIN
 #might need to make build dir too on some systems
 mkdir -pv $BIN

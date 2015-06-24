@@ -1,4 +1,0 @@
-6.3
-
-push June 10th, 2015.
-fixed gnu/xsi compiler differences in strerror_r

@@ -26,12 +26,14 @@ import nbtool.gui.logviews.loc.LocSwarmView;
 public class NBConstants {
 	
 	public static final int VERSION = 6;
+	public static final int MINOR_VERSION = 5;
 	
 	public static final String PROTOBUF_TYPE_PREFIX = "proto-";
 	
 	public static final Rectangle DEFAULT_BOUNDS = new Rectangle(0,0,900,600);
 		
 	public static final String USER_PREFERENCES = "~/.nbtool-preferences.txt";
+	public static final String NBITES_DIR = System.getenv("NBITES_DIR");
 	
 	public static final String DEFAULT_S = "_DEFAULT_";
 	public static final String PROTOBUF_S = "_PROTOBUF_";
@@ -44,6 +46,7 @@ public class NBConstants {
 	public static final int NBCROSS_PORT = 30002;
 	
 	public static final int SOCKET_TIMEOUT = 5000; 		//Milliseconds
+	
 	public static final int NBCROSS_CALL_TIMEOUT = 0;	//interpreted as infinite.  Note that, since these calls are local,
 														//we worry less about dead sockets.
 	
