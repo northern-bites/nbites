@@ -1,5 +1,7 @@
 package nbtool.gui.utilitypanes;
 
+import java.awt.Container;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -12,6 +14,7 @@ import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import nbtool.data.Log;
 import nbtool.data.SExpr;
@@ -73,6 +76,9 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	        initComponents();
 	        cameraBox.setSelectedIndex(0);
 	        saveButton.setEnabled(false);
+	        
+	        saveButton.addActionListener(this);
+	        callButton.addActionListener(this);
 	        
 	        using = SessionMaster.get().getLatestSession();
 	        if (using != null)
@@ -261,7 +267,6 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	    @SuppressWarnings("unchecked")
 	    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
 	    private void initComponents() {
-
 	        cameraBox = new javax.swing.JComboBox<>();
 	        callButton = new javax.swing.JButton();
 	        sessionNameLabel = new javax.swing.JLabel();
@@ -353,7 +358,61 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	        );
 
 	        pack();
-	    }// </editor-fold>                        
+	    }// </editor-fold>     
+	    
+	    private void initComponents2() {
+	    	cameraBox = new javax.swing.JComboBox<>();
+	        callButton = new javax.swing.JButton();
+	        sessionNameLabel = new javax.swing.JLabel();
+	        sessionSizeLabel = new javax.swing.JLabel();
+	        saveButton = new javax.swing.JButton();
+	        calcLabel = new javax.swing.JLabel();
+	        rollLabel = new javax.swing.JLabel();
+	        tiltLabel = new javax.swing.JLabel();
+	        cameraLabel = new javax.swing.JLabel();
+	        robotLabel = new javax.swing.JLabel();
+
+	        setTitle("Cheddar's Cool Calibration Utility");
+	        setMinimumSize(new java.awt.Dimension(485, 242));
+
+	        cameraBox.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { "TOP", "BOT" }));
+
+	        callButton.setText("get calibration params");
+
+	        sessionNameLabel.setText("Session name:");
+
+	        sessionSizeLabel.setText("Session size:");
+
+	        saveButton.setText("SAVE");
+
+	        calcLabel.setText("");
+
+	        rollLabel.setText("");
+
+	        tiltLabel.setText("");
+
+	        cameraLabel.setText("");
+
+	        robotLabel.setText("");
+	        
+	        GridLayout grid = new GridLayout(10,1);
+	        Container content = this.getContentPane();
+	        content.setLayout(grid);
+	        content.add(sessionNameLabel);
+	        content.add(sessionSizeLabel);
+	        
+	        content.add(callButton);
+	        content.add(cameraBox);
+	        
+	        content.add(calcLabel);
+	        content.add(robotLabel);
+	   
+	        content.add(cameraLabel);
+	        content.add(rollLabel);
+	        
+	        content.add(tiltLabel);
+	        content.add(saveButton);
+	    }
 
 	    // Variables declaration - do not modify                     
 	    private javax.swing.JButton callButton;
