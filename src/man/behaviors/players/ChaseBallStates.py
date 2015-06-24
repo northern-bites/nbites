@@ -32,7 +32,7 @@ def approachBall(player):
         elif player.penaltyKicking:
             return player.goNow('prepareForPenaltyKick')
         else:
-            player.brain.nav.chaseBall(Navigator.FULL_SPEED, fast = True)
+            player.brain.nav.chaseBall(Navigator.FAST_SPEED, fast = True)
 
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
@@ -41,7 +41,7 @@ def approachBall(player):
     elif transitions.shouldDecelerate(player):
         player.brain.nav.chaseBallDeceleratingSpeed()
     else:
-        player.brain.nav.chaseBall(Navigator.FULL_SPEED, fast = True)
+        player.brain.nav.chaseBall(Navigator.FAST_SPEED, fast = True)
 
 
 @defaultState('prepareForKick')
@@ -77,6 +77,7 @@ def prepareForKick(player):
     elif player.finishedPlay:
         player.inKickOffPlay = False
 
+    player.motionKick = True
     return player.goNow('followPotentialField')
 
 @superState('positionAndKickBall')
@@ -356,15 +357,8 @@ def penaltyKickSpin(player):
         print "Y: ", player.brain.ball.rel_y
         return player.stay()
 
-    postBearing = player.brain.yglp.bearing_deg
-
-    if not player.penaltyKickRight or player.brain.yglp.certainty == 0:
-        if player.brain.yglp.certainty == 0:
-            print "I MIGHT be using right gp for left"
-        postBearing = player.brain.ygrp.bearing_deg
-
     if player.penaltyKickRight:
-        if postBearing > -12:
+        if player.brain.loc.h < -20:
             penaltyKickSpin.threshCount += 1
             if penaltyKickSpin.threshCount == 3:
                 player.brain.nav.stand()
@@ -375,7 +369,7 @@ def penaltyKickSpin(player):
         else:
             penaltyKickSpin.threshCount = 0
     else:
-        if postBearing < 12:
+        if player.brain.loc.h > 20:
             penaltyKickSpin.threshCount += 1
             if penaltyKickSpin.threshCount == 3:
                 player.brain.nav.stand()
@@ -385,10 +379,6 @@ def penaltyKickSpin(player):
                 return player.goNow('positionForPenaltyKick')
         else:
             penaltyKickSpin.threshCount = 0
-
-    # print "Left post: ", player.brain.ygrp.bearing_deg
-    # print "Right post: ", player.brain.yglp.bearing_deg
-    # print "-----------------------------"
 
     return player.stay()
 
