@@ -29,6 +29,7 @@ SExpr treeFromBlob(man::vision::Blob& b);
 
 
 int Vision_func() {
+
     assert(args.size() == 1);
 
     printf("Vision_func()\n");
@@ -324,6 +325,7 @@ int Vision_func() {
     std::cout << std::endl << "Goalbox and corner detection:" << std::endl;
     man::vision::GoalboxDetector* box = module.getBox(topCamera);
     man::vision::CornerDetector* corners = module.getCorners(topCamera);
+
     if (box->first != NULL)
         std::cout << box->print() << std::endl;
     for (int i = 0; i < corners->size(); i++) {
@@ -344,7 +346,7 @@ int Vision_func() {
     std::list<man::vision::Blob> blobs = detector->getBlobber()->blobs;
 
     SExpr allBalls;
-    int count=0;
+    int count = 0;
     for (auto i=balls.begin(); i!=balls.end(); i++) {
         SExpr ballTree = treeFromBall(*i);
         SExpr next = SExpr::keyValue("ball" + std::to_string(count), ballTree);

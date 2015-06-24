@@ -53,7 +53,8 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         frontEnd[i] = new ImageFrontEnd();
         edgeDetector[i] = new EdgeDetector();
         edges[i] = new EdgeList(32000);
-        houghLines[i] = new HoughLineList(128);
+        houghLinesStrict[i] = new HoughLineList(128);
+        houghLinesLoose[i] = new HoughLineList(128);
         calibrationParams[i] = new CalibrationParams();
         kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography(i == 0);
@@ -84,7 +85,8 @@ VisionModule::~VisionModule()
         delete frontEnd[i];
         delete edgeDetector[i];
         delete edges[i];
-        delete houghLines[i];
+        delete houghLinesStrict[i];
+        delete houghLinesLoose[i];
         delete hough[i];
         delete calibrationParams[i];
         delete kinematics[i];
@@ -144,11 +146,13 @@ void VisionModule::run_()
         edgeDetector[i]->edgeDetect(greenImage, *(edges[i]));
 
         // Run hough line detection
-        hough[i]->run(*(edges[i]), *(houghLines[i]));
+        hough[i]->run(*(edges[i]), *(houghLinesStrict[i]), *(houghLinesLoose[i]));
+
+        // Detect center circle
 
         // Find field lines
-        houghLines[i]->mapToField(*(homography[i]));
-        fieldLines[i]->find(*(houghLines[i]));
+        houghLinesStrict[i]->mapToField(*(homography[i]));
+        fieldLines[i]->find(*(houghLinesStrict[i]));
 
         // Classify field lines
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));

@@ -58,7 +58,7 @@ struct AdjustSet
   };
   AdjustParams params[MaxAdjustSteps];
 
-  AdjustSet();
+  AdjustSet(bool strict = true);
 };
 
 class HoughLine : public GeoLine
@@ -114,6 +114,9 @@ public:
 
   // For sorting lines in decreasing order of score. 
   bool operator<(const HoughLine& hl) { return score() > hl.score(); }
+
+  // Compare two HoughLines
+ // bool equals(const HoughLine& hl);
 
   std::string print() const;
 };
@@ -238,6 +241,17 @@ public:
 
   double edgeImageThreshold() const { return edgeImageThreshold_; }
   void edgeImageThreshold(double newThreshold) { edgeImageThreshold_ = newThreshold; }
+};
+
+// Dectects center circle
+// Stores center of centercircle in field coordinates
+class CenterCircleDetector {
+  double ccr;
+  double cct;
+
+public:
+  // void dectectCenterCircle(HoughLineList& strictList, HoughLineList& looseList);
+
 };
 
 enum class LineID {
@@ -384,7 +398,7 @@ private:
   void wrapAround();
   void smooth();
   void peaks(HoughLineList&);
-  void adjust(EdgeList&, HoughLineList&);
+  void adjust(EdgeList&, HoughLineList&, bool strict = true);
 
   static bool tableInit;
   static int16_t sincosTable[0x140 + 2 * AngleSpread + 1];
@@ -417,6 +431,7 @@ public:
   static const char* timeNames[NumTimes];
 
   void run(EdgeList&, HoughLineList&);
+  void run(EdgeList&, HoughLineList&, HoughLineList&);
 };
 
 }

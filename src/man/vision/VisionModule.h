@@ -33,9 +33,9 @@ public:
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
-    HoughLineList* getLines(bool topCamera = true) const { return houghLines[!topCamera]; }
+    HoughLineList* getHoughLines(bool topCamera = true) const { return houghLinesStrict[!topCamera]; }
+    HoughLineList* getLooseHoughLines(bool topCamera = true) const { return houghLinesLoose[!topCamera]; }
     BallDetector* getBallDetector(bool topCamera = true) const { return ballDetector[!topCamera]; }
-    HoughLineList* getHoughLines(bool topCamera = true) const { return houghLines[!topCamera]; }
     Kinematics* getKinematics(bool topCamera = true) const {return kinematics[!topCamera]; }
     FieldHomography* getFieldHomography(bool topCamera = true) const {return homography[!topCamera]; }
     FieldLineList* getFieldLines(bool topCamera = true) const { return fieldLines[!topCamera]; }
@@ -65,7 +65,8 @@ private:
     ImageFrontEnd* frontEnd[2];
     EdgeDetector* edgeDetector[2];
     EdgeList* edges[2];
-    HoughLineList* houghLines[2];
+    HoughLineList* houghLinesStrict[2];
+    HoughLineList* houghLinesLoose[2];
     HoughSpace* hough[2];
     CalibrationParams* calibrationParams[2];
     Kinematics* kinematics[2];

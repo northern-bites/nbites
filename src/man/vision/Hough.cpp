@@ -30,11 +30,11 @@ AdjustParams::AdjustParams()
   scoreThreshold = 32;
 }
 
-AdjustSet::AdjustSet()
-{
+AdjustSet::AdjustSet(bool strict) {
   params[1].angleThr = FuzzyThr(0.08f, 0.12f);
   params[1].distanceThr = FuzzyThr(0.7f, 2.0f);
-  params[1].fitThresold = 0.6;
+  params[1].fitThresold = strict ? 0.55 : 2.0;
+
 }
 
 void HoughLine::set(int rIndex, int tIndex, double r, double t, double score, int index)
@@ -163,6 +163,10 @@ bool HoughLine::adjust(EdgeList& edges, const AdjustParams& p, bool capture)
 
   return true;
 }
+
+// bool HoughLine::equals(const HoughLine& hl) {
+//   return (rIndex() == hl.rIndex() && tIndex() == hl.tIndex());
+// }
 
 string HoughLine::print() const
 {
@@ -481,6 +485,25 @@ bool CornerDetector::ccw(double ax, double ay,
   return (cy-ay)*(bx-ax) > (by-ay)*(cx-ax);
 }
 
+// *******************
+// *                 *
+// *  Center Circle  *
+// *                 *
+// *******************
+
+// void CenterCircleDetector::dectectCenterCircle(HoughLineList& strictList, HoughLineList& looseList)
+// {
+//   // // Remove duplicates fr
+//   // for (HoughLineList::iterator sl = strictList.begin(); sl != strictList.end(); ++sl) {
+//   //   HoughLineList::iterator ll = looseList.begin();
+//   //   while (ll != looseList.end()) {
+//   //     if (sl->equals(*ll)) {
+//   //       looseList.erase(ll++);
+//   //     }
+//   //   }
+//   // }
+// }
+
 // **************************
 // *                        *
 // *  Field Lines and List  *
@@ -702,6 +725,7 @@ void FieldLineList::classify(GoalboxDetector& boxDetector, CornerDetector& corne
   }
 }
 
+
 // *****************
 // *               *
 // *  Calibration  *
@@ -916,6 +940,8 @@ void HoughSpace::peaks(HoughLineList& hlList)
   int diag2 = rPitch() - 1;
   int accept = acceptThreshold() * 16;
 
+  std::cout << "ACCEPT THRESH: " << acceptThreshold() << std::endl;
+
   hlList.clear();
 
   if (fast())
@@ -956,7 +982,7 @@ void HoughSpace::peaks(HoughLineList& hlList)
   times[3] = timer.time32();
 }
 
-void HoughSpace::adjust(EdgeList& edges, HoughLineList& hlList)
+void HoughSpace::adjust(EdgeList& edges, HoughLineList& hlList, bool strict)
 {
   TickTimer timer;
 
@@ -966,15 +992,19 @@ void HoughSpace::adjust(EdgeList& edges, HoughLineList& hlList)
 
   hlList.sort();
 
+  AdjustSet as(strict);
+
   for (list<HoughLine>::iterator hl = hlList.begin(); hl != hlList.end();)
   {
     bool kill = false;
-    for (int a = 0; a < adjustSteps(); ++a)
-      if (!hl->adjust(edges, adjustSet().params[a], a == adjustSteps() - 1))
+    for (int a = 0; a < adjustSteps(); ++a)  // for (a = 0 -> 1)
+    {
+      if (!hl->adjust(edges, as.params[a], a == adjustSteps() - 1))
       {
         kill = true;
         break;
       }
+    }
 
     if (kill)
       hl = hlList.erase(hl);
@@ -996,6 +1026,19 @@ void HoughSpace::run(EdgeList& edges, HoughLineList& hlList)
   adjust(edges, hlList);
 
   times[5] = timer.time32();
+}
+
+void HoughSpace::run(EdgeList& edges, HoughLineList& strictList, HoughLineList& looseList)
+{
+  clear();
+  processEdges(edges);
+  smooth();
+
+  peaks(strictList);
+  adjust(edges, strictList, true);
+  
+  // peaks(looseList);
+  // adjust(edges, looseList, false);
 }
 
 }
