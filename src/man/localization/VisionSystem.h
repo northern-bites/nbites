@@ -32,21 +32,16 @@ public:
     bool update(ParticleSet& particles,
                 const messages::FieldLines& lines,
                 const messages::Corners& corners);
-
-    int getNumObservations() const { return numObservations; }
-    float getLowestError() const { return lowestError; }
-    float getAvgError() const { return avgError; }
-    float getWeightedAvgError() const { return weightedAvgError; }
     const std::list<ReconstructedLocation>& getInjections() { return injections; }
+    int getNumObservations() const { return numObservations; }
+    double getAvgError() const { return avgError; }
 
 private:
     LineSystem* lineSystem;
-
     std::list<ReconstructedLocation> injections;
+
     int numObservations;
-    float lowestError;
-    float avgError;
-    float weightedAvgError;
+    double avgError;
 };
 
 } // namespace localization

@@ -73,21 +73,21 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
         avgErr = visionSystem->getAvgError();
     }
 
-     if (avgErr > 0) {
-         if (avgErr > 3*errorMagnitude)
-             avgErr = 3*errorMagnitude;
-         errorMagnitude = avgErr*ALPHA
-                          + errorMagnitude*(1-ALPHA);
-     } else
-         errorMagnitude += (1.f/100.f);
+    //  if (avgErr > 0) {
+    //      if (avgErr > 3*errorMagnitude)
+    //          avgErr = 3*errorMagnitude;
+    //      errorMagnitude = avgErr*ALPHA
+    //                       + errorMagnitude*(1-ALPHA);
+    //  } else
+    //      errorMagnitude += (1.f/100.f);
 
-     // std::cout << "Cur Error " << avgErr << std::endl;
-     // std::cout << "Filtered Error:  " << errorMagnitude << std::endl;
+    //  // std::cout << "Cur Error " << avgErr << std::endl;
+    //  // std::cout << "Filtered Error:  " << errorMagnitude << std::endl;
 
-    // Determine if lost in frame or general
-    lost = (errorMagnitude > LOST_THRESHOLD);
-    // std::cout << lost << std::endl;
-    badFrame = (avgErr > LOST_THRESHOLD);
+    // // Determine if lost in frame or general
+    // lost = (errorMagnitude > LOST_THRESHOLD);
+    // // std::cout << lost << std::endl;
+    // badFrame = (avgErr > LOST_THRESHOLD);
 
     // Update filters estimate
     updateEstimate();

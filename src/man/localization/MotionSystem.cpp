@@ -143,7 +143,7 @@ void MotionSystem::randomlyShiftParticle(Particle* particle, bool nearMid)
         pumpNoise = 2.f;
 
     boost::normal_distribution<> xGaussian(0, xAndYNoise);
-    boost::normal_distribution<> yGaussian(0, 2*xAndYNoise);
+    boost::normal_distribution<> yGaussian(0, xAndYNoise);
     boost::normal_distribution<> hGaussian(0, hNoise);
 
     boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > xNoise(rng, xGaussian);
