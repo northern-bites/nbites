@@ -1015,10 +1015,12 @@ std::vector<BodyJointCommand::ptr> MotionModule::generateNextBodyProviderTransit
         return commands;
     }
 
+    if(time > 1) time = 1;
+
     //larm: (0.,90.,0.,0.)
     //rarm: (0.,-90.,0.,0.)
-    float larm_angles[] = {0.9f, 0.3f,0.0f,0.0f};
-    float rarm_angles[] = {0.9f,-0.3f,0.0f,0.0f};
+    float larm_angles[] = {1.5f, 0.5f,0.0f,0.0f};
+    float rarm_angles[] = {1.5f,-0.5f,0.0f,0.0f};
 
     std::vector<float> safe_larm(larm_angles, &larm_angles[Kinematics::ARM_JOINTS]);
     std::vector<float> safe_rarm(rarm_angles, &rarm_angles[Kinematics::ARM_JOINTS]);
@@ -1031,7 +1033,7 @@ std::vector<BodyJointCommand::ptr> MotionModule::generateNextBodyProviderTransit
     if (time > MOTION_FRAME_LENGTH_S * 30){
         commands.push_back(
             BodyJointCommand::ptr (
-                new BodyJointCommand(0.5f,safe_larm, empty,empty,safe_rarm,
+                new BodyJointCommand(0.45f,safe_larm, empty,empty,safe_rarm,
                                      stiffness,
                                      Kinematics::INTERPOLATION_SMOOTH)) );
     }
@@ -1068,7 +1070,7 @@ std::vector<BodyJointCommand::ptr> MotionModule::generateNextArmProviderTransiti
     std::vector<float> empty(0);
     commands.push_back(
         BodyJointCommand::ptr (
-            new BodyJointCommand(.7f,safe_larm, empty,empty,safe_rarm,
+            new BodyJointCommand(.55f,safe_larm, empty,empty,safe_rarm,
                                  stiffness,
                                  Kinematics::INTERPOLATION_SMOOTH)) );
 
