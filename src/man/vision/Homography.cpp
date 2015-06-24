@@ -405,7 +405,7 @@ double GeoLine::error(const GeoLine& other) const
   double rDiff = fabs(fabs(r()) - fabs(other.r()));
   double tDiff = diffRadians(uMod(t(), M_PI), uMod(other.t(), M_PI));
 
-  boost::math::normal_distribution<> rGaussian(0, 300);
+  boost::math::normal_distribution<> rGaussian(0, 150);
   // boost::math::normal_distribution<> rGaussian(0, fabs(other.r()) / 4);
   boost::math::normal_distribution<> tGaussian(0, 20*TO_RAD);
 
