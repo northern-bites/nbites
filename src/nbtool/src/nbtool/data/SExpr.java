@@ -161,6 +161,7 @@ public abstract class SExpr implements Serializable{
 	public abstract boolean isAtom();
 	public abstract boolean isList();
 	public abstract boolean exists();
+	public abstract SEXPR_TYPE type();
 
 	//conversion to strings
 	public abstract String print();
@@ -171,6 +172,37 @@ public abstract class SExpr implements Serializable{
 
 	@Override
 	public abstract String toString();
+	
+	@Override
+	//DOES NOT CHECK FOR CYCLICAL TREE
+	public boolean equals(Object another) {
+		if (another == this)
+			return true;
+		if (! (another instanceof SExpr) )
+			return false;
+		SExpr osexpr = (SExpr) another;
+		if (osexpr.type() != this.type())
+			return false;
+		
+		if (this.isAtom()) {
+			return this.value().equals(osexpr.value());
+		}
+		
+		if (this.isList()) {
+			if (osexpr.count() != this.count())
+				return false;
+			
+			for (int i = 0; i < this.count(); ++i) {
+				if (!osexpr.get(i).equals(this.get(i)))
+					return false;
+			}
+			
+			return true;
+		}
+		
+		assert(!this.exists());
+		return false;	//Somewhat arbitrary, but this says that two distinct (!=) 'Not Found' SExprs cannot be equal.
+	}
 
 	/**
 	 * end functionality listing
@@ -472,6 +504,11 @@ public abstract class SExpr implements Serializable{
 		public String toString() {
 			return atom ? String.format("SExpr.atom(\"%s\")", value) : String.format("SExpr.list(%d)", list.size());
 		}
+
+		@Override
+		public SEXPR_TYPE type() {
+			return atom ? SEXPR_TYPE.ATOM : SEXPR_TYPE.LIST;
+		}
 	}
 
 	private static class NotFound extends SExpr {
@@ -598,6 +635,11 @@ public abstract class SExpr implements Serializable{
 		public Vector<SExpr>[] recursiveFindAll(String key) {
 			return new Vector[0];
 		}
+
+		@Override
+		public SEXPR_TYPE type() {
+			return SEXPR_TYPE.NOTFOUND;
+		}
 	}
 
 	//Doesn't require a throws.. or try/catch like non-Runtime exceptions.
@@ -705,6 +747,12 @@ public abstract class SExpr implements Serializable{
 		}
 
 		return copiedList;
+	}
+	
+	public static enum SEXPR_TYPE {
+		ATOM,
+		LIST,
+		NOTFOUND
 	}
 
 	public static void main(String[] args) {

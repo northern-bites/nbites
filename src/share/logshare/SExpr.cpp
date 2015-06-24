@@ -226,23 +226,22 @@ namespace nblog {
         return true;
     }
 
-    const std::string SExpr::value() {
+    const std::string SExpr::value() const {
         if (_type != SEXPR_ATOM) throw std::domain_error("sexpr is not atom");
         return _value;
     }
     
-    int SExpr::valueAsInt() {
+    int SExpr::valueAsInt() const {
         if (_type != SEXPR_ATOM) throw std::domain_error("sexpr is not atom");
         return std::stoi(_value);
-;
     }
     
-    long SExpr::valueAsLong() {
+    long SExpr::valueAsLong() const {
         if (_type != SEXPR_ATOM) throw std::domain_error("sexpr is not atom");
         return std::stol(_value);
     }
     
-    double SExpr::valueAsDouble() {
+    double SExpr::valueAsDouble() const {
         if (_type != SEXPR_ATOM) throw std::domain_error("sexpr is not atom");
         return std::stod(_value);
     }
@@ -284,7 +283,7 @@ namespace nblog {
     
     const char SExpr::special[] = {' ', '(', ')', '\r', '\n', '\t', '\0'};
     
-    const std::string SExpr::serialize()
+    const std::string SExpr::serialize() const
     {
         if (_type == SEXPR_NOTFOUND) {
             return "NOT_FOUND";
@@ -336,7 +335,7 @@ namespace nblog {
         return s;
     }
     
-    const std::string SExpr::print(int indent, int lineLimit, int level)
+    const std::string SExpr::print (int indent, int lineLimit, int level) const
     {
         if (_type == SEXPR_NOTFOUND) {
             return "NOT_FOUND";

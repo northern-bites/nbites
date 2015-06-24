@@ -1,22 +1,28 @@
 package nbtool.gui.utilitypanes;
 
+import java.awt.Rectangle;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Vector;
 
+import nbtool.util.Center;
+import nbtool.util.Prefs;
+import nbtool.util.Center.NBToolShutdownListener;
+import nbtool.util.Prefs.ExtBounds;
 import static nbtool.util.Logger.*;
 
 public class UtilityManager {
 	
-	/* adding a field here that extends UtilityParent is enough to get it displayed. */
+	/* adding a field here that
+	 * ** extends UtilityParent 
+	 * ** is 'public static final'
+	 * is enough to get it displayed.  This is also the preferred way of added utilities to the display.*/
 	public static final LogToViewUtility LogToViewUtility = new LogToViewUtility();
 	public static final YUVColorUtility YUVColorUtility = new YUVColorUtility();
 	public static final ThreadStateUtility ThreadStateUtility = new ThreadStateUtility();
-	
-	public static final TestUtility TestUtility = new TestUtility();
-	
+		
 	public static final UtilityParent[] utilities = findUtilityFields(); 
 	private static UtilityParent[] findUtilityFields() {
 		Field[] fields = UtilityManager.class.getDeclaredFields();
@@ -43,5 +49,19 @@ public class UtilityManager {
 		}
 		
 		return found.toArray(new UtilityParent[0]);
+	}
+	
+	static {
+		Center.listen(new NBToolShutdownListener() {
+			@Override
+			public void nbtoolShutdownCallback() {
+				for (UtilityParent up : utilities) {
+					if (up.previouslySupplied != null) {
+						Rectangle bnds = up.previouslySupplied.getBounds();
+						Prefs.BOUNDS_MAP.put(up.preferenceKey(), new ExtBounds(bnds, null));
+					}
+				}
+			}
+		});
 	}
 }

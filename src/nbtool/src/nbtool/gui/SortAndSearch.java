@@ -182,7 +182,7 @@ public class SortAndSearch extends JPanel implements ActionListener {
         reverseBox.setText("reverse");
         reverseBox.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
-        deleteLogButton.setText("delete log");
+        deleteLogButton.setText("rm log");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

@@ -38,7 +38,7 @@ public class Events {
 		protected void combine(LinkedList<ToolEvent> others) {}
 
 		@Override
-		protected Class<? extends EventListener> listenerClass() {
+		protected Class<? extends EventListener> listenerClass() { 
 			return eclass;
 		}
 

@@ -1,5 +1,6 @@
 package nbtool.util;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -14,9 +15,9 @@ public class Center {
 	 * EventListener framework.
 	 * */
 
-	private static HashMap<Class<? extends EventListener>, ArrayList<EventListener>> guiListeners =
+	private static final HashMap<Class<? extends EventListener>, ArrayList<EventListener>> guiListeners =
 			new HashMap<Class<? extends EventListener>, ArrayList<EventListener>>();
-	private static HashMap<Class<? extends EventListener>, ArrayList<EventListener>> centerListeners =
+	private static final HashMap<Class<? extends EventListener>, ArrayList<EventListener>> centerListeners =
 			new HashMap<Class<? extends EventListener>, ArrayList<EventListener>>();
 
 
@@ -129,7 +130,7 @@ public class Center {
 		}
 	}
 
-	private static LinkedList<ToolEvent> events = new LinkedList<ToolEvent>();
+	private static final LinkedList<ToolEvent> events = new LinkedList<ToolEvent>();
 	public static void addEvent(ToolEvent e) {
 		synchronized(events) {
 			events.add(e);
@@ -151,5 +152,44 @@ public class Center {
 		protected abstract Class<? extends EventListener> listenerClass();
 		protected abstract void execute(ArrayList<EventListener> guiList, ArrayList<EventListener> centerList);
 		
+	}
+	
+	/*
+	 * tool shutdown handling
+	 */
+	public static interface NBToolShutdownListener {
+		//Guaranteed to be called before Prefs are saved, if Prefs are saved.
+		public void nbtoolShutdownCallback();
+	}
+	
+	private static final LinkedList<NBToolShutdownListener> shutdownListeners = new LinkedList<>();
+	
+	public static void listen(NBToolShutdownListener li) {
+		synchronized(shutdownListeners) {
+			shutdownListeners.add(li);
+		}
+	}
+	
+	static {
+		Logger.println("Center adding preference shutdown hook.");
+		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable(){
+			@Override
+			public void run() {
+				
+				Logger.printf("\n----------------------------------\nCenter hook saving preferences...");
+				for (NBToolShutdownListener l : shutdownListeners) {
+					Logger.printf("\tinforming %s", l.toString());
+					l.nbtoolShutdownCallback();
+				}
+				
+				try {
+					Prefs.savePreferences();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				Logger.printf("Center hook done.");
+			}
+		}));
 	}
 }

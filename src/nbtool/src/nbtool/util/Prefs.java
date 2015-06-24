@@ -73,6 +73,7 @@ public class Prefs {
 	/* "NEW" preference values - stored inside appropriate key */
 	private static final String EXT_BOUNDS_KEY = "__EXT_BOUNDS__";
 	private static final String MISC_KEY = "__MISC__";
+	private static final String STATIC_PREFS_KEY = "__STATIC__";
 	
 	public static class ExtBounds {
 		public Rectangle bounds;
@@ -124,8 +125,14 @@ public class Prefs {
 				profile = null;
 			} else {
 				String pname = s.get(loc).value();
+				//if get() returns null, then profile should be null.
 				profile = ViewProfile.PROFILES.get(pname);
 			}
+		}
+		
+		@Override
+		public String toString() {
+			return String.format("ExtBounds{%s}{%s}", bounds, profile);
 		}
 	}
 	
@@ -140,7 +147,10 @@ public class Prefs {
 		SExpr top = SExpr.newList();
 		top.append(SExpr.newAtom("nbtool-prefs"));
 		
-		top.append(SExpr.newList(
+		SExpr staticPrefs = SExpr.newList(SExpr.atom(STATIC_PREFS_KEY));
+		top.append(staticPrefs);
+		
+		staticPrefs.append(SExpr.newList(
 				SExpr.newAtom("bounds"),
 				SExpr.newAtom(bounds.x),
 				SExpr.newAtom(bounds.y),
@@ -148,7 +158,7 @@ public class Prefs {
 				SExpr.newAtom(bounds.height)
 				));
 		
-		top.append(SExpr.list(
+		staticPrefs.append(SExpr.list(
 				SExpr.atom("split"),
 				SExpr.atom(leftSplitLoc),
 				SExpr.atom(rightSplitLoc)
@@ -158,17 +168,17 @@ public class Prefs {
 			SExpr list = SExpr.newList(SExpr.newAtom("addresses"));
 			for (String a : addresses)
 				list.append(SExpr.newAtom(a));
-			top.append(list);
+			staticPrefs.append(list);
 		}
 
 		{
 			SExpr list = SExpr.newList(SExpr.newAtom("filepaths"));
 			for (String f : filepaths)
 				list.append(SExpr.newAtom(f));
-			top.append(list);
+			staticPrefs.append(list);
 		}
 
-		top.append(SExpr.newKeyValue("logLevel", logLevel.name()));
+		staticPrefs.append(SExpr.newKeyValue("logLevel", logLevel.name()));
 
 		top.append(ViewProfile.makeProfilesSExpr());
 		
@@ -209,50 +219,11 @@ public class Prefs {
 			Logger.log(Logger.WARN, "PREFERENCES FILE HAD INVALID FORMAT");
 			return;
 		}
-
-		if (prefs.find("bounds").exists()) {
-			SExpr pnode = prefs.find("bounds");
-			Rectangle nr = new Rectangle(pnode.get(1).valueAsInt(),
-					pnode.get(2).valueAsInt(),
-					pnode.get(3).valueAsInt(),
-					pnode.get(4).valueAsInt());
-			bounds = nr;
-		}
 		
-		if (prefs.find("split").exists()) {
-			SExpr pnode = prefs.find("split");
-			leftSplitLoc = pnode.get(1).valueAsInt();
-			rightSplitLoc = pnode.get(2).valueAsInt();
-		}
-
-		if (prefs.find("addresses").exists()) {
-			SExpr pnode = prefs.find("addresses");
-			LinkedList<String> nr = new LinkedList<String>();
-			for (int i = 1; i < pnode.count(); ++i) {
-				nr.add(pnode.get(i).value());
-			}
-
-			addresses = nr;
-		}
-
-		if (prefs.find("filepaths").exists()) {
-			SExpr pnode = prefs.find("filepaths");
-			LinkedList<String> nr = new LinkedList<String>();
-			for (int i = 1; i < pnode.count(); ++i) {
-				nr.add(pnode.get(i).value());
-			}
-
-			filepaths = nr;
-		}
-
-		if (prefs.find("logLevel").exists()) {
-			SExpr pnode = prefs.find("logLevel");
-			logLevel = Logger.LogLevel.valueOf(pnode.get(1).value());
-		}
-
-		
-		/* new prefs */
-		
+		SExpr staticPrefs = prefs.find(STATIC_PREFS_KEY);
+		staticPrefs = staticPrefs.exists() ? staticPrefs : prefs;
+		readStaticPrefs(staticPrefs);
+				
 		SExpr vp_se = prefs.find(ViewProfile.PROFILES_KEY);
 		if (vp_se.exists()) {
 			ViewProfile.setupProfiles(vp_se);
@@ -266,6 +237,8 @@ public class Prefs {
 				SExpr item = ext_se.get(i);
 				String key = item.get(0).value();
 				ExtBounds eb = new ExtBounds(item.get(1));
+				
+				//Logger.printf("****got %s from %s (%s)", eb, item.get(1).serialize(), key);
 				
 				BOUNDS_MAP.put(key, eb);
 			}
@@ -283,4 +256,46 @@ public class Prefs {
 	}
 	
 	private static final SExpr VIEW_PROFILE_NOT_FOUND = SExpr.list(SExpr.atom(ViewProfile.PROFILES_KEY));
+	
+	private static void readStaticPrefs(SExpr staticPrefs) {
+		if (staticPrefs.find("bounds").exists()) {
+			SExpr pnode = staticPrefs.find("bounds");
+			Rectangle nr = new Rectangle(pnode.get(1).valueAsInt(),
+					pnode.get(2).valueAsInt(),
+					pnode.get(3).valueAsInt(),
+					pnode.get(4).valueAsInt());
+			bounds = nr;
+		}
+		
+		if (staticPrefs.find("split").exists()) {
+			SExpr pnode = staticPrefs.find("split");
+			leftSplitLoc = pnode.get(1).valueAsInt();
+			rightSplitLoc = pnode.get(2).valueAsInt();
+		}
+
+		if (staticPrefs.find("addresses").exists()) {
+			SExpr pnode = staticPrefs.find("addresses");
+			LinkedList<String> nr = new LinkedList<String>();
+			for (int i = 1; i < pnode.count(); ++i) {
+				nr.add(pnode.get(i).value());
+			}
+
+			addresses = nr;
+		}
+
+		if (staticPrefs.find("filepaths").exists()) {
+			SExpr pnode = staticPrefs.find("filepaths");
+			LinkedList<String> nr = new LinkedList<String>();
+			for (int i = 1; i < pnode.count(); ++i) {
+				nr.add(pnode.get(i).value());
+			}
+
+			filepaths = nr;
+		}
+
+		if (staticPrefs.find("logLevel").exists()) {
+			SExpr pnode = staticPrefs.find("logLevel");
+			logLevel = Logger.LogLevel.valueOf(pnode.get(1).value());
+		}
+	}
 }

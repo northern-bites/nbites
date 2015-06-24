@@ -38,6 +38,7 @@ public class NBConstants {
 	public static final int NBCROSS_PORT = 30002;
 	
 	public static final int SOCKET_TIMEOUT = 5000; 		//Milliseconds
+	
 	public static final int NBCROSS_CALL_TIMEOUT = 0;	//interpreted as infinite.  Note that, since these calls are local,
 														//we worry less about dead sockets.
 	

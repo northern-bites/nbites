@@ -27,12 +27,15 @@ import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.utilitypanes.LogToViewUtility;
 import nbtool.gui.utilitypanes.UtilityManager;
 import nbtool.io.CrossIO;
+import nbtool.util.Center;
+import nbtool.util.Center.NBToolShutdownListener;
 import nbtool.util.Logger;
 import nbtool.util.NBConstants;
 import nbtool.util.Prefs;
+import nbtool.util.Prefs.ExtBounds;
 import nbtool.util.Utility;
 import static nbtool.util.Logger.*;
-public final class Display extends JFrame implements KeyEventPostProcessor {
+public final class Display extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	public Display() {
@@ -42,20 +45,18 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		
 		//Register hook to save preferences.
 		final JFrame _display = this;
-		Runnable savePrefsRunnable = new Runnable() {
-			public void run() {
+		
+		Center.listen(new NBToolShutdownListener(){
+			@Override
+			public void nbtoolShutdownCallback() {
 				Prefs.bounds = _display.getBounds();
 				Prefs.leftSplitLoc = split1.getDividerLocation();
 				Prefs.rightSplitLoc = split2.getDividerLocation();
 				
-				try {
-					Prefs.savePreferences();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				Prefs.BOUNDS_MAP.put(LogDisplayPanel.MAIN_LOG_DISPLAY_KEY,
+						new ExtBounds(null, ldp.currentProfile()));
 			}
-		};
-		Runtime.getRuntime().addShutdownHook(new Thread(savePrefsRunnable));
+		});
 				
 		left = new JTabbedPane();
 		right = new JTabbedPane();
@@ -92,55 +93,17 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		split1.setDividerLocation(Prefs.leftSplitLoc);
 		split2.setDividerLocation(Prefs.rightSplitLoc);
 		
-		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventPostProcessor(this);
+		KeyBind.left = left;
+		KeyBind.right = right;
+		KeyBind.controlPanel = cntrlp;
+		KeyBind.mainPanel = ldp;
+		
+		KeyBind.setupKeyBinds(Prefs.MISC_MAP);
 				
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 		
 		System.out.println("---------------------------------- <end initialization>\n\n");
-	}
-	
-	public boolean postProcessKeyEvent(final KeyEvent e) {
-
-		if (!e.isConsumed() && (e.getID() == KeyEvent.KEY_TYPED)) {
-			
-			Character c = e.getKeyChar();
-			if (Character.isDigit(c)) {
-				ldp.trySetFocus(Character.getNumericValue(c) - 1);
-			}
-			
-			if (Character.isLetter(c)) {
-				switch (c) {
-				case 'q':
-					left.setSelectedIndex(0);
-					break;
-				case 'w':
-					left.setSelectedIndex(1);
-					break;
-				case 'e':
-					right.setSelectedIndex(0);
-					break;
-				case 'r':
-					right.setSelectedIndex(1);
-					break;
-				case 't':
-					right.setSelectedIndex(2);
-					break;
-				case 's':
-					
-					break;
-				case 'l':
-					JFrame frame = UtilityManager.LogToViewUtility.supplyDisplay();
-					boolean vis = frame.isVisible();
-					frame.setVisible(!vis);
-					break;
-				case 'p':
-					break;
-				}
-			}
-		}
-		
-		return false;
 	}
 
 	private JTabbedPane left;

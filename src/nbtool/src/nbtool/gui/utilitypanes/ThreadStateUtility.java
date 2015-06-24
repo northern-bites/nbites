@@ -31,15 +31,6 @@ public class ThreadStateUtility extends UtilityParent {
 			Timer swingTimer = new Timer(1000, this);
 			swingTimer.setInitialDelay(0);
 			swingTimer.start();
-			
-			LogDND.makeComponentTarget(listDisplay, new LogDNDTarget(){
-
-				@Override
-				public void takeLogsFromDrop(Log[] log) {
-					System.out.println("tsu dropped");
-				}
-				
-			});
 		}
 
 		@Override

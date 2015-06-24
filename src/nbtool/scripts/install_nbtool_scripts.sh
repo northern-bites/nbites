@@ -16,6 +16,7 @@ echo "in" $(pwd)
 cp -v ./nbcross $INSTALL_TO_PATH
 cp -v ./nbtool $INSTALL_TO_PATH
 cp -v ./nbtool-build $INSTALL_TO_PATH
+cp -v ./nbtool-version $INSTALL_TO_PATH
 
 echo
 echo "done"

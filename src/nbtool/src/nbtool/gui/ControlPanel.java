@@ -3,6 +3,9 @@ package nbtool.gui;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -164,7 +167,15 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 			}
 		});
 
-		//...
+		/* dirBox prevents hotkeys.  Try to keep it from getting default focus */
+		this.addComponentListener(new ComponentAdapter(){
+			@Override
+			public void componentShown(ComponentEvent e) {
+				//Logger.println("SHOWN");
+				loadButton.requestFocus();
+			}
+
+		});
 
 		//Events.LogsFound, Events.LogSelected, Events.SessionSelected,
 		//Events.ToolStatus, Events.ControlStatus, Events.RelevantRobotStats

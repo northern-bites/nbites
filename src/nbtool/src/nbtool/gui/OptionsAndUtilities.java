@@ -54,6 +54,13 @@ public class OptionsAndUtilities extends JPanel{
 			
 		});
 		
+		newWindowButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ExternalLogDisplay.requestAny();
+			}
+		});
+		
 		//utilityPanel.setLayout(new GridLayout(UtilityManager.utilities.length, 1));
 		utilityHolder.setLayout(new BoxLayout(utilityHolder, BoxLayout.Y_AXIS));
 		for (UtilityParent up : UtilityManager.utilities) {
@@ -61,6 +68,14 @@ public class OptionsAndUtilities extends JPanel{
 			utilityHolder.add(Box.createVerticalStrut(5));
 		}
 		utilityHolder.add(Box.createVerticalGlue());
+		
+		disposeAllButton.setVisible(false);
+		na1.setVisible(false);
+		na2.setVisible(false);
+		na3.setVisible(false);
+		na4.setVisible(false);
+		
+		KeyBind.subRight = this.subRight;
 	}
 	private void dropStatsBoxActionPerformed(java.awt.event.ActionEvent evt) {
 		SessionMaster.dropSTATS = dropStatsBox.isSelected();
@@ -144,7 +159,7 @@ public class OptionsAndUtilities extends JPanel{
 	}
 	
 	private void initComponents() {
-        jTabbedPane2 = new javax.swing.JTabbedPane();
+        subRight = new javax.swing.JTabbedPane();
         utilityHolder = new javax.swing.JPanel();
         optionHolder = new javax.swing.JPanel();
         loggingLabel = new javax.swing.JLabel();
@@ -168,7 +183,7 @@ public class OptionsAndUtilities extends JPanel{
             .addGap(0, 473, Short.MAX_VALUE)
         );
 
-        jTabbedPane2.addTab("utilities", utilityHolder);
+        subRight.addTab("utilities", utilityHolder);
 
         loggingLabel.setText("logging level");
 
@@ -255,17 +270,17 @@ public class OptionsAndUtilities extends JPanel{
                 .addGap(0, 253, Short.MAX_VALUE))
         );
 
-        jTabbedPane2.addTab("options", optionHolder);
+        subRight.addTab("options", optionHolder);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane2)
+            .addComponent(subRight)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane2)
+            .addComponent(subRight)
         );
     }// </editor-fold>                                                                   
 
@@ -273,7 +288,7 @@ public class OptionsAndUtilities extends JPanel{
     // Variables declaration - do not modify                     
     private javax.swing.JButton disposeAllButton;
     private javax.swing.JCheckBox dropStatsBox;
-    private javax.swing.JTabbedPane jTabbedPane2;
+    private javax.swing.JTabbedPane subRight;
     private javax.swing.JComboBox<Logger.LogLevel> levelBox;
     private javax.swing.JLabel loggingLabel;
     private javax.swing.JCheckBox na1;
