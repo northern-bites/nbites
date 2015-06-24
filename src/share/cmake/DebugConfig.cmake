@@ -50,7 +50,7 @@ option(
 option(
   DEBUG_THREADS
   "Toggle threads debug mode."
-  OFF
+  ON
 )
 
 option(
