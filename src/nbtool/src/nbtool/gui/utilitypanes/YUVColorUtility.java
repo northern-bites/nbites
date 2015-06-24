@@ -244,6 +244,6 @@ public class YUVColorUtility extends UtilityParent {
 
 	@Override
 	public char preferredMemnonic() {
-		return 0;
+		return 'y';
 	}
 }

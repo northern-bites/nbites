@@ -72,6 +72,6 @@ public class ThreadStateUtility extends UtilityParent {
 
 	@Override
 	public char preferredMemnonic() {
-		return 't';
+		return 'k';
 	}
 }
