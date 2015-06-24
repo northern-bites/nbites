@@ -31,7 +31,12 @@ bool VisionSystem::update(ParticleSet& particles,
     float totalWeight = 0.0f;
     float sumParticleError = 0.f;
 
-    numObservations = lines.line_size();
+    for (int i = 0; i < lines.line_size(); i++) {
+        if (!LineSystem::shouldUse(lines.line(i)))
+            continue;
+        numObservations++;
+    }
+
     if (numObservations == 0)
         return false;
 
