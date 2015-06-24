@@ -142,17 +142,18 @@ void MotionSystem::randomlyShiftParticle(Particle* particle, bool nearMid)
     if (nearMid)
         pumpNoise = 2.f;
 
-    // TODO: This should be experimentally determined
-    boost::uniform_real<float> coordRange(-1.f * xAndYNoise * pumpNoise, xAndYNoise * pumpNoise);
-    boost::uniform_real<float> headRange (-1.f * hNoise    , hNoise);
-    boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > coordNoise(rng, coordRange);
-    boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > headNoise(rng, headRange);
+    boost::normal_distribution<> xGaussian(0, xAndYNoise);
+    boost::normal_distribution<> yGaussian(0, 2*xAndYNoise);
+    boost::normal_distribution<> hGaussian(0, hNoise);
 
-    // Determine random noise and shift the particle
+    boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > xNoise(rng, xGaussian);
+    boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > yNoise(rng, yGaussian);
+    boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > hNoise(rng, hGaussian);
+
     messages::RobotLocation noise;
-    noise.set_x(coordNoise());
-    noise.set_y(coordNoise());
-    noise.set_h(NBMath::subPIAngle(headNoise()));
+    noise.set_x(xNoise());
+    noise.set_y(yNoise());
+    noise.set_h(NBMath::subPIAngle(hNoise()));
 
     particle->shift(noise);
 }

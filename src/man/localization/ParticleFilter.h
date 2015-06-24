@@ -47,8 +47,8 @@ static const ParticleFilterParams DEFAULT_PARAMS =
     300,                        // Num Particles
     0.2f,                       // Exponential Filter alpha
     0.05f,                      //                    beta
-    1.0f,                       // Variance in x-y odometry
-    0.08f                       // Variance in h odometry
+    0.1f,                       // Variance in x-y odometry
+    0.07f                       // Variance in h odometry
 };
 
 /**
