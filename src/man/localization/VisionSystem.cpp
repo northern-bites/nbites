@@ -26,6 +26,7 @@ bool VisionSystem::update(ParticleSet& particles,
     lowestError = std::numeric_limits<float>::max();
     avgError = 0;
     weightedAvgError = 0;
+    Particle* best = NULL;
  
     float totalWeight = 0.0f;
     float sumParticleError = 0.f;
@@ -41,12 +42,15 @@ bool VisionSystem::update(ParticleSet& particles,
         float curParticleError = 0;
 
         // Score particles according to how well they match with detected lines
+        bool firstError = true;
         for (int i = 0; i < lines.line_size(); i++) {
             if (!LineSystem::shouldUse(lines.line(i)))
                 continue;
-            if (i == 0)
+
+            if (firstError) {
                 curParticleError = lineSystem->scoreObservation(lines.line(i), particle->getLocation());
-            else
+                firstError = false;
+            } else
                 curParticleError = curParticleError*lineSystem->scoreObservation(lines.line(i), particle->getLocation());
         }
 
@@ -59,8 +63,10 @@ bool VisionSystem::update(ParticleSet& particles,
         // Update the total swarm error
         sumParticleError += avgErr;
         particle->setError(avgErr);
-        if (avgErr < lowestError)
-            lowestError = avgErr;
+        if (curParticleError < lowestError) {
+            lowestError = curParticleError;
+            best = particle;
+        }
     }
 
     // Normalize the particle weights and calculate the weighted avg error
