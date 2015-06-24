@@ -95,7 +95,13 @@ public class OptionsAndUtilities extends JPanel{
 			initComponents();
 			
 			util = up;
-			this.memLabel.setText("n/a");
+			char memn = up.preferredMemnonic();
+			if (memn > 0) {
+				this.memLabel.setText("" + memn);
+			} else {
+				this.memLabel.setText("n/a");
+			}
+			
 			this.purposeLabel.setText(up.purpose());
 			this.showButton.setText(up.getClass().getSimpleName());
 			this.showButton.addActionListener(new ActionListener(){
