@@ -143,7 +143,7 @@ public class CameraCalibrateUtility extends UtilityParent {
                         g.drawString("Roll offset: " + Double.toString(rollOffset) + " rad.", buf*8, buf*14);
                         g.drawString("Tilt offset: " + Double.toString(tiltOffset) + " rad.", buf*8, buf*16);
                         g.drawString("For camera: " +  (topCam ? "TOP" : "BOTTOM"), buf*8, buf*18);
-                        g.drawString("Of robot: " + robotName, buf*8, buf*20);
+                        g.drawString("For robot: " + robotName, buf*8, buf*20);
 
                         save.setEnabled(true);
                     }
