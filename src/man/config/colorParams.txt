@@ -27,6 +27,7 @@
             (fuzzy_v 0.05)
           )
         )
+        (SaveParams True)
       )
     )
     ( Bottom
@@ -57,6 +58,7 @@
             (fuzzy_v 0.05)
           )
         )
+        (SaveParams True)
       )
     )
   )

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ $NBITES_DIR == "" ]
+    then
+        echo "cannot use nbtool scripts without NBITES_DIR variable.";
+        exit 1
+fi
+
+echo "using NBITES_DIR=" $NBITES_DIR
+grep VERSION $NBITES_DIR/src/nbtool/src/nbtool/util/NBConstants.java

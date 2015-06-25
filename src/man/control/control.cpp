@@ -288,7 +288,7 @@ namespace control {
         STARTED = true;
         
         bzero((void *) flags, num_flags);
-        
+
         pthread_create(&control_thread, NULL, &cnc_loop, NULL);
         pthread_detach(control_thread);
     }

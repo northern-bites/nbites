@@ -4,7 +4,7 @@ import NavTransitions as navTrans
 from collections import deque
 from objects import RobotLocation, RelRobotLocation
 from ..util import Transition
-from math import fabs
+from math import fabs, degrees
 from random import random
 
 def scriptedMove(nav):
@@ -244,20 +244,35 @@ def destinationWalkingTo(nav):
 destinationWalkingTo.destQueue = deque()
 destinationWalkingTo.speed = 0
 
+def locationsMatch(odom, dest):
+    if (abs(odom.relX - dest.relX) < constants.ODOM_CLOSE_ENOUGH) \
+    and (abs(odom.relY - dest.relY) < constants.ODOM_CLOSE_ENOUGH) \
+    and (abs(odom.relH - degrees(dest.relH)) < 30.0):
+        return True
+
+    return False
+
 def walkingTo(nav):
     """
     State to be used for odometry walking.
     """
     if nav.firstFrame():
+        nav.brain.interface.motionRequest.reset_odometry = True
+        nav.brain.interface.motionRequest.timestamp = int(nav.brain.time * 1000)
         helper.stand(nav)
         return nav.stay()
 
     # TODO why check standing?
     if nav.brain.interface.motionStatus.standing:
+        walkingTo.currentOdo = RelRobotLocation(nav.brain.interface.odometry.x,
+                             nav.brain.interface.odometry.y,
+                             nav.brain.interface.odometry.h)
+
         if len(walkingTo.destQueue) > 0:
             dest = walkingTo.destQueue.popleft()
             helper.setOdometryDestination(nav, dest, walkingTo.speed)
-        else:
+
+        elif locationsMatch(nav.destination, walkingTo.currentOdo):
             return nav.goNow('standing')
 
     return nav.stay()

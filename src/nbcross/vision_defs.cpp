@@ -41,7 +41,7 @@ int Vision_func() {
 
     // Parse YUVImage S-expression
     // Determine if we are looking at a top or bottom image from log description
-    bool topCamera = copy->description().find("TOP") != std::string::npos;
+    bool topCamera = copy->description().find("camera_TOP") != std::string::npos;
     int width, height;
     std::vector<SExpr*> vec = copy->tree().recursiveFind("width");
     if (vec.size() != 0) {
@@ -315,8 +315,12 @@ int Vision_func() {
         std::cout << line.field().print() << std::endl;
     }
 
+    std::cout << "TOP : " << topCamera << std::endl;
+
     std::cout << std::endl << "Field lines:" << std::endl;
+    std::cout << "0.idx, 1.idx, id, idx" << std::endl;
     man::vision::FieldLineList* fieldLineList = module.getFieldLines(topCamera);
+
     for (int i = 0; i < fieldLineList->size(); i++) {
         man::vision::FieldLine& line = (*fieldLineList)[i];
         std::cout << line.print() << std::endl;
@@ -328,6 +332,8 @@ int Vision_func() {
 
     if (box->first != NULL)
         std::cout << box->print() << std::endl;
+
+    std::cout << "    line0, line1, type (concave, convex, T)" << std::endl;
     for (int i = 0; i < corners->size(); i++) {
         const man::vision::Corner& corner = (*corners)[i];
         std::cout << corner.print() << std::endl;

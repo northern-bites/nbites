@@ -84,16 +84,19 @@ def gamePlaying(player):
     if (not player.brain.motion.calibrated):
         return player.stay()
 
-    if player.penalized:
-        player.penalized = False
-        return player.goLater('afterPenalty')
+    #TODO penalty handling
+    # if player.penalized:
+    #     player.penalized = False
+    #     return player.goLater('afterPenalty')
 
-    if player.lastDiffState == 'afterPenalty':
-        return player.goLater('walkToGoal')
+    # if player.lastDiffState == 'afterPenalty':
+    #     return player.goLater('walkToGoal')
 
     if player.lastDiffState == 'fallen':
-        return player.goLater('spinAtGoal')
+        return player.goLater('watchWithLineChecks')
 
+    #TODO before game/scrimmage change this to watch;
+    # this is better for testing purposes!
     return player.goLater('watch')
 
 @superState('gameControllerResponder')
@@ -160,6 +163,77 @@ def standStill(player):
 
     return player.stay()
 
+
+# -----------------------------------------------
+# NEW VISION
+
+@superState('gameControllerResponder')
+def watchWithLineChecks(player):
+    if player.firstFrame():
+        watchWithLineChecks.lines[:] = []
+        player.homeDirections = []
+
+        if player.lastDiffState is not 'lineCheckReposition' \
+        and player.lastDiffState is not 'lineCheckTurn':
+            print "My facing is not necessarily correct! I'm checking"
+            watchWithLineChecks.correctFacing = False
+            watchWithLineChecks.numFixes = 0
+            watchWithLineChecks.numTurns = 0
+            watchWithLineChecks.looking = False
+
+        elif player.lastDiffState is 'lineCheckTurn':
+            print "I think I have correct facing now..."
+            watchWithLineChecks.correctFacing = True
+            watchWithLineChecks.numTurns += 1
+        else:
+            watchWithLineChecks.numFixes += 1
+
+        player.brain.tracker.trackBall()
+        player.brain.nav.stand()
+        player.returningFromPenalty = False
+
+    if (player.brain.ball.vis.frames_on > constants.BALL_ON_SAFE_THRESH \
+        and player.brain.ball.distance > constants.BALL_SAFE_DISTANCE_THRESH \
+        and not watchWithLineChecks.looking):
+        watchWithLineChecks.looking = True
+        player.brain.tracker.performBasicPan()
+
+    if player.brain.tracker.isStopped():
+        watchWithCornerChecks.looking = False
+        player.brain.tracker.trackBall()
+
+    if player.counter > 200:
+        return player.goLater('watch')
+
+    return Transition.getNextState(player, watchWithLineChecks)
+
+watchWithLineChecks.lines = []
+
+@superState('gameControllerResponder')
+def lineCheckReposition(player):
+    if player.firstFrame():
+        player.brain.tracker.repeatBasicPan()
+        dest = average(player.homeDirections)
+        print "My home directions: "
+        print dest
+        player.brain.nav.walkTo(dest)
+
+    return Transition.getNextState(player, lineCheckReposition)
+
+
+@superState('gameControllerResponder')
+def lineCheckTurn(player):
+    if player.firstFrame():
+        player.brain.tracker.repeatBasicPan()
+        dest = average(player.homeDirections)
+        print "My home directions: "
+        print dest
+        player.brain.nav.walkTo(dest)
+
+    return Transition.getNextState(player, lineCheckReposition)
+
+# -----------------------------------------------
+
 @superState('gameControllerResponder')
 def watchWithCornerChecks(player):
     if player.firstFrame():
@@ -200,15 +274,15 @@ def watchWithCornerChecks(player):
         watchWithCornerChecks.looking = False
         player.brain.tracker.trackBall()
 
-    return Transition.getNextState(player, watchWithCornerChecks)
+    return Transition.getNextStateu(player, watchWithCornerChecks)
 
 @superState('gameControllerResponder')
 def watch(player):
     if player.firstFrame():
-        # player.brain.tracker.trackBall()
-        player.brain.tracker.repeatBasicPan()
+        player.brain.tracker.trackBall()
         player.brain.nav.stand()
         player.returningFromPenalty = False
+        print ("I'm moving to watch! I think I'm in the right position")
 
     return Transition.getNextState(player, watch)
 
@@ -221,6 +295,9 @@ def average(locations):
         x += item.relX
         y += item.relY
         h += item.relH
+
+    if len(locations) == 0:
+        return RelRobotLocation(0.0, 0.0, 0.0)
 
     return RelRobotLocation(x/len(locations),
                             y/len(locations),

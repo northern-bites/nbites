@@ -63,7 +63,7 @@ public class ControlIO {
 			instances.add(si);
 		}
 		
-		Thread t = new Thread(si, String.format("thread-%s", si.name()));
+		Thread t = new Thread(si, String.format("nbtool-%s", si.name()));
 		t.setDaemon(true);
 		t.start();
 

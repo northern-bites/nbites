@@ -124,6 +124,8 @@ std::string Ball::properties()
     d += "\tcount is: " + to_string(blob.count()) + "\n";
     d += "\tlocated: (" + to_string(blob.centerX()) +  ", " +
         to_string(blob.centerY()) + ")\n";
+    d += "\tprinceLens: " + to_string(blob.firstPrincipalLength()) + " " +
+        to_string(blob.secondPrincipalLength()) + "\n";
     d += "\taspectR is: " + to_string(blob.secondPrincipalLength() /
                                       blob.firstPrincipalLength()) + "\n";
     d += "\texpect ball to be this many pix: " + to_string(expectedDiam) + "\n";
