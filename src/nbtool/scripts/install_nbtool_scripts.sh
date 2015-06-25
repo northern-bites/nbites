@@ -2,7 +2,7 @@
 
 INSTALL_TO_PATH="/usr/local/bin/"
 
-if [ $NBITES_DIR == "" ]
+if [[ $NBITES_DIR == "" ]]
     then
         echo "cannot use nbtool scripts without NBITES_DIR variable.";
         exit 1
