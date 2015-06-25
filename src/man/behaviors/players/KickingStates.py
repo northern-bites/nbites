@@ -11,8 +11,9 @@ from objects import Location, RelRobotLocation
 
 # TODO refactor, super state?
 
-@superState('positionAndKickBall')
+@superState('gameControllerResponder')
 @ifSwitchLater(transitions.ballMoved, 'approachBall') # TODO this doesn't work
+@ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
 def executeMotionKick(player):
     """
     Do a motion kick.
@@ -28,6 +29,9 @@ def executeMotionKick(player):
                                            player.kick)
     elif player.brain.ball.vis.on: # don't update if we don't see the ball
         player.brain.nav.updateDestinationWalkDest(executeMotionKick.kickPose)
+    elif player.kickedOut and not player.brain.ball.vis.on:
+        player.kickedOut = False
+        return player.goNow('spinSearch')
 
     # TODO not ideal at all!
     if player.counter > 40:
@@ -36,8 +40,9 @@ def executeMotionKick(player):
 
     return player.stay()
 
-@superState('positionAndKickBall')
+@superState('gameControllerResponder')
 @ifSwitchLater(transitions.ballMoved, 'approachBall') # TODO this doesn't work
+@ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
 def executeKick(player):
     """
     Kick the ball.
@@ -66,12 +71,16 @@ def afterKick(player):
     State to follow up after a kick.
     """
     if player.firstFrame():
-        player.stand()        # stand up right, ready to walk
+        # player.stand()        # stand up right, ready to walk
         player.brain.tracker.afterKickScan(player.kick.name)
         return player.stay()
 
-    if player.passBack:
+    if player.penaltyKicking:
+        return player.stay()
+
+    elif player.passBack:
         return player.goNow('passToFieldCross')
+
     elif transitions.shouldKickAgain(player):
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
         if player.motionKick:
@@ -79,19 +88,20 @@ def afterKick(player):
             return player.goNow('spinToBall')
         else:        
             return player.goNow('positionForKick')
+    
+    elif player.kickedOut:
+        player.kickedOut = False
+        return player.goNow('spinSearch')
+
     elif transitions.shouldChaseBall(player):
         return player.goLater('approachBall')
-    else:
+    elif player.stateTime > 2:
         destinationOfKick = Location(player.kick.destinationX,
                                      player.kick.destinationY)
         player.brain.nav.goTo(destinationOfKick, precision = nav.GENERAL_AREA,
                               speed = nav.QUICK_SPEED, avoidObstacles = True,
                               fast = True, pb = False)
-
-    if player.penaltyKicking:
-        return player.stay()
-
-    if player.stateTime > 4:
+    elif player.stateTime > 4:
         return player.goLater('approachBall')
 
     return player.stay()

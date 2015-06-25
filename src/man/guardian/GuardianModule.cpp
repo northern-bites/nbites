@@ -26,7 +26,7 @@ static const float FALLING_ANGLE_THRESH = M_PI_FLOAT/5.0f; // 36.0 degrees
 static const int FALLING_FRAMES_THRESH = 3;
 static const int FALLING_RESET_FRAMES_THRESH = 10;
 
-static const float FALLEN_ANGLE_THRESH = M_PI_FLOAT/3.0f; // 72 degrees
+static const float FALLEN_ANGLE_THRESH = M_PI_FLOAT/3.5f; // 72 degrees
 
 const int GuardianModule::NO_CLICKS = -1;
 

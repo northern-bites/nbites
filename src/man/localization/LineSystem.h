@@ -1,34 +1,52 @@
 /**
  * @brief A class responsible for maintaing knowedge of lines on the field
- *        and comparing projectinos and observations
+ *        and comparing projections and observations.
  *
  * @author EJ Googins <egoogins@bowdoin.edu>
  * @date   June 2013
+ * @author Josh Imhoff <joshimhoff13@gmail.com>
+ * @date   June 2015
  */
 
 #pragma once
 
+#include "Particle.h"
+#include "Vision.pb.h"
 #include "FieldConstants.h"
-#include "LocStructs.h"
+#include "../vision/Homography.h"
 
 namespace man {
 namespace localization {
 
-typedef std::vector<Line> LineSet;
-typedef LineSet::iterator LineIt;
+// TODO rename LineID as VisionLineID
+enum class LocLineID {
+    NotMatched,
+    OurEndline,
+    TheirEndline,
+    OurMidline,
+    TheirMidline,
+    OurTopGoalbox,
+    TheirTopGoalbox,
+    RightSideline,
+    LeftSideline
+};
 
 class LineSystem {
 public:
     LineSystem();
-    virtual ~LineSystem();
+    ~LineSystem();
 
-    void addLine(float startX, float startY, float endX, float endY);
+    LocLineID matchObservation(const messages::FieldLine& observation, const messages::RobotLocation& loc);
+    double scoreObservation(const messages::FieldLine& observation, const messages::RobotLocation& loc);
+    messages::RobotLocation reconstructPosition(LocLineID id, const messages::FieldLine& observation);
 
-    float scoreObservation(Line globalObsv);
-    LineErrorMatch scoreAndMatchObservation(Line globalObsv, bool debug = false);
+    static vision::GeoLine relRobotToAbsolute(const messages::FieldLine& observation, const messages::RobotLocation& loc);
+    static bool shouldUse(const messages::FieldLine& observation); 
 
 private:
-    LineSet lines;
+    void addLine(LocLineID id, float r, float t, float ep0, float ep1);
+
+    std::map<LocLineID, vision::GeoLine> lines;
 };
 
 } // namespace localization

@@ -166,7 +166,7 @@ namespace nblog {
     {
         _list = {SExpr(key), SExpr(roll), SExpr(pitch)};
     }
-    
+
     /*
      Instance methods
      */

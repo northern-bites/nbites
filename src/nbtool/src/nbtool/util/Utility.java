@@ -19,6 +19,7 @@ import nbtool.data.SExpr;
 import nbtool.images.ImageParent;
 import nbtool.images.UV88image;
 import nbtool.images.Y16image;
+import nbtool.images.Y8image;
 import nbtool.images.YUYV8888image;
 
 
@@ -44,17 +45,19 @@ public class Utility {
 			//old image
 			ip = new YUYV8888image(width / 2, height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[Y8(U8/V8)]")) {
-			ip = new YUYV8888image(width , height, log.bytes);
+			ip = new YUYV8888image(2*width, height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[Y16]")) {
 			ip = new Y16image(width , height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[U8V8]")) {
 			ip = new UV88image(width , height, log.bytes);
+		} else if (encoding.equalsIgnoreCase("[Y8]")) {
+			ip = new Y8image(width , height, log.bytes);
 		} else {
 			Logger.log(Logger.WARN, "Cannot use image with encoding:" + encoding);
 			return null;
 		}
 		
-		return ip.toBufferedImage(); 
+		return ip.toBufferedImage();
 	}
 
 	public static final char[] hexArray = "0123456789ABCDEF".toCharArray();
