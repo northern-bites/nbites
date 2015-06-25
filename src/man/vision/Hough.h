@@ -250,7 +250,9 @@ class CenterCircleDetector {
   double cct;
 
 public:
-  // void dectectCenterCircle(HoughLineList& strictList, HoughLineList& looseList);
+  void detectCenterCircle(HoughLineList& hlList);
+  void cleanHoughLineList(HoughLineList& hlList);
+  bool checkLength(const HoughLine& hl);
 
 };
 
@@ -398,7 +400,7 @@ private:
   void wrapAround();
   void smooth();
   void peaks(HoughLineList&);
-  void adjust(EdgeList&, HoughLineList&, bool strict = true);
+  void adjust(EdgeList&, HoughLineList&, HoughLineList&);
 
   static bool tableInit;
   static int16_t sincosTable[0x140 + 2 * AngleSpread + 1];

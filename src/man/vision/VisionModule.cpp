@@ -61,6 +61,7 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         fieldLines[i] = new FieldLineList();
         ballDetector[i] = new BallDetector(homography[i], i == 0);
         boxDetector[i] = new GoalboxDetector();
+        centerCircleDetector[i] = new CenterCircleDetector();
 
         if (i == 0) {
           hough[i] = new HoughSpace(wd / 2, ht / 2);
@@ -92,6 +93,10 @@ VisionModule::~VisionModule()
         delete kinematics[i];
         delete homography[i];
         delete fieldLines[i];
+        delete boxDetector[i];
+        delete cornerDetector[i];
+        delete centerCircleDetector[i];
+        delete ballDetector[i];
     }
 }
 
@@ -148,10 +153,14 @@ void VisionModule::run_()
         // Run hough line detection
         hough[i]->run(*(edges[i]), *(houghLinesStrict[i]), *(houghLinesLoose[i]));
 
-        // Detect center circle
-
-        // Find field lines
+        // Find world coordinates for hough lines
         houghLinesStrict[i]->mapToField(*(homography[i]));
+        houghLinesLoose[i]->mapToField(*(homography[i]));
+        
+        // Detect center circle
+        centerCircleDetector[i]->detectCenterCircle(*(houghLinesLoose[i]));
+
+        // Pair strict hough lines to field lines
         fieldLines[i]->find(*(houghLinesStrict[i]));
 
         // Classify field lines

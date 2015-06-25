@@ -33,7 +33,7 @@ AdjustParams::AdjustParams()
 AdjustSet::AdjustSet(bool strict) {
   params[1].angleThr = FuzzyThr(0.08f, 0.12f);
   params[1].distanceThr = FuzzyThr(0.7f, 2.0f);
-  params[1].fitThresold = strict ? 0.55 : 2.0;
+  params[1].fitThresold = strict ? 0.5 : 2.0;
 
 }
 
@@ -491,18 +491,26 @@ bool CornerDetector::ccw(double ax, double ay,
 // *                 *
 // *******************
 
-// void CenterCircleDetector::dectectCenterCircle(HoughLineList& strictList, HoughLineList& looseList)
-// {
-//   // // Remove duplicates fr
-//   // for (HoughLineList::iterator sl = strictList.begin(); sl != strictList.end(); ++sl) {
-//   //   HoughLineList::iterator ll = looseList.begin();
-//   //   while (ll != looseList.end()) {
-//   //     if (sl->equals(*ll)) {
-//   //       looseList.erase(ll++);
-//   //     }
-//   //   }
-//   // }
-// }
+void CenterCircleDetector::detectCenterCircle(HoughLineList& hlList)
+{
+  cleanHoughLineList(hlList);
+  
+}
+
+void CenterCircleDetector::cleanHoughLineList(HoughLineList& hlList)
+{
+  for (HoughLineList::iterator hl = hlList.begin(); hl != hlList.end();)
+    if (!checkLength(*hl))
+      hl = hlList.erase(hl);
+    else
+      hl++;
+}
+
+bool CenterCircleDetector::checkLength(const HoughLine& hl)
+{
+  double lengthThreshold = 100;
+  return (fabs(hl.field().ep0() - hl.field().ep1()) < lengthThreshold);
+}
 
 // **************************
 // *                        *
@@ -940,8 +948,6 @@ void HoughSpace::peaks(HoughLineList& hlList)
   int diag2 = rPitch() - 1;
   int accept = acceptThreshold() * 16;
 
-  std::cout << "ACCEPT THRESH: " << acceptThreshold() << std::endl;
-
   hlList.clear();
 
   if (fast())
@@ -982,7 +988,7 @@ void HoughSpace::peaks(HoughLineList& hlList)
   times[3] = timer.time32();
 }
 
-void HoughSpace::adjust(EdgeList& edges, HoughLineList& hlList, bool strict)
+void HoughSpace::adjust(EdgeList& edges, HoughLineList& strictList, HoughLineList& looseList)
 {
   TickTimer timer;
 
@@ -990,26 +996,49 @@ void HoughSpace::adjust(EdgeList& edges, HoughLineList& hlList, bool strict)
   for (Edge* e = *abi; e; e = *++abi)
     e->memberOf(0);
 
-  hlList.sort();
+  strictList.sort();
+  looseList.sort();
 
-  AdjustSet as(strict);
+  AdjustSet sas(true); // AdjustSet with strict fitThreshold
+  AdjustSet las(false);// AS with loose threshold
 
-  for (list<HoughLine>::iterator hl = hlList.begin(); hl != hlList.end();)
+  list<HoughLine>::iterator lhl = looseList.begin();
+  for (list<HoughLine>::iterator shl = strictList.begin(); shl != strictList.end();)
   {
-    bool kill = false;
-    for (int a = 0; a < adjustSteps(); ++a)  // for (a = 0 -> 1)
+    bool kill = false; // 0 = don't kill, 1 = kill for loose, 2 = kill for strict, 3 = kill for both
+    for (int a = 0; a < adjustSteps(); ++a)
     {
-      if (!hl->adjust(edges, as.params[a], a == adjustSteps() - 1))
+      if (!shl->adjust(edges, sas.params[a], a == adjustSteps() - 1))
       {
         kill = true;
         break;
       }
     }
+    if (kill) {
+      shl = strictList.erase(shl);
+      if (lhl != looseList.end()) {
+        kill = false;
+        for (int a = 0; a < adjustSteps(); ++a)
+        {
+          if (!lhl->adjust(edges, las.params[a], a == adjustSteps() - 1))
+          {
+            kill = true;
+            break;
+          }
+        }
+        if (kill) {
+          lhl = looseList.erase(lhl);
+        } else {
+          ++lhl;
+        }
+      }
+    } else {
+      ++shl;
+      if (lhl != strictList.end()) {
+        lhl = looseList.erase(lhl);
 
-    if (kill)
-      hl = hlList.erase(hl);
-    else
-      ++hl;
+      }
+    }
   }
 
   times[4] = timer.time32();
@@ -1023,7 +1052,7 @@ void HoughSpace::run(EdgeList& edges, HoughLineList& hlList)
   processEdges(edges);
   smooth();
   peaks(hlList);
-  adjust(edges, hlList);
+//  adjust(edges, hlList);
 
   times[5] = timer.time32();
 }
@@ -1035,10 +1064,9 @@ void HoughSpace::run(EdgeList& edges, HoughLineList& strictList, HoughLineList& 
   smooth();
 
   peaks(strictList);
-  adjust(edges, strictList, true);
-  
-  // peaks(looseList);
-  // adjust(edges, looseList, false);
+  looseList = strictList;
+  adjust(edges, strictList, looseList);
+
 }
 
 }

@@ -33,7 +33,7 @@ public:
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
-    HoughLineList* getHoughLines(bool topCamera = true) const { return houghLinesStrict[!topCamera]; }
+    HoughLineList* getHoughLines(bool topCamera = true) const { return houghLinesLoose[!topCamera]; }
     HoughLineList* getLooseHoughLines(bool topCamera = true) const { return houghLinesLoose[!topCamera]; }
     BallDetector* getBallDetector(bool topCamera = true) const { return ballDetector[!topCamera]; }
     Kinematics* getKinematics(bool topCamera = true) const {return kinematics[!topCamera]; }
@@ -74,6 +74,7 @@ private:
     FieldLineList* fieldLines[2];
     GoalboxDetector* boxDetector[2];
     CornerDetector* cornerDetector[2];
+    CenterCircleDetector* centerCircleDetector[2];
     BallDetector* ballDetector[2];
 
     // Lisp tree with color params saved
