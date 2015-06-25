@@ -71,21 +71,21 @@ bool VisionSystem::update(ParticleSet& particles,
     // Particle injections
     // (1) Reconstruct pose by finding the midpoint of the top goalbox
     injections.clear();
-    // for (int i = 0; i < lines.line_size(); i++) {
-    //     const messages::FieldLine& field = lines.line(i);
-    //     if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
-    //         const messages::HoughLine& inner = field.inner();
+    for (int i = 0; i < lines.line_size(); i++) {
+        const messages::FieldLine& field = lines.line(i);
+        if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
+            const messages::HoughLine& inner = field.inner();
 
-    //         // NOTE particle filter makes sure we only inject particles on
-    //         //      the side of the field that our estimate is on
-    //         std::vector<LocLineID> ids { LocLineID::OurTopGoalbox, LocLineID::TheirTopGoalbox };
-    //         for (int i = 0; i < ids.size(); i++) {
-    //             messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(ids[i], field);
-    //             ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h());
-    //             injections.push_back(reconstructed);
-    //         }
-    //     }
-    // }
+            // NOTE particle filter makes sure we only inject particles on
+            //      the side of the field that our estimate is on
+            std::vector<LocLineID> ids { LocLineID::OurTopGoalbox, LocLineID::TheirTopGoalbox };
+            for (int i = 0; i < ids.size(); i++) {
+                messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(ids[i], field);
+                ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h());
+                injections.push_back(reconstructed);
+            }
+        }
+    }
 
     // Weights were adjusted so return true
     return true;
