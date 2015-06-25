@@ -184,6 +184,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             }
 
         GoalieStates.moveBackwards.transitions = {
+            Transition.CountTransition(GoalieTransitions.shouldStopGoingBack,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.watchWithLineChecks,
+
             Transition.CountTransition(GoalieTransitions.doneWalking,
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
@@ -354,7 +359,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
             Transition.CountTransition(GoalieTransitions.shouldBackUp,
                                        Transition.MOST_OF_THE_TIME,
-                                       30)
+                                       25)
             : GoalieStates.moveBackwards
         }
 

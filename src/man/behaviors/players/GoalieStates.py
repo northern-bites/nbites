@@ -78,8 +78,8 @@ def gamePlaying(player):
         player.brain.fallController.enabled = True
         player.penaltyKicking = False
         player.brain.nav.stand()
-        if player.lastDiffState != 'gameSet':
-            player.brain.resetGoalieLocalization()
+        # if player.lastDiffState != 'gameSet':
+        #     player.brain.resetGoalieLocalization()
 
     # Wait until the sensors are calibrated before moving.
     if (not player.brain.motion.calibrated):
@@ -94,7 +94,10 @@ def gamePlaying(player):
         return player.goLater('walkToGoal')
 
     if player.lastDiffState == 'fallen':
+        #TODO fix this this is a hack to get rid of this thing
+        player.justKicked = False
         if player.justKicked:
+            print "I just kicked, I'm returning to goal!"
             return player.goLater('returnToGoal')
         else:
             return player.goLater('watchWithLineChecks')
@@ -345,7 +348,7 @@ def moveForward(player):
 def moveBackwards(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.brain.nav.walkTo(RelRobotLocation(-30, 0, 0))
+        player.brain.nav.walkTo(RelRobotLocation(-100.0, 0, 0))
 
     return Transition.getNextState(player, moveBackwards)
 
@@ -408,7 +411,7 @@ def upUpUP(player):
         player.upDelay = 0
 
     if player.brain.nav.isStopped():
-        return player.goLater('watchWithCornerChecks')
+        return player.goLater('watchWithLineChecks')
     return player.stay()
 
 @superState('gameControllerResponder')

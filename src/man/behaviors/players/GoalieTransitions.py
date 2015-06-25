@@ -209,6 +209,22 @@ def shouldBackUp(player):
     print "Couldn't find any good lines, backup TRUE"
     return True
 
+def shouldStopGoingBack(player):
+    visionLines = player.brain.visionLines
+    # Add in checks to not add repeat lines?
+
+    for i in range(0, visionLines.line_size()):
+        r = visionLines.line(i).inner.r
+        t = math.degrees(visionLines.line(i).inner.t)
+
+        if r != 0.0 and r < 40.0:
+            print "I see a line now! I should probably stop going backwards"
+            print ("r: ", r)
+            print ("t: ", t)
+            return True
+
+    return False
+
 def getBearingFromRobot(x, y):
     return math.degrees(math.atan2(x, -y));
 
