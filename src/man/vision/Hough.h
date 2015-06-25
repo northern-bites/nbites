@@ -258,6 +258,7 @@ public:
   std::vector<CirclePoint> getPointsVector(HoughLineList& hlList);
   bool fitCircle(CirclePoint&, const CirclePoint&, const CirclePoint&);
   int pointsInCircleRange(const CirclePoint&, const std::vector<CirclePoint>&);
+  bool findCircle(double& x, double& y, const std::vector<CirclePoint>&);
 };
 
 class CirclePoint {
@@ -372,13 +373,13 @@ public:
 class HoughSpace
 {
 public:
-   enum
+  enum
   {
     NumTimes = 6,
   };
 
 private:
- enum
+  enum
   {
     TBits         = 8,
     TSpan         = 1 << TBits,

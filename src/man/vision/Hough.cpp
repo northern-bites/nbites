@@ -500,61 +500,11 @@ bool CenterCircleDetector::detectCenterCircle(HoughLineList& hlList)
     return false;
   }
 
-  // RANSAC circle fitting
-  double cr = CENTER_CIRCLE_RADIUS;
-  double minDistanceSquared = 30 * 30;
-  int closePointsHardAccept = 5;
-  int closePointsSoftAccept = 4;
-
-
-  std::pair<int, CirclePoint> potentialCenter;
-
-  // For two points, if they are not right next to each other,
-  // find the center of a circle of radius 75 that pass through them.
- 
-  for (CirclePoint cp1 : points) {
-    for (unsigned i = points.size(); i >= 0; i--) {
-      CirclePoint cp2 = points[i];
-      if (cp1 != cp2 && cp1.distanceSquared(cp2) > minDistanceSquared) {
-    
-        std::cout << "Comparing two points: " << std::endl;
-        std::cout << "x1: " << cp1.x() << " y1: " << cp1.y() << " t1: " << cp1.t() <<std::endl;
-        std::cout << "x2: " << cp2.x() << " y2: " << cp2.y() << " t2: " << cp2.t() <<std::endl;
-        std::cout << std::endl;
-
-        CirclePoint centerCircle;
-        if (fitCircle(centerCircle, cp1, cp2)) {
-
-          // If we could fit a cirlce, get how many points are within a threshold to the circle
-          if (int p = pointsInCircleRange(centerCircle, points) > closePointsHardAccept) {
-
-            std::cout < "Points near line: " << p << std::endl;
-
-            ccx = centerCircle.x();
-            ccy = centerCircle.y();
-            return true;
-          } else {
-
-            std::cout < "Points near line: " << p << std::endl;
-
-            // Update potential center
-            potentialCenter = (potentialCenter.first < p) ? 
-              std::pair<int, CirclePoint>(p, centerCircle) : potentialCenter;
-          }
-        } else {
-          std::cout << "Could not fit circle" << std::endl;
-        }
-      }
-    }
-  }
-
-    std::cout < "Points near line in potential: " << potentialCenter.first << std::endl;
-  if (potentialCenter.first > closePointsSoftAccept) {
-    ccx = potentialCircle.x();
-    ccy = potentialCircle.y();
-    return true;
-  }
-  return false;
+  if (findCircle(hlList, ccx, ccy))
+    return true
+  else
+    return false;
+  
 }
 
 void CenterCircleDetector::cleanHoughLineList(HoughLineList& hlList)
@@ -577,6 +527,71 @@ std::vector<CirclePoint> CenterCircleDetector::getPointsVector(HoughLineList& hl
   }
   return vec;
 }
+
+// RANSAC circle fitting
+bool findCircle(double& x, double& y, const std::vector<CirclePoint>& points)
+{
+  double cr = CENTER_CIRCLE_RADIUS;
+  double minDistanceSquared = 30 * 30;
+  int closePointsHardAccept = 5;
+  int closePointsSoftAccept = 4;
+
+  std::pair<int, CirclePoint> potentialCenter;
+
+  // TODO: only run a certain number of times
+  for (CirclePoint cp1 : points) {
+    for (unsigned i = points.size(); i >= 0; i--) {
+      CirclePoint cp2 = points[i];
+      
+      // Only proceed if the two points are not too near each other
+      if (cp1 != cp2 && cp1.distanceSquared(cp2) > minDistanceSquared) {
+    
+        std::cout << "Comparing two points: " << std::endl;
+        std::cout << "x1: " << cp1.x() << " y1: " << cp1.y() << " t1: " << cp1.t() <<std::endl;
+        std::cout << "x2: " << cp2.x() << " y2: " << cp2.y() << " t2: " << cp2.t() <<std::endl;
+        std::cout << std::endl;
+
+        // Fit a circle of radius 75 to the two points
+        CirclePoint centerCircle;
+        if (fitCircle(centerCircle, cp1, cp2)) {
+
+          std::cout << "Fitted circle x: " << centerCircle.x() << " y: " << centerCircle.y() << std::endl;  
+
+          // If we could fit a cirlce, get how many points are within a threshold to the circle
+          if (int p = pointsInCircleRange(centerCircle, points) > closePointsHardAccept) {
+
+            // If we found enough points near the line, return as center circle
+            std::cout << "Points near line: " << p << std::endl;
+
+            x = centerCircle.x();
+            y = centerCircle.y();
+            return true;
+          } else {
+
+            // If there where not enough points near the line, save it and try again
+            std::cout << "Points near line: " << p << std::endl;
+
+            // Update potential center
+            potentialCenter = (potentialCenter.first < p) ? 
+              std::pair<int, CirclePoint>(p, centerCircle) : potentialCenter;
+          }
+        } else {
+          std::cout << "Could not fit circle" << std::endl;
+        }
+      }
+    }
+  }
+
+    std::cout < "Points near line in potential: " << potentialCenter.first << std::endl;
+    
+  if (potentialCenter.first > closePointsSoftAccept) {
+    x = potentialCircle.x();
+    y = potentialCircle.y();
+    return true;
+  }
+  return false;
+}
+
 
 bool CenterCircleDetector::checkLength(const HoughLine& hl)
 {
