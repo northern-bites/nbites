@@ -86,16 +86,15 @@ LocLineID LineSystem::matchObservation(const messages::FieldLine& observation,
     LocLineID id = LocLineID::NotMatched;
     double bestScore = std::numeric_limits<double>::min();
 
-    // TODO turn on line classifications
-    // vision::LineID visionID = static_cast<vision::LineID>(observation.id());
-    // const std::vector<LocLineID>& possibleLineIDs = visionToLocIDs[visionID];
-    const std::vector<LocLineID>& possibleLineIDs = visionToLocIDs[vision::LineID::Line];
+    vision::LineID visionID = static_cast<vision::LineID>(observation.id());
+    const std::vector<LocLineID>& possibleLineIDs = visionToLocIDs[visionID];
     for (int i = 0; i < possibleLineIDs.size(); i++) {
         LocLineID possibleID = possibleLineIDs[i];
-
         double curScore = lines[possibleID].error(globalLine, debug);
 
-        if (debug) { std::cout << "Match, " << static_cast<int>(possibleID) << "," << curScore << std::endl; }
+        if (debug)
+            std::cout << "Match, " << static_cast<int>(possibleID) << "," << curScore << std::endl; 
+
         if (curScore > bestScore) {
             id = possibleID;
             bestScore = curScore;
