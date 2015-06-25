@@ -22,6 +22,7 @@ public class UtilityManager {
 	public static final LogToViewUtility LogToViewUtility = new LogToViewUtility();
 	public static final YUVColorUtility YUVColorUtility = new YUVColorUtility();
 	public static final ThreadStateUtility ThreadStateUtility = new ThreadStateUtility();
+	public static final ReplayUtility ReplayUtility = new ReplayUtility();
 		
 	public static final UtilityParent[] utilities = findUtilityFields(); 
 	private static UtilityParent[] findUtilityFields() {

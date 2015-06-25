@@ -17,8 +17,6 @@ public class LogDropListener extends DropTargetAdapter {
 
 	@Override
 	public void drop(DropTargetDropEvent dtde) {
-		System.out.println("drop...");
-
 		try {
 			Transferable tr = dtde.getTransferable();
 
