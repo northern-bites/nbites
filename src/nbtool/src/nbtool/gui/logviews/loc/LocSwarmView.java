@@ -75,21 +75,8 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 		} else { flip = new JButton("flip"); }
 		flip.addActionListener(this);
 		flip.setPreferredSize(new Dimension(70,25));
+		flip.setBounds((int)FieldConstants.FIELD_WIDTH/2,10,70,25);
 		this.add(flip);
-
-		//this.add(f);
-
-		sp = new JScrollPane();
-		sp.setBounds(0,0,800,600);
-		sp.setVisible(true);
-		sp.setViewportView(f);
-
-		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-
-		//sp.getViewport().add(f);
-
-		//this.add(sp);
 	}
 
 	protected void useSize(Dimension s) {
@@ -125,7 +112,7 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 	@Override
 	public void paintComponent(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
-		f.drawField(g2);
+		f.drawField(g2,shouldFlip);
 		naoPlayer.drawNao(g2,shouldFlip);
 		for(int i=0; i<naoParticles.length; i++) {
 			naoParticles[i].drawParticle(g2,pWeight,shouldFlip);

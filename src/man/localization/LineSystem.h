@@ -24,15 +24,15 @@ namespace localization {
 
 // TODO rename LineID as VisionLineID
 enum class LocLineID {
-    NotMatched = 0,
-    OurEndline,
-    TheirEndline,
-    OurMidline,
-    TheirMidline,
-    OurTopGoalbox,
-    TheirTopGoalbox,
-    RightSideline,
-    LeftSideline
+    NotMatched = 0, //black
+    OurEndline, //blue
+    TheirEndline, //red
+    OurMidline, //gray
+    TheirMidline, //yellow
+    OurTopGoalbox, //magenta
+    TheirTopGoalbox, //orange
+    RightSideline, //cyan
+    LeftSideline //pink
 };
 
 class LineSystem {
