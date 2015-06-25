@@ -291,7 +291,7 @@ public:
   
   // Assuming this and other should be the same line, calculate the error.
   // NOTE used in particle filter.
-  double error(const GeoLine& other) const;
+  double error(const GeoLine& other, bool test = false) const;
 
   // Translation rotation of line in plane. 
   // NOTE used in particle filter.

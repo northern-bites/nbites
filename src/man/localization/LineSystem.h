@@ -44,6 +44,7 @@ public:
     double scoreObservation(const messages::FieldLine& observation, const messages::RobotLocation& loc);
     messages::RobotLocation reconstructFromMidpoint(LocLineID id, const messages::FieldLine& observation);
     messages::RobotLocation reconstructWoEndpoints(LocLineID id, const messages::FieldLine& observation);
+    void setDebug(bool debug_) { debug = debug_; }
 
     static vision::GeoLine relRobotToAbsolute(const messages::FieldLine& observation, const messages::RobotLocation& loc);
     static bool shouldUse(const messages::FieldLine& observation); 
@@ -53,6 +54,8 @@ private:
 
     std::map<LocLineID, vision::GeoLine> lines;
     std::map<vision::LineID, std::vector<LocLineID>> visionToLocIDs;
+
+    bool debug;
 };
 
 } // namespace localization

@@ -400,10 +400,11 @@ double GeoLine::separation(const GeoLine& other) const
 }
 
 // TODO params
-double GeoLine::error(const GeoLine& other) const
+double GeoLine::error(const GeoLine& other, bool test) const
 {
+  double normalizedT = (r() > 0 ? t() : t() - M_PI);
   double rDiff = fabs(fabs(r()) - fabs(other.r()));
-  double tDiff = diffRadians(uMod(t(), M_PI), uMod(other.t(), M_PI));
+  double tDiff = fabs(sMod(normalizedT - other.t(), M_PI));
 
   boost::math::normal_distribution<> rGaussian(0, 150);
   // boost::math::normal_distribution<> rGaussian(0, fabs(other.r()) / 4);
@@ -411,6 +412,14 @@ double GeoLine::error(const GeoLine& other) const
 
   double rProb = pdf(rGaussian, rDiff);
   double tProb = pdf(tGaussian, tDiff);
+
+  if (test) {
+    std::cout << "In error," << std::endl;
+    std::cout << r() << "," << other.r() << std::endl;
+    std::cout << normalizedT << "," << other.t() << std::endl;
+    std::cout << rDiff << "-" << tDiff << std::endl;
+    std::cout << rProb << "+" << tProb << std::endl;
+  }
 
   return rProb * tProb;
 }

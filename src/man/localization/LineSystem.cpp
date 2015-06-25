@@ -6,7 +6,7 @@ namespace man {
 namespace localization {
 
 LineSystem::LineSystem() 
-    : lines()
+    : lines(), visionToLocIDs(), debug(false)
 {
     // Part I
     // Add lines in absolute field coordinates to lines map
@@ -87,13 +87,15 @@ LocLineID LineSystem::matchObservation(const messages::FieldLine& observation,
     double bestScore = std::numeric_limits<double>::min();
 
     // TODO turn on line classifications
-    vision::LineID visionID = static_cast<vision::LineID>(observation.id());
-    // const std::vector<LocLineID>& possibleLineIDs = visionToLocIDs[vision::LineID::Line];
-    const std::vector<LocLineID>& possibleLineIDs = visionToLocIDs[visionID];
+    // vision::LineID visionID = static_cast<vision::LineID>(observation.id());
+    const std::vector<LocLineID>& possibleLineIDs = visionToLocIDs[vision::LineID::Line];
+    // const std::vector<LocLineID>& possibleLineIDs = visionToLocIDs[visionID];
     for (int i = 0; i < possibleLineIDs.size(); i++) {
         LocLineID possibleID = possibleLineIDs[i];
 
-        double curScore = lines[possibleID].error(globalLine);
+        double curScore = lines[possibleID].error(globalLine, debug);
+
+        if (debug) { std::cout << "Match, " << static_cast<int>(possibleID) << "," << curScore << std::endl; }
         if (curScore > bestScore) {
             id = possibleID;
             bestScore = curScore;
@@ -121,6 +123,12 @@ double LineSystem::scoreObservation(const messages::FieldLine& observation,
         errorBetweenObservationAndModel = 0;
     else
         errorBetweenObservationAndModel = lines[id].error(globalLine);
+
+    if (debug) { 
+        std::cout << "In scoreObservation," << std::endl;
+        std::cout << static_cast<int>(id) << std::endl;
+        std::cout << errorBetweenObservationAndModel << std::endl;
+    }
 
     return errorBetweenObservationAndModel;
 }

@@ -89,62 +89,22 @@ bool VisionSystem::update(ParticleSet& particles,
     // Particle injections
     // (1) Reconstruct pose by finding the midpoint of the top goalbox
     injections.clear();
-    for (int i = 0; i < lines.line_size(); i++) {
-        const messages::FieldLine& field = lines.line(i);
-        if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
-            const messages::HoughLine& inner = field.inner();
-
-            // NOTE particle filter makes sure we only inject particles on
-            //      the side of the field that our estimate is on
-            std::vector<LocLineID> ids { LocLineID::OurTopGoalbox, LocLineID::TheirTopGoalbox };
-            for (int i = 0; i < ids.size(); i++) {
-                messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(ids[i], field);
-                ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h());
-                injections.push_back(reconstructed);
-            }
-        }
-    }
-
-    // (2) Reconstruct pose by averaging reconstructions for all lines
-    // int numXReconstructs = 0;
-    // int numYReconstructs = 0;
-    // double xAverage = 0;
-    // double yAverage = 0;
-    // double hAverage = 0;
-
     // for (int i = 0; i < lines.line_size(); i++) {
-    //     if (!LineSystem::shouldUse(lines.line(i)))
-    //         continue;
-
     //     const messages::FieldLine& field = lines.line(i);
-    //     const messages::HoughLine& inner = field.inner();
+    //     if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
+    //         const messages::HoughLine& inner = field.inner();
 
-    //     LocLineID bestMatch = lineSystem->matchObservation(field, currentEstimate);
-    //     messages::RobotLocation pose = lineSystem->reconstructWoEndpoints(bestMatch, field);
-
-    //     if (pose.x() >= 0) { 
-    //         numXReconstructs++;
-    //         xAverage += pose.x(); 
+    //         // NOTE particle filter makes sure we only inject particles on
+    //         //      the side of the field that our estimate is on
+    //         std::vector<LocLineID> ids { LocLineID::OurTopGoalbox, LocLineID::TheirTopGoalbox };
+    //         for (int i = 0; i < ids.size(); i++) {
+    //             messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(ids[i], field);
+    //             ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h());
+    //             injections.push_back(reconstructed);
+    //         }
     //     }
-    //     if (pose.y() >= 0) {
-    //         numYReconstructs++;
-    //         yAverage += pose.y();
-    //     }
-    //     hAverage += pose.h();
     // }
 
-    // xAverage = xAverage / numXReconstructs;
-    // yAverage = yAverage / numYReconstructs;
-    // hAverage = hAverage / lines.line_size();
-
-    // if (!numXReconstructs)
-    //     xAverage = currentEstimate.x();
-    // if (!numYReconstructs)
-    //     yAverage = currentEstimate.y();
-    // 
-    // ReconstructedLocation reconstructed(xAverage, yAverage, hAverage);
-    // injections.push_back(reconstructed);
-    
     // Weights were adjusted so return true
     return true;
 }

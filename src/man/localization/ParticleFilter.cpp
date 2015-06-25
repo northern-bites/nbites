@@ -188,6 +188,7 @@ void ParticleFilter::updateEstimate()
 void ParticleFilter::updateLinesForDebug(messages::FieldLines& visionInput)
 {
     LineSystem lineSystem;
+    // lineSystem.setDebug(true);
     for (int i = 0; i < visionInput.line_size(); i++) {
         // Project lines onto the field
         vision::GeoLine projected = LineSystem::relRobotToAbsolute(visionInput.line(i), poseEstimate);
@@ -207,7 +208,7 @@ void ParticleFilter::updateLinesForDebug(messages::FieldLines& visionInput)
 
         // Otherwise line system handles classification and scoring
         field.set_id(static_cast<int>(lineSystem.matchObservation(field, poseEstimate)));
-        field.set_prob(static_cast<int>(lineSystem.scoreObservation(field, poseEstimate)));
+        field.set_prob(lineSystem.scoreObservation(field, poseEstimate));
     }
 }
 
