@@ -501,6 +501,7 @@ void SensorsModule::run_()
                   << std::endl;
         lastPrint = !lastPrint;
     }
+    //std::cout<<"[INFO] Head Yaw: "<<sensorValues_[HeadYaw]<<std::endl;
 }
 
 } // namespace sensors
