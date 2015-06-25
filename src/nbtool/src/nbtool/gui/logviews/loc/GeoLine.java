@@ -21,13 +21,16 @@ public class GeoLine {
 	}
 
 	public GeoLine(double line_r, double line_t, double line_end0, 
-			double line_end1, double line_houghInd, double line_fieldInd) {
+			double line_end1, double line_houghInd, double line_fieldInd,
+			double line_id, double line_prob) {
 		r = line_r;
 		t = line_t;
 		end0 = line_end0;
 		end1 = line_end1;
 		houghIndex = line_houghInd;
 		fieldIndex = line_fieldInd;
+		id = line_id;
+		prob = line_prob;
 	}
 
 	public void draw(Graphics2D g2, BufferedImage origImg) {

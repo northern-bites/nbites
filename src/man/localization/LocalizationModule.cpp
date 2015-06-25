@@ -89,19 +89,23 @@ void LocalizationModule::update()
         messages::RobotLocation rl = *output.getMessage(true).get();
         messages::ParticleSwarm ps = *particleOutput.getMessage(true).get();
         messages::FieldLines fl = curLines;
+        messages::Corners cr = curCorners;
 
         std::string rl_buf;
         std::string ps_buf;
         std::string fl_buf;
+        std::string cr_buf;
         std::string log_buf;
 
         rl.SerializeToString(&rl_buf);
         ps.SerializeToString(&ps_buf);
         fl.SerializeToString(&fl_buf);
+        cr.SerializeToString(&cr_buf);
 
         log_buf.append(rl_buf);
         log_buf.append(ps_buf);
         log_buf.append(fl_buf);
+        log_buf.append(cr_buf);
 
         std::vector<SExpr> contents;
 
@@ -113,6 +117,9 @@ void LocalizationModule::update()
 
         SExpr naoFieldLines("fieldlines",log_from,clock(),log_index,fl_buf.length());
         contents.push_back(naoFieldLines);
+
+        SExpr naoCorners("corners",log_from,clock(),log_index,cr_buf.length());
+        contents.push_back(naoCorners);
 
         NBLog(NBL_SMALL_BUFFER,"LOCSWARM",contents,log_buf);
     }
