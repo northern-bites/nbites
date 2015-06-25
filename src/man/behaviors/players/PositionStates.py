@@ -26,8 +26,4 @@ def positionReady(player):
 
         player.brain.tracker.repeatBasicPan()
 
-    if player.brain.nav.isAtPosition():
-        player.brain.tracker.trackBall()
-        return player.stay()
-
     return player.stay()
