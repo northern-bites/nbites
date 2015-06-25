@@ -22,3 +22,10 @@ util/scripts/nao_files
 util/scripts/wireless_config/wpa_supplicant.conf
 src/serenity/cache.txt
 .DS_Store
+src/nbtool/bin
+.metadata
+.project
+.classpath
+.settings
+.recommenders
+_tempFiles

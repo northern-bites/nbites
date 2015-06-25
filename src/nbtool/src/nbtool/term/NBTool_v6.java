@@ -17,7 +17,6 @@ import nbtool.util.Center;
 import nbtool.util.Logger;
 import nbtool.util.NBConstants;
 import nbtool.util.Prefs;
-import nbtool.util.Utility;
 
 public class NBTool_v6 {
 	
@@ -29,15 +28,14 @@ public class NBTool_v6 {
 			return;
 		}
 		
-		System.out.printf("\n\tnbtool version %d\n\tdevelopment tool for Bowdoin's Northern Bites team\n\n",
-				NBConstants.VERSION);
+		System.out.printf("\n\tnbtool version %d.%d\n\tdevelopment tool for Bowdoin's Northern Bites team\n\n",
+				NBConstants.VERSION, NBConstants.MINOR_VERSION);
 		
 		System.out.println("Generating Center instance..."); Center.startCenter();
 		System.out.println("Generating ToolStats instance: " + ToolStats.INST.toString());
 		System.out.println("Generating SessionMaster instance: " + SessionMaster.get().toString());
 		System.out.println("Generating CrossServer instance ...");
 		CrossIO.startCrossServer();
-		System.out.printf("CrossServer live:%b\n", CrossIO.crossServerLive());
 		
 		try {
 			Logger.log(Logger.INFO, "loading preferences...");
@@ -87,6 +85,7 @@ public class NBTool_v6 {
 				}
 				
 				Logger.logf(INFO, "Creating Display instance...");
+				@SuppressWarnings("unused")
 				final Display disp = new Display();
 			}
 			

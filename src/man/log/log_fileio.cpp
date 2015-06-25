@@ -11,13 +11,18 @@
 
 #include <string>
 #include <algorithm>
+#include <sstream>
 #include <netinet/in.h>
 
 namespace nblog {
     
-    static const char * LOG_FOLDER = "/home/nao/nbites/log/";
+    const char * LOG_FOLDER = "/home/nao/nbites/log/";
     //const char * LOG_FOLDER = "/Users/pkoch/Desktop/LOGS/";
-    static bool STARTED = false;
+    bool STARTED = false;
+    
+    //TODO need more experimenting for optimal size.
+    const uint64_t MAX_WRITTEN_BYTES = 5 * (1<<25);
+    uint64_t total_written = 0;
     
     void * file_io_loop(void * context);
     
@@ -47,10 +52,20 @@ namespace nblog {
             for (cur_bi = 0; cur_bi < NUM_LOG_BUFFERS; ++cur_bi) {
                 
                 for (int r = 0; r < LOG_RATIO[cur_bi]; ++r) {
+                    
+                    if (total_written > MAX_WRITTEN_BYTES) {
+                        printf("\n\n\n**********************\nWARNING:\n"
+                               "\tfileio SHUTTING DOWN AFTER WRITING %llu BYTES"
+                               "\n**********************\n\n\n",
+                               total_written);
+                        return NULL;
+                    }
+                    
                     obj = acquire(cur_bi, &(log_main.buffers[cur_bi].fileio_nextr));
                     
                     if (obj) {
                         wrote_something = 1;
+                        total_written += obj->fullSize();
                         if (write_to_fs(obj) > 0) {
                             printf("**********\nERROR!\n**********\n"
                                    "could not write log to file!\n\n");
@@ -74,15 +89,31 @@ namespace nblog {
      fileio
      */
     
+    int write_index = 0;
     int write_to_fs(Log * obj) {
         int fd;
         
+        std::ostringstream ss;
+        
+        std::string cr_loc = obj->tree().find(LOG_CREATED_S)->get(1)->value();
+        std::string cr_date = obj->tree().find(LOG_CREATED_S)->get(2)->value();
+        std::string type = obj->tree().find(LOG_CONTENTS_S)->get(1)->find(CONTENT_TYPE_S)->get(1)->value();
+        
+        ss << cr_loc << "_" << cr_date << "_" << type << "_i"
+            << write_index++ << ".nblog";
+        
+        /*
         std::string desc = obj->description();
         desc = desc.substr(0, 100);
         std::replace(desc.begin(), desc.end(), ' ', '_');
-        desc.append(".nblog");
+        desc.append(".nblog"); */
+        
         std::string path(LOG_FOLDER);
-        path.append(desc);
+        std::string name = ss.str();
+        std::replace(name.begin(), name.end(), ' ', '_');
+        std::replace(name.begin(), name.end(), '/', '-');
+        std::replace(name.begin(), name.end(), ':', '-');
+        path.append(name);
         
         fd = open(path.c_str(), O_WRONLY | O_TRUNC | O_CREAT, S_IRWXG | S_IRWXU);
         

@@ -2,12 +2,15 @@
 
 BIN=$NBITES_DIR/build/nbtool
 
+echo "BUILDnbtool"
+
 rm -rf $BIN
 #might need to make build dir too on some systems
 mkdir -pv $BIN
 
 find ./src -name *.java > _tempFiles
 javac -d $BIN @_tempFiles
+rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 
 cp ./src/nbtool/util/*.properties $BIN/nbtool/util
 rm _tempFiles

@@ -29,13 +29,15 @@ def gameSet(player):
     if player.firstFrame():
         player.stand()
         player.brain.tracker.lookToAngle(0)
+        player.brain.resetInitialLocalization()
 
     return player.stay()
 
 @superState('gameControllerResponder')
 def gamePlaying(player):
     if player.firstFrame():
-         player.brain.tracker.repeatWidePan()
+        player.brain.tracker.repeatWidePan()
+        player.brain.resetInitialLocalization()
 
     return player.stay()
 
