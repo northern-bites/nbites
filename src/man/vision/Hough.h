@@ -250,8 +250,6 @@ class CenterCircleDetector {
   double ccx;
   double ccy;
 
-public:
-  bool detectCenterCircle(HoughLineList& hlList);
   void cleanHoughLineList(HoughLineList& hlList);
   bool checkLength(const HoughLine& hl);
   bool checkDistance(const HoughLine& hl);
@@ -259,12 +257,16 @@ public:
   bool fitCircle(CirclePoint&, const CirclePoint&, const CirclePoint&);
   int pointsInCircleRange(const CirclePoint&, const std::vector<CirclePoint>&);
   bool findCircle(double& x, double& y, const std::vector<CirclePoint>&);
+
+public:
+  bool detectCenterCircle(HoughLineList& hlList);
 };
 
 class CirclePoint {
   double data[3];
 
 public:
+  CirclePoint();
   CirclePoint(double x, double y, double t);
 
   double x() { return data[0]; }
