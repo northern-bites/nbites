@@ -2840,3 +2840,4 @@ public final class Vision {
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
   }
+}
