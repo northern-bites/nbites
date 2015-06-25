@@ -71,6 +71,8 @@ private:
     uint8_t sensorStaging[SENSOR_SIZE];
     uint64_t sensorSkips;
 
+    uint64_t manMissedFrames;
+
     int fifo_fd;
 };
 

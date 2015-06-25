@@ -158,6 +158,7 @@ void Boss::listener()
     while(1)
     {
         checkFIFO();
+        if (killingMan) killMan();
         sleep(2);
     }
 }
@@ -199,6 +200,9 @@ int Boss::killMan() {
         return -1;
     }
 
+    std::cout << "Man missed " << manMissedFrames << " frames while running.\n";
+    std::cout << "Boss skipped " << sensorSkips << " and " << commandSkips << "commands" << std::endl;
+
     shared->sit = 1;
     // A bit longer than it takes to sit down
     sleep(7);
@@ -229,6 +233,7 @@ int Boss::killMan() {
     pthread_mutex_init( (pthread_mutex_t *) &shared->sensor_mutex[1], NULL);
     pthread_mutex_init( (pthread_mutex_t *) &shared->cmnd_mutex, NULL);
 
+    killingMan = false;
     return 0; // TODO actually return something. Necessary?
 }
 
@@ -371,14 +376,10 @@ bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, uint64_t index)
 
 void Boss::DCMPostProcessCallback()
 {
+    if (!manRunning) return;
     DCM_TIMING_DEBUG_POST1();
-    DCM_TIMING_DEBUG_START();
     SensorValues values = sensor.getSensors();
-    if (DCM_TIMING_DEBUG_END()) {
-        std::cout << "getting sensor values was the problem!" << std::endl;
-    }
 
-    DCM_TIMING_DEBUG_START();
     std::vector<SerializableBase*> objects = {
         // serializer deletes these
         new ProtoSer(&values.joints),
@@ -394,44 +395,27 @@ void Boss::DCMPostProcessCallback()
     };
     uint64_t nextSensorIndex = (shared->latestSensorWritten + 1);
     // Serialize the protobufs to shared mem
-    if (DCM_TIMING_DEBUG_END()) {
-        std::cout << "vectorizing was the problem!" << std::endl;
-    }
-    DCM_TIMING_DEBUG_START();
     if (!serializeTo(objects, nextSensorIndex, sensorStaging, SENSOR_SIZE, NULL)) {
         std::cout << "O HUCK! Couldn't serialize!" << std::endl;
         return;
     }
-    if (DCM_TIMING_DEBUG_END()) {
-        std::cout << "serializeTo was the problem!" << std::endl;
-    }
-    DCM_TIMING_DEBUG_START();
     if (!bossSyncWrite(shared, sensorStaging, nextSensorIndex)) {
-        printf("Boss::DCMPostProcessCallback COULD NOT POST FRESH SENSORS (skip)\n");
+        //printf("Boss::DCMPostProcessCallback COULD NOT POST FRESH SENSORS (skip)\n");
         ++sensorSkips;
     }
-    if (DCM_TIMING_DEBUG_END()) {
-        std::cout << "bossSyncWrite was the problem!" << std::endl;
-    }
-    DCM_TIMING_DEBUG_START();
     uint64_t lastRead = shared->latestSensorRead;
-    if (DCM_TIMING_DEBUG_END()) {
-        std::cout << "WTF?? How is that possible??" << std::endl;
-    }
-    DCM_TIMING_DEBUG_START();
     if (nextSensorIndex - lastRead > 2 && (lastRead != 0) && manRunning) {
-        std::cout << "MAN missed a frame" << std::endl;
-    }
-    if (DCM_TIMING_DEBUG_END()) {
-        std::cout << "IT WAS THIS FUCKING THING" << std::endl;
+        manMissedFrames++; // This (should) happen very rarely.
     }
 
-    //if (nextSensorIndex - lastRead > 10) {
+    if (nextSensorIndex - lastRead > 100 && lastRead != 0) {
         // TODO: Kill? If we get here man is (most likely) already dead
         //std::cout << "Sensors aren't getting read! Did Man die?" << std::endl;
-        //std::cout << "commandIndex: " << sensorIndex << " lastRead: " << lastRead << std::endl;
+        //std::cout << "commandIndex: " << nextSensorIndex << " lastRead: " << lastRead << std::endl;
         //manRunning = false; // TODO
-    //}
+        // Man is running very slow
+        killingMan = true;
+    }
     DCM_TIMING_DEBUG_POST2();
 }
 
