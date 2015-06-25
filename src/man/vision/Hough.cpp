@@ -33,7 +33,7 @@ AdjustParams::AdjustParams()
 AdjustSet::AdjustSet(bool strict) {
   params[1].angleThr = FuzzyThr(0.08f, 0.12f);
   params[1].distanceThr = FuzzyThr(0.7f, 2.0f);
-  params[1].fitThresold = strict ? 0.5 : 2.0;
+  params[1].fitThresold = strict ? 0.5 : 3.0;
 
 }
 
@@ -491,25 +491,117 @@ bool CornerDetector::ccw(double ax, double ay,
 // *                 *
 // *******************
 
-void CenterCircleDetector::detectCenterCircle(HoughLineList& hlList)
+bool CenterCircleDetector::detectCenterCircle(HoughLineList& hlList)
 {
   cleanHoughLineList(hlList);
-  
+  std::vector<CirclePoint> points = getPointsVector(hlList);
+
+  if (points.size() < 4) {
+    return false;
+  }
+
+  // RANSAC circle fitting
+  double cr = CENTER_CIRCLE_RADIUS;
+  double minDistanceSquared = 30 * 30;
+  int closePointsHardAccept = 5;
+  int closePointsSoftAccept = 4;
+
+
+  std::pair<int, CirclePoint> potentialCenter;
+
+  // For two points, if they are not right next to each other,
+  // find the center of a circle of radius 75 that pass through them.
+ 
+  for (CirclePoint cp1 : points) {
+    for (unsigned i = points.size(); i >= 0; i--) {
+      CirclePoint cp2 = points[i];
+      if (cp1 != cp2 && cp1.distanceSquared(cp2) > minDistanceSquared) {
+    
+        std::cout << "Comparing two points: " << std::endl;
+        std::cout << "x1: " << cp1.x() << " y1: " << cp1.y() << " t1: " << cp1.t() <<std::endl;
+        std::cout << "x2: " << cp2.x() << " y2: " << cp2.y() << " t2: " << cp2.t() <<std::endl;
+        std::cout << std::endl;
+
+        CirclePoint centerCircle;
+        if (fitCircle(centerCircle, cp1, cp2)) {
+
+          // If we could fit a cirlce, get how many points are within a threshold to the circle
+          if (int p = pointsInCircleRange(centerCircle, points) > closePointsHardAccept) {
+
+            std::cout < "Points near line: " << p << std::endl;
+
+            ccx = centerCircle.x();
+            ccy = centerCircle.y();
+            return true;
+          } else {
+
+            std::cout < "Points near line: " << p << std::endl;
+
+            // Update potential center
+            potentialCenter = (potentialCenter.first < p) ? 
+              std::pair<int, CirclePoint>(p, centerCircle) : potentialCenter;
+          }
+        } else {
+          std::cout << "Could not fit circle" << std::endl;
+        }
+      }
+    }
+  }
+
+    std::cout < "Points near line in potential: " << potentialCenter.first << std::endl;
+  if (potentialCenter.first > closePointsSoftAccept) {
+    ccx = potentialCircle.x();
+    ccy = potentialCircle.y();
+    return true;
+  }
+  return false;
 }
 
 void CenterCircleDetector::cleanHoughLineList(HoughLineList& hlList)
 {
   for (HoughLineList::iterator hl = hlList.begin(); hl != hlList.end();)
-    if (!checkLength(*hl))
+    if (!checkLength(*hl) || !checkDistance(*hl))
       hl = hlList.erase(hl);
     else
       hl++;
 }
 
+std::vector<CirclePoint> CenterCircleDetector::getPointsVector(HoughLineList& hlList)
+{
+  std::vector<CirclePoint> vec;
+  for (HoughLineList::iterator hl = hlList.begin(); hl != hlList.end(); ++hl)
+  {
+    double x1, y1, x2, y2;
+    hl->field().endPoints(x1, y1, x2, y2);
+    vec.push_back(CirclePoint((x1 + x2) / 2,(y1 + y2) / 2, hl->field().t()));
+  }
+  return vec;
+}
+
 bool CenterCircleDetector::checkLength(const HoughLine& hl)
 {
   double lengthThreshold = 100;
+
   return (fabs(hl.field().ep0() - hl.field().ep1()) < lengthThreshold);
+}
+
+bool CenterCircleDetector::checkDistance(const HoughLine& hl)
+{
+  double distanceThresholdSqared = 600 * 600;   // CC is roughly 600 cm from far corner
+
+  double midPointEP = (hl.field().ep0() + hl.field().ep1()) / 2;
+  return ((hl.field().r()*hl.field().r() + midPointEP*midPointEP) < distanceThresholdSqared);
+}
+
+CirclePoint::CirclePoint(double x, double y, double t)
+{
+  data[0] = x;
+  data[1] = y;
+  data[2] = t;
+}
+double CirclePoint::distanceSquared(CirclePoint cp)
+{
+  return ((x()-cp.x()) * (x()-cp.x()) + (y()-cp.y()) * (y()-cp.y()));
 }
 
 // **************************

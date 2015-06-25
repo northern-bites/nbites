@@ -244,16 +244,32 @@ public:
 };
 
 // Dectects center circle
-// Stores center of centercircle in field coordinates
+class CirclePoint;
+
 class CenterCircleDetector {
-  double ccr;
-  double cct;
+  double ccx;
+  double ccy;
 
 public:
-  void detectCenterCircle(HoughLineList& hlList);
+  bool detectCenterCircle(HoughLineList& hlList);
   void cleanHoughLineList(HoughLineList& hlList);
   bool checkLength(const HoughLine& hl);
+  bool checkDistance(const HoughLine& hl);
+  std::vector<CirclePoint> getPointsVector(HoughLineList& hlList);
+  bool fitCircle(CirclePoint&, const CirclePoint&, const CirclePoint&);
+  int pointsInCircleRange(const CirclePoint&, const std::vector<CirclePoint>&);
+};
 
+class CirclePoint {
+  double data[3];
+
+public:
+  CirclePoint(double x, double y, double t);
+
+  double x() { return data[0]; }
+  double y() { return data[1]; }
+  double t() { return data[2]; }
+  double distanceSquared(CirclePoint cp);
 };
 
 enum class LineID {
