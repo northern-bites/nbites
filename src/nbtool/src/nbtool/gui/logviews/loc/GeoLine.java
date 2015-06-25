@@ -87,6 +87,27 @@ public class GeoLine {
         xstring += scale*Math.cos(t);
         ystring += scale*Math.sin(t);
 
+        switch ((int)id) {
+			case 0: g2.setColor(Color.black); //not matched
+					break;
+			case 1: g2.setColor(Color.blue); //our end line
+					break;
+			case 2: g2.setColor(Color.red); //their end line
+					break;
+			case 3: g2.setColor(Color.gray); //our mid line
+					break;
+			case 4: g2.setColor(Color.yellow); //their mid line
+					break;
+			case 5: g2.setColor(Color.magenta); //our goalbox
+					break;
+			case 6: g2.setColor(Color.orange); //their goalbox
+					break;
+			case 7: g2.setColor(Color.cyan); //right side line (bottom)
+					break;
+			case 8: g2.setColor(Color.pink); //left side line (top)
+					break;
+		}
+
         g2.drawLine(x1,(int)FieldConstants.FIELD_HEIGHT-y1,x2,(int)FieldConstants.FIELD_HEIGHT-y2);
         g2.drawString(Integer.toString((int) id) + "/" + Double.toString(prob), 
                         (int) xstring, (int) (FieldConstants.FIELD_HEIGHT-ystring));
