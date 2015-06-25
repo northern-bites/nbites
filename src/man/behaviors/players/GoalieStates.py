@@ -21,6 +21,7 @@ def gameInitial(player):
         player.zeroHeads()
         player.isSaving = False
         player.lastStiffStatus = True
+        player.justKicked = False
 
     # If stiffnesses were JUST turned on, then stand up.
     if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
@@ -84,16 +85,19 @@ def gamePlaying(player):
     if (not player.brain.motion.calibrated):
         return player.stay()
 
-    #TODO penalty handling
-    # if player.penalized:
-    #     player.penalized = False
-    #     return player.goLater('afterPenalty')
+    # TODO penalty handling
+    if player.penalized:
+        player.penalized = False
+        return player.goLater('afterPenalty')
 
-    # if player.lastDiffState == 'afterPenalty':
-    #     return player.goLater('walkToGoal')
+    if player.lastDiffState == 'afterPenalty':
+        return player.goLater('walkToGoal')
 
     if player.lastDiffState == 'fallen':
-        return player.goLater('watchWithLineChecks')
+        if player.justKicked:
+            return player.goLater('returnToGoal')
+        else:
+            return player.goLater('watchWithLineChecks')
 
     #TODO before game/scrimmage change this to watch;
     # this is better for testing purposes!
@@ -172,6 +176,9 @@ def watchWithLineChecks(player):
     if player.firstFrame():
         watchWithLineChecks.lines[:] = []
         player.homeDirections = []
+
+        if player.lastDiffState == 'returnToGoal':
+            player.justKicked = False
 
         if player.lastDiffState is not 'lineCheckReposition' \
         and player.lastDiffState is not 'lineCheckTurn':
@@ -370,7 +377,8 @@ def kickBall(player):
         player.executeMove(player.kick.sweetMove)
 
     if player.counter > 30 and player.brain.nav.isStopped():
-            return player.goLater('didIKickIt')
+        player.justKicked = True
+        return player.goLater('didIKickIt')
 
     return player.stay()
 

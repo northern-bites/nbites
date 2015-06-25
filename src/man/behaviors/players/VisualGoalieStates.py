@@ -28,6 +28,7 @@ def walkToGoal(player):
         player.returningFromPenalty = False
         player.brain.nav.goTo(Location(FIELD_WHITE_LEFT_SIDELINE_X,
                                        CENTER_FIELD_Y))
+        player.homeDirections += [RelRobotLocation(0.0, 0.0, 150.0)]
 
     return Transition.getNextState(player, walkToGoal)
 
@@ -133,7 +134,7 @@ def waitToFaceField(player):
 @superState('gameControllerResponder')
 def returnToGoal(player):
     if player.firstFrame():
-        if player.lastDiffState == 'didIKickIt':
+        if player.lastDiffState == 'didIKickIt' or player.lastDiffState == 'gamePlaying':
             correctedDest =(RelRobotLocation(0.0, 0.0, 0.0 ) -
                             returnToGoal.kickPose)
         else:
