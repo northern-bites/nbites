@@ -77,6 +77,7 @@ class Brain(object):
 
         # New vision system...
         self.visionLines = None
+        self.visionCorners = None
 
         # FSAs
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
@@ -221,10 +222,11 @@ class Brain(object):
 
     def updateVision(self):
         self.visionLines = self.interface.visionLines
+        self.visionCorners = self.interface.visionCorners
 
-        # if self.counter % 30 == 0:
-        #     print "Visionline size:"
-        #     print self.visionLines.line_size()
+        if self.counter % 30 == 0:
+            print "VisionCorner size:"
+            print self.visionCorners.corner_size()
 
         # for i in range(0, self.visionLines.line_size()):
         #     print "Vision lines:"
