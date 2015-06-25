@@ -23,16 +23,17 @@ namespace man {
 namespace localization {
 
 // TODO rename LineID as VisionLineID
+// NOTE comments map LocLineID to color found in LocSwarmView
 enum class LocLineID {
-    NotMatched = 0, //black
-    OurEndline, //blue
-    TheirEndline, //red
-    OurMidline, //gray
-    TheirMidline, //yellow
-    OurTopGoalbox, //magenta
-    TheirTopGoalbox, //orange
-    RightSideline, //cyan
-    LeftSideline //pink
+    NotMatched = 0,  // black
+    OurEndline,      // blue
+    TheirEndline,    // red
+    OurMidline,      // gray
+    TheirMidline,    // gray
+    OurTopGoalbox,   // magenta
+    TheirTopGoalbox, // orange
+    RightSideline,   // cyan
+    LeftSideline     // pink
 };
 
 class LineSystem {

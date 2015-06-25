@@ -410,13 +410,14 @@ double GeoLine::error(const GeoLine& other, bool test) const
   // boost::math::normal_distribution<> rGaussian(0, fabs(other.r()) / 4);
   boost::math::normal_distribution<> tGaussian(0, 15*TO_RAD);
 
+  // TODO properly sample
   double rProb = pdf(rGaussian, rDiff);
   double tProb = pdf(tGaussian, tDiff);
 
   if (test) {
     std::cout << "In error," << std::endl;
-    std::cout << r() << "," << other.r() << std::endl;
-    std::cout << normalizedT << "," << other.t() << std::endl;
+    std::cout << "Model, " << r() << "," << t() << std::endl;
+    std::cout << "Observation, " << other.r() << "," << other.t() << std::endl;
     std::cout << rDiff << "-" << tDiff << std::endl;
     std::cout << rProb << "+" << tProb << std::endl;
   }

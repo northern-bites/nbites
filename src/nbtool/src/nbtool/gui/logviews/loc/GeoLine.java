@@ -96,7 +96,7 @@ public class GeoLine {
 					break;
 			case 3: g2.setColor(Color.gray); //our mid line
 					break;
-			case 4: g2.setColor(Color.yellow); //their mid line
+			case 4: g2.setColor(Color.gray); //their mid line
 					break;
 			case 5: g2.setColor(Color.magenta); //our goalbox
 					break;

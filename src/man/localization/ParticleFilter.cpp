@@ -188,27 +188,29 @@ void ParticleFilter::updateEstimate()
 void ParticleFilter::updateLinesForDebug(messages::FieldLines& visionInput)
 {
     LineSystem lineSystem;
-    // lineSystem.setDebug(true);
+    lineSystem.setDebug(false);
     for (int i = 0; i < visionInput.line_size(); i++) {
+        // Get line
+        messages::FieldLine& field = *visionInput.mutable_line(i);
+
+        // Set loc ids and scores
+        if (!LineSystem::shouldUse(visionInput.line(i))) {
+            // Lines that the particle filter did not use are given -1 as ID
+            field.set_id(0);
+        } else {
+            // Otherwise line system handles classification and scoring
+            field.set_id(static_cast<int>(lineSystem.matchObservation(field, poseEstimate)));
+            field.set_prob(lineSystem.scoreObservation(field, poseEstimate));
+        }
+
         // Project lines onto the field
         vision::GeoLine projected = LineSystem::relRobotToAbsolute(visionInput.line(i), poseEstimate);
-        messages::FieldLine& field = *visionInput.mutable_line(i);
         messages::HoughLine& hough = *field.mutable_inner();
 
         hough.set_r(projected.r());
         hough.set_t(projected.t());
         hough.set_ep0(projected.ep0());
         hough.set_ep1(projected.ep1());
-
-        // Lines that the particle filter did not use are given -1 as ID
-        if (!LineSystem::shouldUse(visionInput.line(i))) {
-            field.set_id(-1);
-            continue;
-        }
-
-        // Otherwise line system handles classification and scoring
-        field.set_id(static_cast<int>(lineSystem.matchObservation(field, poseEstimate)));
-        field.set_prob(lineSystem.scoreObservation(field, poseEstimate));
     }
 }
 
