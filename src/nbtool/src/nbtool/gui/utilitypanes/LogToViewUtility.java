@@ -115,53 +115,15 @@ public class LogToViewUtility extends UtilityParent {
 
 			return Arrays.asList((ViewState[]) parent).indexOf(child);
 		}
-<<<<<<< HEAD
-		
-		for (Class<? extends ViewParent> cls : pset) {
-			ret[i++] = new ViewState(true, cls);
-=======
-
 
 		private ArrayList<TreeModelListener> listeners = new ArrayList<TreeModelListener>();
 		public void addTreeModelListener(TreeModelListener l) {
 			listeners.add(l);
->>>>>>> d725f5db86dbb464a7cccc427cfd8969fff63ea9
 		}
 
 		public void removeTreeModelListener(TreeModelListener l) {
 			listeners.remove(l);
 		}
-<<<<<<< HEAD
-		states = new ViewState[types.length][];
-		Map<String, Class<? extends ViewParent>[]> lastShown = Prefs.last_shown;
-		
-		for (int i = 0; i < states.length; ++i)
-			states[i] = resolve(types[i], constPossible.get(types[i]),lastShown.get(types[i]));
-		
-		setLayout(null);
-		setSize(600, 400);
-		this.setResizable(true);
-		
-		tree = new JTree(this);
-		tree.setEditable(false);
-		tree.setRootVisible(false);
-		tree.setScrollsOnExpand(true);
-		
-		tree.addMouseListener(this);
-		tree.addKeyListener(this);
-		
-		tree.setCellRenderer(new LTVCellRenderer());
-		tree.addTreeSelectionListener(this);
-		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-		
-		tree.setDragEnabled(false);
-		
-		//this.setContentPane(tree);
-		this.getContentPane().setLayout(new BorderLayout());
-		this.getContentPane().add(tree, BorderLayout.CENTER);
-	}
-=======
->>>>>>> d725f5db86dbb464a7cccc427cfd8969fff63ea9
 
 		/*Rendering code from "Definitive Guide to Swing for Java 2, Second Edition"*/
 		private class LTVCellRenderer implements TreeCellRenderer {

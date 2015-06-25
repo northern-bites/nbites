@@ -20,12 +20,9 @@ import nbtool.gui.logviews.misc.CrossBright;
 import nbtool.gui.logviews.misc.DefaultView;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.logviews.proto.ProtoBufView;
-<<<<<<< HEAD
 import nbtool.gui.logviews.proto.ProtoBallView;
-=======
 import nbtool.gui.logviews.loc.LocSwarmView;
 
->>>>>>> d725f5db86dbb464a7cccc427cfd8969fff63ea9
 
 public class NBConstants {
 	
@@ -84,14 +81,9 @@ public class NBConstants {
 		map.put("prot-RobotLocation", new Class[]{FieldView.class});
 		map.put(DEFAULT_S, new Class[]{DefaultView.class});
 		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
-<<<<<<< HEAD
 		map.put("MULTIBALL", new Class[]{ProtoBallView.class});
-		
-=======
 		map.put("location", new Class[]{LocSwarmView.class});
 		map.put("proto-FieldLines", new Class[]{BasicLineView.class});
-
->>>>>>> d725f5db86dbb464a7cccc427cfd8969fff63ea9
 		return map;
 	}
 }
