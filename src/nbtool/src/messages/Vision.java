@@ -1758,6 +1758,7 @@ public final class Vision {
     boolean hasId();
     int getId();
   }
+
   public static final class Corner extends
       com.google.protobuf.GeneratedMessage
       implements CornerOrBuilder {
@@ -2839,6 +2840,3 @@ public final class Vision {
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
   }
-  
-  // @@protoc_insertion_point(outer_class_scope)
-}

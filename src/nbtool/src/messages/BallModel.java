@@ -13,173 +13,146 @@ public final class BallModel {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>optional float distance = 1;</code>
+     * <code>optional double distance = 1;</code>
      */
     boolean hasDistance();
     /**
-     * <code>optional float distance = 1;</code>
+     * <code>optional double distance = 1;</code>
      */
-    float getDistance();
+    double getDistance();
 
     /**
-     * <code>optional float bearing = 2;</code>
+     * <code>optional double bearing = 2;</code>
      */
     boolean hasBearing();
     /**
-     * <code>optional float bearing = 2;</code>
+     * <code>optional double bearing = 2;</code>
      */
-    float getBearing();
+    double getBearing();
 
     /**
-     * <code>optional float angle_x_deg = 3;</code>
+     * <code>optional double angle_x_deg = 3;</code>
      */
     boolean hasAngleXDeg();
     /**
-     * <code>optional float angle_x_deg = 3;</code>
+     * <code>optional double angle_x_deg = 3;</code>
      */
-    float getAngleXDeg();
+    double getAngleXDeg();
 
     /**
-     * <code>optional float angle_y_deg = 4;</code>
+     * <code>optional double angle_y_deg = 4;</code>
      */
     boolean hasAngleYDeg();
     /**
-     * <code>optional float angle_y_deg = 4;</code>
+     * <code>optional double angle_y_deg = 4;</code>
      */
-    float getAngleYDeg();
+    double getAngleYDeg();
 
     /**
-     * <code>optional float elevation_deg = 5;</code>
-     */
-    boolean hasElevationDeg();
-    /**
-     * <code>optional float elevation_deg = 5;</code>
-     */
-    float getElevationDeg();
-
-    /**
-     * <code>optional float distance_sd = 6;</code>
-     */
-    boolean hasDistanceSd();
-    /**
-     * <code>optional float distance_sd = 6;</code>
-     */
-    float getDistanceSd();
-
-    /**
-     * <code>optional float bearing_sd = 7;</code>
+     * <code>optional double bearing_sd = 5;</code>
      */
     boolean hasBearingSd();
     /**
-     * <code>optional float bearing_sd = 7;</code>
+     * <code>optional double bearing_sd = 5;</code>
      */
-    float getBearingSd();
+    double getBearingSd();
 
     /**
-     * <code>optional bool inTopCam = 8;</code>
+     * <code>optional bool inTopCam = 6;</code>
      */
     boolean hasInTopCam();
     /**
-     * <code>optional bool inTopCam = 8;</code>
+     * <code>optional bool inTopCam = 6;</code>
      */
     boolean getInTopCam();
 
     /**
-     * <code>optional float radius = 9;</code>
+     * <code>optional double radius = 7;</code>
      */
     boolean hasRadius();
     /**
-     * <code>optional float radius = 9;</code>
+     * <code>optional double radius = 7;</code>
      */
-    float getRadius();
+    double getRadius();
 
     /**
-     * <code>optional sint32 confidence = 10;</code>
+     * <code>optional double confidence = 8;</code>
      */
     boolean hasConfidence();
     /**
-     * <code>optional sint32 confidence = 10;</code>
+     * <code>optional double confidence = 8;</code>
      */
-    int getConfidence();
+    double getConfidence();
 
     /**
-     * <code>optional float heat = 11;</code>
-     */
-    boolean hasHeat();
-    /**
-     * <code>optional float heat = 11;</code>
-     */
-    float getHeat();
-
-    /**
-     * <code>optional bool on = 12;</code>
+     * <code>optional bool on = 9;</code>
      */
     boolean hasOn();
     /**
-     * <code>optional bool on = 12;</code>
+     * <code>optional bool on = 9;</code>
      */
     boolean getOn();
 
     /**
-     * <code>optional sint32 frames_on = 13;</code>
+     * <code>optional sint32 frames_on = 10;</code>
      */
     boolean hasFramesOn();
     /**
-     * <code>optional sint32 frames_on = 13;</code>
+     * <code>optional sint32 frames_on = 10;</code>
      */
     int getFramesOn();
 
     /**
-     * <code>optional sint32 frames_off = 14;</code>
+     * <code>optional sint32 frames_off = 11;</code>
      */
     boolean hasFramesOff();
     /**
-     * <code>optional sint32 frames_off = 14;</code>
+     * <code>optional sint32 frames_off = 11;</code>
      */
     int getFramesOff();
 
     /**
-     * <code>optional float rel_x_variance = 16;</code>
+     * <code>optional double rel_x_variance = 12;</code>
      */
     boolean hasRelXVariance();
     /**
-     * <code>optional float rel_x_variance = 16;</code>
+     * <code>optional double rel_x_variance = 12;</code>
      */
-    float getRelXVariance();
+    double getRelXVariance();
 
     /**
-     * <code>optional float rel_y_variance = 17;</code>
+     * <code>optional double rel_y_variance = 13;</code>
      */
     boolean hasRelYVariance();
     /**
-     * <code>optional float rel_y_variance = 17;</code>
+     * <code>optional double rel_y_variance = 13;</code>
      */
-    float getRelYVariance();
+    double getRelYVariance();
 
     /**
-     * <code>optional float bearing_deg = 18;</code>
+     * <code>optional double bearing_deg = 14;</code>
      */
     boolean hasBearingDeg();
     /**
-     * <code>optional float bearing_deg = 18;</code>
+     * <code>optional double bearing_deg = 14;</code>
      */
-    float getBearingDeg();
+    double getBearingDeg();
 
     /**
-     * <code>optional sint32 x = 19;</code>
+     * <code>optional sint32 x = 15;</code>
      */
     boolean hasX();
     /**
-     * <code>optional sint32 x = 19;</code>
+     * <code>optional sint32 x = 15;</code>
      */
     int getX();
 
     /**
-     * <code>optional sint32 y = 20;</code>
+     * <code>optional sint32 y = 16;</code>
      */
     boolean hasY();
     /**
-     * <code>optional sint32 y = 20;</code>
+     * <code>optional sint32 y = 16;</code>
      */
     int getY();
   }
@@ -235,98 +208,83 @@ public final class BallModel {
               }
               break;
             }
-            case 13: {
+            case 9: {
               bitField0_ |= 0x00000001;
-              distance_ = input.readFloat();
+              distance_ = input.readDouble();
               break;
             }
-            case 21: {
+            case 17: {
               bitField0_ |= 0x00000002;
-              bearing_ = input.readFloat();
+              bearing_ = input.readDouble();
               break;
             }
-            case 29: {
+            case 25: {
               bitField0_ |= 0x00000004;
-              angleXDeg_ = input.readFloat();
+              angleXDeg_ = input.readDouble();
               break;
             }
-            case 37: {
+            case 33: {
               bitField0_ |= 0x00000008;
-              angleYDeg_ = input.readFloat();
+              angleYDeg_ = input.readDouble();
               break;
             }
-            case 45: {
+            case 41: {
               bitField0_ |= 0x00000010;
-              elevationDeg_ = input.readFloat();
+              bearingSd_ = input.readDouble();
               break;
             }
-            case 53: {
+            case 48: {
               bitField0_ |= 0x00000020;
-              distanceSd_ = input.readFloat();
-              break;
-            }
-            case 61: {
-              bitField0_ |= 0x00000040;
-              bearingSd_ = input.readFloat();
-              break;
-            }
-            case 64: {
-              bitField0_ |= 0x00000080;
               inTopCam_ = input.readBool();
               break;
             }
-            case 77: {
+            case 57: {
+              bitField0_ |= 0x00000040;
+              radius_ = input.readDouble();
+              break;
+            }
+            case 65: {
+              bitField0_ |= 0x00000080;
+              confidence_ = input.readDouble();
+              break;
+            }
+            case 72: {
               bitField0_ |= 0x00000100;
-              radius_ = input.readFloat();
+              on_ = input.readBool();
               break;
             }
             case 80: {
               bitField0_ |= 0x00000200;
-              confidence_ = input.readSInt32();
-              break;
-            }
-            case 93: {
-              bitField0_ |= 0x00000400;
-              heat_ = input.readFloat();
-              break;
-            }
-            case 96: {
-              bitField0_ |= 0x00000800;
-              on_ = input.readBool();
-              break;
-            }
-            case 104: {
-              bitField0_ |= 0x00001000;
               framesOn_ = input.readSInt32();
               break;
             }
-            case 112: {
-              bitField0_ |= 0x00002000;
+            case 88: {
+              bitField0_ |= 0x00000400;
               framesOff_ = input.readSInt32();
               break;
             }
-            case 133: {
+            case 97: {
+              bitField0_ |= 0x00000800;
+              relXVariance_ = input.readDouble();
+              break;
+            }
+            case 105: {
+              bitField0_ |= 0x00001000;
+              relYVariance_ = input.readDouble();
+              break;
+            }
+            case 113: {
+              bitField0_ |= 0x00002000;
+              bearingDeg_ = input.readDouble();
+              break;
+            }
+            case 120: {
               bitField0_ |= 0x00004000;
-              relXVariance_ = input.readFloat();
-              break;
-            }
-            case 141: {
-              bitField0_ |= 0x00008000;
-              relYVariance_ = input.readFloat();
-              break;
-            }
-            case 149: {
-              bitField0_ |= 0x00010000;
-              bearingDeg_ = input.readFloat();
-              break;
-            }
-            case 152: {
-              bitField0_ |= 0x00020000;
               x_ = input.readSInt32();
               break;
             }
-            case 160: {
-              bitField0_ |= 0x00040000;
+            case 128: {
+              bitField0_ |= 0x00008000;
               y_ = input.readSInt32();
               break;
             }
@@ -371,308 +329,260 @@ public final class BallModel {
 
     private int bitField0_;
     public static final int DISTANCE_FIELD_NUMBER = 1;
-    private float distance_;
+    private double distance_;
     /**
-     * <code>optional float distance = 1;</code>
+     * <code>optional double distance = 1;</code>
      */
     public boolean hasDistance() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional float distance = 1;</code>
+     * <code>optional double distance = 1;</code>
      */
-    public float getDistance() {
+    public double getDistance() {
       return distance_;
     }
 
     public static final int BEARING_FIELD_NUMBER = 2;
-    private float bearing_;
+    private double bearing_;
     /**
-     * <code>optional float bearing = 2;</code>
+     * <code>optional double bearing = 2;</code>
      */
     public boolean hasBearing() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional float bearing = 2;</code>
+     * <code>optional double bearing = 2;</code>
      */
-    public float getBearing() {
+    public double getBearing() {
       return bearing_;
     }
 
     public static final int ANGLE_X_DEG_FIELD_NUMBER = 3;
-    private float angleXDeg_;
+    private double angleXDeg_;
     /**
-     * <code>optional float angle_x_deg = 3;</code>
+     * <code>optional double angle_x_deg = 3;</code>
      */
     public boolean hasAngleXDeg() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional float angle_x_deg = 3;</code>
+     * <code>optional double angle_x_deg = 3;</code>
      */
-    public float getAngleXDeg() {
+    public double getAngleXDeg() {
       return angleXDeg_;
     }
 
     public static final int ANGLE_Y_DEG_FIELD_NUMBER = 4;
-    private float angleYDeg_;
+    private double angleYDeg_;
     /**
-     * <code>optional float angle_y_deg = 4;</code>
+     * <code>optional double angle_y_deg = 4;</code>
      */
     public boolean hasAngleYDeg() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional float angle_y_deg = 4;</code>
+     * <code>optional double angle_y_deg = 4;</code>
      */
-    public float getAngleYDeg() {
+    public double getAngleYDeg() {
       return angleYDeg_;
     }
 
-    public static final int ELEVATION_DEG_FIELD_NUMBER = 5;
-    private float elevationDeg_;
+    public static final int BEARING_SD_FIELD_NUMBER = 5;
+    private double bearingSd_;
     /**
-     * <code>optional float elevation_deg = 5;</code>
+     * <code>optional double bearing_sd = 5;</code>
      */
-    public boolean hasElevationDeg() {
+    public boolean hasBearingSd() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>optional float elevation_deg = 5;</code>
+     * <code>optional double bearing_sd = 5;</code>
      */
-    public float getElevationDeg() {
-      return elevationDeg_;
-    }
-
-    public static final int DISTANCE_SD_FIELD_NUMBER = 6;
-    private float distanceSd_;
-    /**
-     * <code>optional float distance_sd = 6;</code>
-     */
-    public boolean hasDistanceSd() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
-    }
-    /**
-     * <code>optional float distance_sd = 6;</code>
-     */
-    public float getDistanceSd() {
-      return distanceSd_;
-    }
-
-    public static final int BEARING_SD_FIELD_NUMBER = 7;
-    private float bearingSd_;
-    /**
-     * <code>optional float bearing_sd = 7;</code>
-     */
-    public boolean hasBearingSd() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
-    }
-    /**
-     * <code>optional float bearing_sd = 7;</code>
-     */
-    public float getBearingSd() {
+    public double getBearingSd() {
       return bearingSd_;
     }
 
-    public static final int INTOPCAM_FIELD_NUMBER = 8;
+    public static final int INTOPCAM_FIELD_NUMBER = 6;
     private boolean inTopCam_;
     /**
-     * <code>optional bool inTopCam = 8;</code>
+     * <code>optional bool inTopCam = 6;</code>
      */
     public boolean hasInTopCam() {
-      return ((bitField0_ & 0x00000080) == 0x00000080);
+      return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional bool inTopCam = 8;</code>
+     * <code>optional bool inTopCam = 6;</code>
      */
     public boolean getInTopCam() {
       return inTopCam_;
     }
 
-    public static final int RADIUS_FIELD_NUMBER = 9;
-    private float radius_;
+    public static final int RADIUS_FIELD_NUMBER = 7;
+    private double radius_;
     /**
-     * <code>optional float radius = 9;</code>
+     * <code>optional double radius = 7;</code>
      */
     public boolean hasRadius() {
-      return ((bitField0_ & 0x00000100) == 0x00000100);
+      return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
-     * <code>optional float radius = 9;</code>
+     * <code>optional double radius = 7;</code>
      */
-    public float getRadius() {
+    public double getRadius() {
       return radius_;
     }
 
-    public static final int CONFIDENCE_FIELD_NUMBER = 10;
-    private int confidence_;
+    public static final int CONFIDENCE_FIELD_NUMBER = 8;
+    private double confidence_;
     /**
-     * <code>optional sint32 confidence = 10;</code>
+     * <code>optional double confidence = 8;</code>
      */
     public boolean hasConfidence() {
-      return ((bitField0_ & 0x00000200) == 0x00000200);
+      return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
-     * <code>optional sint32 confidence = 10;</code>
+     * <code>optional double confidence = 8;</code>
      */
-    public int getConfidence() {
+    public double getConfidence() {
       return confidence_;
     }
 
-    public static final int HEAT_FIELD_NUMBER = 11;
-    private float heat_;
-    /**
-     * <code>optional float heat = 11;</code>
-     */
-    public boolean hasHeat() {
-      return ((bitField0_ & 0x00000400) == 0x00000400);
-    }
-    /**
-     * <code>optional float heat = 11;</code>
-     */
-    public float getHeat() {
-      return heat_;
-    }
-
-    public static final int ON_FIELD_NUMBER = 12;
+    public static final int ON_FIELD_NUMBER = 9;
     private boolean on_;
     /**
-     * <code>optional bool on = 12;</code>
+     * <code>optional bool on = 9;</code>
      */
     public boolean hasOn() {
-      return ((bitField0_ & 0x00000800) == 0x00000800);
+      return ((bitField0_ & 0x00000100) == 0x00000100);
     }
     /**
-     * <code>optional bool on = 12;</code>
+     * <code>optional bool on = 9;</code>
      */
     public boolean getOn() {
       return on_;
     }
 
-    public static final int FRAMES_ON_FIELD_NUMBER = 13;
+    public static final int FRAMES_ON_FIELD_NUMBER = 10;
     private int framesOn_;
     /**
-     * <code>optional sint32 frames_on = 13;</code>
+     * <code>optional sint32 frames_on = 10;</code>
      */
     public boolean hasFramesOn() {
-      return ((bitField0_ & 0x00001000) == 0x00001000);
+      return ((bitField0_ & 0x00000200) == 0x00000200);
     }
     /**
-     * <code>optional sint32 frames_on = 13;</code>
+     * <code>optional sint32 frames_on = 10;</code>
      */
     public int getFramesOn() {
       return framesOn_;
     }
 
-    public static final int FRAMES_OFF_FIELD_NUMBER = 14;
+    public static final int FRAMES_OFF_FIELD_NUMBER = 11;
     private int framesOff_;
     /**
-     * <code>optional sint32 frames_off = 14;</code>
+     * <code>optional sint32 frames_off = 11;</code>
      */
     public boolean hasFramesOff() {
-      return ((bitField0_ & 0x00002000) == 0x00002000);
+      return ((bitField0_ & 0x00000400) == 0x00000400);
     }
     /**
-     * <code>optional sint32 frames_off = 14;</code>
+     * <code>optional sint32 frames_off = 11;</code>
      */
     public int getFramesOff() {
       return framesOff_;
     }
 
-    public static final int REL_X_VARIANCE_FIELD_NUMBER = 16;
-    private float relXVariance_;
+    public static final int REL_X_VARIANCE_FIELD_NUMBER = 12;
+    private double relXVariance_;
     /**
-     * <code>optional float rel_x_variance = 16;</code>
+     * <code>optional double rel_x_variance = 12;</code>
      */
     public boolean hasRelXVariance() {
-      return ((bitField0_ & 0x00004000) == 0x00004000);
+      return ((bitField0_ & 0x00000800) == 0x00000800);
     }
     /**
-     * <code>optional float rel_x_variance = 16;</code>
+     * <code>optional double rel_x_variance = 12;</code>
      */
-    public float getRelXVariance() {
+    public double getRelXVariance() {
       return relXVariance_;
     }
 
-    public static final int REL_Y_VARIANCE_FIELD_NUMBER = 17;
-    private float relYVariance_;
+    public static final int REL_Y_VARIANCE_FIELD_NUMBER = 13;
+    private double relYVariance_;
     /**
-     * <code>optional float rel_y_variance = 17;</code>
+     * <code>optional double rel_y_variance = 13;</code>
      */
     public boolean hasRelYVariance() {
-      return ((bitField0_ & 0x00008000) == 0x00008000);
+      return ((bitField0_ & 0x00001000) == 0x00001000);
     }
     /**
-     * <code>optional float rel_y_variance = 17;</code>
+     * <code>optional double rel_y_variance = 13;</code>
      */
-    public float getRelYVariance() {
+    public double getRelYVariance() {
       return relYVariance_;
     }
 
-    public static final int BEARING_DEG_FIELD_NUMBER = 18;
-    private float bearingDeg_;
+    public static final int BEARING_DEG_FIELD_NUMBER = 14;
+    private double bearingDeg_;
     /**
-     * <code>optional float bearing_deg = 18;</code>
+     * <code>optional double bearing_deg = 14;</code>
      */
     public boolean hasBearingDeg() {
-      return ((bitField0_ & 0x00010000) == 0x00010000);
+      return ((bitField0_ & 0x00002000) == 0x00002000);
     }
     /**
-     * <code>optional float bearing_deg = 18;</code>
+     * <code>optional double bearing_deg = 14;</code>
      */
-    public float getBearingDeg() {
+    public double getBearingDeg() {
       return bearingDeg_;
     }
 
-    public static final int X_FIELD_NUMBER = 19;
+    public static final int X_FIELD_NUMBER = 15;
     private int x_;
     /**
-     * <code>optional sint32 x = 19;</code>
+     * <code>optional sint32 x = 15;</code>
      */
     public boolean hasX() {
-      return ((bitField0_ & 0x00020000) == 0x00020000);
+      return ((bitField0_ & 0x00004000) == 0x00004000);
     }
     /**
-     * <code>optional sint32 x = 19;</code>
+     * <code>optional sint32 x = 15;</code>
      */
     public int getX() {
       return x_;
     }
 
-    public static final int Y_FIELD_NUMBER = 20;
+    public static final int Y_FIELD_NUMBER = 16;
     private int y_;
     /**
-     * <code>optional sint32 y = 20;</code>
+     * <code>optional sint32 y = 16;</code>
      */
     public boolean hasY() {
-      return ((bitField0_ & 0x00040000) == 0x00040000);
+      return ((bitField0_ & 0x00008000) == 0x00008000);
     }
     /**
-     * <code>optional sint32 y = 20;</code>
+     * <code>optional sint32 y = 16;</code>
      */
     public int getY() {
       return y_;
     }
 
     private void initFields() {
-      distance_ = 0F;
-      bearing_ = 0F;
-      angleXDeg_ = 0F;
-      angleYDeg_ = 0F;
-      elevationDeg_ = 0F;
-      distanceSd_ = 0F;
-      bearingSd_ = 0F;
+      distance_ = 0D;
+      bearing_ = 0D;
+      angleXDeg_ = 0D;
+      angleYDeg_ = 0D;
+      bearingSd_ = 0D;
       inTopCam_ = false;
-      radius_ = 0F;
-      confidence_ = 0;
-      heat_ = 0F;
+      radius_ = 0D;
+      confidence_ = 0D;
       on_ = false;
       framesOn_ = 0;
       framesOff_ = 0;
-      relXVariance_ = 0F;
-      relYVariance_ = 0F;
-      bearingDeg_ = 0F;
+      relXVariance_ = 0D;
+      relYVariance_ = 0D;
+      bearingDeg_ = 0D;
       x_ = 0;
       y_ = 0;
     }
@@ -690,61 +600,52 @@ public final class BallModel {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeFloat(1, distance_);
+        output.writeDouble(1, distance_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeFloat(2, bearing_);
+        output.writeDouble(2, bearing_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeFloat(3, angleXDeg_);
+        output.writeDouble(3, angleXDeg_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeFloat(4, angleYDeg_);
+        output.writeDouble(4, angleYDeg_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeFloat(5, elevationDeg_);
+        output.writeDouble(5, bearingSd_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeFloat(6, distanceSd_);
+        output.writeBool(6, inTopCam_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeFloat(7, bearingSd_);
+        output.writeDouble(7, radius_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        output.writeBool(8, inTopCam_);
+        output.writeDouble(8, confidence_);
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        output.writeFloat(9, radius_);
+        output.writeBool(9, on_);
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
-        output.writeSInt32(10, confidence_);
+        output.writeSInt32(10, framesOn_);
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
-        output.writeFloat(11, heat_);
+        output.writeSInt32(11, framesOff_);
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
-        output.writeBool(12, on_);
+        output.writeDouble(12, relXVariance_);
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
-        output.writeSInt32(13, framesOn_);
+        output.writeDouble(13, relYVariance_);
       }
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
-        output.writeSInt32(14, framesOff_);
+        output.writeDouble(14, bearingDeg_);
       }
       if (((bitField0_ & 0x00004000) == 0x00004000)) {
-        output.writeFloat(16, relXVariance_);
+        output.writeSInt32(15, x_);
       }
       if (((bitField0_ & 0x00008000) == 0x00008000)) {
-        output.writeFloat(17, relYVariance_);
-      }
-      if (((bitField0_ & 0x00010000) == 0x00010000)) {
-        output.writeFloat(18, bearingDeg_);
-      }
-      if (((bitField0_ & 0x00020000) == 0x00020000)) {
-        output.writeSInt32(19, x_);
-      }
-      if (((bitField0_ & 0x00040000) == 0x00040000)) {
-        output.writeSInt32(20, y_);
+        output.writeSInt32(16, y_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -757,79 +658,67 @@ public final class BallModel {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(1, distance_);
+          .computeDoubleSize(1, distance_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(2, bearing_);
+          .computeDoubleSize(2, bearing_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(3, angleXDeg_);
+          .computeDoubleSize(3, angleXDeg_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(4, angleYDeg_);
+          .computeDoubleSize(4, angleYDeg_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(5, elevationDeg_);
+          .computeDoubleSize(5, bearingSd_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(6, distanceSd_);
+          .computeBoolSize(6, inTopCam_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(7, bearingSd_);
+          .computeDoubleSize(7, radius_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(8, inTopCam_);
+          .computeDoubleSize(8, confidence_);
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(9, radius_);
+          .computeBoolSize(9, on_);
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(10, confidence_);
+          .computeSInt32Size(10, framesOn_);
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(11, heat_);
+          .computeSInt32Size(11, framesOff_);
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(12, on_);
+          .computeDoubleSize(12, relXVariance_);
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(13, framesOn_);
+          .computeDoubleSize(13, relYVariance_);
       }
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(14, framesOff_);
+          .computeDoubleSize(14, bearingDeg_);
       }
       if (((bitField0_ & 0x00004000) == 0x00004000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(16, relXVariance_);
+          .computeSInt32Size(15, x_);
       }
       if (((bitField0_ & 0x00008000) == 0x00008000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(17, relYVariance_);
-      }
-      if (((bitField0_ & 0x00010000) == 0x00010000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(18, bearingDeg_);
-      }
-      if (((bitField0_ & 0x00020000) == 0x00020000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(19, x_);
-      }
-      if (((bitField0_ & 0x00040000) == 0x00040000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(20, y_);
+          .computeSInt32Size(16, y_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -948,44 +837,38 @@ public final class BallModel {
 
       public Builder clear() {
         super.clear();
-        distance_ = 0F;
+        distance_ = 0D;
         bitField0_ = (bitField0_ & ~0x00000001);
-        bearing_ = 0F;
+        bearing_ = 0D;
         bitField0_ = (bitField0_ & ~0x00000002);
-        angleXDeg_ = 0F;
+        angleXDeg_ = 0D;
         bitField0_ = (bitField0_ & ~0x00000004);
-        angleYDeg_ = 0F;
+        angleYDeg_ = 0D;
         bitField0_ = (bitField0_ & ~0x00000008);
-        elevationDeg_ = 0F;
+        bearingSd_ = 0D;
         bitField0_ = (bitField0_ & ~0x00000010);
-        distanceSd_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000020);
-        bearingSd_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000040);
         inTopCam_ = false;
+        bitField0_ = (bitField0_ & ~0x00000020);
+        radius_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00000040);
+        confidence_ = 0D;
         bitField0_ = (bitField0_ & ~0x00000080);
-        radius_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000100);
-        confidence_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000200);
-        heat_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000400);
         on_ = false;
-        bitField0_ = (bitField0_ & ~0x00000800);
+        bitField0_ = (bitField0_ & ~0x00000100);
         framesOn_ = 0;
-        bitField0_ = (bitField0_ & ~0x00001000);
+        bitField0_ = (bitField0_ & ~0x00000200);
         framesOff_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000400);
+        relXVariance_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00000800);
+        relYVariance_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00001000);
+        bearingDeg_ = 0D;
         bitField0_ = (bitField0_ & ~0x00002000);
-        relXVariance_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00004000);
-        relYVariance_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00008000);
-        bearingDeg_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00010000);
         x_ = 0;
-        bitField0_ = (bitField0_ & ~0x00020000);
+        bitField0_ = (bitField0_ & ~0x00004000);
         y_ = 0;
-        bitField0_ = (bitField0_ & ~0x00040000);
+        bitField0_ = (bitField0_ & ~0x00008000);
         return this;
       }
 
@@ -1033,61 +916,49 @@ public final class BallModel {
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000010;
         }
-        result.elevationDeg_ = elevationDeg_;
+        result.bearingSd_ = bearingSd_;
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
         }
-        result.distanceSd_ = distanceSd_;
+        result.inTopCam_ = inTopCam_;
         if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
           to_bitField0_ |= 0x00000040;
         }
-        result.bearingSd_ = bearingSd_;
+        result.radius_ = radius_;
         if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
           to_bitField0_ |= 0x00000080;
         }
-        result.inTopCam_ = inTopCam_;
+        result.confidence_ = confidence_;
         if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
           to_bitField0_ |= 0x00000100;
         }
-        result.radius_ = radius_;
+        result.on_ = on_;
         if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
           to_bitField0_ |= 0x00000200;
         }
-        result.confidence_ = confidence_;
+        result.framesOn_ = framesOn_;
         if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
           to_bitField0_ |= 0x00000400;
         }
-        result.heat_ = heat_;
+        result.framesOff_ = framesOff_;
         if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
           to_bitField0_ |= 0x00000800;
         }
-        result.on_ = on_;
+        result.relXVariance_ = relXVariance_;
         if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
           to_bitField0_ |= 0x00001000;
         }
-        result.framesOn_ = framesOn_;
+        result.relYVariance_ = relYVariance_;
         if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
           to_bitField0_ |= 0x00002000;
         }
-        result.framesOff_ = framesOff_;
+        result.bearingDeg_ = bearingDeg_;
         if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
           to_bitField0_ |= 0x00004000;
         }
-        result.relXVariance_ = relXVariance_;
+        result.x_ = x_;
         if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
           to_bitField0_ |= 0x00008000;
-        }
-        result.relYVariance_ = relYVariance_;
-        if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
-          to_bitField0_ |= 0x00010000;
-        }
-        result.bearingDeg_ = bearingDeg_;
-        if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
-          to_bitField0_ |= 0x00020000;
-        }
-        result.x_ = x_;
-        if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
-          to_bitField0_ |= 0x00040000;
         }
         result.y_ = y_;
         result.bitField0_ = to_bitField0_;
@@ -1118,12 +989,6 @@ public final class BallModel {
         if (other.hasAngleYDeg()) {
           setAngleYDeg(other.getAngleYDeg());
         }
-        if (other.hasElevationDeg()) {
-          setElevationDeg(other.getElevationDeg());
-        }
-        if (other.hasDistanceSd()) {
-          setDistanceSd(other.getDistanceSd());
-        }
         if (other.hasBearingSd()) {
           setBearingSd(other.getBearingSd());
         }
@@ -1135,9 +1000,6 @@ public final class BallModel {
         }
         if (other.hasConfidence()) {
           setConfidence(other.getConfidence());
-        }
-        if (other.hasHeat()) {
-          setHeat(other.getHeat());
         }
         if (other.hasOn()) {
           setOn(other.getOn());
@@ -1190,385 +1052,289 @@ public final class BallModel {
       }
       private int bitField0_;
 
-      private float distance_ ;
+      private double distance_ ;
       /**
-       * <code>optional float distance = 1;</code>
+       * <code>optional double distance = 1;</code>
        */
       public boolean hasDistance() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional float distance = 1;</code>
+       * <code>optional double distance = 1;</code>
        */
-      public float getDistance() {
+      public double getDistance() {
         return distance_;
       }
       /**
-       * <code>optional float distance = 1;</code>
+       * <code>optional double distance = 1;</code>
        */
-      public Builder setDistance(float value) {
+      public Builder setDistance(double value) {
         bitField0_ |= 0x00000001;
         distance_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional float distance = 1;</code>
+       * <code>optional double distance = 1;</code>
        */
       public Builder clearDistance() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        distance_ = 0F;
+        distance_ = 0D;
         onChanged();
         return this;
       }
 
-      private float bearing_ ;
+      private double bearing_ ;
       /**
-       * <code>optional float bearing = 2;</code>
+       * <code>optional double bearing = 2;</code>
        */
       public boolean hasBearing() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional float bearing = 2;</code>
+       * <code>optional double bearing = 2;</code>
        */
-      public float getBearing() {
+      public double getBearing() {
         return bearing_;
       }
       /**
-       * <code>optional float bearing = 2;</code>
+       * <code>optional double bearing = 2;</code>
        */
-      public Builder setBearing(float value) {
+      public Builder setBearing(double value) {
         bitField0_ |= 0x00000002;
         bearing_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional float bearing = 2;</code>
+       * <code>optional double bearing = 2;</code>
        */
       public Builder clearBearing() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        bearing_ = 0F;
+        bearing_ = 0D;
         onChanged();
         return this;
       }
 
-      private float angleXDeg_ ;
+      private double angleXDeg_ ;
       /**
-       * <code>optional float angle_x_deg = 3;</code>
+       * <code>optional double angle_x_deg = 3;</code>
        */
       public boolean hasAngleXDeg() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional float angle_x_deg = 3;</code>
+       * <code>optional double angle_x_deg = 3;</code>
        */
-      public float getAngleXDeg() {
+      public double getAngleXDeg() {
         return angleXDeg_;
       }
       /**
-       * <code>optional float angle_x_deg = 3;</code>
+       * <code>optional double angle_x_deg = 3;</code>
        */
-      public Builder setAngleXDeg(float value) {
+      public Builder setAngleXDeg(double value) {
         bitField0_ |= 0x00000004;
         angleXDeg_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional float angle_x_deg = 3;</code>
+       * <code>optional double angle_x_deg = 3;</code>
        */
       public Builder clearAngleXDeg() {
         bitField0_ = (bitField0_ & ~0x00000004);
-        angleXDeg_ = 0F;
+        angleXDeg_ = 0D;
         onChanged();
         return this;
       }
 
-      private float angleYDeg_ ;
+      private double angleYDeg_ ;
       /**
-       * <code>optional float angle_y_deg = 4;</code>
+       * <code>optional double angle_y_deg = 4;</code>
        */
       public boolean hasAngleYDeg() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional float angle_y_deg = 4;</code>
+       * <code>optional double angle_y_deg = 4;</code>
        */
-      public float getAngleYDeg() {
+      public double getAngleYDeg() {
         return angleYDeg_;
       }
       /**
-       * <code>optional float angle_y_deg = 4;</code>
+       * <code>optional double angle_y_deg = 4;</code>
        */
-      public Builder setAngleYDeg(float value) {
+      public Builder setAngleYDeg(double value) {
         bitField0_ |= 0x00000008;
         angleYDeg_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional float angle_y_deg = 4;</code>
+       * <code>optional double angle_y_deg = 4;</code>
        */
       public Builder clearAngleYDeg() {
         bitField0_ = (bitField0_ & ~0x00000008);
-        angleYDeg_ = 0F;
+        angleYDeg_ = 0D;
         onChanged();
         return this;
       }
 
-      private float elevationDeg_ ;
+      private double bearingSd_ ;
       /**
-       * <code>optional float elevation_deg = 5;</code>
+       * <code>optional double bearing_sd = 5;</code>
        */
-      public boolean hasElevationDeg() {
+      public boolean hasBearingSd() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>optional float elevation_deg = 5;</code>
+       * <code>optional double bearing_sd = 5;</code>
        */
-      public float getElevationDeg() {
-        return elevationDeg_;
-      }
-      /**
-       * <code>optional float elevation_deg = 5;</code>
-       */
-      public Builder setElevationDeg(float value) {
-        bitField0_ |= 0x00000010;
-        elevationDeg_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional float elevation_deg = 5;</code>
-       */
-      public Builder clearElevationDeg() {
-        bitField0_ = (bitField0_ & ~0x00000010);
-        elevationDeg_ = 0F;
-        onChanged();
-        return this;
-      }
-
-      private float distanceSd_ ;
-      /**
-       * <code>optional float distance_sd = 6;</code>
-       */
-      public boolean hasDistanceSd() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
-      }
-      /**
-       * <code>optional float distance_sd = 6;</code>
-       */
-      public float getDistanceSd() {
-        return distanceSd_;
-      }
-      /**
-       * <code>optional float distance_sd = 6;</code>
-       */
-      public Builder setDistanceSd(float value) {
-        bitField0_ |= 0x00000020;
-        distanceSd_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional float distance_sd = 6;</code>
-       */
-      public Builder clearDistanceSd() {
-        bitField0_ = (bitField0_ & ~0x00000020);
-        distanceSd_ = 0F;
-        onChanged();
-        return this;
-      }
-
-      private float bearingSd_ ;
-      /**
-       * <code>optional float bearing_sd = 7;</code>
-       */
-      public boolean hasBearingSd() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
-      }
-      /**
-       * <code>optional float bearing_sd = 7;</code>
-       */
-      public float getBearingSd() {
+      public double getBearingSd() {
         return bearingSd_;
       }
       /**
-       * <code>optional float bearing_sd = 7;</code>
+       * <code>optional double bearing_sd = 5;</code>
        */
-      public Builder setBearingSd(float value) {
-        bitField0_ |= 0x00000040;
+      public Builder setBearingSd(double value) {
+        bitField0_ |= 0x00000010;
         bearingSd_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional float bearing_sd = 7;</code>
+       * <code>optional double bearing_sd = 5;</code>
        */
       public Builder clearBearingSd() {
-        bitField0_ = (bitField0_ & ~0x00000040);
-        bearingSd_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        bearingSd_ = 0D;
         onChanged();
         return this;
       }
 
       private boolean inTopCam_ ;
       /**
-       * <code>optional bool inTopCam = 8;</code>
+       * <code>optional bool inTopCam = 6;</code>
        */
       public boolean hasInTopCam() {
-        return ((bitField0_ & 0x00000080) == 0x00000080);
+        return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional bool inTopCam = 8;</code>
+       * <code>optional bool inTopCam = 6;</code>
        */
       public boolean getInTopCam() {
         return inTopCam_;
       }
       /**
-       * <code>optional bool inTopCam = 8;</code>
+       * <code>optional bool inTopCam = 6;</code>
        */
       public Builder setInTopCam(boolean value) {
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000020;
         inTopCam_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool inTopCam = 8;</code>
+       * <code>optional bool inTopCam = 6;</code>
        */
       public Builder clearInTopCam() {
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000020);
         inTopCam_ = false;
         onChanged();
         return this;
       }
 
-      private float radius_ ;
+      private double radius_ ;
       /**
-       * <code>optional float radius = 9;</code>
+       * <code>optional double radius = 7;</code>
        */
       public boolean hasRadius() {
-        return ((bitField0_ & 0x00000100) == 0x00000100);
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
-       * <code>optional float radius = 9;</code>
+       * <code>optional double radius = 7;</code>
        */
-      public float getRadius() {
+      public double getRadius() {
         return radius_;
       }
       /**
-       * <code>optional float radius = 9;</code>
+       * <code>optional double radius = 7;</code>
        */
-      public Builder setRadius(float value) {
-        bitField0_ |= 0x00000100;
+      public Builder setRadius(double value) {
+        bitField0_ |= 0x00000040;
         radius_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional float radius = 9;</code>
+       * <code>optional double radius = 7;</code>
        */
       public Builder clearRadius() {
-        bitField0_ = (bitField0_ & ~0x00000100);
-        radius_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000040);
+        radius_ = 0D;
         onChanged();
         return this;
       }
 
-      private int confidence_ ;
+      private double confidence_ ;
       /**
-       * <code>optional sint32 confidence = 10;</code>
+       * <code>optional double confidence = 8;</code>
        */
       public boolean hasConfidence() {
-        return ((bitField0_ & 0x00000200) == 0x00000200);
+        return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
-       * <code>optional sint32 confidence = 10;</code>
+       * <code>optional double confidence = 8;</code>
        */
-      public int getConfidence() {
+      public double getConfidence() {
         return confidence_;
       }
       /**
-       * <code>optional sint32 confidence = 10;</code>
+       * <code>optional double confidence = 8;</code>
        */
-      public Builder setConfidence(int value) {
-        bitField0_ |= 0x00000200;
+      public Builder setConfidence(double value) {
+        bitField0_ |= 0x00000080;
         confidence_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint32 confidence = 10;</code>
+       * <code>optional double confidence = 8;</code>
        */
       public Builder clearConfidence() {
-        bitField0_ = (bitField0_ & ~0x00000200);
-        confidence_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private float heat_ ;
-      /**
-       * <code>optional float heat = 11;</code>
-       */
-      public boolean hasHeat() {
-        return ((bitField0_ & 0x00000400) == 0x00000400);
-      }
-      /**
-       * <code>optional float heat = 11;</code>
-       */
-      public float getHeat() {
-        return heat_;
-      }
-      /**
-       * <code>optional float heat = 11;</code>
-       */
-      public Builder setHeat(float value) {
-        bitField0_ |= 0x00000400;
-        heat_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional float heat = 11;</code>
-       */
-      public Builder clearHeat() {
-        bitField0_ = (bitField0_ & ~0x00000400);
-        heat_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000080);
+        confidence_ = 0D;
         onChanged();
         return this;
       }
 
       private boolean on_ ;
       /**
-       * <code>optional bool on = 12;</code>
+       * <code>optional bool on = 9;</code>
        */
       public boolean hasOn() {
-        return ((bitField0_ & 0x00000800) == 0x00000800);
+        return ((bitField0_ & 0x00000100) == 0x00000100);
       }
       /**
-       * <code>optional bool on = 12;</code>
+       * <code>optional bool on = 9;</code>
        */
       public boolean getOn() {
         return on_;
       }
       /**
-       * <code>optional bool on = 12;</code>
+       * <code>optional bool on = 9;</code>
        */
       public Builder setOn(boolean value) {
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00000100;
         on_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool on = 12;</code>
+       * <code>optional bool on = 9;</code>
        */
       public Builder clearOn() {
-        bitField0_ = (bitField0_ & ~0x00000800);
+        bitField0_ = (bitField0_ & ~0x00000100);
         on_ = false;
         onChanged();
         return this;
@@ -1576,31 +1342,31 @@ public final class BallModel {
 
       private int framesOn_ ;
       /**
-       * <code>optional sint32 frames_on = 13;</code>
+       * <code>optional sint32 frames_on = 10;</code>
        */
       public boolean hasFramesOn() {
-        return ((bitField0_ & 0x00001000) == 0x00001000);
+        return ((bitField0_ & 0x00000200) == 0x00000200);
       }
       /**
-       * <code>optional sint32 frames_on = 13;</code>
+       * <code>optional sint32 frames_on = 10;</code>
        */
       public int getFramesOn() {
         return framesOn_;
       }
       /**
-       * <code>optional sint32 frames_on = 13;</code>
+       * <code>optional sint32 frames_on = 10;</code>
        */
       public Builder setFramesOn(int value) {
-        bitField0_ |= 0x00001000;
+        bitField0_ |= 0x00000200;
         framesOn_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint32 frames_on = 13;</code>
+       * <code>optional sint32 frames_on = 10;</code>
        */
       public Builder clearFramesOn() {
-        bitField0_ = (bitField0_ & ~0x00001000);
+        bitField0_ = (bitField0_ & ~0x00000200);
         framesOn_ = 0;
         onChanged();
         return this;
@@ -1608,159 +1374,159 @@ public final class BallModel {
 
       private int framesOff_ ;
       /**
-       * <code>optional sint32 frames_off = 14;</code>
+       * <code>optional sint32 frames_off = 11;</code>
        */
       public boolean hasFramesOff() {
-        return ((bitField0_ & 0x00002000) == 0x00002000);
+        return ((bitField0_ & 0x00000400) == 0x00000400);
       }
       /**
-       * <code>optional sint32 frames_off = 14;</code>
+       * <code>optional sint32 frames_off = 11;</code>
        */
       public int getFramesOff() {
         return framesOff_;
       }
       /**
-       * <code>optional sint32 frames_off = 14;</code>
+       * <code>optional sint32 frames_off = 11;</code>
        */
       public Builder setFramesOff(int value) {
-        bitField0_ |= 0x00002000;
+        bitField0_ |= 0x00000400;
         framesOff_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint32 frames_off = 14;</code>
+       * <code>optional sint32 frames_off = 11;</code>
        */
       public Builder clearFramesOff() {
-        bitField0_ = (bitField0_ & ~0x00002000);
+        bitField0_ = (bitField0_ & ~0x00000400);
         framesOff_ = 0;
         onChanged();
         return this;
       }
 
-      private float relXVariance_ ;
+      private double relXVariance_ ;
       /**
-       * <code>optional float rel_x_variance = 16;</code>
+       * <code>optional double rel_x_variance = 12;</code>
        */
       public boolean hasRelXVariance() {
-        return ((bitField0_ & 0x00004000) == 0x00004000);
+        return ((bitField0_ & 0x00000800) == 0x00000800);
       }
       /**
-       * <code>optional float rel_x_variance = 16;</code>
+       * <code>optional double rel_x_variance = 12;</code>
        */
-      public float getRelXVariance() {
+      public double getRelXVariance() {
         return relXVariance_;
       }
       /**
-       * <code>optional float rel_x_variance = 16;</code>
+       * <code>optional double rel_x_variance = 12;</code>
        */
-      public Builder setRelXVariance(float value) {
-        bitField0_ |= 0x00004000;
+      public Builder setRelXVariance(double value) {
+        bitField0_ |= 0x00000800;
         relXVariance_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional float rel_x_variance = 16;</code>
+       * <code>optional double rel_x_variance = 12;</code>
        */
       public Builder clearRelXVariance() {
-        bitField0_ = (bitField0_ & ~0x00004000);
-        relXVariance_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000800);
+        relXVariance_ = 0D;
         onChanged();
         return this;
       }
 
-      private float relYVariance_ ;
+      private double relYVariance_ ;
       /**
-       * <code>optional float rel_y_variance = 17;</code>
+       * <code>optional double rel_y_variance = 13;</code>
        */
       public boolean hasRelYVariance() {
-        return ((bitField0_ & 0x00008000) == 0x00008000);
+        return ((bitField0_ & 0x00001000) == 0x00001000);
       }
       /**
-       * <code>optional float rel_y_variance = 17;</code>
+       * <code>optional double rel_y_variance = 13;</code>
        */
-      public float getRelYVariance() {
+      public double getRelYVariance() {
         return relYVariance_;
       }
       /**
-       * <code>optional float rel_y_variance = 17;</code>
+       * <code>optional double rel_y_variance = 13;</code>
        */
-      public Builder setRelYVariance(float value) {
-        bitField0_ |= 0x00008000;
+      public Builder setRelYVariance(double value) {
+        bitField0_ |= 0x00001000;
         relYVariance_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional float rel_y_variance = 17;</code>
+       * <code>optional double rel_y_variance = 13;</code>
        */
       public Builder clearRelYVariance() {
-        bitField0_ = (bitField0_ & ~0x00008000);
-        relYVariance_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00001000);
+        relYVariance_ = 0D;
         onChanged();
         return this;
       }
 
-      private float bearingDeg_ ;
+      private double bearingDeg_ ;
       /**
-       * <code>optional float bearing_deg = 18;</code>
+       * <code>optional double bearing_deg = 14;</code>
        */
       public boolean hasBearingDeg() {
-        return ((bitField0_ & 0x00010000) == 0x00010000);
+        return ((bitField0_ & 0x00002000) == 0x00002000);
       }
       /**
-       * <code>optional float bearing_deg = 18;</code>
+       * <code>optional double bearing_deg = 14;</code>
        */
-      public float getBearingDeg() {
+      public double getBearingDeg() {
         return bearingDeg_;
       }
       /**
-       * <code>optional float bearing_deg = 18;</code>
+       * <code>optional double bearing_deg = 14;</code>
        */
-      public Builder setBearingDeg(float value) {
-        bitField0_ |= 0x00010000;
+      public Builder setBearingDeg(double value) {
+        bitField0_ |= 0x00002000;
         bearingDeg_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional float bearing_deg = 18;</code>
+       * <code>optional double bearing_deg = 14;</code>
        */
       public Builder clearBearingDeg() {
-        bitField0_ = (bitField0_ & ~0x00010000);
-        bearingDeg_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00002000);
+        bearingDeg_ = 0D;
         onChanged();
         return this;
       }
 
       private int x_ ;
       /**
-       * <code>optional sint32 x = 19;</code>
+       * <code>optional sint32 x = 15;</code>
        */
       public boolean hasX() {
-        return ((bitField0_ & 0x00020000) == 0x00020000);
+        return ((bitField0_ & 0x00004000) == 0x00004000);
       }
       /**
-       * <code>optional sint32 x = 19;</code>
+       * <code>optional sint32 x = 15;</code>
        */
       public int getX() {
         return x_;
       }
       /**
-       * <code>optional sint32 x = 19;</code>
+       * <code>optional sint32 x = 15;</code>
        */
       public Builder setX(int value) {
-        bitField0_ |= 0x00020000;
+        bitField0_ |= 0x00004000;
         x_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint32 x = 19;</code>
+       * <code>optional sint32 x = 15;</code>
        */
       public Builder clearX() {
-        bitField0_ = (bitField0_ & ~0x00020000);
+        bitField0_ = (bitField0_ & ~0x00004000);
         x_ = 0;
         onChanged();
         return this;
@@ -1768,31 +1534,31 @@ public final class BallModel {
 
       private int y_ ;
       /**
-       * <code>optional sint32 y = 20;</code>
+       * <code>optional sint32 y = 16;</code>
        */
       public boolean hasY() {
-        return ((bitField0_ & 0x00040000) == 0x00040000);
+        return ((bitField0_ & 0x00008000) == 0x00008000);
       }
       /**
-       * <code>optional sint32 y = 20;</code>
+       * <code>optional sint32 y = 16;</code>
        */
       public int getY() {
         return y_;
       }
       /**
-       * <code>optional sint32 y = 20;</code>
+       * <code>optional sint32 y = 16;</code>
        */
       public Builder setY(int value) {
-        bitField0_ |= 0x00040000;
+        bitField0_ |= 0x00008000;
         y_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint32 y = 20;</code>
+       * <code>optional sint32 y = 16;</code>
        */
       public Builder clearY() {
-        bitField0_ = (bitField0_ & ~0x00040000);
+        bitField0_ = (bitField0_ & ~0x00008000);
         y_ = 0;
         onChanged();
         return this;
@@ -5298,33 +5064,32 @@ public final class BallModel {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\017BallModel.proto\022\010messages\"\353\002\n\nVisionBa" +
-      "ll\022\020\n\010distance\030\001 \001(\002\022\017\n\007bearing\030\002 \001(\002\022\023\n" +
-      "\013angle_x_deg\030\003 \001(\002\022\023\n\013angle_y_deg\030\004 \001(\002\022" +
-      "\025\n\relevation_deg\030\005 \001(\002\022\023\n\013distance_sd\030\006 " +
-      "\001(\002\022\022\n\nbearing_sd\030\007 \001(\002\022\020\n\010inTopCam\030\010 \001(" +
-      "\010\022\016\n\006radius\030\t \001(\002\022\022\n\nconfidence\030\n \001(\021\022\014\n" +
-      "\004heat\030\013 \001(\002\022\n\n\002on\030\014 \001(\010\022\021\n\tframes_on\030\r \001" +
-      "(\021\022\022\n\nframes_off\030\016 \001(\021\022\026\n\016rel_x_variance" +
-      "\030\020 \001(\002\022\026\n\016rel_y_variance\030\021 \001(\002\022\023\n\013bearin" +
-      "g_deg\030\022 \001(\002\022\t\n\001x\030\023 \001(\021\022\t\n\001y\030\024 \001(\021\"\322\004\n\014Fi",
-      "lteredBall\022!\n\003vis\030\001 \001(\0132\024.messages.Visio" +
-      "nBall\022\020\n\010distance\030\002 \001(\002\022\017\n\007bearing\030\003 \001(\002" +
-      "\022\r\n\005rel_x\030\004 \001(\002\022\r\n\005rel_y\030\005 \001(\002\022\r\n\005vel_x\030" +
-      "\006 \001(\002\022\r\n\005vel_y\030\007 \001(\002\022\021\n\tvar_rel_x\030\010 \001(\002\022" +
-      "\021\n\tvar_rel_y\030\t \001(\002\022\021\n\tvar_vel_x\030\n \001(\002\022\021\n" +
-      "\tvar_vel_y\030\013 \001(\002\022\025\n\ris_stationary\030\014 \001(\010\022" +
-      "\023\n\013bearing_deg\030\r \001(\002\022\t\n\001x\030\016 \001(\002\022\t\n\001y\030\017 \001" +
-      "(\002\022\022\n\nrel_x_dest\030\020 \001(\002\022\022\n\nrel_y_dest\030\021 \001" +
-      "(\002\022\r\n\005speed\030\022 \001(\002\022\034\n\024rel_y_intersect_des" +
-      "t\030\023 \001(\002\022\022\n\nstat_rel_x\030\024 \001(\002\022\022\n\nstat_rel_",
-      "y\030\025 \001(\002\022\025\n\rstat_distance\030\026 \001(\002\022\024\n\014stat_b" +
-      "earing\030\027 \001(\002\022\021\n\tmov_rel_x\030\030 \001(\002\022\021\n\tmov_r" +
-      "el_y\030\031 \001(\002\022\024\n\014mov_distance\030\032 \001(\002\022\023\n\013mov_" +
-      "bearing\030\033 \001(\002\022\021\n\tmov_vel_x\030\034 \001(\002\022\021\n\tmov_" +
-      "vel_y\030\035 \001(\002\022\021\n\tmov_speed\030\036 \001(\002\"H\n\nShared" +
-      "Ball\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\022\017\n\007ball_on\030\003 " +
-      "\001(\010\022\023\n\013reliability\030\004 \001(\005"
+      "\n\017BallModel.proto\022\010messages\"\261\002\n\nVisionBa" +
+      "ll\022\020\n\010distance\030\001 \001(\001\022\017\n\007bearing\030\002 \001(\001\022\023\n" +
+      "\013angle_x_deg\030\003 \001(\001\022\023\n\013angle_y_deg\030\004 \001(\001\022" +
+      "\022\n\nbearing_sd\030\005 \001(\001\022\020\n\010inTopCam\030\006 \001(\010\022\016\n" +
+      "\006radius\030\007 \001(\001\022\022\n\nconfidence\030\010 \001(\001\022\n\n\002on\030" +
+      "\t \001(\010\022\021\n\tframes_on\030\n \001(\021\022\022\n\nframes_off\030\013" +
+      " \001(\021\022\026\n\016rel_x_variance\030\014 \001(\001\022\026\n\016rel_y_va" +
+      "riance\030\r \001(\001\022\023\n\013bearing_deg\030\016 \001(\001\022\t\n\001x\030\017" +
+      " \001(\021\022\t\n\001y\030\020 \001(\021\"\322\004\n\014FilteredBall\022!\n\003vis\030" +
+      "\001 \001(\0132\024.messages.VisionBall\022\020\n\010distance\030",
+      "\002 \001(\002\022\017\n\007bearing\030\003 \001(\002\022\r\n\005rel_x\030\004 \001(\002\022\r\n" +
+      "\005rel_y\030\005 \001(\002\022\r\n\005vel_x\030\006 \001(\002\022\r\n\005vel_y\030\007 \001" +
+      "(\002\022\021\n\tvar_rel_x\030\010 \001(\002\022\021\n\tvar_rel_y\030\t \001(\002" +
+      "\022\021\n\tvar_vel_x\030\n \001(\002\022\021\n\tvar_vel_y\030\013 \001(\002\022\025" +
+      "\n\ris_stationary\030\014 \001(\010\022\023\n\013bearing_deg\030\r \001" +
+      "(\002\022\t\n\001x\030\016 \001(\002\022\t\n\001y\030\017 \001(\002\022\022\n\nrel_x_dest\030\020" +
+      " \001(\002\022\022\n\nrel_y_dest\030\021 \001(\002\022\r\n\005speed\030\022 \001(\002\022" +
+      "\034\n\024rel_y_intersect_dest\030\023 \001(\002\022\022\n\nstat_re" +
+      "l_x\030\024 \001(\002\022\022\n\nstat_rel_y\030\025 \001(\002\022\025\n\rstat_di" +
+      "stance\030\026 \001(\002\022\024\n\014stat_bearing\030\027 \001(\002\022\021\n\tmo",
+      "v_rel_x\030\030 \001(\002\022\021\n\tmov_rel_y\030\031 \001(\002\022\024\n\014mov_" +
+      "distance\030\032 \001(\002\022\023\n\013mov_bearing\030\033 \001(\002\022\021\n\tm" +
+      "ov_vel_x\030\034 \001(\002\022\021\n\tmov_vel_y\030\035 \001(\002\022\021\n\tmov" +
+      "_speed\030\036 \001(\002\"H\n\nSharedBall\022\t\n\001x\030\001 \001(\002\022\t\n" +
+      "\001y\030\002 \001(\002\022\017\n\007ball_on\030\003 \001(\010\022\023\n\013reliability" +
+      "\030\004 \001(\005"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -5343,7 +5108,7 @@ public final class BallModel {
     internal_static_messages_VisionBall_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_VisionBall_descriptor,
-        new java.lang.String[] { "Distance", "Bearing", "AngleXDeg", "AngleYDeg", "ElevationDeg", "DistanceSd", "BearingSd", "InTopCam", "Radius", "Confidence", "Heat", "On", "FramesOn", "FramesOff", "RelXVariance", "RelYVariance", "BearingDeg", "X", "Y", });
+        new java.lang.String[] { "Distance", "Bearing", "AngleXDeg", "AngleYDeg", "BearingSd", "InTopCam", "Radius", "Confidence", "On", "FramesOn", "FramesOff", "RelXVariance", "RelYVariance", "BearingDeg", "X", "Y", });
     internal_static_messages_FilteredBall_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_messages_FilteredBall_fieldAccessorTable = new

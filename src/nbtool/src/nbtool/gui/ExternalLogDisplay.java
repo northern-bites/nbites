@@ -64,6 +64,7 @@ public class ExternalLogDisplay extends JFrame {
 		this.setSize(DEFAULT_SIZE);
 		this.setMinimumSize(DEFAULT_SIZE);
 		ldp = new LogDisplayPanel(false);
+		LogDisplayPanel.extern[index] = ldp;
 
 		ExtBounds eb = Prefs.BOUNDS_MAP.get(preferenceKey(index));
 		if (eb != null) {
