@@ -493,9 +493,18 @@ bool CornerDetector::ccw(double ax, double ay,
 
 bool CenterCircleDetector::detectCenterCircle(HoughLineList& hlList)
 {
+  minPoints = 4;
+
   cleanHoughLineList(hlList);
   std::vector<CirclePoint> points = getPointsVector(hlList);
-  return (points.size() > minPoints && findCircleCenter(ccx, ccy, points));
+  // if (points.size() < minPoints)
+  //   return false;
+  std::vector<Cluster> clusters = getClusters(points);
+  for (Cluster c : clusters) {
+    std::cout << "Point at x: " << c.begin()->first << " y: " << c.begin()->second << std::endl;
+  }
+  joinClosestClusters(clusters);
+  return true;
 
 }
 
@@ -515,22 +524,45 @@ std::vector<CirclePoint> CenterCircleDetector::getPointsVector(HoughLineList& hl
   {
     double x1, y1, x2, y2;
     hl->field().endPoints(x1, y1, x2, y2);
-    vec.push_back(CirclePoint((x1 + x2) / 2,(y1 + y2) / 2, hl->field().t()));
+    double slope = atan2(x1 - x2, y1 - y2);
+    vec.push_back(CirclePoint((x1 + x2) / 2,(y1 + y2) / 2, slope));
   }
   return vec;
 }
 
-bool CenterCircleDetector::findCircleCenter(double& x, double& y, const std::vector<CirclePoint>& points)
+std::vector<Cluster> CenterCircleDetector::getClusters(const std::vector<CirclePoint>& points)
 {
-  double cr = CENTER_CIRCLE_RADIUS;
-  for (CirclePoint cp1 : points) {
-    
-  }
+  std:vector<Cluster> vec;
+  int ccr = CENTER_CIRCLE_RADIUS;
 
-  
-  return false;
+  // For each circle point, find the two points 80 cm away 
+  for (CirclePoint cp : points) {
+    vec.push_back(Cluster(cp.x() + ccr*cos(cp.t()), cp.y() + ccr*sin(cp.t())));
+    vec.push_back(Cluster(cp.x() - ccr*cos(cp.t()), cp.y() - ccr*sin(cp.t())));
+  }
+  return vec;
 }
 
+/*
+ * Join the two closest clusters. Return false if the two closest are too far away
+ */
+bool CenterCircleDetector::joinClosestClusters(std::vector<Cluster>& clusters) {
+  Cluster* first = NULL;
+  Cluster* second = NULL;
+  double closest = 1000;
+
+  for (Cluster c1 : clusters) {
+    for (Cluster c2 : clusters) {
+      if (&c1 != &c2 && c1.distanceTo(c2) < closest) {
+        first = &c1;
+        second = &c2;
+        closest = c1.distanceTo(c2);
+      }
+    }
+  }
+
+  (*first).merge(*second);
+}
 
 bool CenterCircleDetector::checkLength(const HoughLine& hl)
 {
@@ -547,19 +579,11 @@ bool CenterCircleDetector::checkDistance(const HoughLine& hl)
   return ((hl.field().r()*hl.field().r() + midPointEP*midPointEP) < distanceThresholdSqared);
 }
 
-bool CenterCircleDetector::fitCircle(CirclePoint&, const CirclePoint&, const CirclePoint&)
-{
-  return true;
-}
-
-int CenterCircleDetector::pointsInCircleRange(const CirclePoint&, const std::vector<CirclePoint>&)
-{
-  return 1;
-}
 
 // ***********
 // CirclePoint
 // ***********
+
 CirclePoint::CirclePoint()
 {
   data[0] = 0;
@@ -579,7 +603,26 @@ double CirclePoint::distanceSquared(CirclePoint cp)
   return ((x()-cp.x()) * (x()-cp.x()) + (y()-cp.y()) * (y()-cp.y()));
 }
 
+// *******
+// Cluster
+// *******
 
+Cluster::Cluster(double x, double y)
+{
+  push_back(Point(x, y));
+  centroid = Point(x, y);
+}
+
+double Cluster::distanceTo(const Cluster& c)
+{
+  return sqrt((centroid.first + c.centroid.first) * (centroid.first + c.centroid.first) +
+             (centroid.second + c.centroid.second) * (centroid.second + c.centroid.second));
+}
+
+void Cluster::merge(Cluster& c)
+{
+  
+}
 
 
 // **************************

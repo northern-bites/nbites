@@ -245,18 +245,20 @@ public:
 
 // Dectects center circle
 class CirclePoint;
+class Cluster;
 
 class CenterCircleDetector {
   double ccx;
   double ccy;
 
+  int minPoints;
+
   void cleanHoughLineList(HoughLineList& hlList);
-  bool checkLength(const HoughLine& hl);
-  bool checkDistance(const HoughLine& hl);
   std::vector<CirclePoint> getPointsVector(HoughLineList& hlList);
-  bool fitCircle(CirclePoint&, const CirclePoint&, const CirclePoint&);
-  int pointsInCircleRange(const CirclePoint&, const std::vector<CirclePoint>&);
-  bool findCircle(double& x, double& y, const std::vector<CirclePoint>&);
+  std::vector<Cluster> getClusters(const std::vector<CirclePoint>&);
+  bool joinClosestClusters(std::vector<Cluster>&);
+  bool checkLength(const HoughLine&);
+  bool checkDistance(const HoughLine&);
 
 public:
   bool detectCenterCircle(HoughLineList& hlList);
@@ -274,6 +276,17 @@ public:
   double t() { return data[2]; }
   double distanceSquared(CirclePoint cp);
 };
+
+class Cluster : public std::list<Point> {
+  Point centroid;
+  double cohesion;
+
+public:
+  void merge(Cluster& c);
+  Cluster(double x, double y);
+  double distanceTo(const Cluster&);
+};
+
 
 enum class LineID {
   // Most general
