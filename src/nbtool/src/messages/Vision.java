@@ -2155,4 +2155,3 @@ public final class Vision {
 
   // @@protoc_insertion_point(outer_class_scope)
 }
-
