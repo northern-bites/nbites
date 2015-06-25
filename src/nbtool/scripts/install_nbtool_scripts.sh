@@ -13,10 +13,10 @@ echo "using NBITES_DIR=" $NBITES_DIR
 cd $NBITES_DIR/src/nbtool/scripts
 echo "in" $(pwd)
 
-cp -v ./nbcross $INSTALL_TO_PATH
-cp -v ./nbtool $INSTALL_TO_PATH
-cp -v ./nbtool-build $INSTALL_TO_PATH
-cp -v ./nbtool-version $INSTALL_TO_PATH
+sudo cp -v ./nbcross $INSTALL_TO_PATH
+sudo cp -v ./nbtool $INSTALL_TO_PATH
+sudo cp -v ./nbtool-build $INSTALL_TO_PATH
+sudo cp -v ./nbtool-version $INSTALL_TO_PATH
 
 echo
 echo "done"
