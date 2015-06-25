@@ -18,15 +18,18 @@ public class UtilityManager {
 	/* adding a field here that
 	 * ** extends UtilityParent 
 	 * ** is 'public static final'
-	 * is enough to get it displayed.  This is also the preferred way of added utilities to the display.*/
+	 * is enough to get it displayed.  This is also the preferred way of added utilities to the display. */
 	public static final LogToViewUtility LogToViewUtility = new LogToViewUtility();
 	public static final YUVColorUtility YUVColorUtility = new YUVColorUtility();
 	public static final ThreadStateUtility ThreadStateUtility = new ThreadStateUtility();
-
+	public static final ReplayUtility ReplayUtility = new ReplayUtility();
+		
 	public static final SyntheticImageUtility SyntheticImageUtility = new SyntheticImageUtility();
-	public static final CameraCalibrateUtility CameraCalibrateUtility = new CameraCalibrateUtility();
+	//public static final CameraCalibrateUtility CameraCalibrateUtility = new CameraCalibrateUtility();
+	public static final CameraCalibrateUtility2 CameraCalibrateUtility2 = new CameraCalibrateUtility2();
 
 	public static final UtilityParent[] utilities = findUtilityFields();
+
 	private static UtilityParent[] findUtilityFields() {
 		Field[] fields = UtilityManager.class.getDeclaredFields();
 		Vector<UtilityParent> found = new Vector<>();

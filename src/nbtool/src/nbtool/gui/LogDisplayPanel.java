@@ -41,6 +41,9 @@ public class LogDisplayPanel extends JPanel implements
 	
 	public static final String MAIN_LOG_DISPLAY_KEY = "MAIN_LOG_DISPLAY";
 	
+	public static LogDisplayPanel main = null;
+	public static LogDisplayPanel[] extern = new LogDisplayPanel[9];
+	
 	private boolean 	mainDisplay;
 	private Log			current;
 	private JTabbedPane tabs;
