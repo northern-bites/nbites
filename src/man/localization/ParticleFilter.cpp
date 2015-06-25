@@ -199,8 +199,9 @@ void ParticleFilter::updateLinesForDebug(messages::FieldLines& visionInput)
             field.set_id(0);
         } else {
             // Otherwise line system handles classification and scoring
-            field.set_id(static_cast<int>(lineSystem.matchObservation(field, poseEstimate)));
+            LocLineID id = lineSystem.matchObservation(field, poseEstimate);
             field.set_prob(lineSystem.scoreObservation(field, poseEstimate));
+            field.set_id(static_cast<int>(id));
         }
 
         // Project lines onto the field

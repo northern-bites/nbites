@@ -93,7 +93,7 @@ LocLineID LineSystem::matchObservation(const messages::FieldLine& observation,
         double curScore = lines[possibleID].error(globalLine, debug);
 
         if (debug)
-            std::cout << "Match, " << static_cast<int>(possibleID) << "," << curScore << std::endl; 
+            std::cout << "Match, " << static_cast<int>(possibleID) << "," << curScore << "/" << bestScore << std::endl; 
 
         if (curScore > bestScore) {
             id = possibleID;
@@ -118,10 +118,11 @@ double LineSystem::scoreObservation(const messages::FieldLine& observation,
 
     double errorBetweenObservationAndModel;
     LocLineID id = matchObservation(observation, loc);
+
     if (id == LocLineID::NotMatched)
         errorBetweenObservationAndModel = 0;
     else
-        errorBetweenObservationAndModel = lines[id].error(globalLine);
+        errorBetweenObservationAndModel = lines[id].error(globalLine, debug);
 
     if (debug) { 
         std::cout << "In scoreObservation," << std::endl;

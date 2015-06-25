@@ -407,7 +407,6 @@ double GeoLine::error(const GeoLine& other, bool test) const
   double tDiff = fabs(sMod(normalizedT - other.t(), M_PI));
 
   boost::math::normal_distribution<> rGaussian(0, 100);
-  // boost::math::normal_distribution<> rGaussian(0, fabs(other.r()) / 4);
   boost::math::normal_distribution<> tGaussian(0, 10*TO_RAD);
 
   // TODO properly sample
