@@ -77,10 +77,13 @@ def prepareForKick(player):
     elif player.finishedPlay:
         player.inKickOffPlay = False
 
-    player.motionKick = True
     return player.goNow('followPotentialField')
 
-@superState('positionAndKickBall')
+@superState('gameControllerResponder')
+@ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
+@ifSwitchNow(transitions.shouldSupport, 'positionAsSupporter')
+@ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
+@ifSwitchNow(transitions.shouldFindBall, 'findBall')
 def followPotentialField(player):
     """
     This state is based on electric field potential vector paths. The ball is treated as an
@@ -121,16 +124,18 @@ def followPotentialField(player):
         yComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorY/attractorDist**3 - repulsorY/repulsorDist**3
 
         if xComp == 0 and yComp == 0:
-            player.setWalk(0, 0, 0)
+            player.setWalk(0, 0, copysign(Navigator.FAST_SPEED, ball.bearing_deg))
 
         else:
             normalizer = Navigator.FAST_SPEED/(xComp**2 + yComp**2)**.5
 
-            if ball.bearing_deg > constants.SHOULD_SPIN_TO_BALL_BEARING/2:
-                hComp = copysign(Navigator.GRADUAL_SPEED, ball.bearing_deg)
+            if fabs(ball.bearing_deg) < constants.FACING_BALL_ACCEPTABLE_BEARING:
+                hComp = 0
+            elif attractorDist < constants.CLOSE_TO_ATTRACTOR_DIST:
+                hComp = copysign(Navigator.FAST_SPEED, ball.bearing_deg)
             else:
-                hComp = copysign(Navigator.GRADUAL_SPEED, ball.bearing_deg)
-
+                hComp = copysign(Navigator.MEDIUM_SPEED, ball.bearing_deg)
+            
             player.setWalk(normalizer*xComp, normalizer*yComp, hComp)
 
     return player.stay()
