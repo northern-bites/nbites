@@ -104,32 +104,32 @@ bool VisionSystem::update(ParticleSet& particles,
     // Particle injections 
     // (2) Reconstruct pose from ball in set
     // Find line close to ball, should be the midline since in set
-    // TODO find longest line
+    // TODO midline check, closest dist to line below some threshold, length
     for (int i = 0; i < lines.line_size(); i++) {
         const messages::FieldLine& field = lines.line(i);
         const messages::HoughLine& inner = field.inner();
 
+        // Skip short lines, probably in center circle
+        if (!LineSystem::shouldUse(field))
+                continue;
+
         // Polar to cartesian
-        double ballRelXPreRotate = ball.distance() * cos(ball.bearing());
-        double ballRelYPreRotate = ball.distance() * sin(ball.bearing());
+        double ballRelX = ball.distance() * cos(ball.bearing());
+        double ballRelY = ball.distance() * sin(ball.bearing());
 
         std::cout << "TEST" << std::endl;
         std::cout << ball.distance() << std::endl;
         std::cout << ball.bearing() << std::endl;
 
-        std::cout << ballRelXPreRotate << std::endl;
-        std::cout << ballRelYPreRotate << std::endl;
-
-        // Rotate to vision relative robot coordinate system
-        double ballRelX, ballRelY;
-        vision::translateRotate(ballRelXPreRotate, ballRelYPreRotate, 0, 0, (M_PI / 2), ballRelX, ballRelY);
-
         std::cout << ballRelX << std::endl;
         std::cout << ballRelY << std::endl;
 
-        // Project ball onto line, find distance to line
+        // Rotate line to loc rel robot coordinate system 
         vision::GeoLine line;
         line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
+        line.translateRotate(0, 0, -(M_PI / 2));
+
+        // Project ball onto line, find distance to line
         double distToLine = line.qDist(ballRelX, ballRelY);
 
         // If close, found the midline, reconstruct from the midline and the ball
@@ -141,14 +141,18 @@ bool VisionSystem::update(ParticleSet& particles,
             // Rotate to absolute coordinate system
             double ballAbsX, ballAbsY;
             vision::translateRotate(ballRelX, ballRelY, 0, 0, fromLine.h(), ballAbsX, ballAbsY);
-            fromLineAndBall.set_y(CENTER_FIELD_Y - ballAbsX);
+            fromLineAndBall.set_y(CENTER_FIELD_Y - ballAbsY);
 
+            std::cout << "RESULTS" << std::endl;
             std::cout << ballAbsX << std::endl;
             std::cout << ballAbsY << std::endl;
 
             // Add injection and return
-            ReconstructedLocation reconstructed(fromLineAndBall.x(), fromLineAndBall.y(), fromLineAndBall.h());
-            injections.push_back(reconstructed);
+            // TODO remove hack once landmark system is in place
+            for (int i = 0; i < 300; i++) {
+                ReconstructedLocation reconstructed(fromLineAndBall.x(), fromLineAndBall.y(), fromLineAndBall.h());
+                injections.push_back(reconstructed);
+            }
             return true;
         }
     }
