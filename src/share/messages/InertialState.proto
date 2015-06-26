@@ -10,8 +10,10 @@ message InertialState
     // Raw gyrometer data.
     optional float gyr_x = 4;
     optional float gyr_y = 5;
+    optional float gyr_z = 6;
 
     // Filtered angle data.
-    optional float angle_x = 6;
-    optional float angle_y = 7;   
+    optional float angle_x = 7;
+    optional float angle_y = 8;   
+    optional float angle_z = 9;   
 }
