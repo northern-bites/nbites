@@ -14,10 +14,11 @@ import javax.swing.JFrame;
 import nbtool.data.Log;
 import nbtool.data.SExpr;
 import nbtool.io.FileIO;
-import nbtool.util.U;
+import nbtool.util.Logger;
+import nbtool.util.Utility;
 
 public class DefaultView extends ViewParent implements ActionListener {
-	
+		
 	public DefaultView() {
 		initComponents();
 		
@@ -114,22 +115,22 @@ public class DefaultView extends ViewParent implements ActionListener {
 	@Override
 	public void setLog(Log newlog) {
 		assert(newlog.bytes != null);
-		this.log = newlog;
+				
 		descArea.setText(log.tree().print());		
 		if (log.bytes.length < 1000)
-			dataArea.setText(U.bytesToHexString(log.bytes));
-		else dataArea.setText(U.bytesToHexString(U.subArray(log.bytes, 0, 1000)) + "...");
+			dataArea.setText(Utility.bytesToHexString(log.bytes));
+		else dataArea.setText(Utility.bytesToHexString(Utility.subArray(log.bytes, 0, 1000)) + "...");
 		
 		if (log.checksum() != null) {
 			int recv_checksum = log.checksum();
-			int checksum = U.checksum(log.bytes);
+			int checksum = Utility.checksum(log.bytes);
 			
 			if (recv_checksum != checksum) {
 				/*
 				JOptionPane.showMessageDialog(null, "log checksum did not match, expected "
 						+ recv_checksum + " but calculated " + checksum + "."); */
 				
-				U.wf("\n\nWARNING: log checksum DID NOT match!\n\texpected %d\n\tgot %d\n",
+				Logger.logf(Logger.WARN, "\n\nWARNING: log checksum DID NOT match!\n\texpected %d\n\tgot %d\n",
 						recv_checksum, checksum);
 			}
 		}
@@ -137,7 +138,7 @@ public class DefaultView extends ViewParent implements ActionListener {
 		id.setText("id: " + log.unique_id);
 		source.setText("src: " + log.source);
 		dataSize.setText("data b: " + log.bytes.length);
-		descSize.setText("desc c: " + log.description.length());
+		descSize.setText("desc c: " + log.description().length());
 	}
 
 	// Variables declaration - do not modify                     
@@ -168,31 +169,31 @@ public class DefaultView extends ViewParent implements ActionListener {
 			try {
 				SExpr s = SExpr.deserializeFrom(newdesc);
 				if (s == null || s.count() < 1) {
-					U.w("Cannot use new description: " + newdesc);
-					descArea.setText(log.description);
+					Logger.log(Logger.INFO, "Cannot use new description: " + newdesc);
+					descArea.setText(log.description());
 				} else {
-					log.description = newdesc;
 					log.setTree(s);
 				}
 				
 			} catch(Exception ex) {
-				U.w("Cannot use new description: " + newdesc);
-				descArea.setText(log.description);
+				Logger.log(Logger.INFO, "Cannot use new description: " + newdesc);
+				descArea.setText(log.description());
 			}
 		} else if (e.getSource() == saveButton) {
-			int rVal = FileIO.chooser.showSaveDialog(this);
+			int rVal = FileIO.fileChooser.showSaveDialog(this);
 			
 			if (rVal == JFileChooser.APPROVE_OPTION) {
-				File f = FileIO.chooser.getSelectedFile();
+				File f = FileIO.fileChooser.getSelectedFile();
 				if (f.isDirectory()) {
-					U.w("Cannot overwrite directory with log.");
+					Logger.log(Logger.INFO, "Cannot overwrite directory with log.");
+					return;
 				}
 				
 				String aPath = f.getAbsolutePath();
 				if (!aPath.endsWith(".nblog"))
 					aPath = aPath + ".nblog";
 				
-				U.w("Writing log to: " + aPath);
+				Logger.log(Logger.INFO, "Writing log to: " + aPath);
 				
 				try {
 					FileIO.writeLogToPath(log, aPath);
@@ -206,9 +207,9 @@ public class DefaultView extends ViewParent implements ActionListener {
 	
 	@Override
 	public void alsoSelected(ArrayList<Log> also) {
-		U.w("DefaultView sees also selected:");
+		Logger.log(Logger.INFO, "DefaultView sees also selected:");
 		for (Log a: also) {
-			U.wf("\t%s\n", a.toString());
+			Logger.logf(Logger.INFO, "\t%s", a.toString());
 		}
 	}
 }

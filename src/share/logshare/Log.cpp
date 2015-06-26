@@ -2,12 +2,133 @@
 
 namespace nblog {
     
+    nbhost_e HOST_TYPE = UNKNOWN;
+    
     int32_t getChecksum(const std::string& data) {
         int32_t sum = 0;
         for (int i = 0; i < data.size(); ++i)
             sum += (uint8_t) data[i];
         
         return sum;
+    }
+    
+    Log Log::simple(const std::string type, const std::string data) {
+        return Log::ofTypeWithFields(type, data, {});
+    }
+    
+    Log Log::ofType(const std::string type, const std::string data) {
+        return Log::ofTypeWithFields(type, data, {});
+    }
+    
+    Log Log::ofTypeWithFields(const std::string type, const std::string data, std::initializer_list<SExpr> fields) {
+        std::vector<SExpr> scv = {
+            SExpr(CONTENT_TYPE_S, type)
+        };
+        
+        for (auto it = fields.begin();
+             it != fields.end();
+             ++it) {
+            scv.push_back(*it);
+        }
+        
+        SExpr sc(scv);
+        
+        std::vector<SExpr> contv = {
+            SExpr(LOG_CONTENTS_S),
+            sc
+        };
+        SExpr contents(contv);
+        
+        std::vector<SExpr> tv = {
+            SExpr(LOG_FIRST_ATOM_S),
+            contents
+        };
+        
+        SExpr top(tv);
+        
+        Log ret;
+        ret.setTree(top);
+        ret.setData(data);
+        
+        return ret;
+    }
+    
+    Log Log::withContentItems(std::initializer_list<SExpr> items, const std::string data) {
+        std::vector<SExpr> contv = {
+            SExpr(LOG_CONTENTS_S),
+        };
+        
+        for (auto it = items.begin();
+             it != items.end();
+             ++it) {
+            contv.push_back(*it);
+        }
+
+        
+        SExpr contents(contv);
+        
+        std::vector<SExpr> tv = {
+            SExpr(LOG_FIRST_ATOM_S),
+            contents
+        };
+        
+        SExpr top(tv);
+        
+        Log ret;
+        ret.setTree(top);
+        ret.setData(data);
+        
+        return ret;
+    }
+    
+    Log::Log() :
+    _written(false),
+    _refs(0)
+    {
+        
+    }
+    
+    void Log::generic(const std::string& log_class,
+                  const std::string& where_made,
+                  time_t when_made,
+                  int version,
+                  const std::vector<SExpr>& contents_list)
+    {
+        int32_t cs = getChecksum(_data);
+        
+        tm * ptm = localtime(&when_made);
+        char buffer[100];
+        strftime(buffer, 100, "%d.%m.%Y %H:%M:%S", ptm);
+        std::string time(buffer);
+        
+        std::vector<SExpr> made_list = {
+            SExpr(LOG_CREATED_S),
+            SExpr(where_made),
+            SExpr(time)
+        };
+        
+        std::vector<SExpr> clist = {
+            SExpr(LOG_CONTENTS_S)
+        };
+        clist.insert(clist.end(), contents_list.begin(), contents_list.end());
+        
+        std::vector<SExpr> keys = {
+            SExpr(log_class),           //atom
+            SExpr(made_list),           //list
+            SExpr(LOG_VERSION_S, version),  //key-value list
+            SExpr(LOG_CHECKSUM_S, cs),      //key-value list
+            SExpr(clist)                //list, first is "contents" atom
+        };
+        
+        if (HOST_TYPE == V5ROBOT) {
+            keys.push_back(SExpr(LOG_HOST_TYPE_S, "V5ROBOT"));
+        } else if (HOST_TYPE == V4ROBOT) {
+            keys.push_back(SExpr(LOG_HOST_TYPE_S, "V4ROBOT"));
+        } else {
+            keys.push_back(SExpr(LOG_HOST_TYPE_S, "unknown"));
+        }
+        
+        _tree = SExpr(keys);
     }
     
     Log::Log(const std::string& log_class,
@@ -17,36 +138,23 @@ namespace nblog {
              const std::vector<SExpr>& contents_list,
              const std::string& contents_data) :
     _written(false),
-    _refs(0)
+    _refs(0),
+    _data(contents_data)
     {
-        _data = contents_data;
-        int32_t cs = getChecksum(contents_data);
-        
-        tm * ptm = localtime(&when_made);
-        char buffer[100];
-        strftime(buffer, 100, "%d.%m.%Y %H:%M:%S", ptm);
-        std::string time(buffer);
-        
-        std::vector<SExpr> made_list = {
-            SExpr("created"),
-            SExpr(where_made),
-            SExpr(time)
-        };
-        
-        std::vector<SExpr> clist = {
-            SExpr("contents")
-        };
-        clist.insert(clist.end(), contents_list.begin(), contents_list.end());
-        
-        std::vector<SExpr> keys = {
-            SExpr(log_class),           //atom
-            SExpr(made_list),           //list
-            SExpr("version", version),  //key-value list
-            SExpr("checksum", cs),      //key-value list
-            SExpr(clist)                //list, first is "contents" atom
-        };
-        
-        _tree = SExpr(keys);
+        generic(log_class, where_made, when_made, version, contents_list);
+    }
+    
+    Log::Log(const std::string& log_class,
+             const std::string& where_made,
+             time_t when_made,
+             int version,
+             const std::vector<SExpr>& contents_list,
+             const void * buffer, size_t nbytes) :
+        _written(false),
+        _refs(0),
+        _data( (const char *) buffer, nbytes)
+    {
+        generic(log_class, where_made, when_made, version, contents_list);
     }
     
     Log::Log(std::string& desc) : _written(false), _refs(0) {

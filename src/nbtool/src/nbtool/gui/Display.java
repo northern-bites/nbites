@@ -9,79 +9,79 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.UnsupportedLookAndFeelException;
 
-import nbtool.data.SessionHandler;
 import nbtool.data.SessionMaster;
-import nbtool.data.Stats;
+import nbtool.data.ToolStats;
+import nbtool.gui.logviews.misc.ViewParent;
+import nbtool.gui.utilitypanes.LogToViewUtility;
+import nbtool.gui.utilitypanes.UtilityManager;
 import nbtool.io.CrossIO;
-import nbtool.util.N;
+import nbtool.util.Center;
+import nbtool.util.Center.NBToolShutdownListener;
+import nbtool.util.Logger;
 import nbtool.util.NBConstants;
-import nbtool.util.P;
-import nbtool.util.U;
-import nbtool.util.N.EVENT;
-
-public final class Display extends JFrame implements KeyEventPostProcessor {
+import nbtool.util.Prefs;
+import nbtool.util.Prefs.ExtBounds;
+import nbtool.util.Utility;
+import static nbtool.util.Logger.*;
+public final class Display extends JFrame {
 	private static final long serialVersionUID = 1L;
-	public static void main(String[] args) {
-		
-		if (!Display.class.desiredAssertionStatus()) {
-			System.out.println("nbtool should always be run with assertions ON (vm argument -ea)");
-			System.out.println("if you want to disable this, you'll have to edit the source code.");
-			return;
-		}
-		
-		//Run static setup.
-		U.w("static singleton Stats..." + Stats.INST.toString());
-		U.w("static singleton SessionMaster..." + SessionMaster.INST.toString());
-		U.w("static singleton CppIO server ..." + 
-				CrossIO.current.toString() + " live:" + CrossIO.thread.isAlive()); 
-		
-		SwingUtilities.invokeLater(new Runnable(){
-
-			@Override
-			public void run() {
-				U.w("Creating nbtool.gui.Display instance...");
-				new Display();
-			}
-			
-		});
-	}
 	
 	public Display() {
-		super("nbtool v" + NBConstants.VERSION);
+		super("nbtool v" + NBConstants.VERSION + "." + NBConstants.MINOR_VERSION);
 		setMinimumSize(MIN_SIZE);
-		setBounds(P.getBounds());
+		setBounds(Prefs.bounds);
 		
-		Runnable r = new Runnable() {
-			public void run() {
-				saveBounds();
+		//Register hook to save preferences.
+		final JFrame _display = this;
+		
+		Center.listen(new NBToolShutdownListener(){
+			@Override
+			public void nbtoolShutdownCallback() {
+				Prefs.bounds = _display.getBounds();
+				Prefs.leftSplitLoc = split1.getDividerLocation();
+				Prefs.rightSplitLoc = split2.getDividerLocation();
+				
+				Prefs.BOUNDS_MAP.put(LogDisplayPanel.MAIN_LOG_DISPLAY_KEY,
+						new ExtBounds(null, ldp.currentProfile()));
 			}
-		};
-		Runtime.getRuntime().addShutdownHook(new Thread(r));
+		});
 				
 		left = new JTabbedPane();
 		right = new JTabbedPane();
 		
-		ldp = new LogDisplayPanel();
+		ldp = new LogDisplayPanel(true);
+		LogDisplayPanel.main = ldp;
 		
 		cntrlp = new ControlPanel();
+		camstrmp = new StreamingPanel();
 		lc = new LogChooser();
 		left.addTab("control", cntrlp);
 		left.addTab("logs", lc);
+		left.addTab("camera",camstrmp);
 		
 		statusp = new StatusPanel();
 		right.addTab("status", statusp);
 		
-		cp = new NBCrossPane();
+		cp = new CrossPanel(lc);
 		right.addTab("nbcross", cp);
 		
-		up = new PrefsnUtils();
-		right.addTab("utility", up);
+		up = new OptionsAndUtilities();
+		right.addTab("misc", up);
+		
+		right.setMinimumSize(new Dimension(0,0));
+		left.setMinimumSize(new Dimension(0,0));
 		
 		split1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, left, ldp);
 		split2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, split1, right);
@@ -91,69 +91,36 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		split2.setDividerSize(5);
 		
 		add(split2);
-		split1.setResizeWeight(.2);
+		split1.setResizeWeight(.08);
 		split2.setResizeWeight(.85);
+		split1.setDividerLocation(Prefs.leftSplitLoc);
+		split2.setDividerLocation(Prefs.rightSplitLoc);
 		
-		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventPostProcessor(this);
+		KeyBind.left = left;
+		KeyBind.right = right;
+		KeyBind.controlPanel = cntrlp;
+		KeyBind.mainPanel = ldp;
 		
-		N.notifyEDT(EVENT.STATUS, this, NBConstants.STATUS.IDLE, NBConstants.MODE.NONE);
-		
+		KeyBind.setupKeyBinds(Prefs.MISC_MAP);
+				
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
-	}
-	
-	public void saveBounds() {
-		P.putBounds(this.getBounds());
-	}
-	
-	public boolean postProcessKeyEvent(KeyEvent e) {
-
-		if (!e.isConsumed() && (e.getID() == KeyEvent.KEY_TYPED)) {
-			
-			Character c = e.getKeyChar();
-			if (Character.isDigit(c)) {
-				ldp.trySetFocus(Character.getNumericValue(c) - 1);
-			}
-	
-			if (c == '\n' && left.getSelectedIndex() == 0) {
-				cntrlp.goAction();
-			}
-			
-			if (Character.isLetter(c)) {
-				switch (c) {
-				case 'q':
-					left.setSelectedIndex(0);
-					break;
-				case 'w':
-					left.setSelectedIndex(1);
-					break;
-				case 'e':
-					right.setSelectedIndex(0);
-					break;
-				case 'r':
-					right.setSelectedIndex(1);
-					break;
-				case 't':
-					right.setSelectedIndex(2);
-					break;
-				}
-			}
-		}
 		
-		return false;
+		System.out.println("---------------------------------- <end initialization>\n\n");
 	}
 
 	private JTabbedPane left;
 	private JTabbedPane right;
 	
 	private ControlPanel cntrlp;
+	private StreamingPanel camstrmp;
 	private StatusPanel statusp;
 	private LogChooser lc;
 		
 	private LogDisplayPanel ldp;
 	
-	private NBCrossPane cp;	
-	private PrefsnUtils up;
+	private CrossPanel cp;	
+	private OptionsAndUtilities up;
 		
 	private JSplitPane split1;
 	private JSplitPane split2;

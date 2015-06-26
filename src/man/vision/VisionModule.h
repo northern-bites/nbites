@@ -1,72 +1,93 @@
 #pragma once
 
-//#include <vector>
-//#include <list>
-
 #include "RoboGrams.h"
-
+#include "SExpr.h"
+#include "Camera.h"
 #include "Images.h"
 #include "PMotion.pb.h"
-
+#include "Vision.pb.h"
+#include "FrontEnd.h"
+#include "Edge.h"
+#include "Hough.h"
+#include "Kinematics.h"
+#include "Homography.h"
+#include "BallDetector.h"
+#include "BallModel.pb.h"
 #include "InertialState.pb.h"
 
-#include "VisionField.pb.h"
-#include "BallModel.pb.h"
-#include "VisionRobot.pb.h"
-
-#include "Vision.h"
-#include "ConcreteCorner.h"
-#include <boost/shared_ptr.hpp>
-
-
 namespace man {
-namespace vision{
+namespace vision {
 
 class VisionModule : public portals::Module {
-
 public:
-    VisionModule();
+    VisionModule(int wd, int ht, std::string robotName = "");
     virtual ~VisionModule();
 
-    portals::InPortal<messages::ThresholdImage> topThrImage;
-    portals::InPortal<messages::PackedImage16> topYImage;
-    portals::InPortal<messages::PackedImage16> topUImage;
-    portals::InPortal<messages::PackedImage16> topVImage;
+    portals::InPortal<messages::YUVImage> topIn;
+    portals::InPortal<messages::YUVImage> bottomIn;
+    portals::InPortal<messages::JointAngles> jointsIn;
+    portals::InPortal<messages::InertialState> inertsIn;
 
-    portals::InPortal<messages::ThresholdImage> botThrImage;
-    portals::InPortal<messages::PackedImage16> botYImage;
-    portals::InPortal<messages::PackedImage16> botUImage;
-    portals::InPortal<messages::PackedImage16> botVImage;
+    portals::OutPortal<messages::FieldLines> linesOut;
+    portals::OutPortal<messages::Corners> cornersOut;
+    portals::OutPortal<messages::VisionBall> ballOut;
 
-    portals::InPortal<messages::JointAngles> joint_angles;
-    portals::InPortal<messages::InertialState> inertial_state;
+    ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
+    EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
+    HoughLineList* getLines(bool topCamera = true) const { return houghLines[!topCamera]; }
+    BallDetector* getBallDetector(bool topCamera = true) const { return ballDetector[!topCamera]; }
+    HoughLineList* getHoughLines(bool topCamera = true) const { return houghLines[!topCamera]; }
+    Kinematics* getKinematics(bool topCamera = true) const {return kinematics[!topCamera]; }
+    FieldHomography* getFieldHomography(bool topCamera = true) const {return homography[!topCamera]; }
+    FieldLineList* getFieldLines(bool topCamera = true) const { return fieldLines[!topCamera]; }
+    GoalboxDetector* getBox(bool topCamera = true) const { return boxDetector[!topCamera]; }
+    CornerDetector* getCorners(bool topCamera = true) const { return cornerDetector[!topCamera]; }
 
-    portals::OutPortal<messages::VisionField> vision_field;
-    portals::OutPortal<messages::VisionBall> vision_ball;
-    portals::OutPortal<messages::VisionRobot> vision_robot;
-    portals::OutPortal<messages::VisionObstacle> vision_obstacle;
+    // For use by Image nbcross func
+    void setColorParams(Colors* colors, bool topCamera) { colorParams[!topCamera] = colors; }
+    const std::string getStringFromTxtFile(std::string path);
+    Colors* getColorsFromLisp(nblog::SExpr* colors, int camera);
 
-    portals::OutPortal<messages::ThresholdImage> topOutPic;
-    portals::OutPortal<messages::ThresholdImage> botOutPic;
-
-    /* In order to keep logs synced up, joint angs and inert states are passed 
-     * thru the vision system. Joint angles are taken at around 100 hz, but 
-     * images are taken at 30 hz, but by passing joint angles thru vision we 
-     * get joint angles at 30 hz. */
-#ifdef USE_LOGGING
-    portals::OutPortal<messages::JointAngles> joint_angles_out;
-    portals::OutPortal<messages::InertialState> inertial_state_out;
-#endif
+    void setCalibrationParams(std::string robotName);
+    void setCalibrationParams(int camera, std::string robotName);
+    void setCalibrationParams(CalibrationParams* params, bool topCamera) { calibrationParams[!topCamera] = params; }
 
 protected:
     virtual void run_();
-    boost::shared_ptr<Vision> vision;
-    void updateVisionField();
+
+private:
+#ifdef USE_LOGGING
+    void logImage(int i);
+#endif
+    void sendLinesOut();
+    void sendCornersOut();
     void updateVisionBall();
-    void updateVisionRobot();
-    void updateVisionObstacle();
+
+    Colors* colorParams[2];
+    ImageFrontEnd* frontEnd[2];
+    EdgeDetector* edgeDetector[2];
+    EdgeList* edges[2];
+    HoughLineList* houghLines[2];
+    HoughSpace* hough[2];
+    CalibrationParams* calibrationParams[2];
+    Kinematics* kinematics[2];
+    FieldHomography* homography[2];
+    FieldLineList* fieldLines[2];
+    GoalboxDetector* boxDetector[2];
+    CornerDetector* cornerDetector[2];
+    BallDetector* ballDetector[2];
+
+    // Lisp tree with color params saved
+    nblog::SExpr colors;
+
+    // Tracking ball stuff
+    bool ballOn;
+    int ballOnCount;
+    int ballOffCount;
+
+    nblog::SExpr* calibrationLisp;
+    size_t image_index;
 };
 
-void updateRobot(messages::Robot* bot_message, VisualRobot* visualRobot);
 }
 }

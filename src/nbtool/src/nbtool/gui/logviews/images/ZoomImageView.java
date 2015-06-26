@@ -22,16 +22,14 @@ import nbtool.images.ImageParent;
 import nbtool.images.UV88image;
 import nbtool.images.Y16image;
 import nbtool.images.YUYV8888image;
-import nbtool.util.U;
+import nbtool.util.Utility;
 
 
 public class ZoomImageView extends ViewParent {
 	private static final long serialVersionUID = 1L;
 
-	public void setLog(Log newlog) {
-		this.log = newlog;
-		
-		iv.useImage(U.biFromLog(newlog));
+	public void setLog(Log newlog) {		
+		iv.useImage(Utility.biFromLog(newlog));
 	}
 
 	protected void useSize(Dimension s) {
@@ -48,11 +46,10 @@ public class ZoomImageView extends ViewParent {
 		});
 		setLayout(null);
 		
-		iv = new BIWithZoom();
+		iv = new ZoomImageDisplay();
 		sp = new JScrollPane(iv);
 		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		
 		
 		this.add(sp);
 	}
@@ -60,5 +57,5 @@ public class ZoomImageView extends ViewParent {
 	
 	
 	private JScrollPane sp;
-	private BIWithZoom iv;
+	private ZoomImageDisplay iv;
 }

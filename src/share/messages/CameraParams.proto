@@ -1,0 +1,20 @@
+package messages;
+
+message CameraParams
+{
+	optional string whichCamera = 1; 
+	optional int32 H_FLIP = 2;
+	optional int32 V_FLIP = 3;
+	optional int32 auto_exposure = 4;
+	optional int32 brightness = 5;
+	optional int32 contrast = 6;
+	optional int32 saturation = 7;
+	optional int32 hue = 8;
+	optional int32 sharpness = 9;
+	optional int32 gamma = 10;
+	optional int32 autoWhiteBalance = 11;
+	optional int32 exposure = 12;
+	optional int32 gain = 13;
+	optional int32 whiteBalance = 14;
+	optional int32 fadeToBlack = 15;
+}

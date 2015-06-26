@@ -11,7 +11,6 @@ from . import PositionStates
 from . import PenaltyStates
 from . import FindBallStates
 from . import KickingStates
-from . import DribbleStates
 from . import PlayOffBallStates
 from . import KickOffStates
 
@@ -34,7 +33,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(PositionStates)
         self.addStates(PenaltyStates)
         self.addStates(ChaseBallStates)
-        self.addStates(DribbleStates)
         self.addStates(FindBallStates)
         self.addStates(KickingStates)
         self.addStates(KickOffStates)
@@ -64,10 +62,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.wasPenalized = False
         # Controls whether we check for a falling/fallen robot
         self.brain.fallController.enabled = True
-        # Controls whether we want to dribble it from the corner
-        self.corner_dribble = False
         # Controls whether we do a motion kick
         self.motionKick = False
+        # if we purposely kicked the ball out
+        self.kickedOut = False
         # Controls whether we will role switch
         self.roleSwitching = True
         # Controls whether we use claims

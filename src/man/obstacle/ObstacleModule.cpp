@@ -127,13 +127,13 @@ void ObstacleModule::run_()
     // Decide arms
     if (usingArms) { arms = processArms( armContactIn.message()); }
     else { arms = FieldObstacles::Obstacle::NONE; }
-    // if not combining arms and sonars
+    // if not combining arms and sonars, uncomment this:
     // updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, -1.f);
 
     // Decide sonars
     if (usingLeftSonar || usingRightSonar) { sonars = processSonar(sonarIn.message()); }
     else { sonars = FieldObstacles::Obstacle::NONE; }
-    // if not combining arms and sonars:
+    // if not combining arms and sonars, uncomment this:
     // updateObstacleArrays(FieldObstacles::Obstacle::SONARS, sonars, lastSonar);
 
 #ifdef USE_LAB_FIELD // Walls are too close to field for sonar use
@@ -273,7 +273,6 @@ ObstacleModule::processArms(const messages::ArmContactState& input)
 
     // Potential issue: if both arms are pushed in disagreeing directions,
     // we just decide no obstacle.
-
     return FieldObstacles::Obstacle::NONE;
 }
 

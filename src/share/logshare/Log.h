@@ -2,6 +2,7 @@
 #define nbites_Log
 
 #include <string>
+#include <initializer_list>
 #include "SExpr.h"
 
 /*
@@ -14,8 +15,25 @@
 
 namespace nblog {
     
+    enum nbhost_e {
+        V5ROBOT,
+        V4ROBOT,
+        UNKNOWN
+    };
+    
+    extern nbhost_e HOST_TYPE;
+    
     class Log {
     public:
+        
+        static Log simple(const std::string type, const std::string data);
+        static Log ofType(const std::string type, const std::string data);
+        static Log ofTypeWithFields(const std::string type, const std::string data, std::initializer_list<SExpr> fields);
+        
+        static Log withContentItems(std::initializer_list<SExpr> items, const std::string data);
+        
+        //default constructor
+        Log();
         
         //Generic log constructor with standard values.
         Log(const std::string& log_class,
@@ -25,6 +43,12 @@ namespace nblog {
             const std::vector<SExpr>& contents_list,
             const std::string& contents_data);
         
+        Log(const std::string& log_class,
+            const std::string& where_made,
+            time_t when_made,
+            int version,
+            const std::vector<SExpr>& contents_list,
+            const void * buffer, size_t nbytes);
         
         //Parses the SExpr expected to be in description.
         Log(std::string& description);
@@ -69,8 +93,14 @@ namespace nblog {
         std::string _data;
         
         //io stuff
-        volatile int _refs;
         volatile bool _written;
+        volatile int _refs;
+        
+        void generic(const std::string& log_class,
+                      const std::string& where_made,
+                      time_t when_made,
+                      int version,
+                      const std::vector<SExpr>& contents_list);
     };
 }
 

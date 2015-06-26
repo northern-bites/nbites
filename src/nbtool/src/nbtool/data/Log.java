@@ -1,54 +1,35 @@
 package nbtool.data;
 
-import java.io.Serializable;
-import java.util.Map;
-
-import javax.swing.tree.TreePath;
-
+import nbtool.util.Logger;
 import nbtool.util.NBConstants;
-import nbtool.util.U;
+import nbtool.util.Utility;
 
-/*TODO:  if description changes, attributes is out of date.
- * */
-public class Log implements Serializable {
-	private static final long serialVersionUID = 5000703421741282261L;
+public class Log {
 	
-	/*
-	 * Unique number for every log found during this execution.
-	 * */
-	private static Long class_index = new Long(0);
-	private static long getID() {
-		long ret;
-		synchronized(class_index) {
-			ret = class_index++;
-		}
-		
-		return ret;
-	}
-	public final long unique_id = getID();
+	//Top-level keys
+	public static final String LOG_FIRST_ATOM_S = "nblog";
+	public static final String LOG_CONTENTS_S = "contents";
+	public static final String LOG_CREATED_S = "created";
+	public static final String LOG_VERSION_S = "version";
+	public static final String LOG_CHECKSUM_S = "checksum";
+	public static final String LOG_HOST_TYPE_S = "host_type";
+	public static final String LOG_FROM_ADDR_S = "from_address";
 	
-	public String name; //File name, might be null
+	//content item keys
+	public static final String CONTENT_TYPE_S = "type";
+	public static final String CONTENT_FROM_S = "from";
+	public static final String CONTENT_WHEN_S = "when";
+	public static final String CONTENT_IINDEX_S = "iindex";
+	public static final String CONTENT_NBYTES_S = "nbytes";
+	public static final String CONTENT_IMAGE_WIDTH_S = "width";
+	public static final String CONTENT_IMAGE_HEIGHT_S = "height";
+	public static final String CONTENT_IMAGE_ENCODING_S = "encoding";
 	
-	//Core opaque log fields:
-	public String description;
-	public byte[] bytes;
+	//command key
+	public static final String COMMAND_FIRST_ATOM_S = "command";
 	
-	public SOURCE source;
-	
-	//Set by GUI when selected.
-	public transient TreePath lastSeen = null;
-
-	private SExpr tree = null;
-	public SExpr tree() {
-		if (tree == null)
-			tree = SExpr.deserializeFrom(description);
-		return tree;
-	}
-	
-	public void setTree(SExpr nt) {
-		this.tree = nt;
-		this.description = nt.serialize();
-	}
+	//nbcross wildcard
+	public static final String NBCROSS_WILDCARD_TYPE = "__WILDCARD__";
 	
 	public Log() {}
 	
@@ -56,9 +37,8 @@ public class Log implements Serializable {
 		this();
 		
 		this.name = null;
-		this.tree = null;
-		this.description = d;
-		this.bytes = b;		
+		this.tree = SExpr.deserializeFrom(d);
+		this.bytes = b;
 	}
 	
 	public Log(SExpr t, byte[] d) {
@@ -66,62 +46,159 @@ public class Log implements Serializable {
 		
 		this.name = null;
 		this.tree = t;
-		this.description = t.serialize();
 		this.bytes = d;
 	}
 	
+	public static Log logWithType(String type) {
+		return Log.logWithType(type, null);
+	}
+	
+	public static Log logWithType(String type, byte[] b) {
+		SExpr typeField = SExpr.newKeyValue(CONTENT_TYPE_S, type);
+		SExpr fieldList = SExpr.newList(typeField);
+		
+		SExpr topLevel = SExpr.newList(SExpr.newAtom(LOG_FIRST_ATOM_S), SExpr.newKeyValue(LOG_CONTENTS_S, fieldList));
+		return new Log(topLevel, b);
+	}
+	
+	
+	
+	public static Log logWithTypePlus(String type, byte[] b, SExpr... fields) {
+		SExpr typeField = SExpr.newKeyValue(CONTENT_TYPE_S, type);
+		SExpr fieldList = SExpr.newList(typeField);
+		fieldList.append(fields);
+		
+		SExpr topLevel = SExpr.newList(SExpr.newAtom(LOG_FIRST_ATOM_S), SExpr.newKeyValue(LOG_CONTENTS_S, fieldList));
+		return new Log(topLevel, b);
+	}
+	
+	public static Log simpleCommandLog(String cmndName, byte[] bytes) {
+		SExpr commandTree = SExpr.newList(SExpr.newAtom(COMMAND_FIRST_ATOM_S), SExpr.newAtom(cmndName));
+		Log cmnd = new Log(commandTree, bytes);
+		return cmnd;
+	}
+	
+	/*
+	 * Unique number for every log found in this process.
+	 * */
+	private static final Object indexLock = new Object();
+	private static long class_index = 0;
+	private static long getID() {
+		long ret;
+		synchronized(indexLock) {
+			ret = class_index++;
+		}
+		
+		return ret;
+	}
+	public final long unique_id = getID();
+	
+	//Core opaque log fields:
+	public byte[] bytes;
+	private SExpr tree;
+	
+	//used in some rare legacy situations.  ALMOST ALWAYS NULL.
+	public String _olddesc_;
+	
+	//user supplied name, often null.  Used as file name.
+	public String name; 
+	
+	public static enum SOURCE {
+		DERIVED,	//created programmatically from other logs
+		FILE,		//loaded from filesystem
+		NETWORK,	//streamed from network during this process's lifetime
+		GENERATED	//totally synthetic
+	}
+	
+	public SOURCE source;
+	public Session parent = null;	//enclosing Session instance.
+	
+	public byte[] data() {
+		return bytes;
+	}
+	
+	public SExpr tree() {
+		return tree;
+	}
+	
+	public String description() {
+		return tree.serialize();
+	}
+	
+	public String description(int nchars) {
+		String ser = tree.serialize();
+		if (ser.length() > nchars) {
+			return ser.substring(0, nchars - 3) + "...";
+		} else return ser;
+	}
+	
+	public void setTree(SExpr nt) {
+		if (nt.isAtom()) {
+			Logger.warnf("log tree being set atom: %s", nt.serialize());
+		}
+		
+		this.tree = nt;
+	}
+	
+	/* this is typically used as a programmatically generated file name
+	 * so the most important quality of the created String is to be a valid and
+	 * unique file name on all systems.
+	 * */
 	public void setNameFromDesc() {
-		this.name = String.format("made-%s_%s_type-%s_from-%s_v-%d", madeWhere(), madeWhen(), pType(), pFrom(), version());
+		this.name = String.format("type=%s_from=%s_v=%d_i%d_c%d", primaryType(), primaryFrom(), version(),
+				this.unique_id, this.checksum());
 		this.name = this.name
-				.substring(Math.max(0, this.name.length() - 240)).replace('/', '-').replace(' ', '_') + ".nblog";
+				.substring(Math.max(0, this.name.length() - 240))
+				.replace('/', '_').replace(' ', '_').replace(':', '-').replace('.', '-') + ".nblog";
 	}
 	
 	public String toString() {
 		if (name != null) return name;
-		else return description;
+		else return description(100);
 	}
 	
-	public static enum SOURCE {
-		DERIVED, FILE, NETWORK
-	}
 	/* ALL ATTRIBUTES MUST BE OBJECTS SO THAT NULL CAN BE RETURNED IF THEY'RE NOT FOUND */
-	
 	/*
 	 * Attributes relating to the log whole
 	 */
 	
 	public String madeWhere() {
-		SExpr where = tree().find("created").get(1);
+		SExpr where = tree().find(LOG_CREATED_S).get(1);
 		if (where.exists() && where.isAtom())
 			return where.value();
 		else return null;
 	}
 	
 	public String madeWhen() {
-		SExpr when = tree().find("created").get(2);
+		SExpr when = tree().find(LOG_CREATED_S).get(2);
 		if (when.exists() && when.isAtom())
 			return when.value();
 		else return null;
 	}
 	
 	public Integer checksum() {
-		SExpr cs = tree().find("checksum").get(1);
+		SExpr cs = tree().find(LOG_CHECKSUM_S).get(1);
 		if (cs.exists() && cs.isAtom())
 			return cs.valueAsInt();
 		else return null;
 	}
+	//what is this attribute going to return?
+	//public String protoRobotLocation() {
+		//return getAttributes().get("proto-RobotLocation");
+	//}
 	
 	public Integer version() {
-		SExpr v = tree().find("version").get(1);
+		SExpr v = tree().find(LOG_VERSION_S).get(1);
 		if (v.exists() && v.isAtom())
 			return v.valueAsInt();
 		else return null;
 	}
 	
-	public int contentCount() {
-		SExpr v = tree().find("contents");
+	//Does not include the "contents" key.
+	public Integer contentCount() {
+		SExpr v = tree().find(LOG_CONTENTS_S);
 		if (v.exists())
-			return v.count();
+			return (v.count() - 1);
 		return -1;
 	}
 	
@@ -130,33 +207,33 @@ public class Log implements Serializable {
 	 * (the "primary" content)
 	 * */
 	
-	public int pBytes() {
-		SExpr c = tree().find("contents").get(1).find("bytes").get(1);
+	public Integer primaryBytes() {
+		SExpr c = tree().find(LOG_CONTENTS_S).get(1).find("bytes").get(1);
 		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
 	}
 	
-	public String pType() {
-		SExpr c = tree().find("contents").get(1).find("type").get(1);
+	public String primaryType() {
+		SExpr c = tree().find(LOG_CONTENTS_S).get(1).find(CONTENT_TYPE_S).get(1);
 		return c.exists() && c.isAtom() ? c.value() : null;
 	}
 	
-	public String pFrom() {
-		SExpr c = tree().find("contents").get(1).find("from").get(1);
+	public String primaryFrom() {
+		SExpr c = tree().find(LOG_CONTENTS_S).get(1).find(CONTENT_FROM_S).get(1);
 		return c.exists() && c.isAtom() ? c.value() : null;
 	}
 	
-	public int pI_Index() {
-		SExpr c = tree().find("contents").get(1).find("i_index").get(1);
+	public Integer primaryImgIndex() {
+		SExpr c = tree().find(LOG_CONTENTS_S).get(1).find(CONTENT_IINDEX_S).get(1);
 		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
 	}
 	
-	public Long pTime() {
-		SExpr c = tree().find("contents").get(1).find("time").get(1);
+	public Long primaryTime() {
+		SExpr c = tree().find(LOG_CONTENTS_S).get(1).find("time").get(1);
 		return c.exists() && c.isAtom() ? c.valueAsLong() : null;
 	}
 	
-	public boolean pIsProtobuf() {
-		String t = pType();
+	public Boolean primaryIsProtobuf() {
+		String t = primaryType();
 		if (t == null)
 			return false;
 		return t.startsWith(NBConstants.PROTOBUF_TYPE_PREFIX);
@@ -166,18 +243,85 @@ public class Log implements Serializable {
 	 * Attributes relating to possible image content.
 	 */
 	
-	public String pEncoding() {
-		SExpr c = tree().find("contents").get(1).find("encoding").get(1);
+	public String primaryEncoding() {
+		SExpr c = tree().find(LOG_CONTENTS_S).get(1).find(CONTENT_IMAGE_ENCODING_S).get(1);
 		return c.exists() && c.isAtom() ? c.value() : null;
 	}
 	
-	public int pWidth() {
-		SExpr c = tree().find("contents").get(1).find("width").get(1);
+	public Integer primaryWidth() {
+		SExpr c = tree().find(LOG_CONTENTS_S).get(1).find(CONTENT_IMAGE_WIDTH_S).get(1);
 		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
 	}
 	
-	public int pHeight() {
-		SExpr c = tree().find("contents").get(1).find("height").get(1);
+	public Integer primaryHeight() {
+		SExpr c = tree().find(LOG_CONTENTS_S).get(1).find(CONTENT_IMAGE_HEIGHT_S).get(1);
 		return c.exists() && c.isAtom() ? c.valueAsInt() : null;
+	}
+	
+	/*
+	 * Helpers for non-primary content items.
+	 * */
+	
+	public Integer contentNumBytes(int index) {
+		SExpr cont = tree().find(LOG_CONTENTS_S);
+		if (!cont.exists() || index >= (cont.count() - 1) )
+			return null;
+		
+		SExpr item = cont.get(index + 1);
+		if (item.isAtom())
+			return null;
+		
+
+		SExpr bytes = item.find(CONTENT_NBYTES_S).get(1);
+		return bytes.exists() && bytes.isAtom() ? bytes.valueAsInt() : null;
+	}
+	
+	public Integer contentOffset(int index) {
+		SExpr cont = tree().find(LOG_CONTENTS_S);
+		if (!cont.exists() || index >= (cont.count() - 1) )
+			return null;
+		
+		int offset = 0;
+		
+		for (int i = 0; i < index; ++i) {
+			SExpr bytes = cont.get(i + 1).find(CONTENT_NBYTES_S).get(1);
+			if (!bytes.exists() || !bytes.isAtom())
+				return null;
+			offset += bytes.valueAsInt();
+		}
+		
+		return offset;
+	}
+	
+	public byte[] bytesForContentItem(int index) {
+		Integer offset = contentOffset(index);
+		Integer total = contentNumBytes(index);
+
+		if (offset == null || total == null)
+			return null;
+		
+		return Utility.subArray(bytes, offset, total);
+	}
+	
+	//TESTING
+	public static void main(String[] args) {
+		SExpr clist = SExpr.newList(
+				SExpr.newAtom("contents"),
+				SExpr.newList(SExpr.newKeyValue("bytes", "10")),
+				SExpr.newList(SExpr.newKeyValue("bytes", "50")),
+				SExpr.newList(SExpr.newKeyValue("bytes", "100"))
+				);
+		
+		SExpr top = SExpr.newList(clist);
+		Log log = new Log(top, null);
+		
+		System.out.println("desc  = " + log.description());
+		System.out.println("count = " + log.contentCount());
+		System.out.println("b0    = " + log.contentNumBytes(0));
+		System.out.println("b2    = " + log.contentNumBytes(2));
+		System.out.println("b3    = " + log.contentNumBytes(3));
+		System.out.println("");
+		System.out.println("o0    = " + log.contentOffset(0));
+		System.out.println("o2    = " + log.contentOffset(2));
 	}
 }
