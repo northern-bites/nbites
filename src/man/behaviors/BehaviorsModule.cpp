@@ -23,7 +23,7 @@ extern "C" void initButtonState_proto();
 extern "C" void initFallStatus_proto();
 extern "C" void initStiffnessControl_proto();
 extern "C" void initVision_proto();
-// extern "C" void initObstacle_proto();
+extern "C" void initObstacle_proto();
 extern "C" void initinterface();
 
 namespace man {
@@ -97,7 +97,7 @@ void BehaviorsModule::initializePython()
         initFallStatus_proto();
         initStiffnessControl_proto();
         initVision_proto();
-        // initObstacle_proto();
+        initObstacle_proto();
         // Init the interface as well
         initinterface();
     } catch (error_already_set) {
@@ -253,8 +253,8 @@ void BehaviorsModule::prepareMessages()
     linesIn.latch();
     pyInterface.setVisionLines_ptr(&linesIn.message());
 
-    // obstacleIn.latch();
-    // pyInterface.setObstacle_ptr(&obstacleIn.message());
+    obstacleIn.latch();
+    pyInterface.setObstacle_ptr(&obstacleIn.message());
 
     // visionObstacleIn.latch();
     // pyInterface.setVisionObstacle_ptr(&visionObstacleIn.message());

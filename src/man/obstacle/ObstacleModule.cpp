@@ -100,7 +100,7 @@ usingVision(false)
 
 void ObstacleModule::run_()
 {
-    visionIn.latch();
+    // visionIn.latch();
     armContactIn.latch();
     sonarIn.latch();
 
@@ -301,7 +301,7 @@ ObstacleModule::processSonar(const messages::SonarState& input)
     // Use the current average for our decision
     if (usingRightSonar) { right = average(rightSonars); }
     if (usingLeftSonar) { left = average(leftSonars); }
-    // std::cout<<"RIGHT = "<<right<<" , LEFT = "<<left<<std::endl;
+    std::cout<<"RIGHT = "<<right<<" , LEFT = "<<left<<std::endl;
 
     // Both sonars picking up an obstacle? It's probably in front
     if (right < SONAR_FRONT_THRESH_UPPER && left < SONAR_FRONT_THRESH_UPPER &&

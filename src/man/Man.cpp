@@ -104,7 +104,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         cognitionThread.addModule(vision);
         cognitionThread.addModule(localization);
         cognitionThread.addModule(ballTrack);
-        // cognitionThread.addModule(obstacle);
+        cognitionThread.addModule(obstacle);
         cognitionThread.addModule(gamestate);
         cognitionThread.addModule(behaviors);
         cognitionThread.addModule(leds);
@@ -140,9 +140,9 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         sharedBall.locIn.wireTo(&localization.output);
         sharedBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
          
-        // obstacle.armContactIn.wireTo(&arms.contactOut, true);
+        obstacle.armContactIn.wireTo(&arms.contactOut, true);
         // obstacle.visionIn.wireTo(&vision.vision_obstacle, true);
-        // obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
+        obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
          
         gamestate.commInput.wireTo(&comm._gameStateOutput, true);
         gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
@@ -162,7 +162,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
         behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
         behaviors.linesIn.wireTo(&vision.linesOut, true);
-        // behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
+        behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
         behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
         behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);
         for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)

@@ -146,7 +146,7 @@ class Brain(object):
         
         # Update objects
         self.updateVisionObjects()
-        # self.updateObstacles()
+        self.updateObstacles()
         self.updateMotion()
         self.updateLoc()
         self.getCommUpdate()
