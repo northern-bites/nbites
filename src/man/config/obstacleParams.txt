@@ -25,8 +25,8 @@
     (right_sonar 1)
   )
   (beyonce
-    (left_sonar 1)
-    (right_sonar 1)
+    (left_sonar 0)
+    (right_sonar 0)
   )
   (ringo
     (left_sonar 1)
