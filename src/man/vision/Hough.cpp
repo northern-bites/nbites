@@ -490,7 +490,10 @@ bool CornerDetector::ccw(double ax, double ay,
 // *  Center Circle  *
 // *                 *
 // *******************
-
+CenterCircleDetector::CenterCircleDetector() 
+{
+  maxClusterCloseness = 1000;
+}
 bool CenterCircleDetector::detectCenterCircle(HoughLineList& hlList)
 {
   minPoints = 4;
@@ -547,21 +550,35 @@ std::vector<Cluster> CenterCircleDetector::getClusters(const std::vector<CircleP
  * Join the two closest clusters. Return false if the two closest are too far away
  */
 bool CenterCircleDetector::joinClosestClusters(std::vector<Cluster>& clusters) {
-  Cluster* first = NULL;
-  Cluster* second = NULL;
-  double closest = 1000;
+  std::cout << "Running jCC\n";
+  int first, second;
+  double closest = 10000;
 
-  for (Cluster c1 : clusters) {
-    for (Cluster c2 : clusters) {
-      if (&c1 != &c2 && c1.distanceTo(c2) < closest) {
-        first = &c1;
-        second = &c2;
-        closest = c1.distanceTo(c2);
+  for (int i = 0; i < clusters.size() - 1; i++) {
+    for (int j = i; j < clusters.size(); j++) {
+      printf("Comparing (%f,%f) to (%f,%f): ", clusters[i].centroid.first, clusters[i].centroid.second,
+        clusters[j].centroid.first, clusters[j].centroid.second);
+      if (i != j && clusters[i].distanceTo(clusters[j]) < closest) {
+        
+        first = i;
+        second = j;
+        closest = clusters[i].distanceTo(clusters[j]);
+        printf("Closest: %f\n", closest);
+      } else {
+        printf("Not closest\n");
       }
     }
   }
 
-  (*first).merge(*second);
+  std:: cout << "Found clusters " << closest << " cm appart. Current size: " << clusters.size() <<std::endl;
+  if (closest < maxClusterCloseness) {
+    clusters[first].merge(clusters[second]);
+    clusters.erase(clusters.begin() + second);
+    std::cout << "New size: " << clusters.size() << std::endl;
+    return true;
+  } else {
+    return false;
+  }
 }
 
 bool CenterCircleDetector::checkLength(const HoughLine& hl)
@@ -621,7 +638,19 @@ double Cluster::distanceTo(const Cluster& c)
 
 void Cluster::merge(Cluster& c)
 {
-  
+   std::cout << "Merging (" << c.centroid.first << ", " << c.centroid.second << 
+        ") with (" << centroid.first << ", " << centroid.second << "). ";
+  insert(end(), c.begin(), c.end());
+  double totalX, totalY;
+  for (Point p : *this) {
+    totalX += p.first;
+    totalY += p.second;
+  }
+  centroid.first = totalX / size();
+  centroid.second = totalY / size();
+
+  std::cout << "New centroid: (" << centroid.first << ", " << centroid.second << "). Size :" <<
+      size() << std::endl << std::endl;
 }
 
 
