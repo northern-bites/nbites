@@ -8,5 +8,6 @@
 #include "../vision/Hough.h"
 
 void c_init_noggin_constants();
+int get_strategy();
 
 #endif //PyConstants_h_DEFINED

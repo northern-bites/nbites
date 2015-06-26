@@ -5,7 +5,14 @@
 
 #include <boost/python.hpp>
 
+#include <iostream>
+#include <fstream>
+#include <stdio.h>
+
 #include "DebugConfig.h"
+#include "../../share/logshare/SExpr.h"
+
+using nblog::SExpr;
 
 using namespace boost::python;
 using namespace man::behaviors;
@@ -287,6 +294,51 @@ BOOST_PYTHON_MODULE(noggin_constants)
         .value("BLUE_2", BLUE_2)
         .value("BLUE_3", BLUE_3)
         ;
+
+    //strategy
+    scope().attr("STRATEGY") = get_strategy();
+}
+
+int get_strategy() {
+    std::string filepath = "/home/nao/nbites/Config/behaviorParams.txt";
+    if(FILE *file = fopen(filepath.c_str(),"r")) {
+        fclose(file);
+        std::ifstream inputFile(filepath);
+        std::string readInFile((std::istreambuf_iterator<char>(inputFile)),
+                                std::istreambuf_iterator<char>());
+        int i=0;
+        SExpr params = *SExpr::read(readInFile,i);
+        std::string strat = params.find("strategy")->get(1)->value();
+        int retVal;
+        char * temp;
+        long int st = std::strtol(strat.c_str(),&temp,0);
+        std::cout<<"[DEBUG] Parsed Value: "<<st<<std::endl;
+        if(*temp != '\0') { //check if string completely converted to int
+            std::cout<<"[WARN] Invalid Params. Passed in String. Need Int. Defaulting to 1"<<std::endl;
+            retVal = 1;
+            return retVal;
+        }
+        switch(st) {
+            case 1:
+                retVal = 1;
+                break;
+            case 2:
+                retVal = 2;
+                break;
+            case 3:
+                retVal = 3;
+                break;
+            default:
+                retVal = 1;
+                std::cout<<"[WARN] Invalid Strategy. Defaulting to 1"<<std::endl;
+                break;
+        }
+        std::cout<<"[INFO] RETURN STRATEGY: "<<retVal<<std::endl;
+        return retVal;
+    } else {
+        std::cout<<"[ERR] BehaviorParams File Does Not Exist"<<std::endl;
+        return 1;
+    }
 }
 
 void c_init_noggin_constants() {
