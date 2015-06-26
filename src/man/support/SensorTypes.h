@@ -146,8 +146,8 @@ namespace man
         //END_FSRS_RIGHT,
 
         /** Inertial Measurement Units (IMUs) or
-            Inertial Sensors (2 axis gyrometers,
-            1 3 axis accelerometer)              **/
+            Inertial Sensors (3 axis gyrometers and 3 axis accelerometer)
+         **/
         // Raw accelerometer data
         AccX,
         AccY,
@@ -155,9 +155,11 @@ namespace man
         // Raw gyrometer data
         GyrX,
         GyrY,
+        GyrZ,
         // Filtered angle data
         AngleX,
         AngleY,
+        AngleZ,
 
         //END_INTERTIALS,
 
@@ -328,8 +330,10 @@ namespace man
         "AccZ",
         "GyrX",
         "GyrY",
+        "GyrZ",
         "AngleX",
         "AngleY",
+        "AngleZ",
         //"!!END!!",
         //OTHERS
         "BatteryCharge",

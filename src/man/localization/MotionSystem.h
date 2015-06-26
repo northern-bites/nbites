@@ -29,20 +29,14 @@ public:
                 const messages::RobotLocation& deltaMotionInfo,
                 float error);
 
+private:
     void randomlyShiftParticle(Particle* particle, bool nearMid);
-
     void noiseShiftWithOdo(Particle* particle, float dX, float dY, float dH, float error);
 
-    void setFallen(bool fallen);
-
-    void resetNoise(float xyNoise_, float hNoise_);
-
     boost::mt19937 rng;
-private:
+
     float xAndYNoise;
     float hNoise;
-
-    bool robotFallen;
 
     messages::RobotLocation curOdometry;
     messages::RobotLocation lastOdometry;
