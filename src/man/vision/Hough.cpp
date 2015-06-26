@@ -493,15 +493,14 @@ bool CornerDetector::ccw(double ax, double ay,
 CenterCircleDetector::CenterCircleDetector() 
 {
   maxClusterCloseness = 1000;
+  minPoints = 1;
 }
 bool CenterCircleDetector::detectCenterCircle(HoughLineList& hlList)
 {
-  minPoints = 4;
-
   cleanHoughLineList(hlList);
   std::vector<CirclePoint> points = getPointsVector(hlList);
-  // if (points.size() < minPoints)
-  //   return false;
+  if (points.size() < minPoints)
+    return false;
   std::vector<Cluster> clusters = getClusters(points);
   for (Cluster c : clusters) {
     std::cout << "Point at x: " << c.begin()->first << " y: " << c.begin()->second << std::endl;
