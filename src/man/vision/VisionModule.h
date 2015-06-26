@@ -29,6 +29,7 @@ public:
     portals::InPortal<messages::InertialState> inertsIn;
 
     portals::OutPortal<messages::FieldLines> linesOut;
+    portals::OutPortal<messages::Corners> cornersOut;
     portals::OutPortal<messages::VisionBall> ballOut;
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
@@ -59,6 +60,7 @@ private:
     void logImage(int i);
 #endif
     void sendLinesOut();
+    void sendCornersOut();
     void updateVisionBall();
 
     Colors* colorParams[2];

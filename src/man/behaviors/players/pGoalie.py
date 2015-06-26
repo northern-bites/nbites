@@ -41,19 +41,16 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.roleSwitching = False
         self.penalized = False
         self.commMode = -1
+        self.justKicked = False
 
         ### ALL TRANSITIONS ARE DEFINED HERE ############
         ### Their conditions are in GoalieTransitions ###
         VisualGoalieStates.walkToGoal.transitions = {
-            Transition.CountTransition(GoalieTransitions.atGoalArea,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : VisualGoalieStates.spinAtGoal,
 
             Transition.CountTransition(GoalieTransitions.reachedMyDestination,
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.INSTANT)
-            : VisualGoalieStates.spinAtGoal
+            : GoalieStates.lineCheckTurn
 
             }
 
@@ -187,6 +184,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             }
 
         GoalieStates.moveBackwards.transitions = {
+            Transition.CountTransition(GoalieTransitions.shouldStopGoingBack,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.watchWithLineChecks,
+
             Transition.CountTransition(GoalieTransitions.doneWalking,
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
@@ -357,7 +359,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
             Transition.CountTransition(GoalieTransitions.shouldBackUp,
                                        Transition.MOST_OF_THE_TIME,
-                                       30)
+                                       25)
             : GoalieStates.moveBackwards
         }
 

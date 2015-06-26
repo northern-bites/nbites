@@ -8,6 +8,8 @@
 #include "Hough.h"
 #include "NBMath.h"
 
+#include <boost/math/distributions/normal.hpp>
+
 using namespace std;
 
 namespace man {
@@ -397,19 +399,29 @@ double GeoLine::separation(const GeoLine& other) const
   return pDist(x0, y0) + other.pDist(x0, y0);
 }
 
-double GeoLine::error(const GeoLine& other) const
+// TODO params
+double GeoLine::error(const GeoLine& other, bool test) const
 {
+  double normalizedT = (r() > 0 ? t() : t() - M_PI);
   double rDiff = fabs(fabs(r()) - fabs(other.r()));
-  double tDiff = diffRadians(uMod(t(), M_PI), uMod(other.t(), M_PI));
+  double tDiff = fabs(sMod(normalizedT - other.t(), M_PI));
 
-  // TODO load params from LineSystem
-  FuzzyThr rThr(0, 150);
-  FuzzyThr tThr(0, M_PI / 4);
+  boost::math::normal_distribution<> rGaussian(0, 100);
+  boost::math::normal_distribution<> tGaussian(0, 10*TO_RAD);
 
-  Fool rError(rThr, rDiff);
-  Fool tError(tThr, tDiff);
+  // TODO properly sample
+  double rProb = pdf(rGaussian, rDiff);
+  double tProb = pdf(tGaussian, tDiff);
 
-  return (rError | tError).f();
+  if (test) {
+    std::cout << "In error," << std::endl;
+    std::cout << "Model, " << r() << "," << t() << std::endl;
+    std::cout << "Observation, " << other.r() << "," << other.t() << std::endl;
+    std::cout << rDiff << "-" << tDiff << std::endl;
+    std::cout << rProb << "+" << tProb << std::endl;
+  }
+
+  return rProb * tProb;
 }
 
 void GeoLine::translateRotate(double xTrans, double yTrans, double rotation)

@@ -62,6 +62,7 @@ public final class Display extends JFrame {
 		right = new JTabbedPane();
 		
 		ldp = new LogDisplayPanel(true);
+		LogDisplayPanel.main = ldp;
 		
 		cntrlp = new ControlPanel();
 		camstrmp = new StreamingPanel();

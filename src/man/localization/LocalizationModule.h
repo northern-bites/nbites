@@ -41,7 +41,8 @@ public:
 
     /** In Portals **/
     portals::InPortal<messages::RobotLocation> motionInput;
-    portals::InPortal<messages::FieldLines>    visionInput;
+    portals::InPortal<messages::FieldLines>    linesInput;
+    portals::InPortal<messages::Corners>    cornersInput;
     portals::InPortal<messages::RobotLocation> resetInput[2];
     portals::InPortal<messages::GameState>     gameStateInput;
     // portals::InPortal<messages::FilteredBall>  ballInput;
@@ -70,6 +71,7 @@ protected:
     long long lastReset[2];
     messages::RobotLocation curOdometry;
     messages::FieldLines curLines;
+    messages::Corners curCorners;
 
 private:
     size_t log_index;
