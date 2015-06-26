@@ -2,6 +2,8 @@ import RoleConstants as role
 import ClaimTransitions as claimTransitions
 import SharedTransitions as shared
 import ChaseBallConstants as chaseConstants
+import noggin_constants as nogginC
+from objects import RobotLocation
 
 def ballInBox(player):
     """
@@ -84,3 +86,44 @@ def shouldBeSupporter(player):
         
     return (ballInBox(player) and
             claimTransitions.shouldCedeClaim(player))
+
+def findDefenderHome(left, ball, hh):
+    bY = ball.y
+    if left:
+        if bY >= role.evenDefenderForward.y:
+            return role.evenDefenderForward
+        elif bY <= role.oddDefenderBack.y:
+            return role.evenDefenderBack
+        else:
+            # ball is between the two defenders:
+            # linear relationship between ball and where defender stands on their line
+            
+            xDist = role.evenDefenderForward.x - role.evenDefenderBack.x
+            yDist = role.evenDefenderForward.y - role.evenDefenderBack.y
+
+            t = ((bY - role.oddDefenderForward.y) / 
+                (role.evenDefenderForward.y - role.oddDefenderForward.y))
+
+            hx = role.evenDefenderBack.x + t*xDist
+            hy = role.evenDefenderBack.y + t*yDist
+
+            return RobotLocation(hx, hy, hh)
+    else:
+        if bY <= role.oddDefenderForward.y:
+            return role.oddDefenderForward
+        elif bY >= role.evenDefenderBack.y:
+            return role.oddDefenderBack
+        else:
+            # ball is between the two defenders:
+            # linear relationship between ball and where defender stands on their line
+            
+            xDist = role.oddDefenderForward.x - role.oddDefenderBack.x
+            yDist = role.oddDefenderForward.y - role.oddDefenderBack.y
+
+            t = ((bY - role.evenDefenderForward.y) / 
+                (role.oddDefenderForward.y - role.evenDefenderForward.y))
+
+            hx = role.oddDefenderBack.x + t*xDist
+            hy = role.oddDefenderBack.y + t*yDist
+
+            return RobotLocation(hx, hy, hh)

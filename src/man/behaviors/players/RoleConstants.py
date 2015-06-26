@@ -90,6 +90,37 @@ boxBuffer = 100 # Used for the buffered box when approach ball is potentially
 
 ### HOME POSITIONS
 
+# TODO NEW POSITIONS:
+# Trapezoid of terror (defense)
+#       (150, 250), (460, 200), (150, 490), (460, 540)
+# Triangle of torture (chaser 2)
+#       (680, MID), (865,215), (865, 525)
+
+# Trapezoid of terror (defender positioning)
+oddDefenderForward = RobotLocation(NogginConstants.MIDFIELD_X - 60,
+                                    NogginConstants.BLUE_GOALBOX_BOTTOM_Y - 70,
+                                    0)
+evenDefenderForward = RobotLocation(NogginConstants.MIDFIELD_X - 60,
+                                    NogginConstants.BLUE_GOALBOX_TOP_Y + 70,
+                                    0)
+oddDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20, 
+                                NogginConstants.BLUE_GOALBOX_BOTTOM_Y - 10,
+                                0)
+evenDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20, 
+                                NogginConstants.BLUE_GOALBOX_TOP_Y + 10,
+                                0)
+
+#Triangle of torture (odd chaser positioning)
+oddChaserForward = RobotLocation(NogginConstants.MIDFIELD_X - NogginConstants.CENTER_CIRCLE_RADIUS - 70,
+                                NogginConstants.MIDFIELD_Y,
+                                0)
+oddChaserTop = RobotLocation(NogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                NogginConstants.BLUE_GOALBOX_BOTTOM_Y + 45,
+                                0)
+oddChaserBottom = RobotLocation(NogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                NogginConstants.BLUE_GOALBOX_TOP_Y - 45,
+                                0)
+
 oddDefenderHomePenn = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
                                     NogginConstants.MY_GOALBOX_BOTTOM_Y + 40,
                                     0)
