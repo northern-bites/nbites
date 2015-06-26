@@ -75,7 +75,7 @@ bool BallDetector::findBall(ImageLiteU8 orange, double cameraHeight)
 
 Ball::Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_, int imgWidth_) :
     blob(b),
-    radThresh(.1, .5),
+    radThresh(.3, .7),
     thresh(.5, .8),
     x_rel(x_),
     y_rel(y_),
@@ -91,7 +91,8 @@ Ball::Ball() :
     blob(0),
     thresh(0, 0),
     radThresh(0, 0),
-    _confidence(0)
+    _confidence(0),
+    dist(200000)
 { }
 
 void Ball::compute()
