@@ -52,19 +52,18 @@ void LocalizationModule::update()
     curOdometry.set_h(motionInput.message().h());
     curLines = linesInput.message();
     curCorners = cornersInput.message();
+    curBall = ballInput.message();
 
+    const messages::FilteredBall* ball = NULL;
 #ifndef OFFLINE
-    // bool inSet = (STATE_SET == gameStateInput.message().state());
-    // // Update the Particle Filter with the new observations/odometry
-
-    // if (inSet && (!gameStateInput.message().have_remote_gc() || 
-    //     gameStateInput.message().secs_remaining() != 600))
-    //     particleFilter->update(curOdometry, visionInput.message(), ballInput.message());
-    // else
+    bool inSet = (STATE_SET == gameStateInput.message().state());
+    if (inSet && (!gameStateInput.message().have_remote_gc() || 
+        gameStateInput.message().secs_remaining() != 600))
+        ball = &curBall;
 #endif
 
     // Update filter
-    particleFilter->update(curOdometry, curLines, curCorners);
+    particleFilter->update(curOdometry, curLines, curCorners, ball);
 
 //this is part of something old that never executes, check out
 //the ifdef below; same code but it is executed when we want to
@@ -129,7 +128,7 @@ void LocalizationModule::run_()
     cornersInput.latch();
 #ifndef OFFLINE
     gameStateInput.latch();
-    // ballInput.latch();
+    ballInput.latch();
     resetInput[0].latch();
     resetInput[1].latch();
 #endif

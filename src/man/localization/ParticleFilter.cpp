@@ -55,15 +55,17 @@ ParticleFilter::~ParticleFilter()
     delete visionSystem;
 }
 
-
-
 void ParticleFilter::update(const messages::RobotLocation& odometryInput,
                             messages::FieldLines&          linesInput,
-                            messages::Corners&             cornersInput)
+                            messages::Corners&             cornersInput,
+                            const messages::FilteredBall*  ballInput)
 {
     // Motion system and vision system update step
     motionSystem->update(particles, odometryInput, errorMagnitude);
-    updatedVision = visionSystem->update(particles, linesInput, cornersInput);
+    if (ballInput)
+        updatedVision = visionSystem->update(particles, linesInput, cornersInput, *ballInput);
+    else
+        updatedVision = visionSystem->update(particles, linesInput, cornersInput);
 
     // Resample if vision updated
     float avgErr = -1;

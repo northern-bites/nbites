@@ -1,6 +1,7 @@
 #include "VisionSystem.h"
 
 #include "../vision/Hough.h"
+#include "FieldConstants.h"
 
 #include <limits>
 
@@ -89,6 +90,68 @@ bool VisionSystem::update(ParticleSet& particles,
 
     // Weights were adjusted so return true
     return true;
+}
+
+bool VisionSystem::update(ParticleSet& particles,
+                          const messages::FieldLines& lines,
+                          const messages::Corners& corners,
+                          const messages::FilteredBall& ball)
+{
+    // Call overloaded update
+    bool ret = update(particles, lines, corners);
+    if (!ret) return false;
+
+    // Particle injections 
+    // (2) Reconstruct pose from ball in set
+    // Find line close to ball, should be the midline since in set
+    // TODO find longest line
+    for (int i = 0; i < lines.line_size(); i++) {
+        const messages::FieldLine& field = lines.line(i);
+        const messages::HoughLine& inner = field.inner();
+
+        // Polar to cartesian
+        double ballRelXPreRotate = ball.distance() * cos(ball.bearing());
+        double ballRelYPreRotate = ball.distance() * sin(ball.bearing());
+
+        std::cout << "TEST" << std::endl;
+        std::cout << ball.distance() << std::endl;
+        std::cout << ball.bearing() << std::endl;
+
+        std::cout << ballRelXPreRotate << std::endl;
+        std::cout << ballRelYPreRotate << std::endl;
+
+        // Rotate to vision relative robot coordinate system
+        double ballRelX, ballRelY;
+        vision::translateRotate(ballRelXPreRotate, ballRelYPreRotate, 0, 0, (M_PI / 2), ballRelX, ballRelY);
+
+        std::cout << ballRelX << std::endl;
+        std::cout << ballRelY << std::endl;
+
+        // Project ball onto line, find distance to line
+        vision::GeoLine line;
+        line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
+        double distToLine = line.qDist(ballRelX, ballRelY);
+
+        // If close, found the midline, reconstruct from the midline and the ball
+        if (distToLine < 30) {
+            // Recontruct x and h from midline and y from ball
+            messages::RobotLocation fromLine = lineSystem->reconstructWoEndpoints(LocLineID::OurMidline, field);
+            messages::RobotLocation fromLineAndBall = fromLine;
+
+            // Rotate to absolute coordinate system
+            double ballAbsX, ballAbsY;
+            vision::translateRotate(ballRelX, ballRelY, 0, 0, fromLine.h(), ballAbsX, ballAbsY);
+            fromLineAndBall.set_y(CENTER_FIELD_Y - ballAbsX);
+
+            std::cout << ballAbsX << std::endl;
+            std::cout << ballAbsY << std::endl;
+
+            // Add injection and return
+            ReconstructedLocation reconstructed(fromLineAndBall.x(), fromLineAndBall.y(), fromLineAndBall.h());
+            injections.push_back(reconstructed);
+            return true;
+        }
+    }
 }
 
 } // namespace localization

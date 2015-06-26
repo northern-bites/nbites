@@ -14,6 +14,7 @@
 #include "LineSystem.h"
 #include "LocStructs.h"
 #include "FieldConstants.h"
+#include "BallModel.pb.h"
 
 #include <vector>
 #include <list>
@@ -32,6 +33,11 @@ public:
     bool update(ParticleSet& particles,
                 const messages::FieldLines& lines,
                 const messages::Corners& corners);
+    bool update(ParticleSet& particles,
+                const messages::FieldLines& lines,
+                const messages::Corners& corners,
+                const messages::FilteredBall& ball);
+
     const std::list<ReconstructedLocation>& getInjections() { return injections; }
     int getNumObservations() const { return numObservations; }
     double getAvgError() const { return avgError; }

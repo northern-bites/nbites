@@ -15,10 +15,10 @@
 #include "FieldConstants.h"
 #include "VisionSystem.h"
 #include "MotionSystem.h"
-
 #include "NBMath.h"
 
 #include "ParticleSwarm.pb.h"
+#include "BallModel.pb.h"
 
 #include <vector>
 #include <iostream>
@@ -70,7 +70,8 @@ public:
      */
     void update(const messages::RobotLocation& motionInput,
                 messages::FieldLines&          linesInput,
-                messages::Corners&             cornersInput);
+                messages::Corners&             cornersInput,
+                const messages::FilteredBall*  ballInput);
 
     // Overload to use ball info
     // void update(const messages::RobotLocation& motionInput,
