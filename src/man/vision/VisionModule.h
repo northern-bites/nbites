@@ -41,7 +41,7 @@ public:
     FieldLineList* getFieldLines(bool topCamera = true) const { return fieldLines[!topCamera]; }
     GoalboxDetector* getBox(bool topCamera = true) const { return boxDetector[!topCamera]; }
     CornerDetector* getCorners(bool topCamera = true) const { return cornerDetector[!topCamera]; }
-
+    CenterCircleDetector* getCCD(bool topCamera = true) const {return centerCircleDetector[!topCamera]; }
     // For use by Image nbcross func
     void setColorParams(Colors* colors, bool topCamera) { colorParams[!topCamera] = colors; }
     const std::string getStringFromTxtFile(std::string path);

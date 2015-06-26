@@ -33,7 +33,7 @@ AdjustParams::AdjustParams()
 AdjustSet::AdjustSet(bool strict) {
   params[1].angleThr = FuzzyThr(0.08f, 0.12f);
   params[1].distanceThr = FuzzyThr(0.7f, 2.0f);
-  params[1].fitThresold = strict ? 0.5 : 3.0;
+  params[1].fitThresold = strict ? 0.5 : 10.0;
 
 }
 
@@ -505,7 +505,15 @@ bool CenterCircleDetector::detectCenterCircle(HoughLineList& hlList)
   for (Cluster c : clusters) {
     std::cout << "Point at x: " << c.begin()->first << " y: " << c.begin()->second << std::endl;
   }
-  joinClosestClusters(clusters);
+
+  currentClusters = clusters;
+
+  while (clusters.size() > points.size()) { // cluster until size is half
+    joinClosestClusters(clusters);
+  }
+
+  Cluster c = getLargestCluster(clusters);
+    printf("\nLargest cluster: (%f,%f) with %d points.\n\n", c.centroid.first, c.centroid.second, c.size());
   return true;
 
 }
@@ -526,7 +534,9 @@ std::vector<CirclePoint> CenterCircleDetector::getPointsVector(HoughLineList& hl
   {
     double x1, y1, x2, y2;
     hl->field().endPoints(x1, y1, x2, y2);
-    double slope = atan2(x1 - x2, y1 - y2);
+    printf("1: %f,%f. 2: %f,%f", x1, y1, x2, y2);
+    double slope = atan2(y1 - y2, x1 - x2);
+    printf(" slope: %f\n", slope);
     vec.push_back(CirclePoint((x1 + x2) / 2,(y1 + y2) / 2, slope));
   }
   return vec;
@@ -535,12 +545,15 @@ std::vector<CirclePoint> CenterCircleDetector::getPointsVector(HoughLineList& hl
 std::vector<Cluster> CenterCircleDetector::getClusters(const std::vector<CirclePoint>& points)
 {
   std:vector<Cluster> vec;
-  int ccr = CENTER_CIRCLE_RADIUS;
+  int ccr = 80;
 
   // For each circle point, find the two points 80 cm away 
   for (CirclePoint cp : points) {
-    vec.push_back(Cluster(cp.x() + ccr*cos(cp.t()), cp.y() + ccr*sin(cp.t())));
-    vec.push_back(Cluster(cp.x() - ccr*cos(cp.t()), cp.y() - ccr*sin(cp.t())));
+    std::cout << "Converting from Point to Cluster";
+    vec.push_back(Cluster(cp.x() + ccr*sin(cp.t()), cp.y() - ccr*cos(cp.t())));
+    vec.push_back(Cluster(cp.x() - ccr*sin(cp.t()), cp.y() + ccr*cos(cp.t())));
+
+    
   }
   return vec;
 }
@@ -595,18 +608,34 @@ bool CenterCircleDetector::checkDistance(const HoughLine& hl)
   return ((hl.field().r()*hl.field().r() + midPointEP*midPointEP) < distanceThresholdSqared);
 }
 
+Cluster CenterCircleDetector::getLargestCluster(const std::vector<Cluster>& clusters)
+{
+  size_t max = 0;
+  Cluster ret;
+  for (Cluster c : clusters)
+    if (c.size() > max) {
+      max = c.size();
+      ret = c;
+  }
+  std::cout << "Max size: " << max << std::endl;
+  return ret;
+}
+
+// Used for debugging by exernal functions
+std::vector<Point> CenterCircleDetector::getCentroids()
+{
+  std::vector<Point> vec;
+  for (Cluster c : currentClusters) {
+    vec.push_back(Point(c.centroid.first, c.centroid.second));
+  }
+  return vec;
+}
+
 
 // ***********
 // CirclePoint
 // ***********
 
-CirclePoint::CirclePoint()
-{
-  data[0] = 0;
-  data[1] = 0;
-  data[2] = 0;
-   
-}
 CirclePoint::CirclePoint(double x, double y, double t)
 {
   data[0] = x;
@@ -651,6 +680,7 @@ void Cluster::merge(Cluster& c)
   std::cout << "New centroid: (" << centroid.first << ", " << centroid.second << "). Size :" <<
       size() << std::endl << std::endl;
 }
+
 
 
 // **************************

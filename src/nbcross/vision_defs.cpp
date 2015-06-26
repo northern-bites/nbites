@@ -370,6 +370,28 @@ int Vision_func() {
     ballRet->setTree(allBalls);
     rets.push_back(ballRet);
 
+    //---------------
+    // Center Circle
+    //---------------
+
+    man::vision::CenterCircleDetector* ccd = module.getCCD(topCamera);
+    Log* ccdRet = new Log();
+    std::string pointsBuf;
+
+    std::vector<std::pair<double, double>> points = ccd->getCentroids();
+    std::cout << "Centroid size = " << points.size() << " points. Adding: ";
+    for (std::pair<double, double> p : points) {
+        std::cout << "|";
+        endswap<double>(&(p.first));
+        endswap<double>(&(p.second));
+        pointsBuf.append((const char*) &(p.first), sizeof(double));
+        pointsBuf.append((const char*) &(p.second), sizeof(double));
+    }
+    std::cout << std::endl;
+
+    ccdRet->setData(pointsBuf);
+    rets.push_back(ccdRet);
+
     return 0;
 }
 
