@@ -25,6 +25,8 @@ import StiffnessModes as stiff
 #    RIGHT_BIG_KICK = mirrorMove(LEFT_BIG_KICK)
 #============================================================================
 
+
+
 def mirrorMove(positions):
     return tuple(
         tuple(((RShoulderPitch, -RShoulderRoll, -RElbowYaw, -RElbowRoll),
@@ -33,6 +35,7 @@ def mirrorMove(positions):
                (LShoulderPitch, -LShoulderRoll, -LElbowYaw, -LElbowRoll),
                interp_time, interpolation, stiff.flipStiffness(stiffness)))
         for
+# ORIGINAL DOCUMENTATION (above is mirrored)
         ((LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll),
          (LHipYawPitch, LHipRoll, LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll),
          (RHipYawPitch, RHipRoll, RHipPitch, RKneePitch, RAnklePitch, RAnkleRoll),
@@ -1194,10 +1197,11 @@ LEFT_SHORT_STRAIGHT_KICK = (
 # .6
     #kick
     ((43.,30.,0.,0.),
-     (0.,19.,-60,75,-5,-15.),
+     (0.,19.,-60,50,3,-19.),
      (0.,17,-22.3,43,-23,-17),
      (40.,-30.,0.,0),
-     0.18,0, stiff.NORMAL_STIFFNESSES),
+     0.15,0, stiff.NORMAL_STIFFNESSES),
+
     
     #recover
     ((35.,30.,0.,0.),
