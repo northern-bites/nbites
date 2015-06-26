@@ -84,18 +84,23 @@ def clearIt(player):
         player.brain.interface.motionRequest.reset_odometry = True
         player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
         clearIt.odoDelay = True
+
+        print ("Kickpose: ", kickPose[0], kickPose[1])
+        print ("Dest: ", clearIt.ballDest.relX, clearIt.ballDest.relY)
+        print ("Ball: ", player.brain.ball.rel_x, player.brain.ball.rel_y)
         return Transition.getNextState(player, clearIt)
 
     if clearIt.odoDelay:
         clearIt.odoDelay = False
         player.brain.nav.goTo(clearIt.ballDest,
                               nav.CLOSE_ENOUGH,
-                              nav.FAST_SPEED,
+                              nav.QUICK_SPEED,
                               adaptive = False)
 
     kickPose = player.kick.getPosition()
     clearIt.ballDest.relX = player.brain.ball.rel_x - kickPose[0]
     clearIt.ballDest.relY = player.brain.ball.rel_y - kickPose[1]
+    player.brain.nav.updateDest(clearIt.ballDest)
 
     return Transition.getNextState(player, clearIt)
 

@@ -8,7 +8,7 @@ from ..headTracker import HeadMoves
 import GoalieConstants as constants
 import math
 
-SAVING = True
+SAVING = False
 DIVING = False
 
 @superState('gameControllerResponder')
@@ -59,6 +59,10 @@ def gameSet(player):
         player.stand()
         player.brain.interface.motionRequest.reset_odometry = True
         player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
+        watchWithLineChecks.correctFacing = False
+        watchWithLineChecks.numFixes = 0
+        watchWithLineChecks.numTurns = 0
+        watchWithLineChecks.looking = False
 
         # The ball will be right in front of us, for sure
         player.brain.tracker.lookToAngle(0)

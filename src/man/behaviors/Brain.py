@@ -224,12 +224,12 @@ class Brain(object):
         self.visionLines = self.interface.visionLines
         self.visionCorners = self.interface.visionCorners
 
-        if self.counter % 50 == 0:
-            print "VisionCorner size:"
-            print self.visionCorners.corner_size()
+        # if self.counter % 50 == 0:
+        #     print "VisionCorner size:"
+        #     print self.visionCorners.corner_size()
 
-        if self.visionCorners.corner_size() != 0:
-            print "I see a corner!!"
+        # if self.visionCorners.corner_size() != 0:
+        #     print "I see a corner!!"
 
         # for i in range(0, self.visionLines.line_size()):
         #     print "Vision lines:"
