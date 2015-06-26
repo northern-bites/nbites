@@ -248,6 +248,9 @@ def getLineLength(line):
 
 
 
+
+
+
 # Visual Goalie
 
 def getLeftGoalboxCorner(player):
