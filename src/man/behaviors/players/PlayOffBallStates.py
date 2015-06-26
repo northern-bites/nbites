@@ -43,15 +43,25 @@ def positionAtHome(player):
     shared ball if it is on with reliability >= 2. Cherry pickers look in the direction
     of the shared ball if it is on with reliability >= 1.
     """
-    home = RobotLocation(player.homePosition.x, player.homePosition.y, player.homePosition.h)
-    # if (player.brain.sharedBall.ball_on and player.brain.sharedBall.reliability >= 2 and 
-    #     role.isDefender(player.role)):
-    #     sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
-    #     home.h = player.brain.loc.getRelativeBearing(sharedball)
-    # elif (player.brain.sharedBall.ball_on and player.brain.sharedBall.reliability >= 1 and 
-    #       role.isCherryPicker(player.role)):
-    #     sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
-    #     home.h = player.brain.loc.getRelativeBearing(sharedball)
+    if player.brain.ball.vis.on:
+        ball = player.brain.ball
+        player.brain.tracker.trackBall()
+    elif player.brain.sharedBall.ball_on:
+        ball = player.brain.sharedBall
+        player.brain.tracker.trackSharedBall()
+    else:
+        ball = None
+        player.brain.tracker.repeatWidePan()
+        home = player.homePosition
+
+    if ball != None:
+        if role.isLeftDefender(player.role):
+            home = transitions.findDefenderHome(True, ball, player.homePosition.h)
+        elif role.isRightDefender(player.role):
+            home = transitions.findDefenderHome(False, ball, player.homePosition.h)
+        # elif role.isSecondChaser(player.role):
+        else:
+            home = player.homePosition
 
     if player.firstFrame():
         if role.isCherryPicker(player.role):
@@ -67,13 +77,22 @@ def positionAtHome(player):
 
 @superState('playOffBall')
 @stay
-@ifSwitchNow(transitions.tooFarFromHome(20), 'positionAtHome')
 def watchForBall(player):
     """
     The player is at home, waiting for the ball to be within it's box (range)
     """
     if player.firstFrame():
         player.brain.nav.stand()
+
+    if player.brain.ball.vis.on:
+        player.brain.tracker.trackBall()
+    elif player.brain.sharedBall.ball_on:
+        player.brain.tracker.trackSharedBall()
+    else:
+        player.brain.tracker.repeatWidePan()
+
+    if transitions.tooFarFromHome(20, player):
+        return player.goNow('positionAtHome')
 
 @superState('playOffBall')
 @stay
