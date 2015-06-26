@@ -45,10 +45,13 @@ def positionAtHome(player):
     """
     if player.brain.ball.vis.on:
         ball = player.brain.ball
+        player.brain.tracker.trackBall()
     elif player.brain.sharedBall.ball_on:
         ball = player.brain.sharedBall
+        player.brain.tracker.trackSharedBall()
     else:
         ball = None
+        player.brain.tracker.repeatWidePan()
         home = player.homePosition
 
     if ball != None:
@@ -56,7 +59,7 @@ def positionAtHome(player):
             home = transitions.findDefenderHome(True, ball, player.homePosition.h)
         elif role.isRightDefender(player.role):
             home = transitions.findDefenderHome(False, ball, player.homePosition.h)
-        # elif role.isSecondChaser(player.role) or role.isCherryPicker(player.role):
+        # elif role.isSecondChaser(player.role):
         else:
             home = player.homePosition
 
@@ -74,13 +77,22 @@ def positionAtHome(player):
 
 @superState('playOffBall')
 @stay
-@ifSwitchNow(transitions.tooFarFromHome(20), 'positionAtHome')
 def watchForBall(player):
     """
     The player is at home, waiting for the ball to be within it's box (range)
     """
     if player.firstFrame():
         player.brain.nav.stand()
+
+    if player.brain.ball.vis.on:
+        player.brain.tracker.trackBall()
+    elif player.brain.sharedBall.ball_on:
+        player.brain.tracker.trackSharedBall()
+    else:
+        player.brain.tracker.repeatWidePan()
+
+    if transitions.tooFarFromHome(20, player):
+        return player.goNow('positionAtHome')
 
 @superState('playOffBall')
 @stay

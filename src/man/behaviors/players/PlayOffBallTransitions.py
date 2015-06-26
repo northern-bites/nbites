@@ -39,22 +39,22 @@ def ballNotInBufferedBox(player):
     return (ball.vis.frames_off > chaseConstants.BALL_OFF_THRESH or 
             (not inBox and not role.isChaser(player.role)))
 
-def tooFarFromHome(threshold):
+def tooFarFromHome(threshold, player):
     """
     Returns true if LOC thinks we're more than *distance* away from our home
     position
     """
-    def transition(player):
-        loc = player.brain.loc
+    if role.isLeftDefender(player.role):
+        home = findDefenderHome(True, player.brain.ball, player.homePosition.h)
+    elif role.isRightDefender(player.role):
+        home = findDefenderHome(False, player.brain.ball, player.homePosition.h)
+    else:
         home = player.homePosition
 
-        distance = ((loc.x - home.x)**2 + (loc.y - home.y)**2)**.5
+    distance = ((player.brain.loc.x - home.x)**2 + (player.brain.loc.y - home.y)**2)**.5
 
-        if distance > threshold:
-            return True
-        return False
-    return transition
-
+    return distance > threshold
+  
 def shouldApproachBall(player):
     if ballNotInBox(player):
         player.claimedBall = False
