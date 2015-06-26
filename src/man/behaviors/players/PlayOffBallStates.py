@@ -48,15 +48,17 @@ def positionAtHome(player):
     elif player.brain.sharedBall.ball_on:
         ball = player.brain.sharedBall
     else:
+        ball = None
         home = player.homePosition
 
-    if role.isLeftDefender(player.role):
-        home = transitions.findDefenderHome(True, ball, player.homePosition.h)
-    elif role.isRightDefender(player.role):
-        home = transitions.findDefenderHome(False, ball, player.homePosition.h)
-    # elif role.isSecondChaser(player.role) or role.isCherryPicker(player.role):
-    else:
-        home = player.homePosition
+    if ball != None:
+        if role.isLeftDefender(player.role):
+            home = transitions.findDefenderHome(True, ball, player.homePosition.h)
+        elif role.isRightDefender(player.role):
+            home = transitions.findDefenderHome(False, ball, player.homePosition.h)
+        # elif role.isSecondChaser(player.role) or role.isCherryPicker(player.role):
+        else:
+            home = player.homePosition
 
     if player.firstFrame():
         if role.isCherryPicker(player.role):
