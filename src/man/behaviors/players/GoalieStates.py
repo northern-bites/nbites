@@ -216,7 +216,7 @@ def watchWithLineChecks(player):
         watchWithCornerChecks.looking = False
         player.brain.tracker.trackBall()
 
-    if player.counter > 200:
+    if player.counter > 300:
         return player.goLater('watch')
 
     return Transition.getNextState(player, watchWithLineChecks)
