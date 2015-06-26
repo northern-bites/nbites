@@ -51,15 +51,17 @@ class Kick(object):
 # Some standard kicks. x, y, and move should not be modified unless you change
 # the sweetMove. Here heading indicates where one should setup to kick in a
 # particular direction, but it will be modified later on to indicate where the
-# robot needs to orbit to. Dist indicates how far the kick goes on average.
+# robot needs to orbit to. Dist indicates how far the kick goes on average. The
+# x deals with the distance in front of the robot while the y deals with the 
+# distance to the side of the robot
 
 # Sweet move-based kicks
 LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", 
-                                 x = 14.8, y =  3.6,
+                                 x = 15, y =  3.6,
                                  dist = 300,
                                  move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
 RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", 
-                                 x = -13, y = -3.6,
+                                 x = 15, y = -3.6,
                                  dist = 300,
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 
