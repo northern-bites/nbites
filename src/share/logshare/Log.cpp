@@ -88,17 +88,13 @@ namespace nblog {
         
     }
     
-    Log::Log(const std::string& log_class,
-             const std::string& where_made,
-             time_t when_made,
-             int version,
-             const std::vector<SExpr>& contents_list,
-             const std::string& contents_data) :
-    _written(false),
-    _refs(0)
+    void Log::generic(const std::string& log_class,
+                  const std::string& where_made,
+                  time_t when_made,
+                  int version,
+                  const std::vector<SExpr>& contents_list)
     {
-        _data = contents_data;
-        int32_t cs = getChecksum(contents_data);
+        int32_t cs = getChecksum(_data);
         
         tm * ptm = localtime(&when_made);
         char buffer[100];
@@ -133,6 +129,32 @@ namespace nblog {
         }
         
         _tree = SExpr(keys);
+    }
+    
+    Log::Log(const std::string& log_class,
+             const std::string& where_made,
+             time_t when_made,
+             int version,
+             const std::vector<SExpr>& contents_list,
+             const std::string& contents_data) :
+    _written(false),
+    _refs(0),
+    _data(contents_data)
+    {
+        generic(log_class, where_made, when_made, version, contents_list);
+    }
+    
+    Log::Log(const std::string& log_class,
+             const std::string& where_made,
+             time_t when_made,
+             int version,
+             const std::vector<SExpr>& contents_list,
+             const void * buffer, size_t nbytes) :
+        _written(false),
+        _refs(0),
+        _data( (const char *) buffer, nbytes)
+    {
+        generic(log_class, where_made, when_made, version, contents_list);
     }
     
     Log::Log(std::string& desc) : _written(false), _refs(0) {

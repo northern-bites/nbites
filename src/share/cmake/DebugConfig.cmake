@@ -71,4 +71,20 @@ option(
   OFF
 )
 
+include(CMakeDependentOption)
+
+CMAKE_DEPENDENT_OPTION(START_WITH_FILEIO
+    "Start with fileio ON"
+    OFF
+    "USE_LOGGING"
+    OFF
+)
+
+CMAKE_DEPENDENT_OPTION(START_WITH_THUMBNAIL
+    "Start with thumbnails logging"
+    OFF
+    "USE_LOGGING"
+    OFF
+)
+
 endif( NOT OFFLINE )

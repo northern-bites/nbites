@@ -58,40 +58,42 @@ ParticleFilter::~ParticleFilter()
 
 
 void ParticleFilter::update(const messages::RobotLocation& odometryInput,
-                            messages::FieldLines&          visionInput)
+                            messages::FieldLines&          linesInput,
+                            messages::Corners&             cornersInput)
 {
-    // Update motion and vision system
+    // Motion system and vision system update step
     motionSystem->update(particles, odometryInput, errorMagnitude);
-    updatedVision = visionSystem->update(particles, visionInput);
+    updatedVision = visionSystem->update(particles, linesInput, cornersInput);
 
-
-    float avgErr = -1;
     // Resample if vision updated
+    float avgErr = -1;
     if(updatedVision) {
         resample();
         updatedVision = false;
         avgErr = visionSystem->getAvgError();
     }
 
-     if (avgErr > 0) {
-         if (avgErr > 3*errorMagnitude)
-             avgErr = 3*errorMagnitude;
-         errorMagnitude = avgErr*ALPHA
-                          + errorMagnitude*(1-ALPHA);
-     } else
-         errorMagnitude += (1.f/100.f);
+    //  if (avgErr > 0) {
+    //      if (avgErr > 3*errorMagnitude)
+    //          avgErr = 3*errorMagnitude;
+    //      errorMagnitude = avgErr*ALPHA
+    //                       + errorMagnitude*(1-ALPHA);
+    //  } else
+    //      errorMagnitude += (1.f/100.f);
 
-     // std::cout << "Cur Error " << avgErr << std::endl;
-     // std::cout << "Filtered Error:  " << errorMagnitude << std::endl;
+    //  // std::cout << "Cur Error " << avgErr << std::endl;
+    //  // std::cout << "Filtered Error:  " << errorMagnitude << std::endl;
 
-    // Determine if lost in frame or general
-    lost = (errorMagnitude > LOST_THRESHOLD);
-    // std::cout << lost << std::endl;
-    badFrame = (avgErr > LOST_THRESHOLD);
+    // // Determine if lost in frame or general
+    // lost = (errorMagnitude > LOST_THRESHOLD);
+    // // std::cout << lost << std::endl;
+    // badFrame = (avgErr > LOST_THRESHOLD);
 
     // Update filters estimate
     updateEstimate();
-    projectObservationsOntoField(visionInput); 
+
+    // For debug tools, project lines onto field, set IDs, etc.
+    updateLinesForDebug(linesInput); 
 }
 
 // void ParticleFilter::update(const messages::RobotLocation& odometryInput,
@@ -183,11 +185,27 @@ void ParticleFilter::updateEstimate()
 
 }
 
-void ParticleFilter::projectObservationsOntoField(messages::FieldLines& visionInput)
+void ParticleFilter::updateLinesForDebug(messages::FieldLines& visionInput)
 {
+    LineSystem lineSystem;
+    lineSystem.setDebug(false);
     for (int i = 0; i < visionInput.line_size(); i++) {
-        vision::GeoLine projected = LineSystem::relRobotToAbsolute(visionInput.line(i), poseEstimate);
+        // Get line
         messages::FieldLine& field = *visionInput.mutable_line(i);
+
+        // Set loc ids and scores
+        if (!LineSystem::shouldUse(visionInput.line(i))) {
+            // Lines that the particle filter did not use are given -1 as ID
+            field.set_id(0);
+        } else {
+            // Otherwise line system handles classification and scoring
+            LocLineID id = lineSystem.matchObservation(field, poseEstimate);
+            field.set_prob(lineSystem.scoreObservation(field, poseEstimate));
+            field.set_id(static_cast<int>(id));
+        }
+
+        // Project lines onto the field
+        vision::GeoLine projected = LineSystem::relRobotToAbsolute(visionInput.line(i), poseEstimate);
         messages::HoughLine& hough = *field.mutable_inner();
 
         hough.set_r(projected.r());
@@ -454,17 +472,16 @@ void ParticleFilter::resample()
             // If the reconstructions is on the same side and not near midfield
             if ( ((*recLocIt).defSide == onDefendingSide())
                  && (fabs((*recLocIt).x - CENTER_FIELD_X) > 50)) {
-                     // std::cout << "Use reconstruction " << (*recLocIt).x << " " << (*recLocIt).y << " " << (*recLocIt).h << std::endl;
+                // Sanity check, reconstruction must be on field
+                if (((*recLocIt).x >= 0 && (*recLocIt).y <= FIELD_GREEN_WIDTH) &&
+                    ((*recLocIt).y >= 0 && (*recLocIt).y <= FIELD_GREEN_HEIGHT)) {
                      Particle reconstructedParticle((*recLocIt).x,
                                                     (*recLocIt).y,
                                                     (*recLocIt).h,
                                                     1.f/250.f);
-
-                     // for (int i = 0; i < 300; i++) {
-                         newParticles.push_back(reconstructedParticle);
-                         numReconParticlesAdded++;
-                     // }
-                     // break;
+                     newParticles.push_back(reconstructedParticle);
+                     numReconParticlesAdded++;
+                }
             }
         }
 #ifdef DEBUG_LOC

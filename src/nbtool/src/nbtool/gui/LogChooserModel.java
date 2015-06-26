@@ -35,6 +35,8 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 	String root;
 	JTree tree;
 	
+	protected Log[] lastSelectedLogs;
+	
 	public LogChooserModel() {
 		root = "ROOT PLACEHOLDER";
 		
@@ -139,6 +141,7 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 				selected.add(sel);
 			}
 			
+			lastSelectedLogs = selected.toArray(new Log[0]);
 			Events.GLogSelected.generate(this, selected.remove(0), selected);
 			break;
 		}
@@ -157,6 +160,8 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 				sessions.add(log.parent);
 			}
 		}
+		
+		//System.out.println("BF1: logsFound " + sessions.size() + " sessions modified.");
 		
 		for (Session modified : sessions) {
 			sas.sort(modified);
@@ -186,6 +191,29 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 		TreeModelEvent tme = new TreeModelEvent(this, new Object[]{root});
 		for (TreeModelListener l : listeners) {
 			l.treeStructureChanged(tme);
+		}
+	}
+	
+	protected void deleteCurrent() {
+		TreePath tp = tree.getSelectionPath();
+		
+		if( tp.getPathCount() == 3 ) {
+			Session ses = (Session)	tp.getPath()[1];
+			Log sel = (Log) tp.getPath()[2];
+			
+			Logger.warnf("deleting {%s} from {%s}", sel, ses);
+			
+			assert(ses.logs_ALL.contains(sel));
+			ses.logs_ALL.remove(sel);
+			ses.logs_DO.remove(sel);
+			
+			TreeModelEvent tme = new TreeModelEvent(this, new Object[]{root, ses});
+			for (TreeModelListener l : listeners) {
+				l.treeStructureChanged(tme);
+			}
+			
+		} else {
+			Logger.warnf("cannot delete: %s", tp.toString());
 		}
 	}
 }

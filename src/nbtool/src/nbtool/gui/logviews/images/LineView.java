@@ -10,6 +10,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import nbtool.util.Logger;
 import nbtool.data.Log;
@@ -191,10 +193,8 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 //     lines.set(i+4, -1.0);
                 // }
             }
-            /*
-                std::cout << "Width: " << width << " Height: " << height << std::endl;
             
-            */
+            List<Double> drawn = new ArrayList<Double>();
 
             // Loop through again to draw lines in field space with calucluated resize value
             for (int i = 0; i < lines.size(); i += 10) {
@@ -222,6 +222,14 @@ public class LineView extends ViewParent implements IOFirstResponder {
                     int y2 = (int) Math.round(y0 + 3*resize*fcEP1 * Math.cos(fcT));
 
                     g.drawLine(x1, y1, x2, y2);
+
+                    // Draw line label
+                    if (fieldIndex >= 0 && !drawn.contains(fieldIndex)) {
+                        int xMid = (x1 + x2) / 2;
+                        int yMid = (y1 + y2) / 2;
+                        g.drawString(Integer.toString((int)fieldIndex), xMid, yMid + 10);
+                        drawn.add(fieldIndex);
+                    }
                 }
             }
 

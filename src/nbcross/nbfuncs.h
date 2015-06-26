@@ -32,6 +32,8 @@ public:
     { }
 };
 
+const std::string NBCROSS_WILDCARD_TYPE = "__WILDCARD__";
+
 // Defined in pkoch_defs.cpp
 int test_func();
 int arg_test_func();
@@ -47,7 +49,7 @@ int Scratch_func();
 
 
 /* add all functions to publish to this vector */
-static const std::vector<CrossFunc> FUNCS = {
+const std::vector<CrossFunc> FUNCS = {
     CrossFunc("test", test_func, {}),
     CrossFunc("arg_test", arg_test_func, {"YUVImage", "YUVImage"}),
     CrossFunc("CrossBright", CrossBright_func, {"YUVImage"}),

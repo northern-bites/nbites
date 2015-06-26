@@ -45,11 +45,11 @@ public final class CameraParamsOuterClass {
     int getVFLIP();
 
     /**
-     * <code>optional int32 autoExposure = 4;</code>
+     * <code>optional int32 auto_exposure = 4;</code>
      */
     boolean hasAutoExposure();
     /**
-     * <code>optional int32 autoExposure = 4;</code>
+     * <code>optional int32 auto_exposure = 4;</code>
      */
     int getAutoExposure();
 
@@ -392,16 +392,16 @@ public final class CameraParamsOuterClass {
       return vFLIP_;
     }
 
-    public static final int AUTOEXPOSURE_FIELD_NUMBER = 4;
+    public static final int AUTO_EXPOSURE_FIELD_NUMBER = 4;
     private int autoExposure_;
     /**
-     * <code>optional int32 autoExposure = 4;</code>
+     * <code>optional int32 auto_exposure = 4;</code>
      */
     public boolean hasAutoExposure() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional int32 autoExposure = 4;</code>
+     * <code>optional int32 auto_exposure = 4;</code>
      */
     public int getAutoExposure() {
       return autoExposure_;
@@ -1183,19 +1183,19 @@ public final class CameraParamsOuterClass {
 
       private int autoExposure_ ;
       /**
-       * <code>optional int32 autoExposure = 4;</code>
+       * <code>optional int32 auto_exposure = 4;</code>
        */
       public boolean hasAutoExposure() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional int32 autoExposure = 4;</code>
+       * <code>optional int32 auto_exposure = 4;</code>
        */
       public int getAutoExposure() {
         return autoExposure_;
       }
       /**
-       * <code>optional int32 autoExposure = 4;</code>
+       * <code>optional int32 auto_exposure = 4;</code>
        */
       public Builder setAutoExposure(int value) {
         bitField0_ |= 0x00000008;
@@ -1204,7 +1204,7 @@ public final class CameraParamsOuterClass {
         return this;
       }
       /**
-       * <code>optional int32 autoExposure = 4;</code>
+       * <code>optional int32 auto_exposure = 4;</code>
        */
       public Builder clearAutoExposure() {
         bitField0_ = (bitField0_ & ~0x00000008);
@@ -1590,15 +1590,15 @@ public final class CameraParamsOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\022CameraParams.proto\022\010messages\"\247\002\n\014Camer" +
+      "\n\022CameraParams.proto\022\010messages\"\250\002\n\014Camer" +
       "aParams\022\023\n\013whichCamera\030\001 \001(\t\022\016\n\006H_FLIP\030\002" +
-      " \001(\005\022\016\n\006V_FLIP\030\003 \001(\005\022\024\n\014autoExposure\030\004 \001" +
-      "(\005\022\022\n\nbrightness\030\005 \001(\005\022\020\n\010contrast\030\006 \001(\005" +
-      "\022\022\n\nsaturation\030\007 \001(\005\022\013\n\003hue\030\010 \001(\005\022\021\n\tsha" +
-      "rpness\030\t \001(\005\022\r\n\005gamma\030\n \001(\005\022\030\n\020autoWhite" +
-      "Balance\030\013 \001(\005\022\020\n\010exposure\030\014 \001(\005\022\014\n\004gain\030" +
-      "\r \001(\005\022\024\n\014whiteBalance\030\016 \001(\005\022\023\n\013fadeToBla" +
-      "ck\030\017 \001(\005"
+      " \001(\005\022\016\n\006V_FLIP\030\003 \001(\005\022\025\n\rauto_exposure\030\004 " +
+      "\001(\005\022\022\n\nbrightness\030\005 \001(\005\022\020\n\010contrast\030\006 \001(" +
+      "\005\022\022\n\nsaturation\030\007 \001(\005\022\013\n\003hue\030\010 \001(\005\022\021\n\tsh" +
+      "arpness\030\t \001(\005\022\r\n\005gamma\030\n \001(\005\022\030\n\020autoWhit" +
+      "eBalance\030\013 \001(\005\022\020\n\010exposure\030\014 \001(\005\022\014\n\004gain" +
+      "\030\r \001(\005\022\024\n\014whiteBalance\030\016 \001(\005\022\023\n\013fadeToBl" +
+      "ack\030\017 \001(\005"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

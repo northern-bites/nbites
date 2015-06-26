@@ -18,7 +18,7 @@ import nbtool.util.Logger;
 import nbtool.util.Utility;
 
 public class DefaultView extends ViewParent implements ActionListener {
-	
+		
 	public DefaultView() {
 		initComponents();
 		

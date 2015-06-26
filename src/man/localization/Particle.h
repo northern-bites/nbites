@@ -62,7 +62,7 @@ public:
         {
             location.set_x(location.x() + shiftX);
             location.set_y(location.y() + shiftY);
-            location.set_h(location.h() + shiftH);
+            location.set_h(NBMath::subPIAngle(location.h() + shiftH));
         }
 
     void normalizeWeight(float totalWeight) {weight = weight/totalWeight;}
