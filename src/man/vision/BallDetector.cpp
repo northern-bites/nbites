@@ -54,7 +54,7 @@ bool BallDetector::findBall(ImageLiteU8 orange, double cameraHeight)
             candidates.push_back(b);
             std::cout << "accepted ball because:\n" << b.properties() << std::endl;
 #endif
-            if (b.confidence() > _best.confidence()) {
+            if (b.dist < _best.dist) {
                 _best = b;
             }
         }
