@@ -1159,7 +1159,7 @@ void HoughSpace::peaks(HoughLineList& hlList)
   times[3] = timer.time32();
 }
 
-void HoughSpace::adjust(EdgeList& edges, HoughLineList& strictList, HoughLineList& looseList)
+void HoughSpace::adjust(EdgeList& edges, EdgeList& rejectedEdges, HoughLineList& hlList)
 {
   TickTimer timer;
 
@@ -1167,55 +1167,33 @@ void HoughSpace::adjust(EdgeList& edges, HoughLineList& strictList, HoughLineLis
   for (Edge* e = *abi; e; e = *++abi)
     e->memberOf(0);
 
-  strictList.sort();
-  looseList.sort();
+  hlList.sort();
 
-  AdjustSet sas(true); // AdjustSet with strict fitThreshold
-  AdjustSet las(false);// AS with loose threshold
-
-  list<HoughLine>::iterator lhl = looseList.begin();
-  for (list<HoughLine>::iterator shl = strictList.begin(); shl != strictList.end();)
+  for (list<HoughLine>::iterator hl = hlList.begin(); hl != hlList.end();)
   {
-    bool kill = false; // 0 = don't kill, 1 = kill for loose, 2 = kill for strict, 3 = kill for both
+    bool kill = false;
     for (int a = 0; a < adjustSteps(); ++a)
-    {
-      if (!shl->adjust(edges, sas.params[a], a == adjustSteps() - 1))
+      if (!hl->adjust(edges, adjustSet().params[a], a == adjustSteps() - 1))
       {
         kill = true;
         break;
       }
-    }
-    if (kill) {
-      shl = strictList.erase(shl);
-      if (lhl != looseList.end()) {
-        kill = false;
-        for (int a = 0; a < adjustSteps(); ++a)
-        {
-          if (!lhl->adjust(edges, las.params[a], a == adjustSteps() - 1))
-          {
-            kill = true;
-            break;
-          }
-        }
-        if (kill) {
-          lhl = looseList.erase(lhl);
-        } else {
-          ++lhl;
-        }
-      }
-    } else {
-      ++shl;
-      if (lhl != strictList.end()) {
-        lhl = looseList.erase(lhl);
 
-      }
-    }
+    if (kill)
+      hl = hlList.erase(hl);
+    else
+      ++hl;
   }
+
+  AngleBinsIterator<Edge> rejectABI(edges);
+  for (Edge* e = *rejectABI; e; e = *++rejectABI)
+    if (e->memberOf() == 0)
+      rejectedEdges.add(e->x(), e->y(), e->mag(), e->angle());
 
   times[4] = timer.time32();
 }
 
-void HoughSpace::run(EdgeList& edges, HoughLineList& hlList)
+void HoughSpace::run(EdgeList& edges, EdgeList& rejectedEdges, HoughLineList& hlList)
 {
   TickTimer timer;
 
@@ -1223,22 +1201,11 @@ void HoughSpace::run(EdgeList& edges, HoughLineList& hlList)
   processEdges(edges);
   smooth();
   peaks(hlList);
-//  adjust(edges, hlList);
+  adjust(edges, rejectedEdges, hlList);
 
   times[5] = timer.time32();
 }
 
-void HoughSpace::run(EdgeList& edges, HoughLineList& strictList, HoughLineList& looseList)
-{
-  clear();
-  processEdges(edges);
-  smooth();
-
-  peaks(strictList);
-  looseList = strictList;
-  adjust(edges, strictList, looseList);
-
-}
 
 }
 }

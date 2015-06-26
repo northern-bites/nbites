@@ -279,7 +279,6 @@ public:
   double x() { return data[0]; }
   double y() { return data[1]; }
   double t() { return data[2]; }
-  double distanceSquared(CirclePoint cp);
 };
 
 class Cluster : public std::list<Point> {
@@ -440,7 +439,7 @@ private:
   void wrapAround();
   void smooth();
   void peaks(HoughLineList&);
-  void adjust(EdgeList&, HoughLineList&, HoughLineList&);
+  void adjust(EdgeList&, EdgeList&, HoughLineList&);
 
   static bool tableInit;
   static int16_t sincosTable[0x140 + 2 * AngleSpread + 1];
@@ -472,8 +471,7 @@ public:
   uint32_t time(int i) const { return times[i]; }
   static const char* timeNames[NumTimes];
 
-  void run(EdgeList&, HoughLineList&);
-  void run(EdgeList&, HoughLineList&, HoughLineList&);
+  void run(EdgeList&, EdgeList&, HoughLineList&);
 };
 
 }

@@ -53,8 +53,8 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         frontEnd[i] = new ImageFrontEnd();
         edgeDetector[i] = new EdgeDetector();
         edges[i] = new EdgeList(32000);
-        houghLinesStrict[i] = new HoughLineList(128);
-        houghLinesLoose[i] = new HoughLineList(128);
+        rejectedEdges[i] = new EdgeList(32000);
+        houghLines[i] = new HoughLineList(128);
         calibrationParams[i] = new CalibrationParams();
         kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography(i == 0);
@@ -86,8 +86,8 @@ VisionModule::~VisionModule()
         delete frontEnd[i];
         delete edgeDetector[i];
         delete edges[i];
-        delete houghLinesStrict[i];
-        delete houghLinesLoose[i];
+        delete rejectedEdges[i];
+        delete houghLines[i];
         delete hough[i];
         delete calibrationParams[i];
         delete kinematics[i];
@@ -151,17 +151,19 @@ void VisionModule::run_()
         edgeDetector[i]->edgeDetect(greenImage, *(edges[i]));
 
         // Run hough line detection
-        hough[i]->run(*(edges[i]), *(houghLinesStrict[i]), *(houghLinesLoose[i]));
+        hough[i]->run(*(edges[i]), *(rejectedEdges[i]), *(houghLines[i]));
 
         // Find world coordinates for hough lines
-        houghLinesStrict[i]->mapToField(*(homography[i]));
-        houghLinesLoose[i]->mapToField(*(homography[i]));
+        houghLines[i]->mapToField(*(homography[i]));
         
-        // Detect center circle
-        centerCircleDetector[i]->detectCenterCircle(*(houghLinesLoose[i]));
+        // Find world coordinates for rejected edges
+        rejectedEdges[i]->mapToField(*(homography[i]));
 
-        // Pair strict hough lines to field lines
-        fieldLines[i]->find(*(houghLinesStrict[i]));
+        // Detect center circle
+   //   centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]));
+
+        // Pair hough lines to field lines
+        fieldLines[i]->find(*(houghLines[i]));
 
         // Classify field lines
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
