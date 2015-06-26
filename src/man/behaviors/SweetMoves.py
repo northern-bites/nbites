@@ -1171,13 +1171,6 @@ LEFT_QUICK_STRAIGHT_KICK = (
 
 RIGHT_QUICK_STRAIGHT_KICK = mirrorMove(LEFT_QUICK_STRAIGHT_KICK)
 
-# ((RShoulderPitch, -RShoulderRoll, -RElbowYaw, -RElbowRoll),
-# (RHipYawPitch, -RHipRoll, RHipPitch, RKneePitch, RAnklePitch, -RAnkleRoll),
-# (LHipYawPitch, -LHipRoll, LHipPitch, LKneePitch, LAnklePitch, -LAnkleRoll),
-# (LShoulderPitch, -LShoulderRoll, -LElbowYaw, -LElbowRoll),
-# interp_time, interpolation, stiff.flipStiffness(stiffness)))
-
-
 LEFT_SHORT_STRAIGHT_KICK = (
     BRING_ARMS_FORWARD_SLOW,
 
@@ -1187,14 +1180,14 @@ LEFT_SHORT_STRAIGHT_KICK = (
      (-0.2,0.0,-22.3,43.5,-21.2, 0.0),
      (90.,-10.,82.,13.2),
      0.3,0,stiff.NORMAL_STIFFNESSES),
-# .3
+
     #lean right/lift leg
     ((20.,30.,0.,0.),
      (0.,20.,-30,70,-40,-25.),
      (0.,20.,-22.3,50,-22.5,-17),
      (100.,-30.,0.,0),
      0.6,0, stiff.NORMAL_STIFFNESSES),
-# .6
+
     #kick
     ((43.,30.,0.,0.),
      (0.,19.,-60,50,3,-19.),
@@ -1202,7 +1195,6 @@ LEFT_SHORT_STRAIGHT_KICK = (
      (40.,-30.,0.,0),
      0.15,0, stiff.NORMAL_STIFFNESSES),
 
-    
     #recover
     ((35.,30.,0.,0.),
      (0.,25.,-35,65,-30,-25.),
@@ -1223,7 +1215,8 @@ LEFT_SHORT_STRAIGHT_KICK = (
      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
      (90.,-10.,82.,13.2),
      1,0,stiff.NORMAL_STIFFNESSES),
-# 1
+
+    # put arms back 
     ((99.2, 1.4, 74.5, -21.3),
      (-0.2, 0.0, -20.9, 51.6, -30.9, 0.1),
      (-0.2, -0.1, -20.5, 51.3, -31.3, 0.1),
