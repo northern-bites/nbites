@@ -45,13 +45,13 @@ def positionAtHome(player):
     """
     if player.brain.ball.vis.on:
         ball = player.brain.ball
-        player.brain.tracker.trackBall()
+        # player.brain.tracker.trackBall()
     elif player.brain.sharedBall.ball_on:
         ball = player.brain.sharedBall
-        player.brain.tracker.trackSharedBall()
+        # player.brain.tracker.trackSharedBall()
     else:
         ball = None
-        player.brain.tracker.repeatWidePan()
+        # player.brain.tracker.repeatWidePan()
         home = player.homePosition
 
     if ball != None:
@@ -66,8 +66,8 @@ def positionAtHome(player):
     if player.firstFrame():
         if role.isCherryPicker(player.role):
             player.brain.tracker.repeatWidePan()
-        else:
-            player.brain.tracker.trackBall()
+        # else:
+            # player.brain.tracker.trackBall()
         fastWalk = role.isCherryPicker(player.role)
         player.brain.nav.goTo(home, precision = nav.HOME,
                               speed = nav.QUICK_SPEED, avoidObstacles = True,
@@ -84,12 +84,12 @@ def watchForBall(player):
     if player.firstFrame():
         player.brain.nav.stand()
 
-    if player.brain.ball.vis.on:
-        player.brain.tracker.trackBall()
-    elif player.brain.sharedBall.ball_on:
-        player.brain.tracker.trackSharedBall()
-    else:
-        player.brain.tracker.repeatWidePan()
+    # if player.brain.ball.vis.on:
+    #     player.brain.tracker.trackBall()
+    # elif player.brain.sharedBall.ball_on:
+    #     player.brain.tracker.trackSharedBall()
+    # else:
+    #     player.brain.tracker.repeatWidePan()
 
     if transitions.tooFarFromHome(20, player):
         return player.goNow('positionAtHome')
