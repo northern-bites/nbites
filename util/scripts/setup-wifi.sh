@@ -49,6 +49,10 @@ elif [ "$HOSTNAME" = ozzy ]; then
     sed -i 's/ROBOT/20/g' /etc/init.d/nbwired
 elif [ "$HOSTNAME" = avril ]; then
     sed -i 's/ROBOT/21/g' /etc/init.d/nbwired
+elif [ "$HOSTNAME" = batman ]; then
+    sed -i 's/ROBOT/22/g' /etc/init.d/nbwired
+elif [ "$HOSTNAME" = she-hulk ]; then
+    sed -i 's/ROBOT/23/g' /etc/init.d/nbwired
 else
     echo "Robot does not have a valid hostname. Link local will not be configured correctly"
 fi
@@ -81,6 +85,10 @@ elif [ "$HOSTNAME" = ozzy ]; then
     sed -i 's/ROBOT/20/g' /etc/init.d/nbwireless
 elif [ "$HOSTNAME" = avril ]; then
     sed -i 's/ROBOT/21/g' /etc/init.d/nbwireless
+elif [ "$HOSTNAME" = batman ]; then
+    sed -i 's/ROBOT/22/g' /etc/init.d/nbwireless
+elif [ "$HOSTNAME" = she-hulk ]; then
+    sed -i 's/ROBOT/23/g' /etc/init.d/nbwireless
 else
     echo "Robot does not have a valid hostname. Link local will not be configured correctly"
 fi

@@ -27,7 +27,6 @@ namespace man
         LAnklePitch,
         LAnkleRoll,
         // RLEG,
-        RHipYawPitch,
         RHipRoll,
         RHipPitch,
         RKneePitch,
@@ -44,7 +43,7 @@ namespace man
         RWristYaw,
         RHand,
 
-        END_JOINTS,
+        //END_JOINTS,
 
         /** Currents **/
 
@@ -67,7 +66,6 @@ namespace man
         LAnkleRollCurrent,
 
         // Right Leg joints
-        RHipYawPitchCurrent,
         RHipRollCurrent,
         RHipPitchCurrent,
         RKneePitchCurrent,
@@ -86,7 +84,7 @@ namespace man
         RWristYawCurrent,
         RHandCurrent,
 
-        END_CURRENTS,
+        //END_CURRENTS,
 
         /** Temperatures **/
 
@@ -109,7 +107,6 @@ namespace man
         LAnkleRollTemp,
 
         // Right Leg joints
-        RHipYawPitchTemp,
         RHipRollTemp,
         RHipPitchTemp,
         RKneePitchTemp,
@@ -128,7 +125,7 @@ namespace man
         RWristYawTemp,
         RHandTemp,
 
-        END_TEMPERATURES,
+        //END_TEMPERATURES,
 
         /** Force Sensitive Resistors (FSR) **/
         // 4 on each foot
@@ -138,7 +135,7 @@ namespace man
         LFsrRL, // rear left
         LFsrRR, // rear right
 
-        END_FSRS_LEFT,
+        //END_FSRS_LEFT,
 
         // (Right Foot)
         RFsrFL,
@@ -146,7 +143,7 @@ namespace man
         RFsrRL,
         RFsrRR,
 
-        END_FSRS_RIGHT,
+        //END_FSRS_RIGHT,
 
         /** Inertial Measurement Units (IMUs) or
             Inertial Sensors (2 axis gyrometers,
@@ -162,7 +159,7 @@ namespace man
         AngleX,
         AngleY,
 
-        END_INTERTIALS,
+        //END_INTERTIALS,
 
         /* Past here, unneccessary to have END_VARS because
            the string keys are too unique to loop over.     */
@@ -206,7 +203,6 @@ namespace man
         RElbowYawStiff,
         RHandStiff,
         RHipPitchStiff,
-        RHipYawPitchStiff,
         RHipRollStiff,
         RKneePitchStiff,
         RShoulderPitchStiff,
@@ -214,6 +210,16 @@ namespace man
         RWristYawStiff,
 
         NUM_SENSOR_VALUES
+    };
+
+    enum KeyEnds
+    {
+        END_JOINTS = HeadYawCurrent,
+        END_CURRENTS = HeadYawTemp,
+        END_TEMPERATURES = LFsrFL,
+        END_FSRS_LEFT = RFsrFL,
+        END_FSRS_RIGHT = AccX,
+        END_INERTIALS = BatteryCharge
     };
 
     static const std::string SensorNames[] =
@@ -233,7 +239,6 @@ namespace man
         "LAnklePitch",
         "LAnkleRoll",
         // RLEG
-        "RHipYawPitch",
         "RHipRoll",
         "RHipPitch",
         "RKneePitch",
@@ -249,7 +254,7 @@ namespace man
         "LHand",
         "RWristYaw",
         "RHand",
-        "!!END!!",
+        //"!!END!!",
         // CURRENTS
         "HeadYawCurrent",
         "HeadPitchCurrent",
@@ -263,7 +268,6 @@ namespace man
         "LKneePitchCurrent",
         "LAnklePitchCurrent",
         "LAnkleRollCurrent",
-        "RHipYawPitchCurrent",
         "RHipRollCurrent",
         "RHipPitchCurrent",
         "RKneePitchCurrent",
@@ -277,7 +281,7 @@ namespace man
         "LHandCurrent",
         "RWristYawCurrent",
         "RHandCurrent",
-        "!!END!!",
+        //"!!END!!",
         // TEMPS
         "HeadYawTemp",
         "HeadPitchTemp",
@@ -291,7 +295,6 @@ namespace man
         "LKneePitchTemp",
         "LAnklePitchTemp",
         "LAnkleRollTemp",
-        "RHipYawPitchTemp",
         "RHipRollTemp",
         "RHipPitchTemp",
         "RKneePitchTemp",
@@ -305,20 +308,20 @@ namespace man
         "LHandTemp",
         "RWristYawTemp",
         "RHandTemp",
-        "!!END!!",
+        //"!!END!!",
         //FSRS
         // left
         "FrontLeft",
         "FrontRight",
         "RearLeft",
         "RearRight",
-        "!!END!!",
+        //"!!END!!",
         // right
         "FrontLeft",
         "FrontRight",
         "RearLeft",
         "RearRight",
-        "!!END!!",
+        //"!!END!!",
         //INERTIALS
         "AccX",
         "AccY",
@@ -327,7 +330,7 @@ namespace man
         "GyrY",
         "AngleX",
         "AngleY",
-        "!!END!!",
+        //"!!END!!",
         //OTHERS
         "BatteryCharge",
         "BatteryCurrent",
@@ -359,7 +362,6 @@ namespace man
         "RElbowYawStiff",
         "RHandStiff",
         "RHipPitchStiff",
-        "RHipYawPitchStiff",
         "RHipRollStiff",
         "RKneePitchStiff",
         "RShoulderPitchStiff",

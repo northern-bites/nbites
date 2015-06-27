@@ -10,6 +10,7 @@ FLAGS        = -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN)
 
 EXECUTABLE = tool
 LOC_EXECUTABLE = loc_tool
+WORLDVIEW_EXECUTABLE = worldview_tool
 BALL_EXECUTABLE = ball_tool
 VISION_EXECUTABLE = vision_tool
 CALIBRATE_EXECUTABLE = calibrate_tool
@@ -41,6 +42,19 @@ loc: build_loc
 	@echo "Running loc_tool executable."
 	@cd $(BUILD_DIR); \
 	./$(LOC_EXECUTABLE)
+
+.PHONY: build_worldview
+build_worldview:
+	mkdir -p $(BUILD_DIR)
+	cd $(BUILD_DIR); \
+	cmake $(FLAGS) $(SRC_DIR); \
+	$(MAKE) --no-print-directory $(WORLDVIEW_EXECUTABLE)
+
+.PHONY: worldview
+worldview: build_worldview
+	@echo "Running worldview_tool executable."
+	@cd $(BUILD_DIR); \
+	./$(WORLDVIEW_EXECUTABLE)
 
 .PHONY: build_ball
 build_ball:

@@ -32,6 +32,8 @@ if [[ $DOALL -eq 1 ]]; then
     scp -r $FOLDER $WIFI_CONFIG setup-wifi.sh $ROBOT_UNAME@beyonce.local:
     scp -r $FOLDER $WIFI_CONFIG setup-wifi.sh $ROBOT_UNAME@ozzy.local:
     scp -r $FOLDER $WIFI_CONFIG setup-wifi.sh $ROBOT_UNAME@avril.local:
+    scp -r $FOLDER $WIFI_CONFIG setup-wifi.sh $ROBOT_UNAME@batman.local:
+    scp -r $FOLDER $WIFI_CONFIG setup-wifi.sh $ROBOT_UNAME@she-hulk.local:
 else
     scp -r $FOLDER $WIFI_CONFIG setup-wifi.sh $ROBOT_UNAME@$ROBOT:
 fi

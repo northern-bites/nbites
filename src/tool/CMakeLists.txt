@@ -86,6 +86,10 @@ include_directories( ${SHARE_DIR}/include )
 add_subdirectory( ${SHARE_DIR}/portals ${CMAKE_CURRENT_BINARY_DIR}/portals )
 include_directories( ${SHARE_DIR}/portals )
 
+# Compile logshare into logshare folder
+add_subdirectory( ${SHARE_DIR}/logshare ${CMAKE_CURRENT_BINARY_DIR}/logshare )
+include_directories( ${SHARE_DIR}/logshare )
+
 # Compile messages into messages folder
 add_subdirectory( ${SHARE_DIR}/messages ${CMAKE_CURRENT_BINARY_DIR}/messages )
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages )
@@ -155,6 +159,24 @@ set( loc_headers
   DataSelector.h
 
   LocTool.h
+)
+
+# WorldviewTool
+set( worldview_srcs worldview_main.cpp
+  EmptyTool.cpp
+  ToolDiagram.cpp
+  DataSelector.cpp
+  ${MAN_DIR}/DiagramThread.cpp # Needed for worldview
+
+  WorldviewTool.cpp
+  )
+
+set( worldview_headers
+  EmptyTool.h
+  ToolDiagram.h
+  DataSelector.h
+
+  WorldviewTool.h
 )
 
 #BallTool
@@ -248,6 +270,7 @@ set( installer_headers
 # Qt4 goodness (aka moc the headers)
 Qt4_wrap_cpp( tool_headers_moc ${tool_headers} )
 Qt4_wrap_cpp( loc_headers_moc ${loc_headers} )
+Qt4_wrap_cpp( worldview_headers_moc ${worldview_headers} )
 Qt4_wrap_cpp( ball_headers_moc ${ball_headers} )
 Qt4_wrap_cpp( vision_headers_moc ${vision_headers} )
 Qt4_wrap_cpp( calibrate_headers_moc ${calibrate_headers} )
@@ -297,6 +320,27 @@ target_link_libraries(
   logview
   sharedball
   sharedview
+  fieldview
+  worldview
+  tool_common
+  localization
+  ${QT_LIBRARIES}
+  )
+
+# The WorldView executable
+add_executable( worldview_tool
+  ${worldview_srcs}
+  ${worldview_headers_moc} )
+
+target_link_libraries(
+  worldview_tool
+  portals
+  messages
+  unlog
+  image_display
+  logview
+  # sharedball
+  # sharedview
   fieldview
   worldview
   tool_common

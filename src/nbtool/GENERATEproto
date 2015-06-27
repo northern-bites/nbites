@@ -1,0 +1,7 @@
+#!/bin/bash
+
+DEST=$NBITES_DIR/src/nbtool/src/
+cd $NBITES_DIR/src/share/messages
+
+protoc -I=./ --java_out=$DEST ./*.proto
+

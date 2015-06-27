@@ -53,7 +53,7 @@ mv $FOLDER/usr_autoload.ini naoqi/preferences/autoload.ini
 
 # Move the config files for wpa_supplicant
 echo "Moving config files for wpa_supplicant"
-mv $WIFI_CONFIG/wpa_supplicant.conf /etc/wpa_supplicant
+mv $FOLDER/wpa_supplicant.conf /etc/wpa_supplicant
 mv $WIFI_CONFIG/nbwired /etc/init.d
 mv $WIFI_CONFIG/nbwireless /etc/init.d
 chmod +x /etc/init.d/nbwired
@@ -87,6 +87,10 @@ elif [ "$HOSTNAME" = ozzy ]; then
     sed -i 's/ROBOT/20/g' /etc/init.d/nbwired
 elif [ "$HOSTNAME" = avril ]; then
     sed -i 's/ROBOT/21/g' /etc/init.d/nbwired
+elif [ "$HOSTNAME" = batman ]; then
+    sed -i 's/ROBOT/22/g' /etc/init.d/nbwired
+elif [ "$HOSTNAME" = she-hulk ]; then
+    sed -i 's/ROBOT/23/g' /etc/init.d/nbwired
 else
     echo "Robot does not have a valid hostname. Link local will not be configured correctly"
 fi
