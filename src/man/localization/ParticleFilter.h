@@ -36,7 +36,7 @@ namespace man
 namespace localization
 {
 
-const float LOST_THRESHOLD  = 10.f;
+const float LOST_THRESHOLD  = 0.5f;
 const float ALPHA = .07f; // Impact for ~76 frames
 
 // Define the default parameters for the Particle Filter
@@ -47,8 +47,8 @@ static const ParticleFilterParams DEFAULT_PARAMS =
     300,                        // Num Particles
     0.2f,                       // Exponential Filter alpha
     0.05f,                      //                    beta
-    0.1f,                    // Variance in x-y odometry
-    0.04f                    // Variance in h odometry
+    0.5f,                       // Variance in x-y odometry
+    0.008f                       // Variance in h odometry
 };
 
 /**
@@ -69,12 +69,13 @@ public:
      *  @brief Given a new motion and vision input, update the filter
      */
     void update(const messages::RobotLocation& motionInput,
-                const messages::VisionField&   visionInput);
+                messages::FieldLines&          linesInput,
+                messages::Corners&             cornersInput);
 
     // Overload to use ball info
-    void update(const messages::RobotLocation& motionInput,
-                const messages::VisionField&   visionInput,
-                const messages::FilteredBall&    ballInput);
+    // void update(const messages::RobotLocation& motionInput,
+    //             const messages::VisionField&   visionInput,
+    //             const messages::FilteredBall&    ballInput);
 
     float getMagnitudeError();
 
@@ -144,6 +145,8 @@ private:
      * @brief - Update the poseEstimate by avging all particles
      */
     void updateEstimate();
+
+    void updateLinesForDebug(messages::FieldLines& visionInput);
 
     /**
      * @brief - Return symmetric location from given one

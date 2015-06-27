@@ -27,52 +27,50 @@ import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.utilitypanes.LogToViewUtility;
 import nbtool.gui.utilitypanes.UtilityManager;
 import nbtool.io.CrossIO;
+import nbtool.util.Center;
+import nbtool.util.Center.NBToolShutdownListener;
 import nbtool.util.Logger;
 import nbtool.util.NBConstants;
 import nbtool.util.Prefs;
+import nbtool.util.Prefs.ExtBounds;
 import nbtool.util.Utility;
 import static nbtool.util.Logger.*;
-public final class Display extends JFrame implements KeyEventPostProcessor {
+public final class Display extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	public Display() {
-		super("nbtool v" + NBConstants.VERSION);
+		super("nbtool v" + NBConstants.VERSION + "." + NBConstants.MINOR_VERSION);
 		setMinimumSize(MIN_SIZE);
 		setBounds(Prefs.bounds);
 		
 		//Register hook to save preferences.
 		final JFrame _display = this;
-		Runnable savePrefsRunnable = new Runnable() {
-			public void run() {
+		
+		Center.listen(new NBToolShutdownListener(){
+			@Override
+			public void nbtoolShutdownCallback() {
 				Prefs.bounds = _display.getBounds();
+				Prefs.leftSplitLoc = split1.getDividerLocation();
+				Prefs.rightSplitLoc = split2.getDividerLocation();
 				
-				Map<String, Class<? extends ViewParent>[]> lshown = new HashMap<String, Class<? extends ViewParent>[]>();
-				LogToViewUtility ltvu = UtilityManager.instanceOfLTV();
-				for (String t : NBConstants.POSSIBLE_VIEWS.keySet()) {
-					lshown.put(t, (Class<? extends ViewParent>[]) ltvu.selected(t));
-				}
-				
-				Prefs.last_shown = lshown;
-				
-				try {
-					Prefs.savePreferences();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				Prefs.BOUNDS_MAP.put(LogDisplayPanel.MAIN_LOG_DISPLAY_KEY,
+						new ExtBounds(null, ldp.currentProfile()));
 			}
-		};
-		Runtime.getRuntime().addShutdownHook(new Thread(savePrefsRunnable));
+		});
 				
 		left = new JTabbedPane();
 		right = new JTabbedPane();
 		
-		ldp = new LogDisplayPanel();
+		ldp = new LogDisplayPanel(true);
+		LogDisplayPanel.main = ldp;
 		
 		cntrlp = new ControlPanel();
+		camstrmp = new StreamingPanel();
 		lc = new LogChooser();
 		left.addTab("control", cntrlp);
 		left.addTab("logs", lc);
-				
+		left.addTab("camera",camstrmp);
+		
 		statusp = new StatusPanel();
 		right.addTab("status", statusp);
 		
@@ -80,7 +78,10 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		right.addTab("nbcross", cp);
 		
 		up = new OptionsAndUtilities();
-		right.addTab("utility", up);
+		right.addTab("misc", up);
+		
+		right.setMinimumSize(new Dimension(0,0));
+		left.setMinimumSize(new Dimension(0,0));
 		
 		split1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, left, ldp);
 		split2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, split1, right);
@@ -92,50 +93,27 @@ public final class Display extends JFrame implements KeyEventPostProcessor {
 		add(split2);
 		split1.setResizeWeight(.08);
 		split2.setResizeWeight(.85);
+		split1.setDividerLocation(Prefs.leftSplitLoc);
+		split2.setDividerLocation(Prefs.rightSplitLoc);
 		
-		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventPostProcessor(this);
+		KeyBind.left = left;
+		KeyBind.right = right;
+		KeyBind.controlPanel = cntrlp;
+		KeyBind.mainPanel = ldp;
+		
+		KeyBind.setupKeyBinds(Prefs.MISC_MAP);
 				
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
-	}
-	
-	public boolean postProcessKeyEvent(final KeyEvent e) {
-
-		if (!e.isConsumed() && (e.getID() == KeyEvent.KEY_TYPED)) {
-			
-			Character c = e.getKeyChar();
-			if (Character.isDigit(c)) {
-				ldp.trySetFocus(Character.getNumericValue(c) - 1);
-			}
-			
-			if (Character.isLetter(c)) {
-				switch (c) {
-				case 'q':
-					left.setSelectedIndex(0);
-					break;
-				case 'w':
-					left.setSelectedIndex(1);
-					break;
-				case 'e':
-					right.setSelectedIndex(0);
-					break;
-				case 'r':
-					right.setSelectedIndex(1);
-					break;
-				case 't':
-					right.setSelectedIndex(2);
-					break;
-				}
-			}
-		}
 		
-		return false;
+		System.out.println("---------------------------------- <end initialization>\n\n");
 	}
 
 	private JTabbedPane left;
 	private JTabbedPane right;
 	
 	private ControlPanel cntrlp;
+	private StreamingPanel camstrmp;
 	private StatusPanel statusp;
 	private LogChooser lc;
 		

@@ -32,11 +32,10 @@ import RobotLocation_proto
 import BallModel_proto
 import PMotion_proto
 import MotionStatus_proto
-import VisionRobot_proto
-import VisionField_proto
 import ButtonState_proto
 import FallStatus_proto
 import StiffnessControl_proto
+import Vision_proto
 
 class Brain(object):
     """
@@ -47,7 +46,6 @@ class Brain(object):
         """
         Class constructor
         """
-
         # Parse arguments
         self.playerNumber = playerNum
         self.teamNumber = teamNum
@@ -76,6 +74,10 @@ class Brain(object):
         self.motion = None
         self.game = None
         self.locUncert = 0
+
+        # New vision system...
+        self.visionLines = None
+        self.visionCorners = None
 
         # FSAs
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
@@ -141,10 +143,10 @@ class Brain(object):
         """
         # Update Environment
         self.time = time.time()
-
+        
         # Update objects
         self.updateVisionObjects()
-        self.updateObstacles()
+        # self.updateObstacles()
         self.updateMotion()
         self.updateLoc()
         self.getCommUpdate()
@@ -156,6 +158,9 @@ class Brain(object):
         self.player.run()
         self.tracker.run()
         self.nav.run()
+
+        # for new vision stuff
+        self.updateVision()
 
         # HACK for dangerous ball flipping loc
         self.flipLocFilter()
@@ -215,6 +220,22 @@ class Brain(object):
     def updateMotion(self):
         self.motion = self.interface.motionStatus
 
+    def updateVision(self):
+        self.visionLines = self.interface.visionLines
+        self.visionCorners = self.interface.visionCorners
+
+        # if self.counter % 50 == 0:
+        #     print "VisionCorner size:"
+        #     print self.visionCorners.corner_size()
+
+        # if self.visionCorners.corner_size() != 0:
+        #     print "I see a corner!!"
+
+        # for i in range(0, self.visionLines.line_size()):
+        #     print "Vision lines:"
+        #     print i
+        #     print self.visionLines.line(i).id
+
     def updateVisionObjects(self):
         """
         Update estimates of robot and ball positions on the field
@@ -226,16 +247,13 @@ class Brain(object):
             self.ball.x = Constants.CENTER_FIELD_X
             self.ball.y = Constants.CENTER_FIELD_Y
 
-        self.yglp = self.interface.visionField.goal_post_l.visual_detection
-        self.ygrp = self.interface.visionField.goal_post_r.visual_detection
-
     def updateObstacles(self):
         self.obstacles = [0.] * 9
-        size = self.interface.fieldObstacles.obstacle_size()
-        for i in range(size):
-            curr_obst = self.interface.fieldObstacles.obstacle(i)
-            if curr_obst.position is not curr_obst.position.NONE:
-                self.obstacles[int(curr_obst.position)] = curr_obst.distance
+        # size = self.interface.fieldObstacles.obstacle_size()
+        # for i in range(size):
+        #     curr_obst = self.interface.fieldObstacles.obstacle(i)
+        #     if curr_obst.position is not curr_obst.position.NONE:
+        #         self.obstacles[int(curr_obst.position)] = curr_obst.distance
 
     def activeTeamMates(self):
         activeMates = 0

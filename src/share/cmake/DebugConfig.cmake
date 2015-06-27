@@ -50,7 +50,7 @@ option(
 option(
   DEBUG_THREADS
   "Toggle threads debug mode."
-  OFF
+  ON
 )
 
 option(
@@ -69,6 +69,22 @@ option(
   USE_LOGGING
   "Enable logging on the robot."
   OFF
+)
+
+include(CMakeDependentOption)
+
+CMAKE_DEPENDENT_OPTION(START_WITH_FILEIO
+    "Start with fileio ON"
+    OFF
+    "USE_LOGGING"
+    OFF
+)
+
+CMAKE_DEPENDENT_OPTION(START_WITH_THUMBNAIL
+    "Start with thumbnails logging"
+    OFF
+    "USE_LOGGING"
+    OFF
 )
 
 endif( NOT OFFLINE )

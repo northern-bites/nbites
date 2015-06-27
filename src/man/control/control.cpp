@@ -1,6 +1,7 @@
 #include "Log.h"
 #include "exactio.h"
 #include "nbdebug.h"
+#include "DebugConfig.h"
 #include "control.h"
 #include "../log/logging.h"
 
@@ -18,8 +19,10 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <iostream>
+#include <fstream>
 #include <exception>
-
+#include "../../share/logshare/SExpr.h"
 
 using nblog::SExpr;
 using nblog::Log;
@@ -87,6 +90,83 @@ namespace control {
         
         return 0;
     }
+
+    uint32_t cnc_setCameraParams(Log * arg) {
+        size_t u = arg->data().size();
+        bool success = receivedParams.ParseFromString(arg->data());
+        if(!success) {
+            std::cerr<<"Failed to Parse Params\n";
+        } else {
+            SExpr s;
+
+            SExpr h = SExpr("hflip",receivedParams.h_flip());
+            SExpr v = SExpr("vflip",receivedParams.v_flip());
+            SExpr ae = SExpr("autoexposure",receivedParams.auto_exposure());
+            SExpr b = SExpr("brightness",receivedParams.brightness());
+            SExpr c = SExpr("contrast",receivedParams.contrast());
+            SExpr sat = SExpr("saturation",receivedParams.saturation());
+            SExpr hue = SExpr("hue",receivedParams.hue());
+            SExpr sharp = SExpr("sharpness",receivedParams.sharpness());
+            SExpr gamma = SExpr("gamma",receivedParams.gamma());
+            SExpr awb = SExpr("auto_whitebalance",receivedParams.autowhitebalance());
+            SExpr expo = SExpr("exposure",receivedParams.exposure());
+            SExpr gain = SExpr("gain",receivedParams.gain());
+            SExpr wb = SExpr("white_balance",receivedParams.whitebalance());
+            SExpr ftb = SExpr("fade_to_black",receivedParams.fadetoblack());
+
+            s.append(h);
+            s.append(v);
+            s.append(ae);
+            s.append(b);
+            s.append(c);
+            s.append(sat);
+            s.append(hue);
+            s.append(sharp);
+            s.append(gamma);
+            s.append(awb);
+            s.append(expo);
+            s.append(gain);
+            s.append(wb);
+            s.append(ftb);
+
+            std::string stringToWrite = s.serialize();
+
+            #ifdef NAOQI_2
+                std::cout<<"Saving as V5"<<std::endl;
+                if(receivedParams.whichcamera() == "TOP"){
+                    std::cout<<"TOP Params Received"<<std::endl;
+                    std::ofstream file("/home/nao/nbites/Config/V5topCameraParams.txt");
+                    std::cout<<stringToWrite<<std::endl;
+                    file << stringToWrite;
+                    file.close();
+                    std::cout<<"Saving Done"<<std::endl;
+                } else  {
+                    std::cout<<"Bottom Params Received"<<std::endl;
+                    std::ofstream file("/home/nao/nbites/Config/V5bottomCameraParams.txt");
+                    std::cout<<stringToWrite<<std::endl;
+                    file << stringToWrite;
+                    file.close();
+                    std::cout<<"Saving Done"<<std::endl;
+                }
+            #else
+                std::cout<<"Saving as V4"<<std::endl;
+                if(receivedParams.whichcamera() == "TOP"){
+                    std::cout<<"TOP Params Received"<<std::endl;
+                    std::ofstream file("/home/nao/nbites/Config/V4topCameraParams.txt");
+                    file << stringToWrite;
+                    file.close();
+                    std::cout<<"Saving Done"<<std::endl;
+                } else  {
+                    std::cout<<"Bottom Params Received"<<std::endl;
+                    std::ofstream file("/home/nao/nbites/Config/V4bottomCameraParams.txt");
+                    file << stringToWrite;
+                    file.close();
+                    std::cout<<"Saving Done"<<std::endl;
+                }
+            #endif
+        }
+        return 0;
+    }
     
     /*
      THIS IS WHERE YOU PUT NEW CONTROL FUNCTIONS!
@@ -98,6 +178,7 @@ namespace control {
         
         ret["test"] = &cnc_test;
         ret["setFlag"] = &cnc_setFlag;
+        ret["setCameraParams"] = &cnc_setCameraParams;
         
         return ret;
     }
@@ -149,7 +230,7 @@ namespace control {
                     
                     if (desc.count() < 2 ||
                         !(desc.get(0)->isAtom()) ||
-                        !(desc.get(0)->value() == "command") ||
+                        !(desc.get(0)->value() == nblog::COMMAND_FIRST_ATOM_S) ||
                         !(desc.get(1)->isAtom())    //command name
                         ) {
                         NBDEBUG("control: INVALID COMMAND LOG!\n");
@@ -207,7 +288,7 @@ namespace control {
         STARTED = true;
         
         bzero((void *) flags, num_flags);
-        
+
         pthread_create(&control_thread, NULL, &cnc_loop, NULL);
         pthread_detach(control_thread);
     }

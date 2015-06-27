@@ -98,7 +98,8 @@ public class FileIO {
 			U.wf("%d bytes left, hex:\n%s\n", av, text); */
 		}
 		
-		if (!(lg.description().equals(full.description()))) {
+		//Can't check description on old logs – their tree hasn't been created yet.
+		if ((lg._olddesc_ == null) && !(lg.description().equals(full.description()))) {
 			Logger.logf(Logger.WARN, "WARNING: log description found to be different upon load:\n\t%s\n\t%s\n",
 					lg.description(), full.description());
 		}
@@ -164,6 +165,7 @@ public class FileIO {
 			if (!Utility.isv6Description(desc)) {
 				logs[i] = new Log();
 				logs[i]._olddesc_ = desc;
+				logs[i].name = files[i].getName();
 				
 				try {
 					FileIO.loadLog(logs[i], location);
@@ -198,7 +200,7 @@ public class FileIO {
 		fi.ifr = ifr;
 		fi.state = IOState.RUNNING;
 		
-		Thread fithrd = new Thread(fi, String.format("thread-%s", fi.name()));
+		Thread fithrd = new Thread(fi, String.format("nbtool-%s", fi.name()));
 		fithrd.setDaemon(true);
 		fithrd.start();
 		

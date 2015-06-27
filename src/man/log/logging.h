@@ -104,6 +104,10 @@ namespace nblog {
     void NBLog(int buffer_index, const std::string& where_called,
                const std::vector<SExpr>& items, const std::string& data );
     
+    //Same as above, but only copies buffer once.
+    void NBLog(int buffer_index, const std::string& where_called,
+               const std::vector<SExpr>& items, const void * buffer, size_t nbytes );
+    
     
     //init log_main thread
     void log_main_init();

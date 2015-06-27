@@ -15,6 +15,9 @@ import nbtool.io.CommonIO.SequenceErrorException;
 import nbtool.util.Events;
 import nbtool.util.Logger;
 
+import messages.CameraParamsOuterClass;
+import messages.CameraParamsOuterClass.CameraParams;
+
 /*
  * Astute observers will notice this code is remarkably similar to the netIO code
  * */
@@ -26,19 +29,26 @@ public class ControlIO {
 		bytes[0] = (byte) flagi;
 		bytes[1] = (byte) (val ? 1 : 0);
 		
-		SExpr commandTree = SExpr.newList(SExpr.newAtom("command"), SExpr.newAtom("setFlag"));
+		SExpr commandTree = SExpr.newList(SExpr.newAtom(Log.COMMAND_FIRST_ATOM_S), SExpr.newAtom("setFlag"));
 		Log cmnd = new Log(commandTree, bytes);
 		return cmnd;
 	}
 	
+	public static Log createCmndSetCameraParams(CameraParams cam) {
+		byte[] paramsSerialized = cam.toByteArray();
+		SExpr commandTree = SExpr.newList(SExpr.newAtom("command"),SExpr.newAtom("setCameraParams"));
+		Log cmnd = new Log(commandTree,paramsSerialized);
+		return cmnd;
+	}
+	
 	public static Log createCmndTest() {
-		SExpr commandTree = SExpr.newList(SExpr.newAtom("command"), SExpr.newAtom("test"));
+		SExpr commandTree = SExpr.newList(SExpr.newAtom(Log.COMMAND_FIRST_ATOM_S), SExpr.newAtom("test"));
 		Log cmnd = new Log(commandTree, null);
 		return cmnd;
 	}
 	
 	public static Log createCmndExit() {
-		SExpr commandTree = SExpr.newList(SExpr.newAtom("command"), SExpr.newAtom("exit"));
+		SExpr commandTree = SExpr.newList(SExpr.newAtom(Log.COMMAND_FIRST_ATOM_S), SExpr.newAtom("exit"));
 		Log cmnd = new Log(commandTree, null);
 		return cmnd;
 	}
@@ -53,7 +63,7 @@ public class ControlIO {
 			instances.add(si);
 		}
 		
-		Thread t = new Thread(si, String.format("thread-%s", si.name()));
+		Thread t = new Thread(si, String.format("nbtool-%s", si.name()));
 		t.setDaemon(true);
 		t.start();
 
@@ -102,7 +112,7 @@ public class ControlIO {
 					cmnd.tree().count() < 2 ||
 					!cmnd.tree().get(0).isAtom() ||
 					!cmnd.tree().get(1).isAtom() ||
-					!cmnd.tree().get(0).value().equals("command")) {
+					!cmnd.tree().get(0).value().equals(Log.COMMAND_FIRST_ATOM_S)) {
 				Logger.logf(Logger.ERROR, "invalid format for command log: %s", cmnd.toString());
 				return false;
 			}

@@ -1,0 +1,34 @@
+package messages;
+
+message HoughLine 
+{
+    optional float r = 1;
+    optional float t = 2;
+    optional float ep0 = 3;
+    optional float ep1 = 4;
+}
+
+message FieldLine
+{
+    optional HoughLine inner = 1;
+    optional HoughLine outer = 2;
+    optional int32 id = 3;
+    optional float prob = 4;
+}
+
+message FieldLines
+{
+    repeated FieldLine line = 1;
+}
+
+message Corner
+{
+    optional float x = 1;
+    optional float y = 2;
+    optional int32 id = 3;
+}
+
+message Corners
+{
+    repeated Corner corner = 1;
+}

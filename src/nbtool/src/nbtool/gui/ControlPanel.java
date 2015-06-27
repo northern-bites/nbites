@@ -1,12 +1,18 @@
 package nbtool.gui;
 
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Vector;
 
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -31,7 +37,7 @@ import nbtool.util.Prefs;
 import nbtool.util.Utility;
 
 public class ControlPanel extends JPanel implements Events.LogsFound, Events.LogSelected,
-Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.RelevantRobotStats {
+	Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.RelevantRobotStats {
 	
 	private Vector<String> updateList(LinkedList<String> pref, String nv) {
 		if (nv != null) {
@@ -85,6 +91,13 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
 				exitButtonActionPerformed(evt);
 			}
 		});
+		
+		writeBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				writeBoxActionPerformed();
+			}
+		});
+		writeSlider.setEnabled(false);
 
 		this.controlStatus(null, false);
 
@@ -155,7 +168,15 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
 			}
 		});
 
-		//...
+		/* dirBox prevents hotkeys.  Try to keep it from getting default focus */
+		this.addComponentListener(new ComponentAdapter(){
+			@Override
+			public void componentShown(ComponentEvent e) {
+				//Logger.println("SHOWN");
+				loadButton.requestFocus();
+			}
+
+		});
 
 		//Events.LogsFound, Events.LogSelected, Events.SessionSelected,
 		//Events.ToolStatus, Events.ControlStatus, Events.RelevantRobotStats
@@ -165,6 +186,36 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
 		Center.listen(Events.ToolStatus.class, this, true);
 		Center.listen(Events.ControlStatus.class, this, true);
 		Center.listen(Events.RelevantRobotStats.class, this, true);
+	}
+	
+	private void writeBoxActionPerformed() {
+		boolean set = writeBox.isSelected();
+		if (set) {
+			writeSlider.setEnabled(true);
+			if (SessionMaster.get().isIdle()) return;
+			
+			//Not idle, try to latestart
+			String dpath = (String) dirBox.getSelectedItem();
+			if (dpath == null || dpath.trim().isEmpty()) {
+				Logger.warnf("Cannot late start FileInstance with path: %s", dpath);
+				return;
+			}
+			
+			String absolute = Utility.localizePath(dpath.trim()) + File.separator;
+			if (FileIO.checkLogFolder(absolute)) {
+				Logger.warnf("ControlPanel trying to late start a FileInstance...");
+				SessionMaster.get().lateStartFileWriting(absolute);
+			} else {
+				Logger.warnf("Cannot late start FileInstance with path: %s", absolute);
+				return;
+			}
+		} else {
+			writeSlider.setEnabled(false);
+			if (!SessionMaster.get().isIdle()) {
+				Logger.warnf("ControlPanel trying to early stop a FileInstance...");
+				SessionMaster.get().earlyStopFileWriting();
+			}
+		}
 	}
 
 	private void loadButtonActionPerformed(java.awt.event.ActionEvent evt) {    		
@@ -367,19 +418,21 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
 
 	@Override
 	public void sessionSelected(Object source, Session s) {
-		if (source != this)
-			streamCB.setSelected(false);
+//		if (source != this)
+//			streamCB.setSelected(false);
 	}
 
 	@Override
 	public void logSelected(Object source, Log first,
 			ArrayList<Log> alsoSelected) {
+		/*
 		if (source != this)
-			streamCB.setSelected(false);
+			streamCB.setSelected(false); */
 	}
 
 	@Override
 	public void logsFound(Object source, Log... found) {
+		/*
 		if (streamCB.isSelected()) {
 			Log streamLog = null;
 
@@ -392,7 +445,7 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
 			}
 			if (streamLog != null)
 				Events.GLogSelected.generate(this, streamLog, new ArrayList<Log>());
-		}
+		} */
 	}
 
 	/*GENERATED CODE*/
@@ -403,15 +456,13 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
         jTextArea1 = new javax.swing.JTextArea();
         jLabel3 = new javax.swing.JLabel();
         dirpanel = new javax.swing.JPanel();
-        dirBox = new javax.swing.JComboBox<String>();
+        dirBox = new javax.swing.JComboBox<>();
         loadButton = new javax.swing.JButton();
         chooseButton = new javax.swing.JButton();
         clearButton = new javax.swing.JButton();
         robotPanel = new javax.swing.JPanel();
-        addrBox = new javax.swing.JComboBox<String>();
+        addrBox = new javax.swing.JComboBox<>();
         connectButton = new javax.swing.JButton();
-        streamCB = new javax.swing.JCheckBox();
-        streamField = new javax.swing.JTextField();
         writeSlider = new javax.swing.JSlider();
         keepSlider = new javax.swing.JSlider();
         jLabel1 = new javax.swing.JLabel();
@@ -472,10 +523,6 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
 
         connectButton.setText("connect");
 
-        streamCB.setText("stream");
-
-        streamField.setText("(from camera_TOP)");
-
         writeSlider.setMaximum(5);
         writeSlider.setPaintLabels(true);
         writeSlider.setPaintTicks(true);
@@ -490,7 +537,7 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
 
         jLabel2.setText("keep fraction");
 
-        writeBox.setText("write");
+        writeBox.setText("save streamed logs to disk");
 
         javax.swing.GroupLayout robotPanelLayout = new javax.swing.GroupLayout(robotPanel);
         robotPanel.setLayout(robotPanelLayout);
@@ -505,17 +552,13 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
                     .addGroup(robotPanelLayout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(streamCB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(streamField)
-                            .addGroup(robotPanelLayout.createSequentialGroup()
-                                .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(keepSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(writeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(0, 0, Short.MAX_VALUE)))))
+                            .addComponent(keepSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(writeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(robotPanelLayout.createSequentialGroup()
                 .addContainerGap()
@@ -528,20 +571,17 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
                 .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(addrBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(connectButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(streamCB)
-                    .addComponent(streamField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(0, 0, 0)
                 .addComponent(writeBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(writeSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(keepSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGroup(robotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(keepSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         controlPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED), "control"));
@@ -571,7 +611,7 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
                     .addComponent(controlTestButton)
                     .addComponent(controlExitButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(flagScrollPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
+                .addComponent(flagScrollPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -597,8 +637,8 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
                 .addComponent(controlPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
-    }// </editor-fold>                                                          
-
+    }// </editor-fold>                        
+                              
 
     // Variables declaration - do not modify                     
     private javax.swing.JComboBox<String> addrBox;
@@ -611,7 +651,6 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
     private javax.swing.JComboBox<String> dirBox;
     private javax.swing.JPanel dirpanel;
     private javax.swing.JScrollPane flagScrollPanel;
-    private javax.swing.JCheckBox writeBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -620,8 +659,7 @@ Events.SessionSelected, Events.ToolStatus, Events.ControlStatus, Events.Relevant
     private javax.swing.JSlider keepSlider;
     private javax.swing.JButton loadButton;
     private javax.swing.JPanel robotPanel;
-    private javax.swing.JCheckBox streamCB;
-    private javax.swing.JTextField streamField;
+    private javax.swing.JCheckBox writeBox;
     private javax.swing.JSlider writeSlider;
     // End of variables declaration                               
 }

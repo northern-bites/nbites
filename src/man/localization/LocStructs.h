@@ -81,8 +81,8 @@ struct LocNormalParams
 
 struct ReconstructedLocation
 {
-    ReconstructedLocation(float x_, float y_, float h_, float defSide_)
-        : x(x_), y(y_), h(h_), defSide(defSide_)
+    ReconstructedLocation(float x_, float y_, float h_)
+        : x(x_), y(y_), h(h_), defSide(x < CENTER_FIELD_X)
         {
         }
     float x;

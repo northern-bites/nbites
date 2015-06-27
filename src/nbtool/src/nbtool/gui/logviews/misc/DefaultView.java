@@ -18,7 +18,7 @@ import nbtool.util.Logger;
 import nbtool.util.Utility;
 
 public class DefaultView extends ViewParent implements ActionListener {
-	
+		
 	public DefaultView() {
 		initComponents();
 		
@@ -115,7 +115,7 @@ public class DefaultView extends ViewParent implements ActionListener {
 	@Override
 	public void setLog(Log newlog) {
 		assert(newlog.bytes != null);
-		this.log = newlog;
+				
 		descArea.setText(log.tree().print());		
 		if (log.bytes.length < 1000)
 			dataArea.setText(Utility.bytesToHexString(log.bytes));

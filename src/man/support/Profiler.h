@@ -26,31 +26,6 @@ enum ProfiledComponent {
     P_ACQUIRE_IMAGE,
 
     P_VISION,
-    P_TRANSFORM,
-    P_THRESHRUNS,
-    P_FGHORIZON,
-    P_RUNS,
-    P_OBJECT,
-    P_OBSTACLES,
-    P_ROBOTS,
-
-    P_EDGES,
-    P_SOBEL,
-    P_EDGE_PEAKS,
-
-    P_HOUGH,
-    P_MARK_EDGES,
-    P_SMOOTH,
-    P_HOUGH_PEAKS,
-    P_SUPPRESS,
-
-    P_LINES,
-    P_VERT_LINES,
-    P_HOR_LINES,
-    P_CREATE_LINES,
-    P_JOIN_LINES,
-    P_FIT_UNUSED,
-    P_INTERSECT_LINES,
 
     P_SELF_LOC,
     P_BALL_TRACK,

@@ -109,6 +109,10 @@ public class CrossIO {
 				String cs = call.arguments[i].primaryType();
 				String as = args[i];
 				
+				if (cs.equals(Log.NBCROSS_WILDCARD_TYPE) || 
+						as.equals(Log.NBCROSS_WILDCARD_TYPE))
+					continue;
+				
 				if (!cs.equals(as))
 					return false;
 			}
@@ -248,6 +252,7 @@ public class CrossIO {
 						final int ret = dis.readInt();
 						int num_out = dis.readInt();
 						
+
 						final Log[] outs = new Log[num_out];
 						for (int i = 0; i < num_out; ++i) {
 							Log nl = CommonIO.readLog(dis);
@@ -357,7 +362,6 @@ public class CrossIO {
 	private static class CrossServer implements Runnable, IOFirstResponder {
 		@Override
 		public void run() {
-			Logger.log(Logger.INFO, "CrossServer starting up.");
 			ServerSocket server = null;
 			Timer timer = new Timer(true);
 			TimerTask tt = new TimerTask() {
@@ -382,7 +386,8 @@ public class CrossIO {
 			}
 			
 			timer.schedule(tt, 5000, 1000);
-			
+			Logger.log(Logger.INFO, "CrossServer up.");
+
 			try {
 				
 				while (true) {
@@ -399,7 +404,7 @@ public class CrossIO {
 							instances.add(ci);
 						}
 						
-						Thread t = new Thread(ci, String.format("thread-ci%d", ci.unique_id));
+						Thread t = new Thread(ci, String.format("nbtool-ci%d", ci.unique_id));
 						t.setDaemon(true);
 						t.start();
 						
@@ -452,9 +457,9 @@ public class CrossIO {
 			return;
 		}
 		
-		Logger.log(Logger.INFO, "starting thread-CrossServer...");
+		Logger.log(Logger.INFO, "starting nbtool-CrossServer...");
 		
-		serverThread = new Thread(new CrossServer(), "thread-CrossServer");
+		serverThread = new Thread(new CrossServer(), "nbtool-CrossServer");
 		serverThread.setDaemon(true);
 		serverThread.start();
 	}

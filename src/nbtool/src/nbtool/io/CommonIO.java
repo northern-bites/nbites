@@ -149,6 +149,8 @@ public class CommonIO {
 				
 				if (socket != null) {
 					try {
+						socket.shutdownInput();
+						socket.shutdownOutput();
 						socket.close();
 					} catch (IOException e) {
 						e.printStackTrace();

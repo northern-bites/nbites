@@ -62,7 +62,7 @@ public class StreamIO {
 			instances.add(si);
 		}
 		
-		Thread t = new Thread(si, String.format("thread-%s", si.name()));
+		Thread t = new Thread(si, String.format("nbtool-%s", si.name()));
 		t.setDaemon(true);
 		t.start();
 
@@ -162,7 +162,7 @@ public class StreamIO {
 						Log nl = CommonIO.readLog(in);
 
 						nl.tree().append(SExpr.newKeyValue("from_address", this.host));
-						Logger.log(Logger.INFO, this.name() + ": thread got packet of data size: " + nl.bytes.length + " desc: " + nl.description());
+						Logger.log(Logger.INFO, this.name() + ": thread got packet of data size: " + nl.bytes.length + " desc: " + nl.description(50));
 
 						nl.source = SOURCE.NETWORK;
 
