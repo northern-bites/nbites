@@ -122,36 +122,31 @@ def sideLineCheckShouldReposition(player):
     return False
 
 def shouldTurn(player):
-
     if GoalieStates.watchWithLineChecks.numTurns > 1 \
     and GoalieStates.watchWithLineChecks.numFixes < 2:
         return False
-
     if GoalieStates.watchWithLineChecks.numTurns == 2:
         return False
 
     h_dest = 0.0
 
-    # longestLine = None
-    # maxLength = 0.0
-    # for line in GoalieStates.watchWithLineChecks.lines:
-    #     r = line.r
-    #     length = getLineLength(line)
-    #     if r > 100.0 or r == 0.0:
-    #         continue
-    #     if length > maxLength:
-    #         longestLine = line
-
-    # if longestLine not None:
-    #     rlong = longestLine.r
-    #     tlong = longestLine.t
-    # TODO something to use the longest line it can find...
+    longestLine = None
+    longestLength = 0.0
 
     for line in GoalieStates.watchWithLineChecks.lines:
         r = line.r
         t = math.degrees(line.t)
         length = getLineLength(line)
+
+        # Try to avoid facing a sideline
         if length < 30.0 and r > 30.0:
+            continue
+
+        # Avoid invalid lines, lines that are too far, and lines that are possibly
+        # the left and right sidelines
+        if math.fabs(t - constants.EXPECTED_RIGHT_LINE_T) < constants.T_THRESH \
+        or math.fabs(t - constants.EXPECTED_LEFT_LINE_T) < constants.T_THRESH \
+        or r > 100.0 or t == 0.0:
             continue
 
         # Fix this.. very hacky: basically return that we DON'T need to turn
@@ -163,17 +158,22 @@ def shouldTurn(player):
             print ("r: ", r)
             return True
 
-        if math.fabs(t - constants.EXPECTED_RIGHT_LINE_T) < constants.T_THRESH \
-        or math.fabs(t - constants.EXPECTED_LEFT_LINE_T) < constants.T_THRESH \
-        or r > 100.0 or t == 0.0:
-            continue
-
-
         # Assumptions: not facing forward....?
         # Hopefully will find a line close by (r < 100) with an unusual t value
         # and use the information to help correct itself
         # Theoretically will usually be the long front line?
         else:
+            if length > maxLength:
+                longestLine = line
+            # h_dest = t - 90.0
+            # player.homeDirections += [RelRobotLocation(0.0, 0.0, h_dest)]
+            # print "Should turn was TRUE"
+            # print ("hdest: ", h_dest)
+            # print ("t was: ", t)
+            # print ("r was:", r)
+            # return True
+
+        if longestLine not None:
             h_dest = t - 90.0
             player.homeDirections += [RelRobotLocation(0.0, 0.0, h_dest)]
             print "Should turn was TRUE"
@@ -255,6 +255,10 @@ def getLineLength(line):
     x = x2 - x1
     y = y2 - y1
     return math.sqrt(x*x + y*y)
+
+def shouldShiftRight
+
+
 
 
 
