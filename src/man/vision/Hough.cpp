@@ -213,27 +213,29 @@ void FieldLineList::find(HoughLineList& houghLines)
   clear();
 
   for (HoughLineList::iterator hl1 = houghLines.begin(); hl1 != houghLines.end(); ++hl1)
-  {
-    HoughLineList::iterator hl2 = hl1;
-    for (++hl2; hl2 != houghLines.end(); ++hl2)
-      // Here is the dot product 
-      if (hl1->field().ux() * hl2->field().ux() + hl1->field().uy() * hl2->field().uy() <= maxCosAngle)
-      {
-        // Separation is sum of the two r values (distance of line to origin).
-        // This is well defined and sensible for lines that may not be perfectly
-        // parallel. For field lines the polarities are pointing towards each
-        // other, which makes the sum of r's negative. A pair of nearly parallel
-        // lines with the right separation but with polarities pointing away from
-        // each other is not a field line. 
-        double separation = hl1->field().separation(hl2->field());
-        if (0.0 < separation && separation <= maxLineSeparation())
+    if (hl1->field().valid())
+    {
+      HoughLineList::iterator hl2 = hl1;
+      for (++hl2; hl2 != houghLines.end(); ++hl2)
+        // Here is the dot product 
+        if (hl2->field().valid() &&
+            hl1->field().ux() * hl2->field().ux() + hl1->field().uy() * hl2->field().uy() <= maxCosAngle)
         {
-          hl1->fieldLine((int)size());
-          hl2->fieldLine((int)size());
-          push_back(FieldLine(*hl1, *hl2, houghLines.fx0(), houghLines.fy0()));
+          // Separation is sum of the two r values (distance of line to origin).
+          // This is well defined and sensible for lines that may not be perfectly
+          // parallel. For field lines the polarities are pointing towards each
+          // other, which makes the sum of r's negative. A pair of nearly parallel
+          // lines with the right separation but with polarities pointing away from
+          // each other is not a field line. 
+          double separation = hl1->field().separation(hl2->field());
+          if (0.0 < separation && separation <= maxLineSeparation())
+          {
+            hl1->fieldLine((int)size());
+            hl2->fieldLine((int)size());
+            push_back(FieldLine(*hl1, *hl2, houghLines.fx0(), houghLines.fy0()));
+          }
         }
-      }
-  }
+    }
 }
 
 // *****************

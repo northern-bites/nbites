@@ -117,6 +117,10 @@ public:
   // (dix, diy).
   void imageVector(double ix, double iy, double dwx, double dwy, double& dix, double& diy) const;
 
+  // Return the horizon line, which extends between the left and right side of the image
+  // as specified by imageWidth. Note that the horizon may be entirely above the image.
+  GeoLine horizon(int imageWidth) const;
+
   // Recover tilt from known perpendicular or parallel lines
   static double tiltSensitivity;    // min dE/dt for Newton's method
   static double tiltConvergeLimit;  // Newton can stop when error is < this
@@ -138,7 +142,7 @@ public:
                           std::string* diagnostics) const;
 
   // Calibrate tilt and roll using "star target". If successful returns true and
-  // updates tilt and roll.
+  // updates tilt and roll. Obsolete, use StarCal instead. Will be removed eventually.
   bool calibrateFromStar(const FieldLineList& lines);
 };
 
@@ -177,6 +181,8 @@ public:
 
   // Add another set of field lines from a star target image.
   bool add(const FieldLineList&);
+
+  int count() const { return (int)fit.area(); }
 
   // Returns the roll and tilt from the field lines seen so far.
   double tilt();
@@ -225,7 +231,16 @@ protected:
     _ep1 = ep1;
   }
 
+  void setInvalid() { _ux = _uy = 0; }
+
 public:
+  // Default constructor makes the line invalid
+  GeoLine() { setInvalid(); }
+
+  // A line is invalid on default construction, and if mapped to field coordinates
+  // and found to be above the horizon
+  bool valid() const { return ux() != 0 || uy() != 0; }
+
   double r() const { return _r; }
   double t() const { return _t; }
 
@@ -294,12 +309,32 @@ public:
   void correctRollAndAxis(const FieldHomography&);
 
   // Map this image line to field coordinates.  Preserve polarity and endpoints.
+  // If the midpoint of this line is above the horizon, the result is made invalid.
+  // If one endpoint is above the horizon but the midpoint is below, discard the
+  // portion above and construct a line entirely below the horizon.
   void imageToField(const FieldHomography&);
+
+  // Set this line to the horizon line of the specified homography, with endpoints
+  // as specified by imageWidth
+  void setToHorizon(const FieldHomography&, int imageWidth);
 
   // "pretty" is for human consumption. Not pretty is for a high-precision string
   // that is easy to parse by another computer program, e.g. C#
   std::string print(bool pretty = false) const;
 };
+
+// Constructing the horizon is done by the GeoLine class and not the FieldHomography
+// class for reasons of encapsulation. The GeoLine class knows its private
+// data and functions, and only public members of FieldHomography are needed. But
+// from the client's point of view, the horizon is a property of a homography, and
+// so the horizon() member just calls the GeoLine member. Since FieldHomography
+// is declared before GeoLine, the inline function horizon must be defined here.
+inline GeoLine FieldHomography::horizon(int imageWidth) const
+{
+  GeoLine gl;
+  gl.setToHorizon(*this, imageWidth);
+  return gl;
+}
 
 // *****************************
 // *                           *
