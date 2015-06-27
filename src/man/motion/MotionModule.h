@@ -250,6 +250,7 @@ private:
 
     static std::vector<float> getBodyJointsFromProvider(MotionProvider* provider);
     std::vector<BodyJointCommand::ptr> generateNextBodyProviderTransitions();
+    std::vector<BodyJointCommand::ptr> generateNextArmProviderTransitions();
 
     /**
      * @brief Sets the new joint and stiffness messages for

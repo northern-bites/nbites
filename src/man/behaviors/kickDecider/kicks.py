@@ -51,15 +51,17 @@ class Kick(object):
 # Some standard kicks. x, y, and move should not be modified unless you change
 # the sweetMove. Here heading indicates where one should setup to kick in a
 # particular direction, but it will be modified later on to indicate where the
-# robot needs to orbit to. Dist indicates how far the kick goes on average.
+# robot needs to orbit to. Dist indicates how far the kick goes on average. The
+# x deals with the distance in front of the robot while the y deals with the 
+# distance to the side of the robot
 
 # Sweet move-based kicks
 LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", 
-                                 x = 17.2, y =  3.6,
+                                 x = 15, y =  3.6,
                                  dist = 300,
                                  move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
 RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", 
-                                 x = 17.2, y = -3.6,
+                                 x = 15, y = -3.6,
                                  dist = 300,
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 
@@ -134,10 +136,6 @@ LEFT_SHORT_BACK_KICK =  Kick("L_Short_Back", x = 16.8, y =  4,
 RIGHT_SHORT_BACK_KICK = Kick("R_Short_Back", x = 16.8, y = -4,
                              move=SweetMoves.RIGHT_SHORT_BACK_KICK)
 
-# Not used 05-02-14
-# Dribble kick just tells player to run thru the ball, no actual sweet move
-LEFT_DRIBBLE =  Kick("L_Dribble", x = 0, y = 3.0)
-RIGHT_DRIBBLE =  Kick("R_Dribble", x = 0, y = -3.0)
 
 # TODO automate/generalize this?
 def chooseAlignedKickFromKick(player, kick):
@@ -154,12 +152,6 @@ def chooseAlignedKickFromKick(player, kick):
             return M_LEFT_STRAIGHT
         else:
             return M_RIGHT_STRAIGHT
-    elif (kick == LEFT_DRIBBLE or
-        kick == RIGHT_DRIBBLE):
-        if ballRelY > 0:
-            return LEFT_DRIBBLE
-        else:
-            return RIGHT_DRIBBLE
     elif (kick == LEFT_SHORT_STRAIGHT_KICK or
           kick == RIGHT_SHORT_STRAIGHT_KICK):
         if ballRelY > 0:

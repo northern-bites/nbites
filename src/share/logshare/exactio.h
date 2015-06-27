@@ -20,6 +20,19 @@
 #define USLEEP_EXPECTING (1000)
 #define IO_SEC_TO_BREAK (5.0)
 
+static void nbperror(const char * prefix, int errsaved) {
+#ifdef __APPLE__
+    char buf[256];
+    strerror_r(errsaved, buf, 256);
+    printf("%s %s\n", prefix, buf);
+#else
+    char buf[256];
+    char * buf2 = strerror_r(errsaved, buf, 256);
+    printf("%s %s\n", prefix, buf2);
+#endif
+    
+}
+
 //fileio can just use the write function
 #define WRITE_STUB write
 
@@ -73,9 +86,12 @@ static inline int put_exact(ssize_t (* pstub)(int, const void *, size_t),
             if (saved_err == EAGAIN) {
                 usleep(USLEEP_EXPECTING);
             } else {
+                /*
                 char buf[256];
                 strerror_r(saved_err, buf, 256);
-                printf("\n\n****put_exact****:  %s\n", buf);
+                printf("\n\n****put_exact****:  %s\n", buf); */
+                
+                nbperror("\n\n****put_exact****: ", saved_err);
                 return 2;
             }
         } else {
@@ -114,9 +130,12 @@ static inline int get_exact(ssize_t (*gstub)(int, void *,size_t),
             if (err_saved == EAGAIN) {
                 usleep(USLEEP_EXPECTING);
             } else {
+                /*
                 char buf[256];
                 strerror_r(err_saved, buf, 256);
-                printf("\n\n****get_exact****:  %s\n", buf);
+                printf("\n\n****get_exact****:  %s\n", buf); */
+                
+                nbperror("\n\n****get_exact****: ", err_saved);
                 return 2;
             }
         } else {

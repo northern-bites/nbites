@@ -153,6 +153,7 @@ enum SensorTypes
     // Raw gyrometer data
     GyrX,
     GyrY,
+    GyrZ,
     // Filtered angle data
     AngleX,
     AngleY,
@@ -326,6 +327,7 @@ static const std::string SensorNames[] =
     "AccZ",
     "GyrX",
     "GyrY",
+    "GyrZ",
     "AngleX",
     "AngleY",
     //"!!END!!",

@@ -14,6 +14,7 @@ set( COMMON_SRCS
   CameraCalibrate.cpp
   NogginStructs
   ColorParams.cpp
+  RatingParams.cpp
   HighResTimer.cpp
   )
 

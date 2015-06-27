@@ -5,9 +5,8 @@
 #include "DebugConfig.h"
 #include "sensors/SensorsModule.h"
 #include "comm/CommModule.h"
-#include "vision/VisionModule.h"
 #include "image/TranscriberModule.h"
-#include "image/ImageConverterModule.h"
+#include "vision/VisionModule.h"
 #include "guardian/GuardianModule.h"
 #include "audio/AudioEnactorModule.h"
 #include "balltrack/BallTrackModule.h"
@@ -39,7 +38,7 @@ private:
 
     ParamReader param;
     int playerNum, teamNum;
-
+    std::string robotName;
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
     jointenactor::JointEnactorModule jointEnactor;
@@ -56,8 +55,6 @@ private:
     DiagramThread cognitionThread;
     image::TranscriberModule topTranscriber;
     image::TranscriberModule bottomTranscriber;
-    image::ImageConverterModule topConverter;
-    image::ImageConverterModule bottomConverter;
     vision::VisionModule vision;
     localization::LocalizationModule localization;
     balltrack::BallTrackModule ballTrack;

@@ -89,8 +89,8 @@ void ObstacleModule::run_()
     // updateObstacleBuffer(visionL, visionM, visionR);
 
     // Decide arms
-    FieldObstacles::Obstacle::ObstaclePosition
-        arms = processArms(armContactIn.message());
+    // FieldObstacles::Obstacle::ObstaclePosition
+        // arms = processArms(armContactIn.message());
 
     // Used to check if there were any obstacles found
     bool didReturn = false;
@@ -113,7 +113,7 @@ void ObstacleModule::run_()
     // std::cout<<std::endl;
 
     FieldObstacles::Obstacle*temp = current.get()->add_obstacle();
-    temp->set_position(arms);
+    // temp->set_position(arms);
     temp->set_distance(1.f);
 
     obstacleOut.setMessage(current);

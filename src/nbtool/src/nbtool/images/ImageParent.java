@@ -8,21 +8,14 @@ public abstract class ImageParent {
 	public int width;
 	public int height;
 	
-	//IN BYTES (has to be method so that subclasses can/must set.  Silly java)
-	public abstract int pixelSize();
-	
 	public byte[] data;
 	
 	public ImageParent(int w, int h, byte[] d) {
 		this.width = w; this.height = h; this.data = d;
 	}
 	
-	public int rowLength() {return pixelSize() * width;}
-	public byte[] pixelAt(int x, int y) {
-		byte[] ret = new byte[pixelSize()];
-		System.arraycopy(data, x * pixelSize() + (y * width * pixelSize()), ret, 0, pixelSize());
-		
-		return ret;
+	public int pixelAt(int x, int y) {
+		return data[width*y + x] & 0xFF;
 	}
 	
 	public abstract BufferedImage toBufferedImage();

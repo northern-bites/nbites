@@ -19,6 +19,7 @@ import nbtool.data.SExpr;
 import nbtool.images.ImageParent;
 import nbtool.images.UV88image;
 import nbtool.images.Y16image;
+import nbtool.images.Y8image;
 import nbtool.images.YUYV8888image;
 
 
@@ -44,17 +45,19 @@ public class Utility {
 			//old image
 			ip = new YUYV8888image(width / 2, height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[Y8(U8/V8)]")) {
-			ip = new YUYV8888image(width , height, log.bytes);
+			ip = new YUYV8888image(2*width, height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[Y16]")) {
 			ip = new Y16image(width , height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[U8V8]")) {
 			ip = new UV88image(width , height, log.bytes);
+		} else if (encoding.equalsIgnoreCase("[Y8]")) {
+			ip = new Y8image(width , height, log.bytes);
 		} else {
 			Logger.log(Logger.WARN, "Cannot use image with encoding:" + encoding);
 			return null;
 		}
 		
-		return ip.toBufferedImage(); 
+		return ip.toBufferedImage();
 	}
 
 	public static final char[] hexArray = "0123456789ABCDEF".toCharArray();
@@ -196,7 +199,10 @@ public class Utility {
 			old.setTree(SExpr.deserializeFrom(old._olddesc_));
 			return true;
 		}
-		if (old._olddesc_ == null) return false;	//nothing to work with.
+		if (old._olddesc_ == null) {
+			Logger.log(Logger.WARN, "cannot convert old log without string description.");
+			return false;
+		}	//nothing to work with.
 				
 		HashMap<String, String> map = new HashMap<String, String>();
 		String[] attrs = old._olddesc_.trim().split(" ");
@@ -204,31 +210,41 @@ public class Utility {
 			if (a.trim().isEmpty()) continue;
 			
 			String[] parts = a.split("=");
-			if (parts.length != 2)
+			if (parts.length != 2){
+				Logger.warnf("conversion found invalid kvp");
 				return false;	//Don't attempt to reconstruct malformed descriptions.
+			}
 			
 			String key = parts[0].trim();
-			if (key.isEmpty())
+			if (key.isEmpty()) {
+				Logger.warnf("conversion found empty key");
 				return false;
+			}
 			
 			String value = parts[1].trim();
-			if (value.isEmpty())
+			if (value.isEmpty()) {
+				Logger.warnf("conversion found empty value");
 				return false;
+			}
 			
 			if (map.containsKey(key)) {
 				//we never allowed duplicate keys
+				Logger.warnf("conversion found duplicate key");
 				return false;
 			}
 			
 			map.put(key, value);
 		}
 		
+		/*
 		if (map.containsKey("checksum")) {
 			int found_sum = checksum(old.bytes);
 			int read_sum = Integer.parseInt(map.get("checksum"));
-			if (found_sum != read_sum)
+			if (found_sum != read_sum) {
+				Logger.warnf("conversion found wrong checksum");
 				return false;
-		}
+			}
+		} */
 		
 		//Ok, we can convert this.
 		map.remove("checksum");

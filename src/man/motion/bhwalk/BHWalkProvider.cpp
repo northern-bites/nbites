@@ -17,13 +17,12 @@ namespace motion
 
 using namespace boost;
 
-// TODO make this consistent with new walk
 const float BHWalkProvider::INITIAL_BODY_POSE_ANGLES[] =
 {
-        1.57f, 0.18f, -1.56f, -0.18f,
-        0.0f, 0.0f, -0.39f, 0.76f, -0.37f, 0.0f,
-        0.0f, 0.0f, -0.39f, 0.76f, -0.37f, 0.0f,
-        1.57f, -0.18f, 1.43f, 0.23f
+        1.74f, 0.174f,1.31f,-.35f,
+        0.0f, 0.0f, -0.36f, 0.9f, -0.54f, 0.0f,
+        0.0f, 0.0f, -0.36f, 0.9f, -0.54f, 0.0f,
+        1.74f,-0.174f,-1.31f,.35f
 };
 
 /**
@@ -124,7 +123,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     // NOTE currentMotionType and requestMotionType are of type MotionType enum 
     // defined in WalkingEngine.h
     if (walkingEngine->currentMotionType == 0 && tryingToWalk &&
-        walkingEngine->instability.getAverageFloat() > 5.f && calibrated())
+        walkingEngine->instability.getAverageFloat() > 20.f && calibrated())
     {
         std::cout << "We are stuck! Recalibrating." << std::endl;
         walkingEngine->inertiaSensorCalibrator->reset();
@@ -294,6 +293,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
     bh_sensors.data[SensorDataBH::gyroX] = sensorInertials.gyr_x();
     bh_sensors.data[SensorDataBH::gyroY] = sensorInertials.gyr_y();
+    bh_sensors.data[SensorDataBH::gyroZ] = sensorInertials.gyr_z(); // NOTE not currently used by BH
 
     bh_sensors.data[SensorDataBH::accX] = sensorInertials.acc_x();
     bh_sensors.data[SensorDataBH::accY] = sensorInertials.acc_y();
@@ -301,6 +301,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
     bh_sensors.data[SensorDataBH::angleX] = sensorInertials.angle_x();
     bh_sensors.data[SensorDataBH::angleY] = sensorInertials.angle_y();
+    bh_sensors.data[SensorDataBH::angleZ] = sensorInertials.angle_z();
 
     bh_sensors.data[SensorDataBH::fsrLFL] = sensorFSRs.lfl();
     bh_sensors.data[SensorDataBH::fsrLFR] = sensorFSRs.lfr();

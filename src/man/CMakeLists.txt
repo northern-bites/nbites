@@ -158,3 +158,10 @@ target_link_libraries(
 install( TARGETS man
   RUNTIME DESTINATION lib
 )
+
+file( GLOB configFiles
+  "config/*"
+)
+
+install( FILES ${configFiles}
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/Config )

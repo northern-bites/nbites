@@ -1,4 +1,5 @@
 {
 	"playerNumber": @PLAYER_NUMBER@,
-	"teamNumber": @TEAM_NUMBER@
+	"teamNumber": @TEAM_NUMBER@,
+    "robotName": "@REMOTE_ADDRESS@"
 }

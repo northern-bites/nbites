@@ -11,7 +11,7 @@
 
 /** Messages **/
 #include "RoboGrams.h"
-#include "VisionField.pb.h"
+#include "Vision.pb.h"
 #include "RobotLocation.pb.h"
 #include "ParticleSwarm.pb.h"
 #include "GameState.pb.h"
@@ -41,10 +41,11 @@ public:
 
     /** In Portals **/
     portals::InPortal<messages::RobotLocation> motionInput;
-    portals::InPortal<messages::VisionField>   visionInput;
+    portals::InPortal<messages::FieldLines>    linesInput;
+    portals::InPortal<messages::Corners>    cornersInput;
     portals::InPortal<messages::RobotLocation> resetInput[2];
     portals::InPortal<messages::GameState>     gameStateInput;
-    portals::InPortal<messages::FilteredBall>  ballInput;
+    // portals::InPortal<messages::FilteredBall>  ballInput;
 
     /** Out Portals **/
     portals::OutPortal<messages::RobotLocation> output;
@@ -69,6 +70,11 @@ protected:
     ParticleFilter * particleFilter;
     long long lastReset[2];
     messages::RobotLocation curOdometry;
+    messages::FieldLines curLines;
+    messages::Corners curCorners;
+
+private:
+    size_t log_index;
 };
 } // namespace localization
 } // namespace man

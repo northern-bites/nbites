@@ -1,4 +1,5 @@
 #include "LedEnactor.h"
+#include "ALLedNames.h"
 #include <iostream>
 
 namespace boss {
@@ -21,7 +22,7 @@ void LedEnactor::setLeds(messages::LedCommand command)
 
 void LedEnactor::noMan()
 {
-    for (int i=20; i<29; i++)
+    for (int i=20; i<ALNames::NUM_UNIQUE_LEDS; i++)
     {
         naoLights.setRGB(i, 0xFFFFFF);
     }

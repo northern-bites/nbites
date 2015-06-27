@@ -298,26 +298,6 @@ class HeadTrackingHelper(object):
         ball = self.tracker.brain.ball
         self.executeHeadMove(self.convertKickPan(HeadMoves.BALLTRACK_PAN(ball.distance, ball.bearing)))
 
-    # Consider updating this for new loc and vision systems (summer 2012)
-    # Currently broken in Portals system.
-    # TODO: scrap this or make it work.
-    def calculateClosestLandmark(self):
-        brain = self.tracker.brain
-        posts = [brain.yglp, brain.ygrp, brain.bgrp, brain.bglp]
-
-        currYaw = degrees(brain.interface.joints.head_yaw)
-
-        minDiff = 1000000000
-        bestPost = None
-
-        for p in posts:
-            diff = MyMath.sub180Angle(currYaw - p.bearing)
-
-            if diff < minDiff:
-                bestPost = p
-                minDiff = diff
-        return bestPost
-
     def printHeadAngles(self):
         print "Current yaw is: " + str(degrees(self.tracker.brain.interface.joints.head_yaw))
         print "Current pitch is: " + str(degrees(self.tracker.brain.interface.joints.head_pitch))

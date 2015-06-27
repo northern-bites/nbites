@@ -27,15 +27,31 @@ public class Session {
 	
 	public RobotStats most_relevant;
 	
-	public ArrayList<Log> logs_ALL; //Logs in the order they arrived.  Only grows, does not change order.
-	public ArrayList<Log> logs_DO; //All the same logs in logs_TO, but in sorted order.
+	// *** MODIFIED ON CENTER THREAD ***
+	//Logs in the order they arrived.  Only grows, does not change order.
+	public final ArrayList<Log> logs_ALL = new ArrayList<>(); 
 	
-	protected Session(String dir, String addr) {
-		logs_ALL = new ArrayList<Log>();
+	// *** ONLY MODIFIED IN EDThread ***
+	//Some subset of logs_ALL, in order specified by GUI.
+	public ArrayList<Log> logs_DO; 
+	
+	/* Used in SessionMaster for specific purpose sessions */
+	protected Session(String name) {
+//		logs_ALL = new ArrayList<Log>();
 		logs_DO = new ArrayList<Log>();
 		most_relevant = null;
 		
-		assert(dir != null || addr != null);
+		directoryFrom = null;
+		this.name = name;
+	}
+	
+	/* Used in SessionMaster for stream/load sessions */
+	protected Session(String dir, String addr) {
+//		logs_ALL = new ArrayList<Log>();
+		logs_DO = new ArrayList<Log>();
+		most_relevant = null;
+		
+		/* assert(dir != null || addr != null); */
 		assert(dir == null || addr == null);
 		
 		if (dir != null) {
@@ -47,12 +63,36 @@ public class Session {
 		}
 	}
 	
+	/*
+	 * addLog for streaming – checks the log for STATS to update our information of the robot,
+	 * then decides to keep the log based on <dropSTATS> and <keep>
+	 * */
+	public void addLog(Log l, boolean keep) {
+		l.parent = this;
+		
+		if (l.primaryType().equals("STATS")) {
+			this.most_relevant = new RobotStats(l);
+			Events.GRelevantRobotStats.generate(this, most_relevant);
+			
+			if (SessionMaster.dropSTATS) return;
+		}
+		
+		if (keep) {
+			logs_ALL.add(l);
+		}
+	}
+	
+	/*
+	 * addLog for FileIO loading.  Finds most recent STATS log in logs (if present) and
+	 * sets it to most_relevant.
+	 * */
 	public void addLog(Log ... l) {
 		logs_ALL.addAll(Arrays.asList(l));
 		
 		boolean newBS = false;
 		for (Log log : l) {
-			//System.out.println(log.description());
+			log.parent = this;
+
 			if (log.primaryType().equals("STATS")) {
 				this.most_relevant = new RobotStats(log);
 				newBS = true;

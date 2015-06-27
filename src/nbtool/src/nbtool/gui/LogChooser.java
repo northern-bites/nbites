@@ -13,8 +13,10 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import nbtool.data.Log;
+import nbtool.gui.logdnd.LogDND;
+import nbtool.gui.logdnd.LogDND.LogDNDSource;
 
-public class LogChooser extends JPanel {
+public class LogChooser extends JPanel implements LogDNDSource {
 	private static final long serialVersionUID = 1L;
 	public LogChooser() {
 		setLayout(null);
@@ -32,6 +34,13 @@ public class LogChooser extends JPanel {
 		tree.setScrollsOnExpand(true);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		tree.addTreeSelectionListener(model);
+		
+		/* setupDnd */
+		
+		/*
+		tree.setDragEnabled(true);
+		tree.setTransferHandler(new LogTransferHandler(tree, this)); */
+		LogDND.makeComponentSource(tree, this);
 		
 		sas = new SortAndSearch(model);
 		model.sas = sas;
@@ -63,5 +72,10 @@ public class LogChooser extends JPanel {
 	
 	public TreePath[] selection() {
 		return tree.getSelectionPaths();
+	}
+
+	@Override
+	public Log[] supplyLogsForDrag() {
+		return model.lastSelectedLogs;
 	}
 }

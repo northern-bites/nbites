@@ -19,31 +19,6 @@ static const char *PCOMPONENT_NAMES[] = {
     "Image Conversion",
 
     "Vision",
-    "Transform",
-    "ThreshRuns",
-    "FGHorizon",
-    "Runs",
-    "Object",
-    "Obstacles",
-    "Robots",
-
-    "Edges",
-    "Sobel",
-    "Edge Peaks",
-
-    "Hough Transform",
-    "Mark Hough Edges",
-    "Smooth Hough Space",
-    "Hough Peaks",
-    "Suppress Hough Lines",
-
-    "Lines",
-    "Vert Lines",
-    "Hor Lines",
-    "Create Lines",
-    "Join Lines",
-    "Fit Unused",
-    "Intersect Lines",
 
     "Localization",
     "Ball Track",
@@ -95,31 +70,6 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
     /*P_ACQUIRE_IMAGE          --> */ P_COGNITION_THREAD,
 
     /*P_VISION                 --> */ P_COGNITION_THREAD,
-    /*P_TRANSFORM              --> */ P_VISION,
-    /*P_THRESHRUNS             --> */ P_VISION,
-    /*P_FGHORIZON              --> */ P_THRESHRUNS,
-    /*P_RUNS                   --> */ P_THRESHRUNS,
-    /*P_OBJECT                 --> */ P_VISION,
-    /*P_OBSTACLES              --> */ P_VISION,
-    /*P_ROBOTS                 --> */ P_VISION,
-
-    /*P_EDGES,                 --> */ P_VISION,
-    /*P_SOBEL,                 --> */ P_EDGES,
-    /*P_EDGE_PEAKS,            --> */ P_EDGES,
-
-    /*P_HOUGH,                 --> */ P_VISION,
-    /*P_MARK_EDGES,            --> */ P_HOUGH,
-    /*P_SMOOTH,                --> */ P_HOUGH,
-    /*P_HOUGH_PEAKS,           --> */ P_HOUGH,
-    /*P_SUPPRESS,              --> */ P_HOUGH,
-
-    /*P_LINES                  --> */ P_VISION,
-    /*P_VERT_LINES,            --> */ P_LINES,
-    /*P_HOR_LINES,             --> */ P_LINES,
-    /*P_CREATE_LINES,          --> */ P_LINES,
-    /*P_JOIN_LINES,            --> */ P_LINES,
-    /*P_FIT_UNUSED,            --> */ P_LINES,
-    /*P_INTERSECT_LINES,       --> */ P_LINES,
 
     /*P_SELF_LOC               --> */ P_COGNITION_THREAD,
     /*P_BALL_TRACK             --> */ P_COGNITION_THREAD,

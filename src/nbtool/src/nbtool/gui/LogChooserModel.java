@@ -2,6 +2,10 @@ package nbtool.gui;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
 
 import javax.swing.JTree;
 import javax.swing.event.TreeModelEvent;
@@ -20,7 +24,9 @@ import nbtool.util.Events;
 import nbtool.util.Logger;
 import nbtool.util.NBConstants.STATUS;
 
-public class LogChooserModel implements TreeModel, TreeSelectionListener, Events.LogsFound, Events.ToolStatus {
+public class LogChooserModel implements TreeModel, TreeSelectionListener, Events.LogsFound,
+	Events.SessionAdded
+{
 
 	/*
 	 * DataModel:
@@ -29,11 +35,13 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 	String root;
 	JTree tree;
 	
+	protected Log[] lastSelectedLogs;
+	
 	public LogChooserModel() {
 		root = "ROOT PLACEHOLDER";
 		
 		Center.listen(Events.LogsFound.class, this, true);
-		Center.listen(Events.ToolStatus.class, this, true);
+		Center.listen(Events.SessionAdded.class, this, true);
 	}
 	
 	public Object getRoot() {
@@ -133,6 +141,7 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 				selected.add(sel);
 			}
 			
+			lastSelectedLogs = selected.toArray(new Log[0]);
 			Events.GLogSelected.generate(this, selected.remove(0), selected);
 			break;
 		}
@@ -140,26 +149,35 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 			Logger.logf(Logger.ERROR, "ERROR: LCTreeModel path size was: " + first.getPathCount());
 		}
 	}
-	
-	@Override
-	public void toolStatus(Object source, STATUS s, String desc) {
-		Session relevant = SessionMaster.get().getLatestSession();
-		
-		TreeModelEvent tme = new TreeModelEvent(this, new Object[]{root},
-				new int[]{SessionMaster.get().sessions.indexOf(relevant)},
-				new Object[]{relevant});
-		for (TreeModelListener l : listeners) {
-			l.treeStructureChanged(tme);
-		}
-	}
 
 	@Override
 	public void logsFound(Object source, Log... found) {
-		Session relevant = SessionMaster.get().getLatestSession();
-		Logger.logf(Logger.INFO, "TreeModel: rel=%s size=%d", relevant.toString(), relevant.logs_ALL.size());
-		sas.sort(relevant);
+		HashSet<Session> sessions = new HashSet<Session>();
 		
-		TreeModelEvent tme = new TreeModelEvent(this, new Object[]{root, relevant});
+		for (Log log : found) {
+			//We can't display an image that is not part of session.
+			if (log.parent != null) {
+				sessions.add(log.parent);
+			}
+		}
+		
+		//System.out.println("BF1: logsFound " + sessions.size() + " sessions modified.");
+		
+		for (Session modified : sessions) {
+			sas.sort(modified);
+			
+			TreeModelEvent tme = new TreeModelEvent(this, new Object[]{root, modified});
+			for (TreeModelListener l : listeners) {
+				l.treeStructureChanged(tme);
+			}
+		}
+	}
+	
+	@Override
+	public void sessionAdded(Object source, Session session) {
+		TreeModelEvent tme = new TreeModelEvent(this, new Object[]{root},
+				new int[]{SessionMaster.get().sessions.indexOf(session)},
+				new Object[]{session});
 		for (TreeModelListener l : listeners) {
 			l.treeStructureChanged(tme);
 		}
@@ -167,13 +185,35 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 	
 	protected SortAndSearch sas;
 	protected void ssChanged() {
-		
 		for (Session s : SessionMaster.INST.sessions)
 			sas.sort(s);
 		
 		TreeModelEvent tme = new TreeModelEvent(this, new Object[]{root});
 		for (TreeModelListener l : listeners) {
 			l.treeStructureChanged(tme);
+		}
+	}
+	
+	protected void deleteCurrent() {
+		TreePath tp = tree.getSelectionPath();
+		
+		if( tp.getPathCount() == 3 ) {
+			Session ses = (Session)	tp.getPath()[1];
+			Log sel = (Log) tp.getPath()[2];
+			
+			Logger.warnf("deleting {%s} from {%s}", sel, ses);
+			
+			assert(ses.logs_ALL.contains(sel));
+			ses.logs_ALL.remove(sel);
+			ses.logs_DO.remove(sel);
+			
+			TreeModelEvent tme = new TreeModelEvent(this, new Object[]{root, ses});
+			for (TreeModelListener l : listeners) {
+				l.treeStructureChanged(tme);
+			}
+			
+		} else {
+			Logger.warnf("cannot delete: %s", tp.toString());
 		}
 	}
 }

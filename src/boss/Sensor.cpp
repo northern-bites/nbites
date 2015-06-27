@@ -354,6 +354,7 @@ messages::InertialState Sensor::buildInertialsMessage()
 
     inertialsMessage.set_gyr_x(sensorValues[sensors::GyrX]);
     inertialsMessage.set_gyr_y(sensorValues[sensors::GyrY]);
+    inertialsMessage.set_gyr_z(sensorValues[sensors::GyrZ]);
 
     inertialsMessage.set_angle_x(sensorValues[sensors::AngleX]);
     inertialsMessage.set_angle_y(sensorValues[sensors::AngleY]);
