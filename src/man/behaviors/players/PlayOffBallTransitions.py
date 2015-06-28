@@ -127,8 +127,6 @@ def findDefenderHome(left, ball, hh):
             hy = role.oddDefenderBack.y + t*yDist
 
             return RobotLocation(hx, hy, hh)
-<<<<<<< HEAD
-=======
 
 def findChaserHome(ball, hh):
     # find closest point on triangle to the ball and flip it over
@@ -164,4 +162,3 @@ def closePointOnSeg(x1, y1, x2, y2, x3, y3):
     nx = ((x3-x1)*dx + (y3-y1)*dy) / d2
     nx = min(1, max(0, nx))
     return (dx*nx + x1, dy*nx + y1)
->>>>>>> c676f69... tomultuous triangle is a go
