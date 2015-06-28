@@ -62,7 +62,7 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 								curFieldLine.getInner().getEp1(),
 								0.0,
 								0.0,
-								curFieldLine.getId(),
+								curFieldLine.getCorrespondence(),
 								curFieldLine.getProb());
 				naoLines.add(temp);
 			}
@@ -73,7 +73,9 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 				GeoCorner temp = new GeoCorner(
 								curCorner.getX(),
 								curCorner.getY(),
-								curCorner.getId());
+								curCorner.getId(),
+                                curCorner.getCorrespondence(),
+                                curCorner.getProb());
 				naoCorners.add(temp);
 			}
 

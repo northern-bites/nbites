@@ -193,7 +193,7 @@ void ParticleFilter::updateFieldForDebug(messages::FieldLines& lines,
         // Get line
         messages::FieldLine& field = *lines.mutable_line(i);
 
-        // Set loc ids and scores
+        // Set correspondence and scores
         if (!LineSystem::shouldUse(lines.line(i))) {
             // Lines that the particle filter did not use are given -1 as ID
             field.set_id(0);
@@ -201,7 +201,7 @@ void ParticleFilter::updateFieldForDebug(messages::FieldLines& lines,
             // Otherwise line system handles classification and scoring
             LocLineID id = lineSystem.matchObservation(field, poseEstimate);
             field.set_prob(lineSystem.scoreObservation(field, poseEstimate));
-            field.set_id(static_cast<int>(id));
+            field.set_correspondence(static_cast<int>(id));
         }
 
         // Project lines onto the field
@@ -214,6 +214,7 @@ void ParticleFilter::updateFieldForDebug(messages::FieldLines& lines,
         hough.set_ep1(projected.ep1());
     }
 
+    LandmarkSystem landmarkSystem;
     for (int i = 0; i < corners.corner_size(); i++) {
         // Get corner
         messages::Corner& corner = *corners.mutable_corner(i);
@@ -221,6 +222,11 @@ void ParticleFilter::updateFieldForDebug(messages::FieldLines& lines,
         messages::RobotLocation cornerRel;
         cornerRel.set_x(corner.x());
         cornerRel.set_y(corner.y());
+
+        // Set correspondence and scores
+        LandmarkID id = std::get<0>(landmarkSystem.matchCorner(corner, poseEstimate));
+        corner.set_prob(landmarkSystem.scoreCorner(corner, poseEstimate));
+        corner.set_correspondence(static_cast<int>(id));
 
         // Project corner onto the field
         messages::RobotLocation cornerAbs = LandmarkSystem::relRobotToAbsolute(cornerRel, poseEstimate);

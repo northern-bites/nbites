@@ -7,7 +7,8 @@ import javax.swing.*;
 
 public class GeoCorner {
 	float x,y;
-	int id;
+	int id, correspondence;
+    float prob;
 
 	public GeoCorner() {
 		x = 0;
@@ -15,10 +16,12 @@ public class GeoCorner {
 		id = -1;
 	}
 
-	public GeoCorner(float cx, float cy, int c_id) {
+	public GeoCorner(float cx, float cy, int c_id, int c_cor, float c_prob) {
 		x = cx;
 		y = cy;
 		id = c_id;
+        correspondence = c_cor;
+        prob = c_prob;
 	}
 
 	public void draw(Graphics2D g2, boolean shouldFlip) {
@@ -34,5 +37,9 @@ public class GeoCorner {
 			case 2: g2.drawString("T",x,FieldConstants.FIELD_HEIGHT-y);
 		}
 
+		font = new Font("Sans_Serif", Font.PLAIN, 18);
+    	g2.setFont(font);
+        g2.drawString(Integer.toString(correspondence),x,FieldConstants.FIELD_HEIGHT-y+30);
+        g2.drawString(Float.toString(prob),x,FieldConstants.FIELD_HEIGHT-y+60);
 	}
 }
