@@ -147,7 +147,8 @@ private:
      */
     void updateEstimate();
 
-    void updateLinesForDebug(messages::FieldLines& visionInput);
+    void updateFieldForDebug(messages::FieldLines& lines,
+                             messages::Corners& corners);
 
     /**
      * @brief - Return symmetric location from given one

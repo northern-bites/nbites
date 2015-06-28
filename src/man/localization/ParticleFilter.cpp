@@ -62,10 +62,7 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
 {
     // Motion system and vision system update step
     motionSystem->update(particles, odometryInput, errorMagnitude);
-    if (ballInput)
-        updatedVision = visionSystem->update(particles, linesInput, cornersInput, *ballInput);
-    else
-        updatedVision = visionSystem->update(particles, linesInput, cornersInput);
+    updatedVision = visionSystem->update(particles, linesInput, cornersInput, ballInput);
 
     // Resample if vision updated
     float avgErr = -1;
@@ -94,8 +91,8 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     // Update filters estimate
     updateEstimate();
 
-    // For debug tools, project lines onto field, set IDs, etc.
-    updateLinesForDebug(linesInput); 
+    // For debug tools, project lines and corners onto field, set IDs, etc.
+    updateFieldForDebug(linesInput, cornersInput); 
 }
 
 // void ParticleFilter::update(const messages::RobotLocation& odometryInput,
@@ -187,16 +184,17 @@ void ParticleFilter::updateEstimate()
 
 }
 
-void ParticleFilter::updateLinesForDebug(messages::FieldLines& visionInput)
+void ParticleFilter::updateFieldForDebug(messages::FieldLines& lines,
+                                         messages::Corners& corners)
 {
     LineSystem lineSystem;
     lineSystem.setDebug(false);
-    for (int i = 0; i < visionInput.line_size(); i++) {
+    for (int i = 0; i < lines.line_size(); i++) {
         // Get line
-        messages::FieldLine& field = *visionInput.mutable_line(i);
+        messages::FieldLine& field = *lines.mutable_line(i);
 
         // Set loc ids and scores
-        if (!LineSystem::shouldUse(visionInput.line(i))) {
+        if (!LineSystem::shouldUse(lines.line(i))) {
             // Lines that the particle filter did not use are given -1 as ID
             field.set_id(0);
         } else {
@@ -207,13 +205,27 @@ void ParticleFilter::updateLinesForDebug(messages::FieldLines& visionInput)
         }
 
         // Project lines onto the field
-        vision::GeoLine projected = LineSystem::relRobotToAbsolute(visionInput.line(i), poseEstimate);
+        vision::GeoLine projected = LineSystem::relRobotToAbsolute(lines.line(i), poseEstimate);
         messages::HoughLine& hough = *field.mutable_inner();
 
         hough.set_r(projected.r());
         hough.set_t(projected.t());
         hough.set_ep0(projected.ep0());
         hough.set_ep1(projected.ep1());
+    }
+
+    for (int i = 0; i < corners.corner_size(); i++) {
+        // Get corner
+        messages::Corner& corner = *corners.mutable_corner(i);
+
+        messages::RobotLocation cornerRel;
+        cornerRel.set_x(corner.x());
+        cornerRel.set_y(corner.y());
+
+        // Project corner onto the field
+        messages::RobotLocation cornerAbs = LandmarkSystem::relRobotToAbsolute(cornerRel, poseEstimate);
+        corner.set_x(cornerAbs.x());
+        corner.set_y(cornerAbs.y());
     }
 }
 

@@ -116,6 +116,18 @@ inline void translateRotate(double x, double y, double transX, double transY,
     yTransformed = yRotated + transY;
 }
 
+inline void cartesianToPolar(double x, double y, double& r, double& t)
+{
+    r = sqrt(x * x + y * y);
+    t = atan2(y, x);
+}
+
+inline void polarToCartesian(double r, double t, double& x, double& y)
+{
+    x = r * cos(t);
+    y = r * sin(t);
+}
+
 std::string strPrintf(const char* format, ...);
 
 // ************
