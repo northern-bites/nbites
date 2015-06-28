@@ -157,6 +157,7 @@ enum SensorTypes
     // Filtered angle data
     AngleX,
     AngleY,
+    AngleZ,
 
     //END_INTERTIALS,
 
@@ -330,6 +331,7 @@ static const std::string SensorNames[] =
     "GyrZ",
     "AngleX",
     "AngleY",
+    "AngleZ",
     //"!!END!!",
     //OTHERS
     "BatteryCharge",
