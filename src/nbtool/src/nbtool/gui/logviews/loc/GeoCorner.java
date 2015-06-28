@@ -27,11 +27,11 @@ public class GeoCorner {
     	g2.setFont(font);
 
 		switch(id) {
-			case 0: g2.drawString("C",x,y);
+			case 0: g2.drawString("C",x,FieldConstants.FIELD_HEIGHT-y);
 					break;
-			case 1: g2.drawString("V",x,y);
+			case 1: g2.drawString("V",x,FieldConstants.FIELD_HEIGHT-y);
 					break;
-			case 2: g2.drawString("T",x,y);
+			case 2: g2.drawString("T",x,FieldConstants.FIELD_HEIGHT-y);
 		}
 
 	}

@@ -12,11 +12,13 @@ VisionSystem::VisionSystem()
     : injections(), numObservations(0), avgError(0)
 {
     lineSystem = new LineSystem;
+    landmarkSystem = new LandmarkSystem;
 }
 
 VisionSystem::~VisionSystem() 
 {
     delete lineSystem;
+    delete landmarkSystem;
 }
 
 bool VisionSystem::update(ParticleSet& particles,

@@ -10,6 +10,11 @@ LandmarkSystem::LandmarkSystem()
     : corners(), ballInSet()
 {
     // Construct map
+    // Init corner map
+    corners[vision::CornerID::Concave] = std::vector<Landmark>();
+    corners[vision::CornerID::Convex] = std::vector<Landmark>();
+    corners[vision::CornerID::T] = std::vector<Landmark>();
+
     // Add corners to map
     addCorner(vision::CornerID::Concave, LandmarkID::OurRightConcave, GREEN_PAD_X, GREEN_PAD_Y);
     addCorner(vision::CornerID::Concave, LandmarkID::OurLeftConcave, GREEN_PAD_X, GREEN_PAD_Y + FIELD_WHITE_HEIGHT);
@@ -37,7 +42,7 @@ Landmark LandmarkSystem::matchCorner(const messages::Corner& observation,
 {
     Landmark correspondingLandmark;
     double bestScore = std::numeric_limits<double>::min();
-    
+
     // Turn observation into RobotLocation so scoreObservation can operate on it
     messages::RobotLocation obsvAsRobotLocation;
     obsvAsRobotLocation.set_x(observation.x());

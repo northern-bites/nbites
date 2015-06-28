@@ -77,5 +77,6 @@ protected:
 private:
     size_t log_index;
 };
+
 } // namespace localization
 } // namespace man

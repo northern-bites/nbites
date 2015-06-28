@@ -159,6 +159,7 @@ void VisionModule::run_()
 
     // Send messages on outportals
     sendLinesOut();
+    sendCornersOut();
     ballOn = ballDetected;
     updateVisionBall();
 
