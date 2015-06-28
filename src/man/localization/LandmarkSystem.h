@@ -22,7 +22,7 @@ namespace man {
 namespace localization {
 
 enum class LandmarkID {
-    OurRightConcave,
+    OurRightConcave = 0,
     OurLeftConcave,
     OurRightConvex,
     OurLeftConvex,
@@ -39,9 +39,9 @@ enum class LandmarkID {
     BallInSet
 };
 
-// Stores the LandmarkID and (r, t) polar coordinate representation of the location
+// Stores the LandmarkID and (x, y) cartesian coordinate representation of the location
 // of the landmark in absolute coordinates
-// NOTE r is the second argument in the tuple, t is the third
+// NOTE x is the second argument in the tuple, y is the third
 typedef std::tuple<LandmarkID, double, double> Landmark;
 
 class LandmarkSystem {
@@ -73,6 +73,10 @@ public:
     double scoreBallInSet(const messages::FilteredBall& observation, 
                           const messages::RobotLocation& loc);
 
+    // Set debug mode, enables print lines
+    // @param debug_, true if debug mode
+    void setDebug(bool debug_) { debug = debug_; }
+
     // Convert observation from relative robot coords to absolute coords
     // @param observation, the observation in robot relative coords
     // @param loc, pose hypothesis used to map the observation to absolute coords
@@ -88,9 +92,9 @@ private:
     // @returns the probability of correspondence
     // @note matchCorner, scoreCorner, and scoreBallInSet all call on this 
     //       method to do math involved in landmark scoring
-    static double scoreObservation(const messages::RobotLocation& observation, 
-                                   const Landmark& correspondingLandmark,
-                                   const messages::RobotLocation& loc);
+    double scoreObservation(const messages::RobotLocation& observation, 
+                            const Landmark& correspondingLandmark,
+                            const messages::RobotLocation& loc);
 
     // Helper method
     void addCorner(vision::CornerID type, LandmarkID id, double x, double y);
@@ -98,6 +102,8 @@ private:
     // Map
     std::map<vision::CornerID, std::vector<Landmark>> corners;
     Landmark ballInSet;
+
+    bool debug;
 };
 
 } // namespace localization

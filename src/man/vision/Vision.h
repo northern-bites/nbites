@@ -116,6 +116,16 @@ inline void translateRotate(double x, double y, double transX, double transY,
     yTransformed = yRotated + transY;
 }
 
+inline void inverseTranslateRotate(double x, double y, double transX, double transY, 
+                                   double rotation, double& xTransformed, double& yTransformed)
+{
+    double xTranslated = x - transX;
+    double yTranslated = y - transY;
+
+    xTransformed = xTranslated*cos(rotation) + yTranslated*sin(rotation);
+    yTransformed = -xTranslated*sin(rotation) + yTranslated*cos(rotation);
+}
+
 inline void cartesianToPolar(double x, double y, double& r, double& t)
 {
     r = sqrt(x * x + y * y);

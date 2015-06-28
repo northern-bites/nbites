@@ -7,7 +7,7 @@ namespace man {
 namespace localization {
 
 LandmarkSystem::LandmarkSystem() 
-    : corners(), ballInSet()
+    : corners(), ballInSet(), debug(false)
 {
     // Construct map
     // Init corner map
@@ -41,24 +41,27 @@ Landmark LandmarkSystem::matchCorner(const messages::Corner& observation,
                                      const messages::RobotLocation& loc)
 {
     Landmark correspondingLandmark;
-    double bestScore = std::numeric_limits<double>::min();
+    double closestDist = std::numeric_limits<double>::max();
 
-    // Turn observation into RobotLocation so scoreObservation can operate on it
+    // Transform observation to absolute coordinate system
     messages::RobotLocation obsvAsRobotLocation;
     obsvAsRobotLocation.set_x(observation.x());
     obsvAsRobotLocation.set_y(observation.y());
+    messages::RobotLocation obsvAbs = LandmarkSystem::relRobotToAbsolute(obsvAsRobotLocation, loc);
 
     // Loop through all corners with right id from vision and take the corner
     // that best corresponds to the observation
+    // NOTE correspondence is found by minimizing euclidean distance
     vision::CornerID visionID = static_cast<vision::CornerID>(observation.id());
     const std::vector<Landmark>& possibleCorners = corners[visionID];
     for (int i = 0; i < possibleCorners.size(); i++) {
         Landmark possibleCorner = possibleCorners[i];
-        double curScore = LandmarkSystem::scoreObservation(obsvAsRobotLocation, possibleCorner, loc);
+        double dist = vision::dist(obsvAbs.x(), obsvAbs.y(),
+                                   std::get<1>(possibleCorner), std::get<2>(possibleCorner));
 
-        if (curScore > bestScore) {
+        if (closestDist > dist) {
             correspondingLandmark = possibleCorner;
-            bestScore = curScore;
+            closestDist = dist;
         }
     }
 
@@ -75,7 +78,7 @@ double LandmarkSystem::scoreCorner(const messages::Corner& observation,
 
     // Find correspondence and calculate probability of match
     Landmark correspondingLandmark = matchCorner(observation, loc);
-    return LandmarkSystem::scoreObservation(obsvAsRobotLocation, correspondingLandmark, loc);
+    return scoreObservation(obsvAsRobotLocation, correspondingLandmark, loc);
 }
 
 double LandmarkSystem::scoreBallInSet(const messages::FilteredBall& observation, 
@@ -91,7 +94,7 @@ double LandmarkSystem::scoreBallInSet(const messages::FilteredBall& observation,
     obsvAsRobotLocation.set_y(yBall);
 
     // Calculate probability of match
-    return LandmarkSystem::scoreObservation(obsvAsRobotLocation, ballInSet, loc);
+    return scoreObservation(obsvAsRobotLocation, ballInSet, loc);
 }
 
 messages::RobotLocation LandmarkSystem::relRobotToAbsolute(const messages::RobotLocation& observation, const messages::RobotLocation& loc)
@@ -109,20 +112,28 @@ messages::RobotLocation LandmarkSystem::relRobotToAbsolute(const messages::Robot
     return transformed;
 }
 
+// TODO debug
 double LandmarkSystem::scoreObservation(const messages::RobotLocation& observation, 
                                         const Landmark& correspondingLandmark,
                                         const messages::RobotLocation& loc)
 {
-    // Map to absolute coordinates
-    messages::RobotLocation globalObsv = LandmarkSystem::relRobotToAbsolute(observation, loc);
-
-    // Cartesian to polar
+    // Observation, cartesian to polar
     double rObsv, tObsv;
-    vision::cartesianToPolar(globalObsv.x(), globalObsv.y(), rObsv, tObsv);
+    vision::cartesianToPolar(observation.x(), observation.y(), rObsv, tObsv);
+
+    // Landmark in map, absolute to robot relative
+    double xMapRel, yMapRel;
+    vision::inverseTranslateRotate(std::get<1>(correspondingLandmark), 
+                                   std::get<2>(correspondingLandmark),
+                                   loc.x(), loc.y(), loc.h(), xMapRel, yMapRel);
+
+    // Landmark in map, cartesian to polar
+    double rMapRel, tMapRel;
+    vision::cartesianToPolar(xMapRel, yMapRel, rMapRel, tMapRel);
 
     // Find difference in r and t
-    double rDiff = fabs(fabs(std::get<1>(correspondingLandmark)) - fabs(rObsv));
-    double tDiff = vision::diffRadians(std::get<2>(correspondingLandmark), tObsv);
+    double rDiff = fabs(rMapRel - rObsv);
+    double tDiff = vision::diffRadians(tMapRel, tObsv);
  
     // Evaluate gaussian to get probability of observation from location loc
     // TODO params
@@ -132,18 +143,24 @@ double LandmarkSystem::scoreObservation(const messages::RobotLocation& observati
     double rProb = pdf(rGaussian, rDiff);
     double tProb = pdf(tGaussian, tDiff);
 
+    if (debug) {
+        std::cout << "Scoring observation:" << std::endl;
+        std::cout << observation.x() << "," << observation.y() << std::endl;
+        std::cout << rObsv << "," << tObsv << std::endl;
+        std::cout << std::get<1>(correspondingLandmark) << "," << std::get<2>(correspondingLandmark) << std::endl;
+        std::cout << xMapRel << "," << yMapRel << std::endl;
+        std::cout << rMapRel << "," << tMapRel << std::endl;
+        std::cout << rDiff << "/" << tDiff << std::endl;
+        std::cout << rProb << "/" << tProb << std::endl;
+    }
+
     // Make the conditional independence assumption
     return rProb * tProb;
 }
 
 void LandmarkSystem::addCorner(vision::CornerID type, LandmarkID id, double x, double y)
 {
-    // Cartesian to polar
-    double r, t;
-    vision::cartesianToPolar(x, y, r, t);
-
-    // Add corner to map
-    Landmark corner = std::make_tuple(id, r, t);
+    Landmark corner = std::make_tuple(id, x, y);
     corners[type].push_back(corner);
 }
 

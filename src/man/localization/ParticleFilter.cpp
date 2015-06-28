@@ -215,6 +215,7 @@ void ParticleFilter::updateFieldForDebug(messages::FieldLines& lines,
     }
 
     LandmarkSystem landmarkSystem;
+    landmarkSystem.setDebug(true);
     for (int i = 0; i < corners.corner_size(); i++) {
         // Get corner
         messages::Corner& corner = *corners.mutable_corner(i);
