@@ -82,6 +82,7 @@ public class NBConstants {
 		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
 		map.put("location", new Class[]{LocSwarmView.class});
 		map.put("proto-FieldLines", new Class[]{BasicLineView.class});
+		map.put("proto-Corners", new Class[]{BasicLineView.class});
 
 		return map;
 	}

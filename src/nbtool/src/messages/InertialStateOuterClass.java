@@ -74,7 +74,16 @@ public final class InertialStateOuterClass {
     float getGyrY();
 
     /**
-     * <code>optional float angle_x = 6;</code>
+     * <code>optional float gyr_z = 6;</code>
+     */
+    boolean hasGyrZ();
+    /**
+     * <code>optional float gyr_z = 6;</code>
+     */
+    float getGyrZ();
+
+    /**
+     * <code>optional float angle_x = 7;</code>
      *
      * <pre>
      * Filtered angle data.
@@ -82,7 +91,7 @@ public final class InertialStateOuterClass {
      */
     boolean hasAngleX();
     /**
-     * <code>optional float angle_x = 6;</code>
+     * <code>optional float angle_x = 7;</code>
      *
      * <pre>
      * Filtered angle data.
@@ -91,13 +100,22 @@ public final class InertialStateOuterClass {
     float getAngleX();
 
     /**
-     * <code>optional float angle_y = 7;</code>
+     * <code>optional float angle_y = 8;</code>
      */
     boolean hasAngleY();
     /**
-     * <code>optional float angle_y = 7;</code>
+     * <code>optional float angle_y = 8;</code>
      */
     float getAngleY();
+
+    /**
+     * <code>optional float angle_z = 9;</code>
+     */
+    boolean hasAngleZ();
+    /**
+     * <code>optional float angle_z = 9;</code>
+     */
+    float getAngleZ();
   }
   /**
    * Protobuf type {@code messages.InertialState}
@@ -178,12 +196,22 @@ public final class InertialStateOuterClass {
             }
             case 53: {
               bitField0_ |= 0x00000020;
-              angleX_ = input.readFloat();
+              gyrZ_ = input.readFloat();
               break;
             }
             case 61: {
               bitField0_ |= 0x00000040;
+              angleX_ = input.readFloat();
+              break;
+            }
+            case 69: {
+              bitField0_ |= 0x00000080;
               angleY_ = input.readFloat();
+              break;
+            }
+            case 77: {
+              bitField0_ |= 0x00000100;
+              angleZ_ = input.readFloat();
               break;
             }
           }
@@ -317,20 +345,35 @@ public final class InertialStateOuterClass {
       return gyrY_;
     }
 
-    public static final int ANGLE_X_FIELD_NUMBER = 6;
+    public static final int GYR_Z_FIELD_NUMBER = 6;
+    private float gyrZ_;
+    /**
+     * <code>optional float gyr_z = 6;</code>
+     */
+    public boolean hasGyrZ() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional float gyr_z = 6;</code>
+     */
+    public float getGyrZ() {
+      return gyrZ_;
+    }
+
+    public static final int ANGLE_X_FIELD_NUMBER = 7;
     private float angleX_;
     /**
-     * <code>optional float angle_x = 6;</code>
+     * <code>optional float angle_x = 7;</code>
      *
      * <pre>
      * Filtered angle data.
      * </pre>
      */
     public boolean hasAngleX() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
+      return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
-     * <code>optional float angle_x = 6;</code>
+     * <code>optional float angle_x = 7;</code>
      *
      * <pre>
      * Filtered angle data.
@@ -340,19 +383,34 @@ public final class InertialStateOuterClass {
       return angleX_;
     }
 
-    public static final int ANGLE_Y_FIELD_NUMBER = 7;
+    public static final int ANGLE_Y_FIELD_NUMBER = 8;
     private float angleY_;
     /**
-     * <code>optional float angle_y = 7;</code>
+     * <code>optional float angle_y = 8;</code>
      */
     public boolean hasAngleY() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
+      return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
-     * <code>optional float angle_y = 7;</code>
+     * <code>optional float angle_y = 8;</code>
      */
     public float getAngleY() {
       return angleY_;
+    }
+
+    public static final int ANGLE_Z_FIELD_NUMBER = 9;
+    private float angleZ_;
+    /**
+     * <code>optional float angle_z = 9;</code>
+     */
+    public boolean hasAngleZ() {
+      return ((bitField0_ & 0x00000100) == 0x00000100);
+    }
+    /**
+     * <code>optional float angle_z = 9;</code>
+     */
+    public float getAngleZ() {
+      return angleZ_;
     }
 
     private void initFields() {
@@ -361,8 +419,10 @@ public final class InertialStateOuterClass {
       accZ_ = 0F;
       gyrX_ = 0F;
       gyrY_ = 0F;
+      gyrZ_ = 0F;
       angleX_ = 0F;
       angleY_ = 0F;
+      angleZ_ = 0F;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -393,10 +453,16 @@ public final class InertialStateOuterClass {
         output.writeFloat(5, gyrY_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeFloat(6, angleX_);
+        output.writeFloat(6, gyrZ_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeFloat(7, angleY_);
+        output.writeFloat(7, angleX_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeFloat(8, angleY_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        output.writeFloat(9, angleZ_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -429,11 +495,19 @@ public final class InertialStateOuterClass {
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(6, angleX_);
+          .computeFloatSize(6, gyrZ_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(7, angleY_);
+          .computeFloatSize(7, angleX_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(8, angleY_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(9, angleZ_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -562,10 +636,14 @@ public final class InertialStateOuterClass {
         bitField0_ = (bitField0_ & ~0x00000008);
         gyrY_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000010);
-        angleX_ = 0F;
+        gyrZ_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000020);
-        angleY_ = 0F;
+        angleX_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000040);
+        angleY_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000080);
+        angleZ_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000100);
         return this;
       }
 
@@ -617,11 +695,19 @@ public final class InertialStateOuterClass {
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
         }
-        result.angleX_ = angleX_;
+        result.gyrZ_ = gyrZ_;
         if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
           to_bitField0_ |= 0x00000040;
         }
+        result.angleX_ = angleX_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
         result.angleY_ = angleY_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000100;
+        }
+        result.angleZ_ = angleZ_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -653,11 +739,17 @@ public final class InertialStateOuterClass {
         if (other.hasGyrY()) {
           setGyrY(other.getGyrY());
         }
+        if (other.hasGyrZ()) {
+          setGyrZ(other.getGyrZ());
+        }
         if (other.hasAngleX()) {
           setAngleX(other.getAngleX());
         }
         if (other.hasAngleY()) {
           setAngleY(other.getAngleY());
+        }
+        if (other.hasAngleZ()) {
+          setAngleZ(other.getAngleZ());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -878,19 +970,51 @@ public final class InertialStateOuterClass {
         return this;
       }
 
+      private float gyrZ_ ;
+      /**
+       * <code>optional float gyr_z = 6;</code>
+       */
+      public boolean hasGyrZ() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional float gyr_z = 6;</code>
+       */
+      public float getGyrZ() {
+        return gyrZ_;
+      }
+      /**
+       * <code>optional float gyr_z = 6;</code>
+       */
+      public Builder setGyrZ(float value) {
+        bitField0_ |= 0x00000020;
+        gyrZ_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float gyr_z = 6;</code>
+       */
+      public Builder clearGyrZ() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        gyrZ_ = 0F;
+        onChanged();
+        return this;
+      }
+
       private float angleX_ ;
       /**
-       * <code>optional float angle_x = 6;</code>
+       * <code>optional float angle_x = 7;</code>
        *
        * <pre>
        * Filtered angle data.
        * </pre>
        */
       public boolean hasAngleX() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
-       * <code>optional float angle_x = 6;</code>
+       * <code>optional float angle_x = 7;</code>
        *
        * <pre>
        * Filtered angle data.
@@ -900,27 +1024,27 @@ public final class InertialStateOuterClass {
         return angleX_;
       }
       /**
-       * <code>optional float angle_x = 6;</code>
+       * <code>optional float angle_x = 7;</code>
        *
        * <pre>
        * Filtered angle data.
        * </pre>
        */
       public Builder setAngleX(float value) {
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         angleX_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional float angle_x = 6;</code>
+       * <code>optional float angle_x = 7;</code>
        *
        * <pre>
        * Filtered angle data.
        * </pre>
        */
       public Builder clearAngleX() {
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
         angleX_ = 0F;
         onChanged();
         return this;
@@ -928,32 +1052,64 @@ public final class InertialStateOuterClass {
 
       private float angleY_ ;
       /**
-       * <code>optional float angle_y = 7;</code>
+       * <code>optional float angle_y = 8;</code>
        */
       public boolean hasAngleY() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
+        return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
-       * <code>optional float angle_y = 7;</code>
+       * <code>optional float angle_y = 8;</code>
        */
       public float getAngleY() {
         return angleY_;
       }
       /**
-       * <code>optional float angle_y = 7;</code>
+       * <code>optional float angle_y = 8;</code>
        */
       public Builder setAngleY(float value) {
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         angleY_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional float angle_y = 7;</code>
+       * <code>optional float angle_y = 8;</code>
        */
       public Builder clearAngleY() {
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000080);
         angleY_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float angleZ_ ;
+      /**
+       * <code>optional float angle_z = 9;</code>
+       */
+      public boolean hasAngleZ() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      /**
+       * <code>optional float angle_z = 9;</code>
+       */
+      public float getAngleZ() {
+        return angleZ_;
+      }
+      /**
+       * <code>optional float angle_z = 9;</code>
+       */
+      public Builder setAngleZ(float value) {
+        bitField0_ |= 0x00000100;
+        angleZ_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float angle_z = 9;</code>
+       */
+      public Builder clearAngleZ() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        angleZ_ = 0F;
         onChanged();
         return this;
       }
@@ -983,10 +1139,11 @@ public final class InertialStateOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\023InertialState.proto\022\010messages\"|\n\rInert" +
-      "ialState\022\r\n\005acc_x\030\001 \001(\002\022\r\n\005acc_y\030\002 \001(\002\022\r" +
-      "\n\005acc_z\030\003 \001(\002\022\r\n\005gyr_x\030\004 \001(\002\022\r\n\005gyr_y\030\005 " +
-      "\001(\002\022\017\n\007angle_x\030\006 \001(\002\022\017\n\007angle_y\030\007 \001(\002"
+      "\n\023InertialState.proto\022\010messages\"\234\001\n\rIner" +
+      "tialState\022\r\n\005acc_x\030\001 \001(\002\022\r\n\005acc_y\030\002 \001(\002\022" +
+      "\r\n\005acc_z\030\003 \001(\002\022\r\n\005gyr_x\030\004 \001(\002\022\r\n\005gyr_y\030\005" +
+      " \001(\002\022\r\n\005gyr_z\030\006 \001(\002\022\017\n\007angle_x\030\007 \001(\002\022\017\n\007" +
+      "angle_y\030\010 \001(\002\022\017\n\007angle_z\030\t \001(\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1005,7 +1162,7 @@ public final class InertialStateOuterClass {
     internal_static_messages_InertialState_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_InertialState_descriptor,
-        new java.lang.String[] { "AccX", "AccY", "AccZ", "GyrX", "GyrY", "AngleX", "AngleY", });
+        new java.lang.String[] { "AccX", "AccY", "AccZ", "GyrX", "GyrY", "GyrZ", "AngleX", "AngleY", "AngleZ", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

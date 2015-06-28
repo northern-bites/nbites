@@ -88,6 +88,7 @@ public:
     // portals::InPortal<messages::FieldObstacles> obstacleIn;
     // portals::InPortal<messages::VisionObstacle> visionObstacleIn;
     portals::InPortal<messages::FieldLines> linesIn;
+    portals::InPortal<messages::Corners> cornersIn;
     portals::InPortal<messages::SharedBall> sharedBallIn;
     portals::InPortal<messages::RobotLocation> sharedFlipIn;
 
