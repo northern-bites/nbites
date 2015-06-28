@@ -163,8 +163,9 @@ def shouldTurn(player):
         # and use the information to help correct itself
         # Theoretically will usually be the long front line?
         else:
-            if length > maxLength:
+            if length > longestLength:
                 longestLine = line
+                longestLength = length
             # h_dest = t - 90.0
             # player.homeDirections += [RelRobotLocation(0.0, 0.0, h_dest)]
             # print "Should turn was TRUE"
@@ -173,7 +174,7 @@ def shouldTurn(player):
             # print ("r was:", r)
             # return True
 
-        if longestLine not None:
+        if longestLine is not None:
             h_dest = t - 90.0
             player.homeDirections += [RelRobotLocation(0.0, 0.0, h_dest)]
             print "Should turn was TRUE"
@@ -256,8 +257,28 @@ def getLineLength(line):
     y = y2 - y1
     return math.sqrt(x*x + y*y)
 
-def shouldShiftRight
+def shouldPositionRight(player):
+    if player.brain.ball.bearing_deg < -40.0 and \
+    player.inPosition is not constants.RIGHT_POSITION and \
+    player.inPosition is not constants.NOT_IN_POSITION:
+        player.homeDirections += [RelRobotLocation(5.0, -30.0, 0.0)]
+        return True
+    return False
 
+def shouldPositionLeft(player):
+    if player.brain.ball.bearing_deg > 40.0 and \
+    player.inPosition is not constants.LEFT_POSITION and \
+    player.inPosition is not constants.NOT_IN_POSITION:
+        player.homeDirections += [RelRobotLocation(5.0, 30.0, 0.0)]
+        return True
+    return False
+
+def shouldStopTurning(player):
+    lines = player.brain.visionLines
+
+    # for i in range(0, lines.line_size()):
+    #     r = lines(i).inner.r
+    #     t = math.degrees(lines(i).inner.t)
 
 
 
@@ -685,9 +706,9 @@ def shouldClearBall(player):
         shouldGo = True
 
     if shouldGo:
-        if player.brain.ball.bearing_deg < -60.0:
+        if player.brain.ball.bearing_deg < -50.0:
             VisualGoalieStates.clearIt.dangerousSide = constants.RIGHT
-        elif player.brain.ball.bearing_deg > 60.0:
+        elif player.brain.ball.bearing_deg > 50.0:
             VisualGoalieStates.clearIt.dangerousSide = constants.LEFT
         else:
             VisualGoalieStates.clearIt.dangerousSide = -1

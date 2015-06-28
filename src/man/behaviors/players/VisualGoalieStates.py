@@ -163,6 +163,33 @@ def returnToGoal(player):
 
     return Transition.getNextState(player, returnToGoal)
 
+# Very hacky, I am on a lot of shoulder medication
+# Ideally let a robot find its way back to the goalbox after falling
+# or getting lost outside
+# Robot spins until it finds a line, then walks towards it
+@superState('gamecontrollerResponder')
+def findMyWayBackPtI(player):
+    # lines = player.brain.visionLines
+
+    # for i in range(0, lines.line_size()):
+    #     r = lines(i).inner.r
+    #     t = math.degrees(lines(i).inner.t)
+
+    if player.firstFrame():
+        player.brain.nav.stop()
+        spinAtGoal.counter = 0
+        player.brain.tracker.lookToAngle(0.0)
+    spinAtGoal.counter += 1
+    if spinAtGoal.counter > 200:
+            return player.goLater('watchWithLineChecks')
+    if player.brain.nav.isStopped():
+        player.setWalk(0, 0, 20.0)
+
+    return Transition.getNextState(player, findMyWayBackPtI)
+
+
+
+
 @superState('gameControllerResponder')
 def repositionAfterWhiff(player):
     if player.firstFrame():

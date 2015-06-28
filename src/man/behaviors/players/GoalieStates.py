@@ -59,6 +59,8 @@ def gameSet(player):
         player.stand()
         player.brain.interface.motionRequest.reset_odometry = True
         player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
+        player.inPosition = constants.CENTER_POSITION
+
         watchWithLineChecks.correctFacing = False
         watchWithLineChecks.numFixes = 0
         watchWithLineChecks.numTurns = 0
@@ -98,8 +100,8 @@ def gamePlaying(player):
         return player.goLater('walkToGoal')
 
     if player.lastDiffState == 'fallen':
-        #TODO fix this this is a hack to get rid of this thing
-        player.justKicked = False
+        # #TODO fix this
+        # player.justKicked = False
         if player.justKicked:
             print "I just kicked, I'm returning to goal!"
             return player.goLater('returnToGoal')
@@ -362,6 +364,7 @@ def kickBall(player):
     Kick the ball
     """
     if player.firstFrame():
+        player.justKicked = True
         # save odometry if this was your first kick
         if player.lastDiffState == 'clearIt':
             VisualStates.returnToGoal.kickPose = \
@@ -384,7 +387,6 @@ def kickBall(player):
         player.executeMove(player.kick.sweetMove)
 
     if player.counter > 30 and player.brain.nav.isStopped():
-        player.justKicked = True
         return player.goLater('didIKickIt')
 
     return player.stay()
