@@ -127,3 +127,41 @@ def findDefenderHome(left, ball, hh):
             hy = role.oddDefenderBack.y + t*yDist
 
             return RobotLocation(hx, hy, hh)
+<<<<<<< HEAD
+=======
+
+def findChaserHome(ball, hh):
+    # find closest point on triangle to the ball and flip it over
+    # the y axis so we are positioned watching the ball from other side
+    if ball.x < nogginC.LANDMARK_YELLOW_GOAL_CROSS_X:
+        if ball.y > nogginC.MIDFIELD_Y:
+            home = closePointOnSeg(role.oddChaserTop.x,
+                                    role.oddChaserTop.y,
+                                    role.oddChaserForward.x,
+                                    role.oddChaserForward.y,
+                                    ball.x, ball.y)
+            return RobotLocation(home[0], nogginC.FIELD_HEIGHT - home[1], hh)
+        else:
+            home = closePointOnSeg(role.oddChaserBottom.x,
+                                    role.oddChaserBottom.y,
+                                    role.oddChaserForward.x,
+                                    role.oddChaserForward.y,
+                                    ball.x, ball.y)
+            return RobotLocation(home[0], nogginC.FIELD_HEIGHT - home[1], hh)
+    else:
+        home = closePointOnSeg(role.oddChaserBottom.x,
+                                role.oddChaserBottom.y,
+                                role.oddChaserTop.x,
+                                role.oddChaserTop.y,
+                                ball.x, ball.y)
+        return RobotLocation(home[0], nogginC.FIELD_HEIGHT - home[1], hh)
+
+# find the closest point on a line segment ((x1,y1),(x2,y2)) to a point (x3,y3)
+def closePointOnSeg(x1, y1, x2, y2, x3, y3):
+    dx = x2 - x1
+    dy = y2 - y1
+    d2 = dx*dx + dy*dy
+    nx = ((x3-x1)*dx + (y3-y1)*dy) / d2
+    nx = min(1, max(0, nx))
+    return (dx*nx + x1, dy*nx + y1)
+>>>>>>> c676f69... tomultuous triangle is a go

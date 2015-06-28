@@ -59,7 +59,8 @@ def positionAtHome(player):
             home = transitions.findDefenderHome(True, ball, player.homePosition.h)
         elif role.isRightDefender(player.role):
             home = transitions.findDefenderHome(False, ball, player.homePosition.h)
-        # elif role.isSecondChaser(player.role):
+        elif role.isSecondChaser(player.role) or role.isCherryPicker(player.role):
+            home = transitions.findChaserHome(ball, player.homePosition.h)
         else:
             home = player.homePosition
 
