@@ -32,9 +32,7 @@ LandmarkSystem::LandmarkSystem()
     addCorner(vision::CornerID::T, LandmarkID::TheirLeftT, GREEN_PAD_X + FIELD_WHITE_WIDTH, BLUE_GOALBOX_TOP_Y);
 
     // Add ball in set to map
-    double rBall, tBall;
-    vision::cartesianToPolar(CENTER_FIELD_X, CENTER_FIELD_Y, rBall, tBall);
-    ballInSet = std::make_tuple(LandmarkID::BallInSet, rBall, tBall);
+    ballInSet = std::make_tuple(LandmarkID::BallInSet, CENTER_FIELD_X, CENTER_FIELD_Y);
 }
 
 Landmark LandmarkSystem::matchCorner(const messages::Corner& observation, 
@@ -86,7 +84,7 @@ double LandmarkSystem::scoreBallInSet(const messages::FilteredBall& observation,
 {
     // Polar to cartesian
     double xBall, yBall;
-    vision::cartesianToPolar(observation.distance(), observation.bearing(), xBall, yBall);
+    vision::polarToCartesian(observation.distance(), observation.bearing(), xBall, yBall);
 
     // Turn observation into RobotLocation so scoreObservation can operate on it
     messages::RobotLocation obsvAsRobotLocation;

@@ -36,8 +36,7 @@ bool VisionSystem::update(ParticleSet& particles,
         numObservations++;
     }
     numObservations += corners.corner_size();
-    // if (ball != NULL)
-    //     numObservations++;
+    if (ball != NULL) numObservations++;
 
     // If no observations, return without updating weights
     if (!numObservations)
@@ -62,8 +61,8 @@ bool VisionSystem::update(ParticleSet& particles,
             curParticleError = curParticleError*landmarkSystem->scoreCorner(corners.corner(i), particle->getLocation());
 
         // Score particle from ball observation if in game set
-        // if (ball != NULL)
-        //     curParticleError = curParticleError*landmarkSystem->scoreBallInSet(*ball, particle->getLocation());
+        if (ball != NULL)
+            curParticleError = curParticleError*landmarkSystem->scoreBallInSet(*ball, particle->getLocation());
 
         // Set the particle's weight
         particle->setWeight(curParticleError);
@@ -101,45 +100,45 @@ bool VisionSystem::update(ParticleSet& particles,
     // (2) Reconstruct pose from ball in set
     // Find line close to ball, should be the midline since in set
     // TODO how to determine line to use
-    // TODO refactor reconstruction code to landmark system
-    // if (ball != NULL) {
-    //     for (int i = 0; i < lines.line_size(); i++) {
-    //         const messages::FieldLine& field = lines.line(i);
-    //         const messages::HoughLine& inner = field.inner();
+    // TODO refactor reconstruction code to use landmark system
+    if (ball != NULL) {
+        for (int i = 0; i < lines.line_size(); i++) {
+            const messages::FieldLine& field = lines.line(i);
+            const messages::HoughLine& inner = field.inner();
 
-    //         // Skip short lines, probably in center circle
-    //         if (!LineSystem::shouldUse(field))
-    //                 continue;
+            // Skip short lines, probably in center circle
+            if (!LineSystem::shouldUse(field))
+                    continue;
 
-    //         // Polar to cartesian
-    //         double ballRelX = ball->distance() * cos(ball->bearing());
-    //         double ballRelY = ball->distance() * sin(ball->bearing());
+            // Polar to cartesian
+            double ballRelX = ball->distance() * cos(ball->bearing());
+            double ballRelY = ball->distance() * sin(ball->bearing());
 
-    //         // Rotate line to loc rel robot coordinate system 
-    //         vision::GeoLine line;
-    //         line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
-    //         line.translateRotate(0, 0, -(M_PI / 2));
+            // Rotate line to loc rel robot coordinate system 
+            vision::GeoLine line;
+            line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
+            line.translateRotate(0, 0, -(M_PI / 2));
 
-    //         // Project ball onto line, find distance to line
-    //         double distToLine = line.qDist(ballRelX, ballRelY);
+            // Project ball onto line, find distance to line
+            double distToLine = line.qDist(ballRelX, ballRelY);
 
-    //         // If close, found the midline, reconstruct from the midline and the ball
-    //         if (distToLine < 30) {
-    //             // Recontruct x and h from midline and y from ball
-    //             messages::RobotLocation fromLine = lineSystem->reconstructWoEndpoints(LocLineID::OurMidline, field);
-    //             messages::RobotLocation fromLineAndBall = fromLine;
+            // If close, found the midline, reconstruct from the midline and the ball
+            if (distToLine < 30) {
+                // Recontruct x and h from midline and y from ball
+                messages::RobotLocation fromLine = lineSystem->reconstructWoEndpoints(LocLineID::OurMidline, field);
+                messages::RobotLocation fromLineAndBall = fromLine;
 
-    //             // Rotate to absolute coordinate system
-    //             double ballAbsX, ballAbsY;
-    //             vision::translateRotate(ballRelX, ballRelY, 0, 0, fromLine.h(), ballAbsX, ballAbsY);
-    //             fromLineAndBall.set_y(CENTER_FIELD_Y - ballAbsY);
+                // Rotate to absolute coordinate system
+                double ballAbsX, ballAbsY;
+                vision::translateRotate(ballRelX, ballRelY, 0, 0, fromLine.h(), ballAbsX, ballAbsY);
+                fromLineAndBall.set_y(CENTER_FIELD_Y - ballAbsY);
 
-    //             // Add injection and return
-    //             ReconstructedLocation reconstructed(fromLineAndBall.x(), fromLineAndBall.y(), fromLineAndBall.h());
-    //             injections.push_back(reconstructed);
-    //         }
-    //     }
-    // }
+                // Add injection and return
+                ReconstructedLocation reconstructed(fromLineAndBall.x(), fromLineAndBall.y(), fromLineAndBall.h());
+                injections.push_back(reconstructed);
+            }
+        }
+    }
 
     // Weights were adjusted so return true
     return true;
