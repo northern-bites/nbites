@@ -76,7 +76,8 @@ double LandmarkSystem::scoreCorner(const messages::Corner& observation,
 
     // Find correspondence and calculate probability of match
     Landmark correspondingLandmark = matchCorner(observation, loc);
-    return scoreObservation(obsvAsRobotLocation, correspondingLandmark, loc);
+    return scoreObservation(obsvAsRobotLocation, correspondingLandmark, loc, true);
+    // NOTE for corners, only bearing is used to score particles
 }
 
 double LandmarkSystem::scoreBallInSet(const messages::FilteredBall& observation, 
@@ -113,7 +114,8 @@ messages::RobotLocation LandmarkSystem::relRobotToAbsolute(const messages::Robot
 // TODO debug
 double LandmarkSystem::scoreObservation(const messages::RobotLocation& observation, 
                                         const Landmark& correspondingLandmark,
-                                        const messages::RobotLocation& loc)
+                                        const messages::RobotLocation& loc,
+                                        bool onlyBearing)
 {
     // Observation, cartesian to polar
     double rObsv, tObsv;
@@ -152,8 +154,11 @@ double LandmarkSystem::scoreObservation(const messages::RobotLocation& observati
         std::cout << rProb << "/" << tProb << std::endl;
     }
 
-    // Make the conditional independence assumption
-    return rProb * tProb;
+    if (onlyBearing)
+        return 0.001*tProb; // NOTE hack to decrease corner confidence
+    else
+        // Make the conditional independence assumption
+        return rProb * tProb;
 }
 
 void LandmarkSystem::addCorner(vision::CornerID type, LandmarkID id, double x, double y)

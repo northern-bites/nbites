@@ -35,10 +35,9 @@ bool VisionSystem::update(ParticleSet& particles,
             continue;
         numObservations++;
     }
+    numObservations += corners.corner_size();
     if (ball != NULL) 
         numObservations++;
-    else
-        numObservations += corners.corner_size();
 
     // If no observations, return without updating weights
     if (!numObservations)
@@ -58,16 +57,13 @@ bool VisionSystem::update(ParticleSet& particles,
             curParticleError = curParticleError*lineSystem->scoreObservation(lines.line(i), particle->getLocation());
         }
 
+        // Score particle from corner observations
+        for (int i = 0; i < corners.corner_size(); i++)
+            curParticleError = curParticleError*landmarkSystem->scoreCorner(corners.corner(i), particle->getLocation());
 
         // Score particle from ball observation if in game set
         if (ball != NULL)
             curParticleError = curParticleError*landmarkSystem->scoreBallInSet(*ball, particle->getLocation());
-        // NOTE when in set, we trust ball over corners, thus the else statement
-        else {
-            // Score particle from corner observations
-            for (int i = 0; i < corners.corner_size(); i++)
-                curParticleError = curParticleError*landmarkSystem->scoreCorner(corners.corner(i), particle->getLocation());
-        }
 
         // Set the particle's weight
         particle->setWeight(curParticleError);
@@ -132,7 +128,7 @@ bool VisionSystem::update(ParticleSet& particles,
         }
 
         // If sufficiently close, found the midline, reconstruct location
-        if (minDist < 30) {
+        if (minDist < 50) {
             // Recontruct x and h from midline and y from ball
             messages::RobotLocation fromLine = lineSystem->reconstructWoEndpoints(LocLineID::OurMidline, midline);
             messages::RobotLocation fromLineAndBall = fromLine;
