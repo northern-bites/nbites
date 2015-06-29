@@ -1240,7 +1240,7 @@ LEFT_SHORT_STRAIGHT_KICK = (
      (0.,20.,-30,70,-40,-25.),
      (0.,20.,-22.3,50,-22.5,-17),
      (100.,-30.,0.,0),
-     30,0, stiff.NORMAL_STIFFNESSES),
+     0.6,0, stiff.NORMAL_STIFFNESSES),
 
     #kick
     ((43.,30.,0.,0.),
