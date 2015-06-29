@@ -295,7 +295,7 @@ CornerDetector::CornerDetector(int width_, int height_)
     intersectThreshold_(10), 
     closeThreshold_(30), 
     farThreshold_(50), 
-    edgeImageThreshold_(0.05)
+    edgeImageThreshold_(0.10)
 {}
 
 void CornerDetector::findCorners(FieldLineList& list)
