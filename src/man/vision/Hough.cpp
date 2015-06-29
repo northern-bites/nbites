@@ -492,196 +492,36 @@ bool CornerDetector::ccw(double ax, double ay,
 // *******************
 CenterCircleDetector::CenterCircleDetector() 
 {
-  maxClusterCloseness = 1000;
-  minPoints = 1;
+  // Set parameters
+  maxEdgeDistanceSquared = 700 * 700;
+  ccr = 80;  //CENTER_CIRCLE_RADIUS;
 }
-bool CenterCircleDetector::detectCenterCircle(HoughLineList& hlList)
+
+bool CenterCircleDetector::detectCenterCircle(EdgeList& edges)
 {
-  cleanHoughLineList(hlList);
-  std::vector<CirclePoint> points = getPointsVector(hlList);
-  if (points.size() < minPoints)
-    return false;
-  std::vector<Cluster> clusters = getClusters(points);
-  for (Cluster c : clusters) {
-    std::cout << "Point at x: " << c.begin()->first << " y: " << c.begin()->second << std::endl;
-  }
-
-  currentClusters = clusters;
-
-  while (clusters.size() > points.size()) { // cluster until size is half
-    joinClosestClusters(clusters);
-  }
-
-  Cluster c = getLargestCluster(clusters);
-    printf("\nLargest cluster: (%f,%f) with %d points.\n\n", c.centroid.first, c.centroid.second, c.size());
-  return true;
-
+  _potentials = calculatePotentials(edges);
+  return false;
 }
 
-void CenterCircleDetector::cleanHoughLineList(HoughLineList& hlList)
+// Get potential cc centers and clean edge list
+std::vector<Point> CenterCircleDetector::calculatePotentials(EdgeList& edges)
 {
-  for (HoughLineList::iterator hl = hlList.begin(); hl != hlList.end();)
-    if (!checkLength(*hl) || !checkDistance(*hl))
-      hl = hlList.erase(hl);
-    else
-      hl++;
-}
 
-std::vector<CirclePoint> CenterCircleDetector::getPointsVector(HoughLineList& hlList)
-{
-  std::vector<CirclePoint> vec;
-  for (HoughLineList::iterator hl = hlList.begin(); hl != hlList.end(); ++hl)
-  {
-    double x1, y1, x2, y2;
-    hl->field().endPoints(x1, y1, x2, y2);
-    printf("1: %f,%f. 2: %f,%f", x1, y1, x2, y2);
-    double slope = atan2(y1 - y2, x1 - x2);
-    printf(" slope: %f\n", slope);
-    vec.push_back(CirclePoint((x1 + x2) / 2,(y1 + y2) / 2, slope));
-  }
-  return vec;
-}
-
-std::vector<Cluster> CenterCircleDetector::getClusters(const std::vector<CirclePoint>& points)
-{
-  std:vector<Cluster> vec;
-  int ccr = 80;
-
-  // For each circle point, find the two points 80 cm away 
-  for (CirclePoint cp : points) {
-    std::cout << "Converting from Point to Cluster";
-    vec.push_back(Cluster(cp.x() + ccr*sin(cp.t()), cp.y() - ccr*cos(cp.t())));
-    vec.push_back(Cluster(cp.x() - ccr*sin(cp.t()), cp.y() + ccr*cos(cp.t())));
-
-    
-  }
-  return vec;
-}
-
-/*
- * Join the two closest clusters. Return false if the two closest are too far away
- */
-bool CenterCircleDetector::joinClosestClusters(std::vector<Cluster>& clusters) {
-  std::cout << "Running jCC\n";
-  int first, second;
-  double closest = 10000;
-
-  for (int i = 0; i < clusters.size() - 1; i++) {
-    for (int j = i; j < clusters.size(); j++) {
-      printf("Comparing (%f,%f) to (%f,%f): ", clusters[i].centroid.first, clusters[i].centroid.second,
-        clusters[j].centroid.first, clusters[j].centroid.second);
-      if (i != j && clusters[i].distanceTo(clusters[j]) < closest) {
-        
-        first = i;
-        second = j;
-        closest = clusters[i].distanceTo(clusters[j]);
-        printf("Closest: %f\n", closest);
-      } else {
-        printf("Not closest\n");
-      }
+  int c = 0;
+  std::vector<Point> vec;
+  AngleBinsIterator<Edge> abi(edges);
+  for (Edge* e = *abi; e; e = *++abi) {
+    double distance = e->field().x() * e->field().x() + e->field().y() * e->field().y();
+    if (e->field().y() >= 0 && distance < maxEdgeDistanceSquared) {
+      // push back two points 75 cm away from edge point
+      vec.push_back(Point(e->field().x() + ccr*sin(e->field().t()), e->field().y() - ccr*cos(e->field().t())));
+ //     std::cout << "T: " << e->field().t();
+      c++;
     }
   }
-
-  std:: cout << "Found clusters " << closest << " cm appart. Current size: " << clusters.size() <<std::endl;
-  if (closest < maxClusterCloseness) {
-    clusters[first].merge(clusters[second]);
-    clusters.erase(clusters.begin() + second);
-    std::cout << "New size: " << clusters.size() << std::endl;
-    return true;
-  } else {
-    return false;
-  }
-}
-
-bool CenterCircleDetector::checkLength(const HoughLine& hl)
-{
-  double lengthThreshold = 100;
-
-  return (fabs(hl.field().ep0() - hl.field().ep1()) < lengthThreshold);
-}
-
-bool CenterCircleDetector::checkDistance(const HoughLine& hl)
-{
-  double distanceThresholdSqared = 600 * 600;   // CC is roughly 600 cm from far corner
-
-  double midPointEP = (hl.field().ep0() + hl.field().ep1()) / 2;
-  return ((hl.field().r()*hl.field().r() + midPointEP*midPointEP) < distanceThresholdSqared);
-}
-
-Cluster CenterCircleDetector::getLargestCluster(const std::vector<Cluster>& clusters)
-{
-  size_t max = 0;
-  Cluster ret;
-  for (Cluster c : clusters)
-    if (c.size() > max) {
-      max = c.size();
-      ret = c;
-  }
-  std::cout << "Max size: " << max << std::endl;
-  return ret;
-}
-
-// Used for debugging by exernal functions
-std::vector<Point> CenterCircleDetector::getCentroids()
-{
-  std::vector<Point> vec;
-  for (Cluster c : currentClusters) {
-    vec.push_back(Point(c.centroid.first, c.centroid.second));
-  }
+  std::cout << "Count: " << c << std::endl;
   return vec;
 }
-
-
-// ***********
-// CirclePoint
-// ***********
-
-CirclePoint::CirclePoint(double x, double y, double t)
-{
-  data[0] = x;
-  data[1] = y;
-  data[2] = t;
-}
-
-double CirclePoint::distanceSquared(CirclePoint cp)
-{
-  return ((x()-cp.x()) * (x()-cp.x()) + (y()-cp.y()) * (y()-cp.y()));
-}
-
-// *******
-// Cluster
-// *******
-
-Cluster::Cluster(double x, double y)
-{
-  push_back(Point(x, y));
-  centroid = Point(x, y);
-}
-
-double Cluster::distanceTo(const Cluster& c)
-{
-  return sqrt((centroid.first + c.centroid.first) * (centroid.first + c.centroid.first) +
-             (centroid.second + c.centroid.second) * (centroid.second + c.centroid.second));
-}
-
-void Cluster::merge(Cluster& c)
-{
-   std::cout << "Merging (" << c.centroid.first << ", " << c.centroid.second << 
-        ") with (" << centroid.first << ", " << centroid.second << "). ";
-  insert(end(), c.begin(), c.end());
-  double totalX, totalY;
-  for (Point p : *this) {
-    totalX += p.first;
-    totalY += p.second;
-  }
-  centroid.first = totalX / size();
-  centroid.second = totalY / size();
-
-  std::cout << "New centroid: (" << centroid.first << ", " << centroid.second << "). Size :" <<
-      size() << std::endl << std::endl;
-}
-
-
 
 // **************************
 // *                        *
@@ -1185,11 +1025,13 @@ void HoughSpace::adjust(EdgeList& edges, EdgeList& rejectedEdges, HoughLineList&
       ++hl;
   }
 
+  rejectedEdges.reset();
+
   AngleBinsIterator<Edge> rejectABI(edges);
   for (Edge* e = *rejectABI; e; e = *++rejectABI)
-    if (e->memberOf() == 0)
+    if (e->memberOf() == 0) {
       rejectedEdges.add(e->x(), e->y(), e->mag(), e->angle());
-
+    }
   times[4] = timer.time32();
 }
 

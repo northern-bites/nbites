@@ -244,56 +244,28 @@ public:
 };
 
 // Dectects center circle
-class CirclePoint;
-class Cluster;
+// class CirclePoint;
+// class Cluster;
 
 class CenterCircleDetector {
-  double ccx;
-  double ccy;
-  std::vector<Cluster> currentClusters;
+  double _ccx;
+  double _ccy;
+  
+  std::vector<Point> _potentials;
 
-  void cleanHoughLineList(HoughLineList& hlList);
-  std::vector<CirclePoint> getPointsVector(HoughLineList& hlList);
-  std::vector<Cluster> getClusters(const std::vector<CirclePoint>&);
-  bool joinClosestClusters(std::vector<Cluster>&);
-  bool checkLength(const HoughLine&);
-  bool checkDistance(const HoughLine&);
-  Cluster getLargestCluster(const std::vector<Cluster>& clusters);
+  std::vector<Point> calculatePotentials(EdgeList& edges);
+
+ 
 
   // Parameters
-  int minPoints;
-  double maxClusterCloseness;
+  double maxEdgeDistanceSquared;
+  double ccr; // center circle radius
 public:
   CenterCircleDetector();
 
-  std::vector<Point> getCentroids();
-  bool detectCenterCircle(HoughLineList& hlList);
+  bool detectCenterCircle(EdgeList& edges);
+  std::vector<Point> getPotentials() { return _potentials; }
 };
-
-class CirclePoint {
-  double data[3];
-
-public:
-  CirclePoint(double x = 0, double y = 0, double t = 0);
-
-  double x() { return data[0]; }
-  double y() { return data[1]; }
-  double t() { return data[2]; }
-};
-
-class Cluster : public std::list<Point> {
-
-public:
-  Point centroid;
-  
-  Cluster() {}
-  Cluster(double x, double y);
-  
-  void merge(Cluster& c);
-  double distanceTo(const Cluster&);
-  double cohesion();
-};
-
 
 enum class LineID {
   // Most general

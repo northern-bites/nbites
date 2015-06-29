@@ -208,7 +208,10 @@ class FieldEdge {
   double data[3];
 
 public:
-  FieldEdge(double x = 0, double y = 0, double t = 0);
+  FieldEdge(double x = 0, double y = 0, double t = 0)
+  {
+    data[0] = x; data[1] = y; data[2] = t;
+  }
   double x() { return data[0]; }
   double y() { return data[1]; }
   double t() { return data[2]; }
@@ -255,11 +258,10 @@ public:
   Edge* nextMember() { return _nextMember; }
   void nextMember(Edge* e) { _nextMember = e; }
 
-  FieldEdge* field() const { return _field; }
+  FieldEdge field() const { return _field; }
 
   // Translate edge to field coordinates
-  void setField(const FieldHomography& h) { _field = imageToField(h); }
-  FieldEdge imageToField(const FieldHomography&);
+  void setField(const FieldHomography& h);
 };
 
 class EdgeList : public AngleBins<Edge>

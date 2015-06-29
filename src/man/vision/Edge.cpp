@@ -41,9 +41,16 @@ Edge& Edge::operator=(const Edge& e)
 // *        *
 // **********
 
-void imageToField(const FieldHomography& h)
+void Edge::setField(const FieldHomography& h)
 {
-  
+  double wx, wy, dwx, dwy;
+  h.fieldCoords(_x, _y, wx, wy);
+ // double radAng = angle() * (2*M_PI / 255);
+  h.fieldVector(0, 0, sin(), -cos(), dwx, dwy);
+  std::cout << "\n" << atan2(-dwx, dwy);
+  _field = FieldEdge(wx, wy, atan2(dwy, dwx));
+//  printf("World: (%f,%f)\n", wx, wy);
+
 }
 
 
@@ -56,7 +63,7 @@ void imageToField(const FieldHomography& h)
 void EdgeList::mapToField(const FieldHomography& h)
 {
   AngleBinsIterator<Edge> abi(*this);
-  for (Edge* e = *abi; e; e = *++abi) {}
+  for (Edge* e = *abi; e; e = *++abi)
     e->setField(h);
 
   _fx0 = -h.wx0();

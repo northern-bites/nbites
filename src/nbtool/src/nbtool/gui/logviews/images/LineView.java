@@ -184,12 +184,12 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 y2 = (int) Math.round(y0 + startSize*fcEP1 * Math.cos(fcT));
 
                 // Scale down if a line is outside the view, but not if its too far (false field line)
-                if (y1 < 0 && y1 > -2000) {
-                    resize = Math.min(resize, (double)fieldh/(-y1 + fieldh));
-                }
-                if (y2 < 0 && y2 > -2000) {
-                    resize = Math.min(resize, (double)fieldh/(-y2 + fieldh));
-                }
+                // if (y1 < 0 && y1 > -2000) {
+                //     resize = Math.min(resize, (double)fieldh/(-y1 + fieldh));
+                // }
+                // if (y2 < 0 && y2 > -2000) {
+                //     resize = Math.min(resize, (double)fieldh/(-y2 + fieldh));
+                // }
 
                 // // TODO: Don't draw it if it's way out
                 // if (y1 < -3500) {
@@ -268,8 +268,8 @@ public class LineView extends ViewParent implements IOFirstResponder {
             // Center Circle Potential Points
             g.setColor(Color.black);
             for (int i = 0; i < ccPoints.size(); i += 2) {
-                System.out.printf("Point %d x: %f, %f\n", i, ccPoints.get(i+0), ccPoints.get(i + 1));
-                g.fillOval((int)(fxc + ccPoints.get(i+0) - 2.5), (int)(fyc - ccPoints.get(i + 1) - 2.5), 5, 5);
+             //   System.out.printf("Point %d x: %f, %f\n", i, ccPoints.get(i+0), ccPoints.get(i + 1));
+                g.fillRect((int)(fxc + ccPoints.get(i+0)), (int)(fyc - ccPoints.get(i + 1)), 1, 1);
 
             }
         }

@@ -233,6 +233,8 @@ int Vision_func() {
     //-------------------
     //  EDGES
     //-------------------
+
+    // man::vision::EdgeList* edgeList = module.getEdges(topCamera);
     man::vision::EdgeList* edgeList = module.getRejectedEdges(topCamera);
 
     Log* edgeRet = new Log();
@@ -378,10 +380,9 @@ int Vision_func() {
     Log* ccdRet = new Log();
     std::string pointsBuf;
 
-    std::vector<std::pair<double, double>> points = ccd->getCentroids();
-    std::cout << "Centroid size = " << points.size() << " points. Adding: ";
+    std::vector<std::pair<double, double>> points = ccd->getPotentials();
+    std::cout << "Potentials size = " << points.size() << std::cout;
     for (std::pair<double, double> p : points) {
-        std::cout << "|";
         endswap<double>(&(p.first));
         endswap<double>(&(p.second));
         pointsBuf.append((const char*) &(p.first), sizeof(double));
