@@ -93,6 +93,16 @@ ZELLVARRO_RIGHT_KICK = Kick("Zellvarro_Left_Kick",
                       dist = 300,
                       move=SweetMoves.ZELLVARRO_RIGHT_KICK)
 
+LEFT_MEDIUM_STRAIGHT_KICK = Kick("Left_Medium_Straight_Kick",
+                      x = 15.5, y = 3.95, 
+                      dist = 300,
+                      move=SweetMoves.LEFT_MEDIUM_STRAIGHT_KICK)
+
+RIGHT_MEDIUM_STRAIGHT_KICK = Kick("Right_Medium_Straight_Kick",
+                      x = 15.5, y = -3.95,
+                      dist = 300,
+                      move=SweetMoves.RIGHT_MEDIUM_STRAIGHT_KICK)
+
 LEFT_KICK = LEFT_SHORT_STRAIGHT_KICK
 RIGHT_KICK = RIGHT_SHORT_STRAIGHT_KICK
 
@@ -152,6 +162,12 @@ def chooseAlignedKickFromKick(player, kick):
             return M_LEFT_STRAIGHT
         else:
             return M_RIGHT_STRAIGHT
+    elif (kick == LEFT_MEDIUM_STRAIGHT_KICK or
+        kick == RIGHT_MEDIUM_STRAIGHT_KICK):
+        if ballRelY > 0:
+            return LEFT_MEDIUM_STRAIGHT_KICK
+        else:
+            return RIGHT_MEDIUM_STRAIGHT_KICK
     elif (kick == LEFT_SHORT_STRAIGHT_KICK or
           kick == RIGHT_SHORT_STRAIGHT_KICK):
         if ballRelY > 0:

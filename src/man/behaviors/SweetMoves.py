@@ -1138,7 +1138,7 @@ LEFT_QUICK_STRAIGHT_KICK = (
      (100.,-30.,0.,0),
      .6,0, stiff.NORMAL_STIFFNESSES),
 
-    #kick?
+    #kick!!
     ((43.,30.,0.,0.),
      (0.,17.,-65,60,0,-20.),
      (0.,13.,-22.3,45,-22.5,-17),
@@ -1169,6 +1169,63 @@ LEFT_QUICK_STRAIGHT_KICK = (
 
 RIGHT_QUICK_STRAIGHT_KICK = mirrorMove(LEFT_QUICK_STRAIGHT_KICK)
 
+
+LEFT_MEDIUM_STRAIGHT_KICK = (
+    BRING_ARMS_FORWARD_SLOW,
+
+    #stand for a bit
+    ((90.,10.,-90.,-10.),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (90.,-10.,82.,13.2),
+     0.4,0,stiff.NORMAL_STIFFNESSES),
+
+    #lean right/lift leg
+    ((20.,30.,0.,0.),
+     (0.,17.,-30,70,-50,-25.),
+     (0, 19.1, -20.8, 53.5, -25.1, -16.3),
+     (100.,-30.,0.,0),
+     0.6,0, stiff.NORMAL_STIFFNESSES),
+
+    #kick <3
+    ((43.,30.,0.,0.),
+     (0.,17.,-65,60,-10,-20.),
+     (0.,13.,-22.3,45,-22.5,-17),
+     (40.,-30.,0.,0),
+     .18,0, stiff.NORMAL_STIFFNESSES),
+
+    #recover
+    ((35.,30.,0.,0.),
+     (0.,25.,-35,65,-30,-25.),
+     (0.,10.,-22.3,45,-22.5,-17),
+     (90.,-30.,0.,0),
+     .4,0, stiff.NORMAL_STIFFNESSES),
+
+    #back to normal
+    ((40, 9, -80, -9),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (40, -9, 80, -9),
+     .7,0,stiff.NORMAL_STIFFNESSES),
+
+    #stand for a bit
+    ((90.,10.,-90.,-10.),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (90.,-10.,82.,13.2),
+     1,0,stiff.NORMAL_STIFFNESSES),
+    # arms back
+    ((98.4, 0.8, 74.6, -21.9),
+     (0.1, 0.0, -22.5, 55.1, -32.1, 0.0),
+     (0.1, 0.1, -22.5, 55.3, -32.4, -0.1),
+     (98.4, -0.7, -74.5, 21.8),
+     1,0,stiff.NORMAL_STIFFNESSES),
+
+  )
+
+RIGHT_MEDIUM_STRAIGHT_KICK = mirrorMove(LEFT_MEDIUM_STRAIGHT_KICK)
+
+# This is a relatively stable straight kick for arms back
 LEFT_SHORT_STRAIGHT_KICK = (
     BRING_ARMS_FORWARD_SLOW,
 
@@ -1220,6 +1277,14 @@ LEFT_SHORT_STRAIGHT_KICK = (
      (-0.2, -0.1, -20.5, 51.3, -31.3, 0.1),
      (98.5, -0.2, -74.7, 22.1),
      1,0,stiff.NORMAL_STIFFNESSES),
+
+    # arms back position
+    ((98.9, 9.0, 74.8, -19.2),
+     (-0.3, 0.7, -22.5, 44.0, -22.1, -0.5),
+     (-0.3, -0.7, -23.0, 42.8, -21.2, -0.3),
+     (98.8, -9.2, -74.6, 19.0),
+     1,0,stiff.NORMAL_STIFFNESSES),
+
     )
 
 RIGHT_SHORT_STRAIGHT_KICK = mirrorMove(LEFT_SHORT_STRAIGHT_KICK)
