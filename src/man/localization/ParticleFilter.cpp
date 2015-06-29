@@ -64,6 +64,8 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     motionSystem->update(particles, odometryInput, errorMagnitude);
     updatedVision = visionSystem->update(particles, linesInput, cornersInput, ballInput);
 
+    // std::cout << updatedVision << std::endl;
+
     // Resample if vision updated
     float avgErr = -1;
     if(updatedVision) {
@@ -179,9 +181,20 @@ void ParticleFilter::updateEstimate()
     poseEstimate.set_y(sumY/parameters.numParticles);
     poseEstimate.set_h(NBMath::subPIAngle(sumH/parameters.numParticles));
 
+    // std::cout << "TEST: " << sumH << std::endl;
+    // std::cout << sumH/parameters.numParticles << std::endl;
+    // std::cout << NBMath::subPIAngle(sumH/parameters.numParticles) << std::endl;
+
     poseEstimate.set_uncert(errorMagnitude);
 
+    // double variance = 0;
+    // for(iter = particles.begin(); iter != particles.end(); ++iter)
+    // {
 
+    //     variance += pow(poseEstimate.h() - (*iter).getLocation().h(), 2);
+    // }
+
+    // std::cout << variance << std::endl;
 }
 
 void ParticleFilter::updateFieldForDebug(messages::FieldLines& lines,
