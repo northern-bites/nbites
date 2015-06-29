@@ -4,7 +4,7 @@ import RoleConstants as role
 import ChaseBallTransitions as chase
 import ChaseBallConstants as chaseConstants
 import ClaimTransitions as claims
-from SupporterConstants import getSupporterPosition, CHASER_DISTANCE
+from SupporterConstants import getSupporterPosition, CHASER_DISTANCE, findChaserHome, findDefenderHome
 import noggin_constants as NogginConstants
 from ..navigator import Navigator as nav
 from objects import Location, RobotLocation
@@ -59,11 +59,11 @@ def positionAtHome(player):
 
     if ball != None:
         if role.isLeftDefender(player.role):
-            home = transitions.findDefenderHome(True, ball, bearing + player.brain.loc.h)
+            home = findDefenderHome(True, ball, bearing + player.brain.loc.h)
         elif role.isRightDefender(player.role):
-            home = transitions.findDefenderHome(False, ball, bearing + player.brain.loc.h)
-        elif role.isSecondChaser(player.role) or role.isCherryPicker(player.role):
-            home = transitions.findChaserHome(ball, bearing + player.brain.loc.h)
+            home = findDefenderHome(False, ball, bearing + player.brain.loc.h)
+        elif role.isSecondChaser(player.role):
+            home = findChaserHome(ball, bearing + player.brain.loc.h)
         else:
             home = player.homePosition
 

@@ -4,6 +4,7 @@ import SharedTransitions as shared
 import ChaseBallConstants as chaseConstants
 import noggin_constants as nogginC
 from objects import RobotLocation
+from SupporterConstants import findChaserHome, findDefenderHome
 
 def ballInBox(player):
     """
@@ -57,7 +58,7 @@ def tooFarFromHome(threshold, player):
             home = findDefenderHome(True, ball, player.homePosition.h)
         elif role.isRightDefender(player.role):
             home = findDefenderHome(False, ball, player.homePosition.h)
-        elif role.isSecondChaser(player.role) or role.isCherryPicker(player.role):
+        elif role.isSecondChaser(player.role):
             home = findChaserHome(ball, player.homePosition.h)
         else:
             home = player.homePosition
@@ -97,92 +98,3 @@ def shouldBeSupporter(player):
         
     return (ballInBox(player) and
             claimTransitions.shouldCedeClaim(player))
-
-def findDefenderHome(left, ball, hh):
-    bY = ball.y
-    if ball.x < nogginC.MIDFIELD_X:
-        if left:
-            home = closePointOnSeg(role.evenDefenderBack.x, role.evenDefenderBack.y,
-                                    role.evenDefenderForward.x, role.evenDefenderForward.y,
-                                    ball.x, ball.y)
-            return RobotLocation(home[0], home[1], hh)
-        else:
-            home = closePointOnSeg(role.oddDefenderBack.x, role.oddDefenderBack.y,
-                                    role.oddDefenderForward.x, role.oddDefenderForward.y,
-                                    ball.x, ball.y)
-            return RobotLocation(home[0], home[1], hh)
-
-    else:
-        if left:
-            if bY >= role.evenDefenderForward.y:
-                return role.evenDefenderForward
-            elif bY <= role.oddDefenderBack.y:
-                return role.evenDefenderBack
-            else:
-                # ball is between the two defenders:
-                # linear relationship between ball and where defender stands on their line
-                
-                xDist = role.evenDefenderForward.x - role.evenDefenderBack.x
-                yDist = role.evenDefenderForward.y - role.evenDefenderBack.y
-
-                t = ((bY - role.oddDefenderForward.y) / 
-                    (role.evenDefenderForward.y - role.oddDefenderForward.y))
-
-                hx = role.evenDefenderBack.x + t*xDist
-                hy = role.evenDefenderBack.y + t*yDist
-
-                return RobotLocation(hx, hy, hh)
-        else:
-            if bY <= role.oddDefenderForward.y:
-                return role.oddDefenderForward
-            elif bY >= role.evenDefenderBack.y:
-                return role.oddDefenderBack
-            else:
-                # ball is between the two defenders:
-                # linear relationship between ball and where defender stands on their line
-                
-                xDist = role.oddDefenderForward.x - role.oddDefenderBack.x
-                yDist = role.oddDefenderForward.y - role.oddDefenderBack.y
-
-                t = ((bY - role.evenDefenderForward.y) / 
-                    (role.oddDefenderForward.y - role.evenDefenderForward.y))
-
-                hx = role.oddDefenderBack.x + t*xDist
-                hy = role.oddDefenderBack.y + t*yDist
-
-                return RobotLocation(hx, hy, hh)
-
-def findChaserHome(ball, hh):
-    # find closest point on triangle to the ball and flip it over
-    # the y axis so we are positioned watching the ball from other side
-    if ball.x < nogginC.LANDMARK_YELLOW_GOAL_CROSS_X:
-        if ball.y > nogginC.MIDFIELD_Y:
-            home = closePointOnSeg(role.oddChaserTop.x,
-                                    role.oddChaserTop.y,
-                                    role.oddChaserForward.x,
-                                    role.oddChaserForward.y,
-                                    ball.x, ball.y)
-            return RobotLocation(home[0], nogginC.FIELD_HEIGHT - home[1], hh)
-        else:
-            home = closePointOnSeg(role.oddChaserBottom.x,
-                                    role.oddChaserBottom.y,
-                                    role.oddChaserForward.x,
-                                    role.oddChaserForward.y,
-                                    ball.x, ball.y)
-            return RobotLocation(home[0], nogginC.FIELD_HEIGHT - home[1], hh)
-    else:
-        home = closePointOnSeg(role.oddChaserBottom.x,
-                                role.oddChaserBottom.y,
-                                role.oddChaserTop.x,
-                                role.oddChaserTop.y,
-                                ball.x, ball.y)
-        return RobotLocation(home[0], nogginC.FIELD_HEIGHT - home[1], hh)
-
-# find the closest point on a line segment ((x1,y1),(x2,y2)) to a point (x3,y3)
-def closePointOnSeg(x1, y1, x2, y2, x3, y3):
-    dx = x2 - x1
-    dy = y2 - y1
-    d2 = dx*dx + dy*dy
-    nx = ((x3-x1)*dx + (y3-y1)*dy) / d2
-    nx = min(1, max(0, nx))
-    return (dx*nx + x1, dy*nx + y1)
