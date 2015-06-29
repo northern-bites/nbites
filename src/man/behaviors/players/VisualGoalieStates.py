@@ -148,7 +148,7 @@ def returnToGoal(player):
         if player.lastDiffState == 'didIKickIt' or player.lastDiffState == 'gamePlaying':
             correctedDest =(RelRobotLocation(0.0, 0.0, 0.0 ) -
                             returnToGoal.kickPose)
-            # correctedDest.relH = -returnToGoal.kickPose.relH
+            correctedDest.relH = -returnToGoal.kickPose.relH
         else:
             print "This else happened in setting dest"
             correctedDest = (RelRobotLocation(0.0, 0.0, 0.0) -

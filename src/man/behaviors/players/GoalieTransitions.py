@@ -290,7 +290,7 @@ def shouldStopTurning(player):
             print ("R:", r, "T:", t)
             player.homeDirections += [RelRobotLocation(r+35.0, 0.0, 0.0)]
             return True
-        if math.fabs(t - 90.0) < 15.0 and r is not 0.0 and r < 110.0:
+        if math.fabs(t - 90.0) < 15.0 and r is not 0.0 and r > 110.0:
             print "I see a line! Its decently far, so I'm assuming its the back of the goalbox"
             player.homeDirections += [RelRobotLocation(r-25.0, 0.0, 0.0)]
             print ("R:", r, "T:", t)
