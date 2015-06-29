@@ -35,8 +35,10 @@ bool VisionSystem::update(ParticleSet& particles,
             continue;
         numObservations++;
     }
-    numObservations += corners.corner_size();
-    if (ball != NULL) numObservations++;
+    if (ball != NULL) 
+        numObservations++;
+    else
+        numObservations += corners.corner_size();
 
     // If no observations, return without updating weights
     if (!numObservations)
@@ -56,13 +58,16 @@ bool VisionSystem::update(ParticleSet& particles,
             curParticleError = curParticleError*lineSystem->scoreObservation(lines.line(i), particle->getLocation());
         }
 
-        // Score particle from corner observations
-        for (int i = 0; i < corners.corner_size(); i++)
-            curParticleError = curParticleError*landmarkSystem->scoreCorner(corners.corner(i), particle->getLocation());
 
         // Score particle from ball observation if in game set
         if (ball != NULL)
             curParticleError = curParticleError*landmarkSystem->scoreBallInSet(*ball, particle->getLocation());
+        // NOTE when in set, we trust ball over corners, thus the else statement
+        else {
+            // Score particle from corner observations
+            for (int i = 0; i < corners.corner_size(); i++)
+                curParticleError = curParticleError*landmarkSystem->scoreCorner(corners.corner(i), particle->getLocation());
+        }
 
         // Set the particle's weight
         particle->setWeight(curParticleError);
@@ -98,21 +103,18 @@ bool VisionSystem::update(ParticleSet& particles,
     }
 
     // (2) Reconstruct pose from ball in set
-    // Find line close to ball, should be the midline since in set
-    // TODO how to determine line to use
-    // TODO refactor reconstruction code to use landmark system
     if (ball != NULL) {
+        messages::FieldLine midline;
+        double minDist = std::numeric_limits<double>::max();
+
+        // Ball, polar to cartesian
+        double ballRelX, ballRelY;
+        vision::polarToCartesian(ball->distance(), ball->bearing(), ballRelX, ballRelY);
+
+        // Find line that is closest to the ball, should be midline since in set
         for (int i = 0; i < lines.line_size(); i++) {
             const messages::FieldLine& field = lines.line(i);
             const messages::HoughLine& inner = field.inner();
-
-            // Skip short lines, probably in center circle
-            if (!LineSystem::shouldUse(field))
-                    continue;
-
-            // Polar to cartesian
-            double ballRelX = ball->distance() * cos(ball->bearing());
-            double ballRelY = ball->distance() * sin(ball->bearing());
 
             // Rotate line to loc rel robot coordinate system 
             vision::GeoLine line;
@@ -120,23 +122,34 @@ bool VisionSystem::update(ParticleSet& particles,
             line.translateRotate(0, 0, -(M_PI / 2));
 
             // Project ball onto line, find distance to line
-            double distToLine = line.qDist(ballRelX, ballRelY);
+            double distToLine = fabs(line.pDist(ballRelX, ballRelY));
 
-            // If close, found the midline, reconstruct from the midline and the ball
-            if (distToLine < 30) {
-                // Recontruct x and h from midline and y from ball
-                messages::RobotLocation fromLine = lineSystem->reconstructWoEndpoints(LocLineID::OurMidline, field);
-                messages::RobotLocation fromLineAndBall = fromLine;
-
-                // Rotate to absolute coordinate system
-                double ballAbsX, ballAbsY;
-                vision::translateRotate(ballRelX, ballRelY, 0, 0, fromLine.h(), ballAbsX, ballAbsY);
-                fromLineAndBall.set_y(CENTER_FIELD_Y - ballAbsY);
-
-                // Add injection and return
-                ReconstructedLocation reconstructed(fromLineAndBall.x(), fromLineAndBall.y(), fromLineAndBall.h());
-                injections.push_back(reconstructed);
+            // Check for min distance
+            if (minDist > distToLine) {
+                midline = field;
+                minDist = distToLine;
             }
+        }
+
+        // If sufficiently close, found the midline, reconstruct location
+        if (minDist < 30) {
+            // Recontruct x and h from midline and y from ball
+            messages::RobotLocation fromLine = lineSystem->reconstructWoEndpoints(LocLineID::OurMidline, midline);
+            messages::RobotLocation fromLineAndBall = fromLine;
+
+            // Rotate to absolute coordinate system
+            double ballAbsX, ballAbsY;
+            vision::translateRotate(ballRelX, ballRelY, 0, 0, fromLine.h(), ballAbsX, ballAbsY);
+            fromLineAndBall.set_y(CENTER_FIELD_Y - ballAbsY);
+
+            // Add injection and return
+            ReconstructedLocation reconstructed(fromLineAndBall.x(), fromLineAndBall.y(), fromLineAndBall.h());
+            injections.push_back(reconstructed);
+
+            // std::cout << "Injecting in set!" << std::endl;
+            // std::cout << fromLineAndBall.x() << std::endl;
+            // std::cout << fromLineAndBall.y() << std::endl;
+            // std::cout << fromLineAndBall.h() << std::endl;
         }
     }
 
