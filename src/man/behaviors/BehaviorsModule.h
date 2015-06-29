@@ -20,6 +20,7 @@
 #include "RobotLocation.pb.h"
 #include "StiffnessControl.pb.h"
 #include "Obstacle.pb.h"
+#include "Toggle.pb.h"
 
 /**
  *
@@ -91,6 +92,9 @@ public:
     portals::InPortal<messages::Corners> cornersIn;
     portals::InPortal<messages::SharedBall> sharedBallIn;
     portals::InPortal<messages::RobotLocation> sharedFlipIn;
+
+    // A command from Boss
+    portals::InPortal<messages::Toggle> sitDownIn;
 
     portals::OutPortal<messages::LedCommand> ledCommandOut;
     portals::OutPortal<messages::MotionRequest> motionRequestOut;

@@ -22,6 +22,8 @@ extern "C" void initMotionStatus_proto();
 extern "C" void initButtonState_proto();
 extern "C" void initFallStatus_proto();
 extern "C" void initStiffnessControl_proto();
+extern "C" void initObstacle_proto();
+extern "C" void initToggle_proto();
 extern "C" void initVision_proto();
 // extern "C" void initObstacle_proto();
 extern "C" void initinterface();
@@ -96,6 +98,7 @@ void BehaviorsModule::initializePython()
         initButtonState_proto();
         initFallStatus_proto();
         initStiffnessControl_proto();
+        initToggle_proto();
         initVision_proto();
         // initObstacle_proto();
         // Init the interface as well
@@ -261,6 +264,9 @@ void BehaviorsModule::prepareMessages()
 
     // visionObstacleIn.latch();
     // pyInterface.setVisionObstacle_ptr(&visionObstacleIn.message());
+
+    sitDownIn.latch();
+    pyInterface.setSitDown_ptr(&sitDownIn.message());
 
     // Prepare potential out messages for python
     ledCommand = portals::Message<messages::LedCommand>(0);
