@@ -414,6 +414,20 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             : VisualGoalieStates.spinToFaceBall
             }
 
+        VisualGoalieStates.findMyWayBackPtI.transitions = {
+            Transition.CountTransition(GoalieTransitions.shouldStopTurning,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : VisualGoalieStates.findMyWayBackPtII
+            }
+
+        VisualGoalieStates.findMyWayBackPtII.transitions = {
+            Transition.CountTransition(GoalieTransitions.doneWalking,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.watchWithLineChecks
+            }
+
 
 
 # ---------------------------------------------------------------------

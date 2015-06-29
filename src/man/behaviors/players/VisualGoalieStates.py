@@ -167,26 +167,37 @@ def returnToGoal(player):
 # Ideally let a robot find its way back to the goalbox after falling
 # or getting lost outside
 # Robot spins until it finds a line, then walks towards it
-@superState('gamecontrollerResponder')
+@superState('gameControllerResponder')
 def findMyWayBackPtI(player):
-    # lines = player.brain.visionLines
-
-    # for i in range(0, lines.line_size()):
-    #     r = lines(i).inner.r
-    #     t = math.degrees(lines(i).inner.t)
-
     if player.firstFrame():
+        player.homeDirections = []
         player.brain.nav.stop()
-        spinAtGoal.counter = 0
+        findMyWayBackPtI.counter = 0
         player.brain.tracker.lookToAngle(0.0)
-    spinAtGoal.counter += 1
-    if spinAtGoal.counter > 200:
-            return player.goLater('watchWithLineChecks')
+    findMyWayBackPtI.counter += 1
+    # if findMyWayBackPtI.counter > 200:
+    #         return player.goLater('watchWithLineChecks')
     if player.brain.nav.isStopped():
-        player.setWalk(0, 0, 20.0)
+        if clearIt.ballSide == constants.RIGHT:
+            player.setWalk(0, 0, -20.0)
+        else:
+            player.setWalk(0, 0, 20.0)
 
     return Transition.getNextState(player, findMyWayBackPtI)
 
+@superState('gameControllerResponder')
+def findMyWayBackPtII(player):
+    if player.firstFrame():
+        findMyWayBackPtII.counter = 0
+        player.brain.tracker.lookToAngle(0.0)
+        dest = GoalieStates.average(player.homeDirections)
+        print "I'm walking back now!"
+        player.brain.nav.walkTo(dest)
+    findMyWayBackPtII.counter += 1
+    # if findMyWayBackPtII.counter > 200:
+    #         return player.goLater('watchWithLineChecks')
+
+    return Transition.getNextState(player, findMyWayBackPtII)
 
 
 

@@ -262,7 +262,10 @@ def shouldPositionRight(player):
     player.inPosition is not constants.RIGHT_POSITION and \
     player.inPosition is not constants.NOT_IN_POSITION:
         player.homeDirections += [RelRobotLocation(5.0, -30.0, 0.0)]
+        GoalieStates.watchWithLineChecks.shiftedPosition = True
         return True
+
+    GoalieStates.watchWithLineChecks.shiftedPosition = False
     return False
 
 def shouldPositionLeft(player):
@@ -270,17 +273,24 @@ def shouldPositionLeft(player):
     player.inPosition is not constants.LEFT_POSITION and \
     player.inPosition is not constants.NOT_IN_POSITION:
         player.homeDirections += [RelRobotLocation(5.0, 30.0, 0.0)]
+        GoalieStates.watchWithLineChecks.shiftedPosition = True
         return True
+
+    GoalieStates.watchWithLineChecks.shiftedPosition = False
     return False
 
 def shouldStopTurning(player):
     lines = player.brain.visionLines
 
-    # for i in range(0, lines.line_size()):
-    #     r = lines(i).inner.r
-    #     t = math.degrees(lines(i).inner.t)
+    for i in range(0, lines.line_size()):
+        r = lines.line(i).inner.r
+        t = math.degrees(lines.line(i).inner.t)
+        if math.fabs(t - 90.0) < 10.0 and r is not 0.0 and r < 40.0:
+            print "I see a line! I'm assuming its part of the goalbox and I'm going there"
+            player.homeDirections += [RelRobotLocation(r+25.0, 0.0, 0.0)]
+            return True
 
-
+    return False
 
 
 
@@ -705,6 +715,8 @@ def shouldClearBall(player):
         walkedTooFar.yThresh = 300.0
         shouldGo = True
 
+    #TODO: implement check to see if ball is outside of goalbox or not!
+
     if shouldGo:
         if player.brain.ball.bearing_deg < -50.0:
             VisualGoalieStates.clearIt.dangerousSide = constants.RIGHT
@@ -712,6 +724,23 @@ def shouldClearBall(player):
             VisualGoalieStates.clearIt.dangerousSide = constants.LEFT
         else:
             VisualGoalieStates.clearIt.dangerousSide = -1
+
+        if player.brain.ball.bearing_deg < 0.0:
+            VisualGoalieStates.clearIt.ballSide = constants.RIGHT
+        else:
+            VisualGoalieStates.clearIt.ballSide = constants.LEFT
+
+        lines = player.brain.visionLines
+        for i in range(0, lines.line_size()):
+            r = lines.line(i).inner.r
+            t = math.degrees(lines.line(i).inner.t)
+            if r < 120.0 and r is not 0.0:
+                if player.brain.ball.distance > r:
+                    VisualGoalieStates.clearIt.inGoalbox = False
+                    print "I think the ball is outside the goalbox!"
+                else:
+                    VisualGoalieStates.clearIt.inGoalbox = True
+                    print "I think the ball is in the goalbox"
 
     return shouldGo
 

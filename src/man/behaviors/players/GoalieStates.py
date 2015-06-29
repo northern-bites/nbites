@@ -103,8 +103,8 @@ def gamePlaying(player):
         # #TODO fix this
         # player.justKicked = False
         if player.justKicked:
-            print "I just kicked, I'm returning to goal!"
-            return player.goLater('returnToGoal')
+            print "I just kicked, I'm trying to find my way back!"
+            return player.goLater('findMyWayBackPtI')
         else:
             return player.goLater('watchWithLineChecks')
 
@@ -208,6 +208,10 @@ def watchWithLineChecks(player):
         player.brain.nav.stand()
         player.returningFromPenalty = False
 
+        if watchWithLineChecks.shiftedPosition:
+            watchWithLineChecks.shiftedPosition = False
+            return player.goLater('watch')
+
     if (player.brain.ball.vis.frames_on > constants.BALL_ON_SAFE_THRESH \
         and player.brain.ball.distance > constants.BALL_SAFE_DISTANCE_THRESH \
         and not watchWithLineChecks.looking):
@@ -218,12 +222,13 @@ def watchWithLineChecks(player):
         watchWithCornerChecks.looking = False
         player.brain.tracker.trackBall()
 
-    if player.counter > 300:
+    if player.counter > 400:
         return player.goLater('watch')
 
     return Transition.getNextState(player, watchWithLineChecks)
 
 watchWithLineChecks.lines = []
+watchWithLineChecks.shiftedPosition = False
 
 @superState('gameControllerResponder')
 def lineCheckReposition(player):
