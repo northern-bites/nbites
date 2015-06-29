@@ -8,389 +8,95 @@ public final class Vision {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  public interface HoughLineOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
-    
-    // optional float r = 1;
+  public interface HoughLineOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:messages.HoughLine)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional float r = 1;</code>
+     */
     boolean hasR();
+    /**
+     * <code>optional float r = 1;</code>
+     */
     float getR();
-    
-    // optional float t = 2;
+
+    /**
+     * <code>optional float t = 2;</code>
+     */
     boolean hasT();
+    /**
+     * <code>optional float t = 2;</code>
+     */
     float getT();
-    
-    // optional float ep0 = 3;
+
+    /**
+     * <code>optional float ep0 = 3;</code>
+     */
     boolean hasEp0();
+    /**
+     * <code>optional float ep0 = 3;</code>
+     */
     float getEp0();
-    
-    // optional float ep1 = 4;
+
+    /**
+     * <code>optional float ep1 = 4;</code>
+     */
     boolean hasEp1();
+    /**
+     * <code>optional float ep1 = 4;</code>
+     */
     float getEp1();
   }
+  /**
+   * Protobuf type {@code messages.HoughLine}
+   */
   public static final class HoughLine extends
-      com.google.protobuf.GeneratedMessage
-      implements HoughLineOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:messages.HoughLine)
+      HoughLineOrBuilder {
     // Use HoughLine.newBuilder() to construct.
-    private HoughLine(Builder builder) {
+    private HoughLine(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private HoughLine(boolean noInit) {}
-    
+    private HoughLine(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
     private static final HoughLine defaultInstance;
     public static HoughLine getDefaultInstance() {
       return defaultInstance;
     }
-    
+
     public HoughLine getDefaultInstanceForType() {
       return defaultInstance;
     }
-    
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return messages.Vision.internal_static_messages_HoughLine_descriptor;
-    }
-    
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return messages.Vision.internal_static_messages_HoughLine_fieldAccessorTable;
-    }
-    
-    private int bitField0_;
-    // optional float r = 1;
-    public static final int R_FIELD_NUMBER = 1;
-    private float r_;
-    public boolean hasR() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    public float getR() {
-      return r_;
-    }
-    
-    // optional float t = 2;
-    public static final int T_FIELD_NUMBER = 2;
-    private float t_;
-    public boolean hasT() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    public float getT() {
-      return t_;
-    }
-    
-    // optional float ep0 = 3;
-    public static final int EP0_FIELD_NUMBER = 3;
-    private float ep0_;
-    public boolean hasEp0() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    public float getEp0() {
-      return ep0_;
-    }
-    
-    // optional float ep1 = 4;
-    public static final int EP1_FIELD_NUMBER = 4;
-    private float ep1_;
-    public boolean hasEp1() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
-    }
-    public float getEp1() {
-      return ep1_;
-    }
-    
-    private void initFields() {
-      r_ = 0F;
-      t_ = 0F;
-      ep0_ = 0F;
-      ep1_ = 0F;
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-      
-      memoizedIsInitialized = 1;
-      return true;
-    }
-    
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeFloat(1, r_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeFloat(2, t_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeFloat(3, ep0_);
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeFloat(4, ep1_);
-      }
-      getUnknownFields().writeTo(output);
-    }
-    
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-    
-      size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(1, r_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(2, t_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(3, ep0_);
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(4, ep1_);
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-    
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
-    protected Object writeReplace() throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
     }
-    
-    public static messages.Vision.HoughLine parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static messages.Vision.HoughLine parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static messages.Vision.HoughLine parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static messages.Vision.HoughLine parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static messages.Vision.HoughLine parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static messages.Vision.HoughLine parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    public static messages.Vision.HoughLine parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static messages.Vision.HoughLine parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static messages.Vision.HoughLine parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static messages.Vision.HoughLine parseFrom(
+    private HoughLine(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(messages.Vision.HoughLine prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-    
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements messages.Vision.HoughLineOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return messages.Vision.internal_static_messages_HoughLine_descriptor;
-      }
-      
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return messages.Vision.internal_static_messages_HoughLine_fieldAccessorTable;
-      }
-      
-      // Construct using messages.Vision.HoughLine.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-      
-      private Builder(BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-        }
-      }
-      private static Builder create() {
-        return new Builder();
-      }
-      
-      public Builder clear() {
-        super.clear();
-        r_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000001);
-        t_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000002);
-        ep0_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000004);
-        ep1_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000008);
-        return this;
-      }
-      
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
-      }
-      
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return messages.Vision.HoughLine.getDescriptor();
-      }
-      
-      public messages.Vision.HoughLine getDefaultInstanceForType() {
-        return messages.Vision.HoughLine.getDefaultInstance();
-      }
-      
-      public messages.Vision.HoughLine build() {
-        messages.Vision.HoughLine result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-      
-      private messages.Vision.HoughLine buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        messages.Vision.HoughLine result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
-      public messages.Vision.HoughLine buildPartial() {
-        messages.Vision.HoughLine result = new messages.Vision.HoughLine(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
-        }
-        result.r_ = r_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
-        }
-        result.t_ = t_;
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-          to_bitField0_ |= 0x00000004;
-        }
-        result.ep0_ = ep0_;
-        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
-          to_bitField0_ |= 0x00000008;
-        }
-        result.ep1_ = ep1_;
-        result.bitField0_ = to_bitField0_;
-        onBuilt();
-        return result;
-      }
-      
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof messages.Vision.HoughLine) {
-          return mergeFrom((messages.Vision.HoughLine)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-      
-      public Builder mergeFrom(messages.Vision.HoughLine other) {
-        if (other == messages.Vision.HoughLine.getDefaultInstance()) return this;
-        if (other.hasR()) {
-          setR(other.getR());
-        }
-        if (other.hasT()) {
-          setT(other.getT());
-        }
-        if (other.hasEp0()) {
-          setEp0(other.getEp0());
-        }
-        if (other.hasEp1()) {
-          setEp1(other.getEp1());
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
-      
-      public final boolean isInitialized() {
-        return true;
-      }
-      
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
           int tag = input.readTag();
           switch (tag) {
             case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
+              done = true;
+              break;
             default: {
               if (!parseUnknownField(input, unknownFields,
                                      extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
+                done = true;
               }
               break;
             }
@@ -416,201 +122,771 @@ public final class Vision {
             }
           }
         }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
       }
-      
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return messages.Vision.internal_static_messages_HoughLine_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return messages.Vision.internal_static_messages_HoughLine_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              messages.Vision.HoughLine.class, messages.Vision.HoughLine.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<HoughLine> PARSER =
+        new com.google.protobuf.AbstractParser<HoughLine>() {
+      public HoughLine parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new HoughLine(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<HoughLine> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    public static final int R_FIELD_NUMBER = 1;
+    private float r_;
+    /**
+     * <code>optional float r = 1;</code>
+     */
+    public boolean hasR() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional float r = 1;</code>
+     */
+    public float getR() {
+      return r_;
+    }
+
+    public static final int T_FIELD_NUMBER = 2;
+    private float t_;
+    /**
+     * <code>optional float t = 2;</code>
+     */
+    public boolean hasT() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional float t = 2;</code>
+     */
+    public float getT() {
+      return t_;
+    }
+
+    public static final int EP0_FIELD_NUMBER = 3;
+    private float ep0_;
+    /**
+     * <code>optional float ep0 = 3;</code>
+     */
+    public boolean hasEp0() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional float ep0 = 3;</code>
+     */
+    public float getEp0() {
+      return ep0_;
+    }
+
+    public static final int EP1_FIELD_NUMBER = 4;
+    private float ep1_;
+    /**
+     * <code>optional float ep1 = 4;</code>
+     */
+    public boolean hasEp1() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional float ep1 = 4;</code>
+     */
+    public float getEp1() {
+      return ep1_;
+    }
+
+    private void initFields() {
+      r_ = 0F;
+      t_ = 0F;
+      ep0_ = 0F;
+      ep1_ = 0F;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeFloat(1, r_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeFloat(2, t_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeFloat(3, ep0_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeFloat(4, ep1_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(1, r_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(2, t_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(3, ep0_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(4, ep1_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static messages.Vision.HoughLine parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static messages.Vision.HoughLine parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static messages.Vision.HoughLine parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static messages.Vision.HoughLine parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static messages.Vision.HoughLine parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static messages.Vision.HoughLine parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static messages.Vision.HoughLine parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static messages.Vision.HoughLine parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static messages.Vision.HoughLine parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static messages.Vision.HoughLine parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(messages.Vision.HoughLine prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code messages.HoughLine}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:messages.HoughLine)
+        messages.Vision.HoughLineOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return messages.Vision.internal_static_messages_HoughLine_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return messages.Vision.internal_static_messages_HoughLine_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                messages.Vision.HoughLine.class, messages.Vision.HoughLine.Builder.class);
+      }
+
+      // Construct using messages.Vision.HoughLine.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        r_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        t_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        ep0_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        ep1_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return messages.Vision.internal_static_messages_HoughLine_descriptor;
+      }
+
+      public messages.Vision.HoughLine getDefaultInstanceForType() {
+        return messages.Vision.HoughLine.getDefaultInstance();
+      }
+
+      public messages.Vision.HoughLine build() {
+        messages.Vision.HoughLine result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public messages.Vision.HoughLine buildPartial() {
+        messages.Vision.HoughLine result = new messages.Vision.HoughLine(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.r_ = r_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.t_ = t_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.ep0_ = ep0_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.ep1_ = ep1_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof messages.Vision.HoughLine) {
+          return mergeFrom((messages.Vision.HoughLine)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(messages.Vision.HoughLine other) {
+        if (other == messages.Vision.HoughLine.getDefaultInstance()) return this;
+        if (other.hasR()) {
+          setR(other.getR());
+        }
+        if (other.hasT()) {
+          setT(other.getT());
+        }
+        if (other.hasEp0()) {
+          setEp0(other.getEp0());
+        }
+        if (other.hasEp1()) {
+          setEp1(other.getEp1());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        messages.Vision.HoughLine parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (messages.Vision.HoughLine) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
       private int bitField0_;
-      
-      // optional float r = 1;
+
       private float r_ ;
+      /**
+       * <code>optional float r = 1;</code>
+       */
       public boolean hasR() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+      /**
+       * <code>optional float r = 1;</code>
+       */
       public float getR() {
         return r_;
       }
+      /**
+       * <code>optional float r = 1;</code>
+       */
       public Builder setR(float value) {
         bitField0_ |= 0x00000001;
         r_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float r = 1;</code>
+       */
       public Builder clearR() {
         bitField0_ = (bitField0_ & ~0x00000001);
         r_ = 0F;
         onChanged();
         return this;
       }
-      
-      // optional float t = 2;
+
       private float t_ ;
+      /**
+       * <code>optional float t = 2;</code>
+       */
       public boolean hasT() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+      /**
+       * <code>optional float t = 2;</code>
+       */
       public float getT() {
         return t_;
       }
+      /**
+       * <code>optional float t = 2;</code>
+       */
       public Builder setT(float value) {
         bitField0_ |= 0x00000002;
         t_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float t = 2;</code>
+       */
       public Builder clearT() {
         bitField0_ = (bitField0_ & ~0x00000002);
         t_ = 0F;
         onChanged();
         return this;
       }
-      
-      // optional float ep0 = 3;
+
       private float ep0_ ;
+      /**
+       * <code>optional float ep0 = 3;</code>
+       */
       public boolean hasEp0() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
+      /**
+       * <code>optional float ep0 = 3;</code>
+       */
       public float getEp0() {
         return ep0_;
       }
+      /**
+       * <code>optional float ep0 = 3;</code>
+       */
       public Builder setEp0(float value) {
         bitField0_ |= 0x00000004;
         ep0_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float ep0 = 3;</code>
+       */
       public Builder clearEp0() {
         bitField0_ = (bitField0_ & ~0x00000004);
         ep0_ = 0F;
         onChanged();
         return this;
       }
-      
-      // optional float ep1 = 4;
+
       private float ep1_ ;
+      /**
+       * <code>optional float ep1 = 4;</code>
+       */
       public boolean hasEp1() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
+      /**
+       * <code>optional float ep1 = 4;</code>
+       */
       public float getEp1() {
         return ep1_;
       }
+      /**
+       * <code>optional float ep1 = 4;</code>
+       */
       public Builder setEp1(float value) {
         bitField0_ |= 0x00000008;
         ep1_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float ep1 = 4;</code>
+       */
       public Builder clearEp1() {
         bitField0_ = (bitField0_ & ~0x00000008);
         ep1_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // @@protoc_insertion_point(builder_scope:messages.HoughLine)
     }
-    
+
     static {
       defaultInstance = new HoughLine(true);
       defaultInstance.initFields();
     }
-    
+
     // @@protoc_insertion_point(class_scope:messages.HoughLine)
   }
-  
-  public interface FieldLineOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
-    
-    // optional .messages.HoughLine inner = 1;
+
+  public interface FieldLineOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:messages.FieldLine)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional .messages.HoughLine inner = 1;</code>
+     */
     boolean hasInner();
+    /**
+     * <code>optional .messages.HoughLine inner = 1;</code>
+     */
     messages.Vision.HoughLine getInner();
+    /**
+     * <code>optional .messages.HoughLine inner = 1;</code>
+     */
     messages.Vision.HoughLineOrBuilder getInnerOrBuilder();
-    
-    // optional .messages.HoughLine outer = 2;
+
+    /**
+     * <code>optional .messages.HoughLine outer = 2;</code>
+     */
     boolean hasOuter();
+    /**
+     * <code>optional .messages.HoughLine outer = 2;</code>
+     */
     messages.Vision.HoughLine getOuter();
+    /**
+     * <code>optional .messages.HoughLine outer = 2;</code>
+     */
     messages.Vision.HoughLineOrBuilder getOuterOrBuilder();
-    
-    // optional int32 id = 3;
+
+    /**
+     * <code>optional int32 id = 3;</code>
+     */
     boolean hasId();
+    /**
+     * <code>optional int32 id = 3;</code>
+     */
     int getId();
-    
-    // optional float prob = 4;
+
+    /**
+     * <code>optional float prob = 4;</code>
+     */
     boolean hasProb();
+    /**
+     * <code>optional float prob = 4;</code>
+     */
     float getProb();
   }
+  /**
+   * Protobuf type {@code messages.FieldLine}
+   */
   public static final class FieldLine extends
-      com.google.protobuf.GeneratedMessage
-      implements FieldLineOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:messages.FieldLine)
+      FieldLineOrBuilder {
     // Use FieldLine.newBuilder() to construct.
-    private FieldLine(Builder builder) {
+    private FieldLine(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private FieldLine(boolean noInit) {}
-    
+    private FieldLine(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
     private static final FieldLine defaultInstance;
     public static FieldLine getDefaultInstance() {
       return defaultInstance;
     }
-    
+
     public FieldLine getDefaultInstanceForType() {
       return defaultInstance;
     }
-    
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private FieldLine(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              messages.Vision.HoughLine.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000001) == 0x00000001)) {
+                subBuilder = inner_.toBuilder();
+              }
+              inner_ = input.readMessage(messages.Vision.HoughLine.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(inner_);
+                inner_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000001;
+              break;
+            }
+            case 18: {
+              messages.Vision.HoughLine.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000002) == 0x00000002)) {
+                subBuilder = outer_.toBuilder();
+              }
+              outer_ = input.readMessage(messages.Vision.HoughLine.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(outer_);
+                outer_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000002;
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
+              id_ = input.readInt32();
+              break;
+            }
+            case 37: {
+              bitField0_ |= 0x00000008;
+              prob_ = input.readFloat();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages.Vision.internal_static_messages_FieldLine_descriptor;
     }
-    
+
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return messages.Vision.internal_static_messages_FieldLine_fieldAccessorTable;
+      return messages.Vision.internal_static_messages_FieldLine_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              messages.Vision.FieldLine.class, messages.Vision.FieldLine.Builder.class);
     }
-    
+
+    public static com.google.protobuf.Parser<FieldLine> PARSER =
+        new com.google.protobuf.AbstractParser<FieldLine>() {
+      public FieldLine parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new FieldLine(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FieldLine> getParserForType() {
+      return PARSER;
+    }
+
     private int bitField0_;
-    // optional .messages.HoughLine inner = 1;
     public static final int INNER_FIELD_NUMBER = 1;
     private messages.Vision.HoughLine inner_;
+    /**
+     * <code>optional .messages.HoughLine inner = 1;</code>
+     */
     public boolean hasInner() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
+    /**
+     * <code>optional .messages.HoughLine inner = 1;</code>
+     */
     public messages.Vision.HoughLine getInner() {
       return inner_;
     }
+    /**
+     * <code>optional .messages.HoughLine inner = 1;</code>
+     */
     public messages.Vision.HoughLineOrBuilder getInnerOrBuilder() {
       return inner_;
     }
-    
-    // optional .messages.HoughLine outer = 2;
+
     public static final int OUTER_FIELD_NUMBER = 2;
     private messages.Vision.HoughLine outer_;
+    /**
+     * <code>optional .messages.HoughLine outer = 2;</code>
+     */
     public boolean hasOuter() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
+    /**
+     * <code>optional .messages.HoughLine outer = 2;</code>
+     */
     public messages.Vision.HoughLine getOuter() {
       return outer_;
     }
+    /**
+     * <code>optional .messages.HoughLine outer = 2;</code>
+     */
     public messages.Vision.HoughLineOrBuilder getOuterOrBuilder() {
       return outer_;
     }
-    
-    // optional int32 id = 3;
+
     public static final int ID_FIELD_NUMBER = 3;
     private int id_;
+    /**
+     * <code>optional int32 id = 3;</code>
+     */
     public boolean hasId() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
+    /**
+     * <code>optional int32 id = 3;</code>
+     */
     public int getId() {
       return id_;
     }
-    
-    // optional float prob = 4;
+
     public static final int PROB_FIELD_NUMBER = 4;
     private float prob_;
+    /**
+     * <code>optional float prob = 4;</code>
+     */
     public boolean hasProb() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
+    /**
+     * <code>optional float prob = 4;</code>
+     */
     public float getProb() {
       return prob_;
     }
-    
+
     private void initFields() {
       inner_ = messages.Vision.HoughLine.getDefaultInstance();
       outer_ = messages.Vision.HoughLine.getDefaultInstance();
@@ -620,12 +896,13 @@ public final class Vision {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-      
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
       memoizedIsInitialized = 1;
       return true;
     }
-    
+
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
@@ -643,12 +920,12 @@ public final class Vision {
       }
       getUnknownFields().writeTo(output);
     }
-    
+
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
-    
+
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
@@ -670,111 +947,106 @@ public final class Vision {
       memoizedSerializedSize = size;
       return size;
     }
-    
+
+    private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected Object writeReplace() throws java.io.ObjectStreamException {
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
-    
+
     public static messages.Vision.FieldLine parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static messages.Vision.FieldLine parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static messages.Vision.FieldLine parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static messages.Vision.FieldLine parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static messages.Vision.FieldLine parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static messages.Vision.FieldLine parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
     public static messages.Vision.FieldLine parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input);
     }
     public static messages.Vision.FieldLine parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
     public static messages.Vision.FieldLine parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static messages.Vision.FieldLine parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
-    
+
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder(messages.Vision.FieldLine prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
-    
+
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
+    /**
+     * Protobuf type {@code messages.FieldLine}
+     */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements messages.Vision.FieldLineOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:messages.FieldLine)
+        messages.Vision.FieldLineOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return messages.Vision.internal_static_messages_FieldLine_descriptor;
       }
-      
+
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return messages.Vision.internal_static_messages_FieldLine_fieldAccessorTable;
+        return messages.Vision.internal_static_messages_FieldLine_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                messages.Vision.FieldLine.class, messages.Vision.FieldLine.Builder.class);
       }
-      
+
       // Construct using messages.Vision.FieldLine.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
-      
-      private Builder(BuilderParent parent) {
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
@@ -787,7 +1059,7 @@ public final class Vision {
       private static Builder create() {
         return new Builder();
       }
-      
+
       public Builder clear() {
         super.clear();
         if (innerBuilder_ == null) {
@@ -808,20 +1080,20 @@ public final class Vision {
         bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
-      
+
       public Builder clone() {
         return create().mergeFrom(buildPartial());
       }
-      
+
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return messages.Vision.FieldLine.getDescriptor();
+        return messages.Vision.internal_static_messages_FieldLine_descriptor;
       }
-      
+
       public messages.Vision.FieldLine getDefaultInstanceForType() {
         return messages.Vision.FieldLine.getDefaultInstance();
       }
-      
+
       public messages.Vision.FieldLine build() {
         messages.Vision.FieldLine result = buildPartial();
         if (!result.isInitialized()) {
@@ -829,17 +1101,7 @@ public final class Vision {
         }
         return result;
       }
-      
-      private messages.Vision.FieldLine buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        messages.Vision.FieldLine result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
+
       public messages.Vision.FieldLine buildPartial() {
         messages.Vision.FieldLine result = new messages.Vision.FieldLine(this);
         int from_bitField0_ = bitField0_;
@@ -872,7 +1134,7 @@ public final class Vision {
         onBuilt();
         return result;
       }
-      
+
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof messages.Vision.FieldLine) {
           return mergeFrom((messages.Vision.FieldLine)other);
@@ -881,7 +1143,7 @@ public final class Vision {
           return this;
         }
       }
-      
+
       public Builder mergeFrom(messages.Vision.FieldLine other) {
         if (other == messages.Vision.FieldLine.getDefaultInstance()) return this;
         if (other.hasInner()) {
@@ -899,75 +1161,42 @@ public final class Vision {
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
-      
+
       public final boolean isInitialized() {
         return true;
       }
-      
+
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
-              }
-              break;
-            }
-            case 10: {
-              messages.Vision.HoughLine.Builder subBuilder = messages.Vision.HoughLine.newBuilder();
-              if (hasInner()) {
-                subBuilder.mergeFrom(getInner());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setInner(subBuilder.buildPartial());
-              break;
-            }
-            case 18: {
-              messages.Vision.HoughLine.Builder subBuilder = messages.Vision.HoughLine.newBuilder();
-              if (hasOuter()) {
-                subBuilder.mergeFrom(getOuter());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setOuter(subBuilder.buildPartial());
-              break;
-            }
-            case 24: {
-              bitField0_ |= 0x00000004;
-              id_ = input.readInt32();
-              break;
-            }
-            case 37: {
-              bitField0_ |= 0x00000008;
-              prob_ = input.readFloat();
-              break;
-            }
+        messages.Vision.FieldLine parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (messages.Vision.FieldLine) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
           }
         }
+        return this;
       }
-      
       private int bitField0_;
-      
-      // optional .messages.HoughLine inner = 1;
+
       private messages.Vision.HoughLine inner_ = messages.Vision.HoughLine.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           messages.Vision.HoughLine, messages.Vision.HoughLine.Builder, messages.Vision.HoughLineOrBuilder> innerBuilder_;
+      /**
+       * <code>optional .messages.HoughLine inner = 1;</code>
+       */
       public boolean hasInner() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+      /**
+       * <code>optional .messages.HoughLine inner = 1;</code>
+       */
       public messages.Vision.HoughLine getInner() {
         if (innerBuilder_ == null) {
           return inner_;
@@ -975,6 +1204,9 @@ public final class Vision {
           return innerBuilder_.getMessage();
         }
       }
+      /**
+       * <code>optional .messages.HoughLine inner = 1;</code>
+       */
       public Builder setInner(messages.Vision.HoughLine value) {
         if (innerBuilder_ == null) {
           if (value == null) {
@@ -988,6 +1220,9 @@ public final class Vision {
         bitField0_ |= 0x00000001;
         return this;
       }
+      /**
+       * <code>optional .messages.HoughLine inner = 1;</code>
+       */
       public Builder setInner(
           messages.Vision.HoughLine.Builder builderForValue) {
         if (innerBuilder_ == null) {
@@ -999,6 +1234,9 @@ public final class Vision {
         bitField0_ |= 0x00000001;
         return this;
       }
+      /**
+       * <code>optional .messages.HoughLine inner = 1;</code>
+       */
       public Builder mergeInner(messages.Vision.HoughLine value) {
         if (innerBuilder_ == null) {
           if (((bitField0_ & 0x00000001) == 0x00000001) &&
@@ -1015,6 +1253,9 @@ public final class Vision {
         bitField0_ |= 0x00000001;
         return this;
       }
+      /**
+       * <code>optional .messages.HoughLine inner = 1;</code>
+       */
       public Builder clearInner() {
         if (innerBuilder_ == null) {
           inner_ = messages.Vision.HoughLine.getDefaultInstance();
@@ -1025,11 +1266,17 @@ public final class Vision {
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
       }
+      /**
+       * <code>optional .messages.HoughLine inner = 1;</code>
+       */
       public messages.Vision.HoughLine.Builder getInnerBuilder() {
         bitField0_ |= 0x00000001;
         onChanged();
         return getInnerFieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .messages.HoughLine inner = 1;</code>
+       */
       public messages.Vision.HoughLineOrBuilder getInnerOrBuilder() {
         if (innerBuilder_ != null) {
           return innerBuilder_.getMessageOrBuilder();
@@ -1037,27 +1284,35 @@ public final class Vision {
           return inner_;
         }
       }
+      /**
+       * <code>optional .messages.HoughLine inner = 1;</code>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           messages.Vision.HoughLine, messages.Vision.HoughLine.Builder, messages.Vision.HoughLineOrBuilder> 
           getInnerFieldBuilder() {
         if (innerBuilder_ == null) {
           innerBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               messages.Vision.HoughLine, messages.Vision.HoughLine.Builder, messages.Vision.HoughLineOrBuilder>(
-                  inner_,
+                  getInner(),
                   getParentForChildren(),
                   isClean());
           inner_ = null;
         }
         return innerBuilder_;
       }
-      
-      // optional .messages.HoughLine outer = 2;
+
       private messages.Vision.HoughLine outer_ = messages.Vision.HoughLine.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           messages.Vision.HoughLine, messages.Vision.HoughLine.Builder, messages.Vision.HoughLineOrBuilder> outerBuilder_;
+      /**
+       * <code>optional .messages.HoughLine outer = 2;</code>
+       */
       public boolean hasOuter() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+      /**
+       * <code>optional .messages.HoughLine outer = 2;</code>
+       */
       public messages.Vision.HoughLine getOuter() {
         if (outerBuilder_ == null) {
           return outer_;
@@ -1065,6 +1320,9 @@ public final class Vision {
           return outerBuilder_.getMessage();
         }
       }
+      /**
+       * <code>optional .messages.HoughLine outer = 2;</code>
+       */
       public Builder setOuter(messages.Vision.HoughLine value) {
         if (outerBuilder_ == null) {
           if (value == null) {
@@ -1078,6 +1336,9 @@ public final class Vision {
         bitField0_ |= 0x00000002;
         return this;
       }
+      /**
+       * <code>optional .messages.HoughLine outer = 2;</code>
+       */
       public Builder setOuter(
           messages.Vision.HoughLine.Builder builderForValue) {
         if (outerBuilder_ == null) {
@@ -1089,6 +1350,9 @@ public final class Vision {
         bitField0_ |= 0x00000002;
         return this;
       }
+      /**
+       * <code>optional .messages.HoughLine outer = 2;</code>
+       */
       public Builder mergeOuter(messages.Vision.HoughLine value) {
         if (outerBuilder_ == null) {
           if (((bitField0_ & 0x00000002) == 0x00000002) &&
@@ -1105,6 +1369,9 @@ public final class Vision {
         bitField0_ |= 0x00000002;
         return this;
       }
+      /**
+       * <code>optional .messages.HoughLine outer = 2;</code>
+       */
       public Builder clearOuter() {
         if (outerBuilder_ == null) {
           outer_ = messages.Vision.HoughLine.getDefaultInstance();
@@ -1115,11 +1382,17 @@ public final class Vision {
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
+      /**
+       * <code>optional .messages.HoughLine outer = 2;</code>
+       */
       public messages.Vision.HoughLine.Builder getOuterBuilder() {
         bitField0_ |= 0x00000002;
         onChanged();
         return getOuterFieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .messages.HoughLine outer = 2;</code>
+       */
       public messages.Vision.HoughLineOrBuilder getOuterOrBuilder() {
         if (outerBuilder_ != null) {
           return outerBuilder_.getMessageOrBuilder();
@@ -1127,147 +1400,276 @@ public final class Vision {
           return outer_;
         }
       }
+      /**
+       * <code>optional .messages.HoughLine outer = 2;</code>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           messages.Vision.HoughLine, messages.Vision.HoughLine.Builder, messages.Vision.HoughLineOrBuilder> 
           getOuterFieldBuilder() {
         if (outerBuilder_ == null) {
           outerBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               messages.Vision.HoughLine, messages.Vision.HoughLine.Builder, messages.Vision.HoughLineOrBuilder>(
-                  outer_,
+                  getOuter(),
                   getParentForChildren(),
                   isClean());
           outer_ = null;
         }
         return outerBuilder_;
       }
-      
-      // optional int32 id = 3;
+
       private int id_ ;
+      /**
+       * <code>optional int32 id = 3;</code>
+       */
       public boolean hasId() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
+      /**
+       * <code>optional int32 id = 3;</code>
+       */
       public int getId() {
         return id_;
       }
+      /**
+       * <code>optional int32 id = 3;</code>
+       */
       public Builder setId(int value) {
         bitField0_ |= 0x00000004;
         id_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional int32 id = 3;</code>
+       */
       public Builder clearId() {
         bitField0_ = (bitField0_ & ~0x00000004);
         id_ = 0;
         onChanged();
         return this;
       }
-      
-      // optional float prob = 4;
+
       private float prob_ ;
+      /**
+       * <code>optional float prob = 4;</code>
+       */
       public boolean hasProb() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
+      /**
+       * <code>optional float prob = 4;</code>
+       */
       public float getProb() {
         return prob_;
       }
+      /**
+       * <code>optional float prob = 4;</code>
+       */
       public Builder setProb(float value) {
         bitField0_ |= 0x00000008;
         prob_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float prob = 4;</code>
+       */
       public Builder clearProb() {
         bitField0_ = (bitField0_ & ~0x00000008);
         prob_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // @@protoc_insertion_point(builder_scope:messages.FieldLine)
     }
-    
+
     static {
       defaultInstance = new FieldLine(true);
       defaultInstance.initFields();
     }
-    
+
     // @@protoc_insertion_point(class_scope:messages.FieldLine)
   }
-  
-  public interface FieldLinesOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
-    
-    // repeated .messages.FieldLine line = 1;
+
+  public interface FieldLinesOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:messages.FieldLines)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>repeated .messages.FieldLine line = 1;</code>
+     */
     java.util.List<messages.Vision.FieldLine> 
         getLineList();
+    /**
+     * <code>repeated .messages.FieldLine line = 1;</code>
+     */
     messages.Vision.FieldLine getLine(int index);
+    /**
+     * <code>repeated .messages.FieldLine line = 1;</code>
+     */
     int getLineCount();
+    /**
+     * <code>repeated .messages.FieldLine line = 1;</code>
+     */
     java.util.List<? extends messages.Vision.FieldLineOrBuilder> 
         getLineOrBuilderList();
+    /**
+     * <code>repeated .messages.FieldLine line = 1;</code>
+     */
     messages.Vision.FieldLineOrBuilder getLineOrBuilder(
         int index);
   }
+  /**
+   * Protobuf type {@code messages.FieldLines}
+   */
   public static final class FieldLines extends
-      com.google.protobuf.GeneratedMessage
-      implements FieldLinesOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:messages.FieldLines)
+      FieldLinesOrBuilder {
     // Use FieldLines.newBuilder() to construct.
-    private FieldLines(Builder builder) {
+    private FieldLines(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private FieldLines(boolean noInit) {}
-    
+    private FieldLines(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
     private static final FieldLines defaultInstance;
     public static FieldLines getDefaultInstance() {
       return defaultInstance;
     }
-    
+
     public FieldLines getDefaultInstanceForType() {
       return defaultInstance;
     }
-    
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private FieldLines(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                line_ = new java.util.ArrayList<messages.Vision.FieldLine>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              line_.add(input.readMessage(messages.Vision.FieldLine.PARSER, extensionRegistry));
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+          line_ = java.util.Collections.unmodifiableList(line_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages.Vision.internal_static_messages_FieldLines_descriptor;
     }
-    
+
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return messages.Vision.internal_static_messages_FieldLines_fieldAccessorTable;
+      return messages.Vision.internal_static_messages_FieldLines_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              messages.Vision.FieldLines.class, messages.Vision.FieldLines.Builder.class);
     }
-    
-    // repeated .messages.FieldLine line = 1;
+
+    public static com.google.protobuf.Parser<FieldLines> PARSER =
+        new com.google.protobuf.AbstractParser<FieldLines>() {
+      public FieldLines parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new FieldLines(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FieldLines> getParserForType() {
+      return PARSER;
+    }
+
     public static final int LINE_FIELD_NUMBER = 1;
     private java.util.List<messages.Vision.FieldLine> line_;
+    /**
+     * <code>repeated .messages.FieldLine line = 1;</code>
+     */
     public java.util.List<messages.Vision.FieldLine> getLineList() {
       return line_;
     }
+    /**
+     * <code>repeated .messages.FieldLine line = 1;</code>
+     */
     public java.util.List<? extends messages.Vision.FieldLineOrBuilder> 
         getLineOrBuilderList() {
       return line_;
     }
+    /**
+     * <code>repeated .messages.FieldLine line = 1;</code>
+     */
     public int getLineCount() {
       return line_.size();
     }
+    /**
+     * <code>repeated .messages.FieldLine line = 1;</code>
+     */
     public messages.Vision.FieldLine getLine(int index) {
       return line_.get(index);
     }
+    /**
+     * <code>repeated .messages.FieldLine line = 1;</code>
+     */
     public messages.Vision.FieldLineOrBuilder getLineOrBuilder(
         int index) {
       return line_.get(index);
     }
-    
+
     private void initFields() {
       line_ = java.util.Collections.emptyList();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-      
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
       memoizedIsInitialized = 1;
       return true;
     }
-    
+
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
@@ -1276,12 +1678,12 @@ public final class Vision {
       }
       getUnknownFields().writeTo(output);
     }
-    
+
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
-    
+
       size = 0;
       for (int i = 0; i < line_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
@@ -1291,111 +1693,106 @@ public final class Vision {
       memoizedSerializedSize = size;
       return size;
     }
-    
+
+    private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected Object writeReplace() throws java.io.ObjectStreamException {
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
-    
+
     public static messages.Vision.FieldLines parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static messages.Vision.FieldLines parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static messages.Vision.FieldLines parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static messages.Vision.FieldLines parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static messages.Vision.FieldLines parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static messages.Vision.FieldLines parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
     public static messages.Vision.FieldLines parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input);
     }
     public static messages.Vision.FieldLines parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
     public static messages.Vision.FieldLines parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static messages.Vision.FieldLines parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
-    
+
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder(messages.Vision.FieldLines prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
-    
+
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
+    /**
+     * Protobuf type {@code messages.FieldLines}
+     */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements messages.Vision.FieldLinesOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:messages.FieldLines)
+        messages.Vision.FieldLinesOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return messages.Vision.internal_static_messages_FieldLines_descriptor;
       }
-      
+
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return messages.Vision.internal_static_messages_FieldLines_fieldAccessorTable;
+        return messages.Vision.internal_static_messages_FieldLines_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                messages.Vision.FieldLines.class, messages.Vision.FieldLines.Builder.class);
       }
-      
+
       // Construct using messages.Vision.FieldLines.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
-      
-      private Builder(BuilderParent parent) {
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
@@ -1407,7 +1804,7 @@ public final class Vision {
       private static Builder create() {
         return new Builder();
       }
-      
+
       public Builder clear() {
         super.clear();
         if (lineBuilder_ == null) {
@@ -1418,20 +1815,20 @@ public final class Vision {
         }
         return this;
       }
-      
+
       public Builder clone() {
         return create().mergeFrom(buildPartial());
       }
-      
+
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return messages.Vision.FieldLines.getDescriptor();
+        return messages.Vision.internal_static_messages_FieldLines_descriptor;
       }
-      
+
       public messages.Vision.FieldLines getDefaultInstanceForType() {
         return messages.Vision.FieldLines.getDefaultInstance();
       }
-      
+
       public messages.Vision.FieldLines build() {
         messages.Vision.FieldLines result = buildPartial();
         if (!result.isInitialized()) {
@@ -1439,17 +1836,7 @@ public final class Vision {
         }
         return result;
       }
-      
-      private messages.Vision.FieldLines buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        messages.Vision.FieldLines result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
+
       public messages.Vision.FieldLines buildPartial() {
         messages.Vision.FieldLines result = new messages.Vision.FieldLines(this);
         int from_bitField0_ = bitField0_;
@@ -1465,7 +1852,7 @@ public final class Vision {
         onBuilt();
         return result;
       }
-      
+
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof messages.Vision.FieldLines) {
           return mergeFrom((messages.Vision.FieldLines)other);
@@ -1474,7 +1861,7 @@ public final class Vision {
           return this;
         }
       }
-      
+
       public Builder mergeFrom(messages.Vision.FieldLines other) {
         if (other == messages.Vision.FieldLines.getDefaultInstance()) return this;
         if (lineBuilder_ == null) {
@@ -1506,47 +1893,30 @@ public final class Vision {
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
-      
+
       public final boolean isInitialized() {
         return true;
       }
-      
+
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
-              }
-              break;
-            }
-            case 10: {
-              messages.Vision.FieldLine.Builder subBuilder = messages.Vision.FieldLine.newBuilder();
-              input.readMessage(subBuilder, extensionRegistry);
-              addLine(subBuilder.buildPartial());
-              break;
-            }
+        messages.Vision.FieldLines parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (messages.Vision.FieldLines) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
           }
         }
+        return this;
       }
-      
       private int bitField0_;
-      
-      // repeated .messages.FieldLine line = 1;
+
       private java.util.List<messages.Vision.FieldLine> line_ =
         java.util.Collections.emptyList();
       private void ensureLineIsMutable() {
@@ -1555,10 +1925,13 @@ public final class Vision {
           bitField0_ |= 0x00000001;
          }
       }
-      
+
       private com.google.protobuf.RepeatedFieldBuilder<
           messages.Vision.FieldLine, messages.Vision.FieldLine.Builder, messages.Vision.FieldLineOrBuilder> lineBuilder_;
-      
+
+      /**
+       * <code>repeated .messages.FieldLine line = 1;</code>
+       */
       public java.util.List<messages.Vision.FieldLine> getLineList() {
         if (lineBuilder_ == null) {
           return java.util.Collections.unmodifiableList(line_);
@@ -1566,6 +1939,9 @@ public final class Vision {
           return lineBuilder_.getMessageList();
         }
       }
+      /**
+       * <code>repeated .messages.FieldLine line = 1;</code>
+       */
       public int getLineCount() {
         if (lineBuilder_ == null) {
           return line_.size();
@@ -1573,6 +1949,9 @@ public final class Vision {
           return lineBuilder_.getCount();
         }
       }
+      /**
+       * <code>repeated .messages.FieldLine line = 1;</code>
+       */
       public messages.Vision.FieldLine getLine(int index) {
         if (lineBuilder_ == null) {
           return line_.get(index);
@@ -1580,6 +1959,9 @@ public final class Vision {
           return lineBuilder_.getMessage(index);
         }
       }
+      /**
+       * <code>repeated .messages.FieldLine line = 1;</code>
+       */
       public Builder setLine(
           int index, messages.Vision.FieldLine value) {
         if (lineBuilder_ == null) {
@@ -1594,6 +1976,9 @@ public final class Vision {
         }
         return this;
       }
+      /**
+       * <code>repeated .messages.FieldLine line = 1;</code>
+       */
       public Builder setLine(
           int index, messages.Vision.FieldLine.Builder builderForValue) {
         if (lineBuilder_ == null) {
@@ -1605,6 +1990,9 @@ public final class Vision {
         }
         return this;
       }
+      /**
+       * <code>repeated .messages.FieldLine line = 1;</code>
+       */
       public Builder addLine(messages.Vision.FieldLine value) {
         if (lineBuilder_ == null) {
           if (value == null) {
@@ -1618,6 +2006,9 @@ public final class Vision {
         }
         return this;
       }
+      /**
+       * <code>repeated .messages.FieldLine line = 1;</code>
+       */
       public Builder addLine(
           int index, messages.Vision.FieldLine value) {
         if (lineBuilder_ == null) {
@@ -1632,6 +2023,9 @@ public final class Vision {
         }
         return this;
       }
+      /**
+       * <code>repeated .messages.FieldLine line = 1;</code>
+       */
       public Builder addLine(
           messages.Vision.FieldLine.Builder builderForValue) {
         if (lineBuilder_ == null) {
@@ -1643,6 +2037,9 @@ public final class Vision {
         }
         return this;
       }
+      /**
+       * <code>repeated .messages.FieldLine line = 1;</code>
+       */
       public Builder addLine(
           int index, messages.Vision.FieldLine.Builder builderForValue) {
         if (lineBuilder_ == null) {
@@ -1654,17 +2051,24 @@ public final class Vision {
         }
         return this;
       }
+      /**
+       * <code>repeated .messages.FieldLine line = 1;</code>
+       */
       public Builder addAllLine(
           java.lang.Iterable<? extends messages.Vision.FieldLine> values) {
         if (lineBuilder_ == null) {
           ensureLineIsMutable();
-          super.addAll(values, line_);
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, line_);
           onChanged();
         } else {
           lineBuilder_.addAllMessages(values);
         }
         return this;
       }
+      /**
+       * <code>repeated .messages.FieldLine line = 1;</code>
+       */
       public Builder clearLine() {
         if (lineBuilder_ == null) {
           line_ = java.util.Collections.emptyList();
@@ -1675,6 +2079,9 @@ public final class Vision {
         }
         return this;
       }
+      /**
+       * <code>repeated .messages.FieldLine line = 1;</code>
+       */
       public Builder removeLine(int index) {
         if (lineBuilder_ == null) {
           ensureLineIsMutable();
@@ -1685,10 +2092,16 @@ public final class Vision {
         }
         return this;
       }
+      /**
+       * <code>repeated .messages.FieldLine line = 1;</code>
+       */
       public messages.Vision.FieldLine.Builder getLineBuilder(
           int index) {
         return getLineFieldBuilder().getBuilder(index);
       }
+      /**
+       * <code>repeated .messages.FieldLine line = 1;</code>
+       */
       public messages.Vision.FieldLineOrBuilder getLineOrBuilder(
           int index) {
         if (lineBuilder_ == null) {
@@ -1696,6 +2109,9 @@ public final class Vision {
           return lineBuilder_.getMessageOrBuilder(index);
         }
       }
+      /**
+       * <code>repeated .messages.FieldLine line = 1;</code>
+       */
       public java.util.List<? extends messages.Vision.FieldLineOrBuilder> 
            getLineOrBuilderList() {
         if (lineBuilder_ != null) {
@@ -1704,15 +2120,24 @@ public final class Vision {
           return java.util.Collections.unmodifiableList(line_);
         }
       }
+      /**
+       * <code>repeated .messages.FieldLine line = 1;</code>
+       */
       public messages.Vision.FieldLine.Builder addLineBuilder() {
         return getLineFieldBuilder().addBuilder(
             messages.Vision.FieldLine.getDefaultInstance());
       }
+      /**
+       * <code>repeated .messages.FieldLine line = 1;</code>
+       */
       public messages.Vision.FieldLine.Builder addLineBuilder(
           int index) {
         return getLineFieldBuilder().addBuilder(
             index, messages.Vision.FieldLine.getDefaultInstance());
       }
+      /**
+       * <code>repeated .messages.FieldLine line = 1;</code>
+       */
       public java.util.List<messages.Vision.FieldLine.Builder> 
            getLineBuilderList() {
         return getLineFieldBuilder().getBuilderList();
@@ -1731,371 +2156,98 @@ public final class Vision {
         }
         return lineBuilder_;
       }
-      
+
       // @@protoc_insertion_point(builder_scope:messages.FieldLines)
     }
-    
+
     static {
       defaultInstance = new FieldLines(true);
       defaultInstance.initFields();
     }
-    
+
     // @@protoc_insertion_point(class_scope:messages.FieldLines)
   }
-  
-  public interface CornerOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
-    
-    // optional float x = 1;
+
+  public interface CornerOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:messages.Corner)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional float x = 1;</code>
+     */
     boolean hasX();
+    /**
+     * <code>optional float x = 1;</code>
+     */
     float getX();
-    
-    // optional float y = 2;
+
+    /**
+     * <code>optional float y = 2;</code>
+     */
     boolean hasY();
+    /**
+     * <code>optional float y = 2;</code>
+     */
     float getY();
-    
-    // optional int32 id = 3;
+
+    /**
+     * <code>optional int32 id = 3;</code>
+     */
     boolean hasId();
+    /**
+     * <code>optional int32 id = 3;</code>
+     */
     int getId();
   }
-
+  /**
+   * Protobuf type {@code messages.Corner}
+   */
   public static final class Corner extends
-      com.google.protobuf.GeneratedMessage
-      implements CornerOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:messages.Corner)
+      CornerOrBuilder {
     // Use Corner.newBuilder() to construct.
-    private Corner(Builder builder) {
+    private Corner(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private Corner(boolean noInit) {}
-    
+    private Corner(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
     private static final Corner defaultInstance;
     public static Corner getDefaultInstance() {
       return defaultInstance;
     }
-    
+
     public Corner getDefaultInstanceForType() {
       return defaultInstance;
     }
-    
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return messages.Vision.internal_static_messages_Corner_descriptor;
-    }
-    
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return messages.Vision.internal_static_messages_Corner_fieldAccessorTable;
-    }
-    
-    private int bitField0_;
-    // optional float x = 1;
-    public static final int X_FIELD_NUMBER = 1;
-    private float x_;
-    public boolean hasX() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    public float getX() {
-      return x_;
-    }
-    
-    // optional float y = 2;
-    public static final int Y_FIELD_NUMBER = 2;
-    private float y_;
-    public boolean hasY() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    public float getY() {
-      return y_;
-    }
-    
-    // optional int32 id = 3;
-    public static final int ID_FIELD_NUMBER = 3;
-    private int id_;
-    public boolean hasId() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    public int getId() {
-      return id_;
-    }
-    
-    private void initFields() {
-      x_ = 0F;
-      y_ = 0F;
-      id_ = 0;
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-      
-      memoizedIsInitialized = 1;
-      return true;
-    }
-    
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeFloat(1, x_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeFloat(2, y_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeInt32(3, id_);
-      }
-      getUnknownFields().writeTo(output);
-    }
-    
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-    
-      size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(1, x_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(2, y_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(3, id_);
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-    
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
-    protected Object writeReplace() throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
     }
-    
-    public static messages.Vision.Corner parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static messages.Vision.Corner parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static messages.Vision.Corner parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static messages.Vision.Corner parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static messages.Vision.Corner parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static messages.Vision.Corner parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    public static messages.Vision.Corner parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static messages.Vision.Corner parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static messages.Vision.Corner parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static messages.Vision.Corner parseFrom(
+    private Corner(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(messages.Vision.Corner prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-    
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements messages.Vision.CornerOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return messages.Vision.internal_static_messages_Corner_descriptor;
-      }
-      
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return messages.Vision.internal_static_messages_Corner_fieldAccessorTable;
-      }
-      
-      // Construct using messages.Vision.Corner.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-      
-      private Builder(BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-        }
-      }
-      private static Builder create() {
-        return new Builder();
-      }
-      
-      public Builder clear() {
-        super.clear();
-        x_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000001);
-        y_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000002);
-        id_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000004);
-        return this;
-      }
-      
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
-      }
-      
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return messages.Vision.Corner.getDescriptor();
-      }
-      
-      public messages.Vision.Corner getDefaultInstanceForType() {
-        return messages.Vision.Corner.getDefaultInstance();
-      }
-      
-      public messages.Vision.Corner build() {
-        messages.Vision.Corner result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-      
-      private messages.Vision.Corner buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        messages.Vision.Corner result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
-      public messages.Vision.Corner buildPartial() {
-        messages.Vision.Corner result = new messages.Vision.Corner(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
-        }
-        result.x_ = x_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
-        }
-        result.y_ = y_;
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-          to_bitField0_ |= 0x00000004;
-        }
-        result.id_ = id_;
-        result.bitField0_ = to_bitField0_;
-        onBuilt();
-        return result;
-      }
-      
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof messages.Vision.Corner) {
-          return mergeFrom((messages.Vision.Corner)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-      
-      public Builder mergeFrom(messages.Vision.Corner other) {
-        if (other == messages.Vision.Corner.getDefaultInstance()) return this;
-        if (other.hasX()) {
-          setX(other.getX());
-        }
-        if (other.hasY()) {
-          setY(other.getY());
-        }
-        if (other.hasId()) {
-          setId(other.getId());
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
-      
-      public final boolean isInitialized() {
-        return true;
-      }
-      
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
           int tag = input.readTag();
           switch (tag) {
             case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
+              done = true;
+              break;
             default: {
               if (!parseUnknownField(input, unknownFields,
                                      extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
+                done = true;
               }
               break;
             }
@@ -2116,158 +2268,637 @@ public final class Vision {
             }
           }
         }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
       }
-      
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return messages.Vision.internal_static_messages_Corner_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return messages.Vision.internal_static_messages_Corner_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              messages.Vision.Corner.class, messages.Vision.Corner.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<Corner> PARSER =
+        new com.google.protobuf.AbstractParser<Corner>() {
+      public Corner parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Corner(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Corner> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    public static final int X_FIELD_NUMBER = 1;
+    private float x_;
+    /**
+     * <code>optional float x = 1;</code>
+     */
+    public boolean hasX() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional float x = 1;</code>
+     */
+    public float getX() {
+      return x_;
+    }
+
+    public static final int Y_FIELD_NUMBER = 2;
+    private float y_;
+    /**
+     * <code>optional float y = 2;</code>
+     */
+    public boolean hasY() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional float y = 2;</code>
+     */
+    public float getY() {
+      return y_;
+    }
+
+    public static final int ID_FIELD_NUMBER = 3;
+    private int id_;
+    /**
+     * <code>optional int32 id = 3;</code>
+     */
+    public boolean hasId() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional int32 id = 3;</code>
+     */
+    public int getId() {
+      return id_;
+    }
+
+    private void initFields() {
+      x_ = 0F;
+      y_ = 0F;
+      id_ = 0;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeFloat(1, x_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeFloat(2, y_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeInt32(3, id_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(1, x_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(2, y_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, id_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static messages.Vision.Corner parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static messages.Vision.Corner parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static messages.Vision.Corner parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static messages.Vision.Corner parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static messages.Vision.Corner parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static messages.Vision.Corner parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static messages.Vision.Corner parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static messages.Vision.Corner parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static messages.Vision.Corner parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static messages.Vision.Corner parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(messages.Vision.Corner prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code messages.Corner}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:messages.Corner)
+        messages.Vision.CornerOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return messages.Vision.internal_static_messages_Corner_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return messages.Vision.internal_static_messages_Corner_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                messages.Vision.Corner.class, messages.Vision.Corner.Builder.class);
+      }
+
+      // Construct using messages.Vision.Corner.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        x_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        y_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        id_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return messages.Vision.internal_static_messages_Corner_descriptor;
+      }
+
+      public messages.Vision.Corner getDefaultInstanceForType() {
+        return messages.Vision.Corner.getDefaultInstance();
+      }
+
+      public messages.Vision.Corner build() {
+        messages.Vision.Corner result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public messages.Vision.Corner buildPartial() {
+        messages.Vision.Corner result = new messages.Vision.Corner(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.x_ = x_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.y_ = y_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.id_ = id_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof messages.Vision.Corner) {
+          return mergeFrom((messages.Vision.Corner)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(messages.Vision.Corner other) {
+        if (other == messages.Vision.Corner.getDefaultInstance()) return this;
+        if (other.hasX()) {
+          setX(other.getX());
+        }
+        if (other.hasY()) {
+          setY(other.getY());
+        }
+        if (other.hasId()) {
+          setId(other.getId());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        messages.Vision.Corner parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (messages.Vision.Corner) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
       private int bitField0_;
-      
-      // optional float x = 1;
+
       private float x_ ;
+      /**
+       * <code>optional float x = 1;</code>
+       */
       public boolean hasX() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+      /**
+       * <code>optional float x = 1;</code>
+       */
       public float getX() {
         return x_;
       }
+      /**
+       * <code>optional float x = 1;</code>
+       */
       public Builder setX(float value) {
         bitField0_ |= 0x00000001;
         x_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float x = 1;</code>
+       */
       public Builder clearX() {
         bitField0_ = (bitField0_ & ~0x00000001);
         x_ = 0F;
         onChanged();
         return this;
       }
-      
-      // optional float y = 2;
+
       private float y_ ;
+      /**
+       * <code>optional float y = 2;</code>
+       */
       public boolean hasY() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+      /**
+       * <code>optional float y = 2;</code>
+       */
       public float getY() {
         return y_;
       }
+      /**
+       * <code>optional float y = 2;</code>
+       */
       public Builder setY(float value) {
         bitField0_ |= 0x00000002;
         y_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float y = 2;</code>
+       */
       public Builder clearY() {
         bitField0_ = (bitField0_ & ~0x00000002);
         y_ = 0F;
         onChanged();
         return this;
       }
-      
-      // optional int32 id = 3;
+
       private int id_ ;
+      /**
+       * <code>optional int32 id = 3;</code>
+       */
       public boolean hasId() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
+      /**
+       * <code>optional int32 id = 3;</code>
+       */
       public int getId() {
         return id_;
       }
+      /**
+       * <code>optional int32 id = 3;</code>
+       */
       public Builder setId(int value) {
         bitField0_ |= 0x00000004;
         id_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional int32 id = 3;</code>
+       */
       public Builder clearId() {
         bitField0_ = (bitField0_ & ~0x00000004);
         id_ = 0;
         onChanged();
         return this;
       }
-      
+
       // @@protoc_insertion_point(builder_scope:messages.Corner)
     }
-    
+
     static {
       defaultInstance = new Corner(true);
       defaultInstance.initFields();
     }
-    
+
     // @@protoc_insertion_point(class_scope:messages.Corner)
   }
-  
-  public interface CornersOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
-    
-    // repeated .messages.Corner corner = 1;
+
+  public interface CornersOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:messages.Corners)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>repeated .messages.Corner corner = 1;</code>
+     */
     java.util.List<messages.Vision.Corner> 
         getCornerList();
+    /**
+     * <code>repeated .messages.Corner corner = 1;</code>
+     */
     messages.Vision.Corner getCorner(int index);
+    /**
+     * <code>repeated .messages.Corner corner = 1;</code>
+     */
     int getCornerCount();
+    /**
+     * <code>repeated .messages.Corner corner = 1;</code>
+     */
     java.util.List<? extends messages.Vision.CornerOrBuilder> 
         getCornerOrBuilderList();
+    /**
+     * <code>repeated .messages.Corner corner = 1;</code>
+     */
     messages.Vision.CornerOrBuilder getCornerOrBuilder(
         int index);
   }
+  /**
+   * Protobuf type {@code messages.Corners}
+   */
   public static final class Corners extends
-      com.google.protobuf.GeneratedMessage
-      implements CornersOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:messages.Corners)
+      CornersOrBuilder {
     // Use Corners.newBuilder() to construct.
-    private Corners(Builder builder) {
+    private Corners(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private Corners(boolean noInit) {}
-    
+    private Corners(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
     private static final Corners defaultInstance;
     public static Corners getDefaultInstance() {
       return defaultInstance;
     }
-    
+
     public Corners getDefaultInstanceForType() {
       return defaultInstance;
     }
-    
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private Corners(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                corner_ = new java.util.ArrayList<messages.Vision.Corner>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              corner_.add(input.readMessage(messages.Vision.Corner.PARSER, extensionRegistry));
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+          corner_ = java.util.Collections.unmodifiableList(corner_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages.Vision.internal_static_messages_Corners_descriptor;
     }
-    
+
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return messages.Vision.internal_static_messages_Corners_fieldAccessorTable;
+      return messages.Vision.internal_static_messages_Corners_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              messages.Vision.Corners.class, messages.Vision.Corners.Builder.class);
     }
-    
-    // repeated .messages.Corner corner = 1;
+
+    public static com.google.protobuf.Parser<Corners> PARSER =
+        new com.google.protobuf.AbstractParser<Corners>() {
+      public Corners parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Corners(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Corners> getParserForType() {
+      return PARSER;
+    }
+
     public static final int CORNER_FIELD_NUMBER = 1;
     private java.util.List<messages.Vision.Corner> corner_;
+    /**
+     * <code>repeated .messages.Corner corner = 1;</code>
+     */
     public java.util.List<messages.Vision.Corner> getCornerList() {
       return corner_;
     }
+    /**
+     * <code>repeated .messages.Corner corner = 1;</code>
+     */
     public java.util.List<? extends messages.Vision.CornerOrBuilder> 
         getCornerOrBuilderList() {
       return corner_;
     }
+    /**
+     * <code>repeated .messages.Corner corner = 1;</code>
+     */
     public int getCornerCount() {
       return corner_.size();
     }
+    /**
+     * <code>repeated .messages.Corner corner = 1;</code>
+     */
     public messages.Vision.Corner getCorner(int index) {
       return corner_.get(index);
     }
+    /**
+     * <code>repeated .messages.Corner corner = 1;</code>
+     */
     public messages.Vision.CornerOrBuilder getCornerOrBuilder(
         int index) {
       return corner_.get(index);
     }
-    
+
     private void initFields() {
       corner_ = java.util.Collections.emptyList();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-      
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
       memoizedIsInitialized = 1;
       return true;
     }
-    
+
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
@@ -2276,12 +2907,12 @@ public final class Vision {
       }
       getUnknownFields().writeTo(output);
     }
-    
+
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
-    
+
       size = 0;
       for (int i = 0; i < corner_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
@@ -2291,111 +2922,106 @@ public final class Vision {
       memoizedSerializedSize = size;
       return size;
     }
-    
+
+    private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected Object writeReplace() throws java.io.ObjectStreamException {
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
-    
+
     public static messages.Vision.Corners parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static messages.Vision.Corners parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static messages.Vision.Corners parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static messages.Vision.Corners parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static messages.Vision.Corners parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static messages.Vision.Corners parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
     public static messages.Vision.Corners parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input);
     }
     public static messages.Vision.Corners parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
     public static messages.Vision.Corners parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static messages.Vision.Corners parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
-    
+
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder(messages.Vision.Corners prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
-    
+
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
+    /**
+     * Protobuf type {@code messages.Corners}
+     */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements messages.Vision.CornersOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:messages.Corners)
+        messages.Vision.CornersOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return messages.Vision.internal_static_messages_Corners_descriptor;
       }
-      
+
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return messages.Vision.internal_static_messages_Corners_fieldAccessorTable;
+        return messages.Vision.internal_static_messages_Corners_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                messages.Vision.Corners.class, messages.Vision.Corners.Builder.class);
       }
-      
+
       // Construct using messages.Vision.Corners.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
-      
-      private Builder(BuilderParent parent) {
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
@@ -2407,7 +3033,7 @@ public final class Vision {
       private static Builder create() {
         return new Builder();
       }
-      
+
       public Builder clear() {
         super.clear();
         if (cornerBuilder_ == null) {
@@ -2418,20 +3044,20 @@ public final class Vision {
         }
         return this;
       }
-      
+
       public Builder clone() {
         return create().mergeFrom(buildPartial());
       }
-      
+
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return messages.Vision.Corners.getDescriptor();
+        return messages.Vision.internal_static_messages_Corners_descriptor;
       }
-      
+
       public messages.Vision.Corners getDefaultInstanceForType() {
         return messages.Vision.Corners.getDefaultInstance();
       }
-      
+
       public messages.Vision.Corners build() {
         messages.Vision.Corners result = buildPartial();
         if (!result.isInitialized()) {
@@ -2439,17 +3065,7 @@ public final class Vision {
         }
         return result;
       }
-      
-      private messages.Vision.Corners buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        messages.Vision.Corners result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
+
       public messages.Vision.Corners buildPartial() {
         messages.Vision.Corners result = new messages.Vision.Corners(this);
         int from_bitField0_ = bitField0_;
@@ -2465,7 +3081,7 @@ public final class Vision {
         onBuilt();
         return result;
       }
-      
+
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof messages.Vision.Corners) {
           return mergeFrom((messages.Vision.Corners)other);
@@ -2474,7 +3090,7 @@ public final class Vision {
           return this;
         }
       }
-      
+
       public Builder mergeFrom(messages.Vision.Corners other) {
         if (other == messages.Vision.Corners.getDefaultInstance()) return this;
         if (cornerBuilder_ == null) {
@@ -2506,47 +3122,30 @@ public final class Vision {
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
-      
+
       public final boolean isInitialized() {
         return true;
       }
-      
+
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
-              }
-              break;
-            }
-            case 10: {
-              messages.Vision.Corner.Builder subBuilder = messages.Vision.Corner.newBuilder();
-              input.readMessage(subBuilder, extensionRegistry);
-              addCorner(subBuilder.buildPartial());
-              break;
-            }
+        messages.Vision.Corners parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (messages.Vision.Corners) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
           }
         }
+        return this;
       }
-      
       private int bitField0_;
-      
-      // repeated .messages.Corner corner = 1;
+
       private java.util.List<messages.Vision.Corner> corner_ =
         java.util.Collections.emptyList();
       private void ensureCornerIsMutable() {
@@ -2555,10 +3154,13 @@ public final class Vision {
           bitField0_ |= 0x00000001;
          }
       }
-      
+
       private com.google.protobuf.RepeatedFieldBuilder<
           messages.Vision.Corner, messages.Vision.Corner.Builder, messages.Vision.CornerOrBuilder> cornerBuilder_;
-      
+
+      /**
+       * <code>repeated .messages.Corner corner = 1;</code>
+       */
       public java.util.List<messages.Vision.Corner> getCornerList() {
         if (cornerBuilder_ == null) {
           return java.util.Collections.unmodifiableList(corner_);
@@ -2566,6 +3168,9 @@ public final class Vision {
           return cornerBuilder_.getMessageList();
         }
       }
+      /**
+       * <code>repeated .messages.Corner corner = 1;</code>
+       */
       public int getCornerCount() {
         if (cornerBuilder_ == null) {
           return corner_.size();
@@ -2573,6 +3178,9 @@ public final class Vision {
           return cornerBuilder_.getCount();
         }
       }
+      /**
+       * <code>repeated .messages.Corner corner = 1;</code>
+       */
       public messages.Vision.Corner getCorner(int index) {
         if (cornerBuilder_ == null) {
           return corner_.get(index);
@@ -2580,6 +3188,9 @@ public final class Vision {
           return cornerBuilder_.getMessage(index);
         }
       }
+      /**
+       * <code>repeated .messages.Corner corner = 1;</code>
+       */
       public Builder setCorner(
           int index, messages.Vision.Corner value) {
         if (cornerBuilder_ == null) {
@@ -2594,6 +3205,9 @@ public final class Vision {
         }
         return this;
       }
+      /**
+       * <code>repeated .messages.Corner corner = 1;</code>
+       */
       public Builder setCorner(
           int index, messages.Vision.Corner.Builder builderForValue) {
         if (cornerBuilder_ == null) {
@@ -2605,6 +3219,9 @@ public final class Vision {
         }
         return this;
       }
+      /**
+       * <code>repeated .messages.Corner corner = 1;</code>
+       */
       public Builder addCorner(messages.Vision.Corner value) {
         if (cornerBuilder_ == null) {
           if (value == null) {
@@ -2618,6 +3235,9 @@ public final class Vision {
         }
         return this;
       }
+      /**
+       * <code>repeated .messages.Corner corner = 1;</code>
+       */
       public Builder addCorner(
           int index, messages.Vision.Corner value) {
         if (cornerBuilder_ == null) {
@@ -2632,6 +3252,9 @@ public final class Vision {
         }
         return this;
       }
+      /**
+       * <code>repeated .messages.Corner corner = 1;</code>
+       */
       public Builder addCorner(
           messages.Vision.Corner.Builder builderForValue) {
         if (cornerBuilder_ == null) {
@@ -2643,6 +3266,9 @@ public final class Vision {
         }
         return this;
       }
+      /**
+       * <code>repeated .messages.Corner corner = 1;</code>
+       */
       public Builder addCorner(
           int index, messages.Vision.Corner.Builder builderForValue) {
         if (cornerBuilder_ == null) {
@@ -2654,17 +3280,24 @@ public final class Vision {
         }
         return this;
       }
+      /**
+       * <code>repeated .messages.Corner corner = 1;</code>
+       */
       public Builder addAllCorner(
           java.lang.Iterable<? extends messages.Vision.Corner> values) {
         if (cornerBuilder_ == null) {
           ensureCornerIsMutable();
-          super.addAll(values, corner_);
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, corner_);
           onChanged();
         } else {
           cornerBuilder_.addAllMessages(values);
         }
         return this;
       }
+      /**
+       * <code>repeated .messages.Corner corner = 1;</code>
+       */
       public Builder clearCorner() {
         if (cornerBuilder_ == null) {
           corner_ = java.util.Collections.emptyList();
@@ -2675,6 +3308,9 @@ public final class Vision {
         }
         return this;
       }
+      /**
+       * <code>repeated .messages.Corner corner = 1;</code>
+       */
       public Builder removeCorner(int index) {
         if (cornerBuilder_ == null) {
           ensureCornerIsMutable();
@@ -2685,10 +3321,16 @@ public final class Vision {
         }
         return this;
       }
+      /**
+       * <code>repeated .messages.Corner corner = 1;</code>
+       */
       public messages.Vision.Corner.Builder getCornerBuilder(
           int index) {
         return getCornerFieldBuilder().getBuilder(index);
       }
+      /**
+       * <code>repeated .messages.Corner corner = 1;</code>
+       */
       public messages.Vision.CornerOrBuilder getCornerOrBuilder(
           int index) {
         if (cornerBuilder_ == null) {
@@ -2696,6 +3338,9 @@ public final class Vision {
           return cornerBuilder_.getMessageOrBuilder(index);
         }
       }
+      /**
+       * <code>repeated .messages.Corner corner = 1;</code>
+       */
       public java.util.List<? extends messages.Vision.CornerOrBuilder> 
            getCornerOrBuilderList() {
         if (cornerBuilder_ != null) {
@@ -2704,15 +3349,24 @@ public final class Vision {
           return java.util.Collections.unmodifiableList(corner_);
         }
       }
+      /**
+       * <code>repeated .messages.Corner corner = 1;</code>
+       */
       public messages.Vision.Corner.Builder addCornerBuilder() {
         return getCornerFieldBuilder().addBuilder(
             messages.Vision.Corner.getDefaultInstance());
       }
+      /**
+       * <code>repeated .messages.Corner corner = 1;</code>
+       */
       public messages.Vision.Corner.Builder addCornerBuilder(
           int index) {
         return getCornerFieldBuilder().addBuilder(
             index, messages.Vision.Corner.getDefaultInstance());
       }
+      /**
+       * <code>repeated .messages.Corner corner = 1;</code>
+       */
       public java.util.List<messages.Vision.Corner.Builder> 
            getCornerBuilderList() {
         return getCornerFieldBuilder().getBuilderList();
@@ -2731,44 +3385,44 @@ public final class Vision {
         }
         return cornerBuilder_;
       }
-      
+
       // @@protoc_insertion_point(builder_scope:messages.Corners)
     }
-    
+
     static {
       defaultInstance = new Corners(true);
       defaultInstance.initFields();
     }
-    
+
     // @@protoc_insertion_point(class_scope:messages.Corners)
   }
-  
-  private static com.google.protobuf.Descriptors.Descriptor
+
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_HoughLine_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_HoughLine_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_FieldLine_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_FieldLine_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_FieldLines_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_FieldLines_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_Corner_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_Corner_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_Corners_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_Corners_fieldAccessorTable;
-  
+
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
     return descriptor;
@@ -2788,56 +3442,48 @@ public final class Vision {
       "essages.Corner"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_messages_HoughLine_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_messages_HoughLine_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_HoughLine_descriptor,
-              new java.lang.String[] { "R", "T", "Ep0", "Ep1", },
-              messages.Vision.HoughLine.class,
-              messages.Vision.HoughLine.Builder.class);
-          internal_static_messages_FieldLine_descriptor =
-            getDescriptor().getMessageTypes().get(1);
-          internal_static_messages_FieldLine_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_FieldLine_descriptor,
-              new java.lang.String[] { "Inner", "Outer", "Id", "Prob", },
-              messages.Vision.FieldLine.class,
-              messages.Vision.FieldLine.Builder.class);
-          internal_static_messages_FieldLines_descriptor =
-            getDescriptor().getMessageTypes().get(2);
-          internal_static_messages_FieldLines_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_FieldLines_descriptor,
-              new java.lang.String[] { "Line", },
-              messages.Vision.FieldLines.class,
-              messages.Vision.FieldLines.Builder.class);
-          internal_static_messages_Corner_descriptor =
-            getDescriptor().getMessageTypes().get(3);
-          internal_static_messages_Corner_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_Corner_descriptor,
-              new java.lang.String[] { "X", "Y", "Id", },
-              messages.Vision.Corner.class,
-              messages.Vision.Corner.Builder.class);
-          internal_static_messages_Corners_descriptor =
-            getDescriptor().getMessageTypes().get(4);
-          internal_static_messages_Corners_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_messages_Corners_descriptor,
-              new java.lang.String[] { "Corner", },
-              messages.Vision.Corners.class,
-              messages.Vision.Corners.Builder.class);
-          return null;
-        }
-      };
+        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
+    internal_static_messages_HoughLine_descriptor =
+      getDescriptor().getMessageTypes().get(0);
+    internal_static_messages_HoughLine_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_HoughLine_descriptor,
+        new java.lang.String[] { "R", "T", "Ep0", "Ep1", });
+    internal_static_messages_FieldLine_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_messages_FieldLine_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_FieldLine_descriptor,
+        new java.lang.String[] { "Inner", "Outer", "Id", "Prob", });
+    internal_static_messages_FieldLines_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_messages_FieldLines_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_FieldLines_descriptor,
+        new java.lang.String[] { "Line", });
+    internal_static_messages_Corner_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_messages_Corner_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_Corner_descriptor,
+        new java.lang.String[] { "X", "Y", "Id", });
+    internal_static_messages_Corners_descriptor =
+      getDescriptor().getMessageTypes().get(4);
+    internal_static_messages_Corners_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_Corners_descriptor,
+        new java.lang.String[] { "Corner", });
   }
+
+  // @@protoc_insertion_point(outer_class_scope)
 }

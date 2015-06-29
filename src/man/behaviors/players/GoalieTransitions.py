@@ -132,6 +132,21 @@ def shouldTurn(player):
 
     h_dest = 0.0
 
+    # longestLine = None
+    # maxLength = 0.0
+    # for line in GoalieStates.watchWithLineChecks.lines:
+    #     r = line.r
+    #     length = getLineLength(line)
+    #     if r > 100.0 or r == 0.0:
+    #         continue
+    #     if length > maxLength:
+    #         longestLine = line
+
+    # if longestLine not None:
+    #     rlong = longestLine.r
+    #     tlong = longestLine.t
+    # TODO something to use the longest line it can find...
+
     for line in GoalieStates.watchWithLineChecks.lines:
         r = line.r
         t = math.degrees(line.t)
@@ -150,7 +165,6 @@ def shouldTurn(player):
 
         if math.fabs(t - constants.EXPECTED_RIGHT_LINE_T) < constants.T_THRESH \
         or math.fabs(t - constants.EXPECTED_LEFT_LINE_T) < constants.T_THRESH \
-        or math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH \
         or r > 100.0 or t == 0.0:
             continue
 
@@ -217,7 +231,7 @@ def shouldStopGoingBack(player):
         r = visionLines.line(i).inner.r
         t = math.degrees(visionLines.line(i).inner.t)
 
-        if r != 0.0 and r < 40.0:
+        if r != 0.0 and r < 40.0 and r > 25.0 and t < 130.0 and t > 50.0:
             print "I see a line now! I should probably stop going backwards"
             print ("r: ", r)
             print ("t: ", t)
@@ -241,6 +255,9 @@ def getLineLength(line):
     x = x2 - x1
     y = y2 - y1
     return math.sqrt(x*x + y*y)
+
+
+
 
 
 
@@ -644,6 +661,9 @@ def shouldClearBall(player):
         walkedTooFar.xThresh = 150.0
         walkedTooFar.yThresh = 150.0
         shouldGo = True
+        print "Ball dist is less than 120.0!"
+    else:
+        print ("Ball dist is: ", player.brain.ball.distance)
 
     # farther out but being aggressive
     if (player.brain.ball.distance < 150.0 and
@@ -710,7 +730,21 @@ def doneWalking(player):
     return player.brain.nav.currentState == 'standing'
 
 def successfulKick(player):
-    return player.counter > 80
+    return player.counter > 50 and VisualGoalieStates.clearIt.dangerousSide == -1
+
+def successfulKickAndTurn(player):
+    # I went to the far side of a goal and it will be hard to get back!
+    if VisualGoalieStates.clearIt.dangerousSide == -1:
+        return False
+
+    if VisualGoalieStates.clearIt.dangerousSide == constants.RIGHT:
+        player.homeDirections += [RelRobotLocation(-50.0, 0.0, -15.0)]
+    else:
+        player.homeDirections += [RelRobotLocation(-50.0, 0.0, 15.0)]
+    print "Here I go! It was very far to the side"
+
+    # player.homeDirections = player.homeDirections[1:]
+    return player.counter > 30
 
 def whiffed(player):
     """
