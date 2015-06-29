@@ -1,7 +1,6 @@
 #include "Log.h"
 #include "exactio.h"
 #include "nbdebug.h"
-#include "DebugConfig.h"
 #include "control.h"
 #include "../log/logging.h"
 
@@ -23,6 +22,10 @@
 #include <fstream>
 #include <exception>
 #include "../../share/logshare/SExpr.h"
+
+#ifndef  __APPLE__
+#include "DebugConfig.h"
+#endif
 
 using nblog::SExpr;
 using nblog::Log;
@@ -91,6 +94,7 @@ namespace control {
         return 0;
     }
 
+#ifndef __APPLE__
     uint32_t cnc_setCameraParams(Log * arg) {
         size_t u = arg->data().size();
         bool success = receivedParams.ParseFromString(arg->data());
@@ -168,6 +172,8 @@ namespace control {
         return 0;
     }
     
+#endif
+    
     /*
      THIS IS WHERE YOU PUT NEW CONTROL FUNCTIONS!
      
@@ -178,7 +184,10 @@ namespace control {
         
         ret["test"] = &cnc_test;
         ret["setFlag"] = &cnc_setFlag;
+        
+#ifndef __APPLE__
         ret["setCameraParams"] = &cnc_setCameraParams;
+#endif
         
         return ret;
     }
