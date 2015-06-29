@@ -254,7 +254,8 @@ def locationsMatch(odom, dest):
     # print ("relly diff: ", abs(odom.relY - dest.relY))
     # print ("relh diff:", abs(odom.relH - dest.relH))
     # print ("degres", degrees(dest.relH), "normal: ", dest.relH)
-    # print ("odomo: ", odom.relH)
+    # if nav.counter % 30 == 0:
+    #     print ("odomH: ", odom.relH, "odomDeg", degrees(odom.relH), "destH:", dest.relH, "destH deg:", degrees(dest.relH))
 
     return False
 
@@ -269,25 +270,37 @@ def walkingTo(nav):
         helper.stand(nav)
         return nav.stay()
 
+
+    walkingTo.currentOdo = RelRobotLocation(nav.brain.interface.odometry.x,
+                         nav.brain.interface.odometry.y,
+                         nav.brain.interface.odometry.h)
+
     # TODO why check standing?
     if nav.brain.interface.motionStatus.standing:
-        walkingTo.currentOdo = RelRobotLocation(nav.brain.interface.odometry.x,
-                             nav.brain.interface.odometry.y,
-                             nav.brain.interface.odometry.h)
-
-        if nav.counter % 30 == 0:
-            print "Current odo:"
-            print ("x:", walkingTo.currentOdo.relX)
-            print ("y:", walkingTo.currentOdo.relY)
-            print ("h:", walkingTo.currentOdo.relH)
 
         if len(walkingTo.destQueue) > 0:
             dest = walkingTo.destQueue.popleft()
             helper.setOdometryDestination(nav, dest, walkingTo.speed)
             print ("MY dest: ", dest.relX, dest.relY, dest.relH)
 
-        elif locationsMatch(nav.destination, walkingTo.currentOdo):
-            return nav.goNow('standing')
+    if locationsMatch(nav.destination, walkingTo.currentOdo):
+        return nav.goNow('standing')
+
+    # walkingTo.currentOdow = RelRobotLocation(nav.brain.interface.odometry.x,
+    #                          nav.brain.interface.odometry.y,
+    #                          nav.brain.interface.odometry.h)
+    if nav.counter % 30 == 0:
+        print "Current odo:"
+        print ("x:", walkingTo.currentOdo.relX)
+        print ("y:", walkingTo.currentOdo.relY)
+        print ("h:", walkingTo.currentOdo.relH)
+        # print "Current odow:"
+        # print ("x:", walkingTo.currentOdow.relX)
+        # print ("y:", walkingTo.currentOdow.relY)
+        # print ("h:", walkingTo.currentOdow.relH)
+        # print "---------------"
+
+
 
     return nav.stay()
 
