@@ -210,6 +210,7 @@ def watchWithLineChecks(player):
 
         if watchWithLineChecks.shiftedPosition:
             watchWithLineChecks.shiftedPosition = False
+            print "I just shifted my position, I'm moving to watch"
             return player.goLater('watch')
 
     if (player.brain.ball.vis.frames_on > constants.BALL_ON_SAFE_THRESH \
@@ -223,6 +224,7 @@ def watchWithLineChecks(player):
         player.brain.tracker.trackBall()
 
     if player.counter > 400:
+        print "Counter was over 400, going to watch!"
         return player.goLater('watch')
 
     return Transition.getNextState(player, watchWithLineChecks)
@@ -372,10 +374,15 @@ def kickBall(player):
         player.justKicked = True
         # save odometry if this was your first kick
         if player.lastDiffState == 'clearIt':
+            print "Here after clearit"
+            h = math.degrees(player.brain.interface.odometry.h)
             VisualStates.returnToGoal.kickPose = \
                 RelRobotLocation(player.brain.interface.odometry.x,
                                  player.brain.interface.odometry.y,
-                                 player.brain.interface.odometry.h)
+                                 h)
+            print "Im saving my odo!"
+            print ("MY H: ", h)
+            print ("setting kickpose: ", player.brain.interface.odometry.x, player.brain.interface.odometry.y, player.brain.interface.odometry.h)
         #otherwise add to previously saved odo
         else:
             VisualStates.returnToGoal.kickPose.relX += \

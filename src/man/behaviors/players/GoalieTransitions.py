@@ -285,9 +285,15 @@ def shouldStopTurning(player):
     for i in range(0, lines.line_size()):
         r = lines.line(i).inner.r
         t = math.degrees(lines.line(i).inner.t)
-        if math.fabs(t - 90.0) < 10.0 and r is not 0.0 and r < 40.0:
+        if math.fabs(t - 90.0) < 15.0 and r is not 0.0 and r < 40.0:
             print "I see a line! I'm assuming its part of the goalbox and I'm going there"
-            player.homeDirections += [RelRobotLocation(r+25.0, 0.0, 0.0)]
+            print ("R:", r, "T:", t)
+            player.homeDirections += [RelRobotLocation(r+35.0, 0.0, 0.0)]
+            return True
+        if math.fabs(t - 90.0) < 15.0 and r is not 0.0 and r < 110.0:
+            print "I see a line! Its decently far, so I'm assuming its the back of the goalbox"
+            player.homeDirections += [RelRobotLocation(r-25.0, 0.0, 0.0)]
+            print ("R:", r, "T:", t)
             return True
 
     return False
@@ -696,9 +702,6 @@ def shouldClearBall(player):
         walkedTooFar.xThresh = 150.0
         walkedTooFar.yThresh = 150.0
         shouldGo = True
-        print "Ball dist is less than 120.0!"
-    else:
-        print ("Ball dist is: ", player.brain.ball.distance)
 
     # farther out but being aggressive
     if (player.brain.ball.distance < 150.0 and
@@ -738,6 +741,7 @@ def shouldClearBall(player):
                 if player.brain.ball.distance > r:
                     VisualGoalieStates.clearIt.inGoalbox = False
                     print "I think the ball is outside the goalbox!"
+                    print ("R:", r)
                 else:
                     VisualGoalieStates.clearIt.inGoalbox = True
                     print "I think the ball is in the goalbox"
@@ -792,9 +796,9 @@ def successfulKickAndTurn(player):
         return False
 
     if VisualGoalieStates.clearIt.dangerousSide == constants.RIGHT:
-        player.homeDirections += [RelRobotLocation(-50.0, 0.0, -15.0)]
-    else:
         player.homeDirections += [RelRobotLocation(-50.0, 0.0, 15.0)]
+    else:
+        player.homeDirections += [RelRobotLocation(-50.0, 0.0, -15.0)]
     print "Here I go! It was very far to the side"
 
     # player.homeDirections = player.homeDirections[1:]

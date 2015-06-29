@@ -250,6 +250,12 @@ def locationsMatch(odom, dest):
     and (abs(odom.relH - degrees(dest.relH)) < 30.0):
         return True
 
+    # print ("Not true; relx diff:", abs(odom.relX - dest.relX))
+    # print ("relly diff: ", abs(odom.relY - dest.relY))
+    # print ("relh diff:", abs(odom.relH - dest.relH))
+    # print ("degres", degrees(dest.relH), "normal: ", dest.relH)
+    # print ("odomo: ", odom.relH)
+
     return False
 
 def walkingTo(nav):
@@ -257,6 +263,7 @@ def walkingTo(nav):
     State to be used for odometry walking.
     """
     if nav.firstFrame():
+        print ("Resetting odometry!")
         nav.brain.interface.motionRequest.reset_odometry = True
         nav.brain.interface.motionRequest.timestamp = int(nav.brain.time * 1000)
         helper.stand(nav)
@@ -268,9 +275,16 @@ def walkingTo(nav):
                              nav.brain.interface.odometry.y,
                              nav.brain.interface.odometry.h)
 
+        if nav.counter % 30 == 0:
+            print "Current odo:"
+            print ("x:", walkingTo.currentOdo.relX)
+            print ("y:", walkingTo.currentOdo.relY)
+            print ("h:", walkingTo.currentOdo.relH)
+
         if len(walkingTo.destQueue) > 0:
             dest = walkingTo.destQueue.popleft()
             helper.setOdometryDestination(nav, dest, walkingTo.speed)
+            print ("MY dest: ", dest.relX, dest.relY, dest.relH)
 
         elif locationsMatch(nav.destination, walkingTo.currentOdo):
             return nav.goNow('standing')

@@ -293,12 +293,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.doneWalking,
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.OK_PRECISION)
-            : GoalieStates.watchWithLineChecks,
-
-            Transition.CountTransition(GoalieTransitions.shouldStopGoingBack,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
             : GoalieStates.watchWithLineChecks
+
+            # Transition.CountTransition(GoalieTransitions.shouldStopGoingBack,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.OK_PRECISION)
+            # : GoalieStates.watchWithLineChecks
             }
 
         VisualGoalieStates.didIKickIt.transitions = {
@@ -425,7 +425,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.doneWalking,
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : GoalieStates.watchWithLineChecks
+            : GoalieStates.lineCheckReposition
             }
 
 
