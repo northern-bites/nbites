@@ -107,6 +107,11 @@ def positionAsSupporter(player):
         player.brain.nav.goTo(positionAsSupporter.position, precision = nav.GENERAL_AREA,
                               speed = nav.QUICK_SPEED, avoidObstacles = True,
                               fast = False, pb = False)
+
+    if positionAsSupporter.position.distTo(player.brain.loc) > 20:
+        player.brain.nav.goTo(positionAsSupporter.position, precision = nav.GENERAL_AREA,
+                              speed = nav.QUICK_SPEED, avoidObstacles = True,
+                              fast = False, pb = False)
     
     player.brain.nav.updateDest(positionAsSupporter.position, fast=fast)
 

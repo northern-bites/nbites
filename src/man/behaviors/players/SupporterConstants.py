@@ -3,18 +3,18 @@ from objects import Location, RobotLocation
 import RoleConstants as role
 from math import hypot
 
-def getSupporterPosition(player, role):
+def getSupporterPosition(player, r):
     """
     Returns a position to stand at to support teammate who is chasing the ball.
     Used in positionAsSupporter in PlayOffBallStates.
     """
-    if role.isLeftDefender(role):
+    if role.isLeftDefender(r):
         return leftDefender(player)
-    elif role.isRightDefender(role):
+    elif role.isRightDefender(r):
         return rightDefender(player)
-    elif role.isFirstChaser(role):
+    elif role.isFirstChaser(r):
         return firstChaser(player)
-    elif role.isSecondChaser(role):
+    elif role.isSecondChaser(r):
         return striker(player)
     else: # cherry picker
         return cherryPicker(player)
