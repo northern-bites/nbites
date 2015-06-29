@@ -45,12 +45,8 @@ void Edge::setField(const FieldHomography& h)
 {
   double wx, wy, dwx, dwy;
   h.fieldCoords(_x, _y, wx, wy);
- // double radAng = angle() * (2*M_PI / 255);
   h.fieldVector(0, 0, sin(), -cos(), dwx, dwy);
-  std::cout << "\n" << atan2(-dwx, dwy);
   _field = FieldEdge(wx, wy, atan2(dwy, dwx));
-//  printf("World: (%f,%f)\n", wx, wy);
-
 }
 
 

@@ -14,6 +14,7 @@
 
 #include <list>
 #include <vector>
+#include <array>
 #include <iostream>
 
 namespace man {
@@ -255,11 +256,18 @@ class CenterCircleDetector {
 
   std::vector<Point> calculatePotentials(EdgeList& edges);
 
- 
 
   // Parameters
+  int binWidth; // in centimeters
+  int binCount; // per row and col
+  int hardCap; // min number of edge
   double maxEdgeDistanceSquared;
   double ccr; // center circle radius
+  int minVotesInMaxBin;
+
+  bool getMaxBin(std::vector<Point> vec, double& x0, double& y0);
+  int roundDown(int v) { return binWidth*(v/binWidth); }
+
 public:
   CenterCircleDetector();
 

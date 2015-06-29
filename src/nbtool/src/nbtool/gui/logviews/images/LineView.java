@@ -267,11 +267,14 @@ public class LineView extends ViewParent implements IOFirstResponder {
 
             // Center Circle Potential Points
             g.setColor(Color.black);
-            for (int i = 0; i < ccPoints.size(); i += 2) {
+            for (int i = 0; i < ccPoints.size() - 2; i += 2) {
              //   System.out.printf("Point %d x: %f, %f\n", i, ccPoints.get(i+0), ccPoints.get(i + 1));
                 g.fillRect((int)(fxc + ccPoints.get(i+0)), (int)(fyc - ccPoints.get(i + 1)), 1, 1);
 
             }
+            g.setColor(Color.blue);
+            g.drawRect((int)(fxc + ccPoints.get(ccPoints.size()-2)), (int)(fyc - ccPoints.get(ccPoints.size() - 1)), 50, 50);
+
         }
     }
     

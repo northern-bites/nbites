@@ -495,12 +495,22 @@ CenterCircleDetector::CenterCircleDetector()
   // Set parameters
   maxEdgeDistanceSquared = 700 * 700;
   ccr = 80;  //CENTER_CIRCLE_RADIUS;
+  binWidth = 50; // in centimeters
+  binCount = 10; // per row and col
+  hardCap = 10;
+  minVotesInMaxBin = 10;
 }
 
 bool CenterCircleDetector::detectCenterCircle(EdgeList& edges)
 {
-  _potentials = calculatePotentials(edges);
-  return false;
+  if (edges.count() > hardCap) {
+    _potentials = calculatePotentials(edges);
+    double x0, y0;
+    if (getMaxBin(_potentials, x0, y0)) {
+      _potentials.push_back(Point(x0, y0));
+    }
+  }
+    return false;
 }
 
 // Get potential cc centers and clean edge list
@@ -513,14 +523,110 @@ std::vector<Point> CenterCircleDetector::calculatePotentials(EdgeList& edges)
   for (Edge* e = *abi; e; e = *++abi) {
     double distance = e->field().x() * e->field().x() + e->field().y() * e->field().y();
     if (e->field().y() >= 0 && distance < maxEdgeDistanceSquared) {
+      
       // push back two points 75 cm away from edge point
       vec.push_back(Point(e->field().x() + ccr*sin(e->field().t()), e->field().y() - ccr*cos(e->field().t())));
+      vec.push_back(Point(e->field().x() - ccr*sin(e->field().t()), e->field().y() + ccr*cos(e->field().t())));
+
  //     std::cout << "T: " << e->field().t();
       c++;
     }
   }
   std::cout << "Count: " << c << std::endl;
   return vec;
+}
+
+// Set (x0,y0) to upper left hand corner of max populated bin, (x1,y1) to upper right hand corner
+bool CenterCircleDetector::getMaxBin(std::vector<Point> vec, double& x0, double& y0)
+{
+  int bins1[binCount * binCount]; 
+  int bins2[binCount * binCount];
+  int bins3[binCount * binCount]; 
+  int bins4[binCount * binCount]; 
+
+  int binAreaWidthAndHeight = binCount * binWidth;
+
+  for (int i = 0; i < binCount * binCount; i++) {
+    bins1[i] = bins2[i] = bins3[i] = bins4[i] = 0;
+  }
+
+  for (Point p : vec) {
+    // +0, +0
+    int xbin = roundDown((int)p.first + binAreaWidthAndHeight / 2) / binWidth;
+    int ybin = roundDown((int)p.second) / binWidth;
+    bins1[min(xbin, binCount-1) + binCount * min(ybin, binCount-1)] += 1;
+
+    // +0.5, +0.5
+    xbin = roundDown((int)p.first + binWidth/2 + binAreaWidthAndHeight/2) / binWidth;
+    ybin = roundDown((int)p.second + binWidth/2) / binWidth;  
+    bins2[min(xbin, binCount-1) + binCount * min(ybin, binCount-1)] += 1;
+
+    // +0.5, +0
+    xbin = roundDown((int)p.first + binWidth/2 + binAreaWidthAndHeight/2) / binWidth;
+    ybin = roundDown((int)p.second) / binWidth;  
+    bins3[min(xbin, binCount-1) + binCount * min(ybin, binCount-1)] += 1;
+
+    // +0, +0.5
+    xbin = roundDown((int)p.first + binAreaWidthAndHeight/2) / binWidth;
+    ybin = roundDown((int)p.second + binWidth/2) / binWidth;  
+    bins4[min(xbin, binCount-1) + binCount * min(ybin, binCount-1)] += 1;
+
+  }
+
+  int votes = 0;
+  int winBin;
+  int bcSq = binCount * binCount;
+
+  for (int i = 0; i < bcSq; i++) {
+    std::cout << i << ": " << bins1[i] << ", " << bins2[i] << ": " << bins3[i] << ", " << bins4[i] << std::endl;
+    if (bins1[i] > votes) {
+      votes = bins1[i];
+      winBin = i;
+    }
+    if (bins2[i] > votes) {
+      votes = bins2[i];
+      winBin = i + bcSq;
+    }
+    if (bins3[i] > votes) {
+      votes = bins3[i];
+      winBin = i + bcSq*2;
+    }
+    if (bins4[i] > votes) {
+      votes = bins4[i];
+      winBin = i + bcSq*3;
+    }
+  }
+
+  if (votes > minVotesInMaxBin) {
+    if (winBin < bcSq) {
+      x0 = (winBin % binCount) * binWidth - binAreaWidthAndHeight / 2;
+      y0 = (winBin / binCount + 1) * binWidth; 
+      std::cout << winBin << ": 1. (" << x0 << "," << y0 << ") ";
+    } else if (winBin < bcSq *2) {
+      winBin -= bcSq;
+      x0 = (winBin % binCount) * binWidth - (binAreaWidthAndHeight/2) - (binWidth/2);
+      y0 = (winBin / binCount + 0.5) * binWidth; 
+      std::cout << winBin << ": 2. (" << x0 << "," << y0 << ") ";
+    } else if (winBin < bcSq * 3) {
+      winBin -= bcSq * 2;
+      x0 = (winBin % binCount) * binWidth - (binAreaWidthAndHeight/2) - (binWidth/2);
+      y0 = (winBin / binCount + 1) * binWidth; 
+      std::cout << winBin << ": 3. (" << x0 << "," << y0 << ") ";
+    } else {
+      winBin -= bcSq * 3;
+      x0 = (winBin % binCount) * binWidth - binAreaWidthAndHeight / 2;
+      y0 = (winBin / binCount + 0.5) * binWidth; 
+      std::cout << winBin << ": 4. (" << x0 << "," << y0 << ") ";
+
+    }
+  }
+
+    std::cout << "Returning (" << x0 << "," << y0 << ") with " << votes << " votes" << std::endl;
+    return true;
+  
+
+
+  return false;
 }
 
 // **************************
