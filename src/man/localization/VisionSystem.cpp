@@ -35,7 +35,6 @@ bool VisionSystem::update(ParticleSet& particles,
             continue;
         numObservations++;
     }
-    // numObservations += corners.corner_size();
     if (ball != NULL) 
         numObservations++;
 
@@ -56,10 +55,6 @@ bool VisionSystem::update(ParticleSet& particles,
                 continue;
             curParticleError = curParticleError*lineSystem->scoreObservation(lines.line(i), particle->getLocation());
         }
-
-        // Score particle from corner observations
-        // for (int i = 0; i < corners.corner_size(); i++)
-        //     curParticleError = curParticleError*landmarkSystem->scoreCorner(corners.corner(i), particle->getLocation());
 
         // Score particle from ball observation if in game set
         if (ball != NULL)
@@ -141,11 +136,6 @@ bool VisionSystem::update(ParticleSet& particles,
             // Add injection and return
             ReconstructedLocation reconstructed(fromLineAndBall.x(), fromLineAndBall.y(), fromLineAndBall.h());
             injections.push_back(reconstructed);
-
-            // std::cout << "Injecting in set!" << std::endl;
-            // std::cout << fromLineAndBall.x() << std::endl;
-            // std::cout << fromLineAndBall.y() << std::endl;
-            // std::cout << fromLineAndBall.h() << std::endl;
         }
     }
 
