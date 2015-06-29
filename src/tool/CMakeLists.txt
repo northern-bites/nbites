@@ -339,7 +339,7 @@ target_link_libraries(
   unlog
   image_display
   logview
-  # sharedball
+  sharedball
   # sharedview
   fieldview
   worldview

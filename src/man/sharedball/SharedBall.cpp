@@ -48,9 +48,13 @@ void SharedBallModule::run_()
     {
         worldModelIn[i].latch();
         worldMessages[i] = worldModelIn[i].message();
+        std::cout<<"[DEBUG] Run: WorldMessages.Ball_On: "<<worldMessages[i].ball_on()<<std::endl;
         if (worldMessages[i].ball_on())
         {
+            std::cout<<"[DEBUG] Increasing numRobotsOn"<<std::endl;
             numRobotsOn++;
+        } else {
+            std::cout<<"[DEBUG] numRobotsOn NOT increased"<<std::endl;
         }
         // resets ball estimates for each robot
         ballX[i] = -1.f;
@@ -65,8 +69,10 @@ void SharedBallModule::run_()
     ballIn.latch();
     myBall = ballIn.message();
 
+    std::cout<<"[DEBUG] numRobotsOn is "<<numRobotsOn<<std::endl;
     if (numRobotsOn)
     {
+
         ballOn = true;
         chooseRobots();
         weightedavg();
@@ -79,6 +85,7 @@ void SharedBallModule::run_()
     // sets the regular shared ball message
     sharedBallMessage.get()->set_x(x);
     sharedBallMessage.get()->set_y(y);
+    std::cout<<"[DEBUG] Setting BallOn to ShBall Msg. Value: "<<ballOn<<std::endl;
     sharedBallMessage.get()->set_ball_on(ballOn);
     sharedBallMessage.get()->set_reliability(reliability);
     sharedBallOutput.setMessage(sharedBallMessage);
@@ -132,7 +139,7 @@ void SharedBallModule::chooseRobots()
             float dist = getBallDistanceSquared(i, j);
             inEstimate[i][j] = 0;
             if (dist < CONSENSUS_THRESHOLD * CONSENSUS_THRESHOLD
-                or i == j)
+                || i == j)
             {
                 inEstimate[i][j] = 1;
                 numInEstimate[i]++;
@@ -155,8 +162,11 @@ void SharedBallModule::chooseRobots()
     }
 
     // now decide whether or not to use sharedball
+    std::cout<<"[DEBUG] numWithMaxEstimate: "<<numWithMaxEstimate<<std::endl;
+    std::cout<<"[DEBUG] maxInEstimate: "<<maxInEstimate<<std::endl;
     if (numWithMaxEstimate > maxInEstimate)
     {
+        std::cout<<"[DEBUG] Decided to use SharedBall"<<std::endl;
         bool goalieOn = false;
         for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++)
         {
@@ -168,13 +178,17 @@ void SharedBallModule::chooseRobots()
                 break;
             }
         }
-        if (!goalieOn)
+        /*if (!goalieOn)
         {
+            std::cout<<"[DEBUG] Setting BallOn to False. No Goalie"<<std::endl;
             // don't want to use shared ball: not large enough consensus, no goalie
             ballOn = false;
             return;
-        }
+        } */
         // else the goalie will be used to break the tie!
+    } else {
+        std::cout<<"[DEBUG] Decided NOT to use SharedBall"<<std::endl;
+        std::cout<<"[INFO] Ball On Value: "<<ballOn<<std::endl;
     }
 
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++)
@@ -198,6 +212,7 @@ void SharedBallModule::weightedavg()
 {
     if (!ballOn)
     {
+        std::cout<<"BallOn: False. No Wght.Avg"<<std::endl;
         return;
     }
 

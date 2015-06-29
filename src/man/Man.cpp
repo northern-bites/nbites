@@ -127,7 +127,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
         localization.resetInput[1].wireTo(&sharedBall.sharedBallReset, true);
         localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
-        // localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
+        //localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
         
         ballTrack.visionBallInput.wireTo(&vision.ballOut);
         ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
