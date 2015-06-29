@@ -86,7 +86,7 @@ public:
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::FallStatus> fallStatusIn;
     portals::InPortal<messages::StiffStatus> stiffStatusIn;
-    // portals::InPortal<messages::FieldObstacles> obstacleIn;
+    portals::InPortal<messages::FieldObstacles> obstacleIn;
     // portals::InPortal<messages::VisionObstacle> visionObstacleIn;
     portals::InPortal<messages::FieldLines> linesIn;
     portals::InPortal<messages::Corners> cornersIn;

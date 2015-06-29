@@ -42,7 +42,7 @@ Man::Man() :
     vision(640, 480),
     localization(),
     ballTrack(),
-    obstacle(),
+    obstacle("/home/nao/nbites/Config/obstacleParams.txt", robotName),
     gamestate(teamNum, playerNum),
     behaviors(teamNum, playerNum),
     sharedBall(playerNum)
@@ -102,7 +102,7 @@ Man::Man() :
         cognitionThread.addModule(vision);
         cognitionThread.addModule(localization);
         cognitionThread.addModule(ballTrack);
-        // cognitionThread.addModule(obstacle);
+        cognitionThread.addModule(obstacle);
         cognitionThread.addModule(gamestate);
         cognitionThread.addModule(behaviors);
         cognitionThread.addModule(sharedBall);
@@ -136,11 +136,11 @@ Man::Man() :
         }
         sharedBall.locIn.wireTo(&localization.output);
         sharedBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
-
-        // obstacle.armContactIn.wireTo(&arms.contactOut, true);
+         
+        obstacle.armContactIn.wireTo(&arms.contactOut, true);
         // obstacle.visionIn.wireTo(&vision.vision_obstacle, true);
-        // obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
-
+        obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
+         
         gamestate.commInput.wireTo(&comm._gameStateOutput, true);
         gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
         gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
@@ -161,7 +161,7 @@ Man::Man() :
         behaviors.sitDownIn.wireTo(&sensors.sitDownOutput_, true);
         behaviors.linesIn.wireTo(&vision.linesOut, true);
         behaviors.cornersIn.wireTo(&vision.cornersOut, true);
-        // behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
+        behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
         behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
         behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);
 
