@@ -38,7 +38,7 @@ public final class SessionMaster implements IOFirstResponder {
 	public static volatile int saveMod = 1;
 	public static volatile int keepMod = 1;
 	
-	public static volatile boolean dropSTATS = false;
+	public static volatile boolean dropSTATS = true;
 		
 	private ControlInstance control = null;
 	private FileInstance fileio = null;

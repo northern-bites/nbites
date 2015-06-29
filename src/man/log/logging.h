@@ -90,15 +90,7 @@ namespace nblog {
      Thread safe.
      
      buffer_index: which buffer to put data on
-     image_index: image that this log's encapsulated information was derived from.
-        0 means n/a or unknown.
-     
-     creation_time: relative to nao process start time.  Fairly good at making all logs from a given log session distinct.
-     
-     type: specs about this log data.  Pretty important.  Fill 'er in.
-     
-     nbytes/data: encapsulated opaque log data.
-     */
+    */
     
     void NBLog(int buffer_index, Log * log);
     void NBLog(int buffer_index, const std::string& where_called,
@@ -146,6 +138,11 @@ namespace nblog {
     extern uint64_t main_upstart;
     
     const extern uint32_t NUM_CORES;
+    
+    Log * makeSTATSlog();
+    
+    //if true, STATS logs are only created and pushed when a control client is connected.
+    static const bool STATS_ONLY_FOR_CONTROL = true;
     
 }//namespace NBlog
 
