@@ -42,7 +42,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
     double resize = 1;
     
     // Starting size. The larger the number, the smaller the field ratio
-    final int startSize = 1;
+    final int startSize = 3;
 
     boolean click = false;
     boolean drag = false;
@@ -183,13 +183,13 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 x2 = (int) Math.round(x0 + startSize*fcEP1 * Math.sin(fcT));
                 y2 = (int) Math.round(y0 + startSize*fcEP1 * Math.cos(fcT));
 
-                // Scale down if a line is outside the view, but not if its too far (false field line)
-                // if (y1 < 0 && y1 > -2000) {
-                //     resize = Math.min(resize, (double)fieldh/(-y1 + fieldh));
-                // }
-                // if (y2 < 0 && y2 > -2000) {
-                //     resize = Math.min(resize, (double)fieldh/(-y2 + fieldh));
-                // }
+                //Scale down if a line is outside the view, but not if its too far (false field line)
+                if (y1 < 0 && y1 > -2000) {
+                    resize = Math.min(resize, (double)fieldh/(-y1 + fieldh));
+                }
+                if (y2 < 0 && y2 > -2000) {
+                    resize = Math.min(resize, (double)fieldh/(-y2 + fieldh));
+                }
 
                 // // TODO: Don't draw it if it's way out
                 // if (y1 < -3500) {
@@ -263,17 +263,23 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 drag = false;
             }
 
-            System.out.printf("Size: %d\n", ccPoints.size());
+
+            /*
+                Uncomment to show center circle potentials and estimation. The last point is the 
+                CenterCircleDetectors guess. Also comment out resizing and set startSize to 1 for
+                proper scale.
+            */
+            System.out.printf("%d potential center circle centers received\n", ccPoints.size());
 
             // Center Circle Potential Points
-            g.setColor(Color.black);
-            for (int i = 0; i < ccPoints.size() - 2; i += 2) {
-             //   System.out.printf("Point %d x: %f, %f\n", i, ccPoints.get(i+0), ccPoints.get(i + 1));
-                g.fillRect((int)(fxc + ccPoints.get(i+0)), (int)(fyc - ccPoints.get(i + 1)), 1, 1);
+            // g.setColor(Color.black);
+            // for (int i = 0; i < ccPoints.size() - 2; i += 2) {
+            //  //   System.out.printf("Point %d x: %f, %f\n", i, ccPoints.get(i+0), ccPoints.get(i + 1));
+            //     g.fillRect((int)(fxc + ccPoints.get(i+0)), (int)(fyc - ccPoints.get(i + 1)), 1, 1);
 
-            }
-            g.setColor(Color.blue);
-            g.fillOval((int)(fxc + ccPoints.get(ccPoints.size()-2)) - 4, (int)(fyc - ccPoints.get(ccPoints.size() - 1)) - 4, 8, 8);
+            // }
+            // g.setColor(Color.blue);
+            // g.fillOval((int)(fxc + ccPoints.get(ccPoints.size()-2)) - 4, (int)(fyc - ccPoints.get(ccPoints.size() - 1)) - 4, 8, 8);
 
         }
     }
@@ -350,11 +356,10 @@ public class LineView extends ViewParent implements IOFirstResponder {
         ccPoints = new Vector<Double>();
         byte[] pointBytes = out[8].bytes;
         int numPoints = pointBytes.length / (2 * 8);
-        Logger.logf(Logger.INFO, "%d center circle points expected.", numPoints);
+        Logger.logf(Logger.INFO, "%d center circle potential centers expected.", numPoints - 1);
         try {
             DataInputStream dis = new DataInputStream(new ByteArrayInputStream(pointBytes));
             for (int i = 0; i < numPoints; i ++) {
-                System.out.printf("Adding two values to cc\n");
                 ccPoints.add(dis.readDouble()); // X coordinate
                 ccPoints.add(dis.readDouble()); // Y coodinrate
             }

@@ -35,6 +35,7 @@ message Corners
 
 message CenterCircle
 {
-    optional float x = 1;
-    optional float y = 2;
+    optional bool on = 1;
+    optional float x = 2;
+    optional float y = 3;
 }

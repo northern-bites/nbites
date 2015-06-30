@@ -513,7 +513,7 @@ void CenterCircleDetector::set()
   ccr = CENTER_CIRCLE_RADIUS;
   binWidth = 75;
   binCount = 8;
-  minVotesInMaxBin = 0.15;
+  minVotesInMaxBin = 0.19; // 19% of points must be in the bin selected
 }
 
 bool CenterCircleDetector::detectCenterCircle(EdgeList& edges)
@@ -630,12 +630,13 @@ bool CenterCircleDetector::getMaxBin(std::vector<Point> vec, double& x0, double&
       y0 = (winBin / binCount) * binWidth; 
     }
 
-    std::cout << "CC at (" << x0 << "," << y0 << "). " << (double)votes * 100/(double)vec.size() << "\%" << 
-    " Potentials: " << vec.size() << std::endl;
+    std::cout << std::endl << "Center Circle at (" << x0 << "," << y0 << "). " << 
+      (double)votes * 100/(double)vec.size() << "\% of the " << 
+      vec.size() << " potentials in mex populated bin" << std::endl;
 
     return true;
   } else {
-    std::cout << "!CC: " << (double)votes * 100/(double)vec.size() << "\%" << std::endl;
+    std::cout << std::endl << "Can't find center circle: " << (double)votes * 100/(double)vec.size() << "\% in max bin" << std::endl;
 
   }
 

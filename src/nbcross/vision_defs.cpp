@@ -234,8 +234,10 @@ int Vision_func() {
     //  EDGES
     //-------------------
 
-    // man::vision::EdgeList* edgeList = module.getEdges(topCamera);
-    man::vision::EdgeList* edgeList = module.getRejectedEdges(topCamera);
+    man::vision::EdgeList* edgeList = module.getEdges(topCamera);
+    
+    // Uncomment to display rejected edges used in center detection
+    // man::vision::EdgeList* edgeList = module.getRejectedEdges(topCamera);
 
     Log* edgeRet = new Log();
     std::string edgeBuf;
@@ -263,7 +265,7 @@ int Vision_func() {
     Log* lineRet = new Log();
     std::string lineBuf;
 
- //   std::cout << std::endl << "Hough lines in image coordinates:" << std::endl;
+   std::cout << std::endl << "Hough lines in image coordinates:" << std::endl;
 
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
@@ -307,38 +309,36 @@ int Vision_func() {
         lineBuf.append((const char*) &fcEP0, sizeof(double));
         lineBuf.append((const char*) &fcEP1, sizeof(double));
 
-//        std::cout << line.print() << std::endl;
+       std::cout << line.print() << std::endl;
     }
 
- //   std::cout << std::endl << "Hough lines in field coordinates:" << std::endl;
+   std::cout << std::endl << "Hough lines in field coordinates:" << std::endl;
     int i = 0;
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
- //       std::cout << line.field().print() << std::endl;
+       std::cout << line.field().print() << std::endl;
     }
 
-  //  std::cout << "TOP : " << topCamera << std::endl;
-
- //   std::cout << std::endl << "Field lines:" << std::endl;
- //   std::cout << "0.idx, 1.idx, id, idx" << std::endl;
+    std::cout << std::endl << "Field lines:" << std::endl;
+    std::cout << "0.idx, 1.idx, id, idx" << std::endl;
     man::vision::FieldLineList* fieldLineList = module.getFieldLines(topCamera);
 
     for (int i = 0; i < fieldLineList->size(); i++) {
         man::vision::FieldLine& line = (*fieldLineList)[i];
- //       std::cout << line.print() << std::endl;
+       std::cout << line.print() << std::endl;
     }
 
-//    std::cout << std::endl << "Goalbox and corner detection:" << std::endl;
+    std::cout << std::endl << "Goalbox and corner detection:" << std::endl;
     man::vision::GoalboxDetector* box = module.getBox(topCamera);
     man::vision::CornerDetector* corners = module.getCorners(topCamera);
 
     if (box->first != NULL)
- //       std::cout << box->print() << std::endl;
+       std::cout << box->print() << std::endl;
 
-//    std::cout << "    line0, line1, type (concave, convex, T)" << std::endl;
+    std::cout << "    line0, line1, type (concave, convex, T)" << std::endl;
     for (int i = 0; i < corners->size(); i++) {
         const man::vision::Corner& corner = (*corners)[i];
-  //      std::cout << corner.print() << std::endl;
+        std::cout << corner.print() << std::endl;
     }
 
     lineRet->setData(lineBuf);
@@ -381,14 +381,12 @@ int Vision_func() {
     std::string pointsBuf;
 
     std::vector<std::pair<double, double>> points = ccd->getPotentials();
-    std::cout << "Potentials size = " << points.size() << std::cout;
     for (std::pair<double, double> p : points) {
         endswap<double>(&(p.first));
         endswap<double>(&(p.second));
         pointsBuf.append((const char*) &(p.first), sizeof(double));
         pointsBuf.append((const char*) &(p.second), sizeof(double));
     }
-    std::cout << std::endl;
 
     ccdRet->setData(pointsBuf);
     rets.push_back(ccdRet);
@@ -484,11 +482,8 @@ int CameraCalibration_func() {
         } else {
             rollAfter = fh->roll();
             tiltAfter = fh->tilt();
-
             totalR += rollAfter - rollBefore;
             totalT += tiltAfter - tiltBefore;
-
-        //    std::cout << "Tilt before: " << tiltBefore << " Tilt after: " << tiltAfter << std::endl;
         }
     }
 

@@ -27,7 +27,9 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
       ballOut(base()),
       ballOn(false),
       ballOnCount(0),
-      ballOffCount(0)
+      ballOffCount(0),
+      centCircOut(base()),
+      centerCircleDetected(false)
 {
     std:: string colorPath, calibrationPath;
     #ifdef OFFLINE
@@ -114,12 +116,6 @@ void VisionModule::run_()
     std::vector<const messages::YUVImage*> images { &topIn.message(),
                                                     &bottomIn.message() };
 
-    // Time vision module
-    // double topTimes[11];
-    // double bottomTimes[11];
-    // double* times[2] = { topTimes, bottomTimes };
-
-
     bool ballDetected = false;
     centerCircleDetected = false;
 
@@ -157,53 +153,31 @@ void VisionModule::run_()
 #endif
         }
 
-        // times[i][1] = timer.end();
-
         // Approximate brightness gradient
         edgeDetector[i]->gradient(yImage);
-
-        // times[i][2] = timer.end();
         
         // Run edge detection
         edgeDetector[i]->edgeDetect(greenImage, *(edges[i]));
 
-        // times[i][3] = timer.end();
-
         // Run hough line detection
         hough[i]->run(*(edges[i]), *(rejectedEdges[i]), *(houghLines[i]));
-
-        // times[i][4] = timer.end();
 
         // Find world coordinates for hough lines
         houghLines[i]->mapToField(*(homography[i]));
          
-        // times[i][5] = timer.end();
-
         // Find world coordinates for rejected edges
         rejectedEdges[i]->mapToField(*(homography[i]));
  
-        // times[i][6] = timer.end();
-
         // Detect center circle on top
         if (!i) centerCircleDetected = centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]));
  
-        // times[i][7] = timer.end();
-
         // Pair hough lines to field lines
         fieldLines[i]->find(*(houghLines[i]));
  
-        // times[i][8] = timer.end();
-
         // Classify field lines
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
  
-        // times[i][9] = timer.end();
-
         ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
-
-
-        // times[i][10] = timer.end();
-
     }
    
     // Send messages on outportals
@@ -211,28 +185,6 @@ void VisionModule::run_()
     ballOn = ballDetected;
     updateVisionBall();
     sendCenterCircle();
-
-    // Display timer info
-    // for (int i = 0; i < 2; i++) {
-    //     if (i == 0)
-    //         std::cout << "From top camera: " << std::endl;
-    //     else
-    //         std::cout << "From bottom camera: " << std::endl;
-
-    //     std::cout << "  Front end: " << times[i][0] << std::endl;
-    //     std::cout << "  Kinematics and homography: " << times[i][1] << std::endl;
-    //     std::cout << "  Gradient: " << times[i][2] << std::endl;
-    //     std::cout << "  Edge detection: " << times[i][3] << std::endl;
-    //     std::cout << "  Hough: " << times[i][4] << std::endl;
-    //     std::cout << "  Field lines: " << times[i][5] << std::endl;
-    //     std::cout << "  Rejected edges for CC: " << times[i][6] << std::endl;
-    //     std::cout << "  Center Circle: " << times[i][7] << std::endl;
-    //     std::cout << "  Field lines: " << times[i][8] << std::endl;
-    //     std::cout << "  Goalbox and corner: " << times[i][9] << std::endl;
-    //     std::cout << "  Ball: " << times[i][10] << std::endl;
-        
-    // }
-
 
 // TODO move to logImage
 #ifdef USE_LOGGING
@@ -321,6 +273,7 @@ void VisionModule::sendCornersOut()
 
     portals::Message<messages::Corners> cornersOutMessage(&pCorners);
     cornersOut.setMessage(cornersOutMessage);
+}
 
 void VisionModule::updateVisionBall()
 {
@@ -376,15 +329,13 @@ void VisionModule::updateVisionBall()
 }
 
 void VisionModule::sendCenterCircle()
-{
+{ 
+    portals::Message<messages::CenterCircle> ccm(0);
+
+    ccm.get()->set_on(centerCircleDetected);
+    ccm.get()->set_x(centerCircleDetector[0]->x());
+    ccm.get()->set_y(centerCircleDetector[0]->y());
     
-    portals::Message<messages::CenterCirlce> ccm(0);
-
-    if (centerCircle) {
-        ccm.get()->set_x(centerCircleDetector[0]->x());
-        cmm.get()->set_y(centerCircleDetector[0]->y());
-    }
-
     centCircOut.setMessage(ccm);
 }
 

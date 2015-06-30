@@ -116,9 +116,6 @@ public:
   // For sorting lines in decreasing order of score. 
   bool operator<(const HoughLine& hl) { return score() > hl.score(); }
 
-  // Compare two HoughLines
- // bool equals(const HoughLine& hl);
-
   std::string print() const;
 };
 

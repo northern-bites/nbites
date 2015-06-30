@@ -31,7 +31,7 @@ public:
     portals::OutPortal<messages::FieldLines> linesOut;
     portals::OutPortal<messages::Corners> cornersOut;
     portals::OutPortal<messages::VisionBall> ballOut;
-//    portals::OutPortal<message::CenterCircle> centCircOut;
+    portals::OutPortal<messages::CenterCircle> centCircOut;
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
@@ -81,10 +81,10 @@ private:
     CenterCircleDetector* centerCircleDetector[2];
     BallDetector* ballDetector[2];
 
+    bool centerCircleDetected;
+
     // Lisp tree with color params saved
     nblog::SExpr colors;
-
-    bool centerCircleDetected;
 
     // Tracking ball stuff
     bool ballOn;
