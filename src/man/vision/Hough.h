@@ -59,7 +59,7 @@ struct AdjustSet
   };
   AdjustParams params[MaxAdjustSteps];
 
-  AdjustSet(bool strict = true);
+  AdjustSet();
 };
 
 class HoughLine : public GeoLine
