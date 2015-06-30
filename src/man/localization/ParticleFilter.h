@@ -36,17 +36,14 @@ namespace man
 namespace localization
 {
 
-const float LOST_THRESHOLD  = 0.5f;
-const float ALPHA = .07f; // Impact for ~76 frames
-
 // Define the default parameters for the Particle Filter
 static const ParticleFilterParams DEFAULT_PARAMS =
 {
-    FIELD_GREEN_HEIGHT,         // Field Height
-    FIELD_GREEN_WIDTH,          // Field Width
-    300,                        // Num Particles
-    0.2f,                       // Exponential Filter alpha
-    0.05f,                      //                    beta
+    FIELD_GREEN_HEIGHT,         // Field height
+    FIELD_GREEN_WIDTH,          // Field width
+    300,                        // Num particles
+    0.5f,                       // Exponential filter fast
+    0.01f,                      // Exponential filter slow
     0.5f,                       // Variance in x-y odometry
     0.008f                      // Variance in h odometry
 };
@@ -167,7 +164,8 @@ private:
     float lastMotionTimestamp;
     float lastVisionTimestamp;
 
-    bool updatedVision;
+    double wSlow;
+    double wFast;
 
     bool lost;
     bool badFrame;

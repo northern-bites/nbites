@@ -32,14 +32,11 @@ struct ParticleFilterParams
     float fieldHeight;        //! Field height.
     float fieldWidth;         //! Field width.
     float numParticles;       //! Size of particle population.
-    float alpha_fast;         //! Weight factor for fast exponential weight filter.
-    float alpha_slow;         //! Weight factor for slow exponential weight filter.
+    float alphaFast;          //! Weight factor for fast exponential weight filter.
+    float alphaSlow;          //! Weight factor for slow exponential weight filter.
     float odometryXYNoise;    //! Variance for x,y in MotionSystem when updating.
     float odometryHNoise;     //! Variance for h in MotionSystem when updating.
-    // Need to add how much we prefer best particles
 };
-
-
 
 /**
  * Samples a Gaussian normal distribution of specified
