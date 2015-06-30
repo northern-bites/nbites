@@ -39,7 +39,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
     topTranscriber(*new image::ImageTranscriber(Camera::TOP)),
     bottomTranscriber(*new image::ImageTranscriber(Camera::BOTTOM)),
-    vision(640, 480),
+    vision(640, 480, robotName),
     localization(),
     ballTrack(),
     obstacle(),
@@ -119,7 +119,6 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         vision.bottomIn.wireTo(&bottomTranscriber.imageOut);
         vision.jointsIn.wireTo(&topTranscriber.jointsOut, true);
         vision.inertsIn.wireTo(&topTranscriber.inertsOut, true);
-        vision.setCalibrationParams(robotName);
 
         localization.linesInput.wireTo(&vision.linesOut);
         localization.cornersInput.wireTo(&vision.cornersOut);

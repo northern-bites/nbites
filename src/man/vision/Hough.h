@@ -14,6 +14,7 @@
 
 #include <list>
 #include <vector>
+#include <array>
 #include <iostream>
 
 namespace man {
@@ -58,7 +59,7 @@ struct AdjustSet
   };
   AdjustParams params[MaxAdjustSteps];
 
-  AdjustSet();
+  AdjustSet(bool strict = true);
 };
 
 class HoughLine : public GeoLine
@@ -244,6 +245,40 @@ public:
   void edgeImageThreshold(double newThreshold) { edgeImageThreshold_ = newThreshold; }
 };
 
+// Dectects center circle
+// class CirclePoint;
+// class Cluster;
+
+class CenterCircleDetector {
+  double _ccx;
+  double _ccy;
+  
+  std::vector<Point> calculatePotentials(EdgeList& edges);
+
+  // For debugging
+  std::vector<Point> _potentials;
+
+  // Parameters
+  int hardCap;                    // Min number of potential edges
+  double maxEdgeDistanceSquared;  // Max considered distance of an edge
+  double ccr;                     // Center circle radius
+  int binWidth;                   // In centimeters
+  int binCount;                   // Bins per row and col
+  double minVotesInMaxBin;        // Ratio of potentials required in the most populated bin
+
+  void set();
+  bool getMaxBin(std::vector<Point> vec, double& x0, double& y0);
+  inline int roundDown(int v) { return binWidth*(v/binWidth); }
+
+public:
+  CenterCircleDetector();
+  bool detectCenterCircle(EdgeList& edges);
+  std::vector<Point> getPotentials() { return _potentials; }
+  
+  double x() { return _ccx; }
+  double y() { return _ccy; }
+};
+
 enum class LineID {
   // Most general
   Line,
@@ -344,13 +379,13 @@ public:
 class HoughSpace
 {
 public:
-   enum
+  enum
   {
     NumTimes = 6,
   };
 
 private:
- enum
+  enum
   {
     TBits         = 8,
     TSpan         = 1 << TBits,
@@ -388,7 +423,7 @@ private:
   void wrapAround();
   void smooth();
   void peaks(HoughLineList&);
-  void adjust(EdgeList&, HoughLineList&);
+  void adjust(EdgeList&, EdgeList&, HoughLineList&);
 
   static bool tableInit;
   static int16_t sincosTable[0x140 + 2 * AngleSpread + 1];
@@ -420,7 +455,7 @@ public:
   uint32_t time(int i) const { return times[i]; }
   static const char* timeNames[NumTimes];
 
-  void run(EdgeList&, HoughLineList&);
+  void run(EdgeList&, EdgeList&, HoughLineList&);
 };
 
 }
