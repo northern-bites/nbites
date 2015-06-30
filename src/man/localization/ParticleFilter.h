@@ -37,6 +37,7 @@ namespace localization
 {
 
 // Define the default parameters for the Particle Filter
+// TODO add more constants
 static const ParticleFilterParams DEFAULT_PARAMS =
 {
     FIELD_GREEN_HEIGHT,         // Field height

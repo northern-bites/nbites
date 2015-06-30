@@ -66,15 +66,11 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
 {
     // Motion system and vision system update step
     motionSystem->update(particles, odometryInput, errorMagnitude);
-    bool updatedVision = visionSystem->update(particles, linesInput, cornersInput, ballInput);
+    bool updatedVision = visionSystem->update(particles, linesInput, cornersInput, ballInput, poseEstimate);
 
     // Resample if vision updated
     if(updatedVision) {
         double wAvg = visionSystem->getAvgError();
-        std::cout << "!" << std::endl;
-        std::cout << wAvg << std::endl;
-        std::cout << parameters.alphaSlow << std::endl;
-        std::cout << parameters.alphaFast << std::endl;
         wSlow = wSlow + parameters.alphaSlow*(wAvg - wSlow);
         wFast = wFast + parameters.alphaFast*(wAvg - wFast);
         resample();
@@ -413,35 +409,6 @@ void ParticleFilter::resample()
     rng.seed(static_cast<unsigned>(std::time(0)));
     boost::uniform_01<boost::mt19937> gen(rng);
 
-//     if (true)
-//     {
-//         // std::cout << "LOST AND BAD FRAME" << std::endl;
-//         std::list<ReconstructedLocation>::const_iterator recLocIt;
-//         for (recLocIt = reconLocs.begin();
-//              recLocIt != reconLocs.end();
-//              recLocIt ++)
-//         {
-//             // std::cout << "ITER RECONSTRUCT" << std::endl;
-//             // If the reconstructions is on the same side and not near midfield
-//             if ( ((*recLocIt).defSide == onDefendingSide())
-//                  && (fabs((*recLocIt).x - CENTER_FIELD_X) > 50)) {
-//                 // Sanity check, reconstruction must be on field
-//                 if (((*recLocIt).x >= 0 && (*recLocIt).y <= FIELD_GREEN_WIDTH) &&
-//                     ((*recLocIt).y >= 0 && (*recLocIt).y <= FIELD_GREEN_HEIGHT)) {
-//                      Particle reconstructedParticle((*recLocIt).x,
-//                                                     (*recLocIt).y,
-//                                                     (*recLocIt).h,
-//                                                     1.f/250.f);
-//                      newParticles.push_back(reconstructedParticle);
-//                      numReconParticlesAdded++;
-//                 }
-//             }
-//         }
-// #ifdef DEBUG_LOC
-//         std::cout << "Injected " << numReconParticlesAdded << " particles" << std::endl;
-// #endif
-//     }
-
     // Setup
     ParticleSet newParticles;
     const std::vector<ReconstructedLocation>& injections = visionSystem->getInjections();
@@ -451,15 +418,14 @@ void ParticleFilter::resample()
     //
     // NOTE we only consider injecting particles if vision system found 
     //      suitable observations
-    int ni = 0;
     for(int i = 0; i < parameters.numParticles; ++i) {
         double randInjectOrSample = gen();
         if (injections.size() && randInjectOrSample < std::max<double>(0, 1.0 - (wFast / wSlow))) {
             // Inject particles according to sensor measurements
-            const ReconstructedLocation& injection = injections[rand() % injections.size()];
-            ni++;
+            ReconstructedLocation injection = injections[rand() % injections.size()];
+            messages::RobotLocation sample = injection.sample();
 
-            Particle reconstructedParticle(injection.x, injection.y, injection.h, 1/250);
+            Particle reconstructedParticle(sample.x(), sample.y(), sample.h(), 1/250);
             newParticles.push_back(reconstructedParticle);
         } else {
             // Resample from this frame's swarm based on scores
@@ -472,11 +438,11 @@ void ParticleFilter::resample()
         }
     }
 
-    std::cout << "TEST" << std::endl;
-    std::cout << wFast << std::endl;
-    std::cout << wSlow << std::endl;
-    std::cout << 1.0 - (wFast / wSlow) << std::endl;
-    std::cout << ni << std::endl;
+    // std::cout << "INJECTIONS" << std::endl;
+    // std::cout << wFast << std::endl;
+    // std::cout << wSlow << std::endl;
+    // std::cout << 1.0 - (wFast / wSlow) << std::endl;
+    // std::cout << ni << std::endl;
 
     // Update particles
     particles = newParticles;

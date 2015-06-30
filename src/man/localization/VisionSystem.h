@@ -34,7 +34,8 @@ public:
     bool update(ParticleSet& particles,
                 const messages::FieldLines& lines,
                 const messages::Corners& corners,
-                const messages::FilteredBall* ball);
+                const messages::FilteredBall* ball,
+                const messages::RobotLocation& lastEstimate);
 
     const std::vector<ReconstructedLocation>& getInjections() { return injections; }
     int getNumObservations() const { return numObservations; }
