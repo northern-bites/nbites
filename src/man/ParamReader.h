@@ -15,6 +15,9 @@ public:
     T getParam(std::string param){
         return tree.get<T>(param);
     }
+    bool isEmpty(){
+    	return tree.empty();
+    }
 
 private:
     boost::property_tree::ptree tree;

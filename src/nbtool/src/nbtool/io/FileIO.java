@@ -6,12 +6,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -22,7 +19,6 @@ import nbtool.data.Log.SOURCE;
 import nbtool.io.CommonIO.GIOFirstResponder;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOState;
-import nbtool.util.Events.FileIOStatus;
 import nbtool.util.Events.GFileIOStatus;
 import nbtool.util.Logger;
 import nbtool.util.Utility;
@@ -102,7 +98,8 @@ public class FileIO {
 			U.wf("%d bytes left, hex:\n%s\n", av, text); */
 		}
 		
-		if (!(lg.description().equals(full.description()))) {
+		//Can't check description on old logs – their tree hasn't been created yet.
+		if ((lg._olddesc_ == null) && !(lg.description().equals(full.description()))) {
 			Logger.logf(Logger.WARN, "WARNING: log description found to be different upon load:\n\t%s\n\t%s\n",
 					lg.description(), full.description());
 		}
@@ -168,6 +165,15 @@ public class FileIO {
 			if (!Utility.isv6Description(desc)) {
 				logs[i] = new Log();
 				logs[i]._olddesc_ = desc;
+				logs[i].name = files[i].getName();
+				
+				try {
+					FileIO.loadLog(logs[i], location);
+				} catch (IOException e) {
+					e.printStackTrace();
+					continue;
+				}
+				
 				assert(Utility.v6Convert(logs[i]));
 			} else {
 				logs[i] = new Log(desc, null);
@@ -194,7 +200,7 @@ public class FileIO {
 		fi.ifr = ifr;
 		fi.state = IOState.RUNNING;
 		
-		Thread fithrd = new Thread(fi, String.format("thread-%s", fi.name()));
+		Thread fithrd = new Thread(fi, String.format("nbtool-%s", fi.name()));
 		fithrd.setDaemon(true);
 		fithrd.start();
 		
@@ -234,7 +240,6 @@ public class FileIO {
 						lg.setNameFromDesc();
 					} else if (!lg.name.endsWith(".nblog"))
 						lg.name = lg.name + ".nblog";
-					
 					try {		 
 						writeLogToPath(lg, this.path + File.separator + lg.name);
 						Logger.log(Logger.EVENT, "FileIO: thread wrote log: " + lg.name);

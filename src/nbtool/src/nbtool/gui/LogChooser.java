@@ -13,8 +13,10 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import nbtool.data.Log;
+import nbtool.gui.logdnd.LogDND;
+import nbtool.gui.logdnd.LogDND.LogDNDSource;
 
-public class LogChooser extends JPanel {
+public class LogChooser extends JPanel implements LogDNDSource {
 	private static final long serialVersionUID = 1L;
 	public LogChooser() {
 		setLayout(null);
@@ -24,7 +26,7 @@ public class LogChooser extends JPanel {
 			}
 		});
 				
-		model = new LCTreeModel();
+		model = new LogChooserModel();
 		tree = new JTree(model);
 		model.tree = tree;
 		tree.setEditable(false);
@@ -32,8 +34,13 @@ public class LogChooser extends JPanel {
 		tree.setScrollsOnExpand(true);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		tree.addTreeSelectionListener(model);
-		tree.setTransferHandler(model.EXPORT_HANDLER);
+		
+		/* setupDnd */
+		
+		/*
 		tree.setDragEnabled(true);
+		tree.setTransferHandler(new LogTransferHandler(tree, this)); */
+		LogDND.makeComponentSource(tree, this);
 		
 		sas = new SortAndSearch(model);
 		model.sas = sas;
@@ -47,17 +54,28 @@ public class LogChooser extends JPanel {
 		
 		add(sas);
 		add(sp);
+		
+		//tree.getS
 	}
 	
 	private void useSize(Dimension size) {
 		Dimension d = sas.getPreferredSize();
-		sas.setBounds(0,0,d.width,d.height);
+		sas.setBounds(0,0,size.width,d.height);
 		sp.setBounds(0, d.height, size.width, size.height - d.height);
 	}
 	
 	private JScrollPane sp;
 	private JTree tree;
-	private LCTreeModel model;
+	private LogChooserModel model;
 	
 	private SortAndSearch sas;
+	
+	public TreePath[] selection() {
+		return tree.getSelectionPaths();
+	}
+
+	@Override
+	public Log[] supplyLogsForDrag() {
+		return model.lastSelectedLogs;
+	}
 }

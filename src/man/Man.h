@@ -9,8 +9,8 @@
 #include "DebugConfig.h"
 #include "sensors/SensorsModule.h"
 #include "comm/CommModule.h"
-#include "vision/VisionModule.h"
 #include "image/TranscriberModule.h"
+#include "vision/VisionModule.h"
 #include "guardian/GuardianModule.h"
 #include "audio/AudioEnactorModule.h"
 #include "led/LedEnactorModule.h"
@@ -42,6 +42,7 @@ private:
 
     ParamReader param;
     int playerNum, teamNum;
+    std::string robotName;
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
     jointenactor::JointEnactorModule jointEnactor;

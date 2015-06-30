@@ -28,7 +28,7 @@
 #include "nbfuncs.h"
 #include "exactio.h"
 
-#define CHECK_RET(v) if(v) {printf("BAD RET: [%s](%i) at line %i.\n", #v, v, __LINE__); return 2;}
+#define CHECK_RET(v) if(v) {printf("NBCROSS: BAD RET: [%s](%i) at line %i.\n", #v, v, __LINE__); return 2;}
 
 using nblog::Log;
 using nblog::SExpr;
@@ -38,12 +38,19 @@ std::vector<Log *> rets;
 
 bool crossprintout = true;
 
+static inline void nbcprintbreak() {
+    if (crossprintout) {
+        printf("\n\n-----------------------------------------\n");
+    }
+}
+
 static inline void nbcprintf(const char * format, ...) {
     
     va_list arguments;
     va_start(arguments, format);
     
     if (crossprintout) {
+        printf("NBCROSS: ");
         vprintf(format, arguments);
     }
     
@@ -51,6 +58,8 @@ static inline void nbcprintf(const char * format, ...) {
 }
 
 int main(int argc, const char * argv[]) {
+    
+    //-------------------------------------
     std::string instance_name;
     
     if (argc > 1) {
@@ -61,15 +70,14 @@ int main(int argc, const char * argv[]) {
     }
     
     if (argc > 2) {
-        printf("3 or more arguments, disabling status printfs\n");
+        nbcprintf("3 or more arguments, disabling status printfs\n");
         crossprintout = false;
     }
     
     nbcprintf("using %li functions:\n", FUNCS.size());
     for (int i = 0; i < FUNCS.size(); ++i)
         nbcprintf("\t%s(%lu)\n", FUNCS[i].name.c_str(), FUNCS[i].args.size());
-    nbcprintf("\n\n-----------------------------------------\n");
-    
+    nbcprintbreak();
     
     std::vector<SExpr> flist;
     for (int i = 0; i < FUNCS.size(); ++i) {
@@ -113,7 +121,7 @@ int main(int argc, const char * argv[]) {
     CHECK_RET(recv_exact(fd, 4, &net_order, MAX_WAIT));
     
     if (net_order != 0) {
-        nbcprintf("malformed init val: 0x%x\n", net_order);
+        printf("malformed init val: 0x%x\n", net_order);
         return 1;
     }
     
@@ -127,7 +135,7 @@ int main(int argc, const char * argv[]) {
     CHECK_RET(recv_exact(fd, 4, &net_order, MAX_WAIT));
     host_order = ntohl(net_order);
     if (host_order != FUNCS.size()) {
-        nbcprintf("java sent wrong confirmation of FUNCS.size(): %i\n", host_order);
+        printf("java sent wrong confirmation of FUNCS.size(): %i\n", host_order);
         return 1;
     }
     
@@ -139,7 +147,7 @@ int main(int argc, const char * argv[]) {
             CHECK_RET(send_exact(fd, 4, &host_order));
             continue;
         } else if (ntohl(net_order) != 1) {
-            nbcprintf("java sent wrong function call request: 0x%x\n", net_order);
+            printf("java sent wrong function call request: 0x%x\n", net_order);
             return 1;
         }
         
@@ -161,30 +169,31 @@ int main(int argc, const char * argv[]) {
             Log * recvd = Log::recv(fd, MAX_WAIT);
             CHECK_RET(recvd == NULL);
             
-            SExpr * contents = recvd->tree().find("contents");
+            SExpr * contents = recvd->tree().find(nblog::LOG_CONTENTS_S);
             
             if (!contents || !contents->get(0)->isAtom()) {
-                nbcprintf("arg %i wrong format!\n", i);
+                printf("arg %i wrong format!\n", i);
                 return 1;
             }
             
-            std::string type = contents->get(1)->find("type")->get(1)->value();
-            if (type != FUNCS[findex].args[i]) {
-                nbcprintf("arg %i [%s] did NOT match type=%s!\n", i, type.c_str(), FUNCS[findex].args[i].c_str());
-                return 1;
+            std::string type = contents->get(1)->find(nblog::CONTENT_TYPE_S)->get(1)->value();
+            if (type != NBCROSS_WILDCARD_TYPE && FUNCS[findex].args[i] != NBCROSS_WILDCARD_TYPE) {
+                if (type != FUNCS[findex].args[i]) {
+                    printf("arg %i [%s] did NOT match type=%s!\n", i, type.c_str(), FUNCS[findex].args[i].c_str());
+                    return 1;
+                }
             }
             
             args.push_back(recvd);
         }
         
         assert(args.size() == FUNCS[findex].args.size());
-        nbcprintf("calling function [%s]"
-               "\n-------------------------------------------\n", FUNCS[findex].name.c_str());
+        nbcprintf("calling function [%s]", FUNCS[findex].name.c_str());
+        nbcprintbreak();
         
         int ret = FUNCS[findex].func();
         
-        nbcprintf("\n-------------------------------------------\n");
-        
+        nbcprintbreak();
         nbcprintf("function returned with ret:%i, sending %lu output logs.\n", ret, rets.size());
         net_order = htonl(ret);
         CHECK_RET(send_exact(fd, 4, &net_order));
@@ -198,7 +207,7 @@ int main(int argc, const char * argv[]) {
         CHECK_RET(recv_exact(fd, 4, &net_order, MAX_WAIT));
         
         if (ntohl(net_order) != rets.size()) {
-            nbcprintf("java sent bad confirmation of end function call (wanted %lu, got %i)\n", rets.size(), ntohl(net_order));
+            printf("java sent bad confirmation of end function call (wanted %lu, got %i)\n", rets.size(), ntohl(net_order));
             return 1;
         }
         
@@ -208,7 +217,7 @@ int main(int argc, const char * argv[]) {
         
         for (int i = 0; i < rets.size(); ++i) {delete rets[i];}
         rets.clear();
-        nbcprintf("done\n");
+        if (crossprintout) printf("done\n");
         
         nbcprintf("function call completed\n");
     }

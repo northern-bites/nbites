@@ -1,26 +1,18 @@
 package nbtool.util;
 
 import java.awt.BorderLayout;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.security.KeyPair;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.tree.TreePath;
 
 import nbtool.data.Log;
 import nbtool.data.SExpr;
@@ -53,7 +45,7 @@ public class Utility {
 			//old image
 			ip = new YUYV8888image(width / 2, height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[Y8(U8/V8)]")) {
-			ip = new YUYV8888image(width , height, log.bytes);
+			ip = new YUYV8888image(2*width, height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[Y16]")) {
 			ip = new Y16image(width , height, log.bytes);
 		} else if (encoding.equalsIgnoreCase("[U8V8]")) {
@@ -65,7 +57,7 @@ public class Utility {
 			return null;
 		}
 		
-		return ip.toBufferedImage(); 
+		return ip.toBufferedImage();
 	}
 
 	public static final char[] hexArray = "0123456789ABCDEF".toCharArray();
@@ -201,46 +193,58 @@ public class Utility {
 		return (desc != null && desc.trim().startsWith("(nblog"));
 	}
 	
-	/* creates tree for old out of _olddesc_ */
+	/* creates tree for param old out of old._olddesc_ */
 	public static boolean v6Convert(Log old) {
 		if (old._olddesc_ != null && isv6Description(old._olddesc_)) {
 			old.setTree(SExpr.deserializeFrom(old._olddesc_));
 			return true;
 		}
-		if (old._olddesc_ == null) return false;
-		
-		assert(old._olddesc_ != null);
-		
+		if (old._olddesc_ == null) {
+			Logger.log(Logger.WARN, "cannot convert old log without string description.");
+			return false;
+		}	//nothing to work with.
+				
 		HashMap<String, String> map = new HashMap<String, String>();
 		String[] attrs = old._olddesc_.trim().split(" ");
 		for (String a : attrs) {
 			if (a.trim().isEmpty()) continue;
 			
 			String[] parts = a.split("=");
-			if (parts.length != 2)
+			if (parts.length != 2){
+				Logger.warnf("conversion found invalid kvp");
 				return false;	//Don't attempt to reconstruct malformed descriptions.
+			}
 			
-			String type = parts[0].trim();
-			if (type.isEmpty())
-				return false;
-			
-			String value = parts[1].trim();
-			if (value.isEmpty())
-				return false;
-			
-			if (map.containsKey(type)) {
+			String key = parts[0].trim();
+			if (key.isEmpty()) {
+				Logger.warnf("conversion found empty key");
 				return false;
 			}
 			
-			map.put(type, value);
+			String value = parts[1].trim();
+			if (value.isEmpty()) {
+				Logger.warnf("conversion found empty value");
+				return false;
+			}
+			
+			if (map.containsKey(key)) {
+				//we never allowed duplicate keys
+				Logger.warnf("conversion found duplicate key");
+				return false;
+			}
+			
+			map.put(key, value);
 		}
 		
+		/*
 		if (map.containsKey("checksum")) {
 			int found_sum = checksum(old.bytes);
 			int read_sum = Integer.parseInt(map.get("checksum"));
-			if (found_sum != read_sum)
+			if (found_sum != read_sum) {
+				Logger.warnf("conversion found wrong checksum");
 				return false;
-		}
+			}
+		} */
 		
 		//Ok, we can convert this.
 		map.remove("checksum");

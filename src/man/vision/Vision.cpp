@@ -43,7 +43,7 @@ string strPrintf(const char* format, ...)
 
 void LineFit::clear()
 {
-  sumW = sumX = sumY = sumXY = sumX2 = sumY2 = 0;
+  sumW = sumX = sumY = sumXY = sumX2 = sumY2 = _count = 0;
   solved = false;
 }
 
@@ -57,6 +57,7 @@ void LineFit::add(double w, double x, double y)
   sumX2 += wx * x;
   sumY2 += wy * y;
   sumXY += wx * y;
+  _count++;
   solved = false;
 }
 
@@ -68,6 +69,7 @@ void LineFit::sub(double w, double x, double y)
   sumX2 -= w * x * x;
   sumY2 -= w * y * y;
   sumXY -= w * x * y;
+  _count--;
   solved = false;
 }
 
@@ -102,6 +104,7 @@ void LineFit::solve()
 
   solved = true;
 }
+
 
 }
 }

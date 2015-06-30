@@ -32,6 +32,63 @@ import static nbtool.util.NBConstants.*;
 
 public class CrossIO {
 	
+	public static void main(String[] args) throws InterruptedException, IOException {
+		//testing...
+		
+		String path = "~/Documents/testdir/cross";
+		startNBCrossAt(path, "hello", true, false, true).waitFor();
+	}
+	
+	private static ArrayList<Process> children = null;
+		
+	public static synchronized Process startNBCrossAt(String pathToExecutable, String instName,
+			boolean pipeNBCrossOutput, boolean silenceNBCross,
+			boolean killOnJVMexit) throws IOException {
+		String execPath = Utility.localizePath(pathToExecutable);
+		ProcessBuilder cross = new ProcessBuilder();
+		
+		if (pipeNBCrossOutput) {
+			cross.inheritIO();
+		}
+		
+		if (silenceNBCross) {
+			cross.command(execPath, instName, "silent");
+		} else {
+			cross.command(execPath, instName);
+		}
+		
+		Process process = cross.start();
+		
+		if (killOnJVMexit) {
+			if (children != null) {
+				children.add(process);
+			} else {
+				children = new ArrayList<>();
+				
+				Runtime.getRuntime().addShutdownHook(new Thread(new Runnable(){
+
+					@Override
+					public void run() {
+						Logger.logf(Logger.WARN, "CrossIO attempting to destroy child processes.");
+						try {
+							
+							for (Process p : children) {
+								p.destroy();
+							}
+							
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
+					}
+					
+				}));
+			}
+		}
+		
+		return process;
+	}
+		
 	public static class CrossFunc {
 		public String name;
 		public String[] args;
@@ -51,6 +108,10 @@ public class CrossIO {
 			for (int i = 0; i < args.length; ++i) {
 				String cs = call.arguments[i].primaryType();
 				String as = args[i];
+				
+				if (cs.equals(Log.NBCROSS_WILDCARD_TYPE) || 
+						as.equals(Log.NBCROSS_WILDCARD_TYPE))
+					continue;
 				
 				if (!cs.equals(as))
 					return false;
@@ -191,6 +252,7 @@ public class CrossIO {
 						final int ret = dis.readInt();
 						int num_out = dis.readInt();
 						
+
 						final Log[] outs = new Log[num_out];
 						for (int i = 0; i < num_out; ++i) {
 							Log nl = CommonIO.readLog(dis);
@@ -300,7 +362,6 @@ public class CrossIO {
 	private static class CrossServer implements Runnable, IOFirstResponder {
 		@Override
 		public void run() {
-			Logger.log(Logger.INFO, "CrossServer starting up.");
 			ServerSocket server = null;
 			Timer timer = new Timer(true);
 			TimerTask tt = new TimerTask() {
@@ -325,7 +386,8 @@ public class CrossIO {
 			}
 			
 			timer.schedule(tt, 5000, 1000);
-			
+			Logger.log(Logger.INFO, "CrossServer up.");
+
 			try {
 				
 				while (true) {
@@ -342,7 +404,7 @@ public class CrossIO {
 							instances.add(ci);
 						}
 						
-						Thread t = new Thread(ci, String.format("thread-ci%d", ci.unique_id));
+						Thread t = new Thread(ci, String.format("nbtool-ci%d", ci.unique_id));
 						t.setDaemon(true);
 						t.start();
 						
@@ -395,9 +457,9 @@ public class CrossIO {
 			return;
 		}
 		
-		Logger.log(Logger.INFO, "starting thread-CrossServer...");
+		Logger.log(Logger.INFO, "starting nbtool-CrossServer...");
 		
-		serverThread = new Thread(new CrossServer(), "thread-CrossServer");
+		serverThread = new Thread(new CrossServer(), "nbtool-CrossServer");
 		serverThread.setDaemon(true);
 		serverThread.start();
 	}

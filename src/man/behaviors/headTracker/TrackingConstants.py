@@ -20,6 +20,13 @@ LOOK_FIELD_OBJ_FRAMES = 10
 LOOKTIME = 40
 PANTIME = 1
 
+# Calibrate Constants
+TIME_OF_PAN = 0.2
+NUMBER_OF_PANS = 7
+TIME_PER_LOG = 1.0
+
+
+
 FIXED_PITCH_VALUE = 20
 
 KICK_DICT = {"L_Side"               : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
@@ -43,8 +50,8 @@ KICK_DICT = {"L_Side"               : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
 
              "M_Left_Straight"      : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
              "M_Right_Straight"     : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
-             "M_Left_Chip_Shot"     : HeadMoves.FIXED_PITCH_LOOK_LESS_RIGHT,
-             "M_Right_Chip_Shot"    : HeadMoves.FIXED_PITCH_LOOK_LESS_LEFT,
+             "M_Left_Chip_Shot"     : HeadMoves.FIXED_PITCH_LOOK_LEAST_RIGHT,
+             "M_Right_Chip_Shot"    : HeadMoves.FIXED_PITCH_LOOK_LEAST_LEFT,
              "M_Left_Side"          : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
              "M_Right_Side"         : HeadMoves.FIXED_PITCH_LOOK_LEFT
              }

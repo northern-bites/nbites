@@ -13,12 +13,12 @@
 #include "WorldModel.pb.h"
 #include "PMotion.pb.h"
 #include "MotionStatus.pb.h"
-#include "VisionField.pb.h"
-#include "VisionRobot.pb.h"
+#include "Vision.pb.h"
 #include "ButtonState.pb.h"
 #include "FallStatus.pb.h"
 #include "StiffnessControl.pb.h"
 #include "Obstacle.pb.h"
+#include "Vision.pb.h"
 
 namespace man {
 namespace behaviors {
@@ -29,8 +29,7 @@ class PyInterface
 public:
     messages::GameState         const * gameState_ptr;
     messages::RobotLocation     const * loc_ptr;
-    messages::VisionRobot       const * visionRobot_ptr;
-    messages::VisionField       const * visionField_ptr;
+    messages::FieldLines        const * visionField_ptr;
     messages::FilteredBall      const * filteredBall_ptr;
     messages::LedCommand        const * ledCommand_ptr;
     messages::WorldModel        const * worldModel_ptr[NUM_PLAYERS_PER_TEAM];
@@ -45,9 +44,11 @@ public:
     messages::WorldModel        const * myWorldModel_ptr;
     messages::StiffStatus       const * stiffStatus_ptr;
     messages::FieldObstacles    const * obstacle_ptr;
-    messages::VisionObstacle    const * visionObstacle_ptr;
+    // messages::VisionObstacle    const * visionObstacle_ptr;
     messages::SharedBall        const * sharedBall_ptr;
     messages::RobotLocation     const * sharedFlip_ptr;
+    messages::FieldLines        const * visionLines_ptr;
+    messages::Corners           const * corners_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -57,11 +58,7 @@ public:
     {
         loc_ptr = msg;
     }
-    void setVisionRobot_ptr(const messages::VisionRobot* msg)
-    {
-        visionRobot_ptr = msg;
-    }
-    void setVisionField_ptr(const messages::VisionField* msg)
+    void setVisionField_ptr(const messages::FieldLines* msg)
     {
         visionField_ptr = msg;
     }
@@ -80,6 +77,14 @@ public:
     void setLedCommand_ptr(const messages::LedCommand* msg)
     {
         ledCommand_ptr = msg;
+    }
+    void setVisionLines_ptr(const messages::FieldLines* msg)
+    {
+        visionLines_ptr = msg;
+    }
+    void setCorners_ptr(const messages::Corners* msg)
+    {
+        corners_ptr = msg;
     }
     void setWorldModel_ptr(const messages::WorldModel* msg,int i)
     {
@@ -137,10 +142,10 @@ public:
     {
         obstacle_ptr = msg;
     }
-    void setVisionObstacle_ptr(const messages::VisionObstacle* msg)
-    {
-        visionObstacle_ptr = msg;
-    }
+    // void setVisionObstacle_ptr(const messages::VisionObstacle* msg)
+    // {
+    //     visionObstacle_ptr = msg;
+    // }
 
 };
 

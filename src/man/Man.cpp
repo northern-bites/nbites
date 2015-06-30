@@ -25,6 +25,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     param("/home/nao/nbites/lib/parameters.json"),
     playerNum(param.getParam<int>("playerNumber")),
     teamNum(param.getParam<int>("teamNumber")),
+    robotName(param.getParam<std::string>("robotName")),
     sensorsThread("sensors", SENSORS_FRAME_LENGTH_uS),
     sensors(broker),
     jointEnactor(broker),
@@ -38,7 +39,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
     topTranscriber(*new image::ImageTranscriber(Camera::TOP)),
     bottomTranscriber(*new image::ImageTranscriber(Camera::BOTTOM)),
-    vision(),
+    vision(640, 480),
     localization(),
     ballTrack(),
     obstacle(),
@@ -101,13 +102,13 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         cognitionThread.addModule(topTranscriber);
         cognitionThread.addModule(bottomTranscriber);
         cognitionThread.addModule(vision);
-        // cognitionThread.addModule(localization);
-        // cognitionThread.addModule(ballTrack);
+        cognitionThread.addModule(localization);
+        cognitionThread.addModule(ballTrack);
         // cognitionThread.addModule(obstacle);
-        // cognitionThread.addModule(gamestate);
-        // cognitionThread.addModule(behaviors);
-        // cognitionThread.addModule(leds);
-        // cognitionThread.addModule(sharedBall);
+        cognitionThread.addModule(gamestate);
+        cognitionThread.addModule(behaviors);
+        cognitionThread.addModule(leds);
+        cognitionThread.addModule(sharedBall);
         
         topTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
         topTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
@@ -117,56 +118,60 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         vision.topIn.wireTo(&topTranscriber.imageOut);
         vision.bottomIn.wireTo(&bottomTranscriber.imageOut);
         vision.jointsIn.wireTo(&topTranscriber.jointsOut, true);
-        
-        // localization.visionInput.wireTo(&vision.vision_field);
-        // localization.motionInput.wireTo(&motion.odometryOutput_, true);
-        // localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
-        // localization.resetInput[1].wireTo(&sharedBall.sharedBallReset, true);
-        // localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
+        vision.inertsIn.wireTo(&topTranscriber.inertsOut, true);
+        vision.setCalibrationParams(robotName);
+
+        localization.linesInput.wireTo(&vision.linesOut);
+        localization.cornersInput.wireTo(&vision.cornersOut);
+        localization.motionInput.wireTo(&motion.odometryOutput_, true);
+        localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
+        localization.resetInput[1].wireTo(&sharedBall.sharedBallReset, true);
+        localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
         // localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
         
-        // ballTrack.visionBallInput.wireTo(&vision.vision_ball);
-        // ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
-        // ballTrack.localizationInput.wireTo(&localization.output, true);
-        // 
-        // for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
-        // {
-        //     sharedBall.worldModelIn[i].wireTo(comm._worldModels[i], true);
-        // }
-        // sharedBall.locIn.wireTo(&localization.output);
-        // sharedBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
-        // 
+        ballTrack.visionBallInput.wireTo(&vision.ballOut);
+        ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
+        ballTrack.localizationInput.wireTo(&localization.output, true);
+        
+        for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+        {
+            sharedBall.worldModelIn[i].wireTo(comm._worldModels[i], true);
+        }
+        sharedBall.locIn.wireTo(&localization.output);
+        sharedBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
+         
         // obstacle.armContactIn.wireTo(&arms.contactOut, true);
         // obstacle.visionIn.wireTo(&vision.vision_obstacle, true);
         // obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
-        // 
-        // gamestate.commInput.wireTo(&comm._gameStateOutput, true);
-        // gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
-        // gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
-        // gamestate.switchTeamInput.wireTo(&guardian.switchTeamOutput, true);
-        // gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
-        // 
-        // behaviors.localizationIn.wireTo(&localization.output);
-        // behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
-        // behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
-        // behaviors.visionFieldIn.wireTo(&vision.vision_field);
+         
+        gamestate.commInput.wireTo(&comm._gameStateOutput, true);
+        gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
+        gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
+        gamestate.switchTeamInput.wireTo(&guardian.switchTeamOutput, true);
+        gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
+        
+        behaviors.localizationIn.wireTo(&localization.output);
+        behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
+        behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
+        // behaviors.visionFieldIn.wireTo(&vision.linesOut);
         // behaviors.visionRobotIn.wireTo(&vision.vision_robot);
         // behaviors.visionObstacleIn.wireTo(&vision.vision_obstacle);
-        // behaviors.fallStatusIn.wireTo(&guardian.fallStatusOutput, true);
-        // behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
-        // behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
-        // behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
-        // behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
+        behaviors.fallStatusIn.wireTo(&guardian.fallStatusOutput, true);
+        behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
+        behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
+        behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
+        behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
+        behaviors.linesIn.wireTo(&vision.linesOut, true);
+        behaviors.cornersIn.wireTo(&vision.cornersOut, true);
         // behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
-        // behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
-        // behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);
-        // 
-        // for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
-        // {
-        //     behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
-        // }
-        // 
-        // leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
+        behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
+        behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);
+        for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+        {
+            behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
+        }
+        
+        leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
         
 #ifdef USE_LOGGING
         {   //brackets let us hide logging code in certain IDEs.
@@ -176,6 +181,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
          That being said, should probably not init (i.e. start threads)
          if not necessary.
          */
+            
+            
 #ifdef NAOQI_2
             nblog::HOST_TYPE = nblog::V5ROBOT;
 #else
@@ -186,6 +193,22 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         nblog::log_main_init();
         printf("control::control_init()\n");
         control::control_init();
+            
+#ifdef START_WITH_FILEIO
+#ifndef USE_LOGGING
+#error "option START_WITH_FILEIO defined WITHOUT option USE_LOGGING"
+#endif
+            printf("CONTROL: Starting with fileio flag set!\n");
+            control::flags[control::fileio] = 1;
+#endif
+            
+#ifdef START_WITH_THUMBNAIL
+#ifndef USE_LOGGING
+#error "option START_WITH_THUMBNAIL defined WITHOUT option USE_LOGGING"
+#endif
+            printf("CONTROL: Starting with thumbnail flag set!\n");
+            control::flags[control::thumbnail] = 1;
+#endif
         
         /*
          SPECIFIC MODULE LOGGING
@@ -243,14 +266,11 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         
         //Superseded by logging code in ImageTranscriber.
         
-//#ifdef LOG_IMAGES
-        cognitionThread.log<messages::YUVImage>((control::IMAGES), &topTranscriber.imageOut,
-                                                "YUVImage", "camera_TOP");
-        cognitionThread.log<messages::YUVImage>((control::IMAGES), &bottomTranscriber.imageOut,
-                                                "YUVImage", "camera_BOT");
-//#endif
-        
 //#ifdef LOG_VISION
+        cognitionThread.log<messages::FieldLines>((control::VISION), &vision.linesOut,
+                                                   "proto-FieldLines", "vision");
+        cognitionThread.log<messages::Corners>((control::VISION), &vision.cornersOut,
+                                                   "proto-Corners", "vision");
         // cognitionThread.log<messages::VisionField>((control::VISION), &vision.vision_field,
         //                                            "proto-VisionField", "vision");
         // cognitionThread.log<messages::VisionBall>((control::VISION), &vision.vision_ball,

@@ -6,6 +6,7 @@
 
 #include "TorsoMatrixProvider.h"
 #include "Tools/Debugging/DebugDrawings.h"
+#include "DebugConfig.h"
 #include <iostream>
 #include <string>
 
@@ -105,6 +106,7 @@ void TorsoMatrixProvider::update(FilteredOdometryOffset& odometryOffset)
   (Pose3DBH&)lastTorsoMatrix = theTorsoMatrixBH;
 }
 */
+
 void TorsoMatrixProvider::update(OdometryDataBH& odometryData)
 {
   Pose2DBH odometryOffset;
@@ -117,7 +119,15 @@ void TorsoMatrixProvider::update(OdometryDataBH& odometryData)
 
     odometryOffset.translation.x = odometryOffset3D.translation.x;
     odometryOffset.translation.y = odometryOffset3D.translation.y;
+
+#ifdef NAOQI_2
+    // Calculate odometryOffset.rotation from the filtered Z-axis gyro data
+    float angleZ = -theSensorDataBH.data[SensorDataBH::angleZ];
+    odometryOffset.rotation = angleZ - lastAngleZ;
+    lastAngleZ = angleZ;
+#else
     odometryOffset.rotation = odometryOffset3D.rotation.getZAngle();
+#endif
   }
 
   PLOT("module:TorsoMatrixProvider:odometryOffsetX", odometryOffset.translation.x);

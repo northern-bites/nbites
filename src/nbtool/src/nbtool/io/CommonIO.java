@@ -149,6 +149,8 @@ public class CommonIO {
 				
 				if (socket != null) {
 					try {
+						socket.shutdownInput();
+						socket.shutdownOutput();
 						socket.close();
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -156,6 +158,14 @@ public class CommonIO {
 					socket = null;
 				}
 			}
+		}
+		
+		public String host() {
+			return host;
+		}
+		
+		public int port() {
+			return port;
 		}
 		
 		public abstract String name();

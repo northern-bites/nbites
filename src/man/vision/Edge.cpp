@@ -64,7 +64,7 @@ EdgeDetector::EdgeDetector()
 
   gradientThreshold(8);
   edgeThreshold(16);
-  greenThreshold(100);
+  greenThreshold(12);
   correctEdgeDirection(false);
   fast(true);
 }
@@ -244,11 +244,10 @@ uint32_t EdgeDetector::edgeDetect(const ImageLiteU8& green, EdgeList& edgeList)
   uint16_t* gradRow = gradientImage().pixelAddr();
   uint8_t* greenRow = green.pixelAddr();
   if (greenRow)
-    greenRow += green.pitch();
+    greenRow += green.pitch() + 1;
 
   //int x0 = dstWidth() / 2;
   //int y0 = dstHeight() / 2;
-  // "-1" since gradient is shifted by 1 from source
   int x0 = gradientImage().x0() >> 1;
   int y0 = gradientImage().y0() >> 1;
 

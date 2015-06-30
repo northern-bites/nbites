@@ -38,7 +38,7 @@ public class Events {
 		protected void combine(LinkedList<ToolEvent> others) {}
 
 		@Override
-		protected Class<? extends EventListener> listenerClass() {
+		protected Class<? extends EventListener> listenerClass() { 
 			return eclass;
 		}
 
@@ -297,6 +297,26 @@ public class Events {
 		}
 	}
 	
+	public static interface SessionAdded extends EventListener {
+		public void sessionAdded(Object source, Session session);
+	}
+	
+	public static final class GSessionAdded {
+		public static void generate(final Object source, final Session session) {
+			Center.addEvent(new SimpleForEach(SessionAdded.class) {
+				@Override
+				protected void preface() {
+					Logger.logf(Logger.EVENT, "SessionAdded from %s (%s)", source, session);
+				}
+				
+				@Override
+				protected void inform(EventListener l) {
+					((SessionAdded) l).sessionAdded(source, session);
+				}
+			});
+		}
+	}
+	
 	public static interface RelevantRobotStats extends EventListener {
 		public void relRobotStats(Object source, RobotStats bs);
 	}
@@ -473,4 +493,33 @@ public class Events {
 		}
 	}
 	
+	public static interface ViewProfileSetChanged extends EventListener {
+		//Get new profiles via ViewProfile.PROFILES
+		public void viewProfileSetChanged(Object changer);
+	}
+	
+	public static final class GViewProfileSetChanged {
+		public static void generate(final Object source) {
+			Center.addEvent(new SimpleCombine(ViewProfileSetChanged.class, source) {
+				@Override
+				protected void combine(LinkedList<ToolEvent> others) {
+					if (others.isEmpty())
+						return;
+					
+					SimpleCombine sc = (SimpleCombine) others.getLast();
+					payload[0] = sc.payload[0];
+				}
+
+				@Override
+				protected void preface() {
+					Logger.logf(Logger.EVENT, "ViewProfileSetChanged{%s}", payload[0]);
+				}
+
+				@Override
+				protected void inform(EventListener l) {
+					((ViewProfileSetChanged) l).viewProfileSetChanged(payload[0]);
+				}
+			});
+		}
+	}
 }

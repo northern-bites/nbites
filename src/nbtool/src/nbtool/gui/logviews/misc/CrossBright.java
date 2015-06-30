@@ -21,9 +21,7 @@ public class CrossBright extends ViewParent implements IOFirstResponder {
     }
 	
 	@Override
-	public void setLog(Log newlog) {
-		log = newlog;
-		
+	public void setLog(Log newlog) {		
 		CrossInstance inst = CrossIO.instanceByIndex(0);
 		if (inst == null)
 			return;

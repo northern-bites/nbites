@@ -31,14 +31,6 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::loc_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
-        .add_property("visionRobot",
-                      make_getter(&PyInterface::visionRobot_ptr,
-                                  return_value_policy
-                                  <reference_existing_object>()))
-        .add_property("visionField",
-                      make_getter(&PyInterface::visionField_ptr,
-                                  return_value_policy
-                                  <reference_existing_object>()))
         .add_property("filteredBall",
                       make_getter(&PyInterface::filteredBall_ptr,
                                   return_value_policy
@@ -92,16 +84,24 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::obstacle_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
-        .add_property("visionObstacle",
-                      make_getter(&PyInterface::visionObstacle_ptr,
-                                  return_value_policy
-                                  <reference_existing_object>()))
+        // .add_property("visionObstacle",
+        //               make_getter(&PyInterface::visionObstacle_ptr,
+        //                           return_value_policy
+        //                           <reference_existing_object>()))
         .add_property("sharedBall",
                       make_getter(&PyInterface::sharedBall_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
         .add_property("sharedFlip",
                       make_getter(&PyInterface::sharedFlip_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("visionLines",
+                      make_getter(&PyInterface::visionLines_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("visionCorners",
+                      make_getter(&PyInterface::corners_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
 

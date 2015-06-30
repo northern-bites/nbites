@@ -14,8 +14,6 @@ using namespace boost::python;
 
 extern "C" void initLedCommand_proto();
 extern "C" void initGameState_proto();
-extern "C" void initVisionField_proto();
-extern "C" void initVisionRobot_proto();
 extern "C" void initWorldModel_proto();
 extern "C" void initRobotLocation_proto();
 extern "C" void initBallModel_proto();
@@ -24,7 +22,8 @@ extern "C" void initMotionStatus_proto();
 extern "C" void initButtonState_proto();
 extern "C" void initFallStatus_proto();
 extern "C" void initStiffnessControl_proto();
-extern "C" void initObstacle_proto();
+extern "C" void initVision_proto();
+// extern "C" void initObstacle_proto();
 extern "C" void initinterface();
 
 namespace man {
@@ -89,8 +88,6 @@ void BehaviorsModule::initializePython()
     try{
         initLedCommand_proto();
         initGameState_proto();
-        initVisionField_proto();
-        initVisionRobot_proto();
         initWorldModel_proto();
         initBallModel_proto();
         initRobotLocation_proto();
@@ -99,7 +96,8 @@ void BehaviorsModule::initializePython()
         initButtonState_proto();
         initFallStatus_proto();
         initStiffnessControl_proto();
-        initObstacle_proto();
+        initVision_proto();
+        // initObstacle_proto();
         // Init the interface as well
         initinterface();
     } catch (error_already_set) {
@@ -223,12 +221,6 @@ void BehaviorsModule::prepareMessages()
     localizationIn.latch();
     pyInterface.setLoc_ptr(&localizationIn.message());
 
-    visionFieldIn.latch();
-    pyInterface.setVisionField_ptr(&visionFieldIn.message());
-
-    visionRobotIn.latch();
-    pyInterface.setVisionRobot_ptr(&visionRobotIn.message());
-
     sharedBallIn.latch();
     pyInterface.setSharedBall_ptr(&sharedBallIn.message());
 
@@ -258,11 +250,17 @@ void BehaviorsModule::prepareMessages()
     stiffStatusIn.latch();
     pyInterface.setStiffStatus_ptr(&stiffStatusIn.message());
 
-    obstacleIn.latch();
-    pyInterface.setObstacle_ptr(&obstacleIn.message());
+    linesIn.latch();
+    pyInterface.setVisionLines_ptr(&linesIn.message());
 
-    visionObstacleIn.latch();
-    pyInterface.setVisionObstacle_ptr(&visionObstacleIn.message());
+    cornersIn.latch();
+    pyInterface.setCorners_ptr(&cornersIn.message());
+
+    // obstacleIn.latch();
+    // pyInterface.setObstacle_ptr(&obstacleIn.message());
+
+    // visionObstacleIn.latch();
+    // pyInterface.setVisionObstacle_ptr(&visionObstacleIn.message());
 
     // Prepare potential out messages for python
     ledCommand = portals::Message<messages::LedCommand>(0);

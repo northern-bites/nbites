@@ -12,6 +12,8 @@ Kinematics::Kinematics(bool topCamera)
       constants(topCamera),
       joints_(),
       tilt_(0),
+      wx0_(0),
+      wy0_(0),
       wz0_(0),
       azimuth_(0)
 {}
@@ -41,35 +43,35 @@ void Kinematics::compute()
     double hy = joints_.head_yaw();
 
     // Compute kinematics for left and right leg
-    std::pair<double, double> leftLeg = computeForLeg(la, lk, lh, hp);
-    std::pair<double, double> rightLeg = computeForLeg(ra, rk, rh, hp);
-    double leftTilt = leftLeg.first;
-    double rightTilt = rightLeg.first;
-    double leftCameraHeight = leftLeg.second;
-    double rightCameraHeight = rightLeg.second;
+    std::tuple<double, double, double> leftLeg = computeForLeg(la, lk, lh, hp);
+    std::tuple<double, double, double> rightLeg = computeForLeg(ra, rk, rh, hp);
+    double leftTilt = std::get<0>(leftLeg);
+    double rightTilt = std::get<0>(rightLeg);
+    double leftCameraHeight = std::get<1>(leftLeg);
+    double rightCameraHeight = std::get<1>(rightLeg);
+    double leftApertureY = std::get<2>(leftLeg);
+    double rightApertureY = std::get<2>(rightLeg);
 
     // Compute tilt, wz0, and azimuth for whatever leg we are standing on
     if (leftCameraHeight > rightCameraHeight) {
         tilt_ = leftTilt;
+        wx0_ = -1 * sin(hy) * leftApertureY;
+        wy0_ = cos(hy) * leftApertureY;
         wz0_ = leftCameraHeight;
     } else {
         tilt_ = rightTilt;
+        wx0_ = -1 * sin(hy) * rightApertureY;
+        wy0_ = cos(hy) * rightApertureY;
         wz0_ = rightCameraHeight;
     }
     azimuth_ = -hy;
-
-    std::cout << "Tilt: " << tilt_*TO_DEG << std::endl;
-    std::cout << "Wz0: " << wz0_ << std::endl;
-    std::cout << "Azimuth: " << azimuth_*TO_DEG << std::endl << std::endl;
 }
 
-std::pair<double, double> Kinematics::computeForLeg(double anklePitch,
-                                                    double kneePitch,
-                                                    double hipPitch,
-                                                    double neckPitch) const
+std::tuple<double, double, double> Kinematics::computeForLeg(double anklePitch,
+                                                             double kneePitch,
+                                                             double hipPitch,
+                                                             double neckPitch) const
 {
-    std::pair<double, double> tiltAndHeight;
-
     double tibiaPitch = anklePitch;
     double thighPitch = tibiaPitch + kneePitch;
     double torsoPitch = thighPitch + hipPitch;
@@ -82,10 +84,10 @@ std::pair<double, double> Kinematics::computeForLeg(double anklePitch,
                           cos(torsoPitch) * constants.hipToNeck +
                           cos(headPitch) * constants.neckToCameraZ -
                           sin(headPitch) * constants.neckToCameraX;
+    double apertureToTorsoY = cos(headPitch) * constants.neckToCameraX +
+                              sin(headPitch) * constants.neckToCameraZ;
 
-    tiltAndHeight.first = cameraTilt;
-    tiltAndHeight.second = cameraHeight;
-    return tiltAndHeight;
+    return std::make_tuple(cameraTilt, cameraHeight, apertureToTorsoY);
 }
 
 }

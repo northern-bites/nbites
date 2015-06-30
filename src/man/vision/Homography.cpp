@@ -5,6 +5,10 @@
 // ********************************
 
 #include "Homography.h"
+#include "Hough.h"
+#include "NBMath.h"
+
+#include <boost/math/distributions/normal.hpp>
 
 using namespace std;
 
@@ -21,6 +25,7 @@ FieldHomography::FieldHomography(bool topCamera)
   iy0(0);
   roll(0);
   azimuth(0);
+  panRate(0);
   wx0(0);
   wy0(0);
   wz0(52);
@@ -59,6 +64,15 @@ void FieldHomography::compute()
   }
 }
 
+void FieldHomography::panAzimuth(double iy, double x, double y, double& xp, double& yp) const
+{
+  double panAz = -panRate() * iy;   // negative because +iy is earlier in rolling exposure
+  double cp = cos(panAz);           // Could make this faster with the small angle approx
+  double sp = sin(panAz);           //   cp = 1, sp = panAz
+  xp = x * cp - y * sp;
+  yp = x * sp + y * cp;
+}
+
 bool FieldHomography::fieldCoords(double ix, double iy, double& wx, double& wy) const
 {
   compute();
@@ -74,8 +88,9 @@ bool FieldHomography::fieldCoords(double ix, double iy, double& wx, double& wy) 
   cz *= flen();
 
   // World coordinates
-  wx = h11 * cx + h12 * cy + h13 * cz + h14;
-  wy = h21 * cx + h22 * cy + h23 * cz + h24;
+  panAzimuth(iy, h11 * cx + h12 * cy + h13 * cz, h21 * cx + h22 * cy + h23 * cz, wx, wy);
+  wx += h14;
+  wy += h24;
 
   double wz = h31 * cx + h32 * cy + h33 * cz + h34;
   if (fabs(wz) > 1.0e-6) {
@@ -90,14 +105,20 @@ void FieldHomography::fieldVector(double ix, double iy, double dix, double diy,
                                   double& dwx, double& dwy) const
 {
   compute();
+
   ix -= ix0();
   iy -= iy0();
-  double j11 =   ca * st * iy + ( sa * sr - ca * cr * ct) * flen();
-  double j12 = -(ca * st * ix + ( sa * cr + ca * sr * ct) * flen());
-  double j21 =  -sa * st * iy + ( ca * sr + sa * cr * ct) * flen();
-  double j22 =   sa * st * ix + (-ca * cr + sa * sr * ct) * flen();
+
+  double cp, sp;
+  panAzimuth(iy, ca, sa, cp, sp);
+
+  double j11 =   cp * st * iy + ( sp * sr - cp * cr * ct) * flen();
+  double j12 = -(cp * st * ix + ( sp * cr + cp * sr * ct) * flen());
+  double j21 =  -sp * st * iy + ( cp * sr + sp * cr * ct) * flen();
+  double j22 =   sp * st * ix + (-cp * cr + sp * sr * ct) * flen();
   double js = h31 * ix + h32 * iy + h33 * flen();
   js = h34 / (js * js);
+
   dwx = js * (dix * j11 + diy * j12);
   dwy = js * (dix * j21 + diy * j22);
 }
@@ -106,13 +127,19 @@ void FieldHomography::imageVector(double ix, double iy, double dwx, double dwy,
                                   double& dix, double& diy) const
 {
   compute();
+
   ix -= ix0();
   iy -= iy0();
-  double j11 = sa * st * ix + (-ca * cr + sa * sr * ct) * flen();
-  double j12 = ca * st * ix + ( sa * cr + ca * sr * ct) * flen();
-  double j21 = sa * st * iy - ( ca * sr + sa * cr * ct) * flen();
-  double j22 = ca * st * iy + ( sa * sr - ca * cr * ct) * flen();
+
+  double cp, sp;
+  panAzimuth(iy, ca, sa, cp, sp);
+
+  double j11 = sp * st * ix + (-cp * cr + sp * sr * ct) * flen();
+  double j12 = cp * st * ix + ( sp * cr + cp * sr * ct) * flen();
+  double j21 = sp * st * iy - ( cp * sr + sp * cr * ct) * flen();
+  double j22 = cp * st * iy + ( sp * sr - cp * cr * ct) * flen();
   double js = (h31 * ix + h32 * iy + h33 * flen()) / (flen() * h34);
+
   dix = js * (dwx * j11 + dwy * j12);
   diy = js * (dwx * j21 + dwy * j22);
 }
@@ -271,63 +298,48 @@ bool FieldHomography::visualTiltParallel(const GeoLine& a, const GeoLine& b,
   return ok;
 }
 
-#if 0
-string TestVisualTilt(List<FieldLine> lines)
+bool FieldHomography::calibrateFromStar(const FieldLineList& lines)
 {
-  string s = "\n";
-  Stats tiltStats = new Stats();
-
-  for (int i = 0; i < lines.Count - 1; ++i)
-    for (int j = i + 1; j < lines.Count; ++j)
-    {
-      if (Math.Abs(lines[i].Ca * lines[j].Ca + lines[i].Sa * lines[j].Sa) < 0.33)
-      {
-        s += string.Format("Perpendicular field lines {0} and {1}:\n", i, j);
-        for (int a = 0; a < 2; ++a)
-          for (int b = 0; b < 2; ++b)
-          {
-            double t;
-            string diag;
-            bool ok = VisualTiltPerpendicular(lines[i].Lines(a), lines[j].Lines(b), out t, out diag);
-            if (ok)
-            {
-              t *= 180 / Math.PI;
-              tiltStats.Add(t);
-              s += string.Format("  {0,4:f1},", t);
-            }
-            else
-              s += "  ----,";
-            s += string.Format(" | {0}\n", diag);
-          }
-      }
-      else if (Math.Abs(lines[i].Ca * lines[j].Sa - lines[i].Sa * lines[j].Ca) < 0.33)
-      {
-        s += string.Format("Parallel field lines {0} and {1}:\n", i, j);
-        for (int a = 0; a < 2; ++a)
-          for (int b = 0; b < 2; ++b)
-          {
-            double t;
-            string diag;
-            bool ok = VisualTiltParallel(lines[i].Lines(a), lines[j].Lines(b), out t, out diag);
-            if (ok)
-            {
-              t *= 180 / Math.PI;
-              tiltStats.Add(t);
-              s += string.Format("  {0,4:f1},", t);
-            }
-            else
-              s += "  ----,";
-            s += string.Format(" | {0}\n", diag);
-          }
-      }
-    }
-
-  s += string.Format("Mean tilt = {0:f2}, stDev = {1:f2}\n", tiltStats.Mean, tiltStats.StDev);
-  return s;
+  StarCal sc(*this);
+  if (sc.add(lines))
+  {
+    roll(sc.roll());
+    tilt(sc.tilt());
+    return true;
+  }
+  return false;
 }
 
-#endif
+// *****************************
+// *                           *
+// *  Star Target Calibration  *
+// *                           *
+// *****************************
 
+bool StarCal::add(const FieldLineList& lines)
+{
+  for (int i = 0; i < (int)lines.size(); ++i)
+  {
+    double vpx, vpy;
+    if (lines[i][0].intersect(lines[i][1], vpx, vpy) && fabs(lines[i][0].ux()) > 0.3)
+      fit.add(vpx - ix0, vpy - iy0);  // relative to optical axis
+  }
+
+  // If we didn't find exactly three suitable field lines, fail
+  return fit.area() == 3;
+}
+
+double StarCal::roll()
+{
+  return sMod(fit.firstPrincipalAngle(), M_PI);
+}
+
+double StarCal::tilt()
+{
+  double imageDistanceToHorizon
+    = fabs(fit.secondPrinciaplAxisU() * fit.centerX() + fit.secondPrinciaplAxisV() * fit.centerY());
+  return (M_PI / 2) - atan(imageDistanceToHorizon / f);
+}
 
 // ********************
 // *                  *
@@ -338,7 +350,7 @@ string TestVisualTilt(List<FieldLine> lines)
 void GeoLine::intersect(const GeoLine& other, double& px, double& py, double& pg) const
 {
   px =  other.uy() * r() - uy() * other.r();
-  px = -other.ux() * r() + ux() * other.r();
+  py = -other.ux() * r() + ux() * other.r();
   pg = ux() * other.uy() - uy() * other.ux();
 }
 
@@ -377,6 +389,63 @@ void GeoLine::rawEndPoints(double x0, double y0,
   y2 = y0 - y2;
 }
 
+double GeoLine::separation(const GeoLine& other) const
+{
+  double x1, y1, x2, y2, x3, y3, x4, y4;
+  endPoints(x1, y1, x2, y2);
+  other.endPoints(x3, y3, x4, y4);
+  double x0 = (x1 + x2 + x3 + x4) / 4;
+  double y0 = (y1 + y2 + y3 + y4) / 4;
+  return pDist(x0, y0) + other.pDist(x0, y0);
+}
+
+// TODO params
+double GeoLine::error(const GeoLine& other, bool test) const
+{
+  double normalizedT = (r() > 0 ? t() : t() - M_PI);
+  double rDiff = fabs(fabs(r()) - fabs(other.r()));
+  double tDiff = fabs(sMod(normalizedT - other.t(), M_PI));
+
+  boost::math::normal_distribution<> rGaussian(0, 100);
+  boost::math::normal_distribution<> tGaussian(0, 10*TO_RAD);
+
+  // TODO properly sample
+  double rProb = pdf(rGaussian, rDiff);
+  double tProb = pdf(tGaussian, tDiff);
+
+  if (test) {
+    std::cout << "In error," << std::endl;
+    std::cout << "Model, " << r() << "," << t() << std::endl;
+    std::cout << "Observation, " << other.r() << "," << other.t() << std::endl;
+    std::cout << rDiff << "-" << tDiff << std::endl;
+    std::cout << rProb << "+" << tProb << std::endl;
+  }
+
+  return rProb * tProb;
+}
+
+void GeoLine::translateRotate(double xTrans, double yTrans, double rotation)
+{
+    // Find point on line pre-transformation (use endpoints)
+    double x1, y1, x2, y2;
+    endPoints(x1, y1, x2, y2);
+
+    // Translate and rotate
+    double x1t, y1t, x2t, y2t;
+    man::vision::translateRotate(x1, y1, xTrans, yTrans, rotation, x1t, y1t);
+    man::vision::translateRotate(x2, y2, xTrans, yTrans, rotation, x2t, y2t);
+
+    // Calculate new t and unit vector
+    t(uMod(rotation + t(), M_PI));
+
+    // Dot product of point on line with new unit vector to find new r
+    r(ux() * x1t + uy() * y1t);
+
+    // Set endpoints
+    setEndPoints(qDist(x1t, y1t), qDist(x2t, y2t));
+}
+
+
 void GeoLine::imageToField(const FieldHomography& h)
 {
   // Get field coordinates of the line origin (any point on the line will do),
@@ -406,37 +475,116 @@ void GeoLine::imageToField(const FieldHomography& h)
   setEndPoints(qDist(x1, y1), qDist(x2, y2));
 }
 
-#if 0
-  // effect   Transform this line as specified by roll and (x0, y0) in fcp. Translate then rotate.
-  public void Transform(FixedCameraParams fcp)
-  {
-    // Rotate the line's unit vector, but don't set it yet
-    double cs = Math.Cos(fcp.Roll);
-    double sn = Math.Sin(fcp.Roll);
-    double ux = Ux * cs - Uy * sn;
-    double uy = Ux * sn + Uy * cs;
-
-    // Get a point on the new line by mapping with fcp, then get the new R by dot product
-    // with the new unit vector
-    double x0, y0;
-    fcp.ImageCoords(R * Ux, R * Uy, out x0, out y0);
-    R = ux * x0 + uy * y0;
-
-    // The endpoints move by the cross product of the old unit vector and the origin vector
-    // in fcp. This is because rotation does not affect the U values, and translation is done
-    // before rotation.
-    double du = fcp.X0 * Uy - fcp.Y0 * Ux;
-    U0 -= du;
-    U1 -= du;
-
-    // Now we can set the new unit vector
-    setUintVec(ux, uy);
-  }
-#endif
-
-string GeoLine::print() const
+string GeoLine::print(bool pretty) const
 {
-  return strPrintf("%7.1f, %7.1f, %7.1f, %7.1f", r(), t()*(180 / M_PI), ep0(), ep1());
+  if (pretty)
+    return strPrintf("%8.2f,%7.2f  [%7.1f .. %7.1f]",
+                           r(), t() * (180 / M_PI), ep0(), ep1());
+  else
+    return strPrintf("%.8g %.8g %.8g %.8g", r(), t(), ep0(), ep1());
+}
+
+// *****************************
+// *                           *
+// *  Synthetic RoboCup Field  *
+// *                           *
+// *****************************
+
+void syntheticField(YuvLite& img, FieldHomography fh)
+{
+  // The field is defined by a list of non-intersecting oriented rectangles in millimeters.
+  static RectangleF fieldLines[] =
+  {
+    RectangleF(-3025, -4525,   50, 9050),   // left sideline
+    RectangleF( 2975, -4525,   50, 9050),   // right sideline
+    RectangleF(-2975,  4475, 5950,   50),   // back line
+    RectangleF(-2975,   -25, 5950,   50),   // center line
+    RectangleF(-1125,  3875, 2250,   50),   // front goal box line
+    RectangleF(-1125,  3925,   50,  550),   // left goal box line
+    RectangleF( 1075,  3925,   50,  550),   // right goal box line
+    RectangleF(  -75,  3175,  150,   50),   // penalty mark horizontal arm
+    RectangleF(  -25,  3225,   50,   50),   // penalty mark back vertical arm
+    RectangleF(  -25,  3125,   50,   50),   // penalty mark front vertical arm
+    RectangleF(  -25,    25,   50,   50),   // center mark back arm
+    RectangleF(  -25,   -75,   50,   50)    // center mark front arm
+  };
+
+  // Used to make center circle
+  RectangleF ccTangent = RectangleF(725, -50, 50, 100);
+
+  // Convert homography to mm (a metter of convenience in defining the field)
+  fh.wx0(fh.wx0() * 10);
+  fh.wy0(fh.wy0() * 10);
+  fh.wz0(fh.wz0() * 10);
+
+  // Loop over every image pixel
+  for (int j = 0; j < 2 * img.height(); ++j)
+    for (int i = 0; i < 2 * img.width(); ++i)
+    {
+      double ix = i - img.width(), iy = img.height() - j;
+      double wx, wy;
+      int i2 = i / 2;
+      if (fh.fieldCoords(ix, iy, wx, wy))
+      {
+        // Pixel below he horizon, get oriented rectangle in field coordinates that
+        // approximately corresponds to the pixel.
+        const double pixelRadius = 0.6;
+        double rxx, rxy, ryx, ryy;
+        fh.fieldVector(ix, iy, pixelRadius, 0, rxx, rxy);
+        fh.fieldVector(ix, iy, 0, pixelRadius, ryx, ryy);
+        double rx = max(fabs(rxx), fabs(ryx));
+        double ry = max(fabs(rxy), fabs(ryy));
+        RectangleF pixel((float)(wx - rx), (float)(wy - ry), (float)(2 * rx), (float)(2 * ry));
+
+        // Sum the areas of intersection of the pixel with each rectangle.
+        double z = 0;
+        for (int r = 0; r < sizeof(fieldLines) / sizeof(fieldLines[0]); ++r)
+          z += fieldLines[r].intersectArea(pixel);
+        z /= pixel.area();
+
+        // Center circle
+        double wr = sqrt(wx * wx + wy * wy);
+        double cs = wx / wr;
+        double sn = wy / wr;
+        double cxx = cs * rxx - sn * rxy;
+        double cxy = sn * rxx + cs * rxy;
+        double cyx = cs * ryx - sn * ryy;
+        double cyy = sn * ryx + cs * ryy;
+        rx = max(fabs(cxx), fabs(cyx));
+        ry = max(fabs(cxy), fabs(cyy));
+        pixel = RectangleF((float)(wr - rx), (float)(-ry), (float)(2 * rx), (float)(2 * ry));
+        double c = ccTangent.intersectArea(pixel) / pixel.area();
+        z = z + c - z * c;
+
+        // Convert area to brightness, store in image
+        uint8_t y = (uint8_t)((0.625 * z + 0.25) * 255);
+        img.y(i, j, y);
+
+        // Color the field green
+        if ((i & 1) == 0)
+          if (fabs(wx) <= 3700 && fabs(wy) <= 5200)
+          {
+            y = (uint8_t)(0.3 * (z - 1) * 128 + 128);
+            img.u(i2, j, y);
+            img.v(i2, j, y);
+          }
+          else
+          {
+            img.u(i2, j, 128);
+            img.v(i2, j, 128);
+          }
+      }
+      else
+      {
+        // Color the sky blue
+        img.y(i, j, 192);
+        if ((i & 1) == 0)
+        {
+          img.u(i2, j, 144);
+          img.v(i2, j, 112);
+        }
+      }
+    }
 }
 
 }

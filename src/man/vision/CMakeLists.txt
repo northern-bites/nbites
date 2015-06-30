@@ -15,6 +15,7 @@ SET( VISION_SRCS
   Homography.cpp
   Hough.cpp
   Vision.cpp
+  BallDetector.cpp
   )
 
 IF (UNIX AND NOT APPLE)
@@ -35,6 +36,7 @@ ADD_LIBRARY(
   vision
   STATIC
   ${VISION_SRCS}
+  ${VISION_HEADERS}
   )
 
 ############################ SET LIBRARIES TO LINK WITH
