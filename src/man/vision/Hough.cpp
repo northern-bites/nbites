@@ -30,10 +30,10 @@ AdjustParams::AdjustParams()
   scoreThreshold = 32;
 }
 
-AdjustSet::AdjustSet(bool strict) {
+AdjustSet::AdjustSet() {
   params[1].angleThr = FuzzyThr(0.08f, 0.12f);
   params[1].distanceThr = FuzzyThr(0.7f, 2.0f);
-  params[1].fitThresold = strict ? 0.55 : 10.0;
+  params[1].fitThresold = 0.55;
 
 }
 
@@ -632,7 +632,7 @@ bool CenterCircleDetector::getMaxBin(std::vector<Point> vec, double& x0, double&
 
     std::cout << std::endl << "Center Circle at (" << x0 << "," << y0 << "). " << 
       (double)votes * 100/(double)vec.size() << "\% of the " << 
-      vec.size() << " potentials in mex populated bin" << std::endl;
+      vec.size() << " potentials in most populated bin" << std::endl;
 
     return true;
   } else {
