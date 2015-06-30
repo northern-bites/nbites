@@ -33,7 +33,7 @@ AdjustParams::AdjustParams()
 AdjustSet::AdjustSet(bool strict) {
   params[1].angleThr = FuzzyThr(0.08f, 0.12f);
   params[1].distanceThr = FuzzyThr(0.7f, 2.0f);
-  params[1].fitThresold = strict ? 0.5 : 10.0;
+  params[1].fitThresold = strict ? 0.55 : 10.0;
 
 }
 
@@ -492,93 +492,98 @@ bool CornerDetector::ccw(double ax, double ay,
 // *******************
 CenterCircleDetector::CenterCircleDetector() 
 {
+  set();
+}
+
+void CenterCircleDetector::set()
+{
   // Set parameters
-  maxEdgeDistanceSquared = 700 * 700;
-  ccr = 80;  //CENTER_CIRCLE_RADIUS;
-  binWidth = 50; // in centimeters
-  binCount = 10; // per row and col
-  hardCap = 10;
-  minVotesInMaxBin = 10;
+  hardCap = 800;
+  maxEdgeDistanceSquared = 500 * 500;
+  ccr = CENTER_CIRCLE_RADIUS;
+  binWidth = 75;
+  binCount = 8;
+  minVotesInMaxBin = 0.15;
 }
 
 bool CenterCircleDetector::detectCenterCircle(EdgeList& edges)
 {
-  if (edges.count() > hardCap) {
-    _potentials = calculatePotentials(edges);
-    double x0, y0;
-    if (getMaxBin(_potentials, x0, y0)) {
-      _potentials.push_back(Point(x0, y0));
-    }
-  }
-    return false;
+  std::vector<Point> potentials = calculatePotentials(edges);
+  
+#ifdef OFFLINE
+  _potentials = potentials;
+  if (_potentials.size() > hardCap && getMaxBin(_potentials, _ccx, _ccy)) {
+    _potentials.push_back(Point(_ccx, _ccy));
+    return true;
+  } else
+    _potentials.push_back(Point(0.0, 0.0));
+  return false;
+#endif
+
+  return (_potentials.size() > hardCap && getMaxBin(potentials, _ccx, _ccy));
 }
 
 // Get potential cc centers and clean edge list
 std::vector<Point> CenterCircleDetector::calculatePotentials(EdgeList& edges)
 {
-
-  int c = 0;
   std::vector<Point> vec;
   AngleBinsIterator<Edge> abi(edges);
   for (Edge* e = *abi; e; e = *++abi) {
     double distance = e->field().x() * e->field().x() + e->field().y() * e->field().y();
     if (e->field().y() >= 0 && distance < maxEdgeDistanceSquared) {
-      
-      // push back two points 75 cm away from edge point
       vec.push_back(Point(e->field().x() + ccr*sin(e->field().t()), e->field().y() - ccr*cos(e->field().t())));
       vec.push_back(Point(e->field().x() - ccr*sin(e->field().t()), e->field().y() + ccr*cos(e->field().t())));
-
- //     std::cout << "T: " << e->field().t();
-      c++;
     }
   }
-  std::cout << "Count: " << c << std::endl;
   return vec;
 }
 
-// Set (x0,y0) to upper left hand corner of max populated bin, (x1,y1) to upper right hand corner
+// Set (x0,y0) center of most populated bin
 bool CenterCircleDetector::getMaxBin(std::vector<Point> vec, double& x0, double& y0)
 {
-  int bins1[binCount * binCount]; 
-  int bins2[binCount * binCount];
-  int bins3[binCount * binCount]; 
-  int bins4[binCount * binCount]; 
+  int bcSq = binCount * binCount;
 
-  int binAreaWidthAndHeight = binCount * binWidth;
+  // Fill four sets of overlapping bins
+  int bins1[bcSq]; 
+  int bins2[bcSq];
+  int bins3[bcSq]; 
+  int bins4[bcSq]; 
 
-  for (int i = 0; i < binCount * binCount; i++) {
-    bins1[i] = bins2[i] = bins3[i] = bins4[i] = 0;
-  }
+  std::fill(bins1, bins1 + bcSq, 0);
+  std::fill(bins2, bins2 + bcSq, 0);
+  std::fill(bins3, bins3 + bcSq, 0);
+  std::fill(bins4, bins4 + bcSq, 0);
 
-  for (Point p : vec) {
+  int xOffset = binCount * binWidth / 2;
+
+  // Add each potential point to one bin in each of the four overlapping grids
+  for (int i = 0; i < vec.size(); i++) {
+    Point p = vec[i];
     // +0, +0
-    int xbin = roundDown((int)p.first + binAreaWidthAndHeight / 2) / binWidth;
+    int xbin = roundDown((int)p.first + xOffset) / binWidth;
     int ybin = roundDown((int)p.second) / binWidth;
     bins1[min(xbin, binCount-1) + binCount * min(ybin, binCount-1)] += 1;
 
     // +0.5, +0.5
-    xbin = roundDown((int)p.first + binWidth/2 + binAreaWidthAndHeight/2) / binWidth;
+    xbin = roundDown((int)p.first + binWidth/2 + xOffset) / binWidth;
     ybin = roundDown((int)p.second + binWidth/2) / binWidth;  
     bins2[min(xbin, binCount-1) + binCount * min(ybin, binCount-1)] += 1;
 
     // +0.5, +0
-    xbin = roundDown((int)p.first + binWidth/2 + binAreaWidthAndHeight/2) / binWidth;
+    xbin = roundDown((int)p.first + binWidth/2 + xOffset) / binWidth;
     ybin = roundDown((int)p.second) / binWidth;  
     bins3[min(xbin, binCount-1) + binCount * min(ybin, binCount-1)] += 1;
 
     // +0, +0.5
-    xbin = roundDown((int)p.first + binAreaWidthAndHeight/2) / binWidth;
+    xbin = roundDown((int)p.first + xOffset) / binWidth;
     ybin = roundDown((int)p.second + binWidth/2) / binWidth;  
     bins4[min(xbin, binCount-1) + binCount * min(ybin, binCount-1)] += 1;
-
   }
 
-  int votes = 0;
-  int winBin;
-  int bcSq = binCount * binCount;
+  int winBin, votes = 0;
 
+  // Tally bins
   for (int i = 0; i < bcSq; i++) {
-    std::cout << i << ": " << bins1[i] << ", " << bins2[i] << ": " << bins3[i] << ", " << bins4[i] << std::endl;
     if (bins1[i] > votes) {
       votes = bins1[i];
       winBin = i;
@@ -597,34 +602,32 @@ bool CenterCircleDetector::getMaxBin(std::vector<Point> vec, double& x0, double&
     }
   }
 
-  if (votes > minVotesInMaxBin) {
+  if (votes > minVotesInMaxBin * vec.size()) {
     if (winBin < bcSq) {
-      x0 = (winBin % binCount) * binWidth - binAreaWidthAndHeight / 2;
-      y0 = (winBin / binCount + 1) * binWidth; 
-      std::cout << winBin << ": 1. (" << x0 << "," << y0 << ") ";
+      x0 = ((winBin % binCount) + 0.5) * binWidth - xOffset;
+      y0 = (winBin / binCount + 0.5) * binWidth; 
     } else if (winBin < bcSq *2) {
       winBin -= bcSq;
-      x0 = (winBin % binCount) * binWidth - (binAreaWidthAndHeight/2) - (binWidth/2);
-      y0 = (winBin / binCount + 0.5) * binWidth; 
-      std::cout << winBin << ": 2. (" << x0 << "," << y0 << ") ";
+      x0 = (winBin % binCount) * binWidth - (xOffset);
+      y0 = (winBin / binCount) * binWidth; 
     } else if (winBin < bcSq * 3) {
       winBin -= bcSq * 2;
-      x0 = (winBin % binCount) * binWidth - (binAreaWidthAndHeight/2) - (binWidth/2);
-      y0 = (winBin / binCount + 1) * binWidth; 
-      std::cout << winBin << ": 3. (" << x0 << "," << y0 << ") ";
+      x0 = (winBin % binCount) * binWidth - (xOffset);
+      y0 = (winBin / binCount + 0.5) * binWidth; 
     } else {
       winBin -= bcSq * 3;
-      x0 = (winBin % binCount) * binWidth - binAreaWidthAndHeight / 2;
-      y0 = (winBin / binCount + 0.5) * binWidth; 
-      std::cout << winBin << ": 4. (" << x0 << "," << y0 << ") ";
-
+      x0 = (winBin % binCount + 0.5) * binWidth - xOffset;
+      y0 = (winBin / binCount) * binWidth; 
     }
-  }
 
-    std::cout << "Returning (" << x0 << "," << y0 << ") with " << votes << " votes" << std::endl;
+    std::cout << "CC at (" << x0 << "," << y0 << "). " << (double)votes * 100/(double)vec.size() << "\%" << 
+    " Potentials: " << vec.size() << std::endl;
+
     return true;
-  
+  } else {
+    std::cout << "!CC: " << (double)votes * 100/(double)vec.size() << "\%" << std::endl;
 
+  }
 
   return false;
 }

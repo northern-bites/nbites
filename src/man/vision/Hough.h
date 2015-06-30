@@ -252,27 +252,30 @@ class CenterCircleDetector {
   double _ccx;
   double _ccy;
   
-  std::vector<Point> _potentials;
-
   std::vector<Point> calculatePotentials(EdgeList& edges);
 
+  // For debugging
+  std::vector<Point> _potentials;
 
   // Parameters
-  int binWidth; // in centimeters
-  int binCount; // per row and col
-  int hardCap; // min number of edge
-  double maxEdgeDistanceSquared;
-  double ccr; // center circle radius
-  int minVotesInMaxBin;
+  int hardCap;                    // Min number of potential edges
+  double maxEdgeDistanceSquared;  // Max considered distance of an edge
+  double ccr;                     // Center circle radius
+  int binWidth;                   // In centimeters
+  int binCount;                   // Bins per row and col
+  double minVotesInMaxBin;        // Ratio of potentials required in the most populated bin
 
+  void set();
   bool getMaxBin(std::vector<Point> vec, double& x0, double& y0);
-  int roundDown(int v) { return binWidth*(v/binWidth); }
+  inline int roundDown(int v) { return binWidth*(v/binWidth); }
 
 public:
   CenterCircleDetector();
-
   bool detectCenterCircle(EdgeList& edges);
   std::vector<Point> getPotentials() { return _potentials; }
+  
+  double x() { return _ccx; }
+  double y() { return _ccy; }
 };
 
 enum class LineID {

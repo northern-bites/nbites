@@ -273,7 +273,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
 
             }
             g.setColor(Color.blue);
-            g.drawRect((int)(fxc + ccPoints.get(ccPoints.size()-2)), (int)(fyc - ccPoints.get(ccPoints.size() - 1)), 50, 50);
+            g.fillOval((int)(fxc + ccPoints.get(ccPoints.size()-2)) - 4, (int)(fyc - ccPoints.get(ccPoints.size() - 1)) - 4, 8, 8);
 
         }
     }
