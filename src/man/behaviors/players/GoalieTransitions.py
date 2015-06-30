@@ -243,19 +243,37 @@ def shouldStopGoingBack(player):
 def getBearingFromRobot(x, y):
     return math.degrees(math.atan2(x, -y));
 
-def getLineLength(line):
-    r = line.r
-    t = line.t
-    x0 = r * math.cos(t)
-    y0 = r * math.sin(t)
-    x1 = x0 + line.ep0 * math.sin(t)
-    y1 = y0 + -line.ep0 * math.cos(t)
-    x2 = x0 + line.ep1 * math.sin(t)
-    y2 = y0 + -line.ep1 * math.cos(t)
+def facingASideline(player):
+    visionLines = player.brain.visionLines
+    # Add in checks to not add repeat lines?
 
-    x = x2 - x1
-    y = y2 - y1
-    return math.sqrt(x*x + y*y)
+    for i in range(0, visionLines.line_size()):
+        r = visionLines.line(i).inner.r
+        t = math.degrees(visionLines.line(i).inner.t)
+        length = getLineLength(visionLines.line(i).inner)
+        sidelineLength = 50.0
+        if (math.fabs(length - sidelineLength) < 10.0):
+            print "I THINK I SEE A SIDELINE"
+            print "-------------------------"
+            print ("R", r)
+            print ("T", t)
+
+    return False
+
+def getLineLength(line):
+    return line.ep1 - line.ep0
+    # r = line.r
+    # t = line.t
+    # x0 = r * math.cos(t)
+    # y0 = r * math.sin(t)
+    # x1 = x0 + line.ep0 * math.sin(t)
+    # y1 = y0 + -line.ep0 * math.cos(t)
+    # x2 = x0 + line.ep1 * math.sin(t)
+    # y2 = y0 + -line.ep1 * math.cos(t)
+
+    # x = x2 - x1
+    # y = y2 - y1
+    # return math.sqrt(x*x + y*y)
 
 def shouldPositionRight(player):
     if player.brain.ball.bearing_deg < -40.0 and \
