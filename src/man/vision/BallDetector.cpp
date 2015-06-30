@@ -114,6 +114,9 @@ void Ball::compute()
 
     //_confidence = (density > thresh).f() * (aspectRatio > thresh).f() * (diameterRatio > radThresh).f();
     _confidence = ((density > thresh) & (aspectRatio > thresh) & (diameterRatio > radThresh)).f();
+
+    // Hack/Sanity check to ensure we don't see crazy balls
+    if (dist > 600) _confidence = 0;
 }
 
 std::string Ball::properties()
