@@ -15,6 +15,7 @@ from . import Leds
 from . import robots
 from . import GameController
 from . import FallController
+from . import SweetMoves
 
 # Packages and modules from sub-directories
 from .headTracker import HeadTracker
@@ -99,9 +100,13 @@ class Brain(object):
 
         # Used for obstacle detection
         self.obstacles = [0.] * 9
+        self.obstacleDetectors = ['n'] * 9
 
         self.ourScore = 0
         self.theirScore = 0
+
+        # So that we only try to sit down once upon receiving command
+        self.sitting = False
 
     def initTeamMembers(self):
         self.teamMembers = []
@@ -141,12 +146,20 @@ class Brain(object):
         """
         Main control loop
         """
+        # If we're being told to sit do that above all else
+        if self.interface.sitDown.toggle:
+            if self.sitting:
+                return
+            self.sitting = True
+            print "BEHAVIORS is starting to sit"
+            self.nav.performSweetMove(SweetMoves.SIT_POS)
+
         # Update Environment
         self.time = time.time()
         
         # Update objects
         self.updateVisionObjects()
-        # self.updateObstacles()
+        self.updateObstacles()
         self.updateMotion()
         self.updateLoc()
         self.getCommUpdate()
@@ -249,11 +262,21 @@ class Brain(object):
 
     def updateObstacles(self):
         self.obstacles = [0.] * 9
-        # size = self.interface.fieldObstacles.obstacle_size()
-        # for i in range(size):
-        #     curr_obst = self.interface.fieldObstacles.obstacle(i)
-        #     if curr_obst.position is not curr_obst.position.NONE:
-        #         self.obstacles[int(curr_obst.position)] = curr_obst.distance
+        self.obstacleDetectors = ['n'] * 9
+        size = self.interface.fieldObstacles.obstacle_size()
+        for i in range(size):
+            curr_obst = self.interface.fieldObstacles.obstacle(i)
+            if curr_obst.position != curr_obst.position.NONE:
+                self.obstacles[int(curr_obst.position)] = curr_obst.distance
+
+                if curr_obst.detector == curr_obst.detector.ARMS:
+                    self.obstacleDetectors[int(curr_obst.position)] = 'a'
+                elif curr_obst.detector == curr_obst.detector.SONARS:
+                    self.obstacleDetectors[int(curr_obst.position)] = 's'
+                elif curr_obst.detector == curr_obst.detector.VISION:
+                    self.obstacleDetectors[int(curr_obst.position)] = 'v'
+                else:
+                    self.obstacleDetectors[int(curr_obst.position)] = 'n'
 
     def activeTeamMates(self):
         activeMates = 0

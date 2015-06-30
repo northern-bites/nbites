@@ -4,12 +4,12 @@ import RoleConstants as role
 import ChaseBallTransitions as chase
 import ChaseBallConstants as chaseConstants
 import ClaimTransitions as claims
-from SupporterConstants import getSupporterPosition, CHASER_DISTANCE
+from SupporterConstants import getSupporterPosition, CHASER_DISTANCE, findChaserHome, findDefenderHome
 import noggin_constants as NogginConstants
 from ..navigator import Navigator as nav
 from objects import Location, RobotLocation
 from ..util import *
-from math import hypot, fabs
+from math import hypot, fabs, atan2, degrees
 import random
 
 @defaultState('branchOnRole')
@@ -45,9 +45,12 @@ def positionAtHome(player):
     """
     if player.brain.ball.vis.on:
         ball = player.brain.ball
+        bearing = ball.bearing_deg
         # player.brain.tracker.trackBall()
     elif player.brain.sharedBall.ball_on:
         ball = player.brain.sharedBall
+        bearing = degrees(atan2(ball.y - player.brain.loc.y,
+                        ball.x - player.brain.loc.x)) - player.brain.loc.h
         # player.brain.tracker.trackSharedBall()
     else:
         ball = None
@@ -56,10 +59,11 @@ def positionAtHome(player):
 
     if ball != None:
         if role.isLeftDefender(player.role):
-            home = transitions.findDefenderHome(True, ball, player.homePosition.h)
+            home = findDefenderHome(True, ball, bearing + player.brain.loc.h)
         elif role.isRightDefender(player.role):
-            home = transitions.findDefenderHome(False, ball, player.homePosition.h)
-        # elif role.isSecondChaser(player.role):
+            home = findDefenderHome(False, ball, bearing + player.brain.loc.h)
+        elif role.isSecondChaser(player.role):
+            home = findChaserHome(ball, bearing + player.brain.loc.h)
         else:
             home = player.homePosition
 
@@ -84,13 +88,6 @@ def watchForBall(player):
     if player.firstFrame():
         player.brain.nav.stand()
 
-    # if player.brain.ball.vis.on:
-    #     player.brain.tracker.trackBall()
-    # elif player.brain.sharedBall.ball_on:
-    #     player.brain.tracker.trackSharedBall()
-    # else:
-    #     player.brain.tracker.repeatWidePan()
-
     if transitions.tooFarFromHome(20, player):
         return player.goNow('positionAtHome')
 
@@ -107,6 +104,11 @@ def positionAsSupporter(player):
     positionAsSupporter.position = getSupporterPosition(player, player.role)
 
     if player.firstFrame():
+        player.brain.nav.goTo(positionAsSupporter.position, precision = nav.GENERAL_AREA,
+                              speed = nav.QUICK_SPEED, avoidObstacles = True,
+                              fast = False, pb = False)
+
+    if positionAsSupporter.position.distTo(player.brain.loc) > 20:
         player.brain.nav.goTo(positionAsSupporter.position, precision = nav.GENERAL_AREA,
                               speed = nav.QUICK_SPEED, avoidObstacles = True,
                               fast = False, pb = False)

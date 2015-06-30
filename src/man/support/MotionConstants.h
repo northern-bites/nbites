@@ -2,6 +2,7 @@
 
 #include "Kinematics.h"
 #include "PMotion.pb.h"
+#include "JointNames.h"
 
 namespace man
 {
@@ -12,46 +13,6 @@ namespace man
             LEFT_SUPPORT = 0,
             RIGHT_SUPPORT
         };
-
-
-        /**
-         * @brief Converts a JointAngles message to a vector of 
-         *        float joint angle values indexed according to
-         *        the Kinematics::JointName indices.
-         * 
-         * @return A vector of joint angles.
-         */
-        static std::vector<float> toJointAngles(
-            const messages::JointAngles& ja
-            )
-        {
-            std::vector<float> result(Kinematics::NUM_JOINTS, 0.0f);
-            result[Kinematics::HEAD_YAW] = ja.head_yaw();
-            result[Kinematics::HEAD_PITCH] = ja.head_pitch();
-            result[Kinematics::L_SHOULDER_PITCH] = ja.l_shoulder_pitch();
-            result[Kinematics::L_SHOULDER_ROLL] = ja.l_shoulder_roll();
-            result[Kinematics::L_ELBOW_YAW] = ja.l_elbow_yaw();
-            result[Kinematics::L_ELBOW_ROLL] = ja.l_elbow_roll();
-            result[Kinematics::L_HIP_YAW_PITCH] = ja.l_hip_yaw_pitch();
-            result[Kinematics::L_HIP_ROLL] = ja.l_hip_roll();
-            result[Kinematics::L_HIP_PITCH] = ja.l_hip_pitch();
-            result[Kinematics::L_KNEE_PITCH] = ja.l_knee_pitch();
-
-            result[Kinematics::L_ANKLE_PITCH] = ja.l_ankle_pitch();
-            result[Kinematics::L_ANKLE_ROLL] = ja.l_ankle_roll();
-            result[Kinematics::R_HIP_YAW_PITCH] = ja.r_hip_yaw_pitch();
-            result[Kinematics::R_HIP_ROLL] = ja.r_hip_roll();
-            result[Kinematics::R_HIP_PITCH] = ja.r_hip_pitch();
-            result[Kinematics::R_KNEE_PITCH] = ja.r_knee_pitch();
-            result[Kinematics::R_ANKLE_PITCH] = ja.r_ankle_pitch();
-            result[Kinematics::R_ANKLE_ROLL] = ja.r_ankle_roll();
-            result[Kinematics::R_SHOULDER_PITCH] = ja.r_shoulder_pitch();
-            result[Kinematics::R_SHOULDER_ROLL] = ja.r_shoulder_roll();
-            result[Kinematics::R_ELBOW_YAW] = ja.r_elbow_yaw();
-            result[Kinematics::R_ELBOW_ROLL] = ja.r_elbow_roll();
-
-            return result;
-        }
 
         namespace MotionConstants {
 

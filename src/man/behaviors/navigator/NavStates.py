@@ -130,12 +130,11 @@ goToPosition.close = False
 # State where we are moving away from an obstacle
 def dodge(nav):
 
-    # TODO: HACK FOR BRAZIL - THIS IS USED WHEN IT'S ARM-ONLY DETECTION
     if nav.firstFrame():
         ## SET UP the dodge direction based on where the obstacle is
         # if directly in front of us, move back and to one side based on
         # where the goToPosition dest is
-        if dodge.armPosition == 1:
+        if dodge.obstaclePosition == 1:
             print "Dodging NORTH obstacle"
             relDest = helper.getRelativeDestination(nav.brain.loc,
                                                     goToPosition.dest)
@@ -143,19 +142,19 @@ def dodge(nav):
                 direction = -1
             else:
                 direction = 1
-            dodge.dest = RelRobotLocation(-15, direction*10, 0)
-        elif dodge.armPosition == 2:
+            dodge.dest = RelRobotLocation(-10, direction*10, 0)
+        elif dodge.obstaclePosition == 2:
             print "Dodging NORTHEAST obstacle"
-            dodge.dest = RelRobotLocation(-5, 15, 0)
-        elif dodge.armPosition == 3:
+            dodge.dest = RelRobotLocation(10, 20, 0)
+        elif dodge.obstaclePosition == 3:
             print "Dodging EAST obstacle"
             dodge.dest = RelRobotLocation(0, 20, 0)
-        elif dodge.armPosition == 4:
+        elif dodge.obstaclePosition == 4:
             print "Dodging SOUTHEAST obstacle"
-            dodge.dest = RelRobotLocation(5, 15, 0)
+            dodge.dest = RelRobotLocation(10, 20, 0)
         # if directly behind us, move forward and to one side based on
         # where the goToPosition dest is
-        elif dodge.armPosition == 5:
+        elif dodge.obstaclePosition == 5:
             print "Dodging SOUTH obstacle"
             relDest = helper.getRelativeDestination(nav.brain.loc,
                                                     goToPosition.dest)
@@ -164,17 +163,20 @@ def dodge(nav):
             else:
                 direction = 1
             dodge.dest = RelRobotLocation(15, direction*10, 0)
-        elif dodge.armPosition == 6:
+        elif dodge.obstaclePosition == 6:
             print "Dodging SOUTHWEST obstacle"
-            dodge.dest = RelRobotLocation(5, -15, 0)
-        elif dodge.armPosition == 7:
+            dodge.dest = RelRobotLocation(10, -20, 0)
+        elif dodge.obstaclePosition == 7:
             print "Dodging WEST obstacle"
             dodge.dest = RelRobotLocation(0, -20, 0)
-        elif dodge.armPosition == 8:
+        elif dodge.obstaclePosition == 8:
             print "Dodging NORTHWEST obstacle"
-            dodge.dest = RelRobotLocation(-5, -15, 0)
+            dodge.dest = RelRobotLocation(10, -20, 0)
         else:
             return
+
+    # print(nav.brain.obstacles)
+    # print(nav.brain.obstacleDetectors)
 
     dest = RelRobotLocation(dodge.dest.relX + random(),
                             dodge.dest.relY + random(),
@@ -250,6 +252,13 @@ def locationsMatch(odom, dest):
     and (abs(odom.relH - degrees(dest.relH)) < 30.0):
         return True
 
+    # print ("Not true; relx diff:", abs(odom.relX - dest.relX))
+    # print ("relly diff: ", abs(odom.relY - dest.relY))
+    # print ("relh diff:", abs(odom.relH - dest.relH))
+    # print ("degres", degrees(dest.relH), "normal: ", dest.relH)
+    # if nav.counter % 30 == 0:
+    #     print ("odomH: ", odom.relH, "odomDeg", degrees(odom.relH), "destH:", dest.relH, "destH deg:", degrees(dest.relH))
+
     return False
 
 def walkingTo(nav):
@@ -257,23 +266,43 @@ def walkingTo(nav):
     State to be used for odometry walking.
     """
     if nav.firstFrame():
+        print ("Resetting odometry!")
         nav.brain.interface.motionRequest.reset_odometry = True
         nav.brain.interface.motionRequest.timestamp = int(nav.brain.time * 1000)
         helper.stand(nav)
         return nav.stay()
 
+
+    walkingTo.currentOdo = RelRobotLocation(nav.brain.interface.odometry.x,
+                         nav.brain.interface.odometry.y,
+                         nav.brain.interface.odometry.h)
+
     # TODO why check standing?
     if nav.brain.interface.motionStatus.standing:
-        walkingTo.currentOdo = RelRobotLocation(nav.brain.interface.odometry.x,
-                             nav.brain.interface.odometry.y,
-                             nav.brain.interface.odometry.h)
 
         if len(walkingTo.destQueue) > 0:
             dest = walkingTo.destQueue.popleft()
             helper.setOdometryDestination(nav, dest, walkingTo.speed)
+            print ("MY dest: ", dest.relX, dest.relY, dest.relH)
 
-        elif locationsMatch(nav.destination, walkingTo.currentOdo):
-            return nav.goNow('standing')
+    if locationsMatch(nav.destination, walkingTo.currentOdo):
+        return nav.goNow('standing')
+
+    # walkingTo.currentOdow = RelRobotLocation(nav.brain.interface.odometry.x,
+    #                          nav.brain.interface.odometry.y,
+    #                          nav.brain.interface.odometry.h)
+    if nav.counter % 30 == 0:
+        print "Current odo:"
+        print ("x:", walkingTo.currentOdo.relX)
+        print ("y:", walkingTo.currentOdo.relY)
+        print ("h:", walkingTo.currentOdo.relH)
+        # print "Current odow:"
+        # print ("x:", walkingTo.currentOdow.relX)
+        # print ("y:", walkingTo.currentOdow.relY)
+        # print ("h:", walkingTo.currentOdow.relH)
+        # print "---------------"
+
+
 
     return nav.stay()
 
