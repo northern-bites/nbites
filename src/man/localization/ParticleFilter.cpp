@@ -62,11 +62,12 @@ ParticleFilter::~ParticleFilter()
 void ParticleFilter::update(const messages::RobotLocation& odometryInput,
                             messages::FieldLines&          linesInput,
                             messages::Corners&             cornersInput,
+                            messages::CenterCircle&        circleInput,
                             const messages::FilteredBall*  ballInput)
 {
     // Motion system and vision system update step
     motionSystem->update(particles, odometryInput, errorMagnitude);
-    bool updatedVision = visionSystem->update(particles, linesInput, cornersInput, ballInput, poseEstimate);
+    bool updatedVision = visionSystem->update(particles, linesInput, cornersInput, circleInput, ballInput, poseEstimate);
 
     // Resample if vision updated
     if(updatedVision) {

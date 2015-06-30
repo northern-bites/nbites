@@ -53,6 +53,7 @@ void LocalizationModule::update()
     curLines = linesInput.message();
     curCorners = cornersInput.message();
     curBall = ballInput.message();
+    messages::CenterCircle curCircle = circleInput.message();
 
     const messages::FilteredBall* ball = NULL;
 #ifndef OFFLINE
@@ -63,7 +64,7 @@ void LocalizationModule::update()
 #endif
 
     // Update filter
-    particleFilter->update(curOdometry, curLines, curCorners, ball);
+    particleFilter->update(curOdometry, curLines, curCorners, curCircle, ball);
 
 //this is part of something old that never executes, check out
 //the ifdef below; same code but it is executed when we want to
@@ -133,6 +134,7 @@ void LocalizationModule::run_()
     motionInput.latch();
     linesInput.latch();
     cornersInput.latch();
+    circleInput.latch();
 #ifndef OFFLINE
     gameStateInput.latch();
     ballInput.latch();

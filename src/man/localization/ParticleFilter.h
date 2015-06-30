@@ -69,6 +69,7 @@ public:
     void update(const messages::RobotLocation& motionInput,
                 messages::FieldLines&          linesInput,
                 messages::Corners&             cornersInput,
+                messages::CenterCircle&        circleInput,
                 const messages::FilteredBall*  ballInput);
 
     // Overload to use ball info
