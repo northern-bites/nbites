@@ -9,6 +9,9 @@
 #include "Hough.h"
 #include "Kinematics.h"
 #include "Homography.h"
+#include "Field.h"
+
+#define RICH_LOGGING
 
 namespace man {
 namespace vision {
@@ -25,6 +28,7 @@ public:
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
     HoughLineList* getLines(bool topCamera = true) const { return houghLines[!topCamera]; }
+	DebugImage* getDebugImage(bool topCamera = true) const { return debugImage[!topCamera]; }
 
 protected:
     virtual void run_();
@@ -39,6 +43,8 @@ private:
     Kinematics* kinematics[2];
     FieldHomography* homography[2];
     FieldLineList* fieldLines[2];
+	DebugImage* debugImage[2];
+	Field* field;
 };
 
 }

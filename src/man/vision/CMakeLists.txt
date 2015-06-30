@@ -5,10 +5,11 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.8.3 )
 ADD_DEFINITIONS( -mmmx )
 
 ############################ PROJECT SOURCES FILES
-SET( VISION_SRCS 
+SET( VISION_SRCS
   VisionModule.cpp
   Edge.cpp
   FastBlob.cpp
+  Field.cpp
   FrontEnd.cpp
   Kinematics.cpp
   Homography.cpp

@@ -29,6 +29,11 @@ VisionModule::VisionModule()
         kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography(i == 0);
         fieldLines[i] = new FieldLineList();
+#ifdef RICH_LOGGING
+		debugImage[i] = new DebugImage(320, 240);
+#else
+		debugImage[i] = new DebugImage(0, 0);
+#endif
 
         // TODO flag
         bool fast = true;
@@ -36,6 +41,10 @@ VisionModule::VisionModule()
         edgeDetector[i]->fast(fast);
         hough[i]->fast(fast);
     }
+	field = new Field();
+#ifdef RICH_LOGGING
+	field->setDebugImage(debugImage[1]);
+#endif
 }
 
 VisionModule::~VisionModule()
@@ -50,6 +59,7 @@ VisionModule::~VisionModule()
         delete kinematics[i];
         delete homography[i];
         delete fieldLines[i];
+		delete debugImage[i];
     }
 }
 
@@ -100,8 +110,17 @@ void VisionModule::run_()
 
         // Approximate brightness gradient
         edgeDetector[i]->gradient(yImage);
-        
+
         times[i][1] = timer.end();
+
+		// only calculate the field in the top camera
+		// NEWVISION (need actual horizon information)
+		if (i ==0) {
+			field->setImages(frontEnd[0]->whiteImage(), frontEnd[0]->greenImage(),
+							 frontEnd[0]->orangeImage());
+			field->findGreenHorizon(100, 0.0f);
+			debugImage[0]->drawRect(0, 0, 10, 10, 1);
+		}
 
         // Run edge detection
         edgeDetector[i]->edgeDetect(greenImage, *(edges[i]));
