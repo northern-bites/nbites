@@ -52,7 +52,7 @@ bool BallDetector::findBall(ImageLiteU8 orange, double cameraHeight)
         if (b.confidence() > .5) {
 #ifdef OFFLINE
             candidates.push_back(b);
-            std::cout << "accepted ball because:\n" << b.properties() << std::endl;
+   //         std::cout << "accepted ball because:\n" << b.properties() << std::endl;
 #endif
             if (b.dist < _best.dist) {
                 _best = b;
@@ -61,7 +61,7 @@ bool BallDetector::findBall(ImageLiteU8 orange, double cameraHeight)
         else {
             // TODO: ball debug flag
 #ifdef OFFLINE
-            std::cout << "declined ball because:\n" << b.properties() << std::endl;
+    //        std::cout << "declined ball because:\n" << b.properties() << std::endl;
 #endif
         }
     }

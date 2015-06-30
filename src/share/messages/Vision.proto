@@ -32,3 +32,9 @@ message Corners
 {
     repeated Corner corner = 1;
 }
+
+message CenterCircle
+{
+    optional float x = 1;
+    optional float y = 2;
+}

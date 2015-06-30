@@ -30,11 +30,11 @@ AdjustParams::AdjustParams()
   scoreThreshold = 32;
 }
 
-AdjustSet::AdjustSet()
-{
+AdjustSet::AdjustSet(bool strict) {
   params[1].angleThr = FuzzyThr(0.08f, 0.12f);
   params[1].distanceThr = FuzzyThr(0.7f, 2.0f);
-  params[1].fitThresold = 0.6;
+  params[1].fitThresold = strict ? 0.55 : 10.0;
+
 }
 
 void HoughLine::set(int rIndex, int tIndex, double r, double t, double score, int index)
@@ -163,6 +163,10 @@ bool HoughLine::adjust(EdgeList& edges, const AdjustParams& p, bool capture)
 
   return true;
 }
+
+// bool HoughLine::equals(const HoughLine& hl) {
+//   return (rIndex() == hl.rIndex() && tIndex() == hl.tIndex());
+// }
 
 string HoughLine::print() const
 {
@@ -491,6 +495,153 @@ bool CornerDetector::ccw(double ax, double ay,
   return (cy-ay)*(bx-ax) > (by-ay)*(cx-ax);
 }
 
+// *******************
+// *                 *
+// *  Center Circle  *
+// *                 *
+// *******************
+CenterCircleDetector::CenterCircleDetector() 
+{
+  set();
+}
+
+void CenterCircleDetector::set()
+{
+  // Set parameters
+  hardCap = 800;
+  maxEdgeDistanceSquared = 500 * 500;
+  ccr = CENTER_CIRCLE_RADIUS;
+  binWidth = 75;
+  binCount = 8;
+  minVotesInMaxBin = 0.15;
+}
+
+bool CenterCircleDetector::detectCenterCircle(EdgeList& edges)
+{
+  std::vector<Point> potentials = calculatePotentials(edges);
+  
+#ifdef OFFLINE
+  _potentials = potentials;
+  if (_potentials.size() > hardCap && getMaxBin(_potentials, _ccx, _ccy)) {
+    _potentials.push_back(Point(_ccx, _ccy));
+    return true;
+  } else
+    _potentials.push_back(Point(0.0, 0.0));
+  return false;
+#endif
+
+  return (_potentials.size() > hardCap && getMaxBin(potentials, _ccx, _ccy));
+}
+
+// Get potential cc centers and clean edge list
+std::vector<Point> CenterCircleDetector::calculatePotentials(EdgeList& edges)
+{
+  std::vector<Point> vec;
+  AngleBinsIterator<Edge> abi(edges);
+  for (Edge* e = *abi; e; e = *++abi) {
+    double distance = e->field().x() * e->field().x() + e->field().y() * e->field().y();
+    if (e->field().y() >= 0 && distance < maxEdgeDistanceSquared) {
+      vec.push_back(Point(e->field().x() + ccr*sin(e->field().t()), e->field().y() - ccr*cos(e->field().t())));
+      vec.push_back(Point(e->field().x() - ccr*sin(e->field().t()), e->field().y() + ccr*cos(e->field().t())));
+    }
+  }
+  return vec;
+}
+
+// Set (x0,y0) center of most populated bin
+bool CenterCircleDetector::getMaxBin(std::vector<Point> vec, double& x0, double& y0)
+{
+  int bcSq = binCount * binCount;
+
+  // Fill four sets of overlapping bins
+  int bins1[bcSq]; 
+  int bins2[bcSq];
+  int bins3[bcSq]; 
+  int bins4[bcSq]; 
+
+  std::fill(bins1, bins1 + bcSq, 0);
+  std::fill(bins2, bins2 + bcSq, 0);
+  std::fill(bins3, bins3 + bcSq, 0);
+  std::fill(bins4, bins4 + bcSq, 0);
+
+  int xOffset = binCount * binWidth / 2;
+
+  // Add each potential point to one bin in each of the four overlapping grids
+  for (int i = 0; i < vec.size(); i++) {
+    Point p = vec[i];
+    // +0, +0
+    int xbin = roundDown((int)p.first + xOffset) / binWidth;
+    int ybin = roundDown((int)p.second) / binWidth;
+    bins1[min(xbin, binCount-1) + binCount * min(ybin, binCount-1)] += 1;
+
+    // +0.5, +0.5
+    xbin = roundDown((int)p.first + binWidth/2 + xOffset) / binWidth;
+    ybin = roundDown((int)p.second + binWidth/2) / binWidth;  
+    bins2[min(xbin, binCount-1) + binCount * min(ybin, binCount-1)] += 1;
+
+    // +0.5, +0
+    xbin = roundDown((int)p.first + binWidth/2 + xOffset) / binWidth;
+    ybin = roundDown((int)p.second) / binWidth;  
+    bins3[min(xbin, binCount-1) + binCount * min(ybin, binCount-1)] += 1;
+
+    // +0, +0.5
+    xbin = roundDown((int)p.first + xOffset) / binWidth;
+    ybin = roundDown((int)p.second + binWidth/2) / binWidth;  
+    bins4[min(xbin, binCount-1) + binCount * min(ybin, binCount-1)] += 1;
+  }
+
+  int winBin, votes = 0;
+
+  // Tally bins
+  for (int i = 0; i < bcSq; i++) {
+    if (bins1[i] > votes) {
+      votes = bins1[i];
+      winBin = i;
+    }
+    if (bins2[i] > votes) {
+      votes = bins2[i];
+      winBin = i + bcSq;
+    }
+    if (bins3[i] > votes) {
+      votes = bins3[i];
+      winBin = i + bcSq*2;
+    }
+    if (bins4[i] > votes) {
+      votes = bins4[i];
+      winBin = i + bcSq*3;
+    }
+  }
+
+  if (votes > minVotesInMaxBin * vec.size()) {
+    if (winBin < bcSq) {
+      x0 = ((winBin % binCount) + 0.5) * binWidth - xOffset;
+      y0 = (winBin / binCount + 0.5) * binWidth; 
+    } else if (winBin < bcSq *2) {
+      winBin -= bcSq;
+      x0 = (winBin % binCount) * binWidth - (xOffset);
+      y0 = (winBin / binCount) * binWidth; 
+    } else if (winBin < bcSq * 3) {
+      winBin -= bcSq * 2;
+      x0 = (winBin % binCount) * binWidth - (xOffset);
+      y0 = (winBin / binCount + 0.5) * binWidth; 
+    } else {
+      winBin -= bcSq * 3;
+      x0 = (winBin % binCount + 0.5) * binWidth - xOffset;
+      y0 = (winBin / binCount) * binWidth; 
+    }
+
+    std::cout << "CC at (" << x0 << "," << y0 << "). " << (double)votes * 100/(double)vec.size() << "\%" << 
+    " Potentials: " << vec.size() << std::endl;
+
+    return true;
+  } else {
+    std::cout << "!CC: " << (double)votes * 100/(double)vec.size() << "\%" << std::endl;
+
+  }
+
+  return false;
+}
+
 // **************************
 // *                        *
 // *  Field Lines and List  *
@@ -711,6 +862,7 @@ void FieldLineList::classify(GoalboxDetector& boxDetector, CornerDetector& corne
     }
   }
 }
+
 
 // *****************
 // *               *
@@ -966,7 +1118,7 @@ void HoughSpace::peaks(HoughLineList& hlList)
   times[3] = timer.time32();
 }
 
-void HoughSpace::adjust(EdgeList& edges, HoughLineList& hlList)
+void HoughSpace::adjust(EdgeList& edges, EdgeList& rejectedEdges, HoughLineList& hlList)
 {
   TickTimer timer;
 
@@ -992,10 +1144,17 @@ void HoughSpace::adjust(EdgeList& edges, HoughLineList& hlList)
       ++hl;
   }
 
+  rejectedEdges.reset();
+
+  AngleBinsIterator<Edge> rejectABI(edges);
+  for (Edge* e = *rejectABI; e; e = *++rejectABI)
+    if (e->memberOf() == 0) {
+      rejectedEdges.add(e->x(), e->y(), e->mag(), e->angle());
+    }
   times[4] = timer.time32();
 }
 
-void HoughSpace::run(EdgeList& edges, HoughLineList& hlList)
+void HoughSpace::run(EdgeList& edges, EdgeList& rejectedEdges, HoughLineList& hlList)
 {
   TickTimer timer;
 
@@ -1003,10 +1162,11 @@ void HoughSpace::run(EdgeList& edges, HoughLineList& hlList)
   processEdges(edges);
   smooth();
   peaks(hlList);
-  adjust(edges, hlList);
+  adjust(edges, rejectedEdges, hlList);
 
   times[5] = timer.time32();
 }
+
 
 }
 }
