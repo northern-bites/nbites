@@ -48,14 +48,11 @@ void SharedBallModule::run_()
     {
         worldModelIn[i].latch();
         worldMessages[i] = worldModelIn[i].message();
-        std::cout<<"[DEBUG] Run: WorldMessages.Ball_On: "<<worldMessages[i].ball_on()<<std::endl;
         if (worldMessages[i].ball_on())
         {
-            std::cout<<"[DEBUG] Increasing numRobotsOn"<<std::endl;
             numRobotsOn++;
-        } else {
-            std::cout<<"[DEBUG] numRobotsOn NOT increased"<<std::endl;
         }
+
         // resets ball estimates for each robot
         ballX[i] = -1.f;
         ballY[i] = -1.f;
@@ -69,7 +66,6 @@ void SharedBallModule::run_()
     ballIn.latch();
     myBall = ballIn.message();
 
-    std::cout<<"[DEBUG] numRobotsOn is "<<numRobotsOn<<std::endl;
     if (numRobotsOn)
     {
 
@@ -85,7 +81,6 @@ void SharedBallModule::run_()
     // sets the regular shared ball message
     sharedBallMessage.get()->set_x(x);
     sharedBallMessage.get()->set_y(y);
-    std::cout<<"[DEBUG] Setting BallOn to ShBall Msg. Value: "<<ballOn<<std::endl;
     sharedBallMessage.get()->set_ball_on(ballOn);
     sharedBallMessage.get()->set_reliability(reliability);
     sharedBallOutput.setMessage(sharedBallMessage);
@@ -162,11 +157,8 @@ void SharedBallModule::chooseRobots()
     }
 
     // now decide whether or not to use sharedball
-    std::cout<<"[DEBUG] numWithMaxEstimate: "<<numWithMaxEstimate<<std::endl;
-    std::cout<<"[DEBUG] maxInEstimate: "<<maxInEstimate<<std::endl;
     if (numWithMaxEstimate > maxInEstimate)
     {
-        std::cout<<"[DEBUG] Decided to use SharedBall"<<std::endl;
         bool goalieOn = false;
         for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++)
         {
@@ -186,10 +178,7 @@ void SharedBallModule::chooseRobots()
             return;
         } */
         // else the goalie will be used to break the tie!
-    } else {
-        std::cout<<"[DEBUG] Decided NOT to use SharedBall"<<std::endl;
-        std::cout<<"[INFO] Ball On Value: "<<ballOn<<std::endl;
-    }
+    } 
 
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++)
     {
@@ -212,7 +201,6 @@ void SharedBallModule::weightedavg()
 {
     if (!ballOn)
     {
-        std::cout<<"BallOn: False. No Wght.Avg"<<std::endl;
         return;
     }
 
@@ -256,9 +244,7 @@ void SharedBallModule::weightedavg()
         x = numx / sumweight;
         y = numy / sumweight;
         ballOn = true;
-    } else {
-        std::cout<<"Error! SumWeight is 0!"<<std::endl;
-    }
+    } 
 }
 
 

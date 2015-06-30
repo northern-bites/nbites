@@ -66,7 +66,6 @@ def shouldApproachBall(player):
     return True
 
 def shouldFindSharedBall(player):
-    return False
     return (player.brain.sharedBall.ball_on and
             player.brain.sharedBall.reliability >= 1)
 
