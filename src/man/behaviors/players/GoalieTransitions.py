@@ -248,15 +248,24 @@ def facingASideline(player):
     # Add in checks to not add repeat lines?
 
     for i in range(0, visionLines.line_size()):
-        r = visionLines.line(i).inner.r
-        t = math.degrees(visionLines.line(i).inner.t)
-        length = getLineLength(visionLines.line(i).inner)
-        sidelineLength = 50.0
-        if (math.fabs(length - sidelineLength) < 10.0):
-            print "I THINK I SEE A SIDELINE"
-            print "-------------------------"
-            print ("R", r)
-            print ("T", t)
+        r1 = visionLines.line(i).inner.r
+        t1 = math.degrees(visionLines.line(i).inner.t)
+        length1 = getLineLength(visionLines.line(i).inner)
+        for j in range(0, visionLines.line_size()):
+            r2 = visionLines.line(j).inner.r
+            t2 = math.degrees(visionLines.line(j).inner.t)
+            length2 = getLineLength(visionLines.line(j).inner)
+
+            if (math.fabs(t1 - t2) - 90.0 < 15.0) and \
+            r1 != 0.0 and r2 != 0.0 \
+            and i is not j:
+                print "I THINK I SEE A SIDELINE"
+                print "-------------------------"
+                print ("R", r1)
+                print ("R2", r2)
+                print ("T", t1)
+                print ("T2", t2)
+                print ("i:", i, "j:", j)
 
     return False
 
