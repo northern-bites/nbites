@@ -1,5 +1,6 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
+from ..navigator import Navigator
 from ..util import *
 from objects import Location
 from math import fabs, degrees
@@ -35,7 +36,7 @@ def spinSearch(player):
         my = player.brain.loc
         ball = Location(player.brain.ball.x, player.brain.ball.y)
         spinDir = my.spinDirToPoint(ball)
-        player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
+        player.setWalk(0, 0, spinDir*Navigator.QUICK_SPEED)
         player.brain.tracker.lookToSpinDirection(spinDir)
 
 @superState('gameControllerResponder')
@@ -76,9 +77,10 @@ def scrumStrategy(player):
 def backPedal(player):
     if player.firstFrame():
         player.setWalk(constants.BACK_PEDAL_SPEED, 0., 0.)
+        player.brain.tracker.repeatFastNarrowPan()
 
     elif player.stateTime > constants.BACK_PEDAL_TIME:
-        return player.goLater('spinForwardSearch')
+        return player.goLater('playOffBall')
 
 @superState('scrumStrategy')
 @stay

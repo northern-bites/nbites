@@ -194,7 +194,12 @@ void HoughLineList::mapToField(const FieldHomography& h)
 
 Corner::Corner(FieldLine* first_, FieldLine* second_, CornerID id_)
   : std::pair<FieldLine*, FieldLine*>(first_, second_), id(id_)
-{}
+{
+  const GeoLine& field1 = (*first)[0].field();
+  const GeoLine& field2 = (*second)[0].field();
+
+  field1.intersect(field2, x, y);
+}
 
 string Corner::print() const
 {
@@ -257,7 +262,7 @@ bool GoalboxDetector::validBox(const HoughLine& line1, const HoughLine& line2) c
   const GeoLine& field2 = line2.field();
 
   // Goalbox = two field lines that are parallel, seperated by 60 cm, 
-  // and both over 60 cm in length
+  // and both over 80 cm in length
 
   // (1) Parallel
   // NOTE this check also requires that the robot is not in between the lines 
@@ -270,9 +275,9 @@ bool GoalboxDetector::validBox(const HoughLine& line1, const HoughLine& line2) c
   double distBetween = fabs(field1.pDist(field2.r()*cos(field2.t()), field2.r()*sin(field2.t())));
   bool seperation = fabs(distBetween - GOALBOX_DEPTH) < seperationThreshold();
 
-  // (3) Both over 60 cm in length
-  bool length1 = field1.ep1() - field1.ep0() > 60;
-  bool length2 = field2.ep1() - field2.ep0() > 60;
+  // (3) Both over 150 cm in length
+  bool length1 = field1.ep1() - field1.ep0() > 150;
+  bool length2 = field2.ep1() - field2.ep0() > 150;
   bool length = length1 && length2;
 
   return parallel && seperation && length;
@@ -385,7 +390,12 @@ bool CornerDetector::isCorner(const HoughLine& line1, const HoughLine& line2) co
   double normalizedT2 = (field2.r() > 0 ? field2.t() : field2.t() - M_PI);
   bool orthogonal = diffRadians(diffRadians(normalizedT1, normalizedT2), (M_PI / 2)) < orthogonalThreshold()*TO_RAD;
 
-  return intersects && farEnoughFromImageEdge && orthogonal;
+  // (3) Check that lines are longer than 70 cms
+  bool length1 = field1.ep1() - field1.ep0() > 70;
+  bool length2 = field2.ep1() - field2.ep0() > 70;
+  bool length = length1 && length2;
+
+  return intersects && farEnoughFromImageEdge && orthogonal && length;
 }
 
 CornerID CornerDetector::classify(const HoughLine& line1, const HoughLine& line2) const

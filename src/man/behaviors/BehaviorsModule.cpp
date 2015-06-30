@@ -256,6 +256,9 @@ void BehaviorsModule::prepareMessages()
     linesIn.latch();
     pyInterface.setVisionLines_ptr(&linesIn.message());
 
+    cornersIn.latch();
+    pyInterface.setCorners_ptr(&cornersIn.message());
+
     // obstacleIn.latch();
     // pyInterface.setObstacle_ptr(&obstacleIn.message());
 

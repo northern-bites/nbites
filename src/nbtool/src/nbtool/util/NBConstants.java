@@ -84,6 +84,7 @@ public class NBConstants {
 		map.put("MULTIBALL", new Class[]{ProtoBallView.class});
 		map.put("location", new Class[]{LocSwarmView.class});
 		map.put("proto-FieldLines", new Class[]{BasicLineView.class});
+		map.put("proto-Corners", new Class[]{BasicLineView.class});
 		return map;
 	}
 }

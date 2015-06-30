@@ -314,7 +314,7 @@ int Vision_func() {
         std::cout << line.field().print() << std::endl;
     }
 
-    std::cout << "TOP : " << top << std::endl;
+    std::cout << "TOP : " << topCamera << std::endl;
 
     std::cout << std::endl << "Field lines:" << std::endl;
     std::cout << "0.idx, 1.idx, id, idx" << std::endl;

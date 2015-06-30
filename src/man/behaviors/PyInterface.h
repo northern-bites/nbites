@@ -48,7 +48,8 @@ public:
     messages::SharedBall        const * sharedBall_ptr;
     messages::RobotLocation     const * sharedFlip_ptr;
     messages::NaiveBall         const * naiveBall_ptr;
-    messages::FieldLines     const * visionLines_ptr;
+    messages::FieldLines        const * visionLines_ptr;
+    messages::Corners           const * corners_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -85,6 +86,10 @@ public:
     void setVisionLines_ptr(const messages::FieldLines* msg)
     {
         visionLines_ptr = msg;
+    }
+    void setCorners_ptr(const messages::Corners* msg)
+    {
+        corners_ptr = msg;
     }
     void setWorldModel_ptr(const messages::WorldModel* msg,int i)
     {

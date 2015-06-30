@@ -8,7 +8,7 @@ from ..headTracker import HeadMoves
 import GoalieConstants as constants
 import math
 
-SAVING = True
+SAVING = False
 DIVING = False
 
 @superState('gameControllerResponder')
@@ -21,6 +21,7 @@ def gameInitial(player):
         player.zeroHeads()
         player.isSaving = False
         player.lastStiffStatus = True
+        player.justKicked = False
 
     # If stiffnesses were JUST turned on, then stand up.
     if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
@@ -58,6 +59,10 @@ def gameSet(player):
         player.stand()
         player.brain.interface.motionRequest.reset_odometry = True
         player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
+        watchWithLineChecks.correctFacing = False
+        watchWithLineChecks.numFixes = 0
+        watchWithLineChecks.numTurns = 0
+        watchWithLineChecks.looking = False
 
         # The ball will be right in front of us, for sure
         player.brain.tracker.lookToAngle(0)
@@ -77,23 +82,29 @@ def gamePlaying(player):
         player.brain.fallController.enabled = True
         player.penaltyKicking = False
         player.brain.nav.stand()
-        if player.lastDiffState != 'gameSet':
-            player.brain.resetGoalieLocalization()
+        # if player.lastDiffState != 'gameSet':
+        #     player.brain.resetGoalieLocalization()
 
     # Wait until the sensors are calibrated before moving.
     if (not player.brain.motion.calibrated):
         return player.stay()
 
-    #TODO penalty handling
-    # if player.penalized:
-    #     player.penalized = False
-    #     return player.goLater('afterPenalty')
+    # TODO penalty handling
+    if player.penalized:
+        player.penalized = False
+        return player.goLater('afterPenalty')
 
-    # if player.lastDiffState == 'afterPenalty':
-    #     return player.goLater('walkToGoal')
+    if player.lastDiffState == 'afterPenalty':
+        return player.goLater('walkToGoal')
 
     if player.lastDiffState == 'fallen':
-        return player.goLater('watchWithLineChecks')
+        #TODO fix this this is a hack to get rid of this thing
+        player.justKicked = False
+        if player.justKicked:
+            print "I just kicked, I'm returning to goal!"
+            return player.goLater('returnToGoal')
+        else:
+            return player.goLater('watchWithLineChecks')
 
     #TODO before game/scrimmage change this to watch;
     # this is better for testing purposes!
@@ -173,6 +184,9 @@ def watchWithLineChecks(player):
         watchWithLineChecks.lines[:] = []
         player.homeDirections = []
 
+        if player.lastDiffState == 'returnToGoal':
+            player.justKicked = False
+
         if player.lastDiffState is not 'lineCheckReposition' \
         and player.lastDiffState is not 'lineCheckTurn':
             print "My facing is not necessarily correct! I'm checking"
@@ -202,7 +216,7 @@ def watchWithLineChecks(player):
         watchWithCornerChecks.looking = False
         player.brain.tracker.trackBall()
 
-    if player.counter > 200:
+    if player.counter > 300:
         return player.goLater('watch')
 
     return Transition.getNextState(player, watchWithLineChecks)
@@ -338,7 +352,7 @@ def moveForward(player):
 def moveBackwards(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.brain.nav.walkTo(RelRobotLocation(-30, 0, 0))
+        player.brain.nav.walkTo(RelRobotLocation(-100.0, 0, 0))
 
     return Transition.getNextState(player, moveBackwards)
 
@@ -370,7 +384,8 @@ def kickBall(player):
         player.executeMove(player.kick.sweetMove)
 
     if player.counter > 30 and player.brain.nav.isStopped():
-            return player.goLater('didIKickIt')
+        player.justKicked = True
+        return player.goLater('didIKickIt')
 
     return player.stay()
 
@@ -400,7 +415,7 @@ def upUpUP(player):
         player.upDelay = 0
 
     if player.brain.nav.isStopped():
-        return player.goLater('watchWithCornerChecks')
+        return player.goLater('watchWithLineChecks')
     return player.stay()
 
 @superState('gameControllerResponder')

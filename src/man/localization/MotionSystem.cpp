@@ -1,5 +1,7 @@
 #include "MotionSystem.h"
 
+#include <ctime>
+
 namespace man {
 namespace localization {
 
@@ -8,17 +10,13 @@ static const float FRICTION_FACTOR_Y = 1.f;
 static const float FRICTION_FACTOR_H = 1.f;
 
 MotionSystem::MotionSystem(float xAndYNoise_, float hNoise_)
+    : rng(time(0))
 {
     xAndYNoise = xAndYNoise_;
     hNoise = hNoise_;
 }
-MotionSystem::~MotionSystem(){}
 
-void MotionSystem::resetNoise(float xyNoise_, float hNoise_)
-{
-    xAndYNoise = xyNoise_;
-    hNoise = hNoise_;
-}
+MotionSystem::~MotionSystem() {}
 
 /**
  * Updates the particle set according to the motion.
@@ -63,8 +61,8 @@ void MotionSystem::update(ParticleSet& particles,
         dH = dH_R                    * FRICTION_FACTOR_H;
 
         particle->shift(dX, dY, dH);
-
-        noiseShiftWithOdo(particle, dX, dY, dH, error);
+        // noiseShiftWithOdo(particle, dX, dY, dH, error);
+        randomlyShiftParticle(particle, false);
     }
 }
 
@@ -144,17 +142,19 @@ void MotionSystem::randomlyShiftParticle(Particle* particle, bool nearMid)
     if (nearMid)
         pumpNoise = 2.f;
 
-    // TODO: This should be experimentally determined
-    boost::uniform_real<float> coordRange(-1.f * xAndYNoise * pumpNoise, xAndYNoise * pumpNoise);
-    boost::uniform_real<float> headRange (-1.f * hNoise    , hNoise);
-    boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > coordNoise(rng, coordRange);
-    boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > headNoise(rng, headRange);
+    boost::normal_distribution<> xGaussian(0, xAndYNoise);
+    boost::normal_distribution<> yGaussian(0, xAndYNoise);
+    boost::normal_distribution<> hGaussian(0, hNoise);
 
-    // Determine random noise and shift the particle
+    boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > xNoise(rng, xGaussian);
+    boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > yNoise(rng, yGaussian);
+    boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > hNoise(rng, hGaussian);
+
     messages::RobotLocation noise;
-    noise.set_x(coordNoise());
-    noise.set_y(coordNoise());
-    noise.set_h(NBMath::subPIAngle(headNoise()));
+    noise.set_x(xNoise());
+    noise.set_y(yNoise());
+    noise.set_h(NBMath::subPIAngle(hNoise()));
+
     particle->shift(noise);
 }
 
