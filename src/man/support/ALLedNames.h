@@ -52,6 +52,7 @@ static const unsigned int NUM_CHEST_LEDS = 1;
  */
 static const unsigned int NUM_COMM_LEDS = 1;
 static const unsigned int NUM_CALIBRATION_LEDS  = 1;
+static const unsigned int NUM_DODGE_LEDS  = 1;
 static const unsigned int NUM_BALL_LEDS = 5;
 static const unsigned int NUM_GOALBOX_LEDS = NUM_FACE_LEDS - NUM_BALL_LEDS;
 static const unsigned int NUM_ROLE_LEDS = NUM_FACE_LEDS;
@@ -60,10 +61,12 @@ static const unsigned int NUM_LED_COLORS = 3;
 static const unsigned int NUM_LED_ORIENTATIONS = 2;
 static const unsigned int NUM_ONE_EYE_LEDS = NUM_LED_COLORS * NUM_FACE_LEDS;
 
-static const unsigned int NUM_UNIQUE_LEDS = 26;
+static const unsigned int NUM_UNIQUE_LEDS = 36;
 static const unsigned int NUM_RGB_LEDS[NUM_UNIQUE_LEDS] ={
     NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,
     NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,NUM_CALIBRATION_LEDS,
+    NUM_DODGE_LEDS,NUM_DODGE_LEDS,NUM_DODGE_LEDS,NUM_DODGE_LEDS,NUM_DODGE_LEDS,
+    NUM_DODGE_LEDS,NUM_DODGE_LEDS,NUM_DODGE_LEDS,NUM_DODGE_LEDS,NUM_DODGE_LEDS,
     NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,
     NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,NUM_COMM_LEDS,
     NUM_ROLE_LEDS,                                 // Left Eye
@@ -276,6 +279,16 @@ static const std::string * RGB_LED_STRINGS[NUM_UNIQUE_LEDS] ={
     &earL[LEFT_LED][3],             // 4
     &earL[LEFT_LED][4],             // 5
     &earL[RIGHT_LED][1],            // Right Calibration 1
+    &earL[RIGHT_LED][2],            // 2
+    &earL[RIGHT_LED][3],            // 3
+    &earL[RIGHT_LED][4],            // 4
+    &earL[RIGHT_LED][5],            // 5
+    &earL[LEFT_LED][0],             // Left Dodge 1
+    &earL[LEFT_LED][1],             // 2
+    &earL[LEFT_LED][2],             // 3
+    &earL[LEFT_LED][3],             // 4
+    &earL[LEFT_LED][4],             // 5
+    &earL[RIGHT_LED][1],            // Right Dodge 1
     &earL[RIGHT_LED][2],            // 2
     &earL[RIGHT_LED][3],            // 3
     &earL[RIGHT_LED][4],            // 4
