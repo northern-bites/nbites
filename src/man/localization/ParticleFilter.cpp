@@ -438,11 +438,7 @@ void ParticleFilter::resample()
         }
     }
 
-    // std::cout << "INJECTIONS" << std::endl;
-    // std::cout << wFast << std::endl;
-    // std::cout << wSlow << std::endl;
     // std::cout << 1.0 - (wFast / wSlow) << std::endl;
-    // std::cout << ni << std::endl;
 
     // Update particles
     particles = newParticles;
