@@ -78,18 +78,18 @@ bool VisionSystem::update(ParticleSet& particles,
     // Particle injections
     // (1) Reconstruct pose by finding the midpoint of the top goalbox
     injections.clear();
-    for (int i = 0; i < lines.line_size(); i++) {
-        const messages::FieldLine& field = lines.line(i);
-        if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
-            const messages::HoughLine& inner = field.inner();
+    // for (int i = 0; i < lines.line_size(); i++) {
+    //     const messages::FieldLine& field = lines.line(i);
+    //     if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
+    //         const messages::HoughLine& inner = field.inner();
 
-            LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirTopGoalbox : LocLineID::OurTopGoalbox);
-            messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(id, field);
-            ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 1, 5, 0.01);
-            if (reconstructed.onField())
-                injections.push_back(reconstructed);
-        }
-    }
+    //         LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirTopGoalbox : LocLineID::OurTopGoalbox);
+    //         messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(id, field);
+    //         ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 1, 5, 0.01);
+    //         if (reconstructed.onField())
+    //             injections.push_back(reconstructed);
+    //     }
+    // }
 
     // (2) Reconstruct pose from ball in set
     if (ball != NULL) {

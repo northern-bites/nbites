@@ -58,7 +58,8 @@ void LocalizationModule::update()
 #ifndef OFFLINE
     bool inSet = (STATE_SET == gameStateInput.message().state());
     if (inSet && (!gameStateInput.message().have_remote_gc() || 
-        gameStateInput.message().secs_remaining() != 600))
+        gameStateInput.message().secs_remaining() != 600) &&
+        curBall.vis().on())
         ball = &curBall;
 #endif
 
