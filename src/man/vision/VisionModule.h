@@ -53,6 +53,11 @@ public:
     void setCalibrationParams(int camera, std::string robotName);
     void setCalibrationParams(CalibrationParams* params, bool topCamera) { calibrationParams[!topCamera] = params; }
 
+#ifdef OFFLINE
+    void blackStar(bool blackStar) { blackStar_ = blackStar; }
+    bool blackStar() const {return blackStar_;}
+#endif
+
 protected:
     virtual void run_();
 
@@ -83,6 +88,8 @@ private:
 
     bool centerCircleDetected;
 
+    bool blackStar_;
+    
     // Lisp tree with color params saved
     nblog::SExpr colors;
 
@@ -93,6 +100,8 @@ private:
 
     nblog::SExpr* calibrationLisp;
     size_t image_index;
+
+#
 };
 
 }

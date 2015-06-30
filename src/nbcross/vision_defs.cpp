@@ -73,16 +73,7 @@ int Vision_func() {
         joints.ParseFromArray((void *) ptToJoints, numBytes[2]);
     }
 
-    // Empty Images to pass to vision module, top & bottom
-    messages::YUVImage realImage(buf, width, height, width);
-    messages::YUVImage emptyImage(width, height);
-
-    // Setup and run module
-    portals::Message<messages::YUVImage> rImageMessage(&realImage);
-    portals::Message<messages::YUVImage> eImageMessage(&emptyImage);
-    portals::Message<messages::JointAngles> jointsMessage(&joints);
-
-    // Look for robot name and pass to module if found
+    // If log includes robot name (which it always should), pass to module
     SExpr* robotName = args[0]->tree().find("from_address");
     std::string rname;
     if (robotName != NULL) {
@@ -90,6 +81,15 @@ int Vision_func() {
     }
 
     man::vision::VisionModule module(width / 2, height, rname);
+
+    // Images to pass to vision module, top & bottom
+    messages::YUVImage realImage(buf, width, height, width);
+    messages::YUVImage emptyImage(width, height);
+
+    // Setup module
+    portals::Message<messages::YUVImage> rImageMessage(&realImage);
+    portals::Message<messages::YUVImage> eImageMessage(&emptyImage);
+    portals::Message<messages::JointAngles> jointsMessage(&joints);
 
     if (topCamera) {
         module.topIn.setMessage(rImageMessage);
@@ -118,7 +118,7 @@ int Vision_func() {
     }
 
     // If log includes calibration parameters in description, have madule use those
-    std::vector<SExpr* > calParamsVec = args[0]->tree().recursiveFind("CalibrationParams");
+    std::vector<SExpr*> calParamsVec = args[0]->tree().recursiveFind("CalibrationParams");
     if (calParamsVec.size() != 0) {
         SExpr* calParams = calParamsVec.at(calParamsVec.size()-2);
         calParams = topCamera ? calParams->find("camera_TOP") : calParams->find("camera_BOT");
@@ -133,6 +133,15 @@ int Vision_func() {
         }
     }
 
+    // If log includes "BlackStar," set flag
+    std::vector<SExpr*> blackStarVec = args[0]->tree().recursiveFind("BlackStar");
+    if (blackStarVec.size() != 0) {
+        module.blackStar(true);
+        std::cout << "\nBLACK STAR TRUE!!!\n\n";
+    } else std::cout << "\nBLACK STAR FALSE\n\n";
+    
+    
+    // Run it!
     module.run();
 
     // -----------
