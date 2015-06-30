@@ -38,9 +38,9 @@ float minimum(std::list<float>& buf)
 ObstacleModule::ObstacleModule(std::string filepath, std::string robotName)
 : obstacleOut(base()),
 lastSonar(0.f),
-usingArms(true),
-usingLeftSonar(true),
-usingRightSonar(true),
+usingArms(false),
+usingLeftSonar(false),
+usingRightSonar(false),
 usingVision(false)
 {
     memset(obstacleBuffer, 0, sizeof(obstacleBuffer));
@@ -71,17 +71,42 @@ usingVision(false)
             std::cout<<"[OBSTACLE ] Reading from SExpr"<<std::endl;
             std::cout<<"[OBSTACLE ] PATH: "<<filepath<<std::endl;
 
-            usingArms = params.find("arms")->get(1)->valueAsInt();
-            usingVision = params.find("vision")->get(1)->valueAsInt();
-            bool all_sonars = params.find("set_all_sonar")->get(1)->valueAsInt();
+            bool all_sonars = false;
+            SExpr *tempArms, *tempVision, *tempAll;
+            tempArms = params.find("arms")->get(1);
+            tempVision = params.find("vision")->get(1);
+            tempAll = params.find("set_all_sonar")->get(1);
+
+            if (tempArms) { usingArms = tempArms->valueAsInt()==1 ? true : false; }
+            if (tempVision) { usingVision = tempVision->valueAsInt()==1 ? true : false; }
+            if (tempAll) { all_sonars = tempAll->valueAsInt()==1 ? true : false; }
 
             if (all_sonars) {
                 std::cout<<"[OBSTACLE ] Setting all robots the same"<<std::endl;
-                usingLeftSonar = params.find("all_left_sonar")->get(1)->valueAsInt();
-                usingRightSonar = params.find("all_right_sonar")->get(1)->valueAsInt();
+
+                SExpr *leftTemp = NULL, *rightTemp = NULL;
+                leftTemp = params.find("all_left_sonar")->get(1);
+                rightTemp = params.find("all_right_sonar")->get(1);
+
+                if (leftTemp) { usingLeftSonar = leftTemp->valueAsInt() == 1 ? true : false; }
+                if (rightTemp) { usingRightSonar = rightTemp->valueAsInt() == 1 ? true : false; }
             } else {
-                usingLeftSonar = params.find(robotName)->get(1)->get(1)->valueAsInt();
-                usingRightSonar = params.find(robotName)->get(2)->get(1)->valueAsInt();
+                SExpr *leftTemp = NULL, *rightTemp = NULL;
+                SExpr *leftTemp2 = NULL, *rightTemp2 = NULL;
+                SExpr* temp1 = params.find(robotName);
+                if (temp1) {
+                    leftTemp = temp1->get(1);
+                    rightTemp = temp1->get(2);
+                }
+                if (leftTemp) { leftTemp2 = leftTemp->get(1); }
+                if (rightTemp) { rightTemp2 = rightTemp->get(1); }
+
+                if (leftTemp2) {
+                    usingLeftSonar = leftTemp2->valueAsInt() == 1 ? true : false;
+                }
+                if (rightTemp2) {
+                    usingRightSonar = rightTemp2->valueAsInt() == 1 ? true : false;
+                }
             }
         } else {
             std::cout<<"[ERR ] Invalid SExpr"<<std::endl;
