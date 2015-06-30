@@ -24,7 +24,8 @@ VisionSystem::~VisionSystem()
 bool VisionSystem::update(ParticleSet& particles,
                           const messages::FieldLines& lines,
                           const messages::Corners& corners,
-                          const messages::FilteredBall* ball)
+                          const messages::FilteredBall* ball,
+                          const messages::RobotLocation& lastEstimate)
 {
     numObservations = 0;
     avgError = 0;
@@ -35,7 +36,6 @@ bool VisionSystem::update(ParticleSet& particles,
             continue;
         numObservations++;
     }
-    // numObservations += corners.corner_size();
     if (ball != NULL) 
         numObservations++;
 
@@ -56,10 +56,6 @@ bool VisionSystem::update(ParticleSet& particles,
                 continue;
             curParticleError = curParticleError*lineSystem->scoreObservation(lines.line(i), particle->getLocation());
         }
-
-        // Score particle from corner observations
-        // for (int i = 0; i < corners.corner_size(); i++)
-        //     curParticleError = curParticleError*landmarkSystem->scoreCorner(corners.corner(i), particle->getLocation());
 
         // Score particle from ball observation if in game set
         if (ball != NULL)
@@ -82,21 +78,18 @@ bool VisionSystem::update(ParticleSet& particles,
     // Particle injections
     // (1) Reconstruct pose by finding the midpoint of the top goalbox
     injections.clear();
-    for (int i = 0; i < lines.line_size(); i++) {
-        const messages::FieldLine& field = lines.line(i);
-        if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
-            const messages::HoughLine& inner = field.inner();
+    // for (int i = 0; i < lines.line_size(); i++) {
+    //     const messages::FieldLine& field = lines.line(i);
+    //     if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
+    //         const messages::HoughLine& inner = field.inner();
 
-            // NOTE particle filter makes sure we only inject particles on
-            //      the side of the field that our estimate is on
-            std::vector<LocLineID> ids { LocLineID::OurTopGoalbox, LocLineID::TheirTopGoalbox };
-            for (int i = 0; i < ids.size(); i++) {
-                messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(ids[i], field);
-                ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h());
-                injections.push_back(reconstructed);
-            }
-        }
-    }
+    //         LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirTopGoalbox : LocLineID::OurTopGoalbox);
+    //         messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(id, field);
+    //         ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 1, 5, 0.01);
+    //         if (reconstructed.onField())
+    //             injections.push_back(reconstructed);
+    //     }
+    // }
 
     // (2) Reconstruct pose from ball in set
     if (ball != NULL) {
@@ -139,13 +132,9 @@ bool VisionSystem::update(ParticleSet& particles,
             fromLineAndBall.set_y(CENTER_FIELD_Y - ballAbsY);
 
             // Add injection and return
-            ReconstructedLocation reconstructed(fromLineAndBall.x(), fromLineAndBall.y(), fromLineAndBall.h());
-            injections.push_back(reconstructed);
-
-            // std::cout << "Injecting in set!" << std::endl;
-            // std::cout << fromLineAndBall.x() << std::endl;
-            // std::cout << fromLineAndBall.y() << std::endl;
-            // std::cout << fromLineAndBall.h() << std::endl;
+            ReconstructedLocation reconstructed(fromLineAndBall.x(), fromLineAndBall.y(), fromLineAndBall.h(), 1, 1, 0.01);
+            if (reconstructed.onField())
+                injections.push_back(reconstructed);
         }
     }
 

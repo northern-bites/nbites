@@ -3,12 +3,16 @@
 #include "LineSystem.h"
 #include "DebugConfig.h"
 
+#include <algorithm>
+
 namespace man {
 namespace localization {
 
 ParticleFilter::ParticleFilter(ParticleFilterParams params)
     : parameters(params),
-      setResetTransition(0)
+      setResetTransition(0),
+      wSlow(0),
+      wFast(0)
 {
     motionSystem = new MotionSystem(params.odometryXYNoise,
                                     params.odometryHNoise);
@@ -46,7 +50,7 @@ ParticleFilter::ParticleFilter(ParticleFilterParams params)
 
     lost = false;
     badFrame = false;
-    errorMagnitude = .8f * LOST_THRESHOLD;
+    errorMagnitude = .8f;
 }
 
 ParticleFilter::~ParticleFilter()
@@ -62,33 +66,15 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
 {
     // Motion system and vision system update step
     motionSystem->update(particles, odometryInput, errorMagnitude);
-    updatedVision = visionSystem->update(particles, linesInput, cornersInput, ballInput);
-
-    // std::cout << updatedVision << std::endl;
+    bool updatedVision = visionSystem->update(particles, linesInput, cornersInput, ballInput, poseEstimate);
 
     // Resample if vision updated
-    float avgErr = -1;
     if(updatedVision) {
+        double wAvg = visionSystem->getAvgError();
+        wSlow = wSlow + parameters.alphaSlow*(wAvg - wSlow);
+        wFast = wFast + parameters.alphaFast*(wAvg - wFast);
         resample();
-        updatedVision = false;
-        avgErr = visionSystem->getAvgError();
     }
-
-    //  if (avgErr > 0) {
-    //      if (avgErr > 3*errorMagnitude)
-    //          avgErr = 3*errorMagnitude;
-    //      errorMagnitude = avgErr*ALPHA
-    //                       + errorMagnitude*(1-ALPHA);
-    //  } else
-    //      errorMagnitude += (1.f/100.f);
-
-    //  // std::cout << "Cur Error " << avgErr << std::endl;
-    //  // std::cout << "Filtered Error:  " << errorMagnitude << std::endl;
-
-    // // Determine if lost in frame or general
-    // lost = (errorMagnitude > LOST_THRESHOLD);
-    // // std::cout << lost << std::endl;
-    // badFrame = (avgErr > LOST_THRESHOLD);
 
     // Update filters estimate
     updateEstimate();
@@ -96,64 +82,6 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     // For debug tools, project lines and corners onto field, set IDs, etc.
     updateFieldForDebug(linesInput, cornersInput); 
 }
-
-// void ParticleFilter::update(const messages::RobotLocation& odometryInput,
-//                             const messages::VisionField&     visionInput,
-//                             const messages::FilteredBall&      ballInput)
-// {
-//     framesSinceReset++;
-// 
-//     Point ballGuess(ballInput.x(), ballInput.y());
-//     Point ballLoc(MIDFIELD_X, MIDFIELD_Y); // in set
-//     float distBallOff = ballLoc.distanceTo(ballGuess);
-// 
-//     // Determine if we think we should reset
-//     if (((errorMagnitude > 20) || (distBallOff > 150))
-//         && (ballInput.vis().frames_on() > 5)&& (framesSinceReset > 30)){
-//         setResetTransition++;
-//     }
-//     else {
-//         setResetTransition = 0;
-//     }
-// 
-//    if(setResetTransition > 5){
-//         std::cout << "LOST IN SET!" << std::endl;
-//         setResetTransition = 0;
-//         resetLocToSide(true);
-//     }
-// 
-//     motionSystem->update(particles, odometryInput, errorMagnitude);
-// 
-//     // Update the Vision Model
-//     // set updated vision to determine if resampling necessary
-//     updatedVision = visionSystem->update(particles, visionInput, ballInput);
-// 
-//     float avgErr = -1;
-//     // Resample if vision update
-//     if(updatedVision)
-//     {
-//         resample();
-//         updatedVision = false;
-// 
-//         avgErr = visionSystem->getAvgError();
-//     }
-// 
-//     if (avgErr > 0) {
-//         if (avgErr > 3*errorMagnitude)
-//             avgErr = 3*errorMagnitude;
-//         errorMagnitude = avgErr*ALPHA
-//                          + errorMagnitude*(1-ALPHA);
-//     }
-//     else
-//         errorMagnitude+= (1.f/100.f);
-// 
-//     // Determine if lost in frame and/or general
-//     lost = (errorMagnitude > LOST_THRESHOLD);
-//     badFrame = (avgErr > LOST_THRESHOLD);
-// 
-//     // Update filters estimate
-//     updateEstimate();
-// }
 
 /**
  *@brief  Updates the filters estimate of the robots position
@@ -180,10 +108,6 @@ void ParticleFilter::updateEstimate()
     poseEstimate.set_x(sumX/parameters.numParticles);
     poseEstimate.set_y(sumY/parameters.numParticles);
     poseEstimate.set_h(NBMath::subPIAngle(sumH/parameters.numParticles));
-
-    // std::cout << "TEST: " << sumH << std::endl;
-    // std::cout << sumH/parameters.numParticles << std::endl;
-    // std::cout << NBMath::subPIAngle(sumH/parameters.numParticles) << std::endl;
 
     poseEstimate.set_uncert(errorMagnitude);
 
@@ -472,7 +396,6 @@ void ParticleFilter::resample()
 {
     // Map each normalized weight to the corresponding particle.
     std::map<float, Particle> cdf;
-
     float prev = 0.0f;
     ParticleIt iter;
     for(iter = particles.begin(); iter != particles.end(); ++iter)
@@ -481,58 +404,43 @@ void ParticleFilter::resample()
         prev += iter->getWeight();
     }
 
+    // Setup random number generator
     boost::mt19937 rng;
     rng.seed(static_cast<unsigned>(std::time(0)));
     boost::uniform_01<boost::mt19937> gen(rng);
 
-    float rand;
+    // Setup
     ParticleSet newParticles;
+    const std::vector<ReconstructedLocation>& injections = visionSystem->getInjections();
 
-    //std::cout << "Error " << errorMagnitude << std::endl;
+    // Either inject particle or sample with replacement according to the
+    // normalized weights, and place in a new particle set
+    //
+    // NOTE we only consider injecting particles if vision system found 
+    //      suitable observations
+    for(int i = 0; i < parameters.numParticles; ++i) {
+        double randInjectOrSample = gen();
+        if (injections.size() && randInjectOrSample < std::max<double>(0, 1.0 - (wFast / wSlow))) {
+            // Inject particles according to sensor measurements
+            ReconstructedLocation injection = injections[rand() % injections.size()];
+            messages::RobotLocation sample = injection.sample();
 
-    // First add reconstructed particles from corner observations
-    int numReconParticlesAdded = 0;
-    // if (lost && badFrame)
-    if (true)
-    {
-        // std::cout << "LOST AND BAD FRAME" << std::endl;
-        const std::list<ReconstructedLocation>& reconLocs = visionSystem->getInjections();
-        std::list<ReconstructedLocation>::const_iterator recLocIt;
-        for (recLocIt = reconLocs.begin();
-             recLocIt != reconLocs.end();
-             recLocIt ++)
-        {
-            // std::cout << "ITER RECONSTRUCT" << std::endl;
-            // If the reconstructions is on the same side and not near midfield
-            if ( ((*recLocIt).defSide == onDefendingSide())
-                 && (fabs((*recLocIt).x - CENTER_FIELD_X) > 50)) {
-                // Sanity check, reconstruction must be on field
-                if (((*recLocIt).x >= 0 && (*recLocIt).y <= FIELD_GREEN_WIDTH) &&
-                    ((*recLocIt).y >= 0 && (*recLocIt).y <= FIELD_GREEN_HEIGHT)) {
-                     Particle reconstructedParticle((*recLocIt).x,
-                                                    (*recLocIt).y,
-                                                    (*recLocIt).h,
-                                                    1.f/250.f);
-                     newParticles.push_back(reconstructedParticle);
-                     numReconParticlesAdded++;
-                }
-            }
+            Particle reconstructedParticle(sample.x(), sample.y(), sample.h(), 1/250);
+            newParticles.push_back(reconstructedParticle);
+        } else {
+            // Resample from this frame's swarm based on scores
+            double randSample = gen();
+
+            if (cdf.upper_bound(randSample) == cdf.end())
+                newParticles.push_back(cdf.begin()->second); // NOTE return something that DEF exists
+            else
+                newParticles.push_back(cdf.upper_bound(randSample)->second);
         }
-#ifdef DEBUG_LOC
-        std::cout << "Injected " << numReconParticlesAdded << " particles" << std::endl;
-#endif
     }
 
-    // Sample numParticles particles with replacement according to the
-    // normalized weights, and place them in a new particle set.
-    for(int i = 0; i < (parameters.numParticles - (float)numReconParticlesAdded); ++i)
-    {
-        rand = (float)gen();
-        if(cdf.upper_bound(rand) == cdf.end())
-            newParticles.push_back(cdf.begin()->second); // Return something that DEF exists
-        else
-            newParticles.push_back(cdf.upper_bound(rand)->second);
-    }
+    // std::cout << 1.0 - (wFast / wSlow) << std::endl;
+
+    // Update particles
     particles = newParticles;
 }
 
