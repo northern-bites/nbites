@@ -43,7 +43,7 @@ def positionAtHome(player):
     shared ball if it is on with reliability >= 2. Cherry pickers look in the direction
     of the shared ball if it is on with reliability >= 1.
     """
-    if player.brain.ball.vis.on:
+    if player.brain.ball.vis.frames_off < 10:
         ball = player.brain.ball
         bearing = ball.bearing_deg
         # player.brain.tracker.trackBall()
