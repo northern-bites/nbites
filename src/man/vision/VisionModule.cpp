@@ -155,14 +155,7 @@ void VisionModule::run_()
         edgeDetector[i]->gradient(yImage);
         
         // Run edge detection
-        if (!blackStar()) {
-            edgeDetector[i]->edgeDetect(greenImage, *(edges[i]));
-            std::cout << "Called eD with green image.\n";
-        }
-        else {
-            edgeDetector[i]->edgeDetect(whiteImage, *(edges[i]));
-            std::cout << "Called eD with white image.\n";
-        }
+        edgeDetector[i]->edgeDetect(greenImage, *(edges[i]));
 
         // Run hough line detection
         hough[i]->run(*(edges[i]), *(rejectedEdges[i]), *(houghLines[i]));
@@ -177,7 +170,7 @@ void VisionModule::run_()
         if (!i) centerCircleDetected = centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]));
  
         // Pair hough lines to field lines
-        fieldLines[i]->find(*(houghLines[i]));
+        fieldLines[i]->find(*(houghLines[i]), blackStar());
  
         // Classify field lines
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
@@ -329,6 +322,12 @@ void VisionModule::sendCenterCircle()
     centCircOut.setMessage(ccm);
 }
 
+void VisionModule::setColorParams(Colors* colors, bool topCamera)
+{ 
+    delete colorParams[!topCamera];
+    colorParams[!topCamera] = colors;
+}
+
 const std::string VisionModule::getStringFromTxtFile(std::string path) 
 {
     std::ifstream textFile;
@@ -420,11 +419,18 @@ void VisionModule::setCalibrationParams(int camera, std::string robotName)
         std::string cam = camera == 0 ? "TOP" : "BOT";
         double roll =  robot->find(cam)->get(1)->valueAsDouble();
         double tilt = robot->find(cam)->get(2)->valueAsDouble();
+        delete calibrationParams[camera];
         calibrationParams[camera] = new CalibrationParams(roll, tilt);
 
         std::cerr << "Found and set calibration params for " << robotName;
         std::cerr << "Roll: " << roll << " Tilt: " << tilt << std::endl;
     }
+}
+
+void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamera)
+{
+    delete calibrationParams[!topCamera];
+    calibrationParams[!topCamera] = params;
 }
 
 #ifdef USE_LOGGING

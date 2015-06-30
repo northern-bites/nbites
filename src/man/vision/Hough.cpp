@@ -672,7 +672,7 @@ FieldLineList::FieldLineList()
   maxCalibrateAngle(5.0f);
 }
 
-void FieldLineList::find(HoughLineList& houghLines)
+void FieldLineList::find(HoughLineList& houghLines, bool blackStar)
 {
   // Check max angle by dot product of unit vectors. Since lines must have opposite
   // polarity, dot product must be below a negative threshold.
@@ -691,6 +691,12 @@ void FieldLineList::find(HoughLineList& houghLines)
         // coordinates leads to crossed field lines if the homography is poor.
         // Crosses field lines in world coordinates leads to polarity error.
         bool correctPolarity = (hl1->r() + hl2->r() < 0);
+
+        // If we are looking for lines in the black clibration star, check for
+        // opposite polarity.
+        if (blackStar)
+          correctPolarity = !correctPolarity;
+
         // Separation is sum of the two r values (distance of line to origin).
         // This is well defined and sensible for lines that may not be perfectly
         // parallel. For field lines the polarities are pointing towards each
