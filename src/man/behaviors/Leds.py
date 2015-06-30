@@ -15,7 +15,6 @@ BALL_LEDS = True
 GOALBOX_LEDS = True
 ROLESWITCH_LEDS = True
 CALIBRATION_LEDS = True
-DODGE_LEDS = True
 SHAREDFLIP_LEDS = True
 COMM_LEDS = True
 
@@ -25,7 +24,7 @@ LED_ON = 1
 
 #The order here must match the order of the string defined in Lights.h
 # and in ALLedNames.h
-NUM_LED_GROUPS = 36
+NUM_LED_GROUPS = 26
 
 (LEFT_CALIBRATION_ONE_LED,
 LEFT_CALIBRATION_TWO_LED,
@@ -37,16 +36,6 @@ RIGHT_CALIBRATION_TWO_LED,
 RIGHT_CALIBRATION_THREE_LED,
 RIGHT_CALIBRATION_FOUR_LED,
 RIGHT_CALIBRATION_FIVE_LED,
-LEFT_DODGE_ONE_LED,
-LEFT_DODGE_TWO_LED,
-LEFT_DODGE_THREE_LED,
-LEFT_DODGE_FOUR_LED,
-LEFT_DODGE_FIVE_LED,
-RIGHT_DODGE_ONE_LED,
-RIGHT_DODGE_TWO_LED,
-RIGHT_DODGE_THREE_LED,
-RIGHT_DODGE_FOUR_LED,
-RIGHT_DODGE_FIVE_LED,
 LEFT_COMM_ONE_LED,
 LEFT_COMM_TWO_LED,
 LEFT_COMM_THREE_LED,
@@ -122,28 +111,6 @@ RIGHT_CALIBRATION_THREE_OFF_LEDS= ((RIGHT_CALIBRATION_THREE_LED, OFF, NOW),)
 RIGHT_CALIBRATION_FOUR_OFF_LEDS = ((RIGHT_CALIBRATION_FOUR_LED, OFF, NOW),)
 RIGHT_CALIBRATION_FIVE_OFF_LEDS = ((RIGHT_CALIBRATION_FIVE_LED, OFF, NOW),)
 
-##### DODGE #####
-LEFT_DODGE_ONE_LEDS   = ((LEFT_DODGE_ONE_LED, BLUE, NOW),)
-LEFT_DODGE_TWO_LEDS   = ((LEFT_DODGE_TWO_LED, BLUE, NOW),)
-LEFT_DODGE_THREE_LEDS = ((LEFT_DODGE_THREE_LED, BLUE, NOW),)
-LEFT_DODGE_FOUR_LEDS  = ((LEFT_DODGE_FOUR_LED, BLUE, NOW),)
-LEFT_DODGE_FIVE_LEDS  = ((LEFT_DODGE_FIVE_LED, BLUE, NOW),)
-RIGHT_DODGE_ONE_LEDS  = ((RIGHT_DODGE_ONE_LED, BLUE, NOW),)
-RIGHT_DODGE_TWO_LEDS  = ((RIGHT_DODGE_TWO_LED, BLUE, NOW),)
-RIGHT_DODGE_THREE_LEDS= ((RIGHT_DODGE_THREE_LED, BLUE, NOW),)
-RIGHT_DODGE_FOUR_LEDS = ((RIGHT_DODGE_FOUR_LED, BLUE, NOW),)
-RIGHT_DODGE_FIVE_LEDS = ((RIGHT_DODGE_FIVE_LED, BLUE, NOW),)
-LEFT_DODGE_ONE_OFF_LEDS   = ((LEFT_DODGE_ONE_LED, OFF, NOW),)
-LEFT_DODGE_TWO_OFF_LEDS   = ((LEFT_DODGE_TWO_LED, OFF, NOW),)
-LEFT_DODGE_THREE_OFF_LEDS = ((LEFT_DODGE_THREE_LED, OFF, NOW),)
-LEFT_DODGE_FOUR_OFF_LEDS  = ((LEFT_DODGE_FOUR_LED, OFF, NOW),)
-LEFT_DODGE_FIVE_OFF_LEDS  = ((LEFT_DODGE_FIVE_LED, OFF, NOW),)
-RIGHT_DODGE_ONE_OFF_LEDS  = ((RIGHT_DODGE_ONE_LED, OFF, NOW),)
-RIGHT_DODGE_TWO_OFF_LEDS  = ((RIGHT_DODGE_TWO_LED, OFF, NOW),)
-RIGHT_DODGE_THREE_OFF_LEDS= ((RIGHT_DODGE_THREE_LED, OFF, NOW),)
-RIGHT_DODGE_FOUR_OFF_LEDS = ((RIGHT_DODGE_FOUR_LED, OFF, NOW),)
-RIGHT_DODGE_FIVE_OFF_LEDS = ((RIGHT_DODGE_FIVE_LED, OFF, NOW),)
-
 ##### COMM #####
 LEFT_COMM_ONE_LEDS   = ((LEFT_COMM_ONE_LED, BLUE, NOW),)
 LEFT_COMM_TWO_LEDS   = ((LEFT_COMM_TWO_LED, BLUE, NOW),)
@@ -193,7 +160,6 @@ class Leds():
         self.numActiveMates = 0
         self.role = -1
         self.calibrationCount = 0
-        self.dodgeCount = 0
         self.flippingCount = 0
         self.oldFlipTime = 0
         self.flashingCount = 150
@@ -284,33 +250,6 @@ class Leds():
         #         self.executeLeds(RIGHT_CALIBRATION_FOUR_OFF_LEDS)
         #         self.executeLeds(RIGHT_CALIBRATION_FIVE_OFF_LEDS)
         #     self.flippingCount = self.flippingCount + 1
-
-        # Show LEDs while we dodge!
-        if DODGE_LEDS:
-            if (self.brain.currentlyDodging and self.dodgeCount % 4 < 2):
-                self.executeLeds(LEFT_DODGE_ONE_LEDS)
-                self.executeLeds(LEFT_DODGE_TWO_LEDS)
-                self.executeLeds(LEFT_DODGE_THREE_LEDS)
-                self.executeLeds(LEFT_DODGE_FOUR_LEDS)
-                self.executeLeds(LEFT_DODGE_FIVE_LEDS)
-                self.executeLeds(RIGHT_DODGE_ONE_LEDS)
-                self.executeLeds(RIGHT_DODGE_TWO_LEDS)
-                self.executeLeds(RIGHT_DODGE_THREE_LEDS)
-                self.executeLeds(RIGHT_DODGE_FOUR_LEDS)
-                self.executeLeds(RIGHT_DODGE_FIVE_LEDS)
-            else:
-                self.executeLeds(LEFT_DODGE_ONE_OFF_LEDS)
-                self.executeLeds(LEFT_DODGE_TWO_OFF_LEDS)
-                self.executeLeds(LEFT_DODGE_THREE_OFF_LEDS)
-                self.executeLeds(LEFT_DODGE_FOUR_OFF_LEDS)
-                self.executeLeds(LEFT_DODGE_FIVE_OFF_LEDS)
-                self.executeLeds(RIGHT_DODGE_ONE_OFF_LEDS)
-                self.executeLeds(RIGHT_DODGE_TWO_OFF_LEDS)
-                self.executeLeds(RIGHT_DODGE_THREE_OFF_LEDS)
-                self.executeLeds(RIGHT_DODGE_FOUR_OFF_LEDS)
-                self.executeLeds(RIGHT_DODGE_FIVE_OFF_LEDS)
-
-            self.dodgeCount = self.dodgeCount + 1
 
         # If more teammates are added, consider making bottom of right
         # eye into localization uncertainty and using whole ear for comm
