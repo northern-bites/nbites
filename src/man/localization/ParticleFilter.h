@@ -15,10 +15,10 @@
 #include "FieldConstants.h"
 #include "VisionSystem.h"
 #include "MotionSystem.h"
-
 #include "NBMath.h"
 
 #include "ParticleSwarm.pb.h"
+#include "BallModel.pb.h"
 
 #include <vector>
 #include <iostream>
@@ -48,7 +48,7 @@ static const ParticleFilterParams DEFAULT_PARAMS =
     0.2f,                       // Exponential Filter alpha
     0.05f,                      //                    beta
     0.5f,                       // Variance in x-y odometry
-    0.008f                       // Variance in h odometry
+    0.008f                      // Variance in h odometry
 };
 
 /**
@@ -70,7 +70,8 @@ public:
      */
     void update(const messages::RobotLocation& motionInput,
                 messages::FieldLines&          linesInput,
-                messages::Corners&             cornersInput);
+                messages::Corners&             cornersInput,
+                const messages::FilteredBall*  ballInput);
 
     // Overload to use ball info
     // void update(const messages::RobotLocation& motionInput,
@@ -146,7 +147,8 @@ private:
      */
     void updateEstimate();
 
-    void updateLinesForDebug(messages::FieldLines& visionInput);
+    void updateFieldForDebug(messages::FieldLines& lines,
+                             messages::Corners& corners);
 
     /**
      * @brief - Return symmetric location from given one

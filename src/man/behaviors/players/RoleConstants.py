@@ -110,15 +110,15 @@ evenDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
                                 NogginConstants.BLUE_GOALBOX_TOP_Y + 10,
                                 0)
 
-#Triangle of torture (odd chaser positioning)
-oddChaserForward = RobotLocation(NogginConstants.MIDFIELD_X - NogginConstants.CENTER_CIRCLE_RADIUS - 70,
+#Tomultuous triangle (odd chaser positioning)
+oddChaserForward = RobotLocation(NogginConstants.MIDFIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS + 70,
                                 NogginConstants.MIDFIELD_Y,
                                 0)
-oddChaserTop = RobotLocation(NogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                NogginConstants.BLUE_GOALBOX_BOTTOM_Y + 45,
+oddChaserBottom = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X,
+                                NogginConstants.MIDFIELD_Y - 60,
                                 0)
-oddChaserBottom = RobotLocation(NogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                NogginConstants.BLUE_GOALBOX_TOP_Y - 45,
+oddChaserTop = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X,
+                                NogginConstants.MIDFIELD_Y + 60,
                                 0)
 
 oddDefenderHomePenn = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,

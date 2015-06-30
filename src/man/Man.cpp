@@ -16,19 +16,19 @@ SET_POOL_SIZE(messages::JointAngles, 24);
 SET_POOL_SIZE(messages::InertialState, 16);
 SET_POOL_SIZE(messages::YUVImage, 16);
 SET_POOL_SIZE(messages::RobotLocation, 16);
+SET_POOL_SIZE(messages::Toggle, 16);
 #endif
 
 namespace man {
-    
-Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
-    : AL::ALModule(broker, name),
+
+Man::Man() :
     param("/home/nao/nbites/lib/parameters.json"),
     playerNum(param.getParam<int>("playerNumber")),
     teamNum(param.getParam<int>("teamNumber")),
     robotName(param.getParam<std::string>("robotName")),
     sensorsThread("sensors", SENSORS_FRAME_LENGTH_uS),
-    sensors(broker),
-    jointEnactor(broker),
+    sensors(),
+    jointEnactor(),
     motion(),
     arms(),
     guardianThread("guardian", GUARDIAN_FRAME_LENGTH_uS),
@@ -42,22 +42,19 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     vision(640, 480),
     localization(),
     ballTrack(),
-    obstacle(),
+    obstacle("/home/nao/nbites/Config/obstacleParams.txt", robotName),
     gamestate(teamNum, playerNum),
     behaviors(teamNum, playerNum),
-    leds(broker),
     sharedBall(playerNum)
     {
-        setModuleDescription("The Northern Bites' soccer player.");
-                
         /** Sensors **/
         sensorsThread.addModule(sensors);
         sensorsThread.addModule(jointEnactor);
         sensorsThread.addModule(motion);
         sensorsThread.addModule(arms);
-        
+
         sensors.printInput.wireTo(&guardian.printJointsOutput, true);
-        
+
         motion.jointsInput_.wireTo(&sensors.jointsOutput_);
         motion.currentsInput_.wireTo(&sensors.currentsOutput_);
         motion.inertialsInput_.wireTo(&sensors.inertialsOutput_);
@@ -67,14 +64,15 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         motion.headCommandInput_.wireTo(&behaviors.headMotionCommandOut, true);
         motion.requestInput_.wireTo(&behaviors.motionRequestOut, true);
         motion.fallInput_.wireTo(&guardian.fallStatusOutput, true);
-        
+
         jointEnactor.jointsInput_.wireTo(&motion.jointsOutput_);
         jointEnactor.stiffnessInput_.wireTo(&motion.stiffnessOutput_);
-        
+        jointEnactor.ledsInput_.wireTo(&behaviors.ledCommandOut, true);
+
         arms.actualJointsIn.wireTo(&sensors.jointsOutput_);
         arms.expectedJointsIn.wireTo(&motion.jointsOutput_);
         arms.handSpeedsIn.wireTo(&motion.handSpeedsOutput_);
-        
+
         /** Guardian **/
         guardianThread.addModule(guardian);
         guardianThread.addModule(audio);
@@ -86,35 +84,34 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         guardian.batteryInput.wireTo(&sensors.batteryOutput_, true);
         guardian.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
         audio.audioIn.wireTo(&guardian.audioOutput);
-        
+
         /** Comm **/
         commThread.addModule(comm);
         comm._worldModelInput.wireTo(&behaviors.myWorldModelOut, true);
         comm._gcResponseInput.wireTo(&gamestate.gcResponseOutput, true);
-        
+
         /** Cognition **/
         // Turn ON the finalize method for images, which we've specialized
         portals::Message<messages::YUVImage>::setFinalize(true);
         portals::Message<messages::ThresholdImage>::setFinalize(true);
         portals::Message<messages::PackedImage16>::setFinalize(true);
         portals::Message<messages::PackedImage8>::setFinalize(true);
-        
+
         cognitionThread.addModule(topTranscriber);
         cognitionThread.addModule(bottomTranscriber);
         cognitionThread.addModule(vision);
         cognitionThread.addModule(localization);
         cognitionThread.addModule(ballTrack);
-        // cognitionThread.addModule(obstacle);
+        cognitionThread.addModule(obstacle);
         cognitionThread.addModule(gamestate);
         cognitionThread.addModule(behaviors);
-        cognitionThread.addModule(leds);
         cognitionThread.addModule(sharedBall);
-        
+
         topTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
         topTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
         bottomTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
         bottomTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
-        
+
         vision.topIn.wireTo(&topTranscriber.imageOut);
         vision.bottomIn.wireTo(&bottomTranscriber.imageOut);
         vision.jointsIn.wireTo(&topTranscriber.jointsOut, true);
@@ -127,12 +124,12 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
         localization.resetInput[1].wireTo(&sharedBall.sharedBallReset, true);
         localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
-        // localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
-        
+        localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
+
         ballTrack.visionBallInput.wireTo(&vision.ballOut);
         ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
         ballTrack.localizationInput.wireTo(&localization.output, true);
-        
+
         for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
         {
             sharedBall.worldModelIn[i].wireTo(comm._worldModels[i], true);
@@ -140,16 +137,16 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         sharedBall.locIn.wireTo(&localization.output);
         sharedBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
          
-        // obstacle.armContactIn.wireTo(&arms.contactOut, true);
+        obstacle.armContactIn.wireTo(&arms.contactOut, true);
         // obstacle.visionIn.wireTo(&vision.vision_obstacle, true);
-        // obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
+        obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
          
         gamestate.commInput.wireTo(&comm._gameStateOutput, true);
         gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
         gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
         gamestate.switchTeamInput.wireTo(&guardian.switchTeamOutput, true);
         gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
-        
+
         behaviors.localizationIn.wireTo(&localization.output);
         behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
         behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
@@ -161,23 +158,23 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
         behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
         behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
+        behaviors.sitDownIn.wireTo(&sensors.sitDownOutput_, true);
         behaviors.linesIn.wireTo(&vision.linesOut, true);
         behaviors.cornersIn.wireTo(&vision.cornersOut, true);
-        // behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
+        behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
         behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
         behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);
+
         for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
         {
             behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
         }
-        
-        leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
-        
+
 #ifdef USE_LOGGING
         {   //brackets let us hide logging code in certain IDEs.
         /*
          log threads should have low CPU time if nothing is being logged.
-         
+
          That being said, should probably not init (i.e. start threads)
          if not necessary.
          */
@@ -193,7 +190,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         nblog::log_main_init();
         printf("control::control_init()\n");
         control::control_init();
-            
+
 #ifdef START_WITH_FILEIO
 #ifndef USE_LOGGING
 #error "option START_WITH_FILEIO defined WITHOUT option USE_LOGGING"
@@ -201,7 +198,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
             printf("CONTROL: Starting with fileio flag set!\n");
             control::flags[control::fileio] = 1;
 #endif
-            
+
 #ifdef START_WITH_THUMBNAIL
 #ifndef USE_LOGGING
 #error "option START_WITH_THUMBNAIL defined WITHOUT option USE_LOGGING"
@@ -209,11 +206,10 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
             printf("CONTROL: Starting with thumbnail flag set!\n");
             control::flags[control::thumbnail] = 1;
 #endif
-        
+
         /*
          SPECIFIC MODULE LOGGING
          */
-//#ifdef LOG_SENSORS
         sensorsThread.log<messages::JointAngles>((control::SENSORS), &sensors.jointsOutput_,
                                                  "proto-JointAngles", "sensorsThread");
         sensorsThread.log<messages::JointAngles>((control::SENSORS), &sensors.temperatureOutput_,
@@ -230,9 +226,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
                                          "proto-FSR", "sensorsThread");
         sensorsThread.log<messages::BatteryState>((control::SENSORS), &sensors.batteryOutput_,
                                                   "proto-BatteryState", "sensorsThread");
-//#endif
-        
-//#ifdef LOG_GUARDIAN
+
         guardianThread.log<messages::StiffnessControl>((control::GUARDIAN), &guardian.stiffnessControlOutput,
                                                        "proto-StiffnessControl", "guardianThread");
         guardianThread.log<messages::FeetOnGround>((control::GUARDIAN), &guardian.feetOnGroundOutput,
@@ -241,32 +235,12 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
                                                  "proto-FallStatus", "guardianThread");
         guardianThread.log<messages::AudioCommand>((control::GUARDIAN), &guardian.audioOutput,
                                                    "proto-AudioCommand", "guardianThread");
-//#endif
-        
-//#ifdef LOG_LOCATION
 //         cognitionThread.log<messages::RobotLocation>((control::LOCATION), &localization.output, "proto-RobotLocation", "location");
-// //#endif
-//         
-// //#ifdef LOG_ODOMETRY
 //         cognitionThread.log<messages::RobotLocation>((control::ODOMETRY), &motion.odometryOutput_, "proto-RobotLocation", "odometry");
-// //#endif
-//         
-// //#ifdef LOG_OBSERVATIONS
 //         cognitionThread.log<messages::VisionField>((control::OBSERVATIONS), &vision.vision_field, "proto-VisionField", "observations");
-// //#endif
-//         
-// //#ifdef LOG_LOCALIZATION
 //         cognitionThread.log<messages::ParticleSwarm>((control::LOCALIZATION), &localization.particleOutput, "proto-ParticleSwarm", "localization");
-// //#endif
-//         
-// //#ifdef LOG_BALLTRACK
 //         cognitionThread.log<messages::FilteredBall>((control::BALLTRACK), &ballTrack.ballLocationOutput, "proto-FilteredBall", "balltrack");
         // cognitionThread.log<messages::VisionBall>((control::BALLTRACK), &vision.vision_ball, "proto-VisionBall", "balltrack");
-//#endif
-        
-        //Superseded by logging code in ImageTranscriber.
-        
-//#ifdef LOG_VISION
         cognitionThread.log<messages::FieldLines>((control::VISION), &vision.linesOut,
                                                    "proto-FieldLines", "vision");
         cognitionThread.log<messages::Corners>((control::VISION), &vision.cornersOut,
@@ -283,35 +257,44 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         //                                            "proto-JointAngles", "vision");
         // cognitionThread.log<messages::InertialState>((control::VISION), &vision.inertial_state_out,
                                                      // "proto-InertialState", "vision");
-//#endif
-        
-    }
+
+        }
 #endif //USE_LOGGING
-        
+
 #ifdef USE_TIME_PROFILING
         Profiler::getInstance()->profileFrames(1400);
 #endif
-        
+
         startSubThreads();
+        std::cout << "Man built" << std::endl;
     }
-    
-    Man::~Man()
-    {}
-    
-    void Man::startSubThreads()
+
+
+Man::~Man()
+{
+    std::cout << "MAN::Man is being killed" << std::endl;
+}
+
+void Man::preClose()
+{
+    topTranscriber.closeTranscriber();
+    bottomTranscriber.closeTranscriber();
+}
+
+void Man::startSubThreads()
+{
+    startAndCheckThread(sensorsThread);
+    startAndCheckThread(guardianThread);
+    startAndCheckThread(commThread);
+    startAndCheckThread(cognitionThread);
+}
+
+void Man::startAndCheckThread(DiagramThread& thread)
+{
+    if(thread.start())
     {
-        startAndCheckThread(sensorsThread);
-        startAndCheckThread(guardianThread);
-        startAndCheckThread(commThread);
-        startAndCheckThread(cognitionThread);
-    }
-    
-    void Man::startAndCheckThread(DiagramThread& thread)
-    {
-        if(thread.start())
-        {
-            std::cout << thread.getName() << "thread failed to start." <<
-            std::endl;
-        }
+        std::cout << thread.getName() << "thread failed to start." << std::endl;
     }
 }
+
+} // namespace man

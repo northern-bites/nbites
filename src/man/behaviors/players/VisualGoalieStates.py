@@ -16,6 +16,7 @@ from noggin_constants import (LINE_CROSS_OFFSET, GOALBOX_DEPTH, GOALBOX_WIDTH,
 #from vision import cornerID as IDs
 from math import fabs, degrees, radians, sin, cos
 from ..kickDecider import kicks
+import GoalieStates as GoalieStates
 import noggin_constants as Constants
 
 @superState('gameControllerResponder')
@@ -100,6 +101,7 @@ def clearIt(player):
     kickPose = player.kick.getPosition()
     clearIt.ballDest.relX = player.brain.ball.rel_x - kickPose[0]
     clearIt.ballDest.relY = player.brain.ball.rel_y - kickPose[1]
+    clearIt.ballDest.relH = 0.0
     player.brain.nav.updateDest(clearIt.ballDest)
 
     return Transition.getNextState(player, clearIt)
@@ -119,6 +121,9 @@ def spinToFaceBall(player):
     # else:
     #     player.side = LEFT
     #     facingDest.relH = 90
+    # player.brain.interface.motionRequest.reset_odometry = True
+    # player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
+
     facingDest.relH = player.brain.ball.bearing_deg
     player.brain.nav.goTo(facingDest,
                           nav.CLOSE_ENOUGH,
@@ -139,21 +144,26 @@ def waitToFaceField(player):
 @superState('gameControllerResponder')
 def returnToGoal(player):
     if player.firstFrame():
+        print ("first returnToGoal.kickPose: ", returnToGoal.kickPose.relX, returnToGoal.kickPose.relY, returnToGoal.kickPose.relH)
         if player.lastDiffState == 'didIKickIt' or player.lastDiffState == 'gamePlaying':
             correctedDest =(RelRobotLocation(0.0, 0.0, 0.0 ) -
                             returnToGoal.kickPose)
+            correctedDest.relH = -returnToGoal.kickPose.relH
         else:
+            print "This else happened in setting dest"
             correctedDest = (RelRobotLocation(0.0, 0.0, 0.0) -
                              RelRobotLocation(player.brain.interface.odometry.x,
                                               player.brain.interface.odometry.y,
                                               0.0))
 
-        if fabs(correctedDest.relX) < 5:
-            correctedDest.relX = 0.0
-        if fabs(correctedDest.relY) < 5:
-            correctedDest.relY = 0.0
-        if fabs(correctedDest.relH) < 5:
-            correctedDest.relH = 0.0
+        print ("first correctedDest: ", correctedDest.relX, correctedDest.relY, correctedDest.relH)
+
+        # if fabs(correctedDest.relX) < 5:
+        #     correctedDest.relX = 0.0
+        # if fabs(correctedDest.relY) < 5:
+        #     correctedDest.relY = 0.0
+        # if fabs(correctedDest.relH) < 5:
+        #     correctedDest.relH = 0.0
 
         print "I'm returning to goal now!"
         print ("my correctedDest: ", correctedDest.relX, correctedDest.relY, correctedDest.relH)
@@ -162,6 +172,49 @@ def returnToGoal(player):
         player.brain.nav.walkTo(correctedDest)
 
     return Transition.getNextState(player, returnToGoal)
+
+# Very hacky, I am on a lot of shoulder medication
+# Ideally let a robot find its way back to the goalbox after falling
+# or getting lost outside
+# Robot spins until it finds a line, then walks towards it
+@superState('gameControllerResponder')
+def findMyWayBackPtI(player):
+    if player.firstFrame():
+        player.homeDirections = []
+        player.brain.nav.stop()
+        findMyWayBackPtI.counter = 0
+        player.brain.tracker.lookToAngle(0.0)
+    findMyWayBackPtI.counter += 1
+    # if findMyWayBackPtI.counter > 200:
+    #         return player.goLater('watchWithLineChecks')
+    if player.brain.nav.isStopped():
+        if clearIt.ballSide == RIGHT:
+            player.setWalk(0, 0, -20.0)
+        else:
+            player.setWalk(0, 0, 20.0)
+
+    return Transition.getNextState(player, findMyWayBackPtI)
+
+@superState('gameControllerResponder')
+def findMyWayBackPtII(player):
+    if player.firstFrame():
+        findMyWayBackPtII.counter = 0
+        player.brain.tracker.lookToAngle(0.0)
+        dest = GoalieStates.average(player.homeDirections)
+        print "I'm walking back now!"
+        player.brain.nav.walkTo(dest)
+        player.homeDirections = []
+        if clearIt.ballSide == RIGHT:
+            player.homeDirections += [RelRobotLocation(0.0, 0.0, 175.0)]
+        else:
+            player.homeDirections += [RelRobotLocation(0.0, 0.0, -175.0)]
+    findMyWayBackPtII.counter += 1
+    # if findMyWayBackPtII.counter > 200:
+    #         return player.goLater('watchWithLineChecks')
+
+    return Transition.getNextState(player, findMyWayBackPtII)
+
+
 
 @superState('gameControllerResponder')
 def repositionAfterWhiff(player):

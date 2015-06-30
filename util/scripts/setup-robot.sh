@@ -31,6 +31,14 @@ mv $FOLDER/libprotobuf.so.7 /usr/lib/
 echo "Moving camera driver..."
 mv $FOLDER/mt9m114.ko /lib/modules/2.6.33.9-rt31-aldebaran-rt/kernel/drivers/media/video/
 
+# Put man script in /usr/bin
+echo "Moving man control script"
+mv $FOLDER/man /usr/bin/
+
+# Create nbitesFIFO which Boss listens to
+echo "Making FIFO"
+mkfifo nbites/nbitesFIFO
+
 # Set the hostname
 echo "Setting the hostname to $HOSTNAME..."
 echo $HOSTNAME > /etc/hostname

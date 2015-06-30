@@ -28,10 +28,11 @@ def shouldDodge(nav):
         return False
 
     for i in range(1, len(nav.brain.obstacles)):
-        if nav.brain.obstacles[i] == 1.0:
-            states.dodge.armPosition = i
+        if nav.brain.obstacleDetectors[i] == 's':
+            states.dodge.obstaclePosition = i
             doneDodging.timer = 0
-            doneDodging.armPosition = i
+            doneDodging.obstaclePosition = i
+            doneDodging.detectorDodged = nav.brain.obstacleDetectors[i]
             return True
 
     return False
@@ -82,14 +83,14 @@ def shouldDodge(nav):
 # Check if an obstacle is no longer there, or if we've completed the dodge
 def doneDodging(nav):
     timerDone = False
-    obstacles = False
+    obstacles = True
 
     doneDodging.timer += 1
-    if doneDodging.timer > 90:
+    if doneDodging.timer > 75:
         timerDone = True
 
-    if nav.brain.obstacles[doneDodging.armPosition] == 1.0:
-        obstacles = True
+    if nav.brain.obstacleDetectors[doneDodging.obstaclePosition] != doneDodging.detectorDodged:
+        obstacles = False
 
     return timerDone and not obstacles
 

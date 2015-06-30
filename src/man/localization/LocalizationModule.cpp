@@ -52,19 +52,18 @@ void LocalizationModule::update()
     curOdometry.set_h(motionInput.message().h());
     curLines = linesInput.message();
     curCorners = cornersInput.message();
+    curBall = ballInput.message();
 
+    const messages::FilteredBall* ball = NULL;
 #ifndef OFFLINE
-    // bool inSet = (STATE_SET == gameStateInput.message().state());
-    // // Update the Particle Filter with the new observations/odometry
-
-    // if (inSet && (!gameStateInput.message().have_remote_gc() || 
-    //     gameStateInput.message().secs_remaining() != 600))
-    //     particleFilter->update(curOdometry, visionInput.message(), ballInput.message());
-    // else
+    bool inSet = (STATE_SET == gameStateInput.message().state());
+    if (inSet && (!gameStateInput.message().have_remote_gc() || 
+        gameStateInput.message().secs_remaining() != 600))
+        ball = &curBall;
 #endif
 
     // Update filter
-    particleFilter->update(curOdometry, curLines, curCorners);
+    particleFilter->update(curOdometry, curLines, curCorners, ball);
 
 //this is part of something old that never executes, check out
 //the ifdef below; same code but it is executed when we want to
@@ -89,19 +88,23 @@ void LocalizationModule::update()
         messages::RobotLocation rl = *output.getMessage(true).get();
         messages::ParticleSwarm ps = *particleOutput.getMessage(true).get();
         messages::FieldLines fl = curLines;
+        messages::Corners cr = curCorners;
 
         std::string rl_buf;
         std::string ps_buf;
         std::string fl_buf;
+        std::string cr_buf;
         std::string log_buf;
 
         rl.SerializeToString(&rl_buf);
         ps.SerializeToString(&ps_buf);
         fl.SerializeToString(&fl_buf);
+        cr.SerializeToString(&cr_buf);
 
         log_buf.append(rl_buf);
         log_buf.append(ps_buf);
         log_buf.append(fl_buf);
+        log_buf.append(cr_buf);
 
         std::vector<SExpr> contents;
 
@@ -113,6 +116,9 @@ void LocalizationModule::update()
 
         SExpr naoFieldLines("fieldlines",log_from,clock(),log_index,fl_buf.length());
         contents.push_back(naoFieldLines);
+
+        SExpr naoCorners("corners",log_from,clock(),log_index,cr_buf.length());
+        contents.push_back(naoCorners);
 
         NBLog(NBL_SMALL_BUFFER,"LOCSWARM",contents,log_buf);
     }
@@ -129,7 +135,7 @@ void LocalizationModule::run_()
     cornersInput.latch();
 #ifndef OFFLINE
     gameStateInput.latch();
-    // ballInput.latch();
+    ballInput.latch();
     resetInput[0].latch();
     resetInput[1].latch();
 #endif
