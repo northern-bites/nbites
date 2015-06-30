@@ -58,7 +58,8 @@ TranscriberBuffer::~TranscriberBuffer()
 ImageTranscriber::ImageTranscriber(Camera::Type which) :
     settings(Camera::getSettings(which)),
     cameraType(which),
-    timeStamp(0)
+    timeStamp(0),
+    exiting(false)
 {
     // Bottom camera takes video at half the resolution of the top camera
     if (which == Camera::TOP) {
@@ -86,7 +87,11 @@ ImageTranscriber::ImageTranscriber(Camera::Type which) :
 
 ImageTranscriber::~ImageTranscriber()
 {
+    // If this is true then we've (hopefully) already closed up shop
+    if (exiting) return;
+
     // disable streaming
+    std::cout << "STOPPING THE CAMERA" << std::endl;
     int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     verify(ioctl(fd, VIDIOC_STREAMOFF, &type),
            "Capture stop failed.");
@@ -94,10 +99,27 @@ ImageTranscriber::~ImageTranscriber()
     // unmap buffers
     for (int i = 0; i < NUM_BUFFERS; ++i)
         munmap(mem[i], memLength[i]);
-
     // close the device
     close(cameraAdapterFd);
     close(fd);
+    std::cout << "Done closing Camera" << std::endl;
+}
+
+void ImageTranscriber::closeDriver()
+{
+    exiting = true;
+    std::cout << "STOPPING THE CAMERA" << std::endl;
+    int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    verify(ioctl(fd, VIDIOC_STREAMOFF, &type),
+           "Capture stop failed.");
+
+    // unmap buffers
+    for (int i = 0; i < NUM_BUFFERS; ++i)
+        munmap(mem[i], memLength[i]);
+    // close the device
+    close(cameraAdapterFd);
+    close(fd);
+    std::cout << "Done closing Camera" << std::endl;
 }
 
 void ImageTranscriber::initOpenI2CAdapter() {
@@ -542,6 +564,11 @@ void ImageTranscriber::startCapturing() {
 // The heart of the transcriber, returns an image full of pixels from video mem
 messages::YUVImage ImageTranscriber::getNextImage()
 {
+    if (exiting) {
+        // Make sure we aren't trying to read from the camera if
+        // man is in the process of exiting
+        return messages::YUVImage(width*2, height);
+    }
     // dequeue a frame buffer (this call blocks when there is
     // no new image available)
     if(cameraType == Camera::TOP)
@@ -593,8 +620,19 @@ TranscriberModule::TranscriberModule(ImageTranscriber& trans)
 {
 }
 
+TranscriberModule::~TranscriberModule()
+{
+    std::cout << "Transcriber destructor" << std::endl;
+    delete &it;
+}
+
+void TranscriberModule::closeTranscriber()
+{
+    it.closeDriver();
+}
+
 void logThumbnail(messages::YUVImage& image, std::string& ifrom, size_t iindex);
-    
+
 // Get image from Transcriber and outportal it
 void TranscriberModule::run_()
 {
@@ -646,7 +684,7 @@ void TranscriberModule::run_()
     messages::YUVImage image = it.getNextImage();
     portals::Message<messages::YUVImage> imageOutMessage(&image);
     imageOut.setMessage(imageOutMessage);
-    
+
 #ifdef USE_LOGGING
     if (control::flags[control::thumbnail]) {
         std::string image_from;
@@ -656,7 +694,7 @@ void TranscriberModule::run_()
         } else {
             image_from = "camera_BOT";
         }
-        
+
         logThumbnail(image, image_from, ++image_index);
     }
 #endif

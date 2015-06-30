@@ -159,6 +159,7 @@ void VisionModule::run_()
 
     // Send messages on outportals
     sendLinesOut();
+    sendCornersOut();
     ballOn = ballDetected;
     updateVisionBall();
 
@@ -337,8 +338,12 @@ void VisionModule::sendCornersOut()
             messages::Corner* pCorner = pCorners.add_corner();
             Corner& corner = (*(cornerDetector[i]))[j];
 
-            pCorner->set_x(corner.x);
-            pCorner->set_y(corner.y);
+            // Rotate to post vision relative robot coordinate system
+            double rotatedX, rotatedY;
+            man::vision::translateRotate(corner.x, corner.y, 0, 0, -(M_PI / 2), rotatedX, rotatedY);
+
+            pCorner->set_x(rotatedX);
+            pCorner->set_y(rotatedY);
             pCorner->set_id(static_cast<int>(corner.id));
         }
     }
