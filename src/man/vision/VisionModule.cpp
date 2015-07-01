@@ -169,7 +169,7 @@ void VisionModule::run_()
         rejectedEdges[i]->mapToField(*(homography[i]));
  
         // Detect center circle on top
-        // if (!i) centerCircleDetected = centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]));
+        if (!i) centerCircleDetected = centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]));
  
         // Pair hough lines to field lines
         fieldLines[i]->find(*(houghLines[i]));
