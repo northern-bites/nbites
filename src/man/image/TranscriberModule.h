@@ -61,6 +61,8 @@ public:
     uint64_t getTimestamp() const;
     Camera::Type type() { return cameraType; }
 
+    // Cleanly close the camera driver
+    void closeDriver();
     struct NewSettings {
         bool hflip;
         bool vflip;
@@ -129,6 +131,8 @@ private:
 
     uint64_t timeStamp;
 
+    // True if this is about to be destroyed. So that we don't try to use driver after its closed
+    bool exiting;
 };
 
 // Module that wraps Transcriber's functionality
@@ -137,6 +141,8 @@ class TranscriberModule : public portals::Module
 {
 public :
     TranscriberModule(ImageTranscriber&);
+    ~TranscriberModule();
+    void closeTranscriber();
 
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::InertialState> inertsIn;

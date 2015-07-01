@@ -399,13 +399,13 @@ double GeoLine::separation(const GeoLine& other) const
   return pDist(x0, y0) + other.pDist(x0, y0);
 }
 
-// TODO params
 double GeoLine::error(const GeoLine& other, bool test) const
 {
   double normalizedT = (r() > 0 ? t() : t() - M_PI);
   double rDiff = fabs(fabs(r()) - fabs(other.r()));
   double tDiff = fabs(sMod(normalizedT - other.t(), M_PI));
 
+  // TODO params
   boost::math::normal_distribution<> rGaussian(0, 100);
   boost::math::normal_distribution<> tGaussian(0, 10*TO_RAD);
 
