@@ -66,7 +66,8 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
 			debugSpace[1] = (uint8_t *)malloc((wd / 2) * (ht / 2) * sizeof(uint8_t));
 		}
 #else
-		debugSpace[0] = NULL;
+		// don't get any space if we're running on the robot
+		debugSpace[i] = NULL;
 #endif
 		if (i == 0) {
 			debugImage[i] = new DebugImage(wd, ht, debugSpace[0]);
