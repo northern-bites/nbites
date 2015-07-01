@@ -11,6 +11,7 @@ FLAGS        = -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN)
 EXECUTABLE = tool
 LOC_EXECUTABLE = loc_tool
 WORLDVIEW_EXECUTABLE = worldview_tool
+SHAREDVIEW_EXECUTABLE = sharedview_tool
 BALL_EXECUTABLE = ball_tool
 VISION_EXECUTABLE = vision_tool
 CALIBRATE_EXECUTABLE = calibrate_tool
@@ -55,6 +56,19 @@ worldview: build_worldview
 	@echo "Running worldview_tool executable."
 	@cd $(BUILD_DIR); \
 	./$(WORLDVIEW_EXECUTABLE)
+
+.PHONY: build_sharedview
+build_sharedview:
+	mkdir -p $(BUILD_DIR)
+	cd $(BUILD_DIR); \
+	cmake $(FLAGS) $(SRC_DIR); \
+	$(MAKE) --no-print-directory $(SHAREDVIEW_EXECUTABLE)
+
+.PHONY: sharedview
+sharedview: build_sharedview
+	@echo "Running sharedview_tool executable."
+	@cd $(BUILD_DIR); \
+	./$(SHAREDVIEW_EXECUTABLE)
 
 .PHONY: build_ball
 build_ball:
