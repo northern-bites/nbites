@@ -9,6 +9,8 @@
 
 #include "Stdafx.h"
 #include "Vision.h"
+#include "Homography.h"
+
 
 // ******************************************************
 // *                                                    *
@@ -201,6 +203,19 @@ AngleBinsIterator<T>& AngleBinsIterator<T>::operator++()
 // **********
 
 class HoughLine;
+class Edge;
+class FieldEdge {
+  double data[3];
+
+public:
+  FieldEdge(double x = 0, double y = 0, double t = 0)
+  {
+    data[0] = x; data[1] = y; data[2] = t;
+  }
+  double x() { return data[0]; }
+  double y() { return data[1]; }
+  double t() { return data[2]; }
+};
 
 class Edge : public AngleElement
 {
@@ -209,6 +224,8 @@ class Edge : public AngleElement
 
   HoughLine* _memberOf;
   Edge* _nextMember;
+
+  FieldEdge _field;
 
 public:
   // Default constructor leaves members uninitialized so AngleBins can allocate a large
@@ -240,6 +257,11 @@ public:
   const Edge* nextMember() const { return _nextMember; }
   Edge* nextMember() { return _nextMember; }
   void nextMember(Edge* e) { _nextMember = e; }
+
+  FieldEdge field() const { return _field; }
+
+  // Translate edge to field coordinates
+  void setField(const FieldHomography& h);
 };
 
 class EdgeList : public AngleBins<Edge>
@@ -247,6 +269,8 @@ class EdgeList : public AngleBins<Edge>
   // No copy/assign
   EdgeList(const EdgeList&);
   EdgeList& operator=(const EdgeList&);
+
+  double _fx0, _fy0;
 
 public:
   EdgeList(int size) : AngleBins(size) {}
@@ -257,6 +281,12 @@ public:
     e->set(x, y, mag);
     return e;
   }
+  void mapToField(const FieldHomography&);
+
+
+  // The field coordinates of the robot at the time mapToField was called.
+  double fx0() const { return _fx0; }
+  double fy0() const { return _fy0; }
 };
 
 // *********************************

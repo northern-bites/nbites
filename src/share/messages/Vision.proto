@@ -38,3 +38,10 @@ message Corners
 {
     repeated Corner corner = 1;
 }
+
+message CenterCircle
+{
+    optional bool on = 1;
+    optional float x = 2;
+    optional float y = 3;
+}

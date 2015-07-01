@@ -31,26 +31,29 @@ public:
     portals::OutPortal<messages::FieldLines> linesOut;
     portals::OutPortal<messages::Corners> cornersOut;
     portals::OutPortal<messages::VisionBall> ballOut;
+    portals::OutPortal<messages::CenterCircle> centCircOut;
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
-    HoughLineList* getLines(bool topCamera = true) const { return houghLines[!topCamera]; }
-    BallDetector* getBallDetector(bool topCamera = true) const { return ballDetector[!topCamera]; }
+    EdgeList* getRejectedEdges(bool topCamera = true) const {return rejectedEdges[!topCamera]; }
     HoughLineList* getHoughLines(bool topCamera = true) const { return houghLines[!topCamera]; }
+    BallDetector* getBallDetector(bool topCamera = true) const { return ballDetector[!topCamera]; }
     Kinematics* getKinematics(bool topCamera = true) const {return kinematics[!topCamera]; }
     FieldHomography* getFieldHomography(bool topCamera = true) const {return homography[!topCamera]; }
     FieldLineList* getFieldLines(bool topCamera = true) const { return fieldLines[!topCamera]; }
     GoalboxDetector* getBox(bool topCamera = true) const { return boxDetector[!topCamera]; }
     CornerDetector* getCorners(bool topCamera = true) const { return cornerDetector[!topCamera]; }
-
-    // For use by Image nbcross func
-    void setColorParams(Colors* colors, bool topCamera) { colorParams[!topCamera] = colors; }
+    CenterCircleDetector* getCCD(bool topCamera = true) const {return centerCircleDetector[!topCamera]; }
+    
+    // For use by vision_defs
+    void setColorParams(Colors* colors, bool topCamera);
     const std::string getStringFromTxtFile(std::string path);
     Colors* getColorsFromLisp(nblog::SExpr* colors, int camera);
-
     void setCalibrationParams(std::string robotName);
     void setCalibrationParams(int camera, std::string robotName);
-    void setCalibrationParams(CalibrationParams* params, bool topCamera) { calibrationParams[!topCamera] = params; }
+    void setCalibrationParams(CalibrationParams* params, bool topCamera);
+    void blackStar(bool blackStar) { blackStar_ = blackStar; }
+    bool blackStar() const {return blackStar_;}
 
 protected:
     virtual void run_();
@@ -62,11 +65,13 @@ private:
     void sendLinesOut();
     void sendCornersOut();
     void updateVisionBall();
+    void sendCenterCircle();
 
     Colors* colorParams[2];
     ImageFrontEnd* frontEnd[2];
     EdgeDetector* edgeDetector[2];
     EdgeList* edges[2];
+    EdgeList* rejectedEdges[2];
     HoughLineList* houghLines[2];
     HoughSpace* hough[2];
     CalibrationParams* calibrationParams[2];
@@ -75,8 +80,13 @@ private:
     FieldLineList* fieldLines[2];
     GoalboxDetector* boxDetector[2];
     CornerDetector* cornerDetector[2];
+    CenterCircleDetector* centerCircleDetector[2];
     BallDetector* ballDetector[2];
 
+    bool centerCircleDetected;
+
+    bool blackStar_;
+    
     // Lisp tree with color params saved
     nblog::SExpr colors;
 
@@ -87,6 +97,8 @@ private:
 
     nblog::SExpr* calibrationLisp;
     size_t image_index;
+
+#
 };
 
 }

@@ -419,7 +419,7 @@ void ObstacleModule::processVision(float distance, float bearing)
         // obstacle to the east
         updateVisionBuffer(FieldObstacles::Obstacle::EAST, EDists, distance);
     }
-    else if ( bearing < -ZONE_WIDTH )
+    else if ( bearing < -1.f*ZONE_WIDTH )
     {
         // obstacle to northeast
         updateVisionBuffer(FieldObstacles::Obstacle::NORTHEAST, NEDists, distance);

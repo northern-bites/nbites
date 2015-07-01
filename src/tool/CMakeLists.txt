@@ -179,6 +179,23 @@ set( worldview_headers
   WorldviewTool.h
 )
 
+# SharedviewTool
+set( sharedview_srcs sharedview_main.cpp
+  EmptyTool.cpp
+  ToolDiagram.cpp
+  DataSelector.cpp
+
+  SharedTool.cpp
+  )
+
+set( sharedview_headers
+  EmptyTool.h
+  ToolDiagram.h
+  DataSelector.h
+
+  SharedTool.h
+)
+
 #BallTool
 set( ball_srcs ball_main.cpp
   EmptyTool.cpp
@@ -271,6 +288,7 @@ set( installer_headers
 Qt4_wrap_cpp( tool_headers_moc ${tool_headers} )
 Qt4_wrap_cpp( loc_headers_moc ${loc_headers} )
 Qt4_wrap_cpp( worldview_headers_moc ${worldview_headers} )
+Qt4_wrap_cpp( sharedview_headers_moc ${sharedview_headers} )
 Qt4_wrap_cpp( ball_headers_moc ${ball_headers} )
 Qt4_wrap_cpp( vision_headers_moc ${vision_headers} )
 Qt4_wrap_cpp( calibrate_headers_moc ${calibrate_headers} )
@@ -339,10 +357,29 @@ target_link_libraries(
   unlog
   image_display
   logview
-  # sharedball
+  sharedball
   # sharedview
   fieldview
   worldview
+  tool_common
+  localization
+  ${QT_LIBRARIES}
+  )
+
+# The SharedView executable
+add_executable( sharedview_tool
+  ${sharedview_srcs}
+  ${sharedview_headers_moc} )
+
+target_link_libraries(
+  sharedview_tool
+  portals
+  messages
+  unlog
+  image_display
+  logview
+  sharedball
+  sharedview
   tool_common
   localization
   ${QT_LIBRARIES}
