@@ -465,6 +465,14 @@ int CameraCalibration_func() {
                 return 0;
             }
         }
+
+        // If log includes "BlackStar," set flag
+        std::vector<SExpr*> blackStarVec = args[0]->tree().recursiveFind("BlackStar");
+        if (blackStarVec.size() != 0) {
+            module.blackStar(true);
+            std::cout << "\nBLACK STAR TRUE!!!\n\n";
+        } else std::cout << "\nBLACK STAR FALSE\n\n";
+        
         
         // Create messages
         messages::YUVImage image(buf, width, height, width);
@@ -496,7 +504,7 @@ int CameraCalibration_func() {
         }
     }
 
-    if (failures > 2) {
+    if (failures > 4) {
         // Handle failure
         printf("FAILED: %d times\n", failures);
         rets.push_back(new Log("(failure)"));

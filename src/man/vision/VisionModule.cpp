@@ -122,6 +122,7 @@ void VisionModule::run_()
 
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
+        
         // Get image
         const messages::YUVImage* image = images[i];
 
@@ -164,10 +165,10 @@ void VisionModule::run_()
         houghLines[i]->mapToField(*(homography[i]));
          
         // Find world coordinates for rejected edges
-        rejectedEdges[i]->mapToField(*(homography[i]));
+//        rejectedEdges[i]->mapToField(*(homography[i]));
  
         // Detect center circle on top
-        if (!i) centerCircleDetected = centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]));
+//        if (!i) centerCircleDetected = centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]));
  
         // Pair hough lines to field lines
         fieldLines[i]->find(*(houghLines[i]), blackStar());

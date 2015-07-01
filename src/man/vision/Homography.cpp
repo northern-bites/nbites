@@ -320,11 +320,17 @@ bool StarCal::add(const FieldLineList& lines)
 {
   for (int i = 0; i < (int)lines.size(); ++i)
   {
+    std::cout << "Looking at line " << i << std::endl;
     double vpx, vpy;
-    if (lines[i][0].intersect(lines[i][1], vpx, vpy) && fabs(lines[i][0].ux()) > 0.3)
+    if (lines[i][0].intersect(lines[i][1], vpx, vpy)) {
+      std::cout << "Passed first test\n";
+     if (fabs(lines[i][0].ux()) > 0.3) {
+      std::cout << "Passed both tests\n";
       fit.add(vpx - ix0, vpy - iy0);  // relative to optical axis
+     }
+    }
   }
-
+  std::cout << fit.area() << "lines passed the test\n";
   // If we didn't find exactly three suitable field lines, fail
   return fit.area() == 3;
 }

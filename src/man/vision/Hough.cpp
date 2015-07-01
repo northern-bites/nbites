@@ -1151,13 +1151,14 @@ void HoughSpace::adjust(EdgeList& edges, EdgeList& rejectedEdges, HoughLineList&
       ++hl;
   }
 
-  rejectedEdges.reset();
+  // For center circle detection, colloect all orphan edges
+  // rejectedEdges.reset();
 
-  AngleBinsIterator<Edge> rejectABI(edges);
-  for (Edge* e = *rejectABI; e; e = *++rejectABI)
-    if (e->memberOf() == 0) {
-      rejectedEdges.add(e->x(), e->y(), e->mag(), e->angle());
-    }
+  // AngleBinsIterator<Edge> rejectABI(edges);
+  // for (Edge* e = *rejectABI; e; e = *++rejectABI)
+  //   if (e->memberOf() == 0) {
+  //     rejectedEdges.add(e->x(), e->y(), e->mag(), e->angle());
+  //   }
   times[4] = timer.time32();
 }
 
