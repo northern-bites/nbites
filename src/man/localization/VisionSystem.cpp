@@ -84,12 +84,14 @@ bool VisionSystem::update(ParticleSet& particles,
         // If found top goalbox
         if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
             const messages::HoughLine& inner = field.inner();
+            LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirTopGoalbox : LocLineID::OurTopGoalbox);
 
             // Rotate line to loc rel robot coordinate system 
             vision::GeoLine line;
             line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
             line.translateRotate(0, 0, -(M_PI / 2));
 
+            // Based on corners
             for (int j = 0; j < corners.corner_size(); j++) {
                 const messages::Corner& corner = corners.corner(j);
 
@@ -100,7 +102,6 @@ bool VisionSystem::update(ParticleSet& particles,
                 if (corner.id() == static_cast<int>(vision::CornerID::Convex) && 
                     (corner.line1() == field.index() || corner.line2() == field.index())) {
                     // Recover x and heading from top goalbox line
-                    LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirTopGoalbox : LocLineID::OurTopGoalbox);
                     messages::RobotLocation pose = lineSystem->reconstructWoEndpoints(id, field);
 
                     // Recover y from corner
@@ -125,6 +126,15 @@ bool VisionSystem::update(ParticleSet& particles,
                     if (reconstructed.onField())
                         injections.push_back(reconstructed);
                 }
+            }
+
+            // Based on midpoint of top goalbox
+            // NOTE only valid if line is sufficiently long, otherwise too much
+            //      error in the y direction
+            if (inner.ep1() - inner.ep0() > 200) {
+                messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(id, field);
+                ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 3, 0.01);
+                injections.push_back(reconstructed);
             }
         }
     }
