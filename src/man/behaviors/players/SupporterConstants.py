@@ -13,7 +13,7 @@ def getSupporterPosition(player, r):
     elif role.isRightDefender(r):
         return rightDefender(player)
     elif role.isFirstChaser(r):
-        return firstChaser(player)
+        return chaser(player)
     elif role.isSecondChaser(r):
         return striker(player)
     else: # cherry picker
