@@ -498,7 +498,7 @@ int Synthetics_func() {
     double flen = (fullres ? 544 : 272);
 
     int size = wd*4*ht*2;
-    uint8_t* pixels = new uint8_t[size];
+    uint8_t pixels[size];
     man::vision::YuvLite synthetic(wd, ht, wd*4, pixels);
 
     man::vision::FieldHomography homography(top);
