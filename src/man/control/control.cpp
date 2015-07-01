@@ -131,7 +131,7 @@ namespace control {
 
             std::string stringToWrite = s.serialize();
 
-            #ifdef NAOQI_2
+            #ifdef V5_ROBOT
                 std::cout<<"Saving as V5"<<std::endl;
                 if(receivedParams.whichcamera() == "TOP"){
                     std::cout<<"TOP Params Received"<<std::endl;

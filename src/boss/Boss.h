@@ -61,6 +61,8 @@ private:
     pid_t manPID;
     bool manRunning;
     bool killingMan;
+    uint64_t killingNext;
+    uint64_t killingLast;
 
     int shared_fd;
     volatile SharedData* shared;

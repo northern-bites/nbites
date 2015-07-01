@@ -34,16 +34,17 @@ public:
     bool update(ParticleSet& particles,
                 const messages::FieldLines& lines,
                 const messages::Corners& corners,
-                const messages::FilteredBall* ball);
+                const messages::FilteredBall* ball,
+                const messages::RobotLocation& lastEstimate);
 
-    const std::list<ReconstructedLocation>& getInjections() { return injections; }
+    const std::vector<ReconstructedLocation>& getInjections() { return injections; }
     int getNumObservations() const { return numObservations; }
     double getAvgError() const { return avgError; }
 
 private:
     LineSystem* lineSystem;
     LandmarkSystem* landmarkSystem;
-    std::list<ReconstructedLocation> injections;
+    std::vector<ReconstructedLocation> injections;
 
     int numObservations;
     double avgError;
