@@ -322,6 +322,7 @@ void VisionModule::sendLinesOut()
             }
 
             pLine->set_id(static_cast<int>(line.id()));
+            pLine->set_index(static_cast<int>(line.index()));
         }
     }
 
@@ -345,6 +346,8 @@ void VisionModule::sendCornersOut()
             pCorner->set_x(rotatedX);
             pCorner->set_y(rotatedY);
             pCorner->set_id(static_cast<int>(corner.id));
+            pCorner->set_line1(static_cast<int>(corner.first->index()));
+            pCorner->set_line2(static_cast<int>(corner.second->index()));
         }
     }
 

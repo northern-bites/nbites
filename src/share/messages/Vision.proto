@@ -15,6 +15,7 @@ message FieldLine
     optional int32 id = 3;
     optional int32 correspondence = 4;
     optional float prob = 5;
+    optional int32 index = 6;
 }
 
 message FieldLines
@@ -29,6 +30,8 @@ message Corner
     optional int32 id = 3;
     optional int32 correspondence = 4;
     optional float prob = 5;
+    optional int32 line1 = 6;
+    optional int32 line2 = 7;
 }
 
 message Corners

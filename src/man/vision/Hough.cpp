@@ -261,8 +261,7 @@ bool GoalboxDetector::validBox(const HoughLine& line1, const HoughLine& line2) c
   const GeoLine& field1 = line1.field();
   const GeoLine& field2 = line2.field();
 
-  // Goalbox = two field lines that are parallel, seperated by 60 cm, 
-  // and both over 80 cm in length
+  // Goalbox = two field lines that are parallel and seperated according to spec
 
   // (1) Parallel
   // NOTE this check also requires that the robot is not in between the lines 
@@ -275,12 +274,7 @@ bool GoalboxDetector::validBox(const HoughLine& line1, const HoughLine& line2) c
   double distBetween = fabs(field1.pDist(field2.r()*cos(field2.t()), field2.r()*sin(field2.t())));
   bool seperation = fabs(distBetween - GOALBOX_DEPTH) < seperationThreshold();
 
-  // (3) Both over 150 cm in length
-  bool length1 = field1.ep1() - field1.ep0() > 150;
-  bool length2 = field2.ep1() - field2.ep0() > 150;
-  bool length = length1 && length2;
-
-  return parallel && seperation && length;
+  return parallel && seperation;
 }
 
 string GoalboxDetector::print() const
@@ -390,12 +384,7 @@ bool CornerDetector::isCorner(const HoughLine& line1, const HoughLine& line2) co
   double normalizedT2 = (field2.r() > 0 ? field2.t() : field2.t() - M_PI);
   bool orthogonal = diffRadians(diffRadians(normalizedT1, normalizedT2), (M_PI / 2)) < orthogonalThreshold()*TO_RAD;
 
-  // (3) Check that lines are longer than 70 cms
-  bool length1 = field1.ep1() - field1.ep0() > 70;
-  bool length2 = field2.ep1() - field2.ep0() > 70;
-  bool length = length1 && length2;
-
-  return intersects && farEnoughFromImageEdge && orthogonal && length;
+  return intersects && farEnoughFromImageEdge && orthogonal;
 }
 
 CornerID CornerDetector::classify(const HoughLine& line1, const HoughLine& line2) const
