@@ -20,6 +20,7 @@ import nbtool.gui.logviews.misc.CrossBright;
 import nbtool.gui.logviews.misc.DefaultView;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.logviews.proto.ProtoBufView;
+import nbtool.gui.logviews.sound.SoundFreqView;
 import nbtool.gui.logviews.sound.SoundView;
 import nbtool.gui.logviews.loc.LocSwarmView;
 
@@ -83,7 +84,7 @@ public class NBConstants {
 		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
 		map.put("location", new Class[]{LocSwarmView.class});
 		map.put("proto-FieldLines", new Class[]{BasicLineView.class});
-		map.put("sound", new Class[]{SoundView.class});
+		map.put("sound", new Class[]{SoundView.class, SoundFreqView.class});
 
 		return map;
 	}

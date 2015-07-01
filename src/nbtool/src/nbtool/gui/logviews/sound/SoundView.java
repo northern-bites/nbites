@@ -15,8 +15,8 @@ public class SoundView extends ViewParent {
 	private int channels = 2;
 	private int frames = 1024;
 	
-	private int[] left = new int[1024];
-	private int[] right = new int[1024];
+	private Integer[] left = new Integer[1024];
+	private Integer[] right = new Integer[1024];
 	
 	@Override
 	public void setLog(Log newlog) {
@@ -37,6 +37,12 @@ public class SoundView extends ViewParent {
 		Logger.printf("Max is %d", max);
 		
 		this.repaint();
+		
+		SoundPane<Integer> sp = new SoundPane<>(left, right, 2, new SoundPane.Scaler<Integer>(){
+			public int pixelsFor(Integer val, int pixels) {
+				return 0;
+			}
+		});
 	}
 	
 	public static enum Format {
