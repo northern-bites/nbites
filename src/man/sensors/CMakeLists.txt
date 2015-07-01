@@ -14,5 +14,4 @@ add_library(
 target_link_libraries(sensors
   portals
   messages
-  ${ALCOMMON_LIBRARIES}
 )

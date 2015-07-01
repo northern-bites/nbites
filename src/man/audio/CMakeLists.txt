@@ -15,5 +15,5 @@ add_library(
 target_link_libraries(audio
   portals
   messages
-  ${ALCOMMON_LIBRARIES}
+  #${ALCOMMON_LIBRARIES}
 )
