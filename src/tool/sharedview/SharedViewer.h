@@ -52,6 +52,8 @@ public:
     //note: only setting the following in worldModel that are used by sharedball
     // ball_on, my_uncert, my_x, my_y, my_h, timestamp, ball_dist, ball_bearing
     portals::OutPortal<messages::WorldModel>* worldsOut[NUM_PLAYERS_PER_TEAM];
+    portals::OutPortal<messages::FilteredBall> ballOut;
+    portals::OutPortal<messages::RobotLocation> locOut;
 
 protected slots:
     void updateMessageInfo();
