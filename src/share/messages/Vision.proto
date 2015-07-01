@@ -13,7 +13,8 @@ message FieldLine
     optional HoughLine inner = 1;
     optional HoughLine outer = 2;
     optional int32 id = 3;
-    optional float prob = 4;
+    optional int32 correspondence = 4;
+    optional float prob = 5;
 }
 
 message FieldLines
@@ -26,6 +27,8 @@ message Corner
     optional float x = 1;
     optional float y = 2;
     optional int32 id = 3;
+    optional int32 correspondence = 4;
+    optional float prob = 5;
 }
 
 message Corners
