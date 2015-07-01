@@ -248,7 +248,7 @@ void ImageTranscriber::initQueueAllBuffers() {
 void ImageTranscriber::initSettings()
 {
     std::string filepath;
-#ifdef NAOQI_2 //for NAOQI 2.x
+//#ifdef NAOQI_2 //for NAOQI 2.x
     if(cameraType == Camera::TOP) {
         filepath = "/home/nao/nbites/Config/V5topCameraParams.txt";
         std::cout<<"[INFO] Camera::TOP"<<std::endl;
@@ -256,15 +256,15 @@ void ImageTranscriber::initSettings()
         filepath = "/home/nao/nbites/Config/V5bottomCameraParams.txt";
         std::cout<<"[INFO] Camera::BOTTOM"<<std::endl;
     }
-#else //for NAOQI 1.14
-    if(cameraType == Camera::TOP) {
-        filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
-        std::cout<<"[INFO] Camera::TOP"<<std::endl;
-    } else {
-        filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
-        std::cout<<"[INFO] Camera::BOTTOM"<<std::endl;
-    }
-#endif
+// #else //for NAOQI 1.14
+//     if(cameraType == Camera::TOP) {
+//         filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
+//         std::cout<<"[INFO] Camera::TOP"<<std::endl;
+//     } else {
+//         filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
+//         std::cout<<"[INFO] Camera::BOTTOM"<<std::endl;
+//     }
+// #endif
     
     if(FILE *file = fopen(filepath.c_str(),"r")) {
         fclose(file);
@@ -314,10 +314,8 @@ void ImageTranscriber::initSettings()
     setControlSetting(V4L2_CID_SATURATION, updated_settings.saturation);
     setControlSetting(V4L2_CID_HUE, updated_settings.hue);
     setControlSetting(V4L2_CID_SHARPNESS, updated_settings.sharpness);
-
-#ifdef NAOQI_2
     setControlSetting(V4L2_CID_GAMMA, updated_settings.gamma);
-#endif
+
     // Auto white balance, exposure,  and backlight comp off!
     // The first two are both for white balance. The docs don't make
     // it clear what the difference is...
@@ -329,12 +327,8 @@ void ImageTranscriber::initSettings()
     setControlSetting(V4L2_CID_EXPOSURE, updated_settings.exposure);
     setControlSetting(V4L2_CID_GAIN, updated_settings.gain);
 
-#ifdef NAOQI_2
     setControlSetting(V4L2_CID_DO_WHITE_BALANCE, 0);
     setControlSetting(V4L2_CID_WHITE_BALANCE_TEMPERATURE, updated_settings.white_balance);
-#else
-    setControlSetting(V4L2_CID_DO_WHITE_BALANCE, updated_settings.white_balance);
-#endif
     setControlSetting(V4L2_MT9M114_FADE_TO_BLACK, updated_settings.fade_to_black);
 
     //testControlSettings();
@@ -350,12 +344,7 @@ void ImageTranscriber::testControlSettings() {
     int sharpness = getControlSetting(V4L2_CID_SHARPNESS);
     int gain = getControlSetting(V4L2_CID_GAIN);
     int exposure = getControlSetting(V4L2_CID_EXPOSURE);
-
-#ifdef NAOQI_2
     int whitebalance = getControlSetting(V4L2_CID_WHITE_BALANCE_TEMPERATURE);
-#else
-    int whitebalance = getControlSetting(V4L2_CID_DO_WHITE_BALANCE);
-#endif
     int fade = getControlSetting(V4L2_MT9M114_FADE_TO_BLACK);
 
 
@@ -447,11 +436,7 @@ void ImageTranscriber::assertCameraSettings() {
     int sharpness = getControlSetting(V4L2_CID_SHARPNESS);
     int gain = getControlSetting(V4L2_CID_GAIN);
     int exposure = getControlSetting(V4L2_CID_EXPOSURE);
-#ifdef NAOQI_2
     int whitebalance = getControlSetting(V4L2_CID_WHITE_BALANCE_TEMPERATURE);
-#else
-    int whitebalance = getControlSetting(V4L2_CID_DO_WHITE_BALANCE);
-#endif
     int fade = getControlSetting(V4L2_MT9M114_FADE_TO_BLACK);
 
     //std::cerr << "Done checking driver settings" << std::endl;
@@ -638,19 +623,19 @@ void TranscriberModule::run_()
 {
     struct stat file_stats;
     std::string filepath;
-    #ifdef NAOQI_2
-        if(it.type() == Camera::TOP) {
-            filepath = "/home/nao/nbites/Config/V5topCameraParams.txt";
-        } else {
-            filepath = "/home/nao/nbites/Config/V5bottomCameraParams.txt";
-        }
-    #else
-        if(it.type() == Camera::TOP) {
-            filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
-        } else {
-            filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
-        }
-    #endif
+// #ifdef NAOQI_2
+    if(it.type() == Camera::TOP) {
+        filepath = "/home/nao/nbites/Config/V5topCameraParams.txt";
+    } else {
+        filepath = "/home/nao/nbites/Config/V5bottomCameraParams.txt";
+    }
+// #else
+//     if(it.type() == Camera::TOP) {
+//         filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
+//     } else {
+//         filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
+//     }
+// #endif
 
     if(FILE *file = fopen(filepath.c_str(),"r")) { //existence check
         fclose(file);
