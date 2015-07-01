@@ -13,6 +13,7 @@ from . import FindBallStates
 from . import KickingStates
 from . import PlayOffBallStates
 from . import KickOffStates
+from . import PenaltyKickingStates
 
 import noggin_constants as NogginConstants
 
@@ -36,6 +37,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(FindBallStates)
         self.addStates(KickingStates)
         self.addStates(KickOffStates)
+        self.addStates(PenaltyKickingStates)
         self.setName('pBrunswick')
         self.currentState = 'fallController' # initial state
 

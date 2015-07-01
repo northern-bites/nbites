@@ -254,6 +254,13 @@ def locationsMatch(odom, dest):
     and (abs(odom.relH - degrees(dest.relH)) < 30.0):
         return True
 
+    # print ("Not true; relx diff:", abs(odom.relX - dest.relX))
+    # print ("relly diff: ", abs(odom.relY - dest.relY))
+    # print ("relh diff:", abs(odom.relH - dest.relH))
+    # print ("degres", degrees(dest.relH), "normal: ", dest.relH)
+    # if nav.counter % 30 == 0:
+    #     print ("odomH: ", odom.relH, "odomDeg", degrees(odom.relH), "destH:", dest.relH, "destH deg:", degrees(dest.relH))
+
     return False
 
 def walkingTo(nav):
@@ -261,23 +268,43 @@ def walkingTo(nav):
     State to be used for odometry walking.
     """
     if nav.firstFrame():
+        print ("Resetting odometry!")
         nav.brain.interface.motionRequest.reset_odometry = True
         nav.brain.interface.motionRequest.timestamp = int(nav.brain.time * 1000)
         helper.stand(nav)
         return nav.stay()
 
+
+    walkingTo.currentOdo = RelRobotLocation(nav.brain.interface.odometry.x,
+                         nav.brain.interface.odometry.y,
+                         nav.brain.interface.odometry.h)
+
     # TODO why check standing?
     if nav.brain.interface.motionStatus.standing:
-        walkingTo.currentOdo = RelRobotLocation(nav.brain.interface.odometry.x,
-                             nav.brain.interface.odometry.y,
-                             nav.brain.interface.odometry.h)
 
         if len(walkingTo.destQueue) > 0:
             dest = walkingTo.destQueue.popleft()
             helper.setOdometryDestination(nav, dest, walkingTo.speed)
+            print ("MY dest: ", dest.relX, dest.relY, dest.relH)
 
-        elif locationsMatch(nav.destination, walkingTo.currentOdo):
-            return nav.goNow('standing')
+    if locationsMatch(nav.destination, walkingTo.currentOdo):
+        return nav.goNow('standing')
+
+    # walkingTo.currentOdow = RelRobotLocation(nav.brain.interface.odometry.x,
+    #                          nav.brain.interface.odometry.y,
+    #                          nav.brain.interface.odometry.h)
+    if nav.counter % 30 == 0:
+        print "Current odo:"
+        print ("x:", walkingTo.currentOdo.relX)
+        print ("y:", walkingTo.currentOdo.relY)
+        print ("h:", walkingTo.currentOdo.relH)
+        # print "Current odow:"
+        # print ("x:", walkingTo.currentOdow.relX)
+        # print ("y:", walkingTo.currentOdow.relY)
+        # print ("h:", walkingTo.currentOdow.relH)
+        # print "---------------"
+
+
 
     return nav.stay()
 
