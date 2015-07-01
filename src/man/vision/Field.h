@@ -21,14 +21,14 @@ namespace vision {
 // NEWVISION
 #define IMAGE_WIDTH 320
 #define IMAGE_HEIGHT 240
-#define BLACK 0
-#define BLUE 1
-#define MAROON 2
-#define WHITE 3
-#define GREEN 4
+#define BLACK 1
+#define BLUE 7
+#define MAROON 8
+#define WHITE 2
+#define GREEN 6
 #define YELLOW 5
-#define RED 6
-#define ORANGE 7
+#define RED 3
+#define ORANGE 4
 
 // constants for Graham scanning to find convex hull
 static const int RUNSIZE = 8;
@@ -42,10 +42,11 @@ class Field
     friend class VisionModule;
 public:
     Field();
-    virtual ~Field() {}
+    virtual ~Field() {
+	}
 
     // main methods
-	void setDebugImage(DebugImage *di);
+	void setDebugImage(DebugImage * di);
 	void setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 orange);
 	void getColor(int x, int y);
    	bool isGreen();
@@ -86,7 +87,7 @@ public:
 		return static_cast<int>(std::floor(x + 0.5f) );
 	}
 
-#ifdef RICH_LOGGING
+#ifdef OFFLINE
 	void setDebugHorizon(bool debug) {debugHorizon = debug;}
 	void setDebugFieldEdge(bool debug) {debugFieldEdge = debug;}
 #endif
@@ -95,7 +96,6 @@ private:
 	// NEWVISION
 	bool topCamera;
 	DebugImage debugDraw;
-	//ImageLiteU8 debugImages;
 	ImageLiteU8 whiteImage, greenImage, orangeImage;
 	int currentX, currentY;
 
@@ -109,7 +109,7 @@ private:
 	int topBlock[IMAGE_WIDTH+1];
     point<int> convex[HULLS];
 	point<int> blockages[HULLS];
-#ifdef RICH_LOGGING
+#ifdef OFFLINE
     bool debugHorizon;
     bool debugFieldEdge;
 	bool debugDrawFieldEdge;

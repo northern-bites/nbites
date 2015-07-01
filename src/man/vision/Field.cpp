@@ -48,15 +48,16 @@ Field::Field()
 	topCamera = true;
 	currentX = 0;
 	currentY = 0;
-#ifdef RICH_LOGGING
-	debugFieldEdge = true;
-	debugDrawFieldEdge = false;
-	debugHorizon = true;
+#ifdef OFFLINE
+	debugFieldEdge = false;
+	debugDrawFieldEdge = true;
+	debugHorizon = false;
 #endif
 }
 
-	void Field::setDebugImage(DebugImage *di) {
-		debugDraw = *di;
+	void Field::setDebugImage(DebugImage * di) {
+		debugDraw =  *di;
+		//cout << "Set debug " << (int)di << endl;
 	}
 
 	void Field::setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 orange) {
@@ -108,11 +109,11 @@ Field::Field()
 	}
 
 	void Field::drawPoint(int x, int y, int c) {
-		//debugImage->drawPoint(x, y, c);
+		debugDraw.drawPoint(x, y, c);
 	}
 
 	void Field::drawLine(int x, int y, int x1, int x2, int c) {
-		//debugImage->drawLine(x, y, x1, x2, c);
+		debugDraw.drawLine(x, y, x1, x2, c);
 	}
 
 /* As part of finding the convex hull, we need to know where the
@@ -137,7 +138,6 @@ void Field::initialScanForTopGreenPoints(int pH) {
 	int lastGreen;            // y value of last seen green pixel
     const float BUFFER = 100.0f; // other fields should be farther than this
 	// we need a better criteria for what the top is
-	cout << "Scanning" << endl;
 	for (int i = 0; i < HULLS; i++) {
 		good = 0;      // good == # of green pixels
 		ok = 0;        // ok == # of pixels that could be green (e.g. orange, white)
@@ -819,7 +819,7 @@ void Field::drawLess(int x, int y, int c)
 {
     const int lineBuff = 10;
 
-#ifdef RICH_LOGGING
+#ifdef OFFLINE
     drawLine(x, y, x + lineBuff, y - lineBuff, c);
     drawLine(x, y, x + lineBuff, y + lineBuff, c);
     drawLine(x + 1, y, x + lineBuff + 1, y - lineBuff, c);
@@ -831,7 +831,7 @@ void Field::drawMore(int x, int y, int c)
 {
     const int lineBuff = 10;
 
-#ifdef RICH_LOGGING
+#ifdef OFFLINE
     drawLine(x, y, x - lineBuff, y - lineBuff, c);
     drawLine(x, y, x - lineBuff, y + lineBuff, c);
     drawLine(x - 1, y, x - lineBuff - 1, y - lineBuff, c);

@@ -18,6 +18,8 @@
 namespace man {
 namespace vision {
 
+	class DebugImage;
+
 // Scan array of unsigned bytes or words for values above the specified
 // threshold. Place in the runs array the offset of each such byte/word found,
 // terminated by -1.
@@ -496,19 +498,32 @@ public:
  * as whatever colors it likes.
  * Note: all code is #ifdef'd as absolute insurance it doesn't run on the robot
  */
+
 class DebugImage : ImageLiteU8
 {
 private:
+	//DebugImage(const DebugImage&);
+	//DebugImage& operator= (const DebugImage&);
 
 public:
 
-	DebugImage(int wd, int ht)
-		: ImageLiteU8(wd, ht, wd, (uint8_t *)malloc(wd * ht * sizeof(uint8_t)))
-		{
-			//_pixels = malloc(wd * ht * sizeof(uint8_t));
-		}
+	DebugImage(int wd, int ht, uint8_t *d)
+	//: ImageLiteU8(wd, ht, wd, (uint8_t *)malloc(wd * ht * sizeof(uint8_t)))
+		:ImageLiteU8(wd, ht, wd, d)
+		{}
 
-	DebugImage() {
+	DebugImage() {}
+
+	uint8_t* pixArray() { return pixelAddr(); }
+
+	//uint8_t  pixAddr(int x, int y) const { return * pixelAddr(x, y); }
+
+	void reset() {
+		for (int i = 0; i < height(); i++) {
+			for (int j = 0; j < width(); j++) {
+				*pixelAddr(j, i) = 0;
+			}
+		}
 	}
 
     /**
@@ -521,42 +536,42 @@ public:
 	 * @param c        the color we'd like to draw
 	 */
 	void drawBox(int left, int right, int bottom, int top, int c) {
-#ifdef RICH_LOGGING
+#ifdef OFFLINE
 		if (left < 0) {
 			left = 0;
 		}
 		if (top < 0) {
 			top = 0;
 		}
-		int width = right-left;
-		int height = bottom-top;
+		int boxwidth = right-left;
+		int boxheight = bottom-top;
 
-		for (int i = left; i < left + width; i++) {
+		for (int i = left; i < left + boxwidth; i++) {
 			if (top >= 0 &&
-				top < imageHeight &&
+				top < height() &&
 				i >= 0 &&
-				i < imageWidth) {
+				i < width()) {
 				*pixelAddr(i, top) = static_cast<unsigned char>(c);
 			}
-			if ((top + height) >= 0 &&
-				(top + height) < imageHeight &&
+			if ((top + boxheight) >= 0 &&
+				(top + boxheight) < height() &&
 				i >= 0 &&
-				i < imageWidth) {
-				*pixelAddr(i, top + height) = static_cast<unsigned char>(c);
+				i < width()) {
+				*pixelAddr(i, top + boxheight) = static_cast<unsigned char>(c);
 			}
 		}
-		for (int i = top; i < top + height; i++) {
+		for (int i = top; i < top + boxheight; i++) {
 			if (i >= 0 &&
-				i < imageHeight &&
+				i < height() &&
 				left >= 0 &&
-				left < imageWidth) {
+				left < width()) {
 				*pixelAddr(left, i) = static_cast<unsigned char>(c);
 			}
 			if (i >= 0 &&
-				i < imageHeight &&
-				(left+width) >= 0 &&
-				(left+width) < imageWidth) {
-				*pixelAddr(left + width, i) = static_cast<unsigned char>(c);
+				i < height() &&
+				(left+boxwidth) >= 0 &&
+				(left+boxwidth) < width()) {
+				*pixelAddr(left + boxwidth, i) = static_cast<unsigned char>(c);
 			}
 		}
 #endif
@@ -571,41 +586,41 @@ public:
 	 * @param height   height of the box
 	 * @param c        the color we'd like to draw
 	 */
-	void drawRect(int left, int top, int width, int height, int c)
+	void drawRect(int left, int top, int rectwidth, int rectheight, int c)
 		{
-#ifdef RICH_LOGGING
+#ifdef OFFLINE
 			if (left < 0) {
-				width += left;
+				rectwidth += left;
 				left = 0;
 			}
 			if (top < 0) {
-				height += top;
+				rectheight += top;
 				top = 0;
 			}
 
-			for (int i = left; i < left + width; i++) {
-				if (top >= 0 && top < imageHeight && i >= 0 && i < imageWidth) {
+			for (int i = left; i < left + rectwidth; i++) {
+				if (top >= 0 && top < height() && i >= 0 && i < width()) {
 					*pixelAddr(i, top) = static_cast<unsigned char>(c);
 				}
-				if ((top + height) >= 0 &&
-					(top + height) < imageHeight &&
+				if ((top + rectheight) >= 0 &&
+					(top + rectheight) < height() &&
 					i >= 0 &&
-					i < imageWidth) {
-					*pixelAddr(i, top + height) = static_cast<unsigned char>(c);
+					i < width()) {
+					*pixelAddr(i, top + rectheight) = static_cast<unsigned char>(c);
 				}
 			}
-			for (int i = top; i < top + height; i++) {
+			for (int i = top; i < top + rectheight; i++) {
 				if (i >= 0 &&
-					i < imageHeight &&
+					i < height() &&
 					left >= 0 &&
-					left < imageWidth) {
+					left < width()) {
 					*pixelAddr(left, i) = static_cast<unsigned char>(c);
 				}
 				if (i >= 0 &&
-					i < imageHeight &&
-					(left+width) >= 0 &&
-					(left+width) < imageWidth) {
-					*pixelAddr(left + width, i) = static_cast<unsigned char>(c);
+					i < height() &&
+					(left+rectwidth) >= 0 &&
+					(left+rectwidth) < width()) {
+					*pixelAddr(left + rectwidth, i) = static_cast<unsigned char>(c);
 				}
 			}
 #endif
@@ -623,7 +638,7 @@ public:
 	 */
 	void drawLine(int x, int y, int x1, int y1, int c)
 		{
-#ifdef RICH_LOGGING
+#ifdef OFFLINE
 			float slope = static_cast<float>(y - y1) / static_cast<float>(x - x1);
 			int sign = 1;
 			if ((abs(y - y1)) > (abs(x - x1))) {
@@ -635,7 +650,7 @@ public:
 					int newx = x +
 						static_cast<int>(slope * static_cast<float>(i - y) );
 
-					if (newx >= 0 && newx < imageWidth && i >= 0 && i < imageHeight) {
+					if (newx >= 0 && newx < width() && i >= 0 && i < height()) {
 						*pixelAddr(newx, i) = static_cast<unsigned char>(c);
 					}
 				}
@@ -648,7 +663,7 @@ public:
 					int newy = y +
 						static_cast<int>(slope * static_cast<float>(i - x) );
 
-					if (newy >= 0 && newy < imageHeight && i >= 0 && i < imageWidth) {
+					if (newy >= 0 && newy < height() && i >= 0 && i < width()) {
 						*pixelAddr(i, newy) = static_cast<unsigned char>(c);
 					}
 				}
@@ -657,7 +672,7 @@ public:
 				int startX = min(x, x1);
 				int endX = max(x, x1);
 				for (int i = startX; i <= endX; i++) {
-					if (y >= 0 && y < imageHeight && i >= 0 && i < imageWidth) {
+					if (y >= 0 && y < height() && i >= 0 && i < width()) {
 						*pixelAddr(i, y) = static_cast<unsigned char>(c);
 					}
 				}
@@ -667,8 +682,8 @@ public:
 
 	void drawDot(int x, int y, int c)
 		{
-#ifdef RICH_LOGGING
-			if (y > 0 && x > 0 && y < (imageHeight) && x < (imageWidth)) {
+#ifdef OFFLINE
+			if (y > 0 && x > 0 && y < (height()) && x < (width())) {
 				*pixelAddr(x, y) = static_cast<unsigned char>(c);
 			}
 #endif
@@ -677,7 +692,7 @@ public:
     // Prerequisite - point is within bounds of screen
 	void drawX(int x, int y, int c)
 		{
-#ifdef RICH_LOGGING
+#ifdef OFFLINE
 			// Mid point
 /*			pixelAddr([y-2][x-2] = static_cast<unsigned char>(c);
 			pixelAddr([y-1][x-1] = static_cast<unsigned char>(c);
@@ -702,24 +717,24 @@ public:
 	 */
 	void drawPoint(int x, int y, int c)
 		{
-#ifdef RICH_LOGGING
-			if (y > 0 && x > 0 && y < (imageHeight) && x < (imageWidth)) {
+#ifdef OFFLINE
+			if (y > 0 && x > 0 && y < (height()) && x < (width())) {
 				*pixelAddr(x, y) = static_cast<unsigned char>(c);
-			}if (y+1 > 0 && x > 0 && y+1 < (imageHeight) && x < (imageWidth)) {
+			}if (y+1 > 0 && x > 0 && y+1 < (height()) && x < (width())) {
 				*pixelAddr(x, y+1) = static_cast<unsigned char>(c);
-			}if (y+2 > 0 && x > 0 && y+2 < (imageHeight) && x < (imageWidth)) {
+			}if (y+2 > 0 && x > 0 && y+2 < (height()) && x < (width())) {
 				*pixelAddr(x, y+2) = static_cast<unsigned char>(c);
-			}if (y-1 > 0 && x > 0 && y-1 < (imageHeight) && x < (imageWidth)) {
+			}if (y-1 > 0 && x > 0 && y-1 < (height()) && x < (width())) {
 				*pixelAddr(x, y-1) = static_cast<unsigned char>(c);
-			}if (y-2 > 0 && x > 0 && y-2 < (imageHeight) && x < (imageWidth)) {
+			}if (y-2 > 0 && x > 0 && y-2 < (height()) && x < (width())) {
 				*pixelAddr(x, y-2) = static_cast<unsigned char>(c);
-			}if (y > 0 && x+1 > 0 && y < (imageHeight) && x+1 < (imageWidth)) {
+			}if (y > 0 && x+1 > 0 && y < (height()) && x+1 < (width())) {
 				*pixelAddr(x+1, y) = static_cast<unsigned char>(c);
-			}if (y > 0 && x+2 > 0 && y < (imageHeight) && x+2 < (imageWidth)) {
+			}if (y > 0 && x+2 > 0 && y < (height()) && x+2 < (width())) {
 				*pixelAddr(x+2, y) = static_cast<unsigned char>(c);
-			}if (y > 0 && x-1 > 0 && y < (imageHeight) && x-1 < (imageWidth)) {
+			}if (y > 0 && x-1 > 0 && y < (height()) && x-1 < (width())) {
 				*pixelAddr(x-1, y) = static_cast<unsigned char>(c);
-			}if (y > 0 && x-2 > 0 && y < (imageHeight) && x-2 < (imageWidth)) {
+			}if (y > 0 && x-2 > 0 && y < (height()) && x-2 < (width())) {
 				*pixelAddr(x-2, y) = static_cast<unsigned char>(c);
 			}
 #endif

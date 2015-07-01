@@ -59,11 +59,23 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography(i == 0);
         fieldLines[i] = new FieldLineList();
-#ifdef RICH_LOGGING
-		debugImage[i] = new DebugImage(320, 240);
+#ifdef OFFLINE
+		if (i == 0) {
+			debugSpace[0] = (uint8_t *)malloc(wd * ht * sizeof(uint8_t));
+		} else {
+			debugSpace[1] = (uint8_t *)malloc((wd / 2) * (ht / 2) * sizeof(uint8_t));
+		}
 #else
-		debugImage[i] = new DebugImage(0, 0);
+		debugSpace[0] = NULL;
 #endif
+		if (i == 0) {
+			debugImage[i] = new DebugImage(wd, ht, debugSpace[0]);
+			debugImage[i]->reset();
+		} else {
+			debugImage[i] = new DebugImage(wd / 2, ht / 2, debugSpace[1]);
+			debugImage[i]->reset();
+		}
+
         ballDetector[i] = new BallDetector(homography[i], i == 0);
         boxDetector[i] = new GoalboxDetector();
 
@@ -81,8 +93,8 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         hough[i]->fast(fast);
     }
 	field = new Field();
-#ifdef RICH_LOGGING
-	field->setDebugImage(debugImage[1]);
+#ifdef OFFLINE
+	field->setDebugImage(debugImage[0]);
 #endif
     setCalibrationParams(robotName);
 }
@@ -101,6 +113,7 @@ VisionModule::~VisionModule()
         delete homography[i];
         delete fieldLines[i];
 		delete debugImage[i];
+		delete debugSpace[i];
     }
 }
 
@@ -151,15 +164,12 @@ void VisionModule::run_()
         // Approximate brightness gradient
         edgeDetector[i]->gradient(yImage);
 
-        times[i][1] = timer.end();
-
 		// only calculate the field in the top camera
 		// NEWVISION (need actual horizon information)
 		if (i ==0) {
 			field->setImages(frontEnd[0]->whiteImage(), frontEnd[0]->greenImage(),
 							 frontEnd[0]->orangeImage());
-			field->findGreenHorizon(100, 0.0f);
-			debugImage[0]->drawRect(0, 0, 10, 10, 1);
+			field->findGreenHorizon(0, 0.0f);
 		}
 
         // Run edge detection

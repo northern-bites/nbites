@@ -17,7 +17,6 @@
 #include "BallModel.pb.h"
 #include "InertialState.pb.h"
 
-#define RICH_LOGGING
 
 namespace man {
 namespace vision {
@@ -91,6 +90,8 @@ private:
     bool ballOn;
     int ballOnCount;
     int ballOffCount;
+
+	uint8_t * debugSpace[2];
 
     nblog::SExpr* calibrationLisp;
     size_t image_index;

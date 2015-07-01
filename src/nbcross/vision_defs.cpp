@@ -368,6 +368,22 @@ int Vision_func() {
     ballRet->setTree(allBalls);
     rets.push_back(ballRet);
 
+    //-------------------
+    //  DEBUG IMAGE
+    //-------------------
+    Log* debugImage = new Log();
+    int debugImageLength = (width / 4) * (height / 2);
+
+    // Create temp buffer and fill with debug image
+    uint8_t debBuf[debugImageLength];
+    memcpy(debBuf, module.getDebugImage(topCamera)->pixArray(), debugImageLength);
+
+    // Convert to string and set log
+    std::string debBuffer((const char*)debBuf, debugImageLength);
+    debugImage->setData(debBuffer);
+
+    rets.push_back(debugImage);
+
     return 0;
 }
 
