@@ -20,10 +20,10 @@ BOOST_PYTHON_MODULE(noggin_constants)
     scope().attr("USE_LAB_FIELD") = false;
 #endif
 
-#ifdef NAOQI_2
-    scope().attr("NAOQI_2") = true;
+#ifdef V5_ROBOT
+    scope().attr("V5_ROBOT") = true;
 #else
-    scope().attr("NAOQI_2") = false;
+    scope().attr("V5_ROBOT") = false;
 #endif
 
     // Walk time

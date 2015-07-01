@@ -52,11 +52,8 @@ public:
     void setCalibrationParams(std::string robotName);
     void setCalibrationParams(int camera, std::string robotName);
     void setCalibrationParams(CalibrationParams* params, bool topCamera);
-
-#ifdef OFFLINE
     void blackStar(bool blackStar) { blackStar_ = blackStar; }
     bool blackStar() const {return blackStar_;}
-#endif
 
 protected:
     virtual void run_();

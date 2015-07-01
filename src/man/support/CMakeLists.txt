@@ -12,7 +12,6 @@ set( COMMON_SRCS
   CoordFrame3D.cpp
   CoordFrame4D.cpp
   CameraCalibrate.cpp
-  ALLedNames
   NogginStructs
   ColorParams.cpp
   RatingParams.cpp
