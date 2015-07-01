@@ -94,6 +94,12 @@ def clearIt(player):
 
     if clearIt.odoDelay:
         clearIt.odoDelay = False
+        kickPose = player.kick.getPosition()
+        # player.brain.nav.destinationWalkTo(clearIt.ballDest, nav.QUICK_SPEED)
+        clearIt.ballDest = RelRobotLocation(player.brain.ball.rel_x -
+                                            kickPose[0],
+                                            0.0,
+                                            0.0)
         player.brain.nav.goTo(clearIt.ballDest,
                               nav.CLOSE_ENOUGH,
                               nav.QUICK_SPEED,
@@ -101,9 +107,12 @@ def clearIt(player):
 
     kickPose = player.kick.getPosition()
     clearIt.ballDest.relX = player.brain.ball.rel_x - kickPose[0]
-    clearIt.ballDest.relY = player.brain.ball.rel_y - kickPose[1]
-    clearIt.ballDest.relH = 0.0
-    player.brain.nav.updateDest(clearIt.ballDest)
+    if (player.brain.ball.rel_x < 30.0):
+        clearIt.ballDest.relY = player.brain.ball.rel_y - kickPose[1]
+
+    # clearIt.ballDest.relY = player.brain.ball.rel_y - kickPose[1]
+    # clearIt.ballDest.relH = 0.0
+    # player.brain.nav.updateDest(clearIt.ballDest)
 
     return Transition.getNextState(player, clearIt)
 
