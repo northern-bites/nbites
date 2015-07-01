@@ -115,7 +115,7 @@ void WalkingEngine::init()
         cout << "Could not find jointCalibration.cfg!" << endl;
     }
 
-#ifdef NAOQI_2
+#ifdef V5_ROBOT
     InMapFile massCalibrationStream(ModuleBase::config_path + "massCalibrationV5.cfg");
 #else
     InMapFile massCalibrationStream(ModuleBase::config_path + "massCalibrationV4.cfg");

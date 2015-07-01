@@ -48,7 +48,7 @@ bool BallDetector::findBall(ImageLiteU8 orange, double cameraHeight)
             continue;
         }
 
-        Ball b((*i), x_rel, -1 * y_rel, cameraHeight, orange.height(), orange.width());
+        Ball b((*i), x_rel, -1 * y_rel, cameraHeight, orange.height(), orange.width(), topCamera);
         if (b.confidence() > .5) {
 #ifdef OFFLINE
             candidates.push_back(b);
@@ -73,7 +73,7 @@ bool BallDetector::findBall(ImageLiteU8 orange, double cameraHeight)
     }
 }
 
-Ball::Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_, int imgWidth_) :
+Ball::Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_, int imgWidth_, bool top) :
     blob(b),
     radThresh(.3, .7),
     thresh(.5, .8),
@@ -84,6 +84,9 @@ Ball::Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_, int i
     imgWidth(imgWidth_),
     _confidence(0)
 {
+    if (!top) {
+        radThresh = thresh;
+    }
     compute();
 }
 
@@ -114,6 +117,9 @@ void Ball::compute()
 
     //_confidence = (density > thresh).f() * (aspectRatio > thresh).f() * (diameterRatio > radThresh).f();
     _confidence = ((density > thresh) & (aspectRatio > thresh) & (diameterRatio > radThresh)).f();
+
+    // Hack/Sanity check to ensure we don't see crazy balls
+    if (dist > 600) _confidence = 0;
 }
 
 std::string Ball::properties()

@@ -158,7 +158,11 @@ void Boss::listener()
     while(1)
     {
         checkFIFO();
-        if (killingMan) killMan();
+        if (killingMan) {
+            printf("killingMan == true!!!\n\n\n; kNext: %lld kLast: %lld\n",
+                   (long long)killingNext, (long long)killingLast);
+            killMan();
+        }
         sleep(2);
     }
 }
@@ -414,6 +418,8 @@ void Boss::DCMPostProcessCallback()
         //std::cout << "commandIndex: " << nextSensorIndex << " lastRead: " << lastRead << std::endl;
         //manRunning = false; // TODO
         // Man is running very slow
+        killingNext = nextSensorIndex;
+        killingLast = lastRead;
         killingMan = true;
     }
     DCM_TIMING_DEBUG_POST2();
