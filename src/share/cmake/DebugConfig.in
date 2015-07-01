@@ -67,11 +67,11 @@
 #   undef USE_SPL_COMM
 #endif
 
-#define USE_NAOQI_2_${USE_NAOQI_2}
-#ifdef  USE_NAOQI_2_ON
-#    define NAOQI_2
+#define V5_ROBOT_${V5_ROBOT}
+#ifdef  V5_ROBOT_ON
+#    define V5_ROBOT
 #else
-#    undef NAOQI_2
+#    undef V5_ROBOT
 #endif
 
 #define USE_LOGGING_${USE_LOGGING}
