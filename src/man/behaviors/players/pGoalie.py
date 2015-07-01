@@ -158,7 +158,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             #                            Transition.LOW_PRECISION)
             # : GoalieStates.saveRight,
 
-            Transition.CountTransition(GoalieTransitions.facingASideline,
+            Transition.CountTransition(GoalieTransitions.shouldClearBall,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.OK_PRECISION + 5)
             : VisualGoalieStates.spinToFaceBall
@@ -351,6 +351,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             # : GoalieStates.saveRight,
 
             Transition.CountTransition(GoalieTransitions.shouldClearBall,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION + 5)
+            : VisualGoalieStates.spinToFaceBall,
+
+            Transition.CountTransition(GoalieTransitions.facingASideline,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.OK_PRECISION + 5)
             : VisualGoalieStates.spinToFaceBall,

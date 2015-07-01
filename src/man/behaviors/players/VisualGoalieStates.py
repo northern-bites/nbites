@@ -62,6 +62,7 @@ def clearIt(player):
         player.brain.tracker.trackBall()
         if clearIt.dangerousSide == -1:
             if player.brain.ball.rel_y < 0.0:
+                print "I'm kicking right!"
                 player.side = RIGHT
                 player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
             else:
@@ -87,7 +88,7 @@ def clearIt(player):
         clearIt.odoDelay = True
 
         print ("Kickpose: ", kickPose[0], kickPose[1])
-        print ("Dest: ", clearIt.ballDest.relX, clearIt.ballDest.relY)
+        print ("Dest: ", clearIt.ballDest.relX, clearIt.ballDest.relY, clearIt.ballDest.relH)
         print ("Ball: ", player.brain.ball.rel_x, player.brain.ball.rel_y)
         return Transition.getNextState(player, clearIt)
 
@@ -124,11 +125,12 @@ def spinToFaceBall(player):
     # player.brain.interface.motionRequest.reset_odometry = True
     # player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
 
+
     facingDest.relH = player.brain.ball.bearing_deg
     player.brain.nav.goTo(facingDest,
                           nav.CLOSE_ENOUGH,
                           nav.CAREFUL_SPEED)
-
+    print("My facing dest:", facingDest.relH)
     # if player.counter > 180:
     #     return player.goLater('spinAtGoal')
 

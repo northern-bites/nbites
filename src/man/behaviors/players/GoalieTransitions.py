@@ -266,6 +266,7 @@ def facingASideline(player):
                 print ("T", t1)
                 print ("T2", t2)
                 print ("i:", i, "j:", j)
+                print ("MY loc h: ", player.brain.loc.h)
 
     return False
 
@@ -748,9 +749,9 @@ def shouldClearBall(player):
     #TODO: implement check to see if ball is outside of goalbox or not!
 
     if shouldGo:
-        if player.brain.ball.bearing_deg < -50.0:
+        if player.brain.ball.bearing_deg < -60.0:
             VisualGoalieStates.clearIt.dangerousSide = constants.RIGHT
-        elif player.brain.ball.bearing_deg > 50.0:
+        elif player.brain.ball.bearing_deg > 60.0:
             VisualGoalieStates.clearIt.dangerousSide = constants.LEFT
         else:
             VisualGoalieStates.clearIt.dangerousSide = -1
