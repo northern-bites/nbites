@@ -79,16 +79,16 @@ class ObstacleModule : public portals::Module
     static const int NUM_DIRECTIONS = 9;
 
     // How close do our sonar readings need to get for us to decide obstacle?
-    static constexpr float SONAR_THRESH_UPPER = 0.45f;
-    static constexpr float SONAR_FRONT_THRESH_UPPER = 0.45f;
-    static constexpr float SONAR_THRESH_LOWER = 0.15f;
+    static const float SONAR_THRESH_UPPER = 0.45f;
+    static const float SONAR_FRONT_THRESH_UPPER = 0.45f;
+    static const float SONAR_THRESH_LOWER = 0.15f;
     // How many frames do we consider in our average of sonar values?
     static const unsigned int SONAR_FRAMES_TO_BUFFER = 20;
 
     // How do we divide up the directions of the robot's field of vision?
-    static constexpr float ZONE_WIDTH = (3.14159f) / (2.f * 4.f); //4 dir per pi
+    static const float ZONE_WIDTH = (3.14159f) / (2.f * 4.f); //4 dir per pi
     // How far away should we consider something to be an obstacle?
-    static constexpr float VISION_MAX_DIST = 150.f; // 1.5 meters
+    static const float VISION_MAX_DIST = 150.f; // 1.5 meters
     // How many frames do we consider in our average of obstacle distances?
     static const unsigned int VISION_FRAMES_TO_BUFFER = 20;
     // After we see an obstacle, how long should we say it's still there?
