@@ -421,7 +421,7 @@ void ParticleFilter::resample()
     int ni = 0;
     for(int i = 0; i < parameters.numParticles; ++i) {
         double randInjectOrSample = gen();
-        if (injections.size() && randInjectOrSample < 1) { //std::max<double>(0, 1.0 - (wFast / wSlow))) {
+        if (injections.size() && randInjectOrSample < std::max<double>(0, 1.0 - (wFast / wSlow))) {
             // Inject particles according to sensor measurements
             ReconstructedLocation injection = injections[rand() % injections.size()];
             messages::RobotLocation sample = injection.sample();
@@ -440,7 +440,10 @@ void ParticleFilter::resample()
         }
     }
 
+    // std::cout << "TEST" << std::endl;
     // std::cout << 1.0 - (wFast / wSlow) << std::endl;
+    // std::cout << wFast << std::endl;
+    // std::cout << wSlow << std::endl;
     // std::cout << ni << std::endl;
 
     // Update particles
