@@ -59,7 +59,7 @@ struct AdjustSet
   };
   AdjustParams params[MaxAdjustSteps];
 
-  AdjustSet(bool strict = true);
+  AdjustSet();
 };
 
 class HoughLine : public GeoLine
@@ -359,7 +359,7 @@ public:
   FieldLineList();
 
   // Find field lines
-  void find(HoughLineList&);
+  void find(HoughLineList&, bool blackStar = false);
 
   // Classify field lines
   void classify(GoalboxDetector& boxDetector, CornerDetector& cornerDetector);

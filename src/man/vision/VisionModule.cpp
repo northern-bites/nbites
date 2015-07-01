@@ -29,7 +29,8 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
       ballOnCount(0),
       ballOffCount(0),
       centCircOut(base()),
-      centerCircleDetected(false)
+      centerCircleDetected(false),
+      blackStar_(false)
 {
     std:: string colorPath, calibrationPath;
     #ifdef OFFLINE
@@ -121,6 +122,7 @@ void VisionModule::run_()
 
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
+        
         // Get image
         const messages::YUVImage* image = images[i];
 
@@ -130,15 +132,12 @@ void VisionModule::run_()
                         image->rowPitch(),
                         image->pixelAddress(0, 0));
 
-        // HighResTimer timer;
-
         // Run front end
         frontEnd[i]->run(yuvLite, colorParams[i]);
         ImageLiteU16 yImage(frontEnd[i]->yImage());
+        ImageLiteU8 whiteImage(frontEnd[i]->whiteImage());
         ImageLiteU8 greenImage(frontEnd[i]->greenImage());
         ImageLiteU8 orangeImage(frontEnd[i]->orangeImage());
-
-        // times[i][0] = timer.end();
 
         // Calculate kinematics and adjust homography
         if (jointsIn.message().has_head_yaw()) {
@@ -172,12 +171,16 @@ void VisionModule::run_()
         if (!i) centerCircleDetected = centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]));
  
         // Pair hough lines to field lines
-        fieldLines[i]->find(*(houghLines[i]));
+        fieldLines[i]->find(*(houghLines[i]), blackStar());
  
         // Classify field lines
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
  
         ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
+
+#ifdef USE_LOGGING
+        logImage(i);
+#endif
     }
    
     // Send messages on outportals
@@ -186,25 +189,6 @@ void VisionModule::run_()
     ballOn = ballDetected;
     updateVisionBall();
     sendCenterCircle();
-
-// TODO move to logImage
-#ifdef USE_LOGGING
-    if (getenv("LOG_THIS") != NULL) {
-        if (strcmp(getenv("LOG_THIS"), std::string("top").c_str()) == 0) {
-            logImage(0);
-            setenv("LOG_THIS", "false", 1);
-            std::cerr << "pCal logging top log\n";
-        } else if (strcmp(getenv("LOG_THIS"), std::string("bottom").c_str()) == 0) {
-            logImage(1);
-            setenv("LOG_THIS", "false", 1);
-            std::cerr << "pCal logging bot log\n";
-        }// else
-           // std::cerr << "N "; 
-    } else {
-        logImage(0);
-        logImage(1);
-    }
-#endif
 }
 
 
@@ -344,6 +328,12 @@ void VisionModule::sendCenterCircle()
     centCircOut.setMessage(ccm);
 }
 
+void VisionModule::setColorParams(Colors* colors, bool topCamera)
+{ 
+    delete colorParams[!topCamera];
+    colorParams[!topCamera] = colors;
+}
+
 const std::string VisionModule::getStringFromTxtFile(std::string path) 
 {
     std::ifstream textFile;
@@ -435,6 +425,7 @@ void VisionModule::setCalibrationParams(int camera, std::string robotName)
         std::string cam = camera == 0 ? "TOP" : "BOT";
         double roll =  robot->find(cam)->get(1)->valueAsDouble();
         double tilt = robot->find(cam)->get(2)->valueAsDouble();
+        delete calibrationParams[camera];
         calibrationParams[camera] = new CalibrationParams(roll, tilt);
 
         std::cerr << "Found and set calibration params for " << robotName;
@@ -442,10 +433,37 @@ void VisionModule::setCalibrationParams(int camera, std::string robotName)
     }
 }
 
+void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamera)
+{
+    delete calibrationParams[!topCamera];
+    calibrationParams[!topCamera] = params;
+}
+
 #ifdef USE_LOGGING
 void VisionModule::logImage(int i) 
 {
-    std::string t = "true";
+    bool blackStar = false;
+
+    if (getenv("LOG_THIS") != NULL) {
+        if (strcmp(getenv("LOG_THIS"), std::string("top").c_str()) == 0) {
+            if (i != 0)
+                return;
+            else {
+                setenv("LOG_THIS", "false", 1);
+                blackStar = true;
+                std::cerr << "pCal logging top log\n";
+            }
+        } else if (strcmp(getenv("LOG_THIS"), std::string("bottom").c_str()) == 0) {   
+            if (i != 1)
+                return;
+            else {
+                setenv("LOG_THIS", "false", 1);
+                blackStar = true;
+                std::cerr << "pCal logging bot log\n";
+            }
+        } else 
+            return;
+    }
 
     if (control::flags[control::tripoint]) {
         ++image_index;
@@ -532,6 +550,8 @@ void VisionModule::logImage(int i)
 
         nblog::SExpr cal("CalibrationParams", "tripoint", clock(), image_index, 0);
         cal.append(nblog::SExpr(image_from, calibrationParams[i]->getRoll(), calibrationParams[i]->getTilt()));
+        if (blackStar)
+            cal.append(nblog::SExpr("BlackStar"));
         contents.push_back(cal);
 
         nblog::NBLog(NBL_IMAGE_BUFFER, "tripoint", contents, im_buf);

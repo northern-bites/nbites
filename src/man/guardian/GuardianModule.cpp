@@ -13,7 +13,7 @@
 namespace man{
 namespace guardian{
 
-#ifdef NAOQI_2
+#ifdef V5_ROBOT
 static const float FALL_SPEED_THRESH = 0.045f; // rads/20ms
 static const float NOFALL_SPEED_THRESH = 0.02f; // rads/20ms
 static const float FALLING_ANGLE_THRESH = M_PI_FLOAT/4.5f; // 45.0 degrees

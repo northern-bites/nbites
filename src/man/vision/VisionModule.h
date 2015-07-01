@@ -44,14 +44,16 @@ public:
     GoalboxDetector* getBox(bool topCamera = true) const { return boxDetector[!topCamera]; }
     CornerDetector* getCorners(bool topCamera = true) const { return cornerDetector[!topCamera]; }
     CenterCircleDetector* getCCD(bool topCamera = true) const {return centerCircleDetector[!topCamera]; }
-    // For use by Image nbcross func
-    void setColorParams(Colors* colors, bool topCamera) { colorParams[!topCamera] = colors; }
+    
+    // For use by vision_defs
+    void setColorParams(Colors* colors, bool topCamera);
     const std::string getStringFromTxtFile(std::string path);
     Colors* getColorsFromLisp(nblog::SExpr* colors, int camera);
-
     void setCalibrationParams(std::string robotName);
     void setCalibrationParams(int camera, std::string robotName);
-    void setCalibrationParams(CalibrationParams* params, bool topCamera) { calibrationParams[!topCamera] = params; }
+    void setCalibrationParams(CalibrationParams* params, bool topCamera);
+    void blackStar(bool blackStar) { blackStar_ = blackStar; }
+    bool blackStar() const {return blackStar_;}
 
 protected:
     virtual void run_();
@@ -83,6 +85,8 @@ private:
 
     bool centerCircleDetected;
 
+    bool blackStar_;
+    
     // Lisp tree with color params saved
     nblog::SExpr colors;
 
@@ -93,6 +97,8 @@ private:
 
     nblog::SExpr* calibrationLisp;
     size_t image_index;
+
+#
 };
 
 }

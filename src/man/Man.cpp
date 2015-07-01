@@ -180,7 +180,7 @@ Man::Man() :
          */
             
             
-#ifdef NAOQI_2
+#ifdef V5_ROBOT
             nblog::HOST_TYPE = nblog::V5ROBOT;
 #else
             nblog::HOST_TYPE = nblog::V4ROBOT;

@@ -324,7 +324,6 @@ bool StarCal::add(const FieldLineList& lines)
     if (lines[i][0].intersect(lines[i][1], vpx, vpy) && fabs(lines[i][0].ux()) > 0.3)
       fit.add(vpx - ix0, vpy - iy0);  // relative to optical axis
   }
-
   // If we didn't find exactly three suitable field lines, fail
   return fit.area() == 3;
 }

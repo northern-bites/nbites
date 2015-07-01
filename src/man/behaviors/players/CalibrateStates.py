@@ -13,6 +13,7 @@ NUM_FRAMES_TO_SAVE = 150
 @superState('gameControllerResponder')
 def gameInitial(player):
     if player.firstFrame():
+        player.returningFromPenalty = False
         player.stand()
         player.brain.tracker.lookToAngle(0)
     return player.stay()

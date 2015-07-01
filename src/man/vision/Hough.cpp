@@ -30,10 +30,10 @@ AdjustParams::AdjustParams()
   scoreThreshold = 32;
 }
 
-AdjustSet::AdjustSet(bool strict) {
+AdjustSet::AdjustSet() {
   params[1].angleThr = FuzzyThr(0.08f, 0.12f);
   params[1].distanceThr = FuzzyThr(0.7f, 2.0f);
-  params[1].fitThresold = strict ? 0.55 : 10.0;
+  params[1].fitThresold = 0.55;
 
 }
 
@@ -519,6 +519,7 @@ void CenterCircleDetector::set()
 bool CenterCircleDetector::detectCenterCircle(EdgeList& edges)
 {
   std::vector<Point> potentials = calculatePotentials(edges);
+  std::cout << "Center circle detector" << potentials.size() << std::endl;
 
 #ifdef OFFLINE
   _potentials = potentials;
@@ -635,7 +636,7 @@ bool CenterCircleDetector::getMaxBin(std::vector<Point> vec, double& x0, double&
       (double)votes * 100/(double)vec.size() << "\% of the " << 
       vec.size() << " potentials in most populated bin" << std::endl;
 #endif
-      
+
     return true;
   } else {
 #ifdef OFFLINE
@@ -675,7 +676,7 @@ FieldLineList::FieldLineList()
   maxCalibrateAngle(5.0f);
 }
 
-void FieldLineList::find(HoughLineList& houghLines)
+void FieldLineList::find(HoughLineList& houghLines, bool blackStar)
 {
   // Check max angle by dot product of unit vectors. Since lines must have opposite
   // polarity, dot product must be below a negative threshold.
@@ -694,6 +695,12 @@ void FieldLineList::find(HoughLineList& houghLines)
         // coordinates leads to crossed field lines if the homography is poor.
         // Crosses field lines in world coordinates leads to polarity error.
         bool correctPolarity = (hl1->r() + hl2->r() < 0);
+
+        // If we are looking for lines in the black clibration star, check for
+        // opposite polarity.
+        if (blackStar)
+          correctPolarity = !correctPolarity;
+
         // Separation is sum of the two r values (distance of line to origin).
         // This is well defined and sensible for lines that may not be perfectly
         // parallel. For field lines the polarities are pointing towards each
@@ -1148,13 +1155,14 @@ void HoughSpace::adjust(EdgeList& edges, EdgeList& rejectedEdges, HoughLineList&
       ++hl;
   }
 
+  // For center circle detection, colloect all orphan edges
   rejectedEdges.reset();
 
   AngleBinsIterator<Edge> rejectABI(edges);
   for (Edge* e = *rejectABI; e; e = *++rejectABI)
-    if (e->memberOf() == 0) {
+    if (e->memberOf() == 0) 
       rejectedEdges.add(e->x(), e->y(), e->mag(), e->angle());
-    }
+    
   times[4] = timer.time32();
 }
 
