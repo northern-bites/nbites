@@ -172,7 +172,12 @@ void VisionModule::run_()
  
         // Pair hough lines to field lines
         fieldLines[i]->find(*(houghLines[i]), blackStar());
- 
+
+            double tiltBefore = homography[i]->tilt();
+        if (homography[i]->calibrateFromStar(*fieldLines[i])) {
+            double tiltAfter = homography[i]->tilt();
+            std::cerr << i << " k: " << tiltBefore << " o: " << tiltAfter-tiltBefore << std::endl;
+        }
         // Classify field lines
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
  
