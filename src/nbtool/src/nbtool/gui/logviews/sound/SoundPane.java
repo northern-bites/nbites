@@ -41,14 +41,6 @@ public class SoundPane <T extends Number> extends JPanel{
 		int fs = 5;
 		int ss = 10 + diameter;
 		
-		g.drawLine(0, fs, left.length, fs);
-		g.drawLine(0, fs + radius, left.length, fs + radius);
-		g.drawLine(0, fs + diameter, left.length, fs + diameter);
-		
-		g.drawLine(0, ss, right.length, ss);
-		g.drawLine(0, ss + radius, right.length, ss + radius);
-		g.drawLine(0, ss + diameter, right.length, ss + diameter);
-		
 		g.setColor(Color.RED);
 		for (int i = 0; i < left.length; ++i) {
 			int yoff = scaler.pixelsFor(left[i], radius);
@@ -62,6 +54,14 @@ public class SoundPane <T extends Number> extends JPanel{
 			g.drawLine(i, ss + radius,
 					i, ss + radius + yoff);
 		}
+		g.setColor(Color.black);
+		g.drawLine(0, fs, left.length, fs);
+		g.drawLine(0, fs + radius, left.length, fs + radius);
+		g.drawLine(0, fs + diameter, left.length, fs + diameter);
+		
+		g.drawLine(0, ss, right.length, ss);
+		g.drawLine(0, ss + radius, right.length, ss + radius);
+		g.drawLine(0, ss + diameter, right.length, ss + diameter);
 	}
 	
 	@Override

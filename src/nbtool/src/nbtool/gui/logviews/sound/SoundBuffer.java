@@ -70,4 +70,18 @@ public class SoundBuffer {
 		
 		return ret;
 	}
+	
+	public static Integer[] objectify(int[] vals) {
+		Integer[] io = new Integer[vals.length];
+		for (int i = 0; i < vals.length; ++i)
+			io[i] = vals[i];
+		return io;
+	}
+	
+	public static Double[] objectify(double[] vals) {
+		Double[] io = new Double[vals.length];
+		for (int i = 0; i < vals.length; ++i)
+			io[i] = vals[i];
+		return io;
+	}
 }
