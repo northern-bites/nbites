@@ -19,7 +19,7 @@
           )
         )
         ( Orange
-          ( (dark_u 0.05)
+          ( (dark_u 0.08)
             (dark_v 0.025)
             (light_u -0.025)
             (light_v -0.07)
