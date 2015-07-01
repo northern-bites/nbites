@@ -404,14 +404,18 @@ double GeoLine::error(const GeoLine& other, bool test) const
   double normalizedT = (r() > 0 ? t() : t() - M_PI);
   double rDiff = fabs(fabs(r()) - fabs(other.r()));
   double tDiff = fabs(sMod(normalizedT - other.t(), M_PI));
+  double ep0Diff = ep0() - other.ep0();
+  double ep1Diff = other.ep1() - ep1();
 
   // TODO params
   boost::math::normal_distribution<> rGaussian(0, 100);
   boost::math::normal_distribution<> tGaussian(0, 10*TO_RAD);
+  boost::math::normal_distribution<> epGaussian(0, 40);
 
-  // TODO properly sample
   double rProb = pdf(rGaussian, rDiff);
   double tProb = pdf(tGaussian, tDiff);
+  double ep0Prob = pdf(epGaussian, ep0Diff);
+  double ep1Prob = pdf(epGaussian, ep1Diff);
 
   if (test) {
     std::cout << "In error," << std::endl;
@@ -421,7 +425,12 @@ double GeoLine::error(const GeoLine& other, bool test) const
     std::cout << rProb << "+" << tProb << std::endl;
   }
 
-  return rProb * tProb;
+  double prob = rProb * tProb;
+  if (ep0Diff > 0)
+      prob = prob*ep0Prob;
+  if (ep1Diff > 0)
+      prob = prob*ep1Prob;
+  return prob;
 }
 
 void GeoLine::translateRotate(double xTrans, double yTrans, double rotation)

@@ -25,6 +25,16 @@ LineSystem::LineSystem()
     addLine(LocLineID::RightSideline, -GREEN_PAD_Y, 3 * M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
     addLine(LocLineID::LeftSideline, GREEN_PAD_Y + FIELD_WHITE_HEIGHT, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
 
+    addLine(LocLineID::RightSideline, -GREEN_PAD_Y, 3 * M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
+    addLine(LocLineID::LeftSideline, GREEN_PAD_Y + FIELD_WHITE_HEIGHT, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
+
+    addLine(LocLineID::OurRightGoalbox, BLUE_GOALBOX_BOTTOM_Y, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + GOALBOX_DEPTH);
+    addLine(LocLineID::TheirRightGoalbox, BLUE_GOALBOX_BOTTOM_Y, M_PI / 2, YELLOW_GOALBOX_LEFT_X, YELLOW_GOALBOX_RIGHT_X);
+
+    // NOTE right from the perspective of an observer looking in the positive x direction
+    addLine(LocLineID::OurLeftGoalbox, BLUE_GOALBOX_TOP_Y, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + GOALBOX_DEPTH);
+    addLine(LocLineID::TheirLeftGoalbox, BLUE_GOALBOX_TOP_Y, M_PI / 2, YELLOW_GOALBOX_LEFT_X, YELLOW_GOALBOX_RIGHT_X);
+
     // Part II
     // Map LineID that vision computes to LocLineID for use in solving the 
     // correspondence problem (see matchObservation)
@@ -32,7 +42,9 @@ LineSystem::LineSystem()
         LocLineID::OurEndline, LocLineID::TheirEndline,
         LocLineID::OurMidline, LocLineID::TheirMidline,
         LocLineID::OurTopGoalbox, LocLineID::TheirTopGoalbox,
-        LocLineID::RightSideline, LocLineID::LeftSideline 
+        LocLineID::RightSideline, LocLineID::LeftSideline,
+        LocLineID::OurRightGoalbox, LocLineID::TheirRightGoalbox,
+        LocLineID::OurLeftGoalbox, LocLineID::TheirLeftGoalbox 
     };
     visionToLocIDs[vision::LineID::Line] = all;
 
@@ -215,9 +227,10 @@ vision::GeoLine LineSystem::relRobotToAbsolute(const messages::FieldLine& observ
 // TODO parameters
 bool LineSystem::shouldUse(const messages::FieldLine& observation)
 {
-    const messages::HoughLine& inner = observation.inner();
-    bool longEnough = inner.ep1() - inner.ep0() > 60;
-    return longEnough;
+    // const messages::HoughLine& inner = observation.inner();
+    // bool longEnough = inner.ep1() - inner.ep0() > 60;
+    // return longEnough;
+    return true;
 }
 
 void LineSystem::addLine(LocLineID id, float r, float t, float ep0, float ep1)
