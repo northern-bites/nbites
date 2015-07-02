@@ -58,8 +58,11 @@ void SharedBallModule::run_()
         ballY[i] = -1.f;
     }
 
+    std::cout<<"getting to sharedball"<<std::endl;
+
     // get myInfo:
     locIn.latch();
+    std::cout<<"latching"<<std::cout;
     myX = locIn.message().x();
     myY = locIn.message().y();
     myH = locIn.message().h();
@@ -68,7 +71,6 @@ void SharedBallModule::run_()
 
     if (numRobotsOn)
     {
-
         ballOn = true;
         chooseRobots();
         weightedavg();
