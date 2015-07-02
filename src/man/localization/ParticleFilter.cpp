@@ -77,6 +77,7 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
 
         // Ad hoc method to determine if lost based on exponential filters
         // NOTE if set, behaviors may change action of robot to recover localization
+        // NOTE not currently used
         if (1.0 - (wFast / wSlow) > parameters.lostThreshold)
             lost = true;
         else
@@ -122,7 +123,7 @@ void ParticleFilter::updateEstimate()
 
     bool offField = !(poseEstimate.x() >= 0 && poseEstimate.x() <= FIELD_GREEN_WIDTH && 
                       poseEstimate.y() >= 0 && poseEstimate.y() <= FIELD_GREEN_HEIGHT); 
-    poseEstimate.set_lost(lost || offField);
+    poseEstimate.set_lost(offField);
 
     // double variance = 0;
     // for(iter = particles.begin(); iter != particles.end(); ++iter)
