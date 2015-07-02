@@ -15,6 +15,7 @@ BALL_LEDS = True
 GOALBOX_LEDS = True
 ROLESWITCH_LEDS = True
 CALIBRATION_LEDS = True
+DODGE_LEDS = True
 SHAREDFLIP_LEDS = True
 COMM_LEDS = True
 
@@ -111,6 +112,18 @@ RIGHT_CALIBRATION_THREE_OFF_LEDS= ((RIGHT_CALIBRATION_THREE_LED, OFF, NOW),)
 RIGHT_CALIBRATION_FOUR_OFF_LEDS = ((RIGHT_CALIBRATION_FOUR_LED, OFF, NOW),)
 RIGHT_CALIBRATION_FIVE_OFF_LEDS = ((RIGHT_CALIBRATION_FIVE_LED, OFF, NOW),)
 
+##### DODGE #####
+LEFT_DODGE_ONE_LEDS   = ((LEFT_CALIBRATION_ONE_LED, BLUE, NOW),)
+LEFT_DODGE_TWO_LEDS   = ((LEFT_CALIBRATION_TWO_LED, BLUE, NOW),)
+LEFT_DODGE_THREE_LEDS = ((LEFT_CALIBRATION_THREE_LED, BLUE, NOW),)
+LEFT_DODGE_FOUR_LEDS  = ((LEFT_CALIBRATION_FOUR_LED, BLUE, NOW),)
+LEFT_DODGE_FIVE_LEDS  = ((LEFT_CALIBRATION_FIVE_LED, BLUE, NOW),)
+RIGHT_DODGE_ONE_LEDS  = ((RIGHT_CALIBRATION_ONE_LED, BLUE, NOW),)
+RIGHT_DODGE_TWO_LEDS  = ((RIGHT_CALIBRATION_TWO_LED, BLUE, NOW),)
+RIGHT_DODGE_THREE_LEDS= ((RIGHT_CALIBRATION_THREE_LED, BLUE, NOW),)
+RIGHT_DODGE_FOUR_LEDS = ((RIGHT_CALIBRATION_FOUR_LED, BLUE, NOW),)
+RIGHT_DODGE_FIVE_LEDS = ((RIGHT_CALIBRATION_FIVE_LED, BLUE, NOW),)
+
 ##### COMM #####
 LEFT_COMM_ONE_LEDS   = ((LEFT_COMM_ONE_LED, BLUE, NOW),)
 LEFT_COMM_TWO_LEDS   = ((LEFT_COMM_TWO_LED, BLUE, NOW),)
@@ -160,6 +173,7 @@ class Leds():
         self.numActiveMates = 0
         self.role = -1
         self.calibrationCount = 0
+        self.dodgeCount = 0
         self.flippingCount = 0
         self.oldFlipTime = 0
         self.flashingCount = 150
@@ -204,6 +218,17 @@ class Leds():
                 self.executeLeds(RIGHT_CALIBRATION_THREE_LEDS)
                 self.executeLeds(RIGHT_CALIBRATION_FOUR_LEDS)
                 self.executeLeds(RIGHT_CALIBRATION_FIVE_LEDS)
+            elif (DODGE_LEDS and self.brain.currentlyDodging and self.dodgeCount % 4 < 2):
+                self.executeLeds(LEFT_DODGE_ONE_LEDS)
+                self.executeLeds(LEFT_DODGE_TWO_LEDS)
+                self.executeLeds(LEFT_DODGE_THREE_LEDS)
+                self.executeLeds(LEFT_DODGE_FOUR_LEDS)
+                self.executeLeds(LEFT_DODGE_FIVE_LEDS)
+                self.executeLeds(RIGHT_DODGE_ONE_LEDS)
+                self.executeLeds(RIGHT_DODGE_TWO_LEDS)
+                self.executeLeds(RIGHT_DODGE_THREE_LEDS)
+                self.executeLeds(RIGHT_DODGE_FOUR_LEDS)
+                self.executeLeds(RIGHT_DODGE_FIVE_LEDS)
             else:
                 self.executeLeds(LEFT_CALIBRATION_ONE_OFF_LEDS)
                 self.executeLeds(LEFT_CALIBRATION_TWO_OFF_LEDS)
@@ -217,6 +242,7 @@ class Leds():
                 self.executeLeds(RIGHT_CALIBRATION_FIVE_OFF_LEDS)
 
             self.calibrationCount = self.calibrationCount + 1
+            self.dodgeCount = self.dodgeCount + 1
 
         # TODO this is a hacky solution to using the same LEDs as calibration
         # if SHAREDFLIP_LEDS and self.brain.motion.calibrated:

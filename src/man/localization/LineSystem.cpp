@@ -227,10 +227,11 @@ vision::GeoLine LineSystem::relRobotToAbsolute(const messages::FieldLine& observ
 // TODO parameters
 bool LineSystem::shouldUse(const messages::FieldLine& observation)
 {
-    // const messages::HoughLine& inner = observation.inner();
-    // bool longEnough = inner.ep1() - inner.ep0() > 60;
-    // return longEnough;
-    return true;
+    const messages::HoughLine& inner = observation.inner();
+    bool longEnough = inner.ep1() - inner.ep0() > 60;
+    bool closeEnough = inner.r() < 60;
+    closeEnough = false;
+    return longEnough || closeEnough;
 }
 
 void LineSystem::addLine(LocLineID id, float r, float t, float ep0, float ep1)

@@ -118,13 +118,11 @@ Man::Man() :
         vision.inertsIn.wireTo(&topTranscriber.inertsOut, true);
 
         localization.linesInput.wireTo(&vision.linesOut);
-        localization.cornersInput.wireTo(&vision.cornersOut);
-        localization.circleInput.wireTo(&vision.centCircOut);
+        localization.visionInput.wireTo(&vision.visionOut);
         localization.motionInput.wireTo(&motion.odometryOutput_, true);
         localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
         localization.resetInput[1].wireTo(&sharedBall.sharedBallReset, true);
         localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
-        localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
 
         ballTrack.visionBallInput.wireTo(&vision.ballOut);
         ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);

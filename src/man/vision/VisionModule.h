@@ -28,10 +28,8 @@ public:
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::InertialState> inertsIn;
 
-    portals::OutPortal<messages::FieldLines> linesOut;
-    portals::OutPortal<messages::Corners> cornersOut;
-    portals::OutPortal<messages::VisionBall> ballOut;
-    portals::OutPortal<messages::CenterCircle> centCircOut;
+    portals::OutPortal<messages::Vision> visionOut;
+
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
@@ -62,10 +60,7 @@ private:
 #ifdef USE_LOGGING
     void logImage(int i);
 #endif
-    void sendLinesOut();
-    void sendCornersOut();
-    void updateVisionBall();
-    void sendCenterCircle();
+    void outportalVisionField();
 
     Colors* colorParams[2];
     ImageFrontEnd* frontEnd[2];

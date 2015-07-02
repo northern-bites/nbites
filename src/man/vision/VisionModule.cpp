@@ -22,13 +22,10 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
       topIn(),
       bottomIn(),
       jointsIn(),
-      linesOut(base()),
-      cornersOut(base()),
-      ballOut(base()),
+      visionOut(base()),
       ballOn(false),
       ballOnCount(0),
       ballOffCount(0),
-      centCircOut(base()),
       centerCircleDetected(false),
       blackStar_(false)
 {
@@ -184,17 +181,17 @@ void VisionModule::run_()
     }
    
     // Send messages on outportals
-    sendLinesOut();
-    sendCornersOut();
     ballOn = ballDetected;
-    updateVisionBall();
-    sendCenterCircle();
+    outportalVisionField();
+    
+
 }
 
-
-
-void VisionModule::sendLinesOut()
+void VisionModule::outportalVisionField()
 {
+    messages::Vision visionField;
+
+    // Outportal Lines
     // Mark repeat lines (already found in bottom camera) in top camera
     for (int i = 0; i < fieldLines[0]->size(); i++) {
         for (int j = 0; j < fieldLines[1]->size(); j++) {
@@ -209,12 +206,11 @@ void VisionModule::sendLinesOut()
         }
     }
 
-    // Outportal results
     // NOTE repeats are not outportaled
-    messages::FieldLines pLines;
+    //  messages::FieldLines pLines;
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < fieldLines[i]->size(); j++) {
-            messages::FieldLine* pLine = pLines.add_line();
+            messages::FieldLine* pLine = visionField.add_line();
             FieldLine& line = (*(fieldLines[i]))[j];
             if (line.repeat()) continue;
 
@@ -234,20 +230,14 @@ void VisionModule::sendLinesOut()
             }
 
             pLine->set_id(static_cast<int>(line.id()));
+            pLine->set_index(static_cast<int>(line.index()));
         }
     }
 
-    portals::Message<messages::FieldLines> linesOutMessage(&pLines);
-    linesOut.setMessage(linesOutMessage);
-}
-
-// TODO repeats
-void VisionModule::sendCornersOut()
-{
-    messages::Corners pCorners;
+    // Outportal Corners
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < cornerDetector[i]->size(); j++) {
-            messages::Corner* pCorner = pCorners.add_corner();
+            messages::Corner* pCorner = visionField.add_corner();
             Corner& corner = (*(cornerDetector[i]))[j];
 
             // Rotate to post vision relative robot coordinate system
@@ -257,16 +247,23 @@ void VisionModule::sendCornersOut()
             pCorner->set_x(rotatedX);
             pCorner->set_y(rotatedY);
             pCorner->set_id(static_cast<int>(corner.id));
+            pCorner->set_line1(static_cast<int>(corner.first->index()));
+            pCorner->set_line2(static_cast<int>(corner.second->index()));
         }
     }
 
-    portals::Message<messages::Corners> cornersOutMessage(&pCorners);
-    cornersOut.setMessage(cornersOutMessage);
-}
+    // Outportal Center Circle
+    messages::CenterCircle ccm;
+    if (centerCircleDetected) {
+        ccm.set_x(centerCircleDetector[0]->x());
+        ccm.set_y(centerCircleDetector[0]->y());
+    }
 
-void VisionModule::updateVisionBall()
-{
-    portals::Message<messages::VisionBall> ball_message(0);
+    // Set circle
+    visionField.set_circle(ccm);
+
+    // Outportal Ball
+    messages::VisionBall ball_message;
 
     Ball topBall = ballDetector[0]->best();
     Ball botBall = ballDetector[1]->best();
@@ -288,44 +285,43 @@ void VisionModule::updateVisionBall()
         top = true;
     }
 
-    ball_message.get()->set_on(ballOn);
-    ball_message.get()->set_frames_on(ballOnCount);
-    ball_message.get()->set_frames_off(ballOffCount);
-    ball_message.get()->set_intopcam(top);
+    ball_message.set_on(ballOn);
+    ball_message.set_frames_on(ballOnCount);
+    ball_message.set_frames_off(ballOffCount);
+    ball_message.set_intopcam(top);
 
     if (ballOn)
     {
-        ball_message.get()->set_distance(best.dist);
+        ball_message.set_distance(best.dist);
 
-        ball_message.get()->set_radius(best.blob.firstPrincipalLength());
+        ball_message.set_radius(best.blob.firstPrincipalLength());
         double bearing = atan(best.x_rel / best.y_rel);
-        ball_message.get()->set_bearing(bearing);
-        ball_message.get()->set_bearing_deg(bearing * TO_DEG);
+        ball_message.set_bearing(bearing);
+        ball_message.set_bearing_deg(bearing * TO_DEG);
 
         double angle_x = (best.imgWidth/2 - best.getBlob().centerX()) /
             (best.imgWidth) * HORIZ_FOV_DEG;
         double angle_y = (best.imgHeight/2 - best.getBlob().centerY()) /
             (best.imgHeight) * VERT_FOV_DEG;
-        ball_message.get()->set_angle_x_deg(angle_x);
-        ball_message.get()->set_angle_y_deg(angle_y);
+        ball_message.set_angle_x_deg(angle_x);
+        ball_message.set_angle_y_deg(angle_y);
 
-        ball_message.get()->set_confidence(best.confidence());
-        ball_message.get()->set_x(static_cast<int>(best.blob.centerX()));
-        ball_message.get()->set_y(static_cast<int>(best.blob.centerY()));
+        ball_message.set_confidence(best.confidence());
+        ball_message.set_x(static_cast<int>(best.blob.centerX()));
+        ball_message.set_y(static_cast<int>(best.blob.centerY()));
     }
 
-    ballOut.setMessage(ball_message);
+    // Set Ball
+    visionField.set_ball(ball_message);
+
+    portals::Message<massages::Vision> visionOutMessage(&visionField);
+    visionOut.setMessage(visionOutMessage);
+
 }
 
 void VisionModule::sendCenterCircle()
 { 
-    portals::Message<messages::CenterCircle> ccm(0);
-    if (centerCircleDetected) {
-        ccm.get()->set_x(centerCircleDetector[0]->x());
-        ccm.get()->set_y(centerCircleDetector[0]->y());
-    }
-
-    centCircOut.setMessage(ccm);
+    
 }
 
 void VisionModule::setColorParams(Colors* colors, bool topCamera)

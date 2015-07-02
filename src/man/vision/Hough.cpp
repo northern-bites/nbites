@@ -265,8 +265,7 @@ bool GoalboxDetector::validBox(const HoughLine& line1, const HoughLine& line2) c
   const GeoLine& field1 = line1.field();
   const GeoLine& field2 = line2.field();
 
-  // Goalbox = two field lines that are parallel, seperated by 60 cm, 
-  // and both over 80 cm in length
+  // Goalbox = two field lines that are parallel and seperated according to spec
 
   // (1) Parallel
   // NOTE this check also requires that the robot is not in between the lines 
@@ -279,12 +278,7 @@ bool GoalboxDetector::validBox(const HoughLine& line1, const HoughLine& line2) c
   double distBetween = fabs(field1.pDist(field2.r()*cos(field2.t()), field2.r()*sin(field2.t())));
   bool seperation = fabs(distBetween - GOALBOX_DEPTH) < seperationThreshold();
 
-  // (3) Both over 150 cm in length
-  bool length1 = field1.ep1() - field1.ep0() > 150;
-  bool length2 = field2.ep1() - field2.ep0() > 150;
-  bool length = length1 && length2;
-
-  return parallel && seperation && length;
+  return parallel && seperation;
 }
 
 string GoalboxDetector::print() const
@@ -394,12 +388,7 @@ bool CornerDetector::isCorner(const HoughLine& line1, const HoughLine& line2) co
   double normalizedT2 = (field2.r() > 0 ? field2.t() : field2.t() - M_PI);
   bool orthogonal = diffRadians(diffRadians(normalizedT1, normalizedT2), (M_PI / 2)) < orthogonalThreshold()*TO_RAD;
 
-  // (3) Check that lines are longer than 70 cms
-  bool length1 = field1.ep1() - field1.ep0() > 70;
-  bool length2 = field2.ep1() - field2.ep0() > 70;
-  bool length = length1 && length2;
-
-  return intersects && farEnoughFromImageEdge && orthogonal && length;
+  return intersects && farEnoughFromImageEdge && orthogonal;
 }
 
 CornerID CornerDetector::classify(const HoughLine& line1, const HoughLine& line2) const
@@ -685,38 +674,40 @@ void FieldLineList::find(HoughLineList& houghLines, bool blackStar)
   clear();
 
   for (HoughLineList::iterator hl1 = houghLines.begin(); hl1 != houghLines.end(); ++hl1)
-  {
-    HoughLineList::iterator hl2 = hl1;
-    for (++hl2; hl2 != houghLines.end(); ++hl2)
-      // Here is the dot product 
-      if (hl1->field().ux() * hl2->field().ux() + hl1->field().uy() * hl2->field().uy() <= maxCosAngle)
-      {
-        // We use image coordinates to check polarity. Converting to field 
-        // coordinates leads to crossed field lines if the homography is poor.
-        // Crosses field lines in world coordinates leads to polarity error.
-        bool correctPolarity = (hl1->r() + hl2->r() < 0);
-
-        // If we are looking for lines in the black clibration star, check for
-        // opposite polarity.
-        if (blackStar)
-          correctPolarity = !correctPolarity;
-
-        // Separation is sum of the two r values (distance of line to origin).
-        // This is well defined and sensible for lines that may not be perfectly
-        // parallel. For field lines the polarities are pointing towards each
-        // other, which makes the sum of r's negative. A pair of nearly parallel
-        // lines with the right separation but with polarities pointing away from
-        // each other is not a field line. 
-        double separation = fabs(hl1->field().r() + hl2->field().r());
-        if (correctPolarity && separation <= maxLineSeparation())
+    if (hl1->field().valid())
+    {
+      HoughLineList::iterator hl2 = hl1;
+      for (++hl2; hl2 != houghLines.end(); ++hl2)
+        // Here is the dot product 
+        if (hl2->field().valid() &&
+            hl1->field().ux() * hl2->field().ux() + hl1->field().uy() * hl2->field().uy() <= maxCosAngle)
         {
-          int index = size();
-          hl1->fieldLine(index);
-          hl2->fieldLine(index);
-          push_back(FieldLine(*hl1, *hl2, index, houghLines.fx0(), houghLines.fy0()));
+          // We use image coordinates to check polarity. Converting to field 
+          // coordinates leads to crossed field lines if the homography is poor.
+          // Crosses field lines in world coordinates leads to polarity error.
+          bool correctPolarity = (hl1->r() + hl2->r() < 0);
+
+          // If we are looking for lines in the black clibration star, check for
+          // opposite polarity.
+          if (blackStar)
+            correctPolarity = !correctPolarity;
+
+          // Separation is sum of the two r values (distance of line to origin).
+          // This is well defined and sensible for lines that may not be perfectly
+          // parallel. For field lines the polarities are pointing towards each
+          // other, which makes the sum of r's negative. A pair of nearly parallel
+          // lines with the right separation but with polarities pointing away from
+          // each other is not a field line. 
+          double separation = fabs(hl1->field().r() + hl2->field().r());
+          if (correctPolarity && separation <= maxLineSeparation())
+          {
+            int index = size();
+            hl1->fieldLine(index);
+            hl2->fieldLine(index);
+            push_back(FieldLine(*hl1, *hl2, index, houghLines.fx0(), houghLines.fy0()));
+          }
         }
-      }
-  }
+    }
 }
 
 // TODO goalie and the goalbox

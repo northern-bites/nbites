@@ -1,5 +1,4 @@
-import "BallModel.proto"
-
+import "BallModel.proto";
 package messages;
 
 message HoughLine 
@@ -17,11 +16,7 @@ message FieldLine
     optional int32 id = 3;
     optional int32 correspondence = 4;
     optional float prob = 5;
-}
-
-message FieldLines
-{
-    repeated FieldLine line = 1;
+    optional int32 index = 6;
 }
 
 message Corner
@@ -31,11 +26,8 @@ message Corner
     optional int32 id = 3;
     optional int32 correspondence = 4;
     optional float prob = 5;
-}
-
-message Corners
-{
-    repeated Corner corner = 1;
+    optional int32 line1 = 6;
+    optional int32 line2 = 7;
 }
 
 message CenterCircle

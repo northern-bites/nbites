@@ -13,6 +13,7 @@ Sensor::Sensor(boost::shared_ptr<AL::ALBroker> broker_) :
     fastAccess(new AL::ALMemoryFastAccess())
 {
     initSensor();
+    initSonarValues();
 }
 
 Sensor::~Sensor()

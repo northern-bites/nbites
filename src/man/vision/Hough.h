@@ -174,7 +174,6 @@ struct Corner : public std::pair<FieldLine*, FieldLine*>
   Corner() : std::pair<FieldLine*, FieldLine*>() {}
   Corner(FieldLine* first_, FieldLine* second_, CornerID id_);
 
-  // TODO h
   double x;
   double y;
 

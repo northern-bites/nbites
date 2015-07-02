@@ -66,6 +66,7 @@ usingVision(false)
 
         int i=0;
         SExpr params = *SExpr::read(readInFile,i);
+        params.print();
 
         if(params.count() >= 2) {
             std::cout<<"[OBSTACLE ] Reading from SExpr"<<std::endl;
