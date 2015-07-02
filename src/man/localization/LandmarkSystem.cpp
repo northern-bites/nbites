@@ -31,6 +31,9 @@ LandmarkSystem::LandmarkSystem()
     addCorner(vision::CornerID::T, LandmarkID::TheirRightT, GREEN_PAD_X + FIELD_WHITE_WIDTH, BLUE_GOALBOX_BOTTOM_Y);
     addCorner(vision::CornerID::T, LandmarkID::TheirLeftT, GREEN_PAD_X + FIELD_WHITE_WIDTH, BLUE_GOALBOX_TOP_Y);
 
+    // Add center circle to map
+    circle = std::make_tuple(LandmarkID::CenterCircle, CENTER_FIELD_X, CENTER_FIELD_Y);
+
     // Add ball in set to map
     ballInSet = std::make_tuple(LandmarkID::BallInSet, CENTER_FIELD_X, CENTER_FIELD_Y);
 }
@@ -78,6 +81,23 @@ double LandmarkSystem::scoreCorner(const messages::Corner& observation,
     Landmark correspondingLandmark = matchCorner(observation, loc);
     return scoreObservation(obsvAsRobotLocation, correspondingLandmark, loc, true);
     // NOTE for corners, only bearing is used to score particles
+}
+
+double LandmarkSystem::scoreCircle(const messages::CenterCircle& observation, 
+                                   const messages::RobotLocation& loc)
+{
+    // Rotate to loc relative robot coordinate system
+    // TODO perform rotation in vision module
+    double rotatedX, rotatedY;
+    man::vision::translateRotate(observation.x(), observation.y(), 0, 0, -(M_PI / 2), rotatedX, rotatedY);
+
+    // Turn observation into RobotLocation so scoreObservation can operate on it
+    messages::RobotLocation obsvAsRobotLocation;
+    obsvAsRobotLocation.set_x(rotatedX);
+    obsvAsRobotLocation.set_y(rotatedY);
+
+    // Calculate probability of match
+    return scoreObservation(obsvAsRobotLocation, circle, loc);
 }
 
 double LandmarkSystem::scoreBallInSet(const messages::FilteredBall& observation, 

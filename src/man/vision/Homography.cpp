@@ -409,7 +409,6 @@ double GeoLine::error(const GeoLine& other, bool test) const
   boost::math::normal_distribution<> rGaussian(0, 100);
   boost::math::normal_distribution<> tGaussian(0, 10*TO_RAD);
 
-  // TODO properly sample
   double rProb = pdf(rGaussian, rDiff);
   double tProb = pdf(tGaussian, tDiff);
 

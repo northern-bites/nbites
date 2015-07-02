@@ -36,7 +36,8 @@ enum class LandmarkID {
     TheirLeftConvex,
     TheirRightT,
     TheirLeftT,
-    BallInSet
+    BallInSet,
+    CenterCircle
 };
 
 // Stores the LandmarkID and (x, y) cartesian coordinate representation of the location
@@ -64,6 +65,13 @@ public:
     // @param loc, pose hypothesis used to map the observation to absolute coords
     // @returns the probability of correspondence
     double scoreCorner(const messages::Corner& observation, 
+                       const messages::RobotLocation& loc);
+
+    // Return probability of correspondence with center circle
+    // @param observation, the circle observation from the vision system in robot relative coords
+    // @param loc, pose hypothesis used to map the observation to absolute coords
+    // @returns the probability of correspondence
+    double scoreCircle(const messages::CenterCircle& observation, 
                        const messages::RobotLocation& loc);
 
     // Return probability of correspondence with ball in set
@@ -104,6 +112,7 @@ private:
 
     // Map
     std::map<vision::CornerID, std::vector<Landmark>> corners;
+    Landmark circle;
     Landmark ballInSet;
 
     bool debug;

@@ -508,7 +508,7 @@ void CenterCircleDetector::set()
 bool CenterCircleDetector::detectCenterCircle(EdgeList& edges)
 {
   std::vector<Point> potentials = calculatePotentials(edges);
-  
+
 #ifdef OFFLINE
   _potentials = potentials;
   if (_potentials.size() > hardCap && getMaxBin(_potentials, _ccx, _ccy)) {
@@ -519,7 +519,7 @@ bool CenterCircleDetector::detectCenterCircle(EdgeList& edges)
   return false;
 #endif
 
-  return (_potentials.size() > hardCap && getMaxBin(potentials, _ccx, _ccy));
+  return (potentials.size() > hardCap && getMaxBin(potentials, _ccx, _ccy));
 }
 
 // Get potential cc centers and clean edge list
@@ -619,14 +619,17 @@ bool CenterCircleDetector::getMaxBin(std::vector<Point> vec, double& x0, double&
       y0 = (winBin / binCount) * binWidth; 
     }
 
-    std::cout << std::endl << "Center Circle at (" << x0 << "," << y0 << "). " << 
+#ifdef OFFLINE
+    std::cerr << std::endl << "Center Circle at (" << x0 << "," << y0 << "). " << 
       (double)votes * 100/(double)vec.size() << "\% of the " << 
       vec.size() << " potentials in most populated bin" << std::endl;
-
+#endif
+      
     return true;
   } else {
+#ifdef OFFLINE
     std::cout << std::endl << "Can't find center circle: " << (double)votes * 100/(double)vec.size() << "\% in max bin" << std::endl;
-
+#endif
   }
 
   return false;
