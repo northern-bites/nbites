@@ -1,3 +1,5 @@
+import "BallModel.proto"
+
 package messages;
 
 message HoughLine 
@@ -38,7 +40,15 @@ message Corners
 
 message CenterCircle
 {
-    optional bool on = 1;
-    optional float x = 2;
-    optional float y = 3;
+    optional float x = 1;
+    optional float y = 2;
+    optional float prob = 3;
+}
+
+message Vision
+{
+    repeated FieldLine line = 1;
+    repeated Corner corner = 2;
+    optional CenterCircle circle = 3;
+    optional VisionBall ball = 4;
 }

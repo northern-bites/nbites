@@ -320,11 +320,11 @@ void VisionModule::updateVisionBall()
 void VisionModule::sendCenterCircle()
 { 
     portals::Message<messages::CenterCircle> ccm(0);
+    if (centerCircleDetected) {
+        ccm.get()->set_x(centerCircleDetector[0]->x());
+        ccm.get()->set_y(centerCircleDetector[0]->y());
+    }
 
-    ccm.get()->set_on(centerCircleDetected);
-    ccm.get()->set_x(centerCircleDetector[0]->x());
-    ccm.get()->set_y(centerCircleDetector[0]->y());
-    
     centCircOut.setMessage(ccm);
 }
 
