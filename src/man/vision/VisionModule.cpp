@@ -260,7 +260,8 @@ void VisionModule::outportalVisionField()
     }
 
     // Set circle
-    visionField.set_circle(ccm);
+    messages::CenterCircle* cc = visionField.mutable_circle(); 
+    cc = &ccm;
 
     // Outportal Ball
     messages::VisionBall ball_message;
@@ -312,16 +313,12 @@ void VisionModule::outportalVisionField()
     }
 
     // Set Ball
-    visionField.set_ball(ball_message);
+    messages::VisionBall* vb = visionField.mutable_ball();
+    vb = &ball_message;
 
-    portals::Message<massages::Vision> visionOutMessage(&visionField);
+    portals::Message<messages::Vision> visionOutMessage(&visionField);
     visionOut.setMessage(visionOutMessage);
 
-}
-
-void VisionModule::sendCenterCircle()
-{ 
-    
 }
 
 void VisionModule::setColorParams(Colors* colors, bool topCamera)

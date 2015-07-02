@@ -157,8 +157,7 @@ Man::Man() :
         behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
         behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
         behaviors.sitDownIn.wireTo(&sensors.sitDownOutput_, true);
-        behaviors.linesIn.wireTo(&vision.linesOut, true);
-        behaviors.cornersIn.wireTo(&vision.cornersOut, true);
+        behaviors.visionIn.wireTo(&vision.visionOut, true);
         behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
         behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
         behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);

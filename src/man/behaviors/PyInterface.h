@@ -30,7 +30,6 @@ class PyInterface
 public:
     messages::GameState         const * gameState_ptr;
     messages::RobotLocation     const * loc_ptr;
-    messages::FieldLines        const * visionField_ptr;
     messages::FilteredBall      const * filteredBall_ptr;
     messages::LedCommand        const * ledCommand_ptr;
     messages::WorldModel        const * worldModel_ptr[NUM_PLAYERS_PER_TEAM];
@@ -49,8 +48,7 @@ public:
     messages::SharedBall        const * sharedBall_ptr;
     messages::RobotLocation     const * sharedFlip_ptr;
     messages::Toggle            const * sitDown_ptr;
-    messages::FieldLines        const * visionLines_ptr;
-    messages::Corners           const * corners_ptr;
+    messages::Vision            const * vision_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -59,10 +57,6 @@ public:
     void setLoc_ptr(const messages::RobotLocation* msg)
     {
         loc_ptr = msg;
-    }
-    void setVisionField_ptr(const messages::FieldLines* msg)
-    {
-        visionField_ptr = msg;
     }
     void setFilteredBall_ptr(const messages::FilteredBall* msg)
     {
@@ -79,14 +73,6 @@ public:
     void setLedCommand_ptr(const messages::LedCommand* msg)
     {
         ledCommand_ptr = msg;
-    }
-    void setVisionLines_ptr(const messages::FieldLines* msg)
-    {
-        visionLines_ptr = msg;
-    }
-    void setCorners_ptr(const messages::Corners* msg)
-    {
-        corners_ptr = msg;
     }
     void setWorldModel_ptr(const messages::WorldModel* msg,int i)
     {
@@ -147,6 +133,10 @@ public:
     void setSitDown_ptr(const messages::Toggle* msg)
     {
         sitDown_ptr = msg;
+    }
+    void setVision_ptr(const messages::Vision* msg)
+    {
+        vision_ptr = msg;
     }
     // void setVisionObstacle_ptr(const messages::VisionObstacle* msg)
     // {

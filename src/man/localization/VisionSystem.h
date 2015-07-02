@@ -32,10 +32,7 @@ public:
     ~VisionSystem();
 
     bool update(ParticleSet& particles,
-                const messages::FieldLines& lines,
-                const messages::Corners& corners,
-                const messages::CenterCircle& circle,
-                const messages::FilteredBall* ball,
+                const messages::Vision& vision, 
                 const messages::RobotLocation& lastEstimate);
 
     const std::vector<ReconstructedLocation>& getInjections() { return injections; }
