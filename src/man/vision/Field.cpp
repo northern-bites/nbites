@@ -43,17 +43,20 @@ namespace man {
 namespace vision {
 
 // Constructor for Field class.
-Field::Field()
-{
-	topCamera = true;
-	currentX = 0;
-	currentY = 0;
+	Field::Field(int w, int h, FieldHomography *hom)
+		:width(w),
+		 height(h),
+		 homography(hom)
+	{
+		topCamera = true;
+		currentX = 0;
+		currentY = 0;
 #ifdef OFFLINE
-	debugFieldEdge = false;
-	debugDrawFieldEdge = true;
-	debugHorizon = false;
+		debugFieldEdge = false;
+		debugDrawFieldEdge = false;
+		debugHorizon = false;
 #endif
-}
+	}
 
 	void Field::setDebugImage(DebugImage * di) {
 		debugDraw =  *di;
@@ -101,7 +104,15 @@ Field::Field()
 	}
 
 	float Field::getPixDistance(int x) {
-		return 0.0f;
+		double x1, x2, y1, y2;
+		// field coords wants things specified relative to the center of the image
+		int offset = height / 2 - x;
+		y1 = static_cast<double>(offset);
+		if (homography->fieldCoords(0.0, y1, x1, y2)) {
+			//cout << "Calculating distance " << x << " " << y2 << endl;
+			return static_cast<float>(y2);
+		}
+		return 100000.0f;
 	}
 
 	bool Field::isNavy() {
@@ -114,6 +125,10 @@ Field::Field()
 
 	void Field::drawLine(int x, int y, int x1, int x2, int c) {
 		debugDraw.drawLine(x, y, x1, x2, c);
+	}
+
+	void Field::drawDot(int x, int y, int c) {
+		debugDraw.drawDot(x, y, c);
 	}
 
 /* As part of finding the convex hull, we need to know where the
@@ -150,12 +165,12 @@ void Field::initialScanForTopGreenPoints(int pH) {
 		} else if (pH == 0) {
 			poseProject = 0;
 		}
-		topGreen = IMAGE_HEIGHT - 1;
+		topGreen = height - 1;
 		greenRun = 0;
 		lastGreen = 0;
 		// scan from the top point down
-		for (top = max(poseProject, 0);
-				good < RUNSIZE && top < IMAGE_HEIGHT; top++) {
+		for (top = max(poseProject, poseHorizon);
+				good < RUNSIZE && top < height; top++) {
 			// scan until we find a run of green pixels
 			int x = i * SCANSIZE;           // scan column
 			if (i == HULLS - 1) {
@@ -169,13 +184,13 @@ void Field::initialScanForTopGreenPoints(int pH) {
 			//pixel = getColor(x, top);
 			getColor(x, top);
             // watch out for patches of green off the field
-            if (topGreen != IMAGE_HEIGHT - 1 &&
+            if (topGreen != height - 1 &&
 				top - lastGreen  >  5 &&
                 possible - getPixDistance(top) > BUFFER / 2) {
 				if (debugFieldEdge) {
 					cout << "Detected bad patch " << x << " " << top << " " << lastGreen << endl;
 				}
-                topGreen = IMAGE_HEIGHT - 1;
+                topGreen = height - 1;
             }
 			//pixel = thresh->thresholded[top][x];
 			if (isGreen()) {
@@ -183,7 +198,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
 				lastGreen = top;
 				good++;
 				greenRun++;
-				if ((greenRun > 3 || good == RUNSIZE) && topGreen == IMAGE_HEIGHT - 1) {
+				if ((greenRun > 3 || good == RUNSIZE) && topGreen == height - 1) {
 					topGreen = top - greenRun;
                     possible = getPixDistance(topGreen);
 					if (debugFieldEdge) {
@@ -192,7 +207,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
 					}
 				}
                 // before we finish make sure we haven't seen another field
-                if (good == RUNSIZE && topGreen != IMAGE_HEIGHT - 1) {
+                if (good == RUNSIZE && topGreen != height - 1) {
                     float topDist = getPixDistance(topGreen);
                     float newDist = getPixDistance(top);
                     if (topDist > BUFFER) {
@@ -203,12 +218,12 @@ void Field::initialScanForTopGreenPoints(int pH) {
 						int blues = 0;
 						bool found = false;
 						while ((getPixDistance(check) > BUFFER ||
-								check < IMAGE_HEIGHT / 2) && !found && check < IMAGE_HEIGHT - 1) {
+								check < height / 2) && !found && check < height - 1) {
 							check++;
 							//pixel = getColor(x, check);
 							getColor(x, check);
 							greens = 0;
-							while (isGreen() && check < IMAGE_HEIGHT - 1) {
+							while (isGreen() && check < height - 1) {
 								check++;
 								greens++;
 								//pixel = getColor(x, check);
@@ -220,7 +235,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
 							} else if (greens > 2) {
 								check2 = check;
 							}
-							while (!isGreen() && check < IMAGE_HEIGHT - 1) {
+							while (!isGreen() && check < height - 1) {
 								check++;
 								greens++;
 								if (isWhite()) {
@@ -241,11 +256,11 @@ void Field::initialScanForTopGreenPoints(int pH) {
 										(getPixDistance(check2) - getPixDistance(check))
 										 << endl;
 								}
-								topGreen = IMAGE_HEIGHT - 1;
+								topGreen = height - 1;
 								top = check;
 								good = 1;
 								greenRun = 1;
-								check = IMAGE_HEIGHT - 1;
+								check = height - 1;
 							} else {
 								//good += greens;
 							}
@@ -274,7 +289,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
 				convex[i] = point<int>(i * SCANSIZE, 0);
             }
         } else {
-            convex[i] = point<int>(i * SCANSIZE, IMAGE_HEIGHT);
+            convex[i] = point<int>(i * SCANSIZE, height);
         }
         if (debugFieldEdge) {
             drawPoint(i * SCANSIZE, convex[i].y, MAROON);
@@ -307,12 +322,12 @@ void Field::initialScanForTopGreenPoints(int pH) {
         }
 	}
 	// prepare for the convex hull algorithm
-    for (good = 0; convex[good].y == IMAGE_HEIGHT && good < HULLS; good++) {}
+    for (good = 0; convex[good].y == height && good < HULLS; good++) {}
     if (good < HULLS) {
         for (int i = good-1; i > -1; i--) {
             convex[i].y = convex[i+1].y;
         }
-        for (good = HULLS - 1; convex[good].y == IMAGE_HEIGHT && good > 0; good--) {}
+        for (good = HULLS - 1; convex[good].y == height && good > 0; good--) {}
         for (int i = good + 1; i < HULLS; i++) {
             convex[i].y = convex[i-1].y;
         }
@@ -408,7 +423,7 @@ void Field::findTopEdges(int M) {
     // calculate the distance to the edge of the field at three key points
 	// NEWVISION
 	/*
-    const int quarter = IMAGE_WIDTH / 4;
+    const int quarter = width / 4;
     const int TOPPING = 30;
     float qDist = 1000.0f, hDist = 1000.0f, tDist = 1000.0f;
     if (topEdge[quarter] > TOPPING) {
@@ -435,9 +450,9 @@ void Field::findTopEdges(int M) {
    or is roughly horizontal;
  */
 int Field::findSlant() {
-	if (topEdge[0] > topEdge[IMAGE_HEIGHT - 1] + 30) {
+	if (topEdge[0] > topEdge[height - 1] + 30) {
 		return 1;
-	} else if (topEdge[IMAGE_HEIGHT - 1] > topEdge[0] + 30) {
+	} else if (topEdge[height - 1] > topEdge[0] + 30) {
 		return -1;
 	}
 	return 0;
@@ -497,7 +512,7 @@ void Field::findConvexHull(int pH) {
         }
         diffx2 = convex[M].x - convex[M-1].x;
         project = (float)convex[M-1].y + (float)diffx2 * steps;
-        if (convex[M-1].x > IMAGE_WIDTH - 1 - 50 && convex[M].y - (int)project > 5) {
+        if (convex[M-1].x > width - 1 - 50 && convex[M].y - (int)project > 5) {
             convex[M].y = (int)project;
         }
     }
@@ -542,14 +557,14 @@ int Field::getInitialHorizonEstimate(int pH) {
 
     // we're going to do this backwards of how we used to - we start at the pose
     // horizon and scan down.  This will provide an initial estimate
-    for (j = max(0, pH); j < IMAGE_HEIGHT && horizon == -1; j+=SCAN_INTERVAL_Y) {
+    for (j = max(0, pH); j < height && horizon == -1; j+=SCAN_INTERVAL_Y) {
         // reset values for each scan
         greenPixels = 0;
         run = 0;
         scanY = 0;
         // we do a scan based on the slope provided by pose
         // and we only look at every 10th pixel
-        for (i = 0; i < IMAGE_WIDTH && scanY < IMAGE_HEIGHT && scanY > -1
+        for (i = 0; i < width && scanY < height && scanY > -1
                  && greenPixels <= pixelsNeeded; i+= SCAN_INTERVAL_X) {
             //pixel = thresh->thresholded[scanY][i];
             //pixel = getColor(i, scanY);
@@ -573,7 +588,6 @@ int Field::getInitialHorizonEstimate(int pH) {
 			return j;
 		}
     }
-	cout << "Initial horizon at: " << j << endl;
     return j;
 }
 
@@ -593,9 +607,9 @@ int Field::getImprovedEstimate(int horizon) {
     register int i, j;
     unsigned char pixel; //, lastPixel;
     // we should have a base estimate, let's move it up
-    int k, l, minpix = IMAGE_WIDTH, minpixrow = -1;
+    int k, l, minpix = width, minpixrow = -1;
     // scan back toward the pose estimated horizon
-    for (k = min(horizon, IMAGE_HEIGHT - 2); k > -1; k-=4) {
+    for (k = min(horizon, height - 2); k > -1 && k > poseHorizon; k-=4) {
         // this is basically identical to the initial method except we're going up
         // Also, since we're trying to be precise we scan more and
         // have to worry about where the projection of the line goes
@@ -603,8 +617,8 @@ int Field::getImprovedEstimate(int horizon) {
         run = 0;
         scanY = 0;
         int maxRun = 0;
-        for (l = max(0, firstpix - 5), firstpix = -1; l < IMAGE_WIDTH && scanY <
-                 IMAGE_HEIGHT && scanY > -1 && run < MIN_GREEN_SIZE &&
+        for (l = max(0, firstpix - 5), firstpix = -1; l < width && scanY <
+                 height && scanY > -1 && run < MIN_GREEN_SIZE &&
                  (greenPixels < MIN_PIXELS_PRECISE || maxRun < 5); l+=3) {
             if (debugHorizon) {
                 drawPoint(l, scanY, BLACK);
@@ -646,8 +660,8 @@ int Field::getImprovedEstimate(int horizon) {
                 if (scanY < 0) {
                     scanY = 0;
                 }
-                if (scanY > IMAGE_HEIGHT) {
-                    scanY = IMAGE_HEIGHT;
+                if (scanY > height) {
+                    scanY = height;
                 }
                 if (debugHorizon) {
                     drawPoint(j, scanY, BLACK);
@@ -701,7 +715,7 @@ int Field::getImprovedEstimate(int horizon) {
 
 int Field::findGreenHorizon(int pH, float sl) {
     // re init shooting info
-    for (int i = 0; i < IMAGE_WIDTH; i++) {
+    for (int i = 0; i < width; i++) {
         topEdge[i] = 0;
     }
     // store field pose
@@ -712,6 +726,12 @@ int Field::findGreenHorizon(int pH, float sl) {
     if (debugHorizon) {
         cout << "initial estimate is " << initialEstimate << " " << pH << endl;
     }
+	if (debugDrawFieldEdge) {
+		for (int i = 0; i < width; i++) {
+			drawDot(i, pH, ORANGE);
+		}
+	}
+
     // improve the estimate
     horizon = getImprovedEstimate(initialEstimate);
     // calculate the convex hull
@@ -727,14 +747,14 @@ int Field::findGreenHorizon(int pH, float sl) {
 
 int Field::horizonAt(int x) {
     if (topCamera) {
-        if (x < 0 || x >= IMAGE_WIDTH) {
+        if (x < 0 || x >= width) {
             if (debugHorizon) {
                 cout << "Problem in horizon " << x << endl;
             }
             if (x < 0) {
                 return topEdge[0];
             } else {
-                return topEdge[IMAGE_WIDTH - 1];
+                return topEdge[width - 1];
             }
         }
         return topEdge[x];
@@ -751,14 +771,14 @@ int Field::horizonAt(int x) {
 
 int Field::occludingHorizonAt(int x) {
     if (topCamera) {
-        if (x < 0 || x >= IMAGE_WIDTH) {
+        if (x < 0 || x >= width) {
             if (debugHorizon) {
                 cout << "Problem in occluding horizon " << x << endl;
             }
             if (x < 0) {
                 return topBlock[0];
             } else {
-                return topBlock[IMAGE_WIDTH - 1];
+                return topBlock[width - 1];
             }
         }
         return topBlock[x];

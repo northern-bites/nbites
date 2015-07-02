@@ -64,6 +64,7 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         homography[i] = new FieldHomography(i == 0);
         fieldLines[i] = new FieldLineList();
 #ifdef OFFLINE
+		// Get the appropriate amount of space for the Debug Image
 		if (i == 0) {
 			debugSpace[0] = (uint8_t *)malloc(wd * ht * sizeof(uint8_t));
 		} else {
@@ -73,6 +74,7 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
 		// don't get any space if we're running on the robot
 		debugSpace[i] = NULL;
 #endif
+		// Construct the lightweight debug images that know where the space is
 		if (i == 0) {
 			debugImage[i] = new DebugImage(wd, ht, debugSpace[0]);
 			debugImage[i]->reset();
@@ -98,8 +100,10 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         edgeDetector[i]->fast(fast);
         hough[i]->fast(fast);
     }
-	field = new Field();
+	field = new Field(wd / 2, ht / 2, homography[0]);
 #ifdef OFFLINE
+	// Here is an example of how to get access to the debug space. In this case the
+	// field class only runs on the top image so it only needs that one
 	field->setDebugImage(debugImage[0]);
 #endif
     setCalibrationParams(robotName);
@@ -180,11 +184,16 @@ void VisionModule::run_()
         edgeDetector[i]->gradient(yImage);
 
 		// only calculate the field in the top camera
-		// NEWVISION (need actual horizon information)
 		if (i ==0) {
+			// field needs the color images
 			field->setImages(frontEnd[0]->whiteImage(), frontEnd[0]->greenImage(),
 							 frontEnd[0]->orangeImage());
-			field->findGreenHorizon(0, 0.0f);
+			GeoLine horizon = homography[0]->horizon(image->width() / 2);
+			double x1, x2, y1, y2;
+			horizon.endPoints(x1, y1, x2, y2);
+			int hor = static_cast<int>(y1);
+			hor = image->height() / 4 - hor;
+			field->findGreenHorizon(hor, 0.0f);
 		}
 
         // Run edge detection
@@ -197,10 +206,10 @@ void VisionModule::run_()
         houghLines[i]->mapToField(*(homography[i]));
 
         // Find world coordinates for rejected edges
-//        rejectedEdges[i]->mapToField(*(homography[i]));
+        // rejectedEdges[i]->mapToField(*(homography[i]));
 
         // Detect center circle on top
-//        if (!i) centerCircleDetected = centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]));
+        // if (!i) centerCircleDetected = centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]));
 
         // Pair hough lines to field lines
         fieldLines[i]->find(*(houghLines[i]), blackStar());

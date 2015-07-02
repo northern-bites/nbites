@@ -23,6 +23,7 @@ public class DebugImage extends ImageParent {
 	private static Color[] initColorMap(){
 
 		Color[] ret = {
+			Color.WHITE,              // Will not actually be used
 			Color.BLACK,
 			Color.WHITE,
 			Color.RED,

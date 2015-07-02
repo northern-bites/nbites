@@ -11,6 +11,7 @@ namespace vision {
 }
 
 #include "VisionModule.h"
+#include "Homography.h"
 
 //#include "Threshold.h"
 //#include "NaoPose.h"
@@ -41,7 +42,7 @@ class Field
 {
     friend class VisionModule;
 public:
-    Field();
+    Field(int w, int h, FieldHomography *hom);
     virtual ~Field() {
 	}
 
@@ -56,6 +57,7 @@ public:
 	bool isUndefined();
 	float getPixDistance(int x);
 	void drawPoint(int x, int y, int c);
+	void drawDot(int x, int y, int c);
 	void drawLine(int x, int y, int x1, int y1, int c);
 
     int findGreenHorizon(int pH, float sl);
@@ -98,6 +100,8 @@ private:
 	DebugImage debugDraw;
 	ImageLiteU8 whiteImage, greenImage, orangeImage;
 	int currentX, currentY;
+	FieldHomography * homography;
+	int width, height;
 
 	// the field horizon
 	int horizon;
