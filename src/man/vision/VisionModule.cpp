@@ -174,9 +174,9 @@ void VisionModule::run_()
         fieldLines[i]->find(*(houghLines[i]), true);
 
             double tiltBefore = homography[i]->tilt();
-        if (!i && homography[i]->calibrateFromStar(*fieldLines[i])) {
+        if (homography[i]->calibrateFromStar(*fieldLines[i])) {
             double tiltAfter = homography[i]->tilt();
-            std::cerr  << " k: " << tiltBefore << " o: " << tiltAfter-tiltBefore << std::endl;
+            std::cerr  << (!i ? "Top" : "Bot")  << " k: " << tiltBefore << " o: " << tiltAfter-tiltBefore << std::endl;
         }
         // Classify field lines
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));

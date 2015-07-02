@@ -135,11 +135,8 @@ int Vision_func() {
 
     // If log includes "BlackStar," set flag
     std::vector<SExpr*> blackStarVec = args[0]->tree().recursiveFind("BlackStar");
-    if (blackStarVec.size() != 0) {
+    if (blackStarVec.size() != 0)
         module.blackStar(true);
-        std::cout << "\nBLACK STAR TRUE!!!\n\n";
-    } else std::cout << "\nBLACK STAR FALSE\n\n";
-    
     
     // Run it!
     module.run();
