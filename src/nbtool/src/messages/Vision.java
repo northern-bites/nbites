@@ -679,11 +679,20 @@ public final class Vision {
     int getId();
 
     /**
-     * <code>optional float prob = 4;</code>
+     * <code>optional int32 correspondence = 4;</code>
+     */
+    boolean hasCorrespondence();
+    /**
+     * <code>optional int32 correspondence = 4;</code>
+     */
+    int getCorrespondence();
+
+    /**
+     * <code>optional float prob = 5;</code>
      */
     boolean hasProb();
     /**
-     * <code>optional float prob = 4;</code>
+     * <code>optional float prob = 5;</code>
      */
     float getProb();
   }
@@ -770,8 +779,13 @@ public final class Vision {
               id_ = input.readInt32();
               break;
             }
-            case 37: {
+            case 32: {
               bitField0_ |= 0x00000008;
+              correspondence_ = input.readInt32();
+              break;
+            }
+            case 45: {
+              bitField0_ |= 0x00000010;
               prob_ = input.readFloat();
               break;
             }
@@ -872,16 +886,31 @@ public final class Vision {
       return id_;
     }
 
-    public static final int PROB_FIELD_NUMBER = 4;
-    private float prob_;
+    public static final int CORRESPONDENCE_FIELD_NUMBER = 4;
+    private int correspondence_;
     /**
-     * <code>optional float prob = 4;</code>
+     * <code>optional int32 correspondence = 4;</code>
      */
-    public boolean hasProb() {
+    public boolean hasCorrespondence() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional float prob = 4;</code>
+     * <code>optional int32 correspondence = 4;</code>
+     */
+    public int getCorrespondence() {
+      return correspondence_;
+    }
+
+    public static final int PROB_FIELD_NUMBER = 5;
+    private float prob_;
+    /**
+     * <code>optional float prob = 5;</code>
+     */
+    public boolean hasProb() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional float prob = 5;</code>
      */
     public float getProb() {
       return prob_;
@@ -891,6 +920,7 @@ public final class Vision {
       inner_ = messages.Vision.HoughLine.getDefaultInstance();
       outer_ = messages.Vision.HoughLine.getDefaultInstance();
       id_ = 0;
+      correspondence_ = 0;
       prob_ = 0F;
     }
     private byte memoizedIsInitialized = -1;
@@ -916,7 +946,10 @@ public final class Vision {
         output.writeInt32(3, id_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeFloat(4, prob_);
+        output.writeInt32(4, correspondence_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeFloat(5, prob_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -941,7 +974,11 @@ public final class Vision {
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(4, prob_);
+          .computeInt32Size(4, correspondence_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(5, prob_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1076,8 +1113,10 @@ public final class Vision {
         bitField0_ = (bitField0_ & ~0x00000002);
         id_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
-        prob_ = 0F;
+        correspondence_ = 0;
         bitField0_ = (bitField0_ & ~0x00000008);
+        prob_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
 
@@ -1129,6 +1168,10 @@ public final class Vision {
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
         }
+        result.correspondence_ = correspondence_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
         result.prob_ = prob_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -1154,6 +1197,9 @@ public final class Vision {
         }
         if (other.hasId()) {
           setId(other.getId());
+        }
+        if (other.hasCorrespondence()) {
+          setCorrespondence(other.getCorrespondence());
         }
         if (other.hasProb()) {
           setProb(other.getProb());
@@ -1449,33 +1495,65 @@ public final class Vision {
         return this;
       }
 
-      private float prob_ ;
+      private int correspondence_ ;
       /**
-       * <code>optional float prob = 4;</code>
+       * <code>optional int32 correspondence = 4;</code>
        */
-      public boolean hasProb() {
+      public boolean hasCorrespondence() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional float prob = 4;</code>
+       * <code>optional int32 correspondence = 4;</code>
+       */
+      public int getCorrespondence() {
+        return correspondence_;
+      }
+      /**
+       * <code>optional int32 correspondence = 4;</code>
+       */
+      public Builder setCorrespondence(int value) {
+        bitField0_ |= 0x00000008;
+        correspondence_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 correspondence = 4;</code>
+       */
+      public Builder clearCorrespondence() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        correspondence_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private float prob_ ;
+      /**
+       * <code>optional float prob = 5;</code>
+       */
+      public boolean hasProb() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional float prob = 5;</code>
        */
       public float getProb() {
         return prob_;
       }
       /**
-       * <code>optional float prob = 4;</code>
+       * <code>optional float prob = 5;</code>
        */
       public Builder setProb(float value) {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         prob_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional float prob = 4;</code>
+       * <code>optional float prob = 5;</code>
        */
       public Builder clearProb() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         prob_ = 0F;
         onChanged();
         return this;
@@ -2198,6 +2276,24 @@ public final class Vision {
      * <code>optional int32 id = 3;</code>
      */
     int getId();
+
+    /**
+     * <code>optional int32 correspondence = 4;</code>
+     */
+    boolean hasCorrespondence();
+    /**
+     * <code>optional int32 correspondence = 4;</code>
+     */
+    int getCorrespondence();
+
+    /**
+     * <code>optional float prob = 5;</code>
+     */
+    boolean hasProb();
+    /**
+     * <code>optional float prob = 5;</code>
+     */
+    float getProb();
   }
   /**
    * Protobuf type {@code messages.Corner}
@@ -2264,6 +2360,16 @@ public final class Vision {
             case 24: {
               bitField0_ |= 0x00000004;
               id_ = input.readInt32();
+              break;
+            }
+            case 32: {
+              bitField0_ |= 0x00000008;
+              correspondence_ = input.readInt32();
+              break;
+            }
+            case 45: {
+              bitField0_ |= 0x00000010;
+              prob_ = input.readFloat();
               break;
             }
           }
@@ -2351,10 +2457,42 @@ public final class Vision {
       return id_;
     }
 
+    public static final int CORRESPONDENCE_FIELD_NUMBER = 4;
+    private int correspondence_;
+    /**
+     * <code>optional int32 correspondence = 4;</code>
+     */
+    public boolean hasCorrespondence() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional int32 correspondence = 4;</code>
+     */
+    public int getCorrespondence() {
+      return correspondence_;
+    }
+
+    public static final int PROB_FIELD_NUMBER = 5;
+    private float prob_;
+    /**
+     * <code>optional float prob = 5;</code>
+     */
+    public boolean hasProb() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional float prob = 5;</code>
+     */
+    public float getProb() {
+      return prob_;
+    }
+
     private void initFields() {
       x_ = 0F;
       y_ = 0F;
       id_ = 0;
+      correspondence_ = 0;
+      prob_ = 0F;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -2378,6 +2516,12 @@ public final class Vision {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeInt32(3, id_);
       }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeInt32(4, correspondence_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeFloat(5, prob_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -2398,6 +2542,14 @@ public final class Vision {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(3, id_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(4, correspondence_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(5, prob_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -2522,6 +2674,10 @@ public final class Vision {
         bitField0_ = (bitField0_ & ~0x00000002);
         id_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
+        correspondence_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        prob_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
 
@@ -2562,6 +2718,14 @@ public final class Vision {
           to_bitField0_ |= 0x00000004;
         }
         result.id_ = id_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.correspondence_ = correspondence_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.prob_ = prob_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2586,6 +2750,12 @@ public final class Vision {
         }
         if (other.hasId()) {
           setId(other.getId());
+        }
+        if (other.hasCorrespondence()) {
+          setCorrespondence(other.getCorrespondence());
+        }
+        if (other.hasProb()) {
+          setProb(other.getProb());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -2706,6 +2876,70 @@ public final class Vision {
       public Builder clearId() {
         bitField0_ = (bitField0_ & ~0x00000004);
         id_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int correspondence_ ;
+      /**
+       * <code>optional int32 correspondence = 4;</code>
+       */
+      public boolean hasCorrespondence() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional int32 correspondence = 4;</code>
+       */
+      public int getCorrespondence() {
+        return correspondence_;
+      }
+      /**
+       * <code>optional int32 correspondence = 4;</code>
+       */
+      public Builder setCorrespondence(int value) {
+        bitField0_ |= 0x00000008;
+        correspondence_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 correspondence = 4;</code>
+       */
+      public Builder clearCorrespondence() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        correspondence_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private float prob_ ;
+      /**
+       * <code>optional float prob = 5;</code>
+       */
+      public boolean hasProb() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional float prob = 5;</code>
+       */
+      public float getProb() {
+        return prob_;
+      }
+      /**
+       * <code>optional float prob = 5;</code>
+       */
+      public Builder setProb(float value) {
+        bitField0_ |= 0x00000010;
+        prob_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float prob = 5;</code>
+       */
+      public Builder clearProb() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        prob_ = 0F;
         onChanged();
         return this;
       }
@@ -3433,13 +3667,14 @@ public final class Vision {
     java.lang.String[] descriptorData = {
       "\n\014Vision.proto\022\010messages\";\n\tHoughLine\022\t\n" +
       "\001r\030\001 \001(\002\022\t\n\001t\030\002 \001(\002\022\013\n\003ep0\030\003 \001(\002\022\013\n\003ep1\030" +
-      "\004 \001(\002\"m\n\tFieldLine\022\"\n\005inner\030\001 \001(\0132\023.mess" +
-      "ages.HoughLine\022\"\n\005outer\030\002 \001(\0132\023.messages" +
-      ".HoughLine\022\n\n\002id\030\003 \001(\005\022\014\n\004prob\030\004 \001(\002\"/\n\n" +
-      "FieldLines\022!\n\004line\030\001 \003(\0132\023.messages.Fiel" +
-      "dLine\"*\n\006Corner\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\022\n\n" +
-      "\002id\030\003 \001(\005\"+\n\007Corners\022 \n\006corner\030\001 \003(\0132\020.m" +
-      "essages.Corner"
+      "\004 \001(\002\"\205\001\n\tFieldLine\022\"\n\005inner\030\001 \001(\0132\023.mes" +
+      "sages.HoughLine\022\"\n\005outer\030\002 \001(\0132\023.message" +
+      "s.HoughLine\022\n\n\002id\030\003 \001(\005\022\026\n\016correspondenc" +
+      "e\030\004 \001(\005\022\014\n\004prob\030\005 \001(\002\"/\n\nFieldLines\022!\n\004l" +
+      "ine\030\001 \003(\0132\023.messages.FieldLine\"P\n\006Corner" +
+      "\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\022\n\n\002id\030\003 \001(\005\022\026\n\016co" +
+      "rrespondence\030\004 \001(\005\022\014\n\004prob\030\005 \001(\002\"+\n\007Corn" +
+      "ers\022 \n\006corner\030\001 \003(\0132\020.messages.Corner"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3464,7 +3699,7 @@ public final class Vision {
     internal_static_messages_FieldLine_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_FieldLine_descriptor,
-        new java.lang.String[] { "Inner", "Outer", "Id", "Prob", });
+        new java.lang.String[] { "Inner", "Outer", "Id", "Correspondence", "Prob", });
     internal_static_messages_FieldLines_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_messages_FieldLines_fieldAccessorTable = new
@@ -3476,7 +3711,7 @@ public final class Vision {
     internal_static_messages_Corner_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_Corner_descriptor,
-        new java.lang.String[] { "X", "Y", "Id", });
+        new java.lang.String[] { "X", "Y", "Id", "Correspondence", "Prob", });
     internal_static_messages_Corners_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_messages_Corners_fieldAccessorTable = new

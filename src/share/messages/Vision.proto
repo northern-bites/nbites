@@ -13,7 +13,9 @@ message FieldLine
     optional HoughLine inner = 1;
     optional HoughLine outer = 2;
     optional int32 id = 3;
-    optional float prob = 4;
+    optional int32 correspondence = 4;
+    optional float prob = 5;
+    optional int32 index = 6;
 }
 
 message FieldLines
@@ -26,9 +28,20 @@ message Corner
     optional float x = 1;
     optional float y = 2;
     optional int32 id = 3;
+    optional int32 correspondence = 4;
+    optional float prob = 5;
+    optional int32 line1 = 6;
+    optional int32 line2 = 7;
 }
 
 message Corners
 {
     repeated Corner corner = 1;
+}
+
+message CenterCircle
+{
+    optional bool on = 1;
+    optional float x = 2;
+    optional float y = 3;
 }

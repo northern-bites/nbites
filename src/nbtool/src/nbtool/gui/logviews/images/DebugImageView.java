@@ -143,7 +143,7 @@ public class DebugImageView extends ViewParent implements IOFirstResponder {
     @Override
     public void ioReceived(IOInstance inst, int ret, Log... out) {
 		System.out.println("IO received in Debug");
-        DebugImage ei = new DebugImage(width, height, out[8].bytes, originalImage);
+        DebugImage ei = new DebugImage(width, height, out[9].bytes, originalImage);
         debugImage = ei.toBufferedImage();
 
 		if (out.length > 2) {

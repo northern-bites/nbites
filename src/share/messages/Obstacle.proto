@@ -17,8 +17,17 @@ message FieldObstacles
             NORTHWEST = 8;
         }
 
+        enum ObstacleDetector
+        {
+            NA = 0;
+            ARMS = 1;
+            SONARS = 2;
+            VISION = 3;
+        }
+
         optional ObstaclePosition position = 1;
         optional float distance = 2;
+        optional ObstacleDetector detector = 3;
     }
     repeated Obstacle obstacle = 1;
 }
