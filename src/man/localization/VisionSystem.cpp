@@ -183,7 +183,9 @@ bool VisionSystem::update(ParticleSet& particles,
 
             // Add injection and return
             ReconstructedLocation reconstructed(fromLineAndBall.x(), fromLineAndBall.y(), fromLineAndBall.h(), 1, 1, 0.01);
-            if (reconstructed.onField())
+            if (fromLineAndBall.x() > CENTER_FIELD_X)
+                std::cout << "Major bug in ball in set injections!" << std::endl;
+            else if (reconstructed.onField())
                 injections.push_back(reconstructed);
         }
     }
