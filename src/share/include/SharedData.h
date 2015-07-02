@@ -39,13 +39,12 @@ struct SensorValues {
 };
 
 struct SharedData {
-    uint8_t sensors[2][SENSOR_SIZE];
+    uint8_t sensors[SENSOR_SIZE];
     uint8_t command[COMMAND_SIZE];
 
-    pthread_mutex_t sensor_mutex[2];
+    pthread_mutex_t sensor_mutex;
     pthread_mutex_t cmnd_mutex;
 
-    uint8_t sensorSwitch;
     uint64_t latestSensorWritten;
     uint64_t latestSensorRead;
 
@@ -54,3 +53,8 @@ struct SharedData {
 
     uint8_t sit;
 };
+
+#ifndef _POSIX_THREAD_PROCESS_SHARED
+#error "Boss must be able to share mutexes between processes"
+#endif
+

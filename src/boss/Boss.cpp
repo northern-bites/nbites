@@ -82,6 +82,10 @@ bool DCM_TIMING_DEBUG_END() {
 
 #endif
 
+#ifdef DCM_TIMING_DEBUG
+#else
+#endif
+
 
 namespace boss {
 
@@ -98,7 +102,7 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     shared_fd(-1),
     shared(NULL),
     commandSkips(0),
-    sensorSkips(0),
+    sensorLockMiss(0),
     fifo_fd(-1)
 {
     std::cout << "Boss Constructor" << std::endl;
@@ -107,6 +111,8 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
         std::cout << "Couldn't construct shared mem, oh well!" << std::endl;
         return;
     }
+    
+    bool success = true;
 
     // Link up to the DCM loop
     try {
@@ -115,6 +121,7 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     }
     catch(const AL::ALError& e) {
         std::cout << "Tried to bind preprocess, but failed, because " + e.toString() << std::endl;
+        success = false;
     }
     try {
         dcmPostProcessConnection = broker_->getProxy("DCM")->getModule()->atPostProcess(
@@ -122,6 +129,7 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     }
     catch(const AL::ALError& e) {
         std::cout << "Tried to bind postprocess, but failed, because " + e.toString() << std::endl;
+        success = false;
     }
 
     // The FIFO that we're going to listen for terminal commands on
@@ -129,9 +137,22 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     if (fifo_fd <= 0) {
         std::cout << "FIFO ERROR" << std::endl;
         std::cout << "Boss will not be able to receive commands from terminal" << std::endl;
+        success = false;
     }
-
-    std::cout << "Boss Constructed successfully!" << std::endl;
+    
+    if ( pthread_mutexattr_init(&shared_mutex_attr) ||
+        pthread_mutexattr_setpshared(&shared_mutex_attr, PTHREAD_PROCESS_SHARED)
+    {
+        std::cout << "ERROR constructing shared process mutex attributes!" << std::endl;
+        success = false;
+    }
+   
+    if (success) {
+        std::cout << "Boss Constructed successfully!" << std::endl;
+    } else {
+        std::cout << "\nWARNING: one or more errors while constructing Boss! Crash likely." << std::endl;
+    }
+    
 
     startMan();
 
@@ -205,7 +226,7 @@ int Boss::killMan() {
     }
 
     std::cout << "Man missed " << manMissedFrames << " frames while running.\n";
-    std::cout << "Boss skipped " << sensorSkips << " and " << commandSkips << "commands" << std::endl;
+    std::cout << "Boss skipped " << sensorLockMiss << " and " << cmndLockMiss << "commands" << std::endl;
 
     shared->sit = 1;
     // A bit longer than it takes to sit down
@@ -226,16 +247,15 @@ int Boss::killMan() {
     shared->latestSensorWritten = 0;
     shared->latestSensorRead = 0;
     shared->sit = 0;
-    commandSkips = 0;
-    sensorSkips = 0;
+    cmndLockMiss = 0;
+    sensorLockMiss = 0;
 
     // Just in case we interrupted (man) in the middle of a critical section
-    pthread_mutex_destroy((pthread_mutex_t *) &shared->sensor_mutex[0]);
-    pthread_mutex_destroy((pthread_mutex_t *) &shared->sensor_mutex[0]);
-    pthread_mutex_destroy((pthread_mutex_t *) &shared->sensor_mutex[0]);
-    pthread_mutex_init( (pthread_mutex_t *) &shared->sensor_mutex[0], NULL);
-    pthread_mutex_init( (pthread_mutex_t *) &shared->sensor_mutex[1], NULL);
-    pthread_mutex_init( (pthread_mutex_t *) &shared->cmnd_mutex, NULL);
+    
+    pthread_mutex_destroy((pthread_mutex_t *) &shared->sensor_mutex);
+    pthread_mutex_destroy((pthread_mutex_t *) &shared->cmnd_mutex);
+    pthread_mutex_init( (pthread_mutex_t *) &shared->sensor_mutex, &shared_mutex_attr);
+    pthread_mutex_init( (pthread_mutex_t *) &shared->cmnd_mutex, &shared_mutex_attr);
 
     killingMan = false;
     return 0; // TODO actually return something. Necessary?
@@ -270,9 +290,8 @@ int Boss::constructSharedMem()
     memset((void *) shared, 0, sizeof(SharedData));
     shared->sensorSwitch = 0;
 
-    pthread_mutex_init( (pthread_mutex_t *) &shared->sensor_mutex[0], NULL);
-    pthread_mutex_init( (pthread_mutex_t *) &shared->sensor_mutex[1], NULL);
-    pthread_mutex_init( (pthread_mutex_t *) &shared->cmnd_mutex, NULL);
+    pthread_mutex_init( (pthread_mutex_t *) &shared->sensor_mutex, &shared_mutex_attr);
+    pthread_mutex_init( (pthread_mutex_t *) &shared->cmnd_mutex, &shared_mutex_attr);
 
     return 1;
 }
@@ -341,7 +360,7 @@ void Boss::DCMPreProcessCallback()
 
         } else {
             printf("Boss::DCMPreProcessCallback COULD NOT READ FRESH COMMAND (skip)\n");
-            ++commandSkips;
+            ++cmndLockMiss;
         }
     } else {
         //No new data to read.
@@ -405,7 +424,7 @@ void Boss::DCMPostProcessCallback()
     }
     if (!bossSyncWrite(shared, sensorStaging, nextSensorIndex)) {
         //printf("Boss::DCMPostProcessCallback COULD NOT POST FRESH SENSORS (skip)\n");
-        ++sensorSkips;
+        ++sensorLockMiss;
     }
     uint64_t lastRead = shared->latestSensorRead;
     if (nextSensorIndex - lastRead > 2 && (lastRead != 0) && manRunning) {
