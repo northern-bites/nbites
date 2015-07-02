@@ -17,12 +17,13 @@ namespace motion
 
 using namespace boost;
 
+// TODO make this consistent with new walk
 const float BHWalkProvider::INITIAL_BODY_POSE_ANGLES[] =
 {
-        1.74f, 0.174f,1.31f,-.35f,
+        1.57f, 0.18f, -1.56f, -0.18f,
         0.0f, 0.0f, -0.36f, 0.9f, -0.54f, 0.0f,
         0.0f, 0.0f, -0.36f, 0.9f, -0.54f, 0.0f,
-        1.74f,-0.174f,-1.31f,.35f
+        1.57f, -0.18f, 1.43f, 0.23f
 };
 
 /**
