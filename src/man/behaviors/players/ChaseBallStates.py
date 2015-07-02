@@ -78,8 +78,6 @@ def prepareForKick(player):
     elif player.finishedPlay:
         player.inKickOffPlay = False
 
-    player.motionKick = True
-    player.kick = kicks.M_LEFT_STRAIGHT
     return player.goNow('followPotentialField')
 
 @superState('gameControllerResponder')
