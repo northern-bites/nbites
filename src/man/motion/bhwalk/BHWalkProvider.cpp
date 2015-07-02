@@ -439,7 +439,9 @@ bool BHWalkProvider::calibrated() const {
 }
 
 bool BHWalkProvider::upright() const {
-    return walkingEngine->theFallDownStateBH.state == FallDownStateBH::upright;
+
+    return walkingEngine->theFallDownStateBH.state == FallDownStateBH::upright || walkingEngine->theFallDownStateBH.state == FallDownStateBH::undefined || walkingEngine->theFallDownStateBH.state == FallDownStateBH::staggering;
+//     return walkingEngine->theFallDownStateBH.state == FallDownStateBH::upright;
 }
 
 float BHWalkProvider::leftHandSpeed() const {

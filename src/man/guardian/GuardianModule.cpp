@@ -119,14 +119,16 @@ void GuardianModule::checkFalling()
         return;
     }
 
+    falling = false;
+
     messages::MotionStatus bh = motionStatusIn.message();
-    if (!bh.walk_is_active() || !bh.calibrated())
-        framesInBHWalk = 0;
-    else
-        framesInBHWalk++;
+    // if (!bh.walk_is_active() || !bh.calibrated())
+    //     framesInBHWalk = 0;
+    // else
+    //     framesInBHWalk++;
 
     // If we are not in BH walk or just switched to it, then use NB fall down detection
-    if (framesInBHWalk < 300)
+    if (0)
     {
         struct Inertial inertial = {inertialInput.message().angle_x(),
                                      inertialInput.message().angle_y() };
@@ -185,6 +187,8 @@ void GuardianModule::checkFalling()
     else if (!bh.upright())
     {
         std::cout << "BH thinks we are falling!" << std::endl;
+        std::cout << "[INERTDEBUG] BH calibrated:" << bh.calibrated() << std::endl;
+        std::cout << "[INERTDEBUG] BH walk_is_active:" << bh.walk_is_active() << std::endl;
         falling = true;
     }
 }
