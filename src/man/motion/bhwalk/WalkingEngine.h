@@ -99,13 +99,13 @@ MODULE(WalkingEngine)
   DEFINES_PARAMETER(SubPhaseParameters, walkLiftPhase, SubPhaseParameters(0.f, 1.f)) /**< The beginning and length of the trajectory used to lift the swinging foot */
 #ifdef V5_ROBOT
   DEFINES_PARAMETER(Vector3BH<>, walkLiftOffset, Vector3BH<>(0.f, 5.f, 22.f)) /**< The height the swinging foot is lifted */
-  DEFINES_PARAMETER(Vector3BH<>, walkLiftOffsetAtFullSpeedX, Vector3BH<>(0.f, 5.f, 22.f)) /**< The height the swinging foot is lifted when walking full speed in x-direction */
+  DEFINES_PARAMETER(Vector3BH<>, walkLiftOffsetAtFullSpeedX, Vector3BH<>(0.f, 5.f, 28.f)) /**< The height the swinging foot is lifted when walking full speed in x-direction */
 #else
   DEFINES_PARAMETER(Vector3BH<>, walkLiftOffset, Vector3BH<>(0.f, 5.f, 17.f)) /**< The height the swinging foot is lifted */
   DEFINES_PARAMETER(Vector3BH<>, walkLiftOffsetAtFullSpeedX, Vector3BH<>(0.f, 5.f, 25.f)) /**< The height the swinging foot is lifted when walking full speed in x-direction */
 #endif
   DEFINES_PARAMETER(Vector3BH<>, walkLiftOffsetAtFullSpeedY, Vector3BH<>(0.f, 20.f, 25.f)) /**< The height the swinging foot is lifted when walking full speed in y-direction */
-  DEFINES_PARAMETER(Vector3BH<>, walkLiftRotation, Vector3BH<>(-0.05f, -0.1f, 0.f)) /**< The amount the swinging foot is rotated while getting lifted */
+  DEFINES_PARAMETER(Vector3BH<>, walkLiftRotation, Vector3BH<>(-0.05f, -0.03f, 0.f)) /**< The amount the swinging foot is rotated while getting lifted */
   DEFINES_PARAMETER(float, walkSupportRotation, 0.f) /**< A rotation added to the supporting foot to boost the com acceleration */
   DEFINES_PARAMETER(Vector3BH<>, walkComLiftOffset, Vector3BH<>(0.f, 0.f, 2.3f)) /**< The height the center of mass is lifted within a single support phase */
 #ifdef V5_ROBOT

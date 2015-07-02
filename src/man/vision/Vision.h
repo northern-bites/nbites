@@ -38,6 +38,14 @@ namespace vision {
 extern "C" void _runLengthU8 (uint8_t * source, int count, int thresh, int32_t* runs);
 extern "C" void _runLengthU16(uint16_t* source, int count, int thresh, int32_t* runs);
 
+// ***********
+// *         *
+// *  Point  *
+// *         *
+// ***********
+
+typedef std::pair<double, double> Point;
+
 // *************
 // *           *
 // *  Utility  *

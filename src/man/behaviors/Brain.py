@@ -101,6 +101,7 @@ class Brain(object):
         # Used for obstacle detection
         self.obstacles = [0.] * 9
         self.obstacleDetectors = ['n'] * 9
+        self.currentlyDodging = False
 
         self.ourScore = 0
         self.theirScore = 0
@@ -294,6 +295,7 @@ class Brain(object):
                                  self.interface.loc.y,
                                  self.interface.loc.h * (180. / math.pi))
         self.locUncert = self.interface.loc.uncert
+        self.lost = self.interface.loc.lost
 
     def resetLocTo(self, x, y, h):
         """
