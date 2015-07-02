@@ -269,11 +269,11 @@ def positionForKick(player):
     if player.firstFrame():
         player.brain.tracker.lookStraightThenTrack()
 
-        if player.kick == kicks.M_LEFT_STRAIGHT or player.kick == kicks.M_RIGHT_STRAIGHT:
-            positionForKick.speed = Navigator.BRISK_SPEED
-        else:
-            positionForKick.speed = Navigator.MEDIUM_SPEED
-
+        # if player.kick == kicks.M_LEFT_STRAIGHT or player.kick == kicks.M_RIGHT_STRAIGHT:
+        #     positionForKick.speed = Navigator.BRISK_SPEED
+        # else:
+        #     positionForKick.speed = Navigator.MEDIUM_SPEED
+        positionForKick.speed = Navigator.MEDIUM_SPEED
         player.brain.nav.destinationWalkTo(positionForKick.kickPose, 
                                             positionForKick.speed)
 
