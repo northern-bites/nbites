@@ -31,7 +31,7 @@ def branchOnRole(player):
     if role.isChaser(player.role):
         if transitions.shouldFindSharedBall(player):
             return player.goNow('searchFieldForSharedBall')
-        return player.goNow('searchFieldByQuad')
+        return player.goNow('positionAtHome')
     return player.goNow('positionAtHome')
 
 @superState('playOffBall')
@@ -43,6 +43,10 @@ def positionAtHome(player):
     shared ball if it is on with reliability >= 2. Cherry pickers look in the direction
     of the shared ball if it is on with reliability >= 1.
     """
+
+    if role.isFirstChaser(player.role) and transitions.shouldFindSharedBall(player):
+        return player.goLater('searchFieldForSharedBall')
+
     if player.brain.ball.vis.frames_off < 10:
         ball = player.brain.ball
         bearing = ball.bearing_deg
@@ -118,7 +122,7 @@ def positionAsSupporter(player):
 @superState('playOffBall')
 @stay
 @ifSwitchNow(transitions.shouldFindFlippedSharedBall, 'searchFieldForFlippedSharedBall')
-@ifSwitchNow(transitions.shouldStopLookingForSharedBall, 'searchFieldByQuad')
+@ifSwitchNow(transitions.shouldStopLookingForSharedBall, 'positionAtHome')
 def searchFieldForSharedBall(player):
     """
     Searches the field for the shared ball.
@@ -148,7 +152,7 @@ def searchFieldForSharedBall(player):
 
 @superState('playOffBall')
 @stay
-@ifSwitchNow(transitions.shouldStopLookingForFlippedSharedBall, 'searchFieldByQuad')
+@ifSwitchNow(transitions.shouldStopLookingForFlippedSharedBall, 'positionAtHome')
 def searchFieldForFlippedSharedBall(player):
     """
     Flips the shared ball and searches for it.
