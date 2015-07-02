@@ -128,7 +128,7 @@ void GuardianModule::checkFalling()
     //     framesInBHWalk++;
 
     // If we are not in BH walk or just switched to it, then use NB fall down detection
-    if (0)
+    if (!bh.calibrated())
     {
         struct Inertial inertial = {inertialInput.message().angle_x(),
                                      inertialInput.message().angle_y() };
@@ -145,6 +145,7 @@ void GuardianModule::checkFalling()
 
         if(isFalling(angleMag, angleSpeed))
         {
+            // std::cout << "[INERT DEBUG] I'm calibrating now, so I'm using nbites inertials, and I think I'm falling!" << std::endl;
             // If falling, increment falling frames counter.
             fallingFrames += 1;
             notFallingFrames = 0;
