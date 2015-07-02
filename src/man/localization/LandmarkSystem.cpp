@@ -144,21 +144,18 @@ double LandmarkSystem::scoreObservation(const messages::RobotLocation& observati
     double tProb = pdf(tGaussian, tDiff);
 
     if (debug) {
-        std::cout << "Scoring observation:" << std::endl;
+        std::cout << "Scoring landmark:" << std::endl;
         std::cout << observation.x() << "," << observation.y() << std::endl;
         std::cout << rObsv << "," << tObsv << std::endl;
         std::cout << std::get<1>(correspondingLandmark) << "," << std::get<2>(correspondingLandmark) << std::endl;
         std::cout << xMapRel << "," << yMapRel << std::endl;
         std::cout << rMapRel << "," << tMapRel << std::endl;
-        std::cout << rDiff << "/" << tDiff << std::endl;
+        std::cout << rDiff << "," << tDiff << std::endl;
         std::cout << rProb << "/" << tProb << std::endl;
     }
 
-    if (onlyBearing)
-        return 0.001*tProb; // NOTE hack to decrease corner confidence
-    else
-        // Make the conditional independence assumption
-        return rProb * tProb;
+    // Make the conditional independence assumption
+    return rProb * tProb;
 }
 
 void LandmarkSystem::addCorner(vision::CornerID type, LandmarkID id, double x, double y)

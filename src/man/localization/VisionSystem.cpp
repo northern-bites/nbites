@@ -58,7 +58,7 @@ bool VisionSystem::update(ParticleSet& particles,
         for (int i = 0; i < lines.line_size(); i++) {
             if (!LineSystem::shouldUse(lines.line(i)))
                 continue;
-            curParticleError = curParticleError*lineSystem->scoreObservation(lines.line(i), particle->getLocation());
+            curParticleError = curParticleError*lineSystem->scoreLine(lines.line(i), particle->getLocation());
         }
 
         // Score particle from ball observation if in game set
