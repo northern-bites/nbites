@@ -324,7 +324,6 @@ bool StarCal::add(const FieldLineList& lines)
     if (lines[i][0].intersect(lines[i][1], vpx, vpy) && fabs(lines[i][0].ux()) > 0.3)
       fit.add(vpx - ix0, vpy - iy0);  // relative to optical axis
   }
-
   // If we didn't find exactly three suitable field lines, fail
   return fit.area() == 3;
 }
@@ -436,7 +435,7 @@ void GeoLine::translateRotate(double xTrans, double yTrans, double rotation)
     man::vision::translateRotate(x2, y2, xTrans, yTrans, rotation, x2t, y2t);
 
     // Calculate new t and unit vector
-    t(uMod(rotation + t(), M_PI));
+    t(rotation + t());
 
     // Dot product of point on line with new unit vector to find new r
     r(ux() * x1t + uy() * y1t);
