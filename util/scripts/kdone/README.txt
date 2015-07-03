@@ -3,7 +3,8 @@ How to install the updated done script, kdone:
 1) get kdone.sh to the robot
 scp ./kdone.sh nao@<robot>:nbites/kdone.sh
 
-2) get root
+2a) ssh into the robot
+2b) get root
 su
 
 3) add alias to /etc/profile
