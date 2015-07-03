@@ -2,7 +2,7 @@
 
 #include <pthread.h>
 
-#ifndef _POSIX_THREAD_PROCESS_SHARED
+#if !defined(_POSIX_THREAD_PROCESS_SHARED) && !defined(PTHREAD_PROCESS_SHARED)
 #error "Boss must be able to share mutexes between processes"
 #endif
 

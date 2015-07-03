@@ -14,20 +14,12 @@
 #define MAN_KILL    'k'
 #define MAN_START   's'
 
-/*
- Begin timing macros for debugging callbacks.
- define DCM_DEBUG 0
-    to hear when callbacks take > 10ms
- define DCM_DEBUG 1
-    to always hear about callback timing
- don't define DCM_DEBUG
-    to never hear from or call any code.
- */
-#define DCM_DEBUG 0
-//#define DCM_DEBUG 1
+
+#define DCM_DEBUG
+
 
 #ifdef DCM_DEBUG
-
+#define DCM_TIMING_DEBUG_ALWAYS false
 std::chrono::time_point<std::chrono::high_resolution_clock> pre_start, post_start, temp_start;
 void DCM_TIMING_DEBUG_PRE1() {
     pre_start = std::chrono::high_resolution_clock::now();
@@ -37,7 +29,7 @@ void DCM_TIMING_DEBUG_PRE2() {
     auto tpnow = std::chrono::high_resolution_clock::now();
     long micros = std::chrono::duration_cast<std::chrono::microseconds>(tpnow - pre_start).count();
     //if longer than 10 milliseconds, or DCM_TIMING_DEBUG > 0, shout.
-    if (micros > 10000 || DCM_TIMING_DEBUG) {
+    if (micros > 10000 || DCM_TIMING_DEBUG_ALWAYS) {
         printf("WARNING: DCMPreCallback took %li microseconds!\n", micros);
     }
 }
@@ -50,7 +42,7 @@ void DCM_TIMING_DEBUG_POST2() {
     auto tpnow = std::chrono::high_resolution_clock::now();
     long micros = std::chrono::duration_cast<std::chrono::microseconds>(tpnow - post_start).count();
     
-    if (micros > 10000 || DCM_TIMING_DEBUG) {
+    if (micros > 10000 || DCM_TIMING_DEBUG_ALWAYS) {
         printf("WARNING: DCMPostCallback took %li microseconds!\n", micros);
     }
 }
@@ -63,7 +55,7 @@ bool DCM_TIMING_DEBUG_END() {
     auto tpnow = std::chrono::high_resolution_clock::now();
     long micros = std::chrono::duration_cast<std::chrono::microseconds>(tpnow - temp_start).count();
     
-    if (micros > 10000 || DCM_TIMING_DEBUG) {
+    if (micros > 10000 || DCM_TIMING_DEBUG_ALWAYS) {
         printf("WARNING: DCM_TIMING_DEBUG measured %li microseconds!\n", micros);
         return true;
     }
