@@ -51,7 +51,7 @@ public:
     static vision::GeoLine relRobotToAbsolute(const messages::FieldLine& observation, const messages::RobotLocation& loc);
 
 private:
-    bool scoreObservation(const vision::GeoLine& observation, const vision::GeoLine& correspondingLine, const messages::RobotLocation& loc);
+    double scoreObservation(const vision::GeoLine& observation, const vision::GeoLine& correspondingLine, const messages::RobotLocation& loc);
     void addLine(LocLineID id, float r, float t, float ep0, float ep1);
 
     std::map<LocLineID, vision::GeoLine> lines;

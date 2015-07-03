@@ -138,7 +138,7 @@ void ParticleFilter::updateFieldForDebug(messages::FieldLines& lines,
                                          messages::Corners& corners)
 {
     LineSystem lineSystem;
-    lineSystem.setDebug(false);
+    lineSystem.setDebug(true);
     for (int i = 0; i < lines.line_size(); i++) {
         // Get line
         messages::FieldLine& field = *lines.mutable_line(i);

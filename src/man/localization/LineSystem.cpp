@@ -95,11 +95,17 @@ LocLineID LineSystem::matchLine(const messages::FieldLine& observation,
     const std::vector<LocLineID>& possibleLineIDs = visionToLocIDs[visionID];
     for (int i = 0; i < possibleLineIDs.size(); i++) {
         LocLineID possibleID = possibleLineIDs[i];
-        double curScore = scoreObservation(obsvAsGeoLine, lines[id], loc);
+        double curScore = scoreObservation(obsvAsGeoLine, lines[possibleID], loc);
 
         if (curScore > bestScore) {
             id = possibleID;
             bestScore = curScore;
+        }
+
+        if (debug) {
+            std::cout << "In matchLine:" << std::endl;
+            std::cout << static_cast<int>(possibleID) << std::endl;
+            std::cout << curScore << std::endl;
         }
     }
 
@@ -124,7 +130,13 @@ double LineSystem::scoreLine(const messages::FieldLine& observation,
 
     // Find correspondence and calculate probability of match
     LocLineID id = matchLine(observation, loc);
-    return scoreObservation(obsvAsGeoLine, lines[id], loc);
+    double score = scoreObservation(obsvAsGeoLine, lines[id], loc);
+
+    if (debug) {
+        std::cout << "In scoreLine:" << std::endl;
+        std::cout << static_cast<int>(id) << std::endl;
+        std::cout << score << std::endl;
+    }
 }
 
 // NOTE method assumes that endpoints seen in observation are endpoints of line
@@ -212,16 +224,16 @@ vision::GeoLine LineSystem::relRobotToAbsolute(const messages::FieldLine& observ
     return globalLine;
 }
 
-bool LineSystem::scoreObservation(const vision::GeoLine& observation, 
-                                  const vision::GeoLine& correspondingLine, 
-                                  const messages::RobotLocation& loc)
+double LineSystem::scoreObservation(const vision::GeoLine& observation, 
+                                    const vision::GeoLine& correspondingLine, 
+                                    const messages::RobotLocation& loc)
 {
     // Normalize correspondingLine to have positive r and t between 0 and PI / 2 
     // NOTE see constructor for explanation of what negative r means in this context
     double normalizedT = (correspondingLine.r() > 0 ? correspondingLine.t() : correspondingLine.t() - M_PI);
     vision::GeoLine normalizedCorrespondingLine;
     normalizedCorrespondingLine.set(fabs(correspondingLine.r()), normalizedT, 
-                                         correspondingLine.ep0(), correspondingLine.ep1());
+                                    fabs(correspondingLine.ep0()), fabs(correspondingLine.ep1()));
     
     // Landmark in map, absolute to robot relative
     normalizedCorrespondingLine.inverseTranslateRotate(loc.x(), loc.y(), loc.h());
@@ -240,9 +252,12 @@ bool LineSystem::scoreObservation(const vision::GeoLine& observation,
     double tProb = pdf(tGaussian, tDiff);
   
     if (debug) {
-      std::cout << "Scoring line:" << std::endl;
+      std::cout << "In scoreObservation:" << std::endl;
+      std::cout << normalizedCorrespondingLine.r() << "," << normalizedCorrespondingLine.t() << std::endl;
+      std::cout << observation.r() << "," << observation.t() << std::endl;
       std::cout << rDiff << "," << tDiff << std::endl;
       std::cout << rProb << "/" << tProb << std::endl;
+      std::cout << (rProb * tProb) << std::endl;
     }
 
     // Make the conditional independence assumption

@@ -111,7 +111,6 @@ messages::RobotLocation LandmarkSystem::relRobotToAbsolute(const messages::Robot
     return transformed;
 }
 
-// TODO debug
 double LandmarkSystem::scoreObservation(const messages::RobotLocation& observation, 
                                         const Landmark& correspondingLandmark,
                                         const messages::RobotLocation& loc,
@@ -144,7 +143,7 @@ double LandmarkSystem::scoreObservation(const messages::RobotLocation& observati
     double tProb = pdf(tGaussian, tDiff);
 
     if (debug) {
-        std::cout << "Scoring landmark:" << std::endl;
+        std::cout << "In scoreObservation:" << std::endl;
         std::cout << observation.x() << "," << observation.y() << std::endl;
         std::cout << rObsv << "," << tObsv << std::endl;
         std::cout << std::get<1>(correspondingLandmark) << "," << std::get<2>(correspondingLandmark) << std::endl;
@@ -152,6 +151,7 @@ double LandmarkSystem::scoreObservation(const messages::RobotLocation& observati
         std::cout << rMapRel << "," << tMapRel << std::endl;
         std::cout << rDiff << "," << tDiff << std::endl;
         std::cout << rProb << "/" << tProb << std::endl;
+        std::cout << (rProb * tProb) << std::endl;
     }
 
     // Make the conditional independence assumption
