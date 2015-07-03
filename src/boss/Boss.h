@@ -60,11 +60,6 @@ private:
     // Vars relating to Man
     pid_t manPID;
     bool manRunning;
-    bool killingMan;
-    
-    // Used to save state for printout when we kill man.
-    uint64_t killingNext;
-    uint64_t killingLast;
 
     int shared_fd;
     volatile SharedData* shared;
@@ -75,8 +70,6 @@ private:
 
     uint8_t sensorStaging[SENSOR_SIZE];
     uint64_t sensorLockMiss;
-
-    uint64_t manMissedFrames;
 
     int fifo_fd;
 };

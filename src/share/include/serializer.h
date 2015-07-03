@@ -52,7 +52,7 @@ public:
 
 //true on success, false on failure (null pointer, <= 0 length, oversized)
 // **** DELETES POINTERS IN >objects< AFTER SERIALIZING ****
-inline bool serializeTo(std::vector<SerializableBase *> objects, uint64_t objectIndex, void * destStart, size_t maxSize, size_t * usedReturn) {
+inline bool serializeTo(std::vector<SerializableBase *> objects, int64_t objectIndex, void * destStart, size_t maxSize, size_t * usedReturn) {
 
     if (maxSize > (size_t)INT32_MAX) {
         printf("ERROR: serializeTo() designed for 32 bit size values!  maxSize %zu exceeds INT32_MAX %u!\n",
@@ -63,9 +63,9 @@ inline bool serializeTo(std::vector<SerializableBase *> objects, uint64_t object
     size_t loc = 0;
     uint8_t * bytePointer = (uint8_t *) destStart;
 
-    uint64_t * indexPointer = (uint64_t *) bytePointer;
+    int64_t * indexPointer = (int64_t *) bytePointer;
     *indexPointer = objectIndex;
-    loc += sizeof(uint64_t);
+    loc += sizeof(int64_t);
 
     int32_t * intPointer = (int32_t *) (bytePointer + loc);
     *intPointer = (int32_t) objects.size();
@@ -114,7 +114,7 @@ class Deserialize {
 
     int askIndex;
 
-    uint64_t _dataIndex;
+    int64_t _dataIndex;
     std::vector<std::string> objs;
 
     int32_t _length() {
@@ -153,8 +153,8 @@ public:
 
         size_t nobjs, tbytes;
 
-        _dataIndex = *((uint64_t *) (base + loc));
-        loc += sizeof(uint64_t);
+        _dataIndex = *((int64_t *) (base + loc));
+        loc += sizeof(int64_t);
 
         nobjs = * ((uint32_t *) (base + loc));
         loc += sizeof(int32_t);
@@ -238,7 +238,7 @@ public:
         return objs.size();
     }
 
-    uint64_t dataIndex() {
+    int64_t dataIndex() {
         if (parsed())
             return _dataIndex;
         else return -1;

@@ -54,6 +54,8 @@ int main() {
 
     while (1) {
         // Hack so that I don't have to modify DiagramThread
+        // (Diagram threads are daemon threads, and man will exit if they're the
+        // only ones left)
         sleep(10);
     }
     return 1;

@@ -52,9 +52,6 @@ private:
     messages::JointAngles latestJointAngles_;
     messages::JointAngles latestStiffness_;
     messages::LedCommand latestLeds_;
-
-    // Used to throttle "BOSS missed a frame" prints
-    bool bossSlow;
 };
 
 } // namespace jointenactor
