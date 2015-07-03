@@ -138,7 +138,7 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     }
     
     if ( pthread_mutexattr_init(&shared_mutex_attr) ||
-        pthread_mutexattr_setpshared(&shared_mutex_attr, PTHREAD_PROCESS_SHARED)
+        pthread_mutexattr_setpshared(&shared_mutex_attr, PTHREAD_PROCESS_SHARED) )
     {
         std::cout << "ERROR constructing shared process mutex attributes!" << std::endl;
         success = false;
@@ -444,7 +444,7 @@ void Boss::checkFIFO() {
         default:
             printf("Boss::checkFIFO got unexpected amt return: %li\n", amt);
             return;
-        case FIFO_CMND_SIZE;
+        case FIFO_CMND_SIZE:
             //continue....
     }
 
