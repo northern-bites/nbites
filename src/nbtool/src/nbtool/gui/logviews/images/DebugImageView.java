@@ -31,8 +31,10 @@ import nbtool.io.CrossIO.CrossInstance;
 import nbtool.io.CrossIO.CrossCall;
 import nbtool.util.Utility;
 
-public class DebugImageView extends ViewParent implements IOFirstResponder, ActionListener {
+public class DebugImageView extends ViewParent
+	implements IOFirstResponder, ActionListener {
 
+	// Values according to nbcross/vision_defs.cpp - must be kept in sync
 	static final int YIMAGE = 0;
 	static final int WHITE_IMAGE = 1;
 	static final int GREEN_IMAGE = 2;
@@ -45,45 +47,28 @@ public class DebugImageView extends ViewParent implements IOFirstResponder, Acti
 	static final int DRAWING = 9;
 	static final int ORIGINAL = 10;
 
-	String[] imageViews = { "Original", "Green", "Orange", "White", "Edge", "Ball" };
+	static final int DEFAULT_WIDTH = 320;
+	static final int DEFAULT_HEIGHT = 240;
+
+	// Images that we can view in this view using the combo box
+	String[] imageViews = { "Original", "Green", "Orange", "White", "Edge",
+							"Ball" };
 	JComboBox viewList;
 
+	// Dimensions of the image that we are working with
     int width;
     int height;
 
+	// Dimensions as we want to display them
     int displayw;
     int displayh;
 
-    final int fieldw = 640;
-    final int fieldh = 554;
+    BufferedImage originalImage;            // what the robot saw
+    DebugImage debugImage;                  // drawing overlay
+	BufferedImage debugImageDisplay;        // overlay + original
+	BufferedImage displayImages[] = new BufferedImage[ORIGINAL+1]; // our images
 
-    final int buffer = 5;
-
-    double resize = 1;
-
-    boolean click = false;
-    boolean drag = false;
-
-    // Click and release values
-    int clickX1 = 0;
-    int clickY1 = 0;
-    int clickX2 = 0;
-    int clickY2 = 0;
-
-    // Field coordinate image upper left hand corder
-    int fx0;
-    int fy0;
-
-    // Center of field cordinate system
-    int fxc = displayw + buffer + fieldw/2;
-    int fyc = fieldh;
-
-    BufferedImage originalImage;
-    DebugImage debugImage;
-	BufferedImage debugImageDisplay;
-	BufferedImage displayImages[] = new BufferedImage[ORIGINAL+1];
-
-	static int currentTop, currentBottom;
+	static int currentBottom;  // track current selection
 
     @Override
     public void setLog(Log newlog) {
@@ -103,7 +88,7 @@ public class DebugImageView extends ViewParent implements IOFirstResponder, Acti
             width =  w.get(1).valueAsInt() / 2;
         } else {
             System.out.printf("COULD NOT READ WIDTH FROM LOG DESC\n");
-            width = 320;
+            width = DEFAULT_WIDTH;
         }
 
         vec = newlog.tree().recursiveFind("height");
@@ -112,51 +97,55 @@ public class DebugImageView extends ViewParent implements IOFirstResponder, Acti
             height = h.get(1).valueAsInt() / 2;
         } else {
             System.out.printf("COULD NOT READ HEIGHT FROM LOG DESC\n");
-            height = 240;
+            height = DEFAULT_HEIGHT;
         }
 
         displayw = width*2;
         displayh = height*2;
 
-        fx0 = displayw + buffer;
-        fy0 = 0;
-
-        fxc = displayw + buffer + fieldw/2;
-        fyc = fieldh;
-
         displayImages[ORIGINAL] = Utility.biFromLog(newlog);
     }
 
     public void paintComponent(Graphics g) {
+		final int BOX_HEIGHT = 25;
         if (debugImage != null) {
             g.drawImage(debugImageDisplay, 0, 0, displayw, displayh, null);
 			g.drawImage(displayImages[currentBottom], 0, displayh + 5, displayw,
 						displayh, null);
-			viewList.setBounds(0, displayh * 2 + 10, displayw / 2, 25);
-			//currentBottom = GREEN_IMAGE;
+			viewList.setBounds(0, displayh * 2 + 10, displayw / 2, BOX_HEIGHT);
         }
     }
 
     public DebugImageView() {
         super();
         setLayout(null);
+		// set up combo box to select views
 		viewList = new JComboBox(imageViews);
 		viewList.setSelectedIndex(0);
 		viewList.addActionListener(this);
+
         this.addMouseListener(new DistanceGetter());
-		currentBottom = ORIGINAL;
-		currentTop = ORIGINAL;
+
+		// default image to display - save across instances
+		if (currentBottom == 0) {
+			currentBottom = ORIGINAL;
+		}
 		add(viewList);
     }
 
+	/* Currently only called by the JComboBox, if we start adding more actions
+	 * then we will need to update this accordingly.
+	 */
 	public void actionPerformed(ActionEvent e) {
 		JComboBox cb = (JComboBox)e.getSource();
 		String viewName = (String)cb.getSelectedItem();
 		updateView(viewName);
 	}
 
+	/* Updates the image displayed on the bottom according to the user's
+	 * selection.
+	 */
 	public void updateView(String viewName) {
-		System.out.println("Selected "+viewName);
 		if (viewName == "Green") {
 			currentBottom = GREEN_IMAGE;
 		} else if (viewName == "White") {
@@ -222,7 +211,6 @@ public class DebugImageView extends ViewParent implements IOFirstResponder, Acti
         debugImage = new DebugImage(width, height, out[DRAWING].bytes,
 									   displayImages[ORIGINAL]);
         debugImageDisplay = debugImage.toBufferedImage();
-
 
         repaint();
 
