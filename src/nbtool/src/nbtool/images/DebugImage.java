@@ -17,6 +17,10 @@ public class DebugImage extends ImageParent {
 		originalImage = o;
 	}
 
+	public void updateBuffer(BufferedImage o) {
+		originalImage = o;
+	}
+
 
 	private static final Color[] colorMap = initColorMap();
 
