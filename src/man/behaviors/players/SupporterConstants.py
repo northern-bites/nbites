@@ -13,8 +13,8 @@ def getSupporterPosition(player, r):
     elif role.isRightDefender(r):
         return rightDefender(player)
     elif role.isFirstChaser(r):
-        return firstChaser(player)
-    elif role.isSecondChaser(r):
+        return chaser(player)
+    elif role.isStriker(r):
         return striker(player)
     else: # cherry picker
         return cherryPicker(player)
@@ -95,7 +95,7 @@ def cherryPicker(player):
                          player.brain.loc.y,
                          player.brain.ball.bearing_deg + player.brain.loc.h)
 def striker(player):
-    return findChaserHome(player.brain.ball, player.brain.ball.bearing_deg + player.brain.loc.h)
+    return findStrikerHome(player.brain.ball, player.brain.ball.bearing_deg + player.brain.loc.h)
 
 def inBounds(position):
     return (position.x >= NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X and 
@@ -170,29 +170,29 @@ def findDefenderHome(left, ball, hh):
 
                 return RobotLocation(hx, hy, hh)
 
-def findChaserHome(ball, hh):
+def findStrikerHome(ball, hh):
     # find closest point on triangle to the ball and flip it over
     # the y axis so we are positioned watching the ball from other side
     if ball.x < NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X:
         if ball.y > NogginConstants.MIDFIELD_Y:
-            home = closePointOnSeg(role.oddChaserTop.x,
-                                    role.oddChaserTop.y,
-                                    role.oddChaserForward.x,
-                                    role.oddChaserForward.y,
+            home = closePointOnSeg(role.strikerTop.x,
+                                    role.strikerTop.y,
+                                    role.strikerForward.x,
+                                    role.strikerForward.y,
                                     ball.x, ball.y)
             return RobotLocation(home[0], NogginConstants.FIELD_HEIGHT - home[1], hh)
         else:
-            home = closePointOnSeg(role.oddChaserBottom.x,
-                                    role.oddChaserBottom.y,
-                                    role.oddChaserForward.x,
-                                    role.oddChaserForward.y,
+            home = closePointOnSeg(role.strikerBottom.x,
+                                    role.strikerBottom.y,
+                                    role.strikerForward.x,
+                                    role.strikerForward.y,
                                     ball.x, ball.y)
             return RobotLocation(home[0], NogginConstants.FIELD_HEIGHT - home[1], hh)
     else:
-        home = closePointOnSeg(role.oddChaserBottom.x,
-                                role.oddChaserBottom.y,
-                                role.oddChaserTop.x,
-                                role.oddChaserTop.y,
+        home = closePointOnSeg(role.strikerBottom.x,
+                                role.strikerBottom.y,
+                                role.strikerTop.x,
+                                role.strikerTop.y,
                                 ball.x, ball.y)
         return RobotLocation(home[0], NogginConstants.FIELD_HEIGHT - home[1], hh)
 
