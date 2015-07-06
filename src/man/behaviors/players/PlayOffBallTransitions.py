@@ -4,7 +4,7 @@ import SharedTransitions as shared
 import ChaseBallConstants as chaseConstants
 import noggin_constants as nogginC
 from objects import RobotLocation
-from SupporterConstants import findChaserHome, findDefenderHome
+from SupporterConstants import findStrikerHome, findDefenderHome
 
 def ballInBox(player):
     """
@@ -58,8 +58,8 @@ def tooFarFromHome(threshold, player):
             home = findDefenderHome(True, ball, player.homePosition.h)
         elif role.isRightDefender(player.role):
             home = findDefenderHome(False, ball, player.homePosition.h)
-        elif role.isSecondChaser(player.role):
-            home = findChaserHome(ball, player.homePosition.h)
+        elif role.isStriker(player.role):
+            home = findStrikerHome(ball, player.homePosition.h)
         else:
             home = player.homePosition
 

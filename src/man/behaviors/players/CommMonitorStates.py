@@ -32,7 +32,7 @@ def commMonitor(player):
         print "Switched to awful comm mode!"
         player.role = player.brain.playerNumber
         player.prevRoleConfig = RoleConstants.roleConfiguration
-        RoleConstants.roleConfiguration = RoleConstants.moderate
+        RoleConstants.roleConfiguration = RoleConstants.spread
         RoleConstants.oddDefenderBox = RoleConstants.defenderBox
         RoleConstants.evenDefenderBox = RoleConstants.defenderBox
         # US Open Hack

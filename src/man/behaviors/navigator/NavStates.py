@@ -134,7 +134,6 @@ def dodge(nav):
         ## SET UP the dodge direction based on where the obstacle is
         # if directly in front of us, move back and to one side based on
         # where the goToPosition dest is
-        nav.brain.currentlyDodging = True
         if dodge.obstaclePosition == 1:
             print "Dodging NORTH obstacle"
             relDest = helper.getRelativeDestination(nav.brain.loc,
@@ -215,7 +214,6 @@ def getIndex(num):
 
 # Quick stand to stabilize from the dodge.
 def briefStand(nav):
-    nav.brain.currentlyDodging = False
     if nav.firstFrame():
         helper.stand(nav)
 

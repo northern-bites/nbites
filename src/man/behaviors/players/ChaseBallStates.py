@@ -10,10 +10,7 @@ from ..kickDecider import KickDecider
 from ..kickDecider import kicks
 from ..util import *
 from objects import RelRobotLocation, Location, RobotLocation
-import noggin_constants as nogginConstants
 from math import fabs, degrees, cos, sin, pi, radians, copysign
-from random import randrange
-
 
 @superState('gameControllerResponder')
 @stay
@@ -78,6 +75,12 @@ def prepareForKick(player):
     elif player.finishedPlay:
         player.inKickOffPlay = False
 
+    #  TODO just to be safe since we are only motionkicking now
+    player.motionKick = True
+    # only orbit is small orbit
+    relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
+    if fabs(relH) < constants.SHOULD_ORBIT_BEARING:
+        return player.goNow('orbitBall')
     return player.goNow('followPotentialField')
 
 @superState('gameControllerResponder')
@@ -99,6 +102,7 @@ def followPotentialField(player):
     relH = player.decider.normalizeAngle(player.kick.setupH - heading)
 
     if (transitions.shouldPositionForKick(player, ball, relH)):
+        player.brain.nav.stand()
         destinationX = player.kick.destinationX
         destinationY = player.kick.destinationY
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
@@ -267,26 +271,12 @@ def positionForKick(player):
 
     if player.firstFrame():
         player.brain.tracker.lookStraightThenTrack()
-        player.brain.nav.destinationWalkTo(positionForKick.kickPose,
-                                           Navigator.MEDIUM_SPEED)
-        positionForKick.slowDown = False
+
+        player.brain.nav.destinationWalkTo(positionForKick.kickPose, 
+                                            Navigator.MEDIUM_SPEED)
+
     elif player.brain.ball.vis.on: # don't update if we don't see the ball
-        # slows down the walk when very close to the ball to stabalize motion kicking and to not walk over the ball
-        if player.kick == kicks.M_LEFT_STRAIGHT or player.kick == kicks.M_RIGHT_STRAIGHT:
-            if (not positionForKick.slowDown and 
-                player.brain.ball.distance < constants.SLOW_DOWN_TO_BALL_DIST):
-                positionForKick.slowDown = True
-                player.brain.nav.destinationWalkTo(positionForKick.kickPose,
-                                           Navigator.GRADUAL_SPEED)
-            elif (positionForKick.slowDown and 
-                player.brain.ball.distance >= constants.SLOW_DOWN_TO_BALL_DIST):
-                positionForKick.slowDown = False
-                player.brain.nav.destinationWalkTo(positionForKick.kickPose,
-                                           Navigator.MEDIUM_SPEED)
-            else:
-                player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
-        else:
-            player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
+        player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
 
     player.ballBeforeKick = player.brain.ball
     if transitions.ballInPosition(player, positionForKick.kickPose):
