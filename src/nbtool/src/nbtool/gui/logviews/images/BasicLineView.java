@@ -51,7 +51,6 @@ public class BasicLineView extends ViewParent {
             return;
         }
         if (t.equals("proto-FieldLines")) {
-            System.out.println("FIELD LINES!!!!");
             usingLines = true;
             try {
                 FieldLines msg = FieldLines.parseFrom(newlog.bytes);
@@ -63,7 +62,6 @@ public class BasicLineView extends ViewParent {
             }
         }
         else {
-            System.out.println("CORNERS!!!!");
             usingLines = false;
             try {
                 Corners msg = Corners.parseFrom(newlog.bytes);

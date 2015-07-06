@@ -625,6 +625,13 @@ float floatArg(int& argIndex, int argc, char* argv[])
   throw string("No more arguments while looking for float");
 }
 
+string stringArg(int& argIndex, int argc, char* argv[])
+{
+  if (argIndex < argc)
+    return argv[argIndex++];
+  throw string("No more arguments while looking for string");
+}
+
 int main(int argc, char* argv[])
 {
   // Here are some parameters found to be useful.
@@ -655,13 +662,10 @@ int main(int argc, char* argv[])
       switch (cmd)
       {
       case 'img':
-        if (argIndex < argc)
         {
-          string imageAttributes = image.read(argv[argIndex++]);
-          printf("\n%s\n", imageAttributes.c_str());
+          string imageAttributes = image.read(stringArg(argIndex, argc, argv));
+          //printf("\n%s\n", imageAttributes.c_str());
         }
-        else
-          throw string("No more arguments while looking for image filename");
         break;
 
       case 'rand':
@@ -852,6 +856,30 @@ int main(int argc, char* argv[])
         }
         break;
 
+      case 'star':
+        {
+          StarCal sc(fh);
+          int n = intArg(argIndex, argc, argv);
+          EdgeList edges(24000);
+          HoughLineList lines(12);
+          FieldLineList fLines;
+          for (int i = 0; i < n; ++i)
+          {
+            image.read(stringArg(argIndex, argc, argv));
+            getEdges(edges);
+            hs.run(edges, lines);
+            lines.mapToField(fh);
+            fLines.find(lines);
+            sc.add(fLines);
+          }
+          printf("Count = %d, roll = %.2f, tilt = %.2f\n",
+                 sc.count(), sc.roll() * (180 / M_PI), sc.tilt() * (180 / M_PI));
+        }
+        break;
+
+      case 'hrzn':
+        printf("\n%s\n", fh.horizon(320).print(true).c_str());
+        break;
 
       default:
         throw strPrintf("Unknown command %s\n", argv[argIndex - 1]);

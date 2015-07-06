@@ -85,7 +85,7 @@ MODULE(WalkingEngine)
   DEFINES_PARAMETER(RangeBH<>, walkRefYLimit, RangeBH<>(-30.f, 30.f)) /**< The limit for shifting the pendulum pivot point towards the y-axis when balancing */
   DEFINES_PARAMETER(RangeBH<>, walkStepSizeXPlanningLimit, RangeBH<>(-50.f, 60.f)) /**< The minimum and maximum step size used to plan the next step size */
   DEFINES_PARAMETER(RangeBH<>, walkStepSizeXLimit, RangeBH<>(-55.f, 66.f)) /**< The minimum and maximum step size when balancing */
-#ifdef NAOQI_2
+#ifdef V5_ROBOT
   DEFINES_PARAMETER(float, walkStepDuration, 535.f) /**< the duration of a full step cycle (two half steps) */
   DEFINES_PARAMETER(float, walkStepDurationAtFullSpeedX, 535.f) /**< the duration of a full step cycle when walking forwards with maximum speed */
 #else
@@ -97,18 +97,18 @@ MODULE(WalkingEngine)
   DEFINES_PARAMETER(float, walkArmRotationAtFullSpeedX, 0.1f) /**< The maximum deflection for the arm swinging motion */
   DEFINES_PARAMETER(SubPhaseParameters, walkMovePhase, SubPhaseParameters(0.f, 1.f)) /**< The beginning and length of the trajectory used to move the swinging foot to its new position */
   DEFINES_PARAMETER(SubPhaseParameters, walkLiftPhase, SubPhaseParameters(0.f, 1.f)) /**< The beginning and length of the trajectory used to lift the swinging foot */
-#ifdef NAOQI_2
+#ifdef V5_ROBOT
   DEFINES_PARAMETER(Vector3BH<>, walkLiftOffset, Vector3BH<>(0.f, 5.f, 22.f)) /**< The height the swinging foot is lifted */
-  DEFINES_PARAMETER(Vector3BH<>, walkLiftOffsetAtFullSpeedX, Vector3BH<>(0.f, 5.f, 22.f)) /**< The height the swinging foot is lifted when walking full speed in x-direction */
+  DEFINES_PARAMETER(Vector3BH<>, walkLiftOffsetAtFullSpeedX, Vector3BH<>(0.f, 5.f, 28.f)) /**< The height the swinging foot is lifted when walking full speed in x-direction */
 #else
   DEFINES_PARAMETER(Vector3BH<>, walkLiftOffset, Vector3BH<>(0.f, 5.f, 17.f)) /**< The height the swinging foot is lifted */
   DEFINES_PARAMETER(Vector3BH<>, walkLiftOffsetAtFullSpeedX, Vector3BH<>(0.f, 5.f, 25.f)) /**< The height the swinging foot is lifted when walking full speed in x-direction */
 #endif
   DEFINES_PARAMETER(Vector3BH<>, walkLiftOffsetAtFullSpeedY, Vector3BH<>(0.f, 20.f, 25.f)) /**< The height the swinging foot is lifted when walking full speed in y-direction */
-  DEFINES_PARAMETER(Vector3BH<>, walkLiftRotation, Vector3BH<>(-0.05f, -0.1f, 0.f)) /**< The amount the swinging foot is rotated while getting lifted */
+  DEFINES_PARAMETER(Vector3BH<>, walkLiftRotation, Vector3BH<>(-0.05f, -0.03f, 0.f)) /**< The amount the swinging foot is rotated while getting lifted */
   DEFINES_PARAMETER(float, walkSupportRotation, 0.f) /**< A rotation added to the supporting foot to boost the com acceleration */
   DEFINES_PARAMETER(Vector3BH<>, walkComLiftOffset, Vector3BH<>(0.f, 0.f, 2.3f)) /**< The height the center of mass is lifted within a single support phase */
-#ifdef NAOQI_2
+#ifdef V5_ROBOT
   DEFINES_PARAMETER(float, walkComBodyRotation, 0.07f) /**< How much the torso is rotated to achieve the center of mass shift along the y-axis */
 #else
   DEFINES_PARAMETER(float, walkComBodyRotation, 0.05f) /**< How much the torso is rotated to achieve the center of mass shift along the y-axis */

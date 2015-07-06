@@ -29,6 +29,7 @@ SExpr treeFromBlob(man::vision::Blob& b);
 
 
 int Vision_func() {
+
     assert(args.size() == 1);
 
     printf("Vision_func()\n");
@@ -72,16 +73,7 @@ int Vision_func() {
         joints.ParseFromArray((void *) ptToJoints, numBytes[2]);
     }
 
-    // Empty Images to pass to vision module, top & bottom
-    messages::YUVImage realImage(buf, width, height, width);
-    messages::YUVImage emptyImage(width, height);
-
-    // Setup and run module
-    portals::Message<messages::YUVImage> rImageMessage(&realImage);
-    portals::Message<messages::YUVImage> eImageMessage(&emptyImage);
-    portals::Message<messages::JointAngles> jointsMessage(&joints);
-
-    // Look for robot name and pass to module if found
+    // If log includes robot name (which it always should), pass to module
     SExpr* robotName = args[0]->tree().find("from_address");
     std::string rname;
     if (robotName != NULL) {
@@ -89,6 +81,15 @@ int Vision_func() {
     }
 
     man::vision::VisionModule module(width / 2, height, rname);
+
+    // Images to pass to vision module, top & bottom
+    messages::YUVImage realImage(buf, width, height, width);
+    messages::YUVImage emptyImage(width, height);
+
+    // Setup module
+    portals::Message<messages::YUVImage> rImageMessage(&realImage);
+    portals::Message<messages::YUVImage> eImageMessage(&emptyImage);
+    portals::Message<messages::JointAngles> jointsMessage(&joints);
 
     if (topCamera) {
         module.topIn.setMessage(rImageMessage);
@@ -117,7 +118,7 @@ int Vision_func() {
     }
 
     // If log includes calibration parameters in description, have madule use those
-    std::vector<SExpr* > calParamsVec = args[0]->tree().recursiveFind("CalibrationParams");
+    std::vector<SExpr*> calParamsVec = args[0]->tree().recursiveFind("CalibrationParams");
     if (calParamsVec.size() != 0) {
         SExpr* calParams = calParamsVec.at(calParamsVec.size()-2);
         calParams = topCamera ? calParams->find("camera_TOP") : calParams->find("camera_BOT");
@@ -132,6 +133,15 @@ int Vision_func() {
         }
     }
 
+    // If log includes "BlackStar," set flag
+    std::vector<SExpr*> blackStarVec = args[0]->tree().recursiveFind("BlackStar");
+    if (blackStarVec.size() != 0) {
+        module.blackStar(true);
+        std::cout << "\nBLACK STAR TRUE!!!\n\n";
+    } else std::cout << "\nBLACK STAR FALSE\n\n";
+    
+    
+    // Run it!
     module.run();
 
     // -----------
@@ -232,7 +242,11 @@ int Vision_func() {
     //-------------------
     //  EDGES
     //-------------------
+
     man::vision::EdgeList* edgeList = module.getEdges(topCamera);
+    
+    // Uncomment to display rejected edges used in center detection
+    // man::vision::EdgeList* edgeList = module.getRejectedEdges(topCamera);
 
     Log* edgeRet = new Log();
     std::string edgeBuf;
@@ -260,7 +274,7 @@ int Vision_func() {
     Log* lineRet = new Log();
     std::string lineBuf;
 
-    std::cout << std::endl << "Hough lines in image coordinates:" << std::endl;
+   std::cout << std::endl << "Hough lines in image coordinates:" << std::endl;
 
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
@@ -304,17 +318,15 @@ int Vision_func() {
         lineBuf.append((const char*) &fcEP0, sizeof(double));
         lineBuf.append((const char*) &fcEP1, sizeof(double));
 
-        std::cout << line.print() << std::endl;
+       std::cout << line.print() << std::endl;
     }
 
-    std::cout << std::endl << "Hough lines in field coordinates:" << std::endl;
+   std::cout << std::endl << "Hough lines in field coordinates:" << std::endl;
     int i = 0;
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
-        std::cout << line.field().print() << std::endl;
+       std::cout << line.field().print() << std::endl;
     }
-
-    std::cout << "TOP : " << topCamera << std::endl;
 
     std::cout << std::endl << "Field lines:" << std::endl;
     std::cout << "0.idx, 1.idx, id, idx" << std::endl;
@@ -322,14 +334,15 @@ int Vision_func() {
 
     for (int i = 0; i < fieldLineList->size(); i++) {
         man::vision::FieldLine& line = (*fieldLineList)[i];
-        std::cout << line.print() << std::endl;
+       std::cout << line.print() << std::endl;
     }
 
     std::cout << std::endl << "Goalbox and corner detection:" << std::endl;
     man::vision::GoalboxDetector* box = module.getBox(topCamera);
     man::vision::CornerDetector* corners = module.getCorners(topCamera);
+
     if (box->first != NULL)
-        std::cout << box->print() << std::endl;
+       std::cout << box->print() << std::endl;
 
     std::cout << "    line0, line1, type (concave, convex, T)" << std::endl;
     for (int i = 0; i < corners->size(); i++) {
@@ -350,7 +363,7 @@ int Vision_func() {
     std::list<man::vision::Blob> blobs = detector->getBlobber()->blobs;
 
     SExpr allBalls;
-    int count=0;
+    int count = 0;
     for (auto i=balls.begin(); i!=balls.end(); i++) {
         SExpr ballTree = treeFromBall(*i);
         SExpr next = SExpr::keyValue("ball" + std::to_string(count), ballTree);
@@ -367,6 +380,25 @@ int Vision_func() {
 
     ballRet->setTree(allBalls);
     rets.push_back(ballRet);
+
+    //---------------
+    // Center Circle
+    //---------------
+
+    man::vision::CenterCircleDetector* ccd = module.getCCD(topCamera);
+    Log* ccdRet = new Log();
+    std::string pointsBuf;
+
+    std::vector<std::pair<double, double>> points = ccd->getPotentials();
+    for (std::pair<double, double> p : points) {
+        endswap<double>(&(p.first));
+        endswap<double>(&(p.second));
+        pointsBuf.append((const char*) &(p.first), sizeof(double));
+        pointsBuf.append((const char*) &(p.second), sizeof(double));
+    }
+
+    ccdRet->setData(pointsBuf);
+    rets.push_back(ccdRet);
 
     return 0;
 }
@@ -433,6 +465,14 @@ int CameraCalibration_func() {
                 return 0;
             }
         }
+
+        // If log includes "BlackStar," set flag
+        std::vector<SExpr*> blackStarVec = args[0]->tree().recursiveFind("BlackStar");
+        if (blackStarVec.size() != 0) {
+            module.blackStar(true);
+            std::cout << "\nBLACK STAR TRUE!!!\n\n";
+        } else std::cout << "\nBLACK STAR FALSE\n\n";
+        
         
         // Create messages
         messages::YUVImage image(buf, width, height, width);
@@ -459,15 +499,12 @@ int CameraCalibration_func() {
         } else {
             rollAfter = fh->roll();
             tiltAfter = fh->tilt();
-
             totalR += rollAfter - rollBefore;
             totalT += tiltAfter - tiltBefore;
-
-        //    std::cout << "Tilt before: " << tiltBefore << " Tilt after: " << tiltAfter << std::endl;
         }
     }
 
-    if (failures > 2) {
+    if (failures > 4) {
         // Handle failure
         printf("FAILED: %d times\n", failures);
         rets.push_back(new Log("(failure)"));
@@ -498,7 +535,7 @@ int Synthetics_func() {
     double flen = (fullres ? 544 : 272);
 
     int size = wd*4*ht*2;
-    uint8_t* pixels = new uint8_t[size];
+    uint8_t pixels[size];
     man::vision::YuvLite synthetic(wd, ht, wd*4, pixels);
 
     man::vision::FieldHomography homography(top);

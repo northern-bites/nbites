@@ -120,7 +120,7 @@ void TorsoMatrixProvider::update(OdometryDataBH& odometryData)
     odometryOffset.translation.x = odometryOffset3D.translation.x;
     odometryOffset.translation.y = odometryOffset3D.translation.y;
 
-#ifdef NAOQI_2
+#ifdef V5_ROBOT
     // Calculate odometryOffset.rotation from the filtered Z-axis gyro data
     float angleZ = -theSensorDataBH.data[SensorDataBH::angleZ];
     odometryOffset.rotation = angleZ - lastAngleZ;

@@ -399,13 +399,13 @@ double GeoLine::separation(const GeoLine& other) const
   return pDist(x0, y0) + other.pDist(x0, y0);
 }
 
-// TODO params
 double GeoLine::error(const GeoLine& other, bool test) const
 {
   double normalizedT = (r() > 0 ? t() : t() - M_PI);
   double rDiff = fabs(fabs(r()) - fabs(other.r()));
   double tDiff = fabs(sMod(normalizedT - other.t(), M_PI));
 
+  // TODO params
   boost::math::normal_distribution<> rGaussian(0, 100);
   boost::math::normal_distribution<> tGaussian(0, 10*TO_RAD);
 
@@ -436,7 +436,7 @@ void GeoLine::translateRotate(double xTrans, double yTrans, double rotation)
     man::vision::translateRotate(x2, y2, xTrans, yTrans, rotation, x2t, y2t);
 
     // Calculate new t and unit vector
-    t(uMod(rotation + t(), M_PI));
+    t(rotation + t());
 
     // Dot product of point on line with new unit vector to find new r
     r(ux() * x1t + uy() * y1t);
@@ -445,41 +445,107 @@ void GeoLine::translateRotate(double xTrans, double yTrans, double rotation)
     setEndPoints(qDist(x1t, y1t), qDist(x2t, y2t));
 }
 
-
 void GeoLine::imageToField(const FieldHomography& h)
 {
-  // Get field coordinates of the line origin (any point on the line will do),
-  // which in general will not be the line origin in field coords
-  double ix0 = r() * ux();
-  double iy0 = r() * uy();
-  double xf, yf;
-  h.fieldCoords(ix0, iy0, xf, yf);
+  if (valid())
+  {
+    // Get endpoints in image coords
+    double ix1, ix2, iy1, iy2;
+    endPoints(ix1, iy1, ix2, iy2);
 
-  // Get endpoints in image coords
-  double x1, x2, y1, y2;
-  endPoints(x1, y1, x2, y2);
+    // Convert to field coords
+    double fx1, fx2, fy1, fy2;
+    bool belowHorizon1 = h.fieldCoords(ix1, iy1, fx1, fy1);
+    bool belowHorizon2 = h.fieldCoords(ix2, iy2, fx2, fy2);
 
-  // Map a unit vector (length doesn't matter but must not be 0) in the +
-  // direction along the line to a field vector, which will not in general
-  // be of unit length. Use it to set angle and unit vector in field coords.
-  double uxf, uyf;
-  h.fieldVector(ix0, iy0, uy(), -ux(), uxf, uyf);
-  setUnitVec(-uyf, uxf);
+    // If both endpoints are below the horizon, result is invalid
+    if (!belowHorizon1 && !belowHorizon2)
+    {
+      setInvalid();
+      return;
+    }
 
-  // Now we can set r in field coords
-  r(ux() * xf + uy() * yf);
+    // If one endpoint is below the horizon, check the midpoint. If it is above
+    // the horizon, the result is invalid. Otherwise adjust the endpoint that is
+    // above so that keepFraction of the line segment below the horizon is used.
+    if (!(belowHorizon1 && belowHorizon2))
+    {
+      double xMid, yMid;
+      if (!h.fieldCoords(0.5 * (ix1 + ix2), 0.5 * (iy1 + iy2), xMid, yMid))
+      {
+        setInvalid();
+        return;
+      }
 
-  // Map endpoints to field coords
-  h.fieldCoords(x1, y1, x1, y1);
-  h.fieldCoords(x2, y2, x2, y2);
-  setEndPoints(qDist(x1, y1), qDist(x2, y2));
+      GeoLine horizon;
+      horizon.setToHorizon(h, 0);
+      double hx, hy;
+      intersect(horizon, hx, hy);
+      const double keepFraction = 0.875;
+      if (belowHorizon1)
+        h.fieldCoords(ix1 + keepFraction * (hx - ix1), iy1 + keepFraction * (hy - iy1),
+                      fx2, fy2);
+      else
+        h.fieldCoords(ix2 + keepFraction * (hx - ix2), iy2 + keepFraction * (hy - iy2),
+                      fx1, fy1);
+    }
+
+    // For lines with endpoints reasonably separated, get field line by mapping
+    // endpoints and then constructing line between them. Mapping endpoints is
+    // more accurate when h.panRate() is non-zero.
+    if (length() > 1)
+    {
+      setUnitVec(fy1 - fy2, fx2 - fx1);
+      r(ux() * fx1 + uy() * fy1);
+    }
+
+    // For lines with endpoints too close together, get field line by mapping
+    // unit normal vector. This would be used, for example, if a line is made
+    // with no endpoints, in which case both endpoints are 0. 
+    else
+    {
+      // Get field coordinates of the line origin (any point on the line will do),
+      // which in general will not be the line origin in field coords
+      double ix0 = r() * ux();
+      double iy0 = r() * uy();
+      double xf, yf;
+      h.fieldCoords(ix0, iy0, xf, yf);
+
+      // Map a unit vector (length doesn't matter but must not be 0) in the +
+      // direction along the line to a field vector, which will not in general
+      // be of unit length. Use it to set angle and unit vector in field coords.
+      double uxf, uyf;
+      h.fieldVector(ix0, iy0, uy(), -ux(), uxf, uyf);
+      setUnitVec(-uyf, uxf);
+
+      // Now we can set r in field coords
+      r(ux() * xf + uy() * yf);
+    }
+
+    // Now that we have r and t, we can set endpoints
+    setEndPoints(qDist(fx1, fy1), qDist(fx2, fy2));
+  }
+}
+
+void GeoLine::setToHorizon(const FieldHomography& fh, int imageWidth)
+{
+  t(fh.roll() + M_PI / 2);
+  r(fh.flen() * tan(M_PI / 2 - fh.tilt()) - (fh.ix0() * ux() + fh.iy0() * uy()));
+
+  double ep = fabs(imageWidth / (2 * uy()));
+  setEndPoints(-ep, ep);
 }
 
 string GeoLine::print(bool pretty) const
 {
   if (pretty)
-    return strPrintf("%8.2f,%7.2f  [%7.1f .. %7.1f]",
-                           r(), t() * (180 / M_PI), ep0(), ep1());
+  {
+    if (valid())
+      return strPrintf("%8.2f,%7.2f  [%7.1f .. %7.1f]",
+                       r(), t() * (180 / M_PI), ep0(), ep1());
+    else
+      return "---- (invalid) ----";
+  }
   else
     return strPrintf("%.8g %.8g %.8g %.8g", r(), t(), ep0(), ep1());
 }

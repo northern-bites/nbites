@@ -5,6 +5,7 @@ namespace obstacle {
 
 using messages::FieldObstacles;
 using messages::ArmContactState;
+using nblog::SExpr;
 
 // Helper method, used to get the average of the sonar value buffers
 float average(std::list<float>& buf)
@@ -34,10 +35,17 @@ float minimum(std::list<float>& buf)
     return min;
 }
 
-ObstacleModule::ObstacleModule() : obstacleOut(base())
+ObstacleModule::ObstacleModule(std::string filepath, std::string robotName)
+: obstacleOut(base()),
+lastSonar(0.f),
+usingArms(false),
+usingLeftSonar(false),
+usingRightSonar(false),
+usingVision(false)
 {
     memset(obstacleBuffer, 0, sizeof(obstacleBuffer));
     memset(obstacleDistances, 0, sizeof(obstacleDistances));
+    memset(obstacleDetectors, 0, sizeof(obstacleDetectors));
 
     obstaclesList[0] = FieldObstacles::Obstacle::NONE;
     obstaclesList[1] = FieldObstacles::Obstacle::NORTH;
@@ -49,114 +57,134 @@ ObstacleModule::ObstacleModule() : obstacleOut(base())
     obstaclesList[7] = FieldObstacles::Obstacle::WEST;
     obstaclesList[8] = FieldObstacles::Obstacle::NORTHWEST;
 
-    // obstacleBuffer = { 0 };
-    // obstacleDistances = { 0.f };
-    // Used when setting the message fields
-    // obstaclesList = { FieldObstacles::Obstacle::NONE,
-    //                   FieldObstacles::Obstacle::NORTH,
-    //                   FieldObstacles::Obstacle::NORTHEAST,
-    //                   FieldObstacles::Obstacle::EAST,
-    //                   FieldObstacles::Obstacle::SOUTHEAST,
-    //                   FieldObstacles::Obstacle::SOUTH,
-    //                   FieldObstacles::Obstacle::SOUTHWEST,
-    //                   FieldObstacles::Obstacle::WEST,
-    //                   FieldObstacles::Obstacle::NORTHWEST
-    // };
+    if(FILE *file = fopen(filepath.c_str(),"r")) {
+        fclose(file);
+
+        std::ifstream inputFile(filepath);
+        std::string readInFile((std::istreambuf_iterator<char>(inputFile)),
+                                std::istreambuf_iterator<char>());
+
+        int i=0;
+        SExpr params = *SExpr::read(readInFile,i);
+        params.print();
+
+        if(params.count() >= 2) {
+            std::cout<<"[OBSTACLE ] Reading from SExpr"<<std::endl;
+            std::cout<<"[OBSTACLE ] PATH: "<<filepath<<std::endl;
+
+            bool all_sonars = false;
+            SExpr *tempArms, *tempVision, *tempAll;
+            tempArms = params.find("arms")->get(1);
+            tempVision = params.find("vision")->get(1);
+            tempAll = params.find("set_all_sonar")->get(1);
+
+            if (tempArms) { usingArms = tempArms->valueAsInt()==1 ? true : false; }
+            if (tempVision) { usingVision = tempVision->valueAsInt()==1 ? true : false; }
+            if (tempAll) { all_sonars = tempAll->valueAsInt()==1 ? true : false; }
+
+            if (all_sonars) {
+                std::cout<<"[OBSTACLE ] Setting all robots the same"<<std::endl;
+
+                SExpr *leftTemp = NULL, *rightTemp = NULL;
+                leftTemp = params.find("all_left_sonar")->get(1);
+                rightTemp = params.find("all_right_sonar")->get(1);
+
+                if (leftTemp) { usingLeftSonar = leftTemp->valueAsInt() == 1 ? true : false; }
+                if (rightTemp) { usingRightSonar = rightTemp->valueAsInt() == 1 ? true : false; }
+            } else {
+                SExpr *leftTemp = NULL, *rightTemp = NULL;
+                SExpr *leftTemp2 = NULL, *rightTemp2 = NULL;
+                SExpr* temp1 = params.find(robotName);
+                if (temp1) {
+                    leftTemp = temp1->get(1);
+                    rightTemp = temp1->get(2);
+                }
+                if (leftTemp) { leftTemp2 = leftTemp->get(1); }
+                if (rightTemp) { rightTemp2 = rightTemp->get(1); }
+
+                if (leftTemp2) {
+                    usingLeftSonar = leftTemp2->valueAsInt() == 1 ? true : false;
+                }
+                if (rightTemp2) {
+                    usingRightSonar = rightTemp2->valueAsInt() == 1 ? true : false;
+                }
+            }
+        } else {
+            std::cout<<"[ERR ] Invalid SExpr"<<std::endl;
+            std::cout<<"[ERR ] Check /nbites/Config/ for them"<<std::endl;
+        }
+    } else {
+        std::cout<<"[ERR ] Config files not found."<<std::endl;
+    }
+    std::cout<<"[OBSTACLE ] VARS:";
+    if (usingArms) { std::cout<<" (ARMS)"; }
+    if (usingLeftSonar) { std::cout<<" (LEFT SONAR)"; }
+    if (usingRightSonar) { std::cout<<" (RIGHT SONAR)"; }
+    if (usingVision) { std::cout<<" (VISION)"; }
+    std::cout<<std::endl;
 }
 
 void ObstacleModule::run_()
 {
+    // visionIn.latch();
     armContactIn.latch();
-    visionIn.latch();
     sonarIn.latch();
 
-    // Decide sonars
-    // FieldObstacles::Obstacle::ObstaclePosition
-    //     sonars = processSonar(sonarIn.message());
+    // Don't need this kind of buffer when we aren't using vision, so keep uninit'd
+    if (!usingVision)
+    {
+        for (int i = 0; i < NUM_DIRECTIONS; i++) {
+            obstacleBuffer[i] = 0;
+        }
+    }
+
+    FieldObstacles::Obstacle::ObstaclePosition sonars, arms;
 
     // Process vision in all three sections of frame separately
-    // FieldObstacles::Obstacle::ObstaclePosition
-    //     visionL = processVision(visionIn.message().left_dist(),
-    //                             visionIn.message().left_bearing());
-    // FieldObstacles::Obstacle::ObstaclePosition
-    //     visionM = processVision(visionIn.message().mid_dist(),
-    //                             visionIn.message().mid_bearing());
-    // FieldObstacles::Obstacle::ObstaclePosition
-    //     visionR = processVision(visionIn.message().right_dist(),
-    //                             visionIn.message().right_bearing());
-
-    // update obstacle buffer with new information from vision
-    // updateObstacleBuffer(visionL, visionM, visionR);
+    if (usingVision) {
+        processVision(visionIn.message().left_dist(),
+                      visionIn.message().left_bearing());
+        processVision(visionIn.message().mid_dist(),
+                      visionIn.message().mid_bearing());
+        processVision(visionIn.message().right_dist(),
+                      visionIn.message().right_bearing());
+    }
 
     // Decide arms
-    // FieldObstacles::Obstacle::ObstaclePosition
-        // arms = processArms(armContactIn.message());
+    if (usingArms) { arms = processArms( armContactIn.message()); }
+    else { arms = FieldObstacles::Obstacle::NONE; }
+    // if not combining arms and sonars, uncomment this:
+    // updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, -1.f);
 
-    // Used to check if there were any obstacles found
-    bool didReturn = false;
-    portals::Message<messages::FieldObstacles> current(0);
+    // Decide sonars
+    if (usingLeftSonar || usingRightSonar) { sonars = processSonar(sonarIn.message()); }
+    else { sonars = FieldObstacles::Obstacle::NONE; }
+    // if not combining arms and sonars, uncomment this:
+    // updateObstacleArrays(FieldObstacles::Obstacle::SONARS, sonars, lastSonar);
 
-    // std::cout<<"OBSTACLE: ";
-
-    // ignore "NONE" direction, start at 1
-    // for (int i = 1; i < NUM_DIRECTIONS; i++)
-    // {
-    //     if (obstacleBuffer[i] != 0)
-    //     {
-    //         FieldObstacles::Obstacle* temp = current.get()->add_obstacle();
-    //         temp->set_position(obstaclesList[i]);
-    //         temp->set_distance(obstacleDistances[i]);
-    //         // std::cout<<obstacleDistances[i]<<", ";
-    //         didReturn = true;
-    //     }
-    // }
-    // std::cout<<std::endl;
-
-    FieldObstacles::Obstacle*temp = current.get()->add_obstacle();
-    // temp->set_position(arms);
-    temp->set_distance(1.f);
-
-    obstacleOut.setMessage(current);
-
-/*
- * This code processes both sonars and arms, then returns where
- * a single obstacle is based on information gathered from both inputs.
- * It does not use vision at all.
- *
 #ifdef USE_LAB_FIELD // Walls are too close to field for sonar use
-    sonars = Obstacle::NONE;
+    sonars = FieldObstacles::Obstacle::NONE;
 #endif
 
-    // How do we combine the two decisions?
-    // If they agree, easy
-    if (arms == sonars)
+    // combines input from both arms and sonars
+    // Can also choose to do this separately
+    combineArmsAndSonars(arms, sonars);
+
+    // Now we take information and return relevant obstacles
+    portals::Message<messages::FieldObstacles> current(0);
+
+    // ignore "NONE" direction, start at 1
+    for (int i = 1; i < NUM_DIRECTIONS; i++)
     {
-        current.get()->set_position(arms);
-    }
-    // Trust sonars before we get any arm input
-    else if (arms == Obstacle::NONE)
-    {
-        current.get()->set_position(sonars);
-    }
-    // If they sort of agree, use the value that gives us better dodging info
-    else if (sonars == Obstacle::NORTH && (arms == Obstacle::NORTHWEST ||
-                                           arms == Obstacle::NORTHEAST))
-    {
-        current.get()->set_position(arms);
-    }
-    else if (arms == Obstacle::NORTH &&  (sonars == Obstacle::NORTHWEST ||
-                                          sonars == Obstacle::NORTHEAST))
-    {
-        current.get()->set_position(sonars);
-    }
-    // If they don't agree or get no sonars, trust the arms
-    else
-    {
-        current.get()->set_position(arms);
+        if (obstacleBuffer[i]==0) { continue; } //no obstacle here
+
+        FieldObstacles::Obstacle* temp = current.get()->add_obstacle();
+        temp->set_position(obstaclesList[i]);
+        temp->set_distance(obstacleDistances[i]);
+        temp->set_detector(obstacleDetectors[i]);
     }
 
     obstacleOut.setMessage(current);
-*/
 }
 
 FieldObstacles::Obstacle::ObstaclePosition
@@ -271,195 +299,183 @@ ObstacleModule::processArms(const messages::ArmContactState& input)
 
     // Potential issue: if both arms are pushed in disagreeing directions,
     // we just decide no obstacle.
-
     return FieldObstacles::Obstacle::NONE;
 }
 
 FieldObstacles::Obstacle::ObstaclePosition
 ObstacleModule::processSonar(const messages::SonarState& input)
 {
+    // If front thresh is larger than regular upper thresh
+    float right = SONAR_FRONT_THRESH_UPPER;
+    float left = SONAR_FRONT_THRESH_UPPER;
+
     // Buffer the current sonar values
     rightSonars.push_back(input.us_right());
     leftSonars.push_back(input.us_left());
 
     // Get rid of old values
-    if (rightSonars.size() > SONAR_FRAMES_TO_BUFFER)
+    if (usingRightSonar && rightSonars.size() > SONAR_FRAMES_TO_BUFFER)
     {
         rightSonars.pop_front();
     }
 
-    if (leftSonars.size() > SONAR_FRAMES_TO_BUFFER)
+    if (usingLeftSonar && leftSonars.size() > SONAR_FRAMES_TO_BUFFER)
     {
         leftSonars.pop_front();
     }
 
     // Use the current average for our decision
-    float right = average(rightSonars);
-    float left = average(leftSonars);
+    if (usingRightSonar) { right = average(rightSonars); }
+    if (usingLeftSonar) { left = average(leftSonars); }
+    // std::cout<<"RIGHT = "<<right<<" , LEFT = "<<left<<std::endl;
 
     // Both sonars picking up an obstacle? It's probably in front
-    if (right < SONAR_THRESH && left < SONAR_THRESH)
+    if (right < SONAR_FRONT_THRESH_UPPER && left < SONAR_FRONT_THRESH_UPPER &&
+        right > SONAR_THRESH_LOWER && left > SONAR_THRESH_LOWER)
     {
+        lastSonar = .5f * (right + left);
         return FieldObstacles::Obstacle::NORTH;
     }
     // Otherwise to right side...
-    else if (right < SONAR_THRESH)
+    else if (right < SONAR_THRESH_UPPER && right > SONAR_THRESH_LOWER)
     {
+        lastSonar = right;
         return FieldObstacles::Obstacle::NORTHEAST;
     }
     // ... left side ...
-    else if (left < SONAR_THRESH)
+    else if (left < SONAR_THRESH_UPPER && left > SONAR_THRESH_LOWER)
     {
+        lastSonar = left;
         return FieldObstacles::Obstacle::NORTHWEST;
     }
     // .. or no obstacle
-    else return FieldObstacles::Obstacle::NONE;
-}
-
-FieldObstacles::Obstacle::ObstaclePosition
-ObstacleModule::processVision(float distance, float bearing)
-{
-    FieldObstacles::Obstacle::ObstaclePosition dir;
-    float avg;
-
-    // Process what direction it is in: act appropriately
-    if ( bearing < -5.f*ZONE_WIDTH)
+    else
     {
-        // obstacle to the southeast
-        SEDists.push_back(distance);
-        if (SEDists.size() > VISION_FRAMES_TO_BUFFER)
-        {
-            SEDists.pop_front();
-        }
-        dir = FieldObstacles::Obstacle::SOUTHEAST;
-        avg = average(SEDists);
-        obstacleDistances[int(dir)] = avg;
-        return dir;
-    }
-    else if ( bearing < -3.f*ZONE_WIDTH )
-    {
-        // obstacle to the east
-        EDists.push_back(distance);
-        if (EDists.size() > VISION_FRAMES_TO_BUFFER)
-        {
-            EDists.pop_front();
-        }
-
-        dir = FieldObstacles::Obstacle::EAST;
-        avg = average(EDists);
-        obstacleDistances[int(dir)] = avg;
-
-        return dir;
-    }
-    else if ( bearing < -ZONE_WIDTH )
-    {
-        // obstacle to northeast
-        NEDists.push_back(distance);
-        if (NEDists.size() > VISION_FRAMES_TO_BUFFER)
-        {
-            NEDists.pop_front();
-        }
-
-        dir = FieldObstacles::Obstacle::NORTHEAST;
-        avg = average(NEDists);
-        obstacleDistances[int(dir)] = avg;
-
-        return dir;
-    }
-    else if ( bearing < ZONE_WIDTH )
-    {
-        // obstacle to north
-        NDists.push_back(distance);
-        if (NDists.size() > VISION_FRAMES_TO_BUFFER)
-        {
-            NDists.pop_front();
-        }
-
-        dir = FieldObstacles::Obstacle::NORTH;
-        avg = average(NDists);
-        obstacleDistances[int(dir)] = avg;
-
-        return dir;
-    }
-    else if ( bearing < 3.f*ZONE_WIDTH )
-    {
-        // obstacle to northwest
-        NWDists.push_back(distance);
-        if (NWDists.size() > VISION_FRAMES_TO_BUFFER)
-        {
-            NWDists.pop_front();
-        }
-
-        dir = FieldObstacles::Obstacle::NORTHWEST;
-        avg = average(NWDists);
-        obstacleDistances[int(dir)] = avg;
-
-        return dir;
-    }
-    else if ( bearing < 5.f*ZONE_WIDTH )
-    {
-        // obstacle to west
-        WDists.push_back(distance);
-        if (WDists.size() > VISION_FRAMES_TO_BUFFER)
-        {
-            WDists.pop_front();
-        }
-
-        dir = FieldObstacles::Obstacle::WEST;
-        avg = average(WDists);
-        obstacleDistances[int(dir)] = avg;
-
-        return dir;
-    }
-    else if ( bearing < 7.f * ZONE_WIDTH )
-    {
-        // obstacle to southwest
-        SWDists.push_back(distance);
-        if (SWDists.size() > VISION_FRAMES_TO_BUFFER)
-        {
-            SWDists.pop_front();
-        }
-
-        dir = FieldObstacles::Obstacle::SOUTHWEST;
-        avg = average(SWDists);
-        obstacleDistances[int(dir)] = avg;
-
-        return dir;
-    }
-    else // south
-    {
+        lastSonar = 0.f;
         return FieldObstacles::Obstacle::NONE;
     }
 }
 
-void ObstacleModule::updateObstacleBuffer
-(FieldObstacles::Obstacle::ObstaclePosition visionL,
- FieldObstacles::Obstacle::ObstaclePosition visionM,
- FieldObstacles::Obstacle::ObstaclePosition visionR)
+
+void ObstacleModule::combineArmsAndSonars
+(FieldObstacles::Obstacle::ObstaclePosition arms,
+ FieldObstacles::Obstacle::ObstaclePosition sonars)
 {
-    // std::cout<<"Obstacle Buffer: ";
-    // start at 1 to ignore "NONE" direction
+    // How do we combine the arm and sonar decisions?
+    // If they agree, easy
+    if (arms == sonars)
+    {
+        updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, -1.f);
+    }
+    // Trust sonars before we get any arm input
+    else if (arms == FieldObstacles::Obstacle::NONE)
+    {
+        updateObstacleArrays(FieldObstacles::Obstacle::SONARS, sonars, lastSonar);
+    }
+    // If they sort of agree, use the value that gives us better dodging info
+    else if (sonars == FieldObstacles::Obstacle::NORTH &&
+             (arms == FieldObstacles::Obstacle::NORTHWEST ||
+              arms == FieldObstacles::Obstacle::NORTHEAST))
+    {
+        updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, -1.f);
+    }
+    else if (arms == FieldObstacles::Obstacle::NORTH &&
+             (sonars == FieldObstacles::Obstacle::NORTHWEST ||
+              sonars == FieldObstacles::Obstacle::NORTHEAST))
+    {
+        updateObstacleArrays(FieldObstacles::Obstacle::SONARS, sonars, lastSonar);
+    }
+    // If they don't agree or get no sonars, trust the arms
+    else
+    {
+        updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, -1.f);
+    }
+
+}
+
+void ObstacleModule::updateVisionBuffer
+(FieldObstacles::Obstacle::ObstaclePosition pos,
+ std::list<float> dists, float distance)
+{
+    dists.push_back(distance);
+    if (dists.size() > VISION_FRAMES_TO_BUFFER)
+    {
+        dists.pop_front();
+    }
+
+    float avg = average(dists);
+    updateObstacleArrays(FieldObstacles::Obstacle::VISION, pos, avg);
+}
+
+void ObstacleModule::processVision(float distance, float bearing)
+{
+    // Process what direction it is in: act appropriately
+    if ( bearing < -5.f*ZONE_WIDTH)
+    {
+        // obstacle to the southeast
+        updateVisionBuffer(FieldObstacles::Obstacle::SOUTHEAST, SEDists, distance);
+    }
+    else if ( bearing < -3.f*ZONE_WIDTH )
+    {
+        // obstacle to the east
+        updateVisionBuffer(FieldObstacles::Obstacle::EAST, EDists, distance);
+    }
+    else if ( bearing < -1.f*ZONE_WIDTH )
+    {
+        // obstacle to northeast
+        updateVisionBuffer(FieldObstacles::Obstacle::NORTHEAST, NEDists, distance);
+    }
+    else if ( bearing < ZONE_WIDTH )
+    {
+        // obstacle to north
+        updateVisionBuffer(FieldObstacles::Obstacle::NORTH, NDists, distance);
+    }
+    else if ( bearing < 3.f*ZONE_WIDTH )
+    {
+        // obstacle to northwest
+        updateVisionBuffer(FieldObstacles::Obstacle::NORTHWEST, NWDists, distance);
+    }
+    else if ( bearing < 5.f*ZONE_WIDTH )
+    {
+        // obstacle to west
+        updateVisionBuffer(FieldObstacles::Obstacle::WEST, WDists, distance);
+    }
+    else if ( bearing < 7.f * ZONE_WIDTH )
+    {
+        // obstacle to southwest
+        updateVisionBuffer(FieldObstacles::Obstacle::SOUTHWEST, SWDists, distance);
+    }
+    // else // south
+    // {
+    //     return FieldObstacles::Obstacle::NONE;
+    // }
+}
+
+void ObstacleModule::updateObstacleArrays
+(FieldObstacles::Obstacle::ObstacleDetector detector,
+ FieldObstacles::Obstacle::ObstaclePosition pos, float dist)
+{
+    // if (detector==FieldObstacles::Obstacle::SONARS)
+    //     std::cout<<"SONARS "<<dist<<std::endl;
+    // start the buffer count
+    obstacleBuffer[int(pos)] = 1;
+    obstacleDistances[int(pos)] = dist;
+    obstacleDetectors[int(pos)] = detector;
+}
+
+void ObstacleModule::updateObstacleBuffer()
+{
     for (int i = 1; i < NUM_DIRECTIONS; i++)
     {
-        if ( i == int(visionL) || i == int(visionM) ||
-             i == int(visionR) )
-        {
-            obstacleBuffer[i] = 1;
-            // std::cout<<obstacleBuffer[i]<<", ";
-            continue;
-        }
         if (obstacleBuffer[i] == 0 or
             obstacleBuffer[i] > VISION_FRAMES_TO_HAVE_OBSTACLE)
         {
             obstacleBuffer[i] = 0;
-            obstacleDistances[i] = 0;
-            // std::cout<<obstacleBuffer[i]<<", ";
+            obstacleDistances[i] = 0.f;
             continue;
         }
         obstacleBuffer[i]++;
-        // std::cout<<obstacleBuffer[i]<<", ";
     }
-    // std::cout<<std::endl;
 }
 
 } // namespace obstacle

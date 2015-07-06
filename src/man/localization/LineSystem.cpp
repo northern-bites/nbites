@@ -86,7 +86,7 @@ LocLineID LineSystem::matchObservation(const messages::FieldLine& observation,
     LocLineID id = LocLineID::NotMatched;
     double bestScore = std::numeric_limits<double>::min();
 
-    vision::LineID visionID = static_cast<vision::LineID>(observation.id());
+    vision::LineID visionID = vision::LineID::Line;
     const std::vector<LocLineID>& possibleLineIDs = visionToLocIDs[visionID];
     for (int i = 0; i < possibleLineIDs.size(); i++) {
         LocLineID possibleID = possibleLineIDs[i];

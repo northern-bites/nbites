@@ -91,8 +91,8 @@ class KickDecider(object):
         self.brain.player.motionKick = False
 
         self.kicks = []
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.LEFT_MEDIUM_STRAIGHT_KICK)
+        self.kicks.append(kicks.RIGHT_MEDIUM_STRAIGHT_KICK)
 
         self.scoreKick = self.minimizeOrbitTime
 
@@ -281,8 +281,8 @@ class KickDecider(object):
         self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
         self.kicks.append(kicks.M_LEFT_SIDE)
         self.kicks.append(kicks.M_RIGHT_SIDE)
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        # self.kicks.append(kicks.LEFT_MEDIUM_STRAIGHT_KICK)
+        # self.kicks.append(kicks.RIGHT_MEDIUM_STRAIGHT_KICK)
 
         self.filters = []
         self.filters.append(self.outOfBounds)
@@ -304,8 +304,8 @@ class KickDecider(object):
 
     def allKicksAsap(self):
         self.kicks = []
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        # self.kicks.append(kicks.LEFT_MEDIUM_STRAIGHT_KICK)
+        # self.kicks.append(kicks.RIGHT_MEDIUM_STRAIGHT_KICK)
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
         self.kicks.append(kicks.M_RIGHT_STRAIGHT)
         self.kicks.append(kicks.M_LEFT_SIDE)
@@ -412,8 +412,8 @@ class KickDecider(object):
         self.kicks.append(kicks.M_RIGHT_SIDE)
         self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
         self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        # self.kicks.append(kicks.LEFT_MEDIUM_STRAIGHT_KICK)
+        # self.kicks.append(kicks.RIGHT_MEDIUM_STRAIGHT_KICK)
 
         self.scoreKick = self.minimizeDistanceToGoal
         
@@ -421,7 +421,7 @@ class KickDecider(object):
         self.filters.append(self.crossesGoalLine)
 
         self.clearPossibleKicks()
-        self.addFastestPossibleKicks()
+        self.addShotsOnGoal()
 
         try:
             k = (kick for kick in self.possibleKicks).next().next()
@@ -470,8 +470,8 @@ class KickDecider(object):
         self.kicks.append(kicks.M_RIGHT_STRAIGHT)
         self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
         self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.LEFT_MEDIUM_STRAIGHT_KICK)
+        self.kicks.append(kicks.RIGHT_MEDIUM_STRAIGHT_KICK)
 
         self.scoreKick = self.minimizeDistanceToGoal
         
@@ -514,9 +514,9 @@ class KickDecider(object):
         if nearGoal:
             return nearGoal
 
-        frontKicks = self.frontKicksOrbitIfSmall()
-        if frontKicks: 
-            return frontKicks
+        # frontKicks = self.frontKicksOrbitIfSmall()
+        # if frontKicks: 
+        #     return frontKicks
 
         if self.brain.loc.x < nogginC.MIDFIELD_X:
             asap = self.motionKicksAsap()

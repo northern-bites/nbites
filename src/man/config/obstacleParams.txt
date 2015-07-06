@@ -1,0 +1,71 @@
+( (arms 0)
+  (vision 0)
+  (set_all_sonar 0)
+  (all_left_sonar 1)
+  (all_right_sonar 1)
+
+  (shehulk
+    (left_sonar 1)
+    (right_sonar 1)
+  )
+  (shehulk
+    (left_sonar 1)
+    (right_sonar 1)
+  )
+  (batman
+    (left_sonar 1)
+    (right_sonar 1)
+  )
+  (avril
+    (left_sonar 1)
+    (right_sonar 1)
+  )
+  (ozzy
+    (left_sonar 1)
+    (right_sonar 1)
+  )
+  (beyonce
+    (left_sonar 0)
+    (right_sonar 0)
+  )
+  (ringo
+    (left_sonar 1)
+    (right_sonar 1)
+  )
+  (zoe
+    (left_sonar 1)
+    (right_sonar 1)
+  )
+  (mal
+    (left_sonar 1)
+    (right_snar 1)
+  )
+  (vera
+    (left_sonar 1)
+    (right_sonar 1)
+  )
+  (kaylee
+    (left_sonar 1)
+    (right_sonar 1)
+  )
+  (inara
+    (left_sonar 1)
+    (right_sonar 1)
+  )
+  (simon
+    (left_sonar 1)
+    (right_sonar 1)
+  )
+  (jayne
+    (left_sonar 1)
+    (right_sonar 1)
+  )
+  (river
+    (left_sonar 1)
+    (right_sonar 1)
+  )
+  (wash
+    (left_sonar 1)
+    (right_sonar 1)
+  )
+)

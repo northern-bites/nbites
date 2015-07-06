@@ -25,4 +25,5 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.brain.fallController.enabled = True 
         self.roleSwitching = False
         self.role = brain.playerNumber
+        self.returningFromPenalty = False
         self.commMode = -1
