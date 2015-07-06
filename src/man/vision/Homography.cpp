@@ -418,7 +418,7 @@ void GeoLine::translateRotate(double xTrans, double yTrans, double rotation)
     setEndPoints(qDist(x1t, y1t), qDist(x2t, y2t));
 }
 
-void GeoLine::inverseTranslateRotate(double xTrans, double yTrans, double rotation)
+void GeoLine::inverseTranslateRotate(double xTrans, double yTrans, double rotation, bool debug)
 {
     // Find point on line pre-transformation (use endpoints)
     double x1, y1, x2, y2;
@@ -433,7 +433,19 @@ void GeoLine::inverseTranslateRotate(double xTrans, double yTrans, double rotati
     t(rotation + t());
 
     // Dot product of point on line with new unit vector to find new r
-    r(fabs(ux() * x1t + uy() * y1t));
+    r(ux() * x1t + uy() * y1t);
+
+    // If negative r, then make r positive and set t accordingly
+    if (r() < 0) {
+        r(fabs(r()));
+        t(t() + M_PI);
+    }
+
+    if (debug) {
+      std::cout << "In inverseTranslateRotate:" << std::endl;
+      std::cout << x1 << "," << y1 << std::endl;
+      std::cout << x1t << "," << y1t << std::endl;
+    }
 
     // Set endpoints
     setEndPoints(qDist(x1t, y1t), qDist(x2t, y2t));

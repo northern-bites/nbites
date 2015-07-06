@@ -311,7 +311,7 @@ public:
 
   // Inverse translation rotation of line in plane. 
   // NOTE used in particle filter.
-  void inverseTranslateRotate(double xTrans, double yTrans, double rotation);
+  void inverseTranslateRotate(double xTrans, double yTrans, double rotation, bool debug = false);
 
   // Map this image line to what we would see if roll were 0 and the optical axis
   // was at the center of the image
