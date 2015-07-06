@@ -20,7 +20,7 @@ extern "C"
         AL::ALBrokerManager::getInstance()->addBroker(broker);
         // create module instances
         printf("Creating module\n");
-        AL::ALModule::createModule<boss::Boss>(broker, "nbitesman");
+        AL::ALModule::createModule<boss::Boss>(broker, "nbites-boss");
         printf("Successfully created module!\n");
         return 0;
     }
@@ -31,8 +31,3 @@ extern "C"
         return 0;
     }
 }
-
-// int main() {
-//     printf("IM BEING EXECUTED ON A ROBOT!!!!!!!!!\n");
-//     return 1;
-// }
