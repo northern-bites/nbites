@@ -430,7 +430,7 @@ void GeoLine::inverseTranslateRotate(double xTrans, double yTrans, double rotati
     man::vision::inverseTranslateRotate(x2, y2, xTrans, yTrans, rotation, x2t, y2t);
 
     // Calculate new t and unit vector
-    t(rotation + t());
+    t(-rotation + t());
 
     // Dot product of point on line with new unit vector to find new r
     r(ux() * x1t + uy() * y1t);
