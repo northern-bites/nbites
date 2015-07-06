@@ -272,15 +272,15 @@ public class LineView extends ViewParent implements IOFirstResponder {
             System.out.printf("%d potential center circle centers received\n", ccPoints.size());
 
             // Center Circle Potential Points
-            // g.setColor(Color.black);
-            // for (int i = 0; i < ccPoints.size() - 2; i += 2) {
-            //  //   System.out.printf("Point %d x: %f, %f\n", i, ccPoints.get(i+0), ccPoints.get(i + 1));
-            //     g.fillRect((int)(fxc + ccPoints.get(i+0)), (int)(fyc - ccPoints.get(i + 1)), 1, 1);
-
-            // }
-            // g.setColor(Color.blue);
-            // g.fillOval((int)(fxc + ccPoints.get(ccPoints.size()-2)) - 4, (int)(fyc - ccPoints.get(ccPoints.size() - 1)) - 4, 8, 8);
-
+            g.setColor(Color.black);
+            for (int i = 0; i < ccPoints.size() - 2; i += 2)
+                g.fillRect((int)(fxc + ccPoints.get(i+0)), (int)(fyc - ccPoints.get(i + 1)), 1, 1);
+            if (ccPoints.size() > 1) {
+                if (ccPoints.get(ccPoints.size()-2) != 0 || ccPoints.get(ccPoints.size() - 1) != 0) {
+                    g.setColor(Color.blue);
+                    g.fillOval((int)(fxc + ccPoints.get(ccPoints.size()-2)) - 4, (int)(fyc - ccPoints.get(ccPoints.size() - 1)) - 4, 8, 8);
+                }
+            }
         }
     }
     

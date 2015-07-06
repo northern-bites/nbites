@@ -252,7 +252,6 @@ class CenterCircleDetector {
   double _ccx;
   double _ccy;
   
-  std::vector<Point> calculatePotentials(EdgeList& edges);
 
   // For debugging
   std::vector<Point> _potentials;
@@ -266,7 +265,8 @@ class CenterCircleDetector {
   double minVotesInMaxBin;        // Ratio of potentials required in the most populated bin
 
   void set();
-  bool getMaxBin(std::vector<Point> vec, double& x0, double& y0);
+  void calculatePotentials(EdgeList& edges, std::vector<Point>& vec);
+  bool getMaxBin(const std::vector<Point>& vec, double& x0, double& y0);
   inline int roundDown(int v) { return binWidth*(v/binWidth); }
 
 public:
