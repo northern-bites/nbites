@@ -122,10 +122,11 @@ def sideLineCheckShouldReposition(player):
     return False
 
 def shouldTurn(player):
+    # Turn twice, then reposition, then turn twice again, etc.
     if GoalieStates.watchWithLineChecks.numTurns > 1 \
     and GoalieStates.watchWithLineChecks.numFixes < 2:
         return False
-    if GoalieStates.watchWithLineChecks.numTurns == 2:
+    if GoalieStates.watchWithLineChecks.numTurns == 5:
         return False
 
     h_dest = 0.0
@@ -259,14 +260,32 @@ def facingASideline(player):
             if (math.fabs(t1 - t2) - 90.0 < 15.0) and \
             r1 != 0.0 and r2 != 0.0 \
             and i is not j:
-                print "I THINK I SEE A SIDELINE"
+                print ("MY loc h: ", player.brain.loc.h)
+                if player.brain.loc.h > 0.0:
+                    print "I THINK I SEE MY RIGHT SIDELINE"
+                else:
+                    print "I THINK I SEE MY LEFT SIDELINE"
                 print "-------------------------"
                 print ("R", r1)
                 print ("R2", r2)
                 print ("T", t1)
                 print ("T2", t2)
                 print ("i:", i, "j:", j)
-                print ("MY loc h: ", player.brain.loc.h)
+
+                if GoalieStates.watchWithLineChecks.wentToClearIt and\
+                not GoalieStates.watchWithLineChecks.correctFacing:
+                    if VisualGoalieStates.clearIt.ballSide == constants.RIGHT:
+                        player.homeDirections += [RelRobotLocation(0,0,90.0)]
+                        print "I think I'm facing right, so I'm turning left!"
+                    else:
+                        player.homeDirections += [RelRobotLocation(0,0,-90.0)]
+                        print "I think I'm facing left, so I'm turning right!"
+                    return True
+                # if GoalieStates.watchWithLineChecks.correctFacing:
+                #     # Adjust heading appropriately
+                #     print "I think my heading's right"
+                # else:
+                #     player.homeDirections += [RelRobotLocation(0, 0, -90)]
 
     return False
 
