@@ -7,6 +7,7 @@ from .. import SweetMoves
 from ..headTracker import HeadMoves
 import GoalieConstants as constants
 import math
+import noggin_constants as nogginConstants
 
 SAVING = False
 DIVING = False
@@ -139,7 +140,10 @@ def gameFinished(player):
         player.brain.fallController.enabled = False
         player.stopWalking()
         player.zeroHeads()
-        player.executeMove(SweetMoves.SIT_POS)
+        if nogginConstants.V5_ROBOT:
+            player.executeMove(SweetMoves.SIT_POS_V5)
+        else:
+            player.executeMove(SweetMoves.SIT_POS)
         return player.stay()
 
     if player.brain.nav.isStopped():

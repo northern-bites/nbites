@@ -153,7 +153,10 @@ class Brain(object):
                 return
             self.sitting = True
             print "BEHAVIORS is starting to sit"
-            self.nav.performSweetMove(SweetMoves.SIT_POS)
+            if Constants.V5_ROBOT:
+                self.nav.performSweetMove(SweetMoves.SIT_POS_V5)
+            else:
+                self.nav.performSweetMove(SweetMoves.SIT_POS)
 
         # Update Environment
         self.time = time.time()
@@ -296,6 +299,7 @@ class Brain(object):
                                  self.interface.loc.y,
                                  self.interface.loc.h * (180. / math.pi))
         self.locUncert = self.interface.loc.uncert
+        self.lost = self.interface.loc.lost
 
     def resetLocTo(self, x, y, h):
         """

@@ -8,6 +8,8 @@ namespace sharer{
 SharedViewer::SharedViewer(QWidget* parent):
     QWidget(parent),
     wviewShared(1),
+    ballOut(base()),
+    locOut(base()),
     mutex()
 {
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
@@ -133,6 +135,9 @@ SharedViewer::SharedViewer(QWidget* parent):
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++) {
         wviewShared.worldModelIn[i].wireTo(worldsOut[i], true);
     }
+
+    wviewShared.locIn.wireTo(&locOut, true);
+    wviewShared.ballIn.wireTo(&ballOut, true);
 }
 
 /*
@@ -199,6 +204,16 @@ void SharedViewer::run_()
         fieldPainter->updateWithLocationInfo(xCoord[i], yCoord[i],
                                   heading[i], ballDistance[i], i);
     }
+    portals::Message<messages::FilteredBall> ballMessage(0);
+    ballMessage.get()->set_distance(ballDistance[0]);
+    ballMessage.get()->set_bearing(ballBearing);
+    ballOut.setMessage(ballMessage);
+
+    portals::Message<messages::RobotLocation> locMessage(0);
+    locMessage.get()->set_x(xCoord[0]);
+    locMessage.get()->set_y(yCoord[0]);
+    locMessage.get()->set_h(heading[0]);
+    locOut.setMessage(locMessage);
 
     sharedBallIn.latch();
     fieldPainter->updateWithSharedBallMessage(sharedBallIn.message());

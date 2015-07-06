@@ -35,6 +35,38 @@ Edge& Edge::operator=(const Edge& e)
   return *this;
 }
 
+// **********
+// *        *
+// *  Edge  *
+// *        *
+// **********
+
+void Edge::setField(const FieldHomography& h)
+{
+  double wx, wy, dwx, dwy;
+  h.fieldCoords(_x, _y, wx, wy);
+  h.fieldVector(0, 0, sin(), -cos(), dwx, dwy);
+  _field = FieldEdge(wx, wy, atan2(dwy, dwx));
+}
+
+
+// **************
+// *            *
+// *  EdgeList  *
+// *            *
+// **************
+
+void EdgeList::mapToField(const FieldHomography& h)
+{
+  AngleBinsIterator<Edge> abi(*this);
+  for (Edge* e = *abi; e; e = *++abi)
+    e->setField(h);
+
+  _fx0 = -h.wx0();
+  _fy0 = -h.wy0();
+}
+
+
 // **************
 // *            *
 // *  Gradient  *
