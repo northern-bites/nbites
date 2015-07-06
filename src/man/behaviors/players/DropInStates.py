@@ -1,5 +1,5 @@
 """
-Game controller states for pBrunswick, our soccer player.
+Game controller states for pDropIn, our soccer player.
 """
 
 import noggin_constants as nogginConstants
