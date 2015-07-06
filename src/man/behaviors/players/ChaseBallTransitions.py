@@ -40,7 +40,7 @@ def shouldSupport(player):
         player.claimedBall = False
         return False
     # for drop in
-     if player.dropIn:
+    if player.dropIn:
         return player.brain.ball.vis.frames_on and claimTrans.shouldGoForBall(player)
     
     return player.brain.ball.vis.frames_on and claimTrans.shouldCedeClaim(player)

@@ -3,7 +3,9 @@ import time
 from . import SoccerFSA
 from . import FallControllerStates
 #different from pBrunswick
-from . import DropInRoleSwitchingStates
+# 
+from . import RoleSwitchingStates
+# from . import DropInRoleSwitchingStates
 from . import CommMonitorStates
 from . import GameControllerStates
 # from . import BrunswickStates
@@ -29,7 +31,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(FallControllerStates)
         self.addStates(GameControllerStates)
         #different from pBrunswick
-        self.addStates(DropInRoleSwitchingStates)
+        self.addStates(RoleSwitchingStates)
+        # self.addStates(DropInRoleSwitchingStates)
         self.addStates(CommMonitorStates)
         #diffrent from pBrunswick
         self.addStates(DropInStates)

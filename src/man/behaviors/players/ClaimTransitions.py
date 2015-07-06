@@ -95,7 +95,7 @@ def shouldGoForBall(player):
         # grows quickly at mid-range to far distances and at very far distances, asymptotically
         # approaches a maximum. uses the distance of the close robot
 
-       if player.brain.ball.distance < mateBallDistance:
+        if player.brain.ball.distance < mateBallDistance:
             closerDistance = player.brain.ball.distance
         else:
             closerDistance = mateBallDistance
@@ -140,6 +140,6 @@ def mateBallHeading(ball_y, mate_y, mate_h, distance):
         mate_ballHeading = mate_h
     else:
         dy = mate_y - ball_y
-        ball_dist_heading = math.asin((float)dy/(float)distance)
+        ball_dist_heading = math.asin(float(dy)/ float (distance))
         mate_ballHeading = mate_h - ball_dist_heading
     return mate_ballHeading

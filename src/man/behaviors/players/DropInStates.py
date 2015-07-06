@@ -7,7 +7,8 @@ from math import fabs
 from ..util import *
 from .. import SweetMoves
 from . import RoleConstants as roleConstants
-from . import DropInRoleSwitchingStates as roleSwitching
+from . import RoleSwitchingStates as roleSwitching
+# from . import DropInRoleSwitchingStates as roleSwitching
 import KickOffConstants as kickOff
 
 @superState('gameControllerResponder')
@@ -106,7 +107,6 @@ def gamePlaying(player):
         return player.goNow('afterPenalty')
 
     #if statement to change roles
-
 
     if not player.brain.motion.calibrated:
         return player.stay()
