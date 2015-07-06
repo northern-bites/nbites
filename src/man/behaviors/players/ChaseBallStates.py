@@ -10,10 +10,7 @@ from ..kickDecider import KickDecider
 from ..kickDecider import kicks
 from ..util import *
 from objects import RelRobotLocation, Location, RobotLocation
-import noggin_constants as nogginConstants
 from math import fabs, degrees, cos, sin, pi, radians, copysign
-from random import randrange
-
 
 @superState('gameControllerResponder')
 @stay
@@ -78,7 +75,12 @@ def prepareForKick(player):
     elif player.finishedPlay:
         player.inKickOffPlay = False
 
+    #  TODO just to be safe since we are only motionkicking now
     player.motionKick = True
+    # only orbit is small orbit
+    relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
+    if fabs(relH) < constants.SHOULD_ORBIT_BEARING:
+        return player.goNow('orbitBall')
     return player.goNow('followPotentialField')
 
 @superState('gameControllerResponder')
@@ -100,6 +102,7 @@ def followPotentialField(player):
     relH = player.decider.normalizeAngle(player.kick.setupH - heading)
 
     if (transitions.shouldPositionForKick(player, ball, relH)):
+        player.brain.nav.stand()
         destinationX = player.kick.destinationX
         destinationY = player.kick.destinationY
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
@@ -269,13 +272,8 @@ def positionForKick(player):
     if player.firstFrame():
         player.brain.tracker.lookStraightThenTrack()
 
-        # if player.kick == kicks.M_LEFT_STRAIGHT or player.kick == kicks.M_RIGHT_STRAIGHT:
-        #     positionForKick.speed = Navigator.BRISK_SPEED
-        # else:
-        #     positionForKick.speed = Navigator.MEDIUM_SPEED
-        positionForKick.speed = Navigator.MEDIUM_SPEED
         player.brain.nav.destinationWalkTo(positionForKick.kickPose, 
-                                            positionForKick.speed)
+                                            Navigator.MEDIUM_SPEED)
 
     elif player.brain.ball.vis.on: # don't update if we don't see the ball
         player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)

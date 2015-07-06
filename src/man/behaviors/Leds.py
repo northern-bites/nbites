@@ -218,7 +218,7 @@ class Leds():
                 self.executeLeds(RIGHT_CALIBRATION_THREE_LEDS)
                 self.executeLeds(RIGHT_CALIBRATION_FOUR_LEDS)
                 self.executeLeds(RIGHT_CALIBRATION_FIVE_LEDS)
-            elif (DODGE_LEDS and self.brain.currentlyDodging and self.dodgeCount % 4 < 2):
+            elif (DODGE_LEDS and self.brain.nav.currentState=="dodge" and self.dodgeCount % 4 < 2):
                 self.executeLeds(LEFT_DODGE_ONE_LEDS)
                 self.executeLeds(LEFT_DODGE_TWO_LEDS)
                 self.executeLeds(LEFT_DODGE_THREE_LEDS)
