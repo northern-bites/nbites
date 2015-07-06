@@ -445,7 +445,7 @@ void Boss::checkFIFO() {
             printf("Boss::checkFIFO got unexpected amt return: %li\n", amt);
             return;
         case FIFO_CMND_SIZE:
-            //continue....
+            ; //continue....
     }
 
     switch(command[0]) {

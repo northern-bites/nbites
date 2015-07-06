@@ -9,6 +9,7 @@
 
 int lockFD = 0;
 man::Man* instance;
+const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog"
 
 void handler(int signal)
 {
@@ -18,7 +19,10 @@ void handler(int signal)
         // I.e. close camera driver gracefully
         instance->preClose();
         flock(lockFD, LOCK_UN);
-
+        
+        printf("man closing MAN_LOG_PATH...\n");
+        fclose(stdout);
+        
         delete instance;
         exit(0);
     }
@@ -44,10 +48,11 @@ void establishLock()
 }
 
 int main() {
-
     signal(SIGTERM, handler);
-
     establishLock();
+    
+    printf("Man re-opening stdout...\n");
+    freopen(MAN_LOG_PATH, "w", stdout);
 
     // Constructs an instance of man. If we get here we have a lock
     instance = new man::Man();
