@@ -209,8 +209,7 @@ int Boss::startMan() {
         //replace this child process with an instance of man.
         execl("/home/nao/nbites/lib/man", "", NULL);
         printf("CHILD PROCESS FAILED TO EXECL MAN!\n");
-        //exit(1); Can't do this because Aldebaran overrides it
-        int val = *((int *) 0); // FORCE SEG FAULT
+        ::exit(1);
     }
     else {
         std::cout << "COULD NOT DETACH MAN" << std::endl;
