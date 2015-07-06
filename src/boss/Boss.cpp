@@ -175,7 +175,7 @@ void Boss::listener()
     while(true)
     {
         if (manRunning) {
-            DEBUG_MAN_DEAD();
+            //DEBUG_MAN_DEAD();
             
             if ( (shared->latestSensorWritten - shared->latestSensorRead) > MAN_DEAD_THRESHOLD ) {
                 printf("Boss::listener() killing man due to inactivity.\n");
