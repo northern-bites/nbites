@@ -31,8 +31,6 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 
 		RobotLocation naoLoc;
 		ParticleSwarm naoSwarm;
-	//	FieldLines naoFieldLines;
-	//	Corners naoCr;
 		Vision naoVision;
 
 		float naoX, naoY, naoH;
@@ -58,7 +56,6 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 			
 			// Get vision info log (fild lines, ball, center circle) 
 			naoVision = Vision.parseFrom(log.bytesForContentItem(2));
-			// naoFieldLines = FieldLines.parseFrom(log.bytesForContentItem(2));
 			for(int i=0; i<naoVision.getLineCount(); i++) {
 				FieldLine curFieldLine = naoVision.getLine(i);
 				GeoLine temp = new GeoLine(
@@ -72,7 +69,7 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 								curFieldLine.getProb());
 				naoLines.add(temp);
 			}
-//			naoCr = Corners.parseFrom(log.bytesForContentItem(3));
+
 			for(int i=0; i<naoVision.getCornerCount(); i++) {
 				Corner curCorner = naoVision.getCorner(i);
 				GeoCorner temp = new GeoCorner(
@@ -123,6 +120,9 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 	Vector<NaoParticle> naoParticles = new Vector<NaoParticle>();
 	Vector<GeoLine> naoLines = new Vector<GeoLine>();
 	Vector<GeoCorner> naoCorners = new Vector<GeoCorner>();
+	GeoBall naoBall = new GeoBall();
+	GeoCenterCircle naoCenterCircle = new GeoCenterCircle();
+
 	private JButton flip;
 	private JScrollPane sp;
 	public static float pWeight;
