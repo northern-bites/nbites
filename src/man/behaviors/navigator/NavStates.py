@@ -288,14 +288,11 @@ def walkingTo(nav):
     if locationsMatch(nav.destination, walkingTo.currentOdo):
         return nav.goNow('standing')
 
-    # walkingTo.currentOdow = RelRobotLocation(nav.brain.interface.odometry.x,
-    #                          nav.brain.interface.odometry.y,
-    #                          nav.brain.interface.odometry.h)
-    if nav.counter % 30 == 0:
-        print "Current odo:"
-        print ("x:", walkingTo.currentOdo.relX)
-        print ("y:", walkingTo.currentOdo.relY)
-        print ("h:", walkingTo.currentOdo.relH)
+    # if nav.counter % 30 == 0:
+    #     print "Current odo:"
+    #     print ("x:", walkingTo.currentOdo.relX)
+    #     print ("y:", walkingTo.currentOdo.relY)
+    #     print ("h:", walkingTo.currentOdo.relH)
         # print "Current odow:"
         # print ("x:", walkingTo.currentOdow.relX)
         # print ("y:", walkingTo.currentOdow.relY)

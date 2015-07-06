@@ -59,18 +59,23 @@ def backUpForDangerousBall(player):
 @superState('gameControllerResponder')
 def clearIt(player):
     if player.firstFrame():
+        GoalieStates.watchWithLineChecks.wentToClearIt = True
+        GoalieStates.watchWithLineChecks.correctFacing = False
         player.brain.tracker.trackBall()
         if clearIt.dangerousSide == -1:
             if player.brain.ball.rel_y < 0.0:
+                print "I'm kicking right!"
                 player.side = RIGHT
                 player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
             else:
                 player.side = LEFT
                 player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
         elif clearIt.dangerousSide == RIGHT:
+            print "I'm doing a side kick!"
             player.side = RIGHT
             player.kick = kicks.RIGHT_SIDE_KICK
         else:
+            print "I'm doing a left side kick!"
             player.side = LEFT
             player.kick = kicks.LEFT_SIDE_KICK
 
@@ -85,24 +90,41 @@ def clearIt(player):
         player.brain.interface.motionRequest.reset_odometry = True
         player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
         clearIt.odoDelay = True
+        clearIt.closeEnuf = False
 
         print ("Kickpose: ", kickPose[0], kickPose[1])
-        print ("Dest: ", clearIt.ballDest.relX, clearIt.ballDest.relY)
+        print ("Dest: ", clearIt.ballDest.relX, clearIt.ballDest.relY, clearIt.ballDest.relH)
         print ("Ball: ", player.brain.ball.rel_x, player.brain.ball.rel_y)
         return Transition.getNextState(player, clearIt)
 
     if clearIt.odoDelay:
         clearIt.odoDelay = False
+        kickPose = player.kick.getPosition()
+        # player.brain.nav.destinationWalkTo(clearIt.ballDest, nav.QUICK_SPEED)
+        clearIt.ballDest = RelRobotLocation(player.brain.ball.rel_x -
+                                            kickPose[0], 0.0,
+                                            # player.brain.ball.rel_y -
+                                            # kickPose[1],
+                                            0.0)
         player.brain.nav.goTo(clearIt.ballDest,
                               nav.CLOSE_ENOUGH,
                               nav.QUICK_SPEED,
                               adaptive = False)
 
     kickPose = player.kick.getPosition()
-    clearIt.ballDest.relX = player.brain.ball.rel_x - kickPose[0]
+
+    if (player.brain.ball.rel_x < 30.0) and not clearIt.closeEnuf:
+        print "I'm moving my y now"
+        clearIt.closeEnuf = True
+        player.brain.nav.goTo(clearIt.ballDest,
+                              (3.0, 3.0, 5),
+                              nav.MEDIUM_SPEED,
+                              adaptive = False)
+
     clearIt.ballDest.relY = player.brain.ball.rel_y - kickPose[1]
-    clearIt.ballDest.relH = 0.0
-    player.brain.nav.updateDest(clearIt.ballDest)
+    clearIt.ballDest.relX = player.brain.ball.rel_x - kickPose[0]
+    # clearIt.ballDest.relH = 0.0
+    # player.brain.nav.updateDest(clearIt.ballDest)
 
     return Transition.getNextState(player, clearIt)
 
@@ -114,23 +136,32 @@ def didIKickIt(player):
 
 @superState('gameControllerResponder')
 def spinToFaceBall(player):
-    facingDest = RelRobotLocation(0.0, 0.0, 0.0)
-    # if player.brain.ball.bearing_deg < 0.0:
-    #     player.side = RIGHT
-    #     facingDest.relH = -90
-    # else:
-    #     player.side = LEFT
-    #     facingDest.relH = 90
-    # player.brain.interface.motionRequest.reset_odometry = True
-    # player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
+    if player.firstFrame():
+        print("ball at ", player.brain.ball.bearing_deg)
+        facingDest = RelRobotLocation(0.0, 0.0, 0.0)
+        # if player.brain.ball.bearing_deg < 0.0:
+        #     player.side = RIGHT
+        #     facingDest.relH = -90
+        # else:
+        #     player.side = LEFT
+        #     facingDest.relH = 90
 
-    facingDest.relH = player.brain.ball.bearing_deg
-    player.brain.nav.goTo(facingDest,
-                          nav.CLOSE_ENOUGH,
-                          nav.CAREFUL_SPEED)
+
+        # facingDest.relH = player.brain.ball.bearing_deg
+        if player.brain.ball.bearing_deg < 0.0:
+            player.side = RIGHT
+            facingDest.relH = player.brain.ball.bearing_deg + 10.0
+        else:
+            player.side = LEFT
+            facingDest.relH = player.brain.ball.bearing_deg - 10.0
+
+        player.brain.nav.walkTo(facingDest)
+
+        # player.brain.nav.goTo(facingDest,
+                              # nav.CLOSE_ENOUGH,
+                              # nav.CAREFUL_SPEED)
 
     # if player.counter > 180:
-    #     return player.goLater('spinAtGoal')
 
     return Transition.getNextState(player, spinToFaceBall)
 
@@ -144,11 +175,11 @@ def waitToFaceField(player):
 @superState('gameControllerResponder')
 def returnToGoal(player):
     if player.firstFrame():
-        print ("first returnToGoal.kickPose: ", returnToGoal.kickPose.relX, returnToGoal.kickPose.relY, returnToGoal.kickPose.relH)
         if player.lastDiffState == 'didIKickIt' or player.lastDiffState == 'gamePlaying':
             correctedDest =(RelRobotLocation(0.0, 0.0, 0.0 ) -
                             returnToGoal.kickPose)
             correctedDest.relH = -returnToGoal.kickPose.relH
+            print ("first returnToGoal.kickPose: ", returnToGoal.kickPose.relX, returnToGoal.kickPose.relY, returnToGoal.kickPose.relH)
         else:
             print "This else happened in setting dest"
             correctedDest = (RelRobotLocation(0.0, 0.0, 0.0) -
