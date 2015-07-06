@@ -137,6 +137,8 @@ double LineSystem::scoreLine(const messages::FieldLine& observation,
         std::cout << static_cast<int>(id) << std::endl;
         std::cout << score << std::endl;
     }
+
+    return score;
 }
 
 // NOTE method assumes that endpoints seen in observation are endpoints of line
