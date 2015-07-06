@@ -83,10 +83,11 @@ def checkForConsistency(player):
         print "We have conflicting role AND there are no more open roles..."
 
     # US Open Hacks
+    """
     if player.brain.game:
         oppTeam = player.brain.game.team(1).team_number
     else:
         oppTeam = -1
     constants.setRoleConstants(player, position, oppTeam)
     return
-
+    """
