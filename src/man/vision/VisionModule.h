@@ -49,6 +49,10 @@ public:
     GoalboxDetector* getBox(bool topCamera = true) const { return boxDetector[!topCamera]; }
     CornerDetector* getCorners(bool topCamera = true) const { return cornerDetector[!topCamera]; }
     CenterCircleDetector* getCCD(bool topCamera = true) const {return centerCircleDetector[!topCamera]; }
+
+#ifdef OFFLINE
+	void setDebugDrawingParameters(nblog::SExpr* debugParams);
+#endif
     
     // For use by vision_defs
     void setColorParams(Colors* colors, bool topCamera);

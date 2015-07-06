@@ -92,6 +92,8 @@ public:
 #ifdef OFFLINE
 	void setDebugHorizon(bool debug) {debugHorizon = debug;}
 	void setDebugFieldEdge(bool debug) {debugFieldEdge = debug;}
+	void setDrawFieldHorizon(bool debug) {debugDrawFieldEdge = debug;}
+	void setDrawCameraHorizon(bool debug) {drawCameraHorizon = debug;}
 #endif
 
 private:
@@ -117,10 +119,12 @@ private:
     bool debugHorizon;
     bool debugFieldEdge;
 	bool debugDrawFieldEdge;
+	bool drawCameraHorizon;
 #else
     static const bool debugHorizon = false;
     static const bool debugFieldEdge = false;
 	static const bool debugDrawFieldEdge = false;
+	static const bool drawCameraHorizon = false;
 #endif
 };
 

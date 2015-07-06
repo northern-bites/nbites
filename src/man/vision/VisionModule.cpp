@@ -397,6 +397,20 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
     return (const std::string)sexpText;
 }
 
+#ifdef OFFLINE
+	void VisionModule::setDebugDrawingParameters(nblog::SExpr* params) {
+		std::cout << "In debug drawing parameters" << params->print() << std::endl;
+		int cameraHorizon = params->get(1)->find("CameraHorizon")->get(1)->valueAsInt();
+		int fieldHorizon = params->get(1)->find("FieldHorizon")->get(1)->valueAsInt();
+		int debugHorizon = params->get(1)->find("DebugHorizon")->get(1)->valueAsInt();
+		int debugField = params->get(1)->find("DebugField")->get(1)->valueAsInt();
+		field->setDrawCameraHorizon(cameraHorizon);
+		field->setDrawFieldHorizon(fieldHorizon);
+		field->setDebugHorizon(debugHorizon);
+		field->setDebugFieldEdge(debugField);
+	}
+#endif
+
 /*
  Lisp data in config/colorParams.txt stores 32 parameters. Read lisp and
   load the three compoenets of a Colors struct, white, green, and orange,

@@ -7,6 +7,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -15,6 +17,9 @@ import java.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComboBox;
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
+import java.awt.GridLayout;
 
 import nbtool.util.Logger;
 import nbtool.data.Log;
@@ -54,6 +59,15 @@ public class DebugImageView extends ViewParent
 	String[] imageViews = { "Original", "Green", "Orange", "White", "Edge",
 							"Ball" };
 	JComboBox viewList;
+	JPanel checkBoxPanel;
+	JCheckBox showCameraHorizon;
+	JCheckBox showFieldHorizon;
+	JCheckBox debugHorizon;
+	JCheckBox debugFieldEdge;
+	CheckBoxListener checkListener = null;
+
+	static final int NUMBER_OF_PARAMS = 4; // update as new params are added
+	int displayParams[] = new int[NUMBER_OF_PARAMS];
 
 	// Dimensions of the image that we are working with
     int width;
@@ -68,7 +82,10 @@ public class DebugImageView extends ViewParent
 	BufferedImage debugImageDisplay;        // overlay + original
 	BufferedImage displayImages[] = new BufferedImage[ORIGINAL+1]; // our images
 
+	Log currentLog;
+
 	static int currentBottom;  // track current selection
+	boolean firstLoad;
 
     @Override
     public void setLog(Log newlog) {
@@ -104,7 +121,40 @@ public class DebugImageView extends ViewParent
         displayh = height*2;
 
         displayImages[ORIGINAL] = Utility.biFromLog(newlog);
+		currentLog = newlog;
     }
+
+    /* Our parameters have been adjusted. Get their values, make an expression
+	 * and ship it off to Vision.
+    */
+    public void adjustParams() {
+
+        // Don't make an extra initial call
+        if (firstLoad) {
+			System.out.println("Skipping parameter adjustments");
+            return;
+		}
+        //zeroParam();
+
+        SExpr newParams = SExpr.newList(SExpr.newKeyValue("CameraHorizon", displayParams[0]),
+										SExpr.newKeyValue("FieldHorizon", displayParams[1]),
+										SExpr.newKeyValue("DebugHorizon", displayParams[2]),
+										SExpr.newKeyValue("DebugField", displayParams[3]));
+
+        // Look for existing Params atom in current this.log description
+        SExpr oldParams = currentLog.tree().find("DebugDrawing");
+
+        // Add params or replace params
+        if (oldParams.exists()) {
+            oldParams.setList( SExpr.atom("DebugDrawing"), newParams);
+        } else {
+            this.log.tree().append(SExpr.pair("DebugDrawing", newParams));
+        }
+
+        rerunLog();
+		repaint();
+    }
+
 
     public void paintComponent(Graphics g) {
 		final int BOX_HEIGHT = 25;
@@ -113,8 +163,26 @@ public class DebugImageView extends ViewParent
 			g.drawImage(displayImages[currentBottom], 0, displayh + 5, displayw,
 						displayh, null);
 			viewList.setBounds(0, displayh * 2 + 10, displayw / 2, BOX_HEIGHT);
+			checkBoxPanel.setBounds(displayw + 10, 0, displayw, displayh);
         }
     }
+
+	/* Called when our display conditions have changed, but we still want to
+	 * run on the current log.
+	 */
+
+	public void rerunLog() {
+		System.out.println("Rerunning log");
+        CrossInstance ci = CrossIO.instanceByIndex(0);
+        if (ci == null)
+            return;
+        CrossFunc func = ci.functionWithName("Vision");
+        assert(func != null);
+
+        CrossCall cc = new CrossCall(this, func, currentLog);
+
+        assert(ci.tryAddCall(cc));
+	}
 
     public DebugImageView() {
         super();
@@ -124,12 +192,47 @@ public class DebugImageView extends ViewParent
 		viewList.setSelectedIndex(0);
 		viewList.addActionListener(this);
 
+		// set up check boxes
+		checkListener = new CheckBoxListener();
+		showCameraHorizon = new JCheckBox("Show camera horizon");
+		showFieldHorizon = new JCheckBox("Show field convex hull");
+		debugHorizon = new JCheckBox("Debug Field Horizon");
+		debugFieldEdge = new JCheckBox("Debug Field Edge");
+
+		// add their listeners
+		showCameraHorizon.addItemListener(checkListener);
+		showFieldHorizon.addItemListener(checkListener);
+		debugHorizon.addItemListener(checkListener);
+		debugFieldEdge.addItemListener(checkListener);
+
+		// put them into one panel
+		checkBoxPanel = new JPanel();
+		checkBoxPanel.setLayout(new GridLayout(0, 1)); // 0 rows, 1 column
+		checkBoxPanel.add(showCameraHorizon);
+		checkBoxPanel.add(showFieldHorizon);
+		checkBoxPanel.add(debugHorizon);
+		checkBoxPanel.add(debugFieldEdge);
+
+		// default all checkboxes to false
+		showCameraHorizon.setSelected(false);
+		showFieldHorizon.setSelected(false);
+		debugHorizon.setSelected(false);
+		debugFieldEdge.setSelected(false);
+
         this.addMouseListener(new DistanceGetter());
 
 		// default image to display - save across instances
 		if (currentBottom == 0) {
+			for (int i = 0; i < NUMBER_OF_PARAMS; i++) {
+				displayParams[i] = 0;
+			}
+
+			firstLoad = true;
 			currentBottom = ORIGINAL;
-		}
+		} else {
+			System.out.println("Reloading");
+			}
+		add(checkBoxPanel);
 		add(viewList);
     }
 
@@ -182,6 +285,29 @@ public class DebugImageView extends ViewParent
       public void mouseExited(MouseEvent e) {}
     }
 
+	class CheckBoxListener implements ItemListener {
+		public void itemStateChanged(ItemEvent e) {
+			int index = 0;
+			Object source = e.getSource();
+			if (source == showCameraHorizon) {
+				index = 0;
+			} else if (source == showFieldHorizon) {
+				index = 1;
+			} else if (source == debugHorizon) {
+				index = 2;
+			} else if (source == debugFieldEdge) {
+				index = 3;
+			}
+			// flip the value of the parameter checked
+			if (displayParams[index] == 0) {
+				displayParams[index] = 1;
+			} else {
+				displayParams[index] = 0;
+			}
+		adjustParams();
+		}
+	}
+
     @Override
     public void ioFinished(IOInstance instance) {}
 
@@ -211,6 +337,8 @@ public class DebugImageView extends ViewParent
         debugImage = new DebugImage(width, height, out[DRAWING].bytes,
 									   displayImages[ORIGINAL]);
         debugImageDisplay = debugImage.toBufferedImage();
+
+		firstLoad = false;
 
         repaint();
 

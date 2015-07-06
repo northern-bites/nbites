@@ -133,6 +133,12 @@ int Vision_func() {
         }
     }
 
+	// if log specified debug drawing parameters then set them
+	SExpr* debugDrawing = args[0]->tree().find("DebugDrawing");
+	if (debugDrawing != NULL) {
+		module.setDebugDrawingParameters(debugDrawing);
+	}
+
     // If log includes "BlackStar," set flag
     std::vector<SExpr*> blackStarVec = args[0]->tree().recursiveFind("BlackStar");
     if (blackStarVec.size() != 0) {

@@ -55,6 +55,7 @@ namespace vision {
 		debugFieldEdge = false;
 		debugDrawFieldEdge = false;
 		debugHorizon = false;
+		drawCameraHorizon = false;
 #endif
 	}
 
@@ -726,7 +727,8 @@ int Field::findGreenHorizon(int pH, float sl) {
     if (debugHorizon) {
         cout << "initial estimate is " << initialEstimate << " " << pH << endl;
     }
-	if (debugDrawFieldEdge) {
+	if (drawCameraHorizon) {
+		cout << "Drawing camera horizon" << endl;
 		for (int i = 0; i < width; i++) {
 			drawDot(i, pH, ORANGE);
 		}
