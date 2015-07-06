@@ -1,6 +1,5 @@
 package messages;
 
-// robot locations should have a pose, and an uncertainty associated with it
 message RobotLocation
 {
     optional float x = 1;
@@ -8,4 +7,5 @@ message RobotLocation
     optional float h = 3;
     optional int64 timestamp = 4;
     optional float uncert = 5;
+    optional bool lost = 6;
 }
