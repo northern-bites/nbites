@@ -31,12 +31,15 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 
 		RobotLocation naoLoc;
 		ParticleSwarm naoSwarm;
-		FieldLines naoFieldLines;
-		Corners naoCr;
+	//	FieldLines naoFieldLines;
+	//	Corners naoCr;
+		Vision naoVision;
 
 		float naoX, naoY, naoH;
 
 		try {
+
+			// Get loc info from log
 			naoLoc = RobotLocation.parseFrom(log.bytesForContentItem(0));
 			naoX = naoLoc.getX();
 			naoY = naoLoc.getY();
@@ -51,10 +54,13 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 				temp.moveTo(currentNaoSwarm.getX(),currentNaoSwarm.getY());
 				naoParticles.add(temp);
 			}
-
-			naoFieldLines = FieldLines.parseFrom(log.bytesForContentItem(2));
-			for(int i=0; i<naoFieldLines.getLineCount(); i++) {
-				FieldLine curFieldLine = naoFieldLines.getLine(i);
+			
+			
+			// Get vision info log (fild lines, ball, center circle) 
+			naoVision = Vision.parseFrom(log.bytesForContentItem(2));
+			// naoFieldLines = FieldLines.parseFrom(log.bytesForContentItem(2));
+			for(int i=0; i<naoVision.getLineCount(); i++) {
+				FieldLine curFieldLine = naoVision.getLine(i);
 				GeoLine temp = new GeoLine(
 								curFieldLine.getInner().getR(),
 								curFieldLine.getInner().getT(),
@@ -66,10 +72,9 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 								curFieldLine.getProb());
 				naoLines.add(temp);
 			}
-
-			naoCr = Corners.parseFrom(log.bytesForContentItem(3));
-			for(int i=0; i<naoCr.getCornerCount(); i++) {
-				Corner curCorner = naoCr.getCorner(i);
+//			naoCr = Corners.parseFrom(log.bytesForContentItem(3));
+			for(int i=0; i<naoVision.getCornerCount(); i++) {
+				Corner curCorner = naoVision.getCorner(i);
 				GeoCorner temp = new GeoCorner(
 								curCorner.getX(),
 								curCorner.getY(),
@@ -78,7 +83,7 @@ public class LocSwarmView extends ViewParent implements ActionListener {
                                 curCorner.getProb());
 				naoCorners.add(temp);
 			}
-
+			
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
