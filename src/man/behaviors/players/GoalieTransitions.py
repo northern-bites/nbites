@@ -92,7 +92,7 @@ def sideLineCheckShouldReposition(player):
 
     reasonAbleFrontLine = False
     for line in GoalieStates.watchWithLineChecks.lines:
-        if math.fabs(math.degrees(line.t) - constants.EXPECTED_FRONT_LINE_T) < 30.0:
+        if math.fabs(math.degrees(line.t) - constants.EXPECTED_FRONT_LINE_T) < 15.0:
             if line.r > 20.0:
                 reasonAbleFrontLine = True
                 print("I found a resonable front line!")
@@ -110,7 +110,7 @@ def sideLineCheckShouldReposition(player):
         if (math.fabs(t - constants.EXPECTED_RIGHT_LINE_T) < constants.T_THRESH \
             or math.fabs(t - constants.EXPECTED_RIGHT_LINE_T2) < constants.T_THRESH) \
         and math.fabs(r - constants.EXPECTED_SIDE_LINE_R) > constants.R_THRESH \
-        and r < 170.0:
+        and r < 170.0 and r != 0.0:
             y_dest = constants.EXPECTED_SIDE_LINE_R - r
             print "Right side was TRUE"
             print ("ydest: ", y_dest)
@@ -122,7 +122,7 @@ def sideLineCheckShouldReposition(player):
         # Same as above, except with the left side line
         if math.fabs(t - constants.EXPECTED_LEFT_LINE_T) < constants.T_THRESH \
         and math.fabs(r - constants.EXPECTED_SIDE_LINE_R) > constants.R_THRESH \
-        and r < 170.0:
+        and r < 170.0 and r != 0.0:
             y_dest = r - constants.EXPECTED_SIDE_LINE_R
             print "Left side was TRUE"
             print ("ydest: ", y_dest)
@@ -135,7 +135,7 @@ def sideLineCheckShouldReposition(player):
 def shouldTurn(player):
     # Turn twice, then reposition, then turn twice again, etc.
     if GoalieStates.watchWithLineChecks.numTurns > 1 \
-    and GoalieStates.watchWithLineChecks.numFixes < 2:
+    and GoalieStates.watchWithLineChecks.numFixes < 1:
         return False
     if GoalieStates.watchWithLineChecks.numTurns == 5:
         return False

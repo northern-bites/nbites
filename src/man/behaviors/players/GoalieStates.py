@@ -358,6 +358,7 @@ def moveForward(player):
 @superState('gameControllerResponder')
 def moveBackwards(player):
     if player.firstFrame():
+        watchWithLineChecks.numFixes += 1
         player.brain.tracker.trackBall()
         player.brain.nav.walkTo(RelRobotLocation(-100.0, 0, 0))
 
