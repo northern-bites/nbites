@@ -59,6 +59,10 @@ def shouldApproachBall(player):
     if ballNotInBox(player):
         player.claimedBall = False
         return False
+    # DROPIN
+    if player.dropIn:
+        if claimTransitions.shouldGoForBall(player):
+            return False
 
     if claimTransitions.shouldCedeClaim(player):
         return False
@@ -83,6 +87,11 @@ def shouldBeSupporter(player):
     if not player.brain.motion.calibrated:
         player.claimedBall = False
         return False
+
+    # DROPIN
+    if player.dropIn:
+        return (ballInBox(player) and
+            claimTransitions.shouldGoForBall(player))
         
     return (ballInBox(player) and
             claimTransitions.shouldCedeClaim(player))

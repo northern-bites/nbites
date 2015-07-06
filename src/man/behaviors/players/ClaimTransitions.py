@@ -63,3 +63,83 @@ def weightedDistAndHeading(distance, heading, ballBearing):
     elif ballHeading < -90:
         distance += distance * (ballBearing+90)**2 / 90**2
     return distance
+
+
+# FOR THE DROPIN PLAYER!!!!!
+
+
+#given that we cannot control what our mates are doing during the dropin game,
+# this function decides whether or not we should go for the ball
+def shouldGoForBall(player):
+    if not player.useClaims:
+        return False
+
+    playerWeight = weightedDistAndHeading(player.brain.ball.distance, 
+                                              player.brain.loc.h, player.brain.ball.bearing_deg)
+    for mate in player.brain.teamMembers:
+        if (mate.playerNumber == player.brain.playerNumber):
+            continue
+        if not mate.active or mate.fallen:
+            continue
+
+        mateBallDistance = mateBallDist(player.brain.loc.x, player.brain.loc.y, player.brain.loc.h, player.brain.ball,distance, 
+                                    player.brain.ball_bearing_deg, mate_x, mate_y)
+
+        ball_y = ballY(player.brain.loc.h, player.brain.ball.bearing_deg,player.brain.ball.distance)
+
+        mateBallBearing =mateBallHeading(ball_y, mate.y, mate.h, mateBallDistance) 
+
+        mateWeight = weightedDistAndHeading(mateBallDistance, mate.h, mateBallBearing)
+
+        # sigmoid function so that the difference increases slowly at close distances but
+        # grows quickly at mid-range to far distances and at very far distances, asymptotically
+        # approaches a maximum. uses the distance of the close robot
+
+       if player.brain.ball.distance < mateBallDistance:
+            closerDistance = player.brain.ball.distance
+        else:
+            closerDistance = mateBallDistance
+        closeWeightDifference = 25 + 150/(1 + math.e**(6.25 - .05*closerDistance))
+        if (math.fabs(mateWeight - playerWeight) < closeWeightDifference):
+            if roleConstants.isFirstChaser(mate.role):
+                player.roleOfClaimer =  mate.role
+                # player.claimedBall = False
+                return True
+            elif player.role < mate.role and not roleConstants.isFirstChaser(player.role):
+                player.roleOfClaimer =  mate.role
+                # player.claimedBall = False
+                return True
+        elif (mateWeight < playerWeight):
+            player.roleOfClaimer =  mate.role
+            # player.claimedBall = False
+            return True
+    # player.claimedBall = True
+    return False
+
+
+def ballY(my_h, ballBearing,distance):
+    ballHeading = my_h - ballBearing
+    ball_y_to_me = distance * math.sin(ballHeading - math.pi/2)
+    ball_y =  ball_y_to_me + my_y
+    return ball_y
+
+# The function calculates the distance between your mate and the ball based
+# on the mandatory information given for dropin
+def mateBallDist(my_x, my_y, my_h, distance, ballBearing, mate_x, mate_y):
+
+    ballHeading = my_h - ballBearing
+    ball_x_to_me = distance * math.sin(ballHeading)
+    ball_x = ball_x_to_me + my_x
+    ball_y = ballY(my_h, ballBearing,distance)
+    ball_dist_to_mate =((ball_x - mate_x)**2 + (ball_y - mate_y)**2)**0.5
+    return ball_dist_to_mate
+
+# The function calculates the ball heading for the mate
+def mateBallHeading(ball_y, mate_y, mate_h, distance):
+    if distance == 0.0:
+        mate_ballHeading = mate_h
+    else:
+        dy = mate_y - ball_y
+        ball_dist_heading = math.asin((float)dy/(float)distance)
+        mate_ballHeading = mate_h - ball_dist_heading
+    return mate_ballHeading
