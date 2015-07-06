@@ -71,9 +71,11 @@ def clearIt(player):
                 player.side = LEFT
                 player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
         elif clearIt.dangerousSide == RIGHT:
+            print "I'm doing a side kick!"
             player.side = RIGHT
             player.kick = kicks.RIGHT_SIDE_KICK
         else:
+            print "I'm doing a left side kick!"
             player.side = LEFT
             player.kick = kicks.LEFT_SIDE_KICK
 
@@ -121,8 +123,6 @@ def clearIt(player):
 
     clearIt.ballDest.relY = player.brain.ball.rel_y - kickPose[1]
     clearIt.ballDest.relX = player.brain.ball.rel_x - kickPose[0]
-    clearIt.ballDest.relH = 0.0
-    # clearIt.ballDest.relY = player.brain.ball.rel_y - kickPose[1]
     # clearIt.ballDest.relH = 0.0
     # player.brain.nav.updateDest(clearIt.ballDest)
 
@@ -136,28 +136,32 @@ def didIKickIt(player):
 
 @superState('gameControllerResponder')
 def spinToFaceBall(player):
-    facingDest = RelRobotLocation(0.0, 0.0, 0.0)
-    # if player.brain.ball.bearing_deg < 0.0:
-    #     player.side = RIGHT
-    #     facingDest.relH = -90
-    # else:
-    #     player.side = LEFT
-    #     facingDest.relH = 90
-    # player.brain.interface.motionRequest.reset_odometry = True
-    # player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
+    if player.firstFrame():
+        print("ball at ", player.brain.ball.bearing_deg)
+        facingDest = RelRobotLocation(0.0, 0.0, 0.0)
+        # if player.brain.ball.bearing_deg < 0.0:
+        #     player.side = RIGHT
+        #     facingDest.relH = -90
+        # else:
+        #     player.side = LEFT
+        #     facingDest.relH = 90
 
 
-    facingDest.relH = player.brain.ball.bearing_deg
-    if player.brain.ball.bearing_deg < 0.0:
-        facingDest.relH = player.brain.ball.bearing_deg + 10.0
-    # else:
-    #     facingDest.relH = player.brain.ball.bearing_deg - 10.0
-    player.brain.nav.goTo(facingDest,
-                          nav.CLOSE_ENOUGH,
-                          nav.CAREFUL_SPEED)
-    # print("My facing dest:", facingDest.relH)
+        # facingDest.relH = player.brain.ball.bearing_deg
+        if player.brain.ball.bearing_deg < 0.0:
+            player.side = RIGHT
+            facingDest.relH = player.brain.ball.bearing_deg + 10.0
+        else:
+            player.side = LEFT
+            facingDest.relH = player.brain.ball.bearing_deg - 10.0
+
+        player.brain.nav.walkTo(facingDest)
+
+        # player.brain.nav.goTo(facingDest,
+                              # nav.CLOSE_ENOUGH,
+                              # nav.CAREFUL_SPEED)
+
     # if player.counter > 180:
-    #     return player.goLater('spinAtGoal')
 
     return Transition.getNextState(player, spinToFaceBall)
 

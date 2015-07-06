@@ -102,11 +102,11 @@ def gamePlaying(player):
     if player.lastDiffState == 'fallen':
         # #TODO fix this
         # player.justKicked = False
-        if player.justKicked:
+        # if player.justKicked:
         #     print "I just kicked, I'm trying to find my way back!"
         #     return player.goLater('findMyWayBackPtI')
         # else:
-            return player.goLater('watchWithLineChecks')
+        return player.goLater('watchWithLineChecks')
 
     #TODO before game/scrimmage change this to watch;
     # this is better for testing purposes!
@@ -199,7 +199,7 @@ def watchWithLineChecks(player):
 
         # elif player.lastDiffState is 'lineCheckTurn':
         #     print "I think I have correct facing now..."
-        elif watchWithLineChecks.numTurns > 1:
+        elif watchWithLineChecks.numTurns > 0:
             print "I think I have corrected my facing now..."
             watchWithLineChecks.correctFacing = True
         #     watchWithLineChecks.numTurns += 1
@@ -252,17 +252,6 @@ def lineCheckReposition(player):
 
     return Transition.getNextState(player, lineCheckReposition)
 
-
-@superState('gameControllerResponder')
-def lineCheckTurn(player):
-    if player.firstFrame():
-        player.brain.tracker.repeatBasicPan()
-        dest = average(player.homeDirections)
-        print "My home directions: "
-        print dest
-        player.brain.nav.walkTo(dest)
-
-    return Transition.getNextState(player, lineCheckReposition)
 
 # -----------------------------------------------
 
