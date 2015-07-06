@@ -257,7 +257,7 @@ class CenterCircleDetector {
   std::vector<Point> _potentials;
 
   // Parameters
-  int hardCap;                    // Min number of potential edges
+  int minPotentials;              // Min number of potential edges
   double maxEdgeDistanceSquared;  // Max considered distance of an edge
   double ccr;                     // Center circle radius
   int binWidth;                   // In centimeters

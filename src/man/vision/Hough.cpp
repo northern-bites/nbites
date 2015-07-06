@@ -497,7 +497,7 @@ CenterCircleDetector::CenterCircleDetector()
 void CenterCircleDetector::set()
 {
   // Set parameters
-  hardCap = 800;
+  minPotentials = 1000;
   maxEdgeDistanceSquared = 500 * 500;
   ccr = CENTER_CIRCLE_RADIUS;
   binWidth = 50;
@@ -512,7 +512,7 @@ bool CenterCircleDetector::detectCenterCircle(EdgeList& edges)
 
 #ifdef OFFLINE
   _potentials = potentials;
-  if (_potentials.size() > hardCap && getMaxBin(_potentials, _ccx, _ccy)) {
+  if (_potentials.size() > minPotentials && getMaxBin(_potentials, _ccx, _ccy)) {
     _potentials.push_back(Point(_ccx, _ccy));
     return true;
   } else
@@ -520,7 +520,7 @@ bool CenterCircleDetector::detectCenterCircle(EdgeList& edges)
   return false;
 #endif
 
-  return (potentials.size() > hardCap && getMaxBin(potentials, _ccx, _ccy));
+  return (potentials.size() > minPotentials && getMaxBin(potentials, _ccx, _ccy));
 }
 
 // Get potential cc centers and clean edge list
