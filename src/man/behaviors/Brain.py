@@ -101,7 +101,6 @@ class Brain(object):
         # Used for obstacle detection
         self.obstacles = [0.] * 9
         self.obstacleDetectors = ['n'] * 9
-        self.currentlyDodging = False
 
         self.ourScore = 0
         self.theirScore = 0
