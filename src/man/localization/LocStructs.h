@@ -37,6 +37,7 @@ struct ParticleFilterParams
     float alphaSlow;          //! Weight factor for slow exponential weight filter.
     float odometryXYNoise;    //! Variance for x,y in MotionSystem when updating.
     float odometryHNoise;     //! Variance for h in MotionSystem when updating.
+    float lostThreshold;      //! Threshold for determining when lost applied to exponential filters
 };
 
 /**
@@ -117,7 +118,7 @@ struct ReconstructedLocation
 
     bool onField() 
     { 
-        return (x >= 0 && y <= FIELD_GREEN_WIDTH && y >= 0 && y <= FIELD_GREEN_HEIGHT); 
+        return (x >= 0 && x <= FIELD_GREEN_WIDTH && y >= 0 && y <= FIELD_GREEN_HEIGHT); 
     }
 };
 

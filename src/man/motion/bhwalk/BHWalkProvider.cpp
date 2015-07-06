@@ -440,7 +440,13 @@ bool BHWalkProvider::calibrated() const {
 }
 
 bool BHWalkProvider::upright() const {
-    return walkingEngine->theFallDownStateBH.state == FallDownStateBH::upright;
+    if (!isWalkActive() && walkingEngine->theFallDownStateBH.state == FallDownStateBH::onGround) {
+        std::cout << "[INERT DEBUG] Walk is not active, and falldownstate is on the ground, but we are returning upright anyways..." << std::endl;
+        return true;
+    }
+
+    return walkingEngine->theFallDownStateBH.state == FallDownStateBH::upright || walkingEngine->theFallDownStateBH.state == FallDownStateBH::undefined || walkingEngine->theFallDownStateBH.state == FallDownStateBH::staggering;
+//     return walkingEngine->theFallDownStateBH.state == FallDownStateBH::upright;
 }
 
 float BHWalkProvider::leftHandSpeed() const {
