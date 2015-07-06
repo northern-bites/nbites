@@ -22,15 +22,17 @@ public class SoundFreqView extends ViewParent {
 		FastFourierTransformer trans = new FastFourierTransformer(DftNormalization.STANDARD);
 		Complex[] out = trans.transform(ls, TransformType.FORWARD);		
 		
-		Double[] real = new Double[buffer.left.length];
-		Double[] imgn = new Double[buffer.left.length];
+		Double[] magn = new Double[buffer.left.length];
+		Double[] zero = new Double[buffer.left.length];
+		
+		
 		
 		for (int i = 0; i < out.length; ++i) {
-			real[i] = out[i].getReal();
-			imgn[i] = out[i].getImaginary();
+			magn[i] = out[i].abs();
+			zero[i] = 0d;
 		}
 		
-		SoundPane<Double> sp = new SoundPane<>(real, imgn, new SoundPane.Scaler<Double>() {
+		SoundPane<Double> sp = new SoundPane<>(magn, zero, new SoundPane.Scaler<Double>() {
 
 			@Override
 			public int pixelsFor(Double val, int pixels) {

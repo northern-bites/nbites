@@ -23,6 +23,8 @@ public class UtilityManager {
 	public static final YUVColorUtility YUVColorUtility = new YUVColorUtility();
 	public static final ThreadStateUtility ThreadStateUtility = new ThreadStateUtility();
 	public static final ReplayUtility ReplayUtility = new ReplayUtility();
+	
+	public static final SyntheticSndUtility SyntheticSndUtility = new SyntheticSndUtility();
 		
 	public static final SyntheticImageUtility SyntheticImageUtility = new SyntheticImageUtility();
 	//public static final CameraCalibrateUtility CameraCalibrateUtility = new CameraCalibrateUtility();
