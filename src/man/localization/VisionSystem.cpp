@@ -30,6 +30,8 @@ bool VisionSystem::update(ParticleSet& particles,
     numObservations = 0;
     avgError = 0;
 
+    // HACK until systematic error in homography is gone for large azimuth,
+    //      do not score balls with abs(bearing) > PI / 4
     bool useBall = (ball != NULL) && (fabs(vision::sMod(ball->bearing(), 2 * PI)) < M_PI / 4);
 
     // Count observations
@@ -48,7 +50,7 @@ bool VisionSystem::update(ParticleSet& particles,
     // Loop over particles and adjust weights
     ParticleIt iter;
     double totalWeight = 0;
-    for(iter = particles.begin(); iter != particles.end(); iter++) {
+    for (iter = particles.begin(); iter != particles.end(); iter++) {
         Particle* particle = &(*iter);
         float curParticleError = 1;
 
@@ -69,7 +71,7 @@ bool VisionSystem::update(ParticleSet& particles,
     }
 
     // Normalize the particle weights
-    for(iter = particles.begin(); iter != particles.end(); iter++) {
+    for (iter = particles.begin(); iter != particles.end(); iter++) {
         Particle* particle = &(*iter);
         particle->normalizeWeight(totalWeight);
     }
@@ -183,7 +185,9 @@ bool VisionSystem::update(ParticleSet& particles,
 
             // Add injection and return
             ReconstructedLocation reconstructed(fromLineAndBall.x(), fromLineAndBall.y(), fromLineAndBall.h(), 1, 1, 0.01);
-            if (reconstructed.onField())
+            if (fromLineAndBall.x() > CENTER_FIELD_X)
+                std::cout << "Major bug in ball in set injections!" << std::endl;
+            else if (reconstructed.onField())
                 injections.push_back(reconstructed);
         }
     }
