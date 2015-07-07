@@ -45,16 +45,31 @@ void WorldViewPainter::paintSharedBallLocation(QPaintEvent* event,
             painter.translate(0, FIELD_GREEN_HEIGHT*scaleFactor);
             painter.scale(scaleFactor, -scaleFactor);
         }
-        QPoint ballCenter(msg.x(),
-                          msg.y());
+        QPoint ballCenter(msg.x(),msg.y());
 
         //draw the weighted averaged location of the ball
         painter.setBrush(QColor::fromRgb(153,0,153));
-        painter.drawEllipse(ballCenter,
-                            8,
-                            8);
+        painter.drawEllipse(ballCenter,8,8);
     }
     return;
+}
+
+void WorldViewPainter::paintClaimedBallLocation(QPaintEvent* event, 
+                                                messages::SharedBall msg) 
+{
+    if(msg.claimed_ball()) {
+        QPainter painter(this);
+        if (flipped) {
+            painter.translate(FIELD_GREEN_WIDTH*scaleFactor,0);
+            painter.scale(-scaleFactor, scaleFactor);
+        } else {
+            painter.translate(0, FIELD_GREEN_HEIGHT*scaleFactor);
+            painter.scale(scaleFactor, -scaleFactor);
+        }
+        QPoint ballCenter(msg.x(),msg.y());
+        painter.setBrush(QColor::fromRgb(255,0,0));
+        painter.drawEllipse(ballCenter,8,8);
+    }
 }
 
 void WorldViewPainter::paintRobotLocation(QPaintEvent* event,

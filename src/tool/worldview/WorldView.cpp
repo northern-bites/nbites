@@ -117,8 +117,8 @@ WorldView::WorldView(QWidget* parent)
         wviewShared.worldModelIn[i].wireTo(wviewComm._worldModels[i]);
     }
 
-    wviewShared.ballIn.wireTo(&ballOut);
-    wviewShared.locIn.wireTo(&locOut);
+    wviewShared.ballIn.wireTo(&ballOut,true);
+    wviewShared.locIn.wireTo(&locOut,true);
 
     sharedIn.wireTo(&wviewShared.sharedBallOutput);
 }
@@ -144,7 +144,6 @@ void WorldView::run_()
     }
 
     setSharedBall();
-    std::cout<<"getting here"<<std::endl;
     sharedIn.latch();
 
     fieldPainter->updateWithSharedBallMessage(sharedIn.message());
