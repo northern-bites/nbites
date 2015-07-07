@@ -8,27 +8,17 @@
 #include <string.h>
 #include <cstdlib>
 #include <chrono>
+#include <errno.h>
 
 #define MAN_RESTART 'r'
 #define MAN_KILL    'k'
 #define MAN_START   's'
+#define BOSS_PRINT  'p'
 
-/*
- Begin timing macros for debugging callbacks.
- define DCM_TIMING_DEBUG 0
-    to hear when callbacks take > 10ms
- define DCM_TIMING_DEBUG 1
-    to always hear about callback timing
- don't define DCM_TIMING_DEBUG
-    to never hear from or call any code.
- */
-#define DCM_TIMING_DEBUG 0
-//#define DCM_TIMING_DEBUG 1
+//#define DCM_DEBUG
 
-#ifdef DCM_TIMING_DEBUG
-
-
-
+#ifdef DCM_DEBUG
+#define DCM_TIMING_DEBUG_ALWAYS false
 std::chrono::time_point<std::chrono::high_resolution_clock> pre_start, post_start, temp_start;
 void DCM_TIMING_DEBUG_PRE1() {
     pre_start = std::chrono::high_resolution_clock::now();
@@ -38,7 +28,7 @@ void DCM_TIMING_DEBUG_PRE2() {
     auto tpnow = std::chrono::high_resolution_clock::now();
     long micros = std::chrono::duration_cast<std::chrono::microseconds>(tpnow - pre_start).count();
     //if longer than 10 milliseconds, or DCM_TIMING_DEBUG > 0, shout.
-    if (micros > 10000 || DCM_TIMING_DEBUG) {
+    if (micros > 10000 || DCM_TIMING_DEBUG_ALWAYS) {
         printf("WARNING: DCMPreCallback took %li microseconds!\n", micros);
     }
 }
@@ -51,7 +41,7 @@ void DCM_TIMING_DEBUG_POST2() {
     auto tpnow = std::chrono::high_resolution_clock::now();
     long micros = std::chrono::duration_cast<std::chrono::microseconds>(tpnow - post_start).count();
     
-    if (micros > 10000 || DCM_TIMING_DEBUG) {
+    if (micros > 10000 || DCM_TIMING_DEBUG_ALWAYS) {
         printf("WARNING: DCMPostCallback took %li microseconds!\n", micros);
     }
 }
@@ -64,12 +54,13 @@ bool DCM_TIMING_DEBUG_END() {
     auto tpnow = std::chrono::high_resolution_clock::now();
     long micros = std::chrono::duration_cast<std::chrono::microseconds>(tpnow - temp_start).count();
     
-    if (micros > 10000 || DCM_TIMING_DEBUG) {
+    if (micros > 10000 || DCM_TIMING_DEBUG_ALWAYS) {
         printf("WARNING: DCM_TIMING_DEBUG measured %li microseconds!\n", micros);
         return true;
     }
     return false;
 }
+
 #else
 
 #define DCM_TIMING_DEBUG_PRE1()
@@ -82,6 +73,8 @@ bool DCM_TIMING_DEBUG_END() {
 
 #endif
 
+#define MAN_DEAD_THRESHOLD 2000
+#define BOSS_MAIN_LOOP_US 500000
 
 namespace boss {
 
@@ -94,19 +87,21 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     led(broker),
     manPID(-1),
     manRunning(false),
-    killingMan(false),
     shared_fd(-1),
     shared(NULL),
-    commandSkips(0),
-    sensorSkips(0),
+    cmndLockMiss(0),
+    sensorLockMiss(0),
     fifo_fd(-1)
 {
+    printf("\t\tboss 7/%d\n", BOSS_VERSION);
     std::cout << "Boss Constructor" << std::endl;
 
     if (constructSharedMem() != 1) {
         std::cout << "Couldn't construct shared mem, oh well!" << std::endl;
         return;
     }
+    
+    bool success = true;
 
     // Link up to the DCM loop
     try {
@@ -115,6 +110,7 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     }
     catch(const AL::ALError& e) {
         std::cout << "Tried to bind preprocess, but failed, because " + e.toString() << std::endl;
+        success = false;
     }
     try {
         dcmPostProcessConnection = broker_->getProxy("DCM")->getModule()->atPostProcess(
@@ -122,6 +118,7 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     }
     catch(const AL::ALError& e) {
         std::cout << "Tried to bind postprocess, but failed, because " + e.toString() << std::endl;
+        success = false;
     }
 
     // The FIFO that we're going to listen for terminal commands on
@@ -129,10 +126,22 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     if (fifo_fd <= 0) {
         std::cout << "FIFO ERROR" << std::endl;
         std::cout << "Boss will not be able to receive commands from terminal" << std::endl;
+        success = false;
     }
-
-    std::cout << "Boss Constructed successfully!" << std::endl;
-
+    
+    if ( pthread_mutexattr_init(&shared_mutex_attr) ||
+        pthread_mutexattr_setpshared(&shared_mutex_attr, PTHREAD_PROCESS_SHARED) )
+    {
+        std::cout << "ERROR constructing shared process mutex attributes!" << std::endl;
+        success = false;
+    }
+   
+    if (success) {
+        std::cout << "Boss Constructed successfully!" << std::endl;
+    } else {
+        std::cout << "\nWARNING: one or more errors while constructing Boss! Crash likely." << std::endl;
+    }
+    
     startMan();
 
     // This will not return.
@@ -151,19 +160,23 @@ Boss::~Boss()
     close(fifo_fd);
 }
 
-
-
 void Boss::listener()
 {
-    while(1)
+    while(true)
     {
-        checkFIFO();
-        if (killingMan) {
-            printf("killingMan == true!!!\n\n\n; kNext: %lld kLast: %lld\n",
-                   (long long)killingNext, (long long)killingLast);
-            killMan();
+        if (manRunning) {
+            
+            if ( (shared->latestSensorWritten - shared->latestSensorRead) > MAN_DEAD_THRESHOLD ) {
+                std::cout << "Boss::listener() killing man due to inactivity" << std::endl;
+                print_info();
+                killMan();
+                continue;
+            }
         }
-        sleep(2);
+        
+        checkFIFO();
+        
+        usleep(BOSS_MAIN_LOOP_US);
     }
 }
 
@@ -186,8 +199,7 @@ int Boss::startMan() {
         //replace this child process with an instance of man.
         execl("/home/nao/nbites/lib/man", "", NULL);
         printf("CHILD PROCESS FAILED TO EXECL MAN!\n");
-        //exit(1); Can't do this because Aldebaran overrides it
-        int val = *((int *) 0); // FORCE SEG FAULT
+        ::exit(1);
     }
     else {
         std::cout << "COULD NOT DETACH MAN" << std::endl;
@@ -204,8 +216,8 @@ int Boss::killMan() {
         return -1;
     }
 
-    std::cout << "Man missed " << manMissedFrames << " frames while running.\n";
-    std::cout << "Boss skipped " << sensorSkips << " and " << commandSkips << "commands" << std::endl;
+//    std::cout << "Man missed " << manMissedFrames << " frames while running.\n";
+//    std::cout << "Boss skipped " << sensorLockMiss << " and " << cmndLockMiss << "commands" << std::endl;
 
     shared->sit = 1;
     // A bit longer than it takes to sit down
@@ -218,26 +230,23 @@ int Boss::killMan() {
     sleep(5);
 
     // Clear the buffers
-    memset((void*)shared->sensors[0], 0, SENSOR_SIZE);
-    memset((void*)shared->sensors[1], 0, SENSOR_SIZE);
+    memset((void*)shared->sensors, 0, SENSOR_SIZE);
     memset((void*)shared->command, 0, COMMAND_SIZE);
     shared->latestCommandWritten = 0;
     shared->latestCommandRead = 0;
     shared->latestSensorWritten = 0;
     shared->latestSensorRead = 0;
     shared->sit = 0;
-    commandSkips = 0;
-    sensorSkips = 0;
+    cmndLockMiss = 0;
+    sensorLockMiss = 0;
 
     // Just in case we interrupted (man) in the middle of a critical section
-    pthread_mutex_destroy((pthread_mutex_t *) &shared->sensor_mutex[0]);
-    pthread_mutex_destroy((pthread_mutex_t *) &shared->sensor_mutex[0]);
-    pthread_mutex_destroy((pthread_mutex_t *) &shared->sensor_mutex[0]);
-    pthread_mutex_init( (pthread_mutex_t *) &shared->sensor_mutex[0], NULL);
-    pthread_mutex_init( (pthread_mutex_t *) &shared->sensor_mutex[1], NULL);
-    pthread_mutex_init( (pthread_mutex_t *) &shared->cmnd_mutex, NULL);
+    
+    pthread_mutex_destroy((pthread_mutex_t *) &shared->sensor_mutex);
+    pthread_mutex_destroy((pthread_mutex_t *) &shared->cmnd_mutex);
+    pthread_mutex_init( (pthread_mutex_t *) &shared->sensor_mutex, &shared_mutex_attr);
+    pthread_mutex_init( (pthread_mutex_t *) &shared->cmnd_mutex, &shared_mutex_attr);
 
-    killingMan = false;
     return 0; // TODO actually return something. Necessary?
 }
 
@@ -253,6 +262,7 @@ int Boss::constructSharedMem()
 
         return -1;
     }
+    
     if (ftruncate(shared_fd, sizeof(SharedData)) == -1) {
         std::cout << "Couldn't truncate shared mem" << std::endl;
         return -1;
@@ -268,11 +278,9 @@ int Boss::constructSharedMem()
 
     // Make sure memory is in known state
     memset((void *) shared, 0, sizeof(SharedData));
-    shared->sensorSwitch = 0;
 
-    pthread_mutex_init( (pthread_mutex_t *) &shared->sensor_mutex[0], NULL);
-    pthread_mutex_init( (pthread_mutex_t *) &shared->sensor_mutex[1], NULL);
-    pthread_mutex_init( (pthread_mutex_t *) &shared->cmnd_mutex, NULL);
+    pthread_mutex_init( (pthread_mutex_t *) &shared->sensor_mutex, &shared_mutex_attr);
+    pthread_mutex_init( (pthread_mutex_t *) &shared->cmnd_mutex, &shared_mutex_attr);
 
     return 1;
 }
@@ -314,7 +322,6 @@ void Boss::DCMPreProcessCallback()
         if (bossSyncRead(shared, cmndStaging)) {
             Deserialize des(cmndStaging);
 
-
             if (!des.parse()) {
                 // Couldn't parse anything from shared memory
                 // Could imply bad things?
@@ -340,8 +347,7 @@ void Boss::DCMPreProcessCallback()
             led.setLeds(ledResults);
 
         } else {
-            printf("Boss::DCMPreProcessCallback COULD NOT READ FRESH COMMAND (skip)\n");
-            ++commandSkips;
+            ++cmndLockMiss;
         }
     } else {
         //No new data to read.
@@ -350,37 +356,26 @@ void Boss::DCMPreProcessCallback()
     DCM_TIMING_DEBUG_PRE2();
 }
 
-bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, uint64_t index)
+bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, int64_t index)
 {
-    volatile uint8_t& newest = (sd->sensorSwitch);
-    pthread_mutex_t * oldestLock = (pthread_mutex_t *) &sd->sensor_mutex[!(newest)];
-    pthread_mutex_t * newestLock = (pthread_mutex_t *) &sd->sensor_mutex[ (newest)];
-
-    if (
-        pthread_mutex_trylock(oldestLock) == 0 //locked
-        )
-    {
-        memcpy((void *)sd->sensors[!newest], stage, SENSOR_SIZE);
-        newest = !newest;
-        sd->latestSensorWritten = index;
-        pthread_mutex_unlock(oldestLock);
-        return true;
-    } else if (
-        pthread_mutex_trylock(newestLock) == 0
-        ) {
-        memcpy((void *)sd->sensors[newest], stage, SENSOR_SIZE);
-        //newest = newest
-        sd->latestSensorWritten = index;
-        pthread_mutex_unlock(newestLock);
-        return true;
-    } else {
+    // trylock because we're in the DCMs cycle right now. We don't want to block!
+    int lockret = pthread_mutex_trylock( (pthread_mutex_t *) &(sd->sensor_mutex));
+    if (lockret) {
         return false;
     }
+    // Secured lock
+    // Grab the data quickly then release
+    memcpy((void *)sd->sensors, stage, SENSOR_SIZE);
+    sd->latestSensorWritten = index;
+    pthread_mutex_unlock((pthread_mutex_t *) &(sd->sensor_mutex));
+    
+    return true;
 }
 
 void Boss::DCMPostProcessCallback()
 {
     if (!manRunning) return;
+    
     DCM_TIMING_DEBUG_POST1();
     SensorValues values = sensor.getSensors();
 
@@ -397,42 +392,46 @@ void Boss::DCMPostProcessCallback()
         new ProtoSer(&values.battery),
         new ProtoSer(&values.stiffStatus),
     };
-    uint64_t nextSensorIndex = (shared->latestSensorWritten + 1);
+    
+    int64_t nextSensorIndex = (shared->latestSensorWritten + 1);
     // Serialize the protobufs to shared mem
     if (!serializeTo(objects, nextSensorIndex, sensorStaging, SENSOR_SIZE, NULL)) {
-        std::cout << "O HUCK! Couldn't serialize!" << std::endl;
+        std::cout << "O HUCK! Couldn't serialize!\n";
+        DCM_TIMING_DEBUG_POST2();
         return;
     }
+    
     if (!bossSyncWrite(shared, sensorStaging, nextSensorIndex)) {
-        //printf("Boss::DCMPostProcessCallback COULD NOT POST FRESH SENSORS (skip)\n");
-        ++sensorSkips;
-    }
-    uint64_t lastRead = shared->latestSensorRead;
-    if (nextSensorIndex - lastRead > 2 && (lastRead != 0) && manRunning) {
-        manMissedFrames++; // This (should) happen very rarely.
+        ++sensorLockMiss;
     }
 
-    if (nextSensorIndex - lastRead > 100 && lastRead != 0) {
-        // TODO: Kill? If we get here man is (most likely) already dead
-        //std::cout << "Sensors aren't getting read! Did Man die?" << std::endl;
-        //std::cout << "commandIndex: " << nextSensorIndex << " lastRead: " << lastRead << std::endl;
-        //manRunning = false; // TODO
-        // Man is running very slow
-        killingNext = nextSensorIndex;
-        killingLast = lastRead;
-        killingMan = true;
-    }
     DCM_TIMING_DEBUG_POST2();
 }
 
+const int FIFO_CMND_SIZE = 2;
 void Boss::checkFIFO() {
     // Command is going to be a single char, reading two characters consumes '\0'
-    char command[2];
+    char command[FIFO_CMND_SIZE];
 
-    size_t amt = read(fifo_fd, &command, 2);
-
-    if (amt == 0) {
-        return; // Read nothing
+    ssize_t amt = read(fifo_fd, &command, FIFO_CMND_SIZE);
+    
+    if (amt < 0 && errno != EAGAIN) {
+        int se = errno;
+        printf("ERROR reading nbitesFIFO: %i\n", se);
+        return;
+    }
+    
+    switch (amt) {
+        case 0:
+            return;
+        case 1:
+            printf("Boss::checkFIFO ignoring partial read!\n");
+            return;
+        default:
+            printf("Boss::checkFIFO got unexpected amt return: %li\n", amt);
+            return;
+        case FIFO_CMND_SIZE:
+            ; //continue....
     }
 
     switch(command[0]) {
@@ -449,6 +448,20 @@ void Boss::checkFIFO() {
         std::cout << "MAN_START" << std::endl;
         startMan();
         break;
+    case BOSS_PRINT:
+        print_info();
+        break;
     }
+}
+    
+void Boss::print_info() {
+    int64_t _lw = shared->latestSensorWritten;
+    int64_t _lr = shared->latestSensorRead;
+    printf("BOSS PRINT:\n\tpre-skips=%lld post-skips=%lld\n"
+           "\tman-live: \t%lld\t[%lld - %lld]\n",
+           cmndLockMiss,sensorLockMiss,
+           _lw - _lr, _lw, _lr);
+    
+    fflush(stdout);
 }
 }
