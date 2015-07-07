@@ -62,6 +62,7 @@ def gameSet(player):
         player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
         player.inPosition = constants.CENTER_POSITION
 
+        print "[Goalie debug] Set these"
         watchWithLineChecks.correctFacing = False
         watchWithLineChecks.numFixes = 0
         watchWithLineChecks.numTurns = 0
@@ -278,6 +279,7 @@ def spinToHorizon(player):
 @superState('gameControllerResponder')
 def spinBack(player):
     if player.firstFrame():
+        spinBack.counter = 0
         player.brain.tracker.lookToAngle(0)
         if (math.fabs(-spinBack.toAngle) < 10.0 and -spinBack.toAngle > 0):
             angle = 20.0
@@ -290,6 +292,8 @@ def spinBack(player):
 
     if player.counter % 30 == 0:
         print("Horizon dist == ", player.brain.visionLines.horizon_dist)
+    if spinBack.counter > 150:
+        return player.goLater('watchWithLineChecks')
 
     return Transition.getNextState(player, spinBack)
 

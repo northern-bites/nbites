@@ -70,7 +70,8 @@ def frontLineCheckShouldReposition(player):
         # the goalbox, use the r value to correct the robot's y position
         # If have good t value and bad r value, reposition accordingly
         # Additional r < 100 check to throw away the middle line
-        if math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH \
+        if (math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH \
+        or math.fabs(t - constants.EXPECTED_FRONT_LINE_T_2) < constants.T_THRESH) \
         and math.fabs(r - constants.EXPECTED_FRONT_LINE_R) > constants.R_THRESH \
         and r < 100.0:
             x_dest = r - constants.EXPECTED_FRONT_LINE_R
@@ -119,11 +120,11 @@ def sideLineCheckShouldReposition(player):
         # print("incorrect facing")
         return False
 
-    reasonAbleFrontLine = False
-    for line in GoalieStates.watchWithLineChecks.lines:
-        if math.fabs(math.degrees(line.t) - constants.EXPECTED_FRONT_LINE_T) < 15.0:
-            if line.r > 15.0:
-                reasonAbleFrontLine = True
+    # reasonAbleFrontLine = False
+    # for line in GoalieStates.watchWithLineChecks.lines:
+    #     if math.fabs(math.degrees(line.t) - constants.EXPECTED_FRONT_LINE_T) < 15.0:
+    #         if line.r > 15.0:
+    #             reasonAbleFrontLine = True
 
     if GoalieStates.watchWithLineChecks.numFixes < 1:
         # print "not enough fgixes"
@@ -136,8 +137,7 @@ def sideLineCheckShouldReposition(player):
         # If we find a line that, judging by its t value, is likely the right line,
         # of the goalbox, use the r value to correct the robot's x position
         # Additional r < 200 check to throw away the side field lines
-        if (math.fabs(t - constants.EXPECTED_RIGHT_LINE_T) < constants.T_THRESH \
-            or math.fabs(t - constants.EXPECTED_RIGHT_LINE_T2) < constants.T_THRESH) \
+        if math.fabs(t - constants.EXPECTED_RIGHT_LINE_T) < constants.T_THRESH \
         and math.fabs(r - constants.EXPECTED_SIDE_LINE_R) > constants.R_THRESH \
         and r < 170.0 and r != 0.0:
             y_dest = constants.EXPECTED_SIDE_LINE_R - r
@@ -187,12 +187,13 @@ def shouldTurn(player):
         # the left and right sidelines
         if math.fabs(t - constants.EXPECTED_RIGHT_LINE_T) < constants.T_THRESH \
         or math.fabs(t - constants.EXPECTED_LEFT_LINE_T) < constants.T_THRESH \
-        or r > 100.0 or t == 0.0:
+        or r > 100.0 or r == 0.0:
             continue
 
         # Fix this.. very hacky: basically return that we DON'T need to turn
         # if we see a reasonable front line
-        if math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH\
+        if (math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH\
+        or math.fabs(t - constants.EXPECTED_FRONT_LINE_T_2) < constants.T_THRESH) \
         and not GoalieStates.watchWithLineChecks.correctFacing:
             h_dest = 0.0
             player.homeDirections += [RelRobotLocation(0.0, 0.0, h_dest)]
@@ -218,7 +219,11 @@ def shouldTurn(player):
             # return True
 
         if longestLine is not None:
-            h_dest = t - 90.0
+            if t > 180:
+                h_dest = t - constants.EXPECTED_FRONT_LINE_T_2
+            else:
+                h_dest = t - constants.EXPECTED_FRONT_LINE_T
+
             if h_dest < constants.T_THRESH:
                 return False
             print "Should turn was TRUE"
@@ -259,8 +264,10 @@ def noTopLine(player):
     for line in GoalieStates.watchWithLineChecks.lines:
         r = line.r
         t = math.degrees(line.t)
+        print('t',t, 'r',r)
         length = getLineLength(line)
-        if math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < 30.0\
+        if (math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < 30.0\
+        or math.fabs(t - constants.EXPECTED_FRONT_LINE_T_2) < 30.0) \
         and math.fabs(r - constants.EXPECTED_FRONT_LINE_R) < 15.0:
             # print("found front line!", "r", r, "t", t)
             return False
@@ -301,7 +308,9 @@ def shouldStopGoingBack(player):
         r = visionLines.line(i).inner.r
         t = math.degrees(visionLines.line(i).inner.t)
 
-        if r != 0.0 and r < 40.0 and r > 25.0 and t < 130.0 and t > 50.0:
+        if r != 0.0 and r < 40.0 and r > 25.0 and \
+        (math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < 50.0\
+        or math.fabs(t - constants.EXPECTED_FRONT_LINE_T_2) < 50.0):
             print "I see a line now! I should probably stop going backwards"
             print ("r: ", r)
             print ("t: ", t)
@@ -360,15 +369,16 @@ def facingASideline(player):
 
                 elif GoalieStates.watchWithLineChecks.correctFacing and r1 > 20.0\
                 and r2 > 20.0:
-                    if math.fabs(t1 - 90.0) < math.fabs(t2 - 90.0):
+                    if math.fabs(math.fabs(t1 - 180.0) - 180.0) < math.fabs(math.fabs(t2 - 180.0) - 180.0):
                         frontline = visionLines.line(i).inner
                         sideline = visionLines.line(j).inner
                     else:
                         frontline = visionLines.line(j).inner
                         sideline = visionLines.line(i).inner
 
+                    #TODO adjust this to new line coords
                     # If sideline bearing is to my right, assume right sideline
-                    if math.degrees(sideline.t) < 90.0 or math.degrees(sideline.t) > 270.0:
+                    if math.degrees(sideline.t) > 180.0:
                         print "I think this is my RIGHT sideline, I'm moving away"
                         y_dest = constants.EXPECTED_SIDE_LINE_R - sideline.r
                     else:

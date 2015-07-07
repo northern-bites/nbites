@@ -115,6 +115,7 @@ def clearIt(player):
 
     if (player.brain.ball.rel_x < 30.0) and not clearIt.closeEnuf:
         print "I'm moving my y now"
+        print("ball x", player.brain.ball.rel_x)
         clearIt.closeEnuf = True
         player.brain.nav.goTo(clearIt.ballDest,
                               (3.0, 3.0, 5),
