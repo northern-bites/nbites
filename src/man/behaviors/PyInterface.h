@@ -13,7 +13,7 @@
 #include "WorldModel.pb.h"
 #include "PMotion.pb.h"
 #include "MotionStatus.pb.h"
-#include "Vision.pb.h"
+//#include "Vision.pb.h"
 #include "ButtonState.pb.h"
 #include "FallStatus.pb.h"
 #include "StiffnessControl.pb.h"

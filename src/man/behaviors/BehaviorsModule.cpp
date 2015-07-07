@@ -259,6 +259,7 @@ void BehaviorsModule::prepareMessages()
     obstacleIn.latch();
     pyInterface.setObstacle_ptr(&obstacleIn.message());
 
+
     // visionObstacleIn.latch();
     // pyInterface.setVisionObstacle_ptr(&visionObstacleIn.message());
 

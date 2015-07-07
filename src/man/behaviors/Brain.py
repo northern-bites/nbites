@@ -236,7 +236,7 @@ class Brain(object):
 
     def updateVision(self):
         self.visionLines = self.interface.vision
-        self.visionCorners = self.interface.vision
+     #   self.visionCorners = self.interface.vision
 
     def updateVisionObjects(self):
         """
