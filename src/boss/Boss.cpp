@@ -81,7 +81,6 @@ bool DCM_TIMING_DEBUG_END() {
 
 #endif
 
-
 #define MAN_DEAD_THRESHOLD 500
 #define BOSS_MAIN_LOOP_US 500000
 
@@ -273,6 +272,7 @@ int Boss::constructSharedMem()
 
         return -1;
     }
+    
     if (ftruncate(shared_fd, sizeof(SharedData)) == -1) {
         std::cout << "Couldn't truncate shared mem" << std::endl;
         return -1;
