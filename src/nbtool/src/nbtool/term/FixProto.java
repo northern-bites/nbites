@@ -6,20 +6,20 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import nbtool.util.Logger;
+//import nbtool.util.Logger;
 
 public class FixProto {
 	
 	public static void main(String[] args) throws Exception {
 		String nbdir = System.getenv("NBITES_DIR");
 		nbdir += "/src/share/messages/";
-		Logger.println("at: " + nbdir);
+		System.out.println("at: " + nbdir);
 		
 		File mdir = new File(nbdir);
 		assert(mdir.exists() && mdir.isDirectory());
 		for (File file : mdir.listFiles()) {
 			if (file.getAbsolutePath().endsWith(".proto")) {
-				Logger.printf("found: %s", file.getName());
+				System.out.printf("found: %s\n", file.getName());
 				byte[] bytes = Files.readAllBytes(file.toPath());
 				String content = new String(bytes, StandardCharsets.UTF_8);
 				
@@ -32,7 +32,7 @@ public class FixProto {
 				
 				String fileName = file.getName().substring(0, file.getName().length() - ".proto".length());
 				//Logger.println(fileName);
-				String outerName = String.format("_OuterClass_%s", fileName);
+				String outerName = String.format("_File_%s", fileName);
 				String start = content.substring(0, end_i);
 				String end = content.substring(end_i);
 				String middle = String.format("\n\noption java_outer_classname = \"%s\";\n" +
@@ -40,8 +40,8 @@ public class FixProto {
 						outerName);
 				
 				String final_content = start + middle + end;
-				Logger.println(final_content);
-				//Files.write(file.toPath(), final_content.getBytes(StandardCharsets.UTF_8));
+				System.out.println(final_content);
+				Files.write(file.toPath(), final_content.getBytes(StandardCharsets.UTF_8));
 			}
 		}
 	}

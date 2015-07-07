@@ -15,7 +15,7 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import messages.HeaderOuterClass.Header;
+import messages.Header;
 import nbtool.data.Log;
 import nbtool.data.SExpr;
 import nbtool.io.CommonIO;

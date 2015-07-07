@@ -109,12 +109,12 @@ public final class FSR extends
   }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return messages.FSROuterClass.internal_static_messages_FSR_descriptor;
+    return messages._File_FSR.internal_static_messages_FSR_descriptor;
   }
 
   protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return messages.FSROuterClass.internal_static_messages_FSR_fieldAccessorTable
+    return messages._File_FSR.internal_static_messages_FSR_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.FSR.class, messages.FSR.Builder.class);
   }
@@ -494,12 +494,12 @@ public final class FSR extends
       messages.FSROrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return messages.FSROuterClass.internal_static_messages_FSR_descriptor;
+      return messages._File_FSR.internal_static_messages_FSR_descriptor;
     }
 
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return messages.FSROuterClass.internal_static_messages_FSR_fieldAccessorTable
+      return messages._File_FSR.internal_static_messages_FSR_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               messages.FSR.class, messages.FSR.Builder.class);
     }
@@ -549,7 +549,7 @@ public final class FSR extends
 
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return messages.FSROuterClass.internal_static_messages_FSR_descriptor;
+      return messages._File_FSR.internal_static_messages_FSR_descriptor;
     }
 
     public messages.FSR getDefaultInstanceForType() {

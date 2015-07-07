@@ -1,5 +1,10 @@
 package messages;
 
+option java_outer_classname = "_File_RobotLocation";
+option java_multiple_files = true;
+
+
+
 // robot locations should have a pose, and an uncertainty associated with it
 message RobotLocation
 {

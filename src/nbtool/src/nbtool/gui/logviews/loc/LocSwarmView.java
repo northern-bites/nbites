@@ -12,10 +12,7 @@ package nbtool.gui.logviews.loc;
 
 	import com.google.protobuf.Message;
 
-	import messages.RobotLocationOuterClass.*;
-	import messages.ParticleSwarmOuterClass.ParticleSwarm;
-	import messages.ParticleSwarmOuterClass.Particle;
-	import messages.Vision.*;
+	import messages.*;
 
 	import nbtool.data.Log;
 	import nbtool.data.SExpr;

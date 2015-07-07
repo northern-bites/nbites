@@ -15,8 +15,7 @@ import nbtool.io.CommonIO.SequenceErrorException;
 import nbtool.util.Events;
 import nbtool.util.Logger;
 
-import messages.CameraParamsOuterClass;
-import messages.CameraParamsOuterClass.CameraParams;
+import messages.*;
 
 /*
  * Astute observers will notice this code is remarkably similar to the netIO code
