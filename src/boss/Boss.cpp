@@ -95,14 +95,20 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
 {
     printf("\t\tboss 7/%d\n", BOSS_VERSION);
     std::cout << "Boss Constructor" << std::endl;
+    bool success = true;
+    
+    if ( pthread_mutexattr_init(&shared_mutex_attr) ||
+        pthread_mutexattr_setpshared(&shared_mutex_attr, PTHREAD_PROCESS_SHARED) )
+    {
+        std::cout << "ERROR constructing shared process mutex attributes!" << std::endl;
+        success = false;
+    }
 
-    if (constructSharedMem() != 1) {
+    if ( constructSharedMem() ) {
         std::cout << "Couldn't construct shared mem, oh well!" << std::endl;
         return;
     }
     
-    bool success = true;
-
     // Link up to the DCM loop
     try {
         dcmPreProcessConnection = broker_->getProxy("DCM")->getModule()->atPreProcess(
@@ -126,13 +132,6 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     if (fifo_fd <= 0) {
         std::cout << "FIFO ERROR" << std::endl;
         std::cout << "Boss will not be able to receive commands from terminal" << std::endl;
-        success = false;
-    }
-    
-    if ( pthread_mutexattr_init(&shared_mutex_attr) ||
-        pthread_mutexattr_setpshared(&shared_mutex_attr, PTHREAD_PROCESS_SHARED) )
-    {
-        std::cout << "ERROR constructing shared process mutex attributes!" << std::endl;
         success = false;
     }
    
@@ -241,7 +240,6 @@ int Boss::killMan() {
     sensorLockMiss = 0;
 
     // Just in case we interrupted (man) in the middle of a critical section
-    
     pthread_mutex_destroy((pthread_mutex_t *) &shared->sensor_mutex);
     pthread_mutex_destroy((pthread_mutex_t *) &shared->cmnd_mutex);
     pthread_mutex_init( (pthread_mutex_t *) &shared->sensor_mutex, &shared_mutex_attr);
@@ -282,7 +280,7 @@ int Boss::constructSharedMem()
     pthread_mutex_init( (pthread_mutex_t *) &shared->sensor_mutex, &shared_mutex_attr);
     pthread_mutex_init( (pthread_mutex_t *) &shared->cmnd_mutex, &shared_mutex_attr);
 
-    return 1;
+    return 0;
 }
 
 
