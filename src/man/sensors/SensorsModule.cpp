@@ -111,7 +111,6 @@ void SensorsModule::updateSensorValues()
         return;
     }
     
-
     Deserialize des(sensorsStage);
     if (!des.parse() || des.nObjects() < 10) {
         std::cout << "Sensors couldn't parse anything from shared memory! returning" << std::endl;

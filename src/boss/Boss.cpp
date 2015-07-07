@@ -73,7 +73,7 @@ bool DCM_TIMING_DEBUG_END() {
 
 #endif
 
-#define MAN_DEAD_THRESHOLD 500
+#define MAN_DEAD_THRESHOLD 2000
 #define BOSS_MAIN_LOOP_US 500000
 
 namespace boss {
@@ -230,8 +230,7 @@ int Boss::killMan() {
     sleep(5);
 
     // Clear the buffers
-    memset((void*)shared->sensors[0], 0, SENSOR_SIZE);
-    memset((void*)shared->sensors[1], 0, SENSOR_SIZE);
+    memset((void*)shared->sensors, 0, SENSOR_SIZE);
     memset((void*)shared->command, 0, COMMAND_SIZE);
     shared->latestCommandWritten = 0;
     shared->latestCommandRead = 0;
