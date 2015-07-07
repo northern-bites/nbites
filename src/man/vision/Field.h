@@ -67,6 +67,7 @@ public:
     int getInitialHorizonEstimate(int pH);
     int getImprovedEstimate(int pH);
 	int horizonAt(int x);
+    float horizonDist() { return getPixDistance(horizonAt(IMAGE_WIDTH / 2)); }
 	int occludingHorizonAt(int x);
 	float distanceToHorizon(int x, int y);
 	int ccw(point<int> p1, point<int> p2, point<int> p3);
