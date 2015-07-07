@@ -2,6 +2,11 @@ import "WorldModel.proto";
 
 package messages;
 
+option java_outer_classname = "_File_TeamPacket";
+option java_multiple_files = true;
+
+
+
 message TeamPacket
 {
     optional string header = 1 ;

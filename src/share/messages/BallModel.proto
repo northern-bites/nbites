@@ -1,5 +1,10 @@
 package messages;
 
+option java_outer_classname = "_File_BallModel";
+option java_multiple_files = true;
+
+
+
 message VisionBall {
     optional double distance = 1;
     optional double bearing = 2;

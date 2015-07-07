@@ -11,8 +11,7 @@ import nbtool.io.ControlIO;
 import nbtool.io.ControlIO.ControlInstance;
 import nbtool.util.NBConstants.*;
 import nbtool.util.Logger;
-import messages.CameraParamsOuterClass;
-import messages.CameraParamsOuterClass.CameraParams;
+import messages.CameraParams;
 
 import java.io.File;
 import java.io.FileOutputStream;

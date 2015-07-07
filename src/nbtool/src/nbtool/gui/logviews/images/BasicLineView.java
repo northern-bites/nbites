@@ -30,7 +30,7 @@ import nbtool.util.Utility;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 
-import messages.Vision.*;
+import messages.*;
 
 public class BasicLineView extends ViewParent {
 

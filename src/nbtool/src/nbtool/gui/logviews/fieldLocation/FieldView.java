@@ -6,7 +6,7 @@ import javax.swing.*;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import messages.RobotLocationOuterClass.RobotLocation;
+import messages.RobotLocation;
 import nbtool.data.Log;
 import nbtool.gui.logviews.misc.ViewParent;
 
