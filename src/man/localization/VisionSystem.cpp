@@ -8,7 +8,7 @@ namespace man {
 namespace localization {
 
 VisionSystem::VisionSystem() 
-    : injections(), numObservations(0), lowestError(0), avgError(0), weightedAvgError(0)
+    : injections(), numObservations(0), avgError(0)
 {
     lineSystem = new LineSystem;
 }
@@ -19,58 +19,54 @@ VisionSystem::~VisionSystem()
 }
 
 bool VisionSystem::update(ParticleSet& particles,
-                          const messages::FieldLines& lines)
+                          const messages::FieldLines& lines,
+                          const messages::Corners& corners)
 {
     numObservations = 0;
-    lowestError = std::numeric_limits<float>::max();
     avgError = 0;
-    weightedAvgError = 0;
- 
-    float totalWeight = 0.0f;
-    float sumParticleError = 0.f;
 
-    numObservations = lines.line_size();
+    // Check that there are valid observations
+    for (int i = 0; i < lines.line_size(); i++) {
+        if (!LineSystem::shouldUse(lines.line(i)))
+            continue;
+        numObservations++;
+    }
     if (numObservations == 0)
         return false;
 
     // Loop over particles and adjust weights
     ParticleIt iter;
+    double totalWeight = 0;
     for(iter = particles.begin(); iter != particles.end(); iter++) {
         Particle* particle = &(*iter);
         float curParticleError = 0;
 
         // Score particles according to how well they match with detected lines
+        bool firstLine = true;
         for (int i = 0; i < lines.line_size(); i++) {
             if (!LineSystem::shouldUse(lines.line(i)))
                 continue;
-            curParticleError += lineSystem->scoreObservation(lines.line(i), particle->getLocation());
+
+            if (firstLine) {
+                curParticleError = lineSystem->scoreObservation(lines.line(i), particle->getLocation());
+                firstLine = false;
+            } else
+                curParticleError = curParticleError*lineSystem->scoreObservation(lines.line(i), particle->getLocation());
         }
 
-        // Set the particle's weight (no golf scores)
-        // TODO divide by zero
-        float avgErr = curParticleError / static_cast<float>(numObservations);
-        particle->setWeight(1 / avgErr);
+        // Set the particle's weight
+        particle->setWeight(curParticleError);
         totalWeight += particle->getWeight();
-
-        // Update the total swarm error
-        sumParticleError += avgErr;
-        particle->setError(avgErr);
-        if (avgErr < lowestError)
-            lowestError = avgErr;
     }
 
-    // Normalize the particle weights and calculate the weighted avg error
-    weightedAvgError = 0.f;
-    for(iter = particles.begin(); iter != particles.end(); iter++)
-    {
+    // Normalize the particle weights
+    for(iter = particles.begin(); iter != particles.end(); iter++) {
         Particle* particle = &(*iter);
         particle->normalizeWeight(totalWeight);
-        weightedAvgError += particle->getWeight() * particle->getError();
     }
 
-    // Calculate avgError by dividing the total by the number of particles
-    avgError = sumParticleError / static_cast<float>(particles.size());
-    lowestError = lowestError;
+    // Calculate error metric for particle filter
+    avgError = totalWeight / static_cast<float>(particles.size());
 
     // Particle injections
     // (1) Reconstruct pose by finding the midpoint of the top goalbox
@@ -84,13 +80,9 @@ bool VisionSystem::update(ParticleSet& particles,
             //      the side of the field that our estimate is on
             std::vector<LocLineID> ids { LocLineID::OurTopGoalbox, LocLineID::TheirTopGoalbox };
             for (int i = 0; i < ids.size(); i++) {
-                messages::RobotLocation pose = lineSystem->reconstructPosition(ids[i], field);
-                ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), ids[i] == LocLineID::OurTopGoalbox);
-
-                // Sanity check, reconstruction must be on field
-                if( (reconstructed.x >= 0 && reconstructed.y <= FIELD_GREEN_WIDTH) &&
-                    (reconstructed.y >= 0 && reconstructed.y <= FIELD_GREEN_HEIGHT)  )
-                    injections.push_back(reconstructed);
+                messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(ids[i], field);
+                ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h());
+                injections.push_back(reconstructed);
             }
         }
     }

@@ -55,11 +55,11 @@ class Kick(object):
 
 # Sweet move-based kicks
 LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", 
-                                 x = 17.2, y =  3.6,
+                                 x = 14.8, y =  3.6,
                                  dist = 300,
                                  move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
 RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", 
-                                 x = 17.2, y = -3.6,
+                                 x = -13, y = -3.6,
                                  dist = 300,
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 
