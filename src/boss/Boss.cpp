@@ -61,11 +61,6 @@ bool DCM_TIMING_DEBUG_END() {
     return false;
 }
 
-#define DEBUG_MAN_DEAD() {  int64_t _lw = shared->latestSensorWritten;   \
-                            int64_t _lr = shared->latestSensorRead;      \
-                            printf("BOSS-MAN:%lld\t[%lld - %lld]\n", \
-                            _lw - _lr, _lw, _lr);                    }
-
 #else
 
 #define DCM_TIMING_DEBUG_PRE1()
@@ -75,8 +70,6 @@ bool DCM_TIMING_DEBUG_END() {
 
 #define DCM_TIMING_DEBUG_START()
 #define DCM_TIMING_DEBUG_END() false
-
-#define DEBUG_MAN_DEAD()
 
 #endif
 
@@ -172,10 +165,10 @@ void Boss::listener()
     while(true)
     {
         if (manRunning) {
-            //DEBUG_MAN_DEAD();
             
             if ( (shared->latestSensorWritten - shared->latestSensorRead) > MAN_DEAD_THRESHOLD ) {
-                printf("Boss::listener() killing man due to inactivity.\n");
+                std::cout << "Boss::listener() killing man due to inactivity" << std::endl;
+                print_info();
                 killMan();
                 continue;
             }
@@ -404,7 +397,7 @@ void Boss::DCMPostProcessCallback()
     int64_t nextSensorIndex = (shared->latestSensorWritten + 1);
     // Serialize the protobufs to shared mem
     if (!serializeTo(objects, nextSensorIndex, sensorStaging, SENSOR_SIZE, NULL)) {
-        std::cout << "O HUCK! Couldn't serialize!" << std::endl;
+        std::cout << "O HUCK! Couldn't serialize!\n";
         DCM_TIMING_DEBUG_POST2();
         return;
     }
@@ -457,13 +450,19 @@ void Boss::checkFIFO() {
         startMan();
         break;
     case BOSS_PRINT:
-        int64_t _lw = shared->latestSensorWritten;
-        int64_t _lr = shared->latestSensorRead;
-        printf("BOSS PRINT:\n\tpre-skips=%lld post-skips=%lld\n"
-               "\tman-live: \t%lld\t[%lld - %lld]\n",
-               cmndLockMiss,sensorLockMiss,
-               _lw - _lr, _lw, _lr);
+        print_info();
         break;
     }
+}
+    
+void Boss::print_info() {
+    int64_t _lw = shared->latestSensorWritten;
+    int64_t _lr = shared->latestSensorRead;
+    printf("BOSS PRINT:\n\tpre-skips=%lld post-skips=%lld\n"
+           "\tman-live: \t%lld\t[%lld - %lld]\n",
+           cmndLockMiss,sensorLockMiss,
+           _lw - _lr, _lw, _lr);
+    
+    fflush(stdout);
 }
 }

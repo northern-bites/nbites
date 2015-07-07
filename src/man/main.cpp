@@ -44,7 +44,6 @@ void establishLock()
         std::cout << "Could not establish lock on lock file. Is man already running?" << std::endl;
         exit(0);
     }
-
 }
 
 int main() {

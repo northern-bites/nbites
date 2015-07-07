@@ -72,6 +72,8 @@ private:
     uint64_t sensorLockMiss;
 
     int fifo_fd;
+    
+    void print_info();
 };
 
 }
