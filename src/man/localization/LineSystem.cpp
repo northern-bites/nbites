@@ -10,17 +10,20 @@ LineSystem::LineSystem()
 {
     // Part I
     // Add lines in absolute field coordinates to lines map
-    addLine(LocLineID::OurEndline, GREEN_PAD_X, 0, -GREEN_PAD_Y, -(GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
+    // TODO document sign convention
+    addLine(LocLineID::OurEndline, -GREEN_PAD_X, M_PI, -GREEN_PAD_Y, -(GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
     addLine(LocLineID::TheirEndline, GREEN_PAD_X + FIELD_WHITE_WIDTH, 0, -GREEN_PAD_Y, -(GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
 
     // NOTE two midlines so that reconstructions can be handled gracefully from
     //      either side of the field
-    addLine(LocLineID::TheirMidline, CENTER_FIELD_X, 0, -GREEN_PAD_Y, -(GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
+    addLine(LocLineID::TheirMidline, -CENTER_FIELD_X, M_PI, -GREEN_PAD_Y, -(GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
     addLine(LocLineID::OurMidline, CENTER_FIELD_X, 0, -GREEN_PAD_Y, -(GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
 
-    addLine(LocLineID::OurTopGoalbox, GREEN_PAD_X + GOALBOX_DEPTH, 0, -BLUE_GOALBOX_BOTTOM_Y, -BLUE_GOALBOX_TOP_Y);
+    addLine(LocLineID::OurTopGoalbox, -(GREEN_PAD_X + GOALBOX_DEPTH), M_PI, -BLUE_GOALBOX_BOTTOM_Y, -BLUE_GOALBOX_TOP_Y);
     addLine(LocLineID::TheirTopGoalbox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH , 0, -YELLOW_GOALBOX_BOTTOM_Y, -YELLOW_GOALBOX_TOP_Y);
 
+    // NOTE system currently doesn't support reconstructions from sideline, so
+    //      these lines are not polarized
     addLine(LocLineID::RightSideline, GREEN_PAD_Y, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
     addLine(LocLineID::LeftSideline, GREEN_PAD_Y + FIELD_WHITE_HEIGHT, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
 
@@ -141,7 +144,7 @@ double LineSystem::scoreLine(const messages::FieldLine& observation,
 }
 
 // NOTE method assumes that endpoints seen in observation are endpoints of line
-// TODO update
+// IMPORTANT only tested with id == OurTopGoalbox || TheirTopGoalbox
 messages::RobotLocation LineSystem::reconstructFromMidpoint(LocLineID id, 
                                                             const messages::FieldLine& observation)
 {
@@ -175,7 +178,6 @@ messages::RobotLocation LineSystem::reconstructFromMidpoint(LocLineID id,
     return position;
 }
 
-// TODO update
 messages::RobotLocation LineSystem::reconstructWoEndpoints(LocLineID id, 
                                                            const messages::FieldLine& observation)
 {
@@ -234,10 +236,9 @@ double LineSystem::scoreObservation(const vision::GeoLine& observation,
 {
     // Normalize correspondingLine to have positive r and t between 0 and PI / 2 
     // NOTE see constructor for explanation of what negative r means in this context
-    // TODO update
     double normalizedT = (correspondingLine.r() > 0 ? correspondingLine.t() : correspondingLine.t() - M_PI);
     vision::GeoLine normalizedCorrespondingLine;
-    normalizedCorrespondingLine.set(correspondingLine.r(), correspondingLine.t(),
+    normalizedCorrespondingLine.set(fabs(correspondingLine.r()), normalizedT,
                                     correspondingLine.ep0(), correspondingLine.ep1());
     
     // Landmark in map, absolute to robot relative
