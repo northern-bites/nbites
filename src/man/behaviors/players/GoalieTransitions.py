@@ -254,6 +254,19 @@ def shouldGoForward(player):
 
     return False
 
+def noTopLine(player):
+    getLines(player)
+    for line in GoalieStates.watchWithLineChecks.lines:
+        r = line.r
+        t = math.degrees(line.t)
+        length = getLineLength(line)
+        if math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < 30.0\
+        and math.fabs(r - constants.EXPECTED_FRONT_LINE_R) < 15.0:
+            # print("found front line!", "r", r, "t", t)
+            return False
+
+    # print "NO top line!!!"
+    return True
 
 def shouldBackUp(player):
     # If we cannot see any good lines, should probably back up!
@@ -261,7 +274,7 @@ def shouldBackUp(player):
     for line in GoalieStates.watchWithLineChecks.lines:
         r = line.r
         t = math.degrees(line.t)
-        print("found line!", r)
+        # print("found line!", r)
 
         if r < 220.0 and r != 0.0:
             return False
@@ -762,17 +775,17 @@ def shouldDiveRight(player):
         sightOk):
         print "DIVE RIGHT"
 
-    return (nball.x_vel < -10.0 and
-        not nball.stationary and
-        nball.yintercept < -20.0 and
-        ball.distance < 150.0 and
-        sightOk)
+    # return (nball.x_vel < -10.0 and
+    #     not nball.stationary and
+    #     nball.yintercept < -20.0 and
+    #     ball.distance < 150.0 and
+    #     sightOk)
 
-    # return (ball.mov_vel_x < -6.0 and
-    #         ball.mov_speed > 8.0 and
-    #         ball.rel_y_intersect_dest < -20.0 and
-    #         ball.distance < 150.0 and
-    #         sightOk)
+    return (ball.mov_vel_x < -6.0 and
+            ball.mov_speed > 8.0 and
+            ball.rel_y_intersect_dest < -20.0 and
+            ball.distance < 150.0 and
+            sightOk)
 
 def shouldDiveLeft(player):
 
@@ -797,17 +810,17 @@ def shouldDiveLeft(player):
         sightOk):
         print "DIVE LEFT"
 
-    return (nball.x_vel < -10.0 and
-        not nball.stationary and
-        nball.yintercept > 20.0 and
-        ball.distance < 150.0 and
-        sightOk)
+    # return (nball.x_vel < -10.0 and
+    #     not nball.stationary and
+    #     nball.yintercept > 20.0 and
+    #     ball.distance < 150.0 and
+    #     sightOk)
 
-    # return (ball.mov_vel_x < -6.0 and
-    #         ball.mov_speed > 8.0 and
-    #         ball.rel_y_intersect_dest > 20.0 and
-    #         ball.distance < 150.0 and
-    #         sightOk)
+    return (ball.mov_vel_x < -6.0 and
+            ball.mov_speed > 8.0 and
+            ball.rel_y_intersect_dest > 20.0 and
+            ball.distance < 150.0 and
+            sightOk)
 
 def shouldSquat(player):
 
@@ -836,18 +849,18 @@ def shouldSquat(player):
     # Lower threshold for fast balls
     # if nball.x_vel < -30.0 and abs(nball.yintercept)
 
-    return (nball.x_vel < -10.0 and
-        not nball.stationary and
-        abs(nball.yintercept) < 30.0 and
-        nball.yintercept != 0.0 and
-        ball.distance < 150.0 and
-        sightOk)
+    # return (nball.x_vel < -10.0 and
+    #     not nball.stationary and
+    #     abs(nball.yintercept) < 30.0 and
+    #     nball.yintercept != 0.0 and
+    #     ball.distance < 150.0 and
+    #     sightOk)
 
-    # return (ball.mov_vel_x < -4.0 and
-    #         ball.mov_speed > 8.0 and
-    #         abs(ball.rel_y_intersect_dest) < 40.0 and
-    #         ball.distance < 150.0 and
-    #         sightOk)
+    return (ball.mov_vel_x < -4.0 and
+            ball.mov_speed > 8.0 and
+            abs(ball.rel_y_intersect_dest) < 40.0 and
+            ball.distance < 150.0 and
+            sightOk)
 
 def shouldClearDangerousBall(player):
     return False

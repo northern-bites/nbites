@@ -187,7 +187,9 @@ def standStill(player):
 @superState('gameControllerResponder')
 def watchWithLineChecks(player):
     if player.firstFrame():
+        watchWithLineChecks.counter = 0
         print ("My num turns:", watchWithLineChecks.numTurns)
+        print ("My num fix:", watchWithLineChecks.numFixes)
         watchWithLineChecks.lines[:] = []
         player.homeDirections = []
 
@@ -233,10 +235,11 @@ def watchWithLineChecks(player):
         watchWithLineChecks.looking = False
         player.brain.tracker.trackBall()
 
-    if player.counter > 400 or watchWithLineChecks.numFixes > 6:
-        print "Counter was over 400, going to watch!"
+    if watchWithLineChecks.counter > 300 or watchWithLineChecks.numFixes > 6:
+        print "Counter was over 300, going to watch!"
         return player.goLater('watch')
 
+    watchWithLineChecks.counter += 1
     return Transition.getNextState(player, watchWithLineChecks)
 
 watchWithLineChecks.lines = []
