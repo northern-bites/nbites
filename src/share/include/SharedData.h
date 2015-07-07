@@ -2,6 +2,10 @@
 
 #include <pthread.h>
 
+#if !defined(_POSIX_THREAD_PROCESS_SHARED) && !defined(PTHREAD_PROCESS_SHARED)
+#error "Boss must be able to share mutexes between processes"
+#endif
+
 #include "PMotion.pb.h"
 #include "ButtonState.pb.h"
 #include "InertialState.pb.h"
@@ -19,13 +23,13 @@ static const int COMMAND_SIZE = (1 << 11);
 static const int SENSOR_SIZE = (1 << 10);
 
 struct JointCommand {
-    uint64_t writeIndex;
+    int64_t writeIndex;
     messages::JointAngles jointsCommand;
     messages::JointAngles stiffnessCommand;
 };
 
 struct SensorValues {
-    uint64_t writeIndex;
+    int64_t writeIndex;
     messages::JointAngles joints;
     messages::JointAngles currents;
     messages::JointAngles temperature;
@@ -39,18 +43,25 @@ struct SensorValues {
 };
 
 struct SharedData {
-    uint8_t sensors[2][SENSOR_SIZE];
+    uint8_t sensors[SENSOR_SIZE];
     uint8_t command[COMMAND_SIZE];
 
-    pthread_mutex_t sensor_mutex[2];
+    pthread_mutex_t sensor_mutex;
     pthread_mutex_t cmnd_mutex;
 
-    uint8_t sensorSwitch;
-    uint64_t latestSensorWritten;
-    uint64_t latestSensorRead;
+    //indices signed so that if (read > written), for whatever horrible reason,
+    //simple (last_written - last_read) difference checks will still work.
+    
+    /* NOTE: it is assumed these values will never overflow (would require 9e15 frames,
+     or 25019997929 hours) */
+    
+    int64_t latestSensorWritten;
+    int64_t latestSensorRead;
 
-    uint64_t latestCommandWritten;
-    uint64_t latestCommandRead;
-
+    int64_t latestCommandWritten;
+    int64_t latestCommandRead;
+    
     uint8_t sit;
 };
+
+
