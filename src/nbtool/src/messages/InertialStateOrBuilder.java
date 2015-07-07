@@ -69,7 +69,16 @@ public interface InertialStateOrBuilder extends
   float getGyrY();
 
   /**
-   * <code>optional float angle_x = 6;</code>
+   * <code>optional float gyr_z = 6;</code>
+   */
+  boolean hasGyrZ();
+  /**
+   * <code>optional float gyr_z = 6;</code>
+   */
+  float getGyrZ();
+
+  /**
+   * <code>optional float angle_x = 7;</code>
    *
    * <pre>
    * Filtered angle data.
@@ -77,7 +86,7 @@ public interface InertialStateOrBuilder extends
    */
   boolean hasAngleX();
   /**
-   * <code>optional float angle_x = 6;</code>
+   * <code>optional float angle_x = 7;</code>
    *
    * <pre>
    * Filtered angle data.
@@ -86,11 +95,20 @@ public interface InertialStateOrBuilder extends
   float getAngleX();
 
   /**
-   * <code>optional float angle_y = 7;</code>
+   * <code>optional float angle_y = 8;</code>
    */
   boolean hasAngleY();
   /**
-   * <code>optional float angle_y = 7;</code>
+   * <code>optional float angle_y = 8;</code>
    */
   float getAngleY();
+
+  /**
+   * <code>optional float angle_z = 9;</code>
+   */
+  boolean hasAngleZ();
+  /**
+   * <code>optional float angle_z = 9;</code>
+   */
+  float getAngleZ();
 }

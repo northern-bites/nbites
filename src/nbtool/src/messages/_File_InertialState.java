@@ -22,11 +22,12 @@ public final class _File_InertialState {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\023InertialState.proto\022\010messages\"|\n\rInert" +
-      "ialState\022\r\n\005acc_x\030\001 \001(\002\022\r\n\005acc_y\030\002 \001(\002\022\r" +
-      "\n\005acc_z\030\003 \001(\002\022\r\n\005gyr_x\030\004 \001(\002\022\r\n\005gyr_y\030\005 " +
-      "\001(\002\022\017\n\007angle_x\030\006 \001(\002\022\017\n\007angle_y\030\007 \001(\002B\027B" +
-      "\023_File_InertialStateP\001"
+      "\n\023InertialState.proto\022\010messages\"\234\001\n\rIner" +
+      "tialState\022\r\n\005acc_x\030\001 \001(\002\022\r\n\005acc_y\030\002 \001(\002\022" +
+      "\r\n\005acc_z\030\003 \001(\002\022\r\n\005gyr_x\030\004 \001(\002\022\r\n\005gyr_y\030\005" +
+      " \001(\002\022\r\n\005gyr_z\030\006 \001(\002\022\017\n\007angle_x\030\007 \001(\002\022\017\n\007" +
+      "angle_y\030\010 \001(\002\022\017\n\007angle_z\030\t \001(\002B\027B\023_File_" +
+      "InertialStateP\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -45,7 +46,7 @@ public final class _File_InertialState {
     internal_static_messages_InertialState_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_InertialState_descriptor,
-        new java.lang.String[] { "AccX", "AccY", "AccZ", "GyrX", "GyrY", "AngleX", "AngleY", });
+        new java.lang.String[] { "AccX", "AccY", "AccZ", "GyrX", "GyrY", "GyrZ", "AngleX", "AngleY", "AngleZ", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

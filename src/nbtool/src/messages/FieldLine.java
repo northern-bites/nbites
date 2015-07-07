@@ -86,6 +86,11 @@ public final class FieldLine extends
             id_ = input.readInt32();
             break;
           }
+          case 37: {
+            bitField0_ |= 0x00000008;
+            prob_ = input.readFloat();
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -183,10 +188,26 @@ public final class FieldLine extends
     return id_;
   }
 
+  public static final int PROB_FIELD_NUMBER = 4;
+  private float prob_;
+  /**
+   * <code>optional float prob = 4;</code>
+   */
+  public boolean hasProb() {
+    return ((bitField0_ & 0x00000008) == 0x00000008);
+  }
+  /**
+   * <code>optional float prob = 4;</code>
+   */
+  public float getProb() {
+    return prob_;
+  }
+
   private void initFields() {
     inner_ = messages.HoughLine.getDefaultInstance();
     outer_ = messages.HoughLine.getDefaultInstance();
     id_ = 0;
+    prob_ = 0F;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -210,6 +231,9 @@ public final class FieldLine extends
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       output.writeInt32(3, id_);
     }
+    if (((bitField0_ & 0x00000008) == 0x00000008)) {
+      output.writeFloat(4, prob_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -230,6 +254,10 @@ public final class FieldLine extends
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(3, id_);
+    }
+    if (((bitField0_ & 0x00000008) == 0x00000008)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeFloatSize(4, prob_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSerializedSize = size;
@@ -364,6 +392,8 @@ public final class FieldLine extends
       bitField0_ = (bitField0_ & ~0x00000002);
       id_ = 0;
       bitField0_ = (bitField0_ & ~0x00000004);
+      prob_ = 0F;
+      bitField0_ = (bitField0_ & ~0x00000008);
       return this;
     }
 
@@ -412,6 +442,10 @@ public final class FieldLine extends
         to_bitField0_ |= 0x00000004;
       }
       result.id_ = id_;
+      if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+        to_bitField0_ |= 0x00000008;
+      }
+      result.prob_ = prob_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -436,6 +470,9 @@ public final class FieldLine extends
       }
       if (other.hasId()) {
         setId(other.getId());
+      }
+      if (other.hasProb()) {
+        setProb(other.getProb());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       return this;
@@ -724,6 +761,38 @@ public final class FieldLine extends
     public Builder clearId() {
       bitField0_ = (bitField0_ & ~0x00000004);
       id_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private float prob_ ;
+    /**
+     * <code>optional float prob = 4;</code>
+     */
+    public boolean hasProb() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional float prob = 4;</code>
+     */
+    public float getProb() {
+      return prob_;
+    }
+    /**
+     * <code>optional float prob = 4;</code>
+     */
+    public Builder setProb(float value) {
+      bitField0_ |= 0x00000008;
+      prob_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional float prob = 4;</code>
+     */
+    public Builder clearProb() {
+      bitField0_ = (bitField0_ & ~0x00000008);
+      prob_ = 0F;
       onChanged();
       return this;
     }

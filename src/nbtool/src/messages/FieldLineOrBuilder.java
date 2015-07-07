@@ -41,4 +41,13 @@ public interface FieldLineOrBuilder extends
    * <code>optional int32 id = 3;</code>
    */
   int getId();
+
+  /**
+   * <code>optional float prob = 4;</code>
+   */
+  boolean hasProb();
+  /**
+   * <code>optional float prob = 4;</code>
+   */
+  float getProb();
 }
