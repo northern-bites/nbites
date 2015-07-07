@@ -3,6 +3,7 @@
  **/
 
 #include "Man.h"
+#include "SharedData.h"
 
 #include <sys/file.h>
 #include <errno.h>
@@ -50,7 +51,7 @@ int main() {
     signal(SIGTERM, handler);
     establishLock();
     
-    printf("\t\tman 7/9\n");
+    printf("\t\tman 7/%d\n", BOSS_VERSION);
     printf("Man re-opening stdout...\n");
     freopen(MAN_LOG_PATH, "w", stdout);
 
