@@ -74,15 +74,6 @@ RIGHT_BIG_KICK = Kick("R_Big_Straight",
                       dist = 500,
                       move=SweetMoves.RIGHT_BIG_KICK)
 
-LEFT_SIDE_KICK =  Kick("L_Side", 
-                       x = 17.5, y =  2, h = 90,
-                       dist = 150,
-                       move=SweetMoves.GOOGZ_LEFT_SIDE_KICK)
-RIGHT_SIDE_KICK = Kick("R_Side", 
-                       x = 17.5, y = -2, h = -90,
-                       dist = 150,
-                       move=SweetMoves.GOOGZ_RIGHT_SIDE_KICK)
-
 ZELLVARRO_LEFT_KICK = Kick("Zellvarro_Left_Kick",
                       x = 15.5, y = 3.95, 
                       dist = 300,
