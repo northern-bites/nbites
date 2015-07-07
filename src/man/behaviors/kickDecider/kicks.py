@@ -113,8 +113,8 @@ M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 13.3, y = -3., dist = 70)
 M_LEFT_CHIP_SHOT =  Kick("M_Left_Chip_Shot", x = 12.3, y = -.3, h = 45, dist = 70)
 M_RIGHT_CHIP_SHOT =  Kick("M_Right_Chip_Shot", x = 12.3, y = .3, h = -45, dist = 70)
 
-M_LEFT_SIDE = Kick("M_Left_Side", x = 13.4, y = -2.76, h = 90, dist = 100)
-M_RIGHT_SIDE = Kick("M_Right_Side", x = 13.4, y = 2.76, h = -90, dist = 100)
+M_LEFT_SIDE = Kick("M_Left_Side", x = 13.2, y = -2.76, h = 90, dist = 100)
+M_RIGHT_SIDE = Kick("M_Right_Side", x = 13.2, y = 2.76, h = -90, dist = 100)
 
 # Motion kicks for v5s. We need to determine a good way of dealing with this in python
 #M_LEFT_SIDE = Kick("M_Left_Side", x = 13, y = -2.8, h = 90, dist = 100)
