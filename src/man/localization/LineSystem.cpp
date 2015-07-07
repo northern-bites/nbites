@@ -94,7 +94,7 @@ LocLineID LineSystem::matchLine(const messages::FieldLine& observation,
     const std::vector<LocLineID>& possibleLineIDs = visionToLocIDs[visionID];
     for (int i = 0; i < possibleLineIDs.size(); i++) {
         LocLineID possibleID = possibleLineIDs[i];
-        double curScore = scoreObservation(obsvAsGeoLine, lines[possibleID], loc);
+        double curScore = scoreObservation(obsvAsGeoLine, lines[possibleID], loc, observation.wz0());
 
         if (curScore > bestScore) {
             id = possibleID;
@@ -129,7 +129,7 @@ double LineSystem::scoreLine(const messages::FieldLine& observation,
 
     // Find correspondence and calculate probability of match
     LocLineID id = matchLine(observation, loc);
-    double score = scoreObservation(obsvAsGeoLine, lines[id], loc);
+    double score = scoreObservation(obsvAsGeoLine, lines[id], loc, observation.wz0());
 
     if (debug) {
         std::cout << "In scoreLine:" << std::endl;
@@ -227,9 +227,10 @@ vision::GeoLine LineSystem::relRobotToAbsolute(const messages::FieldLine& observ
     return globalLine;
 }
 
-double LineSystem::scoreObservation(const vision::GeoLine& observation, 
+double LineSystem::scoreObservation(const vision::GeoLine& observation,
                                     const vision::GeoLine& correspondingLine, 
-                                    const messages::RobotLocation& loc)
+                                    const messages::RobotLocation& loc,
+                                    double wz0)
 {
     // Normalize correspondingLine to have positive r and t between 0 and PI / 2 
     // NOTE see constructor for explanation of what negative r means in this context
@@ -242,30 +243,35 @@ double LineSystem::scoreObservation(const vision::GeoLine& observation,
     // Landmark in map, absolute to robot relative
     normalizedCorrespondingLine.inverseTranslateRotate(loc.x(), loc.y(), loc.h(), debug);
 
-    // Find differences in r and t
-    // NOTE must normalize T
-    double rDiff = fabs(observation.r() - normalizedCorrespondingLine.r());
+    // Calculate tilt to both observation and corresponding line in map 
+    // NOTE better to score error in r in angular coordinates since this 
+    //      weights close observations more highly
+    double observationTilt = atan(observation.r() / wz0);
+    double correspondingTilt = atan(normalizedCorrespondingLine.r() / wz0);
+
+    // Find differences in tilt and t
+    double tiltDiff = vision::diffRadians(observationTilt, correspondingTilt);
     double tDiff = vision::diffRadians(observation.t(), normalizedCorrespondingLine.t());
 
     // Evaluate gaussian to get probability of observation from location loc
     // TODO params
-    boost::math::normal_distribution<> rGaussian(0, 100);
+    boost::math::normal_distribution<> tiltGaussian(0, 5*TO_RAD);
     boost::math::normal_distribution<> tGaussian(0, 10*TO_RAD);
   
-    double rProb = pdf(rGaussian, rDiff);
+    double tiltProb = pdf(tiltGaussian, tiltDiff);
     double tProb = pdf(tGaussian, tDiff);
   
     if (debug) {
       std::cout << "In scoreObservation:" << std::endl;
       std::cout << normalizedCorrespondingLine.r() << "," << normalizedCorrespondingLine.t() << std::endl;
       std::cout << observation.r() << "," << observation.t() << std::endl;
-      std::cout << rDiff << "," << tDiff << std::endl;
-      std::cout << rProb << "/" << tProb << std::endl;
-      std::cout << (rProb * tProb) << std::endl;
+      std::cout << tiltDiff << "," << tDiff << std::endl;
+      std::cout << tiltProb << "/" << tProb << std::endl;
+      std::cout << (tiltProb * tProb) << std::endl;
     }
 
     // Make the conditional independence assumption
-    return rProb * tProb;
+    return tiltProb * tProb;
 }
 
 void LineSystem::addLine(LocLineID id, float r, float t, float ep0, float ep1)

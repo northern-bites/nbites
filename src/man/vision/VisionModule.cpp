@@ -226,6 +226,7 @@ void VisionModule::sendLinesOut()
 
             pLine->set_id(static_cast<int>(line.id()));
             pLine->set_index(static_cast<int>(line.index()));
+            pLine->set_wz0(homography[i]->wz0());
         }
     }
 
