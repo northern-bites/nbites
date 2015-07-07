@@ -158,20 +158,20 @@ def fallen(player):
     player.inKickingState = False
     return player.stay()
 
-@superState('gameControllerResponder')
-def spinToWalkOffField(player):
-    if player.firstFrame():
-        player.brain.tracker.lookToAngle(0)
-        player.brain.nav.goTo(RelRobotLocation(0, 0, 90))
+# @superState('gameControllerResponder')
+# def spinToWalkOffField(player):
+#     if player.firstFrame():
+#         player.brain.tracker.lookToAngle(0)
+#         player.brain.nav.goTo(RelRobotLocation(0, 0, 90))
 
-    return Transition.getNextState(player, spinToWalkOffField)
+#     return Transition.getNextState(player, spinToWalkOffField)
 
-@superState('gameControllerResponder')
-def bookIt(player):
-    if player.firstFrame():
-        player.brain.nav.goTo(RelRobotLocation(100, 0, 0), avoidObstacles = True)
+# @superState('gameControllerResponder')
+# def bookIt(player):
+#     if player.firstFrame():
+#         player.brain.nav.goTo(RelRobotLocation(100, 0, 0), avoidObstacles = True)
 
-    return Transition.getNextState(player, bookIt)
+#     return Transition.getNextState(player, bookIt)
 
 @superState('gameControllerResponder')
 def standStill(player):
@@ -227,7 +227,7 @@ def watchWithLineChecks(player):
         player.brain.tracker.performBasicPan()
 
     if player.brain.tracker.isStopped():
-        watchWithCornerChecks.looking = False
+        watchWithLineChecks.looking = False
         player.brain.tracker.trackBall()
 
     if player.counter > 400:
@@ -260,47 +260,47 @@ def lineCheckReposition(player):
 
 # -----------------------------------------------
 
-@superState('gameControllerResponder')
-def watchWithCornerChecks(player):
-    if player.firstFrame():
-        # This is dumb, but...
-        if player.lastDiffState not in ['fixMyself',
-                                        'moveForward',
-                                        'moveBackwards']:
-            watchWithCornerChecks.numFixes = 0
-        else:
-            watchWithCornerChecks.numFixes += 1
+# @superState('gameControllerResponder')
+# def watchWithCornerChecks(player):
+#     if player.firstFrame():
+#         # This is dumb, but...
+#         if player.lastDiffState not in ['fixMyself',
+#                                         'moveForward',
+#                                         'moveBackwards']:
+#             watchWithCornerChecks.numFixes = 0
+#         else:
+#             watchWithCornerChecks.numFixes += 1
 
-        if watchWithCornerChecks.numFixes > 6:
-            return player.goLater('watch')
+#         if watchWithCornerChecks.numFixes > 6:
+#             return player.goLater('watch')
 
-        watchWithCornerChecks.looking = False
-        watchWithCornerChecks.lastLook = constants.RIGHT
-        player.homeDirections = []
-        player.brain.tracker.trackBall()
-        player.brain.nav.stand()
-        player.returningFromPenalty = False
+#         watchWithCornerChecks.looking = False
+#         watchWithCornerChecks.lastLook = constants.RIGHT
+#         player.homeDirections = []
+#         player.brain.tracker.trackBall()
+#         player.brain.nav.stand()
+#         player.returningFromPenalty = False
 
-    if player.counter > 200:
-        return player.goLater('watch')
+#     if player.counter > 200:
+#         return player.goLater('watch')
 
-    if (player.brain.ball.vis.frames_on > constants.BALL_ON_SAFE_THRESH
-        and
-        player.brain.ball.distance > constants.BALL_SAFE_DISTANCE_THRESH
-        and not watchWithCornerChecks.looking):
-        watchWithCornerChecks.looking = True
-        if watchWithCornerChecks.lastLook is constants.RIGHT:
-            player.brain.tracker.lookToAngle(constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER)
-            watchWithCornerChecks.lastLook = constants.LEFT
-        else:
-            player.brain.tracker.lookToAngle(constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER)
-            watchWithCornerChecks.lastLook = constants.RIGHT
+#     if (player.brain.ball.vis.frames_on > constants.BALL_ON_SAFE_THRESH
+#         and
+#         player.brain.ball.distance > constants.BALL_SAFE_DISTANCE_THRESH
+#         and not watchWithCornerChecks.looking):
+#         watchWithCornerChecks.looking = True
+#         if watchWithCornerChecks.lastLook is constants.RIGHT:
+#             player.brain.tracker.lookToAngle(constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER)
+#             watchWithCornerChecks.lastLook = constants.LEFT
+#         else:
+#             player.brain.tracker.lookToAngle(constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER)
+#             watchWithCornerChecks.lastLook = constants.RIGHT
 
-    if player.brain.tracker.isStopped():
-        watchWithCornerChecks.looking = False
-        player.brain.tracker.trackBall()
+#     if player.brain.tracker.isStopped():
+#         watchWithCornerChecks.looking = False
+#         player.brain.tracker.trackBall()
 
-    return Transition.getNextStateu(player, watchWithCornerChecks)
+#     return Transition.getNextStateu(player, watchWithCornerChecks)
 
 @superState('gameControllerResponder')
 def watch(player):
@@ -343,22 +343,22 @@ def correct(destination):
 
     return destination
 
-@superState('gameControllerResponder')
-def fixMyself(player):
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
-        dest = correct(average(player.homeDirections))
-        player.brain.nav.walkTo(dest)
+# @superState('gameControllerResponder')
+# def fixMyself(player):
+#     if player.firstFrame():
+#         player.brain.tracker.trackBall()
+#         dest = correct(average(player.homeDirections))
+#         player.brain.nav.walkTo(dest)
 
-    return Transition.getNextState(player, fixMyself)
+#     return Transition.getNextState(player, fixMyself)
 
-@superState('gameControllerResponder')
-def moveForward(player):
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
-        player.brain.nav.walkTo(RelRobotLocation(30, 0, 0))
+# @superState('gameControllerResponder')
+# def moveForward(player):
+#     if player.firstFrame():
+#         player.brain.tracker.trackBall()
+#         player.brain.nav.walkTo(RelRobotLocation(30, 0, 0))
 
-    return Transition.getNextState(player, moveForward)
+#     return Transition.getNextState(player, moveForward)
 
 @superState('gameControllerResponder')
 def moveBackwards(player):
