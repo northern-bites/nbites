@@ -37,6 +37,10 @@ def goToPosition(nav):
     #                                             nav.brain.ball.loc.relY,
     #                                             nav.brain.ball.loc.bearing)
 
+    goToPosition.speed = nav.velocity
+    if fabs(nav.requestVelocity - nav.velocity) > Navigator.SPEED_CHANGE:
+        nav.velocity += copysign(Navigator.SPEED_CHANGE, (nav.requestVelocity - nav.velocity))
+
     if goToPosition.pb:
         # Calc dist to dest
         dist = helper.getDistToDest(nav.brain.loc, goToPosition.dest)
@@ -70,10 +74,6 @@ def goToPosition(nav):
             velH = helper.adaptSpeed(relDest.relH,
                                     HEADING_ADAPT_CUTOFF,
                                     MAX_TURN)
-
-        goToPosition.speed = nav.velocity
-        if fabs(nav.requestVelocity - nav.velocity) > Navigator.SPEED_CHANGE:
-            nav.velocity += copysign(Navigator.SPEED_CHANGE, (nav.requestVelocity - nav.velocity))
 
         if relDest.relX >= DISTANCE_ADAPT_CUTOFF:
             velX = goToPosition.speed
