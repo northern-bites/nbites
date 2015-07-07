@@ -84,6 +84,15 @@ ZELLVARRO_RIGHT_KICK = Kick("Zellvarro_Left_Kick",
                       dist = 300,
                       move=SweetMoves.ZELLVARRO_RIGHT_KICK)
 
+LEFT_SIDE_KICK = Kick("Left_Side_Kick",
+                      x = 15.5, y = 3.95, 
+                      dist = 300,
+                      move=SweetMoves.LEFT_SIDE_KICK)
+RIGHT_SIDE_KICK = Kick("Right_Side_Kick",
+                      x = 15.5, y = -3.95, 
+                      dist = 300,
+                      move=SweetMoves.RIGHT_SIDE_KICK)
+
 LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 14.5, y = 4.0,
                            move=SweetMoves.LEFT_STRAIGHT_KICK)
 RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 14.5, y = -4.0,
