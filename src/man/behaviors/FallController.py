@@ -26,6 +26,8 @@ class FallController():
             self.falling = True
             self.brain.player.gainsOff()
             self.brain.player.switchTo('fallen')
+            print "[debug] Current State is"
+            print self.brain.player.currentState
             self.brain.tracker.stopHeadMoves()
 
         # Check if we have fallen.
