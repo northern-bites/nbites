@@ -23,6 +23,7 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
       bottomIn(),
       jointsIn(),
       visionOut(base()),
+      ballOut(base()),
       ballOn(false),
       ballOnCount(0),
       ballOffCount(0),
@@ -207,7 +208,6 @@ void VisionModule::outportalVisionField()
     }
 
     // NOTE repeats are not outportaled
-    //  messages::FieldLines pLines;
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < fieldLines[i]->size(); j++) {
             messages::FieldLine* pLine = visionField.add_line();

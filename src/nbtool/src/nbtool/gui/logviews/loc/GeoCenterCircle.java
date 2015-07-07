@@ -25,7 +25,7 @@ public class GeoCenterCircle {
         g2.setColor(Color.black);
         g2.setStroke(new BasicStroke(3));
 
-        g2.drawOval(x - 10, FieldConstants.FIELD_HEIGHT - y -10, 20, 20);
+        g2.drawOval((int)x - 10, (int)(FieldConstants.FIELD_HEIGHT - y) -10, 20, 20);
         font = new Font("Sans_Serif", Font.PLAIN, 18);
         g2.setFont(font);
         g2.drawString(Float.toString(prob),x,FieldConstants.FIELD_HEIGHT-y+60);

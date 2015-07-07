@@ -60,14 +60,12 @@ ParticleFilter::~ParticleFilter()
 }
 
 void ParticleFilter::update(const messages::RobotLocation& odometryInput,
-                            messages::FieldLines&          linesInput,
-                            messages::Corners&             cornersInput,
-                            messages::CenterCircle&        circleInput,
+                            messages::Vision&              visionInput,
                             const messages::FilteredBall*  ballInput)
 {
     // Motion system and vision system update step
     motionSystem->update(particles, odometryInput, errorMagnitude);
-    bool updatedVision = visionSystem->update(particles, linesInput, cornersInput, circleInput, ballInput, poseEstimate);
+    bool updatedVision = visionSystem->update(particles, visionInput, ballInput, poseEstimate);
 
     // Resample if vision updated
     if(updatedVision) {
@@ -90,7 +88,7 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     updateEstimate();
 
     // For debug tools, project lines and corners onto field, set IDs, etc.
-    updateFieldForDebug(linesInput, cornersInput); 
+    updateFieldForDebug(visionInput); 
 }
 
 /**
@@ -135,17 +133,16 @@ void ParticleFilter::updateEstimate()
     // std::cout << variance << std::endl;
 }
 
-void ParticleFilter::updateFieldForDebug(messages::FieldLines& lines,
-                                         messages::Corners& corners)
+void ParticleFilter::updateFieldForDebug(messages::Vision& vision)
 {
     LineSystem lineSystem;
     lineSystem.setDebug(false);
-    for (int i = 0; i < lines.line_size(); i++) {
+    for (int i = 0; i < vision.line_size(); i++) {
         // Get line
-        messages::FieldLine& field = *lines.mutable_line(i);
+        messages::FieldLine& field = *vision.mutable_line(i);
 
         // Set correspondence and scores
-        if (!LineSystem::shouldUse(lines.line(i))) {
+        if (!LineSystem::shouldUse(vision.line(i))) {
             // Lines that the particle filter did not use are given -1 as ID
             field.set_id(0);
         } else {
@@ -156,7 +153,7 @@ void ParticleFilter::updateFieldForDebug(messages::FieldLines& lines,
         }
 
         // Project lines onto the field
-        vision::GeoLine projected = LineSystem::relRobotToAbsolute(lines.line(i), poseEstimate);
+        vision::GeoLine projected = LineSystem::relRobotToAbsolute(vision.line(i), poseEstimate);
         messages::HoughLine& hough = *field.mutable_inner();
 
         hough.set_r(projected.r());
@@ -167,9 +164,9 @@ void ParticleFilter::updateFieldForDebug(messages::FieldLines& lines,
 
     LandmarkSystem landmarkSystem;
     landmarkSystem.setDebug(false);
-    for (int i = 0; i < corners.corner_size(); i++) {
+    for (int i = 0; i < vision.corner_size(); i++) {
         // Get corner
-        messages::Corner& corner = *corners.mutable_corner(i);
+        messages::Corner& corner = *vision.mutable_corner(i);
 
         messages::RobotLocation cornerRel;
         cornerRel.set_x(corner.x());

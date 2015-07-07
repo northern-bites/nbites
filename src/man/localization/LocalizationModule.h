@@ -41,9 +41,10 @@ public:
 
     /** In Portals **/
     portals::InPortal<messages::RobotLocation> motionInput;
-    portals::InPortal<messages::Vision> visionInput;
+    portals::InPortal<messages::Vision>        visionInput;
     portals::InPortal<messages::RobotLocation> resetInput[2];
     portals::InPortal<messages::GameState>     gameStateInput;
+    portals::InPortal<messages::FilteredBall>   ballInput;
 
     /** Out Portals **/
     portals::OutPortal<messages::RobotLocation> output;
@@ -68,8 +69,7 @@ protected:
     ParticleFilter * particleFilter;
     long long lastReset[2];
     messages::RobotLocation curOdometry;
-    messages::FieldLines curLines;
-    messages::Corners curCorners;
+    messages::Vision curVision;
     messages::FilteredBall curBall;
 
 private:

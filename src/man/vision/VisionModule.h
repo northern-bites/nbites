@@ -29,6 +29,7 @@ public:
     portals::InPortal<messages::InertialState> inertsIn;
 
     portals::OutPortal<messages::Vision> visionOut;
+    portals::OutPortal<messages::VisionBall> ballOut;
 
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }

@@ -253,7 +253,6 @@ void BehaviorsModule::prepareMessages()
     stiffStatusIn.latch();
     pyInterface.setStiffStatus_ptr(&stiffStatusIn.message());
 
-
     visionIn.latch();
     pyInterface.setVision_ptr(&visionIn.message());
 

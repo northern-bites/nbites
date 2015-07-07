@@ -117,12 +117,12 @@ Man::Man() :
         vision.jointsIn.wireTo(&topTranscriber.jointsOut, true);
         vision.inertsIn.wireTo(&topTranscriber.inertsOut, true);
 
-        localization.linesInput.wireTo(&vision.linesOut);
-        localization.visionInput.wireTo(&vision.visionOut);
         localization.motionInput.wireTo(&motion.odometryOutput_, true);
         localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
         localization.resetInput[1].wireTo(&sharedBall.sharedBallReset, true);
         localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
+        localization.visionInput.wireTo(&vision.visionOut);
+        localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
 
         ballTrack.visionBallInput.wireTo(&vision.ballOut);
         ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
@@ -238,10 +238,8 @@ Man::Man() :
 //         cognitionThread.log<messages::ParticleSwarm>((control::LOCALIZATION), &localization.particleOutput, "proto-ParticleSwarm", "localization");
 //         cognitionThread.log<messages::FilteredBall>((control::BALLTRACK), &ballTrack.ballLocationOutput, "proto-FilteredBall", "balltrack");
         // cognitionThread.log<messages::VisionBall>((control::BALLTRACK), &vision.vision_ball, "proto-VisionBall", "balltrack");
-        cognitionThread.log<messages::FieldLines>((control::VISION), &vision.linesOut,
-                                                   "proto-FieldLines", "vision");
-        cognitionThread.log<messages::Corners>((control::VISION), &vision.cornersOut,
-                                                   "proto-Corners", "vision");
+        cognitionThread.log<messages::Vision>((control::VISION), &vision.visionOut,
+                                                   "proto-Vision", "vision");
         // cognitionThread.log<messages::VisionField>((control::VISION), &vision.vision_field,
         //                                            "proto-VisionField", "vision");
         // cognitionThread.log<messages::VisionBall>((control::VISION), &vision.vision_ball,
