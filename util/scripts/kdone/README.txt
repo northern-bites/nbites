@@ -11,7 +11,7 @@ su
 nano /etc/profile
 
 #Add the following line to the bottom of the file right next to the done alias:
-alias kdone='source /home/nao/nbites/kdone.sh'
+alias kdone='source /home/nao/nbites/kdone.sh && exit'
 
 
 The What and the Why:
