@@ -27,7 +27,7 @@ def fallController(player):
 #         player.brain.player.gainsOff()
 #         player.brain.tracker.stopHeadMoves()
 #         player.inKickingState = False
-# 
+
 # @switchLater('standingUp')
 # def prepareForStandUp(player):
 #     """
@@ -38,7 +38,7 @@ def fallController(player):
 #         player.brain.interface.motionRequest.timestamp = int(player.brain.time*1000)
 #         player.brain.player.gainsOn()
 #         player.brain.tracker.setNeutralHead()
-# 
+
 # @stay
 # def standingUp(player):
 #     """
@@ -49,9 +49,9 @@ def fallController(player):
 #             standingUp.move = SweetMoves.STAND_UP_FRONT
 #         else:
 #             standingUp.move = SweetMoves.STAND_UP_BACK
-# 
+
 #         player.brain.player.executeMove(standingUp.move)
-# 
+
 #     # Does not use ifSwitch because we need access to 'move' and 
 #     # 'player.currentState'
 #     if sameStateForNSeconds(SweetMoves.getMoveTime(standingUp.move))(player): 
