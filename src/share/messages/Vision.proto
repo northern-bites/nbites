@@ -34,6 +34,7 @@ message CenterCircle
     optional bool on = 1;
     optional float x = 2;
     optional float y = 3;
+    optional float prob = 4;
 }
 
 message Vision

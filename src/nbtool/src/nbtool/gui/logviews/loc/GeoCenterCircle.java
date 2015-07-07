@@ -22,10 +22,10 @@ public class GeoCenterCircle {
 
     public void draw(Graphics2D g2, boolean shouldFlip) {
         Font font = new Font("Sans_Serif", Font.PLAIN, 30);
-        g2.setColor(Color.black);
+        g2.setColor(Color.white);
         g2.setStroke(new BasicStroke(3));
 
-        g2.drawOval((int)x - 10, (int)(FieldConstants.FIELD_HEIGHT - y) -10, 20, 20);
+        g2.drawOval((int)x - 15, (int)(FieldConstants.FIELD_HEIGHT - y) -15, 30, 30);
         font = new Font("Sans_Serif", Font.PLAIN, 18);
         g2.setFont(font);
         g2.drawString(Float.toString(prob),x,FieldConstants.FIELD_HEIGHT-y+60);

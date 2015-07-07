@@ -254,10 +254,9 @@ void VisionModule::outportalVisionField()
 
     // Outportal Center Circle
     messages::CenterCircle* cc = visionField.mutable_circle(); 
-    if (centerCircleDetected) {
-        cc->set_x((float)centerCircleDetector[0]->x());
-        cc->set_y((float)centerCircleDetector[0]->y());
-    }
+    cc->set_on(centerCircleDetected ? true : false);
+    cc->set_x((float)centerCircleDetector[0]->x());
+    cc->set_y((float)centerCircleDetector[0]->y());
 
     // Outportal Ball
     messages::VBall* vb = visionField.mutable_ball();
@@ -311,8 +310,6 @@ void VisionModule::outportalVisionField()
     // Send it out
     portals::Message<messages::Vision> visionOutMessage(&visionField);
     visionOut.setMessage(visionOutMessage);
-
- //   std::cout << ""
 
 }
 

@@ -2518,29 +2518,38 @@ public final class VisionOuterClass {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>optional float x = 1;</code>
+     * <code>optional bool on = 1;</code>
+     */
+    boolean hasOn();
+    /**
+     * <code>optional bool on = 1;</code>
+     */
+    boolean getOn();
+
+    /**
+     * <code>optional float x = 2;</code>
      */
     boolean hasX();
     /**
-     * <code>optional float x = 1;</code>
+     * <code>optional float x = 2;</code>
      */
     float getX();
 
     /**
-     * <code>optional float y = 2;</code>
+     * <code>optional float y = 3;</code>
      */
     boolean hasY();
     /**
-     * <code>optional float y = 2;</code>
+     * <code>optional float y = 3;</code>
      */
     float getY();
 
     /**
-     * <code>optional float prob = 3;</code>
+     * <code>optional float prob = 4;</code>
      */
     boolean hasProb();
     /**
-     * <code>optional float prob = 3;</code>
+     * <code>optional float prob = 4;</code>
      */
     float getProb();
   }
@@ -2596,18 +2605,23 @@ public final class VisionOuterClass {
               }
               break;
             }
-            case 13: {
+            case 8: {
               bitField0_ |= 0x00000001;
-              x_ = input.readFloat();
+              on_ = input.readBool();
               break;
             }
             case 21: {
               bitField0_ |= 0x00000002;
-              y_ = input.readFloat();
+              x_ = input.readFloat();
               break;
             }
             case 29: {
               bitField0_ |= 0x00000004;
+              y_ = input.readFloat();
+              break;
+            }
+            case 37: {
+              bitField0_ |= 0x00000008;
               prob_ = input.readFloat();
               break;
             }
@@ -2651,52 +2665,68 @@ public final class VisionOuterClass {
     }
 
     private int bitField0_;
-    public static final int X_FIELD_NUMBER = 1;
-    private float x_;
+    public static final int ON_FIELD_NUMBER = 1;
+    private boolean on_;
     /**
-     * <code>optional float x = 1;</code>
+     * <code>optional bool on = 1;</code>
      */
-    public boolean hasX() {
+    public boolean hasOn() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional float x = 1;</code>
+     * <code>optional bool on = 1;</code>
+     */
+    public boolean getOn() {
+      return on_;
+    }
+
+    public static final int X_FIELD_NUMBER = 2;
+    private float x_;
+    /**
+     * <code>optional float x = 2;</code>
+     */
+    public boolean hasX() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional float x = 2;</code>
      */
     public float getX() {
       return x_;
     }
 
-    public static final int Y_FIELD_NUMBER = 2;
+    public static final int Y_FIELD_NUMBER = 3;
     private float y_;
     /**
-     * <code>optional float y = 2;</code>
+     * <code>optional float y = 3;</code>
      */
     public boolean hasY() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional float y = 2;</code>
+     * <code>optional float y = 3;</code>
      */
     public float getY() {
       return y_;
     }
 
-    public static final int PROB_FIELD_NUMBER = 3;
+    public static final int PROB_FIELD_NUMBER = 4;
     private float prob_;
     /**
-     * <code>optional float prob = 3;</code>
+     * <code>optional float prob = 4;</code>
      */
     public boolean hasProb() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional float prob = 3;</code>
+     * <code>optional float prob = 4;</code>
      */
     public float getProb() {
       return prob_;
     }
 
     private void initFields() {
+      on_ = false;
       x_ = 0F;
       y_ = 0F;
       prob_ = 0F;
@@ -2715,13 +2745,16 @@ public final class VisionOuterClass {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeFloat(1, x_);
+        output.writeBool(1, on_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeFloat(2, y_);
+        output.writeFloat(2, x_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeFloat(3, prob_);
+        output.writeFloat(3, y_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeFloat(4, prob_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -2734,15 +2767,19 @@ public final class VisionOuterClass {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(1, x_);
+          .computeBoolSize(1, on_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(2, y_);
+          .computeFloatSize(2, x_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(3, prob_);
+          .computeFloatSize(3, y_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(4, prob_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -2861,12 +2898,14 @@ public final class VisionOuterClass {
 
       public Builder clear() {
         super.clear();
-        x_ = 0F;
+        on_ = false;
         bitField0_ = (bitField0_ & ~0x00000001);
-        y_ = 0F;
+        x_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000002);
-        prob_ = 0F;
+        y_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000004);
+        prob_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
@@ -2898,13 +2937,17 @@ public final class VisionOuterClass {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.x_ = x_;
+        result.on_ = on_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.y_ = y_;
+        result.x_ = x_;
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
+        }
+        result.y_ = y_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
         }
         result.prob_ = prob_;
         result.bitField0_ = to_bitField0_;
@@ -2923,6 +2966,9 @@ public final class VisionOuterClass {
 
       public Builder mergeFrom(messages.VisionOuterClass.CenterCircle other) {
         if (other == messages.VisionOuterClass.CenterCircle.getDefaultInstance()) return this;
+        if (other.hasOn()) {
+          setOn(other.getOn());
+        }
         if (other.hasX()) {
           setX(other.getX());
         }
@@ -2959,33 +3005,65 @@ public final class VisionOuterClass {
       }
       private int bitField0_;
 
-      private float x_ ;
+      private boolean on_ ;
       /**
-       * <code>optional float x = 1;</code>
+       * <code>optional bool on = 1;</code>
        */
-      public boolean hasX() {
+      public boolean hasOn() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional float x = 1;</code>
+       * <code>optional bool on = 1;</code>
+       */
+      public boolean getOn() {
+        return on_;
+      }
+      /**
+       * <code>optional bool on = 1;</code>
+       */
+      public Builder setOn(boolean value) {
+        bitField0_ |= 0x00000001;
+        on_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool on = 1;</code>
+       */
+      public Builder clearOn() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        on_ = false;
+        onChanged();
+        return this;
+      }
+
+      private float x_ ;
+      /**
+       * <code>optional float x = 2;</code>
+       */
+      public boolean hasX() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional float x = 2;</code>
        */
       public float getX() {
         return x_;
       }
       /**
-       * <code>optional float x = 1;</code>
+       * <code>optional float x = 2;</code>
        */
       public Builder setX(float value) {
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000002;
         x_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional float x = 1;</code>
+       * <code>optional float x = 2;</code>
        */
       public Builder clearX() {
-        bitField0_ = (bitField0_ & ~0x00000001);
+        bitField0_ = (bitField0_ & ~0x00000002);
         x_ = 0F;
         onChanged();
         return this;
@@ -2993,31 +3071,31 @@ public final class VisionOuterClass {
 
       private float y_ ;
       /**
-       * <code>optional float y = 2;</code>
+       * <code>optional float y = 3;</code>
        */
       public boolean hasY() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional float y = 2;</code>
+       * <code>optional float y = 3;</code>
        */
       public float getY() {
         return y_;
       }
       /**
-       * <code>optional float y = 2;</code>
+       * <code>optional float y = 3;</code>
        */
       public Builder setY(float value) {
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         y_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional float y = 2;</code>
+       * <code>optional float y = 3;</code>
        */
       public Builder clearY() {
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
         y_ = 0F;
         onChanged();
         return this;
@@ -3025,31 +3103,31 @@ public final class VisionOuterClass {
 
       private float prob_ ;
       /**
-       * <code>optional float prob = 3;</code>
+       * <code>optional float prob = 4;</code>
        */
       public boolean hasProb() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional float prob = 3;</code>
+       * <code>optional float prob = 4;</code>
        */
       public float getProb() {
         return prob_;
       }
       /**
-       * <code>optional float prob = 3;</code>
+       * <code>optional float prob = 4;</code>
        */
       public Builder setProb(float value) {
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         prob_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional float prob = 3;</code>
+       * <code>optional float prob = 4;</code>
        */
       public Builder clearProb() {
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000008);
         prob_ = 0F;
         onChanged();
         return this;
@@ -3132,17 +3210,17 @@ public final class VisionOuterClass {
     messages.VisionOuterClass.CenterCircleOrBuilder getCircleOrBuilder();
 
     /**
-     * <code>optional .messages.VisionBall ball = 4;</code>
+     * <code>optional .messages.VBall ball = 4;</code>
      */
     boolean hasBall();
     /**
-     * <code>optional .messages.VisionBall ball = 4;</code>
+     * <code>optional .messages.VBall ball = 4;</code>
      */
-    messages.BallModel.VisionBall getBall();
+    messages.VisionOuterClass.VBall getBall();
     /**
-     * <code>optional .messages.VisionBall ball = 4;</code>
+     * <code>optional .messages.VBall ball = 4;</code>
      */
-    messages.BallModel.VisionBallOrBuilder getBallOrBuilder();
+    messages.VisionOuterClass.VBallOrBuilder getBallOrBuilder();
   }
   /**
    * Protobuf type {@code messages.Vision}
@@ -3226,11 +3304,11 @@ public final class VisionOuterClass {
               break;
             }
             case 34: {
-              messages.BallModel.VisionBall.Builder subBuilder = null;
+              messages.VisionOuterClass.VBall.Builder subBuilder = null;
               if (((bitField0_ & 0x00000002) == 0x00000002)) {
                 subBuilder = ball_.toBuilder();
               }
-              ball_ = input.readMessage(messages.BallModel.VisionBall.PARSER, extensionRegistry);
+              ball_ = input.readMessage(messages.VisionOuterClass.VBall.PARSER, extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom(ball_);
                 ball_ = subBuilder.buildPartial();
@@ -3376,23 +3454,23 @@ public final class VisionOuterClass {
     }
 
     public static final int BALL_FIELD_NUMBER = 4;
-    private messages.BallModel.VisionBall ball_;
+    private messages.VisionOuterClass.VBall ball_;
     /**
-     * <code>optional .messages.VisionBall ball = 4;</code>
+     * <code>optional .messages.VBall ball = 4;</code>
      */
     public boolean hasBall() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional .messages.VisionBall ball = 4;</code>
+     * <code>optional .messages.VBall ball = 4;</code>
      */
-    public messages.BallModel.VisionBall getBall() {
+    public messages.VisionOuterClass.VBall getBall() {
       return ball_;
     }
     /**
-     * <code>optional .messages.VisionBall ball = 4;</code>
+     * <code>optional .messages.VBall ball = 4;</code>
      */
-    public messages.BallModel.VisionBallOrBuilder getBallOrBuilder() {
+    public messages.VisionOuterClass.VBallOrBuilder getBallOrBuilder() {
       return ball_;
     }
 
@@ -3400,7 +3478,7 @@ public final class VisionOuterClass {
       line_ = java.util.Collections.emptyList();
       corner_ = java.util.Collections.emptyList();
       circle_ = messages.VisionOuterClass.CenterCircle.getDefaultInstance();
-      ball_ = messages.BallModel.VisionBall.getDefaultInstance();
+      ball_ = messages.VisionOuterClass.VBall.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -3592,7 +3670,7 @@ public final class VisionOuterClass {
         }
         bitField0_ = (bitField0_ & ~0x00000004);
         if (ballBuilder_ == null) {
-          ball_ = messages.BallModel.VisionBall.getDefaultInstance();
+          ball_ = messages.VisionOuterClass.VBall.getDefaultInstance();
         } else {
           ballBuilder_.clear();
         }
@@ -4356,19 +4434,19 @@ public final class VisionOuterClass {
         return circleBuilder_;
       }
 
-      private messages.BallModel.VisionBall ball_ = messages.BallModel.VisionBall.getDefaultInstance();
+      private messages.VisionOuterClass.VBall ball_ = messages.VisionOuterClass.VBall.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
-          messages.BallModel.VisionBall, messages.BallModel.VisionBall.Builder, messages.BallModel.VisionBallOrBuilder> ballBuilder_;
+          messages.VisionOuterClass.VBall, messages.VisionOuterClass.VBall.Builder, messages.VisionOuterClass.VBallOrBuilder> ballBuilder_;
       /**
-       * <code>optional .messages.VisionBall ball = 4;</code>
+       * <code>optional .messages.VBall ball = 4;</code>
        */
       public boolean hasBall() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional .messages.VisionBall ball = 4;</code>
+       * <code>optional .messages.VBall ball = 4;</code>
        */
-      public messages.BallModel.VisionBall getBall() {
+      public messages.VisionOuterClass.VBall getBall() {
         if (ballBuilder_ == null) {
           return ball_;
         } else {
@@ -4376,9 +4454,9 @@ public final class VisionOuterClass {
         }
       }
       /**
-       * <code>optional .messages.VisionBall ball = 4;</code>
+       * <code>optional .messages.VBall ball = 4;</code>
        */
-      public Builder setBall(messages.BallModel.VisionBall value) {
+      public Builder setBall(messages.VisionOuterClass.VBall value) {
         if (ballBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -4392,10 +4470,10 @@ public final class VisionOuterClass {
         return this;
       }
       /**
-       * <code>optional .messages.VisionBall ball = 4;</code>
+       * <code>optional .messages.VBall ball = 4;</code>
        */
       public Builder setBall(
-          messages.BallModel.VisionBall.Builder builderForValue) {
+          messages.VisionOuterClass.VBall.Builder builderForValue) {
         if (ballBuilder_ == null) {
           ball_ = builderForValue.build();
           onChanged();
@@ -4406,14 +4484,14 @@ public final class VisionOuterClass {
         return this;
       }
       /**
-       * <code>optional .messages.VisionBall ball = 4;</code>
+       * <code>optional .messages.VBall ball = 4;</code>
        */
-      public Builder mergeBall(messages.BallModel.VisionBall value) {
+      public Builder mergeBall(messages.VisionOuterClass.VBall value) {
         if (ballBuilder_ == null) {
           if (((bitField0_ & 0x00000008) == 0x00000008) &&
-              ball_ != messages.BallModel.VisionBall.getDefaultInstance()) {
+              ball_ != messages.VisionOuterClass.VBall.getDefaultInstance()) {
             ball_ =
-              messages.BallModel.VisionBall.newBuilder(ball_).mergeFrom(value).buildPartial();
+              messages.VisionOuterClass.VBall.newBuilder(ball_).mergeFrom(value).buildPartial();
           } else {
             ball_ = value;
           }
@@ -4425,11 +4503,11 @@ public final class VisionOuterClass {
         return this;
       }
       /**
-       * <code>optional .messages.VisionBall ball = 4;</code>
+       * <code>optional .messages.VBall ball = 4;</code>
        */
       public Builder clearBall() {
         if (ballBuilder_ == null) {
-          ball_ = messages.BallModel.VisionBall.getDefaultInstance();
+          ball_ = messages.VisionOuterClass.VBall.getDefaultInstance();
           onChanged();
         } else {
           ballBuilder_.clear();
@@ -4438,17 +4516,17 @@ public final class VisionOuterClass {
         return this;
       }
       /**
-       * <code>optional .messages.VisionBall ball = 4;</code>
+       * <code>optional .messages.VBall ball = 4;</code>
        */
-      public messages.BallModel.VisionBall.Builder getBallBuilder() {
+      public messages.VisionOuterClass.VBall.Builder getBallBuilder() {
         bitField0_ |= 0x00000008;
         onChanged();
         return getBallFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .messages.VisionBall ball = 4;</code>
+       * <code>optional .messages.VBall ball = 4;</code>
        */
-      public messages.BallModel.VisionBallOrBuilder getBallOrBuilder() {
+      public messages.VisionOuterClass.VBallOrBuilder getBallOrBuilder() {
         if (ballBuilder_ != null) {
           return ballBuilder_.getMessageOrBuilder();
         } else {
@@ -4456,14 +4534,14 @@ public final class VisionOuterClass {
         }
       }
       /**
-       * <code>optional .messages.VisionBall ball = 4;</code>
+       * <code>optional .messages.VBall ball = 4;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          messages.BallModel.VisionBall, messages.BallModel.VisionBall.Builder, messages.BallModel.VisionBallOrBuilder> 
+          messages.VisionOuterClass.VBall, messages.VisionOuterClass.VBall.Builder, messages.VisionOuterClass.VBallOrBuilder> 
           getBallFieldBuilder() {
         if (ballBuilder_ == null) {
           ballBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              messages.BallModel.VisionBall, messages.BallModel.VisionBall.Builder, messages.BallModel.VisionBallOrBuilder>(
+              messages.VisionOuterClass.VBall, messages.VisionOuterClass.VBall.Builder, messages.VisionOuterClass.VBallOrBuilder>(
                   getBall(),
                   getParentForChildren(),
                   isClean());
@@ -4481,6 +4559,1573 @@ public final class VisionOuterClass {
     }
 
     // @@protoc_insertion_point(class_scope:messages.Vision)
+  }
+
+  public interface VBallOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:messages.VBall)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional double distance = 1;</code>
+     */
+    boolean hasDistance();
+    /**
+     * <code>optional double distance = 1;</code>
+     */
+    double getDistance();
+
+    /**
+     * <code>optional double bearing = 2;</code>
+     */
+    boolean hasBearing();
+    /**
+     * <code>optional double bearing = 2;</code>
+     */
+    double getBearing();
+
+    /**
+     * <code>optional double angle_x_deg = 3;</code>
+     */
+    boolean hasAngleXDeg();
+    /**
+     * <code>optional double angle_x_deg = 3;</code>
+     */
+    double getAngleXDeg();
+
+    /**
+     * <code>optional double angle_y_deg = 4;</code>
+     */
+    boolean hasAngleYDeg();
+    /**
+     * <code>optional double angle_y_deg = 4;</code>
+     */
+    double getAngleYDeg();
+
+    /**
+     * <code>optional double bearing_sd = 5;</code>
+     */
+    boolean hasBearingSd();
+    /**
+     * <code>optional double bearing_sd = 5;</code>
+     */
+    double getBearingSd();
+
+    /**
+     * <code>optional bool inTopCam = 6;</code>
+     */
+    boolean hasInTopCam();
+    /**
+     * <code>optional bool inTopCam = 6;</code>
+     */
+    boolean getInTopCam();
+
+    /**
+     * <code>optional double radius = 7;</code>
+     */
+    boolean hasRadius();
+    /**
+     * <code>optional double radius = 7;</code>
+     */
+    double getRadius();
+
+    /**
+     * <code>optional double confidence = 8;</code>
+     */
+    boolean hasConfidence();
+    /**
+     * <code>optional double confidence = 8;</code>
+     */
+    double getConfidence();
+
+    /**
+     * <code>optional bool on = 9;</code>
+     */
+    boolean hasOn();
+    /**
+     * <code>optional bool on = 9;</code>
+     */
+    boolean getOn();
+
+    /**
+     * <code>optional sint32 frames_on = 10;</code>
+     */
+    boolean hasFramesOn();
+    /**
+     * <code>optional sint32 frames_on = 10;</code>
+     */
+    int getFramesOn();
+
+    /**
+     * <code>optional sint32 frames_off = 11;</code>
+     */
+    boolean hasFramesOff();
+    /**
+     * <code>optional sint32 frames_off = 11;</code>
+     */
+    int getFramesOff();
+
+    /**
+     * <code>optional double rel_x_variance = 12;</code>
+     */
+    boolean hasRelXVariance();
+    /**
+     * <code>optional double rel_x_variance = 12;</code>
+     */
+    double getRelXVariance();
+
+    /**
+     * <code>optional double rel_y_variance = 13;</code>
+     */
+    boolean hasRelYVariance();
+    /**
+     * <code>optional double rel_y_variance = 13;</code>
+     */
+    double getRelYVariance();
+
+    /**
+     * <code>optional double bearing_deg = 14;</code>
+     */
+    boolean hasBearingDeg();
+    /**
+     * <code>optional double bearing_deg = 14;</code>
+     */
+    double getBearingDeg();
+
+    /**
+     * <code>optional sint32 x = 15;</code>
+     */
+    boolean hasX();
+    /**
+     * <code>optional sint32 x = 15;</code>
+     */
+    int getX();
+
+    /**
+     * <code>optional sint32 y = 16;</code>
+     */
+    boolean hasY();
+    /**
+     * <code>optional sint32 y = 16;</code>
+     */
+    int getY();
+  }
+  /**
+   * Protobuf type {@code messages.VBall}
+   */
+  public static final class VBall extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:messages.VBall)
+      VBallOrBuilder {
+    // Use VBall.newBuilder() to construct.
+    private VBall(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private VBall(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final VBall defaultInstance;
+    public static VBall getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public VBall getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private VBall(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 9: {
+              bitField0_ |= 0x00000001;
+              distance_ = input.readDouble();
+              break;
+            }
+            case 17: {
+              bitField0_ |= 0x00000002;
+              bearing_ = input.readDouble();
+              break;
+            }
+            case 25: {
+              bitField0_ |= 0x00000004;
+              angleXDeg_ = input.readDouble();
+              break;
+            }
+            case 33: {
+              bitField0_ |= 0x00000008;
+              angleYDeg_ = input.readDouble();
+              break;
+            }
+            case 41: {
+              bitField0_ |= 0x00000010;
+              bearingSd_ = input.readDouble();
+              break;
+            }
+            case 48: {
+              bitField0_ |= 0x00000020;
+              inTopCam_ = input.readBool();
+              break;
+            }
+            case 57: {
+              bitField0_ |= 0x00000040;
+              radius_ = input.readDouble();
+              break;
+            }
+            case 65: {
+              bitField0_ |= 0x00000080;
+              confidence_ = input.readDouble();
+              break;
+            }
+            case 72: {
+              bitField0_ |= 0x00000100;
+              on_ = input.readBool();
+              break;
+            }
+            case 80: {
+              bitField0_ |= 0x00000200;
+              framesOn_ = input.readSInt32();
+              break;
+            }
+            case 88: {
+              bitField0_ |= 0x00000400;
+              framesOff_ = input.readSInt32();
+              break;
+            }
+            case 97: {
+              bitField0_ |= 0x00000800;
+              relXVariance_ = input.readDouble();
+              break;
+            }
+            case 105: {
+              bitField0_ |= 0x00001000;
+              relYVariance_ = input.readDouble();
+              break;
+            }
+            case 113: {
+              bitField0_ |= 0x00002000;
+              bearingDeg_ = input.readDouble();
+              break;
+            }
+            case 120: {
+              bitField0_ |= 0x00004000;
+              x_ = input.readSInt32();
+              break;
+            }
+            case 128: {
+              bitField0_ |= 0x00008000;
+              y_ = input.readSInt32();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return messages.VisionOuterClass.internal_static_messages_VBall_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return messages.VisionOuterClass.internal_static_messages_VBall_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              messages.VisionOuterClass.VBall.class, messages.VisionOuterClass.VBall.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<VBall> PARSER =
+        new com.google.protobuf.AbstractParser<VBall>() {
+      public VBall parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new VBall(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<VBall> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    public static final int DISTANCE_FIELD_NUMBER = 1;
+    private double distance_;
+    /**
+     * <code>optional double distance = 1;</code>
+     */
+    public boolean hasDistance() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional double distance = 1;</code>
+     */
+    public double getDistance() {
+      return distance_;
+    }
+
+    public static final int BEARING_FIELD_NUMBER = 2;
+    private double bearing_;
+    /**
+     * <code>optional double bearing = 2;</code>
+     */
+    public boolean hasBearing() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional double bearing = 2;</code>
+     */
+    public double getBearing() {
+      return bearing_;
+    }
+
+    public static final int ANGLE_X_DEG_FIELD_NUMBER = 3;
+    private double angleXDeg_;
+    /**
+     * <code>optional double angle_x_deg = 3;</code>
+     */
+    public boolean hasAngleXDeg() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional double angle_x_deg = 3;</code>
+     */
+    public double getAngleXDeg() {
+      return angleXDeg_;
+    }
+
+    public static final int ANGLE_Y_DEG_FIELD_NUMBER = 4;
+    private double angleYDeg_;
+    /**
+     * <code>optional double angle_y_deg = 4;</code>
+     */
+    public boolean hasAngleYDeg() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional double angle_y_deg = 4;</code>
+     */
+    public double getAngleYDeg() {
+      return angleYDeg_;
+    }
+
+    public static final int BEARING_SD_FIELD_NUMBER = 5;
+    private double bearingSd_;
+    /**
+     * <code>optional double bearing_sd = 5;</code>
+     */
+    public boolean hasBearingSd() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional double bearing_sd = 5;</code>
+     */
+    public double getBearingSd() {
+      return bearingSd_;
+    }
+
+    public static final int INTOPCAM_FIELD_NUMBER = 6;
+    private boolean inTopCam_;
+    /**
+     * <code>optional bool inTopCam = 6;</code>
+     */
+    public boolean hasInTopCam() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional bool inTopCam = 6;</code>
+     */
+    public boolean getInTopCam() {
+      return inTopCam_;
+    }
+
+    public static final int RADIUS_FIELD_NUMBER = 7;
+    private double radius_;
+    /**
+     * <code>optional double radius = 7;</code>
+     */
+    public boolean hasRadius() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional double radius = 7;</code>
+     */
+    public double getRadius() {
+      return radius_;
+    }
+
+    public static final int CONFIDENCE_FIELD_NUMBER = 8;
+    private double confidence_;
+    /**
+     * <code>optional double confidence = 8;</code>
+     */
+    public boolean hasConfidence() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional double confidence = 8;</code>
+     */
+    public double getConfidence() {
+      return confidence_;
+    }
+
+    public static final int ON_FIELD_NUMBER = 9;
+    private boolean on_;
+    /**
+     * <code>optional bool on = 9;</code>
+     */
+    public boolean hasOn() {
+      return ((bitField0_ & 0x00000100) == 0x00000100);
+    }
+    /**
+     * <code>optional bool on = 9;</code>
+     */
+    public boolean getOn() {
+      return on_;
+    }
+
+    public static final int FRAMES_ON_FIELD_NUMBER = 10;
+    private int framesOn_;
+    /**
+     * <code>optional sint32 frames_on = 10;</code>
+     */
+    public boolean hasFramesOn() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    /**
+     * <code>optional sint32 frames_on = 10;</code>
+     */
+    public int getFramesOn() {
+      return framesOn_;
+    }
+
+    public static final int FRAMES_OFF_FIELD_NUMBER = 11;
+    private int framesOff_;
+    /**
+     * <code>optional sint32 frames_off = 11;</code>
+     */
+    public boolean hasFramesOff() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>optional sint32 frames_off = 11;</code>
+     */
+    public int getFramesOff() {
+      return framesOff_;
+    }
+
+    public static final int REL_X_VARIANCE_FIELD_NUMBER = 12;
+    private double relXVariance_;
+    /**
+     * <code>optional double rel_x_variance = 12;</code>
+     */
+    public boolean hasRelXVariance() {
+      return ((bitField0_ & 0x00000800) == 0x00000800);
+    }
+    /**
+     * <code>optional double rel_x_variance = 12;</code>
+     */
+    public double getRelXVariance() {
+      return relXVariance_;
+    }
+
+    public static final int REL_Y_VARIANCE_FIELD_NUMBER = 13;
+    private double relYVariance_;
+    /**
+     * <code>optional double rel_y_variance = 13;</code>
+     */
+    public boolean hasRelYVariance() {
+      return ((bitField0_ & 0x00001000) == 0x00001000);
+    }
+    /**
+     * <code>optional double rel_y_variance = 13;</code>
+     */
+    public double getRelYVariance() {
+      return relYVariance_;
+    }
+
+    public static final int BEARING_DEG_FIELD_NUMBER = 14;
+    private double bearingDeg_;
+    /**
+     * <code>optional double bearing_deg = 14;</code>
+     */
+    public boolean hasBearingDeg() {
+      return ((bitField0_ & 0x00002000) == 0x00002000);
+    }
+    /**
+     * <code>optional double bearing_deg = 14;</code>
+     */
+    public double getBearingDeg() {
+      return bearingDeg_;
+    }
+
+    public static final int X_FIELD_NUMBER = 15;
+    private int x_;
+    /**
+     * <code>optional sint32 x = 15;</code>
+     */
+    public boolean hasX() {
+      return ((bitField0_ & 0x00004000) == 0x00004000);
+    }
+    /**
+     * <code>optional sint32 x = 15;</code>
+     */
+    public int getX() {
+      return x_;
+    }
+
+    public static final int Y_FIELD_NUMBER = 16;
+    private int y_;
+    /**
+     * <code>optional sint32 y = 16;</code>
+     */
+    public boolean hasY() {
+      return ((bitField0_ & 0x00008000) == 0x00008000);
+    }
+    /**
+     * <code>optional sint32 y = 16;</code>
+     */
+    public int getY() {
+      return y_;
+    }
+
+    private void initFields() {
+      distance_ = 0D;
+      bearing_ = 0D;
+      angleXDeg_ = 0D;
+      angleYDeg_ = 0D;
+      bearingSd_ = 0D;
+      inTopCam_ = false;
+      radius_ = 0D;
+      confidence_ = 0D;
+      on_ = false;
+      framesOn_ = 0;
+      framesOff_ = 0;
+      relXVariance_ = 0D;
+      relYVariance_ = 0D;
+      bearingDeg_ = 0D;
+      x_ = 0;
+      y_ = 0;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeDouble(1, distance_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeDouble(2, bearing_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeDouble(3, angleXDeg_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeDouble(4, angleYDeg_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeDouble(5, bearingSd_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeBool(6, inTopCam_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeDouble(7, radius_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeDouble(8, confidence_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        output.writeBool(9, on_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeSInt32(10, framesOn_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeSInt32(11, framesOff_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeDouble(12, relXVariance_);
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        output.writeDouble(13, relYVariance_);
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        output.writeDouble(14, bearingDeg_);
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        output.writeSInt32(15, x_);
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        output.writeSInt32(16, y_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(1, distance_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(2, bearing_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(3, angleXDeg_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(4, angleYDeg_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(5, bearingSd_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(6, inTopCam_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(7, radius_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(8, confidence_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(9, on_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(10, framesOn_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(11, framesOff_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(12, relXVariance_);
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(13, relYVariance_);
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(14, bearingDeg_);
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(15, x_);
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(16, y_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static messages.VisionOuterClass.VBall parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static messages.VisionOuterClass.VBall parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static messages.VisionOuterClass.VBall parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static messages.VisionOuterClass.VBall parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static messages.VisionOuterClass.VBall parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static messages.VisionOuterClass.VBall parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static messages.VisionOuterClass.VBall parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static messages.VisionOuterClass.VBall parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static messages.VisionOuterClass.VBall parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static messages.VisionOuterClass.VBall parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(messages.VisionOuterClass.VBall prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code messages.VBall}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:messages.VBall)
+        messages.VisionOuterClass.VBallOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return messages.VisionOuterClass.internal_static_messages_VBall_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return messages.VisionOuterClass.internal_static_messages_VBall_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                messages.VisionOuterClass.VBall.class, messages.VisionOuterClass.VBall.Builder.class);
+      }
+
+      // Construct using messages.VisionOuterClass.VBall.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        distance_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        bearing_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        angleXDeg_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        angleYDeg_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        bearingSd_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        inTopCam_ = false;
+        bitField0_ = (bitField0_ & ~0x00000020);
+        radius_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00000040);
+        confidence_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00000080);
+        on_ = false;
+        bitField0_ = (bitField0_ & ~0x00000100);
+        framesOn_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000200);
+        framesOff_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000400);
+        relXVariance_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00000800);
+        relYVariance_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00001000);
+        bearingDeg_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00002000);
+        x_ = 0;
+        bitField0_ = (bitField0_ & ~0x00004000);
+        y_ = 0;
+        bitField0_ = (bitField0_ & ~0x00008000);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return messages.VisionOuterClass.internal_static_messages_VBall_descriptor;
+      }
+
+      public messages.VisionOuterClass.VBall getDefaultInstanceForType() {
+        return messages.VisionOuterClass.VBall.getDefaultInstance();
+      }
+
+      public messages.VisionOuterClass.VBall build() {
+        messages.VisionOuterClass.VBall result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public messages.VisionOuterClass.VBall buildPartial() {
+        messages.VisionOuterClass.VBall result = new messages.VisionOuterClass.VBall(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.distance_ = distance_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.bearing_ = bearing_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.angleXDeg_ = angleXDeg_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.angleYDeg_ = angleYDeg_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.bearingSd_ = bearingSd_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.inTopCam_ = inTopCam_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.radius_ = radius_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.confidence_ = confidence_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000100;
+        }
+        result.on_ = on_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000200;
+        }
+        result.framesOn_ = framesOn_;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        result.framesOff_ = framesOff_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000800;
+        }
+        result.relXVariance_ = relXVariance_;
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
+          to_bitField0_ |= 0x00001000;
+        }
+        result.relYVariance_ = relYVariance_;
+        if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
+          to_bitField0_ |= 0x00002000;
+        }
+        result.bearingDeg_ = bearingDeg_;
+        if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
+          to_bitField0_ |= 0x00004000;
+        }
+        result.x_ = x_;
+        if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
+          to_bitField0_ |= 0x00008000;
+        }
+        result.y_ = y_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof messages.VisionOuterClass.VBall) {
+          return mergeFrom((messages.VisionOuterClass.VBall)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(messages.VisionOuterClass.VBall other) {
+        if (other == messages.VisionOuterClass.VBall.getDefaultInstance()) return this;
+        if (other.hasDistance()) {
+          setDistance(other.getDistance());
+        }
+        if (other.hasBearing()) {
+          setBearing(other.getBearing());
+        }
+        if (other.hasAngleXDeg()) {
+          setAngleXDeg(other.getAngleXDeg());
+        }
+        if (other.hasAngleYDeg()) {
+          setAngleYDeg(other.getAngleYDeg());
+        }
+        if (other.hasBearingSd()) {
+          setBearingSd(other.getBearingSd());
+        }
+        if (other.hasInTopCam()) {
+          setInTopCam(other.getInTopCam());
+        }
+        if (other.hasRadius()) {
+          setRadius(other.getRadius());
+        }
+        if (other.hasConfidence()) {
+          setConfidence(other.getConfidence());
+        }
+        if (other.hasOn()) {
+          setOn(other.getOn());
+        }
+        if (other.hasFramesOn()) {
+          setFramesOn(other.getFramesOn());
+        }
+        if (other.hasFramesOff()) {
+          setFramesOff(other.getFramesOff());
+        }
+        if (other.hasRelXVariance()) {
+          setRelXVariance(other.getRelXVariance());
+        }
+        if (other.hasRelYVariance()) {
+          setRelYVariance(other.getRelYVariance());
+        }
+        if (other.hasBearingDeg()) {
+          setBearingDeg(other.getBearingDeg());
+        }
+        if (other.hasX()) {
+          setX(other.getX());
+        }
+        if (other.hasY()) {
+          setY(other.getY());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        messages.VisionOuterClass.VBall parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (messages.VisionOuterClass.VBall) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private double distance_ ;
+      /**
+       * <code>optional double distance = 1;</code>
+       */
+      public boolean hasDistance() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional double distance = 1;</code>
+       */
+      public double getDistance() {
+        return distance_;
+      }
+      /**
+       * <code>optional double distance = 1;</code>
+       */
+      public Builder setDistance(double value) {
+        bitField0_ |= 0x00000001;
+        distance_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double distance = 1;</code>
+       */
+      public Builder clearDistance() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        distance_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private double bearing_ ;
+      /**
+       * <code>optional double bearing = 2;</code>
+       */
+      public boolean hasBearing() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional double bearing = 2;</code>
+       */
+      public double getBearing() {
+        return bearing_;
+      }
+      /**
+       * <code>optional double bearing = 2;</code>
+       */
+      public Builder setBearing(double value) {
+        bitField0_ |= 0x00000002;
+        bearing_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double bearing = 2;</code>
+       */
+      public Builder clearBearing() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        bearing_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private double angleXDeg_ ;
+      /**
+       * <code>optional double angle_x_deg = 3;</code>
+       */
+      public boolean hasAngleXDeg() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional double angle_x_deg = 3;</code>
+       */
+      public double getAngleXDeg() {
+        return angleXDeg_;
+      }
+      /**
+       * <code>optional double angle_x_deg = 3;</code>
+       */
+      public Builder setAngleXDeg(double value) {
+        bitField0_ |= 0x00000004;
+        angleXDeg_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double angle_x_deg = 3;</code>
+       */
+      public Builder clearAngleXDeg() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        angleXDeg_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private double angleYDeg_ ;
+      /**
+       * <code>optional double angle_y_deg = 4;</code>
+       */
+      public boolean hasAngleYDeg() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional double angle_y_deg = 4;</code>
+       */
+      public double getAngleYDeg() {
+        return angleYDeg_;
+      }
+      /**
+       * <code>optional double angle_y_deg = 4;</code>
+       */
+      public Builder setAngleYDeg(double value) {
+        bitField0_ |= 0x00000008;
+        angleYDeg_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double angle_y_deg = 4;</code>
+       */
+      public Builder clearAngleYDeg() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        angleYDeg_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private double bearingSd_ ;
+      /**
+       * <code>optional double bearing_sd = 5;</code>
+       */
+      public boolean hasBearingSd() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional double bearing_sd = 5;</code>
+       */
+      public double getBearingSd() {
+        return bearingSd_;
+      }
+      /**
+       * <code>optional double bearing_sd = 5;</code>
+       */
+      public Builder setBearingSd(double value) {
+        bitField0_ |= 0x00000010;
+        bearingSd_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double bearing_sd = 5;</code>
+       */
+      public Builder clearBearingSd() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        bearingSd_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private boolean inTopCam_ ;
+      /**
+       * <code>optional bool inTopCam = 6;</code>
+       */
+      public boolean hasInTopCam() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional bool inTopCam = 6;</code>
+       */
+      public boolean getInTopCam() {
+        return inTopCam_;
+      }
+      /**
+       * <code>optional bool inTopCam = 6;</code>
+       */
+      public Builder setInTopCam(boolean value) {
+        bitField0_ |= 0x00000020;
+        inTopCam_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool inTopCam = 6;</code>
+       */
+      public Builder clearInTopCam() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        inTopCam_ = false;
+        onChanged();
+        return this;
+      }
+
+      private double radius_ ;
+      /**
+       * <code>optional double radius = 7;</code>
+       */
+      public boolean hasRadius() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>optional double radius = 7;</code>
+       */
+      public double getRadius() {
+        return radius_;
+      }
+      /**
+       * <code>optional double radius = 7;</code>
+       */
+      public Builder setRadius(double value) {
+        bitField0_ |= 0x00000040;
+        radius_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double radius = 7;</code>
+       */
+      public Builder clearRadius() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        radius_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private double confidence_ ;
+      /**
+       * <code>optional double confidence = 8;</code>
+       */
+      public boolean hasConfidence() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional double confidence = 8;</code>
+       */
+      public double getConfidence() {
+        return confidence_;
+      }
+      /**
+       * <code>optional double confidence = 8;</code>
+       */
+      public Builder setConfidence(double value) {
+        bitField0_ |= 0x00000080;
+        confidence_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double confidence = 8;</code>
+       */
+      public Builder clearConfidence() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        confidence_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private boolean on_ ;
+      /**
+       * <code>optional bool on = 9;</code>
+       */
+      public boolean hasOn() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      /**
+       * <code>optional bool on = 9;</code>
+       */
+      public boolean getOn() {
+        return on_;
+      }
+      /**
+       * <code>optional bool on = 9;</code>
+       */
+      public Builder setOn(boolean value) {
+        bitField0_ |= 0x00000100;
+        on_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool on = 9;</code>
+       */
+      public Builder clearOn() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        on_ = false;
+        onChanged();
+        return this;
+      }
+
+      private int framesOn_ ;
+      /**
+       * <code>optional sint32 frames_on = 10;</code>
+       */
+      public boolean hasFramesOn() {
+        return ((bitField0_ & 0x00000200) == 0x00000200);
+      }
+      /**
+       * <code>optional sint32 frames_on = 10;</code>
+       */
+      public int getFramesOn() {
+        return framesOn_;
+      }
+      /**
+       * <code>optional sint32 frames_on = 10;</code>
+       */
+      public Builder setFramesOn(int value) {
+        bitField0_ |= 0x00000200;
+        framesOn_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 frames_on = 10;</code>
+       */
+      public Builder clearFramesOn() {
+        bitField0_ = (bitField0_ & ~0x00000200);
+        framesOn_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int framesOff_ ;
+      /**
+       * <code>optional sint32 frames_off = 11;</code>
+       */
+      public boolean hasFramesOff() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      /**
+       * <code>optional sint32 frames_off = 11;</code>
+       */
+      public int getFramesOff() {
+        return framesOff_;
+      }
+      /**
+       * <code>optional sint32 frames_off = 11;</code>
+       */
+      public Builder setFramesOff(int value) {
+        bitField0_ |= 0x00000400;
+        framesOff_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 frames_off = 11;</code>
+       */
+      public Builder clearFramesOff() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        framesOff_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private double relXVariance_ ;
+      /**
+       * <code>optional double rel_x_variance = 12;</code>
+       */
+      public boolean hasRelXVariance() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional double rel_x_variance = 12;</code>
+       */
+      public double getRelXVariance() {
+        return relXVariance_;
+      }
+      /**
+       * <code>optional double rel_x_variance = 12;</code>
+       */
+      public Builder setRelXVariance(double value) {
+        bitField0_ |= 0x00000800;
+        relXVariance_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double rel_x_variance = 12;</code>
+       */
+      public Builder clearRelXVariance() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        relXVariance_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private double relYVariance_ ;
+      /**
+       * <code>optional double rel_y_variance = 13;</code>
+       */
+      public boolean hasRelYVariance() {
+        return ((bitField0_ & 0x00001000) == 0x00001000);
+      }
+      /**
+       * <code>optional double rel_y_variance = 13;</code>
+       */
+      public double getRelYVariance() {
+        return relYVariance_;
+      }
+      /**
+       * <code>optional double rel_y_variance = 13;</code>
+       */
+      public Builder setRelYVariance(double value) {
+        bitField0_ |= 0x00001000;
+        relYVariance_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double rel_y_variance = 13;</code>
+       */
+      public Builder clearRelYVariance() {
+        bitField0_ = (bitField0_ & ~0x00001000);
+        relYVariance_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private double bearingDeg_ ;
+      /**
+       * <code>optional double bearing_deg = 14;</code>
+       */
+      public boolean hasBearingDeg() {
+        return ((bitField0_ & 0x00002000) == 0x00002000);
+      }
+      /**
+       * <code>optional double bearing_deg = 14;</code>
+       */
+      public double getBearingDeg() {
+        return bearingDeg_;
+      }
+      /**
+       * <code>optional double bearing_deg = 14;</code>
+       */
+      public Builder setBearingDeg(double value) {
+        bitField0_ |= 0x00002000;
+        bearingDeg_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double bearing_deg = 14;</code>
+       */
+      public Builder clearBearingDeg() {
+        bitField0_ = (bitField0_ & ~0x00002000);
+        bearingDeg_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private int x_ ;
+      /**
+       * <code>optional sint32 x = 15;</code>
+       */
+      public boolean hasX() {
+        return ((bitField0_ & 0x00004000) == 0x00004000);
+      }
+      /**
+       * <code>optional sint32 x = 15;</code>
+       */
+      public int getX() {
+        return x_;
+      }
+      /**
+       * <code>optional sint32 x = 15;</code>
+       */
+      public Builder setX(int value) {
+        bitField0_ |= 0x00004000;
+        x_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 x = 15;</code>
+       */
+      public Builder clearX() {
+        bitField0_ = (bitField0_ & ~0x00004000);
+        x_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int y_ ;
+      /**
+       * <code>optional sint32 y = 16;</code>
+       */
+      public boolean hasY() {
+        return ((bitField0_ & 0x00008000) == 0x00008000);
+      }
+      /**
+       * <code>optional sint32 y = 16;</code>
+       */
+      public int getY() {
+        return y_;
+      }
+      /**
+       * <code>optional sint32 y = 16;</code>
+       */
+      public Builder setY(int value) {
+        bitField0_ |= 0x00008000;
+        y_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 y = 16;</code>
+       */
+      public Builder clearY() {
+        bitField0_ = (bitField0_ & ~0x00008000);
+        y_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:messages.VBall)
+    }
+
+    static {
+      defaultInstance = new VBall(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:messages.VBall)
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor
@@ -4508,6 +6153,11 @@ public final class VisionOuterClass {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_Vision_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_messages_VBall_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_messages_VBall_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -4517,21 +6167,28 @@ public final class VisionOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\014Vision.proto\022\010messages\032\017BallModel.prot" +
-      "o\";\n\tHoughLine\022\t\n\001r\030\001 \001(\002\022\t\n\001t\030\002 \001(\002\022\013\n\003" +
-      "ep0\030\003 \001(\002\022\013\n\003ep1\030\004 \001(\002\"\224\001\n\tFieldLine\022\"\n\005" +
-      "inner\030\001 \001(\0132\023.messages.HoughLine\022\"\n\005oute" +
-      "r\030\002 \001(\0132\023.messages.HoughLine\022\n\n\002id\030\003 \001(\005" +
+      "\n\014Vision.proto\022\010messages\";\n\tHoughLine\022\t\n" +
+      "\001r\030\001 \001(\002\022\t\n\001t\030\002 \001(\002\022\013\n\003ep0\030\003 \001(\002\022\013\n\003ep1\030" +
+      "\004 \001(\002\"\224\001\n\tFieldLine\022\"\n\005inner\030\001 \001(\0132\023.mes" +
+      "sages.HoughLine\022\"\n\005outer\030\002 \001(\0132\023.message" +
+      "s.HoughLine\022\n\n\002id\030\003 \001(\005\022\026\n\016correspondenc" +
+      "e\030\004 \001(\005\022\014\n\004prob\030\005 \001(\002\022\r\n\005index\030\006 \001(\005\"n\n\006" +
+      "Corner\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\022\n\n\002id\030\003 \001(\005" +
       "\022\026\n\016correspondence\030\004 \001(\005\022\014\n\004prob\030\005 \001(\002\022\r" +
-      "\n\005index\030\006 \001(\005\"n\n\006Corner\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030" +
-      "\002 \001(\002\022\n\n\002id\030\003 \001(\005\022\026\n\016correspondence\030\004 \001(" +
-      "\005\022\014\n\004prob\030\005 \001(\002\022\r\n\005line1\030\006 \001(\005\022\r\n\005line2\030" +
-      "\007 \001(\005\"2\n\014CenterCircle\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 ",
-      "\001(\002\022\014\n\004prob\030\003 \001(\002\"\231\001\n\006Vision\022!\n\004line\030\001 \003" +
-      "(\0132\023.messages.FieldLine\022 \n\006corner\030\002 \003(\0132" +
-      "\020.messages.Corner\022&\n\006circle\030\003 \001(\0132\026.mess" +
-      "ages.CenterCircle\022\"\n\004ball\030\004 \001(\0132\024.messag" +
-      "es.VisionBall"
+      "\n\005line1\030\006 \001(\005\022\r\n\005line2\030\007 \001(\005\">\n\014CenterCi" +
+      "rcle\022\n\n\002on\030\001 \001(\010\022\t\n\001x\030\002 \001(\002\022\t\n\001y\030\003 \001(\002\022\014",
+      "\n\004prob\030\004 \001(\002\"\224\001\n\006Vision\022!\n\004line\030\001 \003(\0132\023." +
+      "messages.FieldLine\022 \n\006corner\030\002 \003(\0132\020.mes" +
+      "sages.Corner\022&\n\006circle\030\003 \001(\0132\026.messages." +
+      "CenterCircle\022\035\n\004ball\030\004 \001(\0132\017.messages.VB" +
+      "all\"\254\002\n\005VBall\022\020\n\010distance\030\001 \001(\001\022\017\n\007beari" +
+      "ng\030\002 \001(\001\022\023\n\013angle_x_deg\030\003 \001(\001\022\023\n\013angle_y" +
+      "_deg\030\004 \001(\001\022\022\n\nbearing_sd\030\005 \001(\001\022\020\n\010inTopC" +
+      "am\030\006 \001(\010\022\016\n\006radius\030\007 \001(\001\022\022\n\nconfidence\030\010" +
+      " \001(\001\022\n\n\002on\030\t \001(\010\022\021\n\tframes_on\030\n \001(\021\022\022\n\nf" +
+      "rames_off\030\013 \001(\021\022\026\n\016rel_x_variance\030\014 \001(\001\022",
+      "\026\n\016rel_y_variance\030\r \001(\001\022\023\n\013bearing_deg\030\016" +
+      " \001(\001\022\t\n\001x\030\017 \001(\021\022\t\n\001y\030\020 \001(\021"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4544,7 +6201,6 @@ public final class VisionOuterClass {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          messages.BallModel.getDescriptor(),
         }, assigner);
     internal_static_messages_HoughLine_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -4569,14 +6225,19 @@ public final class VisionOuterClass {
     internal_static_messages_CenterCircle_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_CenterCircle_descriptor,
-        new java.lang.String[] { "X", "Y", "Prob", });
+        new java.lang.String[] { "On", "X", "Y", "Prob", });
     internal_static_messages_Vision_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_messages_Vision_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_Vision_descriptor,
         new java.lang.String[] { "Line", "Corner", "Circle", "Ball", });
-    messages.BallModel.getDescriptor();
+    internal_static_messages_VBall_descriptor =
+      getDescriptor().getMessageTypes().get(5);
+    internal_static_messages_VBall_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_VBall_descriptor,
+        new java.lang.String[] { "Distance", "Bearing", "AngleXDeg", "AngleYDeg", "BearingSd", "InTopCam", "Radius", "Confidence", "On", "FramesOn", "FramesOff", "RelXVariance", "RelYVariance", "BearingDeg", "X", "Y", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

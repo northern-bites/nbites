@@ -32,7 +32,7 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 
 		RobotLocation naoLoc;
 		ParticleSwarm naoSwarm;
-		VisionBall naoBall;
+		VBall naoBall;
 		CenterCircle naoCC;
 		Vision naoVision;
 
@@ -90,6 +90,7 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 			// Ball
 			naoBall = naoVision.getBall();
 			if (naoBall.getOn() == true) {
+				System.out.printf("BALL AT %d,%d\n", naoBall.getX(), naoBall.getY());
 				naoGeoBall = new GeoBall(
 								naoBall.getX(),
 								naoBall.getY(),
@@ -99,7 +100,10 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 			// Center Circle
 			// TODO: how to check on or off?
 			naoCC = naoVision.getCircle();
-			if (naoCC.getProb() > 0.0) {
+			System.out.println(naoCC.getOn());
+			if (naoCC.getOn() == true) {
+				System.out.printf("CIRC AT %f,%f\n", naoCC.getX(), naoCC.getY());
+		
 				naoGeoCenterCircle = new GeoCenterCircle(
 								naoCC.getX(),
 								naoCC.getY(),
@@ -181,7 +185,7 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 			naoGeoBall.draw(g2, shouldFlip);
 		}
 		if(naoGeoCenterCircle != null) {
-			naoGeoBall.draw(g2, shouldFlip);
+			naoGeoCenterCircle.draw(g2, shouldFlip);
 		}
 
 	}
