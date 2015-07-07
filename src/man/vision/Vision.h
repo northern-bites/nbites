@@ -549,6 +549,9 @@ public:
 	//uint8_t  pixAddr(int x, int y) const { return * pixelAddr(x, y); }
 
 	void reset() {
+		if (pixelAddr(0, 0) == NULL) {
+			return;
+		}
 		for (int i = 0; i < height(); i++) {
 			for (int j = 0; j < width(); j++) {
 				*pixelAddr(j, i) = 0;
