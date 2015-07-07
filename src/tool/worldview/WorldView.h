@@ -27,7 +27,7 @@ public:
     portals::InPortal<messages::WorldModel> commIn[NUM_PLAYERS_PER_TEAM];
     portals::InPortal<messages::SharedBall> sharedIn;
 
-    portals::OutPortal<messages::FilteredBall> ballOut;
+    portals::OutPortal<messages::FilteredBall> sharedBallOut;
     portals::OutPortal<messages::RobotLocation> locOut;
 
 protected:

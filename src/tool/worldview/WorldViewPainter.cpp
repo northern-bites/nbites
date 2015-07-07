@@ -11,6 +11,9 @@ static const int VISION_SPAN = 70;
 // Distance of robot vision, for testing
 static const int VISION_DISTANCE = 50;
 
+//Claimed Ball status
+static bool claimed_ball_on = false;
+
 WorldViewPainter::WorldViewPainter(QWidget* parent, float scaleFactor_) :
     PaintField(parent, scaleFactor_)
 {
@@ -48,28 +51,14 @@ void WorldViewPainter::paintSharedBallLocation(QPaintEvent* event,
         QPoint ballCenter(msg.x(),msg.y());
 
         //draw the weighted averaged location of the ball
-        painter.setBrush(QColor::fromRgb(153,0,153));
+        if(claimed_ball_on) {
+            painter.setBrush(QColor::fromRgb(255,0,0));
+        } else {
+            painter.setBrush(QColor::fromRgb(153,0,153));
+        }
         painter.drawEllipse(ballCenter,8,8);
     }
     return;
-}
-
-void WorldViewPainter::paintClaimedBallLocation(QPaintEvent* event, 
-                                                messages::SharedBall msg) 
-{
-    if(msg.claimed_ball()) {
-        QPainter painter(this);
-        if (flipped) {
-            painter.translate(FIELD_GREEN_WIDTH*scaleFactor,0);
-            painter.scale(-scaleFactor, scaleFactor);
-        } else {
-            painter.translate(0, FIELD_GREEN_HEIGHT*scaleFactor);
-            painter.scale(scaleFactor, -scaleFactor);
-        }
-        QPoint ballCenter(msg.x(),msg.y());
-        painter.setBrush(QColor::fromRgb(255,0,0));
-        painter.drawEllipse(ballCenter,8,8);
-    }
 }
 
 void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
@@ -155,6 +144,10 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
                           msg.my_y()+msg.ball_dist()*std::sin(TO_RAD*msg.my_h()+TO_RAD*msg.ball_bearing()));
 
         //draw where I think the ball is
+        //ball color: orange(unclaimed), red (claimed)
+        if(msg.claimed_ball()) {
+            painter.setBrush(QColor::fromRgb(255,0,0));
+        }
         painter.setBrush(QColor::fromRgb(205,140,0));
         painter.drawEllipse(ballCenter,
                             8,

@@ -12,7 +12,7 @@ WorldView::WorldView(QWidget* parent)
       QWidget(parent),
       commThread("comm", COMM_FRAME_LENGTH_uS),
       wviewComm(16,0),
-      ballOut(base()),
+      sharedBallOut(base()),
       locOut(base()),
       wviewShared(1),
       newTeam(0),
@@ -117,7 +117,7 @@ WorldView::WorldView(QWidget* parent)
         wviewShared.worldModelIn[i].wireTo(wviewComm._worldModels[i]);
     }
 
-    wviewShared.ballIn.wireTo(&ballOut,true);
+    wviewShared.ballIn.wireTo(&sharedBallOut,true);
     wviewShared.locIn.wireTo(&locOut,true);
 
     sharedIn.wireTo(&wviewShared.sharedBallOutput);
@@ -153,10 +153,10 @@ void WorldView::run_()
 
 void WorldView::setSharedBall()
 {
-    portals::Message<messages::FilteredBall> ballMessage(0);
-    ballMessage.get()->set_distance(commIn[4].message().ball_dist());
-    ballMessage.get()->set_bearing(commIn[4].message().ball_bearing());
-    ballOut.setMessage(ballMessage);
+    portals::Message<messages::FilteredBall> sharedBallMessage(0);
+    sharedBallMessage.get()->set_distance(commIn[4].message().ball_dist());
+    sharedBallMessage.get()->set_bearing(commIn[4].message().ball_bearing());
+    sharedBallOut.setMessage(sharedBallMessage);
 
     portals::Message<messages::RobotLocation> locMessage(0);
     locMessage.get()->set_x(commIn[4].message().my_x());
