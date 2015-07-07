@@ -459,7 +459,7 @@ void Boss::checkFIFO() {
         int64_t _lw = shared->latestSensorWritten;
         int64_t _lr = shared->latestSensorRead;
         printf("BOSS PRINT:\n\tpre-skips=%lld post-skips=%lld\n"
-               "man-live: \t%lld\t[%lld - %lld]\n",
+               "\tman-live: \t%lld\t[%lld - %lld]\n",
                cmndLockMiss,sensorLockMiss,
                _lw - _lr, _lw, _lr);
         break;
