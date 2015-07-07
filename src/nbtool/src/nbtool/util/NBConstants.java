@@ -25,8 +25,8 @@ import nbtool.gui.logviews.loc.LocSwarmView;
 
 public class NBConstants {
 	
-	public static final int VERSION = 6;
-	public static final int MINOR_VERSION = 5;
+	public static final int VERSION = 7;
+	public static final int MINOR_VERSION = 0;
 	
 	public static final String PROTOBUF_TYPE_PREFIX = "proto-";
 	
