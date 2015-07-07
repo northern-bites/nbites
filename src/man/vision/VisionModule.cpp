@@ -190,7 +190,7 @@ void VisionModule::run_()
 
 void VisionModule::outportalVisionField()
 {
-    messages::Vision visionField;
+    messages::VisionObjects visionField;
 
     // Outportal Lines
     // Mark repeat lines (already found in bottom camera) in top camera
@@ -309,7 +309,7 @@ void VisionModule::outportalVisionField()
     }
 
     // Send it out
-    portals::Message<messages::Vision> visionOutMessage(&visionField);
+    portals::Message<messages::VisionObjects> visionOutMessage(&visionField);
     visionOut.setMessage(visionOutMessage);
 
  //   std::cout << ""

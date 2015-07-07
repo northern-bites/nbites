@@ -68,7 +68,7 @@ public:
      *  @brief Given a new motion and vision input, update the filter
      */
     void update(const messages::RobotLocation& motionInput,
-                messages::Vision&              visionInput,
+                messages::VisionObjects&              visionInput,
                 const messages::FilteredBall*  ballInput);
 
     // Overload to use ball info
@@ -145,7 +145,7 @@ private:
      */
     void updateEstimate();
 
-    void updateFieldForDebug(messages::Vision& vision);
+    void updateFieldForDebug(messages::VisionObjects& vision);
 
     /**
      * @brief - Return symmetric location from given one

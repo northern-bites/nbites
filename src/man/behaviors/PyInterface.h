@@ -31,7 +31,7 @@ public:
     messages::GameState         const * gameState_ptr;
     messages::RobotLocation     const * loc_ptr;
 
-    messages::Vision            const * vision_ptr;
+    messages::VisionTest            const * vision_ptr;
     
     messages::FilteredBall      const * filteredBall_ptr;
     messages::LedCommand        const * ledCommand_ptr;
@@ -80,10 +80,10 @@ public:
     }
 
 
-    void setVision_ptr(const messages::Vision* msg)
+    void setVision_ptr(const messages::VisionTest* msg)
     {
         vision_ptr = msg;
-        std::cout << "CC: " << msg->circle().x() << ", " << msg->circle().y() << std::endl;
+    //    std::cout << "CC: " << msg->circle().x() << ", " << msg->circle().y() << std::endl;
     }
 
 

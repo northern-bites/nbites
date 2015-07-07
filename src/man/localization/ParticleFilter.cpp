@@ -60,7 +60,7 @@ ParticleFilter::~ParticleFilter()
 }
 
 void ParticleFilter::update(const messages::RobotLocation& odometryInput,
-                            messages::Vision&              visionInput,
+                            messages::VisionObjects&              visionInput,
                             const messages::FilteredBall*  ballInput)
 {
     // Motion system and vision system update step
@@ -133,7 +133,7 @@ void ParticleFilter::updateEstimate()
     // std::cout << variance << std::endl;
 }
 
-void ParticleFilter::updateFieldForDebug(messages::Vision& vision)
+void ParticleFilter::updateFieldForDebug(messages::VisionObjects& vision)
 {
     LineSystem lineSystem;
     lineSystem.setDebug(false);

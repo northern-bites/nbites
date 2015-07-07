@@ -239,6 +239,7 @@ class Brain(object):
     def updateVision(self):
         self.visionLines = self.interface.vision
      #   self.visionCorners = self.interface.visionCorners
+        print(self.visionLines.x)
 
         # if self.counter % 50 == 0:
         #     print "VisionCorner size:"
