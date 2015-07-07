@@ -9,11 +9,12 @@
 
 #include "DebugConfig.h"
 
+#define BOSS_DEAD_THRESHOLD 50
+
 namespace man {
 namespace jointenactor{
 
-JointEnactorModule::JointEnactorModule() :
-    bossSlow(false)
+JointEnactorModule::JointEnactorModule()
 {
     shared_fd = shm_open(NBITES_MEM, O_RDWR, 0600);
     if (shared_fd < 0) {
@@ -68,14 +69,16 @@ void JointEnactorModule::writeCommand()
         return;
     }
 
-    uint64_t lw = shared->latestCommandWritten;
-    uint64_t lr = shared->latestCommandRead;
+    int64_t lw = shared->latestCommandWritten;
+    int64_t lr = shared->latestCommandRead;
 
     if (lw - lr > 1) {
         std::cout << "BOSS missed a frame" << std::endl;
     }
 
-    if (lw - lr > 10 && (lr < lw)) {
+    if ( (lw - lr) > BOSS_DEAD_THRESHOLD
+        && (lr != 0)    //Boss might be slow on man startup, that's ok
+        ) {
         std::cout << "Commands aren't getting read! Did Boss die?" << std::endl;
         std::cout << "commandIndex: " << lw << " lastRead: " << lr << std::endl;
         exit(0);
