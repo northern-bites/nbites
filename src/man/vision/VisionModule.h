@@ -28,7 +28,7 @@ public:
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::InertialState> inertsIn;
 
-    portals::OutPortal<messages::VisionObjects> visionOut;
+    portals::OutPortal<messages::Vision> visionOut;
     portals::OutPortal<messages::VisionBall> ballOut;
 
 

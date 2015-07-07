@@ -30,9 +30,7 @@ class PyInterface
 public:
     messages::GameState         const * gameState_ptr;
     messages::RobotLocation     const * loc_ptr;
-
-    messages::VisionObjects            const * vision_ptr;
-    
+    messages::Vision            const * vision_ptr;
     messages::FilteredBall      const * filteredBall_ptr;
     messages::LedCommand        const * ledCommand_ptr;
     messages::WorldModel        const * worldModel_ptr[NUM_PLAYERS_PER_TEAM];
@@ -79,7 +77,7 @@ public:
     }
 
 
-    void setVision_ptr(const messages::VisionObjects* msg)
+    void setVision_ptr(const messages::Vision* msg)
     {
         vision_ptr = msg;
     //    std::cout << "CC: " << msg->circle().x() << ", " << msg->circle().y() << std::endl;

@@ -237,9 +237,8 @@ class Brain(object):
         self.motion = self.interface.motionStatus
 
     def updateVision(self):
-        self.visionLines = self.interface.vision
-     #   self.visionCorners = self.interface.visionCorners
-        print(self.visionLines.circle.x)
+        self.visionLines = self.interface.vision.line
+        self.visionCorners = self.interface.vision.corner
 
         # if self.counter % 50 == 0:
         #     print "VisionCorner size:"

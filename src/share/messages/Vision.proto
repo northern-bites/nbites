@@ -18,11 +18,6 @@ message FieldLine
     optional int32 index = 6;
 }
 
-message FieldLines
-{
-    repeated FieldLine line = 1;
-}
-
 message Corner
 {
     optional float x = 1;
@@ -34,11 +29,6 @@ message Corner
     optional int32 line2 = 7;
 }
 
-message Corners
-{
-    repeated Corner corner = 1;
-}
-
 message CenterCircle
 {
     optional bool on = 1;
@@ -46,11 +36,30 @@ message CenterCircle
     optional float y = 3;
 }
 
-message VisionObjects
+message Vision
 {
     repeated FieldLine line = 1;
     repeated Corner corner = 2;
     optional CenterCircle circle = 3;
-   
+    optional VBall ball = 4;
 }
 
+message VBall
+{
+    optional double distance = 1;
+    optional double bearing = 2;
+    optional double angle_x_deg = 3;
+    optional double angle_y_deg = 4;
+    optional double bearing_sd = 5;
+    optional bool inTopCam = 6;
+    optional double radius = 7;
+    optional double confidence = 8;
+    optional bool on = 9;
+    optional sint32 frames_on = 10;
+    optional sint32 frames_off = 11;
+    optional double rel_x_variance = 12;
+    optional double rel_y_variance = 13;
+    optional double bearing_deg = 14;
+    optional sint32 x = 15;
+    optional sint32 y = 16;
+}
