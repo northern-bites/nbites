@@ -21,6 +21,7 @@ message FieldLine
 message FieldLines
 {
     repeated FieldLine line = 1;
+    optional int32 horizon_dist = 2;
 }
 
 message Corner
