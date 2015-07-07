@@ -4,7 +4,7 @@ from . import NavConstants as constants
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
 from objects import RobotLocation, RelLocation, RelRobotLocation
-from math import pi, sqrt, fabs, copysign
+from math import pi, sqrt
 from ..kickDecider import kicks
 from ..util import Transition
 
@@ -175,10 +175,6 @@ class Navigator(FSA.FSA):
         if speed is not KEEP_SAME_SPEED:
             self.requestVelocity = speed
 
-        if fabs(self.requestVelocity - self.velocity) > SPEED_CHANGE:
-            NavStates.goToPosition.speed = self.velocity
-            self.velocity += copysign(SPEED_CHANGE, (self.requestVelocity - self.velocity))
-
         if fast:
             NavStates.goToPosition.fast = fast
 
@@ -201,9 +197,6 @@ class Navigator(FSA.FSA):
         
         self.requestVelocity = speed
         NavStates.destinationWalkingTo.speed = self.velocity
-        if fabs(self.requestVelocity - self.velocity) > SPEED_CHANGE:
-            NavStates.destinationWalkingTo.speed = self.velocity
-            self.velocity += copysign(SPEED_CHANGE, (self.requestVelocity - self.velocity))
 
         NavStates.destinationWalkingTo.kick = kick
 
@@ -214,10 +207,6 @@ class Navigator(FSA.FSA):
 
     def updateDestinationWalkDest(self, dest):
         """  Update the destination we're headed to   """
-        if fabs(self.requestVelocity - self.velocity) > SPEED_CHANGE:
-            NavStates.destinationWalkingTo.speed = self.velocity
-            self.velocity += copysign(SPEED_CHANGE, (self.requestVelocity - self.velocity))
-
         self.destination = dest
 
         NavStates.destinationWalkingTo.destQueue.append(dest)
