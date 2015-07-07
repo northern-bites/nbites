@@ -549,6 +549,7 @@ public:
 	//uint8_t  pixAddr(int x, int y) const { return * pixelAddr(x, y); }
 
 	void reset() {
+#ifdef OFFLINE
 		if (pixelAddr(0, 0) == NULL) {
 			return;
 		}
@@ -557,6 +558,7 @@ public:
 				*pixelAddr(j, i) = 0;
 			}
 		}
+#endif
 	}
 
     /**

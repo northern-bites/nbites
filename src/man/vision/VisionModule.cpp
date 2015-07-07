@@ -83,7 +83,11 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
 			debugImage[i]->reset();
 		}
 
-        ballDetector[i] = new BallDetector(homography[i], i == 0);
+		if (i == 0) {
+			field = new Field(wd / 2, ht / 2, homography[0]);
+		}
+
+        ballDetector[i] = new BallDetector(homography[i], field, i == 0);
         boxDetector[i] = new GoalboxDetector();
         centerCircleDetector[i] = new CenterCircleDetector();
 
@@ -100,7 +104,6 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         edgeDetector[i]->fast(fast);
         hough[i]->fast(fast);
     }
-	field = new Field(wd / 2, ht / 2, homography[0]);
 #ifdef OFFLINE
 	// Here is an example of how to get access to the debug space. In this case the
 	// field class only runs on the top image so it only needs that one
@@ -404,10 +407,13 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
 		int fieldHorizon = params->get(1)->find("FieldHorizon")->get(1)->valueAsInt();
 		int debugHorizon = params->get(1)->find("DebugHorizon")->get(1)->valueAsInt();
 		int debugField = params->get(1)->find("DebugField")->get(1)->valueAsInt();
+		int debugBall = params->get(1)->find("DebugBall")->get(1)->valueAsInt();
 		field->setDrawCameraHorizon(cameraHorizon);
 		field->setDrawFieldHorizon(fieldHorizon);
 		field->setDebugHorizon(debugHorizon);
 		field->setDebugFieldEdge(debugField);
+		ballDetector[0]->setDebugBall(debugBall);
+		ballDetector[1]->setDebugBall(debugBall);
 	}
 #endif
 

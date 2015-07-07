@@ -72,12 +72,14 @@ public class DebugImageView extends ViewParent
 	JCheckBox showFieldHorizon;
 	JCheckBox debugHorizon;
 	JCheckBox debugFieldEdge;
+	JCheckBox debugBall;
 	JCheckBox showFieldLines;
 	CheckBoxListener checkListener = null;
 
 	boolean displayFieldLines;
+	boolean drawAllBalls;
 
-	static final int NUMBER_OF_PARAMS = 4; // update as new params are added
+	static final int NUMBER_OF_PARAMS = 5; // update as new params are added
 	int displayParams[] = new int[NUMBER_OF_PARAMS];
 
 	// Dimensions of the image that we are working with
@@ -154,7 +156,8 @@ public class DebugImageView extends ViewParent
         SExpr newParams = SExpr.newList(SExpr.newKeyValue("CameraHorizon", displayParams[0]),
 										SExpr.newKeyValue("FieldHorizon", displayParams[1]),
 										SExpr.newKeyValue("DebugHorizon", displayParams[2]),
-										SExpr.newKeyValue("DebugField", displayParams[3]));
+										SExpr.newKeyValue("DebugField", displayParams[3]),
+										SExpr.newKeyValue("DebugBall", displayParams[4]));
 
         // Look for existing Params atom in current this.log description
         SExpr oldParams = currentLog.tree().find("DebugDrawing");
@@ -250,17 +253,18 @@ public class DebugImageView extends ViewParent
         String b = "blob";
 
 		// loop through all of the balls we find in the tree
-        for (int i=0; ; i++)
-        {
-            SExpr tree = balls.tree();
-            SExpr bl = tree.find(b+i);
-            if (!bl.exists()) {
-                break;
-            }
-
-            SExpr blob = bl.get(1);
-            drawBlob(graph, blob);
-        }
+		for (int i=0; ; i++)
+			{
+				SExpr tree = balls.tree();
+				SExpr bl = tree.find(b+i);
+				if (!bl.exists()) {
+					break;
+				}
+				SExpr blob = bl.get(1);
+				if (drawAllBalls) {
+					drawBlob(graph, blob);
+				}
+			}
 
         graph.setColor(Color.GREEN);
 
@@ -343,14 +347,17 @@ public class DebugImageView extends ViewParent
 		showFieldHorizon = new JCheckBox("Show field convex hull");
 		debugHorizon = new JCheckBox("Debug Field Horizon");
 		debugFieldEdge = new JCheckBox("Debug Field Edge");
+		debugBall = new JCheckBox("Debug Ball");
 		showFieldLines = new JCheckBox("Hide Field Lines");
 		displayFieldLines = true;
+		drawAllBalls = false;
 
 		// add their listeners
 		showCameraHorizon.addItemListener(checkListener);
 		showFieldHorizon.addItemListener(checkListener);
 		debugHorizon.addItemListener(checkListener);
 		debugFieldEdge.addItemListener(checkListener);
+		debugBall.addItemListener(checkListener);
 		showFieldLines.addItemListener(checkListener);
 
 		// put them into one panel
@@ -360,6 +367,7 @@ public class DebugImageView extends ViewParent
 		checkBoxPanel.add(showFieldHorizon);
 		checkBoxPanel.add(debugHorizon);
 		checkBoxPanel.add(debugFieldEdge);
+		checkBoxPanel.add(debugBall);
 		checkBoxPanel.add(showFieldLines);
 
 		// default all checkboxes to false
@@ -367,6 +375,7 @@ public class DebugImageView extends ViewParent
 		showFieldHorizon.setSelected(false);
 		debugHorizon.setSelected(false);
 		debugFieldEdge.setSelected(false);
+		debugBall.setSelected(false);
 		showFieldLines.setSelected(false);
 
         this.addMouseListener(new DistanceGetter());
@@ -407,8 +416,6 @@ public class DebugImageView extends ViewParent
 			currentBottom = ORANGE_IMAGE;
 		} else if (viewName == "Edge") {
 			currentBottom = EDGE_IMAGE;
-		} else if (viewName == "Ball") {
-			currentBottom = BALL_IMAGE;
 		} else if (viewName == "Original") {
 			currentBottom = ORIGINAL;
 		} else {
@@ -447,6 +454,9 @@ public class DebugImageView extends ViewParent
 				index = 2;
 			} else if (source == debugFieldEdge) {
 				index = 3;
+			} else if (source == debugBall) {
+				index = 4;
+				drawAllBalls = !drawAllBalls;
 			} else if (source == showFieldLines) {
 				index = -1;
 				displayFieldLines = !displayFieldLines;
