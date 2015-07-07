@@ -37,7 +37,7 @@ def approachBall(player):
         return player.goNow('positionAndKickBall')
     
     elif transitions.shouldDecelerate(player):
-        player.brain.nav.chaseBallDeceleratingSpeed()
+        player.brain.nav.chaseBall(Navigator.BRISK_SPEED, fast = True)
     else:
         player.brain.nav.chaseBall(Navigator.FAST_SPEED, fast = True)
 

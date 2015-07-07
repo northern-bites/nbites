@@ -4,7 +4,7 @@ from . import NavConstants as constants
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
 from objects import RobotLocation, RelLocation, RelRobotLocation
-from math import pi, sqrt
+from math import pi, sqrt, fabs, copysign
 from ..kickDecider import kicks
 from ..util import Transition
 
@@ -33,6 +33,9 @@ PRECISELY = (1.0, 1.0, 5)
 LEFT = 1
 RIGHT = -LEFT
 
+# 2 seconds to go from 0 to 1
+SPEED_CHANGE = 1/60.
+
 DEBUG_MOTION_STATUS = False
 
 class Navigator(FSA.FSA):
@@ -46,6 +49,8 @@ class Navigator(FSA.FSA):
         self.setName('Navigator')
         self.setPrintStateChanges(True)
         self.stateChangeColor = 'cyan'
+        self.velocity = 0.
+        self.requestVelocity = 0.
         self.destination = None # Used to set walking_to in world model proto
         #transitions
         #@todo: move this to the actual transitions file?
@@ -96,14 +101,6 @@ class Navigator(FSA.FSA):
         self.destination = self.brain.ball
 
         self.goTo(self.brain.ball, CLOSE_ENOUGH, speed, True, fast = fast)
-
-    def chaseBallDeceleratingSpeed(self):
-        MAX_SPEED = FULL_SPEED
-        MIN_SPEED = BRISK_SPEED
-        ballDist = self.brain.ball.distance
-        slope = (MAX_SPEED - MIN_SPEED)/(constants.SLOW_CHASE_DIST - constants.PREPARE_FOR_KICK_DIST)
-        deceleratingSpeed = MAX_SPEED - slope*(constants.SLOW_CHASE_DIST - ballDist)
-        self.brain.nav.chaseBall(deceleratingSpeed, fast = True)
 
     def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED,
              avoidObstacles = False, adaptive = False, fast = False, pb = False):
@@ -176,7 +173,12 @@ class Navigator(FSA.FSA):
 
         NavStates.goToPosition.dest = dest
         if speed is not KEEP_SAME_SPEED:
-            NavStates.goToPosition.speed = speed
+            self.requestVelocity = speed
+
+        if fabs(self.requestVelocity - self.velocity) > SPEED_CHANGE:
+            NavStates.goToPosition.speed = self.velocity
+            self.velocity += copysign(SPEED_CHANGE, (self.requestVelocity - self.velocity))
+
         if fast:
             NavStates.goToPosition.fast = fast
 
@@ -196,7 +198,13 @@ class Navigator(FSA.FSA):
         NavStates.destinationWalkingTo.destQueue.clear()
 
         NavStates.destinationWalkingTo.destQueue.append(walkToDest)
-        NavStates.destinationWalkingTo.speed = speed
+        
+        self.requestVelocity = speed
+        NavStates.destinationWalkingTo.speed = self.velocity
+        if fabs(self.requestVelocity - self.velocity) > SPEED_CHANGE:
+            NavStates.destinationWalkingTo.speed = self.velocity
+            self.velocity += copysign(SPEED_CHANGE, (self.requestVelocity - self.velocity))
+
         NavStates.destinationWalkingTo.kick = kick
 
         #reset the counter to make sure walkingTo.firstFrame() is true on entrance
@@ -206,6 +214,10 @@ class Navigator(FSA.FSA):
 
     def updateDestinationWalkDest(self, dest):
         """  Update the destination we're headed to   """
+        if fabs(self.requestVelocity - self.velocity) > SPEED_CHANGE:
+            NavStates.destinationWalkingTo.speed = self.velocity
+            self.velocity += copysign(SPEED_CHANGE, (self.requestVelocity - self.velocity))
+
         self.destination = dest
 
         NavStates.destinationWalkingTo.destQueue.append(dest)
