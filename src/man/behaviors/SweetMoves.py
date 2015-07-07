@@ -51,45 +51,25 @@ def getMoveTime(move):
 
 OFF = None #OFF means the joint chain doesnt get enqueued during this motion
 
-INITIAL_POS = (((90., 10.0, -90., -10.),
-                (0.0,  0.0,  -22.3, 43.5, -21.2, 0.0),
-                (0.0,  0.0,  -22.3, 43.5, -21.2, 0.0),
-                (90.0,-10., 82, 13.2),
+INITIAL_POS = (((90., 10., -90., -3.),
+                (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+                (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+                (90., -10., 90., 3.),
                 3.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
 
 #Keyframe that moves can called from an unbalanced position to slowly return the joints to a stable, standing position.
-INITIAL_POS_KEYFRAME = ((90.,10.,-90.,-10.),
-			(0.0,0.0,-22.3,43.5,-21.2, 0.0),
-			(0.0,0.0,-22.3,43.5,-21.2, 0.0),
-			(90.,-10.,82.,13.2),
-			2,0,stiff.NORMAL_STIFFNESSES)
-
-BRING_ARMS_FORWARD = ((105.,10.,15.,-11.6),
-      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
-      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
-      (105.,-10.,-15.,-11.6),
-      0.5,0,stiff.NORMAL_STIFFNESSES)
-
-BRING_ARMS_FORWARD_SLOW = ((105.,10.,15.,-11.6),
-      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
-      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
-      (105.,-10.,-15.,-11.6),
-      1,0,stiff.NORMAL_STIFFNESSES)
-
+INITIAL_POS_KEYFRAME = ((90., 10., -90., -3.),
+                        (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+                        (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+                        (90., -10., 90., 3.),
+			                   2,0,stiff.NORMAL_STIFFNESSES)
 
 #Keyframe that moves the joints to a stable, standing position quickly.
-QUICK_INITIAL_POS_KEYFRAME = ((90.,10.,-90.,-10.),
-			(0.0,0.0,-22.3,43.5,-21.2, 0.0),
-			(0.0,0.0,-22.3,43.5,-21.2, 0.0),
-			(90.,-10.,82.,13.2),
-			0.8,0,stiff.NORMAL_STIFFNESSES)
-
-#Not used
-NO_HEAD_INITIAL_POS = (((60.0, 35.0, 0.0, 0.0),
-                        (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
-                        (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
-                        (60.0,-35.0, 0.0, 0.0),
-                        3.0,0,stiff.NO_HEAD_STIFFNESSES),)
+QUICK_INITIAL_POS_KEYFRAME = ((90., 10., -90., -3.),
+                              (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+                              (0.0, 0.0, -25., 56.3, -31.3, 0.0),
+                              (90., -10., 90., 3.),
+			                       0.8,0,stiff.NORMAL_STIFFNESSES)
 
 #Angles measured pretty exactly from the robot w/gains off.
 #might want to make them even different if we suspect the
@@ -100,18 +80,25 @@ SIT_POS = (((0.,90.,0.,0.),
             (0.,-90.,0.,0.),
             3.0,0,stiff.LOW_HEAD_STIFFNESSES),
 
-           ((90.,10.,4.,-10.),
-            (0.5,0.,-55.,125.7,-75.7,0.),
-            (0.5,0.,-55.,125.7,-75.7,0.),
-            (90.,-10.,-4.,10.),
+           ((90.,10.,-85.,-10.),
+            (1.0,0.,-55.,125.7,-75.7,0.),
+            (1.0,0.,-55.,125.7,-75.7,0.),
+            (90.,-10.,85.,10.),
             1.5,0,stiff.LOW_LEG_STIFFNESSES)
           )
-#Not used
-ZERO_POS = (((0.,0.,0.,0.),
-             (0.,0.,0.,0.,0.),
-             (0.,0.,0.,0.,0.,0.),
-             (0.,0.,0.,0.),
-             4.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
+
+SIT_POS_V5 = (((0.,90.,0.,0.),
+               (0.,0.,-55.,125.7,-75.7,0.),
+               (0.,0.,-55.,125.7,-75.7,0.),
+               (0.,-90.,0.,0.),
+               3.0,0,stiff.LOW_HEAD_STIFFNESSES),
+
+              ((90.,10.,-85.,-10.),
+               (-1.0,0.,-55.,125.7,-75.7,0.),
+               (-1.0,0.,-55.,125.7,-75.7,0.),
+               (90.,-10.,85.,10.),
+               1.5,0,stiff.LOW_LEG_STIFFNESSES)
+             )
 
 #**********************
 #                     *
@@ -1172,8 +1159,6 @@ RIGHT_QUICK_STRAIGHT_KICK = mirrorMove(LEFT_QUICK_STRAIGHT_KICK)
 
 
 LEFT_MEDIUM_STRAIGHT_KICK = (
-    BRING_ARMS_FORWARD_SLOW,
-
     #stand for a bit
     ((90.,10.,-90.,-10.),
      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
@@ -1228,8 +1213,6 @@ RIGHT_MEDIUM_STRAIGHT_KICK = mirrorMove(LEFT_MEDIUM_STRAIGHT_KICK)
 
 # This is a relatively stable straight kick for arms back
 LEFT_SHORT_STRAIGHT_KICK = (
-    BRING_ARMS_FORWARD_SLOW,
-
     #stand for a bit
     ((90.,10.,-90.,-10.),
      (-0.2,5,-25,43.5,-21.2, 0.0),
