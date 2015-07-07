@@ -434,9 +434,7 @@ void ParticleFilter::resample()
     int ni = 0;
     for(int i = 0; i < parameters.numParticles; ++i) {
         double randInjectOrSample = gen();
-        // NOTE slight deviation from standard augmented MCL, we inject at most
-        //      expected (since involves random numbers) fifty percent of swarm size
-        if (injections.size() && randInjectOrSample < std::max<double>(0, 0.5 - (wFast / wSlow))) {
+        if (injections.size() && randInjectOrSample < std::max<double>(0, 1.0 - (wFast / wSlow))) {
             // Inject particles according to sensor measurements
             ReconstructedLocation injection = injections[rand() % injections.size()];
             messages::RobotLocation sample = injection.sample();
