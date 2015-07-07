@@ -50,7 +50,7 @@ int main() {
     signal(SIGTERM, handler);
     establishLock();
     
-    printf("\t\tman 7/6\n");
+    printf("\t\tman 7/9\n");
     printf("Man re-opening stdout...\n");
     freopen(MAN_LOG_PATH, "w", stdout);
 
