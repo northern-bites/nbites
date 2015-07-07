@@ -22,6 +22,9 @@ def getLines(player):
     if len(GoalieStates.watchWithLineChecks.lines) > constants.MEM_THRESH:
         GoalieStates.watchWithLineChecks.lines = GoalieStates.watchWithLineChecks.lines[1:]
 
+    if len(player.homeDirections) > constants.BUFFER_THRESH:
+        player.homeDirections = player.homeDirections[1:]
+
         # r = line.inner.r
         # t = line.inner.t
         # x0 = r * math.cos(t)
@@ -55,6 +58,7 @@ def frontLineCheckShouldReposition(player):
     h_dest = 0.0
 
     if not GoalieStates.watchWithLineChecks.correctFacing:
+        print "not correct facin"
         return False
 
     for line in GoalieStates.watchWithLineChecks.lines:
@@ -76,10 +80,9 @@ def frontLineCheckShouldReposition(player):
             player.homeDirections += [RelRobotLocation(x_dest, y_dest, h_dest)]
             return True
 
-    if len(player.homeDirections) > constants.BUFFER_THRESH:
-        player.homeDirections = player.homeDirections[1:]
-
     return False
+
+# def iAmRight(player):
 
 
 def sideLineCheckShouldReposition(player):
@@ -88,16 +91,17 @@ def sideLineCheckShouldReposition(player):
     h_dest = 0.0
 
     if GoalieStates.watchWithLineChecks.correctFacing is False:
+        print("incorrect facing")
         return False
 
     reasonAbleFrontLine = False
     for line in GoalieStates.watchWithLineChecks.lines:
         if math.fabs(math.degrees(line.t) - constants.EXPECTED_FRONT_LINE_T) < 15.0:
-            if line.r > 20.0:
+            if line.r > 15.0:
                 reasonAbleFrontLine = True
-                print("I found a resonable front line!")
 
-    if reasonAbleFrontLine is False:
+    if GoalieStates.watchWithLineChecks.numFixes < 1:
+        print "not enough fgixes"
         return False
 
     for line in GoalieStates.watchWithLineChecks.lines:
@@ -137,7 +141,7 @@ def shouldTurn(player):
     if GoalieStates.watchWithLineChecks.numTurns > 1 \
     and GoalieStates.watchWithLineChecks.numFixes < 1:
         return False
-    if GoalieStates.watchWithLineChecks.numTurns == 5:
+    if GoalieStates.watchWithLineChecks.numTurns >= 4:
         return False
 
     h_dest = 0.0
@@ -163,11 +167,13 @@ def shouldTurn(player):
 
         # Fix this.. very hacky: basically return that we DON'T need to turn
         # if we see a reasonable front line
-        if math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH:
+        if math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH\
+        and not GoalieStates.watchWithLineChecks.correctFacing:
             h_dest = 0.0
             player.homeDirections += [RelRobotLocation(0.0, 0.0, h_dest)]
             print ("t: ", t)
             print ("r: ", r)
+            print "Should turn was TRUE"
             return True
 
         # Assumptions: not facing forward....?
@@ -188,11 +194,16 @@ def shouldTurn(player):
 
         if longestLine is not None:
             h_dest = t - 90.0
-            player.homeDirections += [RelRobotLocation(0.0, 0.0, h_dest)]
+            if h_dest < constants.T_THRESH:
+                return False
             print "Should turn was TRUE"
             print ("hdest: ", h_dest)
             print ("t was: ", t)
             print ("r was:", r)
+            if h_dest > 100.0:
+                print "Turn too big, not actually doing it!!"
+                return False
+            player.homeDirections += [RelRobotLocation(0.0, 0.0, h_dest)]
             return True
 
     return False
@@ -229,6 +240,12 @@ def shouldBackUp(player):
         if r < 220.0 and r != 0.0:
             return False
 
+    for i in range(0, player.brain.visionLines.line_size()):
+        r = player.brain.visionLines.line(i).inner.r
+        if r < 200.0 and r != 0.0:
+            return False
+
+
     if player.brain.visionLines.line_size() == 0:
         print "My brain sees no lines right now"
         return True
@@ -259,6 +276,9 @@ def facingASideline(player):
     visionLines = player.brain.visionLines
     # Add in checks to not add repeat lines?
 
+    if GoalieStates.watchWithLineChecks.numFixes > 2:
+        return False
+
     for i in range(0, visionLines.line_size()):
         r1 = visionLines.line(i).inner.r
         t1 = math.degrees(visionLines.line(i).inner.t)
@@ -273,8 +293,8 @@ def facingASideline(player):
             # ep02 = visionLines.line(j).inner.ep0
             # ep12 = visionLines.line(j).inner.ep1
 
-            if (math.fabs(t1 - t2) - 90.0 < 15.0) and \
-            r1 != 0.0 and r2 != 0.0 \
+            if (math.fabs(math.fabs(t1 - t2) - 90.0) < 15.0) and \
+            r1 != 0.0 and r2 != 0.0 and r1 < 200.0 and r2 < 200.0\
             and i is not j:
                 print ("MY loc h: ", player.brain.loc.h)
                 if player.brain.loc.h > 0.0:
@@ -298,7 +318,8 @@ def facingASideline(player):
                         print "I think I'm facing left, so I'm turning right!"
                     return True
 
-                elif GoalieStates.watchWithLineChecks.correctFacing:
+                elif GoalieStates.watchWithLineChecks.correctFacing and r1 > 20.0\
+                and r2 > 20.0:
                     if math.fabs(t1 - 90.0) < math.fabs(t2 - 90.0):
                         frontline = visionLines.line(i).inner
                         sideline = visionLines.line(j).inner
@@ -307,7 +328,7 @@ def facingASideline(player):
                         sideline = visionLines.line(i).inner
 
                     # If sideline bearing is to my right, assume right sideline
-                    if sideline.t < 90.0 or sideline.t > 270.0:
+                    if math.degrees(sideline.t) < 90.0 or math.degrees(sideline.t) > 270.0:
                         print "I think this is my RIGHT sideline, I'm moving away"
                         y_dest = constants.EXPECTED_SIDE_LINE_R - sideline.r
                     else:
@@ -316,6 +337,7 @@ def facingASideline(player):
 
                     h_dest = 0 #frontline.t - 90.0
                     player.homeDirections += [RelRobotLocation(0.0, y_dest, h_dest)]
+                    print("Sideline.r: ", sideline.r, "sideline.t:", math.degrees(sideline.t))
                     print ("I'm adusting myself by: y:", y_dest, "h:", h_dest)
                     return True
 
@@ -819,7 +841,6 @@ def ballSafe(player):
     return math.fabs(player.brain.ball.bearing_deg) < 60.0
 
 def shouldClearBall(player):
-    return False
     """
     Checks that the ball is more or less in the goal box.
     """

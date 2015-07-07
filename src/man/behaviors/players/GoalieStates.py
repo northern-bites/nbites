@@ -194,7 +194,8 @@ def watchWithLineChecks(player):
         if player.lastDiffState == 'returnToGoal':
             player.justKicked = False
 
-        if player.lastDiffState is not 'lineCheckReposition':
+        if player.lastDiffState is not 'lineCheckReposition' and\
+        player.lastDiffState is not 'moveBackwards':
             print "My facing is not necessarily correct! I'm checking"
             watchWithLineChecks.correctFacing = False
             watchWithLineChecks.numFixes = 0
@@ -246,7 +247,7 @@ def lineCheckReposition(player):
         dest = average(player.homeDirections)
         print "My home directions: "
         print dest
-        if dest.relX == 0.0:
+        if dest.relX == 0.0 and dest.relY == 0.0:
             print "I think this was a turn, I'm increasing my num turns!"
             watchWithLineChecks.numTurns += 1
         else:

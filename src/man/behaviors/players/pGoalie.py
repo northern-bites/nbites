@@ -198,7 +198,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         GoalieStates.moveBackwards.transitions = {
             Transition.CountTransition(GoalieTransitions.shouldStopGoingBack,
-                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
             : GoalieStates.watchWithLineChecks,
 
@@ -356,18 +356,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
             Transition.CountTransition(GoalieTransitions.shouldBackUp,
                                        Transition.MOST_OF_THE_TIME,
-                                       25)
+                                       30)
             : GoalieStates.moveBackwards,
-
-            Transition.CountTransition(GoalieTransitions.facingASideline,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.OK_PRECISION + 5)
-            : GoalieStates.lineCheckReposition,
-
-            # Transition.CountTransition(GoalieTransitions.shouldClearDangerousBall,
-            #                            Transition.SOME_OF_THE_TIME,
-            #                            Transition.OK_PRECISION)
-            # : VisualGoalieStates.backUpForDangerousBall,
 
             Transition.CountTransition(GoalieTransitions.frontLineCheckShouldReposition,
                                        Transition.SOME_OF_THE_TIME,
@@ -383,6 +373,17 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.OK_PRECISION)
             : GoalieStates.lineCheckReposition,
+
+            Transition.CountTransition(GoalieTransitions.facingASideline,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.lineCheckReposition,
+
+            # Transition.CountTransition(GoalieTransitions.shouldClearDangerousBall,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.OK_PRECISION)
+            # : VisualGoalieStates.backUpForDangerousBall,
+
 
             Transition.CountTransition(GoalieTransitions.shouldGoForward,
                                        Transition.SOME_OF_THE_TIME,
