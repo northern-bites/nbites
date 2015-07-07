@@ -990,6 +990,8 @@ std::vector<BodyJointCommand::ptr> MotionModule::generateNextBodyProviderTransit
     const float  MAX_RAD_PER_SEC =  M_PI_FLOAT*0.3f;
     float time = max_change/MAX_RAD_PER_SEC;
 
+    if (time > 1.f) time = 1.f;
+
     if(time <= MOTION_FRAME_LENGTH_S){
         return commands;
     }
@@ -1010,7 +1012,7 @@ std::vector<BodyJointCommand::ptr> MotionModule::generateNextBodyProviderTransit
     if (time > MOTION_FRAME_LENGTH_S * 30){
         commands.push_back(
             BodyJointCommand::ptr (
-                new BodyJointCommand(0.5f,safe_larm, empty,empty,safe_rarm,
+                new BodyJointCommand(0.45f,safe_larm, empty,empty,safe_rarm,
                                      stiffness,
                                      Kinematics::INTERPOLATION_SMOOTH)) );
     }
