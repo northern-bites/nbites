@@ -220,6 +220,9 @@ def watchWithLineChecks(player):
             print "I just shifted my position, I'm moving to watch"
             return player.goLater('watch')
 
+    if player.counter % 90 == 0:
+        print("Horizon dist == ", player.brain.visionLines.horizon_dist)
+
     if (player.brain.ball.vis.frames_on > constants.BALL_ON_SAFE_THRESH \
         and player.brain.ball.distance > constants.BALL_SAFE_DISTANCE_THRESH \
         and not watchWithLineChecks.looking):
@@ -230,7 +233,7 @@ def watchWithLineChecks(player):
         watchWithLineChecks.looking = False
         player.brain.tracker.trackBall()
 
-    if player.counter > 400:
+    if player.counter > 400 or watchWithLineChecks.numFixes > 6:
         print "Counter was over 400, going to watch!"
         return player.goLater('watch')
 
@@ -256,6 +259,38 @@ def lineCheckReposition(player):
         player.brain.nav.walkTo(dest)
 
     return Transition.getNextState(player, lineCheckReposition)
+
+@superState('gameControllerResponder')
+def spinToHorizon(player):
+    if player.firstFrame():
+        player.brain.tracker.lookToAngle(0)
+        if player.brain.nav.isStopped():
+            player.setWalk(0, 0, 15.0)
+
+    if player.counter % 30 == 0:
+        print("Horizon dist == ", player.brain.visionLines.horizon_dist)
+
+    return Transition.getNextState(player, spinToHorizon)
+
+@superState('gameControllerResponder')
+def spinBack(player):
+    if player.firstFrame():
+        player.brain.tracker.lookToAngle(0)
+        if (math.fabs(-spinBack.toAngle) < 10.0 and -spinBack.toAngle > 0):
+            angle = 20.0
+        elif(math.fabs(-spinBack.toAngle) < 10.0 and -spinBack.toAngle < 0):
+            angle = -20.0
+        else:
+            angle = -spinBack.toAngle
+        player.brain.nav.walkTo(RelRobotLocation(0,0,angle))
+        print("My toangle:", spinBack.toAngle, "My angle:", angle)
+
+    if player.counter % 30 == 0:
+        print("Horizon dist == ", player.brain.visionLines.horizon_dist)
+
+    return Transition.getNextState(player, spinBack)
+
+spinBack.toAngle = 0.0
 
 
 # -----------------------------------------------
@@ -309,7 +344,12 @@ def watch(player):
         player.brain.nav.stand()
         player.returningFromPenalty = False
         print ("I'm moving to watch! I think I'm in the right position")
+        # player.brain.tracker.lookToAngle(0)
 
+    if player.counter % 30 == 0:
+        print("Horizon dist == ", player.brain.visionLines.horizon_dist)
+
+    # return player.stay()
     return Transition.getNextState(player, watch)
 
 def average(locations):
@@ -364,8 +404,8 @@ def correct(destination):
 def moveBackwards(player):
     if player.firstFrame():
         watchWithLineChecks.numFixes += 1
-        player.brain.tracker.trackBall()
-        player.brain.nav.walkTo(RelRobotLocation(-100.0, 0, 0))
+        player.brain.tracker.repeatBasicPan()
+        player.brain.nav.walkTo(RelRobotLocation(-60.0, 0, 0))
 
     return Transition.getNextState(player, moveBackwards)
 

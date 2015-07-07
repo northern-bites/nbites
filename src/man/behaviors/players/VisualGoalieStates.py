@@ -150,18 +150,19 @@ def spinToFaceBall(player):
         # facingDest.relH = player.brain.ball.bearing_deg
         if player.brain.ball.bearing_deg < 0.0:
             player.side = RIGHT
-            facingDest.relH = player.brain.ball.bearing_deg + 10.0
+            facingDest.relH = player.brain.ball.bearing_deg + 20.0
+            GoalieStates.spinBack.toAngle = player.brain.ball.bearing_deg + 20.0
         else:
             player.side = LEFT
-            facingDest.relH = player.brain.ball.bearing_deg - 10.0
+            facingDest.relH = player.brain.ball.bearing_deg - 20.0
+            GoalieStates.spinBack.toAngle = player.brain.ball.bearing_deg - 20.0
+
+
 
         player.brain.nav.walkTo(facingDest)
 
-        # player.brain.nav.goTo(facingDest,
-                              # nav.CLOSE_ENOUGH,
-                              # nav.CAREFUL_SPEED)
-
-    # if player.counter > 180:
+    if player.counter > 250:
+        return player.goLater('clearIt')
 
     return Transition.getNextState(player, spinToFaceBall)
 
@@ -189,17 +190,17 @@ def returnToGoal(player):
 
         print ("first correctedDest: ", correctedDest.relX, correctedDest.relY, correctedDest.relH)
 
-        # if fabs(correctedDest.relX) < 5:
-        #     correctedDest.relX = 0.0
-        # if fabs(correctedDest.relY) < 5:
-        #     correctedDest.relY = 0.0
-        # if fabs(correctedDest.relH) < 5:
-        #     correctedDest.relH = 0.0
+        if fabs(correctedDest.relX) < 5:
+            correctedDest.relX = 0.0
+        if fabs(correctedDest.relY) < 5:
+            correctedDest.relY = 0.0
+        if fabs(correctedDest.relH) < 5:
+            correctedDest.relH = 0.0
 
         print "I'm returning to goal now!"
         print ("my correctedDest: ", correctedDest.relX, correctedDest.relY, correctedDest.relH)
         print ("My odometry: ", player.brain.interface.odometry.x, player.brain.interface.odometry.y, player.brain.interface.odometry.h )
-
+        correctedDest.relY = 0
         player.brain.nav.walkTo(correctedDest)
 
     return Transition.getNextState(player, returnToGoal)
@@ -272,7 +273,7 @@ def repositionAfterWhiff(player):
                               nav.GRADUAL_SPEED)
 
     # if it took more than 5 seconds, forget it
-    if player.counter > 150:
+    if player.counter > 350:
         returnToGoal.kickPose.relX += player.brain.interface.odometry.x
         returnToGoal.kickPose.relY += player.brain.interface.odometry.y
         returnToGoal.kickPose.relH += player.brain.interface.odometry.h

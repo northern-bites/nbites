@@ -20,7 +20,7 @@ def getLines(player):
         GoalieStates.watchWithLineChecks.lines.append(visionLines.line(i).inner)
 
     if len(GoalieStates.watchWithLineChecks.lines) > constants.MEM_THRESH:
-        GoalieStates.watchWithLineChecks.lines = GoalieStates.watchWithLineChecks.lines[1:]
+        GoalieStates.watchWithLineChecks.lines = GoalieStates.watchWithLineChecks.lines[3:]
 
     if len(player.homeDirections) > constants.BUFFER_THRESH:
         player.homeDirections = player.homeDirections[1:]
@@ -83,7 +83,32 @@ def frontLineCheckShouldReposition(player):
     return False
 
 # def iAmRight(player):
+def facingBackward(player):
+    if player.brain.visionLines.horizon_dist < 170.0 and\
+    math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 10.0:
+        print("I'm FACing backWARDS! yaw:", math.degrees(player.brain.interface.joints.head_yaw))
+        player.homeDirections += [RelRobotLocation(0, 0, 180.0)]
+        player.homeDirections = player.homeDirections[1:]
+        return True
+    return False
 
+def facingSideways(player):
+    if player.brain.visionLines.horizon_dist > 200 and\
+    player.brain.visionLines.horizon_dist < 200 and\
+    math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 10.0:
+        print("I'm FACing backWARDS! yaw:", math.degrees(player.brain.interface.joints.head_yaw))
+        player.homeDirections += [RelRobotLocation(0, 0, 180.0)]
+        player.homeDirections = player.homeDirections[1:]
+        return True
+    return False
+
+def facingFront(player):
+    if math.fabs(player.brain.visionLines.horizon_dist - 1000) < 200 and\
+    math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 10.0:
+        print("I think im facingFront yaw:", math.degrees(player.brain.interface.joints.head_yaw))
+        print("horizon dist:",player.brain.visionLines.horizon_dist )
+        return True
+    return False
 
 def sideLineCheckShouldReposition(player):
     x_dest = 0.0
@@ -91,7 +116,7 @@ def sideLineCheckShouldReposition(player):
     h_dest = 0.0
 
     if GoalieStates.watchWithLineChecks.correctFacing is False:
-        print("incorrect facing")
+        # print("incorrect facing")
         return False
 
     reasonAbleFrontLine = False
@@ -101,7 +126,7 @@ def sideLineCheckShouldReposition(player):
                 reasonAbleFrontLine = True
 
     if GoalieStates.watchWithLineChecks.numFixes < 1:
-        print "not enough fgixes"
+        # print "not enough fgixes"
         return False
 
     for line in GoalieStates.watchWithLineChecks.lines:
@@ -236,18 +261,20 @@ def shouldBackUp(player):
     for line in GoalieStates.watchWithLineChecks.lines:
         r = line.r
         t = math.degrees(line.t)
+        print("found line!", r)
 
         if r < 220.0 and r != 0.0:
             return False
 
     for i in range(0, player.brain.visionLines.line_size()):
         r = player.brain.visionLines.line(i).inner.r
-        if r < 200.0 and r != 0.0:
+        if r < 250.0 and r != 0.0:
             return False
 
 
     if player.brain.visionLines.line_size() == 0:
         print "My brain sees no lines right now"
+        print len(GoalieStates.watchWithLineChecks.lines)
         return True
 
     print "Couldn't find any good lines, backup TRUE"
@@ -294,7 +321,7 @@ def facingASideline(player):
             # ep12 = visionLines.line(j).inner.ep1
 
             if (math.fabs(math.fabs(t1 - t2) - 90.0) < 15.0) and \
-            r1 != 0.0 and r2 != 0.0 and r1 < 200.0 and r2 < 200.0\
+            r1 != 0.0 and r2 != 0.0 and r1 < 170.0 and r2 < 170.0\
             and i is not j:
                 print ("MY loc h: ", player.brain.loc.h)
                 if player.brain.loc.h > 0.0:
@@ -687,8 +714,9 @@ def facingBall(player):
     """
     #magic numbers
     # return (math.fabs(player.brain.ball.bearing_deg) < 10.0 and
-    return player.brain.nav.currentState == 'standing' and \
-            player.brain.ball.vis.on
+    return ((player.brain.nav.currentState == 'standing' and \
+                    player.brain.ball.vis.on) \
+            or (math.fabs(player.brain.ball.bearing_deg) < 15.0))
 
 def goodToBookIt(player):
     vision = player.brain.interface.visionField
