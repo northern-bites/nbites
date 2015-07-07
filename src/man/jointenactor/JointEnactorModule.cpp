@@ -9,7 +9,7 @@
 
 #include "DebugConfig.h"
 
-#define BOSS_DEAD_THRESHOLD 10
+#define BOSS_DEAD_THRESHOLD 50
 
 namespace man {
 namespace jointenactor{
@@ -76,7 +76,9 @@ void JointEnactorModule::writeCommand()
         std::cout << "BOSS missed a frame" << std::endl;
     }
 
-    if ( (lw - lr) > BOSS_DEAD_THRESHOLD) {
+    if ( (lw - lr) > BOSS_DEAD_THRESHOLD
+        && (lr != 0)    //Boss might be slow on man startup, that's ok
+        ) {
         std::cout << "Commands aren't getting read! Did Boss die?" << std::endl;
         std::cout << "commandIndex: " << lw << " lastRead: " << lr << std::endl;
         exit(0);
