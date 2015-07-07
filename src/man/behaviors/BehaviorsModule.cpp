@@ -254,15 +254,7 @@ void BehaviorsModule::prepareMessages()
     pyInterface.setStiffStatus_ptr(&stiffStatusIn.message());
 
     visionIn.latch();
-    //pyInterface.setVision_ptr(&visionIn.message());
-
-    // messages::VisionObjects vo;
-    // messages::FieldLine* fl = vo.add_line();
-    // messages::Corner* crn = vo.add_corner();
-
-    messages::VisionTest vt;
-    vt.set_x(6.7);
-    pyInterface.setVision_ptr(&vt);
+    pyInterface.setVision_ptr(&visionIn.message());
 
     obstacleIn.latch();
     pyInterface.setObstacle_ptr(&obstacleIn.message());

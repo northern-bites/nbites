@@ -1,7 +1,5 @@
 package messages;
 
-import "BallModel.proto";
-
 message HoughLine 
 {
     optional float r = 1;
@@ -53,10 +51,6 @@ message VisionObjects
     repeated FieldLine line = 1;
     repeated Corner corner = 2;
     optional CenterCircle circle = 3;
-    optional VisionBall ball = 4;
+   
 }
 
-message VisionTest
-{
-    optional float x = 1;
-}

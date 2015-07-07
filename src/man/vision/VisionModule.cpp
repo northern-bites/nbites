@@ -259,54 +259,54 @@ void VisionModule::outportalVisionField()
         cc->set_y((float)centerCircleDetector[0]->y());
     }
 
-    // Outportal Ball
-    messages::VisionBall* vb = visionField.mutable_ball();
+    // // Outportal Ball
+    // messages::VisionBall* vb = visionField.mutable_ball();
 
-    Ball topBall = ballDetector[0]->best();
-    Ball botBall = ballDetector[1]->best();
+    // Ball topBall = ballDetector[0]->best();
+    // Ball botBall = ballDetector[1]->best();
 
-    bool top = false;
-    Ball best = botBall;
+    // bool top = false;
+    // Ball best = botBall;
 
-    if (ballOn) {
-        ballOnCount++;
-        ballOffCount = 0;
-    }
-    else {
-        ballOnCount = 0;
-        ballOffCount++;
-    }
+    // if (ballOn) {
+    //     ballOnCount++;
+    //     ballOffCount = 0;
+    // }
+    // else {
+    //     ballOnCount = 0;
+    //     ballOffCount++;
+    // }
 
-    if (topBall.confidence() > botBall.confidence()) {
-        best = topBall;
-        top = true;
-    }
+    // if (topBall.confidence() > botBall.confidence()) {
+    //     best = topBall;
+    //     top = true;
+    // }
 
-    vb->set_on(ballOn);
-    vb->set_frames_on(ballOnCount);
-    vb->set_frames_off(ballOffCount);
-    vb->set_intopcam(top);
+    // vb->set_on(ballOn);
+    // vb->set_frames_on(ballOnCount);
+    // vb->set_frames_off(ballOffCount);
+    // vb->set_intopcam(top);
 
-    if (ballOn)
-    {
-        vb->set_distance(best.dist);
+    // if (ballOn)
+    // {
+    //     vb->set_distance(best.dist);
 
-        vb->set_radius(best.blob.firstPrincipalLength());
-        double bearing = atan(best.x_rel / best.y_rel);
-        vb->set_bearing(bearing);
-        vb->set_bearing_deg(bearing * TO_DEG);
+    //     vb->set_radius(best.blob.firstPrincipalLength());
+    //     double bearing = atan(best.x_rel / best.y_rel);
+    //     vb->set_bearing(bearing);
+    //     vb->set_bearing_deg(bearing * TO_DEG);
 
-        double angle_x = (best.imgWidth/2 - best.getBlob().centerX()) /
-            (best.imgWidth) * HORIZ_FOV_DEG;
-        double angle_y = (best.imgHeight/2 - best.getBlob().centerY()) /
-            (best.imgHeight) * VERT_FOV_DEG;
-        vb->set_angle_x_deg(angle_x);
-        vb->set_angle_y_deg(angle_y);
+    //     double angle_x = (best.imgWidth/2 - best.getBlob().centerX()) /
+    //         (best.imgWidth) * HORIZ_FOV_DEG;
+    //     double angle_y = (best.imgHeight/2 - best.getBlob().centerY()) /
+    //         (best.imgHeight) * VERT_FOV_DEG;
+    //     vb->set_angle_x_deg(angle_x);
+    //     vb->set_angle_y_deg(angle_y);
 
-        vb->set_confidence(best.confidence());
-        vb->set_x(static_cast<int>(best.blob.centerX()));
-        vb->set_y(static_cast<int>(best.blob.centerY()));
-    }
+    //     vb->set_confidence(best.confidence());
+    //     vb->set_x(static_cast<int>(best.blob.centerX()));
+    //     vb->set_y(static_cast<int>(best.blob.centerY()));
+    // }
 
     // Send it out
     portals::Message<messages::VisionObjects> visionOutMessage(&visionField);
