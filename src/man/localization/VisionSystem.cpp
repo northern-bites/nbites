@@ -126,7 +126,6 @@ bool VisionSystem::update(ParticleSet& particles,
 
                     // Inject if reconstucted location is on field
                     ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 2, 0.01);
-                    std::cout << "GOALBOX WITH CORNERS" << std::endl;
                     if (reconstructed.onField())
                         injections.push_back(reconstructed);
                 }
@@ -139,7 +138,6 @@ bool VisionSystem::update(ParticleSet& particles,
                 messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(id, field);
                 ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 3, 0.01);
                 injections.push_back(reconstructed);
-                std::cout << "GOALBOX FROM MP" << std::endl;
             }
         }
     }
