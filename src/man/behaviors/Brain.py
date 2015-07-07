@@ -101,7 +101,6 @@ class Brain(object):
         # Used for obstacle detection
         self.obstacles = [0.] * 9
         self.obstacleDetectors = ['n'] * 9
-        self.currentlyDodging = False
 
         self.ourScore = 0
         self.theirScore = 0
@@ -153,7 +152,10 @@ class Brain(object):
                 return
             self.sitting = True
             print "BEHAVIORS is starting to sit"
-            self.nav.performSweetMove(SweetMoves.SIT_POS)
+            if Constants.V5_ROBOT:
+                self.nav.performSweetMove(SweetMoves.SIT_POS_V5)
+            else:
+                self.nav.performSweetMove(SweetMoves.SIT_POS)
 
         # Update Environment
         self.time = time.time()
@@ -236,7 +238,19 @@ class Brain(object):
 
     def updateVision(self):
         self.visionLines = self.interface.vision
-     #   self.visionCorners = self.interface.vision
+     #   self.visionCorners = self.interface.visionCorners
+
+        # if self.counter % 50 == 0:
+        #     print "VisionCorner size:"
+        #     print self.visionCorners.corner_size()
+
+        # if self.visionCorners.corner_size() != 0:
+        #     print "I see a corner!!"
+
+        # for i in range(0, self.visionLines.line_size()):
+        #     print "Vision lines:"
+        #     print i
+        #     print self.visionLines.line(i).id
 
     def updateVisionObjects(self):
         """

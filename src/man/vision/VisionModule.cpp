@@ -218,10 +218,10 @@ void VisionModule::outportalVisionField()
                 messages::HoughLine pHough;
                 HoughLine& hough = line[k];
 
-                pHough.set_r(hough.field().r());
-                pHough.set_t(hough.field().t());
-                pHough.set_ep0(hough.field().ep0());
-                pHough.set_ep1(hough.field().ep1());
+                pHough.set_r((float)hough.field().r());
+                pHough.set_t((float)hough.field().t());
+                pHough.set_ep0((float)hough.field().ep0());
+                pHough.set_ep1((float)hough.field().ep1());
 
                 if (hough.field().r() < 0)
                     pLine->mutable_outer()->CopyFrom(pHough);
@@ -244,8 +244,8 @@ void VisionModule::outportalVisionField()
             double rotatedX, rotatedY;
             man::vision::translateRotate(corner.x, corner.y, 0, 0, -(M_PI / 2), rotatedX, rotatedY);
 
-            pCorner->set_x(rotatedX);
-            pCorner->set_y(rotatedY);
+            pCorner->set_x((float)rotatedX);
+            pCorner->set_y((float)rotatedY);
             pCorner->set_id(static_cast<int>(corner.id));
             pCorner->set_line1(static_cast<int>(corner.first->index()));
             pCorner->set_line2(static_cast<int>(corner.second->index()));
@@ -253,18 +253,14 @@ void VisionModule::outportalVisionField()
     }
 
     // Outportal Center Circle
-    messages::CenterCircle ccm;
+    messages::CenterCircle* cc = visionField.mutable_circle(); 
     if (centerCircleDetected) {
-        ccm.set_x(centerCircleDetector[0]->x());
-        ccm.set_y(centerCircleDetector[0]->y());
+        cc->set_x((float)centerCircleDetector[0]->x());
+        cc->set_y((float)centerCircleDetector[0]->y());
     }
 
-    // Set circle
-    messages::CenterCircle* cc = visionField.mutable_circle(); 
-    cc = &ccm;
-
     // Outportal Ball
-    messages::VisionBall ball_message;
+    messages::VisionBall* vb = visionField.mutable_ball();
 
     Ball topBall = ballDetector[0]->best();
     Ball botBall = ballDetector[1]->best();
@@ -286,38 +282,37 @@ void VisionModule::outportalVisionField()
         top = true;
     }
 
-    ball_message.set_on(ballOn);
-    ball_message.set_frames_on(ballOnCount);
-    ball_message.set_frames_off(ballOffCount);
-    ball_message.set_intopcam(top);
+    vb->set_on(ballOn);
+    vb->set_frames_on(ballOnCount);
+    vb->set_frames_off(ballOffCount);
+    vb->set_intopcam(top);
 
     if (ballOn)
     {
-        ball_message.set_distance(best.dist);
+        vb->set_distance(best.dist);
 
-        ball_message.set_radius(best.blob.firstPrincipalLength());
+        vb->set_radius(best.blob.firstPrincipalLength());
         double bearing = atan(best.x_rel / best.y_rel);
-        ball_message.set_bearing(bearing);
-        ball_message.set_bearing_deg(bearing * TO_DEG);
+        vb->set_bearing(bearing);
+        vb->set_bearing_deg(bearing * TO_DEG);
 
         double angle_x = (best.imgWidth/2 - best.getBlob().centerX()) /
             (best.imgWidth) * HORIZ_FOV_DEG;
         double angle_y = (best.imgHeight/2 - best.getBlob().centerY()) /
             (best.imgHeight) * VERT_FOV_DEG;
-        ball_message.set_angle_x_deg(angle_x);
-        ball_message.set_angle_y_deg(angle_y);
+        vb->set_angle_x_deg(angle_x);
+        vb->set_angle_y_deg(angle_y);
 
-        ball_message.set_confidence(best.confidence());
-        ball_message.set_x(static_cast<int>(best.blob.centerX()));
-        ball_message.set_y(static_cast<int>(best.blob.centerY()));
+        vb->set_confidence(best.confidence());
+        vb->set_x(static_cast<int>(best.blob.centerX()));
+        vb->set_y(static_cast<int>(best.blob.centerY()));
     }
 
-    // Set Ball
-    messages::VisionBall* vb = visionField.mutable_ball();
-    vb = &ball_message;
-
+    // Send it out
     portals::Message<messages::Vision> visionOutMessage(&visionField);
     visionOut.setMessage(visionOutMessage);
+
+ //   std::cout << ""
 
 }
 
@@ -334,7 +329,7 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
 
     // Get size of file
     textFile.seekg (0, textFile.end);
-    long size = textFile.tellg();
+    long size = (long)textFile.tellg();
     textFile.seekg(0);
     
     // Read file into buffer and convert to string

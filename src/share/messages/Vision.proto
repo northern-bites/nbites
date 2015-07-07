@@ -1,12 +1,13 @@
-import "BallModel.proto";
 package messages;
 
-message HoughLine 
+import "BallModel.proto";
+
+message Vision
 {
-    optional float r = 1;
-    optional float t = 2;
-    optional float ep0 = 3;
-    optional float ep1 = 4;
+    repeated FieldLine line = 1;
+    repeated Corner corner = 2;
+    optional CenterCircle circle = 3;
+    optional VisionBall ball = 4;
 }
 
 message FieldLine
@@ -37,10 +38,10 @@ message CenterCircle
     optional float prob = 3;
 }
 
-message Vision
+message HoughLine 
 {
-    repeated FieldLine line = 1;
-    repeated Corner corner = 2;
-    optional CenterCircle circle = 3;
-    optional VisionBall ball = 4;
+    optional float r = 1;
+    optional float t = 2;
+    optional float ep0 = 3;
+    optional float ep1 = 4;
 }
