@@ -1,0 +1,29 @@
+#!/bin/bash
+
+NBITES_FIFO="/home/nao/nbites/nbitesFIFO"
+naolog='tail -f /home/nao/nbites/log/nblog'
+
+if [ $# -ne 1 ]; then
+   echo "ERROR: man requires a single argument"
+   echo "Usage: man [stop | start | restart]"
+   exit 1
+fi
+
+if [[ $1 == "stop" ]]; then
+   echo "killing"
+   echo 'k' > $NBITES_FIFO
+
+elif [[ $1 == "restart" ]]; then
+   echo 'r' > $NBITES_FIFO
+   $naolog
+
+elif [[ $1 == "start" ]]; then
+   echo 's' > $NBITES_FIFO
+   $naolog
+
+elif [[ $1 == "print" ]]; then
+    echo 'p' > $NBITES_FIFO
+    exit 1
+fi
+
+

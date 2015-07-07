@@ -13,10 +13,9 @@
 #define MAN_RESTART 'r'
 #define MAN_KILL    'k'
 #define MAN_START   's'
+#define BOSS_PRINT  'p'
 
-
-#define DCM_DEBUG
-
+//#define DCM_DEBUG
 
 #ifdef DCM_DEBUG
 #define DCM_TIMING_DEBUG_ALWAYS false
@@ -166,8 +165,6 @@ Boss::~Boss()
     close(shared_fd);
     close(fifo_fd);
 }
-
-
 
 void Boss::listener()
 {
@@ -332,11 +329,9 @@ void Boss::DCMPreProcessCallback()
         if (bossSyncRead(shared, cmndStaging)) {
             Deserialize des(cmndStaging);
 
-
             if (!des.parse()) {
                 // Couldn't parse anything from shared memory
                 // Could imply bad things?
-                 printf("Boss::DCMPreProcessCallback COULD NOT PARSE COMMAND\n");
                 DCM_TIMING_DEBUG_PRE2();
                 return;
             }
@@ -359,7 +354,6 @@ void Boss::DCMPreProcessCallback()
             led.setLeds(ledResults);
 
         } else {
-            printf("Boss::DCMPreProcessCallback COULD NOT READ FRESH COMMAND (skip)\n");
             ++cmndLockMiss;
         }
     } else {
@@ -460,6 +454,14 @@ void Boss::checkFIFO() {
     case MAN_START:
         std::cout << "MAN_START" << std::endl;
         startMan();
+        break;
+    case BOSS_PRINT:
+        int64_t _lw = shared->latestSensorWritten;
+        int64_t _lr = shared->latestSensorRead;
+        printf("BOSS PRINT:\n\tpre-skips=%lld post-skips=%lld\n"
+               "man-live: \t%lld\t[%lld - %lld]\n",
+               cmndLockMiss,sensorLockMiss,
+               _lw - _lr, _lw, _lr);
         break;
     }
 }
