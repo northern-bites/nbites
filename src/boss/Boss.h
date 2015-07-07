@@ -60,22 +60,20 @@ private:
     // Vars relating to Man
     pid_t manPID;
     bool manRunning;
-    bool killingMan;
-    uint64_t killingNext;
-    uint64_t killingLast;
 
     int shared_fd;
     volatile SharedData* shared;
+    pthread_mutexattr_t shared_mutex_attr;
 
     uint8_t cmndStaging[COMMAND_SIZE];
-    uint64_t commandSkips;
+    uint64_t cmndLockMiss;
 
     uint8_t sensorStaging[SENSOR_SIZE];
-    uint64_t sensorSkips;
-
-    uint64_t manMissedFrames;
+    uint64_t sensorLockMiss;
 
     int fifo_fd;
+    
+    void print_info();
 };
 
 }

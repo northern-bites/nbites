@@ -58,17 +58,23 @@ void SharedBallModule::run_()
         ballY[i] = -1.f;
     }
 
-    // get myInfo:
-    locIn.latch();
-    myX = locIn.message().x();
-    myY = locIn.message().y();
-    myH = locIn.message().h();
-    ballIn.latch();
-    myBall = ballIn.message();
+    if(my_num != 6) {
+        // get myInfo:
+        locIn.latch();
+        myX = locIn.message().x();
+        myY = locIn.message().y();
+        myH = locIn.message().h();
+        ballIn.latch();
+        myBall = ballIn.message();
+    } else {
+        myX = 10;
+        myY = 10;
+        myH = 0;
+    }
+    
 
     if (numRobotsOn)
     {
-
         ballOn = true;
         chooseRobots();
         weightedavg();

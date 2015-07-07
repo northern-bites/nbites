@@ -93,7 +93,7 @@ LocLineID LineSystem::matchLine(const messages::FieldLine& observation,
     // that best corresponds to the observation
     // NOTE correspondence is found by maximizing probability of correspondence 
     //      according to model (see scoreObservation)
-    vision::LineID visionID = vision::LineID::Line;
+    vision::LineID visionID = static_cast<vision::LineID>(observation.id());
     const std::vector<LocLineID>& possibleLineIDs = visionToLocIDs[visionID];
     for (int i = 0; i < possibleLineIDs.size(); i++) {
         LocLineID possibleID = possibleLineIDs[i];

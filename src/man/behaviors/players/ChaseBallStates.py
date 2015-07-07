@@ -37,7 +37,7 @@ def approachBall(player):
         return player.goNow('positionAndKickBall')
     
     elif transitions.shouldDecelerate(player):
-        player.brain.nav.chaseBallDeceleratingSpeed()
+        player.brain.nav.chaseBall(Navigator.BRISK_SPEED, fast = True)
     else:
         player.brain.nav.chaseBall(Navigator.FAST_SPEED, fast = True)
 
@@ -272,8 +272,13 @@ def positionForKick(player):
     if player.firstFrame():
         player.brain.tracker.lookStraightThenTrack()
 
+        if player.kick == kicks.M_LEFT_SIDE or player.kick == kicks.M_RIGHT_SIDE:
+            positionForKick.speed = Navigator.SLOW_SPEED
+        else:
+            positionForKick.speed = Navigator.MEDIUM_SPEED
+
         player.brain.nav.destinationWalkTo(positionForKick.kickPose, 
-                                            Navigator.MEDIUM_SPEED)
+                                            positionForKick.speed)
 
     elif player.brain.ball.vis.on: # don't update if we don't see the ball
         player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)

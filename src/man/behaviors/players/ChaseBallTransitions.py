@@ -51,7 +51,7 @@ def shouldPrepareForKick(player):
 
 def shouldPositionForKick(player, ball, relH):
     distToKick = ((ball.rel_x - player.kick.setupX)**2 + (ball.rel_y - player.kick.setupY)**2)**.5
-    return fabs(relH) < constants.ORBIT_GOOD_BEARING and distToKick < 25
+    return fabs(relH) < constants.ORBIT_GOOD_BEARING and distToKick < 30
 
 def shouldSpinToBall(player):
     """
