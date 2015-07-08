@@ -40,6 +40,9 @@ public class WorldViewUtility extends UtilityParent {
 		public void acceptTeamBroadcast(TeamBroadcast tb) {
 			//use tb
 			Logger.printf("got from {%s:%s}", tb.robotName, tb.robotIp);
+			for (String s : tb.message.errors) {
+				Logger.printf("\t%s", s);
+			}
 		}
 		
 	}
