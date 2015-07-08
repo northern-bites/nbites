@@ -4,6 +4,7 @@ import SharedTransitions as shared
 import ChaseBallConstants as chaseConstants
 import noggin_constants as nogginC
 from objects import RobotLocation
+from SupporterConstants import findStrikerHome, findDefenderHome
 
 def ballInBox(player):
     """
@@ -44,12 +45,23 @@ def tooFarFromHome(threshold, player):
     Returns true if LOC thinks we're more than *distance* away from our home
     position
     """
-    if role.isLeftDefender(player.role):
-        home = findDefenderHome(True, player.brain.ball, player.homePosition.h)
-    elif role.isRightDefender(player.role):
-        home = findDefenderHome(False, player.brain.ball, player.homePosition.h)
+    if player.brain.ball.vis.on:
+        ball = player.brain.ball
+    elif player.brain.sharedBall.ball_on:
+        ball = player.brain.sharedBall
     else:
+        ball = None
         home = player.homePosition
+
+    if ball != None:
+        if role.isLeftDefender(player.role):
+            home = findDefenderHome(True, ball, player.homePosition.h)
+        elif role.isRightDefender(player.role):
+            home = findDefenderHome(False, ball, player.homePosition.h)
+        elif role.isStriker(player.role):
+            home = findStrikerHome(ball, player.homePosition.h)
+        else:
+            home = player.homePosition
 
     distance = ((player.brain.loc.x - home.x)**2 + (player.brain.loc.y - home.y)**2)**.5
 
@@ -66,7 +78,6 @@ def shouldApproachBall(player):
     return True
 
 def shouldFindSharedBall(player):
-    return False
     return (player.brain.sharedBall.ball_on and
             player.brain.sharedBall.reliability >= 1)
 
@@ -86,44 +97,3 @@ def shouldBeSupporter(player):
         
     return (ballInBox(player) and
             claimTransitions.shouldCedeClaim(player))
-
-def findDefenderHome(left, ball, hh):
-    bY = ball.y
-    if left:
-        if bY >= role.evenDefenderForward.y:
-            return role.evenDefenderForward
-        elif bY <= role.oddDefenderBack.y:
-            return role.evenDefenderBack
-        else:
-            # ball is between the two defenders:
-            # linear relationship between ball and where defender stands on their line
-            
-            xDist = role.evenDefenderForward.x - role.evenDefenderBack.x
-            yDist = role.evenDefenderForward.y - role.evenDefenderBack.y
-
-            t = ((bY - role.oddDefenderForward.y) / 
-                (role.evenDefenderForward.y - role.oddDefenderForward.y))
-
-            hx = role.evenDefenderBack.x + t*xDist
-            hy = role.evenDefenderBack.y + t*yDist
-
-            return RobotLocation(hx, hy, hh)
-    else:
-        if bY <= role.oddDefenderForward.y:
-            return role.oddDefenderForward
-        elif bY >= role.evenDefenderBack.y:
-            return role.oddDefenderBack
-        else:
-            # ball is between the two defenders:
-            # linear relationship between ball and where defender stands on their line
-            
-            xDist = role.oddDefenderForward.x - role.oddDefenderBack.x
-            yDist = role.oddDefenderForward.y - role.oddDefenderBack.y
-
-            t = ((bY - role.evenDefenderForward.y) / 
-                (role.oddDefenderForward.y - role.evenDefenderForward.y))
-
-            hx = role.oddDefenderBack.x + t*xDist
-            hy = role.oddDefenderBack.y + t*yDist
-
-            return RobotLocation(hx, hy, hh)

@@ -25,6 +25,7 @@
 #include "NBMath.h"
 #include "NBMatrixMath.h"
 #include "CoordFrame.h"
+#include "JointNames.h"
 
 namespace Kinematics {
 
@@ -42,36 +43,6 @@ namespace Kinematics {
     enum InterpolationType {
         INTERPOLATION_SMOOTH = 0,
         INTERPOLATION_LINEAR
-    };
-
-    /// Joint Name constants ///
-    enum JointName {
-        HEAD_YAW = 0,
-        HEAD_PITCH,
-        // LARM,
-        L_SHOULDER_PITCH,
-        L_SHOULDER_ROLL,
-        L_ELBOW_YAW,
-        L_ELBOW_ROLL,
-        // LLEG,
-        L_HIP_YAW_PITCH,
-        L_HIP_ROLL,
-        L_HIP_PITCH,
-        L_KNEE_PITCH,
-        L_ANKLE_PITCH,
-        L_ANKLE_ROLL,
-        // RLEG,
-        R_HIP_YAW_PITCH,
-        R_HIP_ROLL,
-        R_HIP_PITCH,
-        R_KNEE_PITCH,
-        R_ANKLE_PITCH,
-        R_ANKLE_ROLL,
-        // RARM,
-        R_SHOULDER_PITCH,
-        R_SHOULDER_ROLL,
-        R_ELBOW_YAW,
-        R_ELBOW_ROLL
     };
 
     static const unsigned int FIRST_HEAD_JOINT = HEAD_YAW;

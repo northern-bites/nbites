@@ -60,8 +60,8 @@ void MotionModule::run_()
     requestInput_.latch();
     fallInput_.latch();
 
-    sensorAngles   = toJointAngles(jointsInput_.message());
-    sensorCurrents = toJointAngles(currentsInput_.message());
+    sensorAngles   = Kinematics::toJointAngles(jointsInput_.message());
+    sensorCurrents = Kinematics::toJointAngles(currentsInput_.message());
 
     newInputJoints = false;
 
@@ -561,7 +561,6 @@ void MotionModule::safetyCheckJoints()
 void MotionModule::swapBodyProvider()
 {
     std::vector<BodyJointCommand::ptr> transitions;
-    std::vector<BodyJointCommand::ptr> armTransitions;
     std::string old_provider = curProvider->getName();
 
     switch(nextProvider->getType())
@@ -576,31 +575,10 @@ void MotionModule::swapBodyProvider()
         if(noWalkTransitionCommand){//only enqueue one
             noWalkTransitionCommand = false;
             transitions = generateNextBodyProviderTransitions();
-            armTransitions = generateNextArmProviderTransitions();
 
-            if(transitions.size() >= 1 && armTransitions.size() >= 1){
+            if(transitions.size() >= 1){
                 for(unsigned int i = 0; i< transitions.size(); i++){
                     scriptedProvider.setCommand(transitions[i]);
-                }
-                for(unsigned int i = 0; i< armTransitions.size(); i++){
-                    scriptedProvider.setCommand(armTransitions[i]);
-                }
-                curProvider = static_cast<MotionProvider * >(&scriptedProvider);
-                break;
-            }
-        }
-        curProvider = nextProvider;
-        break;
-
-    // this doesn't seem to be working at all
-    case SCRIPTED_PROVIDER:
-        if(noWalkTransitionCommand){//only enqueue one
-            noWalkTransitionCommand = false;
-            armTransitions = generateNextArmProviderTransitions();
-
-            if(armTransitions.size() >= 1){
-                for(unsigned int i = 0; i< armTransitions.size(); i++){
-                    scriptedProvider.setCommand(armTransitions[i]);
                 }
                 curProvider = static_cast<MotionProvider * >(&scriptedProvider);
                 break;
@@ -610,6 +588,7 @@ void MotionModule::swapBodyProvider()
         break;
 
     case NULL_PROVIDER:
+    case SCRIPTED_PROVIDER:
     case HEAD_PROVIDER:
     default:
         noWalkTransitionCommand = true;
@@ -1011,16 +990,16 @@ std::vector<BodyJointCommand::ptr> MotionModule::generateNextBodyProviderTransit
     const float  MAX_RAD_PER_SEC =  M_PI_FLOAT*0.3f;
     float time = max_change/MAX_RAD_PER_SEC;
 
+    if (time > 1.f) time = 1.f;
+
     if(time <= MOTION_FRAME_LENGTH_S){
         return commands;
     }
 
-    if(time > 1) time = 1;
-
     //larm: (0.,90.,0.,0.)
     //rarm: (0.,-90.,0.,0.)
-    float larm_angles[] = {1.5f, 0.5f,0.0f,0.0f};
-    float rarm_angles[] = {1.5f,-0.5f,0.0f,0.0f};
+    float larm_angles[] = {0.9f, 0.3f,0.0f,0.0f};
+    float rarm_angles[] = {0.9f,-0.3f,0.0f,0.0f};
 
     std::vector<float> safe_larm(larm_angles, &larm_angles[Kinematics::ARM_JOINTS]);
     std::vector<float> safe_rarm(rarm_angles, &rarm_angles[Kinematics::ARM_JOINTS]);
@@ -1042,37 +1021,6 @@ std::vector<BodyJointCommand::ptr> MotionModule::generateNextBodyProviderTransit
         BodyJointCommand::ptr (
             new BodyJointCommand(time, providerJoints, stiffness2,
                                  Kinematics::INTERPOLATION_SMOOTH))  );
-    return commands;
-}
-
-std::vector<BodyJointCommand::ptr> MotionModule::generateNextArmProviderTransitions()
-{
-    std::vector<BodyJointCommand::ptr> commands;
-
-    std::vector<float> providerJoints = nextProvider->getInitialStance();
-
-    float max_change = -M_PI_FLOAT*10.0f;
-
-    //ignore the first chain since it's the head one
-    for (unsigned i = 0; i < Kinematics::NUM_BODY_JOINTS; i++) {
-        max_change = (float)std::max((double)max_change, fabs(sensorAngles[i + Kinematics::HEAD_JOINTS] - providerJoints[i]));
-    }
-
-    float larm_angles[] = {1.74f, 0.174f,1.31f,-.35f};
-    float rarm_angles[] = {1.74f,-0.174f,-1.31f,.35f};
-
-    std::vector<float> safe_larm(larm_angles, &larm_angles[Kinematics::ARM_JOINTS]);
-    std::vector<float> safe_rarm(rarm_angles, &rarm_angles[Kinematics::ARM_JOINTS]);
-
-    // HACK @joho get gait stiffness params. nextGait.maxStiffness
-    std::vector<float> stiffness(Kinematics::NUM_JOINTS, 0.75f);
-
-    std::vector<float> empty(0);
-    commands.push_back(
-        BodyJointCommand::ptr (
-            new BodyJointCommand(.55f,safe_larm, empty,empty,safe_rarm,
-                                 stiffness,
-                                 Kinematics::INTERPOLATION_SMOOTH)) );
 
     return commands;
 }

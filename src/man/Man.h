@@ -1,9 +1,5 @@
 #pragma once
 
-#include <alcommon/almodule.h>
-#include <alcommon/albroker.h>
-#include <boost/shared_ptr.hpp>
-
 #include "RoboGrams.h"
 #include "DiagramThread.h"
 #include "DebugConfig.h"
@@ -13,7 +9,6 @@
 #include "vision/VisionModule.h"
 #include "guardian/GuardianModule.h"
 #include "audio/AudioEnactorModule.h"
-#include "led/LedEnactorModule.h"
 #include "balltrack/BallTrackModule.h"
 #include "behaviors/BehaviorsModule.h"
 #include "jointenactor/JointEnactorModule.h"
@@ -29,12 +24,13 @@
 
 namespace man {
 
-class Man : public AL::ALModule
+class Man
 {
 public:
-    Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name);
+    Man();
     virtual ~Man();
-
+    // Let us close camera driver before destroying
+    void preClose();
 
 private:
     void startSubThreads();
@@ -65,7 +61,6 @@ private:
     obstacle::ObstacleModule obstacle;
     gamestate::GameStateModule gamestate;
     behaviors::BehaviorsModule behaviors;
-    led::LedEnactorModule leds;
     context::SharedBallModule sharedBall;
 };
 
