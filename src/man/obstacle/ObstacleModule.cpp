@@ -117,18 +117,18 @@ usingVision(false)
         std::cout<<"[ERR ] Config files not found."<<std::endl;
     }
     std::cout<<"[OBSTACLE ] VARS:";
+    if (usingVision) { std::cout<<" (VISION)"; }
     if (usingArms) { std::cout<<" (ARMS)"; }
     if (usingLeftSonar) { std::cout<<" (LEFT SONAR)"; }
     if (usingRightSonar) { std::cout<<" (RIGHT SONAR)"; }
-    if (usingVision) { std::cout<<" (VISION)"; }
     std::cout<<std::endl;
 }
 
 void ObstacleModule::run_()
 {
-    // visionIn.latch();
     armContactIn.latch();
     sonarIn.latch();
+    visionIn.latch();
 
     // Don't need this kind of buffer when we aren't using vision, so keep uninit'd
     if (!usingVision)
@@ -140,21 +140,11 @@ void ObstacleModule::run_()
 
     FieldObstacles::Obstacle::ObstaclePosition sonars, arms;
 
-    // Process vision in all three sections of frame separately
-    if (usingVision) {
-        processVision(visionIn.message().left_dist(),
-                      visionIn.message().left_bearing());
-        processVision(visionIn.message().mid_dist(),
-                      visionIn.message().mid_bearing());
-        processVision(visionIn.message().right_dist(),
-                      visionIn.message().right_bearing());
-    }
-
     // Decide arms
     if (usingArms) { arms = processArms( armContactIn.message()); }
     else { arms = FieldObstacles::Obstacle::NONE; }
     // if not combining arms and sonars, uncomment this:
-    // updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, -1.f);
+    // updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, 0.f);
 
     // Decide sonars
     if (usingLeftSonar || usingRightSonar) { sonars = processSonar(sonarIn.message()); }
@@ -169,6 +159,13 @@ void ObstacleModule::run_()
     // combines input from both arms and sonars
     // Can also choose to do this separately
     combineArmsAndSonars(arms, sonars);
+
+    // Process vision in all three sections of frame separately
+    if (usingVision) {
+        processVision(visionIn.message());
+    }
+
+    updateObstacleBuffer();
 
     // Now we take information and return relevant obstacles
     portals::Message<messages::FieldObstacles> current(0);
@@ -191,82 +188,58 @@ FieldObstacles::Obstacle::ObstaclePosition
 ObstacleModule::processArms(const messages::ArmContactState& input)
 {
     // Both arms pushed approximately backwards...something is in front
-    if ((input.right_push_direction() ==
-         ArmContactState::SOUTH ||
-         input.right_push_direction() ==
-         ArmContactState::SOUTHEAST ||
-         input.right_push_direction() ==
-         ArmContactState::SOUTHWEST) &&
-        (input.left_push_direction() ==
-         ArmContactState::SOUTH ||
-         input.left_push_direction() ==
-         ArmContactState::SOUTHWEST ||
-         input.left_push_direction() ==
-         ArmContactState::SOUTHEAST))
+    if ((input.right_push_direction() == ArmContactState::SOUTH ||
+         input.right_push_direction() == ArmContactState::SOUTHEAST ||
+         input.right_push_direction() == ArmContactState::SOUTHWEST) &&
+        (input.left_push_direction() == ArmContactState::SOUTH ||
+         input.left_push_direction() == ArmContactState::SOUTHWEST ||
+         input.left_push_direction() == ArmContactState::SOUTHEAST))
     {
         return FieldObstacles::Obstacle::NORTH;
     }
     // Both arms pushed approximately forward... something is behind
-    else if ((input.right_push_direction() ==
-              ArmContactState::NORTH ||
-              input.right_push_direction() ==
-              ArmContactState::NORTHEAST ||
-              input.right_push_direction() ==
-              ArmContactState::NORTHWEST) &&
-             (input.left_push_direction() ==
-              ArmContactState::NORTH ||
-              input.left_push_direction() ==
-              ArmContactState::NORTHWEST ||
-              input.left_push_direction() ==
-              ArmContactState::NORTHEAST))
+    else if ((input.right_push_direction() == ArmContactState::NORTH ||
+              input.right_push_direction() == ArmContactState::NORTHEAST ||
+              input.right_push_direction() == ArmContactState::NORTHWEST) &&
+             (input.left_push_direction() == ArmContactState::NORTH ||
+              input.left_push_direction() == ArmContactState::NORTHWEST ||
+              input.left_push_direction() == ArmContactState::NORTHEAST))
     {
         return FieldObstacles::Obstacle::SOUTH;
     }
     // Not getting pushed on right arm... decide based on left
-    else if (input.right_push_direction() ==
-             ArmContactState::NONE)
+    else if (input.right_push_direction() == ArmContactState::NONE)
     {
-        if (input.left_push_direction() ==
-                 ArmContactState::NORTH ||
-                 input.left_push_direction() ==
-                 ArmContactState::NORTHEAST)
+        if (input.left_push_direction() == ArmContactState::NORTH ||
+                 input.left_push_direction() == ArmContactState::NORTHEAST)
         {
             return FieldObstacles::Obstacle::SOUTHWEST;
         }
-        else if (input.left_push_direction() ==
-             ArmContactState::EAST)
+        else if (input.left_push_direction() == ArmContactState::EAST)
         {
             return FieldObstacles::Obstacle::WEST;
         }
-        else if (input.left_push_direction() ==
-                 ArmContactState::SOUTH ||
-                 input.left_push_direction() ==
-                 ArmContactState::SOUTHEAST)
+        else if (input.left_push_direction() == ArmContactState::SOUTH ||
+                 input.left_push_direction() == ArmContactState::SOUTHEAST)
         {
             return FieldObstacles::Obstacle::NORTHWEST;
         }
-        else if (input.left_push_direction() ==
-             ArmContactState::SOUTHWEST)
+        else if (input.left_push_direction() == ArmContactState::SOUTHWEST)
         {
             return FieldObstacles::Obstacle::NORTH;
         }
-        else if (input.left_push_direction() ==
-                 ArmContactState::WEST ||
-                 input.left_push_direction() ==
-                 ArmContactState::NORTHWEST)
+        else if (input.left_push_direction() == ArmContactState::WEST ||
+                 input.left_push_direction() == ArmContactState::NORTHWEST)
         {
             return FieldObstacles::Obstacle::SOUTH;
         }
         else return FieldObstacles::Obstacle::NONE;
     }
     // Not getting pushed on left arm... decide based on right
-    else if (input.left_push_direction() ==
-             ArmContactState::NONE)
+    else if (input.left_push_direction() == ArmContactState::NONE)
     {
-        if (input.right_push_direction() ==
-                 ArmContactState::NORTH ||
-                 input.right_push_direction() ==
-                 ArmContactState::NORTHWEST)
+        if (input.right_push_direction() == ArmContactState::NORTH ||
+            input.right_push_direction() == ArmContactState::NORTHWEST)
         {
             return FieldObstacles::Obstacle::SOUTHEAST;
         }
@@ -275,22 +248,17 @@ ObstacleModule::processArms(const messages::ArmContactState& input)
         {
             return FieldObstacles::Obstacle::EAST;
         }
-        else if (input.right_push_direction() ==
-                 ArmContactState::SOUTH ||
-                 input.right_push_direction() ==
-                 ArmContactState::SOUTHWEST)
+        else if (input.right_push_direction() == ArmContactState::SOUTH ||
+                 input.right_push_direction() == ArmContactState::SOUTHWEST)
         {
             return FieldObstacles::Obstacle::NORTHEAST;
         }
-        else if (input.right_push_direction() ==
-             ArmContactState::SOUTHEAST)
+        else if (input.right_push_direction() == ArmContactState::SOUTHEAST)
         {
             return FieldObstacles::Obstacle::NORTH;
         }
-        else if (input.right_push_direction() ==
-                 ArmContactState::EAST ||
-                 input.right_push_direction() ==
-                 ArmContactState::NORTHEAST)
+        else if (input.right_push_direction() == ArmContactState::EAST ||
+                 input.right_push_direction() == ArmContactState::NORTHEAST)
         {
             return FieldObstacles::Obstacle::SOUTH;
         }
@@ -365,7 +333,7 @@ void ObstacleModule::combineArmsAndSonars
     // If they agree, easy
     if (arms == sonars)
     {
-        updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, -1.f);
+        updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, 0.f);
     }
     // Trust sonars before we get any arm input
     else if (arms == FieldObstacles::Obstacle::NONE)
@@ -377,7 +345,7 @@ void ObstacleModule::combineArmsAndSonars
              (arms == FieldObstacles::Obstacle::NORTHWEST ||
               arms == FieldObstacles::Obstacle::NORTHEAST))
     {
-        updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, -1.f);
+        updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, 0.f);
     }
     else if (arms == FieldObstacles::Obstacle::NORTH &&
              (sonars == FieldObstacles::Obstacle::NORTHWEST ||
@@ -388,16 +356,16 @@ void ObstacleModule::combineArmsAndSonars
     // If they don't agree or get no sonars, trust the arms
     else
     {
-        updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, -1.f);
+        updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, 0.f);
     }
 
 }
 
 void ObstacleModule::updateVisionBuffer
-(FieldObstacles::Obstacle::ObstaclePosition pos,
- std::list<float> dists, float distance)
+(FieldObstacles::Obstacle::ObstaclePosition pos, std::list<float> dists,
+ const messages::RobotObstacle& input)
 {
-    dists.push_back(distance);
+    dists.push_back(input.box_bottom());
     if (dists.size() > VISION_FRAMES_TO_BUFFER)
     {
         dists.pop_front();
@@ -407,57 +375,51 @@ void ObstacleModule::updateVisionBuffer
     updateObstacleArrays(FieldObstacles::Obstacle::VISION, pos, avg);
 }
 
-void ObstacleModule::processVision(float distance, float bearing)
+void ObstacleModule::processVision(const messages::RobotObstacle& input)
 {
-    // Process what direction it is in: act appropriately
-    if ( bearing < -5.f*ZONE_WIDTH)
-    {
-        // obstacle to the southeast
-        updateVisionBuffer(FieldObstacles::Obstacle::SOUTHEAST, SEDists, distance);
-    }
-    else if ( bearing < -3.f*ZONE_WIDTH )
+    // printf("Obstacle Box OBST: (%g, %g, %g, %g)\n",
+    //         input.closest_y(), input.box_bottom(),
+    //         input.box_left(), input.box_right());
+
+    // check for no obstacle in vision
+    if (input.closest_y() == -1) { return; }
+
+    float bearing = (float)atan2(input.box_bottom(),
+                    ((input.box_left() - input.box_right()) / 2.f));
+
+    // Robot facing bearing of pi/2, east is 0, west is pi
+    // Process what direction obstacle is in: act appropriately
+    if ( bearing < ZONE_WIDTH )
     {
         // obstacle to the east
-        updateVisionBuffer(FieldObstacles::Obstacle::EAST, EDists, distance);
+        updateVisionBuffer(FieldObstacles::Obstacle::EAST, EDists, input);
     }
-    else if ( bearing < -1.f*ZONE_WIDTH )
+    else if ( bearing < 3.f * ZONE_WIDTH )
     {
         // obstacle to northeast
-        updateVisionBuffer(FieldObstacles::Obstacle::NORTHEAST, NEDists, distance);
+        updateVisionBuffer(FieldObstacles::Obstacle::NORTHEAST, NEDists, input);
     }
-    else if ( bearing < ZONE_WIDTH )
+    else if ( bearing < 5.f * ZONE_WIDTH )
     {
         // obstacle to north
-        updateVisionBuffer(FieldObstacles::Obstacle::NORTH, NDists, distance);
-    }
-    else if ( bearing < 3.f*ZONE_WIDTH )
-    {
-        // obstacle to northwest
-        updateVisionBuffer(FieldObstacles::Obstacle::NORTHWEST, NWDists, distance);
-    }
-    else if ( bearing < 5.f*ZONE_WIDTH )
-    {
-        // obstacle to west
-        updateVisionBuffer(FieldObstacles::Obstacle::WEST, WDists, distance);
+        updateVisionBuffer(FieldObstacles::Obstacle::NORTH, NDists, input);
     }
     else if ( bearing < 7.f * ZONE_WIDTH )
     {
-        // obstacle to southwest
-        updateVisionBuffer(FieldObstacles::Obstacle::SOUTHWEST, SWDists, distance);
+        // obstacle to northwest
+        updateVisionBuffer(FieldObstacles::Obstacle::NORTHWEST, NWDists, input);
     }
-    // else // south
-    // {
-    //     return FieldObstacles::Obstacle::NONE;
-    // }
+    else if ( bearing < 9.f * ZONE_WIDTH )
+    {
+        // obstacle to west
+        updateVisionBuffer(FieldObstacles::Obstacle::WEST, WDists, input);
+    }
 }
 
 void ObstacleModule::updateObstacleArrays
 (FieldObstacles::Obstacle::ObstacleDetector detector,
  FieldObstacles::Obstacle::ObstaclePosition pos, float dist)
 {
-    // if (detector==FieldObstacles::Obstacle::SONARS)
-    //     std::cout<<"SONARS "<<dist<<std::endl;
-    // start the buffer count
     obstacleBuffer[int(pos)] = 1;
     obstacleDistances[int(pos)] = dist;
     obstacleDetectors[int(pos)] = detector;
@@ -467,6 +429,8 @@ void ObstacleModule::updateObstacleBuffer()
 {
     for (int i = 1; i < NUM_DIRECTIONS; i++)
     {
+        // If we've kept this obstacle in our buffer for long
+        // or haven't seen an obstacle here yet
         if (obstacleBuffer[i] == 0 or
             obstacleBuffer[i] > VISION_FRAMES_TO_HAVE_OBSTACLE)
         {

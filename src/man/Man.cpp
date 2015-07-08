@@ -135,11 +135,11 @@ Man::Man() :
         }
         sharedBall.locIn.wireTo(&localization.output);
         sharedBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
-         
+
         obstacle.armContactIn.wireTo(&arms.contactOut, true);
-        // obstacle.visionIn.wireTo(&vision.vision_obstacle, true);
+        obstacle.visionIn.wireTo(&vision.robotObstacleOut, true);
         obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
-         
+
         gamestate.commInput.wireTo(&comm._gameStateOutput, true);
         gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
         gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);

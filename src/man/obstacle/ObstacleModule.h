@@ -93,20 +93,14 @@ class ObstacleModule : public portals::Module
     static const unsigned int VISION_FRAMES_TO_BUFFER = 20;
     // After we see an obstacle, how long should we say it's still there?
     // We say the time it takes to do a full pan: 3-4 seconds
-    static const int VISION_FRAMES_TO_HAVE_OBSTACLE = 30;
-
-    // How do we want to detect the obstacles?
-    static const bool USING_VISION = false;
-    static const bool USING_ARMS = false;
-    static const bool USING_SONARS = true;
+    static const int VISION_FRAMES_TO_HAVE_OBSTACLE = 90;
 
 
 public:
     ObstacleModule(std::string filepath, std::string robotName);
 
     portals::InPortal<messages::ArmContactState> armContactIn;
-    portals::InPortal<messages::VisionObstacle> visionIn;
-    // We don't trust sonars right now! So we won't actually use them.
+    portals::InPortal<messages::RobotObstacle> visionIn;
     portals::InPortal<messages::SonarState> sonarIn;
 
     portals::OutPortal<messages::FieldObstacles> obstacleOut;
@@ -115,7 +109,7 @@ protected:
     virtual void run_();
 
     // Makes a decision based on vision
-    void processVision(float distance, float bearing);
+    void processVision(const messages::RobotObstacle& input);
 
     // Makes a decision based on arm contact
     messages::FieldObstacles::Obstacle::ObstaclePosition
@@ -127,7 +121,7 @@ protected:
 
     void updateVisionBuffer(messages::FieldObstacles::Obstacle::ObstaclePosition pos,
                             std::list<float> dists,
-                            float distance);
+                            const messages::RobotObstacle& input);
 
     // Updates how long we've held
     void updateObstacleBuffer();
@@ -156,8 +150,7 @@ private:
     std::list<float> rightSonars, leftSonars;
 
     // Vision buffers for all directions robot can see
-    std::list<float> SWDists, WDists, NWDists, NDists, NEDists, EDists, SEDists;
-    // std::list<float> WBearings, NWBearings, NBearings, NEBearings, EBearings;
+    std::list<float> WDists, NWDists, NDists, NEDists, EDists;
 
     // Global buffer that is updated every frame to show all obstacles
     int obstacleBuffer[NUM_DIRECTIONS];

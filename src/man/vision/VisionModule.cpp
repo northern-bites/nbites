@@ -330,7 +330,8 @@ void VisionModule::updateObstacleBox()
     boxOut.get()->set_box_right(obstacleBox[3]);
     robotObstacleOut.setMessage(boxOut);
 
-    // printf("Obstacle Box VISION: (%g, %g, %g, %g)\n", obstacleBox[0], obstacleBox[1], obstacleBox[2], obstacleBox[3]);
+    // printf("Obstacle Box VISION: (%g, %g, %g, %g)\n", obstacleBox[0],
+    //         obstacleBox[1], obstacleBox[2], obstacleBox[3]);
 }
 
 void VisionModule::sendCenterCircle()
