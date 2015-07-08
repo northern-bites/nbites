@@ -20,7 +20,7 @@ namespace man {
 namespace vision {
 
 // NEWVISION
-#define IMAGE_WIDTH 320
+#define IMAGE_WIDTH 320  // needs to be adjustable in NEWVISION
 #define IMAGE_HEIGHT 240
 #define BLACK 1
 #define BLUE 7
@@ -60,6 +60,7 @@ public:
 	void drawDot(int x, int y, int c);
 	void drawLine(int x, int y, int x1, int y1, int c);
 
+	bool onField(double x, double & y);
     int findGreenHorizon(int pH, float sl);
     void findConvexHull(int pH);
     void initialScanForTopGreenPoints(int pH);
@@ -69,6 +70,7 @@ public:
 	int horizonAt(int x);
 	int occludingHorizonAt(int x);
 	float distanceToHorizon(int x, int y);
+	float fieldEdgeDistanceCenter();
 	int ccw(point<int> p1, point<int> p2, point<int> p3);
     int * getTopEdge(){
         return topEdge;
@@ -110,11 +112,13 @@ private:
 	int poseHorizon;
 	float slope;
 	int peak;
+	int numberOfHulls;
 
 	int  topEdge[IMAGE_WIDTH+1];
 	int topBlock[IMAGE_WIDTH+1];
     point<int> convex[HULLS];
 	point<int> blockages[HULLS];
+	point<double> convexWorld[HULLS];
 #ifdef OFFLINE
     bool debugHorizon;
     bool debugFieldEdge;
