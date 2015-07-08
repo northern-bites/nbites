@@ -504,6 +504,7 @@ bool CornerDetector::ccw(double ax, double ay,
 // *******************
 CenterCircleDetector::CenterCircleDetector() 
 {
+  _on = false;
   set();
 }
 
@@ -527,13 +528,17 @@ bool CenterCircleDetector::detectCenterCircle(EdgeList& edges)
   _potentials = potentials;
   if (_potentials.size() > minPotentials && getMaxBin(_potentials, _ccx, _ccy)) {
     _potentials.push_back(Point(_ccx, _ccy));
-    return true;
+    on(true);
   } else
     _potentials.push_back(Point(0.0, 0.0));
-  return false;
+  return _on;
 #endif
 
-  return (potentials.size() > minPotentials && getMaxBin(potentials, _ccx, _ccy));
+  if (potentials.size() > minPotentials && getMaxBin(potentials, _ccx, _ccy))
+    on(true);
+
+  return _on;
+
 }
 
 // Get potential cc centers and clean edge list
@@ -724,11 +729,15 @@ void FieldLineList::find(HoughLineList& houghLines, bool blackStar)
 // TODO goalie and the goalbox
 // TODO midline classification? (cross detection, lots of green detection, etc.)
 // TODO find and use field edge?
-void FieldLineList::classify(GoalboxDetector& boxDetector, CornerDetector& cornerDetector)
+void FieldLineList::classify(GoalboxDetector& boxDetector,
+                             CornerDetector& cornerDetector,
+                             CenterCircleDetector& circleDetector)
 {
   // If less than one field line, no classification possible
-  if (size() <= 1) return;
-
+  if (size() <= 1) {
+    circleDetector.on(false);
+    return;
+  }
   // Run goalbox detector
   bool topBoxFound = boxDetector.find(*this);
   bool endlineFound = topBoxFound;
@@ -738,6 +747,38 @@ void FieldLineList::classify(GoalboxDetector& boxDetector, CornerDetector& corne
 
   // Run corner detector
   cornerDetector.findCorners(*this);
+
+  // Find line close to center circle;
+  std::cout << "ABOUT TO LOOK FOR LINE CLOSE TO CC\n";
+  if (circleDetector.on()) {
+    double minDist = 1000;
+    FieldLine* midline;
+
+    for (int i = 0; i < size(); ++i) {
+      FieldLine& fl = (*this)[i];
+      HoughLine& inner = fl[0];
+      if (inner.r() < 0) {
+        inner = fl[1];
+      }
+
+      // Project CC center onto line, find distance to line
+      double distToLine = fabs(inner.pDist(circleDetector.x(), circleDetector.y()));
+
+      // Check for min distance
+      if (minDist > distToLine) {
+          midline = &fl;
+          minDist = distToLine;
+      }
+    }
+
+    // Set midline, or discard CC if no close line
+    if (minDist < 50) {
+      midline->id(LineID::Midline);
+      midlineFound = true;
+    } else {
+      circleDetector.on(false);
+    }
+  }
 
   // Loop over lines until no more classifications possible
   int i = 0;
@@ -1157,7 +1198,7 @@ void HoughSpace::adjust(EdgeList& edges, EdgeList& rejectedEdges, HoughLineList&
       ++hl;
   }
 
-  // For center circle detection, colloect all orphan edges
+  // For center circle detection, collect all orphan edges
   rejectedEdges.reset();
 
   AngleBinsIterator<Edge> rejectABI(edges);

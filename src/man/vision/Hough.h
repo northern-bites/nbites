@@ -253,15 +253,12 @@ public:
 };
 
 // Dectects center circle
-// class CirclePoint;
-// class Cluster;
-
 class CenterCircleDetector {
   double _ccx;
   double _ccy;
-  
+  bool _on;
 
-  // For debugging
+  // For debugging (retreived by nbfunc)
   std::vector<Point> _potentials;
 
   // Parameters
@@ -280,10 +277,14 @@ class CenterCircleDetector {
 public:
   CenterCircleDetector();
   bool detectCenterCircle(EdgeList& edges);
-  std::vector<Point> getPotentials() { return _potentials; }
-  
+
   double x() { return _ccx; }
   double y() { return _ccy; }
+  bool on() { return _on; }
+
+  void on(bool on) { _on = on; }
+
+  std::vector<Point> getPotentials() { return _potentials; }
 };
 
 enum class LineID {
@@ -369,7 +370,7 @@ public:
   void find(HoughLineList&, bool blackStar = false);
 
   // Classify field lines
-  void classify(GoalboxDetector& boxDetector, CornerDetector& cornerDetector);
+  void classify(GoalboxDetector&, CornerDetector&, CenterCircleDetector&);
 
   // Calibrate tilt if possible.
   bool tiltCalibrate(FieldHomography&, std::string* message = 0);

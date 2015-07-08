@@ -79,8 +79,6 @@ private:
     CenterCircleDetector* centerCircleDetector[2];
     BallDetector* ballDetector[2];
 
-    bool centerCircleDetected;
-
     bool blackStar_;
     
     // Lisp tree with color params saved

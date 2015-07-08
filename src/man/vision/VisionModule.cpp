@@ -27,7 +27,6 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
       ballOn(false),
       ballOnCount(0),
       ballOffCount(0),
-      centerCircleDetected(false),
       blackStar_(false)
 {
     std:: string colorPath, calibrationPath;
@@ -116,7 +115,6 @@ void VisionModule::run_()
                                                     &bottomIn.message() };
 
     bool ballDetected = false;
-    centerCircleDetected = false;
 
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
@@ -164,15 +162,17 @@ void VisionModule::run_()
          
         // Find world coordinates for rejected edges
         rejectedEdges[i]->mapToField(*(homography[i]));
- 
+
         // Detect center circle on top
-        if (!i) centerCircleDetected = centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]));
+        if (!i) centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]));
  
+        std::cerr << "CC is " << centerCircleDetector[i]->on() << std::endl;
+        
         // Pair hough lines to field lines
         fieldLines[i]->find(*(houghLines[i]), blackStar());
  
         // Classify field lines
-        fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
+        fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]), *(centerCircleDetector[i]));
  
         ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
 
@@ -245,8 +245,8 @@ void VisionModule::outportalVisionField()
 
     // (3) Outportal Center Circle
     messages::CenterCircle* cc = visionField.mutable_circle(); 
-    cc->set_on(centerCircleDetected ? true : false);
-    
+    cc->set_on(centerCircleDetector[0]->on() ? true : false);
+    std::cout << "OUTPORTLER THINKS CC IS " << cc->on() << std::endl;
     // Rotate to post vision relative robot coordinate system
     double rotatedX, rotatedY;
     man::vision::translateRotate(centerCircleDetector[0]->x(), centerCircleDetector[0]->y(), 0, 0, -(M_PI / 2), rotatedX, rotatedY);
