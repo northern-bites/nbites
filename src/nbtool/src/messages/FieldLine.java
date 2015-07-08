@@ -86,9 +86,24 @@ public final class FieldLine extends
             id_ = input.readInt32();
             break;
           }
-          case 37: {
+          case 32: {
             bitField0_ |= 0x00000008;
+            correspondence_ = input.readInt32();
+            break;
+          }
+          case 45: {
+            bitField0_ |= 0x00000010;
             prob_ = input.readFloat();
+            break;
+          }
+          case 48: {
+            bitField0_ |= 0x00000020;
+            index_ = input.readInt32();
+            break;
+          }
+          case 61: {
+            bitField0_ |= 0x00000040;
+            wz0_ = input.readFloat();
             break;
           }
         }
@@ -188,26 +203,74 @@ public final class FieldLine extends
     return id_;
   }
 
-  public static final int PROB_FIELD_NUMBER = 4;
-  private float prob_;
+  public static final int CORRESPONDENCE_FIELD_NUMBER = 4;
+  private int correspondence_;
   /**
-   * <code>optional float prob = 4;</code>
+   * <code>optional int32 correspondence = 4;</code>
    */
-  public boolean hasProb() {
+  public boolean hasCorrespondence() {
     return ((bitField0_ & 0x00000008) == 0x00000008);
   }
   /**
-   * <code>optional float prob = 4;</code>
+   * <code>optional int32 correspondence = 4;</code>
+   */
+  public int getCorrespondence() {
+    return correspondence_;
+  }
+
+  public static final int PROB_FIELD_NUMBER = 5;
+  private float prob_;
+  /**
+   * <code>optional float prob = 5;</code>
+   */
+  public boolean hasProb() {
+    return ((bitField0_ & 0x00000010) == 0x00000010);
+  }
+  /**
+   * <code>optional float prob = 5;</code>
    */
   public float getProb() {
     return prob_;
+  }
+
+  public static final int INDEX_FIELD_NUMBER = 6;
+  private int index_;
+  /**
+   * <code>optional int32 index = 6;</code>
+   */
+  public boolean hasIndex() {
+    return ((bitField0_ & 0x00000020) == 0x00000020);
+  }
+  /**
+   * <code>optional int32 index = 6;</code>
+   */
+  public int getIndex() {
+    return index_;
+  }
+
+  public static final int WZ0_FIELD_NUMBER = 7;
+  private float wz0_;
+  /**
+   * <code>optional float wz0 = 7;</code>
+   */
+  public boolean hasWz0() {
+    return ((bitField0_ & 0x00000040) == 0x00000040);
+  }
+  /**
+   * <code>optional float wz0 = 7;</code>
+   */
+  public float getWz0() {
+    return wz0_;
   }
 
   private void initFields() {
     inner_ = messages.HoughLine.getDefaultInstance();
     outer_ = messages.HoughLine.getDefaultInstance();
     id_ = 0;
+    correspondence_ = 0;
     prob_ = 0F;
+    index_ = 0;
+    wz0_ = 0F;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -232,7 +295,16 @@ public final class FieldLine extends
       output.writeInt32(3, id_);
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
-      output.writeFloat(4, prob_);
+      output.writeInt32(4, correspondence_);
+    }
+    if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      output.writeFloat(5, prob_);
+    }
+    if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      output.writeInt32(6, index_);
+    }
+    if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      output.writeFloat(7, wz0_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -257,7 +329,19 @@ public final class FieldLine extends
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeFloatSize(4, prob_);
+        .computeInt32Size(4, correspondence_);
+    }
+    if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeFloatSize(5, prob_);
+    }
+    if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(6, index_);
+    }
+    if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeFloatSize(7, wz0_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSerializedSize = size;
@@ -392,8 +476,14 @@ public final class FieldLine extends
       bitField0_ = (bitField0_ & ~0x00000002);
       id_ = 0;
       bitField0_ = (bitField0_ & ~0x00000004);
-      prob_ = 0F;
+      correspondence_ = 0;
       bitField0_ = (bitField0_ & ~0x00000008);
+      prob_ = 0F;
+      bitField0_ = (bitField0_ & ~0x00000010);
+      index_ = 0;
+      bitField0_ = (bitField0_ & ~0x00000020);
+      wz0_ = 0F;
+      bitField0_ = (bitField0_ & ~0x00000040);
       return this;
     }
 
@@ -445,7 +535,19 @@ public final class FieldLine extends
       if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
         to_bitField0_ |= 0x00000008;
       }
+      result.correspondence_ = correspondence_;
+      if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+        to_bitField0_ |= 0x00000010;
+      }
       result.prob_ = prob_;
+      if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+        to_bitField0_ |= 0x00000020;
+      }
+      result.index_ = index_;
+      if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+        to_bitField0_ |= 0x00000040;
+      }
+      result.wz0_ = wz0_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -471,8 +573,17 @@ public final class FieldLine extends
       if (other.hasId()) {
         setId(other.getId());
       }
+      if (other.hasCorrespondence()) {
+        setCorrespondence(other.getCorrespondence());
+      }
       if (other.hasProb()) {
         setProb(other.getProb());
+      }
+      if (other.hasIndex()) {
+        setIndex(other.getIndex());
+      }
+      if (other.hasWz0()) {
+        setWz0(other.getWz0());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       return this;
@@ -765,34 +876,130 @@ public final class FieldLine extends
       return this;
     }
 
-    private float prob_ ;
+    private int correspondence_ ;
     /**
-     * <code>optional float prob = 4;</code>
+     * <code>optional int32 correspondence = 4;</code>
      */
-    public boolean hasProb() {
+    public boolean hasCorrespondence() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional float prob = 4;</code>
+     * <code>optional int32 correspondence = 4;</code>
+     */
+    public int getCorrespondence() {
+      return correspondence_;
+    }
+    /**
+     * <code>optional int32 correspondence = 4;</code>
+     */
+    public Builder setCorrespondence(int value) {
+      bitField0_ |= 0x00000008;
+      correspondence_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 correspondence = 4;</code>
+     */
+    public Builder clearCorrespondence() {
+      bitField0_ = (bitField0_ & ~0x00000008);
+      correspondence_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private float prob_ ;
+    /**
+     * <code>optional float prob = 5;</code>
+     */
+    public boolean hasProb() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional float prob = 5;</code>
      */
     public float getProb() {
       return prob_;
     }
     /**
-     * <code>optional float prob = 4;</code>
+     * <code>optional float prob = 5;</code>
      */
     public Builder setProb(float value) {
-      bitField0_ |= 0x00000008;
+      bitField0_ |= 0x00000010;
       prob_ = value;
       onChanged();
       return this;
     }
     /**
-     * <code>optional float prob = 4;</code>
+     * <code>optional float prob = 5;</code>
      */
     public Builder clearProb() {
-      bitField0_ = (bitField0_ & ~0x00000008);
+      bitField0_ = (bitField0_ & ~0x00000010);
       prob_ = 0F;
+      onChanged();
+      return this;
+    }
+
+    private int index_ ;
+    /**
+     * <code>optional int32 index = 6;</code>
+     */
+    public boolean hasIndex() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional int32 index = 6;</code>
+     */
+    public int getIndex() {
+      return index_;
+    }
+    /**
+     * <code>optional int32 index = 6;</code>
+     */
+    public Builder setIndex(int value) {
+      bitField0_ |= 0x00000020;
+      index_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 index = 6;</code>
+     */
+    public Builder clearIndex() {
+      bitField0_ = (bitField0_ & ~0x00000020);
+      index_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private float wz0_ ;
+    /**
+     * <code>optional float wz0 = 7;</code>
+     */
+    public boolean hasWz0() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional float wz0 = 7;</code>
+     */
+    public float getWz0() {
+      return wz0_;
+    }
+    /**
+     * <code>optional float wz0 = 7;</code>
+     */
+    public Builder setWz0(float value) {
+      bitField0_ |= 0x00000040;
+      wz0_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional float wz0 = 7;</code>
+     */
+    public Builder clearWz0() {
+      bitField0_ = (bitField0_ & ~0x00000040);
+      wz0_ = 0F;
       onChanged();
       return this;
     }

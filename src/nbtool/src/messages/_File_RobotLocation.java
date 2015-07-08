@@ -22,10 +22,10 @@ public final class _File_RobotLocation {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\023RobotLocation.proto\022\010messages\"S\n\rRobot" +
+      "\n\023RobotLocation.proto\022\010messages\"a\n\rRobot" +
       "Location\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\022\t\n\001h\030\003 \001(" +
-      "\002\022\021\n\ttimestamp\030\004 \001(\003\022\016\n\006uncert\030\005 \001(\002B\027B\023" +
-      "_File_RobotLocationP\001"
+      "\002\022\021\n\ttimestamp\030\004 \001(\003\022\016\n\006uncert\030\005 \001(\002\022\014\n\004" +
+      "lost\030\006 \001(\010B\027B\023_File_RobotLocationP\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -44,7 +44,7 @@ public final class _File_RobotLocation {
     internal_static_messages_RobotLocation_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_RobotLocation_descriptor,
-        new java.lang.String[] { "X", "Y", "H", "Timestamp", "Uncert", });
+        new java.lang.String[] { "X", "Y", "H", "Timestamp", "Uncert", "Lost", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
