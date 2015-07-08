@@ -80,7 +80,7 @@ def backPedal(player):
         player.brain.tracker.repeatFastNarrowPan()
 
     elif player.stateTime > constants.BACK_PEDAL_TIME:
-        return player.goLater('playOffBall')
+        return player.goLater('spinSearch')
 
 @superState('scrumStrategy')
 @stay
