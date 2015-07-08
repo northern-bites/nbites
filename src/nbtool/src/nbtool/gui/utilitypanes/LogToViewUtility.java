@@ -228,7 +228,6 @@ public class LogToViewUtility extends UtilityParent {
 			}
 
 			if (path.getPathCount() == 3) {
-
 				ViewState vs = (ViewState) path.getPathComponent(2);
 				String type = (String) path.getPathComponent(1);
 
