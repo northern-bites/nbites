@@ -76,7 +76,7 @@ namespace nblog {
     //declared in log_main.cpp
     extern log_main_t log_main;
     
-#define LOG_VERSION 6
+#define LOG_VERSION 7
     
 #define STREAM_PORT (30000)
     
@@ -140,10 +140,9 @@ namespace nblog {
     const extern uint32_t NUM_CORES;
     
     Log * makeSTATSlog();
-    
-    //if true, STATS logs are only created and pushed when a control client is connected.
-    static const bool STATS_ONLY_FOR_CONTROL = true;
-    
+
+    /* set to true to have the logging system periodically generate and log statistics */
+    static const bool STREAM_STATS = false;
 }//namespace NBlog
 
 #endif

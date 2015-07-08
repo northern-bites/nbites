@@ -162,7 +162,7 @@ namespace nblog {
         while (1) {
             sleep(1);
             
-            if (!STATS_ONLY_FOR_CONTROL || control::flags[control::control_connected]) {
+            if (STREAM_STATS) {
                 NBLog(NBL_SMALL_BUFFER, makeSTATSlog());
             }
                         

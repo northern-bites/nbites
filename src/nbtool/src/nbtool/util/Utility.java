@@ -72,6 +72,46 @@ public class Utility {
 		return new String(hexChars);
 	}
 	
+	//binary, not SI
+	public static final long bytesPerKB = (1 << 10);
+	public static final long bytesPerMB = (1 << 20);
+	public static final long bytesPerGB = (1 << 30);
+	
+	public static String byteString( long bytes, boolean sepGig, boolean sepMeg, boolean sepKyb, boolean showByte ) {
+		String total = "";
+		long left = bytes;
+		
+		if (sepGig) {
+			long gigs = left / bytesPerGB;
+			if (gigs > 0) {
+				total = total + String.format("%dGB ", gigs);
+				left = left % bytesPerGB;
+			}
+		}
+		
+		if (sepMeg) {
+			long megs = left / bytesPerMB;
+			if (megs > 0) {
+				total = total + String.format("%dMB ", megs);
+				left = left % bytesPerMB;
+			}
+		}
+		
+		if (sepKyb) {
+			long kbs = left / bytesPerKB;
+			if (kbs > 0) {
+				total = total + String.format("%dKB ", kbs);
+				left = left % bytesPerKB;
+			}
+		}
+		
+		if (showByte && left > 0) {
+			total = total + String.format("%d bytes", left);
+		}
+		
+		return total;
+	}
+	
 	public static JPanel fieldWithlabel(JLabel l, JTextField f) {
 		JPanel p = new JPanel(new BorderLayout());
 		p.add(l,BorderLayout.WEST);
@@ -286,5 +326,9 @@ public class Utility {
 		for (byte b : data)
 			checksum += (b & 0xFF);
 		return checksum;
+	}
+	
+	public static void main(String[] args) {
+		Logger.println(Utility.byteString(12497681235l, true, true, true, true));
 	}
 }

@@ -95,6 +95,8 @@ public final class SessionMaster implements IOFirstResponder {
 		Logger.log(Logger.WARN, "SessionMaster setting up stream.");
 		control = ControlIO.create(this, addr, NBConstants.CONTROL_PORT);
 		streamio = StreamIO.create(this, addr, NBConstants.STREAM_PORT);
+		
+		control.tryAddCmnd(ControlIO.createCmndReqFlags());
 	}
 	
 	public synchronized Session requestSession(String title) {
@@ -199,9 +201,19 @@ public final class SessionMaster implements IOFirstResponder {
 				
 				Events.GLogsFound.generate(this, out);
 			}
+		} else if (inst == control) {
+			for (Log log : out) {
+				if (log.primaryType().equals("STATS")) {
+					RobotStats rs = new RobotStats(log);
+					if (workingSession != null) {
+						workingSession.most_relevant = rs;
+					}
+					
+					Events.GRelevantRobotStats.generate(this, rs);
+				}
+			}
 		} else {
-			if (!(inst == control && out.length == 0))
-				Logger.logf(Logger.WARN, "SessionMaster got %d surprising logs from %s.", out.length, inst.name());
+			Logger.logf(Logger.WARN, "SessionMaster got %d surprising logs from %s.", out.length, inst.name());
 		}
 		
 	}
