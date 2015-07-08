@@ -106,6 +106,7 @@ def clearIt(player):
                                             # player.brain.ball.rel_y -
                                             # kickPose[1],
                                             0.0)
+
         player.brain.nav.goTo(clearIt.ballDest,
                               nav.CLOSE_ENOUGH,
                               nav.QUICK_SPEED,

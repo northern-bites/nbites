@@ -73,7 +73,7 @@ def frontLineCheckShouldReposition(player):
         if (math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH \
         or math.fabs(t - constants.EXPECTED_FRONT_LINE_T_2) < constants.T_THRESH) \
         and math.fabs(r - constants.EXPECTED_FRONT_LINE_R) > constants.R_THRESH \
-        and r < 100.0:
+        and r < 100.0 and r != 0.0:
             x_dest = r - constants.EXPECTED_FRONT_LINE_R
             print "Front was TRUE"
             print x_dest
