@@ -221,8 +221,7 @@ public class LogToViewUtility extends UtilityParent {
 		@Override
 		public void keyTyped(KeyEvent e) {
 			TreePath path = tree.getSelectionPath();
-			//int toIndex = e.getKeyChar() - '1';
-			int toIndex = Character.getNumericValue(e.getKeyChar());
+			int toIndex = Character.getNumericValue(e.getKeyChar()) - 1;
 
 			if (path == null || toIndex < 0 || toIndex > 8) {
 				return;
