@@ -15,3 +15,4 @@ JARS_EXTERNAL=$NBITES_DIR/src/nbtool/jars-external/
 
 cd $BIN_NBTOOL
 java -ea -Xms200m -Xmx200m -cp .:$JARS_EXTERNAL:$LIB_GOOGLE:$LIB_BHUMAN:$LIB_APACHE nbtool.term.NBTool_v7
+#java -ea -Xms200m -Xmx200m -cp .:$JARS_EXTERNAL:$LIB_GOOGLE:$LIB_BHUMAN:$LIB_APACHE nbtool.term.BroadcastTest
