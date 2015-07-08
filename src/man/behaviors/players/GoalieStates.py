@@ -245,7 +245,7 @@ def watchWithLineChecks(player):
         watchWithLineChecks.looking = False
         player.brain.tracker.trackBall()
 
-    if watchWithLineChecks.counter > 300 or watchWithLineChecks.numFixes > 6:
+    if watchWithLineChecks.counter > 400 or watchWithLineChecks.numFixes > 6:
         print "Counter was over 300, going to watch!"
         return player.goLater('watch')
 
@@ -307,6 +307,15 @@ def spinBack(player):
     return Transition.getNextState(player, spinBack)
 
 spinBack.toAngle = 0.0
+
+@superState('gameControllerResponder')
+def recoverMyself(player):
+    if player.firstFrame():
+        print("In recover myself")
+        player.brain.tracker.lookToAngle(0)
+        player.brain.nav.setWalk(0,0,20)
+
+    return Transition.getNextState(player, recoverMyself)
 
 
 # -----------------------------------------------

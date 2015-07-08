@@ -358,6 +358,12 @@ def facingASideline(player):
                 print ("T", t1)
                 print ("T2", t2)
                 print ("i:", i, "j:", j)
+                print ("horizon dist:", player.brain.visionLines.horizon_dist)
+                print ("num corners:", player.brain.visionCorners.corner_size())
+
+                for k in range(0, player.brain.visionCorners.corner_size()):
+                    c = player.brain.visionCorners
+                    print("x", c.corner(k).x, "y", c.corner(k).y)
 
                 if GoalieStates.watchWithLineChecks.wentToClearIt and\
                 not GoalieStates.watchWithLineChecks.correctFacing:
@@ -369,8 +375,8 @@ def facingASideline(player):
                         print "I think I'm facing left, so I'm turning right!"
                     return True
 
-                elif GoalieStates.watchWithLineChecks.correctFacing and r1 > 20.0\
-                and r2 > 20.0:
+                elif (GoalieStates.watchWithLineChecks.correctFacing and r1 > 20.0\
+                                and r2 > 20.0) or player.brain.visionLines.horizon_dist > 600:
                     if math.fabs(math.fabs(t1 - 180.0) - 180.0) < math.fabs(math.fabs(t2 - 180.0) - 180.0):
                         frontline = visionLines.line(i).inner
                         sideline = visionLines.line(j).inner
