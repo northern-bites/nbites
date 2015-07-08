@@ -148,7 +148,7 @@ private:
      * @brief Resamples (with replacement) the particle population according
      *        to the normalized weights of the particles.
      */
-    void resample();
+    void resample(bool inSet);
 
     /**
      * @brief - Update the poseEstimate by avging all particles
