@@ -362,7 +362,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
             Transition.CountTransition(GoalieTransitions.shouldBackUp,
                                        Transition.ALL_OF_THE_TIME,
-                                       40)
+                                       45)
             : GoalieStates.moveBackwards,
 
             Transition.CountTransition(GoalieTransitions.shouldGoForward,

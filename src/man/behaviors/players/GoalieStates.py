@@ -429,7 +429,7 @@ def correct(destination):
 def moveBackwards(player):
     if player.firstFrame():
         watchWithLineChecks.numFixes += 1
-        player.brain.tracker.repeatBasicPan()
+        player.brain.tracker.lookToAngle(0)
         player.brain.nav.walkTo(RelRobotLocation(-60.0, 0, 0))
 
     return Transition.getNextState(player, moveBackwards)

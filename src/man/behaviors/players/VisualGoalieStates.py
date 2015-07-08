@@ -139,6 +139,7 @@ def didIKickIt(player):
 @superState('gameControllerResponder')
 def spinToFaceBall(player):
     if player.firstFrame():
+        player.brain.tracker.trackBall
         print("ball at ", player.brain.ball.bearing_deg)
         facingDest = RelRobotLocation(0.0, 0.0, 0.0)
         # if player.brain.ball.bearing_deg < 0.0:

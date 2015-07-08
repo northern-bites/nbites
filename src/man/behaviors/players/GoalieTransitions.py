@@ -126,9 +126,9 @@ def sideLineCheckShouldReposition(player):
     #         if line.r > 15.0:
     #             reasonAbleFrontLine = True
 
-    if GoalieStates.watchWithLineChecks.numFixes < 1:
-        # print "not enough fgixes"
-        return False
+    # if GoalieStates.watchWithLineChecks.numFixes < 1:
+    #     # print "not enough fixes"
+    #     return False
 
     for line in GoalieStates.watchWithLineChecks.lines:
         r = line.r
@@ -224,7 +224,7 @@ def shouldTurn(player):
             else:
                 h_dest = t - constants.EXPECTED_FRONT_LINE_T
 
-            if h_dest < constants.T_THRESH:
+            if h_dest < 10.0:
                 return False
             print "Should turn was TRUE"
             print ("hdest: ", h_dest)
@@ -285,12 +285,12 @@ def shouldBackUp(player):
         t = math.degrees(line.t)
         # print("found line!", r)
 
-        if r < 220.0 and r != 0.0:
+        if r < 130.0 and r != 0.0:
             return False
 
     for i in range(0, player.brain.visionLines.line_size()):
         r = player.brain.visionLines.line(i).inner.r
-        if r < 250.0 and r != 0.0:
+        if r < 130.0 and r != 0.0:
             return False
 
 
@@ -344,8 +344,9 @@ def facingASideline(player):
             # ep02 = visionLines.line(j).inner.ep0
             # ep12 = visionLines.line(j).inner.ep1
 
-            if (math.fabs(math.fabs(t1 - t2) - 90.0) < 15.0) and \
-            r1 != 0.0 and r2 != 0.0 and r1 < 170.0 and r2 < 170.0\
+            if ((math.fabs(math.fabs(t1 - t2) - 90.0) < 15.0) \
+            or (math.fabs(math.fabs(t1 - t2) - 265) < 15.0)) \
+            and r1 != 0.0 and r2 != 0.0 and r1 < 170.0 and r2 < 170.0\
             and i is not j:
                 print ("MY loc h: ", player.brain.loc.h)
                 if player.brain.loc.h > 0.0:
@@ -357,13 +358,17 @@ def facingASideline(player):
                 print ("R2", r2)
                 print ("T", t1)
                 print ("T2", t2)
-                print ("i:", i, "j:", j)
+                print ("length1:", length1, "length2:", length2)
                 print ("horizon dist:", player.brain.visionLines.horizon_dist)
                 print ("num corners:", player.brain.visionCorners.corner_size())
 
                 for k in range(0, player.brain.visionCorners.corner_size()):
                     c = player.brain.visionCorners
                     print("x", c.corner(k).x, "y", c.corner(k).y)
+
+                facefrnt = (player.brain.visionLines.horizon_dist > 600) and \
+                math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 10.0
+                print("Facing front: ", facefrnt)
 
                 if GoalieStates.watchWithLineChecks.wentToClearIt and\
                 not GoalieStates.watchWithLineChecks.correctFacing:
@@ -376,13 +381,17 @@ def facingASideline(player):
                     return True
 
                 elif (GoalieStates.watchWithLineChecks.correctFacing and r1 > 20.0\
-                                and r2 > 20.0) or player.brain.visionLines.horizon_dist > 600:
+                                and r2 > 20.0) or facefrnt:
                     if math.fabs(math.fabs(t1 - 180.0) - 180.0) < math.fabs(math.fabs(t2 - 180.0) - 180.0):
                         frontline = visionLines.line(i).inner
                         sideline = visionLines.line(j).inner
                     else:
                         frontline = visionLines.line(j).inner
                         sideline = visionLines.line(i).inner
+
+                    flength = getLineLength(frontline)
+                    slength = getLineLength(sideline)
+                    print("front line length:", flength, "sideline length:", slength)
 
                     #TODO adjust this to new line coords
                     # If sideline bearing is to my right, assume right sideline
@@ -394,7 +403,7 @@ def facingASideline(player):
                         y_dest = sideline.r - constants.EXPECTED_SIDE_LINE_R
 
                     h_dest = 0 #frontline.t - 90.0
-                    if y_dest < 10.0:
+                    if math.fabs(y_dest) < 10.0:
                         print("adjustment too small, not doing it", y_dest)
                         return False
                     player.homeDirections += [RelRobotLocation(0.0, y_dest, h_dest)]
@@ -465,6 +474,19 @@ def shouldStopTurning(player):
             return True
 
     return False
+
+def seeFrontLine(player):
+    lines = player.brain.visionLines
+    horizon = player.brain.visionLines.horizon_dist
+
+    for i in range(0, lines.line_size()):
+        r = lines.line(i).inner.r
+        t = math.degrees(lines.line(i).inner.t)
+        length = getLineLength(lines.line(i).inner)
+
+
+        print ("R:", r, "T:", t)
+
 
 
 
@@ -796,17 +818,17 @@ def shouldDiveRight(player):
         sightOk):
         print "DIVE RIGHT"
 
-    # return (nball.x_vel < -10.0 and
-    #     not nball.stationary and
-    #     nball.yintercept < -20.0 and
-    #     ball.distance < 150.0 and
-    #     sightOk)
+    return (nball.x_vel < -10.0 and
+        not nball.stationary and
+        nball.yintercept < -20.0 and
+        ball.distance < 150.0 and
+        sightOk)
 
-    return (ball.mov_vel_x < -6.0 and
-            ball.mov_speed > 8.0 and
-            ball.rel_y_intersect_dest < -20.0 and
-            ball.distance < 150.0 and
-            sightOk)
+    # return (ball.mov_vel_x < -6.0 and
+    #         ball.mov_speed > 8.0 and
+    #         ball.rel_y_intersect_dest < -20.0 and
+    #         ball.distance < 150.0 and
+    #         sightOk)
 
 def shouldDiveLeft(player):
 
@@ -831,17 +853,17 @@ def shouldDiveLeft(player):
         sightOk):
         print "DIVE LEFT"
 
-    # return (nball.x_vel < -10.0 and
-    #     not nball.stationary and
-    #     nball.yintercept > 20.0 and
-    #     ball.distance < 150.0 and
-    #     sightOk)
+    return (nball.x_vel < -10.0 and
+        not nball.stationary and
+        nball.yintercept > 20.0 and
+        ball.distance < 150.0 and
+        sightOk)
 
-    return (ball.mov_vel_x < -6.0 and
-            ball.mov_speed > 8.0 and
-            ball.rel_y_intersect_dest > 20.0 and
-            ball.distance < 150.0 and
-            sightOk)
+    # return (ball.mov_vel_x < -6.0 and
+    #         ball.mov_speed > 8.0 and
+    #         ball.rel_y_intersect_dest > 20.0 and
+    #         ball.distance < 150.0 and
+    #         sightOk)
 
 def shouldSquat(player):
 
@@ -870,18 +892,18 @@ def shouldSquat(player):
     # Lower threshold for fast balls
     # if nball.x_vel < -30.0 and abs(nball.yintercept)
 
-    # return (nball.x_vel < -10.0 and
-    #     not nball.stationary and
-    #     abs(nball.yintercept) < 30.0 and
-    #     nball.yintercept != 0.0 and
-    #     ball.distance < 150.0 and
-    #     sightOk)
+    return (nball.x_vel < -10.0 and
+        not nball.stationary and
+        abs(nball.yintercept) < 30.0 and
+        nball.yintercept != 0.0 and
+        ball.distance < 150.0 and
+        sightOk)
 
-    return (ball.mov_vel_x < -4.0 and
-            ball.mov_speed > 8.0 and
-            abs(ball.rel_y_intersect_dest) < 40.0 and
-            ball.distance < 150.0 and
-            sightOk)
+    # return (ball.mov_vel_x < -4.0 and
+    #         ball.mov_speed > 8.0 and
+    #         abs(ball.rel_y_intersect_dest) < 40.0 and
+    #         ball.distance < 150.0 and
+    #         sightOk)
 
 def shouldClearDangerousBall(player):
     return False
