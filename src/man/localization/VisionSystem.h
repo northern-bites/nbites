@@ -32,8 +32,7 @@ public:
     ~VisionSystem();
 
     bool update(ParticleSet& particles,
-                const messages::FieldLines& lines,
-                const messages::Corners& corners,
+                const messages::Vision& vision,
                 const messages::FilteredBall* ball,
                 const messages::RobotLocation& lastEstimate);
 

@@ -27,6 +27,13 @@ LineSystem::LineSystem()
     addLine(LocLineID::RightSideline, GREEN_PAD_Y, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
     addLine(LocLineID::LeftSideline, GREEN_PAD_Y + FIELD_WHITE_HEIGHT, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
 
+    // addLine(LocLineID::OurRightGoalbox, BLUE_GOALBOX_BOTTOM_Y, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + GOALBOX_DEPTH);
+    // addLine(LocLineID::TheirRightGoalbox, BLUE_GOALBOX_BOTTOM_Y, M_PI / 2, YELLOW_GOALBOX_LEFT_X, YELLOW_GOALBOX_RIGHT_X);
+
+    // NOTE right from the perspective of an observer looking in the positive x direction
+    // addLine(LocLineID::OurLeftGoalbox, BLUE_GOALBOX_TOP_Y, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + GOALBOX_DEPTH);
+    // addLine(LocLineID::TheirLeftGoalbox, BLUE_GOALBOX_TOP_Y, M_PI / 2, YELLOW_GOALBOX_LEFT_X, YELLOW_GOALBOX_RIGHT_X);
+
     // Part II
     // Map LineID that vision computes to LocLineID for use in solving the 
     // correspondence problem (see matchObservation)
@@ -34,7 +41,7 @@ LineSystem::LineSystem()
         LocLineID::OurEndline, LocLineID::TheirEndline,
         LocLineID::OurMidline, LocLineID::TheirMidline,
         LocLineID::OurTopGoalbox, LocLineID::TheirTopGoalbox,
-        LocLineID::RightSideline, LocLineID::LeftSideline 
+        LocLineID::RightSideline, LocLineID::LeftSideline
     };
     visionToLocIDs[vision::LineID::Line] = all;
 
@@ -246,7 +253,6 @@ double LineSystem::scoreObservation(const vision::GeoLine& observation,
         normalizedEp0 = correspondingLine.ep0();
         normalizedEp1 = correspondingLine.ep1();
     }
-
     vision::GeoLine normalizedCorrespondingLine;
     normalizedCorrespondingLine.set(fabs(correspondingLine.r()), normalizedT,
                                     normalizedEp0, normalizedEp1);

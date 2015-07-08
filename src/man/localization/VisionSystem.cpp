@@ -22,8 +22,7 @@ VisionSystem::~VisionSystem()
 }
 
 bool VisionSystem::update(ParticleSet& particles,
-                          const messages::FieldLines& lines,
-                          const messages::Corners& corners,
+                          const messages::Vision& vision,
                           const messages::FilteredBall* ball,
                           const messages::RobotLocation& lastEstimate)
 {
@@ -35,11 +34,13 @@ bool VisionSystem::update(ParticleSet& particles,
     bool useBall = (ball != NULL) && (fabs(vision::sMod(ball->bearing(), 2 * PI)) < M_PI / 4);
 
     // Count observations
-    for (int i = 0; i < lines.line_size(); i++) {
-        if (!LineSystem::shouldUse(lines.line(i)))
+    for (int i = 0; i < vision.line_size(); i++) {
+        if (!LineSystem::shouldUse(vision.line(i)))
             continue;
         numObservations++;
     }
+    if (vision.has_circle())
+        numObservations++;
     if (useBall)
         numObservations++;
 
@@ -55,11 +56,15 @@ bool VisionSystem::update(ParticleSet& particles,
         float curParticleError = 1;
 
         // Score particle from line observations
-        for (int i = 0; i < lines.line_size(); i++) {
-            if (!LineSystem::shouldUse(lines.line(i)))
+        for (int i = 0; i < vision.line_size(); i++) {
+            if (!LineSystem::shouldUse(vision.line(i)))
                 continue;
-            curParticleError = curParticleError*lineSystem->scoreLine(lines.line(i), particle->getLocation());
+            curParticleError = curParticleError*lineSystem->scoreLine(vision.line(i), particle->getLocation());
         }
+
+        // Score particle from center circle if on
+        if (vision.has_circle())
+            curParticleError = curParticleError*landmarkSystem->scoreCircle(vision.circle(), particle->getLocation());
 
         // Score particle from ball observation if in game set
         if (useBall)
@@ -82,8 +87,8 @@ bool VisionSystem::update(ParticleSet& particles,
     // Particle injections
     // (1) Reconstruct pose from top goalbox
     injections.clear();
-    for (int i = 0; i < lines.line_size(); i++) {
-        const messages::FieldLine& field = lines.line(i);
+    for (int i = 0; i < vision.line_size(); i++) {
+        const messages::FieldLine& field = vision.line(i);
 
         // If found top goalbox
         if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
@@ -95,8 +100,8 @@ bool VisionSystem::update(ParticleSet& particles,
             line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
 
             // Based on corners
-            for (int j = 0; j < corners.corner_size(); j++) {
-                const messages::Corner& corner = corners.corner(j);
+            for (int j = 0; j < vision.corner_size(); j++) {
+                const messages::Corner& corner = vision.corner(j);
 
                 // Project corner onto line, find distance parallel to line from origin
                 double distParallel = line.qDist(corner.x(), corner.y());
@@ -152,8 +157,8 @@ bool VisionSystem::update(ParticleSet& particles,
         vision::polarToCartesian(ball->distance(), ball->bearing(), ballRelX, ballRelY);
 
         // Find line that is closest to the ball, should be midline since in set
-        for (int i = 0; i < lines.line_size(); i++) {
-            const messages::FieldLine& field = lines.line(i);
+        for (int i = 0; i < vision.line_size(); i++) {
+            const messages::FieldLine& field = vision.line(i);
             const messages::HoughLine& inner = field.inner();
 
             // Rotate line to loc rel robot coordinate system 

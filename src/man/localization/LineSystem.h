@@ -34,6 +34,10 @@ enum class LocLineID {
     TheirTopGoalbox, // orange
     RightSideline,   // cyan
     LeftSideline     // pink
+    // OurRightGoalbox,
+    // OurLeftGoalbox,
+    // TheirRightGoalbox,
+    // TheirLeftGoalbox,
 };
 
 class LineSystem {

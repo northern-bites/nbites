@@ -510,21 +510,22 @@ CenterCircleDetector::CenterCircleDetector()
 void CenterCircleDetector::set()
 {
   // Set parameters
-  hardCap = 800;
+  minPotentials = 1000;
   maxEdgeDistanceSquared = 500 * 500;
   ccr = CENTER_CIRCLE_RADIUS;
-  binWidth = 75;
-  binCount = 8;
-  minVotesInMaxBin = 0.19; // 19% of points must be in the bin selected
+  binWidth = 50;
+  binCount = 10;
+  minVotesInMaxBin = 0.18; // 18% of points must be in the bin selected
 }
 
 bool CenterCircleDetector::detectCenterCircle(EdgeList& edges)
 {
-  std::vector<Point> potentials = calculatePotentials(edges);
-  
+  std::vector<Point> potentials;
+  calculatePotentials(edges, potentials);
+
 #ifdef OFFLINE
   _potentials = potentials;
-  if (_potentials.size() > hardCap && getMaxBin(_potentials, _ccx, _ccy)) {
+  if (_potentials.size() > minPotentials && getMaxBin(_potentials, _ccx, _ccy)) {
     _potentials.push_back(Point(_ccx, _ccy));
     return true;
   } else
@@ -532,13 +533,12 @@ bool CenterCircleDetector::detectCenterCircle(EdgeList& edges)
   return false;
 #endif
 
-  return (_potentials.size() > hardCap && getMaxBin(potentials, _ccx, _ccy));
+  return (potentials.size() > minPotentials && getMaxBin(potentials, _ccx, _ccy));
 }
 
 // Get potential cc centers and clean edge list
-std::vector<Point> CenterCircleDetector::calculatePotentials(EdgeList& edges)
+void CenterCircleDetector::calculatePotentials(EdgeList& edges, std::vector<Point>& vec)
 {
-  std::vector<Point> vec;
   AngleBinsIterator<Edge> abi(edges);
   for (Edge* e = *abi; e; e = *++abi) {
     double distance = e->field().x() * e->field().x() + e->field().y() * e->field().y();
@@ -547,11 +547,10 @@ std::vector<Point> CenterCircleDetector::calculatePotentials(EdgeList& edges)
       vec.push_back(Point(e->field().x() - ccr*sin(e->field().t()), e->field().y() + ccr*cos(e->field().t())));
     }
   }
-  return vec;
 }
 
 // Set (x0,y0) center of most populated bin
-bool CenterCircleDetector::getMaxBin(std::vector<Point> vec, double& x0, double& y0)
+bool CenterCircleDetector::getMaxBin(const std::vector<Point>& vec, double& x0, double& y0)
 {
   int bcSq = binCount * binCount;
 
@@ -632,14 +631,17 @@ bool CenterCircleDetector::getMaxBin(std::vector<Point> vec, double& x0, double&
       y0 = (winBin / binCount) * binWidth; 
     }
 
-    std::cout << std::endl << "Center Circle at (" << x0 << "," << y0 << "). " << 
+#ifdef OFFLINE
+    std::cerr << std::endl << "Center Circle at (" << x0 << "," << y0 << "). " << 
       (double)votes * 100/(double)vec.size() << "\% of the " << 
       vec.size() << " potentials in most populated bin" << std::endl;
+#endif
 
     return true;
   } else {
+#ifdef OFFLINE
     std::cout << std::endl << "Can't find center circle: " << (double)votes * 100/(double)vec.size() << "\% in max bin" << std::endl;
-
+#endif
   }
 
   return false;
@@ -1156,13 +1158,13 @@ void HoughSpace::adjust(EdgeList& edges, EdgeList& rejectedEdges, HoughLineList&
   }
 
   // For center circle detection, colloect all orphan edges
-  // rejectedEdges.reset();
+  rejectedEdges.reset();
 
-  // AngleBinsIterator<Edge> rejectABI(edges);
-  // for (Edge* e = *rejectABI; e; e = *++rejectABI)
-  //   if (e->memberOf() == 0) {
-  //     rejectedEdges.add(e->x(), e->y(), e->mag(), e->angle());
-  //   }
+  AngleBinsIterator<Edge> rejectABI(edges);
+  for (Edge* e = *rejectABI; e; e = *++rejectABI)
+    if (e->memberOf() == 0) 
+      rejectedEdges.add(e->x(), e->y(), e->mag(), e->angle());
+    
   times[4] = timer.time32();
 }
 
