@@ -53,7 +53,7 @@ if ( OFFLINE )
   include ( ${SHARE_DIR}/cmake/BuildGTest.cmake )
 endif()
 
-# For Aldebaran's headers
+# For Aldebaran's headers (actually just for the cross-compiled boost lib)
 find_package(ALCOMMON REQUIRED)
 include_directories( ${ALCOMMON_INCLUDE_DIR} )
 
@@ -108,7 +108,7 @@ add_subdirectory( gamestate )
 add_subdirectory( guardian )
 add_subdirectory( image )
 add_subdirectory( jointenactor )
-add_subdirectory( led )
+#add_subdirectory( led )
 add_subdirectory( localization )
 add_subdirectory( log )
 add_subdirectory( motion )
@@ -123,9 +123,8 @@ set( MAN_SRCS main.cpp
   ParamReader.cpp
 )
 
-add_library(
+add_executable(
   man
-  SHARED
   ${MAN_SRCS}
 )
 
@@ -142,7 +141,7 @@ target_link_libraries(
   guardian
   image
   jointenactor
-  led
+  #led
   localization
   log
   messages
@@ -157,7 +156,7 @@ target_link_libraries(
 )
 
 install( TARGETS man
-  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION lib
 )
 
 file( GLOB configFiles
