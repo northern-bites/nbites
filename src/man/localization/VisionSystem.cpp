@@ -58,7 +58,7 @@ bool VisionSystem::update(ParticleSet& particles,
         for (int i = 0; i < lines.line_size(); i++) {
             if (!LineSystem::shouldUse(lines.line(i)))
                 continue;
-            curParticleError = curParticleError*lineSystem->scoreObservation(lines.line(i), particle->getLocation());
+            curParticleError = curParticleError*lineSystem->scoreLine(lines.line(i), particle->getLocation());
         }
 
         // Score particle from ball observation if in game set
@@ -93,7 +93,6 @@ bool VisionSystem::update(ParticleSet& particles,
             // Rotate line to loc rel robot coordinate system 
             vision::GeoLine line;
             line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
-            line.translateRotate(0, 0, -(M_PI / 2));
 
             // Based on corners
             for (int j = 0; j < corners.corner_size(); j++) {
@@ -160,7 +159,6 @@ bool VisionSystem::update(ParticleSet& particles,
             // Rotate line to loc rel robot coordinate system 
             vision::GeoLine line;
             line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
-            line.translateRotate(0, 0, -(M_PI / 2));
 
             // Project ball onto line, find distance to line
             double distToLine = fabs(line.pDist(ballRelX, ballRelY));

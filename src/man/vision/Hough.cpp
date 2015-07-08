@@ -211,7 +211,8 @@ string Corner::print() const
 }
 
 GoalboxDetector::GoalboxDetector()
-  : std::pair<FieldLine*, FieldLine*>(NULL, NULL), parallelThreshold_(15), seperationThreshold_(20)
+  : std::pair<FieldLine*, FieldLine*>(NULL, NULL), 
+    parallelThreshold_(15), seperationThreshold_(20), lengthThreshold_(70)
 {}
 
 bool GoalboxDetector::find(FieldLineList& list)
@@ -265,7 +266,8 @@ bool GoalboxDetector::validBox(const HoughLine& line1, const HoughLine& line2) c
   const GeoLine& field1 = line1.field();
   const GeoLine& field2 = line2.field();
 
-  // Goalbox = two field lines that are parallel and seperated according to spec
+  // Goalbox = two field lines that are parallel, seperated according to spec,
+  // and sufficiently long (to rule out center circle false positives)
 
   // (1) Parallel
   // NOTE this check also requires that the robot is not in between the lines 
@@ -278,7 +280,12 @@ bool GoalboxDetector::validBox(const HoughLine& line1, const HoughLine& line2) c
   double distBetween = fabs(field1.pDist(field2.r()*cos(field2.t()), field2.r()*sin(field2.t())));
   bool seperation = fabs(distBetween - GOALBOX_DEPTH) < seperationThreshold();
 
-  return parallel && seperation;
+  // (3) Both lines are sufficiently long
+  bool line1Length = (field1.ep1() - field1.ep0()) > lengthThreshold();
+  bool line2Length = (field2.ep1() - field2.ep0()) > lengthThreshold();
+  bool length = line1Length && line2Length;
+
+  return parallel && seperation && length;
 }
 
 string GoalboxDetector::print() const
@@ -293,7 +300,8 @@ CornerDetector::CornerDetector(int width_, int height_)
     intersectThreshold_(10), 
     closeThreshold_(30), 
     farThreshold_(50), 
-    edgeImageThreshold_(0.10)
+    edgeImageThreshold_(0.25),
+    lengthThreshold_(70)
 {}
 
 void CornerDetector::findCorners(FieldLineList& list)
@@ -388,7 +396,12 @@ bool CornerDetector::isCorner(const HoughLine& line1, const HoughLine& line2) co
   double normalizedT2 = (field2.r() > 0 ? field2.t() : field2.t() - M_PI);
   bool orthogonal = diffRadians(diffRadians(normalizedT1, normalizedT2), (M_PI / 2)) < orthogonalThreshold()*TO_RAD;
 
-  return intersects && farEnoughFromImageEdge && orthogonal;
+  // (4) Both lines are sufficiently long
+  bool line1Length = (field1.ep1() - field1.ep0()) > lengthThreshold();
+  bool line2Length = (field2.ep1() - field2.ep0()) > lengthThreshold();
+  bool length = line1Length && line2Length;
+
+  return intersects && farEnoughFromImageEdge && orthogonal && length;
 }
 
 CornerID CornerDetector::classify(const HoughLine& line1, const HoughLine& line2) const

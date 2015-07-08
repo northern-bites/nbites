@@ -3,12 +3,14 @@
  **/
 
 #include "Man.h"
+#include "SharedData.h"
 
 #include <sys/file.h>
 #include <errno.h>
 
 int lockFD = 0;
 man::Man* instance;
+const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
 
 void handler(int signal)
 {
@@ -18,7 +20,10 @@ void handler(int signal)
         // I.e. close camera driver gracefully
         instance->preClose();
         flock(lockFD, LOCK_UN);
-
+        
+        printf("man closing MAN_LOG_PATH...\n");
+        fclose(stdout);
+        
         delete instance;
         exit(0);
     }
@@ -40,20 +45,23 @@ void establishLock()
         std::cout << "Could not establish lock on lock file. Is man already running?" << std::endl;
         exit(0);
     }
-
 }
 
 int main() {
-
     signal(SIGTERM, handler);
-
     establishLock();
+    
+    printf("\t\tman 7/%d\n", BOSS_VERSION);
+    printf("Man re-opening stdout...\n");
+    freopen(MAN_LOG_PATH, "w", stdout);
 
     // Constructs an instance of man. If we get here we have a lock
     instance = new man::Man();
 
     while (1) {
         // Hack so that I don't have to modify DiagramThread
+        // (Diagram threads are daemon threads, and man will exit if they're the
+        // only ones left)
         sleep(10);
     }
     return 1;

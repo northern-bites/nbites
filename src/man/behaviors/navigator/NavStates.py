@@ -1,10 +1,11 @@
 import NavConstants as constants
 import NavHelper as helper
 import NavTransitions as navTrans
+import Navigator as Navigator
 from collections import deque
 from objects import RobotLocation, RelRobotLocation
 from ..util import Transition
-from math import fabs, degrees
+from math import fabs, degrees, copysign
 from random import random
 
 def scriptedMove(nav):
@@ -70,6 +71,10 @@ def goToPosition(nav):
                                     HEADING_ADAPT_CUTOFF,
                                     MAX_TURN)
 
+        goToPosition.speed = nav.velocity
+        if fabs(nav.requestVelocity - nav.velocity) > Navigator.SPEED_CHANGE:
+            nav.velocity += copysign(Navigator.SPEED_CHANGE, (nav.requestVelocity - nav.velocity))
+
         if relDest.relX >= DISTANCE_ADAPT_CUTOFF:
             velX = goToPosition.speed
         elif relDest.relX <= -DISTANCE_ADAPT_CUTOFF:
@@ -134,7 +139,6 @@ def dodge(nav):
         ## SET UP the dodge direction based on where the obstacle is
         # if directly in front of us, move back and to one side based on
         # where the goToPosition dest is
-        nav.brain.currentlyDodging = True
         if dodge.obstaclePosition == 1:
             print "Dodging NORTH obstacle"
             relDest = helper.getRelativeDestination(nav.brain.loc,
@@ -215,7 +219,6 @@ def getIndex(num):
 
 # Quick stand to stabilize from the dodge.
 def briefStand(nav):
-    nav.brain.currentlyDodging = False
     if nav.firstFrame():
         helper.stand(nav)
 
@@ -230,6 +233,10 @@ def destinationWalkingTo(nav):
     """
     if nav.firstFrame():
         destinationWalkingTo.enqueAZeroVector = False
+
+    destinationWalkingTo.speed = nav.velocity
+    if fabs(nav.requestVelocity - nav.velocity) > Navigator.SPEED_CHANGE:
+            nav.velocity += copysign(Navigator.SPEED_CHANGE, (nav.requestVelocity - nav.velocity))
 
     if len(destinationWalkingTo.destQueue) > 0:
         dest = destinationWalkingTo.destQueue.popleft()
