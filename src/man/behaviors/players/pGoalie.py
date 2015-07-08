@@ -165,8 +165,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
 
             Transition.CountTransition(GoalieTransitions.noTopLine,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
+                                       Transition.MOST_OF_THE_TIME,
+                                       40)
             : GoalieStates.moveBackwards,
 
             # Transition.CountTransition(GoalieTransitions.shouldPositionLeft,
@@ -377,7 +377,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
             Transition.CountTransition(GoalieTransitions.facingBackward,
                                        Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
+                                       Transition.OK_PRECISION)
             : GoalieStates.lineCheckReposition,
 
             Transition.CountTransition(GoalieTransitions.sideLineCheckShouldReposition,

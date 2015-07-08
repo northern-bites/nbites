@@ -150,7 +150,13 @@ def spinToFaceBall(player):
 
 
         # facingDest.relH = player.brain.ball.bearing_deg
-        if player.brain.ball.bearing_deg < 0.0:
+        if clearIt.dangerousSide != -1:
+            print("Ball is very far to the side and i am side kicking so \
+                i will walk straight towards it")
+            facingDest.relH = player.brain.ball.bearing_deg
+            GoalieStates.spinBack.toAngle = player.brain.ball.bearing_deg
+
+        elif player.brain.ball.bearing_deg < 0.0:
             player.side = RIGHT
             facingDest.relH = player.brain.ball.bearing_deg + 20.0
             GoalieStates.spinBack.toAngle = player.brain.ball.bearing_deg + 20.0

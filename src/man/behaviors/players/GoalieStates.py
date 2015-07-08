@@ -104,11 +104,16 @@ def gamePlaying(player):
     if player.lastDiffState == 'fallen':
         # #TODO fix this
         # player.justKicked = False
-        # if player.justKicked:
-        #     print "I just kicked, I'm trying to find my way back!"
-        #     return player.goLater('findMyWayBackPtI')
-        # else:
-        return player.goLater('watchWithLineChecks')
+        if fallen.lastState == 'clearIt' and player.brain.ball.vis.on\
+        and math.fabs(player.brain.ball.bearing_deg) < 25.0:
+            print "I was already going to clear it!"
+            return player.goLater('clearIt')
+        elif fallen.lastState == 'spinBack' or fallen.lastState == 'didIKickIt'\
+        or fallen.lastState == 'kickBall' or fallen.lastState == 'repositionAfterWhiff':
+            print("I was just in either spinback or didIKickIt, meaning I'm away frm the goalbox likely")
+            return player.goLater('watchWithLineChecks')
+        else:
+            return player.goLater('watchWithLineChecks')
 
     #TODO before game/scrimmage change this to watch;
     # this is better for testing purposes!
@@ -156,8 +161,12 @@ def gameFinished(player):
 
 @superState('gameControllerResponder')
 def fallen(player):
+    fallen.lastState = player.lastDiffState
+    # print("My last state before falling was:", player.lastDiffState)
     player.inKickingState = False
     return player.stay()
+
+fallen.lastState = 'watch'
 
 # @superState('gameControllerResponder')
 # def spinToWalkOffField(player):

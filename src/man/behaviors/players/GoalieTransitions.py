@@ -86,9 +86,9 @@ def frontLineCheckShouldReposition(player):
 # def iAmRight(player):
 def facingBackward(player):
     if player.brain.visionLines.horizon_dist < 170.0 and\
-    math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 10.0:
+    math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 15.0:
         print("I'm FACing backWARDS! yaw:", math.degrees(player.brain.interface.joints.head_yaw))
-        player.homeDirections += [RelRobotLocation(0, 0, 180.0)]
+        player.homeDirections += [RelRobotLocation(0, 0, 150.0)]
         player.homeDirections = player.homeDirections[1:]
         return True
     return False
@@ -254,6 +254,7 @@ def shouldGoForward(player):
             and r != 0.0 and r2 != 0.0:
                 print "I'm seeing two lines, I should go forward"
                 print ("r1: ", r, "r2: ", r2, " t1: ", t, "t2: ", t2)
+                player.homeDirections = []
                 player.homeDirections += [RelRobotLocation(25.0, 0.0, 0.0)]
                 return True
 
@@ -264,11 +265,12 @@ def noTopLine(player):
     for line in GoalieStates.watchWithLineChecks.lines:
         r = line.r
         t = math.degrees(line.t)
-        print('t',t, 'r',r)
+        # print('t',t, 'r',r)
         length = getLineLength(line)
         if (math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < 30.0\
         or math.fabs(t - constants.EXPECTED_FRONT_LINE_T_2) < 30.0) \
-        and math.fabs(r - constants.EXPECTED_FRONT_LINE_R) < 15.0:
+        and math.fabs(r - constants.EXPECTED_FRONT_LINE_R) < 15.0\
+        and r != 0.0:
             # print("found front line!", "r", r, "t", t)
             return False
 
@@ -386,6 +388,9 @@ def facingASideline(player):
                         y_dest = sideline.r - constants.EXPECTED_SIDE_LINE_R
 
                     h_dest = 0 #frontline.t - 90.0
+                    if y_dest < 10.0:
+                        print("adjustment too small, not doing it", y_dest)
+                        return False
                     player.homeDirections += [RelRobotLocation(0.0, y_dest, h_dest)]
                     print("Sideline.r: ", sideline.r, "sideline.t:", math.degrees(sideline.t))
                     print ("I'm adusting myself by: y:", y_dest, "h:", h_dest)
