@@ -738,6 +738,7 @@ void FieldLineList::classify(GoalboxDetector& boxDetector,
     circleDetector.on(false);
     return;
   }
+
   // Run goalbox detector
   bool topBoxFound = boxDetector.find(*this);
   bool endlineFound = topBoxFound;
@@ -773,9 +774,12 @@ void FieldLineList::classify(GoalboxDetector& boxDetector,
 
     // Set midline, or discard CC if no close line
     if (minDist < 50) {
+      std::cout << "MIN D: " << minDist << " KEEPING CC\n";
       midline->id(LineID::Midline);
       midlineFound = true;
     } else {
+      std::cout << "MIN D: " << minDist << " LOOSING CC\n";
+
       circleDetector.on(false);
     }
   }

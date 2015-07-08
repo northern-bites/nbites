@@ -166,7 +166,7 @@ void VisionModule::run_()
         // Detect center circle on top
         if (!i) centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]));
  
-        std::cerr << "CC is " << centerCircleDetector[i]->on() << std::endl;
+        std::cerr << "Before CC is " << centerCircleDetector[i]->on() << std::endl;
         
         // Pair hough lines to field lines
         fieldLines[i]->find(*(houghLines[i]), blackStar());
@@ -174,6 +174,9 @@ void VisionModule::run_()
         // Classify field lines
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]), *(centerCircleDetector[i]));
  
+       std::cerr << "After  CC is " << centerCircleDetector[i]->on() << std::endl;
+
+
         ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
 
 #ifdef USE_LOGGING
