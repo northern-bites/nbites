@@ -24,6 +24,8 @@ namespace vision {
 
 	bool BallDetector::findBall(ImageLiteU8 orange, double cameraHeight)
 	{
+		const double CONFIDENCE = 0.5;
+
 		if (debugBall) {
 			candidates.clear();
 		}
@@ -42,14 +44,17 @@ namespace vision {
 			double bIY = (orange.height() / 2 - (*i).centerY()) -
 				(*i).firstPrincipalLength();
 
-			int x = (int)((*i).centerX());
-			int y = (int)((*i).centerY());
-			bool offField = y < field->horizonAt(x);
-			if (offField) {
-				if (debugBall) {
-					std::cout << "Blob is off the field: " << std::endl;
+			// When looking in the top camera worry about the field
+			if (topCamera) {
+				int x = (int)((*i).centerX());
+				int y = (int)((*i).centerY());
+				bool offField = y < field->horizonAt(x);
+				if (offField) {
+					if (debugBall) {
+						std::cout << "Blob is off the field: " << std::endl;
+					}
+					continue;
 				}
-				continue;
 			}
 
 			bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
@@ -64,7 +69,7 @@ namespace vision {
 
 			Ball b((*i), x_rel, -1 * y_rel, cameraHeight, orange.height(),
 				   orange.width(), topCamera);
-			if (b.confidence() > .5) {
+			if (b.confidence() > CONFIDENCE) {
 #ifdef OFFLINE
 				// we always want to draw the ball, even when not debugging it
 				candidates.push_back(b);
@@ -84,7 +89,7 @@ namespace vision {
 				}
 			}
 		}
-		if (_best.confidence() > .5) {
+		if (_best.confidence() > CONFIDENCE) {
 			return true;
 		}
 		else {
@@ -130,17 +135,20 @@ namespace vision {
 		expectedDiam = pixDiameterFromDist(hypotDist);
 
 		diameterRatio;
-		if (expectedDiam > 2 * blob.firstPrincipalLength())
+		if (expectedDiam > 2 * blob.firstPrincipalLength()) {
 			diameterRatio = 2*blob.firstPrincipalLength() / expectedDiam;
-		else
+		} else {
 			diameterRatio = expectedDiam / (2 * blob.firstPrincipalLength());
+		}
 
 		//_confidence = (density > thresh).f() * (aspectRatio > thresh).f() * (diameterRatio > radThresh).f();
 		_confidence = ((density > thresh) & (aspectRatio > thresh) &
 					   (diameterRatio > radThresh)).f();
 
 		// Hack/Sanity check to ensure we don't see crazy balls
-		if (dist > 600) _confidence = 0;
+		if (dist > 600) {
+			_confidence = 0;
+		}
 	}
 
 	std::string Ball::properties()
@@ -163,7 +171,7 @@ namespace vision {
 		return d;
 	}
 
-// The expected diameter of ball in image at distance d in CM
+    // The expected diameter of ball in image at distance d in CM
 	double Ball::pixDiameterFromDist(double d) const
 	{
 		double trig = atan(BALL_RADIUS / d);
