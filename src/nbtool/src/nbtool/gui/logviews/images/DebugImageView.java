@@ -178,65 +178,68 @@ public class DebugImageView extends ViewParent
 		final int BOX_HEIGHT = 25;
         if (debugImage != null) {
             g.drawImage(debugImageDisplay, 0, 0, displayw, displayh, null);
-            // Get hough line data from buffer
-			// This code stolen from LineView.java
-			// TODO: obviously this should be moved into its own function
-			if (displayFieldLines) {
-				for (int i = 0; i < lines.size(); i += 10) {
-					double icR = lines.get(i);
-					double icT = lines.get(i + 1);
-					double icEP0 = lines.get(i + 2);
-					double icEP1 = lines.get(i + 3);
-					double houghIndex = lines.get(i + 4);
-					double fieldIndex = lines.get(i + 5);
-					double fcR = lines.get(i + 6);
-					double fcT = lines.get(i + 7);
-					double fcEP0 = lines.get(i + 8);
-					double fcEP1 = lines.get(i + 9);
-
-					// Draw it in image coordinates
-					if (fieldIndex == -1)
-						g.setColor(Color.red);
-					else
-						g.setColor(Color.blue);
-
-					double x0 = 2*icR * Math.cos(icT) + displayImages[ORIGINAL].getWidth() / 2;
-					double y0 = -2*icR * Math.sin(icT) + displayImages[ORIGINAL].getHeight() / 2;
-					int x1 = (int) Math.round(x0 + 2*icEP0 * Math.sin(icT));
-					int y1 = (int) Math.round(y0 + 2*icEP0 * Math.cos(icT));
-					int x2 = (int) Math.round(x0 + 2*icEP1 * Math.sin(icT));
-					int y2 = (int) Math.round(y0 + 2*icEP1 * Math.cos(icT));
-
-					g.drawLine(x1, y1, x2, y2);
-
-					// Image view line labels
-					double xstring = (x1 + x2) / 2;
-					double ystring = (y1 + y2) / 2;
-
-					double scale = 0;
-					if (icR > 0)
-						scale = 10;
-					else
-						scale = 3;
-					xstring += scale*Math.cos(icT);
-					ystring += scale*Math.sin(icT);
-
-					g.drawString(Integer.toString((int) houghIndex) + "/" +
-								 Integer.toString((int) fieldIndex),
-								 (int) xstring,
-								 (int) ystring);
-
-				}
-			}
+			drawLines(g);
 			drawBlobs(g);
-
 			g.drawImage(displayImages[currentBottom], 0, displayh + 5, displayw,
 						displayh, null);
 			viewList.setBounds(0, displayh * 2 + 10, displayw / 2, BOX_HEIGHT);
-			checkBoxPanel.setBounds(displayw + 10, 0, displayw, displayh);
+			checkBoxPanel.setBounds(displayw + 10, 0, displayw / 2, displayh);
+			checkBoxPanel.show();
         }
     }
 
+	/* Taken from LineView.java
+	 */
+	public void drawLines(Graphics g) {
+		// This code stolen from LineView.java
+		// TODO: obviously this should be moved into its own function
+		if (displayFieldLines) {
+			for (int i = 0; i < lines.size(); i += 10) {
+				double icR = lines.get(i);
+				double icT = lines.get(i + 1);
+				double icEP0 = lines.get(i + 2);
+				double icEP1 = lines.get(i + 3);
+				double houghIndex = lines.get(i + 4);
+				double fieldIndex = lines.get(i + 5);
+				double fcR = lines.get(i + 6);
+				double fcT = lines.get(i + 7);
+				double fcEP0 = lines.get(i + 8);
+				double fcEP1 = lines.get(i + 9);
+
+				// Draw it in image coordinates
+				if (fieldIndex == -1)
+					g.setColor(Color.red);
+				else
+					g.setColor(Color.blue);
+
+				double x0 = 2*icR * Math.cos(icT) + displayImages[ORIGINAL].getWidth() / 2;
+				double y0 = -2*icR * Math.sin(icT) + displayImages[ORIGINAL].getHeight() / 2;
+				int x1 = (int) Math.round(x0 + 2*icEP0 * Math.sin(icT));
+				int y1 = (int) Math.round(y0 + 2*icEP0 * Math.cos(icT));
+				int x2 = (int) Math.round(x0 + 2*icEP1 * Math.sin(icT));
+				int y2 = (int) Math.round(y0 + 2*icEP1 * Math.cos(icT));
+
+				g.drawLine(x1, y1, x2, y2);
+
+				// Image view line labels
+				double xstring = (x1 + x2) / 2;
+				double ystring = (y1 + y2) / 2;
+
+				double scale = 0;
+				if (icR > 0)
+					scale = 10;
+				else
+					scale = 3;
+				xstring += scale*Math.cos(icT);
+				ystring += scale*Math.sin(icT);
+
+				g.drawString(Integer.toString((int) houghIndex) + "/" +
+							 Integer.toString((int) fieldIndex),
+							 (int) xstring,
+							 (int) ystring);
+			}
+		}
+	}
 	/* Taken directly from BallView.java (where it was undocumented). Draws blobs
 	 * related to the ball.
 	 */
