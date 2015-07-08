@@ -1,11 +1,11 @@
 package nbtool.term;
 
-import nbtool.io.BroadcastIO.TeamBroadcastListener;
+import nbtool.io.BroadcastIO.TeamBroadcastInstance;
 
 public class BroadcastTest {
 	
 	public static void main(String[] args) {
-		TeamBroadcastListener tbl = new TeamBroadcastListener();
+		TeamBroadcastInstance tbl = new TeamBroadcastInstance();
 		tbl.run();
 	}
 
