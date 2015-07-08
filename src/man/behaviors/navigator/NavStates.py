@@ -189,26 +189,6 @@ def dodge(nav):
     helper.setDestination(nav, dest, 0.5)
     return Transition.getNextState(nav, dodge)
 
-    # order = [0, 1, -1, 2, -2, 3, -3, 4]
-    # if nav.firstFrame():
-    #     # dodge.positions[0] is position.NONE, so direction numbers are their own index
-    #     for i in range(len(order)):
-    #         temp = getIndex(int(dodge.targetDest) + order[i])
-    #         # if there is no obstacle in this direction
-    #         if not dodge.positions[temp]:
-    #             print "DODGE TO ", dodge.DDirects[temp]
-    #             dodge.dest = RelRobotLocation(constants.DGE_DESTS[temp-1][0],
-    #                                           constants.DGE_DESTS[temp-1][1],
-    #                                           constants.DGE_DESTS[temp-1][2])
-    #             break
-
-    # # TODO the worst hack I have ever written, sorry -- Josh Imhoff
-    # dest2 = RelRobotLocation(dodge.dest.relX + random(),
-    #                          dodge.dest.relY + random(),
-    #                          dodge.dest.relH + random())
-    # helper.setDestination(nav, dest2, 0.5)
-    # return Transition.getNextState(nav, dodge)
-
 def getIndex(num):
     if num <=8 and num >= 1:
         return num

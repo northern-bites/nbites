@@ -43,7 +43,6 @@ usingLeftSonar(false),
 usingRightSonar(false),
 usingVision(false)
 {
-    memset(obstacleBuffer, 0, sizeof(obstacleBuffer));
     memset(obstacleDistances, 0, sizeof(obstacleDistances));
     memset(obstacleDetectors, 0, sizeof(obstacleDetectors));
 
@@ -130,12 +129,10 @@ void ObstacleModule::run_()
     sonarIn.latch();
     visionIn.latch();
 
-    // Don't need this kind of buffer when we aren't using vision, so keep uninit'd
-    if (!usingVision)
-    {
-        for (int i = 0; i < NUM_DIRECTIONS; i++) {
-            obstacleBuffer[i] = 0;
-        }
+    // init arrays
+    for (int i = 0; i < NUM_DIRECTIONS; i++) {
+        obstacleDistances[i] = 0;
+        obstacleDetectors[i] = FieldObstacles::Obstacle::NA;
     }
 
     FieldObstacles::Obstacle::ObstaclePosition sonars, arms;
@@ -157,15 +154,11 @@ void ObstacleModule::run_()
 #endif
 
     // combines input from both arms and sonars
-    // Can also choose to do this separately
+    // Comment this out if we choose to do this separately
     combineArmsAndSonars(arms, sonars);
 
-    // Process vision in all three sections of frame separately
-    if (usingVision) {
-        processVision(visionIn.message());
-    }
-
-    updateObstacleBuffer();
+    // Process vision if we want to use it
+    if (usingVision) { processVision(visionIn.message()); }
 
     // Now we take information and return relevant obstacles
     portals::Message<messages::FieldObstacles> current(0);
@@ -173,12 +166,21 @@ void ObstacleModule::run_()
     // ignore "NONE" direction, start at 1
     for (int i = 1; i < NUM_DIRECTIONS; i++)
     {
-        if (obstacleBuffer[i]==0) { continue; } //no obstacle here
+        if (obstacleDistances[i]==0) { continue; } //no obstacle here
 
         FieldObstacles::Obstacle* temp = current.get()->add_obstacle();
         temp->set_position(obstaclesList[i]);
         temp->set_distance(obstacleDistances[i]);
         temp->set_detector(obstacleDetectors[i]);
+
+        // update vision box
+        if (obstacleBox[0] == i && obstacleDetectors[i] ==
+            FieldObstacles::Obstacle::VISION) {
+            temp->set_closest_y(obstacleBox[1]);
+            temp->set_box_bottom(obstacleBox[2]);
+            temp->set_box_left(obstacleBox[3]);
+            temp->set_box_right(obstacleBox[4]);
+        }
     }
 
     obstacleOut.setMessage(current);
@@ -362,17 +364,20 @@ void ObstacleModule::combineArmsAndSonars
 }
 
 void ObstacleModule::updateVisionBuffer
-(FieldObstacles::Obstacle::ObstaclePosition pos, std::list<float> dists,
+(FieldObstacles::Obstacle::ObstaclePosition pos,
  const messages::RobotObstacle& input)
 {
-    dists.push_back(input.box_bottom());
-    if (dists.size() > VISION_FRAMES_TO_BUFFER)
-    {
-        dists.pop_front();
-    }
+    // update with distance in meters instead of cm
+    updateObstacleArrays(FieldObstacles::Obstacle::VISION, pos, .01f*input.box_bottom());
 
-    float avg = average(dists);
-    updateObstacleArrays(FieldObstacles::Obstacle::VISION, pos, avg);
+    obstacleBox[0] = (float)pos;
+    obstacleBox[1] = input.closest_y();
+    obstacleBox[2] = input.box_bottom();
+    obstacleBox[3] = input.box_left();
+    obstacleBox[4] = input.box_right();
+
+    // printf("Obstacle Box OBST2: (%g, %g, %g, %g)\n",
+    //         obstacleBox[1], obstacleBox[2], obstacleBox[3], obstacleBox[4]);
 }
 
 void ObstacleModule::processVision(const messages::RobotObstacle& input)
@@ -381,8 +386,16 @@ void ObstacleModule::processVision(const messages::RobotObstacle& input)
     //         input.closest_y(), input.box_bottom(),
     //         input.box_left(), input.box_right());
 
+    // reset obstacle box
+    for (int i = 0; i < 5; i++) {
+        obstacleBox[i] = -1;
+    }
+
     // check for no obstacle in vision
     if (input.closest_y() == -1) { return; }
+
+    // Don't want to dodge obstacles too far away
+    if (input.box_bottom() > VISION_MAX_DIST) { return; }
 
     float bearing = (float)atan2(input.box_bottom(),
                     ((input.box_left() - input.box_right()) / 2.f));
@@ -392,27 +405,27 @@ void ObstacleModule::processVision(const messages::RobotObstacle& input)
     if ( bearing < ZONE_WIDTH )
     {
         // obstacle to the east
-        updateVisionBuffer(FieldObstacles::Obstacle::EAST, EDists, input);
+        updateVisionBuffer(FieldObstacles::Obstacle::EAST, input);
     }
     else if ( bearing < 3.f * ZONE_WIDTH )
     {
         // obstacle to northeast
-        updateVisionBuffer(FieldObstacles::Obstacle::NORTHEAST, NEDists, input);
+        updateVisionBuffer(FieldObstacles::Obstacle::NORTHEAST, input);
     }
     else if ( bearing < 5.f * ZONE_WIDTH )
     {
         // obstacle to north
-        updateVisionBuffer(FieldObstacles::Obstacle::NORTH, NDists, input);
+        updateVisionBuffer(FieldObstacles::Obstacle::NORTH, input);
     }
     else if ( bearing < 7.f * ZONE_WIDTH )
     {
         // obstacle to northwest
-        updateVisionBuffer(FieldObstacles::Obstacle::NORTHWEST, NWDists, input);
+        updateVisionBuffer(FieldObstacles::Obstacle::NORTHWEST, input);
     }
     else if ( bearing < 9.f * ZONE_WIDTH )
     {
         // obstacle to west
-        updateVisionBuffer(FieldObstacles::Obstacle::WEST, WDists, input);
+        updateVisionBuffer(FieldObstacles::Obstacle::WEST, input);
     }
 }
 
@@ -420,26 +433,9 @@ void ObstacleModule::updateObstacleArrays
 (FieldObstacles::Obstacle::ObstacleDetector detector,
  FieldObstacles::Obstacle::ObstaclePosition pos, float dist)
 {
-    obstacleBuffer[int(pos)] = 1;
+    if (int(pos) == 0) { return; }
     obstacleDistances[int(pos)] = dist;
     obstacleDetectors[int(pos)] = detector;
-}
-
-void ObstacleModule::updateObstacleBuffer()
-{
-    for (int i = 1; i < NUM_DIRECTIONS; i++)
-    {
-        // If we've kept this obstacle in our buffer for long
-        // or haven't seen an obstacle here yet
-        if (obstacleBuffer[i] == 0 or
-            obstacleBuffer[i] > VISION_FRAMES_TO_HAVE_OBSTACLE)
-        {
-            obstacleBuffer[i] = 0;
-            obstacleDistances[i] = 0.f;
-            continue;
-        }
-        obstacleBuffer[i]++;
-    }
 }
 
 } // namespace obstacle
