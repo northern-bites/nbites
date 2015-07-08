@@ -25,6 +25,7 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
       linesOut(base()),
       cornersOut(base()),
       ballOut(base()),
+      robotObstacleOut(base()),
       ballOn(false),
       ballOnCount(0),
       ballOffCount(0),
@@ -80,6 +81,7 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         edgeDetector[i]->fast(fast);
         hough[i]->fast(fast);
     }
+    robotImageObstacle = new RobotObstacle(wd / 4, ht / 4);
     setCalibrationParams(robotName);
 }
 
@@ -189,6 +191,7 @@ void VisionModule::run_()
     ballOn = ballDetected;
     updateVisionBall();
     sendCenterCircle();
+    updateObstacleBox();
 }
 
 
@@ -310,6 +313,24 @@ void VisionModule::updateVisionBall()
     }
 
     ballOut.setMessage(ball_message);
+}
+
+void VisionModule::updateObstacleBox()
+{
+    // only want bottom camera
+    robotImageObstacle->updateVisionObstacle(frontEnd[1]->whiteImage(),
+                                             *(edges[1]), obstacleBox,
+                                             homography[1]);
+
+    // std::cout<<"about to set message for obstacle vision"<<std::endl;
+    portals::Message<messages::RobotObstacle> boxOut(0);
+    boxOut.get()->set_closest_y(obstacleBox[0]);
+    boxOut.get()->set_box_bottom(obstacleBox[1]);
+    boxOut.get()->set_box_left(obstacleBox[2]);
+    boxOut.get()->set_box_right(obstacleBox[3]);
+    robotObstacleOut.setMessage(boxOut);
+
+    // printf("Obstacle Box VISION: (%g, %g, %g, %g)\n", obstacleBox[0], obstacleBox[1], obstacleBox[2], obstacleBox[3]);
 }
 
 void VisionModule::sendCenterCircle()
