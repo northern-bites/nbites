@@ -1,4 +1,4 @@
-( (arms 0)
+( (arms 1)
   (vision 1)
   (set_all_sonar 1)
   (all_left_sonar 0)

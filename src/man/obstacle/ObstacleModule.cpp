@@ -141,7 +141,7 @@ void ObstacleModule::run_()
     if (usingArms) { arms = processArms( armContactIn.message()); }
     else { arms = FieldObstacles::Obstacle::NONE; }
     // if not combining arms and sonars, uncomment this:
-    // updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, 0.f);
+    // updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, -1.f);
 
     // Decide sonars
     if (usingLeftSonar || usingRightSonar) { sonars = processSonar(sonarIn.message()); }
@@ -335,7 +335,7 @@ void ObstacleModule::combineArmsAndSonars
     // If they agree, easy
     if (arms == sonars)
     {
-        updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, 0.f);
+        updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, -1.f);
     }
     // Trust sonars before we get any arm input
     else if (arms == FieldObstacles::Obstacle::NONE)
@@ -347,7 +347,7 @@ void ObstacleModule::combineArmsAndSonars
              (arms == FieldObstacles::Obstacle::NORTHWEST ||
               arms == FieldObstacles::Obstacle::NORTHEAST))
     {
-        updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, 0.f);
+        updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, -1.f);
     }
     else if (arms == FieldObstacles::Obstacle::NORTH &&
              (sonars == FieldObstacles::Obstacle::NORTHWEST ||
@@ -358,7 +358,7 @@ void ObstacleModule::combineArmsAndSonars
     // If they don't agree or get no sonars, trust the arms
     else
     {
-        updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, 0.f);
+        updateObstacleArrays(FieldObstacles::Obstacle::ARMS, arms, -1.f);
     }
 
 }
