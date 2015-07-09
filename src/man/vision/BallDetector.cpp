@@ -51,6 +51,36 @@ namespace vision {
 			double bIY = (orange.height() / 2 - (*i).centerY()) -
 				(*i).firstPrincipalLength();
 
+			// When looking in the top camera worry about the field
+			if (topCamera) {
+				bool offField = centerY < field->horizonAt(centerX);
+				if (offField) {
+					if (debugBall) {
+						std::cout << "Blob is off the field: " << std::endl;
+					}
+					continue;
+				}
+				offField = centerY - principalLength <
+										 field->blockHorizonAt(centerX);
+				if (offField) {
+					if (debugBall) {
+						std::cout << "Blob is on blocked part of field " <<
+								  "and is probably a robot uniform" << std::endl;
+					}
+					continue;
+				}
+			}
+
+			bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
+
+			// This blob is above the horizon. Can't be a ball
+			if (!belowHoriz) {
+				if (debugBall) {
+					std::cout << "BLOB is above horizon:" << std::endl;
+				}
+				continue;
+			}
+
 			// is the ball occluded?
 			if (centerX - principalLength < 0 ||
 				centerX + principalLength > orange.width()) {
@@ -71,27 +101,6 @@ namespace vision {
 					std::cout << "Blob is occluded on bottom" << std::endl;
 				}
 				occludedBottom = true;
-			}
-
-			// When looking in the top camera worry about the field
-			if (topCamera) {
-				bool offField = centerY < field->horizonAt(centerX);
-				if (offField) {
-					if (debugBall) {
-						std::cout << "Blob is off the field: " << std::endl;
-					}
-					continue;
-				}
-			}
-
-			bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
-
-			// This blob is above the horizon. Can't be a ball
-			if (!belowHoriz) {
-				if (debugBall) {
-					std::cout << "BLOB is above horizon:" << std::endl;
-				}
-				continue;
 			}
 
 			Ball b((*i), x_rel, -1 * y_rel, cameraHeight, orange.height(),
@@ -176,11 +185,11 @@ namespace vision {
 
 		//_confidence = (density > thresh).f() * (aspectRatio > thresh).f() * (diameterRatio > radThresh).f();
 
-		if (!topCamera && (occludedSide || occludedTop)) {
+		if ((occludedSide || occludedTop || occludedBottom) && density > 0.9) {
 			_confidence = ((density > thresh) & (aspectRatio > thresh) &
 						   (diameterRatio > radThresh)).f();
 			_confidence = ((density > thresh) &
-						   (diameterRatio > radThresh)).f();
+						   (diameterRatio > radThresh)).f() * 0.85;
 		} else {
 			_confidence = ((density > thresh) & (aspectRatio > thresh) &
 						   (diameterRatio > radThresh)).f();

@@ -68,6 +68,7 @@ public:
     int getInitialHorizonEstimate(int pH);
     int getImprovedEstimate(int pH);
 	int horizonAt(int x);
+	int blockHorizonAt(int x);
 	int occludingHorizonAt(int x);
 	float distanceToHorizon(int x, int y);
 	float fieldEdgeDistanceCenter();

@@ -756,6 +756,32 @@ int Field::findGreenHorizon(int pH, float sl) {
     return horizon;
 }
 
+/* The blocked horizon at the given x value. This is a more stringest
+ * horizon that gives lower values in the presence of blackages - usually
+ * robots or goal posts.
+ * @param x        column to find the blocked horizon in
+ * @return        projected value
+ */
+
+int Field::blockHorizonAt(int x) {
+    if (topCamera) {
+        if (x < 0 || x >= width) {
+            if (debugHorizon) {
+                cout << "Problem in blocked horizon " << x << endl;
+            }
+            if (x < 0) {
+                return topBlock[0];
+            } else {
+                return topBlock[width - 1];
+            }
+        }
+        return topBlock[x];
+    }
+    else
+        return 0;
+}
+
+
 /* The horizon at the given x value.  Eventually we'll be changing this to
  * return a value based upon the field edges.
  * @param x        column to find the horizon in
