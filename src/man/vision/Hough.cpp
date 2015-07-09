@@ -301,7 +301,7 @@ CornerDetector::CornerDetector(int width_, int height_)
     closeThreshold_(30), 
     farThreshold_(50), 
     edgeImageThreshold_(0.25),
-    lengthThreshold_(70)
+    lengthThreshold_(0) // NOTE zero means that the condition is not currently being used
 {}
 
 void CornerDetector::findCorners(FieldLineList& list)
@@ -719,9 +719,6 @@ void FieldLineList::find(HoughLineList& houghLines, bool blackStar)
     }
 }
 
-// TODO goalie and the goalbox
-// TODO midline classification? (cross detection, lots of green detection, etc.)
-// TODO find and use field edge?
 void FieldLineList::classify(GoalboxDetector& boxDetector, CornerDetector& cornerDetector)
 {
   // If less than one field line, no classification possible
@@ -737,118 +734,133 @@ void FieldLineList::classify(GoalboxDetector& boxDetector, CornerDetector& corne
   // Run corner detector
   cornerDetector.findCorners(*this);
 
+  // China 2015 hack
+  //
+  // The code belows attempts to make all possible line classifications from
+  // already classified lines. This is a useful bit of functionality, but significant
+  // testing is needed before we trust such a system, probably in the form of a 
+  // unit test. As we are about to go play robot soccer in China, such a test is
+  // not gonna happen.
+  //
+  // So the current strategy is to just classify lines via the goalbox detector,
+  // the circle detector, and the corner loop below the commented out code. This
+  // is plenty sufficient for good localization accuracy, but in the future it
+  // would be better to get the code commented out below tested and running.
+  //
+  // - Josh
+
   // Loop over lines until no more classifications possible
-  int i = 0;
-  int numStepsWithoutClassify = -1;
-  int numLines = static_cast<int>(size());
-  while (numStepsWithoutClassify < numLines) {
-    numStepsWithoutClassify++;
-    FieldLine& line = (*this)[i];
-    i = (i + 1) % numLines;
-    if (line.id() != LineID::Line) continue;
-    std::vector<Corner> corners = line.corners();
+  // int i = 0;
+  // int numStepsWithoutClassify = -1;
+  // int numLines = static_cast<int>(size());
+  // while (numStepsWithoutClassify < numLines) {
+  //   numStepsWithoutClassify++;
+  //   FieldLine& line = (*this)[i];
+  //   i = (i + 1) % numLines;
+  //   if (line.id() != LineID::Line) continue;
+  //   std::vector<Corner> corners = line.corners();
 
-    bool oneConcave = false;
-    bool oneConvex = false;
-    bool oneTHorizontal = false;
-    bool oneTVertical = false;
+  //   bool oneConcave = false;
+  //   bool oneConvex = false;
+  //   bool oneTHorizontal = false;
+  //   bool oneTVertical = false;
 
-    for (int j = 0; j < corners.size(); j++) {
-      // (1) Classifies lines based on seeing two corners connected to line
-      // Two concave -> endline
-      if (corners[j].id == CornerID::Concave) {
-        if (oneConcave) {
-          line.id(LineID::Endline);
-          numStepsWithoutClassify = 0;
-          endlineFound = true;
-        } else
-          oneConcave = true;
-      // Two convex -> top goalbox
-      } else if (corners[j].id == CornerID::Convex) {
-        if (oneConvex) {
-          line.id(LineID::TopGoalbox);
-          numStepsWithoutClassify = 0;
-          topBoxFound = true;
-        } else {
-          oneConvex = true;
-          // One convex, one T (vertical) -> side goalbox
-          if (oneTVertical) {
-            line.id(LineID::SideGoalbox);
-            numStepsWithoutClassify = 0;
-            sideboxFound = true;
-          }
-        }
-      // Two t (horizontal) -> endline
-      } else if (corners[j].id == CornerID::T &&
-          corners[j].first == &line) {
-        if (oneTHorizontal) {
-          line.id(LineID::Endline);
-          numStepsWithoutClassify = 0;
-          endlineFound = true;
-        } else
-          oneTHorizontal = true;
-      // Two t (vertical) -> midline
-      } else if (corners[j].id == CornerID::T &&
-          corners[j].second == &line) {
-        if (oneTVertical) {
-          line.id(LineID::Midline);
-          numStepsWithoutClassify = 0;
-          midlineFound = true;
-        } else {
-          oneTVertical = true;
-          // One convex, one T (vertical) -> side goalbox
-          if (oneConvex) {
-            line.id(LineID::SideGoalbox);
-            numStepsWithoutClassify = 0;
-            sideboxFound = true;
-          }
-        }
-      }
+  //   for (int j = 0; j < corners.size(); j++) {
+  //     // (1) Classifies lines based on seeing two corners connected to line
+  //     // Two concave -> endline
+  //     if (corners[j].id == CornerID::Concave) {
+  //       if (oneConcave) {
+  //         line.id(LineID::Endline);
+  //         numStepsWithoutClassify = 0;
+  //         endlineFound = true;
+  //       } else
+  //         oneConcave = true;
+  //     // Two convex -> top goalbox
+  //     } else if (corners[j].id == CornerID::Convex) {
+  //       if (oneConvex) {
+  //         line.id(LineID::TopGoalbox);
+  //         numStepsWithoutClassify = 0;
+  //         topBoxFound = true;
+  //       } else {
+  //         oneConvex = true;
+  //         // One convex, one T (vertical) -> side goalbox
+  //         if (oneTVertical) {
+  //           line.id(LineID::SideGoalbox);
+  //           numStepsWithoutClassify = 0;
+  //           sideboxFound = true;
+  //         }
+  //       }
+  //     // Two t (horizontal) -> endline
+  //     } else if (corners[j].id == CornerID::T &&
+  //         corners[j].first == &line) {
+  //       if (oneTHorizontal) {
+  //         line.id(LineID::Endline);
+  //         numStepsWithoutClassify = 0;
+  //         endlineFound = true;
+  //       } else
+  //         oneTHorizontal = true;
+  //     // Two t (vertical) -> midline
+  //     } else if (corners[j].id == CornerID::T &&
+  //         corners[j].second == &line) {
+  //       if (oneTVertical) {
+  //         line.id(LineID::Midline);
+  //         numStepsWithoutClassify = 0;
+  //         midlineFound = true;
+  //       } else {
+  //         oneTVertical = true;
+  //         // One convex, one T (vertical) -> side goalbox
+  //         if (oneConvex) {
+  //           line.id(LineID::SideGoalbox);
+  //           numStepsWithoutClassify = 0;
+  //           sideboxFound = true;
+  //         }
+  //       }
+  //     }
 
-      // (2) Classifies line based on looking for connections to already classified lines
-      if (topBoxFound) {
-        // Top box found and convex corner -> side goalbox
-        if (corners[j].id == CornerID::Convex) {
-          line.id(LineID::SideGoalbox); 
-          numStepsWithoutClassify = 0;
-          sideboxFound = true;
-        }
-      } 
-      if (endlineFound) {
-        // Endline found and concave corner -> sideline
-        if (corners[j].id == CornerID::Concave) {
-          line.id(LineID::Sideline); 
-          numStepsWithoutClassify = 0;
-          sidelineFound = true;
-        // Endline found, T, and corner.first is endline -> side goalbox
-        } else if (corners[j].id == CornerID::T) {
-          if (corners[j].first->id() == LineID::Endline) {
-            line.id(LineID::SideGoalbox); 
-            numStepsWithoutClassify = 0;
-            sideboxFound = true;
-          }
-        }
-      } 
-      if (midlineFound) {
-        // Midline found, T, and corner.second is midline -> sideline
-        if (corners[j].id == CornerID::T) {
-          if (corners[j].second->id() == LineID::Midline) {
-            line.id(LineID::Sideline); 
-            numStepsWithoutClassify = 0;
-            sidelineFound = true;
-          }
-        }
-      }
-      // TODO
-      if (sidelineFound) {
-        ;
-      }
-      // TODO
-      if (sideboxFound) {
-        ;
-      }
-    }
-  }
+  //     // (2) Classifies line based on looking for connections to already classified lines
+  //     if (topBoxFound) {
+  //       // Top box found and convex corner -> side goalbox
+  //       if (corners[j].id == CornerID::Convex) {
+  //         line.id(LineID::SideGoalbox); 
+  //         numStepsWithoutClassify = 0;
+  //         sideboxFound = true;
+  //       }
+  //     } 
+  //     if (endlineFound) {
+  //       // Endline found and concave corner -> sideline
+  //       if (corners[j].id == CornerID::Concave) {
+  //         line.id(LineID::Sideline); 
+  //         numStepsWithoutClassify = 0;
+  //         sidelineFound = true;
+  //       // Endline found, T, and corner.first is endline -> side goalbox
+  //       } else if (corners[j].id == CornerID::T) {
+  //         if (corners[j].first->id() == LineID::Endline) {
+  //           line.id(LineID::SideGoalbox); 
+  //           numStepsWithoutClassify = 0;
+  //           sideboxFound = true;
+  //         }
+  //       }
+  //     } 
+  //     if (midlineFound) {
+  //       // Midline found, T, and corner.second is midline -> sideline
+  //       if (corners[j].id == CornerID::T) {
+  //         if (corners[j].second->id() == LineID::Midline) {
+  //           line.id(LineID::Sideline); 
+  //           numStepsWithoutClassify = 0;
+  //           sidelineFound = true;
+  //         }
+  //       }
+  //     }
+  //     // TODO
+  //     if (sidelineFound) {
+  //       ;
+  //     }
+  //     // TODO
+  //     if (sideboxFound) {
+  //       ;
+  //     }
+  //   }
+  // }
 
   // Classify less specifically
   for (int i = 0; i < size(); i++) {
@@ -862,7 +874,7 @@ void FieldLineList::classify(GoalboxDetector& boxDetector, CornerDetector& corne
         line.id(LineID::TopGoalboxOrSideGoalbox);
       // Only two lines connected to concave corner
       else if (corners[j].id == CornerID::Concave)
-        line.id(LineID::EndlineOrSideline);
+        line.id(LineID::EndlineSidelineTopGoalboxOrSideGoalbox);
       // Only four lines connected to T corner
       else if (corners[j].id == CornerID::T) {
         if (corners[j].first == &line)

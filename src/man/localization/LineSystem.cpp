@@ -54,6 +54,15 @@ LineSystem::LineSystem()
     };
     visionToLocIDs[vision::LineID::EndlineOrSideline] = endlineOrSideline;
 
+    std::vector<LocLineID> endlineSidelineTopGoalboxOrSideGoalbox { 
+        LocLineID::OurEndline, LocLineID::TheirEndline,
+        LocLineID::RightSideline, LocLineID::LeftSideline,
+        LocLineID::OurTopGoalbox, LocLineID::TheirTopGoalbox,
+        LocLineID::OurRightGoalbox, LocLineID::OurLeftGoalbox,
+        LocLineID::TheirRightGoalbox, LocLineID::TheirLeftGoalbox
+    };
+    visionToLocIDs[vision::LineID::EndlineSidelineTopGoalboxOrSideGoalbox] = endlineSidelineTopGoalboxOrSideGoalbox;
+
     std::vector<LocLineID> topGoalboxOrSideGoalbox { 
         LocLineID::OurTopGoalbox, LocLineID::TheirTopGoalbox,
         LocLineID::OurRightGoalbox, LocLineID::OurLeftGoalbox,

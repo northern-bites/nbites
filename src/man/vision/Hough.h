@@ -290,8 +290,9 @@ enum class LineID {
   // Most general
   Line,
 
-  // Two possibilities
+  // Multiple possibilities
   EndlineOrSideline,
+  EndlineSidelineTopGoalboxOrSideGoalbox,
   TopGoalboxOrSideGoalbox,
   SideGoalboxOrMidline,
   
