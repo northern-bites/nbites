@@ -16,6 +16,7 @@ message FieldLine
     optional int32 correspondence = 4;
     optional float prob = 5;
     optional int32 index = 6;
+    optional float wz0 = 7;
 }
 
 message FieldLines

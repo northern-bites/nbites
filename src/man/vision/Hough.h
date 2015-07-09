@@ -189,6 +189,7 @@ class GoalboxDetector : public std::pair<FieldLine*, FieldLine*>
 {
   double parallelThreshold_;
   double seperationThreshold_;
+  double lengthThreshold_;
 
   bool validBox(const HoughLine& line1, const HoughLine& line2) const;
 
@@ -201,6 +202,9 @@ public:
 
   double seperationThreshold() const { return seperationThreshold_; }
   void seperationThreshold(double newThreshold) { seperationThreshold_ = newThreshold; }
+
+  double lengthThreshold() const { return lengthThreshold_; }
+  void lengthThreshold(double newThreshold) { lengthThreshold_ = newThreshold; }
 
   std::string print() const;
 };
@@ -216,6 +220,7 @@ class CornerDetector : public std::vector<Corner>
   double closeThreshold_;
   double farThreshold_;
   double edgeImageThreshold_;
+  double lengthThreshold_;
 
   bool isCorner(const HoughLine& line1, const HoughLine& line2) const;
   CornerID classify(const HoughLine& line1, const HoughLine& line2) const; 
@@ -242,6 +247,9 @@ public:
 
   double edgeImageThreshold() const { return edgeImageThreshold_; }
   void edgeImageThreshold(double newThreshold) { edgeImageThreshold_ = newThreshold; }
+
+  double lengthThreshold() const { return lengthThreshold_; }
+  void lengthThreshold(double newThreshold) { lengthThreshold_ = newThreshold; }
 };
 
 // Dectects center circle

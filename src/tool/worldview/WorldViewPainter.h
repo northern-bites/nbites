@@ -52,6 +52,8 @@ protected:
 
     void paintSharedBallLocation(QPaintEvent* event, messages::SharedBall msg);
 
+    void paintClaimedBallLocation(QPaintEvent* event, messages::SharedBall msg);
+
 private:
     messages::WorldModel curLoc[NUM_PLAYERS_PER_TEAM];
     messages::SharedBall sharedballLoc;
