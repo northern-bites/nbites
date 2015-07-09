@@ -58,7 +58,6 @@ def frontLineCheckShouldReposition(player):
     h_dest = 0.0
 
     if not GoalieStates.watchWithLineChecks.correctFacing:
-        print "not correct facin"
         return False
 
     for line in GoalieStates.watchWithLineChecks.lines:
@@ -88,8 +87,8 @@ def facingBackward(player):
     if player.brain.visionLines.horizon_dist < 170.0 and\
     math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 15.0:
         print("I'm FACing backWARDS! yaw:", math.degrees(player.brain.interface.joints.head_yaw))
+        player.homeDirections = []
         player.homeDirections += [RelRobotLocation(0, 0, 150.0)]
-        player.homeDirections = player.homeDirections[1:]
         return True
     return False
 
@@ -488,7 +487,7 @@ def seeFrontLine(player):
         print ("R:", r, "T:", t)
 
 def lostBall(player):
-    if player.brain.ball.vis.frames_off > 20:
+    if player.brain.ball.vis.frames_off > 15:
         return True
 
     return False
@@ -817,7 +816,8 @@ def shouldDiveRight(player):
 
     nball = player.brain.naiveBall
 
-    if (nball.x_vel < -10.0 and
+    # if (nball.x_vel < -10.0 and
+    if (ball.mov_vel_x < -10.0 and
         not nball.stationary and
         nball.yintercept < -20.0 and
         ball.distance < 140.0 and
@@ -826,11 +826,14 @@ def shouldDiveRight(player):
         print("Ball dist:", ball.distance)
         print("shouldDiveRight.lastFramesOff:", shouldDiveRight.lastFramesOff)
         print("ball.vis.frames_on", ball.vis.frames_on)
-        print("xvel:", nball.x_vel)
+        print("nb xvel:", nball.x_vel)
+        print("ball x vel:", ball.vel_x)
+        print("ball mov vel:", ball.mov_vel_x)
 
-    return (nball.x_vel < -10.0 and
+    # return (nball.x_vel < -10.0 and
+    return (ball.mov_vel_x < -10.0 and
         not nball.stationary and
-        nball.yintercept < -20.0 and
+        nball.yintercept < -25.0 and
         ball.distance < 150.0 and
         sightOk)
 
@@ -856,7 +859,8 @@ def shouldDiveLeft(player):
 
     nball = player.brain.naiveBall
 
-    if (nball.x_vel < -10.0 and
+    # if (nball.x_vel < -10.0 and
+    if (ball.mov_vel_x < -10.0 and
         not nball.stationary and
         nball.yintercept > 20.0 and
         ball.distance < 140.0 and
@@ -865,11 +869,14 @@ def shouldDiveLeft(player):
         print("Ball dist:", ball.distance)
         print("shouldDiveRight.lastFramesOff:", shouldDiveRight.lastFramesOff)
         print("ball.vis.frames_on", ball.vis.frames_on)
-        print("xvel:", nball.x_vel)
+        print("nb xvel:", nball.x_vel)
+        print("ball x vel:", ball.vel_x)
+        print("ball mov vel:", ball.mov_vel_x)
 
-    return (nball.x_vel < -10.0 and
-        not nball.stationary and
-        nball.yintercept > 20.0 and
+    # return (nball.x_vel < -10.0 and
+    return (ball.mov_vel_x < -10.0 and
+       not nball.stationary and
+        nball.yintercept > 25.0 and
         ball.distance < 150.0 and
         sightOk)
 
@@ -895,7 +902,8 @@ def shouldSquat(player):
 
     nball = player.brain.naiveBall
 
-    if (nball.x_vel < -10.0 and
+    # if (nball.x_vel < -10.0 and
+    if (ball.mov_vel_x < -10.0 and
         not nball.stationary and
         abs(nball.yintercept) < 30.0 and
         nball.yintercept != 0.0 and
@@ -905,12 +913,21 @@ def shouldSquat(player):
         print("Ball dist:", ball.distance)
         print("shouldDiveRight.lastFramesOff:", shouldDiveRight.lastFramesOff)
         print("ball.vis.frames_on", ball.vis.frames_on)
-        print("xvel:", nball.x_vel)
+        print("nb xvel:", nball.x_vel)
+        print("ball x vel:", ball.vel_x)
+        print("ball mov vel:", ball.mov_vel_x)
 
     # Lower threshold for fast balls
     # if nball.x_vel < -30.0 and abs(nball.yintercept)
 
-    return (nball.x_vel < -10.0 and
+    # More sensitive to close balls even at lower speeds
+    if ball.distance < 50.0 and ball.mov_vel_x < -6.0 and nball.yintercept != 0.0\
+    and abs(nball.yintercept) < 30.0:
+        print("ball exceptionally close, I'm saving")
+        return True
+
+    # return (nball.x_vel < -10.0 and
+    return (ball.mov_vel_x < -10.0 and
         not nball.stationary and
         abs(nball.yintercept) < 30.0 and
         nball.yintercept != 0.0 and
@@ -965,9 +982,9 @@ def shouldClearBall(player):
     shouldGo = False
 
     # if definitely within good chasing area
-    if (player.brain.ball.distance < 130.0):
-        walkedTooFar.xThresh = 130.0
-        walkedTooFar.yThresh = 130.0
+    if (player.brain.ball.distance < 120.0):
+        walkedTooFar.xThresh = 140.0
+        walkedTooFar.yThresh = 140.0
         shouldGo = True
 
     # farther out but being aggressive
@@ -997,6 +1014,8 @@ def shouldClearBall(player):
             VisualGoalieStates.clearIt.ballSide = constants.RIGHT
         else:
             VisualGoalieStates.clearIt.ballSide = constants.LEFT
+
+        print ("Ball dist:", player.brain.ball.distance)
 
     return shouldGo
 

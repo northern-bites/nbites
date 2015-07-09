@@ -62,6 +62,7 @@ def clearIt(player):
         GoalieStates.watchWithLineChecks.wentToClearIt = True
         GoalieStates.watchWithLineChecks.correctFacing = False
         player.brain.tracker.trackBall()
+        clearIt.startingBallX = player.brain.ball.x
         if clearIt.dangerousSide == -1:
             if player.brain.ball.rel_y < 0.0:
                 print "I'm kicking right!"
@@ -128,6 +129,18 @@ def clearIt(player):
     # clearIt.ballDest.relH = 0.0
     # player.brain.nav.updateDest(clearIt.ballDest)
 
+    # print("Ball stationary:", player.brain.ball.is_stationary)
+    # print("x", player.brain.ball.x, "y:", player.brain.ball.y)
+    if not player.brain.ball.vis.on:
+        print("Ball off, num frames:", player.brain.ball.vis.frames_off)
+
+    # if clearIt.startingBallX - player.brain.ball.x > 15.0:
+    #     print("I think the ball is coming towards me!")
+    #     return player.goLater('saveCenter')
+
+    print("Ball vel:", player.brain.ball.mov_vel_x)
+
+
     return Transition.getNextState(player, clearIt)
 
 @superState('gameControllerResponder')
@@ -159,12 +172,12 @@ def spinToFaceBall(player):
 
         elif player.brain.ball.bearing_deg < 0.0:
             player.side = RIGHT
-            facingDest.relH = player.brain.ball.bearing_deg + 20.0
-            GoalieStates.spinBack.toAngle = player.brain.ball.bearing_deg + 20.0
+            facingDest.relH = player.brain.ball.bearing_deg + 10.0
+            GoalieStates.spinBack.toAngle = player.brain.ball.bearing_deg + 10.0
         else:
             player.side = LEFT
-            facingDest.relH = player.brain.ball.bearing_deg - 20.0
-            GoalieStates.spinBack.toAngle = player.brain.ball.bearing_deg - 20.0
+            facingDest.relH = player.brain.ball.bearing_deg - 10.0
+            GoalieStates.spinBack.toAngle = player.brain.ball.bearing_deg - 10.0
 
 
 
@@ -185,13 +198,14 @@ def waitToFaceField(player):
 @superState('gameControllerResponder')
 def returnToGoal(player):
     if player.firstFrame():
-        if player.lastDiffState == 'didIKickIt' or player.lastDiffState == 'gamePlaying':
+        player.brain.tracker.trackBall
+        if player.lastDiffState == 'didIKickIt' or player.lastDiffState == 'gamePlaying'\
+        or player.lastDiffState == 'spinBack':
             correctedDest =(RelRobotLocation(0.0, 0.0, 0.0 ) -
                             returnToGoal.kickPose)
             correctedDest.relH = -returnToGoal.kickPose.relH
             print ("first returnToGoal.kickPose: ", returnToGoal.kickPose.relX, returnToGoal.kickPose.relY, returnToGoal.kickPose.relH)
         else:
-            print "This else happened in setting dest"
             correctedDest = (RelRobotLocation(0.0, 0.0, 0.0) -
                              RelRobotLocation(player.brain.interface.odometry.x,
                                               player.brain.interface.odometry.y,

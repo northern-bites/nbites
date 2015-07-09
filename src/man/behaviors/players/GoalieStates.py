@@ -249,7 +249,9 @@ def watchWithLineChecks(player):
         print "Counter was over 300, going to watch!"
         return player.goLater('watch')
 
-    watchWithLineChecks.counter += 1
+    # Bc we won't be looking at landmarks if ball is on
+    if not player.brain.ball.vis.on:
+        watchWithLineChecks.counter += 1
     return Transition.getNextState(player, watchWithLineChecks)
 
 watchWithLineChecks.lines = []
@@ -296,13 +298,20 @@ def spinBack(player):
             angle = -20.0
         else:
             angle = -spinBack.toAngle
+
+        VisualStates.returnToGoal.kickPose.relX += \
+            player.brain.interface.odometry.x
+        VisualStates.returnToGoal.kickPose.relY += \
+            player.brain.interface.odometry.y
+        VisualStates.returnToGoal.kickPose.relH += \
+            player.brain.interface.odometry.h
         player.brain.nav.walkTo(RelRobotLocation(0,0,angle))
         print("My toangle:", spinBack.toAngle, "My angle:", angle)
 
     if player.counter % 30 == 0:
         print("Horizon dist == ", player.brain.visionLines.horizon_dist)
     if spinBack.counter > 150:
-        return player.goLater('watchWithLineChecks')
+        return player.goLater('returnToGoal')
 
     return Transition.getNextState(player, spinBack)
 
@@ -431,11 +440,11 @@ def moveBackwards(player):
         watchWithLineChecks.numFixes += 1
         player.brain.tracker.lookToAngle(0)
         player.brain.nav.walkTo(RelRobotLocation(-60.0, 0, 0))
-        notTracking = True
+        moveBackwards.notTracking = True
 
-    if player.brain.ball.vis.on and notTracking:
+    if player.brain.ball.vis.on and moveBackwards.notTracking:
         player.brain.tracker.trackBall
-        notTracking = False
+        moveBackwards.notTracking = False
 
     return Transition.getNextState(player, moveBackwards)
 
@@ -472,6 +481,10 @@ def kickBall(player):
     if player.counter is 20:
         player.executeMove(player.kick.sweetMove)
 
+    if player.brain.ball.vis.frames_off > 10.0:
+        print("I lost the ball! I'm returning to goal")
+        return player.goLater('spinBack')
+
     if player.counter > 30 and player.brain.nav.isStopped():
         return player.goLater('didIKickIt')
 
@@ -484,8 +497,8 @@ def saveCenter(player):
         player.brain.tracker.lookToAngle(0)
         if SAVING:
             player.executeMove(SweetMoves.GOALIE_SQUAT)
-        else:
-            player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
+        # else:
+        #     player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
 
     if player.counter > 80:
         if SAVING:
@@ -514,8 +527,8 @@ def saveRight(player):
         if SAVING and DIVING:
             player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
             player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
-        else:
-            player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
+        # else:
+        #     player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
 
     if player.counter > 80:
         if SAVING and DIVING:
@@ -534,8 +547,8 @@ def saveLeft(player):
         if SAVING and DIVING:
             player.executeMove(SweetMoves.GOALIE_DIVE_LEFT)
             player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
-        else:
-            player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
+        # else:
+        #     player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
 
     if player.counter > 80:
         if SAVING and DIVING:
