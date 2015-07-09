@@ -133,6 +133,12 @@ int Vision_func() {
         }
     }
 
+	// if log specified debug drawing parameters then set them
+	SExpr* debugDrawing = args[0]->tree().find("DebugDrawing");
+	if (debugDrawing != NULL) {
+		module.setDebugDrawingParameters(debugDrawing);
+	}
+
     // If log includes "BlackStar," set flag
     std::vector<SExpr*> blackStarVec = args[0]->tree().recursiveFind("BlackStar");
     if (blackStarVec.size() != 0)
@@ -396,6 +402,23 @@ int Vision_func() {
 
     ccdRet->setData(pointsBuf);
     rets.push_back(ccdRet);
+
+    //-------------------
+    //  DEBUG IMAGE
+    //-------------------
+    Log* debugImage = new Log();
+    int debugImageLength = (width / 4) * (height / 2);
+
+    // Create temp buffer and fill with debug image
+    uint8_t debBuf[debugImageLength];
+    memcpy(debBuf, module.getDebugImage(topCamera)->pixArray(), debugImageLength);
+
+    // Convert to string and set log
+    std::string debBuffer((const char*)debBuf, debugImageLength);
+    debugImage->setData(debBuffer);
+
+    rets.push_back(debugImage);
+
 
     return 0;
 }

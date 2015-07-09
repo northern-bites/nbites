@@ -517,16 +517,20 @@ void CenterCircleDetector::set()
   binWidth = 50;
   binCount = 10;
   minVotesInMaxBin = 0.18; // 18% of points must be in the bin selected
+  fieldTestDistance = 200;
+
 }
 
-bool CenterCircleDetector::detectCenterCircle(EdgeList& edges)
+bool CenterCircleDetector::detectCenterCircle(EdgeList& edges, Field& field)
 {
   std::vector<Point> potentials;
   calculatePotentials(edges, potentials);
 
 #ifdef OFFLINE
   _potentials = potentials;
-  if (_potentials.size() > minPotentials && getMaxBin(_potentials, _ccx, _ccy)) {
+  if (potentials.size() > minPotentials && 
+      getMaxBin(potentials, _ccx, _ccy) &&
+      onField(field)) {
     _potentials.push_back(Point(_ccx, _ccy));
     on(true);
   } else
@@ -534,7 +538,9 @@ bool CenterCircleDetector::detectCenterCircle(EdgeList& edges)
   return _on;
 #endif
 
-  if (potentials.size() > minPotentials && getMaxBin(potentials, _ccx, _ccy))
+  if (potentials.size() > minPotentials && 
+      getMaxBin(potentials, _ccx, _ccy) &&
+      onField(field))
     on(true);
 
   return _on;
@@ -652,6 +658,23 @@ bool CenterCircleDetector::getMaxBin(const std::vector<Point>& vec, double& x0, 
   return false;
 }
 
+// Project 2 points from CC and check if they are on the field
+bool CenterCircleDetector::onField(Field& field)
+{
+  //
+  return true;
+  //
+
+  double y;
+  std::cout << "(" << _ccx << "," << _ccy << ") " << field.onField(_ccx, y) << " @ " << y << std::endl;
+  if (field.onField(_ccx + fieldTestDistance, y) && _ccy + fieldTestDistance < y &&
+          field.onField(_ccx - fieldTestDistance, y) && _ccy + fieldTestDistance < y) {
+    std::cout << "PASSING ON FIELD TEST\n";
+  } else std::cout << "FAILING ON FIELD TEST\n";
+  return (field.onField(_ccx + fieldTestDistance, y) && _ccy + fieldTestDistance < y &&
+          field.onField(_ccx - fieldTestDistance, y) && _ccy + fieldTestDistance < y);
+}
+
 // **************************
 // *                        *
 // *  Field Lines and List  *
@@ -733,8 +756,12 @@ void FieldLineList::classify(GoalboxDetector& boxDetector,
                              CornerDetector& cornerDetector,
                              CenterCircleDetector& circleDetector)
 {
-  // If less than one field line, no classification possible
-  if (size() <= 1) {
+  bool sideboxFound = false;
+  bool midlineFound = false;
+  bool sidelineFound = false;
+
+  // If there are no field lines, no classification possible
+  if (size() < 1) {
     circleDetector.on(false);
     return;
   }
@@ -742,15 +769,11 @@ void FieldLineList::classify(GoalboxDetector& boxDetector,
   // Run goalbox detector
   bool topBoxFound = boxDetector.find(*this);
   bool endlineFound = topBoxFound;
-  bool sideboxFound = false;
-  bool midlineFound = false;
-  bool sidelineFound = false;
 
   // Run corner detector
   cornerDetector.findCorners(*this);
-
-  // Find line close to center circle;
-  std::cout << "ABOUT TO LOOK FOR LINE CLOSE TO CC\n";
+  
+  // Look for field line close to the center circle
   if (circleDetector.on()) {
     double minDist = 1000;
     FieldLine* midline;
@@ -763,7 +786,7 @@ void FieldLineList::classify(GoalboxDetector& boxDetector,
       }
 
       // Project CC center onto line, find distance to line
-      double distToLine = fabs(inner.pDist(circleDetector.x(), circleDetector.y()));
+      double distToLine = fabs(inner.field().pDist(circleDetector.x(), circleDetector.y()));
 
       // Check for min distance
       if (minDist > distToLine) {
@@ -771,18 +794,21 @@ void FieldLineList::classify(GoalboxDetector& boxDetector,
           minDist = distToLine;
       }
     }
+      std::cout << "CC distance to fieldline: " << minDist;
 
-    // Set midline, or discard CC if no close line
-    if (minDist < 50) {
-      std::cout << "MIN D: " << minDist << " KEEPING CC\n";
+    // Set midline and adjust CC, or discard CC if no close line
+    if (minDist < 30) {
       midline->id(LineID::Midline);
       midlineFound = true;
-    } else {
-      std::cout << "MIN D: " << minDist << " LOOSING CC\n";
 
+    } else {
       circleDetector.on(false);
     }
   }
+
+  // If there is only one line, stop here 
+  if (size() < 2)
+    return;
 
   // Loop over lines until no more classifications possible
   int i = 0;

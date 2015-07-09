@@ -42,7 +42,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
     double resize = 1;
     
     // Starting size. The larger the number, the smaller the field ratio
-    final int startSize = 3;
+    final int startSize = 1;
 
     boolean click = false;
     boolean drag = false;
@@ -184,12 +184,12 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 y2 = (int) Math.round(y0 + startSize*fcEP1 * Math.cos(fcT));
 
                 //Scale down if a line is outside the view, but not if its too far (false field line)
-                if (y1 < 0 && y1 > -2000) {
-                    resize = Math.min(resize, (double)fieldh/(-y1 + fieldh));
-                }
-                if (y2 < 0 && y2 > -2000) {
-                    resize = Math.min(resize, (double)fieldh/(-y2 + fieldh));
-                }
+                // if (y1 < 0 && y1 > -2000) {
+                //     resize = Math.min(resize, (double)fieldh/(-y1 + fieldh));
+                // }
+                // if (y2 < 0 && y2 > -2000) {
+                //     resize = Math.min(resize, (double)fieldh/(-y2 + fieldh));
+                // }
 
                 // // TODO: Don't draw it if it's way out
                 // if (y1 < -3500) {

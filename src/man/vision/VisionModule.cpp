@@ -60,7 +60,31 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography(i == 0);
         fieldLines[i] = new FieldLineList();
-        ballDetector[i] = new BallDetector(homography[i], i == 0);
+#ifdef OFFLINE
+		// Get the appropriate amount of space for the Debug Image
+		if (i == 0) {
+			debugSpace[0] = (uint8_t *)malloc(wd * ht * sizeof(uint8_t));
+		} else {
+			debugSpace[1] = (uint8_t *)malloc((wd / 2) * (ht / 2) * sizeof(uint8_t));
+		}
+#else
+		// don't get any space if we're running on the robot
+		debugSpace[i] = NULL;
+#endif
+		// Construct the lightweight debug images that know where the space is
+		if (i == 0) {
+			debugImage[i] = new DebugImage(wd, ht, debugSpace[0]);
+			debugImage[i]->reset();
+		} else {
+			debugImage[i] = new DebugImage(wd / 2, ht / 2, debugSpace[1]);
+			debugImage[i]->reset();
+		}
+
+		if (i == 0) {
+			field = new Field(wd / 2, ht / 2, homography[0]);
+		}
+
+        ballDetector[i] = new BallDetector(homography[i], field, i == 0);
         boxDetector[i] = new GoalboxDetector();
         centerCircleDetector[i] = new CenterCircleDetector();
 
@@ -77,6 +101,11 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         edgeDetector[i]->fast(fast);
         hough[i]->fast(fast);
     }
+#ifdef OFFLINE
+	// Here is an example of how to get access to the debug space. In this case the
+	// field class only runs on the top image so it only needs that one
+	field->setDebugImage(debugImage[0]);
+#endif
     setCalibrationParams(robotName);
 }
 
@@ -94,6 +123,8 @@ VisionModule::~VisionModule()
         delete kinematics[i];
         delete homography[i];
         delete fieldLines[i];
+		delete debugImage[i];
+		delete debugSpace[i];
         delete boxDetector[i];
         delete cornerDetector[i];
         delete centerCircleDetector[i];
@@ -118,7 +149,7 @@ void VisionModule::run_()
 
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
-        
+
         // Get image
         const messages::YUVImage* image = images[i];
 
@@ -150,7 +181,20 @@ void VisionModule::run_()
 
         // Approximate brightness gradient
         edgeDetector[i]->gradient(yImage);
-        
+
+		// only calculate the field in the top camera
+		if (!i) {
+			// field needs the color images
+			field->setImages(frontEnd[0]->whiteImage(), frontEnd[0]->greenImage(),
+							 frontEnd[0]->orangeImage());
+			GeoLine horizon = homography[0]->horizon(image->width() / 2);
+			double x1, x2, y1, y2;
+			horizon.endPoints(x1, y1, x2, y2);
+			int hor = static_cast<int>(y1);
+			hor = image->height() / 4 - hor;
+			field->findGreenHorizon(hor, 0.0f);
+		}
+
         // Run edge detection
         edgeDetector[i]->edgeDetect(greenImage, *(edges[i]));
 
@@ -159,31 +203,30 @@ void VisionModule::run_()
 
         // Find world coordinates for hough lines
         houghLines[i]->mapToField(*(homography[i]));
-         
+
         // Find world coordinates for rejected edges
         rejectedEdges[i]->mapToField(*(homography[i]));
 
         // Detect center circle on top
-        if (!i) centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]));
+        if (!i) centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]), *field);
  
-        std::cerr << "Before CC is " << centerCircleDetector[i]->on() << std::endl;
-        
+        if (!i) std::cerr << "Before CC is " << centerCircleDetector[i]->on() << std::endl;
+
         // Pair hough lines to field lines
         fieldLines[i]->find(*(houghLines[i]), blackStar());
- 
+
         // Classify field lines
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]), *(centerCircleDetector[i]));
  
-       std::cerr << "After  CC is " << centerCircleDetector[i]->on() << std::endl;
-
-
+        if (!i) std::cerr << "After  CC is " << centerCircleDetector[i]->on() << std::endl;
+       
         ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
 
 #ifdef USE_LOGGING
         logImage(i);
 #endif
     }
-   
+
     // Send messages on outportals
     ballOn = ballDetected;
     outportalVisionField();
@@ -326,7 +369,7 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
     textFile.seekg (0, textFile.end);
     long size = (long)textFile.tellg();
     textFile.seekg(0);
-    
+
     // Read file into buffer and convert to string
     char* buff = new char[size];
     textFile.read(buff, size);
@@ -335,6 +378,23 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
     textFile.close();
     return (const std::string)sexpText;
 }
+
+#ifdef OFFLINE
+	void VisionModule::setDebugDrawingParameters(nblog::SExpr* params) {
+		std::cout << "In debug drawing parameters" << params->print() << std::endl;
+		int cameraHorizon = params->get(1)->find("CameraHorizon")->get(1)->valueAsInt();
+		int fieldHorizon = params->get(1)->find("FieldHorizon")->get(1)->valueAsInt();
+		int debugHorizon = params->get(1)->find("DebugHorizon")->get(1)->valueAsInt();
+		int debugField = params->get(1)->find("DebugField")->get(1)->valueAsInt();
+		int debugBall = params->get(1)->find("DebugBall")->get(1)->valueAsInt();
+		field->setDrawCameraHorizon(cameraHorizon);
+		field->setDrawFieldHorizon(fieldHorizon);
+		field->setDebugHorizon(debugHorizon);
+		field->setDebugFieldEdge(debugField);
+		ballDetector[0]->setDebugBall(debugBall);
+		ballDetector[1]->setDebugBall(debugBall);
+	}
+#endif
 
 /*
  Lisp data in config/colorParams.txt stores 32 parameters. Read lisp and
@@ -361,8 +421,8 @@ Colors* VisionModule::getColorsFromLisp(nblog::SExpr* colors, int camera)
                      std::stof(colors->get(2)->get(1)->serialize()),
                      std::stof(colors->get(3)->get(1)->serialize()),
                      std::stof(colors->get(4)->get(1)->serialize()),
-                     std::stof(colors->get(5)->get(1)->serialize())); 
-    
+                     std::stof(colors->get(5)->get(1)->serialize()));
+
     colors = params->get(1)->get(1);
 
     ret->green. load(std::stof(colors->get(0)->get(1)->serialize()),
@@ -370,8 +430,8 @@ Colors* VisionModule::getColorsFromLisp(nblog::SExpr* colors, int camera)
                      std::stof(colors->get(2)->get(1)->serialize()),
                      std::stof(colors->get(3)->get(1)->serialize()),
                      std::stof(colors->get(4)->get(1)->serialize()),
-                     std::stof(colors->get(5)->get(1)->serialize()));  
-    
+                     std::stof(colors->get(5)->get(1)->serialize()));
+
     colors = params->get(2)->get(1);
 
     ret->orange.load(std::stof(colors->get(0)->get(1)->serialize()),
@@ -401,7 +461,7 @@ void VisionModule::setCalibrationParams(int camera, std::string robotName)
     if (robotName == "") {
         return;
     }
-    
+
     nblog::SExpr* robot = calibrationLisp->get(1)->find(robotName);
 
     if (robot != NULL) {

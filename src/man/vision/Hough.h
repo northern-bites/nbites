@@ -11,6 +11,7 @@
 #include "Vision.h"
 #include "Edge.h"
 #include "Homography.h"
+#include "Field.h"
 
 #include <list>
 #include <vector>
@@ -253,7 +254,8 @@ public:
 };
 
 // Dectects center circle
-class CenterCircleDetector {
+class CenterCircleDetector
+{
   double _ccx;
   double _ccy;
   bool _on;
@@ -268,15 +270,17 @@ class CenterCircleDetector {
   int binWidth;                   // In centimeters
   int binCount;                   // Bins per row and col
   double minVotesInMaxBin;        // Ratio of potentials required in the most populated bin
-
+  double fieldTestDistance;       // Distance of projected points to check on fieldness
+  
   void set();
   void calculatePotentials(EdgeList& edges, std::vector<Point>& vec);
   bool getMaxBin(const std::vector<Point>& vec, double& x0, double& y0);
+  bool onField(Field& field);
   inline int roundDown(int v) { return binWidth*(v/binWidth); }
 
 public:
   CenterCircleDetector();
-  bool detectCenterCircle(EdgeList& edges);
+  bool detectCenterCircle(EdgeList& edges, Field& field);
 
   double x() { return _ccx; }
   double y() { return _ccy; }
