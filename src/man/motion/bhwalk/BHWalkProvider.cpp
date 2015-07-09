@@ -376,11 +376,13 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             }
             else {
                 chain_angles.push_back(ko.angles[nb_joint_order[j]] * walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].sign - walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].offset);
-                //std::cout << "Angle: " << j << " " << ko.angles[nb_joint_order[j]] << std::endl;
+                std::cout << "Kicking Angle: " << j << " " << ko.angles[nb_joint_order[j]] << std::endl;
+                std::cout << "Kicking Hard: " << ko.jointHardness.hardness[nb_joint_order[j]] << std::endl;
             if (ko.jointHardness.hardness[nb_joint_order[j]] == 0) {
                 chain_hardness.push_back(MotionConstants::NO_STIFFNESS);
             } else {
-                chain_hardness.push_back(ko.jointHardness.hardness[nb_joint_order[j]] / 100.f);
+                chain_hardness.push_back(1);
+                //chain_hardness.push_back(ko.jointHardness.hardness[nb_joint_order[j]] / 100.f);
             }
             }
 

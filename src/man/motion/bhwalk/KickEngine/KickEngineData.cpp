@@ -113,7 +113,7 @@ bool KickEngineData::calcJoints(JointRequestBH& jointRequest, const RobotDimensi
 
     simpleCalcArmJoints(JointDataBH::LShoulderPitch, jointRequest, rd, positions[Phase::leftArmTra], positions[Phase::leftHandRot]);
     simpleCalcArmJoints(JointDataBH::RShoulderPitch, jointRequest, rd, positions[Phase::rightArmTra], positions[Phase::rightHandRot]);
-
+    std::cout << "DATA is setting the joints with information!" << std::endl;
     return true;
   }
   else //just set the angles from init
@@ -628,6 +628,7 @@ void KickEngineData::ModifyData(const KickRequest& br, JointRequestBH& kickEngin
   PLOT("module:KickEngine:bodyErrory", toDegrees(bodyError.y));
 
 #ifndef RELEASE
+  std::cout << "MODIFYING THE HARDNESS DATA!!!!!!!" << std::endl;
   for(int i = 0; i < Phase::numOfLimbs; i++)
   {
     int hardness = 100;
@@ -873,6 +874,7 @@ bool KickEngineData::sitOutTransitionDisturbance(bool& compensate, bool& compens
       }
     }
 
+    std::cout << "Setting hardness 100!" << std::endl;
     for(int i = 0; i < JointDataBH::numOfJoints; i++)
     {
       kickEngineOutput.angles[i] = compenJoints.angles[i];
