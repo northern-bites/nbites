@@ -53,6 +53,8 @@ class KickDecider(object):
     def frontKickCrosses(self):
         self.brain.player.motionKick = True
         
+        print "In front kick crosses"
+
         self.kicks = []
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
         self.kicks.append(kicks.M_RIGHT_STRAIGHT)
@@ -187,6 +189,7 @@ class KickDecider(object):
 
     def motionKicksAsap(self):
         self.brain.player.motionKick = True
+        print "In motion kicks asap"
     
         self.kicks = []
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
@@ -405,6 +408,8 @@ class KickDecider(object):
             return None
 
     def allKicksAsapOnGoal(self):
+        print "In allKicksAsapOnGoal"
+
         self.kicks = []
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
         self.kicks.append(kicks.M_RIGHT_STRAIGHT)
@@ -508,10 +513,12 @@ class KickDecider(object):
     def attacker(self):
         goalShot = self.allKicksAsapOnGoal()
         if goalShot:
+            print "allKicksAsapOnGoal returned"
             return goalShot
 
         nearGoal = self.nearOurGoal()
         if nearGoal:
+            print "nearOurGoal returned"
             return nearGoal
 
         # frontKicks = self.frontKicksOrbitIfSmall()
@@ -521,8 +528,10 @@ class KickDecider(object):
         #if self.brain.loc.x < nogginC.MIDFIELD_X:
         asap = self.motionKicksAsap()
         if asap:
+            print "motionKicksAsap on goal returned"
             return asap
-
+        
+        print "Using frontKickCrosses"
         return self.frontKickCrosses()
 
     def defender(self):
@@ -625,15 +634,23 @@ class KickDecider(object):
         yield
 
     def filterAndScoreKicks(self, kicks):
+        filteredKickLists = []
         if self.filters:
             for filt in self.filters:
-                filteredKicks = (kick for kick in kicks if filt(kick))
+                print "Filter tested: ", filt
+                filtKick = [kick for kick in kicks if filt(kick)]
+                filteredKickLists.append(filtKick)
+
+            print "Current list of filters: ", filteredKickLists
+            filteredKicks = list(set.intersection(*map(set, filteredKickLists)))
+            print "Filtered kicks: ", filteredKicks
         else:
             filteredKicks = kicks
 
         try:
             yield max(filteredKicks,key=self.scoreKick)
         except ValueError:
+            print "Value Error in python filter"
             yield filteredKicks.next()
 
     def generateFastestPossibleKicks(self):
