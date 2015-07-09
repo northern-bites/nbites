@@ -70,13 +70,6 @@ class Navigator(FSA.FSA):
             self.atLocPositionTransition : NavStates.atPosition,
             }
 
-        NavStates.dodge.transitions = {
-            Transition.CountTransition(navTrans.doneDodging,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
-           : NavStates.briefStand
-           }
-
         NavStates.atPosition.transitions = {
             self.locRepositionTransition : NavStates.goToPosition
             }

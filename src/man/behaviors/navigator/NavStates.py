@@ -137,61 +137,26 @@ goToPosition.close = False
 
 # State where we are moving away from an obstacle
 def dodge(nav):
-
     if nav.firstFrame():
-        nav.brain.tracker.trackObstacle(str(dodge.obstaclePosition))
+        nav.brain.tracker.trackObstacle(dodge.obstaclePosition)
+
         ## SET UP the dodge direction based on where the obstacle is
         # if directly in front of us, move back and to one side based on
         # where the goToPosition dest is
-        if dodge.obstaclePosition == 1:
-            print "Dodging NORTH obstacle"
-            relDest = helper.getRelativeDestination(nav.brain.loc,
-                                                    goToPosition.dest)
-            if relDest.relY <= 0:
-                direction = -1
-            else:
-                direction = 1
-            dodge.dest = RelRobotLocation(-10, direction*10, 0)
-        elif dodge.obstaclePosition == 2:
-            print "Dodging NORTHEAST obstacle"
-            dodge.dest = RelRobotLocation(10, 20, 0)
-        elif dodge.obstaclePosition == 3:
-            print "Dodging EAST obstacle"
-            dodge.dest = RelRobotLocation(0, 20, 0)
-        elif dodge.obstaclePosition == 4:
-            print "Dodging SOUTHEAST obstacle"
-            dodge.dest = RelRobotLocation(10, 20, 0)
-        # if directly behind us, move forward and to one side based on
-        # where the goToPosition dest is
-        elif dodge.obstaclePosition == 5:
-            print "Dodging SOUTH obstacle"
-            relDest = helper.getRelativeDestination(nav.brain.loc,
-                                                    goToPosition.dest)
-            if relDest.relY <= 0:
-                direction = -1
-            else:
-                direction = 1
-            dodge.dest = RelRobotLocation(15, direction*10, 0)
-        elif dodge.obstaclePosition == 6:
-            print "Dodging SOUTHWEST obstacle"
-            dodge.dest = RelRobotLocation(10, -20, 0)
-        elif dodge.obstaclePosition == 7:
-            print "Dodging WEST obstacle"
-            dodge.dest = RelRobotLocation(0, -20, 0)
-        elif dodge.obstaclePosition == 8:
-            print "Dodging NORTHWEST obstacle"
-            dodge.dest = RelRobotLocation(10, -20, 0)
-        else:
-            return
+        dodge.speed = Navigator.BRISK_SPEED
 
-    # print(nav.brain.obstacles)
-    # print(nav.brain.obstacleDetectors)
+        obstacleInfo = constants.OBS_DICT[dodge.obstaclePosition]
+        helper.createAndSendWalkVector(nav, 
+                                        dodge.speed*obstacleInfo[0], 
+                                        dodge.speed*obstacleInfo[1], 
+                                        0)
+        print "Dodging ", obstacleInfo[2], " Obstacle"
 
-    dest = RelRobotLocation(dodge.dest.relX + random(),
-                            dodge.dest.relY + random(),
-                            dodge.dest.relH + random())
-    helper.setDestination(nav, dest, 0.5)
-    return Transition.getNextState(nav, dodge)
+    if navTrans.doneDodging(nav):
+        nav.brain.tracker.repeatBasicPan()
+        return nav.goLater('briefStand')
+
+    return nav.stay()
 
 def getIndex(num):
     if num <=8 and num >= 1:

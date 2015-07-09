@@ -22,6 +22,9 @@ def atDestination(nav):
 
     return relDest.within((x, y, h))
 
+# we can't see or sonar obstacles behind us so ignore those
+def obstacleAhead(direction):
+    return direction <= 3 or direction >= 7
 
 def shouldDodge(nav):
     # If nav isn't avoiding things, just no
@@ -35,11 +38,11 @@ def shouldDodge(nav):
     shouldDodge.willDodge = False
 
     for i, detector in enumerate(nav.brain.obstacleDetectors):
-        if detector == 's' or detector == 'a':
+        if (detector == 's' and obstacleAhead(i)) or detector == 'a':
             shouldDodge.sOrACount += 1
             if shouldDodge.sOrACount >= 7:
                 shouldDodge.willDodge = True
-        elif detector == 'v':
+        elif detector == 'v' and obstacleAhead(i):
             shouldDodge.vCount += 1
             if shouldDodge.vCount >= 3:
                 shouldDodge.willDodge = True
@@ -47,10 +50,14 @@ def shouldDodge(nav):
         if shouldDodge.willDodge:
             shouldDodge.sOrACount = 0
             shouldDodge.vCount = 0
+
             states.dodge.obstaclePosition = i
-            doneDodging.timer = 0
-            doneDodging.obstaclePosition = i
-            doneDodging.detectorDodged = detector
+            states.dodge.detectorDodged = detector
+
+            # find out if north is really northwest/northeast
+            if detector == 'v' and i == 1 and nav.brain.obstacles[i][1] > 0:
+                states.dodge.obstaclePosition = 8
+
             return True
             
     # reset counters if we did not get that observation
@@ -63,17 +70,8 @@ def shouldDodge(nav):
 
 # Check if an obstacle is no longer there, or if we've completed the dodge
 def doneDodging(nav):
-    timerDone = False
-    obstacles = True
-
-    doneDodging.timer += 1
-    if doneDodging.timer > 70:
-        timerDone = True
-
-    if nav.brain.obstacleDetectors[doneDodging.obstaclePosition] != doneDodging.detectorDodged:
-        obstacles = False
-
-    return timerDone and not obstacles
+    return (nav.stateTime >= 3.5 and 
+        nav.brain.obstacleDetectors[states.dodge.obstaclePosition] != states.dodge.detectorDodged)
 
 def getDirection(h):
     if (h < helper.constants.ZONE_WIDTH * -7. or
