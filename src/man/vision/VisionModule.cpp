@@ -215,6 +215,10 @@ void VisionModule::run_()
 
         // Classify field lines
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]), *(centerCircleDetector[i]));
+
+        if (centerCircleDetector[0]->on()) {
+            std::cout << "-------------- FOUND CENTER CIRLCE ----------------\n";
+        } else std::cout << std::endl;
         
         ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
 
@@ -288,7 +292,7 @@ void VisionModule::outportalVisionField()
     // (3) Outportal Center Circle
     messages::CenterCircle* cc = visionField.mutable_circle(); 
     cc->set_on(centerCircleDetector[0]->on() ? true : false);
-    std::cout << "OUTPORTLER THINKS CC IS " << cc->on() << std::endl;
+
     // Rotate to post vision relative robot coordinate system
     double rotatedX, rotatedY;
     man::vision::translateRotate(centerCircleDetector[0]->x(), centerCircleDetector[0]->y(), 0, 0, -(M_PI / 2), rotatedX, rotatedY);
