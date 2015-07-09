@@ -56,6 +56,7 @@ class Navigator(FSA.FSA):
         # initialize obstacle counts
         navTrans.shouldDodge.sOrACount = 0
         navTrans.shouldDodge.vCount = 0
+        self.dodging = False
 
         #transitions
         #@todo: move this to the actual transitions file?

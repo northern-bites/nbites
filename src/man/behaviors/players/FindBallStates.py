@@ -46,6 +46,9 @@ def spinToFoundBall(player):
     """
     spins to the ball until it is facing the ball 
     """
+    if player.brain.nav.dodging:
+        return player.stay()
+
     if player.firstFrame():
         player.brain.tracker.trackBall()
         print "spinning to found ball"
@@ -108,7 +111,7 @@ def farBallSearch(player):
 @stay
 def walkToBallModel(player):
     if player.firstFrame():
-        player.brain.nav.chaseBall(.5, fast = True)
+        player.brain.nav.chaseBall(Navigator.FAST_SPEED, fast = True)
         player.brain.tracker.repeatFastNarrowPan()
     elif player.stateTime > 5:
         return player.goLater('spinSearch')

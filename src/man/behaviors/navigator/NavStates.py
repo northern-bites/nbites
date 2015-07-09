@@ -138,6 +138,8 @@ goToPosition.close = False
 # State where we are moving away from an obstacle
 def dodge(nav):
     if nav.firstFrame():
+        nav.dodging = True
+
         nav.brain.tracker.trackObstacle(dodge.obstaclePosition)
 
         ## SET UP the dodge direction based on where the obstacle is
@@ -153,6 +155,7 @@ def dodge(nav):
         print "Dodging ", obstacleInfo[2], " Obstacle"
 
     if navTrans.doneDodging(nav):
+        nav.dodging = False
         nav.brain.tracker.repeatBasicPan()
         return nav.goLater('briefStand')
 
@@ -273,6 +276,9 @@ def walking(nav):
     State to be used for velocity walking.
     """
     helper.setSpeed(nav, walking.speeds)
+
+    if navTrans.shouldDodge(nav):
+        return nav.goNow('dodge')
 
     return Transition.getNextState(nav, walking)
 
