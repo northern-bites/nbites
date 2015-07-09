@@ -28,7 +28,8 @@ def shouldDodge(nav):
         return False
 
     for i in range(1, len(nav.brain.obstacles)):
-        if nav.brain.obstacleDetectors[i] == 's':
+        if (nav.brain.obstacleDetectors[i] == 's' or
+            nav.brain.obstacleDetectors[i] == 'a'):
             states.dodge.obstaclePosition = i
             doneDodging.timer = 0
             doneDodging.obstaclePosition = i

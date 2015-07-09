@@ -1,6 +1,6 @@
 #include "LineSystem.h"
 
-#include <limits>
+#include <boost/math/distributions/normal.hpp>
 
 namespace man {
 namespace localization {
@@ -10,19 +10,21 @@ LineSystem::LineSystem()
 {
     // Part I
     // Add lines in absolute field coordinates to lines map
-    // TODO document sign conventions
-    addLine(LocLineID::OurEndline, -GREEN_PAD_X, M_PI, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
+    // TODO document sign convention
+    addLine(LocLineID::OurEndline, -GREEN_PAD_X, M_PI, GREEN_PAD_Y, (GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
     addLine(LocLineID::TheirEndline, GREEN_PAD_X + FIELD_WHITE_WIDTH, 0, -GREEN_PAD_Y, -(GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
 
     // NOTE two midlines so that reconstructions can be handled gracefully from
     //      either side of the field
-    addLine(LocLineID::TheirMidline, -CENTER_FIELD_X, M_PI, GREEN_PAD_Y, GREEN_PAD_Y + FIELD_WHITE_HEIGHT); 
+    addLine(LocLineID::TheirMidline, -CENTER_FIELD_X, M_PI, GREEN_PAD_Y, (GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
     addLine(LocLineID::OurMidline, CENTER_FIELD_X, 0, -GREEN_PAD_Y, -(GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
 
-    addLine(LocLineID::OurTopGoalbox, -(GREEN_PAD_X + GOALBOX_DEPTH) , M_PI, BLUE_GOALBOX_BOTTOM_Y, BLUE_GOALBOX_TOP_Y);
+    addLine(LocLineID::OurTopGoalbox, -(GREEN_PAD_X + GOALBOX_DEPTH), M_PI, BLUE_GOALBOX_BOTTOM_Y, BLUE_GOALBOX_TOP_Y);
     addLine(LocLineID::TheirTopGoalbox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH , 0, -YELLOW_GOALBOX_BOTTOM_Y, -YELLOW_GOALBOX_TOP_Y);
 
-    addLine(LocLineID::RightSideline, -GREEN_PAD_Y, 3 * M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
+    // IMPORTANT system currently doesn't support reconstructions from sideline, so
+    //           these lines are not polarized
+    addLine(LocLineID::RightSideline, GREEN_PAD_Y, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
     addLine(LocLineID::LeftSideline, GREEN_PAD_Y + FIELD_WHITE_HEIGHT, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
 
     // Part II
@@ -70,37 +72,47 @@ LineSystem::LineSystem()
     };
     visionToLocIDs[vision::LineID::TopGoalbox] = topGoalbox;
 
-    std::vector<LocLineID> midline { 
+    std::vector<LocLineID> midline {
         LocLineID::OurMidline, LocLineID::TheirMidline 
     };
     visionToLocIDs[vision::LineID::Midline] = midline;
 }
 
-LineSystem::~LineSystem() {}
-
-LocLineID LineSystem::matchObservation(const messages::FieldLine& observation, 
-                                       const messages::RobotLocation& loc)
+LocLineID LineSystem::matchLine(const messages::FieldLine& observation, 
+                                const messages::RobotLocation& loc)
 {
-    vision::GeoLine globalLine = LineSystem::relRobotToAbsolute(observation, loc);
-
     LocLineID id = LocLineID::NotMatched;
-    double bestScore = std::numeric_limits<double>::min();
+    double bestScore = 0;
 
-    vision::LineID visionID = vision::LineID::Line;
+    // Turn observation into GeoLine so scoreObservation can operate on it
+    vision::GeoLine obsvAsGeoLine;
+    obsvAsGeoLine.set(observation.inner().r(), observation.inner().t(), 
+                      observation.inner().ep0(), observation.inner().ep1());
+
+    // Loop through all corners with right id from vision and take the corner
+    // that best corresponds to the observation
+    // NOTE correspondence is found by maximizing probability of correspondence 
+    //      according to model (see scoreObservation)
+    vision::LineID visionID = static_cast<vision::LineID>(observation.id());
     const std::vector<LocLineID>& possibleLineIDs = visionToLocIDs[visionID];
     for (int i = 0; i < possibleLineIDs.size(); i++) {
         LocLineID possibleID = possibleLineIDs[i];
-        double curScore = lines[possibleID].error(globalLine, debug);
-
-        if (debug)
-            std::cout << "Match, " << static_cast<int>(possibleID) << "," << curScore << "/" << bestScore << std::endl; 
+        double curScore = scoreObservation(obsvAsGeoLine, lines[possibleID], loc, observation.wz0());
 
         if (curScore > bestScore) {
             id = possibleID;
             bestScore = curScore;
         }
+
+        if (debug) {
+            std::cout << "In matchLine:" << std::endl;
+            std::cout << static_cast<int>(possibleID) << std::endl;
+            std::cout << curScore << std::endl;
+        }
     }
 
+    // NOTE two midlines so that reconstructions can be handled gracefully from
+    //      either side of the field
     if (id == LocLineID::TheirMidline || id == LocLineID::OurMidline) {
         if (loc.x() < CENTER_FIELD_X)
             return LocLineID::OurMidline;
@@ -110,30 +122,29 @@ LocLineID LineSystem::matchObservation(const messages::FieldLine& observation,
     return id;
 }
 
-// TODO rename to prob
-double LineSystem::scoreObservation(const messages::FieldLine& observation,
-                                    const messages::RobotLocation& loc)
+double LineSystem::scoreLine(const messages::FieldLine& observation,
+                             const messages::RobotLocation& loc)
 {
-    vision::GeoLine globalLine = LineSystem::relRobotToAbsolute(observation, loc);
+    // Turn observation into GeoLine so scoreObservation can operate on it
+    vision::GeoLine obsvAsGeoLine;
+    obsvAsGeoLine.set(observation.inner().r(), observation.inner().t(), 
+                      observation.inner().ep0(), observation.inner().ep1());
 
-    double errorBetweenObservationAndModel;
-    LocLineID id = matchObservation(observation, loc);
+    // Find correspondence and calculate probability of match
+    LocLineID id = matchLine(observation, loc);
+    double score = scoreObservation(obsvAsGeoLine, lines[id], loc, observation.wz0());
 
-    if (id == LocLineID::NotMatched)
-        errorBetweenObservationAndModel = 0;
-    else
-        errorBetweenObservationAndModel = lines[id].error(globalLine, debug);
-
-    if (debug) { 
-        std::cout << "In scoreObservation," << std::endl;
+    if (debug) {
+        std::cout << "In scoreLine:" << std::endl;
         std::cout << static_cast<int>(id) << std::endl;
-        std::cout << errorBetweenObservationAndModel << std::endl;
+        std::cout << score << std::endl;
     }
 
-    return errorBetweenObservationAndModel;
+    return score;
 }
 
 // NOTE method assumes that endpoints seen in observation are endpoints of line
+// IMPORTANT only tested with id == OurTopGoalbox || TheirTopGoalbox
 messages::RobotLocation LineSystem::reconstructFromMidpoint(LocLineID id, 
                                                             const messages::FieldLine& observation)
 {
@@ -142,13 +153,12 @@ messages::RobotLocation LineSystem::reconstructFromMidpoint(LocLineID id,
     const vision::GeoLine& absolute = lines[id];
 
     // Calculate heading in absolute coords
-    position.set_h(vision::uMod((M_PI / 2) - inner.t() + absolute.t(), 2 * M_PI));
+    position.set_h(vision::uMod(-inner.t() + absolute.t(), 2 * M_PI));
 
     // Calculate midpoint of line in relative coords
     double rx1, ry1, rx2, ry2, rxm, rym;
     vision::GeoLine relRobot;
     relRobot.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
-    relRobot.translateRotate(0, 0, -(M_PI / 2));
     relRobot.translateRotate(0, 0, position.h());
     relRobot.endPoints(rx1, ry1, rx2, ry2);
     rxm = (rx1 + rx2) / 2;
@@ -167,6 +177,7 @@ messages::RobotLocation LineSystem::reconstructFromMidpoint(LocLineID id,
     return position;
 }
 
+// IMPORTANT only tested with id == OurMidline
 messages::RobotLocation LineSystem::reconstructWoEndpoints(LocLineID id, 
                                                            const messages::FieldLine& observation)
 {
@@ -179,7 +190,7 @@ messages::RobotLocation LineSystem::reconstructWoEndpoints(LocLineID id,
     position.set_y(-1);
 
     // Calculate heading in absolute coords
-    position.set_h(vision::uMod((M_PI / 2) - inner.t() + absolute.t(), 2 * M_PI));
+    position.set_h(vision::uMod(-inner.t() + absolute.t(), 2 * M_PI));
 
     // Calculate x or y depending on orientation of line
     if (id == LocLineID::LeftSideline || id == LocLineID::RightSideline) {
@@ -199,6 +210,13 @@ messages::RobotLocation LineSystem::reconstructWoEndpoints(LocLineID id,
     return position;
 }
 
+bool LineSystem::shouldUse(const messages::FieldLine& observation)
+{
+    const messages::HoughLine& inner = observation.inner();
+    bool longEnough = inner.ep1() - inner.ep0() > 60;
+    return longEnough;
+}
+
 vision::GeoLine LineSystem::relRobotToAbsolute(const messages::FieldLine& observation,
                                                const messages::RobotLocation& loc)
 {
@@ -206,18 +224,65 @@ vision::GeoLine LineSystem::relRobotToAbsolute(const messages::FieldLine& observ
 
     vision::GeoLine globalLine;
     globalLine.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
-    globalLine.translateRotate(0, 0, -(M_PI / 2));
     globalLine.translateRotate(loc.x(), loc.y(), loc.h());
 
     return globalLine;
 }
 
-// TODO parameters
-bool LineSystem::shouldUse(const messages::FieldLine& observation)
+double LineSystem::scoreObservation(const vision::GeoLine& observation,
+                                    const vision::GeoLine& correspondingLine, 
+                                    const messages::RobotLocation& loc,
+                                    double wz0)
 {
-    const messages::HoughLine& inner = observation.inner();
-    bool longEnough = inner.ep1() - inner.ep0() > 60;
-    return longEnough;
+    // Normalize correspondingLine to have positive r and t between 0 and PI / 2 
+    // NOTE see constructor for explanation of what negative r means in this context
+    double normalizedT, normalizedEp0, normalizedEp1;
+    if (correspondingLine.r() < 0) {
+        normalizedT = correspondingLine.t() - M_PI;
+        normalizedEp0 = -correspondingLine.ep0();
+        normalizedEp1 = -correspondingLine.ep1();
+    } else {
+        normalizedT = correspondingLine.t();
+        normalizedEp0 = correspondingLine.ep0();
+        normalizedEp1 = correspondingLine.ep1();
+    }
+
+    vision::GeoLine normalizedCorrespondingLine;
+    normalizedCorrespondingLine.set(fabs(correspondingLine.r()), normalizedT,
+                                    normalizedEp0, normalizedEp1);
+    
+    // Landmark in map, absolute to robot relative
+    normalizedCorrespondingLine.inverseTranslateRotate(loc.x(), loc.y(), loc.h(), debug);
+
+    // Calculate tilt to both observation and corresponding line in map 
+    // NOTE better to score error in r in angular coordinates since this 
+    //      weights close observations more highly
+    double observationTilt = atan(observation.r() / wz0);
+    double correspondingTilt = atan(normalizedCorrespondingLine.r() / wz0);
+
+    // Find differences in tilt and t
+    double tiltDiff = vision::diffRadians(observationTilt, correspondingTilt);
+    double tDiff = vision::diffRadians(observation.t(), normalizedCorrespondingLine.t());
+
+    // Evaluate gaussian to get probability of observation from location loc
+    // TODO params
+    boost::math::normal_distribution<> tiltGaussian(0, 5*TO_RAD);
+    boost::math::normal_distribution<> tGaussian(0, 10*TO_RAD);
+  
+    double tiltProb = pdf(tiltGaussian, tiltDiff);
+    double tProb = pdf(tGaussian, tDiff);
+  
+    if (debug) {
+      std::cout << "In scoreObservation:" << std::endl;
+      std::cout << normalizedCorrespondingLine.r() << "," << normalizedCorrespondingLine.t() << std::endl;
+      std::cout << observation.r() << "," << observation.t() << std::endl;
+      std::cout << tiltDiff << "," << tDiff << std::endl;
+      std::cout << tiltProb << "/" << tProb << std::endl;
+      std::cout << (tiltProb * tProb) << std::endl;
+    }
+
+    // Make the conditional independence assumption
+    return tiltProb * tProb;
 }
 
 void LineSystem::addLine(LocLineID id, float r, float t, float ep0, float ep1)
