@@ -351,12 +351,9 @@ void Field::initialScanForTopGreenPoints(int pH) {
  * @return    if calculation was possible, false otherwise
  */
 	bool Field::onField(double x, double & y) {
-        std::cout << " IN FIELD W/ " << numberOfHulls << " HULLS" << std::endl;
-    for (int i = 1; i < numberOfHulls; i++) {
-        std::cout << "X: " << x << " CX: (" << convexWorld[i-1].x << "," <<
+    for (int i = 1; i <= numberOfHulls; i++) {
             convexWorld[i].x << ")\n";
 		if (convexWorld[i-1].x < x && convexWorld[i].x > x) {
-            std::cout << "Internal\n";
 			// interpolate the y's
 			double diff = convexWorld[i].x - convexWorld[i-1].x;
 			double diffy = convexWorld[i].y - convexWorld[i-1].y;
@@ -364,9 +361,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
 			double finalDiffY = diffy * stepPercent;
 			y = convexWorld[i-1].y + finalDiffY;
 			return true;
-		} else {
-            std::cout << "External\n";
-        }
+		}
 	}
 	y = 0;
 	return false;
@@ -381,9 +376,6 @@ void Field::initialScanForTopGreenPoints(int pH) {
 void Field::findTopEdges(int M) {
     // interpolate the points in the hull to determine values for every scanline
 	numberOfHulls = M;
-
-    std::cout << "number of hulls = " << numberOfHulls << std::endl;
-
     topEdge[0] = convex[0].y;
 	topBlock[0] = blockages[0].y;
     float maxPix = 0.0f;

@@ -275,6 +275,8 @@ public class LineView extends ViewParent implements IOFirstResponder {
             g.setColor(Color.black);
             for (int i = 0; i < ccPoints.size() - 2; i += 2)
                 g.fillRect((int)(fxc + ccPoints.get(i+0)), (int)(fyc - ccPoints.get(i + 1)), 1, 1);
+            
+            // Last point is predicted center circle center!
             if (ccPoints.size() > 1) {
                 if (ccPoints.get(ccPoints.size()-2) != 0 || ccPoints.get(ccPoints.size() - 1) != 0) {
                     g.setColor(Color.blue);
