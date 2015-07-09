@@ -24,7 +24,7 @@ KEEP_SAME_SPEED = -1
 ADAPTIVE = True
 #goTo precision
 GRAINY = (50.0, 50.0, 30)
-HOME = (50.0, 50.0, 20)
+HOME = (30.0, 30.0, 20)
 PLAYBOOK = (10.0, 10.0, 10)
 GENERAL_AREA = (5.0, 5.0, 20)
 CLOSE_ENOUGH = (3.5, 3.5, 10)
