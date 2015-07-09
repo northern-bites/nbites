@@ -68,7 +68,10 @@ class KickDecider(object):
         self.addPassesToFieldCross()
         self.addShotsOnGoal()
 
-        return (kick for kick in self.possibleKicks).next().next()
+        kickReturned =  (kick for kick in self.possibleKicks).next().next()
+        print "Kick being used: ", kickReturned
+
+        return kickReturned
 
     def frontKicksOrbit(self):
         self.brain.player.motionKick = False
@@ -189,7 +192,7 @@ class KickDecider(object):
 
     def motionKicksAsap(self):
         self.brain.player.motionKick = True
-        print "In motion kicks asap"
+        print "In MotionKicksAsap"
     
         self.kicks = []
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
@@ -209,7 +212,9 @@ class KickDecider(object):
         self.addFastestPossibleKicks()
 
         try:
-            return (kick for kick in self.possibleKicks).next().next()
+            var = (kick for kick in self.possibleKicks).next().next()
+            print "Kick being used: ", var
+            return var
         except:
             return None
 
@@ -327,6 +332,7 @@ class KickDecider(object):
 
         try:
             k = (kick for kick in self.possibleKicks).next().next()
+            print "kick being used: ", k
             if k.sweetMove: 
                 self.brain.player.motionKick = False
             else:
@@ -430,6 +436,7 @@ class KickDecider(object):
 
         try:
             k = (kick for kick in self.possibleKicks).next().next()
+            print "Kick being used: ", k
             if k.sweetMove: 
                 self.brain.player.motionKick = False
             else:
@@ -650,8 +657,10 @@ class KickDecider(object):
         try:
             yield max(filteredKicks,key=self.scoreKick)
         except ValueError:
-            print "Value Error in python filter"
-            yield filteredKicks.next()
+            print "No kick satisfied the filter req's"
+            var = filteredKicks.next()
+            print var
+            yield  var
 
     def generateFastestPossibleKicks(self):
         for k in self.kicks:
@@ -808,6 +817,7 @@ class KickDecider(object):
         intoBox = (kick.destinationX > nogginC.GREEN_PAD_X and kick.destinationX < nogginC.BLUE_GOALBOX_RIGHT_X and
                     kick.destinationY < nogginC.BLUE_GOALBOX_TOP_Y and kick.destinationY > nogginC.BLUE_GOALBOX_BOTTOM_Y)
 
+        print "inBox returned"
         if intoBox and not inBox:
             return False
 
