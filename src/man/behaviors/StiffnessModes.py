@@ -45,33 +45,6 @@ LOW_HEAD_STIFFNESSES = (LOWER_HEAD_VALUE, # Head
                         GAINS_ARMS_VALUE,
                         GAINS_ARMS_VALUE,)
 
-
-
-BACK_KICK_STIFFNESSES =  (LOWER_HEAD_VALUE, # Head
-                        LOWER_HEAD_VALUE,
-                        GAINS_ON_VALUE, # larm
-                        GAINS_ON_VALUE,
-                        GAINS_ON_VALUE,
-                        GAINS_ON_VALUE,
-                        GAINS_ON_VALUE, # lleg
-                        GAINS_ON_VALUE,
-                        GAINS_ON_VALUE,
-                        GAINS_ON_VALUE,
-                        GAINS_ON_VALUE,
-                        GAINS_ON_VALUE,
-                        GAINS_ON_VALUE, # rleg
-                        GAINS_ON_VALUE,
-                        GAINS_ON_VALUE,
-                        GAINS_ON_VALUE,
-                        GAINS_ON_VALUE,
-                        GAINS_ON_VALUE,
-                        GAINS_ON_VALUE, # rarm
-                        GAINS_ON_VALUE,
-                        GAINS_ON_VALUE,
-                        GAINS_ON_VALUE,)
-
-
-
 STANDUP_STIFFNESSES = (STANDUP_GAINS_VALUE, # Head
                        STANDUP_GAINS_VALUE,
                        STANDUP_GAINS_VALUE, # larm
@@ -95,29 +68,6 @@ STANDUP_STIFFNESSES = (STANDUP_GAINS_VALUE, # Head
                        STANDUP_GAINS_VALUE,
                        STANDUP_GAINS_VALUE,)
 
-LOOSE_ARMS_STIFFNESSES = (GAINS_ON_VALUE, # Head
-                          GAINS_ON_VALUE,
-                          GAINS_ARMS_VALUE, # larm
-                          GAINS_ARMS_VALUE,
-                          GAINS_ARMS_VALUE,
-                          GAINS_ARMS_VALUE,
-                          GAINS_ON_VALUE, # lleg
-                          GAINS_ON_VALUE,
-                          GAINS_ON_VALUE,
-                          GAINS_ON_VALUE,
-                          GAINS_ON_VALUE,
-                          GAINS_ON_VALUE,
-                          GAINS_ON_VALUE, # rleg
-                          GAINS_ON_VALUE,
-                          GAINS_ON_VALUE,
-                          GAINS_ON_VALUE,
-                          GAINS_ON_VALUE,
-                          GAINS_ON_VALUE,
-                          GAINS_ARMS_VALUE, # rarm
-                          GAINS_ARMS_VALUE,
-                          GAINS_ARMS_VALUE,
-                          GAINS_ARMS_VALUE,)
-
 NORMAL_STIFFNESSES = (GAINS_ON_VALUE, # Head
                       GAINS_ON_VALUE,
                       GAINS_ON_VALUE, # larm
@@ -140,76 +90,6 @@ NORMAL_STIFFNESSES = (GAINS_ON_VALUE, # Head
                       GAINS_ON_VALUE,
                       GAINS_ON_VALUE,
                       GAINS_ON_VALUE,)
-
-NO_STIFFNESSES = (GAINS_OFF_VALUE, # Head
-                      GAINS_OFF_VALUE,
-                      GAINS_OFF_VALUE, # larm
-                      GAINS_OFF_VALUE,
-                      GAINS_OFF_VALUE,
-                      GAINS_OFF_VALUE,
-                      GAINS_OFF_VALUE, # lleg
-                      GAINS_OFF_VALUE,
-                      GAINS_OFF_VALUE,
-                      GAINS_OFF_VALUE,
-                      GAINS_OFF_VALUE,
-                      GAINS_OFF_VALUE,
-                      GAINS_OFF_VALUE, # rleg
-                      GAINS_OFF_VALUE,
-                      GAINS_OFF_VALUE,
-                      GAINS_OFF_VALUE,
-                      GAINS_OFF_VALUE,
-                      GAINS_OFF_VALUE,
-                      GAINS_OFF_VALUE, # rarm
-                      GAINS_OFF_VALUE,
-                      GAINS_OFF_VALUE,
-                      GAINS_OFF_VALUE,)
-
-FAR_KICK_SUPPORT_LEG_VALUE = 0.4
-LEFT_FAR_KICK_STIFFNESSES = (GAINS_ON_VALUE, # Head
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE, # larm
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE, # lleg
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE,
-                             FAR_KICK_SUPPORT_LEG_VALUE, # rleg
-                             FAR_KICK_SUPPORT_LEG_VALUE,
-                             FAR_KICK_SUPPORT_LEG_VALUE,
-                             FAR_KICK_SUPPORT_LEG_VALUE,
-                             GAINS_ON_VALUE,
-                             FAR_KICK_SUPPORT_LEG_VALUE,
-                             GAINS_ON_VALUE, # rarm
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE,)
-
-RIGHT_FAR_KICK_STIFFNESSES = (GAINS_ON_VALUE, # Head
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE, # larm
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE,
-                             FAR_KICK_SUPPORT_LEG_VALUE, # lleg
-                             FAR_KICK_SUPPORT_LEG_VALUE,
-                             FAR_KICK_SUPPORT_LEG_VALUE,
-                             FAR_KICK_SUPPORT_LEG_VALUE,
-                              GAINS_ON_VALUE,
-                              FAR_KICK_SUPPORT_LEG_VALUE,
-                             GAINS_ON_VALUE, # rleg
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE, # rarm
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE,
-                             GAINS_ON_VALUE,)
 
 LOW_LEG_STIFFNESSES =  (GAINS_OFF_VALUE, # Head
                           GAINS_OFF_VALUE,
@@ -257,10 +137,6 @@ NO_HEAD_STIFFNESSES = (GAINS_OFF_VALUE, # Head
                           GAINS_OFF_VALUE,
                           GAINS_OFF_VALUE,)
 
-LEFT_SIDE_KICK_STIFFNESSES = LOOSE_ARMS_STIFFNESSES
-
-RIGHT_SIDE_KICK_STIFFNESSES = LOOSE_ARMS_STIFFNESSES
-
 GOALIE_DIVE_RIGHT_STIFFNESSES=  (LOWER_HEAD_VALUE, # Head
                                  LOWER_HEAD_VALUE,
                                  GAINS_ON_VALUE, # larm
@@ -306,27 +182,3 @@ GOALIE_GROUND_STIFFNESSES = (LOWER_HEAD_VALUE, # Head
                              DIVE_VALUE,
                              DIVE_VALUE,
                              DIVE_VALUE,)
-
-LEARN_MOTION_STIFFNESSES = (GAINS_OFF_VALUE, # Head
-                            GAINS_OFF_VALUE,
-                            GAINS_OFF_VALUE, # larm
-                            GAINS_OFF_VALUE,
-                            GAINS_OFF_VALUE,
-                            GAINS_OFF_VALUE,
-                            GAINS_OFF_VALUE, # lleg
-                            GAINS_OFF_VALUE,
-                            GAINS_OFF_VALUE,
-                            GAINS_OFF_VALUE,
-                            GAINS_OFF_VALUE,
-                            GAINS_OFF_VALUE,
-                            GAINS_ON_VALUE, # rleg
-                            GAINS_ON_VALUE,
-                            GAINS_ON_VALUE,
-                            GAINS_ON_VALUE,
-                            GAINS_ON_VALUE,
-                            GAINS_ON_VALUE,
-                            GAINS_OFF_VALUE, # rarm
-                            GAINS_OFF_VALUE,
-                            GAINS_OFF_VALUE,
-                            GAINS_OFF_VALUE,)
-

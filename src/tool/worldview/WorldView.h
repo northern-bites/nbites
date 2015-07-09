@@ -4,6 +4,7 @@
 
 #include "WorldModel.pb.h"
 #include "BallModel.pb.h"
+#include "RobotLocation.pb.h"
 
 #include "WorldViewPainter.h"
 
@@ -25,6 +26,9 @@ public:
 
     portals::InPortal<messages::WorldModel> commIn[NUM_PLAYERS_PER_TEAM];
     portals::InPortal<messages::SharedBall> sharedIn;
+
+    portals::OutPortal<messages::FilteredBall> sharedBallOut;
+    portals::OutPortal<messages::RobotLocation> locOut;
 
 protected:
     virtual void run_();
@@ -53,6 +57,7 @@ protected slots:
     void startButtonClicked();
     void stopButtonClicked();
     void teamChanged();
+    void setSharedBall();
 };
 
 static const QString roles[] = {QString("GOALIE"),

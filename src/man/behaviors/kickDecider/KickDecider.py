@@ -421,7 +421,7 @@ class KickDecider(object):
         self.filters.append(self.crossesGoalLine)
 
         self.clearPossibleKicks()
-        self.addShotsOnGoal()
+        self.addFastestPossibleKicks()
 
         try:
             k = (kick for kick in self.possibleKicks).next().next()
@@ -518,10 +518,10 @@ class KickDecider(object):
         # if frontKicks: 
         #     return frontKicks
 
-        if self.brain.loc.x < nogginC.MIDFIELD_X:
-            asap = self.motionKicksAsap()
-            if asap:
-                return asap
+        #if self.brain.loc.x < nogginC.MIDFIELD_X:
+        asap = self.motionKicksAsap()
+        if asap:
+            return asap
 
         return self.frontKickCrosses()
 
@@ -585,7 +585,7 @@ class KickDecider(object):
 
     ### API ###
     def addShotsOnGoal(self):
-        x = nogginC.OPP_GOALBOX_RIGHT_X - self.brain.ball.x
+        x = nogginC.OPP_GOALBOX_RIGHT_X - self.brain.ball.x 
         y1 = nogginC.OPP_GOALBOX_MIDDLE_Y - self.brain.ball.y
         y2 = nogginC.OPP_GOALBOX_MIDDLE_Y - constants.SHOT_PRECISION - self.brain.ball.y
         # Two vectors that share an x coordinate but have diff y coordinates
@@ -672,6 +672,7 @@ class KickDecider(object):
             kickDestinationY = y - self.brain.ball.y
 
             # Angle between unit vector and kickDestination, cos(theta) = a.b / ||a||||b||
+            # Our unit vector is (1,0). We are trying to determine our angle wre to the normal.
             angleToKickDestination = math.degrees(math.acos(kickDestinationX / 
                                                             math.sqrt(kickDestinationX**2 + kickDestinationY**2)))
             if kickDestinationY < 0: angleToKickDestination = -angleToKickDestination
