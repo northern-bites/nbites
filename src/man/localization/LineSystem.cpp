@@ -1,5 +1,6 @@
 #include "LineSystem.h"
 
+#include <algorithm>
 #include <boost/math/distributions/normal.hpp>
 
 namespace man {
@@ -23,9 +24,16 @@ LineSystem::LineSystem()
     addLine(LocLineID::TheirTopGoalbox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH , 0, -YELLOW_GOALBOX_BOTTOM_Y, -YELLOW_GOALBOX_TOP_Y);
 
     // IMPORTANT system currently doesn't support reconstructions from sideline, so
-    //           these lines are not polarized
+    //           the below lines are not polarized
     addLine(LocLineID::RightSideline, GREEN_PAD_Y, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
     addLine(LocLineID::LeftSideline, GREEN_PAD_Y + FIELD_WHITE_HEIGHT, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
+
+    addLine(LocLineID::OurRightGoalbox, BLUE_GOALBOX_BOTTOM_Y, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + GOALBOX_DEPTH);
+    addLine(LocLineID::TheirRightGoalbox, BLUE_GOALBOX_BOTTOM_Y, M_PI / 2, YELLOW_GOALBOX_LEFT_X, YELLOW_GOALBOX_RIGHT_X);
+
+    // NOTE right from the perspective of an observer looking in the positive x direction
+    addLine(LocLineID::OurLeftGoalbox, BLUE_GOALBOX_TOP_Y, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + GOALBOX_DEPTH);
+    addLine(LocLineID::TheirLeftGoalbox, BLUE_GOALBOX_TOP_Y, M_PI / 2, YELLOW_GOALBOX_LEFT_X, YELLOW_GOALBOX_RIGHT_X);
 
     // Part II
     // Map LineID that vision computes to LocLineID for use in solving the 
@@ -34,7 +42,9 @@ LineSystem::LineSystem()
         LocLineID::OurEndline, LocLineID::TheirEndline,
         LocLineID::OurMidline, LocLineID::TheirMidline,
         LocLineID::OurTopGoalbox, LocLineID::TheirTopGoalbox,
-        LocLineID::RightSideline, LocLineID::LeftSideline 
+        LocLineID::RightSideline, LocLineID::LeftSideline,
+        LocLineID::OurRightGoalbox, LocLineID::OurLeftGoalbox,
+        LocLineID::TheirRightGoalbox, LocLineID::TheirLeftGoalbox
     };
     visionToLocIDs[vision::LineID::Line] = all;
 
@@ -45,12 +55,16 @@ LineSystem::LineSystem()
     visionToLocIDs[vision::LineID::EndlineOrSideline] = endlineOrSideline;
 
     std::vector<LocLineID> topGoalboxOrSideGoalbox { 
-        LocLineID::OurTopGoalbox, LocLineID::TheirTopGoalbox
+        LocLineID::OurTopGoalbox, LocLineID::TheirTopGoalbox,
+        LocLineID::OurRightGoalbox, LocLineID::OurLeftGoalbox,
+        LocLineID::TheirRightGoalbox, LocLineID::TheirLeftGoalbox
     };
     visionToLocIDs[vision::LineID::TopGoalboxOrSideGoalbox] = topGoalboxOrSideGoalbox;
 
     std::vector<LocLineID> sideGoalboxOrMidline { 
-        LocLineID::OurMidline, LocLineID::TheirMidline
+        LocLineID::OurMidline, LocLineID::TheirMidline,
+        LocLineID::OurRightGoalbox, LocLineID::OurLeftGoalbox,
+        LocLineID::TheirRightGoalbox, LocLineID::TheirLeftGoalbox
     };
     visionToLocIDs[vision::LineID::SideGoalboxOrMidline] = sideGoalboxOrMidline;
 
@@ -59,7 +73,10 @@ LineSystem::LineSystem()
     };
     visionToLocIDs[vision::LineID::Sideline] = sideline;
 
-    std::vector<LocLineID> sideGoalbox {};
+    std::vector<LocLineID> sideGoalbox {
+        LocLineID::OurRightGoalbox, LocLineID::OurLeftGoalbox,
+        LocLineID::TheirRightGoalbox, LocLineID::TheirLeftGoalbox
+    };
     visionToLocIDs[vision::LineID::SideGoalbox] = sideGoalbox;
 
     std::vector<LocLineID> endline { 
@@ -212,9 +229,7 @@ messages::RobotLocation LineSystem::reconstructWoEndpoints(LocLineID id,
 
 bool LineSystem::shouldUse(const messages::FieldLine& observation)
 {
-    const messages::HoughLine& inner = observation.inner();
-    bool longEnough = inner.ep1() - inner.ep0() > 60;
-    return longEnough;
+    return true;
 }
 
 vision::GeoLine LineSystem::relRobotToAbsolute(const messages::FieldLine& observation,
@@ -263,26 +278,37 @@ double LineSystem::scoreObservation(const vision::GeoLine& observation,
     // Find differences in tilt and t
     double tiltDiff = vision::diffRadians(observationTilt, correspondingTilt);
     double tDiff = vision::diffRadians(observation.t(), normalizedCorrespondingLine.t());
+    
+    // Find endpoint error
+    // Endpoints of observation should be contained between endpoints of line in map
+    double ep0Error = std::max(0.0, normalizedCorrespondingLine.ep0() - observation.ep0());
+    double ep1Error = std::max(0.0, observation.ep1() - normalizedCorrespondingLine.ep1());
 
     // Evaluate gaussian to get probability of observation from location loc
     // TODO params
     boost::math::normal_distribution<> tiltGaussian(0, 5*TO_RAD);
     boost::math::normal_distribution<> tGaussian(0, 10*TO_RAD);
+    boost::math::normal_distribution<> ep0Gaussian(0, 50);
+    boost::math::normal_distribution<> ep1Gaussian(0, 50);
   
     double tiltProb = pdf(tiltGaussian, tiltDiff);
     double tProb = pdf(tGaussian, tDiff);
+    double ep0Prob = pdf(ep0Gaussian, ep0Error);
+    double ep1Prob = pdf(ep1Gaussian, ep1Error);
   
     if (debug) {
       std::cout << "In scoreObservation:" << std::endl;
       std::cout << normalizedCorrespondingLine.r() << "," << normalizedCorrespondingLine.t() << std::endl;
       std::cout << observation.r() << "," << observation.t() << std::endl;
       std::cout << tiltDiff << "," << tDiff << std::endl;
+      std::cout << ep0Error << "," << ep1Error << std::endl;
       std::cout << tiltProb << "/" << tProb << std::endl;
-      std::cout << (tiltProb * tProb) << std::endl;
+      std::cout << ep0Prob << "/" << ep1Prob << std::endl;
+      std::cout << (tiltProb * tProb * ep0Prob * ep1Prob) << std::endl;
     }
 
     // Make the conditional independence assumption
-    return tiltProb * tProb;
+    return tiltProb * tProb * ep0Prob * ep1Prob;
 }
 
 void LineSystem::addLine(LocLineID id, float r, float t, float ep0, float ep1)
