@@ -266,14 +266,19 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             }
 
         VisualGoalieStates.clearIt.transitions = {
+            Transition.CountTransition(GoalieTransitions.shouldSquat,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.saveCenter,
+
             Transition.CountTransition(GoalieTransitions.reachedMyDestination,
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.INSTANT)
             : GoalieStates.kickBall,
 
-            Transition.CountTransition(GoalieTransitions.ballLostStopChasing,
-                                       Transition.ALL_OF_THE_TIME,
-                                       90)
+            Transition.CountTransition(GoalieTransitions.lostBall,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
             : VisualGoalieStates.returnToGoal,
 
             Transition.CountTransition(GoalieTransitions.ballMovedStopChasing,

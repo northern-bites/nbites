@@ -33,10 +33,6 @@ BALL_SAFE_DISTANCE_THRESH = 150.0
 # -----------------------------------
 # Crazy new vision system constants:
 EXPECTED_SIDE_LINE_R = 87.0
-
-# EXPECTED_FRONT_LINE_R_BOTTOM_CAM = 34.0
-# EXPECTED_FRONT_LINE_R_TOP_CAM = 49.0
-
 EXPECTED_FRONT_LINE_R = 50.0
 
 EXPECTED_LEFT_LINE_T = 90.0

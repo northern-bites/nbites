@@ -117,7 +117,7 @@ def gamePlaying(player):
 
     #TODO before game/scrimmage change this to watch;
     # this is better for testing purposes!
-    return player.goLater('watchWithLineChecks')
+    return player.goLater('watch')
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
@@ -223,7 +223,7 @@ def watchWithLineChecks(player):
         # else:
         #     watchWithLineChecks.numFixes += 1
 
-        player.brain.tracker.performBasicPan()
+        player.brain.tracker.trackBall()
         player.brain.nav.stand()
         player.returningFromPenalty = False
 
@@ -431,6 +431,11 @@ def moveBackwards(player):
         watchWithLineChecks.numFixes += 1
         player.brain.tracker.lookToAngle(0)
         player.brain.nav.walkTo(RelRobotLocation(-60.0, 0, 0))
+        notTracking = True
+
+    if player.brain.ball.vis.on and notTracking:
+        player.brain.tracker.trackBall
+        notTracking = False
 
     return Transition.getNextState(player, moveBackwards)
 
