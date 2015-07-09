@@ -216,10 +216,6 @@ void VisionModule::run_()
         // Classify field lines
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]), *(centerCircleDetector[i]));
 
-        if (centerCircleDetector[0]->on()) {
-            std::cout << "-------------- FOUND CENTER CIRLCE ----------------\n";
-        } else std::cout << std::endl;
-        
         ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
 
 #ifdef USE_LOGGING

@@ -63,7 +63,7 @@ bool VisionSystem::update(ParticleSet& particles,
         }
 
         // Score particle from center circle if on
-        if (false) //vision.circle().on())
+        if (vision.circle().on())
             curParticleError = curParticleError*landmarkSystem->scoreCircle(vision.circle(), particle->getLocation());
 
         // Score particle from ball observation if in game set
@@ -196,7 +196,7 @@ bool VisionSystem::update(ParticleSet& particles,
     }
 
     // (3) Reconstruct pose from center circle
-    if (false) { //vision.circle().on()) {
+    if (vision.circle().on()) {
         messages::FieldLine midline;
         double minDist = std::numeric_limits<double>::max();
 
