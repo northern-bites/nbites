@@ -5,6 +5,8 @@ import java.awt.geom.*;
 import java.awt.event.*;
 import javax.swing.*;
 
+import nbtool.data.TeamBroadcast;
+
 public class NaoRobot {
 	private final static float naoRobotSize = 15.f;
 	double halfViewAngle = Math.toRadians(31);
