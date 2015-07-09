@@ -351,7 +351,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
  * @return    if calculation was possible, false otherwise
  */
 	bool Field::onField(double x, double & y) {
-	for (int i = 1; i < numberOfHulls; i++) {
+	for (int i = 1; i <= numberOfHulls; i++) {
 		if (convexWorld[i-1].x < x && convexWorld[i].x > x) {
 			// interpolate the y's
 			double diff = convexWorld[i].x - convexWorld[i-1].x;

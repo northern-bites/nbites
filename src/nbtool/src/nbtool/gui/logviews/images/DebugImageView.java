@@ -381,6 +381,9 @@ public class DebugImageView extends ViewParent
 		debugBall.setSelected(false);
 		showFieldLines.setSelected(false);
 
+		add(checkBoxPanel);
+		add(viewList);
+
         this.addMouseListener(new DistanceGetter());
 
 		// default image to display - save across instances
@@ -394,8 +397,6 @@ public class DebugImageView extends ViewParent
 		} else {
 			System.out.println("Reloading");
 			}
-		add(checkBoxPanel);
-		add(viewList);
     }
 
 	/* Currently only called by the JComboBox, if we start adding more actions

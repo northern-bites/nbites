@@ -38,17 +38,44 @@ namespace vision {
 
 		// TODO: Sort blobber list by size
 		for (auto i=blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
+			int centerX = static_cast<int>((*i).centerX());
+			int centerY = static_cast<int>((*i).centerY());
+			int principalLength = static_cast<int>((*i).firstPrincipalLength());
+			bool occludedSide = false;
+			bool occludedTop = false;
+			bool occludedBottom = false;
+
 			double x_rel, y_rel;
 
 			double bIX = ((*i).centerX() - orange.width()/2);
 			double bIY = (orange.height() / 2 - (*i).centerY()) -
 				(*i).firstPrincipalLength();
 
+			// is the ball occluded?
+			if (centerX - principalLength < 0 ||
+				centerX + principalLength > orange.width()) {
+				if (debugBall) {
+					std::cout << "Blob is occluded on side" << std::endl;
+				}
+				occludedSide = true;
+			}
+
+			if (centerY - principalLength < 0) {
+				if (debugBall) {
+					std::cout << "Blob is occluded on top" << std::endl;
+				}
+				occludedBottom = true;
+			}
+			if (centerY + principalLength > orange.height()) {
+				if (debugBall) {
+					std::cout << "Blob is occluded on bottom" << std::endl;
+				}
+				occludedBottom = true;
+			}
+
 			// When looking in the top camera worry about the field
 			if (topCamera) {
-				int x = (int)((*i).centerX());
-				int y = (int)((*i).centerY());
-				bool offField = y < field->horizonAt(x);
+				bool offField = centerY < field->horizonAt(centerX);
 				if (offField) {
 					if (debugBall) {
 						std::cout << "Blob is off the field: " << std::endl;
@@ -68,7 +95,9 @@ namespace vision {
 			}
 
 			Ball b((*i), x_rel, -1 * y_rel, cameraHeight, orange.height(),
-				   orange.width(), topCamera);
+				   orange.width(), topCamera, occludedSide, occludedTop,
+				   occludedBottom);
+
 			if (b.confidence() > CONFIDENCE) {
 #ifdef OFFLINE
 				// we always want to draw the ball, even when not debugging it
@@ -98,7 +127,7 @@ namespace vision {
 	}
 
 	Ball::Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_,
-			   int imgWidth_, bool top) :
+			   int imgWidth_, bool top, bool os, bool ot, bool ob) :
 		blob(b),
 		radThresh(.3, .7),
 		thresh(.5, .8),
@@ -107,6 +136,10 @@ namespace vision {
 		cameraH(cameraH_),
 		imgHeight(imgHeight_),
 		imgWidth(imgWidth_),
+		topCamera(top),
+		occludedSide(os),
+		occludedTop(ot),
+		occludedBottom(ob),
 		_confidence(0)
 	{
 		if (!top) {
@@ -142,8 +175,17 @@ namespace vision {
 		}
 
 		//_confidence = (density > thresh).f() * (aspectRatio > thresh).f() * (diameterRatio > radThresh).f();
-		_confidence = ((density > thresh) & (aspectRatio > thresh) &
-					   (diameterRatio > radThresh)).f();
+
+		if (!topCamera && (occludedSide || occludedTop)) {
+			_confidence = ((density > thresh) & (aspectRatio > thresh) &
+						   (diameterRatio > radThresh)).f();
+			_confidence = ((density > thresh) &
+						   (diameterRatio > radThresh)).f();
+		} else {
+			_confidence = ((density > thresh) & (aspectRatio > thresh) &
+						   (diameterRatio > radThresh)).f();
+		}
+
 
 		// Hack/Sanity check to ensure we don't see crazy balls
 		if (dist > 600) {
