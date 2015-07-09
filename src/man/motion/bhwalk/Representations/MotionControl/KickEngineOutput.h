@@ -14,9 +14,9 @@
 * @class KickEngineOutput
 * A class that represents the output of the walking engine.
 */
-STREAMABLE_WITH_BASE(KickEngineOutput, JointRequest,
+STREAMABLE_WITH_BASE(KickEngineOutput, JointRequestBH,
 {,
-  (Pose2D) odometryOffset, /**< The body motion performed in this step. */
+  (Pose2DBH) odometryOffset, /**< The body motion performed in this step. */
   (bool)(true) isLeavingPossible, /**< Is leaving the motion module possible now? */
   (bool)(true) isStable, /**< Is motion currently stable? */
   (KickRequest) executedKickRequest, /**< The kick request that is currently in execution. */

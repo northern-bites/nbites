@@ -43,9 +43,9 @@ private:
   unsigned int timeStamp;
   int timeSinceTimeStamp;
 
-  RingBufferWithSum <Vector2<int>, 10> standLegPos;
+  RingBufferWithSumBH <Vector2BH<int>, 10> standLegPos;
 
-  Vector2<> comOffset,
+  Vector2BH<> comOffset,
           balanceSum,
           gyro,
           lastGyroLeft,
@@ -59,19 +59,19 @@ private:
           gyroD,
           origin;
 
-  Vector2<> head;
+  Vector2BH<> head;
 
-  Vector3<> positions[Phase::numOfLimbs], origins[Phase::numOfLimbs];
+  Vector3BH<> positions[Phase::numOfLimbs], origins[Phase::numOfLimbs];
 
-  Vector3<> torsoRot;
+  Vector3BH<> torsoRot;
 
-  Vector3<> lastCom, ref, actualDiff;
+  Vector3BH<> lastCom, ref, actualDiff;
 
   KickEngineParameters currentParameters;
 
-  RobotModel robotModel, comRobotModel;
+  RobotModelBH robotModel, comRobotModel;
 
-  JointRequest lastBalancedJointRequest, compenJoints;
+  JointRequestBH lastBalancedJointRequest, compenJoints;
 
   bool wasActive, startComp, willBeLeft;
 
@@ -79,37 +79,37 @@ public:
   KickRequest currentKickRequest;
   bool internalIsLeavingPossible;
 
-  bool getMotionIDByName(const MotionRequest& motionRequest, const std::vector<KickEngineParameters>& params);
-  void calculateOrigins(const RobotDimensions& theRobotDimension, const FilteredJointData& jd);
-  bool checkPhaseTime(const FrameInfo& frame, const RobotDimensions& rd, const FilteredJointData& jd, const TorsoMatrix& torsoMatrix);
-  void balanceCOM(JointRequest& joints, const RobotDimensions& rd, const MassCalibration& mc, const FilteredJointData& theFilteredJointData);
-  void calculatePreviewCom(Vector3<> &ref, Vector2<> &origin);
+  bool getMotionIDByName(const MotionRequestBH& motionRequest, const std::vector<KickEngineParameters>& params);
+  void calculateOrigins(const RobotDimensionsBH& theRobotDimension, const FilteredJointDataBH& jd);
+  bool checkPhaseTime(const FrameInfoBH& frame, const RobotDimensionsBH& rd, const FilteredJointDataBH& jd, const TorsoMatrixBH& torsoMatrix);
+  void balanceCOM(JointRequestBH& joints, const RobotDimensionsBH& rd, const MassCalibrationBH& mc, const FilteredJointDataBH& theFilteredJointData);
+  void calculatePreviewCom(Vector3BH<> &ref, Vector2BH<> &origin);
   void setStandLeg(const float& originY);
-  bool calcJoints(JointRequest& jointRequest, const RobotDimensions& rd, const HeadJointRequest& hr);
-  void calcLegJoints(const JointData::Joint& joint, JointRequest& jointRequest, const RobotDimensions& theRobotDimensions);
-  static void simpleCalcArmJoints(const JointData::Joint& joint, JointRequest& jointRequest, const RobotDimensions& theRobotDimensions, const Vector3<>& armPos, const Vector3<>& handRotAng);
-  void getCOMReference(const Vector3<>& lFootPos, const Vector3<>& rFootPos, Vector3<>& comRef, Vector2<>& origin);
+  bool calcJoints(JointRequestBH& jointRequest, const RobotDimensionsBH& rd, const HeadJointRequestBH& hr);
+  void calcLegJoints(const JointDataBH::Joint& joint, JointRequestBH& jointRequest, const RobotDimensionsBH& theRobotDimensions);
+  static void simpleCalcArmJoints(const JointDataBH::Joint& joint, JointRequestBH& jointRequest, const RobotDimensionsBH& theRobotDimensions, const Vector3BH<>& armPos, const Vector3BH<>& handRotAng);
+  void getCOMReference(const Vector3BH<>& lFootPos, const Vector3BH<>& rFootPos, Vector3BH<>& comRef, Vector2BH<>& origin);
   void setStaticReference();
-  void mirrorIfNecessary(JointRequest& joints);
-  void addGyroBalance(JointRequest& jointRequest, const JointCalibration& jc, const FilteredSensorData& sd, const float& ratio);
-  void addDynPoint(const DynPoint& dynPoint, const RobotDimensions& rd, const TorsoMatrix& torsoMatrix);
-  void ModifyData(const KickRequest& br, JointRequest& kickEngineOutput, std::vector<KickEngineParameters>& params);
+  void mirrorIfNecessary(JointRequestBH& joints);
+  void addGyroBalance(JointRequestBH& jointRequest, const JointCalibrationBH& jc, const FilteredSensorDataBH& sd, const float& ratio);
+  void addDynPoint(const DynPoint& dynPoint, const RobotDimensionsBH& rd, const TorsoMatrixBH& torsoMatrix);
+  void ModifyData(const KickRequest& br, JointRequestBH& kickEngineOutput, std::vector<KickEngineParameters>& params);
   void debugFormMode(std::vector<KickEngineParameters>& params);
   void setCycleTime(float time);
   void calcPhaseState();
-  void calcPositions(JointRequest& joints, const FilteredJointData& theFilteredJointData);
-  void setRobotModel(RobotModel rm);
+  void calcPositions(JointRequestBH& joints, const FilteredJointDataBH& theFilteredJointData);
+  void setRobotModel(RobotModelBH rm);
   bool isMotionAlmostOver();
-  void setCurrentKickRequest(const MotionRequest& mr);
+  void setCurrentKickRequest(const MotionRequestBH& mr);
   void setExecutedKickRequest(KickRequest& br);
-  void initData(const bool& compensated, const FrameInfo& frame, const MotionRequest& mr, const RobotDimensions& theRobotDimensions, std::vector<KickEngineParameters>& params, const FilteredJointData& jd, const TorsoMatrix& torsoMatrix);
+  void initData(const bool& compensated, const FrameInfoBH& frame, const MotionRequestBH& mr, const RobotDimensionsBH& theRobotDimensions, std::vector<KickEngineParameters>& params, const FilteredJointDataBH& jd, const TorsoMatrixBH& torsoMatrix);
   void setEngineActivation(const float& ratio);
   bool activateNewMotion(const KickRequest& br, const bool& isLeavingPossible);
-  bool sitOutTransitionDisturbance(bool& compensate, bool& compensated, const FilteredSensorData& sd, KickEngineOutput& kickEngineOutput, const JointData& jd, const FrameInfo& frame);
+  bool sitOutTransitionDisturbance(bool& compensate, bool& compensated, const FilteredSensorDataBH& sd, KickEngineOutput& kickEngineOutput, const JointDataBH& jd, const FrameInfoBH& frame);
 
-  Pose3D calcDesBodyAngle(JointRequest& jointData, const RobotDimensions& robotDimensions, JointData::Joint joint);
+  Pose3DBH calcDesBodyAngle(JointRequestBH& jointData, const RobotDimensionsBH& robotDimensions, JointDataBH::Joint joint);
 
-  void transferDynPoint(Vector3<>& d, const RobotDimensions& rd, const TorsoMatrix& torsoMatrix);
+  void transferDynPoint(Vector3BH<>& d, const RobotDimensionsBH& rd, const TorsoMatrixBH& torsoMatrix);
 
   KickEngineData():
     formMode(false),

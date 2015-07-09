@@ -22,91 +22,71 @@ timeSinceLastPhase(0)
 {
   params.reserve(10);
 
-  char dirname[260];
+  // Below is used for reading in multiple kicks. As of now we only use one kick, so hardcode!
+  // char dirname[260];
 
-#ifdef WINDOWS
-  sprintf(dirname, "%s/Config/KickEngine/*.kmc", File::getBHDir());
-  WIN32_FIND_DATA findFileData;
-  std::string fileName;
-  HANDLE hFind = FindFirstFile(dirname, &findFileData);
+  // sprintf(dirname, "%s/Config/KickEngine/", File::getBHDir());
+  // DIR* dir = opendir(dirname);
+  // ASSERT(dir);
+  // struct dirent* file = readdir(dir);
 
-  while(hFind != INVALID_HANDLE_VALUE)
+  // while(file != NULL)
+  // {
+  //   char name[260];
+  //   sprintf(name, "KickEngine/%s", file->d_name);
+
+  //   if(strstr(name, ".kmc"))
+  //   {
+  //     InMapFile stream(name);
+  //     ASSERT(stream.exists());
+
+  //     KickEngineParameters parameters;
+  //     stream >> parameters;
+
+  //     sprintf(name, "%s", file->d_name);
+  //     for(int i = 0; i < 260; i++)
+  //     {
+  //       if(name[i] == '.') name[i] = 0;
+  //     }
+  //     strcpy(parameters.name, name);
+
+  //     if(KickRequest::getKickMotionFromName(parameters.name) < KickRequest::none)
+  //     {
+  //       params.push_back(parameters);
+  //     }
+  //     else
+  //     {
+  //       OUTPUT(idText, text, "Warning: KickRequest is missing the id for " << parameters.name);
+  //       fprintf(stderr, "Warning: KickRequest is missing the id for %s \n", parameters.name);
+  //     }
+  //   }
+  //   file = readdir(dir);
+  // }
+  // closedir(dir);
+
+  InMapFile stream(ModuleBase::config_path + "kickForward.kmc");
+  ASSERT(stream.exists());
+
+  KickEngineParameters parameters;
+  stream >> parameters;
+
+  // sprintf(name, "%s", file->d_name);
+  // for(int i = 0; i < 260; i++)
+  // {
+  //     if(name[i] == '.') name[i] = 0;
+  // }
+  strcpy(parameters.name, "kickForward.kmc");
+
+  if(KickRequest::getKickMotionFromName(parameters.name) < KickRequest::none)
   {
-    char name[512];
-
-    fileName = findFileData.cFileName;
-
-    sprintf(name, "KickEngine/%s", fileName.c_str());
-
-    InMapFile stream(name);
-    ASSERT(stream.exists());
-
-    KickEngineParameters parameters;
-    stream >> parameters;
-
-    char temp[260];
-
-    sprintf(temp, "%s", fileName.c_str());
-
-    for(int i = 0; i < 260; i++)
-    {
-      if(temp[i] == '.') temp[i] = 0;
-    }
-
-    strcpy(parameters.name, temp);
-    if(KickRequest::getKickMotionFromName(parameters.name) < KickRequest::numOfKickMotionIDs)
-    {
       params.push_back(parameters);
-    }
-    else
-    {
-      OUTPUT(idText, text, "Warning: KickRequest is missing the id for " << parameters.name);
-    }
-
-    if(!FindNextFile(hFind, &findFileData))break;
   }
-
-#else //LINUX
-  sprintf(dirname, "%s/Config/KickEngine/", File::getBHDir());
-  DIR* dir = opendir(dirname);
-  ASSERT(dir);
-  struct dirent* file = readdir(dir);
-
-  while(file != NULL)
+  else
   {
-    char name[260];
-    sprintf(name, "KickEngine/%s", file->d_name);
-
-    if(strstr(name, ".kmc"))
-    {
-      InMapFile stream(name);
-      ASSERT(stream.exists());
-
-      KickEngineParameters parameters;
-      stream >> parameters;
-
-      sprintf(name, "%s", file->d_name);
-      for(int i = 0; i < 260; i++)
-      {
-        if(name[i] == '.') name[i] = 0;
-      }
-      strcpy(parameters.name, name);
-
-      if(KickRequest::getKickMotionFromName(parameters.name) < KickRequest::none)
-      {
-        params.push_back(parameters);
-      }
-      else
-      {
-        OUTPUT(idText, text, "Warning: KickRequest is missing the id for " << parameters.name);
-        fprintf(stderr, "Warning: KickRequest is missing the id for %s \n", parameters.name);
-      }
-    }
-    file = readdir(dir);
+      std::cout << "COULD NOT PARSE ANY KICKS FROM 'kickForward.kmc'!" << std::endl;
+      OUTPUT(idText, text, "Warning: KickRequest is missing the id for " << parameters.name);
+      fprintf(stderr, "Warning: KickRequest is missing the id for %s \n", parameters.name);
   }
-  closedir(dir);
-
-#endif //LINUX
 
   for(int i = 0; i < KickRequest::numOfKickMotionIDs - 2; ++i)
   {
@@ -136,39 +116,39 @@ timeSinceLastPhase(0)
 
 void KickEngine::update(KickEngineOutput& kickEngineOutput)
 {
-  if(theMotionSelection.ratios[MotionRequest::kick] > 0.f)
+  if(theMotionSelectionBH.ratios[MotionRequestBH::kick] > 0.f)
   {
-    data.setCycleTime(theFrameInfo.cycleTime);
+    data.setCycleTime(theFrameInfoBH.cycleTime);
 
-    if(theMotionSelection.ratios[MotionRequest::kick] < 1.f && !compensated) compensate = true;
+    if(theMotionSelectionBH.ratios[MotionRequestBH::kick] < 1.f && !compensated) compensate = true;
 
-    data.setRobotModel(theRobotModel);
+    data.setRobotModel(theRobotModelBH);
 
-    if(data.sitOutTransitionDisturbance(compensate, compensated, theFilteredSensorData, kickEngineOutput, theWalkingEngineStandOutput, theFrameInfo))
+    if(data.sitOutTransitionDisturbance(compensate, compensated, theFilteredSensorDataBH, kickEngineOutput, theWalkingEngineStandOutputBH, theFrameInfoBH))
     {
-      if(data.activateNewMotion(theMotionRequest.kickRequest, kickEngineOutput.isLeavingPossible) && theMotionRequest.motion == MotionRequest::kick)
+      if(data.activateNewMotion(theMotionRequestBH.kickRequest, kickEngineOutput.isLeavingPossible) && theMotionRequestBH.motion == MotionRequestBH::kick)
       {
-        data.initData(compensated, theFrameInfo, theMotionRequest, theRobotDimensions, params, theFilteredJointData, theTorsoMatrix);
-        data.setCurrentKickRequest(theMotionRequest);
+        data.initData(compensated, theFrameInfoBH, theMotionRequestBH, theRobotDimensionsBH, params, theFilteredJointDataBH, theTorsoMatrixBH);
+        data.setCurrentKickRequest(theMotionRequestBH);
         data.setExecutedKickRequest(kickEngineOutput.executedKickRequest);
 
         data.internalIsLeavingPossible = false;
         kickEngineOutput.isLeavingPossible = false;
 
-        kickEngineOutput.odometryOffset = Pose2D();
+        kickEngineOutput.odometryOffset = Pose2DBH();
 
-        for(int i = JointData::LShoulderPitch; i < JointData::numOfJoints; ++i)
+        for(int i = JointDataBH::LShoulderPitch; i < JointDataBH::numOfJoints; ++i)
           kickEngineOutput.jointHardness.hardness[i] = 100;
 
         kickEngineOutput.isStable = true;
       }//this gotta go to config file and be more common
 
-      if(data.checkPhaseTime(theFrameInfo, theRobotDimensions, theFilteredJointData, theTorsoMatrix))
+      if(data.checkPhaseTime(theFrameInfoBH, theRobotDimensionsBH, theFilteredJointDataBH, theTorsoMatrixBH))
       {
         data.calcPhaseState();
-        data.calcPositions(kickEngineOutput, theFilteredJointData);
+        data.calcPositions(kickEngineOutput, theFilteredJointDataBH);
         data.setStaticReference();
-        timeSinceLastPhase = theFrameInfo.time;
+        timeSinceLastPhase = theFrameInfoBH.time;
       }
       else
       {
@@ -179,16 +159,16 @@ void KickEngine::update(KickEngineOutput& kickEngineOutput)
       //  if(data.isMotionAlmostOver()) //last three phases are unstable
       //    kickEngineOutput.isStable = false;
 
-      if(data.calcJoints(kickEngineOutput, theRobotDimensions, theHeadJointRequest))
+      if(data.calcJoints(kickEngineOutput, theRobotDimensionsBH, theHeadJointRequestBH))
       {
 #ifndef RELEASE
         data.debugFormMode(params);
 #endif
-        data.balanceCOM(kickEngineOutput, theRobotDimensions, theMassCalibration, theFilteredJointData);
-        data.calcJoints(kickEngineOutput, theRobotDimensions, theHeadJointRequest);
+        data.balanceCOM(kickEngineOutput, theRobotDimensionsBH, theMassCalibrationBH, theFilteredJointDataBH);
+        data.calcJoints(kickEngineOutput, theRobotDimensionsBH, theHeadJointRequestBH);
         data.mirrorIfNecessary(kickEngineOutput);
       }
-      data.addGyroBalance(kickEngineOutput, theJointCalibration, theFilteredSensorData, theMotionSelection.ratios[MotionRequest::kick]);
+      data.addGyroBalance(kickEngineOutput, theJointCalibrationBH, theFilteredSensorDataBH, theMotionSelectionBH.ratios[MotionRequestBH::kick]);
     }
   }
   else
@@ -196,8 +176,8 @@ void KickEngine::update(KickEngineOutput& kickEngineOutput)
     compensated = false;
   }
 
-  data.setEngineActivation(theMotionSelection.ratios[MotionRequest::kick]);
-  data.ModifyData(theMotionRequest.kickRequest, kickEngineOutput, params);
+  data.setEngineActivation(theMotionSelectionBH.ratios[MotionRequestBH::kick]);
+  data.ModifyData(theMotionRequestBH.kickRequest, kickEngineOutput, params);
 }
 
 MAKE_MODULE(KickEngine, Motion Control)

@@ -13,26 +13,26 @@ void Phase::serialize(In* in, Out* out)
 
   STREAM(duration);
 
-  Vector3<>& leftFootTra1(controlPoints[leftFootTra][1]);
-  Vector3<>& leftFootTra2(controlPoints[leftFootTra][2]);
-  Vector3<>& leftFootRot1(controlPoints[leftFootRot][1]);
-  Vector3<>& leftFootRot2(controlPoints[leftFootRot][2]);
-  Vector3<>& rightFootTra1(controlPoints[rightFootTra][1]);
-  Vector3<>& rightFootTra2(controlPoints[rightFootTra][2]);
-  Vector3<>& rightFootRot1(controlPoints[rightFootRot][1]);
-  Vector3<>& rightFootRot2(controlPoints[rightFootRot][2]);
-  Vector3<>& leftArmTra1(controlPoints[leftArmTra][1]);
-  Vector3<>& leftArmTra2(controlPoints[leftArmTra][2]);
-  Vector3<>& leftHandRot1(controlPoints[leftHandRot][1]);
-  Vector3<>& leftHandRot2(controlPoints[leftHandRot][2]);
-  Vector3<>& rightArmTra1(controlPoints[rightArmTra][1]);
-  Vector3<>& rightArmTra2(controlPoints[rightArmTra][2]);
-  Vector3<>& rightHandRot1(controlPoints[rightHandRot][1]);
-  Vector3<>& rightHandRot2(controlPoints[rightHandRot][2]);
-  Vector2<>& comTra1(comTra[1]);
-  Vector2<>& comTra2(comTra[2]);
-  Vector2<>& headTra1(headTra[1]);
-  Vector2<>& headTra2(headTra[2]);
+  Vector3BH<>& leftFootTra1(controlPoints[leftFootTra][1]);
+  Vector3BH<>& leftFootTra2(controlPoints[leftFootTra][2]);
+  Vector3BH<>& leftFootRot1(controlPoints[leftFootRot][1]);
+  Vector3BH<>& leftFootRot2(controlPoints[leftFootRot][2]);
+  Vector3BH<>& rightFootTra1(controlPoints[rightFootTra][1]);
+  Vector3BH<>& rightFootTra2(controlPoints[rightFootTra][2]);
+  Vector3BH<>& rightFootRot1(controlPoints[rightFootRot][1]);
+  Vector3BH<>& rightFootRot2(controlPoints[rightFootRot][2]);
+  Vector3BH<>& leftArmTra1(controlPoints[leftArmTra][1]);
+  Vector3BH<>& leftArmTra2(controlPoints[leftArmTra][2]);
+  Vector3BH<>& leftHandRot1(controlPoints[leftHandRot][1]);
+  Vector3BH<>& leftHandRot2(controlPoints[leftHandRot][2]);
+  Vector3BH<>& rightArmTra1(controlPoints[rightArmTra][1]);
+  Vector3BH<>& rightArmTra2(controlPoints[rightArmTra][2]);
+  Vector3BH<>& rightHandRot1(controlPoints[rightHandRot][1]);
+  Vector3BH<>& rightHandRot2(controlPoints[rightHandRot][2]);
+  Vector2BH<>& comTra1(comTra[1]);
+  Vector2BH<>& comTra2(comTra[2]);
+  Vector2BH<>& headTra1(headTra[1]);
+  Vector2BH<>& headTra2(headTra[2]);
 
   STREAM(leftFootTra1)
   STREAM(leftFootTra2)
@@ -141,9 +141,9 @@ void KickEngineParameters::calcControlPoints()
   }
 }
 
-Vector3<> KickEngineParameters::getPosition(const float& phase, const int& phaseNumber, const int& limb)
+Vector3BH<> KickEngineParameters::getPosition(const float& phase, const int& phaseNumber, const int& limb)
 {
-  Vector3<> p0, p1;
+  Vector3BH<> p0, p1;
   if(phaseNumber == 0)
   {
     p0 = phaseParameters[phaseNumber].originPos[limb];
@@ -155,15 +155,15 @@ Vector3<> KickEngineParameters::getPosition(const float& phase, const int& phase
     p1 = phaseParameters[phaseNumber].controlPoints[limb][0];
   }
 
-  Vector3<> p2 = phaseParameters[phaseNumber].controlPoints[limb][1];
-  Vector3<> p3 = phaseParameters[phaseNumber].controlPoints[limb][2];
+  Vector3BH<> p2 = phaseParameters[phaseNumber].controlPoints[limb][1];
+  Vector3BH<> p3 = phaseParameters[phaseNumber].controlPoints[limb][2];
 
   return (-p0 + p1 * 3 - p2 * 3 + p3) * phase * phase * phase + (p0 * 3 - p1 * 6 + p2 * 3) * phase * phase + (p0 * -3 + p1 * 3) * phase + p0;
 }
 
-Vector2<>KickEngineParameters::getComRefPosition(const float& phase, const int& phaseNumber)
+Vector2BH<>KickEngineParameters::getComRefPosition(const float& phase, const int& phaseNumber)
 {
-  Vector2<> p0, p1;
+  Vector2BH<> p0, p1;
   if(phaseNumber == 0)
   {
     p0 = phaseParameters[phaseNumber].comOriginPos;
@@ -175,15 +175,15 @@ Vector2<>KickEngineParameters::getComRefPosition(const float& phase, const int& 
     p1 = phaseParameters[phaseNumber].comTra[0];
   }
 
-  Vector2<> p2 = phaseParameters[phaseNumber].comTra[1];
-  Vector2<> p3 = phaseParameters[phaseNumber].comTra[2];
+  Vector2BH<> p2 = phaseParameters[phaseNumber].comTra[1];
+  Vector2BH<> p3 = phaseParameters[phaseNumber].comTra[2];
 
   return (-p0 + p1 * 3 - p2 * 3 + p3) * phase * phase * phase + (p0 * 3 - p1 * 6 + p2 * 3) * phase * phase + (p0 * -3 + p1 * 3) * phase + p0;
 }
 
-Vector2<>KickEngineParameters::getHeadRefPosition(const float& phase, const int& phaseNumber)
+Vector2BH<>KickEngineParameters::getHeadRefPosition(const float& phase, const int& phaseNumber)
 {
-  Vector2<> p0, p1;
+  Vector2BH<> p0, p1;
   if(phaseNumber == 0)
   {
     p0 = phaseParameters[phaseNumber].headOrigin;
@@ -195,8 +195,8 @@ Vector2<>KickEngineParameters::getHeadRefPosition(const float& phase, const int&
     p1 = phaseParameters[phaseNumber].headTra[0];
   }
 
-  Vector2<> p2 = phaseParameters[phaseNumber].headTra[1];
-  Vector2<> p3 = phaseParameters[phaseNumber].headTra[2];
+  Vector2BH<> p2 = phaseParameters[phaseNumber].headTra[1];
+  Vector2BH<> p3 = phaseParameters[phaseNumber].headTra[2];
 
   return (-p0 + p1 * 3 - p2 * 3 + p3) * phase * phase * phase + (p0 * 3 - p1 * 6 + p2 * 3) * phase * phase + (p0 * -3 + p1 * 3) * phase + p0;
 }
@@ -207,59 +207,59 @@ void KickEngineParameters::initFirstPhase()
   if(numberOfPhases > 0)
   {
     phaseParameters[0].originPos[Phase::leftFootTra] = footOrigin;
-    phaseParameters[0].originPos[Phase::rightFootTra] = Vector3<>(footOrigin.x, -footOrigin.y, footOrigin.z);
+    phaseParameters[0].originPos[Phase::rightFootTra] = Vector3BH<>(footOrigin.x, -footOrigin.y, footOrigin.z);
 
     phaseParameters[0].originPos[Phase::leftFootRot] = footRotOrigin;
-    phaseParameters[0].originPos[Phase::rightFootRot] = Vector3<>(-footRotOrigin.x, footRotOrigin.y, -footRotOrigin.z);
+    phaseParameters[0].originPos[Phase::rightFootRot] = Vector3BH<>(-footRotOrigin.x, footRotOrigin.y, -footRotOrigin.z);
 
     phaseParameters[0].originPos[Phase::leftArmTra] = armOrigin;
-    phaseParameters[0].originPos[Phase::rightArmTra] = Vector3<>(armOrigin.x, -armOrigin.y, armOrigin.z);
+    phaseParameters[0].originPos[Phase::rightArmTra] = Vector3BH<>(armOrigin.x, -armOrigin.y, armOrigin.z);
 
     phaseParameters[0].originPos[Phase::leftHandRot] = handRotOrigin;
-    phaseParameters[0].originPos[Phase::rightHandRot] = Vector3<>(-handRotOrigin.x, handRotOrigin.y, -handRotOrigin.z);
+    phaseParameters[0].originPos[Phase::rightHandRot] = Vector3BH<>(-handRotOrigin.x, handRotOrigin.y, -handRotOrigin.z);
 
     //set the Offset for the first Phase to zero, because all calculations based on the startOrigin
 
     phaseParameters[0].comOriginPos = comOrigin;
-    phaseParameters[0].comOriginOffset = Vector2<>(0.f, 0.f);
+    phaseParameters[0].comOriginOffset = Vector2BH<>(0.f, 0.f);
 
     phaseParameters[0].headOrigin = headOrigin;
 
     phaseParameters[0].controlPoints[Phase::leftFootTra][0] = footOrigin;
-    phaseParameters[0].controlPoints[Phase::rightFootTra][0] = Vector3<>(footOrigin.x, -footOrigin.y, footOrigin.z);
+    phaseParameters[0].controlPoints[Phase::rightFootTra][0] = Vector3BH<>(footOrigin.x, -footOrigin.y, footOrigin.z);
 
     phaseParameters[0].controlPoints[Phase::leftFootRot][0] = footRotOrigin;
-    phaseParameters[0].controlPoints[Phase::rightFootRot][0] = Vector3<>(-footRotOrigin.x, footRotOrigin.y, -footRotOrigin.z);
+    phaseParameters[0].controlPoints[Phase::rightFootRot][0] = Vector3BH<>(-footRotOrigin.x, footRotOrigin.y, -footRotOrigin.z);
 
     phaseParameters[0].controlPoints[Phase::leftArmTra][0] = armOrigin;
-    phaseParameters[0].controlPoints[Phase::rightArmTra][0] = Vector3<>(armOrigin.x, -armOrigin.y, armOrigin.z);
+    phaseParameters[0].controlPoints[Phase::rightArmTra][0] = Vector3BH<>(armOrigin.x, -armOrigin.y, armOrigin.z);
 
     phaseParameters[0].controlPoints[Phase::leftHandRot][0] = handRotOrigin;
-    phaseParameters[0].controlPoints[Phase::rightHandRot][0] = Vector3<>(-handRotOrigin.x, handRotOrigin.y, -handRotOrigin.z);
+    phaseParameters[0].controlPoints[Phase::rightHandRot][0] = Vector3BH<>(-handRotOrigin.x, handRotOrigin.y, -handRotOrigin.z);
 
     phaseParameters[0].comTra[0] = comOrigin;
   }
 }
 
-void KickEngineParameters::initFirstPhase(Vector3<> *origins, Vector2<> head)
+void KickEngineParameters::initFirstPhase(Vector3BH<> *origins, Vector2BH<> head)
 {
   for(int i = 0; i < Phase::numOfLimbs; ++i)
   {
     phaseParameters[0].originPos[i] = origins[i];
   }
-  phaseParameters[0].comOriginPos = Vector2<>(0.f, 0.f);
-  phaseParameters[0].comOriginOffset = Vector2<>(0.f, 0.f);
+  phaseParameters[0].comOriginPos = Vector2BH<>(0.f, 0.f);
+  phaseParameters[0].comOriginOffset = Vector2BH<>(0.f, 0.f);
   phaseParameters[0].headOrigin = head;
 }
 
-void KickEngineParameters::initFirstPhaseLoop(Vector3<> *origins, Vector2<> lastCom, Vector2<> head)
+void KickEngineParameters::initFirstPhaseLoop(Vector3BH<> *origins, Vector2BH<> lastCom, Vector2BH<> head)
 {
   for(int i = 0; i < Phase::numOfLimbs; ++i)
   {
     phaseParameters[0].originPos[i] = origins[i];
   }
   phaseParameters[0].comOriginPos = lastCom;
-  phaseParameters[0].comOriginOffset = Vector2<>(0.f, 0.f);
+  phaseParameters[0].comOriginOffset = Vector2BH<>(0.f, 0.f);
   phaseParameters[0].headOrigin = head;
 }
 

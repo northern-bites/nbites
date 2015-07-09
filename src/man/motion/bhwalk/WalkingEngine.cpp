@@ -214,8 +214,6 @@ void WalkingEngine::update(WalkingEngineOutputBH& walkingEngineOutput)
     theMotionInfoBH.motion = theMotionRequestBH.motion;
     theMotionInfoBH.specialActionRequest = theMotionRequestBH.specialActionRequest;
     theMotionInfoBH.walkRequest = theMotionRequestBH.walkRequest;
-    theMotionInfoBH.bikeRequest = theMotionRequestBH.bikeRequest;
-    theMotionInfoBH.indykickRequest = theMotionRequestBH.indykickRequest;
     theMotionInfoBH.isMotionStable = true;
 
     naoProvider->update(theJointDataBH, theSensorDataBH);
@@ -527,7 +525,7 @@ void WalkingEngine::generateJointRequest()
     jointRequest.angles[JointDataBH::RElbowRoll] = targetPosture.rightArmJointAngles[3];
 
     // compute torso orientation
-    bool transition = theMotionSelectionBH.ratios[MotionRequestBH::specialAction] > 0 || theMotionSelectionBH.ratios[MotionRequestBH::bike] > 0 || theMotionSelectionBH.ratios[MotionRequestBH::getUp] > 0;
+    bool transition = theMotionSelectionBH.ratios[MotionRequestBH::specialAction] > 0 || theMotionSelectionBH.ratios[MotionRequestBH::getUp] > 0;
     float additionalBodyRotation = (((targetPosture.rightOriginToCom.y - targetPosture.rightOriginToFoot.translation.y) - standComPosition.y) + ((targetPosture.leftOriginToCom.y - targetPosture.leftOriginToFoot.translation.y) + standComPosition.y)) * 0.5f;
     additionalBodyRotation *= 1.f / (22.5f - 50.f);
     additionalBodyRotation *= walkComBodyRotation;

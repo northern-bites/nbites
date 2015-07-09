@@ -6,11 +6,7 @@
 
 #pragma once
 
-#ifndef WINDOWS
 #include <dirent.h>
-#else
-#include <windows.h>
-#endif
 #include <cstdio>
 #include <cstring>
 
@@ -25,19 +21,19 @@
 #include "Representations/Sensing/TorsoMatrix.h"
 
 MODULE(KickEngine)
-  REQUIRES(RobotDimensions),
-  REQUIRES(JointCalibration),
-  REQUIRES(FrameInfo),
-  REQUIRES(FilteredSensorData),
-  REQUIRES(MotionSelection),
-  REQUIRES(MotionRequest),
-  REQUIRES(FilteredJointData),
-  REQUIRES(MassCalibration),
-  REQUIRES(RobotModel),
-  REQUIRES(WalkingEngineStandOutput),
-  REQUIRES(TorsoMatrix),
-  REQUIRES(HeadJointRequest),
-  PROVIDES_WITH_MODIFY(KickEngineOutput),
+  REQUIRES(RobotDimensionsBH)
+  REQUIRES(JointCalibrationBH)
+  REQUIRES(FrameInfoBH)
+  REQUIRES(FilteredSensorDataBH)
+  REQUIRES(MotionSelectionBH)
+  REQUIRES(MotionRequestBH)
+  REQUIRES(FilteredJointDataBH)
+  REQUIRES(MassCalibrationBH)
+  REQUIRES(RobotModelBH)
+  REQUIRES(WalkingEngineStandOutputBH)
+  REQUIRES(TorsoMatrixBH)
+  REQUIRES(HeadJointRequestBH)
+  PROVIDES_WITH_MODIFY(KickEngineOutput)
 END_MODULE
 
 class KickEngine : public KickEngineBase

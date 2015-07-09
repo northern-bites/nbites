@@ -17,19 +17,19 @@
 STREAMABLE(DynPoint,
 {
 public:
-  DynPoint() = default;
-  DynPoint(int limb, int phaseNumber, int duration, const Vector3<>& translation, const Vector3<>& angle, const Vector3<>& odometryOffset);
-  DynPoint(int limb, int phaseNumber, const Vector3<>& translation),
+//  DynPoint() = default;
+    DynPoint(int limb, int phaseNumber, int duration, const Vector3BH<>& translation, const Vector3BH<>& angle, const Vector3BH<>& odometryOffset);
+  DynPoint(int limb, int phaseNumber, const Vector3BH<>& translation),
 
   (int) limb,
   (int) phaseNumber,
   (int) duration,
-  (Vector3<>) translation,
-  (Vector3<>) angle,
-  (Vector3<>) odometryOffset,
+  (Vector3BH<>) translation,
+  (Vector3BH<>) angle,
+  (Vector3BH<>) odometryOffset,
 });
 
-inline DynPoint::DynPoint(int limb, int phaseNumber, int duration, const Vector3<>& translation, const Vector3<>& angle, const Vector3<>& odometryOffset)
+inline DynPoint::DynPoint(int limb, int phaseNumber, int duration, const Vector3BH<>& translation, const Vector3BH<>& angle, const Vector3BH<>& odometryOffset)
 : limb(limb),
   phaseNumber(phaseNumber),
   duration(duration),
@@ -37,7 +37,7 @@ inline DynPoint::DynPoint(int limb, int phaseNumber, int duration, const Vector3
   angle(angle),
   odometryOffset(odometryOffset) {}
 
-inline DynPoint::DynPoint(int limb, int phaseNumber, const Vector3<>& translation)
+inline DynPoint::DynPoint(int limb, int phaseNumber, const Vector3BH<>& translation)
 : limb(limb),
   phaseNumber(phaseNumber),
   duration(0), //no change
@@ -59,13 +59,13 @@ public:
 
   unsigned int duration;
 
-  Vector3<> controlPoints[Phase::numOfLimbs][NUM_OF_POINTS];
-  Vector2<> comTra[NUM_OF_POINTS];
-  Vector2<> headTra[NUM_OF_POINTS];
+  Vector3BH<> controlPoints[Phase::numOfLimbs][NUM_OF_POINTS];
+  Vector2BH<> comTra[NUM_OF_POINTS];
+  Vector2BH<> headTra[NUM_OF_POINTS];
 
-  Vector3<> originPos[Phase::numOfLimbs];
-  Vector2<> comOriginPos, comOriginOffset, headOrigin;
-  Vector3<> odometryOffset;
+  Vector3BH<> originPos[Phase::numOfLimbs];
+  Vector2BH<> comOriginPos, comOriginOffset, headOrigin;
+  Vector3BH<> odometryOffset;
 
   virtual void serialize(In* in, Out* out);
 };
@@ -79,8 +79,8 @@ public:
   bool loop, autoComTra, ignoreHead;
   char name[260];
 
-  Vector3<> footOrigin, armOrigin, footRotOrigin, handRotOrigin;
-  Vector2<> comOrigin, headOrigin;
+  Vector3BH<> footOrigin, armOrigin, footRotOrigin, handRotOrigin;
+  Vector2BH<> comOrigin, headOrigin;
 
   std::vector<Phase> phaseParameters;
   float kpx, kdx, kix, kpy, kdy, kiy;
@@ -94,14 +94,14 @@ public:
 
   void calcControlPoints();
 
-  Vector3<> getPosition(const float& phase, const int& phaseNumber, const int& limb);
+  Vector3BH<> getPosition(const float& phase, const int& phaseNumber, const int& limb);
 
-  Vector2<> getComRefPosition(const float& phase, const int& phaseNumber);
-  Vector2<> getHeadRefPosition(const float& phase, const int& phaseNumber);
+  Vector2BH<> getComRefPosition(const float& phase, const int& phaseNumber);
+  Vector2BH<> getHeadRefPosition(const float& phase, const int& phaseNumber);
 
   void initFirstPhase();
-  void initFirstPhase(Vector3<>* origins, Vector2<> head);
-  void initFirstPhaseLoop(Vector3<> *origins, Vector2<> lastCom, Vector2<> head);
+  void initFirstPhase(Vector3BH<>* origins, Vector2BH<> head);
+  void initFirstPhaseLoop(Vector3BH<> *origins, Vector2BH<> lastCom, Vector2BH<> head);
 
   KickEngineParameters():
     numberOfPhases(0),

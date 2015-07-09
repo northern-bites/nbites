@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "Modules/MotionControl/KickEngine/KickEngineParameters.h"
+#include "KickEngine/KickEngineParameters.h"
 #include "Tools/Streams/AutoStreamable.h"
 
 STREAMABLE(KickRequest,
