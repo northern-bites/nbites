@@ -22,36 +22,42 @@ def atDestination(nav):
 
     return relDest.within((x, y, h))
 
-# Transition: Should I perform a dodge wiith arms or sonars? Sets up dodge params.
+
 def shouldDodge(nav):
     # If nav isn't avoiding things, just no
     if not states.goToPosition.avoidObstacles:
         return False
 
-    for i in range(1, len(nav.brain.obstacles)):
-        if (nav.brain.obstacleDetectors[i] == 's' or
-            nav.brain.obstacleDetectors[i] == 'a'):
+    # these will let us know if we didn't have an obstacle detector of this type
+    shouldDodge.prevSOrACount = shouldDodge.sOrACount
+    shouldDodge.prevVCount = shouldDodge.vCount
+
+    shouldDodge.willDodge = False
+
+    for i, detector in enumerate(nav.brain.obstacleDetectors):
+        if detector == 's' or detector == 'a':
+            shouldDodge.sOrACount += 1
+            if shouldDodge.sOrACount >= 7:
+                shouldDodge.willDodge = True
+        elif detector == 'v':
+            shouldDodge.vCount += 1
+            if shouldDodge.vCount >= 3:
+                shouldDodge.willDodge = True
+
+        if shouldDodge.willDodge:
+            shouldDodge.sOrACount = 0
+            shouldDodge.vCount = 0
             states.dodge.obstaclePosition = i
             doneDodging.timer = 0
             doneDodging.obstaclePosition = i
-            doneDodging.detectorDodged = nav.brain.obstacleDetectors[i]
+            doneDodging.detectorDodged = detector
             return True
-
-    return False
-
-# Transition: Should I perform a dodge if my vision tells me there's an obstacle?
-def shouldDodgeVision(nav):
-    # If nav isn't avoiding things, just no
-    if not states.goToPosition.avoidObstacles:
-        return False
-
-    for i in range(1, len(nav.brain.obstacles)):
-        if (nav.brain.obstacleDetectors[i] == 'v'):
-            states.dodge.obstaclePosition = i
-            doneDodging.timer = 0
-            doneDodging.obstaclePosition = i
-            doneDodging.detectorDodged = nav.brain.obstacleDetectors[i]
-            return True
+            
+    # reset counters if we did not get that observation
+    if shouldDodge.prevSOrACount == shouldDodge.sOrACount:
+        shouldDodge.sOrACount = 0
+    if shouldDodge.prevVCount == shouldDodge.vCount:
+        shouldDodge.vCount = 0
 
     return False
 

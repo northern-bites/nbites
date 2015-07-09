@@ -179,6 +179,13 @@ class HeadTracker(FSA.FSA):
         self.kickName = name
         self.switchTo('afterKickScan')
 
+    def trackObstacle(self, direction):
+        """
+        Track visual obstacle so we can dodge accordingly
+        """
+        self.obstacleDir = direction
+        self.switchTo('trackObstacle')
+
     # Not currently used, but would be good functionality to have in the future.
     # TODO: add this functionality back in
     def lookAtTarget(self, target):

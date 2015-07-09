@@ -59,3 +59,9 @@ KICK_DICT = {"L_Side"               : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
              }
 # TODO: Test and improve these pans.
 
+OBSTACLE_DICT = { "1": HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+                  "2" : HeadMoves.FIXED_PITCH_LOOK_LESS_RIGHT,
+                  "3" : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
+                  "7" : HeadMoves.FIXED_PITCH_LOOK_LEFT,
+                  "8" : HeadMoves.FIXED_PITCH_LOOK_LESS_LEFT     
+            }

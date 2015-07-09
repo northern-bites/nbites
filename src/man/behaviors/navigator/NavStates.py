@@ -4,7 +4,7 @@ import NavTransitions as navTrans
 import Navigator as Navigator
 from collections import deque
 from objects import RobotLocation, RelRobotLocation
-from ..util import Transition
+from ..util import *
 from math import fabs, degrees, copysign
 from random import random
 
@@ -121,6 +121,9 @@ def goToPosition(nav):
 
         helper.setDestination(nav, relDest, speed)
 
+    if navTrans.shouldDodge(nav):
+        return nav.goNow('dodge')
+        
     return Transition.getNextState(nav, goToPosition)
 
 goToPosition.speed = "speed gain from 0 to 1"
@@ -136,6 +139,7 @@ goToPosition.close = False
 def dodge(nav):
 
     if nav.firstFrame():
+        nav.brain.tracker.trackObstacle(str(dodge.obstaclePosition))
         ## SET UP the dodge direction based on where the obstacle is
         # if directly in front of us, move back and to one side based on
         # where the goToPosition dest is

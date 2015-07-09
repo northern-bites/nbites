@@ -52,6 +52,11 @@ class Navigator(FSA.FSA):
         self.velocity = 0.
         self.requestVelocity = 0.
         self.destination = None # Used to set walking_to in world model proto
+
+        # initialize obstacle counts
+        navTrans.shouldDodge.sOrACount = 0
+        navTrans.shouldDodge.vCount = 0
+
         #transitions
         #@todo: move this to the actual transitions file?
         self.atLocPositionTransition = Transition.CountTransition(navTrans.atDestination,
@@ -63,17 +68,6 @@ class Navigator(FSA.FSA):
 
         NavStates.goToPosition.transitions = {
             self.atLocPositionTransition : NavStates.atPosition,
-
-            Transition.CountTransition(navTrans.shouldDodgeVision,
-                                       Transition.OCCASIONALLY,
-                                       Transition.LOW_PRECISION)
-            : NavStates.dodge,
-
-            Transition.CountTransition(navTrans.shouldDodge,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : NavStates.dodge
-
             }
 
         NavStates.dodge.transitions = {

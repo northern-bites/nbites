@@ -235,3 +235,13 @@ def afterKickScan(tracker):
         tracker.performHeadMove(constants.KICK_DICT[tracker.kickName])
 
     return tracker.stay()
+
+def trackObstacle(tracker):
+    """
+    Looks in the direction the ball was kicked in.
+    If the ball is seen, go to state 'ballTracking'.
+    """
+    if tracker.firstFrame():
+        tracker.performHeadMove(constants.OBSTACLE_DICT[tracker.obstacleDir])
+
+    return tracker.stay()
