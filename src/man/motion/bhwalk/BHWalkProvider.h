@@ -22,6 +22,7 @@
 
 //BH
 #include "WalkingEngine.h"
+#include "KickEngine/KickEngine.h"
 #include "Representations/Blackboard.h"
 #include "Tools/Math/Pose2D.h"
 
@@ -83,6 +84,8 @@ public:
 
     void setStandby(bool value) { standby = value; }
 
+
+    static int frameCount;
 protected:
     void stand();
     void setActive() {}
@@ -96,6 +99,7 @@ private:
     Pose2DBH startOdometry;
 
     WalkingEngine *walkingEngine;
+    KickEngine *kickEngine;
     Blackboard *blackboard;
     };
 } // namespace motion

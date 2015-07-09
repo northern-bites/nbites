@@ -14,7 +14,7 @@ namespace man
 {
 namespace motion
 {
-
+int BHWalkProvider::frameCount = 0;
 using namespace boost;
 
 // TODO make this consistent with new walk
@@ -67,14 +67,16 @@ BHWalkProvider::BHWalkProvider()
     // Setup the blackboard (used by bhuman to pass data around modules)
 	blackboard = new Blackboard;
 
-    // Setup the walk engine
+    // Setup the walk engine & kick engine
 	walkingEngine = new WalkingEngine;
+    kickEngine = new KickEngine;
     hardReset();
 }
 
 BHWalkProvider::~BHWalkProvider()
 {
     delete blackboard;
+    delete kickEngine;
     delete walkingEngine;
 }
 
@@ -116,6 +118,9 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     const messages::FSR&           sensorFSRs
     ) 
 {
+    BHWalkProvider::frameCount++;
+
+
 
     PROF_ENTER(P_WALK);
 
@@ -315,7 +320,36 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     bh_sensors.data[SensorDataBH::fsrLBR] = sensorFSRs.lrr();
 
     WalkingEngineOutputBH output;
-    walkingEngine->update(output);
+
+    KickEngineOutput ko;
+    if (BHWalkProvider::frameCount > 600) {
+//        std::cout << "REQUESTING A KICK!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+        MotionRequestBH motionRequest;
+        motionRequest.motion = MotionRequestBH::kick;
+        motionRequest.kickRequest.kickMotionType = KickRequest::getKickMotionFromName("kickForward");
+//        std::cout << "The kick is: " << (int)motionRequest.kickRequest.kickMotionType << std::endl;
+
+        WalkingEngineStandOutputBH standout;
+        walkingEngine->theMotionRequestBH = motionRequest;
+        walkingEngine->update(output);
+        walkingEngine->update(standout);
+
+        kickEngine->theMotionRequestBH = motionRequest;
+        kickEngine->theWalkingEngineStandOutputBH = standout;
+
+        kickEngine->update(ko);
+    }
+    else {
+        walkingEngine->update(output);
+    }
+    // else if (BHWalkProvider::frameCount > 600) {
+    //     std::cout << "Updating with contents of request!!" << std::endl;
+    //     WalkingEngineStandOutputBH standout;
+    //     walkingEngine->update(standout);
+    //     kickEngine->theWalkingEngineStandOutputBH = standout;
+
+    //     kickEngine->update(ko);
+    // }
 
     // Update justMotionKicked so that we do not motion kick multiple times in a row
     if (output.executedWalk.kickType != WalkRequest::none) { // if we succesfully motion kicked
@@ -332,12 +366,24 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         std::vector<float> chain_hardness;
         for (unsigned j = Kinematics::chain_first_joint[i];
                      j <= Kinematics::chain_last_joint[i]; j++) {
-            chain_angles.push_back(output.angles[nb_joint_order[j]] * walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].sign - walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].offset);
+            if (BHWalkProvider::frameCount < 600) {
+                chain_angles.push_back(output.angles[nb_joint_order[j]] * walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].sign - walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].offset);
             if (output.jointHardness.hardness[nb_joint_order[j]] == 0) {
                 chain_hardness.push_back(MotionConstants::NO_STIFFNESS);
             } else {
                 chain_hardness.push_back(output.jointHardness.hardness[nb_joint_order[j]] / 100.f);
             }
+            }
+            else {
+                chain_angles.push_back(ko.angles[nb_joint_order[j]] * walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].sign - walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].offset);
+                //std::cout << "Angle: " << j << " " << ko.angles[nb_joint_order[j]] << std::endl;
+            if (ko.jointHardness.hardness[nb_joint_order[j]] == 0) {
+                chain_hardness.push_back(MotionConstants::NO_STIFFNESS);
+            } else {
+                chain_hardness.push_back(ko.jointHardness.hardness[nb_joint_order[j]] / 100.f);
+            }
+            }
+
 
         }
         this->setNextChainJoints((Kinematics::ChainID) i, chain_angles);
