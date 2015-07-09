@@ -375,6 +375,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.LOW_PRECISION)
             : GoalieStates.lineCheckReposition,
 
+            # Transition.CountTransition(GoalieTransitions.facingSideways,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.LOW_PRECISION)
+            # : GoalieStates.lineCheckReposition,
+
             Transition.CountTransition(GoalieTransitions.frontLineCheckShouldReposition,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
@@ -473,7 +478,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.doneWalking,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : VisualGoalieStates.returnToGoal
+            : GoalieStates.moveBackwards #returnToGoal
             }
 
         GoalieStates.recoverMyself.transitions = {

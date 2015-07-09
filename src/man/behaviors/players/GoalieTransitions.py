@@ -94,12 +94,16 @@ def facingBackward(player):
 
 def facingSideways(player):
     if player.brain.visionLines.horizon_dist > 200 and\
-    player.brain.visionLines.horizon_dist < 200 and\
+    player.brain.visionLines.horizon_dist < 600 and\
     math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 10.0:
-        print("I'm FACing backWARDS! yaw:", math.degrees(player.brain.interface.joints.head_yaw))
+        print("I'm FACing sideways! yaw:", math.degrees(player.brain.interface.joints.head_yaw))
         player.homeDirections += [RelRobotLocation(0, 0, 180.0)]
         player.homeDirections = player.homeDirections[1:]
+        print("horizon", player.brain.visionLines.horizon_dist)
         return True
+    elif math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 10.0:
+        print "I'm Def NOT facing sideways!!"
+        print("horizon", player.brain.visionLines.horizon_dist)
     return False
 
 def facingFront(player):
@@ -173,6 +177,10 @@ def shouldTurn(player):
     longestLine = None
     longestLength = 0.0
 
+    if facingSideways(player):
+        print "I'm facing sideways..."
+        print("My loc.h:", player.brain.loc.h)
+
     for line in GoalieStates.watchWithLineChecks.lines:
         r = line.r
         t = math.degrees(line.t)
@@ -229,6 +237,7 @@ def shouldTurn(player):
             print ("hdest: ", h_dest)
             print ("t was: ", t)
             print ("r was:", r)
+            print ("length of line:", longestLength)
             if h_dest > 100.0:
                 print "Turn too big, not actually doing it!!"
                 return False
@@ -714,21 +723,21 @@ def shouldMoveBackwards(player):
 
     return True
 
-def facingSideways(player):
-    """
-    If the robot is facing a post directly, it's probably turned around.
-    """
-    if ((player.brain.yglp.on and
-         math.fabs(player.brain.yglp.bearing_deg) < 20.0 and
-         player.brain.yglp.bearing_deg != 0.0 and
-         player.brain.yglp.distance < 300.0) or
-        (player.brain.ygrp.on and
-         math.fabs(player.brain.ygrp.bearing_deg) < 20.0 and
-         player.brain.ygrp.bearing_deg != 0.0 and
-         player.brain.ygrp.distance < 300.0)):
-        return True
-    else:
-        return False
+# def facingSideways(player):
+#     """
+#     If the robot is facing a post directly, it's probably turned around.
+#     """
+#     if ((player.brain.yglp.on and
+#          math.fabs(player.brain.yglp.bearing_deg) < 20.0 and
+#          player.brain.yglp.bearing_deg != 0.0 and
+#          player.brain.yglp.distance < 300.0) or
+#         (player.brain.ygrp.on and
+#          math.fabs(player.brain.ygrp.bearing_deg) < 20.0 and
+#          player.brain.ygrp.bearing_deg != 0.0 and
+#          player.brain.ygrp.distance < 300.0)):
+#         return True
+#     else:
+#         return False
 
 def facingBackwards(player):
     return player.brain.interface.visionField.visual_field_edge.distance_m < 110.0
