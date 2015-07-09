@@ -15,6 +15,8 @@
 #include "Tools/Math/Pose3D.h"
 #include <cerrno>
 
+using namespace std;
+
 KickEngine::KickEngine() :
 compensate(false),
 compensated(false),
@@ -112,10 +114,101 @@ timeSinceLastPhase(0)
   strcpy(newKickMotion.name, "newKick");
   params.push_back(newKickMotion);
 #endif
-};
+
+    naoProvider = new NaoProvider();
+    jointFilter = new JointFilter();
+    robotModelProvider = new RobotModelProvider();
+    groundContactDetector = new GroundContactDetector();
+    inertiaSensorCalibrator = new InertiaSensorCalibrator();
+    inertiaSensorFilter = new InertiaSensorFilter();
+    sensorFilter = new SensorFilter();
+    fallDownStateDetector = new FallDownStateDetector();
+    torsoMatrixProvider = new TorsoMatrixProvider();
+    motionSelector = new MotionSelector();
+
+    init();
+}
+
+KickEngine::~KickEngine()
+{
+    delete naoProvider;
+    delete jointFilter;
+    delete robotModelProvider;
+    delete groundContactDetector;
+    delete inertiaSensorCalibrator;
+    delete inertiaSensorFilter;
+    delete sensorFilter;
+    delete fallDownStateDetector;
+    delete torsoMatrixProvider;
+    delete motionSelector;
+}
+
+void KickEngine::init()
+{
+    InMapFile hardnessStream(ModuleBase::config_path + "hardnessSettings.cfg");
+    if (hardnessStream.exists()) {
+        hardnessStream >> theHardnessSettingsBH;
+    } else {
+        cout << "Could not find hardnessSettings.cfg!" << endl;
+    }
+
+    InMapFile sensorStream(ModuleBase::config_path + "sensorCalibration.cfg");
+    if (sensorStream.exists()) {
+        sensorStream >> theSensorCalibrationBH;
+    } else {
+        cout << "Could not find sensorCalibration.cfg!" << endl;
+    }
+
+    InMapFile jointCalibrateStream(ModuleBase::config_path + "jointCalibration.cfg");
+    if (jointCalibrateStream.exists()) {
+        jointCalibrateStream >> theJointCalibrationBH;
+    } else {
+        cout << "Could not find jointCalibration.cfg!" << endl;
+    }
+
+#ifdef V5_ROBOT
+    InMapFile massCalibrationStream(ModuleBase::config_path + "massCalibrationV5.cfg");
+#else
+    InMapFile massCalibrationStream(ModuleBase::config_path + "massCalibrationV4.cfg");
+#endif
+    if (massCalibrationStream.exists()) {
+        massCalibrationStream >> theMassCalibrationBH;
+    } else {
+        cout << "Could not find massCalibration.cfg!" << endl;
+    }
+
+    InMapFile robotDimensionsStream(ModuleBase::config_path + "robotDimensions.cfg");
+    if (robotDimensionsStream.exists()) {
+        robotDimensionsStream >> theRobotDimensionsBH;
+    } else {
+        cout << "Could not find robotDimensions.cfg!" << endl;
+    }
+
+    InMapFile damageStream(ModuleBase::config_path + "damageConfiguration.cfg");
+    if (damageStream.exists()) {
+        damageStream >> theDamageConfigurationBH;
+    } else {
+        cout << "Could not find damageConfiguration.cfg!" << endl;
+    }
+}
 
 void KickEngine::update(KickEngineOutput& kickEngineOutput)
 {
+    // Update requisite modules
+    naoProvider->update(theJointDataBH, theSensorDataBH);
+    naoProvider->update(theFrameInfoBH);
+    jointFilter->update(theFilteredJointDataBH);
+    robotModelProvider->update(theRobotModelBH);
+    groundContactDetector->update(theGroundContactStateBH);
+    inertiaSensorCalibrator->update(theInertiaSensorDataBH);
+    inertiaSensorFilter->update(theOrientationDataBH);
+    sensorFilter->update(theFilteredSensorDataBH);
+    fallDownStateDetector->update(theFallDownStateBH);
+    torsoMatrixProvider->update(theOdometryDataBH);
+    torsoMatrixProvider->update(theTorsoMatrixBH);
+    motionSelector->update(theMotionSelectionBH);
+
+
   if(theMotionSelectionBH.ratios[MotionRequestBH::kick] > 0.f)
   {
     data.setCycleTime(theFrameInfoBH.cycleTime);
