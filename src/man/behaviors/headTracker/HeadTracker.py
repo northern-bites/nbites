@@ -99,9 +99,6 @@ class HeadTracker(FSA.FSA):
     def repeatFastNarrowPan(self):
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN_NARROW_FAST)
 
-    def performBasicPan(self):
-        self.performHeadMove(HeadMoves.FIXED_PITCH_PAN)
-
     # @param invert: false if pan should start to the left,
     #                true if pan should start to the right
     def performKickPan(self, invert = False):
