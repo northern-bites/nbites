@@ -18,6 +18,10 @@
 namespace man {
 namespace vision {
 
+// Azimuth tilt error mapped to line: y = |mx+b|
+const double AZ_M = 0.0007;
+const double AZ_B = -0.0011;
+
 class VisionModule : public portals::Module {
 public:
     VisionModule(int wd, int ht, std::string robotName = "");

@@ -146,7 +146,13 @@ void VisionModule::run_()
             homography[i]->wy0(kinematics[i]->wy0());
             homography[i]->wz0(kinematics[i]->wz0());
             homography[i]->roll(calibrationParams[i]->getRoll());
-            homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt());
+
+            double azOffset = AZ_M*kinematics[i]->tilt() + AZ_B;
+            if (kinematics[i]->tilt() < 0) {
+                homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt() - azOffset);
+            } else {
+                homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt() + azOffset);
+            }
 #ifndef OFFLINE
             homography[i]->azimuth(kinematics[i]->azimuth());
 #endif
