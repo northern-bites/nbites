@@ -68,6 +68,7 @@ class KickDecider(object):
         self.addPassesToFieldCross()
         self.addShotsOnGoal()
 
+
         kickReturned =  (kick for kick in self.possibleKicks).next().next()
         print "Kick being used: ", kickReturned
 
@@ -413,6 +414,30 @@ class KickDecider(object):
         except:
             return None
 
+    def allKicksOnGoal(self):
+        self.brain.player.motionKick = True
+
+        print "In allKicksOnGoal"
+        self.kicks = []
+        self.kicks.append(kicks.M_LEFT_STRAIGHT)
+        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
+
+        self.scoreKick = self.minimizeOrbitTime
+
+        self.filters = []
+        self.filters.append(self.crossesGoalLine)
+        #self.filters.append(self.inBounds)
+
+        self.addShotsOnBackOfGoal()
+
+        try:
+            kickReturned =  (kick for kick in self.possibleKicks).next().next()
+            print "Kick being used: ", kickReturned
+            return kickReturned
+        except:
+            print "There was an exception in all Kicks on Goal"
+            None
+
     def allKicksAsapOnGoal(self):
         print "In allKicksAsapOnGoal"
 
@@ -502,25 +527,14 @@ class KickDecider(object):
             return k
         except:
             return None
-
-    def nearOurGoal(self):
-        nearOurGoal = (math.fabs(self.brain.loc.h) > 100 and 
-                                self.brain.ball.x < nogginC.LANDMARK_BLUE_GOAL_CROSS_X)
-        if nearOurGoal:
-            out = self.kickOutOfBounds()
-            if out:
-                self.brain.player.kickedOut = True
-                return out
-            else:
-                return None
-        else:
-            return None
-
+    
+    ###########################
     ### HIGH LEVEL PLANNERS ###
-    def attacker(self):
-        goalShot = self.allKicksAsapOnGoal()
+    ###########################
+    def decidingStrategy(self):
+        goalShot = self.allKicksOnGoal()
         if goalShot:
-            print "allKicksAsapOnGoal returned"
+            print "allKicksOnGoal returned"
             return goalShot
 
         nearGoal = self.nearOurGoal()
@@ -532,7 +546,6 @@ class KickDecider(object):
         # if frontKicks: 
         #     return frontKicks
 
-        #if self.brain.loc.x < nogginC.MIDFIELD_X:
         asap = self.motionKicksAsap()
         if asap:
             print "motionKicksAsap on goal returned"
@@ -555,6 +568,19 @@ class KickDecider(object):
             return asap
 
         return self.frontKickCrosses()
+
+    def nearOurGoal(self):
+        nearOurGoal = (math.fabs(self.brain.loc.h) > 100 and 
+                                self.brain.ball.x < nogginC.LANDMARK_BLUE_GOAL_CROSS_X)
+        if nearOurGoal:
+            out = self.kickOutOfBounds()
+            if out:
+                self.brain.player.kickedOut = True
+                return out
+            else:
+                return None
+        else:
+            return None
 
     def obstacleAware(self, clearing = False):
         motionKicksOnGoal = self.motionKicksAsapOnGoal()
@@ -615,6 +641,23 @@ class KickDecider(object):
                                                                             nogginC.CENTER_FIELD_Y,
                                                                             precision))
 
+    def addShotsOnBackOfGoal(self):
+        x = nogginC.OPP_GOALBOX_RIGHT_X - self.brain.ball.x + 50 
+        y1 = nogginC.OPP_GOALBOX_MIDDLE_Y - self.brain.ball.y
+        y2 = nogginC.OPP_GOALBOX_MIDDLE_Y - constants.SHOT_PRECISION - self.brain.ball.y
+        # Two vectors that share an x coordinate but have diff y coordinates
+        toGoalCenterMagnitude = math.sqrt(x**2+y1**2)
+        toGoalCenterMinusPrecisionMagnitude = math.sqrt(x**2+y2**2)
+        # Formula for angle between two vectors, cos(theta) = a.b/||a||||b||
+        theta = math.acos((x*x+y1*y2)/(toGoalCenterMagnitude*toGoalCenterMinusPrecisionMagnitude))
+        precision = toGoalCenterMagnitude*math.tan(theta)
+        self.possibleKicks = itertools.chain(self.possibleKicks,
+                                             self.generateKicksFromGoalDest(nogginC.OPP_GOALBOX_RIGHT_X + 50,
+                                                                            nogginC.CENTER_FIELD_Y,
+                                                                            precision))
+
+
+
     def addPassesTo(self, location):
         self.possibleKicks = itertools.chain(self.possibleKicks,
                                              self.generateKicksFromGoalDest(location.x,
@@ -655,12 +698,20 @@ class KickDecider(object):
             filteredKicks = kicks
 
         try:
-            yield max(filteredKicks,key=self.scoreKick)
+            tempVar = max(filteredKicks,key=self.scoreKick)
+            print "This is the max scored kick", tempVar
+            yield tempVar
         except ValueError:
             print "No kick satisfied the filter req's"
-            var = filteredKicks.next()
-            print var
-            yield  var
+            yield filteredKicks #list is empty
+            #try:
+            #    varIter = iter(filteredKicks)
+            #    var = varIter.next()
+            #    print "Sending kick: ", var
+            #    yield var
+            #except StopIteration:
+            #    print "Empty list in the filter function"
+            #    yield  var
 
     def generateFastestPossibleKicks(self):
         for k in self.kicks:
@@ -737,6 +788,7 @@ class KickDecider(object):
     ### SCORE KICK FUNCTIONS ###
     def minimizeOrbitTime(self, kick):
         orbitTime = abs(self.normalizeAngle(kick.setupH - self.brain.loc.h))
+        print "Orbit time: ", -orbitTime
         return -orbitTime
 
     def minimizeKickTime(self, kick):
@@ -757,7 +809,7 @@ class KickDecider(object):
                               nogginC.CENTER_FIELD_Y)
         return (offset - math.sqrt((kick.destinationX - goalCenter.x)**2 +
                                    (kick.destinationY - goalCenter.y)**2))
-
+    
     ### FILTERS ###
 
     # can we kick it out of bounds behind our own goal without scoring an own goal?
