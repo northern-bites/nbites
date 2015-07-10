@@ -74,7 +74,7 @@ def positionAtHome(player):
         else:
             player.brain.tracker.trackBall()
         
-        fastWalk = role.isCherryPicker(player.role)
+        fastWalk = role.isChaser(player.role)
         player.brain.nav.goTo(home, precision = nav.HOME,
                               speed = nav.QUICK_SPEED, avoidObstacles = True,
                               fast = fastWalk, pb = False)
@@ -99,27 +99,23 @@ def watchForBall(player):
 @stay
 @ifSwitchLater(shared.ballOffForNFrames(120), 'playOffBall')
 def positionAsSupporter(player):
-    if (role.isChaser(player.role) and role.isChaser(player.roleOfClaimer) and 
-        player.brain.ball.distance > hypot(CHASER_DISTANCE, CHASER_DISTANCE)):
-        fast = True
-    else:
-        fast = False
-
     positionAsSupporter.position = getSupporterPosition(player, player.role)
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
 
+        fastWalk = role.isChaser(player.role)
+
         player.brain.nav.goTo(positionAsSupporter.position, precision = nav.GENERAL_AREA,
                               speed = nav.QUICK_SPEED, avoidObstacles = True,
-                              fast = False, pb = False)
+                              fast = fastWalk, pb = False)
 
     if positionAsSupporter.position.distTo(player.brain.loc) > 20:
         player.brain.nav.goTo(positionAsSupporter.position, precision = nav.GENERAL_AREA,
                               speed = nav.QUICK_SPEED, avoidObstacles = True,
-                              fast = False, pb = False)
+                              fast = fastWalk, pb = False)
     
-    player.brain.nav.updateDest(positionAsSupporter.position, fast=fast)
+    player.brain.nav.updateDest(positionAsSupporter.position, fast = fastWalk)
 
 @superState('playOffBall')
 @stay
