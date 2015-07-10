@@ -184,17 +184,7 @@ void VisionModule::run_()
 //        if (!i) centerCircleDetected = centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]));
  
         // Pair hough lines to field lines
-        fieldLines[i]->find(*(houghLines[i]), true);
-
-        double tiltBefore = homography[i]->tilt();
-        if (homography[i]->calibrateFromStar(*fieldLines[i])) {
-            double tiltAfter = homography[i]->tilt();
-            std::cout   << (!i ? "Top" : "Bot")
-                        << " a: " << homography[i]->azimuth()  
-                        << " o: " << azOffset << " k: " 
-                        << tiltBefore << " e: " 
-                        << tiltAfter-tiltBefore << std::endl;
-        }
+        fieldLines[i]->find(*(houghLines[i]), blackStar());
 
         // Classify field lines
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
