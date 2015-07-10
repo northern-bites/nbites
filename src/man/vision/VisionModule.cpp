@@ -287,7 +287,7 @@ void VisionModule::outportalVisionField()
 
     // (3) Outportal Center Circle
     messages::CenterCircle* cc = visionField.mutable_circle(); 
-    cc->set_on(centerCircleDetector[0]->on() ? true : false);
+    cc->set_on(centerCircleDetector[0]->on());
 
     // Rotate to post vision relative robot coordinate system
     double rotatedX, rotatedY;
@@ -347,7 +347,6 @@ void VisionModule::outportalVisionField()
     // Send
     portals::Message<messages::Vision> visionOutMessage(&visionField);
     visionOut.setMessage(visionOutMessage);
-
 }
 
 void VisionModule::setColorParams(Colors* colors, bool topCamera)

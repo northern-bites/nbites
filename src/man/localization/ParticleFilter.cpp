@@ -143,7 +143,7 @@ void ParticleFilter::updateFieldForDebug(messages::Vision& vision)
         messages::FieldLine& field = *vision.mutable_line(i);
 
         // Set correspondence and scores
-        if (!LineSystem::shouldUse(lines.line(i), poseEstimate)) {
+        if (!LineSystem::shouldUse(vision.line(i), poseEstimate)) {
             // Lines that the particle filter did not use are given -1 as ID
             field.set_id(0);
         } else {
