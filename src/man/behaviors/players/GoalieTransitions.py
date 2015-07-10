@@ -14,14 +14,14 @@ from objects import RelRobotLocation
 def getCorners(player):
     corners = player.brain.visionCorners
 
-    print ("horizon dist:", player.brain.visionLines.horizon_dist)
-    print ("num corners:", player.brain.visionCorners.corner_size())
+    # print ("horizon dist:", player.brain.visionLines.horizon_dist)
+    # print ("num corners:", player.brain.visionCorners.corner_size())
 
-    for k in range(0, player.brain.visionCorners.corner_size()):
-        c = player.brain.visionCorners
-        print("x", c.corner(k).x, "y", c.corner(k).y)
-        print("id", c.corner(k).id)
-    print " -------------------------"
+    # for k in range(0, player.brain.visionCorners.corner_size()):
+    #     c = player.brain.visionCorners
+    #     print("x", c.corner(k).x, "y", c.corner(k).y)
+    #     print("id", c.corner(k).id)
+    # print " -------------------------"
 
   # Concave,
   # Convex,
@@ -526,7 +526,7 @@ def shouldPositionRight(player):
     player.inPosition is not constants.RIGHT_POSITION and \
     player.inPosition is not constants.NOT_IN_POSITION:
         player.homeDirections = []
-        player.homeDirections += [RelRobotLocation(5.0, -30.0, 0.0)]
+        player.homeDirections += [RelRobotLocation(5.0, -30.0, -15.0)]
         return True
 
     GoalieStates.watchWithLineChecks.shiftedPosition = False
@@ -538,7 +538,7 @@ def shouldPositionLeft(player):
     player.inPosition is not constants.LEFT_POSITION and \
     player.inPosition is not constants.NOT_IN_POSITION:
         player.homeDirections = []
-        player.homeDirections += [RelRobotLocation(5.0, 30.0, 0.0)]
+        player.homeDirections += [RelRobotLocation(5.0, 30.0, 15.0)]
         return True
 
     return False
@@ -917,10 +917,10 @@ def shouldDiveRight(player):
         print("ball mov vel:", ball.mov_vel_x)
 
     # return (nball.x_vel < -10.0 and
-    return (ball.mov_vel_x < -10.0 and
+    return (ball.mov_vel_x < constants.SAVE_X_VEL and
         not nball.stationary and
         nball.yintercept < -25.0 and
-        ball.distance < 150.0 and
+        ball.distance < constants.SAVE_DIST and
         sightOk)
 
     # return (ball.mov_vel_x < -6.0 and
@@ -946,7 +946,7 @@ def shouldDiveLeft(player):
     nball = player.brain.naiveBall
 
     # if (nball.x_vel < -10.0 and
-    if (ball.mov_vel_x < -10.0 and
+    if (ball.mov_vel_x < constants.SAVE_X_VEL and
         not nball.stationary and
         nball.yintercept > 20.0 and
         ball.distance < 140.0 and
@@ -959,10 +959,10 @@ def shouldDiveLeft(player):
         print("ball mov vel:", ball.mov_vel_x)
 
     # return (nball.x_vel < -10.0 and
-    return (ball.mov_vel_x < -10.0 and
+    return (ball.mov_vel_x < -9.0 and
        not nball.stationary and
         nball.yintercept > 25.0 and
-        ball.distance < 150.0 and
+        ball.distance < constants.SAVE_DIST and
         sightOk)
 
     # return (ball.mov_vel_x < -6.0 and
@@ -988,11 +988,11 @@ def shouldSquat(player):
     nball = player.brain.naiveBall
 
     # if (nball.x_vel < -10.0 and
-    if (ball.mov_vel_x < -10.0 and
+    if (ball.mov_vel_x < constants.SAVE_X_VEL and
         not nball.stationary and
-        abs(nball.yintercept) < 30.0 and
+        abs(nball.yintercept) < 25.0 and
         nball.yintercept != 0.0 and
-        ball.distance < 150.0 and
+        ball.distance < constants.SAVE_DIST and
         sightOk):
         print "SQUAT"
         print("Ball dist:", ball.distance)
@@ -1010,13 +1010,12 @@ def shouldSquat(player):
         print("ball exceptionally close, I'm saving")
         return True
 
-    if ball.distance < 25.0 and ball.mov_vel_x < -3.0 and nball.yintercept != 0.0\
-    and abs(nball.yintercept) < 30.0:
+    if ball.distance < 40.0 and ball.mov_vel_x < -2.0:
         print("ball exceptionally close, I'm saving")
         return True
 
     # return (nball.x_vel < -10.0 and
-    return (ball.mov_vel_x < -10.0 and
+    return (ball.mov_vel_x < -9.0 and
         not nball.stationary and
         abs(nball.yintercept) < 30.0 and
         nball.yintercept != 0.0 and
@@ -1123,7 +1122,7 @@ def ballMovedStopChasing(player):
     stop chasing.
     """
     return (player.brain.ball.distance > 50.0 and
-            player.counter > 150.0)
+            player.counter > 175.0)
 
 def walkedTooFar(player):
     # for the odometry reset delay

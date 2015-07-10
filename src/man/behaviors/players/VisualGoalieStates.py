@@ -120,25 +120,35 @@ def clearIt(player):
         print "I'm moving my y now"
         print("ball x", player.brain.ball.rel_x)
         clearIt.closeEnuf = True
+        clearIt.ballDest.relH = 0.0
         player.brain.nav.goTo(clearIt.ballDest,
                               (3.0, 3.0, 5),
                               nav.MEDIUM_SPEED,
                               adaptive = False)
 
+    elif fabs(player.brain.ball.bearing_deg) > 20:
+        clearIt.ballDest.relH = player.brain.ball.bearing_deg
+
     clearIt.ballDest.relY = player.brain.ball.rel_y - kickPose[1]
     clearIt.ballDest.relX = player.brain.ball.rel_x - kickPose[0]
+
     # clearIt.ballDest.relH = 0.0
     # player.brain.nav.updateDest(clearIt.ballDest)
 
     # print("Ball stationary:", player.brain.ball.is_stationary)
     # print("x", player.brain.ball.x, "y:", player.brain.ball.y)
-    if not player.brain.ball.vis.on:
-        print("Ball off, num frames:", player.brain.ball.vis.frames_off)
 
-    if clearIt.startingBallX - player.brain.ball.x > 15.0:
+    if fabs(player.brain.ball.mov_vel_x) > 2.0:
+        print("I think ball is moving", player.brain.ball.mov_vel_x)
+        print("y", player.brain.ball.mov_vel_y)
+    if player.brain.ball.mov_vel_x < -4.0:
         print("I think the ball is coming towards me!")
-        # return player.goLater('saveCenter')
-    # elif player.brain.ball.mov_vel_x > 5.0 \
+        print("I think ball is moving", player.brain.ball.mov_vel_x)
+        print("y", player.brain.ball.mov_vel_y)
+    if player.brain.ball.mov_vel_x > 4.0:
+        print("I think ball moving away!")
+        return player.goLater('returnUsingLoc')
+
     # or math.fabs(player.brain.ball.x - clearIt.startingBallX) > 15.0:
     #     print("I think the ball has moved away I should stop chasing")
 
