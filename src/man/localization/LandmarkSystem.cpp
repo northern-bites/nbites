@@ -79,8 +79,7 @@ double LandmarkSystem::scoreCorner(const messages::Corner& observation,
 
     // Find correspondence and calculate probability of match
     Landmark correspondingLandmark = matchCorner(observation, loc);
-    return scoreObservation(obsvAsRobotLocation, correspondingLandmark, loc, true);
-    // NOTE for corners, only bearing is used to score particles
+    return scoreObservation(obsvAsRobotLocation, correspondingLandmark, loc);
 }
 
 double LandmarkSystem::scoreCircle(const messages::CenterCircle& observation, 

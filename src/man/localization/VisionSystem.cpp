@@ -36,8 +36,10 @@ bool VisionSystem::update(ParticleSet& particles,
     // Count observations
     for (int i = 0; i < vision.line_size(); i++) {
         if (!LineSystem::shouldUse(vision.line(i), lastEstimate))
-        numObservations++;
+            numObservations++;
     }
+    for (int i = 0; i < vision.corner_size(); i++)
+        numObservations++;
     if (vision.circle().on())
         numObservations++;
     if (useBall)
@@ -60,6 +62,10 @@ bool VisionSystem::update(ParticleSet& particles,
                 continue;
             curParticleError = curParticleError*lineSystem->scoreLine(vision.line(i), particle->getLocation());
         }
+
+        // Score particle from corner observations
+        for (int i = 0; i < vision.corner_size(); i++)
+            curParticleError = curParticleError*landmarkSystem->scoreCorner(vision.corner(i), particle->getLocation());
 
         // Score particle from center circle if on
         if (vision.circle().on())
