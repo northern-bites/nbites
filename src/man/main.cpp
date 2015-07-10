@@ -66,8 +66,8 @@ int main() {
     //Send stderr to whatever stdout's fd describes
     dup2(STDOUT_FILENO, STDERR_FILENO);
     
-    fprintf(stderr, "THIS IS A TEST OF STDERR\n");
-    fprintf(stdout, "THIS IS A TEST OF STDOUT\n");
+    //fprintf(stderr, "THIS IS A TEST OF STDERR\n");
+    //fprintf(stdout, "THIS IS A TEST OF STDOUT\n");
     
     // Constructs an instance of man. If we get here we have a lock
     instance = new man::Man();
