@@ -40,6 +40,9 @@ public class LineView extends ViewParent implements IOFirstResponder {
     final int buffer = 5;
 
     double resize = 1;
+    
+    // Starting size. The larger the number, the smaller the field ratio
+    final int startSize = 3;
 
     boolean click = false;
     boolean drag = false;
@@ -61,6 +64,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
     BufferedImage originalImage;
     BufferedImage edgeImage;
     Vector<Double> lines;
+    Vector<Double> ccPoints;
 
 
     @Override
@@ -126,6 +130,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
             g.setColor(Color.lightGray);
             g.fillOval(fxc - 30, fyc - 20, 60, 40);
 
+            // Get hough line data from buffer
             for (int i = 0; i < lines.size(); i += 10) {
                 double icR = lines.get(i);
                 double icT = lines.get(i + 1);
@@ -169,15 +174,16 @@ public class LineView extends ViewParent implements IOFirstResponder {
                              (int) xstring, 
                              (int) ystring);
 
-                // Calculate field coordinates to find resize value
-                x0 =  3*fcR * Math.cos(fcT) + displayw + buffer + fieldw/2;
-                y0 = -3*fcR * Math.sin(fcT) + fieldh;
-                x1 = (int) Math.round(x0 + 3*fcEP0 * Math.sin(fcT));
-                y1 = (int) Math.round(y0 + 3*fcEP0 * Math.cos(fcT));
-                x2 = (int) Math.round(x0 + 3*fcEP1 * Math.sin(fcT));
-                y2 = (int) Math.round(y0 + 3*fcEP1 * Math.cos(fcT));
 
-                // Scale down if a line is outside the view, but not if its too far (false field line)
+                // Calculate field coordinates to find resize value
+                x0 =  startSize*fcR * Math.cos(fcT) + displayw + buffer + fieldw/2;
+                y0 = -startSize*fcR * Math.sin(fcT) + fieldh;
+                x1 = (int) Math.round(x0 + startSize*fcEP0 * Math.sin(fcT));
+                y1 = (int) Math.round(y0 + startSize*fcEP0 * Math.cos(fcT));
+                x2 = (int) Math.round(x0 + startSize*fcEP1 * Math.sin(fcT));
+                y2 = (int) Math.round(y0 + startSize*fcEP1 * Math.cos(fcT));
+
+                //Scale down if a line is outside the view, but not if its too far (false field line)
                 if (y1 < 0 && y1 > -2000) {
                     resize = Math.min(resize, (double)fieldh/(-y1 + fieldh));
                 }
@@ -214,12 +220,12 @@ public class LineView extends ViewParent implements IOFirstResponder {
                         g.setColor(Color.red);
 
                     // Recalculate with resize
-                    double x0 =  3*resize*fcR * Math.cos(fcT) + displayw + buffer + fieldw/2;
-                    double y0 = -3*resize*fcR * Math.sin(fcT) + fieldh;
-                    int x1 = (int) Math.round(x0 + 3*resize*fcEP0 * Math.sin(fcT));
-                    int y1 = (int) Math.round(y0 + 3*resize*fcEP0 * Math.cos(fcT));
-                    int x2 = (int) Math.round(x0 + 3*resize*fcEP1 * Math.sin(fcT));
-                    int y2 = (int) Math.round(y0 + 3*resize*fcEP1 * Math.cos(fcT));
+                    double x0 =  startSize*resize*fcR * Math.cos(fcT) + displayw + buffer + fieldw/2;
+                    double y0 = -startSize*resize*fcR * Math.sin(fcT) + fieldh;
+                    int x1 = (int) Math.round(x0 + startSize*resize*fcEP0 * Math.sin(fcT));
+                    int y1 = (int) Math.round(y0 + startSize*resize*fcEP0 * Math.cos(fcT));
+                    int x2 = (int) Math.round(x0 + startSize*resize*fcEP1 * Math.sin(fcT));
+                    int y2 = (int) Math.round(y0 + startSize*resize*fcEP1 * Math.cos(fcT));
 
                     g.drawLine(x1, y1, x2, y2);
 
@@ -238,7 +244,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
             if (click && clickX1 > fx0 && clickX1 < fx0+fieldw && clickY1 < fieldh) {
                 g.drawLine(fxc, fyc, clickX1, clickY1);
                 double distanceCM = Math.sqrt((clickX1-fxc)*(clickX1-fxc) + (clickY1-fyc)*(clickY1-fyc));
-                distanceCM *= (1.0/3.0)*(1/resize);
+                distanceCM *= (1.0/(double)startSize)*(1/resize);
                 g.drawString(Double.toString((double)Math.round(distanceCM* 1000)/1000) + "cm",
                     (fxc+clickX1)/2 + 5, (fyc+clickY1)/2);
                 click = false;
@@ -249,14 +255,32 @@ public class LineView extends ViewParent implements IOFirstResponder {
                         clickX2 > fx0 && clickX2 < fx0 + fieldw && clickY2 < fieldh) {
                 g.drawLine(clickX1, clickY1, clickX2, clickY2);
                 double distanceCM = Math.sqrt((clickX1-clickX2)*(clickX1-clickX2) + (clickY1-clickY2)*(clickY1-clickY2));
-                distanceCM *= (1.0/3.0)*(1/resize);
+                distanceCM *= (1.0/startSize)*(1/resize);
                 double dString = (double)Math.round(distanceCM* 1000)/1000;
                 if (dString != 0) {
                     g.drawString(Double.toString(dString) + "cm", (clickX1+clickX2)/2 + 5, (clickY1+clickY2)/2);
                 }
                 drag = false;
-
             }
+
+
+            /*
+                Uncomment to show center circle potentials and estimation. The last point is the 
+                CenterCircleDetectors guess. Also comment out resizing and set startSize to 1 for
+                proper scale.
+            */
+            System.out.printf("%d potential center circle centers received\n", ccPoints.size());
+
+            // Center Circle Potential Points
+            // g.setColor(Color.black);
+            // for (int i = 0; i < ccPoints.size() - 2; i += 2) {
+            //  //   System.out.printf("Point %d x: %f, %f\n", i, ccPoints.get(i+0), ccPoints.get(i + 1));
+            //     g.fillRect((int)(fxc + ccPoints.get(i+0)), (int)(fyc - ccPoints.get(i + 1)), 1, 1);
+
+            // }
+            // g.setColor(Color.blue);
+            // g.fillOval((int)(fxc + ccPoints.get(ccPoints.size()-2)) - 4, (int)(fyc - ccPoints.get(ccPoints.size() - 1)) - 4, 8, 8);
+
         }
     }
     
@@ -308,7 +332,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
         // TODO refactor. Protobuff?
         lines = new Vector<Double>();
         byte[] lineBytes = out[6].bytes;
-        int numLines = lineBytes.length / (18 * 4);
+        int numLines = lineBytes.length / (9 * 8);
         Logger.logf(Logger.INFO, "%d field lines expected.", numLines);
         try {
             DataInputStream dis = new DataInputStream(new ByteArrayInputStream(lineBytes));
@@ -326,6 +350,21 @@ public class LineView extends ViewParent implements IOFirstResponder {
             }
         } catch (Exception e) {
             Logger.logf(Logger.ERROR, "Conversion from bytes to hough coord lines in LineView failed.");
+            e.printStackTrace();
+        }
+
+        ccPoints = new Vector<Double>();
+        byte[] pointBytes = out[8].bytes;
+        int numPoints = pointBytes.length / (2 * 8);
+        Logger.logf(Logger.INFO, "%d center circle potential centers expected.", numPoints - 1);
+        try {
+            DataInputStream dis = new DataInputStream(new ByteArrayInputStream(pointBytes));
+            for (int i = 0; i < numPoints; i ++) {
+                ccPoints.add(dis.readDouble()); // X coordinate
+                ccPoints.add(dis.readDouble()); // Y coodinrate
+            }
+        } catch (Exception e) {
+            Logger.logf(Logger.ERROR, "Conversion from bytes to center circ points in LineView failed.");
             e.printStackTrace();
         }
     }

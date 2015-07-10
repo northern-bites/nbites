@@ -2,6 +2,9 @@ import RoleConstants as role
 import ClaimTransitions as claimTransitions
 import SharedTransitions as shared
 import ChaseBallConstants as chaseConstants
+import noggin_constants as nogginC
+from objects import RobotLocation
+from SupporterConstants import findStrikerHome, findDefenderHome
 
 def ballInBox(player):
     """
@@ -37,22 +40,33 @@ def ballNotInBufferedBox(player):
     return (ball.vis.frames_off > chaseConstants.BALL_OFF_THRESH or 
             (not inBox and not role.isChaser(player.role)))
 
-def tooFarFromHome(threshold):
+def tooFarFromHome(threshold, player):
     """
     Returns true if LOC thinks we're more than *distance* away from our home
     position
     """
-    def transition(player):
-        loc = player.brain.loc
+    if player.brain.ball.vis.on:
+        ball = player.brain.ball
+    elif player.brain.sharedBall.ball_on:
+        ball = player.brain.sharedBall
+    else:
+        ball = None
         home = player.homePosition
 
-        distance = ((loc.x - home.x)**2 + (loc.y - home.y)**2)**.5
+    if ball != None:
+        if role.isLeftDefender(player.role):
+            home = findDefenderHome(True, ball, player.homePosition.h)
+        elif role.isRightDefender(player.role):
+            home = findDefenderHome(False, ball, player.homePosition.h)
+        elif role.isStriker(player.role):
+            home = findStrikerHome(ball, player.homePosition.h)
+        else:
+            home = player.homePosition
 
-        if distance > threshold:
-            return True
-        return False
-    return transition
+    distance = ((player.brain.loc.x - home.x)**2 + (player.brain.loc.y - home.y)**2)**.5
 
+    return distance > threshold
+  
 def shouldApproachBall(player):
     if ballNotInBox(player):
         player.claimedBall = False
@@ -64,7 +78,6 @@ def shouldApproachBall(player):
     return True
 
 def shouldFindSharedBall(player):
-    return False
     return (player.brain.sharedBall.ball_on and
             player.brain.sharedBall.reliability >= 1)
 

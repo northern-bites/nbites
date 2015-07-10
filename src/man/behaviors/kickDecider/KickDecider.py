@@ -91,8 +91,8 @@ class KickDecider(object):
         self.brain.player.motionKick = False
 
         self.kicks = []
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.LEFT_MEDIUM_STRAIGHT_KICK)
+        self.kicks.append(kicks.RIGHT_MEDIUM_STRAIGHT_KICK)
 
         self.scoreKick = self.minimizeOrbitTime
 
@@ -281,8 +281,8 @@ class KickDecider(object):
         self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
         self.kicks.append(kicks.M_LEFT_SIDE)
         self.kicks.append(kicks.M_RIGHT_SIDE)
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        # self.kicks.append(kicks.LEFT_MEDIUM_STRAIGHT_KICK)
+        # self.kicks.append(kicks.RIGHT_MEDIUM_STRAIGHT_KICK)
 
         self.filters = []
         self.filters.append(self.outOfBounds)
@@ -304,8 +304,8 @@ class KickDecider(object):
 
     def allKicksAsap(self):
         self.kicks = []
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        # self.kicks.append(kicks.LEFT_MEDIUM_STRAIGHT_KICK)
+        # self.kicks.append(kicks.RIGHT_MEDIUM_STRAIGHT_KICK)
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
         self.kicks.append(kicks.M_RIGHT_STRAIGHT)
         self.kicks.append(kicks.M_LEFT_SIDE)
@@ -412,8 +412,8 @@ class KickDecider(object):
         self.kicks.append(kicks.M_RIGHT_SIDE)
         self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
         self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        # self.kicks.append(kicks.LEFT_MEDIUM_STRAIGHT_KICK)
+        # self.kicks.append(kicks.RIGHT_MEDIUM_STRAIGHT_KICK)
 
         self.scoreKick = self.minimizeDistanceToGoal
         
@@ -470,8 +470,8 @@ class KickDecider(object):
         self.kicks.append(kicks.M_RIGHT_STRAIGHT)
         self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
         self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
-        self.kicks.append(kicks.LEFT_SHORT_STRAIGHT_KICK)
-        self.kicks.append(kicks.RIGHT_SHORT_STRAIGHT_KICK)
+        self.kicks.append(kicks.LEFT_MEDIUM_STRAIGHT_KICK)
+        self.kicks.append(kicks.RIGHT_MEDIUM_STRAIGHT_KICK)
 
         self.scoreKick = self.minimizeDistanceToGoal
         
@@ -514,14 +514,14 @@ class KickDecider(object):
         if nearGoal:
             return nearGoal
 
-        frontKicks = self.frontKicksOrbitIfSmall()
-        if frontKicks: 
-            return frontKicks
+        # frontKicks = self.frontKicksOrbitIfSmall()
+        # if frontKicks: 
+        #     return frontKicks
 
-        if self.brain.loc.x < nogginC.MIDFIELD_X:
-            asap = self.motionKicksAsap()
-            if asap:
-                return asap
+        #if self.brain.loc.x < nogginC.MIDFIELD_X:
+        asap = self.motionKicksAsap()
+        if asap:
+            return asap
 
         return self.frontKickCrosses()
 
@@ -585,7 +585,7 @@ class KickDecider(object):
 
     ### API ###
     def addShotsOnGoal(self):
-        x = nogginC.OPP_GOALBOX_RIGHT_X - self.brain.ball.x
+        x = nogginC.OPP_GOALBOX_RIGHT_X - self.brain.ball.x 
         y1 = nogginC.OPP_GOALBOX_MIDDLE_Y - self.brain.ball.y
         y2 = nogginC.OPP_GOALBOX_MIDDLE_Y - constants.SHOT_PRECISION - self.brain.ball.y
         # Two vectors that share an x coordinate but have diff y coordinates
@@ -672,6 +672,7 @@ class KickDecider(object):
             kickDestinationY = y - self.brain.ball.y
 
             # Angle between unit vector and kickDestination, cos(theta) = a.b / ||a||||b||
+            # Our unit vector is (1,0). We are trying to determine our angle wre to the normal.
             angleToKickDestination = math.degrees(math.acos(kickDestinationX / 
                                                             math.sqrt(kickDestinationX**2 + kickDestinationY**2)))
             if kickDestinationY < 0: angleToKickDestination = -angleToKickDestination

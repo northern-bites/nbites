@@ -22,8 +22,8 @@ option(
 )
 
 option(
-  USE_NAOQI_2
-  "Installing using the Naoqi 2.1 cross compiler"
+  V5_ROBOT
+  "Installing to a V5 robot"
   ON
 )
 

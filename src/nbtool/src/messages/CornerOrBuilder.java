@@ -33,4 +33,40 @@ public interface CornerOrBuilder extends
    * <code>optional int32 id = 3;</code>
    */
   int getId();
+
+  /**
+   * <code>optional int32 correspondence = 4;</code>
+   */
+  boolean hasCorrespondence();
+  /**
+   * <code>optional int32 correspondence = 4;</code>
+   */
+  int getCorrespondence();
+
+  /**
+   * <code>optional float prob = 5;</code>
+   */
+  boolean hasProb();
+  /**
+   * <code>optional float prob = 5;</code>
+   */
+  float getProb();
+
+  /**
+   * <code>optional int32 line1 = 6;</code>
+   */
+  boolean hasLine1();
+  /**
+   * <code>optional int32 line1 = 6;</code>
+   */
+  int getLine1();
+
+  /**
+   * <code>optional int32 line2 = 7;</code>
+   */
+  boolean hasLine2();
+  /**
+   * <code>optional int32 line2 = 7;</code>
+   */
+  int getLine2();
 }

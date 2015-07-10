@@ -126,6 +126,15 @@ public final class FieldObstacles extends
      * <code>optional float distance = 2;</code>
      */
     float getDistance();
+
+    /**
+     * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
+     */
+    boolean hasDetector();
+    /**
+     * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
+     */
+    messages.FieldObstacles.Obstacle.ObstacleDetector getDetector();
   }
   /**
    * Protobuf type {@code messages.FieldObstacles.Obstacle}
@@ -193,6 +202,17 @@ public final class FieldObstacles extends
             case 21: {
               bitField0_ |= 0x00000002;
               distance_ = input.readFloat();
+              break;
+            }
+            case 24: {
+              int rawValue = input.readEnum();
+              messages.FieldObstacles.Obstacle.ObstacleDetector value = messages.FieldObstacles.Obstacle.ObstacleDetector.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(3, rawValue);
+              } else {
+                bitField0_ |= 0x00000004;
+                detector_ = value;
+              }
               break;
             }
           }
@@ -379,6 +399,106 @@ public final class FieldObstacles extends
       // @@protoc_insertion_point(enum_scope:messages.FieldObstacles.Obstacle.ObstaclePosition)
     }
 
+    /**
+     * Protobuf enum {@code messages.FieldObstacles.Obstacle.ObstacleDetector}
+     */
+    public enum ObstacleDetector
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>NA = 0;</code>
+       */
+      NA(0, 0),
+      /**
+       * <code>ARMS = 1;</code>
+       */
+      ARMS(1, 1),
+      /**
+       * <code>SONARS = 2;</code>
+       */
+      SONARS(2, 2),
+      /**
+       * <code>VISION = 3;</code>
+       */
+      VISION(3, 3),
+      ;
+
+      /**
+       * <code>NA = 0;</code>
+       */
+      public static final int NA_VALUE = 0;
+      /**
+       * <code>ARMS = 1;</code>
+       */
+      public static final int ARMS_VALUE = 1;
+      /**
+       * <code>SONARS = 2;</code>
+       */
+      public static final int SONARS_VALUE = 2;
+      /**
+       * <code>VISION = 3;</code>
+       */
+      public static final int VISION_VALUE = 3;
+
+
+      public final int getNumber() { return value; }
+
+      public static ObstacleDetector valueOf(int value) {
+        switch (value) {
+          case 0: return NA;
+          case 1: return ARMS;
+          case 2: return SONARS;
+          case 3: return VISION;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<ObstacleDetector>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<ObstacleDetector>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<ObstacleDetector>() {
+              public ObstacleDetector findValueByNumber(int number) {
+                return ObstacleDetector.valueOf(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return messages.FieldObstacles.Obstacle.getDescriptor().getEnumTypes().get(1);
+      }
+
+      private static final ObstacleDetector[] VALUES = values();
+
+      public static ObstacleDetector valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int index;
+      private final int value;
+
+      private ObstacleDetector(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:messages.FieldObstacles.Obstacle.ObstacleDetector)
+    }
+
     private int bitField0_;
     public static final int POSITION_FIELD_NUMBER = 1;
     private messages.FieldObstacles.Obstacle.ObstaclePosition position_;
@@ -410,9 +530,25 @@ public final class FieldObstacles extends
       return distance_;
     }
 
+    public static final int DETECTOR_FIELD_NUMBER = 3;
+    private messages.FieldObstacles.Obstacle.ObstacleDetector detector_;
+    /**
+     * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
+     */
+    public boolean hasDetector() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
+     */
+    public messages.FieldObstacles.Obstacle.ObstacleDetector getDetector() {
+      return detector_;
+    }
+
     private void initFields() {
       position_ = messages.FieldObstacles.Obstacle.ObstaclePosition.NONE;
       distance_ = 0F;
+      detector_ = messages.FieldObstacles.Obstacle.ObstacleDetector.NA;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -433,6 +569,9 @@ public final class FieldObstacles extends
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeFloat(2, distance_);
       }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeEnum(3, detector_.getNumber());
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -449,6 +588,10 @@ public final class FieldObstacles extends
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
           .computeFloatSize(2, distance_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(3, detector_.getNumber());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -571,6 +714,8 @@ public final class FieldObstacles extends
         bitField0_ = (bitField0_ & ~0x00000001);
         distance_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000002);
+        detector_ = messages.FieldObstacles.Obstacle.ObstacleDetector.NA;
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
 
@@ -607,6 +752,10 @@ public final class FieldObstacles extends
           to_bitField0_ |= 0x00000002;
         }
         result.distance_ = distance_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.detector_ = detector_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -628,6 +777,9 @@ public final class FieldObstacles extends
         }
         if (other.hasDistance()) {
           setDistance(other.getDistance());
+        }
+        if (other.hasDetector()) {
+          setDetector(other.getDetector());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -719,6 +871,41 @@ public final class FieldObstacles extends
       public Builder clearDistance() {
         bitField0_ = (bitField0_ & ~0x00000002);
         distance_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private messages.FieldObstacles.Obstacle.ObstacleDetector detector_ = messages.FieldObstacles.Obstacle.ObstacleDetector.NA;
+      /**
+       * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
+       */
+      public boolean hasDetector() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
+       */
+      public messages.FieldObstacles.Obstacle.ObstacleDetector getDetector() {
+        return detector_;
+      }
+      /**
+       * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
+       */
+      public Builder setDetector(messages.FieldObstacles.Obstacle.ObstacleDetector value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000004;
+        detector_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
+       */
+      public Builder clearDetector() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        detector_ = messages.FieldObstacles.Obstacle.ObstacleDetector.NA;
         onChanged();
         return this;
       }

@@ -14,6 +14,8 @@ import javax.swing.JTextField;
 
 import com.jogamp.nativewindow.util.Dimension;
 
+import nbtool.gui.field.*;
+
 import nbtool.data.Log;
 import nbtool.data.TeamBroadcast;
 import nbtool.io.BroadcastIO;
@@ -55,8 +57,10 @@ public class WorldViewUtility extends UtilityParent {
 		@Override
 		public void acceptTeamBroadcast(TeamBroadcast tb) {
 			//use tb
-			Logger.printf("got from {%s:%s}", tb.robotName, tb.robotIp);
 			Logger.printf("Team: %s, Player: %s",tb.dataTeamPacket.getTeamNumber(), tb.dataTeamPacket.getPlayerNumber());
+			for (String s : tb.message.errors) {
+				Logger.printf("\t%s", s);
+			}
 			if(runWorldview) {
 				if(tb.dataTeamPacket.getTeamNumber() == teamNumber) {
 					ar[tb.dataTeamPacket.getPlayerNumber()-1] = new NaoRobot();
@@ -72,7 +76,7 @@ public class WorldViewUtility extends UtilityParent {
 				public void paintComponent(Graphics g) {
 					super.paintComponent(g);
 					Graphics2D g2 = (Graphics2D) g;
-					f.drawField(g2, shouldFlip);
+					f.drawField(g2, shouldFlip,lineColors);
 					for(int i=0; i<ar.length; i++) {
 						if(ar[i] != null) {
 							ar[i].drawNao(g2, shouldFlip);	
@@ -109,6 +113,7 @@ public class WorldViewUtility extends UtilityParent {
 		private JButton flip;
 		private JButton startWorldView;
 		private boolean shouldFlip = false;
+		private boolean lineColors = false;
 		private boolean runWorldview = false;
 		private JTextField teamNumberInput;
 		private int teamNumber;
@@ -138,6 +143,7 @@ public class WorldViewUtility extends UtilityParent {
 			} else if(e.getActionCommand() == "Stop") {
 				runWorldview = false;
 				startWorldView.setText("Start WorldView");
+				Logger.infof("Stopped Listening to team %s", teamNumber);
 				for(int i=0; i<ar.length; i++) {
 					ar[i] = null;
 				}

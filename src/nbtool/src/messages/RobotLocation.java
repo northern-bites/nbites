@@ -5,10 +5,6 @@ package messages;
 
 /**
  * Protobuf type {@code messages.RobotLocation}
- *
- * <pre>
- * robot locations should have a pose, and an uncertainty associated with it
- * </pre>
  */
 public final class RobotLocation extends
     com.google.protobuf.GeneratedMessage implements
@@ -82,6 +78,11 @@ public final class RobotLocation extends
           case 45: {
             bitField0_ |= 0x00000010;
             uncert_ = input.readFloat();
+            break;
+          }
+          case 48: {
+            bitField0_ |= 0x00000020;
+            lost_ = input.readBool();
             break;
           }
         }
@@ -199,12 +200,28 @@ public final class RobotLocation extends
     return uncert_;
   }
 
+  public static final int LOST_FIELD_NUMBER = 6;
+  private boolean lost_;
+  /**
+   * <code>optional bool lost = 6;</code>
+   */
+  public boolean hasLost() {
+    return ((bitField0_ & 0x00000020) == 0x00000020);
+  }
+  /**
+   * <code>optional bool lost = 6;</code>
+   */
+  public boolean getLost() {
+    return lost_;
+  }
+
   private void initFields() {
     x_ = 0F;
     y_ = 0F;
     h_ = 0F;
     timestamp_ = 0L;
     uncert_ = 0F;
+    lost_ = false;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -234,6 +251,9 @@ public final class RobotLocation extends
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
       output.writeFloat(5, uncert_);
     }
+    if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      output.writeBool(6, lost_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -262,6 +282,10 @@ public final class RobotLocation extends
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
       size += com.google.protobuf.CodedOutputStream
         .computeFloatSize(5, uncert_);
+    }
+    if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(6, lost_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSerializedSize = size;
@@ -343,10 +367,6 @@ public final class RobotLocation extends
   }
   /**
    * Protobuf type {@code messages.RobotLocation}
-   *
-   * <pre>
-   * robot locations should have a pose, and an uncertainty associated with it
-   * </pre>
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessage.Builder<Builder> implements
@@ -394,6 +414,8 @@ public final class RobotLocation extends
       bitField0_ = (bitField0_ & ~0x00000008);
       uncert_ = 0F;
       bitField0_ = (bitField0_ & ~0x00000010);
+      lost_ = false;
+      bitField0_ = (bitField0_ & ~0x00000020);
       return this;
     }
 
@@ -442,6 +464,10 @@ public final class RobotLocation extends
         to_bitField0_ |= 0x00000010;
       }
       result.uncert_ = uncert_;
+      if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+        to_bitField0_ |= 0x00000020;
+      }
+      result.lost_ = lost_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -472,6 +498,9 @@ public final class RobotLocation extends
       }
       if (other.hasUncert()) {
         setUncert(other.getUncert());
+      }
+      if (other.hasLost()) {
+        setLost(other.getLost());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       return this;
@@ -656,6 +685,38 @@ public final class RobotLocation extends
     public Builder clearUncert() {
       bitField0_ = (bitField0_ & ~0x00000010);
       uncert_ = 0F;
+      onChanged();
+      return this;
+    }
+
+    private boolean lost_ ;
+    /**
+     * <code>optional bool lost = 6;</code>
+     */
+    public boolean hasLost() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional bool lost = 6;</code>
+     */
+    public boolean getLost() {
+      return lost_;
+    }
+    /**
+     * <code>optional bool lost = 6;</code>
+     */
+    public Builder setLost(boolean value) {
+      bitField0_ |= 0x00000020;
+      lost_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional bool lost = 6;</code>
+     */
+    public Builder clearLost() {
+      bitField0_ = (bitField0_ & ~0x00000020);
+      lost_ = false;
       onChanged();
       return this;
     }

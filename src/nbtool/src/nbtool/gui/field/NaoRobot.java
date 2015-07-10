@@ -1,4 +1,4 @@
-package nbtool.gui.utilitypanes;
+package nbtool.gui.field;
 
 import java.awt.*;
 import java.awt.geom.*;

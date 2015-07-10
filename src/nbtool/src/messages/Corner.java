@@ -70,6 +70,26 @@ public final class Corner extends
             id_ = input.readInt32();
             break;
           }
+          case 32: {
+            bitField0_ |= 0x00000008;
+            correspondence_ = input.readInt32();
+            break;
+          }
+          case 45: {
+            bitField0_ |= 0x00000010;
+            prob_ = input.readFloat();
+            break;
+          }
+          case 48: {
+            bitField0_ |= 0x00000020;
+            line1_ = input.readInt32();
+            break;
+          }
+          case 56: {
+            bitField0_ |= 0x00000040;
+            line2_ = input.readInt32();
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -155,10 +175,74 @@ public final class Corner extends
     return id_;
   }
 
+  public static final int CORRESPONDENCE_FIELD_NUMBER = 4;
+  private int correspondence_;
+  /**
+   * <code>optional int32 correspondence = 4;</code>
+   */
+  public boolean hasCorrespondence() {
+    return ((bitField0_ & 0x00000008) == 0x00000008);
+  }
+  /**
+   * <code>optional int32 correspondence = 4;</code>
+   */
+  public int getCorrespondence() {
+    return correspondence_;
+  }
+
+  public static final int PROB_FIELD_NUMBER = 5;
+  private float prob_;
+  /**
+   * <code>optional float prob = 5;</code>
+   */
+  public boolean hasProb() {
+    return ((bitField0_ & 0x00000010) == 0x00000010);
+  }
+  /**
+   * <code>optional float prob = 5;</code>
+   */
+  public float getProb() {
+    return prob_;
+  }
+
+  public static final int LINE1_FIELD_NUMBER = 6;
+  private int line1_;
+  /**
+   * <code>optional int32 line1 = 6;</code>
+   */
+  public boolean hasLine1() {
+    return ((bitField0_ & 0x00000020) == 0x00000020);
+  }
+  /**
+   * <code>optional int32 line1 = 6;</code>
+   */
+  public int getLine1() {
+    return line1_;
+  }
+
+  public static final int LINE2_FIELD_NUMBER = 7;
+  private int line2_;
+  /**
+   * <code>optional int32 line2 = 7;</code>
+   */
+  public boolean hasLine2() {
+    return ((bitField0_ & 0x00000040) == 0x00000040);
+  }
+  /**
+   * <code>optional int32 line2 = 7;</code>
+   */
+  public int getLine2() {
+    return line2_;
+  }
+
   private void initFields() {
     x_ = 0F;
     y_ = 0F;
     id_ = 0;
+    correspondence_ = 0;
+    prob_ = 0F;
+    line1_ = 0;
+    line2_ = 0;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -182,6 +266,18 @@ public final class Corner extends
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       output.writeInt32(3, id_);
     }
+    if (((bitField0_ & 0x00000008) == 0x00000008)) {
+      output.writeInt32(4, correspondence_);
+    }
+    if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      output.writeFloat(5, prob_);
+    }
+    if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      output.writeInt32(6, line1_);
+    }
+    if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      output.writeInt32(7, line2_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -202,6 +298,22 @@ public final class Corner extends
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(3, id_);
+    }
+    if (((bitField0_ & 0x00000008) == 0x00000008)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(4, correspondence_);
+    }
+    if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeFloatSize(5, prob_);
+    }
+    if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(6, line1_);
+    }
+    if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(7, line2_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSerializedSize = size;
@@ -326,6 +438,14 @@ public final class Corner extends
       bitField0_ = (bitField0_ & ~0x00000002);
       id_ = 0;
       bitField0_ = (bitField0_ & ~0x00000004);
+      correspondence_ = 0;
+      bitField0_ = (bitField0_ & ~0x00000008);
+      prob_ = 0F;
+      bitField0_ = (bitField0_ & ~0x00000010);
+      line1_ = 0;
+      bitField0_ = (bitField0_ & ~0x00000020);
+      line2_ = 0;
+      bitField0_ = (bitField0_ & ~0x00000040);
       return this;
     }
 
@@ -366,6 +486,22 @@ public final class Corner extends
         to_bitField0_ |= 0x00000004;
       }
       result.id_ = id_;
+      if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+        to_bitField0_ |= 0x00000008;
+      }
+      result.correspondence_ = correspondence_;
+      if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+        to_bitField0_ |= 0x00000010;
+      }
+      result.prob_ = prob_;
+      if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+        to_bitField0_ |= 0x00000020;
+      }
+      result.line1_ = line1_;
+      if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+        to_bitField0_ |= 0x00000040;
+      }
+      result.line2_ = line2_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -390,6 +526,18 @@ public final class Corner extends
       }
       if (other.hasId()) {
         setId(other.getId());
+      }
+      if (other.hasCorrespondence()) {
+        setCorrespondence(other.getCorrespondence());
+      }
+      if (other.hasProb()) {
+        setProb(other.getProb());
+      }
+      if (other.hasLine1()) {
+        setLine1(other.getLine1());
+      }
+      if (other.hasLine2()) {
+        setLine2(other.getLine2());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       return this;
@@ -510,6 +658,134 @@ public final class Corner extends
     public Builder clearId() {
       bitField0_ = (bitField0_ & ~0x00000004);
       id_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private int correspondence_ ;
+    /**
+     * <code>optional int32 correspondence = 4;</code>
+     */
+    public boolean hasCorrespondence() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional int32 correspondence = 4;</code>
+     */
+    public int getCorrespondence() {
+      return correspondence_;
+    }
+    /**
+     * <code>optional int32 correspondence = 4;</code>
+     */
+    public Builder setCorrespondence(int value) {
+      bitField0_ |= 0x00000008;
+      correspondence_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 correspondence = 4;</code>
+     */
+    public Builder clearCorrespondence() {
+      bitField0_ = (bitField0_ & ~0x00000008);
+      correspondence_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private float prob_ ;
+    /**
+     * <code>optional float prob = 5;</code>
+     */
+    public boolean hasProb() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional float prob = 5;</code>
+     */
+    public float getProb() {
+      return prob_;
+    }
+    /**
+     * <code>optional float prob = 5;</code>
+     */
+    public Builder setProb(float value) {
+      bitField0_ |= 0x00000010;
+      prob_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional float prob = 5;</code>
+     */
+    public Builder clearProb() {
+      bitField0_ = (bitField0_ & ~0x00000010);
+      prob_ = 0F;
+      onChanged();
+      return this;
+    }
+
+    private int line1_ ;
+    /**
+     * <code>optional int32 line1 = 6;</code>
+     */
+    public boolean hasLine1() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional int32 line1 = 6;</code>
+     */
+    public int getLine1() {
+      return line1_;
+    }
+    /**
+     * <code>optional int32 line1 = 6;</code>
+     */
+    public Builder setLine1(int value) {
+      bitField0_ |= 0x00000020;
+      line1_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 line1 = 6;</code>
+     */
+    public Builder clearLine1() {
+      bitField0_ = (bitField0_ & ~0x00000020);
+      line1_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private int line2_ ;
+    /**
+     * <code>optional int32 line2 = 7;</code>
+     */
+    public boolean hasLine2() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional int32 line2 = 7;</code>
+     */
+    public int getLine2() {
+      return line2_;
+    }
+    /**
+     * <code>optional int32 line2 = 7;</code>
+     */
+    public Builder setLine2(int value) {
+      bitField0_ |= 0x00000040;
+      line2_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 line2 = 7;</code>
+     */
+    public Builder clearLine2() {
+      bitField0_ = (bitField0_ & ~0x00000040);
+      line2_ = 0;
       onChanged();
       return this;
     }
