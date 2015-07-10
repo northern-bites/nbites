@@ -68,7 +68,7 @@ def tooFarFromHome(threshold, player):
     return distance > threshold
 
 def shouldSpinSearchFromWatching(player):
-    return (player.stateTime > 7 and
+    return (player.stateTime > 12 and
             player.brain.ball.vis.frames_off > 30 and
             not player.brain.sharedBall.ball_on)
   
