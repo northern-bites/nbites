@@ -20,6 +20,7 @@
 namespace man {
 namespace vision {
 
+
 class VisionModule : public portals::Module {
 public:
     VisionModule(int wd, int ht, std::string robotName = "");
@@ -101,6 +102,10 @@ private:
 
     nblog::SExpr* calibrationLisp;
     size_t image_index;
+
+    // Constants for tilt azimuth adjustment hack
+    static constexpr double azimuth_m = 0.0426;
+    static constexpr double azimuth_b = -0.0011;
 };
 
 }

@@ -105,6 +105,8 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
 	// field class only runs on the top image so it only needs that one
 	field->setDebugImage(debugImage[0]);
 #endif
+
+    // Retreive calibration params for the robot name specified in the constructor
     setCalibrationParams(robotName);
 }
 
@@ -146,6 +148,7 @@ void VisionModule::run_()
 
     bool ballDetected = false;
 
+
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
 
@@ -165,6 +168,9 @@ void VisionModule::run_()
         ImageLiteU8 greenImage(frontEnd[i]->greenImage());
         ImageLiteU8 orangeImage(frontEnd[i]->orangeImage());
 
+        // Offset to hackily adjust tilt for high-azimuth error
+        double azOffset = azimuth_m * fabs(kinematics[i]->azimuth()) + azimuth_b;
+
         // Calculate kinematics and adjust homography
         if (jointsIn.message().has_head_yaw()) {
             kinematics[i]->joints(jointsIn.message());
@@ -172,7 +178,9 @@ void VisionModule::run_()
             homography[i]->wy0(kinematics[i]->wy0());
             homography[i]->wz0(kinematics[i]->wz0());
             homography[i]->roll(calibrationParams[i]->getRoll());
-            homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt());
+
+            homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt() + azOffset);
+         
 #ifndef OFFLINE
             homography[i]->azimuth(kinematics[i]->azimuth());
 #endif
