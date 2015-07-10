@@ -809,8 +809,9 @@ class KickDecider(object):
                               nogginC.CENTER_FIELD_Y)
         return (offset - math.sqrt((kick.destinationX - goalCenter.x)**2 +
                                    (kick.destinationY - goalCenter.y)**2))
-    
+    ###############
     ### FILTERS ###
+    ###############
 
     # can we kick it out of bounds behind our own goal without scoring an own goal?
     def outOfBounds(self, kick):
