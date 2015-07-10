@@ -117,7 +117,7 @@ def gamePlaying(player):
 
     #TODO before game/scrimmage change this to watch;
     # this is better for testing purposes!
-    return player.goLater('watch')
+    return player.goLater('watchWithLineChecks')
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
@@ -214,14 +214,9 @@ def watchWithLineChecks(player):
             watchWithLineChecks.numTurns = 0
             watchWithLineChecks.looking = False
 
-        # elif player.lastDiffState is 'lineCheckTurn':
-        #     print "I think I have correct facing now..."
         elif watchWithLineChecks.numTurns > 0:
             print "I think I have corrected my facing now..."
             watchWithLineChecks.correctFacing = True
-        #     watchWithLineChecks.numTurns += 1
-        # else:
-        #     watchWithLineChecks.numFixes += 1
 
         player.brain.tracker.trackBall()
         player.brain.nav.stand()
@@ -272,6 +267,9 @@ def lineCheckReposition(player):
             print "This was a reposition, I think"
             watchWithLineChecks.numFixes += 1
         player.brain.nav.walkTo(dest)
+
+    if player.counter > 120:
+        return player.goLater('watchWithLineChecks')
 
     return Transition.getNextState(player, lineCheckReposition)
 
@@ -438,13 +436,16 @@ def correct(destination):
 def moveBackwards(player):
     if player.firstFrame():
         watchWithLineChecks.numFixes += 1
-        player.brain.tracker.lookToAngle(0)
-        player.brain.nav.walkTo(RelRobotLocation(-60.0, 0, 0))
-        moveBackwards.notTracking = True
-
-    if player.brain.ball.vis.on and moveBackwards.notTracking:
+        # player.brain.tracker.lookToAngle(0)
         player.brain.tracker.trackBall
-        moveBackwards.notTracking = False
+        player.brain.nav.walkTo(RelRobotLocation(-100.0, 0, 0))
+        # moveBackwards.notTracking = True
+
+    # if player.brain.ball.vis.on and moveBackwards.notTracking:
+    #     player.brain.tracker.trackBall
+    #     moveBackwards.notTracking = False
+    if player.counter > 110:
+        print("Walking backwards too long... switch to a different state!")
 
     return Transition.getNextState(player, moveBackwards)
 

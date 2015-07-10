@@ -365,20 +365,20 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.OK_PRECISION + 5)
             : VisualGoalieStates.spinToFaceBall,
 
-            Transition.CountTransition(GoalieTransitions.shouldBackUp,
-                                       Transition.ALL_OF_THE_TIME,
-                                       45)
-            : GoalieStates.moveBackwards,
-
             Transition.CountTransition(GoalieTransitions.shouldGoForward,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
             : GoalieStates.lineCheckReposition,
 
-            # Transition.CountTransition(GoalieTransitions.facingSideways,
-            #                            Transition.SOME_OF_THE_TIME,
-            #                            Transition.LOW_PRECISION)
-            # : GoalieStates.lineCheckReposition,
+            Transition.CountTransition(GoalieTransitions.shouldBackUp,
+                                       Transition.ALL_OF_THE_TIME,
+                                       45)
+            : GoalieStates.moveBackwards,
+
+            Transition.CountTransition(GoalieTransitions.facingSideways,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.lineCheckReposition,
 
             Transition.CountTransition(GoalieTransitions.frontLineCheckShouldReposition,
                                        Transition.SOME_OF_THE_TIME,
@@ -443,7 +443,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.shouldClearBall,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.OK_PRECISION + 5)
-            : VisualGoalieStates.spinToFaceBall
+            : VisualGoalieStates.spinToFaceBall,
+
+            Transition.CountTransition(GoalieTransitions.shouldGoForward,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.lineCheckReposition
             }
 
         VisualGoalieStates.findMyWayBackPtI.transitions = {

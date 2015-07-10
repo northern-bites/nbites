@@ -62,6 +62,7 @@ def clearIt(player):
         GoalieStates.watchWithLineChecks.wentToClearIt = True
         GoalieStates.watchWithLineChecks.correctFacing = False
         player.brain.tracker.trackBall()
+        clearIt.startingBallDist = player.brain.ball.distance
         clearIt.startingBallX = player.brain.ball.x
         if clearIt.dangerousSide == -1:
             if player.brain.ball.rel_y < 0.0:
@@ -134,11 +135,14 @@ def clearIt(player):
     if not player.brain.ball.vis.on:
         print("Ball off, num frames:", player.brain.ball.vis.frames_off)
 
-    # if clearIt.startingBallX - player.brain.ball.x > 15.0:
-    #     print("I think the ball is coming towards me!")
-    #     return player.goLater('saveCenter')
+    if clearIt.startingBallX - player.brain.ball.x > 15.0:
+        print("I think the ball is coming towards me!")
+        # return player.goLater('saveCenter')
+    elif player.brain.ball.x.mov_vel_x > 5.0 \
+    or math.fabs(player.brain.ball.x - clearIt.startingBallX) > 15.0:
+        print("I think the ball has moved away I should stop chasing")
 
-    print("Ball vel:", player.brain.ball.mov_vel_x)
+    # print("Ball vel:", player.brain.ball.mov_vel_x)
 
 
     return Transition.getNextState(player, clearIt)

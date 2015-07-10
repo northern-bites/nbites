@@ -82,7 +82,6 @@ def frontLineCheckShouldReposition(player):
 
     return False
 
-# def iAmRight(player):
 def facingBackward(player):
     if player.brain.visionLines.horizon_dist < 170.0 and\
     math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 15.0:
@@ -92,6 +91,18 @@ def facingBackward(player):
         return True
     return False
 
+#TODO Finish
+def seeGoalbox(player):
+    lines = player.brain.visionLines
+    for i in range(0, lines.line_size()):
+        r1 = lines.line(i).inner.r
+        t1 = math.degrees(lines.line(i).inner.t)
+
+        for l in range(0, player.brain.visionLines.line_size()):
+            r2 = lines.line(l).inner.r
+            t2 = math.degrees(lines.line(l).inner.t)
+
+
 def facingSideways(player):
     if player.brain.visionLines.horizon_dist > 200 and\
     player.brain.visionLines.horizon_dist < 600 and\
@@ -100,6 +111,15 @@ def facingSideways(player):
         player.homeDirections += [RelRobotLocation(0, 0, 180.0)]
         player.homeDirections = player.homeDirections[1:]
         print("horizon", player.brain.visionLines.horizon_dist)
+        if player.brain.loc.h < 180.0:
+            # Facing left
+            player.homeDirections = []
+            player.homeDirections += [RelRobotLocation(0,0,-70)]
+        else:
+            # Facing right
+            print "I think I'm facing right!!"
+            player.homeDirections = []
+            player.homeDirections += [RelRobotLocation(0,0,70)]
         return True
     elif math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 10.0:
         print "I'm Def NOT facing sideways!!"
@@ -257,8 +277,8 @@ def shouldGoForward(player):
             r2 = lines.line(l).inner.r
             t2 = math.degrees(lines.line(l).inner.t)
 
-            if (l != i) and math.fabs(t - t2) < 6.0 \
-            and r2 < 120.0 and r < 120.0 and math.fabs(r - r2) > 35.0 \
+            if (l != i) and math.fabs(t - t2) < 15.0 \
+            and r2 < 120.0 and r < 120.0 and math.fabs(r - r2) > 25.0 \
             and r != 0.0 and r2 != 0.0:
                 print "I'm seeing two lines, I should go forward"
                 print ("r1: ", r, "r2: ", r2, " t1: ", t, "t2: ", t2)
@@ -429,18 +449,6 @@ def facingASideline(player):
 
 def getLineLength(line):
     return line.ep1 - line.ep0
-    # r = line.r
-    # t = line.t
-    # x0 = r * math.cos(t)
-    # y0 = r * math.sin(t)
-    # x1 = x0 + line.ep0 * math.sin(t)
-    # y1 = y0 + -line.ep0 * math.cos(t)
-    # x2 = x0 + line.ep1 * math.sin(t)
-    # y2 = y0 + -line.ep1 * math.cos(t)
-
-    # x = x2 - x1
-    # y = y2 - y1
-    # return math.sqrt(x*x + y*y)
 
 def shouldPositionRight(player):
     if player.brain.ball.bearing_deg < -40.0 and \
@@ -668,7 +676,6 @@ def goodRightCornerObservation(player):
     return False
 
 def shouldMoveForward(player):
-    return False
     vision = player.brain.interface.visionField
 
     if (player.counter > 150 and
@@ -836,7 +843,6 @@ def shouldDiveRight(player):
         print("shouldDiveRight.lastFramesOff:", shouldDiveRight.lastFramesOff)
         print("ball.vis.frames_on", ball.vis.frames_on)
         print("nb xvel:", nball.x_vel)
-        print("ball x vel:", ball.vel_x)
         print("ball mov vel:", ball.mov_vel_x)
 
     # return (nball.x_vel < -10.0 and
@@ -879,7 +885,6 @@ def shouldDiveLeft(player):
         print("shouldDiveRight.lastFramesOff:", shouldDiveRight.lastFramesOff)
         print("ball.vis.frames_on", ball.vis.frames_on)
         print("nb xvel:", nball.x_vel)
-        print("ball x vel:", ball.vel_x)
         print("ball mov vel:", ball.mov_vel_x)
 
     # return (nball.x_vel < -10.0 and
@@ -923,7 +928,6 @@ def shouldSquat(player):
         print("shouldDiveRight.lastFramesOff:", shouldDiveRight.lastFramesOff)
         print("ball.vis.frames_on", ball.vis.frames_on)
         print("nb xvel:", nball.x_vel)
-        print("ball x vel:", ball.vel_x)
         print("ball mov vel:", ball.mov_vel_x)
 
     # Lower threshold for fast balls
@@ -931,6 +935,11 @@ def shouldSquat(player):
 
     # More sensitive to close balls even at lower speeds
     if ball.distance < 50.0 and ball.mov_vel_x < -6.0 and nball.yintercept != 0.0\
+    and abs(nball.yintercept) < 30.0:
+        print("ball exceptionally close, I'm saving")
+        return True
+
+    if ball.distance < 25.0 and ball.mov_vel_x < -3.0 and nball.yintercept != 0.0\
     and abs(nball.yintercept) < 30.0:
         print("ball exceptionally close, I'm saving")
         return True
@@ -1033,7 +1042,7 @@ def ballLostStopChasing(player):
     If the robot does not see the ball while chasing, it is lost. Delay
     in case our shoulder pads are just hiding it.
     """
-    if player.brain.ball.vis.frames_off > 100:
+    if player.brain.ball.vis.frames_off > 30:
         return True
 
 def ballMovedStopChasing(player):
@@ -1042,7 +1051,7 @@ def ballMovedStopChasing(player):
     stop chasing.
     """
     return (player.brain.ball.distance > 50.0 and
-            player.counter > 200.0)
+            player.counter > 70.0)
 
 def walkedTooFar(player):
     # for the odometry reset delay
