@@ -83,7 +83,6 @@ public class WorldViewUtility extends UtilityParent {
 						Logger.warnf("WorldView got packet from correct team with OOB player: %d", 
 								tb.dataTeamPacket.getPlayerNumber());
 					}
-					
 				}
 			}
 		}
