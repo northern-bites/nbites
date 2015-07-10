@@ -308,8 +308,8 @@ double LineSystem::scoreObservation(const vision::GeoLine& observation,
     // TODO params
     boost::math::normal_distribution<> tiltGaussian(0, 5*TO_RAD);
     boost::math::normal_distribution<> tGaussian(0, 10*TO_RAD);
-    boost::math::normal_distribution<> ep0Gaussian(0, 50);
-    boost::math::normal_distribution<> ep1Gaussian(0, 50);
+    boost::math::normal_distribution<> ep0Gaussian(0, 100);
+    boost::math::normal_distribution<> ep1Gaussian(0, 100);
   
     double tiltProb = pdf(tiltGaussian, tiltDiff);
     double tProb = pdf(tGaussian, tDiff);
