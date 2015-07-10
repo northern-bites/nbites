@@ -60,13 +60,12 @@ ParticleFilter::~ParticleFilter()
 }
 
 void ParticleFilter::update(const messages::RobotLocation& odometryInput,
-                            messages::FieldLines&          linesInput,
-                            messages::Corners&             cornersInput,
+                            messages::Vision&              visionInput,
                             const messages::FilteredBall*  ballInput)
 {
     // Motion system and vision system update step
     motionSystem->update(particles, odometryInput, errorMagnitude);
-    bool updatedVision = visionSystem->update(particles, linesInput, cornersInput, ballInput, poseEstimate);
+    bool updatedVision = visionSystem->update(particles, visionInput, ballInput, poseEstimate);
 
     // Resample if vision updated
     if(updatedVision) {
@@ -89,7 +88,7 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     updateEstimate();
 
     // For debug tools, project lines and corners onto field, set IDs, etc.
-    updateFieldForDebug(linesInput, cornersInput); 
+    updateFieldForDebug(visionInput); 
 }
 
 /**
@@ -134,14 +133,14 @@ void ParticleFilter::updateEstimate()
     // std::cout << variance << std::endl;
 }
 
-void ParticleFilter::updateFieldForDebug(messages::FieldLines& lines,
-                                         messages::Corners& corners)
+void ParticleFilter::updateFieldForDebug(messages::Vision& vision)
 {
+    // (1) Lines
     LineSystem lineSystem;
     lineSystem.setDebug(false);
-    for (int i = 0; i < lines.line_size(); i++) {
+    for (int i = 0; i < vision.line_size(); i++) {
         // Get line
-        messages::FieldLine& field = *lines.mutable_line(i);
+        messages::FieldLine& field = *vision.mutable_line(i);
 
         // Set correspondence and scores
         if (!LineSystem::shouldUse(lines.line(i), poseEstimate)) {
@@ -155,7 +154,7 @@ void ParticleFilter::updateFieldForDebug(messages::FieldLines& lines,
         }
 
         // Project lines onto the field
-        vision::GeoLine projected = LineSystem::relRobotToAbsolute(lines.line(i), poseEstimate);
+        vision::GeoLine projected = LineSystem::relRobotToAbsolute(vision.line(i), poseEstimate);
         messages::HoughLine& hough = *field.mutable_inner();
 
         hough.set_r(projected.r());
@@ -164,26 +163,54 @@ void ParticleFilter::updateFieldForDebug(messages::FieldLines& lines,
         hough.set_ep1(projected.ep1());
     }
 
+    // (2) Corners
     LandmarkSystem landmarkSystem;
     landmarkSystem.setDebug(false);
-    for (int i = 0; i < corners.corner_size(); i++) {
+    for (int i = 0; i < vision.corner_size(); i++) {
         // Get corner
-        messages::Corner& corner = *corners.mutable_corner(i);
+        messages::Corner& corner = *vision.mutable_corner(i);
 
-        messages::RobotLocation cornerRel;
-        cornerRel.set_x(corner.x());
-        cornerRel.set_y(corner.y());
-
-        // Set correspondence and scores
+        // Set correspondence and score
         LandmarkID id = std::get<0>(landmarkSystem.matchCorner(corner, poseEstimate));
         corner.set_prob(landmarkSystem.scoreCorner(corner, poseEstimate));
         corner.set_correspondence(static_cast<int>(id));
 
         // Project corner onto the field
+        messages::RobotLocation cornerRel;
+        cornerRel.set_x(corner.x());
+        cornerRel.set_y(corner.y());
+
         messages::RobotLocation cornerAbs = LandmarkSystem::relRobotToAbsolute(cornerRel, poseEstimate);
         corner.set_x(cornerAbs.x());
         corner.set_y(cornerAbs.y());
     }
+
+    // (3) Center circle
+    messages::CenterCircle& circle = *vision.mutable_circle();
+
+    // Set score
+    circle.set_prob(landmarkSystem.scoreCircle(circle, poseEstimate));
+
+    // Project circle onto the field
+    messages::RobotLocation circleRel;
+    circleRel.set_x(circle.x());
+    circleRel.set_y(circle.y());
+
+    messages::RobotLocation circleAbs = LandmarkSystem::relRobotToAbsolute(circleRel, poseEstimate);
+    circle.set_x(circleAbs.x());
+    circle.set_y(circleAbs.y());
+
+    // (4) Ball
+    messages::VBall& ball = *vision.mutable_ball();
+
+    // Project ball onto the field
+    messages::RobotLocation ballRel;
+    ballRel.set_x(ball.x());
+    ballRel.set_y(ball.y());
+
+    messages::RobotLocation ballAbs = LandmarkSystem::relRobotToAbsolute(ballRel, poseEstimate);
+    ball.set_x(ballAbs.x());
+    ball.set_y(ballAbs.y());
 }
 
 /**

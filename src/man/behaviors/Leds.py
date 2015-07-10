@@ -188,8 +188,8 @@ class Leds():
 
         if GOALBOX_LEDS:
             gbOn = False
-            for i in range(0, self.brain.visionLines.line_size()):
-                if self.brain.visionLines.line(i).id == 7:
+            for i in range(0, self.brain.vision.line_size()):
+                if self.brain.vision.line(i).id == 7:
                     self.executeLeds(GOALBOX_ON_LEDS)
                     gbOn = True
                     break

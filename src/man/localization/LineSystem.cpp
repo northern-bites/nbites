@@ -281,7 +281,6 @@ double LineSystem::scoreObservation(const vision::GeoLine& observation,
         normalizedEp0 = correspondingLine.ep0();
         normalizedEp1 = correspondingLine.ep1();
     }
-
     vision::GeoLine normalizedCorrespondingLine;
     normalizedCorrespondingLine.set(fabs(correspondingLine.r()), normalizedT,
                                     normalizedEp0, normalizedEp1);

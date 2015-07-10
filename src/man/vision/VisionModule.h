@@ -11,9 +11,12 @@
 #include "Hough.h"
 #include "Kinematics.h"
 #include "Homography.h"
+#include "Field.h"
+
 #include "BallDetector.h"
 #include "BallModel.pb.h"
 #include "InertialState.pb.h"
+
 
 namespace man {
 namespace vision {
@@ -28,22 +31,27 @@ public:
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::InertialState> inertsIn;
 
-    portals::OutPortal<messages::FieldLines> linesOut;
-    portals::OutPortal<messages::Corners> cornersOut;
+    portals::OutPortal<messages::Vision> visionOut;
     portals::OutPortal<messages::VisionBall> ballOut;
-    portals::OutPortal<messages::CenterCircle> centCircOut;
+
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
+    HoughLineList* getLines(bool topCamera = true) const { return houghLines[!topCamera]; }
+	DebugImage* getDebugImage(bool topCamera = true) const { return debugImage[!topCamera]; }
+    BallDetector* getBallDetector(bool topCamera = true) const { return ballDetector[!topCamera]; }
     EdgeList* getRejectedEdges(bool topCamera = true) const {return rejectedEdges[!topCamera]; }
     HoughLineList* getHoughLines(bool topCamera = true) const { return houghLines[!topCamera]; }
-    BallDetector* getBallDetector(bool topCamera = true) const { return ballDetector[!topCamera]; }
     Kinematics* getKinematics(bool topCamera = true) const {return kinematics[!topCamera]; }
     FieldHomography* getFieldHomography(bool topCamera = true) const {return homography[!topCamera]; }
     FieldLineList* getFieldLines(bool topCamera = true) const { return fieldLines[!topCamera]; }
     GoalboxDetector* getBox(bool topCamera = true) const { return boxDetector[!topCamera]; }
     CornerDetector* getCorners(bool topCamera = true) const { return cornerDetector[!topCamera]; }
     CenterCircleDetector* getCCD(bool topCamera = true) const {return centerCircleDetector[!topCamera]; }
+
+#ifdef OFFLINE
+	void setDebugDrawingParameters(nblog::SExpr* debugParams);
+#endif
     
     // For use by vision_defs
     void setColorParams(Colors* colors, bool topCamera);
@@ -62,10 +70,7 @@ private:
 #ifdef USE_LOGGING
     void logImage(int i);
 #endif
-    void sendLinesOut();
-    void sendCornersOut();
-    void updateVisionBall();
-    void sendCenterCircle();
+    void outportalVisionField();
 
     Colors* colorParams[2];
     ImageFrontEnd* frontEnd[2];
@@ -78,12 +83,12 @@ private:
     Kinematics* kinematics[2];
     FieldHomography* homography[2];
     FieldLineList* fieldLines[2];
+	DebugImage* debugImage[2];
+	Field* field;
     GoalboxDetector* boxDetector[2];
     CornerDetector* cornerDetector[2];
     CenterCircleDetector* centerCircleDetector[2];
     BallDetector* ballDetector[2];
-
-    bool centerCircleDetected;
 
     bool blackStar_;
     
@@ -94,6 +99,8 @@ private:
     bool ballOn;
     int ballOnCount;
     int ballOffCount;
+
+	uint8_t * debugSpace[2];
 
     nblog::SExpr* calibrationLisp;
     size_t image_index;

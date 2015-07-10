@@ -1,6 +1,7 @@
 package messages;
 
-message VisionBall {
+message VisionBall
+{
     optional double distance = 1;
     optional double bearing = 2;
     optional double angle_x_deg = 3;
@@ -59,7 +60,8 @@ message FilteredBall
     optional float mov_speed = 30;
 }
 
-message SharedBall {
+message SharedBall
+{
     optional float x = 1;
     optional float y = 2;
     optional bool ball_on  = 3;
