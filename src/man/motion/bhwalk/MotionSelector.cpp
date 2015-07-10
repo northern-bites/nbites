@@ -25,10 +25,9 @@ void MotionSelector::stand()
 
 void MotionSelector::update(MotionSelectionBH& motionSelection)
 {
-  std::cout << "Motion selector update" << std::endl;
   static int interpolationTimes[MotionRequestBH::numOfMotions];
   interpolationTimes[MotionRequestBH::walk] = 10;
-  interpolationTimes[MotionRequestBH::kick] = 200;
+  interpolationTimes[MotionRequestBH::kick] = 10;
   interpolationTimes[MotionRequestBH::specialAction] = 10;
   interpolationTimes[MotionRequestBH::stand] = 10;
   interpolationTimes[MotionRequestBH::getUp] = 600;
@@ -37,7 +36,6 @@ void MotionSelector::update(MotionSelectionBH& motionSelection)
   if(lastExecution)
   {
     MotionRequestBH::Motion requestedMotion = theMotionRequestBH.motion;
-    std::cout << "Motion request in selector: " << (int) requestedMotion << std::endl;
     if(theMotionRequestBH.motion == MotionRequestBH::walk && !theGroundContactStateBH.contact)
       requestedMotion = MotionRequestBH::stand;
 
@@ -55,9 +53,7 @@ void MotionSelector::update(MotionSelectionBH& motionSelection)
        (lastMotion == MotionRequestBH::kick && theKickEngineOutput.isLeavingPossible)
         )
     {
-
       motionSelection.targetMotion = requestedMotion;
-      std::cout << "target: " << (int) requestedMotion << std::endl;
     }
 
     if(requestedMotion == MotionRequestBH::specialAction)
@@ -79,8 +75,9 @@ void MotionSelector::update(MotionSelectionBH& motionSelection)
     float sum(0);
     for(int i = 0; i < MotionRequestBH::numOfMotions; i++)
     {
-      if(i == motionSelection.targetMotion)
-        motionSelection.ratios[i] += delta;
+        if(i == motionSelection.targetMotion) {
+            motionSelection.ratios[i] += delta;
+        }
       else
         motionSelection.ratios[i] -= delta;
       motionSelection.ratios[i] = std::max(motionSelection.ratios[i], 0.0f); // clip ratios

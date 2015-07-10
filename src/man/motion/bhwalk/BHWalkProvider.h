@@ -94,6 +94,7 @@ private:
     bool requestedToStop;
     bool standby;
     bool justMotionKicked;
+    bool kicking;
     bool tryingToWalk;
     MotionCommand::ptr currentCommand;
     Pose2DBH startOdometry;
@@ -101,6 +102,18 @@ private:
     WalkingEngine *walkingEngine;
     KickEngine *kickEngine;
     Blackboard *blackboard;
+
+    // Note: The kick engine output requires state to notify when it's finised.
+    WalkingEngineOutputBH walkOutput;
+    KickEngineOutput kickOut;
     };
+
+static const int ON_STIFF_ARRAY[] =
+{ 100, 100,
+  100, 100, 100, 100, 100,
+  100, 100, 100, 100, 100,
+  100, 100, 100, 100, 100,
+  100, 100, 100, 100, 100};
+
 } // namespace motion
 } // namespace man

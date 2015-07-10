@@ -59,7 +59,7 @@ static const JointDataBH::Joint nb_joint_order[] = {
 };
 
 BHWalkProvider::BHWalkProvider()
-    : MotionProvider(WALK_PROVIDER), requestedToStop(false), tryingToWalk(false)
+    : MotionProvider(WALK_PROVIDER), requestedToStop(false), tryingToWalk(false), kicking(true)
 {
 	// Setup Walk Engine Configuation Parameters
 	ModuleBase::config_path = common::paths::NAO_CONFIG_DIR;
@@ -139,6 +139,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     assert(JointDataBH::numOfJoints == Kinematics::NUM_JOINTS);
 
     if (standby) {
+        //std::cout << "In standby" << std::endl;
         tryingToWalk = false;
 
         MotionRequestBH motionRequest;
@@ -156,6 +157,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     } else {
     // TODO VERY UGLY -- refactor this please
     if (requestedToStop || !isActive()) {
+        //std::cout << "RequestedToStop" << std::endl;
         tryingToWalk = false;
 
         MotionRequestBH motionRequest;
@@ -172,11 +174,13 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         // If we're not calibrated, wait until we are calibrated to walk
         if (!calibrated())
         {
+            //std::cout << "Calibrating" << std::endl;
             MotionRequestBH motionRequest;
             motionRequest.motion = MotionRequestBH::stand;
 
             walkingEngine->theMotionRequestBH = motionRequest;
         } else if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP) {
+            //std::cout << "trying to walk via step" << std::endl;
             tryingToWalk = true;
 
             StepCommand::ptr command = boost::shared_static_cast<StepCommand>(currentCommand);
@@ -211,6 +215,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
         } else {
         if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK) {
+            //std::cout << "WALK" << std::endl;
             tryingToWalk = true;
 
             WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
@@ -227,6 +232,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             walkingEngine->theMotionRequestBH = motionRequest;
         } else {
         if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
+            //std::cout << "DESTINATION" << std::endl;
             tryingToWalk = true;
 
             DestinationCommand::ptr command = boost::shared_static_cast<DestinationCommand>(currentCommand);
@@ -270,6 +276,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         }
         //TODO make special command for stand
         if (!currentCommand.get()) {
+            //std::cout << "Standing" << std::endl;
             tryingToWalk = false;
 
             MotionRequestBH motionRequest;
@@ -319,40 +326,41 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     bh_sensors.data[SensorDataBH::fsrLBL] = sensorFSRs.lrl();
     bh_sensors.data[SensorDataBH::fsrLBR] = sensorFSRs.lrr();
 
-    WalkingEngineOutputBH output;
+    const float* angles = NULL;
+    const int* hardness = NULL;
 
-    KickEngineOutput ko;
-    if (BHWalkProvider::frameCount > 600) {
-//        std::cout << "REQUESTING A KICK!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+    if (BHWalkProvider::frameCount > 400 && kicking) {
         MotionRequestBH motionRequest;
         motionRequest.motion = MotionRequestBH::kick;
         motionRequest.kickRequest.kickMotionType = KickRequest::getKickMotionFromName("kickForward");
-//        std::cout << "The kick is: " << (int)motionRequest.kickRequest.kickMotionType << std::endl;
 
         WalkingEngineStandOutputBH standout;
         walkingEngine->theMotionRequestBH = motionRequest;
-        walkingEngine->update(output);
+        walkingEngine->update(walkOutput);
         walkingEngine->update(standout);
 
         kickEngine->theMotionRequestBH = motionRequest;
         kickEngine->theWalkingEngineStandOutputBH = standout;
 
-        kickEngine->update(ko);
+        kickEngine->update(kickOut);
+        angles = (kickOut.angles);
+        // Kick Engine doesn't seem to be setting stiffnesses..
+        hardness = (ON_STIFF_ARRAY);
+        if (kickOut.isLeavingPossible) {
+            //std::cout << "DONE" << std::endl;
+            // walkingEngine->theMotionRequestBH.motion = MotionRequestBH::stand;
+            // walkingEngine->update(output);
+        }
+        kicking = !kickOut.isLeavingPossible;
     }
     else {
-        walkingEngine->update(output);
+        walkingEngine->update(walkOutput);
+        angles = (walkOutput.angles);
+        hardness = (walkOutput.jointHardness.hardness);
     }
-    // else if (BHWalkProvider::frameCount > 600) {
-    //     std::cout << "Updating with contents of request!!" << std::endl;
-    //     WalkingEngineStandOutputBH standout;
-    //     walkingEngine->update(standout);
-    //     kickEngine->theWalkingEngineStandOutputBH = standout;
-
-    //     kickEngine->update(ko);
-    // }
 
     // Update justMotionKicked so that we do not motion kick multiple times in a row
-    if (output.executedWalk.kickType != WalkRequest::none) { // if we succesfully motion kicked
+    if (walkOutput.executedWalk.kickType != WalkRequest::none) { // if we succesfully motion kicked
         justMotionKicked = true;
     }
     else if (walkingEngine->theMotionRequestBH.walkRequest.mode != WalkRequest::targetMode || // else if we are no longer attempting to motion kick
@@ -366,27 +374,13 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         std::vector<float> chain_hardness;
         for (unsigned j = Kinematics::chain_first_joint[i];
                      j <= Kinematics::chain_last_joint[i]; j++) {
-            if (BHWalkProvider::frameCount < 600) {
-                chain_angles.push_back(output.angles[nb_joint_order[j]] * walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].sign - walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].offset);
-            if (output.jointHardness.hardness[nb_joint_order[j]] == 0) {
+            chain_angles.push_back(angles[nb_joint_order[j]] * walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].sign - walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].offset);
+            if (hardness[nb_joint_order[j]] == 0) {
+                std::cout << "NO_STIFF" << std::endl;
                 chain_hardness.push_back(MotionConstants::NO_STIFFNESS);
             } else {
-                chain_hardness.push_back(output.jointHardness.hardness[nb_joint_order[j]] / 100.f);
+                chain_hardness.push_back(hardness[nb_joint_order[j]] / 100.f);
             }
-            }
-            else {
-                chain_angles.push_back(ko.angles[nb_joint_order[j]] * walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].sign - walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].offset);
-                std::cout << "Kicking Angle: " << j << " " << ko.angles[nb_joint_order[j]] << std::endl;
-                std::cout << "Kicking Hard: " << ko.jointHardness.hardness[nb_joint_order[j]] << std::endl;
-            if (ko.jointHardness.hardness[nb_joint_order[j]] == 0) {
-                chain_hardness.push_back(MotionConstants::NO_STIFFNESS);
-            } else {
-                chain_hardness.push_back(1);
-                //chain_hardness.push_back(ko.jointHardness.hardness[nb_joint_order[j]] / 100.f);
-            }
-            }
-
-
         }
         this->setNextChainJoints((Kinematics::ChainID) i, chain_angles);
         this->setNextChainStiffnesses((Kinematics::ChainID) i, chain_hardness);

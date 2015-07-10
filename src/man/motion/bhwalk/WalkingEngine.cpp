@@ -212,6 +212,7 @@ void WalkingEngine::update(WalkingEngineOutputBH& walkingEngineOutput)
     MODIFY("module:WalkingEngine:optimizeBestParameters", optimizeBestParameters);
 
     theMotionInfoBH.motion = theMotionRequestBH.motion;
+    theMotionInfoBH.kickRequest = theMotionRequestBH.kickRequest;
     theMotionInfoBH.specialActionRequest = theMotionRequestBH.specialActionRequest;
     theMotionInfoBH.walkRequest = theMotionRequestBH.walkRequest;
     theMotionInfoBH.isMotionStable = true;

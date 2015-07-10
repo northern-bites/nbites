@@ -196,39 +196,20 @@ void KickEngine::init()
 
 void KickEngine::update(KickEngineOutput& kickEngineOutput)
 {
-    // Update requisite modules
-    // naoProvider->update(theJointDataBH, theSensorDataBH);
-    // naoProvider->update(theFrameInfoBH);
-    // jointFilter->update(theFilteredJointDataBH);
-    // robotModelProvider->update(theRobotModelBH);
-    // groundContactDetector->update(theGroundContactStateBH);
-    // inertiaSensorCalibrator->update(theInertiaSensorDataBH);
-    // inertiaSensorFilter->update(theOrientationDataBH);
-    // sensorFilter->update(theFilteredSensorDataBH);
-    // fallDownStateDetector->update(theFallDownStateBH);
-    // torsoMatrixProvider->update(theOdometryDataBH);
-    // torsoMatrixProvider->update(theTorsoMatrixBH);
-    // motionSelector->update(theMotionSelectionBH);
-
-    std::cout << "Kick Engine update" << std::endl;
   if(theMotionSelectionBH.ratios[MotionRequestBH::kick] > 0.f)
   {
-      std::cout << "Ratio > 0" << std::endl;
     data.setCycleTime(theFrameInfoBH.cycleTime);
 
     if(theMotionSelectionBH.ratios[MotionRequestBH::kick] < 1.f && !compensated) {
         compensate = true;
-        std::cout << "Ratio <1" << std::endl;
     }
 
     data.setRobotModel(theRobotModelBH);
 
     if(data.sitOutTransitionDisturbance(compensate, compensated, theFilteredSensorDataBH, kickEngineOutput, theWalkingEngineStandOutputBH, theFrameInfoBH))
     {
-        std::cout << "inside with standoutputbh"<< std::endl;
       if(data.activateNewMotion(theMotionRequestBH.kickRequest, kickEngineOutput.isLeavingPossible) && theMotionRequestBH.motion == MotionRequestBH::kick)
       {
-          std::cout << "data.activateNewMotion" << std::endl;
         data.initData(compensated, theFrameInfoBH, theMotionRequestBH, theRobotDimensionsBH, params, theFilteredJointDataBH, theTorsoMatrixBH);
         data.setCurrentKickRequest(theMotionRequestBH);
         data.setExecutedKickRequest(kickEngineOutput.executedKickRequest);
@@ -259,13 +240,11 @@ void KickEngine::update(KickEngineOutput& kickEngineOutput)
 
       //  if(data.isMotionAlmostOver()) //last three phases are unstable
       //    kickEngineOutput.isStable = false;
-      std::cout << "Pre calcjoints" << std::endl;
       if(data.calcJoints(kickEngineOutput, theRobotDimensionsBH, theHeadJointRequestBH))
       {
 #ifndef RELEASE
         data.debugFormMode(params);
 #endif
-        std::cout << "calcJoints TRUE" << std::endl;
         data.balanceCOM(kickEngineOutput, theRobotDimensionsBH, theMassCalibrationBH, theFilteredJointDataBH);
         data.calcJoints(kickEngineOutput, theRobotDimensionsBH, theHeadJointRequestBH);
         data.mirrorIfNecessary(kickEngineOutput);
@@ -275,7 +254,6 @@ void KickEngine::update(KickEngineOutput& kickEngineOutput)
   }
   else
   {
-      std::cout << "compensated == false" << std::endl;
     compensated = false;
   }
 

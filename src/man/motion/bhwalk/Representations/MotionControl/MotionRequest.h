@@ -18,11 +18,11 @@ STREAMABLE(MotionRequestBH,
 {
 public:
   ENUM(Motion,
-    walk,
-    kick,
-    specialAction,
-    stand,
-    getUp
+       walk,         // 0
+       kick,         // 1
+       specialAction,// 2
+       stand,        // 3
+       getUp         // 4
   );
 
   /**
