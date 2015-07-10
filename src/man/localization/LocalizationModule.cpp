@@ -57,8 +57,7 @@ void LocalizationModule::update()
     const messages::FilteredBall* ball = NULL;
 #ifndef OFFLINE
     bool inSet = (STATE_SET == gameStateInput.message().state());
-    if (inSet && (!gameStateInput.message().have_remote_gc() || 
-        gameStateInput.message().secs_remaining() != 600))
+    if (inSet)
         ball = &curBall;
 #endif
 
