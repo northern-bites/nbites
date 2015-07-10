@@ -350,7 +350,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
  * @param y   back the field edge in global coordinates (if possible)
  * @return    if calculation was possible, false otherwise
  */
-	bool Field::onField(double x, double & y) {
+bool Field::onField(double x, double & y) {
     for (int i = 1; i <= numberOfHulls; i++) {
 		if (convexWorld[i-1].x < x && convexWorld[i].x > x) {
 			// interpolate the y's
@@ -728,7 +728,7 @@ int Field::getImprovedEstimate(int horizon) {
  * @return      the new horizon estimate
  */
 
-int Field::findGreenHorizon(int pH, float sl) {
+int Field::findGreenHorizon(int pH, int rH) {
     // re init shooting info
     for (int i = 0; i < width; i++) {
         topEdge[i] = 0;
@@ -736,24 +736,53 @@ int Field::findGreenHorizon(int pH, float sl) {
     // store field pose
     poseHorizon = pH;
 
+	if (drawCameraHorizon) {
+		cout << "Drawing camera horizon from " << pH << " to " << rH << endl;
+		float diff = (float)(rH - pH) / (float)width;
+		float start = static_cast<float>(pH);
+		for (int i = 0; i < width; i++) {
+			start += diff;
+			drawDot(i, (int)start, ORANGE);
+		}
+	}
+
     // get an initial estimate
     int initialEstimate = getInitialHorizonEstimate(pH);
     if (debugHorizon) {
         cout << "initial estimate is " << initialEstimate << " " << pH << endl;
     }
-	if (drawCameraHorizon) {
-		cout << "Drawing camera horizon" << endl;
-		for (int i = 0; i < width; i++) {
-			drawDot(i, pH, ORANGE);
-		}
-	}
-
     // improve the estimate
     horizon = getImprovedEstimate(initialEstimate);
     // calculate the convex hull
     findConvexHull(horizon);
     return horizon;
 }
+
+/* The blocked horizon at the given x value. This is a more stringest
+ * horizon that gives lower values in the presence of blackages - usually
+ * robots or goal posts.
+ * @param x        column to find the blocked horizon in
+ * @return        projected value
+ */
+
+int Field::blockHorizonAt(int x) {
+    if (topCamera) {
+        if (x < 0 || x >= width) {
+            if (debugHorizon) {
+                cout << "Problem in blocked horizon " << x << endl;
+            }
+            if (x < 0) {
+                return topBlock[0];
+            } else {
+                return topBlock[width - 1];
+            }
+        }
+        return topBlock[x];
+    }
+    else
+        return 0;
+}
+
 
 /* The horizon at the given x value.  Eventually we'll be changing this to
  * return a value based upon the field edges.

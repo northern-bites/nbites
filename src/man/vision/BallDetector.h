@@ -23,7 +23,7 @@ namespace man {
 		class Ball {
 		public:
 			Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_,
-				 int imgWidth_, bool top);
+				 int imgWidth_, bool top, bool os, bool ot, bool ob);
 			Ball();
 
 			std::string properties();
@@ -45,6 +45,11 @@ namespace man {
 			double y_rel;
 			double cameraH;
 			double dist;
+
+			bool occludedSide;
+			bool occludedTop;
+			bool occludedBottom;
+			bool topCamera;
 
 			int imgHeight, imgWidth;
 			double expectedDiam;

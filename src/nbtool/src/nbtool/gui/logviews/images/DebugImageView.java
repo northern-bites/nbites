@@ -80,7 +80,7 @@ public class DebugImageView extends ViewParent
 	boolean drawAllBalls;
 
 	static final int NUMBER_OF_PARAMS = 5; // update as new params are added
-	int displayParams[] = new int[NUMBER_OF_PARAMS];
+	static int displayParams[] = new int[NUMBER_OF_PARAMS];
 
 	// Dimensions of the image that we are working with
     int width;
@@ -102,7 +102,86 @@ public class DebugImageView extends ViewParent
 	Log balls;
 
 	static int currentBottom;  // track current selection
-	boolean firstLoad;
+	static boolean firstLoad = true;
+	boolean newLog = true;
+
+	boolean parametersNeedSetting = false;
+
+    public DebugImageView() {
+        super();
+        setLayout(null);
+		// set up combo box to select views
+		viewList = new JComboBox(imageViews);
+		viewList.setSelectedIndex(0);
+		viewList.addActionListener(this);
+
+		// set up check boxes
+		checkListener = new CheckBoxListener();
+		showCameraHorizon = new JCheckBox("Show camera horizon");
+		showFieldHorizon = new JCheckBox("Show field convex hull");
+		debugHorizon = new JCheckBox("Debug Field Horizon");
+		debugFieldEdge = new JCheckBox("Debug Field Edge");
+		debugBall = new JCheckBox("Debug Ball");
+		showFieldLines = new JCheckBox("Hide Field Lines");
+		displayFieldLines = true;
+		drawAllBalls = false;
+
+		// add their listeners
+		showCameraHorizon.addItemListener(checkListener);
+		showFieldHorizon.addItemListener(checkListener);
+		debugHorizon.addItemListener(checkListener);
+		debugFieldEdge.addItemListener(checkListener);
+		debugBall.addItemListener(checkListener);
+		showFieldLines.addItemListener(checkListener);
+
+		// put them into one panel
+		checkBoxPanel = new JPanel();
+		checkBoxPanel.setLayout(new GridLayout(0, 1)); // 0 rows, 1 column
+		checkBoxPanel.add(showCameraHorizon);
+		checkBoxPanel.add(showFieldHorizon);
+		checkBoxPanel.add(debugHorizon);
+		checkBoxPanel.add(debugFieldEdge);
+		checkBoxPanel.add(debugBall);
+		checkBoxPanel.add(showFieldLines);
+
+		add(checkBoxPanel);
+		add(viewList);
+
+        this.addMouseListener(new DistanceGetter());
+
+		// default all checkboxes to false
+		showCameraHorizon.setSelected(false);
+		showFieldHorizon.setSelected(false);
+		debugHorizon.setSelected(false);
+		debugFieldEdge.setSelected(false);
+		debugBall.setSelected(false);
+		showFieldLines.setSelected(false);
+
+		// for now do not bother trying to save params across instances
+		for (int i = 0; i < NUMBER_OF_PARAMS; i++) {
+			displayParams[i] = 0;
+		}
+		// default image to display - save across instances
+		if (firstLoad) {
+			for (int i = 0; i < NUMBER_OF_PARAMS; i++) {
+				displayParams[i] = 0;
+			}
+
+			firstLoad = false;
+			currentBottom = ORIGINAL;
+		} else {
+			System.out.println("Reloading");
+			// Ideally we'd do our debug drawing right away,
+			// but this isn't easily possible until we shift
+			// the tool to doing a single VisionModule instance
+			/*for (int i = 0; i < NUMBER_OF_PARAMS; i++) {
+				if (displayParams[i] != 0) {
+					parametersNeedSetting = true;
+					break;
+				}
+				}*/
+		}
+    }
 
     @Override
     public void setLog(Log newlog) {
@@ -147,7 +226,7 @@ public class DebugImageView extends ViewParent
     public void adjustParams() {
 
         // Don't make an extra initial call
-        if (firstLoad) {
+        if (newLog) {
 			System.out.println("Skipping parameter adjustments");
             return;
 		}
@@ -178,65 +257,72 @@ public class DebugImageView extends ViewParent
 		final int BOX_HEIGHT = 25;
         if (debugImage != null) {
             g.drawImage(debugImageDisplay, 0, 0, displayw, displayh, null);
-            // Get hough line data from buffer
-			// This code stolen from LineView.java
-			// TODO: obviously this should be moved into its own function
-			if (displayFieldLines) {
-				for (int i = 0; i < lines.size(); i += 10) {
-					double icR = lines.get(i);
-					double icT = lines.get(i + 1);
-					double icEP0 = lines.get(i + 2);
-					double icEP1 = lines.get(i + 3);
-					double houghIndex = lines.get(i + 4);
-					double fieldIndex = lines.get(i + 5);
-					double fcR = lines.get(i + 6);
-					double fcT = lines.get(i + 7);
-					double fcEP0 = lines.get(i + 8);
-					double fcEP1 = lines.get(i + 9);
-
-					// Draw it in image coordinates
-					if (fieldIndex == -1)
-						g.setColor(Color.red);
-					else
-						g.setColor(Color.blue);
-
-					double x0 = 2*icR * Math.cos(icT) + displayImages[ORIGINAL].getWidth() / 2;
-					double y0 = -2*icR * Math.sin(icT) + displayImages[ORIGINAL].getHeight() / 2;
-					int x1 = (int) Math.round(x0 + 2*icEP0 * Math.sin(icT));
-					int y1 = (int) Math.round(y0 + 2*icEP0 * Math.cos(icT));
-					int x2 = (int) Math.round(x0 + 2*icEP1 * Math.sin(icT));
-					int y2 = (int) Math.round(y0 + 2*icEP1 * Math.cos(icT));
-
-					g.drawLine(x1, y1, x2, y2);
-
-					// Image view line labels
-					double xstring = (x1 + x2) / 2;
-					double ystring = (y1 + y2) / 2;
-
-					double scale = 0;
-					if (icR > 0)
-						scale = 10;
-					else
-						scale = 3;
-					xstring += scale*Math.cos(icT);
-					ystring += scale*Math.sin(icT);
-
-					g.drawString(Integer.toString((int) houghIndex) + "/" +
-								 Integer.toString((int) fieldIndex),
-								 (int) xstring,
-								 (int) ystring);
-
-				}
-			}
+			drawLines(g);
 			drawBlobs(g);
-
 			g.drawImage(displayImages[currentBottom], 0, displayh + 5, displayw,
 						displayh, null);
 			viewList.setBounds(0, displayh * 2 + 10, displayw / 2, BOX_HEIGHT);
-			checkBoxPanel.setBounds(displayw + 10, 0, displayw, displayh);
+			// TODO: figure out how to make this consistently display
+			// The problem has to do with repaint and the fact that Java
+			// treats it as a low priority request. Sometimes it will just
+			// take its sweet time because it doesn't think anything has changed
+			checkBoxPanel.setBounds(displayw+10, 0, displayw, displayh);
+			checkBoxPanel.show();
         }
     }
 
+	/* Taken from LineView.java
+	 */
+	public void drawLines(Graphics g) {
+		// This code stolen from LineView.java
+		// TODO: obviously this should be moved into its own function
+		if (displayFieldLines) {
+			for (int i = 0; i < lines.size(); i += 10) {
+				double icR = lines.get(i);
+				double icT = lines.get(i + 1);
+				double icEP0 = lines.get(i + 2);
+				double icEP1 = lines.get(i + 3);
+				double houghIndex = lines.get(i + 4);
+				double fieldIndex = lines.get(i + 5);
+				double fcR = lines.get(i + 6);
+				double fcT = lines.get(i + 7);
+				double fcEP0 = lines.get(i + 8);
+				double fcEP1 = lines.get(i + 9);
+
+				// Draw it in image coordinates
+				if (fieldIndex == -1)
+					g.setColor(Color.red);
+				else
+					g.setColor(Color.blue);
+
+				double x0 = 2*icR * Math.cos(icT) + displayImages[ORIGINAL].getWidth() / 2;
+				double y0 = -2*icR * Math.sin(icT) + displayImages[ORIGINAL].getHeight() / 2;
+				int x1 = (int) Math.round(x0 + 2*icEP0 * Math.sin(icT));
+				int y1 = (int) Math.round(y0 + 2*icEP0 * Math.cos(icT));
+				int x2 = (int) Math.round(x0 + 2*icEP1 * Math.sin(icT));
+				int y2 = (int) Math.round(y0 + 2*icEP1 * Math.cos(icT));
+
+				g.drawLine(x1, y1, x2, y2);
+
+				// Image view line labels
+				double xstring = (x1 + x2) / 2;
+				double ystring = (y1 + y2) / 2;
+
+				double scale = 0;
+				if (icR > 0)
+					scale = 10;
+				else
+					scale = 3;
+				xstring += scale*Math.cos(icT);
+				ystring += scale*Math.sin(icT);
+
+				g.drawString(Integer.toString((int) houghIndex) + "/" +
+							 Integer.toString((int) fieldIndex),
+							 (int) xstring,
+							 (int) ystring);
+			}
+		}
+	}
 	/* Taken directly from BallView.java (where it was undocumented). Draws blobs
 	 * related to the ball.
 	 */
@@ -332,68 +418,6 @@ public class DebugImageView extends ViewParent
 
         assert(ci.tryAddCall(cc));
 	}
-
-    public DebugImageView() {
-        super();
-        setLayout(null);
-		// set up combo box to select views
-		viewList = new JComboBox(imageViews);
-		viewList.setSelectedIndex(0);
-		viewList.addActionListener(this);
-
-		// set up check boxes
-		checkListener = new CheckBoxListener();
-		showCameraHorizon = new JCheckBox("Show camera horizon");
-		showFieldHorizon = new JCheckBox("Show field convex hull");
-		debugHorizon = new JCheckBox("Debug Field Horizon");
-		debugFieldEdge = new JCheckBox("Debug Field Edge");
-		debugBall = new JCheckBox("Debug Ball");
-		showFieldLines = new JCheckBox("Hide Field Lines");
-		displayFieldLines = true;
-		drawAllBalls = false;
-
-		// add their listeners
-		showCameraHorizon.addItemListener(checkListener);
-		showFieldHorizon.addItemListener(checkListener);
-		debugHorizon.addItemListener(checkListener);
-		debugFieldEdge.addItemListener(checkListener);
-		debugBall.addItemListener(checkListener);
-		showFieldLines.addItemListener(checkListener);
-
-		// put them into one panel
-		checkBoxPanel = new JPanel();
-		checkBoxPanel.setLayout(new GridLayout(0, 1)); // 0 rows, 1 column
-		checkBoxPanel.add(showCameraHorizon);
-		checkBoxPanel.add(showFieldHorizon);
-		checkBoxPanel.add(debugHorizon);
-		checkBoxPanel.add(debugFieldEdge);
-		checkBoxPanel.add(debugBall);
-		checkBoxPanel.add(showFieldLines);
-
-		// default all checkboxes to false
-		showCameraHorizon.setSelected(false);
-		showFieldHorizon.setSelected(false);
-		debugHorizon.setSelected(false);
-		debugFieldEdge.setSelected(false);
-		debugBall.setSelected(false);
-		showFieldLines.setSelected(false);
-
-        this.addMouseListener(new DistanceGetter());
-
-		// default image to display - save across instances
-		if (currentBottom == 0) {
-			for (int i = 0; i < NUMBER_OF_PARAMS; i++) {
-				displayParams[i] = 0;
-			}
-
-			firstLoad = true;
-			currentBottom = ORIGINAL;
-		} else {
-			System.out.println("Reloading");
-			}
-		add(checkBoxPanel);
-		add(viewList);
-    }
 
 	/* Currently only called by the JComboBox, if we start adding more actions
 	 * then we will need to update this accordingly.
@@ -550,7 +574,7 @@ public class DebugImageView extends ViewParent
 									   displayImages[ORIGINAL]);
         debugImageDisplay = debugImage.toBufferedImage();
 
-		firstLoad = false;
+		newLog = false;
 
         repaint();
 

@@ -63,13 +63,14 @@ public:
     // Returns true if x is WITHIN SCOPE convex hull and sets y 
     //  to height of hull at that x. (True could still be off field)
 	bool onField(double x, double & y);
-    int findGreenHorizon(int pH, float sl);
+    int findGreenHorizon(int pH, int rH);
     void findConvexHull(int pH);
     void initialScanForTopGreenPoints(int pH);
     void findTopEdges(int M);
     int getInitialHorizonEstimate(int pH);
     int getImprovedEstimate(int pH);
 	int horizonAt(int x);
+	int blockHorizonAt(int x);
 	int occludingHorizonAt(int x);
 	float distanceToHorizon(int x, int y);
 	float fieldEdgeDistanceCenter();
