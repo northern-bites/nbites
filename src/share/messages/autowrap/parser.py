@@ -7,6 +7,12 @@ name_word = Word(alphanums + '_')
 package_scopes = delimitedList(name_word, '.')
 package_declaration = 'package' + package_scopes.setResultsName('scopes') + ';'
 
+#The original version of this file did not support standard google protobuf options
+#This hack allows the parser to ignore protobuf java options.
+java_JOC_decl = 'option java_outer_classname = "' + name_word + ';"'
+java_JMF_decl = 'option java_multiple_files = true;'
+
+
 default_value_word = Word(alphanums + '-_.\"\\ ')
 default = Literal('[') + Literal('default') + Literal('=') + default_value_word + ']'
 
@@ -53,7 +59,7 @@ message << message_keyword + message_name + '{' + nested_elements + '}'
 # messages in a proto_file are named elements so that top-level messages can
 # be processed just like nested messages (so they're nested under the global
 # namespace in some sense)
-proto_file = Optional(package_declaration).setResultsName('package') + ZeroOrMore(Group(message)).setResultsName('elements')
+proto_file = Optional(package_declaration).setResultsName('package') + Optional(java_JOC_decl) + Optional(java_JMF_decl) + ZeroOrMore(Group(message)).setResultsName('elements')
 
 proto_file.ignore(dblSlashComment)
 
