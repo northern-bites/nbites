@@ -204,7 +204,10 @@ theirKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - \
 #
 # Useful constants can be found in src/share/include/FieldConstants.h
 
-defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X - 70, NogginConstants.FIELD_GREEN_HEIGHT)
+if NogginConstants.V5_ROBOT:
+    defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.FIELD_GREEN_HEIGHT)
+else:
+    defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X - 40, NogginConstants.FIELD_GREEN_HEIGHT)
 
 oddDefenderBoxCautious = ((0, 0), NogginConstants.CENTER_FIELD_X - 70, NogginConstants.CENTER_FIELD_Y)
 
@@ -216,7 +219,7 @@ evenDefenderBox = defenderBox
 
 chaserBox = ((0, 0), NogginConstants.FIELD_WIDTH, NogginConstants.FIELD_HEIGHT)
 
-strikerBox = ((strikerForward.x, 0), (NogginConstants.FIELD_GREEN_WIDTH - strikerForward.x), NogginConstants.FIELD_HEIGHT)
+strikerBox = ((strikerForward.x - 70, 0), (NogginConstants.FIELD_GREEN_WIDTH - strikerForward.x), NogginConstants.FIELD_HEIGHT)
 
 cherryPickerBox = (((0.5*NogginConstants.FIELD_GREEN_WIDTH + 0.25*NogginConstants.FIELD_WHITE_WIDTH), 0),
                     0.25*NogginConstants.FIELD_WHITE_WIDTH + NogginConstants.GREEN_PAD_X, 
