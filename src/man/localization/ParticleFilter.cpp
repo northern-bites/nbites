@@ -77,12 +77,12 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
         // Ad hoc method to determine if lost based on exponential filters
         // NOTE if set, behaviors may change action of robot to recover localization
         // NOTE not currently used
-        if (1.0 - (wFast / wSlow) > parameters.lostThreshold)
+        if (wFast < parameters.lostThreshold)
             lost = true;
         else
             lost = false;
 
-        resample();
+        resample(ballInput != NULL);
     }
 
     // Update filters estimate
@@ -405,7 +405,7 @@ void ParticleFilter::resetLocToSide(bool blueSide)
  * @brief  Resample the particles based on vision observations
  *         NOTE: Assume given a swarm with normalized weights
  */
-void ParticleFilter::resample()
+void ParticleFilter::resample(bool inSet)
 {
     // Map each normalized weight to the corresponding particle.
     std::map<float, Particle> cdf;
@@ -426,38 +426,43 @@ void ParticleFilter::resample()
     ParticleSet newParticles;
     const std::vector<ReconstructedLocation>& injections = visionSystem->getInjections();
 
+    // China 2015 hack
+    // If in set and see ball suitable for reconstruction, completely replace swarm with injections
+    if (inSet && injections.size()) {
+        for(int i = 0; i < parameters.numParticles; ++i) {
+            ReconstructedLocation injection = injections[rand() % injections.size()];
+            messages::RobotLocation sample = injection.sample();
+
+            Particle reconstructedParticle(sample.x(), sample.y(), sample.h(), 1/250);
+            newParticles.push_back(reconstructedParticle);
+        }
+    // Augmented MCL
     // Either inject particle or sample with replacement according to the
     // normalized weights, and place in a new particle set
     //
     // NOTE we only consider injecting particles if vision system found 
     //      suitable observations
-    int ni = 0;
-    for(int i = 0; i < parameters.numParticles; ++i) {
-        double randInjectOrSample = gen();
-        if (injections.size() && randInjectOrSample < std::max<double>(0, 1.0 - (wFast / wSlow))) {
-            // Inject particles according to sensor measurements
-            ReconstructedLocation injection = injections[rand() % injections.size()];
-            messages::RobotLocation sample = injection.sample();
-            ni++;
+    } else {
+        for(int i = 0; i < parameters.numParticles; ++i) {
+            double randInjectOrSample = gen();
+            if (injections.size() && randInjectOrSample < std::max<double>(0, 1.0 - (wFast / wSlow))) {
+                // Inject particles according to sensor measurements
+                ReconstructedLocation injection = injections[rand() % injections.size()];
+                messages::RobotLocation sample = injection.sample();
 
-            Particle reconstructedParticle(sample.x(), sample.y(), sample.h(), 1/250);
-            newParticles.push_back(reconstructedParticle);
-        } else {
-            // Resample from this frame's swarm based on scores
-            double randSample = gen();
+                Particle reconstructedParticle(sample.x(), sample.y(), sample.h(), 1/250);
+                newParticles.push_back(reconstructedParticle);
+            } else {
+                // Resample from this frame's swarm based on scores
+                double randSample = gen();
 
-            if (cdf.upper_bound(randSample) == cdf.end())
-                newParticles.push_back(cdf.begin()->second); // NOTE return something that DEF exists
-            else
-                newParticles.push_back(cdf.upper_bound(randSample)->second);
+                if (cdf.upper_bound(randSample) == cdf.end())
+                    newParticles.push_back(cdf.begin()->second); // NOTE return something that DEF exists
+                else
+                    newParticles.push_back(cdf.upper_bound(randSample)->second);
+            }
         }
     }
-
-    // std::cout << "TEST" << std::endl;
-    // std::cout << 1.0 - (wFast / wSlow) << std::endl;
-    // std::cout << wFast << std::endl;
-    // std::cout << wSlow << std::endl;
-    // std::cout << ni << std::endl;
 
     // Update particles
     particles = newParticles;
