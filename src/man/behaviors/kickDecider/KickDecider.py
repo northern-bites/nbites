@@ -207,7 +207,7 @@ class KickDecider(object):
         
         self.filters = []
         self.filters.append(self.inBoundsOrGoal)
-        self.filters.append(self.notTowardOurGoal)
+        #self.filters.append(self.notTowardOurGoal)
 
         self.clearPossibleKicks()
         self.addFastestPossibleKicks()
@@ -855,7 +855,9 @@ class KickDecider(object):
         rightPostY = nogginC.LANDMARK_OPP_GOAL_RIGHT_POST_Y - self.brain.ball.y 
         leftPostY = nogginC.LANDMARK_OPP_GOAL_LEFT_POST_Y - self.brain.ball.y 
 
-        scale = goalLineX / kickVector[0]
+        #scale = goalLineX / kickVector[0]
+        scale = goalLineX / kick.distance
+        print "Do we cross the goal line: ", scale
 
         if 0 <= scale <= 1:
             return (rightPostY <= kickVector[1]*scale <= leftPostY)
