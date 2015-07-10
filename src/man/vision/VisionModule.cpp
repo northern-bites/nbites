@@ -83,11 +83,6 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
 
     // Retreive calibration params for the robot name specified in the constructor
     setCalibrationParams(robotName);
-
-    // Set constants used for tilt adjustment
-   /* azimuth_m = 0.0426;
-    azimuth_b = -0.0011;*/
-    
 }
 
 VisionModule::~VisionModule()
