@@ -136,7 +136,7 @@ public:
   // If diagnostics is not null, set the string to a report of convergence.
   bool visualTiltPerpendicular(const GeoLine& a, const GeoLine& b, double& tilt,
                                std::string* diagnostics) const;
-  
+
   // Same as above, but for lines known to be parallel in world coordinates.
   bool visualTiltParallel(const GeoLine& a, const GeoLine& b, double& tilt,
                           std::string* diagnostics) const;
@@ -304,6 +304,10 @@ public:
   // (gradients pointing away from each other. Separation is approximately zero
   // otherwise. 
   double separation(const GeoLine& other) const;
+
+  // Assuming this and other should be the same line, calculate the error.
+  // NOTE used in particle filter.
+  double error(const GeoLine& other, bool test = false) const;
 
   // Translation rotation of line in plane. 
   // NOTE used in particle filter.

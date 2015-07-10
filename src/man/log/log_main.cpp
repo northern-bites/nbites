@@ -199,6 +199,9 @@ namespace nblog {
                 SExpr("tripoint", control::tripoint,
                       control::flags[control::tripoint]),
 
+                SExpr("multiball", control::multiball,
+                      control::flags[control::multiball]),
+            
                 SExpr("thumbnail", control::thumbnail,
                       control::flags[control::thumbnail])
             };

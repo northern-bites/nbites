@@ -5040,6 +5040,1910 @@ public final class BallModel {
     // @@protoc_insertion_point(class_scope:messages.SharedBall)
   }
 
+  public interface NaiveBallOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:messages.NaiveBall)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional float velocity = 1;</code>
+     */
+    boolean hasVelocity();
+    /**
+     * <code>optional float velocity = 1;</code>
+     */
+    float getVelocity();
+
+    /**
+     * <code>optional bool stationary = 2;</code>
+     */
+    boolean hasStationary();
+    /**
+     * <code>optional bool stationary = 2;</code>
+     */
+    boolean getStationary();
+
+    /**
+     * <code>optional float yintercept = 3;</code>
+     */
+    boolean hasYintercept();
+    /**
+     * <code>optional float yintercept = 3;</code>
+     */
+    float getYintercept();
+
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    java.util.List<messages.BallModel.NaiveBall.Position> 
+        getPositionList();
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    messages.BallModel.NaiveBall.Position getPosition(int index);
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    int getPositionCount();
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    java.util.List<? extends messages.BallModel.NaiveBall.PositionOrBuilder> 
+        getPositionOrBuilderList();
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    messages.BallModel.NaiveBall.PositionOrBuilder getPositionOrBuilder(
+        int index);
+
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    java.util.List<messages.BallModel.NaiveBall.Position> 
+        getDestBufferList();
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    messages.BallModel.NaiveBall.Position getDestBuffer(int index);
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    int getDestBufferCount();
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    java.util.List<? extends messages.BallModel.NaiveBall.PositionOrBuilder> 
+        getDestBufferOrBuilderList();
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    messages.BallModel.NaiveBall.PositionOrBuilder getDestBufferOrBuilder(
+        int index);
+
+    /**
+     * <code>optional float x_vel = 6;</code>
+     */
+    boolean hasXVel();
+    /**
+     * <code>optional float x_vel = 6;</code>
+     */
+    float getXVel();
+
+    /**
+     * <code>optional float y_vel = 7;</code>
+     */
+    boolean hasYVel();
+    /**
+     * <code>optional float y_vel = 7;</code>
+     */
+    float getYVel();
+  }
+  /**
+   * Protobuf type {@code messages.NaiveBall}
+   */
+  public static final class NaiveBall extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:messages.NaiveBall)
+      NaiveBallOrBuilder {
+    // Use NaiveBall.newBuilder() to construct.
+    private NaiveBall(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private NaiveBall(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final NaiveBall defaultInstance;
+    public static NaiveBall getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public NaiveBall getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private NaiveBall(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 13: {
+              bitField0_ |= 0x00000001;
+              velocity_ = input.readFloat();
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              stationary_ = input.readBool();
+              break;
+            }
+            case 29: {
+              bitField0_ |= 0x00000004;
+              yintercept_ = input.readFloat();
+              break;
+            }
+            case 34: {
+              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+                position_ = new java.util.ArrayList<messages.BallModel.NaiveBall.Position>();
+                mutable_bitField0_ |= 0x00000008;
+              }
+              position_.add(input.readMessage(messages.BallModel.NaiveBall.Position.PARSER, extensionRegistry));
+              break;
+            }
+            case 42: {
+              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+                destBuffer_ = new java.util.ArrayList<messages.BallModel.NaiveBall.Position>();
+                mutable_bitField0_ |= 0x00000010;
+              }
+              destBuffer_.add(input.readMessage(messages.BallModel.NaiveBall.Position.PARSER, extensionRegistry));
+              break;
+            }
+            case 53: {
+              bitField0_ |= 0x00000008;
+              xVel_ = input.readFloat();
+              break;
+            }
+            case 61: {
+              bitField0_ |= 0x00000010;
+              yVel_ = input.readFloat();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+          position_ = java.util.Collections.unmodifiableList(position_);
+        }
+        if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+          destBuffer_ = java.util.Collections.unmodifiableList(destBuffer_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return messages.BallModel.internal_static_messages_NaiveBall_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return messages.BallModel.internal_static_messages_NaiveBall_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              messages.BallModel.NaiveBall.class, messages.BallModel.NaiveBall.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<NaiveBall> PARSER =
+        new com.google.protobuf.AbstractParser<NaiveBall>() {
+      public NaiveBall parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new NaiveBall(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<NaiveBall> getParserForType() {
+      return PARSER;
+    }
+
+    public interface PositionOrBuilder extends
+        // @@protoc_insertion_point(interface_extends:messages.NaiveBall.Position)
+        com.google.protobuf.MessageOrBuilder {
+
+      /**
+       * <code>optional float x = 1;</code>
+       */
+      boolean hasX();
+      /**
+       * <code>optional float x = 1;</code>
+       */
+      float getX();
+
+      /**
+       * <code>optional float y = 2;</code>
+       */
+      boolean hasY();
+      /**
+       * <code>optional float y = 2;</code>
+       */
+      float getY();
+    }
+    /**
+     * Protobuf type {@code messages.NaiveBall.Position}
+     */
+    public static final class Position extends
+        com.google.protobuf.GeneratedMessage implements
+        // @@protoc_insertion_point(message_implements:messages.NaiveBall.Position)
+        PositionOrBuilder {
+      // Use Position.newBuilder() to construct.
+      private Position(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+        super(builder);
+        this.unknownFields = builder.getUnknownFields();
+      }
+      private Position(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+      private static final Position defaultInstance;
+      public static Position getDefaultInstance() {
+        return defaultInstance;
+      }
+
+      public Position getDefaultInstanceForType() {
+        return defaultInstance;
+      }
+
+      private final com.google.protobuf.UnknownFieldSet unknownFields;
+      @java.lang.Override
+      public final com.google.protobuf.UnknownFieldSet
+          getUnknownFields() {
+        return this.unknownFields;
+      }
+      private Position(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        initFields();
+        int mutable_bitField0_ = 0;
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+            com.google.protobuf.UnknownFieldSet.newBuilder();
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              default: {
+                if (!parseUnknownField(input, unknownFields,
+                                       extensionRegistry, tag)) {
+                  done = true;
+                }
+                break;
+              }
+              case 13: {
+                bitField0_ |= 0x00000001;
+                x_ = input.readFloat();
+                break;
+              }
+              case 21: {
+                bitField0_ |= 0x00000002;
+                y_ = input.readFloat();
+                break;
+              }
+            }
+          }
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(this);
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this);
+        } finally {
+          this.unknownFields = unknownFields.build();
+          makeExtensionsImmutable();
+        }
+      }
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return messages.BallModel.internal_static_messages_NaiveBall_Position_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return messages.BallModel.internal_static_messages_NaiveBall_Position_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                messages.BallModel.NaiveBall.Position.class, messages.BallModel.NaiveBall.Position.Builder.class);
+      }
+
+      public static com.google.protobuf.Parser<Position> PARSER =
+          new com.google.protobuf.AbstractParser<Position>() {
+        public Position parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+          return new Position(input, extensionRegistry);
+        }
+      };
+
+      @java.lang.Override
+      public com.google.protobuf.Parser<Position> getParserForType() {
+        return PARSER;
+      }
+
+      private int bitField0_;
+      public static final int X_FIELD_NUMBER = 1;
+      private float x_;
+      /**
+       * <code>optional float x = 1;</code>
+       */
+      public boolean hasX() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional float x = 1;</code>
+       */
+      public float getX() {
+        return x_;
+      }
+
+      public static final int Y_FIELD_NUMBER = 2;
+      private float y_;
+      /**
+       * <code>optional float y = 2;</code>
+       */
+      public boolean hasY() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional float y = 2;</code>
+       */
+      public float getY() {
+        return y_;
+      }
+
+      private void initFields() {
+        x_ = 0F;
+        y_ = 0F;
+      }
+      private byte memoizedIsInitialized = -1;
+      public final boolean isInitialized() {
+        byte isInitialized = memoizedIsInitialized;
+        if (isInitialized == 1) return true;
+        if (isInitialized == 0) return false;
+
+        memoizedIsInitialized = 1;
+        return true;
+      }
+
+      public void writeTo(com.google.protobuf.CodedOutputStream output)
+                          throws java.io.IOException {
+        getSerializedSize();
+        if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          output.writeFloat(1, x_);
+        }
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          output.writeFloat(2, y_);
+        }
+        getUnknownFields().writeTo(output);
+      }
+
+      private int memoizedSerializedSize = -1;
+      public int getSerializedSize() {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+
+        size = 0;
+        if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeFloatSize(1, x_);
+        }
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeFloatSize(2, y_);
+        }
+        size += getUnknownFields().getSerializedSize();
+        memoizedSerializedSize = size;
+        return size;
+      }
+
+      private static final long serialVersionUID = 0L;
+      @java.lang.Override
+      protected java.lang.Object writeReplace()
+          throws java.io.ObjectStreamException {
+        return super.writeReplace();
+      }
+
+      public static messages.BallModel.NaiveBall.Position parseFrom(
+          com.google.protobuf.ByteString data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static messages.BallModel.NaiveBall.Position parseFrom(
+          com.google.protobuf.ByteString data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
+      public static messages.BallModel.NaiveBall.Position parseFrom(byte[] data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static messages.BallModel.NaiveBall.Position parseFrom(
+          byte[] data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
+      public static messages.BallModel.NaiveBall.Position parseFrom(java.io.InputStream input)
+          throws java.io.IOException {
+        return PARSER.parseFrom(input);
+      }
+      public static messages.BallModel.NaiveBall.Position parseFrom(
+          java.io.InputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return PARSER.parseFrom(input, extensionRegistry);
+      }
+      public static messages.BallModel.NaiveBall.Position parseDelimitedFrom(java.io.InputStream input)
+          throws java.io.IOException {
+        return PARSER.parseDelimitedFrom(input);
+      }
+      public static messages.BallModel.NaiveBall.Position parseDelimitedFrom(
+          java.io.InputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      }
+      public static messages.BallModel.NaiveBall.Position parseFrom(
+          com.google.protobuf.CodedInputStream input)
+          throws java.io.IOException {
+        return PARSER.parseFrom(input);
+      }
+      public static messages.BallModel.NaiveBall.Position parseFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return PARSER.parseFrom(input, extensionRegistry);
+      }
+
+      public static Builder newBuilder() { return Builder.create(); }
+      public Builder newBuilderForType() { return newBuilder(); }
+      public static Builder newBuilder(messages.BallModel.NaiveBall.Position prototype) {
+        return newBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() { return newBuilder(this); }
+
+      @java.lang.Override
+      protected Builder newBuilderForType(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        Builder builder = new Builder(parent);
+        return builder;
+      }
+      /**
+       * Protobuf type {@code messages.NaiveBall.Position}
+       */
+      public static final class Builder extends
+          com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+          // @@protoc_insertion_point(builder_implements:messages.NaiveBall.Position)
+          messages.BallModel.NaiveBall.PositionOrBuilder {
+        public static final com.google.protobuf.Descriptors.Descriptor
+            getDescriptor() {
+          return messages.BallModel.internal_static_messages_NaiveBall_Position_descriptor;
+        }
+
+        protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+            internalGetFieldAccessorTable() {
+          return messages.BallModel.internal_static_messages_NaiveBall_Position_fieldAccessorTable
+              .ensureFieldAccessorsInitialized(
+                  messages.BallModel.NaiveBall.Position.class, messages.BallModel.NaiveBall.Position.Builder.class);
+        }
+
+        // Construct using messages.BallModel.NaiveBall.Position.newBuilder()
+        private Builder() {
+          maybeForceBuilderInitialization();
+        }
+
+        private Builder(
+            com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          super(parent);
+          maybeForceBuilderInitialization();
+        }
+        private void maybeForceBuilderInitialization() {
+          if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          }
+        }
+        private static Builder create() {
+          return new Builder();
+        }
+
+        public Builder clear() {
+          super.clear();
+          x_ = 0F;
+          bitField0_ = (bitField0_ & ~0x00000001);
+          y_ = 0F;
+          bitField0_ = (bitField0_ & ~0x00000002);
+          return this;
+        }
+
+        public Builder clone() {
+          return create().mergeFrom(buildPartial());
+        }
+
+        public com.google.protobuf.Descriptors.Descriptor
+            getDescriptorForType() {
+          return messages.BallModel.internal_static_messages_NaiveBall_Position_descriptor;
+        }
+
+        public messages.BallModel.NaiveBall.Position getDefaultInstanceForType() {
+          return messages.BallModel.NaiveBall.Position.getDefaultInstance();
+        }
+
+        public messages.BallModel.NaiveBall.Position build() {
+          messages.BallModel.NaiveBall.Position result = buildPartial();
+          if (!result.isInitialized()) {
+            throw newUninitializedMessageException(result);
+          }
+          return result;
+        }
+
+        public messages.BallModel.NaiveBall.Position buildPartial() {
+          messages.BallModel.NaiveBall.Position result = new messages.BallModel.NaiveBall.Position(this);
+          int from_bitField0_ = bitField0_;
+          int to_bitField0_ = 0;
+          if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+            to_bitField0_ |= 0x00000001;
+          }
+          result.x_ = x_;
+          if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+            to_bitField0_ |= 0x00000002;
+          }
+          result.y_ = y_;
+          result.bitField0_ = to_bitField0_;
+          onBuilt();
+          return result;
+        }
+
+        public Builder mergeFrom(com.google.protobuf.Message other) {
+          if (other instanceof messages.BallModel.NaiveBall.Position) {
+            return mergeFrom((messages.BallModel.NaiveBall.Position)other);
+          } else {
+            super.mergeFrom(other);
+            return this;
+          }
+        }
+
+        public Builder mergeFrom(messages.BallModel.NaiveBall.Position other) {
+          if (other == messages.BallModel.NaiveBall.Position.getDefaultInstance()) return this;
+          if (other.hasX()) {
+            setX(other.getX());
+          }
+          if (other.hasY()) {
+            setY(other.getY());
+          }
+          this.mergeUnknownFields(other.getUnknownFields());
+          return this;
+        }
+
+        public final boolean isInitialized() {
+          return true;
+        }
+
+        public Builder mergeFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
+          messages.BallModel.NaiveBall.Position parsedMessage = null;
+          try {
+            parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+            parsedMessage = (messages.BallModel.NaiveBall.Position) e.getUnfinishedMessage();
+            throw e;
+          } finally {
+            if (parsedMessage != null) {
+              mergeFrom(parsedMessage);
+            }
+          }
+          return this;
+        }
+        private int bitField0_;
+
+        private float x_ ;
+        /**
+         * <code>optional float x = 1;</code>
+         */
+        public boolean hasX() {
+          return ((bitField0_ & 0x00000001) == 0x00000001);
+        }
+        /**
+         * <code>optional float x = 1;</code>
+         */
+        public float getX() {
+          return x_;
+        }
+        /**
+         * <code>optional float x = 1;</code>
+         */
+        public Builder setX(float value) {
+          bitField0_ |= 0x00000001;
+          x_ = value;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>optional float x = 1;</code>
+         */
+        public Builder clearX() {
+          bitField0_ = (bitField0_ & ~0x00000001);
+          x_ = 0F;
+          onChanged();
+          return this;
+        }
+
+        private float y_ ;
+        /**
+         * <code>optional float y = 2;</code>
+         */
+        public boolean hasY() {
+          return ((bitField0_ & 0x00000002) == 0x00000002);
+        }
+        /**
+         * <code>optional float y = 2;</code>
+         */
+        public float getY() {
+          return y_;
+        }
+        /**
+         * <code>optional float y = 2;</code>
+         */
+        public Builder setY(float value) {
+          bitField0_ |= 0x00000002;
+          y_ = value;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>optional float y = 2;</code>
+         */
+        public Builder clearY() {
+          bitField0_ = (bitField0_ & ~0x00000002);
+          y_ = 0F;
+          onChanged();
+          return this;
+        }
+
+        // @@protoc_insertion_point(builder_scope:messages.NaiveBall.Position)
+      }
+
+      static {
+        defaultInstance = new Position(true);
+        defaultInstance.initFields();
+      }
+
+      // @@protoc_insertion_point(class_scope:messages.NaiveBall.Position)
+    }
+
+    private int bitField0_;
+    public static final int VELOCITY_FIELD_NUMBER = 1;
+    private float velocity_;
+    /**
+     * <code>optional float velocity = 1;</code>
+     */
+    public boolean hasVelocity() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional float velocity = 1;</code>
+     */
+    public float getVelocity() {
+      return velocity_;
+    }
+
+    public static final int STATIONARY_FIELD_NUMBER = 2;
+    private boolean stationary_;
+    /**
+     * <code>optional bool stationary = 2;</code>
+     */
+    public boolean hasStationary() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional bool stationary = 2;</code>
+     */
+    public boolean getStationary() {
+      return stationary_;
+    }
+
+    public static final int YINTERCEPT_FIELD_NUMBER = 3;
+    private float yintercept_;
+    /**
+     * <code>optional float yintercept = 3;</code>
+     */
+    public boolean hasYintercept() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional float yintercept = 3;</code>
+     */
+    public float getYintercept() {
+      return yintercept_;
+    }
+
+    public static final int POSITION_FIELD_NUMBER = 4;
+    private java.util.List<messages.BallModel.NaiveBall.Position> position_;
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    public java.util.List<messages.BallModel.NaiveBall.Position> getPositionList() {
+      return position_;
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    public java.util.List<? extends messages.BallModel.NaiveBall.PositionOrBuilder> 
+        getPositionOrBuilderList() {
+      return position_;
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    public int getPositionCount() {
+      return position_.size();
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    public messages.BallModel.NaiveBall.Position getPosition(int index) {
+      return position_.get(index);
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    public messages.BallModel.NaiveBall.PositionOrBuilder getPositionOrBuilder(
+        int index) {
+      return position_.get(index);
+    }
+
+    public static final int DEST_BUFFER_FIELD_NUMBER = 5;
+    private java.util.List<messages.BallModel.NaiveBall.Position> destBuffer_;
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    public java.util.List<messages.BallModel.NaiveBall.Position> getDestBufferList() {
+      return destBuffer_;
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    public java.util.List<? extends messages.BallModel.NaiveBall.PositionOrBuilder> 
+        getDestBufferOrBuilderList() {
+      return destBuffer_;
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    public int getDestBufferCount() {
+      return destBuffer_.size();
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    public messages.BallModel.NaiveBall.Position getDestBuffer(int index) {
+      return destBuffer_.get(index);
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    public messages.BallModel.NaiveBall.PositionOrBuilder getDestBufferOrBuilder(
+        int index) {
+      return destBuffer_.get(index);
+    }
+
+    public static final int X_VEL_FIELD_NUMBER = 6;
+    private float xVel_;
+    /**
+     * <code>optional float x_vel = 6;</code>
+     */
+    public boolean hasXVel() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional float x_vel = 6;</code>
+     */
+    public float getXVel() {
+      return xVel_;
+    }
+
+    public static final int Y_VEL_FIELD_NUMBER = 7;
+    private float yVel_;
+    /**
+     * <code>optional float y_vel = 7;</code>
+     */
+    public boolean hasYVel() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional float y_vel = 7;</code>
+     */
+    public float getYVel() {
+      return yVel_;
+    }
+
+    private void initFields() {
+      velocity_ = 0F;
+      stationary_ = false;
+      yintercept_ = 0F;
+      position_ = java.util.Collections.emptyList();
+      destBuffer_ = java.util.Collections.emptyList();
+      xVel_ = 0F;
+      yVel_ = 0F;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeFloat(1, velocity_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBool(2, stationary_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeFloat(3, yintercept_);
+      }
+      for (int i = 0; i < position_.size(); i++) {
+        output.writeMessage(4, position_.get(i));
+      }
+      for (int i = 0; i < destBuffer_.size(); i++) {
+        output.writeMessage(5, destBuffer_.get(i));
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeFloat(6, xVel_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeFloat(7, yVel_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(1, velocity_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(2, stationary_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(3, yintercept_);
+      }
+      for (int i = 0; i < position_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, position_.get(i));
+      }
+      for (int i = 0; i < destBuffer_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, destBuffer_.get(i));
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(6, xVel_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(7, yVel_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static messages.BallModel.NaiveBall parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static messages.BallModel.NaiveBall parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static messages.BallModel.NaiveBall parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static messages.BallModel.NaiveBall parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static messages.BallModel.NaiveBall parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static messages.BallModel.NaiveBall parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static messages.BallModel.NaiveBall parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static messages.BallModel.NaiveBall parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static messages.BallModel.NaiveBall parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static messages.BallModel.NaiveBall parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(messages.BallModel.NaiveBall prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code messages.NaiveBall}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:messages.NaiveBall)
+        messages.BallModel.NaiveBallOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return messages.BallModel.internal_static_messages_NaiveBall_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return messages.BallModel.internal_static_messages_NaiveBall_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                messages.BallModel.NaiveBall.class, messages.BallModel.NaiveBall.Builder.class);
+      }
+
+      // Construct using messages.BallModel.NaiveBall.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getPositionFieldBuilder();
+          getDestBufferFieldBuilder();
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        velocity_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        stationary_ = false;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        yintercept_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        if (positionBuilder_ == null) {
+          position_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000008);
+        } else {
+          positionBuilder_.clear();
+        }
+        if (destBufferBuilder_ == null) {
+          destBuffer_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000010);
+        } else {
+          destBufferBuilder_.clear();
+        }
+        xVel_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000020);
+        yVel_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000040);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return messages.BallModel.internal_static_messages_NaiveBall_descriptor;
+      }
+
+      public messages.BallModel.NaiveBall getDefaultInstanceForType() {
+        return messages.BallModel.NaiveBall.getDefaultInstance();
+      }
+
+      public messages.BallModel.NaiveBall build() {
+        messages.BallModel.NaiveBall result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public messages.BallModel.NaiveBall buildPartial() {
+        messages.BallModel.NaiveBall result = new messages.BallModel.NaiveBall(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.velocity_ = velocity_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.stationary_ = stationary_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.yintercept_ = yintercept_;
+        if (positionBuilder_ == null) {
+          if (((bitField0_ & 0x00000008) == 0x00000008)) {
+            position_ = java.util.Collections.unmodifiableList(position_);
+            bitField0_ = (bitField0_ & ~0x00000008);
+          }
+          result.position_ = position_;
+        } else {
+          result.position_ = positionBuilder_.build();
+        }
+        if (destBufferBuilder_ == null) {
+          if (((bitField0_ & 0x00000010) == 0x00000010)) {
+            destBuffer_ = java.util.Collections.unmodifiableList(destBuffer_);
+            bitField0_ = (bitField0_ & ~0x00000010);
+          }
+          result.destBuffer_ = destBuffer_;
+        } else {
+          result.destBuffer_ = destBufferBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.xVel_ = xVel_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.yVel_ = yVel_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof messages.BallModel.NaiveBall) {
+          return mergeFrom((messages.BallModel.NaiveBall)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(messages.BallModel.NaiveBall other) {
+        if (other == messages.BallModel.NaiveBall.getDefaultInstance()) return this;
+        if (other.hasVelocity()) {
+          setVelocity(other.getVelocity());
+        }
+        if (other.hasStationary()) {
+          setStationary(other.getStationary());
+        }
+        if (other.hasYintercept()) {
+          setYintercept(other.getYintercept());
+        }
+        if (positionBuilder_ == null) {
+          if (!other.position_.isEmpty()) {
+            if (position_.isEmpty()) {
+              position_ = other.position_;
+              bitField0_ = (bitField0_ & ~0x00000008);
+            } else {
+              ensurePositionIsMutable();
+              position_.addAll(other.position_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.position_.isEmpty()) {
+            if (positionBuilder_.isEmpty()) {
+              positionBuilder_.dispose();
+              positionBuilder_ = null;
+              position_ = other.position_;
+              bitField0_ = (bitField0_ & ~0x00000008);
+              positionBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getPositionFieldBuilder() : null;
+            } else {
+              positionBuilder_.addAllMessages(other.position_);
+            }
+          }
+        }
+        if (destBufferBuilder_ == null) {
+          if (!other.destBuffer_.isEmpty()) {
+            if (destBuffer_.isEmpty()) {
+              destBuffer_ = other.destBuffer_;
+              bitField0_ = (bitField0_ & ~0x00000010);
+            } else {
+              ensureDestBufferIsMutable();
+              destBuffer_.addAll(other.destBuffer_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.destBuffer_.isEmpty()) {
+            if (destBufferBuilder_.isEmpty()) {
+              destBufferBuilder_.dispose();
+              destBufferBuilder_ = null;
+              destBuffer_ = other.destBuffer_;
+              bitField0_ = (bitField0_ & ~0x00000010);
+              destBufferBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getDestBufferFieldBuilder() : null;
+            } else {
+              destBufferBuilder_.addAllMessages(other.destBuffer_);
+            }
+          }
+        }
+        if (other.hasXVel()) {
+          setXVel(other.getXVel());
+        }
+        if (other.hasYVel()) {
+          setYVel(other.getYVel());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        messages.BallModel.NaiveBall parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (messages.BallModel.NaiveBall) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private float velocity_ ;
+      /**
+       * <code>optional float velocity = 1;</code>
+       */
+      public boolean hasVelocity() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional float velocity = 1;</code>
+       */
+      public float getVelocity() {
+        return velocity_;
+      }
+      /**
+       * <code>optional float velocity = 1;</code>
+       */
+      public Builder setVelocity(float value) {
+        bitField0_ |= 0x00000001;
+        velocity_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float velocity = 1;</code>
+       */
+      public Builder clearVelocity() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        velocity_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private boolean stationary_ ;
+      /**
+       * <code>optional bool stationary = 2;</code>
+       */
+      public boolean hasStationary() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional bool stationary = 2;</code>
+       */
+      public boolean getStationary() {
+        return stationary_;
+      }
+      /**
+       * <code>optional bool stationary = 2;</code>
+       */
+      public Builder setStationary(boolean value) {
+        bitField0_ |= 0x00000002;
+        stationary_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool stationary = 2;</code>
+       */
+      public Builder clearStationary() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        stationary_ = false;
+        onChanged();
+        return this;
+      }
+
+      private float yintercept_ ;
+      /**
+       * <code>optional float yintercept = 3;</code>
+       */
+      public boolean hasYintercept() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional float yintercept = 3;</code>
+       */
+      public float getYintercept() {
+        return yintercept_;
+      }
+      /**
+       * <code>optional float yintercept = 3;</code>
+       */
+      public Builder setYintercept(float value) {
+        bitField0_ |= 0x00000004;
+        yintercept_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float yintercept = 3;</code>
+       */
+      public Builder clearYintercept() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        yintercept_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private java.util.List<messages.BallModel.NaiveBall.Position> position_ =
+        java.util.Collections.emptyList();
+      private void ensurePositionIsMutable() {
+        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+          position_ = new java.util.ArrayList<messages.BallModel.NaiveBall.Position>(position_);
+          bitField0_ |= 0x00000008;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          messages.BallModel.NaiveBall.Position, messages.BallModel.NaiveBall.Position.Builder, messages.BallModel.NaiveBall.PositionOrBuilder> positionBuilder_;
+
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public java.util.List<messages.BallModel.NaiveBall.Position> getPositionList() {
+        if (positionBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(position_);
+        } else {
+          return positionBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public int getPositionCount() {
+        if (positionBuilder_ == null) {
+          return position_.size();
+        } else {
+          return positionBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public messages.BallModel.NaiveBall.Position getPosition(int index) {
+        if (positionBuilder_ == null) {
+          return position_.get(index);
+        } else {
+          return positionBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public Builder setPosition(
+          int index, messages.BallModel.NaiveBall.Position value) {
+        if (positionBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePositionIsMutable();
+          position_.set(index, value);
+          onChanged();
+        } else {
+          positionBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public Builder setPosition(
+          int index, messages.BallModel.NaiveBall.Position.Builder builderForValue) {
+        if (positionBuilder_ == null) {
+          ensurePositionIsMutable();
+          position_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          positionBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public Builder addPosition(messages.BallModel.NaiveBall.Position value) {
+        if (positionBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePositionIsMutable();
+          position_.add(value);
+          onChanged();
+        } else {
+          positionBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public Builder addPosition(
+          int index, messages.BallModel.NaiveBall.Position value) {
+        if (positionBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePositionIsMutable();
+          position_.add(index, value);
+          onChanged();
+        } else {
+          positionBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public Builder addPosition(
+          messages.BallModel.NaiveBall.Position.Builder builderForValue) {
+        if (positionBuilder_ == null) {
+          ensurePositionIsMutable();
+          position_.add(builderForValue.build());
+          onChanged();
+        } else {
+          positionBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public Builder addPosition(
+          int index, messages.BallModel.NaiveBall.Position.Builder builderForValue) {
+        if (positionBuilder_ == null) {
+          ensurePositionIsMutable();
+          position_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          positionBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public Builder addAllPosition(
+          java.lang.Iterable<? extends messages.BallModel.NaiveBall.Position> values) {
+        if (positionBuilder_ == null) {
+          ensurePositionIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, position_);
+          onChanged();
+        } else {
+          positionBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public Builder clearPosition() {
+        if (positionBuilder_ == null) {
+          position_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000008);
+          onChanged();
+        } else {
+          positionBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public Builder removePosition(int index) {
+        if (positionBuilder_ == null) {
+          ensurePositionIsMutable();
+          position_.remove(index);
+          onChanged();
+        } else {
+          positionBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public messages.BallModel.NaiveBall.Position.Builder getPositionBuilder(
+          int index) {
+        return getPositionFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public messages.BallModel.NaiveBall.PositionOrBuilder getPositionOrBuilder(
+          int index) {
+        if (positionBuilder_ == null) {
+          return position_.get(index);  } else {
+          return positionBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public java.util.List<? extends messages.BallModel.NaiveBall.PositionOrBuilder> 
+           getPositionOrBuilderList() {
+        if (positionBuilder_ != null) {
+          return positionBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(position_);
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public messages.BallModel.NaiveBall.Position.Builder addPositionBuilder() {
+        return getPositionFieldBuilder().addBuilder(
+            messages.BallModel.NaiveBall.Position.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public messages.BallModel.NaiveBall.Position.Builder addPositionBuilder(
+          int index) {
+        return getPositionFieldBuilder().addBuilder(
+            index, messages.BallModel.NaiveBall.Position.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public java.util.List<messages.BallModel.NaiveBall.Position.Builder> 
+           getPositionBuilderList() {
+        return getPositionFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          messages.BallModel.NaiveBall.Position, messages.BallModel.NaiveBall.Position.Builder, messages.BallModel.NaiveBall.PositionOrBuilder> 
+          getPositionFieldBuilder() {
+        if (positionBuilder_ == null) {
+          positionBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              messages.BallModel.NaiveBall.Position, messages.BallModel.NaiveBall.Position.Builder, messages.BallModel.NaiveBall.PositionOrBuilder>(
+                  position_,
+                  ((bitField0_ & 0x00000008) == 0x00000008),
+                  getParentForChildren(),
+                  isClean());
+          position_ = null;
+        }
+        return positionBuilder_;
+      }
+
+      private java.util.List<messages.BallModel.NaiveBall.Position> destBuffer_ =
+        java.util.Collections.emptyList();
+      private void ensureDestBufferIsMutable() {
+        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+          destBuffer_ = new java.util.ArrayList<messages.BallModel.NaiveBall.Position>(destBuffer_);
+          bitField0_ |= 0x00000010;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          messages.BallModel.NaiveBall.Position, messages.BallModel.NaiveBall.Position.Builder, messages.BallModel.NaiveBall.PositionOrBuilder> destBufferBuilder_;
+
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public java.util.List<messages.BallModel.NaiveBall.Position> getDestBufferList() {
+        if (destBufferBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(destBuffer_);
+        } else {
+          return destBufferBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public int getDestBufferCount() {
+        if (destBufferBuilder_ == null) {
+          return destBuffer_.size();
+        } else {
+          return destBufferBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public messages.BallModel.NaiveBall.Position getDestBuffer(int index) {
+        if (destBufferBuilder_ == null) {
+          return destBuffer_.get(index);
+        } else {
+          return destBufferBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public Builder setDestBuffer(
+          int index, messages.BallModel.NaiveBall.Position value) {
+        if (destBufferBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureDestBufferIsMutable();
+          destBuffer_.set(index, value);
+          onChanged();
+        } else {
+          destBufferBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public Builder setDestBuffer(
+          int index, messages.BallModel.NaiveBall.Position.Builder builderForValue) {
+        if (destBufferBuilder_ == null) {
+          ensureDestBufferIsMutable();
+          destBuffer_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          destBufferBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public Builder addDestBuffer(messages.BallModel.NaiveBall.Position value) {
+        if (destBufferBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureDestBufferIsMutable();
+          destBuffer_.add(value);
+          onChanged();
+        } else {
+          destBufferBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public Builder addDestBuffer(
+          int index, messages.BallModel.NaiveBall.Position value) {
+        if (destBufferBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureDestBufferIsMutable();
+          destBuffer_.add(index, value);
+          onChanged();
+        } else {
+          destBufferBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public Builder addDestBuffer(
+          messages.BallModel.NaiveBall.Position.Builder builderForValue) {
+        if (destBufferBuilder_ == null) {
+          ensureDestBufferIsMutable();
+          destBuffer_.add(builderForValue.build());
+          onChanged();
+        } else {
+          destBufferBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public Builder addDestBuffer(
+          int index, messages.BallModel.NaiveBall.Position.Builder builderForValue) {
+        if (destBufferBuilder_ == null) {
+          ensureDestBufferIsMutable();
+          destBuffer_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          destBufferBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public Builder addAllDestBuffer(
+          java.lang.Iterable<? extends messages.BallModel.NaiveBall.Position> values) {
+        if (destBufferBuilder_ == null) {
+          ensureDestBufferIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, destBuffer_);
+          onChanged();
+        } else {
+          destBufferBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public Builder clearDestBuffer() {
+        if (destBufferBuilder_ == null) {
+          destBuffer_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000010);
+          onChanged();
+        } else {
+          destBufferBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public Builder removeDestBuffer(int index) {
+        if (destBufferBuilder_ == null) {
+          ensureDestBufferIsMutable();
+          destBuffer_.remove(index);
+          onChanged();
+        } else {
+          destBufferBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public messages.BallModel.NaiveBall.Position.Builder getDestBufferBuilder(
+          int index) {
+        return getDestBufferFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public messages.BallModel.NaiveBall.PositionOrBuilder getDestBufferOrBuilder(
+          int index) {
+        if (destBufferBuilder_ == null) {
+          return destBuffer_.get(index);  } else {
+          return destBufferBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public java.util.List<? extends messages.BallModel.NaiveBall.PositionOrBuilder> 
+           getDestBufferOrBuilderList() {
+        if (destBufferBuilder_ != null) {
+          return destBufferBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(destBuffer_);
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public messages.BallModel.NaiveBall.Position.Builder addDestBufferBuilder() {
+        return getDestBufferFieldBuilder().addBuilder(
+            messages.BallModel.NaiveBall.Position.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public messages.BallModel.NaiveBall.Position.Builder addDestBufferBuilder(
+          int index) {
+        return getDestBufferFieldBuilder().addBuilder(
+            index, messages.BallModel.NaiveBall.Position.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public java.util.List<messages.BallModel.NaiveBall.Position.Builder> 
+           getDestBufferBuilderList() {
+        return getDestBufferFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          messages.BallModel.NaiveBall.Position, messages.BallModel.NaiveBall.Position.Builder, messages.BallModel.NaiveBall.PositionOrBuilder> 
+          getDestBufferFieldBuilder() {
+        if (destBufferBuilder_ == null) {
+          destBufferBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              messages.BallModel.NaiveBall.Position, messages.BallModel.NaiveBall.Position.Builder, messages.BallModel.NaiveBall.PositionOrBuilder>(
+                  destBuffer_,
+                  ((bitField0_ & 0x00000010) == 0x00000010),
+                  getParentForChildren(),
+                  isClean());
+          destBuffer_ = null;
+        }
+        return destBufferBuilder_;
+      }
+
+      private float xVel_ ;
+      /**
+       * <code>optional float x_vel = 6;</code>
+       */
+      public boolean hasXVel() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional float x_vel = 6;</code>
+       */
+      public float getXVel() {
+        return xVel_;
+      }
+      /**
+       * <code>optional float x_vel = 6;</code>
+       */
+      public Builder setXVel(float value) {
+        bitField0_ |= 0x00000020;
+        xVel_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float x_vel = 6;</code>
+       */
+      public Builder clearXVel() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        xVel_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float yVel_ ;
+      /**
+       * <code>optional float y_vel = 7;</code>
+       */
+      public boolean hasYVel() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>optional float y_vel = 7;</code>
+       */
+      public float getYVel() {
+        return yVel_;
+      }
+      /**
+       * <code>optional float y_vel = 7;</code>
+       */
+      public Builder setYVel(float value) {
+        bitField0_ |= 0x00000040;
+        yVel_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float y_vel = 7;</code>
+       */
+      public Builder clearYVel() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        yVel_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:messages.NaiveBall)
+    }
+
+    static {
+      defaultInstance = new NaiveBall(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:messages.NaiveBall)
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_VisionBall_descriptor;
   private static
@@ -5055,6 +6959,16 @@ public final class BallModel {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_SharedBall_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_messages_NaiveBall_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_messages_NaiveBall_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_messages_NaiveBall_Position_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_messages_NaiveBall_Position_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -5089,7 +7003,13 @@ public final class BallModel {
       "ov_vel_x\030\034 \001(\002\022\021\n\tmov_vel_y\030\035 \001(\002\022\021\n\tmov" +
       "_speed\030\036 \001(\002\"H\n\nSharedBall\022\t\n\001x\030\001 \001(\002\022\t\n" +
       "\001y\030\002 \001(\002\022\017\n\007ball_on\030\003 \001(\010\022\023\n\013reliability" +
-      "\030\004 \001(\005"
+      "\030\004 \001(\005\"\350\001\n\tNaiveBall\022\020\n\010velocity\030\001 \001(\002\022\022" +
+      "\n\nstationary\030\002 \001(\010\022\022\n\nyintercept\030\003 \001(\002\022." +
+      "\n\010position\030\004 \003(\0132\034.messages.NaiveBall.Po" +
+      "sition\0221\n\013dest_buffer\030\005 \003(\0132\034.messages.N" +
+      "aiveBall.Position\022\r\n\005x_vel\030\006 \001(\002\022\r\n\005y_ve",
+      "l\030\007 \001(\002\032 \n\010Position\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(" +
+      "\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -5121,6 +7041,18 @@ public final class BallModel {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_SharedBall_descriptor,
         new java.lang.String[] { "X", "Y", "BallOn", "Reliability", });
+    internal_static_messages_NaiveBall_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_messages_NaiveBall_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_NaiveBall_descriptor,
+        new java.lang.String[] { "Velocity", "Stationary", "Yintercept", "Position", "DestBuffer", "XVel", "YVel", });
+    internal_static_messages_NaiveBall_Position_descriptor =
+      internal_static_messages_NaiveBall_descriptor.getNestedTypes().get(0);
+    internal_static_messages_NaiveBall_Position_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_NaiveBall_Position_descriptor,
+        new java.lang.String[] { "X", "Y", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

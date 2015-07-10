@@ -45,7 +45,8 @@ Man::Man() :
     obstacle("/home/nao/nbites/Config/obstacleParams.txt", robotName),
     gamestate(teamNum, playerNum),
     behaviors(teamNum, playerNum),
-    sharedBall(playerNum)
+    sharedBall(playerNum),
+    naiveBall()
     {
         /** Sensors **/
         sensorsThread.addModule(sensors);
@@ -106,11 +107,17 @@ Man::Man() :
         cognitionThread.addModule(gamestate);
         cognitionThread.addModule(behaviors);
         cognitionThread.addModule(sharedBall);
+        cognitionThread.addModule(naiveBall);
 
         topTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
         topTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
+        topTranscriber.naiveBallIn.wireTo(&naiveBall.naiveBallOutput, true);
+        topTranscriber.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
+
         bottomTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
         bottomTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
+        bottomTranscriber.naiveBallIn.wireTo(&naiveBall.naiveBallOutput, true);
+        bottomTranscriber.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
 
         vision.topIn.wireTo(&topTranscriber.imageOut);
         vision.bottomIn.wireTo(&bottomTranscriber.imageOut);
@@ -135,9 +142,8 @@ Man::Man() :
         }
         sharedBall.locIn.wireTo(&localization.output);
         sharedBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
-         
+        naiveBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
         obstacle.armContactIn.wireTo(&arms.contactOut, true);
-        // obstacle.visionIn.wireTo(&vision.vision_obstacle, true);
         obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
          
         gamestate.commInput.wireTo(&comm._gameStateOutput, true);
@@ -163,7 +169,7 @@ Man::Man() :
         behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
         behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
         behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);
-
+        behaviors.naiveBallIn.wireTo(&naiveBall.naiveBallOutput);
         for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
         {
             behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);

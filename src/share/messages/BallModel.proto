@@ -65,3 +65,17 @@ message SharedBall {
     optional bool ball_on  = 3;
     optional int32 reliability = 4;
 }
+
+message NaiveBall {
+    message Position {
+        optional float x = 1;
+        optional float y = 2;
+    }
+    optional float velocity = 1;
+    optional bool stationary = 2;
+    optional float yintercept = 3;
+    repeated Position position = 4;
+    repeated Position dest_buffer = 5;
+    optional float x_vel = 6;
+    optional float y_vel = 7;
+}
