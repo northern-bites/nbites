@@ -26,7 +26,7 @@ class FallController():
             # Save the player. We are falling
             self.falling = True
             self.brain.player.gainsOff()
-            self.sawBall = self.brain.ball.vis.frames_off < 60
+            self.sawBall = self.brain.ball.vis.frames_off < 30
             self.brain.player.switchTo('fallen')
             self.brain.tracker.stopHeadMoves()
 
