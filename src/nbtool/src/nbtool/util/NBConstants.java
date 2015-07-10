@@ -77,12 +77,13 @@ public class NBConstants {
 		
 		map.put("YUVImage", new Class[]{ImageView.class, ZoomImageView.class, FrontEndView.class, LineView.class, BallView.class});
 		map.put("STATS", new Class[]{BotStatsView.class});
-		map.put("prot-RobotLocation", new Class[]{FieldView.class});
-		map.put(DEFAULT_S, new Class[]{DefaultView.class});
-		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
+		map.put("proto-RobotLocation", new Class[]{FieldView.class});
 		map.put("location", new Class[]{LocSwarmView.class});
 		map.put("proto-FieldLines", new Class[]{BasicLineView.class});
 		map.put("proto-Corners", new Class[]{BasicLineView.class});
+		
+		map.put(DEFAULT_S, new Class[]{DefaultView.class});
+		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
 
 		return map;
 	}
