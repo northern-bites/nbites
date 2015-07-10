@@ -1,6 +1,6 @@
 ( (arms 1)
-  (vision 0)
-  (set_all_sonar 0)
+  (vision 1)
+  (set_all_sonar 1)
   (all_left_sonar 0)
   (all_right_sonar 0)
 
@@ -25,12 +25,12 @@
     (right_sonar 1)
   )
   (beyonce
-    (left_sonar 0)
-    (right_sonar 0)
-  )
-  (ringo
     (left_sonar 1)
     (right_sonar 1)
+  )
+  (ringo
+    (left_sonar 0)
+    (right_sonar 0)
   )
   (zoe
     (left_sonar 1)
