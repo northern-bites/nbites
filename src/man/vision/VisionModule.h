@@ -18,9 +18,6 @@
 namespace man {
 namespace vision {
 
-// Azimuth tilt error mapped to line: y = |mx+b|
-const double AZ_M = 0.0007;
-const double AZ_B = -0.0011;
 
 class VisionModule : public portals::Module {
 public:
@@ -101,6 +98,11 @@ private:
 
     nblog::SExpr* calibrationLisp;
     size_t image_index;
+
+    // Constants for tilt azimuth adjustment hack
+    static const double azimuth_m = 0.0426;
+    static const double azimuth_b = -0.0011;
+    
 
 #
 };

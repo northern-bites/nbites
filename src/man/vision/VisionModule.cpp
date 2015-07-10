@@ -80,7 +80,14 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         edgeDetector[i]->fast(fast);
         hough[i]->fast(fast);
     }
+
+    // Retreive calibration params for the robot name specified in the constructor
     setCalibrationParams(robotName);
+
+    // Set constants used for tilt adjustment
+   /* azimuth_m = 0.0426;
+    azimuth_b = -0.0011;*/
+    
 }
 
 VisionModule::~VisionModule()
@@ -120,6 +127,7 @@ void VisionModule::run_()
     bool ballDetected = false;
     centerCircleDetected = false;
 
+
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
         
@@ -139,6 +147,9 @@ void VisionModule::run_()
         ImageLiteU8 greenImage(frontEnd[i]->greenImage());
         ImageLiteU8 orangeImage(frontEnd[i]->orangeImage());
 
+        // Offset to hackily adjust tilt for high-azimuth error
+        double azOffset = azimuth_m * fabs(kinematics[i]->azimuth()) + azimuth_b;
+
         // Calculate kinematics and adjust homography
         if (jointsIn.message().has_head_yaw()) {
             kinematics[i]->joints(jointsIn.message());
@@ -147,12 +158,8 @@ void VisionModule::run_()
             homography[i]->wz0(kinematics[i]->wz0());
             homography[i]->roll(calibrationParams[i]->getRoll());
 
-            double azOffset = AZ_M*kinematics[i]->tilt() + AZ_B;
-            if (kinematics[i]->tilt() < 0) {
-                homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt() - azOffset);
-            } else {
-                homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt() + azOffset);
-            }
+            homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt() + azOffset);
+         
 #ifndef OFFLINE
             homography[i]->azimuth(kinematics[i]->azimuth());
 #endif
@@ -177,8 +184,18 @@ void VisionModule::run_()
 //        if (!i) centerCircleDetected = centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]));
  
         // Pair hough lines to field lines
-        fieldLines[i]->find(*(houghLines[i]), blackStar());
- 
+        fieldLines[i]->find(*(houghLines[i]), true);
+
+        double tiltBefore = homography[i]->tilt();
+        if (homography[i]->calibrateFromStar(*fieldLines[i])) {
+            double tiltAfter = homography[i]->tilt();
+            std::cout   << (!i ? "Top" : "Bot")
+                        << " a: " << homography[i]->azimuth()  
+                        << " o: " << azOffset << " k: " 
+                        << tiltBefore << " e: " 
+                        << tiltAfter-tiltBefore << std::endl;
+        }
+
         // Classify field lines
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
  
