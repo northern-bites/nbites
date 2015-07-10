@@ -15,7 +15,6 @@
 #include "LandmarkSystem.h"
 #include "LocStructs.h"
 #include "FieldConstants.h"
-#include "BallModel.pb.h"
 
 #include <vector>
 #include <list>

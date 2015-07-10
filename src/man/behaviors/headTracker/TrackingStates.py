@@ -1,7 +1,7 @@
 from . import TrackingConstants as constants
 import HeadMoves
 import noggin_constants as NogginConstants
-import BallModel_proto as BallModel
+import Vision_proto as Vision
 import math
 
 #TODO: if targets are messed up, insert 'target = tracker.brain.ball'
@@ -190,11 +190,11 @@ def fullPan(tracker):
         # Repeat the pan
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
 
-    if not isinstance(tracker.target, BallModel.messages.FilteredBall):
+    if not isinstance(tracker.target, Vision.messages.FilteredBall):
         if tracker.target.on:
             return tracker.goLater('trackingFieldObject')
 
-    if (isinstance(tracker.target, BallModel.messages.FilteredBall) and
+    if (isinstance(tracker.target, Vision.messages.FilteredBall) and
         tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH):
         return tracker.goLater('tracking')
 
@@ -216,11 +216,11 @@ def bounceFullPan(tracker):
         # Repeat the pan
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
 
-    if not isinstance(tracker.target, BallModel.messages.FilteredBall):
+    if not isinstance(tracker.target, Vision.messages.FilteredBall):
         if tracker.target.on:
             return tracker.goLater('trackingFieldObject')
 
-    if (isinstance(tracker.target, BallModel.messages.FilteredBall) and
+    if (isinstance(tracker.target, Vision.messages.FilteredBall) and
         tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH):
         return tracker.goLater('bounceTracking')
 

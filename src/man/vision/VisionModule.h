@@ -14,7 +14,6 @@
 #include "Field.h"
 
 #include "BallDetector.h"
-#include "BallModel.pb.h"
 #include "InertialState.pb.h"
 
 
@@ -32,8 +31,6 @@ public:
     portals::InPortal<messages::InertialState> inertsIn;
 
     portals::OutPortal<messages::Vision> visionOut;
-    portals::OutPortal<messages::VisionBall> ballOut;
-
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
@@ -104,8 +101,6 @@ private:
 
     nblog::SExpr* calibrationLisp;
     size_t image_index;
-
-#
 };
 
 }

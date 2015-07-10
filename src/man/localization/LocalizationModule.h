@@ -15,7 +15,6 @@
 #include "RobotLocation.pb.h"
 #include "ParticleSwarm.pb.h"
 #include "GameState.pb.h"
-#include "BallModel.pb.h"
 
 /** Filter Headers **/
 #include "SensorModel.h"

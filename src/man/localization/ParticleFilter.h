@@ -19,7 +19,6 @@
 #include "DebugConfig.h"
 
 #include "ParticleSwarm.pb.h"
-#include "BallModel.pb.h"
 
 #include <vector>
 #include <iostream>

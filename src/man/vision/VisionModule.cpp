@@ -23,7 +23,6 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
       bottomIn(),
       jointsIn(),
       visionOut(base()),
-      ballOut(base()),
       ballOn(false),
       ballOnCount(0),
       ballOffCount(0),
@@ -322,6 +321,11 @@ void VisionModule::outportalVisionField()
     vb->set_frames_on(ballOnCount);
     vb->set_frames_off(ballOffCount);
     vb->set_intopcam(top);
+
+    // std::cout << "VISION: " << std::endl;
+    // std::cout << "ON: " << ballOn << std::endl;
+    // std::cout << "ON COUNT: " << ballOnCount << std::endl;
+    // std::cout << "OFF COUNT: " << ballOffCount << std::endl;
 
     if (ballOn)
     {

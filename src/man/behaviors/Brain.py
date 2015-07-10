@@ -30,7 +30,6 @@ import LedCommand_proto
 import GameState_proto
 import WorldModel_proto
 import RobotLocation_proto
-import BallModel_proto
 import PMotion_proto
 import MotionStatus_proto
 import ButtonState_proto
@@ -258,6 +257,12 @@ class Brain(object):
         Update estimates of robot and ball positions on the field
         """
         self.ball = self.interface.filteredBall
+        # print "BEH: " 
+        # print self.ball.vis.frames_on
+        # print self.ball.vis.frames_off
+        # print self.ball.rel_x
+        # print self.ball.rel_y
+        # print self.player.inKickOffPlay
         self.sharedBall = self.interface.sharedBall
         if (self.player.gameState == 'gameReady'
             or self.player.gameState == 'gameSet'):

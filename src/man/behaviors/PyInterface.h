@@ -8,12 +8,10 @@
 
 #include "GameState.pb.h"
 #include "RobotLocation.pb.h"
-#include "BallModel.pb.h"
 #include "LedCommand.pb.h"
 #include "WorldModel.pb.h"
 #include "PMotion.pb.h"
 #include "MotionStatus.pb.h"
-//#include "Vision.pb.h"
 #include "ButtonState.pb.h"
 #include "FallStatus.pb.h"
 #include "StiffnessControl.pb.h"

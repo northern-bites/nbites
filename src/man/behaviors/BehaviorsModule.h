@@ -9,7 +9,6 @@
 #include "Common.h"
 
 #include "GameState.pb.h"
-#include "BallModel.pb.h"
 #include "LedCommand.pb.h"
 #include "WorldModel.pb.h"
 #include "PMotion.pb.h"
@@ -81,7 +80,6 @@ public:
     portals::InPortal<messages::MotionStatus> motionStatusIn;
     portals::InPortal<messages::RobotLocation> odometryIn;
     portals::InPortal<messages::RobotLocation> localizationIn;
-    portals::InPortal<messages::VisionBall> visionBallIn;
     portals::InPortal<messages::FilteredBall> filteredBallIn;
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::FallStatus> fallStatusIn;

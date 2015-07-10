@@ -10,7 +10,6 @@
 
 #include "Particle.h"
 #include "Vision.pb.h"
-#include "BallModel.pb.h"
 #include "FieldConstants.h"
 #include "../vision/Homography.h"
 #include "../vision/Hough.h"

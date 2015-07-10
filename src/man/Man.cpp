@@ -124,7 +124,7 @@ Man::Man() :
         localization.visionInput.wireTo(&vision.visionOut);
         localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
 
-        ballTrack.visionBallInput.wireTo(&vision.ballOut);
+        ballTrack.visionInput.wireTo(&vision.visionOut);
         ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
         ballTrack.localizationInput.wireTo(&localization.output, true);
 
