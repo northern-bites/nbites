@@ -23,7 +23,13 @@ cautious = {1: "Goalie",
             4: "FirstChaser",
             5: "CherryPicker"}
 
-roleConfiguration = moderate
+spread = {1: "Goalie",
+            2: "LeftDefender",
+            3: "RightDefender",
+            4: "FirstChaser",
+            5: "Striker"}
+
+roleConfiguration = spread
 
 def getRole(role):
     if role < 1:
@@ -48,8 +54,11 @@ def isFirstChaser(role):
 def isSecondChaser(role):
     return getRole(role) == "SecondChaser"
 
+def isStriker(role):
+    return getRole(role) == "Striker"
+
 def isChaser(role):
-    return isFirstChaser(role) or isSecondChaser(role)
+    return isFirstChaser(role) or isSecondChaser(role) or isStriker(role)
 
 def isCherryPicker(role):
     return getRole(role) == "CherryPicker"
@@ -68,18 +77,16 @@ def twoAttackersOnField(player):
 
     if isFirstChaser(player.role):
         firstAttacker = True
-    elif isSecondChaser(player.role) or isCherryPicker(player.role):
+    elif isSecondChaser(player.role) or isCherryPicker(player.role) or isStriker(player.role):
         secondAttacker = True
 
     for mate in player.brain.teamMembers:
         if isFirstChaser(mate.role):
             firstAttacker = True
-        elif isSecondChaser(mate.role) or isCherryPicker(mate.role):
+        elif isSecondChaser(mate.role) or isCherryPicker(mate.role) or isStriker(player.role):
             secondAttacker = True
-    if firstAttacker and secondAttacker:
-        return True
-
-    return False
+    
+    return firstAttacker and secondAttacker
 
 ### RANDOM STUFF
 isKickingOff = False # Default is false, changed by pBrunswick or some other if
@@ -89,6 +96,37 @@ boxBuffer = 100 # Used for the buffered box when approach ball is potentially
                 # going to transition out and into 'positionAtHome'
 
 ### HOME POSITIONS
+
+# TODO NEW POSITIONS:
+# Trapezoid of terror (defense)
+#       (150, 250), (460, 200), (150, 490), (460, 540)
+# Triangle of torture (chaser 2)
+#       (680, MID), (865,215), (865, 525)
+
+# Trapezoid of terror (defender positioning)
+oddDefenderForward = RobotLocation(NogginConstants.MIDFIELD_X - 60,
+                                    NogginConstants.BLUE_GOALBOX_BOTTOM_Y - 70,
+                                    0)
+evenDefenderForward = RobotLocation(NogginConstants.MIDFIELD_X - 60,
+                                    NogginConstants.BLUE_GOALBOX_TOP_Y + 70,
+                                    0)
+oddDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20, 
+                                NogginConstants.BLUE_GOALBOX_BOTTOM_Y - 10,
+                                0)
+evenDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20, 
+                                NogginConstants.BLUE_GOALBOX_TOP_Y + 10,
+                                0)
+
+#Tomultuous triangle (odd chaser positioning)
+strikerForward = RobotLocation(NogginConstants.MIDFIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS + 70,
+                                NogginConstants.MIDFIELD_Y,
+                                180)
+strikerBottom = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X,
+                                NogginConstants.MIDFIELD_Y - 60,
+                                0)
+strikerTop = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X,
+                                NogginConstants.MIDFIELD_Y + 60,
+                                0)
 
 oddDefenderHomePenn = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
                                     NogginConstants.MY_GOALBOX_BOTTOM_Y + 40,
@@ -129,8 +167,8 @@ oddChaserKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 45,
                                  NogginConstants.OPP_GOALBOX_BOTTOM_Y - 100,
                                  0)
 evenChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
-                               NogginConstants.FIELD_GREEN_HEIGHT - 100,
-                               -90)
+                               NogginConstants.CENTER_FIELD_Y,
+                               0)
 
 cherryPickerHome = RobotLocation(NogginConstants.OPP_GOALBOX_LEFT_X,
                                  NogginConstants.OPP_GOALBOX_BOTTOM_Y,
@@ -184,6 +222,8 @@ evenDefenderBox = defenderBox
 
 chaserBox = ((0, 0), NogginConstants.FIELD_WIDTH, NogginConstants.FIELD_HEIGHT)
 
+strikerBox = ((strikerForward.x, 0), (NogginConstants.FIELD_GREEN_WIDTH - strikerForward.x), NogginConstants.FIELD_HEIGHT)
+
 cherryPickerBox = (((0.5*NogginConstants.FIELD_GREEN_WIDTH + 0.25*NogginConstants.FIELD_WHITE_WIDTH), 0),
                     0.25*NogginConstants.FIELD_WHITE_WIDTH + NogginConstants.GREEN_PAD_X, 
                     NogginConstants.FIELD_HEIGHT)
@@ -233,6 +273,11 @@ def setRoleConstants(player, role, oppTeam):
         player.homePosition = oddChaserHome
         player.kickoffPosition = oddChaserKickoff
         player.box = chaserBox
+        player.isKickingOff = False
+    elif isStriker(role):
+        player.homePosition = strikerForward
+        player.kickoffPosition = oddChaserKickoff
+        player.box = strikerBox
         player.isKickingOff = False
     elif isCherryPicker(role):
         player.homePosition = cherryPickerHome

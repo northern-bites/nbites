@@ -38,6 +38,14 @@ namespace vision {
 extern "C" void _runLengthU8 (uint8_t * source, int count, int thresh, int32_t* runs);
 extern "C" void _runLengthU16(uint16_t* source, int count, int thresh, int32_t* runs);
 
+// ***********
+// *         *
+// *  Point  *
+// *         *
+// ***********
+
+typedef std::pair<double, double> Point;
+
 // *************
 // *           *
 // *  Utility  *
@@ -114,6 +122,28 @@ inline void translateRotate(double x, double y, double transX, double transY,
 
     xTransformed = xRotated + transX;
     yTransformed = yRotated + transY;
+}
+
+inline void inverseTranslateRotate(double x, double y, double transX, double transY, 
+                                   double rotation, double& xTransformed, double& yTransformed)
+{
+    double xTranslated = x - transX;
+    double yTranslated = y - transY;
+
+    xTransformed = xTranslated*cos(rotation) + yTranslated*sin(rotation);
+    yTransformed = -xTranslated*sin(rotation) + yTranslated*cos(rotation);
+}
+
+inline void cartesianToPolar(double x, double y, double& r, double& t)
+{
+    r = sqrt(x * x + y * y);
+    t = atan2(y, x);
+}
+
+inline void polarToCartesian(double r, double t, double& x, double& y)
+{
+    x = r * cos(t);
+    y = r * sin(t);
 }
 
 std::string strPrintf(const char* format, ...);

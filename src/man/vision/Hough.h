@@ -14,6 +14,7 @@
 
 #include <list>
 #include <vector>
+#include <array>
 #include <iostream>
 
 namespace man {
@@ -173,7 +174,6 @@ struct Corner : public std::pair<FieldLine*, FieldLine*>
   Corner() : std::pair<FieldLine*, FieldLine*>() {}
   Corner(FieldLine* first_, FieldLine* second_, CornerID id_);
 
-  // TODO h
   double x;
   double y;
 
@@ -189,6 +189,7 @@ class GoalboxDetector : public std::pair<FieldLine*, FieldLine*>
 {
   double parallelThreshold_;
   double seperationThreshold_;
+  double lengthThreshold_;
 
   bool validBox(const HoughLine& line1, const HoughLine& line2) const;
 
@@ -201,6 +202,9 @@ public:
 
   double seperationThreshold() const { return seperationThreshold_; }
   void seperationThreshold(double newThreshold) { seperationThreshold_ = newThreshold; }
+
+  double lengthThreshold() const { return lengthThreshold_; }
+  void lengthThreshold(double newThreshold) { lengthThreshold_ = newThreshold; }
 
   std::string print() const;
 };
@@ -216,6 +220,7 @@ class CornerDetector : public std::vector<Corner>
   double closeThreshold_;
   double farThreshold_;
   double edgeImageThreshold_;
+  double lengthThreshold_;
 
   bool isCorner(const HoughLine& line1, const HoughLine& line2) const;
   CornerID classify(const HoughLine& line1, const HoughLine& line2) const; 
@@ -242,6 +247,43 @@ public:
 
   double edgeImageThreshold() const { return edgeImageThreshold_; }
   void edgeImageThreshold(double newThreshold) { edgeImageThreshold_ = newThreshold; }
+
+  double lengthThreshold() const { return lengthThreshold_; }
+  void lengthThreshold(double newThreshold) { lengthThreshold_ = newThreshold; }
+};
+
+// Dectects center circle
+// class CirclePoint;
+// class Cluster;
+
+class CenterCircleDetector {
+  double _ccx;
+  double _ccy;
+  
+  std::vector<Point> calculatePotentials(EdgeList& edges);
+
+  // For debugging
+  std::vector<Point> _potentials;
+
+  // Parameters
+  int hardCap;                    // Min number of potential edges
+  double maxEdgeDistanceSquared;  // Max considered distance of an edge
+  double ccr;                     // Center circle radius
+  int binWidth;                   // In centimeters
+  int binCount;                   // Bins per row and col
+  double minVotesInMaxBin;        // Ratio of potentials required in the most populated bin
+
+  void set();
+  bool getMaxBin(std::vector<Point> vec, double& x0, double& y0);
+  inline int roundDown(int v) { return binWidth*(v/binWidth); }
+
+public:
+  CenterCircleDetector();
+  bool detectCenterCircle(EdgeList& edges);
+  std::vector<Point> getPotentials() { return _potentials; }
+  
+  double x() { return _ccx; }
+  double y() { return _ccy; }
 };
 
 enum class LineID {
@@ -324,7 +366,7 @@ public:
   FieldLineList();
 
   // Find field lines
-  void find(HoughLineList&);
+  void find(HoughLineList&, bool blackStar = false);
 
   // Classify field lines
   void classify(GoalboxDetector& boxDetector, CornerDetector& cornerDetector);
@@ -344,13 +386,13 @@ public:
 class HoughSpace
 {
 public:
-   enum
+  enum
   {
     NumTimes = 6,
   };
 
 private:
- enum
+  enum
   {
     TBits         = 8,
     TSpan         = 1 << TBits,
@@ -388,7 +430,7 @@ private:
   void wrapAround();
   void smooth();
   void peaks(HoughLineList&);
-  void adjust(EdgeList&, HoughLineList&);
+  void adjust(EdgeList&, EdgeList&, HoughLineList&);
 
   static bool tableInit;
   static int16_t sincosTable[0x140 + 2 * AngleSpread + 1];
@@ -420,7 +462,7 @@ public:
   uint32_t time(int i) const { return times[i]; }
   static const char* timeNames[NumTimes];
 
-  void run(EdgeList&, HoughLineList&);
+  void run(EdgeList&, EdgeList&, HoughLineList&);
 };
 
 }

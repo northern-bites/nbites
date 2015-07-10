@@ -58,7 +58,8 @@ TranscriberBuffer::~TranscriberBuffer()
 ImageTranscriber::ImageTranscriber(Camera::Type which) :
     settings(Camera::getSettings(which)),
     cameraType(which),
-    timeStamp(0)
+    timeStamp(0),
+    exiting(false)
 {
     // Bottom camera takes video at half the resolution of the top camera
     if (which == Camera::TOP) {
@@ -86,7 +87,11 @@ ImageTranscriber::ImageTranscriber(Camera::Type which) :
 
 ImageTranscriber::~ImageTranscriber()
 {
+    // If this is true then we've (hopefully) already closed up shop
+    if (exiting) return;
+
     // disable streaming
+    std::cout << "STOPPING THE CAMERA" << std::endl;
     int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     verify(ioctl(fd, VIDIOC_STREAMOFF, &type),
            "Capture stop failed.");
@@ -94,10 +99,27 @@ ImageTranscriber::~ImageTranscriber()
     // unmap buffers
     for (int i = 0; i < NUM_BUFFERS; ++i)
         munmap(mem[i], memLength[i]);
-
     // close the device
     close(cameraAdapterFd);
     close(fd);
+    std::cout << "Done closing Camera" << std::endl;
+}
+
+void ImageTranscriber::closeDriver()
+{
+    exiting = true;
+    std::cout << "STOPPING THE CAMERA" << std::endl;
+    int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    verify(ioctl(fd, VIDIOC_STREAMOFF, &type),
+           "Capture stop failed.");
+
+    // unmap buffers
+    for (int i = 0; i < NUM_BUFFERS; ++i)
+        munmap(mem[i], memLength[i]);
+    // close the device
+    close(cameraAdapterFd);
+    close(fd);
+    std::cout << "Done closing Camera" << std::endl;
 }
 
 void ImageTranscriber::initOpenI2CAdapter() {
@@ -226,7 +248,7 @@ void ImageTranscriber::initQueueAllBuffers() {
 void ImageTranscriber::initSettings()
 {
     std::string filepath;
-#ifdef NAOQI_2 //for NAOQI 2.x
+//#ifdef NAOQI_2 //for NAOQI 2.x
     if(cameraType == Camera::TOP) {
         filepath = "/home/nao/nbites/Config/V5topCameraParams.txt";
         std::cout<<"[INFO] Camera::TOP"<<std::endl;
@@ -234,15 +256,15 @@ void ImageTranscriber::initSettings()
         filepath = "/home/nao/nbites/Config/V5bottomCameraParams.txt";
         std::cout<<"[INFO] Camera::BOTTOM"<<std::endl;
     }
-#else //for NAOQI 1.14
-    if(cameraType == Camera::TOP) {
-        filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
-        std::cout<<"[INFO] Camera::TOP"<<std::endl;
-    } else {
-        filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
-        std::cout<<"[INFO] Camera::BOTTOM"<<std::endl;
-    }
-#endif
+// #else //for NAOQI 1.14
+//     if(cameraType == Camera::TOP) {
+//         filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
+//         std::cout<<"[INFO] Camera::TOP"<<std::endl;
+//     } else {
+//         filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
+//         std::cout<<"[INFO] Camera::BOTTOM"<<std::endl;
+//     }
+// #endif
     
     if(FILE *file = fopen(filepath.c_str(),"r")) {
         fclose(file);
@@ -292,10 +314,8 @@ void ImageTranscriber::initSettings()
     setControlSetting(V4L2_CID_SATURATION, updated_settings.saturation);
     setControlSetting(V4L2_CID_HUE, updated_settings.hue);
     setControlSetting(V4L2_CID_SHARPNESS, updated_settings.sharpness);
-
-#ifdef NAOQI_2
     setControlSetting(V4L2_CID_GAMMA, updated_settings.gamma);
-#endif
+
     // Auto white balance, exposure,  and backlight comp off!
     // The first two are both for white balance. The docs don't make
     // it clear what the difference is...
@@ -307,12 +327,8 @@ void ImageTranscriber::initSettings()
     setControlSetting(V4L2_CID_EXPOSURE, updated_settings.exposure);
     setControlSetting(V4L2_CID_GAIN, updated_settings.gain);
 
-#ifdef NAOQI_2
     setControlSetting(V4L2_CID_DO_WHITE_BALANCE, 0);
     setControlSetting(V4L2_CID_WHITE_BALANCE_TEMPERATURE, updated_settings.white_balance);
-#else
-    setControlSetting(V4L2_CID_DO_WHITE_BALANCE, updated_settings.white_balance);
-#endif
     setControlSetting(V4L2_MT9M114_FADE_TO_BLACK, updated_settings.fade_to_black);
 
     //testControlSettings();
@@ -328,12 +344,7 @@ void ImageTranscriber::testControlSettings() {
     int sharpness = getControlSetting(V4L2_CID_SHARPNESS);
     int gain = getControlSetting(V4L2_CID_GAIN);
     int exposure = getControlSetting(V4L2_CID_EXPOSURE);
-
-#ifdef NAOQI_2
     int whitebalance = getControlSetting(V4L2_CID_WHITE_BALANCE_TEMPERATURE);
-#else
-    int whitebalance = getControlSetting(V4L2_CID_DO_WHITE_BALANCE);
-#endif
     int fade = getControlSetting(V4L2_MT9M114_FADE_TO_BLACK);
 
 
@@ -425,11 +436,7 @@ void ImageTranscriber::assertCameraSettings() {
     int sharpness = getControlSetting(V4L2_CID_SHARPNESS);
     int gain = getControlSetting(V4L2_CID_GAIN);
     int exposure = getControlSetting(V4L2_CID_EXPOSURE);
-#ifdef NAOQI_2
     int whitebalance = getControlSetting(V4L2_CID_WHITE_BALANCE_TEMPERATURE);
-#else
-    int whitebalance = getControlSetting(V4L2_CID_DO_WHITE_BALANCE);
-#endif
     int fade = getControlSetting(V4L2_MT9M114_FADE_TO_BLACK);
 
     //std::cerr << "Done checking driver settings" << std::endl;
@@ -542,6 +549,11 @@ void ImageTranscriber::startCapturing() {
 // The heart of the transcriber, returns an image full of pixels from video mem
 messages::YUVImage ImageTranscriber::getNextImage()
 {
+    if (exiting) {
+        // Make sure we aren't trying to read from the camera if
+        // man is in the process of exiting
+        return messages::YUVImage(width*2, height);
+    }
     // dequeue a frame buffer (this call blocks when there is
     // no new image available)
     if(cameraType == Camera::TOP)
@@ -593,26 +605,37 @@ TranscriberModule::TranscriberModule(ImageTranscriber& trans)
 {
 }
 
+TranscriberModule::~TranscriberModule()
+{
+    std::cout << "Transcriber destructor" << std::endl;
+    delete &it;
+}
+
+void TranscriberModule::closeTranscriber()
+{
+    it.closeDriver();
+}
+
 void logThumbnail(messages::YUVImage& image, std::string& ifrom, size_t iindex);
-    
+
 // Get image from Transcriber and outportal it
 void TranscriberModule::run_()
 {
     struct stat file_stats;
     std::string filepath;
-    #ifdef NAOQI_2
-        if(it.type() == Camera::TOP) {
-            filepath = "/home/nao/nbites/Config/V5topCameraParams.txt";
-        } else {
-            filepath = "/home/nao/nbites/Config/V5bottomCameraParams.txt";
-        }
-    #else
-        if(it.type() == Camera::TOP) {
-            filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
-        } else {
-            filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
-        }
-    #endif
+// #ifdef NAOQI_2
+    if(it.type() == Camera::TOP) {
+        filepath = "/home/nao/nbites/Config/V5topCameraParams.txt";
+    } else {
+        filepath = "/home/nao/nbites/Config/V5bottomCameraParams.txt";
+    }
+// #else
+//     if(it.type() == Camera::TOP) {
+//         filepath = "/home/nao/nbites/Config/V4topCameraParams.txt";
+//     } else {
+//         filepath = "/home/nao/nbites/Config/V4bottomCameraParams.txt";
+//     }
+// #endif
 
     if(FILE *file = fopen(filepath.c_str(),"r")) { //existence check
         fclose(file);
@@ -646,7 +669,7 @@ void TranscriberModule::run_()
     messages::YUVImage image = it.getNextImage();
     portals::Message<messages::YUVImage> imageOutMessage(&image);
     imageOut.setMessage(imageOutMessage);
-    
+
 #ifdef USE_LOGGING
     if (control::flags[control::thumbnail]) {
         std::string image_from;
@@ -656,7 +679,7 @@ void TranscriberModule::run_()
         } else {
             image_from = "camera_BOT";
         }
-        
+
         logThumbnail(image, image_from, ++image_index);
     }
 #endif

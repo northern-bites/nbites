@@ -51,15 +51,17 @@ class Kick(object):
 # Some standard kicks. x, y, and move should not be modified unless you change
 # the sweetMove. Here heading indicates where one should setup to kick in a
 # particular direction, but it will be modified later on to indicate where the
-# robot needs to orbit to. Dist indicates how far the kick goes on average.
+# robot needs to orbit to. Dist indicates how far the kick goes on average. The
+# x deals with the distance in front of the robot while the y deals with the 
+# distance to the side of the robot
 
 # Sweet move-based kicks
 LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", 
-                                 x = 14.8, y =  3.6,
+                                 x = 15, y =  3.6,
                                  dist = 300,
                                  move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
 RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", 
-                                 x = -13, y = -3.6,
+                                 x = 15, y = -3.6,
                                  dist = 300,
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 
@@ -72,15 +74,6 @@ RIGHT_BIG_KICK = Kick("R_Big_Straight",
                       dist = 500,
                       move=SweetMoves.RIGHT_BIG_KICK)
 
-LEFT_SIDE_KICK =  Kick("L_Side", 
-                       x = 17.5, y =  2, h = 90,
-                       dist = 150,
-                       move=SweetMoves.GOOGZ_LEFT_SIDE_KICK)
-RIGHT_SIDE_KICK = Kick("R_Side", 
-                       x = 17.5, y = -2, h = -90,
-                       dist = 150,
-                       move=SweetMoves.GOOGZ_RIGHT_SIDE_KICK)
-
 ZELLVARRO_LEFT_KICK = Kick("Zellvarro_Left_Kick",
                       x = 15.5, y = 3.95, 
                       dist = 300,
@@ -91,49 +84,37 @@ ZELLVARRO_RIGHT_KICK = Kick("Zellvarro_Left_Kick",
                       dist = 300,
                       move=SweetMoves.ZELLVARRO_RIGHT_KICK)
 
-LEFT_KICK = LEFT_SHORT_STRAIGHT_KICK
-RIGHT_KICK = RIGHT_SHORT_STRAIGHT_KICK
+LEFT_SIDE_KICK = Kick("Left_Side_Kick",
+                      x = 15.5, y = 3.95, 
+                      dist = 300,
+                      move=SweetMoves.LEFT_SIDE_KICK)
+RIGHT_SIDE_KICK = Kick("Right_Side_Kick",
+                      x = 15.5, y = -3.95, 
+                      dist = 300,
+                      move=SweetMoves.RIGHT_SIDE_KICK)
 
-# Motion kicks
-M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 12.7, y = 3.6, dist = 70)
-M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 12.7, y = -3.6, dist = 70)
-
-M_LEFT_CHIP_SHOT =  Kick("M_Left_Chip_Shot", x = 12.3, y = -.3, h = 45, dist = 70)
-M_RIGHT_CHIP_SHOT =  Kick("M_Right_Chip_Shot", x = 12.3, y = .3, h = -45, dist = 70)
-
-M_LEFT_SIDE = Kick("M_Left_Side", x = 13.4, y = -2.76, h = 90, dist = 100)
-M_RIGHT_SIDE = Kick("M_Right_Side", x = 13.4, y = 2.76, h = -90, dist = 100)
-
-# Motion kicks for v5s. We need to determine a good way of dealing with this in python
-#M_LEFT_SIDE = Kick("M_Left_Side", x = 13, y = -2.8, h = 90, dist = 100)
-#M_RIGHT_SIDE = Kick("M_Right_Side", x = 13, y = 2.8, h = -90, dist = 100)
-
-# Not used 04-19-13
-LEFT_SHORT_SIDE_KICK =  Kick("L_Short_Side", x = 15.5, y = -.5,
-                             h = 90,
-                             move=SweetMoves.LEFT_SHORT_SIDE_KICK)
-RIGHT_SHORT_SIDE_KICK = Kick("R_Short_Side", x = 15.5, y = .5,
-                             h = -90,
-                             move=SweetMoves.RIGHT_SHORT_SIDE_KICK)
-
-# Not used 05-02-14
-LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 16.5, y = 5.0,
+LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 14.5, y = 4.0,
                            move=SweetMoves.LEFT_STRAIGHT_KICK)
-RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 16.5, y = -5.0,
+RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 14.5, y = -4.0,
                            move=SweetMoves.RIGHT_STRAIGHT_KICK)
 
-# Not used 05-02-14
-LEFT_LONG_BACK_KICK =  Kick("L_Long_Back", x = 15.7, y =  4.1,
-                            move=SweetMoves.LEFT_LONG_BACK_KICK)
-RIGHT_LONG_BACK_KICK = Kick("R_Long_Back", x = 15.7, y = -4.1,
-                            move=SweetMoves.RIGHT_LONG_BACK_KICK)
-
-# Not used 05-02-14
 LEFT_SHORT_BACK_KICK =  Kick("L_Short_Back", x = 16.8, y =  4,
                              move=SweetMoves.LEFT_SHORT_BACK_KICK)
 RIGHT_SHORT_BACK_KICK = Kick("R_Short_Back", x = 16.8, y = -4,
                              move=SweetMoves.RIGHT_SHORT_BACK_KICK)
 
+LEFT_KICK = LEFT_SHORT_STRAIGHT_KICK
+RIGHT_KICK = RIGHT_SHORT_STRAIGHT_KICK
+
+# Motion kicks
+M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 13.3, y = 3., dist = 70)
+M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 13.3, y = -3., dist = 70)
+
+M_LEFT_CHIP_SHOT =  Kick("M_Left_Chip_Shot", x = 12.3, y = -.3, h = 45, dist = 70)
+M_RIGHT_CHIP_SHOT =  Kick("M_Right_Chip_Shot", x = 12.3, y = .3, h = -45, dist = 70)
+
+M_LEFT_SIDE = Kick("M_Left_Side", x = 13.2, y = -2.76, h = 90, dist = 100)
+M_RIGHT_SIDE = Kick("M_Right_Side", x = 13.2, y = 2.76, h = -90, dist = 100)
 
 # TODO automate/generalize this?
 def chooseAlignedKickFromKick(player, kick):
@@ -168,12 +149,6 @@ def chooseAlignedKickFromKick(player, kick):
             return LEFT_BIG_KICK
         else:
             return RIGHT_BIG_KICK
-    elif (kick == LEFT_LONG_BACK_KICK or
-          kick == RIGHT_LONG_BACK_KICK):
-        if ballRelY > 0:
-            return LEFT_LONG_BACK_KICK
-        else:
-            return RIGHT_LONG_BACK_KICK
     elif (kick == LEFT_SHORT_BACK_KICK or
           kick == RIGHT_SHORT_BACK_KICK):
         if ballRelY > 0:

@@ -18,6 +18,7 @@
 #include "FallStatus.pb.h"
 #include "StiffnessControl.pb.h"
 #include "Obstacle.pb.h"
+#include "Toggle.pb.h"
 #include "Vision.pb.h"
 
 namespace man {
@@ -47,7 +48,9 @@ public:
     // messages::VisionObstacle    const * visionObstacle_ptr;
     messages::SharedBall        const * sharedBall_ptr;
     messages::RobotLocation     const * sharedFlip_ptr;
-    messages::FieldLines     const * visionLines_ptr;
+    messages::Toggle            const * sitDown_ptr;
+    messages::FieldLines        const * visionLines_ptr;
+    messages::Corners           const * corners_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -80,6 +83,10 @@ public:
     void setVisionLines_ptr(const messages::FieldLines* msg)
     {
         visionLines_ptr = msg;
+    }
+    void setCorners_ptr(const messages::Corners* msg)
+    {
+        corners_ptr = msg;
     }
     void setWorldModel_ptr(const messages::WorldModel* msg,int i)
     {
@@ -136,6 +143,10 @@ public:
     void setObstacle_ptr(const messages::FieldObstacles* msg)
     {
         obstacle_ptr = msg;
+    }
+    void setSitDown_ptr(const messages::Toggle* msg)
+    {
+        sitDown_ptr = msg;
     }
     // void setVisionObstacle_ptr(const messages::VisionObstacle* msg)
     // {

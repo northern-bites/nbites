@@ -13,6 +13,7 @@
 
 #include "NBMath.h"
 #include "FieldConstants.h"
+#include "RobotLocation.pb.h"
 
 #include <boost/random.hpp>
 #include <boost/random/normal_distribution.hpp>
@@ -32,14 +33,12 @@ struct ParticleFilterParams
     float fieldHeight;        //! Field height.
     float fieldWidth;         //! Field width.
     float numParticles;       //! Size of particle population.
-    float alpha_fast;         //! Weight factor for fast exponential weight filter.
-    float alpha_slow;         //! Weight factor for slow exponential weight filter.
+    float alphaFast;          //! Weight factor for fast exponential weight filter.
+    float alphaSlow;          //! Weight factor for slow exponential weight filter.
     float odometryXYNoise;    //! Variance for x,y in MotionSystem when updating.
     float odometryHNoise;     //! Variance for h in MotionSystem when updating.
-    // Need to add how much we prefer best particles
+    float lostThreshold;      //! Threshold for determining when lost applied to exponential filters
 };
-
-
 
 /**
  * Samples a Gaussian normal distribution of specified
@@ -81,30 +80,46 @@ struct LocNormalParams
 
 struct ReconstructedLocation
 {
-    ReconstructedLocation(float x_, float y_, float h_)
-        : x(x_), y(y_), h(h_), defSide(x < CENTER_FIELD_X)
-        {
-        }
     float x;
     float y;
-    float h; // Robot Pose
+    float h;
 
-    bool defSide;
+    float xSigma;
+    float ySigma;
+    float hSigma;
 
-    friend bool operator ==(const ReconstructedLocation& first,
-                            const ReconstructedLocation& second)
-        {
-            if(std::fabs(first.x - second.x) > 15.f)
-                return false;
-            if(std::fabs(first.y - second.y) > 15.f)
-                return false;
-            if(std::fabs(first.h - second.h) > TO_RAD*20.f)
-                return false;
+    boost::mt19937 rng;
 
-            // Made it through, so close enough
-            return true;
-        }
+    ReconstructedLocation(float x_, float y_, float h_, float xs_, float ys_, float hs_)
+        : x(x_), y(y_), h(h_), xSigma(xs_), ySigma(ys_), hSigma(hs_), rng(time(0))
+    {}
 
+    messages::RobotLocation sample()
+    {
+        messages::RobotLocation sampled;
+
+        boost::normal_distribution<> xGaussian(x, xSigma);
+        boost::normal_distribution<> yGaussian(y, ySigma);
+        boost::normal_distribution<> hGaussian(h, hSigma);
+
+        boost::variate_generator<boost::mt19937&,
+                                 boost::normal_distribution<> > xNoise(rng, xGaussian);
+        boost::variate_generator<boost::mt19937&,
+                                 boost::normal_distribution<> > yNoise(rng, yGaussian);
+        boost::variate_generator<boost::mt19937&,
+                                 boost::normal_distribution<> > hNoise(rng, hGaussian);
+
+        sampled.set_x(xNoise());
+        sampled.set_y(yNoise());
+        sampled.set_h(hNoise());
+
+        return sampled;
+    }
+
+    bool onField() 
+    { 
+        return (x >= 0 && x <= FIELD_GREEN_WIDTH && y >= 0 && y <= FIELD_GREEN_HEIGHT); 
+    }
 };
 
 template <class T>

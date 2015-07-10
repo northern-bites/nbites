@@ -51,10 +51,7 @@ public class NBConstants {
 	
 	public static final int NBCROSS_CALL_TIMEOUT = 0;	//interpreted as infinite.  Note that, since these calls are local,
 														//we worry less about dead sockets.
-	
-	//Who names a class DataFlavor?  That's just so... Idk. Fllaavvvooorr.  Data Fllaaavoor. MMM, gimme some'o that DataFlav
-	public static final DataFlavor treeFlavor = new DataFlavor(Log.class, "NB-OpaqueLog");
-	
+		
 	public static enum STATUS {
 		IDLE(0),		//No io or IO threads active.  No active SessionHandler.  Ready to start.
 		STARTING(1),	//Setting up IO or threads in a SessionHandler (usually very short)
@@ -79,12 +76,14 @@ public class NBConstants {
 		
 		map.put("YUVImage", new Class[]{ImageView.class, ZoomImageView.class, FrontEndView.class, LineView.class, BallView.class});
 		map.put("STATS", new Class[]{BotStatsView.class});
-		map.put("prot-RobotLocation", new Class[]{FieldView.class});
-		map.put(DEFAULT_S, new Class[]{DefaultView.class});
-		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
+		map.put("proto-RobotLocation", new Class[]{FieldView.class});
 		map.put("location", new Class[]{LocSwarmView.class});
 		map.put("proto-FieldLines", new Class[]{BasicLineView.class});
 		map.put("sound", new Class[]{SoundView.class, SoundFreqView.class});
+		map.put("proto-Corners", new Class[]{BasicLineView.class});
+		
+		map.put(DEFAULT_S, new Class[]{DefaultView.class});
+		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
 
 		return map;
 	}

@@ -52,18 +52,26 @@ void SharedBallModule::run_()
         {
             numRobotsOn++;
         }
+
         // resets ball estimates for each robot
         ballX[i] = -1.f;
         ballY[i] = -1.f;
     }
 
-    // get myInfo:
-    locIn.latch();
-    myX = locIn.message().x();
-    myY = locIn.message().y();
-    myH = locIn.message().h();
-    ballIn.latch();
-    myBall = ballIn.message();
+    if(my_num != 6) {
+        // get myInfo:
+        locIn.latch();
+        myX = locIn.message().x();
+        myY = locIn.message().y();
+        myH = locIn.message().h();
+        ballIn.latch();
+        myBall = ballIn.message();
+    } else {
+        myX = 10;
+        myY = 10;
+        myH = 0;
+    }
+    
 
     if (numRobotsOn)
     {
@@ -132,7 +140,7 @@ void SharedBallModule::chooseRobots()
             float dist = getBallDistanceSquared(i, j);
             inEstimate[i][j] = 0;
             if (dist < CONSENSUS_THRESHOLD * CONSENSUS_THRESHOLD
-                or i == j)
+                || i == j)
             {
                 inEstimate[i][j] = 1;
                 numInEstimate[i]++;
@@ -168,14 +176,15 @@ void SharedBallModule::chooseRobots()
                 break;
             }
         }
-        if (!goalieOn)
+        /*if (!goalieOn)
         {
+            std::cout<<"[DEBUG] Setting BallOn to False. No Goalie"<<std::endl;
             // don't want to use shared ball: not large enough consensus, no goalie
             ballOn = false;
             return;
-        }
+        } */
         // else the goalie will be used to break the tie!
-    }
+    } 
 
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++)
     {
@@ -241,9 +250,7 @@ void SharedBallModule::weightedavg()
         x = numx / sumweight;
         y = numy / sumweight;
         ballOn = true;
-    } else {
-        std::cout<<"Error! SumWeight is 0!"<<std::endl;
-    }
+    } 
 }
 
 

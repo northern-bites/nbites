@@ -43,11 +43,38 @@ public interface FieldLineOrBuilder extends
   int getId();
 
   /**
-   * <code>optional float prob = 4;</code>
+   * <code>optional int32 correspondence = 4;</code>
+   */
+  boolean hasCorrespondence();
+  /**
+   * <code>optional int32 correspondence = 4;</code>
+   */
+  int getCorrespondence();
+
+  /**
+   * <code>optional float prob = 5;</code>
    */
   boolean hasProb();
   /**
-   * <code>optional float prob = 4;</code>
+   * <code>optional float prob = 5;</code>
    */
   float getProb();
+
+  /**
+   * <code>optional int32 index = 6;</code>
+   */
+  boolean hasIndex();
+  /**
+   * <code>optional int32 index = 6;</code>
+   */
+  int getIndex();
+
+  /**
+   * <code>optional float wz0 = 7;</code>
+   */
+  boolean hasWz0();
+  /**
+   * <code>optional float wz0 = 7;</code>
+   */
+  float getWz0();
 }

@@ -21,7 +21,7 @@ const double HORIZ_FOV_RAD = HORIZ_FOV_DEG * M_PI / 180;
 
 class Ball {
 public:
-    Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_, int imgWidth_);
+    Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_, int imgWidth_, bool top);
     Ball();
 
     std::string properties();

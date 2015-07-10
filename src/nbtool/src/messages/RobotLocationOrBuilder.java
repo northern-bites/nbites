@@ -51,4 +51,13 @@ public interface RobotLocationOrBuilder extends
    * <code>optional float uncert = 5;</code>
    */
   float getUncert();
+
+  /**
+   * <code>optional bool lost = 6;</code>
+   */
+  boolean hasLost();
+  /**
+   * <code>optional bool lost = 6;</code>
+   */
+  boolean getLost();
 }
