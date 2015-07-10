@@ -244,10 +244,12 @@ bool LineSystem::shouldUse(const messages::FieldLine& observation,
     // in localization, otherwise do not, as you are probably seeing center
     // circle lines
     double heading = vision::uMod(loc.h(), 2 * M_PI);
-    return ((loc.x() < CENTER_FIELD_X - 150 && (heading > 150*TO_RAD && heading < 210*TO_RAD)) ||
-            (loc.x() > CENTER_FIELD_X + 150 && (heading < 150*TO_RAD && heading < 210*TO_RAD)) ||
-            (loc.x() < LANDMARK_BLUE_GOAL_CROSS_X) ||
-            (loc.x() > LANDMARK_YELLOW_GOAL_CROSS_X));
+    bool useShorts = ((loc.x() < CENTER_FIELD_X - 150 && (heading > 150*TO_RAD && heading < 210*TO_RAD)) ||
+                      (loc.x() > CENTER_FIELD_X + 150 && (heading < 150*TO_RAD && heading < 210*TO_RAD)) ||
+                      (loc.x() < LANDMARK_BLUE_GOAL_CROSS_X) ||
+                      (loc.x() > LANDMARK_YELLOW_GOAL_CROSS_X));
+    bool length = observation.inner().ep1() - observation.inner().ep0() > 60;
+    return useShorts || length;
 }
 
 vision::GeoLine LineSystem::relRobotToAbsolute(const messages::FieldLine& observation,
