@@ -1,5 +1,5 @@
 import time
-from objects import RelRobotLocation
+from objects import RelRobotLocation, RobotLocation
 from ..navigator import Navigator as nav
 from ..util import *
 import VisualGoalieStates as VisualStates
@@ -105,13 +105,15 @@ def gamePlaying(player):
         # #TODO fix this
         # player.justKicked = False
         if fallen.lastState == 'clearIt' and player.brain.ball.vis.on\
-        and math.fabs(player.brain.ball.bearing_deg) < 25.0:
+        and math.fabs(player.brain.ball.bearing_deg) < 25.0 and player.brain.ball.distance < 90:
             print "I was already going to clear it!"
             return player.goLater('clearIt')
         elif fallen.lastState == 'spinBack' or fallen.lastState == 'didIKickIt'\
         or fallen.lastState == 'kickBall' or fallen.lastState == 'repositionAfterWhiff':
             print("I was just in either spinback or didIKickIt, meaning I'm away frm the goalbox likely")
-            return player.goLater('watchWithLineChecks')
+            return player.goLater('returnUsingLoc')
+        elif fallen.lastState == 'returnUsingLoc':
+            return player.goLater('returnUsingLoc')
         else:
             return player.goLater('watchWithLineChecks')
 
@@ -263,12 +265,17 @@ def lineCheckReposition(player):
         if dest.relX == 0.0 and dest.relY == 0.0:
             print "I think this was a turn, I'm increasing my num turns!"
             watchWithLineChecks.numTurns += 1
+        elif dest.relX == 5.0 and dest.relY == -30:
+            player.inPosition = constants.RIGHT_POSITION
+        elif dest.relX == 5.0 and dest.relY == 30:
+            player.inPosition = constants.LEFT_POSITION
         else:
             print "This was a reposition, I think"
             watchWithLineChecks.numFixes += 1
-        player.brain.nav.walkTo(dest)
+        player.brain.nav.walkTo(dest, speed = nav.QUICK_SPEED)
+        # player.brain.nav.goTo(dest, precision = (20.0, 20.0, 20))
 
-    if player.counter > 120:
+    if player.counter > 300:
         return player.goLater('watchWithLineChecks')
 
     return Transition.getNextState(player, lineCheckReposition)
@@ -289,15 +296,19 @@ def spinToHorizon(player):
 @superState('gameControllerResponder')
 def returnUsingLoc(player):
     if player.firstFrame():
-        dest = RobotLocation(Constants.FIELD_WHITE_LEFT_SIDELINE_X,
-                        Constants.MIDFIELD_Y,
+        dest = RobotLocation(nogginConstants.FIELD_WHITE_LEFT_SIDELINE_X,
+                        nogginConstants.MIDFIELD_Y,
                         0.0)
         player.brain.nav.goTo(dest,
-                            speed = Navigator.QUICK_SPEED)
+                            speed = nav.BRISK_SPEED)
         print("I'm trying to return using loc!")
         player.brain.tracker.trackBall
 
-    return Transition.getNextState(player. returnUsingLoc)
+    if player.counter > 300:
+        print "This is taking a suspiciously long time"
+        return player.goLater('watchWithLineChecks')
+
+    return Transition.getNextState(player, returnUsingLoc)
 
 @superState('gameControllerResponder')
 def spinBack(player):
@@ -458,8 +469,9 @@ def moveBackwards(player):
     # if player.brain.ball.vis.on and moveBackwards.notTracking:
     #     player.brain.tracker.trackBall
     #     moveBackwards.notTracking = False
-    if player.counter > 110:
+    if player.counter > 100:
         print("Walking backwards too long... switch to a different state!")
+        return player.goLater('findMyWayBackPtI')
 
     return Transition.getNextState(player, moveBackwards)
 
@@ -496,9 +508,10 @@ def kickBall(player):
     if player.counter is 20:
         player.executeMove(player.kick.sweetMove)
 
-    if player.brain.ball.vis.frames_off > 10.0:
+    if player.brain.ball.vis.frames_off > 15.0:
         print("I lost the ball! I'm returning to goal")
-        return player.goLater('spinBack')
+        # return player.goLater('spinBack')
+        return player.goLater('returnUsingLoc')
 
     if player.counter > 30 and player.brain.nav.isStopped():
         return player.goLater('didIKickIt')

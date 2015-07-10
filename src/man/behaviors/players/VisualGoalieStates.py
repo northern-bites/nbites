@@ -138,9 +138,9 @@ def clearIt(player):
     if clearIt.startingBallX - player.brain.ball.x > 15.0:
         print("I think the ball is coming towards me!")
         # return player.goLater('saveCenter')
-    elif player.brain.ball.x.mov_vel_x > 5.0 \
-    or math.fabs(player.brain.ball.x - clearIt.startingBallX) > 15.0:
-        print("I think the ball has moved away I should stop chasing")
+    # elif player.brain.ball.mov_vel_x > 5.0 \
+    # or math.fabs(player.brain.ball.x - clearIt.startingBallX) > 15.0:
+    #     print("I think the ball has moved away I should stop chasing")
 
     # print("Ball vel:", player.brain.ball.mov_vel_x)
 

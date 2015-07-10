@@ -245,7 +245,7 @@ void VisionModule::sendLinesOut()
             for (int k = 0; k < 2; k++) {
                 const GeoLine& topGeo = topField[k].field();
                 const GeoLine& botGeo = botField[k].field();
-                if (topGeo.error(botGeo) < 0.3) // TODO constant
+                if (topGeo.error(botGeo) < 0.001) // TODO constant
                     (*(fieldLines[0]))[i].repeat(true);
             }
         }

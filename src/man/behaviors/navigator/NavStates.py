@@ -292,7 +292,9 @@ def walkingTo(nav):
 
         if len(walkingTo.destQueue) > 0:
             dest = walkingTo.destQueue.popleft()
+            # dest.relH = 0
             helper.setOdometryDestination(nav, dest, walkingTo.speed)
+            # helper.setDestination(nav, dest, walkingTo.speed)
             print ("MY dest: ", dest.relX, dest.relY, dest.relH)
 
     if locationsMatch(nav.destination, walkingTo.currentOdo):
