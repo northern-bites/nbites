@@ -59,7 +59,9 @@ public:
 	void drawPoint(int x, int y, int c);
 	void drawDot(int x, int y, int c);
 	void drawLine(int x, int y, int x1, int y1, int c);
-
+    
+    // Returns true if x is WITHIN SCOPE convex hull and sets y 
+    //  to height of hull at that x. (True could still be off field)
 	bool onField(double x, double & y);
     int findGreenHorizon(int pH, int rH);
     void findConvexHull(int pH);

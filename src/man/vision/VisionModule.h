@@ -14,12 +14,14 @@
 #include "Field.h"
 
 #include "BallDetector.h"
-#include "BallModel.pb.h"
+#include "RobotObstacle.h"
 #include "InertialState.pb.h"
+#include "VisionRobot.pb.h"
 
 
 namespace man {
 namespace vision {
+
 
 class VisionModule : public portals::Module {
 public:
@@ -31,10 +33,8 @@ public:
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::InertialState> inertsIn;
 
-    portals::OutPortal<messages::FieldLines> linesOut;
-    portals::OutPortal<messages::Corners> cornersOut;
-    portals::OutPortal<messages::VisionBall> ballOut;
-    portals::OutPortal<messages::CenterCircle> centCircOut;
+    portals::OutPortal<messages::Vision> visionOut;
+    portals::OutPortal<messages::RobotObstacle> robotObstacleOut;
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
@@ -71,10 +71,8 @@ private:
 #ifdef USE_LOGGING
     void logImage(int i);
 #endif
-    void sendLinesOut();
-    void sendCornersOut();
-    void updateVisionBall();
-    void sendCenterCircle();
+    void outportalVisionField();
+    void updateObstacleBox();
 
     Colors* colorParams[2];
     ImageFrontEnd* frontEnd[2];
@@ -94,8 +92,6 @@ private:
     CenterCircleDetector* centerCircleDetector[2];
     BallDetector* ballDetector[2];
 
-    bool centerCircleDetected;
-
     bool blackStar_;
     
     // Lisp tree with color params saved
@@ -111,7 +107,13 @@ private:
     nblog::SExpr* calibrationLisp;
     size_t image_index;
 
-#
+    // Constants for tilt azimuth adjustment hack
+    static constexpr double azimuth_m = 0.0426;
+    static constexpr double azimuth_b = -0.0011;
+
+    // obstacleBox
+    RobotObstacle* robotImageObstacle;
+    float obstacleBox[4];
 };
 
 }

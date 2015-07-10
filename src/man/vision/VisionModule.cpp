@@ -22,14 +22,11 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
       topIn(),
       bottomIn(),
       jointsIn(),
-      linesOut(base()),
-      cornersOut(base()),
-      ballOut(base()),
+      visionOut(base()),
+      robotObstacleOut(base()),
       ballOn(false),
       ballOnCount(0),
       ballOffCount(0),
-      centCircOut(base()),
-      centerCircleDetected(false),
       blackStar_(false)
 {
     std:: string colorPath, calibrationPath;
@@ -109,7 +106,11 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
 	// field class only runs on the top image so it only needs that one
 	field->setDebugImage(debugImage[0]);
 #endif
+
+    // Retreive calibration params for the robot name specified in the constructor
     setCalibrationParams(robotName);
+
+    robotImageObstacle = new RobotObstacle(wd / 4, ht / 4);
 }
 
 VisionModule::~VisionModule()
@@ -149,7 +150,7 @@ void VisionModule::run_()
                                                     &bottomIn.message() };
 
     bool ballDetected = false;
-    centerCircleDetected = false;
+
 
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
@@ -170,6 +171,9 @@ void VisionModule::run_()
         ImageLiteU8 greenImage(frontEnd[i]->greenImage());
         ImageLiteU8 orangeImage(frontEnd[i]->orangeImage());
 
+        // Offset to hackily adjust tilt for high-azimuth error
+        double azOffset = azimuth_m * fabs(kinematics[i]->azimuth()) + azimuth_b;
+
         // Calculate kinematics and adjust homography
         if (jointsIn.message().has_head_yaw()) {
             kinematics[i]->joints(jointsIn.message());
@@ -177,7 +181,9 @@ void VisionModule::run_()
             homography[i]->wy0(kinematics[i]->wy0());
             homography[i]->wz0(kinematics[i]->wz0());
             homography[i]->roll(calibrationParams[i]->getRoll());
-            homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt());
+
+            homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt() + azOffset);
+         
 #ifndef OFFLINE
             homography[i]->azimuth(kinematics[i]->azimuth());
 #endif
@@ -187,7 +193,7 @@ void VisionModule::run_()
         edgeDetector[i]->gradient(yImage);
 
 		// only calculate the field in the top camera
-		if (i ==0) {
+		if (!i) {
 			// field needs the color images
 			field->setImages(frontEnd[0]->whiteImage(), frontEnd[0]->greenImage(),
 							 frontEnd[0]->orangeImage());
@@ -211,16 +217,16 @@ void VisionModule::run_()
         houghLines[i]->mapToField(*(homography[i]));
 
         // Find world coordinates for rejected edges
-        // rejectedEdges[i]->mapToField(*(homography[i]));
+        rejectedEdges[i]->mapToField(*(homography[i]));
 
         // Detect center circle on top
-        // if (!i) centerCircleDetected = centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]));
-
+        if (!i) centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]), *field);
+ 
         // Pair hough lines to field lines
         fieldLines[i]->find(*(houghLines[i]), blackStar());
 
         // Classify field lines
-        fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
+        fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]), *(centerCircleDetector[i]));
 
         ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
 
@@ -230,25 +236,21 @@ void VisionModule::run_()
     }
 
     // Send messages on outportals
-    sendLinesOut();
-    sendCornersOut();
     ballOn = ballDetected;
-    updateVisionBall();
-    sendCenterCircle();
+    outportalVisionField();
+    updateObstacleBox();
 }
 
-
-
-void VisionModule::sendLinesOut()
+void VisionModule::outportalVisionField()
 {
-    // Outportal results
-    // NOTE repeats are outportaled
-    messages::FieldLines pLines;
+    messages::Vision visionField;
+
+    // (1) Outportal lines
+    // NOTE repeats (in top and bottom camera) are outportaled
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < fieldLines[i]->size(); j++) {
-            messages::FieldLine* pLine = pLines.add_line();
+            messages::FieldLine* pLine = visionField.add_line();
             FieldLine& line = (*(fieldLines[i]))[j];
-            // if (line.repeat()) continue;
 
             for (int k = 0; k < 2; k++) {
                 messages::HoughLine pHough;
@@ -276,38 +278,36 @@ void VisionModule::sendLinesOut()
         }
     }
 
-    portals::Message<messages::FieldLines> linesOutMessage(&pLines);
-    linesOut.setMessage(linesOutMessage);
-}
-
-// TODO repeats
-void VisionModule::sendCornersOut()
-{
-    messages::Corners pCorners;
+    // (2) Outportal Corners
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < cornerDetector[i]->size(); j++) {
-            messages::Corner* pCorner = pCorners.add_corner();
+            messages::Corner* pCorner = visionField.add_corner();
             Corner& corner = (*(cornerDetector[i]))[j];
 
             // Rotate to post vision relative robot coordinate system
             double rotatedX, rotatedY;
             man::vision::translateRotate(corner.x, corner.y, 0, 0, -(M_PI / 2), rotatedX, rotatedY);
 
-            pCorner->set_x(rotatedX);
-            pCorner->set_y(rotatedY);
+            pCorner->set_x((float)rotatedX);
+            pCorner->set_y((float)rotatedY);
             pCorner->set_id(static_cast<int>(corner.id));
             pCorner->set_line1(static_cast<int>(corner.first->index()));
             pCorner->set_line2(static_cast<int>(corner.second->index()));
         }
     }
 
-    portals::Message<messages::Corners> cornersOutMessage(&pCorners);
-    cornersOut.setMessage(cornersOutMessage);
-}
+    // (3) Outportal Center Circle
+    messages::CenterCircle* cc = visionField.mutable_circle(); 
+    cc->set_on(centerCircleDetector[0]->on());
 
-void VisionModule::updateVisionBall()
-{
-    portals::Message<messages::VisionBall> ball_message(0);
+    // Rotate to post vision relative robot coordinate system
+    double rotatedX, rotatedY;
+    man::vision::translateRotate(centerCircleDetector[0]->x(), centerCircleDetector[0]->y(), 0, 0, -(M_PI / 2), rotatedX, rotatedY);
+    cc->set_x(rotatedX);
+    cc->set_y(rotatedY);
+
+    // (4) Outportal Ball
+    messages::VBall* vb = visionField.mutable_ball();
 
     Ball topBall = ballDetector[0]->best();
     Ball botBall = ballDetector[1]->best();
@@ -329,44 +329,54 @@ void VisionModule::updateVisionBall()
         top = true;
     }
 
-    ball_message.get()->set_on(ballOn);
-    ball_message.get()->set_frames_on(ballOnCount);
-    ball_message.get()->set_frames_off(ballOffCount);
-    ball_message.get()->set_intopcam(top);
+    vb->set_on(ballOn);
+    vb->set_frames_on(ballOnCount);
+    vb->set_frames_off(ballOffCount);
+    vb->set_intopcam(top);
 
     if (ballOn)
     {
-        ball_message.get()->set_distance(best.dist);
+        vb->set_distance(best.dist);
 
-        ball_message.get()->set_radius(best.blob.firstPrincipalLength());
+        vb->set_radius(best.blob.firstPrincipalLength());
         double bearing = atan(best.x_rel / best.y_rel);
-        ball_message.get()->set_bearing(bearing);
-        ball_message.get()->set_bearing_deg(bearing * TO_DEG);
+        vb->set_bearing(bearing);
+        vb->set_bearing_deg(bearing * TO_DEG);
 
         double angle_x = (best.imgWidth/2 - best.getBlob().centerX()) /
             (best.imgWidth) * HORIZ_FOV_DEG;
         double angle_y = (best.imgHeight/2 - best.getBlob().centerY()) /
             (best.imgHeight) * VERT_FOV_DEG;
-        ball_message.get()->set_angle_x_deg(angle_x);
-        ball_message.get()->set_angle_y_deg(angle_y);
+        vb->set_angle_x_deg(angle_x);
+        vb->set_angle_y_deg(angle_y);
 
-        ball_message.get()->set_confidence(best.confidence());
-        ball_message.get()->set_x(static_cast<int>(best.blob.centerX()));
-        ball_message.get()->set_y(static_cast<int>(best.blob.centerY()));
+        vb->set_confidence(best.confidence());
+        vb->set_x(static_cast<int>(best.blob.centerX()));
+        vb->set_y(static_cast<int>(best.blob.centerY()));
     }
 
-    ballOut.setMessage(ball_message);
+    // Send
+    portals::Message<messages::Vision> visionOutMessage(&visionField);
+    visionOut.setMessage(visionOutMessage);
 }
 
-void VisionModule::sendCenterCircle()
-{ 
-    portals::Message<messages::CenterCircle> ccm(0);
+void VisionModule::updateObstacleBox()
+{
+    // only want bottom camera
+    robotImageObstacle->updateVisionObstacle(frontEnd[1]->whiteImage(),
+                                             *(edges[1]), obstacleBox,
+                                             homography[1]);
 
-    ccm.get()->set_on(centerCircleDetected);
-    ccm.get()->set_x(centerCircleDetector[0]->x());
-    ccm.get()->set_y(centerCircleDetector[0]->y());
-    
-    centCircOut.setMessage(ccm);
+    // std::cout<<"about to set message for obstacle vision"<<std::endl;
+    portals::Message<messages::RobotObstacle> boxOut(0);
+    boxOut.get()->set_closest_y(obstacleBox[0]);
+    boxOut.get()->set_box_bottom(obstacleBox[1]);
+    boxOut.get()->set_box_left(obstacleBox[2]);
+    boxOut.get()->set_box_right(obstacleBox[3]);
+    robotObstacleOut.setMessage(boxOut);
+
+    // printf("Obstacle Box VISION: (%g, %g, %g, %g)\n", obstacleBox[0],
+    //         obstacleBox[1], obstacleBox[2], obstacleBox[3]);
 }
 
 void VisionModule::setColorParams(Colors* colors, bool topCamera)
@@ -382,7 +392,7 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
 
     // Get size of file
     textFile.seekg (0, textFile.end);
-    long size = textFile.tellg();
+    long size = (long)textFile.tellg();
     textFile.seekg(0);
 
     // Read file into buffer and convert to string

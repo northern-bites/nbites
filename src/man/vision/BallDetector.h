@@ -92,9 +92,7 @@ namespace man {
 			Ball _best;
 
 			// For tool
-#ifdef OFFLINE
 			std::vector<Ball> candidates;
-#endif
 #ifdef OFFLINE
 			bool debugBall;
 #else
