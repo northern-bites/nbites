@@ -45,27 +45,10 @@ def getLines(player):
         # t = line.inner.t
         # x0 = r * math.cos(t)
         # y0 = r * math.sin(t)
-        # x1 = x0 + line.inner.eP0 * math.sin(t)
-        # y1 = y0 + -line.inner.eP0 * math.cos(t)
-        # x2 = x0 + line.inner.eP1 * math.sin(t)
-        # y2 = y0 + -line.inner.eP1 * math.cos(t)
-
-def findCorner(player):
-    visionLines = player.brain.visionLines
-
-    # for i in range(0, visionLines.line_size()):
-
-
-# def getFrontLine(player):
-#     # Assume facing forward
-#     for line in GoalieStates.watchWithLineChecks.lines:
-#         r = line.r
-#         t = line.t
-#         # Assumptions: facing forward
-#         # If have good t value and bad r value, reposition accordingly
-#         if math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH \
-#         and math.fabs(r - constants.EXPECTED_FRONT_LINE_R) < constants.R_THRESH:
-#             return line
+        # x1 = x0 + line.inner.ep0 * math.sin(t)
+        # y1 = y0 + -line.inner.ep0 * math.cos(t)
+        # x2 = x0 + line.inner.ep1 * math.sin(t)
+        # y2 = y0 + -line.inner.ep1 * math.cos(t)
 
 def frontLineCheckShouldReposition(player):
     # getLines(player)
@@ -153,7 +136,6 @@ def seeGoalbox(player):
             return True
 
     return False
-
 
 def facingSideways(player):
     if player.brain.visionLines.horizon_dist > 200 and\
@@ -281,7 +263,7 @@ def shouldTurn(player):
             print "Should turn was TRUE"
             return True
 
-        # Assumptions: not facing forward....?
+        # Assumptions: not facing forward...
         # Hopefully will find a line close by (r < 100) with an unusual t value
         # and use the information to help correct itself
         # Theoretically will usually be the long front line?
@@ -339,7 +321,6 @@ def shouldGoForward(player):
                 player.homeDirections = []
                 player.homeDirections += [RelRobotLocation(25.0, 0.0, 0.0)]
                 return True
-
 
         # r = lines.line(i).inner.r
         # t = math.degrees(lines.line(i).inner.t)
@@ -570,264 +551,12 @@ def seeFrontLine(player):
         r = lines.line(i).inner.r
         t = math.degrees(lines.line(i).inner.t)
         length = getLineLength(lines.line(i).inner)
-
-
         print ("R:", r, "T:", t)
 
 def lostBall(player):
     if player.brain.ball.vis.frames_off > 15:
         return True
-
     return False
-
-
-
-
-
-
-
-
-
-
-# Visual Goalie
-
-def getLeftGoalboxCorner(player):
-    vision = player.brain.interface.visionField
-
-    # check top corners first
-    for i in range(0, vision.visual_corner_size()):
-        for j in range(0, vision.visual_corner(i).poss_id_size()):
-            if (vision.visual_corner(i).poss_id(j) ==
-                vision.visual_corner(i).corner_id.YELLOW_GOAL_LEFT_L):
-                if (vision.visual_corner(i).orientation < 0):
-                    return vision.visual_corner(i)
-
-    # also look in bottom camera
-    for i in range(0, vision.bottom_corner_size()):
-        for j in range(0, vision.bottom_corner(i).poss_id_size()):
-            if (vision.bottom_corner(i).poss_id(j) ==
-                vision.bottom_corner(i).corner_id.YELLOW_GOAL_LEFT_L):
-                # HACK
-                if (vision.bottom_corner(i).orientation > 0):
-                    return vision.bottom_corner(i)
-
-    return None
-
-def getRightGoalboxCorner(player):
-    vision = player.brain.interface.visionField
-
-    # check top corners first
-    for i in range(0, vision.visual_corner_size()):
-        for j in range(0, vision.visual_corner(i).poss_id_size()):
-            if (vision.visual_corner(i).poss_id(j) ==
-                vision.visual_corner(i).corner_id.YELLOW_GOAL_RIGHT_L):
-                if (vision.visual_corner(i).orientation > 0):
-                    return vision.visual_corner(i)
-
-    # also look in bottom camera
-    for i in range(0, vision.bottom_corner_size()):
-        for j in range(0, vision.bottom_corner(i).poss_id_size()):
-            if (vision.bottom_corner(i).poss_id(j) ==
-                vision.bottom_corner(i).corner_id.YELLOW_GOAL_RIGHT_L):
-                # HACK
-                if (vision.bottom_corner(i).orientation < 0):
-                    return vision.bottom_corner(i)
-
-    return None
-
-# Rel X of corner from robot
-def getCornerRelX(alpha, corner):
-    return (corner.visual_detection.distance *
-            math.cos(corner.physical_orientation + math.radians(alpha)))
-
-# Rel Y of corner from robot
-def getCornerRelY(alpha, corner):
-    return (corner.visual_detection.distance *
-            math.sin(corner.physical_orientation + math.radians(alpha)))
-
-def getRobotGlobalHeading(alpha, corner):
-    return math.degrees(corner.physical_orientation + math.radians(alpha) -
-                        corner.visual_detection.bearing)
-
-
-
-def badLeftCornerObservation(player):
-    corner = getLeftGoalboxCorner(player)
-    if not corner:
-        return False
-
-    dDist = math.fabs(constants.EXPECTED_CORNER_DIST_FROM_CENTER -
-                      corner.visual_detection.distance)
-    dBear = math.fabs(constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER -
-                      corner.visual_detection.bearing_deg)
-
-    if not (dDist > constants.CORNER_DISTANCE_THRESH or
-            dBear > constants.CORNER_BEARING_THRESH):
-        return False
-
-    homeRelX = -(field.GOALBOX_DEPTH - getCornerRelX(90, corner) -
-                 constants.GOALIE_OFFSET)
-    homeRelY = -(field.GOALBOX_WIDTH/2.0 - getCornerRelY(90, corner))
-    homeRelH = -getRobotGlobalHeading(90, corner)
-
-    player.homeDirections += [RelRobotLocation(homeRelX,
-                                               homeRelY,
-                                               homeRelH)]
-
-
-    if len(player.homeDirections) > constants.BUFFER_THRESH:
-        player.homeDirections = player.homeDirections[1:]
-
-    return True
-
-def badRightCornerObservation(player):
-    corner = getRightGoalboxCorner(player)
-    if not corner:
-        return False
-
-    dDist = math.fabs(constants.EXPECTED_CORNER_DIST_FROM_CENTER -
-                      corner.visual_detection.distance)
-    dBear = math.fabs(constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER -
-                      corner.visual_detection.bearing_deg)
-
-    if not (dDist > constants.CORNER_DISTANCE_THRESH or
-            dBear > constants.CORNER_BEARING_THRESH):
-        return False
-
-    homeRelX = -(field.GOALBOX_DEPTH - getCornerRelX(0, corner) -
-                 constants.GOALIE_OFFSET)
-    homeRelY = field.GOALBOX_WIDTH/2.0 + getCornerRelY(0, corner)
-    homeRelH = -getRobotGlobalHeading(0, corner)
-
-    player.homeDirections += [RelRobotLocation(homeRelX,
-                                               homeRelY,
-                                               homeRelH)]
-
-    if len(player.homeDirections) > constants.BUFFER_THRESH:
-        player.homeDirections = player.homeDirections[1:]
-
-    return True
-
-def goodLeftCornerObservation(player):
-    if player.counter < 60:
-        return False
-
-    corner = getLeftGoalboxCorner(player)
-    if not corner:
-        return False
-
-    dDist = math.fabs(constants.EXPECTED_CORNER_DIST_FROM_CENTER -
-                      corner.visual_detection.distance)
-    dBear = math.fabs(constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER -
-                      corner.visual_detection.bearing_deg)
-
-    if (dDist < constants.CORNER_DISTANCE_THRESH + 10.0 and
-        dBear < constants.CORNER_BEARING_THRESH + 10.0):
-        return True
-
-    return False
-
-def goodRightCornerObservation(player):
-    if player.counter < 60:
-        return False
-
-    corner = getRightGoalboxCorner(player)
-    if not corner:
-        return False
-
-    dDist = math.fabs(constants.EXPECTED_CORNER_DIST_FROM_CENTER -
-                      corner.visual_detection.distance)
-    dBear = math.fabs(constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER -
-                      corner.visual_detection.bearing_deg)
-
-    if (dDist < constants.CORNER_DISTANCE_THRESH + 10.0 and
-        dBear < constants.CORNER_BEARING_THRESH + 10.0):
-        return True
-
-    return False
-
-def shouldMoveForward(player):
-    vision = player.brain.interface.visionField
-
-    if (player.counter > 150 and
-        ((player.brain.yglp.on and
-          math.fabs(player.brain.yglp.bearing) < 80 and
-          player.brain.yglp.distance < 300.0 and
-          player.brain.yglp.distance != 0.0) or
-         (player.brain.ygrp.on and
-          math.fabs(player.brain.ygrp.bearing) < 80 and
-          player.brain.yglp.distance < 300.0 and
-          player.brain.yglp.distance != 0.0))):
-        return True
-
-    foundGoalBoxTop = 0
-    orientation = 0
-
-    for i in range(0, vision.visual_line_size()):
-        if vision.visual_line(i).visual_detection.distance < 200.0:
-            foundGoalBoxTop = vision.visual_line(i).visual_detection.distance
-            orientation = vision.visual_line(i).angle
-            break
-
-    if not foundGoalBoxTop:
-        return False
-
-    for i in range(0, vision.bottom_line_size()):
-        if (vision.bottom_line(i).visual_detection.distance < 70.0 and
-            vision.visual_field_edge.distance_m > 150.0 and
-            math.fabs(vision.bottom_line(i).visual_detection.distance -
-                      foundGoalBoxTop) > 30.0 and
-            math.fabs(math.degrees(vision.bottom_line(i).angle -
-                                   orientation)) < 45.0):
-            return True
-
-    return False
-
-def shouldMoveBackwards(player):
-    return False
-    vision = player.brain.interface.visionField
-
-    if (vision.bottom_line_size() == 0 and
-        vision.visual_line_size() == 0):
-        return True
-
-    for i in range(0, vision.visual_line_size()):
-        if vision.visual_line(i).visual_detection.distance < 120.0:
-            return False
-
-    for i in range(0, vision.bottom_line_size()):
-        if vision.bottom_line(i).visual_detection.distance < 120.0:
-            return False
-
-    return True
-
-# def facingSideways(player):
-#     """
-#     If the robot is facing a post directly, it's probably turned around.
-#     """
-#     if ((player.brain.yglp.on and
-#          math.fabs(player.brain.yglp.bearing_deg) < 20.0 and
-#          player.brain.yglp.bearing_deg != 0.0 and
-#          player.brain.yglp.distance < 300.0) or
-#         (player.brain.ygrp.on and
-#          math.fabs(player.brain.ygrp.bearing_deg) < 20.0 and
-#          player.brain.ygrp.bearing_deg != 0.0 and
-#          player.brain.ygrp.distance < 300.0)):
-#         return True
-#     else:
-#         return False
-
-def facingBackwards(player):
-    return player.brain.interface.visionField.visual_field_edge.distance_m < 110.0
-
-def shouldReposition(player):
-    return False
-    return (badLeftCornerObservation(player) or
-            badRightCornerObservation(player))
-
-def goodPosition(player):
-    return (goodLeftCornerObservation(player) or
-            goodRightCornerObservation(player))
 
 def atGoalArea(player):
     """
@@ -1001,7 +730,7 @@ def shouldSquat(player):
         print("nb xvel:", nball.x_vel)
         print("ball mov vel:", ball.mov_vel_x)
 
-    # Lower threshold for fast balls
+    # TODO Lower threshold for fast balls
     # if nball.x_vel < -30.0 and abs(nball.yintercept)
 
     # More sensitive to close balls even at lower speeds

@@ -27,25 +27,10 @@ def walkToGoal(player):
     if player.firstFrame():
         player.brain.tracker.repeatBasicPan()
         player.returningFromPenalty = False
-        player.brain.nav.goTo(Location(FIELD_WHITE_LEFT_SIDELINE_X,
-                                       CENTER_FIELD_Y))
-        # player.homeDirections += [RelRobotLocation(0.0, 0.0, 150.0)]
+        player.brain.nav.goTo(RobotLocation(FIELD_WHITE_LEFT_SIDELINE_X,
+                                       CENTER_FIELD_Y, 0.0))
 
     return Transition.getNextState(player, walkToGoal)
-
-@superState('gameControllerResponder')
-def spinAtGoal(player):
-    if player.firstFrame():
-        player.brain.nav.stop()
-        spinAtGoal.counter = 0
-        player.brain.tracker.lookToAngle(0.0)
-    spinAtGoal.counter += 1
-    if spinAtGoal.counter > 200:
-            return player.goLater('watchWithCornerChecks')
-    if player.brain.nav.isStopped():
-        player.setWalk(0, 0, 20.0)
-
-    return Transition.getNextState(player, spinAtGoal)
 
 @superState('gameControllerResponder')
 def backUpForDangerousBall(player):
@@ -169,31 +154,9 @@ def spinToFaceBall(player):
         player.brain.tracker.trackBall
         print("ball at ", player.brain.ball.bearing_deg)
         facingDest = RelRobotLocation(0.0, 0.0, 0.0)
-        # if player.brain.ball.bearing_deg < 0.0:
-        #     player.side = RIGHT
-        #     facingDest.relH = -90
-        # else:
-        #     player.side = LEFT
-        #     facingDest.relH = 90
 
-
-        # facingDest.relH = player.brain.ball.bearing_deg
-        if clearIt.dangerousSide != -1:
-            print("Ball is very far to the side and i am side kicking so \
-                i will walk straight towards it")
-            facingDest.relH = player.brain.ball.bearing_deg
-            GoalieStates.spinBack.toAngle = player.brain.ball.bearing_deg
-
-        elif player.brain.ball.bearing_deg < 0.0:
-            player.side = RIGHT
-            facingDest.relH = player.brain.ball.bearing_deg + 10.0
-            GoalieStates.spinBack.toAngle = player.brain.ball.bearing_deg + 10.0
-        else:
-            player.side = LEFT
-            facingDest.relH = player.brain.ball.bearing_deg - 10.0
-            GoalieStates.spinBack.toAngle = player.brain.ball.bearing_deg - 10.0
-
-
+        facingDest.relH = player.brain.ball.bearing_deg
+        GoalieStates.spinBack.toAngle = player.brain.ball.bearing_deg
 
         player.brain.nav.walkTo(facingDest)
 
@@ -254,8 +217,8 @@ def findMyWayBackPtI(player):
         findMyWayBackPtI.counter = 0
         player.brain.tracker.lookToAngle(0.0)
     findMyWayBackPtI.counter += 1
-    # if findMyWayBackPtI.counter > 200:
-    #         return player.goLater('watchWithLineChecks')
+    if findMyWayBackPtI.counter > 200:
+            return player.goLater('watchWithLineChecks')
     if player.brain.nav.isStopped():
         if clearIt.ballSide == RIGHT:
             player.setWalk(0, 0, -20.0)

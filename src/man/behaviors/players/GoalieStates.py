@@ -40,9 +40,6 @@ def gameReady(player):
         player.penaltyKicking = False
         player.stand()
         player.brain.tracker.lookToAngle(0)
-        # Rule change, we can't do this anymore...
-        # if player.lastDiffState != 'gameInitial':
-        #    return player.goLater('spinToWalkOffField')
 
     # Wait until the sensors are calibrated before moving.
     if(not player.brain.motion.calibrated):
@@ -62,7 +59,6 @@ def gameSet(player):
         player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
         player.inPosition = constants.CENTER_POSITION
 
-        print "[Goalie debug] Set these"
         watchWithLineChecks.correctFacing = False
         watchWithLineChecks.numFixes = 0
         watchWithLineChecks.numTurns = 0
@@ -86,8 +82,6 @@ def gamePlaying(player):
         player.brain.fallController.enabled = True
         player.penaltyKicking = False
         player.brain.nav.stand()
-        # if player.lastDiffState != 'gameSet':
-        #     player.brain.resetGoalieLocalization()
 
     # Wait until the sensors are calibrated before moving.
     if (not player.brain.motion.calibrated):
@@ -164,26 +158,10 @@ def gameFinished(player):
 @superState('gameControllerResponder')
 def fallen(player):
     fallen.lastState = player.lastDiffState
-    # print("My last state before falling was:", player.lastDiffState)
     player.inKickingState = False
     return player.stay()
 
 fallen.lastState = 'watch'
-
-# @superState('gameControllerResponder')
-# def spinToWalkOffField(player):
-#     if player.firstFrame():
-#         player.brain.tracker.lookToAngle(0)
-#         player.brain.nav.goTo(RelRobotLocation(0, 0, 90))
-
-#     return Transition.getNextState(player, spinToWalkOffField)
-
-# @superState('gameControllerResponder')
-# def bookIt(player):
-#     if player.firstFrame():
-#         player.brain.nav.goTo(RelRobotLocation(100, 0, 0), avoidObstacles = True)
-
-#     return Transition.getNextState(player, bookIt)
 
 @superState('gameControllerResponder')
 def standStill(player):
@@ -191,10 +169,6 @@ def standStill(player):
         player.brain.nav.stop()
 
     return player.stay()
-
-
-# -----------------------------------------------
-# NEW VISION
 
 @superState('gameControllerResponder')
 def watchWithLineChecks(player):
@@ -292,7 +266,6 @@ def spinToHorizon(player):
 
     return Transition.getNextState(player, spinToHorizon)
 
-
 @superState('gameControllerResponder')
 def returnUsingLoc(player):
     if player.firstFrame():
@@ -348,51 +321,6 @@ def recoverMyself(player):
         player.brain.nav.setWalk(0,0,20)
 
     return Transition.getNextState(player, recoverMyself)
-
-
-# -----------------------------------------------
-
-# @superState('gameControllerResponder')
-# def watchWithCornerChecks(player):
-#     if player.firstFrame():
-#         # This is dumb, but...
-#         if player.lastDiffState not in ['fixMyself',
-#                                         'moveForward',
-#                                         'moveBackwards']:
-#             watchWithCornerChecks.numFixes = 0
-#         else:
-#             watchWithCornerChecks.numFixes += 1
-
-#         if watchWithCornerChecks.numFixes > 6:
-#             return player.goLater('watch')
-
-#         watchWithCornerChecks.looking = False
-#         watchWithCornerChecks.lastLook = constants.RIGHT
-#         player.homeDirections = []
-#         player.brain.tracker.trackBall()
-#         player.brain.nav.stand()
-#         player.returningFromPenalty = False
-
-#     if player.counter > 200:
-#         return player.goLater('watch')
-
-#     if (player.brain.ball.vis.frames_on > constants.BALL_ON_SAFE_THRESH
-#         and
-#         player.brain.ball.distance > constants.BALL_SAFE_DISTANCE_THRESH
-#         and not watchWithCornerChecks.looking):
-#         watchWithCornerChecks.looking = True
-#         if watchWithCornerChecks.lastLook is constants.RIGHT:
-#             player.brain.tracker.lookToAngle(constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER)
-#             watchWithCornerChecks.lastLook = constants.LEFT
-#         else:
-#             player.brain.tracker.lookToAngle(constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER)
-#             watchWithCornerChecks.lastLook = constants.RIGHT
-
-#     if player.brain.tracker.isStopped():
-#         watchWithCornerChecks.looking = False
-#         player.brain.tracker.trackBall()
-
-#     return Transition.getNextStateu(player, watchWithCornerChecks)
 
 @superState('gameControllerResponder')
 def watch(player):
@@ -450,23 +378,6 @@ def correct(destination):
 
     return destination
 
-# @superState('gameControllerResponder')
-# def fixMyself(player):
-#     if player.firstFrame():
-#         player.brain.tracker.trackBall()
-#         dest = correct(average(player.homeDirections))
-#         player.brain.nav.walkTo(dest)
-
-#     return Transition.getNextState(player, fixMyself)
-
-# @superState('gameControllerResponder')
-# def moveForward(player):
-#     if player.firstFrame():
-#         player.brain.tracker.trackBall()
-#         player.brain.nav.walkTo(RelRobotLocation(30, 0, 0))
-
-#     return Transition.getNextState(player, moveForward)
-
 @superState('gameControllerResponder')
 def moveBackwards(player):
     if player.firstFrame():
@@ -474,11 +385,7 @@ def moveBackwards(player):
         # player.brain.tracker.lookToAngle(0)
         player.brain.tracker.trackBall
         player.brain.nav.walkTo(RelRobotLocation(-100.0, 0, 0))
-        # moveBackwards.notTracking = True
 
-    # if player.brain.ball.vis.on and moveBackwards.notTracking:
-    #     player.brain.tracker.trackBall
-    #     moveBackwards.notTracking = False
     if player.counter > 100:
         print("Walking backwards too long... switch to a different state!")
         return player.goLater('findMyWayBackPtI')
@@ -535,8 +442,8 @@ def saveCenter(player):
         player.brain.tracker.lookToAngle(0)
         if SAVING:
             player.executeMove(SweetMoves.GOALIE_SQUAT)
-        # else:
-        #     player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
+        else:
+            player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
 
     if player.counter > 80:
         if SAVING:
@@ -565,8 +472,8 @@ def saveRight(player):
         if SAVING and DIVING:
             player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
             player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
-        # else:
-        #     player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
+        else:
+            player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
 
     if player.counter > 80:
         if SAVING and DIVING:
@@ -585,8 +492,8 @@ def saveLeft(player):
         if SAVING and DIVING:
             player.executeMove(SweetMoves.GOALIE_DIVE_LEFT)
             player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
-        # else:
-        #     player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
+        else:
+            player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
 
     if player.counter > 80:
         if SAVING and DIVING:
