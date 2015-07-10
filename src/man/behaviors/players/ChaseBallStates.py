@@ -17,6 +17,9 @@ from math import fabs, degrees, cos, sin, pi, radians, copysign
 @ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
 @ifSwitchNow(transitions.shouldFindBall, 'findBall')
 def approachBall(player):
+    if player.brain.nav.dodging:
+        return player.stay()
+
     if player.firstFrame():
         player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
                                                  0.8, 10)
@@ -96,6 +99,9 @@ def followPotentialField(player):
     attractive force where on the side that will be kicked. The opposite side is treated as 
     a repulsive force of smaller magnitude.
     """
+    if player.brain.nav.dodging:
+        return player.stay()
+
     if player.firstFrame():
         player.brain.tracker.trackBall()  
 
@@ -152,6 +158,9 @@ def orbitBall(player):
     """
     State to orbit the ball
     """
+    if player.brain.nav.dodging:
+        return player.stay()
+
     # Calculate relative heading every frame
     relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
 
@@ -239,6 +248,9 @@ def spinToBall(player):
     """
     spins to the ball until it is facing the ball 
     """
+    if player.brain.nav.dodging:
+        return player.stay()
+
     if player.firstFrame():
         player.brain.tracker.trackBall()
         print "spinning to ball"
@@ -275,9 +287,9 @@ def positionForKick(player):
         player.brain.tracker.lookStraightThenTrack()
 
         if player.kick == kicks.M_LEFT_SIDE or player.kick == kicks.M_RIGHT_SIDE:
-            positionForKick.speed = Navigator.SLOW_SPEED
+            positionForKick.speed = Navigator.GRADUAL_SPEED
         else:
-            positionForKick.speed = Navigator.MEDIUM_SPEED
+            positionForKick.speed = Navigator.BRISK_SPEED
 
         player.brain.nav.destinationWalkTo(positionForKick.kickPose, 
                                             positionForKick.speed)

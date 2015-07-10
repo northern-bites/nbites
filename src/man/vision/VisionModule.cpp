@@ -23,6 +23,7 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
       bottomIn(),
       jointsIn(),
       visionOut(base()),
+      robotObstacleOut(base()),
       ballOn(false),
       ballOnCount(0),
       ballOffCount(0),
@@ -108,6 +109,8 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
 
     // Retreive calibration params for the robot name specified in the constructor
     setCalibrationParams(robotName);
+
+    robotImageObstacle = new RobotObstacle(wd / 4, ht / 4);
 }
 
 VisionModule::~VisionModule()
@@ -235,8 +238,7 @@ void VisionModule::run_()
     // Send messages on outportals
     ballOn = ballDetected;
     outportalVisionField();
-    
-
+    updateObstacleBox();
 }
 
 void VisionModule::outportalVisionField()
@@ -356,6 +358,25 @@ void VisionModule::outportalVisionField()
     // Send
     portals::Message<messages::Vision> visionOutMessage(&visionField);
     visionOut.setMessage(visionOutMessage);
+}
+
+void VisionModule::updateObstacleBox()
+{
+    // only want bottom camera
+    robotImageObstacle->updateVisionObstacle(frontEnd[1]->whiteImage(),
+                                             *(edges[1]), obstacleBox,
+                                             homography[1]);
+
+    // std::cout<<"about to set message for obstacle vision"<<std::endl;
+    portals::Message<messages::RobotObstacle> boxOut(0);
+    boxOut.get()->set_closest_y(obstacleBox[0]);
+    boxOut.get()->set_box_bottom(obstacleBox[1]);
+    boxOut.get()->set_box_left(obstacleBox[2]);
+    boxOut.get()->set_box_right(obstacleBox[3]);
+    robotObstacleOut.setMessage(boxOut);
+
+    // printf("Obstacle Box VISION: (%g, %g, %g, %g)\n", obstacleBox[0],
+    //         obstacleBox[1], obstacleBox[2], obstacleBox[3]);
 }
 
 void VisionModule::setColorParams(Colors* colors, bool topCamera)

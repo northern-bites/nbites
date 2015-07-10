@@ -14,7 +14,9 @@
 #include "Field.h"
 
 #include "BallDetector.h"
+#include "RobotObstacle.h"
 #include "InertialState.pb.h"
+#include "VisionRobot.pb.h"
 
 
 namespace man {
@@ -32,6 +34,7 @@ public:
     portals::InPortal<messages::InertialState> inertsIn;
 
     portals::OutPortal<messages::Vision> visionOut;
+    portals::OutPortal<messages::RobotObstacle> robotObstacleOut;
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }
@@ -69,6 +72,7 @@ private:
     void logImage(int i);
 #endif
     void outportalVisionField();
+    void updateObstacleBox();
 
     Colors* colorParams[2];
     ImageFrontEnd* frontEnd[2];
@@ -106,6 +110,10 @@ private:
     // Constants for tilt azimuth adjustment hack
     static constexpr double azimuth_m = 0.0426;
     static constexpr double azimuth_b = -0.0011;
+
+    // obstacleBox
+    RobotObstacle* robotImageObstacle;
+    float obstacleBox[4];
 };
 
 }

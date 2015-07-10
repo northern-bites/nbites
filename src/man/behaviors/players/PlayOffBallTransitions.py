@@ -13,8 +13,6 @@ def ballInBox(player):
     ball = player.brain.ball
 
     if ball.vis.frames_on > chaseConstants.BALL_ON_THRESH:
-        if role.isChaser(player.role):
-            return True
         return (ball.x > player.box[0][0] and ball.y > player.box[0][1] and
                 ball.x < player.box[0][0] + player.box[1] and
                 ball.y < player.box[0][1] + player.box[2])
@@ -68,7 +66,7 @@ def tooFarFromHome(threshold, player):
     return distance > threshold
 
 def shouldSpinSearchFromWatching(player):
-    return (player.stateTime > 7 and
+    return (player.stateTime > 12 and
             player.brain.ball.vis.frames_off > 30 and
             not player.brain.sharedBall.ball_on)
   
