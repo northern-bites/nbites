@@ -255,9 +255,9 @@ void VisionModule::sendLinesOut()
     messages::FieldLines pLines;
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < fieldLines[i]->size(); j++) {
-            messages::FieldLine* pLine = pLines.add_line();
             FieldLine& line = (*(fieldLines[i]))[j];
             if (line.repeat()) continue;
+            messages::FieldLine* pLine = pLines.add_line();
 
             for (int k = 0; k < 2; k++) {
                 messages::HoughLine pHough;

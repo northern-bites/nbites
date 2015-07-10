@@ -279,17 +279,17 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.lostBall,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.OK_PRECISION)
-            : VisualGoalieStates.returnToGoal,
+            : GoalieStates.returnUsingLoc,
 
             Transition.CountTransition(GoalieTransitions.ballMovedStopChasing,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.OK_PRECISION)
-            : VisualGoalieStates.returnToGoal,
+            : GoalieStates.returnUsingLoc,
 
             Transition.CountTransition(GoalieTransitions.walkedTooFar,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.OK_PRECISION)
-            : VisualGoalieStates.returnToGoal
+            : GoalieStates.returnUsingLoc
             }
 
         VisualGoalieStates.repositionAfterWhiff.transitions = {
@@ -321,12 +321,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.successfulKick,
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.INSTANT)
-            : GoalieStates.spinBack,
+            : GoalieStates.returnUsingLoc,
 
-            Transition.CountTransition(GoalieTransitions.successfulKickAndTurn,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.spinBack#lineCheckReposition
+            # Transition.CountTransition(GoalieTransitions.successfulKickAndTurn,
+            #                            Transition.MOST_OF_THE_TIME,
+            #                            Transition.LOW_PRECISION)
+            # : GoalieStates.spinBack#lineCheckReposition
             }
 
         # GoalieStates.spinToWalkOffField.transitions = {
@@ -501,5 +501,27 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
             : GoalieStates.moveBackwards,
+
+            }
+
+        GoalieStates.returnUsingLoc.transitions = {
+            Transition.CountTransition(GoalieTransitions.doneWalking,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.watchWithLineChecks
+            # Transition.CountTransition(GoalieTransitions.shouldTurn,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.LOW_PRECISION)
+            # : GoalieStates.lineCheckReposition,
+
+            # Transition.CountTransition(GoalieTransitions.shouldBackUp,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.LOW_PRECISION)
+            # : GoalieStates.moveBackwards,
+
+            # Transition.CountTransition(GoalieTransitions.facingASideline,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.LOW_PRECISION)
+            # : GoalieStates.moveBackwards,
 
             }
