@@ -12,25 +12,19 @@ import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.util.Logger;
 
 public class SoundView extends ViewParent {
-
-	private int channels = 2;
-	private int frames = 1024;
-	
-	private Integer[] left = new Integer[1024];
-	private Integer[] right = new Integer[1024];
 	
 	@Override
 	public void setLog(Log newlog) {
 		SoundBuffer sb = new SoundBuffer(newlog);
 		Logger.printf("SoundBuffer.max = %d", sb.max);
-		SoundPane<Integer> sp = new SoundPane<>(
+		SoundPane<Short> sp = new SoundPane<>(
 				SoundBuffer.objectify(sb.left),
 				SoundBuffer.objectify(sb.right),
-				new SoundPane.Scaler<Integer>() {
+				new SoundPane.Scaler<Short>() {
 
 					@Override
-					public int pixelsFor(Integer val, int pixels) {
-						return (int) (( (long)val *  (long)pixels) / 20000000) ;
+					public int pixelsFor(Short val, int pixels) {
+						return (int) (( (long)val *  (long) pixels) / Short.MAX_VALUE) ;
 					}
 					
 				}

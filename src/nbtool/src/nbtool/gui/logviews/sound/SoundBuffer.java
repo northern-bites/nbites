@@ -9,8 +9,8 @@ import nbtool.util.Logger;
 
 public class SoundBuffer {
 	
-	public int[] left;
-	public int[] right;
+	public short[] left;
+	public short[] right;
 	
 	public int nframes;
 	public int max;
@@ -23,22 +23,21 @@ public class SoundBuffer {
 		assert(frames == 1024);
 		this.nframes = frames;
 
-		Logger.printf("%s bytes wanted %d", from.bytes.length, nframes * 2 * Integer.BYTES);
-		assert(from.bytes.length == nframes * 2 * Integer.BYTES);
+		Logger.printf("%s bytes wanted %d", from.bytes.length, nframes * 2 * Short.BYTES);
+		assert(from.bytes.length == nframes * 2 * Short.BYTES);
 		
-		
-		ByteBuffer bb = ByteBuffer.allocate(nframes * 2 * Integer.BYTES);
+		ByteBuffer bb = ByteBuffer.allocate(nframes * 2 * Short.BYTES);
 		bb.order(ByteOrder.LITTLE_ENDIAN);
 		bb.put(from.bytes);
 		bb.order(ByteOrder.BIG_ENDIAN);
 		bb.rewind();
 		
 		max = 0;
-		left = new int[nframes];
-		right = new int[nframes];
+		left = new short[nframes];
+		right = new short[nframes];
 		for (int i = 0; i < 1024; ++i) {
-			left[i] = bb.getInt();
-			right[i] = bb.getInt();
+			left[i] = bb.getShort();
+			right[i] = bb.getShort();
 			if (left[i] > max) max = left[i];
 			if (right[i] > max) max = right[i];
 		}
@@ -47,22 +46,22 @@ public class SoundBuffer {
 	}
 	
 	public double[] left() {
-		return convertToDouble(left, Integer.MAX_VALUE);
+		return convertToDouble(left, Short.MAX_VALUE);
 	}
 
 	public double[] right() {
-		return convertToDouble(right, Integer.MAX_VALUE);
+		return convertToDouble(right, Short.MAX_VALUE);
 	}
 	
-	public double[] left(int d) {
+	public double[] left(short d) {
 		return convertToDouble(left, d);
 	}
 	
-	public double[] right(int d) {
+	public double[] right(short d) {
 		return convertToDouble(right, d);
 	}
 	
-	private static double[] convertToDouble(int[] array, int denom) {
+	private static double[] convertToDouble(short[] array, short denom) {
 		double[] ret = new double[array.length];
 		for (int i = 0; i < ret.length; ++i) {
 			ret[i] = array[i] / ((double) denom);
@@ -71,8 +70,8 @@ public class SoundBuffer {
 		return ret;
 	}
 	
-	public static Integer[] objectify(int[] vals) {
-		Integer[] io = new Integer[vals.length];
+	public static Short[] objectify(short[] vals) {
+		Short[] io = new Short[vals.length];
 		for (int i = 0; i < vals.length; ++i)
 			io[i] = vals[i];
 		return io;

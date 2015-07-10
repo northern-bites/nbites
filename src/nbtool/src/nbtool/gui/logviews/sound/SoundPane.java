@@ -54,6 +54,7 @@ public class SoundPane <T extends Number> extends JPanel{
 			g.drawLine(i, ss + radius,
 					i, ss + radius + yoff);
 		}
+		
 		g.setColor(Color.black);
 		g.drawLine(0, fs, left.length, fs);
 		g.drawLine(0, fs + radius, left.length, fs + radius);
