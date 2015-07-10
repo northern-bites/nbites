@@ -13,11 +13,11 @@ class FallController():
         self.standDelay = 0
         self.startStandupTime = 0
         self.standupMoveTime = 0
+        self.sawBall = False
 
         self.enabled = True
 
     def run(self):
-        lastState = 0
         if not self.enabled:
             return
 
@@ -26,9 +26,7 @@ class FallController():
             # Save the player. We are falling
             self.falling = True
             self.brain.player.gainsOff()
-            print "[debug] State before Fall"
-            lastState = self.brain.player.currentState
-            print lastState
+            self.sawBall = self.brain.ball.vis.frames_off < 60
             self.brain.player.switchTo('fallen')
             self.brain.tracker.stopHeadMoves()
 
@@ -71,29 +69,15 @@ class FallController():
 
         # If we are standing, check if we are done.
         elif (self.standingUp):
-                if (self.brain.time - self.startStandupTime > self.standupMoveTime):
-                    self.brain.nav.stand()
-                    self.falling = False
-                    self.fell = False
-                    self.standingUp = False
-                    self.standDelay = 0
-                    self.brain.tracker.repeatWidePan()
-                    print "Last State in Standing Up"
-                    print lastState
-                    '''
-                    if lastState == 'positionAtHome':
-                        #self.brain.player.goNow('spinSearch')
-                        print "[debug] got into if"
-                    else:
-                        print "[debug] got into else"
-                        #self.brain.player.switchTo(self.brain.player.gameState)
-                    '''
-                    print "Player GameState"
-                    print self.brain.player.gameState
-                    while True:
-                        if(self.brain.motion.calibrated):
-                            print "[success] calibrated"
-                            break
-                        else:
-                            print self.brain.player.currentState
-                    self.brain.player.switchTo('spinSearch')
+            if (self.brain.time - self.startStandupTime > self.standupMoveTime):
+                self.brain.player.stand()
+                self.falling = False
+                self.fell = False
+                self.standingUp = False
+                self.standDelay = 0
+            
+                if self.sawBall:
+                    return self.brain.player.switchTo('spinSearch')
+                else:
+                    self.brain.player.switchTo(self.brain.player.gameState)
+                

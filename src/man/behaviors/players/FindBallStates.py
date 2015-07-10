@@ -36,11 +36,15 @@ def spinSearch(player):
         my = player.brain.loc
         ball = Location(player.brain.ball.x, player.brain.ball.y)
         spinDir = my.spinDirToPoint(ball)
-        print "[debug] spin direction"
-        print spinDir
         player.setWalk(0, 0, spinDir*Navigator.QUICK_SPEED)
-        print "[debug] setting walk in spinSearch"
         player.brain.tracker.lookToSpinDirection(spinDir)
+
+    # this is such a hack for spinning when we lost the ball while falling
+    if not player.brain.motion.calibrated:
+        player.startTime = player.getTime()
+        player.stateTime = 0
+        player.counter = 0
+        return player.stay()
 
 @superState('gameControllerResponder')
 @stay
