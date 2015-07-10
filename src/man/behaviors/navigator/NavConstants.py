@@ -28,12 +28,12 @@ PREPARE_FOR_KICK_DIST = 50.
 
 # relative speed to walk for an obstacle and its name
 OBS_DICT = {
-                1 : (0.7,1, "North"),
-                2 : (0.7,1, "Northeast"),
+                1 : (0.5,1, "North"),
+                2 : (0.5,1, "Northeast"),
                 3 : (0,1, "East"),
-                4 : (0.7,1, "Southeast"),
-                5 : (0.7,-1, "South"),
-                6 : (0.7,-1, "Southwest"),
+                4 : (0.5,1, "Southeast"),
+                5 : (0.5,-1, "South"),
+                6 : (0.5,-1, "Southwest"),
                 7 : (0,-1, "West"),
-                8 : (0.7,-1, "Northwest")
+                8 : (0.5,-1, "Northwest")
             }
