@@ -1,4 +1,4 @@
-package nbtool.gui.logviews.loc;
+package nbtool.gui.field;
 
 import java.awt.*;
 import java.awt.geom.*;
