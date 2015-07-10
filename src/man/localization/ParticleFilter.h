@@ -45,7 +45,7 @@ static const ParticleFilterParams DEFAULT_PARAMS =
     300,                        // Num particles
     0.1f,                       // Exponential filter fast
     0.01f,                      // Exponential filter slow
-    0.9f,                       // Variance in x-y odometry
+    0.5f,                       // Variance in x-y odometry
     0.008f,                     // Variance in h odometry
     0.8f                        // Lost threshold
 };
