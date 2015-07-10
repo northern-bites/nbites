@@ -45,7 +45,7 @@ def tooFarFromHome(threshold, player):
     Returns true if LOC thinks we're more than *distance* away from our home
     position
     """
-    if player.brain.ball.vis.on:
+    if player.brain.ball.vis.frames_off < 10:
         ball = player.brain.ball
     elif player.brain.sharedBall.ball_on:
         ball = player.brain.sharedBall
@@ -66,6 +66,11 @@ def tooFarFromHome(threshold, player):
     distance = ((player.brain.loc.x - home.x)**2 + (player.brain.loc.y - home.y)**2)**.5
 
     return distance > threshold
+
+def shouldSpinSearchFromWatching(player):
+    return (player.stateTime > 7 and
+            player.brain.ball.vis.frames_off > 30 and
+            not player.brain.sharedBall.ball_on)
   
 def shouldApproachBall(player):
     if ballNotInBox(player):
