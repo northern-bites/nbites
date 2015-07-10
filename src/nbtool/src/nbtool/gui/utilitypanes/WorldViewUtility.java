@@ -33,7 +33,8 @@ public class WorldViewUtility extends UtilityParent {
 			Logger.println("WorldView creating broadcast listener...");
 			this.broadcastListener = BroadcastIO.createTBI(this);
 			this.setTitle("WorldView");
-			initiate();
+			initiateTools();
+			initiateFieldAndPlayers();
 		}
 
 		@Override
@@ -60,23 +61,12 @@ public class WorldViewUtility extends UtilityParent {
 				if(tb.dataTeamPacket.getTeamNumber() == teamNumber) {
 					ar[tb.dataTeamPacket.getPlayerNumber()-1] = new NaoRobot();
 					ar[tb.dataTeamPacket.getPlayerNumber()-1].wvNao(tb);
-					this.repaint();
+					panel.repaint();
 				}
 			}
 		}
 		
-		private void initiate() {
-			flip = new JButton("flip");
-			flip.addActionListener(this);
-			flip.setBounds((int)FieldConstants.FIELD_GREEN_WIDTH,10,200,25);
-			
-			teamNumberInput = new JTextField("0",2);
-			teamNumberInput.setBounds((int)FieldConstants.FIELD_GREEN_WIDTH, 40, 200, 25);
-			
-			startWorldView = new JButton("Start WorldView");
-			startWorldView.addActionListener(this);
-			startWorldView.setBounds((int)FieldConstants.FIELD_GREEN_WIDTH,70,200,25);
-			
+		private void initiateFieldAndPlayers() {
 			panel = new JPanel() {
 				@Override
 				public void paintComponent(Graphics g) {
@@ -90,14 +80,27 @@ public class WorldViewUtility extends UtilityParent {
 					}
 				}
 			};
+			add(panel);
+
+			validate();
+			repaint();
+		}
+		
+		private void initiateTools() {
+			flip = new JButton("flip");
+			flip.addActionListener(this);
+			flip.setBounds((int)FieldConstants.FIELD_GREEN_WIDTH,10,200,25);
+			
+			teamNumberInput = new JTextField("0",2);
+			teamNumberInput.setBounds((int)FieldConstants.FIELD_GREEN_WIDTH, 40, 200, 25);
+			
+			startWorldView = new JButton("Start WorldView");
+			startWorldView.addActionListener(this);
+			startWorldView.setBounds((int)FieldConstants.FIELD_GREEN_WIDTH,70,200,25);
 
 			add(flip);
 			add(teamNumberInput);
 			add(startWorldView);
-			add(panel);
-
-			this.validate();
-			this.repaint();
 		}
 
 		Field f = new Field();

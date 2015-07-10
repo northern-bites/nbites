@@ -61,8 +61,6 @@ public class NaoRobot {
 			walkingToY = (int) FieldConstants.FIELD_HEIGHT-walkingToY;
 			ballY = (int) FieldConstants.FIELD_HEIGHT-ballY;
 		}
-		
-		
 
 		g2.setColor(naoColor);
 		g2.fill(new Ellipse2D.Float(x-7.5f, y-7.5f, 15.f, 15.f));
