@@ -80,7 +80,7 @@ public class DebugImageView extends ViewParent
 	boolean drawAllBalls;
 
 	static final int NUMBER_OF_PARAMS = 5; // update as new params are added
-	int displayParams[] = new int[NUMBER_OF_PARAMS];
+	static int displayParams[] = new int[NUMBER_OF_PARAMS];
 
 	// Dimensions of the image that we are working with
     int width;
@@ -102,7 +102,86 @@ public class DebugImageView extends ViewParent
 	Log balls;
 
 	static int currentBottom;  // track current selection
-	boolean firstLoad;
+	static boolean firstLoad = true;
+	boolean newLog = true;
+
+	boolean parametersNeedSetting = false;
+
+    public DebugImageView() {
+        super();
+        setLayout(null);
+		// set up combo box to select views
+		viewList = new JComboBox(imageViews);
+		viewList.setSelectedIndex(0);
+		viewList.addActionListener(this);
+
+		// set up check boxes
+		checkListener = new CheckBoxListener();
+		showCameraHorizon = new JCheckBox("Show camera horizon");
+		showFieldHorizon = new JCheckBox("Show field convex hull");
+		debugHorizon = new JCheckBox("Debug Field Horizon");
+		debugFieldEdge = new JCheckBox("Debug Field Edge");
+		debugBall = new JCheckBox("Debug Ball");
+		showFieldLines = new JCheckBox("Hide Field Lines");
+		displayFieldLines = true;
+		drawAllBalls = false;
+
+		// add their listeners
+		showCameraHorizon.addItemListener(checkListener);
+		showFieldHorizon.addItemListener(checkListener);
+		debugHorizon.addItemListener(checkListener);
+		debugFieldEdge.addItemListener(checkListener);
+		debugBall.addItemListener(checkListener);
+		showFieldLines.addItemListener(checkListener);
+
+		// put them into one panel
+		checkBoxPanel = new JPanel();
+		checkBoxPanel.setLayout(new GridLayout(0, 1)); // 0 rows, 1 column
+		checkBoxPanel.add(showCameraHorizon);
+		checkBoxPanel.add(showFieldHorizon);
+		checkBoxPanel.add(debugHorizon);
+		checkBoxPanel.add(debugFieldEdge);
+		checkBoxPanel.add(debugBall);
+		checkBoxPanel.add(showFieldLines);
+
+		add(checkBoxPanel);
+		add(viewList);
+
+        this.addMouseListener(new DistanceGetter());
+
+		// default all checkboxes to false
+		showCameraHorizon.setSelected(false);
+		showFieldHorizon.setSelected(false);
+		debugHorizon.setSelected(false);
+		debugFieldEdge.setSelected(false);
+		debugBall.setSelected(false);
+		showFieldLines.setSelected(false);
+
+		// for now do not bother trying to save params across instances
+		for (int i = 0; i < NUMBER_OF_PARAMS; i++) {
+			displayParams[i] = 0;
+		}
+		// default image to display - save across instances
+		if (firstLoad) {
+			for (int i = 0; i < NUMBER_OF_PARAMS; i++) {
+				displayParams[i] = 0;
+			}
+
+			firstLoad = false;
+			currentBottom = ORIGINAL;
+		} else {
+			System.out.println("Reloading");
+			// Ideally we'd do our debug drawing right away,
+			// but this isn't easily possible until we shift
+			// the tool to doing a single VisionModule instance
+			/*for (int i = 0; i < NUMBER_OF_PARAMS; i++) {
+				if (displayParams[i] != 0) {
+					parametersNeedSetting = true;
+					break;
+				}
+				}*/
+		}
+    }
 
     @Override
     public void setLog(Log newlog) {
@@ -147,7 +226,7 @@ public class DebugImageView extends ViewParent
     public void adjustParams() {
 
         // Don't make an extra initial call
-        if (firstLoad) {
+        if (newLog) {
 			System.out.println("Skipping parameter adjustments");
             return;
 		}
@@ -183,7 +262,11 @@ public class DebugImageView extends ViewParent
 			g.drawImage(displayImages[currentBottom], 0, displayh + 5, displayw,
 						displayh, null);
 			viewList.setBounds(0, displayh * 2 + 10, displayw / 2, BOX_HEIGHT);
-			checkBoxPanel.setBounds(displayw + 10, 0, displayw / 2, displayh);
+			// TODO: figure out how to make this consistently display
+			// The problem has to do with repaint and the fact that Java
+			// treats it as a low priority request. Sometimes it will just
+			// take its sweet time because it doesn't think anything has changed
+			checkBoxPanel.setBounds(displayw+10, 0, displayw, displayh);
 			checkBoxPanel.show();
         }
     }
@@ -335,69 +418,6 @@ public class DebugImageView extends ViewParent
 
         assert(ci.tryAddCall(cc));
 	}
-
-    public DebugImageView() {
-        super();
-        setLayout(null);
-		// set up combo box to select views
-		viewList = new JComboBox(imageViews);
-		viewList.setSelectedIndex(0);
-		viewList.addActionListener(this);
-
-		// set up check boxes
-		checkListener = new CheckBoxListener();
-		showCameraHorizon = new JCheckBox("Show camera horizon");
-		showFieldHorizon = new JCheckBox("Show field convex hull");
-		debugHorizon = new JCheckBox("Debug Field Horizon");
-		debugFieldEdge = new JCheckBox("Debug Field Edge");
-		debugBall = new JCheckBox("Debug Ball");
-		showFieldLines = new JCheckBox("Hide Field Lines");
-		displayFieldLines = true;
-		drawAllBalls = false;
-
-		// add their listeners
-		showCameraHorizon.addItemListener(checkListener);
-		showFieldHorizon.addItemListener(checkListener);
-		debugHorizon.addItemListener(checkListener);
-		debugFieldEdge.addItemListener(checkListener);
-		debugBall.addItemListener(checkListener);
-		showFieldLines.addItemListener(checkListener);
-
-		// put them into one panel
-		checkBoxPanel = new JPanel();
-		checkBoxPanel.setLayout(new GridLayout(0, 1)); // 0 rows, 1 column
-		checkBoxPanel.add(showCameraHorizon);
-		checkBoxPanel.add(showFieldHorizon);
-		checkBoxPanel.add(debugHorizon);
-		checkBoxPanel.add(debugFieldEdge);
-		checkBoxPanel.add(debugBall);
-		checkBoxPanel.add(showFieldLines);
-
-		// default all checkboxes to false
-		showCameraHorizon.setSelected(false);
-		showFieldHorizon.setSelected(false);
-		debugHorizon.setSelected(false);
-		debugFieldEdge.setSelected(false);
-		debugBall.setSelected(false);
-		showFieldLines.setSelected(false);
-
-		add(checkBoxPanel);
-		add(viewList);
-
-        this.addMouseListener(new DistanceGetter());
-
-		// default image to display - save across instances
-		if (currentBottom == 0) {
-			for (int i = 0; i < NUMBER_OF_PARAMS; i++) {
-				displayParams[i] = 0;
-			}
-
-			firstLoad = true;
-			currentBottom = ORIGINAL;
-		} else {
-			System.out.println("Reloading");
-			}
-    }
 
 	/* Currently only called by the JComboBox, if we start adding more actions
 	 * then we will need to update this accordingly.
@@ -554,7 +574,7 @@ public class DebugImageView extends ViewParent
 									   displayImages[ORIGINAL]);
         debugImageDisplay = debugImage.toBufferedImage();
 
-		firstLoad = false;
+		newLog = false;
 
         repaint();
 

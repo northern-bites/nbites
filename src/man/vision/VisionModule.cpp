@@ -196,7 +196,9 @@ void VisionModule::run_()
 			horizon.endPoints(x1, y1, x2, y2);
 			int hor = static_cast<int>(y1);
 			hor = image->height() / 4 - hor;
-			field->findGreenHorizon(hor, 0.0f);
+			int hor2 = static_cast<int>(y2);
+			hor2 = image->height() / 4 - hor2;
+			field->findGreenHorizon(hor, hor2);
 		}
 
         // Run edge detection

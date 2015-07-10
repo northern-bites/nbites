@@ -60,7 +60,7 @@ namespace vision {
 					}
 					continue;
 				}
-				offField = centerY - principalLength <
+				offField = centerY + principalLength <
 										 field->blockHorizonAt(centerX);
 				if (offField) {
 					if (debugBall) {

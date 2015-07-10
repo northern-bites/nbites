@@ -61,7 +61,7 @@ public:
 	void drawLine(int x, int y, int x1, int y1, int c);
 
 	bool onField(double x, double & y);
-    int findGreenHorizon(int pH, float sl);
+    int findGreenHorizon(int pH, int rH);
     void findConvexHull(int pH);
     void initialScanForTopGreenPoints(int pH);
     void findTopEdges(int M);

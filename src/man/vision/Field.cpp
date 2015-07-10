@@ -729,7 +729,7 @@ int Field::getImprovedEstimate(int horizon) {
  * @return      the new horizon estimate
  */
 
-int Field::findGreenHorizon(int pH, float sl) {
+int Field::findGreenHorizon(int pH, int rH) {
     // re init shooting info
     for (int i = 0; i < width; i++) {
         topEdge[i] = 0;
@@ -737,18 +737,21 @@ int Field::findGreenHorizon(int pH, float sl) {
     // store field pose
     poseHorizon = pH;
 
+	if (drawCameraHorizon) {
+		cout << "Drawing camera horizon from " << pH << " to " << rH << endl;
+		float diff = (float)(rH - pH) / (float)width;
+		float start = static_cast<float>(pH);
+		for (int i = 0; i < width; i++) {
+			start += diff;
+			drawDot(i, (int)start, ORANGE);
+		}
+	}
+
     // get an initial estimate
     int initialEstimate = getInitialHorizonEstimate(pH);
     if (debugHorizon) {
         cout << "initial estimate is " << initialEstimate << " " << pH << endl;
     }
-	if (drawCameraHorizon) {
-		cout << "Drawing camera horizon" << endl;
-		for (int i = 0; i < width; i++) {
-			drawDot(i, pH, ORANGE);
-		}
-	}
-
     // improve the estimate
     horizon = getImprovedEstimate(initialEstimate);
     // calculate the convex hull
