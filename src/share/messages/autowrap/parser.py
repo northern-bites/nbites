@@ -9,9 +9,8 @@ package_declaration = 'package' + package_scopes.setResultsName('scopes') + ';'
 
 #The original version of this file did not support standard google protobuf options
 #This hack allows the parser to ignore protobuf java options.
-java_JOC_decl = 'option java_outer_classname = "' + name_word + ';"'
-java_JMF_decl = 'option java_multiple_files = true;'
-
+java_option = Keyword('option') + SkipTo(';') + ';'
+#java_option.setDebug()
 
 default_value_word = Word(alphanums + '-_.\"\\ ')
 default = Literal('[') + Literal('default') + Literal('=') + default_value_word + ']'
@@ -59,9 +58,14 @@ message << message_keyword + message_name + '{' + nested_elements + '}'
 # messages in a proto_file are named elements so that top-level messages can
 # be processed just like nested messages (so they're nested under the global
 # namespace in some sense)
-proto_file = Optional(package_declaration).setResultsName('package') + Optional(java_JOC_decl) + Optional(java_JMF_decl) + ZeroOrMore(Group(message)).setResultsName('elements')
+#proto_file = Optional(package_declaration).setResultsName('package') + Optional(java_JOC_decl) + Optional(java_JMF_decl) + ZeroOrMore(Group(message)).setResultsName('elements')
+
+proto_file = Optional(package_declaration).setResultsName('package') + ZeroOrMore(Group(message)).setResultsName('elements')
 
 proto_file.ignore(dblSlashComment)
+proto_file.ignore(java_option)
 
 def parse_proto_file(file_path):
-    return proto_file.parseFile(file_path)
+    ret = proto_file.parseFile(file_path)
+#print 'FOUND: '; print ret	
+    return ret
