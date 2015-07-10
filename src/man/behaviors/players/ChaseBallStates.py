@@ -61,15 +61,17 @@ def prepareForKick(player):
         player.brain.nav.stand()
 
     if not player.inKickOffPlay:
-        if player.shouldKickOff or player.brain.gameController.timeSincePlaying < 10:
-            print "Overriding kick decider for kickoff!"
-            player.shouldKickOff = False
-            player.kick = player.decider.kicksBeforeBallIsFree()
-        else:
-            if roleConstants.isDefender(player.role):
-                player.kick = player.decider.defender()
-            else:
-                player.kick = player.decider.attacker()
+        #if player.shouldKickOff or player.brain.gameController.timeSincePlaying < 10:
+        #    print "Overriding kick decider for kickoff!"
+        #    player.shouldKickOff = False
+        #    player.kick = player.decider.kicksBeforeBallIsFree()
+        #else:
+        player.shouldKickOff = False
+        #if roleConstants.isDefender(player.role):
+        #    player.kick = player.decider.defender()
+        #else:
+        #    player.kick = player.decider.attacker()
+        player.kick = player.decider.decidingStrategy()
         player.inKickingState = True
 
     elif player.finishedPlay:

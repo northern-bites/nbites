@@ -60,7 +60,7 @@ def passToFieldCross(player):
                 # player.kick = decider.bigKicksOnGoal()
                 # player.kick = decider.sweetMovesOnGoal()
                 # player.kick = decider.sweetMoveCrossToCenter()
-                player.kick = decider.attacker()
+                player.kick = decider.decidingStrategy()
                 player.finishedPlay = True
                 player.inKickingState = True
                 return player.goNow('approachBall')
