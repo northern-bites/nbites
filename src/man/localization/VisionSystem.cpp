@@ -36,7 +36,7 @@ bool VisionSystem::update(ParticleSet& particles,
 
     // Count observations
     for (int i = 0; i < lines.line_size(); i++) {
-        if (!LineSystem::shouldUse(lines.line(i)))
+        if (!LineSystem::shouldUse(lines.line(i), lastEstimate))
             continue;
         numObservations++;
     }
@@ -56,7 +56,7 @@ bool VisionSystem::update(ParticleSet& particles,
 
         // Score particle from line observations
         for (int i = 0; i < lines.line_size(); i++) {
-            if (!LineSystem::shouldUse(lines.line(i)))
+            if (!LineSystem::shouldUse(lines.line(i), lastEstimate))
                 continue;
             curParticleError = curParticleError*lineSystem->scoreLine(lines.line(i), particle->getLocation());
         }

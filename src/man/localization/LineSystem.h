@@ -51,7 +51,7 @@ public:
     messages::RobotLocation reconstructWoEndpoints(LocLineID id, const messages::FieldLine& observation);
     void setDebug(bool debug_) { debug = debug_; }
 
-    static bool shouldUse(const messages::FieldLine& observation); 
+    static bool shouldUse(const messages::FieldLine& observation, const messages::RobotLocation& loc); 
     static vision::GeoLine relRobotToAbsolute(const messages::FieldLine& observation, const messages::RobotLocation& loc);
 
 private:
