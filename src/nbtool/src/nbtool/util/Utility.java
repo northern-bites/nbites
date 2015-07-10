@@ -141,55 +141,14 @@ public class Utility {
 	public static Class<? extends com.google.protobuf.GeneratedMessage> protobufClassFromType(String _type) {
 		assert(_type.startsWith(NBConstants.PROTOBUF_TYPE_PREFIX));
 		String type = _type.substring(NBConstants.PROTOBUF_TYPE_PREFIX.length()); //Remove prefix.
-		String classname;
-		String except;
-		
-		try {
-			except = Prefs.CLASS_EXCEPTIONS_MAP.get(type);
-		} catch(MissingResourceException mre) {
-			except = null;
-		}
-		
-		ClassNotFoundException ocE = null, nocE = null;
-		
-		/*
-		 * Generate the %sOuterClass%s format, using the outer class name exception if found.
-		 * */
-		if ( except != null )
-			classname = String.format("messages.%sOuterClass$%s", except, type);
-		else
-			classname = String.format("messages.%sOuterClass$%s", type, type);
+		String classname = String.format("messages.%s", type);
 
-		Class<? extends com.google.protobuf.GeneratedMessage> retClass = null;
-		
-		//Try that format.
 		try {
-			retClass = (Class<? extends com.google.protobuf.GeneratedMessage>) Class.forName(classname);
+			return (Class<? extends com.google.protobuf.GeneratedMessage>) Class.forName(classname);
 		} catch (ClassNotFoundException e) {
-			ocE  = e;
-			retClass = null;
+			e.printStackTrace();
+			return null;
 		}
-		
-		if (retClass != null)
-			return retClass;	//OuterClass format found the class.
-		
-		//Didn't find the class, try class name format WITHOUT 'OuterClass'
-		if (except == null) return null; //Can't try this if we didn't find a class name exception.
-		classname = String.format("messages.%s$%s", except, type);
-		try {
-			retClass = (Class<? extends com.google.protobuf.GeneratedMessage>) Class.forName(classname);
-		} catch (ClassNotFoundException e) {
-			nocE  = e;
-			retClass = null;
-		}
-		
-		if (retClass != null)
-			return retClass;
-		
-		//Couldn't find the class, print the errors we found for debugging.
-		ocE.printStackTrace();
-		nocE.printStackTrace();
-		return null;
 	}
 	
 	public static <T extends com.google.protobuf.Message>
