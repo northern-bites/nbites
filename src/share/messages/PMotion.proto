@@ -19,7 +19,7 @@ message MotionCommand
         WALK_COMMAND = 1;
         SCRIPTED_MOVE = 2;
         ODOMETRY_WALK = 3;
-	KICK = 4;
+        KICK = 4;
     }
 
     optional CommandType type = 1;
@@ -83,10 +83,11 @@ message MotionKick
 
 message Kick
 {
-    enum KickType { // For when we have multiple types of kicks
-    	 kickForward = 0;
+    enum KickType {
+    	 kickForwardLeft = 0;
+    	 kickForwardRight = 0;
     }
-     optional KickType type = 2;
+    optional KickType type = 2;
 }
 
 message HeadMotionCommand

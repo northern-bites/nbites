@@ -8,7 +8,6 @@ from ..util import *
 from .. import SweetMoves
 from . import RoleConstants as roleConstants
 import KickOffConstants as kickOff
-import PMotion_proto
 
 ### NORMAL PLAY ###
 @superState('gameControllerResponder')
@@ -50,15 +49,9 @@ def gameReady(player):
     if player.firstFrame():
         player.inKickingState = False
         player.brain.fallController.enabled = True
-        #player.brain.nav.stand()
+        player.brain.nav.stand()
+        player.brain.tracker.repeatBasicPan()
 
-        command = player.brain.interface.bodyMotionCommand
-        command.type = command.CommandType.KICK
-        command.kick.type = PMotion_proto.messages.Kick.kickForward
-        command.timestamp = int(player.brain.time * 1000)
-        player.boolean = True
-
-        player.brain.tracker.repeatWidePan()
         player.timeReadyBegan = player.brain.time
         if player.lastDiffState == 'gameInitial':
             player.brain.resetInitialLocalization()
@@ -87,7 +80,7 @@ def gameSet(player):
         player.gainsOn()
         player.stand()
         player.brain.nav.stand()
-        player.brain.tracker.performBasicPan()
+        player.brain.tracker.performWidePan()
 
     elif player.brain.tracker.isStopped():
         player.brain.tracker.trackBall()

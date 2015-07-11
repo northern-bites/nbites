@@ -7,6 +7,7 @@ from objects import RobotLocation, RelLocation, RelRobotLocation
 from math import pi, sqrt
 from ..kickDecider import kicks
 from ..util import Transition
+import PMotion_proto
 
 #speed gains
 FULL_SPEED = 1.0
@@ -24,7 +25,7 @@ KEEP_SAME_SPEED = -1
 ADAPTIVE = True
 #goTo precision
 GRAINY = (50.0, 50.0, 30)
-HOME = (50.0, 50.0, 20)
+HOME = (30.0, 30.0, 20)
 PLAYBOOK = (10.0, 10.0, 10)
 GENERAL_AREA = (5.0, 5.0, 20)
 CLOSE_ENOUGH = (3.5, 3.5, 10)
@@ -52,6 +53,12 @@ class Navigator(FSA.FSA):
         self.velocity = 0.
         self.requestVelocity = 0.
         self.destination = None # Used to set walking_to in world model proto
+
+        # initialize obstacle counts
+        navTrans.shouldDodge.sOrACount = 0
+        navTrans.shouldDodge.vCount = 0
+        self.dodging = False
+
         #transitions
         #@todo: move this to the actual transitions file?
         self.atLocPositionTransition = Transition.CountTransition(navTrans.atDestination,
@@ -63,20 +70,7 @@ class Navigator(FSA.FSA):
 
         NavStates.goToPosition.transitions = {
             self.atLocPositionTransition : NavStates.atPosition,
-
-            Transition.CountTransition(navTrans.shouldDodge,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : NavStates.dodge
-
             }
-
-        NavStates.dodge.transitions = {
-            Transition.CountTransition(navTrans.doneDodging,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
-           : NavStates.briefStand
-           }
 
         NavStates.atPosition.transitions = {
             self.locRepositionTransition : NavStates.goToPosition
@@ -91,6 +85,14 @@ class Navigator(FSA.FSA):
         """
         NavStates.scriptedMove.sweetMove = move
         self.switchTo('scriptedMove')
+
+    def callKickEngine(self, kickType)
+        """
+        Do a BH kick engine kick. Never write a sweet ass move again. Except standups :)
+        By default, execute forward kick.
+        """
+        NavStates.kickEngine.kickType = kickType
+        self.switchTo('kickEngine')
 
     def chaseBall(self, speed = FAST_SPEED, fast = False):
         """
