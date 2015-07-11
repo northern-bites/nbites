@@ -24,6 +24,7 @@
 #include "BodyJointCommand.h"
 #include "WalkCommand.h"
 #include "DestinationCommand.h"
+#include "KickCommand.h"
 #include "StepCommand.h"
 #include "FreezeCommand.h"
 #include "UnfreezeCommand.h"
@@ -152,6 +153,9 @@ public:
      */
     void sendMotionCommand(const StepCommand::ptr command);
     void sendMotionCommand(messages::OdometryWalk command);
+
+    void sendMotionCommand(const KickCommand::ptr command);
+    void sendMotionCommand(messages::Kick command, int time);
 
     //TODO: add a stand command!
 

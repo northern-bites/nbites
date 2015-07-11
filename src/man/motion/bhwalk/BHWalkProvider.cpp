@@ -14,7 +14,7 @@ namespace man
 {
 namespace motion
 {
-
+int BHWalkProvider::frameCount = 0;
 using namespace boost;
 
 // TODO make this consistent with new walk
@@ -59,7 +59,7 @@ static const JointDataBH::Joint nb_joint_order[] = {
 };
 
 BHWalkProvider::BHWalkProvider()
-    : MotionProvider(WALK_PROVIDER), requestedToStop(false), tryingToWalk(false)
+    : MotionProvider(WALK_PROVIDER), requestedToStop(false), tryingToWalk(false), kicking(false)
 {
 	// Setup Walk Engine Configuation Parameters
 	ModuleBase::config_path = common::paths::NAO_CONFIG_DIR;
@@ -67,14 +67,16 @@ BHWalkProvider::BHWalkProvider()
     // Setup the blackboard (used by bhuman to pass data around modules)
 	blackboard = new Blackboard;
 
-    // Setup the walk engine
+    // Setup the walk engine & kick engine
 	walkingEngine = new WalkingEngine;
+    kickEngine = new KickEngine;
     hardReset();
 }
 
 BHWalkProvider::~BHWalkProvider()
 {
     delete blackboard;
+    delete kickEngine;
     delete walkingEngine;
 }
 
@@ -116,7 +118,6 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     const messages::FSR&           sensorFSRs
     ) 
 {
-
     PROF_ENTER(P_WALK);
 
     // If our calibration became bad (as decided by the walkingEngine,
@@ -130,10 +131,10 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         walkingEngine->inertiaSensorCalibrator->reset();
         walkingEngine->instability.init();
     }
-
     assert(JointDataBH::numOfJoints == Kinematics::NUM_JOINTS);
 
     if (standby) {
+        //std::cout << "In standby" << std::endl;
         tryingToWalk = false;
 
         MotionRequestBH motionRequest;
@@ -151,6 +152,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     } else {
     // TODO VERY UGLY -- refactor this please
     if (requestedToStop || !isActive()) {
+        //std::cout << "RequestedToStop" << std::endl;
         tryingToWalk = false;
 
         MotionRequestBH motionRequest;
@@ -167,11 +169,13 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         // If we're not calibrated, wait until we are calibrated to walk
         if (!calibrated())
         {
+            //std::cout << "Calibrating" << std::endl;
             MotionRequestBH motionRequest;
             motionRequest.motion = MotionRequestBH::stand;
 
             walkingEngine->theMotionRequestBH = motionRequest;
         } else if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP) {
+            //std::cout << "trying to walk via step" << std::endl;
             tryingToWalk = true;
 
             StepCommand::ptr command = boost::shared_static_cast<StepCommand>(currentCommand);
@@ -206,6 +210,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
         } else {
         if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK) {
+            //std::cout << "WALK" << std::endl;
             tryingToWalk = true;
 
             WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
@@ -222,6 +227,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             walkingEngine->theMotionRequestBH = motionRequest;
         } else {
         if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
+            //std::cout << "DESTINATION" << std::endl;
             tryingToWalk = true;
 
             DestinationCommand::ptr command = boost::shared_static_cast<DestinationCommand>(currentCommand);
@@ -263,8 +269,25 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
             walkingEngine->theMotionRequestBH = motionRequest;
         }
+        else if(currentCommand.get() && currentCommand->getType() == MotionConstants::KICK)
+        {
+            std::cout << "Kick Command" << std::endl;
+            kickCommand = boost::shared_static_cast<KickCommand>(currentCommand);
+
+            // Only set kicking to true once
+            if (kickCommand->timeStamp != kickIndex) {
+                kickIndex = kickCommand->timeStamp;
+                kicking = true;
+            }
+            else if (!kicking) { // Ignore the command if we've finished kicking
+                std::cout << "!kicking" << std::endl;
+                stand();
+            }
+
+        }
         //TODO make special command for stand
         if (!currentCommand.get()) {
+            //std::cout << "Standing" << std::endl;
             tryingToWalk = false;
 
             MotionRequestBH motionRequest;
@@ -314,11 +337,48 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     bh_sensors.data[SensorDataBH::fsrLBL] = sensorFSRs.lrl();
     bh_sensors.data[SensorDataBH::fsrLBR] = sensorFSRs.lrr();
 
-    WalkingEngineOutputBH output;
-    walkingEngine->update(output);
+    const float* angles = NULL;
+    const int* hardness = NULL;
+
+    if (kicking) {
+        MotionRequestBH motionRequest;
+        motionRequest.motion = MotionRequestBH::kick;
+        if (kickCommand->kickType == 0) {
+            motionRequest.kickRequest.kickMotionType = KickRequest::getKickMotionFromName("kickForward");
+        }
+        else {
+            std::cout << "Kick unknown to BHWalkProvider requested. Defaulting." << std::endl;
+            motionRequest.kickRequest.kickMotionType = KickRequest::getKickMotionFromName("kickForward");
+        }
+
+        walkingEngine->theMotionRequestBH = motionRequest;
+        kickEngine->theMotionRequestBH = motionRequest;
+
+        WalkingEngineStandOutputBH standout;
+
+        walkingEngine->update(walkOutput);
+        walkingEngine->update(standout);
+
+
+        kickEngine->theWalkingEngineStandOutputBH = standout;
+        kickEngine->update(kickOut);
+
+        angles = (kickOut.angles);
+        // Kick Engine doesn't seem to be setting stiffnesses..
+        hardness = (ON_STIFF_ARRAY);
+        if (kickOut.isLeavingPossible) {
+            kicking = false;
+            stand();
+        }
+    }
+    else {
+        walkingEngine->update(walkOutput);
+        angles = (walkOutput.angles);
+        hardness = (walkOutput.jointHardness.hardness);
+    }
 
     // Update justMotionKicked so that we do not motion kick multiple times in a row
-    if (output.executedWalk.kickType != WalkRequest::none) { // if we succesfully motion kicked
+    if (walkOutput.executedWalk.kickType != WalkRequest::none) { // if we succesfully motion kicked
         justMotionKicked = true;
     }
     else if (walkingEngine->theMotionRequestBH.walkRequest.mode != WalkRequest::targetMode || // else if we are no longer attempting to motion kick
@@ -332,13 +392,13 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         std::vector<float> chain_hardness;
         for (unsigned j = Kinematics::chain_first_joint[i];
                      j <= Kinematics::chain_last_joint[i]; j++) {
-            chain_angles.push_back(output.angles[nb_joint_order[j]] * walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].sign - walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].offset);
-            if (output.jointHardness.hardness[nb_joint_order[j]] == 0) {
+            chain_angles.push_back(angles[nb_joint_order[j]] * walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].sign - walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].offset);
+            if (hardness[nb_joint_order[j]] == 0) {
+                std::cout << "NO_STIFF" << std::endl;
                 chain_hardness.push_back(MotionConstants::NO_STIFFNESS);
             } else {
-                chain_hardness.push_back(output.jointHardness.hardness[nb_joint_order[j]] / 100.f);
+                chain_hardness.push_back(hardness[nb_joint_order[j]] / 100.f);
             }
-
         }
         this->setNextChainJoints((Kinematics::ChainID) i, chain_angles);
         this->setNextChainStiffnesses((Kinematics::ChainID) i, chain_hardness);
@@ -430,6 +490,12 @@ void BHWalkProvider::setCommand(const StepCommand::ptr command) {
 
 void BHWalkProvider::setCommand(const DestinationCommand::ptr command) {
 
+    currentCommand = command;
+
+    active();
+}
+
+void BHWalkProvider::setCommand(const KickCommand::ptr command) {
     currentCommand = command;
 
     active();
