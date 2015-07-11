@@ -100,11 +100,10 @@ def watchForBall(player):
 @ifSwitchLater(shared.ballOffForNFrames(120), 'playOffBall')
 def positionAsSupporter(player):
     positionAsSupporter.position = getSupporterPosition(player, player.role)
+    fastWalk = role.isChaser(player.role)
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
-
-        fastWalk = role.isChaser(player.role)
 
         player.brain.nav.goTo(positionAsSupporter.position, precision = nav.GENERAL_AREA,
                               speed = nav.QUICK_SPEED, avoidObstacles = True,
