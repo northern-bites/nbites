@@ -140,6 +140,7 @@ VisionModule::~VisionModule()
 // TODO use horizon on top image
 void VisionModule::run_()
 {
+    PROF_ENTER(P_VISION)
     // Get messages from inPortals
     topIn.latch();
     bottomIn.latch();
@@ -161,7 +162,7 @@ void VisionModule::run_()
 
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
-
+        PROF_ENTER2(P_VISION_TOP, P_VISION_BOT, i==0)
         // Get image
         const messages::YUVImage* image = images[i];
 
@@ -176,7 +177,9 @@ void VisionModule::run_()
 
 
         // Run front end
+        PROF_ENTER2(P_FRONT_TOP, P_FRONT_BOT, i==0)
         frontEnd[i]->run(yuvLite, colorParams[i]);
+        PROF_EXIT2(P_FRONT_TOP, P_FRONT_BOT, i==0)
         ImageLiteU16 yImage(frontEnd[i]->yImage());
         ImageLiteU8 whiteImage(frontEnd[i]->whiteImage());
         ImageLiteU8 greenImage(frontEnd[i]->greenImage());
@@ -197,7 +200,7 @@ void VisionModule::run_()
             homography[i]->roll(calibrationParams[i]->getRoll());
 
             homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt() + azOffset);
-         
+
 #ifndef OFFLINE
             homography[i]->azimuth(kinematics[i]->azimuth());
 #endif
@@ -207,11 +210,14 @@ void VisionModule::run_()
 
 
         // Approximate brightness gradient
+        PROF_ENTER2(P_GRAD_TOP, P_GRAD_BOT, i==0)
         edgeDetector[i]->gradient(yImage);
+        PROF_EXIT2(P_GRAD_TOP, P_GRAD_BOT, i==0)
 
         times[i][2] = timer.end();
 
 		// only calculate the field in the top camera
+        PROF_ENTER2(P_FIELD_TOP, P_FIELD_BOT, i==0)
 		if (!i) {
 			// field needs the color images
 			field->setImages(frontEnd[0]->whiteImage(), frontEnd[0]->greenImage(),
@@ -225,15 +231,20 @@ void VisionModule::run_()
 			hor2 = image->height() / 4 - hor2;
 			field->findGreenHorizon(hor, hor2);
 		}
+        PROF_EXIT2(P_FIELD_TOP, P_FIELD_BOT, i==0)
 
         times[i][3] = timer.end();
 
         // Run edge detection
+        PROF_ENTER2(P_EDGE_TOP, P_EDGE_BOT, i==0)
         edgeDetector[i]->edgeDetect(greenImage, *(edges[i]));
+        PROF_EXIT2(P_EDGE_TOP, P_EDGE_BOT, i==0)
         times[i][4] = timer.end();
 
         // Run hough line detection
+        PROF_ENTER2(P_HOUGH_TOP, P_HOUGH_BOT, i==0)
         hough[i]->run(*(edges[i]), *(rejectedEdges[i]), *(houghLines[i]));
+        PROF_EXIT2(P_HOUGH_TOP, P_HOUGH_BOT, i==0)
         times[i][5] = timer.end();
 
         // Find world coordinates for hough lines
@@ -241,24 +252,35 @@ void VisionModule::run_()
         times[i][6] = timer.end();
 
         // Find world coordinates for rejected edges
+        PROF_ENTER2(P_EDGEMAP_TOP, P_EDGEMAP_BOT, i==0)
         rejectedEdges[i]->mapToField(*(homography[i]));
+        PROF_EXIT2(P_EDGEMAP_TOP, P_EDGEMAP_BOT, i==0)
         times[i][7] = timer.end();
 
         // Detect center circle on top
+        PROF_ENTER2(P_CIRCLE_TOP, P_CIRCLE_BOT, i==0)
         if (!i) centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]), *field);
+        PROF_EXIT2(P_CIRCLE_TOP, P_CIRCLE_BOT, i==0)
         times[i][8] = timer.end();
- 
+
         // Pair hough lines to field lines
+        PROF_ENTER2(P_LINES_TOP, P_LINES_BOT, i==0)
         fieldLines[i]->find(*(houghLines[i]), blackStar());
+        PROF_EXIT2(P_LINES_TOP, P_LINES_BOT, i==0)
         times[i][9] = timer.end();
 
         // Classify field lines
+        PROF_ENTER2(P_LINECLASS_TOP, P_LINECLASS_BOT, i==0)
         fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]), *(centerCircleDetector[i]));
+        PROF_EXIT2(P_LINECLASS_TOP, P_LINECLASS_BOT, i==0)
         times[i][10] = timer.end();
 
+        PROF_ENTER2(P_BALL_TOP, P_BALL_BOT, i==0)
         ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
+        PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
         times[i][11] = timer.end();
 
+        PROF_EXIT2(P_VISION_TOP, P_VISION_BOT, i==0)
 #ifdef USE_LOGGING
         logImage(i);
 #endif
@@ -296,7 +318,7 @@ void VisionModule::run_()
         }
     }
 
-    if (topTotal + bottomTotal > 16.0) {
+    if (topTotal + bottomTotal > 16.0 && false) {
         overrun++;
         for (int i = 0; i < 2; i++) {
             if (i == 0) {
@@ -330,8 +352,11 @@ void VisionModule::run_()
     
     outportalVisionField();
 
+    PROF_ENTER(P_OBSTACLE)
     updateObstacleBox();
+    PROF_EXIT(P_OBSTACLE)
 
+    PROF_EXIT(P_VISION);
 }
 
 void VisionModule::outportalVisionField()

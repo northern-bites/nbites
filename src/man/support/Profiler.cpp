@@ -19,6 +19,29 @@ static const char *PCOMPONENT_NAMES[] = {
     "Image Conversion",
 
     "Vision",
+    "Vision top",
+    "Front end top",
+    "Gradient top",
+    "Field top",
+    "Edge top",
+    "Hough top",
+    "Edgemap top",
+    "Center circle top",
+    "Lines top",
+    "Line Classification top",
+    "Ball top",
+    "Vision bot",
+    "Front end bot",
+    "Gradient bot",
+    "Field bot",
+    "Edge bot",
+    "Hough bot",
+    "Edgemap bot",
+    "Center circle bot",
+    "Lines bot",
+    "Line Classification bot",
+    "Ball bot",
+    "Obstacle",
 
     "Localization",
     "Ball Track",
@@ -70,6 +93,29 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
     /*P_ACQUIRE_IMAGE          --> */ P_COGNITION_THREAD,
 
     /*P_VISION                 --> */ P_COGNITION_THREAD,
+    /*P_VISION_TOP             --> */ P_VISION,
+    /*P_FRONT_TOP              --> */ P_VISION_TOP,
+    /*P_GRAD_TOP               --> */ P_VISION_TOP,
+    /*P_FIELD_TOP              --> */ P_VISION_TOP,
+    /*P_EDGE_TOP               --> */ P_VISION_TOP,
+    /*P_HOUGH_TOP              --> */ P_VISION_TOP,
+    /*P_EDGEMAP_TOP            --> */ P_VISION_TOP,
+    /*P_CIRCLE_TOP             --> */ P_VISION_TOP,
+    /*P_LINES_TOP              --> */ P_VISION_TOP,
+    /*P_LINECLASS_TOP          --> */ P_VISION_TOP,
+    /*P_BALL_TOP               --> */ P_VISION_TOP,
+    /*P_VISION_BOT             --> */ P_VISION,
+    /*P_FRONT_BOT              --> */ P_VISION_BOT,
+    /*P_GRAD_BOT               --> */ P_VISION_BOT,
+    /*P_FIELD_BOT              --> */ P_VISION_BOT,
+    /*P_EDGE_BOT               --> */ P_VISION_BOT,
+    /*P_HOUGH_BOT              --> */ P_VISION_BOT,
+    /*P_EDGEMAP_BOT            --> */ P_VISION_BOT,
+    /*P_CIRCLE_BOT             --> */ P_VISION_BOT,
+    /*P_LINES_BOT              --> */ P_VISION_BOT,
+    /*P_LINECLASS_BOT          --> */ P_VISION_BOT,
+    /*P_BALL_BOT               --> */ P_VISION_BOT,
+    /*P_OBSTACLE               --> */ P_VISION,
 
     /*P_SELF_LOC               --> */ P_COGNITION_THREAD,
     /*P_BALL_TRACK             --> */ P_COGNITION_THREAD,
@@ -266,18 +312,16 @@ void Profiler::printIndentedSummary()
 
     // Calculate depths of sub-components, for indented display
     int depths[NUM_PCOMPONENTS];
+
     int length, max_length = 0;
     int comp;
     for (int i = 0; i < NUM_PCOMPONENTS; i++) {
-
         depths[i] = 0;
         comp = i;
-        //comp = PCOMPONENT_SUB_ORDER[i];
         while (comp != PCOMPONENT_SUB_ORDER[comp]) {
             depths[i]++;
             comp = PCOMPONENT_SUB_ORDER[comp];
         }
-
         length = strlen(PCOMPONENT_NAMES[i]) + depths[i]*2;
         max_length = max_length > length ? max_length : length;
     }

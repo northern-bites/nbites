@@ -5,16 +5,21 @@
 #include <boost/shared_ptr.hpp>
 #include "Common.h"
 #include "DebugConfig.h"
+#include "iostream"
 class Profiler;
 
 #ifdef USE_TIME_PROFILING
 #  define PROF_NFRAME()  (Profiler::getInstance()->nextFrame());
 #  define PROF_ENTER(c) (Profiler::getInstance()->enterComponent(c));
 #  define PROF_EXIT(c)  (Profiler::getInstance()->exitComponent(c));
+#  define PROF_ENTER2(c1, c2, first) (Profiler::getInstance()->enterDoubleComponent(c1, c2, first));
+#  define PROF_EXIT2(c1, c2, first) (Profiler::getInstance()->exitDoubleComponent(c1, c2, first));
 #else
 #  define PROF_NFRAME()
 #  define PROF_ENTER(c)
 #  define PROF_EXIT(c)
+#  define PROF_ENTER2(c1, c2, first)
+#  define PROF_EXIT2(c1, c2, first)
 #endif
 
 enum ProfiledComponent {
@@ -26,6 +31,29 @@ enum ProfiledComponent {
     P_ACQUIRE_IMAGE,
 
     P_VISION,
+    P_VISION_TOP,
+    P_FRONT_TOP,
+    P_GRAD_TOP,
+    P_FIELD_TOP,
+    P_EDGE_TOP,
+    P_HOUGH_TOP,
+    P_EDGEMAP_TOP,
+    P_CIRCLE_TOP,
+    P_LINES_TOP,
+    P_LINECLASS_TOP,
+    P_BALL_TOP,
+    P_VISION_BOT,
+    P_FRONT_BOT,
+    P_GRAD_BOT,
+    P_FIELD_BOT,
+    P_EDGE_BOT,
+    P_HOUGH_BOT,
+    P_EDGEMAP_BOT,
+    P_CIRCLE_BOT,
+    P_LINES_BOT,
+    P_LINECLASS_BOT,
+    P_BALL_BOT,
+    P_OBSTACLE,
 
     P_SELF_LOC,
     P_BALL_TRACK,
@@ -92,14 +120,39 @@ class Profiler {
     inline void enterComponent(ProfiledComponent c) {
         if (!profiling)
             return;
+        if (enterTime[c] != 0)
+            std::cout << "ERROR: PROF Entered twice on: " << c << " without exiting" << std::endl;
         enterTime[c] = thread_timeFunction();
     }
     inline void exitComponent(ProfiledComponent c) {
         if (!profiling)
             return;
         lastTime[c] = thread_timeFunction() - enterTime[c];
+        enterTime[c] = 0;
         minTime[c] = std::min(lastTime[c], minTime[c]);
         maxTime[c] = std::max(lastTime[c], maxTime[c]);
+    }
+
+    inline void enterDoubleComponent(ProfiledComponent c1,
+                                     ProfiledComponent c2,
+                                     bool first) {
+        if (first) {
+            enterComponent(c1);
+        }
+        else {
+            enterComponent(c2);
+        }
+    }
+
+    inline void exitDoubleComponent(ProfiledComponent c1,
+                                    ProfiledComponent c2,
+                                    bool first) {
+        if (first) {
+            exitComponent(c1);
+        }
+        else {
+            exitComponent(c2);
+        }
     }
 
     inline bool shouldNotPrintLine(int i) {
