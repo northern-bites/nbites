@@ -335,16 +335,21 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     const int* hardness = NULL;
 
     if (kicking) {
-        std::cout << "Requested to kick" << std::endl;
+//        std::cout << "Requested to kick" << std::endl;
         MotionRequestBH motionRequest;
         motionRequest.motion = MotionRequestBH::kick;
         if (kickCommand->kickType == 0) {
+            motionRequest.kickRequest.kickMotionType = KickRequest::getKickMotionFromName("kickForward");
+            motionRequest.kickRequest.mirror = true;
+        }
+        else if (kickCommand->kickType == 1) {
             motionRequest.kickRequest.kickMotionType = KickRequest::getKickMotionFromName("kickForward");
         }
         else {
             std::cout << "Kick unknown to BHWalkProvider requested. Defaulting." << std::endl;
             motionRequest.kickRequest.kickMotionType = KickRequest::getKickMotionFromName("kickForward");
         }
+        motionRequest.kickRequest.dynamical = true;
 
         walkingEngine->theMotionRequestBH = motionRequest;
         kickEngine->theMotionRequestBH = motionRequest;

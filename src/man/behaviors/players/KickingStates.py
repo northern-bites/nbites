@@ -49,12 +49,12 @@ def executeSweetKick(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        executeKick.sweetMove = player.kick.sweetMove
+        executeSweetKick.sweetMove = player.kick.sweetMove
         return player.stay()
 
     # TODO consider lowering this
     if player.counter == 30:
-        player.executeMove(executeKick.sweetMove)
+        player.executeMove(executeSweetKick.sweetMove)
         return player.stay()
 
     # TODO not ideal at all!
@@ -63,7 +63,7 @@ def executeSweetKick(player):
 
     return player.stay()
 
-executeKick.sweetMove = None
+executeSweetKick.sweetMove = None
 
 @superState('gameControllerResponder')
 @ifSwitchLater(transitions.ballMoved, 'approachBall') # TODO this doesn't work
@@ -74,10 +74,12 @@ def executeBHKick(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.brain.nav.callKickEngine(player.kick.bhKickType)
         return player.stay()
 
-    if player.counter > 100:
+    if player.counter > 30:
+        player.brain.nav.callKickEngine(player.kick.bhKickType)
+
+    if player.counter > 130:
         return player.goNow('afterKick')
 
     return player.stay()

@@ -86,7 +86,7 @@ class Navigator(FSA.FSA):
         NavStates.scriptedMove.sweetMove = move
         self.switchTo('scriptedMove')
 
-    def callKickEngine(self, kickType)
+    def callKickEngine(self, kickType):
         """
         Do a BH kick engine kick. Never write a sweet ass move again. Except standups :)
         By default, execute forward kick.

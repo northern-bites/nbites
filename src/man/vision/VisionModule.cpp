@@ -238,7 +238,7 @@ void VisionModule::run_()
     // Send messages on outportals
     ballOn = ballDetected;
     outportalVisionField();
-    updateObstacleBox();
+    //updateObstacleBox();
 }
 
 void VisionModule::outportalVisionField()

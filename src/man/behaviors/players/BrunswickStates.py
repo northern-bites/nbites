@@ -60,9 +60,6 @@ def gameReady(player):
             player.wasPenalized = False
             return player.goNow('afterPenalty')
 
-    elif player.boolean:
-        player.boolean = False
-        player.brain.nav.stand()
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
         return player.stay()

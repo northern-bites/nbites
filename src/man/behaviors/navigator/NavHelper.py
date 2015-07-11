@@ -218,7 +218,7 @@ def executeKickEngine(nav, kickType):
     """
     Method to call BH kick engine.
     """
-    command = player.brain.interface.bodyMotionCommand
+    command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.KICK
     command.kick.type = kickType
-    command.timestamp = int(player.brain.time * 1000)
+    command.timestamp = int(nav.brain.time * 1000)

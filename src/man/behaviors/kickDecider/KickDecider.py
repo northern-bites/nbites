@@ -425,7 +425,7 @@ class KickDecider(object):
         self.scoreKick = self.minimizeOrbitTime
 
         self.filters = []
-        self.filters.append(self.crossesGoalLine)
+        #self.filters.append(self.crossesGoalLine)
 
         self.addShotsOnBackOfGoal()
 

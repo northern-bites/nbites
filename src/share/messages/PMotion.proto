@@ -85,7 +85,7 @@ message Kick
 {
     enum KickType {
     	 kickForwardLeft = 0;
-    	 kickForwardRight = 0;
+    	 kickForwardRight = 1;
     }
     optional KickType type = 2;
 }

@@ -30,7 +30,7 @@ def afterPenalty(player):
         afterPenalty.goalLeft = 0
         afterPenalty.reset_loc = 0
 
-    lines = player.brain.visionLines
+    lines = player.brain.vision
 
     # Do we see the top of the goalbox
     for i in range(0, lines.line_size()):
