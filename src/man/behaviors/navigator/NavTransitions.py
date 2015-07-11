@@ -28,7 +28,9 @@ def obstacleAhead(direction):
 
 def shouldDodge(nav):
     # If nav isn't avoiding things, just no
-    if not states.goToPosition.avoidObstacles:
+    if (not states.goToPosition.avoidObstacles or 
+        (nav.brain.ball.distance < 65 and
+        nav.brain.ball.vis.on)):
         return False
 
     # these will let us know if we didn't have an obstacle detector of this type
@@ -70,8 +72,9 @@ def shouldDodge(nav):
 
 # Check if an obstacle is no longer there, or if we've completed the dodge
 def doneDodging(nav):
-    return (nav.stateTime >= 3.5 and 
-        nav.brain.obstacleDetectors[states.dodge.obstaclePosition] != states.dodge.detectorDodged)
+    return ((nav.stateTime >= 3.5 and 
+        nav.brain.obstacleDetectors[states.dodge.obstaclePosition] != states.dodge.detectorDodged) or
+        nav.brain.ball.distance < 65)
 
 def getDirection(h):
     if (h < helper.constants.ZONE_WIDTH * -7. or

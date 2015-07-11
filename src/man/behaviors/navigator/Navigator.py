@@ -78,8 +78,7 @@ class Navigator(FSA.FSA):
     def run(self):
         if self.dodging and self.currentState != 'dodge':
             self.dodging = False
-            print "just reset dodging"
-
+            
         FSA.FSA.run(self)
 
     def performSweetMove(self, move):
