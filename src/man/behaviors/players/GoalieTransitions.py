@@ -416,11 +416,11 @@ def facingASideline(player):
                 print ("T2", t2)
                 print ("length1:", length1, "length2:", length2)
                 print ("horizon dist:", player.brain.vision.horizon_dist)
-                print ("num corners:", player.brain.visionCorners.corner_size())
+                # print ("num corners:", player.brain.visionCorners.corner_size())
 
-                for k in range(0, player.brain.visionCorners.corner_size()):
-                    c = player.brain.visionCorners
-                    print("x", c.corner(k).x, "y", c.corner(k).y)
+                # for k in range(0, player.brain.visionCorners.corner_size()):
+                #     c = player.brain.visionCorners
+                #     print("x", c.corner(k).x, "y", c.corner(k).y)
 
                 facefrnt = (player.brain.vision.horizon_dist > 600) and \
                 math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 10.0
@@ -604,8 +604,8 @@ def shouldDiveRight(player):
 
     nball = player.brain.naiveBall
 
-    save = (nball.x_vel < -10.0 and
-    # return (ball.mov_vel_x < constants.SAVE_X_VEL and
+    # save = (nball.x_vel < -10.0 and
+    return (ball.mov_vel_x < constants.SAVE_X_VEL and
         not nball.stationary and
         nball.yintercept < -20.0 and
         ball.distance < constants.SAVE_DIST and
@@ -654,8 +654,8 @@ def shouldDiveLeft(player):
 
     # if (nball.x_vel < -10.0 and
 
-    save = (nball.x_vel < -10.0 and
-    # return (ball.mov_vel_x < -9.0 and
+    # save = (nball.x_vel < -10.0 and
+    return (ball.mov_vel_x < -9.0 and
        not nball.stationary and
         nball.yintercept > 20.0 and
         ball.distance < constants.SAVE_DIST and
@@ -704,8 +704,8 @@ def shouldSquat(player):
     # TODO Lower threshold for fast balls
     # if nball.x_vel < -30.0 and abs(nball.yintercept)
 
-    save = (nball.x_vel < -10.0 and
-    # save = (ball.mov_vel_x < -9.0 and
+    # save = (nball.x_vel < -10.0 and
+    save = (ball.mov_vel_x < -9.0 and
         not nball.stationary and
         abs(nball.yintercept) < 25.0 and
         nball.yintercept != 0.0 and

@@ -70,26 +70,26 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.LOW_PRECISION)
             : GoalieStates.watchWithLineChecks,
 
-            Transition.CountTransition(GoalieTransitions.shouldSquat,
-                                       Transition.OCCASIONALLY,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.saveCenter,
+            # Transition.CountTransition(GoalieTransitions.shouldSquat,
+            #                            Transition.OCCASIONALLY,
+            #                            Transition.LOW_PRECISION)
+            # : GoalieStates.saveCenter,
 
-            # No dives -- TESTING DIVES
-            Transition.CountTransition(GoalieTransitions.shouldDiveLeft,
-                                       Transition.OCCASIONALLY,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.saveLeft,
+            # # No dives -- TESTING DIVES
+            # Transition.CountTransition(GoalieTransitions.shouldDiveLeft,
+            #                            Transition.OCCASIONALLY,
+            #                            Transition.LOW_PRECISION)
+            # : GoalieStates.saveLeft,
 
-            Transition.CountTransition(GoalieTransitions.shouldDiveRight,
-                                       Transition.OCCASIONALLY,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.saveRight,
+            # Transition.CountTransition(GoalieTransitions.shouldDiveRight,
+            #                            Transition.OCCASIONALLY,
+            #                            Transition.LOW_PRECISION)
+            # : GoalieStates.saveRight,
 
-            # Transition.CountTransition(GoalieTransitions.shouldClearBall,
-            #                            Transition.SOME_OF_THE_TIME,
-            #                            Transition.OK_PRECISION + 5)
-            # : VisualGoalieStates.clearBall,
+            Transition.CountTransition(GoalieTransitions.shouldClearBall,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION + 5)
+            : VisualGoalieStates.clearBall,
 
 
             # Transition.CountTransition(GoalieTransitions.noTopLine,
@@ -268,21 +268,21 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.LOW_PRECISION)
             : GoalieStates.watch,
 
-            Transition.CountTransition(GoalieTransitions.shouldSquat,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.saveCenter,
+            # Transition.CountTransition(GoalieTransitions.shouldSquat,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.LOW_PRECISION)
+            # : GoalieStates.saveCenter,
 
-            # No dives -- TESTING DIVES
-            Transition.CountTransition(GoalieTransitions.shouldDiveLeft,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.saveLeft,
+            # # No dives -- TESTING DIVES
+            # Transition.CountTransition(GoalieTransitions.shouldDiveLeft,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.LOW_PRECISION)
+            # : GoalieStates.saveLeft,
 
-            Transition.CountTransition(GoalieTransitions.shouldDiveRight,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.saveRight,
+            # Transition.CountTransition(GoalieTransitions.shouldDiveRight,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.LOW_PRECISION)
+            # : GoalieStates.saveRight,
 
             Transition.CountTransition(GoalieTransitions.shouldClearBall,
                                        Transition.SOME_OF_THE_TIME,
