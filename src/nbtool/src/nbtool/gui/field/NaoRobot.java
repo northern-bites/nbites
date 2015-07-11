@@ -145,7 +145,7 @@ public class NaoRobot {
 			walkingToX = (int)tb.dataWorldModel.getWalkingToX();
 			walkingToY = (int)tb.dataWorldModel.getWalkingToY();
 		}
-		/*
+		
 		if(tb.dataWorldModel.getBallOn()) {
 			seeing_ball = true;
 			Point ballCenter = new Point((int)(tb.dataWorldModel.getMyX()+tb.dataWorldModel.getBallDist()
@@ -156,7 +156,7 @@ public class NaoRobot {
 			ballX = ballCenter.x;
 			ballY = ballCenter.y;
 
-		} */
+		}
 	}
 	
 	public void wvSharedBall(TeamBroadcast tb) {
