@@ -48,6 +48,20 @@ def spinSearch(player):
 
 @superState('gameControllerResponder')
 @stay
+def searchAfterFall(player):
+    """
+    goes into this state only if we saw the ball during the last second before the fall
+    """
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+
+    if player.brain.motion.calibrated:
+        return player.goNow('spinSearch')
+    else:
+        return player.stay()
+
+@superState('gameControllerResponder')
+@stay
 @ifSwitchLater(transitions.shouldFindBall, 'findBall')
 def spinToFoundBall(player):
     """

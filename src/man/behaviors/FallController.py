@@ -77,7 +77,7 @@ class FallController():
                 self.standDelay = 0
             
                 if self.sawBall:
-                    return self.brain.player.switchTo('spinSearch')
+                    return self.brain.player.switchTo('searchAfterFall')
                 else:
                     self.brain.player.switchTo(self.brain.player.gameState)
                 
