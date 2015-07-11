@@ -24,11 +24,6 @@ message FieldLine
     optional float wz0 = 7;
 }
 
-message FieldLines
-{
-    repeated FieldLine line = 1;
-}
-
 message Corner
 {
     optional float x = 1;
@@ -40,14 +35,90 @@ message Corner
     optional int32 line2 = 7;
 }
 
-message Corners
-{
-    repeated Corner corner = 1;
-}
-
 message CenterCircle
 {
     optional bool on = 1;
     optional float x = 2;
     optional float y = 3;
+    optional float prob = 4;
+}
+
+message Vision
+{
+    repeated FieldLine line = 1;
+    repeated Corner corner = 2;
+    optional CenterCircle circle = 3;
+    optional VBall ball = 4;
+}
+
+message VBall
+{
+    optional double distance = 1;
+    optional double bearing = 2;
+    optional double angle_x_deg = 3;
+    optional double angle_y_deg = 4;
+    optional double bearing_sd = 5;
+    optional bool inTopCam = 6;
+    optional double radius = 7;
+    optional double confidence = 8;
+    optional bool on = 9;
+    optional sint32 frames_on = 10;
+    optional sint32 frames_off = 11;
+    optional double rel_x_variance = 12;
+    optional double rel_y_variance = 13;
+    optional double bearing_deg = 14;
+    optional sint32 x = 15;
+    optional sint32 y = 16;
+}
+
+// China 2015 hack
+// The protos below should be in a seperate file than Vision.proto, but boost
+// issues made this difficult, should update in future
+
+message FilteredBall
+{
+    optional VBall vis = 1;
+    optional float distance = 2;
+    optional float bearing = 3;
+
+    // State of best filter
+    optional float rel_x = 4;
+    optional float rel_y = 5;
+    optional float vel_x = 6;
+    optional float vel_y = 7;
+    optional float var_rel_x = 8;
+    optional float var_rel_y = 9;
+    optional float var_vel_x = 10;
+    optional float var_vel_y = 11;
+    optional bool  is_stationary = 12;
+    optional float bearing_deg = 13;
+    optional float x = 14;
+    optional float y = 15;
+
+    optional float rel_x_dest = 16;
+    optional float rel_y_dest = 17;
+
+    // For Goalie, know where the ball is going to intersect y-axis
+    optional float speed = 18;
+    optional float rel_y_intersect_dest = 19;
+
+    optional float stat_rel_x = 20;
+    optional float stat_rel_y = 21;
+    optional float stat_distance = 22;
+    optional float stat_bearing = 23;
+    optional float mov_rel_x = 24;
+    optional float mov_rel_y = 25;
+    optional float mov_distance= 26;
+    optional float mov_bearing = 27;
+    optional float mov_vel_x = 28;
+    optional float mov_vel_y = 29;
+    optional float mov_speed = 30;
+}
+
+message SharedBall
+{
+    optional float x = 1;
+    optional float y = 2;
+    optional bool ball_on  = 3;
+    optional int32 reliability = 4;
 }

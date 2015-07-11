@@ -2,6 +2,8 @@ package nbtool.term;
 
 import static nbtool.util.Logger.INFO;
 
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 import javax.swing.SwingUtilities;
@@ -92,34 +94,6 @@ public class NBTool_v7 {
 		});
 
 	}
-
-	static byte[] hash = {
-		105,
-		110,
-		114,
-		103,
-		104,
-		108,
-		103,
-		110,
-		101,
-		101,
-	};
-
-	private static String genHash() {
-		byte[] b2 = new byte[hash.length];
-		for (int i = 0; i < b2.length; ++i) {
-			b2[i] = (byte) (hash[i] + 1);
-		}
-
-		return new String(b2);
-	}
-
-	static {
-		String uname = System.getProperty("user.name");
-		if (uname.equalsIgnoreCase(genHash())) {
-		//if (uname.equalsIgnoreCase("")) {
-			System.exit(42);
-		}
-	}
+	
+	
 }

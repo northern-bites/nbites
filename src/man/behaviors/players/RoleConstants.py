@@ -97,12 +97,6 @@ boxBuffer = 100 # Used for the buffered box when approach ball is potentially
 
 ### HOME POSITIONS
 
-# TODO NEW POSITIONS:
-# Trapezoid of terror (defense)
-#       (150, 250), (460, 200), (150, 490), (460, 540)
-# Triangle of torture (chaser 2)
-#       (680, MID), (865,215), (865, 525)
-
 # Trapezoid of terror (defender positioning)
 oddDefenderForward = RobotLocation(NogginConstants.MIDFIELD_X - 60,
                                     NogginConstants.BLUE_GOALBOX_BOTTOM_Y - 70,
@@ -118,7 +112,7 @@ evenDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
                                 0)
 
 #Tomultuous triangle (odd chaser positioning)
-strikerForward = RobotLocation(NogginConstants.MIDFIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS + 70,
+strikerForward = RobotLocation(NogginConstants.MIDFIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS + 150,
                                 NogginConstants.MIDFIELD_Y,
                                 180)
 strikerBottom = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X,
@@ -166,7 +160,7 @@ oddChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
 oddChaserKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 45,
                                  NogginConstants.OPP_GOALBOX_BOTTOM_Y - 100,
                                  0)
-evenChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
+evenChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS,
                                NogginConstants.CENTER_FIELD_Y,
                                0)
 
@@ -210,7 +204,10 @@ theirKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - \
 #
 # Useful constants can be found in src/share/include/FieldConstants.h
 
-defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X - 70, NogginConstants.FIELD_GREEN_HEIGHT)
+if NogginConstants.V5_ROBOT:
+    defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.FIELD_GREEN_HEIGHT)
+else:
+    defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X - 40, NogginConstants.FIELD_GREEN_HEIGHT)
 
 oddDefenderBoxCautious = ((0, 0), NogginConstants.CENTER_FIELD_X - 70, NogginConstants.CENTER_FIELD_Y)
 
@@ -222,7 +219,7 @@ evenDefenderBox = defenderBox
 
 chaserBox = ((0, 0), NogginConstants.FIELD_WIDTH, NogginConstants.FIELD_HEIGHT)
 
-strikerBox = ((strikerForward.x, 0), (NogginConstants.FIELD_GREEN_WIDTH - strikerForward.x), NogginConstants.FIELD_HEIGHT)
+strikerBox = ((strikerForward.x - 70, 0), (NogginConstants.FIELD_GREEN_WIDTH - strikerForward.x), NogginConstants.FIELD_HEIGHT)
 
 cherryPickerBox = (((0.5*NogginConstants.FIELD_GREEN_WIDTH + 0.25*NogginConstants.FIELD_WHITE_WIDTH), 0),
                     0.25*NogginConstants.FIELD_WHITE_WIDTH + NogginConstants.GREEN_PAD_X, 

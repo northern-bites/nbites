@@ -23,6 +23,11 @@ public final class _File_VisionRobot {
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_VisionObstacle_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_messages_RobotObstacle_descriptor;
+  static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_messages_RobotObstacle_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -52,7 +57,10 @@ public final class _File_VisionRobot {
       "ght\030\006 \001(\021\022\021\n\tleft_dist\030\007 \001(\002\022\020\n\010mid_dist" +
       "\030\010 \001(\002\022\022\n\nright_dist\030\t \001(\002\022\024\n\014left_beari" +
       "ng\030\n \001(\002\022\023\n\013mid_bearing\030\013 \001(\002\022\025\n\rright_b",
-      "earing\030\014 \001(\002B\025B\021_File_VisionRobotP\001"
+      "earing\030\014 \001(\002\"[\n\rRobotObstacle\022\021\n\tclosest" +
+      "_y\030\001 \001(\002\022\022\n\nbox_bottom\030\002 \001(\002\022\020\n\010box_left" +
+      "\030\003 \001(\002\022\021\n\tbox_right\030\004 \001(\002B\025B\021_File_Visio" +
+      "nRobotP\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -84,6 +92,12 @@ public final class _File_VisionRobot {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_VisionObstacle_descriptor,
         new java.lang.String[] { "OnLeft", "OnRight", "OffField", "BlockLeft", "BlockMid", "BlockRight", "LeftDist", "MidDist", "RightDist", "LeftBearing", "MidBearing", "RightBearing", });
+    internal_static_messages_RobotObstacle_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_messages_RobotObstacle_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_RobotObstacle_descriptor,
+        new java.lang.String[] { "ClosestY", "BoxBottom", "BoxLeft", "BoxRight", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -135,6 +135,42 @@ public final class FieldObstacles extends
      * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
      */
     messages.FieldObstacles.Obstacle.ObstacleDetector getDetector();
+
+    /**
+     * <code>optional float closest_y = 4;</code>
+     */
+    boolean hasClosestY();
+    /**
+     * <code>optional float closest_y = 4;</code>
+     */
+    float getClosestY();
+
+    /**
+     * <code>optional float box_bottom = 5;</code>
+     */
+    boolean hasBoxBottom();
+    /**
+     * <code>optional float box_bottom = 5;</code>
+     */
+    float getBoxBottom();
+
+    /**
+     * <code>optional float box_left = 6;</code>
+     */
+    boolean hasBoxLeft();
+    /**
+     * <code>optional float box_left = 6;</code>
+     */
+    float getBoxLeft();
+
+    /**
+     * <code>optional float box_right = 7;</code>
+     */
+    boolean hasBoxRight();
+    /**
+     * <code>optional float box_right = 7;</code>
+     */
+    float getBoxRight();
   }
   /**
    * Protobuf type {@code messages.FieldObstacles.Obstacle}
@@ -213,6 +249,26 @@ public final class FieldObstacles extends
                 bitField0_ |= 0x00000004;
                 detector_ = value;
               }
+              break;
+            }
+            case 37: {
+              bitField0_ |= 0x00000008;
+              closestY_ = input.readFloat();
+              break;
+            }
+            case 45: {
+              bitField0_ |= 0x00000010;
+              boxBottom_ = input.readFloat();
+              break;
+            }
+            case 53: {
+              bitField0_ |= 0x00000020;
+              boxLeft_ = input.readFloat();
+              break;
+            }
+            case 61: {
+              bitField0_ |= 0x00000040;
+              boxRight_ = input.readFloat();
               break;
             }
           }
@@ -545,10 +601,74 @@ public final class FieldObstacles extends
       return detector_;
     }
 
+    public static final int CLOSEST_Y_FIELD_NUMBER = 4;
+    private float closestY_;
+    /**
+     * <code>optional float closest_y = 4;</code>
+     */
+    public boolean hasClosestY() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional float closest_y = 4;</code>
+     */
+    public float getClosestY() {
+      return closestY_;
+    }
+
+    public static final int BOX_BOTTOM_FIELD_NUMBER = 5;
+    private float boxBottom_;
+    /**
+     * <code>optional float box_bottom = 5;</code>
+     */
+    public boolean hasBoxBottom() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional float box_bottom = 5;</code>
+     */
+    public float getBoxBottom() {
+      return boxBottom_;
+    }
+
+    public static final int BOX_LEFT_FIELD_NUMBER = 6;
+    private float boxLeft_;
+    /**
+     * <code>optional float box_left = 6;</code>
+     */
+    public boolean hasBoxLeft() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional float box_left = 6;</code>
+     */
+    public float getBoxLeft() {
+      return boxLeft_;
+    }
+
+    public static final int BOX_RIGHT_FIELD_NUMBER = 7;
+    private float boxRight_;
+    /**
+     * <code>optional float box_right = 7;</code>
+     */
+    public boolean hasBoxRight() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional float box_right = 7;</code>
+     */
+    public float getBoxRight() {
+      return boxRight_;
+    }
+
     private void initFields() {
       position_ = messages.FieldObstacles.Obstacle.ObstaclePosition.NONE;
       distance_ = 0F;
       detector_ = messages.FieldObstacles.Obstacle.ObstacleDetector.NA;
+      closestY_ = 0F;
+      boxBottom_ = 0F;
+      boxLeft_ = 0F;
+      boxRight_ = 0F;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -572,6 +692,18 @@ public final class FieldObstacles extends
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeEnum(3, detector_.getNumber());
       }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeFloat(4, closestY_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeFloat(5, boxBottom_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeFloat(6, boxLeft_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeFloat(7, boxRight_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -592,6 +724,22 @@ public final class FieldObstacles extends
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(3, detector_.getNumber());
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(4, closestY_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(5, boxBottom_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(6, boxLeft_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(7, boxRight_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -716,6 +864,14 @@ public final class FieldObstacles extends
         bitField0_ = (bitField0_ & ~0x00000002);
         detector_ = messages.FieldObstacles.Obstacle.ObstacleDetector.NA;
         bitField0_ = (bitField0_ & ~0x00000004);
+        closestY_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        boxBottom_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        boxLeft_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000020);
+        boxRight_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
 
@@ -756,6 +912,22 @@ public final class FieldObstacles extends
           to_bitField0_ |= 0x00000004;
         }
         result.detector_ = detector_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.closestY_ = closestY_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.boxBottom_ = boxBottom_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.boxLeft_ = boxLeft_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.boxRight_ = boxRight_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -780,6 +952,18 @@ public final class FieldObstacles extends
         }
         if (other.hasDetector()) {
           setDetector(other.getDetector());
+        }
+        if (other.hasClosestY()) {
+          setClosestY(other.getClosestY());
+        }
+        if (other.hasBoxBottom()) {
+          setBoxBottom(other.getBoxBottom());
+        }
+        if (other.hasBoxLeft()) {
+          setBoxLeft(other.getBoxLeft());
+        }
+        if (other.hasBoxRight()) {
+          setBoxRight(other.getBoxRight());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -906,6 +1090,134 @@ public final class FieldObstacles extends
       public Builder clearDetector() {
         bitField0_ = (bitField0_ & ~0x00000004);
         detector_ = messages.FieldObstacles.Obstacle.ObstacleDetector.NA;
+        onChanged();
+        return this;
+      }
+
+      private float closestY_ ;
+      /**
+       * <code>optional float closest_y = 4;</code>
+       */
+      public boolean hasClosestY() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional float closest_y = 4;</code>
+       */
+      public float getClosestY() {
+        return closestY_;
+      }
+      /**
+       * <code>optional float closest_y = 4;</code>
+       */
+      public Builder setClosestY(float value) {
+        bitField0_ |= 0x00000008;
+        closestY_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float closest_y = 4;</code>
+       */
+      public Builder clearClosestY() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        closestY_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float boxBottom_ ;
+      /**
+       * <code>optional float box_bottom = 5;</code>
+       */
+      public boolean hasBoxBottom() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional float box_bottom = 5;</code>
+       */
+      public float getBoxBottom() {
+        return boxBottom_;
+      }
+      /**
+       * <code>optional float box_bottom = 5;</code>
+       */
+      public Builder setBoxBottom(float value) {
+        bitField0_ |= 0x00000010;
+        boxBottom_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float box_bottom = 5;</code>
+       */
+      public Builder clearBoxBottom() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        boxBottom_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float boxLeft_ ;
+      /**
+       * <code>optional float box_left = 6;</code>
+       */
+      public boolean hasBoxLeft() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional float box_left = 6;</code>
+       */
+      public float getBoxLeft() {
+        return boxLeft_;
+      }
+      /**
+       * <code>optional float box_left = 6;</code>
+       */
+      public Builder setBoxLeft(float value) {
+        bitField0_ |= 0x00000020;
+        boxLeft_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float box_left = 6;</code>
+       */
+      public Builder clearBoxLeft() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        boxLeft_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float boxRight_ ;
+      /**
+       * <code>optional float box_right = 7;</code>
+       */
+      public boolean hasBoxRight() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>optional float box_right = 7;</code>
+       */
+      public float getBoxRight() {
+        return boxRight_;
+      }
+      /**
+       * <code>optional float box_right = 7;</code>
+       */
+      public Builder setBoxRight(float value) {
+        bitField0_ |= 0x00000040;
+        boxRight_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float box_right = 7;</code>
+       */
+      public Builder clearBoxRight() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        boxRight_ = 0F;
         onChanged();
         return this;
       }

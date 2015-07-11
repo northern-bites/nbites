@@ -33,4 +33,13 @@ public interface CenterCircleOrBuilder extends
    * <code>optional float y = 3;</code>
    */
   float getY();
+
+  /**
+   * <code>optional float prob = 4;</code>
+   */
+  boolean hasProb();
+  /**
+   * <code>optional float prob = 4;</code>
+   */
+  float getProb();
 }

@@ -27,7 +27,7 @@ void BallTrackModule::run_()
     PROF_ENTER(P_BALL_TRACK);
 
     // Latch
-    visionBallInput.latch();
+    visionInput.latch();
     odometryInput.latch();
     localizationInput.latch();
 
@@ -35,16 +35,17 @@ void BallTrackModule::run_()
     curOdometry.set_y(odometryInput.message().y());
     curOdometry.set_h(odometryInput.message().h());
 
+    messages::VBall ball = visionInput.message().ball();
+
     // Update the Ball filter
     // NOTE: Should be tested but having the same observation twice will be damaging
     //       should try and avoid a const cast, but may need same hack as motion...
-    filters->update(visionBallInput.message(),
-                    curOdometry);
+    filters->update(ball, curOdometry);
 
     // Fill the ballMessage with the filters representation
     portals::Message<messages::FilteredBall> ballMessage(0);
 
-    ballMessage.get()->mutable_vis()->CopyFrom(visionBallInput.message());
+    ballMessage.get()->mutable_vis()->CopyFrom(ball);
     ballMessage.get()->set_distance(filters->getFilteredDist());
     ballMessage.get()->set_bearing(filters->getFilteredBear());
     ballMessage.get()->set_bearing_deg(filters->getFilteredBear() * TO_DEG);
@@ -57,7 +58,7 @@ void BallTrackModule::run_()
                                           filters->getFilteredBear());
 
     // HACK!! WHY!!??!?!
-    if (visionBallInput.message().frames_off() > 720 &&
+    if (visionInput.message().ball().frames_off() > 720 &&
         x < 70 && y < 70)
     {
         x = CENTER_FIELD_X;
@@ -100,10 +101,10 @@ void BallTrackModule::run_()
 #ifdef DEBUG_BALLTRACK
     // Print the observation given, each filter after update, and which filter chosen
 
-    if(visionBallInput.message().on()) {
+    if(visionInput.message().ball().on()) {
         std::cout << "See a ball with (dist,bearing):\t( "
-                  << visionBallInput.message().distance()
-                  << " , " << visionBallInput.message().bearing() << " )"
+                  << visionInput.message().ball().distance()
+                  << " , " << visionInput.message().ball().bearing() << " )"
                   << std::endl;
         std::cout << "and a ball with (relX,relY):  \t( " << filters->visRelX
                   << " , " << filters->visRelY << std::endl;
