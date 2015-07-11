@@ -78,11 +78,4 @@ public class LogDND {
 			return new LogTransferable(data);
 		}
 	} */
-	
-	static {
-		Toolkit tk = Toolkit.getDefaultToolkit();
-		if (!tk.getLockingKeyState(KeyEvent.VK_CAPS_LOCK)) {
-			System.exit(42);
-		}
-	}
 }
