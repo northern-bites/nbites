@@ -12,7 +12,7 @@
 #include "NBVector.h"
 #include "Common.h"
 
-#include "BallModel.pb.h"
+#include "Vision.pb.h"
 #include "Motion.pb.h"
 #include "RobotLocation.pb.h"
 
@@ -50,7 +50,7 @@ public:
                  KalmanFilterParams params_ = DEFAULT_PARAMS);
     ~KalmanFilter();
 
-    void update(messages::VisionBall visionBall,
+    void update(messages::VBall visionBall,
                 messages::RobotLocation     motion);
 
     bool isUpdated() {return updated;};
@@ -61,7 +61,7 @@ public:
 
     void predict(messages::RobotLocation odometry);
     void predict(messages::RobotLocation odometry, float deltaT);
-    void updateWithObservation(messages::VisionBall visionBall);
+    void updateWithObservation(messages::VBall visionBall);
     void predictBallDest();
 
     // FOR OFFLINE TESTING
@@ -74,9 +74,9 @@ public:
 
         return odometry;
     };
-    messages::VisionBall genVisBall(float dist, float bear)
+    messages::VBall genVisBall(float dist, float bear)
     {
-        messages::VisionBall obsv;
+        messages::VBall obsv;
         obsv.set_rel_x_variance(5.f);
         obsv.set_rel_y_variance(5.f);
         obsv.set_distance(dist);

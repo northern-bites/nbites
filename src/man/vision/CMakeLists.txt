@@ -9,12 +9,14 @@ SET( VISION_SRCS
   VisionModule.cpp
   Edge.cpp
   FastBlob.cpp
+  Field.cpp
   FrontEnd.cpp
   Kinematics.cpp
   Homography.cpp
   Hough.cpp
   Vision.cpp
   BallDetector.cpp
+  RobotObstacle.cpp
   )
 
 IF (UNIX AND NOT APPLE)

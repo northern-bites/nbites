@@ -109,6 +109,14 @@ public class GeoLine {
 					break;
 			case 8: g2.setColor(Color.pink); //left side line (top)
 					break;
+			case 9: g2.setColor(Color.yellow); //our right goalbox
+					break;
+			case 10: g2.setColor(Color.green); //our left goalbox
+					 break;
+			case 11: g2.setColor(Color.white); //their right goalbox
+					 break;
+			case 12: g2.setColor(Color.darkGray); //their left goalbox
+					 break;
 		}
 
         g2.drawLine(x1,(int)FieldConstants.FIELD_HEIGHT-y1,x2,(int)FieldConstants.FIELD_HEIGHT-y2);

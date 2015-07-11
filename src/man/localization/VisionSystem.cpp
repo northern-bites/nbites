@@ -22,8 +22,7 @@ VisionSystem::~VisionSystem()
 }
 
 bool VisionSystem::update(ParticleSet& particles,
-                          const messages::FieldLines& lines,
-                          const messages::Corners& corners,
+                          const messages::Vision& vision,
                           const messages::FilteredBall* ball,
                           const messages::RobotLocation& lastEstimate)
 {
@@ -32,14 +31,17 @@ bool VisionSystem::update(ParticleSet& particles,
 
     // HACK until systematic error in homography is gone for large azimuth,
     //      do not score balls with abs(bearing) > PI / 4
-    bool useBall = (ball != NULL) && (fabs(vision::sMod(ball->bearing(), 2 * PI)) < M_PI / 4);
+    bool useBall = (ball != NULL) && ball->vis().on() && (fabs(vision::sMod(ball->bearing(), 2 * PI)) < M_PI / 4);
 
     // Count observations
-    for (int i = 0; i < lines.line_size(); i++) {
-        if (!LineSystem::shouldUse(lines.line(i)))
-            continue;
-        numObservations++;
+    for (int i = 0; i < vision.line_size(); i++) {
+        if (!LineSystem::shouldUse(vision.line(i), lastEstimate))
+            numObservations++;
     }
+    for (int i = 0; i < vision.corner_size(); i++)
+        numObservations++;
+    if (vision.circle().on())
+        numObservations++;
     if (useBall)
         numObservations++;
 
@@ -55,11 +57,19 @@ bool VisionSystem::update(ParticleSet& particles,
         float curParticleError = 1;
 
         // Score particle from line observations
-        for (int i = 0; i < lines.line_size(); i++) {
-            if (!LineSystem::shouldUse(lines.line(i)))
+        for (int i = 0; i < vision.line_size(); i++) {
+            if (!LineSystem::shouldUse(vision.line(i), lastEstimate))
                 continue;
-            curParticleError = curParticleError*lineSystem->scoreLine(lines.line(i), particle->getLocation());
+            curParticleError = curParticleError*lineSystem->scoreLine(vision.line(i), particle->getLocation());
         }
+
+        // Score particle from corner observations
+        for (int i = 0; i < vision.corner_size(); i++)
+            curParticleError = curParticleError*landmarkSystem->scoreCorner(vision.corner(i), particle->getLocation());
+
+        // Score particle from center circle if on
+        if (vision.circle().on())
+            curParticleError = curParticleError*landmarkSystem->scoreCircle(vision.circle(), particle->getLocation());
 
         // Score particle from ball observation if in game set
         if (useBall)
@@ -80,70 +90,10 @@ bool VisionSystem::update(ParticleSet& particles,
     avgError = totalWeight / static_cast<float>(particles.size());
 
     // Particle injections
-    // (1) Reconstruct pose from top goalbox
     injections.clear();
-    for (int i = 0; i < lines.line_size(); i++) {
-        const messages::FieldLine& field = lines.line(i);
 
-        // If found top goalbox
-        if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
-            const messages::HoughLine& inner = field.inner();
-            LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirTopGoalbox : LocLineID::OurTopGoalbox);
-
-            // Rotate line to loc rel robot coordinate system 
-            vision::GeoLine line;
-            line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
-
-            // Based on corners
-            for (int j = 0; j < corners.corner_size(); j++) {
-                const messages::Corner& corner = corners.corner(j);
-
-                // Project corner onto line, find distance parallel to line from origin
-                double distParallel = line.qDist(corner.x(), corner.y());
-
-                // If found convex corner attached to top goalbox, inject particles
-                if (corner.id() == static_cast<int>(vision::CornerID::Convex) && 
-                    (corner.line1() == field.index() || corner.line2() == field.index())) {
-                    // Recover x and heading from top goalbox line
-                    messages::RobotLocation pose = lineSystem->reconstructWoEndpoints(id, field);
-
-                    // Recover y from corner
-                    double cornerAbsX, cornerAbsY;
-                    vision::translateRotate(corner.x(), corner.y(), 0, 0, pose.h(), cornerAbsX, cornerAbsY);
-
-                    // Right or left convex goalbox corner
-                    if (fabs(distParallel - inner.ep1()) > fabs(distParallel - inner.ep0())) {
-                        if (id == LocLineID::OurTopGoalbox)
-                            pose.set_y(BLUE_GOALBOX_BOTTOM_Y - cornerAbsY);
-                        else
-                            pose.set_y(YELLOW_GOALBOX_TOP_Y - cornerAbsY);
-                    } else {
-                        if (id == LocLineID::OurTopGoalbox)
-                            pose.set_y(BLUE_GOALBOX_TOP_Y - cornerAbsY);
-                        else
-                            pose.set_y(YELLOW_GOALBOX_BOTTOM_Y - cornerAbsY);
-                    }
-
-                    // Inject if reconstucted location is on field
-                    ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 2, 0.01);
-                    if (reconstructed.onField())
-                        injections.push_back(reconstructed);
-                }
-            }
-
-            // Based on midpoint of top goalbox
-            // NOTE only valid if line is sufficiently long, otherwise too much
-            //      error in the y direction
-            if (inner.ep1() - inner.ep0() > 200) {
-                messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(id, field);
-                ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 3, 0.01);
-                injections.push_back(reconstructed);
-            }
-        }
-    }
-
-    // (2) Reconstruct pose from ball in set
-    if (useBall) {
+    // (1) Reconstruct pose from ball in set
+    if (useBall && ball->vis().frames_on() > 5) {
         messages::FieldLine midline;
         double minDist = std::numeric_limits<double>::max();
 
@@ -152,8 +102,8 @@ bool VisionSystem::update(ParticleSet& particles,
         vision::polarToCartesian(ball->distance(), ball->bearing(), ballRelX, ballRelY);
 
         // Find line that is closest to the ball, should be midline since in set
-        for (int i = 0; i < lines.line_size(); i++) {
-            const messages::FieldLine& field = lines.line(i);
+        for (int i = 0; i < vision.line_size(); i++) {
+            const messages::FieldLine& field = vision.line(i);
             const messages::HoughLine& inner = field.inner();
 
             // Rotate line to loc rel robot coordinate system 
@@ -188,6 +138,115 @@ bool VisionSystem::update(ParticleSet& particles,
             else if (reconstructed.onField())
                 injections.push_back(reconstructed);
         }
+    // China 2015 hack
+    // Don't inject off of any features but ball in set
+    } else if (ball != NULL) {
+        // (2) Reconstruct pose from top goalbox
+        for (int i = 0; i < vision.line_size(); i++) {
+            const messages::FieldLine& field = vision.line(i);
+
+            // If found top goalbox
+            if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
+                const messages::HoughLine& inner = field.inner();
+                LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirTopGoalbox : LocLineID::OurTopGoalbox);
+
+                // Rotate line to loc rel robot coordinate system 
+                vision::GeoLine line;
+                line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
+
+                // Based on corners
+                for (int j = 0; j < vision.corner_size(); j++) {
+                    const messages::Corner& corner = vision.corner(j);
+
+                    // Project corner onto line, find distance parallel to line from origin
+                    double distParallel = line.qDist(corner.x(), corner.y());
+
+                    // If found convex corner attached to top goalbox, inject particles
+                    if (corner.id() == static_cast<int>(vision::CornerID::Convex) && 
+                        (corner.line1() == field.index() || corner.line2() == field.index())) {
+                        // Recover x and heading from top goalbox line
+                        messages::RobotLocation pose = lineSystem->reconstructWoEndpoints(id, field);
+
+                        // Recover y from corner
+                        double cornerAbsX, cornerAbsY;
+                        vision::translateRotate(corner.x(), corner.y(), 0, 0, pose.h(), cornerAbsX, cornerAbsY);
+
+                        // Right or left convex goalbox corner
+                        if (fabs(distParallel - inner.ep1()) > fabs(distParallel - inner.ep0())) {
+                            if (id == LocLineID::OurTopGoalbox)
+                                pose.set_y(BLUE_GOALBOX_BOTTOM_Y - cornerAbsY);
+                            else
+                                pose.set_y(YELLOW_GOALBOX_TOP_Y - cornerAbsY);
+                        } else {
+                            if (id == LocLineID::OurTopGoalbox)
+                                pose.set_y(BLUE_GOALBOX_TOP_Y - cornerAbsY);
+                            else
+                                pose.set_y(YELLOW_GOALBOX_BOTTOM_Y - cornerAbsY);
+                        }
+
+                        // Inject if reconstucted location is on field
+                        ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 2, 0.01);
+                        if (reconstructed.onField())
+                            injections.push_back(reconstructed);
+                    }
+                }
+
+                // Based on midpoint of top goalbox
+                // NOTE only valid if line is sufficiently long, otherwise too much
+                //      error in the y direction
+                if (inner.ep1() - inner.ep0() > 200) {
+                    messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(id, field);
+                    ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 3, 0.01);
+                    injections.push_back(reconstructed);
+                }
+            }
+        }
+
+        // (3) Reconstruct pose from center circle
+        // TODO check for midline classification
+    //     if (vision.circle().on()) {
+    //         messages::FieldLine midline;
+    //         double minDist = std::numeric_limits<double>::max();
+
+    //         // Find line that is closest to the circle, should be midline
+    //         for (int i = 0; i < vision.line_size(); i++) {
+    //             const messages::FieldLine& field = vision.line(i);
+    //             const messages::HoughLine& inner = field.inner();
+
+    //             // Create GeoLine
+    //             vision::GeoLine line;
+    //             line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
+
+    //             // Project ball onto line, find distance to line
+    //             double distToLine = fabs(line.pDist(vision.circle().x(), vision.circle().y()));
+
+    //             // Check for min distance
+    //             if (minDist > distToLine) {
+    //                 midline = field;
+    //                 minDist = distToLine;
+    //             }
+    //         }
+
+    //         // If sufficiently close, found the midline, reconstruct location
+    //         if (minDist < 60) {
+    //             // Get appropriate line id
+    //             LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirMidline : LocLineID::OurMidline);
+
+    //             // Recontruct x and h from midline and y from center circle
+    //             messages::RobotLocation fromLine = lineSystem->reconstructWoEndpoints(id, midline);
+    //             messages::RobotLocation fromLineAndCircle = fromLine;
+
+    //             // Rotate to absolute coordinate system
+    //             double circleAbsX, circleAbsY;
+    //             vision::translateRotate(vision.circle().x(), vision.circle().y(), 0, 0, fromLine.h(), circleAbsX, circleAbsY);
+    //             fromLineAndCircle.set_y(CENTER_FIELD_Y - circleAbsY);
+
+    //             // Add injection and return
+    //             ReconstructedLocation reconstructed(fromLineAndCircle.x(), fromLineAndCircle.y(), fromLineAndCircle.h(), 1, 1, 0.01);
+    //             if (reconstructed.onField())
+    //                 injections.push_back(reconstructed);
+    //         }
+    //     }
     }
 
     // Weights were adjusted so return true

@@ -55,12 +55,15 @@ def chaser(player):
     or cherry picker is calling them off. Chasers position further away up field if
     a defender is calling them off.
     """
+    if role.isStriker(player.roleOfClaimer):
+        return striker(player)
+
     if role.isDefender(player.roleOfClaimer):
         if player.brain.ball.y >= player.brain.loc.y:
-            return RobotLocation(player.brain.ball.x + 200,
+            return RobotLocation(player.brain.ball.x + 250,
                                  player.brain.ball.y - CHASER_DISTANCE,
                                  player.brain.ball.bearing_deg + player.brain.loc.h)
-        return RobotLocation(player.brain.ball.x + 200,
+        return RobotLocation(player.brain.ball.x + 250,
                              player.brain.ball.y + CHASER_DISTANCE,
                              player.brain.ball.bearing_deg + player.brain.loc.h)
     else:
@@ -78,14 +81,14 @@ def chaser(player):
                                  player.brain.ball.bearing_deg + player.brain.loc.h)
 
         supportPostitions = [southEast,southWest,northEast,northWest]
-        positionsFilteredByInBounds = [position for position in supportPostitions if inBounds(position)]
+        positionsFilteredByInBounds = [position for position in supportPostitions if (inBounds(position) and notBlockingGoal(position))]
         if len(positionsFilteredByInBounds) > 0:
             return min(positionsFilteredByInBounds, key=distanceToPosition(player))
         
         # print "no in bounds position"
         return southEast
 
-CHASER_DISTANCE = 60
+CHASER_DISTANCE = 100
 
 def cherryPicker(player):
     """
@@ -102,6 +105,9 @@ def inBounds(position):
             position.x <= NogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X and
             position.y >= NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y and
             position.y <= NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y)
+
+def notBlockingGoal(position):
+    return position.x < NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X
 
 def distanceToPosition(player):
     def distToPositionHelper(position):

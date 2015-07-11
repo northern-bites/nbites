@@ -99,9 +99,6 @@ class HeadTracker(FSA.FSA):
     def repeatFastNarrowPan(self):
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN_NARROW_FAST)
 
-    def performBasicPan(self):
-        self.performHeadMove(HeadMoves.FIXED_PITCH_PAN)
-
     # @param invert: false if pan should start to the left,
     #                true if pan should start to the right
     def performKickPan(self, invert = False):
@@ -178,6 +175,13 @@ class HeadTracker(FSA.FSA):
         self.target = self.brain.ball
         self.kickName = name
         self.switchTo('afterKickScan')
+
+    def trackObstacle(self, direction):
+        """
+        Track visual obstacle so we can dodge accordingly
+        """
+        self.obstacleDir = direction
+        self.switchTo('trackObstacle')
 
     # Not currently used, but would be good functionality to have in the future.
     # TODO: add this functionality back in

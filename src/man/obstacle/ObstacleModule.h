@@ -88,25 +88,19 @@ class ObstacleModule : public portals::Module
     // How do we divide up the directions of the robot's field of vision?
     static const float ZONE_WIDTH = (3.14159f) / (2.f * 4.f); //4 dir per pi
     // How far away should we consider something to be an obstacle?
-    static const float VISION_MAX_DIST = 150.f; // 1.5 meters
+    static const float VISION_MAX_DIST = 55.f; // .55 meters
     // How many frames do we consider in our average of obstacle distances?
     static const unsigned int VISION_FRAMES_TO_BUFFER = 20;
     // After we see an obstacle, how long should we say it's still there?
     // We say the time it takes to do a full pan: 3-4 seconds
-    static const int VISION_FRAMES_TO_HAVE_OBSTACLE = 30;
-
-    // How do we want to detect the obstacles?
-    static const bool USING_VISION = false;
-    static const bool USING_ARMS = false;
-    static const bool USING_SONARS = true;
+    static const int VISION_FRAMES_TO_HAVE_OBSTACLE = 90;
 
 
 public:
     ObstacleModule(std::string filepath, std::string robotName);
 
     portals::InPortal<messages::ArmContactState> armContactIn;
-    portals::InPortal<messages::VisionObstacle> visionIn;
-    // We don't trust sonars right now! So we won't actually use them.
+    portals::InPortal<messages::RobotObstacle> visionIn;
     portals::InPortal<messages::SonarState> sonarIn;
 
     portals::OutPortal<messages::FieldObstacles> obstacleOut;
@@ -115,7 +109,7 @@ protected:
     virtual void run_();
 
     // Makes a decision based on vision
-    void processVision(float distance, float bearing);
+    void processVision(const messages::RobotObstacle& input);
 
     // Makes a decision based on arm contact
     messages::FieldObstacles::Obstacle::ObstaclePosition
@@ -126,11 +120,7 @@ protected:
     processSonar(const messages::SonarState& input);
 
     void updateVisionBuffer(messages::FieldObstacles::Obstacle::ObstaclePosition pos,
-                            std::list<float> dists,
-                            float distance);
-
-    // Updates how long we've held
-    void updateObstacleBuffer();
+                            const messages::RobotObstacle& input);
 
     // Updates vision buffer with info from last frame of vision
     void updateObstacleArrays(messages::FieldObstacles::Obstacle::ObstacleDetector detector,
@@ -155,13 +145,6 @@ private:
     // Sonar value buffers
     std::list<float> rightSonars, leftSonars;
 
-    // Vision buffers for all directions robot can see
-    std::list<float> SWDists, WDists, NWDists, NDists, NEDists, EDists, SEDists;
-    // std::list<float> WBearings, NWBearings, NBearings, NEBearings, EBearings;
-
-    // Global buffer that is updated every frame to show all obstacles
-    int obstacleBuffer[NUM_DIRECTIONS];
-
     // Global array that keeps avg distance of obstacle in given direction
     float obstacleDistances[NUM_DIRECTIONS];
 
@@ -172,6 +155,9 @@ private:
     // Keeps a list of the obstacle message type locations
     messages::FieldObstacles::Obstacle::ObstaclePosition
     obstaclesList[NUM_DIRECTIONS];
+
+    // Vision obstacle box, first index holds direction
+    float obstacleBox[5];
 };
 
 }
