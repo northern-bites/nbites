@@ -47,7 +47,7 @@ static const ParticleFilterParams DEFAULT_PARAMS =
     0.01f,                      // Exponential filter slow
     0.5f,                       // Variance in x-y odometry
     0.008f,                     // Variance in h odometry
-    0.8f                        // Lost threshold
+    0.05f                       // Learned slow exponential filter value
 };
 
 /**

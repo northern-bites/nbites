@@ -73,14 +73,6 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
         wSlow = wSlow + parameters.alphaSlow*(wAvg - wSlow);
         wFast = wFast + parameters.alphaFast*(wAvg - wFast);
 
-        // Ad hoc method to determine if lost based on exponential filters
-        // NOTE if set, behaviors may change action of robot to recover localization
-        // NOTE not currently used
-        if (wFast < parameters.lostThreshold)
-            lost = true;
-        else
-            lost = false;
-
         resample(ballInput != NULL);
     }
 
@@ -470,12 +462,14 @@ void ParticleFilter::resample(bool inSet)
     // NOTE we only consider injecting particles if vision system found 
     //      suitable observations
     } else {
+        int ni = 0;
         for(int i = 0; i < parameters.numParticles; ++i) {
             double randInjectOrSample = gen();
-            if (injections.size() && randInjectOrSample < std::max<double>(0, 1.0 - (wFast / wSlow))) {
+            if (injections.size() && randInjectOrSample < std::max<double>(0, 1.0 - (wFast / parameters.learnedSlowExponential))) {
                 // Inject particles according to sensor measurements
                 ReconstructedLocation injection = injections[rand() % injections.size()];
                 messages::RobotLocation sample = injection.sample();
+                ni++;
 
                 Particle reconstructedParticle(sample.x(), sample.y(), sample.h(), 1/250);
                 newParticles.push_back(reconstructedParticle);
@@ -489,7 +483,11 @@ void ParticleFilter::resample(bool inSet)
                     newParticles.push_back(cdf.upper_bound(randSample)->second);
             }
         }
+        std::cout << "WSLOW: " << wSlow << std::endl;
+        std::cout << "WFAST: " << wFast << std::endl;
+        std::cout << "NUMBERS OF INJECTIONS: " << ni << std::endl;
     }
+
 
     // Update particles
     particles = newParticles;

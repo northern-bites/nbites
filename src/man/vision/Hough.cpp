@@ -756,7 +756,7 @@ void FieldLineList::classify(GoalboxDetector& boxDetector,
     }
 
     // Set midline and adjust CC, or discard CC if no close line
-    if (fabs(minDist) < 30) {
+    if (fabs(minDist) < 40) {
       midline->id(LineID::Midline);
       midlineFound = true;
       circleDetector.adjustCC(-minDist * cos(midHoughInner->field().t()),
