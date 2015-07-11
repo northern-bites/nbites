@@ -446,8 +446,8 @@ def saveCenter(player):
         player.brain.tracker.lookToAngle(0)
         if SAVING:
             player.executeMove(SweetMoves.GOALIE_SQUAT)
-        else:
-            player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
+        # else:
+        #     player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
 
     if player.counter > 80:
         if SAVING:
@@ -476,8 +476,8 @@ def saveRight(player):
         if SAVING and DIVING:
             player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
             player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
-        else:
-            player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
+        # else:
+        #     player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
 
     if player.counter > 80:
         if SAVING and DIVING:
@@ -496,8 +496,8 @@ def saveLeft(player):
         if SAVING and DIVING:
             player.executeMove(SweetMoves.GOALIE_DIVE_LEFT)
             player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
-        else:
-            player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
+        # else:
+        #     player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
 
     if player.counter > 80:
         if SAVING and DIVING:

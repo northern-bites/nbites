@@ -604,25 +604,27 @@ def shouldDiveRight(player):
 
     nball = player.brain.naiveBall
 
-    # if (nball.x_vel < -10.0 and
-    if (ball.mov_vel_x < -10.0 and
+    save = (nball.x_vel < -10.0 and
+    # return (ball.mov_vel_x < constants.SAVE_X_VEL and
         not nball.stationary and
         nball.yintercept < -20.0 and
-        ball.distance < 140.0 and
-        sightOk):
+        ball.distance < constants.SAVE_DIST and
+        sightOk)
+
+    if save:
         print "DIVE RIGHT"
         print("Ball dist:", ball.distance)
         print("shouldDiveRight.lastFramesOff:", shouldDiveRight.lastFramesOff)
         print("ball.vis.frames_on", ball.vis.frames_on)
         print("nb xvel:", nball.x_vel)
         print("ball mov vel:", ball.mov_vel_x)
+        if math.fabs(ball.mov_vel_x) < 5:
+            nb = player.brain.naiveBall
+            for i in range(0, nb.position_size()):
+                print("Position", i, ":: x: ", nb.position(i).x, "y: ", nb.position(i).y)
 
-    return (nball.x_vel < -10.0 and
-    # return (ball.mov_vel_x < constants.SAVE_X_VEL and
-        not nball.stationary and
-        nball.yintercept < -20.0 and
-        ball.distance < constants.SAVE_DIST and
-        sightOk)
+
+    return save
 
     # return (ball.mov_vel_x < -6.0 and
     #         ball.mov_speed > 8.0 and
@@ -647,24 +649,27 @@ def shouldDiveLeft(player):
     nball = player.brain.naiveBall
 
     # if (nball.x_vel < -10.0 and
-    if (ball.mov_vel_x < constants.SAVE_X_VEL and
-        not nball.stationary and
+
+    save = (nball.x_vel < -10.0 and
+    # return (ball.mov_vel_x < -9.0 and
+       not nball.stationary and
         nball.yintercept > 20.0 and
-        ball.distance < 140.0 and
-        sightOk):
+        ball.distance < constants.SAVE_DIST and
+        sightOk)
+
+    if save:
         print "DIVE LEFT"
         print("Ball dist:", ball.distance)
         print("shouldDiveRight.lastFramesOff:", shouldDiveRight.lastFramesOff)
         print("ball.vis.frames_on", ball.vis.frames_on)
         print("nb xvel:", nball.x_vel)
         print("ball mov vel:", ball.mov_vel_x)
+        if math.fabs(ball.mov_vel_x) < 5:
+            nb = player.brain.naiveBall
+            for i in range(0, nb.position_size()):
+                print("Position", i, ":: x: ", nb.position(i).x, "y: ", nb.position(i).y)
 
-    return (nball.x_vel < -10.0 and
-    # return (ball.mov_vel_x < -9.0 and
-       not nball.stationary and
-        nball.yintercept > 20.0 and
-        ball.distance < constants.SAVE_DIST and
-        sightOk)
+    return save
 
     # return (ball.mov_vel_x < -6.0 and
     #         ball.mov_speed > 8.0 and
@@ -688,40 +693,40 @@ def shouldSquat(player):
 
     nball = player.brain.naiveBall
 
-    if (nball.x_vel < -10.0 and
-    # if (ball.mov_vel_x < constants.SAVE_X_VEL and
+    # TODO Lower threshold for fast balls
+    # if nball.x_vel < -30.0 and abs(nball.yintercept)
+
+    save = (nball.x_vel < -10.0 and
+    # save = (ball.mov_vel_x < -9.0 and
         not nball.stationary and
         abs(nball.yintercept) < 25.0 and
         nball.yintercept != 0.0 and
-        ball.distance < constants.SAVE_DIST and
-        sightOk):
+        ball.distance < 150.0 and
+        sightOk)
+
+     # More sensitive to close balls even at lower speeds
+    if ball.distance < 50.0 and ball.mov_vel_x < -6.0 and nball.yintercept != 0.0\
+    and math.fabs(nball.yintercept) < 30.0:
+        print("ball exceptionally close and somewhat fast, I'm saving")
+        save = True
+
+    if ball.distance < 40.0 and ball.mov_vel_x < -2.0:
+        print("ball exceptionally close, I'm saving")
+        save = True
+
+    if save:
         print "SQUAT"
         print("Ball dist:", ball.distance)
         print("shouldDiveRight.lastFramesOff:", shouldDiveRight.lastFramesOff)
         print("ball.vis.frames_on", ball.vis.frames_on)
         print("nb xvel:", nball.x_vel)
         print("ball mov vel:", ball.mov_vel_x)
+        if math.fabs(ball.mov_vel_x) < 5:
+            nb = player.brain.naiveBall
+            for i in range(0, nb.position_size()):
+                print("Position", i, ":: x: ", nb.position(i).x, "y: ", nb.position(i).y)
 
-    # TODO Lower threshold for fast balls
-    # if nball.x_vel < -30.0 and abs(nball.yintercept)
-
-    # More sensitive to close balls even at lower speeds
-    if ball.distance < 50.0 and ball.mov_vel_x < -6.0 and nball.yintercept != 0.0\
-    and abs(nball.yintercept) < 30.0:
-        print("ball exceptionally close, I'm saving")
-        return True
-
-    if ball.distance < 40.0 and ball.mov_vel_x < -2.0:
-        print("ball exceptionally close, I'm saving")
-        return True
-
-    # return (nball.x_vel < -10.0 and
-    return (ball.mov_vel_x < -9.0 and
-        not nball.stationary and
-        abs(nball.yintercept) < 25.0 and
-        nball.yintercept != 0.0 and
-        ball.distance < 150.0 and
-        sightOk)
+    return save
 
     # return (ball.mov_vel_x < -4.0 and
     #         ball.mov_speed > 8.0 and
