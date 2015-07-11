@@ -372,6 +372,8 @@ void VisionModule::outportalVisionField()
         vb->set_y(static_cast<int>(best.blob.centerY()));
     }
 
+    visionField.set_horizon_dist(field->horizonDist());
+
     // Send
     portals::Message<messages::Vision> visionOutMessage(&visionField);
     visionOut.setMessage(visionOutMessage);

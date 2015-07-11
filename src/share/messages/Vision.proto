@@ -44,6 +44,7 @@ message Vision
     repeated Corner corner = 2;
     optional CenterCircle circle = 3;
     optional VBall ball = 4;
+    optional int32 horizon_dist = 5;
 }
 
 message VBall

@@ -14,7 +14,7 @@ from objects import RelRobotLocation
 def getCorners(player):
     corners = player.brain.visionCorners
 
-    # print ("horizon dist:", player.brain.visionLines.horizon_dist)
+    # print ("horizon dist:", player.brain.vision.horizon_dist)
     # print ("num corners:", player.brain.visionCorners.corner_size())
 
     # for k in range(0, player.brain.visionCorners.corner_size()):
@@ -82,7 +82,7 @@ def frontLineCheckShouldReposition(player):
     return False
 
 def facingBackward(player):
-    if player.brain.visionLines.horizon_dist < 200.0 and\
+    if player.brain.vision.horizon_dist < 200.0 and\
     math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 15.0:
         print("I'm FACing backWARDS! yaw:", math.degrees(player.brain.interface.joints.head_yaw))
         player.homeDirections = []
@@ -131,20 +131,20 @@ def seeGoalbox(player):
                 h = 0
             print("Backline r:", r, "t:", t)
             print("mx:", mx, "my", my, "h", h)
-            print("horizon", player.brain.visionLines.horizon_dist)
+            print("horizon", player.brain.vision.horizon_dist)
             player.homeDirections += [RelRobotLocation(mx, my, h)]
             return True
 
     return False
 
 def facingSideways(player):
-    if player.brain.visionLines.horizon_dist > 200 and\
-    player.brain.visionLines.horizon_dist < 600 and\
+    if player.brain.vision.horizon_dist > 200 and\
+    player.brain.vision.horizon_dist < 600 and\
     math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 10.0:
         print("I'm FACing sideways! yaw:", math.degrees(player.brain.interface.joints.head_yaw))
         player.homeDirections += [RelRobotLocation(0, 0, 180.0)]
         player.homeDirections = player.homeDirections[1:]
-        print("horizon", player.brain.visionLines.horizon_dist)
+        print("horizon", player.brain.vision.horizon_dist)
         if player.brain.loc.h < 180.0:
             # Facing left
             player.homeDirections = []
@@ -161,10 +161,10 @@ def facingSideways(player):
     return False
 
 def facingFront(player):
-    if math.fabs(player.brain.visionLines.horizon_dist - 1000) < 200 and\
+    if math.fabs(player.brain.vision.horizon_dist - 1000) < 200 and\
     math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 10.0:
         print("I think im facingFront yaw:", math.degrees(player.brain.interface.joints.head_yaw))
-        print("horizon dist:",player.brain.visionLines.horizon_dist )
+        print("horizon dist:",player.brain.vision.horizon_dist )
         return True
     return False
 
@@ -317,7 +317,7 @@ def shouldGoForward(player):
             and r != 0.0 and r2 != 0.0:
                 print "I'm seeing two lines, I should go forward"
                 print ("r1: ", r, "r2: ", r2, " t1: ", t, "t2: ", t2)
-                print("horizon", player.brain.visionLines.horizon_dist)
+                print("horizon", player.brain.vision.horizon_dist)
                 player.homeDirections = []
                 player.homeDirections += [RelRobotLocation(25.0, 0.0, 0.0)]
                 return True
@@ -438,14 +438,14 @@ def facingASideline(player):
                 print ("T", t1)
                 print ("T2", t2)
                 print ("length1:", length1, "length2:", length2)
-                print ("horizon dist:", player.brain.visionLines.horizon_dist)
+                print ("horizon dist:", player.brain.vision.horizon_dist)
                 print ("num corners:", player.brain.visionCorners.corner_size())
 
                 for k in range(0, player.brain.visionCorners.corner_size()):
                     c = player.brain.visionCorners
                     print("x", c.corner(k).x, "y", c.corner(k).y)
 
-                facefrnt = (player.brain.visionLines.horizon_dist > 600) and \
+                facefrnt = (player.brain.vision.horizon_dist > 600) and \
                 math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 10.0
                 print("Facing front: ", facefrnt)
 
@@ -545,7 +545,7 @@ def shouldStopTurning(player):
 
 def seeFrontLine(player):
     lines = player.brain.visionLines
-    horizon = player.brain.visionLines.horizon_dist
+    horizon = player.brain.vision.horizon_dist
 
     for i in range(0, lines.line_size()):
         r = lines.line(i).inner.r
