@@ -69,10 +69,12 @@ def prepareForKick(player):
             player.shouldKickOff = False
             player.kick = player.decider.kicksBeforeBallIsFree()
         else:
-            if roleConstants.isDefender(player.role):
-                player.kick = player.decider.defender()
-            else:
-                player.kick = player.decider.attacker()
+        #player.shouldKickOff = False
+        #if roleConstants.isDefender(player.role):
+        #    player.kick = player.decider.defender()
+        #else:
+        #    player.kick = player.decider.attacker()
+            player.kick = player.decider.decidingStrategy()
         player.inKickingState = True
 
     elif player.finishedPlay:
@@ -285,9 +287,9 @@ def positionForKick(player):
         player.brain.tracker.lookStraightThenTrack()
 
         if player.kick == kicks.M_LEFT_SIDE or player.kick == kicks.M_RIGHT_SIDE:
-            positionForKick.speed = Navigator.SLOW_SPEED
+            positionForKick.speed = Navigator.GRADUAL_SPEED
         else:
-            positionForKick.speed = Navigator.MEDIUM_SPEED
+            positionForKick.speed = Navigator.BRISK_SPEED
 
         player.brain.nav.destinationWalkTo(positionForKick.kickPose, 
                                             positionForKick.speed)

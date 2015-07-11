@@ -31,6 +31,9 @@ LandmarkSystem::LandmarkSystem()
     addCorner(vision::CornerID::T, LandmarkID::TheirRightT, GREEN_PAD_X + FIELD_WHITE_WIDTH, BLUE_GOALBOX_BOTTOM_Y);
     addCorner(vision::CornerID::T, LandmarkID::TheirLeftT, GREEN_PAD_X + FIELD_WHITE_WIDTH, BLUE_GOALBOX_TOP_Y);
 
+    // Add center circle to map
+    circle = std::make_tuple(LandmarkID::CenterCircle, CENTER_FIELD_X, CENTER_FIELD_Y);
+
     // Add ball in set to map
     ballInSet = std::make_tuple(LandmarkID::BallInSet, CENTER_FIELD_X, CENTER_FIELD_Y);
 }
@@ -76,8 +79,19 @@ double LandmarkSystem::scoreCorner(const messages::Corner& observation,
 
     // Find correspondence and calculate probability of match
     Landmark correspondingLandmark = matchCorner(observation, loc);
-    return scoreObservation(obsvAsRobotLocation, correspondingLandmark, loc, true);
-    // NOTE for corners, only bearing is used to score particles
+    return scoreObservation(obsvAsRobotLocation, correspondingLandmark, loc);
+}
+
+double LandmarkSystem::scoreCircle(const messages::CenterCircle& observation, 
+                                   const messages::RobotLocation& loc)
+{
+    // Turn observation into RobotLocation so scoreObservation can operate on it
+    messages::RobotLocation obsvAsRobotLocation;
+    obsvAsRobotLocation.set_x(observation.x());
+    obsvAsRobotLocation.set_y(observation.y());
+
+    // Calculate probability of match
+    return scoreObservation(obsvAsRobotLocation, circle, loc);
 }
 
 double LandmarkSystem::scoreBallInSet(const messages::FilteredBall& observation, 
@@ -155,6 +169,8 @@ double LandmarkSystem::scoreObservation(const messages::RobotLocation& observati
     }
 
     // Make the conditional independence assumption
+    if (onlyBearing)
+        return tProb;
     return rProb * tProb;
 }
 

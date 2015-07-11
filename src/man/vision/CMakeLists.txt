@@ -9,6 +9,7 @@ SET( VISION_SRCS
   VisionModule.cpp
   Edge.cpp
   FastBlob.cpp
+  Field.cpp
   FrontEnd.cpp
   Kinematics.cpp
   Homography.cpp

@@ -11,6 +11,7 @@
 #include "Vision.h"
 #include "Edge.h"
 #include "Homography.h"
+#include "Field.h"
 
 #include <list>
 #include <vector>
@@ -253,45 +254,62 @@ public:
 };
 
 // Dectects center circle
-// class CirclePoint;
-// class Cluster;
-
-class CenterCircleDetector {
+class CenterCircleDetector
+{
   double _ccx;
   double _ccy;
-  
-  std::vector<Point> calculatePotentials(EdgeList& edges);
+  bool _on;
 
-  // For debugging
+  // For debugging (retreived by nbfunc)
   std::vector<Point> _potentials;
 
+
   // Parameters
-  int hardCap;                    // Min number of potential edges
+  int minPotentials;              // Min number of potential edges
   double maxEdgeDistanceSquared;  // Max considered distance of an edge
   double ccr;                     // Center circle radius
-  int binWidth;                   // In centimeters
-  int binCount;                   // Bins per row and col
   double minVotesInMaxBin;        // Ratio of potentials required in the most populated bin
-
+  double fieldTestDistance;       // Distance of projected points to check on-fieldness
+  
   void set();
-  bool getMaxBin(std::vector<Point> vec, double& x0, double& y0);
+  bool findPotentialsAndCluster(EdgeList& edges, double& x0, double& y0);
+  bool getMaxBin(const std::vector<Point>& vec, double& x0, double& y0);
+  bool onField(Field& field);
   inline int roundDown(int v) { return binWidth*(v/binWidth); }
+
+  enum ccconst
+  {
+    /*
+      binCount MUST BE EVEN
+      binCount*binWidth MUST EQUAL maxEdgeDistance
+     */
+    binCount = 20,    // Bins per row and col
+    binWidth = 25,    // In centimeters
+  };
 
 public:
   CenterCircleDetector();
-  bool detectCenterCircle(EdgeList& edges);
-  std::vector<Point> getPotentials() { return _potentials; }
-  
+  bool detectCenterCircle(EdgeList& edges, Field& field);
+
   double x() { return _ccx; }
   double y() { return _ccy; }
+  bool on() { return _on; }
+
+  void on(bool on) { _on = on; }
+  void adjustCC(double x, double y);
+
+#ifdef OFFLINE
+  std::vector<Point> getPotentials() { return _potentials; }
+#endif
 };
 
 enum class LineID {
   // Most general
   Line,
 
-  // Two possibilities
+  // Multiple possibilities
   EndlineOrSideline,
+  EndlineSidelineTopGoalboxOrSideGoalbox,
   TopGoalboxOrSideGoalbox,
   SideGoalboxOrMidline,
   
@@ -369,7 +387,7 @@ public:
   void find(HoughLineList&, bool blackStar = false);
 
   // Classify field lines
-  void classify(GoalboxDetector& boxDetector, CornerDetector& cornerDetector);
+  void classify(GoalboxDetector&, CornerDetector&, CenterCircleDetector&);
 
   // Calibrate tilt if possible.
   bool tiltCalibrate(FieldHomography&, std::string* message = 0);
