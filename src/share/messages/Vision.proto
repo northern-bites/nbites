@@ -132,4 +132,12 @@ message NaiveBall {
     repeated Position dest_buffer = 5;
     optional float x_vel = 6;
     optional float y_vel = 7;
+
+    optional float start_avg_x = 8;
+    optional float start_avg_y = 9;
+    optional float end_avg_x = 10;
+    optional float end_avg_y = 11;
+    optional float avg_start_index = 12;
+    optional float avg_end_index = 13;
+    optional float denom = 14;
 }

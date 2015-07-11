@@ -34,6 +34,16 @@ NaiveBallModule::NaiveBallModule() :
     bufferFull = false;
     velBufferFull = false;
     yIntercept = 0.f;
+
+
+    // DEFINITELY REMOVE
+    startAvgX = 0.f;
+    startAvgY = 0.f;
+    endAvgX = 0.f;
+    endAvgY = 0.f;
+    avgStartIndex = 0.f;
+    avgEndIndex = 0.f;
+    denom = 0.f;
 }
 
 NaiveBallModule::~NaiveBallModule()
@@ -83,6 +93,13 @@ void NaiveBallModule::run_()
             temp->set_x(dest_buffer[i].rel_x);
             temp->set_y(dest_buffer[i].rel_y);
         }
+        naiveBallMessage.get()->set_start_avg_x(startAvgX);
+        naiveBallMessage.get()->set_start_avg_y(startAvgY);
+        naiveBallMessage.get()->set_end_avg_x(endAvgX);
+        naiveBallMessage.get()->set_end_avg_y(endAvgY);
+        naiveBallMessage.get()->set_avg_start_index(avgStartIndex);
+        naiveBallMessage.get()->set_avg_end_index(avgEndIndex);
+        naiveBallMessage.get()->set_denom(denom);
     }
 
     if (checkIfStationary() == true || stationaryOffFrameCount < STATIONARY_CHECK) {
@@ -181,6 +198,14 @@ void NaiveBallModule::calculateVelocity()
 
     float dist = calcSumSquaresSQRT((xVelocityEst), (yVelocityEst));
     velocityEst = (dist / denominator) * ALPHA + velocityEst * (1-ALPHA);
+
+    startAvgX = start_avgs.rel_x;
+    startAvgY = start_avgs.rel_y;
+    endAvgX = end_avgs.rel_x;
+    endAvgY = end_avgs.rel_y;
+    avgStartIndex = startIndex;
+    avgEndIndex = endIndex;
+    denom = denominator;
 }
 
 void NaiveBallModule::calcPath()

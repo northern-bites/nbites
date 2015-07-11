@@ -620,6 +620,10 @@ def shouldDiveRight(player):
         print("ball mov vel:", ball.mov_vel_x)
         if math.fabs(ball.mov_vel_x) < 5:
             nb = player.brain.naiveBall
+            print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
+            print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
+            print("avgStartIndex:", nb.avg_start_index, "end:", nb.avg_end_index)
+            print("denom:", nb.denom)
             for i in range(0, nb.position_size()):
                 print("Position", i, ":: x: ", nb.position(i).x, "y: ", nb.position(i).y)
 
@@ -666,6 +670,10 @@ def shouldDiveLeft(player):
         print("ball mov vel:", ball.mov_vel_x)
         if math.fabs(ball.mov_vel_x) < 5:
             nb = player.brain.naiveBall
+            print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
+            print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
+            print("avgStartIndex:", nb.avg_start_index, "end:", nb.avg_end_index)
+            print("denom:", nb.denom)
             for i in range(0, nb.position_size()):
                 print("Position", i, ":: x: ", nb.position(i).x, "y: ", nb.position(i).y)
 
@@ -723,6 +731,10 @@ def shouldSquat(player):
         print("ball mov vel:", ball.mov_vel_x)
         if math.fabs(ball.mov_vel_x) < 5:
             nb = player.brain.naiveBall
+            print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
+            print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
+            print("avgStartIndex:", nb.avg_start_index, "end:", nb.avg_end_index)
+            print("denom:", nb.denom)
             for i in range(0, nb.position_size()):
                 print("Position", i, ":: x: ", nb.position(i).x, "y: ", nb.position(i).y)
 
