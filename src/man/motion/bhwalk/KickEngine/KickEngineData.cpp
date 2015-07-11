@@ -627,7 +627,6 @@ void KickEngineData::ModifyData(const KickRequest& br, JointRequestBH& kickEngin
   PLOT("module:KickEngine:bodyErrory", toDegrees(bodyError.y));
 
 #ifndef RELEASE
-  std::cout << "MODIFYING THE HARDNESS DATA!!!!!!!" << std::endl;
   for(int i = 0; i < Phase::numOfLimbs; i++)
   {
     int hardness = 100;

@@ -373,8 +373,7 @@ void MotionModule::processMotionInput()
         else if (bodyCommandInput_.message().type() ==
                  messages::MotionCommand::KICK)
         {
-            //std::cout << "KICK REQUESTED from BEHAVIORS" << std::endl;
-            sendMotionCommand(bodyCommandInput_.message().kick(), bodyCommandInput_.message().timestamp());
+              sendMotionCommand(bodyCommandInput_.message().kick(), bodyCommandInput_.message().timestamp());
         }
         else if (bodyCommandInput_.message().type() ==
                  messages::MotionCommand::SCRIPTED_MOVE)

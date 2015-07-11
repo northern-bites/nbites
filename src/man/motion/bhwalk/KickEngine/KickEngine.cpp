@@ -236,6 +236,9 @@ void KickEngine::update(KickEngineOutput& kickEngineOutput)
       {
         kickEngineOutput.isLeavingPossible = true;
         data.internalIsLeavingPossible = true;
+        // Kinda a hack. This value *SHOULD* change next frame since the kick is over
+        // but we immediately stop running the engine once a kick is over.
+        theMotionSelectionBH.ratios[MotionRequestBH::kick] = 0.f;
       }
 
       //  if(data.isMotionAlmostOver()) //last three phases are unstable

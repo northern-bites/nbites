@@ -127,14 +127,12 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     if (walkingEngine->currentMotionType == 0 && tryingToWalk &&
         walkingEngine->instability.getAverageFloat() > 20.f && calibrated())
     {
-        std::cout << "We are stuck! Recalibrating." << std::endl;
         walkingEngine->inertiaSensorCalibrator->reset();
         walkingEngine->instability.init();
     }
     assert(JointDataBH::numOfJoints == Kinematics::NUM_JOINTS);
 
     if (standby) {
-        //std::cout << "In standby" << std::endl;
         tryingToWalk = false;
 
         MotionRequestBH motionRequest;
@@ -152,7 +150,6 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     } else {
     // TODO VERY UGLY -- refactor this please
     if (requestedToStop || !isActive()) {
-        //std::cout << "RequestedToStop" << std::endl;
         tryingToWalk = false;
 
         MotionRequestBH motionRequest;
@@ -169,13 +166,11 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         // If we're not calibrated, wait until we are calibrated to walk
         if (!calibrated())
         {
-            //std::cout << "Calibrating" << std::endl;
             MotionRequestBH motionRequest;
             motionRequest.motion = MotionRequestBH::stand;
 
             walkingEngine->theMotionRequestBH = motionRequest;
         } else if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP) {
-            //std::cout << "trying to walk via step" << std::endl;
             tryingToWalk = true;
 
             StepCommand::ptr command = boost::shared_static_cast<StepCommand>(currentCommand);
@@ -210,7 +205,6 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
         } else {
         if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK) {
-            //std::cout << "WALK" << std::endl;
             tryingToWalk = true;
 
             WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
@@ -227,7 +221,6 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             walkingEngine->theMotionRequestBH = motionRequest;
         } else {
         if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
-            //std::cout << "DESTINATION" << std::endl;
             tryingToWalk = true;
 
             DestinationCommand::ptr command = boost::shared_static_cast<DestinationCommand>(currentCommand);
@@ -276,7 +269,9 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
             // Only set kicking to true once
             if (kickCommand->timeStamp != kickIndex) {
+                std::cout << "Sent" << std::endl;
                 kickIndex = kickCommand->timeStamp;
+                kickOut = KickEngineOutput();
                 kicking = true;
             }
             else if (!kicking) { // Ignore the command if we've finished kicking
@@ -287,7 +282,6 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         }
         //TODO make special command for stand
         if (!currentCommand.get()) {
-            //std::cout << "Standing" << std::endl;
             tryingToWalk = false;
 
             MotionRequestBH motionRequest;
@@ -341,6 +335,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     const int* hardness = NULL;
 
     if (kicking) {
+        std::cout << "Requested to kick" << std::endl;
         MotionRequestBH motionRequest;
         motionRequest.motion = MotionRequestBH::kick;
         if (kickCommand->kickType == 0) {

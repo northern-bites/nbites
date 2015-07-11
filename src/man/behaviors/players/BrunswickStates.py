@@ -56,6 +56,7 @@ def gameReady(player):
         command.type = command.CommandType.KICK
         command.kick.type = PMotion_proto.messages.Kick.kickForward
         command.timestamp = int(player.brain.time * 1000)
+        player.boolean = True
 
         player.brain.tracker.repeatWidePan()
         player.timeReadyBegan = player.brain.time
@@ -66,6 +67,9 @@ def gameReady(player):
             player.wasPenalized = False
             return player.goNow('afterPenalty')
 
+    elif player.boolean:
+        player.boolean = False
+        player.brain.nav.stand()
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
         return player.stay()
