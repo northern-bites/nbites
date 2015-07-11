@@ -1,4 +1,4 @@
-package nbtool.gui.logviews.sound;
+package nbtool.gui.logviews.sound2;
 
 import java.awt.BorderLayout;
 
@@ -13,41 +13,49 @@ import nbtool.data.Log;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.util.Logger;
 
-public class SoundFreqView extends ViewParent {
-	SoundBuffer buffer = null;
+public class SndFreqView extends ViewParent {
+
+	ShortBuffer sb = null;
 	
 	@Override
 	public void setLog(Log newlog) {
-		this.buffer = new SoundBuffer(newlog);
+		this.sb = new ShortBuffer();
+		sb.parse(newlog);
 		
-		double[] ls = buffer.left();
+		double[] ls = new double[sb.frames];
+		for (int i = 0; i < ls.length; ++i)
+			ls[i] = sb.left(i);
+		
 		FastFourierTransformer trans = new FastFourierTransformer(DftNormalization.STANDARD);
 		Complex[] out = trans.transform(ls, TransformType.FORWARD);		
 		
-		Double[] magn = new Double[buffer.left.length];
-		Double[] zero = new Double[buffer.left.length];
+		final Double[] magn = new Double[ls.length];
 		
 		double max = Double.NEGATIVE_INFINITY;
 		for (int i = 0; i < out.length; ++i) {
 			magn[i] = out[i].abs();
 			if (magn[i] > max)
-				max = magn[i];
-			zero[i] = 0d;
-			
-			//Logger.println("" + magn[i]);
+				max = magn[i];			
 		}
 		final double MAX = max;
-		SoundPane<Double> sp = new SoundPane<>(magn, zero, new SoundPane.Scaler<Double>() {
-			@Override
-			public int pixelsFor(Double val, int pixels) {
-				return (int) ( (val / MAX) * pixels);
-			}
-		});
 		
-		this.add(new JLabel("max=" + MAX), BorderLayout.NORTH);
+		SoundPane sp = new SoundPane(1, sb.frames) {
+
+			@Override
+			public int pixels(int c, int f, int radius) {
+				return (int) ((magn[f] / MAX) * radius);
+			}
+
+			@Override
+			public String peakString() {
+				return "max = " + MAX;
+			}
+			
+		};
+		
 		this.add(sp, BorderLayout.CENTER);
 	}
-	public SoundFreqView() {
+	public SndFreqView() {
 		super();
 		this.setLayout(new BorderLayout());
 	}
