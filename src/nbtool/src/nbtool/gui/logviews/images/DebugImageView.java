@@ -94,7 +94,7 @@ public class DebugImageView extends ViewParent
 
 	static int currentBottom;  // track current selection
 	static boolean firstLoad = true;
-	boolean newLog = true;
+	boolean newLogLoaded = true;
 
 	boolean parametersNeedSetting = false;
 	static PersistantStuff persistant;
@@ -110,13 +110,9 @@ public class DebugImageView extends ViewParent
 		add(viewList);
         this.addMouseListener(new DistanceGetter());
 
-		// for now do not bother trying to save params across instances
-		for (int i = 0; i < NUMBER_OF_PARAMS; i++) {
-			displayParams[i] = 0;
-		}
 		// default image to display - save across instances
 		if (firstLoad) {
-			persistant = new PersistantStuff();
+			persistant = new PersistantStuff(this);
 			for (int i = 0; i < NUMBER_OF_PARAMS; i++) {
 				displayParams[i] = 0;
 			}
@@ -125,6 +121,9 @@ public class DebugImageView extends ViewParent
 			currentBottom = ORIGINAL;
 		} else {
 			System.out.println("Reloading");
+			newLogLoaded = true;
+			persistant.setParent(this);
+			//adjustParams();
 		}
 		add(persistant);
     }
@@ -172,7 +171,7 @@ public class DebugImageView extends ViewParent
     public void adjustParams() {
 
         // Don't make an extra initial call
-        if (newLog) {
+        if (newLogLoaded) {
 			System.out.println("Skipping parameter adjustments");
             return;
 		}
@@ -196,7 +195,7 @@ public class DebugImageView extends ViewParent
         }
 
         rerunLog();
-		repaint();
+		//repaint();
     }
 
 
@@ -209,14 +208,6 @@ public class DebugImageView extends ViewParent
 			g.drawImage(displayImages[currentBottom], 0, displayh + 5, displayw,
 						displayh, null);
 			viewList.setBounds(0, displayh * 2 + 10, displayw / 2, BOX_HEIGHT);
-			//greenThreshold.setBounds(0, displayh*2 + 15 + BOX_HEIGHT,
-			//						 displayw / 2, BOX_HEIGHT * 2);
-			// TODO: figure out how to make this consistently display
-			// The problem has to do with repaint and the fact that Java
-			// treats it as a low priority request. Sometimes it will just
-			// take its sweet time because it doesn't think anything has changed
-			//checkBoxPanel.setBounds(displayw+10, 0, displayw, displayh);
-			//checkBoxPanel.show();
 			persistant.setBounds(displayw+10, 0, 400, 300);
         }
     }
@@ -430,8 +421,10 @@ public class DebugImageView extends ViewParent
 		int thresh = 128;
 		boolean displayFieldLines;
 		boolean drawAllBalls;
+		DebugImageView parent;
 
-		PersistantStuff() {
+		PersistantStuff(DebugImageView p) {
+			parent = p;
 			// set up slider
 			greenThreshold = new JSlider(JSlider.HORIZONTAL, 128, 200, thresh);
 			greenThreshold.addChangeListener(this);
@@ -479,12 +472,18 @@ public class DebugImageView extends ViewParent
 			setSize(300, 300);
 		}
 
+		public void setParent(DebugImageView p) {
+			parent = p;
+		}
+
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider)e.getSource();
 			if (!source.getValueIsAdjusting()) {
 				thresh = (int)source.getValue();
 				System.out.println("New value is "+thresh);
 			}
+			parent.adjustParams();
+			parent.repaint();
 		}
 
 		public void itemStateChanged(ItemEvent e) {
@@ -507,13 +506,14 @@ public class DebugImageView extends ViewParent
 			}
 			// flip the value of the parameter checked
 			if (index >= 0) {
-				if (displayParams[index] == 0) {
-					displayParams[index] = 1;
+				if (parent.displayParams[index] == 0) {
+					parent.displayParams[index] = 1;
 				} else {
-					displayParams[index] = 0;
+					parent.displayParams[index] = 0;
 				}
 			}
-			repaint();
+			parent.adjustParams();
+			parent.repaint();
 		}
 
 
@@ -594,7 +594,10 @@ public class DebugImageView extends ViewParent
 									   displayImages[ORIGINAL]);
         debugImageDisplay = debugImage.toBufferedImage();
 
-		newLog = false;
+		if (newLogLoaded) {
+			newLogLoaded = false;
+			adjustParams();
+		}
 
         repaint();
 
