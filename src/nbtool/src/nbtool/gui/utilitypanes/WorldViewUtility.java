@@ -78,6 +78,11 @@ public class WorldViewUtility extends UtilityParent {
 					if (index >= 0 && index < robots.length) {
 						robots[tb.dataTeamPacket.getPlayerNumber()-1] = new NaoRobot();
 						robots[tb.dataTeamPacket.getPlayerNumber()-1].wvNao(tb);
+						//shared ball defunct for now
+						/*
+						if(index == 3 || index == 4) {
+							robots[tb.dataTeamPacket.getPlayerNumber()-1].wvSharedBall(tb);
+						} */
 						fieldDisplay.repaint();
 					} else {
 						Logger.warnf("WorldView got packet from correct team with OOB player: %d", 

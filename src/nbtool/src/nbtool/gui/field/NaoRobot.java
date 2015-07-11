@@ -13,12 +13,13 @@ public class NaoRobot {
 	private final static float naoRobotSize = 15.f;
 	private final static int playerNumberOffset = 10;
 	double halfViewAngle = Math.toRadians(31);
-	protected int walkingToX, walkingToY, playerNumber, ballX, ballY;
+	protected int walkingToX, walkingToY, playerNumber, ballX, ballY, sharedBallX, sharedBallY;
 	public float x,y,h, radius, xDist, yDist,kickDestX, kickDestY;
 	public boolean shouldFlip_; 
 	public boolean in_kicking_state = false; 
 	public boolean seeing_ball = false;
 	public boolean fallen = false;
+	public boolean sharedBall = false;
 	protected Color naoColor;
 	float TO_RAD = (float) (Math.PI/180);
 
@@ -112,6 +113,13 @@ public class NaoRobot {
 			g2.drawString(Integer.toString(playerNumber), ballX+1, ballY-1);	
 		}
 		
+		//where is my shared ball | only for player 4&5: chasers
+		g2.setColor(new Color(204,0,100));
+		if(sharedBall) {
+			g2.fill(new Ellipse2D.Double(sharedBallX-4, sharedBallY-4,8,8));
+			g2.drawString(Integer.toString(playerNumber), sharedBallX, sharedBallY);
+		}
+		
 	}
 	
 	public void wvNao(TeamBroadcast tb) {
@@ -137,7 +145,7 @@ public class NaoRobot {
 			walkingToX = (int)tb.dataWorldModel.getWalkingToX();
 			walkingToY = (int)tb.dataWorldModel.getWalkingToY();
 		}
-		
+		/*
 		if(tb.dataWorldModel.getBallOn()) {
 			seeing_ball = true;
 			Point ballCenter = new Point((int)(tb.dataWorldModel.getMyX()+tb.dataWorldModel.getBallDist()
@@ -148,7 +156,23 @@ public class NaoRobot {
 			ballX = ballCenter.x;
 			ballY = ballCenter.y;
 
-		}
+		} */
+	}
+	
+	public void wvSharedBall(TeamBroadcast tb) {
+		sharedBall = true;
+		float sinHB, cosHB;
+		
+		float hb = TO_RAD*h+TO_RAD*tb.dataWorldModel.getBallBearing();
+		sinHB = (float) Math.sin(hb);
+		cosHB = (float) Math.cos(hb);
+			
+		float newBallX = x + tb.dataWorldModel.getBallDist()*cosHB;
+		float newBallY = y + tb.dataWorldModel.getBallDist()*sinHB;
+			
+		sharedBallX = (int) newBallX;
+		sharedBallY = (int) newBallY;
+
 	}
 
 	public void moveTo(float xCoord, float yCoord, float heading) {
