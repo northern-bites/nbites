@@ -8,6 +8,7 @@ from ..util import *
 from .. import SweetMoves
 from . import RoleConstants as roleConstants
 import KickOffConstants as kickOff
+import PMotion_proto
 
 ### NORMAL PLAY ###
 @superState('gameControllerResponder')
@@ -49,7 +50,13 @@ def gameReady(player):
     if player.firstFrame():
         player.inKickingState = False
         player.brain.fallController.enabled = True
-        player.brain.nav.stand()
+        #player.brain.nav.stand()
+
+        command = player.brain.interface.bodyMotionCommand
+        command.type = command.CommandType.KICK
+        command.kick.type = PMotion_proto.messages.Kick.kickForward
+        command.timestamp = int(player.brain.time * 1000)
+
         player.brain.tracker.repeatWidePan()
         player.timeReadyBegan = player.brain.time
         if player.lastDiffState == 'gameInitial':
@@ -62,7 +69,7 @@ def gameReady(player):
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
         return player.stay()
-
+    return player.stay()
     return player.goNow('positionReady')
 
 @superState('gameControllerResponder')

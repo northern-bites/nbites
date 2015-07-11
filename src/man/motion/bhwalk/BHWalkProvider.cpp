@@ -59,7 +59,7 @@ static const JointDataBH::Joint nb_joint_order[] = {
 };
 
 BHWalkProvider::BHWalkProvider()
-    : MotionProvider(WALK_PROVIDER), requestedToStop(false), tryingToWalk(false), kicking(true)
+    : MotionProvider(WALK_PROVIDER), requestedToStop(false), tryingToWalk(false), kicking(false)
 {
 	// Setup Walk Engine Configuation Parameters
 	ModuleBase::config_path = common::paths::NAO_CONFIG_DIR;
@@ -118,10 +118,6 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     const messages::FSR&           sensorFSRs
     ) 
 {
-    BHWalkProvider::frameCount++;
-
-
-
     PROF_ENTER(P_WALK);
 
     // If our calibration became bad (as decided by the walkingEngine,
@@ -135,7 +131,6 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         walkingEngine->inertiaSensorCalibrator->reset();
         walkingEngine->instability.init();
     }
-
     assert(JointDataBH::numOfJoints == Kinematics::NUM_JOINTS);
 
     if (standby) {
@@ -274,6 +269,22 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
             walkingEngine->theMotionRequestBH = motionRequest;
         }
+        else if(currentCommand.get() && currentCommand->getType() == MotionConstants::KICK)
+        {
+            std::cout << "Kick Command" << std::endl;
+            kickCommand = boost::shared_static_cast<KickCommand>(currentCommand);
+
+            // Only set kicking to true once
+            if (kickCommand->timeStamp != kickIndex) {
+                kickIndex = kickCommand->timeStamp;
+                kicking = true;
+            }
+            else if (!kicking) { // Ignore the command if we've finished kicking
+                std::cout << "!kicking" << std::endl;
+                stand();
+            }
+
+        }
         //TODO make special command for stand
         if (!currentCommand.get()) {
             //std::cout << "Standing" << std::endl;
@@ -329,29 +340,36 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     const float* angles = NULL;
     const int* hardness = NULL;
 
-    if (BHWalkProvider::frameCount > 400 && kicking) {
+    if (kicking) {
         MotionRequestBH motionRequest;
         motionRequest.motion = MotionRequestBH::kick;
-        motionRequest.kickRequest.kickMotionType = KickRequest::getKickMotionFromName("kickForward");
+        if (kickCommand->kickType == 0) {
+            motionRequest.kickRequest.kickMotionType = KickRequest::getKickMotionFromName("kickForward");
+        }
+        else {
+            std::cout << "Kick unknown to BHWalkProvider requested. Defaulting." << std::endl;
+            motionRequest.kickRequest.kickMotionType = KickRequest::getKickMotionFromName("kickForward");
+        }
+
+        walkingEngine->theMotionRequestBH = motionRequest;
+        kickEngine->theMotionRequestBH = motionRequest;
 
         WalkingEngineStandOutputBH standout;
-        walkingEngine->theMotionRequestBH = motionRequest;
+
         walkingEngine->update(walkOutput);
         walkingEngine->update(standout);
 
-        kickEngine->theMotionRequestBH = motionRequest;
-        kickEngine->theWalkingEngineStandOutputBH = standout;
 
+        kickEngine->theWalkingEngineStandOutputBH = standout;
         kickEngine->update(kickOut);
+
         angles = (kickOut.angles);
         // Kick Engine doesn't seem to be setting stiffnesses..
         hardness = (ON_STIFF_ARRAY);
         if (kickOut.isLeavingPossible) {
-            //std::cout << "DONE" << std::endl;
-            // walkingEngine->theMotionRequestBH.motion = MotionRequestBH::stand;
-            // walkingEngine->update(output);
+            kicking = false;
+            stand();
         }
-        kicking = !kickOut.isLeavingPossible;
     }
     else {
         walkingEngine->update(walkOutput);
@@ -472,6 +490,12 @@ void BHWalkProvider::setCommand(const StepCommand::ptr command) {
 
 void BHWalkProvider::setCommand(const DestinationCommand::ptr command) {
 
+    currentCommand = command;
+
+    active();
+}
+
+void BHWalkProvider::setCommand(const KickCommand::ptr command) {
     currentCommand = command;
 
     active();
