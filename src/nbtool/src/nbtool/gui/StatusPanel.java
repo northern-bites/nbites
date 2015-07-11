@@ -53,7 +53,7 @@ public class StatusPanel extends JPanel implements Events.ControlStatus, Events.
 		canvas.setLayout(null);
 		
 		Font msf = new Font("monospaced", Font.PLAIN, 14);
-		Font sf = new Font("monospaced", Font.PLAIN, 12);
+		Font sf  = new Font("monospaced", Font.PLAIN, 12);
 		Font bsf = msf.deriveFont(Font.BOLD, 15);
 		
 		serv = new JLabel("[serv]");

@@ -23,16 +23,17 @@ public class UtilityManager {
 	public static final YUVColorUtility YUVColorUtility = new YUVColorUtility();
 	public static final ThreadStateUtility ThreadStateUtility = new ThreadStateUtility();
 	public static final ReplayUtility ReplayUtility = new ReplayUtility();
-	
-	public static final SyntheticSndUtility SyntheticSndUtility = new SyntheticSndUtility();
-		
+			
 	public static final SyntheticImageUtility SyntheticImageUtility = new SyntheticImageUtility();
-	//public static final CameraCalibrateUtility CameraCalibrateUtility = new CameraCalibrateUtility();
 	public static final CameraCalibrateUtility2 CameraCalibrateUtility2 = new CameraCalibrateUtility2();
 	
-	//public static final MultiStreamUtility MultiStreamUtility = new MultiStreamUtility();
 	
 	public static final WorldViewUtility WorldViewUtility = new WorldViewUtility();
+	
+	//Unused at the moment – comment out to re-enable.
+	//public static final MultiStreamUtility MultiStreamUtility = new MultiStreamUtility();
+	//public static final CameraCalibrateUtility CameraCalibrateUtility = new CameraCalibrateUtility();
+	//public static final SyntheticSndUtility SyntheticSndUtility = new SyntheticSndUtility();
 
 	public static final UtilityParent[] utilities = findUtilityFields();
 
