@@ -212,7 +212,7 @@ string Corner::print() const
 
 GoalboxDetector::GoalboxDetector()
   : std::pair<FieldLine*, FieldLine*>(NULL, NULL), 
-    parallelThreshold_(15), seperationThreshold_(20), lengthThreshold_(70)
+    parallelThreshold_(15), seperationThreshold_(20), lengthThreshold_(0)
 {}
 
 bool GoalboxDetector::find(FieldLineList& list)
