@@ -7,6 +7,7 @@ from ..navigator import Navigator as nav
 from ..util import *
 #import goalie
 from GoalieConstants import RIGHT, LEFT, UNKNOWN
+import GoalieConstants as constants
 import GoalieTransitions
 from objects import RelRobotLocation, RelLocation, Location, RobotLocation
 from noggin_constants import (LINE_CROSS_OFFSET, GOALBOX_DEPTH, GOALBOX_WIDTH,
@@ -142,6 +143,10 @@ def clearIt(player):
 
     return Transition.getNextState(player, clearIt)
 
+
+
+
+
 @superState('gameControllerResponder')
 def didIKickIt(player):
     if player.firstFrame():
@@ -151,19 +156,67 @@ def didIKickIt(player):
 @superState('gameControllerResponder')
 def spinToFaceBall(player):
     if player.firstFrame():
-        player.brain.tracker.trackBall
-        print("ball at ", player.brain.ball.bearing_deg)
-        facingDest = RelRobotLocation(0.0, 0.0, 0.0)
+        player.brain.tracker.trackBall()
+        # print("ball at ", player.brain.ball.bearing_deg)
+        # facingDest = RelRobotLocation(0.0, 0.0, 0.0)
 
-        facingDest.relH = player.brain.ball.bearing_deg
-        GoalieStates.spinBack.toAngle = player.brain.ball.bearing_deg
+        # facingDest.relH = player.brain.ball.bearing_deg
+        # GoalieStates.spinBack.toAngle = player.brain.ball.bearing_deg
 
-        player.brain.nav.walkTo(facingDest)
+        # player.brain.nav.walkTo(facingDest)
 
-    if player.counter > 250:
-        return player.goLater('clearIt')
+    # if player.counter > 250:
+    #     return player.goLater('clearIt')
 
-    return Transition.getNextState(player, spinToFaceBall)
+    # return Transition.getNextState(player, spinToFaceBall)
+
+@superState('gameControllerResponder')
+def clearBall(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        clearBall.startDist = player.brain.ball.distance
+
+    if player.brain.ball.distance < constants.POSITION_FOR_KICK_DIST:
+        print "Now positioning for kick"
+        return player.goNow('positionForGoalieKick')
+    elif player.brain.ball.distance < constants.SLOW_DOWN_DIST:
+        print "Slowing down"
+        player.brain.nav.chaseBall(nav.MEDIUM_SPEED, fast = True)
+    else:
+        print "approaching ball"
+        player.brain.nav.chaseBall(nav.FAST_SPEED, fast = True)
+
+    return player.stay()
+
+@superState('gameControllerResponder')
+def positionForGoalieKick(player):
+    if player.firstFrame():
+        player.brain.tracker.lookStraightThenTrack()
+        if clearIt.ballSide == RIGHT:
+            player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
+        else:
+            player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
+        ball = player.brain.ball
+        positionForGoalieKick.kickPose = RelRobotLocation(ball.rel_x - player.kick.setupX,
+                                    ball.rel_y - player.kick.setupY,
+                                    0)
+        positionForGoalieKick.speed = nav.CAREFUL_SPEED
+
+        player.brain.nav.goTo(positionForGoalieKick.kickPose,
+                                            speed = positionForGoalieKick.speed,
+                                            precision = nav.CLOSE_ENOUGH)
+    ball = player.brain.ball
+    positionForGoalieKick.kickPose = RelRobotLocation(ball.rel_x - player.kick.setupX,
+                                    ball.rel_y - player.kick.setupY,
+                                    0)
+    player.brain.nav.updateDest(positionForGoalieKick.kickPose)
+
+    if GoalieTransitions.ballReadyToKick(player, positionForGoalieKick.kickPose):
+        player.brain.nav.stand()
+        return player.goNow('kickBall')
+
+    return player.stay()
+    return Transition.getNextState(player, positionForGoalieKick)
 
 @superState('gameControllerResponder')
 def waitToFaceField(player):

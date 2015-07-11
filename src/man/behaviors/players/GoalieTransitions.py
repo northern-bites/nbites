@@ -27,13 +27,11 @@ def getCorners(player):
   # Convex,
   # T,
 
-# New vision system visual goalie
 def getLines(player):
     visionLines = player.brain.visionLines
-    # Add in checks to not add repeat lines?
 
-    for i in range(0, visionLines.line_size()):
-        GoalieStates.watchWithLineChecks.lines.append(visionLines.line(i).inner)
+    for i in range(0, player.brain.vision.line_size()):
+        GoalieStates.watchWithLineChecks.lines.append(visionLines(i).inner)
 
     if len(GoalieStates.watchWithLineChecks.lines) > constants.MEM_THRESH:
         GoalieStates.watchWithLineChecks.lines = GoalieStates.watchWithLineChecks.lines[3:]
@@ -93,13 +91,13 @@ def facingBackward(player):
 #TODO Finish
 def seeGoalbox(player):
     lines = player.brain.visionLines
-    for i in range(0, lines.line_size()):
-        r1 = lines.line(i).inner.r
-        t1 = math.degrees(lines.line(i).inner.t)
+    for i in range(0, lines_size()):
+        r1 = lines(i).inner.r
+        t1 = math.degrees(lines(i).inner.t)
 
-        for l in range(0, player.brain.visionLines.line_size()):
-            r2 = lines.line(l).inner.r
-            t2 = math.degrees(lines.line(l).inner.t)
+        for l in range(0, player.brain.vision.line_size()):
+            r2 = lines(l).inner.r
+            t2 = math.degrees(lines(l).inner.t)
 
         if l != i and math.fabs(t1 - t2) < 10.0 and r2 < 120.0 and r1 < 120.0 \
         and r1 != 0.0 and r2 != 0.0 and math.fabs(r1 - r2) > 15:
@@ -107,11 +105,11 @@ def seeGoalbox(player):
             print("r1, t1:", r1, t1, "r2,t2", r2, t2)
 
             if r1 > r2:
-                backline = lines.line(i).inner
-                frontline = lines.line(l).inner
+                backline = lines(i).inner
+                frontline = lines(l).inner
             else:
-                backline = lines.line(l).inner
-                frontline = lines.line(i).inner
+                backline = lines(l).inner
+                frontline = lines(i).inner
 
             r = backline.r
             t = math.degrees(backline.t)
@@ -321,39 +319,18 @@ def shouldGoForward(player):
                 player.homeDirections = []
                 player.homeDirections += [RelRobotLocation(25.0, 0.0, 0.0)]
                 return True
-
-        # r = lines.line(i).inner.r
-        # t = math.degrees(lines.line(i).inner.t)
-        # for l in range(0, player.brain.visionLines.line_size()):
-        #     r2 = lines.line(l).inner.r
-        #     t2 = math.degrees(lines.line(l).inner.t)
-
-        #     if (l != i) and math.fabs(t - t2) < 15.0 \
-        #     and r2 < 120.0 and r < 120.0 and math.fabs(r - r2) > 25.0 \
-        #     and r != 0.0 and r2 != 0.0:
-        #         print "I'm seeing two lines, I should go forward"
-        #         print ("r1: ", r, "r2: ", r2, " t1: ", t, "t2: ", t2)
-        #         player.homeDirections = []
-        #         player.homeDirections += [RelRobotLocation(25.0, 0.0, 0.0)]
-        #         return True
-
     return False
 
 def noTopLine(player):
-    # getLines(player)
     for line in GoalieStates.watchWithLineChecks.lines:
         r = line.r
         t = math.degrees(line.t)
-        # print('t',t, 'r',r)
         length = getLineLength(line)
         if (math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < 30.0\
         or math.fabs(t - constants.EXPECTED_FRONT_LINE_T_2) < 30.0) \
         and math.fabs(r - constants.EXPECTED_FRONT_LINE_R) < 15.0\
         and r != 0.0:
-            # print("found front line!", "r", r, "t", t)
             return False
-
-    # print "NO top line!!!"
     return True
 
 def shouldBackUp(player):
@@ -367,13 +344,13 @@ def shouldBackUp(player):
         if r < 130.0 and r != 0.0:
             return False
 
-    for i in range(0, player.brain.visionLines.line_size()):
-        r = player.brain.visionLines.line(i).inner.r
+    for i in range(0, player.brain.vision.line_size()):
+        r = player.brain.visionLines(i).inner.r
         if r < 130.0 and r != 0.0:
             return False
 
 
-    if player.brain.visionLines.line_size() == 0:
+    if player.brain.vision.line_size() == 0:
         print "My brain sees no lines right now"
         print len(GoalieStates.watchWithLineChecks.lines)
         return True
@@ -385,9 +362,9 @@ def shouldStopGoingBack(player):
     visionLines = player.brain.visionLines
     # Add in checks to not add repeat lines?
 
-    for i in range(0, visionLines.line_size()):
-        r = visionLines.line(i).inner.r
-        t = math.degrees(visionLines.line(i).inner.t)
+    for i in range(0, player.brain.vision.line_size()):
+        r = visionLines(i).inner.r
+        t = math.degrees(visionLines(i).inner.t)
 
         if r != 0.0 and r < 40.0 and r > 25.0 and \
         (math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < 50.0\
@@ -409,19 +386,19 @@ def facingASideline(player):
     if GoalieStates.watchWithLineChecks.numFixes > 2:
         return False
 
-    for i in range(0, visionLines.line_size()):
-        r1 = visionLines.line(i).inner.r
-        t1 = math.degrees(visionLines.line(i).inner.t)
-        length1 = getLineLength(visionLines.line(i).inner)
-        # ep01 = visionLines.line(i).inner.ep0
-        # ep11 = visionLines.line(i).inner.ep1
+    for i in range(0, player.brain.vision.line_size()):
+        r1 = visionLines(i).inner.r
+        t1 = math.degrees(visionLines(i).inner.t)
+        length1 = getLineLength(visionLines(i).inner)
+        # ep01 = visionLines(i).inner.ep0
+        # ep11 = visionLines(i).inner.ep1
 
-        for j in range(0, visionLines.line_size()):
-            r2 = visionLines.line(j).inner.r
-            t2 = math.degrees(visionLines.line(j).inner.t)
-            length2 = getLineLength(visionLines.line(j).inner)
-            # ep02 = visionLines.line(j).inner.ep0
-            # ep12 = visionLines.line(j).inner.ep1
+        for j in range(0, player.brain.vision.line_size()):
+            r2 = visionLines(j).inner.r
+            t2 = math.degrees(visionLines(j).inner.t)
+            length2 = getLineLength(visionLines(j).inner)
+            # ep02 = visionLines(j).inner.ep0
+            # ep12 = visionLines(j).inner.ep1
 
             if ((math.fabs(math.fabs(t1 - t2) - 90.0) < 15.0) \
             or (math.fabs(math.fabs(t1 - t2) - 265) < 15.0)) \
@@ -462,11 +439,11 @@ def facingASideline(player):
                 elif (GoalieStates.watchWithLineChecks.correctFacing and r1 > 20.0\
                                 and r2 > 20.0) or facefrnt:
                     if math.fabs(math.fabs(t1 - 180.0) - 180.0) < math.fabs(math.fabs(t2 - 180.0) - 180.0):
-                        frontline = visionLines.line(i).inner
-                        sideline = visionLines.line(j).inner
+                        frontline = visionLines(i).inner
+                        sideline = visionLines(j).inner
                     else:
-                        frontline = visionLines.line(j).inner
-                        sideline = visionLines.line(i).inner
+                        frontline = visionLines(j).inner
+                        sideline = visionLines(i).inner
 
                     flength = getLineLength(frontline)
                     slength = getLineLength(sideline)
@@ -527,9 +504,9 @@ def shouldPositionLeft(player):
 def shouldStopTurning(player):
     lines = player.brain.visionLines
 
-    for i in range(0, lines.line_size()):
-        r = lines.line(i).inner.r
-        t = math.degrees(lines.line(i).inner.t)
+    for i in range(0, lines_size()):
+        r = lines(i).inner.r
+        t = math.degrees(lines(i).inner.t)
         if math.fabs(t - 90.0) < 15.0 and r is not 0.0 and r < 40.0:
             print "I see a line! I'm assuming its part of the goalbox and I'm going there"
             print ("R:", r, "T:", t)
@@ -547,16 +524,11 @@ def seeFrontLine(player):
     lines = player.brain.visionLines
     horizon = player.brain.vision.horizon_dist
 
-    for i in range(0, lines.line_size()):
-        r = lines.line(i).inner.r
-        t = math.degrees(lines.line(i).inner.t)
-        length = getLineLength(lines.line(i).inner)
+    for i in range(0, lines_size()):
+        r = lines(i).inner.r
+        t = math.degrees(lines(i).inner.t)
+        length = getLineLength(lines(i).inner)
         print ("R:", r, "T:", t)
-
-def lostBall(player):
-    if player.brain.ball.vis.frames_off > 15:
-        return True
-    return False
 
 def atGoalArea(player):
     """
@@ -645,10 +617,10 @@ def shouldDiveRight(player):
         print("nb xvel:", nball.x_vel)
         print("ball mov vel:", ball.mov_vel_x)
 
-    # return (nball.x_vel < -10.0 and
-    return (ball.mov_vel_x < constants.SAVE_X_VEL and
+    return (nball.x_vel < -10.0 and
+    # return (ball.mov_vel_x < constants.SAVE_X_VEL and
         not nball.stationary and
-        nball.yintercept < -25.0 and
+        nball.yintercept < -20.0 and
         ball.distance < constants.SAVE_DIST and
         sightOk)
 
@@ -687,10 +659,10 @@ def shouldDiveLeft(player):
         print("nb xvel:", nball.x_vel)
         print("ball mov vel:", ball.mov_vel_x)
 
-    # return (nball.x_vel < -10.0 and
-    return (ball.mov_vel_x < -9.0 and
+    return (nball.x_vel < -10.0 and
+    # return (ball.mov_vel_x < -9.0 and
        not nball.stationary and
-        nball.yintercept > 25.0 and
+        nball.yintercept > 20.0 and
         ball.distance < constants.SAVE_DIST and
         sightOk)
 
@@ -716,8 +688,8 @@ def shouldSquat(player):
 
     nball = player.brain.naiveBall
 
-    # if (nball.x_vel < -10.0 and
-    if (ball.mov_vel_x < constants.SAVE_X_VEL and
+    if (nball.x_vel < -10.0 and
+    # if (ball.mov_vel_x < constants.SAVE_X_VEL and
         not nball.stationary and
         abs(nball.yintercept) < 25.0 and
         nball.yintercept != 0.0 and
@@ -746,7 +718,7 @@ def shouldSquat(player):
     # return (nball.x_vel < -10.0 and
     return (ball.mov_vel_x < -9.0 and
         not nball.stationary and
-        abs(nball.yintercept) < 30.0 and
+        abs(nball.yintercept) < 25.0 and
         nball.yintercept != 0.0 and
         ball.distance < 150.0 and
         sightOk)
@@ -799,22 +771,14 @@ def shouldClearBall(player):
     shouldGo = False
 
     # if definitely within good chasing area
-    if (player.brain.ball.distance < constants.CLEARIT_DIST):
-        walkedTooFar.xThresh = 120.0
-        walkedTooFar.yThresh = 120.0
+    if (player.brain.ball.distance < constants.CLEARIT_DIST_FRONT):
+        walkedTooFar.xThresh = 150.0
+        walkedTooFar.yThresh = 150.0
         shouldGo = True
-
-    # farther out but being aggressive
-    # if (player.brain.ball.distance < 130.0 and
-    #     player.brain.ball.is_stationary and
-    #     player.aggressive):
-    #     walkedTooFar.xThresh = 150.0
-    #     walkedTooFar.yThresh = 150.0
-    #     shouldGo = True
 
     # to goalie's sides, being aggressive
     # if (math.fabs(player.brain.ball.bearing_deg) > 50.0 and
-    #     player.aggressive):
+    #     player.brain.ball.distance < constants.CLEARIT_DIST_SIDE):
     #     walkedTooFar.xThresh = 300.0
     #     walkedTooFar.yThresh = 300.0
     #     shouldGo = True
@@ -841,7 +805,7 @@ def ballLostStopChasing(player):
     If the robot does not see the ball while chasing, it is lost. Delay
     in case our shoulder pads are just hiding it.
     """
-    if player.brain.ball.vis.frames_off > 30:
+    if player.brain.ball.vis.frames_off > 15:
         return True
 
 #TODO fix this and make more sensitive
@@ -852,6 +816,14 @@ def ballMovedStopChasing(player):
     """
     return (player.brain.ball.distance > 50.0 and
             player.counter > 175.0)
+
+def ballReadyToKick(player, kickPose):
+    if not player.brain.ball.vis.on:
+        return False
+
+    return (kickPose.relX < constants.BALL_X_OFFSET and
+            math.fabs(kickPose.relY) < constants.BALL_Y_OFFSET and
+            math.fabs(kickPose.relH) < constants.GOOD_ENOUGH_H)
 
 def walkedTooFar(player):
     # for the odometry reset delay
@@ -913,3 +885,4 @@ def saveNow(player):
         GoalieStates.doDive.side = 3
 
     return player.brain.ball.mov_speed > 8.0
+

@@ -96,6 +96,7 @@ def gamePlaying(player):
         return player.goLater('walkToGoal')
 
     if player.lastDiffState == 'fallen':
+        return player.goLater('watch')
         # #TODO fix this
         # player.justKicked = False
         if fallen.lastState == 'clearIt' and player.brain.ball.vis.on\
@@ -179,8 +180,9 @@ def watchWithLineChecks(player):
         watchWithLineChecks.lines[:] = []
         player.homeDirections = []
 
-        if player.lastDiffState == 'returnToGoal':
-            player.justKicked = False
+        if player.lastDiffState == 'returnUsingLoc':
+            print("I'm resetting my loc, I think I'm back!")
+            player.brain.resetGoalieLocalization()
 
         if player.lastDiffState is not 'lineCheckReposition' and\
         player.lastDiffState is not 'moveBackwards':
@@ -275,7 +277,7 @@ def returnUsingLoc(player):
         player.brain.nav.goTo(dest,
                             speed = nav.BRISK_SPEED)
         print("I'm trying to return using loc!")
-        player.brain.tracker.trackBall
+        player.brain.tracker.trackBall()
 
     if player.counter > 300:
         print "This is taking a suspiciously long time"
@@ -331,7 +333,8 @@ def watch(player):
         print ("I'm moving to watch! I think I'm in the right position")
         # player.brain.tracker.lookToAngle(0)
 
-    if player.counter % 10 == 0:
+
+    if player.counter % 20 == 0:
         print("Horizon dist == ", player.brain.vision.horizon_dist)
 
         ball = player.brain.ball
@@ -342,6 +345,8 @@ def watch(player):
         print("nb xvel:", nball.x_vel)
         print("ball mov vel:", ball.mov_vel_x)
         print("ball mov speed:", ball.mov_speed)
+        print("stationary: ", nball.stationary)
+        print("yintercept", nball.yintercept)
         print"- - -  -- - -- --- ---    - --"
 
     # return player.stay()
@@ -400,7 +405,7 @@ def kickBall(player):
     if player.firstFrame():
         player.justKicked = True
         # save odometry if this was your first kick
-        if player.lastDiffState == 'clearIt':
+        if player.lastDiffState == 'clearIt' or player.lastDiffState == 'positionForGoalieKick':
             print "Here after clearit"
             h = math.degrees(player.brain.interface.odometry.h)
             VisualStates.returnToGoal.kickPose = \
@@ -427,7 +432,6 @@ def kickBall(player):
 
     if player.brain.ball.vis.frames_off > 15.0:
         print("I lost the ball! I'm returning to goal")
-        # return player.goLater('spinBack')
         return player.goLater('returnUsingLoc')
 
     if player.counter > 30 and player.brain.nav.isStopped():
@@ -442,8 +446,8 @@ def saveCenter(player):
         player.brain.tracker.lookToAngle(0)
         if SAVING:
             player.executeMove(SweetMoves.GOALIE_SQUAT)
-        # else:
-        #     player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
+        else:
+            player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
 
     if player.counter > 80:
         if SAVING:
@@ -472,8 +476,8 @@ def saveRight(player):
         if SAVING and DIVING:
             player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
             player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
-        # else:
-        #     player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
+        else:
+            player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
 
     if player.counter > 80:
         if SAVING and DIVING:
@@ -492,8 +496,8 @@ def saveLeft(player):
         if SAVING and DIVING:
             player.executeMove(SweetMoves.GOALIE_DIVE_LEFT)
             player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
-        # else:
-        #     player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
+        else:
+            player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
 
     if player.counter > 80:
         if SAVING and DIVING:

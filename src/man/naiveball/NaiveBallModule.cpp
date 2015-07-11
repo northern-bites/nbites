@@ -88,11 +88,33 @@ void NaiveBallModule::run_()
     if (checkIfStationary() == true || stationaryOffFrameCount < STATIONARY_CHECK) {
         naiveBallMessage.get()->set_stationary(true);
         yIntercept = 0.f;
+#ifdef CHECK
+        std::cout << "stationary true " << std::endl;
+#endif
     }
     else {
         naiveBallMessage.get()->set_stationary(false);
+#ifdef CHECK
+        std::cout << "stationary false" << std::endl;
+#endif
     }
 
+#ifdef CHECK
+    std::cout << "yIntercept " << yIntercept << std::endl;
+    std::cout << "velocityEst  " << velocityEst << std::endl;
+
+
+    if (fabs(myBall.mov_vel_x()) > 2.0 and fabs(vel_x_buffer[currentIndex]) < .01) {
+            std::cout << "---- what happened ----" << std::endl;
+            std::cout << "mov_vel_x  " << myBall.mov_vel_x() << std::endl;
+            std::cout << "frames off:" << frameOffCount << std::endl;
+            std::cout << "stationary frames off:" << stationaryOffFrameCount << std::endl;
+            std::cout << "bufferFull  " << bufferFull << " cur index: " << currentIndex << std::endl;
+            std::cout << "xVelocityEst  " << xVelocityEst << ", yVelocityEst " << yVelocityEst << std::endl;
+            std::cout << "vel_x_buffer cur index " << vel_x_buffer[currentIndex]<< std::endl;
+            // printBuffer();
+    }
+#endif
     naiveBallMessage.get()->set_velocity(velocityEst);
     naiveBallMessage.get()->set_yintercept(yIntercept);
     naiveBallMessage.get()->set_x_vel(vel_x_buffer[currentIndex]);
@@ -106,6 +128,12 @@ void NaiveBallModule::updateBuffers()
 {
     currentIndex = (currentIndex + 1) % NUM_FRAMES;
     position_buffer[currentIndex] = BallState(myBall.rel_x(), myBall.rel_y(), myBall.distance(), myBall.bearing());
+
+#ifdef CHECK
+    std::cout << "---- Buffer Update ----" << std::endl;
+    std::cout << "rel_x  " << myBall.rel_x() << ", rel_y: " << myBall.rel_y() << std::endl;
+    std::cout << "vis x  " << myBall.vis().x() << ", vis y: " << myBall.vis().y() << std::endl;
+#endif
 
     if (bufferFull) {
         calculateVelocity();
@@ -133,13 +161,23 @@ void NaiveBallModule::clearBuffers()
 void NaiveBallModule::calculateVelocity()
 {
     int startIndex = currentIndex + 1;
-    int endIndex = currentIndex - AVGING_FRAMES -1;
+    int endIndex = currentIndex - AVGING_FRAMES - 1;
     if (endIndex < 0) endIndex = endIndex + NUM_FRAMES;
     BallState start_avgs = avgFrames(startIndex);
     BallState end_avgs = avgFrames(endIndex);
     float denominator = (float)NUM_FRAMES / 30.f;
     xVelocityEst = (end_avgs.rel_x - start_avgs.rel_x) / denominator * ALPHA + .9*xVelocityEst * (1 - ALPHA);
     yVelocityEst = (end_avgs.rel_y - start_avgs.rel_y) / denominator * ALPHA + .9*yVelocityEst * (1 - ALPHA);
+
+    if (fabs(xVelocityEst) < .01 && xVelocityEst != 0.0 && fabs(myBall.mov_vel_x()) > 2.0) {
+        std::cout << "----- velocity extremely low?" << std::endl;
+        printBallState(start_avgs);
+        printBallState(end_avgs);
+        std::cout << "xVelocityEst: " << xVelocityEst << std::endl;
+        std::cout << "endIndex: " << endIndex << std::endl;
+        std::cout << "startIndex: " << startIndex << std::endl;
+        std::cout << "yIntercept: " << yIntercept << std::endl;
+    }
 
     float dist = calcSumSquaresSQRT((xVelocityEst), (yVelocityEst));
     velocityEst = (dist / denominator) * ALPHA + velocityEst * (1-ALPHA);
@@ -166,6 +204,13 @@ bool NaiveBallModule::checkIfStationary()
 {
     if (fabs(xVelocityEst) < STATIONARY_THRESHOLD && fabs(yVelocityEst) < STATIONARY_THRESHOLD) {
         stationaryOffFrameCount = 0;    // Reset to 0
+        // if (myBall.mov_vel_x() > 2.0) {
+        //     std::cout << "---- what happened ----" << std::endl;
+        //     std::cout << "mov_vel_x  " << myBall.mov_vel_x() << std::endl;
+        //     std::cout << "bufferFull  " << bufferFull << " cur index: " << currentIndex << std::endl;
+        //     std::cout << "xVelocityEst  " << xVelocityEst << ", yVelocityEst " << yVelocityEst << std::endl;
+        //     printBuffer();
+        // }
         return true; }
     stationaryOffFrameCount++;
     return false;
