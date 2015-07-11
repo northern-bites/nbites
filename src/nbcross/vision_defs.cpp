@@ -141,11 +141,8 @@ int Vision_func() {
 
     // If log includes "BlackStar," set flag
     std::vector<SExpr*> blackStarVec = args[0]->tree().recursiveFind("BlackStar");
-    if (blackStarVec.size() != 0) {
+    if (blackStarVec.size() != 0)
         module.blackStar(true);
-        std::cout << "\nBLACK STAR TRUE!!!\n\n";
-    } else std::cout << "\nBLACK STAR FALSE\n\n";
-    
     
     // Run it!
     module.run();
@@ -401,6 +398,13 @@ int Vision_func() {
         endswap<double>(&(p.second));
         pointsBuf.append((const char*) &(p.first), sizeof(double));
         pointsBuf.append((const char*) &(p.second), sizeof(double));
+    }
+
+    // Add 0,0 point if cc if off so tool doesn't display a rejected one
+    std::pair<double, double> zero(0.0, 0.0);
+    if (!ccd->on()) {
+        pointsBuf.append((const char*) &(zero.first), sizeof(double));
+        pointsBuf.append((const char*) &(zero.second), sizeof(double));
     }
 
     ccdRet->setData(pointsBuf);

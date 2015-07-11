@@ -26,12 +26,14 @@ DODGE_DIST = 80.0 #cm
 SLOW_CHASE_DIST = 100.
 PREPARE_FOR_KICK_DIST = 50.
 
-DGE_DESTS = ((40, 0, 0),            # Dodging to NORTH
-             (30, -50, 0),            # TO NORTHEAST
-             (0, -40, 0),            # TO EAST
-             (-30, -50, 0),            # TO SOUTHEAST
-             (-40, 0, 0),           # TO SOUTH
-             (-30, 50, 0),             # TO SOUTHWEST
-             (0, 40, 0),             # TO WEST
-             (30, 50, 0)              # TO NORTHWEST
-)
+# relative speed to walk for an obstacle and its name
+OBS_DICT = {
+                1 : (0.5,1, "North"),
+                2 : (0.5,1, "Northeast"),
+                3 : (0,1, "East"),
+                4 : (0.5,1, "Southeast"),
+                5 : (0.5,-1, "South"),
+                6 : (0.5,-1, "Southwest"),
+                7 : (0,-1, "West"),
+                8 : (0.5,-1, "Northwest")
+            }

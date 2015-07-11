@@ -10,7 +10,7 @@
 #include <iostream>
 
 #include "WorldModel.pb.h"
-#include "BallModel.pb.h"
+#include "Vision.pb.h"
 #include "RobotLocation.pb.h"
 
 /*

@@ -504,146 +504,135 @@ bool CornerDetector::ccw(double ax, double ay,
 // *******************
 CenterCircleDetector::CenterCircleDetector() 
 {
+  _on = false;
   set();
 }
 
 void CenterCircleDetector::set()
 {
   // Set parameters
-  hardCap = 800;
-  maxEdgeDistanceSquared = 500 * 500;
-  ccr = CENTER_CIRCLE_RADIUS;
-  binWidth = 75;
-  binCount = 8;
-  minVotesInMaxBin = 0.19; // 19% of points must be in the bin selected
+  minPotentials = 850;
+  maxEdgeDistanceSquared = 500 * 500;       // Good practicle distance = 5m
+  ccr = CENTER_CIRCLE_RADIUS;               // 75 cm
+  minVotesInMaxBin = 0.18;                  // Conservative clustering theshold
+  fieldTestDistance = 200;
+
 }
 
-bool CenterCircleDetector::detectCenterCircle(EdgeList& edges)
+bool CenterCircleDetector::detectCenterCircle(EdgeList& edges, Field& field)
 {
-  std::vector<Point> potentials = calculatePotentials(edges);
-  
-#ifdef OFFLINE
-  _potentials = potentials;
-  if (_potentials.size() > hardCap && getMaxBin(_potentials, _ccx, _ccy)) {
-    _potentials.push_back(Point(_ccx, _ccy));
-    return true;
-  } else
-    _potentials.push_back(Point(0.0, 0.0));
-  return false;
-#endif
-
-  return (_potentials.size() > hardCap && getMaxBin(potentials, _ccx, _ccy));
+  on(findPotentialsAndCluster(edges, _ccx, _ccy) && onField(field));
+  return (on());
 }
 
 // Get potential cc centers and clean edge list
-std::vector<Point> CenterCircleDetector::calculatePotentials(EdgeList& edges)
+bool CenterCircleDetector::findPotentialsAndCluster(EdgeList& edges, double& x0, double& y0)
 {
   std::vector<Point> vec;
+  Point p1, p2;
+  int count = 0;
+  int xOffset = binCount * binWidth / 2;
+
+  int bcSq = binCount * binCount;
+  
+  // Fill set of little bins
+  int bins[bcSq]; 
+  
+  std::fill(bins, bins + bcSq, 0);
+
   AngleBinsIterator<Edge> abi(edges);
   for (Edge* e = *abi; e; e = *++abi) {
     double distance = e->field().x() * e->field().x() + e->field().y() * e->field().y();
     if (e->field().y() >= 0 && distance < maxEdgeDistanceSquared) {
-      vec.push_back(Point(e->field().x() + ccr*sin(e->field().t()), e->field().y() - ccr*cos(e->field().t())));
-      vec.push_back(Point(e->field().x() - ccr*sin(e->field().t()), e->field().y() + ccr*cos(e->field().t())));
+      count += 2;
+      p1 = Point(e->field().x() + ccr*sin(e->field().t()), e->field().y() - ccr*cos(e->field().t()));
+      p2 = Point(e->field().x() - ccr*sin(e->field().t()), e->field().y() + ccr*cos(e->field().t()));
+
+#ifdef OFFLINE
+      _potentials.push_back(p1);
+      _potentials.push_back(p2);
+#endif
+    
+      // Add first potential point to one bin if it is within the grid
+      int xbin = roundDown((int)p1.first + xOffset) / binWidth;
+      int ybin = roundDown((int)p1.second) / binWidth;
+      if (xbin < binCount - 1 && ybin < binCount - 1)
+        bins[xbin + binCount * ybin] += 1;
+
+      // Add second potential point to one bin if within grid
+      xbin = roundDown((int)p2.first + xOffset) / binWidth;
+      ybin = ((int)p2.second) / binWidth;
+      if (xbin < binCount - 1 && ybin < binCount - 1)
+        bins[xbin + binCount * ybin] += 1;
+
     }
   }
-  return vec;
-}
 
-// Set (x0,y0) center of most populated bin
-bool CenterCircleDetector::getMaxBin(std::vector<Point> vec, double& x0, double& y0)
-{
-  int bcSq = binCount * binCount;
-
-  // Fill four sets of overlapping bins
-  int bins1[bcSq]; 
-  int bins2[bcSq];
-  int bins3[bcSq]; 
-  int bins4[bcSq]; 
-
-  std::fill(bins1, bins1 + bcSq, 0);
-  std::fill(bins2, bins2 + bcSq, 0);
-  std::fill(bins3, bins3 + bcSq, 0);
-  std::fill(bins4, bins4 + bcSq, 0);
-
-  int xOffset = binCount * binWidth / 2;
-
-  // Add each potential point to one bin in each of the four overlapping grids
-  for (int i = 0; i < vec.size(); i++) {
-    Point p = vec[i];
-    // +0, +0
-    int xbin = roundDown((int)p.first + xOffset) / binWidth;
-    int ybin = roundDown((int)p.second) / binWidth;
-    bins1[min(xbin, binCount-1) + binCount * min(ybin, binCount-1)] += 1;
-
-    // +0.5, +0.5
-    xbin = roundDown((int)p.first + binWidth/2 + xOffset) / binWidth;
-    ybin = roundDown((int)p.second + binWidth/2) / binWidth;  
-    bins2[min(xbin, binCount-1) + binCount * min(ybin, binCount-1)] += 1;
-
-    // +0.5, +0
-    xbin = roundDown((int)p.first + binWidth/2 + xOffset) / binWidth;
-    ybin = roundDown((int)p.second) / binWidth;  
-    bins3[min(xbin, binCount-1) + binCount * min(ybin, binCount-1)] += 1;
-
-    // +0, +0.5
-    xbin = roundDown((int)p.first + xOffset) / binWidth;
-    ybin = roundDown((int)p.second + binWidth/2) / binWidth;  
-    bins4[min(xbin, binCount-1) + binCount * min(ybin, binCount-1)] += 1;
+  if (count < minPotentials) {
+#ifdef OFFLINE
+    std::cerr << std::endl << "Not enough potentials for center circle: " << (double)count << " potentials" << std::endl;
+#endif   
+    return false;
   }
-
-  int winBin, votes = 0;
 
   // Tally bins
-  for (int i = 0; i < bcSq; i++) {
-    if (bins1[i] > votes) {
-      votes = bins1[i];
-      winBin = i;
-    }
-    if (bins2[i] > votes) {
-      votes = bins2[i];
-      winBin = i + bcSq;
-    }
-    if (bins3[i] > votes) {
-      votes = bins3[i];
-      winBin = i + bcSq*2;
-    }
-    if (bins4[i] > votes) {
-      votes = bins4[i];
-      winBin = i + bcSq*3;
+  int winBin, votes = 0;
+
+  for (int i = 0; i < binCount - 1; i++) {
+    for (int j = 0; j < binCount - 1; j++) {
+      int neighboorTally = bins[i +  j   *binCount] + bins[i+1 +  j   *binCount] +
+                           bins[i + (j+1)*binCount] + bins[i+1 + (j+1)*binCount];
+
+      // Look at neighbooring bins for overlapping effect
+      if (neighboorTally > votes) {
+        votes = neighboorTally;
+        winBin = i + j*binCount;
+      }
     }
   }
 
-  if (votes > minVotesInMaxBin * vec.size()) {
-    if (winBin < bcSq) {
-      x0 = ((winBin % binCount) + 0.5) * binWidth - xOffset;
-      y0 = (winBin / binCount + 0.5) * binWidth; 
-    } else if (winBin < bcSq *2) {
-      winBin -= bcSq;
-      x0 = (winBin % binCount) * binWidth - (xOffset);
-      y0 = (winBin / binCount) * binWidth; 
-    } else if (winBin < bcSq * 3) {
-      winBin -= bcSq * 2;
-      x0 = (winBin % binCount) * binWidth - (xOffset);
-      y0 = (winBin / binCount + 0.5) * binWidth; 
-    } else {
-      winBin -= bcSq * 3;
-      x0 = (winBin % binCount + 0.5) * binWidth - xOffset;
-      y0 = (winBin / binCount) * binWidth; 
-    }
-
-    std::cout << std::endl << "Center Circle at (" << x0 << "," << y0 << "). " << 
-      (double)votes * 100/(double)vec.size() << "\% of the " << 
-      vec.size() << " potentials in most populated bin" << std::endl;
-
+  if (votes > minVotesInMaxBin * count) {
+    x0 = (winBin % binCount + 1) * binWidth - xOffset;
+    y0 = (winBin / binCount + 1) * binWidth; 
+    
+#ifdef OFFLINE
+    _potentials.push_back(Point(x0, y0));
+    std::cerr << std::endl << "Center Circle at (" << x0 << "," << y0 << "). " << 
+      (double)votes * 100/count << "\% of the " << count << " potentials in most populated bin" << std::endl;
+#endif
     return true;
   } else {
-    std::cout << std::endl << "Can't find center circle: " << (double)votes * 100/(double)vec.size() << "\% in max bin" << std::endl;
-
+#ifdef OFFLINE
+    _potentials.push_back(Point(0.0, 0.0));
+#endif
+  return false;
   }
 
-  return false;
 }
+
+// Project 2 points from CC and check if they are on the field
+bool CenterCircleDetector::onField(Field& field)
+{
+  double y;
+  if (field.onField(_ccx + fieldTestDistance, y) && _ccy + fieldTestDistance < y &&
+          field.onField(_ccx - fieldTestDistance, y) && _ccy + fieldTestDistance < y) {
+    return true;
+  } else {
+#ifdef OFFLINE
+    std::cerr << "FAILING ON FIELD TEST\n";
+#endif
+    return false; 
+  }
+ 
+}
+
+void CenterCircleDetector::adjustCC(double x, double y)
+{
+  _ccx += x;
+  _ccy += y;
+  _potentials.push_back(Point(_ccx, _ccy));
+}
+
 
 // **************************
 // *                        *
@@ -719,20 +708,67 @@ void FieldLineList::find(HoughLineList& houghLines, bool blackStar)
     }
 }
 
-void FieldLineList::classify(GoalboxDetector& boxDetector, CornerDetector& cornerDetector)
+void FieldLineList::classify(GoalboxDetector& boxDetector,
+                             CornerDetector& cornerDetector,
+                             CenterCircleDetector& circleDetector)
 {
-  // If less than one field line, no classification possible
-  if (size() <= 1) return;
-
-  // Run goalbox detector
-  bool topBoxFound = boxDetector.find(*this);
-  bool endlineFound = topBoxFound;
   bool sideboxFound = false;
   bool midlineFound = false;
   bool sidelineFound = false;
 
+  // If there are no field lines, no classification possible
+  if (size() < 1) {
+    circleDetector.on(false);
+    return;
+  }
+
+  // Run goalbox detector
+  bool topBoxFound = boxDetector.find(*this);
+  bool endlineFound = topBoxFound;
+
   // Run corner detector
   cornerDetector.findCorners(*this);
+  
+  // Look for field line close to the center circle
+  if (circleDetector.on()) {
+    double minDist = 1000;
+    FieldLine* midline;
+    HoughLine* midHoughInner;
+
+    for (int i = 0; i < size(); ++i) {
+      FieldLine& fl = (*this)[i];
+      HoughLine& inner = fl[0];
+      if (inner.field().r() < 0) {
+        inner = fl[1];
+      }
+
+      // Project CC center onto line, find distance to line
+      double distToLine = inner.field().pDist(circleDetector.x(), circleDetector.y());
+      double qD = inner.field().qDist(circleDetector.x(), circleDetector.y());
+      bool within = qD > inner.field().ep0() && qD < inner.field().ep1();
+
+      // Check for min distance
+      if (within && minDist > fabs(distToLine)) {
+          midline = &fl;
+          midHoughInner = &inner;
+          minDist = distToLine;
+      }
+    }
+
+    // Set midline and adjust CC, or discard CC if no close line
+    if (fabs(minDist) < 30) {
+      midline->id(LineID::Midline);
+      midlineFound = true;
+      circleDetector.adjustCC(-minDist * cos(midHoughInner->field().t()),
+                              -minDist * sin(midHoughInner->field().t()));
+    } else {
+      circleDetector.on(false);
+    }
+  }
+
+  // If there is only one line, stop here 
+  if (size() < 2)
+    return;
 
   // China 2015 hack
   //
@@ -1167,14 +1203,14 @@ void HoughSpace::adjust(EdgeList& edges, EdgeList& rejectedEdges, HoughLineList&
       ++hl;
   }
 
-  // For center circle detection, colloect all orphan edges
-  // rejectedEdges.reset();
+  // For center circle detection, collect all orphan edges
+  rejectedEdges.reset();
 
-  // AngleBinsIterator<Edge> rejectABI(edges);
-  // for (Edge* e = *rejectABI; e; e = *++rejectABI)
-  //   if (e->memberOf() == 0) {
-  //     rejectedEdges.add(e->x(), e->y(), e->mag(), e->angle());
-  //   }
+  AngleBinsIterator<Edge> rejectABI(edges);
+  for (Edge* e = *rejectABI; e; e = *++rejectABI)
+    if (e->memberOf() == 0) 
+      rejectedEdges.add(e->x(), e->y(), e->mag(), e->angle());
+    
   times[4] = timer.time32();
 }
 

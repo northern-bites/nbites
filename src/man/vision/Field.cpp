@@ -343,6 +343,29 @@ void Field::initialScanForTopGreenPoints(int pH) {
 	}
 }
 
+/* This function takes in an x value in field coordinates and calculates
+ * the relative field edge y point (also in field coordinates) if it can be
+ * determined.
+ * @param x   value in global coordinates
+ * @param y   back the field edge in global coordinates (if possible)
+ * @return    if calculation was possible, false otherwise
+ */
+bool Field::onField(double x, double & y) {
+    for (int i = 1; i <= numberOfHulls; i++) {
+		if (convexWorld[i-1].x < x && convexWorld[i].x > x) {
+			// interpolate the y's
+			double diff = convexWorld[i].x - convexWorld[i-1].x;
+			double diffy = convexWorld[i].y - convexWorld[i-1].y;
+			double stepPercent = (x - convexWorld[i-1].x) / diff ;
+			double finalDiffY = diffy * stepPercent;
+			y = convexWorld[i-1].y + finalDiffY;
+			return true;
+		}
+	}
+	y = 0;
+	return false;
+}
+
 /* At this point we have found our convex hull as defined for the scanlines.
    We want to extend this information to all possible x values.  So here we
    calculate all of those values, doing some simple interpolating to find
@@ -351,12 +374,28 @@ void Field::initialScanForTopGreenPoints(int pH) {
 */
 void Field::findTopEdges(int M) {
     // interpolate the points in the hull to determine values for every scanline
+	numberOfHulls = M;
     topEdge[0] = convex[0].y;
 	topBlock[0] = blockages[0].y;
     float maxPix = 0.0f;
     //estimate e;
 	peak = -1;
 	float maxLine = 1000.0f;
+	for (int i = 0; i <= M; i++) {
+		double x1, x2, y1, y2;
+		// field coords wants things specified relative to the center of the image
+		int offsety = height / 2 - convex[i].y;
+		int offsetx = convex[i].x - width / 2;
+		y1 = static_cast<double>(offsety);
+		x1 = static_cast<double>(offsetx);
+		// convert the convex hull in image coordinates to field coordinates
+		homography->fieldCoords(x1, y1, convexWorld[i].x, convexWorld[i].y);
+		if (debugFieldEdge) {
+			cout << "Convex Hull: " << convex[i].x << " " << convex[i].y << " "
+				 << convexWorld[i].x << " " << convexWorld[i].y <<
+				" " << offsety << " " << offsetx << endl;
+		}
+	}
 	// This loop does the horizon calculations given the convex hull info
     for (int i = 1; i <= M; i++) {
         int diff = convex[i].y - convex[i-1].y;
@@ -421,30 +460,6 @@ void Field::findTopEdges(int M) {
 					 blockages[i].y, BLACK);
         }
     }
-    // calculate the distance to the edge of the field at three key points
-	// NEWVISION
-	/*
-    const int quarter = width / 4;
-    const int TOPPING = 30;
-    float qDist = 1000.0f, hDist = 1000.0f, tDist = 1000.0f;
-    if (topEdge[quarter] > TOPPING) {
-        e = vision->pose->pixEstimate(quarter, topEdge[quarter], 0.0f);
-        qDist = e.dist;
-    }
-    if (topEdge[quarter * 2] > TOPPING) {
-        e = vision->pose->pixEstimate(quarter * 2, topEdge[quarter * 2], 0.0f);
-        hDist = e.dist;
-    }
-    if (topEdge[quarter * 3] > TOPPING) {
-        e = vision->pose->pixEstimate(quarter * 3, topEdge[quarter * 3], 0.0f);
-        tDist = e.dist;
-    }
-    vision->fieldEdge->setDistances(qDist, hDist, tDist);
-    if (debugFieldEdge) {
-        cout << "Distances are " << qDist << " " << hDist << " " << tDist <<
-               " there are " << M << " points." << endl;
-        cout << "Max dist is " << maxPix << endl;
-		}*/
 }
 
 /* Provides a rough guidline to whether the horizon slopes to the right or left
@@ -468,7 +483,6 @@ int Field::findSlant() {
 */
 
 void Field::findConvexHull(int pH) {
-    //point<int> convex[HULLS];
     initialScanForTopGreenPoints(pH);
 
 	// save the points we calculated to use for other things such as robot detection
@@ -714,7 +728,7 @@ int Field::getImprovedEstimate(int horizon) {
  * @return      the new horizon estimate
  */
 
-int Field::findGreenHorizon(int pH, float sl) {
+int Field::findGreenHorizon(int pH, int rH) {
     // re init shooting info
     for (int i = 0; i < width; i++) {
         topEdge[i] = 0;
@@ -722,24 +736,53 @@ int Field::findGreenHorizon(int pH, float sl) {
     // store field pose
     poseHorizon = pH;
 
+	if (drawCameraHorizon) {
+		cout << "Drawing camera horizon from " << pH << " to " << rH << endl;
+		float diff = (float)(rH - pH) / (float)width;
+		float start = static_cast<float>(pH);
+		for (int i = 0; i < width; i++) {
+			start += diff;
+			drawDot(i, (int)start, ORANGE);
+		}
+	}
+
     // get an initial estimate
     int initialEstimate = getInitialHorizonEstimate(pH);
     if (debugHorizon) {
         cout << "initial estimate is " << initialEstimate << " " << pH << endl;
     }
-	if (drawCameraHorizon) {
-		cout << "Drawing camera horizon" << endl;
-		for (int i = 0; i < width; i++) {
-			drawDot(i, pH, ORANGE);
-		}
-	}
-
     // improve the estimate
     horizon = getImprovedEstimate(initialEstimate);
     // calculate the convex hull
     findConvexHull(horizon);
     return horizon;
 }
+
+/* The blocked horizon at the given x value. This is a more stringest
+ * horizon that gives lower values in the presence of blackages - usually
+ * robots or goal posts.
+ * @param x        column to find the blocked horizon in
+ * @return        projected value
+ */
+
+int Field::blockHorizonAt(int x) {
+    if (topCamera) {
+        if (x < 0 || x >= width) {
+            if (debugHorizon) {
+                cout << "Problem in blocked horizon " << x << endl;
+            }
+            if (x < 0) {
+                return topBlock[0];
+            } else {
+                return topBlock[width - 1];
+            }
+        }
+        return topBlock[x];
+    }
+    else
+        return 0;
+}
+
 
 /* The horizon at the given x value.  Eventually we'll be changing this to
  * return a value based upon the field edges.
@@ -763,6 +806,14 @@ int Field::horizonAt(int x) {
     }
     else
         return 0;
+}
+
+/* Returns the distance to the edge of the field in the center column of
+ * the image.
+ */
+float Field::fieldEdgeDistanceCenter() {
+	int x = width / 2;
+	return getPixDistance(horizonAt(x));
 }
 
 /* The horizon at the given x value.  Eventually we'll be changing this to

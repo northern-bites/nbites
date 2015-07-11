@@ -13,7 +13,7 @@
 #include "Images.h"
 #include "PMotion.pb.h"
 #include "InertialState.pb.h"
-#include "BallModel.pb.h"
+#include "Vision.pb.h"
 #include "Images.h"
 #include "RoboGrams.h"
 

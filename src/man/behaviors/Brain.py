@@ -30,7 +30,6 @@ import LedCommand_proto
 import GameState_proto
 import WorldModel_proto
 import RobotLocation_proto
-import BallModel_proto
 import PMotion_proto
 import MotionStatus_proto
 import ButtonState_proto
@@ -238,9 +237,10 @@ class Brain(object):
         self.motion = self.interface.motionStatus
 
     def updateVision(self):
-        self.visionLines = self.interface.visionLines
-        self.visionCorners = self.interface.visionCorners
-
+        self.visionLines = self.interface.vision.line
+        self.visionCorners = self.interface.vision.corner
+        self.vision = self.interface.vision
+        
         # if self.counter % 50 == 0:
         #     print "VisionCorner size:"
         #     print self.visionCorners.corner_size()
@@ -272,7 +272,7 @@ class Brain(object):
         for i in range(size):
             curr_obst = self.interface.fieldObstacles.obstacle(i)
             if curr_obst.position != curr_obst.position.NONE:
-                self.obstacles[int(curr_obst.position)] = curr_obst.distance
+                self.obstacles[int(curr_obst.position)] = (curr_obst.distance, curr_obst.closest_y)
 
                 if curr_obst.detector == curr_obst.detector.ARMS:
                     self.obstacleDetectors[int(curr_obst.position)] = 'a'

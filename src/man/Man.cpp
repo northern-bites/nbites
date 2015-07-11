@@ -124,15 +124,14 @@ Man::Man() :
         vision.jointsIn.wireTo(&topTranscriber.jointsOut, true);
         vision.inertsIn.wireTo(&topTranscriber.inertsOut, true);
 
-        localization.linesInput.wireTo(&vision.linesOut);
-        localization.cornersInput.wireTo(&vision.cornersOut);
         localization.motionInput.wireTo(&motion.odometryOutput_, true);
         localization.resetInput[0].wireTo(&behaviors.resetLocOut, true);
         localization.resetInput[1].wireTo(&sharedBall.sharedBallReset, true);
         localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
+        localization.visionInput.wireTo(&vision.visionOut);
         localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
 
-        ballTrack.visionBallInput.wireTo(&vision.ballOut);
+        ballTrack.visionInput.wireTo(&vision.visionOut);
         ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
         ballTrack.localizationInput.wireTo(&localization.output, true);
 
@@ -143,9 +142,11 @@ Man::Man() :
         sharedBall.locIn.wireTo(&localization.output);
         sharedBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
         naiveBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
+
         obstacle.armContactIn.wireTo(&arms.contactOut, true);
+        obstacle.visionIn.wireTo(&vision.robotObstacleOut, true);
         obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
-         
+
         gamestate.commInput.wireTo(&comm._gameStateOutput, true);
         gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
         gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
@@ -164,8 +165,7 @@ Man::Man() :
         behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
         behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
         behaviors.sitDownIn.wireTo(&sensors.sitDownOutput_, true);
-        behaviors.linesIn.wireTo(&vision.linesOut, true);
-        behaviors.cornersIn.wireTo(&vision.cornersOut, true);
+        behaviors.visionIn.wireTo(&vision.visionOut, true);
         behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
         behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
         behaviors.sharedFlipIn.wireTo(&sharedBall.sharedBallReset, true);
@@ -246,10 +246,8 @@ Man::Man() :
 //         cognitionThread.log<messages::ParticleSwarm>((control::LOCALIZATION), &localization.particleOutput, "proto-ParticleSwarm", "localization");
 //         cognitionThread.log<messages::FilteredBall>((control::BALLTRACK), &ballTrack.ballLocationOutput, "proto-FilteredBall", "balltrack");
         // cognitionThread.log<messages::VisionBall>((control::BALLTRACK), &vision.vision_ball, "proto-VisionBall", "balltrack");
-        cognitionThread.log<messages::FieldLines>((control::VISION), &vision.linesOut,
-                                                   "proto-FieldLines", "vision");
-        cognitionThread.log<messages::Corners>((control::VISION), &vision.cornersOut,
-                                                   "proto-Corners", "vision");
+        cognitionThread.log<messages::Vision>((control::VISION), &vision.visionOut,
+                                                   "proto-Vision", "vision");
         // cognitionThread.log<messages::VisionField>((control::VISION), &vision.vision_field,
         //                                            "proto-VisionField", "vision");
         // cognitionThread.log<messages::VisionBall>((control::VISION), &vision.vision_ball,

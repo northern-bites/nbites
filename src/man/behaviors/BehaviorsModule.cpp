@@ -16,7 +16,6 @@ extern "C" void initLedCommand_proto();
 extern "C" void initGameState_proto();
 extern "C" void initWorldModel_proto();
 extern "C" void initRobotLocation_proto();
-extern "C" void initBallModel_proto();
 extern "C" void initPMotion_proto();
 extern "C" void initMotionStatus_proto();
 extern "C" void initButtonState_proto();
@@ -91,7 +90,6 @@ void BehaviorsModule::initializePython()
         initLedCommand_proto();
         initGameState_proto();
         initWorldModel_proto();
-        initBallModel_proto();
         initRobotLocation_proto();
         initPMotion_proto();
         initMotionStatus_proto();
@@ -256,14 +254,12 @@ void BehaviorsModule::prepareMessages()
     stiffStatusIn.latch();
     pyInterface.setStiffStatus_ptr(&stiffStatusIn.message());
 
-    linesIn.latch();
-    pyInterface.setVisionLines_ptr(&linesIn.message());
-
-    cornersIn.latch();
-    pyInterface.setCorners_ptr(&cornersIn.message());
+    visionIn.latch();
+    pyInterface.setVision_ptr(&visionIn.message());
 
     obstacleIn.latch();
     pyInterface.setObstacle_ptr(&obstacleIn.message());
+
 
     // visionObstacleIn.latch();
     // pyInterface.setVisionObstacle_ptr(&visionObstacleIn.message());

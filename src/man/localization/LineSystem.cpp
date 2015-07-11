@@ -281,7 +281,6 @@ double LineSystem::scoreObservation(const vision::GeoLine& observation,
         normalizedEp0 = correspondingLine.ep0();
         normalizedEp1 = correspondingLine.ep1();
     }
-
     vision::GeoLine normalizedCorrespondingLine;
     normalizedCorrespondingLine.set(fabs(correspondingLine.r()), normalizedT,
                                     normalizedEp0, normalizedEp1);
@@ -328,7 +327,8 @@ double LineSystem::scoreObservation(const vision::GeoLine& observation,
     }
 
     // Make the conditional independence assumption
-    return tiltProb * tProb * ep0Prob * ep1Prob;
+    // NOTE endpoints not currently being used
+    return tiltProb * tProb;
 }
 
 void LineSystem::addLine(LocLineID id, float r, float t, float ep0, float ep1)
