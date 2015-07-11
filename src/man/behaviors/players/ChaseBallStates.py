@@ -301,8 +301,11 @@ def positionForKick(player):
     if transitions.ballInPosition(player, positionForKick.kickPose):
         if player.motionKick:
            return player.goNow('executeMotionKick')
+        elif player.kick.bhKickType:
+            player.brain.nav.stand()
+            return player.goLater('executeBHKick')
         else:
             player.brain.nav.stand()
-            return player.goNow('executeKick')
+            return player.goLater('executeSweetKick')
 
     return player.stay()

@@ -9,7 +9,9 @@ from math import fabs, degrees, copysign
 from random import random
 
 def scriptedMove(nav):
-    '''State that we stay in while doing sweet moves'''
+    """
+    State that we stay in while doing sweet moves
+    """
     if nav.firstFrame():
         helper.executeMove(nav, scriptedMove.sweetMove)
         return nav.stay()
@@ -20,6 +22,19 @@ def scriptedMove(nav):
     return nav.stay()
 
 scriptedMove.sweetMove = None
+
+def kickEngine(nav):
+    """
+    State that we stay in while calling kick engine
+    """
+    if nav.firstFrame():
+        helper.executeKickEngine(nav, kickEngine.kickType)
+        return nav.stay()
+
+    helper.stand(nav)
+    return nav.stay()
+
+kickEngine.kickType = None
 
 def goToPosition(nav):
     """

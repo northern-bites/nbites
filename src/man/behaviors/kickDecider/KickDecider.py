@@ -414,19 +414,18 @@ class KickDecider(object):
         except:
             return None
 
-    def allKicksOnGoal(self):
-        self.brain.player.motionKick = True
+    def forwardKickOnGoal(self):
+        self.brain.player.motionKick = False
 
-        print "In allKicksOnGoal"
+        print "In forwardKickOnGoal"
         self.kicks = []
-        self.kicks.append(kicks.M_LEFT_STRAIGHT)
-        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
+        self.kicks.append(kicks.BH_LEFT_FORWARD_KICK)
+        self.kicks.append(kicks.BH_RIGHT_FORWARD_KICK)
 
         self.scoreKick = self.minimizeOrbitTime
 
         self.filters = []
         self.filters.append(self.crossesGoalLine)
-        #self.filters.append(self.inBounds)
 
         self.addShotsOnBackOfGoal()
 
@@ -436,7 +435,7 @@ class KickDecider(object):
             return kickReturned
         except:
             print "There was an exception in all Kicks on Goal"
-            None
+            return None
 
     def allKicksAsapOnGoal(self):
         print "In allKicksAsapOnGoal"
@@ -532,19 +531,15 @@ class KickDecider(object):
     ### HIGH LEVEL PLANNERS ###
     ###########################
     def decidingStrategy(self):
-        goalShot = self.allKicksOnGoal()
+        goalShot = self.forwardKickOnGoal()
         if goalShot:
-            print "allKicksOnGoal returned"
+            print "forwardKickOnGoal returned"
             return goalShot
 
         nearGoal = self.nearOurGoal()
         if nearGoal:
             print "nearOurGoal returned"
             return nearGoal
-
-        # frontKicks = self.frontKicksOrbitIfSmall()
-        # if frontKicks: 
-        #     return frontKicks
 
         asap = self.motionKicksAsap()
         if asap:
