@@ -30,7 +30,7 @@ import nbtool.util.Utility;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 
-import messages.Vision.*;
+import messages.VisionOuterClass.*;
 
 public class BasicLineView extends ViewParent {
 
@@ -53,7 +53,7 @@ public class BasicLineView extends ViewParent {
         if (t.equals("proto-FieldLines")) {
             usingLines = true;
             try {
-                FieldLines msg = FieldLines.parseFrom(newlog.bytes);
+                Vision msg = Vision.parseFrom(newlog.bytes);
                 for (FieldLine line : msg.getLineList()) {
                     lines.add(line);
                 }
@@ -64,7 +64,7 @@ public class BasicLineView extends ViewParent {
         else {
             usingLines = false;
             try {
-                Corners msg = Corners.parseFrom(newlog.bytes);
+                Vision msg = Vision.parseFrom(newlog.bytes);
                 System.out.println("CORNER SIZE: " + msg.getCornerCount());
 
                 for (Corner corner : msg.getCornerList()) {
