@@ -32,7 +32,7 @@ def gamePenalized(player):
 @superState('gameControllerResponder')
 def kick(player):
     if player.firstFrame():
-        player.brain.nav.callKickEngine(PMotion_proto.messages.Kick.kickForwardLeft)
+        player.brain.nav.callKickEngine(PMotion_proto.messages.Kick.kickForwardRight)
 
     return player.stay()
 

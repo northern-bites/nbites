@@ -349,7 +349,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             std::cout << "Kick unknown to BHWalkProvider requested. Defaulting." << std::endl;
             motionRequest.kickRequest.kickMotionType = KickRequest::getKickMotionFromName("kickForward");
         }
-        motionRequest.kickRequest.dynamical = true;
+        //motionRequest.kickRequest.dynamical = true;
 
         walkingEngine->theMotionRequestBH = motionRequest;
         kickEngine->theMotionRequestBH = motionRequest;

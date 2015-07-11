@@ -27,9 +27,9 @@ void MotionSelector::update(MotionSelectionBH& motionSelection)
 {
   static int interpolationTimes[MotionRequestBH::numOfMotions];
   interpolationTimes[MotionRequestBH::walk] = 10;
-  interpolationTimes[MotionRequestBH::kick] = 10;
+  interpolationTimes[MotionRequestBH::kick] = 100;
   interpolationTimes[MotionRequestBH::specialAction] = 10;
-  interpolationTimes[MotionRequestBH::stand] = 10;
+  interpolationTimes[MotionRequestBH::stand] = 100;
   interpolationTimes[MotionRequestBH::getUp] = 600;
   static const int playDeadDelay(2000);
 
