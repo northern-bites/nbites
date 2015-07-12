@@ -8,10 +8,6 @@
     (left_sonar 0)
     (right_sonar 0)
   )
-  (shehulk
-    (left_sonar 0)
-    (right_sonar 0)
-  )
   (batman
     (left_sonar 0)
     (right_sonar 0)
