@@ -157,8 +157,8 @@ oddChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
                               NogginConstants.GREEN_PAD_Y + 100,
                               90)
 
-oddChaserKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 45,
-                                 NogginConstants.OPP_GOALBOX_BOTTOM_Y - 100,
+oddChaserKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 60,
+                                 NogginConstants.OPP_GOALBOX_BOTTOM_Y - 120,
                                  0)
 evenChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS,
                                NogginConstants.CENTER_FIELD_Y,
