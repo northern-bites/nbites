@@ -186,7 +186,7 @@ def clearBall(player):
         print "approaching ball"
         player.brain.nav.chaseBall(nav.FAST_SPEED, fast = True)
 
-    return player.stay()
+    return Transition.getNextState(player, clearBall)
 
 @superState('gameControllerResponder')
 def positionForGoalieKick(player):
@@ -215,7 +215,6 @@ def positionForGoalieKick(player):
         player.brain.nav.stand()
         return player.goNow('kickBall')
 
-    return player.stay()
     return Transition.getNextState(player, positionForGoalieKick)
 
 @superState('gameControllerResponder')

@@ -221,44 +221,50 @@ void NaiveBallModule::calculateVelocity()
 void NaiveBallModule::calculateAltVelocity()
 {
 
-    int sampleSize = 10;
-    int fromIndex = (currentIndex + 1) % NUM_FRAMES;
-    int toIndex = (fromIndex + sampleSize) % NUM_FRAMES;
-    float denominator = (float)(sampleSize) / 30.f;
-    float xVelSum = 0.f;
+    // int sampleSize = 10;
+    // int fromIndex = (currentIndex + 1) % NUM_FRAMES;
+    // int toIndex = (fromIndex + sampleSize) % NUM_FRAMES;
+    // float denominator = (float)(sampleSize) / 30.f;
+    // float xVelSum = 0.f;
+    // std::cout << "-----" << std::endl;
+    // for (int i = 0; i < 3; i++) {
+    //     int fromIndex = (i * sampleSize) + currentIndex + 1;
+    //     fromIndex = fromIndex % NUM_FRAMES;
+    //     int toIndex = (fromIndex + sampleSize - 1) % NUM_FRAMES;
+    //     float xVel = (position_buffer[toIndex].rel_x - position_buffer[fromIndex].rel_x) / denominator; // * ALPHA + .9*xVelocityEst * (1 - ALPHA);
+    //     xVelSum = xVel + xVelSum;
+    //     if (i == 0) {v1 = xVel; }
+    //     if (i == 1) {v2 = xVel; }
+    //     if (i == 2) {v3 = xVel; }
 
-    for (int i = 0; i < 3; i++) {
-        int fromIndex = (i * sampleSize) + currentIndex + 1;
-        fromIndex = fromIndex % NUM_FRAMES;
-        int toIndex = (fromIndex + sampleSize - 1) % NUM_FRAMES;
-        float xVel = (position_buffer[toIndex].rel_x - position_buffer[fromIndex].rel_x) / denominator; // * ALPHA + .9*xVelocityEst * (1 - ALPHA);
-        xVelSum = xVel + xVelSum;
-        if (i == 0) {v1 = xVel; }
-        if (i == 1) {v2 = xVel; }
-        if (i == 2) {v3 = xVel; }
+    //     // std::cout << "[NB DEBUG] fromIndex: " << fromIndex << ", toIndex: " << toIndex << std::endl;
+    //     // std::cout << "[NB DEBUG] xVel: " << xVel << std::endl;
+    //     // std::cout << "toX: " << (position_buffer[toIndex].rel_x) << ", fromX: " << (position_buffer[fromIndex].rel_x) << std::endl;
 
-    }
-    v3 = xVelSum;
-    altXVelocityEst = xVelSum / 3.0; //(NUM_FRAMES/sampleSize);
-
-
-
-
-
-    // int numVel = NUM_FRAMES/2;
-    // int fromIndex = currentIndex; // + 1;
-    // // int toIndex = (NUM_FRAMES / 2 + fromIndex) % NUM_FRAMES;
-    // float denominator = (float)(numVel) / 30.f;
-    // float xVelSum = 0.0;
-
-    // for (int i = 0; i < numVel; i++) {
-    //     fromIndex = (fromIndex + 1) % NUM_FRAMES;
-    //     int toIndex = (numVel + fromIndex) % NUM_FRAMES;
-    //     float xVel = (position_buffer[toIndex].rel_x - position_buffer[fromIndex].rel_x) / denominator * ALPHA + .9*xVelocityEst * (1 - ALPHA);
-
-    //     xVelSum += xVel;
     // }
-    // altXVelocityEst = xVelSum / ((float)numVel);
+    // v3 = xVelSum;
+    // altXVelocityEst = xVelSum / 3.0; //(NUM_FRAMES/sampleSize);
+    // // std::cout << "sum: " << xVelSum << std::endl;
+    // std::cout << "est: " << altXVelocityEst << std::endl;
+
+
+
+
+
+    int numVel = NUM_FRAMES/2;
+    int fromIndex = currentIndex; // + 1;
+    // int toIndex = (NUM_FRAMES / 2 + fromIndex) % NUM_FRAMES;
+    float denominator = (float)(numVel) / 30.f;
+    float xVelSum = 0.0;
+
+    for (int i = 0; i < numVel; i++) {
+        fromIndex = (fromIndex + 1) % NUM_FRAMES;
+        int toIndex = (numVel + fromIndex) % NUM_FRAMES;
+        float xVel = (position_buffer[toIndex].rel_x - position_buffer[fromIndex].rel_x) / denominator * ALPHA + .9*xVelocityEst * (1 - ALPHA);
+
+        xVelSum += xVel;
+    }
+    altXVelocityEst = xVelSum / ((float)numVel);
 }
 
 void NaiveBallModule::calcPath()

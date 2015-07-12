@@ -28,6 +28,7 @@ def getCorners(player):
   # T,
 
 def getLines(player):
+    getCorners(player)
     visionLines = player.brain.visionLines
 
     for i in range(0, player.brain.vision.line_size()):
@@ -91,7 +92,7 @@ def facingBackward(player):
 #TODO Finish
 def seeGoalbox(player):
     lines = player.brain.visionLines
-    for i in range(0, lines_size()):
+    for i in range(0, player.brain.vision.line_size()):
         r1 = lines(i).inner.r
         t1 = math.degrees(lines(i).inner.t)
 
@@ -155,7 +156,7 @@ def facingSideways(player):
         return True
     elif math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 10.0:
         print "I'm Def NOT facing sideways!!"
-        print("horizon", player.brain.visionLines.horizon_dist)
+        print("horizon", player.brain.vision.horizon_dist)
     return False
 
 def facingFront(player):
@@ -480,11 +481,9 @@ def getLineLength(line):
 
 def shouldPositionRight(player):
     if player.brain.ball.bearing_deg < -40.0 and \
-    player.brain.ball.distance > constants.CLEARIT_DIST and \
-    player.inPosition is not constants.RIGHT_POSITION and \
-    player.inPosition is not constants.NOT_IN_POSITION:
-        player.homeDirections = []
-        player.homeDirections += [RelRobotLocation(5.0, -30.0, -15.0)]
+    player.brain.ball.distance > constants.CLEARIT_DIST_SIDE and \
+    player.inPosition is not constants.RIGHT_POSITION:
+        GoalieStates.shiftedPosition.dest = constants.LEFT_SHIFT
         return True
 
     GoalieStates.watchWithLineChecks.shiftedPosition = False
@@ -492,11 +491,9 @@ def shouldPositionRight(player):
 
 def shouldPositionLeft(player):
     if player.brain.ball.bearing_deg > 40.0 and \
-    player.brain.ball.distance > constants.CLEARIT_DIST and \
-    player.inPosition is not constants.LEFT_POSITION and \
-    player.inPosition is not constants.NOT_IN_POSITION:
-        player.homeDirections = []
-        player.homeDirections += [RelRobotLocation(5.0, 30.0, 15.0)]
+    player.brain.ball.distance > constants.CLEARIT_DIST_SIDE and \
+    player.inPosition is not constants.LEFT_POSITION:
+        GoalieStates.shiftedPosition.dest = constants.RIGHT_SHIFT
         return True
 
     return False
@@ -504,7 +501,7 @@ def shouldPositionLeft(player):
 def shouldStopTurning(player):
     lines = player.brain.visionLines
 
-    for i in range(0, lines_size()):
+    for i in range(0, player.brain.vision.line_size()):
         r = lines(i).inner.r
         t = math.degrees(lines(i).inner.t)
         if math.fabs(t - 90.0) < 15.0 and r is not 0.0 and r < 40.0:
@@ -524,7 +521,7 @@ def seeFrontLine(player):
     lines = player.brain.visionLines
     horizon = player.brain.vision.horizon_dist
 
-    for i in range(0, lines_size()):
+    for i in range(0, player.brain.vision.line_size()):
         r = lines(i).inner.r
         t = math.degrees(lines(i).inner.t)
         length = getLineLength(lines(i).inner)
@@ -590,20 +587,53 @@ def notTurnedAround(player):
 def updateSpeedBuffer(player):
     buffSize = 6
     player.ballObservations += [player.brain.ball.mov_vel_x]
-    
+    if len(player.ballObservations) > buffSize:
+        player.ballObservations = player.ballObservations[1:]
+    for i in range(3, buffSize):
+        if math.fabs(player.ballObservations[i] - player.ballObservations[i-3]) > 2.0:
+            print "Noticed very different vels!"
+            print("Vel: ", player.ballObservations[i], "and :", player.ballObservations[i-1])
+    print "ayo"
 
 
 updateSpeedBuffer.currentIndex = 0
 
+def veryFastBall(player, y_lower_bound, y_upper_bound):
+    # More sensitive to very fast balls that are far
+    ball = player.brain.ball
+    nball = player.brain.naiveBall
+
+
+    # if nball.yintercept == 0.0:
+    #     print("[SAVING] No yintercept")
+
+    if (ball.distance < 175.0 and
+        ball.mov_vel_x < -14.0 and
+        nball.x_vel < -14.0 and
+        nball.yintercept != 0.0 and
+        nball.yintercept < y_upper_bound and
+        nball.yintercept > y_lower_bound):
+        print("[SAVING] Fast ball first check true")
+        return True
+
+    elif (ball.distance < 200.0 and
+        ball.mov_vel_x < -19.0 and
+        nball.x_vel < -30.0 and
+        nball.yintercept != 0.0 and
+        nball.yintercept < y_upper_bound and
+        nball.yintercept > y_lower_bound):
+        print("[SAVING] Fast ball second check true")
+        return True
+
+    return False
 
 # Saving transitions....
 def shouldDiveRight(player):
-
     if player.firstFrame():
         shouldDiveRight.lastFramesOff = 21
-
     sightOk = True
     ball = player.brain.ball
+    nball = player.brain.naiveBall
 
     if shouldDiveRight.lastFramesOff > 20 and ball.vis.frames_on < 20:
         sightOk = False
@@ -611,18 +641,29 @@ def shouldDiveRight(player):
     if not ball.vis.on:
         shouldDiveRight.lastFramesOff = ball.vis.frames_off
 
-    nball = player.brain.naiveBall
-
-    save = (nball.x_vel < -10.0 and
-        ball.mov_vel_x < constants.SAVE_X_VEL and
+    save = (nball.x_vel < -7.0 and
+        ball.mov_vel_x < -5 and
         not nball.stationary and
         nball.yintercept < -20.0 and
         nball.yintercept > -100.0 and
         ball.distance < constants.SAVE_DIST and
         sightOk)
 
-#todo if ball vel < -15
-#check nb avging
+    if sightOk and veryFastBall(player, -100.0, -20.0):
+        save = True
+
+    # if ball.distance < 175.0 and ball.mov_vel_x < -14.0 and nball.x_vel < -14.0\
+    # and nball.yintercept < -20.0 and nball.yintercept > -100.0 and sightOk:
+    #     save = True
+    #     print "sooo fast"
+
+    # if ball.distance < 200.0 and ball.mov_vel_x < -19.0 and nball.x_vel < -30.0 and sightOk:
+    #     if nball.yintercept < -20.0 and nball.yintercept > -100.0:
+    #         print "should def save right!!"
+    #     elif nball.yintercept == 0.0:
+    #         print "havent yet found a y oops"
+    #     save = True
+    #     print "sooosoo fast"
 
     if save:
         print "DIVE RIGHT"
@@ -650,12 +691,12 @@ def shouldDiveRight(player):
     #         sightOk)
 
 def shouldDiveLeft(player):
-
     if player.firstFrame():
         shouldDiveLeft.lastFramesOff = 21
 
     sightOk = True
     ball = player.brain.ball
+    nball = player.brain.naiveBall
 
     if shouldDiveLeft.lastFramesOff > 20 and ball.vis.frames_on < 20:
         sightOk = False
@@ -663,9 +704,6 @@ def shouldDiveLeft(player):
     if not ball.vis.on:
         shouldDiveLeft.lastFramesOff = ball.vis.frames_off
 
-    nball = player.brain.naiveBall
-
-    # if (nball.x_vel < -10.0 and
 
     save = (nball.x_vel < -10.0 and
         ball.mov_vel_x < constants.SAVE_X_VEL and
@@ -674,6 +712,9 @@ def shouldDiveLeft(player):
         nball.yintercept < 100.0 and
         ball.distance < constants.SAVE_DIST and
         sightOk)
+
+    if sightOk and veryFastBall(player, 20.0, 100.0):
+        save = True
 
     if save:
         print "DIVE LEFT"
@@ -700,20 +741,18 @@ def shouldDiveLeft(player):
     #         sightOk)
 
 def shouldSquat(player):
-
     if player.firstFrame():
         shouldSquat.lastFramesOff = 21
 
     sightOk = True
     ball = player.brain.ball
+    nball = player.brain.naiveBall
 
     if shouldSquat.lastFramesOff > 20 and ball.vis.frames_on < 20:
         sightOk = False
 
     if not ball.vis.on:
         shouldSquat.lastFramesOff = ball.vis.frames_off
-
-    nball = player.brain.naiveBall
 
     # TODO Lower threshold for fast balls
     # if nball.x_vel < -30.0 and abs(nball.yintercept)
@@ -727,13 +766,19 @@ def shouldSquat(player):
         sightOk)
 
      # More sensitive to close balls even at lower speeds
-    if ball.distance < 50.0 and ball.mov_vel_x < -6.0 and nball.yintercept != 0.0\
-    and math.fabs(nball.yintercept) < 30.0:
-        print("ball exceptionally close and somewhat fast, I'm saving")
+    # if ball.distance < 50.0 and ball.mov_vel_x < -6.0 and nball.yintercept != 0.0\
+    # and math.fabs(nball.yintercept) < 30.0 and sightOk:
+    #     print("ball exceptionally close and somewhat fast, I'm saving")
+    #     save = True
+
+    # if ball.distance < 40.0 and ball.mov_vel_x < -2.0 and sightOk:
+    #     print("ball exceptionally close, I'm saving")
+    #     save = True
+
+    if sightOk and veryFastBall(player, -25.0, 25.0):
         save = True
 
-    if ball.distance < 40.0 and ball.mov_vel_x < -2.0:
-        print("ball exceptionally close, I'm saving")
+    elif sightOk and veryCloseBall(player, -25.0, 25.0):
         save = True
 
     if save:
@@ -759,6 +804,29 @@ def shouldSquat(player):
     #         abs(ball.rel_y_intersect_dest) < 40.0 and
     #         ball.distance < 150.0 and
     #         sightOk)
+
+def veryCloseBall(player, y_lower_bound, y_upper_bound):
+    # More sensitive to close balls even at lower speeds
+    ball = player.brain.ball
+    nball = player.brain.naiveBall
+
+    if (ball.distance < 50.0
+    and ball.mov_vel_x < -6.0
+    and nball.yintercept != 0.0
+    and nball.yintercept > y_lower_bound
+    and nball.yintercept < y_upper_bound):
+        print("[SAVING] Ball exceptionally close and somewhat fast, I'm saving")
+        return True
+
+    elif (ball.distance < 40.0
+    and ball.mov_vel_x < -2.0
+    and nball.yintercept != 0.0
+    and nball.yintercept > y_lower_bound
+    and nball.yintercept < y_upper_bound):
+        print("[SAVING] Ball exceptionally close, I'm saving")
+        return True
+
+    return False
 
 def shouldClearDangerousBall(player):
     return False

@@ -9,8 +9,8 @@ import GoalieConstants as constants
 import math
 import noggin_constants as nogginConstants
 
-SAVING = False
-DIVING = False
+SAVING = True
+DIVING = True
 
 @superState('gameControllerResponder')
 def gameInitial(player):
@@ -96,6 +96,7 @@ def gamePlaying(player):
         return player.goLater('walkToGoal')
 
     if player.lastDiffState == 'fallen':
+        #TESTINGCHANGE
         return player.goLater('watch')
         # #TODO fix this
         # player.justKicked = False
@@ -182,7 +183,7 @@ def watchWithLineChecks(player):
 
         if player.lastDiffState == 'returnUsingLoc':
             print("I'm resetting my loc, I think I'm back!")
-            player.brain.resetGoalieLocalization()
+            player.brain.resetLocTo(constants.HOME_POSITION)
 
         if player.lastDiffState is not 'lineCheckReposition' and\
         player.lastDiffState is not 'moveBackwards':
@@ -234,17 +235,13 @@ watchWithLineChecks.wentToClearIt = False
 @superState('gameControllerResponder')
 def lineCheckReposition(player):
     if player.firstFrame():
-        player.brain.tracker.repeatBasicPan()
+        player.brain.tracker.trackBall()
         dest = average(player.homeDirections)
         print "My home directions: "
         print dest
         if dest.relX == 0.0 and dest.relY == 0.0:
             print "I think this was a turn, I'm increasing my num turns!"
             watchWithLineChecks.numTurns += 1
-        elif dest.relX == 5.0 and dest.relY == -30:
-            player.inPosition = constants.RIGHT_POSITION
-        elif dest.relX == 5.0 and dest.relY == 30:
-            player.inPosition = constants.LEFT_POSITION
         else:
             print "This was a reposition, I think"
             watchWithLineChecks.numFixes += 1
@@ -271,13 +268,19 @@ def spinToHorizon(player):
 @superState('gameControllerResponder')
 def returnUsingLoc(player):
     if player.firstFrame():
-        dest = RobotLocation(nogginConstants.FIELD_WHITE_LEFT_SIDELINE_X,
-                        nogginConstants.MIDFIELD_Y,
-                        0.0)
+        dest = constants.HOME_POSITION
         player.brain.nav.goTo(dest,
                             speed = nav.BRISK_SPEED)
         print("I'm trying to return using loc!")
         player.brain.tracker.trackBall()
+        returnUsingLoc.panning = False
+
+    if (player.counter % 60 == 0):
+        print("Switching headtracker")
+        if not returnUsingLoc.panning:
+            player.brain.tracker.repeatBasicPan()
+        else:
+            player.brain.tracker.trackBall
 
     if player.counter > 300:
         print "This is taking a suspiciously long time"
@@ -316,6 +319,33 @@ def spinBack(player):
 spinBack.toAngle = 0.0
 
 @superState('gameControllerResponder')
+def shiftPosition(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        if (shiftPosition.dest == constants.RIGHT_SHIFT
+        and player.inPosition == constants.LEFT_POSITION):
+            player.inPosition = constants.CENTER_POSITION
+            print("[GOALIE POSITION] I think I'm in the center now, I moved right")
+        elif (shiftPosition.dest == constants.RIGHT_SHIFT
+        and player.inPosition == constants.CENTER_POSITION):
+            player.inPosition = constants.RIGHT_POSITION
+            print("[GOALIE POSITION] I think I'm on the right now, I moved right")
+        elif (shiftPosition.dest == constants.LEFT_SHIFT
+        and player.inPosition == constants.CENTER_POSITION):
+            player.inPosition = constants.LEFT_POSITION
+            print("[GOALIE POSITION] I think I'm on the left now, I moved left")
+        elif (shiftPosition.dest == constants.LEFT_SHIFT
+        and player.inPosition == constants.RIGHT_POSITION):
+            player.inPosition = constants.CENTER_POSITION
+            print("[GOALIE POSITION] I think I'm in the center now, I moved left")
+        player.brain.nav.walkTo(shiftPosition.dest, speed = nav.QUICK_SPEED)
+
+    if player.counter > 300:
+        return player.goLater('watch')
+
+    return Transition.getNextState(player, shiftPosition)
+
+@superState('gameControllerResponder')
 def recoverMyself(player):
     if player.firstFrame():
         print("In recover myself")
@@ -330,11 +360,12 @@ def watch(player):
         player.brain.tracker.trackBall()
         player.brain.nav.stand()
         player.returningFromPenalty = False
+        player.inPosition = constants.CENTER_POSITION
         print ("I'm moving to watch! I think I'm in the right position")
         # player.brain.tracker.lookToAngle(0)
 
 
-    if player.counter % 2 == 0:
+    if 1 < 4: #player.counter % 2 == 0:
         print("Horizon dist == ", player.brain.vision.horizon_dist)
 
         ball = player.brain.ball
@@ -452,6 +483,7 @@ def saveCenter(player):
             player.executeMove(SweetMoves.GOALIE_SQUAT)
         # else:
         #     player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
+        #TESTINGCHANGE
 
     if player.counter > 80:
         if SAVING:
@@ -462,6 +494,7 @@ def saveCenter(player):
 
     return player.stay()
 
+
 @superState('gameControllerResponder')
 def upUpUP(player):
     if player.firstFrame():
@@ -470,6 +503,7 @@ def upUpUP(player):
 
     if player.brain.nav.isStopped():
         #TODO testing change, put this back!!!
+        #TESTINGCHANGE
         return player.goLater('watch')
     return player.stay()
 
@@ -486,8 +520,8 @@ def saveRight(player):
 
     if player.counter > 80:
         if SAVING and DIVING:
-            player.executeMove(SweetMoves.GOALIE_ROLL_OUT_RIGHT)
-            return player.goLater('rollOut')
+            # player.executeMove(SweetMoves.GOALIE_ROLL_OUT_RIGHT)
+            return player.goLater('fallen')
         else:
             return player.goLater('watch')
 
@@ -507,7 +541,8 @@ def saveLeft(player):
     if player.counter > 80:
         if SAVING and DIVING:
             player.executeMove(SweetMoves.GOALIE_ROLL_OUT_LEFT)
-            return player.goLater('fallen')
+            return player.goLater('rollOut')
+            #TESTINGCHANGE
         else:
             return player.goLater('watch')
 

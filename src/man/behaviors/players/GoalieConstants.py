@@ -4,6 +4,7 @@
 #
 
 import noggin_constants as constants
+from objects import RelRobotLocation, RobotLocation
 from math import atan2, degrees
 
 RIGHT = 0
@@ -63,3 +64,9 @@ SLOW_DOWN_DIST = 65.0
 BALL_X_OFFSET = 2
 BALL_Y_OFFSET = 2
 GOOD_ENOUGH_H = 6
+
+HOME_POSITION = RobotLocation(constants.FIELD_WHITE_LEFT_SIDELINE_X + 10.0,
+                        constants.MIDFIELD_Y,
+                        0.0)
+LEFT_SHIFT = RelRobotLocation(5.0, 30.0, 15.0)
+RIGHT_SHIFT = RelRobotLocation(5.0, -30.0, -15.0)
