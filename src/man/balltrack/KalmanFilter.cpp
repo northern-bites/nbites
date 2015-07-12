@@ -43,7 +43,7 @@ void KalmanFilter::updateDeltaTime()
     lastUpdateTime = time;
 }
 
-void KalmanFilter::update(messages::VisionBall visionBall,
+void KalmanFilter::update(messages::VBall visionBall,
                           messages::RobotLocation  motion)
 {
     updated = true;
@@ -230,7 +230,7 @@ void KalmanFilter::predict(messages::RobotLocation odometry, float deltaT)
     filteredBear = NBMath::safe_atan2(x(1),x(0));
 }
 
-void KalmanFilter::updateWithObservation(messages::VisionBall visionBall)
+void KalmanFilter::updateWithObservation(messages::VBall visionBall)
 {
     // Declare C and C transpose (ublas)
     // C takes state estimate to observation frame so

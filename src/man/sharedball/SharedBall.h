@@ -10,9 +10,8 @@
 #include <iostream>
 
 #include "WorldModel.pb.h"
-#include "BallModel.pb.h"
+#include "Vision.pb.h"
 #include "RobotLocation.pb.h"
-#include "BallModel.pb.h"
 
 /**
  *****DOES NOT WORK WITH WORLDVIEW OR SHARED VIEWER. MAJOR TODO.****

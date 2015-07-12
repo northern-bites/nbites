@@ -60,13 +60,12 @@ ParticleFilter::~ParticleFilter()
 }
 
 void ParticleFilter::update(const messages::RobotLocation& odometryInput,
-                            messages::FieldLines&          linesInput,
-                            messages::Corners&             cornersInput,
+                            messages::Vision&              visionInput,
                             const messages::FilteredBall*  ballInput)
 {
     // Motion system and vision system update step
     motionSystem->update(particles, odometryInput, errorMagnitude);
-    bool updatedVision = visionSystem->update(particles, linesInput, cornersInput, ballInput, poseEstimate);
+    bool updatedVision = visionSystem->update(particles, visionInput, ballInput, poseEstimate);
 
     // Resample if vision updated
     if(updatedVision) {
@@ -77,19 +76,19 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
         // Ad hoc method to determine if lost based on exponential filters
         // NOTE if set, behaviors may change action of robot to recover localization
         // NOTE not currently used
-        if (1.0 - (wFast / wSlow) > parameters.lostThreshold)
+        if (wFast < parameters.lostThreshold)
             lost = true;
         else
             lost = false;
 
-        resample();
+        resample(ballInput != NULL);
     }
 
     // Update filters estimate
     updateEstimate();
 
     // For debug tools, project lines and corners onto field, set IDs, etc.
-    updateFieldForDebug(linesInput, cornersInput); 
+    updateFieldForDebug(visionInput); 
 }
 
 /**
@@ -134,17 +133,17 @@ void ParticleFilter::updateEstimate()
     // std::cout << variance << std::endl;
 }
 
-void ParticleFilter::updateFieldForDebug(messages::FieldLines& lines,
-                                         messages::Corners& corners)
+void ParticleFilter::updateFieldForDebug(messages::Vision& vision)
 {
+    // (1) Lines
     LineSystem lineSystem;
     lineSystem.setDebug(false);
-    for (int i = 0; i < lines.line_size(); i++) {
+    for (int i = 0; i < vision.line_size(); i++) {
         // Get line
-        messages::FieldLine& field = *lines.mutable_line(i);
+        messages::FieldLine& field = *vision.mutable_line(i);
 
         // Set correspondence and scores
-        if (!LineSystem::shouldUse(lines.line(i))) {
+        if (!LineSystem::shouldUse(vision.line(i), poseEstimate)) {
             // Lines that the particle filter did not use are given -1 as ID
             field.set_id(0);
         } else {
@@ -155,7 +154,7 @@ void ParticleFilter::updateFieldForDebug(messages::FieldLines& lines,
         }
 
         // Project lines onto the field
-        vision::GeoLine projected = LineSystem::relRobotToAbsolute(lines.line(i), poseEstimate);
+        vision::GeoLine projected = LineSystem::relRobotToAbsolute(vision.line(i), poseEstimate);
         messages::HoughLine& hough = *field.mutable_inner();
 
         hough.set_r(projected.r());
@@ -164,26 +163,54 @@ void ParticleFilter::updateFieldForDebug(messages::FieldLines& lines,
         hough.set_ep1(projected.ep1());
     }
 
+    // (2) Corners
     LandmarkSystem landmarkSystem;
     landmarkSystem.setDebug(false);
-    for (int i = 0; i < corners.corner_size(); i++) {
+    for (int i = 0; i < vision.corner_size(); i++) {
         // Get corner
-        messages::Corner& corner = *corners.mutable_corner(i);
+        messages::Corner& corner = *vision.mutable_corner(i);
 
-        messages::RobotLocation cornerRel;
-        cornerRel.set_x(corner.x());
-        cornerRel.set_y(corner.y());
-
-        // Set correspondence and scores
+        // Set correspondence and score
         LandmarkID id = std::get<0>(landmarkSystem.matchCorner(corner, poseEstimate));
         corner.set_prob(landmarkSystem.scoreCorner(corner, poseEstimate));
         corner.set_correspondence(static_cast<int>(id));
 
         // Project corner onto the field
+        messages::RobotLocation cornerRel;
+        cornerRel.set_x(corner.x());
+        cornerRel.set_y(corner.y());
+
         messages::RobotLocation cornerAbs = LandmarkSystem::relRobotToAbsolute(cornerRel, poseEstimate);
         corner.set_x(cornerAbs.x());
         corner.set_y(cornerAbs.y());
     }
+
+    // (3) Center circle
+    messages::CenterCircle& circle = *vision.mutable_circle();
+
+    // Set score
+    circle.set_prob(landmarkSystem.scoreCircle(circle, poseEstimate));
+
+    // Project circle onto the field
+    messages::RobotLocation circleRel;
+    circleRel.set_x(circle.x());
+    circleRel.set_y(circle.y());
+
+    messages::RobotLocation circleAbs = LandmarkSystem::relRobotToAbsolute(circleRel, poseEstimate);
+    circle.set_x(circleAbs.x());
+    circle.set_y(circleAbs.y());
+
+    // (4) Ball
+    messages::VBall& ball = *vision.mutable_ball();
+
+    // Project ball onto the field
+    messages::RobotLocation ballRel;
+    ballRel.set_x(ball.x());
+    ballRel.set_y(ball.y());
+
+    messages::RobotLocation ballAbs = LandmarkSystem::relRobotToAbsolute(ballRel, poseEstimate);
+    ball.set_x(ballAbs.x());
+    ball.set_y(ballAbs.y());
 }
 
 /**
@@ -405,7 +432,7 @@ void ParticleFilter::resetLocToSide(bool blueSide)
  * @brief  Resample the particles based on vision observations
  *         NOTE: Assume given a swarm with normalized weights
  */
-void ParticleFilter::resample()
+void ParticleFilter::resample(bool inSet)
 {
     // Map each normalized weight to the corresponding particle.
     std::map<float, Particle> cdf;
@@ -426,38 +453,43 @@ void ParticleFilter::resample()
     ParticleSet newParticles;
     const std::vector<ReconstructedLocation>& injections = visionSystem->getInjections();
 
+    // China 2015 hack
+    // If in set and see ball suitable for reconstruction, completely replace swarm with injections
+    if (inSet && injections.size()) {
+        for(int i = 0; i < parameters.numParticles; ++i) {
+            ReconstructedLocation injection = injections[rand() % injections.size()];
+            messages::RobotLocation sample = injection.sample();
+
+            Particle reconstructedParticle(sample.x(), sample.y(), sample.h(), 1/250);
+            newParticles.push_back(reconstructedParticle);
+        }
+    // Augmented MCL
     // Either inject particle or sample with replacement according to the
     // normalized weights, and place in a new particle set
     //
     // NOTE we only consider injecting particles if vision system found 
     //      suitable observations
-    int ni = 0;
-    for(int i = 0; i < parameters.numParticles; ++i) {
-        double randInjectOrSample = gen();
-        if (injections.size() && randInjectOrSample < std::max<double>(0, 1.0 - (wFast / wSlow))) {
-            // Inject particles according to sensor measurements
-            ReconstructedLocation injection = injections[rand() % injections.size()];
-            messages::RobotLocation sample = injection.sample();
-            ni++;
+    } else {
+        for(int i = 0; i < parameters.numParticles; ++i) {
+            double randInjectOrSample = gen();
+            if (injections.size() && randInjectOrSample < std::max<double>(0, 1.0 - (wFast / wSlow))) {
+                // Inject particles according to sensor measurements
+                ReconstructedLocation injection = injections[rand() % injections.size()];
+                messages::RobotLocation sample = injection.sample();
 
-            Particle reconstructedParticle(sample.x(), sample.y(), sample.h(), 1/250);
-            newParticles.push_back(reconstructedParticle);
-        } else {
-            // Resample from this frame's swarm based on scores
-            double randSample = gen();
+                Particle reconstructedParticle(sample.x(), sample.y(), sample.h(), 1/250);
+                newParticles.push_back(reconstructedParticle);
+            } else {
+                // Resample from this frame's swarm based on scores
+                double randSample = gen();
 
-            if (cdf.upper_bound(randSample) == cdf.end())
-                newParticles.push_back(cdf.begin()->second); // NOTE return something that DEF exists
-            else
-                newParticles.push_back(cdf.upper_bound(randSample)->second);
+                if (cdf.upper_bound(randSample) == cdf.end())
+                    newParticles.push_back(cdf.begin()->second); // NOTE return something that DEF exists
+                else
+                    newParticles.push_back(cdf.upper_bound(randSample)->second);
+            }
         }
     }
-
-    // std::cout << "TEST" << std::endl;
-    // std::cout << 1.0 - (wFast / wSlow) << std::endl;
-    // std::cout << wFast << std::endl;
-    // std::cout << wSlow << std::endl;
-    // std::cout << ni << std::endl;
 
     // Update particles
     particles = newParticles;

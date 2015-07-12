@@ -47,7 +47,7 @@ MMKalmanFilter::~MMKalmanFilter()
  * @params - visionball is a NEW vision message
            - motion is a NEW motion message
  */
-void MMKalmanFilter::update(messages::VisionBall    visionBall,
+void MMKalmanFilter::update(messages::VBall         visionBall,
                             messages::RobotLocation odometry)
 {
     predictFilters(odometry);
@@ -348,7 +348,7 @@ void MMKalmanFilter::predictFilters(messages::RobotLocation odometry)
  * @brief - Correct each filter given an observation
  *          Pretty straightforward...
  */
-void MMKalmanFilter::updateWithVision(messages::VisionBall visionBall)
+void MMKalmanFilter::updateWithVision(messages::VBall visionBall)
 {
     for (std::vector<KalmanFilter *>::iterator it = filters.begin(); it != filters.end(); it++)
     {

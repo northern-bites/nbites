@@ -30,12 +30,12 @@ def afterPenalty(player):
         afterPenalty.goalLeft = 0
         afterPenalty.reset_loc = 0
 
-    lines = player.brain.visionLines
+    vis = player.brain.vision
 
     # Do we see the top of the goalbox
-    for i in range(0, lines.line_size()):
-        if lines.line(i).id == LineID.TopGoalbox:
-            topGoalBox = lines.line(i).inner
+    for i in range(0, vis.line_size()):
+        if vis.line(i).id == LineID.TopGoalbox:
+            topGoalBox = vis.line(i).inner
             leftAngle = fabs(topGoalBox.t - pi) < .25
             # Goalbox to the left = 1 to the right = -1
             toLeft = 1 if leftAngle else -1
