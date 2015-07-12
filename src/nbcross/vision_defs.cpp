@@ -410,6 +410,7 @@ int Vision_func() {
     ccdRet->setData(pointsBuf);
     rets.push_back(ccdRet);
 
+	std::cout << "Debug image" << std::endl;
     //-------------------
     //  DEBUG IMAGE
     //-------------------
@@ -426,7 +427,7 @@ int Vision_func() {
 
     rets.push_back(debugImage);
 
-
+	std::cout << "Exiting Vision Call" << std::endl;
     return 0;
 }
 

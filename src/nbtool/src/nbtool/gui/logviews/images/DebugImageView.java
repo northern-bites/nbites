@@ -181,8 +181,8 @@ public class DebugImageView extends ViewParent
 										SExpr.newKeyValue("FieldHorizon", displayParams[1]),
 										SExpr.newKeyValue("DebugHorizon", displayParams[2]),
 										SExpr.newKeyValue("DebugField", displayParams[3]),
-										SExpr.newKeyValue("DebugBall", displayParams[4]),
-										SExpr.newKeyValue("GreenThresh", persistant.thresh));
+										SExpr.newKeyValue("DebugBall", displayParams[4]));
+
 
         // Look for existing Params atom in current this.log description
         SExpr oldParams = currentLog.tree().find("DebugDrawing");
@@ -482,8 +482,8 @@ public class DebugImageView extends ViewParent
 				thresh = (int)source.getValue();
 				System.out.println("New value is "+thresh);
 			}
-			parent.adjustParams();
-			parent.repaint();
+			//parent.adjustParams();
+			//parent.repaint();
 		}
 
 		public void itemStateChanged(ItemEvent e) {

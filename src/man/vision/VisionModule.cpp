@@ -154,7 +154,6 @@ void VisionModule::run_()
 
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
-
         // Get image
         const messages::YUVImage* image = images[i];
 
@@ -239,6 +238,7 @@ void VisionModule::run_()
     ballOn = ballDetected;
     outportalVisionField();
     updateObstacleBox();
+
 }
 
 void VisionModule::outportalVisionField()
@@ -412,12 +412,10 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
 		int debugHorizon = params->get(1)->find("DebugHorizon")->get(1)->valueAsInt();
 		int debugField = params->get(1)->find("DebugField")->get(1)->valueAsInt();
 		int debugBall = params->get(1)->find("DebugBall")->get(1)->valueAsInt();
-		int greenThresh = params->get(1)->find("GreenThresh")->get(1)->valueAsInt();
 		field->setDrawCameraHorizon(cameraHorizon);
 		field->setDrawFieldHorizon(fieldHorizon);
 		field->setDebugHorizon(debugHorizon);
 		field->setDebugFieldEdge(debugField);
-		field->setGreenThresh(greenThresh);
 		ballDetector[0]->setDebugBall(debugBall);
 		ballDetector[1]->setDebugBall(debugBall);
 	}
