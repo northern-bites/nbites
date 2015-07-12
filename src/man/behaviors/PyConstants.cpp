@@ -296,7 +296,7 @@ BOOST_PYTHON_MODULE(noggin_constants)
         ;
 
     //strategy
-    scope().attr("STRATEGY") = get_strategy();
+    scope().attr("DEFENSIVE_STRATEGY") = get_strategy();
 }
 
 int get_strategy() {

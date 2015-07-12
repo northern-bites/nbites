@@ -1,1 +1,1 @@
-((strategy 1))
+((fixed_defender_home False))
