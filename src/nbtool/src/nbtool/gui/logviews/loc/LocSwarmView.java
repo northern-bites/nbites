@@ -129,7 +129,7 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 	public void paintComponent(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		f.drawField(g2,shouldFlip, lineColors);
-		naoPlayer.drawNao(g2,shouldFlip);
+		naoPlayer.drawNaoLoc(g2,shouldFlip);
 		if(!naoParticles.isEmpty()) {
 			for(int i=0; i<naoParticles.size(); i++) {
 				naoParticles.get(i).drawParticle(g2,pWeight,shouldFlip);

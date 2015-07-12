@@ -13,8 +13,15 @@ public class NaoRobot {
 	private final static float naoRobotSize = 15.f;
 	private final static int playerNumberOffset = 10;
 	double halfViewAngle = Math.toRadians(31);
-	protected int walkingToX, walkingToY, playerNumber, ballX, ballY, sharedBallX, sharedBallY;
-	public float x,y,h, radius, xDist, yDist,kickDestX, kickDestY;
+	
+	public int fieldWalkingToX, fieldWalkingToY, playerNumber, fieldBallX, fieldBallY, 
+				fieldSharedBallX, fieldSharedBallY;
+	public float fieldX,fieldY,fieldH,fieldXDist,fieldYDist,fieldKickDestX, fieldKickDestY, radius;
+	
+	int screenX, screenY, screenKickDestX, screenKickDestY,screenWalkingToX, screenWalkingToY, 
+		screenBallX, screenBallY,screenSharedBallX, screenSharedBallY;
+	float screenXDist, screenYDist, screenH;
+	
 	public boolean shouldFlip_; 
 	public boolean in_kicking_state = false; 
 	public boolean seeing_ball = false;
@@ -24,22 +31,22 @@ public class NaoRobot {
 	float TO_RAD = (float) (Math.PI/180);
 
 	public NaoRobot() { 
-		x = 0.0f;
-		y = 0.0f;
+		screenX = 0;
+		screenY = 0;
 		setRadiusAndColor(); 
 	}
 
 	NaoRobot(float xCoord, float yCoord) {
-		x = xCoord;
-		y = yCoord;
-		h = 0.0f;
+		screenX = (int) xCoord;
+		screenY = (int) yCoord;
+		screenH = 0.0f;
 		setRadiusAndColor();
 	}
 
 	NaoRobot(float xCoord, float yCoord, float heading) {
-		x = xCoord;
-		y = yCoord;
-		h = -heading;
+		screenX = (int) xCoord;
+		screenY = (int) yCoord;
+		screenH = -heading;
 		setRadiusAndColor();
 	}
 
@@ -47,85 +54,126 @@ public class NaoRobot {
 		radius = naoRobotSize;
 		naoColor = Color.cyan;
 	}
-
-	public void drawNao(Graphics2D g2, boolean shouldFlip) {
-		shouldFlip_ = shouldFlip;
-		if(shouldFlip_) {
-			x = FieldConstants.FIELD_WIDTH-x;
-			h += (float)Math.PI;
-			kickDestX = (int) (FieldConstants.FIELD_WIDTH-kickDestX);
-			walkingToX = (int) (FieldConstants.FIELD_WIDTH-walkingToX);
-			ballX = (int) (FieldConstants.FIELD_WIDTH-ballX);
+	
+	public void drawNaoLoc(Graphics2D g2, boolean shouldFlip) {
+		if(shouldFlip) {
+			screenX = (int) (FieldConstants.FIELD_WIDTH-screenX);
+			screenH = (float) (Math.PI+screenH);
 		} else {
-			y = FieldConstants.FIELD_HEIGHT-y;
-			kickDestY = (int) FieldConstants.FIELD_HEIGHT-kickDestY;
-			walkingToY = (int) FieldConstants.FIELD_HEIGHT-walkingToY;
-			ballY = (int) FieldConstants.FIELD_HEIGHT-ballY;
+			screenY = (int) (FieldConstants.FIELD_HEIGHT-screenY);
 		}
-
+		
 		g2.setColor(naoColor);
-		g2.fill(new Ellipse2D.Float(x-7.5f, y-7.5f, 15.f, 15.f));
+		g2.fill(new Ellipse2D.Float(screenX-naoRobotSize/2, screenY-naoRobotSize/2, naoRobotSize, naoRobotSize));
 
 		//heading
 		g2.setColor(Color.black);
 		g2.setStroke(new BasicStroke(3));
-		xDist = (float)(20 * Math.cos(TO_RAD*h)+x);
-		yDist = (float)(20 * Math.sin(TO_RAD*h)+y);
-		g2.draw(new Line2D.Float(x, y, xDist, yDist));
+		int xDist = (int)(20 * Math.cos(screenH)+screenX);
+		int yDist = (int)(20 * Math.sin(screenH)+screenY);
+		g2.drawLine((int)screenX,(int)(screenY),xDist,yDist);
 
 		//field of view
 		g2.setColor(Color.red);
 		g2.setStroke(new BasicStroke(2));
 		//right
-		xDist = (float)(20 * Math.cos(TO_RAD*h+halfViewAngle)+x);
-		yDist = (float)(20 * Math.sin(TO_RAD*h+halfViewAngle)+y);
-		g2.draw(new Line2D.Float(x, y, xDist, yDist));
+		xDist = (int)(20 * Math.cos(screenH+halfViewAngle)+screenX);
+		yDist = (int)(20 * Math.sin(screenH+halfViewAngle)+screenY);
+		g2.drawLine((int)screenX,(int)screenY,xDist,yDist);
+		//left
+		xDist = (int)(20 * Math.cos(screenH-halfViewAngle)+screenX);
+		yDist = (int)(20 * Math.sin(screenH-halfViewAngle)+screenY);
+		g2.drawLine((int)screenX,(int)screenY,xDist,yDist);
+	}
+
+	public void drawNaoWV(Graphics2D g2, boolean shouldFlip) {
+			if(shouldFlip) {
+				screenX = (int) (FieldConstants.FIELD_WIDTH-fieldX);
+				screenY = (int) fieldY;
+				screenH = (float) (180+fieldH);
+				screenKickDestX = (int) (FieldConstants.FIELD_WIDTH-fieldKickDestX);
+				screenKickDestY  = (int) fieldKickDestY;
+				screenWalkingToX = (int) (FieldConstants.FIELD_WIDTH-fieldWalkingToX);
+				screenWalkingToY = (int) fieldWalkingToY;
+				screenBallX = (int) (FieldConstants.FIELD_WIDTH-fieldBallX);
+				screenBallY = (int) fieldBallY;
+			} else {
+				screenX = (int) fieldX;
+				screenY = (int) (FieldConstants.FIELD_HEIGHT- fieldY);
+				System.out.println("Screen H: "+screenH);
+				System.out.println("Field H: "+fieldH);
+				screenH = fieldH;
+				screenKickDestX  = (int) fieldKickDestX;
+				screenKickDestY = (int) (FieldConstants.FIELD_HEIGHT-fieldKickDestY);
+				screenWalkingToX = (int) fieldWalkingToX;
+				screenWalkingToY = (int) (FieldConstants.FIELD_HEIGHT-fieldWalkingToY);
+				screenBallX = (int) fieldBallX;
+				screenBallY = (int) (FieldConstants.FIELD_HEIGHT-fieldBallY);
+			}
+
+		g2.setColor(naoColor);
+		g2.fill(new Ellipse2D.Float(screenX-naoRobotSize/2, screenY-naoRobotSize/2, naoRobotSize, naoRobotSize));
+
+		//heading
+		g2.setColor(Color.black);
+		g2.setStroke(new BasicStroke(3));
+		screenXDist = (float)(20 * Math.cos(TO_RAD*screenH)+screenX);
+		screenYDist = (float)(20 * Math.sin(TO_RAD*screenH)+screenY);
+		g2.draw(new Line2D.Float(screenX, screenY, screenXDist, screenYDist));
+
+		//field of view
+		g2.setColor(Color.red);
+		g2.setStroke(new BasicStroke(2));
+		//right
+		screenXDist = (float)(20 * Math.cos(TO_RAD*screenH+halfViewAngle)+screenX);
+		screenYDist = (float)(20 * Math.sin(TO_RAD*screenH+halfViewAngle)+screenY);
+		g2.draw(new Line2D.Float(screenX, screenY, screenXDist, screenYDist));
 		
 		//left
-		xDist = (float)(20 * Math.cos(TO_RAD*h-halfViewAngle)+x);
-		yDist = (float)(20 * Math.sin(TO_RAD*h-halfViewAngle)+y);
-		g2.draw(new Line2D.Float(x, y, xDist, yDist));
+		screenXDist = (float)(20 * Math.cos(TO_RAD*screenH-halfViewAngle)+screenX);
+		screenYDist = (float)(20 * Math.sin(TO_RAD*screenH-halfViewAngle)+screenY);
+		g2.draw(new Line2D.Float(screenX, screenY, screenXDist, screenYDist));
 		
 		//player number
 		g2.setColor(naoColor);
-		g2.drawString(Integer.toString(playerNumber), x+playerNumberOffset, y-playerNumberOffset);
+		g2.drawString(Integer.toString(playerNumber), screenX+playerNumberOffset, screenY-playerNumberOffset);
 		
 		//where am i kicking
 		g2.setColor(Color.blue);
 		if(!in_kicking_state) {
-			kickDestX = (int)x;
-			kickDestY = (int)y;
+			screenKickDestX = (int)screenX;
+			screenKickDestY = (int)screenY;
 		}
-		g2.draw(new Line2D.Float(x,y,kickDestX,kickDestY));
+		g2.draw(new Line2D.Float(screenX,screenY,screenKickDestX,screenKickDestY));
 		
 		//where am i walking
 		g2.setColor(Color.red);
 		if(!fallen) {
-			walkingToX = (int)x;
-			walkingToY = (int)y;
+			screenWalkingToX = (int)screenX;
+			screenWalkingToY = (int)screenY;
 		}
-		g2.drawLine((int)x,(int)y,walkingToX,walkingToY);
+		g2.drawLine((int)screenX,(int)screenY,screenWalkingToX,screenWalkingToY);
 		
 		//where is my ball
 		g2.setColor(Color.orange);
 		if(seeing_ball) {
-			g2.fill(new Ellipse2D.Double(ballX-4, ballY-4, 8, 8));
-			g2.drawString(Integer.toString(playerNumber), ballX+1, ballY-1);	
+			g2.fill(new Ellipse2D.Double(screenBallX-4, screenBallY-4, 8, 8));
+			g2.drawString(Integer.toString(playerNumber), screenBallX+1, screenBallY-1);	
 		}
 		
 		//where is my shared ball | only for player 4&5: chasers
 		g2.setColor(new Color(204,0,100));
 		if(sharedBall) {
-			g2.fill(new Ellipse2D.Double(sharedBallX-4, sharedBallY-4,8,8));
-			g2.drawString(Integer.toString(playerNumber), sharedBallX, sharedBallY);
+			g2.fill(new Ellipse2D.Double(screenSharedBallX-4, screenSharedBallY-4,8,8));
+			g2.drawString(Integer.toString(playerNumber), screenSharedBallX+1, screenSharedBallX-1);
 		}
 		
 	}
 	
 	public void wvNao(TeamBroadcast tb) {
-		x = tb.dataWorldModel.getMyX();
-		y = tb.dataWorldModel.getMyY();
-		h = -tb.dataWorldModel.getMyH();
+		fieldX = tb.dataWorldModel.getMyX();
+		fieldY = tb.dataWorldModel.getMyY();
+		fieldH = -tb.dataWorldModel.getMyH();
 		playerNumber = tb.dataTeamPacket.getPlayerNumber();
 		
 		if(tb.dataWorldModel.getFallen()) {
@@ -136,14 +184,14 @@ public class NaoRobot {
 		
 		if(tb.dataWorldModel.getInKickingState()) {
 			in_kicking_state = true;
-			kickDestX = (int)tb.dataWorldModel.getKickingToX();
-			kickDestY = (int)tb.dataWorldModel.getKickingToY();
+			fieldKickDestX = (int)tb.dataWorldModel.getKickingToX();
+			fieldKickDestY = (int)tb.dataWorldModel.getKickingToY();
 		}
 		
 		if(!tb.dataWorldModel.getFallen()) {
 			fallen = true;
-			walkingToX = (int)tb.dataWorldModel.getWalkingToX();
-			walkingToY = (int)tb.dataWorldModel.getWalkingToY();
+			fieldWalkingToX = (int)tb.dataWorldModel.getWalkingToX();
+			fieldWalkingToY = (int)tb.dataWorldModel.getWalkingToY();
 		}
 		
 		if(tb.dataWorldModel.getBallOn()) {
@@ -153,8 +201,8 @@ public class NaoRobot {
 					(int)(tb.dataWorldModel.getMyY()+tb.dataWorldModel.getBallDist()
 					*Math.sin(TO_RAD*tb.dataWorldModel.getMyH()+tb.dataWorldModel.getBallBearing())));
 			
-			ballX = ballCenter.x;
-			ballY = ballCenter.y;
+			fieldBallX = ballCenter.x;
+			fieldBallY = ballCenter.y;
 
 		}
 	}
@@ -163,25 +211,25 @@ public class NaoRobot {
 		sharedBall = true;
 		float sinHB, cosHB;
 		
-		float hb = TO_RAD*h+TO_RAD*tb.dataWorldModel.getBallBearing();
+		float hb = TO_RAD*fieldH+TO_RAD*tb.dataWorldModel.getBallBearing();
 		sinHB = (float) Math.sin(hb);
 		cosHB = (float) Math.cos(hb);
 			
-		float newBallX = x + tb.dataWorldModel.getBallDist()*cosHB;
-		float newBallY = y + tb.dataWorldModel.getBallDist()*sinHB;
+		float newBallX = fieldX + tb.dataWorldModel.getBallDist()*cosHB;
+		float newBallY = fieldY + tb.dataWorldModel.getBallDist()*sinHB;
 			
-		sharedBallX = (int) newBallX;
-		sharedBallY = (int) newBallY;
+		fieldBallX = (int) newBallX;
+		fieldBallY = (int) newBallY;
 
 	}
 
 	public void moveTo(float xCoord, float yCoord, float heading) {
-		x = xCoord;
-		y = yCoord;
-		h = -heading;
+		screenX = (int)xCoord;
+		screenY = (int)yCoord;
+		screenH = heading;
 	}
 
-	public float getX() { return x; }
-	public float getY() { return y; }
-	public float getH() { return h; }
+	public float getX() { return fieldX; }
+	public float getY() { return fieldY; }
+	public float getH() { return fieldH; }
 }
