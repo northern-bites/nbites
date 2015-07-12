@@ -51,7 +51,10 @@ def tooFarFromHome(threshold, player):
         ball = None
         home = player.homePosition
 
-    if ball != None:
+    if nogginC.FIXED_D_HOME:
+        home = player.homePosition
+
+    elif ball != None:
         if role.isLeftDefender(player.role):
             home = findDefenderHome(True, ball, player.homePosition.h)
         elif role.isRightDefender(player.role):
