@@ -52,6 +52,13 @@ class Navigator(FSA.FSA):
         self.velocity = 0.
         self.requestVelocity = 0.
         self.destination = None # Used to set walking_to in world model proto
+
+        # initialize obstacle counts
+        navTrans.shouldDodge.sOrACount = 0
+        navTrans.shouldDodge.vCount = 0
+        NavStates.goToPosition.avoidObstacles = True
+        self.dodging = False
+
         #transitions
         #@todo: move this to the actual transitions file?
         self.atLocPositionTransition = Transition.CountTransition(navTrans.atDestination,
@@ -63,26 +70,16 @@ class Navigator(FSA.FSA):
 
         NavStates.goToPosition.transitions = {
             self.atLocPositionTransition : NavStates.atPosition,
-
-            Transition.CountTransition(navTrans.shouldDodge,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : NavStates.dodge
-
             }
-
-        NavStates.dodge.transitions = {
-            Transition.CountTransition(navTrans.doneDodging,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
-           : NavStates.briefStand
-           }
 
         NavStates.atPosition.transitions = {
             self.locRepositionTransition : NavStates.goToPosition
             }
 
     def run(self):
+        if self.dodging and self.currentState != 'dodge':
+            self.dodging = False
+            
         FSA.FSA.run(self)
 
     def performSweetMove(self, move):

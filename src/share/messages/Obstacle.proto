@@ -33,6 +33,11 @@ message FieldObstacles
         optional ObstaclePosition position = 1;
         optional float distance = 2;
         optional ObstacleDetector detector = 3;
+
+        optional float closest_y = 4;
+        optional float box_bottom = 5;
+        optional float box_left = 6;
+        optional float box_right = 7;
     }
     repeated Obstacle obstacle = 1;
 }

@@ -91,18 +91,18 @@ public class FieldConstants
     public final float MY_GOAL_HEADING = 180.0f;
 
     // my goal box constants relative to (0,0) on my team
-    public final float MY_GOALBOX_TOP_Y = MIDFIELD_Y + GOALBOX_WIDTH * .5f;
-    public final float MY_GOALBOX_BOTTOM_Y = MIDFIELD_Y - GOALBOX_WIDTH * .5f;
+    public final static float MY_GOALBOX_TOP_Y = MIDFIELD_Y + GOALBOX_WIDTH * .5f;
+    public final static float MY_GOALBOX_BOTTOM_Y = MIDFIELD_Y - GOALBOX_WIDTH * .5f;
     // bottom as in closest to (0,0)
-    public final float MY_GOALBOX_LEFT_X = GREEN_PAD_X;
-    public final float MY_GOALBOX_RIGHT_X = GREEN_PAD_X + GOALBOX_DEPTH;
+    public final static float MY_GOALBOX_LEFT_X = GREEN_PAD_X;
+    public final static float MY_GOALBOX_RIGHT_X = GREEN_PAD_X + GOALBOX_DEPTH;
     
     // opp goal box constants relative to (0,0) on my team
-    public final float OPP_GOALBOX_BOTTOM_Y = MIDFIELD_Y - GOALBOX_WIDTH * .5f;
-    public final float OPP_GOALBOX_TOP_Y = MIDFIELD_Y + GOALBOX_WIDTH * .5f;
-    public final float OPP_GOALBOX_LEFT_X =
+    public final static float OPP_GOALBOX_BOTTOM_Y = MIDFIELD_Y - GOALBOX_WIDTH * .5f;
+    public final static float OPP_GOALBOX_TOP_Y = MIDFIELD_Y + GOALBOX_WIDTH * .5f;
+    public final static float OPP_GOALBOX_LEFT_X =
     FIELD_WHITE_RIGHT_SIDELINE_X - GOALBOX_DEPTH;
-    public final float OPP_GOALBOX_RIGHT_X = FIELD_WHITE_RIGHT_SIDELINE_X;
+    public final static float OPP_GOALBOX_RIGHT_X = FIELD_WHITE_RIGHT_SIDELINE_X;
 
     public final float LINE_CROSS_OFFSET = 130.0f;
         

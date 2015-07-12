@@ -226,7 +226,7 @@ public class NaoRobot {
 	public void moveTo(float xCoord, float yCoord, float heading) {
 		screenX = (int)xCoord;
 		screenY = (int)yCoord;
-		screenH = heading;
+		screenH = -heading;
 	}
 
 	public float getX() { return fieldX; }

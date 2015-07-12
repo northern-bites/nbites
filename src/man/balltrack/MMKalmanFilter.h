@@ -19,7 +19,7 @@
 
 #include "NBMath.h"
 
-#include "BallModel.pb.h"
+#include "Vision.pb.h"
 #include "Motion.pb.h"
 #include "RobotLocation.pb.h"
 
@@ -58,7 +58,7 @@ public:
     MMKalmanFilter(MMKalmanFilterParams params_ = DEFAULT_MM_PARAMS);
     ~MMKalmanFilter();
 
-    void update(messages::VisionBall    visionBall,
+    void update(messages::VBall         visionBall,
                 messages::RobotLocation odometry);
 
     ufvector4 getStateEst(){return stateEst;};
@@ -114,7 +114,7 @@ public:
 private:
     void predictFilters(messages::RobotLocation odometry);
     void predictFilters(messages::RobotLocation odometry, float t);
-    void updateWithVision(messages::VisionBall visionBall);
+    void updateWithVision(messages::VBall visionBall);
 
     void updatePredictions();
 

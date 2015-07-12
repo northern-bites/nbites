@@ -18,6 +18,8 @@
 namespace man {
 namespace vision {
 
+	class DebugImage;
+
 // Scan array of unsigned bytes or words for values above the specified
 // threshold. Place in the runs array the offset of each such byte/word found,
 // terminated by -1.
@@ -260,7 +262,7 @@ public:
   {
     return Fool(max(f(), a.f()));
   }
-    
+
   Fool operator!()
   {
     return Fool(1 - f());
@@ -379,7 +381,7 @@ public:
   // bit to the right of the binary point). There are several reasons that a
   // half-pixel shift may occur:
   //    * The original source image (e.g. from a camera) may be of odd width
-  //      or height (unlikely, od course).
+  //      or height (unlikely, of course).
   //    * A neighborhood processing operation may use an odd-diameter neighborhood
   //    * Features (e.g. edges) can be detected with half-pixel resolution.
   int x0() const { return _x0; }
@@ -405,7 +407,7 @@ public:
     _pitch = pitch;
   }
 
-  // Construct, placing (x0, y0) at the center. 
+  // Construct, placing (x0, y0) at the center.
   ImageLiteBase(int wd, int ht, int pitch)
   {
     _x0 = wd;   // This is wd/2 because x0 is in half-pixel units
@@ -517,6 +519,278 @@ public:
   void u(int i, int j, uint8_t z) {  (pixelAddr() + j * pitch())[4 * i + 1] = z; }
   int v(int i, int j) const { return (pixelAddr() + j * pitch())[4 * i + 3]; }
   void v(int i, int j, uint8_t z) {  (pixelAddr() + j * pitch())[4 * i + 3] = z; }
+};
+
+/* DebugImage
+ * This class provides extra images that can be "drawn" on as a way of
+ * debugging. The class is really just a 2D array filled with "colors"
+ * that are just numbers. Later the nbtool can interpret those numbers
+ * as whatever colors it likes.
+ * Note: all code is #ifdef'd as absolute insurance it doesn't run on the robot
+ */
+
+class DebugImage : ImageLiteU8
+{
+private:
+	//DebugImage(const DebugImage&);
+	//DebugImage& operator= (const DebugImage&);
+
+public:
+
+	DebugImage(int wd, int ht, uint8_t *d)
+	//: ImageLiteU8(wd, ht, wd, (uint8_t *)malloc(wd * ht * sizeof(uint8_t)))
+		:ImageLiteU8(wd, ht, wd, d)
+		{}
+
+	DebugImage() {}
+
+	uint8_t* pixArray() { return pixelAddr(); }
+
+	//uint8_t  pixAddr(int x, int y) const { return * pixelAddr(x, y); }
+
+	void reset() {
+#ifdef OFFLINE
+		if (pixelAddr(0, 0) == NULL) {
+			return;
+		}
+		for (int i = 0; i < height(); i++) {
+			for (int j = 0; j < width(); j++) {
+				*pixelAddr(j, i) = 0;
+			}
+		}
+#endif
+	}
+
+    /**
+	 * Draw a rectangle in the debugging image.
+	 *
+	 * @param left     x value of left edge
+	 * @param right    x value of right edge
+	 * @param bottom   y value of bottom
+	 * @param top      y value of top
+	 * @param c        the color we'd like to draw
+	 */
+	void drawBox(int left, int right, int bottom, int top, int c) {
+#ifdef OFFLINE
+		if (left < 0) {
+			left = 0;
+		}
+		if (top < 0) {
+			top = 0;
+		}
+		int boxwidth = right-left;
+		int boxheight = bottom-top;
+
+		for (int i = left; i < left + boxwidth; i++) {
+			if (top >= 0 &&
+				top < height() &&
+				i >= 0 &&
+				i < width()) {
+				*pixelAddr(i, top) = static_cast<unsigned char>(c);
+			}
+			if ((top + boxheight) >= 0 &&
+				(top + boxheight) < height() &&
+				i >= 0 &&
+				i < width()) {
+				*pixelAddr(i, top + boxheight) = static_cast<unsigned char>(c);
+			}
+		}
+		for (int i = top; i < top + boxheight; i++) {
+			if (i >= 0 &&
+				i < height() &&
+				left >= 0 &&
+				left < width()) {
+				*pixelAddr(left, i) = static_cast<unsigned char>(c);
+			}
+			if (i >= 0 &&
+				i < height() &&
+				(left+boxwidth) >= 0 &&
+				(left+boxwidth) < width()) {
+				*pixelAddr(left + boxwidth, i) = static_cast<unsigned char>(c);
+			}
+		}
+#endif
+	}
+
+    /**
+	 * Draw a rectangle in the debugging image.
+	 *
+	 * @param left     x value of left edge
+	 * @param top      y value of the top edge
+	 * @param width    width of the box
+	 * @param height   height of the box
+	 * @param c        the color we'd like to draw
+	 */
+	void drawRect(int left, int top, int rectwidth, int rectheight, int c)
+		{
+#ifdef OFFLINE
+			if (left < 0) {
+				rectwidth += left;
+				left = 0;
+			}
+			if (top < 0) {
+				rectheight += top;
+				top = 0;
+			}
+
+			for (int i = left; i < left + rectwidth; i++) {
+				if (top >= 0 && top < height() && i >= 0 && i < width()) {
+					*pixelAddr(i, top) = static_cast<unsigned char>(c);
+				}
+				if ((top + rectheight) >= 0 &&
+					(top + rectheight) < height() &&
+					i >= 0 &&
+					i < width()) {
+					*pixelAddr(i, top + rectheight) = static_cast<unsigned char>(c);
+				}
+			}
+			for (int i = top; i < top + rectheight; i++) {
+				if (i >= 0 &&
+					i < height() &&
+					left >= 0 &&
+					left < width()) {
+					*pixelAddr(left, i) = static_cast<unsigned char>(c);
+				}
+				if (i >= 0 &&
+					i < height() &&
+					(left+rectwidth) >= 0 &&
+					(left+rectwidth) < width()) {
+					*pixelAddr(left + rectwidth, i) = static_cast<unsigned char>(c);
+				}
+			}
+#endif
+		}
+
+    /**
+	 * Draw a line at the specified coordinates on the debugging
+	 * image.
+	 *
+	 * @param x       start x
+	 * @param y       start y
+	 * @param x1      finish x
+	 * @param y1      finish y
+	 * @param c       color we'd like to draw
+	 */
+	void drawLine(int x, int y, int x1, int y1, int c)
+		{
+#ifdef OFFLINE
+			float slope = static_cast<float>(y - y1) / static_cast<float>(x - x1);
+			int sign = 1;
+			if ((abs(y - y1)) > (abs(x - x1))) {
+				slope = 1.0f / slope;
+				if (y > y1)  {
+					sign = -1;
+				}
+				for (int i = y; i != y1; i += sign) {
+					int newx = x +
+						static_cast<int>(slope * static_cast<float>(i - y) );
+
+					if (newx >= 0 && newx < width() && i >= 0 && i < height()) {
+						*pixelAddr(newx, i) = static_cast<unsigned char>(c);
+					}
+				}
+			} else if (slope != 0) {
+				//slope = 1.0 / slope;
+				if (x > x1) {
+					sign = -1;
+				}
+				for (int i = x; i != x1; i += sign) {
+					int newy = y +
+						static_cast<int>(slope * static_cast<float>(i - x) );
+
+					if (newy >= 0 && newy < height() && i >= 0 && i < width()) {
+						*pixelAddr(i, newy) = static_cast<unsigned char>(c);
+					}
+				}
+			}
+			else if (slope == 0) {
+				int startX = min(x, x1);
+				int endX = max(x, x1);
+				for (int i = startX; i <= endX; i++) {
+					if (y >= 0 && y < height() && i >= 0 && i < width()) {
+						*pixelAddr(i, y) = static_cast<unsigned char>(c);
+					}
+				}
+			}
+#endif
+		}
+
+	void drawDot(int x, int y, int c)
+		{
+#ifdef OFFLINE
+			if (y > 0 && x > 0 && y < (height()) && x < (width())) {
+				*pixelAddr(x, y) = static_cast<unsigned char>(c);
+			}
+#endif
+		}
+
+    // Prerequisite - point is within bounds of screen
+	void drawX(int x, int y, int c)
+		{
+#ifdef OFFLINE
+			// Mid point
+/*			pixelAddr([y-2][x-2] = static_cast<unsigned char>(c);
+			pixelAddr([y-1][x-1] = static_cast<unsigned char>(c);
+			pixelAddr([y][x] = static_cast<unsigned char>(c);
+			pixelAddr([y+1][x+1] = static_cast<unsigned char>(c);
+			pixelAddr([y+2][x+2] = static_cast<unsigned char>(c);
+
+			pixelAddr([y-2][x+2] = static_cast<unsigned char>(c);
+			pixelAddr([y-1][x+1] = static_cast<unsigned char>(c);
+
+			pixelAddr([y+1][x-1] = static_cast<unsigned char>(c);
+			pixelAddr([y+2][x-2] = static_cast<unsigned char>(c);*/
+#endif
+		}
+
+    /* drawPoint()
+	 * Draws a crosshair or a 'point' on the fake image at some given x, y, and
+	 * with a given color.
+	 * @param x       center of the point
+	 * @param y       center y value
+	 * @param c       color to draw
+	 */
+	void drawPoint(int x, int y, int c)
+		{
+#ifdef OFFLINE
+			if (y > 0 && x > 0 && y < (height()) && x < (width())) {
+				*pixelAddr(x, y) = static_cast<unsigned char>(c);
+			}if (y+1 > 0 && x > 0 && y+1 < (height()) && x < (width())) {
+				*pixelAddr(x, y+1) = static_cast<unsigned char>(c);
+			}if (y+2 > 0 && x > 0 && y+2 < (height()) && x < (width())) {
+				*pixelAddr(x, y+2) = static_cast<unsigned char>(c);
+			}if (y-1 > 0 && x > 0 && y-1 < (height()) && x < (width())) {
+				*pixelAddr(x, y-1) = static_cast<unsigned char>(c);
+			}if (y-2 > 0 && x > 0 && y-2 < (height()) && x < (width())) {
+				*pixelAddr(x, y-2) = static_cast<unsigned char>(c);
+			}if (y > 0 && x+1 > 0 && y < (height()) && x+1 < (width())) {
+				*pixelAddr(x+1, y) = static_cast<unsigned char>(c);
+			}if (y > 0 && x+2 > 0 && y < (height()) && x+2 < (width())) {
+				*pixelAddr(x+2, y) = static_cast<unsigned char>(c);
+			}if (y > 0 && x-1 > 0 && y < (height()) && x-1 < (width())) {
+				*pixelAddr(x-1, y) = static_cast<unsigned char>(c);
+			}if (y > 0 && x-2 > 0 && y < (height()) && x-2 < (width())) {
+				*pixelAddr(x-2, y) = static_cast<unsigned char>(c);
+			}
+#endif
+		}
+};
+
+template <typename T>
+struct point {
+	T x, y;
+	point() : x(0), y(0) { }
+	point(const T _x, const T _y)
+		: x(_x), y(_y) { }
+
+	bool operator== (const point& secondPt) const {
+		return (x == secondPt.x && y == secondPt.y);
+	}
+
+	// NEWVISION
+	//friend std::ostream& operator<< (std::ostream &o, const point &c) {
+	//	return o << "(" << c.x << "," << c.y << ")";
+	//}
 };
 
 // ***************
