@@ -2,6 +2,7 @@
 
 #include "LineSystem.h"
 #include "DebugConfig.h"
+#include "Profiler.h"
 
 #include <algorithm>
 
@@ -64,25 +65,24 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
                             const messages::FilteredBall*  ballInput)
 {
     // Motion system and vision system update step
+    PROF_ENTER(P_LOC_MOTION)
     motionSystem->update(particles, odometryInput, errorMagnitude);
-    bool updatedVision = visionSystem->update(particles, visionInput, ballInput, poseEstimate);
+    PROF_EXIT(P_LOC_MOTION)
 
+    PROF_ENTER(P_LOC_VISION)
+    bool updatedVision = visionSystem->update(particles, visionInput, ballInput, poseEstimate);
+    PROF_EXIT(P_LOC_VISION)
+
+    PROF_ENTER(P_LOC_RESAMPLE)
     // Resample if vision updated
     if(updatedVision) {
         double wAvg = visionSystem->getAvgError();
         wSlow = wSlow + parameters.alphaSlow*(wAvg - wSlow);
         wFast = wFast + parameters.alphaFast*(wAvg - wFast);
 
-        // Ad hoc method to determine if lost based on exponential filters
-        // NOTE if set, behaviors may change action of robot to recover localization
-        // NOTE not currently used
-        if (wFast < parameters.lostThreshold)
-            lost = true;
-        else
-            lost = false;
-
         resample(ballInput != NULL);
     }
+    PROF_EXIT(P_LOC_RESAMPLE)
 
     // Update filters estimate
     updateEstimate();
@@ -122,15 +122,6 @@ void ParticleFilter::updateEstimate()
     bool offField = !(poseEstimate.x() >= 0 && poseEstimate.x() <= FIELD_GREEN_WIDTH && 
                       poseEstimate.y() >= 0 && poseEstimate.y() <= FIELD_GREEN_HEIGHT); 
     poseEstimate.set_lost(offField);
-
-    // double variance = 0;
-    // for(iter = particles.begin(); iter != particles.end(); ++iter)
-    // {
-
-    //     variance += pow(poseEstimate.h() - (*iter).getLocation().h(), 2);
-    // }
-
-    // std::cout << variance << std::endl;
 }
 
 void ParticleFilter::updateFieldForDebug(messages::Vision& vision)
@@ -470,12 +461,14 @@ void ParticleFilter::resample(bool inSet)
     // NOTE we only consider injecting particles if vision system found 
     //      suitable observations
     } else {
+        int ni = 0;
         for(int i = 0; i < parameters.numParticles; ++i) {
             double randInjectOrSample = gen();
-            if (injections.size() && randInjectOrSample < std::max<double>(0, 1.0 - (wFast / wSlow))) {
+            if (injections.size() && randInjectOrSample < std::max<double>(0, 1.0 - (wFast / parameters.learnedSlowExponential))) {
                 // Inject particles according to sensor measurements
                 ReconstructedLocation injection = injections[rand() % injections.size()];
                 messages::RobotLocation sample = injection.sample();
+                ni++;
 
                 Particle reconstructedParticle(sample.x(), sample.y(), sample.h(), 1/250);
                 newParticles.push_back(reconstructedParticle);
@@ -484,11 +477,15 @@ void ParticleFilter::resample(bool inSet)
                 double randSample = gen();
 
                 if (cdf.upper_bound(randSample) == cdf.end())
-                    newParticles.push_back(cdf.begin()->second); // NOTE return something that DEF exists
+                    newParticles.push_back(cdf.begin()->second); // NOTE return something that def exists
                 else
                     newParticles.push_back(cdf.upper_bound(randSample)->second);
             }
         }
+
+        // std::cout << "wSlow: " << wSlow << std::endl;
+        // std::cout << "wFast: " << wFast << std::endl;
+        // std::cout << "Injections: " << ni << std::endl;
     }
 
     // Update particles
