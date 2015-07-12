@@ -300,7 +300,7 @@ CornerDetector::CornerDetector(int width_, int height_)
     intersectThreshold_(10), 
     closeThreshold_(30), 
     farThreshold_(50), 
-    edgeImageThreshold_(0.25),
+    edgeImageThreshold_(0.20),
     lengthThreshold_(0) // NOTE zero means that the condition is not currently being used
 {}
 
@@ -319,18 +319,26 @@ void CornerDetector::findCorners(FieldLineList& list)
       FieldLine& line1 = list[i];
       FieldLine& line2 = list[j];
 
+      std::cout << std::endl << std::endl;
+      std::cout << line1.index() << std::endl;
+      std::cout << line2.index() << std::endl;
+
       // Find corners
       // NOTE since there are two hough lines in each field line, we require
       //      finding (1) at least one intersecting set of hough lines and 
       //      (2) the same corner ID in all pairings of hough lines
       bool foundCorner = isCorner(line1[0], line2[0]);
+      std::cout << "FOUND? " << foundCorner << std::endl;
       CornerID firstId = classify(line1[0], line2[0]);
+      std::cout << "ID? " << (int)firstId << std::endl;
       bool sameId = true;
       for (int k = 0; k < 2; k++) {
         for (int l = 0; l < 2; l++) {
           if (k == 0 && l == 0) continue;
           foundCorner = foundCorner || isCorner(line1[k], line2[l]);
+          std::cout << "FOUND? " << foundCorner << std::endl;
           CornerID newId = classify(line1[k], line2[l]);
+          std::cout << "ID? " << (int)newId << std::endl;
           if (firstId != newId)
             sameId = false;
         }
@@ -380,12 +388,21 @@ bool CornerDetector::isCorner(const HoughLine& line1, const HoughLine& line2) co
 
   // (2) If intersection is in edge of image, don't classify corner
   double xThreshold = (width / 2) - (width * edgeImageThreshold());
-  double yThreshold = (height / 2) - (height * edgeImageThreshold());
+  double yThresholdBottom = (height / 2) - (height * edgeImageThreshold());
+  double yThresholdTop = (height / 2) - (height * 0.5*edgeImageThreshold());
+  // NOTE top no corner buffer is half the size of side and bottom buffer
 
+  std::cout << "IS CORNER?" << std::endl;
+  std::cout << xThreshold << std::endl;
+  std::cout << yThresholdBottom << std::endl;
+  std::cout << yThresholdTop << std::endl;
+  std::cout << imageIntersectX << std::endl;
+  std::cout << imageIntersectY << std::endl;
   bool farEnoughFromImageEdge = (imageIntersectX >= -xThreshold &&
                                  imageIntersectX <=  xThreshold &&
-                                 imageIntersectY >= -yThreshold &&
-                                 imageIntersectY <=  yThreshold);
+                                 imageIntersectY >= -yThresholdBottom &&
+                                 imageIntersectY <=  yThresholdTop);
+  std::cout << farEnoughFromImageEdge << std::endl;
 
   // (3) Check that lines are close to orthogonal
   // NOTE done in world coords
