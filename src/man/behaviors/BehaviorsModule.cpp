@@ -16,14 +16,15 @@ extern "C" void initLedCommand_proto();
 extern "C" void initGameState_proto();
 extern "C" void initWorldModel_proto();
 extern "C" void initRobotLocation_proto();
-extern "C" void initBallModel_proto();
 extern "C" void initPMotion_proto();
 extern "C" void initMotionStatus_proto();
 extern "C" void initButtonState_proto();
 extern "C" void initFallStatus_proto();
 extern "C" void initStiffnessControl_proto();
+extern "C" void initObstacle_proto();
+extern "C" void initToggle_proto();
 extern "C" void initVision_proto();
-// extern "C" void initObstacle_proto();
+extern "C" void initObstacle_proto();
 extern "C" void initinterface();
 
 namespace man {
@@ -89,15 +90,15 @@ void BehaviorsModule::initializePython()
         initLedCommand_proto();
         initGameState_proto();
         initWorldModel_proto();
-        initBallModel_proto();
         initRobotLocation_proto();
         initPMotion_proto();
         initMotionStatus_proto();
         initButtonState_proto();
         initFallStatus_proto();
         initStiffnessControl_proto();
+        initToggle_proto();
         initVision_proto();
-        // initObstacle_proto();
+        initObstacle_proto();
         // Init the interface as well
         initinterface();
     } catch (error_already_set) {
@@ -250,14 +251,18 @@ void BehaviorsModule::prepareMessages()
     stiffStatusIn.latch();
     pyInterface.setStiffStatus_ptr(&stiffStatusIn.message());
 
-    linesIn.latch();
-    pyInterface.setVisionLines_ptr(&linesIn.message());
+    visionIn.latch();
+    pyInterface.setVision_ptr(&visionIn.message());
 
-    // obstacleIn.latch();
-    // pyInterface.setObstacle_ptr(&obstacleIn.message());
+    obstacleIn.latch();
+    pyInterface.setObstacle_ptr(&obstacleIn.message());
+
 
     // visionObstacleIn.latch();
     // pyInterface.setVisionObstacle_ptr(&visionObstacleIn.message());
+
+    sitDownIn.latch();
+    pyInterface.setSitDown_ptr(&sitDownIn.message());
 
     // Prepare potential out messages for python
     ledCommand = portals::Message<messages::LedCommand>(0);

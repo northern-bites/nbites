@@ -8,16 +8,15 @@
 
 #include "GameState.pb.h"
 #include "RobotLocation.pb.h"
-#include "BallModel.pb.h"
 #include "LedCommand.pb.h"
 #include "WorldModel.pb.h"
 #include "PMotion.pb.h"
 #include "MotionStatus.pb.h"
-#include "Vision.pb.h"
 #include "ButtonState.pb.h"
 #include "FallStatus.pb.h"
 #include "StiffnessControl.pb.h"
 #include "Obstacle.pb.h"
+#include "Toggle.pb.h"
 #include "Vision.pb.h"
 
 namespace man {
@@ -29,7 +28,7 @@ class PyInterface
 public:
     messages::GameState         const * gameState_ptr;
     messages::RobotLocation     const * loc_ptr;
-    messages::FieldLines        const * visionField_ptr;
+    messages::Vision            const * vision_ptr;
     messages::FilteredBall      const * filteredBall_ptr;
     messages::LedCommand        const * ledCommand_ptr;
     messages::WorldModel        const * worldModel_ptr[NUM_PLAYERS_PER_TEAM];
@@ -47,7 +46,8 @@ public:
     // messages::VisionObstacle    const * visionObstacle_ptr;
     messages::SharedBall        const * sharedBall_ptr;
     messages::RobotLocation     const * sharedFlip_ptr;
-    messages::FieldLines     const * visionLines_ptr;
+    messages::Toggle            const * sitDown_ptr;
+
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -56,10 +56,6 @@ public:
     void setLoc_ptr(const messages::RobotLocation* msg)
     {
         loc_ptr = msg;
-    }
-    void setVisionField_ptr(const messages::FieldLines* msg)
-    {
-        visionField_ptr = msg;
     }
     void setFilteredBall_ptr(const messages::FilteredBall* msg)
     {
@@ -77,10 +73,15 @@ public:
     {
         ledCommand_ptr = msg;
     }
-    void setVisionLines_ptr(const messages::FieldLines* msg)
+
+
+    void setVision_ptr(const messages::Vision* msg)
     {
-        visionLines_ptr = msg;
+        vision_ptr = msg;
+    //    std::cout << "CC: " << msg->circle().x() << ", " << msg->circle().y() << std::endl;
     }
+
+
     void setWorldModel_ptr(const messages::WorldModel* msg,int i)
     {
         worldModel_ptr[i] = msg;
@@ -136,6 +137,10 @@ public:
     void setObstacle_ptr(const messages::FieldObstacles* msg)
     {
         obstacle_ptr = msg;
+    }
+    void setSitDown_ptr(const messages::Toggle* msg)
+    {
+        sitDown_ptr = msg;
     }
     // void setVisionObstacle_ptr(const messages::VisionObstacle* msg)
     // {

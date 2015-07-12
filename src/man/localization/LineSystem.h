@@ -25,32 +25,37 @@ namespace localization {
 // TODO rename LineID as VisionLineID
 // NOTE comments map LocLineID to color found in LocSwarmView
 enum class LocLineID {
-    NotMatched = 0,  // black
-    OurEndline,      // blue
-    TheirEndline,    // red
-    OurMidline,      // gray
-    TheirMidline,    // gray
-    OurTopGoalbox,   // magenta
-    TheirTopGoalbox, // orange
-    RightSideline,   // cyan
-    LeftSideline     // pink
+    NotMatched = 0,    // black
+    OurEndline,        // blue
+    TheirEndline,      // red
+    OurMidline,        // gray
+    TheirMidline,      // gray
+    OurTopGoalbox,     // magenta
+    TheirTopGoalbox,   // orange
+    RightSideline,     // cyan
+    LeftSideline,      // pink
+    OurRightGoalbox,   // yellow
+    OurLeftGoalbox,    // green
+    TheirRightGoalbox, // white
+    TheirLeftGoalbox   // dark gray
 };
 
 class LineSystem {
 public:
     LineSystem();
-    ~LineSystem();
+    ~LineSystem() {}
 
-    LocLineID matchObservation(const messages::FieldLine& observation, const messages::RobotLocation& loc);
-    double scoreObservation(const messages::FieldLine& observation, const messages::RobotLocation& loc);
+    LocLineID matchLine(const messages::FieldLine& observation, const messages::RobotLocation& loc);
+    double scoreLine(const messages::FieldLine& observation, const messages::RobotLocation& loc);
     messages::RobotLocation reconstructFromMidpoint(LocLineID id, const messages::FieldLine& observation);
     messages::RobotLocation reconstructWoEndpoints(LocLineID id, const messages::FieldLine& observation);
     void setDebug(bool debug_) { debug = debug_; }
 
+    static bool shouldUse(const messages::FieldLine& observation, const messages::RobotLocation& loc); 
     static vision::GeoLine relRobotToAbsolute(const messages::FieldLine& observation, const messages::RobotLocation& loc);
-    static bool shouldUse(const messages::FieldLine& observation); 
 
 private:
+    double scoreObservation(const vision::GeoLine& observation, const vision::GeoLine& correspondingLine, const messages::RobotLocation& loc, double wz0);
     void addLine(LocLineID id, float r, float t, float ep0, float ep1);
 
     std::map<LocLineID, vision::GeoLine> lines;

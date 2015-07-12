@@ -1,10 +1,11 @@
 import NavConstants as constants
 import NavHelper as helper
 import NavTransitions as navTrans
+import Navigator as Navigator
 from collections import deque
 from objects import RobotLocation, RelRobotLocation
-from ..util import Transition
-from math import fabs, degrees
+from ..util import *
+from math import fabs, degrees, copysign
 from random import random
 
 def scriptedMove(nav):
@@ -35,6 +36,10 @@ def goToPosition(nav):
     #    print "ball is at {0}, {1}, {2} ".format(nav.brain.ball.loc.relX,
     #                                             nav.brain.ball.loc.relY,
     #                                             nav.brain.ball.loc.bearing)
+
+    goToPosition.speed = nav.velocity
+    if fabs(nav.requestVelocity - nav.velocity) > Navigator.SPEED_CHANGE:
+        nav.velocity += copysign(Navigator.SPEED_CHANGE, (nav.requestVelocity - nav.velocity))
 
     if goToPosition.pb:
         # Calc dist to dest
@@ -116,6 +121,9 @@ def goToPosition(nav):
 
         helper.setDestination(nav, relDest, speed)
 
+    if navTrans.shouldDodge(nav):
+        return nav.goNow('dodge')
+        
     return Transition.getNextState(nav, goToPosition)
 
 goToPosition.speed = "speed gain from 0 to 1"
@@ -129,78 +137,29 @@ goToPosition.close = False
 
 # State where we are moving away from an obstacle
 def dodge(nav):
-
-    # TODO: HACK FOR BRAZIL - THIS IS USED WHEN IT'S ARM-ONLY DETECTION
     if nav.firstFrame():
+        nav.dodging = True
+
+        nav.brain.tracker.trackObstacle(dodge.obstaclePosition)
+
         ## SET UP the dodge direction based on where the obstacle is
         # if directly in front of us, move back and to one side based on
         # where the goToPosition dest is
-        if dodge.armPosition == 1:
-            print "Dodging NORTH obstacle"
-            relDest = helper.getRelativeDestination(nav.brain.loc,
-                                                    goToPosition.dest)
-            if relDest.relY <= 0:
-                direction = -1
-            else:
-                direction = 1
-            dodge.dest = RelRobotLocation(-15, direction*10, 0)
-        elif dodge.armPosition == 2:
-            print "Dodging NORTHEAST obstacle"
-            dodge.dest = RelRobotLocation(-5, 15, 0)
-        elif dodge.armPosition == 3:
-            print "Dodging EAST obstacle"
-            dodge.dest = RelRobotLocation(0, 20, 0)
-        elif dodge.armPosition == 4:
-            print "Dodging SOUTHEAST obstacle"
-            dodge.dest = RelRobotLocation(5, 15, 0)
-        # if directly behind us, move forward and to one side based on
-        # where the goToPosition dest is
-        elif dodge.armPosition == 5:
-            print "Dodging SOUTH obstacle"
-            relDest = helper.getRelativeDestination(nav.brain.loc,
-                                                    goToPosition.dest)
-            if relDest.relY <= 0:
-                direction = -1
-            else:
-                direction = 1
-            dodge.dest = RelRobotLocation(15, direction*10, 0)
-        elif dodge.armPosition == 6:
-            print "Dodging SOUTHWEST obstacle"
-            dodge.dest = RelRobotLocation(5, -15, 0)
-        elif dodge.armPosition == 7:
-            print "Dodging WEST obstacle"
-            dodge.dest = RelRobotLocation(0, -20, 0)
-        elif dodge.armPosition == 8:
-            print "Dodging NORTHWEST obstacle"
-            dodge.dest = RelRobotLocation(-5, -15, 0)
-        else:
-            return
+        dodge.speed = Navigator.BRISK_SPEED
 
-    dest = RelRobotLocation(dodge.dest.relX + random(),
-                            dodge.dest.relY + random(),
-                            dodge.dest.relH + random())
-    helper.setDestination(nav, dest, 0.5)
-    return Transition.getNextState(nav, dodge)
+        obstacleInfo = constants.OBS_DICT[dodge.obstaclePosition]
+        helper.createAndSendWalkVector(nav, 
+                                        dodge.speed*obstacleInfo[0], 
+                                        dodge.speed*obstacleInfo[1], 
+                                        0)
+        print "Dodging ", obstacleInfo[2], " Obstacle"
 
-    # order = [0, 1, -1, 2, -2, 3, -3, 4]
-    # if nav.firstFrame():
-    #     # dodge.positions[0] is position.NONE, so direction numbers are their own index
-    #     for i in range(len(order)):
-    #         temp = getIndex(int(dodge.targetDest) + order[i])
-    #         # if there is no obstacle in this direction
-    #         if not dodge.positions[temp]:
-    #             print "DODGE TO ", dodge.DDirects[temp]
-    #             dodge.dest = RelRobotLocation(constants.DGE_DESTS[temp-1][0],
-    #                                           constants.DGE_DESTS[temp-1][1],
-    #                                           constants.DGE_DESTS[temp-1][2])
-    #             break
+    if navTrans.doneDodging(nav):
+        nav.dodging = False
+        nav.brain.tracker.repeatBasicPan()
+        return nav.goLater('briefStand')
 
-    # # TODO the worst hack I have ever written, sorry -- Josh Imhoff
-    # dest2 = RelRobotLocation(dodge.dest.relX + random(),
-    #                          dodge.dest.relY + random(),
-    #                          dodge.dest.relH + random())
-    # helper.setDestination(nav, dest2, 0.5)
-    # return Transition.getNextState(nav, dodge)
+    return nav.stay()
 
 def getIndex(num):
     if num <=8 and num >= 1:
@@ -227,6 +186,10 @@ def destinationWalkingTo(nav):
     if nav.firstFrame():
         destinationWalkingTo.enqueAZeroVector = False
 
+    destinationWalkingTo.speed = nav.velocity
+    if fabs(nav.requestVelocity - nav.velocity) > Navigator.SPEED_CHANGE:
+            nav.velocity += copysign(Navigator.SPEED_CHANGE, (nav.requestVelocity - nav.velocity))
+
     if len(destinationWalkingTo.destQueue) > 0:
         dest = destinationWalkingTo.destQueue.popleft()
         helper.setDestination(nav, dest,
@@ -250,6 +213,13 @@ def locationsMatch(odom, dest):
     and (abs(odom.relH - degrees(dest.relH)) < 30.0):
         return True
 
+    # print ("Not true; relx diff:", abs(odom.relX - dest.relX))
+    # print ("relly diff: ", abs(odom.relY - dest.relY))
+    # print ("relh diff:", abs(odom.relH - dest.relH))
+    # print ("degres", degrees(dest.relH), "normal: ", dest.relH)
+    # if nav.counter % 30 == 0:
+    #     print ("odomH: ", odom.relH, "odomDeg", degrees(odom.relH), "destH:", dest.relH, "destH deg:", degrees(dest.relH))
+
     return False
 
 def walkingTo(nav):
@@ -257,23 +227,43 @@ def walkingTo(nav):
     State to be used for odometry walking.
     """
     if nav.firstFrame():
+        print ("Resetting odometry!")
         nav.brain.interface.motionRequest.reset_odometry = True
         nav.brain.interface.motionRequest.timestamp = int(nav.brain.time * 1000)
         helper.stand(nav)
         return nav.stay()
 
+
+    walkingTo.currentOdo = RelRobotLocation(nav.brain.interface.odometry.x,
+                         nav.brain.interface.odometry.y,
+                         nav.brain.interface.odometry.h)
+
     # TODO why check standing?
     if nav.brain.interface.motionStatus.standing:
-        walkingTo.currentOdo = RelRobotLocation(nav.brain.interface.odometry.x,
-                             nav.brain.interface.odometry.y,
-                             nav.brain.interface.odometry.h)
 
         if len(walkingTo.destQueue) > 0:
             dest = walkingTo.destQueue.popleft()
             helper.setOdometryDestination(nav, dest, walkingTo.speed)
+            print ("MY dest: ", dest.relX, dest.relY, dest.relH)
 
-        elif locationsMatch(nav.destination, walkingTo.currentOdo):
-            return nav.goNow('standing')
+    if locationsMatch(nav.destination, walkingTo.currentOdo):
+        return nav.goNow('standing')
+
+    # walkingTo.currentOdow = RelRobotLocation(nav.brain.interface.odometry.x,
+    #                          nav.brain.interface.odometry.y,
+    #                          nav.brain.interface.odometry.h)
+    if nav.counter % 30 == 0:
+        print "Current odo:"
+        print ("x:", walkingTo.currentOdo.relX)
+        print ("y:", walkingTo.currentOdo.relY)
+        print ("h:", walkingTo.currentOdo.relH)
+        # print "Current odow:"
+        # print ("x:", walkingTo.currentOdow.relX)
+        # print ("y:", walkingTo.currentOdow.relY)
+        # print ("h:", walkingTo.currentOdow.relH)
+        # print "---------------"
+
+
 
     return nav.stay()
 
@@ -286,6 +276,9 @@ def walking(nav):
     State to be used for velocity walking.
     """
     helper.setSpeed(nav, walking.speeds)
+
+    if navTrans.shouldDodge(nav):
+        return nav.goNow('dodge')
 
     return Transition.getNextState(nav, walking)
 

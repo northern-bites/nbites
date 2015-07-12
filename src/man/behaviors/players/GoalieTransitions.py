@@ -122,21 +122,31 @@ def sideLineCheckShouldReposition(player):
     return False
 
 def shouldTurn(player):
-
     if GoalieStates.watchWithLineChecks.numTurns > 1 \
     and GoalieStates.watchWithLineChecks.numFixes < 2:
         return False
-
     if GoalieStates.watchWithLineChecks.numTurns == 2:
         return False
 
     h_dest = 0.0
 
+    longestLine = None
+    longestLength = 0.0
+
     for line in GoalieStates.watchWithLineChecks.lines:
         r = line.r
         t = math.degrees(line.t)
         length = getLineLength(line)
+
+        # Try to avoid facing a sideline
         if length < 30.0 and r > 30.0:
+            continue
+
+        # Avoid invalid lines, lines that are too far, and lines that are possibly
+        # the left and right sidelines
+        if math.fabs(t - constants.EXPECTED_RIGHT_LINE_T) < constants.T_THRESH \
+        or math.fabs(t - constants.EXPECTED_LEFT_LINE_T) < constants.T_THRESH \
+        or r > 100.0 or t == 0.0:
             continue
 
         # Fix this.. very hacky: basically return that we DON'T need to turn
@@ -148,18 +158,23 @@ def shouldTurn(player):
             print ("r: ", r)
             return True
 
-        if math.fabs(t - constants.EXPECTED_RIGHT_LINE_T) < constants.T_THRESH \
-        or math.fabs(t - constants.EXPECTED_LEFT_LINE_T) < constants.T_THRESH \
-        or math.fabs(t - constants.EXPECTED_FRONT_LINE_T) < constants.T_THRESH \
-        or r > 100.0 or t == 0.0:
-            continue
-
-
         # Assumptions: not facing forward....?
         # Hopefully will find a line close by (r < 100) with an unusual t value
         # and use the information to help correct itself
         # Theoretically will usually be the long front line?
         else:
+            if length > longestLength:
+                longestLine = line
+                longestLength = length
+            # h_dest = t - 90.0
+            # player.homeDirections += [RelRobotLocation(0.0, 0.0, h_dest)]
+            # print "Should turn was TRUE"
+            # print ("hdest: ", h_dest)
+            # print ("t was: ", t)
+            # print ("r was:", r)
+            # return True
+
+        if longestLine is not None:
             h_dest = t - 90.0
             player.homeDirections += [RelRobotLocation(0.0, 0.0, h_dest)]
             print "Should turn was TRUE"
@@ -217,7 +232,7 @@ def shouldStopGoingBack(player):
         r = visionLines.line(i).inner.r
         t = math.degrees(visionLines.line(i).inner.t)
 
-        if r != 0.0 and r < 40.0:
+        if r != 0.0 and r < 40.0 and r > 25.0 and t < 130.0 and t > 50.0:
             print "I see a line now! I should probably stop going backwards"
             print ("r: ", r)
             print ("t: ", t)
@@ -241,6 +256,49 @@ def getLineLength(line):
     x = x2 - x1
     y = y2 - y1
     return math.sqrt(x*x + y*y)
+
+def shouldPositionRight(player):
+    if player.brain.ball.bearing_deg < -40.0 and \
+    player.inPosition is not constants.RIGHT_POSITION and \
+    player.inPosition is not constants.NOT_IN_POSITION:
+        player.homeDirections += [RelRobotLocation(5.0, -30.0, 0.0)]
+        GoalieStates.watchWithLineChecks.shiftedPosition = True
+        return True
+
+    GoalieStates.watchWithLineChecks.shiftedPosition = False
+    return False
+
+def shouldPositionLeft(player):
+    if player.brain.ball.bearing_deg > 40.0 and \
+    player.inPosition is not constants.LEFT_POSITION and \
+    player.inPosition is not constants.NOT_IN_POSITION:
+        player.homeDirections += [RelRobotLocation(5.0, 30.0, 0.0)]
+        GoalieStates.watchWithLineChecks.shiftedPosition = True
+        return True
+
+    GoalieStates.watchWithLineChecks.shiftedPosition = False
+    return False
+
+def shouldStopTurning(player):
+    lines = player.brain.visionLines
+
+    for i in range(0, lines.line_size()):
+        r = lines.line(i).inner.r
+        t = math.degrees(lines.line(i).inner.t)
+        if math.fabs(t - 90.0) < 15.0 and r is not 0.0 and r < 40.0:
+            print "I see a line! I'm assuming its part of the goalbox and I'm going there"
+            print ("R:", r, "T:", t)
+            player.homeDirections += [RelRobotLocation(r+35.0, 0.0, 0.0)]
+            return True
+        if math.fabs(t - 90.0) < 15.0 and r is not 0.0 and r > 110.0:
+            print "I see a line! Its decently far, so I'm assuming its the back of the goalbox"
+            player.homeDirections += [RelRobotLocation(r-25.0, 0.0, 0.0)]
+            print ("R:", r, "T:", t)
+            return True
+
+    return False
+
+
 
 
 
@@ -660,13 +718,33 @@ def shouldClearBall(player):
         walkedTooFar.yThresh = 300.0
         shouldGo = True
 
+    #TODO: implement check to see if ball is outside of goalbox or not!
+
     if shouldGo:
-        if player.brain.ball.bearing_deg < -60.0:
+        if player.brain.ball.bearing_deg < -50.0:
             VisualGoalieStates.clearIt.dangerousSide = constants.RIGHT
-        elif player.brain.ball.bearing_deg > 60.0:
+        elif player.brain.ball.bearing_deg > 50.0:
             VisualGoalieStates.clearIt.dangerousSide = constants.LEFT
         else:
             VisualGoalieStates.clearIt.dangerousSide = -1
+
+        if player.brain.ball.bearing_deg < 0.0:
+            VisualGoalieStates.clearIt.ballSide = constants.RIGHT
+        else:
+            VisualGoalieStates.clearIt.ballSide = constants.LEFT
+
+        lines = player.brain.visionLines
+        for i in range(0, lines.line_size()):
+            r = lines.line(i).inner.r
+            t = math.degrees(lines.line(i).inner.t)
+            if r < 120.0 and r is not 0.0:
+                if player.brain.ball.distance > r:
+                    VisualGoalieStates.clearIt.inGoalbox = False
+                    print "I think the ball is outside the goalbox!"
+                    print ("R:", r)
+                else:
+                    VisualGoalieStates.clearIt.inGoalbox = True
+                    print "I think the ball is in the goalbox"
 
     return shouldGo
 
@@ -710,7 +788,21 @@ def doneWalking(player):
     return player.brain.nav.currentState == 'standing'
 
 def successfulKick(player):
-    return player.counter > 80
+    return player.counter > 50 and VisualGoalieStates.clearIt.dangerousSide == -1
+
+def successfulKickAndTurn(player):
+    # I went to the far side of a goal and it will be hard to get back!
+    if VisualGoalieStates.clearIt.dangerousSide == -1:
+        return False
+
+    if VisualGoalieStates.clearIt.dangerousSide == constants.RIGHT:
+        player.homeDirections += [RelRobotLocation(-50.0, 0.0, 15.0)]
+    else:
+        player.homeDirections += [RelRobotLocation(-50.0, 0.0, -15.0)]
+    print "Here I go! It was very far to the side"
+
+    # player.homeDirections = player.homeDirections[1:]
+    return player.counter > 30
 
 def whiffed(player):
     """

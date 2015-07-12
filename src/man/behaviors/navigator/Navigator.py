@@ -24,7 +24,7 @@ KEEP_SAME_SPEED = -1
 ADAPTIVE = True
 #goTo precision
 GRAINY = (50.0, 50.0, 30)
-HOME = (50.0, 50.0, 20)
+HOME = (30.0, 30.0, 20)
 PLAYBOOK = (10.0, 10.0, 10)
 GENERAL_AREA = (5.0, 5.0, 20)
 CLOSE_ENOUGH = (3.5, 3.5, 10)
@@ -32,6 +32,9 @@ PRECISELY = (1.0, 1.0, 5)
 #directions - left is positive (in terms of rotation or y) and right is negative
 LEFT = 1
 RIGHT = -LEFT
+
+# 2 seconds to go from 0 to 1
+SPEED_CHANGE = 1/60.
 
 DEBUG_MOTION_STATUS = False
 
@@ -46,7 +49,15 @@ class Navigator(FSA.FSA):
         self.setName('Navigator')
         self.setPrintStateChanges(True)
         self.stateChangeColor = 'cyan'
+        self.velocity = 0.
+        self.requestVelocity = 0.
         self.destination = None # Used to set walking_to in world model proto
+
+        # initialize obstacle counts
+        navTrans.shouldDodge.sOrACount = 0
+        navTrans.shouldDodge.vCount = 0
+        self.dodging = False
+
         #transitions
         #@todo: move this to the actual transitions file?
         self.atLocPositionTransition = Transition.CountTransition(navTrans.atDestination,
@@ -58,20 +69,7 @@ class Navigator(FSA.FSA):
 
         NavStates.goToPosition.transitions = {
             self.atLocPositionTransition : NavStates.atPosition,
-
-            Transition.CountTransition(navTrans.shouldDodge,
-                                       Transition.OCCASIONALLY,
-                                       Transition.LOW_PRECISION)
-            : NavStates.dodge
-
             }
-
-        NavStates.dodge.transitions = {
-            Transition.CountTransition(navTrans.doneDodging,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
-           : NavStates.briefStand
-           }
 
         NavStates.atPosition.transitions = {
             self.locRepositionTransition : NavStates.goToPosition
@@ -96,14 +94,6 @@ class Navigator(FSA.FSA):
         self.destination = self.brain.ball
 
         self.goTo(self.brain.ball, CLOSE_ENOUGH, speed, True, fast = fast)
-
-    def chaseBallDeceleratingSpeed(self):
-        MAX_SPEED = FULL_SPEED
-        MIN_SPEED = BRISK_SPEED
-        ballDist = self.brain.ball.distance
-        slope = (MAX_SPEED - MIN_SPEED)/(constants.SLOW_CHASE_DIST - constants.PREPARE_FOR_KICK_DIST)
-        deceleratingSpeed = MAX_SPEED - slope*(constants.SLOW_CHASE_DIST - ballDist)
-        self.brain.nav.chaseBall(deceleratingSpeed, fast = True)
 
     def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED,
              avoidObstacles = False, adaptive = False, fast = False, pb = False):
@@ -176,7 +166,8 @@ class Navigator(FSA.FSA):
 
         NavStates.goToPosition.dest = dest
         if speed is not KEEP_SAME_SPEED:
-            NavStates.goToPosition.speed = speed
+            self.requestVelocity = speed
+
         if fast:
             NavStates.goToPosition.fast = fast
 
@@ -196,7 +187,10 @@ class Navigator(FSA.FSA):
         NavStates.destinationWalkingTo.destQueue.clear()
 
         NavStates.destinationWalkingTo.destQueue.append(walkToDest)
-        NavStates.destinationWalkingTo.speed = speed
+        
+        self.requestVelocity = speed
+        NavStates.destinationWalkingTo.speed = self.velocity
+
         NavStates.destinationWalkingTo.kick = kick
 
         #reset the counter to make sure walkingTo.firstFrame() is true on entrance

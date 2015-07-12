@@ -50,7 +50,7 @@ def gameReady(player):
         player.inKickingState = False
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
-        player.brain.tracker.repeatWidePan()
+        player.brain.tracker.repeatBasicPan()
         player.timeReadyBegan = player.brain.time
         if player.lastDiffState == 'gameInitial':
             player.brain.resetInitialLocalization()
@@ -76,7 +76,7 @@ def gameSet(player):
         player.gainsOn()
         player.stand()
         player.brain.nav.stand()
-        player.brain.tracker.performBasicPan()
+        player.brain.tracker.performWidePan()
 
     elif player.brain.tracker.isStopped():
         player.brain.tracker.trackBall()
@@ -138,7 +138,10 @@ def gameFinished(player):
         player.brain.fallController.enabled = False
         player.stopWalking()
         player.zeroHeads()
-        player.executeMove(SweetMoves.SIT_POS)
+        if nogginConstants.V5_ROBOT:
+            player.executeMove(SweetMoves.SIT_POS_V5)
+        else:
+            player.executeMove(SweetMoves.SIT_POS)
 
     if player.brain.nav.isStopped():
         player.gainsOff()

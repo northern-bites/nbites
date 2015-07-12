@@ -12,6 +12,7 @@
 
 #include "NBMath.h"
 #include "LineSystem.h"
+#include "LandmarkSystem.h"
 #include "LocStructs.h"
 #include "FieldConstants.h"
 
@@ -30,15 +31,18 @@ public:
     ~VisionSystem();
 
     bool update(ParticleSet& particles,
-                const messages::FieldLines& lines,
-                const messages::Corners& corners);
-    const std::list<ReconstructedLocation>& getInjections() { return injections; }
+                const messages::Vision& vision,
+                const messages::FilteredBall* ball,
+                const messages::RobotLocation& lastEstimate);
+
+    const std::vector<ReconstructedLocation>& getInjections() { return injections; }
     int getNumObservations() const { return numObservations; }
     double getAvgError() const { return avgError; }
 
 private:
     LineSystem* lineSystem;
-    std::list<ReconstructedLocation> injections;
+    LandmarkSystem* landmarkSystem;
+    std::vector<ReconstructedLocation> injections;
 
     int numObservations;
     double avgError;

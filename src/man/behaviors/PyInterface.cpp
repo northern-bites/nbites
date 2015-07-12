@@ -96,10 +96,22 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::sharedFlip_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
-        .add_property("visionLines",
-                      make_getter(&PyInterface::visionLines_ptr,
+        .add_property("sitDown",
+                      make_getter(&PyInterface::sitDown_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
+        .add_property("vision",
+                      make_getter(&PyInterface::vision_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        // .add_property("visionLines",
+        //               make_getter(&PyInterface::visionLines_ptr,
+        //                           return_value_policy
+        //                           <reference_existing_object>()))
+        // .add_property("visionCorners",
+        //               make_getter(&PyInterface::corners_ptr,
+        //                           return_value_policy
+        //                           <reference_existing_object>()))
 
         ;
     scope().attr("interface") = interface_ptr;

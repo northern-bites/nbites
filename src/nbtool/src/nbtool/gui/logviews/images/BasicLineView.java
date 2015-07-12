@@ -30,35 +30,88 @@ import nbtool.util.Utility;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 
-import messages.Vision.*;
+import messages.VisionOuterClass.*;
 
 public class BasicLineView extends ViewParent {
 
     List<FieldLine> lines;
+    List<Corner> corners;
+    boolean usingLines = false;
 
     @Override
     public void setLog(Log newlog) {
         String t = (String) newlog.primaryType();
-        Class<? extends com.google.protobuf.GeneratedMessage> lClass = Utility.protobufClassFromType(t);
-        Logger.logf(Logger.INFO, "ProtoBufView: using class %s for type %s.\n", lClass.getName(), t);
+        // Class<? extends com.google.protobuf.GeneratedMessage> lClass = Utility.protobufClassFromType(t);
+        // Logger.logf(Logger.INFO, "ProtoBufView: using class %s for type %s.\n", lClass.getName(), t);
 
-        if (!t.equals("proto-FieldLines")) {
+        System.out.println("My type: " + t);
+
+        if (!t.equals("proto-FieldLines") && !t.equals("proto-Corners")) {
+            System.out.println("i'm returning...");
             return;
         }
-        try {
-            FieldLines msg = FieldLines.parseFrom(newlog.bytes);
-            for (FieldLine line : msg.getLineList()) {
-                lines.add(line);
+        if (t.equals("proto-FieldLines")) {
+            usingLines = true;
+            try {
+                Vision msg = Vision.parseFrom(newlog.bytes);
+                for (FieldLine line : msg.getLineList()) {
+                    lines.add(line);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }
+        else {
+            usingLines = false;
+            try {
+                Vision msg = Vision.parseFrom(newlog.bytes);
+                System.out.println("CORNER SIZE: " + msg.getCornerCount());
+
+                for (Corner corner : msg.getCornerList()) {
+                    corners.add(corner);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         repaint();
     }
 
     public void paintComponent(Graphics g) {
+        if (usingLines) paintLines(g);
+        else paintCorners(g);
+    }
 
+    private void paintCorners(Graphics g) {
+
+        int originX = this.getWidth()/2;
+        int originY = this.getHeight()/2 - 100;
+        int height = this.getHeight()/2;
+        int width = this.getWidth();
+
+        g.setColor(new Color(40, 140, 40));
+        g.fillRect(0, 0, this.getWidth(), this.getHeight()/2);
+
+        g.setColor(Color.red);
+        g.fillRect(originX-10, originY-10, 20, 20);
+
+        if (corners.size() < 1) return;
+
+        for (int i = 0; i < corners.size(); i++) {
+            float x = 2*corners.get(i).getX() + originX;
+            float y = 2*corners.get(i).getY() + originY;
+            int cwidth = 10;
+            String descriptor = "x: " + corners.get(i).getX() + " y: " + corners.get(i).getY() + "\nid: " + corners.get(i).getId();
+            g.setColor(Color.yellow);
+            g.fillRect((int)(x - cwidth/2), (int)(y - cwidth/2), cwidth, cwidth);
+            g.drawString(descriptor, 10, (int)(height + i*20.0));
+
+        }
+    }
+
+    private void paintLines(Graphics g)
+    {
         int offsetY = this.getHeight()/2 + 20;
         int offsetX = 10;
         int offset = 20;
@@ -177,14 +230,13 @@ public class BasicLineView extends ViewParent {
             g.drawString(b2, offsetX, offsetY + 4*offset);
             offsetX += 150;
         }
-
-
     }
 
     public BasicLineView() {
         super();
         setLayout(null);
         lines = new ArrayList<FieldLine>();
+        corners = new ArrayList<Corner>();
 
     }
 

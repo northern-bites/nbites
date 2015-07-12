@@ -371,9 +371,8 @@ DATA_PAN = (
 
 ################### FIXED PITCH PANS #################
 FIXED_PITCH_PAN = (
-    ((57.0,25.0), 3, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-57.0,25.0), 3, 1, stiff.LOW_HEAD_STIFFNESSES)) # was ~46 degrees per second
-#                                                         now ~38 degrees per second
+    ((57.0,25.0), 2.7, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-57.0,25.0), 2.7, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 FIXED_PITCH_LEFT_SIDE_PAN = (
     ((60.0,25.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
@@ -449,7 +448,7 @@ CAL_PAN_TIME = 0.2
 CAL_TOP_PITCH = 26.0
 CAL_BOTTOM_PITCH = -20.0
 
-CALIBRATION_TOP_PAN = ( ( ((-6.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
+CALIBRATION_TOP_PAN = ( ( ((-6.0, CAL_TOP_PITCH), CAL_PAN_TIME*2, 1, stiff.LOW_HEAD_STIFFNESSES), ),
                         
                         ( ((-4.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
 
@@ -464,7 +463,7 @@ CALIBRATION_TOP_PAN = ( ( ((-6.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEA
                         ( ((6.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
                     )
 
-CALIBRATION_BOTTOM_PAN = ( ( ((-6.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
+CALIBRATION_BOTTOM_PAN = ( ( ((-6.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME*2, 1, stiff.LOW_HEAD_STIFFNESSES), ),
                         
                            ( ((-4.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
 

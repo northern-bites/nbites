@@ -21,13 +21,16 @@ public class GeoLine {
 	}
 
 	public GeoLine(double line_r, double line_t, double line_end0, 
-			double line_end1, double line_houghInd, double line_fieldInd) {
+			double line_end1, double line_houghInd, double line_fieldInd,
+			double line_id, double line_prob) {
 		r = line_r;
 		t = line_t;
 		end0 = line_end0;
 		end1 = line_end1;
 		houghIndex = line_houghInd;
 		fieldIndex = line_fieldInd;
+		id = line_id;
+		prob = line_prob;
 	}
 
 	public void draw(Graphics2D g2, BufferedImage origImg) {
@@ -106,6 +109,14 @@ public class GeoLine {
 					break;
 			case 8: g2.setColor(Color.pink); //left side line (top)
 					break;
+			case 9: g2.setColor(Color.yellow); //our right goalbox
+					break;
+			case 10: g2.setColor(Color.green); //our left goalbox
+					 break;
+			case 11: g2.setColor(Color.white); //their right goalbox
+					 break;
+			case 12: g2.setColor(Color.darkGray); //their left goalbox
+					 break;
 		}
 
         g2.drawLine(x1,(int)FieldConstants.FIELD_HEIGHT-y1,x2,(int)FieldConstants.FIELD_HEIGHT-y2);

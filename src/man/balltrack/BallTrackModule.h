@@ -6,12 +6,11 @@
  */
 #pragma once
 
-#include "NaiveBallFilter.h"
 #include "KalmanFilter.h"
 #include "MMKalmanFilter.h"
 
 #include "RoboGrams.h"
-#include "BallModel.pb.h"
+#include "Vision.pb.h"
 #include "RobotLocation.pb.h"
 #include <boost/shared_ptr.hpp>
 
@@ -26,7 +25,7 @@ public:
     BallTrackModule();
     ~BallTrackModule();
 
-    portals::InPortal<messages::VisionBall> visionBallInput;
+    portals::InPortal<messages::Vision> visionInput;
     portals::InPortal<messages::RobotLocation> odometryInput;
     portals::InPortal<messages::RobotLocation> localizationInput;
     portals::OutPortal<messages::FilteredBall> ballLocationOutput;

@@ -1,4 +1,6 @@
 import SweetMoves as SweetMoves
+import noggin_constants as nogginConstants
+
 
 class FallController():
     def __init__(self, brain):
@@ -11,6 +13,7 @@ class FallController():
         self.standDelay = 0
         self.startStandupTime = 0
         self.standupMoveTime = 0
+        self.sawBall = False
 
         self.enabled = True
 
@@ -23,6 +26,7 @@ class FallController():
             # Save the player. We are falling
             self.falling = True
             self.brain.player.gainsOff()
+            self.sawBall = self.brain.ball.vis.frames_off < 30
             self.brain.player.switchTo('fallen')
             self.brain.tracker.stopHeadMoves()
 
@@ -46,10 +50,17 @@ class FallController():
             self.brain.tracker.setNeutralHead()
 
             move = None
+            #stand up depends on whether the robot is a v4 or a v5
             if (self.brain.interface.fallStatus.on_front):
-                move = SweetMoves.STAND_UP_FRONT
+                if nogginConstants.V5_ROBOT:
+                    move = SweetMoves.STAND_UP_FRONT
+                else:
+                    move = SweetMoves.STAND_UP_FRONT_V4
             else:
-                move = SweetMoves.STAND_UP_BACK
+                if nogginConstants.V5_ROBOT:
+                    move = SweetMoves.STAND_UP_BACK
+                else:
+                    move = SweetMoves.STAND_UP_BACK_V4
 
             self.brain.player.executeMove(move)
 
@@ -60,8 +71,13 @@ class FallController():
         elif (self.standingUp):
             if (self.brain.time - self.startStandupTime > self.standupMoveTime):
                 self.brain.player.stand()
-                self.brain.player.switchTo(self.brain.player.gameState)
                 self.falling = False
                 self.fell = False
                 self.standingUp = False
                 self.standDelay = 0
+            
+                if self.sawBall:
+                    return self.brain.player.switchTo('spinSearch')
+                else:
+                    self.brain.player.switchTo(self.brain.player.gameState)
+                

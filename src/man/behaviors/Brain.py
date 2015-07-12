@@ -15,6 +15,7 @@ from . import Leds
 from . import robots
 from . import GameController
 from . import FallController
+from . import SweetMoves
 
 # Packages and modules from sub-directories
 from .headTracker import HeadTracker
@@ -29,7 +30,6 @@ import LedCommand_proto
 import GameState_proto
 import WorldModel_proto
 import RobotLocation_proto
-import BallModel_proto
 import PMotion_proto
 import MotionStatus_proto
 import ButtonState_proto
@@ -77,6 +77,7 @@ class Brain(object):
 
         # New vision system...
         self.visionLines = None
+        self.visionCorners = None
 
         # FSAs
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
@@ -98,9 +99,13 @@ class Brain(object):
 
         # Used for obstacle detection
         self.obstacles = [0.] * 9
+        self.obstacleDetectors = ['n'] * 9
 
         self.ourScore = 0
         self.theirScore = 0
+
+        # So that we only try to sit down once upon receiving command
+        self.sitting = False
 
     def initTeamMembers(self):
         self.teamMembers = []
@@ -140,12 +145,23 @@ class Brain(object):
         """
         Main control loop
         """
+        # If we're being told to sit do that above all else
+        if self.interface.sitDown.toggle:
+            if self.sitting:
+                return
+            self.sitting = True
+            print "BEHAVIORS is starting to sit"
+            if Constants.V5_ROBOT:
+                self.nav.performSweetMove(SweetMoves.SIT_POS_V5)
+            else:
+                self.nav.performSweetMove(SweetMoves.SIT_POS)
+
         # Update Environment
         self.time = time.time()
         
         # Update objects
         self.updateVisionObjects()
-        # self.updateObstacles()
+        self.updateObstacles()
         self.updateMotion()
         self.updateLoc()
         self.getCommUpdate()
@@ -220,11 +236,16 @@ class Brain(object):
         self.motion = self.interface.motionStatus
 
     def updateVision(self):
-        self.visionLines = self.interface.visionLines
+        self.visionLines = self.interface.vision.line
+        self.visionCorners = self.interface.vision.corner
+        self.vision = self.interface.vision
+        
+        # if self.counter % 50 == 0:
+        #     print "VisionCorner size:"
+        #     print self.visionCorners.corner_size()
 
-        # if self.counter % 30 == 0:
-        #     print "Visionline size:"
-        #     print self.visionLines.line_size()
+        # if self.visionCorners.corner_size() != 0:
+        #     print "I see a corner!!"
 
         # for i in range(0, self.visionLines.line_size()):
         #     print "Vision lines:"
@@ -244,11 +265,21 @@ class Brain(object):
 
     def updateObstacles(self):
         self.obstacles = [0.] * 9
-        # size = self.interface.fieldObstacles.obstacle_size()
-        # for i in range(size):
-        #     curr_obst = self.interface.fieldObstacles.obstacle(i)
-        #     if curr_obst.position is not curr_obst.position.NONE:
-        #         self.obstacles[int(curr_obst.position)] = curr_obst.distance
+        self.obstacleDetectors = ['n'] * 9
+        size = self.interface.fieldObstacles.obstacle_size()
+        for i in range(size):
+            curr_obst = self.interface.fieldObstacles.obstacle(i)
+            if curr_obst.position != curr_obst.position.NONE:
+                self.obstacles[int(curr_obst.position)] = (curr_obst.distance, curr_obst.closest_y)
+
+                if curr_obst.detector == curr_obst.detector.ARMS:
+                    self.obstacleDetectors[int(curr_obst.position)] = 'a'
+                elif curr_obst.detector == curr_obst.detector.SONARS:
+                    self.obstacleDetectors[int(curr_obst.position)] = 's'
+                elif curr_obst.detector == curr_obst.detector.VISION:
+                    self.obstacleDetectors[int(curr_obst.position)] = 'v'
+                else:
+                    self.obstacleDetectors[int(curr_obst.position)] = 'n'
 
     def activeTeamMates(self):
         activeMates = 0
@@ -266,6 +297,7 @@ class Brain(object):
                                  self.interface.loc.y,
                                  self.interface.loc.h * (180. / math.pi))
         self.locUncert = self.interface.loc.uncert
+        self.lost = self.interface.loc.lost
 
     def resetLocTo(self, x, y, h):
         """

@@ -112,16 +112,16 @@ class TeamMember(RobotLocation):
         self.ballAge = ball.vis.frames_off*30
         self.ballDist = ball.distance
         self.ballBearing = ball.bearing_deg
-        self.ballOn = False
-        # TODO -1 when ball has not been seen
-        self.ballAge = -1
-        self.ballDist = 0
-        self.ballBearing = 0
+        # self.ballOn = False
+        # # TODO -1 when ball has not been seen
+        # self.ballAge = -1
+        # self.ballDist = 0
+        # self.ballBearing = 0
 
         self.ballVelX = ball.vel_x
         self.ballVelY = ball.vel_y
-        self.ballVelX = 0
-        self.ballVelY = 0
+        # self.ballVelX = 0
+        # self.ballVelY = 0
 
         # TODO use covariance matrices
         self.ballUncert = 0

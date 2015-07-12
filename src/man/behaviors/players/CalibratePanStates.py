@@ -6,12 +6,14 @@ from ..util import *
 
 @superState('gameControllerResponder')
 def panTop(player):
-	# print "Got to pan"
 	if player.panIndex < constants.NUMBER_OF_PANS and player.firstFrame():
 		player.brain.tracker.helper.executeHeadMove(tracker.HeadMoves.CALIBRATION_TOP_PAN[player.panIndex])
 		player.panIndex += 1
 
-	elif player.stateTime >= constants.TIME_OF_PAN*2:
+	elif player.stateTime >= constants.TIME_OF_PAN*2 and not player.panIndex == 1:
+		return player.goLater('logTop')
+
+	elif player.stateTime >= constants.TIME_OF_PAN*6:
 		return player.goLater('logTop')
 
 	return player.stay()
@@ -31,12 +33,14 @@ def logTop(player):
 
 @superState('gameControllerResponder')
 def panBottom(player):
-	# print "Got to pan"
 	if player.panIndex < constants.NUMBER_OF_PANS and player.firstFrame():
 		player.brain.tracker.helper.executeHeadMove(tracker.HeadMoves.CALIBRATION_BOTTOM_PAN[player.panIndex])
 		player.panIndex += 1
 
-	elif player.stateTime >= constants.TIME_OF_PAN*2:
+	elif player.stateTime >= constants.TIME_OF_PAN*2 and not player.panIndex == 1:
+		return player.goLater('logBottom')
+
+	elif player.stateTime >= constants.TIME_OF_PAN*6:
 		return player.goLater('logBottom')
 
 	return player.stay()
