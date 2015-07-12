@@ -298,10 +298,10 @@ CornerDetector::CornerDetector(int width_, int height_)
     height(height_), 
     orthogonalThreshold_(40), 
     intersectThreshold_(15), 
-    closeThreshold_(15), 
-    farThreshold_(30), 
+    closeThreshold_(15),
+    farThreshold_(15), 
     edgeImageThreshold_(0.1),
-    lengthThreshold_(0) // NOTE zero means that the condition is not currently being used
+    lengthThreshold_(0)  // NOTE zero means that the condition is not currently being used
 {}
 
 void CornerDetector::findCorners(FieldLineList& list)
@@ -343,9 +343,7 @@ void CornerDetector::findCorners(FieldLineList& list)
       }
 
       // NOTE TFirst and TSecond are temporarily used to specify whether corner.first
-      //      or corner.second is the top of the T corner. If TFirst, then corner.first
-      //      is the vertical part of the T, otherwise, corner.second is 
-      //      vertical part of the T. Before the corner detector finishes 
+      //      or corner.second is the top of the T corner. Before the corner detector finishes 
       //      finding corners, all references to TFirst and TSecond are replaced 
       //      with T and the corner.first is the vertical part of the T. This happens 
       //      below. Thus the client is not aware of TFirst and TSecond.
@@ -426,6 +424,20 @@ CornerID CornerDetector::classify(const HoughLine& line1, const HoughLine& line2
   if (!intersects) return CornerID::None; 
   // NOTE should never happen since checked above in image coords
 
+  // (1) Check for T corner
+  // Project intersection point onto lines
+  double whereOnField1 = field1.qDist(worldIntersectX, worldIntersectY);
+  double whereOnField2 = field2.qDist(worldIntersectX, worldIntersectY);
+
+  // If intersection point is between line's endpoints, found T
+  if (whereOnField1 > field1.ep0() + farThreshold() && 
+      whereOnField1 < field1.ep1() - farThreshold())
+    return CornerID::TFirst;
+  else if (whereOnField2 > field2.ep0() + farThreshold() && 
+           whereOnField2 < field2.ep1() - farThreshold())
+    return CornerID::TSecond;
+
+  // (2) Check for convave or convex corner
   // Find endpoints
   double field1EndX[2];
   double field1EndY[2];
@@ -456,17 +468,6 @@ CornerID CornerDetector::classify(const HoughLine& line1, const HoughLine& line2
           return CornerID::Concave;
         return CornerID::Convex;
       }
-    }
-  }
-  // Find and classify t corners
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 2; j++) {
-      // Found t
-      // TODO for T corners, both endpoints outside of far threshold?
-      if ((dist1[i] < closeThreshold() && dist2[j] >= farThreshold()))
-        return CornerID::TSecond;
-      else if (dist2[j] < closeThreshold() && dist1[i] >= farThreshold())
-        return CornerID::TFirst;
     }
   }
 
