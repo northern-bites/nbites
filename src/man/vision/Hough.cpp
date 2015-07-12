@@ -296,11 +296,13 @@ string GoalboxDetector::print() const
 CornerDetector::CornerDetector(int width_, int height_)
   : width(width_), 
     height(height_), 
-    orthogonalThreshold_(40), 
-    intersectThreshold_(10), 
-    closeThreshold_(30), 
-    farThreshold_(50), 
-    edgeImageThreshold_(0.20),
+    orthogonalThreshold_(20), 
+    intersectThreshold_(15), 
+    // closeThreshold_(30), 
+    // farThreshold_(50), 
+    closeThreshold_(15), 
+    farThreshold_(30), 
+    edgeImageThreshold_(0.15),
     lengthThreshold_(0) // NOTE zero means that the condition is not currently being used
 {}
 
@@ -319,29 +321,35 @@ void CornerDetector::findCorners(FieldLineList& list)
       FieldLine& line1 = list[i];
       FieldLine& line2 = list[j];
 
-      std::cout << std::endl << std::endl;
+      std::cout << std::endl << "START" << std::endl;
       std::cout << line1.index() << std::endl;
       std::cout << line2.index() << std::endl;
 
       // Find corners
       // NOTE since there are two hough lines in each field line, we require
-      //      finding (1) at least one intersecting set of hough lines and 
-      //      (2) the same corner ID in all pairings of hough lines
-      bool foundCorner = isCorner(line1[0], line2[0]);
-      std::cout << "FOUND? " << foundCorner << std::endl;
-      CornerID firstId = classify(line1[0], line2[0]);
-      std::cout << "ID? " << (int)firstId << std::endl;
-      bool sameId = true;
-      for (int k = 0; k < 2; k++) {
-        for (int l = 0; l < 2; l++) {
-          if (k == 0 && l == 0) continue;
-          foundCorner = foundCorner || isCorner(line1[k], line2[l]);
-          std::cout << "FOUND? " << foundCorner << std::endl;
-          CornerID newId = classify(line1[k], line2[l]);
-          std::cout << "ID? " << (int)newId << std::endl;
-          if (firstId != newId)
-            sameId = false;
-        }
+      //      finding valid corners with same id in at least two pairings 
+      //      of hough lines
+      std::vector<CornerID> ids;
+      if (isCorner(line1[0], line2[0]))
+          ids.push_back(classify(line1[0], line2[0]));
+      if (isCorner(line1[0], line2[1]))
+          ids.push_back(classify(line1[0], line2[1]));
+      if (isCorner(line1[1], line2[0]))
+          ids.push_back(classify(line1[1], line2[0]));
+      if (isCorner(line1[1], line2[1]))
+          ids.push_back(classify(line1[1], line2[1]));
+
+      std::cout << "IDS: " << std::endl;
+      for (int i = 0; i < ids.size(); i++)
+          std::cout << static_cast<int>(ids[i]) << std::endl;
+
+      CornerID id = CornerID::None;
+      for (int i = 0; i < ids.size(); i++) {
+          for (int j = 0; j < ids.size(); j++) {
+              if (i == j) continue;
+              if (ids[i] != CornerID::None && ids[i] == ids[j])
+                  id = ids[i];
+          }
       }
 
       // NOTE TFirst and TSecond are temporarily used to specify whether corner.first
@@ -353,14 +361,14 @@ void CornerDetector::findCorners(FieldLineList& list)
       //      below. Thus the client is not aware of TFirst and TSecond.
 
       // Create corner object and add to field lines
-      if (sameId && foundCorner && firstId != CornerID::None) {
+      if (id != CornerID::None) {
         Corner newCorner;
-        if (firstId == CornerID::TSecond)
+        if (id == CornerID::TSecond)
           newCorner = Corner(&line2, &line1, CornerID::T);
-        else if (firstId == CornerID::TFirst)
+        else if (id == CornerID::TFirst)
           newCorner = Corner(&line1, &line2, CornerID::T);
         else
-          newCorner = Corner(&line1, &line2, firstId);
+          newCorner = Corner(&line1, &line2, id);
         line1.addCorner(newCorner);
         line2.addCorner(newCorner);
         this->push_back(newCorner);
@@ -417,6 +425,12 @@ bool CornerDetector::isCorner(const HoughLine& line1, const HoughLine& line2) co
   bool line1Length = (field1.ep1() - field1.ep0()) > lengthThreshold();
   bool line2Length = (field2.ep1() - field2.ep0()) > lengthThreshold();
   bool length = line1Length && line2Length;
+
+  std::cout << "TESTS:" << std::endl;
+  std::cout << intersects << std::endl;
+  std::cout << farEnoughFromImageEdge << std::endl;
+  std::cout << orthogonal << std::endl;
+  std::cout << length << std::endl;
 
   return intersects && farEnoughFromImageEdge && orthogonal && length;
 }
