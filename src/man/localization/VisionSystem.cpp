@@ -136,8 +136,8 @@ bool VisionSystem::update(ParticleSet& particles,
                 injections.push_back(reconstructed);
         }
     // China 2015 hack
-    // Don't inject off of any features but ball in set
-    } else if (ball != NULL) {
+    // Don't inject off of any features but ball when in set
+    } else if (ball == NULL) {
         // (2) Reconstruct pose from top goalbox
         // for (int i = 0; i < vision.line_size(); i++) {
         //     const messages::FieldLine& field = vision.line(i);
@@ -199,51 +199,43 @@ bool VisionSystem::update(ParticleSet& particles,
         //     }
         // }
 
-        // (3) Reconstruct pose from center circle
-        // TODO check for midline classification
-    //     if (vision.circle().on()) {
-    //         messages::FieldLine midline;
-    //         double minDist = std::numeric_limits<double>::max();
+        // (3) Reconstruct pose from center circle and midline
+        if (vision.circle().on()) {
+            bool midlineFound = false;
+            messages::FieldLine midline;
 
-    //         // Find line that is closest to the circle, should be midline
-    //         for (int i = 0; i < vision.line_size(); i++) {
-    //             const messages::FieldLine& field = vision.line(i);
-    //             const messages::HoughLine& inner = field.inner();
+            // Find line that loc system classified as midline
+            for (int i = 0; i < vision.line_size(); i++) {
+                const messages::FieldLine& field = vision.line(i);
 
-    //             // Create GeoLine
-    //             vision::GeoLine line;
-    //             line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
+                // Check for midline
+                if (field.id() == static_cast<int>(vision::LineID::Midline)) {
+                    midlineFound = true;
+                    midline = field;
+                }
+            }
 
-    //             // Project ball onto line, find distance to line
-    //             double distToLine = fabs(line.pDist(vision.circle().x(), vision.circle().y()));
+            // If found the midline, reconstruct location
+            if (midlineFound) {
+                // Get appropriate line id
+                LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirMidline : LocLineID::OurMidline);
 
-    //             // Check for min distance
-    //             if (minDist > distToLine) {
-    //                 midline = field;
-    //                 minDist = distToLine;
-    //             }
-    //         }
+                // Recontruct x and h from midline and y from center circle
+                messages::RobotLocation fromLine = lineSystem->reconstructWoEndpoints(id, midline);
+                messages::RobotLocation fromLineAndCircle = fromLine;
 
-    //         // If sufficiently close, found the midline, reconstruct location
-    //         if (minDist < 60) {
-    //             // Get appropriate line id
-    //             LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirMidline : LocLineID::OurMidline);
+                // Rotate to absolute coordinate system
+                double circleAbsX, circleAbsY;
+                vision::translateRotate(vision.circle().x(), vision.circle().y(), 0, 0, fromLine.h(), circleAbsX, circleAbsY);
+                fromLineAndCircle.set_y(CENTER_FIELD_Y - circleAbsY);
 
-    //             // Recontruct x and h from midline and y from center circle
-    //             messages::RobotLocation fromLine = lineSystem->reconstructWoEndpoints(id, midline);
-    //             messages::RobotLocation fromLineAndCircle = fromLine;
-
-    //             // Rotate to absolute coordinate system
-    //             double circleAbsX, circleAbsY;
-    //             vision::translateRotate(vision.circle().x(), vision.circle().y(), 0, 0, fromLine.h(), circleAbsX, circleAbsY);
-    //             fromLineAndCircle.set_y(CENTER_FIELD_Y - circleAbsY);
-
-    //             // Add injection and return
-    //             ReconstructedLocation reconstructed(fromLineAndCircle.x(), fromLineAndCircle.y(), fromLineAndCircle.h(), 1, 1, 0.01);
-    //             if (reconstructed.onField())
-    //                 injections.push_back(reconstructed);
-    //         }
-    //     }
+                // Add injection and return
+                ReconstructedLocation reconstructed(fromLineAndCircle.x(), fromLineAndCircle.y(), fromLineAndCircle.h(), 1, 1, 0.01);
+                std::cout << "HEADING: " << fromLineAndCircle.h() << std::endl;
+                if (reconstructed.onField())
+                    injections.push_back(reconstructed);
+            }
+        }
     }
 
     // Weights were adjusted so return true
