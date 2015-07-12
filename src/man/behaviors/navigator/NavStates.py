@@ -140,7 +140,10 @@ def dodge(nav):
     if nav.firstFrame():
         nav.dodging = True
 
-        nav.brain.tracker.trackObstacle(dodge.obstaclePosition)
+        if nav.brain.ball.vis.frames_off < 5:
+            nav.brain.tracker.trackBall()
+        else:
+            nav.brain.tracker.trackObstacle(dodge.obstaclePosition)
 
         ## SET UP the dodge direction based on where the obstacle is
         # if directly in front of us, move back and to one side based on
