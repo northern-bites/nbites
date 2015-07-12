@@ -55,6 +55,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.penaltyKicking = False
         # Kickoff kick
         self.shouldKickOff = False
+        self.inKickOffPlay = False
         # To keep track of when we are coming out of penalty
         self.wasPenalized = False
         # Controls whether we check for a falling/fallen robot
@@ -68,6 +69,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Controls whether we use claims
         self.useClaims = True
         self.returningFromPenalty = False
+
         # Trinary flag indicating state of communications
         # 0 -- all field players are online
         # 1 -- one field player is offline
