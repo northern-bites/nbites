@@ -41,7 +41,8 @@ def commMonitor(player):
         else:
             oppTeam = -1
         RoleConstants.setRoleConstants(player, player.role, oppTeam)
-        player.roleSwitching = False
+        if not player.dropIn:
+            player.roleSwitching = False
         player.commMode = 2
     elif not player.brain.game.have_remote_gc and player.commMode != 1 and transitions.mediocreComm(player):
         print "Switched to mediocre comm mode!"
@@ -56,7 +57,8 @@ def commMonitor(player):
         else:
             oppTeam = -1
         RoleConstants.setRoleConstants(player, player.role, oppTeam)
-        player.roleSwitching = False
+        if not player.dropIn:
+            player.roleSwitching = False
         player.commMode = 1
     elif player.commMode != 0 and transitions.goodComm(player):
         print "Switched to good comm mode!"

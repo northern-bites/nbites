@@ -109,3 +109,8 @@ def shouldBeSupporter(player):
         
     return (ballInBox(player) and
             claimTransitions.shouldCedeClaim(player))
+
+#DROPIN
+def missingPlayers(player):
+    if player.brain.activeTeamMates() < 5:
+        return True

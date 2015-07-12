@@ -16,6 +16,8 @@ import random
 @superState('gameControllerResponder')
 @ifSwitchNow(transitions.shouldBeSupporter, 'positionAsSupporter')
 @ifSwitchNow(transitions.shouldApproachBall, 'approachBall')
+@ifSwitchNow(transitions.missingPlayers, 'switchRoles')
+
 def playOffBall(player):
     """
     Superstate for all off ball play.

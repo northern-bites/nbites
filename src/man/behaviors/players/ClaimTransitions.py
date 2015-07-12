@@ -82,7 +82,7 @@ def shouldGoForBall(player):
         if not mate.active or mate.fallen:
             continue
 
-        mateBallDistance = mateBallDist(player.brain.loc.x, player.brain.loc.y, player.brain.loc.h, player.brain.ball,distance, 
+        mateBallDistance = mateBallDist(player.brain.loc.x, player.brain.loc.y, player.brain.loc.h, player.brain.ball.distance, 
                                     player.brain.ball_bearing_deg, mate_x, mate_y)
 
         ball_y = ballY(player.brain.loc.h, player.brain.ball.bearing_deg,player.brain.ball.distance)

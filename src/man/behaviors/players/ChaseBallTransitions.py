@@ -26,9 +26,10 @@ def shouldReturnHome(player):
         player.claimedBall = False
         return True;
     #For  DropIn player! 
+    """
     if player.dropIn:
         return claimTrans.shouldGoForBall(player)
-
+    """
     return claimTrans.shouldCedeClaim(player)
 
 def shouldSupport(player):
@@ -40,9 +41,10 @@ def shouldSupport(player):
         player.claimedBall = False
         return False
     # for drop in
+    """
     if player.dropIn:
         return player.brain.ball.vis.frames_on and claimTrans.shouldGoForBall(player)
-    
+    """
     return player.brain.ball.vis.frames_on and claimTrans.shouldCedeClaim(player)
 
 def shouldDecelerate(player):

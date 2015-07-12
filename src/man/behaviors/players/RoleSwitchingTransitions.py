@@ -83,11 +83,84 @@ def checkForConsistency(player):
         print "We have conflicting role AND there are no more open roles..."
 
     # US Open Hacks
-    """
     if player.brain.game:
         oppTeam = player.brain.game.team(1).team_number
     else:
         oppTeam = -1
     constants.setRoleConstants(player, position, oppTeam)
     return
+
+
+def determineOpenRoles(player):
     """
+    Used for role switching in drop in games. Similar to structures of determineRole
+    in PenaltyStates and checkForConsistency above.
+    """
+
+    if player.brain.activeTeamMates() > 4:
+        print "Sufficient number of teammates."
+        return
+
+    if not player.roleSwitching:
+        return
+
+    if not player.gameState == "gamePlaying":
+        return
+
+    openSpaces = [True, True, True, True] 
+    openSpaces[player.role - 2] = False
+    conflict = -1
+
+    #number of defenders and number of offense players
+    for mate in player.brain.teamMembers:
+        if constants.isGoalie(mate.role):
+            continue
+        if constants.isDefender(mate.role) and mate.frameSinceActive > 30:
+            openSpaces[mate.role - 2] = False
+        if constants.isChaser(mate.role) and mate.frameSinceActive > 30:
+            openSpaces[mate.role -2] = False
+        if player.role == mate.role:
+            if mate.playerNumber == player.brain.playerNumber:
+                continue 
+            print "There is role overlap in role", mate.role, "with player number", mate.playerNumber
+            conflict = player.role
+
+    #if robots overlap on a position that is not the goalie
+    #switch roles, prioritizing higher positions
+    if conflict > 1:
+        print "Conflict value is ", conflict
+        for i in range(3, -1, -1):
+            if openSpaces[i] == True:
+                switchToRole(player, i+2)
+                return
+
+    if offenseOpen and not defenseOpen(openSpaces):
+        for i in range(3, -1, -1):
+            if openSpaces[i] == True:
+                switchToRole(player, i+2)
+                return
+        
+    # elif defenseOpen(openSpaces) and not offenseOpen(openSpaces):
+    #     print "Defense was open, switching to defense."
+    #     for i in range(3):
+    #         if openSpaces[i] == True:
+    #             switchToRole(player, i+2)
+    #             return
+
+    return
+
+def switchToRole(player,role):
+    print "Switching to role", role
+    player.role = role
+    constants.setRoleConstants(player, role, -1)
+    return
+
+def offenseOpen(openSpaces):
+    print "Testing if both chaser/striker are on the field."
+    if openSpaces[2] == openSpaces[3] == True:
+        return True
+
+def defenseOpen(openSpaces):
+    print "Testing if both defenders are on the field."
+    if openSpaces[0] == openSpaces[1] == True:
+        return True
