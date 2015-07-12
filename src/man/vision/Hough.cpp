@@ -296,13 +296,11 @@ string GoalboxDetector::print() const
 CornerDetector::CornerDetector(int width_, int height_)
   : width(width_), 
     height(height_), 
-    orthogonalThreshold_(20), 
+    orthogonalThreshold_(40), 
     intersectThreshold_(15), 
-    // closeThreshold_(30), 
-    // farThreshold_(50), 
     closeThreshold_(15), 
     farThreshold_(30), 
-    edgeImageThreshold_(0.15),
+    edgeImageThreshold_(0.1),
     lengthThreshold_(0) // NOTE zero means that the condition is not currently being used
 {}
 
@@ -398,7 +396,7 @@ bool CornerDetector::isCorner(const HoughLine& line1, const HoughLine& line2) co
   double xThreshold = (width / 2) - (width * edgeImageThreshold());
   double yThresholdBottom = (height / 2) - (height * edgeImageThreshold());
   double yThresholdTop = (height / 2) - (height * 0.5*edgeImageThreshold());
-  // NOTE top no corner buffer is half the size of side and bottom buffer
+  // NOTE in top of image, no classify buffer is half the size
 
   std::cout << "IS CORNER?" << std::endl;
   std::cout << xThreshold << std::endl;
