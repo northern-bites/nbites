@@ -114,15 +114,6 @@ void ParticleFilter::updateEstimate()
     bool offField = !(poseEstimate.x() >= 0 && poseEstimate.x() <= FIELD_GREEN_WIDTH && 
                       poseEstimate.y() >= 0 && poseEstimate.y() <= FIELD_GREEN_HEIGHT); 
     poseEstimate.set_lost(offField);
-
-    // double variance = 0;
-    // for(iter = particles.begin(); iter != particles.end(); ++iter)
-    // {
-
-    //     variance += pow(poseEstimate.h() - (*iter).getLocation().h(), 2);
-    // }
-
-    // std::cout << variance << std::endl;
 }
 
 void ParticleFilter::updateFieldForDebug(messages::Vision& vision)
@@ -478,16 +469,16 @@ void ParticleFilter::resample(bool inSet)
                 double randSample = gen();
 
                 if (cdf.upper_bound(randSample) == cdf.end())
-                    newParticles.push_back(cdf.begin()->second); // NOTE return something that DEF exists
+                    newParticles.push_back(cdf.begin()->second); // NOTE return something that def exists
                 else
                     newParticles.push_back(cdf.upper_bound(randSample)->second);
             }
         }
-        std::cout << "WSLOW: " << wSlow << std::endl;
-        std::cout << "WFAST: " << wFast << std::endl;
-        std::cout << "NUMBERS OF INJECTIONS: " << ni << std::endl;
-    }
 
+        // std::cout << "wSlow: " << wSlow << std::endl;
+        // std::cout << "wFast: " << wFast << std::endl;
+        // std::cout << "Injections: " << ni << std::endl;
+    }
 
     // Update particles
     particles = newParticles;
