@@ -286,39 +286,21 @@ void VisionModule::run_()
 #endif
     }
     double topTotal;
-    double bottomTotal;
+    double botTotal;
 
     for (int i = 0; i < 2; i++) {
         if (i == 0) {
-            topTotal = times[i][0] +
-                       times[i][1] +
-                       times[i][2] +
-                       times[i][3] +
-                       times[i][4] +
-                       times[i][5] +
-                       times[i][6] +
-                       times[i][7] +
-                       times[i][8] +
-                       times[i][9] +
-                       times[i][10] +
-                       times[i][11];
+            topTotal = (times[i][0] + times[i][1] + times[i][2] + times[i][3] +
+                        times[i][4] + times[i][5] + times[i][6] + times[i][7] +
+                        times[i][8] + times[i][9] + times[i][10] + times[i][11]);
         } else {
-            bottomTotal = times[i][0] +
-                       times[i][1] +
-                       times[i][2] +
-                       times[i][3] +
-                       times[i][4] +
-                       times[i][5] +
-                       times[i][6] +
-                       times[i][7] +
-                       times[i][8] +
-                       times[i][9] +
-                       times[i][10] +
-                       times[i][11];
+            botTotal = (times[i][0] + times[i][1] + times[i][2] + times[i][3] +
+                        times[i][4] + times[i][5] + times[i][6] + times[i][7] +
+                        times[i][8] + times[i][9] + times[i][10] + times[i][11]);
         }
     }
 
-    if (topTotal + bottomTotal > 16.0 && false) {
+    if (topTotal + botTotal > 16.0 && false) {
         overrun++;
         for (int i = 0; i < 2; i++) {
             if (i == 0) {
@@ -338,9 +320,9 @@ void VisionModule::run_()
             std::cout << "Field lines:    " << times[i][9] << std::endl;
             std::cout << "FL classify:    " << times[i][10] << std::endl;
             std::cout << "Ball:           " << times[i][11] << std::endl;
-            std::cout << "Total:          " << (!i ? topTotal : bottomTotal) <<std::endl;
+            std::cout << "Total:          " << (!i ? topTotal : botTotal) <<std::endl;
         }
-        std::cout << std::endl << "TOTAL:          " << topTotal + bottomTotal << " " <<
+        std::cout << std::endl << "TOTAL:          " << topTotal + botTotal << " " <<
         edges[0]->count() << " edges in top. " << overrun <<
         " total overruns" << std::endl << std::endl;
     }

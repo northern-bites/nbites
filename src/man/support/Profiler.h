@@ -56,6 +56,11 @@ enum ProfiledComponent {
     P_OBSTACLE,
 
     P_SELF_LOC,
+    P_LOC_MOTION,
+    P_LOC_VISION,
+    P_LOCV_SCORING,
+    P_LOCV_INJECTION,
+    P_LOC_RESAMPLE,
     P_BALL_TRACK,
 
     P_BEHAVIORS,

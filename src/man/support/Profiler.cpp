@@ -44,6 +44,11 @@ static const char *PCOMPONENT_NAMES[] = {
     "Obstacle",
 
     "Localization",
+    "Loc Motion Update",
+    "Loc Vision Update",
+    "Loc Vision Scoring",
+    "Loc Vision Injection",
+    "Loc Resample",
     "Ball Track",
 
     "Behaviors",
@@ -118,6 +123,11 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
     /*P_OBSTACLE               --> */ P_VISION,
 
     /*P_SELF_LOC               --> */ P_COGNITION_THREAD,
+    /*P_LOC_MOTION             --> */ P_SELF_LOC,
+    /*P_LOC_VISION             --> */ P_SELF_LOC,
+    /*P_LOCV_SCORING           --> */ P_LOC_VISION,
+    /*P_LOCV_INJECTION         --> */ P_LOC_VISION,
+    /*P_LOC_RESAMPLE           --> */ P_SELF_LOC,
     /*P_BALL_TRACK             --> */ P_COGNITION_THREAD,
 
     /*P_BEHAVIORS              --> */ P_COGNITION_THREAD,
