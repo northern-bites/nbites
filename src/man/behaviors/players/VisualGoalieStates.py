@@ -289,10 +289,11 @@ def findMyWayBackPtII(player):
         print "I'm walking back now!"
         player.brain.nav.walkTo(dest)
         player.homeDirections = []
-        if clearIt.ballSide == RIGHT:
-            player.homeDirections += [RelRobotLocation(0.0, 0.0, 175.0)]
-        else:
-            player.homeDirections += [RelRobotLocation(0.0, 0.0, -175.0)]
+        #Testingchange
+        # if clearIt.ballSide == RIGHT:
+        #     player.homeDirections += [RelRobotLocation(0.0, 0.0, 175.0)]
+        # else:
+            # player.homeDirections += [RelRobotLocation(0.0, 0.0, -175.0)]
     findMyWayBackPtII.counter += 1
     # if findMyWayBackPtII.counter > 200:
     #         return player.goLater('watchWithLineChecks')
