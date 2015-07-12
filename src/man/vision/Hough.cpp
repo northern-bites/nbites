@@ -704,7 +704,7 @@ void FieldLineList::find(HoughLineList& houghLines, bool blackStar)
           // other, which makes the sum of r's negative. A pair of nearly parallel
           // lines with the right separation but with polarities pointing away from
           // each other is not a field line. 
-          double separation = fabs(hl1->field().r() + hl2->field().r());
+          double separation = fabs(hl1->field().separation(hl2->field()));
           if (correctPolarity && separation <= maxLineSeparation())
           {
             int index = size();
@@ -788,7 +788,7 @@ void FieldLineList::classify(GoalboxDetector& boxDetector,
   //
   // So the current strategy is to just classify lines via the goalbox detector,
   // the circle detector, and the corner loop below the commented out code. This
-  // is plenty sufficient for good localization accuracy, but in the future it
+  // is imo sufficient for good localization accuracy, but in the future it
   // would be better to get the code commented out below tested and running.
   //
   // - Josh
