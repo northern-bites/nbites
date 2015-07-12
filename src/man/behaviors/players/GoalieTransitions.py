@@ -15,13 +15,12 @@ def getCorners(player):
     corners = player.brain.visionCorners
 
     # print ("horizon dist:", player.brain.vision.horizon_dist)
-    # print ("num corners:", player.brain.visionCorners.corner_size())
 
-    # for k in range(0, player.brain.visionCorners.corner_size()):
-    #     c = player.brain.visionCorners
-    #     print("x", c.corner(k).x, "y", c.corner(k).y)
-    #     print("id", c.corner(k).id)
-    # print " -------------------------"
+    for k in range(0, player.brain.vision.corner_size()):
+        c = player.brain.visionCorners
+        print("x", c(k).x, "y", c(k).y)
+        print("id", c(k).id)
+    print " -------------------------"
 
   # Concave,
   # Convex,
@@ -122,12 +121,12 @@ def seeGoalbox(player):
             y2 = y0 + -backline.ep1 * math.cos(t)
             mx = (r1+r2)/3 * 2 #(x1+x2)/2
             my = 0 #(y1+y2)/2
-            if t > 180 and t < 340:
-                h = 20 #(360 - t) / 2
-            elif t < 180 and t > 15:
-                h = -20 #-(t/2)
-            else:
-                h = 0
+            # if t > 180 and t < 340:
+            #     h = 20 #(360 - t) / 2
+            # elif t < 180 and t > 15:
+            #     h = -20 #-(t/2)
+            # else:
+            h = 0
             print("Backline r:", r, "t:", t)
             print("mx:", mx, "my", my, "h", h)
             print("horizon", player.brain.vision.horizon_dist)
@@ -313,7 +312,7 @@ def shouldGoForward(player):
 
             if (l != i) and math.fabs(t - t2) < 15.0 \
             and r2 < 120.0 and r < 120.0 and math.fabs(r - r2) > 25.0 \
-            and r != 0.0 and r2 != 0.0:
+            and r != 0.0 and r2 != 0.0 and (r < 35.0 or r2 < 35.0):
                 print "I'm seeing two lines, I should go forward"
                 print ("r1: ", r, "r2: ", r2, " t1: ", t, "t2: ", t2)
                 print("horizon", player.brain.vision.horizon_dist)
@@ -483,17 +482,18 @@ def shouldPositionRight(player):
     if player.brain.ball.bearing_deg < -40.0 and \
     player.brain.ball.distance > constants.CLEARIT_DIST_SIDE and \
     player.inPosition is not constants.RIGHT_POSITION:
-        GoalieStates.shiftedPosition.dest = constants.LEFT_SHIFT
+        GoalieStates.shiftPosition.dest = constants.RIGHT_SHIFT
+        print("Bearing: ", player.brain.ball.bearing_deg)
         return True
 
-    GoalieStates.watchWithLineChecks.shiftedPosition = False
     return False
 
 def shouldPositionLeft(player):
     if player.brain.ball.bearing_deg > 40.0 and \
     player.brain.ball.distance > constants.CLEARIT_DIST_SIDE and \
     player.inPosition is not constants.LEFT_POSITION:
-        GoalieStates.shiftedPosition.dest = constants.RIGHT_SHIFT
+        GoalieStates.shiftPosition.dest = constants.LEFT_SHIFT
+        print("Bearing: ", player.brain.ball.bearing_deg)
         return True
 
     return False

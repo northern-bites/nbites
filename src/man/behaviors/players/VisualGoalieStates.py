@@ -272,10 +272,11 @@ def findMyWayBackPtI(player):
     if findMyWayBackPtI.counter > 200:
             return player.goLater('watchWithLineChecks')
     if player.brain.nav.isStopped():
-        if clearIt.ballSide == RIGHT:
-            player.setWalk(0, 0, -20.0)
-        else:
-            player.setWalk(0, 0, 20.0)
+        #TESTING CHANGE
+        # if clearIt.ballSide == RIGHT:
+        #     player.setWalk(0, 0, -20.0)
+        # else:
+        player.setWalk(0, 0, 20.0)
 
     return Transition.getNextState(player, findMyWayBackPtI)
 

@@ -9,8 +9,8 @@ import GoalieConstants as constants
 import math
 import noggin_constants as nogginConstants
 
-SAVING = True
-DIVING = True
+SAVING = False
+DIVING = False
 
 @superState('gameControllerResponder')
 def gameInitial(player):
@@ -115,6 +115,7 @@ def gamePlaying(player):
 
     #TODO before game/scrimmage change this to watch;
     # this is better for testing purposes!
+    #TESTINGCHANGE
     return player.goLater('watch')
 
 @superState('gameControllerResponder')
@@ -201,11 +202,6 @@ def watchWithLineChecks(player):
         player.brain.nav.stand()
         player.returningFromPenalty = False
 
-        if watchWithLineChecks.shiftedPosition:
-            watchWithLineChecks.shiftedPosition = False
-            print "I just shifted my position, I'm moving to watch"
-            return player.goLater('watch')
-
     if player.counter % 90 == 0:
         print("Horizon dist == ", player.brain.vision.horizon_dist)
 
@@ -229,7 +225,6 @@ def watchWithLineChecks(player):
     return Transition.getNextState(player, watchWithLineChecks)
 
 watchWithLineChecks.lines = []
-watchWithLineChecks.shiftedPosition = False
 watchWithLineChecks.wentToClearIt = False
 
 @superState('gameControllerResponder')
@@ -340,7 +335,8 @@ def shiftPosition(player):
             print("[GOALIE POSITION] I think I'm in the center now, I moved left")
         player.brain.nav.walkTo(shiftPosition.dest, speed = nav.QUICK_SPEED)
 
-    if player.counter > 300:
+    if player.counter > 200:
+        print "Took too long"
         return player.goLater('watch')
 
     return Transition.getNextState(player, shiftPosition)
@@ -360,12 +356,13 @@ def watch(player):
         player.brain.tracker.trackBall()
         player.brain.nav.stand()
         player.returningFromPenalty = False
-        player.inPosition = constants.CENTER_POSITION
+        if player.lastState is not 'shiftPosition':
+            player.inPosition = constants.CENTER_POSITION
         print ("I'm moving to watch! I think I'm in the right position")
-        # player.brain.tracker.lookToAngle(0)
+        player.brain.tracker.lookToAngle(0)
 
 
-    if 1 < 4: #player.counter % 2 == 0:
+    if player.counter % 2 == 0:
         print("Horizon dist == ", player.brain.vision.horizon_dist)
 
         ball = player.brain.ball
