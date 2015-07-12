@@ -139,6 +139,9 @@ bool VisionSystem::update(ParticleSet& particles,
     // Don't inject off of any features but ball when in set
     } else if (ball == NULL) {
         // (2) Reconstruct pose from top goalbox
+        // TODO reconstructing location from a line and a landmark is general
+        //      functionality that LineSystem and/or LandmarkSystem should
+        //      support, refactor after competition
         for (int i = 0; i < vision.line_size(); i++) {
             const messages::FieldLine& field = vision.line(i);
 
@@ -151,7 +154,6 @@ bool VisionSystem::update(ParticleSet& particles,
                 vision::GeoLine line;
                 line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
 
-                // Based on corners
                 for (int j = 0; j < vision.corner_size(); j++) {
                     const messages::Corner& corner = vision.corner(j);
 
@@ -203,7 +205,58 @@ bool VisionSystem::update(ParticleSet& particles,
             }
         }
 
-        // (3) Reconstruct pose from center circle and midline
+        // (3) Reconstruct pose from endline
+        // for (int i = 0; i < vision.line_size(); i++) {
+        //     const messages::FieldLine& field = vision.line(i);
+
+        //     // If found endline, inject based on T corner
+        //     if (field.id() == static_cast<int>(vision::LineID::Endline)) {
+        //         const messages::HoughLine& inner = field.inner();
+        //         LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirEndline : LocLineID::OurEndline);
+
+        //         // Rotate line to loc rel robot coordinate system 
+        //         vision::GeoLine line;
+        //         line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
+
+        //         for (int j = 0; j < vision.corner_size(); j++) {
+        //             const messages::Corner& corner = vision.corner(j);
+
+        //             // Project corner onto line, find distance parallel to line from origin
+        //             double distParallel = line.qDist(corner.x(), corner.y());
+
+        //             // If found T corner attached to endline, inject particles
+        //             if (corner.id() == static_cast<int>(vision::CornerID::T) && 
+        //                 (corner.line1() == field.index() || corner.line2() == field.index())) {
+        //                 // Recover x and heading from endline
+        //                 messages::RobotLocation pose = lineSystem->reconstructWoEndpoints(id, field);
+
+        //                 // Recover y from corner
+        //                 double cornerAbsX, cornerAbsY;
+        //                 vision::translateRotate(corner.x(), corner.y(), 0, 0, pose.h(), cornerAbsX, cornerAbsY);
+
+        //                 // Right or left T corner
+        //                 if (fabs(distParallel - inner.ep1()) > fabs(distParallel - inner.ep0())) {
+        //                     if (id == LocLineID::OurEndline)
+        //                         pose.set_y(BLUE_GOALBOX_BOTTOM_Y - cornerAbsY);
+        //                     else
+        //                         pose.set_y(YELLOW_GOALBOX_TOP_Y - cornerAbsY);
+        //                 } else {
+        //                     if (id == LocLineID::OurEndline)
+        //                         pose.set_y(BLUE_GOALBOX_TOP_Y - cornerAbsY);
+        //                     else
+        //                         pose.set_y(YELLOW_GOALBOX_BOTTOM_Y - cornerAbsY);
+        //                 }
+
+        //                 // Inject if reconstucted location is on field
+        //                 ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 2, 0.01);
+        //                 if (reconstructed.onField())
+        //                     injections.push_back(reconstructed);
+        //             }
+        //         }
+        //     }
+        // }
+
+        // (4) Reconstruct pose from center circle and midline
         if (vision.circle().on()) {
             bool midlineFound = false;
             messages::FieldLine midline;
