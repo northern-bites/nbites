@@ -319,10 +319,6 @@ void CornerDetector::findCorners(FieldLineList& list)
       FieldLine& line1 = list[i];
       FieldLine& line2 = list[j];
 
-      std::cout << std::endl << "START" << std::endl;
-      std::cout << line1.index() << std::endl;
-      std::cout << line2.index() << std::endl;
-
       // Find corners
       // NOTE since there are two hough lines in each field line, we require
       //      finding valid corners with same id in at least two pairings 
@@ -336,10 +332,6 @@ void CornerDetector::findCorners(FieldLineList& list)
           ids.push_back(classify(line1[1], line2[0]));
       if (isCorner(line1[1], line2[1]))
           ids.push_back(classify(line1[1], line2[1]));
-
-      std::cout << "IDS: " << std::endl;
-      for (int i = 0; i < ids.size(); i++)
-          std::cout << static_cast<int>(ids[i]) << std::endl;
 
       CornerID id = CornerID::None;
       for (int i = 0; i < ids.size(); i++) {
@@ -398,17 +390,10 @@ bool CornerDetector::isCorner(const HoughLine& line1, const HoughLine& line2) co
   double yThresholdTop = (height / 2) - (height * 0.5*edgeImageThreshold());
   // NOTE in top of image, no classify buffer is half the size
 
-  std::cout << "IS CORNER?" << std::endl;
-  std::cout << xThreshold << std::endl;
-  std::cout << yThresholdBottom << std::endl;
-  std::cout << yThresholdTop << std::endl;
-  std::cout << imageIntersectX << std::endl;
-  std::cout << imageIntersectY << std::endl;
   bool farEnoughFromImageEdge = (imageIntersectX >= -xThreshold &&
                                  imageIntersectX <=  xThreshold &&
                                  imageIntersectY >= -yThresholdBottom &&
                                  imageIntersectY <=  yThresholdTop);
-  std::cout << farEnoughFromImageEdge << std::endl;
 
   // (3) Check that lines are close to orthogonal
   // NOTE done in world coords
@@ -423,12 +408,6 @@ bool CornerDetector::isCorner(const HoughLine& line1, const HoughLine& line2) co
   bool line1Length = (field1.ep1() - field1.ep0()) > lengthThreshold();
   bool line2Length = (field2.ep1() - field2.ep0()) > lengthThreshold();
   bool length = line1Length && line2Length;
-
-  std::cout << "TESTS:" << std::endl;
-  std::cout << intersects << std::endl;
-  std::cout << farEnoughFromImageEdge << std::endl;
-  std::cout << orthogonal << std::endl;
-  std::cout << length << std::endl;
 
   return intersects && farEnoughFromImageEdge && orthogonal && length;
 }
