@@ -26,6 +26,7 @@ public abstract class SoundPane extends JPanel implements ChangeListener {
 		
 		requested = new Dimension(frames + 100, 150 * channels);
 		multiplier = new JSlider(JSlider.VERTICAL);
+		multiplier.setMinimum(1);
 		multiplier.setValue(1);
 		multiplier.addChangeListener(this);
 		
@@ -42,7 +43,7 @@ public abstract class SoundPane extends JPanel implements ChangeListener {
 	
 	private class Display extends JPanel {
 		
-		private Color[] defined = {Color.RED, Color.GREEN, Color.BLUE, Color.orange};
+		private Color[] defined = {Color.RED, Color.GREEN, Color.BLUE, Color.ORANGE};
 		private Color getChannelColor(int i) {
 			if (i < defined.length)
 				return defined[i];

@@ -51,16 +51,14 @@ public class SyntheticSndUtility extends UtilityParent {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Logger.println("generating...");
-			ByteBuffer bb = ByteBuffer.allocate(Short.BYTES * 2 * nframes);
+			byte[] internal = new byte[Short.BYTES * 2 * nframes];
+			ByteBuffer bb = ByteBuffer.wrap(internal);
 			bb.order(ByteOrder.LITTLE_ENDIAN);
-			Signal s = new Signal(Short.MAX_VALUE, 0, 1024);
+			Signal s = new Signal(Short.MAX_VALUE, 0, 50);
 			for (int i = 0; i < nframes; ++i) {
 				Logger.printf("%d for %d", s.value(i), i);
-				//bb.putShort(s.value(i));
-				//bb.putShort(s.value(i));
-				
-				bb.putShort( (short) (i * 100));
-				bb.putShort( (short) (i * 10));
+				bb.putShort(s.value(i));
+				bb.putShort(s.value(i));
 			}
 			
 			Log newSound = Log.logWithTypePlus("sound", bb.array(), SExpr.pair("channels", 2), SExpr.pair("frames", nframes));

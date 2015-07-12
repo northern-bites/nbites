@@ -24,7 +24,6 @@ public class SndAmpView extends ViewParent {
 			public String peakString() {
 				return String.format("peak left = %d, peak right = %d", sb.peaks[0], sb.peaks[1]);
 			}
-			
 		};
 		
 		this.add(pane, BorderLayout.CENTER);

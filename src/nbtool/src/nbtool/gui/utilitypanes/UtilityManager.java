@@ -33,7 +33,7 @@ public class UtilityManager {
 	//Unused at the moment – comment out to re-enable.
 	//public static final MultiStreamUtility MultiStreamUtility = new MultiStreamUtility();
 	//public static final CameraCalibrateUtility CameraCalibrateUtility = new CameraCalibrateUtility();
-	//public static final SyntheticSndUtility SyntheticSndUtility = new SyntheticSndUtility();
+	public static final SyntheticSndUtility SyntheticSndUtility = new SyntheticSndUtility();
 
 	public static final UtilityParent[] utilities = findUtilityFields();
 
