@@ -587,6 +587,15 @@ def notTurnedAround(player):
     return (player.brain.interface.visionField.visual_field_edge.distance_m
             > 400.0)
 
+def updateSpeedBuffer(player):
+    buffSize = 6
+    player.ballObservations += [player.brain.ball.mov_vel_x]
+    
+
+
+updateSpeedBuffer.currentIndex = 0
+
+
 # Saving transitions....
 def shouldDiveRight(player):
 
@@ -604,28 +613,32 @@ def shouldDiveRight(player):
 
     nball = player.brain.naiveBall
 
-    # save = (nball.x_vel < -10.0 and
-    return (ball.mov_vel_x < constants.SAVE_X_VEL and
+    save = (nball.x_vel < -10.0 and
+        ball.mov_vel_x < constants.SAVE_X_VEL and
         not nball.stationary and
         nball.yintercept < -20.0 and
+        nball.yintercept > -100.0 and
         ball.distance < constants.SAVE_DIST and
         sightOk)
 
+#todo if ball vel < -15
+#check nb avging
+
     if save:
         print "DIVE RIGHT"
+        print("yintercept:", nball.yintercept)
         print("Ball dist:", ball.distance)
         print("shouldDiveRight.lastFramesOff:", shouldDiveRight.lastFramesOff)
         print("ball.vis.frames_on", ball.vis.frames_on)
         print("nb xvel:", nball.x_vel)
         print("ball mov vel:", ball.mov_vel_x)
-        if math.fabs(ball.mov_vel_x) < 5:
-            nb = player.brain.naiveBall
-            print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
-            print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
-            print("avgStartIndex:", nb.avg_start_index, "end:", nb.avg_end_index)
-            print("denom:", nb.denom)
-            for i in range(0, nb.position_size()):
-                print("Position", i, ":: x: ", nb.position(i).x, "y: ", nb.position(i).y)
+        nb = player.brain.naiveBall
+        print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
+        print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
+        print("avgStartIndex:", nb.avg_start_index, "end:", nb.avg_end_index)
+        print("alt vel x:", nb.alt_x_vel)
+        for i in range(0, nb.position_size()):
+            print("Position", i, ":: x: ", nb.position(i).x, "y: ", nb.position(i).y)
 
 
     return save
@@ -654,28 +667,29 @@ def shouldDiveLeft(player):
 
     # if (nball.x_vel < -10.0 and
 
-    # save = (nball.x_vel < -10.0 and
-    return (ball.mov_vel_x < -9.0 and
-       not nball.stationary and
+    save = (nball.x_vel < -10.0 and
+        ball.mov_vel_x < constants.SAVE_X_VEL and
+        not nball.stationary and
         nball.yintercept > 20.0 and
+        nball.yintercept < 100.0 and
         ball.distance < constants.SAVE_DIST and
         sightOk)
 
     if save:
         print "DIVE LEFT"
+        print("yintercept:", nball.yintercept)
         print("Ball dist:", ball.distance)
-        print("shouldDiveRight.lastFramesOff:", shouldDiveRight.lastFramesOff)
+        print("shouldDiveRight.lastFramesOff:", shouldDiveLeft.lastFramesOff)
         print("ball.vis.frames_on", ball.vis.frames_on)
         print("nb xvel:", nball.x_vel)
         print("ball mov vel:", ball.mov_vel_x)
-        if math.fabs(ball.mov_vel_x) < 5:
-            nb = player.brain.naiveBall
-            print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
-            print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
-            print("avgStartIndex:", nb.avg_start_index, "end:", nb.avg_end_index)
-            print("denom:", nb.denom)
-            for i in range(0, nb.position_size()):
-                print("Position", i, ":: x: ", nb.position(i).x, "y: ", nb.position(i).y)
+        nb = player.brain.naiveBall
+        print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
+        print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
+        print("avgStartIndex:", nb.avg_start_index, "end:", nb.avg_end_index)
+        print("alt vel x:", nb.alt_x_vel)
+        for i in range(0, nb.position_size()):
+            print("Position", i, ":: x: ", nb.position(i).x, "y: ", nb.position(i).y)
 
     return save
 
@@ -704,8 +718,8 @@ def shouldSquat(player):
     # TODO Lower threshold for fast balls
     # if nball.x_vel < -30.0 and abs(nball.yintercept)
 
-    # save = (nball.x_vel < -10.0 and
-    save = (ball.mov_vel_x < -9.0 and
+    save = (nball.x_vel < -10.0 and
+        ball.mov_vel_x < constants.SAVE_X_VEL and
         not nball.stationary and
         abs(nball.yintercept) < 25.0 and
         nball.yintercept != 0.0 and
@@ -724,19 +738,19 @@ def shouldSquat(player):
 
     if save:
         print "SQUAT"
+        print("yintercept:", nball.yintercept)
         print("Ball dist:", ball.distance)
-        print("shouldDiveRight.lastFramesOff:", shouldDiveRight.lastFramesOff)
+        print("shouldDiveRight.lastFramesOff:", shouldSquat.lastFramesOff)
         print("ball.vis.frames_on", ball.vis.frames_on)
         print("nb xvel:", nball.x_vel)
         print("ball mov vel:", ball.mov_vel_x)
-        if math.fabs(ball.mov_vel_x) < 5:
-            nb = player.brain.naiveBall
-            print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
-            print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
-            print("avgStartIndex:", nb.avg_start_index, "end:", nb.avg_end_index)
-            print("denom:", nb.denom)
-            for i in range(0, nb.position_size()):
-                print("Position", i, ":: x: ", nb.position(i).x, "y: ", nb.position(i).y)
+        nb = player.brain.naiveBall
+        print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
+        print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
+        print("avgStartIndex:", nb.avg_start_index, "end:", nb.avg_end_index)
+        print("alt vel x:", nb.alt_x_vel)
+        for i in range(0, nb.position_size()):
+            print("Position", i, ":: x: ", nb.position(i).x, "y: ", nb.position(i).y)
 
     return save
 

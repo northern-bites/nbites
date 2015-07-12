@@ -21,10 +21,10 @@
 namespace man {
 namespace naive {
 
-const float ALPHA = .7f;
+const float ALPHA = .75f;
 const float STATIONARY_THRESHOLD = 2.f; // Any velocity w/ abs below this is stationary
 const float FRICTION = .9f;   // Help?????
-const int NUM_FRAMES = 15;  // Num frames to keep a buffer of; 30 frames ~ 1 sec
+const int NUM_FRAMES = 30;  // Num frames to keep a buffer of; 30 frames ~ 1 sec
 const int MAX_FRAMES_OFF = 10;   // If don't see the ball for 5 frames, clear buffer
 const int AVGING_FRAMES = 5; // Number of frames to take an avg position estimate from
 const int NUM_DEST = 10; // Number of destination predictions to make
@@ -49,6 +49,7 @@ private:
     void clearBuffers();
     void calcPath();
     void calculateVelocity();
+    void calculateAltVelocity();
     BallState avgFrames(int startingIndex);
 
     void print();
@@ -80,6 +81,10 @@ private:
     float avgStartIndex;
     float avgEndIndex;
     float denom;
+    float altXVelocityEst;
+    float v1;
+    float v2;
+    float v3;
 
     messages::WorldModel worldMessages[NUM_PLAYERS_PER_TEAM];
     messages::FilteredBall myBall;

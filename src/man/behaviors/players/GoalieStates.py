@@ -334,7 +334,7 @@ def watch(player):
         # player.brain.tracker.lookToAngle(0)
 
 
-    if player.counter % 20 == 0:
+    if player.counter % 2 == 0:
         print("Horizon dist == ", player.brain.vision.horizon_dist)
 
         ball = player.brain.ball
@@ -343,10 +343,14 @@ def watch(player):
         print("Ball dist:", ball.distance)
         print("ball.vis.frames_on", ball.vis.frames_on)
         print("nb xvel:", nball.x_vel)
+        print("nb altxvel:", nball.alt_x_vel)
         print("ball mov vel:", ball.mov_vel_x)
         print("ball mov speed:", ball.mov_speed)
         print("stationary: ", nball.stationary)
         print("yintercept", nball.yintercept)
+        print("1", nball.x_v_1)
+        print("2", nball.x_v_2)
+        print("3", nball.x_v_3)
         print"- - -  -- - -- --- ---    - --"
 
     # return player.stay()
@@ -446,8 +450,8 @@ def saveCenter(player):
         player.brain.tracker.lookToAngle(0)
         if SAVING:
             player.executeMove(SweetMoves.GOALIE_SQUAT)
-        else:
-            player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
+        # else:
+        #     player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
 
     if player.counter > 80:
         if SAVING:
@@ -465,7 +469,8 @@ def upUpUP(player):
         player.upDelay = 0
 
     if player.brain.nav.isStopped():
-        return player.goLater('watchWithLineChecks')
+        #TODO testing change, put this back!!!
+        return player.goLater('watch')
     return player.stay()
 
 @superState('gameControllerResponder')
@@ -476,8 +481,8 @@ def saveRight(player):
         if SAVING and DIVING:
             player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
             player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
-        else:
-            player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
+        # else:
+        #     player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
 
     if player.counter > 80:
         if SAVING and DIVING:
@@ -496,13 +501,13 @@ def saveLeft(player):
         if SAVING and DIVING:
             player.executeMove(SweetMoves.GOALIE_DIVE_LEFT)
             player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
-        else:
-            player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
+        # else:
+        #     player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
 
     if player.counter > 80:
         if SAVING and DIVING:
             player.executeMove(SweetMoves.GOALIE_ROLL_OUT_LEFT)
-            return player.goLater('rollOut')
+            return player.goLater('fallen')
         else:
             return player.goLater('watch')
 

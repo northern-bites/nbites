@@ -44,6 +44,10 @@ NaiveBallModule::NaiveBallModule() :
     avgStartIndex = 0.f;
     avgEndIndex = 0.f;
     denom = 0.f;
+    altXVelocityEst = 0.f;
+    v1 = 0.f;
+    v2 = 0.f;
+    v3 = 0.f;
 }
 
 NaiveBallModule::~NaiveBallModule()
@@ -99,7 +103,10 @@ void NaiveBallModule::run_()
         naiveBallMessage.get()->set_end_avg_y(endAvgY);
         naiveBallMessage.get()->set_avg_start_index(avgStartIndex);
         naiveBallMessage.get()->set_avg_end_index(avgEndIndex);
-        naiveBallMessage.get()->set_denom(denom);
+        naiveBallMessage.get()->set_alt_x_vel(altXVelocityEst);
+        naiveBallMessage.get()->set_x_v_1(v1);
+        naiveBallMessage.get()->set_x_v_2(v2);
+        naiveBallMessage.get()->set_x_v_3(v3);
     }
 
     if (checkIfStationary() == true || stationaryOffFrameCount < STATIONARY_CHECK) {
@@ -206,6 +213,52 @@ void NaiveBallModule::calculateVelocity()
     avgStartIndex = startIndex;
     avgEndIndex = endIndex;
     denom = denominator;
+    calculateAltVelocity();
+}
+
+// Calculate velocity between first and fifteenth frame, second and sixteenth frames,
+// etc., then avg together
+void NaiveBallModule::calculateAltVelocity()
+{
+
+    int sampleSize = 10;
+    int fromIndex = (currentIndex + 1) % NUM_FRAMES;
+    int toIndex = (fromIndex + sampleSize) % NUM_FRAMES;
+    float denominator = (float)(sampleSize) / 30.f;
+    float xVelSum = 0.f;
+
+    for (int i = 0; i < 3; i++) {
+        int fromIndex = (i * sampleSize) + currentIndex + 1;
+        fromIndex = fromIndex % NUM_FRAMES;
+        int toIndex = (fromIndex + sampleSize - 1) % NUM_FRAMES;
+        float xVel = (position_buffer[toIndex].rel_x - position_buffer[fromIndex].rel_x) / denominator; // * ALPHA + .9*xVelocityEst * (1 - ALPHA);
+        xVelSum = xVel + xVelSum;
+        if (i == 0) {v1 = xVel; }
+        if (i == 1) {v2 = xVel; }
+        if (i == 2) {v3 = xVel; }
+
+    }
+    v3 = xVelSum;
+    altXVelocityEst = xVelSum / 3.0; //(NUM_FRAMES/sampleSize);
+
+
+
+
+
+    // int numVel = NUM_FRAMES/2;
+    // int fromIndex = currentIndex; // + 1;
+    // // int toIndex = (NUM_FRAMES / 2 + fromIndex) % NUM_FRAMES;
+    // float denominator = (float)(numVel) / 30.f;
+    // float xVelSum = 0.0;
+
+    // for (int i = 0; i < numVel; i++) {
+    //     fromIndex = (fromIndex + 1) % NUM_FRAMES;
+    //     int toIndex = (numVel + fromIndex) % NUM_FRAMES;
+    //     float xVel = (position_buffer[toIndex].rel_x - position_buffer[fromIndex].rel_x) / denominator * ALPHA + .9*xVelocityEst * (1 - ALPHA);
+
+    //     xVelSum += xVel;
+    // }
+    // altXVelocityEst = xVelSum / ((float)numVel);
 }
 
 void NaiveBallModule::calcPath()

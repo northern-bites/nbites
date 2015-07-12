@@ -139,5 +139,9 @@ message NaiveBall {
     optional float end_avg_y = 11;
     optional float avg_start_index = 12;
     optional float avg_end_index = 13;
-    optional float denom = 14;
+    optional float alt_x_vel = 14;
+    optional float x_v_1 = 15;
+    optional float x_v_2 = 16;
+    optional float x_v_3 = 17;
+
 }
