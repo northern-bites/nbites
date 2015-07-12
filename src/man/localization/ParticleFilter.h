@@ -43,7 +43,7 @@ static const ParticleFilterParams DEFAULT_PARAMS =
 #ifdef V5_ROBOT
     FIELD_GREEN_HEIGHT,         // Field height
     FIELD_GREEN_WIDTH,          // Field width
-    300,                        // Num particles
+    200,                        // Num particles
     0.1f,                       // Exponential filter fast
     0.01f,                      // Exponential filter slow
     0.5f,                       // Variance in x-y odometry

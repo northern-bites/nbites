@@ -2,6 +2,7 @@
 
 #include "LineSystem.h"
 #include "DebugConfig.h"
+#include "Profiler.h"
 
 #include <algorithm>
 
@@ -64,9 +65,15 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
                             const messages::FilteredBall*  ballInput)
 {
     // Motion system and vision system update step
+    PROF_ENTER(P_LOC_MOTION)
     motionSystem->update(particles, odometryInput, errorMagnitude);
-    bool updatedVision = visionSystem->update(particles, visionInput, ballInput, poseEstimate);
+    PROF_EXIT(P_LOC_MOTION)
 
+    PROF_ENTER(P_LOC_VISION)
+    bool updatedVision = visionSystem->update(particles, visionInput, ballInput, poseEstimate);
+    PROF_EXIT(P_LOC_VISION)
+
+    PROF_ENTER(P_LOC_RESAMPLE)
     // Resample if vision updated
     if(updatedVision) {
         double wAvg = visionSystem->getAvgError();
@@ -75,6 +82,7 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
 
         resample(ballInput != NULL);
     }
+    PROF_EXIT(P_LOC_RESAMPLE)
 
     // Update filters estimate
     updateEstimate();

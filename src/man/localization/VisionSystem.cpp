@@ -2,6 +2,8 @@
 
 #include "../vision/Hough.h"
 #include "FieldConstants.h"
+#include "Profiler.h"
+#include "HighResTimer.h"
 
 #include <limits>
 
@@ -31,7 +33,7 @@ bool VisionSystem::update(ParticleSet& particles,
 
     // Count observations
     for (int i = 0; i < vision.line_size(); i++) {
-        if (!LineSystem::shouldUse(vision.line(i), lastEstimate))
+        if (LineSystem::shouldUse(vision.line(i), lastEstimate))
             numObservations++;
     }
     for (int i = 0; i < vision.corner_size(); i++)
@@ -49,6 +51,8 @@ bool VisionSystem::update(ParticleSet& particles,
     // Loop over particles and adjust weights
     ParticleIt iter;
     double totalWeight = 0;
+    HighResTimer timer;
+    PROF_ENTER(P_LOCV_SCORING)
     for (iter = particles.begin(); iter != particles.end(); iter++) {
         Particle* particle = &(*iter);
         float curParticleError = 1;
@@ -58,6 +62,7 @@ bool VisionSystem::update(ParticleSet& particles,
             if (!LineSystem::shouldUse(vision.line(i), lastEstimate))
                 continue;
             curParticleError = curParticleError*lineSystem->scoreLine(vision.line(i), particle->getLocation());
+            break;
         }
 
         // Score particle from corner observations
@@ -76,6 +81,18 @@ bool VisionSystem::update(ParticleSet& particles,
         particle->setWeight(curParticleError);
         totalWeight += particle->getWeight();
     }
+    PROF_EXIT(P_LOCV_SCORING)
+    double time = timer.end();
+
+    if (time > 15) {
+        printf("==================\n");
+        printf("LOC TOOK: %f\n", time);
+        printf("With %d observations\n", numObservations);
+        printf("Circle bool: %d\n", vision.circle().on());
+        printf("UseBall bool: %d\n", useBall);
+        printf("NumCorner: %d\n", vision.corner_size());
+        printf("NumLines:  %d\n", vision.line_size());
+    }
 
     // Normalize the particle weights
     for (iter = particles.begin(); iter != particles.end(); iter++) {
@@ -87,6 +104,7 @@ bool VisionSystem::update(ParticleSet& particles,
     avgError = totalWeight / static_cast<float>(particles.size());
 
     // Particle injections
+    PROF_ENTER(P_LOCV_INJECTION)
     injections.clear();
 
     // (1) Reconstruct pose from ball in set
@@ -293,7 +311,7 @@ bool VisionSystem::update(ParticleSet& particles,
             }
         }
     }
-
+    PROF_EXIT(P_LOCV_INJECTION)
     // Weights were adjusted so return true
     return true;
 }
