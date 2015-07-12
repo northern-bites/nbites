@@ -14,17 +14,29 @@ from objects import RelRobotLocation
 def getCorners(player):
     corners = player.brain.visionCorners
 
-    # print ("horizon dist:", player.brain.vision.horizon_dist)
-#Testingchangfe
-    # for k in range(0, player.brain.vision.corner_size()):
-    #     c = player.brain.visionCorners
-    #     print("x", c(k).x, "y", c(k).y)
-    #     print("id", c(k).id)
-    # print " -------------------------"
+    if player.brain.vision.corner_size() == 0:
+        return False
+
+#     print ("horizon dist:", player.brain.vision.horizon_dist)
+# # Testingchangfe
+#     for k in range(0, player.brain.vision.corner_size()):
+#         c = player.brain.visionCorners
+#         dist = getCornerDist(c(k))
+#         if dist > 150:
+#             continue
+#         print("dist:", dist)
+#         print("bearing:", getBearingFromRobot(c(k).x, c(k).y))
+#         print("x", c(k).x, "y", c(k).y)
+#         print("id", c(k).id)
+#     print " -------------------------"
 
   # Concave,
   # Convex,
   # T,
+
+def getCornerDist(c):
+    dist = c.x * c.x + c.y * c.y
+    return math.sqrt(dist)
 
 def getLines(player):
     getCorners(player)
@@ -377,7 +389,7 @@ def shouldStopGoingBack(player):
     return False
 
 def getBearingFromRobot(x, y):
-    return math.degrees(math.atan2(x, -y));
+    return math.degrees(math.tan(y/x));
 
 def facingASideline(player):
     visionLines = player.brain.visionLines
@@ -666,21 +678,21 @@ def shouldDiveRight(player):
     #     print "sooosoo fast"
 
 #TestingChange
-    # if save:
-    #     print "DIVE RIGHT"
-    #     print("yintercept:", nball.yintercept)
-    #     print("Ball dist:", ball.distance)
-    #     print("shouldDiveRight.lastFramesOff:", shouldDiveRight.lastFramesOff)
-    #     print("ball.vis.frames_on", ball.vis.frames_on)
-    #     print("nb xvel:", nball.x_vel)
-    #     print("ball mov vel:", ball.mov_vel_x)
-    #     nb = player.brain.naiveBall
-    #     print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
-    #     print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
-    #     print("avgStartIndex:", nb.avg_start_index, "end:", nb.avg_end_index)
-    #     print("alt vel x:", nb.alt_x_vel)
-    #     for i in range(0, nb.position_size()):
-    #         print("Position", i, ":: x: ", nb.position(i).x, "y: ", nb.position(i).y)
+    if save:
+        print "DIVE RIGHT"
+        print("yintercept:", nball.yintercept)
+        print("Ball dist:", ball.distance)
+        print("shouldDiveRight.lastFramesOff:", shouldDiveRight.lastFramesOff)
+        print("ball.vis.frames_on", ball.vis.frames_on)
+        print("nb xvel:", nball.x_vel)
+        print("ball mov vel:", ball.mov_vel_x)
+        nb = player.brain.naiveBall
+        print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
+        print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
+        print("avgStartIndex:", nb.avg_start_index, "end:", nb.avg_end_index)
+        print("alt vel x:", nb.alt_x_vel)
+        for i in range(0, nb.position_size()):
+            print("Position", i, ":: x: ", nb.position(i).x, "y: ", nb.position(i).y)
 
 
     return save
@@ -719,21 +731,21 @@ def shouldDiveLeft(player):
 
 
 #TestingChange
-    # if save:
-    #     print "DIVE LEFT"
-    #     print("yintercept:", nball.yintercept)
-    #     print("Ball dist:", ball.distance)
-    #     print("shouldDiveRight.lastFramesOff:", shouldDiveLeft.lastFramesOff)
-    #     print("ball.vis.frames_on", ball.vis.frames_on)
-    #     print("nb xvel:", nball.x_vel)
-    #     print("ball mov vel:", ball.mov_vel_x)
-    #     nb = player.brain.naiveBall
-    #     print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
-    #     print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
-    #     print("avgStartIndex:", nb.avg_start_index, "end:", nb.avg_end_index)
-    #     print("alt vel x:", nb.alt_x_vel)
-    #     for i in range(0, nb.position_size()):
-    #         print("Position", i, ":: x: ", nb.position(i).x, "y: ", nb.position(i).y)
+    if save:
+        print "DIVE LEFT"
+        print("yintercept:", nball.yintercept)
+        print("Ball dist:", ball.distance)
+        print("shouldDiveRight.lastFramesOff:", shouldDiveLeft.lastFramesOff)
+        print("ball.vis.frames_on", ball.vis.frames_on)
+        print("nb xvel:", nball.x_vel)
+        print("ball mov vel:", ball.mov_vel_x)
+        nb = player.brain.naiveBall
+        print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
+        print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
+        print("avgStartIndex:", nb.avg_start_index, "end:", nb.avg_end_index)
+        print("alt vel x:", nb.alt_x_vel)
+        for i in range(0, nb.position_size()):
+            print("Position", i, ":: x: ", nb.position(i).x, "y: ", nb.position(i).y)
 
     return save
 
@@ -765,7 +777,7 @@ def shouldSquat(player):
         not nball.stationary and
         abs(nball.yintercept) < 25.0 and
         nball.yintercept != 0.0 and
-        ball.distance < 150.0 and
+        ball.distance < constants.SAVE_DIST and
         sightOk)
 
      # More sensitive to close balls even at lower speeds
@@ -785,21 +797,21 @@ def shouldSquat(player):
         save = True
 
 #TestingChange
-    # if save:
-    #     print "SQUAT"
-    #     print("yintercept:", nball.yintercept)
-    #     print("Ball dist:", ball.distance)
-    #     print("shouldDiveRight.lastFramesOff:", shouldSquat.lastFramesOff)
-    #     print("ball.vis.frames_on", ball.vis.frames_on)
-    #     print("nb xvel:", nball.x_vel)
-    #     print("ball mov vel:", ball.mov_vel_x)
-    #     nb = player.brain.naiveBall
-    #     print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
-    #     print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
-    #     print("avgStartIndex:", nb.avg_start_index, "end:", nb.avg_end_index)
-    #     print("alt vel x:", nb.alt_x_vel)
-    #     for i in range(0, nb.position_size()):
-    #         print("Position", i, ":: x: ", nb.position(i).x, "y: ", nb.position(i).y)
+    if save:
+        print "SQUAT"
+        print("yintercept:", nball.yintercept)
+        print("Ball dist:", ball.distance)
+        print("shouldDiveRight.lastFramesOff:", shouldSquat.lastFramesOff)
+        print("ball.vis.frames_on", ball.vis.frames_on)
+        print("nb xvel:", nball.x_vel)
+        print("ball mov vel:", ball.mov_vel_x)
+        nb = player.brain.naiveBall
+        print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
+        print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
+        print("avgStartIndex:", nb.avg_start_index, "end:", nb.avg_end_index)
+        print("alt vel x:", nb.alt_x_vel)
+        for i in range(0, nb.position_size()):
+            print("Position", i, ":: x: ", nb.position(i).x, "y: ", nb.position(i).y)
 
     return save
 

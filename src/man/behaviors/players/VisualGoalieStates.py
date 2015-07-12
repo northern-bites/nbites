@@ -177,13 +177,13 @@ def clearBall(player):
         clearBall.startDist = player.brain.ball.distance
 
     if player.brain.ball.distance < constants.POSITION_FOR_KICK_DIST:
-        print "Now positioning for kick"
+        # print "Now positioning for kick"
         return player.goNow('positionForGoalieKick')
     elif player.brain.ball.distance < constants.SLOW_DOWN_DIST:
-        print "Slowing down"
+        # print "Slowing down"
         player.brain.nav.chaseBall(nav.MEDIUM_SPEED, fast = True)
     else:
-        print "approaching ball"
+        # print "approaching ball"
         player.brain.nav.chaseBall(nav.FAST_SPEED, fast = True)
 
     return Transition.getNextState(player, clearBall)

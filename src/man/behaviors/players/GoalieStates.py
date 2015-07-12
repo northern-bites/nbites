@@ -188,7 +188,7 @@ def watchWithLineChecks(player):
             print("I'm resetting my loc, I think I'm back!")
 #TestingChange
             # player.brain.resetLocTo(constants.HOME_POSITION)
-            player.brain.resetGoalieLocalization()
+            # player.brain.resetGoalieLocalization()
 
         if player.lastDiffState is not 'lineCheckReposition' and\
         player.lastDiffState is not 'moveBackwards':
@@ -274,14 +274,14 @@ def returnUsingLoc(player):
         player.brain.tracker.trackBall()
         returnUsingLoc.panning = False
 
-    if (player.counter % 60 == 0):
+    if (player.counter % 90 == 0):
         print("Switching headtracker")
         if not returnUsingLoc.panning:
             player.brain.tracker.repeatBasicPan()
         else:
             player.brain.tracker.trackBall
 
-    if player.counter > 300:
+    if player.counter > 600:
         print "This is taking a suspiciously long time"
         return player.goLater('watchWithLineChecks')
 
@@ -358,6 +358,7 @@ def recoverMyself(player):
 def watch(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
+        # player.brain.tracker.repeatBasicPan()
         player.brain.nav.stand()
         player.returningFromPenalty = False
         if player.lastState is not 'shiftPosition':
