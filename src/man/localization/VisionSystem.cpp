@@ -63,6 +63,9 @@ bool VisionSystem::update(ParticleSet& particles,
                 continue;
             curParticleError = curParticleError*lineSystem->scoreLine(vision.line(i), particle->getLocation());
             break;
+            // IMPORTANT currently we only have the time to process a single line
+            //           optimizing this inner loop, so more lines can be 
+            //           processed is an excellent idea
         }
 
         // Score particle from corner observations
