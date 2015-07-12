@@ -47,12 +47,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Initialized for the sake of those who aren't
         self.isKickingOff = False
         # Set home position, box, kickoff vars, etc. based on role number
-        # US Open Hack
-        if self.brain.game:
-            oppTeam = self.brain.game.team(1).team_number
-        else:
-            oppTeam = -1
-        roleConstants.setRoleConstants(self, self.role, oppTeam)
+        roleConstants.setRoleConstants(self, self.role)
 
         self.frameCounter = 0
         self.shouldRelocalizeCounter = 0

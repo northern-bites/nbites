@@ -10,7 +10,6 @@
 #include <stdio.h>
 
 #include "DebugConfig.h"
-#include "../../share/logshare/SExpr.h"
 
 using nblog::SExpr;
 
@@ -295,12 +294,12 @@ BOOST_PYTHON_MODULE(noggin_constants)
         .value("BLUE_3", BLUE_3)
         ;
 
-    //strategy
-    scope().attr("DEFENSIVE_STRATEGY") = get_strategy();
+    get_config_params();
 }
 
-int get_strategy() {
+void get_config_params() {
     std::string filepath = "/home/nao/nbites/Config/behaviorParams.txt";
+
     if(FILE *file = fopen(filepath.c_str(),"r")) {
         fclose(file);
         std::ifstream inputFile(filepath);
@@ -308,37 +307,85 @@ int get_strategy() {
                                 std::istreambuf_iterator<char>());
         int i=0;
         SExpr params = *SExpr::read(readInFile,i);
-        std::string strat = params.find("strategy")->get(1)->value();
-        int retVal;
-        char * temp;
-        long int st = std::strtol(strat.c_str(),&temp,0);
-        std::cout<<"[DEBUG] Parsed Value: "<<st<<std::endl;
-        if(*temp != '\0') { //check if string completely converted to int
-            std::cout<<"[WARN] Invalid Params. Passed in String. Need Int. Defaulting to 1"<<std::endl;
-            retVal = 1;
-            return retVal;
-        }
-        switch(st) {
-            case 1:
-                retVal = 1;
-                break;
-            case 2:
-                retVal = 2;
-                break;
-            case 3:
-                retVal = 3;
-                break;
-            default:
-                retVal = 1;
-                std::cout<<"[WARN] Invalid Strategy. Defaulting to 1"<<std::endl;
-                break;
-        }
-        std::cout<<"[INFO] RETURN STRATEGY: "<<retVal<<std::endl;
-        return retVal;
+
+        // should defenders have a fixed home or dynamic
+        scope().attr("FIXED_D_HOME") = get_defensive_strategy(params);
+        // do we want defenders to play up or back
+        scope().attr("FORWARD_DEFENSE") = get_defender_home(params);
+        // max speed when chasing the ball
+        scope().attr("MAX_SPEED") = get_max_speed(params);
+        // min speed when chasing the ball
+        scope().attr("MIN_SPEED") = get_min_speed(params);
+
+
     } else {
         std::cout<<"[ERR] BehaviorParams File Does Not Exist"<<std::endl;
-        return 1;
+
+        // default values
+        scope().attr("FIXED_D_HOME") = true;
+        // do we want defenders to play up or back
+        scope().attr("FORWARD_DEFENSE") = false;
+        // max speed when chasing the ball
+        scope().attr("MAX_SPEED") = 0.8f;
+        // min speed when chasing the ball
+        scope().attr("MIN_SPEED") = 0.5f;
     }
+}
+
+bool get_defensive_strategy(SExpr params) {
+    SExpr *dStrat = params.find("fixed_defender_home")->get(1);
+    bool fixedD = true;
+    
+    if (dStrat) { fixedD = dStrat->valueAsInt()==1 ? true : false; }
+    else { std::cout << "[WARN] Invalid defensive strategy. Default to fixed home positions." << std::endl; }
+    
+    return fixedD;
+}
+
+bool get_defender_home(SExpr params) {
+    SExpr *dPos = params.find("forward_defense")->get(1);
+    bool forwardD = false;
+    
+    if (dPos) { forwardD = dPos->valueAsInt()==1 ? true : false; }
+    else { std::cout << "[WARN] Invalid defense home. Default to back positions." << std::endl; }
+    
+    return forwardD;
+}
+
+float get_max_speed(SExpr params) {
+    SExpr *maxSpeed = params.find("max_speed")->get(1);
+    
+    if (maxSpeed) { 
+        std::string speedString = maxSpeed->value();
+        if (speedString.size() >= 3) {
+            if (speedString.substr(0,3) == "1.0") { return 1.0f; }
+            if (speedString.substr(0,2) == "0." && isdigit(speedString[2])) {
+                int iSpeed = speedString[2] - '0';
+                return iSpeed / 10.f;
+            }
+        }      
+    }
+    
+    std::cout << "[WARN] Invalid max speed. Default to 0.8" << std::endl;
+    return 0.8f;
+}
+
+float get_min_speed(SExpr params) {
+    SExpr *minSpeed = params.find("min_speed")->get(1);
+    
+    if (minSpeed) { 
+        std::string speedString = minSpeed->value();
+        if (speedString.size() >= 3) {
+            if (speedString.substr(0,3) == "1.0") { return 1.0f; }
+            if (speedString.substr(0,2) == "0." && isdigit(speedString[2])) {
+                int iSpeed = speedString[2] - '0';
+                return iSpeed / 10.f;
+            }
+        }      
+    }
+    
+    std::cout << "[WARN] Invalid min speed. Default to 0.5" << std::endl;
+    return 0.5f;
 }
 
 void c_init_noggin_constants() {
