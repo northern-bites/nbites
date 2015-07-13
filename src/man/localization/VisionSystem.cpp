@@ -51,8 +51,11 @@ bool VisionSystem::update(ParticleSet& particles,
     // Loop over particles and adjust weights
     ParticleIt iter;
     double totalWeight = 0;
+
+    // Timing
     HighResTimer timer;
     PROF_ENTER(P_LOCV_SCORING)
+
     for (iter = particles.begin(); iter != particles.end(); iter++) {
         Particle* particle = &(*iter);
         float curParticleError = 1;
@@ -84,9 +87,13 @@ bool VisionSystem::update(ParticleSet& particles,
         particle->setWeight(curParticleError);
         totalWeight += particle->getWeight();
     }
+
     PROF_EXIT(P_LOCV_SCORING)
     double time = timer.end();
 
+    // China 2015 hack
+    // Loc is sometimes causing cognition thread to overrun, these
+    // print outs print when loc took longer than we'd like
     if (time > 15) {
         printf("==================\n");
         printf("LOC TOOK: %f\n", time);
@@ -310,7 +317,9 @@ bool VisionSystem::update(ParticleSet& particles,
         //     }
         // }
     }
+
     PROF_EXIT(P_LOCV_INJECTION)
+
     // Weights were adjusted so return true
     return true;
 }

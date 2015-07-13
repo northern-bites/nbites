@@ -102,8 +102,7 @@ void ParticleFilter::updateEstimate()
     float sumH = 0;
 
     ParticleIt iter;
-    for(iter = particles.begin(); iter != particles.end(); ++iter)
-    {
+    for(iter = particles.begin(); iter != particles.end(); ++iter) {
         sumX += (*iter).getLocation().x();
         sumY += (*iter).getLocation().y();
         sumH += (*iter).getLocation().h();
@@ -122,6 +121,10 @@ void ParticleFilter::updateEstimate()
     bool offField = !(poseEstimate.x() >= 0 && poseEstimate.x() <= FIELD_GREEN_WIDTH && 
                       poseEstimate.y() >= 0 && poseEstimate.y() <= FIELD_GREEN_HEIGHT); 
     poseEstimate.set_lost(offField);
+
+    // double variance = 0;
+    // for(iter = particles.begin(); iter != particles.end(); ++iter)
+    //     variance += pow(poseEstimate.h() - (*iter).getLocation().h(), 2);
 }
 
 void ParticleFilter::updateFieldForDebug(messages::Vision& vision)
@@ -429,8 +432,7 @@ void ParticleFilter::resample(bool inSet)
     std::map<float, Particle> cdf;
     float prev = 0.0f;
     ParticleIt iter;
-    for(iter = particles.begin(); iter != particles.end(); ++iter)
-    {
+    for (iter = particles.begin(); iter != particles.end(); ++iter) {
         cdf[prev + iter->getWeight()] = (*iter);
         prev += iter->getWeight();
     }
@@ -447,7 +449,7 @@ void ParticleFilter::resample(bool inSet)
     // China 2015 hack
     // If in set and see ball suitable for reconstruction, completely replace swarm with injections
     if (inSet && injections.size()) {
-        for(int i = 0; i < parameters.numParticles; ++i) {
+        for (int i = 0; i < parameters.numParticles; ++i) {
             ReconstructedLocation injection = injections[rand() % injections.size()];
             messages::RobotLocation sample = injection.sample();
 
