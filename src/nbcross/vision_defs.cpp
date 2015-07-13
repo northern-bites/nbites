@@ -733,7 +733,9 @@ man::vision::VisionModule& getModuleRef(const std::string robotName) {
     if (vmRefMap.find(robotName) != vmRefMap.end()) {
         printf("nbcross-getModuleRef REUSING MODULE %s\n",
                robotName.c_str() );
-        return *vmRefMap[robotName];
+		man::vision::VisionModule* module = vmRefMap[robotName];
+		module->reset();
+        return *module;
         
     } else {
         printf("nbcross-getModuleRef CREATING NEW MODULE %s\n",
