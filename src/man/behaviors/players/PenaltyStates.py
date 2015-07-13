@@ -30,12 +30,12 @@ def afterPenalty(player):
         afterPenalty.goalLeft = 0
         afterPenalty.reset_loc = 0
 
-    lines = player.brain.vision
+    vis = player.brain.vision
 
     # Do we see the top of the goalbox
-    for i in range(0, lines.line_size()):
-        if lines.line(i).id == LineID.TopGoalbox:
-            topGoalBox = lines.line(i).inner
+    for i in range(0, vis.line_size()):
+        if vis.line(i).id == LineID.TopGoalbox:
+            topGoalBox = vis.line(i).inner
             leftAngle = fabs(topGoalBox.t - pi) < .25
             # Goalbox to the left = 1 to the right = -1
             toLeft = 1 if leftAngle else -1
@@ -96,23 +96,14 @@ def determineRole(player):
 
     for i in range(4):
         if openSpaces[i] and roleConstants.canRoleSwitchTo(i+2):
-            # US Open hack
-            if player.brain.game:
-                oppTeam = player.brain.game.team(1).team_number
-            else:
-                oppTeam = -1
-            roleConstants.setRoleConstants(player, i+2, oppTeam)
+            roleConstants.setRoleConstants(player, i+2)
             return player.goLater(player.gameState)
         elif openSpaces[i]:
             position = i+2
 
     if position == 0:
         print "Came out of penalty and found no open spaces!!!"
-    # US Open hack
-    if player.brain.game:
-        oppTeam = player.brain.game.team(1).team_number
-    else:
-        oppTeam = -1
-    roleConstants.setRoleConstants(player, i+2, oppTeam)
+
+    roleConstants.setRoleConstants(player, i+2)
     return player.goLater(player.gameState)
 

@@ -8,6 +8,7 @@ import PlayOffBallTransitions as playOffTransitions
 from ..navigator import Navigator
 from ..kickDecider import KickDecider
 from ..kickDecider import kicks
+from noggin_constants import MAX_SPEED, MIN_SPEED 
 from ..util import *
 from objects import RelRobotLocation, Location, RobotLocation
 from math import fabs, degrees, cos, sin, pi, radians, copysign
@@ -33,16 +34,16 @@ def approachBall(player):
         elif player.penaltyKicking:
             return player.goNow('prepareForPenaltyKick')
         else:
-            player.brain.nav.chaseBall(Navigator.FAST_SPEED, fast = True)
+            player.brain.nav.chaseBall(MAX_SPEED, fast = True)
 
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
         return player.goNow('positionAndKickBall')
     
     elif transitions.shouldDecelerate(player):
-        player.brain.nav.chaseBall(Navigator.BRISK_SPEED, fast = True)
+        player.brain.nav.chaseBall(MIN_SPEED, fast = True)
     else:
-        player.brain.nav.chaseBall(Navigator.FAST_SPEED, fast = True)
+        player.brain.nav.chaseBall(MAX_SPEED, fast = True)
 
 
 @defaultState('prepareForKick')
@@ -135,7 +136,7 @@ def followPotentialField(player):
         yComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorY/attractorDist**3 - repulsorY/repulsorDist**3
 
         if xComp == 0 and yComp == 0:
-            player.setWalk(0, 0, copysign(Navigator.FAST_SPEED, ball.bearing_deg))
+            player.setWalk(0, 0, copysign(MAX_SPEED, ball.bearing_deg))
 
         else:
             normalizer = Navigator.FAST_SPEED/(xComp**2 + yComp**2)**.5
@@ -287,7 +288,7 @@ def positionForKick(player):
         if player.kick == kicks.M_LEFT_SIDE or player.kick == kicks.M_RIGHT_SIDE:
             positionForKick.speed = Navigator.GRADUAL_SPEED
         else:
-            positionForKick.speed = Navigator.BRISK_SPEED
+            positionForKick.speed = MIN_SPEED
 
         player.brain.nav.destinationWalkTo(positionForKick.kickPose, 
                                             positionForKick.speed)
