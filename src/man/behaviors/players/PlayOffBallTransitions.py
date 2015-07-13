@@ -73,7 +73,8 @@ def shouldApproachBall(player):
         return False
     # DROPIN
     if player.dropIn:
-        if claimTransitions.shouldGoForBall(player):
+        print "shouldApproachBall"
+        if claimTransitions.shouldGiveUpBall(player):
             return False
 
     if claimTransitions.shouldCedeClaim(player):
@@ -101,8 +102,9 @@ def shouldBeSupporter(player):
 
     # DROPIN
     if player.dropIn:
+        print "shouldBeSupporter"
         return (ballInBox(player) and
-            claimTransitions.shouldGoForBall(player))
+            claimTransitions.shouldGiveUpBall(player))
         
     return (ballInBox(player) and
             claimTransitions.shouldCedeClaim(player))

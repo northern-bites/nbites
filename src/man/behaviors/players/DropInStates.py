@@ -72,6 +72,8 @@ def gameSet(player):
         player.stand()
         player.brain.nav.stand()
         player.brain.tracker.performBasicPan()
+        print "x", player.brain.loc.x
+        print "y", player.brain.loc.y
 
     elif player.brain.tracker.isStopped():
         player.brain.tracker.trackBall()

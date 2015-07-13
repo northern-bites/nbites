@@ -67,7 +67,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.motionKick = False
         # if we purposely kicked the ball out
         self.kickedOut = False
-        # Controls whether we will role switch
+        # Controls whether we will role switch 
         self.roleSwitching = True
         # Controls whether we use claims
         self.useClaims = True

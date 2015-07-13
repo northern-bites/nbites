@@ -27,7 +27,8 @@ def shouldReturnHome(player):
         return True;
     #For  DropIn player! 
     if player.dropIn:
-        return claimTrans.shouldGoForBall(player)
+        print "shouldReturnHome"
+        return claimTrans.shouldGiveUpBall(player)
 
     return claimTrans.shouldCedeClaim(player)
 
@@ -41,7 +42,8 @@ def shouldSupport(player):
         return False
     # for drop in
     if player.dropIn:
-        return player.brain.ball.vis.frames_on and claimTrans.shouldGoForBall(player)
+        print "shouldSupport"
+        return player.brain.ball.vis.frames_on and claimTrans.shouldGiveUpBall(player)
     
     return player.brain.ball.vis.frames_on and claimTrans.shouldCedeClaim(player)
 
@@ -58,7 +60,7 @@ def shouldPrepareForKick(player):
 
 def shouldPositionForKick(player, ball, relH):
     distToKick = ((ball.rel_x - player.kick.setupX)**2 + (ball.rel_y - player.kick.setupY)**2)**.5
-    return fabs(relH) < constants.ORBIT_GOOD_BEARING and distToKick < 25
+    return fabs(relH) < constants.ORBIT_GOOD_BEARING and distToKick < 30
 
 def shouldSpinToBall(player):
     """
