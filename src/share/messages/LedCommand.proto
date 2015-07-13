@@ -1,5 +1,10 @@
 package messages;
 
+option java_outer_classname = "_File_LedCommand";
+option java_multiple_files = true;
+
+
+
 message LedCommand
 {
     // LED ID and hex value.

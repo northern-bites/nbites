@@ -72,6 +72,46 @@ public class Utility {
 		return new String(hexChars);
 	}
 	
+	//binary, not SI
+	public static final long bytesPerKB = (1 << 10);
+	public static final long bytesPerMB = (1 << 20);
+	public static final long bytesPerGB = (1 << 30);
+	
+	public static String byteString( long bytes, boolean sepGig, boolean sepMeg, boolean sepKyb, boolean showByte ) {
+		String total = "";
+		long left = bytes;
+		
+		if (sepGig) {
+			long gigs = left / bytesPerGB;
+			if (gigs > 0) {
+				total = total + String.format("%dGB ", gigs);
+				left = left % bytesPerGB;
+			}
+		}
+		
+		if (sepMeg) {
+			long megs = left / bytesPerMB;
+			if (megs > 0) {
+				total = total + String.format("%dMB ", megs);
+				left = left % bytesPerMB;
+			}
+		}
+		
+		if (sepKyb) {
+			long kbs = left / bytesPerKB;
+			if (kbs > 0) {
+				total = total + String.format("%dKB ", kbs);
+				left = left % bytesPerKB;
+			}
+		}
+		
+		if (showByte && left > 0) {
+			total = total + String.format("%d bytes", left);
+		}
+		
+		return total;
+	}
+	
 	public static JPanel fieldWithlabel(JLabel l, JTextField f) {
 		JPanel p = new JPanel(new BorderLayout());
 		p.add(l,BorderLayout.WEST);
@@ -101,55 +141,14 @@ public class Utility {
 	public static Class<? extends com.google.protobuf.GeneratedMessage> protobufClassFromType(String _type) {
 		assert(_type.startsWith(NBConstants.PROTOBUF_TYPE_PREFIX));
 		String type = _type.substring(NBConstants.PROTOBUF_TYPE_PREFIX.length()); //Remove prefix.
-		String classname;
-		String except;
-		
-		try {
-			except = Prefs.CLASS_EXCEPTIONS_MAP.get(type);
-		} catch(MissingResourceException mre) {
-			except = null;
-		}
-		
-		ClassNotFoundException ocE = null, nocE = null;
-		
-		/*
-		 * Generate the %sOuterClass%s format, using the outer class name exception if found.
-		 * */
-		if ( except != null )
-			classname = String.format("messages.%sOuterClass$%s", except, type);
-		else
-			classname = String.format("messages.%sOuterClass$%s", type, type);
+		String classname = String.format("messages.%s", type);
 
-		Class<? extends com.google.protobuf.GeneratedMessage> retClass = null;
-		
-		//Try that format.
 		try {
-			retClass = (Class<? extends com.google.protobuf.GeneratedMessage>) Class.forName(classname);
+			return (Class<? extends com.google.protobuf.GeneratedMessage>) Class.forName(classname);
 		} catch (ClassNotFoundException e) {
-			ocE  = e;
-			retClass = null;
+			e.printStackTrace();
+			return null;
 		}
-		
-		if (retClass != null)
-			return retClass;	//OuterClass format found the class.
-		
-		//Didn't find the class, try class name format WITHOUT 'OuterClass'
-		if (except == null) return null; //Can't try this if we didn't find a class name exception.
-		classname = String.format("messages.%s$%s", except, type);
-		try {
-			retClass = (Class<? extends com.google.protobuf.GeneratedMessage>) Class.forName(classname);
-		} catch (ClassNotFoundException e) {
-			nocE  = e;
-			retClass = null;
-		}
-		
-		if (retClass != null)
-			return retClass;
-		
-		//Couldn't find the class, print the errors we found for debugging.
-		ocE.printStackTrace();
-		nocE.printStackTrace();
-		return null;
 	}
 	
 	public static <T extends com.google.protobuf.Message>
@@ -286,5 +285,9 @@ public class Utility {
 		for (byte b : data)
 			checksum += (b & 0xFF);
 		return checksum;
+	}
+	
+	public static void main(String[] args) {
+		Logger.println(Utility.byteString(12497681235l, true, true, true, true));
 	}
 }

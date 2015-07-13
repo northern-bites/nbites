@@ -61,8 +61,6 @@ public class Log {
 		return new Log(topLevel, b);
 	}
 	
-	
-	
 	public static Log logWithTypePlus(String type, byte[] b, SExpr... fields) {
 		SExpr typeField = SExpr.newKeyValue(CONTENT_TYPE_S, type);
 		SExpr fieldList = SExpr.newList(typeField);
