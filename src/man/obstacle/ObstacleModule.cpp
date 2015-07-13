@@ -404,8 +404,9 @@ void ObstacleModule::processVision(const messages::RobotObstacle& input)
     // Process what direction obstacle is in: act appropriately
     if ( bearing < ZONE_WIDTH )
     {
+        // HACK CHINA 2015 SO WE DON'T DETECT SELF AS OBSTACLE
         // obstacle to the east
-        updateVisionBuffer(FieldObstacles::Obstacle::EAST, input);
+        // updateVisionBuffer(FieldObstacles::Obstacle::EAST, input);
     }
     else if ( bearing < 3.f * ZONE_WIDTH )
     {
@@ -424,8 +425,9 @@ void ObstacleModule::processVision(const messages::RobotObstacle& input)
     }
     else if ( bearing < 9.f * ZONE_WIDTH )
     {
+        // HACK CHINA 2015 SO WE DON'T DETECT SELF AS OBSTACLE
         // obstacle to west
-        updateVisionBuffer(FieldObstacles::Obstacle::WEST, input);
+        // updateVisionBuffer(FieldObstacles::Obstacle::WEST, input);
     }
 }
 
