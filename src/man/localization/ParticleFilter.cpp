@@ -198,9 +198,12 @@ void ParticleFilter::updateFieldForDebug(messages::Vision& vision)
     messages::VBall& ball = *vision.mutable_ball();
 
     // Project ball onto the field
+    double ballRelX, ballRelY;
+    vision::polarToCartesian(ball.distance(), ball.bearing(), ballRelX, ballRelY);
+
     messages::RobotLocation ballRel;
-    ballRel.set_x(ball.x());
-    ballRel.set_y(ball.y());
+    ballRel.set_x(ballRelX);
+    ballRel.set_y(ballRelY);
 
     messages::RobotLocation ballAbs = LandmarkSystem::relRobotToAbsolute(ballRel, poseEstimate);
     ball.set_x(ballAbs.x());

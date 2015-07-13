@@ -37,15 +37,15 @@ public class Field extends JPanel {
         g2.setColor(Color.gray);
         g2.draw(new Line2D.Float(FieldConstants.MIDFIELD_X, FieldConstants.GREEN_PAD_Y, 
         						 FieldConstants.MIDFIELD_X, FieldConstants.FIELD_WHITE_TOP_SIDELINE_Y));
-        //left goalbox
+        //our top goalbox
         if(shouldFlip) { g2.setColor(Color.orange); } else { g2.setColor(Color.magenta);}
-        g2.draw(new Rectangle2D.Float(FieldConstants.GREEN_PAD_X,FieldConstants.FIELD_WHITE_HEIGHT*0.45f,
-        							  FieldConstants.GOALBOX_DEPTH,FieldConstants.GOALBOX_WIDTH));
-        //right goalbox
+        g2.draw(new Line2D.Float(FieldConstants.GREEN_PAD_X + FieldConstants.GOALBOX_DEPTH, FieldConstants.MY_GOALBOX_BOTTOM_Y, 
+        						 FieldConstants.GREEN_PAD_X + FieldConstants.GOALBOX_DEPTH, FieldConstants.MY_GOALBOX_TOP_Y));
+        
+        //their top goalbox
         if(shouldFlip) { g2.setColor(Color.magenta); } else { g2.setColor(Color.orange);}
-        g2.draw(new Rectangle2D.Float(FieldConstants.FIELD_GREEN_WIDTH-FieldConstants.GREEN_PAD_X-
-        							  FieldConstants.GOALBOX_DEPTH, FieldConstants.FIELD_WHITE_HEIGHT*0.45f, 
-        							  FieldConstants.GOALBOX_DEPTH,FieldConstants.GOALBOX_WIDTH));
+        g2.draw(new Line2D.Float(FieldConstants.FIELD_GREEN_WIDTH - FieldConstants.GREEN_PAD_X - FieldConstants.GOALBOX_DEPTH, FieldConstants.MY_GOALBOX_BOTTOM_Y, 
+        						 FieldConstants.FIELD_GREEN_WIDTH - FieldConstants.GREEN_PAD_X- FieldConstants.GOALBOX_DEPTH, FieldConstants.MY_GOALBOX_TOP_Y));
 
         //our left goalbox
         if(shouldFlip) { g2.setColor(Color.white); } else { g2.setColor(Color.green);}
