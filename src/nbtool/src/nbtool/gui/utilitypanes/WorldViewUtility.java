@@ -191,9 +191,12 @@ public class WorldViewUtility extends UtilityParent {
 		}
 		
 		private void updateTeamInfo(TeamBroadcast tb) {
-			int role = tb.dataWorldModel.getRole();
 			int playerNum = tb.dataTeamPacket.getPlayerNumber();
-			switch (role) {
+			if(!tb.dataWorldModel.getActive()) {
+				teamInfo[playerNum-1].setText("Player "+(playerNum)+": Penalized");
+			}
+			
+			switch (playerNum) {
 				case 1:playerRoles[playerNum-1] = "Goalie";
 					break;
 				case 2:playerRoles[playerNum-1] = "Defender #1";
@@ -252,6 +255,7 @@ public class WorldViewUtility extends UtilityParent {
 				Logger.infof("Stopped Listening to team %s", teamNumber);
 				for(int i=0; i<robots.length; i++) {
 					robots[i] = null;
+					teamInfo[i].setText("Player "+(i+1)+": Inactive");
 				}
 			}
 		}
