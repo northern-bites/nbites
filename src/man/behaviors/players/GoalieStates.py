@@ -118,7 +118,7 @@ def gamePlaying(player):
     # this is better for testing purposes!
     #TESTINGCHANGE
     # return player.goLater('watchWithLineChecks')
-    return player.goLater('checkSafePlacement')
+    return player.goLater('watch')
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
@@ -178,6 +178,8 @@ def standStill(player):
 @superState('gameControllerResponder')
 def watchWithLineChecks(player):
     if player.firstFrame():
+        player.goodRightCornerObservation = False
+        player.goodLeftCornerObservation = False
         watchWithLineChecks.counter = 0
         print ("My num turns:", watchWithLineChecks.numTurns)
         print ("My num fix:", watchWithLineChecks.numFixes)
@@ -220,7 +222,7 @@ def watchWithLineChecks(player):
         player.brain.tracker.trackBall()
 
     if watchWithLineChecks.counter > 400 or watchWithLineChecks.numFixes > 6:
-        print "Counter was over 300, going to watch!"
+        print "Counter was over 400, going to watch!"
         return player.goLater('watch')
 
     # Bc we won't be looking at landmarks if ball is on
@@ -337,7 +339,10 @@ def shiftPosition(player):
         and player.inPosition == constants.RIGHT_POSITION):
             player.inPosition = constants.CENTER_POSITION
             print("[GOALIE POSITION] I think I'm in the center now, I moved left")
-        player.brain.nav.walkTo(shiftPosition.dest, speed = nav.QUICK_SPEED)
+
+        # player.brain.nav.walkTo(shiftPosition.dest, speed = nav.QUICK_SPEED)
+        player.brain.nav.goTo(dest,
+                            speed = nav.BRISK_SPEED)
 
     if player.counter > 200:
         print "Took too long"

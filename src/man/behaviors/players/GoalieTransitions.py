@@ -45,15 +45,15 @@ def safelyPlaced(player):
                 print("Found a good right corner!")
 
     if goodLeftCornerObservation > 5:
-        VisualGoalieStates.checkSafePlacement.goodLeftCornerObservation = True
+        player.goodLeftCornerObservation = True
     if goodRightCornerObservation > 5:
-        VisualGoalieStates.checkSafePlacement.goodRightCornerObservation = True
+        player.goodRightCornerObservation = True
 
-    if (VisualGoalieStates.checkSafePlacement.goodRightCornerObservation
-        and VisualGoalieStates.checkSafePlacement.goodLeftCornerObservation):
+    if (player.goodRightCornerObservation
+        and player.goodLeftCornerObservation):
 
     # if goodRightCornerObservation > 5 and goodLeftCornerObservation > 5:
-        print("I think I'm placed good!")
+        print("I think I'm placed well!")
         return True
 
 def getCorners(player):
@@ -555,20 +555,33 @@ def getLineLength(line):
     return line.ep1 - line.ep0
 
 def shouldPositionRight(player):
-    if player.brain.ball.bearing_deg < -40.0 and \
+    if player.brain.ball.bearing_deg < -50.0 and \
     player.brain.ball.distance > constants.CLEARIT_DIST_SIDE and \
-    player.inPosition is not constants.RIGHT_POSITION:
+    player.inPosition is not constants.CENTER_POSITION:
         GoalieStates.shiftPosition.dest = constants.RIGHT_SHIFT
         print("Bearing: ", player.brain.ball.bearing_deg)
         return True
 
+    elif player.brain.ball.bearing_deg < -30.0 and \
+    player.brain.ball.distance > constants.CLEARIT_DIST_SIDE and \
+    player.inPosition is constants.LEFT_POSITION:
+        GoalieStates.shiftPosition.dest = constants.HOME_POSITION
+        print("Bearing: ", player.brain.ball.bearing_deg)
+
     return False
 
 def shouldPositionLeft(player):
-    if player.brain.ball.bearing_deg > 40.0 and \
+    if player.brain.ball.bearing_deg > 50.0 and \
     player.brain.ball.distance > constants.CLEARIT_DIST_SIDE and \
-    player.inPosition is not constants.LEFT_POSITION:
+    player.inPosition is constants.CENTER_POSITION:
         GoalieStates.shiftPosition.dest = constants.LEFT_SHIFT
+        print("Bearing: ", player.brain.ball.bearing_deg)
+        return True
+
+    elif player.brain.ball.bearing_deg > 30.0 and \
+    player.brain.ball.distance > constants.CLEARIT_DIST_SIDE and \
+    player.inPosition is constants.RIGHT_POSITION:
+        GoalieStates.shiftPosition.dest = constants.HOME_POSITION
         print("Bearing: ", player.brain.ball.bearing_deg)
         return True
 
@@ -951,16 +964,16 @@ def shouldClearBall(player):
 
     # if definitely within good chasing area
     if (player.brain.ball.distance < constants.CLEARIT_DIST_FRONT):
-        walkedTooFar.xThresh = 150.0
-        walkedTooFar.yThresh = 150.0
+        walkedTooFar.xThresh = constants.CLEARIT_DIST_FRONT + 10.0
+        walkedTooFar.yThresh = constants.CLEARIT_DIST_FRONT + 10.0
         shouldGo = True
 
     # to goalie's sides, being aggressive
-    # if (math.fabs(player.brain.ball.bearing_deg) > 50.0 and
-    #     player.brain.ball.distance < constants.CLEARIT_DIST_SIDE):
-    #     walkedTooFar.xThresh = 300.0
-    #     walkedTooFar.yThresh = 300.0
-    #     shouldGo = True
+    if (math.fabs(player.brain.ball.bearing_deg) > 50.0 and
+        player.brain.ball.distance < constants.CLEARIT_DIST_SIDE):
+        walkedTooFar.xThresh = constants.CLEARIT_DIST_SIDE + 10.0
+        walkedTooFar.yThresh = constants.CLEARIT_DIST_SIDE + 10.0
+        shouldGo = True
 
     if shouldGo:
         if player.brain.ball.bearing_deg < -65.0:

@@ -69,5 +69,12 @@ GOOD_ENOUGH_H = 6
 HOME_POSITION = RobotLocation(constants.FIELD_WHITE_LEFT_SIDELINE_X + 10.0,
                         constants.MIDFIELD_Y,
                         0.0)
-LEFT_SHIFT = RelRobotLocation(5.0, 30.0, 0.0)
-RIGHT_SHIFT = RelRobotLocation(5.0, -30.0, 0.0)
+# LEFT_SHIFT = RelRobotLocation(5.0, 30.0, 0.0)
+# RIGHT_SHIFT = RelRobotLocation(5.0, -30.0, 0.0)
+
+LEFT_SHIFT = RobotLocation(HOME_POSITION.x,
+						HOME_POSITION.y + 35,
+						15)
+RIGHT_SHIFT = RobotLocation(HOME_POSITION.x,
+						HOME_POSITION.y - 35,
+						-15)

@@ -151,8 +151,8 @@ def checkSafePlacement(player):
         player.corners = []
         checkSafePlacement.lastLook = constants.RIGHT
         checkSafePlacement.looking = False
-        checkSafePlacement.goodRightCornerObservation = False
-        checkSafePlacement.goodLeftCornerObservation = False
+        player.goodRightCornerObservation = False
+        player.goodLeftCornerObservation = False
 
     if not checkSafePlacement.looking:
         checkSafePlacement.looking = True
