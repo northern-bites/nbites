@@ -86,7 +86,9 @@ def shouldApproachBall(player):
     return True
 
 def shouldFindSharedBall(player):
-    return (player.brain.sharedBall.ball_on and
+    return (role.isFirstChaser(player.role) and
+            player.brain.ball.vis.frames_off > 10 and
+            player.brain.sharedBall.ball_on and
             player.brain.sharedBall.reliability >= 1)
 
 def shouldFindFlippedSharedBall(player):
