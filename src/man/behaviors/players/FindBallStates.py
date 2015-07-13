@@ -46,6 +46,48 @@ def spinSearch(player):
         player.counter = 0
         return player.stay()
 
+@defaultState('doFirstHalfSpin')
+@superState('gameControllerResponder')
+@stay
+def spinInHomePosition(player):
+    """
+    half-spin towards goal box -> pan -> finish spin in home position
+    """
+    pass
+
+@superState('spinInHomePosition')
+def doFirstHalfSpin(player):
+    if player.firstFrame():
+        my = player.brain.loc
+        ball = Location(player.brain.ball.x,player.brain.ball.y)
+        spinDir = my.spinDirToPoint(ball)
+        player.setWalk(0,0,spinDir*Navigator.QUICK_SPEED)
+        player.brain.tracker.lookToSpinDirection(spinDir)
+    while player.stateTime < constants.SPUN_ONCE_TIME_THRESH/2:
+        return player.stay()
+    return player.goNow('doPan')
+
+@superState('spinInHomePosition')
+def doPan(player):
+    if player.firstFrame():
+        player.stand()
+        player.brain.tracker.repeatWidePan()
+    while player.stateTime < 5:
+        return player.stay()
+    return player.goNow('doSecondHalfSpin')
+
+@superState('spinInHomePosition')
+def doSecondHalfSpin(player):
+    if player.firstFrame():
+        my = player.brain.loc
+        ball = Location(player.brain.ball.x,player.brain.ball.y)
+        spinDir = -my.spinDirToPoint(ball)
+        player.setWalk(0,0,spinDir*Navigator.QUICK_SPEED)
+        player.brain.tracker.lookToSpinDirection(spinDir)
+    while player.stateTime < constants.SPUN_ONCE_TIME_THRESH/2:
+        return player.stay()
+    return player.goNow('playOffBall')
+
 @superState('gameControllerResponder')
 @stay
 @ifSwitchLater(transitions.shouldFindBall, 'findBall')
