@@ -186,11 +186,11 @@ def watchWithLineChecks(player):
         watchWithLineChecks.lines[:] = []
         player.homeDirections = []
 
-        if player.lastDiffState == 'returnUsingLoc':
-            print("I'm resetting my loc, I think I'm back!")
-#TestingChange
-            # player.brain.resetLocTo(constants.HOME_POSITION)
-            # player.brain.resetGoalieLocalization()
+#         if player.lastDiffState == 'returnUsingLoc':
+#             print("I'm resetting my loc, I think I'm back!")
+# #TestingChange
+#             # player.brain.resetLocTo(constants.HOME_POSITION)
+#             # player.brain.resetGoalieLocalization()
 
         if player.lastDiffState is not 'lineCheckReposition' and\
         player.lastDiffState is not 'moveBackwards':

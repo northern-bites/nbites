@@ -568,12 +568,12 @@ def adjustPosition(player):
     position = getPositionFromBall(player)
 
     if position == player.inPosition:
-        print("I'm already in position!")
+        # print("I'm already in position!")
         return False
 
     else:
         GoalieStates.shiftPosition.dest = position
-        print("I should shift my position")
+        # print("I should shift my position")
         return True
 
 def getPositionFromBall(player):
