@@ -51,7 +51,10 @@ def tooFarFromHome(threshold, player):
         ball = None
         home = player.homePosition
 
-    if ball != None:
+    if nogginC.FIXED_D_HOME:
+        home = player.homePosition
+
+    elif ball != None:
         if role.isLeftDefender(player.role):
             home = findDefenderHome(True, ball, player.homePosition.h)
         elif role.isRightDefender(player.role):
@@ -66,7 +69,9 @@ def tooFarFromHome(threshold, player):
     return distance > threshold
 
 def shouldSpinSearchFromWatching(player):
-    return (player.stateTime > 12 and
+    shouldExtendTimer = player.commMode == 2 and role.isDefender(player.role)
+    spinTimer = 25 if shouldExtendTimer else 12
+    return (player.stateTime > spinTimer and
             player.brain.ball.vis.frames_off > 30 and
             not player.brain.sharedBall.ball_on)
   
