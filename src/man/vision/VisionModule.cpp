@@ -580,6 +580,7 @@ void VisionModule::setCalibrationParams(int camera, std::string robotName)
 {
     if (std::string::npos != robotName.find(".local")) {
         robotName.resize(robotName.find("."));
+        //Much love for the edge cases.
         if (robotName == "she-hulk")
             robotName = "shehulk";
     }

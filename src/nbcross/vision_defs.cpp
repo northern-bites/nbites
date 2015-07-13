@@ -27,6 +27,8 @@ std::string getSExprStringFromColorJSonNode(boost::property_tree::ptree tree);
 SExpr treeFromBall(man::vision::Ball& b);
 SExpr treeFromBlob(man::vision::Blob& b);
 
+//robotName may be empty ("").
+man::vision::VisionModule& getModuleRef(const std::string robotName);
 
 int Vision_func() {
 
@@ -57,6 +59,21 @@ int Vision_func() {
     } else {
         std::cout << "Could not get height from description!\n";
     }
+    
+    if (topCamera && (height != man::vision::DEFAULT_TOP_IMAGE_HEIGHT ||
+                      width != 2 * man::vision::DEFAULT_TOP_IMAGE_WIDTH)
+                      ) {
+        printf("WARNING! topCamera dimensions (%i, %i) NOT DEFAULT, VisionModule results undefined!\n",
+               width, height);
+    }
+    
+    if (!topCamera && (height != (man::vision::DEFAULT_TOP_IMAGE_HEIGHT / 2) ||
+                       // 2 / 2 == 1
+                      width != man::vision::DEFAULT_TOP_IMAGE_WIDTH)
+        ) {
+        printf("WARNING! botCamera dimensions (%i, %i) NOT DEFAULT, VisionModule results undefined!\n",
+               width, height);
+    }
 
     // Location of lisp text file with color params
     std::string sexpPath = std::string(getenv("NBITES_DIR"));
@@ -80,7 +97,8 @@ int Vision_func() {
         rname = robotName->get(1)->value();
     }
 
-    man::vision::VisionModule module(width / 2, height, rname);
+    //man::vision::VisionModule module(width / 2, height, rname);
+    man::vision::VisionModule& module = getModuleRef(rname);
 
     // Images to pass to vision module, top & bottom
     messages::YUVImage realImage(buf, width, height, width);
@@ -117,7 +135,7 @@ int Vision_func() {
         }
     }
 
-    // If log includes calibration parameters in description, have madule use those
+    // If log includes calibration parameters in description, have module use those
     std::vector<SExpr*> calParamsVec = args[0]->tree().recursiveFind("CalibrationParams");
     if (calParamsVec.size() != 0) {
         SExpr* calParams = calParamsVec.at(calParamsVec.size()-2);
@@ -706,3 +724,23 @@ SExpr treeFromBlob(man::vision::Blob& b)
 }
 
 int Scratch_func() {}
+
+#include <map>
+std::map<const std::string, man::vision::VisionModule *> vmRefMap;
+
+man::vision::VisionModule& getModuleRef(const std::string robotName) {
+    if (vmRefMap.find(robotName) != vmRefMap.end()) {
+        printf("nbcross-getModuleRef REUSING MODULE %s\n",
+               robotName.c_str() );
+        return *vmRefMap[robotName];
+        
+    } else {
+        printf("nbcross-getModuleRef CREATING NEW MODULE %s\n",
+               robotName.c_str() );
+        man::vision::VisionModule * newInst =
+            new man::vision::VisionModule(man::vision::DEFAULT_TOP_IMAGE_WIDTH,
+                                      man::vision::DEFAULT_TOP_IMAGE_HEIGHT, robotName);
+        vmRefMap[robotName] = newInst;
+        return *newInst;
+    }
+}
