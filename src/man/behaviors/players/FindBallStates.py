@@ -39,11 +39,18 @@ def spinSearch(player):
         player.setWalk(0, 0, spinDir*Navigator.QUICK_SPEED)
         player.brain.tracker.lookToSpinDirection(spinDir)
 
-    # this is such a hack for spinning when we lost the ball while falling
-    if not player.brain.motion.calibrated:
-        player.startTime = player.getTime()
-        player.stateTime = 0
-        player.counter = 0
+@superState('gameControllerResponder')
+@stay
+def searchAfterFall(player):
+    """
+    goes into this state only if we saw the ball during the last second before the fall
+    """
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+
+    if player.brain.motion.calibrated:
+        return player.goNow('spinSearch')
+    else:
         return player.stay()
 
 @superState('gameControllerResponder')
