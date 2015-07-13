@@ -100,8 +100,6 @@ public class NaoRobot {
 			} else {
 				screenX = (int) fieldX;
 				screenY = (int) (FieldConstants.FIELD_HEIGHT- fieldY);
-				System.out.println("Screen H: "+screenH);
-				System.out.println("Field H: "+fieldH);
 				screenH = fieldH;
 				screenKickDestX  = (int) fieldKickDestX;
 				screenKickDestY = (int) (FieldConstants.FIELD_HEIGHT-fieldKickDestY);
