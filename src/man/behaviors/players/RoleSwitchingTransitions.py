@@ -111,14 +111,20 @@ def determineOpenRoles(player):
     openSpaces[player.role - 2] = False
     conflict = -1
 
+    print "I have", player.brain.activeTeamMates(), "active teammates."
     #number of defenders and number of offense players
     for mate in player.brain.teamMembers:
+        print "Player", mate.playerNumber, "has role", player.role
         if constants.isGoalie(mate.role):
             continue
         if constants.isDefender(mate.role) and mate.frameSinceActive > 30:
             openSpaces[mate.role - 2] = False
+            print "Player", mate.playerNumber, "is a defender."
+            continue
         if constants.isChaser(mate.role) and mate.frameSinceActive > 30:
             openSpaces[mate.role -2] = False
+            print "Player", mate.playerNumber, "is a chaser/striker."
+            continue
         if player.role == mate.role:
             if mate.playerNumber == player.brain.playerNumber:
                 continue 
