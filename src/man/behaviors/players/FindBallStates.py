@@ -57,6 +57,9 @@ def spinInHomePosition(player):
 
 @superState('spinInHomePosition')
 def doFirstHalfSpin(player):
+    """
+    spin to where we think the ball is
+    """
     if player.firstFrame():
         my = player.brain.loc
         ball = Location(player.brain.ball.x,player.brain.ball.y)
@@ -69,6 +72,9 @@ def doFirstHalfSpin(player):
 
 @superState('spinInHomePosition')
 def doPan(player):
+    """
+    wide pan for 5 seconds
+    """
     if player.firstFrame():
         player.stand()
         player.brain.tracker.repeatWidePan()
@@ -78,6 +84,9 @@ def doPan(player):
 
 @superState('spinInHomePosition')
 def doSecondHalfSpin(player):
+    """
+    keep spinning in the same direction
+    """
     if player.firstFrame():
         my = player.brain.loc
         ball = Location(player.brain.ball.x,player.brain.ball.y)
