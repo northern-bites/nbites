@@ -17,7 +17,6 @@
 namespace nblog {
     
     const char * LOG_FOLDER = "/home/nao/nbites/log/";
-    //const char * LOG_FOLDER = "/Users/pkoch/Desktop/LOGS/";
     bool STARTED = false;
     
     //TODO need more experimenting for optimal size.

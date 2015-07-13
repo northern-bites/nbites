@@ -1,0 +1,8 @@
+<?xml version = '1.0' encoding = 'utf-8'?>
+<!DOCTYPE project>
+<project name="libgamectrl">
+  <!-- Add your project dependencies here -->
+  <!--
+  <depends buildtime="true" runtime="true" names="foo" />
+  -->
+</project>

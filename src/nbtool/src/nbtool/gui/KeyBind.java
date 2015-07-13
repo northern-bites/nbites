@@ -43,42 +43,42 @@ public class KeyBind {
 		assert(controlPanel != null);
 		
 		/* first install core keybinds */
-		BIND_MAP.put('q', new KeyBoundAction(){
+		BIND_MAP.put('C', new KeyBoundAction(){
 			@Override
 			protected void happened() {
 				left.setSelectedIndex(0);
 			}
 		});
 		
-		BIND_MAP.put('w', new KeyBoundAction(){
+		BIND_MAP.put('L', new KeyBoundAction(){
 			@Override
 			protected void happened() {
 				left.setSelectedIndex(1);
 			}
 		});
 		
-		BIND_MAP.put('e', new KeyBoundAction(){
+		BIND_MAP.put('S', new KeyBoundAction(){
 			@Override
 			protected void happened() {
 				right.setSelectedIndex(0);
 			}
 		});
 		
-		BIND_MAP.put('r', new KeyBoundAction(){
+		BIND_MAP.put('X', new KeyBoundAction(){
 			@Override
 			protected void happened() {
 				right.setSelectedIndex(1);
 			}
 		});
 		
-		BIND_MAP.put('t', new KeyBoundAction(){
+		BIND_MAP.put('M', new KeyBoundAction(){
 			@Override
 			protected void happened() {
 				right.setSelectedIndex(2);
 			}
 		});
 		
-		BIND_MAP.put('f', new KeyBoundAction(){
+		BIND_MAP.put('U', new KeyBoundAction(){
 			@Override
 			protected void happened() {
 				right.setSelectedIndex(2);
@@ -86,7 +86,7 @@ public class KeyBind {
 			}
 		});
 		
-		BIND_MAP.put('g', new KeyBoundAction(){
+		BIND_MAP.put('O', new KeyBoundAction(){
 			@Override
 			protected void happened() {
 				right.setSelectedIndex(2);

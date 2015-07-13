@@ -39,12 +39,70 @@ def spinSearch(player):
         player.setWalk(0, 0, spinDir*Navigator.QUICK_SPEED)
         player.brain.tracker.lookToSpinDirection(spinDir)
 
-    # this is such a hack for spinning when we lost the ball while falling
-    if not player.brain.motion.calibrated:
-        player.startTime = player.getTime()
-        player.stateTime = 0
-        player.counter = 0
+@superState('gameControllerResponder')
+@stay
+def searchAfterFall(player):
+    """
+    goes into this state only if we saw the ball during the last second before the fall
+    """
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+
+    if player.brain.motion.calibrated:
+        return player.goNow('spinSearch')
+    else:
         return player.stay()
+
+@defaultState('doFirstHalfSpin')
+@superState('gameControllerResponder')
+@stay
+def spinInHomePosition(player):
+    """
+    half-spin towards goal box -> pan -> finish spin in home position
+    """
+    pass
+
+@superState('spinInHomePosition')
+def doFirstHalfSpin(player):
+    """
+    spin to where we think the ball is
+    """
+    if player.firstFrame():
+        my = player.brain.loc
+        ball = Location(player.brain.ball.x,player.brain.ball.y)
+        spinDir = my.spinDirToPoint(ball)
+        player.setWalk(0,0,spinDir*Navigator.QUICK_SPEED)
+        player.brain.tracker.lookToSpinDirection(spinDir)
+    while player.stateTime < constants.SPUN_ONCE_TIME_THRESH/2:
+        return player.stay()
+    return player.goNow('doPan')
+
+@superState('spinInHomePosition')
+def doPan(player):
+    """
+    wide pan for 5 seconds
+    """
+    if player.firstFrame():
+        player.stand()
+        player.brain.tracker.repeatWidePan()
+    while player.stateTime < 5:
+        return player.stay()
+    return player.goNow('doSecondHalfSpin')
+
+@superState('spinInHomePosition')
+def doSecondHalfSpin(player):
+    """
+    keep spinning in the same direction
+    """
+    if player.firstFrame():
+        my = player.brain.loc
+        ball = Location(player.brain.ball.x,player.brain.ball.y)
+        spinDir = -my.spinDirToPoint(ball)
+        player.setWalk(0,0,spinDir*Navigator.QUICK_SPEED)
+        player.brain.tracker.lookToSpinDirection(spinDir)
+    while player.stateTime < constants.SPUN_ONCE_TIME_THRESH/2:
+        return player.stay()
+    return player.goNow('playOffBall')
 
 @superState('gameControllerResponder')
 @stay

@@ -1,0 +1,54 @@
+#!/bin/bash
+
+echo "MAKEnbtool..."
+
+BIN_BASE=$NBITES_DIR/build/java/
+
+BIN_LIBS=$BIN_BASE/libs/
+BIN_NBTOOL=$BIN_BASE/volatile/
+
+LIB_APACHE=$BIN_LIBS/apache/
+LIB_BHUMAN=$BIN_LIBS/bhuman/
+LIB_GOOGLE=$BIN_LIBS/google/
+
+JARS_EXTERNAL=$NBITES_DIR/src/nbtool/jars-external/
+
+echo "BIN_BASE=" $BIN_BASE
+
+if [ ! -d "$BIN_LIBS" ]; then
+    echo "Building libs..."
+
+    echo "Building LIB_APACHE to " $LIB_APACHE
+    mkdir -pv $LIB_APACHE
+    find ./src/apache/ -name *.java > _tempFiles
+    javac -d $LIB_APACHE @_tempFiles
+    rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+
+    echo "Building LIB_BHUMAN to " $LIB_BHUMAN
+    mkdir -pv $LIB_BHUMAN
+    find ./src/bhuman/ -name *.java > _tempFiles
+    javac -d $LIB_BHUMAN -classpath .:$JARS_EXTERNAL/* @_tempFiles
+    rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+
+    echo "Building LIB_GOOGLE to " $LIB_GOOGLE
+    mkdir -pv $LIB_GOOGLE
+    find ./src/google/ -name *.java > _tempFiles
+    javac -d $LIB_GOOGLE @_tempFiles
+    rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+
+    echo "Done building libs."
+fi
+
+rm -r $BIN_NBTOOL
+mkdir -pv $BIN_NBTOOL
+find ./src/messages/ -name *.java > _tempFiles
+find ./src/nbtool/ -name *.java >> _tempFiles
+
+javac -d $BIN_NBTOOL -classpath .:$JARS_EXTERNAL:$LIB_GOOGLE:$LIB_BHUMAN:$LIB_APACHE @_tempFiles
+rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+
+cp ./src/nbtool/util/*.properties $BIN_NBTOOL/nbtool/util
+
+rm _tempFiles
+
+
