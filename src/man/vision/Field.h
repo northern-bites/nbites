@@ -59,8 +59,8 @@ public:
 	void drawPoint(int x, int y, int c);
 	void drawDot(int x, int y, int c);
 	void drawLine(int x, int y, int x1, int y1, int c);
-    
-    // Returns true if x is WITHIN SCOPE convex hull and sets y 
+
+    // Returns true if x is WITHIN SCOPE convex hull and sets y
     //  to height of hull at that x. (True could still be off field)
 	bool onField(double x, double & y);
     int findGreenHorizon(int pH, int rH);
@@ -99,6 +99,7 @@ public:
 	void setDebugFieldEdge(bool debug) {debugFieldEdge = debug;}
 	void setDrawFieldHorizon(bool debug) {debugDrawFieldEdge = debug;}
 	void setDrawCameraHorizon(bool debug) {drawCameraHorizon = debug;}
+	void setGreenThresh(int gt) {greenThresh = gt; }
 #endif
 
 private:
@@ -127,11 +128,13 @@ private:
     bool debugFieldEdge;
 	bool debugDrawFieldEdge;
 	bool drawCameraHorizon;
+	int greenThresh;
 #else
     static const bool debugHorizon = false;
     static const bool debugFieldEdge = false;
 	static const bool debugDrawFieldEdge = false;
 	static const bool drawCameraHorizon = false;
+	static const int greenThresh = 128;
 #endif
 };
 

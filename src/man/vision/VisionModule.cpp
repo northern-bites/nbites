@@ -128,12 +128,13 @@ VisionModule::~VisionModule()
         delete homography[i];
         delete fieldLines[i];
 		delete debugImage[i];
-		delete debugSpace[i];
+		//delete debugSpace[i];
         delete boxDetector[i];
         delete cornerDetector[i];
         delete centerCircleDetector[i];
         delete ballDetector[i];
     }
+	delete field;
 }
 
     int overrun = 0;
@@ -336,6 +337,7 @@ void VisionModule::run_()
 
     PROF_ENTER(P_OBSTACLE)
     updateObstacleBox();
+
     PROF_EXIT(P_OBSTACLE)
 
     PROF_EXIT(P_VISION);
