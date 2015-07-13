@@ -8,6 +8,8 @@ import nbtool.data.SExpr;
 
 public class ShortBuffer extends Buffer<Short> {
 	
+	public static final int SHORT_BYTES = 2;
+	
 	short[] peaks;
 	short[][] data;
 	
@@ -39,7 +41,7 @@ public class ShortBuffer extends Buffer<Short> {
 		
 		data = new short[channels][frames];
 		peaks = new short[channels];
-		assert(soundLog.bytes.length >= (Short.BYTES * channels * frames));
+		assert(soundLog.bytes.length >= (SHORT_BYTES * channels * frames));
 		
 		ByteBuffer buffer = ByteBuffer.wrap(soundLog.bytes);
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -55,7 +57,7 @@ public class ShortBuffer extends Buffer<Short> {
 
 	@Override
 	public Log toLog() {
-		byte[] internal = new byte[Short.BYTES * channels * frames];
+		byte[] internal = new byte[SHORT_BYTES * channels * frames];
 		ByteBuffer buffer = ByteBuffer.wrap(internal);
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
 		
