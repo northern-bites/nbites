@@ -23,16 +23,16 @@ namespace localization {
 enum class LandmarkID {
     OurRightConcave = 0,
     OurLeftConcave,
-    OurRightConvex,
-    OurLeftConvex,
+    OurRightBox,       // Concave or convex depending on where standing
+    OurLeftBox,        // Concave or convex depending on where standing
     OurRightT,
     OurLeftT,
     MidLeftT,
     MidRightT,
     TheirRightConcave,
     TheirLeftConcave,
-    TheirRightConvex,
-    TheirLeftConvex,
+    TheirRightBox,     // Concave or convex depending on where standing
+    TheirLeftBox,      // Concave or convex depending on where standing
     TheirRightT,
     TheirLeftT,
     BallInSet,

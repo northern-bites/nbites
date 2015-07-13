@@ -5,7 +5,13 @@
 
 #include <boost/python.hpp>
 
+#include <iostream>
+#include <fstream>
+#include <stdio.h>
+
 #include "DebugConfig.h"
+
+using nblog::SExpr;
 
 using namespace boost::python;
 using namespace man::behaviors;
@@ -287,6 +293,99 @@ BOOST_PYTHON_MODULE(noggin_constants)
         .value("BLUE_2", BLUE_2)
         .value("BLUE_3", BLUE_3)
         ;
+
+    get_config_params();
+}
+
+void get_config_params() {
+    std::string filepath = "/home/nao/nbites/Config/behaviorParams.txt";
+
+    if(FILE *file = fopen(filepath.c_str(),"r")) {
+        fclose(file);
+        std::ifstream inputFile(filepath);
+        std::string readInFile((std::istreambuf_iterator<char>(inputFile)),
+                                std::istreambuf_iterator<char>());
+        int i=0;
+        SExpr params = *SExpr::read(readInFile,i);
+
+        // should defenders have a fixed home or dynamic
+        scope().attr("FIXED_D_HOME") = get_defensive_strategy(params);
+        // do we want defenders to play up or back
+        scope().attr("FORWARD_DEFENSE") = get_defender_home(params);
+        // max speed when chasing the ball
+        scope().attr("MAX_SPEED") = get_max_speed(params);
+        // min speed when chasing the ball
+        scope().attr("MIN_SPEED") = get_min_speed(params);
+
+
+    } else {
+        std::cout<<"[ERR] BehaviorParams File Does Not Exist"<<std::endl;
+
+        // default values
+        scope().attr("FIXED_D_HOME") = true;
+        // do we want defenders to play up or back
+        scope().attr("FORWARD_DEFENSE") = false;
+        // max speed when chasing the ball
+        scope().attr("MAX_SPEED") = 0.8f;
+        // min speed when chasing the ball
+        scope().attr("MIN_SPEED") = 0.5f;
+    }
+}
+
+bool get_defensive_strategy(SExpr params) {
+    SExpr *dStrat = params.find("fixed_defender_home")->get(1);
+    bool fixedD = true;
+    
+    if (dStrat) { fixedD = dStrat->valueAsInt()==1 ? true : false; }
+    else { std::cout << "[WARN] Invalid defensive strategy. Default to fixed home positions." << std::endl; }
+    
+    return fixedD;
+}
+
+bool get_defender_home(SExpr params) {
+    SExpr *dPos = params.find("forward_defense")->get(1);
+    bool forwardD = false;
+    
+    if (dPos) { forwardD = dPos->valueAsInt()==1 ? true : false; }
+    else { std::cout << "[WARN] Invalid defense home. Default to back positions." << std::endl; }
+    
+    return forwardD;
+}
+
+float get_max_speed(SExpr params) {
+    SExpr *maxSpeed = params.find("max_speed")->get(1);
+    
+    if (maxSpeed) { 
+        std::string speedString = maxSpeed->value();
+        if (speedString.size() >= 3) {
+            if (speedString.substr(0,3) == "1.0") { return 1.0f; }
+            if (speedString.substr(0,2) == "0." && isdigit(speedString[2])) {
+                int iSpeed = speedString[2] - '0';
+                return iSpeed / 10.f;
+            }
+        }      
+    }
+    
+    std::cout << "[WARN] Invalid max speed. Default to 0.8" << std::endl;
+    return 0.8f;
+}
+
+float get_min_speed(SExpr params) {
+    SExpr *minSpeed = params.find("min_speed")->get(1);
+    
+    if (minSpeed) { 
+        std::string speedString = minSpeed->value();
+        if (speedString.size() >= 3) {
+            if (speedString.substr(0,3) == "1.0") { return 1.0f; }
+            if (speedString.substr(0,2) == "0." && isdigit(speedString[2])) {
+                int iSpeed = speedString[2] - '0';
+                return iSpeed / 10.f;
+            }
+        }      
+    }
+    
+    std::cout << "[WARN] Invalid min speed. Default to 0.5" << std::endl;
+    return 0.5f;
 }
 
 void c_init_noggin_constants() {
