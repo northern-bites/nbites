@@ -5,6 +5,7 @@
 #include "DebugConfig.h"
 #include "../log/logging.h"
 #include "../control/control.h"
+#include "HighResTimer.h"
 #include "nbdebug.h"
 
 using nblog::SExpr;
@@ -124,7 +125,6 @@ void LocalizationModule::update()
 void LocalizationModule::run_()
 {
     PROF_ENTER(P_SELF_LOC);
-
     motionInput.latch();
     visionInput.latch();
 #ifndef OFFLINE
@@ -135,7 +135,6 @@ void LocalizationModule::run_()
 #endif
 
     update();
-
     PROF_EXIT(P_SELF_LOC);
 }
 
