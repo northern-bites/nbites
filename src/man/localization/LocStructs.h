@@ -30,14 +30,14 @@ namespace localization
  */
 struct ParticleFilterParams
 {
-    float fieldHeight;        //! Field height.
-    float fieldWidth;         //! Field width.
-    float numParticles;       //! Size of particle population.
-    float alphaFast;          //! Weight factor for fast exponential weight filter.
-    float alphaSlow;          //! Weight factor for slow exponential weight filter.
-    float odometryXYNoise;    //! Variance for x,y in MotionSystem when updating.
-    float odometryHNoise;     //! Variance for h in MotionSystem when updating.
-    float lostThreshold;      //! Threshold for determining when lost applied to exponential filters
+    float fieldHeight;            //! Field height.
+    float fieldWidth;             //! Field width.
+    float numParticles;           //! Size of particle population.
+    float alphaFast;              //! Weight factor for fast exponential weight filter.
+    float alphaSlow;              //! Weight factor for slow exponential weight filter.
+    float odometryXYNoise;        //! Variance for x,y in MotionSystem when updating.
+    float odometryHNoise;         //! Variance for h in MotionSystem when updating.
+    float learnedSlowExponential; //! Learned slow exponential filter value when localized.
 };
 
 /**
