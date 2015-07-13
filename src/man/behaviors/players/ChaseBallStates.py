@@ -70,24 +70,13 @@ def prepareForKick(player):
             player.shouldKickOff = False
             player.kick = player.decider.kicksBeforeBallIsFree()
         else:
-        #player.shouldKickOff = False
-        #if roleConstants.isDefender(player.role):
-        #    player.kick = player.decider.defender()
-        #else:
-        #    player.kick = player.decider.attacker()
             player.kick = player.decider.decidingStrategy()
         player.inKickingState = True
-
     elif player.finishedPlay:
         player.inKickOffPlay = False
 
-    #  TODO just to be safe since we are only motionkicking now
     player.motionKick = True
-    # only orbit is small orbit
-    relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
-    if fabs(relH) < constants.SHOULD_ORBIT_BEARING:
-        return player.goNow('orbitBall')
-    return player.goNow('followPotentialField')
+    return player.goNow('orbitBall')
 
 @superState('gameControllerResponder')
 @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
@@ -157,7 +146,7 @@ def followPotentialField(player):
 @superState('positionAndKickBall')
 def orbitBall(player):
     """
-    State to orbit the ball
+    State to orbit the ball. Uses a PID controller!
     """
     if player.brain.nav.dodging:
         return player.stay()
@@ -165,84 +154,38 @@ def orbitBall(player):
     # Calculate relative heading every frame
     relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
 
-    # Are we within the acceptable heading range?
+    # Check if within the acceptable heading range
     if (relH > -constants.ORBIT_GOOD_BEARING and
         relH < constants.ORBIT_GOOD_BEARING):
-        print "STOPPED! Because relH is: ", relH
-        #player.stopWalking()
+        print "STOPPED! RelH: ", relH
+
         destinationX = player.kick.destinationX
         destinationY = player.kick.destinationY
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
         player.kick.destinationX = destinationX
         player.kick.destinationY = destinationY
+
         return player.goNow('positionForKick')
 
     if (transitions.orbitTooLong(player) or
         transitions.orbitBallTooFar(player)):
-        #player.stopWalking()
         return player.goLater('approachBall')
 
-    # Set our walk. Nav will make sure that we don't set duplicate speeds.
-    if relH < 0:
-        if relH < -20:
-            player.setWalk(0, 0.7, -0.25)
-        else:
-            player.setWalk(0, 0.5, -0.15)
-    elif relH > 0:
-        if relH > 20:
-            player.setWalk(0, -0.7, 0.25)
-        else:
-            player.setWalk(0, -0.5, 0.15)
+    # Orbit in correct direction at constant speed
+    ySpeed = constants.Y_SPEED
+    if relH < 0: ySpeed = -ySpeed
 
-    # DEBUGGING PRINT OUTS
-    if constants.DEBUG_ORBIT and player.counter%20 == 0:
-        print "desiredHeading is:  | ", player.kick.setupH
-        print "player heading:     | ", player.brain.loc.h
-        print "orbit heading:      | ", relH
-        print "walk is:            |  (",player.brain.nav.getXSpeed(),",",player.brain.nav.getYSpeed(),",",player.brain.nav.getHSpeed(),")"
-        print "==============================="
+    # Calculate corrections in x and h using PID controller 
+    xSpeedCorrect = orbitBall.xController(ball.distance - constants.X_FROM_BALL)
+    hSpeedCorrect = orbitBall.hController(ball.bearing)
 
-    # X correction
-    if (constants.ORBIT_BALL_DISTANCE + constants.ORBIT_DISTANCE_FAR <
-        player.brain.ball.distance): # Too far away
-        player.brain.nav.setXSpeed(.15)
-    elif (constants.ORBIT_BALL_DISTANCE - constants.ORBIT_DISTANCE_CLOSE >
-          player.brain.ball.distance): # Too close
-        player.brain.nav.setXSpeed(-.15)
-    elif (constants.ORBIT_BALL_DISTANCE + constants.ORBIT_DISTANCE_GOOD >
-          player.brain.ball.distance and constants.ORBIT_BALL_DISTANCE -
-          constants.ORBIT_DISTANCE_GOOD < player.brain.ball.distance):
-        player.brain.nav.setXSpeed(0)
-
-    # H correction
-    if relH < 0: # Orbiting clockwise
-        if player.brain.ball.rel_y > 2:
-            player.brain.nav.setHSpeed(0)
-        elif player.brain.ball.rel_y < -2:
-            if relH < -20:
-                player.brain.nav.setHSpeed(-0.35)
-            else:
-                player.brain.nav.setHSpeed(-0.2)
-        else:
-            if relH < -20:
-                player.brain.nav.setHSpeed(-0.25)
-            else:
-                player.brain.nav.setHSpeed(-0.15)
-    else: # Orbiting counter-clockwise
-        if player.brain.ball.rel_y > 2:
-            if relH > 20:
-                player.brain.nav.setHSpeed(0.35)
-            else:
-                player.brain.nav.setHSpeed(0.2)
-        elif player.brain.ball.rel_y < -2:
-            player.brain.nav.setHSpeed(0)
-        else:
-            if relH > 20:
-                player.brain.nav.setHSpeed(0.25)
-            else:
-                player.brain.nav.setHSpeed(0.15)
+    player.setWalk(correctXSpeed, constants.Y_SPEED, correctHSpeed)
 
     return player.stay()
+
+# PID controllers used in orbitBall
+orbitBall.xController = PIDController(0.5, 0.5, 0.5)
+orbitBall.hController = PIDController(0.5, 0.5, 0.5)
 
 @superState('positionAndKickBall')
 def spinToBall(player):
