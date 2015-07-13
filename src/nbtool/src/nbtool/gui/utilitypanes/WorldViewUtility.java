@@ -3,6 +3,7 @@ package nbtool.gui.utilitypanes;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
@@ -78,6 +79,11 @@ public class WorldViewUtility extends UtilityParent {
 					if (index >= 0 && index < robots.length) {
 						robots[tb.dataTeamPacket.getPlayerNumber()-1] = new NaoRobot();
 						robots[tb.dataTeamPacket.getPlayerNumber()-1].wvNao(tb);
+						/* shared ball off for now
+						if(index == 3 || index == 4) {
+							robots[tb.dataTeamPacket.getPlayerNumber()-1].wvSharedBall(tb);
+						} */
+						updateTeamInfo(tb);
 						fieldDisplay.repaint();
 					} else {
 						Logger.warnf("WorldView got packet from correct team with OOB player: %d", 
@@ -96,7 +102,7 @@ public class WorldViewUtility extends UtilityParent {
 					f.drawField(g2, shouldFlip,lineColors);
 					for(int i=0; i<robots.length; i++) {
 						if(robots[i] != null) {
-							robots[i].drawNao(g2, shouldFlip);	
+							robots[i].drawNaoWV(g2, shouldFlip);	
 						}
 					}
 				}
@@ -113,6 +119,7 @@ public class WorldViewUtility extends UtilityParent {
 			flip = new JButton("flip");
 			flip.addActionListener(this);
 			flip.setAlignmentX(Component.LEFT_ALIGNMENT);
+			flip.setEnabled(true);
 			//flip.setBounds((int)FieldConstants.FIELD_GREEN_WIDTH,10,200,25);
 			accessories.add(flip);
 			
@@ -128,11 +135,41 @@ public class WorldViewUtility extends UtilityParent {
 			startWorldView.setAlignmentX(Component.LEFT_ALIGNMENT);
 			//startWorldView.setBounds((int)FieldConstants.FIELD_GREEN_WIDTH,70,200,25);
 			accessories.add(startWorldView);
-
+			
+			JLabel robotStates = new JLabel("Robot States");
+			robotStates.setFont(new Font("Verdana", Font.BOLD, 16));
+			robotStates.setAlignmentX(Component.LEFT_ALIGNMENT);
+			accessories.add(robotStates);
+			
+			for(int i=0; i<5; i++) {
+				if(playerRoles[i] == null) { playerRoles[i] = "Inactive";}
+				teamInfo[i] = new JLabel("Player "+(i+1)+": "+playerRoles[i]);
+				teamInfo[i].setAlignmentX(Component.LEFT_ALIGNMENT);
+				accessories.add(teamInfo[i]);
+			}
+			
 			//accessories.add(Box.createHorizontalStrut(200));
 			accessories.add(Box.createVerticalGlue());
 
 			this.getContentPane().add(accessories, BorderLayout.EAST);
+		}
+		
+		private void updateTeamInfo(TeamBroadcast tb) {
+			int role = tb.dataWorldModel.getRole();
+			int playerNum = tb.dataTeamPacket.getPlayerNumber();
+			switch (role) {
+				case 1:playerRoles[playerNum-1] = "Goalie";
+					break;
+				case 2:playerRoles[playerNum-1] = "Defender #1";
+					break;
+				case 3:playerRoles[playerNum-1] = "Defender #2";
+					break;
+				case 4:playerRoles[playerNum-1] = "Chaser #1";
+					break;
+				case 5:playerRoles[playerNum-1] = "Chaser #2";
+					break;
+			}
+			teamInfo[playerNum-1].setText("Player "+(playerNum)+": "+playerRoles[playerNum-1]);
 		}
 		
 		JPanel fieldDisplay;
@@ -142,7 +179,9 @@ public class WorldViewUtility extends UtilityParent {
 		JPanel accessories;
 		private JButton flip;
 		private JButton startWorldView;
-		private JTextField teamNumberInput;		
+		private JTextField teamNumberInput;
+		private JLabel teamInfo[] = new JLabel[5];
+		private String playerRoles[] = new String[5];
 		
 		private boolean shouldFlip = false;
 		private boolean lineColors = false;

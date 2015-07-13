@@ -47,12 +47,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Initialized for the sake of those who aren't
         self.isKickingOff = False
         # Set home position, box, kickoff vars, etc. based on role number
-        # US Open Hack
-        if self.brain.game:
-            oppTeam = self.brain.game.team(1).team_number
-        else:
-            oppTeam = -1
-        roleConstants.setRoleConstants(self, self.role, oppTeam)
+        roleConstants.setRoleConstants(self, self.role)
 
         self.frameCounter = 0
         self.shouldRelocalizeCounter = 0
@@ -60,6 +55,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.penaltyKicking = False
         # Kickoff kick
         self.shouldKickOff = False
+        self.inKickOffPlay = False
         # To keep track of when we are coming out of penalty
         self.wasPenalized = False
         # Controls whether we check for a falling/fallen robot
@@ -73,6 +69,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Controls whether we use claims
         self.useClaims = True
         self.returningFromPenalty = False
+
         # Trinary flag indicating state of communications
         # 0 -- all field players are online
         # 1 -- one field player is offline
