@@ -67,6 +67,12 @@ namespace man {
 
 			bool findBall(ImageLiteU8 orange, double cameraHeight);
 
+			bool preScreen(int centerX, int centerY, int principalLength,
+						   int principalLength2,
+						   bool & occludedSide, bool & occludedTop,
+						   bool & occludedBottom);
+
+
 			Ball& best() { return _best; }
 
 			// For tool
@@ -80,6 +86,8 @@ namespace man {
 			FieldHomography* homography;
 			Field* field;
 			bool topCamera;
+			int width;
+			int height;
 
 			Ball _best;
 

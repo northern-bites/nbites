@@ -300,6 +300,7 @@ double LineSystem::scoreObservation(const vision::GeoLine& observation,
     
     // Find endpoint error
     // Endpoints of observation should be contained between endpoints of line in map
+    // NOTE endpoints not currently being used
     double ep0Error = std::max(0.0, normalizedCorrespondingLine.ep0() - observation.ep0());
     double ep1Error = std::max(0.0, observation.ep1() - normalizedCorrespondingLine.ep1());
 
@@ -327,7 +328,6 @@ double LineSystem::scoreObservation(const vision::GeoLine& observation,
     }
 
     // Make the conditional independence assumption
-    // NOTE endpoints not currently being used
     return tiltProb * tProb;
 }
 

@@ -2,7 +2,7 @@
 
 echo "RUNnbtool (with build)..."
 
-./BUILDnbtool
+./MAKEnbtool
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 
 ./RUNnbtool-nobuild

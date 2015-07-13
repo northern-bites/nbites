@@ -1,0 +1,13 @@
+#!/bin/bash
+
+echo "Make clean..."
+
+OLD_BIN=$NBITES_DIR/build/nbtool
+
+if [ -d "$OLD_BIN" ]; then
+    echo "Removing old-style nbtool bin..."
+    rm -rv $OLD_BIN
+fi
+
+BIN_BASE=$NBITES_DIR/build/java/
+rm -rv $BIN_BASE

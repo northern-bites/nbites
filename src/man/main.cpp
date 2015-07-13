@@ -21,7 +21,10 @@ void handler(int signal)
         instance->preClose();
         flock(lockFD, LOCK_UN);
         
-        printf("man closing MAN_LOG_PATH...\n");
+        printf("Man closing output streams...\n");
+        fflush(stderr);
+        fflush(stdout);
+        
         fclose(stdout);
         
         delete instance;
@@ -52,9 +55,20 @@ int main() {
     establishLock();
     
     printf("\t\tman 7/%d\n", BOSS_VERSION);
+    
+    //it is somewhat important that we write to the old file descriptors before reopening.
+    //this copies some stdout buffer behavior to the new file description.
     printf("Man re-opening stdout...\n");
-    freopen(MAN_LOG_PATH, "w", stdout);
+    fprintf(stderr, "Man re-opening stderr...\n");
 
+    //Make stdout's fd point to a file description for the manlog file (MAN_LOG_PATH)
+    freopen(MAN_LOG_PATH, "w", stdout);
+    //Send stderr to whatever stdout's fd describes
+    dup2(STDOUT_FILENO, STDERR_FILENO);
+    
+    //fprintf(stderr, "THIS IS A TEST OF STDERR\n");
+    //fprintf(stdout, "THIS IS A TEST OF STDOUT\n");
+    
     // Constructs an instance of man. If we get here we have a lock
     instance = new man::Man();
 

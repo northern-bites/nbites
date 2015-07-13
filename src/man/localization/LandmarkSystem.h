@@ -96,15 +96,14 @@ private:
     // @param observation, the observation from the vision system in robot relative coords
     // @param correspondingLandmark, the corresponding landmark to score observation against
     // @param loc, pose hypothesis used to map the observation to absolute coords
-    // @param onlyBearing, if true, only scores particle based on bearing 
-    //                     between landmark in map and obsvervation
+    // @param wz0, the height of the camera used to find observation
     // @returns the probability of correspondence
     // @note matchCorner, scoreCorner, and scoreBallInSet all call on this 
     //       method to do math involved in landmark scoring
     double scoreObservation(const messages::RobotLocation& observation, 
                             const Landmark& correspondingLandmark,
                             const messages::RobotLocation& loc,
-                            bool onlyBearing = false);
+                            double wz0);
 
     // Helper method
     void addCorner(vision::CornerID type, LandmarkID id, double x, double y);
