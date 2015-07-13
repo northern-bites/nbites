@@ -239,7 +239,7 @@ namespace vision {
 			to_string(blob.secondPrincipalLength()) + "\n";
 		d += "\taspectR is: " + to_string(blob.secondPrincipalLength() /
 										  blob.firstPrincipalLength()) + "\n";
-		d += "\texpect ball to be this many pix: " + to_string(expectedDiam) + "\n";
+		d += "\texpect ball to be this diam: " + to_string(expectedDiam) + "\n";
 		d += "\tdiamRatio: " + to_string(diameterRatio) + "\n";
 		d += "\tdiam Confidence: " + to_string((diameterRatio> radThresh).f()) + "\n";
 		d += "\n\tconfidence is: " + to_string(_confidence) + "\n====================\n";

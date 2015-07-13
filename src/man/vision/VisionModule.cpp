@@ -128,12 +128,13 @@ VisionModule::~VisionModule()
         delete homography[i];
         delete fieldLines[i];
 		delete debugImage[i];
-		delete debugSpace[i];
+		//delete debugSpace[i];
         delete boxDetector[i];
         delete cornerDetector[i];
         delete centerCircleDetector[i];
         delete ballDetector[i];
     }
+	delete field;
 }
 
 // TODO use horizon on top image
