@@ -212,7 +212,7 @@ string Corner::print() const
 
 GoalboxDetector::GoalboxDetector()
   : std::pair<FieldLine*, FieldLine*>(NULL, NULL), 
-    parallelThreshold_(15), seperationThreshold_(20), lengthThreshold_(70)
+    parallelThreshold_(15), seperationThreshold_(20), lengthThreshold_(0)
 {}
 
 bool GoalboxDetector::find(FieldLineList& list)
@@ -297,11 +297,11 @@ CornerDetector::CornerDetector(int width_, int height_)
   : width(width_), 
     height(height_), 
     orthogonalThreshold_(40), 
-    intersectThreshold_(10), 
-    closeThreshold_(30), 
-    farThreshold_(50), 
-    edgeImageThreshold_(0.25),
-    lengthThreshold_(0) // NOTE zero means that the condition is not currently being used
+    intersectThreshold_(15), 
+    closeThreshold_(15),
+    farThreshold_(15), 
+    edgeImageThreshold_(0.1),
+    lengthThreshold_(0)  // NOTE zero means that the condition is not currently being used
 {}
 
 void CornerDetector::findCorners(FieldLineList& list)
@@ -321,38 +321,42 @@ void CornerDetector::findCorners(FieldLineList& list)
 
       // Find corners
       // NOTE since there are two hough lines in each field line, we require
-      //      finding (1) at least one intersecting set of hough lines and 
-      //      (2) the same corner ID in all pairings of hough lines
-      bool foundCorner = isCorner(line1[0], line2[0]);
-      CornerID firstId = classify(line1[0], line2[0]);
-      bool sameId = true;
-      for (int k = 0; k < 2; k++) {
-        for (int l = 0; l < 2; l++) {
-          if (k == 0 && l == 0) continue;
-          foundCorner = foundCorner || isCorner(line1[k], line2[l]);
-          CornerID newId = classify(line1[k], line2[l]);
-          if (firstId != newId)
-            sameId = false;
-        }
+      //      finding valid corners with same id in at least two pairings 
+      //      of hough lines
+      std::vector<CornerID> ids;
+      if (isCorner(line1[0], line2[0]))
+          ids.push_back(classify(line1[0], line2[0]));
+      if (isCorner(line1[0], line2[1]))
+          ids.push_back(classify(line1[0], line2[1]));
+      if (isCorner(line1[1], line2[0]))
+          ids.push_back(classify(line1[1], line2[0]));
+      if (isCorner(line1[1], line2[1]))
+          ids.push_back(classify(line1[1], line2[1]));
+
+      CornerID id = CornerID::None;
+      for (int i = 0; i < ids.size(); i++) {
+          for (int j = 0; j < ids.size(); j++) {
+              if (i == j) continue;
+              if (ids[i] != CornerID::None && ids[i] == ids[j])
+                  id = ids[i];
+          }
       }
 
       // NOTE TFirst and TSecond are temporarily used to specify whether corner.first
-      //      or corner.second is the top of the T corner. If TFirst, then corner.first
-      //      is the vertical part of the T, otherwise, corner.second is 
-      //      vertical part of the T. Before the corner detector finishes 
+      //      or corner.second is the top of the T corner. Before the corner detector finishes 
       //      finding corners, all references to TFirst and TSecond are replaced 
       //      with T and the corner.first is the vertical part of the T. This happens 
       //      below. Thus the client is not aware of TFirst and TSecond.
 
       // Create corner object and add to field lines
-      if (sameId && foundCorner && firstId != CornerID::None) {
+      if (id != CornerID::None) {
         Corner newCorner;
-        if (firstId == CornerID::TSecond)
+        if (id == CornerID::TSecond)
           newCorner = Corner(&line2, &line1, CornerID::T);
-        else if (firstId == CornerID::TFirst)
+        else if (id == CornerID::TFirst)
           newCorner = Corner(&line1, &line2, CornerID::T);
         else
-          newCorner = Corner(&line1, &line2, firstId);
+          newCorner = Corner(&line1, &line2, id);
         line1.addCorner(newCorner);
         line2.addCorner(newCorner);
         this->push_back(newCorner);
@@ -380,12 +384,14 @@ bool CornerDetector::isCorner(const HoughLine& line1, const HoughLine& line2) co
 
   // (2) If intersection is in edge of image, don't classify corner
   double xThreshold = (width / 2) - (width * edgeImageThreshold());
-  double yThreshold = (height / 2) - (height * edgeImageThreshold());
+  double yThresholdBottom = (height / 2) - (height * edgeImageThreshold());
+  double yThresholdTop = (height / 2) - (height * 0.5*edgeImageThreshold());
+  // NOTE in top of image, no classify buffer is half the size
 
   bool farEnoughFromImageEdge = (imageIntersectX >= -xThreshold &&
                                  imageIntersectX <=  xThreshold &&
-                                 imageIntersectY >= -yThreshold &&
-                                 imageIntersectY <=  yThreshold);
+                                 imageIntersectY >= -yThresholdBottom &&
+                                 imageIntersectY <=  yThresholdTop);
 
   // (3) Check that lines are close to orthogonal
   // NOTE done in world coords
@@ -418,6 +424,20 @@ CornerID CornerDetector::classify(const HoughLine& line1, const HoughLine& line2
   if (!intersects) return CornerID::None; 
   // NOTE should never happen since checked above in image coords
 
+  // (1) Check for T corner
+  // Project intersection point onto lines
+  double whereOnField1 = field1.qDist(worldIntersectX, worldIntersectY);
+  double whereOnField2 = field2.qDist(worldIntersectX, worldIntersectY);
+
+  // If intersection point is between line's endpoints, found T
+  if (whereOnField1 > field1.ep0() + farThreshold() && 
+      whereOnField1 < field1.ep1() - farThreshold())
+    return CornerID::TFirst;
+  else if (whereOnField2 > field2.ep0() + farThreshold() && 
+           whereOnField2 < field2.ep1() - farThreshold())
+    return CornerID::TSecond;
+
+  // (2) Check for convave or convex corner
   // Find endpoints
   double field1EndX[2];
   double field1EndY[2];
@@ -448,17 +468,6 @@ CornerID CornerDetector::classify(const HoughLine& line1, const HoughLine& line2
           return CornerID::Concave;
         return CornerID::Convex;
       }
-    }
-  }
-  // Find and classify t corners
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 2; j++) {
-      // Found t
-      // TODO for T corners, both endpoints outside of far threshold?
-      if ((dist1[i] < closeThreshold() && dist2[j] >= farThreshold()))
-        return CornerID::TSecond;
-      else if (dist2[j] < closeThreshold() && dist1[i] >= farThreshold())
-        return CornerID::TFirst;
     }
   }
 
@@ -696,7 +705,7 @@ void FieldLineList::find(HoughLineList& houghLines, bool blackStar)
           // other, which makes the sum of r's negative. A pair of nearly parallel
           // lines with the right separation but with polarities pointing away from
           // each other is not a field line. 
-          double separation = fabs(hl1->field().r() + hl2->field().r());
+          double separation = fabs(hl1->field().separation(hl2->field()));
           if (correctPolarity && separation <= maxLineSeparation())
           {
             int index = size();
@@ -756,7 +765,7 @@ void FieldLineList::classify(GoalboxDetector& boxDetector,
     }
 
     // Set midline and adjust CC, or discard CC if no close line
-    if (fabs(minDist) < 30) {
+    if (fabs(minDist) < 40) {
       midline->id(LineID::Midline);
       midlineFound = true;
       circleDetector.adjustCC(-minDist * cos(midHoughInner->field().t()),
@@ -780,7 +789,7 @@ void FieldLineList::classify(GoalboxDetector& boxDetector,
   //
   // So the current strategy is to just classify lines via the goalbox detector,
   // the circle detector, and the corner loop below the commented out code. This
-  // is plenty sufficient for good localization accuracy, but in the future it
+  // is imo sufficient for good localization accuracy, but in the future it
   // would be better to get the code commented out below tested and running.
   //
   // - Josh
