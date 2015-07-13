@@ -1,7 +1,7 @@
 import time
 
 class PIDController:
-    def __init__(proportional, integral, derivative):
+    def __init__(self, proportional, integral, derivative):
         # PID control parameters
         self.proportionalGain = proportional
         self.integralGain = integral
@@ -11,7 +11,7 @@ class PIDController:
         self.lastTime = time.clock()
         self.integral = 0
 
-    def correct(error):
+    def correct(self, error):
         # Time
         newTime = time.clock()
         deltaTime = newTime - self.lastTime
@@ -30,6 +30,6 @@ class PIDController:
         # Combine and return correction
         return proportionalTerm + integralTerm + derivativeTerm
 
-    def reset():
+    def reset(self):
         self.lastTime = time.clock()
         self.integral = 0

@@ -6,6 +6,7 @@ import ChaseBallConstants as constants
 import RoleConstants as roleConstants
 import PlayOffBallTransitions as playOffTransitions
 from ..navigator import Navigator
+from ..navigator import PID
 from ..kickDecider import KickDecider
 from ..kickDecider import kicks
 from noggin_constants import MAX_SPEED, MIN_SPEED 
@@ -148,6 +149,10 @@ def orbitBall(player):
     """
     State to orbit the ball. Uses a PID controller!
     """
+    if player.firstFrame():
+        orbitBall.xController.reset()
+        orbitBall.hController.reset()
+
     if player.brain.nav.dodging:
         return player.stay()
 
@@ -176,16 +181,16 @@ def orbitBall(player):
     if relH < 0: ySpeed = -ySpeed
 
     # Calculate corrections in x and h using PID controller 
-    xSpeedCorrect = orbitBall.xController(ball.distance - constants.X_FROM_BALL)
-    hSpeedCorrect = orbitBall.hController(ball.bearing)
+    xSpeedCorrect = orbitBall.xController.correct(player.brain.ball.distance - constants.X_FROM_BALL)
+    hSpeedCorrect = orbitBall.hController.correct(player.brain.ball.bearing)
 
     player.setWalk(correctXSpeed, constants.Y_SPEED, correctHSpeed)
 
     return player.stay()
 
 # PID controllers used in orbitBall
-orbitBall.xController = PIDController(0.5, 0.5, 0.5)
-orbitBall.hController = PIDController(0.5, 0.5, 0.5)
+orbitBall.xController = PID.PIDController(0.5, 0.5, 0.0)
+orbitBall.hController = PID.PIDController(0.5, 0.5, 0.0)
 
 @superState('positionAndKickBall')
 def spinToBall(player):
