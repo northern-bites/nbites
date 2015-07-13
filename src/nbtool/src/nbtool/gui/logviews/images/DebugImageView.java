@@ -94,6 +94,7 @@ public class DebugImageView extends ViewParent
     DebugImage debugImage;                  // drawing overlay
 	BufferedImage debugImageDisplay;        // overlay + original
 	BufferedImage displayImages[] = new BufferedImage[ORIGINAL+1]; // our images
+	Y8ThreshImage greenCheck;
 
 	Log currentLog;
 	Log balls;
@@ -224,7 +225,7 @@ public class DebugImageView extends ViewParent
 			g.drawImage(displayImages[currentBottom], 0, displayh + 5, displayw,
 						displayh, null);
 			viewList.setBounds(0, displayh * 2 + 10, displayw / 2, BOX_HEIGHT);
-			greenThreshold.setBounds(0, displayh*2 + 15 + BOX_HEIGHT, displayw, BOX_HEIGHT);
+			greenThreshold.setBounds(0, displayh*2 + 15 + BOX_HEIGHT, displayw, BOX_HEIGHT+20);
 			persistant.setBounds(displayw+10, 0, 400, 300);
         }
     }
@@ -413,6 +414,11 @@ public class DebugImageView extends ViewParent
 		if (!source.getValueIsAdjusting()) {
 			thresh = (int)source.getValue();
 			System.out.println("New value is "+thresh);
+			greenCheck.setThresh(thresh);
+			displayImages[THRESH] = greenCheck.toBufferedImage();
+			if (currentBottom == THRESH) {
+				repaint();
+			}
 		}
 		//parent.adjustParams();
 		//parent.repaint();
@@ -535,7 +541,7 @@ public class DebugImageView extends ViewParent
 		if (out.length > GREEN_IMAGE) {
             Y8image green8 = new Y8image(width, height, out[GREEN_IMAGE].bytes);
             displayImages[GREEN_IMAGE] = green8.toBufferedImage();
-			Y8ThreshImage greenCheck = new Y8ThreshImage(width, height, out[GREEN_IMAGE].bytes);
+			greenCheck = new Y8ThreshImage(width, height, out[GREEN_IMAGE].bytes);
 			greenCheck.setThresh(thresh);
 			displayImages[THRESH] = greenCheck.toBufferedImage();
         }
