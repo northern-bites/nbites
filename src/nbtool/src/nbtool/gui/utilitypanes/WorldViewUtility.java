@@ -9,6 +9,10 @@ import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.Vector;
 
 import javax.swing.Box;
@@ -30,15 +34,42 @@ import nbtool.util.Logger;
 
 public class WorldViewUtility extends UtilityParent {
 	
-	private class WorldView extends JFrame implements TeamBroadcastListener, ActionListener
+	private class WorldView extends JFrame implements TeamBroadcastListener, ActionListener, ComponentListener
 	{
-		private TeamBroadcastInstance broadcastListener;
+		private TeamBroadcastInstance broadcastListener = null;
+		
+		@Override
+		public void componentResized(ComponentEvent e) {}
+
+		@Override
+		public void componentMoved(ComponentEvent e) {}
+
+		@Override
+		public void componentShown(ComponentEvent e) {
+			if (broadcastListener != null) {
+				return;
+			} else {
+				Logger.println("WorldView creating broadcast listener...");
+				broadcastListener = BroadcastIO.createTBI(this);
+			}
+		}
+
+		@Override
+		public void componentHidden(ComponentEvent e) {
+			if (broadcastListener == null) {
+				return;
+			} else {
+				Logger.println("WorldView stopping broadcast listener...");
+				broadcastListener.kill();
+				broadcastListener = null;
+			}
+		}
 		
 		protected WorldView() {
 			super();
-			Logger.println("WorldView creating broadcast listener...");
-			this.broadcastListener = BroadcastIO.createTBI(this);
 			
+			addComponentListener(this);
+
 			this.setTitle("WorldView");
 			//default, usually overridden later.
 			this.setSize((int) FieldConstants.FIELD_WIDTH + 150, (int) FieldConstants.FIELD_HEIGHT + 50);
@@ -46,6 +77,7 @@ public class WorldViewUtility extends UtilityParent {
 			
 			initiateTools();
 			initiateFieldAndPlayers();
+			
 		}
 
 		@Override
