@@ -48,7 +48,7 @@ static const ParticleFilterParams DEFAULT_PARAMS =
     0.01f,                      // Exponential filter slow
     0.5f,                       // Variance in x-y odometry
     0.008f,                     // Variance in h odometry
-    0.05f                       // Learned slow exponential filter value
+    5.0f                        // Learned slow exponential filter value
 #else
     FIELD_GREEN_HEIGHT,         // Field height
     FIELD_GREEN_WIDTH,          // Field width
@@ -57,7 +57,7 @@ static const ParticleFilterParams DEFAULT_PARAMS =
     0.01f,                      // Exponential filter slow
     0.5f,                       // Variance in x-y odometry
     0.012f,                     // Variance in h odometry
-    0.05f                       // Learned slow exponential filter value
+    5.0f                        // Learned slow exponential filter value
 #endif
 };
 
