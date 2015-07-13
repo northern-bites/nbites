@@ -1,4 +1,4 @@
-package nbtool.gui.logviews.loc;
+package nbtool.gui.field;
 
 public class FieldConstants
 {
