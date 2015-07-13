@@ -519,6 +519,8 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
 		field->setDebugFieldEdge(debugField);
 		ballDetector[0]->setDebugBall(debugBall);
 		ballDetector[1]->setDebugBall(debugBall);
+		debugImage[0]->reset();
+		debugImage[1]->reset();
 	}
 #endif
 

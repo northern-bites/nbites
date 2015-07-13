@@ -134,7 +134,7 @@ private:
     static const bool debugFieldEdge = false;
 	static const bool debugDrawFieldEdge = false;
 	static const bool drawCameraHorizon = false;
-	static const int greenThresh = 128;
+	static const int greenThresh = 196;
 #endif
 };
 
