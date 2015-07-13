@@ -39,10 +39,10 @@ def safelyPlaced(player):
         and math.fabs(dist - constants.EXPECTED_CORNER_DIST_FROM_CENTER) < constants.CORNER_DISTANCE_THRESH):
             if (math.fabs(bearing - constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER) < constants.CORNER_BEARING_THRESH):
                 goodLeftCornerObservation += 1
-                print("Found a good left corner!")
+                # print("Found a good left corner!")
             elif (math.fabs(bearing - constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER) < constants.CORNER_BEARING_THRESH):
                 goodRightCornerObservation += 1
-                print("Found a good right corner!")
+                # print("Found a good right corner!")
 
     if goodLeftCornerObservation > 5:
         player.goodLeftCornerObservation = True
@@ -554,38 +554,59 @@ def facingASideline(player):
 def getLineLength(line):
     return line.ep1 - line.ep0
 
-def shouldPositionRight(player):
-    if player.brain.ball.bearing_deg < -50.0 and \
-    player.brain.ball.distance > constants.CLEARIT_DIST_SIDE and \
-    player.inPosition is not constants.CENTER_POSITION:
-        GoalieStates.shiftPosition.dest = constants.RIGHT_SHIFT
-        print("Bearing: ", player.brain.ball.bearing_deg)
-        return True
+def adjustPosition(player):
 
-    elif player.brain.ball.bearing_deg < -30.0 and \
-    player.brain.ball.distance > constants.CLEARIT_DIST_SIDE and \
-    player.inPosition is constants.LEFT_POSITION:
+    if player.brain.ball.vis.frames_off > 60 and player.inPosition is not constants.HOME_POSITION:
+        # print("can't see the ball, I'm returning to home position")
         GoalieStates.shiftPosition.dest = constants.HOME_POSITION
-        print("Bearing: ", player.brain.ball.bearing_deg)
-
-    return False
-
-def shouldPositionLeft(player):
-    if player.brain.ball.bearing_deg > 50.0 and \
-    player.brain.ball.distance > constants.CLEARIT_DIST_SIDE and \
-    player.inPosition is constants.CENTER_POSITION:
-        GoalieStates.shiftPosition.dest = constants.LEFT_SHIFT
-        print("Bearing: ", player.brain.ball.bearing_deg)
         return True
 
-    elif player.brain.ball.bearing_deg > 30.0 and \
-    player.brain.ball.distance > constants.CLEARIT_DIST_SIDE and \
-    player.inPosition is constants.RIGHT_POSITION:
-        GoalieStates.shiftPosition.dest = constants.HOME_POSITION
-        print("Bearing: ", player.brain.ball.bearing_deg)
+    if (player.brain.ball.vis.frames_on < 15
+        or player.brain.ball.distance < constants.CLEARIT_DIST_FRONT
+        or player.brain.ball.distance > 400):
+        return False
+    position = getPositionFromBall(player)
+
+    if position == player.inPosition:
+        print("I'm already in position!")
+        return False
+
+    else:
+        GoalieStates.shiftPosition.dest = position
+        print("I should shift my position")
         return True
 
-    return False
+def getPositionFromBall(player):
+    ball = player.brain.ball
+    ball_x = ball.x
+    ball_y = ball.y
+
+    y = ball_y - field.MIDFIELD_Y
+    x = ball_x - field.FIELD_WHITE_LEFT_SIDELINE_X
+
+    bearing_from_center = math.degrees(math.atan(y/x))
+    # print("I think the ball's bearing from the center is:", bearing_from_center)
+
+    if (math.fabs(bearing_from_center) < 25.0):
+        # print "HOME"
+        return constants.HOME_POSITION
+
+    elif bearing_from_center > 50.0:
+        # print "FAR_LEFT"
+        return constants.FAR_LEFT_POSITION
+
+    elif bearing_from_center > 25.0:
+        # print "LEFT"
+        return constants.LEFT_POSITION
+
+    elif bearing_from_center < -50.0:
+        # print "FAR_RIGHT"
+        return constants.FAR_RIGHT_POSITION
+
+    else: # bearing_from_center < -25.0:
+        # print "RIGHT"
+        return constants.RIGHT_POSITION
+
 
 def shouldStopTurning(player):
     lines = player.brain.visionLines
@@ -651,7 +672,7 @@ def facingBall(player):
     # return (math.fabs(player.brain.ball.bearing_deg) < 10.0 and
     return ((player.brain.nav.currentState == 'standing' and \
                     player.brain.ball.vis.on) \
-            or (math.fabs(player.brain.ball.bearing_deg) < 15.0))
+            or (math.fabs(player.brain.ball.bearing_deg) < 9.0))
 
 def goodToBookIt(player):
     vision = player.brain.interface.visionField
@@ -696,22 +717,31 @@ def veryFastBall(player, y_lower_bound, y_upper_bound):
     # if nball.yintercept == 0.0:
     #     print("[SAVING] No yintercept")
 
-    if (ball.distance < 175.0 and
-        ball.mov_vel_x < -14.0 and
-        nball.x_vel < -14.0 and
+    if (ball.distance < 165.0 and
+        ball.mov_vel_x < -16.0 and
+        nball.x_vel < -26.0 and
         nball.yintercept != 0.0 and
         nball.yintercept < y_upper_bound and
         nball.yintercept > y_lower_bound):
         print("[SAVING] Fast ball first check true")
         return True
 
-    elif (ball.distance < 200.0 and
-        ball.mov_vel_x < -19.0 and
+    elif (ball.distance < 180.0 and
+        ball.mov_vel_x < -20.0 and
         nball.x_vel < -30.0 and
         nball.yintercept != 0.0 and
         nball.yintercept < y_upper_bound and
         nball.yintercept > y_lower_bound):
         print("[SAVING] Fast ball second check true")
+        return True
+
+    elif (ball.distance < 200.0 and
+        ball.mov_vel_x < -40.0 and
+        nball.x_vel < -50.0 and
+        nball.yintercept != 0.0 and
+        nball.yintercept < y_upper_bound and
+        nball.yintercept > y_lower_bound):
+        print("[SAVING] Fast ball third check true")
         return True
 
     return False
@@ -723,6 +753,8 @@ def shouldDiveRight(player):
     sightOk = True
     ball = player.brain.ball
     nball = player.brain.naiveBall
+    if player.inPosition == constants.FAR_RIGHT_POSITION:
+        return False
 
     if shouldDiveRight.lastFramesOff > 20 and ball.vis.frames_on < 20:
         sightOk = False
@@ -784,6 +816,9 @@ def shouldDiveLeft(player):
     if player.firstFrame():
         shouldDiveLeft.lastFramesOff = 21
 
+    if player.inPosition == constants.FAR_LEFT_POSITION:
+        return False
+
     sightOk = True
     ball = player.brain.ball
     nball = player.brain.naiveBall
@@ -831,6 +866,35 @@ def shouldDiveLeft(player):
     #         ball.rel_y_intersect_dest > 20.0 and
     #         ball.distance < 150.0 and
     #         sightOk)
+
+def adjustSave(player):
+    # No y intercept checks
+    if player.firstFrame():
+        shouldSquat.lastFramesOff = 21
+
+    sightOk = True
+    ball = player.brain.ball
+    nball = player.brain.naiveBall
+
+    save = (nball.x_vel < -10.0 and
+        ball.mov_vel_x < constants.SAVE_X_VEL and
+        not nball.stationary and
+        # abs(nball.yintercept) < 25.0 and
+        nball.yintercept != 0.0 and
+        ball.distance < constants.SAVE_DIST and
+        sightOk)
+
+    if save:
+        print ("Should adjust save!!")
+        print "SQUAT"
+        print("yintercept:", nball.yintercept)
+        print("Ball dist:", ball.distance)
+        print("shouldDiveRight.lastFramesOff:", shouldSquat.lastFramesOff)
+        print("ball.vis.frames_on", ball.vis.frames_on)
+        print("nb xvel:", nball.x_vel)
+        print("ball mov vel:", ball.mov_vel_x)
+
+    return save
 
 def shouldSquat(player):
     if player.firstFrame():
@@ -963,7 +1027,9 @@ def shouldClearBall(player):
     shouldGo = False
 
     # if definitely within good chasing area
-    if (player.brain.ball.distance < constants.CLEARIT_DIST_FRONT):
+    if (player.brain.ball.distance < constants.CLEARIT_DIST_FRONT
+        and player.inPosition is not constants.FAR_RIGHT_POSITION
+        and player.inPosition is not constants.FAR_LEFT_POSITION):
         walkedTooFar.xThresh = constants.CLEARIT_DIST_FRONT + 10.0
         walkedTooFar.yThresh = constants.CLEARIT_DIST_FRONT + 10.0
         shouldGo = True
@@ -973,6 +1039,13 @@ def shouldClearBall(player):
         player.brain.ball.distance < constants.CLEARIT_DIST_SIDE):
         walkedTooFar.xThresh = constants.CLEARIT_DIST_SIDE + 10.0
         walkedTooFar.yThresh = constants.CLEARIT_DIST_SIDE + 10.0
+        shouldGo = True
+
+    if (player.brain.ball.distance < 70.0
+        and (player.inPosition is constants.FAR_RIGHT_POSITION
+        or player.inPosition is constants.FAR_LEFT_POSITION)):
+        walkedTooFar.xThresh = 90.0
+        walkedTooFar.yThresh = 90.0
         shouldGo = True
 
     if shouldGo:
@@ -1007,7 +1080,7 @@ def ballMovedStopChasing(player):
     stop chasing.
     """
     return (player.brain.ball.distance > 50.0 and
-            player.counter > 175.0)
+            player.counter > 200.0)
 
 def ballReadyToKick(player, kickPose):
     if not player.brain.ball.vis.on:

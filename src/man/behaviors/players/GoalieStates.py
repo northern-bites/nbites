@@ -101,10 +101,10 @@ def gamePlaying(player):
         # return player.goLater('watch')
         # #TODO fix this
         # player.justKicked = False
-        if fallen.lastState == 'clearIt' and player.brain.ball.vis.on\
+        if fallen.lastState == 'clearBall' and player.brain.ball.vis.on\
         and math.fabs(player.brain.ball.bearing_deg) < 25.0 and player.brain.ball.distance < 90:
             print "I was already going to clear it!"
-            return player.goLater('clearIt')
+            return player.goLater('clearBall')
         elif fallen.lastState == 'spinBack' or fallen.lastState == 'didIKickIt'\
         or fallen.lastState == 'kickBall' or fallen.lastState == 'repositionAfterWhiff':
             print("I was just in either spinback or didIKickIt, meaning I'm away frm the goalbox likely")
@@ -112,7 +112,7 @@ def gamePlaying(player):
         elif fallen.lastState == 'returnUsingLoc':
             return player.goLater('returnUsingLoc')
         else:
-            return player.goLater('watchWithLineChecks')
+            return player.goLater('checkSafePlacement')
 
     #TODO before game/scrimmage change this to watch;
     # this is better for testing purposes!
@@ -267,6 +267,16 @@ def spinToHorizon(player):
     return Transition.getNextState(player, spinToHorizon)
 
 @superState('gameControllerResponder')
+def arcMove(player):
+    if player.firstFrame():
+        dest = constants.HOME_POSITION
+        player.brain.nav.goTo(dest,
+                            speed = nav.BRISK_SPEED)
+        print("I'm trying to position on an arc!")
+        player.brain.tracker.trackBall()
+
+
+@superState('gameControllerResponder')
 def returnUsingLoc(player):
     if player.firstFrame():
         dest = constants.HOME_POSITION
@@ -323,32 +333,50 @@ spinBack.toAngle = 0.0
 def shiftPosition(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        if (shiftPosition.dest == constants.RIGHT_SHIFT
-        and player.inPosition == constants.LEFT_POSITION):
-            player.inPosition = constants.CENTER_POSITION
-            print("[GOALIE POSITION] I think I'm in the center now, I moved right")
-        elif (shiftPosition.dest == constants.RIGHT_SHIFT
-        and player.inPosition == constants.CENTER_POSITION):
-            player.inPosition = constants.RIGHT_POSITION
-            print("[GOALIE POSITION] I think I'm on the right now, I moved right")
-        elif (shiftPosition.dest == constants.LEFT_SHIFT
-        and player.inPosition == constants.CENTER_POSITION):
-            player.inPosition = constants.LEFT_POSITION
-            print("[GOALIE POSITION] I think I'm on the left now, I moved left")
-        elif (shiftPosition.dest == constants.LEFT_SHIFT
-        and player.inPosition == constants.RIGHT_POSITION):
-            player.inPosition = constants.CENTER_POSITION
-            print("[GOALIE POSITION] I think I'm in the center now, I moved left")
+        player.inPosition = shiftPosition.dest
+        print("H:", shiftPosition.dest.h)
 
-        # player.brain.nav.walkTo(shiftPosition.dest, speed = nav.QUICK_SPEED)
-        player.brain.nav.goTo(dest,
-                            speed = nav.BRISK_SPEED)
 
-    if player.counter > 200:
+        # player.brain.nav.walkTo(constants.LEFT_SHIFT, speed = nav.FAST_SPEED)
+
+        player.brain.nav.goTo(shiftPosition.dest,
+                            speed = nav.BRISK_SPEED,
+                            fast = False)
+
+    if player.counter > 300:
         print "Took too long"
-        return player.goLater('watch')
+        return player.goLater('faceBall')
+
+    # shiftPosition.dest.relH = player.brain.ball.bearing_deg
+    # dest = player.brain.nav.destination
 
     return Transition.getNextState(player, shiftPosition)
+
+shiftPosition.destb = constants.HOME_POSITION
+
+@superState('gameControllerResponder')
+def faceBall(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        print("ball at ", player.brain.ball.bearing_deg)
+        facingDest = RelRobotLocation(0.0, 0.0, 0.0)
+
+        facingDest.relH = player.brain.ball.bearing_deg
+        if player.inPosition == constants.FAR_LEFT_POSITION:
+            facingDest.relH += 10.0
+        player.brain.nav.walkTo(facingDest, speed = nav.FAST_SPEED)
+
+        # if player.brain.ball.bearing_deg < 0:
+        #     player.brain.nav.setWalk(0,0,-15)
+        # else:
+        #     player.brain.nav.setWalk(0,0,15)
+
+        # if player.counter < 30:
+    if player.counter > 300 or player.brain.ball.vis.frames_off > 10:
+        return player.goLater('watch')
+
+
+    return Transition.getNextState(player, faceBall)
 
 @superState('gameControllerResponder')
 def recoverMyself(player):
@@ -362,23 +390,28 @@ def recoverMyself(player):
 @superState('gameControllerResponder')
 def watch(player):
     if player.firstFrame():
-        # player.brain.tracker.trackBall()
-        player.brain.tracker.repeatBasicPan()
+        player.brain.tracker.trackBall()
+        # player.brain.tracker.repeatBasicPan()
         player.brain.nav.stand()
         player.returningFromPenalty = False
-        if player.lastState is not 'shiftPosition':
-            player.inPosition = constants.CENTER_POSITION
+        if (player.lastState is not 'shiftPosition'
+            and player.lastState is not 'faceBall'):
+            player.inPosition = constants.HOME_POSITION
         print ("I'm moving to watch! I think I'm in the right position")
         # player.brain.tracker.lookToAngle(0)
 
 
 #TestingChange
-    # if player.counter % 2 == 0:
-    #     print("Horizon dist == ", player.brain.vision.horizon_dist)
+    # if player.counter % 10 == 0:
+    # #     print("Horizon dist == ", player.brain.vision.horizon_dist)
 
     #     ball = player.brain.ball
     #     nball = player.brain.naiveBall
 
+    #     print("Ball bearing:", ball.bearing_deg)
+    #     print("Ball x:", ball.x)
+    #     print("Ball y:", ball.y)
+    #     print("Ball dist:", ball.distance)
     #     print("Ball dist:", ball.distance)
     #     print("ball.vis.frames_on", ball.vis.frames_on)
     #     print("nb xvel:", nball.x_vel)
@@ -387,9 +420,9 @@ def watch(player):
     #     print("ball mov speed:", ball.mov_speed)
     #     print("stationary: ", nball.stationary)
     #     print("yintercept", nball.yintercept)
-    #     print("1", nball.x_v_1)
-    #     print("2", nball.x_v_2)
-    #     print("3", nball.x_v_3)
+    # #     print("1", nball.x_v_1)
+    # #     print("2", nball.x_v_2)
+    # #     print("3", nball.x_v_3)
     #     print"- - -  -- - -- --- ---    - --"
 
     # return player.stay()

@@ -169,7 +169,7 @@ def checkSafePlacement(player):
     if player.brain.tracker.isStopped():
         checkSafePlacement.looking = False
 
-    if player.counter > 150:
+    if player.counter > 160:
         print("Took too long, assume wrong")
         return player.goLater('watchWithLineChecks')
 

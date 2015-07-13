@@ -4,7 +4,7 @@
 #
 
 import noggin_constants as constants
-from objects import RelRobotLocation, RobotLocation
+from objects import RelRobotLocation, RobotLocation, Location
 from math import atan2, degrees
 
 RIGHT = 0
@@ -66,15 +66,40 @@ BALL_X_OFFSET = 2
 BALL_Y_OFFSET = 2
 GOOD_ENOUGH_H = 6
 
-HOME_POSITION = RobotLocation(constants.FIELD_WHITE_LEFT_SIDELINE_X + 10.0,
+HOME = 0
+LEFT = 1
+FAR_LEFT = 2
+RIGHT = -1
+FAR_RIGHT = -2
+
+HOME_POSITION = RobotLocation(constants.FIELD_WHITE_LEFT_SIDELINE_X + 15.0,
                         constants.MIDFIELD_Y,
                         0.0)
-# LEFT_SHIFT = RelRobotLocation(5.0, 30.0, 0.0)
-# RIGHT_SHIFT = RelRobotLocation(5.0, -30.0, 0.0)
 
-LEFT_SHIFT = RobotLocation(HOME_POSITION.x,
+LEFT_POSITION = RobotLocation(constants.FIELD_WHITE_LEFT_SIDELINE_X + 10.0,
 						HOME_POSITION.y + 35,
-						15)
-RIGHT_SHIFT = RobotLocation(HOME_POSITION.x,
+						0.0)
+
+FAR_LEFT_POSITION = RobotLocation(constants.FIELD_WHITE_LEFT_SIDELINE_X + 17.0,
+						HOME_POSITION.y + 65,
+						0.0)
+
+RIGHT_POSITION = RobotLocation(constants.FIELD_WHITE_LEFT_SIDELINE_X + 10.0,
 						HOME_POSITION.y - 35,
-						-15)
+						0.0)
+
+FAR_RIGHT_POSITION = RobotLocation(constants.FIELD_WHITE_LEFT_SIDELINE_X + 17.0,
+						HOME_POSITION.y - 65,
+						0.0)
+
+
+
+LEFT_SHIFT = RelRobotLocation(5.0, 30.0, 0.0)
+RIGHT_SHIFT = RelRobotLocation(5.0, -30.0, 0.0)
+
+# LEFT_SHIFT = RobotLocation(HOME_POSITION.x + 10,
+# 						HOME_POSITION.y + 35,
+# 						0.0)
+# RIGHT_SHIFT = RobotLocation(HOME_POSITION.x,
+# 						HOME_POSITION.y - 35,
+# 						-15)
