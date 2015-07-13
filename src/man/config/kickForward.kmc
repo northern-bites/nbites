@@ -4,11 +4,11 @@
  handRotOrigin = {x = 0 ; y = 1 ; z = 0.5 ;};
  comOrigin = {x = 10 ; y = 5 ;};
  headOrigin = {x = 0 ; y = 0 ;};
- kpx = 0.3 ;
- kix = 0.04 ;
+ kpx = 1.4;
+ kix = 0.09 ;
  kdx = 0 ;
- kpy = 0.3 ;
- kiy = 0.04 ;
+ kpy = 1.2 ;
+ kiy = 0 ;
  kdy = 0 ;
  preview = 100 ;
  loop = false ;
@@ -65,7 +65,7 @@
  odometryOffset = {x = 0 ; y = 0 ; z = 0 ;};
  },
  {
- duration = 250 ;
+ duration = 350 ;
  leftFootTra1 = {x = 0 ; y = -5 ; z = -230 ;};
  leftFootTra2 = {x = 0 ; y = -5 ; z = -230 ;};
  leftFootRot1 = {x = 0 ; y = 0 ; z = 0 ;};
@@ -89,7 +89,7 @@
  odometryOffset = {x = 0 ; y = 0 ; z = 0 ;};
  },
  {
- duration = 250 ;
+ duration = 350 ;
  leftFootTra1 = {x = 0 ; y = -5 ; z = -230 ;};
  leftFootTra2 = {x = 0 ; y = -5 ; z = -230 ;};
  leftFootRot1 = {x = 0 ; y = 0 ; z = 0 ;};
@@ -113,7 +113,7 @@
  odometryOffset = {x = 0 ; y = 0 ; z = 0 ;};
  },
  {
- duration = 125 ;
+ duration = 225 ;
  leftFootTra1 = {x = 0 ; y = -5 ; z = -230 ;};
  leftFootTra2 = {x = 0 ; y = -5 ; z = -230 ;};
  leftFootRot1 = {x = 0 ; y = 0 ; z = 0 ;};

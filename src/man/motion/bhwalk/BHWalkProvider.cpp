@@ -507,7 +507,7 @@ bool BHWalkProvider::calibrated() const {
 
 bool BHWalkProvider::upright() const {
     if (!isWalkActive() && walkingEngine->theFallDownStateBH.state == FallDownStateBH::onGround) {
-        std::cout << "[INERT DEBUG] Walk is not active, and falldownstate is on the ground, but we are returning upright anyways..." << std::endl;
+        //std::cout << "[INERT DEBUG] Walk is not active, and falldownstate is on the ground, but we are returning upright anyways..." << std::endl;
         return true;
     }
 

@@ -250,6 +250,9 @@ void KickEngineData::balanceCOM(JointRequestBH& joints, const RobotDimensionsBH&
     comOffset.y = (balance.x != 0) ? atan2((balance.x), height) : 0;
   }
 
+  //printf("ERROR : %f, %f\n", actualDiff.x, actualDiff.y);
+  //printf("OUTPUT: %f, %f\n=========================================\n", comOffset.x, comOffset.y);
+
   lastCom = actualDiff;
 }
 
@@ -483,6 +486,7 @@ void KickEngineData::addGyroBalance(JointRequestBH& jointRequest, const JointCal
       jointRequest.angles[JointDataBH::RHipRoll] += calcVelocity[2] * cycletime * ratio;
       jointRequest.angles[JointDataBH::LAnkleRoll] -= calcVelocity[2] * cycletime * ratio;
       jointRequest.angles[JointDataBH::RAnkleRoll] -= -calcVelocity[2] * cycletime * ratio;
+      printf("ERROR : %f, %f\n", calcVelocity[0], calcVelocity[2]);
     }
     else //if(toRightSupport)
     {
