@@ -156,20 +156,17 @@ public class WorldViewUtility extends UtilityParent {
 			flip.addActionListener(this);
 			flip.setAlignmentX(Component.LEFT_ALIGNMENT);
 			flip.setEnabled(true);
-			//flip.setBounds((int)FieldConstants.FIELD_GREEN_WIDTH,10,200,25);
 			accessories.add(flip);
 			
 			teamNumberInput = new JTextField("0",2);
 			teamNumberInput.setMaximumSize(new Dimension(Short.MAX_VALUE, teamNumberInput.getPreferredSize().height));
 			teamNumberInput.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-			//teamNumberInput.setBounds((int)FieldConstants.FIELD_GREEN_WIDTH, 40, 200, 25);
 			accessories.add(teamNumberInput);
 			
 			startWorldView = new JButton("Start WorldView");
 			startWorldView.addActionListener(this);
 			startWorldView.setAlignmentX(Component.LEFT_ALIGNMENT);
-			//startWorldView.setBounds((int)FieldConstants.FIELD_GREEN_WIDTH,70,200,25);
 			accessories.add(startWorldView);
 			
 			JLabel robotStates = new JLabel("Robot States");
