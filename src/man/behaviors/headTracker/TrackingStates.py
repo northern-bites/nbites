@@ -244,4 +244,7 @@ def trackObstacle(tracker):
     if tracker.firstFrame():
         tracker.performHeadMove(constants.OBSTACLE_DICT[tracker.obstacleDir])
 
+    if tracker.brain.ball.vis.frames_on >= 1:
+        return tracker.goLater('trackBall')
+
     return tracker.stay()
