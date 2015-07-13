@@ -143,9 +143,37 @@ def clearIt(player):
 
     return Transition.getNextState(player, clearIt)
 
+#TODO make reactive to ball...
+@superState('gameControllerResponder')
+def checkSafePlacement(player):
+    if player.firstFrame():
+        print("First frame of check safe placement")
+        player.corners = []
+        checkSafePlacement.lastLook = constants.RIGHT
+        checkSafePlacement.looking = False
+        checkSafePlacement.goodRightCornerObservation = False
+        checkSafePlacement.goodLeftCornerObservation = False
 
+    if not checkSafePlacement.looking:
+        checkSafePlacement.looking = True
+        if checkSafePlacement.lastLook is constants.RIGHT:
+            player.brain.tracker.lookToAngle(constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER)
+            checkSafePlacement.lastLook = constants.LEFT
+        elif checkSafePlacement.lastLook is constants.LEFT:
+            player.brain.tracker.lookToAngle(0)
+            checkSafePlacement.lastLook = constants.UNKNOWN
+        else:
+            player.brain.tracker.lookToAngle(constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER)
+            checkSafePlacement.lastLook = constants.RIGHT
 
+    if player.brain.tracker.isStopped():
+        checkSafePlacement.looking = False
 
+    if player.counter > 150:
+        print("Took too long, assume wrong")
+        return player.goLater('watchWithLineChecks')
+
+    return Transition.getNextState(player, checkSafePlacement)
 
 @superState('gameControllerResponder')
 def didIKickIt(player):

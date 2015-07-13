@@ -118,7 +118,7 @@ def gamePlaying(player):
     # this is better for testing purposes!
     #TESTINGCHANGE
     # return player.goLater('watchWithLineChecks')
-    return player.goLater('watch')
+    return player.goLater('checkSafePlacement')
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
@@ -283,7 +283,7 @@ def returnUsingLoc(player):
 
     if player.counter > 600:
         print "This is taking a suspiciously long time"
-        return player.goLater('watchWithLineChecks')
+        return player.goLater('checkSafePlacement')
 
     return Transition.getNextState(player, returnUsingLoc)
 
@@ -357,8 +357,8 @@ def recoverMyself(player):
 @superState('gameControllerResponder')
 def watch(player):
     if player.firstFrame():
-        player.brain.tracker.trackBall()
-        # player.brain.tracker.repeatBasicPan()
+        # player.brain.tracker.trackBall()
+        player.brain.tracker.repeatBasicPan()
         player.brain.nav.stand()
         player.returningFromPenalty = False
         if player.lastState is not 'shiftPosition':

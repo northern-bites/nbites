@@ -43,6 +43,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.commMode = -1
         self.justKicked = False
         self.ballObservations = []
+        self.corners = []
 
         self.inPosition = CENTER_POSITION
         self.inGoalbox = True
@@ -63,6 +64,13 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.HIGH_PRECISION)
             : PenaltyStates.afterPenalty
+            }
+
+        VisualGoalieStates.checkSafePlacement.transitions = {
+            Transition.CountTransition(GoalieTransitions.safelyPlaced,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.watch
             }
 
         GoalieStates.watch.transitions = {
@@ -99,6 +107,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
             # Transition.CountTransition(GoalieTransitions.shouldPositionLeft,
             #                            Transition.SOME_OF_THE_TIME,
+
             #                            Transition.OK_PRECISION + 5)
             # : GoalieStates.shiftPosition,
 
@@ -467,12 +476,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.doneWalking,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : GoalieStates.watchWithLineChecks,
+            : VisualGoalieStates.checkSafePlacement,
 
             Transition.CountTransition(GoalieTransitions.reachedMyDestination,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : GoalieStates.watchWithLineChecks
+            : VisualGoalieStates.checkSafePlacement
 
             # TODO put in saves??
 

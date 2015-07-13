@@ -56,13 +56,18 @@ public final class RobotLocationOuterClass {
      * <code>optional float uncert = 5;</code>
      */
     float getUncert();
+
+    /**
+     * <code>optional bool lost = 6;</code>
+     */
+    boolean hasLost();
+    /**
+     * <code>optional bool lost = 6;</code>
+     */
+    boolean getLost();
   }
   /**
    * Protobuf type {@code messages.RobotLocation}
-   *
-   * <pre>
-   * robot locations should have a pose, and an uncertainty associated with it
-   * </pre>
    */
   public static final class RobotLocation extends
       com.google.protobuf.GeneratedMessage implements
@@ -136,6 +141,11 @@ public final class RobotLocationOuterClass {
             case 45: {
               bitField0_ |= 0x00000010;
               uncert_ = input.readFloat();
+              break;
+            }
+            case 48: {
+              bitField0_ |= 0x00000020;
+              lost_ = input.readBool();
               break;
             }
           }
@@ -253,12 +263,28 @@ public final class RobotLocationOuterClass {
       return uncert_;
     }
 
+    public static final int LOST_FIELD_NUMBER = 6;
+    private boolean lost_;
+    /**
+     * <code>optional bool lost = 6;</code>
+     */
+    public boolean hasLost() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional bool lost = 6;</code>
+     */
+    public boolean getLost() {
+      return lost_;
+    }
+
     private void initFields() {
       x_ = 0F;
       y_ = 0F;
       h_ = 0F;
       timestamp_ = 0L;
       uncert_ = 0F;
+      lost_ = false;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -288,6 +314,9 @@ public final class RobotLocationOuterClass {
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeFloat(5, uncert_);
       }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeBool(6, lost_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -316,6 +345,10 @@ public final class RobotLocationOuterClass {
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
           .computeFloatSize(5, uncert_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(6, lost_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -397,10 +430,6 @@ public final class RobotLocationOuterClass {
     }
     /**
      * Protobuf type {@code messages.RobotLocation}
-     *
-     * <pre>
-     * robot locations should have a pose, and an uncertainty associated with it
-     * </pre>
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
@@ -448,6 +477,8 @@ public final class RobotLocationOuterClass {
         bitField0_ = (bitField0_ & ~0x00000008);
         uncert_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000010);
+        lost_ = false;
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
 
@@ -496,6 +527,10 @@ public final class RobotLocationOuterClass {
           to_bitField0_ |= 0x00000010;
         }
         result.uncert_ = uncert_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.lost_ = lost_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -526,6 +561,9 @@ public final class RobotLocationOuterClass {
         }
         if (other.hasUncert()) {
           setUncert(other.getUncert());
+        }
+        if (other.hasLost()) {
+          setLost(other.getLost());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -714,6 +752,38 @@ public final class RobotLocationOuterClass {
         return this;
       }
 
+      private boolean lost_ ;
+      /**
+       * <code>optional bool lost = 6;</code>
+       */
+      public boolean hasLost() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional bool lost = 6;</code>
+       */
+      public boolean getLost() {
+        return lost_;
+      }
+      /**
+       * <code>optional bool lost = 6;</code>
+       */
+      public Builder setLost(boolean value) {
+        bitField0_ |= 0x00000020;
+        lost_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool lost = 6;</code>
+       */
+      public Builder clearLost() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        lost_ = false;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:messages.RobotLocation)
     }
 
@@ -739,9 +809,10 @@ public final class RobotLocationOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\023RobotLocation.proto\022\010messages\"S\n\rRobot" +
+      "\n\023RobotLocation.proto\022\010messages\"a\n\rRobot" +
       "Location\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\022\t\n\001h\030\003 \001(" +
-      "\002\022\021\n\ttimestamp\030\004 \001(\003\022\016\n\006uncert\030\005 \001(\002"
+      "\002\022\021\n\ttimestamp\030\004 \001(\003\022\016\n\006uncert\030\005 \001(\002\022\014\n\004" +
+      "lost\030\006 \001(\010"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -760,7 +831,7 @@ public final class RobotLocationOuterClass {
     internal_static_messages_RobotLocation_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_RobotLocation_descriptor,
-        new java.lang.String[] { "X", "Y", "H", "Timestamp", "Uncert", });
+        new java.lang.String[] { "X", "Y", "H", "Timestamp", "Uncert", "Lost", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

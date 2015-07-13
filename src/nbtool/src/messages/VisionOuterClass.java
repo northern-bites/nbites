@@ -704,6 +704,15 @@ public final class VisionOuterClass {
      * <code>optional int32 index = 6;</code>
      */
     int getIndex();
+
+    /**
+     * <code>optional float wz0 = 7;</code>
+     */
+    boolean hasWz0();
+    /**
+     * <code>optional float wz0 = 7;</code>
+     */
+    float getWz0();
   }
   /**
    * Protobuf type {@code messages.FieldLine}
@@ -801,6 +810,11 @@ public final class VisionOuterClass {
             case 48: {
               bitField0_ |= 0x00000020;
               index_ = input.readInt32();
+              break;
+            }
+            case 61: {
+              bitField0_ |= 0x00000040;
+              wz0_ = input.readFloat();
               break;
             }
           }
@@ -945,6 +959,21 @@ public final class VisionOuterClass {
       return index_;
     }
 
+    public static final int WZ0_FIELD_NUMBER = 7;
+    private float wz0_;
+    /**
+     * <code>optional float wz0 = 7;</code>
+     */
+    public boolean hasWz0() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional float wz0 = 7;</code>
+     */
+    public float getWz0() {
+      return wz0_;
+    }
+
     private void initFields() {
       inner_ = messages.VisionOuterClass.HoughLine.getDefaultInstance();
       outer_ = messages.VisionOuterClass.HoughLine.getDefaultInstance();
@@ -952,6 +981,7 @@ public final class VisionOuterClass {
       correspondence_ = 0;
       prob_ = 0F;
       index_ = 0;
+      wz0_ = 0F;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -983,6 +1013,9 @@ public final class VisionOuterClass {
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         output.writeInt32(6, index_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeFloat(7, wz0_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -1016,6 +1049,10 @@ public final class VisionOuterClass {
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(6, index_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(7, wz0_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1156,6 +1193,8 @@ public final class VisionOuterClass {
         bitField0_ = (bitField0_ & ~0x00000010);
         index_ = 0;
         bitField0_ = (bitField0_ & ~0x00000020);
+        wz0_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
 
@@ -1216,6 +1255,10 @@ public final class VisionOuterClass {
           to_bitField0_ |= 0x00000020;
         }
         result.index_ = index_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.wz0_ = wz0_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1249,6 +1292,9 @@ public final class VisionOuterClass {
         }
         if (other.hasIndex()) {
           setIndex(other.getIndex());
+        }
+        if (other.hasWz0()) {
+          setWz0(other.getWz0());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -1633,6 +1679,38 @@ public final class VisionOuterClass {
       public Builder clearIndex() {
         bitField0_ = (bitField0_ & ~0x00000020);
         index_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private float wz0_ ;
+      /**
+       * <code>optional float wz0 = 7;</code>
+       */
+      public boolean hasWz0() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>optional float wz0 = 7;</code>
+       */
+      public float getWz0() {
+        return wz0_;
+      }
+      /**
+       * <code>optional float wz0 = 7;</code>
+       */
+      public Builder setWz0(float value) {
+        bitField0_ |= 0x00000040;
+        wz0_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float wz0 = 7;</code>
+       */
+      public Builder clearWz0() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        wz0_ = 0F;
         onChanged();
         return this;
       }
@@ -2518,13 +2596,6 @@ public final class VisionOuterClass {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-<<<<<<< HEAD
-     * <code>optional float x = 1;</code>
-     */
-    boolean hasX();
-    /**
-     * <code>optional float x = 1;</code>
-=======
      * <code>optional bool on = 1;</code>
      */
     boolean hasOn();
@@ -2539,41 +2610,24 @@ public final class VisionOuterClass {
     boolean hasX();
     /**
      * <code>optional float x = 2;</code>
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
      */
     float getX();
 
     /**
-<<<<<<< HEAD
-     * <code>optional float y = 2;</code>
-     */
-    boolean hasY();
-    /**
-     * <code>optional float y = 2;</code>
-=======
      * <code>optional float y = 3;</code>
      */
     boolean hasY();
     /**
      * <code>optional float y = 3;</code>
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
      */
     float getY();
 
     /**
-<<<<<<< HEAD
-     * <code>optional float prob = 3;</code>
-     */
-    boolean hasProb();
-    /**
-     * <code>optional float prob = 3;</code>
-=======
      * <code>optional float prob = 4;</code>
      */
     boolean hasProb();
     /**
      * <code>optional float prob = 4;</code>
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
      */
     float getProb();
   }
@@ -2629,36 +2683,23 @@ public final class VisionOuterClass {
               }
               break;
             }
-<<<<<<< HEAD
-            case 13: {
-              bitField0_ |= 0x00000001;
-              x_ = input.readFloat();
-=======
             case 8: {
               bitField0_ |= 0x00000001;
               on_ = input.readBool();
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
               break;
             }
             case 21: {
               bitField0_ |= 0x00000002;
-<<<<<<< HEAD
-              y_ = input.readFloat();
-=======
               x_ = input.readFloat();
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
               break;
             }
             case 29: {
               bitField0_ |= 0x00000004;
-<<<<<<< HEAD
-=======
               y_ = input.readFloat();
               break;
             }
             case 37: {
               bitField0_ |= 0x00000008;
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
               prob_ = input.readFloat();
               break;
             }
@@ -2702,18 +2743,6 @@ public final class VisionOuterClass {
     }
 
     private int bitField0_;
-<<<<<<< HEAD
-    public static final int X_FIELD_NUMBER = 1;
-    private float x_;
-    /**
-     * <code>optional float x = 1;</code>
-     */
-    public boolean hasX() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    /**
-     * <code>optional float x = 1;</code>
-=======
     public static final int ON_FIELD_NUMBER = 1;
     private boolean on_;
     /**
@@ -2739,24 +2768,11 @@ public final class VisionOuterClass {
     }
     /**
      * <code>optional float x = 2;</code>
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
      */
     public float getX() {
       return x_;
     }
 
-<<<<<<< HEAD
-    public static final int Y_FIELD_NUMBER = 2;
-    private float y_;
-    /**
-     * <code>optional float y = 2;</code>
-     */
-    public boolean hasY() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    /**
-     * <code>optional float y = 2;</code>
-=======
     public static final int Y_FIELD_NUMBER = 3;
     private float y_;
     /**
@@ -2767,24 +2783,11 @@ public final class VisionOuterClass {
     }
     /**
      * <code>optional float y = 3;</code>
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
      */
     public float getY() {
       return y_;
     }
 
-<<<<<<< HEAD
-    public static final int PROB_FIELD_NUMBER = 3;
-    private float prob_;
-    /**
-     * <code>optional float prob = 3;</code>
-     */
-    public boolean hasProb() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    /**
-     * <code>optional float prob = 3;</code>
-=======
     public static final int PROB_FIELD_NUMBER = 4;
     private float prob_;
     /**
@@ -2795,17 +2798,13 @@ public final class VisionOuterClass {
     }
     /**
      * <code>optional float prob = 4;</code>
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
      */
     public float getProb() {
       return prob_;
     }
 
     private void initFields() {
-<<<<<<< HEAD
-=======
       on_ = false;
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
       x_ = 0F;
       y_ = 0F;
       prob_ = 0F;
@@ -2824,15 +2823,6 @@ public final class VisionOuterClass {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-<<<<<<< HEAD
-        output.writeFloat(1, x_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeFloat(2, y_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeFloat(3, prob_);
-=======
         output.writeBool(1, on_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
@@ -2843,7 +2833,6 @@ public final class VisionOuterClass {
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeFloat(4, prob_);
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
       }
       getUnknownFields().writeTo(output);
     }
@@ -2856,17 +2845,6 @@ public final class VisionOuterClass {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-<<<<<<< HEAD
-          .computeFloatSize(1, x_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(2, y_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(3, prob_);
-=======
           .computeBoolSize(1, on_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
@@ -2880,7 +2858,6 @@ public final class VisionOuterClass {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
           .computeFloatSize(4, prob_);
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -2999,14 +2976,6 @@ public final class VisionOuterClass {
 
       public Builder clear() {
         super.clear();
-<<<<<<< HEAD
-        x_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000001);
-        y_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000002);
-        prob_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000004);
-=======
         on_ = false;
         bitField0_ = (bitField0_ & ~0x00000001);
         x_ = 0F;
@@ -3015,7 +2984,6 @@ public final class VisionOuterClass {
         bitField0_ = (bitField0_ & ~0x00000004);
         prob_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000008);
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
         return this;
       }
 
@@ -3047,16 +3015,6 @@ public final class VisionOuterClass {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-<<<<<<< HEAD
-        result.x_ = x_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
-        }
-        result.y_ = y_;
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-          to_bitField0_ |= 0x00000004;
-        }
-=======
         result.on_ = on_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
@@ -3069,7 +3027,6 @@ public final class VisionOuterClass {
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
         }
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
         result.prob_ = prob_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -3087,12 +3044,9 @@ public final class VisionOuterClass {
 
       public Builder mergeFrom(messages.VisionOuterClass.CenterCircle other) {
         if (other == messages.VisionOuterClass.CenterCircle.getDefaultInstance()) return this;
-<<<<<<< HEAD
-=======
         if (other.hasOn()) {
           setOn(other.getOn());
         }
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
         if (other.hasX()) {
           setX(other.getX());
         }
@@ -3129,17 +3083,6 @@ public final class VisionOuterClass {
       }
       private int bitField0_;
 
-<<<<<<< HEAD
-      private float x_ ;
-      /**
-       * <code>optional float x = 1;</code>
-       */
-      public boolean hasX() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
-      }
-      /**
-       * <code>optional float x = 1;</code>
-=======
       private boolean on_ ;
       /**
        * <code>optional bool on = 1;</code>
@@ -3181,39 +3124,24 @@ public final class VisionOuterClass {
       }
       /**
        * <code>optional float x = 2;</code>
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
        */
       public float getX() {
         return x_;
       }
       /**
-<<<<<<< HEAD
-       * <code>optional float x = 1;</code>
-       */
-      public Builder setX(float value) {
-        bitField0_ |= 0x00000001;
-=======
        * <code>optional float x = 2;</code>
        */
       public Builder setX(float value) {
         bitField0_ |= 0x00000002;
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
         x_ = value;
         onChanged();
         return this;
       }
       /**
-<<<<<<< HEAD
-       * <code>optional float x = 1;</code>
-       */
-      public Builder clearX() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-=======
        * <code>optional float x = 2;</code>
        */
       public Builder clearX() {
         bitField0_ = (bitField0_ & ~0x00000002);
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
         x_ = 0F;
         onChanged();
         return this;
@@ -3221,15 +3149,6 @@ public final class VisionOuterClass {
 
       private float y_ ;
       /**
-<<<<<<< HEAD
-       * <code>optional float y = 2;</code>
-       */
-      public boolean hasY() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
-      }
-      /**
-       * <code>optional float y = 2;</code>
-=======
        * <code>optional float y = 3;</code>
        */
       public boolean hasY() {
@@ -3237,39 +3156,24 @@ public final class VisionOuterClass {
       }
       /**
        * <code>optional float y = 3;</code>
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
        */
       public float getY() {
         return y_;
       }
       /**
-<<<<<<< HEAD
-       * <code>optional float y = 2;</code>
-       */
-      public Builder setY(float value) {
-        bitField0_ |= 0x00000002;
-=======
        * <code>optional float y = 3;</code>
        */
       public Builder setY(float value) {
         bitField0_ |= 0x00000004;
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
         y_ = value;
         onChanged();
         return this;
       }
       /**
-<<<<<<< HEAD
-       * <code>optional float y = 2;</code>
-       */
-      public Builder clearY() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-=======
        * <code>optional float y = 3;</code>
        */
       public Builder clearY() {
         bitField0_ = (bitField0_ & ~0x00000004);
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
         y_ = 0F;
         onChanged();
         return this;
@@ -3277,15 +3181,6 @@ public final class VisionOuterClass {
 
       private float prob_ ;
       /**
-<<<<<<< HEAD
-       * <code>optional float prob = 3;</code>
-       */
-      public boolean hasProb() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
-      }
-      /**
-       * <code>optional float prob = 3;</code>
-=======
        * <code>optional float prob = 4;</code>
        */
       public boolean hasProb() {
@@ -3293,39 +3188,24 @@ public final class VisionOuterClass {
       }
       /**
        * <code>optional float prob = 4;</code>
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
        */
       public float getProb() {
         return prob_;
       }
       /**
-<<<<<<< HEAD
-       * <code>optional float prob = 3;</code>
-       */
-      public Builder setProb(float value) {
-        bitField0_ |= 0x00000004;
-=======
        * <code>optional float prob = 4;</code>
        */
       public Builder setProb(float value) {
         bitField0_ |= 0x00000008;
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
         prob_ = value;
         onChanged();
         return this;
       }
       /**
-<<<<<<< HEAD
-       * <code>optional float prob = 3;</code>
-       */
-      public Builder clearProb() {
-        bitField0_ = (bitField0_ & ~0x00000004);
-=======
        * <code>optional float prob = 4;</code>
        */
       public Builder clearProb() {
         bitField0_ = (bitField0_ & ~0x00000008);
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
         prob_ = 0F;
         onChanged();
         return this;
@@ -3408,19 +3288,6 @@ public final class VisionOuterClass {
     messages.VisionOuterClass.CenterCircleOrBuilder getCircleOrBuilder();
 
     /**
-<<<<<<< HEAD
-     * <code>optional .messages.VisionBall ball = 4;</code>
-     */
-    boolean hasBall();
-    /**
-     * <code>optional .messages.VisionBall ball = 4;</code>
-     */
-    messages.BallModel.VisionBall getBall();
-    /**
-     * <code>optional .messages.VisionBall ball = 4;</code>
-     */
-    messages.BallModel.VisionBallOrBuilder getBallOrBuilder();
-=======
      * <code>optional .messages.VBall ball = 4;</code>
      */
     boolean hasBall();
@@ -3432,7 +3299,15 @@ public final class VisionOuterClass {
      * <code>optional .messages.VBall ball = 4;</code>
      */
     messages.VisionOuterClass.VBallOrBuilder getBallOrBuilder();
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
+
+    /**
+     * <code>optional int32 horizon_dist = 5;</code>
+     */
+    boolean hasHorizonDist();
+    /**
+     * <code>optional int32 horizon_dist = 5;</code>
+     */
+    int getHorizonDist();
   }
   /**
    * Protobuf type {@code messages.Vision}
@@ -3516,24 +3391,21 @@ public final class VisionOuterClass {
               break;
             }
             case 34: {
-<<<<<<< HEAD
-              messages.BallModel.VisionBall.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000002) == 0x00000002)) {
-                subBuilder = ball_.toBuilder();
-              }
-              ball_ = input.readMessage(messages.BallModel.VisionBall.PARSER, extensionRegistry);
-=======
               messages.VisionOuterClass.VBall.Builder subBuilder = null;
               if (((bitField0_ & 0x00000002) == 0x00000002)) {
                 subBuilder = ball_.toBuilder();
               }
               ball_ = input.readMessage(messages.VisionOuterClass.VBall.PARSER, extensionRegistry);
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
               if (subBuilder != null) {
                 subBuilder.mergeFrom(ball_);
                 ball_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000002;
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000004;
+              horizonDist_ = input.readInt32();
               break;
             }
           }
@@ -3674,31 +3546,14 @@ public final class VisionOuterClass {
     }
 
     public static final int BALL_FIELD_NUMBER = 4;
-<<<<<<< HEAD
-    private messages.BallModel.VisionBall ball_;
-    /**
-     * <code>optional .messages.VisionBall ball = 4;</code>
-=======
     private messages.VisionOuterClass.VBall ball_;
     /**
      * <code>optional .messages.VBall ball = 4;</code>
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
      */
     public boolean hasBall() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-<<<<<<< HEAD
-     * <code>optional .messages.VisionBall ball = 4;</code>
-     */
-    public messages.BallModel.VisionBall getBall() {
-      return ball_;
-    }
-    /**
-     * <code>optional .messages.VisionBall ball = 4;</code>
-     */
-    public messages.BallModel.VisionBallOrBuilder getBallOrBuilder() {
-=======
      * <code>optional .messages.VBall ball = 4;</code>
      */
     public messages.VisionOuterClass.VBall getBall() {
@@ -3708,19 +3563,30 @@ public final class VisionOuterClass {
      * <code>optional .messages.VBall ball = 4;</code>
      */
     public messages.VisionOuterClass.VBallOrBuilder getBallOrBuilder() {
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
       return ball_;
+    }
+
+    public static final int HORIZON_DIST_FIELD_NUMBER = 5;
+    private int horizonDist_;
+    /**
+     * <code>optional int32 horizon_dist = 5;</code>
+     */
+    public boolean hasHorizonDist() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional int32 horizon_dist = 5;</code>
+     */
+    public int getHorizonDist() {
+      return horizonDist_;
     }
 
     private void initFields() {
       line_ = java.util.Collections.emptyList();
       corner_ = java.util.Collections.emptyList();
       circle_ = messages.VisionOuterClass.CenterCircle.getDefaultInstance();
-<<<<<<< HEAD
-      ball_ = messages.BallModel.VisionBall.getDefaultInstance();
-=======
       ball_ = messages.VisionOuterClass.VBall.getDefaultInstance();
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
+      horizonDist_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -3747,6 +3613,9 @@ public final class VisionOuterClass {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeMessage(4, ball_);
       }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeInt32(5, horizonDist_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -3771,6 +3640,10 @@ public final class VisionOuterClass {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, ball_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(5, horizonDist_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3912,15 +3785,13 @@ public final class VisionOuterClass {
         }
         bitField0_ = (bitField0_ & ~0x00000004);
         if (ballBuilder_ == null) {
-<<<<<<< HEAD
-          ball_ = messages.BallModel.VisionBall.getDefaultInstance();
-=======
           ball_ = messages.VisionOuterClass.VBall.getDefaultInstance();
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
         } else {
           ballBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000008);
+        horizonDist_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
 
@@ -3983,6 +3854,10 @@ public final class VisionOuterClass {
         } else {
           result.ball_ = ballBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.horizonDist_ = horizonDist_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -4056,6 +3931,9 @@ public final class VisionOuterClass {
         }
         if (other.hasBall()) {
           mergeBall(other.getBall());
+        }
+        if (other.hasHorizonDist()) {
+          setHorizonDist(other.getHorizonDist());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -4680,33 +4558,19 @@ public final class VisionOuterClass {
         return circleBuilder_;
       }
 
-<<<<<<< HEAD
-      private messages.BallModel.VisionBall ball_ = messages.BallModel.VisionBall.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
-          messages.BallModel.VisionBall, messages.BallModel.VisionBall.Builder, messages.BallModel.VisionBallOrBuilder> ballBuilder_;
-      /**
-       * <code>optional .messages.VisionBall ball = 4;</code>
-=======
       private messages.VisionOuterClass.VBall ball_ = messages.VisionOuterClass.VBall.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           messages.VisionOuterClass.VBall, messages.VisionOuterClass.VBall.Builder, messages.VisionOuterClass.VBallOrBuilder> ballBuilder_;
       /**
        * <code>optional .messages.VBall ball = 4;</code>
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
        */
       public boolean hasBall() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-<<<<<<< HEAD
-       * <code>optional .messages.VisionBall ball = 4;</code>
-       */
-      public messages.BallModel.VisionBall getBall() {
-=======
        * <code>optional .messages.VBall ball = 4;</code>
        */
       public messages.VisionOuterClass.VBall getBall() {
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
         if (ballBuilder_ == null) {
           return ball_;
         } else {
@@ -4714,15 +4578,9 @@ public final class VisionOuterClass {
         }
       }
       /**
-<<<<<<< HEAD
-       * <code>optional .messages.VisionBall ball = 4;</code>
-       */
-      public Builder setBall(messages.BallModel.VisionBall value) {
-=======
        * <code>optional .messages.VBall ball = 4;</code>
        */
       public Builder setBall(messages.VisionOuterClass.VBall value) {
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
         if (ballBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -4736,17 +4594,10 @@ public final class VisionOuterClass {
         return this;
       }
       /**
-<<<<<<< HEAD
-       * <code>optional .messages.VisionBall ball = 4;</code>
-       */
-      public Builder setBall(
-          messages.BallModel.VisionBall.Builder builderForValue) {
-=======
        * <code>optional .messages.VBall ball = 4;</code>
        */
       public Builder setBall(
           messages.VisionOuterClass.VBall.Builder builderForValue) {
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
         if (ballBuilder_ == null) {
           ball_ = builderForValue.build();
           onChanged();
@@ -4757,16 +4608,6 @@ public final class VisionOuterClass {
         return this;
       }
       /**
-<<<<<<< HEAD
-       * <code>optional .messages.VisionBall ball = 4;</code>
-       */
-      public Builder mergeBall(messages.BallModel.VisionBall value) {
-        if (ballBuilder_ == null) {
-          if (((bitField0_ & 0x00000008) == 0x00000008) &&
-              ball_ != messages.BallModel.VisionBall.getDefaultInstance()) {
-            ball_ =
-              messages.BallModel.VisionBall.newBuilder(ball_).mergeFrom(value).buildPartial();
-=======
        * <code>optional .messages.VBall ball = 4;</code>
        */
       public Builder mergeBall(messages.VisionOuterClass.VBall value) {
@@ -4775,7 +4616,6 @@ public final class VisionOuterClass {
               ball_ != messages.VisionOuterClass.VBall.getDefaultInstance()) {
             ball_ =
               messages.VisionOuterClass.VBall.newBuilder(ball_).mergeFrom(value).buildPartial();
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
           } else {
             ball_ = value;
           }
@@ -4787,19 +4627,11 @@ public final class VisionOuterClass {
         return this;
       }
       /**
-<<<<<<< HEAD
-       * <code>optional .messages.VisionBall ball = 4;</code>
-       */
-      public Builder clearBall() {
-        if (ballBuilder_ == null) {
-          ball_ = messages.BallModel.VisionBall.getDefaultInstance();
-=======
        * <code>optional .messages.VBall ball = 4;</code>
        */
       public Builder clearBall() {
         if (ballBuilder_ == null) {
           ball_ = messages.VisionOuterClass.VBall.getDefaultInstance();
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
           onChanged();
         } else {
           ballBuilder_.clear();
@@ -4808,29 +4640,17 @@ public final class VisionOuterClass {
         return this;
       }
       /**
-<<<<<<< HEAD
-       * <code>optional .messages.VisionBall ball = 4;</code>
-       */
-      public messages.BallModel.VisionBall.Builder getBallBuilder() {
-=======
        * <code>optional .messages.VBall ball = 4;</code>
        */
       public messages.VisionOuterClass.VBall.Builder getBallBuilder() {
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
         bitField0_ |= 0x00000008;
         onChanged();
         return getBallFieldBuilder().getBuilder();
       }
       /**
-<<<<<<< HEAD
-       * <code>optional .messages.VisionBall ball = 4;</code>
-       */
-      public messages.BallModel.VisionBallOrBuilder getBallOrBuilder() {
-=======
        * <code>optional .messages.VBall ball = 4;</code>
        */
       public messages.VisionOuterClass.VBallOrBuilder getBallOrBuilder() {
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
         if (ballBuilder_ != null) {
           return ballBuilder_.getMessageOrBuilder();
         } else {
@@ -4838,16 +4658,6 @@ public final class VisionOuterClass {
         }
       }
       /**
-<<<<<<< HEAD
-       * <code>optional .messages.VisionBall ball = 4;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilder<
-          messages.BallModel.VisionBall, messages.BallModel.VisionBall.Builder, messages.BallModel.VisionBallOrBuilder> 
-          getBallFieldBuilder() {
-        if (ballBuilder_ == null) {
-          ballBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              messages.BallModel.VisionBall, messages.BallModel.VisionBall.Builder, messages.BallModel.VisionBallOrBuilder>(
-=======
        * <code>optional .messages.VBall ball = 4;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
@@ -4856,13 +4666,44 @@ public final class VisionOuterClass {
         if (ballBuilder_ == null) {
           ballBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               messages.VisionOuterClass.VBall, messages.VisionOuterClass.VBall.Builder, messages.VisionOuterClass.VBallOrBuilder>(
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
                   getBall(),
                   getParentForChildren(),
                   isClean());
           ball_ = null;
         }
         return ballBuilder_;
+      }
+
+      private int horizonDist_ ;
+      /**
+       * <code>optional int32 horizon_dist = 5;</code>
+       */
+      public boolean hasHorizonDist() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional int32 horizon_dist = 5;</code>
+       */
+      public int getHorizonDist() {
+        return horizonDist_;
+      }
+      /**
+       * <code>optional int32 horizon_dist = 5;</code>
+       */
+      public Builder setHorizonDist(int value) {
+        bitField0_ |= 0x00000010;
+        horizonDist_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 horizon_dist = 5;</code>
+       */
+      public Builder clearHorizonDist() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        horizonDist_ = 0;
+        onChanged();
+        return this;
       }
 
       // @@protoc_insertion_point(builder_scope:messages.Vision)
@@ -4876,95 +4717,6 @@ public final class VisionOuterClass {
     // @@protoc_insertion_point(class_scope:messages.Vision)
   }
 
-<<<<<<< HEAD
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_messages_HoughLine_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_messages_HoughLine_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_messages_FieldLine_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_messages_FieldLine_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_messages_Corner_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_messages_Corner_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_messages_CenterCircle_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_messages_CenterCircle_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_messages_Vision_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_messages_Vision_fieldAccessorTable;
-
-  public static com.google.protobuf.Descriptors.FileDescriptor
-      getDescriptor() {
-    return descriptor;
-  }
-  private static com.google.protobuf.Descriptors.FileDescriptor
-      descriptor;
-  static {
-    java.lang.String[] descriptorData = {
-      "\n\014Vision.proto\022\010messages\032\017BallModel.prot" +
-      "o\";\n\tHoughLine\022\t\n\001r\030\001 \001(\002\022\t\n\001t\030\002 \001(\002\022\013\n\003" +
-      "ep0\030\003 \001(\002\022\013\n\003ep1\030\004 \001(\002\"\224\001\n\tFieldLine\022\"\n\005" +
-      "inner\030\001 \001(\0132\023.messages.HoughLine\022\"\n\005oute" +
-      "r\030\002 \001(\0132\023.messages.HoughLine\022\n\n\002id\030\003 \001(\005" +
-      "\022\026\n\016correspondence\030\004 \001(\005\022\014\n\004prob\030\005 \001(\002\022\r" +
-      "\n\005index\030\006 \001(\005\"n\n\006Corner\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030" +
-      "\002 \001(\002\022\n\n\002id\030\003 \001(\005\022\026\n\016correspondence\030\004 \001(" +
-      "\005\022\014\n\004prob\030\005 \001(\002\022\r\n\005line1\030\006 \001(\005\022\r\n\005line2\030" +
-      "\007 \001(\005\"2\n\014CenterCircle\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 ",
-      "\001(\002\022\014\n\004prob\030\003 \001(\002\"\231\001\n\006Vision\022!\n\004line\030\001 \003" +
-      "(\0132\023.messages.FieldLine\022 \n\006corner\030\002 \003(\0132" +
-      "\020.messages.Corner\022&\n\006circle\030\003 \001(\0132\026.mess" +
-      "ages.CenterCircle\022\"\n\004ball\030\004 \001(\0132\024.messag" +
-      "es.VisionBall"
-    };
-    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
-            descriptor = root;
-            return null;
-          }
-        };
-    com.google.protobuf.Descriptors.FileDescriptor
-      .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[] {
-          messages.BallModel.getDescriptor(),
-        }, assigner);
-    internal_static_messages_HoughLine_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_messages_HoughLine_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_HoughLine_descriptor,
-        new java.lang.String[] { "R", "T", "Ep0", "Ep1", });
-    internal_static_messages_FieldLine_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_messages_FieldLine_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_FieldLine_descriptor,
-        new java.lang.String[] { "Inner", "Outer", "Id", "Correspondence", "Prob", "Index", });
-    internal_static_messages_Corner_descriptor =
-      getDescriptor().getMessageTypes().get(2);
-    internal_static_messages_Corner_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_Corner_descriptor,
-        new java.lang.String[] { "X", "Y", "Id", "Correspondence", "Prob", "Line1", "Line2", });
-    internal_static_messages_CenterCircle_descriptor =
-      getDescriptor().getMessageTypes().get(3);
-    internal_static_messages_CenterCircle_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_messages_CenterCircle_descriptor,
-        new java.lang.String[] { "X", "Y", "Prob", });
-=======
   public interface VBallOrBuilder extends
       // @@protoc_insertion_point(interface_extends:messages.VBall)
       com.google.protobuf.MessageOrBuilder {
@@ -6532,6 +6284,6155 @@ public final class VisionOuterClass {
     // @@protoc_insertion_point(class_scope:messages.VBall)
   }
 
+  public interface FilteredBallOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:messages.FilteredBall)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional .messages.VBall vis = 1;</code>
+     */
+    boolean hasVis();
+    /**
+     * <code>optional .messages.VBall vis = 1;</code>
+     */
+    messages.VisionOuterClass.VBall getVis();
+    /**
+     * <code>optional .messages.VBall vis = 1;</code>
+     */
+    messages.VisionOuterClass.VBallOrBuilder getVisOrBuilder();
+
+    /**
+     * <code>optional float distance = 2;</code>
+     */
+    boolean hasDistance();
+    /**
+     * <code>optional float distance = 2;</code>
+     */
+    float getDistance();
+
+    /**
+     * <code>optional float bearing = 3;</code>
+     */
+    boolean hasBearing();
+    /**
+     * <code>optional float bearing = 3;</code>
+     */
+    float getBearing();
+
+    /**
+     * <code>optional float rel_x = 4;</code>
+     *
+     * <pre>
+     * State of best filter
+     * </pre>
+     */
+    boolean hasRelX();
+    /**
+     * <code>optional float rel_x = 4;</code>
+     *
+     * <pre>
+     * State of best filter
+     * </pre>
+     */
+    float getRelX();
+
+    /**
+     * <code>optional float rel_y = 5;</code>
+     */
+    boolean hasRelY();
+    /**
+     * <code>optional float rel_y = 5;</code>
+     */
+    float getRelY();
+
+    /**
+     * <code>optional float vel_x = 6;</code>
+     */
+    boolean hasVelX();
+    /**
+     * <code>optional float vel_x = 6;</code>
+     */
+    float getVelX();
+
+    /**
+     * <code>optional float vel_y = 7;</code>
+     */
+    boolean hasVelY();
+    /**
+     * <code>optional float vel_y = 7;</code>
+     */
+    float getVelY();
+
+    /**
+     * <code>optional float var_rel_x = 8;</code>
+     */
+    boolean hasVarRelX();
+    /**
+     * <code>optional float var_rel_x = 8;</code>
+     */
+    float getVarRelX();
+
+    /**
+     * <code>optional float var_rel_y = 9;</code>
+     */
+    boolean hasVarRelY();
+    /**
+     * <code>optional float var_rel_y = 9;</code>
+     */
+    float getVarRelY();
+
+    /**
+     * <code>optional float var_vel_x = 10;</code>
+     */
+    boolean hasVarVelX();
+    /**
+     * <code>optional float var_vel_x = 10;</code>
+     */
+    float getVarVelX();
+
+    /**
+     * <code>optional float var_vel_y = 11;</code>
+     */
+    boolean hasVarVelY();
+    /**
+     * <code>optional float var_vel_y = 11;</code>
+     */
+    float getVarVelY();
+
+    /**
+     * <code>optional bool is_stationary = 12;</code>
+     */
+    boolean hasIsStationary();
+    /**
+     * <code>optional bool is_stationary = 12;</code>
+     */
+    boolean getIsStationary();
+
+    /**
+     * <code>optional float bearing_deg = 13;</code>
+     */
+    boolean hasBearingDeg();
+    /**
+     * <code>optional float bearing_deg = 13;</code>
+     */
+    float getBearingDeg();
+
+    /**
+     * <code>optional float x = 14;</code>
+     */
+    boolean hasX();
+    /**
+     * <code>optional float x = 14;</code>
+     */
+    float getX();
+
+    /**
+     * <code>optional float y = 15;</code>
+     */
+    boolean hasY();
+    /**
+     * <code>optional float y = 15;</code>
+     */
+    float getY();
+
+    /**
+     * <code>optional float rel_x_dest = 16;</code>
+     */
+    boolean hasRelXDest();
+    /**
+     * <code>optional float rel_x_dest = 16;</code>
+     */
+    float getRelXDest();
+
+    /**
+     * <code>optional float rel_y_dest = 17;</code>
+     */
+    boolean hasRelYDest();
+    /**
+     * <code>optional float rel_y_dest = 17;</code>
+     */
+    float getRelYDest();
+
+    /**
+     * <code>optional float speed = 18;</code>
+     *
+     * <pre>
+     * For Goalie, know where the ball is going to intersect y-axis
+     * </pre>
+     */
+    boolean hasSpeed();
+    /**
+     * <code>optional float speed = 18;</code>
+     *
+     * <pre>
+     * For Goalie, know where the ball is going to intersect y-axis
+     * </pre>
+     */
+    float getSpeed();
+
+    /**
+     * <code>optional float rel_y_intersect_dest = 19;</code>
+     */
+    boolean hasRelYIntersectDest();
+    /**
+     * <code>optional float rel_y_intersect_dest = 19;</code>
+     */
+    float getRelYIntersectDest();
+
+    /**
+     * <code>optional float stat_rel_x = 20;</code>
+     */
+    boolean hasStatRelX();
+    /**
+     * <code>optional float stat_rel_x = 20;</code>
+     */
+    float getStatRelX();
+
+    /**
+     * <code>optional float stat_rel_y = 21;</code>
+     */
+    boolean hasStatRelY();
+    /**
+     * <code>optional float stat_rel_y = 21;</code>
+     */
+    float getStatRelY();
+
+    /**
+     * <code>optional float stat_distance = 22;</code>
+     */
+    boolean hasStatDistance();
+    /**
+     * <code>optional float stat_distance = 22;</code>
+     */
+    float getStatDistance();
+
+    /**
+     * <code>optional float stat_bearing = 23;</code>
+     */
+    boolean hasStatBearing();
+    /**
+     * <code>optional float stat_bearing = 23;</code>
+     */
+    float getStatBearing();
+
+    /**
+     * <code>optional float mov_rel_x = 24;</code>
+     */
+    boolean hasMovRelX();
+    /**
+     * <code>optional float mov_rel_x = 24;</code>
+     */
+    float getMovRelX();
+
+    /**
+     * <code>optional float mov_rel_y = 25;</code>
+     */
+    boolean hasMovRelY();
+    /**
+     * <code>optional float mov_rel_y = 25;</code>
+     */
+    float getMovRelY();
+
+    /**
+     * <code>optional float mov_distance = 26;</code>
+     */
+    boolean hasMovDistance();
+    /**
+     * <code>optional float mov_distance = 26;</code>
+     */
+    float getMovDistance();
+
+    /**
+     * <code>optional float mov_bearing = 27;</code>
+     */
+    boolean hasMovBearing();
+    /**
+     * <code>optional float mov_bearing = 27;</code>
+     */
+    float getMovBearing();
+
+    /**
+     * <code>optional float mov_vel_x = 28;</code>
+     */
+    boolean hasMovVelX();
+    /**
+     * <code>optional float mov_vel_x = 28;</code>
+     */
+    float getMovVelX();
+
+    /**
+     * <code>optional float mov_vel_y = 29;</code>
+     */
+    boolean hasMovVelY();
+    /**
+     * <code>optional float mov_vel_y = 29;</code>
+     */
+    float getMovVelY();
+
+    /**
+     * <code>optional float mov_speed = 30;</code>
+     */
+    boolean hasMovSpeed();
+    /**
+     * <code>optional float mov_speed = 30;</code>
+     */
+    float getMovSpeed();
+  }
+  /**
+   * Protobuf type {@code messages.FilteredBall}
+   */
+  public static final class FilteredBall extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:messages.FilteredBall)
+      FilteredBallOrBuilder {
+    // Use FilteredBall.newBuilder() to construct.
+    private FilteredBall(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private FilteredBall(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final FilteredBall defaultInstance;
+    public static FilteredBall getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public FilteredBall getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private FilteredBall(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              messages.VisionOuterClass.VBall.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000001) == 0x00000001)) {
+                subBuilder = vis_.toBuilder();
+              }
+              vis_ = input.readMessage(messages.VisionOuterClass.VBall.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(vis_);
+                vis_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000001;
+              break;
+            }
+            case 21: {
+              bitField0_ |= 0x00000002;
+              distance_ = input.readFloat();
+              break;
+            }
+            case 29: {
+              bitField0_ |= 0x00000004;
+              bearing_ = input.readFloat();
+              break;
+            }
+            case 37: {
+              bitField0_ |= 0x00000008;
+              relX_ = input.readFloat();
+              break;
+            }
+            case 45: {
+              bitField0_ |= 0x00000010;
+              relY_ = input.readFloat();
+              break;
+            }
+            case 53: {
+              bitField0_ |= 0x00000020;
+              velX_ = input.readFloat();
+              break;
+            }
+            case 61: {
+              bitField0_ |= 0x00000040;
+              velY_ = input.readFloat();
+              break;
+            }
+            case 69: {
+              bitField0_ |= 0x00000080;
+              varRelX_ = input.readFloat();
+              break;
+            }
+            case 77: {
+              bitField0_ |= 0x00000100;
+              varRelY_ = input.readFloat();
+              break;
+            }
+            case 85: {
+              bitField0_ |= 0x00000200;
+              varVelX_ = input.readFloat();
+              break;
+            }
+            case 93: {
+              bitField0_ |= 0x00000400;
+              varVelY_ = input.readFloat();
+              break;
+            }
+            case 96: {
+              bitField0_ |= 0x00000800;
+              isStationary_ = input.readBool();
+              break;
+            }
+            case 109: {
+              bitField0_ |= 0x00001000;
+              bearingDeg_ = input.readFloat();
+              break;
+            }
+            case 117: {
+              bitField0_ |= 0x00002000;
+              x_ = input.readFloat();
+              break;
+            }
+            case 125: {
+              bitField0_ |= 0x00004000;
+              y_ = input.readFloat();
+              break;
+            }
+            case 133: {
+              bitField0_ |= 0x00008000;
+              relXDest_ = input.readFloat();
+              break;
+            }
+            case 141: {
+              bitField0_ |= 0x00010000;
+              relYDest_ = input.readFloat();
+              break;
+            }
+            case 149: {
+              bitField0_ |= 0x00020000;
+              speed_ = input.readFloat();
+              break;
+            }
+            case 157: {
+              bitField0_ |= 0x00040000;
+              relYIntersectDest_ = input.readFloat();
+              break;
+            }
+            case 165: {
+              bitField0_ |= 0x00080000;
+              statRelX_ = input.readFloat();
+              break;
+            }
+            case 173: {
+              bitField0_ |= 0x00100000;
+              statRelY_ = input.readFloat();
+              break;
+            }
+            case 181: {
+              bitField0_ |= 0x00200000;
+              statDistance_ = input.readFloat();
+              break;
+            }
+            case 189: {
+              bitField0_ |= 0x00400000;
+              statBearing_ = input.readFloat();
+              break;
+            }
+            case 197: {
+              bitField0_ |= 0x00800000;
+              movRelX_ = input.readFloat();
+              break;
+            }
+            case 205: {
+              bitField0_ |= 0x01000000;
+              movRelY_ = input.readFloat();
+              break;
+            }
+            case 213: {
+              bitField0_ |= 0x02000000;
+              movDistance_ = input.readFloat();
+              break;
+            }
+            case 221: {
+              bitField0_ |= 0x04000000;
+              movBearing_ = input.readFloat();
+              break;
+            }
+            case 229: {
+              bitField0_ |= 0x08000000;
+              movVelX_ = input.readFloat();
+              break;
+            }
+            case 237: {
+              bitField0_ |= 0x10000000;
+              movVelY_ = input.readFloat();
+              break;
+            }
+            case 245: {
+              bitField0_ |= 0x20000000;
+              movSpeed_ = input.readFloat();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return messages.VisionOuterClass.internal_static_messages_FilteredBall_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return messages.VisionOuterClass.internal_static_messages_FilteredBall_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              messages.VisionOuterClass.FilteredBall.class, messages.VisionOuterClass.FilteredBall.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<FilteredBall> PARSER =
+        new com.google.protobuf.AbstractParser<FilteredBall>() {
+      public FilteredBall parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new FilteredBall(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FilteredBall> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    public static final int VIS_FIELD_NUMBER = 1;
+    private messages.VisionOuterClass.VBall vis_;
+    /**
+     * <code>optional .messages.VBall vis = 1;</code>
+     */
+    public boolean hasVis() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional .messages.VBall vis = 1;</code>
+     */
+    public messages.VisionOuterClass.VBall getVis() {
+      return vis_;
+    }
+    /**
+     * <code>optional .messages.VBall vis = 1;</code>
+     */
+    public messages.VisionOuterClass.VBallOrBuilder getVisOrBuilder() {
+      return vis_;
+    }
+
+    public static final int DISTANCE_FIELD_NUMBER = 2;
+    private float distance_;
+    /**
+     * <code>optional float distance = 2;</code>
+     */
+    public boolean hasDistance() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional float distance = 2;</code>
+     */
+    public float getDistance() {
+      return distance_;
+    }
+
+    public static final int BEARING_FIELD_NUMBER = 3;
+    private float bearing_;
+    /**
+     * <code>optional float bearing = 3;</code>
+     */
+    public boolean hasBearing() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional float bearing = 3;</code>
+     */
+    public float getBearing() {
+      return bearing_;
+    }
+
+    public static final int REL_X_FIELD_NUMBER = 4;
+    private float relX_;
+    /**
+     * <code>optional float rel_x = 4;</code>
+     *
+     * <pre>
+     * State of best filter
+     * </pre>
+     */
+    public boolean hasRelX() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional float rel_x = 4;</code>
+     *
+     * <pre>
+     * State of best filter
+     * </pre>
+     */
+    public float getRelX() {
+      return relX_;
+    }
+
+    public static final int REL_Y_FIELD_NUMBER = 5;
+    private float relY_;
+    /**
+     * <code>optional float rel_y = 5;</code>
+     */
+    public boolean hasRelY() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional float rel_y = 5;</code>
+     */
+    public float getRelY() {
+      return relY_;
+    }
+
+    public static final int VEL_X_FIELD_NUMBER = 6;
+    private float velX_;
+    /**
+     * <code>optional float vel_x = 6;</code>
+     */
+    public boolean hasVelX() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional float vel_x = 6;</code>
+     */
+    public float getVelX() {
+      return velX_;
+    }
+
+    public static final int VEL_Y_FIELD_NUMBER = 7;
+    private float velY_;
+    /**
+     * <code>optional float vel_y = 7;</code>
+     */
+    public boolean hasVelY() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional float vel_y = 7;</code>
+     */
+    public float getVelY() {
+      return velY_;
+    }
+
+    public static final int VAR_REL_X_FIELD_NUMBER = 8;
+    private float varRelX_;
+    /**
+     * <code>optional float var_rel_x = 8;</code>
+     */
+    public boolean hasVarRelX() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional float var_rel_x = 8;</code>
+     */
+    public float getVarRelX() {
+      return varRelX_;
+    }
+
+    public static final int VAR_REL_Y_FIELD_NUMBER = 9;
+    private float varRelY_;
+    /**
+     * <code>optional float var_rel_y = 9;</code>
+     */
+    public boolean hasVarRelY() {
+      return ((bitField0_ & 0x00000100) == 0x00000100);
+    }
+    /**
+     * <code>optional float var_rel_y = 9;</code>
+     */
+    public float getVarRelY() {
+      return varRelY_;
+    }
+
+    public static final int VAR_VEL_X_FIELD_NUMBER = 10;
+    private float varVelX_;
+    /**
+     * <code>optional float var_vel_x = 10;</code>
+     */
+    public boolean hasVarVelX() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    /**
+     * <code>optional float var_vel_x = 10;</code>
+     */
+    public float getVarVelX() {
+      return varVelX_;
+    }
+
+    public static final int VAR_VEL_Y_FIELD_NUMBER = 11;
+    private float varVelY_;
+    /**
+     * <code>optional float var_vel_y = 11;</code>
+     */
+    public boolean hasVarVelY() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>optional float var_vel_y = 11;</code>
+     */
+    public float getVarVelY() {
+      return varVelY_;
+    }
+
+    public static final int IS_STATIONARY_FIELD_NUMBER = 12;
+    private boolean isStationary_;
+    /**
+     * <code>optional bool is_stationary = 12;</code>
+     */
+    public boolean hasIsStationary() {
+      return ((bitField0_ & 0x00000800) == 0x00000800);
+    }
+    /**
+     * <code>optional bool is_stationary = 12;</code>
+     */
+    public boolean getIsStationary() {
+      return isStationary_;
+    }
+
+    public static final int BEARING_DEG_FIELD_NUMBER = 13;
+    private float bearingDeg_;
+    /**
+     * <code>optional float bearing_deg = 13;</code>
+     */
+    public boolean hasBearingDeg() {
+      return ((bitField0_ & 0x00001000) == 0x00001000);
+    }
+    /**
+     * <code>optional float bearing_deg = 13;</code>
+     */
+    public float getBearingDeg() {
+      return bearingDeg_;
+    }
+
+    public static final int X_FIELD_NUMBER = 14;
+    private float x_;
+    /**
+     * <code>optional float x = 14;</code>
+     */
+    public boolean hasX() {
+      return ((bitField0_ & 0x00002000) == 0x00002000);
+    }
+    /**
+     * <code>optional float x = 14;</code>
+     */
+    public float getX() {
+      return x_;
+    }
+
+    public static final int Y_FIELD_NUMBER = 15;
+    private float y_;
+    /**
+     * <code>optional float y = 15;</code>
+     */
+    public boolean hasY() {
+      return ((bitField0_ & 0x00004000) == 0x00004000);
+    }
+    /**
+     * <code>optional float y = 15;</code>
+     */
+    public float getY() {
+      return y_;
+    }
+
+    public static final int REL_X_DEST_FIELD_NUMBER = 16;
+    private float relXDest_;
+    /**
+     * <code>optional float rel_x_dest = 16;</code>
+     */
+    public boolean hasRelXDest() {
+      return ((bitField0_ & 0x00008000) == 0x00008000);
+    }
+    /**
+     * <code>optional float rel_x_dest = 16;</code>
+     */
+    public float getRelXDest() {
+      return relXDest_;
+    }
+
+    public static final int REL_Y_DEST_FIELD_NUMBER = 17;
+    private float relYDest_;
+    /**
+     * <code>optional float rel_y_dest = 17;</code>
+     */
+    public boolean hasRelYDest() {
+      return ((bitField0_ & 0x00010000) == 0x00010000);
+    }
+    /**
+     * <code>optional float rel_y_dest = 17;</code>
+     */
+    public float getRelYDest() {
+      return relYDest_;
+    }
+
+    public static final int SPEED_FIELD_NUMBER = 18;
+    private float speed_;
+    /**
+     * <code>optional float speed = 18;</code>
+     *
+     * <pre>
+     * For Goalie, know where the ball is going to intersect y-axis
+     * </pre>
+     */
+    public boolean hasSpeed() {
+      return ((bitField0_ & 0x00020000) == 0x00020000);
+    }
+    /**
+     * <code>optional float speed = 18;</code>
+     *
+     * <pre>
+     * For Goalie, know where the ball is going to intersect y-axis
+     * </pre>
+     */
+    public float getSpeed() {
+      return speed_;
+    }
+
+    public static final int REL_Y_INTERSECT_DEST_FIELD_NUMBER = 19;
+    private float relYIntersectDest_;
+    /**
+     * <code>optional float rel_y_intersect_dest = 19;</code>
+     */
+    public boolean hasRelYIntersectDest() {
+      return ((bitField0_ & 0x00040000) == 0x00040000);
+    }
+    /**
+     * <code>optional float rel_y_intersect_dest = 19;</code>
+     */
+    public float getRelYIntersectDest() {
+      return relYIntersectDest_;
+    }
+
+    public static final int STAT_REL_X_FIELD_NUMBER = 20;
+    private float statRelX_;
+    /**
+     * <code>optional float stat_rel_x = 20;</code>
+     */
+    public boolean hasStatRelX() {
+      return ((bitField0_ & 0x00080000) == 0x00080000);
+    }
+    /**
+     * <code>optional float stat_rel_x = 20;</code>
+     */
+    public float getStatRelX() {
+      return statRelX_;
+    }
+
+    public static final int STAT_REL_Y_FIELD_NUMBER = 21;
+    private float statRelY_;
+    /**
+     * <code>optional float stat_rel_y = 21;</code>
+     */
+    public boolean hasStatRelY() {
+      return ((bitField0_ & 0x00100000) == 0x00100000);
+    }
+    /**
+     * <code>optional float stat_rel_y = 21;</code>
+     */
+    public float getStatRelY() {
+      return statRelY_;
+    }
+
+    public static final int STAT_DISTANCE_FIELD_NUMBER = 22;
+    private float statDistance_;
+    /**
+     * <code>optional float stat_distance = 22;</code>
+     */
+    public boolean hasStatDistance() {
+      return ((bitField0_ & 0x00200000) == 0x00200000);
+    }
+    /**
+     * <code>optional float stat_distance = 22;</code>
+     */
+    public float getStatDistance() {
+      return statDistance_;
+    }
+
+    public static final int STAT_BEARING_FIELD_NUMBER = 23;
+    private float statBearing_;
+    /**
+     * <code>optional float stat_bearing = 23;</code>
+     */
+    public boolean hasStatBearing() {
+      return ((bitField0_ & 0x00400000) == 0x00400000);
+    }
+    /**
+     * <code>optional float stat_bearing = 23;</code>
+     */
+    public float getStatBearing() {
+      return statBearing_;
+    }
+
+    public static final int MOV_REL_X_FIELD_NUMBER = 24;
+    private float movRelX_;
+    /**
+     * <code>optional float mov_rel_x = 24;</code>
+     */
+    public boolean hasMovRelX() {
+      return ((bitField0_ & 0x00800000) == 0x00800000);
+    }
+    /**
+     * <code>optional float mov_rel_x = 24;</code>
+     */
+    public float getMovRelX() {
+      return movRelX_;
+    }
+
+    public static final int MOV_REL_Y_FIELD_NUMBER = 25;
+    private float movRelY_;
+    /**
+     * <code>optional float mov_rel_y = 25;</code>
+     */
+    public boolean hasMovRelY() {
+      return ((bitField0_ & 0x01000000) == 0x01000000);
+    }
+    /**
+     * <code>optional float mov_rel_y = 25;</code>
+     */
+    public float getMovRelY() {
+      return movRelY_;
+    }
+
+    public static final int MOV_DISTANCE_FIELD_NUMBER = 26;
+    private float movDistance_;
+    /**
+     * <code>optional float mov_distance = 26;</code>
+     */
+    public boolean hasMovDistance() {
+      return ((bitField0_ & 0x02000000) == 0x02000000);
+    }
+    /**
+     * <code>optional float mov_distance = 26;</code>
+     */
+    public float getMovDistance() {
+      return movDistance_;
+    }
+
+    public static final int MOV_BEARING_FIELD_NUMBER = 27;
+    private float movBearing_;
+    /**
+     * <code>optional float mov_bearing = 27;</code>
+     */
+    public boolean hasMovBearing() {
+      return ((bitField0_ & 0x04000000) == 0x04000000);
+    }
+    /**
+     * <code>optional float mov_bearing = 27;</code>
+     */
+    public float getMovBearing() {
+      return movBearing_;
+    }
+
+    public static final int MOV_VEL_X_FIELD_NUMBER = 28;
+    private float movVelX_;
+    /**
+     * <code>optional float mov_vel_x = 28;</code>
+     */
+    public boolean hasMovVelX() {
+      return ((bitField0_ & 0x08000000) == 0x08000000);
+    }
+    /**
+     * <code>optional float mov_vel_x = 28;</code>
+     */
+    public float getMovVelX() {
+      return movVelX_;
+    }
+
+    public static final int MOV_VEL_Y_FIELD_NUMBER = 29;
+    private float movVelY_;
+    /**
+     * <code>optional float mov_vel_y = 29;</code>
+     */
+    public boolean hasMovVelY() {
+      return ((bitField0_ & 0x10000000) == 0x10000000);
+    }
+    /**
+     * <code>optional float mov_vel_y = 29;</code>
+     */
+    public float getMovVelY() {
+      return movVelY_;
+    }
+
+    public static final int MOV_SPEED_FIELD_NUMBER = 30;
+    private float movSpeed_;
+    /**
+     * <code>optional float mov_speed = 30;</code>
+     */
+    public boolean hasMovSpeed() {
+      return ((bitField0_ & 0x20000000) == 0x20000000);
+    }
+    /**
+     * <code>optional float mov_speed = 30;</code>
+     */
+    public float getMovSpeed() {
+      return movSpeed_;
+    }
+
+    private void initFields() {
+      vis_ = messages.VisionOuterClass.VBall.getDefaultInstance();
+      distance_ = 0F;
+      bearing_ = 0F;
+      relX_ = 0F;
+      relY_ = 0F;
+      velX_ = 0F;
+      velY_ = 0F;
+      varRelX_ = 0F;
+      varRelY_ = 0F;
+      varVelX_ = 0F;
+      varVelY_ = 0F;
+      isStationary_ = false;
+      bearingDeg_ = 0F;
+      x_ = 0F;
+      y_ = 0F;
+      relXDest_ = 0F;
+      relYDest_ = 0F;
+      speed_ = 0F;
+      relYIntersectDest_ = 0F;
+      statRelX_ = 0F;
+      statRelY_ = 0F;
+      statDistance_ = 0F;
+      statBearing_ = 0F;
+      movRelX_ = 0F;
+      movRelY_ = 0F;
+      movDistance_ = 0F;
+      movBearing_ = 0F;
+      movVelX_ = 0F;
+      movVelY_ = 0F;
+      movSpeed_ = 0F;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeMessage(1, vis_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeFloat(2, distance_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeFloat(3, bearing_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeFloat(4, relX_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeFloat(5, relY_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeFloat(6, velX_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeFloat(7, velY_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeFloat(8, varRelX_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        output.writeFloat(9, varRelY_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeFloat(10, varVelX_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeFloat(11, varVelY_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeBool(12, isStationary_);
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        output.writeFloat(13, bearingDeg_);
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        output.writeFloat(14, x_);
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        output.writeFloat(15, y_);
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        output.writeFloat(16, relXDest_);
+      }
+      if (((bitField0_ & 0x00010000) == 0x00010000)) {
+        output.writeFloat(17, relYDest_);
+      }
+      if (((bitField0_ & 0x00020000) == 0x00020000)) {
+        output.writeFloat(18, speed_);
+      }
+      if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        output.writeFloat(19, relYIntersectDest_);
+      }
+      if (((bitField0_ & 0x00080000) == 0x00080000)) {
+        output.writeFloat(20, statRelX_);
+      }
+      if (((bitField0_ & 0x00100000) == 0x00100000)) {
+        output.writeFloat(21, statRelY_);
+      }
+      if (((bitField0_ & 0x00200000) == 0x00200000)) {
+        output.writeFloat(22, statDistance_);
+      }
+      if (((bitField0_ & 0x00400000) == 0x00400000)) {
+        output.writeFloat(23, statBearing_);
+      }
+      if (((bitField0_ & 0x00800000) == 0x00800000)) {
+        output.writeFloat(24, movRelX_);
+      }
+      if (((bitField0_ & 0x01000000) == 0x01000000)) {
+        output.writeFloat(25, movRelY_);
+      }
+      if (((bitField0_ & 0x02000000) == 0x02000000)) {
+        output.writeFloat(26, movDistance_);
+      }
+      if (((bitField0_ & 0x04000000) == 0x04000000)) {
+        output.writeFloat(27, movBearing_);
+      }
+      if (((bitField0_ & 0x08000000) == 0x08000000)) {
+        output.writeFloat(28, movVelX_);
+      }
+      if (((bitField0_ & 0x10000000) == 0x10000000)) {
+        output.writeFloat(29, movVelY_);
+      }
+      if (((bitField0_ & 0x20000000) == 0x20000000)) {
+        output.writeFloat(30, movSpeed_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, vis_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(2, distance_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(3, bearing_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(4, relX_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(5, relY_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(6, velX_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(7, velY_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(8, varRelX_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(9, varRelY_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(10, varVelX_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(11, varVelY_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(12, isStationary_);
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(13, bearingDeg_);
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(14, x_);
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(15, y_);
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(16, relXDest_);
+      }
+      if (((bitField0_ & 0x00010000) == 0x00010000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(17, relYDest_);
+      }
+      if (((bitField0_ & 0x00020000) == 0x00020000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(18, speed_);
+      }
+      if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(19, relYIntersectDest_);
+      }
+      if (((bitField0_ & 0x00080000) == 0x00080000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(20, statRelX_);
+      }
+      if (((bitField0_ & 0x00100000) == 0x00100000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(21, statRelY_);
+      }
+      if (((bitField0_ & 0x00200000) == 0x00200000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(22, statDistance_);
+      }
+      if (((bitField0_ & 0x00400000) == 0x00400000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(23, statBearing_);
+      }
+      if (((bitField0_ & 0x00800000) == 0x00800000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(24, movRelX_);
+      }
+      if (((bitField0_ & 0x01000000) == 0x01000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(25, movRelY_);
+      }
+      if (((bitField0_ & 0x02000000) == 0x02000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(26, movDistance_);
+      }
+      if (((bitField0_ & 0x04000000) == 0x04000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(27, movBearing_);
+      }
+      if (((bitField0_ & 0x08000000) == 0x08000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(28, movVelX_);
+      }
+      if (((bitField0_ & 0x10000000) == 0x10000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(29, movVelY_);
+      }
+      if (((bitField0_ & 0x20000000) == 0x20000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(30, movSpeed_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static messages.VisionOuterClass.FilteredBall parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static messages.VisionOuterClass.FilteredBall parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static messages.VisionOuterClass.FilteredBall parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static messages.VisionOuterClass.FilteredBall parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static messages.VisionOuterClass.FilteredBall parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static messages.VisionOuterClass.FilteredBall parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static messages.VisionOuterClass.FilteredBall parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static messages.VisionOuterClass.FilteredBall parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static messages.VisionOuterClass.FilteredBall parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static messages.VisionOuterClass.FilteredBall parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(messages.VisionOuterClass.FilteredBall prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code messages.FilteredBall}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:messages.FilteredBall)
+        messages.VisionOuterClass.FilteredBallOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return messages.VisionOuterClass.internal_static_messages_FilteredBall_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return messages.VisionOuterClass.internal_static_messages_FilteredBall_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                messages.VisionOuterClass.FilteredBall.class, messages.VisionOuterClass.FilteredBall.Builder.class);
+      }
+
+      // Construct using messages.VisionOuterClass.FilteredBall.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getVisFieldBuilder();
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        if (visBuilder_ == null) {
+          vis_ = messages.VisionOuterClass.VBall.getDefaultInstance();
+        } else {
+          visBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000001);
+        distance_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        bearing_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        relX_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        relY_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        velX_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000020);
+        velY_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000040);
+        varRelX_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000080);
+        varRelY_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000100);
+        varVelX_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000200);
+        varVelY_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000400);
+        isStationary_ = false;
+        bitField0_ = (bitField0_ & ~0x00000800);
+        bearingDeg_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00001000);
+        x_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00002000);
+        y_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00004000);
+        relXDest_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00008000);
+        relYDest_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00010000);
+        speed_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00020000);
+        relYIntersectDest_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00040000);
+        statRelX_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00080000);
+        statRelY_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00100000);
+        statDistance_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00200000);
+        statBearing_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00400000);
+        movRelX_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00800000);
+        movRelY_ = 0F;
+        bitField0_ = (bitField0_ & ~0x01000000);
+        movDistance_ = 0F;
+        bitField0_ = (bitField0_ & ~0x02000000);
+        movBearing_ = 0F;
+        bitField0_ = (bitField0_ & ~0x04000000);
+        movVelX_ = 0F;
+        bitField0_ = (bitField0_ & ~0x08000000);
+        movVelY_ = 0F;
+        bitField0_ = (bitField0_ & ~0x10000000);
+        movSpeed_ = 0F;
+        bitField0_ = (bitField0_ & ~0x20000000);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return messages.VisionOuterClass.internal_static_messages_FilteredBall_descriptor;
+      }
+
+      public messages.VisionOuterClass.FilteredBall getDefaultInstanceForType() {
+        return messages.VisionOuterClass.FilteredBall.getDefaultInstance();
+      }
+
+      public messages.VisionOuterClass.FilteredBall build() {
+        messages.VisionOuterClass.FilteredBall result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public messages.VisionOuterClass.FilteredBall buildPartial() {
+        messages.VisionOuterClass.FilteredBall result = new messages.VisionOuterClass.FilteredBall(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        if (visBuilder_ == null) {
+          result.vis_ = vis_;
+        } else {
+          result.vis_ = visBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.distance_ = distance_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.bearing_ = bearing_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.relX_ = relX_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.relY_ = relY_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.velX_ = velX_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.velY_ = velY_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.varRelX_ = varRelX_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000100;
+        }
+        result.varRelY_ = varRelY_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000200;
+        }
+        result.varVelX_ = varVelX_;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        result.varVelY_ = varVelY_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000800;
+        }
+        result.isStationary_ = isStationary_;
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
+          to_bitField0_ |= 0x00001000;
+        }
+        result.bearingDeg_ = bearingDeg_;
+        if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
+          to_bitField0_ |= 0x00002000;
+        }
+        result.x_ = x_;
+        if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
+          to_bitField0_ |= 0x00004000;
+        }
+        result.y_ = y_;
+        if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
+          to_bitField0_ |= 0x00008000;
+        }
+        result.relXDest_ = relXDest_;
+        if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
+          to_bitField0_ |= 0x00010000;
+        }
+        result.relYDest_ = relYDest_;
+        if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
+          to_bitField0_ |= 0x00020000;
+        }
+        result.speed_ = speed_;
+        if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
+          to_bitField0_ |= 0x00040000;
+        }
+        result.relYIntersectDest_ = relYIntersectDest_;
+        if (((from_bitField0_ & 0x00080000) == 0x00080000)) {
+          to_bitField0_ |= 0x00080000;
+        }
+        result.statRelX_ = statRelX_;
+        if (((from_bitField0_ & 0x00100000) == 0x00100000)) {
+          to_bitField0_ |= 0x00100000;
+        }
+        result.statRelY_ = statRelY_;
+        if (((from_bitField0_ & 0x00200000) == 0x00200000)) {
+          to_bitField0_ |= 0x00200000;
+        }
+        result.statDistance_ = statDistance_;
+        if (((from_bitField0_ & 0x00400000) == 0x00400000)) {
+          to_bitField0_ |= 0x00400000;
+        }
+        result.statBearing_ = statBearing_;
+        if (((from_bitField0_ & 0x00800000) == 0x00800000)) {
+          to_bitField0_ |= 0x00800000;
+        }
+        result.movRelX_ = movRelX_;
+        if (((from_bitField0_ & 0x01000000) == 0x01000000)) {
+          to_bitField0_ |= 0x01000000;
+        }
+        result.movRelY_ = movRelY_;
+        if (((from_bitField0_ & 0x02000000) == 0x02000000)) {
+          to_bitField0_ |= 0x02000000;
+        }
+        result.movDistance_ = movDistance_;
+        if (((from_bitField0_ & 0x04000000) == 0x04000000)) {
+          to_bitField0_ |= 0x04000000;
+        }
+        result.movBearing_ = movBearing_;
+        if (((from_bitField0_ & 0x08000000) == 0x08000000)) {
+          to_bitField0_ |= 0x08000000;
+        }
+        result.movVelX_ = movVelX_;
+        if (((from_bitField0_ & 0x10000000) == 0x10000000)) {
+          to_bitField0_ |= 0x10000000;
+        }
+        result.movVelY_ = movVelY_;
+        if (((from_bitField0_ & 0x20000000) == 0x20000000)) {
+          to_bitField0_ |= 0x20000000;
+        }
+        result.movSpeed_ = movSpeed_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof messages.VisionOuterClass.FilteredBall) {
+          return mergeFrom((messages.VisionOuterClass.FilteredBall)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(messages.VisionOuterClass.FilteredBall other) {
+        if (other == messages.VisionOuterClass.FilteredBall.getDefaultInstance()) return this;
+        if (other.hasVis()) {
+          mergeVis(other.getVis());
+        }
+        if (other.hasDistance()) {
+          setDistance(other.getDistance());
+        }
+        if (other.hasBearing()) {
+          setBearing(other.getBearing());
+        }
+        if (other.hasRelX()) {
+          setRelX(other.getRelX());
+        }
+        if (other.hasRelY()) {
+          setRelY(other.getRelY());
+        }
+        if (other.hasVelX()) {
+          setVelX(other.getVelX());
+        }
+        if (other.hasVelY()) {
+          setVelY(other.getVelY());
+        }
+        if (other.hasVarRelX()) {
+          setVarRelX(other.getVarRelX());
+        }
+        if (other.hasVarRelY()) {
+          setVarRelY(other.getVarRelY());
+        }
+        if (other.hasVarVelX()) {
+          setVarVelX(other.getVarVelX());
+        }
+        if (other.hasVarVelY()) {
+          setVarVelY(other.getVarVelY());
+        }
+        if (other.hasIsStationary()) {
+          setIsStationary(other.getIsStationary());
+        }
+        if (other.hasBearingDeg()) {
+          setBearingDeg(other.getBearingDeg());
+        }
+        if (other.hasX()) {
+          setX(other.getX());
+        }
+        if (other.hasY()) {
+          setY(other.getY());
+        }
+        if (other.hasRelXDest()) {
+          setRelXDest(other.getRelXDest());
+        }
+        if (other.hasRelYDest()) {
+          setRelYDest(other.getRelYDest());
+        }
+        if (other.hasSpeed()) {
+          setSpeed(other.getSpeed());
+        }
+        if (other.hasRelYIntersectDest()) {
+          setRelYIntersectDest(other.getRelYIntersectDest());
+        }
+        if (other.hasStatRelX()) {
+          setStatRelX(other.getStatRelX());
+        }
+        if (other.hasStatRelY()) {
+          setStatRelY(other.getStatRelY());
+        }
+        if (other.hasStatDistance()) {
+          setStatDistance(other.getStatDistance());
+        }
+        if (other.hasStatBearing()) {
+          setStatBearing(other.getStatBearing());
+        }
+        if (other.hasMovRelX()) {
+          setMovRelX(other.getMovRelX());
+        }
+        if (other.hasMovRelY()) {
+          setMovRelY(other.getMovRelY());
+        }
+        if (other.hasMovDistance()) {
+          setMovDistance(other.getMovDistance());
+        }
+        if (other.hasMovBearing()) {
+          setMovBearing(other.getMovBearing());
+        }
+        if (other.hasMovVelX()) {
+          setMovVelX(other.getMovVelX());
+        }
+        if (other.hasMovVelY()) {
+          setMovVelY(other.getMovVelY());
+        }
+        if (other.hasMovSpeed()) {
+          setMovSpeed(other.getMovSpeed());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        messages.VisionOuterClass.FilteredBall parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (messages.VisionOuterClass.FilteredBall) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private messages.VisionOuterClass.VBall vis_ = messages.VisionOuterClass.VBall.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          messages.VisionOuterClass.VBall, messages.VisionOuterClass.VBall.Builder, messages.VisionOuterClass.VBallOrBuilder> visBuilder_;
+      /**
+       * <code>optional .messages.VBall vis = 1;</code>
+       */
+      public boolean hasVis() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional .messages.VBall vis = 1;</code>
+       */
+      public messages.VisionOuterClass.VBall getVis() {
+        if (visBuilder_ == null) {
+          return vis_;
+        } else {
+          return visBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .messages.VBall vis = 1;</code>
+       */
+      public Builder setVis(messages.VisionOuterClass.VBall value) {
+        if (visBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          vis_ = value;
+          onChanged();
+        } else {
+          visBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      /**
+       * <code>optional .messages.VBall vis = 1;</code>
+       */
+      public Builder setVis(
+          messages.VisionOuterClass.VBall.Builder builderForValue) {
+        if (visBuilder_ == null) {
+          vis_ = builderForValue.build();
+          onChanged();
+        } else {
+          visBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      /**
+       * <code>optional .messages.VBall vis = 1;</code>
+       */
+      public Builder mergeVis(messages.VisionOuterClass.VBall value) {
+        if (visBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) == 0x00000001) &&
+              vis_ != messages.VisionOuterClass.VBall.getDefaultInstance()) {
+            vis_ =
+              messages.VisionOuterClass.VBall.newBuilder(vis_).mergeFrom(value).buildPartial();
+          } else {
+            vis_ = value;
+          }
+          onChanged();
+        } else {
+          visBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      /**
+       * <code>optional .messages.VBall vis = 1;</code>
+       */
+      public Builder clearVis() {
+        if (visBuilder_ == null) {
+          vis_ = messages.VisionOuterClass.VBall.getDefaultInstance();
+          onChanged();
+        } else {
+          visBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+      /**
+       * <code>optional .messages.VBall vis = 1;</code>
+       */
+      public messages.VisionOuterClass.VBall.Builder getVisBuilder() {
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return getVisFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .messages.VBall vis = 1;</code>
+       */
+      public messages.VisionOuterClass.VBallOrBuilder getVisOrBuilder() {
+        if (visBuilder_ != null) {
+          return visBuilder_.getMessageOrBuilder();
+        } else {
+          return vis_;
+        }
+      }
+      /**
+       * <code>optional .messages.VBall vis = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          messages.VisionOuterClass.VBall, messages.VisionOuterClass.VBall.Builder, messages.VisionOuterClass.VBallOrBuilder> 
+          getVisFieldBuilder() {
+        if (visBuilder_ == null) {
+          visBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              messages.VisionOuterClass.VBall, messages.VisionOuterClass.VBall.Builder, messages.VisionOuterClass.VBallOrBuilder>(
+                  getVis(),
+                  getParentForChildren(),
+                  isClean());
+          vis_ = null;
+        }
+        return visBuilder_;
+      }
+
+      private float distance_ ;
+      /**
+       * <code>optional float distance = 2;</code>
+       */
+      public boolean hasDistance() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional float distance = 2;</code>
+       */
+      public float getDistance() {
+        return distance_;
+      }
+      /**
+       * <code>optional float distance = 2;</code>
+       */
+      public Builder setDistance(float value) {
+        bitField0_ |= 0x00000002;
+        distance_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float distance = 2;</code>
+       */
+      public Builder clearDistance() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        distance_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float bearing_ ;
+      /**
+       * <code>optional float bearing = 3;</code>
+       */
+      public boolean hasBearing() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional float bearing = 3;</code>
+       */
+      public float getBearing() {
+        return bearing_;
+      }
+      /**
+       * <code>optional float bearing = 3;</code>
+       */
+      public Builder setBearing(float value) {
+        bitField0_ |= 0x00000004;
+        bearing_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float bearing = 3;</code>
+       */
+      public Builder clearBearing() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        bearing_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float relX_ ;
+      /**
+       * <code>optional float rel_x = 4;</code>
+       *
+       * <pre>
+       * State of best filter
+       * </pre>
+       */
+      public boolean hasRelX() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional float rel_x = 4;</code>
+       *
+       * <pre>
+       * State of best filter
+       * </pre>
+       */
+      public float getRelX() {
+        return relX_;
+      }
+      /**
+       * <code>optional float rel_x = 4;</code>
+       *
+       * <pre>
+       * State of best filter
+       * </pre>
+       */
+      public Builder setRelX(float value) {
+        bitField0_ |= 0x00000008;
+        relX_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float rel_x = 4;</code>
+       *
+       * <pre>
+       * State of best filter
+       * </pre>
+       */
+      public Builder clearRelX() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        relX_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float relY_ ;
+      /**
+       * <code>optional float rel_y = 5;</code>
+       */
+      public boolean hasRelY() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional float rel_y = 5;</code>
+       */
+      public float getRelY() {
+        return relY_;
+      }
+      /**
+       * <code>optional float rel_y = 5;</code>
+       */
+      public Builder setRelY(float value) {
+        bitField0_ |= 0x00000010;
+        relY_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float rel_y = 5;</code>
+       */
+      public Builder clearRelY() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        relY_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float velX_ ;
+      /**
+       * <code>optional float vel_x = 6;</code>
+       */
+      public boolean hasVelX() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional float vel_x = 6;</code>
+       */
+      public float getVelX() {
+        return velX_;
+      }
+      /**
+       * <code>optional float vel_x = 6;</code>
+       */
+      public Builder setVelX(float value) {
+        bitField0_ |= 0x00000020;
+        velX_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float vel_x = 6;</code>
+       */
+      public Builder clearVelX() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        velX_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float velY_ ;
+      /**
+       * <code>optional float vel_y = 7;</code>
+       */
+      public boolean hasVelY() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>optional float vel_y = 7;</code>
+       */
+      public float getVelY() {
+        return velY_;
+      }
+      /**
+       * <code>optional float vel_y = 7;</code>
+       */
+      public Builder setVelY(float value) {
+        bitField0_ |= 0x00000040;
+        velY_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float vel_y = 7;</code>
+       */
+      public Builder clearVelY() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        velY_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float varRelX_ ;
+      /**
+       * <code>optional float var_rel_x = 8;</code>
+       */
+      public boolean hasVarRelX() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional float var_rel_x = 8;</code>
+       */
+      public float getVarRelX() {
+        return varRelX_;
+      }
+      /**
+       * <code>optional float var_rel_x = 8;</code>
+       */
+      public Builder setVarRelX(float value) {
+        bitField0_ |= 0x00000080;
+        varRelX_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float var_rel_x = 8;</code>
+       */
+      public Builder clearVarRelX() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        varRelX_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float varRelY_ ;
+      /**
+       * <code>optional float var_rel_y = 9;</code>
+       */
+      public boolean hasVarRelY() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      /**
+       * <code>optional float var_rel_y = 9;</code>
+       */
+      public float getVarRelY() {
+        return varRelY_;
+      }
+      /**
+       * <code>optional float var_rel_y = 9;</code>
+       */
+      public Builder setVarRelY(float value) {
+        bitField0_ |= 0x00000100;
+        varRelY_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float var_rel_y = 9;</code>
+       */
+      public Builder clearVarRelY() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        varRelY_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float varVelX_ ;
+      /**
+       * <code>optional float var_vel_x = 10;</code>
+       */
+      public boolean hasVarVelX() {
+        return ((bitField0_ & 0x00000200) == 0x00000200);
+      }
+      /**
+       * <code>optional float var_vel_x = 10;</code>
+       */
+      public float getVarVelX() {
+        return varVelX_;
+      }
+      /**
+       * <code>optional float var_vel_x = 10;</code>
+       */
+      public Builder setVarVelX(float value) {
+        bitField0_ |= 0x00000200;
+        varVelX_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float var_vel_x = 10;</code>
+       */
+      public Builder clearVarVelX() {
+        bitField0_ = (bitField0_ & ~0x00000200);
+        varVelX_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float varVelY_ ;
+      /**
+       * <code>optional float var_vel_y = 11;</code>
+       */
+      public boolean hasVarVelY() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      /**
+       * <code>optional float var_vel_y = 11;</code>
+       */
+      public float getVarVelY() {
+        return varVelY_;
+      }
+      /**
+       * <code>optional float var_vel_y = 11;</code>
+       */
+      public Builder setVarVelY(float value) {
+        bitField0_ |= 0x00000400;
+        varVelY_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float var_vel_y = 11;</code>
+       */
+      public Builder clearVarVelY() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        varVelY_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private boolean isStationary_ ;
+      /**
+       * <code>optional bool is_stationary = 12;</code>
+       */
+      public boolean hasIsStationary() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional bool is_stationary = 12;</code>
+       */
+      public boolean getIsStationary() {
+        return isStationary_;
+      }
+      /**
+       * <code>optional bool is_stationary = 12;</code>
+       */
+      public Builder setIsStationary(boolean value) {
+        bitField0_ |= 0x00000800;
+        isStationary_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool is_stationary = 12;</code>
+       */
+      public Builder clearIsStationary() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        isStationary_ = false;
+        onChanged();
+        return this;
+      }
+
+      private float bearingDeg_ ;
+      /**
+       * <code>optional float bearing_deg = 13;</code>
+       */
+      public boolean hasBearingDeg() {
+        return ((bitField0_ & 0x00001000) == 0x00001000);
+      }
+      /**
+       * <code>optional float bearing_deg = 13;</code>
+       */
+      public float getBearingDeg() {
+        return bearingDeg_;
+      }
+      /**
+       * <code>optional float bearing_deg = 13;</code>
+       */
+      public Builder setBearingDeg(float value) {
+        bitField0_ |= 0x00001000;
+        bearingDeg_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float bearing_deg = 13;</code>
+       */
+      public Builder clearBearingDeg() {
+        bitField0_ = (bitField0_ & ~0x00001000);
+        bearingDeg_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float x_ ;
+      /**
+       * <code>optional float x = 14;</code>
+       */
+      public boolean hasX() {
+        return ((bitField0_ & 0x00002000) == 0x00002000);
+      }
+      /**
+       * <code>optional float x = 14;</code>
+       */
+      public float getX() {
+        return x_;
+      }
+      /**
+       * <code>optional float x = 14;</code>
+       */
+      public Builder setX(float value) {
+        bitField0_ |= 0x00002000;
+        x_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float x = 14;</code>
+       */
+      public Builder clearX() {
+        bitField0_ = (bitField0_ & ~0x00002000);
+        x_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float y_ ;
+      /**
+       * <code>optional float y = 15;</code>
+       */
+      public boolean hasY() {
+        return ((bitField0_ & 0x00004000) == 0x00004000);
+      }
+      /**
+       * <code>optional float y = 15;</code>
+       */
+      public float getY() {
+        return y_;
+      }
+      /**
+       * <code>optional float y = 15;</code>
+       */
+      public Builder setY(float value) {
+        bitField0_ |= 0x00004000;
+        y_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float y = 15;</code>
+       */
+      public Builder clearY() {
+        bitField0_ = (bitField0_ & ~0x00004000);
+        y_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float relXDest_ ;
+      /**
+       * <code>optional float rel_x_dest = 16;</code>
+       */
+      public boolean hasRelXDest() {
+        return ((bitField0_ & 0x00008000) == 0x00008000);
+      }
+      /**
+       * <code>optional float rel_x_dest = 16;</code>
+       */
+      public float getRelXDest() {
+        return relXDest_;
+      }
+      /**
+       * <code>optional float rel_x_dest = 16;</code>
+       */
+      public Builder setRelXDest(float value) {
+        bitField0_ |= 0x00008000;
+        relXDest_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float rel_x_dest = 16;</code>
+       */
+      public Builder clearRelXDest() {
+        bitField0_ = (bitField0_ & ~0x00008000);
+        relXDest_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float relYDest_ ;
+      /**
+       * <code>optional float rel_y_dest = 17;</code>
+       */
+      public boolean hasRelYDest() {
+        return ((bitField0_ & 0x00010000) == 0x00010000);
+      }
+      /**
+       * <code>optional float rel_y_dest = 17;</code>
+       */
+      public float getRelYDest() {
+        return relYDest_;
+      }
+      /**
+       * <code>optional float rel_y_dest = 17;</code>
+       */
+      public Builder setRelYDest(float value) {
+        bitField0_ |= 0x00010000;
+        relYDest_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float rel_y_dest = 17;</code>
+       */
+      public Builder clearRelYDest() {
+        bitField0_ = (bitField0_ & ~0x00010000);
+        relYDest_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float speed_ ;
+      /**
+       * <code>optional float speed = 18;</code>
+       *
+       * <pre>
+       * For Goalie, know where the ball is going to intersect y-axis
+       * </pre>
+       */
+      public boolean hasSpeed() {
+        return ((bitField0_ & 0x00020000) == 0x00020000);
+      }
+      /**
+       * <code>optional float speed = 18;</code>
+       *
+       * <pre>
+       * For Goalie, know where the ball is going to intersect y-axis
+       * </pre>
+       */
+      public float getSpeed() {
+        return speed_;
+      }
+      /**
+       * <code>optional float speed = 18;</code>
+       *
+       * <pre>
+       * For Goalie, know where the ball is going to intersect y-axis
+       * </pre>
+       */
+      public Builder setSpeed(float value) {
+        bitField0_ |= 0x00020000;
+        speed_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float speed = 18;</code>
+       *
+       * <pre>
+       * For Goalie, know where the ball is going to intersect y-axis
+       * </pre>
+       */
+      public Builder clearSpeed() {
+        bitField0_ = (bitField0_ & ~0x00020000);
+        speed_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float relYIntersectDest_ ;
+      /**
+       * <code>optional float rel_y_intersect_dest = 19;</code>
+       */
+      public boolean hasRelYIntersectDest() {
+        return ((bitField0_ & 0x00040000) == 0x00040000);
+      }
+      /**
+       * <code>optional float rel_y_intersect_dest = 19;</code>
+       */
+      public float getRelYIntersectDest() {
+        return relYIntersectDest_;
+      }
+      /**
+       * <code>optional float rel_y_intersect_dest = 19;</code>
+       */
+      public Builder setRelYIntersectDest(float value) {
+        bitField0_ |= 0x00040000;
+        relYIntersectDest_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float rel_y_intersect_dest = 19;</code>
+       */
+      public Builder clearRelYIntersectDest() {
+        bitField0_ = (bitField0_ & ~0x00040000);
+        relYIntersectDest_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float statRelX_ ;
+      /**
+       * <code>optional float stat_rel_x = 20;</code>
+       */
+      public boolean hasStatRelX() {
+        return ((bitField0_ & 0x00080000) == 0x00080000);
+      }
+      /**
+       * <code>optional float stat_rel_x = 20;</code>
+       */
+      public float getStatRelX() {
+        return statRelX_;
+      }
+      /**
+       * <code>optional float stat_rel_x = 20;</code>
+       */
+      public Builder setStatRelX(float value) {
+        bitField0_ |= 0x00080000;
+        statRelX_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float stat_rel_x = 20;</code>
+       */
+      public Builder clearStatRelX() {
+        bitField0_ = (bitField0_ & ~0x00080000);
+        statRelX_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float statRelY_ ;
+      /**
+       * <code>optional float stat_rel_y = 21;</code>
+       */
+      public boolean hasStatRelY() {
+        return ((bitField0_ & 0x00100000) == 0x00100000);
+      }
+      /**
+       * <code>optional float stat_rel_y = 21;</code>
+       */
+      public float getStatRelY() {
+        return statRelY_;
+      }
+      /**
+       * <code>optional float stat_rel_y = 21;</code>
+       */
+      public Builder setStatRelY(float value) {
+        bitField0_ |= 0x00100000;
+        statRelY_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float stat_rel_y = 21;</code>
+       */
+      public Builder clearStatRelY() {
+        bitField0_ = (bitField0_ & ~0x00100000);
+        statRelY_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float statDistance_ ;
+      /**
+       * <code>optional float stat_distance = 22;</code>
+       */
+      public boolean hasStatDistance() {
+        return ((bitField0_ & 0x00200000) == 0x00200000);
+      }
+      /**
+       * <code>optional float stat_distance = 22;</code>
+       */
+      public float getStatDistance() {
+        return statDistance_;
+      }
+      /**
+       * <code>optional float stat_distance = 22;</code>
+       */
+      public Builder setStatDistance(float value) {
+        bitField0_ |= 0x00200000;
+        statDistance_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float stat_distance = 22;</code>
+       */
+      public Builder clearStatDistance() {
+        bitField0_ = (bitField0_ & ~0x00200000);
+        statDistance_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float statBearing_ ;
+      /**
+       * <code>optional float stat_bearing = 23;</code>
+       */
+      public boolean hasStatBearing() {
+        return ((bitField0_ & 0x00400000) == 0x00400000);
+      }
+      /**
+       * <code>optional float stat_bearing = 23;</code>
+       */
+      public float getStatBearing() {
+        return statBearing_;
+      }
+      /**
+       * <code>optional float stat_bearing = 23;</code>
+       */
+      public Builder setStatBearing(float value) {
+        bitField0_ |= 0x00400000;
+        statBearing_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float stat_bearing = 23;</code>
+       */
+      public Builder clearStatBearing() {
+        bitField0_ = (bitField0_ & ~0x00400000);
+        statBearing_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float movRelX_ ;
+      /**
+       * <code>optional float mov_rel_x = 24;</code>
+       */
+      public boolean hasMovRelX() {
+        return ((bitField0_ & 0x00800000) == 0x00800000);
+      }
+      /**
+       * <code>optional float mov_rel_x = 24;</code>
+       */
+      public float getMovRelX() {
+        return movRelX_;
+      }
+      /**
+       * <code>optional float mov_rel_x = 24;</code>
+       */
+      public Builder setMovRelX(float value) {
+        bitField0_ |= 0x00800000;
+        movRelX_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float mov_rel_x = 24;</code>
+       */
+      public Builder clearMovRelX() {
+        bitField0_ = (bitField0_ & ~0x00800000);
+        movRelX_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float movRelY_ ;
+      /**
+       * <code>optional float mov_rel_y = 25;</code>
+       */
+      public boolean hasMovRelY() {
+        return ((bitField0_ & 0x01000000) == 0x01000000);
+      }
+      /**
+       * <code>optional float mov_rel_y = 25;</code>
+       */
+      public float getMovRelY() {
+        return movRelY_;
+      }
+      /**
+       * <code>optional float mov_rel_y = 25;</code>
+       */
+      public Builder setMovRelY(float value) {
+        bitField0_ |= 0x01000000;
+        movRelY_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float mov_rel_y = 25;</code>
+       */
+      public Builder clearMovRelY() {
+        bitField0_ = (bitField0_ & ~0x01000000);
+        movRelY_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float movDistance_ ;
+      /**
+       * <code>optional float mov_distance = 26;</code>
+       */
+      public boolean hasMovDistance() {
+        return ((bitField0_ & 0x02000000) == 0x02000000);
+      }
+      /**
+       * <code>optional float mov_distance = 26;</code>
+       */
+      public float getMovDistance() {
+        return movDistance_;
+      }
+      /**
+       * <code>optional float mov_distance = 26;</code>
+       */
+      public Builder setMovDistance(float value) {
+        bitField0_ |= 0x02000000;
+        movDistance_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float mov_distance = 26;</code>
+       */
+      public Builder clearMovDistance() {
+        bitField0_ = (bitField0_ & ~0x02000000);
+        movDistance_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float movBearing_ ;
+      /**
+       * <code>optional float mov_bearing = 27;</code>
+       */
+      public boolean hasMovBearing() {
+        return ((bitField0_ & 0x04000000) == 0x04000000);
+      }
+      /**
+       * <code>optional float mov_bearing = 27;</code>
+       */
+      public float getMovBearing() {
+        return movBearing_;
+      }
+      /**
+       * <code>optional float mov_bearing = 27;</code>
+       */
+      public Builder setMovBearing(float value) {
+        bitField0_ |= 0x04000000;
+        movBearing_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float mov_bearing = 27;</code>
+       */
+      public Builder clearMovBearing() {
+        bitField0_ = (bitField0_ & ~0x04000000);
+        movBearing_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float movVelX_ ;
+      /**
+       * <code>optional float mov_vel_x = 28;</code>
+       */
+      public boolean hasMovVelX() {
+        return ((bitField0_ & 0x08000000) == 0x08000000);
+      }
+      /**
+       * <code>optional float mov_vel_x = 28;</code>
+       */
+      public float getMovVelX() {
+        return movVelX_;
+      }
+      /**
+       * <code>optional float mov_vel_x = 28;</code>
+       */
+      public Builder setMovVelX(float value) {
+        bitField0_ |= 0x08000000;
+        movVelX_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float mov_vel_x = 28;</code>
+       */
+      public Builder clearMovVelX() {
+        bitField0_ = (bitField0_ & ~0x08000000);
+        movVelX_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float movVelY_ ;
+      /**
+       * <code>optional float mov_vel_y = 29;</code>
+       */
+      public boolean hasMovVelY() {
+        return ((bitField0_ & 0x10000000) == 0x10000000);
+      }
+      /**
+       * <code>optional float mov_vel_y = 29;</code>
+       */
+      public float getMovVelY() {
+        return movVelY_;
+      }
+      /**
+       * <code>optional float mov_vel_y = 29;</code>
+       */
+      public Builder setMovVelY(float value) {
+        bitField0_ |= 0x10000000;
+        movVelY_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float mov_vel_y = 29;</code>
+       */
+      public Builder clearMovVelY() {
+        bitField0_ = (bitField0_ & ~0x10000000);
+        movVelY_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float movSpeed_ ;
+      /**
+       * <code>optional float mov_speed = 30;</code>
+       */
+      public boolean hasMovSpeed() {
+        return ((bitField0_ & 0x20000000) == 0x20000000);
+      }
+      /**
+       * <code>optional float mov_speed = 30;</code>
+       */
+      public float getMovSpeed() {
+        return movSpeed_;
+      }
+      /**
+       * <code>optional float mov_speed = 30;</code>
+       */
+      public Builder setMovSpeed(float value) {
+        bitField0_ |= 0x20000000;
+        movSpeed_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float mov_speed = 30;</code>
+       */
+      public Builder clearMovSpeed() {
+        bitField0_ = (bitField0_ & ~0x20000000);
+        movSpeed_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:messages.FilteredBall)
+    }
+
+    static {
+      defaultInstance = new FilteredBall(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:messages.FilteredBall)
+  }
+
+  public interface SharedBallOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:messages.SharedBall)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional float x = 1;</code>
+     */
+    boolean hasX();
+    /**
+     * <code>optional float x = 1;</code>
+     */
+    float getX();
+
+    /**
+     * <code>optional float y = 2;</code>
+     */
+    boolean hasY();
+    /**
+     * <code>optional float y = 2;</code>
+     */
+    float getY();
+
+    /**
+     * <code>optional bool ball_on = 3;</code>
+     */
+    boolean hasBallOn();
+    /**
+     * <code>optional bool ball_on = 3;</code>
+     */
+    boolean getBallOn();
+
+    /**
+     * <code>optional int32 reliability = 4;</code>
+     */
+    boolean hasReliability();
+    /**
+     * <code>optional int32 reliability = 4;</code>
+     */
+    int getReliability();
+  }
+  /**
+   * Protobuf type {@code messages.SharedBall}
+   */
+  public static final class SharedBall extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:messages.SharedBall)
+      SharedBallOrBuilder {
+    // Use SharedBall.newBuilder() to construct.
+    private SharedBall(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private SharedBall(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final SharedBall defaultInstance;
+    public static SharedBall getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public SharedBall getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private SharedBall(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 13: {
+              bitField0_ |= 0x00000001;
+              x_ = input.readFloat();
+              break;
+            }
+            case 21: {
+              bitField0_ |= 0x00000002;
+              y_ = input.readFloat();
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
+              ballOn_ = input.readBool();
+              break;
+            }
+            case 32: {
+              bitField0_ |= 0x00000008;
+              reliability_ = input.readInt32();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return messages.VisionOuterClass.internal_static_messages_SharedBall_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return messages.VisionOuterClass.internal_static_messages_SharedBall_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              messages.VisionOuterClass.SharedBall.class, messages.VisionOuterClass.SharedBall.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<SharedBall> PARSER =
+        new com.google.protobuf.AbstractParser<SharedBall>() {
+      public SharedBall parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new SharedBall(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<SharedBall> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    public static final int X_FIELD_NUMBER = 1;
+    private float x_;
+    /**
+     * <code>optional float x = 1;</code>
+     */
+    public boolean hasX() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional float x = 1;</code>
+     */
+    public float getX() {
+      return x_;
+    }
+
+    public static final int Y_FIELD_NUMBER = 2;
+    private float y_;
+    /**
+     * <code>optional float y = 2;</code>
+     */
+    public boolean hasY() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional float y = 2;</code>
+     */
+    public float getY() {
+      return y_;
+    }
+
+    public static final int BALL_ON_FIELD_NUMBER = 3;
+    private boolean ballOn_;
+    /**
+     * <code>optional bool ball_on = 3;</code>
+     */
+    public boolean hasBallOn() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional bool ball_on = 3;</code>
+     */
+    public boolean getBallOn() {
+      return ballOn_;
+    }
+
+    public static final int RELIABILITY_FIELD_NUMBER = 4;
+    private int reliability_;
+    /**
+     * <code>optional int32 reliability = 4;</code>
+     */
+    public boolean hasReliability() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional int32 reliability = 4;</code>
+     */
+    public int getReliability() {
+      return reliability_;
+    }
+
+    private void initFields() {
+      x_ = 0F;
+      y_ = 0F;
+      ballOn_ = false;
+      reliability_ = 0;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeFloat(1, x_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeFloat(2, y_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBool(3, ballOn_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeInt32(4, reliability_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(1, x_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(2, y_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(3, ballOn_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(4, reliability_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static messages.VisionOuterClass.SharedBall parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static messages.VisionOuterClass.SharedBall parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static messages.VisionOuterClass.SharedBall parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static messages.VisionOuterClass.SharedBall parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static messages.VisionOuterClass.SharedBall parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static messages.VisionOuterClass.SharedBall parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static messages.VisionOuterClass.SharedBall parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static messages.VisionOuterClass.SharedBall parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static messages.VisionOuterClass.SharedBall parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static messages.VisionOuterClass.SharedBall parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(messages.VisionOuterClass.SharedBall prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code messages.SharedBall}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:messages.SharedBall)
+        messages.VisionOuterClass.SharedBallOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return messages.VisionOuterClass.internal_static_messages_SharedBall_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return messages.VisionOuterClass.internal_static_messages_SharedBall_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                messages.VisionOuterClass.SharedBall.class, messages.VisionOuterClass.SharedBall.Builder.class);
+      }
+
+      // Construct using messages.VisionOuterClass.SharedBall.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        x_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        y_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        ballOn_ = false;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        reliability_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return messages.VisionOuterClass.internal_static_messages_SharedBall_descriptor;
+      }
+
+      public messages.VisionOuterClass.SharedBall getDefaultInstanceForType() {
+        return messages.VisionOuterClass.SharedBall.getDefaultInstance();
+      }
+
+      public messages.VisionOuterClass.SharedBall build() {
+        messages.VisionOuterClass.SharedBall result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public messages.VisionOuterClass.SharedBall buildPartial() {
+        messages.VisionOuterClass.SharedBall result = new messages.VisionOuterClass.SharedBall(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.x_ = x_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.y_ = y_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.ballOn_ = ballOn_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.reliability_ = reliability_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof messages.VisionOuterClass.SharedBall) {
+          return mergeFrom((messages.VisionOuterClass.SharedBall)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(messages.VisionOuterClass.SharedBall other) {
+        if (other == messages.VisionOuterClass.SharedBall.getDefaultInstance()) return this;
+        if (other.hasX()) {
+          setX(other.getX());
+        }
+        if (other.hasY()) {
+          setY(other.getY());
+        }
+        if (other.hasBallOn()) {
+          setBallOn(other.getBallOn());
+        }
+        if (other.hasReliability()) {
+          setReliability(other.getReliability());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        messages.VisionOuterClass.SharedBall parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (messages.VisionOuterClass.SharedBall) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private float x_ ;
+      /**
+       * <code>optional float x = 1;</code>
+       */
+      public boolean hasX() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional float x = 1;</code>
+       */
+      public float getX() {
+        return x_;
+      }
+      /**
+       * <code>optional float x = 1;</code>
+       */
+      public Builder setX(float value) {
+        bitField0_ |= 0x00000001;
+        x_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float x = 1;</code>
+       */
+      public Builder clearX() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        x_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float y_ ;
+      /**
+       * <code>optional float y = 2;</code>
+       */
+      public boolean hasY() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional float y = 2;</code>
+       */
+      public float getY() {
+        return y_;
+      }
+      /**
+       * <code>optional float y = 2;</code>
+       */
+      public Builder setY(float value) {
+        bitField0_ |= 0x00000002;
+        y_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float y = 2;</code>
+       */
+      public Builder clearY() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        y_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private boolean ballOn_ ;
+      /**
+       * <code>optional bool ball_on = 3;</code>
+       */
+      public boolean hasBallOn() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional bool ball_on = 3;</code>
+       */
+      public boolean getBallOn() {
+        return ballOn_;
+      }
+      /**
+       * <code>optional bool ball_on = 3;</code>
+       */
+      public Builder setBallOn(boolean value) {
+        bitField0_ |= 0x00000004;
+        ballOn_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool ball_on = 3;</code>
+       */
+      public Builder clearBallOn() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        ballOn_ = false;
+        onChanged();
+        return this;
+      }
+
+      private int reliability_ ;
+      /**
+       * <code>optional int32 reliability = 4;</code>
+       */
+      public boolean hasReliability() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional int32 reliability = 4;</code>
+       */
+      public int getReliability() {
+        return reliability_;
+      }
+      /**
+       * <code>optional int32 reliability = 4;</code>
+       */
+      public Builder setReliability(int value) {
+        bitField0_ |= 0x00000008;
+        reliability_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 reliability = 4;</code>
+       */
+      public Builder clearReliability() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        reliability_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:messages.SharedBall)
+    }
+
+    static {
+      defaultInstance = new SharedBall(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:messages.SharedBall)
+  }
+
+  public interface NaiveBallOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:messages.NaiveBall)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional float velocity = 1;</code>
+     */
+    boolean hasVelocity();
+    /**
+     * <code>optional float velocity = 1;</code>
+     */
+    float getVelocity();
+
+    /**
+     * <code>optional bool stationary = 2;</code>
+     */
+    boolean hasStationary();
+    /**
+     * <code>optional bool stationary = 2;</code>
+     */
+    boolean getStationary();
+
+    /**
+     * <code>optional float yintercept = 3;</code>
+     */
+    boolean hasYintercept();
+    /**
+     * <code>optional float yintercept = 3;</code>
+     */
+    float getYintercept();
+
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    java.util.List<messages.VisionOuterClass.NaiveBall.Position> 
+        getPositionList();
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    messages.VisionOuterClass.NaiveBall.Position getPosition(int index);
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    int getPositionCount();
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    java.util.List<? extends messages.VisionOuterClass.NaiveBall.PositionOrBuilder> 
+        getPositionOrBuilderList();
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    messages.VisionOuterClass.NaiveBall.PositionOrBuilder getPositionOrBuilder(
+        int index);
+
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    java.util.List<messages.VisionOuterClass.NaiveBall.Position> 
+        getDestBufferList();
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    messages.VisionOuterClass.NaiveBall.Position getDestBuffer(int index);
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    int getDestBufferCount();
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    java.util.List<? extends messages.VisionOuterClass.NaiveBall.PositionOrBuilder> 
+        getDestBufferOrBuilderList();
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    messages.VisionOuterClass.NaiveBall.PositionOrBuilder getDestBufferOrBuilder(
+        int index);
+
+    /**
+     * <code>optional float x_vel = 6;</code>
+     */
+    boolean hasXVel();
+    /**
+     * <code>optional float x_vel = 6;</code>
+     */
+    float getXVel();
+
+    /**
+     * <code>optional float y_vel = 7;</code>
+     */
+    boolean hasYVel();
+    /**
+     * <code>optional float y_vel = 7;</code>
+     */
+    float getYVel();
+
+    /**
+     * <code>optional float start_avg_x = 8;</code>
+     */
+    boolean hasStartAvgX();
+    /**
+     * <code>optional float start_avg_x = 8;</code>
+     */
+    float getStartAvgX();
+
+    /**
+     * <code>optional float start_avg_y = 9;</code>
+     */
+    boolean hasStartAvgY();
+    /**
+     * <code>optional float start_avg_y = 9;</code>
+     */
+    float getStartAvgY();
+
+    /**
+     * <code>optional float end_avg_x = 10;</code>
+     */
+    boolean hasEndAvgX();
+    /**
+     * <code>optional float end_avg_x = 10;</code>
+     */
+    float getEndAvgX();
+
+    /**
+     * <code>optional float end_avg_y = 11;</code>
+     */
+    boolean hasEndAvgY();
+    /**
+     * <code>optional float end_avg_y = 11;</code>
+     */
+    float getEndAvgY();
+
+    /**
+     * <code>optional float avg_start_index = 12;</code>
+     */
+    boolean hasAvgStartIndex();
+    /**
+     * <code>optional float avg_start_index = 12;</code>
+     */
+    float getAvgStartIndex();
+
+    /**
+     * <code>optional float avg_end_index = 13;</code>
+     */
+    boolean hasAvgEndIndex();
+    /**
+     * <code>optional float avg_end_index = 13;</code>
+     */
+    float getAvgEndIndex();
+
+    /**
+     * <code>optional float alt_x_vel = 14;</code>
+     */
+    boolean hasAltXVel();
+    /**
+     * <code>optional float alt_x_vel = 14;</code>
+     */
+    float getAltXVel();
+
+    /**
+     * <code>optional float x_v_1 = 15;</code>
+     */
+    boolean hasXV1();
+    /**
+     * <code>optional float x_v_1 = 15;</code>
+     */
+    float getXV1();
+
+    /**
+     * <code>optional float x_v_2 = 16;</code>
+     */
+    boolean hasXV2();
+    /**
+     * <code>optional float x_v_2 = 16;</code>
+     */
+    float getXV2();
+
+    /**
+     * <code>optional float x_v_3 = 17;</code>
+     */
+    boolean hasXV3();
+    /**
+     * <code>optional float x_v_3 = 17;</code>
+     */
+    float getXV3();
+  }
+  /**
+   * Protobuf type {@code messages.NaiveBall}
+   */
+  public static final class NaiveBall extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:messages.NaiveBall)
+      NaiveBallOrBuilder {
+    // Use NaiveBall.newBuilder() to construct.
+    private NaiveBall(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private NaiveBall(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final NaiveBall defaultInstance;
+    public static NaiveBall getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public NaiveBall getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private NaiveBall(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 13: {
+              bitField0_ |= 0x00000001;
+              velocity_ = input.readFloat();
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              stationary_ = input.readBool();
+              break;
+            }
+            case 29: {
+              bitField0_ |= 0x00000004;
+              yintercept_ = input.readFloat();
+              break;
+            }
+            case 34: {
+              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+                position_ = new java.util.ArrayList<messages.VisionOuterClass.NaiveBall.Position>();
+                mutable_bitField0_ |= 0x00000008;
+              }
+              position_.add(input.readMessage(messages.VisionOuterClass.NaiveBall.Position.PARSER, extensionRegistry));
+              break;
+            }
+            case 42: {
+              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+                destBuffer_ = new java.util.ArrayList<messages.VisionOuterClass.NaiveBall.Position>();
+                mutable_bitField0_ |= 0x00000010;
+              }
+              destBuffer_.add(input.readMessage(messages.VisionOuterClass.NaiveBall.Position.PARSER, extensionRegistry));
+              break;
+            }
+            case 53: {
+              bitField0_ |= 0x00000008;
+              xVel_ = input.readFloat();
+              break;
+            }
+            case 61: {
+              bitField0_ |= 0x00000010;
+              yVel_ = input.readFloat();
+              break;
+            }
+            case 69: {
+              bitField0_ |= 0x00000020;
+              startAvgX_ = input.readFloat();
+              break;
+            }
+            case 77: {
+              bitField0_ |= 0x00000040;
+              startAvgY_ = input.readFloat();
+              break;
+            }
+            case 85: {
+              bitField0_ |= 0x00000080;
+              endAvgX_ = input.readFloat();
+              break;
+            }
+            case 93: {
+              bitField0_ |= 0x00000100;
+              endAvgY_ = input.readFloat();
+              break;
+            }
+            case 101: {
+              bitField0_ |= 0x00000200;
+              avgStartIndex_ = input.readFloat();
+              break;
+            }
+            case 109: {
+              bitField0_ |= 0x00000400;
+              avgEndIndex_ = input.readFloat();
+              break;
+            }
+            case 117: {
+              bitField0_ |= 0x00000800;
+              altXVel_ = input.readFloat();
+              break;
+            }
+            case 125: {
+              bitField0_ |= 0x00001000;
+              xV1_ = input.readFloat();
+              break;
+            }
+            case 133: {
+              bitField0_ |= 0x00002000;
+              xV2_ = input.readFloat();
+              break;
+            }
+            case 141: {
+              bitField0_ |= 0x00004000;
+              xV3_ = input.readFloat();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+          position_ = java.util.Collections.unmodifiableList(position_);
+        }
+        if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+          destBuffer_ = java.util.Collections.unmodifiableList(destBuffer_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return messages.VisionOuterClass.internal_static_messages_NaiveBall_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return messages.VisionOuterClass.internal_static_messages_NaiveBall_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              messages.VisionOuterClass.NaiveBall.class, messages.VisionOuterClass.NaiveBall.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<NaiveBall> PARSER =
+        new com.google.protobuf.AbstractParser<NaiveBall>() {
+      public NaiveBall parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new NaiveBall(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<NaiveBall> getParserForType() {
+      return PARSER;
+    }
+
+    public interface PositionOrBuilder extends
+        // @@protoc_insertion_point(interface_extends:messages.NaiveBall.Position)
+        com.google.protobuf.MessageOrBuilder {
+
+      /**
+       * <code>optional float x = 1;</code>
+       */
+      boolean hasX();
+      /**
+       * <code>optional float x = 1;</code>
+       */
+      float getX();
+
+      /**
+       * <code>optional float y = 2;</code>
+       */
+      boolean hasY();
+      /**
+       * <code>optional float y = 2;</code>
+       */
+      float getY();
+    }
+    /**
+     * Protobuf type {@code messages.NaiveBall.Position}
+     */
+    public static final class Position extends
+        com.google.protobuf.GeneratedMessage implements
+        // @@protoc_insertion_point(message_implements:messages.NaiveBall.Position)
+        PositionOrBuilder {
+      // Use Position.newBuilder() to construct.
+      private Position(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+        super(builder);
+        this.unknownFields = builder.getUnknownFields();
+      }
+      private Position(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+      private static final Position defaultInstance;
+      public static Position getDefaultInstance() {
+        return defaultInstance;
+      }
+
+      public Position getDefaultInstanceForType() {
+        return defaultInstance;
+      }
+
+      private final com.google.protobuf.UnknownFieldSet unknownFields;
+      @java.lang.Override
+      public final com.google.protobuf.UnknownFieldSet
+          getUnknownFields() {
+        return this.unknownFields;
+      }
+      private Position(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        initFields();
+        int mutable_bitField0_ = 0;
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+            com.google.protobuf.UnknownFieldSet.newBuilder();
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              default: {
+                if (!parseUnknownField(input, unknownFields,
+                                       extensionRegistry, tag)) {
+                  done = true;
+                }
+                break;
+              }
+              case 13: {
+                bitField0_ |= 0x00000001;
+                x_ = input.readFloat();
+                break;
+              }
+              case 21: {
+                bitField0_ |= 0x00000002;
+                y_ = input.readFloat();
+                break;
+              }
+            }
+          }
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(this);
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this);
+        } finally {
+          this.unknownFields = unknownFields.build();
+          makeExtensionsImmutable();
+        }
+      }
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return messages.VisionOuterClass.internal_static_messages_NaiveBall_Position_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return messages.VisionOuterClass.internal_static_messages_NaiveBall_Position_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                messages.VisionOuterClass.NaiveBall.Position.class, messages.VisionOuterClass.NaiveBall.Position.Builder.class);
+      }
+
+      public static com.google.protobuf.Parser<Position> PARSER =
+          new com.google.protobuf.AbstractParser<Position>() {
+        public Position parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+          return new Position(input, extensionRegistry);
+        }
+      };
+
+      @java.lang.Override
+      public com.google.protobuf.Parser<Position> getParserForType() {
+        return PARSER;
+      }
+
+      private int bitField0_;
+      public static final int X_FIELD_NUMBER = 1;
+      private float x_;
+      /**
+       * <code>optional float x = 1;</code>
+       */
+      public boolean hasX() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional float x = 1;</code>
+       */
+      public float getX() {
+        return x_;
+      }
+
+      public static final int Y_FIELD_NUMBER = 2;
+      private float y_;
+      /**
+       * <code>optional float y = 2;</code>
+       */
+      public boolean hasY() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional float y = 2;</code>
+       */
+      public float getY() {
+        return y_;
+      }
+
+      private void initFields() {
+        x_ = 0F;
+        y_ = 0F;
+      }
+      private byte memoizedIsInitialized = -1;
+      public final boolean isInitialized() {
+        byte isInitialized = memoizedIsInitialized;
+        if (isInitialized == 1) return true;
+        if (isInitialized == 0) return false;
+
+        memoizedIsInitialized = 1;
+        return true;
+      }
+
+      public void writeTo(com.google.protobuf.CodedOutputStream output)
+                          throws java.io.IOException {
+        getSerializedSize();
+        if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          output.writeFloat(1, x_);
+        }
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          output.writeFloat(2, y_);
+        }
+        getUnknownFields().writeTo(output);
+      }
+
+      private int memoizedSerializedSize = -1;
+      public int getSerializedSize() {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+
+        size = 0;
+        if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeFloatSize(1, x_);
+        }
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeFloatSize(2, y_);
+        }
+        size += getUnknownFields().getSerializedSize();
+        memoizedSerializedSize = size;
+        return size;
+      }
+
+      private static final long serialVersionUID = 0L;
+      @java.lang.Override
+      protected java.lang.Object writeReplace()
+          throws java.io.ObjectStreamException {
+        return super.writeReplace();
+      }
+
+      public static messages.VisionOuterClass.NaiveBall.Position parseFrom(
+          com.google.protobuf.ByteString data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static messages.VisionOuterClass.NaiveBall.Position parseFrom(
+          com.google.protobuf.ByteString data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
+      public static messages.VisionOuterClass.NaiveBall.Position parseFrom(byte[] data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static messages.VisionOuterClass.NaiveBall.Position parseFrom(
+          byte[] data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
+      public static messages.VisionOuterClass.NaiveBall.Position parseFrom(java.io.InputStream input)
+          throws java.io.IOException {
+        return PARSER.parseFrom(input);
+      }
+      public static messages.VisionOuterClass.NaiveBall.Position parseFrom(
+          java.io.InputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return PARSER.parseFrom(input, extensionRegistry);
+      }
+      public static messages.VisionOuterClass.NaiveBall.Position parseDelimitedFrom(java.io.InputStream input)
+          throws java.io.IOException {
+        return PARSER.parseDelimitedFrom(input);
+      }
+      public static messages.VisionOuterClass.NaiveBall.Position parseDelimitedFrom(
+          java.io.InputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      }
+      public static messages.VisionOuterClass.NaiveBall.Position parseFrom(
+          com.google.protobuf.CodedInputStream input)
+          throws java.io.IOException {
+        return PARSER.parseFrom(input);
+      }
+      public static messages.VisionOuterClass.NaiveBall.Position parseFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return PARSER.parseFrom(input, extensionRegistry);
+      }
+
+      public static Builder newBuilder() { return Builder.create(); }
+      public Builder newBuilderForType() { return newBuilder(); }
+      public static Builder newBuilder(messages.VisionOuterClass.NaiveBall.Position prototype) {
+        return newBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() { return newBuilder(this); }
+
+      @java.lang.Override
+      protected Builder newBuilderForType(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        Builder builder = new Builder(parent);
+        return builder;
+      }
+      /**
+       * Protobuf type {@code messages.NaiveBall.Position}
+       */
+      public static final class Builder extends
+          com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+          // @@protoc_insertion_point(builder_implements:messages.NaiveBall.Position)
+          messages.VisionOuterClass.NaiveBall.PositionOrBuilder {
+        public static final com.google.protobuf.Descriptors.Descriptor
+            getDescriptor() {
+          return messages.VisionOuterClass.internal_static_messages_NaiveBall_Position_descriptor;
+        }
+
+        protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+            internalGetFieldAccessorTable() {
+          return messages.VisionOuterClass.internal_static_messages_NaiveBall_Position_fieldAccessorTable
+              .ensureFieldAccessorsInitialized(
+                  messages.VisionOuterClass.NaiveBall.Position.class, messages.VisionOuterClass.NaiveBall.Position.Builder.class);
+        }
+
+        // Construct using messages.VisionOuterClass.NaiveBall.Position.newBuilder()
+        private Builder() {
+          maybeForceBuilderInitialization();
+        }
+
+        private Builder(
+            com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          super(parent);
+          maybeForceBuilderInitialization();
+        }
+        private void maybeForceBuilderInitialization() {
+          if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          }
+        }
+        private static Builder create() {
+          return new Builder();
+        }
+
+        public Builder clear() {
+          super.clear();
+          x_ = 0F;
+          bitField0_ = (bitField0_ & ~0x00000001);
+          y_ = 0F;
+          bitField0_ = (bitField0_ & ~0x00000002);
+          return this;
+        }
+
+        public Builder clone() {
+          return create().mergeFrom(buildPartial());
+        }
+
+        public com.google.protobuf.Descriptors.Descriptor
+            getDescriptorForType() {
+          return messages.VisionOuterClass.internal_static_messages_NaiveBall_Position_descriptor;
+        }
+
+        public messages.VisionOuterClass.NaiveBall.Position getDefaultInstanceForType() {
+          return messages.VisionOuterClass.NaiveBall.Position.getDefaultInstance();
+        }
+
+        public messages.VisionOuterClass.NaiveBall.Position build() {
+          messages.VisionOuterClass.NaiveBall.Position result = buildPartial();
+          if (!result.isInitialized()) {
+            throw newUninitializedMessageException(result);
+          }
+          return result;
+        }
+
+        public messages.VisionOuterClass.NaiveBall.Position buildPartial() {
+          messages.VisionOuterClass.NaiveBall.Position result = new messages.VisionOuterClass.NaiveBall.Position(this);
+          int from_bitField0_ = bitField0_;
+          int to_bitField0_ = 0;
+          if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+            to_bitField0_ |= 0x00000001;
+          }
+          result.x_ = x_;
+          if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+            to_bitField0_ |= 0x00000002;
+          }
+          result.y_ = y_;
+          result.bitField0_ = to_bitField0_;
+          onBuilt();
+          return result;
+        }
+
+        public Builder mergeFrom(com.google.protobuf.Message other) {
+          if (other instanceof messages.VisionOuterClass.NaiveBall.Position) {
+            return mergeFrom((messages.VisionOuterClass.NaiveBall.Position)other);
+          } else {
+            super.mergeFrom(other);
+            return this;
+          }
+        }
+
+        public Builder mergeFrom(messages.VisionOuterClass.NaiveBall.Position other) {
+          if (other == messages.VisionOuterClass.NaiveBall.Position.getDefaultInstance()) return this;
+          if (other.hasX()) {
+            setX(other.getX());
+          }
+          if (other.hasY()) {
+            setY(other.getY());
+          }
+          this.mergeUnknownFields(other.getUnknownFields());
+          return this;
+        }
+
+        public final boolean isInitialized() {
+          return true;
+        }
+
+        public Builder mergeFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
+          messages.VisionOuterClass.NaiveBall.Position parsedMessage = null;
+          try {
+            parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+            parsedMessage = (messages.VisionOuterClass.NaiveBall.Position) e.getUnfinishedMessage();
+            throw e;
+          } finally {
+            if (parsedMessage != null) {
+              mergeFrom(parsedMessage);
+            }
+          }
+          return this;
+        }
+        private int bitField0_;
+
+        private float x_ ;
+        /**
+         * <code>optional float x = 1;</code>
+         */
+        public boolean hasX() {
+          return ((bitField0_ & 0x00000001) == 0x00000001);
+        }
+        /**
+         * <code>optional float x = 1;</code>
+         */
+        public float getX() {
+          return x_;
+        }
+        /**
+         * <code>optional float x = 1;</code>
+         */
+        public Builder setX(float value) {
+          bitField0_ |= 0x00000001;
+          x_ = value;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>optional float x = 1;</code>
+         */
+        public Builder clearX() {
+          bitField0_ = (bitField0_ & ~0x00000001);
+          x_ = 0F;
+          onChanged();
+          return this;
+        }
+
+        private float y_ ;
+        /**
+         * <code>optional float y = 2;</code>
+         */
+        public boolean hasY() {
+          return ((bitField0_ & 0x00000002) == 0x00000002);
+        }
+        /**
+         * <code>optional float y = 2;</code>
+         */
+        public float getY() {
+          return y_;
+        }
+        /**
+         * <code>optional float y = 2;</code>
+         */
+        public Builder setY(float value) {
+          bitField0_ |= 0x00000002;
+          y_ = value;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>optional float y = 2;</code>
+         */
+        public Builder clearY() {
+          bitField0_ = (bitField0_ & ~0x00000002);
+          y_ = 0F;
+          onChanged();
+          return this;
+        }
+
+        // @@protoc_insertion_point(builder_scope:messages.NaiveBall.Position)
+      }
+
+      static {
+        defaultInstance = new Position(true);
+        defaultInstance.initFields();
+      }
+
+      // @@protoc_insertion_point(class_scope:messages.NaiveBall.Position)
+    }
+
+    private int bitField0_;
+    public static final int VELOCITY_FIELD_NUMBER = 1;
+    private float velocity_;
+    /**
+     * <code>optional float velocity = 1;</code>
+     */
+    public boolean hasVelocity() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional float velocity = 1;</code>
+     */
+    public float getVelocity() {
+      return velocity_;
+    }
+
+    public static final int STATIONARY_FIELD_NUMBER = 2;
+    private boolean stationary_;
+    /**
+     * <code>optional bool stationary = 2;</code>
+     */
+    public boolean hasStationary() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional bool stationary = 2;</code>
+     */
+    public boolean getStationary() {
+      return stationary_;
+    }
+
+    public static final int YINTERCEPT_FIELD_NUMBER = 3;
+    private float yintercept_;
+    /**
+     * <code>optional float yintercept = 3;</code>
+     */
+    public boolean hasYintercept() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional float yintercept = 3;</code>
+     */
+    public float getYintercept() {
+      return yintercept_;
+    }
+
+    public static final int POSITION_FIELD_NUMBER = 4;
+    private java.util.List<messages.VisionOuterClass.NaiveBall.Position> position_;
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    public java.util.List<messages.VisionOuterClass.NaiveBall.Position> getPositionList() {
+      return position_;
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    public java.util.List<? extends messages.VisionOuterClass.NaiveBall.PositionOrBuilder> 
+        getPositionOrBuilderList() {
+      return position_;
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    public int getPositionCount() {
+      return position_.size();
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    public messages.VisionOuterClass.NaiveBall.Position getPosition(int index) {
+      return position_.get(index);
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+     */
+    public messages.VisionOuterClass.NaiveBall.PositionOrBuilder getPositionOrBuilder(
+        int index) {
+      return position_.get(index);
+    }
+
+    public static final int DEST_BUFFER_FIELD_NUMBER = 5;
+    private java.util.List<messages.VisionOuterClass.NaiveBall.Position> destBuffer_;
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    public java.util.List<messages.VisionOuterClass.NaiveBall.Position> getDestBufferList() {
+      return destBuffer_;
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    public java.util.List<? extends messages.VisionOuterClass.NaiveBall.PositionOrBuilder> 
+        getDestBufferOrBuilderList() {
+      return destBuffer_;
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    public int getDestBufferCount() {
+      return destBuffer_.size();
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    public messages.VisionOuterClass.NaiveBall.Position getDestBuffer(int index) {
+      return destBuffer_.get(index);
+    }
+    /**
+     * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+     */
+    public messages.VisionOuterClass.NaiveBall.PositionOrBuilder getDestBufferOrBuilder(
+        int index) {
+      return destBuffer_.get(index);
+    }
+
+    public static final int X_VEL_FIELD_NUMBER = 6;
+    private float xVel_;
+    /**
+     * <code>optional float x_vel = 6;</code>
+     */
+    public boolean hasXVel() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional float x_vel = 6;</code>
+     */
+    public float getXVel() {
+      return xVel_;
+    }
+
+    public static final int Y_VEL_FIELD_NUMBER = 7;
+    private float yVel_;
+    /**
+     * <code>optional float y_vel = 7;</code>
+     */
+    public boolean hasYVel() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional float y_vel = 7;</code>
+     */
+    public float getYVel() {
+      return yVel_;
+    }
+
+    public static final int START_AVG_X_FIELD_NUMBER = 8;
+    private float startAvgX_;
+    /**
+     * <code>optional float start_avg_x = 8;</code>
+     */
+    public boolean hasStartAvgX() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional float start_avg_x = 8;</code>
+     */
+    public float getStartAvgX() {
+      return startAvgX_;
+    }
+
+    public static final int START_AVG_Y_FIELD_NUMBER = 9;
+    private float startAvgY_;
+    /**
+     * <code>optional float start_avg_y = 9;</code>
+     */
+    public boolean hasStartAvgY() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional float start_avg_y = 9;</code>
+     */
+    public float getStartAvgY() {
+      return startAvgY_;
+    }
+
+    public static final int END_AVG_X_FIELD_NUMBER = 10;
+    private float endAvgX_;
+    /**
+     * <code>optional float end_avg_x = 10;</code>
+     */
+    public boolean hasEndAvgX() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional float end_avg_x = 10;</code>
+     */
+    public float getEndAvgX() {
+      return endAvgX_;
+    }
+
+    public static final int END_AVG_Y_FIELD_NUMBER = 11;
+    private float endAvgY_;
+    /**
+     * <code>optional float end_avg_y = 11;</code>
+     */
+    public boolean hasEndAvgY() {
+      return ((bitField0_ & 0x00000100) == 0x00000100);
+    }
+    /**
+     * <code>optional float end_avg_y = 11;</code>
+     */
+    public float getEndAvgY() {
+      return endAvgY_;
+    }
+
+    public static final int AVG_START_INDEX_FIELD_NUMBER = 12;
+    private float avgStartIndex_;
+    /**
+     * <code>optional float avg_start_index = 12;</code>
+     */
+    public boolean hasAvgStartIndex() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    /**
+     * <code>optional float avg_start_index = 12;</code>
+     */
+    public float getAvgStartIndex() {
+      return avgStartIndex_;
+    }
+
+    public static final int AVG_END_INDEX_FIELD_NUMBER = 13;
+    private float avgEndIndex_;
+    /**
+     * <code>optional float avg_end_index = 13;</code>
+     */
+    public boolean hasAvgEndIndex() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>optional float avg_end_index = 13;</code>
+     */
+    public float getAvgEndIndex() {
+      return avgEndIndex_;
+    }
+
+    public static final int ALT_X_VEL_FIELD_NUMBER = 14;
+    private float altXVel_;
+    /**
+     * <code>optional float alt_x_vel = 14;</code>
+     */
+    public boolean hasAltXVel() {
+      return ((bitField0_ & 0x00000800) == 0x00000800);
+    }
+    /**
+     * <code>optional float alt_x_vel = 14;</code>
+     */
+    public float getAltXVel() {
+      return altXVel_;
+    }
+
+    public static final int X_V_1_FIELD_NUMBER = 15;
+    private float xV1_;
+    /**
+     * <code>optional float x_v_1 = 15;</code>
+     */
+    public boolean hasXV1() {
+      return ((bitField0_ & 0x00001000) == 0x00001000);
+    }
+    /**
+     * <code>optional float x_v_1 = 15;</code>
+     */
+    public float getXV1() {
+      return xV1_;
+    }
+
+    public static final int X_V_2_FIELD_NUMBER = 16;
+    private float xV2_;
+    /**
+     * <code>optional float x_v_2 = 16;</code>
+     */
+    public boolean hasXV2() {
+      return ((bitField0_ & 0x00002000) == 0x00002000);
+    }
+    /**
+     * <code>optional float x_v_2 = 16;</code>
+     */
+    public float getXV2() {
+      return xV2_;
+    }
+
+    public static final int X_V_3_FIELD_NUMBER = 17;
+    private float xV3_;
+    /**
+     * <code>optional float x_v_3 = 17;</code>
+     */
+    public boolean hasXV3() {
+      return ((bitField0_ & 0x00004000) == 0x00004000);
+    }
+    /**
+     * <code>optional float x_v_3 = 17;</code>
+     */
+    public float getXV3() {
+      return xV3_;
+    }
+
+    private void initFields() {
+      velocity_ = 0F;
+      stationary_ = false;
+      yintercept_ = 0F;
+      position_ = java.util.Collections.emptyList();
+      destBuffer_ = java.util.Collections.emptyList();
+      xVel_ = 0F;
+      yVel_ = 0F;
+      startAvgX_ = 0F;
+      startAvgY_ = 0F;
+      endAvgX_ = 0F;
+      endAvgY_ = 0F;
+      avgStartIndex_ = 0F;
+      avgEndIndex_ = 0F;
+      altXVel_ = 0F;
+      xV1_ = 0F;
+      xV2_ = 0F;
+      xV3_ = 0F;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeFloat(1, velocity_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBool(2, stationary_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeFloat(3, yintercept_);
+      }
+      for (int i = 0; i < position_.size(); i++) {
+        output.writeMessage(4, position_.get(i));
+      }
+      for (int i = 0; i < destBuffer_.size(); i++) {
+        output.writeMessage(5, destBuffer_.get(i));
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeFloat(6, xVel_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeFloat(7, yVel_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeFloat(8, startAvgX_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeFloat(9, startAvgY_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeFloat(10, endAvgX_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        output.writeFloat(11, endAvgY_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeFloat(12, avgStartIndex_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeFloat(13, avgEndIndex_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeFloat(14, altXVel_);
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        output.writeFloat(15, xV1_);
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        output.writeFloat(16, xV2_);
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        output.writeFloat(17, xV3_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(1, velocity_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(2, stationary_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(3, yintercept_);
+      }
+      for (int i = 0; i < position_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, position_.get(i));
+      }
+      for (int i = 0; i < destBuffer_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, destBuffer_.get(i));
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(6, xVel_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(7, yVel_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(8, startAvgX_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(9, startAvgY_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(10, endAvgX_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(11, endAvgY_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(12, avgStartIndex_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(13, avgEndIndex_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(14, altXVel_);
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(15, xV1_);
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(16, xV2_);
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(17, xV3_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static messages.VisionOuterClass.NaiveBall parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static messages.VisionOuterClass.NaiveBall parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static messages.VisionOuterClass.NaiveBall parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static messages.VisionOuterClass.NaiveBall parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static messages.VisionOuterClass.NaiveBall parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static messages.VisionOuterClass.NaiveBall parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static messages.VisionOuterClass.NaiveBall parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static messages.VisionOuterClass.NaiveBall parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static messages.VisionOuterClass.NaiveBall parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static messages.VisionOuterClass.NaiveBall parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(messages.VisionOuterClass.NaiveBall prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code messages.NaiveBall}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:messages.NaiveBall)
+        messages.VisionOuterClass.NaiveBallOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return messages.VisionOuterClass.internal_static_messages_NaiveBall_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return messages.VisionOuterClass.internal_static_messages_NaiveBall_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                messages.VisionOuterClass.NaiveBall.class, messages.VisionOuterClass.NaiveBall.Builder.class);
+      }
+
+      // Construct using messages.VisionOuterClass.NaiveBall.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getPositionFieldBuilder();
+          getDestBufferFieldBuilder();
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        velocity_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        stationary_ = false;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        yintercept_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        if (positionBuilder_ == null) {
+          position_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000008);
+        } else {
+          positionBuilder_.clear();
+        }
+        if (destBufferBuilder_ == null) {
+          destBuffer_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000010);
+        } else {
+          destBufferBuilder_.clear();
+        }
+        xVel_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000020);
+        yVel_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000040);
+        startAvgX_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000080);
+        startAvgY_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000100);
+        endAvgX_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000200);
+        endAvgY_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000400);
+        avgStartIndex_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000800);
+        avgEndIndex_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00001000);
+        altXVel_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00002000);
+        xV1_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00004000);
+        xV2_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00008000);
+        xV3_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00010000);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return messages.VisionOuterClass.internal_static_messages_NaiveBall_descriptor;
+      }
+
+      public messages.VisionOuterClass.NaiveBall getDefaultInstanceForType() {
+        return messages.VisionOuterClass.NaiveBall.getDefaultInstance();
+      }
+
+      public messages.VisionOuterClass.NaiveBall build() {
+        messages.VisionOuterClass.NaiveBall result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public messages.VisionOuterClass.NaiveBall buildPartial() {
+        messages.VisionOuterClass.NaiveBall result = new messages.VisionOuterClass.NaiveBall(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.velocity_ = velocity_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.stationary_ = stationary_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.yintercept_ = yintercept_;
+        if (positionBuilder_ == null) {
+          if (((bitField0_ & 0x00000008) == 0x00000008)) {
+            position_ = java.util.Collections.unmodifiableList(position_);
+            bitField0_ = (bitField0_ & ~0x00000008);
+          }
+          result.position_ = position_;
+        } else {
+          result.position_ = positionBuilder_.build();
+        }
+        if (destBufferBuilder_ == null) {
+          if (((bitField0_ & 0x00000010) == 0x00000010)) {
+            destBuffer_ = java.util.Collections.unmodifiableList(destBuffer_);
+            bitField0_ = (bitField0_ & ~0x00000010);
+          }
+          result.destBuffer_ = destBuffer_;
+        } else {
+          result.destBuffer_ = destBufferBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.xVel_ = xVel_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.yVel_ = yVel_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.startAvgX_ = startAvgX_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.startAvgY_ = startAvgY_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.endAvgX_ = endAvgX_;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000100;
+        }
+        result.endAvgY_ = endAvgY_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000200;
+        }
+        result.avgStartIndex_ = avgStartIndex_;
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        result.avgEndIndex_ = avgEndIndex_;
+        if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
+          to_bitField0_ |= 0x00000800;
+        }
+        result.altXVel_ = altXVel_;
+        if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
+          to_bitField0_ |= 0x00001000;
+        }
+        result.xV1_ = xV1_;
+        if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
+          to_bitField0_ |= 0x00002000;
+        }
+        result.xV2_ = xV2_;
+        if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
+          to_bitField0_ |= 0x00004000;
+        }
+        result.xV3_ = xV3_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof messages.VisionOuterClass.NaiveBall) {
+          return mergeFrom((messages.VisionOuterClass.NaiveBall)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(messages.VisionOuterClass.NaiveBall other) {
+        if (other == messages.VisionOuterClass.NaiveBall.getDefaultInstance()) return this;
+        if (other.hasVelocity()) {
+          setVelocity(other.getVelocity());
+        }
+        if (other.hasStationary()) {
+          setStationary(other.getStationary());
+        }
+        if (other.hasYintercept()) {
+          setYintercept(other.getYintercept());
+        }
+        if (positionBuilder_ == null) {
+          if (!other.position_.isEmpty()) {
+            if (position_.isEmpty()) {
+              position_ = other.position_;
+              bitField0_ = (bitField0_ & ~0x00000008);
+            } else {
+              ensurePositionIsMutable();
+              position_.addAll(other.position_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.position_.isEmpty()) {
+            if (positionBuilder_.isEmpty()) {
+              positionBuilder_.dispose();
+              positionBuilder_ = null;
+              position_ = other.position_;
+              bitField0_ = (bitField0_ & ~0x00000008);
+              positionBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getPositionFieldBuilder() : null;
+            } else {
+              positionBuilder_.addAllMessages(other.position_);
+            }
+          }
+        }
+        if (destBufferBuilder_ == null) {
+          if (!other.destBuffer_.isEmpty()) {
+            if (destBuffer_.isEmpty()) {
+              destBuffer_ = other.destBuffer_;
+              bitField0_ = (bitField0_ & ~0x00000010);
+            } else {
+              ensureDestBufferIsMutable();
+              destBuffer_.addAll(other.destBuffer_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.destBuffer_.isEmpty()) {
+            if (destBufferBuilder_.isEmpty()) {
+              destBufferBuilder_.dispose();
+              destBufferBuilder_ = null;
+              destBuffer_ = other.destBuffer_;
+              bitField0_ = (bitField0_ & ~0x00000010);
+              destBufferBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getDestBufferFieldBuilder() : null;
+            } else {
+              destBufferBuilder_.addAllMessages(other.destBuffer_);
+            }
+          }
+        }
+        if (other.hasXVel()) {
+          setXVel(other.getXVel());
+        }
+        if (other.hasYVel()) {
+          setYVel(other.getYVel());
+        }
+        if (other.hasStartAvgX()) {
+          setStartAvgX(other.getStartAvgX());
+        }
+        if (other.hasStartAvgY()) {
+          setStartAvgY(other.getStartAvgY());
+        }
+        if (other.hasEndAvgX()) {
+          setEndAvgX(other.getEndAvgX());
+        }
+        if (other.hasEndAvgY()) {
+          setEndAvgY(other.getEndAvgY());
+        }
+        if (other.hasAvgStartIndex()) {
+          setAvgStartIndex(other.getAvgStartIndex());
+        }
+        if (other.hasAvgEndIndex()) {
+          setAvgEndIndex(other.getAvgEndIndex());
+        }
+        if (other.hasAltXVel()) {
+          setAltXVel(other.getAltXVel());
+        }
+        if (other.hasXV1()) {
+          setXV1(other.getXV1());
+        }
+        if (other.hasXV2()) {
+          setXV2(other.getXV2());
+        }
+        if (other.hasXV3()) {
+          setXV3(other.getXV3());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        messages.VisionOuterClass.NaiveBall parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (messages.VisionOuterClass.NaiveBall) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private float velocity_ ;
+      /**
+       * <code>optional float velocity = 1;</code>
+       */
+      public boolean hasVelocity() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional float velocity = 1;</code>
+       */
+      public float getVelocity() {
+        return velocity_;
+      }
+      /**
+       * <code>optional float velocity = 1;</code>
+       */
+      public Builder setVelocity(float value) {
+        bitField0_ |= 0x00000001;
+        velocity_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float velocity = 1;</code>
+       */
+      public Builder clearVelocity() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        velocity_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private boolean stationary_ ;
+      /**
+       * <code>optional bool stationary = 2;</code>
+       */
+      public boolean hasStationary() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional bool stationary = 2;</code>
+       */
+      public boolean getStationary() {
+        return stationary_;
+      }
+      /**
+       * <code>optional bool stationary = 2;</code>
+       */
+      public Builder setStationary(boolean value) {
+        bitField0_ |= 0x00000002;
+        stationary_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool stationary = 2;</code>
+       */
+      public Builder clearStationary() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        stationary_ = false;
+        onChanged();
+        return this;
+      }
+
+      private float yintercept_ ;
+      /**
+       * <code>optional float yintercept = 3;</code>
+       */
+      public boolean hasYintercept() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional float yintercept = 3;</code>
+       */
+      public float getYintercept() {
+        return yintercept_;
+      }
+      /**
+       * <code>optional float yintercept = 3;</code>
+       */
+      public Builder setYintercept(float value) {
+        bitField0_ |= 0x00000004;
+        yintercept_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float yintercept = 3;</code>
+       */
+      public Builder clearYintercept() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        yintercept_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private java.util.List<messages.VisionOuterClass.NaiveBall.Position> position_ =
+        java.util.Collections.emptyList();
+      private void ensurePositionIsMutable() {
+        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+          position_ = new java.util.ArrayList<messages.VisionOuterClass.NaiveBall.Position>(position_);
+          bitField0_ |= 0x00000008;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          messages.VisionOuterClass.NaiveBall.Position, messages.VisionOuterClass.NaiveBall.Position.Builder, messages.VisionOuterClass.NaiveBall.PositionOrBuilder> positionBuilder_;
+
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public java.util.List<messages.VisionOuterClass.NaiveBall.Position> getPositionList() {
+        if (positionBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(position_);
+        } else {
+          return positionBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public int getPositionCount() {
+        if (positionBuilder_ == null) {
+          return position_.size();
+        } else {
+          return positionBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public messages.VisionOuterClass.NaiveBall.Position getPosition(int index) {
+        if (positionBuilder_ == null) {
+          return position_.get(index);
+        } else {
+          return positionBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public Builder setPosition(
+          int index, messages.VisionOuterClass.NaiveBall.Position value) {
+        if (positionBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePositionIsMutable();
+          position_.set(index, value);
+          onChanged();
+        } else {
+          positionBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public Builder setPosition(
+          int index, messages.VisionOuterClass.NaiveBall.Position.Builder builderForValue) {
+        if (positionBuilder_ == null) {
+          ensurePositionIsMutable();
+          position_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          positionBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public Builder addPosition(messages.VisionOuterClass.NaiveBall.Position value) {
+        if (positionBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePositionIsMutable();
+          position_.add(value);
+          onChanged();
+        } else {
+          positionBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public Builder addPosition(
+          int index, messages.VisionOuterClass.NaiveBall.Position value) {
+        if (positionBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePositionIsMutable();
+          position_.add(index, value);
+          onChanged();
+        } else {
+          positionBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public Builder addPosition(
+          messages.VisionOuterClass.NaiveBall.Position.Builder builderForValue) {
+        if (positionBuilder_ == null) {
+          ensurePositionIsMutable();
+          position_.add(builderForValue.build());
+          onChanged();
+        } else {
+          positionBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public Builder addPosition(
+          int index, messages.VisionOuterClass.NaiveBall.Position.Builder builderForValue) {
+        if (positionBuilder_ == null) {
+          ensurePositionIsMutable();
+          position_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          positionBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public Builder addAllPosition(
+          java.lang.Iterable<? extends messages.VisionOuterClass.NaiveBall.Position> values) {
+        if (positionBuilder_ == null) {
+          ensurePositionIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, position_);
+          onChanged();
+        } else {
+          positionBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public Builder clearPosition() {
+        if (positionBuilder_ == null) {
+          position_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000008);
+          onChanged();
+        } else {
+          positionBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public Builder removePosition(int index) {
+        if (positionBuilder_ == null) {
+          ensurePositionIsMutable();
+          position_.remove(index);
+          onChanged();
+        } else {
+          positionBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public messages.VisionOuterClass.NaiveBall.Position.Builder getPositionBuilder(
+          int index) {
+        return getPositionFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public messages.VisionOuterClass.NaiveBall.PositionOrBuilder getPositionOrBuilder(
+          int index) {
+        if (positionBuilder_ == null) {
+          return position_.get(index);  } else {
+          return positionBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public java.util.List<? extends messages.VisionOuterClass.NaiveBall.PositionOrBuilder> 
+           getPositionOrBuilderList() {
+        if (positionBuilder_ != null) {
+          return positionBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(position_);
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public messages.VisionOuterClass.NaiveBall.Position.Builder addPositionBuilder() {
+        return getPositionFieldBuilder().addBuilder(
+            messages.VisionOuterClass.NaiveBall.Position.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public messages.VisionOuterClass.NaiveBall.Position.Builder addPositionBuilder(
+          int index) {
+        return getPositionFieldBuilder().addBuilder(
+            index, messages.VisionOuterClass.NaiveBall.Position.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position position = 4;</code>
+       */
+      public java.util.List<messages.VisionOuterClass.NaiveBall.Position.Builder> 
+           getPositionBuilderList() {
+        return getPositionFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          messages.VisionOuterClass.NaiveBall.Position, messages.VisionOuterClass.NaiveBall.Position.Builder, messages.VisionOuterClass.NaiveBall.PositionOrBuilder> 
+          getPositionFieldBuilder() {
+        if (positionBuilder_ == null) {
+          positionBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              messages.VisionOuterClass.NaiveBall.Position, messages.VisionOuterClass.NaiveBall.Position.Builder, messages.VisionOuterClass.NaiveBall.PositionOrBuilder>(
+                  position_,
+                  ((bitField0_ & 0x00000008) == 0x00000008),
+                  getParentForChildren(),
+                  isClean());
+          position_ = null;
+        }
+        return positionBuilder_;
+      }
+
+      private java.util.List<messages.VisionOuterClass.NaiveBall.Position> destBuffer_ =
+        java.util.Collections.emptyList();
+      private void ensureDestBufferIsMutable() {
+        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+          destBuffer_ = new java.util.ArrayList<messages.VisionOuterClass.NaiveBall.Position>(destBuffer_);
+          bitField0_ |= 0x00000010;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          messages.VisionOuterClass.NaiveBall.Position, messages.VisionOuterClass.NaiveBall.Position.Builder, messages.VisionOuterClass.NaiveBall.PositionOrBuilder> destBufferBuilder_;
+
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public java.util.List<messages.VisionOuterClass.NaiveBall.Position> getDestBufferList() {
+        if (destBufferBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(destBuffer_);
+        } else {
+          return destBufferBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public int getDestBufferCount() {
+        if (destBufferBuilder_ == null) {
+          return destBuffer_.size();
+        } else {
+          return destBufferBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public messages.VisionOuterClass.NaiveBall.Position getDestBuffer(int index) {
+        if (destBufferBuilder_ == null) {
+          return destBuffer_.get(index);
+        } else {
+          return destBufferBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public Builder setDestBuffer(
+          int index, messages.VisionOuterClass.NaiveBall.Position value) {
+        if (destBufferBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureDestBufferIsMutable();
+          destBuffer_.set(index, value);
+          onChanged();
+        } else {
+          destBufferBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public Builder setDestBuffer(
+          int index, messages.VisionOuterClass.NaiveBall.Position.Builder builderForValue) {
+        if (destBufferBuilder_ == null) {
+          ensureDestBufferIsMutable();
+          destBuffer_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          destBufferBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public Builder addDestBuffer(messages.VisionOuterClass.NaiveBall.Position value) {
+        if (destBufferBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureDestBufferIsMutable();
+          destBuffer_.add(value);
+          onChanged();
+        } else {
+          destBufferBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public Builder addDestBuffer(
+          int index, messages.VisionOuterClass.NaiveBall.Position value) {
+        if (destBufferBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureDestBufferIsMutable();
+          destBuffer_.add(index, value);
+          onChanged();
+        } else {
+          destBufferBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public Builder addDestBuffer(
+          messages.VisionOuterClass.NaiveBall.Position.Builder builderForValue) {
+        if (destBufferBuilder_ == null) {
+          ensureDestBufferIsMutable();
+          destBuffer_.add(builderForValue.build());
+          onChanged();
+        } else {
+          destBufferBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public Builder addDestBuffer(
+          int index, messages.VisionOuterClass.NaiveBall.Position.Builder builderForValue) {
+        if (destBufferBuilder_ == null) {
+          ensureDestBufferIsMutable();
+          destBuffer_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          destBufferBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public Builder addAllDestBuffer(
+          java.lang.Iterable<? extends messages.VisionOuterClass.NaiveBall.Position> values) {
+        if (destBufferBuilder_ == null) {
+          ensureDestBufferIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, destBuffer_);
+          onChanged();
+        } else {
+          destBufferBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public Builder clearDestBuffer() {
+        if (destBufferBuilder_ == null) {
+          destBuffer_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000010);
+          onChanged();
+        } else {
+          destBufferBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public Builder removeDestBuffer(int index) {
+        if (destBufferBuilder_ == null) {
+          ensureDestBufferIsMutable();
+          destBuffer_.remove(index);
+          onChanged();
+        } else {
+          destBufferBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public messages.VisionOuterClass.NaiveBall.Position.Builder getDestBufferBuilder(
+          int index) {
+        return getDestBufferFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public messages.VisionOuterClass.NaiveBall.PositionOrBuilder getDestBufferOrBuilder(
+          int index) {
+        if (destBufferBuilder_ == null) {
+          return destBuffer_.get(index);  } else {
+          return destBufferBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public java.util.List<? extends messages.VisionOuterClass.NaiveBall.PositionOrBuilder> 
+           getDestBufferOrBuilderList() {
+        if (destBufferBuilder_ != null) {
+          return destBufferBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(destBuffer_);
+        }
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public messages.VisionOuterClass.NaiveBall.Position.Builder addDestBufferBuilder() {
+        return getDestBufferFieldBuilder().addBuilder(
+            messages.VisionOuterClass.NaiveBall.Position.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public messages.VisionOuterClass.NaiveBall.Position.Builder addDestBufferBuilder(
+          int index) {
+        return getDestBufferFieldBuilder().addBuilder(
+            index, messages.VisionOuterClass.NaiveBall.Position.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .messages.NaiveBall.Position dest_buffer = 5;</code>
+       */
+      public java.util.List<messages.VisionOuterClass.NaiveBall.Position.Builder> 
+           getDestBufferBuilderList() {
+        return getDestBufferFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          messages.VisionOuterClass.NaiveBall.Position, messages.VisionOuterClass.NaiveBall.Position.Builder, messages.VisionOuterClass.NaiveBall.PositionOrBuilder> 
+          getDestBufferFieldBuilder() {
+        if (destBufferBuilder_ == null) {
+          destBufferBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              messages.VisionOuterClass.NaiveBall.Position, messages.VisionOuterClass.NaiveBall.Position.Builder, messages.VisionOuterClass.NaiveBall.PositionOrBuilder>(
+                  destBuffer_,
+                  ((bitField0_ & 0x00000010) == 0x00000010),
+                  getParentForChildren(),
+                  isClean());
+          destBuffer_ = null;
+        }
+        return destBufferBuilder_;
+      }
+
+      private float xVel_ ;
+      /**
+       * <code>optional float x_vel = 6;</code>
+       */
+      public boolean hasXVel() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional float x_vel = 6;</code>
+       */
+      public float getXVel() {
+        return xVel_;
+      }
+      /**
+       * <code>optional float x_vel = 6;</code>
+       */
+      public Builder setXVel(float value) {
+        bitField0_ |= 0x00000020;
+        xVel_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float x_vel = 6;</code>
+       */
+      public Builder clearXVel() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        xVel_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float yVel_ ;
+      /**
+       * <code>optional float y_vel = 7;</code>
+       */
+      public boolean hasYVel() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>optional float y_vel = 7;</code>
+       */
+      public float getYVel() {
+        return yVel_;
+      }
+      /**
+       * <code>optional float y_vel = 7;</code>
+       */
+      public Builder setYVel(float value) {
+        bitField0_ |= 0x00000040;
+        yVel_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float y_vel = 7;</code>
+       */
+      public Builder clearYVel() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        yVel_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float startAvgX_ ;
+      /**
+       * <code>optional float start_avg_x = 8;</code>
+       */
+      public boolean hasStartAvgX() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional float start_avg_x = 8;</code>
+       */
+      public float getStartAvgX() {
+        return startAvgX_;
+      }
+      /**
+       * <code>optional float start_avg_x = 8;</code>
+       */
+      public Builder setStartAvgX(float value) {
+        bitField0_ |= 0x00000080;
+        startAvgX_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float start_avg_x = 8;</code>
+       */
+      public Builder clearStartAvgX() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        startAvgX_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float startAvgY_ ;
+      /**
+       * <code>optional float start_avg_y = 9;</code>
+       */
+      public boolean hasStartAvgY() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      /**
+       * <code>optional float start_avg_y = 9;</code>
+       */
+      public float getStartAvgY() {
+        return startAvgY_;
+      }
+      /**
+       * <code>optional float start_avg_y = 9;</code>
+       */
+      public Builder setStartAvgY(float value) {
+        bitField0_ |= 0x00000100;
+        startAvgY_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float start_avg_y = 9;</code>
+       */
+      public Builder clearStartAvgY() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        startAvgY_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float endAvgX_ ;
+      /**
+       * <code>optional float end_avg_x = 10;</code>
+       */
+      public boolean hasEndAvgX() {
+        return ((bitField0_ & 0x00000200) == 0x00000200);
+      }
+      /**
+       * <code>optional float end_avg_x = 10;</code>
+       */
+      public float getEndAvgX() {
+        return endAvgX_;
+      }
+      /**
+       * <code>optional float end_avg_x = 10;</code>
+       */
+      public Builder setEndAvgX(float value) {
+        bitField0_ |= 0x00000200;
+        endAvgX_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float end_avg_x = 10;</code>
+       */
+      public Builder clearEndAvgX() {
+        bitField0_ = (bitField0_ & ~0x00000200);
+        endAvgX_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float endAvgY_ ;
+      /**
+       * <code>optional float end_avg_y = 11;</code>
+       */
+      public boolean hasEndAvgY() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      /**
+       * <code>optional float end_avg_y = 11;</code>
+       */
+      public float getEndAvgY() {
+        return endAvgY_;
+      }
+      /**
+       * <code>optional float end_avg_y = 11;</code>
+       */
+      public Builder setEndAvgY(float value) {
+        bitField0_ |= 0x00000400;
+        endAvgY_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float end_avg_y = 11;</code>
+       */
+      public Builder clearEndAvgY() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        endAvgY_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float avgStartIndex_ ;
+      /**
+       * <code>optional float avg_start_index = 12;</code>
+       */
+      public boolean hasAvgStartIndex() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional float avg_start_index = 12;</code>
+       */
+      public float getAvgStartIndex() {
+        return avgStartIndex_;
+      }
+      /**
+       * <code>optional float avg_start_index = 12;</code>
+       */
+      public Builder setAvgStartIndex(float value) {
+        bitField0_ |= 0x00000800;
+        avgStartIndex_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float avg_start_index = 12;</code>
+       */
+      public Builder clearAvgStartIndex() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        avgStartIndex_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float avgEndIndex_ ;
+      /**
+       * <code>optional float avg_end_index = 13;</code>
+       */
+      public boolean hasAvgEndIndex() {
+        return ((bitField0_ & 0x00001000) == 0x00001000);
+      }
+      /**
+       * <code>optional float avg_end_index = 13;</code>
+       */
+      public float getAvgEndIndex() {
+        return avgEndIndex_;
+      }
+      /**
+       * <code>optional float avg_end_index = 13;</code>
+       */
+      public Builder setAvgEndIndex(float value) {
+        bitField0_ |= 0x00001000;
+        avgEndIndex_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float avg_end_index = 13;</code>
+       */
+      public Builder clearAvgEndIndex() {
+        bitField0_ = (bitField0_ & ~0x00001000);
+        avgEndIndex_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float altXVel_ ;
+      /**
+       * <code>optional float alt_x_vel = 14;</code>
+       */
+      public boolean hasAltXVel() {
+        return ((bitField0_ & 0x00002000) == 0x00002000);
+      }
+      /**
+       * <code>optional float alt_x_vel = 14;</code>
+       */
+      public float getAltXVel() {
+        return altXVel_;
+      }
+      /**
+       * <code>optional float alt_x_vel = 14;</code>
+       */
+      public Builder setAltXVel(float value) {
+        bitField0_ |= 0x00002000;
+        altXVel_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float alt_x_vel = 14;</code>
+       */
+      public Builder clearAltXVel() {
+        bitField0_ = (bitField0_ & ~0x00002000);
+        altXVel_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float xV1_ ;
+      /**
+       * <code>optional float x_v_1 = 15;</code>
+       */
+      public boolean hasXV1() {
+        return ((bitField0_ & 0x00004000) == 0x00004000);
+      }
+      /**
+       * <code>optional float x_v_1 = 15;</code>
+       */
+      public float getXV1() {
+        return xV1_;
+      }
+      /**
+       * <code>optional float x_v_1 = 15;</code>
+       */
+      public Builder setXV1(float value) {
+        bitField0_ |= 0x00004000;
+        xV1_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float x_v_1 = 15;</code>
+       */
+      public Builder clearXV1() {
+        bitField0_ = (bitField0_ & ~0x00004000);
+        xV1_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float xV2_ ;
+      /**
+       * <code>optional float x_v_2 = 16;</code>
+       */
+      public boolean hasXV2() {
+        return ((bitField0_ & 0x00008000) == 0x00008000);
+      }
+      /**
+       * <code>optional float x_v_2 = 16;</code>
+       */
+      public float getXV2() {
+        return xV2_;
+      }
+      /**
+       * <code>optional float x_v_2 = 16;</code>
+       */
+      public Builder setXV2(float value) {
+        bitField0_ |= 0x00008000;
+        xV2_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float x_v_2 = 16;</code>
+       */
+      public Builder clearXV2() {
+        bitField0_ = (bitField0_ & ~0x00008000);
+        xV2_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float xV3_ ;
+      /**
+       * <code>optional float x_v_3 = 17;</code>
+       */
+      public boolean hasXV3() {
+        return ((bitField0_ & 0x00010000) == 0x00010000);
+      }
+      /**
+       * <code>optional float x_v_3 = 17;</code>
+       */
+      public float getXV3() {
+        return xV3_;
+      }
+      /**
+       * <code>optional float x_v_3 = 17;</code>
+       */
+      public Builder setXV3(float value) {
+        bitField0_ |= 0x00010000;
+        xV3_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float x_v_3 = 17;</code>
+       */
+      public Builder clearXV3() {
+        bitField0_ = (bitField0_ & ~0x00010000);
+        xV3_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:messages.NaiveBall)
+    }
+
+    static {
+      defaultInstance = new NaiveBall(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:messages.NaiveBall)
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_HoughLine_descriptor;
   private static
@@ -6562,6 +12463,26 @@ public final class VisionOuterClass {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_VBall_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_messages_FilteredBall_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_messages_FilteredBall_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_messages_SharedBall_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_messages_SharedBall_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_messages_NaiveBall_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_messages_NaiveBall_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_messages_NaiveBall_Position_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_messages_NaiveBall_Position_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -6573,26 +12494,54 @@ public final class VisionOuterClass {
     java.lang.String[] descriptorData = {
       "\n\014Vision.proto\022\010messages\";\n\tHoughLine\022\t\n" +
       "\001r\030\001 \001(\002\022\t\n\001t\030\002 \001(\002\022\013\n\003ep0\030\003 \001(\002\022\013\n\003ep1\030" +
-      "\004 \001(\002\"\224\001\n\tFieldLine\022\"\n\005inner\030\001 \001(\0132\023.mes" +
+      "\004 \001(\002\"\241\001\n\tFieldLine\022\"\n\005inner\030\001 \001(\0132\023.mes" +
       "sages.HoughLine\022\"\n\005outer\030\002 \001(\0132\023.message" +
       "s.HoughLine\022\n\n\002id\030\003 \001(\005\022\026\n\016correspondenc" +
-      "e\030\004 \001(\005\022\014\n\004prob\030\005 \001(\002\022\r\n\005index\030\006 \001(\005\"n\n\006" +
-      "Corner\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\022\n\n\002id\030\003 \001(\005" +
-      "\022\026\n\016correspondence\030\004 \001(\005\022\014\n\004prob\030\005 \001(\002\022\r" +
-      "\n\005line1\030\006 \001(\005\022\r\n\005line2\030\007 \001(\005\">\n\014CenterCi" +
-      "rcle\022\n\n\002on\030\001 \001(\010\022\t\n\001x\030\002 \001(\002\022\t\n\001y\030\003 \001(\002\022\014",
-      "\n\004prob\030\004 \001(\002\"\224\001\n\006Vision\022!\n\004line\030\001 \003(\0132\023." +
-      "messages.FieldLine\022 \n\006corner\030\002 \003(\0132\020.mes" +
-      "sages.Corner\022&\n\006circle\030\003 \001(\0132\026.messages." +
-      "CenterCircle\022\035\n\004ball\030\004 \001(\0132\017.messages.VB" +
-      "all\"\254\002\n\005VBall\022\020\n\010distance\030\001 \001(\001\022\017\n\007beari" +
-      "ng\030\002 \001(\001\022\023\n\013angle_x_deg\030\003 \001(\001\022\023\n\013angle_y" +
-      "_deg\030\004 \001(\001\022\022\n\nbearing_sd\030\005 \001(\001\022\020\n\010inTopC" +
-      "am\030\006 \001(\010\022\016\n\006radius\030\007 \001(\001\022\022\n\nconfidence\030\010" +
-      " \001(\001\022\n\n\002on\030\t \001(\010\022\021\n\tframes_on\030\n \001(\021\022\022\n\nf" +
-      "rames_off\030\013 \001(\021\022\026\n\016rel_x_variance\030\014 \001(\001\022",
-      "\026\n\016rel_y_variance\030\r \001(\001\022\023\n\013bearing_deg\030\016" +
-      " \001(\001\022\t\n\001x\030\017 \001(\021\022\t\n\001y\030\020 \001(\021"
+      "e\030\004 \001(\005\022\014\n\004prob\030\005 \001(\002\022\r\n\005index\030\006 \001(\005\022\013\n\003" +
+      "wz0\030\007 \001(\002\"n\n\006Corner\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(" +
+      "\002\022\n\n\002id\030\003 \001(\005\022\026\n\016correspondence\030\004 \001(\005\022\014\n" +
+      "\004prob\030\005 \001(\002\022\r\n\005line1\030\006 \001(\005\022\r\n\005line2\030\007 \001(" +
+      "\005\">\n\014CenterCircle\022\n\n\002on\030\001 \001(\010\022\t\n\001x\030\002 \001(\002",
+      "\022\t\n\001y\030\003 \001(\002\022\014\n\004prob\030\004 \001(\002\"\252\001\n\006Vision\022!\n\004" +
+      "line\030\001 \003(\0132\023.messages.FieldLine\022 \n\006corne" +
+      "r\030\002 \003(\0132\020.messages.Corner\022&\n\006circle\030\003 \001(" +
+      "\0132\026.messages.CenterCircle\022\035\n\004ball\030\004 \001(\0132" +
+      "\017.messages.VBall\022\024\n\014horizon_dist\030\005 \001(\005\"\254" +
+      "\002\n\005VBall\022\020\n\010distance\030\001 \001(\001\022\017\n\007bearing\030\002 " +
+      "\001(\001\022\023\n\013angle_x_deg\030\003 \001(\001\022\023\n\013angle_y_deg\030" +
+      "\004 \001(\001\022\022\n\nbearing_sd\030\005 \001(\001\022\020\n\010inTopCam\030\006 " +
+      "\001(\010\022\016\n\006radius\030\007 \001(\001\022\022\n\nconfidence\030\010 \001(\001\022" +
+      "\n\n\002on\030\t \001(\010\022\021\n\tframes_on\030\n \001(\021\022\022\n\nframes",
+      "_off\030\013 \001(\021\022\026\n\016rel_x_variance\030\014 \001(\001\022\026\n\016re" +
+      "l_y_variance\030\r \001(\001\022\023\n\013bearing_deg\030\016 \001(\001\022" +
+      "\t\n\001x\030\017 \001(\021\022\t\n\001y\030\020 \001(\021\"\315\004\n\014FilteredBall\022\034" +
+      "\n\003vis\030\001 \001(\0132\017.messages.VBall\022\020\n\010distance" +
+      "\030\002 \001(\002\022\017\n\007bearing\030\003 \001(\002\022\r\n\005rel_x\030\004 \001(\002\022\r" +
+      "\n\005rel_y\030\005 \001(\002\022\r\n\005vel_x\030\006 \001(\002\022\r\n\005vel_y\030\007 " +
+      "\001(\002\022\021\n\tvar_rel_x\030\010 \001(\002\022\021\n\tvar_rel_y\030\t \001(" +
+      "\002\022\021\n\tvar_vel_x\030\n \001(\002\022\021\n\tvar_vel_y\030\013 \001(\002\022" +
+      "\025\n\ris_stationary\030\014 \001(\010\022\023\n\013bearing_deg\030\r " +
+      "\001(\002\022\t\n\001x\030\016 \001(\002\022\t\n\001y\030\017 \001(\002\022\022\n\nrel_x_dest\030",
+      "\020 \001(\002\022\022\n\nrel_y_dest\030\021 \001(\002\022\r\n\005speed\030\022 \001(\002" +
+      "\022\034\n\024rel_y_intersect_dest\030\023 \001(\002\022\022\n\nstat_r" +
+      "el_x\030\024 \001(\002\022\022\n\nstat_rel_y\030\025 \001(\002\022\025\n\rstat_d" +
+      "istance\030\026 \001(\002\022\024\n\014stat_bearing\030\027 \001(\002\022\021\n\tm" +
+      "ov_rel_x\030\030 \001(\002\022\021\n\tmov_rel_y\030\031 \001(\002\022\024\n\014mov" +
+      "_distance\030\032 \001(\002\022\023\n\013mov_bearing\030\033 \001(\002\022\021\n\t" +
+      "mov_vel_x\030\034 \001(\002\022\021\n\tmov_vel_y\030\035 \001(\002\022\021\n\tmo" +
+      "v_speed\030\036 \001(\002\"H\n\nSharedBall\022\t\n\001x\030\001 \001(\002\022\t" +
+      "\n\001y\030\002 \001(\002\022\017\n\007ball_on\030\003 \001(\010\022\023\n\013reliabilit" +
+      "y\030\004 \001(\005\"\250\003\n\tNaiveBall\022\020\n\010velocity\030\001 \001(\002\022",
+      "\022\n\nstationary\030\002 \001(\010\022\022\n\nyintercept\030\003 \001(\002\022" +
+      ".\n\010position\030\004 \003(\0132\034.messages.NaiveBall.P" +
+      "osition\0221\n\013dest_buffer\030\005 \003(\0132\034.messages." +
+      "NaiveBall.Position\022\r\n\005x_vel\030\006 \001(\002\022\r\n\005y_v" +
+      "el\030\007 \001(\002\022\023\n\013start_avg_x\030\010 \001(\002\022\023\n\013start_a" +
+      "vg_y\030\t \001(\002\022\021\n\tend_avg_x\030\n \001(\002\022\021\n\tend_avg" +
+      "_y\030\013 \001(\002\022\027\n\017avg_start_index\030\014 \001(\002\022\025\n\ravg" +
+      "_end_index\030\r \001(\002\022\021\n\talt_x_vel\030\016 \001(\002\022\r\n\005x" +
+      "_v_1\030\017 \001(\002\022\r\n\005x_v_2\030\020 \001(\002\022\r\n\005x_v_3\030\021 \001(\002" +
+      "\032 \n\010Position\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -6617,7 +12566,7 @@ public final class VisionOuterClass {
     internal_static_messages_FieldLine_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_FieldLine_descriptor,
-        new java.lang.String[] { "Inner", "Outer", "Id", "Correspondence", "Prob", "Index", });
+        new java.lang.String[] { "Inner", "Outer", "Id", "Correspondence", "Prob", "Index", "Wz0", });
     internal_static_messages_Corner_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_messages_Corner_fieldAccessorTable = new
@@ -6630,23 +12579,42 @@ public final class VisionOuterClass {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_CenterCircle_descriptor,
         new java.lang.String[] { "On", "X", "Y", "Prob", });
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
     internal_static_messages_Vision_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_messages_Vision_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_Vision_descriptor,
-        new java.lang.String[] { "Line", "Corner", "Circle", "Ball", });
-<<<<<<< HEAD
-    messages.BallModel.getDescriptor();
-=======
+        new java.lang.String[] { "Line", "Corner", "Circle", "Ball", "HorizonDist", });
     internal_static_messages_VBall_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_messages_VBall_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_VBall_descriptor,
         new java.lang.String[] { "Distance", "Bearing", "AngleXDeg", "AngleYDeg", "BearingSd", "InTopCam", "Radius", "Confidence", "On", "FramesOn", "FramesOff", "RelXVariance", "RelYVariance", "BearingDeg", "X", "Y", });
->>>>>>> d0b64903304453d41f6ad07fb3d6a8fd91c5355c
+    internal_static_messages_FilteredBall_descriptor =
+      getDescriptor().getMessageTypes().get(6);
+    internal_static_messages_FilteredBall_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_FilteredBall_descriptor,
+        new java.lang.String[] { "Vis", "Distance", "Bearing", "RelX", "RelY", "VelX", "VelY", "VarRelX", "VarRelY", "VarVelX", "VarVelY", "IsStationary", "BearingDeg", "X", "Y", "RelXDest", "RelYDest", "Speed", "RelYIntersectDest", "StatRelX", "StatRelY", "StatDistance", "StatBearing", "MovRelX", "MovRelY", "MovDistance", "MovBearing", "MovVelX", "MovVelY", "MovSpeed", });
+    internal_static_messages_SharedBall_descriptor =
+      getDescriptor().getMessageTypes().get(7);
+    internal_static_messages_SharedBall_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_SharedBall_descriptor,
+        new java.lang.String[] { "X", "Y", "BallOn", "Reliability", });
+    internal_static_messages_NaiveBall_descriptor =
+      getDescriptor().getMessageTypes().get(8);
+    internal_static_messages_NaiveBall_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_NaiveBall_descriptor,
+        new java.lang.String[] { "Velocity", "Stationary", "Yintercept", "Position", "DestBuffer", "XVel", "YVel", "StartAvgX", "StartAvgY", "EndAvgX", "EndAvgY", "AvgStartIndex", "AvgEndIndex", "AltXVel", "XV1", "XV2", "XV3", });
+    internal_static_messages_NaiveBall_Position_descriptor =
+      internal_static_messages_NaiveBall_descriptor.getNestedTypes().get(0);
+    internal_static_messages_NaiveBall_Position_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_NaiveBall_Position_descriptor,
+        new java.lang.String[] { "X", "Y", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

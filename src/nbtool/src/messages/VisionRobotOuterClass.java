@@ -4649,6 +4649,637 @@ public final class VisionRobotOuterClass {
     // @@protoc_insertion_point(class_scope:messages.VisionObstacle)
   }
 
+  public interface RobotObstacleOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:messages.RobotObstacle)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional float closest_y = 1;</code>
+     */
+    boolean hasClosestY();
+    /**
+     * <code>optional float closest_y = 1;</code>
+     */
+    float getClosestY();
+
+    /**
+     * <code>optional float box_bottom = 2;</code>
+     */
+    boolean hasBoxBottom();
+    /**
+     * <code>optional float box_bottom = 2;</code>
+     */
+    float getBoxBottom();
+
+    /**
+     * <code>optional float box_left = 3;</code>
+     */
+    boolean hasBoxLeft();
+    /**
+     * <code>optional float box_left = 3;</code>
+     */
+    float getBoxLeft();
+
+    /**
+     * <code>optional float box_right = 4;</code>
+     */
+    boolean hasBoxRight();
+    /**
+     * <code>optional float box_right = 4;</code>
+     */
+    float getBoxRight();
+  }
+  /**
+   * Protobuf type {@code messages.RobotObstacle}
+   */
+  public static final class RobotObstacle extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:messages.RobotObstacle)
+      RobotObstacleOrBuilder {
+    // Use RobotObstacle.newBuilder() to construct.
+    private RobotObstacle(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private RobotObstacle(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final RobotObstacle defaultInstance;
+    public static RobotObstacle getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public RobotObstacle getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private RobotObstacle(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 13: {
+              bitField0_ |= 0x00000001;
+              closestY_ = input.readFloat();
+              break;
+            }
+            case 21: {
+              bitField0_ |= 0x00000002;
+              boxBottom_ = input.readFloat();
+              break;
+            }
+            case 29: {
+              bitField0_ |= 0x00000004;
+              boxLeft_ = input.readFloat();
+              break;
+            }
+            case 37: {
+              bitField0_ |= 0x00000008;
+              boxRight_ = input.readFloat();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return messages.VisionRobotOuterClass.internal_static_messages_RobotObstacle_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return messages.VisionRobotOuterClass.internal_static_messages_RobotObstacle_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              messages.VisionRobotOuterClass.RobotObstacle.class, messages.VisionRobotOuterClass.RobotObstacle.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<RobotObstacle> PARSER =
+        new com.google.protobuf.AbstractParser<RobotObstacle>() {
+      public RobotObstacle parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new RobotObstacle(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<RobotObstacle> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    public static final int CLOSEST_Y_FIELD_NUMBER = 1;
+    private float closestY_;
+    /**
+     * <code>optional float closest_y = 1;</code>
+     */
+    public boolean hasClosestY() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional float closest_y = 1;</code>
+     */
+    public float getClosestY() {
+      return closestY_;
+    }
+
+    public static final int BOX_BOTTOM_FIELD_NUMBER = 2;
+    private float boxBottom_;
+    /**
+     * <code>optional float box_bottom = 2;</code>
+     */
+    public boolean hasBoxBottom() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional float box_bottom = 2;</code>
+     */
+    public float getBoxBottom() {
+      return boxBottom_;
+    }
+
+    public static final int BOX_LEFT_FIELD_NUMBER = 3;
+    private float boxLeft_;
+    /**
+     * <code>optional float box_left = 3;</code>
+     */
+    public boolean hasBoxLeft() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional float box_left = 3;</code>
+     */
+    public float getBoxLeft() {
+      return boxLeft_;
+    }
+
+    public static final int BOX_RIGHT_FIELD_NUMBER = 4;
+    private float boxRight_;
+    /**
+     * <code>optional float box_right = 4;</code>
+     */
+    public boolean hasBoxRight() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional float box_right = 4;</code>
+     */
+    public float getBoxRight() {
+      return boxRight_;
+    }
+
+    private void initFields() {
+      closestY_ = 0F;
+      boxBottom_ = 0F;
+      boxLeft_ = 0F;
+      boxRight_ = 0F;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeFloat(1, closestY_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeFloat(2, boxBottom_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeFloat(3, boxLeft_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeFloat(4, boxRight_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(1, closestY_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(2, boxBottom_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(3, boxLeft_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(4, boxRight_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static messages.VisionRobotOuterClass.RobotObstacle parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static messages.VisionRobotOuterClass.RobotObstacle parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static messages.VisionRobotOuterClass.RobotObstacle parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static messages.VisionRobotOuterClass.RobotObstacle parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static messages.VisionRobotOuterClass.RobotObstacle parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static messages.VisionRobotOuterClass.RobotObstacle parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static messages.VisionRobotOuterClass.RobotObstacle parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static messages.VisionRobotOuterClass.RobotObstacle parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static messages.VisionRobotOuterClass.RobotObstacle parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static messages.VisionRobotOuterClass.RobotObstacle parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(messages.VisionRobotOuterClass.RobotObstacle prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code messages.RobotObstacle}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:messages.RobotObstacle)
+        messages.VisionRobotOuterClass.RobotObstacleOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return messages.VisionRobotOuterClass.internal_static_messages_RobotObstacle_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return messages.VisionRobotOuterClass.internal_static_messages_RobotObstacle_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                messages.VisionRobotOuterClass.RobotObstacle.class, messages.VisionRobotOuterClass.RobotObstacle.Builder.class);
+      }
+
+      // Construct using messages.VisionRobotOuterClass.RobotObstacle.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        closestY_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        boxBottom_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        boxLeft_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        boxRight_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return messages.VisionRobotOuterClass.internal_static_messages_RobotObstacle_descriptor;
+      }
+
+      public messages.VisionRobotOuterClass.RobotObstacle getDefaultInstanceForType() {
+        return messages.VisionRobotOuterClass.RobotObstacle.getDefaultInstance();
+      }
+
+      public messages.VisionRobotOuterClass.RobotObstacle build() {
+        messages.VisionRobotOuterClass.RobotObstacle result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public messages.VisionRobotOuterClass.RobotObstacle buildPartial() {
+        messages.VisionRobotOuterClass.RobotObstacle result = new messages.VisionRobotOuterClass.RobotObstacle(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.closestY_ = closestY_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.boxBottom_ = boxBottom_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.boxLeft_ = boxLeft_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.boxRight_ = boxRight_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof messages.VisionRobotOuterClass.RobotObstacle) {
+          return mergeFrom((messages.VisionRobotOuterClass.RobotObstacle)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(messages.VisionRobotOuterClass.RobotObstacle other) {
+        if (other == messages.VisionRobotOuterClass.RobotObstacle.getDefaultInstance()) return this;
+        if (other.hasClosestY()) {
+          setClosestY(other.getClosestY());
+        }
+        if (other.hasBoxBottom()) {
+          setBoxBottom(other.getBoxBottom());
+        }
+        if (other.hasBoxLeft()) {
+          setBoxLeft(other.getBoxLeft());
+        }
+        if (other.hasBoxRight()) {
+          setBoxRight(other.getBoxRight());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        messages.VisionRobotOuterClass.RobotObstacle parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (messages.VisionRobotOuterClass.RobotObstacle) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private float closestY_ ;
+      /**
+       * <code>optional float closest_y = 1;</code>
+       */
+      public boolean hasClosestY() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional float closest_y = 1;</code>
+       */
+      public float getClosestY() {
+        return closestY_;
+      }
+      /**
+       * <code>optional float closest_y = 1;</code>
+       */
+      public Builder setClosestY(float value) {
+        bitField0_ |= 0x00000001;
+        closestY_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float closest_y = 1;</code>
+       */
+      public Builder clearClosestY() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        closestY_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float boxBottom_ ;
+      /**
+       * <code>optional float box_bottom = 2;</code>
+       */
+      public boolean hasBoxBottom() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional float box_bottom = 2;</code>
+       */
+      public float getBoxBottom() {
+        return boxBottom_;
+      }
+      /**
+       * <code>optional float box_bottom = 2;</code>
+       */
+      public Builder setBoxBottom(float value) {
+        bitField0_ |= 0x00000002;
+        boxBottom_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float box_bottom = 2;</code>
+       */
+      public Builder clearBoxBottom() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        boxBottom_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float boxLeft_ ;
+      /**
+       * <code>optional float box_left = 3;</code>
+       */
+      public boolean hasBoxLeft() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional float box_left = 3;</code>
+       */
+      public float getBoxLeft() {
+        return boxLeft_;
+      }
+      /**
+       * <code>optional float box_left = 3;</code>
+       */
+      public Builder setBoxLeft(float value) {
+        bitField0_ |= 0x00000004;
+        boxLeft_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float box_left = 3;</code>
+       */
+      public Builder clearBoxLeft() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        boxLeft_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float boxRight_ ;
+      /**
+       * <code>optional float box_right = 4;</code>
+       */
+      public boolean hasBoxRight() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional float box_right = 4;</code>
+       */
+      public float getBoxRight() {
+        return boxRight_;
+      }
+      /**
+       * <code>optional float box_right = 4;</code>
+       */
+      public Builder setBoxRight(float value) {
+        bitField0_ |= 0x00000008;
+        boxRight_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float box_right = 4;</code>
+       */
+      public Builder clearBoxRight() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        boxRight_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:messages.RobotObstacle)
+    }
+
+    static {
+      defaultInstance = new RobotObstacle(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:messages.RobotObstacle)
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_VisionRobot_descriptor;
   private static
@@ -4664,6 +5295,11 @@ public final class VisionRobotOuterClass {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_VisionObstacle_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_messages_RobotObstacle_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_messages_RobotObstacle_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -4693,7 +5329,9 @@ public final class VisionRobotOuterClass {
       "ght\030\006 \001(\021\022\021\n\tleft_dist\030\007 \001(\002\022\020\n\010mid_dist" +
       "\030\010 \001(\002\022\022\n\nright_dist\030\t \001(\002\022\024\n\014left_beari" +
       "ng\030\n \001(\002\022\023\n\013mid_bearing\030\013 \001(\002\022\025\n\rright_b",
-      "earing\030\014 \001(\002"
+      "earing\030\014 \001(\002\"[\n\rRobotObstacle\022\021\n\tclosest" +
+      "_y\030\001 \001(\002\022\022\n\nbox_bottom\030\002 \001(\002\022\020\n\010box_left" +
+      "\030\003 \001(\002\022\021\n\tbox_right\030\004 \001(\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4725,6 +5363,12 @@ public final class VisionRobotOuterClass {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_VisionObstacle_descriptor,
         new java.lang.String[] { "OnLeft", "OnRight", "OffField", "BlockLeft", "BlockMid", "BlockRight", "LeftDist", "MidDist", "RightDist", "LeftBearing", "MidBearing", "RightBearing", });
+    internal_static_messages_RobotObstacle_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_messages_RobotObstacle_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_messages_RobotObstacle_descriptor,
+        new java.lang.String[] { "ClosestY", "BoxBottom", "BoxLeft", "BoxRight", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

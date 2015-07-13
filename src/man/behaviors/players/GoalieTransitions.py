@@ -11,28 +11,87 @@ import VisualGoalieStates
 import GoalieStates
 from objects import RelRobotLocation
 
+# def getCornerObservation(player, cornerSide):
+#     getCorners(player)
+#     corners = player.corners
+#     goodRightCornerObservation = 0
+#     goodLeftCornerObservation = 0
+
+#     for corner in corners:
+#         dist = getCornerDist(corner)
+#         bearing = getBearingFromRobot(corner.x, corner.y)
+#         corner_id = corner.id
+
+#         # if (corner_id == 0
+        # and math.fabs(dist - constants.EXPECTED_CORNER_DIST_FROM_CENTER) < constants.CORNER_DISTANCE_THRESH):
+
+def safelyPlaced(player):
+    getLines(player)
+    corners = player.corners
+    goodRightCornerObservation = 0
+    goodLeftCornerObservation = 0
+    for corner in corners:
+        dist = getCornerDist(corner)
+        bearing = getBearingFromRobot(corner.x, corner.y)
+        corner_id = corner.id
+
+        if (corner_id == 0
+        and math.fabs(dist - constants.EXPECTED_CORNER_DIST_FROM_CENTER) < constants.CORNER_DISTANCE_THRESH):
+            if (math.fabs(bearing - constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER) < constants.CORNER_BEARING_THRESH):
+                goodLeftCornerObservation += 1
+                print("Found a good left corner!")
+            elif (math.fabs(bearing - constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER) < constants.CORNER_BEARING_THRESH):
+                goodRightCornerObservation += 1
+                print("Found a good right corner!")
+
+    if goodLeftCornerObservation > 5:
+        VisualGoalieStates.checkSafePlacement.goodLeftCornerObservation = True
+    if goodRightCornerObservation > 5:
+        VisualGoalieStates.checkSafePlacement.goodRightCornerObservation = True
+
+    if (VisualGoalieStates.checkSafePlacement.goodRightCornerObservation
+        and VisualGoalieStates.checkSafePlacement.goodLeftCornerObservation):
+
+    # if goodRightCornerObservation > 5 and goodLeftCornerObservation > 5:
+        print("I think I'm placed good!")
+        return True
+
 def getCorners(player):
-    corners = player.brain.visionCorners
-
-    if player.brain.vision.corner_size() == 0:
-        return False
-
-#     print ("horizon dist:", player.brain.vision.horizon_dist)
-# # Testingchangfe
-#     for k in range(0, player.brain.vision.corner_size()):
-#         c = player.brain.visionCorners
-#         dist = getCornerDist(c(k))
-#         if dist > 150:
-#             continue
-#         print("dist:", dist)
-#         print("bearing:", getBearingFromRobot(c(k).x, c(k).y))
-#         print("x", c(k).x, "y", c(k).y)
-#         print("id", c(k).id)
-#     print " -------------------------"
+# Testingchangfe
+    for k in range(0, player.brain.vision.corner_size()):
+        corner = player.brain.visionCorners(k)
+        dist = getCornerDist(corner)
+        if dist > 150 or corner.x == 0.0:
+            continue
+        player.corners.append(corner)
+    #     print("dist:", dist)
+    #     print("bearing:", getBearingFromRobot(corner.x, corner.y))
+    #     print("x", corner.x, "y", corner.y)
+    #     print("id", corner.id)
+    # print " -------------------------"
 
   # Concave,
   # Convex,
   # T,
+
+# def tooSimilar(corner):
+#     corners = VisualGoalieStates.checkSafePlacement.corners[-5:]
+#     if len(VisualGoalieStates.checkSafePlacement.corners) < 10: return False
+#     similar_count = 0
+#     for existing_corner in corners:
+#         existing_dist = getCornerDist(existing_corner)
+#         dist = getCornerDist(corner)
+#         bearing = getBearingFromRobot(corner.x, corner.y)
+#         existing_bearing = getBearingFromRobot(existing_corner.x, existing_corner.y)
+#         if (math.fabs(existing_dist - dist) < 4.0
+#         and math.fabs(existing_bearing - bearing) < 4.0):
+#             similar_count += 1
+
+#     if similar_count > 3:
+#         print('Corner too similar, rejecting')
+#         return True
+
+#     return False
 
 def getCornerDist(c):
     dist = c.x * c.x + c.y * c.y
@@ -46,10 +105,13 @@ def getLines(player):
         GoalieStates.watchWithLineChecks.lines.append(visionLines(i).inner)
 
     if len(GoalieStates.watchWithLineChecks.lines) > constants.MEM_THRESH:
-        GoalieStates.watchWithLineChecks.lines = GoalieStates.watchWithLineChecks.lines[3:]
+        GoalieStates.watchWithLineChecks.lines = GoalieStates.watchWithLineChecks.lines[1:]
+
+    if len(player.corners) > constants.CORNER_MEM_THRESH:
+        player.corners = player.corners[1:]
 
     if len(player.homeDirections) > constants.BUFFER_THRESH:
-        player.homeDirections = [player.homeDirections[-1]]
+        player.homeDirections = player.homeDirections[1:]
 
         # r = line.inner.r
         # t = line.inner.t
@@ -389,7 +451,9 @@ def shouldStopGoingBack(player):
     return False
 
 def getBearingFromRobot(x, y):
-    return math.degrees(math.tan(y/x));
+    if x == 0: return 0.0
+    return math.degrees(math.atan(y/x))
+    # return math.degrees(math.tan(-y/x));
 
 def facingASideline(player):
     visionLines = player.brain.visionLines
