@@ -109,8 +109,12 @@ public class WorldViewUtility extends UtilityParent {
 				if(tb.dataTeamPacket.getTeamNumber() == teamNumber) {
 					int index = tb.dataTeamPacket.getPlayerNumber() - 1;
 					if (index >= 0 && index < robots.length) {
-						robots[tb.dataTeamPacket.getPlayerNumber()-1] = new NaoRobot();
-						robots[tb.dataTeamPacket.getPlayerNumber()-1].wvNao(tb);
+						if(tb.dataWorldModel.getActive()) {
+							robots[tb.dataTeamPacket.getPlayerNumber()-1] = new NaoRobot();
+							robots[tb.dataTeamPacket.getPlayerNumber()-1].wvNao(tb);
+						} else {
+							robots[tb.dataTeamPacket.getPlayerNumber()-1] = null;
+						}
 						/* shared ball off for now
 						if(index == 3 || index == 4) {
 							robots[tb.dataTeamPacket.getPlayerNumber()-1].wvSharedBall(tb);
