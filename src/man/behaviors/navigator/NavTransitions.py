@@ -72,7 +72,7 @@ def shouldDodge(nav):
 
 # Check if an obstacle is no longer there, or if we've completed the dodge
 def doneDodging(nav):
-    return ((nav.stateTime >= 3.5 and 
+    return ((nav.stateTime >= 3. and
         nav.brain.obstacleDetectors[states.dodge.obstaclePosition] != states.dodge.detectorDodged) or
         nav.brain.ball.distance < 65)
 
