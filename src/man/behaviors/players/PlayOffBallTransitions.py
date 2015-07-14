@@ -44,7 +44,11 @@ def tooFarFromHome(player, distThreshold, angleThreshold):
     Returns true if LOC thinks we're more than *distance* away from our home
     position
     """
-    home = calculateHomePosition(player)
+    if role.isDefender(player.role):
+        home = calculateHomePosition(player)
+    else:
+        home = player.homePosition
+
     distanceTo = ((player.brain.loc.x - home.x)**2 + (player.brain.loc.y - home.y)**2)**.5
     angleTo = fabs(player.brain.loc.h - home.h)
 

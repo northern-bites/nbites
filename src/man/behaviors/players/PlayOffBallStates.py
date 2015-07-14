@@ -33,7 +33,10 @@ def positionAtHome(player):
     """
     Go to the player's home position.
     """
-    home = calculateHomePosition(player)
+    if role.isDefender(player.role):
+        home = calculateHomePosition(player)
+    else:
+        home = player.homePosition
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
@@ -119,7 +122,7 @@ def positionAsSupporter(player):
     Position to support teammate with claim.
     """
     positionAsSupporter.position = getSupporterPosition(player, player.role)
-    fastWalk = role.isChaser(player.role)
+    fastWalk = False
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
