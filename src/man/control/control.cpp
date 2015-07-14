@@ -193,7 +193,7 @@ namespace control {
     
     /* NOTE: this still requires restarting man! */
     uint32_t cnc_setCalibration(Log * arg) {
-        SExpr * params = SExpr::read(arg.data());
+        SExpr * params = SExpr::read(arg->data());
         
         
         
