@@ -1,12 +1,11 @@
 from ..navigator import BrunswickSpeeds as speeds
 
-# Transitions' Constants
 # Ball on and off frame thresholds
-BALL_ON_THRESH = 2
+BALL_ON_THRESH = 1
 BALL_OFF_THRESH = 10
 BALL_OFF_KICK_THRESH = 4 # 4 seconds, time threshold!
 
-# should decelerate
+# Should decelerate
 SLOW_CHASE_DIST = 60.
 
 # Should position for kick
@@ -29,11 +28,11 @@ CLOSE_TO_ATTRACTOR_DIST = 10
 # Orbit
 DEBUG_ORBIT = False
 SHOULD_ORBIT_BEARING = 25
-ORBIT_GOOD_BEARING = 6
+ORBIT_GOOD_BEARING = 10
 SHOULD_CANCEL_ORBIT_BALL_DIST = APPROACH_BALL_AGAIN_DIST
 ORBIT_TOO_LONG_THR = 8
-Y_SPEED = 0.5
-X_FROM_BALL = 30
+Y_SPEED = 0.8
+X_FROM_BALL = 15
 
 # Should kick again
 SHOULD_KICK_AGAIN_CLOSE_X = 9.5

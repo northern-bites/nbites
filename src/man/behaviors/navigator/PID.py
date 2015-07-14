@@ -25,7 +25,10 @@ class PIDController:
         integralTerm = self.integralGain * self.integral
 
         # Derivative term
-        derivativeTerm = self.derivativeGain * (error / deltaTime)
+        if deltaTime != 0:
+            derivativeTerm = self.derivativeGain * (error / deltaTime)
+        else:
+            derivativeTerm = 0
 
         # Combine and return correction
         return proportionalTerm + integralTerm + derivativeTerm

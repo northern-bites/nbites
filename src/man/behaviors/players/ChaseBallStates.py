@@ -71,7 +71,7 @@ def prepareForKick(player):
             player.shouldKickOff = False
             player.kick = player.decider.kicksBeforeBallIsFree()
         else:
-            player.kick = player.decider.decidingStrategy()
+            player.kick = player.decider.fastKicking()
         player.inKickingState = True
     elif player.finishedPlay:
         player.inKickOffPlay = False
@@ -144,10 +144,14 @@ def followPotentialField(player):
 
     return player.stay()
 
-@superState('positionAndKickBall')
+@superState('gameControllerResponder')
+@ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
+@ifSwitchNow(transitions.shouldSupport, 'positionAsSupporter')
+@ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
+@ifSwitchNow(transitions.shouldFindBall, 'findBall')
 def orbitBall(player):
     """
-    State to orbit the ball. Uses a PID controller!
+    State to orbit the ball. Uses two PID controllers!
     """
     if player.firstFrame():
         orbitBall.xController.reset()
@@ -178,19 +182,29 @@ def orbitBall(player):
 
     # Orbit in correct direction at constant speed
     ySpeed = constants.Y_SPEED
-    if relH < 0: ySpeed = -ySpeed
+    if relH > 0: ySpeed = -ySpeed
 
     # Calculate corrections in x and h using PID controller 
-    xSpeedCorrect = orbitBall.xController.correct(player.brain.ball.distance - constants.X_FROM_BALL)
-    hSpeedCorrect = orbitBall.hController.correct(player.brain.ball.bearing)
+    xError = player.brain.ball.distance - constants.X_FROM_BALL
+    hError = player.brain.ball.bearing
+    xSpeedCorrect = orbitBall.xController.correct(xError)
+    hSpeedCorrect = orbitBall.hController.correct(hError)
 
-    player.setWalk(correctXSpeed, constants.Y_SPEED, correctHSpeed)
+    # Set walk vector
+    player.setWalk(xSpeedCorrect, ySpeed, hSpeedCorrect)
+
+    if constants.DEBUG_ORBIT:
+        print "ORBIT DEBUG:"
+        print xError
+        print hError
+        print xSpeedCorrect
+        print hSpeedCorrect
 
     return player.stay()
 
 # PID controllers used in orbitBall
-orbitBall.xController = PID.PIDController(0.5, 0.5, 0.0)
-orbitBall.hController = PID.PIDController(0.5, 0.5, 0.0)
+orbitBall.xController = PID.PIDController(0.01, 0.01, 0.0)
+orbitBall.hController = PID.PIDController(0.8, 0.2, 0.0)
 
 @superState('positionAndKickBall')
 def spinToBall(player):

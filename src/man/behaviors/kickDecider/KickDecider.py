@@ -531,26 +531,27 @@ class KickDecider(object):
     ###########################
     ### HIGH LEVEL PLANNERS ###
     ###########################
-    def decidingStrategy(self):
+    def fastKicking(self):
         return self.motionFrontKicksOrbit()
 
-        # goalShot = self.allKicksOnGoal()
-        # if goalShot:
-        #     print "allKicksOnGoal returned"
-        #     return goalShot
+    def decidingStrategy(self):
+        goalShot = self.allKicksOnGoal()
+        if goalShot:
+            print "allKicksOnGoal returned"
+            return goalShot
 
-        # nearGoal = self.nearOurGoal()
-        # if nearGoal:
-        #     print "nearOurGoal returned"
-        #     return nearGoal
+        nearGoal = self.nearOurGoal()
+        if nearGoal:
+            print "nearOurGoal returned"
+            return nearGoal
 
-        # asap = self.motionKicksAsap()
-        # if asap:
-        #     print "motionKicksAsap on goal returned"
-        #     return asap
-        # 
-        # print "Using frontKickCrosses"
-        # return self.frontKickCrosses()
+        asap = self.motionKicksAsap()
+        if asap:
+            print "motionKicksAsap on goal returned"
+            return asap
+        
+        print "Using frontKickCrosses"
+        return self.frontKickCrosses()
 
     def defender(self):
         nearGoal = self.nearOurGoal()
