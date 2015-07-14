@@ -21,8 +21,12 @@ import nbtool.gui.logviews.misc.CrossBright;
 import nbtool.gui.logviews.misc.DefaultView;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.logviews.proto.ProtoBufView;
+<<<<<<< HEAD
+import nbtool.gui.logviews.proto.ProtoBallView;
+=======
 import nbtool.gui.logviews.sound2.SndFreqView;
 import nbtool.gui.logviews.sound2.SndAmpView;
+>>>>>>> 4b1b1bcf5a1fce7c38a23b8065ec778e34cb91f7
 import nbtool.gui.logviews.loc.LocSwarmView;
 
 
@@ -77,15 +81,25 @@ public class NBConstants {
 		
 		map.put("YUVImage", new Class[]{ImageView.class, ZoomImageView.class, FrontEndView.class, LineView.class, BallView.class, DebugImageView.class});
 		map.put("STATS", new Class[]{BotStatsView.class});
+<<<<<<< HEAD
+		map.put("prot-RobotLocation", new Class[]{FieldView.class});
+		map.put(DEFAULT_S, new Class[]{DefaultView.class});
+		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
+		map.put("MULTIBALL", new Class[]{ProtoBallView.class});
+=======
 		map.put("proto-RobotLocation", new Class[]{FieldView.class});
+>>>>>>> 4b1b1bcf5a1fce7c38a23b8065ec778e34cb91f7
 		map.put("location", new Class[]{LocSwarmView.class});
 		map.put("proto-FieldLines", new Class[]{BasicLineView.class});
 		map.put("sound", new Class[]{SndFreqView.class, SndAmpView.class});
 		map.put("proto-Corners", new Class[]{BasicLineView.class});
+<<<<<<< HEAD
+=======
 		
 		map.put(DEFAULT_S, new Class[]{DefaultView.class});
 		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
 
+>>>>>>> 4b1b1bcf5a1fce7c38a23b8065ec778e34cb91f7
 		return map;
 	}
 }

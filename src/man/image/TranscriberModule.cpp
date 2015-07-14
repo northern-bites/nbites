@@ -659,6 +659,14 @@ void TranscriberModule::run_()
     jointsIn.latch();
     inertsIn.latch();
 
+    filteredBallIn.latch();
+    naiveBallIn.latch();
+
+    // filteredBallOut.setMessage(portals::Message<messages::FilteredBall>(
+    //                      &filteredBallIn.message()));
+    // naiveBallOut.setMessage(portals::Message<messages::NaiveBall>(
+    //                      &naiveBallIn.message()));
+
     /* Pass the most recent joints and inerts thru transcriber and outportal,
      * so that vision has synced images, joints, and inerts to process. */
     jointsOut.setMessage(portals::Message<messages::JointAngles>(
@@ -681,6 +689,36 @@ void TranscriberModule::run_()
         }
 
         logThumbnail(image, image_from, ++image_index);
+    }
+
+    if (control::flags[control::multiball]) {
+        messages::NaiveBall nb_pb = naiveBallIn.message();
+        messages::FilteredBall fb_pb = filteredBallIn.message();
+
+        std::string nb_buf;
+        std::string fb_buf;
+
+        nb_pb.SerializeToString(&nb_buf);
+        fb_pb.SerializeToString(&fb_buf);
+
+        int nb_length = nb_buf.length();
+        int fb_length = fb_buf.length();
+
+        nb_buf.append(fb_buf);
+
+        std::vector<SExpr> contents;
+
+        SExpr naive("MULTIBALL", "multiball", clock(), -1, nb_buf.length());
+        naive.append(SExpr("nb_length", nb_length));
+        naive.append(SExpr("fb_length", fb_length));
+
+        contents.push_back(naive);
+
+        SExpr filter("FilteredBall", "multiball", clock(), -1, fb_buf.length());
+        contents.push_back(filter);
+
+        NBLog(NBL_IMAGE_BUFFER, "multiball",
+                   contents, nb_buf);
     }
 #endif
 }

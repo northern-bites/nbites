@@ -345,14 +345,30 @@ void VisionModule::run_()
 
 void VisionModule::outportalVisionField()
 {
+    // Mark repeat lines (already found in bottom camera) in top camera
+    for (int i = 0; i < fieldLines[0]->size(); i++) {
+        for (int j = 0; j < fieldLines[1]->size(); j++) {
+            FieldLine& topField = (*(fieldLines[0]))[i];
+            FieldLine& botField = (*(fieldLines[1]))[j];
+            for (int k = 0; k < 2; k++) {
+                const GeoLine& topGeo = topField[k].field();
+                const GeoLine& botGeo = botField[k].field();
+                if (topGeo.error(botGeo) < 0.001) // TODO constant
+                    (*(fieldLines[0]))[i].repeat(true);
+            }
+        }
+    }
+    // Outportal results
+    // NOTE repeats are not outportaled
     messages::Vision visionField;
 
     // (1) Outportal lines
     // NOTE repeats (in top and bottom camera) are outportaled
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < fieldLines[i]->size(); j++) {
-            messages::FieldLine* pLine = visionField.add_line();
             FieldLine& line = (*(fieldLines[i]))[j];
+            if (line.repeat()) continue;
+            messages::FieldLine* pLine = visionField.add_line();
 
             for (int k = 0; k < 2; k++) {
                 messages::HoughLine pHough;
@@ -459,6 +475,8 @@ void VisionModule::outportalVisionField()
         vb->set_x(static_cast<int>(best.blob.centerX()));
         vb->set_y(static_cast<int>(best.blob.centerY()));
     }
+
+    visionField.set_horizon_dist(field->horizonDist());
 
     // Send
     portals::Message<messages::Vision> visionOutMessage(&visionField);

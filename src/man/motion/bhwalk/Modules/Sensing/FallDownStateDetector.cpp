@@ -53,7 +53,7 @@ void FallDownStateDetector::update(FallDownStateBH& fallDownState)
   {
     if(theFrameInfoBH.getTimeSince(lastFallDetected) <= fallTime)
     {
-      std::cout << "[BH DEBUG] This is changing to falling NOW" << std::endl;
+      // std::cout << "[BH DEBUG] This is changing to falling NOW" << std::endl;
       fallDownState.state = FallDownStateBH::falling;
     }
     else if((abs(theFilteredSensorDataBH.data[SensorDataBH::angleX]) <= staggeringAngleX - pi_180
@@ -66,7 +66,7 @@ void FallDownStateDetector::update(FallDownStateBH& fallDownState)
     }
     else if(fallDownState.state == FallDownStateBH::staggering && isFalling())
     {
-      std::cout << "[BH DEBUG] This is changing to falling NOW 2" << std::endl;
+      // std::cout << "[BH DEBUG] This is changing to falling NOW 2" << std::endl;
       lastFallDetected = theFrameInfoBH.time;
       fallDownState.state = FallDownStateBH::falling;
       fallDownState.direction = directionOf(theFilteredSensorDataBH.data[SensorDataBH::angleX], theFilteredSensorDataBH.data[SensorDataBH::angleY]);
@@ -81,11 +81,11 @@ void FallDownStateDetector::update(FallDownStateBH& fallDownState)
                 && abs(theFilteredSensorDataBH.data[SensorDataBH::angleX]) <= staggeringAngleX - pi_180
                 && abs(theFilteredSensorDataBH.data[SensorDataBH::angleY]) <= staggeringAngleY - pi_180))
     {
-      std::cout << "[BH DEBUG] This is changing to falling NOW 3" << std::endl;
-      std::cout << "[BH DEBUG] isStaggering() " << isStaggering() << std::endl;
-      std::cout << "[BH DEBUG] fallDownState.state " << fallDownState.state  << std::endl;
-      std::cout << "[BH DEBUG] abs(theFilteredSensorDataBH.data[SensorDataBH::angleX])" << abs(theFilteredSensorDataBH.data[SensorDataBH::angleX]) << isStaggering() << std::endl;
-      std::cout << "[BH DEBUG] isUprightOrStaggering(fallDownState):" << isUprightOrStaggering(fallDownState) << std::endl;
+      // std::cout << "[BH DEBUG] This is changing to falling NOW 3" << std::endl;
+      // std::cout << "[BH DEBUG] isStaggering() " << isStaggering() << std::endl;
+      // std::cout << "[BH DEBUG] fallDownState.state " << fallDownState.state  << std::endl;
+      // std::cout << "[BH DEBUG] abs(theFilteredSensorDataBH.data[SensorDataBH::angleX])" << abs(theFilteredSensorDataBH.data[SensorDataBH::angleX]) << isStaggering() << std::endl;
+      // std::cout << "[BH DEBUG] isUprightOrStaggering(fallDownState):" << isUprightOrStaggering(fallDownState) << std::endl;
       fallDownState.state = FallDownStateBH::staggering;
       fallDownState.direction = directionOf(theFilteredSensorDataBH.data[SensorDataBH::angleX], theFilteredSensorDataBH.data[SensorDataBH::angleY]);
       if(fallDownState.sidewards != FallDownStateBH::fallen)
@@ -95,7 +95,7 @@ void FallDownStateDetector::update(FallDownStateBH& fallDownState)
     }
     else
     {
-      std::cout << "[BH DEBUG] This is changing to falling NOW 4 UNDEFINED" << std::endl;
+      // std::cout << "[BH DEBUG] This is changing to falling NOW 4 UNDEFINED" << std::endl;
       fallDownState.state = FallDownStateBH::undefined;
 
       if(abs(accelerationAngleXZ) < 0.5f)
@@ -103,8 +103,8 @@ void FallDownStateDetector::update(FallDownStateBH& fallDownState)
         fallDownState.direction = FallDownStateBH::front;
         if(theMotionInfoBH.motion != MotionRequestBH::getUp)
         {
-          std::cout << "[BH DEBUG] This is changing to falling NOW 5 GROUND" << std::endl;
-          std::cout << "[BH DEBUG] Acc angle" << accelerationAngleXZ << std::endl;
+          // std::cout << "[BH DEBUG] This is changing to falling NOW 5 GROUND" << std::endl;
+          // std::cout << "[BH DEBUG] Acc angle" << accelerationAngleXZ << std::endl;
           fallDownState.state = FallDownStateBH::onGround;
           if(fallDownState.sidewards == FallDownStateBH::leftwards)
           {
@@ -125,7 +125,7 @@ void FallDownStateDetector::update(FallDownStateBH& fallDownState)
         if(theMotionInfoBH.motion != MotionRequestBH::getUp)
         {
 
-          std::cout << "[BH DEBUG] This is changing to falling NOW 6 onground" << std::endl;
+          // std::cout << "[BH DEBUG] This is changing to falling NOW 6 onground" << std::endl;
           fallDownState.state = FallDownStateBH::onGround;
           if(fallDownState.sidewards == FallDownStateBH::leftwards)
           {
@@ -144,7 +144,7 @@ void FallDownStateDetector::update(FallDownStateBH& fallDownState)
         fallDownState.direction = FallDownStateBH::left;
         if(theMotionInfoBH.motion != MotionRequestBH::getUp)
         {
-          std::cout << "[BH DEBUG] This is changing to falling NOW 7 grrruond" << std::endl;
+          // std::cout << "[BH DEBUG] This is changing to falling NOW 7 grrruond" << std::endl;
           fallDownState.state = FallDownStateBH::onGround;
 
           if(fallDownState.sidewards != FallDownStateBH::fallen)
@@ -158,7 +158,7 @@ void FallDownStateDetector::update(FallDownStateBH& fallDownState)
         fallDownState.direction = FallDownStateBH::right;
         if(theMotionInfoBH.motion != MotionRequestBH::getUp)
         {
-          std::cout << "[BH DEBUG] This is changing to falling NOW 8 ground" << std::endl;
+          // std::cout << "[BH DEBUG] This is changing to falling NOW 8 ground" << std::endl;
           fallDownState.state = FallDownStateBH::onGround;
 
           if(fallDownState.sidewards != FallDownStateBH::fallen)
