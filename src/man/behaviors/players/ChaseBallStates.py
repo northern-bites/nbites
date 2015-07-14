@@ -77,7 +77,7 @@ def prepareForKick(player):
         player.inKickOffPlay = False
 
     player.motionKick = True
-    return player.goNow('orbitBall')
+    return player.goNow('lineUp')
 
 @superState('gameControllerResponder')
 @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
@@ -149,6 +149,41 @@ def followPotentialField(player):
 @ifSwitchNow(transitions.shouldSupport, 'positionAsSupporter')
 @ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
 @ifSwitchNow(transitions.shouldFindBall, 'findBall')
+def lineUp(player):
+    """
+    State to line up for orbit. Uses two PID controllers!
+    """
+    if player.firstFrame():
+        lineUp.xController.reset()
+        lineUp.hController.reset()
+
+    if player.brain.nav.dodging:
+        return player.stay()
+
+    # Calculate corrections in x and h using PID controller 
+    xError = player.brain.ball.distance - constants.X_FROM_BALL
+    hError = player.brain.ball.bearing
+    xSpeedCorrect = lineUp.xController.correct(xError)
+    hSpeedCorrect = lineUp.hController.correct(hError)
+
+    # Set walk vector
+    player.setWalk(xSpeedCorrect, 0, hSpeedCorrect)
+
+    # If close enough to ball, go orbit
+    if player.brain.ball.distance < constants.X_FROM_BALL:
+        return player.goNow('orbitBall')
+
+    return player.stay()
+
+# PID controllers used in lineUp
+lineUp.xController = PID.PIDController(0.01, 0.01, 0.0)
+lineUp.hController = PID.PIDController(0.8, 0.2, 0.0)
+
+@superState('gameControllerResponder')
+@ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
+@ifSwitchNow(transitions.shouldSupport, 'positionAsSupporter')
+@ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
+@ifSwitchNow(transitions.shouldFindBall, 'findBall')
 def orbitBall(player):
     """
     State to orbit the ball. Uses two PID controllers!
@@ -205,6 +240,7 @@ def orbitBall(player):
 # PID controllers used in orbitBall
 orbitBall.xController = PID.PIDController(0.01, 0.01, 0.0)
 orbitBall.hController = PID.PIDController(0.8, 0.2, 0.0)
+# TODO third PID controller for Y
 
 @superState('positionAndKickBall')
 def spinToBall(player):
