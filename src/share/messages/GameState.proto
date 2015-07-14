@@ -1,5 +1,10 @@
 package messages;
 
+option java_outer_classname = "_File_GameState";
+option java_multiple_files = true;
+
+
+
 message GameState
 {
     optional uint32 state = 1;

@@ -29,3 +29,4 @@ src/nbtool/bin
 .settings
 .recommenders
 _tempFiles
+*.swp

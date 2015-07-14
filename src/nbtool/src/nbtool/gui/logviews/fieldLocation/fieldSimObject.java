@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
 
+import nbtool.gui.field.FieldConstants;
+
 public abstract class fieldSimObject {
 	protected float x,y,radius;
 	protected Color color;

@@ -1,5 +1,10 @@
 package messages;
 
+option java_outer_classname = "_File_Header";
+option java_multiple_files = true;
+
+
+
 message Header
 {
     optional int64 timestamp = 1;
