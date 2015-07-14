@@ -182,13 +182,6 @@ bool VisionSystem::update(ParticleSet& particles,
                 vision::GeoLine line;
                 line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
 
-                // China 2015 really big hack
-                // Only inject if angle to line is less than +-45 degrees, so 
-                // we don't inject when coming off line in game ready
-                // double angleToLine = vision::sMod(inner.t(), 2 * M_PI);
-                // if (angleToLine > M_PI / 3 || angleToLine < -M_PI / 3)
-                //     continue;
-
                 for (int j = 0; j < vision.corner_size(); j++) {
                     const messages::Corner& corner = vision.corner(j);
 

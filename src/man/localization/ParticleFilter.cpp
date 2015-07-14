@@ -499,7 +499,7 @@ void ParticleFilter::resample(bool inSet)
 
         // std::cout << "wSlow: " << wSlow << std::endl;
         // std::cout << "wFast: " << wFast << std::endl;
-        std::cout << "Injections: " << ni << std::endl;
+        // std::cout << "Injections: " << ni << std::endl;
     }
 
     // Update particles
