@@ -433,7 +433,7 @@ int Vision_func() {
     //  DEBUG IMAGE
     //-------------------
     Log* debugImage = new Log();
-    int debugImageLength = (width / 4) * (height / 2);
+    int debugImageLength = (width / 2) * (height / 2);
 
     // Create temp buffer and fill with debug image
     uint8_t debBuf[debugImageLength];

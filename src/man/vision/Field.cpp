@@ -420,6 +420,7 @@ void Field::findTopEdges(int M) {
             }
         }
         if (debugDrawFieldEdge) {
+			cout << "Calling drawline" << endl;
             drawLine(convex[i-1].x, convex[i-1].y, convex[i].x,
 					 convex[i].y, ORANGE);
         }

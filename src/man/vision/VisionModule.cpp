@@ -63,7 +63,7 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
 #ifdef OFFLINE
 		// Get the appropriate amount of space for the Debug Image
 		if (i == 0) {
-			debugSpace[0] = (uint8_t *)malloc(wd * ht * sizeof(uint8_t));
+			debugSpace[0] = (uint8_t *)malloc(wd * ht * 2 * sizeof(uint8_t));
 		} else {
 			debugSpace[1] = (uint8_t *)malloc((wd / 2) * (ht / 2) * sizeof(uint8_t));
 		}
