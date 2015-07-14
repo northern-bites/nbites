@@ -22,6 +22,8 @@
 namespace man {
 namespace vision {
 
+    const int DEFAULT_TOP_IMAGE_WIDTH = 640;
+    const int DEFAULT_TOP_IMAGE_HEIGHT= 480;
 
 class VisionModule : public portals::Module {
 public:

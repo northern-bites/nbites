@@ -523,6 +523,8 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
 		field->setDebugFieldEdge(debugField);
 		ballDetector[0]->setDebugBall(debugBall);
 		ballDetector[1]->setDebugBall(debugBall);
+		debugImage[0]->reset();
+		debugImage[1]->reset();
 	}
 #endif
 
@@ -585,6 +587,7 @@ void VisionModule::setCalibrationParams(int camera, std::string robotName)
 {
     if (std::string::npos != robotName.find(".local")) {
         robotName.resize(robotName.find("."));
+        //Much love for the edge cases.
         if (robotName == "she-hulk")
             robotName = "shehulk";
     }
