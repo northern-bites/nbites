@@ -4,7 +4,8 @@ import SharedTransitions as shared
 import ChaseBallConstants as chaseConstants
 import noggin_constants as nogginC
 from objects import RobotLocation
-from SupporterConstants import findStrikerHome, findDefenderHome
+from SupporterConstants import calculateHomePosition
+from math import fabs
 
 def ballInBox(player):
     """
@@ -36,37 +37,18 @@ def ballNotInBufferedBox(player):
             ball.y < player.box[0][1] + player.box[2] + buf)
 
     return (ball.vis.frames_off > chaseConstants.BALL_OFF_THRESH or 
-            (not inBox and not role.isChaser(player.role)))
+            (not inBox and not role.isFirstChaser(player.role)))
 
-def tooFarFromHome(threshold, player):
+def tooFarFromHome(player, distThreshold, angleThreshold):
     """
     Returns true if LOC thinks we're more than *distance* away from our home
     position
     """
-    if player.brain.ball.vis.frames_off < 10:
-        ball = player.brain.ball
-    elif player.brain.sharedBall.ball_on:
-        ball = player.brain.sharedBall
-    else:
-        ball = None
-        home = player.homePosition
+    home = calculateHomePosition(player)
+    distanceTo = ((player.brain.loc.x - home.x)**2 + (player.brain.loc.y - home.y)**2)**.5
+    angleTo = fabs(player.brain.loc.h - home.h)
 
-    if nogginC.FIXED_D_HOME:
-        home = player.homePosition
-
-    elif ball != None:
-        if role.isLeftDefender(player.role):
-            home = findDefenderHome(True, ball, player.homePosition.h)
-        elif role.isRightDefender(player.role):
-            home = findDefenderHome(False, ball, player.homePosition.h)
-        elif role.isStriker(player.role):
-            home = findStrikerHome(ball, player.homePosition.h)
-        else:
-            home = player.homePosition
-
-    distance = ((player.brain.loc.x - home.x)**2 + (player.brain.loc.y - home.y)**2)**.5
-
-    return distance > threshold
+    return distanceTo > distThreshold or angleTo > angleThreshold
 
 def shouldSpinSearchFromWatching(player):
     shouldExtendTimer = player.commMode == 2 and role.isDefender(player.role)

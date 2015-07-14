@@ -1,7 +1,7 @@
 import noggin_constants as NogginConstants
 from objects import Location, RobotLocation
 import RoleConstants as role
-from math import hypot
+from math import hypot, atan2, degrees
 
 def getSupporterPosition(player, r):
     """
@@ -210,3 +210,31 @@ def closePointOnSeg(x1, y1, x2, y2, x3, y3):
     nx = ((x3-x1)*dx + (y3-y1)*dy) / d2
     nx = min(1, max(0, nx))
     return (dx*nx + x1, dy*nx + y1)
+
+def calculateHomePosition(player):
+    """
+    Calculate home position.
+    """
+    if player.brain.ball.vis.frames_off < 10:
+        ball = player.brain.ball
+        bearing = ball.bearing_deg
+    elif player.brain.sharedBall.ball_on:
+        ball = player.brain.sharedBall
+        bearing = degrees(atan2(ball.y - player.brain.loc.y,
+                          ball.x - player.brain.loc.x)) - player.brain.loc.h
+    else:
+        ball = None
+
+    if ball != None and not (role.isDefender(player.role) and NogginConstants.FIXED_D_HOME):
+        if role.isLeftDefender(player.role):
+            home = findDefenderHome(True, ball, bearing + player.brain.loc.h)
+        elif role.isRightDefender(player.role):
+            home = findDefenderHome(False, ball, bearing + player.brain.loc.h)
+        elif role.isStriker(player.role):
+            home = findStrikerHome(ball, bearing + player.brain.loc.h)
+        else:
+            home = player.homePosition
+    else:
+        home = player.homePosition
+
+    return home
