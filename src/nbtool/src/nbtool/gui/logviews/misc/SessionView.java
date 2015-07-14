@@ -52,7 +52,7 @@ public class SessionView extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		
 		if (e.getSource() == save) {
-			int ret = FileIO.dirChooser.showOpenDialog(this);
+			int ret = FileIO.dirChooser.showSaveDialog(this);
 			
 			if (ret == JFileChooser.APPROVE_OPTION) {
 				String path = FileIO.dirChooser.getSelectedFile().getAbsolutePath();

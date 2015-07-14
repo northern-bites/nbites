@@ -85,7 +85,7 @@ def positionAtHome(player):
 
 @superState('playOffBall')
 @stay
-@ifSwitchLater(transitions.shouldSpinSearchFromWatching, 'spinSearch')
+@ifSwitchLater(transitions.shouldSpinSearchFromWatching, 'spinInHomePosition')
 def watchForBall(player):
     """
     The player is at home, waiting for the ball to be within it's box (range)

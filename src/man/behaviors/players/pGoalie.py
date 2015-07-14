@@ -72,7 +72,28 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.safelyPlaced,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : GoalieStates.watch
+            : GoalieStates.watch,
+
+            Transition.CountTransition(GoalieTransitions.shouldClearBall,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION + 5)
+            : VisualGoalieStates.clearBall,
+
+            Transition.CountTransition(GoalieTransitions.shouldSquat,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.saveCenter,
+
+            # No dives -- TESTING DIVES
+            Transition.CountTransition(GoalieTransitions.shouldDiveLeft,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.saveLeft,
+
+            Transition.CountTransition(GoalieTransitions.shouldDiveRight,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.saveRight,
             }
 
         GoalieStates.watch.transitions = {
@@ -121,22 +142,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.LOW_PRECISION)
             : GoalieStates.watchWithLineChecks
 
-            # Transition.CountTransition(GoalieTransitions.shouldClearBall,
-            #                            Transition.SOME_OF_THE_TIME,
-            #                            Transition.OK_PRECISION + 5)
-            # : VisualGoalieStates.spinToFaceBall,
-
-            # Transition.CountTransition(GoalieTransitions.shouldClearDangerousBall,
-            #                            Transition.SOME_OF_THE_TIME,
-            #                            Transition.OK_PRECISION)
-            # : VisualGoalieStates.backUpForDangerousBall
-            }
-
-        VisualGoalieStates.spinToFaceBall.transitions = {
-            Transition.CountTransition(GoalieTransitions.facingBall,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : VisualGoalieStates.clearIt
             }
 
         VisualGoalieStates.clearBall.transitions = {
@@ -153,54 +158,16 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.walkedTooFar,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.OK_PRECISION)
-            : GoalieStates.returnUsingLoc
-            }
-
-        VisualGoalieStates.positionForGoalieKick.transitions = {
-            Transition.CountTransition(GoalieTransitions.ballLostStopChasing,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
             : GoalieStates.returnUsingLoc,
 
-            Transition.CountTransition(GoalieTransitions.ballMovedStopChasing,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : GoalieStates.returnUsingLoc,
-
-            Transition.CountTransition(GoalieTransitions.walkedTooFar,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : GoalieStates.returnUsingLoc
-            }
-
-        VisualGoalieStates.backUpForDangerousBall.transitions = {
-            Transition.CountTransition(GoalieTransitions.ballSafe,
-                                       Transition.OCCASIONALLY,
-                                       Transition.LOW_PRECISION)
-            : VisualGoalieStates.spinToFaceBall,
-
-            # Transition.CountTransition(GoalieTransitions.ballLostStopChasing,
-            #                            Transition.ALL_OF_THE_TIME,
-            #                            90)
-            # : GoalieStates.watchWithCornerChecks,
-
-            # Transition.CountTransition(GoalieTransitions.ballMovedStopChasing,
-            #                            Transition.MOST_OF_THE_TIME,
-            #                            Transition.OK_PRECISION)
-            # : GoalieStates.watchWithCornerChecks
-            }
-
-        VisualGoalieStates.clearIt.transitions = {
             Transition.CountTransition(GoalieTransitions.shouldSquat,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
             : GoalieStates.saveCenter,
 
-            Transition.CountTransition(GoalieTransitions.reachedMyDestination,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
-            : GoalieStates.kickBall,
+            }
 
+        VisualGoalieStates.positionForGoalieKick.transitions = {
             Transition.CountTransition(GoalieTransitions.ballLostStopChasing,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.OK_PRECISION)
@@ -222,19 +189,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.INSTANT)
             : GoalieStates.kickBall
-            }
-
-            #VISION CHANGE
-        VisualGoalieStates.returnToGoal.transitions = {
-            Transition.CountTransition(GoalieTransitions.doneWalking,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : GoalieStates.watchWithLineChecks
-
-            # Transition.CountTransition(GoalieTransitions.shouldStopGoingBack,
-            #                            Transition.SOME_OF_THE_TIME,
-            #                            Transition.OK_PRECISION)
-            # : GoalieStates.watchWithLineChecks
             }
 
         VisualGoalieStates.didIKickIt.transitions = {
@@ -444,62 +398,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             : VisualGoalieStates.clearBall
             }
 
-        VisualGoalieStates.findMyWayBackPtI.transitions = {
-            Transition.CountTransition(GoalieTransitions.shouldStopTurning,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : VisualGoalieStates.findMyWayBackPtII,
-
-            Transition.CountTransition(GoalieTransitions.seeGoalbox,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.lineCheckReposition
-            }
-
-        VisualGoalieStates.findMyWayBackPtII.transitions = {
-            Transition.CountTransition(GoalieTransitions.doneWalking,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.lineCheckReposition
-            }
-
         GoalieStates.waitForPenaltySave.transitions = {
             Transition.CountTransition(GoalieTransitions.saveNow,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
             : GoalieStates.doDive,
-            }
-
-        GoalieStates.spinToHorizon.transitions = {
-            Transition.CountTransition(GoalieTransitions.facingFront,
-                                       Transition.OCCASIONALLY,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.moveBackwards
-            }
-
-        GoalieStates.spinBack.transitions = {
-            Transition.CountTransition(GoalieTransitions.doneWalking,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.moveBackwards #returnToGoal
-            }
-
-        GoalieStates.recoverMyself.transitions = {
-            Transition.CountTransition(GoalieTransitions.shouldTurn,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.lineCheckReposition,
-
-            Transition.CountTransition(GoalieTransitions.shouldBackUp,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.moveBackwards,
-
-            Transition.CountTransition(GoalieTransitions.facingASideline,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.moveBackwards,
-
             }
 
         GoalieStates.returnUsingLoc.transitions = {
@@ -511,7 +414,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.reachedMyDestination,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : VisualGoalieStates.checkSafePlacement
+            : VisualGoalieStates.checkSafePlacement,
+
+            Transition.CountTransition(GoalieTransitions.ballWithinLocClearingDist,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : VisualGoalieStates.clearBall
 
             # TODO put in saves??
 

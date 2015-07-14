@@ -11,20 +11,6 @@ import VisualGoalieStates
 import GoalieStates
 from objects import RelRobotLocation
 
-# def getCornerObservation(player, cornerSide):
-#     getCorners(player)
-#     corners = player.corners
-#     goodRightCornerObservation = 0
-#     goodLeftCornerObservation = 0
-
-#     for corner in corners:
-#         dist = getCornerDist(corner)
-#         bearing = getBearingFromRobot(corner.x, corner.y)
-#         corner_id = corner.id
-
-#         # if (corner_id == 0
-        # and math.fabs(dist - constants.EXPECTED_CORNER_DIST_FROM_CENTER) < constants.CORNER_DISTANCE_THRESH):
-
 def safelyPlaced(player):
     getLines(player)
     corners = player.corners
@@ -73,25 +59,6 @@ def getCorners(player):
   # Concave,
   # Convex,
   # T,
-
-# def tooSimilar(corner):
-#     corners = VisualGoalieStates.checkSafePlacement.corners[-5:]
-#     if len(VisualGoalieStates.checkSafePlacement.corners) < 10: return False
-#     similar_count = 0
-#     for existing_corner in corners:
-#         existing_dist = getCornerDist(existing_corner)
-#         dist = getCornerDist(corner)
-#         bearing = getBearingFromRobot(corner.x, corner.y)
-#         existing_bearing = getBearingFromRobot(existing_corner.x, existing_corner.y)
-#         if (math.fabs(existing_dist - dist) < 4.0
-#         and math.fabs(existing_bearing - bearing) < 4.0):
-#             similar_count += 1
-
-#     if similar_count > 3:
-#         print('Corner too similar, rejecting')
-#         return True
-
-#     return False
 
 def getCornerDist(c):
     dist = c.x * c.x + c.y * c.y
@@ -206,6 +173,13 @@ def seeGoalbox(player):
             print("horizon", player.brain.vision.horizon_dist)
             player.homeDirections += [RelRobotLocation(mx, my, h)]
             return True
+
+        for corner in player.corners:
+            if (corner.id == 1
+            and getCornerDist(corner) != 0.0
+            and getCornerDist(corner) < 300.0): # Convex corner
+                print("Found convex corner! It's probably the goalbox")
+                dest = RelRobotLocation(corner.x + 20.0, corner.y, 0.0)
 
     return False
 
@@ -498,22 +472,12 @@ def facingASideline(player):
                 #     c = player.brain.visionCorners
                 #     print("x", c.corner(k).x, "y", c.corner(k).y)
 
-                facefrnt = (player.brain.vision.horizon_dist > 600) and \
+                facefront = (player.brain.vision.horizon_dist > 600) and \
                 math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 10.0
-                print("Facing front: ", facefrnt)
+                print("Facing front: ", facefront)
 
-                if GoalieStates.watchWithLineChecks.wentToClearIt and\
-                not GoalieStates.watchWithLineChecks.correctFacing:
-                    if VisualGoalieStates.clearIt.ballSide == constants.RIGHT:
-                        player.homeDirections += [RelRobotLocation(0,0,50.0)]
-                        print "I think I'm facing right, so I'm turning left!"
-                    else:
-                        player.homeDirections += [RelRobotLocation(0,0,-50.0)]
-                        print "I think I'm facing left, so I'm turning right!"
-                    return True
-
-                elif (GoalieStates.watchWithLineChecks.correctFacing and r1 > 20.0\
-                                and r2 > 20.0) or facefrnt:
+                if (GoalieStates.watchWithLineChecks.correctFacing and r1 > 20.0\
+                                and r2 > 20.0) or facefront:
                     if math.fabs(math.fabs(t1 - 180.0) - 180.0) < math.fabs(math.fabs(t2 - 180.0) - 180.0):
                         frontline = visionLines(i).inner
                         sideline = visionLines(j).inner
@@ -772,29 +736,15 @@ def shouldDiveRight(player):
 
     if sightOk and veryFastBall(player, -100.0, -20.0):
         save = True
-
-    # if ball.distance < 175.0 and ball.mov_vel_x < -14.0 and nball.x_vel < -14.0\
-    # and nball.yintercept < -20.0 and nball.yintercept > -100.0 and sightOk:
-    #     save = True
-    #     print "sooo fast"
-
-    # if ball.distance < 200.0 and ball.mov_vel_x < -19.0 and nball.x_vel < -30.0 and sightOk:
-    #     if nball.yintercept < -20.0 and nball.yintercept > -100.0:
-    #         print "should def save right!!"
-    #     elif nball.yintercept == 0.0:
-    #         print "havent yet found a y oops"
-    #     save = True
-    #     print "sooosoo fast"
-
 #TestingChange
-    # if save:
-    #     print "DIVE RIGHT"
-    #     print("yintercept:", nball.yintercept)
-    #     print("Ball dist:", ball.distance)
-    #     print("shouldDiveRight.lastFramesOff:", shouldDiveRight.lastFramesOff)
-    #     print("ball.vis.frames_on", ball.vis.frames_on)
-    #     print("nb xvel:", nball.x_vel)
-    #     print("ball mov vel:", ball.mov_vel_x)
+    if save:
+        print "DIVE RIGHT"
+        print("yintercept:", nball.yintercept)
+        print("Ball dist:", ball.distance)
+        print("shouldDiveRight.lastFramesOff:", shouldDiveRight.lastFramesOff)
+        print("ball.vis.frames_on", ball.vis.frames_on)
+        print("nb xvel:", nball.x_vel)
+        print("ball mov vel:", ball.mov_vel_x)
     #     nb = player.brain.naiveBall
     #     print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
     #     print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
@@ -843,14 +793,14 @@ def shouldDiveLeft(player):
 
 
 #TestingChange
-    # if save:
-    #     print "DIVE LEFT"
-    #     print("yintercept:", nball.yintercept)
-    #     print("Ball dist:", ball.distance)
-    #     print("shouldDiveRight.lastFramesOff:", shouldDiveLeft.lastFramesOff)
-    #     print("ball.vis.frames_on", ball.vis.frames_on)
-    #     print("nb xvel:", nball.x_vel)
-    #     print("ball mov vel:", ball.mov_vel_x)
+    if save:
+        print "DIVE LEFT"
+        print("yintercept:", nball.yintercept)
+        print("Ball dist:", ball.distance)
+        print("shouldDiveRight.lastFramesOff:", shouldDiveLeft.lastFramesOff)
+        print("ball.vis.frames_on", ball.vis.frames_on)
+        print("nb xvel:", nball.x_vel)
+        print("ball mov vel:", ball.mov_vel_x)
     #     nb = player.brain.naiveBall
     #     print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
     #     print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
@@ -938,15 +888,14 @@ def shouldSquat(player):
         save = True
 
 #TestingChange
-    # if save:
-    #     print "SQUAT"
-    #     print("yintercept:", nball.yintercept)
-    #     print("Ball dist:", ball.distance)
-    #     print("shouldDiveRight.lastFramesOff:", shouldSquat.lastFramesOff)
-    #     print("ball.vis.frames_on", ball.vis.frames_on)
-    #     print("nb xvel:", nball.x_vel)
-    #     print("ball mov vel:", ball.mov_vel_x)
-    #     nb = player.brain.naiveBall
+    if save:
+        print "SQUAT"
+        print("yintercept:", nball.yintercept)
+        print("Ball dist:", ball.distance)
+        print("shouldDiveRight.lastFramesOff:", shouldSquat.lastFramesOff)
+        print("ball.vis.frames_on", ball.vis.frames_on)
+        print("nb xvel:", nball.x_vel)
+        print("ball mov vel:", ball.mov_vel_x)
     #     print("startAvgX:", nb.start_avg_x, "Y:", nb.start_avg_y)
     #     print("endAvgX:", nb.end_avg_x, "Y:", nb.end_avg_y)
     #     print("avgStartIndex:", nb.avg_start_index, "end:", nb.avg_end_index)
@@ -985,24 +934,29 @@ def veryCloseBall(player, y_lower_bound, y_upper_bound):
 
     return False
 
-def shouldClearDangerousBall(player):
-    return False
-    # ball must be visible
+def ballSafe(player):
+    return math.fabs(player.brain.ball.bearing_deg) < 60.0
+
+def ballWithinLocClearingDist(player):
     if player.brain.ball.vis.frames_off > 10:
         return False
 
-    if (math.fabs(player.brain.ball.bearing_deg) > 70.0 and
-        player.brain.ball.distance < 50.0):
-        if player.brain.ball.bearing_deg < 0:
-            VisualGoalieStates.clearIt.dangerousSide = constants.RIGHT
-        else:
-            VisualGoalieStates.clearIt.dangerousSide = constants.LEFT
+    ball = player.brain.ball
+
+    if ball.distance < 50.0:
+        print("ball pretty close")
         return True
 
-    return False
+    if withinGoalArea(ball):
+        print("ball within goal area")
+        return True
 
-def ballSafe(player):
-    return math.fabs(player.brain.ball.bearing_deg) < 60.0
+def withinGoalArea(ball):
+    if (ball.y < field.BLUE_GOALBOX_TOP_Y + 25.0
+    and ball.y > field.BLUE_GOALBOX_BOTTOM_Y - 25.0
+    and ball.x > field.BLUE_GOALBOX_LEFT_X - 25.0
+    and ball.x < BLUE_GOALBOX_RIGHT_X + 25.0):
+        return True
 
 def shouldClearBall(player):
     """
@@ -1048,20 +1002,20 @@ def shouldClearBall(player):
         walkedTooFar.yThresh = 90.0
         shouldGo = True
 
-    if shouldGo:
-        if player.brain.ball.bearing_deg < -65.0:
-            VisualGoalieStates.clearIt.dangerousSide = constants.RIGHT
-        elif player.brain.ball.bearing_deg > 65.0:
-            VisualGoalieStates.clearIt.dangerousSide = constants.LEFT
-        else:
-            VisualGoalieStates.clearIt.dangerousSide = -1
+    # if shouldGo:
+    #     if player.brain.ball.bearing_deg < -65.0:
+    #         VisualGoalieStates.clearIt.dangerousSide = constants.RIGHT
+    #     elif player.brain.ball.bearing_deg > 65.0:
+    #         VisualGoalieStates.clearIt.dangerousSide = constants.LEFT
+    #     else:
+    #         VisualGoalieStates.clearIt.dangerousSide = -1
 
-        if player.brain.ball.bearing_deg < 0.0:
-            VisualGoalieStates.clearIt.ballSide = constants.RIGHT
-        else:
-            VisualGoalieStates.clearIt.ballSide = constants.LEFT
+    #     if player.brain.ball.bearing_deg < 0.0:
+    #         VisualGoalieStates.clearIt.ballSide = constants.RIGHT
+    #     else:
+    #         VisualGoalieStates.clearIt.ballSide = constants.LEFT
 
-        print ("Ball dist:", player.brain.ball.distance)
+        # print ("Ball dist:", player.brain.ball.distance)
 
     return shouldGo
 
@@ -1117,20 +1071,6 @@ def doneWalking(player):
 
 def successfulKick(player):
     return player.counter > 50 #and VisualGoalieStates.clearIt.dangerousSide == -1
-
-def successfulKickAndTurn(player):
-    # I went to the far side of a goal and it will be hard to get back!
-    if VisualGoalieStates.clearIt.dangerousSide == -1:
-        return False
-
-    if VisualGoalieStates.clearIt.dangerousSide == constants.RIGHT:
-        player.homeDirections += [RelRobotLocation(-50.0, 0.0, 15.0)]
-    else:
-        player.homeDirections += [RelRobotLocation(-50.0, 0.0, -15.0)]
-    print "Here I go! It was very far to the side"
-
-    # player.homeDirections = player.homeDirections[1:]
-    return player.counter > 30
 
 def whiffed(player):
     """

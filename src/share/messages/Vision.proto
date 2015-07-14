@@ -1,5 +1,10 @@
 package messages;
 
+option java_outer_classname = "_File_Vision";
+option java_multiple_files = true;
+
+
+
 message HoughLine 
 {
     optional float r = 1;
@@ -28,6 +33,7 @@ message Corner
     optional float prob = 5;
     optional int32 line1 = 6;
     optional int32 line2 = 7;
+    optional float wz0 = 8;
 }
 
 message CenterCircle
@@ -36,6 +42,7 @@ message CenterCircle
     optional float x = 2;
     optional float y = 3;
     optional float prob = 4;
+    optional float wz0 = 5;
 }
 
 message Vision
@@ -65,6 +72,7 @@ message VBall
     optional double bearing_deg = 14;
     optional sint32 x = 15;
     optional sint32 y = 16;
+    optional float wz0 = 17;
 }
 
 // China 2015 hack
