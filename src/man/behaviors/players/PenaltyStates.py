@@ -24,6 +24,8 @@ def afterPenalty(player):
         afterPenalty.decidedSide = False
         player.brain.tracker.lookToAngle(-90)
 
+        afterPenalty.rightRatio = 0
+        afterPenalty.leftRatio = 0
         # reset state specific counters
         afterPenalty.cornerOn = 0
         afterPenalty.cornerFrames = 0
@@ -34,11 +36,13 @@ def afterPenalty(player):
 
     # Alternate between looking right and left
     if afterPenalty.stateCount % 70 == 0:
-        afterPenalty.right = not afterPenalty.right
         if afterPenalty.right:
-            player.brain.tracker.lookToAngle(-90)
-        else:
+            afterPenalty.rightRatio = afterPenalty.cornerOn / float(afterPenalty.cornerFrames)
             player.brain.tracker.lookToAngle(90)
+        else:
+            player.brain.tracker.lookToAngle(-90)
+            afterPenalty.leftRatio = afterPenalty.cornerOn / float(afterPenalty.cornerFrames)
+        afterPenalty.right = not afterPenalty.right
         # Reset counters
         afterPenalty.cornerOn = 0
         afterPenalty.cornerFrames = 0
@@ -57,12 +61,16 @@ def afterPenalty(player):
         afterPenalty.cornerFrames += 1
 
     # Only decide we're good to go if we saw corner in > 2/3 of frames
-    if afterPenalty.cornerFrames > 30:
-        ratio = afterPenalty.cornerOn / float(afterPenalty.cornerFrames)
-        if ratio > .66:
+    if afterPenalty.stateCount > 140:
+        if max(afterPenalty.rightRatio, afterPenalty.leftRatio) > .66:
             afterPenalty.decidedSide = True
+            afterPenalty.right = afterPenalty.rightRatio > afterPenalty.leftRatio
+            if afterPenalty.right:
+                player.brain.tracker.lookToAngle(-90)
+            else:
+                player.brain.tracker.lookToAngle(90)
 
-    if afterPenalty.decidedSide:
+    if afterPenalty.decidedSide or afterPenalty.stateCount > 300:
         player.brain.resetLocalizationFromPenalty(afterPenalty.right)
         if DEBUG_PENALTY_STATES:
             print "We've decided that the goal's to our right? " + str(afterPenalty.right)
