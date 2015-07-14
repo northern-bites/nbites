@@ -337,6 +337,7 @@ void VisionModule::run_()
 
     PROF_ENTER(P_OBSTACLE)
     updateObstacleBox();
+
     PROF_EXIT(P_OBSTACLE)
 
     PROF_EXIT(P_VISION);
@@ -394,12 +395,14 @@ void VisionModule::outportalVisionField()
             pCorner->set_id(static_cast<int>(corner.id));
             pCorner->set_line1(static_cast<int>(corner.first->index()));
             pCorner->set_line2(static_cast<int>(corner.second->index()));
+            pCorner->set_wz0(homography[i]->wz0());
         }
     }
 
     // (3) Outportal Center Circle
     messages::CenterCircle* cc = visionField.mutable_circle(); 
     cc->set_on(centerCircleDetector[0]->on());
+    cc->set_wz0(homography[0]->wz0());
 
     // Rotate to post vision relative robot coordinate system
     double rotatedX, rotatedY;
@@ -434,6 +437,7 @@ void VisionModule::outportalVisionField()
     vb->set_frames_on(ballOnCount);
     vb->set_frames_off(ballOffCount);
     vb->set_intopcam(top);
+    vb->set_wz0(homography[!top]->wz0());
 
     if (ballOn)
     {

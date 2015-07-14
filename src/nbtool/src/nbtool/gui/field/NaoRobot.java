@@ -22,7 +22,6 @@ public class NaoRobot {
 		screenBallX, screenBallY,screenSharedBallX, screenSharedBallY;
 	float screenXDist, screenYDist, screenH;
 	
-	public boolean shouldFlip_; 
 	public boolean in_kicking_state = false; 
 	public boolean seeing_ball = false;
 	public boolean fallen = false;
