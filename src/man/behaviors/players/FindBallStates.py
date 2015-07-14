@@ -50,7 +50,7 @@ def searchAfterFall(player):
 
     if player.brain.motion.calibrated:
         if player.brain.ball.vis.on:
-            return player.goNow('approachBall')
+            return player.goNow('playOffBall')
         else:
             return player.goNow('spinSearch')
     else:
