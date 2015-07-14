@@ -95,3 +95,8 @@ def shouldBeSupporter(player):
         
     return (ballInBox(player) and
             claimTransitions.shouldCedeClaim(player))
+
+def shouldNotBeSupporter(player):
+    if role.isChaser(player.role):
+        return shared.ballOffForNFrames(120)
+    return not shouldBeSupporter(player)

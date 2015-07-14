@@ -12,6 +12,9 @@ from ..util import *
 from math import hypot, fabs, atan2, degrees
 import random
 
+# IMPORTANT China 2015 bug found
+# TODO fix oscillation between positionAtHome and positionAsSupporter
+
 @defaultState('positionAtHome')
 @superState('gameControllerResponder')
 @ifSwitchNow(transitions.shouldFindSharedBall, 'searchFieldForSharedBall')
@@ -110,7 +113,7 @@ def doSecondHalfSpin(player):
 
 @superState('playOffBall')
 @stay
-@ifSwitchLater(shared.ballOffForNFrames(120), 'playOffBall')
+@ifSwitchLater(transitions.shouldNotBeSupporter, 'playOffBall')
 def positionAsSupporter(player):
     """
     Position to support teammate with claim.
