@@ -154,12 +154,10 @@ void VisionModule::run_()
 
     bool ballDetected = false;
 
-
     // Time vision module
     double topTimes[12];
     double bottomTimes[12];
     double* times[2] = { topTimes, bottomTimes };
-
 
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
@@ -190,7 +188,9 @@ void VisionModule::run_()
 
 
         // Offset to hackily adjust tilt for high-azimuth error
-        double azOffset = azimuth_m * fabs(kinematics[i]->azimuth()) + azimuth_b;
+        double azOffset = 0;
+        if (name != "ringo")
+            azOffset = azimuth_m * fabs(kinematics[i]->azimuth()) + azimuth_b;
 
         // Calculate kinematics and adjust homography
         if (jointsIn.message().has_head_yaw()) {
@@ -609,6 +609,10 @@ void VisionModule::setCalibrationParams(int camera, std::string robotName)
         if (robotName == "she-hulk")
             robotName = "shehulk";
     }
+
+    // Set local private variable
+    name = robotName;
+
     if (robotName == "") {
         return;
     }
