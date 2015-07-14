@@ -72,8 +72,10 @@ def shouldSpinSearchFromWatching(player):
     shouldExtendTimer = player.commMode == 2 and role.isDefender(player.role)
     spinTimer = 25 if shouldExtendTimer else 12
     return (player.stateTime > spinTimer and
-            player.brain.ball.vis.frames_off > 30 and
-            not player.brain.sharedBall.ball_on)
+            player.brain.ball.vis.frames_off > 30)
+  
+def stopSpinning(player):
+    return player.brain.ball.vis.frames_on > 0
   
 def shouldApproachBall(player):
     if ballNotInBox(player):
@@ -89,14 +91,18 @@ def shouldFindSharedBall(player):
     return (player.brain.sharedBall.ball_on and
             player.brain.sharedBall.reliability >= 1)
 
+def noBallFoundAtSharedBall(player):
+    return (player.sharedBallCloseCount >= 60 and 
+            player.brain.sharedBall.ball_on)
+
 def shouldFindFlippedSharedBall(player):
-    return player.sharedBallCloseCount >= 60
+    return noBallFoundAtSharedBall(player) and player.brain.sharedBall.reliability >= 2
 
 def shouldStopLookingForSharedBall(player):
     return player.sharedBallOffCount >= 105
 
 def shouldStopLookingForFlippedSharedBall(player):
-    return shouldFindFlippedSharedBall(player) or shouldStopLookingForSharedBall(player)
+    return noBallFoundAtSharedBall(player) or shouldStopLookingForSharedBall(player)
 
 def shouldBeSupporter(player):
     if not player.brain.motion.calibrated:
