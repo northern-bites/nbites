@@ -64,7 +64,7 @@ namespace control {
         printf("cnc_setFlag() len=%lu\n", u);
         
         if (u != 2) { //need (index, value)
-            printf("cnc_setFlag() wrong number of bytes, assuming resquest for stats!\n");
+            printf("cnc_setFlag() wrong number of bytes, assuming request for stats!\n");
             
             //This is used by the tool to request current state of robot, so set RETURN.
             RETURN = nblog::makeSTATSlog();
@@ -191,6 +191,16 @@ namespace control {
     
 #endif
     
+    /* NOTE: this still requires restarting man! */
+    uint32_t cnc_setCalibration(Log * arg) {
+        SExpr * params = SExpr::read(arg.data());
+        
+        
+        
+        delete params;
+        return 0;
+    }
+    
     /*
      THIS IS WHERE YOU PUT NEW CONTROL FUNCTIONS!
      
@@ -202,6 +212,8 @@ namespace control {
         ret["test"] = &cnc_test;
         ret["setFlag"] = &cnc_setFlag;
         ret["exit"] = &cnc_exit;
+        
+        ret["setCalibration"] = &cnc_setCalibration;
         
 #ifndef __APPLE__
         ret["setCameraParams"] = &cnc_setCameraParams;
