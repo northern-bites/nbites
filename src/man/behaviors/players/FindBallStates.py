@@ -49,7 +49,10 @@ def searchAfterFall(player):
         player.brain.tracker.trackBall()
 
     if player.brain.motion.calibrated:
-        return player.goNow('spinSearch')
+        if player.brain.ball.vis.on:
+            return player.goNow('approachBall')
+        else:
+            return player.goNow('spinSearch')
     else:
         return player.stay()
 
