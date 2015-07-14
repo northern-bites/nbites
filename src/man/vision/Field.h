@@ -99,7 +99,6 @@ public:
 	void setDebugFieldEdge(bool debug) {debugFieldEdge = debug;}
 	void setDrawFieldHorizon(bool debug) {debugDrawFieldEdge = debug;}
 	void setDrawCameraHorizon(bool debug) {drawCameraHorizon = debug;}
-	void setGreenThresh(int gt) {greenThresh = gt; }
 #endif
 
 private:
