@@ -18,16 +18,20 @@ LandmarkSystem::LandmarkSystem()
     // Add corners to map
     addCorner(vision::CornerID::Concave, LandmarkID::OurRightConcave, GREEN_PAD_X, GREEN_PAD_Y);
     addCorner(vision::CornerID::Concave, LandmarkID::OurLeftConcave, GREEN_PAD_X, GREEN_PAD_Y + FIELD_WHITE_HEIGHT);
-    addCorner(vision::CornerID::Convex, LandmarkID::OurRightConvex, GREEN_PAD_X + GOALBOX_DEPTH, BLUE_GOALBOX_BOTTOM_Y);
-    addCorner(vision::CornerID::Convex, LandmarkID::OurLeftConvex, GREEN_PAD_X + GOALBOX_DEPTH, BLUE_GOALBOX_TOP_Y);
+    addCorner(vision::CornerID::Concave, LandmarkID::OurRightBox, GREEN_PAD_X + GOALBOX_DEPTH, BLUE_GOALBOX_BOTTOM_Y);
+    addCorner(vision::CornerID::Concave, LandmarkID::OurLeftBox, GREEN_PAD_X + GOALBOX_DEPTH, BLUE_GOALBOX_TOP_Y);
+    addCorner(vision::CornerID::Convex, LandmarkID::OurRightBox, GREEN_PAD_X + GOALBOX_DEPTH, BLUE_GOALBOX_BOTTOM_Y);
+    addCorner(vision::CornerID::Convex, LandmarkID::OurLeftBox, GREEN_PAD_X + GOALBOX_DEPTH, BLUE_GOALBOX_TOP_Y);
     addCorner(vision::CornerID::T, LandmarkID::OurRightT, GREEN_PAD_X, BLUE_GOALBOX_BOTTOM_Y);
     addCorner(vision::CornerID::T, LandmarkID::OurLeftT, GREEN_PAD_X, BLUE_GOALBOX_TOP_Y);
     addCorner(vision::CornerID::T, LandmarkID::MidRightT, CENTER_FIELD_X, GREEN_PAD_Y);
     addCorner(vision::CornerID::T, LandmarkID::MidLeftT, CENTER_FIELD_X, GREEN_PAD_Y + FIELD_WHITE_HEIGHT);
     addCorner(vision::CornerID::Concave, LandmarkID::TheirRightConcave, GREEN_PAD_X + FIELD_WHITE_WIDTH, GREEN_PAD_Y);
     addCorner(vision::CornerID::Concave, LandmarkID::TheirLeftConcave, GREEN_PAD_X + FIELD_WHITE_WIDTH, GREEN_PAD_Y + FIELD_WHITE_HEIGHT);
-    addCorner(vision::CornerID::Convex, LandmarkID::TheirRightConvex, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH, BLUE_GOALBOX_BOTTOM_Y);
-    addCorner(vision::CornerID::Convex, LandmarkID::TheirLeftConvex, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH, BLUE_GOALBOX_TOP_Y);
+    addCorner(vision::CornerID::Concave, LandmarkID::TheirRightBox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH, BLUE_GOALBOX_BOTTOM_Y);
+    addCorner(vision::CornerID::Concave, LandmarkID::TheirLeftBox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH, BLUE_GOALBOX_TOP_Y);
+    addCorner(vision::CornerID::Convex, LandmarkID::TheirRightBox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH, BLUE_GOALBOX_BOTTOM_Y);
+    addCorner(vision::CornerID::Convex, LandmarkID::TheirLeftBox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH, BLUE_GOALBOX_TOP_Y);
     addCorner(vision::CornerID::T, LandmarkID::TheirRightT, GREEN_PAD_X + FIELD_WHITE_WIDTH, BLUE_GOALBOX_BOTTOM_Y);
     addCorner(vision::CornerID::T, LandmarkID::TheirLeftT, GREEN_PAD_X + FIELD_WHITE_WIDTH, BLUE_GOALBOX_TOP_Y);
 
@@ -79,7 +83,7 @@ double LandmarkSystem::scoreCorner(const messages::Corner& observation,
 
     // Find correspondence and calculate probability of match
     Landmark correspondingLandmark = matchCorner(observation, loc);
-    return scoreObservation(obsvAsRobotLocation, correspondingLandmark, loc);
+    return scoreObservation(obsvAsRobotLocation, correspondingLandmark, loc, observation.wz0());
 }
 
 double LandmarkSystem::scoreCircle(const messages::CenterCircle& observation, 
@@ -91,7 +95,7 @@ double LandmarkSystem::scoreCircle(const messages::CenterCircle& observation,
     obsvAsRobotLocation.set_y(observation.y());
 
     // Calculate probability of match
-    return scoreObservation(obsvAsRobotLocation, circle, loc);
+    return scoreObservation(obsvAsRobotLocation, circle, loc, observation.wz0());
 }
 
 double LandmarkSystem::scoreBallInSet(const messages::FilteredBall& observation, 
@@ -107,7 +111,7 @@ double LandmarkSystem::scoreBallInSet(const messages::FilteredBall& observation,
     obsvAsRobotLocation.set_y(yBall);
 
     // Calculate probability of match
-    return scoreObservation(obsvAsRobotLocation, ballInSet, loc);
+    return scoreObservation(obsvAsRobotLocation, ballInSet, loc, observation.vis().wz0());
 }
 
 messages::RobotLocation LandmarkSystem::relRobotToAbsolute(const messages::RobotLocation& observation, const messages::RobotLocation& loc)
@@ -128,7 +132,7 @@ messages::RobotLocation LandmarkSystem::relRobotToAbsolute(const messages::Robot
 double LandmarkSystem::scoreObservation(const messages::RobotLocation& observation, 
                                         const Landmark& correspondingLandmark,
                                         const messages::RobotLocation& loc,
-                                        bool onlyBearing)
+                                        double wz0)
 {
     // Observation, cartesian to polar
     double rObsv, tObsv;
@@ -144,16 +148,22 @@ double LandmarkSystem::scoreObservation(const messages::RobotLocation& observati
     double rMapRel, tMapRel;
     vision::cartesianToPolar(xMapRel, yMapRel, rMapRel, tMapRel);
 
-    // Find difference in r and t
-    double rDiff = fabs(rMapRel - rObsv);
+    // Calculate tilt to both observation and corresponding line in map 
+    // NOTE better to score error in r in angular coordinates since this 
+    //      weights close observations more highly
+    double observationTilt = atan(rObsv / wz0);
+    double correspondingTilt = atan(rMapRel / wz0);
+
+    // Find differences in tilt and t
+    double tiltDiff = vision::diffRadians(observationTilt, correspondingTilt);
     double tDiff = vision::diffRadians(tMapRel, tObsv);
  
     // Evaluate gaussian to get probability of observation from location loc
     // TODO params
-    boost::math::normal_distribution<> rGaussian(0, 100);
-    boost::math::normal_distribution<> tGaussian(0, 10*TO_RAD);
+    boost::math::normal_distribution<> tiltGaussian(0, 5*TO_RAD);
+    boost::math::normal_distribution<> tGaussian(0, 20*TO_RAD);
 
-    double rProb = pdf(rGaussian, rDiff);
+    double tiltProb = pdf(tiltGaussian, tiltDiff);
     double tProb = pdf(tGaussian, tDiff);
 
     if (debug) {
@@ -163,15 +173,13 @@ double LandmarkSystem::scoreObservation(const messages::RobotLocation& observati
         std::cout << std::get<1>(correspondingLandmark) << "," << std::get<2>(correspondingLandmark) << std::endl;
         std::cout << xMapRel << "," << yMapRel << std::endl;
         std::cout << rMapRel << "," << tMapRel << std::endl;
-        std::cout << rDiff << "," << tDiff << std::endl;
-        std::cout << rProb << "/" << tProb << std::endl;
-        std::cout << (rProb * tProb) << std::endl;
+        std::cout << tiltDiff << "," << tDiff << std::endl;
+        std::cout << tiltProb << "/" << tProb << std::endl;
+        std::cout << (tiltProb * tProb) << std::endl;
     }
 
     // Make the conditional independence assumption
-    if (onlyBearing)
-        return tProb;
-    return rProb * tProb;
+    return tiltProb * tProb;
 }
 
 void LandmarkSystem::addCorner(vision::CornerID type, LandmarkID id, double x, double y)

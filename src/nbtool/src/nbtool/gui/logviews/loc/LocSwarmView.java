@@ -12,14 +12,11 @@ import java.util.Vector;
 
 import com.google.protobuf.Message;
 
-import messages.RobotLocationOuterClass.*;
-import messages.ParticleSwarmOuterClass.ParticleSwarm;
-import messages.ParticleSwarmOuterClass.Particle;
-import messages.VisionOuterClass.*;
-import messages.BallModel.*;
+import messages.*;
 
 import nbtool.data.Log;
 import nbtool.data.SExpr;
+import nbtool.gui.field.*;
 import nbtool.gui.logviews.misc.ViewParent;
 
 public class LocSwarmView extends ViewParent implements ActionListener {
@@ -157,6 +154,7 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 	private JScrollPane sp;
 	public static float pWeight;
 	public static boolean shouldFlip = false;
+	public static boolean lineColors = true;
 	public static final Dimension fieldDimension = new Dimension(
 								(int)FieldConstants.FIELD_WIDTH,
 								(int)FieldConstants.FIELD_HEIGHT);
@@ -164,8 +162,8 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 	@Override
 	public void paintComponent(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
-		f.drawField(g2,shouldFlip);
-		naoPlayer.drawNao(g2,shouldFlip);
+		f.drawField(g2,shouldFlip, lineColors);
+		naoPlayer.drawNaoLoc(g2,shouldFlip);
 		if(!naoParticles.isEmpty()) {
 			for(int i=0; i<naoParticles.size(); i++) {
 				naoParticles.get(i).drawParticle(g2,pWeight,shouldFlip);

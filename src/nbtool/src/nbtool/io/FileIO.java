@@ -191,7 +191,7 @@ public class FileIO {
 	
 	/**
 	 * ----------------------------------------------------------------------------
-	 * Asynchronous writing of logs via a FileIO object.
+	 * Asynchronous writing of logs via a FileInstance object.
 	 * */
 	
 	public static FileInstance makeFileWriter(String path, IOFirstResponder ifr) {

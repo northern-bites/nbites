@@ -56,9 +56,8 @@ def positionAtHome(player):
                         ball.x - player.brain.loc.x)) - player.brain.loc.h
     else:
         ball = None
-        home = player.homePosition
 
-    if ball != None:
+    if ball != None and not (role.isDefender(player.role) and NogginConstants.FIXED_D_HOME):
         if role.isLeftDefender(player.role):
             home = findDefenderHome(True, ball, bearing + player.brain.loc.h)
         elif role.isRightDefender(player.role):
@@ -67,6 +66,9 @@ def positionAtHome(player):
             home = findStrikerHome(ball, bearing + player.brain.loc.h)
         else:
             home = player.homePosition
+
+    else:
+        home = player.homePosition
 
     if player.firstFrame():
         if role.isCherryPicker(player.role):
@@ -83,7 +85,7 @@ def positionAtHome(player):
 
 @superState('playOffBall')
 @stay
-@ifSwitchLater(transitions.shouldSpinSearchFromWatching, 'spinSearch')
+@ifSwitchLater(transitions.shouldSpinSearchFromWatching, 'spinInHomePosition')
 def watchForBall(player):
     """
     The player is at home, waiting for the ball to be within it's box (range)

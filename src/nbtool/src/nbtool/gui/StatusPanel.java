@@ -30,8 +30,10 @@ import nbtool.io.FileIO.FileInstance;
 import nbtool.io.StreamIO.StreamInstance;
 import nbtool.util.Center;
 import nbtool.util.Events;
+import nbtool.util.Logger;
 import nbtool.util.NBConstants;
 import nbtool.util.NBConstants.STATUS;
+import nbtool.util.Utility;
 
 public class StatusPanel extends JPanel implements Events.ControlStatus, Events.CrossStatus, Events.FileIOStatus,
 	Events.StreamIOStatus, Events.LogsFound, Events.ToolStats, Events.ToolStatus, Events.RelevantRobotStats{
@@ -51,7 +53,7 @@ public class StatusPanel extends JPanel implements Events.ControlStatus, Events.
 		canvas.setLayout(null);
 		
 		Font msf = new Font("monospaced", Font.PLAIN, 14);
-		Font sf = new Font("monospaced", Font.PLAIN, 12);
+		Font sf  = new Font("monospaced", Font.PLAIN, 12);
 		Font bsf = msf.deriveFont(Font.BOLD, 15);
 		
 		serv = new JLabel("[serv]");
@@ -211,8 +213,13 @@ public class StatusPanel extends JPanel implements Events.ControlStatus, Events.
 		long used = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed();
 	    long max = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax();
 	    
-	    jvm_heap.setText(String.format("JVM heap using  ~%d bytes.", used));
-	    jvm_max.setText(String.format("JVM heap max is ~%d bytes.", max));
+	    //jvm_heap.setText(String.format("JVM heap using  ~%d bytes.", used));
+	    //jvm_max.setText(String.format("JVM heap max is ~%d bytes.", max));
+	    jvm_heap.setText(String.format("JVM heap using  ~%s.",
+	    		Utility.byteString(used, true, true, true, false)));
+	    jvm_max.setText(String.format("JVM heap max  ~%s.",
+	    		Utility.byteString(max, true, true, true, false)));
+	    //Logger.println("" + max);
 	}
 	
 	private void set() {
@@ -220,7 +227,8 @@ public class StatusPanel extends JPanel implements Events.ControlStatus, Events.
 		
 		l_found.setText("# logs found: " + ToolStats.INST.l_found);
 		s_found.setText("# sessions: " + SessionMaster.INST.sessions.size());
-		db_found.setText("Total bytes of data found: " + ToolStats.INST.db_found);
+		db_found.setText("Total bytes of data found: " + 
+				Utility.byteString(ToolStats.INST.db_found, true, true, true, true));
 		db_cur.setText("Current data bytes retained: " + ToolStats.INST.db_cur);
 		db_dropped.setText("Total released data: " + ToolStats.INST.db_dropped);
 		
