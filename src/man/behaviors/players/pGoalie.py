@@ -340,7 +340,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
             Transition.CountTransition(GoalieTransitions.shouldSquat,
                                        Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
+                                       Transition.OK_PRECISION)
             : GoalieStates.saveCenter,
 
             # No dives -- TESTING DIVES
@@ -373,7 +373,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
             Transition.CountTransition(GoalieTransitions.shouldSquat,
                                        Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
+                                       Transition.OK_PRECISION)
             : GoalieStates.saveCenter,
 
             # No dives -- TESTING DIVES
