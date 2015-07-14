@@ -242,3 +242,11 @@ def calculateHomePosition(player):
         home = player.homePosition
 
     return home
+
+def closePointOnSeg(x1, y1, x2, y2, x3, y3):
+    dx = x2 - x1
+    dy = y2 - y1
+    d2 = dx*dx + dy*dy
+    nx = ((x3-x1)*dx + (y3-y1)*dy) / d2
+    nx = min(1, max(0, nx))
+    return (dx*nx + x1, dy*nx + y1)
