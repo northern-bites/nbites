@@ -1,7 +1,7 @@
 from ..navigator import BrunswickSpeeds as speeds
 
 # Ball on and off frame thresholds
-BALL_ON_THRESH = 1
+BALL_ON_THRESH = 2
 BALL_OFF_THRESH = 10
 BALL_OFF_KICK_THRESH = 4 # 4 seconds, time threshold!
 
@@ -25,14 +25,31 @@ REPULSOR_BALL_DIST = ATTRACTOR_BALL_DIST - 15
 ATTRACTOR_REPULSOR_RATIO = 2
 CLOSE_TO_ATTRACTOR_DIST = 10
 
+# Line up
+LINE_UP_X = 30
+
+LINE_UP_XP = 0.05 # PID params for x error
+LINE_UP_XI = 0.0
+LINE_UP_XD = 0.0
+LINE_UP_HP = 0.3  # PID params for h error
+LINE_UP_HI = 0.2
+LINE_UP_HD = 0.0
+
 # Orbit
 DEBUG_ORBIT = False
 SHOULD_ORBIT_BEARING = 25
 ORBIT_GOOD_BEARING = 10
 SHOULD_CANCEL_ORBIT_BALL_DIST = APPROACH_BALL_AGAIN_DIST
 ORBIT_TOO_LONG_THR = 8
-Y_SPEED = 0.8
-X_FROM_BALL = 15
+ORBIT_Y_SPEED = 0.8
+ORBIT_X = 15
+
+ORBIT_XP = 0.01 # PID params for x error
+ORBIT_XI = 0.01
+ORBIT_XD = 0.0
+ORBIT_HP = 0.8  # PID params for h error
+ORBIT_HI = 0.2
+ORBIT_HD = 0.0
 
 # Should kick again
 SHOULD_KICK_AGAIN_CLOSE_X = 9.5
