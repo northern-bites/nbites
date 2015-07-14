@@ -22,14 +22,11 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
       topIn(),
       bottomIn(),
       jointsIn(),
-      linesOut(base()),
-      cornersOut(base()),
-      ballOut(base()),
+      visionOut(base()),
+      robotObstacleOut(base()),
       ballOn(false),
       ballOnCount(0),
       ballOffCount(0),
-      centCircOut(base()),
-      centerCircleDetected(false),
       blackStar_(false)
 {
     std:: string colorPath, calibrationPath;
@@ -63,7 +60,31 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         kinematics[i] = new Kinematics(i == 0);
         homography[i] = new FieldHomography(i == 0);
         fieldLines[i] = new FieldLineList();
-        ballDetector[i] = new BallDetector(homography[i], i == 0);
+#ifdef OFFLINE
+		// Get the appropriate amount of space for the Debug Image
+		if (i == 0) {
+			debugSpace[0] = (uint8_t *)malloc(wd * ht * sizeof(uint8_t));
+		} else {
+			debugSpace[1] = (uint8_t *)malloc((wd / 2) * (ht / 2) * sizeof(uint8_t));
+		}
+#else
+		// don't get any space if we're running on the robot
+		debugSpace[i] = NULL;
+#endif
+		// Construct the lightweight debug images that know where the space is
+		if (i == 0) {
+			debugImage[i] = new DebugImage(wd, ht, debugSpace[0]);
+			debugImage[i]->reset();
+		} else {
+			debugImage[i] = new DebugImage(wd / 2, ht / 2, debugSpace[1]);
+			debugImage[i]->reset();
+		}
+
+		if (i == 0) {
+			field = new Field(wd / 2, ht / 2, homography[0]);
+		}
+
+        ballDetector[i] = new BallDetector(homography[i], field, i == 0);
         boxDetector[i] = new GoalboxDetector();
         centerCircleDetector[i] = new CenterCircleDetector();
 
@@ -80,7 +101,16 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         edgeDetector[i]->fast(fast);
         hough[i]->fast(fast);
     }
+#ifdef OFFLINE
+	// Here is an example of how to get access to the debug space. In this case the
+	// field class only runs on the top image so it only needs that one
+	field->setDebugImage(debugImage[0]);
+#endif
+
+    // Retreive calibration params for the robot name specified in the constructor
     setCalibrationParams(robotName);
+
+    robotImageObstacle = new RobotObstacle(wd / 4, ht / 4);
 }
 
 VisionModule::~VisionModule()
@@ -97,6 +127,8 @@ VisionModule::~VisionModule()
         delete kinematics[i];
         delete homography[i];
         delete fieldLines[i];
+		delete debugImage[i];
+		delete debugSpace[i];
         delete boxDetector[i];
         delete cornerDetector[i];
         delete centerCircleDetector[i];
@@ -104,9 +136,11 @@ VisionModule::~VisionModule()
     }
 }
 
+    int overrun = 0;
 // TODO use horizon on top image
 void VisionModule::run_()
 {
+    PROF_ENTER(P_VISION)
     // Get messages from inPortals
     topIn.latch();
     bottomIn.latch();
@@ -118,11 +152,17 @@ void VisionModule::run_()
                                                     &bottomIn.message() };
 
     bool ballDetected = false;
-    centerCircleDetected = false;
+
+
+    // Time vision module
+    double topTimes[12];
+    double bottomTimes[12];
+    double* times[2] = { topTimes, bottomTimes };
+
 
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
-        
+        PROF_ENTER2(P_VISION_TOP, P_VISION_BOT, i==0)
         // Get image
         const messages::YUVImage* image = images[i];
 
@@ -132,12 +172,24 @@ void VisionModule::run_()
                         image->rowPitch(),
                         image->pixelAddress(0, 0));
 
+
+        HighResTimer timer;
+
+
         // Run front end
+        PROF_ENTER2(P_FRONT_TOP, P_FRONT_BOT, i==0)
         frontEnd[i]->run(yuvLite, colorParams[i]);
+        PROF_EXIT2(P_FRONT_TOP, P_FRONT_BOT, i==0)
         ImageLiteU16 yImage(frontEnd[i]->yImage());
         ImageLiteU8 whiteImage(frontEnd[i]->whiteImage());
         ImageLiteU8 greenImage(frontEnd[i]->greenImage());
         ImageLiteU8 orangeImage(frontEnd[i]->orangeImage());
+
+        times[i][0] = timer.end();
+
+
+        // Offset to hackily adjust tilt for high-azimuth error
+        double azOffset = azimuth_m * fabs(kinematics[i]->azimuth()) + azimuth_b;
 
         // Calculate kinematics and adjust homography
         if (jointsIn.message().has_head_yaw()) {
@@ -146,63 +198,159 @@ void VisionModule::run_()
             homography[i]->wy0(kinematics[i]->wy0());
             homography[i]->wz0(kinematics[i]->wz0());
             homography[i]->roll(calibrationParams[i]->getRoll());
-            homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt());
+
+            homography[i]->tilt(kinematics[i]->tilt() + calibrationParams[i]->getTilt() + azOffset);
+
 #ifndef OFFLINE
             homography[i]->azimuth(kinematics[i]->azimuth());
 #endif
         }
 
+        times[i][1] = timer.end();
+
+
         // Approximate brightness gradient
+        PROF_ENTER2(P_GRAD_TOP, P_GRAD_BOT, i==0)
         edgeDetector[i]->gradient(yImage);
-        
+        PROF_EXIT2(P_GRAD_TOP, P_GRAD_BOT, i==0)
+
+        times[i][2] = timer.end();
+
+		// only calculate the field in the top camera
+        PROF_ENTER2(P_FIELD_TOP, P_FIELD_BOT, i==0)
+		if (!i) {
+			// field needs the color images
+			field->setImages(frontEnd[0]->whiteImage(), frontEnd[0]->greenImage(),
+							 frontEnd[0]->orangeImage());
+			GeoLine horizon = homography[0]->horizon(image->width() / 2);
+			double x1, x2, y1, y2;
+			horizon.endPoints(x1, y1, x2, y2);
+			int hor = static_cast<int>(y1);
+			hor = image->height() / 4 - hor;
+			int hor2 = static_cast<int>(y2);
+			hor2 = image->height() / 4 - hor2;
+			field->findGreenHorizon(hor, hor2);
+		}
+        PROF_EXIT2(P_FIELD_TOP, P_FIELD_BOT, i==0)
+
+        times[i][3] = timer.end();
+
         // Run edge detection
+        PROF_ENTER2(P_EDGE_TOP, P_EDGE_BOT, i==0)
         edgeDetector[i]->edgeDetect(greenImage, *(edges[i]));
+        PROF_EXIT2(P_EDGE_TOP, P_EDGE_BOT, i==0)
+        times[i][4] = timer.end();
 
         // Run hough line detection
+        PROF_ENTER2(P_HOUGH_TOP, P_HOUGH_BOT, i==0)
         hough[i]->run(*(edges[i]), *(rejectedEdges[i]), *(houghLines[i]));
+        PROF_EXIT2(P_HOUGH_TOP, P_HOUGH_BOT, i==0)
+        times[i][5] = timer.end();
 
         // Find world coordinates for hough lines
         houghLines[i]->mapToField(*(homography[i]));
-         
-        // Find world coordinates for rejected edges
-//        rejectedEdges[i]->mapToField(*(homography[i]));
- 
-        // Detect center circle on top
-//        if (!i) centerCircleDetected = centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]));
- 
-        // Pair hough lines to field lines
-        fieldLines[i]->find(*(houghLines[i]), blackStar());
- 
-        // Classify field lines
-        fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]));
- 
-        ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
+        times[i][6] = timer.end();
 
+        // Find world coordinates for rejected edges
+        PROF_ENTER2(P_EDGEMAP_TOP, P_EDGEMAP_BOT, i==0)
+        rejectedEdges[i]->mapToField(*(homography[i]));
+        PROF_EXIT2(P_EDGEMAP_TOP, P_EDGEMAP_BOT, i==0)
+        times[i][7] = timer.end();
+
+        // Detect center circle on top
+        PROF_ENTER2(P_CIRCLE_TOP, P_CIRCLE_BOT, i==0)
+        if (!i) centerCircleDetector[i]->detectCenterCircle(*(rejectedEdges[i]), *field);
+        PROF_EXIT2(P_CIRCLE_TOP, P_CIRCLE_BOT, i==0)
+        times[i][8] = timer.end();
+
+        // Pair hough lines to field lines
+        PROF_ENTER2(P_LINES_TOP, P_LINES_BOT, i==0)
+        fieldLines[i]->find(*(houghLines[i]), blackStar());
+        PROF_EXIT2(P_LINES_TOP, P_LINES_BOT, i==0)
+        times[i][9] = timer.end();
+
+        // Classify field lines
+        PROF_ENTER2(P_LINECLASS_TOP, P_LINECLASS_BOT, i==0)
+        fieldLines[i]->classify(*(boxDetector[i]), *(cornerDetector[i]), *(centerCircleDetector[i]));
+        PROF_EXIT2(P_LINECLASS_TOP, P_LINECLASS_BOT, i==0)
+        times[i][10] = timer.end();
+
+        PROF_ENTER2(P_BALL_TOP, P_BALL_BOT, i==0)
+        ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
+        PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
+        times[i][11] = timer.end();
+
+        PROF_EXIT2(P_VISION_TOP, P_VISION_BOT, i==0)
 #ifdef USE_LOGGING
         logImage(i);
 #endif
     }
-   
+    double topTotal;
+    double botTotal;
+
+    for (int i = 0; i < 2; i++) {
+        if (i == 0) {
+            topTotal = (times[i][0] + times[i][1] + times[i][2] + times[i][3] +
+                        times[i][4] + times[i][5] + times[i][6] + times[i][7] +
+                        times[i][8] + times[i][9] + times[i][10] + times[i][11]);
+        } else {
+            botTotal = (times[i][0] + times[i][1] + times[i][2] + times[i][3] +
+                        times[i][4] + times[i][5] + times[i][6] + times[i][7] +
+                        times[i][8] + times[i][9] + times[i][10] + times[i][11]);
+        }
+    }
+
+    if (topTotal + botTotal > 16.0 && false) {
+        overrun++;
+        for (int i = 0; i < 2; i++) {
+            if (i == 0) {
+                std::cout << "From top camera:" << std::endl;
+            } else {
+                std::cout << std::endl << "From bottom camera:" << std::endl;
+            }
+            std::cout << "Front end:      " << times[i][0] << std::endl;
+            std::cout << "Homography:     " << times[i][1] << std::endl;
+            std::cout << "Gradient:       " << times[i][2] << std::endl;
+            std::cout << "Field:          " << times[i][3] << std::endl;
+            std::cout << "Edge detection: " << times[i][4] << std::endl;
+            std::cout << "Hough:          " << times[i][5] << std::endl;
+            std::cout << "Hough to world: " << times[i][6] << std::endl;
+            std::cout << "Edges to world: " << times[i][7] << std::endl;
+            std::cout << "CenterCircle:   " << times[i][8] << std::endl;
+            std::cout << "Field lines:    " << times[i][9] << std::endl;
+            std::cout << "FL classify:    " << times[i][10] << std::endl;
+            std::cout << "Ball:           " << times[i][11] << std::endl;
+            std::cout << "Total:          " << (!i ? topTotal : botTotal) <<std::endl;
+        }
+        std::cout << std::endl << "TOTAL:          " << topTotal + botTotal << " " <<
+        edges[0]->count() << " edges in top. " << overrun <<
+        " total overruns" << std::endl << std::endl;
+    }
+    
+
+
     // Send messages on outportals
-    sendLinesOut();
-    sendCornersOut();
     ballOn = ballDetected;
-    updateVisionBall();
-    sendCenterCircle();
+    
+    outportalVisionField();
+
+    PROF_ENTER(P_OBSTACLE)
+    updateObstacleBox();
+    PROF_EXIT(P_OBSTACLE)
+
+    PROF_EXIT(P_VISION);
 }
 
-
-
-void VisionModule::sendLinesOut()
+void VisionModule::outportalVisionField()
 {
-    // Outportal results
-    // NOTE repeats are outportaled
-    messages::FieldLines pLines;
+    messages::Vision visionField;
+
+    // (1) Outportal lines
+    // NOTE repeats (in top and bottom camera) are outportaled
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < fieldLines[i]->size(); j++) {
-            messages::FieldLine* pLine = pLines.add_line();
+            messages::FieldLine* pLine = visionField.add_line();
             FieldLine& line = (*(fieldLines[i]))[j];
-            // if (line.repeat()) continue;
 
             for (int k = 0; k < 2; k++) {
                 messages::HoughLine pHough;
@@ -230,38 +378,36 @@ void VisionModule::sendLinesOut()
         }
     }
 
-    portals::Message<messages::FieldLines> linesOutMessage(&pLines);
-    linesOut.setMessage(linesOutMessage);
-}
-
-// TODO repeats
-void VisionModule::sendCornersOut()
-{
-    messages::Corners pCorners;
+    // (2) Outportal Corners
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < cornerDetector[i]->size(); j++) {
-            messages::Corner* pCorner = pCorners.add_corner();
+            messages::Corner* pCorner = visionField.add_corner();
             Corner& corner = (*(cornerDetector[i]))[j];
 
             // Rotate to post vision relative robot coordinate system
             double rotatedX, rotatedY;
             man::vision::translateRotate(corner.x, corner.y, 0, 0, -(M_PI / 2), rotatedX, rotatedY);
 
-            pCorner->set_x(rotatedX);
-            pCorner->set_y(rotatedY);
+            pCorner->set_x((float)rotatedX);
+            pCorner->set_y((float)rotatedY);
             pCorner->set_id(static_cast<int>(corner.id));
             pCorner->set_line1(static_cast<int>(corner.first->index()));
             pCorner->set_line2(static_cast<int>(corner.second->index()));
         }
     }
 
-    portals::Message<messages::Corners> cornersOutMessage(&pCorners);
-    cornersOut.setMessage(cornersOutMessage);
-}
+    // (3) Outportal Center Circle
+    messages::CenterCircle* cc = visionField.mutable_circle(); 
+    cc->set_on(centerCircleDetector[0]->on());
 
-void VisionModule::updateVisionBall()
-{
-    portals::Message<messages::VisionBall> ball_message(0);
+    // Rotate to post vision relative robot coordinate system
+    double rotatedX, rotatedY;
+    man::vision::translateRotate(centerCircleDetector[0]->x(), centerCircleDetector[0]->y(), 0, 0, -(M_PI / 2), rotatedX, rotatedY);
+    cc->set_x(rotatedX);
+    cc->set_y(rotatedY);
+
+    // (4) Outportal Ball
+    messages::VBall* vb = visionField.mutable_ball();
 
     Ball topBall = ballDetector[0]->best();
     Ball botBall = ballDetector[1]->best();
@@ -283,44 +429,54 @@ void VisionModule::updateVisionBall()
         top = true;
     }
 
-    ball_message.get()->set_on(ballOn);
-    ball_message.get()->set_frames_on(ballOnCount);
-    ball_message.get()->set_frames_off(ballOffCount);
-    ball_message.get()->set_intopcam(top);
+    vb->set_on(ballOn);
+    vb->set_frames_on(ballOnCount);
+    vb->set_frames_off(ballOffCount);
+    vb->set_intopcam(top);
 
     if (ballOn)
     {
-        ball_message.get()->set_distance(best.dist);
+        vb->set_distance(best.dist);
 
-        ball_message.get()->set_radius(best.blob.firstPrincipalLength());
+        vb->set_radius(best.blob.firstPrincipalLength());
         double bearing = atan(best.x_rel / best.y_rel);
-        ball_message.get()->set_bearing(bearing);
-        ball_message.get()->set_bearing_deg(bearing * TO_DEG);
+        vb->set_bearing(bearing);
+        vb->set_bearing_deg(bearing * TO_DEG);
 
         double angle_x = (best.imgWidth/2 - best.getBlob().centerX()) /
             (best.imgWidth) * HORIZ_FOV_DEG;
         double angle_y = (best.imgHeight/2 - best.getBlob().centerY()) /
             (best.imgHeight) * VERT_FOV_DEG;
-        ball_message.get()->set_angle_x_deg(angle_x);
-        ball_message.get()->set_angle_y_deg(angle_y);
+        vb->set_angle_x_deg(angle_x);
+        vb->set_angle_y_deg(angle_y);
 
-        ball_message.get()->set_confidence(best.confidence());
-        ball_message.get()->set_x(static_cast<int>(best.blob.centerX()));
-        ball_message.get()->set_y(static_cast<int>(best.blob.centerY()));
+        vb->set_confidence(best.confidence());
+        vb->set_x(static_cast<int>(best.blob.centerX()));
+        vb->set_y(static_cast<int>(best.blob.centerY()));
     }
 
-    ballOut.setMessage(ball_message);
+    // Send
+    portals::Message<messages::Vision> visionOutMessage(&visionField);
+    visionOut.setMessage(visionOutMessage);
 }
 
-void VisionModule::sendCenterCircle()
-{ 
-    portals::Message<messages::CenterCircle> ccm(0);
+void VisionModule::updateObstacleBox()
+{
+    // only want bottom camera
+    robotImageObstacle->updateVisionObstacle(frontEnd[1]->whiteImage(),
+                                             *(edges[1]), obstacleBox,
+                                             homography[1]);
 
-    ccm.get()->set_on(centerCircleDetected);
-    ccm.get()->set_x(centerCircleDetector[0]->x());
-    ccm.get()->set_y(centerCircleDetector[0]->y());
-    
-    centCircOut.setMessage(ccm);
+    // std::cout<<"about to set message for obstacle vision"<<std::endl;
+    portals::Message<messages::RobotObstacle> boxOut(0);
+    boxOut.get()->set_closest_y(obstacleBox[0]);
+    boxOut.get()->set_box_bottom(obstacleBox[1]);
+    boxOut.get()->set_box_left(obstacleBox[2]);
+    boxOut.get()->set_box_right(obstacleBox[3]);
+    robotObstacleOut.setMessage(boxOut);
+
+    // printf("Obstacle Box VISION: (%g, %g, %g, %g)\n", obstacleBox[0],
+    //         obstacleBox[1], obstacleBox[2], obstacleBox[3]);
 }
 
 void VisionModule::setColorParams(Colors* colors, bool topCamera)
@@ -336,9 +492,9 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
 
     // Get size of file
     textFile.seekg (0, textFile.end);
-    long size = textFile.tellg();
+    long size = (long)textFile.tellg();
     textFile.seekg(0);
-    
+
     // Read file into buffer and convert to string
     char* buff = new char[size];
     textFile.read(buff, size);
@@ -347,6 +503,23 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
     textFile.close();
     return (const std::string)sexpText;
 }
+
+#ifdef OFFLINE
+	void VisionModule::setDebugDrawingParameters(nblog::SExpr* params) {
+		std::cout << "In debug drawing parameters" << params->print() << std::endl;
+		int cameraHorizon = params->get(1)->find("CameraHorizon")->get(1)->valueAsInt();
+		int fieldHorizon = params->get(1)->find("FieldHorizon")->get(1)->valueAsInt();
+		int debugHorizon = params->get(1)->find("DebugHorizon")->get(1)->valueAsInt();
+		int debugField = params->get(1)->find("DebugField")->get(1)->valueAsInt();
+		int debugBall = params->get(1)->find("DebugBall")->get(1)->valueAsInt();
+		field->setDrawCameraHorizon(cameraHorizon);
+		field->setDrawFieldHorizon(fieldHorizon);
+		field->setDebugHorizon(debugHorizon);
+		field->setDebugFieldEdge(debugField);
+		ballDetector[0]->setDebugBall(debugBall);
+		ballDetector[1]->setDebugBall(debugBall);
+	}
+#endif
 
 /*
  Lisp data in config/colorParams.txt stores 32 parameters. Read lisp and
@@ -373,8 +546,8 @@ Colors* VisionModule::getColorsFromLisp(nblog::SExpr* colors, int camera)
                      std::stof(colors->get(2)->get(1)->serialize()),
                      std::stof(colors->get(3)->get(1)->serialize()),
                      std::stof(colors->get(4)->get(1)->serialize()),
-                     std::stof(colors->get(5)->get(1)->serialize())); 
-    
+                     std::stof(colors->get(5)->get(1)->serialize()));
+
     colors = params->get(1)->get(1);
 
     ret->green. load(std::stof(colors->get(0)->get(1)->serialize()),
@@ -382,8 +555,8 @@ Colors* VisionModule::getColorsFromLisp(nblog::SExpr* colors, int camera)
                      std::stof(colors->get(2)->get(1)->serialize()),
                      std::stof(colors->get(3)->get(1)->serialize()),
                      std::stof(colors->get(4)->get(1)->serialize()),
-                     std::stof(colors->get(5)->get(1)->serialize()));  
-    
+                     std::stof(colors->get(5)->get(1)->serialize()));
+
     colors = params->get(2)->get(1);
 
     ret->orange.load(std::stof(colors->get(0)->get(1)->serialize()),
@@ -413,7 +586,7 @@ void VisionModule::setCalibrationParams(int camera, std::string robotName)
     if (robotName == "") {
         return;
     }
-    
+
     nblog::SExpr* robot = calibrationLisp->get(1)->find(robotName);
 
     if (robot != NULL) {

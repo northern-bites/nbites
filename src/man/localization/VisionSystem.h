@@ -15,7 +15,6 @@
 #include "LandmarkSystem.h"
 #include "LocStructs.h"
 #include "FieldConstants.h"
-#include "BallModel.pb.h"
 
 #include <vector>
 #include <list>
@@ -32,8 +31,7 @@ public:
     ~VisionSystem();
 
     bool update(ParticleSet& particles,
-                const messages::FieldLines& lines,
-                const messages::Corners& corners,
+                const messages::Vision& vision,
                 const messages::FilteredBall* ball,
                 const messages::RobotLocation& lastEstimate);
 

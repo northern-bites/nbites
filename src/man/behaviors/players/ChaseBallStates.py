@@ -8,6 +8,7 @@ import PlayOffBallTransitions as playOffTransitions
 from ..navigator import Navigator
 from ..kickDecider import KickDecider
 from ..kickDecider import kicks
+from noggin_constants import MAX_SPEED, MIN_SPEED 
 from ..util import *
 from objects import RelRobotLocation, Location, RobotLocation
 from math import fabs, degrees, cos, sin, pi, radians, copysign
@@ -17,6 +18,9 @@ from math import fabs, degrees, cos, sin, pi, radians, copysign
 @ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
 @ifSwitchNow(transitions.shouldFindBall, 'findBall')
 def approachBall(player):
+    if player.brain.nav.dodging:
+        return player.stay()
+
     if player.firstFrame():
         player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
                                                  0.8, 10)
@@ -30,16 +34,16 @@ def approachBall(player):
         elif player.penaltyKicking:
             return player.goNow('prepareForPenaltyKick')
         else:
-            player.brain.nav.chaseBall(Navigator.FAST_SPEED, fast = True)
+            player.brain.nav.chaseBall(MAX_SPEED, fast = True)
 
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
         return player.goNow('positionAndKickBall')
     
     elif transitions.shouldDecelerate(player):
-        player.brain.nav.chaseBall(Navigator.BRISK_SPEED, fast = True)
+        player.brain.nav.chaseBall(MIN_SPEED, fast = True)
     else:
-        player.brain.nav.chaseBall(Navigator.FAST_SPEED, fast = True)
+        player.brain.nav.chaseBall(MAX_SPEED, fast = True)
 
 
 @defaultState('prepareForKick')
@@ -66,10 +70,12 @@ def prepareForKick(player):
             player.shouldKickOff = False
             player.kick = player.decider.kicksBeforeBallIsFree()
         else:
-            if roleConstants.isDefender(player.role):
-                player.kick = player.decider.defender()
-            else:
-                player.kick = player.decider.attacker()
+        #player.shouldKickOff = False
+        #if roleConstants.isDefender(player.role):
+        #    player.kick = player.decider.defender()
+        #else:
+        #    player.kick = player.decider.attacker()
+            player.kick = player.decider.decidingStrategy()
         player.inKickingState = True
 
     elif player.finishedPlay:
@@ -94,6 +100,9 @@ def followPotentialField(player):
     attractive force where on the side that will be kicked. The opposite side is treated as 
     a repulsive force of smaller magnitude.
     """
+    if player.brain.nav.dodging:
+        return player.stay()
+
     if player.firstFrame():
         player.brain.tracker.trackBall()  
 
@@ -129,7 +138,7 @@ def followPotentialField(player):
         yComp = constants.ATTRACTOR_REPULSOR_RATIO*attractorY/attractorDist**3 - repulsorY/repulsorDist**3
 
         if xComp == 0 and yComp == 0:
-            player.setWalk(0, 0, copysign(Navigator.FAST_SPEED, ball.bearing_deg))
+            player.setWalk(0, 0, copysign(MAX_SPEED, ball.bearing_deg))
 
         else:
             normalizer = Navigator.FAST_SPEED/(xComp**2 + yComp**2)**.5
@@ -150,6 +159,9 @@ def orbitBall(player):
     """
     State to orbit the ball
     """
+    if player.brain.nav.dodging:
+        return player.stay()
+
     # Calculate relative heading every frame
     relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
 
@@ -237,6 +249,9 @@ def spinToBall(player):
     """
     spins to the ball until it is facing the ball 
     """
+    if player.brain.nav.dodging:
+        return player.stay()
+
     if player.firstFrame():
         player.brain.tracker.trackBall()
         print "spinning to ball"
@@ -273,9 +288,9 @@ def positionForKick(player):
         player.brain.tracker.lookStraightThenTrack()
 
         if player.kick == kicks.M_LEFT_SIDE or player.kick == kicks.M_RIGHT_SIDE:
-            positionForKick.speed = Navigator.SLOW_SPEED
+            positionForKick.speed = Navigator.GRADUAL_SPEED
         else:
-            positionForKick.speed = Navigator.MEDIUM_SPEED
+            positionForKick.speed = MIN_SPEED
 
         player.brain.nav.destinationWalkTo(positionForKick.kickPose, 
                                             positionForKick.speed)

@@ -13,8 +13,6 @@ def ballInBox(player):
     ball = player.brain.ball
 
     if ball.vis.frames_on > chaseConstants.BALL_ON_THRESH:
-        if role.isChaser(player.role):
-            return True
         return (ball.x > player.box[0][0] and ball.y > player.box[0][1] and
                 ball.x < player.box[0][0] + player.box[1] and
                 ball.y < player.box[0][1] + player.box[2])
@@ -45,7 +43,7 @@ def tooFarFromHome(threshold, player):
     Returns true if LOC thinks we're more than *distance* away from our home
     position
     """
-    if player.brain.ball.vis.on:
+    if player.brain.ball.vis.frames_off < 10:
         ball = player.brain.ball
     elif player.brain.sharedBall.ball_on:
         ball = player.brain.sharedBall
@@ -53,7 +51,10 @@ def tooFarFromHome(threshold, player):
         ball = None
         home = player.homePosition
 
-    if ball != None:
+    if nogginC.FIXED_D_HOME:
+        home = player.homePosition
+
+    elif ball != None:
         if role.isLeftDefender(player.role):
             home = findDefenderHome(True, ball, player.homePosition.h)
         elif role.isRightDefender(player.role):
@@ -66,6 +67,13 @@ def tooFarFromHome(threshold, player):
     distance = ((player.brain.loc.x - home.x)**2 + (player.brain.loc.y - home.y)**2)**.5
 
     return distance > threshold
+
+def shouldSpinSearchFromWatching(player):
+    shouldExtendTimer = player.commMode == 2 and role.isDefender(player.role)
+    spinTimer = 25 if shouldExtendTimer else 12
+    return (player.stateTime > spinTimer and
+            player.brain.ball.vis.frames_off > 30 and
+            not player.brain.sharedBall.ball_on)
   
 def shouldApproachBall(player):
     if ballNotInBox(player):

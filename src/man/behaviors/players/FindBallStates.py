@@ -39,6 +39,13 @@ def spinSearch(player):
         player.setWalk(0, 0, spinDir*Navigator.QUICK_SPEED)
         player.brain.tracker.lookToSpinDirection(spinDir)
 
+    # this is such a hack for spinning when we lost the ball while falling
+    if not player.brain.motion.calibrated:
+        player.startTime = player.getTime()
+        player.stateTime = 0
+        player.counter = 0
+        return player.stay()
+
 @superState('gameControllerResponder')
 @stay
 @ifSwitchLater(transitions.shouldFindBall, 'findBall')
@@ -46,6 +53,9 @@ def spinToFoundBall(player):
     """
     spins to the ball until it is facing the ball 
     """
+    if player.brain.nav.dodging:
+        return player.stay()
+
     if player.firstFrame():
         player.brain.tracker.trackBall()
         print "spinning to found ball"
@@ -80,7 +90,7 @@ def backPedal(player):
         player.brain.tracker.repeatFastNarrowPan()
 
     elif player.stateTime > constants.BACK_PEDAL_TIME:
-        return player.goLater('playOffBall')
+        return player.goLater('spinSearch')
 
 @superState('scrumStrategy')
 @stay
@@ -108,7 +118,7 @@ def farBallSearch(player):
 @stay
 def walkToBallModel(player):
     if player.firstFrame():
-        player.brain.nav.chaseBall(.5, fast = True)
+        player.brain.nav.chaseBall(Navigator.FAST_SPEED, fast = True)
         player.brain.tracker.repeatFastNarrowPan()
     elif player.stateTime > 5:
         return player.goLater('spinSearch')

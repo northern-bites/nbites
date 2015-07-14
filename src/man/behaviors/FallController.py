@@ -13,6 +13,7 @@ class FallController():
         self.standDelay = 0
         self.startStandupTime = 0
         self.standupMoveTime = 0
+        self.sawBall = False
 
         self.enabled = True
 
@@ -25,6 +26,7 @@ class FallController():
             # Save the player. We are falling
             self.falling = True
             self.brain.player.gainsOff()
+            self.sawBall = self.brain.ball.vis.frames_off < 30
             self.brain.player.switchTo('fallen')
             self.brain.tracker.stopHeadMoves()
 
@@ -69,8 +71,13 @@ class FallController():
         elif (self.standingUp):
             if (self.brain.time - self.startStandupTime > self.standupMoveTime):
                 self.brain.player.stand()
-                self.brain.player.switchTo(self.brain.player.gameState)
                 self.falling = False
                 self.fell = False
                 self.standingUp = False
                 self.standDelay = 0
+            
+                if self.sawBall:
+                    return self.brain.player.switchTo('spinSearch')
+                else:
+                    self.brain.player.switchTo(self.brain.player.gameState)
+                

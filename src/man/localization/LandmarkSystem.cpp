@@ -18,18 +18,25 @@ LandmarkSystem::LandmarkSystem()
     // Add corners to map
     addCorner(vision::CornerID::Concave, LandmarkID::OurRightConcave, GREEN_PAD_X, GREEN_PAD_Y);
     addCorner(vision::CornerID::Concave, LandmarkID::OurLeftConcave, GREEN_PAD_X, GREEN_PAD_Y + FIELD_WHITE_HEIGHT);
-    addCorner(vision::CornerID::Convex, LandmarkID::OurRightConvex, GREEN_PAD_X + GOALBOX_DEPTH, BLUE_GOALBOX_BOTTOM_Y);
-    addCorner(vision::CornerID::Convex, LandmarkID::OurLeftConvex, GREEN_PAD_X + GOALBOX_DEPTH, BLUE_GOALBOX_TOP_Y);
+    addCorner(vision::CornerID::Concave, LandmarkID::OurRightBox, GREEN_PAD_X + GOALBOX_DEPTH, BLUE_GOALBOX_BOTTOM_Y);
+    addCorner(vision::CornerID::Concave, LandmarkID::OurLeftBox, GREEN_PAD_X + GOALBOX_DEPTH, BLUE_GOALBOX_TOP_Y);
+    addCorner(vision::CornerID::Convex, LandmarkID::OurRightBox, GREEN_PAD_X + GOALBOX_DEPTH, BLUE_GOALBOX_BOTTOM_Y);
+    addCorner(vision::CornerID::Convex, LandmarkID::OurLeftBox, GREEN_PAD_X + GOALBOX_DEPTH, BLUE_GOALBOX_TOP_Y);
     addCorner(vision::CornerID::T, LandmarkID::OurRightT, GREEN_PAD_X, BLUE_GOALBOX_BOTTOM_Y);
     addCorner(vision::CornerID::T, LandmarkID::OurLeftT, GREEN_PAD_X, BLUE_GOALBOX_TOP_Y);
     addCorner(vision::CornerID::T, LandmarkID::MidRightT, CENTER_FIELD_X, GREEN_PAD_Y);
     addCorner(vision::CornerID::T, LandmarkID::MidLeftT, CENTER_FIELD_X, GREEN_PAD_Y + FIELD_WHITE_HEIGHT);
     addCorner(vision::CornerID::Concave, LandmarkID::TheirRightConcave, GREEN_PAD_X + FIELD_WHITE_WIDTH, GREEN_PAD_Y);
     addCorner(vision::CornerID::Concave, LandmarkID::TheirLeftConcave, GREEN_PAD_X + FIELD_WHITE_WIDTH, GREEN_PAD_Y + FIELD_WHITE_HEIGHT);
-    addCorner(vision::CornerID::Convex, LandmarkID::TheirRightConvex, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH, BLUE_GOALBOX_BOTTOM_Y);
-    addCorner(vision::CornerID::Convex, LandmarkID::TheirLeftConvex, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH, BLUE_GOALBOX_TOP_Y);
+    addCorner(vision::CornerID::Concave, LandmarkID::TheirRightBox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH, BLUE_GOALBOX_BOTTOM_Y);
+    addCorner(vision::CornerID::Concave, LandmarkID::TheirLeftBox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH, BLUE_GOALBOX_TOP_Y);
+    addCorner(vision::CornerID::Convex, LandmarkID::TheirRightBox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH, BLUE_GOALBOX_BOTTOM_Y);
+    addCorner(vision::CornerID::Convex, LandmarkID::TheirLeftBox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH, BLUE_GOALBOX_TOP_Y);
     addCorner(vision::CornerID::T, LandmarkID::TheirRightT, GREEN_PAD_X + FIELD_WHITE_WIDTH, BLUE_GOALBOX_BOTTOM_Y);
     addCorner(vision::CornerID::T, LandmarkID::TheirLeftT, GREEN_PAD_X + FIELD_WHITE_WIDTH, BLUE_GOALBOX_TOP_Y);
+
+    // Add center circle to map
+    circle = std::make_tuple(LandmarkID::CenterCircle, CENTER_FIELD_X, CENTER_FIELD_Y);
 
     // Add ball in set to map
     ballInSet = std::make_tuple(LandmarkID::BallInSet, CENTER_FIELD_X, CENTER_FIELD_Y);
@@ -76,8 +83,19 @@ double LandmarkSystem::scoreCorner(const messages::Corner& observation,
 
     // Find correspondence and calculate probability of match
     Landmark correspondingLandmark = matchCorner(observation, loc);
-    return scoreObservation(obsvAsRobotLocation, correspondingLandmark, loc, true);
-    // NOTE for corners, only bearing is used to score particles
+    return scoreObservation(obsvAsRobotLocation, correspondingLandmark, loc);
+}
+
+double LandmarkSystem::scoreCircle(const messages::CenterCircle& observation, 
+                                   const messages::RobotLocation& loc)
+{
+    // Turn observation into RobotLocation so scoreObservation can operate on it
+    messages::RobotLocation obsvAsRobotLocation;
+    obsvAsRobotLocation.set_x(observation.x());
+    obsvAsRobotLocation.set_y(observation.y());
+
+    // Calculate probability of match
+    return scoreObservation(obsvAsRobotLocation, circle, loc);
 }
 
 double LandmarkSystem::scoreBallInSet(const messages::FilteredBall& observation, 
@@ -155,6 +173,8 @@ double LandmarkSystem::scoreObservation(const messages::RobotLocation& observati
     }
 
     // Make the conditional independence assumption
+    if (onlyBearing)
+        return tProb;
     return rProb * tProb;
 }
 

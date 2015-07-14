@@ -96,7 +96,7 @@ EdgeDetector::EdgeDetector()
 
   gradientThreshold(8);
   edgeThreshold(16);
-  greenThreshold(12);
+  greenThreshold(80);
   correctEdgeDirection(false);
   fast(true);
 }

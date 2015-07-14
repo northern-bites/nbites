@@ -69,12 +69,7 @@ def checkForConsistency(player):
 
     for i in range(3):
         if openSpaces[i] and constants.canRoleSwitchTo(i+2):
-            # US Open Hacks
-            if player.brain.game:
-                oppTeam = player.brain.game.team(1).team_number
-            else:
-                oppTeam = -1
-            constants.setRoleConstants(player, i+2, oppTeam)
+            constants.setRoleConstants(player, i+2)
             return
         elif openSpaces[i]:
             position = i+2
@@ -82,12 +77,5 @@ def checkForConsistency(player):
     if position == 0:
         print "We have conflicting role AND there are no more open roles..."
 
-    # US Open Hacks
-    """
-    if player.brain.game:
-        oppTeam = player.brain.game.team(1).team_number
-    else:
-        oppTeam = -1
-    constants.setRoleConstants(player, position, oppTeam)
+    constants.setRoleConstants(player, position)
     return
-    """
