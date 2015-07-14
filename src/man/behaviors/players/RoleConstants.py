@@ -120,17 +120,20 @@ strikerTop = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X,
                                 NogginConstants.MIDFIELD_Y + 60,
                                 0)
 
-if NogginConstants.FORWARD_DEFENSE:
+if NogginConstants.LEFT_FORWARD_DEFENSE:
     evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 140,
                                     NogginConstants.MY_GOALBOX_TOP_Y,
                                     0)
-    oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 140,
-                                NogginConstants.MY_GOALBOX_BOTTOM_Y,
-                                0)
 else:
     evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 50,
                                     NogginConstants.MY_GOALBOX_TOP_Y,
                                     0)
+    
+if NogginConstants.RIGHT_FORWARD_DEFENSE:
+    oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 140,
+                                NogginConstants.MY_GOALBOX_BOTTOM_Y,
+                                0)
+else:
     oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 50,
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 0)
