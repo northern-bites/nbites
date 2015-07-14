@@ -70,11 +70,8 @@ def doFirstHalfSpin(player):
     Spin to where we think the ball is.
     """
     if player.firstFrame():
-        my = player.brain.loc
-        ball = Location(player.brain.ball.x, player.brain.ball.y)
-        spinDir = my.spinDirToPoint(ball)
         player.setWalk(0, 0, nav.QUICK_SPEED)
-        player.brain.tracker.lookToSpinDirection(spinDir)
+        player.brain.tracker.lookToSpinDirection(1)
 
     while player.stateTime < chaseConstants.SPUN_ONCE_TIME_THRESH / 2:
         return player.stay()
@@ -101,11 +98,8 @@ def doSecondHalfSpin(player):
     Keep spinning in the same direction.
     """
     if player.firstFrame():
-        my = player.brain.loc
-        ball = Location(player.brain.ball.x, player.brain.ball.y)
-        spinDir = -my.spinDirToPoint(ball)
         player.setWalk(0, 0, nav.QUICK_SPEED)
-        player.brain.tracker.lookToSpinDirection(spinDir)
+        player.brain.tracker.lookToSpinDirection(1)
 
     while player.stateTime < chaseConstants.SPUN_ONCE_TIME_THRESH / 2:
         return player.stay()
