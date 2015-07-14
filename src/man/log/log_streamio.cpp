@@ -81,6 +81,7 @@ namespace nblog {
             uint32_t version = htonl(LOG_VERSION);
             uint32_t seq_num = 0;
             uint32_t recvd;
+            int ourVersion, thmVersion;
             
             CHECK_RET(send_exact(connfd, 4, (uint8_t *) &seq_num))
             
@@ -94,6 +95,12 @@ namespace nblog {
             CHECK_RET(send_exact(connfd, 4, (uint8_t *) &version))
             
             CHECK_RET(recv_exact(connfd, 4, (uint8_t *) &recvd, IO_SEC_TO_BREAK));
+            
+            ourVersion = ntohl(version);
+            thmVersion = ntohl(recvd);
+            
+            /*
+            NBDEBUG( "log_streamio starting connection; server version: %u, client version: %u\n", ourVersion, thmVersion); */
             
             NBDEBUG( "log_streamio starting connection; server version: %u, client version: %u\n", ntohl(version), ntohl(recvd));
             
@@ -128,6 +135,14 @@ namespace nblog {
                 }
                 
                 if (!ws) {
+                    int32_t zero = 0, resp;
+                    CHECK_RET( send_exact(connfd, 4, &zero) );
+                    CHECK_RET( recv_exact(connfd, 4, &resp, IO_SEC_TO_BREAK) );
+                    
+                    if (zero != resp) {
+                        goto connection_died;
+                    }
+                    
                     usleep(STREAM_USLEEP_WAITING);
                 }
             }

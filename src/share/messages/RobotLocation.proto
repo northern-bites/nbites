@@ -1,5 +1,9 @@
 package messages;
 
+option java_outer_classname = "_File_RobotLocation";
+option java_multiple_files = true;
+
+
 message RobotLocation
 {
     optional float x = 1;

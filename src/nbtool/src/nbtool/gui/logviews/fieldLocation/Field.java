@@ -3,6 +3,8 @@ package nbtool.gui.logviews.fieldLocation;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import nbtool.gui.field.FieldConstants;
+
 import java.awt.*;
 import java.awt.geom.*;
 

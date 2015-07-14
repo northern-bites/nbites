@@ -221,15 +221,13 @@ public class LogToViewUtility extends UtilityParent {
 		@Override
 		public void keyTyped(KeyEvent e) {
 			TreePath path = tree.getSelectionPath();
-			//int toIndex = e.getKeyChar() - '1';
-			int toIndex = Character.getNumericValue(e.getKeyChar());
+			int toIndex = Character.getNumericValue(e.getKeyChar()) - 1;
 
 			if (path == null || toIndex < 0 || toIndex > 8) {
 				return;
 			}
 
 			if (path.getPathCount() == 3) {
-
 				ViewState vs = (ViewState) path.getPathComponent(2);
 				String type = (String) path.getPathComponent(1);
 
