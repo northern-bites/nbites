@@ -86,11 +86,12 @@ def clearBall(player):
         # print "approaching ball"
         player.brain.nav.chaseBall(nav.FAST_SPEED, fast = True)
 
-    if player.counter % 5 == 0:
+    if player.counter % 2 == 0:
+        nball = player.brain.naiveBall
+        ball = player.brain.ball
         print "================================="
         print("yintercept:", nball.yintercept)
         print("Ball dist:", ball.distance)
-        print("shouldDiveRight.lastFramesOff:", shouldSquat.lastFramesOff)
         print("ball.vis.frames_on", ball.vis.frames_on)
         print("nb xvel:", nball.x_vel)
         print("ball mov vel:", ball.mov_vel_x)
@@ -101,7 +102,7 @@ def clearBall(player):
 def positionForGoalieKick(player):
     if player.firstFrame():
         player.brain.tracker.lookStraightThenTrack()
-        if clearIt.ballSide == RIGHT:
+        if clearBall.ballSide == RIGHT:
             player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
         else:
             player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
@@ -140,12 +141,12 @@ def repositionAfterWhiff(player):
         player.brain.interface.motionRequest.reset_odometry = True
         player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
 
-        if player.kick in [kicks.RIGHT_SIDE_KICK, kicks.LEFT_SIDE_KICK]:
-            pass
-        elif player.brain.ball.rel_y < 0.0:
-            player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
-        else:
-            player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
+        # if player.kick in [kicks.RIGHT_SIDE_KICK, kicks.LEFT_SIDE_KICK]:
+        #     pass
+        # elif player.brain.ball.rel_y < 0.0:
+        #     player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
+        # else:
+        #     player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
 
         kickPose = player.kick.getPosition()
         repositionAfterWhiff.ballDest = RelRobotLocation(player.brain.ball.rel_x -
@@ -159,10 +160,6 @@ def repositionAfterWhiff(player):
 
     # if it took more than 5 seconds, forget it
     if player.counter > 350:
-        returnToGoal.kickPose.relX += player.brain.interface.odometry.x
-        returnToGoal.kickPose.relY += player.brain.interface.odometry.y
-        returnToGoal.kickPose.relH += player.brain.interface.odometry.h
-
         return player.goLater('returnUsingLoc')
 
     kickPose = player.kick.getPosition()

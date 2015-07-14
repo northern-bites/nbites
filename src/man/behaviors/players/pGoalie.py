@@ -160,10 +160,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.OK_PRECISION)
             : GoalieStates.returnUsingLoc,
 
-            Transition.CountTransition(GoalieTransitions.shouldSquat,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.saveCenter,
+            # Transition.CountTransition(GoalieTransitions.shouldSquat,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.OK_PRECISION)
+            # : GoalieStates.saveCenter,
 
             }
 
@@ -201,11 +201,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.INSTANT)
             : GoalieStates.returnUsingLoc,
-
-            # Transition.CountTransition(GoalieTransitions.successfulKickAndTurn,
-            #                            Transition.MOST_OF_THE_TIME,
-            #                            Transition.LOW_PRECISION)
-            # : GoalieStates.spinBack#lineCheckReposition
             }
 
 #TestingChange
@@ -422,5 +417,30 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             : VisualGoalieStates.clearBall
 
             # TODO put in saves??
+
+            }
+
+        GoalieStates.spinToRecover.transitions = {
+            Transition.CountTransition(GoalieTransitions.seeGoalbox,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.lineCheckReposition,
+
+            # Transition.CountTransition(GoalieTransitions.doneWalking,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.LOW_PRECISION)
+            # : VisualGoalieStates.checkSafePlacement,
+
+            # Transition.CountTransition(GoalieTransitions.reachedMyDestination,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.LOW_PRECISION)
+            # : VisualGoalieStates.checkSafePlacement,
+
+            # Transition.CountTransition(GoalieTransitions.ballWithinLocClearingDist,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.OK_PRECISION)
+            # : VisualGoalieStates.clearBall
+
+            # # TODO put in saves??
 
             }

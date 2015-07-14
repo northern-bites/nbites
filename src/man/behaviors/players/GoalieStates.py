@@ -119,6 +119,7 @@ def gamePlaying(player):
     #TESTINGCHANGE
     # return player.goLater('watchWithLineChecks')
     return player.goLater('watch')
+    # return player.goLater('spinToRecover')
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
@@ -245,11 +246,21 @@ def lineCheckReposition(player):
     return Transition.getNextState(player, lineCheckReposition)
 
 @superState('gameControllerResponder')
+def goToGoalbox(player):
+    if player.firstFrame():
+        player.brain.tracker.lookToAngle(0)
+        player.brain.nav.walkTo(goToGoalbox.angleDest)
+
+
+goToGoalbox.angleDest = RelRobotLocation(0,0,0)
+goToGoalbox.dest = RelRobotLocation(0,0,0)
+
+@superState('gameControllerResponder')
 def returnUsingLoc(player):
     if player.firstFrame():
         dest = constants.HOME_POSITION
         player.brain.nav.goTo(dest,
-                            speed = nav.BRISK_SPEED)
+                            speed = nav.QUICK_SPEED)
         print("I'm trying to return using loc!")
         player.brain.tracker.trackBall()
         returnUsingLoc.panning = False
@@ -309,6 +320,7 @@ def faceBall(player):
 @superState('gameControllerResponder')
 def watch(player):
     if player.firstFrame():
+        player.brain.fallController.enabled = True
         player.brain.tracker.trackBall()
         # player.brain.tracker.repeatBasicPan()
         player.brain.nav.stand()
@@ -321,24 +333,24 @@ def watch(player):
 
 
 #TestingChange
-    # if player.counter % 10 == 0:
-    # #     print("Horizon dist == ", player.brain.vision.horizon_dist)
+    if player.counter % 2 == 0:
+    #     print("Horizon dist == ", player.brain.vision.horizon_dist)
 
-    #     ball = player.brain.ball
-    #     nball = player.brain.naiveBall
+        ball = player.brain.ball
+        nball = player.brain.naiveBall
 
-    #     print("Ball bearing:", ball.bearing_deg)
-    #     print("Ball x:", ball.x)
-    #     print("Ball y:", ball.y)
-    #     print("Ball dist:", ball.distance)
-    #     print("Ball dist:", ball.distance)
-    #     print("ball.vis.frames_on", ball.vis.frames_on)
-    #     print("nb xvel:", nball.x_vel)
-    #     print("nb altxvel:", nball.alt_x_vel)
-    #     print("ball mov vel:", ball.mov_vel_x)
-    #     print("ball mov speed:", ball.mov_speed)
-    #     print("stationary: ", nball.stationary)
-    #     print("yintercept", nball.yintercept)
+        print("Ball bearing:", ball.bearing_deg)
+        print("Ball x:", ball.x)
+        print("Ball y:", ball.y)
+        print("Ball dist:", ball.distance)
+        print("Ball dist:", ball.distance)
+        print("ball.vis.frames_on", ball.vis.frames_on)
+        print("nb xvel:", nball.x_vel)
+        print("nb altxvel:", nball.alt_x_vel)
+        print("ball mov vel:", ball.mov_vel_x)
+        print("ball mov speed:", ball.mov_speed)
+        print("stationary: ", nball.stationary)
+        print("yintercept", nball.yintercept)
     # #     print("1", nball.x_v_1)
     # #     print("2", nball.x_v_2)
     # #     print("3", nball.x_v_3)
@@ -389,15 +401,20 @@ def moveBackwards(player):
 #TestingChange
     if player.counter > 100:
         print("Walking backwards too long... switch to a different state!")
-        return player.goLater('findMyWayBackPtI')
+        return player.goLater('spinToRecover')
 
     return Transition.getNextState(player, moveBackwards)
 
 @superState('gameControllerResponder')
 def spinToRecover(player):
     if player.firstFrame():
-        player.brain.nav.setWalk(0,0,20.0)
+        player.setWalk(0,0,20.0)
 
+    if player.counter > 250:
+        print("Too long... switch to a different state!")
+        return player.goLater('returnUsingLoc')
+
+    return Transition.getNextState(player, spinToRecover)
 
 @superState('gameControllerResponder')
 def kickBall(player):
