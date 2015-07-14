@@ -28,10 +28,12 @@ CLOSE_TO_ATTRACTOR_DIST = 10
 # Line up
 LINE_UP_X = 30
 
-LINE_UP_XP = 0.05 # PID params for x error
+# Line up PID params
+LINE_UP_XP = 0.05
 LINE_UP_XI = 0.0
 LINE_UP_XD = 0.0
-LINE_UP_HP = 0.3  # PID params for h error
+
+LINE_UP_HP = 0.3
 LINE_UP_HI = 0.2
 LINE_UP_HD = 0.0
 
@@ -44,10 +46,16 @@ ORBIT_TOO_LONG_THR = 8
 ORBIT_Y_SPEED = 0.8
 ORBIT_X = 15
 
-ORBIT_XP = 0.01 # PID params for x error
+# Orbit PID params
+ORBIT_XP = 0.01
 ORBIT_XI = 0.01
 ORBIT_XD = 0.0
-ORBIT_HP = 0.8  # PID params for h error
+
+ORBIT_YP = 0.007
+ORBIT_YI = 0.0
+ORBIT_YD = 0.0
+
+ORBIT_HP = 0.8
 ORBIT_HI = 0.2
 ORBIT_HD = 0.0
 

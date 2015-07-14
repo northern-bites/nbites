@@ -144,7 +144,6 @@ def followPotentialField(player):
 
     return player.stay()
 
-# TODO PID controller for spin to ball?
 @superState('positionAndKickBall')
 def lineUp(player):
     """
@@ -177,6 +176,9 @@ def lineUp(player):
 lineUp.xController = PID.PIDController(constants.LINE_UP_XP, constants.LINE_UP_XI, constants.LINE_UP_XD)
 lineUp.hController = PID.PIDController(constants.LINE_UP_HP, constants.LINE_UP_HI, constants.LINE_UP_HD)
 
+# TODO PID controller for spin to ball
+# TODO PID controller for positionForKick
+
 @superState('gameControllerResponder')
 @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
 @ifSwitchNow(transitions.shouldSupport, 'positionAsSupporter')
@@ -189,7 +191,6 @@ def orbitBall(player):
     if player.firstFrame():
         orbitBall.xController.reset()
         orbitBall.hController.reset()
-        player.kick.setupH = player.brain.loc.h + 180
 
     if player.brain.nav.dodging:
         return player.stay()
@@ -216,7 +217,7 @@ def orbitBall(player):
         return player.goLater('approachBall')
 
     # Orbit in correct direction at constant speed
-    ySpeed = constants.ORBIT_Y_SPEED
+    ySpeed = min(constants.ORBIT_Y_SPEED, fabs(orbitBall.yController.correct(relH)))
     if relH > 0: ySpeed = -ySpeed
 
     # Calculate corrections in x and h using PID controller 
@@ -239,8 +240,8 @@ def orbitBall(player):
 
 # PID controllers used in orbitBall
 orbitBall.xController = PID.PIDController(constants.ORBIT_XP, constants.ORBIT_XI, constants.ORBIT_XD)
+orbitBall.yController = PID.PIDController(constants.ORBIT_YP, constants.ORBIT_YI, constants.ORBIT_YD)
 orbitBall.hController = PID.PIDController(constants.ORBIT_HP, constants.ORBIT_HI, constants.ORBIT_HD)
-# TODO third PID controller for Y?
 
 @superState('positionAndKickBall')
 def spinToBall(player):
