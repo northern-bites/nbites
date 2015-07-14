@@ -187,10 +187,12 @@ Man::Man() :
             
             
 #ifdef V5_ROBOT
-            nblog::HOST_TYPE = nblog::V5ROBOT;
+        nblog::HOST_TYPE = nblog::V5ROBOT;
 #else
-            nblog::HOST_TYPE = nblog::V4ROBOT;
+        nblog::HOST_TYPE = nblog::V4ROBOT;
 #endif
+            
+        nblog::HOST_NAME = robotName;
             
         printf("nblog::log_main_init()\n");
         nblog::log_main_init();
@@ -215,6 +217,8 @@ Man::Man() :
 
         /*
          SPECIFIC MODULE LOGGING
+         
+         CALLING NBLOG IN A SPECIFIC LOCATION, as in TRIPOINT, IS ALWAYS MORE EFFICIENT THAN THIS
          */
         sensorsThread.log<messages::JointAngles>((control::SENSORS), &sensors.jointsOutput_,
                                                  "proto-JointAngles", "sensorsThread");
