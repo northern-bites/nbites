@@ -177,30 +177,42 @@ def findDefenderHome(left, ball, hh):
                 return RobotLocation(hx, hy, hh)
 
 def findStrikerHome(ball, hh):
-    # find closest point on triangle to the ball and flip it over
-    # the y axis so we are positioned watching the ball from other side
-    if ball.x < NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X:
-        if ball.y > NogginConstants.MIDFIELD_Y:
-            home = closePointOnSeg(role.strikerTop.x,
-                                    role.strikerTop.y,
-                                    role.strikerForward.x,
-                                    role.strikerForward.y,
-                                    ball.x, ball.y)
-            return RobotLocation(home[0], NogginConstants.FIELD_HEIGHT - home[1], hh)
-        else:
-            home = closePointOnSeg(role.strikerBottom.x,
-                                    role.strikerBottom.y,
-                                    role.strikerForward.x,
-                                    role.strikerForward.y,
-                                    ball.x, ball.y)
-            return RobotLocation(home[0], NogginConstants.FIELD_HEIGHT - home[1], hh)
+    if not hasattr(findStrikerHome, 'upperHalf'):
+        findStrikerHome.upperHalf = (ball.y - NogginConstants.CENTER_FIELD_Y) >= 0 
+
+    # the buffer zone is twice this because its this distance on each side of midfield
+    # the buffer keeps us from oscillating sides of the field when the ball is near the center line
+    oscBuff = 50
+    if findStrikerHome.upperHalf and (ball.y - NogginConstants.CENTER_FIELD_Y) < -1*oscBuff:
+        findStrikerHome.upperHalf = False
+    elif not findStrikerHome.upperHalf and (ball.y - NogginConstants.CENTER_FIELD_Y) > oscBuff:
+        findStrikerHome.upperHalf = True
+
+    goalCenter = Location(NogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X, NogginConstants.MIDFIELD_Y)
+    ballToGoal = Location(goalCenter.x - ball.x, goalCenter.y - ball.y) # vector
+
+    # avoid divide by zeros
+    if ballToGoal == Location(0, 0):
+        ballToGoal = Location (1, 0)
+
+    # the point at which we draw our normal vector from
+    percentageToPivot = 0.8
+    pivotPoint = Location(ball.x + ballToGoal.x*0.8, ball.y + ballToGoal.y*0.8)
+
+    # two possible normal vectors. If ball.y is greater than midfield.y choose (dy, -dx)
+    # else choose (-dy, dx)
+    if findStrikerHome.upperHalf:
+        normalVect = Location(ballToGoal.y, -1*ballToGoal.x)
     else:
-        home = closePointOnSeg(role.strikerBottom.x,
-                                role.strikerBottom.y,
-                                role.strikerTop.x,
-                                role.strikerTop.y,
-                                ball.x, ball.y)
-        return RobotLocation(home[0], NogginConstants.FIELD_HEIGHT - home[1], hh)
+        normalVect = Location(-1*ballToGoal.y, ballToGoal.x)
+
+    # normalize the vector and make its magnitude to the desired value
+    normalVectLength = 100
+    normalizeMag = normalVectLength/normalVect.distTo(Location(0,0))
+    normalVect.x *= normalizeMag
+    normalVect.y *= normalizeMag
+
+    return RobotLocation(pivotPoint.x + normalVect.x , pivotPoint.y + normalVect.y, hh)
 
 # find the closest point on a line segment ((x1,y1),(x2,y2)) to a point (x3,y3)
 def closePointOnSeg(x1, y1, x2, y2, x3, y3):
@@ -210,31 +222,3 @@ def closePointOnSeg(x1, y1, x2, y2, x3, y3):
     nx = ((x3-x1)*dx + (y3-y1)*dy) / d2
     nx = min(1, max(0, nx))
     return (dx*nx + x1, dy*nx + y1)
-
-def calculateHomePosition(player):
-    """
-    Calculate home position.
-    """
-    if player.brain.ball.vis.frames_off < 10:
-        ball = player.brain.ball
-        bearing = ball.bearing_deg
-    elif player.brain.sharedBall.ball_on:
-        ball = player.brain.sharedBall
-        bearing = degrees(atan2(ball.y - player.brain.loc.y,
-                          ball.x - player.brain.loc.x)) - player.brain.loc.h
-    else:
-        ball = None
-
-    if ball != None and not (role.isDefender(player.role) and NogginConstants.FIXED_D_HOME):
-        if role.isLeftDefender(player.role):
-            home = findDefenderHome(True, ball, bearing + player.brain.loc.h)
-        elif role.isRightDefender(player.role):
-            home = findDefenderHome(False, ball, bearing + player.brain.loc.h)
-        elif role.isStriker(player.role):
-            home = findStrikerHome(ball, bearing + player.brain.loc.h)
-        else:
-            home = player.homePosition
-    else:
-        home = player.homePosition
-
-    return home

@@ -110,7 +110,7 @@ evenDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
                                 0)
 
 # Tomultuous triangle (odd chaser positioning)
-strikerForward = RobotLocation(NogginConstants.MIDFIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS + 150,
+strikerForward = RobotLocation(NogginConstants.MIDFIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS + 170,
                                 NogginConstants.MIDFIELD_Y,
                                 180)
 strikerBottom = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X,
@@ -201,7 +201,9 @@ evenDefenderBox = defenderBox
 
 chaserBox = ((0, 0), NogginConstants.FIELD_WIDTH, NogginConstants.FIELD_HEIGHT)
 
-strikerBox = ((strikerForward.x - 70, 0), (NogginConstants.FIELD_GREEN_WIDTH - strikerForward.x), NogginConstants.FIELD_HEIGHT)
+strikerBox = ((NogginConstants.CENTER_FIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS, 0), 
+    (NogginConstants.FIELD_GREEN_WIDTH - (NogginConstants.CENTER_FIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS)), 
+    NogginConstants.FIELD_HEIGHT)
 
 cherryPickerBox = (((0.5*NogginConstants.FIELD_GREEN_WIDTH + 0.25*NogginConstants.FIELD_WHITE_WIDTH), 0),
                     0.25*NogginConstants.FIELD_WHITE_WIDTH + NogginConstants.GREEN_PAD_X, 
