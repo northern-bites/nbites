@@ -58,6 +58,7 @@ void SharedBallModule::run_()
         ballY[i] = -1.f;
     }
 
+    // when player number is 6, we are running from the tool
     if(my_num != 6) {
         // get myInfo:
         locIn.latch();
@@ -71,7 +72,7 @@ void SharedBallModule::run_()
         myY = 10;
         myH = 0;
     }
-    
+
 
     if (numRobotsOn)
     {
@@ -124,12 +125,20 @@ void SharedBallModule::chooseRobots()
 
         for (int j = 0; j < NUM_PLAYERS_PER_TEAM; j++)
         {
+            // TOOL: Comment out this next "if" statement
             if (!worldMessages[i].ball_on() || !worldMessages[j].ball_on()
                 || !worldMessages[i].active() || !worldMessages[j].active())
             {
                 inEstimate[i][j] = 0;
                 continue;
             }
+
+            // TOOL: Comment back in this "if" statement
+            // if (worldMessages[i].my_x() == 0 || worldMessages[j].my_x() == 0) {
+            //     inEstimate[i][j] = 0;
+            //     continue;
+            // }
+
             // If I don't want goalie, don't use him!
             if ( !includeGoalie && (i == 0 or j == 0) )
             {
@@ -162,7 +171,9 @@ void SharedBallModule::chooseRobots()
         }
     }
 
-    // now decide whether or not to use sharedball
+    // now decide whether or not to use sharedball: if we have confusing groupings
+    // if we have two sets of two robots agreeing, numWithMaxEstimate = 4, maxInEstimate = 2
+    // this will happen when there is more than one group of agreeing robots
     if (numWithMaxEstimate > maxInEstimate)
     {
         bool goalieOn = false;
@@ -176,15 +187,14 @@ void SharedBallModule::chooseRobots()
                 break;
             }
         }
-        /*if (!goalieOn)
+        if (!goalieOn)
         {
-            std::cout<<"[DEBUG] Setting BallOn to False. No Goalie"<<std::endl;
             // don't want to use shared ball: not large enough consensus, no goalie
             ballOn = false;
             return;
-        } */
+        }
         // else the goalie will be used to break the tie!
-    } 
+    }
 
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; i++)
     {
@@ -250,7 +260,7 @@ void SharedBallModule::weightedavg()
         x = numx / sumweight;
         y = numy / sumweight;
         ballOn = true;
-    } 
+    }
 }
 
 
@@ -310,12 +320,12 @@ void SharedBallModule::checkForPlayerFlip()
         }
         timestamp = int(worldMessages[i].timestamp());
         flippedRobot = float(i + 1);
-        std::cout<<"FLIPPED! I am "<<my_num<<" and I flipped with reliability "
+        std::cout<<"[SHAREDBALL] FLIPPED! I am "<<my_num<<" and I flipped with reliability "
                      <<reliability<<"!"<<std::endl;
-        std::cout<<"I flipped from "<<myX<<", "<<myY<<std::endl;
-        std::cout<<"I flipped to "<<flipX<<", "<<flipY<<std::endl;
-        std::cout<<"...Because shared ball is at "<<x<<", "<<y<<std::endl;
-        std::cout<<"And my ball was at "<<ballX[i]<<", "<<ballY[i]<<std::endl;
+        std::cout<<"[SHAREDBALL] I flipped from "<<myX<<", "<<myY<<std::endl;
+        std::cout<<"[SHAREDBALL] I flipped to "<<flipX<<", "<<flipY<<std::endl;
+        std::cout<<"[SHAREDBALL] ...Because shared ball is at "<<x<<", "<<y<<std::endl;
+        std::cout<<"[SHAREDBALL] And my ball was at "<<ballX[i]<<", "<<ballY[i]<<std::endl;
     }
 }
 
