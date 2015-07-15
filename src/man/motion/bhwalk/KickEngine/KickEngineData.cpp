@@ -61,7 +61,6 @@ bool KickEngineData::checkPhaseTime(const FrameInfoBH& frame, const RobotDimensi
       if((unsigned int) timeSinceTimeStamp > currentParameters.phaseParameters[phaseNumber].duration)
       {
         phaseNumber++;
-        std::cout << "NEW PHASE " << phaseNumber << std::endl;
         timeStamp = frame.time;
         timeSinceTimeStamp = frame.getTimeSince(timeStamp);
         if(currentKickRequest.dynamical && !currentKickRequest.dynPoints.empty())
@@ -251,10 +250,7 @@ void KickEngineData::balanceCOM(JointRequestBH& joints, const RobotDimensionsBH&
     comOffset.y = (balance.x != 0) ? atan2((balance.x), height) : 0;
   }
 
-  // printf("ERROR : %f, %f\n", actualDiff.x, actualDiff.y);
-  // printf("OUTPUT: %f, %f\n=========================================\n", comOffset.x, comOffset.y);
-  printf("ERROR : %f\n", actualDiff.y);
-  printf("OUTPUT: %f\n=========================================\n", comOffset.y);
+  printf("%d, %f, %f\n", phaseNumber, actualDiff.y, comOffset.x);
 
   lastCom = actualDiff;
 }
@@ -489,7 +485,6 @@ void KickEngineData::addGyroBalance(JointRequestBH& jointRequest, const JointCal
       jointRequest.angles[JointDataBH::RHipRoll] += calcVelocity[2] * cycletime * ratio;
       jointRequest.angles[JointDataBH::LAnkleRoll] -= calcVelocity[2] * cycletime * ratio;
       jointRequest.angles[JointDataBH::RAnkleRoll] -= -calcVelocity[2] * cycletime * ratio;
-      printf("ERROR : %f, %f\n", calcVelocity[0], calcVelocity[2]);
     }
     else //if(toRightSupport)
     {
