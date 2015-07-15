@@ -250,7 +250,8 @@ void KickEngineData::balanceCOM(JointRequestBH& joints, const RobotDimensionsBH&
     comOffset.y = (balance.x != 0) ? atan2((balance.x), height) : 0;
   }
 
-  printf("%d, %f, %f\n", phaseNumber, actualDiff.y, comOffset.x);
+  // Northern bites debugging, for measuring stability
+  // printf("%d, %f, %f\n", phaseNumber, actualDiff.y, comOffset.x);
 
   lastCom = actualDiff;
 }
