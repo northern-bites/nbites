@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cp -r $NBITES_DIR/data/bhuman-stuff/* $NBITES_DIR/build/java/libs/bhuman/
+
+cd $NBITES_DIR/build/java/libs/bhuman/
+java controller/GameController
