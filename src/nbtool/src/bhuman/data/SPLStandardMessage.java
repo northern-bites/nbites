@@ -325,6 +325,11 @@ public class SPLStandardMessage implements Serializable {
         } catch (RuntimeException e) {
             errors.add("error while reading message: " + e.getClass().getSimpleName() + e.getMessage());
         }
+        
+        System.out.println("SPLStandardMessage errors:");
+        for (String s : errors) {
+        	System.out.println("\t" + s);
+        }
 
         valid = headerValid && versionValid && playerNumValid && teamNumValid && fallenValid && poseValid && walkingToValid && shootingToValid && ballValid && intentionValid && averageWalkSpeedValid && maxKickDistanceValid && currentPositionConfidenceValid && currentSideConfidenceValid && dataValid;
         if (valid) {

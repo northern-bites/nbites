@@ -136,7 +136,8 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
     {
         // initial setup
         struct SPLStandardMessage splMessage;
-        memset(&splMessage, 0, sizeof(SPLStandardMessage)); // @TODO: neccessary?
+        //declared on stack, init all fields to 0
+        memset(&splMessage, 0, sizeof(SPLStandardMessage));
 
         // actually check socket
         result = socket->receive((char*) &splMessage, sizeof(SPLStandardMessage));
