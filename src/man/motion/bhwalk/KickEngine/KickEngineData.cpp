@@ -61,6 +61,7 @@ bool KickEngineData::checkPhaseTime(const FrameInfoBH& frame, const RobotDimensi
       if((unsigned int) timeSinceTimeStamp > currentParameters.phaseParameters[phaseNumber].duration)
       {
         phaseNumber++;
+        std::cout << "NEW PHASE " << phaseNumber << std::endl;
         timeStamp = frame.time;
         timeSinceTimeStamp = frame.getTimeSince(timeStamp);
         if(currentKickRequest.dynamical && !currentKickRequest.dynPoints.empty())

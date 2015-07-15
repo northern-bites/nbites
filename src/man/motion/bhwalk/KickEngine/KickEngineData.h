@@ -117,9 +117,9 @@ public:
     cycletime(0.f),
     lastRatio(0.f),
     //Parameter for P, I and D for gyro PID Contol
-    gyroP(3.0f, -2.5f),
-    gyroI(.2, 0),
-    gyroD(0.0f, 0.01f),
+    gyroP(3.f, -2.5f),
+    gyroI(0, 0),
+    gyroD(0.03f, 0.01f),
     internalIsLeavingPossible(false)
   {
     for(int i = 0; i < Phase::numOfLimbs; i++)
