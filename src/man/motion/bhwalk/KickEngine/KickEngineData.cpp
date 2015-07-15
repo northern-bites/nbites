@@ -250,8 +250,10 @@ void KickEngineData::balanceCOM(JointRequestBH& joints, const RobotDimensionsBH&
     comOffset.y = (balance.x != 0) ? atan2((balance.x), height) : 0;
   }
 
-  //printf("ERROR : %f, %f\n", actualDiff.x, actualDiff.y);
-  //printf("OUTPUT: %f, %f\n=========================================\n", comOffset.x, comOffset.y);
+  // printf("ERROR : %f, %f\n", actualDiff.x, actualDiff.y);
+  // printf("OUTPUT: %f, %f\n=========================================\n", comOffset.x, comOffset.y);
+  printf("ERROR : %f\n", actualDiff.y);
+  printf("OUTPUT: %f\n=========================================\n", comOffset.y);
 
   lastCom = actualDiff;
 }
