@@ -26,13 +26,11 @@ void MotionSelector::stand()
 void MotionSelector::update(MotionSelectionBH& motionSelection)
 {
   static int interpolationTimes[MotionRequestBH::numOfMotions];
-  interpolationTimes[MotionRequestBH::walk] = 10;
-  interpolationTimes[MotionRequestBH::bike] = 200;
-  interpolationTimes[MotionRequestBH::indykick] = 10;
-  interpolationTimes[MotionRequestBH::specialAction] = 10;
-  interpolationTimes[MotionRequestBH::stand] = 10;
+  interpolationTimes[MotionRequestBH::walk] = 1000;
+  interpolationTimes[MotionRequestBH::kick] = 1000;
+  interpolationTimes[MotionRequestBH::specialAction] = 1000;
+  interpolationTimes[MotionRequestBH::stand] = 1000;
   interpolationTimes[MotionRequestBH::getUp] = 600;
-  interpolationTimes[MotionRequestBH::takeBall] = 600;
   static const int playDeadDelay(2000);
 
   if(lastExecution)
@@ -51,11 +49,9 @@ void MotionSelector::update(MotionSelectionBH& motionSelection)
     if((lastMotion == MotionRequestBH::walk && (!&theWalkingEngineOutputBH || theWalkingEngineOutputBH.isLeavingPossible || !theGroundContactStateBH.contact)) ||
        lastMotion == MotionRequestBH::stand || // stand can always be left
        (lastMotion == MotionRequestBH::specialAction) ||
-       (lastMotion == MotionRequestBH::bike && (!&theBikeEngineOutputBH || theBikeEngineOutputBH.isLeavingPossible)) ||
-       (lastMotion == MotionRequestBH::indykick && (!&theIndykickEngineOutputBH || theIndykickEngineOutputBH.isLeavingPossible)) ||
        (lastMotion == MotionRequestBH::getUp && (!&theGetUpEngineOutputBH || theGetUpEngineOutputBH.isLeavingPossible)) ||
-       (lastMotion == MotionRequestBH::takeBall && (!&theBallTakingOutputBH || theBallTakingOutputBH.isLeavingPossible)) ||
-       (requestedMotion == MotionRequestBH::takeBall && &theBallTakingOutputBH && lastMotion == MotionRequestBH::walk)) 
+       (lastMotion == MotionRequestBH::kick && theKickEngineOutput.isLeavingPossible)
+        )
     {
       motionSelection.targetMotion = requestedMotion;
     }
@@ -79,8 +75,9 @@ void MotionSelector::update(MotionSelectionBH& motionSelection)
     float sum(0);
     for(int i = 0; i < MotionRequestBH::numOfMotions; i++)
     {
-      if(i == motionSelection.targetMotion)
-        motionSelection.ratios[i] += delta;
+        if(i == motionSelection.targetMotion) {
+            motionSelection.ratios[i] += delta;
+        }
       else
         motionSelection.ratios[i] -= delta;
       motionSelection.ratios[i] = std::max(motionSelection.ratios[i], 0.0f); // clip ratios

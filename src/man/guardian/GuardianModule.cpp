@@ -14,13 +14,13 @@ namespace man{
 namespace guardian{
 
 #ifdef V5_ROBOT
-static const float FALL_SPEED_THRESH = 0.045f; // rads/20ms
+static const float FALL_SPEED_THRESH = 0.06f; // rads/20ms
 static const float NOFALL_SPEED_THRESH = 0.02f; // rads/20ms
-static const float FALLING_ANGLE_THRESH = M_PI_FLOAT/4.5f; // 45.0 degrees
+static const float FALLING_ANGLE_THRESH = M_PI_FLOAT/3.0f; // 45.0 degrees
 #else
 static const float FALL_SPEED_THRESH = 0.03f; // rads/20ms
 static const float NOFALL_SPEED_THRESH = 0.01f; // rads/20ms
-static const float FALLING_ANGLE_THRESH = M_PI_FLOAT/5.0f; // 36.0 degrees
+static const float FALLING_ANGLE_THRESH = M_PI_FLOAT/4.5f; // 36.0 degrees
 #endif
 
 static const int FALLING_FRAMES_THRESH = 3;
@@ -187,9 +187,9 @@ void GuardianModule::checkFalling()
     // If we have been in BH walk for some time, then use BH fall down detection
     else if (!bh.upright())
     {
-        std::cout << "BH thinks we are falling!" << std::endl;
-        std::cout << "[INERTDEBUG] BH calibrated:" << bh.calibrated() << std::endl;
-        std::cout << "[INERTDEBUG] BH walk_is_active:" << bh.walk_is_active() << std::endl;
+        //std::cout << "BH thinks we are falling!" << std::endl;
+        //std::cout << "[INERTDEBUG] BH calibrated:" << bh.calibrated() << std::endl;
+        //std::cout << "[INERTDEBUG] BH walk_is_active:" << bh.walk_is_active() << std::endl;
         falling = true;
     }
 }
@@ -462,6 +462,8 @@ std::vector<float> GuardianModule::vectorizeTemperatures(const messages::JointAn
 void GuardianModule::processFallingProtection()
 {
     portals::Message<messages::FallStatus> status(0);
+    fallStatusOutput.setMessage(status);
+    return;
     if(useFallProtection && falling)
     {
         if (!registeredFalling)

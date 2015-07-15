@@ -122,6 +122,7 @@ class BikeEngineOutputBH;
 class MotionInfoBH;
 class BallTakingOutputBH;
 class IndykickEngineOutputBH;
+class KickEngineOutput;
 
 // friends
 class Process;
@@ -250,10 +251,8 @@ public:
   SpecialActionsOutputBH& theSpecialActionsOutputBH;
   WalkingEngineOutputBH& theWalkingEngineOutputBH;
   WalkingEngineStandOutputBH& theWalkingEngineStandOutputBH;
-  BikeEngineOutputBH& theBikeEngineOutputBH;
   MotionInfoBH& theMotionInfoBH;
-  BallTakingOutputBH& theBallTakingOutputBH;
-  IndykickEngineOutputBH& theIndykickEngineOutputBH;
+  KickEngineOutput& theKickEngineOutput;
 
   static PROCESS_WIDE_STORAGE(Blackboard) theInstance; /**< The only real instance in the current process. */
 

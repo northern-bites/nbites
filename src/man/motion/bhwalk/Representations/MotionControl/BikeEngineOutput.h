@@ -14,10 +14,10 @@
 * @class BikeEngineOutputBH
 * A class that represents the output of the walking engine.
 */
-STREAMABLE_WITH_BASE(BikeEngineOutputBH, JointRequestBH,
-{,
-  (Pose2DBH) odometryOffset, /**< The body motion performed in this step. */
-  (bool)(true) isLeavingPossible, /**< Is leaving the motion module possible now? */
-  (bool)(true) isStable, /**< Is motion currently stable? */
-  (BikeRequest) executedBikeRequest, /**< The bike request that is currently in execution. */
-});
+// STREAMABLE_WITH_BASE(BikeEngineOutputBH, JointRequestBH,
+// {,
+//   (Pose2DBH) odometryOffset, /**< The body motion performed in this step. */
+//   (bool)(true) isLeavingPossible, /**< Is leaving the motion module possible now? */
+//   (bool)(true) isStable, /**< Is motion currently stable? */
+//   (BikeRequest) executedBikeRequest, /**< The bike request that is currently in execution. */
+// });
