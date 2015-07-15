@@ -113,7 +113,7 @@
  odometryOffset = {x = 0 ; y = 0 ; z = 0 ;};
  },
  {
- duration = 225 ;
+ duration = 165 ;
  leftFootTra1 = {x = 0 ; y = -12 ; z = -230 ;};
  leftFootTra2 = {x = 0 ; y = -12 ; z = -230 ;};
  leftFootRot1 = {x = 0 ; y = 0 ; z = 0 ;};
