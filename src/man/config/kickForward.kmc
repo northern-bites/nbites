@@ -5,7 +5,7 @@
  comOrigin = {x = 10 ; y = 5 ;};
  headOrigin = {x = 0 ; y = 0 ;};
  kpx = 0.3 ;
- kix = 0.08 ;
+ kix = 0.04 ;
  kdx = 0 ;
  kpy = 0.3 ;
  kiy = 0.04 ;

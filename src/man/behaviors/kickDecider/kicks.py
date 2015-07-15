@@ -113,8 +113,8 @@ LEFT_KICK = LEFT_SHORT_STRAIGHT_KICK
 RIGHT_KICK = RIGHT_SHORT_STRAIGHT_KICK
 
 # BH kick engine kicks
-BH_LEFT_FORWARD_KICK =  Kick("BH_L_FORWARD", x = 16, y =  3.6, dist = 500, bhType = PMotion_proto.messages.Kick.kickForwardLeft)
-BH_RIGHT_FORWARD_KICK =  Kick("BH_R_FORWARD", x = 16, y =  -3.6, dist = 500, bhType = PMotion_proto.messages.Kick.kickForwardRight)
+BH_LEFT_FORWARD_KICK =  Kick("BH_L_FORWARD", x = 14, y =  3.6, dist = 500, bhType = PMotion_proto.messages.Kick.kickForwardLeft)
+BH_RIGHT_FORWARD_KICK =  Kick("BH_R_FORWARD", x = 14, y =  -3.6, dist = 500, bhType = PMotion_proto.messages.Kick.kickForwardRight)
 
 # Motion kicks
 M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 13.3, y = 3., dist = 70)
