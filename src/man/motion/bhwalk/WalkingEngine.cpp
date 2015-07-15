@@ -526,7 +526,7 @@ void WalkingEngine::generateJointRequest()
     jointRequest.angles[JointDataBH::RElbowRoll] = targetPosture.rightArmJointAngles[3];
 
     // compute torso orientation
-    bool transition = theMotionSelectionBH.ratios[MotionRequestBH::specialAction] > 0 || theMotionSelectionBH.ratios[MotionRequestBH::getUp] > 0 || theMotionSelectionBH.ratios[MotionRequestBH::kick] > 0;
+    bool transition = theMotionSelectionBH.ratios[MotionRequestBH::specialAction] > 0 || theMotionSelectionBH.ratios[MotionRequestBH::getUp] > 0;
     float additionalBodyRotation = (((targetPosture.rightOriginToCom.y - targetPosture.rightOriginToFoot.translation.y) - standComPosition.y) + ((targetPosture.leftOriginToCom.y - targetPosture.leftOriginToFoot.translation.y) + standComPosition.y)) * 0.5f;
     additionalBodyRotation *= 1.f / (22.5f - 50.f);
     additionalBodyRotation *= walkComBodyRotation;
@@ -567,7 +567,6 @@ void WalkingEngine::generateJointRequest()
     }
     else
     {
-        //std::cout << "IN TRANSITION" << std::endl;
         lastSmoothedGyroY = InertiaSensorDataBH::off;
         relativeRotations.init();
     }

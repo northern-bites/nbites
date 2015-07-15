@@ -264,7 +264,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         }
         else if(currentCommand.get() && currentCommand->getType() == MotionConstants::KICK)
         {
-            //std::cout << "Kick Command" << std::endl;
+            std::cout << "Kick Command" << std::endl;
             kickCommand = boost::shared_static_cast<KickCommand>(currentCommand);
 
             // Only set kicking to true once
@@ -278,7 +278,6 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
                 std::cout << "!kicking" << std::endl;
                 stand();
             }
-
 
         }
         //TODO make special command for stand
@@ -335,9 +334,8 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     const float* angles = NULL;
     const int* hardness = NULL;
 
-
     if (kicking) {
-        //std::cout << "Kicking!" << std::endl;;
+//        std::cout << "Requested to kick" << std::endl;
         MotionRequestBH motionRequest;
         motionRequest.motion = MotionRequestBH::kick;
         if (kickCommand->kickType == 0) {
@@ -351,51 +349,31 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             std::cout << "Kick unknown to BHWalkProvider requested. Defaulting." << std::endl;
             motionRequest.kickRequest.kickMotionType = KickRequest::getKickMotionFromName("kickForward");
         }
+        //motionRequest.kickRequest.dynamical = true;
 
         walkingEngine->theMotionRequestBH = motionRequest;
         kickEngine->theMotionRequestBH = motionRequest;
 
         WalkingEngineStandOutputBH standout;
+
         walkingEngine->update(walkOutput);
         walkingEngine->update(standout);
+
 
         kickEngine->theWalkingEngineStandOutputBH = standout;
         kickEngine->update(kickOut);
 
-//        angles = (kickOut.angles);
-        float kickRatio = kickEngine->theMotionSelectionBH.ratios[MotionRequestBH::kick];
-        if (kickEngine->theMotionSelectionBH.ratios[MotionRequestBH::walk] > 0) {
-            interpolate((JointRequestBH)kickOut, (JointRequestBH)walkOutput, kickRatio);
-            angles = request.angles;
-        }
-        else {
-            angles = kickOut.angles;
-        }
-
-
+        angles = (kickOut.angles);
         // Kick Engine doesn't seem to be setting stiffnesses..
         hardness = (ON_STIFF_ARRAY);
         if (kickOut.isLeavingPossible) {
-            std::cout << "DONE KICKING" << std::endl;
             kicking = false;
             stand();
         }
     }
     else {
-        //walkingEngine->update(walkOutput);
-        std::cout << "Walking" << std::endl;
         walkingEngine->update(walkOutput);
-        kickEngine->update(kickOut);
-
-        float walkRatio = walkingEngine->theMotionSelectionBH.ratios[MotionRequestBH::walk];
-
-        if (walkingEngine->theMotionSelectionBH.ratios[MotionRequestBH::kick] > 0) {
-            interpolate((JointRequestBH)walkOutput, (JointRequestBH)kickOut, walkRatio);
-            angles = request.angles;
-        }
-        else {
-            angles = (walkOutput.angles);
-        }
+        angles = (walkOutput.angles);
         hardness = (walkOutput.jointHardness.hardness);
     }
 
@@ -438,45 +416,6 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     }
 
     PROF_EXIT(P_WALK);
-}
-
-
-void BHWalkProvider::interpolate(const JointRequestBH& from, const JointRequestBH& to, float toRatio)
-{
-    if (toRatio > 1.0f) printf("WHY?\n\n\n\n\n\n\n\n\n\n\n\n\n");
-  for(int i = 0; i < JointDataBH::numOfJoints; ++i)
-  {
-    float f = from.angles[i];
-    float t = to.angles[i];
-
-    if(t == JointDataBH::ignore && f == JointDataBH::ignore)
-      continue;
-
-    if(t == JointDataBH::ignore)
-      t = request.angles[i];
-    if(f == JointDataBH::ignore)
-      f = request.angles[i];
-
-    int fHardness = f != JointDataBH::off ? from.jointHardness.hardness[i] : 0;
-    int tHardness = t != JointDataBH::off ? to.jointHardness.hardness[i] : 0;
-
-    if(t == JointDataBH::off || t == JointDataBH::ignore)
-      t = request.angles[i];
-    if(f == JointDataBH::off || f == JointDataBH::ignore)
-      f = request.angles[i];
-    // if(request.angles[i] == JointDataBH::off || request.angles[i] == JointDataBH::ignore)
-    //   target.angles[i] = request.angles[i];
-
-    ASSERT(request.angles[i] != JointDataBH::off && request.angles[i] != JointDataBH::ignore);
-    ASSERT(t != JointDataBH::off && t != JointDataBH::ignore);
-    ASSERT(f != JointDataBH::off && f != JointDataBH::ignore);
-
-    request.angles[i] = toRatio * t + (1 - toRatio) * f;
-    // if(interpolateHardness)
-    //   target.jointHardness.hardness[i] += int(-fromRatio * float(tHardness) + fromRatio * float(fHardness));
-    // else
-    //   target.jointHardness.hardness[i] = tHardness;
-  }
 }
 
 bool BHWalkProvider::isStanding() const {

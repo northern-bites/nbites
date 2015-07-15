@@ -208,10 +208,8 @@ void KickEngine::update(KickEngineOutput& kickEngineOutput)
 
     if(data.sitOutTransitionDisturbance(compensate, compensated, theFilteredSensorDataBH, kickEngineOutput, theWalkingEngineStandOutputBH, theFrameInfoBH))
     {
-        //printf("sit out transition\n");
       if(data.activateNewMotion(theMotionRequestBH.kickRequest, kickEngineOutput.isLeavingPossible) && theMotionRequestBH.motion == MotionRequestBH::kick)
       {
-          //printf("activating new mot\n");
         data.initData(compensated, theFrameInfoBH, theMotionRequestBH, theRobotDimensionsBH, params, theFilteredJointDataBH, theTorsoMatrixBH);
         data.setCurrentKickRequest(theMotionRequestBH);
         data.setExecutedKickRequest(kickEngineOutput.executedKickRequest);
@@ -229,7 +227,6 @@ void KickEngine::update(KickEngineOutput& kickEngineOutput)
 
       if(data.checkPhaseTime(theFrameInfoBH, theRobotDimensionsBH, theFilteredJointDataBH, theTorsoMatrixBH))
       {
-          //printf("Calculating positions\n");
         data.calcPhaseState();
         data.calcPositions(kickEngineOutput, theFilteredJointDataBH);
         data.setStaticReference();
@@ -241,7 +238,7 @@ void KickEngine::update(KickEngineOutput& kickEngineOutput)
         data.internalIsLeavingPossible = true;
         // Kinda a hack. This value *SHOULD* change next frame since the kick is over
         // but we immediately stop running the engine once a kick is over.
-        //theMotionSelectionBH.ratios[MotionRequestBH::kick] = 0.f;
+        theMotionSelectionBH.ratios[MotionRequestBH::kick] = 0.f;
       }
 
       //  if(data.isMotionAlmostOver()) //last three phases are unstable

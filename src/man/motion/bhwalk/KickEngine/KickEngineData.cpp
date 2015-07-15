@@ -819,9 +819,8 @@ void KickEngineData::setEngineActivation(const float& ratio)
 
 bool KickEngineData::activateNewMotion(const KickRequest& br, const bool& isLeavingPossible)
 {
-    if(!wasActive || (br.kickMotionType != currentKickRequest.kickMotionType && isLeavingPossible)) {
-        return true;
-    }
+  if(!wasActive || (br.kickMotionType != currentKickRequest.kickMotionType && isLeavingPossible))
+    return true;
   else if(br.kickMotionType == currentKickRequest.kickMotionType && br.mirror == currentKickRequest.mirror)
     currentKickRequest = br; // update KickRequest when it is compatible to the current motion
 
