@@ -81,6 +81,74 @@ def checkForConsistency(player):
     return
 
 
+
+
+
+
+### DROP IN PLAYER ONLY ###
+
+#Can be replaced with constants.twoAttackersOnField?
+def offenseMissing(player):
+    """
+    There is a chaser/striker spot ready to be filled
+    """
+
+    if not player.dropIn:
+        return
+
+    if not player.roleSwitching or player.brain.gameController.penalized:
+        return
+
+    if not player.gameState == "gamePlaying":
+        return
+
+    numAttackers = 0
+    for mate in player.brain.teamMembers:
+        if constants.isChaser(player.role):
+            numAttackers += 1
+
+    if numAttackers < 2:
+        player.role = 4
+        return 
+
+def roleOverlap(player):
+    """
+    Returns true if there are more than two players on offense/defense.
+    """
+
+    if not player.dropIn:
+        return
+
+    if not player.roleSwitching or player.brain.gameController.penalized:
+        return
+
+    if not player.gameState == "gamePlaying":
+        return
+
+    numAttackers = 0
+    numDefenders = 0
+
+    for mate in player.game.teamMembers:
+        if constants.isChaser(player.role):
+            numAttackers += 1
+        elif constants.isDefender(player.role):
+            numDefenders += 1
+
+    if numAttackers > 2:
+        player.role = 3
+        return
+
+    if numDefenders > 2:
+        player.role = 4
+        return
+
+    return
+
+
+
+
+
+
 def determineOpenRoles(player):
     """
     Used for role switching in drop in games. Similar to structures of determineRole

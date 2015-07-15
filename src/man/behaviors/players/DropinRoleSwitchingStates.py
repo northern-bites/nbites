@@ -21,7 +21,11 @@ def switchRoles(player):
     """
     State to decide who on the team should become the new chaser and switch accordingly.
     """
-    print "\nI think my current role is", player.role, "! \n"
-    if player.brain. activeTeamMates() < 5:
-        transitions.determineOpenRoles(player)
+
+    if transitions.offenseMissing(player):
+        constants.setRoleConstants(player, player.role)
     return player.goNow(player.gameState)
+
+    if transitions.roleOverlap(player):
+        constants.setRoleConstants(player,player.role)
+        constants.setRoleConstants(player, role)
