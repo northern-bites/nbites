@@ -101,6 +101,18 @@ PROF_ENTER(P_COMM_BUILD_PACKET);
 
     splMessage.ballVel[0] = model.ball_vel_x()*CM_TO_MM;
     splMessage.ballVel[1] = model.ball_vel_y()*CM_TO_MM;
+    
+    /* MISSING FIELDS for HeFei 2015 */
+    splMessage.averageWalkSpeed = 100;   //100 mm/second
+    splMessage.maxKickDistance = 1000;   //1 meter
+    splMessage.currentPositionConfidence = 0;
+    splMessage.currentSideConfidence = 0;
+    
+    for (int i = 0; i < SPL_STANDARD_MESSAGE_MAX_NUM_OF_PLAYERS; ++i) {
+        splMessage.suggestion[i] = 0;   //default, no meaning
+    }
+    
+    splMessage.intention = 0;   //default, no meaning
 
 PROF_EXIT(P_COMM_BUILD_PACKET);
 
