@@ -126,10 +126,6 @@ class HeadTrackingHelper(object):
         changeX, changeY = 0.0, 0.0
 
         # If we cannot see the target, abort.
-        # print("Tracking")
-        # print(target.rel_x)
-        # print(target.rel_y)
-        
         if not (target # target is null
                 or (target.rel_x == 0.0 and target.rel_y == 0.0) # target is under us (info error)
                 or (target.vis.frames_off > 0 and target.vis.frames_off < 3)): # off frame, but under thresh

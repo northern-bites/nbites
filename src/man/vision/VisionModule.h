@@ -95,6 +95,8 @@ private:
     BallDetector* ballDetector[2];
 
     bool blackStar_;
+
+    std::string name;
     
     // Lisp tree with color params saved
     nblog::SExpr colors;
