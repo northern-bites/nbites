@@ -382,15 +382,15 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         }
     }
     else {
-        //walkingEngine->update(walkOutput);
-        std::cout << "Walking" << std::endl;
+        //std::cout << "Walking" << std::endl;
         walkingEngine->update(walkOutput);
         kickEngine->update(kickOut);
 
-        float walkRatio = walkingEngine->theMotionSelectionBH.ratios[MotionRequestBH::walk];
+        float walkRatio = walkingEngine->theMotionSelectionBH.ratios[MotionRequestBH::stand];
 
+        // Make sure that we smoothly transition into standing
         if (walkingEngine->theMotionSelectionBH.ratios[MotionRequestBH::kick] > 0) {
-            interpolate((JointRequestBH)walkOutput, (JointRequestBH)kickOut, walkRatio);
+            interpolate((JointRequestBH)kickOut, (JointRequestBH)walkOutput, walkRatio);
             angles = request.angles;
         }
         else {
@@ -446,6 +446,7 @@ void BHWalkProvider::interpolate(const JointRequestBH& from, const JointRequestB
     if (toRatio > 1.0f) printf("WHY?\n\n\n\n\n\n\n\n\n\n\n\n\n");
   for(int i = 0; i < JointDataBH::numOfJoints; ++i)
   {
+
     float f = from.angles[i];
     float t = to.angles[i];
 

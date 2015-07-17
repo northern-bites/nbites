@@ -26,10 +26,10 @@ void MotionSelector::stand()
 void MotionSelector::update(MotionSelectionBH& motionSelection)
 {
   static int interpolationTimes[MotionRequestBH::numOfMotions];
-  interpolationTimes[MotionRequestBH::walk] = 1000;
-  interpolationTimes[MotionRequestBH::kick] = 1000;
-  interpolationTimes[MotionRequestBH::specialAction] = 1000;
-  interpolationTimes[MotionRequestBH::stand] = 1000;
+  interpolationTimes[MotionRequestBH::walk] = 300;
+  interpolationTimes[MotionRequestBH::kick] = 300;
+  interpolationTimes[MotionRequestBH::specialAction] = 10;
+  interpolationTimes[MotionRequestBH::stand] = 300;
   interpolationTimes[MotionRequestBH::getUp] = 600;
   static const int playDeadDelay(2000);
 
@@ -88,8 +88,9 @@ void MotionSelector::update(MotionSelectionBH& motionSelection)
     for(int i = 0; i < MotionRequestBH::numOfMotions; i++)
     {
       motionSelection.ratios[i] /= sum;
-      if(std::abs(motionSelection.ratios[i] - 1.f) < 0.00001f)
+      if(std::abs(motionSelection.ratios[i] - 1.f) < 0.00001f) {
         motionSelection.ratios[i] = 1.f; // this should fix a "motionSelection.ratios[motionSelection.targetMotion] remains smaller than 1.f" bug
+      }
     }
 
     if(motionSelection.ratios[MotionRequestBH::specialAction] < 1.f)
