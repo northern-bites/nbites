@@ -184,7 +184,7 @@ void VisionModule::run_()
         ImageLiteU8 greenImage(frontEnd[i]->greenImage());
         ImageLiteU8 orangeImage(frontEnd[i]->orangeImage());
 
-        times[i][0] = timer.end();=
+        times[i][0] = timer.end();
 
         // Offset to hackily adjust tilt for high-azimuth error
         double azOffset = 0;

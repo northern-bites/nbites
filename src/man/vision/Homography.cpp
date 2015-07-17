@@ -327,10 +327,10 @@ bool StarCal::add(const FieldLineList& lines)
 
   // If we didn't find exactly three suitable field lines, fail
   if (fit.area() != 3) {
-   // std::cout << "Failed" << std::endl;
+    std::cout << "Failed" << std::endl;
     return false;
   } else {
-   // std::cout << "Success" << std::endl;
+    std::cout << "Success" << std::endl;
     return true;
   }
 }
