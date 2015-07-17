@@ -224,8 +224,8 @@ public class DebugImageView extends ViewParent
 			//displayImages[THRESH].setThresh(persistant.greenThreshold);
 			g.drawImage(displayImages[currentBottom], 0, displayh + 5, displayw,
 						displayh, null);
-			viewList.setBounds(0, displayh * 2 + 10, displayw / 2, BOX_HEIGHT);
-			greenThreshold.setBounds(0, displayh*2 + 15 + BOX_HEIGHT, displayw, BOX_HEIGHT+20);
+			viewList.setBounds(displayw, displayh  + 10, displayw / 2, BOX_HEIGHT);
+			greenThreshold.setBounds(displayw, displayh + 15 + BOX_HEIGHT, displayw / 2, BOX_HEIGHT+20);
 			greenThreshold.repaint();
 			persistant.setBounds(displayw+10, 0, 400, 300);
         }
