@@ -33,7 +33,7 @@ AdjustParams::AdjustParams()
 AdjustSet::AdjustSet() {
   params[1].angleThr = FuzzyThr(0.08f, 0.12f);
   params[1].distanceThr = FuzzyThr(0.7f, 2.0f);
-  params[1].fitThresold = 0.65;
+  params[1].fitThresold = 0.55;
 
 }
 
