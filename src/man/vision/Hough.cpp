@@ -537,6 +537,10 @@ bool CenterCircleDetector::detectCenterCircle(EdgeList& edges, Field& field)
 // Get potential cc centers and clean edge list
 bool CenterCircleDetector::findPotentialsAndCluster(EdgeList& edges, double& x0, double& y0)
 {
+#ifdef OFFLINE
+  _potentials.clear();
+  std::cout << "POTENTIAL SIZE: " << _potentials.size() << std::endl;
+#endif
   std::vector<Point> vec;
   Point p1, p2;
   int count = 0;
