@@ -46,6 +46,7 @@ public:
     // messages::VisionObstacle    const * visionObstacle_ptr;
     messages::SharedBall        const * sharedBall_ptr;
     messages::RobotLocation     const * sharedFlip_ptr;
+    messages::NaiveBall         const * naiveBall_ptr;
     messages::Toggle            const * sitDown_ptr;
 
 
@@ -68,6 +69,10 @@ public:
     void setSharedFlip_ptr(const messages::RobotLocation* msg)
     {
         sharedFlip_ptr = msg;
+    }
+    void setNaiveBall_ptr(const messages::NaiveBall* msg)
+    {
+        naiveBall_ptr = msg;
     }
     void setLedCommand_ptr(const messages::LedCommand* msg)
     {

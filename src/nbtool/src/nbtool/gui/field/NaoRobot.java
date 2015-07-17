@@ -2,9 +2,6 @@ package nbtool.gui.field;
 
 import java.awt.*;
 import java.awt.geom.*;
-import java.awt.geom.Line2D.Float;
-import java.awt.event.*;
-import javax.swing.*;
 import java.lang.Math;
 
 import nbtool.data.TeamBroadcast;
@@ -19,8 +16,8 @@ public class NaoRobot {
 	public float fieldX,fieldY,fieldH,fieldXDist,fieldYDist,fieldKickDestX, fieldKickDestY, radius;
 	
 	int screenX, screenY, screenKickDestX, screenKickDestY,screenWalkingToX, screenWalkingToY, 
-		screenBallX, screenBallY,screenSharedBallX, screenSharedBallY;
-	float screenXDist, screenYDist, screenH;
+		screenBallX, screenBallY,screenSharedBallX, screenSharedBallY, ballDist;
+	float screenXDist, screenYDist, screenH, ballBearing;
 	
 	public boolean in_kicking_state = false; 
 	public boolean seeing_ball = false;
@@ -94,8 +91,6 @@ public class NaoRobot {
 				screenKickDestY  = (int) fieldKickDestY;
 				screenWalkingToX = (int) (FieldConstants.FIELD_WIDTH-fieldWalkingToX);
 				screenWalkingToY = (int) fieldWalkingToY;
-				screenBallX = (int) (FieldConstants.FIELD_WIDTH-fieldBallX);
-				screenBallY = (int) fieldBallY;
 			} else {
 				screenX = (int) fieldX;
 				screenY = (int) (FieldConstants.FIELD_HEIGHT- fieldY);
@@ -104,8 +99,6 @@ public class NaoRobot {
 				screenKickDestY = (int) (FieldConstants.FIELD_HEIGHT-fieldKickDestY);
 				screenWalkingToX = (int) fieldWalkingToX;
 				screenWalkingToY = (int) (FieldConstants.FIELD_HEIGHT-fieldWalkingToY);
-				screenBallX = (int) fieldBallX;
-				screenBallY = (int) (FieldConstants.FIELD_HEIGHT-fieldBallY);
 			}
 
 		g2.setColor(naoColor);
@@ -154,8 +147,10 @@ public class NaoRobot {
 		//where is my ball
 		g2.setColor(Color.orange);
 		if(seeing_ball) {
-			g2.fill(new Ellipse2D.Double(screenBallX-4, screenBallY-4, 8, 8));
-			g2.drawString(Integer.toString(playerNumber), screenBallX+1, screenBallY-1);	
+			Point ballCenter = new Point((int)(screenX+ballDist*Math.cos(TO_RAD*screenH+TO_RAD*ballBearing)),
+									  (int)(screenY-ballDist*Math.sin(TO_RAD*screenH+TO_RAD*ballBearing)));
+			g2.fill(new Ellipse2D.Double(ballCenter.x, ballCenter.y, 8, 8));
+			g2.drawString(Integer.toString(playerNumber), ballCenter.x+1, ballCenter.y-1);	
 		}
 		
 		//where is my shared ball | only for player 4&5: chasers
@@ -193,14 +188,8 @@ public class NaoRobot {
 		
 		if(tb.dataWorldModel.getBallOn()) {
 			seeing_ball = true;
-			Point ballCenter = new Point((int)(tb.dataWorldModel.getMyX()+tb.dataWorldModel.getBallDist()
-					*Math.cos(TO_RAD*tb.dataWorldModel.getMyH()+TO_RAD*tb.dataWorldModel.getBallBearing())),
-					(int)(tb.dataWorldModel.getMyY()+tb.dataWorldModel.getBallDist()
-					*Math.sin(TO_RAD*tb.dataWorldModel.getMyH()+tb.dataWorldModel.getBallBearing())));
-			
-			fieldBallX = ballCenter.x;
-			fieldBallY = ballCenter.y;
-
+			ballDist = (int) tb.dataWorldModel.getBallDist();
+			ballBearing = (int) tb.dataWorldModel.getBallBearing();
 		}
 	}
 	

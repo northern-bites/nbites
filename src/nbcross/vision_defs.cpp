@@ -27,6 +27,34 @@ std::string getSExprStringFromColorJSonNode(boost::property_tree::ptree tree);
 SExpr treeFromBall(man::vision::Ball& b);
 SExpr treeFromBlob(man::vision::Blob& b);
 
+messages::YUVImage emptyTop(
+    man::vision::DEFAULT_TOP_IMAGE_WIDTH * 2,
+    man::vision::DEFAULT_TOP_IMAGE_HEIGHT
+);
+
+messages::YUVImage emptyBot(
+    man::vision::DEFAULT_TOP_IMAGE_WIDTH,
+    man::vision::DEFAULT_TOP_IMAGE_HEIGHT / 2
+);
+
+void imageSizeCheck(bool top, int width, int height) {
+    if (top) {
+        if (width != 2 * man::vision::DEFAULT_TOP_IMAGE_WIDTH ||
+            height != man::vision::DEFAULT_TOP_IMAGE_HEIGHT ) {
+            printf("WARNING! topCamera dimensions (%i, %i) NOT DEFAULT, VisionModule results undefined!\n",
+                   width, height);
+        }
+    } else {
+        //bot
+        if ( // 2 / 2 == 1
+            width != man::vision::DEFAULT_TOP_IMAGE_WIDTH ||
+            height != ( man::vision::DEFAULT_TOP_IMAGE_HEIGHT / 2 ) ) {
+            printf("WARNING! botCamera dimensions (%i, %i) NOT DEFAULT, VisionModule results undefined!\n",
+                   width, height);
+        }
+    }
+}
+
 //robotName may be empty ("").
 man::vision::VisionModule& getModuleRef(const std::string robotName);
 
@@ -60,20 +88,7 @@ int Vision_func() {
         std::cout << "Could not get height from description!\n";
     }
     
-    if (topCamera && (height != man::vision::DEFAULT_TOP_IMAGE_HEIGHT ||
-                      width != 2 * man::vision::DEFAULT_TOP_IMAGE_WIDTH)
-                      ) {
-        printf("WARNING! topCamera dimensions (%i, %i) NOT DEFAULT, VisionModule results undefined!\n",
-               width, height);
-    }
-    
-    if (!topCamera && (height != (man::vision::DEFAULT_TOP_IMAGE_HEIGHT / 2) ||
-                       // 2 / 2 == 1
-                      width != man::vision::DEFAULT_TOP_IMAGE_WIDTH)
-        ) {
-        printf("WARNING! botCamera dimensions (%i, %i) NOT DEFAULT, VisionModule results undefined!\n",
-               width, height);
-    }
+    imageSizeCheck(topCamera, width, height);
 
     // Location of lisp text file with color params
     std::string sexpPath = std::string(getenv("NBITES_DIR"));
@@ -102,11 +117,11 @@ int Vision_func() {
 
     // Images to pass to vision module, top & bottom
     messages::YUVImage realImage(buf, width, height, width);
-    messages::YUVImage emptyImage(width, height);
 
     // Setup module
     portals::Message<messages::YUVImage> rImageMessage(&realImage);
-    portals::Message<messages::YUVImage> eImageMessage(&emptyImage);
+    portals::Message<messages::YUVImage> eImageMessage(
+                                topCamera ? &emptyBot : & emptyTop );
     portals::Message<messages::JointAngles> jointsMessage(&joints);
 
     if (topCamera) {
@@ -117,6 +132,7 @@ int Vision_func() {
         module.topIn.setMessage(eImageMessage);
         module.bottomIn.setMessage(rImageMessage);
     }
+    
     module.jointsIn.setMessage(jointsMessage);
 
     // If log includes color parameters in description, have module use those
@@ -445,7 +461,6 @@ int Vision_func() {
 
     rets.push_back(debugImage);
 
-	std::cout << "Exiting Vision Call" << std::endl;
     return 0;
 }
 
@@ -455,10 +470,13 @@ int CameraCalibration_func() {
     int failures = 0;
     double totalR = 0;
     double totalT = 0;
+    
+    man::vision::VisionModule& module = getModuleRef("");
 
     // Repeat for each log
     for (int i = 0; i < 7; i++) {
-
+        module.reset();
+        
         Log* l = new Log(args[i]);
 
         size_t length = l->data().size();
@@ -473,11 +491,9 @@ int CameraCalibration_func() {
         int height = atoi(l->tree().find("contents")->get(1)->
                                        find("height")->get(1)->value().c_str());
 
-        double rollChange, pitchChange;
+        imageSizeCheck(top, width, height);
         
-        // Init vision module with offsets of 0.0
-        man::vision::VisionModule module(width / 2, height);
-
+        double rollChange, pitchChange;
 
         // Read number of bytes of image, inertials, and joints if exist
         int numBytes[3];
@@ -525,8 +541,16 @@ int CameraCalibration_func() {
         portals::Message<messages::YUVImage> imageMessage(&image);
         portals::Message<messages::JointAngles> jointsMessage(&joints);
 
-        module.topIn.setMessage(imageMessage);
-        module.bottomIn.setMessage(imageMessage);
+        if (top) {
+            portals::Message<messages::YUVImage> emptyMessage(&emptyBot);
+            module.topIn.setMessage(imageMessage);
+            module.bottomIn.setMessage(emptyMessage);
+        } else {
+            portals::Message<messages::YUVImage> emptyMessage(&emptyTop);
+            module.topIn.setMessage(emptyMessage);
+            module.bottomIn.setMessage(imageMessage);
+        }
+        
         module.jointsIn.setMessage(jointsMessage);
 
         module.run();
@@ -731,14 +755,14 @@ std::map<const std::string, man::vision::VisionModule *> vmRefMap;
 
 man::vision::VisionModule& getModuleRef(const std::string robotName) {
     if (vmRefMap.find(robotName) != vmRefMap.end()) {
-        printf("nbcross-getModuleRef REUSING MODULE %s\n",
+        printf("nbcross-getModuleRef REUSING MODULE [%s]\n",
                robotName.c_str() );
 		man::vision::VisionModule* module = vmRefMap[robotName];
 		module->reset();
         return *module;
         
     } else {
-        printf("nbcross-getModuleRef CREATING NEW MODULE %s\n",
+        printf("nbcross-getModuleRef CREATING NEW MODULE [%s]\n",
                robotName.c_str() );
         man::vision::VisionModule * newInst =
             new man::vision::VisionModule(man::vision::DEFAULT_TOP_IMAGE_WIDTH,

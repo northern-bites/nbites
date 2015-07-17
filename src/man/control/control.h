@@ -36,6 +36,7 @@ namespace control {
         VISION,
         
         tripoint,
+        multiball,
         thumbnail,
         
         //Num_flags must be last!  it has int value ( 'previous' + 1)

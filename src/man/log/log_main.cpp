@@ -162,6 +162,7 @@ namespace nblog {
         while (1) {
             sleep(1);
             
+
             if (STREAM_STATS) {
                 NBLog(NBL_SMALL_BUFFER, makeSTATSlog());
             }
