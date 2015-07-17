@@ -326,7 +326,11 @@ bool StarCal::add(const FieldLineList& lines)
   }
 
   // If we didn't find exactly three suitable field lines, fail
-  return fit.area() == 3;
+  if (fit.area() != 3) {
+    std::cout << "Couldn't find three field lines in star log\n";
+    return false;
+  } else
+    return true;
 }
 
 double StarCal::roll()

@@ -101,7 +101,8 @@ def afterKick(player):
         player.brain.nav.goTo(destinationOfKick, precision = nav.GENERAL_AREA,
                               speed = nav.QUICK_SPEED, avoidObstacles = True,
                               fast = True, pb = False)
-    elif player.stateTime > 4:
+
+    if player.stateTime > 4:
         return player.goLater('approachBall')
 
     return player.stay()
