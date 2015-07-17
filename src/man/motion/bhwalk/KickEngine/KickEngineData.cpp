@@ -251,7 +251,7 @@ void KickEngineData::balanceCOM(JointRequestBH& joints, const RobotDimensionsBH&
   }
 
   // Northern bites debugging, for measuring stability
-  // printf("%d, %f, %f\n", phaseNumber, actualDiff.y, comOffset.x);
+  printf("%d %f %f\n", phaseNumber, actualDiff.y, comOffset.x);
 
   lastCom = actualDiff;
 }
