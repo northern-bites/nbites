@@ -38,7 +38,7 @@ void TeamConnect::setUpSocket()
     socket->setBlocking(false);
     socket->setBroadcast(true);
 
-    socket->setTarget(IP_TARGET, TEAM_PORT);
+    socket->setTarget("10.0.255.255", TEAM_PORT);
     socket->bind("", TEAM_PORT); // listen for anything on our port
 }
 
