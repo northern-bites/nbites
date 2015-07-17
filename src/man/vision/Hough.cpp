@@ -523,7 +523,7 @@ void CenterCircleDetector::set()
   minPotentials = 850;
   maxEdgeDistanceSquared = 500 * 500;       // Good practicle distance = 5m
   ccr = CENTER_CIRCLE_RADIUS;               // 75 cm
-  minVotesInMaxBin = 0.18;                  // Conservative clustering theshold
+  minVotesInMaxBin = 0.20;                  // Conservative clustering theshold
   fieldTestDistance = 200;
 
 }
