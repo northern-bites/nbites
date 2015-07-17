@@ -283,7 +283,8 @@ void VisionModule::run_()
 
         PROF_EXIT2(P_VISION_TOP, P_VISION_BOT, i==0)
 #ifdef USE_LOGGING
-        logImage(i);
+        if (centerCircleDetector[i]->on())
+            logImage(i);
 #endif
     }
     double topTotal;
