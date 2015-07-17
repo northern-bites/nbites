@@ -77,7 +77,7 @@ namespace vision {
 	}
 
 	bool Field::isGreen() {
-		if (*(greenImage.pixelAddr(currentX, currentY)) > 200) {
+		if (*(greenImage.pixelAddr(currentX, currentY)) > 138) {
 			return true;
 		}
 		return false;
