@@ -94,15 +94,15 @@ bool VisionSystem::update(ParticleSet& particles,
     // China 2015 hack
     // Loc is sometimes causing cognition thread to overrun, these
     // print outs print when loc took longer than we'd like
-    if (time > 15) {
-        printf("==================\n");
-        printf("LOC TOOK: %f\n", time);
-        printf("With %d observations\n", numObservations);
-        printf("Circle bool: %d\n", vision.circle().on());
-        printf("UseBall bool: %d\n", useBall);
-        printf("NumCorner: %d\n", vision.corner_size());
-        printf("NumLines:  %d\n", vision.line_size());
-    }
+    // if (time > 15) {
+    //     printf("==================\n");
+    //     printf("LOC TOOK: %f\n", time);
+    //     printf("With %d observations\n", numObservations);
+    //     printf("Circle bool: %d\n", vision.circle().on());
+    //     printf("UseBall bool: %d\n", useBall);
+    //     printf("NumCorner: %d\n", vision.corner_size());
+    //     printf("NumLines:  %d\n", vision.line_size());
+    // }
 
     // Normalize the particle weights
     for (iter = particles.begin(); iter != particles.end(); iter++) {
