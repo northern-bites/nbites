@@ -530,7 +530,7 @@ void CenterCircleDetector::set()
 
 bool CenterCircleDetector::detectCenterCircle(EdgeList& edges, Field& field)
 {
-  on(findPotentialsAndCluster(edges, _ccx, _ccy) && onField(field));
+  on(findPotentialsAndCluster(edges, _ccx, _ccy));  // Excluding onField test. Needs debugging.
   return (on());
 }
 
@@ -619,6 +619,7 @@ bool CenterCircleDetector::findPotentialsAndCluster(EdgeList& edges, double& x0,
 
 }
 
+// TODO: debug and enable
 // Project 2 points from CC and check if they are on the field
 bool CenterCircleDetector::onField(Field& field)
 {
