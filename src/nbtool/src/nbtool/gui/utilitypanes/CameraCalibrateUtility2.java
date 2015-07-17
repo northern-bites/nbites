@@ -76,6 +76,8 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	        initComponents();
 	        cameraBox.setSelectedIndex(0);
 	        writeButton.setEnabled(false);
+	        sendButton.setEnabled(false);
+	        switchButton.setEnabled(false);
 	        
 	        writeButton.addActionListener(this);
 	        sendButton.addActionListener(this);
@@ -281,11 +283,13 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	        
 	        writeButton = new JButton();
 	        sendButton = new JButton();
+	        switchButton = new JButton();
 	        
 	        saveContainer = new javax.swing.JPanel();
-	        saveContainer.setLayout(new GridLayout(1,2));
+	        saveContainer.setLayout(new GridLayout(1,3));
 	        saveContainer.add( writeButton );
 	        saveContainer.add( sendButton );
+	        saveContainer.add( switchButton );
 
 	        setTitle("Cheddar's Cool Calibration Utility");
 	        setMinimumSize(new java.awt.Dimension(485, 242));
@@ -300,6 +304,7 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 
 	        writeButton.setText("SAVE");
 	        sendButton.setText("SEND");
+	        switchButton.setText("SWITCH");
 
 	        calcLabel.setText("");
 
@@ -336,7 +341,7 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	                            .addComponent(robotLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 	                            .addComponent(cameraLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 	                            .addGroup(layout.createSequentialGroup()
-	                                .addComponent(saveContainer, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+	                                .addComponent(saveContainer, 400, 400, 400)
 	                                .addGap(0, 0, Short.MAX_VALUE))
 	                            .addComponent(tiltLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
 	                .addContainerGap())
@@ -438,6 +443,7 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	    
 	    private javax.swing.JButton writeButton;
 	    private javax.swing.JButton sendButton;
+	    private javax.swing.JButton switchButton;
 	    private javax.swing.JPanel  saveContainer;
 	    // End of variables declaration                   
 	}
