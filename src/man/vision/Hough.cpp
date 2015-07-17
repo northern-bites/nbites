@@ -187,9 +187,6 @@ void HoughLineList::mapToField(const FieldHomography& h, Field& f)
   for (list<HoughLine>::iterator hl = begin(); hl != end(); ++hl) {
     hl->setField(h);
 
-    std::cout << "TEST" << std::endl;
-    std::cout << hl->index() << std::endl;
-
     // China 2015 hack
     // We require that line is sufficiently below field horizon to be a hough line
     //
@@ -197,23 +194,13 @@ void HoughLineList::mapToField(const FieldHomography& h, Field& f)
     double ep0x, ep0y, ep1x, ep1y;
     hl->field().endPoints(ep0x, ep0y, ep1x, ep1y);
 
-    std::cout << ep0x << std::endl;
-    std::cout << ep0y << std::endl;
-    std::cout << ep1x << std::endl;
-    std::cout << ep1y << std::endl;
-
     double ep0yField, ep1yField;
     bool t1 = f.onField(ep0x, ep0yField); 
     bool t2 = f.onField(ep1x, ep1yField); 
 
-    std::cout << t1 << std::endl;
-    std::cout << t2 << std::endl;
-    std::cout << ep0yField << std::endl;
-    std::cout << ep1yField << std::endl;
-
-    if (fabs(ep0y - ep0yField) < 50)
+    if (!t1 || fabs(ep0y - ep0yField) < 30)
       hl->onField(false);
-    if (fabs(ep1y - ep1yField) < 50)
+    if (!t2 || fabs(ep1y - ep1yField) < 30)
       hl->onField(false);
   }
 
