@@ -452,7 +452,7 @@ void Field::findTopEdges(int M) {
             cur -= step;
             topBlock[j] = (int)cur;
             if (debugDrawFieldEdge) {
-				drawPoint(j, (int)cur, BLACK);
+				drawDot(j, (int)cur, WHITE);
             }
         }
         if (debugDrawFieldEdge) {
