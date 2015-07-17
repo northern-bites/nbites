@@ -42,8 +42,8 @@
  },
  {
  duration = 500 ;
- leftFootTra1 = {x = 0 ; y = -12 ; z = -230 ;};
- leftFootTra2 = {x = 0 ; y = -12 ; z = -230 ;};
+ leftFootTra1 = {x = 0 ; y = -10 ; z = -230 ;};
+ leftFootTra2 = {x = 0 ; y = -10 ; z = -230 ;};
  leftFootRot1 = {x = 0 ; y = 0 ; z = 0 ;};
  leftFootRot2 = {x = 0 ; y = 0 ; z = 0 ;};
  rightFootTra1 = {x = 0 ; y = -125 ; z = -220 ;};
@@ -66,8 +66,8 @@
  },
  {
  duration = 250 ;
- leftFootTra1 = {x = 0 ; y = -13 ; z = -230 ;};
- leftFootTra2 = {x = 0 ; y = -13 ; z = -230 ;};
+ leftFootTra1 = {x = 0 ; y = -10 ; z = -230 ;};
+ leftFootTra2 = {x = 0 ; y = -10 ; z = -230 ;};
  leftFootRot1 = {x = 0 ; y = 0 ; z = 0 ;};
  leftFootRot2 = {x = 0 ; y = 0 ; z = 0 ;};
  rightFootTra1 = {x = 0 ; y = -110 ; z = -200 ;};
@@ -90,8 +90,8 @@
  },
  {
  duration = 500 ;
- leftFootTra1 = {x = 0 ; y = -12 ; z = -230 ;};
- leftFootTra2 = {x = 0 ; y = -12 ; z = -230 ;};
+ leftFootTra1 = {x = 0 ; y = -10 ; z = -230 ;};
+ leftFootTra2 = {x = 0 ; y = -10 ; z = -230 ;};
  leftFootRot1 = {x = 0 ; y = 0 ; z = 0 ;};
  leftFootRot2 = {x = 0 ; y = 0 ; z = 0 ;};
  rightFootTra1 = {x = -90 ; y = -110 ; z = -160 ;};
@@ -114,8 +114,8 @@
  },
  {
  duration = 165 ;
- leftFootTra1 = {x = 0 ; y = -12 ; z = -230 ;};
- leftFootTra2 = {x = 0 ; y = -12 ; z = -230 ;};
+ leftFootTra1 = {x = 0 ; y = -10 ; z = -230 ;};
+ leftFootTra2 = {x = 0 ; y = -10 ; z = -230 ;};
  leftFootRot1 = {x = 0 ; y = 0 ; z = 0 ;};
  leftFootRot2 = {x = 0 ; y = 0 ; z = 0 ;};
  rightFootTra1 = {x = 70.2095 ; y = -110 ; z = -180 ;};
@@ -138,8 +138,8 @@
  },
  {
  duration = 500 ;
- leftFootTra1 = {x = 0 ; y = -12 ; z = -230 ;};
- leftFootTra2 = {x = 0 ; y = -12 ; z = -230 ;};
+ leftFootTra1 = {x = 0 ; y = -10 ; z = -230 ;};
+ leftFootTra2 = {x = 0 ; y = -10 ; z = -230 ;};
  leftFootRot1 = {x = 0 ; y = 0 ; z = 0 ;};
  leftFootRot2 = {x = 0 ; y = 0 ; z = 0 ;};
  rightFootTra1 = {x = -17.6936 ; y = -100 ; z = -180 ;};
