@@ -111,6 +111,10 @@ private:
     // Note: The kick engine output requires state to notify when it's finised.
     WalkingEngineOutputBH walkOutput;
     KickEngineOutput kickOut;
+
+    JointRequestBH request;
+
+    void interpolate(const JointRequestBH& from, const JointRequestBH& to, float toRatio);
     };
 
 static const int ON_STIFF_ARRAY[] =
