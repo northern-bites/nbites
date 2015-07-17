@@ -47,6 +47,7 @@ void HoughLine::set(int rIndex, int tIndex, double r, double t, double score, in
   members = 0;
   fieldLine(-1);
   _index = index;
+  _onField = true;
 }
 
 enum
@@ -181,10 +182,40 @@ string HoughLine::print() const
 // *                   *
 // *********************
 
-void HoughLineList::mapToField(const FieldHomography& h)
+void HoughLineList::mapToField(const FieldHomography& h, Field& f)
 {
-  for (list<HoughLine>::iterator hl = begin(); hl != end(); ++hl)
+  for (list<HoughLine>::iterator hl = begin(); hl != end(); ++hl) {
     hl->setField(h);
+
+    std::cout << "TEST" << std::endl;
+    std::cout << hl->index() << std::endl;
+
+    // China 2015 hack
+    // We require that line is sufficiently below field horizon to be a hough line
+    //
+    // This hack should be eliminated after the competition
+    double ep0x, ep0y, ep1x, ep1y;
+    hl->field().endPoints(ep0x, ep0y, ep1x, ep1y);
+
+    std::cout << ep0x << std::endl;
+    std::cout << ep0y << std::endl;
+    std::cout << ep1x << std::endl;
+    std::cout << ep1y << std::endl;
+
+    double ep0yField, ep1yField;
+    bool t1 = f.onField(ep0x, ep0yField); 
+    bool t2 = f.onField(ep1x, ep1yField); 
+
+    std::cout << t1 << std::endl;
+    std::cout << t2 << std::endl;
+    std::cout << ep0yField << std::endl;
+    std::cout << ep1yField << std::endl;
+
+    if (fabs(ep0y - ep0yField) < 50)
+      hl->onField(false);
+    if (fabs(ep1y - ep1yField) < 50)
+      hl->onField(false);
+  }
 
   _fx0 = -h.wx0();
   _fy0 = -h.wy0();
@@ -681,12 +712,12 @@ void FieldLineList::find(HoughLineList& houghLines, bool blackStar)
   clear();
 
   for (HoughLineList::iterator hl1 = houghLines.begin(); hl1 != houghLines.end(); ++hl1)
-    if (hl1->field().valid())
+    if (hl1->field().valid() && hl1->onField())
     {
       HoughLineList::iterator hl2 = hl1;
       for (++hl2; hl2 != houghLines.end(); ++hl2)
         // Here is the dot product 
-        if (hl2->field().valid() &&
+        if (hl2->field().valid() && hl2->onField() &&
             hl1->field().ux() * hl2->field().ux() + hl1->field().uy() * hl2->field().uy() <= maxCosAngle)
         {
           // We use image coordinates to check polarity. Converting to field 

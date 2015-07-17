@@ -311,7 +311,7 @@ int Vision_func() {
     Log* lineRet = new Log();
     std::string lineBuf;
 
-    bool debugLines = false;
+    bool debugLines = true;
     if (debugLines)
         std::cout << std::endl << "Hough lines in image coordinates:" << std::endl;
 

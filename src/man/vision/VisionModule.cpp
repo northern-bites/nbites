@@ -249,7 +249,7 @@ void VisionModule::run_()
         times[i][5] = timer.end();
 
         // Find world coordinates for hough lines
-        houghLines[i]->mapToField(*(homography[i]));
+        houghLines[i]->mapToField(*(homography[i]), *field);
         times[i][6] = timer.end();
 
         // Find world coordinates for rejected edges
