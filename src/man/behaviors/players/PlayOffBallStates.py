@@ -4,6 +4,7 @@ import RoleConstants as role
 import ChaseBallTransitions as chase
 import ChaseBallConstants as chaseConstants
 import ClaimTransitions as claims
+import RoleSwitchingTransitions as roleTransitions
 from SupporterConstants import getSupporterPosition, CHASER_DISTANCE, findStrikerHome, findDefenderHome, calculateHomePosition
 import noggin_constants as NogginConstants
 from ..navigator import Navigator as nav
@@ -50,6 +51,8 @@ def positionAtHome(player):
 @superState('playOffBall')
 @stay
 @ifSwitchNow(transitions.shouldSpinSearchFromWatching, 'spinAtHome')
+# @ifSwitchNow(roleTransitions.roleOverlap, 'switchRoles')
+# @ifSwitchNow(roleTransitions.offenseMissing, 'switchRoles')
 def watchForBall(player):
     """
     The player is at home, waiting for the ball to be within box.

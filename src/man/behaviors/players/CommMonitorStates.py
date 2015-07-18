@@ -31,7 +31,8 @@ def commMonitor(player):
         RoleConstants.oddDefenderBox = RoleConstants.defenderBox
         RoleConstants.evenDefenderBox = RoleConstants.defenderBox
         RoleConstants.setRoleConstants(player, player.role)
-        player.roleSwitching = False
+        if not player.dropIn:
+            player.roleSwitching = False
         player.commMode = 2
     elif not player.brain.game.have_remote_gc and player.commMode != 1 and transitions.mediocreComm(player):
         print "Switched to mediocre comm mode!"
@@ -41,7 +42,8 @@ def commMonitor(player):
         RoleConstants.oddDefenderBox = RoleConstants.defenderBox
         RoleConstants.evenDefenderBox = RoleConstants.defenderBox
         RoleConstants.setRoleConstants(player, player.role)
-        player.roleSwitching = False
+        if not player.dropIn:
+            player.roleSwitching = False
         player.commMode = 1
     elif player.commMode != 0 and transitions.goodComm(player):
         print "Switched to good comm mode!"

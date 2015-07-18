@@ -18,12 +18,17 @@ def shouldReturnHome(player):
     """
     The ball is no longer our responsibility. Go home.
     player.buffBoxFiltered is a CountTransition, see approachBall.
-
+ 
     If the ball IS in our box, check the claims for a higher priority claim
     """
+
     if player.buffBoxFiltered.checkCondition(player):
         player.claimedBall = False
         return True;
+    
+    #For  Dropin player! 
+    if player.dropIn:
+        return claimTrans.shouldGiveUpBall(player)
 
     return claimTrans.shouldCedeClaim(player)
 
@@ -35,6 +40,10 @@ def shouldSupport(player):
     if not player.brain.motion.calibrated:
         player.claimedBall = False
         return False
+    # for drop in
+    
+    if player.dropIn:
+        return player.brain.ball.vis.frames_on and claimTrans.shouldGiveUpBall(player)
         
     return player.brain.ball.vis.frames_on and claimTrans.shouldCedeClaim(player)
 

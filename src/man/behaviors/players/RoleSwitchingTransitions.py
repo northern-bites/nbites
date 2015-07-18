@@ -3,7 +3,7 @@ import RoleConstants as constants
 def chaserIsOut(player):
     """
     There is a chaser spot ready to be filled.
-    """
+    
     if not player.roleSwitching or player.brain.gameController.penalized:
         return False
 
@@ -12,22 +12,22 @@ def chaserIsOut(player):
 
     checkForConsistency(player)
 
-    if constants.canRoleSwitchTo(player.role):
+    if constants.canRoleSwitchTo(player.intention):
         return False
 
     openPositions = ()
     positions = [False, False, False, False]
     for mate in player.brain.teamMembers:
-        if mate.role <= 1:
+        if mate.intention <= 1:
             continue
         if mate.frameSinceActive < 30:
-            positions[mate.role - 2] = True
+            positions[mate.intention - 2] = True
         if mate.playerNumber == player.brain.playerNumber:
             continue
-        if constants.canRoleSwitchTo(mate.role) and mate.frameSinceActive > 30:
-            openPositions += (mate.role,)
+        if constants.canRoleSwitchTo(mate.intention) and mate.frameSinceActive > 30:
+            openPositions += (mate.intention,)
 
-        if constants.willRoleSwitch(mate.role) \
+        if constants.willRoleSwitch(mate.intention) \
                 and mate.playerNumber > player.brain.playerNumber \
                 and (mate.frameSinceActive < 30 or not mate.active):
             return False # Active, higher numbered player takes precedence
@@ -39,6 +39,8 @@ def chaserIsOut(player):
             print "Switching to role: ", pos
             return True
 
+    """
+
     return False
 
 
@@ -48,35 +50,120 @@ def checkForConsistency(player):
     a lower playerNumber then we change. Otherwise we assume that they will
     fix the issue. Very similar in structure to determineRole in penalty states.
     """
-    if not player.roleSwitching:
-        return
 
-    openSpaces = [True, True, True, True]
-    conflict = False
-    position = 0
+    # if not player.roleSwitching:
+    #     return
+
+    # openSpaces = [True, True, True, True]
+    # conflict = False
+    # position = 0
+
+    # for mate in player.brain.teamMembers:
+    #     if mate.playerNumber == player.brain.playerNumber:
+    #         continue
+    #     openSpaces[mate.intention - 2] = False
+    #     if mate.intention == player.intention \
+    #             and mate.playerNumber > player.brain.playerNumber \
+    #             and mate.frameSinceActive < 30:
+    #         conflict = True
+
+    # if not conflict:
+    #     return # The expected outcome
+
+    # for i in range(3):
+    #     if openSpaces[i] and constants.canRoleSwitchTo(i+2):
+    #         constants.setRoleConstants(player, i+2)
+    #         return
+    #     elif openSpaces[i]:
+    #         position = i+2
+
+    # if position == 0:
+    #     print "We have conflicting role AND there are no more open roles..."
+
+    # constants.setRoleConstants(player, position)
+
+    return
+
+
+
+### DROP IN PLAYER ONLY ###
+
+#Can be replaced with constants.twoAttackersOnField?
+def offenseMissing(player):
+    """
+    There is a chaser/striker spot ready to be filled
+    
+
+    if not player.dropIn:
+        return False
+
+    if not player.roleSwitching or player.brain.gameController.penalized:
+        return False
+
+    if not player.gameState == "gamePlaying":
+        return False
+
+    if constants.isChaser(player.intention):
+        return False
+
+    numAttackers = 0
+    for mate in player.brain.teamMembers:
+        print "player number", mate.playerNumber, "player role", mate.intention
+        if constants.isChaser(player.role):
+            numAttackers += 1
+
+    print "Number of players on offense:", numAttackers
+
+    if numAttackers < 2:
+        player.role = 4
+        return True
+
+    """
+
+    return False
+
+def roleOverlap(player):
+    """
+    Returns true if there are more than two players on offense/defense.
+    
+    print "Entered roleOverlap."
+
+    if not player.dropIn:
+        return False
+
+    if not player.roleSwitching or player.brain.gameController.penalized:
+        return False
+
+    if not player.gameState == "gamePlaying":
+        return False
+
+    numAttackers = 0
+    numDefenders = 0
 
     for mate in player.brain.teamMembers:
-        if mate.playerNumber == player.brain.playerNumber:
-            continue
-        openSpaces[mate.role - 2] = False
-        if mate.role == player.role \
-                and mate.playerNumber > player.brain.playerNumber \
-                and mate.frameSinceActive < 30:
-            conflict = True
+        print "player number", mate.playerNumber, "player role", mate.intention
+        if constants.isChaser(mate.intention):
+            numAttackers += 1
+        elif constants.isDefender(mate.intention):
+            numDefenders += 1
 
-    if not conflict:
-        return # The expected outcome
+    if numAttackers > 2 and constants.isChaser(player.role):
+        print "numAttackers is", numAttackers
+        player.role = 3
+        return True
 
-    for i in range(3):
-        if openSpaces[i] and constants.canRoleSwitchTo(i+2):
-            constants.setRoleConstants(player, i+2)
-            return
-        elif openSpaces[i]:
-            position = i+2
+    if numDefenders > 2 and constants.isDefender(player.role):
+        print "numDefenders is", numDefenders
+        player.role = 4
+        return True
 
-    if position == 0:
-        print "We have conflicting role AND there are no more open roles..."
+    print "Exiting overlap without role switching."
+    """
+    
+    return False
 
-    constants.setRoleConstants(player, position)
+def switchToRole(player, role):
+    # print "Switching to role", role
+    # constants.setRoleConstants(player, role)
     return
 

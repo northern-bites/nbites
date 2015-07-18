@@ -11,7 +11,8 @@ start() {
   ifconfig wlan0 up
   wpa_supplicant -iwlan0 -Dnl80211 -c/etc/wpa_supplicant/wpa_supplicant.conf -B
   sleep 1
-  dhclient wlan0
+#  dhclient wlan0
+  ifconfig wlan0 10.0.14.1 netmask 255.255.0.0
 }
 
 stop() {

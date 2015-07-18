@@ -38,7 +38,7 @@ void TeamConnect::setUpSocket()
     socket->setBlocking(false);
     socket->setBroadcast(true);
 
-    socket->setTarget(IP_TARGET, TEAM_PORT);
+    socket->setTarget("10.0.255.255", TEAM_PORT);
     socket->bind("", TEAM_PORT); // listen for anything on our port
 }
 
@@ -101,6 +101,18 @@ PROF_ENTER(P_COMM_BUILD_PACKET);
 
     splMessage.ballVel[0] = model.ball_vel_x()*CM_TO_MM;
     splMessage.ballVel[1] = model.ball_vel_y()*CM_TO_MM;
+    
+    /* MISSING FIELDS for HeFei 2015 */
+    splMessage.averageWalkSpeed = 100;   //100 mm/second
+    splMessage.maxKickDistance = 1000;   //1 meter
+    splMessage.currentPositionConfidence = 0;
+    splMessage.currentSideConfidence = 0;
+    
+    for (int i = 0; i < SPL_STANDARD_MESSAGE_MAX_NUM_OF_PLAYERS; ++i) {
+        splMessage.suggestion[i] = 0;   //default, no meaning
+    }
+    
+    splMessage.intention = model.intention();   //default, no meaning
 
 PROF_EXIT(P_COMM_BUILD_PACKET);
 
@@ -136,7 +148,8 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
     {
         // initial setup
         struct SPLStandardMessage splMessage;
-        memset(&splMessage, 0, sizeof(SPLStandardMessage)); // @TODO: neccessary?
+        //declared on stack, init all fields to 0
+        memset(&splMessage, 0, sizeof(SPLStandardMessage));
 
         // actually check socket
         result = socket->receive((char*) &splMessage, sizeof(SPLStandardMessage));
@@ -218,7 +231,8 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
         message->set_in_kicking_state(splMessage.pose[0] != splMessage.shootingTo[0] ||
                                       splMessage.pose[1] != splMessage.shootingTo[1]);
         message->set_role(6);
-
+        message->set_intention(splMessage.intention);
+        
         // so that behaviors actually processes world model
         message->set_active(true);
 #else

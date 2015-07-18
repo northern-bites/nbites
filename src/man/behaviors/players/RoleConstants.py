@@ -86,6 +86,7 @@ def twoAttackersOnField(player):
             secondAttacker = True
     
     return firstAttacker and secondAttacker
+    
 
 ### RANDOM STUFF
 isKickingOff = False # Default is false, changed by pBrunswick or some other if

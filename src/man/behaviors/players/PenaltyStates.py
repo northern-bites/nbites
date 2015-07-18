@@ -98,6 +98,7 @@ def determineRole(player):
         if openSpaces[i] and roleConstants.canRoleSwitchTo(i+2):
             roleConstants.setRoleConstants(player, i+2)
             return player.goLater(player.gameState)
+            
         elif openSpaces[i]:
             position = i+2
 
@@ -106,4 +107,3 @@ def determineRole(player):
 
     roleConstants.setRoleConstants(player, i+2)
     return player.goLater(player.gameState)
-

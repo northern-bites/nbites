@@ -75,6 +75,10 @@ def goToPosition(nav):
                                     HEADING_ADAPT_CUTOFF,
                                     MAX_TURN)
 
+        goToPosition.speed = nav.velocity
+        if fabs(nav.requestVelocity - nav.velocity) > Navigator.SPEED_CHANGE:
+            nav.velocity += copysign(Navigator.SPEED_CHANGE, (nav.requestVelocity - nav.velocity))
+
         if relDest.relX >= DISTANCE_ADAPT_CUTOFF:
             velX = goToPosition.speed
         elif relDest.relX <= -DISTANCE_ADAPT_CUTOFF:

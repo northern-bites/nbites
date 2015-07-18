@@ -67,6 +67,10 @@ def shouldApproachBall(player):
     if ballNotInBox(player):
         player.claimedBall = False
         return False
+    # DROPIN
+    if player.dropIn:
+        if claimTransitions.shouldGiveUpBall(player):
+            return False
 
     if claimTransitions.shouldCedeClaim(player):
         return False
@@ -96,11 +100,22 @@ def shouldBeSupporter(player):
     if not player.brain.motion.calibrated:
         player.claimedBall = False
         return False
+
+    # DROPIN
+    if player.dropIn:
+        return (ballInBox(player) and
+            claimTransitions.shouldGiveUpBall(player))
         
     return (ballInBox(player) and
             claimTransitions.shouldCedeClaim(player))
+
+def missingPlayers(player):
+    print "number of teammates", player.brain.activeTeamMates()
+    if player.brain.activeTeamMates() < 5:
+        return True
 
 def shouldNotBeSupporter(player):
     if role.isChaser(player.role):
         return shared.ballOffForNFrames(120)
     return not shouldBeSupporter(player)
+

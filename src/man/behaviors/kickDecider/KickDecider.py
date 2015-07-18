@@ -552,6 +552,7 @@ class KickDecider(object):
             return asap
         
         print "Using frontKickCrosses"
+        
         return self.frontKickCrosses()
 
     def defender(self):
