@@ -100,7 +100,6 @@ public:
 	void setDebugFieldEdge(bool debug) {debugFieldEdge = debug;}
 	void setDrawFieldHorizon(bool debug) {debugDrawFieldEdge = debug;}
 	void setDrawCameraHorizon(bool debug) {drawCameraHorizon = debug;}
-	void setGreenThresh(int gt) {greenThresh = gt; }
 #endif
 
 private:
@@ -129,13 +128,11 @@ private:
     bool debugFieldEdge;
 	bool debugDrawFieldEdge;
 	bool drawCameraHorizon;
-	int greenThresh;
 #else
     static const bool debugHorizon = false;
     static const bool debugFieldEdge = false;
 	static const bool debugDrawFieldEdge = false;
 	static const bool drawCameraHorizon = false;
-	static const int greenThresh = 128;
 #endif
 };
 

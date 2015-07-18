@@ -77,7 +77,7 @@ namespace vision {
 	}
 
 	bool Field::isGreen() {
-		if (*(greenImage.pixelAddr(currentX, currentY)) > 220) {
+		if (*(greenImage.pixelAddr(currentX, currentY)) > 138) {
 			return true;
 		}
 		return false;
@@ -420,6 +420,7 @@ void Field::findTopEdges(int M) {
             }
         }
         if (debugDrawFieldEdge) {
+			cout << "Calling drawline" << endl;
             drawLine(convex[i-1].x, convex[i-1].y, convex[i].x,
 					 convex[i].y, ORANGE);
         }
@@ -452,7 +453,7 @@ void Field::findTopEdges(int M) {
             cur -= step;
             topBlock[j] = (int)cur;
             if (debugDrawFieldEdge) {
-				drawPoint(j, (int)cur, BLACK);
+				drawDot(j, (int)cur, WHITE);
             }
         }
         if (debugDrawFieldEdge) {
