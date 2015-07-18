@@ -55,7 +55,10 @@ void imageSizeCheck(bool top, int width, int height) {
     }
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> northern-bites/master
 //robotName may be empty ("").
 man::vision::VisionModule& getModuleRef(const std::string robotName);
 
@@ -445,6 +448,7 @@ int Vision_func() {
     ccdRet->setData(pointsBuf);
     rets.push_back(ccdRet);
 
+	std::cout << "Debug image" << std::endl;
     //-------------------
     //  DEBUG IMAGE
     //-------------------

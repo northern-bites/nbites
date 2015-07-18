@@ -6,15 +6,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.util.Vector;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -109,8 +104,12 @@ public class WorldViewUtility extends UtilityParent {
 				if(tb.dataTeamPacket.getTeamNumber() == teamNumber) {
 					int index = tb.dataTeamPacket.getPlayerNumber() - 1;
 					if (index >= 0 && index < robots.length) {
-						robots[tb.dataTeamPacket.getPlayerNumber()-1] = new NaoRobot();
-						robots[tb.dataTeamPacket.getPlayerNumber()-1].wvNao(tb);
+						if(tb.dataWorldModel.getActive()) {
+							robots[tb.dataTeamPacket.getPlayerNumber()-1] = new NaoRobot();
+							robots[tb.dataTeamPacket.getPlayerNumber()-1].wvNao(tb);
+						} else {
+							robots[tb.dataTeamPacket.getPlayerNumber()-1] = null;
+						}
 						/* shared ball off for now
 						if(index == 3 || index == 4) {
 							robots[tb.dataTeamPacket.getPlayerNumber()-1].wvSharedBall(tb);
@@ -152,20 +151,17 @@ public class WorldViewUtility extends UtilityParent {
 			flip.addActionListener(this);
 			flip.setAlignmentX(Component.LEFT_ALIGNMENT);
 			flip.setEnabled(true);
-			//flip.setBounds((int)FieldConstants.FIELD_GREEN_WIDTH,10,200,25);
 			accessories.add(flip);
 			
 			teamNumberInput = new JTextField("0",2);
 			teamNumberInput.setMaximumSize(new Dimension(Short.MAX_VALUE, teamNumberInput.getPreferredSize().height));
 			teamNumberInput.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-			//teamNumberInput.setBounds((int)FieldConstants.FIELD_GREEN_WIDTH, 40, 200, 25);
 			accessories.add(teamNumberInput);
 			
 			startWorldView = new JButton("Start WorldView");
 			startWorldView.addActionListener(this);
 			startWorldView.setAlignmentX(Component.LEFT_ALIGNMENT);
-			//startWorldView.setBounds((int)FieldConstants.FIELD_GREEN_WIDTH,70,200,25);
 			accessories.add(startWorldView);
 			
 			JLabel robotStates = new JLabel("Robot States");
@@ -189,19 +185,23 @@ public class WorldViewUtility extends UtilityParent {
 		private void updateTeamInfo(TeamBroadcast tb) {
 			int role = tb.dataWorldModel.getRole();
 			int playerNum = tb.dataTeamPacket.getPlayerNumber();
-			switch (role) {
-				case 1:playerRoles[playerNum-1] = "Goalie";
-					break;
-				case 2:playerRoles[playerNum-1] = "Defender #1";
-					break;
-				case 3:playerRoles[playerNum-1] = "Defender #2";
-					break;
-				case 4:playerRoles[playerNum-1] = "Chaser #1";
-					break;
-				case 5:playerRoles[playerNum-1] = "Chaser #2";
-					break;
+			if(!tb.dataWorldModel.getActive()) {
+				teamInfo[playerNum-1].setText("Player "+(playerNum)+": Penalized");
+			} else {
+				switch (role) {
+					case 1:playerRoles[playerNum-1] = "Goalie";
+						break;
+					case 2:playerRoles[playerNum-1] = "Defender #1";
+						break;
+					case 3:playerRoles[playerNum-1] = "Defender #2";
+						break;
+					case 4:playerRoles[playerNum-1] = "Chaser #1";
+						break;
+					case 5:playerRoles[playerNum-1] = "Chaser #2";
+						break;
+				}
+				teamInfo[playerNum-1].setText("Player "+(playerNum)+": "+playerRoles[playerNum-1]);
 			}
-			teamInfo[playerNum-1].setText("Player "+(playerNum)+": "+playerRoles[playerNum-1]);
 		}
 		
 		JPanel fieldDisplay;
@@ -248,6 +248,7 @@ public class WorldViewUtility extends UtilityParent {
 				Logger.infof("Stopped Listening to team %s", teamNumber);
 				for(int i=0; i<robots.length; i++) {
 					robots[i] = null;
+					teamInfo[i].setText("Player "+(i+1)+": Inactive");
 				}
 			}
 		}

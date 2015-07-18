@@ -128,12 +128,13 @@ VisionModule::~VisionModule()
         delete homography[i];
         delete fieldLines[i];
 		delete debugImage[i];
-		delete debugSpace[i];
+		//delete debugSpace[i];
         delete boxDetector[i];
         delete cornerDetector[i];
         delete centerCircleDetector[i];
         delete ballDetector[i];
     }
+	delete field;
 }
 
     int overrun = 0;
@@ -336,6 +337,7 @@ void VisionModule::run_()
 
     PROF_ENTER(P_OBSTACLE)
     updateObstacleBox();
+
     PROF_EXIT(P_OBSTACLE)
 
     PROF_EXIT(P_VISION);
@@ -343,14 +345,30 @@ void VisionModule::run_()
 
 void VisionModule::outportalVisionField()
 {
+    // Mark repeat lines (already found in bottom camera) in top camera
+    for (int i = 0; i < fieldLines[0]->size(); i++) {
+        for (int j = 0; j < fieldLines[1]->size(); j++) {
+            FieldLine& topField = (*(fieldLines[0]))[i];
+            FieldLine& botField = (*(fieldLines[1]))[j];
+            for (int k = 0; k < 2; k++) {
+                const GeoLine& topGeo = topField[k].field();
+                const GeoLine& botGeo = botField[k].field();
+                if (topGeo.error(botGeo) < 0.001) // TODO constant
+                    (*(fieldLines[0]))[i].repeat(true);
+            }
+        }
+    }
+    // Outportal results
+    // NOTE repeats are not outportaled
     messages::Vision visionField;
 
     // (1) Outportal lines
     // NOTE repeats (in top and bottom camera) are outportaled
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < fieldLines[i]->size(); j++) {
-            messages::FieldLine* pLine = visionField.add_line();
             FieldLine& line = (*(fieldLines[i]))[j];
+            if (line.repeat()) continue;
+            messages::FieldLine* pLine = visionField.add_line();
 
             for (int k = 0; k < 2; k++) {
                 messages::HoughLine pHough;
@@ -393,12 +411,14 @@ void VisionModule::outportalVisionField()
             pCorner->set_id(static_cast<int>(corner.id));
             pCorner->set_line1(static_cast<int>(corner.first->index()));
             pCorner->set_line2(static_cast<int>(corner.second->index()));
+            pCorner->set_wz0(homography[i]->wz0());
         }
     }
 
     // (3) Outportal Center Circle
     messages::CenterCircle* cc = visionField.mutable_circle(); 
     cc->set_on(centerCircleDetector[0]->on());
+    cc->set_wz0(homography[0]->wz0());
 
     // Rotate to post vision relative robot coordinate system
     double rotatedX, rotatedY;
@@ -433,6 +453,7 @@ void VisionModule::outportalVisionField()
     vb->set_frames_on(ballOnCount);
     vb->set_frames_off(ballOffCount);
     vb->set_intopcam(top);
+    vb->set_wz0(homography[!top]->wz0());
 
     if (ballOn)
     {
@@ -454,6 +475,8 @@ void VisionModule::outportalVisionField()
         vb->set_x(static_cast<int>(best.blob.centerX()));
         vb->set_y(static_cast<int>(best.blob.centerY()));
     }
+
+    visionField.set_horizon_dist(field->horizonDist());
 
     // Send
     portals::Message<messages::Vision> visionOutMessage(&visionField);
@@ -518,6 +541,8 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
 		field->setDebugFieldEdge(debugField);
 		ballDetector[0]->setDebugBall(debugBall);
 		ballDetector[1]->setDebugBall(debugBall);
+		debugImage[0]->reset();
+		debugImage[1]->reset();
 	}
 #endif
 

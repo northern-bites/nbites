@@ -11,6 +11,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
+import javax.swing.event.*;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionEvent;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JCheckBox;
+import javax.swing.JSlider;
 import javax.swing.JPanel;
 import java.awt.GridLayout;
 
@@ -32,6 +34,7 @@ import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.images.DebugImage;
 import nbtool.images.Y8image;
 import nbtool.images.EdgeImage;
+import nbtool.images.Y8ThreshImage;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.io.CrossIO;
@@ -41,7 +44,7 @@ import nbtool.io.CrossIO.CrossCall;
 import nbtool.util.Utility;
 
 public class DebugImageView extends ViewParent
-	implements IOFirstResponder, ActionListener {
+	implements IOFirstResponder, ActionListener, ChangeListener {
 
 	// Values according to nbcross/vision_defs.cpp - must be kept in sync
 	static final int YIMAGE = 0;
@@ -54,7 +57,8 @@ public class DebugImageView extends ViewParent
 	static final int BALL_IMAGE = 7;
 	static final int CENTER_CIRCLE = 8;
 	static final int DRAWING = 9;
-	static final int ORIGINAL = 10;
+	static final int THRESH = 10;
+	static final int ORIGINAL = 11;
 
 	static final int DEFAULT_WIDTH = 320;
 	static final int DEFAULT_HEIGHT = 240;
@@ -65,19 +69,12 @@ public class DebugImageView extends ViewParent
 	static final int FIELDH = 554;
 
 	// Images that we can view in this view using the combo box
-	String[] imageViews = { "Original", "Green", "Orange", "White", "Edge" };
+	String[] imageViews = { "Original", "Green", "Orange", "White", "Edge", "Thresh" };
 	JComboBox viewList;
-	JPanel checkBoxPanel;
-	JCheckBox showCameraHorizon;
-	JCheckBox showFieldHorizon;
-	JCheckBox debugHorizon;
-	JCheckBox debugFieldEdge;
-	JCheckBox debugBall;
-	JCheckBox showFieldLines;
-	CheckBoxListener checkListener = null;
 
-	boolean displayFieldLines;
-	boolean drawAllBalls;
+	JSlider greenThreshold;
+	ChangeListener sliderListener;
+	static int thresh = 128;
 
 	static final int NUMBER_OF_PARAMS = 5; // update as new params are added
 	static int displayParams[] = new int[NUMBER_OF_PARAMS];
@@ -97,15 +94,17 @@ public class DebugImageView extends ViewParent
     DebugImage debugImage;                  // drawing overlay
 	BufferedImage debugImageDisplay;        // overlay + original
 	BufferedImage displayImages[] = new BufferedImage[ORIGINAL+1]; // our images
+	Y8ThreshImage greenCheck;
 
 	Log currentLog;
 	Log balls;
 
 	static int currentBottom;  // track current selection
 	static boolean firstLoad = true;
-	boolean newLog = true;
+	boolean newLogLoaded = true;
 
 	boolean parametersNeedSetting = false;
+	static PersistantStuff persistant;
 
     public DebugImageView() {
         super();
@@ -115,54 +114,21 @@ public class DebugImageView extends ViewParent
 		viewList.setSelectedIndex(0);
 		viewList.addActionListener(this);
 
-		// set up check boxes
-		checkListener = new CheckBoxListener();
-		showCameraHorizon = new JCheckBox("Show camera horizon");
-		showFieldHorizon = new JCheckBox("Show field convex hull");
-		debugHorizon = new JCheckBox("Debug Field Horizon");
-		debugFieldEdge = new JCheckBox("Debug Field Edge");
-		debugBall = new JCheckBox("Debug Ball");
-		showFieldLines = new JCheckBox("Hide Field Lines");
-		displayFieldLines = true;
-		drawAllBalls = false;
+		// set up slider
+		greenThreshold = new JSlider(JSlider.HORIZONTAL, 128, 220, thresh);
+		greenThreshold.addChangeListener(this);
+		greenThreshold.setMajorTickSpacing(10);
+		greenThreshold.setMinorTickSpacing(1);
+		greenThreshold.setPaintTicks(true);
+		greenThreshold.setPaintLabels(true);
 
-		// add their listeners
-		showCameraHorizon.addItemListener(checkListener);
-		showFieldHorizon.addItemListener(checkListener);
-		debugHorizon.addItemListener(checkListener);
-		debugFieldEdge.addItemListener(checkListener);
-		debugBall.addItemListener(checkListener);
-		showFieldLines.addItemListener(checkListener);
-
-		// put them into one panel
-		checkBoxPanel = new JPanel();
-		checkBoxPanel.setLayout(new GridLayout(0, 1)); // 0 rows, 1 column
-		checkBoxPanel.add(showCameraHorizon);
-		checkBoxPanel.add(showFieldHorizon);
-		checkBoxPanel.add(debugHorizon);
-		checkBoxPanel.add(debugFieldEdge);
-		checkBoxPanel.add(debugBall);
-		checkBoxPanel.add(showFieldLines);
-
-		add(checkBoxPanel);
 		add(viewList);
-
+		add(greenThreshold);
         this.addMouseListener(new DistanceGetter());
 
-		// default all checkboxes to false
-		showCameraHorizon.setSelected(false);
-		showFieldHorizon.setSelected(false);
-		debugHorizon.setSelected(false);
-		debugFieldEdge.setSelected(false);
-		debugBall.setSelected(false);
-		showFieldLines.setSelected(false);
-
-		// for now do not bother trying to save params across instances
-		for (int i = 0; i < NUMBER_OF_PARAMS; i++) {
-			displayParams[i] = 0;
-		}
 		// default image to display - save across instances
 		if (firstLoad) {
+			persistant = new PersistantStuff(this);
 			for (int i = 0; i < NUMBER_OF_PARAMS; i++) {
 				displayParams[i] = 0;
 			}
@@ -171,16 +137,11 @@ public class DebugImageView extends ViewParent
 			currentBottom = ORIGINAL;
 		} else {
 			System.out.println("Reloading");
-			// Ideally we'd do our debug drawing right away,
-			// but this isn't easily possible until we shift
-			// the tool to doing a single VisionModule instance
-			/*for (int i = 0; i < NUMBER_OF_PARAMS; i++) {
-				if (displayParams[i] != 0) {
-					parametersNeedSetting = true;
-					break;
-				}
-				}*/
+			newLogLoaded = true;
+			persistant.setParent(this);
+			//adjustParams();
 		}
+		add(persistant);
     }
 
     @Override
@@ -226,7 +187,7 @@ public class DebugImageView extends ViewParent
     public void adjustParams() {
 
         // Don't make an extra initial call
-        if (newLog) {
+        if (newLogLoaded) {
 			System.out.println("Skipping parameter adjustments");
             return;
 		}
@@ -237,6 +198,7 @@ public class DebugImageView extends ViewParent
 										SExpr.newKeyValue("DebugHorizon", displayParams[2]),
 										SExpr.newKeyValue("DebugField", displayParams[3]),
 										SExpr.newKeyValue("DebugBall", displayParams[4]));
+
 
         // Look for existing Params atom in current this.log description
         SExpr oldParams = currentLog.tree().find("DebugDrawing");
@@ -249,7 +211,7 @@ public class DebugImageView extends ViewParent
         }
 
         rerunLog();
-		repaint();
+		//repaint();
     }
 
 
@@ -259,15 +221,13 @@ public class DebugImageView extends ViewParent
             g.drawImage(debugImageDisplay, 0, 0, displayw, displayh, null);
 			drawLines(g);
 			drawBlobs(g);
+			//displayImages[THRESH].setThresh(persistant.greenThreshold);
 			g.drawImage(displayImages[currentBottom], 0, displayh + 5, displayw,
 						displayh, null);
 			viewList.setBounds(0, displayh * 2 + 10, displayw / 2, BOX_HEIGHT);
-			// TODO: figure out how to make this consistently display
-			// The problem has to do with repaint and the fact that Java
-			// treats it as a low priority request. Sometimes it will just
-			// take its sweet time because it doesn't think anything has changed
-			checkBoxPanel.setBounds(displayw+10, 0, displayw, displayh);
-			checkBoxPanel.show();
+			greenThreshold.setBounds(0, displayh*2 + 15 + BOX_HEIGHT, displayw, BOX_HEIGHT+20);
+			greenThreshold.repaint();
+			persistant.setBounds(displayw+10, 0, 400, 300);
         }
     }
 
@@ -276,7 +236,7 @@ public class DebugImageView extends ViewParent
 	public void drawLines(Graphics g) {
 		// This code stolen from LineView.java
 		// TODO: obviously this should be moved into its own function
-		if (displayFieldLines) {
+		if (persistant != null && persistant.displayFieldLines) {
 			for (int i = 0; i < lines.size(); i += 10) {
 				double icR = lines.get(i);
 				double icT = lines.get(i + 1);
@@ -347,7 +307,7 @@ public class DebugImageView extends ViewParent
 					break;
 				}
 				SExpr blob = bl.get(1);
-				if (drawAllBalls) {
+				if (persistant != null && persistant.drawAllBalls) {
 					drawBlob(graph, blob);
 				}
 			}
@@ -442,10 +402,27 @@ public class DebugImageView extends ViewParent
 			currentBottom = EDGE_IMAGE;
 		} else if (viewName == "Original") {
 			currentBottom = ORIGINAL;
+		} else if (viewName == "Thresh") {
+			currentBottom = THRESH;
 		} else {
 			currentBottom = ORIGINAL;
 		}
 		repaint();
+	}
+
+	public void stateChanged(ChangeEvent e) {
+		JSlider source = (JSlider)e.getSource();
+		if (!source.getValueIsAdjusting()) {
+			thresh = (int)source.getValue();
+			System.out.println("New value is "+thresh);
+			greenCheck.setThresh(thresh);
+			displayImages[THRESH] = greenCheck.toBufferedImage();
+			if (currentBottom == THRESH) {
+				repaint();
+			}
+		}
+		//parent.adjustParams();
+		//parent.repaint();
 	}
 
     class DistanceGetter implements MouseListener {
@@ -466,7 +443,63 @@ public class DebugImageView extends ViewParent
       public void mouseExited(MouseEvent e) {}
     }
 
-	class CheckBoxListener implements ItemListener {
+	class PersistantStuff extends JPanel
+		implements ItemListener {
+		JPanel checkBoxPanel;
+		JCheckBox showCameraHorizon;
+		JCheckBox showFieldHorizon;
+		JCheckBox debugHorizon;
+		JCheckBox debugFieldEdge;
+		JCheckBox debugBall;
+		JCheckBox showFieldLines;
+		boolean displayFieldLines;
+		boolean drawAllBalls;
+		DebugImageView parent;
+
+		PersistantStuff(DebugImageView p) {
+			parent = p;
+			// set up check boxes
+			showCameraHorizon = new JCheckBox("Show camera horizon");
+			showFieldHorizon = new JCheckBox("Show field convex hull");
+			debugHorizon = new JCheckBox("Debug Field Horizon");
+			debugFieldEdge = new JCheckBox("Debug Field Edge");
+			debugBall = new JCheckBox("Debug Ball");
+			showFieldLines = new JCheckBox("Hide Field Lines");
+
+			// add their listeners
+			showCameraHorizon.addItemListener(this);
+			showFieldHorizon.addItemListener(this);
+			debugHorizon.addItemListener(this);
+			debugFieldEdge.addItemListener(this);
+			debugBall.addItemListener(this);
+			showFieldLines.addItemListener(this);
+
+			// put them into one panel
+			checkBoxPanel = new JPanel();
+			checkBoxPanel.setLayout(new GridLayout(0, 1)); // 0 rows, 1 column
+			checkBoxPanel.add(showCameraHorizon);
+			checkBoxPanel.add(showFieldHorizon);
+			checkBoxPanel.add(debugHorizon);
+			checkBoxPanel.add(debugFieldEdge);
+			checkBoxPanel.add(debugBall);
+			checkBoxPanel.add(showFieldLines);
+
+			// default all checkboxes to false
+			showCameraHorizon.setSelected(false);
+			showFieldHorizon.setSelected(false);
+			debugHorizon.setSelected(false);
+			debugFieldEdge.setSelected(false);
+			debugBall.setSelected(false);
+			showFieldLines.setSelected(false);
+
+			add(checkBoxPanel);
+			setSize(300, 300);
+		}
+
+		public void setParent(DebugImageView p) {
+			parent = p;
+		}
+
 		public void itemStateChanged(ItemEvent e) {
 			int index = 0;
 			Object source = e.getSource();
@@ -487,16 +520,17 @@ public class DebugImageView extends ViewParent
 			}
 			// flip the value of the parameter checked
 			if (index >= 0) {
-				if (displayParams[index] == 0) {
-					displayParams[index] = 1;
+				if (parent.displayParams[index] == 0) {
+					parent.displayParams[index] = 1;
 				} else {
-					displayParams[index] = 0;
+					parent.displayParams[index] = 0;
 				}
-				adjustParams();
-			} else {
-				repaint();
 			}
+			parent.adjustParams();
+			parent.repaint();
 		}
+
+
 	}
 
     @Override
@@ -508,6 +542,9 @@ public class DebugImageView extends ViewParent
 		if (out.length > GREEN_IMAGE) {
             Y8image green8 = new Y8image(width, height, out[GREEN_IMAGE].bytes);
             displayImages[GREEN_IMAGE] = green8.toBufferedImage();
+			greenCheck = new Y8ThreshImage(width, height, out[GREEN_IMAGE].bytes);
+			greenCheck.setThresh(thresh);
+			displayImages[THRESH] = greenCheck.toBufferedImage();
         }
 
 		if (out.length > WHITE_IMAGE) {
@@ -574,7 +611,10 @@ public class DebugImageView extends ViewParent
 									   displayImages[ORIGINAL]);
         debugImageDisplay = debugImage.toBufferedImage();
 
-		newLog = false;
+		if (newLogLoaded) {
+			newLogLoaded = false;
+			adjustParams();
+		}
 
         repaint();
 

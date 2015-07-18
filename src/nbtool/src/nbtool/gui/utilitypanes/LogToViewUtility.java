@@ -116,7 +116,6 @@ public class LogToViewUtility extends UtilityParent {
 			return Arrays.asList((ViewState[]) parent).indexOf(child);
 		}
 
-
 		private ArrayList<TreeModelListener> listeners = new ArrayList<TreeModelListener>();
 		public void addTreeModelListener(TreeModelListener l) {
 			listeners.add(l);
