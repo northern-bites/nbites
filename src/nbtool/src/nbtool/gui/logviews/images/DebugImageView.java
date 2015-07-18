@@ -288,6 +288,10 @@ public class DebugImageView extends ViewParent
 	 */
     public void drawBlobs(Graphics g)
     {
+		int multiplier = 2;
+		if (width != DEFAULT_WIDTH) {
+			multiplier = 4;
+		}
 		// if we don't have an orange image we're in trouble
         if (displayImages[ORANGE_IMAGE] == null) {
 			System.out.println("No orange image");
@@ -308,7 +312,7 @@ public class DebugImageView extends ViewParent
 				}
 				SExpr blob = bl.get(1);
 				if (persistant != null && persistant.drawAllBalls) {
-					drawBlob(graph, blob);
+					drawBlob(graph, blob, multiplier);
 				}
 			}
 
@@ -329,11 +333,13 @@ public class DebugImageView extends ViewParent
 
             int x = (int) Math.round(loc.get(0).valueAsDouble());
             int y = (int) Math.round(loc.get(1).valueAsDouble());
-            graph.draw(new Ellipse2D.Double((x - diam/2) * 2, (y - diam/2)*2, diam*2, diam*2));
+            graph.draw(new Ellipse2D.Double((x - diam/2) * multiplier,
+											(y - diam/2)* multiplier,
+											diam*multiplier, diam*multiplier));
         }
     }
 
-    private void drawBlob(Graphics2D g, SExpr blob)
+    private void drawBlob(Graphics2D g, SExpr blob, int multiplier)
     {
         SExpr loc = blob.find("center").get(1);
 
@@ -350,13 +356,13 @@ public class DebugImageView extends ViewParent
         int secondXOff = (int)Math.round(len2 * Math.cos(ang2));
         int secondYOff = (int)Math.round(len2 * Math.sin(ang2));
 
-        g.drawLine((x - firstXOff)*2, (y - firstYOff)*2,
-				   (x + firstXOff)*2, (y + firstYOff)*2);
-        g.drawLine((x - secondXOff)*2, (y - secondYOff)*2,
-				   (x + secondXOff)*2, (y + secondYOff)*2);
-        Ellipse2D.Double ellipse = new Ellipse2D.Double((x-len1)*2, (y-len2)*2,
-														len1*4, len2*4);
-        Shape rotated = (AffineTransform.getRotateInstance(ang1, x*2, y*2).
+        g.drawLine((x - firstXOff)*multiplier, (y - firstYOff)*multiplier,
+				   (x + firstXOff)*multiplier, (y + firstYOff)*multiplier);
+        g.drawLine((x - secondXOff)*multiplier, (y - secondYOff)*multiplier,
+				   (x + secondXOff)*multiplier, (y + secondYOff)*multiplier);
+        Ellipse2D.Double ellipse = new Ellipse2D.Double((x-len1)*multiplier, (y-len2)*multiplier,
+														len1*2*multiplier, len2*2*multiplier);
+        Shape rotated = (AffineTransform.getRotateInstance(ang1, x*multiplier, y*multiplier).
 						 createTransformedShape(ellipse));
         g.draw(rotated);
     }
