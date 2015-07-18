@@ -63,7 +63,7 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
 #ifdef OFFLINE
 		// Get the appropriate amount of space for the Debug Image
 		if (i == 0) {
-			debugSpace[0] = (uint8_t *)malloc(wd * ht * sizeof(uint8_t));
+			debugSpace[0] = (uint8_t *)malloc(wd * ht * 2 * sizeof(uint8_t));
 		} else {
 			debugSpace[1] = (uint8_t *)malloc((wd / 2) * (ht / 2) * sizeof(uint8_t));
 		}
@@ -249,7 +249,7 @@ void VisionModule::run_()
         times[i][5] = timer.end();
 
         // Find world coordinates for hough lines
-        houghLines[i]->mapToField(*(homography[i]));
+        houghLines[i]->mapToField(*(homography[i]), *field);
         times[i][6] = timer.end();
 
         // Find world coordinates for rejected edges

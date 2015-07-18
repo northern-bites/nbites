@@ -174,8 +174,8 @@ public class DebugImageView extends ViewParent
             height = DEFAULT_HEIGHT;
         }
 
-        displayw = width*2;
-        displayh = height*2;
+        displayw = 640; //width*2;
+        displayh = 480; //height*2;
 
         displayImages[ORIGINAL] = Utility.biFromLog(newlog);
 		currentLog = newlog;
@@ -222,12 +222,12 @@ public class DebugImageView extends ViewParent
 			drawLines(g);
 			drawBlobs(g);
 			//displayImages[THRESH].setThresh(persistant.greenThreshold);
-			g.drawImage(displayImages[currentBottom], 0, displayh + 5, displayw,
-						displayh, null);
-			viewList.setBounds(0, displayh * 2 + 10, displayw / 2, BOX_HEIGHT);
-			greenThreshold.setBounds(0, displayh*2 + 15 + BOX_HEIGHT, displayw, BOX_HEIGHT+20);
+			g.drawImage(displayImages[currentBottom], 0, displayh + 5, displayw / 2,
+						displayh / 2, null);
+			viewList.setBounds(displayw / 2 + 10, displayh  + 10, displayw / 2, BOX_HEIGHT);
+			greenThreshold.setBounds(displayw / 2, displayh + 15 + BOX_HEIGHT, 500, BOX_HEIGHT+20);
 			greenThreshold.repaint();
-			persistant.setBounds(displayw+10, 0, 400, 300);
+			persistant.setBounds(displayw+10, 0, 300, 300);
         }
     }
 
