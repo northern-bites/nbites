@@ -118,8 +118,8 @@ def gamePlaying(player):
     #TODO before game/scrimmage change this to watch;
     #TESTINGCHANGE
     # return player.goLater('watchWithLineChecks')
-    return player.goLater('watch')
-    # return player.goLater('spinToRecover')
+    # return player.goLater('watch')
+    return player.goLater('checkSafePlacement')
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
@@ -329,12 +329,12 @@ def watch(player):
             and player.lastState is not 'faceBall'):
             player.inPosition = constants.HOME_POSITION
         print ("I'm moving to watch! I think I'm in the right position")
-        # player.brain.tracker.lookToAngle(0)
+        player.brain.tracker.lookToAngle(0)
 
 
 #TestingChange
     if player.counter % 2 == 0:
-    #     print("Horizon dist == ", player.brain.vision.horizon_dist)
+        print("Horizon dist == ", player.brain.vision.horizon_dist)
 
         ball = player.brain.ball
         nball = player.brain.naiveBall

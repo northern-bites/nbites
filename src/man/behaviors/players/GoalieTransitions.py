@@ -17,19 +17,21 @@ def safelyPlaced(player):
     corners = player.corners
     goodRightCornerObservation = 0
     goodLeftCornerObservation = 0
+    print("Hello here")
     for corner in corners:
         dist = getCornerDist(corner)
         bearing = getBearingFromRobot(corner.x, corner.y)
         corner_id = corner.id
+        print("Corner dist: ", dist, "bearing:", bearing, "id:", corner_id)
 
         if (corner_id == 0
         and math.fabs(dist - constants.EXPECTED_CORNER_DIST_FROM_CENTER) < constants.CORNER_DISTANCE_THRESH):
             if (math.fabs(bearing - constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER) < constants.CORNER_BEARING_THRESH):
                 goodLeftCornerObservation += 1
-                # print("Found a good left corner!")
+                print("Found a good left corner!")
             elif (math.fabs(bearing - constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER) < constants.CORNER_BEARING_THRESH):
                 goodRightCornerObservation += 1
-                # print("Found a good right corner!")
+                print("Found a good right corner!")
 
     if goodLeftCornerObservation > 5:
         player.goodLeftCornerObservation = True
@@ -122,9 +124,9 @@ def frontLineCheckShouldReposition(player):
     return False
 
 def facingBackward(player):
-    if player.brain.vision.horizon_dist < 200.0 and\
-    math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 15.0:
-        print("I'm FACing backWARDS! yaw:", math.degrees(player.brain.interface.joints.head_yaw))
+    if (player.brain.vision.horizon_dist < 200.0
+        and math.fabs(math.degrees(player.brain.interface.joints.head_yaw)) < 15.0):
+        print("I'm think I'm facing backWARDS! yaw:", math.degrees(player.brain.interface.joints.head_yaw))
         player.homeDirections = []
         player.homeDirections += [RelRobotLocation(0, 0, 180.0)]
         return True

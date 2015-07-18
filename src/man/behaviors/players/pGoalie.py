@@ -94,6 +94,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
             : GoalieStates.saveRight,
+
+            Transition.CountTransition(GoalieTransitions.facingBackward,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.lineCheckReposition,
             }
 
         GoalieStates.watch.transitions = {
