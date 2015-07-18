@@ -66,23 +66,18 @@ def afterPenalty(player):
             else:
                 afterPenalty.cornerCOn += 1
 
-    # Only decide we're good to go if we saw corner in > 2/3 of frames
-    # if afterPenalty.stateCount > 140:
-    #     if max(afterPenalty.rightRatio, afterPenalty.leftRatio) > .3:
-    #         afterPenalty.decidedSide = True
-    #         afterPenalty.right = afterPenalty.rightRatio > afterPenalty.leftRatio
-    #         if afterPenalty.right:
-    #             player.brain.tracker.lookToAngle(-1 * angle)
-    #         else:
-    #             player.brain.tracker.lookToAngle(angle)
-
+    # China hack 2015. Please make this better
     if afterPenalty.stateCount > 140:
-        # We are strongly confident that we're on left side of field
-        if afterPenalty.leftDiff < -20 and afterPenalty.rightDiff > 20:
+        if afterPenalty.rightDiff > 20 && afterPenalty.leftDiff <= 0:
+            afterPenalty.decidedSide = True
+            afterPenalty.right = True
+        elif afterPenalty.rightDiff < 20 && afterPenalty.leftDiff >= 0:
             afterPenalty.decidedSide = True
             afterPenalty.right = False
-        # We are strongly confident that we're on right side of field
-        elif afterPenalty.leftDiff > 20 and afterPenalty.rightDiff < -20:
+        elif afterPenalty.leftDiff > 20 && afterPenalty.rightDiff <= 0:
+            afterPenalty.decidedSide = True
+            afterPenalty.right = False
+        elif afterPenalty.leftDiff < 20 && afterPenalty.rightDiff >= 0:
             afterPenalty.decidedSide = True
             afterPenalty.right = True
 
