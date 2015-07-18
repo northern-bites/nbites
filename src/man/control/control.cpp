@@ -193,11 +193,11 @@ namespace control {
     
     /* NOTE: this still requires restarting man! */
     uint32_t cnc_setCalibration(Log * arg) {
-        SExpr * params = SExpr::read(arg->data());
         
+        std::ofstream robotParamConfig("/home/nao/nbites/Config/calibrationParams.txt");
+        robotParamConfig << arg->data();
+        robotParamConfig.close();
         
-        
-        delete params;
         return 0;
     }
     

@@ -9,6 +9,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,6 +24,8 @@ import nbtool.data.Log;
 import nbtool.data.SExpr;
 import nbtool.data.Session;
 import nbtool.data.SessionMaster;
+import nbtool.io.ControlIO;
+import nbtool.io.ControlIO.ControlInstance;
 import nbtool.io.CrossIO;
 import nbtool.io.CrossIO.CrossCall;
 import nbtool.io.CrossIO.CrossFunc;
@@ -33,6 +38,8 @@ import nbtool.util.Events;
 import nbtool.util.Logger;
 
 public class CameraCalibrateUtility2 extends UtilityParent {
+	
+	private static final String CALIBRATION_CONTROL_NAME = "setCalibration";
 	
 	private CCU_Frame display = null;
 
@@ -159,8 +166,26 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					
+					String filePath = System.getenv().get("NBITES_DIR");
+		            filePath += "/src/man/config/calibrationParams.txt";
+		            
+		            try {
+		            	byte[] data = Files.readAllBytes(
+		            			FileSystems.getDefault().getPath(filePath));
+		            	
+		            	ControlInstance ci = ControlIO.getByIndex(0);
+		            	if (ci == null) {
+		            		JOptionPane.showMessageDialog(outerThis, "no control instance connected!");
+		            		return;
+		            	}
+		            	
+		            	Log command = ControlIO.createSimpleCommand(CALIBRATION_CONTROL_NAME, data);
+		            	ci.tryAddCmnd(command);
+		            } catch (FileNotFoundException e1) {
+		                e1.printStackTrace();
+		            } catch (IOException e1) {
+		                e1.printStackTrace();
+		            }
 				}
 	    		
 	    	});
