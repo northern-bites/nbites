@@ -22,10 +22,8 @@ def switchRoles(player):
     State to decide who on the team should become the new chaser and switch accordingly.
     """
 
-    if transitions.offenseMissing(player):
-        constants.setRoleConstants(player, player.role)
-    return player.goNow(player.gameState)
+    print "roleswitcher"
 
-    if transitions.roleOverlap(player):
-        constants.setRoleConstants(player,player.role)
-        constants.setRoleConstants(player, role)
+    transitions.switchToRole(player, player.role)
+    print "switching to role", player.role
+    return player.goNow(player.gameState)

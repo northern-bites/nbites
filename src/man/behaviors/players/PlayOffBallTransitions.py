@@ -110,6 +110,7 @@ def shouldBeSupporter(player):
             claimTransitions.shouldCedeClaim(player))
 
 def missingPlayers(player):
+    print "number of teammates", player.brain.activeTeamMates()
     if player.brain.activeTeamMates() < 5:
         return True
 
