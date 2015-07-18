@@ -54,7 +54,7 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 		return 'c';
 	}
 	
-	public class CCU_Frame extends javax.swing.JFrame implements IOFirstResponder, ActionListener, Events.SessionSelected {
+	public class CCU_Frame extends javax.swing.JFrame implements IOFirstResponder, Events.SessionSelected {
 		
 		class Params {
 			double rollOffset, tiltOffset;
@@ -71,6 +71,7 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 		
 		Params lastCalculated;
 		Session using;
+		private final CCU_Frame outerThis = this;
 		
 	    public CCU_Frame() {
 	        initComponents();
@@ -101,11 +102,55 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	    
 	    private void setupActionListeners() {
 	    	writeButton.addActionListener(new ActionListener(){
-
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					
+					if (lastCalculated != null && lastCalculated.rollOffset != Double.NaN) {
+						Logger.println("saving parameters...");
+						String filePath = System.getenv().get("NBITES_DIR");
+			            filePath += "/src/man/config/calibrationParams.txt";
+
+			            String lisp = "(" + lastCalculated.camera + " ";
+			            lisp += Double.toString(lastCalculated.rollOffset)
+			            		+ " " + Double.toString(lastCalculated.tiltOffset) + ")";
+			            
+			            String text = "";
+			            try {
+			                FileReader fr = new FileReader(filePath);
+			                BufferedReader bf = new BufferedReader(fr);
+			                String line;
+			                while ((line = bf.readLine()) != null) {
+			                    text += line;
+			                }
+			                SExpr saved = SExpr.deserializeFrom(text);
+			                SExpr bot = saved.get(1).find(lastCalculated.robotName);
+			                if (!bot.exists()) {
+			                    System.out.printf("Invalid robot name! Could not find existing params for \"%s\"\n",
+			                    		lastCalculated.robotName);
+			                } else {
+			                    if (lastCalculated.camera.equals("TOP")) {
+			                        bot.setList(bot.get(0), SExpr.deserializeFrom(lisp), bot.get(2));
+			                    } else {
+			                        bot.setList(bot.get(0), bot.get(1), SExpr.deserializeFrom(lisp));
+			                    }
+			                }
+
+			                // Write out to file
+			                FileOutputStream fos = new FileOutputStream(filePath, false);
+			                byte[] data = saved.print().getBytes();
+			                fos.write(data);
+
+			                fr.close();
+			                bf.close();
+			                fos.close();
+
+			            } catch (FileNotFoundException e1) {
+			                e1.printStackTrace();
+			            } catch (IOException e1) {
+			                e1.printStackTrace();
+			            }
+					} else {
+						JOptionPane.showMessageDialog(outerThis, "successfully calibrate first");
+					}
 				}
 	    		
 	    	});
@@ -124,132 +169,74 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
+					if (using == null) {
+						JOptionPane.showMessageDialog(outerThis, "no selected session");
+						return;
+					}
+					List<Log> accepted = new LinkedList<Log>();
+					String cameraString = (String) cameraBox.getSelectedItem();
+					String searchText = String.format("(from camera_%s)", cameraString);
+					
+					for (Log log : using.logs_ALL) {
+						if (log.description().indexOf(searchText) >= 0) {
+							accepted.add(log);
+						}
+					}
+					
+					if (accepted.size() < 7) {
+						JOptionPane.showMessageDialog(outerThis, "not enough logs from " + cameraString);
+						return;
+					}
+					
+					for (Log log : accepted) {
+						if (log.bytes == null) {
+							try {
+								FileIO.loadLog(log, log.parent.directoryFrom);
+							} catch (IOException e1) {
+								e1.printStackTrace();
+								return;
+							}
+						}
+					}
+					
+					// Fetch name of robot
+	                SExpr name = accepted.get(0).tree().find("from_address");
+	                if (!name.exists()) {
+	                    System.out.printf("COULD NOT LOAD ROBOT NAME. ABORTING.\n");
+	                } else {
+	                    String rname = name.get(1).value();
+	                    int iloc = rname.indexOf(".local");
+	                 
+	                    if (iloc > 0) {
+	                    	rname = rname.substring(0, iloc);
+	                    }
+	                    
+	                    lastCalculated = new Params(cameraString, rname);
+
+	                    // Call calibrate nbfunc with the 7 logs
+	                    Logger.printf("calibrating for camera{%s} robot{%s} session{%s}",
+	                    		cameraString, rname, using.name);
+	                    CrossInstance ci = CrossIO.instanceByIndex(0);
+	                    if (ci == null) {
+	                    	JOptionPane.showMessageDialog(outerThis, "no nbcross instance connected");
+	                    	return;
+	                    }
+	                    
+	                    CrossFunc func = ci.functionWithName("CameraCalibration");
+	                    if (func == null) {
+	                    	Logger.errorf("COULD NOT GET CameraCalibration FUNCTION");
+	                    	return;
+	                    }
+	                    
+	                    Log[] seven = accepted.subList(0, 7).toArray(new Log[0]);
+	                    CrossCall call = new CrossCall(outerThis, func, seven);
+	                    assert(ci.tryAddCall(call));
+	                }
 					
 				}
 	    		
 	    	});
 	    }
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if (e.getSource() == writeButton) {
-				if (lastCalculated != null && lastCalculated.rollOffset != Double.NaN) {
-					Logger.println("saving parameters...");
-					String filePath = System.getenv().get("NBITES_DIR");
-		            filePath += "/src/man/config/calibrationParams.txt";
-
-		            String lisp = "(" + lastCalculated.camera + " ";
-		            lisp += Double.toString(lastCalculated.rollOffset)
-		            		+ " " + Double.toString(lastCalculated.tiltOffset) + ")";
-		            
-		            String text = "";
-		            try {
-		                FileReader fr = new FileReader(filePath);
-		                BufferedReader bf = new BufferedReader(fr);
-		                String line;
-		                while ((line = bf.readLine()) != null) {
-		                    text += line;
-		                }
-		                SExpr saved = SExpr.deserializeFrom(text);
-		                SExpr bot = saved.get(1).find(lastCalculated.robotName);
-		                if (!bot.exists()) {
-		                    System.out.printf("Invalid robot name! Could not find exiting params for \"%s\"\n",
-		                    		lastCalculated.robotName);
-		                } else {
-		                    if (lastCalculated.camera.equals("TOP")) {
-		                        bot.setList(bot.get(0), SExpr.deserializeFrom(lisp), bot.get(2));
-		                    } else {
-		                        bot.setList(bot.get(0), bot.get(1), SExpr.deserializeFrom(lisp));
-		                    }
-		                }
-
-		                // Write out to file
-		                FileOutputStream fos = new FileOutputStream(filePath, false);
-		                byte[] data = saved.print().getBytes();
-		                fos.write(data);
-
-		                fr.close();
-		                bf.close();
-		                fos.close();
-
-		            } catch (FileNotFoundException e1) {
-		                e1.printStackTrace();
-		            } catch (IOException e1) {
-		                e1.printStackTrace();
-		            }
-				} else {
-					JOptionPane.showMessageDialog(this, "successfully call calibrate first");
-				}
-			} else if (e.getSource() == callButton) {
-				if (using == null) {
-					JOptionPane.showMessageDialog(this, "no selected session");
-					return;
-				}
-				List<Log> accepted = new LinkedList<Log>();
-				String cameraString = (String) cameraBox.getSelectedItem();
-				String searchText = String.format("(from camera_%s)", cameraString);
-				
-				for (Log log : using.logs_ALL) {
-					if (log.description().indexOf(searchText) >= 0) {
-						accepted.add(log);
-					}
-				}
-				
-				if (accepted.size() < 7) {
-					JOptionPane.showMessageDialog(this, "not enough logs from " + cameraString);
-					return;
-				}
-				
-				for (Log log : accepted) {
-					if (log.bytes == null) {
-						try {
-							FileIO.loadLog(log, log.parent.directoryFrom);
-						} catch (IOException e1) {
-							e1.printStackTrace();
-							return;
-						}
-					}
-				}
-				
-				// Fetch name of robot
-                SExpr name = accepted.get(0).tree().find("from_address");
-                if (!name.exists()) {
-                    System.out.printf("COULD NOT LOAD ROBOT NAME. ABORTING.\n");
-                } else {
-                    String rname = name.get(1).value();
-                    int iloc = rname.indexOf(".local");
-                 
-                    if (iloc > 0) {
-                    	rname = rname.substring(0, iloc);
-                    }
-                    
-                    lastCalculated = new Params(cameraString, rname);
-
-                    // Call calibrate nbfunc with the 7 logs
-                    Logger.printf("calibrating for camera{%s} robot{%s} session{%s}",
-                    		cameraString, rname, using.name);
-                    CrossInstance ci = CrossIO.instanceByIndex(0);
-                    if (ci == null) {
-                    	JOptionPane.showMessageDialog(this, "no nbcross instance connected");
-                    	return;
-                    }
-                    
-                    CrossFunc func = ci.functionWithName("CameraCalibration");
-                    if (func == null) {
-                    	Logger.errorf("COULD NOT GET CameraCalibration FUNCTION");
-                    	return;
-                    }
-                    
-                    Log[] seven = accepted.subList(0, 7).toArray(new Log[0]);
-                    CrossCall call = new CrossCall(this, func, seven);
-                    assert(ci.tryAddCall(call));
-                }
-				
-			} else {
-				Logger.errorf("UNKNOWN ACTION SOURCE IN CCU");
-			}
-		}
 
 		@Override
 		public void ioFinished(IOInstance instance) {}
