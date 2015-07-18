@@ -193,11 +193,19 @@ namespace control {
     
     /* NOTE: this still requires restarting man! */
     uint32_t cnc_setCalibration(Log * arg) {
-        
+        printf("cnc_setCalibration()!\n");
         std::ofstream robotParamConfig("/home/nao/nbites/Config/calibrationParams.txt");
         robotParamConfig << arg->data();
         robotParamConfig.close();
         
+        return 0;
+    }
+    
+    const std::string path = "/home/nao/nbites/lib/python/players/Switch.py";
+    std::string foundContents;
+    const std::string pCalibrateContents = "from . import pCalibrate as selectedPlayer";
+    uint32_t cnc_calibrationPlayerSwitch(Log * arg) {
+        std::ifstream
         return 0;
     }
     
@@ -214,6 +222,7 @@ namespace control {
         ret["exit"] = &cnc_exit;
         
         ret["setCalibration"] = &cnc_setCalibration;
+        ret["calibrationPlayerSwitch"] = &cnc_calibrationPlayerSwitch;
         
 #ifndef __APPLE__
         ret["setCameraParams"] = &cnc_setCameraParams;
