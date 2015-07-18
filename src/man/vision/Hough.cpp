@@ -541,14 +541,14 @@ void CenterCircleDetector::set()
   minPotentials = 850;
   maxEdgeDistanceSquared = 500 * 500;       // Good practicle distance = 5m
   ccr = CENTER_CIRCLE_RADIUS;               // 75 cm
-  minVotesInMaxBin = 0.18;                  // Conservative clustering theshold
+  minVotesInMaxBin = 0.20;                  // Conservative clustering theshold
   fieldTestDistance = 200;
 
 }
 
 bool CenterCircleDetector::detectCenterCircle(EdgeList& edges, Field& field)
 {
-  on(findPotentialsAndCluster(edges, _ccx, _ccy) && onField(field));
+  on(findPotentialsAndCluster(edges, _ccx, _ccy));  // Excluding onField test. Needs debugging.
   return (on());
 }
 
@@ -641,6 +641,7 @@ bool CenterCircleDetector::findPotentialsAndCluster(EdgeList& edges, double& x0,
 
 }
 
+// TODO: debug and enable
 // Project 2 points from CC and check if they are on the field
 bool CenterCircleDetector::onField(Field& field)
 {
