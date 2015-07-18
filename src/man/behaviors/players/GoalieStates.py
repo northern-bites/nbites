@@ -10,7 +10,7 @@ import math
 import noggin_constants as nogginConstants
 
 #TestingChange
-SAVING = False
+SAVING = True
 DIVING = False
 
 @superState('gameControllerResponder')
@@ -448,7 +448,7 @@ def saveCenter(player):
             player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
         #TESTINGCHANGE
 
-    if player.counter > 80:
+    if player.counter > 120:
         if SAVING:
             player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
             return player.goLater('upUpUP')

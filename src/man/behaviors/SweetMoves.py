@@ -212,7 +212,7 @@ STAND_UP_FRONT = (#Initial
                   INITIAL_POS[0][1],
                   INITIAL_POS[0][2],
                   INITIAL_POS[0][3],
-                  0.5,0, stiff.STANDUP_STIFFNESSES)
+                  0.7,0, stiff.STANDUP_STIFFNESSES)
                  )
 
 
