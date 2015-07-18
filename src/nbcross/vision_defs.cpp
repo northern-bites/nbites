@@ -55,10 +55,6 @@ void imageSizeCheck(bool top, int width, int height) {
     }
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> northern-bites/master
 //robotName may be empty ("").
 man::vision::VisionModule& getModuleRef(const std::string robotName);
 
