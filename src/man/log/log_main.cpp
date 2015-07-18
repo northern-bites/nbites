@@ -9,8 +9,6 @@
 #include "../control/control.h"
 #include "nbdebug.h"
 
-#include "../../share/include/Camera.h"
-
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -164,119 +162,127 @@ namespace nblog {
         while (1) {
             sleep(1);
             
-            //Log state.
-            std::vector<SExpr> fields;
-            fields.push_back(SExpr(CONTENT_TYPE_S, "STATS"));
-            
-            std::vector<SExpr> fvector = {
-                SExpr("flags"),
-                SExpr("serv_connected", control::serv_connected,
-                      control::flags[control::serv_connected]),
-                SExpr("control_connected", control::control_connected,
-                      control::flags[control::control_connected]),
-                SExpr("fileio", control::fileio,
-                      control::flags[control::fileio]),
-                SExpr("SENSORS", control::SENSORS,
-                      control::flags[control::SENSORS]),
-                SExpr("GUARDIAN", control::GUARDIAN,
-                      control::flags[control::GUARDIAN]),
-                SExpr("COMM", control::COMM,
-                      control::flags[control::COMM]),
-                SExpr("LOCATION", control::LOCATION,
-                      control::flags[control::LOCATION]),
-                SExpr("ODOMETRY", control::ODOMETRY,
-                      control::flags[control::ODOMETRY]),
-                SExpr("OBSERVATIONS", control::OBSERVATIONS,
-                      control::flags[control::OBSERVATIONS]),
-                SExpr("LOCALIZATION", control::LOCALIZATION,
-                      control::flags[control::LOCALIZATION]),
-                SExpr("BALLTRACK", control::BALLTRACK,
-                      control::flags[control::BALLTRACK]),
-                
-                SExpr("VISION", control::VISION,
-                      control::flags[control::VISION]),
-                
-                SExpr("tripoint", control::tripoint,
-                      control::flags[control::tripoint]),
 
-                SExpr("thumbnail", control::thumbnail,
-                      control::flags[control::thumbnail])
-            };
-            fields.push_back(SExpr(fvector));
-            
-            
-            fields.push_back(SExpr("num_buffers", NUM_LOG_BUFFERS));
-            fields.push_back(SExpr("num_cores", (int) NUM_CORES));
-            
-            SExpr ratios;
-            ratios.append(SExpr("ratio"));
-            for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
-                ratios.append(SExpr(LOG_RATIO[i]));
+            if (STREAM_STATS) {
+                NBLog(NBL_SMALL_BUFFER, makeSTATSlog());
             }
-            fields.push_back(ratios);
-            
-            SExpr sizes;
-            sizes.append(SExpr("size"));
-            for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
-                sizes.append(SExpr(LOG_BUFFER_SIZES[i]));
-            }
-            fields.push_back(sizes);
-            
-            time_t NOW = time(NULL);
-            
-            fields.push_back(SExpr("con_uptime", control::flags[control::serv_connected] ? difftime(NOW, cio_upstart) : 0));
-            fields.push_back(SExpr("cnc_uptime", control::flags[control::control_connected] ? difftime(NOW, cnc_upstart) : 0));
-            fields.push_back(SExpr("fio_uptime", control::flags[control::fileio] ? difftime(NOW, fio_upstart) : 0));
-            
-            fields.push_back(SExpr("log_uptime", difftime(NOW, main_upstart)));
-            
-            SExpr manages;
-            manages.append(SExpr("bufmanage"));
-            for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
-                manages.append(makeBufManage(i));
-            }
-            fields.push_back(manages);
-            
-            /*
-             This system of grabbing io state is subject to multi-threading accuracy drift.
-             It is therefore only for estimates.
-             */
-            io_state_t zerostate;
-            bzero(&zerostate, sizeof(io_state_t));
-            
-            SExpr state_total;
-            state_total.append(SExpr("total-state"));
-            for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
-                state_total.append(makeBufState(&zerostate, total + i));
-            }
-            fields.push_back(state_total);
-            
-            if (control::flags[control::fileio]) {
-                SExpr state_file;
-                state_file.append(SExpr("file-state"));
-                for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
-                    state_file.append(makeBufState(fio_start + i, total + i));
-                }
-                fields.push_back(state_file);
-            }
-            
-            if (control::flags[control::serv_connected]) {
-                SExpr state_serv;
-                state_serv.append(SExpr("serv-state"));
-                for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
-                    state_serv.append(makeBufState(cio_start + i, total + i));
-                }
-                fields.push_back(state_serv);
-            }
-            
-            std::vector<SExpr> contents = {SExpr(fields)};
-            
-            //NBDEBUG("logged state...");
-            NBLog(NBL_SMALL_BUFFER, "main_loop", contents, "");
+                        
+            //NBLog(NBL_SMALL_BUFFER, "main_loop", contents, "");
         }
         
         return NULL;
     }
+    
+    Log * makeSTATSlog() {
+        //Log state.
+        std::vector<SExpr> fields;
+        fields.push_back(SExpr(CONTENT_TYPE_S, "STATS"));
+        
+        std::vector<SExpr> fvector = {
+            SExpr("flags"),
+            SExpr("serv_connected", control::serv_connected,
+                  control::flags[control::serv_connected]),
+            SExpr("control_connected", control::control_connected,
+                  control::flags[control::control_connected]),
+            SExpr("fileio", control::fileio,
+                  control::flags[control::fileio]),
+            SExpr("SENSORS", control::SENSORS,
+                  control::flags[control::SENSORS]),
+            SExpr("GUARDIAN", control::GUARDIAN,
+                  control::flags[control::GUARDIAN]),
+            SExpr("COMM", control::COMM,
+                  control::flags[control::COMM]),
+            SExpr("LOCATION", control::LOCATION,
+                  control::flags[control::LOCATION]),
+            SExpr("ODOMETRY", control::ODOMETRY,
+                  control::flags[control::ODOMETRY]),
+            SExpr("OBSERVATIONS", control::OBSERVATIONS,
+                  control::flags[control::OBSERVATIONS]),
+            SExpr("LOCALIZATION", control::LOCALIZATION,
+                  control::flags[control::LOCALIZATION]),
+            SExpr("BALLTRACK", control::BALLTRACK,
+                  control::flags[control::BALLTRACK]),
+            
+            SExpr("VISION", control::VISION,
+                  control::flags[control::VISION]),
+            
+            SExpr("tripoint", control::tripoint,
+                  control::flags[control::tripoint]),
+            
+            SExpr("thumbnail", control::thumbnail,
+                  control::flags[control::thumbnail])
+        };
+        fields.push_back(SExpr(fvector));
+        
+        
+        fields.push_back(SExpr("num_buffers", NUM_LOG_BUFFERS));
+        fields.push_back(SExpr("num_cores", (int) NUM_CORES));
+        
+        SExpr ratios;
+        ratios.append(SExpr("ratio"));
+        for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+            ratios.append(SExpr(LOG_RATIO[i]));
+        }
+        fields.push_back(ratios);
+        
+        SExpr sizes;
+        sizes.append(SExpr("size"));
+        for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+            sizes.append(SExpr(LOG_BUFFER_SIZES[i]));
+        }
+        fields.push_back(sizes);
+        
+        time_t NOW = time(NULL);
+        
+        fields.push_back(SExpr("con_uptime", control::flags[control::serv_connected] ? difftime(NOW, cio_upstart) : 0));
+        fields.push_back(SExpr("cnc_uptime", control::flags[control::control_connected] ? difftime(NOW, cnc_upstart) : 0));
+        fields.push_back(SExpr("fio_uptime", control::flags[control::fileio] ? difftime(NOW, fio_upstart) : 0));
+        
+        fields.push_back(SExpr("log_uptime", difftime(NOW, main_upstart)));
+        
+        SExpr manages;
+        manages.append(SExpr("bufmanage"));
+        for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+            manages.append(makeBufManage(i));
+        }
+        fields.push_back(manages);
+        
+        /*
+         This system of grabbing io state is subject to multi-threading accuracy drift.
+         It is therefore only for estimates.
+         */
+        io_state_t zerostate;
+        bzero(&zerostate, sizeof(io_state_t));
+        
+        SExpr state_total;
+        state_total.append(SExpr("total-state"));
+        for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+            state_total.append(makeBufState(&zerostate, total + i));
+        }
+        fields.push_back(state_total);
+        
+        if (control::flags[control::fileio]) {
+            SExpr state_file;
+            state_file.append(SExpr("file-state"));
+            for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+                state_file.append(makeBufState(fio_start + i, total + i));
+            }
+            fields.push_back(state_file);
+        }
+        
+        if (control::flags[control::serv_connected]) {
+            SExpr state_serv;
+            state_serv.append(SExpr("serv-state"));
+            for (int i = 0; i < NUM_LOG_BUFFERS; ++i) {
+                state_serv.append(makeBufState(cio_start + i, total + i));
+            }
+            fields.push_back(state_serv);
+        }
+        
+        std::vector<SExpr> contents = {SExpr(fields)};
+        
+        return new Log(LOG_FIRST_ATOM_S, "makeSTATSlog()", time(NULL), LOG_VERSION, contents, "");
+    };
     
     /*
      Definitions for log lib functions.

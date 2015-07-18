@@ -588,7 +588,7 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 
         controlTestButton.setText("test");
 
-        controlExitButton.setText("exit");
+        controlExitButton.setText("kill man");
 
         javax.swing.GroupLayout controlPanelLayout = new javax.swing.GroupLayout(controlPanel);
         controlPanel.setLayout(controlPanelLayout);

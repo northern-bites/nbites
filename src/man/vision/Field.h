@@ -59,8 +59,8 @@ public:
 	void drawPoint(int x, int y, int c);
 	void drawDot(int x, int y, int c);
 	void drawLine(int x, int y, int x1, int y1, int c);
-    
-    // Returns true if x is WITHIN SCOPE convex hull and sets y 
+
+    // Returns true if x is WITHIN SCOPE convex hull and sets y
     //  to height of hull at that x. (True could still be off field)
 	bool onField(double x, double & y);
     int findGreenHorizon(int pH, int rH);
@@ -70,6 +70,7 @@ public:
     int getInitialHorizonEstimate(int pH);
     int getImprovedEstimate(int pH);
 	int horizonAt(int x);
+    float horizonDist() { return getPixDistance(horizonAt(IMAGE_WIDTH / 2)); }
 	int blockHorizonAt(int x);
 	int occludingHorizonAt(int x);
 	float distanceToHorizon(int x, int y);

@@ -21,13 +21,16 @@ import nbtool.gui.logviews.misc.CrossBright;
 import nbtool.gui.logviews.misc.DefaultView;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.logviews.proto.ProtoBufView;
+import nbtool.gui.logviews.proto.ProtoBallView;
+import nbtool.gui.logviews.sound2.SndFreqView;
+import nbtool.gui.logviews.sound2.SndAmpView;
 import nbtool.gui.logviews.loc.LocSwarmView;
 
 
 public class NBConstants {
 	
-	public static final int VERSION = 6;
-	public static final int MINOR_VERSION = 5;
+	public static final int VERSION = 7;
+	public static final int MINOR_VERSION = 0;
 	
 	public static final String PROTOBUF_TYPE_PREFIX = "proto-";
 	
@@ -50,10 +53,7 @@ public class NBConstants {
 	
 	public static final int NBCROSS_CALL_TIMEOUT = 0;	//interpreted as infinite.  Note that, since these calls are local,
 														//we worry less about dead sockets.
-	
-	//Who names a class DataFlavor?  That's just so... Idk. Fllaavvvooorr.  Data Fllaaavoor. MMM, gimme some'o that DataFlav
-	public static final DataFlavor treeFlavor = new DataFlavor(Log.class, "NB-OpaqueLog");
-	
+		
 	public static enum STATUS {
 		IDLE(0),		//No io or IO threads active.  No active SessionHandler.  Ready to start.
 		STARTING(1),	//Setting up IO or threads in a SessionHandler (usually very short)
@@ -81,9 +81,15 @@ public class NBConstants {
 		map.put("prot-RobotLocation", new Class[]{FieldView.class});
 		map.put(DEFAULT_S, new Class[]{DefaultView.class});
 		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
+		map.put("MULTIBALL", new Class[]{ProtoBallView.class});
+		map.put("proto-RobotLocation", new Class[]{FieldView.class});
 		map.put("location", new Class[]{LocSwarmView.class});
 		map.put("proto-FieldLines", new Class[]{BasicLineView.class});
+		map.put("sound", new Class[]{SndFreqView.class, SndAmpView.class});
 		map.put("proto-Corners", new Class[]{BasicLineView.class});
+		
+		map.put(DEFAULT_S, new Class[]{DefaultView.class});
+		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
 
 		return map;
 	}

@@ -2,10 +2,13 @@
 #define nbcontrol_h
 
 #include <pthread.h>
+
+#ifndef __APPLE__
 #include <CameraParams.pb.h>
 #include <google/protobuf/message_lite.h>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#endif
 
 #define CONTROL_USLEEP_WAITING (100000)
 
@@ -33,6 +36,7 @@ namespace control {
         VISION,
         
         tripoint,
+        multiball,
         thumbnail,
         
         //Num_flags must be last!  it has int value ( 'previous' + 1)
@@ -42,7 +46,10 @@ namespace control {
     } flag_e;
     
     extern volatile uint8_t flags[num_flags];
+    
+#ifndef __APPLE__
     static messages::CameraParams receivedParams;
+#endif
     
     void control_init();
     

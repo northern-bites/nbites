@@ -76,7 +76,7 @@ namespace nblog {
     //declared in log_main.cpp
     extern log_main_t log_main;
     
-#define LOG_VERSION 6
+#define LOG_VERSION 7
     
 #define STREAM_PORT (30000)
     
@@ -90,15 +90,7 @@ namespace nblog {
      Thread safe.
      
      buffer_index: which buffer to put data on
-     image_index: image that this log's encapsulated information was derived from.
-        0 means n/a or unknown.
-     
-     creation_time: relative to nao process start time.  Fairly good at making all logs from a given log session distinct.
-     
-     type: specs about this log data.  Pretty important.  Fill 'er in.
-     
-     nbytes/data: encapsulated opaque log data.
-     */
+    */
     
     void NBLog(int buffer_index, Log * log);
     void NBLog(int buffer_index, const std::string& where_called,
@@ -147,6 +139,10 @@ namespace nblog {
     
     const extern uint32_t NUM_CORES;
     
+    Log * makeSTATSlog();
+
+    /* set to true to have the logging system periodically generate and log statistics */
+    static const bool STREAM_STATS = false;
 }//namespace NBlog
 
 #endif

@@ -1,7 +1,6 @@
 #include "Log.h"
 #include "exactio.h"
 #include "nbdebug.h"
-#include "DebugConfig.h"
 #include "control.h"
 #include "../log/logging.h"
 
@@ -24,6 +23,10 @@
 #include <exception>
 #include "../../share/logshare/SExpr.h"
 
+#ifndef  __APPLE__
+#include "DebugConfig.h"
+#endif
+
 using nblog::SExpr;
 using nblog::Log;
 
@@ -32,9 +35,21 @@ namespace control {
     pthread_t control_thread;
     static bool STARTED = false;
     
+    /* RETURN log may not be 'arg' (double delete) */
+    Log * RETURN = NULL;
+    
     uint32_t cnc_test(Log * arg) {
         printf("\tcnc_test:[%s] %lu bytes of data.\n", arg->description().c_str(),
                arg->data().size());
+        return 0;
+    }
+    
+    uint32_t cnc_exit(Log * arg) {
+        printf("\nWARNING: cnc_exit() called!  Sending SIGTERM...\n");
+        
+        //SIGTERM rather than exit because this allows man to clean up.
+        kill(getpid(), SIGTERM);
+        
         return 0;
     }
     
@@ -49,7 +64,10 @@ namespace control {
         printf("cnc_setFlag() len=%lu\n", u);
         
         if (u != 2) { //need (index, value)
-            printf("cnc_setFlag() wrong number of bytes.\n");
+            printf("cnc_setFlag() wrong number of bytes, assuming request for stats!\n");
+            
+            //This is used by the tool to request current state of robot, so set RETURN.
+            RETURN = nblog::makeSTATSlog();
             return 1;
         }
         
@@ -88,9 +106,12 @@ namespace control {
                 break;
         }
         
+        RETURN = nblog::makeSTATSlog();
+        
         return 0;
     }
 
+#ifndef __APPLE__
     uint32_t cnc_setCameraParams(Log * arg) {
         size_t u = arg->data().size();
         bool success = receivedParams.ParseFromString(arg->data());
@@ -168,6 +189,18 @@ namespace control {
         return 0;
     }
     
+#endif
+    
+    /* NOTE: this still requires restarting man! */
+    uint32_t cnc_setCalibration(Log * arg) {
+        SExpr * params = SExpr::read(arg->data());
+        
+        
+        
+        delete params;
+        return 0;
+    }
+    
     /*
      THIS IS WHERE YOU PUT NEW CONTROL FUNCTIONS!
      
@@ -178,7 +211,13 @@ namespace control {
         
         ret["test"] = &cnc_test;
         ret["setFlag"] = &cnc_setFlag;
+        ret["exit"] = &cnc_exit;
+        
+        ret["setCalibration"] = &cnc_setCalibration;
+        
+#ifndef __APPLE__
         ret["setCameraParams"] = &cnc_setCameraParams;
+#endif
         
         return ret;
     }
@@ -258,6 +297,19 @@ namespace control {
                     uint32_t nret = htonl(ret);
                     CHECK_RET(send_exact(connfd, 4, &nret))
                     
+                    //uint32_t nbck =
+                    if (RETURN) {
+                        uint32_t nbck = htonl(1);
+                        CHECK_RET(send_exact(connfd, 4, &nbck));
+                        
+                        CHECK_RET(!RETURN->send(connfd));
+                        delete RETURN;
+                        RETURN = NULL;
+                    } else {
+                        uint32_t nbck = 0;
+                        CHECK_RET(send_exact(connfd, 4, &nbck));
+                    }
+                    
                     NBDEBUG( "control call finished.\n\n");
                     
                 } else {
@@ -274,6 +326,11 @@ namespace control {
         connection_died:
             flags[control_connected] = 0;
             close(connfd);
+            
+            if (RETURN) {
+                delete RETURN;
+                RETURN = NULL;
+            }
             
             NBDEBUG("control loop broken, connection closed.\n");
         }

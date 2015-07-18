@@ -42,10 +42,12 @@ int CrossBright_func();
 // Defined in misc_defs.cpp
 
 // Defined in vision_defs.cpp
+#ifndef __APPLE__
 int Vision_func();
 int CameraCalibration_func();
 int Synthetics_func();
 int Scratch_func();
+#endif
 
 
 /* add all functions to publish to this vector */
@@ -53,11 +55,14 @@ const std::vector<CrossFunc> FUNCS = {
     CrossFunc("test", test_func, {}),
     CrossFunc("arg_test", arg_test_func, {"YUVImage", "YUVImage"}),
     CrossFunc("CrossBright", CrossBright_func, {"YUVImage"}),
+    
+#ifndef __APPLE__
     CrossFunc("Vision", Vision_func, {"YUVImage"}),
     CrossFunc("CameraCalibration", CameraCalibration_func, {"YUVImage", "YUVImage", "YUVImage", 
                                                 "YUVImage", "YUVImage", "YUVImage", "YUVImage"}),
     CrossFunc("Synthetics", Synthetics_func, {"SyntheticParams"}),
     CrossFunc("Scratch", Scratch_func, {})
+#endif
 };
 
 extern std::vector<nblog::Log *> args;

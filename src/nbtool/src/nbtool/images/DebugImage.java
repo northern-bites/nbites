@@ -53,13 +53,16 @@ public class DebugImage extends ImageParent {
 			}
 		}
 		// now loop through our drawing overlay, painting when nonzero
+		int count = 0;
 		for (int x = 0; x < width; ++x) {
-			for (int y = 0; y < height; ++y) {
-				if (data[y * width + x] > 0) {
-					int col = data[y * width + x];
+			for (int y = 0; y < height * 2; ++y) {
+				//if (data[y * width + x] > 0) {
+				if (pixelAt(x, y) > 0) {
+					int col = pixelAt(x, y); //data[y * width + x];
 					// if the debug image has a valid color, paint it
 					if (col < 10 && col >= 0) {
-						ret.setRGB(x, y / 2,
+						count++;
+						ret.setRGB(x, y/2,
 								   colorMap[data[y * width + x]].getRGB());
 					} else {
 						ret.setRGB(x, y, Color.BLACK.getRGB());

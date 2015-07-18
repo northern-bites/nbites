@@ -195,6 +195,29 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 	}
 	
 	protected void deleteCurrent() {
+		TreePath[] pathes = tree.getSelectionPaths();
+		for (TreePath tp : pathes) {
+			if( tp.getPathCount() == 3 ) {
+				Session ses = (Session)	tp.getPath()[1];
+				Log sel = (Log) tp.getPath()[2];
+				
+				Logger.warnf("deleting {%s} from {%s}", sel, ses);
+				
+				assert(ses.logs_ALL.contains(sel));
+				ses.logs_ALL.remove(sel);
+				ses.logs_DO.remove(sel);
+				
+				TreeModelEvent tme = new TreeModelEvent(this, new Object[]{root, ses});
+				for (TreeModelListener l : listeners) {
+					l.treeStructureChanged(tme);
+				}
+				
+			} else {
+				Logger.warnf("cannot delete: %s", tp.toString());
+			}
+		}
+		
+		/*
 		TreePath tp = tree.getSelectionPath();
 		
 		if( tp.getPathCount() == 3 ) {
@@ -214,6 +237,6 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 			
 		} else {
 			Logger.warnf("cannot delete: %s", tp.toString());
-		}
+		} */
 	}
 }

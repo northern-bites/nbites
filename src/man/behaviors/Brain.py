@@ -74,6 +74,7 @@ class Brain(object):
         self.motion = None
         self.game = None
         self.locUncert = 0
+        self.naiveBall = None
 
         # New vision system...
         self.visionLines = None
@@ -262,6 +263,7 @@ class Brain(object):
             or self.player.gameState == 'gameSet'):
             self.ball.x = Constants.CENTER_FIELD_X
             self.ball.y = Constants.CENTER_FIELD_Y
+        self.naiveBall = self.interface.naiveBall
 
     def updateObstacles(self):
         self.obstacles = [0.] * 9

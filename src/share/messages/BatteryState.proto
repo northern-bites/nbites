@@ -1,5 +1,10 @@
 package messages;
 
+option java_outer_classname = "_File_BatteryState";
+option java_multiple_files = true;
+
+
+
 message BatteryState
 {
     optional float charge = 1;

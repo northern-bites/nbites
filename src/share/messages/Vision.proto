@@ -1,5 +1,10 @@
 package messages;
 
+option java_outer_classname = "_File_Vision";
+option java_multiple_files = true;
+
+
+
 message HoughLine 
 {
     optional float r = 1;
@@ -28,6 +33,7 @@ message Corner
     optional float prob = 5;
     optional int32 line1 = 6;
     optional int32 line2 = 7;
+    optional float wz0 = 8;
 }
 
 message CenterCircle
@@ -36,6 +42,7 @@ message CenterCircle
     optional float x = 2;
     optional float y = 3;
     optional float prob = 4;
+    optional float wz0 = 5;
 }
 
 message Vision
@@ -44,6 +51,7 @@ message Vision
     repeated Corner corner = 2;
     optional CenterCircle circle = 3;
     optional VBall ball = 4;
+    optional int32 horizon_dist = 5;
 }
 
 message VBall
@@ -64,6 +72,7 @@ message VBall
     optional double bearing_deg = 14;
     optional sint32 x = 15;
     optional sint32 y = 16;
+    optional float wz0 = 17;
 }
 
 // China 2015 hack
@@ -116,4 +125,31 @@ message SharedBall
     optional float y = 2;
     optional bool ball_on  = 3;
     optional int32 reliability = 4;
+}
+
+
+message NaiveBall {
+    message Position {
+        optional float x = 1;
+        optional float y = 2;
+    }
+    optional float velocity = 1;
+    optional bool stationary = 2;
+    optional float yintercept = 3;
+    repeated Position position = 4;
+    repeated Position dest_buffer = 5;
+    optional float x_vel = 6;
+    optional float y_vel = 7;
+
+    optional float start_avg_x = 8;
+    optional float start_avg_y = 9;
+    optional float end_avg_x = 10;
+    optional float end_avg_y = 11;
+    optional float avg_start_index = 12;
+    optional float avg_end_index = 13;
+    optional float alt_x_vel = 14;
+    optional float x_v_1 = 15;
+    optional float x_v_2 = 16;
+    optional float x_v_3 = 17;
+
 }

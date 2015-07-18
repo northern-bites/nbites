@@ -159,6 +159,51 @@ public final class ObstacleOuterClass {
        * <code>optional float distance = 2;</code>
        */
       float getDistance();
+
+      /**
+       * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
+       */
+      boolean hasDetector();
+      /**
+       * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
+       */
+      messages.ObstacleOuterClass.FieldObstacles.Obstacle.ObstacleDetector getDetector();
+
+      /**
+       * <code>optional float closest_y = 4;</code>
+       */
+      boolean hasClosestY();
+      /**
+       * <code>optional float closest_y = 4;</code>
+       */
+      float getClosestY();
+
+      /**
+       * <code>optional float box_bottom = 5;</code>
+       */
+      boolean hasBoxBottom();
+      /**
+       * <code>optional float box_bottom = 5;</code>
+       */
+      float getBoxBottom();
+
+      /**
+       * <code>optional float box_left = 6;</code>
+       */
+      boolean hasBoxLeft();
+      /**
+       * <code>optional float box_left = 6;</code>
+       */
+      float getBoxLeft();
+
+      /**
+       * <code>optional float box_right = 7;</code>
+       */
+      boolean hasBoxRight();
+      /**
+       * <code>optional float box_right = 7;</code>
+       */
+      float getBoxRight();
     }
     /**
      * Protobuf type {@code messages.FieldObstacles.Obstacle}
@@ -226,6 +271,37 @@ public final class ObstacleOuterClass {
               case 21: {
                 bitField0_ |= 0x00000002;
                 distance_ = input.readFloat();
+                break;
+              }
+              case 24: {
+                int rawValue = input.readEnum();
+                messages.ObstacleOuterClass.FieldObstacles.Obstacle.ObstacleDetector value = messages.ObstacleOuterClass.FieldObstacles.Obstacle.ObstacleDetector.valueOf(rawValue);
+                if (value == null) {
+                  unknownFields.mergeVarintField(3, rawValue);
+                } else {
+                  bitField0_ |= 0x00000004;
+                  detector_ = value;
+                }
+                break;
+              }
+              case 37: {
+                bitField0_ |= 0x00000008;
+                closestY_ = input.readFloat();
+                break;
+              }
+              case 45: {
+                bitField0_ |= 0x00000010;
+                boxBottom_ = input.readFloat();
+                break;
+              }
+              case 53: {
+                bitField0_ |= 0x00000020;
+                boxLeft_ = input.readFloat();
+                break;
+              }
+              case 61: {
+                bitField0_ |= 0x00000040;
+                boxRight_ = input.readFloat();
                 break;
               }
             }
@@ -412,6 +488,106 @@ public final class ObstacleOuterClass {
         // @@protoc_insertion_point(enum_scope:messages.FieldObstacles.Obstacle.ObstaclePosition)
       }
 
+      /**
+       * Protobuf enum {@code messages.FieldObstacles.Obstacle.ObstacleDetector}
+       */
+      public enum ObstacleDetector
+          implements com.google.protobuf.ProtocolMessageEnum {
+        /**
+         * <code>NA = 0;</code>
+         */
+        NA(0, 0),
+        /**
+         * <code>ARMS = 1;</code>
+         */
+        ARMS(1, 1),
+        /**
+         * <code>SONARS = 2;</code>
+         */
+        SONARS(2, 2),
+        /**
+         * <code>VISION = 3;</code>
+         */
+        VISION(3, 3),
+        ;
+
+        /**
+         * <code>NA = 0;</code>
+         */
+        public static final int NA_VALUE = 0;
+        /**
+         * <code>ARMS = 1;</code>
+         */
+        public static final int ARMS_VALUE = 1;
+        /**
+         * <code>SONARS = 2;</code>
+         */
+        public static final int SONARS_VALUE = 2;
+        /**
+         * <code>VISION = 3;</code>
+         */
+        public static final int VISION_VALUE = 3;
+
+
+        public final int getNumber() { return value; }
+
+        public static ObstacleDetector valueOf(int value) {
+          switch (value) {
+            case 0: return NA;
+            case 1: return ARMS;
+            case 2: return SONARS;
+            case 3: return VISION;
+            default: return null;
+          }
+        }
+
+        public static com.google.protobuf.Internal.EnumLiteMap<ObstacleDetector>
+            internalGetValueMap() {
+          return internalValueMap;
+        }
+        private static com.google.protobuf.Internal.EnumLiteMap<ObstacleDetector>
+            internalValueMap =
+              new com.google.protobuf.Internal.EnumLiteMap<ObstacleDetector>() {
+                public ObstacleDetector findValueByNumber(int number) {
+                  return ObstacleDetector.valueOf(number);
+                }
+              };
+
+        public final com.google.protobuf.Descriptors.EnumValueDescriptor
+            getValueDescriptor() {
+          return getDescriptor().getValues().get(index);
+        }
+        public final com.google.protobuf.Descriptors.EnumDescriptor
+            getDescriptorForType() {
+          return getDescriptor();
+        }
+        public static final com.google.protobuf.Descriptors.EnumDescriptor
+            getDescriptor() {
+          return messages.ObstacleOuterClass.FieldObstacles.Obstacle.getDescriptor().getEnumTypes().get(1);
+        }
+
+        private static final ObstacleDetector[] VALUES = values();
+
+        public static ObstacleDetector valueOf(
+            com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+          if (desc.getType() != getDescriptor()) {
+            throw new java.lang.IllegalArgumentException(
+              "EnumValueDescriptor is not for this type.");
+          }
+          return VALUES[desc.getIndex()];
+        }
+
+        private final int index;
+        private final int value;
+
+        private ObstacleDetector(int index, int value) {
+          this.index = index;
+          this.value = value;
+        }
+
+        // @@protoc_insertion_point(enum_scope:messages.FieldObstacles.Obstacle.ObstacleDetector)
+      }
+
       private int bitField0_;
       public static final int POSITION_FIELD_NUMBER = 1;
       private messages.ObstacleOuterClass.FieldObstacles.Obstacle.ObstaclePosition position_;
@@ -443,9 +619,89 @@ public final class ObstacleOuterClass {
         return distance_;
       }
 
+      public static final int DETECTOR_FIELD_NUMBER = 3;
+      private messages.ObstacleOuterClass.FieldObstacles.Obstacle.ObstacleDetector detector_;
+      /**
+       * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
+       */
+      public boolean hasDetector() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
+       */
+      public messages.ObstacleOuterClass.FieldObstacles.Obstacle.ObstacleDetector getDetector() {
+        return detector_;
+      }
+
+      public static final int CLOSEST_Y_FIELD_NUMBER = 4;
+      private float closestY_;
+      /**
+       * <code>optional float closest_y = 4;</code>
+       */
+      public boolean hasClosestY() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional float closest_y = 4;</code>
+       */
+      public float getClosestY() {
+        return closestY_;
+      }
+
+      public static final int BOX_BOTTOM_FIELD_NUMBER = 5;
+      private float boxBottom_;
+      /**
+       * <code>optional float box_bottom = 5;</code>
+       */
+      public boolean hasBoxBottom() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional float box_bottom = 5;</code>
+       */
+      public float getBoxBottom() {
+        return boxBottom_;
+      }
+
+      public static final int BOX_LEFT_FIELD_NUMBER = 6;
+      private float boxLeft_;
+      /**
+       * <code>optional float box_left = 6;</code>
+       */
+      public boolean hasBoxLeft() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional float box_left = 6;</code>
+       */
+      public float getBoxLeft() {
+        return boxLeft_;
+      }
+
+      public static final int BOX_RIGHT_FIELD_NUMBER = 7;
+      private float boxRight_;
+      /**
+       * <code>optional float box_right = 7;</code>
+       */
+      public boolean hasBoxRight() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>optional float box_right = 7;</code>
+       */
+      public float getBoxRight() {
+        return boxRight_;
+      }
+
       private void initFields() {
         position_ = messages.ObstacleOuterClass.FieldObstacles.Obstacle.ObstaclePosition.NONE;
         distance_ = 0F;
+        detector_ = messages.ObstacleOuterClass.FieldObstacles.Obstacle.ObstacleDetector.NA;
+        closestY_ = 0F;
+        boxBottom_ = 0F;
+        boxLeft_ = 0F;
+        boxRight_ = 0F;
       }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
@@ -466,6 +722,21 @@ public final class ObstacleOuterClass {
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
           output.writeFloat(2, distance_);
         }
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          output.writeEnum(3, detector_.getNumber());
+        }
+        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+          output.writeFloat(4, closestY_);
+        }
+        if (((bitField0_ & 0x00000010) == 0x00000010)) {
+          output.writeFloat(5, boxBottom_);
+        }
+        if (((bitField0_ & 0x00000020) == 0x00000020)) {
+          output.writeFloat(6, boxLeft_);
+        }
+        if (((bitField0_ & 0x00000040) == 0x00000040)) {
+          output.writeFloat(7, boxRight_);
+        }
         getUnknownFields().writeTo(output);
       }
 
@@ -482,6 +753,26 @@ public final class ObstacleOuterClass {
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
           size += com.google.protobuf.CodedOutputStream
             .computeFloatSize(2, distance_);
+        }
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeEnumSize(3, detector_.getNumber());
+        }
+        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeFloatSize(4, closestY_);
+        }
+        if (((bitField0_ & 0x00000010) == 0x00000010)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeFloatSize(5, boxBottom_);
+        }
+        if (((bitField0_ & 0x00000020) == 0x00000020)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeFloatSize(6, boxLeft_);
+        }
+        if (((bitField0_ & 0x00000040) == 0x00000040)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeFloatSize(7, boxRight_);
         }
         size += getUnknownFields().getSerializedSize();
         memoizedSerializedSize = size;
@@ -604,6 +895,16 @@ public final class ObstacleOuterClass {
           bitField0_ = (bitField0_ & ~0x00000001);
           distance_ = 0F;
           bitField0_ = (bitField0_ & ~0x00000002);
+          detector_ = messages.ObstacleOuterClass.FieldObstacles.Obstacle.ObstacleDetector.NA;
+          bitField0_ = (bitField0_ & ~0x00000004);
+          closestY_ = 0F;
+          bitField0_ = (bitField0_ & ~0x00000008);
+          boxBottom_ = 0F;
+          bitField0_ = (bitField0_ & ~0x00000010);
+          boxLeft_ = 0F;
+          bitField0_ = (bitField0_ & ~0x00000020);
+          boxRight_ = 0F;
+          bitField0_ = (bitField0_ & ~0x00000040);
           return this;
         }
 
@@ -640,6 +941,26 @@ public final class ObstacleOuterClass {
             to_bitField0_ |= 0x00000002;
           }
           result.distance_ = distance_;
+          if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+            to_bitField0_ |= 0x00000004;
+          }
+          result.detector_ = detector_;
+          if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+            to_bitField0_ |= 0x00000008;
+          }
+          result.closestY_ = closestY_;
+          if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+            to_bitField0_ |= 0x00000010;
+          }
+          result.boxBottom_ = boxBottom_;
+          if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+            to_bitField0_ |= 0x00000020;
+          }
+          result.boxLeft_ = boxLeft_;
+          if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+            to_bitField0_ |= 0x00000040;
+          }
+          result.boxRight_ = boxRight_;
           result.bitField0_ = to_bitField0_;
           onBuilt();
           return result;
@@ -661,6 +982,21 @@ public final class ObstacleOuterClass {
           }
           if (other.hasDistance()) {
             setDistance(other.getDistance());
+          }
+          if (other.hasDetector()) {
+            setDetector(other.getDetector());
+          }
+          if (other.hasClosestY()) {
+            setClosestY(other.getClosestY());
+          }
+          if (other.hasBoxBottom()) {
+            setBoxBottom(other.getBoxBottom());
+          }
+          if (other.hasBoxLeft()) {
+            setBoxLeft(other.getBoxLeft());
+          }
+          if (other.hasBoxRight()) {
+            setBoxRight(other.getBoxRight());
           }
           this.mergeUnknownFields(other.getUnknownFields());
           return this;
@@ -752,6 +1088,169 @@ public final class ObstacleOuterClass {
         public Builder clearDistance() {
           bitField0_ = (bitField0_ & ~0x00000002);
           distance_ = 0F;
+          onChanged();
+          return this;
+        }
+
+        private messages.ObstacleOuterClass.FieldObstacles.Obstacle.ObstacleDetector detector_ = messages.ObstacleOuterClass.FieldObstacles.Obstacle.ObstacleDetector.NA;
+        /**
+         * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
+         */
+        public boolean hasDetector() {
+          return ((bitField0_ & 0x00000004) == 0x00000004);
+        }
+        /**
+         * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
+         */
+        public messages.ObstacleOuterClass.FieldObstacles.Obstacle.ObstacleDetector getDetector() {
+          return detector_;
+        }
+        /**
+         * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
+         */
+        public Builder setDetector(messages.ObstacleOuterClass.FieldObstacles.Obstacle.ObstacleDetector value) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          bitField0_ |= 0x00000004;
+          detector_ = value;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
+         */
+        public Builder clearDetector() {
+          bitField0_ = (bitField0_ & ~0x00000004);
+          detector_ = messages.ObstacleOuterClass.FieldObstacles.Obstacle.ObstacleDetector.NA;
+          onChanged();
+          return this;
+        }
+
+        private float closestY_ ;
+        /**
+         * <code>optional float closest_y = 4;</code>
+         */
+        public boolean hasClosestY() {
+          return ((bitField0_ & 0x00000008) == 0x00000008);
+        }
+        /**
+         * <code>optional float closest_y = 4;</code>
+         */
+        public float getClosestY() {
+          return closestY_;
+        }
+        /**
+         * <code>optional float closest_y = 4;</code>
+         */
+        public Builder setClosestY(float value) {
+          bitField0_ |= 0x00000008;
+          closestY_ = value;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>optional float closest_y = 4;</code>
+         */
+        public Builder clearClosestY() {
+          bitField0_ = (bitField0_ & ~0x00000008);
+          closestY_ = 0F;
+          onChanged();
+          return this;
+        }
+
+        private float boxBottom_ ;
+        /**
+         * <code>optional float box_bottom = 5;</code>
+         */
+        public boolean hasBoxBottom() {
+          return ((bitField0_ & 0x00000010) == 0x00000010);
+        }
+        /**
+         * <code>optional float box_bottom = 5;</code>
+         */
+        public float getBoxBottom() {
+          return boxBottom_;
+        }
+        /**
+         * <code>optional float box_bottom = 5;</code>
+         */
+        public Builder setBoxBottom(float value) {
+          bitField0_ |= 0x00000010;
+          boxBottom_ = value;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>optional float box_bottom = 5;</code>
+         */
+        public Builder clearBoxBottom() {
+          bitField0_ = (bitField0_ & ~0x00000010);
+          boxBottom_ = 0F;
+          onChanged();
+          return this;
+        }
+
+        private float boxLeft_ ;
+        /**
+         * <code>optional float box_left = 6;</code>
+         */
+        public boolean hasBoxLeft() {
+          return ((bitField0_ & 0x00000020) == 0x00000020);
+        }
+        /**
+         * <code>optional float box_left = 6;</code>
+         */
+        public float getBoxLeft() {
+          return boxLeft_;
+        }
+        /**
+         * <code>optional float box_left = 6;</code>
+         */
+        public Builder setBoxLeft(float value) {
+          bitField0_ |= 0x00000020;
+          boxLeft_ = value;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>optional float box_left = 6;</code>
+         */
+        public Builder clearBoxLeft() {
+          bitField0_ = (bitField0_ & ~0x00000020);
+          boxLeft_ = 0F;
+          onChanged();
+          return this;
+        }
+
+        private float boxRight_ ;
+        /**
+         * <code>optional float box_right = 7;</code>
+         */
+        public boolean hasBoxRight() {
+          return ((bitField0_ & 0x00000040) == 0x00000040);
+        }
+        /**
+         * <code>optional float box_right = 7;</code>
+         */
+        public float getBoxRight() {
+          return boxRight_;
+        }
+        /**
+         * <code>optional float box_right = 7;</code>
+         */
+        public Builder setBoxRight(float value) {
+          bitField0_ |= 0x00000040;
+          boxRight_ = value;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>optional float box_right = 7;</code>
+         */
+        public Builder clearBoxRight() {
+          bitField0_ = (bitField0_ & ~0x00000040);
+          boxRight_ = 0F;
           onChanged();
           return this;
         }
@@ -1332,15 +1831,20 @@ public final class ObstacleOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\016Obstacle.proto\022\010messages\"\257\002\n\016FieldObst" +
+      "\n\016Obstacle.proto\022\010messages\"\377\003\n\016FieldObst" +
       "acles\0223\n\010obstacle\030\001 \003(\0132!.messages.Field" +
-      "Obstacles.Obstacle\032\347\001\n\010Obstacle\022D\n\010posit" +
+      "Obstacles.Obstacle\032\267\003\n\010Obstacle\022D\n\010posit" +
       "ion\030\001 \001(\01622.messages.FieldObstacles.Obst" +
-      "acle.ObstaclePosition\022\020\n\010distance\030\002 \001(\002\"" +
-      "\202\001\n\020ObstaclePosition\022\010\n\004NONE\020\000\022\t\n\005NORTH\020" +
-      "\001\022\r\n\tNORTHEAST\020\002\022\010\n\004EAST\020\003\022\r\n\tSOUTHEAST\020" +
-      "\004\022\t\n\005SOUTH\020\005\022\r\n\tSOUTHWEST\020\006\022\010\n\004WEST\020\007\022\r\n" +
-      "\tNORTHWEST\020\010"
+      "acle.ObstaclePosition\022\020\n\010distance\030\002 \001(\002\022" +
+      "D\n\010detector\030\003 \001(\01622.messages.FieldObstac" +
+      "les.Obstacle.ObstacleDetector\022\021\n\tclosest" +
+      "_y\030\004 \001(\002\022\022\n\nbox_bottom\030\005 \001(\002\022\020\n\010box_left" +
+      "\030\006 \001(\002\022\021\n\tbox_right\030\007 \001(\002\"\202\001\n\020ObstaclePo" +
+      "sition\022\010\n\004NONE\020\000\022\t\n\005NORTH\020\001\022\r\n\tNORTHEAST",
+      "\020\002\022\010\n\004EAST\020\003\022\r\n\tSOUTHEAST\020\004\022\t\n\005SOUTH\020\005\022\r" +
+      "\n\tSOUTHWEST\020\006\022\010\n\004WEST\020\007\022\r\n\tNORTHWEST\020\010\"<" +
+      "\n\020ObstacleDetector\022\006\n\002NA\020\000\022\010\n\004ARMS\020\001\022\n\n\006" +
+      "SONARS\020\002\022\n\n\006VISION\020\003"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1365,7 +1869,7 @@ public final class ObstacleOuterClass {
     internal_static_messages_FieldObstacles_Obstacle_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_messages_FieldObstacles_Obstacle_descriptor,
-        new java.lang.String[] { "Position", "Distance", });
+        new java.lang.String[] { "Position", "Distance", "Detector", "ClosestY", "BoxBottom", "BoxLeft", "BoxRight", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -251,6 +251,9 @@ namespace nblog {
         
         uint32_t desc_hlen = (uint32_t) desc.size();
         uint32_t data_hlen = (uint32_t) _data.size();
+
+        // printf("SENDING LOG: %u desc, %u data\n",
+        //     desc_hlen, data_hlen);
         
         uint32_t desc_nlen = htonl(desc_hlen);
         uint32_t data_nlen = htonl(data_hlen);

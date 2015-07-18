@@ -5,6 +5,7 @@ from ..util import *
 from objects import Location
 from math import fabs, degrees
 
+# TODO this should be super state, as written, easy to introduce bugs
 @superState('gameControllerResponder')
 def findBall(player):
     """
@@ -39,11 +40,21 @@ def spinSearch(player):
         player.setWalk(0, 0, spinDir*Navigator.QUICK_SPEED)
         player.brain.tracker.lookToSpinDirection(spinDir)
 
-    # this is such a hack for spinning when we lost the ball while falling
-    if not player.brain.motion.calibrated:
-        player.startTime = player.getTime()
-        player.stateTime = 0
-        player.counter = 0
+@superState('gameControllerResponder')
+@stay
+def searchAfterFall(player):
+    """
+    goes into this state only if we saw the ball during the last second before the fall
+    """
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+
+    if player.brain.motion.calibrated:
+        if player.brain.ball.vis.on:
+            return player.goNow('playOffBall')
+        else:
+            return player.goNow('spinSearch')
+    else:
         return player.stay()
 
 @superState('gameControllerResponder')
@@ -65,7 +76,7 @@ def spinToFoundBall(player):
 
     if spinToFoundBall.isFacingBall:
         print "facing ball"
-        return player.goLater('approachBall')
+        return player.goLater('playOffBall')
 
     # spins the appropriate direction
     if theta < 0.:

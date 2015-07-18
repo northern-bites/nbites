@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -50,7 +51,6 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 
 	@Override
 	public char preferredMemnonic() {
-		// TODO Auto-generated method stub
 		return 'c';
 	}
 	
@@ -75,9 +75,10 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	    public CCU_Frame() {
 	        initComponents();
 	        cameraBox.setSelectedIndex(0);
-	        saveButton.setEnabled(false);
+	        writeButton.setEnabled(false);
 	        
-	        saveButton.addActionListener(this);
+	        writeButton.addActionListener(this);
+	        sendButton.addActionListener(this);
 	        callButton.addActionListener(this);
 	        
 	        using = SessionMaster.get().getLatestSession();
@@ -96,7 +97,7 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (e.getSource() == saveButton) {
+			if (e.getSource() == writeButton) {
 				if (lastCalculated != null && lastCalculated.rollOffset != Double.NaN) {
 					Logger.println("saving parameters...");
 					String filePath = System.getenv().get("NBITES_DIR");
@@ -186,6 +187,9 @@ public class CameraCalibrateUtility2 extends UtilityParent {
                     if (iloc > 0) {
                     	rname = rname.substring(0, iloc);
                     }
+
+                    if (rname.equals("she-hulk"))
+                    	rname = "shehulk";
                     
                     lastCalculated = new Params(cameraString, rname);
 
@@ -246,7 +250,8 @@ public class CameraCalibrateUtility2 extends UtilityParent {
             rollLabel.setText("Roll offset: " + Double.toString(lastCalculated.rollOffset) + " rad.");
             tiltLabel.setText("Tilt offset: " + Double.toString(lastCalculated.tiltOffset) + " rad.");
             robotLabel.setText("Of robot: " + lastCalculated.robotName);
-            saveButton.setEnabled(true);
+            writeButton.setEnabled(true);
+            sendButton.setEnabled(true);
 		}
 
 		@Override
@@ -271,12 +276,19 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	        callButton = new javax.swing.JButton();
 	        sessionNameLabel = new javax.swing.JLabel();
 	        sessionSizeLabel = new javax.swing.JLabel();
-	        saveButton = new javax.swing.JButton();
 	        calcLabel = new javax.swing.JLabel();
 	        rollLabel = new javax.swing.JLabel();
 	        tiltLabel = new javax.swing.JLabel();
 	        cameraLabel = new javax.swing.JLabel();
 	        robotLabel = new javax.swing.JLabel();
+	        
+	        writeButton = new JButton();
+	        sendButton = new JButton();
+	        
+	        saveContainer = new javax.swing.JPanel();
+	        saveContainer.setLayout(new GridLayout(1,2));
+	        saveContainer.add( writeButton );
+	        saveContainer.add( sendButton );
 
 	        setTitle("Cheddar's Cool Calibration Utility");
 	        setMinimumSize(new java.awt.Dimension(485, 242));
@@ -289,7 +301,8 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 
 	        sessionSizeLabel.setText("Session size:");
 
-	        saveButton.setText("SAVE");
+	        writeButton.setText("SAVE");
+	        sendButton.setText("SEND");
 
 	        calcLabel.setText("");
 
@@ -326,7 +339,7 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	                            .addComponent(robotLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 	                            .addComponent(cameraLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 	                            .addGroup(layout.createSequentialGroup()
-	                                .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+	                                .addComponent(saveContainer, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
 	                                .addGap(0, 0, Short.MAX_VALUE))
 	                            .addComponent(tiltLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
 	                .addContainerGap())
@@ -353,13 +366,14 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 	                .addComponent(robotLabel)
 	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-	                .addComponent(saveButton)
+	                .addComponent(saveContainer)
 	                .addContainerGap())
 	        );
 
 	        pack();
 	    }// </editor-fold>     
 	    
+	    /*
 	    private void initComponents2() {
 	    	cameraBox = new javax.swing.JComboBox<>();
 	        callButton = new javax.swing.JButton();
@@ -412,19 +426,22 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	        
 	        content.add(tiltLabel);
 	        content.add(saveButton);
-	    }
+	    } */
 
 	    // Variables declaration - do not modify                     
 	    private javax.swing.JButton callButton;
 	    private javax.swing.JComboBox<String> cameraBox;
 	    private javax.swing.JLabel cameraLabel;
-	    private javax.swing.JButton saveButton;
 	    private javax.swing.JLabel calcLabel;
 	    private javax.swing.JLabel robotLabel;
 	    private javax.swing.JLabel rollLabel;
 	    private javax.swing.JLabel sessionNameLabel;
 	    private javax.swing.JLabel sessionSizeLabel;
 	    private javax.swing.JLabel tiltLabel;
+	    
+	    private javax.swing.JButton writeButton;
+	    private javax.swing.JButton sendButton;
+	    private javax.swing.JPanel  saveContainer;
 	    // End of variables declaration                   
 	}
 }

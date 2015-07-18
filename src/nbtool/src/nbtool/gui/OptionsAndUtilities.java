@@ -194,6 +194,7 @@ public class OptionsAndUtilities extends JPanel{
         loggingLabel.setText("logging level");
 
         dropStatsBox.setText("drop STATS");
+        dropStatsBox.setSelected(SessionMaster.dropSTATS);
         dropStatsBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 dropStatsBoxActionPerformed(evt);

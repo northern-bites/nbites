@@ -31,35 +31,6 @@ import nbtool.util.Logger.LogLevel;
 
 public class Prefs {
 
-	/*
-	 * CLASS EXCEPTIONS!  See wiki.
-	 */
-	private static final String BUNDLE_CE_NAME = "DEFAULT_CLASS_EXCEPTIONS.properties";
-	public static final HashMap<String, String> CLASS_EXCEPTIONS_MAP = load_CLASS_EXCEPTIONS_MAP();
-	public static HashMap<String, String> load_CLASS_EXCEPTIONS_MAP()  {
-		try {
-			Properties prop = new Properties();
-			InputStream in = new FileInputStream(Prefs.class.getResource(BUNDLE_CE_NAME).getPath());
-			prop.load(in);
-			in.close();
-
-			Logger.log(Logger.INFO, "load_CLASS_EXCEPTIONS_MAP(): found " + prop.size() + " exceptions.");
-
-			HashMap<String, String> ret = new  HashMap<String, String>();
-
-			for (Entry<Object, Object> e : prop.entrySet()) {
-				ret.put((String) e.getKey(), (String) e.getValue());
-			}
-
-			return ret;
-		} catch (Exception e) {
-			e.printStackTrace();
-			Logger.log(Logger.ERROR, "Cannot run without class exception mapping.");
-			System.exit(1);
-			return null;
-		}
-	}
-
 	/* "OLD" preference values – stored at top level. */
 	//bounds (and default) for main display
 	public static Rectangle bounds = NBConstants.DEFAULT_BOUNDS;

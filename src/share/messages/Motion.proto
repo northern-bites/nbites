@@ -1,5 +1,10 @@
 package messages;
 
+option java_outer_classname = "_File_Motion";
+option java_multiple_files = true;
+
+
+
 import "RobotLocation.proto";
 
 message WalkProvider {
