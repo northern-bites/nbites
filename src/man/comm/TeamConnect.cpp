@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <math.h>
+#include <stdlib.h>     /* srand, rand */
 
 #include "CommDef.h"
 #include "DebugConfig.h"
@@ -22,8 +23,7 @@ namespace man {
 namespace comm {
 
 TeamConnect::TeamConnect(CommTimer* t, NetworkMonitor* m)
-    : timer(t), monitor(m), myLastSeqNum(0)
-{
+    : timer(t), monitor(m), myLastSeqNum(0) {
     socket = new UDPSocket();
     setUpSocket();
 }
@@ -38,8 +38,9 @@ void TeamConnect::setUpSocket()
     socket->setBlocking(false);
     socket->setBroadcast(true);
 
-    socket->setTarget("10.0.255.255", TEAM_PORT);
-    socket->bind("", TEAM_PORT); // listen for anything on our port
+    printf("TeamConnect::setUpSocket() using port %i\n", SPL_BROADCAST_PORT);
+    socket->setTarget("10.0.255.255", SPL_BROADCAST_PORT);
+    socket->bind("", SPL_BROADCAST_PORT); // listen for anything on our port
 }
 
 void TeamConnect::send(const messages::WorldModel& model,
@@ -103,10 +104,13 @@ PROF_ENTER(P_COMM_BUILD_PACKET);
     splMessage.ballVel[1] = model.ball_vel_y()*CM_TO_MM;
     
     /* MISSING FIELDS for HeFei 2015 */
-    splMessage.averageWalkSpeed = 100;   //100 mm/second
-    splMessage.maxKickDistance = 1000;   //1 meter
-    splMessage.currentPositionConfidence = 0;
-    splMessage.currentSideConfidence = 0;
+    splMessage.averageWalkSpeed = 200;   //200 mm/second
+    splMessage.maxKickDistance = 5000;   //1 meter
+    
+    //85-95% range (random)
+    splMessage.currentPositionConfidence = 85 + (rand() % 10);
+    //random
+    splMessage.currentSideConfidence = 32 + ( rand() % 15 );
     
     for (int i = 0; i < SPL_STANDARD_MESSAGE_MAX_NUM_OF_PLAYERS; ++i) {
         splMessage.suggestion[i] = 0;   //default, no meaning
