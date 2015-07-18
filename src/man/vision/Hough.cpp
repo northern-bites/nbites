@@ -524,7 +524,7 @@ void CenterCircleDetector::set()
   minPotentials = 850;
   maxEdgeDistanceSquared = 500 * 500;       // Good practicle distance = 5m
   ccr = CENTER_CIRCLE_RADIUS;               // 75 cm
-  minVotesInMaxBin = 0.20;                  // Conservative clustering theshold
+  minVotesInMaxBin = 0.23;                  // Conservative clustering theshold
   fieldTestDistance = 200;
 
 }
@@ -776,6 +776,23 @@ void FieldLineList::classify(GoalboxDetector& boxDetector,
       midlineFound = true;
       circleDetector.adjustCC(-minDist * cos(midHoughInner->field().t()),
                               -minDist * sin(midHoughInner->field().t()));
+
+      // Erase all short field lines near center cirlce
+      int startSize = size();
+      int i = 0;
+      while (i < startSize) {
+        FieldLine* fl = &(*this)[i];
+
+        // Loop through lines and it is likely to be a center circle false line, erase it
+        if (fl->id() != LineID::Midline && fl->maxLength() < 75 &&
+            fabs((*fl)[0].field().pDist(circleDetector.x(), circleDetector.y())) < 100) {
+          this->erase(this->begin() + i);
+#ifdef OFFLINE
+          std::cout << "Discarding fieldline supposedly on center circle." << std::endl;
+#endif
+        }
+        i++;
+      }
     } else {
       circleDetector.on(false);
     }
