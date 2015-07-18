@@ -532,9 +532,6 @@ class KickDecider(object):
     ### HIGH LEVEL PLANNERS ###
     ###########################
     def decidingStrategy(self):
-        self.brain.player.motionKick = True
-        return kicks.M_LEFT_STRAIGHT
-
         goalShot = self.allKicksOnGoal()
         if goalShot:
             # print "allKicksOnGoal returned"

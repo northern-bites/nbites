@@ -74,7 +74,7 @@ def walkToWayPoint(player):
 
         player.brain.nav.goTo(wayPoint, Navigator.CLOSE_ENOUGH, speed, True, fast = True)
 
-        if player.brain.loc.distTo(wayPoint) < 20:
+        if transitions.shouldSpinToKickHeading(player):
             return player.goNow('spinToKickHeading')
 
     else:
@@ -107,7 +107,7 @@ def spinToKickHeading(player):
         speed = constants.FIND_BALL_SPIN_SPEED
 
     # spins the appropriate direction
-    player.brain.nav.walk(0., 0., speed*copysign(relH))
+    player.brain.nav.walk(0., 0., copysign(speed, relH))
 
     return player.stay()
 
@@ -321,7 +321,7 @@ def spinToBall(player):
     spinToBall.isFacingBall = fabs(theta) <= 2*constants.FACING_KICK_ACCEPTABLE_BEARING
 
     if spinToBall.isFacingBall:
-        return player.goLater('positionAndKickBall')
+        return player.goLater('approachBall')
 
     # spins the appropriate direction
     if theta < 0:
