@@ -112,7 +112,7 @@ PROF_ENTER(P_COMM_BUILD_PACKET);
         splMessage.suggestion[i] = 0;   //default, no meaning
     }
     
-    splMessage.intention = 0;   //default, no meaning
+    splMessage.intention = model.intention();   //default, no meaning
 
 PROF_EXIT(P_COMM_BUILD_PACKET);
 
@@ -231,7 +231,8 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
         message->set_in_kicking_state(splMessage.pose[0] != splMessage.shootingTo[0] ||
                                       splMessage.pose[1] != splMessage.shootingTo[1]);
         message->set_role(6);
-
+        message->set_intention(splMessage.intention);
+        
         // so that behaviors actually processes world model
         message->set_active(true);
 #else
