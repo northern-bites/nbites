@@ -79,9 +79,11 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	        sendButton.setEnabled(false);
 	        switchButton.setEnabled(false);
 	        
-	        writeButton.addActionListener(this);
-	        sendButton.addActionListener(this);
-	        callButton.addActionListener(this);
+//	        writeButton.addActionListener(this);
+//	        sendButton.addActionListener(this);
+//	        callButton.addActionListener(this);
+	        
+	        setupActionListeners();
 	        
 	        using = SessionMaster.get().getLatestSession();
 	        if (using != null)
@@ -96,6 +98,38 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 			using = s;
 			updateSessionLabels();
 		}
+	    
+	    private void setupActionListeners() {
+	    	writeButton.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+	    		
+	    	});
+	    	
+	        sendButton.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+	    		
+	    	});
+	        
+	        callButton.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+	    		
+	    	});
+	    }
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
