@@ -58,7 +58,6 @@ def gameReady(player):
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
         return player.stay()
-    return player.stay()
     return player.goNow('positionReady')
 
 @superState('gameControllerResponder')
