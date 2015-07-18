@@ -184,25 +184,8 @@ string HoughLine::print() const
 
 void HoughLineList::mapToField(const FieldHomography& h, Field& f)
 {
-  for (list<HoughLine>::iterator hl = begin(); hl != end(); ++hl) {
+  for (list<HoughLine>::iterator hl = begin(); hl != end(); ++hl)
     hl->setField(h);
-
-    // China 2015 hack
-    // We require that line is sufficiently below field horizon to be a hough line
-    //
-    // This hack should be eliminated after the competition
-    double ep0x, ep0y, ep1x, ep1y;
-    hl->field().endPoints(ep0x, ep0y, ep1x, ep1y);
-
-    double ep0yField, ep1yField;
-    bool t1 = f.onField(ep0x, ep0yField); 
-    bool t2 = f.onField(ep1x, ep1yField); 
-
-    if (!t1 || fabs(ep0y - ep0yField) < 30)
-      hl->onField(false);
-    if (!t2 || fabs(ep1y - ep1yField) < 30)
-      hl->onField(false);
-  }
 
   _fx0 = -h.wx0();
   _fy0 = -h.wy0();

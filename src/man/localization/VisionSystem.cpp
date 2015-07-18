@@ -221,22 +221,22 @@ bool VisionSystem::update(ParticleSet& particles,
                 // Based on midpoint of top goalbox
                 // NOTE only valid if line is sufficiently long, otherwise too much
                 //      error in the y direction
-                if (inner.ep1() - inner.ep0() > 200) {
-                    // China 2015 hack
-                    // Also require that the endline is sufficiently long
-                    // This throws away false positives in center circle
-                    for (int i = 0; i < vision.line_size(); i++) {
-                        const messages::FieldLine& potentialEndline = vision.line(i);
+                // if (inner.ep1() - inner.ep0() > 200) {
+                //     // China 2015 hack
+                //     // Also require that the endline is sufficiently long
+                //     // This throws away false positives in center circle
+                //     for (int i = 0; i < vision.line_size(); i++) {
+                //         const messages::FieldLine& potentialEndline = vision.line(i);
 
-                        if (potentialEndline.id() == static_cast<int>(vision::LineID::Endline)) {
-                            if (potentialEndline.inner().ep1() - potentialEndline.inner().ep0() > 200) {
-                                messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(id, field);
-                                ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 3, 0.01);
-                                injections.push_back(reconstructed);
-                            }
-                        }
-                    }
-                }
+                //         if (potentialEndline.id() == static_cast<int>(vision::LineID::Endline)) {
+                //             if (potentialEndline.inner().ep1() - potentialEndline.inner().ep0() > 200) {
+                //                 messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(id, field);
+                //                 ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 3, 0.01);
+                //                 injections.push_back(reconstructed);
+                //             }
+                //         }
+                //     }
+                // }
             }
         }
 
