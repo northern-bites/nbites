@@ -39,8 +39,8 @@ void TeamConnect::setUpSocket()
     socket->setBlocking(false);
     socket->setBroadcast(true);
 
-    socket->setTarget("10.0.255.255", TEAM_PORT);
-    socket->bind("", TEAM_PORT); // listen for anything on our port
+    socket->setTarget("10.0.255.255", SPL_BROADCAST_PORT);
+    socket->bind("", SPL_BROADCAST_PORT); // listen for anything on our port
 }
 
 void TeamConnect::send(const messages::WorldModel& model,
