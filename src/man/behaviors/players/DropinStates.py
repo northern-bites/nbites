@@ -27,7 +27,7 @@ def gameInitial(player):
         #DEFAULT role to player number
         player.role = player.brain.playerNumber
 
-    #GOALIE FOR DROP IN CHALLENGE?
+    #GOALIE FOR DROP IN CHALLENGE
     if roleConstants.isGoalie(player.role):
         player.roleSwitching = False
 

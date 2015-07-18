@@ -78,11 +78,6 @@ def checkForConsistency(player):
         print "We have conflicting role AND there are no more open roles..."
 
     constants.setRoleConstants(player, position)
-    return
-
-
-
-
 
 
 ### DROP IN PLAYER ONLY ###
@@ -161,3 +156,4 @@ def switchToRole(player, role):
     print "Switching to role", role
     constants.setRoleConstants(player, role)
     return
+

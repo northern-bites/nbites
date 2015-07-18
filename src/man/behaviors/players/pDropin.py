@@ -1,12 +1,9 @@
 import time
 from . import SoccerFSA
 from . import FallControllerStates
-#different from pBrunswick
-#from . import RoleSwitchingStates
 from . import DropinRoleSwitchingStates
 from . import CommMonitorStates
 from . import GameControllerStates
-# from . import BrunswickStates
 from . import DropinStates
 from . import ChaseBallStates
 from . import PositionStates
@@ -24,11 +21,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.__init__(self,brain)
         self.addStates(FallControllerStates)
         self.addStates(GameControllerStates)
-        #different from pBrunswick
-        #self.addStates(RoleSwitchingStates)
         self.addStates(DropinRoleSwitchingStates)
         self.addStates(CommMonitorStates)
-        #diffrent from pBrunswick
         self.addStates(DropinStates)
         self.addStates(PlayOffBallStates)
         self.addStates(PositionStates)
@@ -37,7 +31,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(FindBallStates)
         self.addStates(KickingStates)
         self.addStates(KickOffStates)
-        #different from pBrunswick
         self.setName('pDropin')
         self.currentState = 'fallController' # initial state
         """ THE STATE OF THE PLAYER """
