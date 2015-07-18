@@ -735,7 +735,7 @@ int Field::findGreenHorizon(int pH, int rH) {
         topEdge[i] = 0;
     }
     // store field pose
-    poseHorizon = pH;
+    poseHorizon = min(pH, rH);
 
 	if (drawCameraHorizon) {
 		cout << "Drawing camera horizon from " << pH << " to " << rH << endl;

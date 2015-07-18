@@ -37,7 +37,7 @@ bool VisionSystem::update(ParticleSet& particles,
     //           processed is an excellent idea
     bool foundLine = false;
     double minR = std::numeric_limits<double>::max();
-    const messages::FieldLine line;
+    messages::FieldLine line;
     for (int i = 0; i < vision.line_size(); i++) {
         if (LineSystem::shouldUse(vision.line(i), lastEstimate)) {
             if (vision.line(i).inner().r() < minR) {
@@ -77,7 +77,7 @@ bool VisionSystem::update(ParticleSet& particles,
 
         // Score particle from line observation
         if (foundLine)
-            curParticleError = curParticleError*lineSystem->scoreLine(line(i), particle->getLocation());
+            curParticleError = curParticleError*lineSystem->scoreLine(line, particle->getLocation());
 
         // Score particle from corner observations
         for (int i = 0; i < vision.corner_size(); i++)
