@@ -19,6 +19,7 @@
 #include "arms/ArmContactModule.h"
 #include "obstacle/ObstacleModule.h"
 #include "ParamReader.h"
+#include "naiveball/NaiveBallModule.h"
 
 #include <vector>
 
@@ -62,6 +63,7 @@ private:
     gamestate::GameStateModule gamestate;
     behaviors::BehaviorsModule behaviors;
     context::SharedBallModule sharedBall;
+    naive::NaiveBallModule naiveBall;
 };
 
 }

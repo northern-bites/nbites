@@ -22,6 +22,8 @@
 namespace man {
 namespace vision {
 
+    const int DEFAULT_TOP_IMAGE_WIDTH = 640;
+    const int DEFAULT_TOP_IMAGE_HEIGHT= 480;
 
 class VisionModule : public portals::Module {
 public:
@@ -93,6 +95,8 @@ private:
     BallDetector* ballDetector[2];
 
     bool blackStar_;
+
+    std::string name;
     
     // Lisp tree with color params saved
     nblog::SExpr colors;
@@ -108,8 +112,8 @@ private:
     size_t image_index;
 
     // Constants for tilt azimuth adjustment hack
-    static constexpr double azimuth_m = 0.0426;
-    static constexpr double azimuth_b = -0.0011;
+    static constexpr double azimuth_m = 0.032228876;
+    static constexpr double azimuth_b = 0.0003214286;
 
     // obstacleBox
     RobotObstacle* robotImageObstacle;

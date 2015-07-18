@@ -34,6 +34,7 @@ import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.images.DebugImage;
 import nbtool.images.Y8image;
 import nbtool.images.EdgeImage;
+import nbtool.images.Y8ThreshImage;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.io.CrossIO;
@@ -43,7 +44,7 @@ import nbtool.io.CrossIO.CrossCall;
 import nbtool.util.Utility;
 
 public class DebugImageView extends ViewParent
-	implements IOFirstResponder, ActionListener {
+	implements IOFirstResponder, ActionListener, ChangeListener {
 
 	// Values according to nbcross/vision_defs.cpp - must be kept in sync
 	static final int YIMAGE = 0;
@@ -56,7 +57,8 @@ public class DebugImageView extends ViewParent
 	static final int BALL_IMAGE = 7;
 	static final int CENTER_CIRCLE = 8;
 	static final int DRAWING = 9;
-	static final int ORIGINAL = 10;
+	static final int THRESH = 10;
+	static final int ORIGINAL = 11;
 
 	static final int DEFAULT_WIDTH = 320;
 	static final int DEFAULT_HEIGHT = 240;
@@ -67,8 +69,12 @@ public class DebugImageView extends ViewParent
 	static final int FIELDH = 554;
 
 	// Images that we can view in this view using the combo box
-	String[] imageViews = { "Original", "Green", "Orange", "White", "Edge" };
+	String[] imageViews = { "Original", "Green", "Orange", "White", "Edge", "Thresh" };
 	JComboBox viewList;
+
+	JSlider greenThreshold;
+	ChangeListener sliderListener;
+	static int thresh = 128;
 
 	static final int NUMBER_OF_PARAMS = 5; // update as new params are added
 	static int displayParams[] = new int[NUMBER_OF_PARAMS];
@@ -88,6 +94,7 @@ public class DebugImageView extends ViewParent
     DebugImage debugImage;                  // drawing overlay
 	BufferedImage debugImageDisplay;        // overlay + original
 	BufferedImage displayImages[] = new BufferedImage[ORIGINAL+1]; // our images
+	Y8ThreshImage greenCheck;
 
 	Log currentLog;
 	Log balls;
@@ -107,7 +114,16 @@ public class DebugImageView extends ViewParent
 		viewList.setSelectedIndex(0);
 		viewList.addActionListener(this);
 
+		// set up slider
+		greenThreshold = new JSlider(JSlider.HORIZONTAL, 128, 220, thresh);
+		greenThreshold.addChangeListener(this);
+		greenThreshold.setMajorTickSpacing(10);
+		greenThreshold.setMinorTickSpacing(1);
+		greenThreshold.setPaintTicks(true);
+		greenThreshold.setPaintLabels(true);
+
 		add(viewList);
+		add(greenThreshold);
         this.addMouseListener(new DistanceGetter());
 
 		// default image to display - save across instances
@@ -158,8 +174,8 @@ public class DebugImageView extends ViewParent
             height = DEFAULT_HEIGHT;
         }
 
-        displayw = width*2;
-        displayh = height*2;
+        displayw = 640; //width*2;
+        displayh = 480; //height*2;
 
         displayImages[ORIGINAL] = Utility.biFromLog(newlog);
 		currentLog = newlog;
@@ -205,10 +221,13 @@ public class DebugImageView extends ViewParent
             g.drawImage(debugImageDisplay, 0, 0, displayw, displayh, null);
 			drawLines(g);
 			drawBlobs(g);
-			g.drawImage(displayImages[currentBottom], 0, displayh + 5, displayw,
-						displayh, null);
-			viewList.setBounds(0, displayh * 2 + 10, displayw / 2, BOX_HEIGHT);
-			persistant.setBounds(displayw+10, 0, 400, 300);
+			//displayImages[THRESH].setThresh(persistant.greenThreshold);
+			g.drawImage(displayImages[currentBottom], 0, displayh + 5, displayw / 2,
+						displayh / 2, null);
+			viewList.setBounds(displayw / 2 + 10, displayh  + 10, displayw / 2, BOX_HEIGHT);
+			greenThreshold.setBounds(displayw / 2, displayh + 15 + BOX_HEIGHT, 500, BOX_HEIGHT+20);
+			greenThreshold.repaint();
+			persistant.setBounds(displayw+10, 0, 300, 300);
         }
     }
 
@@ -269,6 +288,10 @@ public class DebugImageView extends ViewParent
 	 */
     public void drawBlobs(Graphics g)
     {
+		int multiplier = 2;
+		if (width != DEFAULT_WIDTH) {
+			multiplier = 4;
+		}
 		// if we don't have an orange image we're in trouble
         if (displayImages[ORANGE_IMAGE] == null) {
 			System.out.println("No orange image");
@@ -289,7 +312,7 @@ public class DebugImageView extends ViewParent
 				}
 				SExpr blob = bl.get(1);
 				if (persistant != null && persistant.drawAllBalls) {
-					drawBlob(graph, blob);
+					drawBlob(graph, blob, multiplier);
 				}
 			}
 
@@ -310,11 +333,13 @@ public class DebugImageView extends ViewParent
 
             int x = (int) Math.round(loc.get(0).valueAsDouble());
             int y = (int) Math.round(loc.get(1).valueAsDouble());
-            graph.draw(new Ellipse2D.Double((x - diam/2) * 2, (y - diam/2)*2, diam*2, diam*2));
+            graph.draw(new Ellipse2D.Double((x - diam/2) * multiplier,
+											(y - diam/2)* multiplier,
+											diam*multiplier, diam*multiplier));
         }
     }
 
-    private void drawBlob(Graphics2D g, SExpr blob)
+    private void drawBlob(Graphics2D g, SExpr blob, int multiplier)
     {
         SExpr loc = blob.find("center").get(1);
 
@@ -331,13 +356,13 @@ public class DebugImageView extends ViewParent
         int secondXOff = (int)Math.round(len2 * Math.cos(ang2));
         int secondYOff = (int)Math.round(len2 * Math.sin(ang2));
 
-        g.drawLine((x - firstXOff)*2, (y - firstYOff)*2,
-				   (x + firstXOff)*2, (y + firstYOff)*2);
-        g.drawLine((x - secondXOff)*2, (y - secondYOff)*2,
-				   (x + secondXOff)*2, (y + secondYOff)*2);
-        Ellipse2D.Double ellipse = new Ellipse2D.Double((x-len1)*2, (y-len2)*2,
-														len1*4, len2*4);
-        Shape rotated = (AffineTransform.getRotateInstance(ang1, x*2, y*2).
+        g.drawLine((x - firstXOff)*multiplier, (y - firstYOff)*multiplier,
+				   (x + firstXOff)*multiplier, (y + firstYOff)*multiplier);
+        g.drawLine((x - secondXOff)*multiplier, (y - secondYOff)*multiplier,
+				   (x + secondXOff)*multiplier, (y + secondYOff)*multiplier);
+        Ellipse2D.Double ellipse = new Ellipse2D.Double((x-len1)*multiplier, (y-len2)*multiplier,
+														len1*2*multiplier, len2*2*multiplier);
+        Shape rotated = (AffineTransform.getRotateInstance(ang1, x*multiplier, y*multiplier).
 						 createTransformedShape(ellipse));
         g.draw(rotated);
     }
@@ -383,10 +408,27 @@ public class DebugImageView extends ViewParent
 			currentBottom = EDGE_IMAGE;
 		} else if (viewName == "Original") {
 			currentBottom = ORIGINAL;
+		} else if (viewName == "Thresh") {
+			currentBottom = THRESH;
 		} else {
 			currentBottom = ORIGINAL;
 		}
 		repaint();
+	}
+
+	public void stateChanged(ChangeEvent e) {
+		JSlider source = (JSlider)e.getSource();
+		if (!source.getValueIsAdjusting()) {
+			thresh = (int)source.getValue();
+			System.out.println("New value is "+thresh);
+			greenCheck.setThresh(thresh);
+			displayImages[THRESH] = greenCheck.toBufferedImage();
+			if (currentBottom == THRESH) {
+				repaint();
+			}
+		}
+		//parent.adjustParams();
+		//parent.repaint();
 	}
 
     class DistanceGetter implements MouseListener {
@@ -408,7 +450,7 @@ public class DebugImageView extends ViewParent
     }
 
 	class PersistantStuff extends JPanel
-		implements ChangeListener, ItemListener {
+		implements ItemListener {
 		JPanel checkBoxPanel;
 		JCheckBox showCameraHorizon;
 		JCheckBox showFieldHorizon;
@@ -416,23 +458,12 @@ public class DebugImageView extends ViewParent
 		JCheckBox debugFieldEdge;
 		JCheckBox debugBall;
 		JCheckBox showFieldLines;
-		JSlider greenThreshold;
-		ChangeListener sliderListener;
-		int thresh = 128;
 		boolean displayFieldLines;
 		boolean drawAllBalls;
 		DebugImageView parent;
 
 		PersistantStuff(DebugImageView p) {
 			parent = p;
-			// set up slider
-			greenThreshold = new JSlider(JSlider.HORIZONTAL, 128, 200, thresh);
-			greenThreshold.addChangeListener(this);
-			greenThreshold.setMajorTickSpacing(10);
-			greenThreshold.setMinorTickSpacing(1);
-			greenThreshold.setPaintTicks(true);
-			greenThreshold.setPaintLabels(true);
-
 			// set up check boxes
 			showCameraHorizon = new JCheckBox("Show camera horizon");
 			showFieldHorizon = new JCheckBox("Show field convex hull");
@@ -468,22 +499,11 @@ public class DebugImageView extends ViewParent
 			showFieldLines.setSelected(false);
 
 			add(checkBoxPanel);
-			add(greenThreshold);
 			setSize(300, 300);
 		}
 
 		public void setParent(DebugImageView p) {
 			parent = p;
-		}
-
-		public void stateChanged(ChangeEvent e) {
-			JSlider source = (JSlider)e.getSource();
-			if (!source.getValueIsAdjusting()) {
-				thresh = (int)source.getValue();
-				System.out.println("New value is "+thresh);
-			}
-			//parent.adjustParams();
-			//parent.repaint();
 		}
 
 		public void itemStateChanged(ItemEvent e) {
@@ -528,6 +548,9 @@ public class DebugImageView extends ViewParent
 		if (out.length > GREEN_IMAGE) {
             Y8image green8 = new Y8image(width, height, out[GREEN_IMAGE].bytes);
             displayImages[GREEN_IMAGE] = green8.toBufferedImage();
+			greenCheck = new Y8ThreshImage(width, height, out[GREEN_IMAGE].bytes);
+			greenCheck.setThresh(thresh);
+			displayImages[THRESH] = greenCheck.toBufferedImage();
         }
 
 		if (out.length > WHITE_IMAGE) {

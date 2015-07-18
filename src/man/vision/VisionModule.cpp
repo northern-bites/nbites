@@ -63,7 +63,7 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
 #ifdef OFFLINE
 		// Get the appropriate amount of space for the Debug Image
 		if (i == 0) {
-			debugSpace[0] = (uint8_t *)malloc(wd * ht * sizeof(uint8_t));
+			debugSpace[0] = (uint8_t *)malloc(wd * ht * 2 * sizeof(uint8_t));
 		} else {
 			debugSpace[1] = (uint8_t *)malloc((wd / 2) * (ht / 2) * sizeof(uint8_t));
 		}
@@ -154,12 +154,10 @@ void VisionModule::run_()
 
     bool ballDetected = false;
 
-
     // Time vision module
     double topTimes[12];
     double bottomTimes[12];
     double* times[2] = { topTimes, bottomTimes };
-
 
     // Loop over top and bottom image and run line detection system
     for (int i = 0; i < images.size(); i++) {
@@ -188,9 +186,10 @@ void VisionModule::run_()
 
         times[i][0] = timer.end();
 
-
         // Offset to hackily adjust tilt for high-azimuth error
-        double azOffset = azimuth_m * fabs(kinematics[i]->azimuth()) + azimuth_b;
+        double azOffset = 0;
+        if (name != "ringo")
+            azOffset = azimuth_m * fabs(kinematics[i]->azimuth()) + azimuth_b;
 
         // Calculate kinematics and adjust homography
         if (jointsIn.message().has_head_yaw()) {
@@ -249,7 +248,7 @@ void VisionModule::run_()
         times[i][5] = timer.end();
 
         // Find world coordinates for hough lines
-        houghLines[i]->mapToField(*(homography[i]));
+        houghLines[i]->mapToField(*(homography[i]), *field);
         times[i][6] = timer.end();
 
         // Find world coordinates for rejected edges
@@ -345,14 +344,30 @@ void VisionModule::run_()
 
 void VisionModule::outportalVisionField()
 {
+    // Mark repeat lines (already found in bottom camera) in top camera
+    for (int i = 0; i < fieldLines[0]->size(); i++) {
+        for (int j = 0; j < fieldLines[1]->size(); j++) {
+            FieldLine& topField = (*(fieldLines[0]))[i];
+            FieldLine& botField = (*(fieldLines[1]))[j];
+            for (int k = 0; k < 2; k++) {
+                const GeoLine& topGeo = topField[k].field();
+                const GeoLine& botGeo = botField[k].field();
+                if (topGeo.error(botGeo) < 0.001) // TODO constant
+                    (*(fieldLines[0]))[i].repeat(true);
+            }
+        }
+    }
+    // Outportal results
+    // NOTE repeats are not outportaled
     messages::Vision visionField;
 
     // (1) Outportal lines
     // NOTE repeats (in top and bottom camera) are outportaled
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < fieldLines[i]->size(); j++) {
-            messages::FieldLine* pLine = visionField.add_line();
             FieldLine& line = (*(fieldLines[i]))[j];
+            if (line.repeat()) continue;
+            messages::FieldLine* pLine = visionField.add_line();
 
             for (int k = 0; k < 2; k++) {
                 messages::HoughLine pHough;
@@ -460,6 +475,8 @@ void VisionModule::outportalVisionField()
         vb->set_y(static_cast<int>(best.blob.centerY()));
     }
 
+    visionField.set_horizon_dist(field->horizonDist());
+
     // Send
     portals::Message<messages::Vision> visionOutMessage(&visionField);
     visionOut.setMessage(visionOutMessage);
@@ -523,6 +540,8 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
 		field->setDebugFieldEdge(debugField);
 		ballDetector[0]->setDebugBall(debugBall);
 		ballDetector[1]->setDebugBall(debugBall);
+		debugImage[0]->reset();
+		debugImage[1]->reset();
 	}
 #endif
 
@@ -585,9 +604,14 @@ void VisionModule::setCalibrationParams(int camera, std::string robotName)
 {
     if (std::string::npos != robotName.find(".local")) {
         robotName.resize(robotName.find("."));
+        //Much love for the edge cases.
         if (robotName == "she-hulk")
             robotName = "shehulk";
     }
+
+    // Set local private variable
+    name = robotName;
+
     if (robotName == "") {
         return;
     }
