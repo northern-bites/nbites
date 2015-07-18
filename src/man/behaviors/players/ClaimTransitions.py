@@ -72,9 +72,8 @@ def weightedDistAndHeading(distance, heading, ballBearing):
 
 
 #given that we cannot control what our mates are doing during the dropin game,
-# this function decides whether or not we should go for the ball
+# this function decides whether or not we should go for the ball based on the information we receive
 def shouldGiveUpBall(player):
-    print "ENTERED CLAIM FOR DROPIN"
     if not player.useClaims:
         return False
     playerWeight = weightedDistAndHeading(player.brain.ball.distance, 
@@ -88,6 +87,8 @@ def shouldGiveUpBall(player):
 
         mateBallDistance = mateBallDist(player.brain.loc.x, player.brain.loc.y, player.brain.loc.h, player.brain.ball.distance, 
                                 player.brain.ball.bearing_deg, mate.x, mate.y)
+        if mateBallDistance > (widthOfField**2 + lengthOfField**2)**0.5:
+            continue
         mateBallBearing = mateBallHeading(ball_y, mate.y, mate.h, mateBallDistance) 
         mateWeight = weightedDistAndHeading(mateBallDistance, mate.h, mateBallBearing)
 
@@ -97,32 +98,24 @@ def shouldGiveUpBall(player):
 
         if player.brain.ball.distance < mateBallDistance:
             closerDistance = player.brain.ball.distance
-            print "CLAIM:im closer"
-            print "See:", player.brain.ball.distance, mateBallDistance
         else:
             closerDistance = mateBallDistance
-            print "CLAIM:other person is closer"
 
         closeWeightDifference = 25 + 150/(1 + math.e**(6.25 - .05*closerDistance))
-        print "closeWeightDifference", closeWeightDifference
         if (math.fabs(mateWeight - playerWeight) < closeWeightDifference):
             if roleConstants.isFirstChaser(mate.role):
                 player.roleOfClaimer =  mate.role
                 # player.claimedBall = False
-                print "CLAIM:true1"
                 return True
             elif player.role < mate.role and not roleConstants.isFirstChaser(player.role):
                 player.roleOfClaimer =  mate.role
                 # player.claimedBall = False
-                print "CLAIM:true2"
                 return True
         elif (mateWeight < playerWeight):
             player.roleOfClaimer =  mate.role
             # player.claimedBall = False
-            print "CLAIM:true3"
             return True
     # player.claimedBall = True
-    print "CLAIM:false"
     return False
 
 
@@ -144,11 +137,10 @@ def mateBallDist(my_x, my_y, my_h, distance, ballBearing, mate_x, mate_y):
 
 # The function calculates the ball heading for the mate
 def mateBallHeading(ball_y, mate_y, mate_h, distance):
-    print "CLAIM: mateBallHeading"
     if distance == 0.0:
         mate_ballHeading = mate_h
     else:
         dy = mate_y - ball_y
-        ball_dist_heading = math.degrees(math.asin(float(dy)/ float(distance)))
+        ball_dist_heading = math.degrees(math.asin(float(dy)/float(distance)))
         mate_ballHeading = mate_h - ball_dist_heading
     return mate_ballHeading

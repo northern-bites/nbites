@@ -27,7 +27,6 @@ def shouldReturnHome(player):
         return True;
     #For  DropIn player! 
     if player.dropIn:
-        print "shouldReturnHome"
         return claimTrans.shouldGiveUpBall(player)
 
     return claimTrans.shouldCedeClaim(player)
@@ -42,7 +41,6 @@ def shouldSupport(player):
         return False
     # for drop in
     if player.dropIn:
-        print "shouldSupport"
         return player.brain.ball.vis.frames_on and claimTrans.shouldGiveUpBall(player)
     
     return player.brain.ball.vis.frames_on and claimTrans.shouldCedeClaim(player)
