@@ -127,6 +127,7 @@ public class Teams
     public static void readTeams()
     {
         BufferedReader br = null;
+        System.out.println("" + PATH+Rules.league.leagueDirectory+"/"+CONFIG);
         try {
             InputStream inStream = new FileInputStream(PATH+Rules.league.leagueDirectory+"/"+CONFIG);
             br = new BufferedReader(

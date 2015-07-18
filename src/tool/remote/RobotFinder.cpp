@@ -11,7 +11,7 @@ namespace qtool {
 namespace remote {
 
 RobotFinder::RobotFinder() {
-    udpSocket.bind(TEAM_PORT, QUdpSocket::ShareAddress);
+    udpSocket.bind(SPL_BROADCAST_PORT, QUdpSocket::ShareAddress);
 
     // Join Multicast groups
     for (int i=0; i<NUM_ROBOTS; ++i)
