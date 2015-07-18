@@ -563,20 +563,16 @@ class KickDecider(object):
     def decidingStrategy(self):
         closeGoalShot = self.motionKickOnGoal()
         if closeGoalShot:
-            print "motionKickOnGoal"
             return closeGoalShot
 
         goalShot = self.forwardKickOnGoal()
         if goalShot:
-            print "forwardKickOnGoal"
             return goalShot
 
         asap = self.motionKicksAsap()
         if asap:
-            print "motionKicksAsap"
             return asap
         
-        print "frontKickCrosses"
         return self.frontKickCrosses()
 
     # not currently used
