@@ -11,7 +11,8 @@ from objects import RelRobotLocation
 from ..navigator import Navigator
 from ..util import *
 
-DEBUG_PENALTY_STATES = False
+DEBUG_PENALTY_STATES = True
+angle = 70
 
 @superState('gameControllerResponder')
 def afterPenalty(player):
@@ -22,7 +23,7 @@ def afterPenalty(player):
 
         afterPenalty.right = True
         afterPenalty.decidedSide = False
-        player.brain.tracker.lookToAngle(-90)
+        player.brain.tracker.lookToAngle(-1 * angle)
 
         afterPenalty.rightRatio = 0
         afterPenalty.leftRatio = 0
@@ -38,10 +39,14 @@ def afterPenalty(player):
     if afterPenalty.stateCount % 70 == 0:
         if afterPenalty.right:
             afterPenalty.rightRatio = afterPenalty.cornerOn / float(afterPenalty.cornerFrames)
-            player.brain.tracker.lookToAngle(90)
+            if DEBUG_PENALTY_STATES:
+                print "After Penalty right ratio: ", afterPenalty.rightRatio
+            player.brain.tracker.lookToAngle(angle)
         else:
-            player.brain.tracker.lookToAngle(-90)
+            player.brain.tracker.lookToAngle(-1* angle)
             afterPenalty.leftRatio = afterPenalty.cornerOn / float(afterPenalty.cornerFrames)
+            if DEBUG_PENALTY_STATES:
+                print "After left right ratio: ", afterPenalty.leftRatio
         afterPenalty.right = not afterPenalty.right
         # Reset counters
         afterPenalty.cornerOn = 0
@@ -62,13 +67,14 @@ def afterPenalty(player):
 
     # Only decide we're good to go if we saw corner in > 2/3 of frames
     if afterPenalty.stateCount > 140:
-        if max(afterPenalty.rightRatio, afterPenalty.leftRatio) > .66:
+        if max(afterPenalty.rightRatio, afterPenalty.leftRatio) > .3:
             afterPenalty.decidedSide = True
             afterPenalty.right = afterPenalty.rightRatio > afterPenalty.leftRatio
             if afterPenalty.right:
-                player.brain.tracker.lookToAngle(-90)
+                player.brain.tracker.lookToAngle(-1 * angle)
             else:
-                player.brain.tracker.lookToAngle(90)
+                player.brain.tracker.lookToAngle(angle)
+
 
     if afterPenalty.decidedSide or afterPenalty.stateCount > 300:
         player.brain.resetLocalizationFromPenalty(afterPenalty.right)
