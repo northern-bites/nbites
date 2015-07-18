@@ -359,6 +359,9 @@ public:
 
   double separation() const { return _lines[0]->field().separation(_lines[1]->field()); }
 
+  // Get length of the longer line
+  double maxLength() const { return max(_lines[0]->field().length(), _lines[1]->field().length()); }
+
   std::string print() const;
 };
 
@@ -397,6 +400,7 @@ public:
 
   // Calibrate tilt if possible.
   bool tiltCalibrate(FieldHomography&, std::string* message = 0);
+
 };
 
 // *****************

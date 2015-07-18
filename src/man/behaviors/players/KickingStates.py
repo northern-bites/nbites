@@ -43,18 +43,18 @@ def executeMotionKick(player):
 @superState('gameControllerResponder')
 @ifSwitchLater(transitions.ballMoved, 'approachBall') # TODO this doesn't work
 @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
-def executeKick(player):
+def executeSweetKick(player):
     """
-    Kick the ball.
+    Kick the ball using sweet move. But don't do it. They suck!
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        executeKick.sweetMove = player.kick.sweetMove
+        executeSweetKick.sweetMove = player.kick.sweetMove
         return player.stay()
 
     # TODO consider lowering this
     if player.counter == 30:
-        player.executeMove(executeKick.sweetMove)
+        player.executeMove(executeSweetKick.sweetMove)
         return player.stay()
 
     # TODO not ideal at all!
@@ -63,7 +63,26 @@ def executeKick(player):
 
     return player.stay()
 
-executeKick.sweetMove = None
+executeSweetKick.sweetMove = None
+
+@superState('gameControllerResponder')
+@ifSwitchLater(transitions.ballMoved, 'approachBall') # TODO this doesn't work
+@ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
+def executeBHKick(player):
+    """
+    Kick the ball using BH kick engine.
+    """
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        return player.stay()
+
+    if player.counter > 30:
+        player.brain.nav.callKickEngine(player.kick.bhKickType)
+
+    if player.counter > 130:
+        return player.goNow('afterKick')
+
+    return player.stay()
 
 @superState('gameControllerResponder')
 def afterKick(player):

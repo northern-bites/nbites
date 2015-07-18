@@ -12,6 +12,9 @@
 #include "Profiler.h"
 #include "DebugConfig.h"
 
+#include "CommDef.h"
+int SPL_BROADCAST_PORT;
+
 namespace man {
 namespace comm {
 
@@ -20,6 +23,8 @@ CommModule::CommModule(int team, int player) :
     _gameStateOutput(base()),
     _myPlayerNumber(player)
 {
+    SPL_BROADCAST_PORT = 10000 + team;
+
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         _worldModels[i] = new portals::OutPortal<messages::WorldModel>(base());

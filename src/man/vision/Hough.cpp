@@ -184,25 +184,8 @@ string HoughLine::print() const
 
 void HoughLineList::mapToField(const FieldHomography& h, Field& f)
 {
-  for (list<HoughLine>::iterator hl = begin(); hl != end(); ++hl) {
+  for (list<HoughLine>::iterator hl = begin(); hl != end(); ++hl)
     hl->setField(h);
-
-    // China 2015 hack
-    // We require that line is sufficiently below field horizon to be a hough line
-    //
-    // This hack should be eliminated after the competition
-    double ep0x, ep0y, ep1x, ep1y;
-    hl->field().endPoints(ep0x, ep0y, ep1x, ep1y);
-
-    double ep0yField, ep1yField;
-    bool t1 = f.onField(ep0x, ep0yField); 
-    bool t2 = f.onField(ep1x, ep1yField); 
-
-    if (!t1 || fabs(ep0y - ep0yField) < 30)
-      hl->onField(false);
-    if (!t2 || fabs(ep1y - ep1yField) < 30)
-      hl->onField(false);
-  }
 
   _fx0 = -h.wx0();
   _fy0 = -h.wy0();
@@ -541,14 +524,14 @@ void CenterCircleDetector::set()
   minPotentials = 850;
   maxEdgeDistanceSquared = 500 * 500;       // Good practicle distance = 5m
   ccr = CENTER_CIRCLE_RADIUS;               // 75 cm
-  minVotesInMaxBin = 0.18;                  // Conservative clustering theshold
+  minVotesInMaxBin = 0.23;                  // Conservative clustering theshold
   fieldTestDistance = 200;
 
 }
 
 bool CenterCircleDetector::detectCenterCircle(EdgeList& edges, Field& field)
 {
-  on(findPotentialsAndCluster(edges, _ccx, _ccy) && onField(field));
+  on(findPotentialsAndCluster(edges, _ccx, _ccy));  // Excluding onField test. Needs debugging.
   return (on());
 }
 
@@ -641,6 +624,7 @@ bool CenterCircleDetector::findPotentialsAndCluster(EdgeList& edges, double& x0,
 
 }
 
+// TODO: debug and enable
 // Project 2 points from CC and check if they are on the field
 bool CenterCircleDetector::onField(Field& field)
 {
@@ -792,6 +776,23 @@ void FieldLineList::classify(GoalboxDetector& boxDetector,
       midlineFound = true;
       circleDetector.adjustCC(-minDist * cos(midHoughInner->field().t()),
                               -minDist * sin(midHoughInner->field().t()));
+
+      // Erase all short field lines near center cirlce
+      int startSize = size();
+      int i = 0;
+      while (i < startSize) {
+        FieldLine* fl = &(*this)[i];
+
+        // Loop through lines and it is likely to be a center circle false line, erase it
+        if (fl->id() != LineID::Midline && fl->maxLength() < 75 &&
+            fabs((*fl)[0].field().pDist(circleDetector.x(), circleDetector.y())) < 100) {
+          this->erase(this->begin() + i);
+#ifdef OFFLINE
+          std::cout << "Discarding fieldline supposedly on center circle." << std::endl;
+#endif
+        }
+        i++;
+      }
     } else {
       circleDetector.on(false);
     }

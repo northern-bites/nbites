@@ -1,0 +1,15 @@
+#!/bin/bash
+
+BIN_BASE=$NBITES_DIR/build/java/
+
+BIN_LIBS=$BIN_BASE/libs/
+BIN_NBTOOL=$BIN_BASE/volatile/
+
+LIB_APACHE=$BIN_LIBS/apache/
+LIB_BHUMAN=$BIN_LIBS/bhuman/
+LIB_GOOGLE=$BIN_LIBS/google/
+
+cp -r $NBITES_DIR/data/bhuman-stuff/* $NBITES_DIR/build/java/libs/bhuman/
+
+cd $NBITES_DIR/build/java/libs/bhuman/
+java -cp .:$LIB_BHUMAN:$NBITES_DIR/src/nbtool/jars-external/* controller/GameController

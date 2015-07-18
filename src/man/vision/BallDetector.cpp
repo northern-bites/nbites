@@ -146,15 +146,15 @@ namespace vision {
 		// Note: this test is for bottom camera, occluded top could mean
 		// a facing red robot. If ball is actually occluded on top it should
 		// show up in the top camera
-		bool occluded = occludedSide || occludedBottom;
+		/*bool occluded = occludedSide || occludedBottom;
 
 		if (!topCamera && !occluded && principalLength2 < height / 20) {
 			if (debugBall) {
 				std::cout << "Blob on bottom is too thin " <<
-					principalLength2 << " " << (height / 20) << std::endl;
+					principalLength2 << " " << principalLength << std::endl;
 			}
 			return true;
-		}
+			}*/
 		return false;
 	}
 
