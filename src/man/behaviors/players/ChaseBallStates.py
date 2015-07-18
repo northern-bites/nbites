@@ -67,35 +67,21 @@ def walkToWayPoint(player):
     else:
         speed = MAX_SPEED
 
-    if relH <= constants.MAX_BEARING_DIFF:
+    if fabs(relH) <= constants.MAX_BEARING_DIFF:
         wayPoint = RobotLocation(ball.x - constants.WAYPOINT_DIST*cos(radians(player.kick.setupH)),
                                 ball.y - constants.WAYPOINT_DIST*sin(radians(player.kick.setupH)),
                                 player.brain.loc.h)
 
-        spinToKickHeading.nextWayPoint = False
+        player.brain.nav.goTo(wayPoint, Navigator.CLOSE_ENOUGH, speed, True, fast = True)
+
+        if player.brain.loc.distTo(wayPoint) < 20:
+            return player.goNow('spinToKickHeading')
 
     else:
-        print "FUCK YOU BITTIES"
-        return player.goNow('prepareForKick')
-        # relH1 = relH + 90
-        # relH2 = relH - 90
-        # wayPoint1 = RobotLocation(ball.x - constants.WAYPOINT_DIST*cos(radians(relH1)),
-        #                         ball.y - constants.WAYPOINT_DIST*sin(radians(relH1)),
-        #                         player.brain.loc.h)
-        # wayPoint2 = RobotLocation(ball.x - constants.WAYPOINT_DIST*cos(radians(relH2)),
-        #                         ball.y - constants.WAYPOINT_DIST*sin(radians(relH2)),
-        #                         player.brain.loc.h)
+        player.brain.nav.chaseBall(speed, fast = True)
 
-        # points = [wayPoint1, wayPoint2]
-
-        # wayPoint = min(points, key=lambda x:player.brain.loc.distTo(x))
-
-        # spinToKickHeading.nextWayPoint = True
-
-    player.brain.nav.goTo(wayPoint, Navigator.CLOSE_ENOUGH, speed, True, fast = True)
-
-    if player.brain.loc.distTo(wayPoint) < 20:
-        return player.goNow('spinToKickHeading')
+        if transitions.shouldPrepareForKick(player):
+            return player.goLater('positionAndKickBall')
 
     return player.stay()
 
@@ -110,22 +96,18 @@ def spinToKickHeading(player):
     if player.brain.nav.dodging:
         return player.stay()
 
-    if spinToKickHeading.nextWayPoint:
-        relH = player.brain.ball.bearing_deg
-    else:
-        relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
+    relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
 
     if fabs(relH) <= constants.FACING_KICK_ACCEPTABLE_BEARING:
-        if spinToKickHeading.nextWayPoint:
-            return player.goLater('walkToWayPoint')
-        else:
-            return player.goNow('positionForKick')
+        return player.goNow('positionForKick')
+
+    if fabs(relH) < constants.SHOULD_SPIN_TO_BALL_BEARING:
+        speed = Navigator.MEDIUM_SPEED
+    else:
+        speed = constants.FIND_BALL_SPIN_SPEED
 
     # spins the appropriate direction
-    if relH < 0:
-        player.brain.nav.walk(0., 0., -1*constants.FIND_BALL_SPIN_SPEED)
-    else:
-        player.brain.nav.walk(0., 0., constants.FIND_BALL_SPIN_SPEED)
+    player.brain.nav.walk(0., 0., speed*copysign(relH))
 
     return player.stay()
 
@@ -166,10 +148,7 @@ def prepareForKick(player):
 
     #  TODO just to be safe since we are only motionkicking now
     player.motionKick = True
-    # only orbit is small orbit
-    relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
-    if fabs(relH) < 70:
-        return player.goNow('orbitBall')
+
     return player.goNow('followPotentialField')
 
 @superState('gameControllerResponder')
