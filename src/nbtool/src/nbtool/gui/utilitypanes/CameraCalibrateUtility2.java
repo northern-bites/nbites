@@ -85,7 +85,7 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	        cameraBox.setSelectedIndex(0);
 	        writeButton.setEnabled(false);
 	        sendButton.setEnabled(false);
-	        switchButton.setEnabled(false);
+	        switchButton.setEnabled(true);
 	        
 //	        writeButton.addActionListener(this);
 //	        sendButton.addActionListener(this);

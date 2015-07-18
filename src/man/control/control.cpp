@@ -212,6 +212,7 @@ namespace control {
         std::stringstream buffer;
         buffer << ifs.rdbuf();
         std::string str = buffer.str();
+        ifs.close();
         
         if (str.find(pCalibrateName) == std::string::npos) {
             printf("[%s] ---> pCalibrate!\n", str.c_str());
@@ -228,12 +229,10 @@ namespace control {
             
             printf("pCalibrate ---> [%s]\n",
                    foundContents.c_str());
+            std::ofstream switchOFS(switchPath);
+            switchOFS << foundContents;
+            switchOFS.close();
         }
-        
-        std::string str((std::istreambuf_iterator<char>(ifs)),
-                        std::istreambuf_iterator<char>());
-        
-        ifs.close();
         
         return 0;
     }
