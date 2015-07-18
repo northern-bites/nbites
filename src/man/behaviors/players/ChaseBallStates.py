@@ -70,19 +70,13 @@ def prepareForKick(player):
             player.shouldKickOff = False
             player.kick = player.decider.kicksBeforeBallIsFree()
         else:
-        #player.shouldKickOff = False
-        #if roleConstants.isDefender(player.role):
-        #    player.kick = player.decider.defender()
-        #else:
-        #    player.kick = player.decider.attacker()
+            player.shouldKickOff = False
             player.kick = player.decider.decidingStrategy()
         player.inKickingState = True
 
     elif player.finishedPlay:
         player.inKickOffPlay = False
 
-    #  TODO just to be safe since we are only motionkicking now
-    player.motionKick = True
     # only orbit is small orbit
     relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
     if fabs(relH) < constants.SHOULD_ORBIT_BEARING:
@@ -300,10 +294,14 @@ def positionForKick(player):
 
     player.ballBeforeKick = player.brain.ball
     if transitions.ballInPosition(player, positionForKick.kickPose):
+        print player.kick
         if player.motionKick:
            return player.goNow('executeMotionKick')
+        elif player.kick.bhKickType or True:
+            player.brain.nav.stand()
+            return player.goLater('executeBHKick')
         else:
             player.brain.nav.stand()
-            return player.goNow('executeKick')
+            return player.goLater('executeSweetKick')
 
     return player.stay()
