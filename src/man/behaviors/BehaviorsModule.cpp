@@ -228,6 +228,9 @@ void BehaviorsModule::prepareMessages()
     sharedFlipIn.latch();
     pyInterface.setSharedFlip_ptr(&sharedFlipIn.message());
 
+    naiveBallIn.latch();
+    pyInterface.setNaiveBall_ptr(&naiveBallIn.message());
+
     filteredBallIn.latch();
     pyInterface.setFilteredBall_ptr(&filteredBallIn.message());
 

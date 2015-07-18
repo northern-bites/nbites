@@ -90,6 +90,7 @@ public:
     portals::InPortal<messages::SharedBall> sharedBallIn;
     portals::InPortal<messages::RobotLocation> sharedFlipIn;
 
+    portals::InPortal<messages::NaiveBall> naiveBallIn;
     // A command from Boss
     portals::InPortal<messages::Toggle> sitDownIn;
 

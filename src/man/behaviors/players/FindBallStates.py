@@ -5,6 +5,7 @@ from ..util import *
 from objects import Location
 from math import fabs, degrees
 
+# TODO this should be super state, as written, easy to introduce bugs
 @superState('gameControllerResponder')
 def findBall(player):
     """
@@ -49,60 +50,12 @@ def searchAfterFall(player):
         player.brain.tracker.trackBall()
 
     if player.brain.motion.calibrated:
-        return player.goNow('spinSearch')
+        if player.brain.ball.vis.on:
+            return player.goNow('playOffBall')
+        else:
+            return player.goNow('spinSearch')
     else:
         return player.stay()
-
-@defaultState('doFirstHalfSpin')
-@superState('gameControllerResponder')
-@stay
-def spinInHomePosition(player):
-    """
-    half-spin towards goal box -> pan -> finish spin in home position
-    """
-    pass
-
-@superState('spinInHomePosition')
-def doFirstHalfSpin(player):
-    """
-    spin to where we think the ball is
-    """
-    if player.firstFrame():
-        my = player.brain.loc
-        ball = Location(player.brain.ball.x,player.brain.ball.y)
-        spinDir = my.spinDirToPoint(ball)
-        player.setWalk(0,0,spinDir*Navigator.QUICK_SPEED)
-        player.brain.tracker.lookToSpinDirection(spinDir)
-    while player.stateTime < constants.SPUN_ONCE_TIME_THRESH/2:
-        return player.stay()
-    return player.goNow('doPan')
-
-@superState('spinInHomePosition')
-def doPan(player):
-    """
-    wide pan for 5 seconds
-    """
-    if player.firstFrame():
-        player.stand()
-        player.brain.tracker.repeatWidePan()
-    while player.stateTime < 5:
-        return player.stay()
-    return player.goNow('doSecondHalfSpin')
-
-@superState('spinInHomePosition')
-def doSecondHalfSpin(player):
-    """
-    keep spinning in the same direction
-    """
-    if player.firstFrame():
-        my = player.brain.loc
-        ball = Location(player.brain.ball.x,player.brain.ball.y)
-        spinDir = -my.spinDirToPoint(ball)
-        player.setWalk(0,0,spinDir*Navigator.QUICK_SPEED)
-        player.brain.tracker.lookToSpinDirection(spinDir)
-    while player.stateTime < constants.SPUN_ONCE_TIME_THRESH/2:
-        return player.stay()
-    return player.goNow('playOffBall')
 
 @superState('gameControllerResponder')
 @stay
@@ -123,7 +76,7 @@ def spinToFoundBall(player):
 
     if spinToFoundBall.isFacingBall:
         print "facing ball"
-        return player.goLater('approachBall')
+        return player.goLater('playOffBall')
 
     # spins the appropriate direction
     if theta < 0.:
