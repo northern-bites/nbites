@@ -23,8 +23,7 @@ namespace man {
 namespace comm {
 
 TeamConnect::TeamConnect(CommTimer* t, NetworkMonitor* m)
-    : timer(t), monitor(m), myLastSeqNum(0), spl_sideConfidence(99)
-{
+    : timer(t), monitor(m), myLastSeqNum(0) {
     socket = new UDPSocket();
     setUpSocket();
 }

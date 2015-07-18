@@ -4,11 +4,10 @@
 #include <string>
 
 #include "Common.h"
-#include "RobotConfig.h"
 
 #define IP_TARGET "10.0.255.255"
-#define SPL_BROADCAST_PORT (10000 + TEAM_NUMBER)
-
+//#define SPL_BROADCAST_PORT (10000 + TEAM_NUMBER)
+extern int SPL_BROADCAST_PORT;
 #define UDP_BUF_SIZE 1024
 #define TCP_BUF_SIZE 1048576 // 1MB for the Nao's
 
