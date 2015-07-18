@@ -201,11 +201,40 @@ namespace control {
         return 0;
     }
     
-    const std::string path = "/home/nao/nbites/lib/python/players/Switch.py";
+    const std::string switchPath = "/home/nao/nbites/lib/python/players/Switch.py";
     std::string foundContents;
     const std::string pCalibrateContents = "from . import pCalibrate as selectedPlayer";
+    const std::string pCalibrateName = "pCalibrate";
+    
     uint32_t cnc_calibrationPlayerSwitch(Log * arg) {
-        std::ifstream
+        printf("cnc_calibrationPlayerSwitch()");
+        std::ifstream ifs(switchPath);
+        std::stringstream buffer;
+        buffer << ifs.rdbuf();
+        std::string str = buffer.str();
+        
+        if (str.find(pCalibrateName) == std::string::npos) {
+            printf("[%s] ---> pCalibrate!\n", str.c_str());
+            foundContents = str;
+            
+            std::ofstream switchOFS(switchPath);
+            switchOFS << pCalibrateContents;
+            switchOFS.close();
+        } else {
+            if (foundContents == "") {
+                printf("ERROR: cannot switch out of pCalibrate without prior state!\n");
+                return 1;
+            }
+            
+            printf("pCalibrate ---> [%s]\n",
+                   foundContents.c_str());
+        }
+        
+        std::string str((std::istreambuf_iterator<char>(ifs)),
+                        std::istreambuf_iterator<char>());
+        
+        ifs.close();
+        
         return 0;
     }
     
