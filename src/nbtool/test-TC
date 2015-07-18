@@ -12,4 +12,4 @@ LIB_GOOGLE=$BIN_LIBS/google/
 cp -r $NBITES_DIR/data/bhuman-stuff/* $NBITES_DIR/build/java/libs/bhuman/
 
 cd $NBITES_DIR/build/java/libs/bhuman/
-java -cp .:$LIB_BHUMAN:$NBITES_DIR/src/nbtool/jars-external/* controller/GameController
+java -cp .:$LIB_BHUMAN:$NBITES_DIR/src/nbtool/jars-external/* teamcomm/TeamCommunicationMonitor
