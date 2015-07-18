@@ -51,8 +51,8 @@ def positionAtHome(player):
 @superState('playOffBall')
 @stay
 @ifSwitchNow(transitions.shouldSpinSearchFromWatching, 'spinAtHome')
-@ifSwitchNow(roleTransitions.roleOverlap, 'switchRoles')
-@ifSwitchNow(roleTransitions.offenseMissing, 'switchRoles')
+# @ifSwitchNow(roleTransitions.roleOverlap, 'switchRoles')
+# @ifSwitchNow(roleTransitions.offenseMissing, 'switchRoles')
 def watchForBall(player):
     """
     The player is at home, waiting for the ball to be within box.

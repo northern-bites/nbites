@@ -8,6 +8,7 @@ widthOfField = 600
 lengthOfField = 900
 
 def shouldCedeClaim(player):
+    """
     if not player.useClaims:
         return False
 
@@ -50,6 +51,8 @@ def shouldCedeClaim(player):
             return True
 
     player.claimedBall = True
+
+    """
     return False
 
 #TODO: make this make use of amount of orbit necessary
@@ -74,6 +77,7 @@ def weightedDistAndHeading(distance, heading, ballBearing):
 #given that we cannot control what our mates are doing during the dropin game,
 # this function decides whether or not we should go for the ball based on the information we receive
 def shouldGiveUpBall(player):
+    """
     if not player.useClaims:
         return False
     playerWeight = weightedDistAndHeading(player.brain.ball.distance, 
@@ -116,6 +120,7 @@ def shouldGiveUpBall(player):
             # player.claimedBall = False
             return True
     # player.claimedBall = True
+    """
     return False
 
 
