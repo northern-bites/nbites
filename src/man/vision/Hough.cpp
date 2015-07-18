@@ -47,6 +47,7 @@ void HoughLine::set(int rIndex, int tIndex, double r, double t, double score, in
   members = 0;
   fieldLine(-1);
   _index = index;
+  _onField = true;
 }
 
 enum
@@ -181,10 +182,27 @@ string HoughLine::print() const
 // *                   *
 // *********************
 
-void HoughLineList::mapToField(const FieldHomography& h)
+void HoughLineList::mapToField(const FieldHomography& h, Field& f)
 {
-  for (list<HoughLine>::iterator hl = begin(); hl != end(); ++hl)
+  for (list<HoughLine>::iterator hl = begin(); hl != end(); ++hl) {
     hl->setField(h);
+
+    // China 2015 hack
+    // We require that line is sufficiently below field horizon to be a hough line
+    //
+    // This hack should be eliminated after the competition
+    double ep0x, ep0y, ep1x, ep1y;
+    hl->field().endPoints(ep0x, ep0y, ep1x, ep1y);
+
+    double ep0yField, ep1yField;
+    bool t1 = f.onField(ep0x, ep0yField); 
+    bool t2 = f.onField(ep1x, ep1yField); 
+
+    if (!t1 || fabs(ep0y - ep0yField) < 30)
+      hl->onField(false);
+    if (!t2 || fabs(ep1y - ep1yField) < 30)
+      hl->onField(false);
+  }
 
   _fx0 = -h.wx0();
   _fy0 = -h.wy0();
@@ -537,6 +555,10 @@ bool CenterCircleDetector::detectCenterCircle(EdgeList& edges, Field& field)
 // Get potential cc centers and clean edge list
 bool CenterCircleDetector::findPotentialsAndCluster(EdgeList& edges, double& x0, double& y0)
 {
+#ifdef OFFLINE
+  _potentials.clear();
+  std::cout << "POTENTIAL SIZE: " << _potentials.size() << std::endl;
+#endif
   std::vector<Point> vec;
   Point p1, p2;
   int count = 0;
@@ -681,12 +703,12 @@ void FieldLineList::find(HoughLineList& houghLines, bool blackStar)
   clear();
 
   for (HoughLineList::iterator hl1 = houghLines.begin(); hl1 != houghLines.end(); ++hl1)
-    if (hl1->field().valid())
+    if (hl1->field().valid() && hl1->onField())
     {
       HoughLineList::iterator hl2 = hl1;
       for (++hl2; hl2 != houghLines.end(); ++hl2)
         // Here is the dot product 
-        if (hl2->field().valid() &&
+        if (hl2->field().valid() && hl2->onField() &&
             hl1->field().ux() * hl2->field().ux() + hl1->field().uy() * hl2->field().uy() <= maxCosAngle)
         {
           // We use image coordinates to check polarity. Converting to field 

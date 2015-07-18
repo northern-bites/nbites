@@ -187,6 +187,9 @@ public class CameraCalibrateUtility2 extends UtilityParent {
                     if (iloc > 0) {
                     	rname = rname.substring(0, iloc);
                     }
+
+                    if (rname.equals("she-hulk"))
+                    	rname = "shehulk";
                     
                     lastCalculated = new Params(cameraString, rname);
 
