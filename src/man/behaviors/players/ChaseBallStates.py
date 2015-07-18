@@ -70,11 +70,7 @@ def prepareForKick(player):
             player.shouldKickOff = False
             player.kick = player.decider.kicksBeforeBallIsFree()
         else:
-        #player.shouldKickOff = False
-        #if roleConstants.isDefender(player.role):
-        #    player.kick = player.decider.defender()
-        #else:
-        #    player.kick = player.decider.attacker()
+            player.shouldKickOff = False
             player.kick = player.decider.decidingStrategy()
         player.inKickingState = True
 
@@ -83,9 +79,9 @@ def prepareForKick(player):
 
     # only orbit is small orbit
     relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
- #   if fabs(relH) < constants.SHOULD_ORBIT_BEARING:
-    return player.goNow('orbitBall')
-#    return player.goNow('followPotentialField')
+    if fabs(relH) < constants.SHOULD_ORBIT_BEARING:
+        return player.goNow('orbitBall')
+    return player.goNow('followPotentialField')
 
 @superState('gameControllerResponder')
 @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
