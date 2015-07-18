@@ -327,7 +327,7 @@ class KickDecider(object):
 
         try:
             k = (kick for kick in self.possibleKicks).next().next()
-            print "kick being used: ", k
+            # print "kick being used: ", k
             if k.sweetMove: 
                 self.brain.player.motionKick = False
             else:
@@ -468,7 +468,7 @@ class KickDecider(object):
             return None
 
     def allKicksAsapOnGoal(self):
-        print "In allKicksAsapOnGoal"
+        # print "In allKicksAsapOnGoal"
 
         self.kicks = []
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
@@ -490,7 +490,7 @@ class KickDecider(object):
 
         try:
             k = (kick for kick in self.possibleKicks).next().next()
-            print "Kick being used: ", k
+            # print "Kick being used: ", k
             if k.sweetMove: 
                 self.brain.player.motionKick = False
             else:
@@ -655,22 +655,22 @@ class KickDecider(object):
         filteredKickLists = []
         if self.filters:
             for filt in self.filters:
-                print "Filter tested: ", filt
+                # print "Filter tested: ", filt
                 filtKick = [kick for kick in kicks if filt(kick)]
                 filteredKickLists.append(filtKick)
 
-            print "Current list of filters: ", filteredKickLists
+            # print "Current list of filters: ", filteredKickLists
             filteredKicks = list(set.intersection(*map(set, filteredKickLists)))
-            print "Filtered kicks: ", filteredKicks
+            # print "Filtered kicks: ", filteredKicks
         else:
             filteredKicks = kicks
 
         try:
             tempVar = max(filteredKicks,key=self.scoreKick)
-            print "This is the max scored kick", tempVar
+            # print "This is the max scored kick", tempVar
             yield tempVar
         except ValueError:
-            print "No kick satisfied the filter req's"
+            # print "No kick satisfied the filter req's"
             yield filteredKicks #list is empty
             #try:
             #    varIter = iter(filteredKicks)
@@ -756,7 +756,7 @@ class KickDecider(object):
     ### SCORE KICK FUNCTIONS ###
     def minimizeOrbitTime(self, kick):
         orbitTime = abs(self.normalizeAngle(kick.setupH - self.brain.loc.h))
-        print "Orbit time: ", -orbitTime
+        # print "Orbit time: ", -orbitTime
         return -orbitTime
 
     def minimizeKickTime(self, kick):
@@ -825,7 +825,7 @@ class KickDecider(object):
 
         #scale = goalLineX / kickVector[0]
         scale = goalLineX / kick.distance
-        print "Do we cross the goal line: ", scale
+        # print "Do we cross the goal line: ", scale
 
         if 0 <= scale <= 1:
             return (rightPostY <= kickVector[1]*scale <= leftPostY)
@@ -840,7 +840,7 @@ class KickDecider(object):
         intoBox = (kick.destinationX > nogginC.GREEN_PAD_X and kick.destinationX < nogginC.BLUE_GOALBOX_RIGHT_X and
                     kick.destinationY < nogginC.BLUE_GOALBOX_TOP_Y and kick.destinationY > nogginC.BLUE_GOALBOX_BOTTOM_Y)
 
-        print "inBox returned"
+        # print "inBox returned"
         if intoBox and not inBox:
             return False
 
