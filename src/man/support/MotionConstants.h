@@ -20,6 +20,7 @@ namespace man
                 WALK = 0,
                 STEP,
                 DESTINATION,
+                KICK,
                 BODY_JOINT,
                 HEAD_JOINT,
                 GAIT,
