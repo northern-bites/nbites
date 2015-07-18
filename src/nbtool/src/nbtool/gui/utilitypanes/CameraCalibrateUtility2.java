@@ -124,7 +124,7 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 			                SExpr saved = SExpr.deserializeFrom(text);
 			                SExpr bot = saved.get(1).find(lastCalculated.robotName);
 			                if (!bot.exists()) {
-			                    System.out.printf("Invalid robot name! Could not find existing params for \"%s\"\n",
+			                    System.out.printf("Invalid robot name! Could not find exiting params for \"%s\"\n",
 			                    		lastCalculated.robotName);
 			                } else {
 			                    if (lastCalculated.camera.equals("TOP")) {
@@ -149,7 +149,7 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 			                e1.printStackTrace();
 			            }
 					} else {
-						JOptionPane.showMessageDialog(outerThis, "successfully calibrate first");
+						JOptionPane.showMessageDialog(outerThis, "successfully call calibrate first");
 					}
 				}
 	    		
