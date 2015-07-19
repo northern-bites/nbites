@@ -79,6 +79,8 @@ def gameSet(player):
 @superState('gameControllerResponder')
 def gamePlaying(player):
     if player.firstFrame():
+        if player.brain.penalizedHack:
+            player.brain.resetGoalieLocalization()
         player.inKickingState = False
         player.brain.fallController.enabled = True
         player.penaltyKicking = False
