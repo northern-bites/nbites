@@ -310,8 +310,8 @@ double LineSystem::scoreObservation(const vision::GeoLine& observation,
 
     // Evaluate gaussian to get probability of observation from location loc
     // TODO params
-    boost::math::normal_distribution<> tiltGaussian(0, 5*TO_RAD);
-    boost::math::normal_distribution<> tGaussian(0, 10*TO_RAD);
+    boost::math::normal_distribution<> tiltGaussian(0, 10*TO_RAD);
+    boost::math::normal_distribution<> tGaussian(0, 20*TO_RAD);
     boost::math::normal_distribution<> ep0Gaussian(0, 100);
     boost::math::normal_distribution<> ep1Gaussian(0, 100);
   
