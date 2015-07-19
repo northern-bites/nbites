@@ -115,23 +115,23 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             # No dives -- TESTING DIVES
             Transition.CountTransition(GoalieTransitions.shouldDiveLeft,
                                        Transition.SOME_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
+                                       Transition.LOW_PRECISION)
             : GoalieStates.saveLeft,
 
             Transition.CountTransition(GoalieTransitions.shouldDiveRight,
                                        Transition.SOME_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
+                                       Transition.LOW_PRECISION)
             : GoalieStates.saveRight,
 
-            # Transition.CountTransition(GoalieTransitions.shouldClearBall,
-            #                            Transition.SOME_OF_THE_TIME,
-            #                            Transition.OK_PRECISION + 5)
-            # : VisualGoalieStates.clearBall,
+            Transition.CountTransition(GoalieTransitions.shouldClearBall,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION + 5)
+            : VisualGoalieStates.clearBall,
 
-            # Transition.CountTransition(GoalieTransitions.adjustPosition,
-            #                            Transition.SOME_OF_THE_TIME,
-            #                            Transition.OK_PRECISION)
-            # : GoalieStates.shiftPosition,
+            Transition.CountTransition(GoalieTransitions.adjustPosition,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : GoalieStates.shiftPosition,
 
 
             }

@@ -17,7 +17,6 @@ def safelyPlaced(player):
     corners = player.corners
     goodRightCornerObservation = 0
     goodLeftCornerObservation = 0
-    print("Hello here")
     for corner in corners:
         dist = getCornerDist(corner)
         bearing = getBearingFromRobot(corner.x, corner.y)
@@ -32,6 +31,11 @@ def safelyPlaced(player):
             elif (math.fabs(bearing - constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER) < constants.CORNER_BEARING_THRESH):
                 goodRightCornerObservation += 1
                 print("Found a good right corner!")
+
+    for line in GoalieStates.watchWithLineChecks.lines:
+        r = line.r
+        t = math.degrees(line.t)
+        print("Line r:", line.r, "line t:", t)
 
     if goodLeftCornerObservation > 5:
         player.goodLeftCornerObservation = True

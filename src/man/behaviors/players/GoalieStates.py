@@ -10,8 +10,8 @@ import math
 import noggin_constants as nogginConstants
 
 #TestingChange
-SAVING = False
-DIVING = False
+SAVING = True
+DIVING = True
 
 @superState('gameControllerResponder')
 def gameInitial(player):
@@ -329,7 +329,7 @@ def watch(player):
             and player.lastState is not 'faceBall'):
             player.inPosition = constants.HOME_POSITION
         print ("I'm moving to watch! I think I'm in the right position")
-        player.brain.tracker.lookToAngle(0)
+        # player.brain.tracker.lookToAngle(0)
 
 
 #TestingChange
@@ -484,7 +484,7 @@ def saveRight(player):
     if player.counter > 80:
         if SAVING and DIVING:
             # player.executeMove(SweetMoves.GOALIE_ROLL_OUT_RIGHT)
-            return player.goLater('fallen')
+            return player.goLater('rollOut')
         else:
             return player.goLater('watch')
 
