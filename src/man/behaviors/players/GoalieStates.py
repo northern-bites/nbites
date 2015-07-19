@@ -333,28 +333,28 @@ def watch(player):
 
 
 #TestingChange
-    if player.counter % 2 == 0:
-        print("Horizon dist == ", player.brain.vision.horizon_dist)
+    # if player.counter % 2 == 0:
+    #     print("Horizon dist == ", player.brain.vision.horizon_dist)
 
-        ball = player.brain.ball
-        nball = player.brain.naiveBall
+    #     ball = player.brain.ball
+    #     nball = player.brain.naiveBall
 
-        print("Ball bearing:", ball.bearing_deg)
-        print("Ball x:", ball.x)
-        print("Ball y:", ball.y)
-        print("Ball dist:", ball.distance)
-        print("Ball dist:", ball.distance)
-        print("ball.vis.frames_on", ball.vis.frames_on)
-        print("nb xvel:", nball.x_vel)
-    #     print("nb altxvel:", nball.alt_x_vel)
-        print("ball mov vel:", ball.mov_vel_x)
-    #     print("ball mov speed:", ball.mov_speed)
-    #     print("stationary: ", nball.stationary)
-    #     print("yintercept", nball.yintercept)
-    # #     print("1", nball.x_v_1)
-    # #     print("2", nball.x_v_2)
-    # #     print("3", nball.x_v_3)
-        print"- - -  -- - -- --- ---    - --"
+    #     print("Ball bearing:", ball.bearing_deg)
+    #     print("Ball x:", ball.x)
+    #     print("Ball y:", ball.y)
+    #     print("Ball dist:", ball.distance)
+    #     print("Ball dist:", ball.distance)
+    #     print("ball.vis.frames_on", ball.vis.frames_on)
+    #     print("nb xvel:", nball.x_vel)
+    # #     print("nb altxvel:", nball.alt_x_vel)
+    #     print("ball mov vel:", ball.mov_vel_x)
+    # #     print("ball mov speed:", ball.mov_speed)
+    # #     print("stationary: ", nball.stationary)
+    # #     print("yintercept", nball.yintercept)
+    # # #     print("1", nball.x_v_1)
+    # # #     print("2", nball.x_v_2)
+    # # #     print("3", nball.x_v_3)
+    #     print"- - -  -- - -- --- ---    - --"
 
     # return player.stay()
     return Transition.getNextState(player, watch)
@@ -447,9 +447,9 @@ def saveCenter(player):
         # else:
         #     player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
         #TESTINGCHANGE
-    if player.counter > 100:
+  
 
-    if player.counter > 40`:
+    if player.counter > 40:
         if SAVING:
             player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
             return player.goLater('upUpUP')
