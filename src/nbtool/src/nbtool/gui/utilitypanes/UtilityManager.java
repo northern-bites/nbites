@@ -29,6 +29,7 @@ public class UtilityManager {
 	
 	
 	public static final WorldViewUtility WorldViewUtility = new WorldViewUtility();
+	public static final BroadcastUtility BroadcastUtility = new BroadcastUtility();
 	
 	//Unused at the moment – comment out to re-enable.
 	//public static final MultiStreamUtility MultiStreamUtility = new MultiStreamUtility();
