@@ -87,15 +87,15 @@ def clearBall(player):
         # print "approaching ball"
         player.brain.nav.chaseBall(nav.FAST_SPEED, fast = True)
 
-    if player.counter % 2 == 0:
-        nball = player.brain.naiveBall
-        ball = player.brain.ball
-        print "================================="
-        print("yintercept:", nball.yintercept)
-        print("Ball dist:", ball.distance)
-        print("ball.vis.frames_on", ball.vis.frames_on)
-        print("nb xvel:", nball.x_vel)
-        print("ball mov vel:", ball.mov_vel_x)
+    # if player.counter % 2 == 0:
+    #     nball = player.brain.naiveBall
+    #     ball = player.brain.ball
+    #     print "================================="
+    #     print("yintercept:", nball.yintercept)
+    #     print("Ball dist:", ball.distance)
+    #     print("ball.vis.frames_on", ball.vis.frames_on)
+    #     print("nb xvel:", nball.x_vel)
+    #     print("ball mov vel:", ball.mov_vel_x)
 
     return Transition.getNextState(player, clearBall)
 
