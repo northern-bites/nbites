@@ -114,6 +114,7 @@ def gamePlaying(player):
             if (roleConstants.isFirstChaser(player.role) and
                 player.brain.ball.vis.on):
                 player.shouldKickOff = True
+                print "SHOULD KICK OFF"
                 return player.goNow('approachBall')
             else:
                 return player.goNow('playOffBall')
