@@ -311,7 +311,8 @@ void get_config_params() {
         // should defenders have a fixed home or dynamic
         scope().attr("FIXED_D_HOME") = get_defensive_strategy(params);
         // do we want defenders to play up or back
-        scope().attr("FORWARD_DEFENSE") = get_defender_home(params);
+        scope().attr("LEFT_FORWARD_DEFENSE") = get_left_defender_home(params);
+        scope().attr("RIGHT_FORWARD_DEFENSE") = get_right_defender_home(params);
         // max speed when chasing the ball
         scope().attr("MAX_SPEED") = get_max_speed(params);
         // min speed when chasing the ball
@@ -324,7 +325,8 @@ void get_config_params() {
         // default values
         scope().attr("FIXED_D_HOME") = true;
         // do we want defenders to play up or back
-        scope().attr("FORWARD_DEFENSE") = false;
+        scope().attr("LEFT_FORWARD_DEFENSE") = false;
+        scope().attr("RIGHT_FORWARD_DEFENSE") = false;
         // max speed when chasing the ball
         scope().attr("MAX_SPEED") = 0.8f;
         // min speed when chasing the ball
@@ -342,8 +344,18 @@ bool get_defensive_strategy(SExpr params) {
     return fixedD;
 }
 
-bool get_defender_home(SExpr params) {
-    SExpr *dPos = params.find("forward_defense")->get(1);
+bool get_left_defender_home(SExpr params) {
+    SExpr *dPos = params.find("left_forward_defense")->get(1);
+    bool forwardD = false;
+    
+    if (dPos) { forwardD = dPos->valueAsInt()==1 ? true : false; }
+    else { std::cout << "[WARN] Invalid defense home. Default to back positions." << std::endl; }
+    
+    return forwardD;
+}
+
+bool get_right_defender_home(SExpr params) {
+    SExpr *dPos = params.find("right_forward_defense")->get(1);
     bool forwardD = false;
     
     if (dPos) { forwardD = dPos->valueAsInt()==1 ? true : false; }

@@ -76,7 +76,7 @@ class FallController():
                 self.standingUp = False
                 self.standDelay = 0
             
-                if self.brain.playerNumber != 1 and self.sawBall:
+                if self.brain.playerNumber != 1 and self.sawBall and self.brain.player.gameState == 'gamePlaying':
                     return self.brain.player.switchTo('searchAfterFall')
                 else:
                     self.brain.player.switchTo(self.brain.player.gameState)

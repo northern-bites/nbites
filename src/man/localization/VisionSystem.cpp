@@ -31,11 +31,26 @@ bool VisionSystem::update(ParticleSet& particles,
     numObservations = 0;
     avgError = 0;
 
-    // Count observations
+    // Find closest line to use as observation
+    // IMPORTANT currently we only have the time to process a single line
+    //           optimizing this inner loop, so more lines can be 
+    //           processed is an excellent idea
+    bool foundLine = false;
+    double minR = std::numeric_limits<double>::max();
+    messages::FieldLine line;
     for (int i = 0; i < vision.line_size(); i++) {
-        if (LineSystem::shouldUse(vision.line(i), lastEstimate))
-            numObservations++;
+        if (LineSystem::shouldUse(vision.line(i), lastEstimate)) {
+            if (vision.line(i).inner().r() < minR) {
+                foundLine = true;
+                line = vision.line(i);
+                minR = vision.line(i).inner().r();
+            }
+        }
     }
+
+    // Count observations
+    if (foundLine)
+        numObservations++;
     for (int i = 0; i < vision.corner_size(); i++)
         numObservations++;
     if (vision.circle().on())
@@ -60,16 +75,9 @@ bool VisionSystem::update(ParticleSet& particles,
         Particle* particle = &(*iter);
         float curParticleError = 1;
 
-        // Score particle from line observations
-        for (int i = 0; i < vision.line_size(); i++) {
-            if (!LineSystem::shouldUse(vision.line(i), lastEstimate))
-                continue;
-            curParticleError = curParticleError*lineSystem->scoreLine(vision.line(i), particle->getLocation());
-            break;
-            // IMPORTANT currently we only have the time to process a single line
-            //           optimizing this inner loop, so more lines can be 
-            //           processed is an excellent idea
-        }
+        // Score particle from line observation
+        if (foundLine)
+            curParticleError = curParticleError*lineSystem->scoreLine(line, particle->getLocation());
 
         // Score particle from corner observations
         for (int i = 0; i < vision.corner_size(); i++)
