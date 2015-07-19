@@ -52,12 +52,26 @@ void RobotObstacle::updateVisionObstacle(ImageLiteU8 whiteImage, EdgeList& edges
     // Go through edges and determine which are "topmost" and "bottommost" ones
     getBottomAndTopEdges(edges);
 
-    // Find constricting box of obstacle in image coordinates
-    // Returns column with the lowest edge point in the image
-    int lowestCol = findObstacle(whiteImage, obstacleBox);
+    // CHINA 2015
+    // Gets the first column of where we want to process obstacles
+    // depending on azimuth: We don't want to pick up an obstacle in the
+    // shoulder by accident
+    // returns negative start column if "startCol" is actually the last column
+    // we want to process (when shoulder is in left part of image)
+    // return value of 0 = process entire image
+    // return value of width = don't process any part of image
+    int startCol = findAzimuthRestrictions(hom);
 
-    // Convert the image coordinates in obstacleBox to robotCoordinates
-    toFieldCoordinates(hom, obstacleBox, lowestCol);
+    // when we don't want to proess image
+    if (startCol != img_wd) {
+        std::cout<<"DIDN'T IGNORE START COL"<<std::endl;
+        // Find constricting box of obstacle in image coordinates
+        // Returns column with the lowest edge point in the image
+        int lowestCol = findObstacle(whiteImage, obstacleBox, startCol);
+
+        // Convert the image coordinates in obstacleBox to robotCoordinates
+        toFieldCoordinates(hom, obstacleBox, lowestCol);
+    }
 }
 
 void RobotObstacle::initAccumulators(float* obstacleBox)
@@ -106,27 +120,109 @@ void RobotObstacle::getBottomAndTopEdges(EdgeList& edges)
     }
 }
 
-int RobotObstacle::findObstacle(ImageLiteU8 whiteImage, float* obstacleBox)
+int RobotObstacle::findAzimuthRestrictions(FieldHomography* hom)
+{
+
+    // A little hacky: TODO make function / calculate better values / use constants
+    // HACK CHINA 2015 SORRY!!
+    double az = hom->azimuth();
+    int val = 0;
+
+    std::cout<<"Azimuth: "<<az<<std::endl;
+
+    // if abs(az) 1.3, too great to detect obstacle: return width
+    if (az > 1.3 || az < -1.3) { return img_wd; std::cout<<"r1"<<std::endl; }
+
+    // if abs(az) is > 1.1 and <= 1.3, ignore 2/3
+    if (az > 1.1 || az < -1.1) {
+        val = (int)(.6666 * (double)img_wd);
+        std::cout<<"r2"<<std::endl;
+    }
+
+    // if abs(az) is > 1 and <= 1.1, ignore 1/2
+    else if (az > 1.0 || az < -1.0) {
+        val = (int)(.5 * (double)img_wd);
+        std::cout<<"r3"<<std::endl;
+    }
+
+    // if abs(az) is > 0.98 and <= 1, ignore 1/3
+    else if (az > 0.98 || az < -0.98) {
+        val = (int)(.3333 * (double)img_wd);
+        std::cout<<"r4"<<std::endl;
+    }
+
+    // if abs(az) is > 0.93 and <= 0.98, ignore 1/4
+    else if (az > 0.93 || az < -0.93) {
+        val = (int)(.25 * (double)img_wd);
+        std::cout<<"r5"<<std::endl;
+    }
+
+    // else, no obstacle! return 0 to detect everything
+    else {
+        std::cout<<"r6"<<std::endl;
+        return 0;
+    }
+
+    // if we've gotten to this point, we want to ignore part of the
+    // image. Side of image depends on sign of azimuth.
+    if (az > 0) {
+        // right side
+        std::cout<<"r7"<<std::endl;
+        return -1*(img_wd - val);
+    } else {
+        // left side (negative lets us know it is the "end col")
+        std::cout<<"r8"<<std::endl;
+        return val;
+    }
+
+}
+
+int RobotObstacle::findObstacle(ImageLiteU8 whiteImage, float* obstacleBox, int startCol)
 {
     int maxLength = 0;          // max run length we've found so far
     int maxStart = -1;          // start of the max run
     int maxBot = 0;             // lowest point of the max run
     int maxCol = -1;            // column with the lowest point
+
     int currLength = 0;         // length of our current run
     int currStart = 0;          // start of first run, start at first index
     int currBot = 0;            // lowest edge of our current run
     int currCol = -1;           // column with lowest point in current run
+    int topWhite = 0;           // how many of the topmost pixels in the run columns are white
+
     int blankCounter = 0;       // how many columns without evidence in a row we've found
+    int endCol;                 // determined by azimuth, want to ignore parts of image to right/left
+
+    // which part of the image do we want to process
+    if (startCol == 0) {
+        endCol = img_wd;
+    } else if (startCol < 0) {
+        endCol = -startCol;
+        startCol = 0;
+    } else {
+        endCol = img_wd;
+    }
+
+    std::cout<<"START col end col: "<<startCol<<", "<<endCol<<std::endl;
 
     // Loop through each column to find a run of columns with evidence of an obstacle
     for (int i = 0; i < img_wd; i++) {
+        if (i < startCol || i > endCol)
+        {
+            continue;
+        }
         int w = 0;
+        bool whiteTop = false;
         for (int j = 0; j < maxbottom[i]; j++) {
             // this is the key business, look for mostly white between edge and top
             if (*(whiteImage.pixelAddr(i,j)) > WHITE_CONFIDENCE_THRESH) {
                 w++;
+
+                // If I am one of the top 3 pixels, check to see if I am white
+                if (j == 0 || j == 1 || j == 2) whiteTop = true;
             }
         }
+
         if (w > maxbottom[i] / 2) {
             // there is enough evidence for this column!
             if (currStart == -1) { currStart = i; }
@@ -134,13 +230,18 @@ int RobotObstacle::findObstacle(ImageLiteU8 whiteImage, float* obstacleBox)
                 currBot = maxbottom[i];
                 currCol = i;
             }
+            if (whiteTop) { topWhite++; }
             blankCounter = 0;
             currLength++;
         } else if (currStart != -1) {   // ignore when we haven't started a run
             if (blankCounter >= MAX_DIST) {
                 // no evidence and blank counter too high, reset params
                 currLength -= blankCounter; // get rid of blanks we counted prematurely
-                if (currLength > maxLength) {
+                std::cout<<"END OF RUN: currLen = "<<currLength<<", topWhite = "<<topWhite<<", maxLength = "<<maxLength<<std::endl;
+                std::cout<<"            i = "<<i<<std::endl;
+                // std::cout<<currLength>maxLength<<std::endl;
+                // std::cout<<(topWhite/currLength)<<std::endl;
+                if (currLength > maxLength && (float)topWhite / (float)currLength > 0.8f) {
                     maxLength = currLength;
                     maxStart = currStart;
                     maxBot = currBot;
@@ -150,6 +251,7 @@ int RobotObstacle::findObstacle(ImageLiteU8 whiteImage, float* obstacleBox)
                 currStart = -1;
                 currBot = 0;
                 blankCounter = 0;
+                topWhite = 0;
             } else {
                 // just a blank, let's increment the blank counter and continue
                 blankCounter++;
@@ -158,8 +260,12 @@ int RobotObstacle::findObstacle(ImageLiteU8 whiteImage, float* obstacleBox)
         }
     }
 
+    std::cout<<"OUTSIDE OF RUN: Curr length = "<<currLength<<", max Len = "<<maxLength<<std::endl;
+
     // check to see if we ended with our maximum length:
-    if (currLength > maxLength) {
+    if (currLength > maxLength && (float)topWhite / (float)currLength > 0.8f) {
+        std::cout<<"HERE"<<std::endl;
+        std::cout<<"END OF RUN: currLen = "<<currLength<<", topWhite = "<<topWhite<<", maxLength = "<<maxLength<<std::endl;
         maxLength = currLength;
         maxStart = currStart;
         maxBot = currBot;
@@ -167,6 +273,7 @@ int RobotObstacle::findObstacle(ImageLiteU8 whiteImage, float* obstacleBox)
     }
 
     if (maxLength > MIN_LENGTH) {
+        std::cout<<"HERE????"<<std::endl;
         // now update obstacle box
         obstacleBox[1] = (float)maxBot;                     // bottom
         obstacleBox[2] = (float)maxStart;                   // left
