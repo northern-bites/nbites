@@ -109,6 +109,9 @@ class Brain(object):
         print '\033[32m'+"GC:  I am player  "+str(self.playerNumber)+'\033[0m'
         print '\033[32m'+"GC:  I am role  "+str(self.player.role)+'\033[0m'
 
+        # CHINA HACK
+        self.penalizedHack = False
+
     def initTeamMembers(self):
         self.teamMembers = []
         for i in xrange(Constants.NUM_PLAYERS_PER_TEAM):
@@ -311,6 +314,15 @@ class Brain(object):
         self.interface.resetLocRequest.y = y
         self.interface.resetLocRequest.h = h * (math.pi / 180.)
         self.interface.resetLocRequest.timestamp = int(self.time * 1000)
+
+    def resetLocToCross(self):
+        """
+        """
+        print "LOC TO CROSS"
+        self.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X, Constants.FIELD_GREEN_HEIGHT / 2, 0)
+        # self.interface.resetLocRequest.x = Constants.LANDMARK_BLUE_GOAL_CROSS_X
+        # self.interface.resetLocRequest.y = Constants.FIELD_GREEN_HEIGHT / 2
+        # self.interface.resetLocRequest.h = 0
 
     def resetInitialLocalization(self):
         """
