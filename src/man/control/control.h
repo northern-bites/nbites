@@ -52,6 +52,7 @@ namespace control {
 #endif
     
     void control_init();
+    void control_destroy();
     
     extern pthread_t control_thread;
 }
