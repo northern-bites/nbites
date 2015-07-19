@@ -62,11 +62,6 @@ class Brain(object):
         # Retrieve our robot identification and set per-robot parameters
         self.CoA = robots.get_certificate()
 
-        # coa is Certificate of Authenticity (to keep things short)
-        print '\033[32m'+str(self.CoA)                              +'\033[0m'
-        print '\033[32m'+"GC:  I am on team "+str(self.teamNumber)  +'\033[0m'
-        print '\033[32m'+"GC:  I am player  "+str(self.playerNumber)+'\033[0m'
-
         # Information about the environment
         self.ball = None
         self.sharedBall = None
@@ -107,6 +102,12 @@ class Brain(object):
 
         # So that we only try to sit down once upon receiving command
         self.sitting = False
+
+        # coa is Certificate of Authenticity (to keep things short)
+        print '\033[32m'+str(self.CoA)                              +'\033[0m'
+        print '\033[32m'+"GC:  I am on team "+str(self.teamNumber)  +'\033[0m'
+        print '\033[32m'+"GC:  I am player  "+str(self.playerNumber)+'\033[0m'
+        print '\033[32m'+"GC:  I am role  "+str(self.player.role)+'\033[0m'
 
     def initTeamMembers(self):
         self.teamMembers = []
@@ -319,23 +320,23 @@ class Brain(object):
               blue goalbox constants always match up with our goal.
         """
         # Does this matter for the goalie? It really shouldn't...
-        if self.playerNumber == 1:
+        if self.player.role == 1:
             self.resetLocTo(Constants.MIDFIELD_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
-        elif self.playerNumber == 2:
+        elif self.player.role == 2:
             self.resetLocTo(Constants.BLUE_GOALBOX_MIDPOINT_X,
                             Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                             Constants.HEADING_DOWN)
-        elif self.playerNumber == 3:
+        elif self.player.role == 3:
             self.resetLocTo(Constants.BLUE_GOALBOX_MIDPOINT_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
-        elif self.playerNumber == 4:
+        elif self.player.role == 4:
             self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
                             Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                             Constants.HEADING_DOWN)
-        elif self.playerNumber == 5:
+        elif self.player.role == 5:
             self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
@@ -349,7 +350,7 @@ class Brain(object):
         gameSetResetUncertainties = _localization.LocNormalParams(50, 200, 1.0)
 
         if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:
-            if self.playerNumber == 1:
+            if self.player.role == 1:
                 self.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
                                 Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                                 Constants.HEADING_UP)
@@ -515,7 +516,7 @@ class Brain(object):
         print ("My position was (" + str(self.loc.x) + ", " + str(self.loc.y) + ", " + str(self.loc.h) +
                ") and the ball's position was " + str(self.ball.x) + ", " + str(self.ball.y) + ")")
 
-        if (self.playerNumber == TeamMember.DEFAULT_GOALIE_NUMBER):
+        if (self.player.role == TeamMember.DEFAULT_GOALIE_NUMBER):
             # I am a goalie. Reset to the penatly box.
             print "I am a goalie. Resetting loc to the goalbox."
             self.resetGoalieLocalization()

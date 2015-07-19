@@ -15,6 +15,7 @@ def positionReady(player):
     if player.firstFrame():
         if player.brain.gameController.ownKickOff and player.isKickingOff:
             player.kickoffPosition = roleConstants.ourKickoff
+            print "kicking off, position is", player.kickoffPosition
         elif player.isKickingOff:
             player.kickoffPosition = roleConstants.theirKickoff
 

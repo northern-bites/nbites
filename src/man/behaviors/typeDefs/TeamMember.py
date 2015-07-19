@@ -184,7 +184,7 @@ class TeamMember(RobotLocation):
         return (self.brain.gameController.penalized)
 
     def isDefaultGoalie(self):
-        return (self.playerNumber == DEFAULT_GOALIE_NUMBER)
+        return (self.role == DEFAULT_GOALIE_NUMBER)
 
     def __str__(self):
         return "I am player number " + str(self.playerNumber)

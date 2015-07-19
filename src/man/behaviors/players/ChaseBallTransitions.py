@@ -75,8 +75,8 @@ def shouldSpinToKickHeading(player):
 
     headingToBall = degrees(atan2(yDiff, xDiff))
 
-    print "HTB", headingToBall
-    print "setup", player.kick.setupH
+    # print "HTB", headingToBall
+    # print "setup", player.kick.setupH
 
     return fabs(headingToBall - player.kick.setupH) < 6 and ball.distance <= constants.PREPARE_FOR_KICK_DIST
 

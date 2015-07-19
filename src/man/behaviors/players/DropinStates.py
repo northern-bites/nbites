@@ -7,7 +7,7 @@ from math import fabs
 from ..util import *
 from .. import SweetMoves
 from . import RoleConstants as roleConstants
-# from . import DropinRoleSwitchingStates as roleSwitching
+from . import DropinRoleSwitchingStates as roleSwitching
 import KickOffConstants as kickOff
 
 @superState('gameControllerResponder')
@@ -24,8 +24,10 @@ def gameInitial(player):
         player.zeroHeads()
         player.brain.resetInitialLocalization()
         player.lastStiffStatus = True
-        #DEFAULT role to player number
-        player.role = player.brain.playerNumber
+        
+        ### HACK CHINA 2015 ###
+
+        player.role = 4
 
     # If stiffnesses were JUST turned on, then stand up.
     if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
