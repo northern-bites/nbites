@@ -118,8 +118,8 @@ def gamePlaying(player):
     #TODO before game/scrimmage change this to watch;
     #TESTINGCHANGE
     # return player.goLater('watchWithLineChecks')
-    # return player.goLater('watch')
-    return player.goLater('checkSafePlacement')
+    return player.goLater('watch')
+    # return player.goLater('checkSafePlacement')
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
