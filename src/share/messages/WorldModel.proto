@@ -39,5 +39,7 @@ message WorldModel
 
     optional bool  claimed_ball = 21;
 
-    optional int32  intention = 22;
+    optional int32 intention = 22;
+
+    optional bool  alive = 23;
 }

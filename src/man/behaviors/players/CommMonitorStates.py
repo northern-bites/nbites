@@ -8,22 +8,14 @@ import CommMonitorTransitions as transitions
 import RoleConstants
 from ..util import *
 
+# TODO China 2015, this clearly needs major rethinking
+
 @defaultState('gameControllerResponder')
 @superState('roleSwitcher')
 def commMonitor(player):
     if player.commMode == -1:
         pass
-    elif player.commMode != 0 and player.brain.game.have_remote_gc:
-        print "Switched to good comm mode because we are on the GC BABAY!"
-        player.role = player.brain.playerNumber
-        if player.commMode == 2: 
-            RoleConstants.roleConfiguration = player.prevRoleConfig
-        RoleConstants.oddDefenderBox = RoleConstants.defenderBox
-        RoleConstants.evenDefenderBox = RoleConstants.defenderBox
-        RoleConstants.setRoleConstants(player, player.role)
-        player.roleSwitching = True
-        player.commMode = 0
-    elif not player.brain.game.have_remote_gc and player.commMode != 2 and transitions.awfulComm(player):
+    elif player.commMode != 2 and transitions.awfulComm(player):
         print "Switched to awful comm mode!"
         player.role = player.brain.playerNumber
         player.prevRoleConfig = RoleConstants.roleConfiguration
@@ -33,7 +25,7 @@ def commMonitor(player):
         RoleConstants.setRoleConstants(player, player.role)
         player.roleSwitching = False
         player.commMode = 2
-    elif not player.brain.game.have_remote_gc and player.commMode != 1 and transitions.mediocreComm(player):
+    elif player.commMode != 1 and transitions.mediocreComm(player):
         print "Switched to mediocre comm mode!"
         player.role = player.brain.playerNumber
         if player.commMode == 2: 
