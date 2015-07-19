@@ -57,6 +57,12 @@ namespace nblog {
     void log_serverio_init();
     void log_fileio_init();
     
+    void log_serverio_destroy();
+    
+    void log_main_destroy() {
+        log_serverio_destroy();
+    }
+    
     void * log_main_loop(void * context);
     
     void sanity_checks() {

@@ -25,6 +25,9 @@ namespace nblog {
     void * server_io_loop(void * context);
     static bool STARTED = false;
     
+    int listenfd = -1;
+    int connfd = -1;
+    
     void log_serverio_init() {
         NBDEBUG("log_serverio_init()\n");
         NBLassert(!STARTED);
@@ -32,6 +35,13 @@ namespace nblog {
         
         pthread_create(&(log_main.log_serverio_thread), NULL, &server_io_loop, NULL);
         pthread_detach(log_main.log_serverio_thread);
+    }
+    
+    void log_serverio_destroy() {
+        if (listenfd > 0)
+            close(listenfd);
+        if (connfd > 0)
+            close(connfd);
     }
     
     /*
@@ -44,10 +54,17 @@ namespace nblog {
     } */
     
 #define CHECK_RET(r) {if (r) goto connection_died;}
+#define CHECK_SETUP(r) {if (r) {    \
+    int errsaved = errno;   \
+    printf("ERROR: log_streamio COULD NOT START up!\n");    \
+    nbperror("log_streamio: ", errsaved);   \
+    return NULL;    \
+} }
+    
+    
 //#define CHECK_RET(r) {if (r) {printf("failed at line %d\n", __LINE__); goto connection_died;}}
     
     void * server_io_loop(void * arg) {
-        int listenfd = -1, connfd = -1;
         struct sockaddr_in serv_addr;
         
         //Network socket, TCP streaming protocol, default options
@@ -59,11 +76,11 @@ namespace nblog {
         serv_addr.sin_family = AF_INET;
         serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
         serv_addr.sin_port = htons(STREAM_PORT);
-        
-        bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+
+        CHECK_SETUP(bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)));
         
         //Accepting connections on this socket, no backqueue
-        listen(listenfd, 0);
+        CHECK_SETUP(listen(listenfd, 0));
         
         NBDEBUG("log_streamio listening...port=%i\n", STREAM_PORT);
         control::flags[control::serv_connected] = false;

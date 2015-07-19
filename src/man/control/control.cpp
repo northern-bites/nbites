@@ -262,8 +262,16 @@ namespace control {
     
 #define CHECK_RET(r) {if (r) goto connection_died;}
     
+#define CHECK_SETUP(r) {if (r) {    \
+    int errsaved = errno;   \
+    printf("ERROR: control COULD NOT START up!\n");    \
+    nbperror("control: ", errsaved);   \
+    return NULL;    \
+} }
+    
+    int listenfd = -1, connfd = -1;
+    
     void * cnc_loop(void * cntxt) {
-        int listenfd = -1, connfd = -1;
         struct sockaddr_in serv_addr;
         
         //Network socket, TCP streaming protocol, default options
@@ -276,10 +284,10 @@ namespace control {
         serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
         serv_addr.sin_port = htons(CONTROL_PORT);
         
-        bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+        CHECK_SETUP(bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)));
                 
         //Accepting connections on this socket, no queue.
-        listen(listenfd, 0);
+        CHECK_SETUP(listen(listenfd, 0));
         
         NBDEBUG("control listening... port = %i\n", CONTROL_PORT);
         
@@ -321,6 +329,10 @@ namespace control {
                         delete found;
                         goto connection_died;
                     }
+                    
+                    printf("control calling [%s]", name.c_str());
+                    std::cout << std::endl; //for flush.
+                    
                     uint32_t ret = -1;
                     try {
                         ret = fmap[name](found);
@@ -387,4 +399,11 @@ namespace control {
         pthread_detach(control_thread);
     }
     
+    
+    void control_destroy() {
+        if (listenfd > 0)
+            close(listenfd);
+        if (connfd > 0)
+            close(connfd);
+    }
 }

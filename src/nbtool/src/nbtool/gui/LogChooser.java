@@ -3,6 +3,9 @@ package nbtool.gui;
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -15,6 +18,7 @@ import javax.swing.tree.TreeSelectionModel;
 import nbtool.data.Log;
 import nbtool.gui.logdnd.LogDND;
 import nbtool.gui.logdnd.LogDND.LogDNDSource;
+import nbtool.util.Logger;
 
 public class LogChooser extends JPanel implements LogDNDSource {
 	private static final long serialVersionUID = 1L;
@@ -36,7 +40,6 @@ public class LogChooser extends JPanel implements LogDNDSource {
 		tree.addTreeSelectionListener(model);
 		
 		/* setupDnd */
-		
 		/*
 		tree.setDragEnabled(true);
 		tree.setTransferHandler(new LogTransferHandler(tree, this)); */
@@ -55,7 +58,17 @@ public class LogChooser extends JPanel implements LogDNDSource {
 		add(sas);
 		add(sp);
 		
-		//tree.getS
+		tree.addKeyListener(new KeyAdapter(){
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_DELETE ||
+						e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+					Logger.println("triggered");
+					model.deleteCurrent();
+				}
+			}
+		});
 	}
 	
 	private void useSize(Dimension size) {
