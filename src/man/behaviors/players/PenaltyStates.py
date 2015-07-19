@@ -16,6 +16,9 @@ angle = 80
 
 @superState('gameControllerResponder')
 def afterPenalty(player):
+    if player.brain.penalizedHack:
+        return player.goLater(player.gameState)
+
 
     if player.firstFrame():
         if DEBUG_PENALTY_STATES:

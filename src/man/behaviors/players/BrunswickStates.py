@@ -153,6 +153,10 @@ def gamePenalized(player):
         player.stand()
         player.penalizeHeads()
         player.wasPenalized = True
+        # RESET LOC TO FIELD CROSS
+        if player.brain.penalizedHack:
+            player.brain.resetLocToCross()
+            print "BRUNSWICK PENALIZED"
 
     return player.stay()
 
