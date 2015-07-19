@@ -11,8 +11,8 @@ from objects import RelRobotLocation
 from ..navigator import Navigator
 from ..util import *
 
-DEBUG_PENALTY_STATES = True
-angle = 70
+DEBUG_PENALTY_STATES = False
+angle = 80
 
 @superState('gameControllerResponder')
 def afterPenalty(player):
@@ -25,10 +25,11 @@ def afterPenalty(player):
         afterPenalty.decidedSide = False
         player.brain.tracker.lookToAngle(-1 * angle)
 
-        afterPenalty.rightRatio = 0
-        afterPenalty.leftRatio = 0
-        # reset state specific counters
-        afterPenalty.cornerOn = 0
+        # state specific counters
+        afterPenalty.rightDiff = 0
+        afterPenalty.leftDiff = 0
+        afterPenalty.cornerCOn = 0
+        afterPenalty.cornerTOn = 0
         afterPenalty.cornerFrames = 0
         afterPenalty.stateCount = 0
 
@@ -38,48 +39,52 @@ def afterPenalty(player):
     # Alternate between looking right and left
     if afterPenalty.stateCount % 70 == 0:
         if afterPenalty.right:
-            afterPenalty.rightRatio = afterPenalty.cornerOn / float(afterPenalty.cornerFrames)
+            afterPenalty.rightDiff += afterPenalty.cornerCOn - afterPenalty.cornerTOn
             if DEBUG_PENALTY_STATES:
-                print "After Penalty right ratio: ", afterPenalty.rightRatio
+                print "After Penalty right Diff: ", afterPenalty.rightDiff, " cOn: ", afterPenalty.cornerCOn, " tOn: ", afterPenalty.cornerTOn
             player.brain.tracker.lookToAngle(angle)
         else:
             player.brain.tracker.lookToAngle(-1* angle)
-            afterPenalty.leftRatio = afterPenalty.cornerOn / float(afterPenalty.cornerFrames)
+            afterPenalty.leftDiff += afterPenalty.cornerCOn - afterPenalty.cornerTOn
             if DEBUG_PENALTY_STATES:
-                print "After left right ratio: ", afterPenalty.leftRatio
+                print "After Penalty left Diff: ", afterPenalty.leftDiff, " cOn: ", afterPenalty.cornerCOn, " tOn: ", afterPenalty.cornerTOn
         afterPenalty.right = not afterPenalty.right
         # Reset counters
-        afterPenalty.cornerOn = 0
-        afterPenalty.cornerFrames = 0
+        afterPenalty.cornerCOn = 0
+        afterPenalty.cornerTOn = 0
+        # afterPenalty.cornerFrames = 0
 
     foundCorner = False
-    for i in range(0, vis.corner_size()):
-        corner = vis.corner(i)
-        # We do NOT want to use T corners
-        if corner.id != 2:
-            foundCorner = True
 
     # Only count if we're looking right/left. Don't want to count goalbox corners
     if player.brain.tracker.isStopped():
-        if foundCorner:
-            afterPenalty.cornerOn += 1
         afterPenalty.cornerFrames += 1
-
-    # Only decide we're good to go if we saw corner in > 2/3 of frames
-    if afterPenalty.stateCount > 140:
-        if max(afterPenalty.rightRatio, afterPenalty.leftRatio) > .3:
-            afterPenalty.decidedSide = True
-            afterPenalty.right = afterPenalty.rightRatio > afterPenalty.leftRatio
-            if afterPenalty.right:
-                player.brain.tracker.lookToAngle(-1 * angle)
+        for i in range(0, vis.corner_size()):
+            corner = vis.corner(i)
+            if corner.id == 2:
+                afterPenalty.cornerTOn += 1
             else:
-                player.brain.tracker.lookToAngle(angle)
+                afterPenalty.cornerCOn += 1
 
+    # China hack 2015. Please make this better
+    if afterPenalty.stateCount > 140:
+        if afterPenalty.rightDiff > 5 and afterPenalty.leftDiff <= 0:
+            afterPenalty.decidedSide = True
+            afterPenalty.right = True
+        elif afterPenalty.rightDiff < -5 and afterPenalty.leftDiff >= 0:
+            afterPenalty.decidedSide = True
+            afterPenalty.right = False
+        elif afterPenalty.leftDiff > 5 and afterPenalty.rightDiff <= 0:
+            afterPenalty.decidedSide = True
+            afterPenalty.right = False
+        elif afterPenalty.leftDiff < -5 and afterPenalty.rightDiff >= 0:
+            afterPenalty.decidedSide = True
+            afterPenalty.right = True
 
     if afterPenalty.decidedSide or afterPenalty.stateCount > 300:
         player.brain.resetLocalizationFromPenalty(afterPenalty.right)
         if DEBUG_PENALTY_STATES:
-            print "We've decided that the goal's to our right? " + str(afterPenalty.right)
+            print "We've decided! ", afterPenalty.right, " LeftDiff: ", afterPenalty.leftDiff, " Right Diff: ", afterPenalty.rightDiff, " StateCount: ", afterPenalty.stateCount
 
         player.brain.tracker.repeatWidePan()
 
@@ -91,9 +96,8 @@ def afterPenalty(player):
 
 @superState('gameControllerResponder')
 def walkOut(player):
-    player.brain.nav.destinationWalkTo(RelRobotLocation(100, 0, 0),
-                                       Navigator.BRISK_SPEED)
-    
+    player.brain.nav.walk(0.5, 0, 0)
+
     if player.stateTime > 5:
         return player.goNow('determineRole')
     return player.stay()
