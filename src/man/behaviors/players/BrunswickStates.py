@@ -46,6 +46,7 @@ def gameReady(player):
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.repeatBasicPan()
+
         player.timeReadyBegan = player.brain.time
         if player.lastDiffState == 'gameInitial':
             player.brain.resetInitialLocalization()
@@ -56,6 +57,11 @@ def gameReady(player):
 
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
+        return player.stay()
+
+    # CHINA HACK player 5 walking off field so start by walking forward
+    if player.brain.playerNumber == 5 and player.stateTime <= 4:
+        player.setWalk(0.6, 0, 0)
         return player.stay()
 
     return player.goNow('positionReady')
@@ -114,6 +120,7 @@ def gamePlaying(player):
             if (roleConstants.isFirstChaser(player.role) and
                 player.brain.ball.vis.on):
                 player.shouldKickOff = True
+                print "SHOULD KICK OFF"
                 return player.goNow('approachBall')
             else:
                 return player.goNow('playOffBall')
@@ -152,6 +159,10 @@ def gamePenalized(player):
         player.stand()
         player.penalizeHeads()
         player.wasPenalized = True
+        # RESET LOC TO FIELD CROSS
+        if player.brain.penalizedHack:
+            player.brain.resetLocToCross()
+            print "BRUNSWICK PENALIZED"
 
     return player.stay()
 

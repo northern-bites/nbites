@@ -3,6 +3,7 @@
 namespace nblog {
     
     nbhost_e HOST_TYPE = UNKNOWN;
+    std::string HOST_NAME = "";
     
     int32_t getChecksum(const std::string& data) {
         int32_t sum = 0;
@@ -126,6 +127,10 @@ namespace nblog {
             keys.push_back(SExpr(LOG_HOST_TYPE_S, "V4ROBOT"));
         } else {
             keys.push_back(SExpr(LOG_HOST_TYPE_S, "unknown"));
+        }
+        
+        if (HOST_NAME != "") {
+            keys.push_back(SExpr(LOG_HOST_NAME_S, HOST_NAME));
         }
         
         _tree = SExpr(keys);

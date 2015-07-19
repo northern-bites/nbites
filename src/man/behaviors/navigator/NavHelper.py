@@ -3,6 +3,7 @@ from ..util import MyMath
 from ..kickDecider import kicks
 import NavConstants as constants
 from objects import RelLocation, RelRobotLocation, RobotLocation, Location
+import PMotion_proto
 
 def stand(nav):
     """
@@ -212,3 +213,12 @@ def executeMove(nav, sweetMove):
 
         else:
             print("What kind of sweet ass-Move is this?")
+
+def executeKickEngine(nav, kickType):
+    """
+    Method to call BH kick engine.
+    """
+    command = nav.brain.interface.bodyMotionCommand
+    command.type = command.CommandType.KICK
+    command.kick.type = kickType
+    command.timestamp = int(nav.brain.time * 1000)

@@ -48,9 +48,13 @@ LineSystem::LineSystem()
     };
     visionToLocIDs[vision::LineID::Line] = all;
 
+    // China 2015 hack
+    // We often see T corners in center circle
+    // This should be made less of a hack after competition
     std::vector<LocLineID> endlineOrSideline { 
         LocLineID::OurEndline, LocLineID::TheirEndline,
-        LocLineID::RightSideline, LocLineID::LeftSideline 
+        LocLineID::OurMidline, LocLineID::TheirMidline,
+        LocLineID::RightSideline, LocLineID::LeftSideline
     };
     visionToLocIDs[vision::LineID::EndlineOrSideline] = endlineOrSideline;
 
