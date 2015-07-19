@@ -113,18 +113,18 @@ LEFT_KICK = LEFT_SHORT_STRAIGHT_KICK
 RIGHT_KICK = RIGHT_SHORT_STRAIGHT_KICK
 
 # BH kick engine kicks
-BH_LEFT_FORWARD_KICK =  Kick("BH_L_FORWARD", x = 14, y =  3.6, dist = 450, bhType = PMotion_proto.messages.Kick.kickForwardLeft)
-BH_RIGHT_FORWARD_KICK =  Kick("BH_R_FORWARD", x = 14, y =  -3.6, dist = 450, bhType = PMotion_proto.messages.Kick.kickForwardRight)
+BH_LEFT_FORWARD_KICK =  Kick("BH_L_FORWARD", x = 13.6, y =  3.2, dist = 475, bhType = PMotion_proto.messages.Kick.kickForwardLeft)
+BH_RIGHT_FORWARD_KICK =  Kick("BH_R_FORWARD", x = 13.6, y =  -3.2, dist = 475, bhType = PMotion_proto.messages.Kick.kickForwardRight)
 
 # Motion kicks
-M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 13.3, y = 3., dist = 70)
-M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 13.3, y = -3., dist = 70)
+M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 13.3, y = 3., dist = 130)
+M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 13.3, y = -3., dist = 130)
 
-M_LEFT_CHIP_SHOT =  Kick("M_Left_Chip_Shot", x = 12.3, y = -.3, h = 45, dist = 70)
-M_RIGHT_CHIP_SHOT =  Kick("M_Right_Chip_Shot", x = 12.3, y = .3, h = -45, dist = 70)
+M_LEFT_CHIP_SHOT =  Kick("M_Left_Chip_Shot", x = 12.3, y = -.3, h = 60, dist = 130)
+M_RIGHT_CHIP_SHOT =  Kick("M_Right_Chip_Shot", x = 12.3, y = .3, h = -60, dist = 130)
 
-M_LEFT_SIDE = Kick("M_Left_Side", x = 13.2, y = -2.76, h = 90, dist = 100)
-M_RIGHT_SIDE = Kick("M_Right_Side", x = 13.2, y = 2.76, h = -90, dist = 100)
+M_LEFT_SIDE = Kick("M_Left_Side", x = 13.16, y = -2.76, h = 80, dist = 110)
+M_RIGHT_SIDE = Kick("M_Right_Side", x = 13.16, y = 2.76, h = -80, dist = 110)
 
 # TODO automate/generalize
 def chooseAlignedKickFromKick(player, kick):
