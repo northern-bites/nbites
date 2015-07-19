@@ -399,7 +399,7 @@ def moveBackwards(player):
         player.brain.nav.walkTo(RelRobotLocation(-100.0, 0, 0))
 
 #TestingChange
-    if player.counter > 100:
+    if player.counter > 130:
         print("Walking backwards too long... switch to a different state!")
         return player.goLater('spinToRecover')
 

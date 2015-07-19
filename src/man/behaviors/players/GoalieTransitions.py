@@ -341,11 +341,11 @@ def shouldTurn(player):
 
             if h_dest < 10.0:
                 return False
-            print "Should turn was TRUE"
-            print ("hdest: ", h_dest)
-            print ("t was: ", t)
-            print ("r was:", r)
-            print ("length of line:", longestLength)
+            # print "Should turn was TRUE"
+            # print ("hdest: ", h_dest)
+            # print ("t was: ", t)
+            # print ("r was:", r)
+            # print ("length of line:", longestLength)
             if h_dest > 100.0:
                 print "Turn too big, not actually doing it!!"
                 return False
@@ -462,18 +462,19 @@ def facingASideline(player):
             or (math.fabs(math.fabs(t1 - t2) - 265) < 15.0)) \
             and r1 != 0.0 and r2 != 0.0 and r1 < 170.0 and r2 < 170.0\
             and i is not j:
-                print ("MY loc h: ", player.brain.loc.h)
-                if player.brain.loc.h > 0.0:
-                    print "I THINK I SEE MY RIGHT CORNER"
-                else:
-                    print "I THINK I SEE MY LEFT COrner"
-                print "-------------------------"
-                print ("R", r1)
-                print ("R2", r2)
-                print ("T", t1)
-                print ("T2", t2)
-                print ("length1:", length1, "length2:", length2)
-                print ("horizon dist:", player.brain.vision.horizon_dist)
+                # TESTINGCHANGE FOR DEBUG
+                # print ("MY loc h: ", player.brain.loc.h)
+                # if player.brain.loc.h > 0.0:
+                #     print "I THINK I SEE MY RIGHT CORNER"
+                # else:
+                #     print "I THINK I SEE MY LEFT COrner"
+                # print "-------------------------"
+                # print ("R", r1)
+                # print ("R2", r2)
+                # print ("T", t1)
+                # print ("T2", t2)
+                # print ("length1:", length1, "length2:", length2)
+                # print ("horizon dist:", player.brain.vision.horizon_dist)
                 # print ("num corners:", player.brain.visionCorners.corner_size())
 
                 # for k in range(0, player.brain.visionCorners.corner_size()):
