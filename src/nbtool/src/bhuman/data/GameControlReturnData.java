@@ -81,17 +81,23 @@ public class GameControlReturnData
             buffer.get(header, 0, 4);
             this.header = new String(header);
             if (!this.header.equals(GAMECONTROLLER_RETURN_STRUCT_HEADER)) {
+            	System.out.println("\theader wrong" + this.header);
                 return false;
             } else {
                 version = buffer.get();
                 switch (version) {
                 case GAMECONTROLLER_RETURN_STRUCT_VERSION:
+                	System.out.println("RETURN DATA USING NEWEST VERSION");
                     team = buffer.get();
                     player = buffer.get();
                     message = buffer.get();
+                    
+                    System.out.println("\tthis one was good");
                     return true;
 
                 case GAMECONTROLLER_RETURN_STRUCT_VERSION1:
+                	System.out.println("ERROR DATA USING OLD VERSION");
+
                     if (   Rules.league.compatibilityToVersion7
                         && buffer.get() == 0
                         && buffer.getShort() == 0)

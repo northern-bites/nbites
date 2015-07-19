@@ -22,7 +22,8 @@ import data.SPLStandardMessage;
 
 public class BroadcastIO {
 	
-	public static final int NBITES_TEAM_PORT = 4500;
+	//public static final int NBITES_TEAM_PORT = 4500;
+	public static final int NBITES_TEAM_PORT = 10014;
 	public static final Map<String, String> ROBOT_TO_IP;
 	public static final Map<String, String> IP_TO_ROBOT;
 	static {

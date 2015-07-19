@@ -544,11 +544,8 @@ int CameraCalibration_func() {
 
         // If log includes "BlackStar," set flag
         std::vector<SExpr*> blackStarVec = args[0]->tree().recursiveFind("BlackStar");
-        if (blackStarVec.size() != 0) {
+        if (blackStarVec.size() != 0)
             module.blackStar(true);
-            std::cout << "\nBLACK STAR TRUE!!!\n\n";
-        } else std::cout << "\nBLACK STAR FALSE\n\n";
-        
         
         // Create messages
         messages::YUVImage image(buf, width, height, width);
@@ -576,6 +573,8 @@ int CameraCalibration_func() {
         rollBefore = fh->roll();
         tiltBefore = fh->tilt();
 
+        std::cout << "Calibrating log " << i+1 << ": "; 
+
         bool success = fh->calibrateFromStar(*module.getFieldLines(top));
 
         if (!success) {
@@ -590,9 +589,11 @@ int CameraCalibration_func() {
 
     if (failures > 4) {
         // Handle failure
-        printf("FAILED: %d times\n", failures);
+        printf("Failed calibration %d times\n", failures);
         rets.push_back(new Log("(failure)"));
     } else {
+        printf("Success calibrating %d times\n", 7 - failures);
+
         totalR /= (args.size() - failures);
         totalT /= (args.size() - failures);
 

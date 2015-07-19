@@ -11,10 +11,8 @@
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/MotionControl/SpecialActionsOutput.h"
 #include "Representations/MotionControl/WalkingEngineOutput.h"
-#include "Representations/MotionControl/BikeEngineOutput.h"
+#include "Representations/MotionControl/KickEngineOutput.h"
 #include "Representations/MotionControl/GetUpEngineOutput.h"
-#include "Representations/MotionControl/BallTakingOutput.h"
-#include "Representations/MotionControl/IndykickEngineOutput.h"
 #include "Representations/MotionControl/MotionRequest.h"
 #include "Representations/MotionControl/MotionSelection.h"
 #include "Representations/Sensing/GroundContactState.h"
@@ -22,10 +20,8 @@
 MODULE(MotionSelector)
   USES(SpecialActionsOutputBH)
   USES(WalkingEngineOutputBH)
-  USES(BikeEngineOutputBH)
+  USES(KickEngineOutput)
   USES(GetUpEngineOutputBH)
-  USES(BallTakingOutputBH)
-  USES(IndykickEngineOutputBH)
   REQUIRES(FrameInfoBH)
   REQUIRES(MotionRequestBH)
   REQUIRES(GroundContactStateBH)

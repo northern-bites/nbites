@@ -14,6 +14,7 @@
 #include "../WalkCommand.h"
 #include "../StepCommand.h"
 #include "../DestinationCommand.h"
+#include "../KickCommand.h"
 #include "../BodyJointCommand.h"
 #include "../MotionProvider.h"
 
@@ -22,6 +23,7 @@
 
 //BH
 #include "WalkingEngine.h"
+#include "KickEngine/KickEngine.h"
 #include "Representations/Blackboard.h"
 #include "Tools/Math/Pose2D.h"
 
@@ -59,6 +61,7 @@ public:
 
     void setCommand(const WalkCommand::ptr command);
     void setCommand(const DestinationCommand::ptr command);
+    void setCommand(const KickCommand::ptr command);
     // StepCommand (currently not used) is actually an odometry destination walk
     void setCommand(const StepCommand::ptr command);
 
@@ -83,6 +86,8 @@ public:
 
     void setStandby(bool value) { standby = value; }
 
+
+    static int frameCount;
 protected:
     void stand();
     void setActive() {}
@@ -95,8 +100,29 @@ private:
     MotionCommand::ptr currentCommand;
     Pose2DBH startOdometry;
 
+    bool kicking;
+    int kickIndex;
+    KickCommand::ptr kickCommand;
+
     WalkingEngine *walkingEngine;
+    KickEngine *kickEngine;
     Blackboard *blackboard;
+
+    // Note: The kick engine output requires state to notify when it's finised.
+    WalkingEngineOutputBH walkOutput;
+    KickEngineOutput kickOut;
+
+    JointRequestBH request;
+
+    void interpolate(const JointRequestBH& from, const JointRequestBH& to, float toRatio);
     };
+
+static const int ON_STIFF_ARRAY[] =
+{ 100, 100,
+  100, 100, 100, 100, 100,
+  100, 100, 100, 100, 100,
+  100, 100, 100, 100, 100,
+  100, 100, 100, 100, 100};
+
 } // namespace motion
 } // namespace man
