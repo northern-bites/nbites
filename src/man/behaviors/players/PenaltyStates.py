@@ -14,15 +14,27 @@ from ..util import *
 DEBUG_PENALTY_STATES = False
 angle = 80
 
+# So this entire state is cobbled together in the rush of China 2015.
+# *IDEALLY* we would use exclusively corners and actively track them,
+# I don't have time to do this so we're just going a static 80 degrees.
+
+# Someone could really knock this out of the park with a good day of work,
+# alternatively this could be a good newbie project. Please fix though
+
 @superState('gameControllerResponder')
 def afterPenalty(player):
-    if player.brain.penalizedHack:
-        return player.goLater(player.gameState)
-
 
     if player.firstFrame():
         if DEBUG_PENALTY_STATES:
             print "Entering the 'afterPenalty' state."
+
+        # Hackity Hackity Hack. Determine if we've been manually positioned or are actually coming out of penalty
+        if player.brain.penalizedHack:
+            closeRatio = player.brain.penalizedEdgeClose / float(player.brain.penalizedCount)
+            print "Close ratio is: ", closeRatio
+            if closeRatio < .5:
+                player.brain.resetLocToCross()
+                return player.goLater(player.gameState)
 
         afterPenalty.right = True
         afterPenalty.decidedSide = False
@@ -33,7 +45,9 @@ def afterPenalty(player):
         afterPenalty.leftDiff = 0
         afterPenalty.cornerCOn = 0
         afterPenalty.cornerTOn = 0
-        afterPenalty.cornerFrames = 0
+
+        afterPenalty.leftHorizSum = 0
+        afterPenalty.rightHorizSum = 0
         afterPenalty.stateCount = 0
 
     afterPenalty.stateCount += 1
@@ -45,23 +59,29 @@ def afterPenalty(player):
             afterPenalty.rightDiff += afterPenalty.cornerCOn - afterPenalty.cornerTOn
             if DEBUG_PENALTY_STATES:
                 print "After Penalty right Diff: ", afterPenalty.rightDiff, " cOn: ", afterPenalty.cornerCOn, " tOn: ", afterPenalty.cornerTOn
+                print "Right sum: ", afterPenalty.rightHorizSum
+                #print "     right close: ", player.brain
             player.brain.tracker.lookToAngle(angle)
         else:
             player.brain.tracker.lookToAngle(-1* angle)
             afterPenalty.leftDiff += afterPenalty.cornerCOn - afterPenalty.cornerTOn
             if DEBUG_PENALTY_STATES:
                 print "After Penalty left Diff: ", afterPenalty.leftDiff, " cOn: ", afterPenalty.cornerCOn, " tOn: ", afterPenalty.cornerTOn
+                print "Left sum: ", afterPenalty.leftHorizSum
         afterPenalty.right = not afterPenalty.right
         # Reset counters
         afterPenalty.cornerCOn = 0
         afterPenalty.cornerTOn = 0
-        # afterPenalty.cornerFrames = 0
 
     foundCorner = False
 
-    # Only count if we're looking right/left. Don't want to count goalbox corners
+    # Only count if we're looking right/left. Don't want to count anything while panning
     if player.brain.tracker.isStopped():
-        afterPenalty.cornerFrames += 1
+        if afterPenalty.right:
+            afterPenalty.rightHorizSum += player.brain.vision.horizon_dist
+        else:
+            afterPenalty.leftHorizSum += player.brain.vision.horizon_dist
+
         for i in range(0, vis.corner_size()):
             corner = vis.corner(i)
             if corner.id == 2:
@@ -69,7 +89,9 @@ def afterPenalty(player):
             else:
                 afterPenalty.cornerCOn += 1
 
-    # China hack 2015. Please make this better
+    # China hack 2015. Please make this better. Fairly arbitrary thresholds.
+    # The idea is if we're flip-flopping between T and C classifications we
+    # have bigger vision problems going on.
     if afterPenalty.stateCount > 140:
         if afterPenalty.rightDiff > 5 and afterPenalty.leftDiff <= 0:
             afterPenalty.decidedSide = True
@@ -85,9 +107,15 @@ def afterPenalty(player):
             afterPenalty.right = True
 
     if afterPenalty.decidedSide or afterPenalty.stateCount > 300:
-        player.brain.resetLocalizationFromPenalty(afterPenalty.right)
+        if afterPenalty.decidedSide:
+            player.brain.resetLocalizationFromPenalty(afterPenalty.right)
+        else:
+            # This is a backup. We would prefer to use corners to determine our side as fieldedge could be noisy
+            player.brain.resetLocalizationFromPenalty(afterPenalty.right < afterPenalty.left)
         if DEBUG_PENALTY_STATES:
-            print "We've decided! ", afterPenalty.right, " LeftDiff: ", afterPenalty.leftDiff, " Right Diff: ", afterPenalty.rightDiff, " StateCount: ", afterPenalty.stateCount
+            print "We've decided! ", afterPenalty.right, " LeftDiff: ", afterPenalty.leftDiff, \
+                " Right Diff: ", afterPenalty.rightDiff, " StateCount: ", afterPenalty.stateCount
+            print "RSUM: ", afterPenalty.rightHorizSum, " LSUM: ", afterPenalty.leftHorizSum
 
         player.brain.tracker.repeatWidePan()
 

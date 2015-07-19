@@ -159,11 +159,17 @@ def gamePenalized(player):
         player.stand()
         player.penalizeHeads()
         player.wasPenalized = True
+        player.brain.penalizedEdgeClose = 0
+        player.brain.penalizedCount = 0
         # RESET LOC TO FIELD CROSS
         if player.brain.penalizedHack:
             player.brain.resetLocToCross()
             print "BRUNSWICK PENALIZED"
 
+    if player.brain.vision.horizon_dist < 200.0:
+        player.brain.penalizedEdgeClose += 1
+
+    player.brain.penalizedCount += 1
     return player.stay()
 
 @superState('gameControllerResponder')
