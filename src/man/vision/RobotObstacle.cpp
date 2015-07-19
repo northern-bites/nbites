@@ -64,7 +64,6 @@ void RobotObstacle::updateVisionObstacle(ImageLiteU8 whiteImage, EdgeList& edges
 
     // when we don't want to proess image
     if (startCol != img_wd) {
-        std::cout<<"DIDN'T IGNORE START COL"<<std::endl;
         // Find constricting box of obstacle in image coordinates
         // Returns column with the lowest edge point in the image
         int lowestCol = findObstacle(whiteImage, obstacleBox, startCol);
@@ -128,38 +127,31 @@ int RobotObstacle::findAzimuthRestrictions(FieldHomography* hom)
     double az = hom->azimuth();
     int val = 0;
 
-    std::cout<<"Azimuth: "<<az<<std::endl;
-
     // if abs(az) 1.3, too great to detect obstacle: return width
-    if (az > 1.3 || az < -1.3) { return img_wd; std::cout<<"r1"<<std::endl; }
+    if (az > 1.3 || az < -1.3) { return img_wd; }
 
     // if abs(az) is > 1.1 and <= 1.3, ignore 2/3
     if (az > 1.1 || az < -1.1) {
         val = (int)(.6666 * (double)img_wd);
-        std::cout<<"r2"<<std::endl;
     }
 
     // if abs(az) is > 1 and <= 1.1, ignore 1/2
     else if (az > 1.0 || az < -1.0) {
         val = (int)(.5 * (double)img_wd);
-        std::cout<<"r3"<<std::endl;
     }
 
     // if abs(az) is > 0.98 and <= 1, ignore 1/3
     else if (az > 0.98 || az < -0.98) {
         val = (int)(.3333 * (double)img_wd);
-        std::cout<<"r4"<<std::endl;
     }
 
     // if abs(az) is > 0.93 and <= 0.98, ignore 1/4
     else if (az > 0.93 || az < -0.93) {
         val = (int)(.25 * (double)img_wd);
-        std::cout<<"r5"<<std::endl;
     }
 
     // else, no obstacle! return 0 to detect everything
     else {
-        std::cout<<"r6"<<std::endl;
         return 0;
     }
 
@@ -167,11 +159,9 @@ int RobotObstacle::findAzimuthRestrictions(FieldHomography* hom)
     // image. Side of image depends on sign of azimuth.
     if (az > 0) {
         // right side
-        std::cout<<"r7"<<std::endl;
         return -1*(img_wd - val);
     } else {
         // left side (negative lets us know it is the "end col")
-        std::cout<<"r8"<<std::endl;
         return val;
     }
 
@@ -202,8 +192,6 @@ int RobotObstacle::findObstacle(ImageLiteU8 whiteImage, float* obstacleBox, int 
     } else {
         endCol = img_wd;
     }
-
-    std::cout<<"START col end col: "<<startCol<<", "<<endCol<<std::endl;
 
     // Loop through each column to find a run of columns with evidence of an obstacle
     for (int i = 0; i < img_wd; i++) {
@@ -237,10 +225,6 @@ int RobotObstacle::findObstacle(ImageLiteU8 whiteImage, float* obstacleBox, int 
             if (blankCounter >= MAX_DIST) {
                 // no evidence and blank counter too high, reset params
                 currLength -= blankCounter; // get rid of blanks we counted prematurely
-                std::cout<<"END OF RUN: currLen = "<<currLength<<", topWhite = "<<topWhite<<", maxLength = "<<maxLength<<std::endl;
-                std::cout<<"            i = "<<i<<std::endl;
-                // std::cout<<currLength>maxLength<<std::endl;
-                // std::cout<<(topWhite/currLength)<<std::endl;
                 if (currLength > maxLength && (float)topWhite / (float)currLength > 0.8f) {
                     maxLength = currLength;
                     maxStart = currStart;
@@ -260,12 +244,8 @@ int RobotObstacle::findObstacle(ImageLiteU8 whiteImage, float* obstacleBox, int 
         }
     }
 
-    std::cout<<"OUTSIDE OF RUN: Curr length = "<<currLength<<", max Len = "<<maxLength<<std::endl;
-
     // check to see if we ended with our maximum length:
     if (currLength > maxLength && (float)topWhite / (float)currLength > 0.8f) {
-        std::cout<<"HERE"<<std::endl;
-        std::cout<<"END OF RUN: currLen = "<<currLength<<", topWhite = "<<topWhite<<", maxLength = "<<maxLength<<std::endl;
         maxLength = currLength;
         maxStart = currStart;
         maxBot = currBot;
@@ -273,7 +253,6 @@ int RobotObstacle::findObstacle(ImageLiteU8 whiteImage, float* obstacleBox, int 
     }
 
     if (maxLength > MIN_LENGTH) {
-        std::cout<<"HERE????"<<std::endl;
         // now update obstacle box
         obstacleBox[1] = (float)maxBot;                     // bottom
         obstacleBox[2] = (float)maxStart;                   // left
