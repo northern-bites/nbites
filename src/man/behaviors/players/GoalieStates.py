@@ -449,6 +449,7 @@ def saveCenter(player):
         #TESTINGCHANGE
     if player.counter > 100:
 
+    if player.counter > 40`:
         if SAVING:
             player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
             return player.goLater('upUpUP')
