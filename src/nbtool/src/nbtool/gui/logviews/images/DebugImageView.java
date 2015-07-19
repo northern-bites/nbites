@@ -9,6 +9,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
 import javax.swing.event.*;
@@ -44,7 +45,7 @@ import nbtool.io.CrossIO.CrossCall;
 import nbtool.util.Utility;
 
 public class DebugImageView extends ViewParent
-	implements IOFirstResponder, ActionListener, ChangeListener {
+	implements IOFirstResponder, ActionListener, ChangeListener, MouseMotionListener {
 
 	// Values according to nbcross/vision_defs.cpp - must be kept in sync
 	static final int YIMAGE = 0;
@@ -96,6 +97,8 @@ public class DebugImageView extends ViewParent
 	BufferedImage displayImages[] = new BufferedImage[ORIGINAL+1]; // our images
 	Y8ThreshImage greenCheck;
 
+	private String label = null;
+
 	Log currentLog;
 	Log balls;
 
@@ -125,6 +128,7 @@ public class DebugImageView extends ViewParent
 		add(viewList);
 		add(greenThreshold);
         this.addMouseListener(new DistanceGetter());
+		this.addMouseMotionListener(this);
 
 		// default image to display - save across instances
 		if (firstLoad) {
@@ -217,14 +221,21 @@ public class DebugImageView extends ViewParent
 
     public void paintComponent(Graphics g) {
 		final int BOX_HEIGHT = 25;
+		super.paintComponent(g);
+
         if (debugImage != null) {
             g.drawImage(debugImageDisplay, 0, 0, displayw, displayh, null);
 			drawLines(g);
 			drawBlobs(g);
 			//displayImages[THRESH].setThresh(persistant.greenThreshold);
-			g.drawImage(displayImages[currentBottom], 0, displayh + 5, displayw / 2,
+			g.drawImage(displayImages[currentBottom], 0, displayh + 25, displayw / 2,
 						displayh / 2, null);
 			viewList.setBounds(displayw / 2 + 10, displayh  + 10, displayw / 2, BOX_HEIGHT);
+			if (label != null) {
+				g.setColor(Color.BLACK);
+				g.drawString(label, 10, displayh + 20);
+			}
+
 			greenThreshold.setBounds(displayw / 2, displayh + 15 + BOX_HEIGHT, 500, BOX_HEIGHT+20);
 			greenThreshold.repaint();
 			persistant.setBounds(displayw+10, 0, 300, 300);
@@ -449,6 +460,34 @@ public class DebugImageView extends ViewParent
       public void mouseExited(MouseEvent e) {}
     }
 
+	@Override
+	public void mouseDragged(MouseEvent e) {}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		if (currentLog == null) {
+			return;
+		}
+
+		int col = e.getX();
+		int row = e.getY();
+
+		if (col < 0 || row < 0 || col >= displayw || row >= displayh) {
+			return;
+		}
+
+		boolean first = (col & 1) == 0;
+		int cbase = (col & ~1);
+		int i = (row * displayw * 2) + (cbase * 2);
+
+		int y = currentLog.data()[first ? i : i + 2] & 0xff;
+		int u = currentLog.data()[i + 1] & 0xff;
+		int v = currentLog.data()[i + 3] & 0xff;
+		label = String.format("(%d,%d): y=%d u=%d v=%d", col, row, y, u, v);
+		repaint();
+	}
+
+
 	class PersistantStuff extends JPanel
 		implements ItemListener {
 		JPanel checkBoxPanel;
@@ -545,6 +584,7 @@ public class DebugImageView extends ViewParent
     @Override
     public void ioReceived(IOInstance inst, int ret, Log... out) {
 		System.out.println("IO received in Debug");
+		//yuv = out[0].bytes;
 		if (out.length > GREEN_IMAGE) {
             Y8image green8 = new Y8image(width, height, out[GREEN_IMAGE].bytes);
             displayImages[GREEN_IMAGE] = green8.toBufferedImage();
