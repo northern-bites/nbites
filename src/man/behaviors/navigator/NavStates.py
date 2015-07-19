@@ -9,7 +9,9 @@ from math import fabs, degrees, copysign
 from random import random
 
 def scriptedMove(nav):
-    '''State that we stay in while doing sweet moves'''
+    """
+    State that we stay in while doing sweet moves
+    """
     if nav.firstFrame():
         helper.executeMove(nav, scriptedMove.sweetMove)
         return nav.stay()
@@ -20,6 +22,19 @@ def scriptedMove(nav):
     return nav.stay()
 
 scriptedMove.sweetMove = None
+
+def kickEngine(nav):
+    """
+    State that we stay in while calling kick engine
+    """
+    if nav.firstFrame():
+        helper.executeKickEngine(nav, kickEngine.kickType)
+        return nav.stay()
+
+    helper.stand(nav)
+    return nav.stay()
+
+kickEngine.kickType = None
 
 def goToPosition(nav):
     """
@@ -213,7 +228,7 @@ destinationWalkingTo.speed = 0
 def locationsMatch(odom, dest):
     if (abs(odom.relX - dest.relX) < constants.ODOM_CLOSE_ENOUGH) \
     and (abs(odom.relY - dest.relY) < constants.ODOM_CLOSE_ENOUGH) \
-    and (abs(odom.relH - degrees(dest.relH)) < 30.0):
+    and (abs(odom.relH - degrees(dest.relH)) < constants.ODOM_CLOSE_ENOUGH):
         return True
 
     # print ("Not true; relx diff:", abs(odom.relX - dest.relX))
@@ -233,6 +248,7 @@ def walkingTo(nav):
         print ("Resetting odometry!")
         nav.brain.interface.motionRequest.reset_odometry = True
         nav.brain.interface.motionRequest.timestamp = int(nav.brain.time * 1000)
+        print ("MY dest: ", nav.destination.relX, nav.destination.relY, nav.destination.relH)
         helper.stand(nav)
         return nav.stay()
 
@@ -246,27 +262,19 @@ def walkingTo(nav):
 
         if len(walkingTo.destQueue) > 0:
             dest = walkingTo.destQueue.popleft()
+            # dest.relH = 0
             helper.setOdometryDestination(nav, dest, walkingTo.speed)
+            # helper.setDestination(nav, dest, walkingTo.speed)
             print ("MY dest: ", dest.relX, dest.relY, dest.relH)
 
     if locationsMatch(nav.destination, walkingTo.currentOdo):
         return nav.goNow('standing')
 
-    # walkingTo.currentOdow = RelRobotLocation(nav.brain.interface.odometry.x,
-    #                          nav.brain.interface.odometry.y,
-    #                          nav.brain.interface.odometry.h)
     if nav.counter % 30 == 0:
         print "Current odo:"
         print ("x:", walkingTo.currentOdo.relX)
         print ("y:", walkingTo.currentOdo.relY)
         print ("h:", walkingTo.currentOdo.relH)
-        # print "Current odow:"
-        # print ("x:", walkingTo.currentOdow.relX)
-        # print ("y:", walkingTo.currentOdow.relY)
-        # print ("h:", walkingTo.currentOdow.relH)
-        # print "---------------"
-
-
 
     return nav.stay()
 

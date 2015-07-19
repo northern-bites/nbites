@@ -36,7 +36,9 @@ enum class LandmarkID {
     TheirRightT,
     TheirLeftT,
     BallInSet,
-    CenterCircle
+    CenterCircle,
+    CenterCircleLeftT,
+    CenterCircleRightT
 };
 
 // Stores the LandmarkID and (x, y) cartesian coordinate representation of the location

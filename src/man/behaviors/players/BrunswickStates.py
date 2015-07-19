@@ -46,6 +46,7 @@ def gameReady(player):
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.repeatBasicPan()
+
         player.timeReadyBegan = player.brain.time
         if player.lastDiffState == 'gameInitial':
             player.brain.resetInitialLocalization()
@@ -57,7 +58,6 @@ def gameReady(player):
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
         return player.stay()
-
     return player.goNow('positionReady')
 
 @superState('gameControllerResponder')
@@ -111,8 +111,8 @@ def gamePlaying(player):
 
     if player.brain.gameController.timeSincePlaying < 10:
         if player.brain.gameController.ownKickOff:
-            if (roleConstants.isChaser(player.role) or roleConstants.isCherryPicker(player.role)
-               and player.brain.ball.vis.on):
+            if (roleConstants.isFirstChaser(player.role) and
+                player.brain.ball.vis.on):
                 player.shouldKickOff = True
                 return player.goNow('approachBall')
             else:

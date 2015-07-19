@@ -6,15 +6,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.util.Vector;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -188,24 +183,25 @@ public class WorldViewUtility extends UtilityParent {
 		}
 		
 		private void updateTeamInfo(TeamBroadcast tb) {
+			int role = tb.dataWorldModel.getRole();
 			int playerNum = tb.dataTeamPacket.getPlayerNumber();
 			if(!tb.dataWorldModel.getActive()) {
 				teamInfo[playerNum-1].setText("Player "+(playerNum)+": Penalized");
+			} else {
+				switch (role) {
+					case 1:playerRoles[playerNum-1] = "Goalie";
+						break;
+					case 2:playerRoles[playerNum-1] = "Defender #1";
+						break;
+					case 3:playerRoles[playerNum-1] = "Defender #2";
+						break;
+					case 4:playerRoles[playerNum-1] = "Chaser #1";
+						break;
+					case 5:playerRoles[playerNum-1] = "Chaser #2";
+						break;
+				}
+				teamInfo[playerNum-1].setText("Player "+(playerNum)+": "+playerRoles[playerNum-1]);
 			}
-			
-			switch (playerNum) {
-				case 1:playerRoles[playerNum-1] = "Goalie";
-					break;
-				case 2:playerRoles[playerNum-1] = "Defender #1";
-					break;
-				case 3:playerRoles[playerNum-1] = "Defender #2";
-					break;
-				case 4:playerRoles[playerNum-1] = "Chaser #1";
-					break;
-				case 5:playerRoles[playerNum-1] = "Chaser #2";
-					break;
-			}
-			teamInfo[playerNum-1].setText("Player "+(playerNum)+": "+playerRoles[playerNum-1]);
 		}
 		
 		JPanel fieldDisplay;

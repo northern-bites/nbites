@@ -1,7 +1,6 @@
 package nbtool.gui.logviews.loc;
 
 import java.awt.*;
-import java.awt.geom.*;
 import java.awt.event.*;
 import javax.swing.*;
 

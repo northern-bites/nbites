@@ -1,1 +1,1 @@
-((hflip 1) (vflip 1) (autoexposure 0) (brightness 250) (contrast 43) (saturation 144) (hue 0) (sharpness 4) (gamma 220) (auto_whitebalance 0) (exposure 167) (gain 53) (white_balance 3300) (fade_to_black 0))
+((hflip 1) (vflip 1) (autoexposure 0) (brightness 250) (contrast 43) (saturation 144) (hue 0) (sharpness 4) (gamma 220) (auto_whitebalance 0) (exposure 133) (gain 53) (white_balance 3300) (fade_to_black 0))
