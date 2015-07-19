@@ -25,17 +25,17 @@ def approachBall(player):
     if player.brain.nav.dodging:
         return player.stay()
 
-        player.brain.tracker.trackBall()
-        if player.shouldKickOff:
-            if player.inKickOffPlay:
-                return player.goNow('giveAndGo')
-            else:
-                return player.goNow('positionAndKickBall')
-
-        elif player.penaltyKicking:
-            return player.goNow('prepareForPenaltyKick')
+    player.brain.tracker.trackBall()
+    if player.shouldKickOff:
+        if player.inKickOffPlay:
+            return player.goNow('giveAndGo')
         else:
-            return player.goNow('lineUpKick')
+            return player.goNow('positionAndKickBall')
+
+    elif player.penaltyKicking:
+        return player.goNow('prepareForPenaltyKick')
+    else:
+        return player.goNow('lineUpKick')
 
     return player.goLater('lineUpKick')
 
