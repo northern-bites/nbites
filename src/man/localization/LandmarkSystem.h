@@ -1,5 +1,5 @@
 /**
- * @brief A class responsible for maintaing knowedge of landmarks (corners, ball)
+ * @brief A class responsible for maintaing knowedge of landmarks (corners, ball, etc.)
  *        and comparing projections and observations.
  *
  * @author Josh Imhoff <joshimhoff13@gmail.com>
@@ -20,6 +20,11 @@
 namespace man {
 namespace localization {
 
+// NOTE whether or not a corner is concave or convex depends on where the
+//      observing robot is standing, the corners stored below assume that
+//      the robot is on the field, thus the bottom left corner must be concave, 
+//      but one could argue that the distinction between concave and convex should
+//      be ignored, so that the robot localizes well when standing outside field boundary
 enum class LandmarkID {
     OurRightConcave = 0,
     OurLeftConcave,

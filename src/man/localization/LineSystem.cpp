@@ -11,7 +11,12 @@ LineSystem::LineSystem()
 {
     // Part I
     // Add lines in absolute field coordinates to lines map
-    // TODO document sign convention
+    //
+    // IMPORTANT lines are stored in polar coordinates, using polar coordinates,
+    //           every line has two representations, one with positive r and one 
+    //           with negative r, the two representations allow for reconstructions
+    //           on either side of a line, see reconstructFromMidpoint and 
+    //           reconstructWoEndpoints for more info
     addLine(LocLineID::OurEndline, -GREEN_PAD_X, M_PI, GREEN_PAD_Y, (GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
     addLine(LocLineID::TheirEndline, GREEN_PAD_X + FIELD_WHITE_WIDTH, 0, -GREEN_PAD_Y, -(GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
 
@@ -23,8 +28,8 @@ LineSystem::LineSystem()
     addLine(LocLineID::OurTopGoalbox, -(GREEN_PAD_X + GOALBOX_DEPTH), M_PI, BLUE_GOALBOX_BOTTOM_Y, BLUE_GOALBOX_TOP_Y);
     addLine(LocLineID::TheirTopGoalbox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH , 0, -YELLOW_GOALBOX_BOTTOM_Y, -YELLOW_GOALBOX_TOP_Y);
 
-    // IMPORTANT system currently doesn't support reconstructions from sideline, so
-    //           the below lines are not polarized
+    // NOTE system currently doesn't support reconstructions from sideline, so
+    //      the below lines are not polarized
     addLine(LocLineID::RightSideline, GREEN_PAD_Y, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
     addLine(LocLineID::LeftSideline, GREEN_PAD_Y + FIELD_WHITE_HEIGHT, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
 
@@ -50,7 +55,6 @@ LineSystem::LineSystem()
 
     // China 2015 hack
     // We often see T corners in center circle
-    // This should be made less of a hack after competition
     std::vector<LocLineID> endlineOrSideline { 
         LocLineID::OurEndline, LocLineID::TheirEndline,
         LocLineID::OurMidline, LocLineID::TheirMidline,
