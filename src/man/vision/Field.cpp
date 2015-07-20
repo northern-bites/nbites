@@ -64,10 +64,12 @@ namespace vision {
 		//cout << "Set debug " << (int)di << endl;
 	}
 
-	void Field::setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 orange) {
+	void Field::setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 orange,
+		ImageLiteU16 yImg) {
 		whiteImage = white;
 		greenImage = green;
 		orangeImage = orange;
+		yImage = yImg;
 	}
 
 
@@ -77,7 +79,8 @@ namespace vision {
 	}
 
 	bool Field::isGreen() {
-		if (*(greenImage.pixelAddr(currentX, currentY)) > 138) {
+		if (*(greenImage.pixelAddr(currentX, currentY)) > 138 &&
+			*(yImage.pixelAddr(currentX, currentY))  < 350) {
 			return true;
 		}
 		return false;
