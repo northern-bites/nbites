@@ -111,7 +111,8 @@ def afterPenalty(player):
             player.brain.resetLocalizationFromPenalty(afterPenalty.right)
         else:
             # This is a backup. We would prefer to use corners to determine our side as fieldedge could be noisy
-            player.brain.resetLocalizationFromPenalty(afterPenalty.right < afterPenalty.left)
+            print "Corners didn't work! defaulting to horizonDist"
+            player.brain.resetLocalizationFromPenalty(afterPenalty.rightHorizSum < afterPenalty.leftHorizSum)
         if DEBUG_PENALTY_STATES:
             print "We've decided! ", afterPenalty.right, " LeftDiff: ", afterPenalty.leftDiff, \
                 " Right Diff: ", afterPenalty.rightDiff, " StateCount: ", afterPenalty.stateCount
