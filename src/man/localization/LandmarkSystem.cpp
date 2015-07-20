@@ -162,7 +162,7 @@ double LandmarkSystem::scoreObservation(const messages::RobotLocation& observati
  
     // Evaluate gaussian to get probability of observation from location loc
     // TODO params
-    boost::math::normal_distribution<> tiltGaussian(0, 5*TO_RAD);
+    boost::math::normal_distribution<> tiltGaussian(0, 10*TO_RAD);
     boost::math::normal_distribution<> tGaussian(0, 20*TO_RAD);
 
     double tiltProb = pdf(tiltGaussian, tiltDiff);

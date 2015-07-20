@@ -310,10 +310,10 @@ double LineSystem::scoreObservation(const vision::GeoLine& observation,
 
     // Evaluate gaussian to get probability of observation from location loc
     // TODO params
-    boost::math::normal_distribution<> tiltGaussian(0, 5*TO_RAD);
-    boost::math::normal_distribution<> tGaussian(0, 10*TO_RAD);
-    boost::math::normal_distribution<> ep0Gaussian(0, 100);
-    boost::math::normal_distribution<> ep1Gaussian(0, 100);
+    boost::math::normal_distribution<> tiltGaussian(0, 10*TO_RAD);
+    boost::math::normal_distribution<> tGaussian(0, 20*TO_RAD);
+    boost::math::normal_distribution<> ep0Gaussian(0, 200);
+    boost::math::normal_distribution<> ep1Gaussian(0, 200);
   
     double tiltProb = pdf(tiltGaussian, tiltDiff);
     double tProb = pdf(tGaussian, tDiff);
@@ -332,7 +332,7 @@ double LineSystem::scoreObservation(const vision::GeoLine& observation,
     }
 
     // Make the conditional independence assumption
-    return tiltProb * tProb;
+    return tiltProb * tProb * ep0Prob * ep1Prob;
 }
 
 void LineSystem::addLine(LocLineID id, float r, float t, float ep0, float ep1)
