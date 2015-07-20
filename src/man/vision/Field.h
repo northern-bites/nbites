@@ -48,8 +48,7 @@ public:
 
     // main methods
 	void setDebugImage(DebugImage * di);
-	void setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 orange,
-		ImageLiteU16 yImg);
+	void setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 orange);
 	void getColor(int x, int y);
    	bool isGreen();
 	bool isWhite();
@@ -108,7 +107,6 @@ private:
 	bool topCamera;
 	DebugImage debugDraw;
 	ImageLiteU8 whiteImage, greenImage, orangeImage;
-	ImageLiteU16 yImage;
 	int currentX, currentY;
 	FieldHomography * homography;
 	int width, height;
