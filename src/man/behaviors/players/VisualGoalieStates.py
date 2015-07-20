@@ -122,6 +122,7 @@ def positionForGoalieKick(player):
         positionForGoalieKick.kickPose = RelRobotLocation(ball.rel_x - player.kick.setupX,
                                     ball.rel_y - player.kick.setupY,
                                     0)
+        print("Kickpose:", positionForGoalieKick.kickPose.relX, positionForGoalieKick.kickPose.relY)
         positionForGoalieKick.speed = nav.GRADUAL_SPEED
 
         player.brain.nav.goTo(positionForGoalieKick.kickPose,
@@ -135,6 +136,7 @@ def positionForGoalieKick(player):
 
     if GoalieTransitions.ballReadyToKick(player, positionForGoalieKick.kickPose):
         player.brain.nav.stand()
+        print("Kickpose:", positionForGoalieKick.kickPose.relX, positionForGoalieKick.kickPose.relY)
         return player.goNow('kickBall')
 
     return Transition.getNextState(player, positionForGoalieKick)

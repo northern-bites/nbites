@@ -100,6 +100,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.OCCASIONALLY,
                                        Transition.LOW_PRECISION)
             : GoalieStates.lineCheckReposition,
+
+            Transition.CountTransition(GoalieTransitions.shouldGoForward,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.lineCheckReposition,
             }
 
         GoalieStates.watch.transitions = {
@@ -431,6 +436,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
             : GoalieStates.lineCheckReposition,
+
+            # Transition.CountTransition(GoalieTransitions.shouldClearBall,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.OK_PRECISION + 5)
+            # : VisualGoalieStates.clearBall,
 
             # Transition.CountTransition(GoalieTransitions.facingBackward,
             #                            Transition.OCCASIONALLY,
