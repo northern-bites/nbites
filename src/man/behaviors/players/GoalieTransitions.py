@@ -10,7 +10,7 @@ import math
 import VisualGoalieStates
 import GoalieStates
 from objects import RelRobotLocation
-savedebug = True
+savedebug = False
 
 def safelyPlaced(player):
     getLines(player)
@@ -884,7 +884,7 @@ def shouldSquat(player):
     save = (nball.x_vel < -10.0 and
         ball.mov_vel_x < constants.SAVE_X_VEL and
         not nball.stationary and
-        abs(nball.yintercept) < 28.0 and
+        abs(nball.yintercept) < 33.0 and
         nball.yintercept != 0.0 and
         ball.distance < constants.SAVE_DIST and
         sightOk)
@@ -899,10 +899,10 @@ def shouldSquat(player):
     #     print("ball exceptionally close, I'm saving")
     #     save = True
 
-    if sightOk and veryFastBall(player, -28.0, 28.0):
+    if sightOk and veryFastBall(player, -33.0, 33.0):
         save = True
 
-    elif sightOk and veryCloseBall(player, -28.0, 28.0):
+    elif sightOk and veryCloseBall(player, -33.0, 33.0):
         save = True
 
 #TestingChange

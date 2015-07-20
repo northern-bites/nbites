@@ -12,7 +12,7 @@ import noggin_constants as nogginConstants
 #TestingChange
 SAVING = True
 DIVING = True
-savedebug = True
+savedebug = False
 
 @superState('gameControllerResponder')
 def gameInitial(player):
