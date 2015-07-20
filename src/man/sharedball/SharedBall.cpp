@@ -270,6 +270,9 @@ void SharedBallModule::weightedavg()
  */
 void SharedBallModule::checkForPlayerFlip()
 {
+    // HACK CHINA 2015: Turn off shared ball flip because comm sucks
+    return;
+
     if (!ballOn or reliability < 2)
     {
         // std::cout<<"Flip return"<<std::endl;
