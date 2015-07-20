@@ -108,8 +108,10 @@ class Brain(object):
         # So that we only try to sit down once upon receiving command
         self.sitting = False
 
-        # CHINA HACK
+        # CHINA HACK(s)
         self.penalizedHack = False
+        self.penalizedEdgeClose = 0
+        self.penalizedCount = 0
 
     def initTeamMembers(self):
         self.teamMembers = []
@@ -276,7 +278,6 @@ class Brain(object):
             curr_obst = self.interface.fieldObstacles.obstacle(i)
             if curr_obst.position != curr_obst.position.NONE:
                 self.obstacles[int(curr_obst.position)] = (curr_obst.distance, curr_obst.closest_y)
-
                 if curr_obst.detector == curr_obst.detector.ARMS:
                     self.obstacleDetectors[int(curr_obst.position)] = 'a'
                 elif curr_obst.detector == curr_obst.detector.SONARS:

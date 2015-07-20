@@ -31,7 +31,7 @@
     )
     ( Bottom
       ( ( White
-          ( (dark_u -0.09)
+          ( (dark_u -0.06)
             (dark_v -0.14)
             (light_u 0.27)
             (light_v -0.125)
@@ -45,7 +45,7 @@
             (light_u 0.05)
             (light_v 0.056666666666666664)
             (fuzzy_u -0.09333333333333334)
-            (fuzzy_v 0.06)
+            (fuzzy_v 0.056666666666666664)
           )
         )
         ( Orange
@@ -57,7 +57,6 @@
             (fuzzy_v 0.05)
           )
         )
-        (SaveParams True)
       )
     )
   )
