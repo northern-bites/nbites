@@ -27,7 +27,6 @@ def obstacleAhead(direction):
     return direction <= 3 or direction >= 7
 
 def shouldDodge(nav):
-    return False
     # If nav isn't avoiding things, just no
     if (not states.goToPosition.avoidObstacles or 
         (nav.brain.ball.distance < 65 and
