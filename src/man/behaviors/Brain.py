@@ -276,7 +276,6 @@ class Brain(object):
             curr_obst = self.interface.fieldObstacles.obstacle(i)
             if curr_obst.position != curr_obst.position.NONE:
                 self.obstacles[int(curr_obst.position)] = (curr_obst.distance, curr_obst.closest_y)
-
                 if curr_obst.detector == curr_obst.detector.ARMS:
                     self.obstacleDetectors[int(curr_obst.position)] = 'a'
                 elif curr_obst.detector == curr_obst.detector.SONARS:
