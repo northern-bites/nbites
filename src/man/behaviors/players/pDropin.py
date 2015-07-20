@@ -35,11 +35,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.currentState = 'fallController' # initial state
         """ THE STATE OF THE PLAYER """
         self.inKickingState = False
-        
         ### DROP IN HACK CHINA 2015 ###
 
         self.role = 4
-
+        roleConstants.setRoleConstants(self, self.role)
         
         # Initialized for the sake of those who aren't
         self.isKickingOff = False
