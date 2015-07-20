@@ -101,10 +101,14 @@ def spinToKickHeading(player):
     if fabs(relH) <= constants.FACING_KICK_ACCEPTABLE_BEARING:
         return player.goNow('positionForKick')
 
-    if fabs(relH) < constants.SHOULD_SPIN_TO_BALL_BEARING:
-        speed = Navigator.MEDIUM_SPEED
+    if fabs(relH) <= constants.FACING_BALL_ACCEPTABLE_BEARING:
+        speed = Navigator.GRADUAL_SPEED
+    elif fabs(relH) >= constants.MAX_BEARING_DIFF:
+        speed = Navigator.FAST_SPEED
     else:
-        speed = constants.FIND_BALL_SPIN_SPEED
+        slope = (Navigator.FAST_SPEED - Navigator.GRADUAL_SPEED) / (constants.MAX_BEARING_DIFF - constants.FACING_BALL_ACCEPTABLE_BEARING)
+        intercept = Navigator.FAST_SPEED - slope*constants.MAX_BEARING_DIFF
+        speed = slope*fabs(relH) + intercept
 
     # spins the appropriate direction
     player.brain.nav.walk(0., 0., copysign(speed, relH))
