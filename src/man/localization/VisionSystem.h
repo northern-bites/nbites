@@ -1,6 +1,6 @@
 /**
  * @brief  A class responsible for scoring the particle swarm based on
- *         observations from the vision system and handling particle injection.
+ *         observations from the vision system and handling particle injection
  *
  * @author EJ Googins <egoogins@bowdoin.edu>
  * @date   February 2013
@@ -27,16 +27,36 @@ namespace localization {
 class VisionSystem
 {
 public:
+    // Constructor
     VisionSystem();
+
+    // Destructor
     ~VisionSystem();
 
+    // Scores particles according to observations from vision
+    // @param particles, the set of particles that represent localization belief
+    // @param vision, observations from the vision system
+    // @param ball, the filtered ball from the balltrack module, also an observation
+    //              when robot is in set
+    // @param lastEstimate, the localization estimate made by the loc system on
+    //                      the last frame, used in reconstructing pose from observations
+    // @returns whether or not particle scores were updated
     bool update(ParticleSet& particles,
                 const messages::Vision& vision,
                 const messages::FilteredBall* ball,
                 const messages::RobotLocation& lastEstimate);
 
+    // Get list of robot poses reconstructed from observations to be used in
+    // particle injection step of augmented MCL
+    // @returns vector of reconstructed poses
     const std::vector<ReconstructedLocation>& getInjections() { return injections; }
+    
+    // Get number of observations used in scoring particles
+    // @returns the number of observations
     int getNumObservations() const { return numObservations; }
+
+    // Get average probability or error of particle in swarm
+    // @returns the average probability
     double getAvgError() const { return avgError; }
 
 private:

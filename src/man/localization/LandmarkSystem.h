@@ -1,6 +1,6 @@
 /**
  * @brief A class responsible for maintaing knowedge of landmarks (corners, ball, etc.)
- *        and comparing projections and observations.
+ *        and comparing projections and observations
  *
  * @author Josh Imhoff <joshimhoff13@gmail.com>
  * @date   June 2015

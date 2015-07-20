@@ -47,6 +47,8 @@ bool VisionSystem::update(ParticleSet& particles,
             }
         }
     }
+    // NOTE one could argue that we should instead select the one line we process
+    //      in localization randomly
 
     // Count observations
     if (foundLine)
@@ -99,9 +101,8 @@ bool VisionSystem::update(ParticleSet& particles,
     PROF_EXIT(P_LOCV_SCORING)
     double time = timer.end();
 
-    // China 2015 hack
-    // Loc is sometimes causing cognition thread to overrun, these
-    // print outs print when loc took longer than we'd like
+    // Loc sometimes causes cognition thread to overrun, these
+    // print outs print when loc took longer than we have time for
     if (time > 15) {
         printf("==================\n");
         printf("LOC TOOK: %f\n", time);
@@ -124,6 +125,9 @@ bool VisionSystem::update(ParticleSet& particles,
     // Particle injections
     PROF_ENTER(P_LOCV_INJECTION)
     injections.clear();
+
+    // TODO refactor, reconstructing location from a line and a landmark is general
+    //      functionality that LineSystem and/or LandmarkSystem should support
 
     // (1) Reconstruct pose from ball in set
     if (useBall && ball->vis().frames_on() > 5) {
@@ -166,65 +170,60 @@ bool VisionSystem::update(ParticleSet& particles,
 
             // Add injection and return
             ReconstructedLocation reconstructed(fromLineAndBall.x(), fromLineAndBall.y(), fromLineAndBall.h(), 2, 2, 0.01);
-            if (fromLineAndBall.x() > CENTER_FIELD_X)
-                std::cout << "Major bug in ball in set injections!" << std::endl;
-            else if (reconstructed.onField())
+            if (reconstructed.onField())
                 injections.push_back(reconstructed);
         }
     // China 2015 hack
     // Don't inject off of any features but ball when in set
     } else if (ball == NULL) {
         // (2) Reconstruct pose from top goalbox
-        // TODO reconstructing location from a line and a landmark is general
-        //      functionality that LineSystem and/or LandmarkSystem should
-        //      support, refactor after competition
-        for (int i = 0; i < vision.line_size(); i++) {
-            const messages::FieldLine& field = vision.line(i);
+        // for (int i = 0; i < vision.line_size(); i++) {
+        //     const messages::FieldLine& field = vision.line(i);
 
-            // If found top goalbox, inject based on convex corner
-            if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
-                const messages::HoughLine& inner = field.inner();
-                LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirTopGoalbox : LocLineID::OurTopGoalbox);
+        //     // If found top goalbox, inject based on convex corner
+        //     if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
+        //         const messages::HoughLine& inner = field.inner();
+        //         LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirTopGoalbox : LocLineID::OurTopGoalbox);
 
-                // Rotate line to loc rel robot coordinate system 
-                vision::GeoLine line;
-                line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
+        //         // Rotate line to loc rel robot coordinate system 
+        //         vision::GeoLine line;
+        //         line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
 
-                for (int j = 0; j < vision.corner_size(); j++) {
-                    const messages::Corner& corner = vision.corner(j);
+        //         for (int j = 0; j < vision.corner_size(); j++) {
+        //             const messages::Corner& corner = vision.corner(j);
 
-                    // Project corner onto line, find distance parallel to line from origin
-                    double distParallel = line.qDist(corner.x(), corner.y());
+        //             // Project corner onto line, find distance parallel to line from origin
+        //             double distParallel = line.qDist(corner.x(), corner.y());
 
-                    // If found convex corner attached to top goalbox, inject particles
-                    if (corner.id() == static_cast<int>(vision::CornerID::Convex) && 
-                        (corner.line1() == field.index() || corner.line2() == field.index())) {
-                        // Recover x and heading from top goalbox line
-                        messages::RobotLocation pose = lineSystem->reconstructWoEndpoints(id, field);
+        //             // If found convex corner attached to top goalbox, inject particles
+        //             if (corner.id() == static_cast<int>(vision::CornerID::Convex) && 
+        //                 (corner.line1() == field.index() || corner.line2() == field.index())) {
+        //                 // Recover x and heading from top goalbox line
+        //                 messages::RobotLocation pose = lineSystem->reconstructWoEndpoints(id, field);
 
-                        // Recover y from corner
-                        double cornerAbsX, cornerAbsY;
-                        vision::translateRotate(corner.x(), corner.y(), 0, 0, pose.h(), cornerAbsX, cornerAbsY);
+        //                 // Recover y from corner
+        //                 double cornerAbsX, cornerAbsY;
+        //                 vision::translateRotate(corner.x(), corner.y(), 0, 0, pose.h(), cornerAbsX, cornerAbsY);
 
-                        // Right or left convex goalbox corner
-                        if (fabs(distParallel - inner.ep1()) > fabs(distParallel - inner.ep0())) {
-                            if (id == LocLineID::OurTopGoalbox)
-                                pose.set_y(BLUE_GOALBOX_BOTTOM_Y - cornerAbsY);
-                            else
-                                pose.set_y(YELLOW_GOALBOX_TOP_Y - cornerAbsY);
-                        } else {
-                            if (id == LocLineID::OurTopGoalbox)
-                                pose.set_y(BLUE_GOALBOX_TOP_Y - cornerAbsY);
-                            else
-                                pose.set_y(YELLOW_GOALBOX_BOTTOM_Y - cornerAbsY);
-                        }
+        //                 // Right or left convex goalbox corner
+        //                 if (fabs(distParallel - inner.ep1()) > fabs(distParallel - inner.ep0())) {
+        //                     if (id == LocLineID::OurTopGoalbox)
+        //                         pose.set_y(BLUE_GOALBOX_BOTTOM_Y - cornerAbsY);
+        //                     else
+        //                         pose.set_y(YELLOW_GOALBOX_TOP_Y - cornerAbsY);
+        //                 } else {
+        //                     if (id == LocLineID::OurTopGoalbox)
+        //                         pose.set_y(BLUE_GOALBOX_TOP_Y - cornerAbsY);
+        //                     else
+        //                         pose.set_y(YELLOW_GOALBOX_BOTTOM_Y - cornerAbsY);
+        //                 }
 
                         // Inject if reconstucted location is on field
                         // ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 2, 0.01);
                         // if (reconstructed.onField())
                         //     injections.push_back(reconstructed);
-                    }
-                }
+                //     }
+                // }
 
                 // Based on midpoint of top goalbox
                 // NOTE only valid if line is sufficiently long, otherwise too much
