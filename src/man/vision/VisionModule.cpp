@@ -221,7 +221,7 @@ void VisionModule::run_()
 		if (!i) {
 			// field needs the color images
 			field->setImages(frontEnd[0]->whiteImage(), frontEnd[0]->greenImage(),
-							 frontEnd[0]->orangeImage());
+							 frontEnd[0]->orangeImage(), frontEnd[0]->yImage());
 			GeoLine horizon = homography[0]->horizon(image->width() / 2);
 			double x1, x2, y1, y2;
 			horizon.endPoints(x1, y1, x2, y2);
