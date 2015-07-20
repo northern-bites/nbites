@@ -59,7 +59,8 @@ public class DebugImageView extends ViewParent
 	static final int CENTER_CIRCLE = 8;
 	static final int DRAWING = 9;
 	static final int THRESH = 10;
-	static final int ORIGINAL = 11;
+	static final int LEARN = 11;
+	static final int ORIGINAL = 12;
 
 	static final int DEFAULT_WIDTH = 320;
 	static final int DEFAULT_HEIGHT = 240;
@@ -70,7 +71,7 @@ public class DebugImageView extends ViewParent
 	static final int FIELDH = 554;
 
 	// Images that we can view in this view using the combo box
-	String[] imageViews = { "Original", "Green", "Orange", "White", "Edge", "Thresh" };
+	String[] imageViews = { "Original", "Green", "Orange", "White", "Edge", "Thresh", "Learn" };
 	JComboBox viewList;
 
 	JSlider greenThreshold;
@@ -96,6 +97,7 @@ public class DebugImageView extends ViewParent
 	BufferedImage debugImageDisplay;        // overlay + original
 	BufferedImage displayImages[] = new BufferedImage[ORIGINAL+1]; // our images
 	Y8ThreshImage greenCheck;
+	Y8image green8;
 
 	private String label = null;
 
@@ -228,8 +230,12 @@ public class DebugImageView extends ViewParent
 			drawLines(g);
 			drawBlobs(g);
 			//displayImages[THRESH].setThresh(persistant.greenThreshold);
-			g.drawImage(displayImages[currentBottom], 0, displayh + 25, displayw / 2,
-						displayh / 2, null);
+			if (currentBottom != LEARN) {
+				g.drawImage(displayImages[currentBottom], 0, displayh + 25, displayw / 2,
+							displayh / 2, null);
+			} else {
+				findGreen(g);
+			}
 			viewList.setBounds(displayw / 2 + 10, displayh  + 10, displayw / 2, BOX_HEIGHT);
 			if (label != null) {
 				g.setColor(Color.BLACK);
@@ -421,6 +427,8 @@ public class DebugImageView extends ViewParent
 			currentBottom = ORIGINAL;
 		} else if (viewName == "Thresh") {
 			currentBottom = THRESH;
+		} else if (viewName == "Learn") {
+			currentBottom = LEARN;
 		} else {
 			currentBottom = ORIGINAL;
 		}
@@ -578,6 +586,45 @@ public class DebugImageView extends ViewParent
 
 	}
 
+	public void findGreen(Graphics g) {
+		int max = 0;
+		int maxY = 0;
+		int maxU = 0;
+		int maxV = 0;
+		for (int col = 0; col < width; col++) {
+			for (int row = 0; row < height; row++) {
+				int gr = (green8.data[row * width + col]) & 0xFF;
+				if (gr > max) {
+					boolean first = (col & 1) == 0;
+					int cbase = (col & ~1);
+					int i = (row * displayw * 2) + (cbase * 2);
+
+					maxY = currentLog.data()[first ? i : i + 2] & 0xff;
+					maxU = currentLog.data()[i + 1] & 0xff;
+					maxV = currentLog.data()[i + 3] & 0xff;
+				}
+			}
+		}
+		for (int col = 0; col < width * 2; col++) {
+			for (int row = 0; row < height * 2; row++) {
+				boolean first = (col & 1) == 0;
+				int cbase = (col & ~1);
+				int i = (row * width * 2 * 2) + (cbase * 2);
+
+				int y = currentLog.data()[first ? i : i + 2] & 0xff;
+				int u = currentLog.data()[i + 1] & 0xff;
+				int v = currentLog.data()[i + 3] & 0xff;
+				if (Math.abs(y - maxY) < 15 && Math.abs(u - maxU) < 10 &&
+					Math.abs(v - maxV) < 10) {
+					g.setColor(Color.GREEN);
+				} else {
+					g.setColor(Color.BLACK);
+				}
+				g.fillRect(col/2, row/2+displayh+30, 1, 1);
+			}
+		}
+	}
+
     @Override
     public void ioFinished(IOInstance instance) {}
 
@@ -586,7 +633,7 @@ public class DebugImageView extends ViewParent
 		System.out.println("IO received in Debug");
 		//yuv = out[0].bytes;
 		if (out.length > GREEN_IMAGE) {
-            Y8image green8 = new Y8image(width, height, out[GREEN_IMAGE].bytes);
+            green8 = new Y8image(width, height, out[GREEN_IMAGE].bytes);
             displayImages[GREEN_IMAGE] = green8.toBufferedImage();
 			greenCheck = new Y8ThreshImage(width, height, out[GREEN_IMAGE].bytes);
 			greenCheck.setThresh(thresh);
