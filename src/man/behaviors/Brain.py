@@ -108,8 +108,10 @@ class Brain(object):
         # So that we only try to sit down once upon receiving command
         self.sitting = False
 
-        # CHINA HACK
+        # CHINA HACK(s)
         self.penalizedHack = False
+        self.penalizedEdgeClose = 0
+        self.penalizedCount = 0
 
     def initTeamMembers(self):
         self.teamMembers = []
