@@ -7,14 +7,13 @@
 
 #pragma once
 
-#include <vector>
-#include <cmath>
-#include <iostream>
-
 #include "NBMath.h"
 #include "FieldConstants.h"
 #include "RobotLocation.pb.h"
 
+#include <vector>
+#include <cmath>
+#include <iostream>
 #include <boost/random.hpp>
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/uniform_real.hpp>
