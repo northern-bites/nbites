@@ -11,8 +11,8 @@
 #pragma once
 
 #include "NBMath.h"
-#include "LineSystem.h"
-#include "LandmarkSystem.h"
+#include "LineModel.h"
+#include "LandmarkModel.h"
 #include "LocStructs.h"
 #include "FieldConstants.h"
 
@@ -24,14 +24,14 @@
 namespace man {
 namespace localization {
 
-class VisionSystem
+class VisionModel
 {
 public:
     // Constructor
-    VisionSystem();
+    VisionModel();
 
     // Destructor
-    ~VisionSystem();
+    ~VisionModel();
 
     // Scores particles according to observations from vision
     // @param particles, the set of particles that represent localization belief
@@ -60,8 +60,8 @@ public:
     double getAvgError() const { return avgError; }
 
 private:
-    LineSystem* lineSystem;
-    LandmarkSystem* landmarkSystem;
+    LineModel* lineSystem;
+    LandmarkModel* landmarkSystem;
     std::vector<ReconstructedLocation> injections;
 
     int numObservations;

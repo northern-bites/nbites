@@ -1,19 +1,19 @@
-#include "MotionSystem.h"
+#include "MotionModel.h"
 
 #include <ctime>
 
 namespace man {
 namespace localization {
 
-MotionSystem::MotionSystem(float xyNoise_, float hNoise_)
+MotionModel::MotionModel(float xyNoise_, float hNoise_)
     : rng(time(0))
 {
     xyNoise = xyNoise_;
     hNoise = hNoise_;
 }
 
-void MotionSystem::update(ParticleSet& particles,
-                          const messages::RobotLocation& odometry)
+void MotionModel::update(ParticleSet& particles,
+                         const messages::RobotLocation& odometry)
 {
     // Store the last odometry and set the current one
     lastOdometry.set_x(curOdometry.x());
@@ -55,7 +55,7 @@ void MotionSystem::update(ParticleSet& particles,
     }
 }
 
-void MotionSystem::noiseShift(Particle* particle)
+void MotionModel::noiseShift(Particle* particle)
 {
     // Three gaussians with zero mean and standard deviations set by the
     // probalistic motion model

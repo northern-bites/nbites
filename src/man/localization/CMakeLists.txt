@@ -8,10 +8,10 @@ set(LOCALIZATION_SRCS
       LocalizationModule
       ParticleFilter
 	  Particle
-	  VisionSystem
-	  MotionSystem
-	  LineSystem
-      LandmarkSystem
+      MotionModel
+      VisionModel
+      LineModel
+      LandmarkModel
 )
 
 # Add project as a library.

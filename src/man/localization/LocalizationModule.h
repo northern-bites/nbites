@@ -18,8 +18,8 @@
 
 /** Filter Headers **/
 #include "ParticleFilter.h"
-#include "VisionSystem.h"
-#include "MotionSystem.h"
+#include "MotionModel.h"
+#include "VisionModel.h"
 
 #include <boost/shared_ptr.hpp>
 

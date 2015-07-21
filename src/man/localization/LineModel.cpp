@@ -1,4 +1,4 @@
-#include "LineSystem.h"
+#include "LineModel.h"
 
 #include <algorithm>
 #include <boost/math/distributions/normal.hpp>
@@ -6,7 +6,7 @@
 namespace man {
 namespace localization {
 
-LineSystem::LineSystem() 
+LineModel::LineModel() 
     : lines(), visionToLocIDs(), debug(false)
 {
     // Part I
@@ -112,8 +112,8 @@ LineSystem::LineSystem()
     visionToLocIDs[vision::LineID::Midline] = midline;
 }
 
-LocLineID LineSystem::matchLine(const messages::FieldLine& observation, 
-                                const messages::RobotLocation& loc)
+LocLineID LineModel::matchLine(const messages::FieldLine& observation, 
+                               const messages::RobotLocation& loc)
 {
     LocLineID id = LocLineID::NotMatched;
     double bestScore = 0;
@@ -156,8 +156,8 @@ LocLineID LineSystem::matchLine(const messages::FieldLine& observation,
     return id;
 }
 
-double LineSystem::scoreLine(const messages::FieldLine& observation,
-                             const messages::RobotLocation& loc)
+double LineModel::scoreLine(const messages::FieldLine& observation,
+                            const messages::RobotLocation& loc)
 {
     // Turn observation into GeoLine so scoreObservation can operate on it
     vision::GeoLine obsvAsGeoLine;
@@ -179,8 +179,8 @@ double LineSystem::scoreLine(const messages::FieldLine& observation,
 
 // NOTE method assumes that endpoints seen in observation are endpoints of line
 // IMPORTANT only tested with id == OurTopGoalbox || TheirTopGoalbox
-messages::RobotLocation LineSystem::reconstructFromMidpoint(LocLineID id, 
-                                                            const messages::FieldLine& observation)
+messages::RobotLocation LineModel::reconstructFromMidpoint(LocLineID id, 
+                                                           const messages::FieldLine& observation)
 {
     messages::RobotLocation position;
     const messages::HoughLine& inner = observation.inner();
@@ -212,8 +212,8 @@ messages::RobotLocation LineSystem::reconstructFromMidpoint(LocLineID id,
 }
 
 // IMPORTANT only tested with id == OurMidline
-messages::RobotLocation LineSystem::reconstructWoEndpoints(LocLineID id, 
-                                                           const messages::FieldLine& observation)
+messages::RobotLocation LineModel::reconstructWoEndpoints(LocLineID id, 
+                                                          const messages::FieldLine& observation)
 {
     messages::RobotLocation position;
     const messages::HoughLine& inner = observation.inner();
@@ -244,8 +244,8 @@ messages::RobotLocation LineSystem::reconstructWoEndpoints(LocLineID id,
     return position;
 }
 
-bool LineSystem::shouldUse(const messages::FieldLine& observation,
-                           const messages::RobotLocation& loc)
+bool LineModel::shouldUse(const messages::FieldLine& observation,
+                          const messages::RobotLocation& loc)
 {
     // China 2015 hack
     // If loc believes we could be seeing the goalbox, score short lines
@@ -260,8 +260,8 @@ bool LineSystem::shouldUse(const messages::FieldLine& observation,
     return useShorts || length;
 }
 
-vision::GeoLine LineSystem::relRobotToAbsolute(const messages::FieldLine& observation,
-                                               const messages::RobotLocation& loc)
+vision::GeoLine LineModel::relRobotToAbsolute(const messages::FieldLine& observation,
+                                              const messages::RobotLocation& loc)
 {
     const messages::HoughLine& inner = observation.inner();
 
@@ -272,10 +272,10 @@ vision::GeoLine LineSystem::relRobotToAbsolute(const messages::FieldLine& observ
     return globalLine;
 }
 
-double LineSystem::scoreObservation(const vision::GeoLine& observation,
-                                    const vision::GeoLine& correspondingLine, 
-                                    const messages::RobotLocation& loc,
-                                    double wz0)
+double LineModel::scoreObservation(const vision::GeoLine& observation,
+                                   const vision::GeoLine& correspondingLine, 
+                                   const messages::RobotLocation& loc,
+                                   double wz0)
 {
     // Normalize correspondingLine to have positive r and t between 0 and PI / 2 
     // NOTE see constructor for explanation of what negative r means in this context
@@ -339,7 +339,7 @@ double LineSystem::scoreObservation(const vision::GeoLine& observation,
     return tiltProb * tProb * ep0Prob * ep1Prob;
 }
 
-void LineSystem::addLine(LocLineID id, float r, float t, float ep0, float ep1)
+void LineModel::addLine(LocLineID id, float r, float t, float ep0, float ep1)
 {
     vision::GeoLine line;
     line.set(r, t, ep0, ep1);

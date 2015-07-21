@@ -51,13 +51,13 @@ enum class LandmarkID {
 // NOTE x is the second argument in the tuple, y is the third
 typedef std::tuple<LandmarkID, double, double> Landmark;
 
-class LandmarkSystem {
+class LandmarkModel {
 public:
     // Constructor
-    LandmarkSystem();
+    LandmarkModel();
 
     // Destructor
-    ~LandmarkSystem() {}
+    ~LandmarkModel() {}
 
     // Find corresponding corner in map
     // @param observation, the corner observation from the vision system in robot relative coords

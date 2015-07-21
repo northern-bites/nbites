@@ -1,4 +1,4 @@
-#include "LandmarkSystem.h"
+#include "LandmarkModel.h"
 
 #include <limits>
 #include <boost/math/distributions/normal.hpp>
@@ -6,7 +6,7 @@
 namespace man {
 namespace localization {
 
-LandmarkSystem::LandmarkSystem() 
+LandmarkModel::LandmarkModel() 
     : corners(), ballInSet(), debug(false)
 {
     // Construct map
@@ -44,8 +44,8 @@ LandmarkSystem::LandmarkSystem()
     ballInSet = std::make_tuple(LandmarkID::BallInSet, CENTER_FIELD_X, CENTER_FIELD_Y);
 }
 
-Landmark LandmarkSystem::matchCorner(const messages::Corner& observation, 
-                                     const messages::RobotLocation& loc)
+Landmark LandmarkModel::matchCorner(const messages::Corner& observation, 
+                                    const messages::RobotLocation& loc)
 {
     Landmark correspondingLandmark;
     double closestDist = std::numeric_limits<double>::max();
@@ -54,7 +54,7 @@ Landmark LandmarkSystem::matchCorner(const messages::Corner& observation,
     messages::RobotLocation obsvAsRobotLocation;
     obsvAsRobotLocation.set_x(observation.x());
     obsvAsRobotLocation.set_y(observation.y());
-    messages::RobotLocation obsvAbs = LandmarkSystem::relRobotToAbsolute(obsvAsRobotLocation, loc);
+    messages::RobotLocation obsvAbs = LandmarkModel::relRobotToAbsolute(obsvAsRobotLocation, loc);
 
     // Loop through all corners with right id from vision and take the corner
     // that best corresponds to the observation
@@ -75,8 +75,8 @@ Landmark LandmarkSystem::matchCorner(const messages::Corner& observation,
     return correspondingLandmark;
 }
 
-double LandmarkSystem::scoreCorner(const messages::Corner& observation, 
-                                   const messages::RobotLocation& loc)
+double LandmarkModel::scoreCorner(const messages::Corner& observation, 
+                                  const messages::RobotLocation& loc)
 {
     // Turn observation into RobotLocation so scoreObservation can operate on it
     messages::RobotLocation obsvAsRobotLocation;
@@ -88,8 +88,8 @@ double LandmarkSystem::scoreCorner(const messages::Corner& observation,
     return scoreObservation(obsvAsRobotLocation, correspondingLandmark, loc, observation.wz0());
 }
 
-double LandmarkSystem::scoreCircle(const messages::CenterCircle& observation, 
-                                   const messages::RobotLocation& loc)
+double LandmarkModel::scoreCircle(const messages::CenterCircle& observation, 
+                                  const messages::RobotLocation& loc)
 {
     // Turn observation into RobotLocation so scoreObservation can operate on it
     messages::RobotLocation obsvAsRobotLocation;
@@ -100,8 +100,8 @@ double LandmarkSystem::scoreCircle(const messages::CenterCircle& observation,
     return scoreObservation(obsvAsRobotLocation, circle, loc, observation.wz0());
 }
 
-double LandmarkSystem::scoreBallInSet(const messages::FilteredBall& observation, 
-                                      const messages::RobotLocation& loc)
+double LandmarkModel::scoreBallInSet(const messages::FilteredBall& observation, 
+                                     const messages::RobotLocation& loc)
 {
     // Polar to cartesian
     double xBall, yBall;
@@ -116,7 +116,7 @@ double LandmarkSystem::scoreBallInSet(const messages::FilteredBall& observation,
     return scoreObservation(obsvAsRobotLocation, ballInSet, loc, observation.vis().wz0());
 }
 
-messages::RobotLocation LandmarkSystem::relRobotToAbsolute(const messages::RobotLocation& observation, const messages::RobotLocation& loc)
+messages::RobotLocation LandmarkModel::relRobotToAbsolute(const messages::RobotLocation& observation, const messages::RobotLocation& loc)
 {
 
     // Translation rotation to absolute coordinate system
@@ -131,10 +131,10 @@ messages::RobotLocation LandmarkSystem::relRobotToAbsolute(const messages::Robot
     return transformed;
 }
 
-double LandmarkSystem::scoreObservation(const messages::RobotLocation& observation, 
-                                        const Landmark& correspondingLandmark,
-                                        const messages::RobotLocation& loc,
-                                        double wz0)
+double LandmarkModel::scoreObservation(const messages::RobotLocation& observation, 
+                                       const Landmark& correspondingLandmark,
+                                       const messages::RobotLocation& loc,
+                                       double wz0)
 {
     // Observation, cartesian to polar
     double rObsv, tObsv;
@@ -184,7 +184,7 @@ double LandmarkSystem::scoreObservation(const messages::RobotLocation& observati
     return tiltProb * tProb;
 }
 
-void LandmarkSystem::addCorner(vision::CornerID type, LandmarkID id, double x, double y)
+void LandmarkModel::addCorner(vision::CornerID type, LandmarkID id, double x, double y)
 {
     Landmark corner = std::make_tuple(id, x, y);
     corners[type].push_back(corner);

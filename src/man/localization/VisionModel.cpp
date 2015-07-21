@@ -1,4 +1,4 @@
-#include "VisionSystem.h"
+#include "VisionModel.h"
 
 #include "../vision/Hough.h"
 #include "FieldConstants.h"
@@ -10,23 +10,23 @@
 namespace man {
 namespace localization {
 
-VisionSystem::VisionSystem() 
+VisionModel::VisionModel() 
     : injections(), numObservations(0), avgError(0)
 {
-    lineSystem = new LineSystem;
-    landmarkSystem = new LandmarkSystem;
+    lineSystem = new LineModel;
+    landmarkSystem = new LandmarkModel;
 }
 
-VisionSystem::~VisionSystem() 
+VisionModel::~VisionModel() 
 {
     delete lineSystem;
     delete landmarkSystem;
 }
 
-bool VisionSystem::update(ParticleSet& particles,
-                          const messages::Vision& vision,
-                          const messages::FilteredBall* ball,
-                          const messages::RobotLocation& lastEstimate)
+bool VisionModel::update(ParticleSet& particles,
+                         const messages::Vision& vision,
+                         const messages::FilteredBall* ball,
+                         const messages::RobotLocation& lastEstimate)
 {
     numObservations = 0;
     avgError = 0;
@@ -39,7 +39,7 @@ bool VisionSystem::update(ParticleSet& particles,
     double minR = std::numeric_limits<double>::max();
     messages::FieldLine line;
     for (int i = 0; i < vision.line_size(); i++) {
-        if (LineSystem::shouldUse(vision.line(i), lastEstimate)) {
+        if (LineModel::shouldUse(vision.line(i), lastEstimate)) {
             if (vision.line(i).inner().r() < minR) {
                 foundLine = true;
                 line = vision.line(i);
@@ -48,7 +48,7 @@ bool VisionSystem::update(ParticleSet& particles,
         }
     }
     // NOTE one could argue that we should instead select the one line we process
-    //      in localization randomly
+    //      in localization randomly in case of some unmodeled systematic error
 
     // Count observations
     if (foundLine)
@@ -127,7 +127,7 @@ bool VisionSystem::update(ParticleSet& particles,
     injections.clear();
 
     // TODO refactor, reconstructing location from a line and a landmark is general
-    //      functionality that LineSystem and/or LandmarkSystem should support
+    //      functionality that LineModel and/or LandmarkModel should support
 
     // (1) Reconstruct pose from ball in set
     if (useBall && ball->vis().frames_on() > 5) {

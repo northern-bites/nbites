@@ -10,8 +10,8 @@
 
 #include "Particle.h"
 #include "FieldConstants.h"
-#include "VisionSystem.h"
-#include "MotionSystem.h"
+#include "MotionModel.h"
+#include "VisionModel.h"
 #include "NBMath.h"
 #include "DebugConfig.h"
 
@@ -166,8 +166,8 @@ private:
 
     ParticleSet particles;
 
-    MotionSystem * motionSystem;
-    VisionSystem * visionSystem;
+    MotionModel* motionSystem;
+    VisionModel* visionSystem;
 
     float lastMotionTimestamp;
     float lastVisionTimestamp;

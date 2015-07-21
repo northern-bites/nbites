@@ -38,13 +38,13 @@ enum class LocLineID {
     TheirLeftGoalbox   // dark gray
 };
 
-class LineSystem {
+class LineModel {
 public:
     // Constructor
-    LineSystem();
+    LineModel();
 
     // Destructor
-    ~LineSystem() {}
+    ~LineModel() {}
 
     // Find corresponding line in map
     // @param observation, the line observation from the vision system in robot relative coords

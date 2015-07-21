@@ -25,7 +25,7 @@ namespace localization
 //              of (1) the speed of robot and (2) the direction of motion 
 //              (more noise in principal direction of motion)
 
-class MotionSystem
+class MotionModel
 {
 public:
     // Constructor
@@ -33,10 +33,10 @@ public:
     //                  xyNoise_ added to particles' x and y components
     // @param hNoise_, noise sampled from a gaussian with standard deviation
     //                 xyNoise_ added to particles' h components
-    MotionSystem(float xyNoise_, float hNoise_);
+    MotionModel(float xyNoise_, float hNoise_);
 
     // Destructor
-    ~MotionSystem() {}
+    ~MotionModel() {}
 
     // Adjusts swarm based on odometry info from motion
     // @param particles, the set of particles that represent localization belief
