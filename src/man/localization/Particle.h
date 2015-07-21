@@ -3,7 +3,10 @@
  * @author Ellis Ratner <eratner@bowdoin.edu>
  * @author EJ Googins <egoogins@bowdoin.edu>
  * @date   January 2013
+ * @author Josh Imhoff <joshimhoff13@gmail.com>
+ * @date   June 2015
  */
+
 #pragma once
 
 #include "LocStructs.h"
