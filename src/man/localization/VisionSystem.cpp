@@ -244,8 +244,8 @@ bool VisionSystem::update(ParticleSet& particles,
                 //         }
                 //     }
                 // }
-            }
-        }
+        //     }
+        // }
 
         // (3) Reconstruct pose from endline
         // for (int i = 0; i < vision.line_size(); i++) {

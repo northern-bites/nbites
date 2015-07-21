@@ -66,7 +66,7 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
 {
     // Motion system and vision system update step
     PROF_ENTER(P_LOC_MOTION)
-    motionSystem->update(particles, odometryInput, errorMagnitude);
+    motionSystem->update(particles, odometryInput);
     PROF_EXIT(P_LOC_MOTION)
 
     PROF_ENTER(P_LOC_VISION)
