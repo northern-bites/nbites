@@ -1,7 +1,7 @@
 #include "LocalizationModule.h"
+
 #include "Profiler.h"
 #include "RoboCupGameControlData.h"
-
 #include "DebugConfig.h"
 #include "../log/logging.h"
 #include "../control/control.h"
@@ -21,9 +21,7 @@ LocalizationModule::LocalizationModule()
       log_index(0)
 {
     particleFilter = new ParticleFilter();
-    // TODO delete?
-    // Chooose on the field looking up as a random initial
-    particleFilter->resetLocTo(110,658,-1.5);
+    particleFilter->resetLocTo(0, 0, 0);
 }
 
 LocalizationModule::~LocalizationModule()
@@ -37,7 +35,7 @@ void LocalizationModule::update()
     for (int i = 0; i < 2; i++) {
         if (lastReset[i] != resetInput[i].message().timestamp())
         {
-            // std::cout<<"RESET LOC ON "<<i<<std::endl;
+            std::cout<< "Reset loc on " << i << std::endl;
             lastReset[i] = resetInput[i].message().timestamp();
             particleFilter->resetLocTo(resetInput[i].message().x(),
                                        resetInput[i].message().y(),
@@ -47,16 +45,10 @@ void LocalizationModule::update()
     }
 #endif
 
-    // Save odometry and lines
-    curOdometry.set_x(motionInput.message().x());
-    curOdometry.set_y(motionInput.message().y());
-    curOdometry.set_h(motionInput.message().h());
+    // Save odometry and sensor measurments
+    curOdometry = motionInput.message();
     curVision = visionInput.message();
-
     curBall = ballInput.message();
-
-    // TODO: use CC
-    messages::CenterCircle curCircle = curVision.circle();
 
     const messages::FilteredBall* ball = NULL;
 #ifndef OFFLINE
@@ -68,17 +60,11 @@ void LocalizationModule::update()
     // Update filter
     particleFilter->update(curOdometry, curVision, ball);
 
-//this is part of something old that never executes, check out
-//the ifdef below; same code but it is executed when we want to
-//to log localization
-#if defined( LOG_LOCALIZATION) || defined(OFFLINE)
-    portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->getCurrentSwarm());
-    particleOutput.setMessage(swarmMessage);
-#endif
-
+    // Output loc estimate
     portals::Message<messages::RobotLocation> locMessage(&particleFilter->getCurrentEstimate());
     output.setMessage(locMessage);
 
+    // Logging
 #ifdef USE_LOGGING
     if(control::flags[control::LOCALIZATION]) {
         ++log_index;
@@ -119,12 +105,13 @@ void LocalizationModule::update()
         NBLog(NBL_SMALL_BUFFER,"LOCSWARM",contents,log_buf);
     }
 #endif
-
 }
 
 void LocalizationModule::run_()
 {
     PROF_ENTER(P_SELF_LOC);
+
+    // Latch inputs
     motionInput.latch();
     visionInput.latch();
 #ifndef OFFLINE
@@ -134,7 +121,9 @@ void LocalizationModule::run_()
     resetInput[1].latch();
 #endif
 
+    // Update loc
     update();
+
     PROF_EXIT(P_SELF_LOC);
 }
 

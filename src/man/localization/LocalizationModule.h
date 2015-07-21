@@ -1,22 +1,19 @@
 /*
  * @brief  The localization module class. Takes input from motion and vision for
- *             calculations, also an inPortal for resetting
+ *         calculations, also an inPortal for resetting
  *
  * @author EJ Googins <egoogins@bowdoin.edu>
  * @date   February 2013
  */
+
 #pragma once
 
-#include "DebugConfig.h"
-
-/** Messages **/
 #include "RoboGrams.h"
 #include "Vision.pb.h"
 #include "RobotLocation.pb.h"
 #include "ParticleSwarm.pb.h"
 #include "GameState.pb.h"
-
-/** Filter Headers **/
+#include "DebugConfig.h"
 #include "ParticleFilter.h"
 #include "MotionModel.h"
 #include "VisionModel.h"
@@ -27,49 +24,35 @@ namespace man
 {
 namespace localization
 {
-/**
- * @class LocalizationModule
- */
+
 class LocalizationModule : public portals::Module
 {
 public:
     LocalizationModule();
     ~LocalizationModule();
 
-    /** In Portals **/
-    portals::InPortal<messages::RobotLocation> motionInput;
-    portals::InPortal<messages::Vision>        visionInput;
-    portals::InPortal<messages::RobotLocation> resetInput[2];
-    portals::InPortal<messages::GameState>     gameStateInput;
+    portals::InPortal<messages::RobotLocation>  motionInput;
+    portals::InPortal<messages::Vision>         visionInput;
+    portals::InPortal<messages::RobotLocation>  resetInput[2];
+    portals::InPortal<messages::GameState>      gameStateInput;
     portals::InPortal<messages::FilteredBall>   ballInput;
 
-    /** Out Portals **/
     portals::OutPortal<messages::RobotLocation> output;
     portals::OutPortal<messages::ParticleSwarm> particleOutput;
 
-    float lastMotionTimestamp;
-    float lastVisionTimestamp;
-
 protected:
-    /**
-     * @brief Update inputs, calculate new state of the filter
-     */
+    // Run method of module
     void run_();
 
-    /**
-     * @brief Updates the current robot pose estimate given
-     *        the most recent motion control inputs and
-     *        measurements taken.
-     */
+    // Updates the current robot pose estimate given the most recent motion 
+    // control inputs and measurements taken
     void update();
 
-    ParticleFilter * particleFilter;
+    ParticleFilter* particleFilter;
     long long lastReset[2];
     messages::RobotLocation curOdometry;
     messages::Vision curVision;
     messages::FilteredBall curBall;
-
-private:
     size_t log_index;
 };
 
