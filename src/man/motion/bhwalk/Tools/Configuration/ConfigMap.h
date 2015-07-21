@@ -47,6 +47,7 @@ public:
   { }
   const char* what() const throw()
   {
+    std::cout<<"[EXCEPTION ERROR ] ConfigMap.h"<<std::endl;
     return msg.c_str();
   }
   virtual ~bad_cm_cast() throw() { }

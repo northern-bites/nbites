@@ -123,6 +123,7 @@ public:
     ~ParseException() throw() {};
     inline const char* what() const throw()
     {
+      std::cout<<"[EXCEPTION ERROR ] ConfigMapParser.h 1"<<std::endl;
       return msg.c_str();
     }
     void printError(const std::string& filename) const;
