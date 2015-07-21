@@ -17,8 +17,6 @@
 #include "GameState.pb.h"
 
 /** Filter Headers **/
-#include "SensorModel.h"
-#include "MotionModel.h"
 #include "ParticleFilter.h"
 #include "VisionSystem.h"
 #include "MotionSystem.h"

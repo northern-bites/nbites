@@ -8,10 +8,7 @@
  */
 #pragma once
 
-#include "SensorModel.h"
-#include "MotionModel.h"
 #include "Particle.h"
-#include "LocSystem.h"
 #include "FieldConstants.h"
 #include "VisionSystem.h"
 #include "MotionSystem.h"
@@ -68,7 +65,7 @@ static const ParticleFilterParams DEFAULT_PARAMS =
  *        based on a prior belief function as well as latest
  *        sensor and control data.
  */
-class ParticleFilter : public LocSystem
+class ParticleFilter// : public LocSystem
 {
 
 public:

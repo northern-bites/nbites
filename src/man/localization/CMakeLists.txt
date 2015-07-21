@@ -5,15 +5,13 @@ project(localization)
 
 # Set source files here that need to be compiled.
 set(LOCALIZATION_SRCS 
-              LocalizationModule
-              ParticleFilter
-		      Particle
-		      MotionModel
-		      SensorModel
-		      VisionSystem
-		      MotionSystem
-		      LineSystem
-              LandmarkSystem
+      LocalizationModule
+      ParticleFilter
+	  Particle
+	  VisionSystem
+	  MotionSystem
+	  LineSystem
+      LandmarkSystem
 )
 
 # Add project as a library.
@@ -29,7 +27,3 @@ target_link_libraries(localization
   support
   portals
   messages)
-
-if ( OFFLINE )
-  nbites_add_test(LocalizationTest LocalizationTest.cpp localization)
-endif ( OFFLINE )
