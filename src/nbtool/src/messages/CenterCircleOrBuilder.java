@@ -42,4 +42,13 @@ public interface CenterCircleOrBuilder extends
    * <code>optional float prob = 4;</code>
    */
   float getProb();
+
+  /**
+   * <code>optional float wz0 = 5;</code>
+   */
+  boolean hasWz0();
+  /**
+   * <code>optional float wz0 = 5;</code>
+   */
+  float getWz0();
 }

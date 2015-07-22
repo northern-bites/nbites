@@ -103,6 +103,7 @@ namespace nblog {
     
     //init log_main thread
     void log_main_init();
+    void log_main_destroy();
     
     //for io threads.
     Log * acquire(int bi, uint32_t * relevant_nextr);

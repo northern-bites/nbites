@@ -26,12 +26,7 @@ def gameInitial(player):
         player.lastStiffStatus = True
         #Reset role to player number
         player.role = player.brain.playerNumber
-        # US OPEN HACK
-        if player.brain.game:
-            oppTeam = player.brain.game.team(1).team_number
-        else:
-            oppTeam = -1
-        roleConstants.setRoleConstants(player, player.role, oppTeam)
+        roleConstants.setRoleConstants(player, player.role)
 
     # If stiffnesses were JUST turned on, then stand up.
     if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
@@ -116,8 +111,8 @@ def gamePlaying(player):
 
     if player.brain.gameController.timeSincePlaying < 10:
         if player.brain.gameController.ownKickOff:
-            if (roleConstants.isChaser(player.role) or roleConstants.isCherryPicker(player.role)
-               and player.brain.ball.vis.on):
+            if (roleConstants.isFirstChaser(player.role) and
+                player.brain.ball.vis.on):
                 player.shouldKickOff = True
                 return player.goNow('approachBall')
             else:

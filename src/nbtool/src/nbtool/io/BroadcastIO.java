@@ -3,26 +3,38 @@ package nbtool.io;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import nbtool.data.TeamBroadcast;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.io.CommonIO.IOState;
 import nbtool.util.Logger;
+import nbtool.util.NBConstants;
 import messages.TeamPacket;
 import messages.WorldModel;
+import data.GameControlData;
 import data.SPLStandardMessage;
 
 public class BroadcastIO {
 	
-	public static final int NBITES_TEAM_PORT = 4500;
+	public static int teamPort(int teamNum) {return 10000 + teamNum;}
+	public static final String BROADCAST_ADDRESS = "10.0.255.255";
+	public static final int NBITES_TEAM_PORT = teamPort(NBConstants.NBITES_TEAM_NUM);
+	
+	public static final int GAME_CONTROL_PORT = GameControlData.GAMECONTROLLER_GAMEDATA_PORT;
+	public static final int GAME_CONTROL_RECV_PORT = GameControlData.GAMECONTROLLER_RETURNDATA_PORT;
+	
 	public static final Map<String, String> ROBOT_TO_IP;
 	public static final Map<String, String> IP_TO_ROBOT;
 	static {
@@ -127,4 +139,77 @@ public class BroadcastIO {
 	public static interface TeamBroadcastListener extends IOFirstResponder {
 		public void acceptTeamBroadcast(TeamBroadcast tb);
 	}
+	
+	public static abstract class BroadcastDataProvider {
+		/* somewhat arbitrary, based on underlying datagram protocol */
+		public static final int MAX_BROADCAST_SIZE = 1200;
+		
+		public abstract byte[] provideBroadcast();
+		public abstract String name();
+	}
+	
+	public static abstract class SPLMessageProvider extends BroadcastDataProvider {
+		public byte[] provideBroadcast() {
+			return provideMessage().toByteArray();
+		}
+		
+		public abstract SPLStandardMessage provideMessage();
+	}
+	
+	public static class Broadcaster {
+		//may NOT be set to null.
+		public volatile BroadcastDataProvider provider;
+		public volatile int interim;
+		public volatile boolean running;
+		
+		public Broadcaster(String address, int port) throws SocketException, UnknownHostException {
+			this.provider = null;
+			this.interim = 1000;
+			this.running = false;
+			
+			this.socket = new DatagramSocket();
+			this.destination = InetAddress.getByName(address);
+			this.destPort = port;
+			
+			this.timer = new Timer("Broadcaster-timer", true);
+			this.timer.schedule(new BroadcastTask(), 1000);
+		}
+		
+		private DatagramSocket socket;
+		private InetAddress destination;
+		private int destPort;
+		
+		private Timer timer;
+		
+		private class BroadcastTask extends TimerTask {
+			@Override
+			public void run() {
+				if (running) {
+					byte[] data = provider.provideBroadcast();
+					if (data != null 
+							&& data.length < BroadcastDataProvider.MAX_BROADCAST_SIZE) {
+						try {
+							Logger.infof("BroadcastTask sending [%d] bytes from [%s].", data.length,
+									provider.name());
+							DatagramPacket packet = new DatagramPacket(data, data.length,
+									destination, destPort);
+							socket.send(packet);
+							
+						} catch (Exception e) {
+							e.printStackTrace();
+							Logger.errorf("Broadcaster exiting...");
+							return;
+						}
+						
+						timer.schedule(new BroadcastTask(), interim);
+						return;
+					}
+				}
+				
+				timer.schedule(new BroadcastTask(), 1000);
+			}
+			
+		}
+	}
+	
 }

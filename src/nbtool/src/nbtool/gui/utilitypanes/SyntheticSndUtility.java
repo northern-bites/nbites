@@ -12,6 +12,7 @@ import nbtool.data.Log;
 import nbtool.data.SExpr;
 import nbtool.data.Session;
 import nbtool.data.SessionMaster;
+import nbtool.gui.logviews.sound2.ShortBuffer;
 import nbtool.util.Events;
 import nbtool.util.Logger;
 
@@ -51,8 +52,10 @@ public class SyntheticSndUtility extends UtilityParent {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Logger.println("generating...");
+            
 			byte[] internal = new byte[Short.BYTES * 2 * nframes];
 			ByteBuffer bb = ByteBuffer.wrap(internal);
+
 			bb.order(ByteOrder.LITTLE_ENDIAN);
 			Signal s = new Signal(Short.MAX_VALUE, 0, 50);
 			for (int i = 0; i < nframes; ++i) {

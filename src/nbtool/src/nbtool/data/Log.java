@@ -13,6 +13,7 @@ public class Log {
 	public static final String LOG_VERSION_S = "version";
 	public static final String LOG_CHECKSUM_S = "checksum";
 	public static final String LOG_HOST_TYPE_S = "host_type";
+	public static final String LOG_HOST_NAME_S = "host_name";
 	public static final String LOG_FROM_ADDR_S = "from_address";
 	
 	//content item keys
@@ -258,6 +259,8 @@ public class Log {
 	
 	/*
 	 * Helpers for non-primary content items.
+	 * 
+	 * 0 based – index 0 refers to the content item after the 'contents' key
 	 * */
 	
 	public Integer contentNumBytes(int index) {
@@ -299,6 +302,14 @@ public class Log {
 			return null;
 		
 		return Utility.subArray(bytes, offset, total);
+	}
+	
+	public SExpr sexprForContentItem(int index) {
+		SExpr cont = tree().find(LOG_CONTENTS_S);
+		if (!cont.exists() || index >= (cont.count() - 1) )
+			return null;
+		
+		return cont.get(index + 1);
 	}
 	
 	//TESTING

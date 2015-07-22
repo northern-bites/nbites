@@ -56,6 +56,7 @@ class Navigator(FSA.FSA):
         # initialize obstacle counts
         navTrans.shouldDodge.sOrACount = 0
         navTrans.shouldDodge.vCount = 0
+        NavStates.goToPosition.avoidObstacles = True
         self.dodging = False
 
         #transitions
@@ -76,6 +77,9 @@ class Navigator(FSA.FSA):
             }
 
     def run(self):
+        if self.dodging and self.currentState != 'dodge':
+            self.dodging = False
+            
         FSA.FSA.run(self)
 
     def performSweetMove(self, move):

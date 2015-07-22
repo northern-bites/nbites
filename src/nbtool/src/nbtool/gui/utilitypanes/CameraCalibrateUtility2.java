@@ -9,9 +9,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -20,6 +24,8 @@ import nbtool.data.Log;
 import nbtool.data.SExpr;
 import nbtool.data.Session;
 import nbtool.data.SessionMaster;
+import nbtool.io.ControlIO;
+import nbtool.io.ControlIO.ControlInstance;
 import nbtool.io.CrossIO;
 import nbtool.io.CrossIO.CrossCall;
 import nbtool.io.CrossIO.CrossFunc;
@@ -32,6 +38,8 @@ import nbtool.util.Events;
 import nbtool.util.Logger;
 
 public class CameraCalibrateUtility2 extends UtilityParent {
+	
+	private static final String CALIBRATION_CONTROL_NAME = "setCalibration";
 	
 	private CCU_Frame display = null;
 
@@ -50,11 +58,10 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 
 	@Override
 	public char preferredMemnonic() {
-		// TODO Auto-generated method stub
 		return 'c';
 	}
 	
-	public class CCU_Frame extends javax.swing.JFrame implements IOFirstResponder, ActionListener, Events.SessionSelected {
+	public class CCU_Frame extends javax.swing.JFrame implements IOFirstResponder, Events.SessionSelected {
 		
 		class Params {
 			double rollOffset, tiltOffset;
@@ -71,14 +78,20 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 		
 		Params lastCalculated;
 		Session using;
+		private final CCU_Frame outerThis = this;
 		
 	    public CCU_Frame() {
 	        initComponents();
 	        cameraBox.setSelectedIndex(0);
-	        saveButton.setEnabled(false);
+	        writeButton.setEnabled(false);
+	        sendButton.setEnabled(false);
+	        switchButton.setEnabled(true);
 	        
-	        saveButton.addActionListener(this);
-	        callButton.addActionListener(this);
+//	        writeButton.addActionListener(this);
+//	        sendButton.addActionListener(this);
+//	        callButton.addActionListener(this);
+	        
+	        setupActionListeners();
 	        
 	        using = SessionMaster.get().getLatestSession();
 	        if (using != null)
@@ -93,126 +106,162 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 			using = s;
 			updateSessionLabels();
 		}
+	    
+	    private void setupActionListeners() {
+	    	writeButton.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (lastCalculated != null && lastCalculated.rollOffset != Double.NaN) {
+						Logger.println("saving parameters...");
+						String filePath = System.getenv().get("NBITES_DIR");
+			            filePath += "/src/man/config/calibrationParams.txt";
 
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if (e.getSource() == saveButton) {
-				if (lastCalculated != null && lastCalculated.rollOffset != Double.NaN) {
-					Logger.println("saving parameters...");
+			            String lisp = "(" + lastCalculated.camera + " ";
+			            lisp += Double.toString(lastCalculated.rollOffset)
+			            		+ " " + Double.toString(lastCalculated.tiltOffset) + ")";
+			            
+			            String text = "";
+			            try {
+			                FileReader fr = new FileReader(filePath);
+			                BufferedReader bf = new BufferedReader(fr);
+			                String line;
+			                while ((line = bf.readLine()) != null) {
+			                    text += line;
+			                }
+			                SExpr saved = SExpr.deserializeFrom(text);
+			                SExpr bot = saved.get(1).find(lastCalculated.robotName);
+			                if (!bot.exists()) {
+			                    System.out.printf("Invalid robot name! Could not find exiting params for \"%s\"\n",
+			                    		lastCalculated.robotName);
+			                } else {
+			                    if (lastCalculated.camera.equals("TOP")) {
+			                        bot.setList(bot.get(0), SExpr.deserializeFrom(lisp), bot.get(2));
+			                    } else {
+			                        bot.setList(bot.get(0), bot.get(1), SExpr.deserializeFrom(lisp));
+			                    }
+			                }
+
+			                // Write out to file
+			                FileOutputStream fos = new FileOutputStream(filePath, false);
+			                byte[] data = saved.print().getBytes();
+			                fos.write(data);
+
+			                fr.close();
+			                bf.close();
+			                fos.close();
+
+			            } catch (FileNotFoundException e1) {
+			                e1.printStackTrace();
+			            } catch (IOException e1) {
+			                e1.printStackTrace();
+			            }
+					} else {
+						JOptionPane.showMessageDialog(outerThis, "successfully call calibrate first");
+					}
+				}
+	    		
+	    	});
+	    	
+	        sendButton.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
 					String filePath = System.getenv().get("NBITES_DIR");
 		            filePath += "/src/man/config/calibrationParams.txt";
-
-		            String lisp = "(" + lastCalculated.camera + " ";
-		            lisp += Double.toString(lastCalculated.rollOffset)
-		            		+ " " + Double.toString(lastCalculated.tiltOffset) + ")";
 		            
-		            String text = "";
 		            try {
-		                FileReader fr = new FileReader(filePath);
-		                BufferedReader bf = new BufferedReader(fr);
-		                String line;
-		                while ((line = bf.readLine()) != null) {
-		                    text += line;
-		                }
-		                SExpr saved = SExpr.deserializeFrom(text);
-		                SExpr bot = saved.get(1).find(lastCalculated.robotName);
-		                if (!bot.exists()) {
-		                    System.out.printf("Invalid robot name! Could not find exiting params for \"%s\"\n",
-		                    		lastCalculated.robotName);
-		                } else {
-		                    if (lastCalculated.camera.equals("TOP")) {
-		                        bot.setList(bot.get(0), SExpr.deserializeFrom(lisp), bot.get(2));
-		                    } else {
-		                        bot.setList(bot.get(0), bot.get(1), SExpr.deserializeFrom(lisp));
-		                    }
-		                }
-
-		                // Write out to file
-		                FileOutputStream fos = new FileOutputStream(filePath, false);
-		                byte[] data = saved.print().getBytes();
-		                fos.write(data);
-
-		                fr.close();
-		                bf.close();
-		                fos.close();
-
+		            	byte[] data = Files.readAllBytes(
+		            			FileSystems.getDefault().getPath(filePath));
+		            	
+		            	ControlInstance ci = ControlIO.getByIndex(0);
+		            	if (ci == null) {
+		            		JOptionPane.showMessageDialog(outerThis, "no control instance connected!");
+		            		return;
+		            	}
+		            	
+		            	Log command = ControlIO.createSimpleCommand(CALIBRATION_CONTROL_NAME, data);
+		            	ci.tryAddCmnd(command);
 		            } catch (FileNotFoundException e1) {
 		                e1.printStackTrace();
 		            } catch (IOException e1) {
 		                e1.printStackTrace();
 		            }
-				} else {
-					JOptionPane.showMessageDialog(this, "successfully call calibrate first");
 				}
-			} else if (e.getSource() == callButton) {
-				if (using == null) {
-					JOptionPane.showMessageDialog(this, "no selected session");
-					return;
-				}
-				List<Log> accepted = new LinkedList<Log>();
-				String cameraString = (String) cameraBox.getSelectedItem();
-				String searchText = String.format("(from camera_%s)", cameraString);
-				
-				for (Log log : using.logs_ALL) {
-					if (log.description().indexOf(searchText) >= 0) {
-						accepted.add(log);
+	    		
+	    	});
+	        
+	        callButton.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (using == null) {
+						JOptionPane.showMessageDialog(outerThis, "no selected session");
+						return;
 					}
-				}
-				
-				if (accepted.size() < 7) {
-					JOptionPane.showMessageDialog(this, "not enough logs from " + cameraString);
-					return;
-				}
-				
-				for (Log log : accepted) {
-					if (log.bytes == null) {
-						try {
-							FileIO.loadLog(log, log.parent.directoryFrom);
-						} catch (IOException e1) {
-							e1.printStackTrace();
-							return;
+					List<Log> accepted = new LinkedList<Log>();
+					String cameraString = (String) cameraBox.getSelectedItem();
+					String searchText = String.format("(from camera_%s)", cameraString);
+					
+					for (Log log : using.logs_ALL) {
+						if (log.description().indexOf(searchText) >= 0) {
+							accepted.add(log);
 						}
 					}
-				}
-				
-				// Fetch name of robot
-                SExpr name = accepted.get(0).tree().find("from_address");
-                if (!name.exists()) {
-                    System.out.printf("COULD NOT LOAD ROBOT NAME. ABORTING.\n");
-                } else {
-                    String rname = name.get(1).value();
-                    int iloc = rname.indexOf(".local");
-                 
-                    if (iloc > 0) {
-                    	rname = rname.substring(0, iloc);
-                    }
-                    
-                    lastCalculated = new Params(cameraString, rname);
+					
+					if (accepted.size() < 7) {
+						JOptionPane.showMessageDialog(outerThis, "not enough logs from " + cameraString);
+						return;
+					}
+					
+					for (Log log : accepted) {
+						if (log.bytes == null) {
+							try {
+								FileIO.loadLog(log, log.parent.directoryFrom);
+							} catch (IOException e1) {
+								e1.printStackTrace();
+								return;
+							}
+						}
+					}
+					
+					// Fetch name of robot
+	                SExpr name = accepted.get(0).tree().find("from_address");
+	                if (!name.exists()) {
+	                    System.out.printf("COULD NOT LOAD ROBOT NAME. ABORTING.\n");
+	                } else {
+	                    String rname = name.get(1).value();
+	                    int iloc = rname.indexOf(".local");
+	                 
+	                    if (iloc > 0) {
+	                    	rname = rname.substring(0, iloc);
+	                    }
+	                    
+	                    lastCalculated = new Params(cameraString, rname);
 
-                    // Call calibrate nbfunc with the 7 logs
-                    Logger.printf("calibrating for camera{%s} robot{%s} session{%s}",
-                    		cameraString, rname, using.name);
-                    CrossInstance ci = CrossIO.instanceByIndex(0);
-                    if (ci == null) {
-                    	JOptionPane.showMessageDialog(this, "no nbcross instance connected");
-                    	return;
-                    }
-                    
-                    CrossFunc func = ci.functionWithName("CameraCalibration");
-                    if (func == null) {
-                    	Logger.errorf("COULD NOT GET CameraCalibration FUNCTION");
-                    	return;
-                    }
-                    
-                    Log[] seven = accepted.subList(0, 7).toArray(new Log[0]);
-                    CrossCall call = new CrossCall(this, func, seven);
-                    assert(ci.tryAddCall(call));
-                }
-				
-			} else {
-				Logger.errorf("UNKNOWN ACTION SOURCE IN CCU");
-			}
-		}
+	                    // Call calibrate nbfunc with the 7 logs
+	                    Logger.printf("calibrating for camera{%s} robot{%s} session{%s}",
+	                    		cameraString, rname, using.name);
+	                    CrossInstance ci = CrossIO.instanceByIndex(0);
+	                    if (ci == null) {
+	                    	JOptionPane.showMessageDialog(outerThis, "no nbcross instance connected");
+	                    	return;
+	                    }
+	                    
+	                    CrossFunc func = ci.functionWithName("CameraCalibration");
+	                    if (func == null) {
+	                    	Logger.errorf("COULD NOT GET CameraCalibration FUNCTION");
+	                    	return;
+	                    }
+	                    
+	                    Log[] seven = accepted.subList(0, 7).toArray(new Log[0]);
+	                    CrossCall call = new CrossCall(outerThis, func, seven);
+	                    assert(ci.tryAddCall(call));
+	                }
+					
+				}
+	    		
+	    	});
+	    }
 
 		@Override
 		public void ioFinished(IOInstance instance) {}
@@ -246,7 +295,8 @@ public class CameraCalibrateUtility2 extends UtilityParent {
             rollLabel.setText("Roll offset: " + Double.toString(lastCalculated.rollOffset) + " rad.");
             tiltLabel.setText("Tilt offset: " + Double.toString(lastCalculated.tiltOffset) + " rad.");
             robotLabel.setText("Of robot: " + lastCalculated.robotName);
-            saveButton.setEnabled(true);
+            writeButton.setEnabled(true);
+            sendButton.setEnabled(true);
 		}
 
 		@Override
@@ -271,12 +321,21 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	        callButton = new javax.swing.JButton();
 	        sessionNameLabel = new javax.swing.JLabel();
 	        sessionSizeLabel = new javax.swing.JLabel();
-	        saveButton = new javax.swing.JButton();
 	        calcLabel = new javax.swing.JLabel();
 	        rollLabel = new javax.swing.JLabel();
 	        tiltLabel = new javax.swing.JLabel();
 	        cameraLabel = new javax.swing.JLabel();
 	        robotLabel = new javax.swing.JLabel();
+	        
+	        writeButton = new JButton();
+	        sendButton = new JButton();
+	        switchButton = new JButton();
+	        
+	        saveContainer = new javax.swing.JPanel();
+	        saveContainer.setLayout(new GridLayout(1,3));
+	        saveContainer.add( writeButton );
+	        saveContainer.add( sendButton );
+	        saveContainer.add( switchButton );
 
 	        setTitle("Cheddar's Cool Calibration Utility");
 	        setMinimumSize(new java.awt.Dimension(485, 242));
@@ -289,7 +348,9 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 
 	        sessionSizeLabel.setText("Session size:");
 
-	        saveButton.setText("SAVE");
+	        writeButton.setText("SAVE");
+	        sendButton.setText("SEND");
+	        switchButton.setText("SWITCH");
 
 	        calcLabel.setText("");
 
@@ -326,7 +387,7 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	                            .addComponent(robotLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 	                            .addComponent(cameraLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 	                            .addGroup(layout.createSequentialGroup()
-	                                .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+	                                .addComponent(saveContainer, 400, 400, 400)
 	                                .addGap(0, 0, Short.MAX_VALUE))
 	                            .addComponent(tiltLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
 	                .addContainerGap())
@@ -353,13 +414,14 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 	                .addComponent(robotLabel)
 	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-	                .addComponent(saveButton)
+	                .addComponent(saveContainer)
 	                .addContainerGap())
 	        );
 
 	        pack();
 	    }// </editor-fold>     
 	    
+	    /*
 	    private void initComponents2() {
 	    	cameraBox = new javax.swing.JComboBox<>();
 	        callButton = new javax.swing.JButton();
@@ -412,19 +474,23 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	        
 	        content.add(tiltLabel);
 	        content.add(saveButton);
-	    }
+	    } */
 
 	    // Variables declaration - do not modify                     
 	    private javax.swing.JButton callButton;
 	    private javax.swing.JComboBox<String> cameraBox;
 	    private javax.swing.JLabel cameraLabel;
-	    private javax.swing.JButton saveButton;
 	    private javax.swing.JLabel calcLabel;
 	    private javax.swing.JLabel robotLabel;
 	    private javax.swing.JLabel rollLabel;
 	    private javax.swing.JLabel sessionNameLabel;
 	    private javax.swing.JLabel sessionSizeLabel;
 	    private javax.swing.JLabel tiltLabel;
+	    
+	    private javax.swing.JButton writeButton;
+	    private javax.swing.JButton sendButton;
+	    private javax.swing.JButton switchButton;
+	    private javax.swing.JPanel  saveContainer;
 	    // End of variables declaration                   
 	}
 }

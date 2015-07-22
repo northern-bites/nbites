@@ -36,6 +36,7 @@ namespace control {
         VISION,
         
         tripoint,
+        multiball,
         thumbnail,
         
         //Num_flags must be last!  it has int value ( 'previous' + 1)
@@ -51,6 +52,7 @@ namespace control {
 #endif
     
     void control_init();
+    void control_destroy();
     
     extern pthread_t control_thread;
 }

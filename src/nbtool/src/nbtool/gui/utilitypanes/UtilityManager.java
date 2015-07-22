@@ -29,11 +29,13 @@ public class UtilityManager {
 	
 	
 	public static final WorldViewUtility WorldViewUtility = new WorldViewUtility();
+	public static final BroadcastUtility BroadcastUtility = new BroadcastUtility();
 	
 	//Unused at the moment – comment out to re-enable.
 	//public static final MultiStreamUtility MultiStreamUtility = new MultiStreamUtility();
-	//public static final CameraCalibrateUtility CameraCalibrateUtility = new CameraCalibrateUtility();
+    
 	public static final SyntheticSndUtility SyntheticSndUtility = new SyntheticSndUtility();
+
 
 	public static final UtilityParent[] utilities = findUtilityFields();
 

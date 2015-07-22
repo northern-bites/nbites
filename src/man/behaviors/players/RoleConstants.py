@@ -3,8 +3,7 @@ from objects import RobotLocation
 
 ### ROLE CONFIGURATION
 # Possibilites are the following:
-# Goalie, LeftDefender, RightDefender, FirstChaser, SecondChaser, CherryPicker
-
+# Goalie, LeftDefender, RightDefender, FirstChaser, SecondChaser, CherryPicker, Striker
 moderate = {1: "Goalie",
             2: "LeftDefender",
             3: "RightDefender",
@@ -24,10 +23,10 @@ cautious = {1: "Goalie",
             5: "CherryPicker"}
 
 spread = {1: "Goalie",
-            2: "LeftDefender",
-            3: "RightDefender",
-            4: "FirstChaser",
-            5: "Striker"}
+          2: "LeftDefender",
+          3: "RightDefender",
+          4: "FirstChaser",
+          5: "Striker"}
 
 roleConfiguration = spread
 
@@ -65,11 +64,11 @@ def isCherryPicker(role):
 
 # Could be useful if we decide that the CherryPicker doesn't roleswitch
 def willRoleSwitch(role):
-    return isDefender(role) or isCherryPicker(role)
+    return not isFirstChaser(role)
 
 # Makes it easy for arbitrary roleswitching
 def canRoleSwitchTo(role):
-    return isChaser(role)
+    return isFirstChaser(role)
 
 def twoAttackersOnField(player):
     firstAttacker = False
@@ -96,7 +95,6 @@ boxBuffer = 100 # Used for the buffered box when approach ball is potentially
                 # going to transition out and into 'positionAtHome'
 
 ### HOME POSITIONS
-
 # Trapezoid of terror (defender positioning)
 oddDefenderForward = RobotLocation(NogginConstants.MIDFIELD_X - 60,
                                     NogginConstants.BLUE_GOALBOX_BOTTOM_Y - 70,
@@ -111,8 +109,8 @@ evenDefenderBack = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
                                 NogginConstants.BLUE_GOALBOX_TOP_Y + 10,
                                 0)
 
-#Tomultuous triangle (odd chaser positioning)
-strikerForward = RobotLocation(NogginConstants.MIDFIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS + 150,
+# Tomultuous triangle (odd chaser positioning)
+strikerForward = RobotLocation(NogginConstants.MIDFIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS + 170,
                                 NogginConstants.MIDFIELD_Y,
                                 180)
 strikerBottom = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X,
@@ -122,44 +120,28 @@ strikerTop = RobotLocation(NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X,
                                 NogginConstants.MIDFIELD_Y + 60,
                                 0)
 
-oddDefenderHomePenn = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
-                                    NogginConstants.MY_GOALBOX_BOTTOM_Y + 40,
+if NogginConstants.FORWARD_DEFENSE:
+    evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 140,
+                                    NogginConstants.MY_GOALBOX_TOP_Y,
                                     0)
-
-evenDefenderHomePenn = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
-                                    NogginConstants.MY_GOALBOX_TOP_Y - 40,
-                                    0)
-
-oddDefenderHomeMiami = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 40,
-                                    NogginConstants.MY_GOALBOX_BOTTOM_Y + 40,
-                                    0)
-
-evenDefenderHomeMiami = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 40,
-                                    NogginConstants.MY_GOALBOX_TOP_Y - 40,
-                                    0)
-oddDefenderHomeTexas = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 75,
-                                    NogginConstants.MY_GOALBOX_BOTTOM_Y + 15,
-                                    0)
-
-evenDefenderHomeTexas = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 75,
-                                 NogginConstants.MY_GOALBOX_TOP_Y - 15,
-                                 0)
-
-oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 50,
+    oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 140,
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 0)
-
-evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 100,
-                                 NogginConstants.MY_GOALBOX_TOP_Y,
-                                 0)
+else:
+    evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 50,
+                                    NogginConstants.MY_GOALBOX_TOP_Y,
+                                    0)
+    oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 50,
+                                NogginConstants.MY_GOALBOX_BOTTOM_Y,
+                                0)
 
 oddChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
                               NogginConstants.GREEN_PAD_Y + 100,
                               90)
 
-oddChaserKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 45,
-                                 NogginConstants.OPP_GOALBOX_BOTTOM_Y - 100,
-                                 0)
+oddChaserKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 60,
+                                 NogginConstants.OPP_GOALBOX_BOTTOM_Y - 120,
+                                 10)
 evenChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS,
                                NogginConstants.CENTER_FIELD_Y,
                                0)
@@ -219,44 +201,23 @@ evenDefenderBox = defenderBox
 
 chaserBox = ((0, 0), NogginConstants.FIELD_WIDTH, NogginConstants.FIELD_HEIGHT)
 
-strikerBox = ((strikerForward.x - 70, 0), (NogginConstants.FIELD_GREEN_WIDTH - strikerForward.x), NogginConstants.FIELD_HEIGHT)
+strikerBox = ((NogginConstants.CENTER_FIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS, 0), 
+    (NogginConstants.FIELD_GREEN_WIDTH - (NogginConstants.CENTER_FIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS)), 
+    NogginConstants.FIELD_HEIGHT)
 
 cherryPickerBox = (((0.5*NogginConstants.FIELD_GREEN_WIDTH + 0.25*NogginConstants.FIELD_WHITE_WIDTH), 0),
                     0.25*NogginConstants.FIELD_WHITE_WIDTH + NogginConstants.GREEN_PAD_X, 
                     NogginConstants.FIELD_HEIGHT)
 
 ### SETS PLAYER STATE PER ROLE
-### US Open Hack
-def setRoleConstants(player, role, oppTeam):
+def setRoleConstants(player, role):
     player.role = role
-
-    PENN = 22
-    TEXAS = 1
-    MIAMI = 16
-
     if isLeftDefender(role):
-        if oppTeam == PENN:
-            player.homePosition = evenDefenderHomePenn
-        elif oppTeam == TEXAS:
-            player.homePosition = evenDefenderHomeTexas
-        elif oppTeam == MIAMI:
-            player.homePosition = evenDefenderHomeMiami
-        else:
-            player.homePosition = evenDefenderHome
-
+        player.homePosition = evenDefenderHome
         player.kickoffPosition = evenDefenderHome
         player.box = evenDefenderBox
         player.isKickingOff = False
     elif isRightDefender(role):
-        if oppTeam == PENN:
-            player.homePosition = oddDefenderHomePenn
-        elif oppTeam == TEXAS:
-            player.homePosition = oddDefenderHomeTexas
-        elif oppTeam == MIAMI:
-            player.homePosition = oddDefenderHomeMiami
-        else:
-            player.homePosition = oddDefenderHome
-
         player.homePosition = oddDefenderHome
         player.kickoffPosition = oddDefenderHome
         player.box = oddDefenderBox

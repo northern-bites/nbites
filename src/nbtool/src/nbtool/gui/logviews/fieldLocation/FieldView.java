@@ -8,6 +8,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 import messages.RobotLocation;
 import nbtool.data.Log;
+import nbtool.gui.field.FieldConstants;
 import nbtool.gui.logviews.misc.ViewParent;
 
 public class FieldView extends ViewParent {

@@ -3,6 +3,7 @@
 namespace nblog {
     
     nbhost_e HOST_TYPE = UNKNOWN;
+    std::string HOST_NAME = "";
     
     int32_t getChecksum(const std::string& data) {
         int32_t sum = 0;
@@ -128,6 +129,10 @@ namespace nblog {
             keys.push_back(SExpr(LOG_HOST_TYPE_S, "unknown"));
         }
         
+        if (HOST_NAME != "") {
+            keys.push_back(SExpr(LOG_HOST_NAME_S, HOST_NAME));
+        }
+        
         _tree = SExpr(keys);
     }
     
@@ -251,6 +256,9 @@ namespace nblog {
         
         uint32_t desc_hlen = (uint32_t) desc.size();
         uint32_t data_hlen = (uint32_t) _data.size();
+
+        // printf("SENDING LOG: %u desc, %u data\n",
+        //     desc_hlen, data_hlen);
         
         uint32_t desc_nlen = htonl(desc_hlen);
         uint32_t data_nlen = htonl(data_hlen);

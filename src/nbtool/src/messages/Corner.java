@@ -90,6 +90,11 @@ public final class Corner extends
             line2_ = input.readInt32();
             break;
           }
+          case 69: {
+            bitField0_ |= 0x00000080;
+            wz0_ = input.readFloat();
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -235,6 +240,21 @@ public final class Corner extends
     return line2_;
   }
 
+  public static final int WZ0_FIELD_NUMBER = 8;
+  private float wz0_;
+  /**
+   * <code>optional float wz0 = 8;</code>
+   */
+  public boolean hasWz0() {
+    return ((bitField0_ & 0x00000080) == 0x00000080);
+  }
+  /**
+   * <code>optional float wz0 = 8;</code>
+   */
+  public float getWz0() {
+    return wz0_;
+  }
+
   private void initFields() {
     x_ = 0F;
     y_ = 0F;
@@ -243,6 +263,7 @@ public final class Corner extends
     prob_ = 0F;
     line1_ = 0;
     line2_ = 0;
+    wz0_ = 0F;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -277,6 +298,9 @@ public final class Corner extends
     }
     if (((bitField0_ & 0x00000040) == 0x00000040)) {
       output.writeInt32(7, line2_);
+    }
+    if (((bitField0_ & 0x00000080) == 0x00000080)) {
+      output.writeFloat(8, wz0_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -314,6 +338,10 @@ public final class Corner extends
     if (((bitField0_ & 0x00000040) == 0x00000040)) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(7, line2_);
+    }
+    if (((bitField0_ & 0x00000080) == 0x00000080)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeFloatSize(8, wz0_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSerializedSize = size;
@@ -446,6 +474,8 @@ public final class Corner extends
       bitField0_ = (bitField0_ & ~0x00000020);
       line2_ = 0;
       bitField0_ = (bitField0_ & ~0x00000040);
+      wz0_ = 0F;
+      bitField0_ = (bitField0_ & ~0x00000080);
       return this;
     }
 
@@ -502,6 +532,10 @@ public final class Corner extends
         to_bitField0_ |= 0x00000040;
       }
       result.line2_ = line2_;
+      if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+        to_bitField0_ |= 0x00000080;
+      }
+      result.wz0_ = wz0_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -538,6 +572,9 @@ public final class Corner extends
       }
       if (other.hasLine2()) {
         setLine2(other.getLine2());
+      }
+      if (other.hasWz0()) {
+        setWz0(other.getWz0());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       return this;
@@ -786,6 +823,38 @@ public final class Corner extends
     public Builder clearLine2() {
       bitField0_ = (bitField0_ & ~0x00000040);
       line2_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private float wz0_ ;
+    /**
+     * <code>optional float wz0 = 8;</code>
+     */
+    public boolean hasWz0() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional float wz0 = 8;</code>
+     */
+    public float getWz0() {
+      return wz0_;
+    }
+    /**
+     * <code>optional float wz0 = 8;</code>
+     */
+    public Builder setWz0(float value) {
+      bitField0_ |= 0x00000080;
+      wz0_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional float wz0 = 8;</code>
+     */
+    public Builder clearWz0() {
+      bitField0_ = (bitField0_ & ~0x00000080);
+      wz0_ = 0F;
       onChanged();
       return this;
     }
