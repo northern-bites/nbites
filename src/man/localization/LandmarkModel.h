@@ -54,7 +54,8 @@ typedef std::tuple<LandmarkID, double, double> Landmark;
 class LandmarkModel {
 public:
     // Constructor
-    LandmarkModel();
+    // @param params_, the particle filter params, including for motion model
+    LandmarkModel(const struct ParticleFilterParams& params_);
 
     // Destructor
     ~LandmarkModel() {}
@@ -114,6 +115,8 @@ private:
 
     // Helper method
     void addCorner(vision::CornerID type, LandmarkID id, double x, double y);
+
+    const struct ParticleFilterParams& params;
 
     // Map
     std::map<vision::CornerID, std::vector<Landmark>> corners;

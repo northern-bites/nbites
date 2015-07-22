@@ -29,14 +29,27 @@ namespace localization
 // Parameters for particle filter, motion model, and vision model
 struct ParticleFilterParams
 {
-    float fieldHeight;
-    float fieldWidth;
-    float numParticles;
+    // General particle filter parameters
+    float numParticles;           // num of particles in swarm
+
+    // Particle injection parameters
     float alphaFast;              // weight factor for fast exponential weight filter
     float alphaSlow;              // weight factor for slow exponential weight filter
+    float learnedSlowExponential; // learned slow exponential filter value when localized
+
+    // Motion model parameters
     float odometryXYNoise;        // variance for x,y in MotionSystem when updating
     float odometryHNoise;         // variance for h in MotionSystem when updating
-    float learnedSlowExponential; // learned slow exponential filter value when localized
+
+    // Sensor model parameters
+    // Line model
+    float lineTiltStdev;          // standard deviation of tilt to line (radians)
+    float lineBearingStdev;       // standard deviation of bearing to line (radians)
+    float lineEndpointStdev;      // standard deviation of endpoints of line (cm)
+
+    // Landmark model
+    float landmarkTiltStdev;      // standard deviation of tilt to landmark (radians)
+    float landmarkBearingStdev;   // standard deviation of bearing to landmark (radians)
 };
 
 // TODO remove

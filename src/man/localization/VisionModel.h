@@ -28,7 +28,8 @@ class VisionModel
 {
 public:
     // Constructor
-    VisionModel();
+    // @param params_, the particle filter params, including for sensor model
+    VisionModel(const struct ParticleFilterParams& params_);
 
     // Destructor
     ~VisionModel();
@@ -60,8 +61,11 @@ public:
     double getAvgError() const { return avgError; }
 
 private:
+    const struct ParticleFilterParams& params;
+    
     LineModel* lineSystem;
     LandmarkModel* landmarkSystem;
+
     std::vector<ReconstructedLocation> injections;
 
     int numObservations;

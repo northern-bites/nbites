@@ -6,8 +6,8 @@
 namespace man {
 namespace localization {
 
-LandmarkModel::LandmarkModel() 
-    : corners(), ballInSet(), debug(false)
+LandmarkModel::LandmarkModel(const struct ParticleFilterParams& params_) 
+    : params(params_), corners(), ballInSet(), debug(false)
 {
     // Construct map
     // Init corner map
@@ -161,9 +161,8 @@ double LandmarkModel::scoreObservation(const messages::RobotLocation& observatio
     double tDiff = vision::diffRadians(tMapRel, tObsv);
  
     // Evaluate gaussian to get probability of observation from location loc
-    // TODO params
-    boost::math::normal_distribution<> tiltGaussian(0, 10*TO_RAD);
-    boost::math::normal_distribution<> tGaussian(0, 20*TO_RAD);
+    boost::math::normal_distribution<> tiltGaussian(0, params.landmarkTiltStdev);
+    boost::math::normal_distribution<> tGaussian(0, params.landmarkBearingStdev);
 
     double tiltProb = pdf(tiltGaussian, tiltDiff);
     double tProb = pdf(tGaussian, tDiff);

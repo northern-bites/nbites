@@ -10,11 +10,11 @@
 namespace man {
 namespace localization {
 
-VisionModel::VisionModel() 
-    : injections(), numObservations(0), avgError(0)
+VisionModel::VisionModel(const struct ParticleFilterParams& params_) 
+    : params(params_), injections(), numObservations(0), avgError(0)
 {
-    lineSystem = new LineModel;
-    landmarkSystem = new LandmarkModel;
+    lineSystem = new LineModel(params);
+    landmarkSystem = new LandmarkModel(params);
 }
 
 VisionModel::~VisionModel() 

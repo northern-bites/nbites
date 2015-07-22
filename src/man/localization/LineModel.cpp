@@ -6,8 +6,8 @@
 namespace man {
 namespace localization {
 
-LineModel::LineModel() 
-    : lines(), visionToLocIDs(), debug(false)
+LineModel::LineModel(const struct ParticleFilterParams& params_) 
+    : params(params_), lines(), visionToLocIDs(), debug(false)
 {
     // Part I
     // Add lines in absolute field coordinates to lines map
@@ -313,11 +313,11 @@ double LineModel::scoreObservation(const vision::GeoLine& observation,
     double ep1Error = std::max(0.0, observation.ep1() - normalizedCorrespondingLine.ep1());
 
     // Evaluate gaussian to get probability of observation from location loc
-    // TODO params
-    boost::math::normal_distribution<> tiltGaussian(0, 10*TO_RAD);
-    boost::math::normal_distribution<> tGaussian(0, 20*TO_RAD);
-    boost::math::normal_distribution<> ep0Gaussian(0, 200);
-    boost::math::normal_distribution<> ep1Gaussian(0, 200);
+    // FUTURE WORK, it may be better to measure endpoint error in angular coordinates
+    boost::math::normal_distribution<> tiltGaussian(0, params.lineTiltStdev);
+    boost::math::normal_distribution<> tGaussian(0, params.lineBearingStdev);
+    boost::math::normal_distribution<> ep0Gaussian(0, params.lineEndpointStdev);
+    boost::math::normal_distribution<> ep1Gaussian(0, params.lineEndpointStdev);
   
     double tiltProb = pdf(tiltGaussian, tiltDiff);
     double tProb = pdf(tGaussian, tDiff);

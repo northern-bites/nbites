@@ -29,11 +29,8 @@ class MotionModel
 {
 public:
     // Constructor
-    // @param xyNoise_, noise sampled from a gaussian with standard deviation
-    //                  xyNoise_ added to particles' x and y components
-    // @param hNoise_, noise sampled from a gaussian with standard deviation
-    //                 xyNoise_ added to particles' h components
-    MotionModel(float xyNoise_, float hNoise_);
+    // @param params_, the particle filter params, including for motion model
+    MotionModel(const struct ParticleFilterParams& params_);
 
     // Destructor
     ~MotionModel() {}
@@ -50,10 +47,9 @@ private:
     // @param particle, the particle to shift
     void noiseShift(Particle* particle);
 
-    boost::mt19937 rng;
+    const struct ParticleFilterParams& params;
 
-    float xyNoise;
-    float hNoise;
+    boost::mt19937 rng;
 
     messages::RobotLocation curOdometry;
     messages::RobotLocation lastOdometry;

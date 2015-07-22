@@ -41,7 +41,8 @@ enum class LocLineID {
 class LineModel {
 public:
     // Constructor
-    LineModel();
+    // @param params_, the particle filter params, including for motion model
+    LineModel(const struct ParticleFilterParams& params_);
 
     // Destructor
     ~LineModel() {}
@@ -103,6 +104,8 @@ private:
 
     // Helper method
     void addLine(LocLineID id, float r, float t, float ep0, float ep1);
+
+    const struct ParticleFilterParams& params;
 
     // Map
     std::map<LocLineID, vision::GeoLine> lines;

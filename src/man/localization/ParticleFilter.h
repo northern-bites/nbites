@@ -33,29 +33,35 @@ namespace man
 namespace localization
 {
 
-// Define the default parameters for the Particle Filter
-// TODO add more constants
+// Parameters for the particle filter
 static const ParticleFilterParams DEFAULT_PARAMS =
 {
+    // General particle filter parameters
+    200,                        // num particles
+
+    // Particle injection parameters
+    0.1f,                       // exponential filter fast
+    0.01f,                      // exponential filter slow
+    5.0f,                       // learned slow exponential filter value
+
+    // Motion model parameters
 #ifdef V5_ROBOT
-    FIELD_GREEN_HEIGHT,         // Field height
-    FIELD_GREEN_WIDTH,          // Field width
-    200,                        // Num particles
-    0.1f,                       // Exponential filter fast
-    0.01f,                      // Exponential filter slow
-    0.8f,                       // Variance in x-y odometry
-    0.008f,                     // Variance in h odometry
-    5.0f                        // Learned slow exponential filter value
+    0.8f,                       // variance in x-y odometry (cm)
+    0.008f,                     // variance in h odometry (radians)
 #else
-    FIELD_GREEN_HEIGHT,         // Field height
-    FIELD_GREEN_WIDTH,          // Field width
-    200,                        // Num particles
-    0.1f,                       // Exponential filter fast
-    0.01f,                      // Exponential filter slow
-    0.5f,                       // Variance in x-y odometry
-    0.012f,                     // Variance in h odometry
-    5.0f                        // Learned slow exponential filter value
+    0.8f,                       // variance in x-y odometry (cm)
+    0.012f,                     // variance in h odometry (radians)
 #endif
+
+    // Sensor model parameters
+    // Line model
+    10*TO_RAD,                  // standard deviation of tilt to line (radians)
+    20*TO_RAD,                  // standard deviation of bearing to line (radians)
+    200,                        // standard deviation of endpoints of line (cm)
+
+    // Landmark model
+    10*TO_RAD,                  // standard deviation of tilt to landmark (radians)
+    20*TO_RAD,                  // standard deviation of bearing to landmark (radians)
 };
 
 /**
@@ -69,7 +75,7 @@ class ParticleFilter// : public LocSystem
 {
 
 public:
-    ParticleFilter(ParticleFilterParams parameters = DEFAULT_PARAMS);
+    ParticleFilter(ParticleFilterParams params = DEFAULT_PARAMS);
     ~ParticleFilter();
 
     /**
@@ -161,7 +167,7 @@ private:
     messages::RobotLocation getMirrorLocation(messages::RobotLocation loc);
 
 
-    ParticleFilterParams parameters;
+    ParticleFilterParams params;
     messages::RobotLocation poseEstimate;
 
     ParticleSet particles;

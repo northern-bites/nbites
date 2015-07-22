@@ -5,12 +5,9 @@
 namespace man {
 namespace localization {
 
-MotionModel::MotionModel(float xyNoise_, float hNoise_)
-    : rng(time(0))
-{
-    xyNoise = xyNoise_;
-    hNoise = hNoise_;
-}
+MotionModel::MotionModel(const struct ParticleFilterParams& params_)
+    : params(params_), rng(time(0))
+{}
 
 void MotionModel::update(ParticleSet& particles,
                          const messages::RobotLocation& odometry)
@@ -59,9 +56,9 @@ void MotionModel::noiseShift(Particle* particle)
 {
     // Three gaussians with zero mean and standard deviations set by the
     // probalistic motion model
-    boost::normal_distribution<> xGaussian(0, xyNoise);
-    boost::normal_distribution<> yGaussian(0, xyNoise);
-    boost::normal_distribution<> hGaussian(0, hNoise);
+    boost::normal_distribution<> xGaussian(0, params.odometryXYNoise);
+    boost::normal_distribution<> yGaussian(0, params.odometryXYNoise);
+    boost::normal_distribution<> hGaussian(0, params.odometryHNoise);
 
     boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > xNoise(rng, xGaussian);
     boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > yNoise(rng, yGaussian);

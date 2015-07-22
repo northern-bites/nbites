@@ -9,41 +9,25 @@
 namespace man {
 namespace localization {
 
-ParticleFilter::ParticleFilter(ParticleFilterParams params)
-    : parameters(params),
+ParticleFilter::ParticleFilter(ParticleFilterParams params_)
+    : params(params_),
       setResetTransition(0),
       wSlow(0),
       wFast(0)
 {
-    motionSystem = new MotionModel(params.odometryXYNoise, params.odometryHNoise);
-    visionSystem = new VisionModel;
+    motionSystem = new MotionModel(params);
+    visionSystem = new VisionModel(params);
 
     boost::mt19937 rng;
     rng.seed(std::time(0));
 
-    boost::uniform_real<float> xBounds(0.0f,
-                                       (float) parameters.fieldWidth);
-    boost::uniform_real<float> yBounds(0.0f,
-                                       (float) parameters.fieldHeight);
-    boost::uniform_real<float> angleBounds(0,
-                                           2.0f*boost::math::constants::pi<float>());
-
-    boost::variate_generator<boost::mt19937&,
-                             boost::uniform_real<float> > xGen(rng, xBounds);
-    boost::variate_generator<boost::mt19937&,
-                             boost::uniform_real<float> > yGen(rng, yBounds);
-    boost::variate_generator<boost::mt19937&,
-                             boost::uniform_real<float> > angleGen(rng, angleBounds);
-
-    // Assign uniform weight.
-    float weight = 1.0f/(((float)parameters.numParticles)*1.0f);
-
-    for(int i = 0; i < parameters.numParticles; ++i)
+    float weight = 1.0f/(((float)params.numParticles)*1.0f);
+    for(int i = 0; i < params.numParticles; ++i)
     {
         messages::RobotLocation randomLocation;
-        randomLocation.set_x(xGen());
-        randomLocation.set_y(yGen());
-        randomLocation.set_h(angleGen());
+        randomLocation.set_x(0);
+        randomLocation.set_y(0);
+        randomLocation.set_h(0);
         Particle p(randomLocation, weight);
         particles.push_back(p);
     }
@@ -76,8 +60,8 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     // Resample if vision updated
     if(updatedVision) {
         double wAvg = visionSystem->getAvgError();
-        wSlow = wSlow + parameters.alphaSlow*(wAvg - wSlow);
-        wFast = wFast + parameters.alphaFast*(wAvg - wFast);
+        wSlow = wSlow + params.alphaSlow*(wAvg - wSlow);
+        wFast = wFast + params.alphaFast*(wAvg - wFast);
 
         resample(ballInput != NULL);
     }
@@ -111,9 +95,9 @@ void ParticleFilter::updateEstimate()
     float previousYEstimate = poseEstimate.y();
     float previousHEstimate = poseEstimate.h();
 
-    poseEstimate.set_x(sumX/parameters.numParticles);
-    poseEstimate.set_y(sumY/parameters.numParticles);
-    poseEstimate.set_h(NBMath::subPIAngle(sumH/parameters.numParticles));
+    poseEstimate.set_x(sumX/params.numParticles);
+    poseEstimate.set_y(sumY/params.numParticles);
+    poseEstimate.set_h(NBMath::subPIAngle(sumH/params.numParticles));
 
     poseEstimate.set_uncert(wFast / wSlow);
 
@@ -129,7 +113,7 @@ void ParticleFilter::updateEstimate()
 void ParticleFilter::updateFieldForDebug(messages::Vision& vision)
 {
     // (1) Lines
-    LineModel lineSystem;
+    LineModel lineSystem(params);
     lineSystem.setDebug(false);
     for (int i = 0; i < vision.line_size(); i++) {
         // Get line
@@ -157,7 +141,7 @@ void ParticleFilter::updateFieldForDebug(messages::Vision& vision)
     }
 
     // (2) Corners
-    LandmarkModel landmarkSystem;
+    LandmarkModel landmarkSystem(params);
     landmarkSystem.setDebug(false);
     for (int i = 0; i < vision.corner_size(); i++) {
         // Get corner
@@ -248,29 +232,14 @@ void ParticleFilter::resetLoc()
     boost::mt19937 rng;
     rng.seed(std::time(0));
 
-    boost::uniform_real<float> xBounds(0.0f,
-                                       (float) parameters.fieldWidth);
-    boost::uniform_real<float> yBounds(0.0f,
-                                       (float) parameters.fieldHeight);
-    boost::uniform_real<float> angleBounds(0,
-                                           2.0f*boost::math::constants::pi<float>());
+    float weight = 1.0f/(((float)params.numParticles)*1.0f);
 
-    boost::variate_generator<boost::mt19937&,
-                             boost::uniform_real<float> > xGen(rng, xBounds);
-    boost::variate_generator<boost::mt19937&,
-                             boost::uniform_real<float> > yGen(rng, yBounds);
-    boost::variate_generator<boost::mt19937&,
-                             boost::uniform_real<float> > angleGen(rng, angleBounds);
-
-    // Assign uniform weight.
-    float weight = 1.0f/(((float)parameters.numParticles)*1.0f);
-
-    for(int i = 0; i < parameters.numParticles; ++i)
+    for(int i = 0; i < params.numParticles; ++i)
     {
         messages::RobotLocation randomLocation;
-        randomLocation.set_x(xGen());
-        randomLocation.set_y(yGen());
-        randomLocation.set_h(angleGen());
+        randomLocation.set_x(0);
+        randomLocation.set_y(0);
+        randomLocation.set_h(0);
         Particle p(randomLocation, weight);
 
         particles.push_back(p);
@@ -278,7 +247,7 @@ void ParticleFilter::resetLoc()
 }
 
 void ParticleFilter::resetLocTo(float x, float y, float h,
-                                LocNormalParams params)
+                                LocNormalParams normalParams)
 {
     framesSinceReset = 0;
 #ifdef DEBUG_LOC
@@ -300,14 +269,14 @@ void ParticleFilter::resetLocTo(float x, float y, float h,
 
     particles.clear();
 
-    float weight = 1.0f/parameters.numParticles;
+    float weight = 1.0f/params.numParticles;
 
-    for(int i = 0; i < parameters.numParticles; ++i)
+    for(int i = 0; i < params.numParticles; ++i)
     {
         // Get the new particles x,y, and h
-        float pX = sampleNormal(x, params.sigma_x);
-        float pY = sampleNormal(y, params.sigma_x);
-        float pH = sampleNormal(h, params.sigma_h);
+        float pX = sampleNormal(x, normalParams.sigma_x);
+        float pY = sampleNormal(y, normalParams.sigma_x);
+        float pH = sampleNormal(h, normalParams.sigma_h);
 
         Particle p(pX, pY, pH, weight);
 
@@ -346,9 +315,9 @@ void ParticleFilter::resetLocTo(float x, float y, float h,
     poseEstimate.set_h(NBMath::subPIAngle(h));
 
     particles.clear();
-    float weight = 1.0f/parameters.numParticles;
+    float weight = 1.0f/params.numParticles;
 
-    for(int i = 0; i < (parameters.numParticles / 2); ++i)
+    for(int i = 0; i < (params.numParticles / 2); ++i)
     {
         // Get the new particles x,y, and h
         float pX = sampleNormal(x, params1.sigma_x);
@@ -360,7 +329,7 @@ void ParticleFilter::resetLocTo(float x, float y, float h,
         particles.push_back(p);
     }
 
-    for(int i = 0; i < ((parameters.numParticles + 1) / 2); ++i)
+    for(int i = 0; i < ((params.numParticles + 1) / 2); ++i)
     {
         // Get the new particles x,y, and h
         float pX = sampleNormal(x_, params2.sigma_x);
@@ -414,9 +383,9 @@ void ParticleFilter::resetLocToSide(bool blueSide)
                              boost::uniform_real<float> > yGen(rng, yBounds);
 
     // Assign uniform weight.
-    float weight = 1.0f/(((float)parameters.numParticles)*1.0f);
+    float weight = 1.0f/(((float)params.numParticles)*1.0f);
 
-    for(int i = 0; i < parameters.numParticles; ++i)
+    for(int i = 0; i < params.numParticles; ++i)
     {
         Particle p(xGen(), yGen(), heading, weight);
 
@@ -451,7 +420,7 @@ void ParticleFilter::resample(bool inSet)
     // China 2015 hack
     // If in set and see ball suitable for reconstruction, completely replace swarm with injections
     if (inSet && injections.size()) {
-        for (int i = 0; i < parameters.numParticles; ++i) {
+        for (int i = 0; i < params.numParticles; ++i) {
             ReconstructedLocation injection = injections[rand() % injections.size()];
             messages::RobotLocation sample = injection.sample();
 
@@ -474,9 +443,9 @@ void ParticleFilter::resample(bool inSet)
     //      suitable observations
     } else {
         int ni = 0;
-        for(int i = 0; i < parameters.numParticles; ++i) {
+        for(int i = 0; i < params.numParticles; ++i) {
             double randInjectOrSample = gen();
-            // if (injections.size() && randInjectOrSample < std::max<double>(0, 1.0 - (wFast / parameters.learnedSlowExponential))) {
+            // if (injections.size() && randInjectOrSample < std::max<double>(0, 1.0 - (wFast / params.learnedSlowExponential))) {
             if (injections.size() && i < 3) {
                 // Inject particles according to sensor measurements
                 ReconstructedLocation injection = injections[rand() % injections.size()];
