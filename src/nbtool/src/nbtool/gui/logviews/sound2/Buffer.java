@@ -9,5 +9,5 @@ public abstract class Buffer<T extends Number> {
 	public abstract T get(int i, int c);
 	
 	public abstract void parse(Log soundLog);
-	public abstract Log toLog();
+	public abstract Log toLog();	
 }

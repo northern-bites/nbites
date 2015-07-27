@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -13,12 +16,13 @@ import javax.swing.event.ChangeListener;
 
 import nbtool.util.Logger;
 
-public abstract class SoundPane extends JPanel implements ChangeListener {
+public abstract class SoundPane extends JPanel implements ChangeListener, MouseMotionListener {
 	private int channels, frames;
 	
 	private JSlider multiplier;
-	private JLabel peak;
 	private Display display;
+	private JLabel peak;
+	private JLabel selection;
 	
 	public SoundPane(int channel, int frame) {
 		this.channels = channel;
@@ -31,15 +35,21 @@ public abstract class SoundPane extends JPanel implements ChangeListener {
 		multiplier.addChangeListener(this);
 		
 		peak = new JLabel(peakString());
+		selection = new JLabel("");
+		
+		display = new Display();
+		display.addMouseMotionListener(this);
 		
 		this.setLayout(new BorderLayout());
 		this.add(peak, BorderLayout.NORTH);
 		this.add(multiplier, BorderLayout.WEST);
-		this.add(display = new Display(), BorderLayout.CENTER);
+		this.add(display, BorderLayout.CENTER);
+		this.add(selection, BorderLayout.SOUTH);
 	}
 	
 	public abstract int pixels(int c, int f, int radius);
 	public abstract String peakString();
+	public abstract String selectionString(int c, int f);
 	
 	private class Display extends JPanel {
 		
@@ -101,5 +111,16 @@ public abstract class SoundPane extends JPanel implements ChangeListener {
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		display.repaint();
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }

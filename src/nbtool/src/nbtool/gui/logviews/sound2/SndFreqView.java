@@ -50,11 +50,17 @@ public class SndFreqView extends ViewParent {
 			public String peakString() {
 				return "max = " + MAX;
 			}
+
+			@Override
+			public String selectionString(int c, int f) {
+				return "" + magn[f];
+			}
 			
 		};
 		
 		this.add(sp, BorderLayout.CENTER);
 	}
+	
 	public SndFreqView() {
 		super();
 		this.setLayout(new BorderLayout());
