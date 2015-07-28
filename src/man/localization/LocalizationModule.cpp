@@ -5,8 +5,6 @@
 #include "DebugConfig.h"
 #include "../log/logging.h"
 #include "../control/control.h"
-#include "HighResTimer.h"
-#include "nbdebug.h"
 
 using nblog::SExpr;
 using nblog::NBLog;
@@ -21,7 +19,6 @@ LocalizationModule::LocalizationModule()
       log_index(0)
 {
     particleFilter = new ParticleFilter();
-    particleFilter->resetLocTo(0, 0, 0);
 }
 
 LocalizationModule::~LocalizationModule()
@@ -31,11 +28,12 @@ LocalizationModule::~LocalizationModule()
 
 void LocalizationModule::update()
 {
+    // Reset filter if behaviors or shared ball make a request
 #ifndef OFFLINE
     for (int i = 0; i < 2; i++) {
         if (lastReset[i] != resetInput[i].message().timestamp())
         {
-            std::cout<< "Reset loc on " << i << std::endl;
+            std::cout << "Reset loc on " << i << std::endl;
             lastReset[i] = resetInput[i].message().timestamp();
             particleFilter->resetLocTo(resetInput[i].message().x(),
                                        resetInput[i].message().y(),
@@ -45,34 +43,34 @@ void LocalizationModule::update()
     }
 #endif
 
-    // Save odometry and sensor measurments
-    curOdometry = motionInput.message();
+    // Save vision message, so can be updated for debug purposes, see
+    // updateFieldForDebug in ParticleFilter.cpp
     curVision = visionInput.message();
-    curBall = ballInput.message();
 
+    // Ball is only a landmark if in set
     const messages::FilteredBall* ball = NULL;
 #ifndef OFFLINE
     bool inSet = (STATE_SET == gameStateInput.message().state());
     if (inSet)
-        ball = &curBall;
+        ball = &ballInput.message();
 #endif
 
     // Update filter
-    particleFilter->update(curOdometry, curVision, ball);
+    particleFilter->update(motionInput.message(), curVision, ball);
 
     // Output loc estimate
     portals::Message<messages::RobotLocation> locMessage(&particleFilter->getCurrentEstimate());
     output.setMessage(locMessage);
+
+    // Output swarm
+    portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->getCurrentSwarm());
+    particleOutput.setMessage(swarmMessage);
 
     // Logging
 #ifdef USE_LOGGING
     if(control::flags[control::LOCALIZATION]) {
         ++log_index;
         std::string log_from = "loc";
-
-        portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
-                                                           getCurrentSwarm());
-        particleOutput.setMessage(swarmMessage);
 
         messages::RobotLocation rl = *output.getMessage(true).get();
         messages::ParticleSwarm ps = *particleOutput.getMessage(true).get();
@@ -96,13 +94,13 @@ void LocalizationModule::update()
         SExpr naoLocation("location", log_from, clock(), log_index, rl_buf.length());
         contents.push_back(naoLocation);
 
-        SExpr naoSwarm("swarm",log_from,clock(),log_index,ps_buf.length());
+        SExpr naoSwarm("swarm", log_from, clock(), log_index, ps_buf.length());
         contents.push_back(naoSwarm);
 
-        SExpr naoVision("vision",log_from,clock(),log_index,vm_buf.length());
+        SExpr naoVision("vision", log_from, clock(), log_index, vm_buf.length());
         contents.push_back(naoVision);
 
-        NBLog(NBL_SMALL_BUFFER,"LOCSWARM",contents,log_buf);
+        NBLog(NBL_SMALL_BUFFER, "LOCSWARM", contents, log_buf);
     }
 #endif
 }
