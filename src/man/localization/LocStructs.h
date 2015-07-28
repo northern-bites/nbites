@@ -33,9 +33,9 @@ struct ParticleFilterParams
     float numParticles;           // num of particles in swarm
 
     // Particle injection parameters
+    bool  injectionOn;            // augmented MCL with injections if true
     float alphaFast;              // weight factor for fast exponential weight filter
     float alphaSlow;              // weight factor for slow exponential weight filter
-    float learnedSlowExponential; // learned slow exponential filter value when localized
 
     // Motion model parameters
     float odometryXYNoise;        // variance for x,y in MotionSystem when updating

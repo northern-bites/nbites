@@ -40,9 +40,9 @@ static const ParticleFilterParams DEFAULT_PARAMS =
     200,                        // num particles
 
     // Particle injection parameters
+    false,                      // particle injection on
     0.1f,                       // exponential filter fast
     0.01f,                      // exponential filter slow
-    5.0f,                       // learned slow exponential filter value
 
     // Motion model parameters
 #ifdef V5_ROBOT

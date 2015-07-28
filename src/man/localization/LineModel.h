@@ -20,7 +20,7 @@
 namespace man {
 namespace localization {
 
-// TODO rename LineID as VisionLineID
+// FUTURE WORK, rename LineID as VisionLineID
 // NOTE comments map LocLineID to color found in LocSwarmView
 enum class LocLineID {
     NotMatched = 0,    // black

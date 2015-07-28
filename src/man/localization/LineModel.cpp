@@ -55,6 +55,8 @@ LineModel::LineModel(const struct ParticleFilterParams& params_)
 
     // China 2015 hack
     // We often see T corners in center circle
+    //
+    // FUTURE WORK, rename LineID::EndlineOrSideline to LineID::EndlineMidlineOrSideline
     std::vector<LocLineID> endlineOrSideline { 
         LocLineID::OurEndline, LocLineID::TheirEndline,
         LocLineID::OurMidline, LocLineID::TheirMidline,
@@ -251,6 +253,9 @@ bool LineModel::shouldUse(const messages::FieldLine& observation,
     // If loc believes we could be seeing the goalbox, score short lines
     // in localization, otherwise do not, as you are probably seeing center
     // circle lines
+    //
+    // FUTURE WORK, add short center cirlce lines to the map, so that this hack
+    //              is not necessary
     double heading = vision::uMod(loc.h(), 2 * M_PI);
     bool useShorts = ((loc.x() < CENTER_FIELD_X - 150 && (heading > 150*TO_RAD && heading < 210*TO_RAD)) ||
                       (loc.x() > CENTER_FIELD_X + 150 && (heading < 150*TO_RAD && heading < 210*TO_RAD)) ||

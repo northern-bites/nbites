@@ -47,8 +47,9 @@ bool VisionModel::update(ParticleSet& particles,
             }
         }
     }
-    // NOTE one could argue that we should instead select the one line we process
-    //      in localization randomly in case of some unmodeled systematic error
+    // FUTURE WORK, one could argue that we should instead select the one line 
+    //              we process in localization randomly in case of some 
+    //              unmodeled systematic error
 
     // Count observations
     if (foundLine)
@@ -122,12 +123,15 @@ bool VisionModel::update(ParticleSet& particles,
     // Calculate error metric for particle filter
     avgError = totalWeight / static_cast<float>(particles.size());
 
-    // Particle injections
+    // Particle injection
     PROF_ENTER(P_LOCV_INJECTION)
     injections.clear();
 
-    // TODO refactor, reconstructing location from a line and a landmark is general
-    //      functionality that LineModel and/or LandmarkModel should support
+    // FUTURE WORK, refactor injection code, reconstructing robot pose
+    //              is general functionality that LineModel and/or LandmarkModel 
+    //              should support, I suggest reading the below code to see 
+    //              what functionality is supported and then rewriting it
+    //              from scratch
 
     // (1) Reconstruct pose from ball in set
     if (useBall && ball->vis().frames_on() > 5) {
@@ -173,167 +177,165 @@ bool VisionModel::update(ParticleSet& particles,
             if (reconstructed.onField())
                 injections.push_back(reconstructed);
         }
-    // China 2015 hack
-    // Don't inject off of any features but ball when in set
+    // NOTE don't inject off of any features but ball when in set
     } else if (ball == NULL) {
         // (2) Reconstruct pose from top goalbox
-        // for (int i = 0; i < vision.line_size(); i++) {
-        //     const messages::FieldLine& field = vision.line(i);
+        for (int i = 0; i < vision.line_size(); i++) {
+            const messages::FieldLine& field = vision.line(i);
 
-        //     // If found top goalbox, inject based on convex corner
-        //     if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
-        //         const messages::HoughLine& inner = field.inner();
-        //         LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirTopGoalbox : LocLineID::OurTopGoalbox);
+            // If found top goalbox, inject based on convex corner
+            if (field.id() == static_cast<int>(vision::LineID::TopGoalbox)) {
+                const messages::HoughLine& inner = field.inner();
+                LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirTopGoalbox : LocLineID::OurTopGoalbox);
 
-        //         // Rotate line to loc rel robot coordinate system 
-        //         vision::GeoLine line;
-        //         line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
+                // Rotate line to loc rel robot coordinate system 
+                vision::GeoLine line;
+                line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
 
-        //         for (int j = 0; j < vision.corner_size(); j++) {
-        //             const messages::Corner& corner = vision.corner(j);
+                for (int j = 0; j < vision.corner_size(); j++) {
+                    const messages::Corner& corner = vision.corner(j);
 
-        //             // Project corner onto line, find distance parallel to line from origin
-        //             double distParallel = line.qDist(corner.x(), corner.y());
+                    // Project corner onto line, find distance parallel to line from origin
+                    double distParallel = line.qDist(corner.x(), corner.y());
 
-        //             // If found convex corner attached to top goalbox, inject particles
-        //             if (corner.id() == static_cast<int>(vision::CornerID::Convex) && 
-        //                 (corner.line1() == field.index() || corner.line2() == field.index())) {
-        //                 // Recover x and heading from top goalbox line
-        //                 messages::RobotLocation pose = lineSystem->reconstructWoEndpoints(id, field);
+                    // If found convex corner attached to top goalbox, inject particles
+                    if (corner.id() == static_cast<int>(vision::CornerID::Convex) && 
+                        (corner.line1() == field.index() || corner.line2() == field.index())) {
+                        // Recover x and heading from top goalbox line
+                        messages::RobotLocation pose = lineSystem->reconstructWoEndpoints(id, field);
 
-        //                 // Recover y from corner
-        //                 double cornerAbsX, cornerAbsY;
-        //                 vision::translateRotate(corner.x(), corner.y(), 0, 0, pose.h(), cornerAbsX, cornerAbsY);
+                        // Recover y from corner
+                        double cornerAbsX, cornerAbsY;
+                        vision::translateRotate(corner.x(), corner.y(), 0, 0, pose.h(), cornerAbsX, cornerAbsY);
 
-        //                 // Right or left convex goalbox corner
-        //                 if (fabs(distParallel - inner.ep1()) > fabs(distParallel - inner.ep0())) {
-        //                     if (id == LocLineID::OurTopGoalbox)
-        //                         pose.set_y(BLUE_GOALBOX_BOTTOM_Y - cornerAbsY);
-        //                     else
-        //                         pose.set_y(YELLOW_GOALBOX_TOP_Y - cornerAbsY);
-        //                 } else {
-        //                     if (id == LocLineID::OurTopGoalbox)
-        //                         pose.set_y(BLUE_GOALBOX_TOP_Y - cornerAbsY);
-        //                     else
-        //                         pose.set_y(YELLOW_GOALBOX_BOTTOM_Y - cornerAbsY);
-        //                 }
+                        // Right or left convex goalbox corner
+                        if (fabs(distParallel - inner.ep1()) > fabs(distParallel - inner.ep0())) {
+                            if (id == LocLineID::OurTopGoalbox)
+                                pose.set_y(BLUE_GOALBOX_BOTTOM_Y - cornerAbsY);
+                            else
+                                pose.set_y(YELLOW_GOALBOX_TOP_Y - cornerAbsY);
+                        } else {
+                            if (id == LocLineID::OurTopGoalbox)
+                                pose.set_y(BLUE_GOALBOX_TOP_Y - cornerAbsY);
+                            else
+                                pose.set_y(YELLOW_GOALBOX_BOTTOM_Y - cornerAbsY);
+                        }
 
                         // Inject if reconstucted location is on field
-                        // ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 2, 0.01);
-                        // if (reconstructed.onField())
-                        //     injections.push_back(reconstructed);
-                //     }
-                // }
+                        ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 2, 0.01);
+                        if (reconstructed.onField())
+                            injections.push_back(reconstructed);
+                    }
+                }
 
                 // Based on midpoint of top goalbox
                 // NOTE only valid if line is sufficiently long, otherwise too much
                 //      error in the y direction
-                // if (inner.ep1() - inner.ep0() > 200) {
-                //     // China 2015 hack
-                //     // Also require that the endline is sufficiently long
-                //     // This throws away false positives in center circle
-                //     for (int i = 0; i < vision.line_size(); i++) {
-                //         const messages::FieldLine& potentialEndline = vision.line(i);
+                if (inner.ep1() - inner.ep0() > 200) {
+                    // NOTE also require that the endline is sufficiently long
+                    //      this throws away false positives in center circle
+                    for (int i = 0; i < vision.line_size(); i++) {
+                        const messages::FieldLine& potentialEndline = vision.line(i);
 
-                //         if (potentialEndline.id() == static_cast<int>(vision::LineID::Endline)) {
-                //             if (potentialEndline.inner().ep1() - potentialEndline.inner().ep0() > 200) {
-                //                 messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(id, field);
-                //                 ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 3, 0.01);
-                //                 injections.push_back(reconstructed);
-                //             }
-                //         }
-                //     }
-                // }
-        //     }
-        // }
+                        if (potentialEndline.id() == static_cast<int>(vision::LineID::Endline)) {
+                            if (potentialEndline.inner().ep1() - potentialEndline.inner().ep0() > 200) {
+                                messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(id, field);
+                                ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 3, 0.01);
+                                injections.push_back(reconstructed);
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         // (3) Reconstruct pose from endline
-        // for (int i = 0; i < vision.line_size(); i++) {
-        //     const messages::FieldLine& field = vision.line(i);
+        for (int i = 0; i < vision.line_size(); i++) {
+            const messages::FieldLine& field = vision.line(i);
 
-        //     // If found endline, inject based on T corner
-        //     if (field.id() == static_cast<int>(vision::LineID::Endline)) {
-        //         const messages::HoughLine& inner = field.inner();
-        //         LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirEndline : LocLineID::OurEndline);
+            // If found endline, inject based on T corner
+            if (field.id() == static_cast<int>(vision::LineID::Endline)) {
+                const messages::HoughLine& inner = field.inner();
+                LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirEndline : LocLineID::OurEndline);
 
-        //         // Rotate line to loc rel robot coordinate system 
-        //         vision::GeoLine line;
-        //         line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
+                // Rotate line to loc rel robot coordinate system 
+                vision::GeoLine line;
+                line.set(inner.r(), inner.t(), inner.ep0(), inner.ep1());
 
-        //         for (int j = 0; j < vision.corner_size(); j++) {
-        //             const messages::Corner& corner = vision.corner(j);
+                for (int j = 0; j < vision.corner_size(); j++) {
+                    const messages::Corner& corner = vision.corner(j);
 
-        //             // Project corner onto line, find distance parallel to line from origin
-        //             double distParallel = line.qDist(corner.x(), corner.y());
+                    // Project corner onto line, find distance parallel to line from origin
+                    double distParallel = line.qDist(corner.x(), corner.y());
 
-        //             // If found T corner attached to endline, inject particles
-        //             if (corner.id() == static_cast<int>(vision::CornerID::T) && 
-        //                 (corner.line1() == field.index() || corner.line2() == field.index())) {
-        //                 // Recover x and heading from endline
-        //                 messages::RobotLocation pose = lineSystem->reconstructWoEndpoints(id, field);
+                    // If found T corner attached to endline, inject particles
+                    if (corner.id() == static_cast<int>(vision::CornerID::T) && 
+                        (corner.line1() == field.index() || corner.line2() == field.index())) {
+                        // Recover x and heading from endline
+                        messages::RobotLocation pose = lineSystem->reconstructWoEndpoints(id, field);
 
-        //                 // Recover y from corner
-        //                 double cornerAbsX, cornerAbsY;
-        //                 vision::translateRotate(corner.x(), corner.y(), 0, 0, pose.h(), cornerAbsX, cornerAbsY);
+                        // Recover y from corner
+                        double cornerAbsX, cornerAbsY;
+                        vision::translateRotate(corner.x(), corner.y(), 0, 0, pose.h(), cornerAbsX, cornerAbsY);
 
-        //                 // Right or left T corner
-        //                 if (fabs(distParallel - inner.ep1()) > fabs(distParallel - inner.ep0())) {
-        //                     if (id == LocLineID::OurEndline)
-        //                         pose.set_y(BLUE_GOALBOX_BOTTOM_Y - cornerAbsY);
-        //                     else
-        //                         pose.set_y(YELLOW_GOALBOX_TOP_Y - cornerAbsY);
-        //                 } else {
-        //                     if (id == LocLineID::OurEndline)
-        //                         pose.set_y(BLUE_GOALBOX_TOP_Y - cornerAbsY);
-        //                     else
-        //                         pose.set_y(YELLOW_GOALBOX_BOTTOM_Y - cornerAbsY);
-        //                 }
+                        // Right or left T corner
+                        if (fabs(distParallel - inner.ep1()) > fabs(distParallel - inner.ep0())) {
+                            if (id == LocLineID::OurEndline)
+                                pose.set_y(BLUE_GOALBOX_BOTTOM_Y - cornerAbsY);
+                            else
+                                pose.set_y(YELLOW_GOALBOX_TOP_Y - cornerAbsY);
+                        } else {
+                            if (id == LocLineID::OurEndline)
+                                pose.set_y(BLUE_GOALBOX_TOP_Y - cornerAbsY);
+                            else
+                                pose.set_y(YELLOW_GOALBOX_BOTTOM_Y - cornerAbsY);
+                        }
 
-        //                 // Inject if reconstucted location is on field
-        //                 ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 2, 0.01);
-        //                 if (reconstructed.onField())
-        //                     injections.push_back(reconstructed);
-        //             }
-        //         }
-        //     }
-        // }
+                        // Inject if reconstucted location is on field
+                        ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 2, 0.01);
+                        if (reconstructed.onField())
+                            injections.push_back(reconstructed);
+                    }
+                }
+            }
+        }
 
         // (4) Reconstruct pose from center circle and midline
-        // if (vision.circle().on()) {
-        //     bool midlineFound = false;
-        //     messages::FieldLine midline;
+        if (vision.circle().on()) {
+            bool midlineFound = false;
+            messages::FieldLine midline;
 
-        //     // Find line that loc system classified as midline
-        //     for (int i = 0; i < vision.line_size(); i++) {
-        //         const messages::FieldLine& field = vision.line(i);
+            // Find line that loc system classified as midline
+            for (int i = 0; i < vision.line_size(); i++) {
+                const messages::FieldLine& field = vision.line(i);
 
-        //         // Check for midline
-        //         if (field.id() == static_cast<int>(vision::LineID::Midline)) {
-        //             midlineFound = true;
-        //             midline = field;
-        //         }
-        //     }
+                // Check for midline
+                if (field.id() == static_cast<int>(vision::LineID::Midline)) {
+                    midlineFound = true;
+                    midline = field;
+                }
+            }
 
-        //     // If found the midline, reconstruct location
-        //     if (midlineFound) {
-        //         // Get appropriate line id
-        //         LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirMidline : LocLineID::OurMidline);
+            // If found the midline, reconstruct location
+            if (midlineFound) {
+                // Get appropriate line id
+                LocLineID id = (lastEstimate.x() > CENTER_FIELD_X ? LocLineID::TheirMidline : LocLineID::OurMidline);
 
-        //         // Recontruct x and h from midline and y from center circle
-        //         messages::RobotLocation fromLine = lineSystem->reconstructWoEndpoints(id, midline);
-        //         messages::RobotLocation fromLineAndCircle = fromLine;
+                // Recontruct x and h from midline and y from center circle
+                messages::RobotLocation fromLine = lineSystem->reconstructWoEndpoints(id, midline);
+                messages::RobotLocation fromLineAndCircle = fromLine;
 
-        //         // Rotate to absolute coordinate system
-        //         double circleAbsX, circleAbsY;
-        //         vision::translateRotate(vision.circle().x(), vision.circle().y(), 0, 0, fromLine.h(), circleAbsX, circleAbsY);
-        //         fromLineAndCircle.set_y(CENTER_FIELD_Y - circleAbsY);
+                // Rotate to absolute coordinate system
+                double circleAbsX, circleAbsY;
+                vision::translateRotate(vision.circle().x(), vision.circle().y(), 0, 0, fromLine.h(), circleAbsX, circleAbsY);
+                fromLineAndCircle.set_y(CENTER_FIELD_Y - circleAbsY);
 
-        //         // Add injection and return
-        //         ReconstructedLocation reconstructed(fromLineAndCircle.x(), fromLineAndCircle.y(), fromLineAndCircle.h(), 1, 1, 0.01);
-        //         if (reconstructed.onField())
-        //             injections.push_back(reconstructed);
-        //     }
-        // }
+                // Add injection and return
+                ReconstructedLocation reconstructed(fromLineAndCircle.x(), fromLineAndCircle.y(), fromLineAndCircle.h(), 1, 1, 0.01);
+                if (reconstructed.onField())
+                    injections.push_back(reconstructed);
+            }
+        }
     }
 
     PROF_EXIT(P_LOCV_INJECTION)

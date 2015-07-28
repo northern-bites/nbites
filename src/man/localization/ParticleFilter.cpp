@@ -399,7 +399,7 @@ void ParticleFilter::resetLocToSide(bool blueSide)
  */
 void ParticleFilter::resample(bool inSet)
 {
-    // Map each normalized weight to the corresponding particle.
+    // Map each normalized weight to the corresponding particle
     std::map<float, Particle> cdf;
     float prev = 0.0f;
     ParticleIt iter;
@@ -418,7 +418,12 @@ void ParticleFilter::resample(bool inSet)
     const std::vector<ReconstructedLocation>& injections = visionSystem->getInjections();
 
     // China 2015 hack
-    // If in set and see ball suitable for reconstruction, completely replace swarm with injections
+    // If in set and see ball suitable for reconstruction, completely replace 
+    // swarm with injections
+    //
+    // FUTURE WORK, this should not be a special case, should use standard augmented
+    //              MCL injection strategy (see below) for goalbox, center 
+    //              cirlce, and ball in set
     if (inSet && injections.size()) {
         for (int i = 0; i < params.numParticles; ++i) {
             ReconstructedLocation injection = injections[rand() % injections.size()];
@@ -431,26 +436,15 @@ void ParticleFilter::resample(bool inSet)
     // Either inject particle or sample with replacement according to the
     // normalized weights, and place in a new particle set
     //
-    // China 2015 really big hack (def should be changed in future)
-    // Inject a small constant number of particles, in this case, three particles
-    //
-    // Not a great sensor resetting system, as doesn't take into account
-    // how lost loc believes the robot to be, but we do not yet have good
-    // metrics for determining when lost, something in the style of the commented 
-    // out code is how sensor resetting ought to work in the future
-    //
     // NOTE we only consider injecting particles if vision system found 
     //      suitable observations
     } else {
-        int ni = 0;
         for(int i = 0; i < params.numParticles; ++i) {
             double randInjectOrSample = gen();
-            // if (injections.size() && randInjectOrSample < std::max<double>(0, 1.0 - (wFast / params.learnedSlowExponential))) {
-            if (injections.size() && i < 3) {
+            if (params.injectionOn && injections.size() && randInjectOrSample < std::max<double>(0, 1.0 - (wFast / wSlow))) {
                 // Inject particles according to sensor measurements
                 ReconstructedLocation injection = injections[rand() % injections.size()];
                 messages::RobotLocation sample = injection.sample();
-                ni++;
 
                 Particle reconstructedParticle(sample.x(), sample.y(), sample.h(), 1/250);
                 newParticles.push_back(reconstructedParticle);
@@ -464,10 +458,6 @@ void ParticleFilter::resample(bool inSet)
                     newParticles.push_back(cdf.upper_bound(randSample)->second);
             }
         }
-
-        // std::cout << "wSlow: " << wSlow << std::endl;
-        // std::cout << "wFast: " << wFast << std::endl;
-        // std::cout << "Injections: " << ni << std::endl;
     }
 
     // Update particles

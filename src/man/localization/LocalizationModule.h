@@ -11,11 +11,18 @@
 #pragma once
 
 // TODO
-// particle class in loc structs file
-// particle injection (off by default)
+//
+// YES
 // particle filter refactor
+// remove unused code in loc structs
 // future work
 //
+// PROBABLY
+// T corners in center circle rename
+// LineID -> VisionLineID
+// particle class in loc structs file
+//
+// MAYBE
 // log_index
 // filtered ball in updateFieldForDebug
 // no location log (tell Phil)
