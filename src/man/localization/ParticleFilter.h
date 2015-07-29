@@ -1,11 +1,13 @@
 /**
- * Implementation of a particle filter localization
- * system for robot self-localization.
+ * Implementation of a particle filter localization system for robot localization
  *
  * @author Ellis Ratner <eratner@bowdoin.edu>
  * @author EJ Googins <egoogins@bowdoin.edu>
- * @date   May 2012 (updated January 2013)
+ * @date   May 2012
+ * @author Josh Imhoff <joshimhoff13@gmail.com>
+ * @date   June 2015
  */
+
 #pragma once
 
 #include "Particle.h"
@@ -14,14 +16,12 @@
 #include "VisionModel.h"
 #include "NBMath.h"
 #include "DebugConfig.h"
-
 #include "ParticleSwarm.pb.h"
 
 #include <vector>
 #include <iostream>
 #include <map>
 #include <cmath>
-
 #include <boost/shared_ptr.hpp>
 #include <boost/random.hpp>
 #include <boost/random/normal_distribution.hpp>
@@ -34,7 +34,7 @@ namespace localization
 {
 
 // Parameters for the particle filter
-static const ParticleFilterParams DEFAULT_PARAMS =
+static const ParticleFilterParams PARAMS =
 {
     // General particle filter parameters
     200,                        // num particles
@@ -64,133 +64,76 @@ static const ParticleFilterParams DEFAULT_PARAMS =
     20*TO_RAD,                  // standard deviation of bearing to landmark (radians)
 };
 
-/**
- * @class ParticleFilter
- * @brief The main particle filter localization class. Handles
- *        functionality for constructing a posterior belief
- *        based on a prior belief function as well as latest
- *        sensor and control data.
- */
-class ParticleFilter// : public LocSystem
+class ParticleFilter
 {
-
 public:
-    ParticleFilter(ParticleFilterParams params = DEFAULT_PARAMS);
+    // Constructor
+    // @param params, the parameters used by particle filter
+    ParticleFilter(ParticleFilterParams params = PARAMS);
+
+    // Destructor
     ~ParticleFilter();
 
-    /**
-     *  @brief Given a new motion and vision input, update the filter
-     */
+    // Updates particle filter with odometry and sensor (vision) measurements
+    // @param motionInput, most recent odometry measurements from motion
+    // @param visionInput, most recent sensor measurements from vision
+    // @param ballInput, the filtered ball, used as a sensor measurement and 
+    //                   landmark when in game set
+    // @note visionInput is not const because it is updated for debug tool
+    //       purposes, see updateObservationsForDebug() for details
     void update(const messages::RobotLocation& motionInput,
                 messages::Vision&              visionInput,
                 const messages::FilteredBall*  ballInput);
 
-    // Overload to use ball info
-    // void update(const messages::RobotLocation& motionInput,
-    //             const messages::VisionField&   visionInput,
-    //             const messages::FilteredBall&    ballInput);
+    // Get robot localization estimate
+    // @returns pose estimate of robot
+    const messages::RobotLocation& getCurrentEstimate() const { return poseEstimate; }
 
-    float getMagnitudeError();
-
-    void resetLocalization();
-
-    void updateMotionModel();
-
-    /** Accessors **/
-    const messages::RobotLocation& getCurrentEstimate() const {return poseEstimate;}
+    // Get full particle swarm
+    // @returns the particle swarm
     const messages::ParticleSwarm& getCurrentSwarm();
-
-    float getXEst() const {return poseEstimate.x();}
-    float getYEst() const {return poseEstimate.y();}
-    float getHEst() const {return poseEstimate.h();}
-    float getHEstDeg() const {return poseEstimate.h()*TO_DEG;}
-
-    ParticleSet getParticles() { return particles; }
-
-    /**
-     * @brief Returns the particle with the highest weight in the set
-     *        (i.e., the "best" particle.)
-     */
-    Particle getBestParticle();
-
-    bool onDefendingSide() {return (poseEstimate.x() < CENTER_FIELD_X);};
-    bool nearMidField() {return (fabs(poseEstimate.x() - CENTER_FIELD_X) < 50);};
-
-    /** Reset Functions **/
-
-    /*
-     * @Brief - Reset the system by spreading through environment
-     */
-    void resetLoc();
-
-    /*
-     * @Brief - Reset the system by injecting particles around given pose
-     */
+    
+    // Reset swarm to (x, y, h) pose plus gaussian noise
+    // @params x, the x component of pose
+    // @params y, the y component of pose
+    // @params h, the h component of pose
+    // @params params, the amount of gaussian noise to add to pose
     void resetLocTo(float x, float y, float h,
                     LocNormalParams params = LocNormalParams());
 
-    /*
-     * @Brief - Reset the system by injecting particles around two given pose
-     */
-    void resetLocTo(float x, float y, float h,
-                    float x_, float y_, float h_,
-                    LocNormalParams params1 = LocNormalParams(),
-                    LocNormalParams params2 = LocNormalParams());
-
-    /*
-     * @Brief - Reset the system by injecting particles throughout one side
-     */
-    void resetLocToSide(bool blueSide);
-
-    /*
-     * @Brief - Flip all particles to the other side symmetric location
-     */
-    void flipLoc();
-
 private:
-    /**
-     * @brief Resamples (with replacement) the particle population according
-     *        to the normalized weights of the particles.
-     */
+    // Resample swarm based on updated particle scores
+    // @param inSet, true if in game set, allows different injection strategies
+    //               depending on game state, see implementation for details
     void resample(bool inSet);
 
-    /**
-     * @brief - Update the poseEstimate by avging all particles
-     */
+    // Update the localization estimate by averaging the x, y, and h components
+    // of all particles in swarm
     void updateEstimate();
 
-    void updateFieldForDebug(messages::Vision& vision);
+    // Update the observations for debug tool purposes, project lines onto global
+    // coordinates, set observation correspondence and probabilities, etc.
+    void updateObservationsForDebug(messages::Vision& vision);
 
-    /**
-     * @brief - Return symmetric location from given one
-     */
-    messages::RobotLocation getMirrorLocation(messages::RobotLocation loc);
-
-
+    // General particle filter data
     ParticleFilterParams params;
+
+    boost::mt19937 rng;
+
     messages::RobotLocation poseEstimate;
-
     ParticleSet particles;
+    messages::ParticleSwarm swarm;
+    // NOTE swarm == particles, swarm is protobuf passed around the cognition thread
+    //      while particles is the object used by the particle filter
 
-    MotionModel* motionSystem;
-    VisionModel* visionSystem;
-
-    float lastMotionTimestamp;
-    float lastVisionTimestamp;
-
+    // Exponential filters used in particle injection
     double wSlow;
     double wFast;
 
-    bool lost;
-    bool badFrame;
-    float errorMagnitude;
+    // Motion and vision model used to move and score particles respectively
+    MotionModel* motionModel;
+    VisionModel* visionModel;
+};
 
-    int framesSinceReset;
-    int setResetTransition;
-
-    // For use when logging particle swarm
-    messages::ParticleSwarm swarm;
-
-    };
 } // namespace localization
 } // namespace man

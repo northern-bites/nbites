@@ -69,7 +69,6 @@ void LocalizationModule::update()
     // Logging
 #ifdef USE_LOGGING
     if(control::flags[control::LOCALIZATION]) {
-        ++log_index;
         std::string log_from = "loc";
 
         messages::RobotLocation rl = *output.getMessage(true).get();
@@ -101,6 +100,11 @@ void LocalizationModule::update()
         contents.push_back(naoVision);
 
         NBLog(NBL_SMALL_BUFFER, "LOCSWARM", contents, log_buf);
+
+        // Two images (top and bottom camera) per localization module run
+        // FUTURE WORK, log_index should actually come directly from images used
+        //              to produce observations used in localization
+        log_index += 2;
     }
 #endif
 }

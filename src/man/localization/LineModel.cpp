@@ -56,7 +56,8 @@ LineModel::LineModel(const struct ParticleFilterParams& params_)
     // China 2015 hack
     // We often see T corners in center circle
     //
-    // FUTURE WORK, rename LineID::EndlineOrSideline to LineID::EndlineMidlineOrSideline
+    // FUTURE WORK, this is probably a general problem, so makes sense to 
+    //              rename LineID::EndlineOrSideline to LineID::EndlineMidlineOrSideline
     std::vector<LocLineID> endlineOrSideline { 
         LocLineID::OurEndline, LocLineID::TheirEndline,
         LocLineID::OurMidline, LocLineID::TheirMidline,

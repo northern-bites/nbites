@@ -13,16 +13,14 @@
 // TODO
 //
 // YES
-// particle filter refactor
-// remove unused code in loc structs
+// sampleNormal -> ReconstructedLocation -> PoseWithGaussianNoise
 // future work
 //
-// PROBABLY
+// MAYBE
 // T corners in center circle rename
 // LineID -> VisionLineID
 // particle class in loc structs file
-//
-// MAYBE
+// loc system abstract class
 // log_index
 // filtered ball in updateFieldForDebug
 // no location log (tell Phil)
@@ -42,7 +40,10 @@ namespace localization
 class LocalizationModule : public portals::Module
 {
 public:
+    // Constructor
     LocalizationModule();
+
+    // Destructor
     ~LocalizationModule();
 
     portals::InPortal<messages::RobotLocation>  motionInput;
@@ -55,7 +56,10 @@ public:
     portals::OutPortal<messages::ParticleSwarm> particleOutput;
 
 protected:
+    // RoboGrams run method
     void run_();
+
+    // Update localization system, called by run_() and calls particle filter
     void update();
 
     ParticleFilter* particleFilter;
