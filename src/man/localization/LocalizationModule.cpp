@@ -68,7 +68,7 @@ void LocalizationModule::update()
 
     // Logging
 #ifdef USE_LOGGING
-    if(control::flags[control::LOCALIZATION]) {
+    if(control::flags[control::localization]) {
         std::string log_from = "loc";
 
         messages::RobotLocation rl = *output.getMessage(true).get();

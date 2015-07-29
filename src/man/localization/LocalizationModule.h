@@ -15,15 +15,14 @@
 // YES
 // sampleNormal -> ReconstructedLocation -> PoseWithGaussianNoise
 // future work
+// pid controller
 //
 // MAYBE
 // T corners in center circle rename
 // LineID -> VisionLineID
 // particle class in loc structs file
-// loc system abstract class
 // log_index
 // filtered ball in updateFieldForDebug
-// no location log (tell Phil)
 
 #include "RoboGrams.h"
 #include "Vision.pb.h"
