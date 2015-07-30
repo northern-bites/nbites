@@ -17,8 +17,19 @@
 namespace control {
     
     /*
-     FLAGS
+     The following code uses X macros.  If you're not sure what those are
+     or how they work, google them.
      */
+    
+    //Construct flag enum.
+#define XTEMP(n) n
+    typedef enum {
+#include "control_flags.defs.h"
+    } flag_e;
+#undef XTEMP
+    
+//The above used to generate:
+    /*
     typedef enum {
         serv_connected,
         control_connected,
@@ -43,9 +54,10 @@ namespace control {
         //which, if it is last,
         //is equivalent to the number of flags previous listed.
         num_flags
-    } flag_e;
+    } flag_e; */
     
     extern volatile uint8_t flags[num_flags];
+    extern const char * string_flags[];
     
 #ifndef __APPLE__
     static messages::CameraParams receivedParams;
