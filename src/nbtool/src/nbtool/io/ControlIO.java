@@ -63,6 +63,12 @@ public class ControlIO {
 		return cmnd;
 	}
 	
+	public static Log createSimpleCommand(String name, byte[] data) {
+		SExpr commandTree = SExpr.list(SExpr.newAtom(Log.COMMAND_FIRST_ATOM_S), SExpr.newAtom(name));
+		Log cmnd = new Log(commandTree, data);
+		return cmnd;
+	}
+	
 	private static final LinkedList<ControlInstance> instances = new LinkedList<>();
 
 	public static ControlInstance create(IOFirstResponder ifr, String host, int port) {

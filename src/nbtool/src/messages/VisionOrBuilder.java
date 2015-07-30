@@ -80,4 +80,13 @@ public interface VisionOrBuilder extends
    * <code>optional .messages.VBall ball = 4;</code>
    */
   messages.VBallOrBuilder getBallOrBuilder();
+
+  /**
+   * <code>optional int32 horizon_dist = 5;</code>
+   */
+  boolean hasHorizonDist();
+  /**
+   * <code>optional int32 horizon_dist = 5;</code>
+   */
+  int getHorizonDist();
 }

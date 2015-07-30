@@ -150,4 +150,13 @@ public interface VBallOrBuilder extends
    * <code>optional sint32 y = 16;</code>
    */
   int getY();
+
+  /**
+   * <code>optional float wz0 = 17;</code>
+   */
+  boolean hasWz0();
+  /**
+   * <code>optional float wz0 = 17;</code>
+   */
+  float getWz0();
 }

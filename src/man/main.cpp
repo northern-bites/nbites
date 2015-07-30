@@ -5,6 +5,9 @@
 #include "Man.h"
 #include "SharedData.h"
 
+#include "control.h"
+#include "logging.h"
+
 #include <sys/file.h>
 #include <errno.h>
 
@@ -20,6 +23,11 @@ void handler(int signal)
         // I.e. close camera driver gracefully
         instance->preClose();
         flock(lockFD, LOCK_UN);
+        
+#ifdef USE_LOGGING
+        control::control_destroy();
+        nblog::log_main_destroy();
+#endif
         
         printf("Man closing output streams...\n");
         fflush(stderr);

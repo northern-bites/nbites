@@ -29,12 +29,10 @@ import com.google.protobuf.Message;
 import nbtool.data.Log;
 import nbtool.util.Logger;
 import nbtool.util.Utility;
-
+import messages.FilteredBall;
+import messages.NaiveBall;
 // import messages.Vision.*;
-import messages.BallModel.*;
-import messages.BallModel.NaiveBall.*;
-import messages.BallModel.FilteredBall.*;
-import messages.BallModel.VisionBall.*;
+import messages.NaiveBall.Position;
 
 public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 	private static final int OFFSET = 2;

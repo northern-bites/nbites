@@ -32,6 +32,8 @@ public class NBConstants {
 	public static final int VERSION = 7;
 	public static final int MINOR_VERSION = 0;
 	
+	public static final int NBITES_TEAM_NUM = 14;
+	
 	public static final String PROTOBUF_TYPE_PREFIX = "proto-";
 	
 	public static final Rectangle DEFAULT_BOUNDS = new Rectangle(0,0,900,600);

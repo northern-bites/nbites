@@ -97,6 +97,11 @@ public final class Vision extends
             bitField0_ |= 0x00000002;
             break;
           }
+          case 40: {
+            bitField0_ |= 0x00000004;
+            horizonDist_ = input.readInt32();
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -255,11 +260,27 @@ public final class Vision extends
     return ball_;
   }
 
+  public static final int HORIZON_DIST_FIELD_NUMBER = 5;
+  private int horizonDist_;
+  /**
+   * <code>optional int32 horizon_dist = 5;</code>
+   */
+  public boolean hasHorizonDist() {
+    return ((bitField0_ & 0x00000004) == 0x00000004);
+  }
+  /**
+   * <code>optional int32 horizon_dist = 5;</code>
+   */
+  public int getHorizonDist() {
+    return horizonDist_;
+  }
+
   private void initFields() {
     line_ = java.util.Collections.emptyList();
     corner_ = java.util.Collections.emptyList();
     circle_ = messages.CenterCircle.getDefaultInstance();
     ball_ = messages.VBall.getDefaultInstance();
+    horizonDist_ = 0;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -286,6 +307,9 @@ public final class Vision extends
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       output.writeMessage(4, ball_);
     }
+    if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      output.writeInt32(5, horizonDist_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -310,6 +334,10 @@ public final class Vision extends
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(4, ball_);
+    }
+    if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(5, horizonDist_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSerializedSize = size;
@@ -456,6 +484,8 @@ public final class Vision extends
         ballBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000008);
+      horizonDist_ = 0;
+      bitField0_ = (bitField0_ & ~0x00000010);
       return this;
     }
 
@@ -518,6 +548,10 @@ public final class Vision extends
       } else {
         result.ball_ = ballBuilder_.build();
       }
+      if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+        to_bitField0_ |= 0x00000004;
+      }
+      result.horizonDist_ = horizonDist_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -591,6 +625,9 @@ public final class Vision extends
       }
       if (other.hasBall()) {
         mergeBall(other.getBall());
+      }
+      if (other.hasHorizonDist()) {
+        setHorizonDist(other.getHorizonDist());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       return this;
@@ -1329,6 +1366,38 @@ public final class Vision extends
         ball_ = null;
       }
       return ballBuilder_;
+    }
+
+    private int horizonDist_ ;
+    /**
+     * <code>optional int32 horizon_dist = 5;</code>
+     */
+    public boolean hasHorizonDist() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional int32 horizon_dist = 5;</code>
+     */
+    public int getHorizonDist() {
+      return horizonDist_;
+    }
+    /**
+     * <code>optional int32 horizon_dist = 5;</code>
+     */
+    public Builder setHorizonDist(int value) {
+      bitField0_ |= 0x00000010;
+      horizonDist_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 horizon_dist = 5;</code>
+     */
+    public Builder clearHorizonDist() {
+      bitField0_ = (bitField0_ & ~0x00000010);
+      horizonDist_ = 0;
+      onChanged();
+      return this;
     }
 
     // @@protoc_insertion_point(builder_scope:messages.Vision)

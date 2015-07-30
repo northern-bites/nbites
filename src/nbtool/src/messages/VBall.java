@@ -135,6 +135,11 @@ public final class VBall extends
             y_ = input.readSInt32();
             break;
           }
+          case 141: {
+            bitField0_ |= 0x00010000;
+            wz0_ = input.readFloat();
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -415,6 +420,21 @@ public final class VBall extends
     return y_;
   }
 
+  public static final int WZ0_FIELD_NUMBER = 17;
+  private float wz0_;
+  /**
+   * <code>optional float wz0 = 17;</code>
+   */
+  public boolean hasWz0() {
+    return ((bitField0_ & 0x00010000) == 0x00010000);
+  }
+  /**
+   * <code>optional float wz0 = 17;</code>
+   */
+  public float getWz0() {
+    return wz0_;
+  }
+
   private void initFields() {
     distance_ = 0D;
     bearing_ = 0D;
@@ -432,6 +452,7 @@ public final class VBall extends
     bearingDeg_ = 0D;
     x_ = 0;
     y_ = 0;
+    wz0_ = 0F;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -493,6 +514,9 @@ public final class VBall extends
     }
     if (((bitField0_ & 0x00008000) == 0x00008000)) {
       output.writeSInt32(16, y_);
+    }
+    if (((bitField0_ & 0x00010000) == 0x00010000)) {
+      output.writeFloat(17, wz0_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -566,6 +590,10 @@ public final class VBall extends
     if (((bitField0_ & 0x00008000) == 0x00008000)) {
       size += com.google.protobuf.CodedOutputStream
         .computeSInt32Size(16, y_);
+    }
+    if (((bitField0_ & 0x00010000) == 0x00010000)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeFloatSize(17, wz0_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSerializedSize = size;
@@ -716,6 +744,8 @@ public final class VBall extends
       bitField0_ = (bitField0_ & ~0x00004000);
       y_ = 0;
       bitField0_ = (bitField0_ & ~0x00008000);
+      wz0_ = 0F;
+      bitField0_ = (bitField0_ & ~0x00010000);
       return this;
     }
 
@@ -808,6 +838,10 @@ public final class VBall extends
         to_bitField0_ |= 0x00008000;
       }
       result.y_ = y_;
+      if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
+        to_bitField0_ |= 0x00010000;
+      }
+      result.wz0_ = wz0_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -871,6 +905,9 @@ public final class VBall extends
       }
       if (other.hasY()) {
         setY(other.getY());
+      }
+      if (other.hasWz0()) {
+        setWz0(other.getWz0());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       return this;
@@ -1407,6 +1444,38 @@ public final class VBall extends
     public Builder clearY() {
       bitField0_ = (bitField0_ & ~0x00008000);
       y_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private float wz0_ ;
+    /**
+     * <code>optional float wz0 = 17;</code>
+     */
+    public boolean hasWz0() {
+      return ((bitField0_ & 0x00010000) == 0x00010000);
+    }
+    /**
+     * <code>optional float wz0 = 17;</code>
+     */
+    public float getWz0() {
+      return wz0_;
+    }
+    /**
+     * <code>optional float wz0 = 17;</code>
+     */
+    public Builder setWz0(float value) {
+      bitField0_ |= 0x00010000;
+      wz0_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional float wz0 = 17;</code>
+     */
+    public Builder clearWz0() {
+      bitField0_ = (bitField0_ & ~0x00010000);
+      wz0_ = 0F;
       onChanged();
       return this;
     }

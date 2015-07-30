@@ -206,8 +206,31 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 				Logger.warnf("ControlPanel trying to late start a FileInstance...");
 				SessionMaster.get().lateStartFileWriting(absolute);
 			} else {
-				Logger.warnf("Cannot late start FileInstance with path: %s", absolute);
-				return;
+				int ret = JOptionPane.showConfirmDialog(this,
+						"would you like to create it?",
+						String.format("bad path {%s}", absolute),
+						JOptionPane.YES_NO_OPTION);
+				
+				if (ret == JOptionPane.YES_OPTION) {
+					File pathCreator = new File(absolute);
+					try {
+						pathCreator.mkdirs();
+						pathCreator.setReadable(true);
+						pathCreator.setWritable(true);
+					} catch (Exception e) {
+						Logger.logf(Logger.ERROR, "could not make full path: %s", absolute);
+						return;
+					}
+					
+					if (!FileIO.checkLogFolder(absolute)) {
+						Logger.logf(Logger.ERROR, "could not verify path: %s", absolute);
+						return;
+					}
+					
+					SessionMaster.get().lateStartFileWriting(absolute);
+				} else {
+					return;
+				}				
 			}
 		} else {
 			writeSlider.setEnabled(false);
@@ -352,9 +375,9 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 		if (!controlling)
 			return;
 
-		flags = new FlagPanel[bs.flags.size() - 2];
+		flags = new FlagPanel[bs.flags.size()];
 		for (int i = 0; i < flags.length; ++i) {
-			Flag f = bs.flags.get(i + 2);	//Skip two for the connected flags.
+			Flag f = bs.flags.get(i);	//Skip two for the connected flags.
 
 			flags[i] = new FlagPanel();
 			flags[i].setInfo(f.name, f.index);

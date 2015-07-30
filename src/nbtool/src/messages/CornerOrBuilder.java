@@ -69,4 +69,13 @@ public interface CornerOrBuilder extends
    * <code>optional int32 line2 = 7;</code>
    */
   int getLine2();
+
+  /**
+   * <code>optional float wz0 = 8;</code>
+   */
+  boolean hasWz0();
+  /**
+   * <code>optional float wz0 = 8;</code>
+   */
+  float getWz0();
 }

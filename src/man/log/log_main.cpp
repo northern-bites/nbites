@@ -57,13 +57,19 @@ namespace nblog {
     void log_serverio_init();
     void log_fileio_init();
     
+    void log_serverio_destroy();
+    
+    void log_main_destroy() {
+        log_serverio_destroy();
+    }
+    
     void * log_main_loop(void * context);
     
     void sanity_checks() {
         NBDEBUG("sanity_checks()...\n");
         
-        NBLassert(control::control_connected == 1);
-        NBLassert(control::fileio == 2);
+       // NBLassert(control::control_connected == 1);
+       // NBLassert(control::fileio == 2);
         NBLassert(!log_running);
         
         //...
@@ -180,6 +186,8 @@ namespace nblog {
         
         std::vector<SExpr> fvector = {
             SExpr("flags"),
+            
+            /*
             SExpr("serv_connected", control::serv_connected,
                   control::flags[control::serv_connected]),
             SExpr("control_connected", control::control_connected,
@@ -210,8 +218,18 @@ namespace nblog {
                   control::flags[control::tripoint]),
             
             SExpr("thumbnail", control::thumbnail,
-                  control::flags[control::thumbnail])
+                  control::flags[control::thumbnail]) */
         };
+        
+        for (int i = control::_START_EXTERNAL_ + 1;
+             i < control::_END_EXTERNAL_; ++i ) {
+            fvector.push_back(SExpr(
+                                    control::string_flags[i],
+                                    i,
+                                    control::flags[i]
+                              ));
+        }
+        
         fields.push_back(SExpr(fvector));
         
         
