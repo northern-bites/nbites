@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -57,15 +58,15 @@ public class FileIO {
 			
 		File f = new File(log_folder);
 		if (!f.exists()) {
-			Logger.logf(Logger.ERROR, "file does not exist!\n");
+			Logger.logf(Logger.ERROR, "file does not exist! %s\n", log_folder);
 			return false;
 		}
 		if (!f.isDirectory()) {
-			Logger.logf(Logger.ERROR, "file is not a directory!\n");
+			Logger.logf(Logger.ERROR, "file is not a directory! %s\n", log_folder);
 			return false;
 		}
 		if (!f.canRead() || !f.canWrite()) {
-			Logger.logf(Logger.ERROR, "permissions errors!\n");
+			Logger.logf(Logger.ERROR, "permissions errors for file %s!\n", log_folder);
 			return false;
 		}
 		
@@ -150,42 +151,69 @@ public class FileIO {
 			}
 		});
 		
-		Log[] logs = new Log[files.length];
+		int rejected = 0;
+		ArrayList<Log> logs = new ArrayList<Log>(files.length);
 		
 		for (int i = 0; i < files.length; ++i) {
+			if (files[i].length() < CommonIO.MINIMUM_VALID_NBLOG_SIZE) {
+				Logger.warnf("FileIO.fetchLogs skipping too small file: %d [%s]",
+						files[i].length(), files[i].getPath());
+				++rejected;
+				continue;
+			}
+			
 			String desc = null;
 			try {
 				desc = readDescriptionFromFile(files[i]);
 			} catch (IOException e) {
+				Logger.errorf("ERROR PARSING LOG AT PATH %s", files[i].getPath());
 				e.printStackTrace();
-				return null;
+				++rejected;
+				continue;
 			}
 			
-			assert(desc != null);
+			if (desc == null) {
+				Logger.errorf("Log description null after read! file %s", files[i].getPath());
+				++rejected;
+				continue;
+			}
+			
+			Log nlog;
 			if (!Utility.isv6Description(desc)) {
-				logs[i] = new Log();
-				logs[i]._olddesc_ = desc;
-				logs[i].name = files[i].getName();
+				nlog = new Log();
+				nlog._olddesc_ = desc;
+				nlog.name = files[i].getName();
 				
 				try {
-					FileIO.loadLog(logs[i], location);
+					FileIO.loadLog(nlog, location);
 				} catch (IOException e) {
 					e.printStackTrace();
+					++rejected;
 					continue;
 				}
 				
-				assert(Utility.v6Convert(logs[i]));
+				if (Utility.v6Convert(nlog)) {
+					Logger.warnf("log %s was converted and will be displayed.  Filesystem not changed.", nlog.name);
+				} else {
+					Logger.warnf("log %s could not be converted!  It will not be displayed.", nlog.name);
+					++rejected;
+					continue;
+				}
+				
 			} else {
-				logs[i] = new Log(desc, null);
+				nlog = new Log(desc, null);
 			}
 			
-			logs[i].name = files[i].getName();
-			logs[i].source = SOURCE.FILE;
+			nlog.name = files[i].getName();
+			nlog.source = SOURCE.FILE;
+			
+			logs.add(nlog);
 		}
 		
-		Logger.logf(Logger.INFO, "FileIO: found " + logs.length + " logs in filesystem.");
+		Logger.logf(Logger.INFO, "FileIO: tried to read in %d logs, accepted %d, rejected %d at path %s",
+				files.length, logs.size(), rejected, location);
 		
-		return logs;
+		return logs.toArray(new Log[0]);
 	}
 	
 	
@@ -194,7 +222,7 @@ public class FileIO {
 	 * Asynchronous writing of logs via a FileInstance object.
 	 * */
 	
-	public static FileInstance makeFileWriter(String path, IOFirstResponder ifr) {
+	public static FileInstance newFileWriter(String path, IOFirstResponder ifr) {
 		FileInstance fi = new FileInstance();
 		fi.path = path;
 		fi.ifr = ifr;

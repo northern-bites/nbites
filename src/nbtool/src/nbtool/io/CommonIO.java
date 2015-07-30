@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import javax.swing.SwingUtilities;
 
 import nbtool.data.Log;
+import nbtool.data.SExpr;
 import nbtool.util.Center;
 import nbtool.util.Center.ToolEvent;
 import nbtool.util.Events.EventListener;
@@ -23,7 +24,12 @@ import nbtool.util.NBConstants;
 import nbtool.util.Utility;
 
 public class CommonIO {
-
+	//4 bytes str len, 4 bytes data len.
+	public static long MINIMUM_LOG_SIZE = 8;
+	
+	private static SExpr _MIN_LOG_SEXPR = SExpr.deserializeFrom("(nblog)");
+	public static long MINIMUM_VALID_NBLOG_SIZE = MINIMUM_LOG_SIZE + _MIN_LOG_SEXPR.serialize().length();
+	
 	public static void writeLog(DataOutputStream dos, Log l) throws IOException {
 		byte[] cbytes = l.description().getBytes(StandardCharsets.UTF_8);
 		byte[] dbytes = l.bytes;
@@ -81,7 +87,8 @@ public class CommonIO {
 	}
 
 	/*
-	 * If you're wondering why there's no explicit load log function: 'loading' a log should be done by reading the log in fully, then checking that the read description matches the log's original description.
+	 * If you're wondering why there's no explicit load log function: 'loading' a log should be done by reading the
+	 *  log in fully, then checking that the read description matches the log's original description.
 	 * */
 
 

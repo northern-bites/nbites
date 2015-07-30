@@ -83,7 +83,7 @@ public final class SessionMaster implements IOFirstResponder {
 		
 		if (path != null && !path.isEmpty()) {
 			Logger.log(Logger.INFO, "SessionMaster setting up file writer.");
-			fileio = FileIO.makeFileWriter(path, this);
+			fileio = FileIO.newFileWriter(path, this);
 		}
 		
 		workingSession = new Session(null, addr);
@@ -144,7 +144,7 @@ public final class SessionMaster implements IOFirstResponder {
 			Logger.infof("SessionMaster latestarting a FileInstance...");
 			
 			assert(FileIO.checkLogFolder(path));
-			fileio = FileIO.makeFileWriter(path, this);
+			fileio = FileIO.newFileWriter(path, this);
 		}
 	}
 	
