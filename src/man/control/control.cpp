@@ -33,7 +33,7 @@ using nblog::Log;
 namespace control {
     
     pthread_t control_thread;
-    static bool STARTED = false;
+    bool STARTED = false;
     
     /* RETURN log may not be 'arg' (double delete) */
     Log * RETURN = NULL;
@@ -53,10 +53,18 @@ namespace control {
         return 0;
     }
     
+    //Construct string_flag array.
+#define XTEMP(n) [n] = #n
+    const char * string_flags[] = {
+#include "control_flags.defs.h"
+    };
+#undef XTEMP
+    
     volatile uint8_t flags[num_flags];
     //expects two bytes of data:
     //  flag index
     //  new flag value (0 or 1)
+    //otherwise, interprets call as request for STATS
     uint32_t cnc_setFlag(Log * arg) {
         
         size_t u = arg->data().size();
@@ -84,26 +92,24 @@ namespace control {
             return 3;
         }
         
-        switch (index) {
-            case serv_connected:
-                printf("cnc_setFlag(): ERROR: CANNOT SET serv_connected!\n");
-                break;
-            case control_connected:
-                printf("cnc_setFlag(): ERROR: CANNOT SET cnc_connected!\n");
-                break;
-            case fileio: //setting fileio
-                if (value) {
-                    memcpy(nblog::fio_start, nblog::total, sizeof(nblog::io_state_t) * NUM_LOG_BUFFERS);
-                    
-                    nblog::fio_upstart = time(NULL);
-                }
+        if (index <= _START_EXTERNAL_ || index >= _END_EXTERNAL_) {
+            printf("cnc_setFlag(): ERROR: tried to set INTERNAL flag!\n");
+            return 4;
+        }
+        
+        if (index == fileio) {
+            //special case, we need to copy starting statistics for
+            //this "to file logging session"
+            if (value) {
+                memcpy(nblog::fio_start, nblog::total, sizeof(nblog::io_state_t) * NUM_LOG_BUFFERS);
                 
-                flags[fileio] = value;
-                break;
-                
-            default:
-                flags[index] = value;
-                break;
+                nblog::fio_upstart = time(NULL);
+            }
+            
+            flags[fileio] = value;
+        } else {
+            
+            flags[index] = value;
         }
         
         RETURN = nblog::makeSTATSlog();

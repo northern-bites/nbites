@@ -375,9 +375,9 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 		if (!controlling)
 			return;
 
-		flags = new FlagPanel[bs.flags.size() - 2];
+		flags = new FlagPanel[bs.flags.size()];
 		for (int i = 0; i < flags.length; ++i) {
-			Flag f = bs.flags.get(i + 2);	//Skip two for the connected flags.
+			Flag f = bs.flags.get(i);	//Skip two for the connected flags.
 
 			flags[i] = new FlagPanel();
 			flags[i].setInfo(f.name, f.index);
