@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import nbtool.data.Log;
+import nbtool.util.Logger;
 
 public class FFTWBuffer extends Buffer<Float> {
 	
@@ -35,11 +36,13 @@ public class FFTWBuffer extends Buffer<Float> {
 		data = new float[2][];
 		for (int i = 0; i < channels; ++i) {
 			data[i] = new float[frames];
-			for (int j = 0; j < channels; ++j) {
+			for (int j = 0; j < frames; ++j) {
 				float f = buf.getFloat();
 				data[i][j] = f;
 				assert(f >= 0);
 				if (f > max) max = f;
+				
+				//Logger.printf("channel %d v %f", i, f);
 			}
 		}
 	}

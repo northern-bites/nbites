@@ -51,8 +51,8 @@ public class ReplayUtility extends UtilityParent {
 			int index = -1;
 			
 			Loop(Session s, Log from, Log to, boolean repeat) {
-				int fi = s.logs_ALL.indexOf(from);
-				int ti = s.logs_ALL.indexOf(to);
+				int fi = s.logs_DO.indexOf(from);
+				int ti = s.logs_DO.indexOf(to);
 				
 				if (!(fi < ti)) {
 					return;
@@ -74,7 +74,7 @@ public class ReplayUtility extends UtilityParent {
 					return null;
 				
 				int offset = index++ % len;
-				Log l = session.logs_ALL.get(first + offset);
+				Log l = session.logs_DO.get(first + offset);
 				if (l.bytes == null) {
 					try {
 						FileIO.loadLog(l, l.parent.directoryFrom);

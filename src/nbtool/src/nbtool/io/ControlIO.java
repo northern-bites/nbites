@@ -226,7 +226,7 @@ public class ControlIO {
 						
 						int ret = in.readInt();
 						int nout = in.readInt();
-						Logger.logf(Logger.INFO, "%s: [%s] got ret [%d](%d back)\n", name(), c.log.description(), ret, nout);
+						Logger.logf(Logger.INFO, "%s: [%s] got ret [%d](and %d logs back)\n", name(), c.log.description(), ret, nout);
 
 						Log[] outa = new Log[nout];
 						for (int i = 0; i < nout; ++i) {

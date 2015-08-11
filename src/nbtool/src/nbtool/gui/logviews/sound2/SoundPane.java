@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -28,6 +29,8 @@ public abstract class SoundPane extends JPanel implements ChangeListener, MouseM
 		this.channels = channel;
 		this.frames = frame;
 		
+		channelRectLast = new Rectangle[channels];
+		
 		requested = new Dimension(frames + 100, 150 * channels);
 		multiplier = new JSlider(JSlider.VERTICAL);
 		multiplier.setMinimum(1);
@@ -50,6 +53,8 @@ public abstract class SoundPane extends JPanel implements ChangeListener, MouseM
 	public abstract int pixels(int c, int f, int radius);
 	public abstract String peakString();
 	public abstract String selectionString(int c, int f);
+	
+	private Rectangle[] channelRectLast;
 	
 	private class Display extends JPanel {
 		
@@ -93,6 +98,8 @@ public abstract class SoundPane extends JPanel implements ChangeListener, MouseM
 				g.drawLine(0, channelBottom, frames, channelBottom);
 				g.drawLine(0, channelMid, frames, channelMid);
 				g.drawLine(0, channelTop, frames, channelTop);
+				
+				channelRectLast[c] = new Rectangle(0, channelBottom, frames, diameter);
 			}
 		}
 	}
@@ -120,7 +127,14 @@ public abstract class SoundPane extends JPanel implements ChangeListener, MouseM
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+		for (int i = 0; i < channels; ++i) {
+			if (channelRectLast[i] != null && channelRectLast[i].contains(e.getPoint())) {
+				int f = e.getX();
+				
+				String text = selectionString(i, f);
+				selection.setText(text);
+				return;
+			}
+		}
 	}
 }
