@@ -18,6 +18,9 @@
 
 #include <boost/random.hpp>
 
+// FUTURE WORK this test is out of date as of June 2015, but the idea of
+//             automated loc tests is an excellent one, reimplement moving forward
+
 namespace man
 {
 namespace fakeInput

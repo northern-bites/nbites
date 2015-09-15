@@ -13,6 +13,7 @@ GC_LEDS = True
 FOOT_LEDS = True
 BALL_LEDS = True
 GOALBOX_LEDS = True
+CENTER_CIRCLE_LEDS = True
 ROLESWITCH_LEDS = True
 CALIBRATION_LEDS = True
 DODGE_LEDS = True
@@ -75,6 +76,9 @@ BALL_OFF_LEDS = ((BALL_LED, OFF, NOW),)
 ##### GoalBox #####
 GOALBOX_ON_LEDS = ((GOALBOX_LED, GREEN, NOW),)
 GOALBOX_OFF_LEDS = ((GOALBOX_LED, OFF, NOW),)
+
+##### Center Circle Leds #####
+CENTER_CIRCLE_ON_LEDS = ((GOALBOX_LED, WHITE, NOW),)
 
 ##### Roles #####
 ROLE_ONE      = ((ROLE_LED, GREEN, NOW),)
@@ -186,7 +190,10 @@ class Leds():
             elif self.brain.ball.vis.frames_off == 1:
                 self.executeLeds(BALL_OFF_LEDS)
 
-        if GOALBOX_LEDS:
+        if CENTER_CIRCLE_LEDS and self.brain.vision.circle.on:
+            self.executeLeds(CENTER_CIRCLE_ON_LEDS)
+        # Only do goalbox if we didn't see a center circle
+        elif GOALBOX_LEDS:
             gbOn = False
             for i in range(0, self.brain.vision.line_size()):
                 if self.brain.vision.line(i).id == 7:
@@ -195,6 +202,8 @@ class Leds():
                     break
             if not gbOn:
                 self.executeLeds(GOALBOX_OFF_LEDS)
+        else:
+            self.executeLeds(GOALBOX_OFF_LEDS)
 
         if ROLESWITCH_LEDS:
             newRole = self.brain.player.role

@@ -7,6 +7,7 @@ from objects import RobotLocation, RelLocation, RelRobotLocation
 from math import pi, sqrt
 from ..kickDecider import kicks
 from ..util import Transition
+import PMotion_proto
 
 #speed gains
 FULL_SPEED = 1.0
@@ -88,6 +89,14 @@ class Navigator(FSA.FSA):
         """
         NavStates.scriptedMove.sweetMove = move
         self.switchTo('scriptedMove')
+
+    def callKickEngine(self, kickType):
+        """
+        Do a BH kick engine kick. Never write a sweet ass move again. Except standups :)
+        By default, execute forward kick.
+        """
+        NavStates.kickEngine.kickType = kickType
+        self.switchTo('kickEngine')
 
     def chaseBall(self, speed = FAST_SPEED, fast = False):
         """

@@ -76,10 +76,14 @@ private:
     /* Finds the topmost and bottommost edges in each column of the image. */
     void getBottomAndTopEdges(EdgeList& edges);
 
+    // Tells us which part of the image to ignore if we are looking too
+    // far to the right or to the left (would pick up shoulder)
+    int findAzimuthRestrictions(FieldHomography* hom);
+
     /* Uses white image to determine which columns have a robot obstacle in them
      * and then where the longest run of these columns is.
      * Returns the column with the lowest point of the obstacle. */
-    int findObstacle(ImageLiteU8 whiteImage, float* obstacleBox);
+    int findObstacle(ImageLiteU8 whiteImage, float* obstacleBox, int startCol);
 
     /* Convert image coordinate obstacle box to robot-relative coordinates */
     void toFieldCoordinates(FieldHomography* hom, float* obstacleBox, int lowestCol);
