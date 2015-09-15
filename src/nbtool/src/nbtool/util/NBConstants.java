@@ -22,6 +22,7 @@ import nbtool.gui.logviews.misc.DefaultView;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.logviews.proto.ProtoBufView;
 import nbtool.gui.logviews.proto.ProtoBallView;
+import nbtool.gui.logviews.sound2.CorrelationView;
 import nbtool.gui.logviews.sound2.FFTWView;
 import nbtool.gui.logviews.sound2.SndFreqView;
 import nbtool.gui.logviews.sound2.SndAmpView;
@@ -81,16 +82,13 @@ public class NBConstants {
 		
 		map.put("YUVImage", new Class[]{ImageView.class, ZoomImageView.class, FrontEndView.class, LineView.class, BallView.class, DebugImageView.class});
 		map.put("STATS", new Class[]{BotStatsView.class});
-		map.put("prot-RobotLocation", new Class[]{FieldView.class});
-		map.put(DEFAULT_S, new Class[]{DefaultView.class});
-		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
-		map.put("MULTIBALL", new Class[]{ProtoBallView.class});
 		map.put("proto-RobotLocation", new Class[]{FieldView.class});
+		map.put("MULTIBALL", new Class[]{ProtoBallView.class});
 		map.put("location", new Class[]{LocSwarmView.class});
 		map.put("proto-FieldLines", new Class[]{BasicLineView.class});
 		map.put("proto-Corners", new Class[]{BasicLineView.class});
 		
-		map.put("sound", new Class[]{SndFreqView.class, SndAmpView.class});
+		map.put("sound", new Class[]{SndFreqView.class, SndAmpView.class, CorrelationView.class});
 		map.put("frequency", new Class[]{FFTWView.class});
 		
 		map.put(DEFAULT_S, new Class[]{DefaultView.class});

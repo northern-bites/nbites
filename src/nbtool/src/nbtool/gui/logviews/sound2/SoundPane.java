@@ -76,7 +76,7 @@ public abstract class SoundPane extends JPanel implements ChangeListener, MouseM
 			}
 			
 			int channelSpace = (size.height - channels * 5) / channels;
-			Logger.printf("%s space for each channel.", channelSpace);
+			//Logger.printf("%s space for each channel.", channelSpace);
 			int mult = multiplier.getValue();
 
 			for (int c = 0; c < channels; ++c) {
