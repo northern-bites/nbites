@@ -15,12 +15,13 @@ import nbtool.data.SessionMaster;
 import nbtool.data.ToolStats;
 import nbtool.gui.Display;
 import nbtool.io.CrossIO;
+import nbtool.term.units.UnitsCollection;
 import nbtool.util.Center;
 import nbtool.util.Logger;
 import nbtool.util.NBConstants;
 import nbtool.util.Prefs;
 
-public class NBTool_v7 {
+public class NBTool_v8 {
 	
 	public static void main(String[] args) {
 		
@@ -33,6 +34,14 @@ public class NBTool_v7 {
 		System.out.printf("\n\tnbtool version %d.%d\n\tdevelopment tool for Bowdoin's Northern Bites team\n\n",
 				NBConstants.VERSION, NBConstants.MINOR_VERSION);
 		
+		System.out.println("Unit tests: ... \n");
+		if (!UnitsCollection.run(NBConstants.NBITES_DIR + "/build/nbtool")) {
+			System.out.println("unit tests failed.");
+			return;
+		} else {
+			System.out.println("unit tests succeeded.");
+		}
+				
 		System.out.println("Generating Center instance..."); Center.startCenter();
 		System.out.println("Generating ToolStats instance: " + ToolStats.INST.toString());
 		System.out.println("Generating SessionMaster instance: " + SessionMaster.get().toString());
@@ -56,7 +65,7 @@ public class NBTool_v7 {
 			@Override
 			public void run() {
 				Logger.logf(INFO, "Finding best LookAndFeel...");
-				LookAndFeelInfo info = null;
+				LookAndFeelInfo info = UIManager.getInstalledLookAndFeels()[0];
 				
 				for (LookAndFeelInfo installed : UIManager.getInstalledLookAndFeels()) {
 					if (installed.getClassName().startsWith("com.apple")) {

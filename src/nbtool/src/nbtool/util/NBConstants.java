@@ -30,7 +30,7 @@ import nbtool.gui.logviews.loc.LocSwarmView;
 
 public class NBConstants {
 	
-	public static final int VERSION = 7;
+	public static final int VERSION = 8;
 	public static final int MINOR_VERSION = 0;
 	
 	public static final int NBITES_TEAM_NUM = 14;
