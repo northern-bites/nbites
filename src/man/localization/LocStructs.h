@@ -52,7 +52,7 @@ struct ParticleFilterParams
     float landmarkBearingStdev;   // standard deviation of bearing to landmark (radians)
 };
 
-// TODO remove
+// FUTURE WORK, remove and use ReconstructedLocation instead
 static float sampleNormal(float mean, float sigma) {
     // Seed the random number generator.
     static boost::mt19937 rng(static_cast<unsigned>(std::time(0)));
@@ -65,7 +65,7 @@ static float sampleNormal(float mean, float sigma) {
     return sample();
 }
 
-// TODO remove
+// FUTURE WORK, remove and use ReconstructedLocation instead
 struct LocNormalParams
 {
     LocNormalParams(float sx, float sy, float sh)
@@ -84,6 +84,8 @@ struct LocNormalParams
 
 // Represents a robot pose reconstructed from observations
 // Injections come from calling sample() on a ReconstructedLocation
+//
+// FUTURE WORK, needs work, name could be more general, PoseWithGaussianNoise for example
 struct ReconstructedLocation
 {
     float x;

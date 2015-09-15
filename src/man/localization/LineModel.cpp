@@ -343,6 +343,10 @@ double LineModel::scoreObservation(const vision::GeoLine& observation,
 
     // Make the conditional independence assumption
     return tiltProb * tProb * ep0Prob * ep1Prob;
+
+    // FUTURE WORK, also model uncertainity in classification, uncertainity may
+    //              vary as a function of line id, for example goalboxes might
+    //              be easier to classify than sidelines
 }
 
 void LineModel::addLine(LocLineID id, float r, float t, float ep0, float ep1)

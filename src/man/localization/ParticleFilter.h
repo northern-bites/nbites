@@ -33,6 +33,14 @@ namespace man
 namespace localization
 {
 
+// NOTE FOR FUTURE DEVELOPERS
+// FUTURE WORK
+// (1) better debug tools including running the particle filter on
+//     logged data and simulated data
+// (2) better recovery from kidnapping, probably via the augmented
+//     MCL strategy
+// (3) see FUTURE WORK tags throughout this directory
+
 // Parameters for the particle filter
 static const ParticleFilterParams PARAMS =
 {

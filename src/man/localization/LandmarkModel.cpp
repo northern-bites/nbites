@@ -131,6 +131,10 @@ messages::RobotLocation LandmarkModel::relRobotToAbsolute(const messages::RobotL
     return transformed;
 }
 
+// FUTURE WORK, currently we use the same gaussians to model error for corners
+//              and center circle, since the detector are different it may be 
+//              better to have different params for the two features, the tradeoff
+//              is that then there are more params to optimize
 double LandmarkModel::scoreObservation(const messages::RobotLocation& observation, 
                                        const Landmark& correspondingLandmark,
                                        const messages::RobotLocation& loc,
@@ -181,6 +185,10 @@ double LandmarkModel::scoreObservation(const messages::RobotLocation& observatio
 
     // Make the conditional independence assumption
     return tiltProb * tProb;
+
+    // FUTURE WORK, also model uncertainity in classification, uncertainity may
+    //              vary as a function of landmark id, for example, the center circle
+    //              may be easier to classify than corners
 }
 
 void LandmarkModel::addCorner(vision::CornerID type, LandmarkID id, double x, double y)

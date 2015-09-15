@@ -10,20 +10,6 @@
 
 #pragma once
 
-// TODO
-//
-// YES
-// sampleNormal -> ReconstructedLocation -> PoseWithGaussianNoise
-// future work
-// pid controller
-//
-// MAYBE
-// T corners in center circle rename
-// LineID -> VisionLineID
-// particle class in loc structs file
-// log_index
-// filtered ball in updateFieldForDebug
-
 #include "RoboGrams.h"
 #include "Vision.pb.h"
 #include "RobotLocation.pb.h"
