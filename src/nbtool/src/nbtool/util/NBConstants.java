@@ -1,14 +1,10 @@
 package nbtool.util;
 
 import java.awt.Rectangle;
-import java.awt.datatransfer.DataFlavor;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import nbtool.data.Log;
 import nbtool.gui.logviews.fieldLocation.FieldView;
-import nbtool.gui.logviews.images.EdgeView;
 import nbtool.gui.logviews.images.LineView;
 import nbtool.gui.logviews.images.DebugImageView;
 import nbtool.gui.logviews.images.BasicLineView;
@@ -17,7 +13,6 @@ import nbtool.gui.logviews.images.ZoomImageView;
 import nbtool.gui.logviews.images.BallView;
 import nbtool.gui.logviews.images.FrontEndView;
 import nbtool.gui.logviews.misc.BotStatsView;
-import nbtool.gui.logviews.misc.CrossBright;
 import nbtool.gui.logviews.misc.DefaultView;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.logviews.proto.ProtoBufView;

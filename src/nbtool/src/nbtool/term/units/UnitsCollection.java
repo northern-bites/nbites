@@ -12,6 +12,8 @@ public class UnitsCollection {
 	static {
 		units.add(new JsonDecodeUnit());
 		units.add(new JsonEncodeUnit());
+		
+		units.add(new CorrelationUnit());
 	}
 	
 	public static boolean run(String path) {
