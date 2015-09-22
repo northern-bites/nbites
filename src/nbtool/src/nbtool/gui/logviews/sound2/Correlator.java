@@ -4,13 +4,10 @@ import java.util.Arrays;
 
 public class Correlator {
 	
-	private static final double TAU = Math.PI * 2;
-
-	public int nchannels;
+	int used[];
 	public double[] tsin, tcos;
 	
-	public double rstep;
-	public double target_amp;
+	public Target target;
 	
 	public Correlator(int nc,
 			double framesPerTargetPeriod,
@@ -19,11 +16,11 @@ public class Correlator {
 		tcos = new double[nc];
 		Arrays.fill(tsin, 0d);
 		Arrays.fill(tcos, 0d);
-
-		nchannels = nc;
+		used = new int[nc];
+		Arrays.fill(used, 0);
 		
-		rstep = TAU / framesPerTargetPeriod;
-		target_amp = targetAmplitude;
+		target = new Target(framesPerTargetPeriod,
+				targetAmplitude, 0.0);
 	}
 	
 	public void correlate(int channel, int frame, int value) {
@@ -31,9 +28,10 @@ public class Correlator {
 	}
 	
 	public void correlate(int channel, int frame, double value) {
-		double angle = frame * rstep;
-		tsin[channel] += Math.sin(angle) * target_amp * value;
-		tcos[channel] += Math.cos(angle) * target_amp * value;
+		tsin[channel] += target.sin(frame) * value;
+		tcos[channel] += target.cos(frame) * value;
+		
+		++used[channel];
 	}
 	
 	public double offset(int channel) {
@@ -44,5 +42,23 @@ public class Correlator {
 		double sum = tcos[channel] * tcos[channel] + 
 				tsin[channel] * tsin[channel];
 		return Math.sqrt(sum);
+	}
+	
+	public int nchannels() {return tsin.length;}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder(100);
+		
+		sb.append(String.format("Correlator(nc=%d, %s){\n",
+				nchannels(), target.toString()
+				));
+		for (int i = 0; i < nchannels(); ++i) {
+			sb.append(String.format("\tc%d: used %d offset %f mag %f\n", 
+					i, used[i], offset(i), magnitude(i)));
+		}
+		sb.append("}");
+		
+		
+		return sb.toString();
 	}
 }

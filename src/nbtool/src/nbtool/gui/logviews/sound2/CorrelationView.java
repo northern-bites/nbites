@@ -5,25 +5,38 @@ import nbtool.gui.logviews.misc.ViewParent;
 
 public class CorrelationView extends ViewParent {
 	
+	private static final int TARGET_F = 2000;
+	
 	public CorrelationView() {
 		super();
 		initComponents();
 		
+		magSlider.setEnabled(false);
+		diffSlider.setEnabled(false);
 	}
 	
-	private int valueForSignedRadian(double rad) {
-		return (int) (100 * ( (rad + Math.PI) / (2 * Math.PI) ));
-	}
-	
-	private int valueForSignedTau(double tau) {
-		return (int) (100 * ( (tau) / (2 * Math.PI) ));
+	private int percentForRange(double min, double max, double val) {
+		assert( min < max && val >= min && val <= max);
+		double fraction = (val - min) / (max - min);
+		return (int) (100 * fraction);
 	}
 
 	@Override
 	public void setLog(Log newlog) {
+		
+		int srate = newlog.sexprForContentItem(0)
+				.firstValueOf("rate").valueAsInt();
+		assert(srate > (TARGET_F * 2));
+		
 		ShortBuffer buf = new ShortBuffer();
 		buf.parse(newlog);
-		Correlator cor = new Correlator(buf.channels, 4d, 1.0d);
+		Correlator cor = new Correlator(buf.channels,
+				srate / TARGET_F, 1.0d);
+		
+		details1.setText(String.format("srate=%d target_f=%d", 
+				srate, TARGET_F));
+		details2.setText(String.format("frames=%d chnls=%d", 
+				buf.frames, buf.channels));
 		
 		for (int j = 0; j < buf.channels; ++j) {
 			for (int i = 0; i < buf.frames; ++i) {
@@ -36,17 +49,19 @@ public class CorrelationView extends ViewParent {
 		
 		leftLabel.setText("left " + lo);
 		leftBar.setValue(
-				valueForSignedRadian(lo)
+				percentForRange(-Math.PI, Math.PI, lo)
 				);
 		
 		rightLabel.setText("right " + ro);
 		rightBar.setValue(
-				valueForSignedRadian(ro)
+				percentForRange(-Math.PI, Math.PI, ro)
 				);
 		
 		double diff = lo - ro;
 		diffLabel.setText("difference " + diff);
-		diffSlider.setValue(valueForSignedTau(diff));
+		diffSlider.setValue(
+				percentForRange(-2 *Math.PI, 2 * Math.PI, diff)
+				);
 		
 		double lm = cor.magnitude(0);
 		double rm = cor.magnitude(1);
@@ -73,8 +88,10 @@ public class CorrelationView extends ViewParent {
         magLabel = new javax.swing.JLabel();
         DMIN_LABEL = new javax.swing.JLabel();
         DMAX_LABEL = new javax.swing.JLabel();
-        diffSlider = new javax.swing.JSlider();
         magSlider = new javax.swing.JSlider();
+        diffSlider = new javax.swing.JSlider();
+        details1 = new javax.swing.JLabel();
+        details2 = new javax.swing.JLabel();
 
         leftLabel.setText("left");
 
@@ -88,9 +105,15 @@ public class CorrelationView extends ViewParent {
 
         DMAX_LABEL.setText("2PI");
 
-        diffSlider.setToolTipText("");
+        magSlider.setToolTipText("");
+        magSlider.setFocusable(false);
 
-        magSlider.setMinimum(-100);
+        diffSlider.setMinimum(-100);
+        diffSlider.setFocusable(false);
+
+        details1.setText("jLabel1");
+
+        details2.setText("jLabel2");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -100,8 +123,8 @@ public class CorrelationView extends ViewParent {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(magLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(diffSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(magSlider, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(magSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(diffSlider, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(DMIN_LABEL)
                         .addGap(206, 206, 206)
@@ -115,13 +138,19 @@ public class CorrelationView extends ViewParent {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(leftBar, javax.swing.GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE)
-                            .addComponent(rightBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(rightBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(details1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(details2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(24, 24, 24)
+                .addContainerGap()
+                .addComponent(details1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(details2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 118, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(leftBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(leftLabel))
@@ -129,17 +158,17 @@ public class CorrelationView extends ViewParent {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(rightBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(rightLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 234, Short.MAX_VALUE)
+                .addGap(90, 90, 90)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(diffLabel)
                     .addComponent(DMIN_LABEL)
                     .addComponent(DMAX_LABEL))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(magSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(diffSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(32, 32, 32)
                 .addComponent(magLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(diffSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(magSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(105, 105, 105))
         );
     }// </editor-fold>                        
@@ -148,6 +177,8 @@ public class CorrelationView extends ViewParent {
     // Variables declaration - do not modify                     
     private javax.swing.JLabel DMAX_LABEL;
     private javax.swing.JLabel DMIN_LABEL;
+    private javax.swing.JLabel details1;
+    private javax.swing.JLabel details2;
     private javax.swing.JLabel diffLabel;
     private javax.swing.JSlider diffSlider;
     private javax.swing.JProgressBar leftBar;
@@ -156,5 +187,5 @@ public class CorrelationView extends ViewParent {
     private javax.swing.JSlider magSlider;
     private javax.swing.JProgressBar rightBar;
     private javax.swing.JLabel rightLabel;
-    // End of variables declaration  
+    // End of variables declaration 
 }
