@@ -95,7 +95,6 @@ public class JsonObject extends LinkedHashMap<JsonString, JsonValue> implements 
 		
 		builder.append(Json.prefix(indent));
 		builder.append(JsonParser.TokenType.OBJECT_END.CHARACTER);
-		//builder.append("\n");
 		return builder.toString();
 	}
 

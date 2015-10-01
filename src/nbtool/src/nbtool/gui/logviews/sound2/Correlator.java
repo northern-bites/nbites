@@ -58,7 +58,6 @@ public class Correlator {
 		}
 		sb.append("}");
 		
-		
 		return sb.toString();
 	}
 }

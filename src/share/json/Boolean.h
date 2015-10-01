@@ -1,12 +1,12 @@
 
 
-#ifndef nb_json_array_header
-#define nb_json_array_header
+#ifndef nb_json_boolean_header
+#define nb_json_boolean_header
 
 #include "Json.h"
 
 namespace json {
-    class Boolean {
+    class Boolean : public JsonValue {
     public:
         bool value();
         Boolean(bool v);
@@ -22,8 +22,8 @@ namespace json {
         bool _value;
     };
     
-    const extern Boolean TRUE;
-    const extern Boolean FALSE;
+    const extern Boolean TRUE_VALUE;
+    const extern Boolean FALSE_VALUE;
 }
 
 #endif

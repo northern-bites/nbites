@@ -11,7 +11,7 @@ namespace json {
     class Array : public std::vector<JsonValue *>, public JsonValue {
         
     public:
-        Array(){}
+        Array(){ }
         
         Array(std::initializer_list<JsonValue *> list) :
             std::vector<JsonValue *>(list)
@@ -21,14 +21,13 @@ namespace json {
             std::vector<JsonValue *> (vec)
         { }
         
-        const std::string toString() {
+        const std::string toString() const {
             return stdprintf("JsonArray[%zu]", size());
         }
         
-        ~JsonValue(){ }
+        ~Array(){ }
         
         const std::string serialize() const;
-        const std::string toString() const;
         const std::string printi(int indent) const;
         
         JsonValueType type() const {

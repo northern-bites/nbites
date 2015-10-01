@@ -24,6 +24,6 @@ namespace json {
         return indentStr(indent) + serialize();
     }
     
-    const Boolean TRUE(true);
-    const Boolean FALSE(false);
+    const Boolean TRUE_VALUE(true);
+    const Boolean FALSE_VALUE(false);
 }

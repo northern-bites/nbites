@@ -31,10 +31,17 @@ public class Json {
 	public static interface JsonValue {
 		public JsonValueType type();
 		
-		//JSON text of value.
+		//JSON text of value, somewhat compact encoding.
 		public String serialize();
 		
 		public String print();
+		/*
+		 * Indenting rules:
+		 * 	a JsonValue implementation is responsible for adding the proper indentation to every line
+		 *  of its plain-text rep., including the first and last.
+		 *  
+		 * an implementation may span multiple lines but should not add a trailing newline.
+		 * */
 		public String print(int indent);
 		
 		//This allows you to daisy-chain subclass operations.  Attempts to inline cast an object

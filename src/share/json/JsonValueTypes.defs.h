@@ -1,5 +1,5 @@
 #ifndef JXM
-#error "JsonvalueTypes x-macro set requires JXM definition!"
+#error "JsonValueTypes x-macro set requires JXM definition!"
 #endif
 
 JXM(Array)

@@ -5,7 +5,7 @@ import nbtool.gui.logviews.misc.ViewParent;
 
 public class CorrelationView extends ViewParent {
 	
-	private static final int TARGET_F = 2000;
+	private static final int TARGET_F = 400;
 	
 	public CorrelationView() {
 		super();

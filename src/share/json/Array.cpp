@@ -2,15 +2,35 @@
 
 namespace json {
     const std::string Array::serialize() const {
-        return std::string();
-    }
-    
-    const std::string Array::toString() const {
-        return std::string();
+        std::string builder = "[";
+        for (int i = 0; i < size(); ++i) {
+            builder += at(i)->serialize();
+            if (i < (size() - 1))
+                builder += ",";
+        }
+        
+        builder += "]";
+        
+        return builder;
     }
     
     const std::string Array::printi(int indent) const {
-        return std::string();
+        std::string builder = indentStr(indent) + "[\n";
+        for (int i = 0; i < size(); ++i) {
+            builder += indentStr(indent);
+            
+            JsonValue * val = this->at(i);
+            builder += val->printi(indent + 1);
+            
+            if (i < (size() - 1))
+                builder += ",";
+            
+            builder += "\n";
+        }
+        
+        builder += indentStr(indent) + "]\n";
+        
+        return builder;
     }
     
 }

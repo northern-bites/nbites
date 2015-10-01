@@ -52,7 +52,7 @@ namespace json {
     };
     
     extern std::string indentStr(int i);
-    extern inline std::string stdprintf(const char * format, ...);
+    extern std::string stdprintf(const char * format, ...);
     
     extern bool isNull(JsonValue *);
     

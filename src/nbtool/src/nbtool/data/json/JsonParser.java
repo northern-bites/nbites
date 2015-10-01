@@ -354,6 +354,7 @@ public class JsonParser {
 		JsonValue val2 = Json.parse(serd);
 		Logger.printf("--------------------------------\n%s", val2.print()); */
 		
+		/*
 		JsonArray array = new JsonArray();
 		array.add(new JsonString("fellow"));
 		array.add(new JsonString("cow"));
@@ -364,6 +365,15 @@ public class JsonParser {
 		obj.put("key1", new JsonNumber("50"));
 		obj.put("key2", new JsonString("the string"));
 		array.add(obj);
-		Logger.println(array.print() + "\n");
+		Logger.println(array.print() + "\n"); */
+		
+		JsonArray outer = new JsonArray();
+		JsonArray inner = Json.array();
+		
+		outer.add(Json.NULL_VALUE);
+		inner.add(Json.NULL_VALUE);
+		outer.add(inner);
+		
+		Logger.println(outer.print() + "\n");
 	}
 }

@@ -67,17 +67,16 @@ public class JsonArray extends ArrayList<JsonValue> implements JsonValue {
 		
 		while(it.hasNext()) {
 			JsonValue entry = it.next();
-			builder.append(Json.prefix(indent));
 			builder.append(entry.print(indent + 1));
 			
 			if (it.hasNext())
 				builder.append(JsonParser.TokenType.SEPARATOR.CHARACTER);
+			
 			builder.append("\n");
 		}
 		
 		builder.append(Json.prefix(indent));
 		builder.append(JsonParser.TokenType.ARRAY_END.CHARACTER);
-		builder.append("\n");
 		return builder.toString();
 	}
 
