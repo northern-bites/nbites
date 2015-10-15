@@ -12,13 +12,13 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 
 import nbtool.data.RobotStats;
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 import nbtool.util.Utility;
 
 public class BotStatsView extends ViewParent {
 
 	@Override
-	public void setLog(Log newlog) {
+	public void setLog(_Log newlog) {
 		RobotStats bs = new RobotStats(newlog);
 		
 		if (area != null) {

@@ -9,7 +9,7 @@ import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
 
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.util.Logger;
 
@@ -18,7 +18,7 @@ public class SndFreqView extends ViewParent {
 	ShortBuffer sb = null;
 	
 	@Override
-	public void setLog(Log newlog) {
+	public void setLog(_Log newlog) {
 		this.sb = new ShortBuffer();
 		sb.parse(newlog);
 		

@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import messages.Header;
-import nbtool.data.Log;
 import nbtool.data.SExpr;
+import nbtool.data.log._Log;
 import nbtool.io.CommonIO;
 import nbtool.util.Logger;
 import nbtool.util.Utility;
@@ -26,7 +26,7 @@ public class NBLOG_pack {
 	public static void main(String[] args) throws IOException {
 		Logger.logf(Logger.INFO, "Attempting pack %d logs into OLD format...\n\n", args.length);
 		
-		LinkedList<Log> accepted = new LinkedList<Log>();
+		LinkedList<_Log> accepted = new LinkedList<_Log>();
 		
 		for (String f : args) {
 			Logger.logf(Logger.INFO, "file %s\n", f);
@@ -59,7 +59,7 @@ public class NBLOG_pack {
 				FileInputStream fis = new FileInputStream(lf);
 				dis = new DataInputStream(new BufferedInputStream(fis));
 				
-				Log found = CommonIO.simpleReadLog(dis);
+				_Log found = CommonIO.simpleReadLog(dis);
 				
 				if (Utility.isv6Description(found._olddesc_)) {
 					found.setTree(SExpr.deserializeFrom(found._olddesc_));
@@ -83,17 +83,17 @@ public class NBLOG_pack {
 		packTo(null, accepted);
 	}
 	
-	public static void packTo(String path, LinkedList<Log> accepted) throws IOException {
+	public static void packTo(String path, LinkedList<_Log> accepted) throws IOException {
 		Logger.logf(Logger.INFO, "Found %d acceptable logs for concatenation.\n", accepted.size());
 		//... concatenate...
 		
 		if (accepted.size() == 0)
 			return;
 		
-		ArrayList<Log> top = new ArrayList<Log>();
-		ArrayList<Log> bot = new ArrayList<Log>();
+		ArrayList<_Log> top = new ArrayList<_Log>();
+		ArrayList<_Log> bot = new ArrayList<_Log>();
 		
-		for (Log l : accepted) {
+		for (_Log l : accepted) {
 			SExpr fromField = l.tree().find("contents").get(1).find("from");
 			assert(fromField.exists() && fromField.count() == 2);
 			String from = fromField.get(1).value();
@@ -118,7 +118,7 @@ public class NBLOG_pack {
 			byte[] headBytes = head.toByteArray();
 			
 			int length = 4 + headBytes.length;
-			for (Log l : top)
+			for (_Log l : top)
 				length += l.bytes.length + (4 * 3);
 			
 			ByteBuffer bb = ByteBuffer.allocate(length);
@@ -127,7 +127,7 @@ public class NBLOG_pack {
 			bb.putInt(headBytes.length);
 			bb.put(headBytes);
 			
-			for (Log l : top) {
+			for (_Log l : top) {
 				SExpr c1 = l.tree().find("contents").get(1);
 				int size = c1.find("nbytes").get(1).valueAsInt();
 				int width = c1.find("width").get(1).valueAsInt() * 2;
@@ -160,7 +160,7 @@ public class NBLOG_pack {
 			byte[] headBytes = head.toByteArray();
 			
 			int length = 4 + headBytes.length;
-			for (Log l : top)
+			for (_Log l : top)
 				length += l.bytes.length + (4 * 3);
 			
 			ByteBuffer bb = ByteBuffer.allocate(length);
@@ -169,7 +169,7 @@ public class NBLOG_pack {
 			bb.putInt(headBytes.length);
 			bb.put(headBytes);
 			
-			for (Log l : bot) {
+			for (_Log l : bot) {
 				SExpr c1 = l.tree().find("contents").get(1);
 				int size = c1.find("nbytes").get(1).valueAsInt();
 				int width = c1.find("width").get(1).valueAsInt() * 2;

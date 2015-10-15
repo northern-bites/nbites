@@ -2,6 +2,7 @@ package nbtool.gui.logviews.loc;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 
 import java.io.ByteArrayInputStream;
@@ -12,9 +13,8 @@ import java.util.Vector;
 import com.google.protobuf.Message;
 
 import messages.*;
-
-import nbtool.data.Log;
 import nbtool.data.SExpr;
+import nbtool.data.log._Log;
 import nbtool.gui.field.*;
 import nbtool.gui.logviews.misc.ViewParent;
 
@@ -23,7 +23,7 @@ public class LocSwarmView extends ViewParent implements ActionListener {
     private int numLines;
 
 	@Override
-	public void setLog(Log newlog) {
+	public void setLog(_Log newlog) {
 		log = newlog;
 
 		RobotLocation naoLoc;

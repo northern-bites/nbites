@@ -14,8 +14,8 @@ import java.util.LinkedList;
 
 import javax.swing.SwingUtilities;
 
-import nbtool.data.Log;
 import nbtool.data.SExpr;
+import nbtool.data.log._Log;
 import nbtool.util.Center;
 import nbtool.util.Center.ToolEvent;
 import nbtool.util.Events.EventListener;
@@ -30,7 +30,7 @@ public class CommonIO {
 	private static SExpr _MIN_LOG_SEXPR = SExpr.deserializeFrom("(nblog)");
 	public static long MINIMUM_VALID_NBLOG_SIZE = MINIMUM_LOG_SIZE + _MIN_LOG_SEXPR.serialize().length();
 	
-	public static void writeLog(DataOutputStream dos, Log l) throws IOException {
+	public static void writeLog(DataOutputStream dos, _Log l) throws IOException {
 		byte[] cbytes = l.description().getBytes(StandardCharsets.UTF_8);
 		byte[] dbytes = l.bytes;
 
@@ -49,7 +49,7 @@ public class CommonIO {
 		dos.flush();
 	}
 
-	public static Log readLog(DataInputStream dis) throws IOException {
+	public static _Log readLog(DataInputStream dis) throws IOException {
 		String desc = readLogDescription(dis);
 
 		int len = dis.readInt();
@@ -57,17 +57,17 @@ public class CommonIO {
 		byte[] dbytes = new byte[len];
 		dis.readFully(dbytes);
 
-		return new Log(desc, dbytes);
+		return new _Log(desc, dbytes);
 	}
 	
-	public static Log simpleReadLog(DataInputStream dis) throws IOException {
+	public static _Log simpleReadLog(DataInputStream dis) throws IOException {
 		String desc = readLogDescription(dis);
 
 		int len = dis.readInt();
 		byte[] dbytes = new byte[len];
 		dis.readFully(dbytes);
 
-		Log ret = new Log();
+		_Log ret = new _Log();
 		ret.bytes = dbytes;
 		ret._olddesc_ = desc;
 		return ret;
@@ -194,14 +194,14 @@ public class CommonIO {
 	
 	public static interface IOFirstResponder {
 		public void ioFinished(IOInstance instance);
-		public void ioReceived(IOInstance inst, int ret, Log ... out);
+		public void ioReceived(IOInstance inst, int ret, _Log ... out);
 		
 		/* !CALLED ASYNCHRONOUSLY! */
 		public boolean ioMayRespondOnCenterThread(IOInstance inst);
 	}
 	
 	public static final class GIOFirstResponder {
-		public static void generateReceived(IOInstance instance, IOFirstResponder responder, int ret, Log ... logs) {
+		public static void generateReceived(IOInstance instance, IOFirstResponder responder, int ret, _Log ... logs) {
 			if (instance == null || responder == null)
 				return;
 			
@@ -231,7 +231,7 @@ public class CommonIO {
 		protected IOInstance instance;
 		protected IOFirstResponder responder;
 		protected int ret;
-		protected Log[] logs;
+		protected _Log[] logs;
 		
 		protected IOReceived() {}
 
@@ -255,7 +255,7 @@ public class CommonIO {
 				final IOInstance inst = instance;
 				final IOFirstResponder resp = responder;
 				final int r = ret;
-				final Log[] out = logs;
+				final _Log[] out = logs;
 				SwingUtilities.invokeLater(new Runnable(){
 					@Override
 					public void run() {

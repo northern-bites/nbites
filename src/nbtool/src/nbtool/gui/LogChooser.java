@@ -15,7 +15,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 import nbtool.gui.logdnd.LogDND;
 import nbtool.gui.logdnd.LogDND.LogDNDSource;
 import nbtool.util.Logger;
@@ -88,7 +88,7 @@ public class LogChooser extends JPanel implements LogDNDSource {
 	}
 
 	@Override
-	public Log[] supplyLogsForDrag() {
+	public _Log[] supplyLogsForDrag() {
 		return model.lastSelectedLogs;
 	}
 }

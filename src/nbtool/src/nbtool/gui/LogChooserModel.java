@@ -15,9 +15,9 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-import nbtool.data.Log;
 import nbtool.data.Session;
 import nbtool.data.SessionMaster;
+import nbtool.data.log._Log;
 import nbtool.io.FileIO;
 import nbtool.util.Center;
 import nbtool.util.Events;
@@ -35,7 +35,7 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 	String root;
 	JTree tree;
 	
-	protected Log[] lastSelectedLogs;
+	protected _Log[] lastSelectedLogs;
 	
 	public LogChooserModel() {
 		root = "ROOT PLACEHOLDER";
@@ -66,7 +66,7 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 	}
 
 	public boolean isLeaf(Object node) {
-		if (node.getClass() == Log.class) return true;
+		if (node.getClass() == _Log.class) return true;
 		else return false;
 	}
 
@@ -115,14 +115,14 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 		}
 		case 3: {
 			//LOG SELECTED.
-			ArrayList<Log> selected = new ArrayList<Log>();
+			ArrayList<_Log> selected = new ArrayList<_Log>();
 			
 			for (TreePath p : all) {
 				if (p.getPathCount() != 3)	//Skip selected items that can't be logs.
 					continue;
 				
 				Session ses = (Session)p.getPath()[1];
-				Log sel = (Log) p.getPath()[2];
+				_Log sel = (_Log) p.getPath()[2];
 								
 				if (sel.bytes == null) {
 					assert(ses.directoryFrom != null && !ses.directoryFrom.isEmpty());
@@ -141,7 +141,7 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 				selected.add(sel);
 			}
 			
-			lastSelectedLogs = selected.toArray(new Log[0]);
+			lastSelectedLogs = selected.toArray(new _Log[0]);
 			Events.GLogSelected.generate(this, selected.remove(0), selected);
 			break;
 		}
@@ -151,10 +151,10 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 	}
 
 	@Override
-	public void logsFound(Object source, Log... found) {
+	public void logsFound(Object source, _Log... found) {
 		HashSet<Session> sessions = new HashSet<Session>();
 		
-		for (Log log : found) {
+		for (_Log log : found) {
 			//We can't display an image that is not part of session.
 			if (log.parent != null) {
 				sessions.add(log.parent);
@@ -199,7 +199,7 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 		for (TreePath tp : pathes) {
 			if( tp.getPathCount() == 3 ) {
 				Session ses = (Session)	tp.getPath()[1];
-				Log sel = (Log) tp.getPath()[2];
+				_Log sel = (_Log) tp.getPath()[2];
 				
 				Logger.warnf("deleting {%s} from {%s}", sel, ses);
 				

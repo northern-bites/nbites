@@ -15,8 +15,8 @@ import javax.swing.JButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import nbtool.data.Log;
 import nbtool.data.SExpr;
+import nbtool.data.log._Log;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
@@ -24,8 +24,8 @@ import nbtool.io.CrossIO;
 import nbtool.io.CrossIO.CrossCall;
 import nbtool.io.CrossIO.CrossFunc;
 import nbtool.io.CrossIO.CrossInstance;
-
 import nbtool.util.Utility;
+
 import java.util.Vector;
 
 
@@ -167,7 +167,7 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
     }
 
     @Override
-    public void setLog(Log newlog) {
+    public void setLog(_Log newlog) {
         log = newlog;
 
         Vector<SExpr> vec = log.tree().recursiveFind("width");
@@ -372,7 +372,7 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
 
 
     @Override
-    public void ioReceived(IOInstance inst, int ret, Log... out) {
+    public void ioReceived(IOInstance inst, int ret, _Log... out) {
         if (out.length > 0) {
             Y16image yImg = new Y16image(width, height, out[0].bytes);
             this.yImage = yImg.toBufferedImage();
@@ -406,7 +406,7 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
     }
 
     // If and only if it is the first load, we need to set the positions of the sliders
-    private void firstIoReceived(Log... out) {
+    private void firstIoReceived(_Log... out) {
         
         // Set sliders to positions based on white, green, then orange images descriptions' s-exps
         SExpr colors = out[1].tree();

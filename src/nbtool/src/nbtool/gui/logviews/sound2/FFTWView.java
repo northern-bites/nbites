@@ -6,7 +6,7 @@ import java.awt.Font;
 
 import javax.swing.JLabel;
 
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 import nbtool.gui.logviews.misc.ViewParent;
 
 public class FFTWView extends ViewParent {
@@ -14,7 +14,7 @@ public class FFTWView extends ViewParent {
 	FFTWBuffer buffer = null;
 
 	@Override
-	public void setLog(Log newlog) {
+	public void setLog(_Log newlog) {
 		buffer = new FFTWBuffer();
 		buffer.parse(newlog);
 		

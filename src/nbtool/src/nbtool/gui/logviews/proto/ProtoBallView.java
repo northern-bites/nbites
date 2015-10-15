@@ -26,7 +26,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 import nbtool.util.Logger;
 import nbtool.util.Utility;
 import messages.FilteredBall;
@@ -153,7 +153,7 @@ public final class ProtoBallView extends nbtool.gui.logviews.misc.ViewParent {
 	// 	naiveBall.clear();
 	// }
 
-	public void setLog(Log newlog) {
+	public void setLog(_Log newlog) {
 		// clear();
 		String t = (String) newlog.primaryType();
 		if (!t.equals("MULTIBALL")) return;

@@ -10,8 +10,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import nbtool.data.Log;
 import nbtool.data.SExpr;
+import nbtool.data.log._Log;
 import nbtool.io.CommonIO;
 import nbtool.util.Logger;
 import nbtool.util.Utility;
@@ -54,7 +54,7 @@ public class NBLOG_v5_v6 {
 				dis = new DataInputStream(new BufferedInputStream(fis));
 
 				
-				Log fnd = CommonIO.simpleReadLog(dis);
+				_Log fnd = CommonIO.simpleReadLog(dis);
 				
 				if (fnd._olddesc_ != null && !Utility.isv6Description(fnd._olddesc_)) {
 					Logger.logf(Logger.INFO, "\tFile %s already v6 log!\n", f);

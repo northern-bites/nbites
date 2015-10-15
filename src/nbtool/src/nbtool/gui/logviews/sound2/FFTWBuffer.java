@@ -3,7 +3,7 @@ package nbtool.gui.logviews.sound2;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 import nbtool.util.Logger;
 
 public class FFTWBuffer extends Buffer<Float> {
@@ -21,7 +21,7 @@ public class FFTWBuffer extends Buffer<Float> {
 	}
 
 	@Override
-	public void parse(Log soundLog) {
+	public void parse(_Log soundLog) {
 		this.frames = soundLog.sexprForContentItem(0).firstValueOf("frames").valueAsInt();
 		this.channels = soundLog.sexprForContentItem(0).firstValueOf("channels").valueAsInt();
 		String format = soundLog.sexprForContentItem(0).firstValueOf("format").value();
@@ -48,7 +48,7 @@ public class FFTWBuffer extends Buffer<Float> {
 	}
 
 	@Override
-	public Log toLog() {
+	public _Log toLog() {
 		// TODO Auto-generated method stub
 		return null;
 	}

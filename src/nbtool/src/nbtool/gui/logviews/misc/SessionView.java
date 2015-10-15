@@ -12,8 +12,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import nbtool.data.Log;
 import nbtool.data.Session;
+import nbtool.data.log._Log;
 import nbtool.io.FileIO;
 import nbtool.term.NBLOG_pack;
 import nbtool.util.Logger;
@@ -57,7 +57,7 @@ public class SessionView extends JPanel implements ActionListener {
 			if (ret == JFileChooser.APPROVE_OPTION) {
 				String path = FileIO.dirChooser.getSelectedFile().getAbsolutePath();
 				
-				for (Log l : session.logs_ALL) {
+				for (_Log l : session.logs_ALL) {
 					if (l.name == null)
 						l.setNameFromDesc();
 					String fname = path + File.separatorChar + l.name ;
@@ -85,9 +85,9 @@ public class SessionView extends JPanel implements ActionListener {
 		
 		if (e.getSource() == pack) {
 			
-			LinkedList<Log> accepted = new LinkedList<Log>();
+			LinkedList<_Log> accepted = new LinkedList<_Log>();
 			
-			for (Log lg : session.logs_ALL) {
+			for (_Log lg : session.logs_ALL) {
 				if (lg.primaryType().equals("YUVImage")) {
 					accepted.add(lg);
 					

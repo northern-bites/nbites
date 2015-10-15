@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import nbtool.util.Logger;
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.images.EdgeImage;
 import nbtool.io.CommonIO.IOFirstResponder;
@@ -39,7 +39,7 @@ public class BasicLineView extends ViewParent {
     boolean usingLines = false;
 
     @Override
-    public void setLog(Log newlog) {
+    public void setLog(_Log newlog) {
         String t = (String) newlog.primaryType();
         // Class<? extends com.google.protobuf.GeneratedMessage> lClass = Utility.protobufClassFromType(t);
         // Logger.logf(Logger.INFO, "ProtoBufView: using class %s for type %s.\n", lClass.getName(), t);

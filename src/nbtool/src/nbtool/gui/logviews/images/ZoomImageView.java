@@ -16,7 +16,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.images.ImageParent;
 import nbtool.images.UV88image;
@@ -28,7 +28,7 @@ import nbtool.util.Utility;
 public class ZoomImageView extends ViewParent {
 	private static final long serialVersionUID = 1L;
 
-	public void setLog(Log newlog) {		
+	public void setLog(_Log newlog) {		
 		iv.useImage(Utility.biFromLog(newlog));
 	}
 

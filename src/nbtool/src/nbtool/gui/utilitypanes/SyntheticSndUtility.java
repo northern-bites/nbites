@@ -8,10 +8,10 @@ import java.nio.ByteOrder;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import nbtool.data.Log;
 import nbtool.data.SExpr;
 import nbtool.data.Session;
 import nbtool.data.SessionMaster;
+import nbtool.data.log._Log;
 import nbtool.gui.logviews.sound2.ShortBuffer;
 import nbtool.gui.logviews.sound2.Target;
 import nbtool.util.Events;
@@ -65,7 +65,7 @@ public class SyntheticSndUtility extends UtilityParent {
 				bb.putShort((short) t1.sin(i));
 			}
 			
-			Log newSound = Log.logWithTypePlus("sound", bb.array(), 
+			_Log newSound = _Log.logWithTypePlus("sound", bb.array(), 
 					SExpr.pair("channels", 2),
 					SExpr.pair("frames", nframes),
 					SExpr.pair("rate", 16000)

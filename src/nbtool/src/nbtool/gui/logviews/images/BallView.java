@@ -9,8 +9,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 
-import nbtool.data.Log;
 import nbtool.data.SExpr;
+import nbtool.data.log._Log;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
@@ -18,18 +18,17 @@ import nbtool.io.CrossIO;
 import nbtool.io.CrossIO.CrossFunc;
 import nbtool.io.CrossIO.CrossInstance;
 import nbtool.io.CrossIO.CrossCall;
-
 import nbtool.util.Utility;
 import nbtool.images.Y8image;
 
 public class BallView extends ViewParent implements IOFirstResponder {
-    Log in;
+    _Log in;
     BufferedImage original;
     BufferedImage orange;
-    Log balls;
+    _Log balls;
 
     @Override
-    public void setLog(Log newlog)
+    public void setLog(_Log newlog)
     {
         CrossInstance cross = CrossIO.instanceByIndex(0);
         if (cross == null) return;
@@ -124,7 +123,7 @@ public class BallView extends ViewParent implements IOFirstResponder {
     public void ioFinished(IOInstance instance) {}
 
     @Override
-    public void ioReceived(IOInstance inst, int ret, Log... out)
+    public void ioReceived(IOInstance inst, int ret, _Log... out)
     {
         SExpr otree = out[3].tree();
         Y8image o = new Y8image(otree.find("width").get(1).valueAsInt(),

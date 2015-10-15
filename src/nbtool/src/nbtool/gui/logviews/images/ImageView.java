@@ -9,7 +9,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.util.Utility;
 
@@ -26,7 +26,7 @@ public class ImageView extends ViewParent implements MouseMotionListener {
 			g.drawString(label, 10, img.getHeight() + 20);
     }
 	
-	public void setLog(Log newlog) {		
+	public void setLog(_Log newlog) {		
 		this.img = Utility.biFromLog(newlog);
 		
 		repaint();

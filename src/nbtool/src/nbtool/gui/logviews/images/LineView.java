@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nbtool.util.Logger;
-import nbtool.data.Log;
 import nbtool.data.SExpr;
+import nbtool.data.log._Log;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.images.EdgeImage;
 import nbtool.io.CommonIO.IOFirstResponder;
@@ -68,7 +68,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
 
 
     @Override
-    public void setLog(Log newlog) {
+    public void setLog(_Log newlog) {
         CrossInstance ci = CrossIO.instanceByIndex(0);
         if (ci == null)
             return;
@@ -326,7 +326,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
     public void ioFinished(IOInstance instance) {}
 
     @Override
-    public void ioReceived(IOInstance inst, int ret, Log... out) {
+    public void ioReceived(IOInstance inst, int ret, _Log... out) {
         EdgeImage ei = new EdgeImage(width, height,  out[5].bytes);
         edgeImage = ei.toBufferedImage();
         repaint();

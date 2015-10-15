@@ -10,7 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 import nbtool.io.CommonIO;
 import nbtool.util.Logger;
 import nbtool.util.Utility;
@@ -64,7 +64,7 @@ public class NBLOG_v2_v4 {
 				if (datalen != rest_of_file.length - 4) {
 					Logger.logf(Logger.INFO, "\t... reformatting...");
 
-					Log log = new Log((new String(descb)).replace("\0", ""), rest_of_file);
+					_Log log = new _Log((new String(descb)).replace("\0", ""), rest_of_file);
 
 					DataOutputStream dos = new DataOutputStream(
 							new BufferedOutputStream(

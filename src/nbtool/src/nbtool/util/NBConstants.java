@@ -42,7 +42,6 @@ public class NBConstants {
 	public static final String PROTOBUF_S = "_PROTOBUF_";
 
 	public static final String IMAGE_S = "YUVImage";
-	public static final String STATS_S = "stats";
 	
 	public static final int STREAM_PORT = 30000;
 	public static final int CONTROL_PORT = 30001;
@@ -75,7 +74,9 @@ public class NBConstants {
 	private static Map<String, Class<? extends ViewParent>[]> setupPossible() {
 		Map<String, Class<? extends ViewParent>[]> map = new HashMap<String, Class<? extends ViewParent>[]>();
 		
-		map.put("YUVImage", new Class[]{ImageView.class, ZoomImageView.class, FrontEndView.class, LineView.class, BallView.class, DebugImageView.class});
+		map.put("YUVImage", new Class[]{ImageView.class, ZoomImageView.class,
+				FrontEndView.class, LineView.class, BallView.class,
+				DebugImageView.class});
 		map.put("STATS", new Class[]{BotStatsView.class});
 		map.put("proto-RobotLocation", new Class[]{FieldView.class});
 		map.put("MULTIBALL", new Class[]{ProtoBallView.class});

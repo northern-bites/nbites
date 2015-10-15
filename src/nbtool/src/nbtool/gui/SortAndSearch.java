@@ -9,8 +9,8 @@ import java.util.Comparator;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
-import nbtool.data.Log;
 import nbtool.data.Session;
+import nbtool.data.log._Log;
 import nbtool.test.TestUtils;
 import nbtool.util.Logger;
 
@@ -36,9 +36,9 @@ public class SortAndSearch extends JPanel implements ActionListener {
 	}                                           
 	
 	public static enum SortType {
-		TIME(0, new Comparator<Log>(){
+		TIME(0, new Comparator<_Log>(){
 
-			public int compare(Log o1, Log o2) {
+			public int compare(_Log o1, _Log o2) {
 				Long s1 = o1.primaryTime();
 				Long s2 = o2.primaryTime();
 				
@@ -53,9 +53,9 @@ public class SortAndSearch extends JPanel implements ActionListener {
 			}
 			
 		}), 
-		TYPE(1, new Comparator<Log>(){
+		TYPE(1, new Comparator<_Log>(){
 
-			public int compare(Log o1, Log o2) {
+			public int compare(_Log o1, _Log o2) {
 				String s1 = o1.primaryType();
 				String s2 = o2.primaryType();
 				
@@ -70,9 +70,9 @@ public class SortAndSearch extends JPanel implements ActionListener {
 			}
 			
 		}),
-		IMAGE(2, new Comparator<Log>(){
+		IMAGE(2, new Comparator<_Log>(){
 
-			public int compare(Log o1, Log o2) {
+			public int compare(_Log o1, _Log o2) {
 				Integer s1 = o1.primaryImgIndex();
 				Integer s2 = o2.primaryImgIndex();
 				
@@ -87,9 +87,9 @@ public class SortAndSearch extends JPanel implements ActionListener {
 			}
 			
 		}),
-		FROM(3, new Comparator<Log>(){
+		FROM(3, new Comparator<_Log>(){
 
-			public int compare(Log o1, Log o2) {
+			public int compare(_Log o1, _Log o2) {
 				String s1 = o1.primaryFrom();
 				String s2 = o2.primaryFrom();
 				
@@ -106,9 +106,9 @@ public class SortAndSearch extends JPanel implements ActionListener {
 		}),
 		ARRIVED(4, null);
 		
-		public Comparator<Log> sorter;
+		public Comparator<_Log> sorter;
 		public final int index;
-		private SortType(int i, Comparator<Log> s) 
+		private SortType(int i, Comparator<_Log> s) 
 		{index = i; sorter = s;}
 	}
 	
@@ -130,7 +130,7 @@ public class SortAndSearch extends JPanel implements ActionListener {
 	
 	public void sort(Session s) {
 		int i = sortByBox.getSelectedIndex();
-		Comparator<Log> cmp;
+		Comparator<_Log> cmp;
 		
 		if (i < 0)
 			cmp = null;
@@ -143,11 +143,11 @@ public class SortAndSearch extends JPanel implements ActionListener {
 		assert(s != null);
 		assert(s.logs_ALL != null);
 		
-		s.logs_DO = new ArrayList<Log>(s.logs_ALL.size());
+		s.logs_DO = new ArrayList<_Log>(s.logs_ALL.size());
 		
 		if (mustContain.isEmpty())
 			s.logs_DO.addAll(s.logs_ALL);
-		else for (Log l : s.logs_ALL)
+		else for (_Log l : s.logs_ALL)
 				if (l.description().contains(mustContain)) s.logs_DO.add(l);
 		
 		//System.out.printf("sort using %d of %d logs\n", s.logs_DO.size(), s.logs_ALL.size());

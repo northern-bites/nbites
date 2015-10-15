@@ -15,7 +15,7 @@ import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import nbtool.data.TeamBroadcast;
+import nbtool.data.NBitesTeamBroadcast;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.io.CommonIO.IOState;
@@ -113,7 +113,7 @@ public class BroadcastIO {
 	                TeamPacket tp = TeamPacket.parseFrom(data.data);
 	                WorldModel wm = tp.getPayload();
 	                
-	                TeamBroadcast tb = new TeamBroadcast(name, address,
+	                NBitesTeamBroadcast tb = new NBitesTeamBroadcast(name, address,
 	                		data, tp, wm);
 	                
 	                if (this.ifr instanceof TeamBroadcastListener) {
@@ -137,7 +137,7 @@ public class BroadcastIO {
 	}
 	
 	public static interface TeamBroadcastListener extends IOFirstResponder {
-		public void acceptTeamBroadcast(TeamBroadcast tb);
+		public void acceptTeamBroadcast(NBitesTeamBroadcast tb);
 	}
 	
 	public static abstract class BroadcastDataProvider {

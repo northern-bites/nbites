@@ -7,7 +7,7 @@ import java.awt.dnd.DragSource;
 
 import javax.swing.JComponent;
 
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 import nbtool.gui.logdnd.LogDND.LogDNDSource;
 
 public class LogDragListener implements DragGestureListener {
@@ -22,7 +22,7 @@ public class LogDragListener implements DragGestureListener {
 	@Override
 	public void dragGestureRecognized(DragGestureEvent dge) {
 		assert(dge.getComponent() == eventSource);
-		Log[] data = logSource.supplyLogsForDrag();
+		_Log[] data = logSource.supplyLogsForDrag();
 		if (data == null)
 			return;
 		

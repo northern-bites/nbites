@@ -12,9 +12,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 
-import nbtool.data.Log;
 import nbtool.data.Session;
 import nbtool.data.SessionMaster;
+import nbtool.data.log._Log;
 import nbtool.io.CrossIO;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
@@ -159,7 +159,7 @@ public class SyntheticImageUtility extends UtilityParent {
 	            String sexpr = "(nblog (version 6) (contents ((type SyntheticParams) (params " + 
 	                           xToSend + " " + yToSend + " " + hToSend +
 	                           " " + fullresToSend + " " + topToSend + "))))";
-	            Log params = new Log(sexpr, null);
+	            _Log params = new _Log(sexpr, null);
 
 	            // Call nbcross
 	            CrossInstance ci = CrossIO.instanceByIndex(0);
@@ -188,7 +188,7 @@ public class SyntheticImageUtility extends UtilityParent {
 		public void ioFinished(IOInstance instance) {}
 
 		@Override
-		public void ioReceived(IOInstance inst, int ret, Log... out) {
+		public void ioReceived(IOInstance inst, int ret, _Log... out) {
 	        if (sess == null) {
 	            //sess = new Session(null, null);
 	            //master.sessions.add(sess);

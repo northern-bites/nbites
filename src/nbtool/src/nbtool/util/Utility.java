@@ -14,8 +14,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import nbtool.data.Log;
 import nbtool.data.SExpr;
+import nbtool.data.log._Log;
 import nbtool.images.ImageParent;
 import nbtool.images.UV88image;
 import nbtool.images.Y16image;
@@ -34,7 +34,7 @@ public class Utility {
 	}
 	
 	//Almost all image logs will have null or [Y8(U8/V8)] encoding, but this method should be extended if that changes.
-	public static BufferedImage biFromLog(Log log) {
+	public static BufferedImage biFromLog(_Log log) {
 		assert(log.primaryType().equalsIgnoreCase(NBConstants.IMAGE_S));
 		int width = log.primaryWidth();
 		int height = log.primaryHeight();
@@ -129,12 +129,9 @@ public class Utility {
 	}
 	
 	/*
-	 * Can't (to my knowledge) search for classes in the JVM except by trying to find specific ones.
-	 * 
-	 * So, this function tries a number of class name formats that (at the time of writing) span all used nb messages.
-	 * 
-	 * This is somewhat hackish, and renaming messages will break this: a better solution would involve rewriting all .proto
-	 * files so that protoc does not feel it needs to generate semi-arbitrary class names.
+	 * assuming the .proto files have the necessary java_options, 
+	 * this function can get the java class of an protobuf from its name
+	 * (the type as used in c++)
 	 * */
 	
 	@SuppressWarnings("unchecked")
@@ -193,7 +190,7 @@ public class Utility {
 	}
 	
 	/* creates tree for param old out of old._olddesc_ */
-	public static boolean v6Convert(Log old) {
+	public static boolean v6Convert(_Log old) {
 		if (old._olddesc_ != null && isv6Description(old._olddesc_)) {
 			old.setTree(SExpr.deserializeFrom(old._olddesc_));
 			return true;

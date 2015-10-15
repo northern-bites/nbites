@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import nbtool.data.log._Log;
 import nbtool.util.Events;
 import nbtool.util.Utility;
 
@@ -29,16 +30,16 @@ public class Session {
 	
 	// *** MODIFIED ON CENTER THREAD ***
 	//Logs in the order they arrived.  Only grows, does not change order.
-	public final ArrayList<Log> logs_ALL = new ArrayList<>(); 
+	public final ArrayList<_Log> logs_ALL = new ArrayList<>(); 
 	
 	// *** ONLY MODIFIED IN EDThread ***
 	//Some subset of logs_ALL, in order specified by GUI.
-	public ArrayList<Log> logs_DO; 
+	public ArrayList<_Log> logs_DO; 
 	
 	/* Used in SessionMaster for specific purpose sessions */
 	protected Session(String name) {
 //		logs_ALL = new ArrayList<Log>();
-		logs_DO = new ArrayList<Log>();
+		logs_DO = new ArrayList<_Log>();
 		most_relevant = null;
 		
 		directoryFrom = null;
@@ -48,7 +49,7 @@ public class Session {
 	/* Used in SessionMaster for stream/load sessions */
 	protected Session(String dir, String addr) {
 //		logs_ALL = new ArrayList<Log>();
-		logs_DO = new ArrayList<Log>();
+		logs_DO = new ArrayList<_Log>();
 		most_relevant = null;
 		
 		/* assert(dir != null || addr != null); */
@@ -67,7 +68,7 @@ public class Session {
 	 * addLog for streaming – checks the log for STATS to update our information of the robot,
 	 * then decides to keep the log based on <dropSTATS> and <keep>
 	 * */
-	public void addLog(Log l, boolean keep) {
+	public void addLog(_Log l, boolean keep) {
 		l.parent = this;
 		
 		if (l.primaryType().equals("STATS")) {
@@ -86,11 +87,11 @@ public class Session {
 	 * addLog for FileIO loading.  Finds most recent STATS log in logs (if present) and
 	 * sets it to most_relevant.
 	 * */
-	public void addLog(Log ... l) {
+	public void addLog(_Log ... l) {
 		logs_ALL.addAll(Arrays.asList(l));
 		
 		boolean newBS = false;
-		for (Log log : l) {
+		for (_Log log : l) {
 			log.parent = this;
 
 			if (log.primaryType().equals("STATS")) {

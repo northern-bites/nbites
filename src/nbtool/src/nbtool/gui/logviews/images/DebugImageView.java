@@ -11,7 +11,9 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.event.*;
+
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionEvent;
@@ -21,15 +23,17 @@ import java.io.DataInputStream;
 import java.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.JComboBox;
 import javax.swing.JCheckBox;
 import javax.swing.JSlider;
 import javax.swing.JPanel;
+
 import java.awt.GridLayout;
 
 import nbtool.util.Logger;
-import nbtool.data.Log;
 import nbtool.data.SExpr;
+import nbtool.data.log._Log;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.images.DebugImage;
 import nbtool.images.Y8image;
@@ -96,8 +100,8 @@ public class DebugImageView extends ViewParent
 	BufferedImage displayImages[] = new BufferedImage[ORIGINAL+1]; // our images
 	Y8ThreshImage greenCheck;
 
-	Log currentLog;
-	Log balls;
+	_Log currentLog;
+	_Log balls;
 
 	static int currentBottom;  // track current selection
 	static boolean firstLoad = true;
@@ -145,7 +149,7 @@ public class DebugImageView extends ViewParent
     }
 
     @Override
-    public void setLog(Log newlog) {
+    public void setLog(_Log newlog) {
         CrossInstance ci = CrossIO.instanceByIndex(0);
         if (ci == null)
             return;
@@ -537,7 +541,7 @@ public class DebugImageView extends ViewParent
     public void ioFinished(IOInstance instance) {}
 
     @Override
-    public void ioReceived(IOInstance inst, int ret, Log... out) {
+    public void ioReceived(IOInstance inst, int ret, _Log... out) {
 		System.out.println("IO received in Debug");
 		if (out.length > GREEN_IMAGE) {
             Y8image green8 = new Y8image(width, height, out[GREEN_IMAGE].bytes);

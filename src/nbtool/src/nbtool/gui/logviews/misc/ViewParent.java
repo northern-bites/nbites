@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 import javax.swing.tree.TreePath;
 
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 
 /**
  * Construction and setLog() are sometimes called in a separate thread,
@@ -16,17 +16,17 @@ import nbtool.data.Log;
  * */
 public abstract class ViewParent extends JPanel {
 	private static final long serialVersionUID = 1L;
-	protected Log log;
+	protected _Log log;
 	
-	public final void _setLog(Log newLog) {
+	public final void _setLog(_Log newLog) {
 		this.log = newLog;
 		setLog(log);
 	}
 	
 	//Use newlog to populate view.
-	public abstract void setLog(Log newlog);
+	public abstract void setLog(_Log newlog);
 	//Override if necessary.
-	public void alsoSelected(ArrayList<Log> also){}
+	public void alsoSelected(ArrayList<_Log> also){}
 	
 	//Override if you want it to load in parallel.
 	public static Boolean shouldLoadInParallel(){return false;}

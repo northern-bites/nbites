@@ -21,9 +21,9 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.text.DefaultCaret;
 
 import nbtool.data.RobotStats;
-import nbtool.data.Log;
 import nbtool.data.SessionMaster;
 import nbtool.data.ToolStats;
+import nbtool.data.log._Log;
 import nbtool.io.ControlIO.ControlInstance;
 import nbtool.io.CrossIO.CrossInstance;
 import nbtool.io.FileIO.FileInstance;
@@ -292,9 +292,9 @@ public class StatusPanel extends JPanel implements Events.ControlStatus, Events.
 	}
 
 	@Override
-	public void logsFound(Object source, Log... found) {
+	public void logsFound(Object source, _Log... found) {
 		for (Object o : found) {
-			Log l = (Log) o;
+			_Log l = (_Log) o;
 			types.add(l.primaryType());
 			
 			set();

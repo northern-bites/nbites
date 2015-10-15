@@ -17,8 +17,8 @@ import java.util.TimerTask;
 
 import javax.swing.SwingUtilities;
 
-import nbtool.data.Log;
-import nbtool.data.Log.SOURCE;
+import nbtool.data.log._Log;
+import nbtool.data.log._Log.SOURCE;
 import nbtool.data.SExpr;
 import nbtool.io.CommonIO.GIOFirstResponder;
 import nbtool.io.CommonIO.IOFirstResponder;
@@ -109,8 +109,8 @@ public class CrossIO {
 				String cs = call.arguments[i].primaryType();
 				String as = args[i];
 				
-				if (cs.equals(Log.NBCROSS_WILDCARD_TYPE) || 
-						as.equals(Log.NBCROSS_WILDCARD_TYPE))
+				if (cs.equals(_Log.NBCROSS_WILDCARD_TYPE) || 
+						as.equals(_Log.NBCROSS_WILDCARD_TYPE))
 					continue;
 				
 				if (!cs.equals(as))
@@ -130,11 +130,11 @@ public class CrossIO {
 		public IOFirstResponder listener;
 		public CrossFunc function;
 		
-		public Log[] arguments;
+		public _Log[] arguments;
 		
 		public CrossCall(IOFirstResponder listener,
 				CrossFunc function,
-				Log ... args) {
+				_Log ... args) {
 			this.listener = listener;
 			this.function = function;
 			this.arguments = args;
@@ -207,7 +207,7 @@ public class CrossIO {
 				if (init != 0)
 					throw new CommonIO.SequenceErrorException(0, init);
 				
-				Log funcLog = CommonIO.readLog(dis);
+				_Log funcLog = CommonIO.readLog(dis);
 				this.parseFunctions(funcLog);
 				dos.writeInt(functions.size());
 				dos.flush();
@@ -244,7 +244,7 @@ public class CrossIO {
 						
 						dos.writeInt(functions.indexOf(call.function));
 						
-						for (Log l : call.arguments) {
+						for (_Log l : call.arguments) {
 							CommonIO.writeLog(dos, l);
 						}
 						dos.flush();
@@ -253,9 +253,9 @@ public class CrossIO {
 						int num_out = dis.readInt();
 						
 
-						final Log[] outs = new Log[num_out];
+						final _Log[] outs = new _Log[num_out];
 						for (int i = 0; i < num_out; ++i) {
-							Log nl = CommonIO.readLog(dis);
+							_Log nl = CommonIO.readLog(dis);
 							nl.source = SOURCE.DERIVED;
 							outs[i] = nl;
 						}
@@ -284,7 +284,7 @@ public class CrossIO {
 			}
 		}
 		
-		private void parseFunctions(Log funclog) {
+		private void parseFunctions(_Log funclog) {
 			SExpr tree = funclog.tree();
 			tree = tree.find("contents");
 			
@@ -329,7 +329,7 @@ public class CrossIO {
 	}
 	
 	private static final LinkedList<CrossInstance> instances = new LinkedList<>();
-	private static final CrossCall TIMER_CALL = new CrossCall(null, null, new Log[0]);
+	private static final CrossCall TIMER_CALL = new CrossCall(null, null, new _Log[0]);
 	private static Thread serverThread = null;
 	
 	public static CrossInstance instanceByIndex(int i) {
@@ -439,7 +439,7 @@ public class CrossIO {
 		}
 
 		@Override
-		public void ioReceived(IOInstance inst, int ret, Log... out) {
+		public void ioReceived(IOInstance inst, int ret, _Log... out) {
 			Logger.logf(Logger.ERROR, "%s tried to notify CrossServer of ioReceived!", inst.name());
 			throw new Error("CrossServer got ioReceived call!");
 		}

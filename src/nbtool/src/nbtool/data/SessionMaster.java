@@ -2,6 +2,7 @@ package nbtool.data;
 
 import java.util.ArrayList;
 
+import nbtool.data.log._Log;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.io.ControlIO;
@@ -58,7 +59,7 @@ public final class SessionMaster implements IOFirstResponder {
 			return;
 		}
 		
-		Log[] logArray = FileIO.fetchLogs(fullPath);
+		_Log[] logArray = FileIO.fetchLogs(fullPath);
 		Session newsess = new Session(fullPath, null);
 		//Use loading addLog
 		newsess.addLog(logArray);
@@ -173,14 +174,14 @@ public final class SessionMaster implements IOFirstResponder {
 	}
 
 	@Override
-	public void ioReceived(IOInstance inst, int ret, Log... out) {
+	public void ioReceived(IOInstance inst, int ret, _Log... out) {
 		if (workingSession == null)
 			return;
 		
 		if (inst == streamio) {
 			synchronized(this) {
 				
-				for (Log log : out) {
+				for (_Log log : out) {
 					
 					if (saveMod != 0 && fileio != null && 
 							(log.unique_id % saveMod == 0)) 
@@ -202,7 +203,7 @@ public final class SessionMaster implements IOFirstResponder {
 				Events.GLogsFound.generate(this, out);
 			}
 		} else if (inst == control) {
-			for (Log log : out) {
+			for (_Log log : out) {
 				if (log.primaryType().equals("STATS")) {
 					RobotStats rs = new RobotStats(log);
 					if (workingSession != null) {

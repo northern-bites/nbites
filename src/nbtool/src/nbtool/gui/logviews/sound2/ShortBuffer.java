@@ -3,8 +3,8 @@ package nbtool.gui.logviews.sound2;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import nbtool.data.Log;
 import nbtool.data.SExpr;
+import nbtool.data.log._Log;
 
 public class ShortBuffer extends Buffer<Short> {
 	
@@ -34,8 +34,8 @@ public class ShortBuffer extends Buffer<Short> {
 	}
 	
 	@Override
-	public void parse(Log soundLog) {
-		SExpr c1 = soundLog.tree().firstValueOf(Log.LOG_CONTENTS_S);
+	public void parse(_Log soundLog) {
+		SExpr c1 = soundLog.tree().firstValueOf(_Log.LOG_CONTENTS_S);
 		channels = c1.firstValueOf("channels").valueAsInt();
 		frames = c1.firstValueOf("frames").valueAsInt();
 		
@@ -56,7 +56,7 @@ public class ShortBuffer extends Buffer<Short> {
 	}
 
 	@Override
-	public Log toLog() {
+	public _Log toLog() {
 		byte[] internal = new byte[SHORT_BYTES * channels * frames];
 		ByteBuffer buffer = ByteBuffer.wrap(internal);
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -67,7 +67,7 @@ public class ShortBuffer extends Buffer<Short> {
 			}
 		}
 		
-		return Log.logWithTypePlus("sound", buffer.array(),
+		return _Log.logWithTypePlus("sound", buffer.array(),
 				SExpr.pair("channels", channels),
 				SExpr.pair("frames", frames));
 	}

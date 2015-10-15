@@ -12,8 +12,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
 
-import nbtool.data.Log;
 import nbtool.data.Session;
+import nbtool.data.log._Log;
 import nbtool.io.CrossIO;
 import nbtool.io.CrossIO.CrossCall;
 import nbtool.io.FileIO;
@@ -30,8 +30,8 @@ public class CrossPanel extends JPanel implements Events.CrossStatus, IOFirstRes
 	private ArrayList<CrossInstance> recognized = new ArrayList<>();
 	private CrossListModel<CrossInstance> recModel = new CrossListModel<>(recognized);
 	
-	private ArrayList<Log> output = new ArrayList<>();
-	private CrossListModel<Log> outModel = new CrossListModel<>(output);
+	private ArrayList<_Log> output = new ArrayList<>();
+	private CrossListModel<_Log> outModel = new CrossListModel<>(output);
 	
 	private LogChooser chooser;
 	
@@ -98,15 +98,15 @@ public class CrossPanel extends JPanel implements Events.CrossStatus, IOFirstRes
 				if (e.getValueIsAdjusting())
 					return;
 				
-				JList<Log> list = (JList<Log>) e.getSource();
+				JList<_Log> list = (JList<_Log>) e.getSource();
 				int index = list.getSelectedIndex();
 				
 				if (index < 0 || index >= output.size())
 					return;
 				Logger.log(Logger.INFO, "NBCrossPane output selected.");
 				
-				Log sel = output.get(index);
-				Events.GLogSelected.generate(this, sel, new ArrayList<Log>());
+				_Log sel = output.get(index);
+				Events.GLogSelected.generate(this, sel, new ArrayList<_Log>());
 			}
         	
         });
@@ -148,7 +148,7 @@ public class CrossPanel extends JPanel implements Events.CrossStatus, IOFirstRes
     	
     	assert(ci != null && cf != null && cf == ci.functions.get(func_i));
     	
-    	Log[] args = new Log[cf.args.length];
+    	_Log[] args = new _Log[cf.args.length];
     	TreePath[] pathes = chooser.selection();
     	
     	if (pathes.length < args.length) {
@@ -166,7 +166,7 @@ public class CrossPanel extends JPanel implements Events.CrossStatus, IOFirstRes
     		}
     		
     		Session ses = (Session)path.getPath()[1];
-			Log sel = (Log) path.getPath()[2];
+			_Log sel = (_Log) path.getPath()[2];
 			
 			if (sel.bytes == null) {
 				assert(ses.directoryFrom != null && !ses.directoryFrom.isEmpty());
@@ -217,8 +217,8 @@ public class CrossPanel extends JPanel implements Events.CrossStatus, IOFirstRes
 	public void ioFinished(IOInstance instance) {}
 
 	@Override
-	public void ioReceived(IOInstance inst, int ret, Log... out) {
-		for (Log l : out) {
+	public void ioReceived(IOInstance inst, int ret, _Log... out) {
+		for (_Log l : out) {
 			Logger.logf(Logger.INFO, "NBCrossPane function returned: %s", l.description());
 			assert(l != null);
 			output.add(l);
@@ -306,6 +306,6 @@ public class CrossPanel extends JPanel implements Events.CrossStatus, IOFirstRes
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JList<Log> outList;
+    private javax.swing.JList<_Log> outList;
     // End of variables declaration            
 }

@@ -15,8 +15,8 @@ import java.util.Queue;
 
 import javax.swing.JFileChooser;
 
-import nbtool.data.Log;
-import nbtool.data.Log.SOURCE;
+import nbtool.data.log._Log;
+import nbtool.data.log._Log.SOURCE;
 import nbtool.io.CommonIO.GIOFirstResponder;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOState;
@@ -73,7 +73,7 @@ public class FileIO {
 		return true;
 	}
 	
-	public static void loadLog(Log lg, String log_folder) throws IOException {
+	public static void loadLog(_Log lg, String log_folder) throws IOException {
 		assert(checkLogFolder(log_folder));
 		assert(lg!=null);
 		assert(lg.name != null);
@@ -85,7 +85,7 @@ public class FileIO {
 		BufferedInputStream bis = new BufferedInputStream(fis);
 		DataInputStream dis = new DataInputStream(bis);
 		
-		Log full = CommonIO.readLog(dis);
+		_Log full = CommonIO.readLog(dis);
 		
 		if (dis.available() != 0) {
 			Logger.logf(Logger.WARN, "WARNING: log [%s] did not follow log format – %d bytes left, CORRUPTION LIKELY\n", logf.getCanonicalPath(),
@@ -110,7 +110,7 @@ public class FileIO {
 		dis.close();
 	}
 	
-	public static void writeLogToPath(Log lg, String path) throws IOException {
+	public static void writeLogToPath(_Log lg, String path) throws IOException {
 		assert(path.endsWith(".nblog"));
 		assert(lg.bytes != null);
 		
@@ -141,7 +141,7 @@ public class FileIO {
 		return r;
 	}
 	
-	public static Log[] fetchLogs(String location) {
+	public static _Log[] fetchLogs(String location) {
 		assert(checkLogFolder(location));
 		
 		File logd = new File(location);
@@ -152,7 +152,7 @@ public class FileIO {
 		});
 		
 		int rejected = 0;
-		ArrayList<Log> logs = new ArrayList<Log>(files.length);
+		ArrayList<_Log> logs = new ArrayList<_Log>(files.length);
 		
 		for (int i = 0; i < files.length; ++i) {
 			if (files[i].length() < CommonIO.MINIMUM_VALID_NBLOG_SIZE) {
@@ -178,9 +178,9 @@ public class FileIO {
 				continue;
 			}
 			
-			Log nlog;
+			_Log nlog;
 			if (!Utility.isv6Description(desc)) {
-				nlog = new Log();
+				nlog = new _Log();
 				nlog._olddesc_ = desc;
 				nlog.name = files[i].getName();
 				
@@ -201,7 +201,7 @@ public class FileIO {
 				}
 				
 			} else {
-				nlog = new Log(desc, null);
+				nlog = new _Log(desc, null);
 			}
 			
 			nlog.name = files[i].getName();
@@ -213,7 +213,7 @@ public class FileIO {
 		Logger.logf(Logger.INFO, "FileIO: tried to read in %d logs, accepted %d, rejected %d at path %s",
 				files.length, logs.size(), rejected, location);
 		
-		return logs.toArray(new Log[0]);
+		return logs.toArray(new _Log[0]);
 	}
 	
 	
@@ -240,15 +240,15 @@ public class FileIO {
 		protected FileInstance() { super(); }
 		protected String path;
 		
-		private final Queue<Log> toWrite = new LinkedList<Log>();
+		private final Queue<_Log> toWrite = new LinkedList<_Log>();
 		
-		public void add(Log log) {
+		public void add(_Log log) {
 			synchronized(toWrite) {
 				toWrite.add(log);
 			}
 		}
 		
-		private Log remove() {
+		private _Log remove() {
 			synchronized(toWrite) {
 				if (toWrite.isEmpty())
 					return null;
@@ -261,7 +261,7 @@ public class FileIO {
 			GFileIOStatus.generate(this, true);
 			
 			while(this.state == IOState.RUNNING) {
-				Log lg  = remove();
+				_Log lg  = remove();
 				
 				if (lg != null) {
 					if (lg.name == null) {

@@ -1,5 +1,6 @@
 package nbtool.data;
 
+import nbtool.data.log._Log;
 import nbtool.util.Center;
 import nbtool.util.Events;
 
@@ -17,8 +18,8 @@ public class ToolStats implements Events.LogLoaded, Events.LogsFound{
 	public long db_found, db_cur, db_dropped;
 
 	@Override
-	public void logsFound(Object source, Log... found) {
-		for (Log l : found) {
+	public void logsFound(Object source, _Log... found) {
+		for (_Log l : found) {
 			++l_found;
 			
 			if (l.bytes != null) {
@@ -31,8 +32,8 @@ public class ToolStats implements Events.LogLoaded, Events.LogsFound{
 	}
 
 	@Override
-	public void logLoaded(Object source, Log... loaded) {
-		for (Log l : loaded) {
+	public void logLoaded(Object source, _Log... loaded) {
+		for (_Log l : loaded) {
 			db_found += l.bytes.length;
 			db_cur += l.bytes.length;
 		}

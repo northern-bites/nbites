@@ -31,9 +31,9 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import nbtool.data.Log;
 import nbtool.data.ViewProfile;
 import nbtool.data.ViewProfile.ViewState;
+import nbtool.data.log._Log;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.util.Events;
 import nbtool.util.NBConstants;

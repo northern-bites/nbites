@@ -21,9 +21,9 @@ import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import nbtool.data.Log;
 import nbtool.data.RobotStats;
 import nbtool.data.RobotStats.Flag;
+import nbtool.data.log._Log;
 import nbtool.data.Session;
 import nbtool.data.SessionMaster;
 import nbtool.io.ControlIO;
@@ -446,15 +446,15 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 	}
 
 	@Override
-	public void logSelected(Object source, Log first,
-			ArrayList<Log> alsoSelected) {
+	public void logSelected(Object source, _Log first,
+			ArrayList<_Log> alsoSelected) {
 		/*
 		if (source != this)
 			streamCB.setSelected(false); */
 	}
 
 	@Override
-	public void logsFound(Object source, Log... found) {
+	public void logsFound(Object source, _Log... found) {
 		/*
 		if (streamCB.isSelected()) {
 			Log streamLog = null;

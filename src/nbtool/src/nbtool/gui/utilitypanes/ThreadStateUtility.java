@@ -8,7 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.Timer;
 
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 import nbtool.gui.logdnd.LogDND;
 import nbtool.gui.logdnd.LogDND.LogDNDTarget;
 import nbtool.util.Logger;

@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.lang.Math;
 
-import nbtool.data.TeamBroadcast;
+import nbtool.data.NBitesTeamBroadcast;
 
 public class NaoRobot {
 	private final static float naoRobotSize = 15.f;
@@ -162,7 +162,7 @@ public class NaoRobot {
 		
 	}
 	
-	public void wvNao(TeamBroadcast tb) {
+	public void wvNao(NBitesTeamBroadcast tb) {
 		fieldX = tb.dataWorldModel.getMyX();
 		fieldY = tb.dataWorldModel.getMyY();
 		fieldH = -tb.dataWorldModel.getMyH();
@@ -193,7 +193,7 @@ public class NaoRobot {
 		}
 	}
 	
-	public void wvSharedBall(TeamBroadcast tb) {
+	public void wvSharedBall(NBitesTeamBroadcast tb) {
 		sharedBall = true;
 		float sinHB, cosHB;
 		

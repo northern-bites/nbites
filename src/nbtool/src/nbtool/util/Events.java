@@ -7,9 +7,9 @@ import java.util.LinkedList;
 
 import javax.swing.SwingUtilities;
 
-import nbtool.data.Log;
 import nbtool.data.RobotStats;
 import nbtool.data.Session;
+import nbtool.data.log._Log;
 import nbtool.io.ControlIO.ControlInstance;
 import nbtool.io.FileIO.FileInstance;
 import nbtool.io.CrossIO.CrossInstance;
@@ -206,11 +206,11 @@ public class Events {
 	}
 	
 	public static interface LogLoaded extends EventListener {
-		public void logLoaded(Object source, Log ... loaded);//SOURCE NULL if combined.
+		public void logLoaded(Object source, _Log ... loaded);//SOURCE NULL if combined.
 	}
 	
 	public static final class GLogLoaded {
-		public static void generate(final Object source, final Log ... loaded) {
+		public static void generate(final Object source, final _Log ... loaded) {
 			Center.addEvent(new SimpleCombine(LogLoaded.class, source, loaded){
 
 				@Override
@@ -219,21 +219,21 @@ public class Events {
 					if (others.size() == 0)
 						return;
 					
-					Log[] ours = (Log[]) payload[1];
-					ArrayList<Log> alsoLoaded = new ArrayList<Log>();
+					_Log[] ours = (_Log[]) payload[1];
+					ArrayList<_Log> alsoLoaded = new ArrayList<_Log>();
 					alsoLoaded.addAll(Arrays.asList(ours));
 					
 					for (ToolEvent te : others) {
 						assert(te instanceof SimpleCombine);
 						
-						Log[] theirs = (Log[]) ((SimpleCombine) te).payload[1];
+						_Log[] theirs = (_Log[]) ((SimpleCombine) te).payload[1];
 						alsoLoaded.addAll(Arrays.asList(theirs));
 					}
 					
 					Logger.logf(Logger.INFO, "LogLoaded combined %d events with %d logs.", others.size(), alsoLoaded.size());
 					
 					this.payload[0] = null;
-					this.payload[1] = alsoLoaded.toArray(new Log[0]);
+					this.payload[1] = alsoLoaded.toArray(new _Log[0]);
 				}
 
 				@Override
@@ -243,7 +243,7 @@ public class Events {
 
 				@Override
 				protected void inform(EventListener l) {
-					Log[] logs = (Log[]) payload[1];
+					_Log[] logs = (_Log[]) payload[1];
 					((LogLoaded) l).logLoaded(payload[0], logs);
 				}
 				
@@ -252,11 +252,11 @@ public class Events {
 	}
 	
 	public static interface LogsFound extends EventListener {
-		public void logsFound(Object source, Log ... found);
+		public void logsFound(Object source, _Log ... found);
 	}
 	
 	public static final class GLogsFound {
-		public static void generate(final Object source, final Log ... found) {
+		public static void generate(final Object source, final _Log ... found) {
 			Center.addEvent(new SimpleCombine(LogsFound.class, source, found){
 
 				@Override
@@ -265,21 +265,21 @@ public class Events {
 					if (others.size() == 0)
 						return;
 					
-					Log[] ours = (Log[]) payload[1];
-					ArrayList<Log> alsoFound = new ArrayList<Log>();
+					_Log[] ours = (_Log[]) payload[1];
+					ArrayList<_Log> alsoFound = new ArrayList<_Log>();
 					alsoFound.addAll(Arrays.asList(ours));
 					
 					for (ToolEvent te : others) {
 						assert(te instanceof SimpleCombine);
 						
-						Log[] theirs = (Log[]) ((SimpleCombine) te).payload[1];
+						_Log[] theirs = (_Log[]) ((SimpleCombine) te).payload[1];
 						alsoFound.addAll(Arrays.asList(theirs));
 					}
 					
 					Logger.logf(Logger.INFO, "LogFound combined %d events with %d logs.", others.size(), alsoFound.size());
 					
 					this.payload[0] = null;
-					this.payload[1] = alsoFound.toArray(new Log[0]);
+					this.payload[1] = alsoFound.toArray(new _Log[0]);
 				}
 
 				@Override
@@ -289,7 +289,7 @@ public class Events {
 
 				@Override
 				protected void inform(EventListener l) {
-					Log[] logs = (Log[]) payload[1];
+					_Log[] logs = (_Log[]) payload[1];
 					((LogsFound) l).logsFound(payload[0], logs);
 				}
 				
@@ -413,11 +413,11 @@ public class Events {
 	}
 	
 	public static interface LogSelected extends EventListener {
-		public void logSelected(Object source, Log first, ArrayList<Log> alsoSelected);
+		public void logSelected(Object source, _Log first, ArrayList<_Log> alsoSelected);
 	}
 	
 	public static final class GLogSelected {
-		public static void generate(Object source, Log first, ArrayList<Log> alsoSelected) {
+		public static void generate(Object source, _Log first, ArrayList<_Log> alsoSelected) {
 			Center.addEvent(new SimpleCombine(LogSelected.class, source, first, alsoSelected){
 
 				@Override
@@ -446,7 +446,7 @@ public class Events {
 
 				@Override
 				protected void inform(EventListener l) {
-					((LogSelected) l).logSelected(payload[0], (Log) payload[1], (ArrayList<Log>) payload[2]);
+					((LogSelected) l).logSelected(payload[0], (_Log) payload[1], (ArrayList<_Log>) payload[2]);
 				}
 				
 			});

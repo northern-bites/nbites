@@ -7,7 +7,7 @@ import javax.swing.*;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import messages.RobotLocation;
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 import nbtool.gui.field.FieldConstants;
 import nbtool.gui.logviews.misc.ViewParent;
 
@@ -36,7 +36,7 @@ public class FieldView extends ViewParent {
 //		myPlayer.draw(g2);
 //	}
 
-	public void setLog(Log newlog) {
+	public void setLog(_Log newlog) {
 		log = newlog;
 		if(log.primaryIsProtobuf()) {
 			assert(log.primaryType().equalsIgnoreCase(

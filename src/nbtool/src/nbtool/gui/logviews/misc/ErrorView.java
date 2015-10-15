@@ -6,7 +6,7 @@ import java.awt.event.ComponentEvent;
 
 import javax.swing.JTextField;
 
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 
 public class ErrorView extends ViewParent {
 	
@@ -25,7 +25,7 @@ public class ErrorView extends ViewParent {
 	}
 
 	
-	public void setLog(Log newlog) {
+	public void setLog(_Log newlog) {
 		efield.setText("ERROR: Could not load data bytes of log. "
 				+ " Check log directory or reduce data usage.");
 	}

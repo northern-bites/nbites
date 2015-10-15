@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import nbtool.data.log._Log;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.util.Logger;
 import nbtool.util.NBConstants;
@@ -81,7 +82,7 @@ public class ViewProfile {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Class<? extends ViewParent>[] viewsForLog(Log log) {
+	public Class<? extends ViewParent>[] viewsForLog(_Log log) {
 		ArrayList<Class<? extends ViewParent>> views = new ArrayList<Class<? extends ViewParent>>();
 		String ptype = log.primaryType();
 		assert(ptype != null);

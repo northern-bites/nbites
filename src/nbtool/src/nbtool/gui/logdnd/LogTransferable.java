@@ -7,12 +7,12 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 import static nbtool.gui.logdnd.LogDND.*;
 
 public class LogTransferable implements Transferable, ClipboardOwner {
-	private Log[] data;
-	public LogTransferable(Log[] data) {
+	private _Log[] data;
+	public LogTransferable(_Log[] data) {
 		this.data = data;
 	}
 

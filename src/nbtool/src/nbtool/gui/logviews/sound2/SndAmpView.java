@@ -2,14 +2,14 @@ package nbtool.gui.logviews.sound2;
 
 import java.awt.BorderLayout;
 
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 import nbtool.gui.logviews.misc.ViewParent;
 
 public class SndAmpView extends ViewParent {
 
 	private ShortBuffer sb;
 	@Override
-	public void setLog(Log newlog) {
+	public void setLog(_Log newlog) {
 		sb = new ShortBuffer();
 		sb.parse(newlog);
 		

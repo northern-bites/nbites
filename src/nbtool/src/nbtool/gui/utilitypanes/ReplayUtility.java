@@ -8,8 +8,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
-import nbtool.data.Log;
 import nbtool.data.Session;
+import nbtool.data.log._Log;
 import nbtool.gui.LogDisplayPanel;
 import nbtool.gui.logdnd.LogDND;
 import nbtool.gui.logdnd.LogDND.LogDNDTarget;
@@ -50,7 +50,7 @@ public class ReplayUtility extends UtilityParent {
 			
 			int index = -1;
 			
-			Loop(Session s, Log from, Log to, boolean repeat) {
+			Loop(Session s, _Log from, _Log to, boolean repeat) {
 				int fi = s.logs_DO.indexOf(from);
 				int ti = s.logs_DO.indexOf(to);
 				
@@ -69,12 +69,12 @@ public class ReplayUtility extends UtilityParent {
 			}
 			
 			Session session;
-			Log getNext() {
+			_Log getNext() {
 				if (index == len && !repeat)
 					return null;
 				
 				int offset = index++ % len;
-				Log l = session.logs_DO.get(first + offset);
+				_Log l = session.logs_DO.get(first + offset);
 				if (l.bytes == null) {
 					try {
 						FileIO.loadLog(l, l.parent.directoryFrom);
@@ -92,8 +92,8 @@ public class ReplayUtility extends UtilityParent {
 			}
 		}
 		
-		private Log fromPlaced = null;
-		private Log toPlaced = null;
+		private _Log fromPlaced = null;
+		private _Log toPlaced = null;
 		private Timer timer = null;
 
 	    public RU_Frame() {
@@ -101,7 +101,7 @@ public class ReplayUtility extends UtilityParent {
 	        
 	        LogDND.makeComponentTarget(logFromLabel, new LogDNDTarget(){
 				@Override
-				public void takeLogsFromDrop(Log[] log) {
+				public void takeLogsFromDrop(_Log[] log) {
 					if (log.length < 1) return;
 					fromPlaced = log[0];
 					logFromLabel.setText(fromPlaced.description(50));
@@ -110,7 +110,7 @@ public class ReplayUtility extends UtilityParent {
 	        
 	        LogDND.makeComponentTarget(logToLabel, new LogDNDTarget(){
 				@Override
-				public void takeLogsFromDrop(Log[] log) {
+				public void takeLogsFromDrop(_Log[] log) {
 					if (log.length < 1) return;
 					toPlaced = log[0];
 					logToLabel.setText(toPlaced.description(50));
@@ -183,7 +183,7 @@ public class ReplayUtility extends UtilityParent {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					Log l = lp.getNext();
+					_Log l = lp.getNext();
 					Logger.printf("loop chose: %s", l);
 					
 					if (l == null) {
@@ -191,7 +191,7 @@ public class ReplayUtility extends UtilityParent {
 						return;
 					}
 					
-					display.takeLogsFromDrop(new Log[]{
+					display.takeLogsFromDrop(new _Log[]{
 						l
 					});
 				}

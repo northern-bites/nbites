@@ -20,9 +20,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
-import nbtool.data.Log;
 import nbtool.data.Session;
 import nbtool.data.ViewProfile;
+import nbtool.data.log._Log;
 import nbtool.gui.logdnd.LogDND;
 import nbtool.gui.logdnd.LogDND.LogDNDTarget;
 import nbtool.gui.logviews.misc.ErrorView;
@@ -45,7 +45,7 @@ public class LogDisplayPanel extends JPanel implements
 	public static LogDisplayPanel[] extern = new LogDisplayPanel[9];
 	
 	private boolean 	mainDisplay;
-	private Log			current;
+	private _Log			current;
 	private JTabbedPane tabs;
 	
 	private DisplayFooter footer;
@@ -115,8 +115,8 @@ public class LogDisplayPanel extends JPanel implements
 	}
 
 	@Override
-	public void logSelected(Object source, Log first,
-			ArrayList<Log> alsoSelected) {
+	public void logSelected(Object source, _Log first,
+			ArrayList<_Log> alsoSelected) {
 		if (!this.isEnabled() || !this.isVisible() || !this.mainDisplay)
 			return;
 		
@@ -125,34 +125,34 @@ public class LogDisplayPanel extends JPanel implements
 	}
 	
 	@Override
-	public void takeLogsFromDrop(Log[] log) {
+	public void takeLogsFromDrop(_Log[] log) {
 		footer.streamBox.setSelected(false);
 		if (log.length < 1) return;
 		
-		ArrayList<Log> logs = new ArrayList<>(Arrays.asList(log));
+		ArrayList<_Log> logs = new ArrayList<>(Arrays.asList(log));
 		setContents(logs.remove(0), logs);
 	}
 
 	@Override
-	public void logsFound(Object source, Log... found) {
+	public void logsFound(Object source, _Log... found) {
 		if (footer.streamBox.isSelected()) {
-			Log streamLog = null;
+			_Log streamLog = null;
 
-			for (Log l : found) {
+			for (_Log l : found) {
 				if (l.description().contains(footer.streamField.getText()) &&
-						l.source == Log.SOURCE.NETWORK) {
+						l.source == _Log.SOURCE.NETWORK) {
 					streamLog = l;
 					break;
 				}
 			}
 			
 			if (streamLog != null) {
-				setContents(streamLog, new ArrayList<Log>());
+				setContents(streamLog, new ArrayList<_Log>());
 			}
 		}
 	}
 	
-	protected void setContents(Log l, ArrayList<Log> also) {
+	protected void setContents(_Log l, ArrayList<_Log> also) {
 		Logger.log(Logger.INFO, "LDP.setContents() type: " + l.primaryType());
 		//Class<? extends ViewParent>[] list = UtilityManager.instanceOfLTV().viewsForLog(l);
 		Class<? extends ViewParent>[] list = profile.viewsForLog(l);
@@ -235,11 +235,11 @@ public class LogDisplayPanel extends JPanel implements
 		int index;
 		ViewParent view;
 		Class<? extends ViewParent> nlClass;
-		Log log;
-		ArrayList<Log> also;
+		_Log log;
+		ArrayList<_Log> also;
 		boolean done;
 		
-		protected CreateViewRunnable(int tabIndex, Class<? extends ViewParent> cls, Log lg,  ArrayList<Log> p) {
+		protected CreateViewRunnable(int tabIndex, Class<? extends ViewParent> cls, _Log lg,  ArrayList<_Log> p) {
 			index = tabIndex;
 			view = null;
 			nlClass = cls;

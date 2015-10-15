@@ -3,7 +3,7 @@ package nbtool.gui.logviews.misc;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.io.CrossIO;
@@ -21,7 +21,7 @@ public class CrossBright extends ViewParent implements IOFirstResponder {
     }
 	
 	@Override
-	public void setLog(Log newlog) {		
+	public void setLog(_Log newlog) {		
 		CrossInstance inst = CrossIO.instanceByIndex(0);
 		if (inst == null)
 			return;
@@ -43,7 +43,7 @@ public class CrossBright extends ViewParent implements IOFirstResponder {
 	public void ioFinished(IOInstance instance) {}
 
 	@Override
-	public void ioReceived(IOInstance inst, int ret, Log... out) {
+	public void ioReceived(IOInstance inst, int ret, _Log... out) {
 		this.img = Utility.biFromLog(out[0]);
 		repaint();
 	}

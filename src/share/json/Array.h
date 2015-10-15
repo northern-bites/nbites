@@ -25,7 +25,13 @@ namespace json {
             return stdprintf("JsonArray[%zu]", size());
         }
         
-        ~Array(){ }
+        ~Array() {
+            for (int i = 0; i < size(); ++i) {
+                if (at(i)) {
+                    delete at(i);
+                }
+            }
+        }
         
         const std::string serialize() const;
         const std::string printi(int indent) const;

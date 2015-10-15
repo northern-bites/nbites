@@ -1,6 +1,6 @@
 package nbtool.gui.logviews.sound2;
 
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 import nbtool.gui.logviews.misc.ViewParent;
 
 public class CorrelationView extends ViewParent {
@@ -22,7 +22,7 @@ public class CorrelationView extends ViewParent {
 	}
 
 	@Override
-	public void setLog(Log newlog) {
+	public void setLog(_Log newlog) {
 		
 		int srate = newlog.sexprForContentItem(0)
 				.firstValueOf("rate").valueAsInt();

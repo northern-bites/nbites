@@ -5,8 +5,14 @@
 
 #include "Json.h"
 
+#include <map>
+#include <string>
+
 namespace json {
-    class Object {
+    class Object :
+        public std::map<std::string, JsonValue *>,
+        public JsonValue
+    {
     public:
         Object();
         

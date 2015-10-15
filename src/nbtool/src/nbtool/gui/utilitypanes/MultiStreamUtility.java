@@ -2,7 +2,7 @@ package nbtool.gui.utilitypanes;
 
 import javax.swing.JFrame;
 
-import nbtool.data.Log;
+import nbtool.data.log._Log;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.io.StreamIO;
@@ -43,7 +43,7 @@ public class MultiStreamUtility extends UtilityParent implements IOFirstResponde
 	}
 
 	@Override
-	public void ioReceived(IOInstance inst, int ret, Log... out) {
+	public void ioReceived(IOInstance inst, int ret, _Log... out) {
 		Events.GLogsFound.generate(this, out);
 	}
 

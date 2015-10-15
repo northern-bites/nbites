@@ -6,15 +6,14 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.util.LinkedList;
 
-import nbtool.data.Log;
 import nbtool.data.SExpr;
+import nbtool.data.log._Log;
 import nbtool.io.CommonIO.GIOFirstResponder;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOState;
 import nbtool.io.CommonIO.SequenceErrorException;
 import nbtool.util.Events;
 import nbtool.util.Logger;
-
 import messages.*;
 
 /*
@@ -23,49 +22,49 @@ import messages.*;
 
 public class ControlIO {
 		
-	public static Log createCmndSetFlag(int flagi, boolean val) {
+	public static _Log createCmndSetFlag(int flagi, boolean val) {
 		byte[] bytes = new byte[2];
 		bytes[0] = (byte) flagi;
 		bytes[1] = (byte) (val ? 1 : 0);
 		
-		SExpr commandTree = SExpr.newList(SExpr.newAtom(Log.COMMAND_FIRST_ATOM_S), SExpr.newAtom("setFlag"));
-		Log cmnd = new Log(commandTree, bytes);
+		SExpr commandTree = SExpr.newList(SExpr.newAtom(_Log.COMMAND_FIRST_ATOM_S), SExpr.newAtom("setFlag"));
+		_Log cmnd = new _Log(commandTree, bytes);
 		return cmnd;
 	}
 	
-	public static Log createCmndReqFlags() {
+	public static _Log createCmndReqFlags() {
 		byte[] bytes = new byte[3];
 		bytes[0] = (byte) Byte.MAX_VALUE;
 		bytes[1] = (byte) Byte.MAX_VALUE;
 		bytes[2] = (byte) Byte.MAX_VALUE;
 		
-		SExpr commandTree = SExpr.newList(SExpr.newAtom(Log.COMMAND_FIRST_ATOM_S), SExpr.newAtom("setFlag"));
-		Log cmnd = new Log(commandTree, bytes);
+		SExpr commandTree = SExpr.newList(SExpr.newAtom(_Log.COMMAND_FIRST_ATOM_S), SExpr.newAtom("setFlag"));
+		_Log cmnd = new _Log(commandTree, bytes);
 		return cmnd;
 	}
  	
-	public static Log createCmndSetCameraParams(CameraParams cam) {
+	public static _Log createCmndSetCameraParams(CameraParams cam) {
 		byte[] paramsSerialized = cam.toByteArray();
 		SExpr commandTree = SExpr.newList(SExpr.newAtom("command"),SExpr.newAtom("setCameraParams"));
-		Log cmnd = new Log(commandTree,paramsSerialized);
+		_Log cmnd = new _Log(commandTree,paramsSerialized);
 		return cmnd;
 	}
 	
-	public static Log createCmndTest() {
-		SExpr commandTree = SExpr.newList(SExpr.newAtom(Log.COMMAND_FIRST_ATOM_S), SExpr.newAtom("test"));
-		Log cmnd = new Log(commandTree, null);
+	public static _Log createCmndTest() {
+		SExpr commandTree = SExpr.newList(SExpr.newAtom(_Log.COMMAND_FIRST_ATOM_S), SExpr.newAtom("test"));
+		_Log cmnd = new _Log(commandTree, null);
 		return cmnd;
 	}
 	
-	public static Log createCmndExit() {
-		SExpr commandTree = SExpr.newList(SExpr.newAtom(Log.COMMAND_FIRST_ATOM_S), SExpr.newAtom("exit"));
-		Log cmnd = new Log(commandTree, null);
+	public static _Log createCmndExit() {
+		SExpr commandTree = SExpr.newList(SExpr.newAtom(_Log.COMMAND_FIRST_ATOM_S), SExpr.newAtom("exit"));
+		_Log cmnd = new _Log(commandTree, null);
 		return cmnd;
 	}
 	
-	public static Log createSimpleCommand(String name, byte[] data) {
-		SExpr commandTree = SExpr.list(SExpr.newAtom(Log.COMMAND_FIRST_ATOM_S), SExpr.newAtom(name));
-		Log cmnd = new Log(commandTree, data);
+	public static _Log createSimpleCommand(String name, byte[] data) {
+		SExpr commandTree = SExpr.list(SExpr.newAtom(_Log.COMMAND_FIRST_ATOM_S), SExpr.newAtom(name));
+		_Log cmnd = new _Log(commandTree, data);
 		return cmnd;
 	}
 	
@@ -122,22 +121,22 @@ public class ControlIO {
 	public static class ControlInstance extends CommonIO.IOInstance {
 		
 		private class Cmnd {
-			Log log;
+			_Log log;
 			IOFirstResponder listener;
 			
-			Cmnd(Log l, IOFirstResponder ls) {
+			Cmnd(_Log l, IOFirstResponder ls) {
 				this.log = l; this.listener = ls;
 			}
 		}
 		
 		private final LinkedList<Cmnd> commands = new LinkedList<>();
 		
-		public boolean tryAddCmnd(Log cmnd) {
+		public boolean tryAddCmnd(_Log cmnd) {
 			if (cmnd == null ||
 					cmnd.tree().count() < 2 ||
 					!cmnd.tree().get(0).isAtom() ||
 					!cmnd.tree().get(1).isAtom() ||
-					!cmnd.tree().get(0).value().equals(Log.COMMAND_FIRST_ATOM_S)) {
+					!cmnd.tree().get(0).value().equals(_Log.COMMAND_FIRST_ATOM_S)) {
 				Logger.logf(Logger.ERROR, "invalid format for command log: %s", cmnd.toString());
 				return false;
 			}
@@ -151,12 +150,12 @@ public class ControlIO {
 		
 		/* listener notified, in addition to IOfr of the ControlInstance, when cmnd returns */
 		/* listener not notified if instance dies prior to sending cmnd. */
-		public boolean tryAddCmnd(Log cmnd, IOFirstResponder listener) {
+		public boolean tryAddCmnd(_Log cmnd, IOFirstResponder listener) {
 			if (cmnd == null ||
 					cmnd.tree().count() < 2 ||
 					!cmnd.tree().get(0).isAtom() ||
 					!cmnd.tree().get(1).isAtom() ||
-					!cmnd.tree().get(0).value().equals(Log.COMMAND_FIRST_ATOM_S)) {
+					!cmnd.tree().get(0).value().equals(_Log.COMMAND_FIRST_ATOM_S)) {
 				Logger.logf(Logger.ERROR, "invalid format for command log: %s", cmnd.toString());
 				return false;
 			}
@@ -228,7 +227,7 @@ public class ControlIO {
 						int nout = in.readInt();
 						Logger.logf(Logger.INFO, "%s: [%s] got ret [%d](and %d logs back)\n", name(), c.log.description(), ret, nout);
 
-						Log[] outa = new Log[nout];
+						_Log[] outa = new _Log[nout];
 						for (int i = 0; i < nout; ++i) {
 							outa[i] = CommonIO.readLog(in);
 						}

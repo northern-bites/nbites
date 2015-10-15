@@ -11,8 +11,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
-import nbtool.data.Log;
 import nbtool.data.SExpr;
+import nbtool.data.log._Log;
 import nbtool.io.FileIO;
 import nbtool.util.Logger;
 import nbtool.util.Utility;
@@ -113,7 +113,7 @@ public class DefaultView extends ViewParent implements ActionListener {
     }
 
 	@Override
-	public void setLog(Log newlog) {
+	public void setLog(_Log newlog) {
 		assert(newlog.bytes != null);
 				
 		descArea.setText(log.tree().print());		
@@ -206,9 +206,9 @@ public class DefaultView extends ViewParent implements ActionListener {
 	}
 	
 	@Override
-	public void alsoSelected(ArrayList<Log> also) {
+	public void alsoSelected(ArrayList<_Log> also) {
 		Logger.log(Logger.INFO, "DefaultView sees also selected:");
-		for (Log a: also) {
+		for (_Log a: also) {
 			Logger.logf(Logger.INFO, "\t%s", a.toString());
 		}
 	}

@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -19,8 +20,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import nbtool.gui.field.*;
-import nbtool.data.Log;
-import nbtool.data.TeamBroadcast;
+import nbtool.data.NBitesTeamBroadcast;
+import nbtool.data.log._Log;
 import nbtool.io.BroadcastIO;
 import nbtool.io.BroadcastIO.TeamBroadcastInstance;
 import nbtool.io.BroadcastIO.TeamBroadcastListener;
@@ -81,7 +82,7 @@ public class WorldViewUtility extends UtilityParent {
 		}
 
 		@Override	//TBI should be smart enough to use acceptTeamBroadcast() instead.
-		public void ioReceived(IOInstance inst, int ret, Log... out) {
+		public void ioReceived(IOInstance inst, int ret, _Log... out) {
 			Logger.println("??? recvd...");
 		}
 
@@ -91,7 +92,7 @@ public class WorldViewUtility extends UtilityParent {
 		}
 
 		@Override
-		public void acceptTeamBroadcast(TeamBroadcast tb) {
+		public void acceptTeamBroadcast(NBitesTeamBroadcast tb) {
 			//use tb
 			Logger.printf("got from {%s:%s}", tb.robotName, tb.robotIp);
 			//Logger.printf("header: %s", tb.message.header);
@@ -182,7 +183,7 @@ public class WorldViewUtility extends UtilityParent {
 			this.getContentPane().add(accessories, BorderLayout.EAST);
 		}
 		
-		private void updateTeamInfo(TeamBroadcast tb) {
+		private void updateTeamInfo(NBitesTeamBroadcast tb) {
 			int role = tb.dataWorldModel.getRole();
 			int playerNum = tb.dataTeamPacket.getPlayerNumber();
 			if(!tb.dataWorldModel.getActive()) {

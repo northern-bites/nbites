@@ -20,10 +20,10 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import nbtool.data.Log;
 import nbtool.data.SExpr;
 import nbtool.data.Session;
 import nbtool.data.SessionMaster;
+import nbtool.data.log._Log;
 import nbtool.io.ControlIO;
 import nbtool.io.ControlIO.ControlInstance;
 import nbtool.io.CrossIO;
@@ -179,7 +179,7 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 		            		return;
 		            	}
 		            	
-		            	Log command = ControlIO.createSimpleCommand(CALIBRATION_CONTROL_NAME, data);
+		            	_Log command = ControlIO.createSimpleCommand(CALIBRATION_CONTROL_NAME, data);
 		            	ci.tryAddCmnd(command);
 		            } catch (FileNotFoundException e1) {
 		                e1.printStackTrace();
@@ -198,11 +198,11 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 						JOptionPane.showMessageDialog(outerThis, "no selected session");
 						return;
 					}
-					List<Log> accepted = new LinkedList<Log>();
+					List<_Log> accepted = new LinkedList<_Log>();
 					String cameraString = (String) cameraBox.getSelectedItem();
 					String searchText = String.format("(from camera_%s)", cameraString);
 					
-					for (Log log : using.logs_ALL) {
+					for (_Log log : using.logs_ALL) {
 						if (log.description().indexOf(searchText) >= 0) {
 							accepted.add(log);
 						}
@@ -213,7 +213,7 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 						return;
 					}
 					
-					for (Log log : accepted) {
+					for (_Log log : accepted) {
 						if (log.bytes == null) {
 							try {
 								FileIO.loadLog(log, log.parent.directoryFrom);
@@ -253,7 +253,7 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	                    	return;
 	                    }
 	                    
-	                    Log[] seven = accepted.subList(0, 7).toArray(new Log[0]);
+	                    _Log[] seven = accepted.subList(0, 7).toArray(new _Log[0]);
 	                    CrossCall call = new CrossCall(outerThis, func, seven);
 	                    assert(ci.tryAddCall(call));
 	                }
@@ -267,7 +267,7 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 		public void ioFinished(IOInstance instance) {}
 
 		@Override
-		public void ioReceived(IOInstance inst, int ret, Log... out) {
+		public void ioReceived(IOInstance inst, int ret, _Log... out) {
 			System.out.println("CamCal ioReceived");
 			assert(lastCalculated != null);
 			
