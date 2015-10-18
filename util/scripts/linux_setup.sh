@@ -27,7 +27,7 @@ VERSION=`lsb_release -a 2>/dev/null | grep 'Release:' | grep -o '[0-9]\+.[0-9]\+
 if [[ $VERSION != '12.04' && $VERSION != '14.04' ]]; then
 
     echo ""
-    echo "That version is NOT SUPPORTED."
+    echo "This version of Linux is NOT SUPPORTED."
     echo "Some packages will not be the right version or may not exist."
     echo "--------------------------------------------------------------"
     echo "If you are very sure of what you are doing, you may continue and"
