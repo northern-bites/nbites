@@ -27,6 +27,9 @@ import nbtool.gui.logviews.sound2.SndAmpView;
 import nbtool.gui.logviews.loc.LocSwarmView;
 
 
+import nbtool.gui.logviews.images.RobotView;
+
+
 public class NBConstants {
 	
 	public static final int VERSION = 7;
@@ -76,7 +79,7 @@ public class NBConstants {
 	private static Map<String, Class<? extends ViewParent>[]> setupPossible() {
 		Map<String, Class<? extends ViewParent>[]> map = new HashMap<String, Class<? extends ViewParent>[]>();
 		
-		map.put("YUVImage", new Class[]{ImageView.class, ZoomImageView.class, FrontEndView.class, LineView.class, BallView.class, DebugImageView.class});
+		map.put("YUVImage", new Class[]{ImageView.class, ZoomImageView.class, FrontEndView.class, LineView.class, BallView.class, DebugImageView.class, RobotView.class});
 		map.put("STATS", new Class[]{BotStatsView.class});
 		map.put("prot-RobotLocation", new Class[]{FieldView.class});
 		map.put(DEFAULT_S, new Class[]{DefaultView.class});
