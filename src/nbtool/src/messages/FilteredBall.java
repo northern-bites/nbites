@@ -6,37 +6,55 @@ package messages;
 /**
  * Protobuf type {@code messages.FilteredBall}
  */
-public final class FilteredBall extends
+public  final class FilteredBall extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.FilteredBall)
     FilteredBallOrBuilder {
   // Use FilteredBall.newBuilder() to construct.
   private FilteredBall(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private FilteredBall(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final FilteredBall defaultInstance;
-  public static FilteredBall getDefaultInstance() {
-    return defaultInstance;
+  private FilteredBall() {
+    distance_ = 0F;
+    bearing_ = 0F;
+    relX_ = 0F;
+    relY_ = 0F;
+    velX_ = 0F;
+    velY_ = 0F;
+    varRelX_ = 0F;
+    varRelY_ = 0F;
+    varVelX_ = 0F;
+    varVelY_ = 0F;
+    isStationary_ = false;
+    bearingDeg_ = 0F;
+    x_ = 0F;
+    y_ = 0F;
+    relXDest_ = 0F;
+    relYDest_ = 0F;
+    speed_ = 0F;
+    relYIntersectDest_ = 0F;
+    statRelX_ = 0F;
+    statRelY_ = 0F;
+    statDistance_ = 0F;
+    statBearing_ = 0F;
+    movRelX_ = 0F;
+    movRelY_ = 0F;
+    movDistance_ = 0F;
+    movBearing_ = 0F;
+    movVelX_ = 0F;
+    movVelY_ = 0F;
+    movSpeed_ = 0F;
   }
 
-  public FilteredBall getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private FilteredBall(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -60,7 +78,7 @@ public final class FilteredBall extends
             if (((bitField0_ & 0x00000001) == 0x00000001)) {
               subBuilder = vis_.toBuilder();
             }
-            vis_ = input.readMessage(messages.VBall.PARSER, extensionRegistry);
+            vis_ = input.readMessage(messages.VBall.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(vis_);
               vis_ = subBuilder.buildPartial();
@@ -216,10 +234,11 @@ public final class FilteredBall extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -237,21 +256,6 @@ public final class FilteredBall extends
             messages.FilteredBall.class, messages.FilteredBall.Builder.class);
   }
 
-  public static com.google.protobuf.Parser<FilteredBall> PARSER =
-      new com.google.protobuf.AbstractParser<FilteredBall>() {
-    public FilteredBall parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new FilteredBall(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<FilteredBall> getParserForType() {
-    return PARSER;
-  }
-
   private int bitField0_;
   public static final int VIS_FIELD_NUMBER = 1;
   private messages.VBall vis_;
@@ -265,13 +269,13 @@ public final class FilteredBall extends
    * <code>optional .messages.VBall vis = 1;</code>
    */
   public messages.VBall getVis() {
-    return vis_;
+    return vis_ == null ? messages.VBall.getDefaultInstance() : vis_;
   }
   /**
    * <code>optional .messages.VBall vis = 1;</code>
    */
   public messages.VBallOrBuilder getVisOrBuilder() {
-    return vis_;
+    return vis_ == null ? messages.VBall.getDefaultInstance() : vis_;
   }
 
   public static final int DISTANCE_FIELD_NUMBER = 2;
@@ -725,38 +729,6 @@ public final class FilteredBall extends
     return movSpeed_;
   }
 
-  private void initFields() {
-    vis_ = messages.VBall.getDefaultInstance();
-    distance_ = 0F;
-    bearing_ = 0F;
-    relX_ = 0F;
-    relY_ = 0F;
-    velX_ = 0F;
-    velY_ = 0F;
-    varRelX_ = 0F;
-    varRelY_ = 0F;
-    varVelX_ = 0F;
-    varVelY_ = 0F;
-    isStationary_ = false;
-    bearingDeg_ = 0F;
-    x_ = 0F;
-    y_ = 0F;
-    relXDest_ = 0F;
-    relYDest_ = 0F;
-    speed_ = 0F;
-    relYIntersectDest_ = 0F;
-    statRelX_ = 0F;
-    statRelY_ = 0F;
-    statDistance_ = 0F;
-    statBearing_ = 0F;
-    movRelX_ = 0F;
-    movRelY_ = 0F;
-    movDistance_ = 0F;
-    movBearing_ = 0F;
-    movVelX_ = 0F;
-    movVelY_ = 0F;
-    movSpeed_ = 0F;
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -769,9 +741,8 @@ public final class FilteredBall extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeMessage(1, vis_);
+      output.writeMessage(1, getVis());
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       output.writeFloat(2, distance_);
@@ -860,18 +831,17 @@ public final class FilteredBall extends
     if (((bitField0_ & 0x20000000) == 0x20000000)) {
       output.writeFloat(30, movSpeed_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, vis_);
+        .computeMessageSize(1, getVis());
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += com.google.protobuf.CodedOutputStream
@@ -989,18 +959,12 @@ public final class FilteredBall extends
       size += com.google.protobuf.CodedOutputStream
         .computeFloatSize(30, movSpeed_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.FilteredBall parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1054,12 +1018,17 @@ public final class FilteredBall extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.FilteredBall prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.FilteredBall prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -1101,14 +1070,10 @@ public final class FilteredBall extends
         getVisFieldBuilder();
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       if (visBuilder_ == null) {
-        vis_ = messages.VBall.getDefaultInstance();
+        vis_ = null;
       } else {
         visBuilder_.clear();
       }
@@ -1172,10 +1137,6 @@ public final class FilteredBall extends
       movSpeed_ = 0F;
       bitField0_ = (bitField0_ & ~0x20000000);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -1429,7 +1390,8 @@ public final class FilteredBall extends
       if (other.hasMovSpeed()) {
         setMovSpeed(other.getMovSpeed());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -1456,7 +1418,7 @@ public final class FilteredBall extends
     }
     private int bitField0_;
 
-    private messages.VBall vis_ = messages.VBall.getDefaultInstance();
+    private messages.VBall vis_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.VBall, messages.VBall.Builder, messages.VBallOrBuilder> visBuilder_;
     /**
@@ -1470,7 +1432,7 @@ public final class FilteredBall extends
      */
     public messages.VBall getVis() {
       if (visBuilder_ == null) {
-        return vis_;
+        return vis_ == null ? messages.VBall.getDefaultInstance() : vis_;
       } else {
         return visBuilder_.getMessage();
       }
@@ -1511,6 +1473,7 @@ public final class FilteredBall extends
     public Builder mergeVis(messages.VBall value) {
       if (visBuilder_ == null) {
         if (((bitField0_ & 0x00000001) == 0x00000001) &&
+            vis_ != null &&
             vis_ != messages.VBall.getDefaultInstance()) {
           vis_ =
             messages.VBall.newBuilder(vis_).mergeFrom(value).buildPartial();
@@ -1529,7 +1492,7 @@ public final class FilteredBall extends
      */
     public Builder clearVis() {
       if (visBuilder_ == null) {
-        vis_ = messages.VBall.getDefaultInstance();
+        vis_ = null;
         onChanged();
       } else {
         visBuilder_.clear();
@@ -1552,7 +1515,8 @@ public final class FilteredBall extends
       if (visBuilder_ != null) {
         return visBuilder_.getMessageOrBuilder();
       } else {
-        return vis_;
+        return vis_ == null ?
+            messages.VBall.getDefaultInstance() : vis_;
       }
     }
     /**
@@ -2535,11 +2499,47 @@ public final class FilteredBall extends
     // @@protoc_insertion_point(builder_scope:messages.FilteredBall)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.FilteredBall)
+  private static final messages.FilteredBall DEFAULT_INSTANCE;
   static {
-    defaultInstance = new FilteredBall(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.FilteredBall();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.FilteredBall)
+  public static messages.FilteredBall getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<FilteredBall>
+      PARSER = new com.google.protobuf.AbstractParser<FilteredBall>() {
+    public FilteredBall parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new FilteredBall(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<FilteredBall> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<FilteredBall> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.FilteredBall getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

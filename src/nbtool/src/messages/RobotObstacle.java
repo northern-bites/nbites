@@ -6,37 +6,30 @@ package messages;
 /**
  * Protobuf type {@code messages.RobotObstacle}
  */
-public final class RobotObstacle extends
+public  final class RobotObstacle extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.RobotObstacle)
     RobotObstacleOrBuilder {
   // Use RobotObstacle.newBuilder() to construct.
   private RobotObstacle(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private RobotObstacle(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final RobotObstacle defaultInstance;
-  public static RobotObstacle getDefaultInstance() {
-    return defaultInstance;
-  }
-
-  public RobotObstacle getDefaultInstanceForType() {
-    return defaultInstance;
+  private RobotObstacle() {
+    closestY_ = 0F;
+    boxBottom_ = 0F;
+    boxLeft_ = 0F;
+    boxRight_ = 0F;
   }
 
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private RobotObstacle(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -78,10 +71,11 @@ public final class RobotObstacle extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -97,21 +91,6 @@ public final class RobotObstacle extends
     return messages._File_VisionRobot.internal_static_messages_RobotObstacle_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.RobotObstacle.class, messages.RobotObstacle.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<RobotObstacle> PARSER =
-      new com.google.protobuf.AbstractParser<RobotObstacle>() {
-    public RobotObstacle parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new RobotObstacle(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<RobotObstacle> getParserForType() {
-    return PARSER;
   }
 
   private int bitField0_;
@@ -175,12 +154,6 @@ public final class RobotObstacle extends
     return boxRight_;
   }
 
-  private void initFields() {
-    closestY_ = 0F;
-    boxBottom_ = 0F;
-    boxLeft_ = 0F;
-    boxRight_ = 0F;
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -193,7 +166,6 @@ public final class RobotObstacle extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeFloat(1, closestY_);
     }
@@ -206,12 +178,11 @@ public final class RobotObstacle extends
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
       output.writeFloat(4, boxRight_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -231,18 +202,12 @@ public final class RobotObstacle extends
       size += com.google.protobuf.CodedOutputStream
         .computeFloatSize(4, boxRight_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.RobotObstacle parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -296,12 +261,17 @@ public final class RobotObstacle extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.RobotObstacle prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.RobotObstacle prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -342,10 +312,6 @@ public final class RobotObstacle extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       closestY_ = 0F;
@@ -357,10 +323,6 @@ public final class RobotObstacle extends
       boxRight_ = 0F;
       bitField0_ = (bitField0_ & ~0x00000008);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -428,7 +390,8 @@ public final class RobotObstacle extends
       if (other.hasBoxRight()) {
         setBoxRight(other.getBoxRight());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -586,11 +549,47 @@ public final class RobotObstacle extends
     // @@protoc_insertion_point(builder_scope:messages.RobotObstacle)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.RobotObstacle)
+  private static final messages.RobotObstacle DEFAULT_INSTANCE;
   static {
-    defaultInstance = new RobotObstacle(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.RobotObstacle();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.RobotObstacle)
+  public static messages.RobotObstacle getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<RobotObstacle>
+      PARSER = new com.google.protobuf.AbstractParser<RobotObstacle>() {
+    public RobotObstacle parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new RobotObstacle(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<RobotObstacle> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<RobotObstacle> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.RobotObstacle getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

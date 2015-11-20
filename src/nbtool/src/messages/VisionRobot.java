@@ -6,37 +6,26 @@ package messages;
 /**
  * Protobuf type {@code messages.VisionRobot}
  */
-public final class VisionRobot extends
+public  final class VisionRobot extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.VisionRobot)
     VisionRobotOrBuilder {
   // Use VisionRobot.newBuilder() to construct.
   private VisionRobot(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private VisionRobot(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final VisionRobot defaultInstance;
-  public static VisionRobot getDefaultInstance() {
-    return defaultInstance;
+  private VisionRobot() {
   }
 
-  public VisionRobot getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private VisionRobot(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -60,7 +49,7 @@ public final class VisionRobot extends
             if (((bitField0_ & 0x00000001) == 0x00000001)) {
               subBuilder = red1_.toBuilder();
             }
-            red1_ = input.readMessage(messages.Robot.PARSER, extensionRegistry);
+            red1_ = input.readMessage(messages.Robot.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(red1_);
               red1_ = subBuilder.buildPartial();
@@ -73,7 +62,7 @@ public final class VisionRobot extends
             if (((bitField0_ & 0x00000002) == 0x00000002)) {
               subBuilder = red2_.toBuilder();
             }
-            red2_ = input.readMessage(messages.Robot.PARSER, extensionRegistry);
+            red2_ = input.readMessage(messages.Robot.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(red2_);
               red2_ = subBuilder.buildPartial();
@@ -86,7 +75,7 @@ public final class VisionRobot extends
             if (((bitField0_ & 0x00000004) == 0x00000004)) {
               subBuilder = red3_.toBuilder();
             }
-            red3_ = input.readMessage(messages.Robot.PARSER, extensionRegistry);
+            red3_ = input.readMessage(messages.Robot.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(red3_);
               red3_ = subBuilder.buildPartial();
@@ -99,7 +88,7 @@ public final class VisionRobot extends
             if (((bitField0_ & 0x00000008) == 0x00000008)) {
               subBuilder = red4_.toBuilder();
             }
-            red4_ = input.readMessage(messages.Robot.PARSER, extensionRegistry);
+            red4_ = input.readMessage(messages.Robot.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(red4_);
               red4_ = subBuilder.buildPartial();
@@ -112,7 +101,7 @@ public final class VisionRobot extends
             if (((bitField0_ & 0x00000010) == 0x00000010)) {
               subBuilder = red5_.toBuilder();
             }
-            red5_ = input.readMessage(messages.Robot.PARSER, extensionRegistry);
+            red5_ = input.readMessage(messages.Robot.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(red5_);
               red5_ = subBuilder.buildPartial();
@@ -125,7 +114,7 @@ public final class VisionRobot extends
             if (((bitField0_ & 0x00000020) == 0x00000020)) {
               subBuilder = navy1_.toBuilder();
             }
-            navy1_ = input.readMessage(messages.Robot.PARSER, extensionRegistry);
+            navy1_ = input.readMessage(messages.Robot.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(navy1_);
               navy1_ = subBuilder.buildPartial();
@@ -138,7 +127,7 @@ public final class VisionRobot extends
             if (((bitField0_ & 0x00000040) == 0x00000040)) {
               subBuilder = navy2_.toBuilder();
             }
-            navy2_ = input.readMessage(messages.Robot.PARSER, extensionRegistry);
+            navy2_ = input.readMessage(messages.Robot.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(navy2_);
               navy2_ = subBuilder.buildPartial();
@@ -151,7 +140,7 @@ public final class VisionRobot extends
             if (((bitField0_ & 0x00000080) == 0x00000080)) {
               subBuilder = navy3_.toBuilder();
             }
-            navy3_ = input.readMessage(messages.Robot.PARSER, extensionRegistry);
+            navy3_ = input.readMessage(messages.Robot.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(navy3_);
               navy3_ = subBuilder.buildPartial();
@@ -164,7 +153,7 @@ public final class VisionRobot extends
             if (((bitField0_ & 0x00000100) == 0x00000100)) {
               subBuilder = navy4_.toBuilder();
             }
-            navy4_ = input.readMessage(messages.Robot.PARSER, extensionRegistry);
+            navy4_ = input.readMessage(messages.Robot.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(navy4_);
               navy4_ = subBuilder.buildPartial();
@@ -177,7 +166,7 @@ public final class VisionRobot extends
             if (((bitField0_ & 0x00000200) == 0x00000200)) {
               subBuilder = navy5_.toBuilder();
             }
-            navy5_ = input.readMessage(messages.Robot.PARSER, extensionRegistry);
+            navy5_ = input.readMessage(messages.Robot.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(navy5_);
               navy5_ = subBuilder.buildPartial();
@@ -188,10 +177,11 @@ public final class VisionRobot extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -209,21 +199,6 @@ public final class VisionRobot extends
             messages.VisionRobot.class, messages.VisionRobot.Builder.class);
   }
 
-  public static com.google.protobuf.Parser<VisionRobot> PARSER =
-      new com.google.protobuf.AbstractParser<VisionRobot>() {
-    public VisionRobot parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new VisionRobot(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<VisionRobot> getParserForType() {
-    return PARSER;
-  }
-
   private int bitField0_;
   public static final int RED1_FIELD_NUMBER = 1;
   private messages.Robot red1_;
@@ -237,13 +212,13 @@ public final class VisionRobot extends
    * <code>optional .messages.Robot red1 = 1;</code>
    */
   public messages.Robot getRed1() {
-    return red1_;
+    return red1_ == null ? messages.Robot.getDefaultInstance() : red1_;
   }
   /**
    * <code>optional .messages.Robot red1 = 1;</code>
    */
   public messages.RobotOrBuilder getRed1OrBuilder() {
-    return red1_;
+    return red1_ == null ? messages.Robot.getDefaultInstance() : red1_;
   }
 
   public static final int RED2_FIELD_NUMBER = 2;
@@ -258,13 +233,13 @@ public final class VisionRobot extends
    * <code>optional .messages.Robot red2 = 2;</code>
    */
   public messages.Robot getRed2() {
-    return red2_;
+    return red2_ == null ? messages.Robot.getDefaultInstance() : red2_;
   }
   /**
    * <code>optional .messages.Robot red2 = 2;</code>
    */
   public messages.RobotOrBuilder getRed2OrBuilder() {
-    return red2_;
+    return red2_ == null ? messages.Robot.getDefaultInstance() : red2_;
   }
 
   public static final int RED3_FIELD_NUMBER = 3;
@@ -279,13 +254,13 @@ public final class VisionRobot extends
    * <code>optional .messages.Robot red3 = 3;</code>
    */
   public messages.Robot getRed3() {
-    return red3_;
+    return red3_ == null ? messages.Robot.getDefaultInstance() : red3_;
   }
   /**
    * <code>optional .messages.Robot red3 = 3;</code>
    */
   public messages.RobotOrBuilder getRed3OrBuilder() {
-    return red3_;
+    return red3_ == null ? messages.Robot.getDefaultInstance() : red3_;
   }
 
   public static final int RED4_FIELD_NUMBER = 4;
@@ -300,13 +275,13 @@ public final class VisionRobot extends
    * <code>optional .messages.Robot red4 = 4;</code>
    */
   public messages.Robot getRed4() {
-    return red4_;
+    return red4_ == null ? messages.Robot.getDefaultInstance() : red4_;
   }
   /**
    * <code>optional .messages.Robot red4 = 4;</code>
    */
   public messages.RobotOrBuilder getRed4OrBuilder() {
-    return red4_;
+    return red4_ == null ? messages.Robot.getDefaultInstance() : red4_;
   }
 
   public static final int RED5_FIELD_NUMBER = 5;
@@ -321,13 +296,13 @@ public final class VisionRobot extends
    * <code>optional .messages.Robot red5 = 5;</code>
    */
   public messages.Robot getRed5() {
-    return red5_;
+    return red5_ == null ? messages.Robot.getDefaultInstance() : red5_;
   }
   /**
    * <code>optional .messages.Robot red5 = 5;</code>
    */
   public messages.RobotOrBuilder getRed5OrBuilder() {
-    return red5_;
+    return red5_ == null ? messages.Robot.getDefaultInstance() : red5_;
   }
 
   public static final int NAVY1_FIELD_NUMBER = 6;
@@ -342,13 +317,13 @@ public final class VisionRobot extends
    * <code>optional .messages.Robot navy1 = 6;</code>
    */
   public messages.Robot getNavy1() {
-    return navy1_;
+    return navy1_ == null ? messages.Robot.getDefaultInstance() : navy1_;
   }
   /**
    * <code>optional .messages.Robot navy1 = 6;</code>
    */
   public messages.RobotOrBuilder getNavy1OrBuilder() {
-    return navy1_;
+    return navy1_ == null ? messages.Robot.getDefaultInstance() : navy1_;
   }
 
   public static final int NAVY2_FIELD_NUMBER = 7;
@@ -363,13 +338,13 @@ public final class VisionRobot extends
    * <code>optional .messages.Robot navy2 = 7;</code>
    */
   public messages.Robot getNavy2() {
-    return navy2_;
+    return navy2_ == null ? messages.Robot.getDefaultInstance() : navy2_;
   }
   /**
    * <code>optional .messages.Robot navy2 = 7;</code>
    */
   public messages.RobotOrBuilder getNavy2OrBuilder() {
-    return navy2_;
+    return navy2_ == null ? messages.Robot.getDefaultInstance() : navy2_;
   }
 
   public static final int NAVY3_FIELD_NUMBER = 8;
@@ -384,13 +359,13 @@ public final class VisionRobot extends
    * <code>optional .messages.Robot navy3 = 8;</code>
    */
   public messages.Robot getNavy3() {
-    return navy3_;
+    return navy3_ == null ? messages.Robot.getDefaultInstance() : navy3_;
   }
   /**
    * <code>optional .messages.Robot navy3 = 8;</code>
    */
   public messages.RobotOrBuilder getNavy3OrBuilder() {
-    return navy3_;
+    return navy3_ == null ? messages.Robot.getDefaultInstance() : navy3_;
   }
 
   public static final int NAVY4_FIELD_NUMBER = 9;
@@ -405,13 +380,13 @@ public final class VisionRobot extends
    * <code>optional .messages.Robot navy4 = 9;</code>
    */
   public messages.Robot getNavy4() {
-    return navy4_;
+    return navy4_ == null ? messages.Robot.getDefaultInstance() : navy4_;
   }
   /**
    * <code>optional .messages.Robot navy4 = 9;</code>
    */
   public messages.RobotOrBuilder getNavy4OrBuilder() {
-    return navy4_;
+    return navy4_ == null ? messages.Robot.getDefaultInstance() : navy4_;
   }
 
   public static final int NAVY5_FIELD_NUMBER = 10;
@@ -426,27 +401,15 @@ public final class VisionRobot extends
    * <code>optional .messages.Robot navy5 = 10;</code>
    */
   public messages.Robot getNavy5() {
-    return navy5_;
+    return navy5_ == null ? messages.Robot.getDefaultInstance() : navy5_;
   }
   /**
    * <code>optional .messages.Robot navy5 = 10;</code>
    */
   public messages.RobotOrBuilder getNavy5OrBuilder() {
-    return navy5_;
+    return navy5_ == null ? messages.Robot.getDefaultInstance() : navy5_;
   }
 
-  private void initFields() {
-    red1_ = messages.Robot.getDefaultInstance();
-    red2_ = messages.Robot.getDefaultInstance();
-    red3_ = messages.Robot.getDefaultInstance();
-    red4_ = messages.Robot.getDefaultInstance();
-    red5_ = messages.Robot.getDefaultInstance();
-    navy1_ = messages.Robot.getDefaultInstance();
-    navy2_ = messages.Robot.getDefaultInstance();
-    navy3_ = messages.Robot.getDefaultInstance();
-    navy4_ = messages.Robot.getDefaultInstance();
-    navy5_ = messages.Robot.getDefaultInstance();
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -459,98 +422,90 @@ public final class VisionRobot extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeMessage(1, red1_);
+      output.writeMessage(1, getRed1());
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      output.writeMessage(2, red2_);
+      output.writeMessage(2, getRed2());
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
-      output.writeMessage(3, red3_);
+      output.writeMessage(3, getRed3());
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
-      output.writeMessage(4, red4_);
+      output.writeMessage(4, getRed4());
     }
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
-      output.writeMessage(5, red5_);
+      output.writeMessage(5, getRed5());
     }
     if (((bitField0_ & 0x00000020) == 0x00000020)) {
-      output.writeMessage(6, navy1_);
+      output.writeMessage(6, getNavy1());
     }
     if (((bitField0_ & 0x00000040) == 0x00000040)) {
-      output.writeMessage(7, navy2_);
+      output.writeMessage(7, getNavy2());
     }
     if (((bitField0_ & 0x00000080) == 0x00000080)) {
-      output.writeMessage(8, navy3_);
+      output.writeMessage(8, getNavy3());
     }
     if (((bitField0_ & 0x00000100) == 0x00000100)) {
-      output.writeMessage(9, navy4_);
+      output.writeMessage(9, getNavy4());
     }
     if (((bitField0_ & 0x00000200) == 0x00000200)) {
-      output.writeMessage(10, navy5_);
+      output.writeMessage(10, getNavy5());
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, red1_);
+        .computeMessageSize(1, getRed1());
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(2, red2_);
+        .computeMessageSize(2, getRed2());
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(3, red3_);
+        .computeMessageSize(3, getRed3());
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(4, red4_);
+        .computeMessageSize(4, getRed4());
     }
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(5, red5_);
+        .computeMessageSize(5, getRed5());
     }
     if (((bitField0_ & 0x00000020) == 0x00000020)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(6, navy1_);
+        .computeMessageSize(6, getNavy1());
     }
     if (((bitField0_ & 0x00000040) == 0x00000040)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(7, navy2_);
+        .computeMessageSize(7, getNavy2());
     }
     if (((bitField0_ & 0x00000080) == 0x00000080)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(8, navy3_);
+        .computeMessageSize(8, getNavy3());
     }
     if (((bitField0_ & 0x00000100) == 0x00000100)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(9, navy4_);
+        .computeMessageSize(9, getNavy4());
     }
     if (((bitField0_ & 0x00000200) == 0x00000200)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(10, navy5_);
+        .computeMessageSize(10, getNavy5());
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.VisionRobot parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -604,12 +559,17 @@ public final class VisionRobot extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.VisionRobot prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.VisionRobot prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -660,77 +620,69 @@ public final class VisionRobot extends
         getNavy5FieldBuilder();
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       if (red1Builder_ == null) {
-        red1_ = messages.Robot.getDefaultInstance();
+        red1_ = null;
       } else {
         red1Builder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000001);
       if (red2Builder_ == null) {
-        red2_ = messages.Robot.getDefaultInstance();
+        red2_ = null;
       } else {
         red2Builder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000002);
       if (red3Builder_ == null) {
-        red3_ = messages.Robot.getDefaultInstance();
+        red3_ = null;
       } else {
         red3Builder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000004);
       if (red4Builder_ == null) {
-        red4_ = messages.Robot.getDefaultInstance();
+        red4_ = null;
       } else {
         red4Builder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000008);
       if (red5Builder_ == null) {
-        red5_ = messages.Robot.getDefaultInstance();
+        red5_ = null;
       } else {
         red5Builder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000010);
       if (navy1Builder_ == null) {
-        navy1_ = messages.Robot.getDefaultInstance();
+        navy1_ = null;
       } else {
         navy1Builder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000020);
       if (navy2Builder_ == null) {
-        navy2_ = messages.Robot.getDefaultInstance();
+        navy2_ = null;
       } else {
         navy2Builder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000040);
       if (navy3Builder_ == null) {
-        navy3_ = messages.Robot.getDefaultInstance();
+        navy3_ = null;
       } else {
         navy3Builder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000080);
       if (navy4Builder_ == null) {
-        navy4_ = messages.Robot.getDefaultInstance();
+        navy4_ = null;
       } else {
         navy4Builder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000100);
       if (navy5Builder_ == null) {
-        navy5_ = messages.Robot.getDefaultInstance();
+        navy5_ = null;
       } else {
         navy5Builder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000200);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -880,7 +832,8 @@ public final class VisionRobot extends
       if (other.hasNavy5()) {
         mergeNavy5(other.getNavy5());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -907,7 +860,7 @@ public final class VisionRobot extends
     }
     private int bitField0_;
 
-    private messages.Robot red1_ = messages.Robot.getDefaultInstance();
+    private messages.Robot red1_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> red1Builder_;
     /**
@@ -921,7 +874,7 @@ public final class VisionRobot extends
      */
     public messages.Robot getRed1() {
       if (red1Builder_ == null) {
-        return red1_;
+        return red1_ == null ? messages.Robot.getDefaultInstance() : red1_;
       } else {
         return red1Builder_.getMessage();
       }
@@ -962,6 +915,7 @@ public final class VisionRobot extends
     public Builder mergeRed1(messages.Robot value) {
       if (red1Builder_ == null) {
         if (((bitField0_ & 0x00000001) == 0x00000001) &&
+            red1_ != null &&
             red1_ != messages.Robot.getDefaultInstance()) {
           red1_ =
             messages.Robot.newBuilder(red1_).mergeFrom(value).buildPartial();
@@ -980,7 +934,7 @@ public final class VisionRobot extends
      */
     public Builder clearRed1() {
       if (red1Builder_ == null) {
-        red1_ = messages.Robot.getDefaultInstance();
+        red1_ = null;
         onChanged();
       } else {
         red1Builder_.clear();
@@ -1003,7 +957,8 @@ public final class VisionRobot extends
       if (red1Builder_ != null) {
         return red1Builder_.getMessageOrBuilder();
       } else {
-        return red1_;
+        return red1_ == null ?
+            messages.Robot.getDefaultInstance() : red1_;
       }
     }
     /**
@@ -1023,7 +978,7 @@ public final class VisionRobot extends
       return red1Builder_;
     }
 
-    private messages.Robot red2_ = messages.Robot.getDefaultInstance();
+    private messages.Robot red2_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> red2Builder_;
     /**
@@ -1037,7 +992,7 @@ public final class VisionRobot extends
      */
     public messages.Robot getRed2() {
       if (red2Builder_ == null) {
-        return red2_;
+        return red2_ == null ? messages.Robot.getDefaultInstance() : red2_;
       } else {
         return red2Builder_.getMessage();
       }
@@ -1078,6 +1033,7 @@ public final class VisionRobot extends
     public Builder mergeRed2(messages.Robot value) {
       if (red2Builder_ == null) {
         if (((bitField0_ & 0x00000002) == 0x00000002) &&
+            red2_ != null &&
             red2_ != messages.Robot.getDefaultInstance()) {
           red2_ =
             messages.Robot.newBuilder(red2_).mergeFrom(value).buildPartial();
@@ -1096,7 +1052,7 @@ public final class VisionRobot extends
      */
     public Builder clearRed2() {
       if (red2Builder_ == null) {
-        red2_ = messages.Robot.getDefaultInstance();
+        red2_ = null;
         onChanged();
       } else {
         red2Builder_.clear();
@@ -1119,7 +1075,8 @@ public final class VisionRobot extends
       if (red2Builder_ != null) {
         return red2Builder_.getMessageOrBuilder();
       } else {
-        return red2_;
+        return red2_ == null ?
+            messages.Robot.getDefaultInstance() : red2_;
       }
     }
     /**
@@ -1139,7 +1096,7 @@ public final class VisionRobot extends
       return red2Builder_;
     }
 
-    private messages.Robot red3_ = messages.Robot.getDefaultInstance();
+    private messages.Robot red3_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> red3Builder_;
     /**
@@ -1153,7 +1110,7 @@ public final class VisionRobot extends
      */
     public messages.Robot getRed3() {
       if (red3Builder_ == null) {
-        return red3_;
+        return red3_ == null ? messages.Robot.getDefaultInstance() : red3_;
       } else {
         return red3Builder_.getMessage();
       }
@@ -1194,6 +1151,7 @@ public final class VisionRobot extends
     public Builder mergeRed3(messages.Robot value) {
       if (red3Builder_ == null) {
         if (((bitField0_ & 0x00000004) == 0x00000004) &&
+            red3_ != null &&
             red3_ != messages.Robot.getDefaultInstance()) {
           red3_ =
             messages.Robot.newBuilder(red3_).mergeFrom(value).buildPartial();
@@ -1212,7 +1170,7 @@ public final class VisionRobot extends
      */
     public Builder clearRed3() {
       if (red3Builder_ == null) {
-        red3_ = messages.Robot.getDefaultInstance();
+        red3_ = null;
         onChanged();
       } else {
         red3Builder_.clear();
@@ -1235,7 +1193,8 @@ public final class VisionRobot extends
       if (red3Builder_ != null) {
         return red3Builder_.getMessageOrBuilder();
       } else {
-        return red3_;
+        return red3_ == null ?
+            messages.Robot.getDefaultInstance() : red3_;
       }
     }
     /**
@@ -1255,7 +1214,7 @@ public final class VisionRobot extends
       return red3Builder_;
     }
 
-    private messages.Robot red4_ = messages.Robot.getDefaultInstance();
+    private messages.Robot red4_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> red4Builder_;
     /**
@@ -1269,7 +1228,7 @@ public final class VisionRobot extends
      */
     public messages.Robot getRed4() {
       if (red4Builder_ == null) {
-        return red4_;
+        return red4_ == null ? messages.Robot.getDefaultInstance() : red4_;
       } else {
         return red4Builder_.getMessage();
       }
@@ -1310,6 +1269,7 @@ public final class VisionRobot extends
     public Builder mergeRed4(messages.Robot value) {
       if (red4Builder_ == null) {
         if (((bitField0_ & 0x00000008) == 0x00000008) &&
+            red4_ != null &&
             red4_ != messages.Robot.getDefaultInstance()) {
           red4_ =
             messages.Robot.newBuilder(red4_).mergeFrom(value).buildPartial();
@@ -1328,7 +1288,7 @@ public final class VisionRobot extends
      */
     public Builder clearRed4() {
       if (red4Builder_ == null) {
-        red4_ = messages.Robot.getDefaultInstance();
+        red4_ = null;
         onChanged();
       } else {
         red4Builder_.clear();
@@ -1351,7 +1311,8 @@ public final class VisionRobot extends
       if (red4Builder_ != null) {
         return red4Builder_.getMessageOrBuilder();
       } else {
-        return red4_;
+        return red4_ == null ?
+            messages.Robot.getDefaultInstance() : red4_;
       }
     }
     /**
@@ -1371,7 +1332,7 @@ public final class VisionRobot extends
       return red4Builder_;
     }
 
-    private messages.Robot red5_ = messages.Robot.getDefaultInstance();
+    private messages.Robot red5_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> red5Builder_;
     /**
@@ -1385,7 +1346,7 @@ public final class VisionRobot extends
      */
     public messages.Robot getRed5() {
       if (red5Builder_ == null) {
-        return red5_;
+        return red5_ == null ? messages.Robot.getDefaultInstance() : red5_;
       } else {
         return red5Builder_.getMessage();
       }
@@ -1426,6 +1387,7 @@ public final class VisionRobot extends
     public Builder mergeRed5(messages.Robot value) {
       if (red5Builder_ == null) {
         if (((bitField0_ & 0x00000010) == 0x00000010) &&
+            red5_ != null &&
             red5_ != messages.Robot.getDefaultInstance()) {
           red5_ =
             messages.Robot.newBuilder(red5_).mergeFrom(value).buildPartial();
@@ -1444,7 +1406,7 @@ public final class VisionRobot extends
      */
     public Builder clearRed5() {
       if (red5Builder_ == null) {
-        red5_ = messages.Robot.getDefaultInstance();
+        red5_ = null;
         onChanged();
       } else {
         red5Builder_.clear();
@@ -1467,7 +1429,8 @@ public final class VisionRobot extends
       if (red5Builder_ != null) {
         return red5Builder_.getMessageOrBuilder();
       } else {
-        return red5_;
+        return red5_ == null ?
+            messages.Robot.getDefaultInstance() : red5_;
       }
     }
     /**
@@ -1487,7 +1450,7 @@ public final class VisionRobot extends
       return red5Builder_;
     }
 
-    private messages.Robot navy1_ = messages.Robot.getDefaultInstance();
+    private messages.Robot navy1_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> navy1Builder_;
     /**
@@ -1501,7 +1464,7 @@ public final class VisionRobot extends
      */
     public messages.Robot getNavy1() {
       if (navy1Builder_ == null) {
-        return navy1_;
+        return navy1_ == null ? messages.Robot.getDefaultInstance() : navy1_;
       } else {
         return navy1Builder_.getMessage();
       }
@@ -1542,6 +1505,7 @@ public final class VisionRobot extends
     public Builder mergeNavy1(messages.Robot value) {
       if (navy1Builder_ == null) {
         if (((bitField0_ & 0x00000020) == 0x00000020) &&
+            navy1_ != null &&
             navy1_ != messages.Robot.getDefaultInstance()) {
           navy1_ =
             messages.Robot.newBuilder(navy1_).mergeFrom(value).buildPartial();
@@ -1560,7 +1524,7 @@ public final class VisionRobot extends
      */
     public Builder clearNavy1() {
       if (navy1Builder_ == null) {
-        navy1_ = messages.Robot.getDefaultInstance();
+        navy1_ = null;
         onChanged();
       } else {
         navy1Builder_.clear();
@@ -1583,7 +1547,8 @@ public final class VisionRobot extends
       if (navy1Builder_ != null) {
         return navy1Builder_.getMessageOrBuilder();
       } else {
-        return navy1_;
+        return navy1_ == null ?
+            messages.Robot.getDefaultInstance() : navy1_;
       }
     }
     /**
@@ -1603,7 +1568,7 @@ public final class VisionRobot extends
       return navy1Builder_;
     }
 
-    private messages.Robot navy2_ = messages.Robot.getDefaultInstance();
+    private messages.Robot navy2_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> navy2Builder_;
     /**
@@ -1617,7 +1582,7 @@ public final class VisionRobot extends
      */
     public messages.Robot getNavy2() {
       if (navy2Builder_ == null) {
-        return navy2_;
+        return navy2_ == null ? messages.Robot.getDefaultInstance() : navy2_;
       } else {
         return navy2Builder_.getMessage();
       }
@@ -1658,6 +1623,7 @@ public final class VisionRobot extends
     public Builder mergeNavy2(messages.Robot value) {
       if (navy2Builder_ == null) {
         if (((bitField0_ & 0x00000040) == 0x00000040) &&
+            navy2_ != null &&
             navy2_ != messages.Robot.getDefaultInstance()) {
           navy2_ =
             messages.Robot.newBuilder(navy2_).mergeFrom(value).buildPartial();
@@ -1676,7 +1642,7 @@ public final class VisionRobot extends
      */
     public Builder clearNavy2() {
       if (navy2Builder_ == null) {
-        navy2_ = messages.Robot.getDefaultInstance();
+        navy2_ = null;
         onChanged();
       } else {
         navy2Builder_.clear();
@@ -1699,7 +1665,8 @@ public final class VisionRobot extends
       if (navy2Builder_ != null) {
         return navy2Builder_.getMessageOrBuilder();
       } else {
-        return navy2_;
+        return navy2_ == null ?
+            messages.Robot.getDefaultInstance() : navy2_;
       }
     }
     /**
@@ -1719,7 +1686,7 @@ public final class VisionRobot extends
       return navy2Builder_;
     }
 
-    private messages.Robot navy3_ = messages.Robot.getDefaultInstance();
+    private messages.Robot navy3_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> navy3Builder_;
     /**
@@ -1733,7 +1700,7 @@ public final class VisionRobot extends
      */
     public messages.Robot getNavy3() {
       if (navy3Builder_ == null) {
-        return navy3_;
+        return navy3_ == null ? messages.Robot.getDefaultInstance() : navy3_;
       } else {
         return navy3Builder_.getMessage();
       }
@@ -1774,6 +1741,7 @@ public final class VisionRobot extends
     public Builder mergeNavy3(messages.Robot value) {
       if (navy3Builder_ == null) {
         if (((bitField0_ & 0x00000080) == 0x00000080) &&
+            navy3_ != null &&
             navy3_ != messages.Robot.getDefaultInstance()) {
           navy3_ =
             messages.Robot.newBuilder(navy3_).mergeFrom(value).buildPartial();
@@ -1792,7 +1760,7 @@ public final class VisionRobot extends
      */
     public Builder clearNavy3() {
       if (navy3Builder_ == null) {
-        navy3_ = messages.Robot.getDefaultInstance();
+        navy3_ = null;
         onChanged();
       } else {
         navy3Builder_.clear();
@@ -1815,7 +1783,8 @@ public final class VisionRobot extends
       if (navy3Builder_ != null) {
         return navy3Builder_.getMessageOrBuilder();
       } else {
-        return navy3_;
+        return navy3_ == null ?
+            messages.Robot.getDefaultInstance() : navy3_;
       }
     }
     /**
@@ -1835,7 +1804,7 @@ public final class VisionRobot extends
       return navy3Builder_;
     }
 
-    private messages.Robot navy4_ = messages.Robot.getDefaultInstance();
+    private messages.Robot navy4_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> navy4Builder_;
     /**
@@ -1849,7 +1818,7 @@ public final class VisionRobot extends
      */
     public messages.Robot getNavy4() {
       if (navy4Builder_ == null) {
-        return navy4_;
+        return navy4_ == null ? messages.Robot.getDefaultInstance() : navy4_;
       } else {
         return navy4Builder_.getMessage();
       }
@@ -1890,6 +1859,7 @@ public final class VisionRobot extends
     public Builder mergeNavy4(messages.Robot value) {
       if (navy4Builder_ == null) {
         if (((bitField0_ & 0x00000100) == 0x00000100) &&
+            navy4_ != null &&
             navy4_ != messages.Robot.getDefaultInstance()) {
           navy4_ =
             messages.Robot.newBuilder(navy4_).mergeFrom(value).buildPartial();
@@ -1908,7 +1878,7 @@ public final class VisionRobot extends
      */
     public Builder clearNavy4() {
       if (navy4Builder_ == null) {
-        navy4_ = messages.Robot.getDefaultInstance();
+        navy4_ = null;
         onChanged();
       } else {
         navy4Builder_.clear();
@@ -1931,7 +1901,8 @@ public final class VisionRobot extends
       if (navy4Builder_ != null) {
         return navy4Builder_.getMessageOrBuilder();
       } else {
-        return navy4_;
+        return navy4_ == null ?
+            messages.Robot.getDefaultInstance() : navy4_;
       }
     }
     /**
@@ -1951,7 +1922,7 @@ public final class VisionRobot extends
       return navy4Builder_;
     }
 
-    private messages.Robot navy5_ = messages.Robot.getDefaultInstance();
+    private messages.Robot navy5_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.Robot, messages.Robot.Builder, messages.RobotOrBuilder> navy5Builder_;
     /**
@@ -1965,7 +1936,7 @@ public final class VisionRobot extends
      */
     public messages.Robot getNavy5() {
       if (navy5Builder_ == null) {
-        return navy5_;
+        return navy5_ == null ? messages.Robot.getDefaultInstance() : navy5_;
       } else {
         return navy5Builder_.getMessage();
       }
@@ -2006,6 +1977,7 @@ public final class VisionRobot extends
     public Builder mergeNavy5(messages.Robot value) {
       if (navy5Builder_ == null) {
         if (((bitField0_ & 0x00000200) == 0x00000200) &&
+            navy5_ != null &&
             navy5_ != messages.Robot.getDefaultInstance()) {
           navy5_ =
             messages.Robot.newBuilder(navy5_).mergeFrom(value).buildPartial();
@@ -2024,7 +1996,7 @@ public final class VisionRobot extends
      */
     public Builder clearNavy5() {
       if (navy5Builder_ == null) {
-        navy5_ = messages.Robot.getDefaultInstance();
+        navy5_ = null;
         onChanged();
       } else {
         navy5Builder_.clear();
@@ -2047,7 +2019,8 @@ public final class VisionRobot extends
       if (navy5Builder_ != null) {
         return navy5Builder_.getMessageOrBuilder();
       } else {
-        return navy5_;
+        return navy5_ == null ?
+            messages.Robot.getDefaultInstance() : navy5_;
       }
     }
     /**
@@ -2070,11 +2043,47 @@ public final class VisionRobot extends
     // @@protoc_insertion_point(builder_scope:messages.VisionRobot)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.VisionRobot)
+  private static final messages.VisionRobot DEFAULT_INSTANCE;
   static {
-    defaultInstance = new VisionRobot(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.VisionRobot();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.VisionRobot)
+  public static messages.VisionRobot getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<VisionRobot>
+      PARSER = new com.google.protobuf.AbstractParser<VisionRobot>() {
+    public VisionRobot parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new VisionRobot(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<VisionRobot> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<VisionRobot> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.VisionRobot getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

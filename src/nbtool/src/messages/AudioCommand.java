@@ -6,37 +6,27 @@ package messages;
 /**
  * Protobuf type {@code messages.AudioCommand}
  */
-public final class AudioCommand extends
+public  final class AudioCommand extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.AudioCommand)
     AudioCommandOrBuilder {
   // Use AudioCommand.newBuilder() to construct.
   private AudioCommand(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private AudioCommand(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final AudioCommand defaultInstance;
-  public static AudioCommand getDefaultInstance() {
-    return defaultInstance;
+  private AudioCommand() {
+    audioFile_ = "";
   }
 
-  public AudioCommand getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private AudioCommand(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -64,10 +54,11 @@ public final class AudioCommand extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -85,24 +76,9 @@ public final class AudioCommand extends
             messages.AudioCommand.class, messages.AudioCommand.Builder.class);
   }
 
-  public static com.google.protobuf.Parser<AudioCommand> PARSER =
-      new com.google.protobuf.AbstractParser<AudioCommand>() {
-    public AudioCommand parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new AudioCommand(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<AudioCommand> getParserForType() {
-    return PARSER;
-  }
-
   private int bitField0_;
   public static final int AUDIO_FILE_FIELD_NUMBER = 1;
-  private java.lang.Object audioFile_;
+  private volatile java.lang.Object audioFile_;
   /**
    * <code>optional string audio_file = 1;</code>
    *
@@ -155,9 +131,6 @@ public final class AudioCommand extends
     }
   }
 
-  private void initFields() {
-    audioFile_ = "";
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -170,35 +143,26 @@ public final class AudioCommand extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeBytes(1, getAudioFileBytes());
+      com.google.protobuf.GeneratedMessage.writeString(output, 1, audioFile_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeBytesSize(1, getAudioFileBytes());
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(1, audioFile_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.AudioCommand parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -252,12 +216,17 @@ public final class AudioCommand extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.AudioCommand prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.AudioCommand prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -298,19 +267,11 @@ public final class AudioCommand extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       audioFile_ = "";
       bitField0_ = (bitField0_ & ~0x00000001);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -359,7 +320,8 @@ public final class AudioCommand extends
         audioFile_ = other.audioFile_;
         onChanged();
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -489,11 +451,47 @@ public final class AudioCommand extends
     // @@protoc_insertion_point(builder_scope:messages.AudioCommand)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.AudioCommand)
+  private static final messages.AudioCommand DEFAULT_INSTANCE;
   static {
-    defaultInstance = new AudioCommand(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.AudioCommand();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.AudioCommand)
+  public static messages.AudioCommand getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<AudioCommand>
+      PARSER = new com.google.protobuf.AbstractParser<AudioCommand>() {
+    public AudioCommand parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new AudioCommand(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<AudioCommand> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<AudioCommand> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.AudioCommand getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

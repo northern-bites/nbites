@@ -6,37 +6,27 @@ package messages;
 /**
  * Protobuf type {@code messages.Toggle}
  */
-public final class Toggle extends
+public  final class Toggle extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.Toggle)
     ToggleOrBuilder {
   // Use Toggle.newBuilder() to construct.
   private Toggle(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private Toggle(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final Toggle defaultInstance;
-  public static Toggle getDefaultInstance() {
-    return defaultInstance;
+  private Toggle() {
+    toggle_ = false;
   }
 
-  public Toggle getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private Toggle(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -63,10 +53,11 @@ public final class Toggle extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -82,21 +73,6 @@ public final class Toggle extends
     return messages._File_Toggle.internal_static_messages_Toggle_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.Toggle.class, messages.Toggle.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<Toggle> PARSER =
-      new com.google.protobuf.AbstractParser<Toggle>() {
-    public Toggle parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new Toggle(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<Toggle> getParserForType() {
-    return PARSER;
   }
 
   private int bitField0_;
@@ -123,9 +99,6 @@ public final class Toggle extends
     return toggle_;
   }
 
-  private void initFields() {
-    toggle_ = false;
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -138,16 +111,14 @@ public final class Toggle extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeBool(1, toggle_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -155,18 +126,12 @@ public final class Toggle extends
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(1, toggle_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.Toggle parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -220,12 +185,17 @@ public final class Toggle extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.Toggle prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.Toggle prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -266,19 +236,11 @@ public final class Toggle extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       toggle_ = false;
       bitField0_ = (bitField0_ & ~0x00000001);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -325,7 +287,8 @@ public final class Toggle extends
       if (other.hasToggle()) {
         setToggle(other.getToggle());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -403,11 +366,47 @@ public final class Toggle extends
     // @@protoc_insertion_point(builder_scope:messages.Toggle)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.Toggle)
+  private static final messages.Toggle DEFAULT_INSTANCE;
   static {
-    defaultInstance = new Toggle(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.Toggle();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.Toggle)
+  public static messages.Toggle getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<Toggle>
+      PARSER = new com.google.protobuf.AbstractParser<Toggle>() {
+    public Toggle parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new Toggle(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<Toggle> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<Toggle> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.Toggle getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

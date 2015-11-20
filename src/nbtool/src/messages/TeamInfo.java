@@ -6,37 +6,31 @@ package messages;
 /**
  * Protobuf type {@code messages.TeamInfo}
  */
-public final class TeamInfo extends
+public  final class TeamInfo extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.TeamInfo)
     TeamInfoOrBuilder {
   // Use TeamInfo.newBuilder() to construct.
   private TeamInfo(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private TeamInfo(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final TeamInfo defaultInstance;
-  public static TeamInfo getDefaultInstance() {
-    return defaultInstance;
-  }
-
-  public TeamInfo getDefaultInstanceForType() {
-    return defaultInstance;
+  private TeamInfo() {
+    teamNumber_ = 0;
+    teamColor_ = 0;
+    score_ = 0;
+    goalColor_ = 0;
+    player_ = java.util.Collections.emptyList();
   }
 
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private TeamInfo(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -80,16 +74,17 @@ public final class TeamInfo extends
               player_ = new java.util.ArrayList<messages.RobotInfo>();
               mutable_bitField0_ |= 0x00000010;
             }
-            player_.add(input.readMessage(messages.RobotInfo.PARSER, extensionRegistry));
+            player_.add(input.readMessage(messages.RobotInfo.parser(), extensionRegistry));
             break;
           }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
         player_ = java.util.Collections.unmodifiableList(player_);
@@ -108,21 +103,6 @@ public final class TeamInfo extends
     return messages._File_GameState.internal_static_messages_TeamInfo_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.TeamInfo.class, messages.TeamInfo.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<TeamInfo> PARSER =
-      new com.google.protobuf.AbstractParser<TeamInfo>() {
-    public TeamInfo parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new TeamInfo(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<TeamInfo> getParserForType() {
-    return PARSER;
   }
 
   private int bitField0_;
@@ -221,13 +201,6 @@ public final class TeamInfo extends
     return player_.get(index);
   }
 
-  private void initFields() {
-    teamNumber_ = 0;
-    teamColor_ = 0;
-    score_ = 0;
-    goalColor_ = 0;
-    player_ = java.util.Collections.emptyList();
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -240,7 +213,6 @@ public final class TeamInfo extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeUInt32(1, teamNumber_);
     }
@@ -256,12 +228,11 @@ public final class TeamInfo extends
     for (int i = 0; i < player_.size(); i++) {
       output.writeMessage(5, player_.get(i));
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -285,18 +256,12 @@ public final class TeamInfo extends
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(5, player_.get(i));
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.TeamInfo parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -350,12 +315,17 @@ public final class TeamInfo extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.TeamInfo prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.TeamInfo prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -397,10 +367,6 @@ public final class TeamInfo extends
         getPlayerFieldBuilder();
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       teamNumber_ = 0;
@@ -418,10 +384,6 @@ public final class TeamInfo extends
         playerBuilder_.clear();
       }
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -524,7 +486,8 @@ public final class TeamInfo extends
           }
         }
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -922,11 +885,47 @@ public final class TeamInfo extends
     // @@protoc_insertion_point(builder_scope:messages.TeamInfo)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.TeamInfo)
+  private static final messages.TeamInfo DEFAULT_INSTANCE;
   static {
-    defaultInstance = new TeamInfo(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.TeamInfo();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.TeamInfo)
+  public static messages.TeamInfo getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<TeamInfo>
+      PARSER = new com.google.protobuf.AbstractParser<TeamInfo>() {
+    public TeamInfo parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new TeamInfo(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<TeamInfo> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<TeamInfo> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.TeamInfo getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

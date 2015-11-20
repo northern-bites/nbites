@@ -6,37 +6,27 @@ package messages;
 /**
  * Protobuf type {@code messages.ButtonState}
  */
-public final class ButtonState extends
+public  final class ButtonState extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.ButtonState)
     ButtonStateOrBuilder {
   // Use ButtonState.newBuilder() to construct.
   private ButtonState(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private ButtonState(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final ButtonState defaultInstance;
-  public static ButtonState getDefaultInstance() {
-    return defaultInstance;
+  private ButtonState() {
+    pressed_ = false;
   }
 
-  public ButtonState getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private ButtonState(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -63,10 +53,11 @@ public final class ButtonState extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -82,21 +73,6 @@ public final class ButtonState extends
     return messages._File_ButtonState.internal_static_messages_ButtonState_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.ButtonState.class, messages.ButtonState.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<ButtonState> PARSER =
-      new com.google.protobuf.AbstractParser<ButtonState>() {
-    public ButtonState parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new ButtonState(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<ButtonState> getParserForType() {
-    return PARSER;
   }
 
   private int bitField0_;
@@ -115,9 +91,6 @@ public final class ButtonState extends
     return pressed_;
   }
 
-  private void initFields() {
-    pressed_ = false;
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -130,16 +103,14 @@ public final class ButtonState extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeBool(1, pressed_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -147,18 +118,12 @@ public final class ButtonState extends
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(1, pressed_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.ButtonState parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -212,12 +177,17 @@ public final class ButtonState extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.ButtonState prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.ButtonState prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -258,19 +228,11 @@ public final class ButtonState extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       pressed_ = false;
       bitField0_ = (bitField0_ & ~0x00000001);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -317,7 +279,8 @@ public final class ButtonState extends
       if (other.hasPressed()) {
         setPressed(other.getPressed());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -379,11 +342,47 @@ public final class ButtonState extends
     // @@protoc_insertion_point(builder_scope:messages.ButtonState)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.ButtonState)
+  private static final messages.ButtonState DEFAULT_INSTANCE;
   static {
-    defaultInstance = new ButtonState(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.ButtonState();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.ButtonState)
+  public static messages.ButtonState getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<ButtonState>
+      PARSER = new com.google.protobuf.AbstractParser<ButtonState>() {
+    public ButtonState parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new ButtonState(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<ButtonState> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<ButtonState> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.ButtonState getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

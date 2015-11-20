@@ -8,22 +8,22 @@ public final class _File_VisionRobot {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_VisionRobot_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_VisionRobot_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_Robot_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_Robot_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_VisionObstacle_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_VisionObstacle_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_RobotObstacle_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable

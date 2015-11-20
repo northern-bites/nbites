@@ -6,37 +6,43 @@ package messages;
 /**
  * Protobuf type {@code messages.VBall}
  */
-public final class VBall extends
+public  final class VBall extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.VBall)
     VBallOrBuilder {
   // Use VBall.newBuilder() to construct.
   private VBall(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private VBall(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final VBall defaultInstance;
-  public static VBall getDefaultInstance() {
-    return defaultInstance;
+  private VBall() {
+    distance_ = 0D;
+    bearing_ = 0D;
+    angleXDeg_ = 0D;
+    angleYDeg_ = 0D;
+    bearingSd_ = 0D;
+    inTopCam_ = false;
+    radius_ = 0D;
+    confidence_ = 0D;
+    on_ = false;
+    framesOn_ = 0;
+    framesOff_ = 0;
+    relXVariance_ = 0D;
+    relYVariance_ = 0D;
+    bearingDeg_ = 0D;
+    x_ = 0;
+    y_ = 0;
+    wz0_ = 0F;
   }
 
-  public VBall getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private VBall(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -135,13 +141,19 @@ public final class VBall extends
             y_ = input.readSInt32();
             break;
           }
+          case 141: {
+            bitField0_ |= 0x00010000;
+            wz0_ = input.readFloat();
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -157,21 +169,6 @@ public final class VBall extends
     return messages._File_Vision.internal_static_messages_VBall_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.VBall.class, messages.VBall.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<VBall> PARSER =
-      new com.google.protobuf.AbstractParser<VBall>() {
-    public VBall parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new VBall(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<VBall> getParserForType() {
-    return PARSER;
   }
 
   private int bitField0_;
@@ -415,24 +412,21 @@ public final class VBall extends
     return y_;
   }
 
-  private void initFields() {
-    distance_ = 0D;
-    bearing_ = 0D;
-    angleXDeg_ = 0D;
-    angleYDeg_ = 0D;
-    bearingSd_ = 0D;
-    inTopCam_ = false;
-    radius_ = 0D;
-    confidence_ = 0D;
-    on_ = false;
-    framesOn_ = 0;
-    framesOff_ = 0;
-    relXVariance_ = 0D;
-    relYVariance_ = 0D;
-    bearingDeg_ = 0D;
-    x_ = 0;
-    y_ = 0;
+  public static final int WZ0_FIELD_NUMBER = 17;
+  private float wz0_;
+  /**
+   * <code>optional float wz0 = 17;</code>
+   */
+  public boolean hasWz0() {
+    return ((bitField0_ & 0x00010000) == 0x00010000);
   }
+  /**
+   * <code>optional float wz0 = 17;</code>
+   */
+  public float getWz0() {
+    return wz0_;
+  }
+
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -445,7 +439,6 @@ public final class VBall extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeDouble(1, distance_);
     }
@@ -494,12 +487,14 @@ public final class VBall extends
     if (((bitField0_ & 0x00008000) == 0x00008000)) {
       output.writeSInt32(16, y_);
     }
-    getUnknownFields().writeTo(output);
+    if (((bitField0_ & 0x00010000) == 0x00010000)) {
+      output.writeFloat(17, wz0_);
+    }
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -567,18 +562,16 @@ public final class VBall extends
       size += com.google.protobuf.CodedOutputStream
         .computeSInt32Size(16, y_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    if (((bitField0_ & 0x00010000) == 0x00010000)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeFloatSize(17, wz0_);
+    }
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.VBall parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -632,12 +625,17 @@ public final class VBall extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.VBall prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.VBall prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -678,10 +676,6 @@ public final class VBall extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       distance_ = 0D;
@@ -716,11 +710,9 @@ public final class VBall extends
       bitField0_ = (bitField0_ & ~0x00004000);
       y_ = 0;
       bitField0_ = (bitField0_ & ~0x00008000);
+      wz0_ = 0F;
+      bitField0_ = (bitField0_ & ~0x00010000);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -808,6 +800,10 @@ public final class VBall extends
         to_bitField0_ |= 0x00008000;
       }
       result.y_ = y_;
+      if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
+        to_bitField0_ |= 0x00010000;
+      }
+      result.wz0_ = wz0_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -872,7 +868,11 @@ public final class VBall extends
       if (other.hasY()) {
         setY(other.getY());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      if (other.hasWz0()) {
+        setWz0(other.getWz0());
+      }
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -1411,14 +1411,82 @@ public final class VBall extends
       return this;
     }
 
+    private float wz0_ ;
+    /**
+     * <code>optional float wz0 = 17;</code>
+     */
+    public boolean hasWz0() {
+      return ((bitField0_ & 0x00010000) == 0x00010000);
+    }
+    /**
+     * <code>optional float wz0 = 17;</code>
+     */
+    public float getWz0() {
+      return wz0_;
+    }
+    /**
+     * <code>optional float wz0 = 17;</code>
+     */
+    public Builder setWz0(float value) {
+      bitField0_ |= 0x00010000;
+      wz0_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional float wz0 = 17;</code>
+     */
+    public Builder clearWz0() {
+      bitField0_ = (bitField0_ & ~0x00010000);
+      wz0_ = 0F;
+      onChanged();
+      return this;
+    }
+
     // @@protoc_insertion_point(builder_scope:messages.VBall)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.VBall)
+  private static final messages.VBall DEFAULT_INSTANCE;
   static {
-    defaultInstance = new VBall(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.VBall();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.VBall)
+  public static messages.VBall getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<VBall>
+      PARSER = new com.google.protobuf.AbstractParser<VBall>() {
+    public VBall parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new VBall(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<VBall> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<VBall> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.VBall getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

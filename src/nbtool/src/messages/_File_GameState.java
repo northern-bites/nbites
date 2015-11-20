@@ -8,17 +8,17 @@ public final class _File_GameState {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_GameState_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_GameState_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_TeamInfo_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_TeamInfo_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_RobotInfo_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable

@@ -6,37 +6,37 @@ package messages;
 /**
  * Protobuf type {@code messages.Robot}
  */
-public final class Robot extends
+public  final class Robot extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.Robot)
     RobotOrBuilder {
   // Use Robot.newBuilder() to construct.
   private Robot(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private Robot(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final Robot defaultInstance;
-  public static Robot getDefaultInstance() {
-    return defaultInstance;
+  private Robot() {
+    distance_ = 0F;
+    bearing_ = 0F;
+    bearingDeg_ = 0F;
+    angleXDeg_ = 0F;
+    angleYDeg_ = 0F;
+    x_ = 0;
+    y_ = 0;
+    elevationDeg_ = 0F;
+    on_ = false;
+    height_ = 0;
+    width_ = 0;
   }
 
-  public Robot getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private Robot(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -113,10 +113,11 @@ public final class Robot extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -132,21 +133,6 @@ public final class Robot extends
     return messages._File_VisionRobot.internal_static_messages_Robot_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.Robot.class, messages.Robot.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<Robot> PARSER =
-      new com.google.protobuf.AbstractParser<Robot>() {
-    public Robot parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new Robot(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<Robot> getParserForType() {
-    return PARSER;
   }
 
   private int bitField0_;
@@ -315,19 +301,6 @@ public final class Robot extends
     return width_;
   }
 
-  private void initFields() {
-    distance_ = 0F;
-    bearing_ = 0F;
-    bearingDeg_ = 0F;
-    angleXDeg_ = 0F;
-    angleYDeg_ = 0F;
-    x_ = 0;
-    y_ = 0;
-    elevationDeg_ = 0F;
-    on_ = false;
-    height_ = 0;
-    width_ = 0;
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -340,7 +313,6 @@ public final class Robot extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeFloat(1, distance_);
     }
@@ -374,12 +346,11 @@ public final class Robot extends
     if (((bitField0_ & 0x00000400) == 0x00000400)) {
       output.writeSInt32(11, width_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -427,18 +398,12 @@ public final class Robot extends
       size += com.google.protobuf.CodedOutputStream
         .computeSInt32Size(11, width_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.Robot parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -492,12 +457,17 @@ public final class Robot extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.Robot prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.Robot prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -538,10 +508,6 @@ public final class Robot extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       distance_ = 0F;
@@ -567,10 +533,6 @@ public final class Robot extends
       width_ = 0;
       bitField0_ = (bitField0_ & ~0x00000400);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -687,7 +649,8 @@ public final class Robot extends
       if (other.hasWidth()) {
         setWidth(other.getWidth());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -1069,11 +1032,47 @@ public final class Robot extends
     // @@protoc_insertion_point(builder_scope:messages.Robot)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.Robot)
+  private static final messages.Robot DEFAULT_INSTANCE;
   static {
-    defaultInstance = new Robot(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.Robot();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.Robot)
+  public static messages.Robot getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<Robot>
+      PARSER = new com.google.protobuf.AbstractParser<Robot>() {
+    public Robot parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new Robot(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<Robot> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<Robot> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.Robot getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

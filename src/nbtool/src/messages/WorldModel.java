@@ -6,37 +6,47 @@ package messages;
 /**
  * Protobuf type {@code messages.WorldModel}
  */
-public final class WorldModel extends
+public  final class WorldModel extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.WorldModel)
     WorldModelOrBuilder {
   // Use WorldModel.newBuilder() to construct.
   private WorldModel(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private WorldModel(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final WorldModel defaultInstance;
-  public static WorldModel getDefaultInstance() {
-    return defaultInstance;
+  private WorldModel() {
+    timestamp_ = 0L;
+    myX_ = 0F;
+    myY_ = 0F;
+    myH_ = 0F;
+    myUncert_ = 0F;
+    walkingToX_ = 0F;
+    walkingToY_ = 0F;
+    ballOn_ = false;
+    ballAge_ = 0;
+    ballDist_ = 0F;
+    ballBearing_ = 0F;
+    ballVelX_ = 0F;
+    ballVelY_ = 0F;
+    ballUncert_ = 0F;
+    role_ = 0;
+    inKickingState_ = false;
+    kickingToX_ = 0F;
+    kickingToY_ = 0F;
+    fallen_ = false;
+    active_ = false;
+    claimedBall_ = false;
   }
 
-  public WorldModel getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private WorldModel(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -163,10 +173,11 @@ public final class WorldModel extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -182,21 +193,6 @@ public final class WorldModel extends
     return messages._File_WorldModel.internal_static_messages_WorldModel_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.WorldModel.class, messages.WorldModel.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<WorldModel> PARSER =
-      new com.google.protobuf.AbstractParser<WorldModel>() {
-    public WorldModel parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new WorldModel(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<WorldModel> getParserForType() {
-    return PARSER;
   }
 
   private int bitField0_;
@@ -515,29 +511,6 @@ public final class WorldModel extends
     return claimedBall_;
   }
 
-  private void initFields() {
-    timestamp_ = 0L;
-    myX_ = 0F;
-    myY_ = 0F;
-    myH_ = 0F;
-    myUncert_ = 0F;
-    walkingToX_ = 0F;
-    walkingToY_ = 0F;
-    ballOn_ = false;
-    ballAge_ = 0;
-    ballDist_ = 0F;
-    ballBearing_ = 0F;
-    ballVelX_ = 0F;
-    ballVelY_ = 0F;
-    ballUncert_ = 0F;
-    role_ = 0;
-    inKickingState_ = false;
-    kickingToX_ = 0F;
-    kickingToY_ = 0F;
-    fallen_ = false;
-    active_ = false;
-    claimedBall_ = false;
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -550,7 +523,6 @@ public final class WorldModel extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeInt64(1, timestamp_);
     }
@@ -614,12 +586,11 @@ public final class WorldModel extends
     if (((bitField0_ & 0x00100000) == 0x00100000)) {
       output.writeBool(21, claimedBall_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -707,18 +678,12 @@ public final class WorldModel extends
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(21, claimedBall_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.WorldModel parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -772,12 +737,17 @@ public final class WorldModel extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.WorldModel prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.WorldModel prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -818,10 +788,6 @@ public final class WorldModel extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       timestamp_ = 0L;
@@ -867,10 +833,6 @@ public final class WorldModel extends
       claimedBall_ = false;
       bitField0_ = (bitField0_ & ~0x00100000);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -1057,7 +1019,8 @@ public final class WorldModel extends
       if (other.hasClaimedBall()) {
         setClaimedBall(other.getClaimedBall());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -1759,11 +1722,47 @@ public final class WorldModel extends
     // @@protoc_insertion_point(builder_scope:messages.WorldModel)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.WorldModel)
+  private static final messages.WorldModel DEFAULT_INSTANCE;
   static {
-    defaultInstance = new WorldModel(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.WorldModel();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.WorldModel)
+  public static messages.WorldModel getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<WorldModel>
+      PARSER = new com.google.protobuf.AbstractParser<WorldModel>() {
+    public WorldModel parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new WorldModel(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<WorldModel> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<WorldModel> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.WorldModel getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

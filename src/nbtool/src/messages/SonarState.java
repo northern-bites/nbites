@@ -6,37 +6,28 @@ package messages;
 /**
  * Protobuf type {@code messages.SonarState}
  */
-public final class SonarState extends
+public  final class SonarState extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.SonarState)
     SonarStateOrBuilder {
   // Use SonarState.newBuilder() to construct.
   private SonarState(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private SonarState(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final SonarState defaultInstance;
-  public static SonarState getDefaultInstance() {
-    return defaultInstance;
+  private SonarState() {
+    usLeft_ = 0F;
+    usRight_ = 0F;
   }
 
-  public SonarState getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private SonarState(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -68,10 +59,11 @@ public final class SonarState extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -87,21 +79,6 @@ public final class SonarState extends
     return messages._File_SonarState.internal_static_messages_SonarState_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.SonarState.class, messages.SonarState.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<SonarState> PARSER =
-      new com.google.protobuf.AbstractParser<SonarState>() {
-    public SonarState parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new SonarState(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<SonarState> getParserForType() {
-    return PARSER;
   }
 
   private int bitField0_;
@@ -135,10 +112,6 @@ public final class SonarState extends
     return usRight_;
   }
 
-  private void initFields() {
-    usLeft_ = 0F;
-    usRight_ = 0F;
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -151,19 +124,17 @@ public final class SonarState extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeFloat(1, usLeft_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       output.writeFloat(2, usRight_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -175,18 +146,12 @@ public final class SonarState extends
       size += com.google.protobuf.CodedOutputStream
         .computeFloatSize(2, usRight_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.SonarState parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -240,12 +205,17 @@ public final class SonarState extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.SonarState prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.SonarState prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -286,10 +256,6 @@ public final class SonarState extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       usLeft_ = 0F;
@@ -297,10 +263,6 @@ public final class SonarState extends
       usRight_ = 0F;
       bitField0_ = (bitField0_ & ~0x00000002);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -354,7 +316,8 @@ public final class SonarState extends
       if (other.hasUsRight()) {
         setUsRight(other.getUsRight());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -448,11 +411,47 @@ public final class SonarState extends
     // @@protoc_insertion_point(builder_scope:messages.SonarState)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.SonarState)
+  private static final messages.SonarState DEFAULT_INSTANCE;
   static {
-    defaultInstance = new SonarState(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.SonarState();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.SonarState)
+  public static messages.SonarState getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<SonarState>
+      PARSER = new com.google.protobuf.AbstractParser<SonarState>() {
+    public SonarState parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new SonarState(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<SonarState> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<SonarState> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.SonarState getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

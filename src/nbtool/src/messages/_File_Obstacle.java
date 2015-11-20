@@ -8,12 +8,12 @@ public final class _File_Obstacle {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_FieldObstacles_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_messages_FieldObstacles_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_FieldObstacles_Obstacle_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable

@@ -6,37 +6,28 @@ package messages;
 /**
  * Protobuf type {@code messages.MotionCommand}
  */
-public final class MotionCommand extends
+public  final class MotionCommand extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.MotionCommand)
     MotionCommandOrBuilder {
   // Use MotionCommand.newBuilder() to construct.
   private MotionCommand(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private MotionCommand(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final MotionCommand defaultInstance;
-  public static MotionCommand getDefaultInstance() {
-    return defaultInstance;
+  private MotionCommand() {
+    type_ = 0;
+    timestamp_ = 0L;
   }
 
-  public MotionCommand getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private MotionCommand(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -62,7 +53,7 @@ public final class MotionCommand extends
               unknownFields.mergeVarintField(1, rawValue);
             } else {
               bitField0_ |= 0x00000001;
-              type_ = value;
+              type_ = rawValue;
             }
             break;
           }
@@ -71,7 +62,7 @@ public final class MotionCommand extends
             if (((bitField0_ & 0x00000002) == 0x00000002)) {
               subBuilder = script_.toBuilder();
             }
-            script_ = input.readMessage(messages.ScriptedMove.PARSER, extensionRegistry);
+            script_ = input.readMessage(messages.ScriptedMove.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(script_);
               script_ = subBuilder.buildPartial();
@@ -84,7 +75,7 @@ public final class MotionCommand extends
             if (((bitField0_ & 0x00000004) == 0x00000004)) {
               subBuilder = dest_.toBuilder();
             }
-            dest_ = input.readMessage(messages.DestinationWalk.PARSER, extensionRegistry);
+            dest_ = input.readMessage(messages.DestinationWalk.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(dest_);
               dest_ = subBuilder.buildPartial();
@@ -97,7 +88,7 @@ public final class MotionCommand extends
             if (((bitField0_ & 0x00000008) == 0x00000008)) {
               subBuilder = speed_.toBuilder();
             }
-            speed_ = input.readMessage(messages.WalkCommand.PARSER, extensionRegistry);
+            speed_ = input.readMessage(messages.WalkCommand.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(speed_);
               speed_ = subBuilder.buildPartial();
@@ -110,7 +101,7 @@ public final class MotionCommand extends
             if (((bitField0_ & 0x00000010) == 0x00000010)) {
               subBuilder = odometryDest_.toBuilder();
             }
-            odometryDest_ = input.readMessage(messages.OdometryWalk.PARSER, extensionRegistry);
+            odometryDest_ = input.readMessage(messages.OdometryWalk.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(odometryDest_);
               odometryDest_ = subBuilder.buildPartial();
@@ -126,10 +117,11 @@ public final class MotionCommand extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -145,21 +137,6 @@ public final class MotionCommand extends
     return messages._File_PMotion.internal_static_messages_MotionCommand_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.MotionCommand.class, messages.MotionCommand.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<MotionCommand> PARSER =
-      new com.google.protobuf.AbstractParser<MotionCommand>() {
-    public MotionCommand parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new MotionCommand(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<MotionCommand> getParserForType() {
-    return PARSER;
   }
 
   /**
@@ -203,7 +180,9 @@ public final class MotionCommand extends
     public static final int ODOMETRY_WALK_VALUE = 3;
 
 
-    public final int getNumber() { return value; }
+    public final int getNumber() {
+      return value;
+    }
 
     public static CommandType valueOf(int value) {
       switch (value) {
@@ -219,8 +198,8 @@ public final class MotionCommand extends
         internalGetValueMap() {
       return internalValueMap;
     }
-    private static com.google.protobuf.Internal.EnumLiteMap<CommandType>
-        internalValueMap =
+    private static final com.google.protobuf.Internal.EnumLiteMap<
+        CommandType> internalValueMap =
           new com.google.protobuf.Internal.EnumLiteMap<CommandType>() {
             public CommandType findValueByNumber(int number) {
               return CommandType.valueOf(number);
@@ -264,7 +243,7 @@ public final class MotionCommand extends
 
   private int bitField0_;
   public static final int TYPE_FIELD_NUMBER = 1;
-  private messages.MotionCommand.CommandType type_;
+  private int type_;
   /**
    * <code>optional .messages.MotionCommand.CommandType type = 1;</code>
    */
@@ -275,7 +254,8 @@ public final class MotionCommand extends
    * <code>optional .messages.MotionCommand.CommandType type = 1;</code>
    */
   public messages.MotionCommand.CommandType getType() {
-    return type_;
+    messages.MotionCommand.CommandType result = messages.MotionCommand.CommandType.valueOf(type_);
+    return result == null ? messages.MotionCommand.CommandType.DESTINATION_WALK : result;
   }
 
   public static final int SCRIPT_FIELD_NUMBER = 2;
@@ -290,13 +270,13 @@ public final class MotionCommand extends
    * <code>optional .messages.ScriptedMove script = 2;</code>
    */
   public messages.ScriptedMove getScript() {
-    return script_;
+    return script_ == null ? messages.ScriptedMove.getDefaultInstance() : script_;
   }
   /**
    * <code>optional .messages.ScriptedMove script = 2;</code>
    */
   public messages.ScriptedMoveOrBuilder getScriptOrBuilder() {
-    return script_;
+    return script_ == null ? messages.ScriptedMove.getDefaultInstance() : script_;
   }
 
   public static final int DEST_FIELD_NUMBER = 3;
@@ -311,13 +291,13 @@ public final class MotionCommand extends
    * <code>optional .messages.DestinationWalk dest = 3;</code>
    */
   public messages.DestinationWalk getDest() {
-    return dest_;
+    return dest_ == null ? messages.DestinationWalk.getDefaultInstance() : dest_;
   }
   /**
    * <code>optional .messages.DestinationWalk dest = 3;</code>
    */
   public messages.DestinationWalkOrBuilder getDestOrBuilder() {
-    return dest_;
+    return dest_ == null ? messages.DestinationWalk.getDefaultInstance() : dest_;
   }
 
   public static final int SPEED_FIELD_NUMBER = 4;
@@ -332,13 +312,13 @@ public final class MotionCommand extends
    * <code>optional .messages.WalkCommand speed = 4;</code>
    */
   public messages.WalkCommand getSpeed() {
-    return speed_;
+    return speed_ == null ? messages.WalkCommand.getDefaultInstance() : speed_;
   }
   /**
    * <code>optional .messages.WalkCommand speed = 4;</code>
    */
   public messages.WalkCommandOrBuilder getSpeedOrBuilder() {
-    return speed_;
+    return speed_ == null ? messages.WalkCommand.getDefaultInstance() : speed_;
   }
 
   public static final int ODOMETRY_DEST_FIELD_NUMBER = 5;
@@ -353,13 +333,13 @@ public final class MotionCommand extends
    * <code>optional .messages.OdometryWalk odometry_dest = 5;</code>
    */
   public messages.OdometryWalk getOdometryDest() {
-    return odometryDest_;
+    return odometryDest_ == null ? messages.OdometryWalk.getDefaultInstance() : odometryDest_;
   }
   /**
    * <code>optional .messages.OdometryWalk odometry_dest = 5;</code>
    */
   public messages.OdometryWalkOrBuilder getOdometryDestOrBuilder() {
-    return odometryDest_;
+    return odometryDest_ == null ? messages.OdometryWalk.getDefaultInstance() : odometryDest_;
   }
 
   public static final int TIMESTAMP_FIELD_NUMBER = 6;
@@ -377,14 +357,6 @@ public final class MotionCommand extends
     return timestamp_;
   }
 
-  private void initFields() {
-    type_ = messages.MotionCommand.CommandType.DESTINATION_WALK;
-    script_ = messages.ScriptedMove.getDefaultInstance();
-    dest_ = messages.DestinationWalk.getDefaultInstance();
-    speed_ = messages.WalkCommand.getDefaultInstance();
-    odometryDest_ = messages.OdometryWalk.getDefaultInstance();
-    timestamp_ = 0L;
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -397,70 +369,62 @@ public final class MotionCommand extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeEnum(1, type_.getNumber());
+      output.writeEnum(1, type_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      output.writeMessage(2, script_);
+      output.writeMessage(2, getScript());
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
-      output.writeMessage(3, dest_);
+      output.writeMessage(3, getDest());
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
-      output.writeMessage(4, speed_);
+      output.writeMessage(4, getSpeed());
     }
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
-      output.writeMessage(5, odometryDest_);
+      output.writeMessage(5, getOdometryDest());
     }
     if (((bitField0_ & 0x00000020) == 0x00000020)) {
       output.writeInt64(6, timestamp_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(1, type_.getNumber());
+        .computeEnumSize(1, type_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(2, script_);
+        .computeMessageSize(2, getScript());
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(3, dest_);
+        .computeMessageSize(3, getDest());
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(4, speed_);
+        .computeMessageSize(4, getSpeed());
     }
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(5, odometryDest_);
+        .computeMessageSize(5, getOdometryDest());
     }
     if (((bitField0_ & 0x00000020) == 0x00000020)) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt64Size(6, timestamp_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.MotionCommand parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -514,12 +478,17 @@ public final class MotionCommand extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.MotionCommand prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.MotionCommand prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -564,34 +533,30 @@ public final class MotionCommand extends
         getOdometryDestFieldBuilder();
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
-      type_ = messages.MotionCommand.CommandType.DESTINATION_WALK;
+      type_ = 0;
       bitField0_ = (bitField0_ & ~0x00000001);
       if (scriptBuilder_ == null) {
-        script_ = messages.ScriptedMove.getDefaultInstance();
+        script_ = null;
       } else {
         scriptBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000002);
       if (destBuilder_ == null) {
-        dest_ = messages.DestinationWalk.getDefaultInstance();
+        dest_ = null;
       } else {
         destBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000004);
       if (speedBuilder_ == null) {
-        speed_ = messages.WalkCommand.getDefaultInstance();
+        speed_ = null;
       } else {
         speedBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000008);
       if (odometryDestBuilder_ == null) {
-        odometryDest_ = messages.OdometryWalk.getDefaultInstance();
+        odometryDest_ = null;
       } else {
         odometryDestBuilder_.clear();
       }
@@ -599,10 +564,6 @@ public final class MotionCommand extends
       timestamp_ = 0L;
       bitField0_ = (bitField0_ & ~0x00000020);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -700,7 +661,8 @@ public final class MotionCommand extends
       if (other.hasTimestamp()) {
         setTimestamp(other.getTimestamp());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -727,7 +689,7 @@ public final class MotionCommand extends
     }
     private int bitField0_;
 
-    private messages.MotionCommand.CommandType type_ = messages.MotionCommand.CommandType.DESTINATION_WALK;
+    private int type_ = 0;
     /**
      * <code>optional .messages.MotionCommand.CommandType type = 1;</code>
      */
@@ -738,7 +700,8 @@ public final class MotionCommand extends
      * <code>optional .messages.MotionCommand.CommandType type = 1;</code>
      */
     public messages.MotionCommand.CommandType getType() {
-      return type_;
+      messages.MotionCommand.CommandType result = messages.MotionCommand.CommandType.valueOf(type_);
+      return result == null ? messages.MotionCommand.CommandType.DESTINATION_WALK : result;
     }
     /**
      * <code>optional .messages.MotionCommand.CommandType type = 1;</code>
@@ -748,7 +711,7 @@ public final class MotionCommand extends
         throw new NullPointerException();
       }
       bitField0_ |= 0x00000001;
-      type_ = value;
+      type_ = value.getNumber();
       onChanged();
       return this;
     }
@@ -757,12 +720,12 @@ public final class MotionCommand extends
      */
     public Builder clearType() {
       bitField0_ = (bitField0_ & ~0x00000001);
-      type_ = messages.MotionCommand.CommandType.DESTINATION_WALK;
+      type_ = 0;
       onChanged();
       return this;
     }
 
-    private messages.ScriptedMove script_ = messages.ScriptedMove.getDefaultInstance();
+    private messages.ScriptedMove script_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.ScriptedMove, messages.ScriptedMove.Builder, messages.ScriptedMoveOrBuilder> scriptBuilder_;
     /**
@@ -776,7 +739,7 @@ public final class MotionCommand extends
      */
     public messages.ScriptedMove getScript() {
       if (scriptBuilder_ == null) {
-        return script_;
+        return script_ == null ? messages.ScriptedMove.getDefaultInstance() : script_;
       } else {
         return scriptBuilder_.getMessage();
       }
@@ -817,6 +780,7 @@ public final class MotionCommand extends
     public Builder mergeScript(messages.ScriptedMove value) {
       if (scriptBuilder_ == null) {
         if (((bitField0_ & 0x00000002) == 0x00000002) &&
+            script_ != null &&
             script_ != messages.ScriptedMove.getDefaultInstance()) {
           script_ =
             messages.ScriptedMove.newBuilder(script_).mergeFrom(value).buildPartial();
@@ -835,7 +799,7 @@ public final class MotionCommand extends
      */
     public Builder clearScript() {
       if (scriptBuilder_ == null) {
-        script_ = messages.ScriptedMove.getDefaultInstance();
+        script_ = null;
         onChanged();
       } else {
         scriptBuilder_.clear();
@@ -858,7 +822,8 @@ public final class MotionCommand extends
       if (scriptBuilder_ != null) {
         return scriptBuilder_.getMessageOrBuilder();
       } else {
-        return script_;
+        return script_ == null ?
+            messages.ScriptedMove.getDefaultInstance() : script_;
       }
     }
     /**
@@ -878,7 +843,7 @@ public final class MotionCommand extends
       return scriptBuilder_;
     }
 
-    private messages.DestinationWalk dest_ = messages.DestinationWalk.getDefaultInstance();
+    private messages.DestinationWalk dest_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.DestinationWalk, messages.DestinationWalk.Builder, messages.DestinationWalkOrBuilder> destBuilder_;
     /**
@@ -892,7 +857,7 @@ public final class MotionCommand extends
      */
     public messages.DestinationWalk getDest() {
       if (destBuilder_ == null) {
-        return dest_;
+        return dest_ == null ? messages.DestinationWalk.getDefaultInstance() : dest_;
       } else {
         return destBuilder_.getMessage();
       }
@@ -933,6 +898,7 @@ public final class MotionCommand extends
     public Builder mergeDest(messages.DestinationWalk value) {
       if (destBuilder_ == null) {
         if (((bitField0_ & 0x00000004) == 0x00000004) &&
+            dest_ != null &&
             dest_ != messages.DestinationWalk.getDefaultInstance()) {
           dest_ =
             messages.DestinationWalk.newBuilder(dest_).mergeFrom(value).buildPartial();
@@ -951,7 +917,7 @@ public final class MotionCommand extends
      */
     public Builder clearDest() {
       if (destBuilder_ == null) {
-        dest_ = messages.DestinationWalk.getDefaultInstance();
+        dest_ = null;
         onChanged();
       } else {
         destBuilder_.clear();
@@ -974,7 +940,8 @@ public final class MotionCommand extends
       if (destBuilder_ != null) {
         return destBuilder_.getMessageOrBuilder();
       } else {
-        return dest_;
+        return dest_ == null ?
+            messages.DestinationWalk.getDefaultInstance() : dest_;
       }
     }
     /**
@@ -994,7 +961,7 @@ public final class MotionCommand extends
       return destBuilder_;
     }
 
-    private messages.WalkCommand speed_ = messages.WalkCommand.getDefaultInstance();
+    private messages.WalkCommand speed_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.WalkCommand, messages.WalkCommand.Builder, messages.WalkCommandOrBuilder> speedBuilder_;
     /**
@@ -1008,7 +975,7 @@ public final class MotionCommand extends
      */
     public messages.WalkCommand getSpeed() {
       if (speedBuilder_ == null) {
-        return speed_;
+        return speed_ == null ? messages.WalkCommand.getDefaultInstance() : speed_;
       } else {
         return speedBuilder_.getMessage();
       }
@@ -1049,6 +1016,7 @@ public final class MotionCommand extends
     public Builder mergeSpeed(messages.WalkCommand value) {
       if (speedBuilder_ == null) {
         if (((bitField0_ & 0x00000008) == 0x00000008) &&
+            speed_ != null &&
             speed_ != messages.WalkCommand.getDefaultInstance()) {
           speed_ =
             messages.WalkCommand.newBuilder(speed_).mergeFrom(value).buildPartial();
@@ -1067,7 +1035,7 @@ public final class MotionCommand extends
      */
     public Builder clearSpeed() {
       if (speedBuilder_ == null) {
-        speed_ = messages.WalkCommand.getDefaultInstance();
+        speed_ = null;
         onChanged();
       } else {
         speedBuilder_.clear();
@@ -1090,7 +1058,8 @@ public final class MotionCommand extends
       if (speedBuilder_ != null) {
         return speedBuilder_.getMessageOrBuilder();
       } else {
-        return speed_;
+        return speed_ == null ?
+            messages.WalkCommand.getDefaultInstance() : speed_;
       }
     }
     /**
@@ -1110,7 +1079,7 @@ public final class MotionCommand extends
       return speedBuilder_;
     }
 
-    private messages.OdometryWalk odometryDest_ = messages.OdometryWalk.getDefaultInstance();
+    private messages.OdometryWalk odometryDest_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.OdometryWalk, messages.OdometryWalk.Builder, messages.OdometryWalkOrBuilder> odometryDestBuilder_;
     /**
@@ -1124,7 +1093,7 @@ public final class MotionCommand extends
      */
     public messages.OdometryWalk getOdometryDest() {
       if (odometryDestBuilder_ == null) {
-        return odometryDest_;
+        return odometryDest_ == null ? messages.OdometryWalk.getDefaultInstance() : odometryDest_;
       } else {
         return odometryDestBuilder_.getMessage();
       }
@@ -1165,6 +1134,7 @@ public final class MotionCommand extends
     public Builder mergeOdometryDest(messages.OdometryWalk value) {
       if (odometryDestBuilder_ == null) {
         if (((bitField0_ & 0x00000010) == 0x00000010) &&
+            odometryDest_ != null &&
             odometryDest_ != messages.OdometryWalk.getDefaultInstance()) {
           odometryDest_ =
             messages.OdometryWalk.newBuilder(odometryDest_).mergeFrom(value).buildPartial();
@@ -1183,7 +1153,7 @@ public final class MotionCommand extends
      */
     public Builder clearOdometryDest() {
       if (odometryDestBuilder_ == null) {
-        odometryDest_ = messages.OdometryWalk.getDefaultInstance();
+        odometryDest_ = null;
         onChanged();
       } else {
         odometryDestBuilder_.clear();
@@ -1206,7 +1176,8 @@ public final class MotionCommand extends
       if (odometryDestBuilder_ != null) {
         return odometryDestBuilder_.getMessageOrBuilder();
       } else {
-        return odometryDest_;
+        return odometryDest_ == null ?
+            messages.OdometryWalk.getDefaultInstance() : odometryDest_;
       }
     }
     /**
@@ -1261,11 +1232,47 @@ public final class MotionCommand extends
     // @@protoc_insertion_point(builder_scope:messages.MotionCommand)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.MotionCommand)
+  private static final messages.MotionCommand DEFAULT_INSTANCE;
   static {
-    defaultInstance = new MotionCommand(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.MotionCommand();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.MotionCommand)
+  public static messages.MotionCommand getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<MotionCommand>
+      PARSER = new com.google.protobuf.AbstractParser<MotionCommand>() {
+    public MotionCommand parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new MotionCommand(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<MotionCommand> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<MotionCommand> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.MotionCommand getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

@@ -6,37 +6,28 @@ package messages;
 /**
  * Protobuf type {@code messages.BodyJointCommand}
  */
-public final class BodyJointCommand extends
+public  final class BodyJointCommand extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.BodyJointCommand)
     BodyJointCommandOrBuilder {
   // Use BodyJointCommand.newBuilder() to construct.
   private BodyJointCommand(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private BodyJointCommand(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final BodyJointCommand defaultInstance;
-  public static BodyJointCommand getDefaultInstance() {
-    return defaultInstance;
+  private BodyJointCommand() {
+    time_ = 0F;
+    interpolation_ = 0;
   }
 
-  public BodyJointCommand getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private BodyJointCommand(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -65,7 +56,7 @@ public final class BodyJointCommand extends
             if (((bitField0_ & 0x00000002) == 0x00000002)) {
               subBuilder = angles_.toBuilder();
             }
-            angles_ = input.readMessage(messages.JointAngles.PARSER, extensionRegistry);
+            angles_ = input.readMessage(messages.JointAngles.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(angles_);
               angles_ = subBuilder.buildPartial();
@@ -78,7 +69,7 @@ public final class BodyJointCommand extends
             if (((bitField0_ & 0x00000004) == 0x00000004)) {
               subBuilder = stiffness_.toBuilder();
             }
-            stiffness_ = input.readMessage(messages.JointAngles.PARSER, extensionRegistry);
+            stiffness_ = input.readMessage(messages.JointAngles.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(stiffness_);
               stiffness_ = subBuilder.buildPartial();
@@ -93,17 +84,18 @@ public final class BodyJointCommand extends
               unknownFields.mergeVarintField(4, rawValue);
             } else {
               bitField0_ |= 0x00000008;
-              interpolation_ = value;
+              interpolation_ = rawValue;
             }
             break;
           }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -119,21 +111,6 @@ public final class BodyJointCommand extends
     return messages._File_PMotion.internal_static_messages_BodyJointCommand_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.BodyJointCommand.class, messages.BodyJointCommand.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<BodyJointCommand> PARSER =
-      new com.google.protobuf.AbstractParser<BodyJointCommand>() {
-    public BodyJointCommand parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new BodyJointCommand(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<BodyJointCommand> getParserForType() {
-    return PARSER;
   }
 
   /**
@@ -161,7 +138,9 @@ public final class BodyJointCommand extends
     public static final int LINEAR_VALUE = 1;
 
 
-    public final int getNumber() { return value; }
+    public final int getNumber() {
+      return value;
+    }
 
     public static InterpolationType valueOf(int value) {
       switch (value) {
@@ -175,8 +154,8 @@ public final class BodyJointCommand extends
         internalGetValueMap() {
       return internalValueMap;
     }
-    private static com.google.protobuf.Internal.EnumLiteMap<InterpolationType>
-        internalValueMap =
+    private static final com.google.protobuf.Internal.EnumLiteMap<
+        InterpolationType> internalValueMap =
           new com.google.protobuf.Internal.EnumLiteMap<InterpolationType>() {
             public InterpolationType findValueByNumber(int number) {
               return InterpolationType.valueOf(number);
@@ -246,13 +225,13 @@ public final class BodyJointCommand extends
    * <code>optional .messages.JointAngles angles = 2;</code>
    */
   public messages.JointAngles getAngles() {
-    return angles_;
+    return angles_ == null ? messages.JointAngles.getDefaultInstance() : angles_;
   }
   /**
    * <code>optional .messages.JointAngles angles = 2;</code>
    */
   public messages.JointAnglesOrBuilder getAnglesOrBuilder() {
-    return angles_;
+    return angles_ == null ? messages.JointAngles.getDefaultInstance() : angles_;
   }
 
   public static final int STIFFNESS_FIELD_NUMBER = 3;
@@ -267,17 +246,17 @@ public final class BodyJointCommand extends
    * <code>optional .messages.JointAngles stiffness = 3;</code>
    */
   public messages.JointAngles getStiffness() {
-    return stiffness_;
+    return stiffness_ == null ? messages.JointAngles.getDefaultInstance() : stiffness_;
   }
   /**
    * <code>optional .messages.JointAngles stiffness = 3;</code>
    */
   public messages.JointAnglesOrBuilder getStiffnessOrBuilder() {
-    return stiffness_;
+    return stiffness_ == null ? messages.JointAngles.getDefaultInstance() : stiffness_;
   }
 
   public static final int INTERPOLATION_FIELD_NUMBER = 4;
-  private messages.BodyJointCommand.InterpolationType interpolation_;
+  private int interpolation_;
   /**
    * <code>optional .messages.BodyJointCommand.InterpolationType interpolation = 4;</code>
    */
@@ -288,15 +267,10 @@ public final class BodyJointCommand extends
    * <code>optional .messages.BodyJointCommand.InterpolationType interpolation = 4;</code>
    */
   public messages.BodyJointCommand.InterpolationType getInterpolation() {
-    return interpolation_;
+    messages.BodyJointCommand.InterpolationType result = messages.BodyJointCommand.InterpolationType.valueOf(interpolation_);
+    return result == null ? messages.BodyJointCommand.InterpolationType.SMOOTH : result;
   }
 
-  private void initFields() {
-    time_ = 0F;
-    angles_ = messages.JointAngles.getDefaultInstance();
-    stiffness_ = messages.JointAngles.getDefaultInstance();
-    interpolation_ = messages.BodyJointCommand.InterpolationType.SMOOTH;
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -309,25 +283,23 @@ public final class BodyJointCommand extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeFloat(1, time_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      output.writeMessage(2, angles_);
+      output.writeMessage(2, getAngles());
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
-      output.writeMessage(3, stiffness_);
+      output.writeMessage(3, getStiffness());
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
-      output.writeEnum(4, interpolation_.getNumber());
+      output.writeEnum(4, interpolation_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -337,28 +309,22 @@ public final class BodyJointCommand extends
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(2, angles_);
+        .computeMessageSize(2, getAngles());
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(3, stiffness_);
+        .computeMessageSize(3, getStiffness());
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(4, interpolation_.getNumber());
+        .computeEnumSize(4, interpolation_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.BodyJointCommand parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -412,12 +378,17 @@ public final class BodyJointCommand extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.BodyJointCommand prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.BodyJointCommand prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -460,33 +431,25 @@ public final class BodyJointCommand extends
         getStiffnessFieldBuilder();
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       time_ = 0F;
       bitField0_ = (bitField0_ & ~0x00000001);
       if (anglesBuilder_ == null) {
-        angles_ = messages.JointAngles.getDefaultInstance();
+        angles_ = null;
       } else {
         anglesBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000002);
       if (stiffnessBuilder_ == null) {
-        stiffness_ = messages.JointAngles.getDefaultInstance();
+        stiffness_ = null;
       } else {
         stiffnessBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000004);
-      interpolation_ = messages.BodyJointCommand.InterpolationType.SMOOTH;
+      interpolation_ = 0;
       bitField0_ = (bitField0_ & ~0x00000008);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -562,7 +525,8 @@ public final class BodyJointCommand extends
       if (other.hasInterpolation()) {
         setInterpolation(other.getInterpolation());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -621,7 +585,7 @@ public final class BodyJointCommand extends
       return this;
     }
 
-    private messages.JointAngles angles_ = messages.JointAngles.getDefaultInstance();
+    private messages.JointAngles angles_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.JointAngles, messages.JointAngles.Builder, messages.JointAnglesOrBuilder> anglesBuilder_;
     /**
@@ -635,7 +599,7 @@ public final class BodyJointCommand extends
      */
     public messages.JointAngles getAngles() {
       if (anglesBuilder_ == null) {
-        return angles_;
+        return angles_ == null ? messages.JointAngles.getDefaultInstance() : angles_;
       } else {
         return anglesBuilder_.getMessage();
       }
@@ -676,6 +640,7 @@ public final class BodyJointCommand extends
     public Builder mergeAngles(messages.JointAngles value) {
       if (anglesBuilder_ == null) {
         if (((bitField0_ & 0x00000002) == 0x00000002) &&
+            angles_ != null &&
             angles_ != messages.JointAngles.getDefaultInstance()) {
           angles_ =
             messages.JointAngles.newBuilder(angles_).mergeFrom(value).buildPartial();
@@ -694,7 +659,7 @@ public final class BodyJointCommand extends
      */
     public Builder clearAngles() {
       if (anglesBuilder_ == null) {
-        angles_ = messages.JointAngles.getDefaultInstance();
+        angles_ = null;
         onChanged();
       } else {
         anglesBuilder_.clear();
@@ -717,7 +682,8 @@ public final class BodyJointCommand extends
       if (anglesBuilder_ != null) {
         return anglesBuilder_.getMessageOrBuilder();
       } else {
-        return angles_;
+        return angles_ == null ?
+            messages.JointAngles.getDefaultInstance() : angles_;
       }
     }
     /**
@@ -737,7 +703,7 @@ public final class BodyJointCommand extends
       return anglesBuilder_;
     }
 
-    private messages.JointAngles stiffness_ = messages.JointAngles.getDefaultInstance();
+    private messages.JointAngles stiffness_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.JointAngles, messages.JointAngles.Builder, messages.JointAnglesOrBuilder> stiffnessBuilder_;
     /**
@@ -751,7 +717,7 @@ public final class BodyJointCommand extends
      */
     public messages.JointAngles getStiffness() {
       if (stiffnessBuilder_ == null) {
-        return stiffness_;
+        return stiffness_ == null ? messages.JointAngles.getDefaultInstance() : stiffness_;
       } else {
         return stiffnessBuilder_.getMessage();
       }
@@ -792,6 +758,7 @@ public final class BodyJointCommand extends
     public Builder mergeStiffness(messages.JointAngles value) {
       if (stiffnessBuilder_ == null) {
         if (((bitField0_ & 0x00000004) == 0x00000004) &&
+            stiffness_ != null &&
             stiffness_ != messages.JointAngles.getDefaultInstance()) {
           stiffness_ =
             messages.JointAngles.newBuilder(stiffness_).mergeFrom(value).buildPartial();
@@ -810,7 +777,7 @@ public final class BodyJointCommand extends
      */
     public Builder clearStiffness() {
       if (stiffnessBuilder_ == null) {
-        stiffness_ = messages.JointAngles.getDefaultInstance();
+        stiffness_ = null;
         onChanged();
       } else {
         stiffnessBuilder_.clear();
@@ -833,7 +800,8 @@ public final class BodyJointCommand extends
       if (stiffnessBuilder_ != null) {
         return stiffnessBuilder_.getMessageOrBuilder();
       } else {
-        return stiffness_;
+        return stiffness_ == null ?
+            messages.JointAngles.getDefaultInstance() : stiffness_;
       }
     }
     /**
@@ -853,7 +821,7 @@ public final class BodyJointCommand extends
       return stiffnessBuilder_;
     }
 
-    private messages.BodyJointCommand.InterpolationType interpolation_ = messages.BodyJointCommand.InterpolationType.SMOOTH;
+    private int interpolation_ = 0;
     /**
      * <code>optional .messages.BodyJointCommand.InterpolationType interpolation = 4;</code>
      */
@@ -864,7 +832,8 @@ public final class BodyJointCommand extends
      * <code>optional .messages.BodyJointCommand.InterpolationType interpolation = 4;</code>
      */
     public messages.BodyJointCommand.InterpolationType getInterpolation() {
-      return interpolation_;
+      messages.BodyJointCommand.InterpolationType result = messages.BodyJointCommand.InterpolationType.valueOf(interpolation_);
+      return result == null ? messages.BodyJointCommand.InterpolationType.SMOOTH : result;
     }
     /**
      * <code>optional .messages.BodyJointCommand.InterpolationType interpolation = 4;</code>
@@ -874,7 +843,7 @@ public final class BodyJointCommand extends
         throw new NullPointerException();
       }
       bitField0_ |= 0x00000008;
-      interpolation_ = value;
+      interpolation_ = value.getNumber();
       onChanged();
       return this;
     }
@@ -883,7 +852,7 @@ public final class BodyJointCommand extends
      */
     public Builder clearInterpolation() {
       bitField0_ = (bitField0_ & ~0x00000008);
-      interpolation_ = messages.BodyJointCommand.InterpolationType.SMOOTH;
+      interpolation_ = 0;
       onChanged();
       return this;
     }
@@ -891,11 +860,47 @@ public final class BodyJointCommand extends
     // @@protoc_insertion_point(builder_scope:messages.BodyJointCommand)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.BodyJointCommand)
+  private static final messages.BodyJointCommand DEFAULT_INSTANCE;
   static {
-    defaultInstance = new BodyJointCommand(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.BodyJointCommand();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.BodyJointCommand)
+  public static messages.BodyJointCommand getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<BodyJointCommand>
+      PARSER = new com.google.protobuf.AbstractParser<BodyJointCommand>() {
+    public BodyJointCommand parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new BodyJointCommand(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<BodyJointCommand> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<BodyJointCommand> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.BodyJointCommand getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

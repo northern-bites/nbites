@@ -6,37 +6,52 @@ package messages;
 /**
  * Protobuf type {@code messages.JointAngles}
  */
-public final class JointAngles extends
+public  final class JointAngles extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.JointAngles)
     JointAnglesOrBuilder {
   // Use JointAngles.newBuilder() to construct.
   private JointAngles(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private JointAngles(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final JointAngles defaultInstance;
-  public static JointAngles getDefaultInstance() {
-    return defaultInstance;
+  private JointAngles() {
+    headYaw_ = 0F;
+    headPitch_ = 0F;
+    lShoulderPitch_ = 0F;
+    lShoulderRoll_ = 0F;
+    lElbowYaw_ = 0F;
+    lElbowRoll_ = 0F;
+    lWristYaw_ = 0F;
+    lHand_ = 0F;
+    rShoulderPitch_ = 0F;
+    rShoulderRoll_ = 0F;
+    rElbowYaw_ = 0F;
+    rElbowRoll_ = 0F;
+    rWristYaw_ = 0F;
+    rHand_ = 0F;
+    lHipYawPitch_ = 0F;
+    rHipYawPitch_ = 0F;
+    lHipRoll_ = 0F;
+    lHipPitch_ = 0F;
+    lKneePitch_ = 0F;
+    lAnklePitch_ = 0F;
+    lAnkleRoll_ = 0F;
+    rHipRoll_ = 0F;
+    rHipPitch_ = 0F;
+    rKneePitch_ = 0F;
+    rAnklePitch_ = 0F;
+    rAnkleRoll_ = 0F;
   }
 
-  public JointAngles getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private JointAngles(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -188,10 +203,11 @@ public final class JointAngles extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -207,21 +223,6 @@ public final class JointAngles extends
     return messages._File_PMotion.internal_static_messages_JointAngles_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.JointAngles.class, messages.JointAngles.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<JointAngles> PARSER =
-      new com.google.protobuf.AbstractParser<JointAngles>() {
-    public JointAngles parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new JointAngles(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<JointAngles> getParserForType() {
-    return PARSER;
   }
 
   private int bitField0_;
@@ -663,34 +664,6 @@ public final class JointAngles extends
     return rAnkleRoll_;
   }
 
-  private void initFields() {
-    headYaw_ = 0F;
-    headPitch_ = 0F;
-    lShoulderPitch_ = 0F;
-    lShoulderRoll_ = 0F;
-    lElbowYaw_ = 0F;
-    lElbowRoll_ = 0F;
-    lWristYaw_ = 0F;
-    lHand_ = 0F;
-    rShoulderPitch_ = 0F;
-    rShoulderRoll_ = 0F;
-    rElbowYaw_ = 0F;
-    rElbowRoll_ = 0F;
-    rWristYaw_ = 0F;
-    rHand_ = 0F;
-    lHipYawPitch_ = 0F;
-    rHipYawPitch_ = 0F;
-    lHipRoll_ = 0F;
-    lHipPitch_ = 0F;
-    lKneePitch_ = 0F;
-    lAnklePitch_ = 0F;
-    lAnkleRoll_ = 0F;
-    rHipRoll_ = 0F;
-    rHipPitch_ = 0F;
-    rKneePitch_ = 0F;
-    rAnklePitch_ = 0F;
-    rAnkleRoll_ = 0F;
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -703,7 +676,6 @@ public final class JointAngles extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeFloat(1, headYaw_);
     }
@@ -782,12 +754,11 @@ public final class JointAngles extends
     if (((bitField0_ & 0x02000000) == 0x02000000)) {
       output.writeFloat(26, rAnkleRoll_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -895,18 +866,12 @@ public final class JointAngles extends
       size += com.google.protobuf.CodedOutputStream
         .computeFloatSize(26, rAnkleRoll_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.JointAngles parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -960,12 +925,17 @@ public final class JointAngles extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.JointAngles prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.JointAngles prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -1006,10 +976,6 @@ public final class JointAngles extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       headYaw_ = 0F;
@@ -1065,10 +1031,6 @@ public final class JointAngles extends
       rAnkleRoll_ = 0F;
       bitField0_ = (bitField0_ & ~0x02000000);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -1290,7 +1252,8 @@ public final class JointAngles extends
       if (other.hasRAnkleRoll()) {
         setRAnkleRoll(other.getRAnkleRoll());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -2248,11 +2211,47 @@ public final class JointAngles extends
     // @@protoc_insertion_point(builder_scope:messages.JointAngles)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.JointAngles)
+  private static final messages.JointAngles DEFAULT_INSTANCE;
   static {
-    defaultInstance = new JointAngles(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.JointAngles();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.JointAngles)
+  public static messages.JointAngles getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<JointAngles>
+      PARSER = new com.google.protobuf.AbstractParser<JointAngles>() {
+    public JointAngles parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new JointAngles(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<JointAngles> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<JointAngles> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.JointAngles getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

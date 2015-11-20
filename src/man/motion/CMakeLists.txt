@@ -28,4 +28,5 @@ target_link_libraries(motion
   messages
   support
   bhwalk
+  unswalk
 )

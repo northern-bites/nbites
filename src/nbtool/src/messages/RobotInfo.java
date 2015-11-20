@@ -6,37 +6,28 @@ package messages;
 /**
  * Protobuf type {@code messages.RobotInfo}
  */
-public final class RobotInfo extends
+public  final class RobotInfo extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.RobotInfo)
     RobotInfoOrBuilder {
   // Use RobotInfo.newBuilder() to construct.
   private RobotInfo(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private RobotInfo(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final RobotInfo defaultInstance;
-  public static RobotInfo getDefaultInstance() {
-    return defaultInstance;
+  private RobotInfo() {
+    penalty_ = 0;
+    secsLeft_ = 0;
   }
 
-  public RobotInfo getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private RobotInfo(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -68,10 +59,11 @@ public final class RobotInfo extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -87,21 +79,6 @@ public final class RobotInfo extends
     return messages._File_GameState.internal_static_messages_RobotInfo_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.RobotInfo.class, messages.RobotInfo.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<RobotInfo> PARSER =
-      new com.google.protobuf.AbstractParser<RobotInfo>() {
-    public RobotInfo parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new RobotInfo(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<RobotInfo> getParserForType() {
-    return PARSER;
   }
 
   private int bitField0_;
@@ -135,10 +112,6 @@ public final class RobotInfo extends
     return secsLeft_;
   }
 
-  private void initFields() {
-    penalty_ = 0;
-    secsLeft_ = 0;
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -151,19 +124,17 @@ public final class RobotInfo extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeUInt32(1, penalty_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       output.writeUInt32(2, secsLeft_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -175,18 +146,12 @@ public final class RobotInfo extends
       size += com.google.protobuf.CodedOutputStream
         .computeUInt32Size(2, secsLeft_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.RobotInfo parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -240,12 +205,17 @@ public final class RobotInfo extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.RobotInfo prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.RobotInfo prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -286,10 +256,6 @@ public final class RobotInfo extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       penalty_ = 0;
@@ -297,10 +263,6 @@ public final class RobotInfo extends
       secsLeft_ = 0;
       bitField0_ = (bitField0_ & ~0x00000002);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -354,7 +316,8 @@ public final class RobotInfo extends
       if (other.hasSecsLeft()) {
         setSecsLeft(other.getSecsLeft());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -448,11 +411,47 @@ public final class RobotInfo extends
     // @@protoc_insertion_point(builder_scope:messages.RobotInfo)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.RobotInfo)
+  private static final messages.RobotInfo DEFAULT_INSTANCE;
   static {
-    defaultInstance = new RobotInfo(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.RobotInfo();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.RobotInfo)
+  public static messages.RobotInfo getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<RobotInfo>
+      PARSER = new com.google.protobuf.AbstractParser<RobotInfo>() {
+    public RobotInfo parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new RobotInfo(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<RobotInfo> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<RobotInfo> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.RobotInfo getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

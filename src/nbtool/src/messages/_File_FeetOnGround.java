@@ -8,7 +8,7 @@ public final class _File_FeetOnGround {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  static final com.google.protobuf.Descriptors.Descriptor
+  static com.google.protobuf.Descriptors.Descriptor
     internal_static_messages_FeetOnGround_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable

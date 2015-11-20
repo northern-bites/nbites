@@ -6,37 +6,27 @@ package messages;
 /**
  * Protobuf type {@code messages.FieldObstacles}
  */
-public final class FieldObstacles extends
+public  final class FieldObstacles extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.FieldObstacles)
     FieldObstaclesOrBuilder {
   // Use FieldObstacles.newBuilder() to construct.
   private FieldObstacles(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private FieldObstacles(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final FieldObstacles defaultInstance;
-  public static FieldObstacles getDefaultInstance() {
-    return defaultInstance;
+  private FieldObstacles() {
+    obstacle_ = java.util.Collections.emptyList();
   }
 
-  public FieldObstacles getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private FieldObstacles(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -60,16 +50,17 @@ public final class FieldObstacles extends
               obstacle_ = new java.util.ArrayList<messages.FieldObstacles.Obstacle>();
               mutable_bitField0_ |= 0x00000001;
             }
-            obstacle_.add(input.readMessage(messages.FieldObstacles.Obstacle.PARSER, extensionRegistry));
+            obstacle_.add(input.readMessage(messages.FieldObstacles.Obstacle.parser(), extensionRegistry));
             break;
           }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
         obstacle_ = java.util.Collections.unmodifiableList(obstacle_);
@@ -88,21 +79,6 @@ public final class FieldObstacles extends
     return messages._File_Obstacle.internal_static_messages_FieldObstacles_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.FieldObstacles.class, messages.FieldObstacles.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<FieldObstacles> PARSER =
-      new com.google.protobuf.AbstractParser<FieldObstacles>() {
-    public FieldObstacles parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new FieldObstacles(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<FieldObstacles> getParserForType() {
-    return PARSER;
   }
 
   public interface ObstacleOrBuilder extends
@@ -175,37 +151,33 @@ public final class FieldObstacles extends
   /**
    * Protobuf type {@code messages.FieldObstacles.Obstacle}
    */
-  public static final class Obstacle extends
+  public  static final class Obstacle extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:messages.FieldObstacles.Obstacle)
       ObstacleOrBuilder {
     // Use Obstacle.newBuilder() to construct.
     private Obstacle(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private Obstacle(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final Obstacle defaultInstance;
-    public static Obstacle getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public Obstacle getDefaultInstanceForType() {
-      return defaultInstance;
+    private Obstacle() {
+      position_ = 0;
+      distance_ = 0F;
+      detector_ = 0;
+      closestY_ = 0F;
+      boxBottom_ = 0F;
+      boxLeft_ = 0F;
+      boxRight_ = 0F;
     }
 
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private Obstacle(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -231,7 +203,7 @@ public final class FieldObstacles extends
                 unknownFields.mergeVarintField(1, rawValue);
               } else {
                 bitField0_ |= 0x00000001;
-                position_ = value;
+                position_ = rawValue;
               }
               break;
             }
@@ -247,7 +219,7 @@ public final class FieldObstacles extends
                 unknownFields.mergeVarintField(3, rawValue);
               } else {
                 bitField0_ |= 0x00000004;
-                detector_ = value;
+                detector_ = rawValue;
               }
               break;
             }
@@ -274,10 +246,11 @@ public final class FieldObstacles extends
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -293,21 +266,6 @@ public final class FieldObstacles extends
       return messages._File_Obstacle.internal_static_messages_FieldObstacles_Obstacle_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               messages.FieldObstacles.Obstacle.class, messages.FieldObstacles.Obstacle.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<Obstacle> PARSER =
-        new com.google.protobuf.AbstractParser<Obstacle>() {
-      public Obstacle parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Obstacle(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<Obstacle> getParserForType() {
-      return PARSER;
     }
 
     /**
@@ -391,7 +349,9 @@ public final class FieldObstacles extends
       public static final int NORTHWEST_VALUE = 8;
 
 
-      public final int getNumber() { return value; }
+      public final int getNumber() {
+        return value;
+      }
 
       public static ObstaclePosition valueOf(int value) {
         switch (value) {
@@ -412,8 +372,8 @@ public final class FieldObstacles extends
           internalGetValueMap() {
         return internalValueMap;
       }
-      private static com.google.protobuf.Internal.EnumLiteMap<ObstaclePosition>
-          internalValueMap =
+      private static final com.google.protobuf.Internal.EnumLiteMap<
+          ObstaclePosition> internalValueMap =
             new com.google.protobuf.Internal.EnumLiteMap<ObstaclePosition>() {
               public ObstaclePosition findValueByNumber(int number) {
                 return ObstaclePosition.valueOf(number);
@@ -496,7 +456,9 @@ public final class FieldObstacles extends
       public static final int VISION_VALUE = 3;
 
 
-      public final int getNumber() { return value; }
+      public final int getNumber() {
+        return value;
+      }
 
       public static ObstacleDetector valueOf(int value) {
         switch (value) {
@@ -512,8 +474,8 @@ public final class FieldObstacles extends
           internalGetValueMap() {
         return internalValueMap;
       }
-      private static com.google.protobuf.Internal.EnumLiteMap<ObstacleDetector>
-          internalValueMap =
+      private static final com.google.protobuf.Internal.EnumLiteMap<
+          ObstacleDetector> internalValueMap =
             new com.google.protobuf.Internal.EnumLiteMap<ObstacleDetector>() {
               public ObstacleDetector findValueByNumber(int number) {
                 return ObstacleDetector.valueOf(number);
@@ -557,7 +519,7 @@ public final class FieldObstacles extends
 
     private int bitField0_;
     public static final int POSITION_FIELD_NUMBER = 1;
-    private messages.FieldObstacles.Obstacle.ObstaclePosition position_;
+    private int position_;
     /**
      * <code>optional .messages.FieldObstacles.Obstacle.ObstaclePosition position = 1;</code>
      */
@@ -568,7 +530,8 @@ public final class FieldObstacles extends
      * <code>optional .messages.FieldObstacles.Obstacle.ObstaclePosition position = 1;</code>
      */
     public messages.FieldObstacles.Obstacle.ObstaclePosition getPosition() {
-      return position_;
+      messages.FieldObstacles.Obstacle.ObstaclePosition result = messages.FieldObstacles.Obstacle.ObstaclePosition.valueOf(position_);
+      return result == null ? messages.FieldObstacles.Obstacle.ObstaclePosition.NONE : result;
     }
 
     public static final int DISTANCE_FIELD_NUMBER = 2;
@@ -587,7 +550,7 @@ public final class FieldObstacles extends
     }
 
     public static final int DETECTOR_FIELD_NUMBER = 3;
-    private messages.FieldObstacles.Obstacle.ObstacleDetector detector_;
+    private int detector_;
     /**
      * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
      */
@@ -598,7 +561,8 @@ public final class FieldObstacles extends
      * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
      */
     public messages.FieldObstacles.Obstacle.ObstacleDetector getDetector() {
-      return detector_;
+      messages.FieldObstacles.Obstacle.ObstacleDetector result = messages.FieldObstacles.Obstacle.ObstacleDetector.valueOf(detector_);
+      return result == null ? messages.FieldObstacles.Obstacle.ObstacleDetector.NA : result;
     }
 
     public static final int CLOSEST_Y_FIELD_NUMBER = 4;
@@ -661,15 +625,6 @@ public final class FieldObstacles extends
       return boxRight_;
     }
 
-    private void initFields() {
-      position_ = messages.FieldObstacles.Obstacle.ObstaclePosition.NONE;
-      distance_ = 0F;
-      detector_ = messages.FieldObstacles.Obstacle.ObstacleDetector.NA;
-      closestY_ = 0F;
-      boxBottom_ = 0F;
-      boxLeft_ = 0F;
-      boxRight_ = 0F;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -682,15 +637,14 @@ public final class FieldObstacles extends
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeEnum(1, position_.getNumber());
+        output.writeEnum(1, position_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeFloat(2, distance_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeEnum(3, detector_.getNumber());
+        output.writeEnum(3, detector_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeFloat(4, closestY_);
@@ -704,18 +658,17 @@ public final class FieldObstacles extends
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         output.writeFloat(7, boxRight_);
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(1, position_.getNumber());
+          .computeEnumSize(1, position_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
@@ -723,7 +676,7 @@ public final class FieldObstacles extends
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(3, detector_.getNumber());
+          .computeEnumSize(3, detector_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
@@ -741,18 +694,12 @@ public final class FieldObstacles extends
         size += com.google.protobuf.CodedOutputStream
           .computeFloatSize(7, boxRight_);
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
     public static messages.FieldObstacles.Obstacle parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -806,12 +753,17 @@ public final class FieldObstacles extends
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(messages.FieldObstacles.Obstacle prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(messages.FieldObstacles.Obstacle prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -852,17 +804,13 @@ public final class FieldObstacles extends
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
-        position_ = messages.FieldObstacles.Obstacle.ObstaclePosition.NONE;
+        position_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
         distance_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000002);
-        detector_ = messages.FieldObstacles.Obstacle.ObstacleDetector.NA;
+        detector_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
         closestY_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000008);
@@ -873,10 +821,6 @@ public final class FieldObstacles extends
         boxRight_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000040);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -965,7 +909,8 @@ public final class FieldObstacles extends
         if (other.hasBoxRight()) {
           setBoxRight(other.getBoxRight());
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
@@ -992,7 +937,7 @@ public final class FieldObstacles extends
       }
       private int bitField0_;
 
-      private messages.FieldObstacles.Obstacle.ObstaclePosition position_ = messages.FieldObstacles.Obstacle.ObstaclePosition.NONE;
+      private int position_ = 0;
       /**
        * <code>optional .messages.FieldObstacles.Obstacle.ObstaclePosition position = 1;</code>
        */
@@ -1003,7 +948,8 @@ public final class FieldObstacles extends
        * <code>optional .messages.FieldObstacles.Obstacle.ObstaclePosition position = 1;</code>
        */
       public messages.FieldObstacles.Obstacle.ObstaclePosition getPosition() {
-        return position_;
+        messages.FieldObstacles.Obstacle.ObstaclePosition result = messages.FieldObstacles.Obstacle.ObstaclePosition.valueOf(position_);
+        return result == null ? messages.FieldObstacles.Obstacle.ObstaclePosition.NONE : result;
       }
       /**
        * <code>optional .messages.FieldObstacles.Obstacle.ObstaclePosition position = 1;</code>
@@ -1013,7 +959,7 @@ public final class FieldObstacles extends
           throw new NullPointerException();
         }
         bitField0_ |= 0x00000001;
-        position_ = value;
+        position_ = value.getNumber();
         onChanged();
         return this;
       }
@@ -1022,7 +968,7 @@ public final class FieldObstacles extends
        */
       public Builder clearPosition() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        position_ = messages.FieldObstacles.Obstacle.ObstaclePosition.NONE;
+        position_ = 0;
         onChanged();
         return this;
       }
@@ -1059,7 +1005,7 @@ public final class FieldObstacles extends
         return this;
       }
 
-      private messages.FieldObstacles.Obstacle.ObstacleDetector detector_ = messages.FieldObstacles.Obstacle.ObstacleDetector.NA;
+      private int detector_ = 0;
       /**
        * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
        */
@@ -1070,7 +1016,8 @@ public final class FieldObstacles extends
        * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
        */
       public messages.FieldObstacles.Obstacle.ObstacleDetector getDetector() {
-        return detector_;
+        messages.FieldObstacles.Obstacle.ObstacleDetector result = messages.FieldObstacles.Obstacle.ObstacleDetector.valueOf(detector_);
+        return result == null ? messages.FieldObstacles.Obstacle.ObstacleDetector.NA : result;
       }
       /**
        * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
@@ -1080,7 +1027,7 @@ public final class FieldObstacles extends
           throw new NullPointerException();
         }
         bitField0_ |= 0x00000004;
-        detector_ = value;
+        detector_ = value.getNumber();
         onChanged();
         return this;
       }
@@ -1089,7 +1036,7 @@ public final class FieldObstacles extends
        */
       public Builder clearDetector() {
         bitField0_ = (bitField0_ & ~0x00000004);
-        detector_ = messages.FieldObstacles.Obstacle.ObstacleDetector.NA;
+        detector_ = 0;
         onChanged();
         return this;
       }
@@ -1225,12 +1172,48 @@ public final class FieldObstacles extends
       // @@protoc_insertion_point(builder_scope:messages.FieldObstacles.Obstacle)
     }
 
+    // @@protoc_insertion_point(class_scope:messages.FieldObstacles.Obstacle)
+    private static final messages.FieldObstacles.Obstacle DEFAULT_INSTANCE;
     static {
-      defaultInstance = new Obstacle(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new messages.FieldObstacles.Obstacle();
     }
 
-    // @@protoc_insertion_point(class_scope:messages.FieldObstacles.Obstacle)
+    public static messages.FieldObstacles.Obstacle getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<Obstacle>
+        PARSER = new com.google.protobuf.AbstractParser<Obstacle>() {
+      public Obstacle parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        try {
+          return new Obstacle(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
+      }
+    };
+
+    public static com.google.protobuf.Parser<Obstacle> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Obstacle> getParserForType() {
+      return PARSER;
+    }
+
+    public messages.FieldObstacles.Obstacle getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public static final int OBSTACLE_FIELD_NUMBER = 1;
@@ -1268,9 +1251,6 @@ public final class FieldObstacles extends
     return obstacle_.get(index);
   }
 
-  private void initFields() {
-    obstacle_ = java.util.Collections.emptyList();
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -1283,16 +1263,14 @@ public final class FieldObstacles extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     for (int i = 0; i < obstacle_.size(); i++) {
       output.writeMessage(1, obstacle_.get(i));
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -1300,18 +1278,12 @@ public final class FieldObstacles extends
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(1, obstacle_.get(i));
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.FieldObstacles parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1365,12 +1337,17 @@ public final class FieldObstacles extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.FieldObstacles prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.FieldObstacles prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -1412,10 +1389,6 @@ public final class FieldObstacles extends
         getObstacleFieldBuilder();
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       if (obstacleBuilder_ == null) {
@@ -1425,10 +1398,6 @@ public final class FieldObstacles extends
         obstacleBuilder_.clear();
       }
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -1501,7 +1470,8 @@ public final class FieldObstacles extends
           }
         }
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -1771,11 +1741,47 @@ public final class FieldObstacles extends
     // @@protoc_insertion_point(builder_scope:messages.FieldObstacles)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.FieldObstacles)
+  private static final messages.FieldObstacles DEFAULT_INSTANCE;
   static {
-    defaultInstance = new FieldObstacles(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.FieldObstacles();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.FieldObstacles)
+  public static messages.FieldObstacles getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<FieldObstacles>
+      PARSER = new com.google.protobuf.AbstractParser<FieldObstacles>() {
+    public FieldObstacles parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new FieldObstacles(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<FieldObstacles> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<FieldObstacles> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.FieldObstacles getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

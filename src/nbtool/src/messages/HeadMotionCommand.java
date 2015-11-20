@@ -6,37 +6,28 @@ package messages;
 /**
  * Protobuf type {@code messages.HeadMotionCommand}
  */
-public final class HeadMotionCommand extends
+public  final class HeadMotionCommand extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.HeadMotionCommand)
     HeadMotionCommandOrBuilder {
   // Use HeadMotionCommand.newBuilder() to construct.
   private HeadMotionCommand(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private HeadMotionCommand(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final HeadMotionCommand defaultInstance;
-  public static HeadMotionCommand getDefaultInstance() {
-    return defaultInstance;
+  private HeadMotionCommand() {
+    type_ = 0;
+    timestamp_ = 0L;
   }
 
-  public HeadMotionCommand getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private HeadMotionCommand(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -62,7 +53,7 @@ public final class HeadMotionCommand extends
               unknownFields.mergeVarintField(1, rawValue);
             } else {
               bitField0_ |= 0x00000001;
-              type_ = value;
+              type_ = rawValue;
             }
             break;
           }
@@ -71,7 +62,7 @@ public final class HeadMotionCommand extends
             if (((bitField0_ & 0x00000002) == 0x00000002)) {
               subBuilder = posCommand_.toBuilder();
             }
-            posCommand_ = input.readMessage(messages.PositionHeadCommand.PARSER, extensionRegistry);
+            posCommand_ = input.readMessage(messages.PositionHeadCommand.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(posCommand_);
               posCommand_ = subBuilder.buildPartial();
@@ -84,7 +75,7 @@ public final class HeadMotionCommand extends
             if (((bitField0_ & 0x00000004) == 0x00000004)) {
               subBuilder = scriptedCommand_.toBuilder();
             }
-            scriptedCommand_ = input.readMessage(messages.ScriptedHeadCommand.PARSER, extensionRegistry);
+            scriptedCommand_ = input.readMessage(messages.ScriptedHeadCommand.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(scriptedCommand_);
               scriptedCommand_ = subBuilder.buildPartial();
@@ -100,10 +91,11 @@ public final class HeadMotionCommand extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -119,21 +111,6 @@ public final class HeadMotionCommand extends
     return messages._File_PMotion.internal_static_messages_HeadMotionCommand_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.HeadMotionCommand.class, messages.HeadMotionCommand.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<HeadMotionCommand> PARSER =
-      new com.google.protobuf.AbstractParser<HeadMotionCommand>() {
-    public HeadMotionCommand parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new HeadMotionCommand(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<HeadMotionCommand> getParserForType() {
-    return PARSER;
   }
 
   /**
@@ -169,7 +146,9 @@ public final class HeadMotionCommand extends
     public static final int SCRIPTED_HEAD_COMMAND_VALUE = 1;
 
 
-    public final int getNumber() { return value; }
+    public final int getNumber() {
+      return value;
+    }
 
     public static CommandType valueOf(int value) {
       switch (value) {
@@ -183,8 +162,8 @@ public final class HeadMotionCommand extends
         internalGetValueMap() {
       return internalValueMap;
     }
-    private static com.google.protobuf.Internal.EnumLiteMap<CommandType>
-        internalValueMap =
+    private static final com.google.protobuf.Internal.EnumLiteMap<
+        CommandType> internalValueMap =
           new com.google.protobuf.Internal.EnumLiteMap<CommandType>() {
             public CommandType findValueByNumber(int number) {
               return CommandType.valueOf(number);
@@ -228,7 +207,7 @@ public final class HeadMotionCommand extends
 
   private int bitField0_;
   public static final int TYPE_FIELD_NUMBER = 1;
-  private messages.HeadMotionCommand.CommandType type_;
+  private int type_;
   /**
    * <code>optional .messages.HeadMotionCommand.CommandType type = 1;</code>
    */
@@ -239,7 +218,8 @@ public final class HeadMotionCommand extends
    * <code>optional .messages.HeadMotionCommand.CommandType type = 1;</code>
    */
   public messages.HeadMotionCommand.CommandType getType() {
-    return type_;
+    messages.HeadMotionCommand.CommandType result = messages.HeadMotionCommand.CommandType.valueOf(type_);
+    return result == null ? messages.HeadMotionCommand.CommandType.POS_HEAD_COMMAND : result;
   }
 
   public static final int POS_COMMAND_FIELD_NUMBER = 2;
@@ -254,13 +234,13 @@ public final class HeadMotionCommand extends
    * <code>optional .messages.PositionHeadCommand pos_command = 2;</code>
    */
   public messages.PositionHeadCommand getPosCommand() {
-    return posCommand_;
+    return posCommand_ == null ? messages.PositionHeadCommand.getDefaultInstance() : posCommand_;
   }
   /**
    * <code>optional .messages.PositionHeadCommand pos_command = 2;</code>
    */
   public messages.PositionHeadCommandOrBuilder getPosCommandOrBuilder() {
-    return posCommand_;
+    return posCommand_ == null ? messages.PositionHeadCommand.getDefaultInstance() : posCommand_;
   }
 
   public static final int SCRIPTED_COMMAND_FIELD_NUMBER = 3;
@@ -275,13 +255,13 @@ public final class HeadMotionCommand extends
    * <code>optional .messages.ScriptedHeadCommand scripted_command = 3;</code>
    */
   public messages.ScriptedHeadCommand getScriptedCommand() {
-    return scriptedCommand_;
+    return scriptedCommand_ == null ? messages.ScriptedHeadCommand.getDefaultInstance() : scriptedCommand_;
   }
   /**
    * <code>optional .messages.ScriptedHeadCommand scripted_command = 3;</code>
    */
   public messages.ScriptedHeadCommandOrBuilder getScriptedCommandOrBuilder() {
-    return scriptedCommand_;
+    return scriptedCommand_ == null ? messages.ScriptedHeadCommand.getDefaultInstance() : scriptedCommand_;
   }
 
   public static final int TIMESTAMP_FIELD_NUMBER = 4;
@@ -299,12 +279,6 @@ public final class HeadMotionCommand extends
     return timestamp_;
   }
 
-  private void initFields() {
-    type_ = messages.HeadMotionCommand.CommandType.POS_HEAD_COMMAND;
-    posCommand_ = messages.PositionHeadCommand.getDefaultInstance();
-    scriptedCommand_ = messages.ScriptedHeadCommand.getDefaultInstance();
-    timestamp_ = 0L;
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -317,56 +291,48 @@ public final class HeadMotionCommand extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeEnum(1, type_.getNumber());
+      output.writeEnum(1, type_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      output.writeMessage(2, posCommand_);
+      output.writeMessage(2, getPosCommand());
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
-      output.writeMessage(3, scriptedCommand_);
+      output.writeMessage(3, getScriptedCommand());
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
       output.writeInt64(4, timestamp_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(1, type_.getNumber());
+        .computeEnumSize(1, type_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(2, posCommand_);
+        .computeMessageSize(2, getPosCommand());
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(3, scriptedCommand_);
+        .computeMessageSize(3, getScriptedCommand());
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt64Size(4, timestamp_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.HeadMotionCommand parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -420,12 +386,17 @@ public final class HeadMotionCommand extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.HeadMotionCommand prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.HeadMotionCommand prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -468,22 +439,18 @@ public final class HeadMotionCommand extends
         getScriptedCommandFieldBuilder();
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
-      type_ = messages.HeadMotionCommand.CommandType.POS_HEAD_COMMAND;
+      type_ = 0;
       bitField0_ = (bitField0_ & ~0x00000001);
       if (posCommandBuilder_ == null) {
-        posCommand_ = messages.PositionHeadCommand.getDefaultInstance();
+        posCommand_ = null;
       } else {
         posCommandBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000002);
       if (scriptedCommandBuilder_ == null) {
-        scriptedCommand_ = messages.ScriptedHeadCommand.getDefaultInstance();
+        scriptedCommand_ = null;
       } else {
         scriptedCommandBuilder_.clear();
       }
@@ -491,10 +458,6 @@ public final class HeadMotionCommand extends
       timestamp_ = 0L;
       bitField0_ = (bitField0_ & ~0x00000008);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -570,7 +533,8 @@ public final class HeadMotionCommand extends
       if (other.hasTimestamp()) {
         setTimestamp(other.getTimestamp());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -597,7 +561,7 @@ public final class HeadMotionCommand extends
     }
     private int bitField0_;
 
-    private messages.HeadMotionCommand.CommandType type_ = messages.HeadMotionCommand.CommandType.POS_HEAD_COMMAND;
+    private int type_ = 0;
     /**
      * <code>optional .messages.HeadMotionCommand.CommandType type = 1;</code>
      */
@@ -608,7 +572,8 @@ public final class HeadMotionCommand extends
      * <code>optional .messages.HeadMotionCommand.CommandType type = 1;</code>
      */
     public messages.HeadMotionCommand.CommandType getType() {
-      return type_;
+      messages.HeadMotionCommand.CommandType result = messages.HeadMotionCommand.CommandType.valueOf(type_);
+      return result == null ? messages.HeadMotionCommand.CommandType.POS_HEAD_COMMAND : result;
     }
     /**
      * <code>optional .messages.HeadMotionCommand.CommandType type = 1;</code>
@@ -618,7 +583,7 @@ public final class HeadMotionCommand extends
         throw new NullPointerException();
       }
       bitField0_ |= 0x00000001;
-      type_ = value;
+      type_ = value.getNumber();
       onChanged();
       return this;
     }
@@ -627,12 +592,12 @@ public final class HeadMotionCommand extends
      */
     public Builder clearType() {
       bitField0_ = (bitField0_ & ~0x00000001);
-      type_ = messages.HeadMotionCommand.CommandType.POS_HEAD_COMMAND;
+      type_ = 0;
       onChanged();
       return this;
     }
 
-    private messages.PositionHeadCommand posCommand_ = messages.PositionHeadCommand.getDefaultInstance();
+    private messages.PositionHeadCommand posCommand_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.PositionHeadCommand, messages.PositionHeadCommand.Builder, messages.PositionHeadCommandOrBuilder> posCommandBuilder_;
     /**
@@ -646,7 +611,7 @@ public final class HeadMotionCommand extends
      */
     public messages.PositionHeadCommand getPosCommand() {
       if (posCommandBuilder_ == null) {
-        return posCommand_;
+        return posCommand_ == null ? messages.PositionHeadCommand.getDefaultInstance() : posCommand_;
       } else {
         return posCommandBuilder_.getMessage();
       }
@@ -687,6 +652,7 @@ public final class HeadMotionCommand extends
     public Builder mergePosCommand(messages.PositionHeadCommand value) {
       if (posCommandBuilder_ == null) {
         if (((bitField0_ & 0x00000002) == 0x00000002) &&
+            posCommand_ != null &&
             posCommand_ != messages.PositionHeadCommand.getDefaultInstance()) {
           posCommand_ =
             messages.PositionHeadCommand.newBuilder(posCommand_).mergeFrom(value).buildPartial();
@@ -705,7 +671,7 @@ public final class HeadMotionCommand extends
      */
     public Builder clearPosCommand() {
       if (posCommandBuilder_ == null) {
-        posCommand_ = messages.PositionHeadCommand.getDefaultInstance();
+        posCommand_ = null;
         onChanged();
       } else {
         posCommandBuilder_.clear();
@@ -728,7 +694,8 @@ public final class HeadMotionCommand extends
       if (posCommandBuilder_ != null) {
         return posCommandBuilder_.getMessageOrBuilder();
       } else {
-        return posCommand_;
+        return posCommand_ == null ?
+            messages.PositionHeadCommand.getDefaultInstance() : posCommand_;
       }
     }
     /**
@@ -748,7 +715,7 @@ public final class HeadMotionCommand extends
       return posCommandBuilder_;
     }
 
-    private messages.ScriptedHeadCommand scriptedCommand_ = messages.ScriptedHeadCommand.getDefaultInstance();
+    private messages.ScriptedHeadCommand scriptedCommand_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.ScriptedHeadCommand, messages.ScriptedHeadCommand.Builder, messages.ScriptedHeadCommandOrBuilder> scriptedCommandBuilder_;
     /**
@@ -762,7 +729,7 @@ public final class HeadMotionCommand extends
      */
     public messages.ScriptedHeadCommand getScriptedCommand() {
       if (scriptedCommandBuilder_ == null) {
-        return scriptedCommand_;
+        return scriptedCommand_ == null ? messages.ScriptedHeadCommand.getDefaultInstance() : scriptedCommand_;
       } else {
         return scriptedCommandBuilder_.getMessage();
       }
@@ -803,6 +770,7 @@ public final class HeadMotionCommand extends
     public Builder mergeScriptedCommand(messages.ScriptedHeadCommand value) {
       if (scriptedCommandBuilder_ == null) {
         if (((bitField0_ & 0x00000004) == 0x00000004) &&
+            scriptedCommand_ != null &&
             scriptedCommand_ != messages.ScriptedHeadCommand.getDefaultInstance()) {
           scriptedCommand_ =
             messages.ScriptedHeadCommand.newBuilder(scriptedCommand_).mergeFrom(value).buildPartial();
@@ -821,7 +789,7 @@ public final class HeadMotionCommand extends
      */
     public Builder clearScriptedCommand() {
       if (scriptedCommandBuilder_ == null) {
-        scriptedCommand_ = messages.ScriptedHeadCommand.getDefaultInstance();
+        scriptedCommand_ = null;
         onChanged();
       } else {
         scriptedCommandBuilder_.clear();
@@ -844,7 +812,8 @@ public final class HeadMotionCommand extends
       if (scriptedCommandBuilder_ != null) {
         return scriptedCommandBuilder_.getMessageOrBuilder();
       } else {
-        return scriptedCommand_;
+        return scriptedCommand_ == null ?
+            messages.ScriptedHeadCommand.getDefaultInstance() : scriptedCommand_;
       }
     }
     /**
@@ -899,11 +868,47 @@ public final class HeadMotionCommand extends
     // @@protoc_insertion_point(builder_scope:messages.HeadMotionCommand)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.HeadMotionCommand)
+  private static final messages.HeadMotionCommand DEFAULT_INSTANCE;
   static {
-    defaultInstance = new HeadMotionCommand(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.HeadMotionCommand();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.HeadMotionCommand)
+  public static messages.HeadMotionCommand getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<HeadMotionCommand>
+      PARSER = new com.google.protobuf.AbstractParser<HeadMotionCommand>() {
+    public HeadMotionCommand parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new HeadMotionCommand(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<HeadMotionCommand> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<HeadMotionCommand> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.HeadMotionCommand getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

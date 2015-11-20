@@ -96,6 +96,7 @@ endif()
 include_directories( support )
 add_subdirectory( support )
 include_directories( motion/bhwalk ) # @todo hack?
+include_directories( motion/unswalk )
 
 # Actual modules
 add_subdirectory( arms )

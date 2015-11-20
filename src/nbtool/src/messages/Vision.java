@@ -6,37 +6,29 @@ package messages;
 /**
  * Protobuf type {@code messages.Vision}
  */
-public final class Vision extends
+public  final class Vision extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.Vision)
     VisionOrBuilder {
   // Use Vision.newBuilder() to construct.
   private Vision(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private Vision(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final Vision defaultInstance;
-  public static Vision getDefaultInstance() {
-    return defaultInstance;
+  private Vision() {
+    line_ = java.util.Collections.emptyList();
+    corner_ = java.util.Collections.emptyList();
+    horizonDist_ = 0;
   }
 
-  public Vision getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private Vision(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -60,7 +52,7 @@ public final class Vision extends
               line_ = new java.util.ArrayList<messages.FieldLine>();
               mutable_bitField0_ |= 0x00000001;
             }
-            line_.add(input.readMessage(messages.FieldLine.PARSER, extensionRegistry));
+            line_.add(input.readMessage(messages.FieldLine.parser(), extensionRegistry));
             break;
           }
           case 18: {
@@ -68,7 +60,7 @@ public final class Vision extends
               corner_ = new java.util.ArrayList<messages.Corner>();
               mutable_bitField0_ |= 0x00000002;
             }
-            corner_.add(input.readMessage(messages.Corner.PARSER, extensionRegistry));
+            corner_.add(input.readMessage(messages.Corner.parser(), extensionRegistry));
             break;
           }
           case 26: {
@@ -76,7 +68,7 @@ public final class Vision extends
             if (((bitField0_ & 0x00000001) == 0x00000001)) {
               subBuilder = circle_.toBuilder();
             }
-            circle_ = input.readMessage(messages.CenterCircle.PARSER, extensionRegistry);
+            circle_ = input.readMessage(messages.CenterCircle.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(circle_);
               circle_ = subBuilder.buildPartial();
@@ -89,7 +81,7 @@ public final class Vision extends
             if (((bitField0_ & 0x00000002) == 0x00000002)) {
               subBuilder = ball_.toBuilder();
             }
-            ball_ = input.readMessage(messages.VBall.PARSER, extensionRegistry);
+            ball_ = input.readMessage(messages.VBall.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(ball_);
               ball_ = subBuilder.buildPartial();
@@ -97,13 +89,19 @@ public final class Vision extends
             bitField0_ |= 0x00000002;
             break;
           }
+          case 40: {
+            bitField0_ |= 0x00000004;
+            horizonDist_ = input.readInt32();
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
         line_ = java.util.Collections.unmodifiableList(line_);
@@ -125,21 +123,6 @@ public final class Vision extends
     return messages._File_Vision.internal_static_messages_Vision_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.Vision.class, messages.Vision.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<Vision> PARSER =
-      new com.google.protobuf.AbstractParser<Vision>() {
-    public Vision parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new Vision(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<Vision> getParserForType() {
-    return PARSER;
   }
 
   private int bitField0_;
@@ -225,13 +208,13 @@ public final class Vision extends
    * <code>optional .messages.CenterCircle circle = 3;</code>
    */
   public messages.CenterCircle getCircle() {
-    return circle_;
+    return circle_ == null ? messages.CenterCircle.getDefaultInstance() : circle_;
   }
   /**
    * <code>optional .messages.CenterCircle circle = 3;</code>
    */
   public messages.CenterCircleOrBuilder getCircleOrBuilder() {
-    return circle_;
+    return circle_ == null ? messages.CenterCircle.getDefaultInstance() : circle_;
   }
 
   public static final int BALL_FIELD_NUMBER = 4;
@@ -246,21 +229,30 @@ public final class Vision extends
    * <code>optional .messages.VBall ball = 4;</code>
    */
   public messages.VBall getBall() {
-    return ball_;
+    return ball_ == null ? messages.VBall.getDefaultInstance() : ball_;
   }
   /**
    * <code>optional .messages.VBall ball = 4;</code>
    */
   public messages.VBallOrBuilder getBallOrBuilder() {
-    return ball_;
+    return ball_ == null ? messages.VBall.getDefaultInstance() : ball_;
   }
 
-  private void initFields() {
-    line_ = java.util.Collections.emptyList();
-    corner_ = java.util.Collections.emptyList();
-    circle_ = messages.CenterCircle.getDefaultInstance();
-    ball_ = messages.VBall.getDefaultInstance();
+  public static final int HORIZON_DIST_FIELD_NUMBER = 5;
+  private int horizonDist_;
+  /**
+   * <code>optional int32 horizon_dist = 5;</code>
+   */
+  public boolean hasHorizonDist() {
+    return ((bitField0_ & 0x00000004) == 0x00000004);
   }
+  /**
+   * <code>optional int32 horizon_dist = 5;</code>
+   */
+  public int getHorizonDist() {
+    return horizonDist_;
+  }
+
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -273,7 +265,6 @@ public final class Vision extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     for (int i = 0; i < line_.size(); i++) {
       output.writeMessage(1, line_.get(i));
     }
@@ -281,17 +272,19 @@ public final class Vision extends
       output.writeMessage(2, corner_.get(i));
     }
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeMessage(3, circle_);
+      output.writeMessage(3, getCircle());
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      output.writeMessage(4, ball_);
+      output.writeMessage(4, getBall());
     }
-    getUnknownFields().writeTo(output);
+    if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      output.writeInt32(5, horizonDist_);
+    }
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -305,24 +298,22 @@ public final class Vision extends
     }
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(3, circle_);
+        .computeMessageSize(3, getCircle());
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(4, ball_);
+        .computeMessageSize(4, getBall());
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(5, horizonDist_);
+    }
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.Vision parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -376,12 +367,17 @@ public final class Vision extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.Vision prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.Vision prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -426,10 +422,6 @@ public final class Vision extends
         getBallFieldBuilder();
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       if (lineBuilder_ == null) {
@@ -445,22 +437,20 @@ public final class Vision extends
         cornerBuilder_.clear();
       }
       if (circleBuilder_ == null) {
-        circle_ = messages.CenterCircle.getDefaultInstance();
+        circle_ = null;
       } else {
         circleBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000004);
       if (ballBuilder_ == null) {
-        ball_ = messages.VBall.getDefaultInstance();
+        ball_ = null;
       } else {
         ballBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000008);
+      horizonDist_ = 0;
+      bitField0_ = (bitField0_ & ~0x00000010);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -518,6 +508,10 @@ public final class Vision extends
       } else {
         result.ball_ = ballBuilder_.build();
       }
+      if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+        to_bitField0_ |= 0x00000004;
+      }
+      result.horizonDist_ = horizonDist_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -592,7 +586,11 @@ public final class Vision extends
       if (other.hasBall()) {
         mergeBall(other.getBall());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      if (other.hasHorizonDist()) {
+        setHorizonDist(other.getHorizonDist());
+      }
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -1099,7 +1097,7 @@ public final class Vision extends
       return cornerBuilder_;
     }
 
-    private messages.CenterCircle circle_ = messages.CenterCircle.getDefaultInstance();
+    private messages.CenterCircle circle_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.CenterCircle, messages.CenterCircle.Builder, messages.CenterCircleOrBuilder> circleBuilder_;
     /**
@@ -1113,7 +1111,7 @@ public final class Vision extends
      */
     public messages.CenterCircle getCircle() {
       if (circleBuilder_ == null) {
-        return circle_;
+        return circle_ == null ? messages.CenterCircle.getDefaultInstance() : circle_;
       } else {
         return circleBuilder_.getMessage();
       }
@@ -1154,6 +1152,7 @@ public final class Vision extends
     public Builder mergeCircle(messages.CenterCircle value) {
       if (circleBuilder_ == null) {
         if (((bitField0_ & 0x00000004) == 0x00000004) &&
+            circle_ != null &&
             circle_ != messages.CenterCircle.getDefaultInstance()) {
           circle_ =
             messages.CenterCircle.newBuilder(circle_).mergeFrom(value).buildPartial();
@@ -1172,7 +1171,7 @@ public final class Vision extends
      */
     public Builder clearCircle() {
       if (circleBuilder_ == null) {
-        circle_ = messages.CenterCircle.getDefaultInstance();
+        circle_ = null;
         onChanged();
       } else {
         circleBuilder_.clear();
@@ -1195,7 +1194,8 @@ public final class Vision extends
       if (circleBuilder_ != null) {
         return circleBuilder_.getMessageOrBuilder();
       } else {
-        return circle_;
+        return circle_ == null ?
+            messages.CenterCircle.getDefaultInstance() : circle_;
       }
     }
     /**
@@ -1215,7 +1215,7 @@ public final class Vision extends
       return circleBuilder_;
     }
 
-    private messages.VBall ball_ = messages.VBall.getDefaultInstance();
+    private messages.VBall ball_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.VBall, messages.VBall.Builder, messages.VBallOrBuilder> ballBuilder_;
     /**
@@ -1229,7 +1229,7 @@ public final class Vision extends
      */
     public messages.VBall getBall() {
       if (ballBuilder_ == null) {
-        return ball_;
+        return ball_ == null ? messages.VBall.getDefaultInstance() : ball_;
       } else {
         return ballBuilder_.getMessage();
       }
@@ -1270,6 +1270,7 @@ public final class Vision extends
     public Builder mergeBall(messages.VBall value) {
       if (ballBuilder_ == null) {
         if (((bitField0_ & 0x00000008) == 0x00000008) &&
+            ball_ != null &&
             ball_ != messages.VBall.getDefaultInstance()) {
           ball_ =
             messages.VBall.newBuilder(ball_).mergeFrom(value).buildPartial();
@@ -1288,7 +1289,7 @@ public final class Vision extends
      */
     public Builder clearBall() {
       if (ballBuilder_ == null) {
-        ball_ = messages.VBall.getDefaultInstance();
+        ball_ = null;
         onChanged();
       } else {
         ballBuilder_.clear();
@@ -1311,7 +1312,8 @@ public final class Vision extends
       if (ballBuilder_ != null) {
         return ballBuilder_.getMessageOrBuilder();
       } else {
-        return ball_;
+        return ball_ == null ?
+            messages.VBall.getDefaultInstance() : ball_;
       }
     }
     /**
@@ -1331,14 +1333,82 @@ public final class Vision extends
       return ballBuilder_;
     }
 
+    private int horizonDist_ ;
+    /**
+     * <code>optional int32 horizon_dist = 5;</code>
+     */
+    public boolean hasHorizonDist() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional int32 horizon_dist = 5;</code>
+     */
+    public int getHorizonDist() {
+      return horizonDist_;
+    }
+    /**
+     * <code>optional int32 horizon_dist = 5;</code>
+     */
+    public Builder setHorizonDist(int value) {
+      bitField0_ |= 0x00000010;
+      horizonDist_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 horizon_dist = 5;</code>
+     */
+    public Builder clearHorizonDist() {
+      bitField0_ = (bitField0_ & ~0x00000010);
+      horizonDist_ = 0;
+      onChanged();
+      return this;
+    }
+
     // @@protoc_insertion_point(builder_scope:messages.Vision)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.Vision)
+  private static final messages.Vision DEFAULT_INSTANCE;
   static {
-    defaultInstance = new Vision(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.Vision();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.Vision)
+  public static messages.Vision getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<Vision>
+      PARSER = new com.google.protobuf.AbstractParser<Vision>() {
+    public Vision parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new Vision(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<Vision> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<Vision> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.Vision getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

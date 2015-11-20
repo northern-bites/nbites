@@ -6,37 +6,28 @@ package messages;
 /**
  * Protobuf type {@code messages.HandSpeeds}
  */
-public final class HandSpeeds extends
+public  final class HandSpeeds extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.HandSpeeds)
     HandSpeedsOrBuilder {
   // Use HandSpeeds.newBuilder() to construct.
   private HandSpeeds(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private HandSpeeds(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final HandSpeeds defaultInstance;
-  public static HandSpeeds getDefaultInstance() {
-    return defaultInstance;
+  private HandSpeeds() {
+    leftSpeed_ = 0F;
+    rightSpeed_ = 0F;
   }
 
-  public HandSpeeds getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private HandSpeeds(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -68,10 +59,11 @@ public final class HandSpeeds extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -87,21 +79,6 @@ public final class HandSpeeds extends
     return messages._File_HandSpeeds.internal_static_messages_HandSpeeds_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.HandSpeeds.class, messages.HandSpeeds.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<HandSpeeds> PARSER =
-      new com.google.protobuf.AbstractParser<HandSpeeds>() {
-    public HandSpeeds parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new HandSpeeds(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<HandSpeeds> getParserForType() {
-    return PARSER;
   }
 
   private int bitField0_;
@@ -135,10 +112,6 @@ public final class HandSpeeds extends
     return rightSpeed_;
   }
 
-  private void initFields() {
-    leftSpeed_ = 0F;
-    rightSpeed_ = 0F;
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -151,19 +124,17 @@ public final class HandSpeeds extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeFloat(1, leftSpeed_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       output.writeFloat(2, rightSpeed_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -175,18 +146,12 @@ public final class HandSpeeds extends
       size += com.google.protobuf.CodedOutputStream
         .computeFloatSize(2, rightSpeed_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.HandSpeeds parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -240,12 +205,17 @@ public final class HandSpeeds extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.HandSpeeds prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.HandSpeeds prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -286,10 +256,6 @@ public final class HandSpeeds extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       leftSpeed_ = 0F;
@@ -297,10 +263,6 @@ public final class HandSpeeds extends
       rightSpeed_ = 0F;
       bitField0_ = (bitField0_ & ~0x00000002);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -354,7 +316,8 @@ public final class HandSpeeds extends
       if (other.hasRightSpeed()) {
         setRightSpeed(other.getRightSpeed());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -448,11 +411,47 @@ public final class HandSpeeds extends
     // @@protoc_insertion_point(builder_scope:messages.HandSpeeds)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.HandSpeeds)
+  private static final messages.HandSpeeds DEFAULT_INSTANCE;
   static {
-    defaultInstance = new HandSpeeds(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.HandSpeeds();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.HandSpeeds)
+  public static messages.HandSpeeds getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<HandSpeeds>
+      PARSER = new com.google.protobuf.AbstractParser<HandSpeeds>() {
+    public HandSpeeds parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new HandSpeeds(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<HandSpeeds> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<HandSpeeds> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.HandSpeeds getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

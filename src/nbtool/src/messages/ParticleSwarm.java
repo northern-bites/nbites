@@ -6,37 +6,27 @@ package messages;
 /**
  * Protobuf type {@code messages.ParticleSwarm}
  */
-public final class ParticleSwarm extends
+public  final class ParticleSwarm extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.ParticleSwarm)
     ParticleSwarmOrBuilder {
   // Use ParticleSwarm.newBuilder() to construct.
   private ParticleSwarm(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private ParticleSwarm(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final ParticleSwarm defaultInstance;
-  public static ParticleSwarm getDefaultInstance() {
-    return defaultInstance;
+  private ParticleSwarm() {
+    particle_ = java.util.Collections.emptyList();
   }
 
-  public ParticleSwarm getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private ParticleSwarm(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -60,16 +50,17 @@ public final class ParticleSwarm extends
               particle_ = new java.util.ArrayList<messages.Particle>();
               mutable_bitField0_ |= 0x00000001;
             }
-            particle_.add(input.readMessage(messages.Particle.PARSER, extensionRegistry));
+            particle_.add(input.readMessage(messages.Particle.parser(), extensionRegistry));
             break;
           }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
         particle_ = java.util.Collections.unmodifiableList(particle_);
@@ -88,21 +79,6 @@ public final class ParticleSwarm extends
     return messages._File_ParticleSwarm.internal_static_messages_ParticleSwarm_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.ParticleSwarm.class, messages.ParticleSwarm.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<ParticleSwarm> PARSER =
-      new com.google.protobuf.AbstractParser<ParticleSwarm>() {
-    public ParticleSwarm parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new ParticleSwarm(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<ParticleSwarm> getParserForType() {
-    return PARSER;
   }
 
   public static final int PARTICLE_FIELD_NUMBER = 1;
@@ -140,9 +116,6 @@ public final class ParticleSwarm extends
     return particle_.get(index);
   }
 
-  private void initFields() {
-    particle_ = java.util.Collections.emptyList();
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -155,16 +128,14 @@ public final class ParticleSwarm extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     for (int i = 0; i < particle_.size(); i++) {
       output.writeMessage(1, particle_.get(i));
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -172,18 +143,12 @@ public final class ParticleSwarm extends
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(1, particle_.get(i));
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.ParticleSwarm parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -237,12 +202,17 @@ public final class ParticleSwarm extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.ParticleSwarm prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.ParticleSwarm prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -284,10 +254,6 @@ public final class ParticleSwarm extends
         getParticleFieldBuilder();
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       if (particleBuilder_ == null) {
@@ -297,10 +263,6 @@ public final class ParticleSwarm extends
         particleBuilder_.clear();
       }
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -373,7 +335,8 @@ public final class ParticleSwarm extends
           }
         }
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -643,11 +606,47 @@ public final class ParticleSwarm extends
     // @@protoc_insertion_point(builder_scope:messages.ParticleSwarm)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.ParticleSwarm)
+  private static final messages.ParticleSwarm DEFAULT_INSTANCE;
   static {
-    defaultInstance = new ParticleSwarm(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.ParticleSwarm();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.ParticleSwarm)
+  public static messages.ParticleSwarm getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<ParticleSwarm>
+      PARSER = new com.google.protobuf.AbstractParser<ParticleSwarm>() {
+    public ParticleSwarm parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new ParticleSwarm(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<ParticleSwarm> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<ParticleSwarm> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.ParticleSwarm getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

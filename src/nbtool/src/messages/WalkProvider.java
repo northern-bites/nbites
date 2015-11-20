@@ -6,37 +6,33 @@ package messages;
 /**
  * Protobuf type {@code messages.WalkProvider}
  */
-public final class WalkProvider extends
+public  final class WalkProvider extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.WalkProvider)
     WalkProviderOrBuilder {
   // Use WalkProvider.newBuilder() to construct.
   private WalkProvider(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private WalkProvider(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final WalkProvider defaultInstance;
-  public static WalkProvider getDefaultInstance() {
-    return defaultInstance;
-  }
-
-  public WalkProvider getDefaultInstanceForType() {
-    return defaultInstance;
+  private WalkProvider() {
+    active_ = false;
+    isWalking_ = false;
+    stopping_ = false;
+    requestedToStop_ = false;
+    isStanding_ = false;
+    calibrated_ = false;
+    commandType_ = 0;
   }
 
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private WalkProvider(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -90,7 +86,7 @@ public final class WalkProvider extends
             if (((bitField0_ & 0x00000080) == 0x00000080)) {
               subBuilder = bhdebug_.toBuilder();
             }
-            bhdebug_ = input.readMessage(messages.WalkProvider.BHDebug.PARSER, extensionRegistry);
+            bhdebug_ = input.readMessage(messages.WalkProvider.BHDebug.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(bhdebug_);
               bhdebug_ = subBuilder.buildPartial();
@@ -106,10 +102,11 @@ public final class WalkProvider extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -125,21 +122,6 @@ public final class WalkProvider extends
     return messages._File_Motion.internal_static_messages_WalkProvider_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.WalkProvider.class, messages.WalkProvider.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<WalkProvider> PARSER =
-      new com.google.protobuf.AbstractParser<WalkProvider>() {
-    public WalkProvider parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new WalkProvider(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<WalkProvider> getParserForType() {
-    return PARSER;
   }
 
   public interface BHDebugOrBuilder extends
@@ -252,37 +234,33 @@ public final class WalkProvider extends
   /**
    * Protobuf type {@code messages.WalkProvider.BHDebug}
    */
-  public static final class BHDebug extends
+  public  static final class BHDebug extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:messages.WalkProvider.BHDebug)
       BHDebugOrBuilder {
     // Use BHDebug.newBuilder() to construct.
     private BHDebug(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private BHDebug(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final BHDebug defaultInstance;
-    public static BHDebug getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public BHDebug getDefaultInstanceForType() {
-      return defaultInstance;
+    private BHDebug() {
+      motionType_ = 0;
+      motionName_ = "";
+      selectedMotionType_ = 0;
+      selectedMotionName_ = "";
+      selectRatios_ = java.util.Collections.emptyList();
+      groundContactSafe_ = false;
+      instable_ = false;
     }
 
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private BHDebug(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -328,7 +306,7 @@ public final class WalkProvider extends
               if (((bitField0_ & 0x00000010) == 0x00000010)) {
                 subBuilder = target_.toBuilder();
               }
-              target_ = input.readMessage(messages.RobotLocation.PARSER, extensionRegistry);
+              target_ = input.readMessage(messages.RobotLocation.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom(target_);
                 target_ = subBuilder.buildPartial();
@@ -341,7 +319,7 @@ public final class WalkProvider extends
               if (((bitField0_ & 0x00000020) == 0x00000020)) {
                 subBuilder = speeds_.toBuilder();
               }
-              speeds_ = input.readMessage(messages.RobotLocation.PARSER, extensionRegistry);
+              speeds_ = input.readMessage(messages.RobotLocation.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom(speeds_);
                 speeds_ = subBuilder.buildPartial();
@@ -383,10 +361,11 @@ public final class WalkProvider extends
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         if (((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
           selectRatios_ = java.util.Collections.unmodifiableList(selectRatios_);
@@ -407,21 +386,6 @@ public final class WalkProvider extends
               messages.WalkProvider.BHDebug.class, messages.WalkProvider.BHDebug.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<BHDebug> PARSER =
-        new com.google.protobuf.AbstractParser<BHDebug>() {
-      public BHDebug parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new BHDebug(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<BHDebug> getParserForType() {
-      return PARSER;
-    }
-
     private int bitField0_;
     public static final int MOTION_TYPE_FIELD_NUMBER = 1;
     private int motionType_;
@@ -439,7 +403,7 @@ public final class WalkProvider extends
     }
 
     public static final int MOTION_NAME_FIELD_NUMBER = 2;
-    private java.lang.Object motionName_;
+    private volatile java.lang.Object motionName_;
     /**
      * <code>optional string motion_name = 2;</code>
      */
@@ -496,7 +460,7 @@ public final class WalkProvider extends
     }
 
     public static final int SELECTED_MOTION_NAME_FIELD_NUMBER = 4;
-    private java.lang.Object selectedMotionName_;
+    private volatile java.lang.Object selectedMotionName_;
     /**
      * <code>optional string selected_motion_name = 4;</code>
      */
@@ -549,13 +513,13 @@ public final class WalkProvider extends
      * <code>optional .messages.RobotLocation target = 5;</code>
      */
     public messages.RobotLocation getTarget() {
-      return target_;
+      return target_ == null ? messages.RobotLocation.getDefaultInstance() : target_;
     }
     /**
      * <code>optional .messages.RobotLocation target = 5;</code>
      */
     public messages.RobotLocationOrBuilder getTargetOrBuilder() {
-      return target_;
+      return target_ == null ? messages.RobotLocation.getDefaultInstance() : target_;
     }
 
     public static final int SPEEDS_FIELD_NUMBER = 6;
@@ -570,13 +534,13 @@ public final class WalkProvider extends
      * <code>optional .messages.RobotLocation speeds = 6;</code>
      */
     public messages.RobotLocation getSpeeds() {
-      return speeds_;
+      return speeds_ == null ? messages.RobotLocation.getDefaultInstance() : speeds_;
     }
     /**
      * <code>optional .messages.RobotLocation speeds = 6;</code>
      */
     public messages.RobotLocationOrBuilder getSpeedsOrBuilder() {
-      return speeds_;
+      return speeds_ == null ? messages.RobotLocation.getDefaultInstance() : speeds_;
     }
 
     public static final int SELECT_RATIOS_FIELD_NUMBER = 7;
@@ -631,17 +595,6 @@ public final class WalkProvider extends
       return instable_;
     }
 
-    private void initFields() {
-      motionType_ = 0;
-      motionName_ = "";
-      selectedMotionType_ = 0;
-      selectedMotionName_ = "";
-      target_ = messages.RobotLocation.getDefaultInstance();
-      speeds_ = messages.RobotLocation.getDefaultInstance();
-      selectRatios_ = java.util.Collections.emptyList();
-      groundContactSafe_ = false;
-      instable_ = false;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -654,24 +607,23 @@ public final class WalkProvider extends
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeUInt32(1, motionType_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getMotionNameBytes());
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, motionName_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeUInt32(3, selectedMotionType_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeBytes(4, getSelectedMotionNameBytes());
+        com.google.protobuf.GeneratedMessage.writeString(output, 4, selectedMotionName_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeMessage(5, target_);
+        output.writeMessage(5, getTarget());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeMessage(6, speeds_);
+        output.writeMessage(6, getSpeeds());
       }
       for (int i = 0; i < selectRatios_.size(); i++) {
         output.writeFloat(7, selectRatios_.get(i));
@@ -682,12 +634,11 @@ public final class WalkProvider extends
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         output.writeBool(9, instable_);
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -696,24 +647,22 @@ public final class WalkProvider extends
           .computeUInt32Size(1, motionType_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getMotionNameBytes());
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, motionName_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt32Size(3, selectedMotionType_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(4, getSelectedMotionNameBytes());
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(4, selectedMotionName_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, target_);
+          .computeMessageSize(5, getTarget());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(6, speeds_);
+          .computeMessageSize(6, getSpeeds());
       }
       {
         int dataSize = 0;
@@ -729,18 +678,12 @@ public final class WalkProvider extends
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(9, instable_);
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
     public static messages.WalkProvider.BHDebug parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -794,12 +737,17 @@ public final class WalkProvider extends
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(messages.WalkProvider.BHDebug prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(messages.WalkProvider.BHDebug prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -842,10 +790,6 @@ public final class WalkProvider extends
           getSpeedsFieldBuilder();
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         motionType_ = 0;
@@ -857,13 +801,13 @@ public final class WalkProvider extends
         selectedMotionName_ = "";
         bitField0_ = (bitField0_ & ~0x00000008);
         if (targetBuilder_ == null) {
-          target_ = messages.RobotLocation.getDefaultInstance();
+          target_ = null;
         } else {
           targetBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000010);
         if (speedsBuilder_ == null) {
-          speeds_ = messages.RobotLocation.getDefaultInstance();
+          speeds_ = null;
         } else {
           speedsBuilder_.clear();
         }
@@ -875,10 +819,6 @@ public final class WalkProvider extends
         instable_ = false;
         bitField0_ = (bitField0_ & ~0x00000100);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -1001,7 +941,8 @@ public final class WalkProvider extends
         if (other.hasInstable()) {
           setInstable(other.getInstable());
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
@@ -1244,7 +1185,7 @@ public final class WalkProvider extends
         return this;
       }
 
-      private messages.RobotLocation target_ = messages.RobotLocation.getDefaultInstance();
+      private messages.RobotLocation target_ = null;
       private com.google.protobuf.SingleFieldBuilder<
           messages.RobotLocation, messages.RobotLocation.Builder, messages.RobotLocationOrBuilder> targetBuilder_;
       /**
@@ -1258,7 +1199,7 @@ public final class WalkProvider extends
        */
       public messages.RobotLocation getTarget() {
         if (targetBuilder_ == null) {
-          return target_;
+          return target_ == null ? messages.RobotLocation.getDefaultInstance() : target_;
         } else {
           return targetBuilder_.getMessage();
         }
@@ -1299,6 +1240,7 @@ public final class WalkProvider extends
       public Builder mergeTarget(messages.RobotLocation value) {
         if (targetBuilder_ == null) {
           if (((bitField0_ & 0x00000010) == 0x00000010) &&
+              target_ != null &&
               target_ != messages.RobotLocation.getDefaultInstance()) {
             target_ =
               messages.RobotLocation.newBuilder(target_).mergeFrom(value).buildPartial();
@@ -1317,7 +1259,7 @@ public final class WalkProvider extends
        */
       public Builder clearTarget() {
         if (targetBuilder_ == null) {
-          target_ = messages.RobotLocation.getDefaultInstance();
+          target_ = null;
           onChanged();
         } else {
           targetBuilder_.clear();
@@ -1340,7 +1282,8 @@ public final class WalkProvider extends
         if (targetBuilder_ != null) {
           return targetBuilder_.getMessageOrBuilder();
         } else {
-          return target_;
+          return target_ == null ?
+              messages.RobotLocation.getDefaultInstance() : target_;
         }
       }
       /**
@@ -1360,7 +1303,7 @@ public final class WalkProvider extends
         return targetBuilder_;
       }
 
-      private messages.RobotLocation speeds_ = messages.RobotLocation.getDefaultInstance();
+      private messages.RobotLocation speeds_ = null;
       private com.google.protobuf.SingleFieldBuilder<
           messages.RobotLocation, messages.RobotLocation.Builder, messages.RobotLocationOrBuilder> speedsBuilder_;
       /**
@@ -1374,7 +1317,7 @@ public final class WalkProvider extends
        */
       public messages.RobotLocation getSpeeds() {
         if (speedsBuilder_ == null) {
-          return speeds_;
+          return speeds_ == null ? messages.RobotLocation.getDefaultInstance() : speeds_;
         } else {
           return speedsBuilder_.getMessage();
         }
@@ -1415,6 +1358,7 @@ public final class WalkProvider extends
       public Builder mergeSpeeds(messages.RobotLocation value) {
         if (speedsBuilder_ == null) {
           if (((bitField0_ & 0x00000020) == 0x00000020) &&
+              speeds_ != null &&
               speeds_ != messages.RobotLocation.getDefaultInstance()) {
             speeds_ =
               messages.RobotLocation.newBuilder(speeds_).mergeFrom(value).buildPartial();
@@ -1433,7 +1377,7 @@ public final class WalkProvider extends
        */
       public Builder clearSpeeds() {
         if (speedsBuilder_ == null) {
-          speeds_ = messages.RobotLocation.getDefaultInstance();
+          speeds_ = null;
           onChanged();
         } else {
           speedsBuilder_.clear();
@@ -1456,7 +1400,8 @@ public final class WalkProvider extends
         if (speedsBuilder_ != null) {
           return speedsBuilder_.getMessageOrBuilder();
         } else {
-          return speeds_;
+          return speeds_ == null ?
+              messages.RobotLocation.getDefaultInstance() : speeds_;
         }
       }
       /**
@@ -1609,12 +1554,48 @@ public final class WalkProvider extends
       // @@protoc_insertion_point(builder_scope:messages.WalkProvider.BHDebug)
     }
 
+    // @@protoc_insertion_point(class_scope:messages.WalkProvider.BHDebug)
+    private static final messages.WalkProvider.BHDebug DEFAULT_INSTANCE;
     static {
-      defaultInstance = new BHDebug(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new messages.WalkProvider.BHDebug();
     }
 
-    // @@protoc_insertion_point(class_scope:messages.WalkProvider.BHDebug)
+    public static messages.WalkProvider.BHDebug getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<BHDebug>
+        PARSER = new com.google.protobuf.AbstractParser<BHDebug>() {
+      public BHDebug parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        try {
+          return new BHDebug(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
+      }
+    };
+
+    public static com.google.protobuf.Parser<BHDebug> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<BHDebug> getParserForType() {
+      return PARSER;
+    }
+
+    public messages.WalkProvider.BHDebug getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   private int bitField0_;
@@ -1735,25 +1716,15 @@ public final class WalkProvider extends
    * <code>optional .messages.WalkProvider.BHDebug bhdebug = 7;</code>
    */
   public messages.WalkProvider.BHDebug getBhdebug() {
-    return bhdebug_;
+    return bhdebug_ == null ? messages.WalkProvider.BHDebug.getDefaultInstance() : bhdebug_;
   }
   /**
    * <code>optional .messages.WalkProvider.BHDebug bhdebug = 7;</code>
    */
   public messages.WalkProvider.BHDebugOrBuilder getBhdebugOrBuilder() {
-    return bhdebug_;
+    return bhdebug_ == null ? messages.WalkProvider.BHDebug.getDefaultInstance() : bhdebug_;
   }
 
-  private void initFields() {
-    active_ = false;
-    isWalking_ = false;
-    stopping_ = false;
-    requestedToStop_ = false;
-    isStanding_ = false;
-    calibrated_ = false;
-    commandType_ = 0;
-    bhdebug_ = messages.WalkProvider.BHDebug.getDefaultInstance();
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -1766,7 +1737,6 @@ public final class WalkProvider extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeBool(1, active_);
     }
@@ -1786,17 +1756,16 @@ public final class WalkProvider extends
       output.writeBool(6, calibrated_);
     }
     if (((bitField0_ & 0x00000080) == 0x00000080)) {
-      output.writeMessage(7, bhdebug_);
+      output.writeMessage(7, getBhdebug());
     }
     if (((bitField0_ & 0x00000040) == 0x00000040)) {
       output.writeInt32(8, commandType_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -1826,24 +1795,18 @@ public final class WalkProvider extends
     }
     if (((bitField0_ & 0x00000080) == 0x00000080)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(7, bhdebug_);
+        .computeMessageSize(7, getBhdebug());
     }
     if (((bitField0_ & 0x00000040) == 0x00000040)) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(8, commandType_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.WalkProvider parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1897,12 +1860,17 @@ public final class WalkProvider extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.WalkProvider prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.WalkProvider prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -1944,10 +1912,6 @@ public final class WalkProvider extends
         getBhdebugFieldBuilder();
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       active_ = false;
@@ -1965,16 +1929,12 @@ public final class WalkProvider extends
       commandType_ = 0;
       bitField0_ = (bitField0_ & ~0x00000040);
       if (bhdebugBuilder_ == null) {
-        bhdebug_ = messages.WalkProvider.BHDebug.getDefaultInstance();
+        bhdebug_ = null;
       } else {
         bhdebugBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000080);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -2074,7 +2034,8 @@ public final class WalkProvider extends
       if (other.hasBhdebug()) {
         mergeBhdebug(other.getBhdebug());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -2325,7 +2286,7 @@ public final class WalkProvider extends
       return this;
     }
 
-    private messages.WalkProvider.BHDebug bhdebug_ = messages.WalkProvider.BHDebug.getDefaultInstance();
+    private messages.WalkProvider.BHDebug bhdebug_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.WalkProvider.BHDebug, messages.WalkProvider.BHDebug.Builder, messages.WalkProvider.BHDebugOrBuilder> bhdebugBuilder_;
     /**
@@ -2339,7 +2300,7 @@ public final class WalkProvider extends
      */
     public messages.WalkProvider.BHDebug getBhdebug() {
       if (bhdebugBuilder_ == null) {
-        return bhdebug_;
+        return bhdebug_ == null ? messages.WalkProvider.BHDebug.getDefaultInstance() : bhdebug_;
       } else {
         return bhdebugBuilder_.getMessage();
       }
@@ -2380,6 +2341,7 @@ public final class WalkProvider extends
     public Builder mergeBhdebug(messages.WalkProvider.BHDebug value) {
       if (bhdebugBuilder_ == null) {
         if (((bitField0_ & 0x00000080) == 0x00000080) &&
+            bhdebug_ != null &&
             bhdebug_ != messages.WalkProvider.BHDebug.getDefaultInstance()) {
           bhdebug_ =
             messages.WalkProvider.BHDebug.newBuilder(bhdebug_).mergeFrom(value).buildPartial();
@@ -2398,7 +2360,7 @@ public final class WalkProvider extends
      */
     public Builder clearBhdebug() {
       if (bhdebugBuilder_ == null) {
-        bhdebug_ = messages.WalkProvider.BHDebug.getDefaultInstance();
+        bhdebug_ = null;
         onChanged();
       } else {
         bhdebugBuilder_.clear();
@@ -2421,7 +2383,8 @@ public final class WalkProvider extends
       if (bhdebugBuilder_ != null) {
         return bhdebugBuilder_.getMessageOrBuilder();
       } else {
-        return bhdebug_;
+        return bhdebug_ == null ?
+            messages.WalkProvider.BHDebug.getDefaultInstance() : bhdebug_;
       }
     }
     /**
@@ -2444,11 +2407,47 @@ public final class WalkProvider extends
     // @@protoc_insertion_point(builder_scope:messages.WalkProvider)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.WalkProvider)
+  private static final messages.WalkProvider DEFAULT_INSTANCE;
   static {
-    defaultInstance = new WalkProvider(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.WalkProvider();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.WalkProvider)
+  public static messages.WalkProvider getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<WalkProvider>
+      PARSER = new com.google.protobuf.AbstractParser<WalkProvider>() {
+    public WalkProvider parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new WalkProvider(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<WalkProvider> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<WalkProvider> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.WalkProvider getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

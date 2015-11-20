@@ -6,37 +6,31 @@ package messages;
 /**
  * Protobuf type {@code messages.CenterCircle}
  */
-public final class CenterCircle extends
+public  final class CenterCircle extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.CenterCircle)
     CenterCircleOrBuilder {
   // Use CenterCircle.newBuilder() to construct.
   private CenterCircle(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private CenterCircle(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final CenterCircle defaultInstance;
-  public static CenterCircle getDefaultInstance() {
-    return defaultInstance;
-  }
-
-  public CenterCircle getDefaultInstanceForType() {
-    return defaultInstance;
+  private CenterCircle() {
+    on_ = false;
+    x_ = 0F;
+    y_ = 0F;
+    prob_ = 0F;
+    wz0_ = 0F;
   }
 
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private CenterCircle(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -75,13 +69,19 @@ public final class CenterCircle extends
             prob_ = input.readFloat();
             break;
           }
+          case 45: {
+            bitField0_ |= 0x00000010;
+            wz0_ = input.readFloat();
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -97,21 +97,6 @@ public final class CenterCircle extends
     return messages._File_Vision.internal_static_messages_CenterCircle_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.CenterCircle.class, messages.CenterCircle.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<CenterCircle> PARSER =
-      new com.google.protobuf.AbstractParser<CenterCircle>() {
-    public CenterCircle parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new CenterCircle(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<CenterCircle> getParserForType() {
-    return PARSER;
   }
 
   private int bitField0_;
@@ -175,12 +160,21 @@ public final class CenterCircle extends
     return prob_;
   }
 
-  private void initFields() {
-    on_ = false;
-    x_ = 0F;
-    y_ = 0F;
-    prob_ = 0F;
+  public static final int WZ0_FIELD_NUMBER = 5;
+  private float wz0_;
+  /**
+   * <code>optional float wz0 = 5;</code>
+   */
+  public boolean hasWz0() {
+    return ((bitField0_ & 0x00000010) == 0x00000010);
   }
+  /**
+   * <code>optional float wz0 = 5;</code>
+   */
+  public float getWz0() {
+    return wz0_;
+  }
+
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -193,7 +187,6 @@ public final class CenterCircle extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeBool(1, on_);
     }
@@ -206,12 +199,14 @@ public final class CenterCircle extends
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
       output.writeFloat(4, prob_);
     }
-    getUnknownFields().writeTo(output);
+    if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      output.writeFloat(5, wz0_);
+    }
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -231,18 +226,16 @@ public final class CenterCircle extends
       size += com.google.protobuf.CodedOutputStream
         .computeFloatSize(4, prob_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeFloatSize(5, wz0_);
+    }
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.CenterCircle parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -296,12 +289,17 @@ public final class CenterCircle extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.CenterCircle prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.CenterCircle prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -342,10 +340,6 @@ public final class CenterCircle extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       on_ = false;
@@ -356,11 +350,9 @@ public final class CenterCircle extends
       bitField0_ = (bitField0_ & ~0x00000004);
       prob_ = 0F;
       bitField0_ = (bitField0_ & ~0x00000008);
+      wz0_ = 0F;
+      bitField0_ = (bitField0_ & ~0x00000010);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -400,6 +392,10 @@ public final class CenterCircle extends
         to_bitField0_ |= 0x00000008;
       }
       result.prob_ = prob_;
+      if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+        to_bitField0_ |= 0x00000010;
+      }
+      result.wz0_ = wz0_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -428,7 +424,11 @@ public final class CenterCircle extends
       if (other.hasProb()) {
         setProb(other.getProb());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      if (other.hasWz0()) {
+        setWz0(other.getWz0());
+      }
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -583,14 +583,82 @@ public final class CenterCircle extends
       return this;
     }
 
+    private float wz0_ ;
+    /**
+     * <code>optional float wz0 = 5;</code>
+     */
+    public boolean hasWz0() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional float wz0 = 5;</code>
+     */
+    public float getWz0() {
+      return wz0_;
+    }
+    /**
+     * <code>optional float wz0 = 5;</code>
+     */
+    public Builder setWz0(float value) {
+      bitField0_ |= 0x00000010;
+      wz0_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional float wz0 = 5;</code>
+     */
+    public Builder clearWz0() {
+      bitField0_ = (bitField0_ & ~0x00000010);
+      wz0_ = 0F;
+      onChanged();
+      return this;
+    }
+
     // @@protoc_insertion_point(builder_scope:messages.CenterCircle)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.CenterCircle)
+  private static final messages.CenterCircle DEFAULT_INSTANCE;
   static {
-    defaultInstance = new CenterCircle(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.CenterCircle();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.CenterCircle)
+  public static messages.CenterCircle getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<CenterCircle>
+      PARSER = new com.google.protobuf.AbstractParser<CenterCircle>() {
+    public CenterCircle parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new CenterCircle(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<CenterCircle> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<CenterCircle> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.CenterCircle getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

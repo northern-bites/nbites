@@ -6,37 +6,28 @@ package messages;
 /**
  * Protobuf type {@code messages.ScriptedProvider}
  */
-public final class ScriptedProvider extends
+public  final class ScriptedProvider extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.ScriptedProvider)
     ScriptedProviderOrBuilder {
   // Use ScriptedProvider.newBuilder() to construct.
   private ScriptedProvider(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private ScriptedProvider(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final ScriptedProvider defaultInstance;
-  public static ScriptedProvider getDefaultInstance() {
-    return defaultInstance;
+  private ScriptedProvider() {
+    active_ = false;
+    stopping_ = false;
   }
 
-  public ScriptedProvider getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private ScriptedProvider(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -68,10 +59,11 @@ public final class ScriptedProvider extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -87,21 +79,6 @@ public final class ScriptedProvider extends
     return messages._File_Motion.internal_static_messages_ScriptedProvider_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.ScriptedProvider.class, messages.ScriptedProvider.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<ScriptedProvider> PARSER =
-      new com.google.protobuf.AbstractParser<ScriptedProvider>() {
-    public ScriptedProvider parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new ScriptedProvider(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<ScriptedProvider> getParserForType() {
-    return PARSER;
   }
 
   private int bitField0_;
@@ -135,10 +112,6 @@ public final class ScriptedProvider extends
     return stopping_;
   }
 
-  private void initFields() {
-    active_ = false;
-    stopping_ = false;
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -151,19 +124,17 @@ public final class ScriptedProvider extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeBool(1, active_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       output.writeBool(2, stopping_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -175,18 +146,12 @@ public final class ScriptedProvider extends
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(2, stopping_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.ScriptedProvider parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -240,12 +205,17 @@ public final class ScriptedProvider extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.ScriptedProvider prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.ScriptedProvider prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -286,10 +256,6 @@ public final class ScriptedProvider extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       active_ = false;
@@ -297,10 +263,6 @@ public final class ScriptedProvider extends
       stopping_ = false;
       bitField0_ = (bitField0_ & ~0x00000002);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -354,7 +316,8 @@ public final class ScriptedProvider extends
       if (other.hasStopping()) {
         setStopping(other.getStopping());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -448,11 +411,47 @@ public final class ScriptedProvider extends
     // @@protoc_insertion_point(builder_scope:messages.ScriptedProvider)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.ScriptedProvider)
+  private static final messages.ScriptedProvider DEFAULT_INSTANCE;
   static {
-    defaultInstance = new ScriptedProvider(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.ScriptedProvider();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.ScriptedProvider)
+  public static messages.ScriptedProvider getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<ScriptedProvider>
+      PARSER = new com.google.protobuf.AbstractParser<ScriptedProvider>() {
+    public ScriptedProvider parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new ScriptedProvider(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<ScriptedProvider> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<ScriptedProvider> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.ScriptedProvider getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

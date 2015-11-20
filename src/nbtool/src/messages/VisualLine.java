@@ -6,37 +6,40 @@ package messages;
 /**
  * Protobuf type {@code messages.VisualLine}
  */
-public final class VisualLine extends
+public  final class VisualLine extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.VisualLine)
     VisualLineOrBuilder {
   // Use VisualLine.newBuilder() to construct.
   private VisualLine(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private VisualLine(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final VisualLine defaultInstance;
-  public static VisualLine getDefaultInstance() {
-    return defaultInstance;
+  private VisualLine() {
+    startX_ = 0;
+    startY_ = 0;
+    startDist_ = 0F;
+    startBearing_ = 0F;
+    endX_ = 0;
+    endY_ = 0;
+    endDist_ = 0F;
+    endBearing_ = 0F;
+    angle_ = 0F;
+    avgWidth_ = 0F;
+    length_ = 0F;
+    slope_ = 0F;
+    yInt_ = 0F;
+    possibilities_ = java.util.Collections.emptyList();
   }
 
-  public VisualLine getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private VisualLine(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -60,7 +63,7 @@ public final class VisualLine extends
             if (((bitField0_ & 0x00000001) == 0x00000001)) {
               subBuilder = visualDetection_.toBuilder();
             }
-            visualDetection_ = input.readMessage(messages.VisualDetection.PARSER, extensionRegistry);
+            visualDetection_ = input.readMessage(messages.VisualDetection.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(visualDetection_);
               visualDetection_ = subBuilder.buildPartial();
@@ -118,12 +121,12 @@ public final class VisualLine extends
             messages.VisualLine.line_id value = messages.VisualLine.line_id.valueOf(rawValue);
             if (value == null) {
               unknownFields.mergeVarintField(11, rawValue);
-              } else {
+            } else {
               if (!((mutable_bitField0_ & 0x00004000) == 0x00004000)) {
-                possibilities_ = new java.util.ArrayList<messages.VisualLine.line_id>();
+                possibilities_ = new java.util.ArrayList<java.lang.Integer>();
                 mutable_bitField0_ |= 0x00004000;
               }
-              possibilities_.add(value);
+              possibilities_.add(rawValue);
             }
             break;
           }
@@ -135,12 +138,12 @@ public final class VisualLine extends
               messages.VisualLine.line_id value = messages.VisualLine.line_id.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(11, rawValue);
-                } else {
+              } else {
                 if (!((mutable_bitField0_ & 0x00004000) == 0x00004000)) {
-                  possibilities_ = new java.util.ArrayList<messages.VisualLine.line_id>();
+                  possibilities_ = new java.util.ArrayList<java.lang.Integer>();
                   mutable_bitField0_ |= 0x00004000;
                 }
-                possibilities_.add(value);
+                possibilities_.add(rawValue);
               }
             }
             input.popLimit(oldLimit);
@@ -169,10 +172,11 @@ public final class VisualLine extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       if (((mutable_bitField0_ & 0x00004000) == 0x00004000)) {
         possibilities_ = java.util.Collections.unmodifiableList(possibilities_);
@@ -191,21 +195,6 @@ public final class VisualLine extends
     return messages._File_VisionField.internal_static_messages_VisualLine_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.VisualLine.class, messages.VisualLine.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<VisualLine> PARSER =
-      new com.google.protobuf.AbstractParser<VisualLine>() {
-    public VisualLine parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new VisualLine(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<VisualLine> getParserForType() {
-    return PARSER;
   }
 
   /**
@@ -395,7 +384,9 @@ public final class VisualLine extends
     public static final int YELLOW_GOALBOX_RIGHT_LINE_VALUE = 67;
 
 
-    public final int getNumber() { return value; }
+    public final int getNumber() {
+      return value;
+    }
 
     public static line_id valueOf(int value) {
       switch (value) {
@@ -425,8 +416,8 @@ public final class VisualLine extends
         internalGetValueMap() {
       return internalValueMap;
     }
-    private static com.google.protobuf.Internal.EnumLiteMap<line_id>
-        internalValueMap =
+    private static final com.google.protobuf.Internal.EnumLiteMap<
+        line_id> internalValueMap =
           new com.google.protobuf.Internal.EnumLiteMap<line_id>() {
             public line_id findValueByNumber(int number) {
               return line_id.valueOf(number);
@@ -481,13 +472,13 @@ public final class VisualLine extends
    * <code>optional .messages.VisualDetection visual_detection = 1;</code>
    */
   public messages.VisualDetection getVisualDetection() {
-    return visualDetection_;
+    return visualDetection_ == null ? messages.VisualDetection.getDefaultInstance() : visualDetection_;
   }
   /**
    * <code>optional .messages.VisualDetection visual_detection = 1;</code>
    */
   public messages.VisualDetectionOrBuilder getVisualDetectionOrBuilder() {
-    return visualDetection_;
+    return visualDetection_ == null ? messages.VisualDetection.getDefaultInstance() : visualDetection_;
   }
 
   public static final int START_X_FIELD_NUMBER = 2;
@@ -686,12 +677,22 @@ public final class VisualLine extends
   }
 
   public static final int POSSIBILITIES_FIELD_NUMBER = 11;
-  private java.util.List<messages.VisualLine.line_id> possibilities_;
+  private java.util.List<java.lang.Integer> possibilities_;
+  private static final com.google.protobuf.Internal.ListAdapter.Converter<
+      java.lang.Integer, messages.VisualLine.line_id> possibilities_converter_ =
+          new com.google.protobuf.Internal.ListAdapter.Converter<
+              java.lang.Integer, messages.VisualLine.line_id>() {
+            public messages.VisualLine.line_id convert(java.lang.Integer from) {
+              messages.VisualLine.line_id result = messages.VisualLine.line_id.valueOf(from);
+              return result == null ? messages.VisualLine.line_id.UNKNOWN_LINE : result;
+            }
+          };
   /**
    * <code>repeated .messages.VisualLine.line_id possibilities = 11;</code>
    */
   public java.util.List<messages.VisualLine.line_id> getPossibilitiesList() {
-    return possibilities_;
+    return new com.google.protobuf.Internal.ListAdapter<
+        java.lang.Integer, messages.VisualLine.line_id>(possibilities_, possibilities_converter_);
   }
   /**
    * <code>repeated .messages.VisualLine.line_id possibilities = 11;</code>
@@ -703,26 +704,9 @@ public final class VisualLine extends
    * <code>repeated .messages.VisualLine.line_id possibilities = 11;</code>
    */
   public messages.VisualLine.line_id getPossibilities(int index) {
-    return possibilities_.get(index);
+    return possibilities_converter_.convert(possibilities_.get(index));
   }
 
-  private void initFields() {
-    visualDetection_ = messages.VisualDetection.getDefaultInstance();
-    startX_ = 0;
-    startY_ = 0;
-    startDist_ = 0F;
-    startBearing_ = 0F;
-    endX_ = 0;
-    endY_ = 0;
-    endDist_ = 0F;
-    endBearing_ = 0F;
-    angle_ = 0F;
-    avgWidth_ = 0F;
-    length_ = 0F;
-    slope_ = 0F;
-    yInt_ = 0F;
-    possibilities_ = java.util.Collections.emptyList();
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -735,9 +719,8 @@ public final class VisualLine extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeMessage(1, visualDetection_);
+      output.writeMessage(1, getVisualDetection());
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       output.writeInt32(2, startX_);
@@ -767,7 +750,7 @@ public final class VisualLine extends
       output.writeFloat(10, yInt_);
     }
     for (int i = 0; i < possibilities_.size(); i++) {
-      output.writeEnum(11, possibilities_.get(i).getNumber());
+      output.writeEnum(11, possibilities_.get(i));
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
       output.writeFloat(12, startDist_);
@@ -781,18 +764,17 @@ public final class VisualLine extends
     if (((bitField0_ & 0x00000100) == 0x00000100)) {
       output.writeFloat(15, endBearing_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, visualDetection_);
+        .computeMessageSize(1, getVisualDetection());
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += com.google.protobuf.CodedOutputStream
@@ -834,7 +816,7 @@ public final class VisualLine extends
       int dataSize = 0;
       for (int i = 0; i < possibilities_.size(); i++) {
         dataSize += com.google.protobuf.CodedOutputStream
-          .computeEnumSizeNoTag(possibilities_.get(i).getNumber());
+          .computeEnumSizeNoTag(possibilities_.get(i));
       }
       size += dataSize;
       size += 1 * possibilities_.size();
@@ -855,18 +837,12 @@ public final class VisualLine extends
       size += com.google.protobuf.CodedOutputStream
         .computeFloatSize(15, endBearing_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.VisualLine parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -920,12 +896,17 @@ public final class VisualLine extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.VisualLine prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.VisualLine prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -967,14 +948,10 @@ public final class VisualLine extends
         getVisualDetectionFieldBuilder();
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       if (visualDetectionBuilder_ == null) {
-        visualDetection_ = messages.VisualDetection.getDefaultInstance();
+        visualDetection_ = null;
       } else {
         visualDetectionBuilder_.clear();
       }
@@ -1008,10 +985,6 @@ public final class VisualLine extends
       possibilities_ = java.util.Collections.emptyList();
       bitField0_ = (bitField0_ & ~0x00004000);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -1168,7 +1141,8 @@ public final class VisualLine extends
         }
         onChanged();
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -1195,7 +1169,7 @@ public final class VisualLine extends
     }
     private int bitField0_;
 
-    private messages.VisualDetection visualDetection_ = messages.VisualDetection.getDefaultInstance();
+    private messages.VisualDetection visualDetection_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.VisualDetection, messages.VisualDetection.Builder, messages.VisualDetectionOrBuilder> visualDetectionBuilder_;
     /**
@@ -1209,7 +1183,7 @@ public final class VisualLine extends
      */
     public messages.VisualDetection getVisualDetection() {
       if (visualDetectionBuilder_ == null) {
-        return visualDetection_;
+        return visualDetection_ == null ? messages.VisualDetection.getDefaultInstance() : visualDetection_;
       } else {
         return visualDetectionBuilder_.getMessage();
       }
@@ -1250,6 +1224,7 @@ public final class VisualLine extends
     public Builder mergeVisualDetection(messages.VisualDetection value) {
       if (visualDetectionBuilder_ == null) {
         if (((bitField0_ & 0x00000001) == 0x00000001) &&
+            visualDetection_ != null &&
             visualDetection_ != messages.VisualDetection.getDefaultInstance()) {
           visualDetection_ =
             messages.VisualDetection.newBuilder(visualDetection_).mergeFrom(value).buildPartial();
@@ -1268,7 +1243,7 @@ public final class VisualLine extends
      */
     public Builder clearVisualDetection() {
       if (visualDetectionBuilder_ == null) {
-        visualDetection_ = messages.VisualDetection.getDefaultInstance();
+        visualDetection_ = null;
         onChanged();
       } else {
         visualDetectionBuilder_.clear();
@@ -1291,7 +1266,8 @@ public final class VisualLine extends
       if (visualDetectionBuilder_ != null) {
         return visualDetectionBuilder_.getMessageOrBuilder();
       } else {
-        return visualDetection_;
+        return visualDetection_ == null ?
+            messages.VisualDetection.getDefaultInstance() : visualDetection_;
       }
     }
     /**
@@ -1727,11 +1703,11 @@ public final class VisualLine extends
       return this;
     }
 
-    private java.util.List<messages.VisualLine.line_id> possibilities_ =
+    private java.util.List<java.lang.Integer> possibilities_ =
       java.util.Collections.emptyList();
     private void ensurePossibilitiesIsMutable() {
       if (!((bitField0_ & 0x00004000) == 0x00004000)) {
-        possibilities_ = new java.util.ArrayList<messages.VisualLine.line_id>(possibilities_);
+        possibilities_ = new java.util.ArrayList<java.lang.Integer>(possibilities_);
         bitField0_ |= 0x00004000;
       }
     }
@@ -1739,7 +1715,8 @@ public final class VisualLine extends
      * <code>repeated .messages.VisualLine.line_id possibilities = 11;</code>
      */
     public java.util.List<messages.VisualLine.line_id> getPossibilitiesList() {
-      return java.util.Collections.unmodifiableList(possibilities_);
+      return new com.google.protobuf.Internal.ListAdapter<
+          java.lang.Integer, messages.VisualLine.line_id>(possibilities_, possibilities_converter_);
     }
     /**
      * <code>repeated .messages.VisualLine.line_id possibilities = 11;</code>
@@ -1751,7 +1728,7 @@ public final class VisualLine extends
      * <code>repeated .messages.VisualLine.line_id possibilities = 11;</code>
      */
     public messages.VisualLine.line_id getPossibilities(int index) {
-      return possibilities_.get(index);
+      return possibilities_converter_.convert(possibilities_.get(index));
     }
     /**
      * <code>repeated .messages.VisualLine.line_id possibilities = 11;</code>
@@ -1762,7 +1739,7 @@ public final class VisualLine extends
         throw new NullPointerException();
       }
       ensurePossibilitiesIsMutable();
-      possibilities_.set(index, value);
+      possibilities_.set(index, value.getNumber());
       onChanged();
       return this;
     }
@@ -1774,7 +1751,7 @@ public final class VisualLine extends
         throw new NullPointerException();
       }
       ensurePossibilitiesIsMutable();
-      possibilities_.add(value);
+      possibilities_.add(value.getNumber());
       onChanged();
       return this;
     }
@@ -1784,8 +1761,9 @@ public final class VisualLine extends
     public Builder addAllPossibilities(
         java.lang.Iterable<? extends messages.VisualLine.line_id> values) {
       ensurePossibilitiesIsMutable();
-      com.google.protobuf.AbstractMessageLite.Builder.addAll(
-          values, possibilities_);
+      for (messages.VisualLine.line_id value : values) {
+        possibilities_.add(value.getNumber());
+      }
       onChanged();
       return this;
     }
@@ -1802,11 +1780,47 @@ public final class VisualLine extends
     // @@protoc_insertion_point(builder_scope:messages.VisualLine)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.VisualLine)
+  private static final messages.VisualLine DEFAULT_INSTANCE;
   static {
-    defaultInstance = new VisualLine(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.VisualLine();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.VisualLine)
+  public static messages.VisualLine getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<VisualLine>
+      PARSER = new com.google.protobuf.AbstractParser<VisualLine>() {
+    public VisualLine parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new VisualLine(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<VisualLine> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<VisualLine> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.VisualLine getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

@@ -6,37 +6,31 @@ package messages;
 /**
  * Protobuf type {@code messages.TeamPacket}
  */
-public final class TeamPacket extends
+public  final class TeamPacket extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.TeamPacket)
     TeamPacketOrBuilder {
   // Use TeamPacket.newBuilder() to construct.
   private TeamPacket(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private TeamPacket(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final TeamPacket defaultInstance;
-  public static TeamPacket getDefaultInstance() {
-    return defaultInstance;
-  }
-
-  public TeamPacket getDefaultInstanceForType() {
-    return defaultInstance;
+  private TeamPacket() {
+    header_ = "";
+    teamNumber_ = 0;
+    playerNumber_ = 0;
+    sequenceNumber_ = 0;
+    timestamp_ = 0L;
   }
 
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private TeamPacket(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -86,7 +80,7 @@ public final class TeamPacket extends
             if (((bitField0_ & 0x00000020) == 0x00000020)) {
               subBuilder = payload_.toBuilder();
             }
-            payload_ = input.readMessage(messages.WorldModel.PARSER, extensionRegistry);
+            payload_ = input.readMessage(messages.WorldModel.parser(), extensionRegistry);
             if (subBuilder != null) {
               subBuilder.mergeFrom(payload_);
               payload_ = subBuilder.buildPartial();
@@ -97,10 +91,11 @@ public final class TeamPacket extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -118,24 +113,9 @@ public final class TeamPacket extends
             messages.TeamPacket.class, messages.TeamPacket.Builder.class);
   }
 
-  public static com.google.protobuf.Parser<TeamPacket> PARSER =
-      new com.google.protobuf.AbstractParser<TeamPacket>() {
-    public TeamPacket parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new TeamPacket(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<TeamPacket> getParserForType() {
-    return PARSER;
-  }
-
   private int bitField0_;
   public static final int HEADER_FIELD_NUMBER = 1;
-  private java.lang.Object header_;
+  private volatile java.lang.Object header_;
   /**
    * <code>optional string header = 1;</code>
    */
@@ -248,23 +228,15 @@ public final class TeamPacket extends
    * <code>optional .messages.WorldModel payload = 6;</code>
    */
   public messages.WorldModel getPayload() {
-    return payload_;
+    return payload_ == null ? messages.WorldModel.getDefaultInstance() : payload_;
   }
   /**
    * <code>optional .messages.WorldModel payload = 6;</code>
    */
   public messages.WorldModelOrBuilder getPayloadOrBuilder() {
-    return payload_;
+    return payload_ == null ? messages.WorldModel.getDefaultInstance() : payload_;
   }
 
-  private void initFields() {
-    header_ = "";
-    teamNumber_ = 0;
-    playerNumber_ = 0;
-    sequenceNumber_ = 0;
-    timestamp_ = 0L;
-    payload_ = messages.WorldModel.getDefaultInstance();
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -277,9 +249,8 @@ public final class TeamPacket extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeBytes(1, getHeaderBytes());
+      com.google.protobuf.GeneratedMessage.writeString(output, 1, header_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       output.writeInt32(2, teamNumber_);
@@ -294,20 +265,18 @@ public final class TeamPacket extends
       output.writeInt64(5, timestamp_);
     }
     if (((bitField0_ & 0x00000020) == 0x00000020)) {
-      output.writeMessage(6, payload_);
+      output.writeMessage(6, getPayload());
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeBytesSize(1, getHeaderBytes());
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(1, header_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += com.google.protobuf.CodedOutputStream
@@ -327,20 +296,14 @@ public final class TeamPacket extends
     }
     if (((bitField0_ & 0x00000020) == 0x00000020)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(6, payload_);
+        .computeMessageSize(6, getPayload());
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.TeamPacket parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -394,12 +357,17 @@ public final class TeamPacket extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.TeamPacket prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.TeamPacket prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -441,10 +409,6 @@ public final class TeamPacket extends
         getPayloadFieldBuilder();
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       header_ = "";
@@ -458,16 +422,12 @@ public final class TeamPacket extends
       timestamp_ = 0L;
       bitField0_ = (bitField0_ & ~0x00000010);
       if (payloadBuilder_ == null) {
-        payload_ = messages.WorldModel.getDefaultInstance();
+        payload_ = null;
       } else {
         payloadBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000020);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -555,7 +515,8 @@ public final class TeamPacket extends
       if (other.hasPayload()) {
         mergePayload(other.getPayload());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -786,7 +747,7 @@ public final class TeamPacket extends
       return this;
     }
 
-    private messages.WorldModel payload_ = messages.WorldModel.getDefaultInstance();
+    private messages.WorldModel payload_ = null;
     private com.google.protobuf.SingleFieldBuilder<
         messages.WorldModel, messages.WorldModel.Builder, messages.WorldModelOrBuilder> payloadBuilder_;
     /**
@@ -800,7 +761,7 @@ public final class TeamPacket extends
      */
     public messages.WorldModel getPayload() {
       if (payloadBuilder_ == null) {
-        return payload_;
+        return payload_ == null ? messages.WorldModel.getDefaultInstance() : payload_;
       } else {
         return payloadBuilder_.getMessage();
       }
@@ -841,6 +802,7 @@ public final class TeamPacket extends
     public Builder mergePayload(messages.WorldModel value) {
       if (payloadBuilder_ == null) {
         if (((bitField0_ & 0x00000020) == 0x00000020) &&
+            payload_ != null &&
             payload_ != messages.WorldModel.getDefaultInstance()) {
           payload_ =
             messages.WorldModel.newBuilder(payload_).mergeFrom(value).buildPartial();
@@ -859,7 +821,7 @@ public final class TeamPacket extends
      */
     public Builder clearPayload() {
       if (payloadBuilder_ == null) {
-        payload_ = messages.WorldModel.getDefaultInstance();
+        payload_ = null;
         onChanged();
       } else {
         payloadBuilder_.clear();
@@ -882,7 +844,8 @@ public final class TeamPacket extends
       if (payloadBuilder_ != null) {
         return payloadBuilder_.getMessageOrBuilder();
       } else {
-        return payload_;
+        return payload_ == null ?
+            messages.WorldModel.getDefaultInstance() : payload_;
       }
     }
     /**
@@ -905,11 +868,47 @@ public final class TeamPacket extends
     // @@protoc_insertion_point(builder_scope:messages.TeamPacket)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.TeamPacket)
+  private static final messages.TeamPacket DEFAULT_INSTANCE;
   static {
-    defaultInstance = new TeamPacket(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.TeamPacket();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.TeamPacket)
+  public static messages.TeamPacket getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<TeamPacket>
+      PARSER = new com.google.protobuf.AbstractParser<TeamPacket>() {
+    public TeamPacket parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new TeamPacket(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<TeamPacket> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<TeamPacket> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.TeamPacket getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

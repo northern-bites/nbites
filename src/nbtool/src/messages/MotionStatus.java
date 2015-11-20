@@ -6,37 +6,32 @@ package messages;
 /**
  * Protobuf type {@code messages.MotionStatus}
  */
-public final class MotionStatus extends
+public  final class MotionStatus extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.MotionStatus)
     MotionStatusOrBuilder {
   // Use MotionStatus.newBuilder() to construct.
   private MotionStatus(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private MotionStatus(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final MotionStatus defaultInstance;
-  public static MotionStatus getDefaultInstance() {
-    return defaultInstance;
-  }
-
-  public MotionStatus getDefaultInstanceForType() {
-    return defaultInstance;
+  private MotionStatus() {
+    standing_ = false;
+    bodyIsActive_ = false;
+    walkIsActive_ = false;
+    headIsActive_ = false;
+    calibrated_ = false;
+    upright_ = false;
   }
 
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private MotionStatus(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -88,10 +83,11 @@ public final class MotionStatus extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -107,21 +103,6 @@ public final class MotionStatus extends
     return messages._File_MotionStatus.internal_static_messages_MotionStatus_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.MotionStatus.class, messages.MotionStatus.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<MotionStatus> PARSER =
-      new com.google.protobuf.AbstractParser<MotionStatus>() {
-    public MotionStatus parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new MotionStatus(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<MotionStatus> getParserForType() {
-    return PARSER;
   }
 
   private int bitField0_;
@@ -215,14 +196,6 @@ public final class MotionStatus extends
     return upright_;
   }
 
-  private void initFields() {
-    standing_ = false;
-    bodyIsActive_ = false;
-    walkIsActive_ = false;
-    headIsActive_ = false;
-    calibrated_ = false;
-    upright_ = false;
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -235,7 +208,6 @@ public final class MotionStatus extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeBool(1, standing_);
     }
@@ -254,12 +226,11 @@ public final class MotionStatus extends
     if (((bitField0_ & 0x00000020) == 0x00000020)) {
       output.writeBool(6, upright_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -287,18 +258,12 @@ public final class MotionStatus extends
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(6, upright_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.MotionStatus parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -352,12 +317,17 @@ public final class MotionStatus extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.MotionStatus prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.MotionStatus prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -398,10 +368,6 @@ public final class MotionStatus extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       standing_ = false;
@@ -417,10 +383,6 @@ public final class MotionStatus extends
       upright_ = false;
       bitField0_ = (bitField0_ & ~0x00000020);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -502,7 +464,8 @@ public final class MotionStatus extends
       if (other.hasUpright()) {
         setUpright(other.getUpright());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -724,11 +687,47 @@ public final class MotionStatus extends
     // @@protoc_insertion_point(builder_scope:messages.MotionStatus)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.MotionStatus)
+  private static final messages.MotionStatus DEFAULT_INSTANCE;
   static {
-    defaultInstance = new MotionStatus(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.MotionStatus();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.MotionStatus)
+  public static messages.MotionStatus getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<MotionStatus>
+      PARSER = new com.google.protobuf.AbstractParser<MotionStatus>() {
+    public MotionStatus parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new MotionStatus(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<MotionStatus> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<MotionStatus> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.MotionStatus getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

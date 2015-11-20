@@ -6,37 +6,27 @@ package messages;
 /**
  * Protobuf type {@code messages.ScriptedHeadCommand}
  */
-public final class ScriptedHeadCommand extends
+public  final class ScriptedHeadCommand extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.ScriptedHeadCommand)
     ScriptedHeadCommandOrBuilder {
   // Use ScriptedHeadCommand.newBuilder() to construct.
   private ScriptedHeadCommand(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private ScriptedHeadCommand(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final ScriptedHeadCommand defaultInstance;
-  public static ScriptedHeadCommand getDefaultInstance() {
-    return defaultInstance;
+  private ScriptedHeadCommand() {
+    command_ = java.util.Collections.emptyList();
   }
 
-  public ScriptedHeadCommand getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private ScriptedHeadCommand(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -60,16 +50,17 @@ public final class ScriptedHeadCommand extends
               command_ = new java.util.ArrayList<messages.HeadJointCommand>();
               mutable_bitField0_ |= 0x00000001;
             }
-            command_.add(input.readMessage(messages.HeadJointCommand.PARSER, extensionRegistry));
+            command_.add(input.readMessage(messages.HeadJointCommand.parser(), extensionRegistry));
             break;
           }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
         command_ = java.util.Collections.unmodifiableList(command_);
@@ -88,21 +79,6 @@ public final class ScriptedHeadCommand extends
     return messages._File_PMotion.internal_static_messages_ScriptedHeadCommand_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             messages.ScriptedHeadCommand.class, messages.ScriptedHeadCommand.Builder.class);
-  }
-
-  public static com.google.protobuf.Parser<ScriptedHeadCommand> PARSER =
-      new com.google.protobuf.AbstractParser<ScriptedHeadCommand>() {
-    public ScriptedHeadCommand parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new ScriptedHeadCommand(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<ScriptedHeadCommand> getParserForType() {
-    return PARSER;
   }
 
   public static final int COMMAND_FIELD_NUMBER = 1;
@@ -140,9 +116,6 @@ public final class ScriptedHeadCommand extends
     return command_.get(index);
   }
 
-  private void initFields() {
-    command_ = java.util.Collections.emptyList();
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -155,16 +128,14 @@ public final class ScriptedHeadCommand extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     for (int i = 0; i < command_.size(); i++) {
       output.writeMessage(1, command_.get(i));
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
@@ -172,18 +143,12 @@ public final class ScriptedHeadCommand extends
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(1, command_.get(i));
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.ScriptedHeadCommand parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -237,12 +202,17 @@ public final class ScriptedHeadCommand extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.ScriptedHeadCommand prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.ScriptedHeadCommand prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -284,10 +254,6 @@ public final class ScriptedHeadCommand extends
         getCommandFieldBuilder();
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       if (commandBuilder_ == null) {
@@ -297,10 +263,6 @@ public final class ScriptedHeadCommand extends
         commandBuilder_.clear();
       }
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -373,7 +335,8 @@ public final class ScriptedHeadCommand extends
           }
         }
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -643,11 +606,47 @@ public final class ScriptedHeadCommand extends
     // @@protoc_insertion_point(builder_scope:messages.ScriptedHeadCommand)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.ScriptedHeadCommand)
+  private static final messages.ScriptedHeadCommand DEFAULT_INSTANCE;
   static {
-    defaultInstance = new ScriptedHeadCommand(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.ScriptedHeadCommand();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.ScriptedHeadCommand)
+  public static messages.ScriptedHeadCommand getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<ScriptedHeadCommand>
+      PARSER = new com.google.protobuf.AbstractParser<ScriptedHeadCommand>() {
+    public ScriptedHeadCommand parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new ScriptedHeadCommand(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<ScriptedHeadCommand> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<ScriptedHeadCommand> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.ScriptedHeadCommand getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 

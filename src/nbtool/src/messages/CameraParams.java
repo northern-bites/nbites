@@ -6,37 +6,41 @@ package messages;
 /**
  * Protobuf type {@code messages.CameraParams}
  */
-public final class CameraParams extends
+public  final class CameraParams extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:messages.CameraParams)
     CameraParamsOrBuilder {
   // Use CameraParams.newBuilder() to construct.
   private CameraParams(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
-    this.unknownFields = builder.getUnknownFields();
   }
-  private CameraParams(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-  private static final CameraParams defaultInstance;
-  public static CameraParams getDefaultInstance() {
-    return defaultInstance;
+  private CameraParams() {
+    whichCamera_ = "";
+    hFLIP_ = 0;
+    vFLIP_ = 0;
+    autoExposure_ = 0;
+    brightness_ = 0;
+    contrast_ = 0;
+    saturation_ = 0;
+    hue_ = 0;
+    sharpness_ = 0;
+    gamma_ = 0;
+    autoWhiteBalance_ = 0;
+    exposure_ = 0;
+    gain_ = 0;
+    whiteBalance_ = 0;
+    fadeToBlack_ = 0;
   }
 
-  public CameraParams getDefaultInstanceForType() {
-    return defaultInstance;
-  }
-
-  private final com.google.protobuf.UnknownFieldSet unknownFields;
   @java.lang.Override
   public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+  getUnknownFields() {
     return this.unknownFields;
   }
   private CameraParams(
       com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    initFields();
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+    this();
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -134,10 +138,11 @@ public final class CameraParams extends
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
+      throw new RuntimeException(e.setUnfinishedMessage(this));
     } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e.getMessage()).setUnfinishedMessage(this);
+      throw new RuntimeException(
+          new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this));
     } finally {
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -155,24 +160,9 @@ public final class CameraParams extends
             messages.CameraParams.class, messages.CameraParams.Builder.class);
   }
 
-  public static com.google.protobuf.Parser<CameraParams> PARSER =
-      new com.google.protobuf.AbstractParser<CameraParams>() {
-    public CameraParams parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return new CameraParams(input, extensionRegistry);
-    }
-  };
-
-  @java.lang.Override
-  public com.google.protobuf.Parser<CameraParams> getParserForType() {
-    return PARSER;
-  }
-
   private int bitField0_;
   public static final int WHICHCAMERA_FIELD_NUMBER = 1;
-  private java.lang.Object whichCamera_;
+  private volatile java.lang.Object whichCamera_;
   /**
    * <code>optional string whichCamera = 1;</code>
    */
@@ -423,23 +413,6 @@ public final class CameraParams extends
     return fadeToBlack_;
   }
 
-  private void initFields() {
-    whichCamera_ = "";
-    hFLIP_ = 0;
-    vFLIP_ = 0;
-    autoExposure_ = 0;
-    brightness_ = 0;
-    contrast_ = 0;
-    saturation_ = 0;
-    hue_ = 0;
-    sharpness_ = 0;
-    gamma_ = 0;
-    autoWhiteBalance_ = 0;
-    exposure_ = 0;
-    gain_ = 0;
-    whiteBalance_ = 0;
-    fadeToBlack_ = 0;
-  }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -452,9 +425,8 @@ public final class CameraParams extends
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeBytes(1, getWhichCameraBytes());
+      com.google.protobuf.GeneratedMessage.writeString(output, 1, whichCamera_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       output.writeInt32(2, hFLIP_);
@@ -498,18 +470,16 @@ public final class CameraParams extends
     if (((bitField0_ & 0x00004000) == 0x00004000)) {
       output.writeInt32(15, fadeToBlack_);
     }
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
-  private int memoizedSerializedSize = -1;
   public int getSerializedSize() {
-    int size = memoizedSerializedSize;
+    int size = memoizedSize;
     if (size != -1) return size;
 
     size = 0;
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeBytesSize(1, getWhichCameraBytes());
+      size += com.google.protobuf.GeneratedMessage.computeStringSize(1, whichCamera_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += com.google.protobuf.CodedOutputStream
@@ -567,18 +537,12 @@ public final class CameraParams extends
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(15, fadeToBlack_);
     }
-    size += getUnknownFields().getSerializedSize();
-    memoizedSerializedSize = size;
+    size += unknownFields.getSerializedSize();
+    memoizedSize = size;
     return size;
   }
 
   private static final long serialVersionUID = 0L;
-  @java.lang.Override
-  protected java.lang.Object writeReplace()
-      throws java.io.ObjectStreamException {
-    return super.writeReplace();
-  }
-
   public static messages.CameraParams parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -632,12 +596,17 @@ public final class CameraParams extends
     return PARSER.parseFrom(input, extensionRegistry);
   }
 
-  public static Builder newBuilder() { return Builder.create(); }
   public Builder newBuilderForType() { return newBuilder(); }
-  public static Builder newBuilder(messages.CameraParams prototype) {
-    return newBuilder().mergeFrom(prototype);
+  public static Builder newBuilder() {
+    return DEFAULT_INSTANCE.toBuilder();
   }
-  public Builder toBuilder() { return newBuilder(this); }
+  public static Builder newBuilder(messages.CameraParams prototype) {
+    return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+  }
+  public Builder toBuilder() {
+    return this == DEFAULT_INSTANCE
+        ? new Builder() : new Builder().mergeFrom(this);
+  }
 
   @java.lang.Override
   protected Builder newBuilderForType(
@@ -678,10 +647,6 @@ public final class CameraParams extends
       if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
       }
     }
-    private static Builder create() {
-      return new Builder();
-    }
-
     public Builder clear() {
       super.clear();
       whichCamera_ = "";
@@ -715,10 +680,6 @@ public final class CameraParams extends
       fadeToBlack_ = 0;
       bitField0_ = (bitField0_ & ~0x00004000);
       return this;
-    }
-
-    public Builder clone() {
-      return create().mergeFrom(buildPartial());
     }
 
     public com.google.protobuf.Descriptors.Descriptor
@@ -865,7 +826,8 @@ public final class CameraParams extends
       if (other.hasFadeToBlack()) {
         setFadeToBlack(other.getFadeToBlack());
       }
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
+      onChanged();
       return this;
     }
 
@@ -1419,11 +1381,47 @@ public final class CameraParams extends
     // @@protoc_insertion_point(builder_scope:messages.CameraParams)
   }
 
+  // @@protoc_insertion_point(class_scope:messages.CameraParams)
+  private static final messages.CameraParams DEFAULT_INSTANCE;
   static {
-    defaultInstance = new CameraParams(true);
-    defaultInstance.initFields();
+    DEFAULT_INSTANCE = new messages.CameraParams();
   }
 
-  // @@protoc_insertion_point(class_scope:messages.CameraParams)
+  public static messages.CameraParams getDefaultInstance() {
+    return DEFAULT_INSTANCE;
+  }
+
+  @java.lang.Deprecated public static final com.google.protobuf.Parser<CameraParams>
+      PARSER = new com.google.protobuf.AbstractParser<CameraParams>() {
+    public CameraParams parsePartialFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      try {
+        return new CameraParams(input, extensionRegistry);
+      } catch (RuntimeException e) {
+        if (e.getCause() instanceof
+            com.google.protobuf.InvalidProtocolBufferException) {
+          throw (com.google.protobuf.InvalidProtocolBufferException)
+              e.getCause();
+        }
+        throw e;
+      }
+    }
+  };
+
+  public static com.google.protobuf.Parser<CameraParams> parser() {
+    return PARSER;
+  }
+
+  @java.lang.Override
+  public com.google.protobuf.Parser<CameraParams> getParserForType() {
+    return PARSER;
+  }
+
+  public messages.CameraParams getDefaultInstanceForType() {
+    return DEFAULT_INSTANCE;
+  }
+
 }
 
