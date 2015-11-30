@@ -251,7 +251,7 @@ public class JsonParser {
 		if ( type != null ) {
 			if (type != TokenType.STRING) {
 				Token ret = new Token();
-				ret.type = SPECIAL.get(c);
+				ret.type = type;
 				ret.val = null;
 				ret.start = pos;
 				ret.after = pos + 1;
