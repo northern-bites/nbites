@@ -6,8 +6,8 @@
 #pragma once
 
 #include <cmath>
-#include "motion/generator/Generator.hpp"
-#include "motion/generator/BodyModel.hpp"
+#include "Generator.hpp"
+#include "BodyModel.hpp"
 #include "types/XYZ_Coord.hpp"
 #include "types/ActionCommand.hpp"
 #include "utils/Timer.hpp"

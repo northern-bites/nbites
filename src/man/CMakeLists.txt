@@ -155,6 +155,7 @@ target_link_libraries(
   sharedball
   naiveball
   support
+  unswalk
   vision
 )
 

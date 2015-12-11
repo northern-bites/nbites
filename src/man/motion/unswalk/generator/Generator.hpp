@@ -5,7 +5,7 @@
 #include "types/JointValues.hpp"
 #include "types/Odometry.hpp"
 #include "types/SensorValues.hpp"
-#include "motion/generator/BodyModel.hpp"
+#include "BodyModel.hpp"
 
 /**
  * Generator - responsible for tranforming ActionCommands into joint angles.

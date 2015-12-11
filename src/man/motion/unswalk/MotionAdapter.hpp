@@ -2,13 +2,13 @@
 
 #include <string>
 #include <map>
-#include "motion/effector/Effector.hpp"
-#include "motion/generator/Generator.hpp"
-#include "motion/touch/FilteredTouch.hpp"
+#include "effector/Effector.hpp"
+#include "generator/Generator.hpp"
+#include "touch/FilteredTouch.hpp"
 #include "blackboard/Adapter.hpp"
-#include "motion/generator/BodyModel.hpp"
-#include "perception/kinematics/Kinematics.hpp"
-#include "motion/SonarRecorder.hpp"
+#include "generator/BodyModel.hpp"
+#include "kinematics/Kinematics.hpp"
+#include "SonarRecorder.hpp"
 
 /**
  * MotionAdapter - interfaces between Motion & rest of system via Blackboard

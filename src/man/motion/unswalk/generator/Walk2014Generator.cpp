@@ -10,7 +10,7 @@
  * The CoM is moved forward when walking to position it closer to the center of the foot
  */
 
-#include "motion/generator/Walk2014Generator.hpp"
+#include "Walk2014Generator.hpp"
 #include <cmath>
 #include "utils/angles.hpp"
 #include "utils/body.hpp"

@@ -20,8 +20,8 @@
 #include "RobotLocation.pb.h"
 
 //UNSW
-#include "/generator/Walk2014Generator.hpp"
-//#include "blackboard/Blackboard.hpp"
+#include "generator/Walk2014Generator.hpp"
+#include "blackboard/Blackboard.hpp"
 
 namespace man
 {
@@ -37,6 +37,9 @@ public:
 protected:
 
 private:
+	bool requestedToStop;
+	bool standby;
+	bool tryingToWalk;
 	Walk2014Generator *walk2014gen;
 };
 

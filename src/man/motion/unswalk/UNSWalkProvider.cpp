@@ -71,7 +71,7 @@ UNSWalkProvider::resetAll() {
 	//reset other parts of walk2014gen
 }
 
-void UNSWalkProvider::calculateNextJointsAndStiffnesses(
+/*void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	std::vector<float>& 			sensorAngles,
 	std::vector<float>& 			sensorCurrents,
 	const messages::IntertialState& sensorIntertials,
@@ -79,16 +79,16 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	) 
 {
 	
-}
+} */
 
-void UNSWalkProvider::restingStand()
-{
+// void UNSWalkProvider::restingStand()
+// {
 
-}
+// }
 
-void UNSWalkProvider::resetOdometry() {
-	//rest odo
-}
+// void UNSWalkProvider::resetOdometry() {
+// 	//rest odo
+// }
 
 }
 

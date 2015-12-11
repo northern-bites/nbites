@@ -1,13 +1,13 @@
-#include "motion/MotionAdapter.hpp"
+#include "MotionAdapter.hpp"
 
 #include <boost/bind.hpp>
 
 #ifdef SIMULATION
-   #include "motion/touch/SimTouch.hpp"
-   #include "motion/effector/SimEffector.hpp"
+   #include "touch/SimTouch.hpp"
+   #include "effector/SimEffector.hpp"
 #else
-   #include "motion/touch/AgentTouch.hpp"
-   #include "motion/effector/AgentEffector.hpp"
+   #include "touch/AgentTouch.hpp"
+   #include "effector/AgentEffector.hpp"
 #endif
 #include "motion/touch/NullTouch.hpp"
 #include "motion/touch/FilteredTouch.hpp"
