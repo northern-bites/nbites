@@ -64,7 +64,7 @@ UNSWalkProvider::~UNSWalkProvider()
 	delete walk2014gen;
 }
 
-UNSWalkProvider::resetAll() {
+void UNSWalkProvider::resetAll() {
 	inactive();
 
 	//reset odometry through walk2014gen

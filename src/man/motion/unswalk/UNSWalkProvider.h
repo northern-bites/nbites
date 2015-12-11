@@ -34,6 +34,8 @@ public:
 	UNSWalkProvider();
 	virtual ~UNSWalkProvider();
 
+	void resetAll();
+
 protected:
 
 private:

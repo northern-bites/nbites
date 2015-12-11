@@ -2,10 +2,10 @@
 #include <iostream>
 #include <list>
 #include "WalkCycle.hpp"
-#include "types/JointValues.hpp"
-#include "types/Odometry.hpp"
-#include "types/XYZ_Coord.hpp"
-#include "../kinematics/Kinematics.hpp"
+#include "../types/JointValues.hpp"
+#include "../types/Odometry.hpp"
+#include "../types/XYZ_Coord.hpp"
+//#include "../kinematics/Kinematics.hpp"
 
 #include "PendulumModel.hpp"
 
@@ -143,7 +143,7 @@ class BodyModel {
       void observationUpdate(Odometry *odometry, const SensorValues &sensors);
       void simulationUpdate();
 
-      Kinematics *kinematics;
+      //Kinematics *kinematics;
       PendulumModel pendulumModel;
       PendulumModel lastPendulumModel;
 

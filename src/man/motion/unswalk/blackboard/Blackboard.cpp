@@ -120,42 +120,42 @@ LocalisationBlackboard::LocalisationBlackboard() {
    havePendingIncomingSharedBundle = std::vector<bool>(5, false);
 }
 
-VisionBlackboard::VisionBlackboard()
-{
-   llog(INFO) << "Initialising blackboard: vision" << endl;
-   landmarks.reserve(MAX_LANDMARKS);
-   feet.reserve(MAX_FEET);
-   balls.reserve(MAX_BALLS);
-   posts.reserve(MAX_POSTS);
-   robots.reserve(MAX_ROBOTS);
-   fieldEdges.reserve(MAX_FIELD_EDGES);
-   fieldFeatures.reserve(MAX_FIELD_FEATURES);
-   vOdometry = Odometry();
-   dualOdometry = Odometry();
-   missedFrames = 0;
-   dxdy = std::make_pair(0,0);
-   caughtLeft = false;
-   caughtRight = false;
-   goalArea = PostInfo::pNone;
-   awayGoalProb = 0.5f;
-   homeMapSize = 0;
-   awayMapSize = 0;
+// VisionBlackboard::VisionBlackboard()
+// {
+//    llog(INFO) << "Initialising blackboard: vision" << endl;
+//    landmarks.reserve(MAX_LANDMARKS);
+//    feet.reserve(MAX_FEET);
+//    balls.reserve(MAX_BALLS);
+//    posts.reserve(MAX_POSTS);
+//    robots.reserve(MAX_ROBOTS);
+//    fieldEdges.reserve(MAX_FIELD_EDGES);
+//    fieldFeatures.reserve(MAX_FIELD_FEATURES);
+//    vOdometry = Odometry();
+//    dualOdometry = Odometry();
+//    missedFrames = 0;
+//    dxdy = std::make_pair(0,0);
+//    caughtLeft = false;
+//    caughtRight = false;
+//    goalArea = PostInfo::pNone;
+//    awayGoalProb = 0.5f;
+//    homeMapSize = 0;
+//    awayMapSize = 0;
 
-   saliency = NULL;
-   currentFrame = NULL;
-   topFrame = NULL;
-   botFrame = NULL;
+//    saliency = NULL;
+//    currentFrame = NULL;
+//    topFrame = NULL;
+//    botFrame = NULL;
 
-   numFieldLinePoints = 0;
-}
+//    numFieldLinePoints = 0;
+// }
 
-PerceptionBlackboard::PerceptionBlackboard() {
-   kinematics = 0;
-   localisation = 0;
-   vision = 0;
-   behaviour = 0;
-   total = 33;
-}
+// PerceptionBlackboard::PerceptionBlackboard() {
+//    kinematics = 0;
+//    localisation = 0;
+//    vision = 0;
+//    behaviour = 0;
+//    total = 33;
+// }
 
 MotionBlackboard::MotionBlackboard() {
    llog(INFO) << "Initialising blackboard: motion" << endl;
@@ -177,19 +177,19 @@ RemoteControlBlackboard::RemoteControlBlackboard() {
 	time_received = 0;
 }
 
-KinematicsBlackboard::KinematicsBlackboard() {
-   llog(INFO) << "Initialising blackboard: kinematics" << endl;
-   std::vector<int> left;
-   left.reserve(Sonar::NUMBER_OF_READINGS/2*WINDOW_SIZE);
-   std::vector<int> middle;
-   middle.reserve(Sonar::NUMBER_OF_READINGS/2*WINDOW_SIZE);
-   std::vector<int> right;
-   right.reserve(Sonar::NUMBER_OF_READINGS/2*WINDOW_SIZE);
-   sonarFiltered.reserve(3);
-   sonarFiltered.push_back(left);
-   sonarFiltered.push_back(middle);
-   sonarFiltered.push_back(right);
-}
+// KinematicsBlackboard::KinematicsBlackboard() {
+//    llog(INFO) << "Initialising blackboard: kinematics" << endl;
+//    std::vector<int> left;
+//    left.reserve(Sonar::NUMBER_OF_READINGS/2*WINDOW_SIZE);
+//    std::vector<int> middle;
+//    middle.reserve(Sonar::NUMBER_OF_READINGS/2*WINDOW_SIZE);
+//    std::vector<int> right;
+//    right.reserve(Sonar::NUMBER_OF_READINGS/2*WINDOW_SIZE);
+//    sonarFiltered.reserve(3);
+//    sonarFiltered.push_back(left);
+//    sonarFiltered.push_back(middle);
+//    sonarFiltered.push_back(right);
+// }
 
 void KinematicsBlackboard::readOptions(const program_options::variables_map& config) {
    isCalibrating = config["kinematics.isCalibrating"].as<bool>();

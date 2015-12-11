@@ -43,7 +43,7 @@
 //#include "types/RobotObstacle.hpp"
 //#include "types/FieldEdgeInfo.hpp"
 //#include "types/FieldFeatureInfo.hpp"
-#include "types/Ipoint.hpp"
+//#include "types/Ipoint.hpp"
 #include "types/Odometry.hpp"
 //#include "types/TeamBallInfo.hpp"
 
@@ -127,7 +127,7 @@ struct KinematicsBlackboard {
    SensorValues sensorsLagged;
 };
 
-/* Data Behaviour module will be sharing with others */
+/* Data Behaviour module will be sharing with others
 struct BehaviourBlackboard {
    explicit BehaviourBlackboard();
    void readOptions(const boost::program_options::variables_map& config);
@@ -135,7 +135,7 @@ struct BehaviourBlackboard {
    int readBuf;
    std::string skill;
    BehaviourSharedData behaviourSharedData;
-};
+}; */
 
 /* Data Localisation module will be sharing */
 struct LocalisationBlackboard {
@@ -172,69 +172,69 @@ struct LocalisationBlackboard {
    AbsCoord ballPos;
 
    // TODO: get rid of this variable from behaviours and everywhere else!
-   TeamBallInfo teamBall;
+   //TeamBallInfo teamBall;
    
    XYZ_Coord ballNeckRelative;
    
-   SharedLocalisationUpdateBundle sharedLocalisationBundle;
+   //SharedLocalisationUpdateBundle sharedLocalisationBundle;
    
    bool havePendingOutgoingSharedBundle;
    std::vector<bool> havePendingIncomingSharedBundle;
 
    /** filtered positions of visual robots */
-   std::vector<RobotObstacle> robotObstacles;
+   //std::vector<RobotObstacle> robotObstacles;
 };
 
 
 /* Data Vision module will be sharing with others */
-struct VisionBlackboard {
-   explicit VisionBlackboard();
+// struct VisionBlackboard {
+//    explicit VisionBlackboard();
 
-   /* Time the frame was captured */
-   int64_t timestamp;
+//    /* Time the frame was captured */
+//    int64_t timestamp;
   
-   /* Detected features */
-   std::vector<Ipoint>           landmarks;
-   std::vector<FootInfo>         feet;
-   std::vector<BallInfo>         balls;
-   BallHint                      ballHint;
-   std::vector<PostInfo>         posts;
-   std::vector<RobotInfo>        robots;
-   std::vector<FieldEdgeInfo>    fieldEdges;
-   std::vector<FieldFeatureInfo> fieldFeatures;	
-   Odometry                      vOdometry;
-   Odometry                      dualOdometry;
-   unsigned int                  missedFrames;
-   std::pair<int, int>           dxdy;
-   bool                          caughtLeft;
-   bool                          caughtRight; // robot is caught on LHS or RHS
-   PostInfo::Type                goalArea;
-   float                         awayGoalProb;
-   int                           homeMapSize;
-   int                           awayMapSize;
+//    /* Detected features */
+//    std::vector<Ipoint>           landmarks;
+//    std::vector<FootInfo>         feet;
+//    std::vector<BallInfo>         balls;
+//    BallHint                      ballHint;
+//    std::vector<PostInfo>         posts;
+//    std::vector<RobotInfo>        robots;
+//    std::vector<FieldEdgeInfo>    fieldEdges;
+//    std::vector<FieldFeatureInfo> fieldFeatures;	
+//    Odometry                      vOdometry;
+//    Odometry                      dualOdometry;
+//    unsigned int                  missedFrames;
+//    std::pair<int, int>           dxdy;
+//    bool                          caughtLeft;
+//    bool                          caughtRight; // robot is caught on LHS or RHS
+//    PostInfo::Type                goalArea;
+//    float                         awayGoalProb;
+//    int                           homeMapSize;
+//    int                           awayMapSize;
 
-   /** Saliency scan */
-   Colour *topSaliency;
-   Colour *botSaliency;
-   Colour *saliency;
+//    /** Saliency scan */
+//    Colour *topSaliency;
+//    Colour *botSaliency;
+//    Colour *saliency;
 
-   /** Pointer to the current frame being processed by Vision */
-   uint8_t const* currentFrame;
-   uint8_t const* topFrame;
-   uint8_t const* botFrame;
+//    /** Pointer to the current frame being processed by Vision */
+//    uint8_t const* currentFrame;
+//    uint8_t const* topFrame;
+//    uint8_t const* botFrame;
 
-   /**
-    * DO NOT USE ANYTHING BELOW HERE
-    * Kept here only for compatibility with 2010 filter
-    * Will be depricated by daves new filter
-    */
+//    /**
+//     * DO NOT USE ANYTHING BELOW HERE
+//     * Kept here only for compatibility with 2010 filter
+//     * Will be depricated by daves new filter
+//     */
 
-   /** Points on field lines */
-   int numFieldLinePoints;
-   RRCoord fieldLinePoints[MAX_FIELD_LINE_POINTS];
-   bool canSeeBottom[MAX_POSTS];
-   bool canSeeBottomRobot[MAX_ROBOTS];
-};
+//    /** Points on field lines */
+//    int numFieldLinePoints;
+//    RRCoord fieldLinePoints[MAX_FIELD_LINE_POINTS];
+//    bool canSeeBottom[MAX_POSTS];
+//    bool canSeeBottomRobot[MAX_ROBOTS];
+// };
 
 struct PerceptionBlackboard {
    explicit PerceptionBlackboard();
