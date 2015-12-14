@@ -10,7 +10,8 @@ public class ShortBuffer extends Buffer<Short> {
 	
 	public static final int SHORT_BYTES = 2;
 	
-	short[] peaks;
+	short[] max;
+	short[] min;
 	short[][] data;
 	
 	public ShortBuffer() {	}
@@ -40,7 +41,8 @@ public class ShortBuffer extends Buffer<Short> {
 		frames = c1.firstValueOf("frames").valueAsInt();
 		
 		data = new short[channels][frames];
-		peaks = new short[channels];
+		max = new short[channels];
+		min = new short[channels];
 		assert(soundLog.bytes.length >= (SHORT_BYTES * channels * frames));
 		
 		ByteBuffer buffer = ByteBuffer.wrap(soundLog.bytes);
@@ -49,8 +51,10 @@ public class ShortBuffer extends Buffer<Short> {
 		for (int f = 0; f < frames; ++f) {
 			for (int c = 0; c < channels; ++c) {
 				data[c][f] = buffer.getShort();
-				if ( Math.abs(data[c][f]) > peaks[c] )
-					peaks[c] = data[c][f];
+				if ( data[c][f] > max[c] )
+					max[c] = data[c][f];
+				if ( data[c][f] < min[c] )
+					min[c] = data[c][f];
 			}
 		}
 	}

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import nbtool.util.Center;
+import nbtool.util.Logger;
 import nbtool.util.Prefs;
 import nbtool.util.Center.NBToolShutdownListener;
 import nbtool.util.Prefs.ExtBounds;
@@ -57,7 +58,7 @@ public class UtilityManager {
 					e.printStackTrace();
 				}
 				if (val instanceof UtilityParent) {
-					System.out.printf("UtilityManager found field of class %s...\n", val.getClass().getName());
+					Logger.infof("UtilityManager found field of class %s...", val.getClass().getName());
 					found.add((UtilityParent) val);
 				}
 			}

@@ -22,7 +22,7 @@ public class SndAmpView extends ViewParent {
 
 			@Override
 			public String peakString() {
-				return String.format("peak left = %d, peak right = %d", sb.peaks[0], sb.peaks[1]);
+				return String.format("hmax left = %d, hmax right = %d", sb.max[0], sb.max[1]);
 			}
 
 			@Override

@@ -14,7 +14,7 @@ public class CorrelationView extends ViewParent {
 		magSlider.setEnabled(false);
 		diffSlider.setEnabled(false);
 		
-		waveScrollPane.setVisible(false);
+//		waveScrollPane.setVisible(false);
 	}
 	
 	private int percentForRange(double min, double max, double val) {
@@ -22,18 +22,32 @@ public class CorrelationView extends ViewParent {
 		double fraction = (val - min) / (max - min);
 		return (int) (100 * fraction);
 	}
+	
+	private double used(short val) {
+		return ( (double) Math.abs(val) ) / Short.MAX_VALUE;
+	}
 
 	@Override
 	public void setLog(_Log newlog) {
 		
 		int srate = newlog.sexprForContentItem(0)
 				.firstValueOf("rate").valueAsInt();
+		
+		//nyquist check
 		assert(srate > (TARGET_F * 2));
 		
 		ShortBuffer buf = new ShortBuffer();
 		buf.parse(newlog);
 		Correlator cor = new Correlator(buf.channels,
 				srate / TARGET_F, 1.0d);
+		
+		String useText = String.format("formate usage: left [%.3f, %.3f] -- right [%.3f, %.3f]",
+				used(buf.min[0]), used(buf.max[0]), used(buf.min[1]), used(buf.max[1]) );
+		formatUsageStats.setText(useText);
+		
+//		System.out.printf("%d %d %.3f %.3f\n",
+//				buf.min[0], buf.max[0], used(buf.min[0]), used(buf.max[0]) );
+				
 		
 		details1.setText(String.format("srate=%d target_f=%d", 
 				srate, TARGET_F));
@@ -86,7 +100,7 @@ public class CorrelationView extends ViewParent {
     } 
 	
 	
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
 
@@ -184,14 +198,14 @@ public class CorrelationView extends ViewParent {
                             .addComponent(details2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(formatUsageStats, javax.swing.GroupLayout.PREFERRED_SIZE, 302, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(showTargetBox)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(showFirstBox)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(showSecondBox)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                                .addComponent(showSecondBox)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(formatUsageStats, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -230,7 +244,7 @@ public class CorrelationView extends ViewParent {
                 .addComponent(magSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(15, 15, 15))
         );
-    }// </editor-fold>                                                                    
+    }// </editor-fold>                        
 
     // Variables declaration - do not modify                     
     private javax.swing.JLabel DMAX_LABEL;

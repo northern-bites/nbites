@@ -198,7 +198,7 @@ public class KeyBind {
 	}
 
 	static {
-		Logger.printf("Installing KeyBind post-processor...");
+		Logger.infof("Installing KeyBind post-processor...");
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventPostProcessor(
 				new KeyEventPostProcessor() {
 
