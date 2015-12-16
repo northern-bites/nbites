@@ -9,7 +9,7 @@ class FilteredTouch : Touch {
    public:
       explicit FilteredTouch(Touch* t);
       ~FilteredTouch();
-      SensorValues getSensors(Kinematics &kinematics);
+      SensorValues getSensors(UNSWKinematics &kinematics);
       void readOptions(const boost::program_options::variables_map& config);
       bool getStanding();
       ButtonPresses getButtons();
@@ -30,7 +30,7 @@ class FilteredTouch : Touch {
       float prevAng[2];
 
       //kinematics body state
-      Kinematics kinematics;
+      UNSWKinematics kinematics;
       matrix<float> lastBodyPosition;
       matrix<float> bodyRotation;
       matrix<float> bodyOrientation;

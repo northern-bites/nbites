@@ -39,68 +39,68 @@ void Blackboard::shallowSerialize(Archive & ar,
    ar & perception.total;
    ar & perception.vision;
 
-   ar & behaviour.request;
+   //ar & behaviour.request;
 
    ar & kinematics.sonarFiltered;
    ar & kinematics.parameters;
    ar & kinematics.sensorsLagged;
 
-   if (this->mask & ROBOT_FILTER_MASK) {
-      ar & localisation.robotObstacles;
-   } else {
-      std::vector<RobotInfo> empty;
-      ar & empty;
-   }
+   // if (this->mask & ROBOT_FILTER_MASK) {
+   //    ar & localisation.robotObstacles;
+   // } else {
+   //    std::vector<RobotInfo> empty;
+   //    ar & empty;
+   // }
 
-   if (this->mask & LANDMARKS_MASK) {
-      ar & vision.landmarks;
-   } else {
-      std::vector<Ipoint> empty;
-      ar & empty;
-   }
+   // if (this->mask & LANDMARKS_MASK) {
+   //    ar & vision.landmarks;
+   // } else {
+   //    std::vector<Ipoint> empty;
+   //    ar & empty;
+   // }
 
-   ar & vision.timestamp;
-   ar & vision.caughtLeft;
-   ar & vision.caughtRight;
-   ar & vision.goalArea;
-   ar & vision.awayGoalProb;
-   ar & vision.homeMapSize;
-   ar & vision.awayMapSize;
-   ar & vision.feet;
-   ar & vision.balls;
-   ar & vision.ballHint;
-   ar & vision.posts;
-   ar & vision.robots;
-   ar & vision.fieldEdges;
-   ar & vision.fieldFeatures;
-   ar & vision.vOdometry;
-   ar & vision.dualOdometry;
-   ar & vision.missedFrames;
-   ar & vision.dxdy;
+   // ar & vision.timestamp;
+   // ar & vision.caughtLeft;
+   // ar & vision.caughtRight;
+   // ar & vision.goalArea;
+   // ar & vision.awayGoalProb;
+   // ar & vision.homeMapSize;
+   // ar & vision.awayMapSize;
+   // ar & vision.feet;
+   // ar & vision.balls;
+   // ar & vision.ballHint;
+   // ar & vision.posts;
+   // ar & vision.robots;
+   // ar & vision.fieldEdges;
+   // ar & vision.fieldFeatures;
+   // ar & vision.vOdometry;
+   // ar & vision.dualOdometry;
+   // ar & vision.missedFrames;
+   // ar & vision.dxdy;
 
    ar & receiver.data;
    ar & receiver.incapacitated;
 
    ar & motion.pendulumModel;
 
-   ar & localisation.robotPos;
-   ar & localisation.ballLostCount;
-   ar & localisation.ballPosRR;
-   ar & localisation.ballPosRRC;
-   ar & localisation.ballVelRRC;
-   if (version >= 16) {
-      ar & localisation.ballVel;
-      ar & localisation.ballPosUncertainty;
-      ar & localisation.ballVelEigenvalue;
-      ar & localisation.robotPosUncertainty;
-      ar & localisation.robotHeadingUncertainty;
-   }
-   ar & localisation.ballNeckRelative;
-   ar & localisation.ballPos;
-   ar & localisation.teamBall;
-   ar & localisation.sharedLocalisationBundle;
-   ar & localisation.havePendingOutgoingSharedBundle;
-   ar & localisation.havePendingIncomingSharedBundle;
+   // ar & localisation.robotPos;
+   // ar & localisation.ballLostCount;
+   // ar & localisation.ballPosRR;
+   // ar & localisation.ballPosRRC;
+   // ar & localisation.ballVelRRC;
+   // if (version >= 16) {
+   //    ar & localisation.ballVel;
+   //    ar & localisation.ballPosUncertainty;
+   //    ar & localisation.ballVelEigenvalue;
+   //    ar & localisation.robotPosUncertainty;
+   //    ar & localisation.robotHeadingUncertainty;
+   // }
+   // ar & localisation.ballNeckRelative;
+   // ar & localisation.ballPos;
+   // ar & localisation.teamBall;
+   // ar & localisation.sharedLocalisationBundle;
+   // ar & localisation.havePendingOutgoingSharedBundle;
+   // ar & localisation.havePendingIncomingSharedBundle;
 }
 
 template<class Archive>

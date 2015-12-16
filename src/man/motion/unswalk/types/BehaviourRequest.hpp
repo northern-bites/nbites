@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types/ActionCommand.hpp"
-#include "../vision/WhichCamera.hpp"
+#include "perception/vision/WhichCamera.hpp"
 
 class BehaviourRequest {
    public:

@@ -115,4 +115,3 @@ BOOST_CLASS_VERSION(Pose, 2);
 
 #include "Pose.tcc"
 
-*/

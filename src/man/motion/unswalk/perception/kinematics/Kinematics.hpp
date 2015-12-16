@@ -7,9 +7,9 @@
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/lu.hpp>
 
-#include <kinematics/Parameters.hpp>
-#include <kinematics/Pose.hpp>
-//#include <perception/vision/Camera.hpp>
+#include <perception/kinematics/Parameters.hpp>
+#include <perception/kinematics/Pose.hpp>
+#include <perception/vision/Camera.hpp>
 
 #include <utils/matrix_helpers.hpp>
 #include <types/RRCoord.hpp>
@@ -23,12 +23,12 @@
 #define ARM_DH_CHAIN_LEN 14
 #define LEG_DH_CHAIN_LEN 19
 
-class Kinematics {
+class UNSWKinematics {
    public:
       friend class KinematicsAdapter;
       friend class KinematicsCalibrationSkill;
       friend class CameraPoseTab;
-      Kinematics();
+      UNSWKinematics();
 
       enum Link {
          FOOT = 0,

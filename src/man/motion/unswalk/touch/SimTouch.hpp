@@ -7,7 +7,7 @@ class SimTouch : Touch {
       explicit SimTouch();
       ~SimTouch();
 
-      SensorValues getSensors(Kinematics &kinematics);
+      SensorValues getSensors(UNSWKinematics &kinematics);
       bool getStanding();
       ButtonPresses getButtons();
 

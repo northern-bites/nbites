@@ -15,37 +15,37 @@
 #include "generator/PendulumModel.hpp"
 #include "utils/body.hpp"
 #include "utils/boostSerializationVariablesMap.hpp"
-#include "kinematics/Parameters.hpp"
+#include "perception/kinematics/Parameters.hpp"
 //#include "vision/VisionDefs.hpp" ??????
 //#include "perception/vision/RobotRegion.hpp"
 //#include "perception/localisation/LocalisationDefs.hpp"
 //#include "perception/localisation/SharedLocalisationUpdateBundle.hpp"
-#include "kinematics/Pose.hpp"
+#include "perception/kinematics/Pose.hpp"
 #include "gamecontroller/RoboCupGameControlData.hpp"
 //#include "utils/Logger.hpp"
 //#include "transmitter/TransmitterDefs.hpp"
-#include "../types/BehaviourRequest.hpp"
+#include "types/BehaviourRequest.hpp"
 
-#include "../types/ActionCommand.hpp"
-#include "../types/ButtonPresses.hpp"
-#include "../types/Odometry.hpp"
-#include "../types/SensorValues.hpp"
-#include "../types/RRCoord.hpp"
-#include "../types/AbsCoord.hpp"
-#include "../types/XYZ_Coord.hpp"
-#include "../types/BroadcastData.hpp"
+#include "types/ActionCommand.hpp"
+#include "types/ButtonPresses.hpp"
+#include "types/Odometry.hpp"
+#include "types/SensorValues.hpp"
+#include "types/RRCoord.hpp"
+#include "types/AbsCoord.hpp"
+#include "types/XYZ_Coord.hpp"
+#include "types/BroadcastData.hpp"
 //#include "../types/BehaviourSharedData.hpp"
 
-//#include "types/FootInfo.hpp"
-//#include "types/BallInfo.hpp"
-//#include "types/PostInfo.hpp"
-//#include "types/RobotInfo.hpp"
-//#include "types/RobotObstacle.hpp"
-//#include "types/FieldEdgeInfo.hpp"
-//#include "types/FieldFeatureInfo.hpp"
+#include "types/FootInfo.hpp"
+#include "types/BallInfo.hpp"
+#include "types/PostInfo.hpp"
+#include "types/RobotInfo.hpp"
+#include "types/RobotObstacle.hpp"
+#include "types/FieldEdgeInfo.hpp"
+#include "types/FieldFeatureInfo.hpp"
 //#include "types/Ipoint.hpp"
 #include "types/Odometry.hpp"
-//#include "types/TeamBallInfo.hpp"
+#include "types/TeamBallInfo.hpp"
 
 namespace VisionTest
 {
@@ -137,7 +137,7 @@ struct BehaviourBlackboard {
    BehaviourSharedData behaviourSharedData;
 }; */
 
-/* Data Localisation module will be sharing */
+/* //Data Localisation module will be sharing 
 struct LocalisationBlackboard {
    explicit LocalisationBlackboard();
 
@@ -181,19 +181,19 @@ struct LocalisationBlackboard {
    bool havePendingOutgoingSharedBundle;
    std::vector<bool> havePendingIncomingSharedBundle;
 
-   /** filtered positions of visual robots */
+   // filtered positions of visual robots 
    //std::vector<RobotObstacle> robotObstacles;
 };
 
 
-/* Data Vision module will be sharing with others */
+// Data Vision module will be sharing with others
 // struct VisionBlackboard {
 //    explicit VisionBlackboard();
 
-//    /* Time the frame was captured */
+//    // Time the frame was captured
 //    int64_t timestamp;
   
-//    /* Detected features */
+//    // Detected features
 //    std::vector<Ipoint>           landmarks;
 //    std::vector<FootInfo>         feet;
 //    std::vector<BallInfo>         balls;
@@ -405,13 +405,13 @@ class Blackboard {
       KinematicsBlackboard kinematics;
 
       /* Data Behaviour module will be sharing with others */
-      BehaviourBlackboard behaviour;
+      //BehaviourBlackboard behaviour;
 
       /* Data Localisation module will be sharing */
       LocalisationBlackboard localisation;
 
       /* Data Vision module will be sharing with others */
-      VisionBlackboard vision;
+      //VisionBlackboard vision;
 
       PerceptionBlackboard perception;
 

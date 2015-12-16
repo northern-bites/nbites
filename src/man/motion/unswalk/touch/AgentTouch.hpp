@@ -8,7 +8,7 @@ class AgentTouch : Touch {
    public:
       explicit AgentTouch();
       ~AgentTouch();
-      SensorValues getSensors(Kinematics &kinematics);
+      SensorValues getSensors(UNSWKinematics &kinematics);
       bool getStanding();
       ButtonPresses getButtons();
 

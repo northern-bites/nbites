@@ -5,7 +5,7 @@
 #include "../types/JointValues.hpp"
 #include "../types/Odometry.hpp"
 #include "../types/XYZ_Coord.hpp"
-//#include "../kinematics/Kinematics.hpp"
+#include "../perception/kinematics/Kinematics.hpp"
 
 #include "PendulumModel.hpp"
 

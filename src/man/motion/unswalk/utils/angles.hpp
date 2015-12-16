@@ -8,22 +8,22 @@
 #include <cmath>
 #include "basic_maths.hpp"
 
-static const float DEG_OVER_RAD = 180 / M_PI;
-static const float RAD_OVER_DEG = M_PI / 180;
+static const float UNSW_DEG_OVER_RAD = 180 / M_PI;
+static const float UNSW_RAD_OVER_DEG = M_PI / 180;
 
 inline static float RAD2DEG(const float x) {
-   return ((x) * DEG_OVER_RAD);
+   return ((x) * UNSW_DEG_OVER_RAD);
 }
 
 inline static float DEG2RAD(const float x) {
-   return ((x) * RAD_OVER_DEG);
+   return ((x) * UNSW_RAD_OVER_DEG);
 }
 
 /* convert radiance from our coordinate system into degrees mod 360
  * ASSUMES theta is within -Pi <= 0 < Pi!
  */
 inline static float RAD2DEG360(const float theta) {
-   float degree = theta * DEG_OVER_RAD; /* clip the theta within 0 ~ 2M_PI */
+   float degree = theta * UNSW_DEG_OVER_RAD; /* clip the theta within 0 ~ 2M_PI */
    if (degree < 0) {
       degree += 360;
    }

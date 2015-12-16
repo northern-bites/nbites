@@ -17,7 +17,7 @@
 // used with filterZeros function
 static const float VERY_SMALL = 0.0001;
 
-// These are the offsets of each of the parts in the kinematics chain, see
+// These are the offsets of each of the parts in the UNSWKinematics chain, see
 // http://runswift.cse.unsw.edu.au/confluence/download/attachments/3047440/100215-NaoForwardKinematicsLegToCamera.pptx.pdf?version=2&modificationDate=1266227985534 
 // for a visual representation of how the Foot->Camera DH chain was calculated
 // for the v3s.
@@ -55,7 +55,7 @@ static const float l10Bot = d1Bot * sin(a1Bot);
 static const float d11Bot = d1Bot * cos(a1Bot);
 static const float a3Bot = camera_bottom_angle - M_PI;
 
-Kinematics::Kinematics() {
+UNSWKinematics::UNSWKinematics() {
    std::vector<boost::numeric::ublas::matrix<float> > chest;
 
    // Left side of body
@@ -125,7 +125,7 @@ Kinematics::Kinematics() {
 
    // Setting up the masses vector to store the mass of each joint in kgs.
    // These are particularly ordered in the order that they are multiplied up
-   // through the kinematics chain for use in Centre of Mass calculations.
+   // through the UNSWKinematics chain for use in Centre of Mass calculations.
    masses.clear();
    masses.push_back(Limbs::TorsoMass); // 0 - Torso
    masses.push_back(Limbs::NeckMass); // 1 - Neck (HeadYaw)
@@ -280,8 +280,8 @@ Kinematics::Kinematics() {
 
 }
 
-Kinematics::Chain
-Kinematics::determineSupportChain() {
+UNSWKinematics::Chain
+UNSWKinematics::determineSupportChain() {
    float lsum = sensorValues.sensors[Sensors::LFoot_FSR_FrontLeft]  +
                 sensorValues.sensors[Sensors::LFoot_FSR_FrontRight] +
                 sensorValues.sensors[Sensors::LFoot_FSR_RearLeft]   +
@@ -294,8 +294,8 @@ Kinematics::determineSupportChain() {
    return RIGHT_CHAIN;
 }
 
-void Kinematics::updateDHChain() {
-   // These are the camera offsets from kinematics calibrations
+void UNSWKinematics::updateDHChain() {
+   // These are the camera offsets from UNSWKinematics calibrations
    float coffsetY, coffsetX, coffsetZ;
 
    JointValues jointValues = sensorValues.joints;
@@ -485,7 +485,7 @@ void Kinematics::updateDHChain() {
    //transformLFB[18] = transformRFB[18];
 }
 
-Pose Kinematics::getPose() {
+Pose UNSWKinematics::getPose() {
    Chain foot = determineSupportChain();
 
    boost::numeric::ublas::matrix<float> c2wTop = createCameraToWorldTransform(foot, true);
@@ -506,21 +506,21 @@ Pose Kinematics::getPose() {
 }
 
 boost::numeric::ublas::matrix<float>
-Kinematics::createCameraToWorldTransform(Chain foot, bool top) {
+UNSWKinematics::createCameraToWorldTransform(Chain foot, bool top) {
    boost::numeric::ublas::matrix<float> c2f = createCameraToFootTransform(foot,top);
    boost::numeric::ublas::matrix<float> f2w = createFootToWorldTransform(foot,top);
    return prod(f2w, c2f);
 }
 
 boost::numeric::ublas::matrix<float>
-Kinematics::createNeckToWorldTransform(Chain foot) {
+UNSWKinematics::createNeckToWorldTransform(Chain foot) {
    boost::numeric::ublas::matrix<float> n2f = createNeckToFootTransform(foot);
    boost::numeric::ublas::matrix<float> f2w = createFootToWorldTransform(foot);
    return prod(f2w, n2f);
 }
 
 boost::numeric::ublas::matrix<float>
-Kinematics::evaluateDHChain(Link from, Link to, Chain foot, bool top) {
+UNSWKinematics::evaluateDHChain(Link from, Link to, Chain foot, bool top) {
    boost::numeric::ublas::matrix<float> finalTransform =
       boost::numeric::ublas::identity_matrix<float>(4);
    if (foot == RIGHT_CHAIN) {
@@ -551,9 +551,9 @@ Kinematics::evaluateDHChain(Link from, Link to, Chain foot, bool top) {
    return finalTransform;
 }
 
-// Evaluate kinematics chain from all limbs back to the IMU, taking into account the COM at each part.
+// Evaluate UNSWKinematics chain from all limbs back to the IMU, taking into account the COM at each part.
 boost::numeric::ublas::matrix<float>
-Kinematics::evaluateMassChain() {   
+UNSWKinematics::evaluateMassChain() {   
    int i, joint = 0;
    float totalMass = 0;
    boost::numeric::ublas::matrix<float> finalTransform(4, 1);
@@ -628,12 +628,12 @@ Kinematics::evaluateMassChain() {
 }
 
 boost::numeric::ublas::matrix<float>
-Kinematics::createCameraToFootTransform(Chain foot, bool top) {
+UNSWKinematics::createCameraToFootTransform(Chain foot, bool top) {
    boost::numeric::ublas::matrix<float> b2f = evaluateDHChain(FOOT, BODY, foot, top);
    // When we get to the torso, we need to adjust the transform by the forward and side lean to account
    // for when the robot's feet are not flat on the ground. We apply the the rotation of the lean to the
    // hip vector to account for the lean already introduced by the leg joints.
-   // We also adjust by the body pitch offset from kinematics calibration.
+   // We also adjust by the body pitch offset from UNSWKinematics calibration.
    boost::numeric::ublas::matrix<float> z(4, 1);
    z(0, 0) = 0;
    z(1, 0) = 0;
@@ -654,12 +654,12 @@ Kinematics::createCameraToFootTransform(Chain foot, bool top) {
 }
 
 boost::numeric::ublas::matrix<float>
-Kinematics::createNeckToFootTransform(Chain foot) {
+UNSWKinematics::createNeckToFootTransform(Chain foot) {
    boost::numeric::ublas::matrix<float> b2f = evaluateDHChain(FOOT, BODY, foot);
    // When we get to the torso, we need to adjust the transform by the forward and side lean to account
    // for when the robot's feet are not flat on the ground. We apply the the rotation of the lean to the
    // hip vector to account for the lean already introduced by the leg joints.
-   // We also adjust by the body pitch offset from kinematics calibration.
+   // We also adjust by the body pitch offset from UNSWKinematics calibration.
    boost::numeric::ublas::matrix<float> z(4, 1);
    z(0, 0) = 0;
    z(1, 0) = 0;
@@ -682,7 +682,7 @@ Kinematics::createNeckToFootTransform(Chain foot) {
 // World is defined as the centre of the two feet on the ground plane,
 // with a heading equal to the average of the two feet directions
 boost::numeric::ublas::matrix<float>
-Kinematics::createFootToWorldTransform(Chain foot, bool top) {
+UNSWKinematics::createFootToWorldTransform(Chain foot, bool top) {
    boost::numeric::ublas::matrix<float> b2lf =
       evaluateDHChain(FOOT, BODY, foot, top);
    boost::numeric::ublas::matrix<float> b2rf =
@@ -726,12 +726,12 @@ Kinematics::createFootToWorldTransform(Chain foot, bool top) {
    return result;
 }
 
-void Kinematics::setSensorValues(SensorValues sensorValues) {
+void UNSWKinematics::setSensorValues(SensorValues sensorValues) {
    this->sensorValues = sensorValues;
 }
 
 boost::numeric::ublas::matrix<float>
-Kinematics::createWorldToFOVTransform(
+UNSWKinematics::createWorldToFOVTransform(
    const boost::numeric::ublas::matrix<float> &c2w) {
    boost::numeric::ublas::matrix<float> w2c = c2w;
 
@@ -748,7 +748,7 @@ Kinematics::createWorldToFOVTransform(
    return transform;
 }
 
-void Kinematics::determineBodyExclusionArray(
+void UNSWKinematics::determineBodyExclusionArray(
    const boost::numeric::ublas::matrix<float> &m,
    int16_t *points, bool top) {
 
@@ -817,7 +817,7 @@ void Kinematics::determineBodyExclusionArray(
    }
 }
 
-std::pair<int, int> Kinematics::calculateHorizon(
+std::pair<int, int> UNSWKinematics::calculateHorizon(
    const boost::numeric::ublas::matrix<float> &c2w) {
    boost::numeric::ublas::matrix<float> transform = createWorldToFOVTransform(c2w);
 
@@ -849,7 +849,7 @@ std::pair<int, int> Kinematics::calculateHorizon(
 }
 
 boost::numeric::ublas::matrix<float>
-Kinematics::fovToImageSpaceTransform(
+UNSWKinematics::fovToImageSpaceTransform(
    const boost::numeric::ublas::matrix<float> &transform,
    const boost::numeric::ublas::matrix<float> &point, bool top) {
 

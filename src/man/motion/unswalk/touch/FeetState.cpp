@@ -36,14 +36,14 @@ void FeetState::update(const SensorValues &sensors, Kinematics &kinematics){
 
    matrix<float> leftFootChain =
       kinematics.evaluateDHChain(
-            Kinematics::FOOT,
-            Kinematics::BODY,
-            Kinematics::LEFT_CHAIN);
+            UNSWKinematics::FOOT,
+            UNSWKinematics::BODY,
+            UNSWKinematics::LEFT_CHAIN);
    matrix<float> rightFootChain =
       kinematics.evaluateDHChain(
-            Kinematics::FOOT,
-            Kinematics::BODY,
-            Kinematics::RIGHT_CHAIN);
+            UNSWKinematics::FOOT,
+            UNSWKinematics::BODY,
+            UNSWKinematics::RIGHT_CHAIN);
    matrix<float> origin = vec4<float>(0, 0, 0, 1);
    matrix<float> lf = prod(leftFootChain, origin);
    matrix<float> rf = prod(rightFootChain, origin);
