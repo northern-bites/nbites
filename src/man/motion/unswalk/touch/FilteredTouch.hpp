@@ -1,7 +1,7 @@
 #pragma once
 
-#include "motion/touch/Touch.hpp"
-#include "motion/touch/TorsoStateFilter.hpp"
+#include "Touch.hpp"
+#include "TorsoStateFilter.hpp"
 
 using namespace boost::numeric::ublas;
 

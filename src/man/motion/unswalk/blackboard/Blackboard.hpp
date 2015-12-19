@@ -11,7 +11,7 @@
 #include <vector>
 #include <deque>
 
-//#include "perception/behaviour/ReadySkillPositionAllocation.hpp"
+#include "perception/behaviour/ReadySkillPositionAllocation.hpp"
 #include "generator/PendulumModel.hpp"
 #include "utils/body.hpp"
 #include "utils/boostSerializationVariablesMap.hpp"
@@ -34,7 +34,7 @@
 #include "types/AbsCoord.hpp"
 #include "types/XYZ_Coord.hpp"
 #include "types/BroadcastData.hpp"
-//#include "../types/BehaviourSharedData.hpp"
+#include "../types/BehaviourSharedData.hpp"
 
 #include "types/FootInfo.hpp"
 #include "types/BallInfo.hpp"
@@ -127,7 +127,7 @@ struct KinematicsBlackboard {
    SensorValues sensorsLagged;
 };
 
-/* Data Behaviour module will be sharing with others
+// Data Behaviour module will be sharing with others
 struct BehaviourBlackboard {
    explicit BehaviourBlackboard();
    void readOptions(const boost::program_options::variables_map& config);
@@ -135,7 +135,7 @@ struct BehaviourBlackboard {
    int readBuf;
    std::string skill;
    BehaviourSharedData behaviourSharedData;
-}; */
+};
 
 /* //Data Localisation module will be sharing 
 struct LocalisationBlackboard {
@@ -396,7 +396,7 @@ class Blackboard {
       /**
        * the mask of what is stored/loaded from a file or network
        */
-      OffNaoMask_t mask;
+      //OffNaoMask_t mask;
 
       /* Options callback for changes at runtime */
       void readOptions(const boost::program_options::variables_map& config);
@@ -405,10 +405,10 @@ class Blackboard {
       KinematicsBlackboard kinematics;
 
       /* Data Behaviour module will be sharing with others */
-      //BehaviourBlackboard behaviour;
+      BehaviourBlackboard behaviour;
 
       /* Data Localisation module will be sharing */
-      LocalisationBlackboard localisation;
+      //LocalisationBlackboard localisation;
 
       /* Data Vision module will be sharing with others */
       //VisionBlackboard vision;

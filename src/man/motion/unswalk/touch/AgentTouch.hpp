@@ -1,7 +1,7 @@
 #pragma once
 
 #include <semaphore.h>
-#include "motion/touch/Touch.hpp"
+#include "Touch.hpp"
 #include "libagent/AgentData.hpp"
 
 class AgentTouch : Touch {

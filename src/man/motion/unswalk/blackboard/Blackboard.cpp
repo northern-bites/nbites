@@ -149,13 +149,13 @@ LocalisationBlackboard::LocalisationBlackboard() {
 //    numFieldLinePoints = 0;
 // }
 
-// PerceptionBlackboard::PerceptionBlackboard() {
-//    kinematics = 0;
-//    localisation = 0;
-//    vision = 0;
-//    behaviour = 0;
-//    total = 33;
-// }
+PerceptionBlackboard::PerceptionBlackboard() {
+   kinematics = 0;
+   localisation = 0;
+   //vision = 0;
+   behaviour = 0;
+   total = 33;
+}
 
 MotionBlackboard::MotionBlackboard() {
    llog(INFO) << "Initialising blackboard: motion" << endl;

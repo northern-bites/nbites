@@ -2,7 +2,7 @@
 
 #include "types/ButtonPresses.hpp"
 #include "types/SensorValues.hpp"
-#include "perception/kinematics/UNSWKinematics.hpp"
+#include "perception/kinematics/Kinematics.hpp"
 #include <boost/program_options/variables_map.hpp>
 
 /**

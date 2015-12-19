@@ -7,8 +7,8 @@
 #include <boost/numeric/ublas/io.hpp>
 #include <iostream>
 #include "types/SensorValues.hpp"
-#include "perception/kinematics/UNSWKinematics.hpp"
-#include "motion/touch/FeetState.hpp"
+#include "perception/kinematics/Kinematics.hpp"
+#include "FeetState.hpp"
 
 using namespace boost::numeric::ublas;
 using namespace std;

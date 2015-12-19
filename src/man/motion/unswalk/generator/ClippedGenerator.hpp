@@ -1,6 +1,6 @@
 #pragma once
 
-#include "motion/generator/Generator.hpp"
+#include "generator/Generator.hpp"
 
 class ClippedGenerator : Generator {
    public:

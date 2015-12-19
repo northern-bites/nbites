@@ -143,7 +143,7 @@ class BodyModel {
       void observationUpdate(Odometry *odometry, const SensorValues &sensors);
       void simulationUpdate();
 
-      //Kinematics *kinematics;
+      UNSWKinematics *kinematics;
       PendulumModel pendulumModel;
       PendulumModel lastPendulumModel;
 

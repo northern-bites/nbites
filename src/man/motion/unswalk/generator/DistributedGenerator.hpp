@@ -2,7 +2,7 @@
 
 #include <map>
 #include <string>
-#include "motion/generator/Generator.hpp"
+#include "generator/Generator.hpp"
 
 class DistributedGenerator : Generator {
    public:

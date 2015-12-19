@@ -5,7 +5,6 @@ add_definitions(-DLINUX -DRELEASE -DTARGET_ROBOT)
 
 set( unswalk_srcs
   UNSWalkProvider.cpp
-  MotionAdapter.cpp
   IKinematics.cpp
   generator/Walk2014Generator.cpp
   generator/BodyModel.cpp  

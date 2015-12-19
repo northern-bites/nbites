@@ -1,6 +1,6 @@
 #pragma once
 
-#include "motion/effector/Effector.hpp"
+#include "Effector.hpp"
 #include "libagent/AgentData.hpp"
 
 class AgentEffector : Effector {

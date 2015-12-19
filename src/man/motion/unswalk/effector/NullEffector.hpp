@@ -1,6 +1,6 @@
 #pragma once
 
-#include "motion/effector/Effector.hpp"
+#include "Effector.hpp"
 
 class NullEffector : Effector {
    public:

@@ -89,6 +89,8 @@ class UNSWKinematics {
 
       std::pair<int, int> calculateHorizon(
          const boost::numeric::ublas::matrix<float> &m);
+
+      Parameters<float> parameters;
    private:
       // CKF is not really tuned and not being used at the moment
       //CKF ckf;
@@ -113,7 +115,7 @@ class UNSWKinematics {
       std::vector<float> masses;
       std::vector<boost::numeric::ublas::matrix<float> > massesCom;
 
-      Parameters<float> parameters;
+      //Parameters<float> parameters; making public
 
       std::vector<std::vector<boost::numeric::ublas::matrix<float> > >
       bodyParts;
