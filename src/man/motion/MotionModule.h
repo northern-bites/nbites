@@ -14,7 +14,7 @@
 #include "MotionConstants.h"
 
 // Motion providers
-#include "bhwalk/BHWalkProvider.h"
+#include "unswalk/UNSWalkProvider.h"
 #include "ScriptedProvider.h"
 #include "NullBodyProvider.h"
 #include "HeadProvider.h"
@@ -270,7 +270,7 @@ private:
     // Update the hand speeds
     void updateHandSpeeds();
 
-    BHWalkProvider          walkProvider;
+    UNSWalkProvider        walkProvider;
     ScriptedProvider        scriptedProvider;
     HeadProvider            headProvider;
     NullHeadProvider        nullHeadProvider;

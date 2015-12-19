@@ -71,15 +71,15 @@ void UNSWalkProvider::resetAll() {
 	//reset other parts of walk2014gen
 }
 
-/*void UNSWalkProvider::calculateNextJointsAndStiffnesses(
+void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	std::vector<float>& 			sensorAngles,
 	std::vector<float>& 			sensorCurrents,
-	const messages::IntertialState& sensorIntertials,
+	const messages::InertialState&  sensorInertials,
 	const messages::FSR& 			sensorFSRs
 	) 
 {
 	
-} */
+}
 
 // void UNSWalkProvider::restingStand()
 // {

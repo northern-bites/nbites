@@ -10,6 +10,7 @@
 #include "PendulumModel.hpp"
 
 class BodyModel {
+   friend class Walk2014Generator;
    public:
       BodyModel();
       void update(Odometry *odometry, const SensorValues &sensors);
@@ -146,7 +147,6 @@ class BodyModel {
       UNSWKinematics *kinematics;
       PendulumModel pendulumModel;
       PendulumModel lastPendulumModel;
-
 
    private:
       WalkCycle walkCycle;

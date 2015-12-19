@@ -185,26 +185,26 @@ void BodyModel::processUpdate(Odometry *odometry, const SensorValues &sensors) {
    
    boost::numeric::ublas::matrix<float> b2f =
       kinematics->evaluateDHChain(
-         Kinematics::FOOT,
-         Kinematics::BODY,
-         isLeftPhase ? Kinematics::RIGHT_CHAIN : Kinematics::LEFT_CHAIN);
+         UNSWKinematics::FOOT,
+         UNSWKinematics::BODY,
+         isLeftPhase ? UNSWKinematics::RIGHT_CHAIN : UNSWKinematics::LEFT_CHAIN);
    
    boost::numeric::ublas::matrix<float> b2fOther =
       kinematics->evaluateDHChain(
-         Kinematics::FOOT,
-         Kinematics::BODY,
-         isLeftPhase ? Kinematics::LEFT_CHAIN : Kinematics::RIGHT_CHAIN);
+         UNSWKinematics::FOOT,
+         UNSWKinematics::BODY,
+         isLeftPhase ? UNSWKinematics::LEFT_CHAIN : UNSWKinematics::RIGHT_CHAIN);
 
    boost::numeric::ublas::matrix<float> n2f =
       kinematics->evaluateDHChain(
-         Kinematics::FOOT,
-         Kinematics::NECK,
-         isLeftPhase ? Kinematics::RIGHT_CHAIN : Kinematics::LEFT_CHAIN);
+         UNSWKinematics::FOOT,
+         UNSWKinematics::NECK,
+         isLeftPhase ? UNSWKinematics::RIGHT_CHAIN : UNSWKinematics::LEFT_CHAIN);
 
 
    boost::numeric::ublas::matrix<float> f2w =
                   kinematics->createFootToWorldTransform(
-         isLeftPhase ? Kinematics::RIGHT_CHAIN : Kinematics::LEFT_CHAIN);
+         isLeftPhase ? UNSWKinematics::RIGHT_CHAIN : UNSWKinematics::LEFT_CHAIN);
 
    boost::numeric::ublas::matrix<float> b2w = boost::numeric::ublas::prod(f2w, b2f);
    boost::numeric::ublas::matrix<float> n2w = boost::numeric::ublas::prod(f2w, n2f);
