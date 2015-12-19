@@ -32,7 +32,7 @@ public class Logger {
 	public static LogLevel level = EVENT;
 	
 	/*
-	 * Don't synchronize output functions, we can assume the JVM / JDK does this for us.
+	 * Don't synchronize output functions, we can assume the JVM does this for us.
 	 * */
 
 	public static void println(String m) {

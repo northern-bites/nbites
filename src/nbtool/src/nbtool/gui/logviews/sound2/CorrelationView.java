@@ -5,16 +5,15 @@ import nbtool.gui.logviews.misc.ViewParent;
 
 public class CorrelationView extends ViewParent {
 	
-	private static final int TARGET_F = 2000;
+	private static final int TARGET_F = 1000;
 	
 	public CorrelationView() {
 		super();
 		initComponents();
 		
 		magSlider.setEnabled(false);
-		diffSlider.setEnabled(false);
-		
-//		waveScrollPane.setVisible(false);
+		diffSlider.setEnabled(false);		
+		waveScrollPane.setVisible(false);
 	}
 	
 	private int percentForRange(double min, double max, double val) {
@@ -48,7 +47,6 @@ public class CorrelationView extends ViewParent {
 //		System.out.printf("%d %d %.3f %.3f\n",
 //				buf.min[0], buf.max[0], used(buf.min[0]), used(buf.max[0]) );
 				
-		
 		details1.setText(String.format("srate=%d target_f=%d", 
 				srate, TARGET_F));
 		details2.setText(String.format("frames=%d chnls=%d", 
@@ -73,10 +71,31 @@ public class CorrelationView extends ViewParent {
 				percentForRange(-Math.PI, Math.PI, ro)
 				);
 		
-		double diff = lo - ro;
+		double l2 = lo + Math.PI;
+		double r2 = ro + Math.PI;
+		double d1 = l2 - r2;
+		double diff;
+		if (Math.abs(d1) > Math.PI) {
+			double d2 = (2 * Math.PI - l2) + r2;
+			double d3 = (2 * Math.PI - r2) + l2;
+			diff = Math.abs(d2) < Math.abs(d3) ? d2 : d3;
+		} else {
+			diff = d1;
+		}
+		
+		/*
+		double d1 = lo - ro;
+		double diff;
+		if ( Math.abs(d1) > Math.PI) {
+			diff = (d1 > 0) ? d1 - Math.PI : d1 + Math.PI;
+		} else {
+			diff = d1;
+		} */
+		
+		//double diff = lo - ro;
 		diffLabel.setText("difference " + diff);
 		diffSlider.setValue(
-				percentForRange(-2 *Math.PI, 2 * Math.PI, diff)
+				percentForRange(-Math.PI, Math.PI, diff)
 				);
 		
 		double lm = cor.magnitude(0);
@@ -137,7 +156,7 @@ public class CorrelationView extends ViewParent {
         magSlider.setToolTipText("");
         magSlider.setFocusable(false);
 
-        diffSlider.setMinimum(-100);
+        diffSlider.setMinimum(0);
         diffSlider.setFocusable(false);
 
         details1.setText("jLabel1");

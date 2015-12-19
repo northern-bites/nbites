@@ -346,7 +346,7 @@ public class LogDisplayPanel extends JPanel implements
 
 	        streamBox.setText("stream logs containing");
 
-	        streamField.setText("TOP");
+	        streamField.setText("");
 	        streamField.setMinimumSize(new java.awt.Dimension(50, 28));
 	        streamField.setPreferredSize(new java.awt.Dimension(100000, 28));
 
