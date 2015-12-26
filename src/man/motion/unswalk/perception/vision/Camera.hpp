@@ -34,10 +34,10 @@ extern __u32 controlIds[NUM_CONTROLS];
  */
 extern __s32 (*controlValues)[NUM_CONTROLS];
 
-class Camera {
+class UNSWCamera {
    public:
-      Camera();
-      virtual ~Camera() {}
+      UNSWCamera();
+      virtual ~UNSWCamera() {}
 
       /**
        * Get the image and convert it to the requested colourSpace (currently only

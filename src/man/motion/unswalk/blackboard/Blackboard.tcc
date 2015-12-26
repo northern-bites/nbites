@@ -24,8 +24,8 @@ void Blackboard::shallowSerialize(Archive & ar,
       throw std::runtime_error("Depricated 2011 dump file detected");
    }
 
-   ar & gameController.team_red;
-   ar & gameController.player_number;
+   //ar & gameController.team_red;
+   //ar & gameController.player_number;
 
    ar & motion.sensors;
    ar & motion.pose;

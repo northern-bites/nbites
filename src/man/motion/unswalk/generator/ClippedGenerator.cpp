@@ -32,7 +32,7 @@ void ClippedGenerator::readOptions(const boost::program_options::variables_map &
 
 JointValues ClippedGenerator::makeJoints(ActionCommand::All* request,
                                          Odometry* odometry,
-                                         const SensorValues &sensors,
+                                         const UNSWSensorValues &sensors,
                                          BodyModel &bodyModel,
                                          float ballX,
                                          float ballY) {

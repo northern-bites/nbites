@@ -35,7 +35,7 @@ BodyModel::BodyModel() : filAccX(0.0),
 }
 
 void BodyModel::update(Odometry *odometry,
-                       const SensorValues &sensors) {
+                       const UNSWSensorValues &sensors) {
    // Various Center of Pressure calcs to help stabilise walk (ZMP)
    stepCounter++;
    // Update maximum sensed foot-sensor readings
@@ -80,7 +80,7 @@ void BodyModel::update(Odometry *odometry,
 }
 
 
-bool BodyModel::isFootOnGround(const SensorValues &sensors) {
+bool BodyModel::isFootOnGround(const UNSWSensorValues &sensors) {
    float leftFrontL = sensors.sensors[Sensors::LFoot_FSR_FrontLeft];
    float leftFrontR = sensors.sensors[Sensors::LFoot_FSR_FrontRight];
    float rightFrontL = sensors.sensors[Sensors::RFoot_FSR_FrontLeft];
@@ -97,7 +97,7 @@ bool BodyModel::isFootOnGround(const SensorValues &sensors) {
           leftRearL > 0.01 && leftRearR > 0.01;
 }
 
-bool BodyModel::isOnFrontOfFoot(const SensorValues &sensors) {
+bool BodyModel::isOnFrontOfFoot(const UNSWSensorValues &sensors) {
    float leftFront = sensors.sensors[Sensors::LFoot_FSR_FrontLeft] +
                      sensors.sensors[Sensors::LFoot_FSR_FrontRight];
    float rightFront = sensors.sensors[Sensors::RFoot_FSR_FrontLeft] +
@@ -112,7 +112,7 @@ bool BodyModel::isOnFrontOfFoot(const SensorValues &sensors) {
    return leftFront > leftRear;
 }
 
-float BodyModel::getFootZMP(bool isLeft, const SensorValues &sensors) {
+float BodyModel::getFootZMP(bool isLeft, const UNSWSensorValues &sensors) {
    if (walkCycle.isDoubleSupportPhase()) return 0;
    float ZMPF = 0;
    float totalPressure = 0;
@@ -145,7 +145,7 @@ float BodyModel::getFootZMP(bool isLeft, const SensorValues &sensors) {
    return ZMPF;
 }
 
-float BodyModel::getHorizontalFootZMP(bool isLeft, const SensorValues &sensors) {
+float BodyModel::getHorizontalFootZMP(bool isLeft, const UNSWSensorValues &sensors) {
    float ZMPF = 0;
    float totalPressure = 0;
    if (isLeft) {
@@ -179,7 +179,7 @@ float BodyModel::getHorizontalFootZMP(bool isLeft, const SensorValues &sensors) 
 
 void BodyModel::simulationUpdate() {}
 
-void BodyModel::processUpdate(Odometry *odometry, const SensorValues &sensors) {
+void BodyModel::processUpdate(Odometry *odometry, const UNSWSensorValues &sensors) {
    float forwardL, forwardR, leftL, leftR, turnLR, liftL, liftR;
    walkCycle.generateWalk(forwardL, forwardR, leftL, leftR, turnLR, liftL, liftR);
    
@@ -301,7 +301,7 @@ void BodyModel::processUpdate(Odometry *odometry, const SensorValues &sensors) {
    }*/
 }
 
-void BodyModel::observationUpdate(Odometry *odometry, const SensorValues &sensors) {
+void BodyModel::observationUpdate(Odometry *odometry, const UNSWSensorValues &sensors) {
    /*
    float supportFootPosition = isLeftPhase ? forwardR : forwardL;
    // supportFootPosition += isOnFront ? FOOT_LENGTH/2 : -FOOT_LENGTH/2;

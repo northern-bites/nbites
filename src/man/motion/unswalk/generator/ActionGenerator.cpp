@@ -30,7 +30,7 @@ void ActionGenerator::stop(){
 
 JointValues ActionGenerator::makeJoints(ActionCommand::All* request,
                                         Odometry* odometry,
-                                        const SensorValues &sensors,
+                                        const UNSWSensorValues &sensors,
                                         BodyModel &bodyModel,
                                         float ballX,
                                         float ballY) {

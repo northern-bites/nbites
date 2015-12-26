@@ -16,7 +16,7 @@ class CKF {
 
       CKF();
 
-      void update(const SensorValues &sensorValues);
+      void update(const UNSWSensorValues &sensorValues);
 
       void resetFilter();
 

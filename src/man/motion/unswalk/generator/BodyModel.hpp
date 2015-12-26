@@ -13,7 +13,7 @@ class BodyModel {
    friend class Walk2014Generator;
    public:
       BodyModel();
-      void update(Odometry *odometry, const SensorValues &sensors);
+      void update(Odometry *odometry, const UNSWSensorValues &sensors);
 
       inline float getPressureL() {
          return pressureL;
@@ -135,13 +135,13 @@ class BodyModel {
          return pendulumModel;
       }
 
-      float getFootZMP(bool isLeft, const SensorValues &sensors);
-      float getHorizontalFootZMP(bool isLeft, const SensorValues &sensors);
+      float getFootZMP(bool isLeft, const UNSWSensorValues &sensors);
+      float getHorizontalFootZMP(bool isLeft, const UNSWSensorValues &sensors);
 
-      bool isFootOnGround(const SensorValues &sensors);
+      bool isFootOnGround(const UNSWSensorValues &sensors);
 
-      void processUpdate(Odometry *odometry, const SensorValues &sensors);
-      void observationUpdate(Odometry *odometry, const SensorValues &sensors);
+      void processUpdate(Odometry *odometry, const UNSWSensorValues &sensors);
+      void observationUpdate(Odometry *odometry, const UNSWSensorValues &sensors);
       void simulationUpdate();
 
       UNSWKinematics *kinematics;
@@ -187,6 +187,6 @@ class BodyModel {
       // real body model
       float t;
 
-      bool isOnFrontOfFoot(const SensorValues &sensor);
+      bool isOnFrontOfFoot(const UNSWSensorValues &sensor);
 };
 

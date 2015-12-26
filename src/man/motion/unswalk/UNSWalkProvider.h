@@ -32,10 +32,13 @@ class UNSWalkProvider : public MotionProvider
 {
 public:
 	UNSWalkProvider();
-	virtual ~UNSWalkProvider();
+	~UNSWalkProvider();
 
 	bool calibrated() const;
 	bool upright() const;
+
+	float leftHandSpeed() const;
+    float rightHandSpeed() const;
 
 	void requestStopFirstInstance();
 	void calculateNextJointsAndStiffnesses(
@@ -52,6 +55,19 @@ public:
     void setCommand(const DestinationCommand::ptr command);
     // StepCommand (currently not used) is actually an odometry destination walk
     void setCommand(const StepCommand::ptr command);
+
+    std::vector<BodyJointCommand::ptr> getGaitTransitionCommand() {
+        return std::vector<BodyJointCommand::ptr>();
+    }
+
+    void getOdometryUpdate(portals::OutPortal<messages::RobotLocation>& out) const;
+
+    static const float INITIAL_BODY_POSE_ANGLES[Kinematics::NUM_JOINTS];
+
+   	std::vector<float> getInitialStance() {
+        return std::vector<float>(INITIAL_BODY_POSE_ANGLES,
+                                  INITIAL_BODY_POSE_ANGLES + Kinematics::NUM_BODY_JOINTS);
+    }
 
     bool isStanding() const;
     bool isWalkActive() const;

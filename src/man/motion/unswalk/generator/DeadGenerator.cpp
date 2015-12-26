@@ -11,7 +11,7 @@ DeadGenerator::~DeadGenerator() {
 
 JointValues DeadGenerator::makeJoints(ActionCommand::All* request,
                                       Odometry* odometry,
-                                      const SensorValues &sensors,
+                                      const UNSWSensorValues &sensors,
                                       BodyModel &bodyModel,
                                       float ballX,
                                       float ballY) {

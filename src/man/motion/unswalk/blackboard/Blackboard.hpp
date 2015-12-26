@@ -21,7 +21,7 @@
 //#include "perception/localisation/LocalisationDefs.hpp"
 //#include "perception/localisation/SharedLocalisationUpdateBundle.hpp"
 #include "perception/kinematics/Pose.hpp"
-#include "gamecontroller/RoboCupGameControlData.hpp"
+//#include "gamecontroller/RoboCupGameControlData.hpp"
 //#include "utils/Logger.hpp"
 //#include "transmitter/TransmitterDefs.hpp"
 #include "types/BehaviourRequest.hpp"
@@ -39,8 +39,8 @@
 #include "types/FootInfo.hpp"
 #include "types/BallInfo.hpp"
 #include "types/PostInfo.hpp"
-#include "types/RobotInfo.hpp"
-#include "types/RobotObstacle.hpp"
+//#include "types/RobotInfo.hpp"
+//#include "types/RobotObstacle.hpp"
 #include "types/FieldEdgeInfo.hpp"
 #include "types/FieldFeatureInfo.hpp"
 //#include "types/Ipoint.hpp"
@@ -124,7 +124,7 @@ struct KinematicsBlackboard {
    std::vector< std::vector <int> > sonarFiltered; 
    bool isCalibrating;
    Parameters<float> parameters;
-   SensorValues sensorsLagged;
+   UNSWSensorValues sensorsLagged;
 };
 
 // Data Behaviour module will be sharing with others
@@ -245,22 +245,22 @@ struct PerceptionBlackboard {
    uint32_t total;
 };
 
-struct GameControllerBlackboard {
-   explicit GameControllerBlackboard();
-   void readOptions(const boost::program_options::variables_map& config);
-   bool connect;
-   bool connected;
-   RoboCupGameControlData data;
-   TeamInfo our_team;
-   bool team_red;
-   int player_number;
-   GameType game_type;
-};
+// struct GameControllerBlackboard {
+//    explicit GameControllerBlackboard();
+//    void readOptions(const boost::program_options::variables_map& config);
+//    bool connect;
+//    bool connected;
+//    RoboCupGameControlData data;
+//    TeamInfo our_team;
+//    bool team_red;
+//    int player_number;
+//    GameType game_type;
+// };
 
 
 struct MotionBlackboard {
    explicit MotionBlackboard();
-   SensorValues sensors;
+   UNSWSensorValues sensors;
    // A rolling list of recent observations of range (m) readings to potentially multiple obstacles
    std::vector < std::vector <int> > sonarWindow; 
    float uptime;
@@ -315,7 +315,7 @@ class Blackboard {
    friend class VisionAdapter;
    friend class MotionAdapter;
    friend class BehaviourAdapter;
-   friend class GameController;
+   //friend class GameController;
    friend class OffNaoTransmitter;
    friend class NaoTransmitter;
    friend class TeamTransmitter;
@@ -416,7 +416,7 @@ class Blackboard {
       PerceptionBlackboard perception;
 
       /* Data GameController will be sharing */
-      GameControllerBlackboard gameController;
+      //GameControllerBlackboard gameController;
 
       /* Data Motion module will be sharing with others */
       MotionBlackboard motion;

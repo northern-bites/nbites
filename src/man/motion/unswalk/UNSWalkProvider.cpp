@@ -20,9 +20,14 @@ namespace man
 namespace motion 
 {
 
+const float UNSWalkProvider::INITIAL_BODY_POSE_ANGLES[] = {
+	0.f,0.f,0.f,0.f,0.f,0.f,0.f,
+	0.f,0.f,0.f,0.f,0.f,0.f,0.f,
+	0.f,0.f,0.f,0.f,0.f,0.f,0.f,0.f,
+};
+
 /**
-*NBites joint order. commented out joints are the ones that UNSW has but we
-*dont use
+*NBites joint order. commented out joints are the ones that UNSW has but we dont use
 */
 static const Joints::JointCode nb_joint_order[] {
 		Joints::HeadYaw,
@@ -71,6 +76,26 @@ void UNSWalkProvider::resetAll() {
 	//reset other parts of walk2014gen
 }
 
+bool UNSWalkProvider::calibrated() const {
+	return NULL;
+}
+
+bool UNSWalkProvider::upright() const {
+	return NULL;
+}
+
+float UNSWalkProvider::leftHandSpeed() const {
+	return NULL;
+}
+
+float UNSWalkProvider::rightHandSpeed() const {
+	return NULL;
+}
+
+void UNSWalkProvider::requestStopFirstInstance() {
+
+}
+
 void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	std::vector<float>& 			sensorAngles,
 	std::vector<float>& 			sensorCurrents,
@@ -80,6 +105,43 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 {
 	
 }
+
+void UNSWalkProvider::hardReset() {
+
+}
+
+void UNSWalkProvider::resetOdometry() {
+
+}
+
+void UNSWalkProvider::setCommand(const WalkCommand::ptr command) {
+
+}
+
+void UNSWalkProvider::setCommand(const DestinationCommand::ptr command) {
+
+}
+
+void UNSWalkProvider::setCommand(const StepCommand::ptr command) {
+
+}
+
+void UNSWalkProvider::getOdometryUpdate(portals::OutPortal<messages::RobotLocation>& out) const {
+
+}
+
+bool UNSWalkProvider::isStanding() const {
+	return NULL;
+}
+
+bool UNSWalkProvider::isWalkActive() const {
+
+}
+
+void UNSWalkProvider::stand() {
+
+}
+
 
 // void UNSWalkProvider::restingStand()
 // {

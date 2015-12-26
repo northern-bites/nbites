@@ -85,7 +85,7 @@ class UNSWKinematics {
 
       Chain determineSupportChain();
 
-      void setSensorValues(SensorValues sensorValues);
+      void setSensorValues(UNSWSensorValues sensorValues);
 
       std::pair<int, int> calculateHorizon(
          const boost::numeric::ublas::matrix<float> &m);
@@ -94,7 +94,7 @@ class UNSWKinematics {
    private:
       // CKF is not really tuned and not being used at the moment
       //CKF ckf;
-      SensorValues sensorValues;
+      UNSWSensorValues sensorValues;
       Chain supportChain;
 
       boost::numeric::ublas::matrix<float> transformLTop[CAMERA_DH_CHAIN_LEN];

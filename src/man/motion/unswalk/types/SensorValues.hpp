@@ -7,8 +7,8 @@
  * A container for joint values, IMU values, FSR values, buttons and sonar
  * readings obtained from the Motion subsystem.
  */
-struct SensorValues {
-   SensorValues() {
+struct UNSWSensorValues {
+   UNSWSensorValues() {
       for (int i = 0; i < Sensors::NUMBER_OF_SENSORS; ++i) {
          sensors[i] = NAN;
       }
@@ -17,7 +17,7 @@ struct SensorValues {
       }
    }
 
-   SensorValues(bool zero) {
+   UNSWSensorValues(bool zero) {
       joints = JointValues(true);
       for (int i = 0; i < Sensors::NUMBER_OF_SENSORS; ++i) {
          sensors[i] = 0;

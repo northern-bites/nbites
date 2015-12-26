@@ -27,7 +27,7 @@ class Generator {
        */
       virtual JointValues makeJoints(ActionCommand::All* request,
                                      Odometry* odometry,
-                                     const SensorValues &sensors,
+                                     const UNSWSensorValues &sensors,
                                      BodyModel &bodyModel,
                                      float ballX,
                                      float ballY) = 0;

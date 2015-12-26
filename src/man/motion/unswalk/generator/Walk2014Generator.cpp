@@ -57,15 +57,15 @@ void checkNaN(float n, string s){
 Walk2014Generator::Walk2014Generator()
    :t(0.0f), z(0.0f), PI(3.1415927) {
    initialise();
-   llog(INFO) << "Walk2014Generator constructed" << std::endl;
+   //llog(INFO) << "Walk2014Generator constructed" << std::endl;
 }
 
 Walk2014Generator::~Walk2014Generator() {
-   llog(INFO) << "Walk2014Generator destroyed" << std::endl;
+   //llog(INFO) << "Walk2014Generator destroyed" << std::endl;
 }
 
 void Walk2014Generator::initialise() {
-   llog(INFO) << "Walk2014 initializing" << endl;
+   //llog(INFO) << "Walk2014 initializing" << endl;
    dt = 0.01;                                             // 100 Hz motion thread
    t = 0.0;                                               // initialise timers (in seconds)
    timer = 0.0;                                           // timer to crouch to walking height
@@ -109,7 +109,7 @@ void Walk2014Generator::initialise() {
 
 JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
                                           Odometry* odometry,
-                                          const SensorValues &sensors,
+                                          const UNSWSensorValues &sensors,
                                           BodyModel &bodyModel,
                                           float ballX,
                                           float ballY) {
@@ -788,12 +788,12 @@ bool Walk2014Generator::isActive() {
 void Walk2014Generator::readOptions(boost::program_options::variables_map &config) {}
 void Walk2014Generator:: reset() {
    initialise();
-   llog(INFO) << "Walk2014 reset" << endl;
+   //llog(INFO) << "Walk2014 reset" << endl;
 }
 
 void Walk2014Generator:: stop() {
    stopping = true;
-   llog(INFO) << "Walk2014 stop" << endl;
+   //llog(INFO) << "Walk2014 stop" << endl;
 }
 
 float Walk2014Generator::interpolateSmooth(float start, float end, float tCurrent, float tEnd) {

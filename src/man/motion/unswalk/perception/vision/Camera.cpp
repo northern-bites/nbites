@@ -106,11 +106,11 @@ __s32 controlValues_lights[NUM_CAMERAS][NUM_CONTROLS] =
 */
 __s32 (*controlValues)[NUM_CONTROLS] = controlValues_lights;
 
-Camera::Camera() : dumpFile(0) {
+UNSWCamera::UNSWCamera() : dumpFile(0) {
    imageSize = IMAGE_WIDTH * IMAGE_HEIGHT * 2;
 }
 
-bool Camera::startRecording(const char *filename, uint32_t frequency_ms) {
+bool UNSWCamera::startRecording(const char *filename, uint32_t frequency_ms) {
    this->frequency_ms = frequency_ms;
    if (dumpFile != NULL) {
       fclose(dumpFile);
@@ -120,7 +120,7 @@ bool Camera::startRecording(const char *filename, uint32_t frequency_ms) {
    return dumpFile != NULL;
 }
 
-void Camera::stopRecording() {
+void UNSWCamera::stopRecording() {
    if (dumpFile != NULL) {
       fclose(dumpFile);
       dumpFile = NULL;
@@ -128,7 +128,7 @@ void Camera::stopRecording() {
    llog(INFO) << "Finishing camera dump to file" << endl;
 }
 
-void Camera::writeFrame(const uint8_t*& image) {
+void UNSWCamera::writeFrame(const uint8_t*& image) {
    static Timer t;
    if (dumpFile != NULL && image != NULL) {
       if (t.elapsed_ms() >= frequency_ms) {
