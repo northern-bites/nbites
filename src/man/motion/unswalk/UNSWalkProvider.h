@@ -86,6 +86,7 @@ private:
 	bool tryingToWalk;
 	MotionCommand::ptr currentCommand;
 	Walk2014Generator *walk2014gen;
+	Odometry startOdometry;
 };
 
 }

@@ -127,15 +127,18 @@ void UNSWalkProvider::setCommand(const StepCommand::ptr command) {
 }
 
 void UNSWalkProvider::getOdometryUpdate(portals::OutPortal<messages::RobotLocation>& out) const {
-
+	portals::Message<messages::RobotLocation> odometryData(0);
+	//odometryData.get()->set_x();
+	//odometryData.get()->set_y();
+	//odometryData.get()->set_h();
 }
 
-bool UNSWalkProvider::isStanding() const {
-	return NULL;
+bool UNSWalkProvider::isStanding() const { //is going to stand rather than at complete standstill
+	return walk2014gen->walk2014Option == 1; //1 corresponds to process of moving from WALK crouch to STAND
 }
 
 bool UNSWalkProvider::isWalkActive() const {
-
+	return !walk2014gen->stopped;
 }
 
 void UNSWalkProvider::stand() {

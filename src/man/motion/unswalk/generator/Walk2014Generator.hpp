@@ -52,7 +52,7 @@ class Walk2014Generator : Generator {
    void stop();
    friend class WalkEnginePreProcessor;
 
-   private:
+   //protected:
    bool exactStepsRequested;
 
    bool stopping;
