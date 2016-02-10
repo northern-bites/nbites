@@ -40,7 +40,7 @@ public class CorrelationView extends ViewParent {
 		Correlator cor = new Correlator(buf.channels,
 				srate / TARGET_F, 1.0d);
 		
-		String useText = String.format("formate usage: left [%.3f, %.3f] -- right [%.3f, %.3f]",
+		String useText = String.format("format usage: left [%.3f, %.3f] -- right [%.3f, %.3f]",
 				used(buf.min[0]), used(buf.max[0]), used(buf.min[1]), used(buf.max[1]) );
 		formatUsageStats.setText(useText);
 		
@@ -58,39 +58,21 @@ public class CorrelationView extends ViewParent {
 			}
 		}
 		
-		double lo = cor.offset(0);
-		double ro = cor.offset(1);
+		double lo = cor.offset(0) + Math.PI;
+		double ro = cor.offset(1) + Math.PI;
 		
 		leftLabel.setText("left " + lo);
 		leftBar.setValue(
-				percentForRange(-Math.PI, Math.PI, lo)
+				percentForRange(0, Target.TAU, lo)
 				);
 		
 		rightLabel.setText("right " + ro);
 		rightBar.setValue(
-				percentForRange(-Math.PI, Math.PI, ro)
+				percentForRange(0, Target.TAU, ro)
 				);
 		
-		double l2 = lo + Math.PI;
-		double r2 = ro + Math.PI;
-		double d1 = l2 - r2;
-		double diff;
-		if (Math.abs(d1) > Math.PI) {
-			double d2 = (2 * Math.PI - l2) + r2;
-			double d3 = (2 * Math.PI - r2) + l2;
-			diff = Math.abs(d2) < Math.abs(d3) ? d2 : d3;
-		} else {
-			diff = d1;
-		}
-		
-		/*
-		double d1 = lo - ro;
-		double diff;
-		if ( Math.abs(d1) > Math.PI) {
-			diff = (d1 > 0) ? d1 - Math.PI : d1 + Math.PI;
-		} else {
-			diff = d1;
-		} */
+		double diff = ModMath.diff(lo, ro);
+		assert(diff >= -Math.PI && diff <= Math.PI);
 		
 		//double diff = lo - ro;
 		diffLabel.setText("difference " + diff);
