@@ -1,55 +1,58 @@
 /**
- * @brief  Defines an abstract interface for modeling robot
- *         motion in localization, which for our purposes is
- *         done by computing odometry measurements in the
- *         motion system.
- * @author Ellis Ratner <eratner@bowdoin.edu>
+ * @brief  Define a class responsible for updating particles based on
+ *         odometry measurements from the motion system
+ *
  * @author EJ Googins <egoogins@bowdoin.edu>
- * @date   January 2013
+ * @date   February 2013
+ * @author Josh Imhoff <joshimhoff13@gmail.com>
+ * @date   June 2015
  */
+
 #pragma once
 
+#include "Particle.h"
 #include "RobotLocation.pb.h"
 
-#include "Particle.h"
+#include <cmath>
 
 namespace man
 {
 namespace localization
 {
 
-/**
- * @class MotionModel
- * @brief The abstract interface for providing motion updates
- *        to the particle filter. Must implement a control
- *        update method.
- */
+// FUTURE WORK, this is a very simplistic motion model, future work includes 
+//              varying the amount of noise added to particles as a function
+//              of (1) the speed of robot and (2) the direction of motion 
+//              (more noise in principal direction of motion)
+
 class MotionModel
 {
 public:
-    MotionModel() { }
-    virtual ~MotionModel() { }
+    // Constructor
+    // @param params_, the particle filter params, including for motion model
+    MotionModel(const struct ParticleFilterParams& params_);
 
-    /**
-     * @brief Update the particles with a the control input
-     *        according to the latest motion.
-     */
-    virtual void update(ParticleSet& particles,
-                        messages::RobotLocation& lastOdometry);
+    // Destructor
+    ~MotionModel() {}
 
-    /*
-     * These methods allow the client to access information as
-     * to whether or not the SensorModel has performed an
-     * update on the latest iteration.
-     */
-    bool hasUpdated() const { return updated; }
-    void setUpdated(bool updated_) { updated = updated_; }
+    // Adjusts swarm based on odometry info from motion
+    // @param particles, the set of particles that represent localization belief
+    // @param odometry, odometry from last motion frame
+    void update(ParticleSet& particles,
+                const messages::RobotLocation& odometry);
 
 private:
-    bool updated;    //! Flag indicates whether or not the particles have
-    //! been updated with the latest sensor readings.
+    // Shift particle by samping from gaussians with standard deviations set by
+    // the probalistic motion model
+    // @param particle, the particle to shift
+    void noiseShift(Particle* particle);
 
+    const struct ParticleFilterParams& params;
+
+    boost::mt19937 rng;
+
+    messages::RobotLocation curOdometry;
+    messages::RobotLocation lastOdometry;
 };
-
 } // namespace localization
 } // namespace man

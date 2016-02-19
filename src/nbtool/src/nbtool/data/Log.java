@@ -13,6 +13,7 @@ public class Log {
 	public static final String LOG_VERSION_S = "version";
 	public static final String LOG_CHECKSUM_S = "checksum";
 	public static final String LOG_HOST_TYPE_S = "host_type";
+	public static final String LOG_HOST_NAME_S = "host_name";
 	public static final String LOG_FROM_ADDR_S = "from_address";
 	
 	//content item keys

@@ -1,4 +1,4 @@
-#include "LineSystem.h"
+#include "LineModel.h"
 
 #include <algorithm>
 #include <boost/math/distributions/normal.hpp>
@@ -6,12 +6,17 @@
 namespace man {
 namespace localization {
 
-LineSystem::LineSystem() 
-    : lines(), visionToLocIDs(), debug(false)
+LineModel::LineModel(const struct ParticleFilterParams& params_) 
+    : params(params_), lines(), visionToLocIDs(), debug(false)
 {
     // Part I
     // Add lines in absolute field coordinates to lines map
-    // TODO document sign convention
+    //
+    // IMPORTANT lines are stored in polar coordinates, using polar coordinates,
+    //           every line has two representations, one with positive r and one 
+    //           with negative r, the two representations allow for reconstructions
+    //           on either side of a line, see reconstructFromMidpoint and 
+    //           reconstructWoEndpoints for more info
     addLine(LocLineID::OurEndline, -GREEN_PAD_X, M_PI, GREEN_PAD_Y, (GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
     addLine(LocLineID::TheirEndline, GREEN_PAD_X + FIELD_WHITE_WIDTH, 0, -GREEN_PAD_Y, -(GREEN_PAD_Y + FIELD_WHITE_HEIGHT)); 
 
@@ -23,8 +28,8 @@ LineSystem::LineSystem()
     addLine(LocLineID::OurTopGoalbox, -(GREEN_PAD_X + GOALBOX_DEPTH), M_PI, BLUE_GOALBOX_BOTTOM_Y, BLUE_GOALBOX_TOP_Y);
     addLine(LocLineID::TheirTopGoalbox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH , 0, -YELLOW_GOALBOX_BOTTOM_Y, -YELLOW_GOALBOX_TOP_Y);
 
-    // IMPORTANT system currently doesn't support reconstructions from sideline, so
-    //           the below lines are not polarized
+    // NOTE system currently doesn't support reconstructions from sideline, so
+    //      the below lines are not polarized
     addLine(LocLineID::RightSideline, GREEN_PAD_Y, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
     addLine(LocLineID::LeftSideline, GREEN_PAD_Y + FIELD_WHITE_HEIGHT, M_PI / 2, GREEN_PAD_X, GREEN_PAD_X + FIELD_WHITE_WIDTH);
 
@@ -48,9 +53,15 @@ LineSystem::LineSystem()
     };
     visionToLocIDs[vision::LineID::Line] = all;
 
+    // China 2015 hack
+    // We often see T corners in center circle
+    //
+    // FUTURE WORK, this is probably a general problem, so makes sense to 
+    //              rename LineID::EndlineOrSideline to LineID::EndlineMidlineOrSideline
     std::vector<LocLineID> endlineOrSideline { 
         LocLineID::OurEndline, LocLineID::TheirEndline,
-        LocLineID::RightSideline, LocLineID::LeftSideline 
+        LocLineID::OurMidline, LocLineID::TheirMidline,
+        LocLineID::RightSideline, LocLineID::LeftSideline
     };
     visionToLocIDs[vision::LineID::EndlineOrSideline] = endlineOrSideline;
 
@@ -104,8 +115,8 @@ LineSystem::LineSystem()
     visionToLocIDs[vision::LineID::Midline] = midline;
 }
 
-LocLineID LineSystem::matchLine(const messages::FieldLine& observation, 
-                                const messages::RobotLocation& loc)
+LocLineID LineModel::matchLine(const messages::FieldLine& observation, 
+                               const messages::RobotLocation& loc)
 {
     LocLineID id = LocLineID::NotMatched;
     double bestScore = 0;
@@ -148,8 +159,8 @@ LocLineID LineSystem::matchLine(const messages::FieldLine& observation,
     return id;
 }
 
-double LineSystem::scoreLine(const messages::FieldLine& observation,
-                             const messages::RobotLocation& loc)
+double LineModel::scoreLine(const messages::FieldLine& observation,
+                            const messages::RobotLocation& loc)
 {
     // Turn observation into GeoLine so scoreObservation can operate on it
     vision::GeoLine obsvAsGeoLine;
@@ -171,8 +182,8 @@ double LineSystem::scoreLine(const messages::FieldLine& observation,
 
 // NOTE method assumes that endpoints seen in observation are endpoints of line
 // IMPORTANT only tested with id == OurTopGoalbox || TheirTopGoalbox
-messages::RobotLocation LineSystem::reconstructFromMidpoint(LocLineID id, 
-                                                            const messages::FieldLine& observation)
+messages::RobotLocation LineModel::reconstructFromMidpoint(LocLineID id, 
+                                                           const messages::FieldLine& observation)
 {
     messages::RobotLocation position;
     const messages::HoughLine& inner = observation.inner();
@@ -204,8 +215,8 @@ messages::RobotLocation LineSystem::reconstructFromMidpoint(LocLineID id,
 }
 
 // IMPORTANT only tested with id == OurMidline
-messages::RobotLocation LineSystem::reconstructWoEndpoints(LocLineID id, 
-                                                           const messages::FieldLine& observation)
+messages::RobotLocation LineModel::reconstructWoEndpoints(LocLineID id, 
+                                                          const messages::FieldLine& observation)
 {
     messages::RobotLocation position;
     const messages::HoughLine& inner = observation.inner();
@@ -236,13 +247,16 @@ messages::RobotLocation LineSystem::reconstructWoEndpoints(LocLineID id,
     return position;
 }
 
-bool LineSystem::shouldUse(const messages::FieldLine& observation,
-                           const messages::RobotLocation& loc)
+bool LineModel::shouldUse(const messages::FieldLine& observation,
+                          const messages::RobotLocation& loc)
 {
     // China 2015 hack
     // If loc believes we could be seeing the goalbox, score short lines
     // in localization, otherwise do not, as you are probably seeing center
     // circle lines
+    //
+    // FUTURE WORK, add short center cirlce lines to the map, so that this hack
+    //              is not necessary
     double heading = vision::uMod(loc.h(), 2 * M_PI);
     bool useShorts = ((loc.x() < CENTER_FIELD_X - 150 && (heading > 150*TO_RAD && heading < 210*TO_RAD)) ||
                       (loc.x() > CENTER_FIELD_X + 150 && (heading < 150*TO_RAD && heading < 210*TO_RAD)) ||
@@ -252,8 +266,8 @@ bool LineSystem::shouldUse(const messages::FieldLine& observation,
     return useShorts || length;
 }
 
-vision::GeoLine LineSystem::relRobotToAbsolute(const messages::FieldLine& observation,
-                                               const messages::RobotLocation& loc)
+vision::GeoLine LineModel::relRobotToAbsolute(const messages::FieldLine& observation,
+                                              const messages::RobotLocation& loc)
 {
     const messages::HoughLine& inner = observation.inner();
 
@@ -264,10 +278,10 @@ vision::GeoLine LineSystem::relRobotToAbsolute(const messages::FieldLine& observ
     return globalLine;
 }
 
-double LineSystem::scoreObservation(const vision::GeoLine& observation,
-                                    const vision::GeoLine& correspondingLine, 
-                                    const messages::RobotLocation& loc,
-                                    double wz0)
+double LineModel::scoreObservation(const vision::GeoLine& observation,
+                                   const vision::GeoLine& correspondingLine, 
+                                   const messages::RobotLocation& loc,
+                                   double wz0)
 {
     // Normalize correspondingLine to have positive r and t between 0 and PI / 2 
     // NOTE see constructor for explanation of what negative r means in this context
@@ -305,11 +319,11 @@ double LineSystem::scoreObservation(const vision::GeoLine& observation,
     double ep1Error = std::max(0.0, observation.ep1() - normalizedCorrespondingLine.ep1());
 
     // Evaluate gaussian to get probability of observation from location loc
-    // TODO params
-    boost::math::normal_distribution<> tiltGaussian(0, 5*TO_RAD);
-    boost::math::normal_distribution<> tGaussian(0, 10*TO_RAD);
-    boost::math::normal_distribution<> ep0Gaussian(0, 100);
-    boost::math::normal_distribution<> ep1Gaussian(0, 100);
+    // FUTURE WORK, it may be better to measure endpoint error in angular coordinates
+    boost::math::normal_distribution<> tiltGaussian(0, params.lineTiltStdev);
+    boost::math::normal_distribution<> tGaussian(0, params.lineBearingStdev);
+    boost::math::normal_distribution<> ep0Gaussian(0, params.lineEndpointStdev);
+    boost::math::normal_distribution<> ep1Gaussian(0, params.lineEndpointStdev);
   
     double tiltProb = pdf(tiltGaussian, tiltDiff);
     double tProb = pdf(tGaussian, tDiff);
@@ -328,10 +342,14 @@ double LineSystem::scoreObservation(const vision::GeoLine& observation,
     }
 
     // Make the conditional independence assumption
-    return tiltProb * tProb;
+    return tiltProb * tProb * ep0Prob * ep1Prob;
+
+    // FUTURE WORK, also model uncertainity in classification, uncertainity may
+    //              vary as a function of line id, for example goalboxes might
+    //              be easier to classify than sidelines
 }
 
-void LineSystem::addLine(LocLineID id, float r, float t, float ep0, float ep1)
+void LineModel::addLine(LocLineID id, float r, float t, float ep0, float ep1)
 {
     vision::GeoLine line;
     line.set(r, t, ep0, ep1);

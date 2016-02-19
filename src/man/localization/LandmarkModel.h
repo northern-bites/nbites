@@ -1,6 +1,6 @@
 /**
- * @brief A class responsible for maintaing knowedge of landmarks (corners, ball)
- *        and comparing projections and observations.
+ * @brief A class responsible for maintaing knowedge of landmarks (corners, ball, etc.)
+ *        and comparing projections and observations
  *
  * @author Josh Imhoff <joshimhoff13@gmail.com>
  * @date   June 2015
@@ -20,6 +20,11 @@
 namespace man {
 namespace localization {
 
+// NOTE whether or not a corner is concave or convex depends on where the
+//      observing robot is standing, the corners stored below assume that
+//      the robot is on the field, thus the bottom left corner must be concave, 
+//      but one could argue that the distinction between concave and convex should
+//      be ignored, so that the robot localizes well when standing outside field boundary
 enum class LandmarkID {
     OurRightConcave = 0,
     OurLeftConcave,
@@ -36,7 +41,9 @@ enum class LandmarkID {
     TheirRightT,
     TheirLeftT,
     BallInSet,
-    CenterCircle
+    CenterCircle,
+    CenterCircleLeftT,
+    CenterCircleRightT
 };
 
 // Stores the LandmarkID and (x, y) cartesian coordinate representation of the location
@@ -44,13 +51,14 @@ enum class LandmarkID {
 // NOTE x is the second argument in the tuple, y is the third
 typedef std::tuple<LandmarkID, double, double> Landmark;
 
-class LandmarkSystem {
+class LandmarkModel {
 public:
     // Constructor
-    LandmarkSystem();
+    // @param params_, the particle filter params, including for motion model
+    LandmarkModel(const struct ParticleFilterParams& params_);
 
     // Destructor
-    ~LandmarkSystem() {}
+    ~LandmarkModel() {}
 
     // Find corresponding corner in map
     // @param observation, the corner observation from the vision system in robot relative coords
@@ -107,6 +115,8 @@ private:
 
     // Helper method
     void addCorner(vision::CornerID type, LandmarkID id, double x, double y);
+
+    const struct ParticleFilterParams& params;
 
     // Map
     std::map<vision::CornerID, std::vector<Landmark>> corners;

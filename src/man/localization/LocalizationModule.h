@@ -1,77 +1,56 @@
 /*
- * @brief  The localization module class. Takes input from motion and vision for
- *             calculations, also an inPortal for resetting
+ * @brief  The localization module, calls the particle filter and outputs
+ *         localization estimate and swarm
  *
  * @author EJ Googins <egoogins@bowdoin.edu>
  * @date   February 2013
+ * @author Josh Imhoff <joshimhoff13@gmail.com>
+ * @date   June 2015
  */
+
 #pragma once
 
-#include "DebugConfig.h"
-
-/** Messages **/
 #include "RoboGrams.h"
 #include "Vision.pb.h"
 #include "RobotLocation.pb.h"
-#include "ParticleSwarm.pb.h"
 #include "GameState.pb.h"
-
-/** Filter Headers **/
-#include "SensorModel.h"
-#include "MotionModel.h"
+#include "ParticleSwarm.pb.h"
 #include "ParticleFilter.h"
-#include "VisionSystem.h"
-#include "MotionSystem.h"
-
-#include <boost/shared_ptr.hpp>
 
 namespace man
 {
 namespace localization
 {
-/**
- * @class LocalizationModule
- */
+
 class LocalizationModule : public portals::Module
 {
 public:
+    // Constructor
     LocalizationModule();
+
+    // Destructor
     ~LocalizationModule();
 
-    /** In Portals **/
-    portals::InPortal<messages::RobotLocation> motionInput;
-    portals::InPortal<messages::Vision>        visionInput;
-    portals::InPortal<messages::RobotLocation> resetInput[2];
-    portals::InPortal<messages::GameState>     gameStateInput;
+    portals::InPortal<messages::RobotLocation>  motionInput;
+    portals::InPortal<messages::Vision>         visionInput;
+    portals::InPortal<messages::RobotLocation>  resetInput[2];
+    portals::InPortal<messages::GameState>      gameStateInput;
     portals::InPortal<messages::FilteredBall>   ballInput;
 
-    /** Out Portals **/
     portals::OutPortal<messages::RobotLocation> output;
     portals::OutPortal<messages::ParticleSwarm> particleOutput;
 
-    float lastMotionTimestamp;
-    float lastVisionTimestamp;
-
 protected:
-    /**
-     * @brief Update inputs, calculate new state of the filter
-     */
+    // RoboGrams run method
     void run_();
 
-    /**
-     * @brief Updates the current robot pose estimate given
-     *        the most recent motion control inputs and
-     *        measurements taken.
-     */
+    // Update localization system, called by run_() and calls particle filter
     void update();
 
-    ParticleFilter * particleFilter;
+    ParticleFilter* particleFilter;
     long long lastReset[2];
-    messages::RobotLocation curOdometry;
     messages::Vision curVision;
-    messages::FilteredBall curBall;
 
-private:
     size_t log_index;
 };
 

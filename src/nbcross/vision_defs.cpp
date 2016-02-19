@@ -311,7 +311,9 @@ int Vision_func() {
     Log* lineRet = new Log();
     std::string lineBuf;
 
-  // std::cout << std::endl << "Hough lines in image coordinates:" << std::endl;
+    bool debugLines = false;
+    if (debugLines)
+        std::cout << std::endl << "Hough lines in image coordinates:" << std::endl;
 
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
@@ -355,36 +357,48 @@ int Vision_func() {
         lineBuf.append((const char*) &fcEP0, sizeof(double));
         lineBuf.append((const char*) &fcEP1, sizeof(double));
 
-   //    std::cout << line.print() << std::endl;
+        if (debugLines)
+            std::cout << line.print() << std::endl;
     }
 
-  // std::cout << std::endl << "Hough lines in field coordinates:" << std::endl;
+    if (debugLines)
+        std::cout << std::endl << "Hough lines in field coordinates:" << std::endl;
+
     int i = 0;
     for (auto it = lineList->begin(); it != lineList->end(); it++) {
         man::vision::HoughLine& line = *it;
-   //    std::cout << line.field().print() << std::endl;
+        if (debugLines)
+            std::cout << line.field().print() << std::endl;
     }
 
-    //std::cout << std::endl << "Field lines:" << std::endl;
-    //std::cout << "0.idx, 1.idx, id, idx" << std::endl;
+    if (debugLines) {
+        std::cout << std::endl << "Field lines:" << std::endl;
+        std::cout << "0.idx, 1.idx, id, idx" << std::endl;
+    }
     man::vision::FieldLineList* fieldLineList = module.getFieldLines(topCamera);
 
     for (int i = 0; i < fieldLineList->size(); i++) {
         man::vision::FieldLine& line = (*fieldLineList)[i];
-   //    std::cout << line.print() << std::endl;
+        if (debugLines)
+            std::cout << line.print() << std::endl;
     }
 
- //   std::cout << std::endl << "Goalbox and corner detection:" << std::endl;
+    if (debugLines)
+        std::cout << std::endl << "Goalbox and corner detection:" << std::endl;
     man::vision::GoalboxDetector* box = module.getBox(topCamera);
     man::vision::CornerDetector* corners = module.getCorners(topCamera);
 
- //   if (box->first != NULL)
-  //     std::cout << box->print() << std::endl;
+    if (debugLines) {
+       if (box->first != NULL)
+          std::cout << box->print() << std::endl;
+    }
 
-  //  std::cout << "    line0, line1, type (concave, convex, T)" << std::endl;
-    for (int i = 0; i < corners->size(); i++) {
-        const man::vision::Corner& corner = (*corners)[i];
-   //     std::cout << corner.print() << std::endl;
+    if (debugLines) {
+        std::cout << "    line0, line1, type (concave, convex, T)" << std::endl;
+        for (int i = 0; i < corners->size(); i++) {
+            const man::vision::Corner& corner = (*corners)[i];
+           std::cout << corner.print() << std::endl;
+        }
     }
 
     lineRet->setData(lineBuf);
@@ -449,7 +463,7 @@ int Vision_func() {
     //  DEBUG IMAGE
     //-------------------
     Log* debugImage = new Log();
-    int debugImageLength = (width / 4) * (height / 2);
+    int debugImageLength = (width / 2) * (height / 2);
 
     // Create temp buffer and fill with debug image
     uint8_t debBuf[debugImageLength];
@@ -530,11 +544,8 @@ int CameraCalibration_func() {
 
         // If log includes "BlackStar," set flag
         std::vector<SExpr*> blackStarVec = args[0]->tree().recursiveFind("BlackStar");
-        if (blackStarVec.size() != 0) {
+        if (blackStarVec.size() != 0)
             module.blackStar(true);
-            std::cout << "\nBLACK STAR TRUE!!!\n\n";
-        } else std::cout << "\nBLACK STAR FALSE\n\n";
-        
         
         // Create messages
         messages::YUVImage image(buf, width, height, width);
@@ -562,6 +573,8 @@ int CameraCalibration_func() {
         rollBefore = fh->roll();
         tiltBefore = fh->tilt();
 
+        std::cout << "Calibrating log " << i+1 << ": "; 
+
         bool success = fh->calibrateFromStar(*module.getFieldLines(top));
 
         if (!success) {
@@ -576,9 +589,11 @@ int CameraCalibration_func() {
 
     if (failures > 4) {
         // Handle failure
-        printf("FAILED: %d times\n", failures);
+        printf("Failed calibration %d times\n", failures);
         rets.push_back(new Log("(failure)"));
     } else {
+        printf("Success calibrating %d times\n", 7 - failures);
+
         totalR /= (args.size() - failures);
         totalT /= (args.size() - failures);
 

@@ -6,6 +6,9 @@
 #include "../LineSystem.h"
 #include "../LocStructs.h"
 
+// FUTURE WORK this test is out of date as of June 2015, but the idea of
+//             automated loc tests is an excellent one, reimplement moving forward
+
 using namespace man::localization;
 
 int main(int argc, char **argv) {

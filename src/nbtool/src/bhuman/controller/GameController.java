@@ -63,6 +63,7 @@ public class GameController
      */
     public static void main(String[] args)
     {
+    	System.out.println("OVERRIDE");
         // Do not just System.exit(0) on Macs when selecting GameController/Quit
         System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
 

@@ -6,8 +6,11 @@ import math
 import copy
 import itertools
 
-# TODO hierarchy of lower level planners
-# TODO actually use a true array of filters
+# TODO China 2015
+#      this file has gotten messy over the years, the general design is fairly good, I think,
+#      but someone needs to refactor/clean up all the code that is no longer used,
+#      so the entire decider can fit inside someone's head
+
 # TODO calculates a true destination when kicking to goal destination
 # TODO kicks.py is ugly and not complete
 # TODO use location objects throughout
@@ -53,13 +56,9 @@ class KickDecider(object):
     def frontKickCrosses(self):
         self.brain.player.motionKick = True
         
-        print "In front kick crosses"
-
         self.kicks = []
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
         self.kicks.append(kicks.M_RIGHT_STRAIGHT)
-        self.kicks.append(kicks.M_LEFT_CHIP_SHOT)
-        self.kicks.append(kicks.M_RIGHT_CHIP_SHOT)
 
         self.scoreKick = self.minimizeOrbitTime
 
@@ -68,9 +67,7 @@ class KickDecider(object):
         self.addPassesToFieldCross()
         self.addShotsOnGoal()
 
-
         kickReturned =  (kick for kick in self.possibleKicks).next().next()
-        print "Kick being used: ", kickReturned
 
         return kickReturned
 
@@ -193,7 +190,6 @@ class KickDecider(object):
 
     def motionKicksAsap(self):
         self.brain.player.motionKick = True
-        print "In MotionKicksAsap"
     
         self.kicks = []
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
@@ -207,14 +203,12 @@ class KickDecider(object):
         
         self.filters = []
         self.filters.append(self.inBoundsOrGoal)
-        #self.filters.append(self.notTowardOurGoal)
 
         self.clearPossibleKicks()
         self.addFastestPossibleKicks()
 
         try:
             var = (kick for kick in self.possibleKicks).next().next()
-            print "Kick being used: ", var
             return var
         except:
             return None
@@ -333,7 +327,7 @@ class KickDecider(object):
 
         try:
             k = (kick for kick in self.possibleKicks).next().next()
-            print "kick being used: ", k
+            # print "kick being used: ", k
             if k.sweetMove: 
                 self.brain.player.motionKick = False
             else:
@@ -414,10 +408,9 @@ class KickDecider(object):
         except:
             return None
 
-    def allKicksOnGoal(self):
+    def motionKickOnGoal(self):
         self.brain.player.motionKick = True
 
-        print "In allKicksOnGoal"
         self.kicks = []
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
         self.kicks.append(kicks.M_RIGHT_STRAIGHT)
@@ -426,20 +419,56 @@ class KickDecider(object):
 
         self.filters = []
         self.filters.append(self.crossesGoalLine)
-        #self.filters.append(self.inBounds)
 
         self.addShotsOnBackOfGoal()
 
         try:
             kickReturned =  (kick for kick in self.possibleKicks).next().next()
-            print "Kick being used: ", kickReturned
             return kickReturned
         except:
-            print "There was an exception in all Kicks on Goal"
-            None
+            return None
+
+    def forwardKickOnGoal(self):
+        self.brain.player.motionKick = False
+
+        self.kicks = []
+        self.kicks.append(kicks.BH_LEFT_FORWARD_KICK)
+        self.kicks.append(kicks.BH_RIGHT_FORWARD_KICK)
+
+        self.scoreKick = self.minimizeOrbitTime
+
+        self.filters = []
+        self.filters.append(self.crossesGoalLine)
+
+        self.addShotsOnBackOfGoal()
+
+        try:
+            kickReturned =  (kick for kick in self.possibleKicks).next().next()
+            return kickReturned
+        except:
+            return None
+
+    def timeForSomeHeroics(self):
+        self.brain.player.motionKick = False
+
+        self.kicks = []
+        self.kicks.append(kicks.BH_LEFT_FORWARD_KICK)
+        self.kicks.append(kicks.BH_RIGHT_FORWARD_KICK)
+
+        self.scoreKick = self.minimizeOrbitTime
+
+        self.filters = []
+
+        self.addShotsOnBackOfGoal()
+
+        try:
+            kickReturned =  (kick for kick in self.possibleKicks).next().next()
+            return kickReturned
+        except:
+            return None
 
     def allKicksAsapOnGoal(self):
-        print "In allKicksAsapOnGoal"
+        # print "In allKicksAsapOnGoal"
 
         self.kicks = []
         self.kicks.append(kicks.M_LEFT_STRAIGHT)
@@ -461,7 +490,7 @@ class KickDecider(object):
 
         try:
             k = (kick for kick in self.possibleKicks).next().next()
-            print "Kick being used: ", k
+            # print "Kick being used: ", k
             if k.sweetMove: 
                 self.brain.player.motionKick = False
             else:
@@ -532,46 +561,24 @@ class KickDecider(object):
     ### HIGH LEVEL PLANNERS ###
     ###########################
     def decidingStrategy(self):
-        goalShot = self.allKicksOnGoal()
+        closeGoalShot = self.motionKickOnGoal()
+        if closeGoalShot:
+            return closeGoalShot
+
+        goalShot = self.forwardKickOnGoal()
         if goalShot:
-            print "allKicksOnGoal returned"
             return goalShot
 
-        nearGoal = self.nearOurGoal()
-        if nearGoal:
-            print "nearOurGoal returned"
-            return nearGoal
-
-        # frontKicks = self.frontKicksOrbitIfSmall()
-        # if frontKicks: 
-        #     return frontKicks
-
         asap = self.motionKicksAsap()
         if asap:
-            print "motionKicksAsap on goal returned"
             return asap
         
-        print "Using frontKickCrosses"
         return self.frontKickCrosses()
 
-    def defender(self):
-        nearGoal = self.nearOurGoal()
-        if nearGoal:
-            return nearGoal
-
-        asap = self.allKicksAsap()
-        if asap:
-            return asap
-
-        asap = self.motionKicksAsap()
-        if asap:
-            return asap
-
-        return self.frontKickCrosses()
-
+    # not currently used
     def nearOurGoal(self):
         nearOurGoal = (math.fabs(self.brain.loc.h) > 100 and 
-                                self.brain.ball.x < nogginC.LANDMARK_BLUE_GOAL_CROSS_X)
+                       self.brain.ball.x < nogginC.LANDMARK_BLUE_GOAL_CROSS_X)
         if nearOurGoal:
             out = self.kickOutOfBounds()
             if out:
@@ -581,49 +588,6 @@ class KickDecider(object):
                 return None
         else:
             return None
-
-    def obstacleAware(self, clearing = False):
-        motionKicksOnGoal = self.motionKicksAsapOnGoal()
-        if motionKicksOnGoal:
-            return motionKicksOnGoal
-
-        # if self.checkObstacle(1, 75):
-        #     inScrum = self.motionKicksInScrumAsap()
-        #     if inScrum:
-        #         return inScrum
-
-        if (not self.checkObstacle(1, 215) and 
-            not self.checkObstacle(1, 215) and
-            not self.checkObstacle(8, 215)): 
-            goalCenter = Location(nogginC.FIELD_WHITE_RIGHT_SIDELINE_X, nogginC.MIDFIELD_Y)
-            ball = Location(self.brain.ball.x, self.brain.ball.y)
-            if ball.distTo(goalCenter) <= 400:
-                timeAndSpace = self.frontKicksOrbitIfSmall()
-                if timeAndSpace:
-                    return timeAndSpace
-            elif clearing:
-                clear = self.frontKicksClear()
-                if clear:
-                    return clear
-
-        asap = self.motionKicksAsap()
-        if asap:
-            return asap
-        
-        return self.frontKickCrosses()
-
-    def timeForSomeHeroics(self):
-        asapOnGoal = self.allKicksIncludingBigKickAsapOnGoal()
-        if asapOnGoal:
-            return asapOnGoal
-
-        # TODO hack for Brazil
-        goalCenter = Location(nogginC.FIELD_WHITE_RIGHT_SIDELINE_X, nogginC.MIDFIELD_Y)
-        ball = Location(self.brain.ball.x, self.brain.ball.y)
-        if ball.distTo(goalCenter) <= 200:
-            return self.frontKicksOrbit()
-
-        return self.bigKicksOrbit()
 
     ### API ###
     def addShotsOnGoal(self):
@@ -687,22 +651,22 @@ class KickDecider(object):
         filteredKickLists = []
         if self.filters:
             for filt in self.filters:
-                print "Filter tested: ", filt
+                # print "Filter tested: ", filt
                 filtKick = [kick for kick in kicks if filt(kick)]
                 filteredKickLists.append(filtKick)
 
-            print "Current list of filters: ", filteredKickLists
+            # print "Current list of filters: ", filteredKickLists
             filteredKicks = list(set.intersection(*map(set, filteredKickLists)))
-            print "Filtered kicks: ", filteredKicks
+            # print "Filtered kicks: ", filteredKicks
         else:
             filteredKicks = kicks
 
         try:
             tempVar = max(filteredKicks,key=self.scoreKick)
-            print "This is the max scored kick", tempVar
+            # print "This is the max scored kick", tempVar
             yield tempVar
         except ValueError:
-            print "No kick satisfied the filter req's"
+            # print "No kick satisfied the filter req's"
             yield filteredKicks #list is empty
             #try:
             #    varIter = iter(filteredKicks)
@@ -788,7 +752,7 @@ class KickDecider(object):
     ### SCORE KICK FUNCTIONS ###
     def minimizeOrbitTime(self, kick):
         orbitTime = abs(self.normalizeAngle(kick.setupH - self.brain.loc.h))
-        print "Orbit time: ", -orbitTime
+        # print "Orbit time: ", -orbitTime
         return -orbitTime
 
     def minimizeKickTime(self, kick):
@@ -857,7 +821,7 @@ class KickDecider(object):
 
         #scale = goalLineX / kickVector[0]
         scale = goalLineX / kick.distance
-        print "Do we cross the goal line: ", scale
+        # print "Do we cross the goal line: ", scale
 
         if 0 <= scale <= 1:
             return (rightPostY <= kickVector[1]*scale <= leftPostY)
@@ -872,7 +836,7 @@ class KickDecider(object):
         intoBox = (kick.destinationX > nogginC.GREEN_PAD_X and kick.destinationX < nogginC.BLUE_GOALBOX_RIGHT_X and
                     kick.destinationY < nogginC.BLUE_GOALBOX_TOP_Y and kick.destinationY > nogginC.BLUE_GOALBOX_BOTTOM_Y)
 
-        print "inBox returned"
+        # print "inBox returned"
         if intoBox and not inBox:
             return False
 
