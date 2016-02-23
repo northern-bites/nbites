@@ -77,7 +77,7 @@ namespace vision {
 	}
 
 	bool Field::isGreen() {
-		if (*(greenImage.pixelAddr(currentX, currentY)) > 220) {
+		if (*(greenImage.pixelAddr(currentX, currentY)) > 138) {
 			return true;
 		}
 		return false;
@@ -420,6 +420,7 @@ void Field::findTopEdges(int M) {
             }
         }
         if (debugDrawFieldEdge) {
+			cout << "Calling drawline" << endl;
             drawLine(convex[i-1].x, convex[i-1].y, convex[i].x,
 					 convex[i].y, ORANGE);
         }
@@ -734,7 +735,7 @@ int Field::findGreenHorizon(int pH, int rH) {
         topEdge[i] = 0;
     }
     // store field pose
-    poseHorizon = pH;
+    poseHorizon = min(pH, rH);
 
 	if (drawCameraHorizon) {
 		cout << "Drawing camera horizon from " << pH << " to " << rH << endl;

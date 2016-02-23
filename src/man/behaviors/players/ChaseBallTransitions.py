@@ -3,7 +3,7 @@ from ..headTracker import HeadMoves
 import ChaseBallConstants as constants
 import noggin_constants as NogginConstants
 import ClaimTransitions as claimTrans
-from math import fabs, degrees
+from math import fabs, degrees, atan2
 
 ####### CHASING STUFF ##############
 
@@ -58,6 +58,15 @@ def shouldSpinToBall(player):
     We're not facing the ball well enough
     """
     return fabs(degrees(player.brain.ball.bearing)) > constants.SHOULD_SPIN_TO_BALL_BEARING and not player.inKickOffPlay
+
+def shouldSpinToKickHeading(player):
+    ball = player.brain.ball
+    xDiff = ball.x - player.brain.loc.x
+    yDiff = ball.y - player.brain.loc.y
+
+    headingToBall = degrees(atan2(yDiff, xDiff))
+
+    return fabs(headingToBall - player.kick.setupH) < 6 and ball.distance <= constants.PREPARE_FOR_KICK_DIST
 
 def shouldApproachBallAgain(player):
     """

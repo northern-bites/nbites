@@ -197,7 +197,7 @@ def findStrikerHome(ball, hh):
 
     # the point at which we draw our normal vector from
     percentageToPivot = 0.8
-    pivotPoint = Location(ball.x + ballToGoal.x*0.8, ball.y + ballToGoal.y*0.8)
+    pivotPoint = Location(ball.x + ballToGoal.x*0.7, ball.y + ballToGoal.y*0.7)
 
     # two possible normal vectors. If ball.y is greater than midfield.y choose (dy, -dx)
     # else choose (-dy, dx)
@@ -212,7 +212,13 @@ def findStrikerHome(ball, hh):
     normalVect.x *= normalizeMag
     normalVect.y *= normalizeMag
 
-    return RobotLocation(pivotPoint.x + normalVect.x , pivotPoint.y + normalVect.y, hh)
+    strikerHome = RobotLocation(pivotPoint.x + normalVect.x , pivotPoint.y + normalVect.y, hh)
+
+    # if for some reason you get placed off the field project back onto the field
+    if strikerHome.x > NogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X - 20:
+        strikerHome.x = NogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X - 20
+
+    return strikerHome
 
 # find the closest point on a line segment ((x1,y1),(x2,y2)) to a point (x3,y3)
 def calculateHomePosition(player):

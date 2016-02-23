@@ -22,6 +22,7 @@ namespace nblog {
     };
     
     extern nbhost_e HOST_TYPE;
+    extern std::string HOST_NAME;
     
     class Log {
     public:
