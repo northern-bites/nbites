@@ -25,16 +25,12 @@ namespace control {
         
         fileio,
         
-        SENSORS,
-        GUARDIAN,
-        COMM,
-        LOCATION,
-        ODOMETRY,
-        OBSERVATIONS,
-        LOCALIZATION,
-        BALLTRACK,
-        VISION,
-        
+        sensors,
+        guardian,
+        comm,
+        localization,
+        balltrack,
+        vision,
         tripoint,
         multiball,
         thumbnail,

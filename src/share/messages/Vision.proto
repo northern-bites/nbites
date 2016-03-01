@@ -3,8 +3,6 @@ package messages;
 option java_outer_classname = "_File_Vision";
 option java_multiple_files = true;
 
-
-
 message HoughLine 
 {
     optional float r = 1;
@@ -126,7 +124,6 @@ message SharedBall
     optional bool ball_on  = 3;
     optional int32 reliability = 4;
 }
-
 
 message NaiveBall {
     message Position {

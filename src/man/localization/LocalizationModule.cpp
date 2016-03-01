@@ -1,12 +1,10 @@
 #include "LocalizationModule.h"
+
 #include "Profiler.h"
 #include "RoboCupGameControlData.h"
-
 #include "DebugConfig.h"
 #include "../log/logging.h"
 #include "../control/control.h"
-#include "HighResTimer.h"
-#include "nbdebug.h"
 
 using nblog::SExpr;
 using nblog::NBLog;
@@ -21,9 +19,6 @@ LocalizationModule::LocalizationModule()
       log_index(0)
 {
     particleFilter = new ParticleFilter();
-    // TODO delete?
-    // Chooose on the field looking up as a random initial
-    particleFilter->resetLocTo(110,658,-1.5);
 }
 
 LocalizationModule::~LocalizationModule()
@@ -33,11 +28,12 @@ LocalizationModule::~LocalizationModule()
 
 void LocalizationModule::update()
 {
+    // Reset filter if behaviors or shared ball make a request
 #ifndef OFFLINE
     for (int i = 0; i < 2; i++) {
         if (lastReset[i] != resetInput[i].message().timestamp())
         {
-            // std::cout<<"RESET LOC ON "<<i<<std::endl;
+            std::cout << "Reset loc on " << i << std::endl;
             lastReset[i] = resetInput[i].message().timestamp();
             particleFilter->resetLocTo(resetInput[i].message().x(),
                                        resetInput[i].message().y(),
@@ -47,46 +43,33 @@ void LocalizationModule::update()
     }
 #endif
 
-    // Save odometry and lines
-    curOdometry.set_x(motionInput.message().x());
-    curOdometry.set_y(motionInput.message().y());
-    curOdometry.set_h(motionInput.message().h());
+    // Save vision message, so can be updated for debug purposes, see
+    // updateFieldForDebug in ParticleFilter.cpp
     curVision = visionInput.message();
 
-    curBall = ballInput.message();
-
-    // TODO: use CC
-    messages::CenterCircle curCircle = curVision.circle();
-
+    // Ball is only a landmark if in set
     const messages::FilteredBall* ball = NULL;
 #ifndef OFFLINE
     bool inSet = (STATE_SET == gameStateInput.message().state());
     if (inSet)
-        ball = &curBall;
+        ball = &ballInput.message();
 #endif
 
     // Update filter
-    particleFilter->update(curOdometry, curVision, ball);
+    particleFilter->update(motionInput.message(), curVision, ball);
 
-//this is part of something old that never executes, check out
-//the ifdef below; same code but it is executed when we want to
-//to log localization
-#if defined( LOG_LOCALIZATION) || defined(OFFLINE)
-    portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->getCurrentSwarm());
-    particleOutput.setMessage(swarmMessage);
-#endif
-
+    // Output loc estimate
     portals::Message<messages::RobotLocation> locMessage(&particleFilter->getCurrentEstimate());
     output.setMessage(locMessage);
 
-#ifdef USE_LOGGING
-    if(control::flags[control::LOCALIZATION]) {
-        ++log_index;
-        std::string log_from = "loc";
+    // Output swarm
+    portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->getCurrentSwarm());
+    particleOutput.setMessage(swarmMessage);
 
-        portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
-                                                           getCurrentSwarm());
-        particleOutput.setMessage(swarmMessage);
+    // Logging
+#ifdef USE_LOGGING
+    if(control::flags[control::localization]) {
+        std::string log_from = "loc";
 
         messages::RobotLocation rl = *output.getMessage(true).get();
         messages::ParticleSwarm ps = *particleOutput.getMessage(true).get();
@@ -110,21 +93,27 @@ void LocalizationModule::update()
         SExpr naoLocation("location", log_from, clock(), log_index, rl_buf.length());
         contents.push_back(naoLocation);
 
-        SExpr naoSwarm("swarm",log_from,clock(),log_index,ps_buf.length());
+        SExpr naoSwarm("swarm", log_from, clock(), log_index, ps_buf.length());
         contents.push_back(naoSwarm);
 
-        SExpr naoVision("vision",log_from,clock(),log_index,vm_buf.length());
+        SExpr naoVision("vision", log_from, clock(), log_index, vm_buf.length());
         contents.push_back(naoVision);
 
-        NBLog(NBL_SMALL_BUFFER,"LOCSWARM",contents,log_buf);
+        NBLog(NBL_SMALL_BUFFER, "LOCSWARM", contents, log_buf);
+
+        // Two images (top and bottom camera) per localization module run
+        // FUTURE WORK, log_index should actually come directly from images used
+        //              to produce observations used in localization
+        log_index += 2;
     }
 #endif
-
 }
 
 void LocalizationModule::run_()
 {
     PROF_ENTER(P_SELF_LOC);
+
+    // Latch inputs
     motionInput.latch();
     visionInput.latch();
 #ifndef OFFLINE
@@ -134,7 +123,9 @@ void LocalizationModule::run_()
     resetInput[1].latch();
 #endif
 
+    // Update loc
     update();
+
     PROF_EXIT(P_SELF_LOC);
 }
 

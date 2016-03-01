@@ -108,6 +108,11 @@ class Brain(object):
         # So that we only try to sit down once upon receiving command
         self.sitting = False
 
+        # CHINA HACK(s)
+        self.penalizedHack = False
+        self.penalizedEdgeClose = 0
+        self.penalizedCount = 0
+
     def initTeamMembers(self):
         self.teamMembers = []
         for i in xrange(Constants.NUM_PLAYERS_PER_TEAM):
@@ -273,7 +278,6 @@ class Brain(object):
             curr_obst = self.interface.fieldObstacles.obstacle(i)
             if curr_obst.position != curr_obst.position.NONE:
                 self.obstacles[int(curr_obst.position)] = (curr_obst.distance, curr_obst.closest_y)
-
                 if curr_obst.detector == curr_obst.detector.ARMS:
                     self.obstacleDetectors[int(curr_obst.position)] = 'a'
                 elif curr_obst.detector == curr_obst.detector.SONARS:
@@ -309,6 +313,15 @@ class Brain(object):
         self.interface.resetLocRequest.y = y
         self.interface.resetLocRequest.h = h * (math.pi / 180.)
         self.interface.resetLocRequest.timestamp = int(self.time * 1000)
+
+    def resetLocToCross(self):
+        """
+        """
+        print "LOC TO CROSS"
+        self.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X, Constants.FIELD_GREEN_HEIGHT / 2, 0)
+        # self.interface.resetLocRequest.x = Constants.LANDMARK_BLUE_GOAL_CROSS_X
+        # self.interface.resetLocRequest.y = Constants.FIELD_GREEN_HEIGHT / 2
+        # self.interface.resetLocRequest.h = 0
 
     def resetInitialLocalization(self):
         """

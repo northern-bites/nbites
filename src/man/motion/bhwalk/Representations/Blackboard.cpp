@@ -99,6 +99,7 @@
 #include "Representations/MotionControl/MotionInfo.h"
 #include "Representations/MotionControl/BallTakingOutput.h"
 #include "Representations/MotionControl/IndykickEngineOutput.h"
+#include "Representations/MotionControl/KickEngineOutput.h"
 
 Blackboard::Blackboard() :
 // Initialize all representations by themselves:
@@ -210,10 +211,8 @@ Blackboard::Blackboard() :
   theSpecialActionsOutputBH(*new SpecialActionsOutputBH),
   theWalkingEngineOutputBH(*new WalkingEngineOutputBH),
   theWalkingEngineStandOutputBH(*new WalkingEngineStandOutputBH),
-  theBikeEngineOutputBH(*new BikeEngineOutputBH),
   theMotionInfoBH(*new MotionInfoBH),
-  theBallTakingOutputBH(*new BallTakingOutputBH),
-  theIndykickEngineOutputBH(*new IndykickEngineOutputBH)
+  theKickEngineOutput(*new KickEngineOutput)
 {
     theInstance = this;
 }

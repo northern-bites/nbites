@@ -104,14 +104,14 @@ namespace vision {
 							   bool & occludedBottom) {
 		// When looking in the top camera worry about the field
 		if (topCamera) {
-			bool offField = centerY < field->horizonAt(centerX);
+			bool offField = centerY + principalLength < field->horizonAt(centerX);
 			if (offField) {
 				if (debugBall) {
 					std::cout << "Blob is off the field: " << std::endl;
 				}
 				return true;
 			}
-			offField = centerY + 2 * principalLength <
+			offField = centerY + 2 * principalLength + 3 <
 									 field->blockHorizonAt(centerX);
 			if (offField) {
 				if (debugBall) {
@@ -146,14 +146,15 @@ namespace vision {
 		// Note: this test is for bottom camera, occluded top could mean
 		// a facing red robot. If ball is actually occluded on top it should
 		// show up in the top camera
-		bool occluded = occludedSide || occludedBottom;
+		/*bool occluded = occludedSide || occludedBottom;
 
 		if (!topCamera && !occluded && principalLength2 < height / 20) {
 			if (debugBall) {
-				std::cout << "Blob on bottom is too thin" << std::endl;
+				std::cout << "Blob on bottom is too thin " <<
+					principalLength2 << " " << principalLength << std::endl;
 			}
 			return true;
-		}
+			}*/
 		return false;
 	}
 

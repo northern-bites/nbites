@@ -8,8 +8,7 @@
 
 #include "SpecialActionRequest.h"
 #include "WalkRequest.h"
-#include "BikeRequest.h"
-#include "IndykickRequest.h"
+#include "KickRequest.h"
 
 /**
 * @class MotionRequestBH
@@ -19,13 +18,11 @@ STREAMABLE(MotionRequestBH,
 {
 public:
   ENUM(Motion,
-    walk,
-    bike,
-    indykick,
-    specialAction,
-    stand,
-    getUp,
-    takeBall
+       walk,         // 0
+       kick,         // 1
+       specialAction,// 2
+       stand,        // 3
+       getUp         // 4
   );
 
   /**
@@ -40,6 +37,5 @@ public:
   (Motion)(specialAction) motion, /**< The selected motion. */
   (SpecialActionRequest) specialActionRequest, /**< The special action request, if it is the selected motion. */
   (WalkRequest) walkRequest, /**< The walk request, if it is the selected motion. */
-  (BikeRequest) bikeRequest, /**< The kick request, if it is the selected motion. */
-  (IndykickRequest) indykickRequest, /**< The kick request, if it is the selected motion. */
+  (KickRequest) kickRequest,
 });

@@ -101,7 +101,6 @@ void FakeLocInputModule::genVisualDetection(messages::PVisualDetection &visualDe
     float calcX = obsvDist*cos + currentLocation.x();
     float calcY = obsvDist*sin + currentLocation.y();
 
-    // @TODO one line? Don't think so but try
     messages::Point concreteCoords;
     concreteCoords.set_x(calcX);
     concreteCoords.set_y(calcY);
