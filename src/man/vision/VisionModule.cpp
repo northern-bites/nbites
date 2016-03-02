@@ -96,6 +96,10 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
           cornerDetector[i] = new CornerDetector(wd / 4, ht / 4);
         }
 
+        if (i == 0) {
+            robotDetector[i] = new RobotDetector(wd / 2, ht / 2);
+        }
+
         bool fast = true;
         frontEnd[i]->fast(fast);
         edgeDetector[i]->fast(fast);
@@ -155,8 +159,8 @@ void VisionModule::run_()
     bool ballDetected = false;
 
     // Time vision module
-    double topTimes[12];
-    double bottomTimes[12];
+    double topTimes[13];
+    double bottomTimes[13];
     double* times[2] = { topTimes, bottomTimes };
 
     // Loop over top and bottom image and run line detection system
@@ -279,7 +283,14 @@ void VisionModule::run_()
         PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
         times[i][11] = timer.end();
 
+        // Detect obstacles
+        PROF_ENTER2(P_OBSTACLE_TOP, P_OBSTACLE_BOT, i==0)
+        detectObstacles(i==0);
+        PROF_EXIT2(P_OBSTACLE_TOP, P_OBSTACLE_BOT, i==0)
+        times[i][12] = timer.end();
+
         PROF_EXIT2(P_VISION_TOP, P_VISION_BOT, i==0)
+
 #ifdef USE_LOGGING
         logImage(i);
 #endif
@@ -291,11 +302,13 @@ void VisionModule::run_()
         if (i == 0) {
             topTotal = (times[i][0] + times[i][1] + times[i][2] + times[i][3] +
                         times[i][4] + times[i][5] + times[i][6] + times[i][7] +
-                        times[i][8] + times[i][9] + times[i][10] + times[i][11]);
+                        times[i][8] + times[i][9] + times[i][10] + times[i][11] +
+                        times[i][12]);
         } else {
             botTotal = (times[i][0] + times[i][1] + times[i][2] + times[i][3] +
                         times[i][4] + times[i][5] + times[i][6] + times[i][7] +
-                        times[i][8] + times[i][9] + times[i][10] + times[i][11]);
+                        times[i][8] + times[i][9] + times[i][10] + times[i][11] +
+                        times[i][12]);
         }
     }
 
@@ -319,24 +332,18 @@ void VisionModule::run_()
             std::cout << "Field lines:    " << times[i][9] << std::endl;
             std::cout << "FL classify:    " << times[i][10] << std::endl;
             std::cout << "Ball:           " << times[i][11] << std::endl;
+            std::cout << "Obstacle:       " << times[i][12] << std::endl;
             std::cout << "Total:          " << (!i ? topTotal : botTotal) <<std::endl;
         }
         std::cout << std::endl << "TOTAL:          " << topTotal + botTotal << " " <<
         edges[0]->count() << " edges in top. " << overrun <<
         " total overruns" << std::endl << std::endl;
     }
-    
-
 
     // Send messages on outportals
     ballOn = ballDetected;
     
     outportalVisionField();
-
-    PROF_ENTER(P_OBSTACLE)
-    updateObstacleBox();
-
-    PROF_EXIT(P_OBSTACLE)
 
     PROF_EXIT(P_VISION);
 }
@@ -481,23 +488,32 @@ void VisionModule::outportalVisionField()
     visionOut.setMessage(visionOutMessage);
 }
 
-void VisionModule::updateObstacleBox()
+void VisionModule::detectObstacles(bool is_top)
 {
-    // only want bottom camera
-    robotImageObstacle->updateVisionObstacle(frontEnd[1]->whiteImage(),
-                                             *(edges[1]), obstacleBox,
-                                             homography[1]);
+    if (is_top) {
+        // make white-gradient image the same size as green / white / orange images
+        ImageLiteU8 WGImage(frontEnd[0]->greenImage());
+        robotDetector[0]->getWhiteGradImage(WGImage, frontEnd[0]->whiteImage(),
+                                            edgeDetector[0], *(edges[0]));
+        // HACK: Intercepting green image for now so I can easily view in tool
+        frontEnd[0]->greenImage() = WGImage;
+    } else {
+        // run old method of detecting obstacles from bottom camera
+        robotImageObstacle->updateVisionObstacle(frontEnd[1]->whiteImage(),
+                                                 *(edges[1]), obstacleBox,
+                                                 homography[1]);
 
-    // std::cout<<"about to set message for obstacle vision"<<std::endl;
-    portals::Message<messages::RobotObstacle> boxOut(0);
-    boxOut.get()->set_closest_y(obstacleBox[0]);
-    boxOut.get()->set_box_bottom(obstacleBox[1]);
-    boxOut.get()->set_box_left(obstacleBox[2]);
-    boxOut.get()->set_box_right(obstacleBox[3]);
-    robotObstacleOut.setMessage(boxOut);
+        // std::cout<<"about to set message for obstacle vision"<<std::endl;
+        portals::Message<messages::RobotObstacle> boxOut(0);
+        boxOut.get()->set_closest_y(obstacleBox[0]);
+        boxOut.get()->set_box_bottom(obstacleBox[1]);
+        boxOut.get()->set_box_left(obstacleBox[2]);
+        boxOut.get()->set_box_right(obstacleBox[3]);
+        robotObstacleOut.setMessage(boxOut);
 
-    // printf("Obstacle Box VISION: (%g, %g, %g, %g)\n", obstacleBox[0],
-    //         obstacleBox[1], obstacleBox[2], obstacleBox[3]);
+        // printf("Obstacle Box VISION: (%g, %g, %g, %g)\n", obstacleBox[0],
+        //         obstacleBox[1], obstacleBox[2], obstacleBox[3]);
+    }
 }
 
 void VisionModule::setColorParams(Colors* colors, bool topCamera)

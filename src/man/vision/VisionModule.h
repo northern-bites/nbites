@@ -15,6 +15,7 @@
 
 #include "BallDetector.h"
 #include "RobotObstacle.h"
+#include "RobotDetector.h"
 #include "InertialState.pb.h"
 #include "VisionRobot.pb.h"
 
@@ -74,7 +75,7 @@ private:
     void logImage(int i);
 #endif
     void outportalVisionField();
-    void updateObstacleBox();
+    void detectObstacles(bool is_top);
 
     Colors* colorParams[2];
     ImageFrontEnd* frontEnd[2];
@@ -93,6 +94,7 @@ private:
     CornerDetector* cornerDetector[2];
     CenterCircleDetector* centerCircleDetector[2];
     BallDetector* ballDetector[2];
+    RobotDetector* robotDetector[2];
 
     bool blackStar_;
 
@@ -117,6 +119,7 @@ private:
 
     // obstacleBox
     RobotObstacle* robotImageObstacle;
+    
     float obstacleBox[4];
 };
 

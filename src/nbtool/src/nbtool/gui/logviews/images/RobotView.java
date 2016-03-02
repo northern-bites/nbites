@@ -125,7 +125,7 @@ public class RobotView extends ViewParent
 
         gFuzzyU.setBounds(hB*1 + lB, vB + sH*2 + tB*3, width/2, sH);
         gFuzzyV.setBounds(hB*1 + lB, vB + sH*4 + tB*3, width/2, sH);
-        g.drawString("width of fuzzy threshold for U and V", hB*1 + lB, vB + sH + tB*3);
+        g.drawString("width of fuzzy threshold for gradient", hB*1 + lB, vB + sH + tB*3);
 
         // Draw button
         saveButton.setBounds(hB*1 + lB,  vB + sH*6 + tB*3, width/2, tB*3);
