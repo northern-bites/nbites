@@ -491,6 +491,14 @@ void VisionModule::outportalVisionField()
 void VisionModule::detectObstacles(bool is_top)
 {
     if (is_top) {
+    //     uint8_t* pixels = new uint8_t[img_ht*img_wd];
+    //     for (int j = 1; j < img_ht-1; ++j) {
+    //         for (int i = 1; i < img_wd-1; ++i) {
+    //             pixels[i + img_wd*j] = 0;
+    //         }
+    //     }
+    //     ImageLiteU8 tempImage(0, 0, img_wd, img_ht, WG.pitch(), pixels);
+
         // make white-gradient image the same size as green / white / orange images
         ImageLiteU8 WGImage(frontEnd[0]->greenImage());
         robotDetector[0]->getWhiteGradImage(WGImage, frontEnd[0]->whiteImage(),

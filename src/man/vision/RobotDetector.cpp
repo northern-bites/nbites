@@ -22,8 +22,16 @@ RobotDetector::RobotDetector(int wd_, int ht_)
 void RobotDetector::getWhiteGradImage(ImageLiteU8& WG, ImageLiteU8 whiteImage,
                                       EdgeDetector* ed, EdgeList& edges)
 {
+    // candidates.clear();
     uint8_t min = 255;
     uint8_t max = 0;
+    uint8_t* pixels = new uint8_t[img_ht*img_wd];
+    for (int j = 1; j < img_ht-1; ++j) {
+        for (int i = 1; i < img_wd-1; ++i) {
+            pixels[i + img_wd*j] = 0;
+        }
+    }
+    ImageLiteU8 tempImage(0, 0, img_wd, img_ht, WG.pitch(), pixels);
 
     // HACK: Do this better -> might impact other things
     ed->gradientThreshold(0); // set to lower fuzzy thresh
@@ -34,17 +42,19 @@ void RobotDetector::getWhiteGradImage(ImageLiteU8& WG, ImageLiteU8 whiteImage,
             uint8_t fuzzy = getFuzzyValue(grad);
             uint8_t whiteVal = *(whiteImage.pixelAddr(i,j));
             if (fuzzy < whiteVal) {
-                *WG.pixelAddr(i,j) = fuzzy;
+                *tempImage.pixelAddr(i,j) = fuzzy;
             } else {
-                *WG.pixelAddr(i,j) = whiteVal;
+                *tempImage.pixelAddr(i,j) = whiteVal;
             }
+            *tempImage.pixelAddr(i,j) = fuzzy;
 
             if (grad < min) { min = grad; }
             if (grad > max) { max = grad; }
         }
     }
 
-    removeHoughLines(WG, edges);
+    removeHoughLines(tempImage, edges);
+    findCandidates(tempImage, WG);
 
     // std::cout<<"Gradient: min = "<< min<<", max = "<< max<< std::endl;
 }
@@ -79,7 +89,7 @@ void RobotDetector::removeHoughLines(ImageLiteU8& WG, EdgeList& edges)
             *WG.pixelAddr(xi + img_wd/2 - 1, img_ht/2 - yi + 1) = 0;
             *WG.pixelAddr(xi + img_wd/2 - 1, img_ht/2 - yi - 1) = 0;
 
-            // remove all pixels within 1 of hough line pixel
+            // remove all pixels within 2 of hough line pixel
             *WG.pixelAddr(xi + img_wd/2 + 2, img_ht/2 - yi) = 0;
             *WG.pixelAddr(xi + img_wd/2, img_ht/2 - yi + 2) = 0;
             *WG.pixelAddr(xi + img_wd/2 - 2, img_ht/2 - yi) = 0;
@@ -89,7 +99,7 @@ void RobotDetector::removeHoughLines(ImageLiteU8& WG, EdgeList& edges)
             *WG.pixelAddr(xi + img_wd/2 - 2, img_ht/2 - yi + 2) = 0;
             *WG.pixelAddr(xi + img_wd/2 - 2, img_ht/2 - yi - 2) = 0;
 
-            // remove all pixels within 1 of hough line pixel
+            // remove all pixels within 3 of hough line pixel
             *WG.pixelAddr(xi + img_wd/2 + 3, img_ht/2 - yi) = 0;
             *WG.pixelAddr(xi + img_wd/2, img_ht/2 - yi + 3) = 0;
             *WG.pixelAddr(xi + img_wd/2 - 3, img_ht/2 - yi) = 0;
@@ -100,6 +110,57 @@ void RobotDetector::removeHoughLines(ImageLiteU8& WG, EdgeList& edges)
             *WG.pixelAddr(xi + img_wd/2 - 3, img_ht/2 - yi - 3) = 0;
         }
     }
+}
+
+void RobotDetector::findCandidates(ImageLiteU8& temp, ImageLiteU8& WG) {
+    int boxW = 70;
+    int boxH = 170;
+    uint8_t brightnessThresh = 150;
+    float percent = .7;
+    int countThresh = ((float)boxW * (float)boxH * percent);
+
+    for (int j = 1; j < img_ht-1; ++j) {
+        for (int i = 1; i < img_wd-1; ++i) {
+            *WG.pixelAddr(i,j) = 0;
+        }
+    }
+
+    for (int j = 1; j < img_ht - boxH - 1; ++j) {
+        for (int i = 1; i < img_wd - boxW - 1; ++i) {
+
+            int count = 0;
+
+            for (int n = j; n < j + boxH; n++) {
+                for (int m = i; m < i + boxW; m++) {
+                    if (*temp.pixelAddr(m,n) > brightnessThresh) {
+                        count++;
+                    }
+                }
+            }
+
+            for (int n = j; n < j+boxH; n++) {
+                for (int m = i; m < i + boxW; m++) {
+                    uint8_t w = *temp.pixelAddr(m,n);
+                    // std::cout<<"BR = "<<w<<std::endl;
+                    if (w > brightnessThresh) {
+                        // std::cout<<"Count++..............."<<count<<std::endl;
+                        count++;
+                    }
+                }
+            }
+
+            // std::cout<<"Count = "<< count << std::endl;
+            if (count > countThresh) {
+                for (int n = j; n < j+boxH; n++) {
+                    for (int m = i; m < i + boxW; m++) {
+                        *WG.pixelAddr(m,n) = *temp.pixelAddr(m,n);
+                    }
+                }
+                return;
+            }
+        }
+    }
+
 }
 
 } //namespace vision
