@@ -735,12 +735,12 @@ SExpr treeFromBall(man::vision::Ball& b)
     SExpr x(b.x_rel);
     SExpr y(b.y_rel);
     SExpr p = SExpr::list({x, y});
-    SExpr bl = treeFromBlob(b.getBlob());
+    //SExpr bl = treeFromBlob(b.getBlob());
 
     SExpr rel = SExpr::keyValue("rel", p);
-    SExpr blob = SExpr::keyValue("blob", bl);
+    //SExpr blob = SExpr::keyValue("blob", bl);
     SExpr exDiam = SExpr::keyValue("expectedDiam", b.expectedDiam);
-    SExpr toRet = SExpr::list({rel, blob, exDiam});
+    SExpr toRet = SExpr::list({rel, exDiam});
 
     return toRet;
 }

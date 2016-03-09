@@ -22,6 +22,328 @@ namespace vision {
 
 	BallDetector::~BallDetector() { }
 
+	void BallDetector::setDebugImage(DebugImage * di) {
+		debugDraw =  *di;
+	}
+
+
+	bool BallDetector::findBallWithEdges(ImageLiteU8 white, EdgeList& edges)
+	{
+		Ball reset;
+		_best = reset;
+		width = white.width();
+		height = white.height();
+
+		int edgeList[width];
+		for (int i = 0; i < width; i++) {
+			edgeList[i] = 0;
+		}
+		// Get edges from vision
+		AngleBinsIterator<Edge> abi(edges);
+		for (Edge* e = *abi; e; e = *++abi){
+			// If we are part of a hough line, we are not a ball edge
+			if (e->memberOf()) { continue; }
+
+			int x = e->x() + width / 2;
+			int y = height / 2 - e->y();
+			int ang = e->angle();
+			edgeList[x] += 1;
+			// if we're off the field we aren't a ball
+			if (topCamera && y < field->blockHorizonAt(x)) { continue; }
+			// we're only going to look at downward angles
+			if (ang < 128) { continue; }
+			//int mag = e->mag();      // magnitude - could be useful later?
+			getColor(x, y+1);
+			int others = 0;
+			int total = 0;
+			int whites = 0;
+			int i;
+			int yMax = 0;
+			int yMin = 500;
+			getColor(x, y);
+			int previousY = *(yImage.pixelAddr(currentX, currentY)) / 4;
+			int previous2 = previousY;
+			int firstBreak = -1; // track the first place we saw a big Y change
+			// scan down from the edge until we hit green
+			for (i = y+2; i < height && !isGreen(); i++) {
+				getColor(x, i);
+				if (isGreen()) {
+					break;
+				}
+				// we're going to track the biggest and smallest Y values we've seen
+				int yValue = *(yImage.pixelAddr(currentX, currentY)) / 4;
+				yMin = min(yValue, yMin);
+				yMax = max(yValue, yMax);
+				if (previous2 - yValue > 100) {
+					if (firstBreak == -1) {
+						firstBreak = i;
+					}
+				}
+				previous2 = previousY;
+				previousY = yValue;
+				total++;
+				if (!isWhite() || isOrange()) {
+					others++;
+				}
+				if (isWhite()) {
+					whites++;
+				}
+			}
+			if (firstBreak != -1 && i - firstBreak < 3) {
+				firstBreak = -1;
+			} else if (firstBreak != -1) {
+				//debugDraw.drawPoint(x, firstBreak, RED);
+			}
+
+			if (debugBall) {
+				// if various things are true, then do more checking
+				// saw some black, some some white, saw a range of Y
+				if (firstBreak != -1 ||
+					(others > (total / 5) && total > 10 && total < 50 && whites > 5 && yMin < 100)) {
+					//std::cout << "Spread is " << yMin << " " << yMax << std::endl;
+					//debugDraw.drawPoint(x, y, BLUE);
+					if (testForBall(x, y, i)) {
+						return true;
+					}
+				} else if (total > 10) {
+					debugDraw.drawPoint(x, i, ORANGE);
+					std::cout << "Missed " << others << " " << whites << " " << yMin << std::endl;
+					if (yMin < 100 && whites > 5) {
+						if (testForBall(x, y, i)) {
+							return true;
+						}
+					}
+				} else {
+					if (ang > 192) {
+						debugDraw.drawPoint(x, y, BLACK);
+					} else {
+						debugDraw.drawPoint(x, y, BLUE);
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	bool BallDetector::testForBall(int x, int top, int bottom) {
+		int mid = (bottom + top) / 2;
+		getColor(x, mid);
+		int right = x;
+		int whites = 0;
+		for ( ; right < width && !isGreen(); right++) {
+			getColor(right, mid);
+			if (isWhite()) {
+				whites++;
+			}
+		}
+		int left = x;
+		getColor(left, mid);
+		for ( ; left >= 0 && !isGreen(); left--) {
+			getColor(left, mid);
+			if (isWhite()) {
+				whites++;
+			}
+		}
+		if (whites < (left - right) / 3) {
+			if (debugBall) {
+				std::cout << "Not enought horizontal white " << whites << " " <<
+					(right - left) << std::endl;
+			}
+			return false;
+		}
+		int midX = (left + right) / 2;
+		whites = bottom - top - 1;
+		getColor(midX, top);
+		for ( ; top > 0 && !isGreen(); top--) {
+			getColor(midX, top);
+			if (isWhite()) {
+				whites++;
+			}
+		}
+		getColor(midX, bottom);
+		for ( ; bottom < height && !isGreen(); bottom++) {
+			getColor(midX, bottom);
+			if (isWhite()) {
+				whites++;
+			}
+		}
+		if (whites < (bottom - top) / 3) {
+			if (debugBall) {
+				std::cout << "Not enought vertical white " << whites << " " <<
+					(bottom - top) << std::endl;
+			}
+			return false;
+		}
+		mid = (bottom + top) / 2;
+		// now scan the diagonals
+		whites = 0;
+		int diaglength1 = 0;
+		getColor(midX, mid);
+		for (int i = 0; !isGreen(); i++) {
+			if (midX + i > width || mid + i > height) {
+				break;
+			}
+			getColor(midX + i, mid + i);
+			if (isWhite()) {
+				whites++;
+			}
+			diaglength1++;
+		}
+		getColor(midX, mid);
+		for (int i = 0; !isGreen(); i++) {
+			if (midX - i < 0 || mid - i < 0) {
+				break;
+			}
+			getColor(midX - i, mid - i);
+			if (isWhite()) {
+				whites++;
+			}
+			diaglength1++;
+		}
+		if (whites < min(right - left, bottom - top) / 3) {
+			if (debugBall) {
+				std::cout << "Not enought diagonal white " << whites << " " <<
+					(bottom - top) << std::endl;
+			}
+			return false;
+		}
+		// now scan the diagonals
+		whites = 0;
+		int diaglength2 = 0;
+		getColor(midX, mid);
+		for (int i = 0; !isGreen(); i++) {
+			if (midX + i > width || mid - i < 0) {
+				break;
+			}
+			getColor(midX + i, mid - i);
+			if (isWhite()) {
+				whites++;
+			}
+			diaglength2++;
+		}
+		getColor(midX, mid);
+		for (int i = 0; !isGreen(); i++) {
+			if (midX - i < 0 || mid + i > height) {
+				break;
+			}
+			getColor(midX - i, mid + i);
+			if (isWhite()) {
+				whites++;
+			}
+			diaglength2++;
+		}
+		if (whites < min(right - left, bottom - top) / 3) {
+			if (debugBall) {
+				std::cout << "Not enought left diagonal white " << whites << " " <<
+					(bottom - top) << std::endl;
+			}
+			return false;
+		}
+		int firstPrincipalLength = min(bottom - top, right - left);
+		int maxLength = max(bottom - top, right - left);
+		if (firstPrincipalLength > 65 || (firstPrincipalLength > 35 && !topCamera)) {
+			return false;
+		}
+		if (diaglength1 > 2 * firstPrincipalLength || diaglength2 > 2 * firstPrincipalLength) {
+			// probably a line, just make sure everything else is fine
+			if (maxLength > 1.5 * firstPrincipalLength) {
+				std::cout << "two things too long " << maxLength << " " << firstPrincipalLength <<
+					std::endl;
+				return false;
+			}
+		}
+		// check a square inside the ball, there ought to be black in there
+		int offset = (right - left) / 4;
+		int offsetY = (bottom - top) / 4;
+		if (offset > 2 * offsetY) {
+			offset = offsetY;
+		} else if (offsetY > 2 * offset) {
+			offsetY = offset;
+		}
+		int blacks = 0;
+		int greens = 0;
+		for (int i = -offset; i <= offset; i++) {
+			for (int j = -offsetY; j <= offsetY; j++) {
+				getColor(i + midX, j + mid);
+				// this needs to be replaced by a true black test
+				if (!isWhite() && !isGreen()) {
+					debugDraw.drawDot(i + midX, j + mid, RED);
+					blacks++;
+				}
+				if (isGreen()) {
+					greens++;
+				}
+			}
+		}
+		if ((blacks < 2 && offset > 4) || greens > 3) {
+			if (debugBall) {
+				std::cout << "Too white or too green" << std::endl;
+			}
+			return false;
+		}
+		if (debugBall) {
+			debugDraw.drawLine(left, mid, right, mid, BLACK);
+			debugDraw.drawLine(midX, top, midX, bottom, BLACK);
+			std::cout << "Ball at " << midX << " " << mid << " width " <<
+				(right - left) << " height " << (bottom - top) << std::endl;
+			std::cout << diaglength1 << " " << diaglength2 << " " << blacks << std::endl;
+		}
+		int centerX = midX;
+		int centerY = mid;
+		double x_rel, y_rel;
+
+		double bIX = (centerX - width/2);
+		double bIY = (height / 2 - centerY) - firstPrincipalLength;
+
+		Ball b(x_rel, -1 * y_rel, 0, height,
+			   width, topCamera, false, false,
+			   false);
+		b.centerX = centerX;
+		b.centerY = centerY;
+		b.firstPrincipalLength = firstPrincipalLength;
+		b._confidence = 0.9;
+		_best = b;
+		return true;
+	}
+
+	void BallDetector::getColor(int x, int y) {
+		currentX = x;
+		currentY = y;
+	}
+
+	bool BallDetector::isGreen() {
+		if (*(greenImage.pixelAddr(currentX, currentY)) > 158) {
+			return true;
+		}
+		return false;
+	}
+
+	bool BallDetector::isWhite() {
+		if (*(whiteImage.pixelAddr(currentX, currentY)) > 88)// &&
+			//*(yImage.pixelAddr(currentX, currentY)) < 350) {
+			{
+			return true;
+		}
+		return false;
+	}
+
+	bool BallDetector::isOrange() {
+		if (*(orangeImage.pixelAddr(currentX, currentY)) > 68) {
+			return true;
+		}
+		return false;
+	}
+
+	void BallDetector::setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 orange,
+		ImageLiteU16 yImg) {
+		whiteImage = white;
+		greenImage = green;
+		orangeImage = orange;
+		yImage = yImg;
+	}
+
+
 	bool BallDetector::findBall(ImageLiteU8 orange, double cameraHeight)
 	{
 		const double CONFIDENCE = 0.5;
@@ -61,7 +383,7 @@ namespace vision {
 				continue;
 			}
 
-			Ball b((*i), x_rel, -1 * y_rel, cameraHeight, height,
+			Ball b(x_rel, -1 * y_rel, cameraHeight, height,
 				   width, topCamera, occludedSide, occludedTop,
 				   occludedBottom);
 
@@ -158,9 +480,8 @@ namespace vision {
 		return false;
 	}
 
-	Ball::Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_,
+	Ball::Ball(double x_, double y_, double cameraH_, int imgHeight_,
 			   int imgWidth_, bool top, bool os, bool ot, bool ob) :
-		blob(b),
 		radThresh(.3, .7),
 		thresh(.5, .8),
 		x_rel(x_),
@@ -183,7 +504,6 @@ namespace vision {
 	}
 
 	Ball::Ball() :
-		blob(0),
 		thresh(0, 0),
 		radThresh(0, 0),
 		_confidence(0),
@@ -193,19 +513,19 @@ namespace vision {
 	void Ball::compute()
 	{
 		dist = hypot(x_rel, y_rel);
-		double density = blob.area() / blob.count();
-		double aspectRatio = (blob.secondPrincipalLength() /
-							  blob.firstPrincipalLength());
+		double density = 1.0; //blob.area() / blob.count();
+		double aspectRatio = 1.0; //(blob.secondPrincipalLength() /
+		//blob.firstPrincipalLength());
 
 		double hypotDist = hypot(dist, cameraH);
 
 		expectedDiam = pixDiameterFromDist(hypotDist);
 
 		diameterRatio;
-		if (expectedDiam > 2 * blob.firstPrincipalLength()) {
-			diameterRatio = 2*blob.firstPrincipalLength() / expectedDiam;
+		if (expectedDiam > 2 * firstPrincipalLength) {
+			diameterRatio = 2 * firstPrincipalLength / expectedDiam;
 		} else {
-			diameterRatio = expectedDiam / (2 * blob.firstPrincipalLength());
+			diameterRatio = expectedDiam / (2 * firstPrincipalLength);
 		}
 
 		//_confidence = (density > thresh).f() * (aspectRatio > thresh).f() * (diameterRatio > radThresh).f();
@@ -232,14 +552,14 @@ namespace vision {
 		std::string d("====Ball properties:====\n");
 		d += "\tRelativePosition: " + to_string(x_rel) + " "+ to_string( y_rel) + "\n";
 		d += "\tHomographyDistance is: " + to_string(dist) + "\n";
-		d += "\tdensity is: " + to_string(blob.area() / blob.count()) + "\n";
-		d += "\tcount is: " + to_string(blob.count()) + "\n";
-		d += "\tlocated: (" + to_string(blob.centerX()) +  ", " +
-			to_string(blob.centerY()) + ")\n";
-		d += "\tprinceLens: " + to_string(blob.firstPrincipalLength()) + " " +
-			to_string(blob.secondPrincipalLength()) + "\n";
-		d += "\taspectR is: " + to_string(blob.secondPrincipalLength() /
-										  blob.firstPrincipalLength()) + "\n";
+		//d += "\tdensity is: " + to_string(blob.area() / blob.count()) + "\n";
+		//d += "\tcount is: " + to_string(blob.count()) + "\n";
+		d += "\tlocated: (" + to_string(centerX) +  ", " +
+			to_string(centerY) + ")\n";
+		d += "\tprinceLens: " + to_string(firstPrincipalLength) + " " +
+			to_string(firstPrincipalLength) + "\n";
+		//d += "\taspectR is: " + to_string(blob.secondPrincipalLength() /
+		//								  blob.firstPrincipalLength()) + "\n";
 		d += "\texpect ball to be this diam: " + to_string(expectedDiam) + "\n";
 		d += "\tdiamRatio: " + to_string(diameterRatio) + "\n";
 		d += "\tdiam Confidence: " + to_string((diameterRatio> radThresh).f()) + "\n";
@@ -253,6 +573,8 @@ namespace vision {
 		double trig = atan(BALL_RADIUS / d);
 		return 2 * imgHeight * trig / VERT_FOV_RAD;
 	}
+
+
 
 }
 }

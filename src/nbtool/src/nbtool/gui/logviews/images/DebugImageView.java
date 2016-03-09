@@ -242,7 +242,7 @@ public class DebugImageView extends ViewParent
 				g.drawString(label, 10, displayh + 20);
 			}
 
-			greenThreshold.setBounds(displayw / 2, displayh + 15 + BOX_HEIGHT, 500, BOX_HEIGHT+20);
+			greenThreshold.setBounds(displayw / 2, 2 * displayh + 15 + BOX_HEIGHT, 500, BOX_HEIGHT+20);
 			greenThreshold.repaint();
 			persistant.setBounds(displayw+10, 0, 300, 300);
         }
@@ -614,13 +614,14 @@ public class DebugImageView extends ViewParent
 				int y = currentLog.data()[first ? i : i + 2] & 0xff;
 				int u = currentLog.data()[i + 1] & 0xff;
 				int v = currentLog.data()[i + 3] & 0xff;
-				if (Math.abs(y - maxY) < 15 && Math.abs(u - maxU) < 10 &&
-					Math.abs(v - maxV) < 10) {
-					g.setColor(Color.GREEN);
-				} else {
+				if (y < 130 && y > 100 && Math.max(Math.max(y, u), v) - Math.min(Math.min(y, u), v) < 15) {
+					g.setColor(Color.GRAY);
+				} else if (y < 100 && v > 120) {
 					g.setColor(Color.BLACK);
+				} else {
+					g.setColor(Color.WHITE);
 				}
-				g.fillRect(col/2, row/2+displayh+30, 1, 1);
+				g.fillRect(col, row+displayh+30, 2, 2);
 			}
 		}
 	}

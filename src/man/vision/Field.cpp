@@ -782,7 +782,7 @@ void Field::findFieldEdge(int pH) {
 						}
 						edgePointsTop.push_back(PointI(x, j));
 					} else {
-						if (debugRansacc) {
+						if (debugRansac) {
 							cout << "Incrementing green tops " << i << endl;
 						}
 						++ greenTops[i];

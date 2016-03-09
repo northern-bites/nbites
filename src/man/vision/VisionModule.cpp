@@ -100,6 +100,9 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         frontEnd[i]->fast(fast);
         edgeDetector[i]->fast(fast);
         hough[i]->fast(fast);
+#ifdef OFFLINE
+		ballDetector[i]->setDebugImage(debugImage[i]);
+#endif
     }
 #ifdef OFFLINE
 	// Here is an example of how to get access to the debug space. In this case the
@@ -275,7 +278,10 @@ void VisionModule::run_()
         times[i][10] = timer.end();
 
         PROF_ENTER2(P_BALL_TOP, P_BALL_BOT, i==0)
-        ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
+			//ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
+		ballDetector[i]->setImages(frontEnd[i]->whiteImage(), frontEnd[i]->greenImage(),
+							 frontEnd[i]->orangeImage(), yImage);
+		ballDetected |= ballDetector[i]->findBallWithEdges(whiteImage, *(edges[i]));
         PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
         times[i][11] = timer.end();
 
@@ -457,21 +463,21 @@ void VisionModule::outportalVisionField()
     {
         vb->set_distance(best.dist);
 
-        vb->set_radius(best.blob.firstPrincipalLength());
+        vb->set_radius(best.firstPrincipalLength);
         double bearing = atan(best.x_rel / best.y_rel);
         vb->set_bearing(bearing);
         vb->set_bearing_deg(bearing * TO_DEG);
 
-        double angle_x = (best.imgWidth/2 - best.getBlob().centerX()) /
+        double angle_x = (best.imgWidth/2 - best.centerX) /
             (best.imgWidth) * HORIZ_FOV_DEG;
-        double angle_y = (best.imgHeight/2 - best.getBlob().centerY()) /
+        double angle_y = (best.imgHeight/2 - best.centerY) /
             (best.imgHeight) * VERT_FOV_DEG;
         vb->set_angle_x_deg(angle_x);
         vb->set_angle_y_deg(angle_y);
 
         vb->set_confidence(best.confidence());
-        vb->set_x(static_cast<int>(best.blob.centerX()));
-        vb->set_y(static_cast<int>(best.blob.centerY()));
+        vb->set_x(static_cast<int>(best.centerX));
+        vb->set_y(static_cast<int>(best.centerY));
     }
 
     visionField.set_horizon_dist(field->horizonDist());
