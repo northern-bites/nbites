@@ -1,5 +1,5 @@
 ( (arms 1)
-  (vision 1)
+  (vision 0)
   (set_all_sonar 0)
   (all_left_sonar 0)
   (all_right_sonar 0)
