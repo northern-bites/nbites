@@ -1,3 +1,4 @@
+
 #include "BallDetector.h"
 
 #include <algorithm>
@@ -26,6 +27,69 @@ namespace vision {
 		debugDraw =  *di;
 	}
 
+    bool BallDetector::bottomCameraCheck(int left, int right, int top, int bottom)
+    {
+        int BOTTOM_MIN = 20;
+        int BUFFER = 3;
+
+        int ballWidth = right - left;
+        int ballHeight = bottom - top;
+        if (ballWidth < BOTTOM_MIN && left > BUFFER && right < width - BUFFER) {
+            if (debugBall) {
+                std::cout << "Width too small " << ballWidth << std::endl;
+            }
+            return false;
+        }
+        if (ballHeight < BOTTOM_MIN && top > BUFFER) {
+            if (debugBall) {
+                std::cout << "Height too small " << ballHeight << std::endl;
+            }
+            return false;
+        }
+    }
+
+    bool BallDetector::topCameraCheck(int left, int right, int top, int bottom)
+    {
+        int TOP_MIN = 10;
+        int BUFFER = 3;
+        int farHorizon = 100;
+        int farDim = 20;
+        int midHorizon = 180;
+        int midDim = 30;
+
+        int ballWidth = right - left;
+        int ballHeight = bottom - top;
+        int minDim = min(ballWidth, ballHeight);
+        if (ballWidth < TOP_MIN && left > BUFFER && right < width - BUFFER) {
+            if (debugBall) {
+                std::cout << "Width too small " << ballWidth << std::endl;
+            }
+            return false;
+        }
+        if (ballHeight < TOP_MIN && top > BUFFER) {
+            if (debugBall) {
+                std::cout << "Height too small " << ballHeight << std::endl;
+            }
+            return false;
+        }
+        if (bottom < farHorizon) {
+            if (ballWidth > farDim || ballHeight > farDim) {
+                if (debugBall) {
+                    std::cout << "Dangerous far ball with large dimension " <<
+                        ballWidth << " " << ballHeight << std::endl;
+                }
+                return false;
+            }
+        } else if (bottom < midHorizon) {
+            if (minDim > midDim) {
+                if (debugBall) {
+                    std::cout << "Dangerous mid ball with large dimensions " <<
+                        ballWidth << " " << ballHeight << std::endl;
+                }
+                return false;
+            }
+        }
+    }
 
 	bool BallDetector::findBallWithEdges(ImageLiteU8 white, EdgeList& edges)
 	{
@@ -40,6 +104,7 @@ namespace vision {
 		}
 		// Get edges from vision
 		AngleBinsIterator<Edge> abi(edges);
+        int yMax = 0;
 		for (Edge* e = *abi; e; e = *++abi){
 			// If we are part of a hough line, we are not a ball edge
 			if (e->memberOf()) { continue; }
@@ -51,23 +116,27 @@ namespace vision {
 			// if we're off the field we aren't a ball
 			if (topCamera && y < field->blockHorizonAt(x)) { continue; }
 			// we're only going to look at downward angles
-			if (ang < 128) { continue; }
+			if ((ang < 128 && topCamera) || (ang > 128 && !topCamera)) { continue; }
 			//int mag = e->mag();      // magnitude - could be useful later?
 			getColor(x, y+1);
 			int others = 0;
 			int total = 0;
 			int whites = 0;
 			int i;
-			int yMax = 0;
+			yMax = 0;
 			int yMin = 500;
 			getColor(x, y);
 			int previousY = *(yImage.pixelAddr(currentX, currentY)) / 4;
 			int previous2 = previousY;
 			int firstBreak = -1; // track the first place we saw a big Y change
 			// scan down from the edge until we hit green
-			for (i = y+2; i < height && !isGreen(); i++) {
+            int direction = 1;
+            if (!topCamera) {
+                direction = -1;
+            }
+			for (i = y+(2*direction); i < height && i > 0 && !isGreen(); i+=direction) {
 				getColor(x, i);
-				if (isGreen()) {
+				if (isGreen() && !isOrange()) {
 					break;
 				}
 				// we're going to track the biggest and smallest Y values we've seen
@@ -79,10 +148,17 @@ namespace vision {
 						firstBreak = i;
 					}
 				}
+                int yThresh = 35;
+                if (yMax > 160) {
+                    yThresh = 60;
+                }
+                if (yValue < yMax - yThresh) {
+                    //debugDraw.drawDot(x, i, RED);
+                }
 				previous2 = previousY;
 				previousY = yValue;
 				total++;
-				if (!isWhite() || isOrange()) {
+				if (!isWhite() || isOrange() || yValue < yMax - yThresh) {
 					others++;
 				}
 				if (isWhite()) {
@@ -102,22 +178,28 @@ namespace vision {
 					(others > (total / 5) && total > 10 && total < 50 && whites > 5 && yMin < 100)) {
 					//std::cout << "Spread is " << yMin << " " << yMax << std::endl;
 					//debugDraw.drawPoint(x, y, BLUE);
-					if (testForBall(x, y, i)) {
+					if (testForBall(x, y, i, yMax)) {
+                        debugDraw.drawPoint(x, y, RED);
 						return true;
-					}
+					} else {
+                        debugDraw.drawPoint(x, y, BLACK);
+                    }
 				} else if (total > 10) {
-					debugDraw.drawPoint(x, i, ORANGE);
-					std::cout << "Missed " << others << " " << whites << " " << yMin << std::endl;
-					if (yMin < 100 && whites > 5) {
-						if (testForBall(x, y, i)) {
+					//std::cout << "Missed " << others << " " << whites << " " << yMin << std::endl;
+					/*if (yMin < 100 && whites > 5) {
+						if (testForBall(x, y, i, yMax)) {
+                            debugDraw.drawPoint(x, y, GREEN);
 							return true;
 						}
-					}
+                        else {
+                            debugDraw.drawPoint(x, y, BLUE);
+                        }
+                        }*/
 				} else {
 					if (ang > 192) {
-						debugDraw.drawPoint(x, y, BLACK);
+						//debugDraw.drawPoint(x, y, BLACK);
 					} else {
-						debugDraw.drawPoint(x, y, BLUE);
+						//debugDraw.drawPoint(x, y, BLUE);
 					}
 				}
 			}
@@ -126,7 +208,12 @@ namespace vision {
 		return false;
 	}
 
-	bool BallDetector::testForBall(int x, int top, int bottom) {
+    bool BallDetector::testForBall(int x, int top, int bottom, int yMax) {
+        if (top > bottom) {
+            int swap = top;
+            top = bottom;
+            bottom = swap;
+        }
 		int mid = (bottom + top) / 2;
 		getColor(x, mid);
 		int right = x;
@@ -175,7 +262,23 @@ namespace vision {
 			}
 			return false;
 		}
+        if (!topCamera) {
+            if (!bottomCameraCheck(left, right, top, bottom)) {
+                if (debugBall) {
+                    std::cout << "Too small for bottom camera ball " << std::endl;
+                }
+                return false;
+            }
+        } else if (!topCameraCheck(left, right, top, bottom)) {
+            return false;
+        }
 		mid = (bottom + top) / 2;
+        if (topCamera && mid < field->horizonAt(midX)) {
+            debugDraw.drawPoint(midX, mid, BLUE);
+            std::cout << "Mid point off field" << std::endl;
+            return false;
+        }
+
 		// now scan the diagonals
 		whites = 0;
 		int diaglength1 = 0;
@@ -242,17 +345,22 @@ namespace vision {
 		}
 		int firstPrincipalLength = min(bottom - top, right - left);
 		int maxLength = max(bottom - top, right - left);
-		if (firstPrincipalLength > 65 || (firstPrincipalLength > 35 && !topCamera)) {
+		if (firstPrincipalLength > 55 || (firstPrincipalLength > 35 && !topCamera)) {
 			return false;
 		}
-		if (diaglength1 > 2 * firstPrincipalLength || diaglength2 > 2 * firstPrincipalLength) {
+        if (firstPrincipalLength < 10 ||
+            (firstPrincipalLength < 25 && bottom > 100 && bottom < height- 5)) {
+            return false;
+        }
+		/*if (diaglength1 > 2 * firstPrincipalLength || diaglength2 > 2 * firstPrincipalLength) {
 			// probably a line, just make sure everything else is fine
 			if (maxLength > 1.5 * firstPrincipalLength) {
 				std::cout << "two things too long " << maxLength << " " << firstPrincipalLength <<
-					std::endl;
+					" " << midX << " " << mid << std::endl;
+                debugDraw.drawDot(midX, mid, BLUE);
 				return false;
 			}
-		}
+            }*/
 		// check a square inside the ball, there ought to be black in there
 		int offset = (right - left) / 4;
 		int offsetY = (bottom - top) / 4;
@@ -267,7 +375,12 @@ namespace vision {
 			for (int j = -offsetY; j <= offsetY; j++) {
 				getColor(i + midX, j + mid);
 				// this needs to be replaced by a true black test
-				if (!isWhite() && !isGreen()) {
+				int yValue = *(yImage.pixelAddr(i + midX, j + mid)) / 4;
+                int yThresh = 35;
+                if (yMax > 160) {
+                    yThresh = 55;
+                }
+				if (!isWhite() && !isGreen() || (yValue < yMax - yThresh && yValue < 110)) {
 					debugDraw.drawDot(i + midX, j + mid, RED);
 					blacks++;
 				}
@@ -276,13 +389,22 @@ namespace vision {
 				}
 			}
 		}
-		if ((blacks < 2 && offset > 4) || greens > 3) {
+		if ((blacks < offset + offsetY && offset > 3) || greens > 3 || blacks == 0) {
 			if (debugBall) {
-				std::cout << "Too white or too green" << std::endl;
+                debugDraw.drawBox(midX - offset, midX + offset, mid + offsetY, mid - offsetY, BLUE);
+				std::cout << "Too white or too green " << blacks << " " << greens << std::endl;
 			}
 			return false;
 		}
+        if (blacks > (offset * offsetY)) {
+			if (debugBall) {
+                debugDraw.drawBox(midX - offset, midX + offset, mid + offsetY, mid - offsetY, BLUE);
+				std::cout << "Too much black " << blacks << " " << (offset * offsetY) << std::endl;
+			}
+            return false;
+        }
 		if (debugBall) {
+            debugDraw.drawBox(midX - offset, midX + offset, mid + offsetY, mid - offsetY, BLACK);
 			debugDraw.drawLine(left, mid, right, mid, BLACK);
 			debugDraw.drawLine(midX, top, midX, bottom, BLACK);
 			std::cout << "Ball at " << midX << " " << mid << " width " <<

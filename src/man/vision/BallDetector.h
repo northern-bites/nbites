@@ -80,7 +80,9 @@ namespace man {
 			void setDebugImage(DebugImage * di);
 			bool findBallWithEdges(ImageLiteU8 white, EdgeList& edges);
 			bool findBall(ImageLiteU8 orange, double cameraHeight);
-			bool testForBall(int x, int top, int bottom);
+			bool testForBall(int x, int top, int bottom, int yMax);
+            bool bottomCameraCheck(int left, int right, int top, int bottom);
+            bool topCameraCheck(int left, int right, int top, int bottom);
 			bool preScreen(int centerX, int centerY, int principalLength,
 						   int principalLength2,
 						   bool & occludedSide, bool & occludedTop,

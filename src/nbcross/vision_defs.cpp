@@ -265,11 +265,12 @@ int Vision_func() {
     //-------------------
     Log* colorSegRet = new Log();
     int colorSegLength = (width / 4) * (height / 2);
-
     // Create temp buffer and fill with segmented image
     uint8_t segBuf[colorSegLength];
-    memcpy(segBuf, frontEnd->colorImage().pixelAddr(), colorSegLength);
+    std::cout << "Segmented2 image" << std::endl;
+    //memcpy(segBuf, frontEnd->colorImage().pixelAddr(), colorSegLength);
 
+    std::cout << "Segment3 image" << std::endl;
     // Convert to string and set log
     std::string segBuffer((const char*)segBuf, colorSegLength);
     colorSegRet->setData(segBuffer);
@@ -306,6 +307,7 @@ int Vision_func() {
     //-------------------
     //  LINES
     //-------------------
+    std::cout << "line image" << std::endl;
     man::vision::HoughLineList* lineList = module.getHoughLines(topCamera);
 
     Log* lineRet = new Log();
@@ -403,6 +405,7 @@ int Vision_func() {
 
     lineRet->setData(lineBuf);
     rets.push_back(lineRet);
+	std::cout << "Debug ball" << std::endl;
 
     //-----------
     //  BALL
