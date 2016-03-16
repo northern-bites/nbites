@@ -53,7 +53,7 @@ namespace vision {
         int TOP_MIN = 10;
         int BUFFER = 3;
         int farHorizon = 100;
-        int farDim = 20;
+        int farDim = 25;
         int midHorizon = 180;
         int midDim = 30;
 
@@ -97,6 +97,59 @@ namespace vision {
 		_best = reset;
 		width = white.width();
 		height = white.height();
+
+        blobber.run(orangeImage.pixelAddr(), orangeImage.width(), orangeImage.height(),
+                    orangeImage.pitch());
+
+        std::vector<std::pair<int,int>> blackBlobs;
+        for (auto i =blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
+            int centerX = static_cast<int>((*i).centerX());
+			int centerY = static_cast<int>((*i).centerY());
+			int principalLength = static_cast<int>((*i).firstPrincipalLength());
+			int principalLength2 = static_cast<int>((*i).secondPrincipalLength());
+			double bIX = ((*i).centerX() - width/2);
+			double bIY = (height / 2 - (*i).centerY()) -
+				(*i).firstPrincipalLength();
+            int minSecond = 0;
+            if (!topCamera) {
+                minSecond = 1;
+            }
+            if (principalLength < 8 && principalLength2 > minSecond &&
+                centerY > field->horizonAt(centerX)) {
+                blackBlobs.push_back(std::make_pair(centerX, centerY));
+                debugDraw.drawPoint(centerX, centerY, BLUE);
+                std::cout << "Black blob " << centerX << " " << centerY <<
+                    " " << principalLength << " " << principalLength2 << std::endl;
+            }
+        }
+        // loop through the filtered blobs and see if any are close together
+        int correlations[blackBlobs.size()];
+        int count = 0;
+        for (std::pair<int,int> p : blackBlobs) {
+            correlations[count] = 0;
+            std::pair<int,int> pair1;
+            for (std::pair<int,int> q : blackBlobs) {
+                int xdiff = abs(p.first - q.first);
+                int ydiff = abs(p.second - q.second);
+                if (xdiff < 30 && ydiff < 30 && (xdiff > 0 || ydiff > 0)) {
+                    std::cout << "Cluster " << p.first << " " << p.second <<
+                        " " << q.first << " " << q.second << std::endl;
+                    correlations[count] += 1;
+                    if (correlations[count] > 1) {
+                        debugDraw.drawPoint(p.first, p.second, ORANGE);
+                        int midx = (pair1.first + q.first + p.first) / 3;
+                        int midy = (pair1.second + q.second + p.second) / 3;
+                        debugDraw.drawPoint(midx, midy, RED);
+                    } else {
+                        pair1 = q;
+                    }
+                    if (correlations[count] > 2) {
+                        debugDraw.drawPoint(p.first, p.second, GREEN);
+                    }
+                }
+            }
+            count++;
+        }
 
 		int edgeList[width];
 		for (int i = 0; i < width; i++) {
@@ -380,27 +433,21 @@ namespace vision {
                 if (yMax > 160) {
                     yThresh = 55;
                 }
-				if (!isWhite() && !isGreen() || (yValue < yMax - yThresh && yValue < 110)) {
+				if (isOrange()) {
 					debugDraw.drawDot(i + midX, j + mid, RED);
 					blacks++;
 				}
-				if (isGreen()) {
+				if (isGreen() && !isOrange()) {
 					greens++;
 				}
 			}
 		}
-		if ((blacks < offset + offsetY && offset > 3) || greens > 3 || blacks == 0) {
-			if (debugBall) {
+        float blackPercentage = (float)blacks / ((float)offset * (float)offsetY * 4.0);
+        if (blackPercentage < 0.10 || blackPercentage > 0.30) {
+            if (debugBall) {
                 debugDraw.drawBox(midX - offset, midX + offset, mid + offsetY, mid - offsetY, BLUE);
-				std::cout << "Too white or too green " << blacks << " " << greens << std::endl;
-			}
-			return false;
-		}
-        if (blacks > (offset * offsetY)) {
-			if (debugBall) {
-                debugDraw.drawBox(midX - offset, midX + offset, mid + offsetY, mid - offsetY, BLUE);
-				std::cout << "Too much black " << blacks << " " << (offset * offsetY) << std::endl;
-			}
+				std::cout << "Black percentage is off " << blackPercentage << std::endl;
+            }
             return false;
         }
 		if (debugBall) {
@@ -410,6 +457,8 @@ namespace vision {
 			std::cout << "Ball at " << midX << " " << mid << " width " <<
 				(right - left) << " height " << (bottom - top) << std::endl;
 			std::cout << diaglength1 << " " << diaglength2 << " " << blacks << std::endl;
+            std::cout << "Offset size: " << offset << " " << offsetY << " " <<
+                ((float)blacks / ((float)offset * (float)offsetY * 4.0)) << std::endl;
 		}
 		int centerX = midX;
 		int centerY = mid;
