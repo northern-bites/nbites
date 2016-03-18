@@ -326,7 +326,7 @@ public:
 
   ~EdgeDetector()
   {
-    delete[] gradMem;
+      //delete[] gradMem;
     delete[] runs;
   }
 

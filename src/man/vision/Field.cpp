@@ -56,7 +56,7 @@ namespace vision {
 		debugDrawFieldEdge = false;
 		debugHorizon = false;
 		drawCameraHorizon = false;
-		debugRansac = true;
+		debugRansac = false;
 #endif
 	}
 

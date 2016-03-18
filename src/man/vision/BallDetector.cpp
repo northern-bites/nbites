@@ -13,12 +13,15 @@ namespace vision {
 	BallDetector::BallDetector(FieldHomography* homography_,
 							   Field* field_, bool topCamera_):
 		blobber(),
+        blobber2(),
 		homography(homography_),
 		field(field_),
 		topCamera(topCamera_)
 	{
 		blobber.secondThreshold(115);
 		blobber.minWeight(4);
+		blobber2.secondThreshold(115);
+		blobber2.minWeight(4);
 	}
 
 	BallDetector::~BallDetector() { }
@@ -91,12 +94,17 @@ namespace vision {
         }
     }
 
-	bool BallDetector::findBallWithEdges(ImageLiteU8 white, EdgeList& edges)
+    bool BallDetector::findBallWithEdges(ImageLiteU8 white, EdgeList& edges,
+                                         double cameraHeight)
 	{
 		Ball reset;
 		_best = reset;
 		width = white.width();
 		height = white.height();
+
+#ifdef OFFLINE
+        candidates.clear();
+#endif
 
         blobber.run(orangeImage.pixelAddr(), orangeImage.width(), orangeImage.height(),
                     orangeImage.pitch());
@@ -107,375 +115,171 @@ namespace vision {
 			int centerY = static_cast<int>((*i).centerY());
 			int principalLength = static_cast<int>((*i).firstPrincipalLength());
 			int principalLength2 = static_cast<int>((*i).secondPrincipalLength());
-			double bIX = ((*i).centerX() - width/2);
-			double bIY = (height / 2 - (*i).centerY()) -
-				(*i).firstPrincipalLength();
-            int minSecond = 0;
+            int minSecond = 1;
             if (!topCamera) {
                 minSecond = 1;
             }
-            if (principalLength < 8 && principalLength2 > minSecond &&
-                centerY > field->horizonAt(centerX)) {
+            if (principalLength < 8 && principalLength2 >= minSecond &&
+                (*i).area() > 10.0 &&
+                (centerY > field->horizonAt(centerX) || !topCamera)) {
                 blackBlobs.push_back(std::make_pair(centerX, centerY));
-                debugDraw.drawPoint(centerX, centerY, BLUE);
-                std::cout << "Black blob " << centerX << " " << centerY <<
-                    " " << principalLength << " " << principalLength2 << std::endl;
+                if (debugBall) {
+                    debugDraw.drawPoint(centerX, centerY, BLUE);
+                    std::cout << "Black blob " << centerX << " " << centerY <<
+                        " " << principalLength << " " << principalLength2;
+                    std::cout << " Area " << (*i).area() << " " <<
+                        (*i).rmsError() << std::endl;
+                }
             }
         }
+
+        blobber2.run(white.pixelAddr(), white.width(), white.height(), white.pitch());
+        std::vector<std::pair<int,int>> whiteBlobs;
+        for (auto i =blobber2.blobs.begin(); i!=blobber2.blobs.end(); i++) {
+            int centerX = static_cast<int>((*i).centerX());
+			int centerY = static_cast<int>((*i).centerY());
+			int principalLength = static_cast<int>((*i).firstPrincipalLength());
+			int principalLength2 = static_cast<int>((*i).secondPrincipalLength());
+			double bIX = ((*i).centerX() - width/2);
+			double bIY = (height / 2 - (*i).centerY()) -
+				(*i).firstPrincipalLength();
+            double x_rel, y_rel;
+            bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
+            int minSecond = 3;
+            if (!topCamera) {
+                minSecond = 3;
+            }
+            if (principalLength < 40 && principalLength2 >= minSecond &&
+                principalLength < principalLength2 * 2 &&
+                (*i).area() > 10.0 &&
+                (centerY > field->horizonAt(centerX) || !topCamera)) {
+                whiteBlobs.push_back(std::make_pair(centerX, centerY));
+                if (debugBall) {
+                    debugDraw.drawPoint(centerX, centerY, BLUE);
+                    std::cout << "White blob " << centerX << " " << centerY <<
+                        " " << principalLength << " " << principalLength2;
+                }
+                int count = 0;
+                for (auto i =blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
+                    for (std::pair<int,int> p : blackBlobs) {
+                        if (abs(p.first - centerX) < principalLength &&
+                            abs(p.second - centerY) < principalLength) {
+                            count++;
+                        }
+                    }
+                }
+                if (count > 2) {
+                    if (debugBall) {
+                        std::cout << "Found a ball! " << height << " " <<
+                            width << std::endl;
+                    }
+                    Ball b((*i), x_rel, -1 * y_rel, cameraHeight, height,
+                           width, topCamera, false, false, false);
+                    b._confidence = 0.9;
+
+#ifdef OFFLINE
+                    candidates.push_back(b);
+#endif
+                    _best = b;
+                    return true;
+                }
+            }
+        }
+
         // loop through the filtered blobs and see if any are close together
         int correlations[blackBlobs.size()];
         int count = 0;
+        int closeness = 30;
+        if (!topCamera) {
+            closeness = 20;
+        }
         for (std::pair<int,int> p : blackBlobs) {
             correlations[count] = 0;
             std::pair<int,int> pair1;
             for (std::pair<int,int> q : blackBlobs) {
                 int xdiff = abs(p.first - q.first);
                 int ydiff = abs(p.second - q.second);
-                if (xdiff < 30 && ydiff < 30 && (xdiff > 0 || ydiff > 0)) {
-                    std::cout << "Cluster " << p.first << " " << p.second <<
-                        " " << q.first << " " << q.second << std::endl;
+                if (xdiff < closeness && ydiff < closeness &&
+                    (xdiff > 0 || ydiff > 0)) {
+                    // could be correlated, watch out for shadows, robot parts, etc.
                     correlations[count] += 1;
                     if (correlations[count] > 1) {
-                        debugDraw.drawPoint(p.first, p.second, ORANGE);
-                        int midx = (pair1.first + q.first + p.first) / 3;
-                        int midy = (pair1.second + q.second + p.second) / 3;
-                        debugDraw.drawPoint(midx, midy, RED);
+                        if (debugBall) {
+                            int midx = (pair1.first + q.first + p.first) / 3;
+                            int midy = (pair1.second + q.second + p.second) / 3;
+                            debugDraw.drawPoint(p.first, p.second, ORANGE);
+                            debugDraw.drawPoint(midx, midy, RED);
+                        }
                     } else {
                         pair1 = q;
                     }
                     if (correlations[count] > 2) {
-                        debugDraw.drawPoint(p.first, p.second, GREEN);
+                        if (debugBall) {
+                            debugDraw.drawPoint(p.first, p.second, GREEN);
+                        }
+                        int centerX = p.first;
+                        int centerY = p.second;
+                        int principalLength = 10;
+                        int principalLength2 = 10;
+                        double bIX = centerX - width/2;
+                        double bIY = (height/2 - centerY) - principalLength;
+                        double x_rel, y_rel;
+                        bool belowHoriz = homography->fieldCoords(bIX, bIY,
+                                                                  x_rel, y_rel);
+                        for (auto i =blobber.blobs.begin();
+                             i!=blobber.blobs.end(); i++) {
+                            int cX = static_cast<int>((*i).centerX());
+                            int cY = static_cast<int>((*i).centerY());
+                            if (cX == p.first && cY == p.second) {
+                                Ball b((*i), x_rel, -1 * y_rel, cameraHeight, height,
+                                       width, topCamera, false, false, false);
+                                b._confidence = 0.9;
+#ifdef OFFLINE
+                                candidates.push_back(b);
+#endif
+                                _best = b;
+                                return true;
+                            }
+                        }
                     }
                 }
             }
             count++;
         }
-
-		int edgeList[width];
-		for (int i = 0; i < width; i++) {
-			edgeList[i] = 0;
-		}
-		// Get edges from vision
-		AngleBinsIterator<Edge> abi(edges);
-        int yMax = 0;
-		for (Edge* e = *abi; e; e = *++abi){
-			// If we are part of a hough line, we are not a ball edge
-			if (e->memberOf()) { continue; }
-
-			int x = e->x() + width / 2;
-			int y = height / 2 - e->y();
-			int ang = e->angle();
-			edgeList[x] += 1;
-			// if we're off the field we aren't a ball
-			if (topCamera && y < field->blockHorizonAt(x)) { continue; }
-			// we're only going to look at downward angles
-			if ((ang < 128 && topCamera) || (ang > 128 && !topCamera)) { continue; }
-			//int mag = e->mag();      // magnitude - could be useful later?
-			getColor(x, y+1);
-			int others = 0;
-			int total = 0;
-			int whites = 0;
-			int i;
-			yMax = 0;
-			int yMin = 500;
-			getColor(x, y);
-			int previousY = *(yImage.pixelAddr(currentX, currentY)) / 4;
-			int previous2 = previousY;
-			int firstBreak = -1; // track the first place we saw a big Y change
-			// scan down from the edge until we hit green
-            int direction = 1;
-            if (!topCamera) {
-                direction = -1;
-            }
-			for (i = y+(2*direction); i < height && i > 0 && !isGreen(); i+=direction) {
-				getColor(x, i);
-				if (isGreen() && !isOrange()) {
-					break;
-				}
-				// we're going to track the biggest and smallest Y values we've seen
-				int yValue = *(yImage.pixelAddr(currentX, currentY)) / 4;
-				yMin = min(yValue, yMin);
-				yMax = max(yValue, yMax);
-				if (previous2 - yValue > 100) {
-					if (firstBreak == -1) {
-						firstBreak = i;
-					}
-				}
-                int yThresh = 35;
-                if (yMax > 160) {
-                    yThresh = 60;
-                }
-                if (yValue < yMax - yThresh) {
-                    //debugDraw.drawDot(x, i, RED);
-                }
-				previous2 = previousY;
-				previousY = yValue;
-				total++;
-				if (!isWhite() || isOrange() || yValue < yMax - yThresh) {
-					others++;
-				}
-				if (isWhite()) {
-					whites++;
-				}
-			}
-			if (firstBreak != -1 && i - firstBreak < 3) {
-				firstBreak = -1;
-			} else if (firstBreak != -1) {
-				//debugDraw.drawPoint(x, firstBreak, RED);
-			}
-
-			if (debugBall) {
-				// if various things are true, then do more checking
-				// saw some black, some some white, saw a range of Y
-				if (firstBreak != -1 ||
-					(others > (total / 5) && total > 10 && total < 50 && whites > 5 && yMin < 100)) {
-					//std::cout << "Spread is " << yMin << " " << yMax << std::endl;
-					//debugDraw.drawPoint(x, y, BLUE);
-					if (testForBall(x, y, i, yMax)) {
-                        debugDraw.drawPoint(x, y, RED);
-						return true;
-					} else {
-                        debugDraw.drawPoint(x, y, BLACK);
+        // TO DO: This currently finds the first good blob, it ought to find the best
+        for (int c = 0; c < count; c++) {
+            if (correlations[c] > 1) {
+                // good candidate ball
+                std::pair<int,int> p = blackBlobs[c];
+                for (auto i =blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
+                    int cX = static_cast<int>((*i).centerX());
+                    int cY = static_cast<int>((*i).centerY());
+                    if (cX == p.first && cY == p.second) {
+                        int centerX = static_cast<int>((*i).centerX());
+                        int centerY = static_cast<int>((*i).centerY());
+                        double bIX = ((*i).centerX() - width/2);
+                        double bIY = (height / 2 - (*i).centerY()) -
+                            (*i).firstPrincipalLength();
+                        double x_rel, y_rel;
+                        bool belowHoriz = homography->fieldCoords(bIX, bIY,
+                                                                  x_rel, y_rel);
+                        Ball b((*i), x_rel, -1 * y_rel, cameraHeight, height,
+                               width, topCamera, false, false, false);
+                        b._confidence = 0.9;
+#ifdef OFFLINE
+                        candidates.push_back(b);
+#endif
+                        _best = b;
+                        return true;
                     }
-				} else if (total > 10) {
-					//std::cout << "Missed " << others << " " << whites << " " << yMin << std::endl;
-					/*if (yMin < 100 && whites > 5) {
-						if (testForBall(x, y, i, yMax)) {
-                            debugDraw.drawPoint(x, y, GREEN);
-							return true;
-						}
-                        else {
-                            debugDraw.drawPoint(x, y, BLUE);
-                        }
-                        }*/
-				} else {
-					if (ang > 192) {
-						//debugDraw.drawPoint(x, y, BLACK);
-					} else {
-						//debugDraw.drawPoint(x, y, BLUE);
-					}
-				}
-			}
-		}
+                }
+            }
+        }
+
+        // TO DO: At this point go back and check for small balls and
+        // balls on the edge
 
 		return false;
-	}
-
-    bool BallDetector::testForBall(int x, int top, int bottom, int yMax) {
-        if (top > bottom) {
-            int swap = top;
-            top = bottom;
-            bottom = swap;
-        }
-		int mid = (bottom + top) / 2;
-		getColor(x, mid);
-		int right = x;
-		int whites = 0;
-		for ( ; right < width && !isGreen(); right++) {
-			getColor(right, mid);
-			if (isWhite()) {
-				whites++;
-			}
-		}
-		int left = x;
-		getColor(left, mid);
-		for ( ; left >= 0 && !isGreen(); left--) {
-			getColor(left, mid);
-			if (isWhite()) {
-				whites++;
-			}
-		}
-		if (whites < (left - right) / 3) {
-			if (debugBall) {
-				std::cout << "Not enought horizontal white " << whites << " " <<
-					(right - left) << std::endl;
-			}
-			return false;
-		}
-		int midX = (left + right) / 2;
-		whites = bottom - top - 1;
-		getColor(midX, top);
-		for ( ; top > 0 && !isGreen(); top--) {
-			getColor(midX, top);
-			if (isWhite()) {
-				whites++;
-			}
-		}
-		getColor(midX, bottom);
-		for ( ; bottom < height && !isGreen(); bottom++) {
-			getColor(midX, bottom);
-			if (isWhite()) {
-				whites++;
-			}
-		}
-		if (whites < (bottom - top) / 3) {
-			if (debugBall) {
-				std::cout << "Not enought vertical white " << whites << " " <<
-					(bottom - top) << std::endl;
-			}
-			return false;
-		}
-        if (!topCamera) {
-            if (!bottomCameraCheck(left, right, top, bottom)) {
-                if (debugBall) {
-                    std::cout << "Too small for bottom camera ball " << std::endl;
-                }
-                return false;
-            }
-        } else if (!topCameraCheck(left, right, top, bottom)) {
-            return false;
-        }
-		mid = (bottom + top) / 2;
-        if (topCamera && mid < field->horizonAt(midX)) {
-            debugDraw.drawPoint(midX, mid, BLUE);
-            std::cout << "Mid point off field" << std::endl;
-            return false;
-        }
-
-		// now scan the diagonals
-		whites = 0;
-		int diaglength1 = 0;
-		getColor(midX, mid);
-		for (int i = 0; !isGreen(); i++) {
-			if (midX + i > width || mid + i > height) {
-				break;
-			}
-			getColor(midX + i, mid + i);
-			if (isWhite()) {
-				whites++;
-			}
-			diaglength1++;
-		}
-		getColor(midX, mid);
-		for (int i = 0; !isGreen(); i++) {
-			if (midX - i < 0 || mid - i < 0) {
-				break;
-			}
-			getColor(midX - i, mid - i);
-			if (isWhite()) {
-				whites++;
-			}
-			diaglength1++;
-		}
-		if (whites < min(right - left, bottom - top) / 3) {
-			if (debugBall) {
-				std::cout << "Not enought diagonal white " << whites << " " <<
-					(bottom - top) << std::endl;
-			}
-			return false;
-		}
-		// now scan the diagonals
-		whites = 0;
-		int diaglength2 = 0;
-		getColor(midX, mid);
-		for (int i = 0; !isGreen(); i++) {
-			if (midX + i > width || mid - i < 0) {
-				break;
-			}
-			getColor(midX + i, mid - i);
-			if (isWhite()) {
-				whites++;
-			}
-			diaglength2++;
-		}
-		getColor(midX, mid);
-		for (int i = 0; !isGreen(); i++) {
-			if (midX - i < 0 || mid + i > height) {
-				break;
-			}
-			getColor(midX - i, mid + i);
-			if (isWhite()) {
-				whites++;
-			}
-			diaglength2++;
-		}
-		if (whites < min(right - left, bottom - top) / 3) {
-			if (debugBall) {
-				std::cout << "Not enought left diagonal white " << whites << " " <<
-					(bottom - top) << std::endl;
-			}
-			return false;
-		}
-		int firstPrincipalLength = min(bottom - top, right - left);
-		int maxLength = max(bottom - top, right - left);
-		if (firstPrincipalLength > 55 || (firstPrincipalLength > 35 && !topCamera)) {
-			return false;
-		}
-        if (firstPrincipalLength < 10 ||
-            (firstPrincipalLength < 25 && bottom > 100 && bottom < height- 5)) {
-            return false;
-        }
-		/*if (diaglength1 > 2 * firstPrincipalLength || diaglength2 > 2 * firstPrincipalLength) {
-			// probably a line, just make sure everything else is fine
-			if (maxLength > 1.5 * firstPrincipalLength) {
-				std::cout << "two things too long " << maxLength << " " << firstPrincipalLength <<
-					" " << midX << " " << mid << std::endl;
-                debugDraw.drawDot(midX, mid, BLUE);
-				return false;
-			}
-            }*/
-		// check a square inside the ball, there ought to be black in there
-		int offset = (right - left) / 4;
-		int offsetY = (bottom - top) / 4;
-		if (offset > 2 * offsetY) {
-			offset = offsetY;
-		} else if (offsetY > 2 * offset) {
-			offsetY = offset;
-		}
-		int blacks = 0;
-		int greens = 0;
-		for (int i = -offset; i <= offset; i++) {
-			for (int j = -offsetY; j <= offsetY; j++) {
-				getColor(i + midX, j + mid);
-				// this needs to be replaced by a true black test
-				int yValue = *(yImage.pixelAddr(i + midX, j + mid)) / 4;
-                int yThresh = 35;
-                if (yMax > 160) {
-                    yThresh = 55;
-                }
-				if (isOrange()) {
-					debugDraw.drawDot(i + midX, j + mid, RED);
-					blacks++;
-				}
-				if (isGreen() && !isOrange()) {
-					greens++;
-				}
-			}
-		}
-        float blackPercentage = (float)blacks / ((float)offset * (float)offsetY * 4.0);
-        if (blackPercentage < 0.10 || blackPercentage > 0.30) {
-            if (debugBall) {
-                debugDraw.drawBox(midX - offset, midX + offset, mid + offsetY, mid - offsetY, BLUE);
-				std::cout << "Black percentage is off " << blackPercentage << std::endl;
-            }
-            return false;
-        }
-		if (debugBall) {
-            debugDraw.drawBox(midX - offset, midX + offset, mid + offsetY, mid - offsetY, BLACK);
-			debugDraw.drawLine(left, mid, right, mid, BLACK);
-			debugDraw.drawLine(midX, top, midX, bottom, BLACK);
-			std::cout << "Ball at " << midX << " " << mid << " width " <<
-				(right - left) << " height " << (bottom - top) << std::endl;
-			std::cout << diaglength1 << " " << diaglength2 << " " << blacks << std::endl;
-            std::cout << "Offset size: " << offset << " " << offsetY << " " <<
-                ((float)blacks / ((float)offset * (float)offsetY * 4.0)) << std::endl;
-		}
-		int centerX = midX;
-		int centerY = mid;
-		double x_rel, y_rel;
-
-		double bIX = (centerX - width/2);
-		double bIY = (height / 2 - centerY) - firstPrincipalLength;
-
-		Ball b(x_rel, -1 * y_rel, 0, height,
-			   width, topCamera, false, false,
-			   false);
-		b.centerX = centerX;
-		b.centerY = centerY;
-		b.firstPrincipalLength = firstPrincipalLength;
-		b._confidence = 0.9;
-		_best = b;
-		return true;
 	}
 
 	void BallDetector::getColor(int x, int y) {
@@ -554,7 +358,7 @@ namespace vision {
 				continue;
 			}
 
-			Ball b(x_rel, -1 * y_rel, cameraHeight, height,
+			Ball b((*i), x_rel, -1 * y_rel, cameraHeight, height,
 				   width, topCamera, occludedSide, occludedTop,
 				   occludedBottom);
 
@@ -651,8 +455,9 @@ namespace vision {
 		return false;
 	}
 
-	Ball::Ball(double x_, double y_, double cameraH_, int imgHeight_,
+    Ball::Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_,
 			   int imgWidth_, bool top, bool os, bool ot, bool ob) :
+        blob(b),
 		radThresh(.3, .7),
 		thresh(.5, .8),
 		x_rel(x_),
@@ -675,6 +480,7 @@ namespace vision {
 	}
 
 	Ball::Ball() :
+        blob(0),
 		thresh(0, 0),
 		radThresh(0, 0),
 		_confidence(0),
@@ -684,9 +490,9 @@ namespace vision {
 	void Ball::compute()
 	{
 		dist = hypot(x_rel, y_rel);
-		double density = 1.0; //blob.area() / blob.count();
-		double aspectRatio = 1.0; //(blob.secondPrincipalLength() /
-		//blob.firstPrincipalLength());
+		double density = blob.area() / blob.count();
+		double aspectRatio = (blob.secondPrincipalLength() /
+                              blob.firstPrincipalLength());
 
 		double hypotDist = hypot(dist, cameraH);
 

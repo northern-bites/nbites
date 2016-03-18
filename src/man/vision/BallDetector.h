@@ -15,7 +15,7 @@
 namespace man {
 	namespace vision {
 
-		const double BALL_RADIUS = 3.25;
+        const double BALL_RADIUS = 5.25; //3.25;
 		const double VERT_FOV_DEG = 47.64;
 		const double VERT_FOV_RAD = VERT_FOV_DEG * M_PI / 180;
 		const double HORIZ_FOV_DEG = 60.97;
@@ -32,7 +32,7 @@ namespace man {
 
 		class Ball {
 		public:
-			Ball(double x_, double y_, double cameraH_, int imgHeight_,
+			Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_,
 				 int imgWidth_, bool top, bool os, bool ot, bool ob);
 			Ball();
 
@@ -41,11 +41,13 @@ namespace man {
 			double confidence() const { return _confidence; }
 
 			// For tool
+            Blob& getBlob() { return blob; }
 //private: should be private. leaving public for now
 			void compute();
 
 			double pixDiameterFromDist(double d) const;
 
+            Blob blob;
 			FuzzyThr thresh;
 			FuzzyThr radThresh;
 
@@ -78,7 +80,7 @@ namespace man {
 			~BallDetector();
 
 			void setDebugImage(DebugImage * di);
-			bool findBallWithEdges(ImageLiteU8 white, EdgeList& edges);
+			bool findBallWithEdges(ImageLiteU8 white, EdgeList& edges, double cameraHeight);
 			bool findBall(ImageLiteU8 orange, double cameraHeight);
 			bool testForBall(int x, int top, int bottom, int yMax);
             bool bottomCameraCheck(int left, int right, int top, int bottom);
@@ -105,6 +107,7 @@ namespace man {
 #endif
 		private:
 			Connectivity blobber;
+            Connectivity blobber2;
 			FieldHomography* homography;
 			Field* field;
 			bool topCamera;

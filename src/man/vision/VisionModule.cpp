@@ -281,7 +281,8 @@ void VisionModule::run_()
 			//ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
 		ballDetector[i]->setImages(frontEnd[i]->whiteImage(), frontEnd[i]->greenImage(),
 							 frontEnd[i]->orangeImage(), yImage);
-		ballDetected |= ballDetector[i]->findBallWithEdges(whiteImage, *(edges[i]));
+		ballDetected |= ballDetector[i]->findBallWithEdges(whiteImage, *(edges[i]),
+                                                           kinematics[i]->wz0());
         PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
         times[i][11] = timer.end();
 
@@ -478,6 +479,7 @@ void VisionModule::outportalVisionField()
         vb->set_confidence(best.confidence());
         vb->set_x(static_cast<int>(best.centerX));
         vb->set_y(static_cast<int>(best.centerY));
+
     }
 
     visionField.set_horizon_dist(field->horizonDist());
@@ -533,7 +535,7 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
 
 #ifdef OFFLINE
 	void VisionModule::setDebugDrawingParameters(nblog::SExpr* params) {
-		std::cout << "In debug drawing parameters" << params->print() << std::endl;
+		//std::cout << "In debug drawing parameters" << params->print() << std::endl;
 		int cameraHorizon = params->get(1)->find("CameraHorizon")->get(1)->valueAsInt();
 		int fieldHorizon = params->get(1)->find("FieldHorizon")->get(1)->valueAsInt();
 		int debugHorizon = params->get(1)->find("DebugHorizon")->get(1)->valueAsInt();

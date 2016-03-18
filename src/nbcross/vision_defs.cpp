@@ -267,10 +267,8 @@ int Vision_func() {
     int colorSegLength = (width / 4) * (height / 2);
     // Create temp buffer and fill with segmented image
     uint8_t segBuf[colorSegLength];
-    std::cout << "Segmented2 image" << std::endl;
     //memcpy(segBuf, frontEnd->colorImage().pixelAddr(), colorSegLength);
 
-    std::cout << "Segment3 image" << std::endl;
     // Convert to string and set log
     std::string segBuffer((const char*)segBuf, colorSegLength);
     colorSegRet->setData(segBuffer);
@@ -307,7 +305,6 @@ int Vision_func() {
     //-------------------
     //  LINES
     //-------------------
-    std::cout << "line image" << std::endl;
     man::vision::HoughLineList* lineList = module.getHoughLines(topCamera);
 
     Log* lineRet = new Log();
@@ -405,7 +402,6 @@ int Vision_func() {
 
     lineRet->setData(lineBuf);
     rets.push_back(lineRet);
-	std::cout << "Debug ball" << std::endl;
 
     //-----------
     //  BALL
@@ -426,10 +422,12 @@ int Vision_func() {
     }
     count = 0;
     for (auto i=blobs.begin(); i!=blobs.end(); i++) {
-        SExpr blobTree = treeFromBlob(*i);
-        SExpr next = SExpr::keyValue("blob" + std::to_string(count), blobTree);
-        allBalls.append(next);
-        count++;
+        if ((*i).firstPrincipalLength() < 8) {
+            SExpr blobTree = treeFromBlob(*i);
+            SExpr next = SExpr::keyValue("blob" + std::to_string(count), blobTree);
+            allBalls.append(next);
+            count++;
+        }
     }
 
     ballRet->setTree(allBalls);
@@ -461,7 +459,6 @@ int Vision_func() {
     ccdRet->setData(pointsBuf);
     rets.push_back(ccdRet);
 
-	std::cout << "Debug image" << std::endl;
     //-------------------
     //  DEBUG IMAGE
     //-------------------
@@ -738,12 +735,12 @@ SExpr treeFromBall(man::vision::Ball& b)
     SExpr x(b.x_rel);
     SExpr y(b.y_rel);
     SExpr p = SExpr::list({x, y});
-    //SExpr bl = treeFromBlob(b.getBlob());
+    SExpr bl = treeFromBlob(b.getBlob());
 
     SExpr rel = SExpr::keyValue("rel", p);
-    //SExpr blob = SExpr::keyValue("blob", bl);
+    SExpr blob = SExpr::keyValue("blob", bl);
     SExpr exDiam = SExpr::keyValue("expectedDiam", b.expectedDiam);
-    SExpr toRet = SExpr::list({rel, exDiam});
+    SExpr toRet = SExpr::list({rel, blob, exDiam});
 
     return toRet;
 }
