@@ -30,72 +30,7 @@ namespace vision {
 		debugDraw =  *di;
 	}
 
-    bool BallDetector::bottomCameraCheck(int left, int right, int top, int bottom)
-    {
-        int BOTTOM_MIN = 20;
-        int BUFFER = 3;
-
-        int ballWidth = right - left;
-        int ballHeight = bottom - top;
-        if (ballWidth < BOTTOM_MIN && left > BUFFER && right < width - BUFFER) {
-            if (debugBall) {
-                std::cout << "Width too small " << ballWidth << std::endl;
-            }
-            return false;
-        }
-        if (ballHeight < BOTTOM_MIN && top > BUFFER) {
-            if (debugBall) {
-                std::cout << "Height too small " << ballHeight << std::endl;
-            }
-            return false;
-        }
-    }
-
-    bool BallDetector::topCameraCheck(int left, int right, int top, int bottom)
-    {
-        int TOP_MIN = 10;
-        int BUFFER = 3;
-        int farHorizon = 100;
-        int farDim = 25;
-        int midHorizon = 180;
-        int midDim = 30;
-
-        int ballWidth = right - left;
-        int ballHeight = bottom - top;
-        int minDim = min(ballWidth, ballHeight);
-        if (ballWidth < TOP_MIN && left > BUFFER && right < width - BUFFER) {
-            if (debugBall) {
-                std::cout << "Width too small " << ballWidth << std::endl;
-            }
-            return false;
-        }
-        if (ballHeight < TOP_MIN && top > BUFFER) {
-            if (debugBall) {
-                std::cout << "Height too small " << ballHeight << std::endl;
-            }
-            return false;
-        }
-        if (bottom < farHorizon) {
-            if (ballWidth > farDim || ballHeight > farDim) {
-                if (debugBall) {
-                    std::cout << "Dangerous far ball with large dimension " <<
-                        ballWidth << " " << ballHeight << std::endl;
-                }
-                return false;
-            }
-        } else if (bottom < midHorizon) {
-            if (minDim > midDim) {
-                if (debugBall) {
-                    std::cout << "Dangerous mid ball with large dimensions " <<
-                        ballWidth << " " << ballHeight << std::endl;
-                }
-                return false;
-            }
-        }
-    }
-
-    bool BallDetector::findBallWithEdges(ImageLiteU8 white, EdgeList& edges,
-                                         double cameraHeight)
+    bool BallDetector::findBallWithEdges(ImageLiteU8 white, double cameraHeight)
 	{
 		Ball reset;
 		_best = reset;
@@ -106,9 +41,12 @@ namespace vision {
         candidates.clear();
 #endif
 
-        blobber.run(orangeImage.pixelAddr(), orangeImage.width(), orangeImage.height(),
-                    orangeImage.pitch());
+        // First we're going to run the blobber on the black image
+        blobber.run(orangeImage.pixelAddr(), orangeImage.width(),
+                    orangeImage.height(), orangeImage.pitch());
 
+        // Then we are going to filter out all of the blobs that obviously
+        // aren't part of the ball
         std::vector<std::pair<int,int>> blackBlobs;
         for (auto i =blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
             int centerX = static_cast<int>((*i).centerX());
@@ -133,8 +71,10 @@ namespace vision {
             }
         }
 
+        // Now run the blobber on the white image
         blobber2.run(white.pixelAddr(), white.width(), white.height(), white.pitch());
         std::vector<std::pair<int,int>> whiteBlobs;
+        // loop through the white blobs hoping to find a ball sized blob
         for (auto i =blobber2.blobs.begin(); i!=blobber2.blobs.end(); i++) {
             int centerX = static_cast<int>((*i).centerX());
 			int centerY = static_cast<int>((*i).centerY());
@@ -149,6 +89,7 @@ namespace vision {
             if (!topCamera) {
                 minSecond = 3;
             }
+            // see if the blob is of the right general shape for a ball
             if (principalLength < 40 && principalLength2 >= minSecond &&
                 principalLength < principalLength2 * 2 &&
                 (*i).area() > 10.0 &&
@@ -160,6 +101,7 @@ namespace vision {
                         " " << principalLength << " " << principalLength2;
                 }
                 int count = 0;
+                // now loop through the black blobs and see if they are inside
                 for (auto i =blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
                     for (std::pair<int,int> p : blackBlobs) {
                         if (abs(p.first - centerX) < principalLength &&
@@ -168,6 +110,7 @@ namespace vision {
                         }
                     }
                 }
+                // if we have multiple black blobs inside - it's a ball!
                 if (count > 2) {
                     if (debugBall) {
                         std::cout << "Found a ball! " << height << " " <<
@@ -193,9 +136,11 @@ namespace vision {
         if (!topCamera) {
             closeness = 20;
         }
+        // loop through filtered black blobs
         for (std::pair<int,int> p : blackBlobs) {
             correlations[count] = 0;
             std::pair<int,int> pair1;
+            // we're going to check against all other black blobs
             for (std::pair<int,int> q : blackBlobs) {
                 int xdiff = abs(p.first - q.first);
                 int ydiff = abs(p.second - q.second);
@@ -213,6 +158,7 @@ namespace vision {
                     } else {
                         pair1 = q;
                     }
+                    // Three close black blobs is good evidence for a ball
                     if (correlations[count] > 2) {
                         if (debugBall) {
                             debugDraw.drawPoint(p.first, p.second, GREEN);
@@ -318,142 +264,6 @@ namespace vision {
 		yImage = yImg;
 	}
 
-
-	bool BallDetector::findBall(ImageLiteU8 orange, double cameraHeight)
-	{
-		const double CONFIDENCE = 0.5;
-
-		if (debugBall) {
-			candidates.clear();
-		}
-
-		blobber.run(orange.pixelAddr(), orange.width(), orange.height(),
-					orange.pitch());
-
-		Ball reset;
-		_best = reset;
-		width = orange.width();
-		height = orange.height();
-
-		// TODO: Sort blobber list by size
-		for (auto i=blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
-			int centerX = static_cast<int>((*i).centerX());
-			int centerY = static_cast<int>((*i).centerY());
-			int principalLength = static_cast<int>((*i).firstPrincipalLength());
-			int principalLength2 = static_cast<int>((*i).secondPrincipalLength());
-			bool occludedSide = false;
-			bool occludedTop = false;
-			bool occludedBottom = false;
-
-			double x_rel, y_rel;
-
-			double bIX = ((*i).centerX() - width/2);
-			double bIY = (height / 2 - (*i).centerY()) -
-				(*i).firstPrincipalLength();
-
-			bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
-
-			if (preScreen(centerX, centerY, principalLength, principalLength2,
-						  occludedSide, occludedTop, occludedBottom)) {
-				continue;
-			}
-
-			Ball b((*i), x_rel, -1 * y_rel, cameraHeight, height,
-				   width, topCamera, occludedSide, occludedTop,
-				   occludedBottom);
-
-			if (b.confidence() > CONFIDENCE) {
-#ifdef OFFLINE
-				// we always want to draw the ball, even when not debugging it
-				candidates.push_back(b);
-#endif
-				if (debugBall) {
-					std::cout << "accepted ball at: " << centerX << " " <<
-						centerY << " because:\n" << b.properties()
-							  << std::endl;
-				}
-				if (b.dist < _best.dist) {
-					_best = b;
-				}
-			}
-			else {
-				if (debugBall) {
-					std::cout << "declined ball at " << centerX << " " <<
-						centerY << " because:\n" << b.properties()
-							  << std::endl;
-				}
-			}
-		}
-		if (_best.confidence() > CONFIDENCE) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
-	/* Before we evaluate a ball check to see if there are obvious problems
-	 * with it - e.g. it isn't on the field.
-	 */
-	bool BallDetector::preScreen(int centerX, int centerY, int principalLength,
-							   int principalLength2,
-							   bool & occludedSide, bool & occludedTop,
-							   bool & occludedBottom) {
-		// When looking in the top camera worry about the field
-		if (topCamera) {
-			bool offField = centerY + principalLength < field->horizonAt(centerX);
-			if (offField) {
-				if (debugBall) {
-					std::cout << "Blob is off the field: " << std::endl;
-				}
-				return true;
-			}
-			offField = centerY + 2 * principalLength + 3 <
-									 field->blockHorizonAt(centerX);
-			if (offField) {
-				if (debugBall) {
-					std::cout << "Blob is on blocked part of field " <<
-						"and is probably a robot uniform" << std::endl;
-				}
-				return true;
-			}
-		}
-
-		// is the ball occluded?
-		if (centerX - principalLength < 2 ||
-			centerX + principalLength > width -2) {
-			if (debugBall) {
-				std::cout << "Blob is occluded on side" << std::endl;
-			}
-			occludedSide = true;
-		}
-
-		if (centerY - principalLength < 0) {
-			if (debugBall) {
-				std::cout << "Blob is occluded on top" << std::endl;
-			}
-			occludedTop = true;
-		}
-		if (centerY + principalLength > height - 2) {
-			if (debugBall) {
-				std::cout << "Blob is occluded on bottom" << std::endl;
-			}
-			occludedBottom = true;
-		}
-		// Note: this test is for bottom camera, occluded top could mean
-		// a facing red robot. If ball is actually occluded on top it should
-		// show up in the top camera
-		/*bool occluded = occludedSide || occludedBottom;
-
-		if (!topCamera && !occluded && principalLength2 < height / 20) {
-			if (debugBall) {
-				std::cout << "Blob on bottom is too thin " <<
-					principalLength2 << " " << principalLength << std::endl;
-			}
-			return true;
-			}*/
-		return false;
-	}
 
     Ball::Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_,
 			   int imgWidth_, bool top, bool os, bool ot, bool ob) :

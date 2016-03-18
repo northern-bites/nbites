@@ -80,15 +80,7 @@ namespace man {
 			~BallDetector();
 
 			void setDebugImage(DebugImage * di);
-			bool findBallWithEdges(ImageLiteU8 white, EdgeList& edges, double cameraHeight);
-			bool findBall(ImageLiteU8 orange, double cameraHeight);
-			bool testForBall(int x, int top, int bottom, int yMax);
-            bool bottomCameraCheck(int left, int right, int top, int bottom);
-            bool topCameraCheck(int left, int right, int top, int bottom);
-			bool preScreen(int centerX, int centerY, int principalLength,
-						   int principalLength2,
-						   bool & occludedSide, bool & occludedTop,
-						   bool & occludedBottom);
+			bool findBallWithEdges(ImageLiteU8 white, double cameraHeight);
 
 			void setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 orange,
 						   ImageLiteU16 yImg);
