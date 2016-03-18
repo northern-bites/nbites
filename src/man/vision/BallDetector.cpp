@@ -98,7 +98,7 @@ namespace vision {
                 if (debugBall) {
                     debugDraw.drawPoint(centerX, centerY, BLUE);
                     std::cout << "White blob " << centerX << " " << centerY <<
-                        " " << principalLength << " " << principalLength2;
+                        " " << principalLength << " " << principalLength2 << std::endl;
                 }
                 int count = 0;
                 // now loop through the black blobs and see if they are inside
@@ -163,12 +163,8 @@ namespace vision {
                         if (debugBall) {
                             debugDraw.drawPoint(p.first, p.second, GREEN);
                         }
-                        int centerX = p.first;
-                        int centerY = p.second;
-                        int principalLength = 10;
-                        int principalLength2 = 10;
-                        double bIX = centerX - width/2;
-                        double bIY = (height/2 - centerY) - principalLength;
+                        double bIX = p.first - width/2;
+                        double bIY = (height/2 - p.second) - 10;
                         double x_rel, y_rel;
                         bool belowHoriz = homography->fieldCoords(bIX, bIY,
                                                                   x_rel, y_rel);
@@ -201,8 +197,6 @@ namespace vision {
                     int cX = static_cast<int>((*i).centerX());
                     int cY = static_cast<int>((*i).centerY());
                     if (cX == p.first && cY == p.second) {
-                        int centerX = static_cast<int>((*i).centerX());
-                        int centerY = static_cast<int>((*i).centerY());
                         double bIX = ((*i).centerX() - width/2);
                         double bIY = (height / 2 - (*i).centerY()) -
                             (*i).firstPrincipalLength();
@@ -224,6 +218,37 @@ namespace vision {
 
         // TO DO: At this point go back and check for small balls and
         // balls on the edge
+        for (auto i =blobber2.blobs.begin(); i!=blobber2.blobs.end(); i++) {
+            int centerX = static_cast<int>((*i).centerX());
+			int centerY = static_cast<int>((*i).centerY());
+			int principalLength = static_cast<int>((*i).firstPrincipalLength());
+			int principalLength2 = static_cast<int>((*i).secondPrincipalLength());
+			double bIX = ((*i).centerX() - width/2);
+			double bIY = (height / 2 - (*i).centerY()) -
+				(*i).firstPrincipalLength();
+            double x_rel, y_rel;
+            bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
+            if (topCamera && centerY < height / 2 && principalLength < 15 &&
+                principalLength2 > principalLength / 2 && (*i).area() > 10.0 &&
+                principalLength2 >= 1 &&
+                (centerY > field->horizonAt(centerX) || !topCamera)) {
+                // could be a ball - or a line, or a field cross or a robot chest
+                Ball b((*i), x_rel, -1 * y_rel, cameraHeight, height,
+                       width, topCamera, false, false, false);
+                b._confidence = 0.5;
+#ifdef OFFLINE
+                candidates.push_back(b);
+#endif
+            } else if (topCamera && centerY + principalLength > height - 10 &&
+                principalLength < 20) {
+                Ball b((*i), x_rel, -1 * y_rel, cameraHeight, height,
+                       width, topCamera, false, false, false);
+                b._confidence = 0.5;
+#ifdef OFFLINE
+                candidates.push_back(b);
+#endif
+            }
+        }
 
 		return false;
 	}
