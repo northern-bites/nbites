@@ -18,6 +18,8 @@ namespace vision {
 		field(field_),
 		topCamera(topCamera_)
 	{
+        // Note from Chown:  I don't know what these numbers mean,
+        // they are holdovers from the Dan Zeller days
 		blobber.secondThreshold(115);
 		blobber.minWeight(4);
 		blobber2.secondThreshold(115);
@@ -30,111 +32,83 @@ namespace vision {
 		debugDraw =  *di;
 	}
 
-    bool BallDetector::findBallWithEdges(ImageLiteU8 white, double cameraHeight)
-	{
-		Ball reset;
-		_best = reset;
-		width = white.width();
-		height = white.height();
+    void BallDetector::filterBlackBlobs(Blob currentBlob,
+                                        std::vector<std::pair<int,int>> & blobs)
+    {
+        int MAXBLACKBLOB = 8;
+        float MINBLACKAREA = 10.0f;
 
-#ifdef OFFLINE
-        candidates.clear();
-#endif
-
-        // First we're going to run the blobber on the black image
-        blobber.run(orangeImage.pixelAddr(), orangeImage.width(),
-                    orangeImage.height(), orangeImage.pitch());
-
-        // Then we are going to filter out all of the blobs that obviously
-        // aren't part of the ball
-        std::vector<std::pair<int,int>> blackBlobs;
-        for (auto i =blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
-            int centerX = static_cast<int>((*i).centerX());
-			int centerY = static_cast<int>((*i).centerY());
-			int principalLength = static_cast<int>((*i).firstPrincipalLength());
-			int principalLength2 = static_cast<int>((*i).secondPrincipalLength());
-            int minSecond = 1;
-            if (!topCamera) {
-                minSecond = 1;
-            }
-            if (principalLength < 8 && principalLength2 >= minSecond &&
-                (*i).area() > 10.0 &&
-                (centerY > field->horizonAt(centerX) || !topCamera)) {
-                blackBlobs.push_back(std::make_pair(centerX, centerY));
-                if (debugBall) {
-                    debugDraw.drawPoint(centerX, centerY, BLUE);
-                    std::cout << "Black blob " << centerX << " " << centerY <<
-                        " " << principalLength << " " << principalLength2;
-                    std::cout << " Area " << (*i).area() << " " <<
-                        (*i).rmsError() << std::endl;
+        int centerX = static_cast<int>(currentBlob.centerX());
+        int centerY = static_cast<int>(currentBlob.centerY());
+        int principalLength = static_cast<int>(currentBlob.firstPrincipalLength());
+        int principalLength2 = static_cast<int>(currentBlob.secondPrincipalLength());
+        int minSecond = 1;
+        if (!topCamera) {
+            minSecond = 1;
+        }
+        if (principalLength < MAXBLACKBLOB &&
+            principalLength2 >= minSecond && currentBlob.area() > MINBLACKAREA &&
+            (centerY > field->horizonAt(centerX) || !topCamera)) {
+            blobs.push_back(std::make_pair(centerX, centerY));
+            if (debugBall) {
+                debugDraw.drawPoint(centerX, centerY, BLUE);
+                std::cout << "Black blob " << centerX << " " << centerY <<
+                    " " << principalLength << " " << principalLength2;
                 }
-            }
+        }
+    }
+
+    int BallDetector::filterWhiteBlobs(Blob currentBlob,
+                                        std::vector<std::pair<int,int>> & blobs,
+                                        std::vector<std::pair<int,int>> blackBlobs)
+    {
+        int MAXWHITEBLOB = 40;
+        float MINWHITEAREA = 10.0f;
+        int centerX = static_cast<int>(currentBlob.centerX());
+        int centerY = static_cast<int>(currentBlob.centerY());
+        int principalLength = static_cast<int>(currentBlob.firstPrincipalLength());
+        int principalLength2 = static_cast<int>(currentBlob.secondPrincipalLength());
+        int minSecond = 3;
+        if (!topCamera) {
+            minSecond = 3;
         }
 
-        // Now run the blobber on the white image
-        blobber2.run(white.pixelAddr(), white.width(), white.height(), white.pitch());
-        std::vector<std::pair<int,int>> whiteBlobs;
-        // loop through the white blobs hoping to find a ball sized blob
-        for (auto i =blobber2.blobs.begin(); i!=blobber2.blobs.end(); i++) {
-            int centerX = static_cast<int>((*i).centerX());
-			int centerY = static_cast<int>((*i).centerY());
-			int principalLength = static_cast<int>((*i).firstPrincipalLength());
-			int principalLength2 = static_cast<int>((*i).secondPrincipalLength());
-			double bIX = ((*i).centerX() - width/2);
-			double bIY = (height / 2 - (*i).centerY()) -
-				(*i).firstPrincipalLength();
-            double x_rel, y_rel;
-            bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
-            int minSecond = 3;
-            if (!topCamera) {
-                minSecond = 3;
+        // see if the blob is of the right general shape for a ball
+        if (principalLength < MAXWHITEBLOB &&
+            principalLength2 >= minSecond &&
+            principalLength < principalLength2 * 2 &&
+            currentBlob.area() > MINWHITEAREA &&
+            (centerY > field->horizonAt(centerX) || !topCamera)) {
+            blobs.push_back(std::make_pair(centerX, centerY));
+            if (debugBall) {
+                debugDraw.drawPoint(centerX, centerY, BLUE);
+                std::cout << "White blob " << centerX << " " << centerY <<
+                    " " << principalLength << " " << principalLength2 << std::endl;
             }
-            // see if the blob is of the right general shape for a ball
-            if (principalLength < 40 && principalLength2 >= minSecond &&
-                principalLength < principalLength2 * 2 &&
-                (*i).area() > 10.0 &&
-                (centerY > field->horizonAt(centerX) || !topCamera)) {
-                whiteBlobs.push_back(std::make_pair(centerX, centerY));
-                if (debugBall) {
-                    debugDraw.drawPoint(centerX, centerY, BLUE);
-                    std::cout << "White blob " << centerX << " " << centerY <<
-                        " " << principalLength << " " << principalLength2 << std::endl;
-                }
-                int count = 0;
-                // now loop through the black blobs and see if they are inside
-                for (auto i =blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
-                    for (std::pair<int,int> p : blackBlobs) {
-                        if (abs(p.first - centerX) < principalLength &&
-                            abs(p.second - centerY) < principalLength) {
-                            count++;
-                        }
-                    }
-                }
-                // if we have multiple black blobs inside - it's a ball!
-                if (count > 2) {
-                    if (debugBall) {
-                        std::cout << "Found a ball! " << height << " " <<
-                            width << std::endl;
-                    }
-                    Ball b((*i), x_rel, -1 * y_rel, cameraHeight, height,
-                           width, topCamera, false, false, false);
-                    b._confidence = 0.9;
-
-#ifdef OFFLINE
-                    candidates.push_back(b);
-#endif
-                    _best = b;
-                    return true;
+            int count = 0;
+            // now loop through the black blobs and see if they are inside
+            for (std::pair<int,int> p : blackBlobs) {
+                if (abs(p.first - centerX) < principalLength &&
+                    abs(p.second - centerY) < principalLength) {
+                    count++;
                 }
             }
+            return count;
         }
+        return 0;
+    }
 
+    bool BallDetector::findCorrelatedBlackBlobs(std::vector<std::pair<int,int>> & blackBlobs,
+                                                double cameraHeight, bool foundBall)
+    {
         // loop through the filtered blobs and see if any are close together
+        int TOPCAMERABLOBNEARNESS = 30;
+        int BOTTOMCAMERABLOBNEARNESS = 20;
         int correlations[blackBlobs.size()];
         int count = 0;
-        int closeness = 30;
+        int closeness = TOPCAMERABLOBNEARNESS;
         if (!topCamera) {
-            closeness = 20;
+            closeness = BOTTOMCAMERABLOBNEARNESS;
         }
         // loop through filtered black blobs
         for (std::pair<int,int> p : blackBlobs) {
@@ -173,14 +147,12 @@ namespace vision {
                             int cX = static_cast<int>((*i).centerX());
                             int cY = static_cast<int>((*i).centerY());
                             if (cX == p.first && cY == p.second) {
-                                Ball b((*i), x_rel, -1 * y_rel, cameraHeight, height,
-                                       width, topCamera, false, false, false);
-                                b._confidence = 0.9;
+                                makeBall((*i), cameraHeight, 0.9, foundBall);
 #ifdef OFFLINE
-                                candidates.push_back(b);
-#endif
-                                _best = b;
+                                foundBall = true;
+#else
                                 return true;
+#endif
                             }
                         }
                     }
@@ -197,23 +169,104 @@ namespace vision {
                     int cX = static_cast<int>((*i).centerX());
                     int cY = static_cast<int>((*i).centerY());
                     if (cX == p.first && cY == p.second) {
-                        double bIX = ((*i).centerX() - width/2);
-                        double bIY = (height / 2 - (*i).centerY()) -
-                            (*i).firstPrincipalLength();
-                        double x_rel, y_rel;
-                        bool belowHoriz = homography->fieldCoords(bIX, bIY,
-                                                                  x_rel, y_rel);
-                        Ball b((*i), x_rel, -1 * y_rel, cameraHeight, height,
-                               width, topCamera, false, false, false);
-                        b._confidence = 0.9;
+                        makeBall((*i), cameraHeight, 0.9, foundBall);
 #ifdef OFFLINE
-                        candidates.push_back(b);
-#endif
-                        _best = b;
+                        foundBall = true;
+#else
                         return true;
+#endif
                     }
                 }
             }
+        }
+        return foundBall;
+    }
+
+    void BallDetector::makeBall(Blob blob, double cameraHeight, double conf,
+                                bool foundBall)
+    {
+        int centerX = static_cast<int>(blob.centerX());
+        int centerY = static_cast<int>(blob.centerY());
+        int principalLength = static_cast<int>(blob.firstPrincipalLength());
+        int principalLength2 = static_cast<int>(blob.secondPrincipalLength());
+        double bIX = (blob.centerX() - width/2);
+        double bIY = (height / 2 - blob.centerY()) -
+            blob.firstPrincipalLength();
+        double x_rel, y_rel;
+        bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
+        Ball b(blob, x_rel, -1 * y_rel, cameraHeight, height,
+               width, topCamera, false, false, false);
+        b._confidence = 0.9;
+        if (!foundBall) {
+            _best = b;
+        }
+#ifdef OFFLINE
+                        candidates.push_back(b);
+#endif
+    }
+
+    bool BallDetector::findBallWithEdges(ImageLiteU8 white, double cameraHeight)
+	{
+		Ball reset;
+		_best = reset;
+		width = white.width();
+		height = white.height();
+
+#ifdef OFFLINE
+        candidates.clear();
+#endif
+
+        bool foundBall = false;
+        int FARAWAYWHITESIZE = 15;
+        int BOTTOMEDGEWHITEMAX = 20;
+        int BUFFER = 10;
+
+        // First we're going to run the blobber on the black image
+        blobber.run(orangeImage.pixelAddr(), orangeImage.width(),
+                    orangeImage.height(), orangeImage.pitch());
+
+        // Then we are going to filter out all of the blobs that obviously
+        // aren't part of the ball
+        std::vector<std::pair<int,int>> blackBlobs;
+        for (auto i =blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
+            filterBlackBlobs((*i), blackBlobs);
+        }
+
+        // Now run the blobber on the white image
+        int MAXWHITEBLOB = 40;
+        float MINWHITEAREA = 10.0f;
+        blobber2.run(white.pixelAddr(), white.width(), white.height(), white.pitch());
+        std::vector<std::pair<int,int>> whiteBlobs;
+        // loop through the white blobs hoping to find a ball sized blob
+        for (auto i =blobber2.blobs.begin(); i!=blobber2.blobs.end(); i++) {
+            int count = filterWhiteBlobs((*i), whiteBlobs, blackBlobs);
+            int centerY = static_cast<int>((*i).centerY());
+            int principalLength = static_cast<int>((*i).firstPrincipalLength());
+            if (count > 2) {
+                makeBall((*i), cameraHeight, 0.9, foundBall);
+#ifdef OFFLINE
+                foundBall = true;
+#else
+                return true;
+#endif
+            } else if (count > 0 && topCamera &&
+                       centerY + principalLength > height - BUFFER &&
+                       principalLength < BOTTOMEDGEWHITEMAX) {
+                makeBall((*i), cameraHeight, 0.5, foundBall);
+#ifdef OFFLINE
+                foundBall = true;
+#else
+                return true;
+#endif
+            }
+        }
+
+        if (findCorrelatedBlackBlobs(blackBlobs, cameraHeight, foundBall)) {
+#ifdef OFFLINE
+            foundBall = true;
+#else
+            return true;
+#endif
         }
 
         // TO DO: At this point go back and check for small balls and
@@ -223,34 +276,24 @@ namespace vision {
 			int centerY = static_cast<int>((*i).centerY());
 			int principalLength = static_cast<int>((*i).firstPrincipalLength());
 			int principalLength2 = static_cast<int>((*i).secondPrincipalLength());
-			double bIX = ((*i).centerX() - width/2);
-			double bIY = (height / 2 - (*i).centerY()) -
-				(*i).firstPrincipalLength();
-            double x_rel, y_rel;
-            bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
-            if (topCamera && centerY < height / 2 && principalLength < 15 &&
-                principalLength2 > principalLength / 2 && (*i).area() > 10.0 &&
+            if (topCamera && centerY < height / 2 &&
+                principalLength < FARAWAYWHITESIZE &&
+                principalLength2 > principalLength / 2 &&
+                (*i).area() > MINWHITEAREA &&
                 principalLength2 >= 1 &&
                 (centerY > field->horizonAt(centerX) || !topCamera)) {
                 // could be a ball - or a line, or a field cross or a robot chest
-                Ball b((*i), x_rel, -1 * y_rel, cameraHeight, height,
-                       width, topCamera, false, false, false);
-                b._confidence = 0.5;
+                // sanity checks needed here
+                makeBall((*i), cameraHeight, 0.5, foundBall);
 #ifdef OFFLINE
-                candidates.push_back(b);
-#endif
-            } else if (topCamera && centerY + principalLength > height - 10 &&
-                principalLength < 20) {
-                Ball b((*i), x_rel, -1 * y_rel, cameraHeight, height,
-                       width, topCamera, false, false, false);
-                b._confidence = 0.5;
-#ifdef OFFLINE
-                candidates.push_back(b);
+                foundBall = true;
+#else
+                return true;
 #endif
             }
         }
 
-		return false;
+		return foundBall;
 	}
 
 	void BallDetector::getColor(int x, int y) {

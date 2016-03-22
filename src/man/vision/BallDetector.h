@@ -82,6 +82,16 @@ namespace man {
 			void setDebugImage(DebugImage * di);
 			bool findBallWithEdges(ImageLiteU8 white, double cameraHeight);
 
+            void filterBlackBlobs(Blob currentBlob,
+                                  std::vector<std::pair<int,int>> & blobs);
+            int filterWhiteBlobs(Blob currentBlob,
+                                  std::vector<std::pair<int,int>> & blobs,
+                                  std::vector<std::pair<int,int>> blackBlobs);
+            bool findCorrelatedBlackBlobs(std::vector<std::pair<int,int>> & blackBlobs,
+                                          double cameraHeight, bool foundBall);
+            void makeBall(Blob blob, double cameraHeight, double conf,
+                          bool foundBall);
+
 			void setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 orange,
 						   ImageLiteU16 yImg);
 			void getColor(int x, int y);
