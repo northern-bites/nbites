@@ -18,6 +18,7 @@ import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.logviews.proto.ProtoBufView;
 import nbtool.gui.logviews.proto.ProtoBallView;
 import nbtool.gui.logviews.sound2.CorrelationView;
+import nbtool.gui.logviews.sound2.DisplayView;
 import nbtool.gui.logviews.sound2.FFTWView;
 import nbtool.gui.logviews.sound2.SndFreqView;
 import nbtool.gui.logviews.sound2.SndAmpView;
@@ -84,7 +85,8 @@ public class NBConstants {
 		map.put("proto-FieldLines", new Class[]{BasicLineView.class});
 		map.put("proto-Corners", new Class[]{BasicLineView.class});
 		
-		map.put("sound", new Class[]{SndFreqView.class, SndAmpView.class, CorrelationView.class});
+		map.put("sound", new Class[]{SndFreqView.class, SndAmpView.class,
+				CorrelationView.class, DisplayView.class});
 		map.put("frequency", new Class[]{FFTWView.class});
 		
 		map.put(DEFAULT_S, new Class[]{DefaultView.class});

@@ -21,7 +21,8 @@
 #include <float.h>
 #include <stdarg.h>
 
-#define PORTNUM 30002
+//#define PORTNUM 30002
+const int PORTNUM 30002
 //#define MAX_WAIT 1 //seconds
 #define MAX_WAIT DBL_MAX
 

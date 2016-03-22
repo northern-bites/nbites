@@ -6,7 +6,7 @@
  */
 
 #ifndef XTEMP
-#error "XTEMP must be defined for control_flags.defs.h"
+#error "XTEMP must be defined for flags.defs.h"
 #endif
 
 //Flags that shouldn't be set outside man – or really outside logging

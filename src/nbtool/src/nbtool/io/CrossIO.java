@@ -376,7 +376,9 @@ public class CrossIO {
 			};
 			
 			try {
-				server = new ServerSocket(NBCROSS_PORT, 1, InetAddress.getByName("127.0.0.1"));
+//				server = new ServerSocket(NBCROSS_PORT, 1, InetAddress.getByName("127.0.0.1"));
+				server = new ServerSocket(NBCROSS_PORT, 1, null);
+				
 			} catch (UnknownHostException e1) {
 				e1.printStackTrace();
 				return;

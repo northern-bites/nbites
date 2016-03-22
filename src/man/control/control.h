@@ -56,7 +56,7 @@ namespace control {
         num_flags
     } flag_e; */
     
-    extern volatile uint8_t flags[num_flags];
+    extern volatile uint8_t flags[];
     extern const char * string_flags[];
     
 #ifndef __APPLE__

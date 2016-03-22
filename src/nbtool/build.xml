@@ -1,0 +1,47 @@
+<project name="nbtool" default="run_nbtool" basedir=".">
+    
+    <property environment="env"/>
+    
+    <fail message="nbtool build requires NBITES_DIR environment varibale">
+        <condition>
+            <not>
+                <isset property="${env.NBITES_DIR2}" />
+            </not>
+        </condition>
+    </fail>
+    
+    <property name="NBITES_DIR" value="${env.NBITES_DIR2}"/>
+    
+    <fail message="nbtool build requires NBITES_DIR environment varibale">
+        <condition>
+            <or>
+                <equals arg1="${NBITES_DIR}" arg2=""/>
+            </or>
+        </condition>
+    </fail>
+    
+    <property name="java_build.dir" value="${NBITES_DIR}/java/"/>
+    <property name="nbtool_build.dir" value="${java_build.dir}/nbtool-volatile"/>
+    <property name="nbtool_libs.dir" value="${java_build.dir}/nbtool-libs"/>
+    
+    <property name="nbtool_src.dir" value="src" />
+    
+    <property name="nb_src" value=""/>
+    
+    <target name="build_nbtool">
+    </target>
+    
+    <target name="run_nbtool">
+        <fail message="nbtool build requires NBITES_DIR environment varibale">
+            <condition>
+                <or>
+                    <equals arg1="${NBITES_DIR}" arg2=""/>
+                </or>
+            </condition>
+        </fail>
+    </target>
+    
+    <target name="clean">
+    </target>
+    
+</project>
