@@ -41,7 +41,8 @@ namespace vision {
        processing.
      */
     void BallDetector::filterBlackBlobs(Blob currentBlob,
-                                        std::vector<std::pair<int,int>> & blobs)
+                                        std::vector<std::pair<int,int>> & blobs,
+                                        std::vector<Blob> & actualBlobs)
     {
         int MAXBLACKBLOB = 8;
         float MINBLACKAREA = 10.0f;
@@ -60,10 +61,11 @@ namespace vision {
             principalLength2 >= minSecond && currentBlob.area() > MINBLACKAREA &&
             (centerY > field->horizonAt(centerX) || !topCamera)) {
             blobs.push_back(std::make_pair(centerX, centerY));
+            actualBlobs.push_back(currentBlob);
             if (debugBall) {
                 debugDraw.drawPoint(centerX, centerY, BLUE);
                 std::cout << "Black blob " << centerX << " " << centerY <<
-                    " " << principalLength << " " << principalLength2;
+                    " " << principalLength << " " << principalLength2 << std::endl;
                 }
         }
     }
@@ -115,6 +117,33 @@ namespace vision {
         return 0;
     }
 
+    /* We have a potential ball on the horizon. Do some checking to
+       screen out potential other stuff.
+     */
+    bool BallDetector::farSanityChecks(Blob blob)
+    {
+        int centerX = static_cast<int>(blob.centerX());
+        int centerY = static_cast<int>(blob.centerY());
+        int principalLength = static_cast<int>(blob.firstPrincipalLength());
+        int principalLength2 = static_cast<int>(blob.secondPrincipalLength());
+        // basic scanning circularity
+        for (int i = centerY - principalLength2; i < centerY + principalLength2;
+             i++) {
+            getColor(centerX, i);
+            if (isGreen()) {
+                return false;
+            }
+        }
+        for (int i = centerX - principalLength2; i < centerX + principalLength2;
+             i++) {
+            getColor(i, centerY);
+            if (isGreen()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /* Our worst ball detector. Tries to find small white blobs
        off in the distance. The trouble is that such blobs might
        be other things. This will require a number of sanity checks.
@@ -127,12 +156,36 @@ namespace vision {
         int centerY = static_cast<int>(blob.centerY());
         int principalLength = static_cast<int>(blob.firstPrincipalLength());
         int principalLength2 = static_cast<int>(blob.secondPrincipalLength());
-        if (topCamera && centerY < height / 2 &&
+        if (topCamera && centerY < height / 3 &&
             principalLength < FARAWAYWHITESIZE &&
             principalLength2 > principalLength / 2 &&
             blob.area() > MINWHITEAREA &&
             principalLength2 >= 1 &&
             (centerY > field->horizonAt(centerX) || !topCamera)) {
+            return farSanityChecks(blob);
+        }
+        return false;
+    }
+
+    /* Checks if two black blobs are close enough to be potentially
+       part of the same ball.
+     */
+
+    bool BallDetector::blobsAreClose(std::pair<int,int> first,
+                                     std::pair<int,int> second)
+    {
+        int BOTTOMCAMERABLOBNEARNESS = 20;
+        int TOPCAMERABLOBNEARNESS = 30;
+        int TOTALCLOSENESS = 40;
+        int closeness = TOPCAMERABLOBNEARNESS;
+        int xdiff = abs(first.first - second.first);
+        int ydiff = abs(first.second - second.second);
+        if (!topCamera) {
+            closeness = BOTTOMCAMERABLOBNEARNESS;
+        }
+        if (xdiff < closeness && ydiff < closeness &&
+            (xdiff + ydiff) < TOTALCLOSENESS &&
+            (xdiff > 0 || ydiff > 0)) {
             return true;
         }
         return false;
@@ -144,76 +197,42 @@ namespace vision {
        and tries to find groups of them that are near each other. If there
        are enough of them then it is strong evidence of a ball.
      */
-    bool BallDetector::findCorrelatedBlackBlobs(std::vector<std::pair<int,int>> & blackBlobs,
-                                                double cameraHeight, bool foundBall)
+    bool BallDetector::findCorrelatedBlackBlobs
+    (std::vector<std::pair<int,int>> & blackBlobs,
+     std::vector<Blob> & actualBlobs,
+     double cameraHeight, bool foundBall)
     {
         // loop through the filtered blobs and see if any are close together
-        int TOPCAMERABLOBNEARNESS = 30;
-        int BOTTOMCAMERABLOBNEARNESS = 20;
         int correlations[blackBlobs.size()];
+        int correlatedTo[blackBlobs.size()][blackBlobs.size()];
+        bool foundThree = false;
         int count = 0;
-        int closeness = TOPCAMERABLOBNEARNESS;
-        if (!topCamera) {
-            closeness = BOTTOMCAMERABLOBNEARNESS;
-        }
         // loop through filtered black blobs
         for (std::pair<int,int> p : blackBlobs) {
+            // initialize the correlations for this blob
             correlations[count] = 0;
-            std::pair<int,int> pair1;
+            for (int k = 0; k < blackBlobs.size(); k++) {
+                correlatedTo[count][k] = 0;
+            }
+            int secondCounter = 0;
             // we're going to check against all other black blobs
             for (std::pair<int,int> q : blackBlobs) {
-                int xdiff = abs(p.first - q.first);
-                int ydiff = abs(p.second - q.second);
-                if (xdiff < closeness && ydiff < closeness &&
-                    (xdiff + ydiff) < 40 &&
-                    (xdiff > 0 || ydiff > 0)) {
-                    std::cout << "Closeness " << xdiff << " " <<
-                        ydiff << " " << (xdiff + ydiff) << std::endl;
-                    // could be correlated, watch out for shadows, robot parts, etc.
+                if (blobsAreClose(p, q)) {
                     correlations[count] += 1;
-                    if (correlations[count] > 1) {
-                        if (debugBall) {
-                            int midx = (pair1.first + q.first + p.first) / 3;
-                            int midy = (pair1.second + q.second + p.second) / 3;
-                            debugDraw.drawPoint(p.first, p.second, ORANGE);
-                            debugDraw.drawPoint(midx, midy, RED);
-                        }
-                    } else {
-                        pair1 = q;
-                    }
-                    // Three close black blobs is good evidence for a ball
+                    correlatedTo[count][secondCounter] = 1;
+                    // Four close black blobs is good evidence for a ball
                     if (correlations[count] > 2) {
-                        if (debugBall) {
-                            debugDraw.drawPoint(p.first, p.second, GREEN);
-                        }
-                        for (auto i =blobber.blobs.begin();
-                             i!=blobber.blobs.end(); i++) {
-                            int cX = static_cast<int>((*i).centerX());
-                            int cY = static_cast<int>((*i).centerY());
-                            if (cX == p.first && cY == p.second) {
-                                makeBall((*i), cameraHeight, 0.9, foundBall);
-#ifdef OFFLINE
-                                foundBall = true;
-#else
-                                return true;
-#endif
+                        // grab this blob from our vector
+                        foundThree = true;
+                        Blob newBall = actualBlobs[count];
+                        // find our correlated blobs and merge them in
+                        for (int k = 0; k < blackBlobs.size(); k++) {
+                            if (correlatedTo[count][k] == 1) {
+                                Blob merger = actualBlobs[k];
+                                newBall.merge(merger);
                             }
                         }
-                    }
-                }
-            }
-            count++;
-        }
-        // TO DO: This currently finds the first good blob, it ought to find the best
-        for (int c = 0; c < count; c++) {
-            if (correlations[c] > 1) {
-                // good candidate ball
-                std::pair<int,int> p = blackBlobs[c];
-                for (auto i =blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
-                    int cX = static_cast<int>((*i).centerX());
-                    int cY = static_cast<int>((*i).centerY());
-                    if (cX == p.first && cY == p.second) {
-                        makeBall((*i), cameraHeight, 0.9, foundBall);
+                        makeBall(newBall, cameraHeight, 0.8, foundBall);
 #ifdef OFFLINE
                         foundBall = true;
 #else
@@ -221,6 +240,30 @@ namespace vision {
 #endif
                     }
                 }
+                secondCounter++;
+            }
+            count++;
+        }
+        // If the best case didn't work out, look for 3 black blobs together
+        for (int c = 0; c < count; c++) {
+            if (correlations[c] > 1 && !foundThree) {
+                // good candidate ball
+                Blob newBall = actualBlobs[c];
+                for (int k = 0; k < blackBlobs.size(); k++) {
+                    if (correlatedTo[c][k] == 1) {
+                        Blob merger = actualBlobs[k];
+                        newBall.merge(merger);
+                        // don't double count this blob
+                        correlatedTo[k][c] = 0;
+                        correlations[k] -= 1;
+                    }
+                }
+                makeBall(newBall, cameraHeight, 0.75, foundBall);
+#ifdef OFFLINE
+                foundBall = true;
+#else
+                return true;
+#endif
             }
         }
         return foundBall;
@@ -263,30 +306,26 @@ namespace vision {
 		_best = reset;
 		width = white.width();
 		height = white.height();
-
 #ifdef OFFLINE
         candidates.clear();
 #endif
-
         bool foundBall = false;
-        int FARAWAYWHITESIZE = 15;
         int BOTTOMEDGEWHITEMAX = 20;
         int BUFFER = 10;
 
         // First we're going to run the blobber on the black image
-        blobber.run(orangeImage.pixelAddr(), orangeImage.width(),
-                    orangeImage.height(), orangeImage.pitch());
+        blobber.run(blackImage.pixelAddr(), blackImage.width(),
+                    blackImage.height(), blackImage.pitch());
 
         // Then we are going to filter out all of the blobs that obviously
         // aren't part of the ball
         std::vector<std::pair<int,int>> blackBlobs;
+        std::vector<Blob> actualBlackBlobs;
         for (auto i =blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
-            filterBlackBlobs((*i), blackBlobs);
+            filterBlackBlobs((*i), blackBlobs, actualBlackBlobs);
         }
 
         // Now run the blobber on the white image
-        int MAXWHITEBLOB = 40;
-        float MINWHITEAREA = 10.0f;
         blobber2.run(white.pixelAddr(), white.width(), white.height(), white.pitch());
         std::vector<std::pair<int,int>> whiteBlobs;
         // loop through the white blobs hoping to find a ball sized blob
@@ -311,7 +350,8 @@ namespace vision {
 #endif
         }
 
-        if (findCorrelatedBlackBlobs(blackBlobs, cameraHeight, foundBall)) {
+        if (findCorrelatedBlackBlobs(blackBlobs, actualBlackBlobs, cameraHeight,
+                                     foundBall)) {
 #ifdef OFFLINE
             foundBall = true;
 #else
@@ -354,18 +394,18 @@ namespace vision {
 		return false;
 	}
 
-	bool BallDetector::isOrange() {
-		if (*(orangeImage.pixelAddr(currentX, currentY)) > 68) {
+	bool BallDetector::isBlack() {
+		if (*(blackImage.pixelAddr(currentX, currentY)) > 68) {
 			return true;
 		}
 		return false;
 	}
 
-	void BallDetector::setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 orange,
+	void BallDetector::setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 black,
 		ImageLiteU16 yImg) {
 		whiteImage = white;
 		greenImage = green;
-		orangeImage = orange;
+		blackImage = black;
 		yImage = yImg;
 	}
 

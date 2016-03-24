@@ -83,22 +83,28 @@ namespace man {
 			bool findBall(ImageLiteU8 white, double cameraHeight);
 
             void filterBlackBlobs(Blob currentBlob,
-                                  std::vector<std::pair<int,int>> & blobs);
+                                  std::vector<std::pair<int,int>> & blobs,
+                                  std::vector<Blob> & actualBlobs);
             int filterWhiteBlobs(Blob currentBlob,
                                   std::vector<std::pair<int,int>> & blobs,
                                   std::vector<std::pair<int,int>> blackBlobs);
             bool findCorrelatedBlackBlobs(std::vector<std::pair<int,int>> & blackBlobs,
+                                          std::vector<Blob> & actualBlobs,
                                           double cameraHeight, bool foundBall);
+            bool blobsAreClose(std::pair<int,int> first,
+                               std::pair<int,int> second);
+
             void makeBall(Blob blob, double cameraHeight, double conf,
                           bool foundBall);
             bool lookForFarAwayBalls(Blob blob);
+            bool farSanityChecks(Blob blob);
 
-			void setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 orange,
+			void setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 black,
 						   ImageLiteU16 yImg);
 			void getColor(int x, int y);
 			bool isGreen();
 			bool isWhite();
-			bool isOrange();
+			bool isBlack();
 
 			Ball& best() { return _best; }
 
@@ -119,7 +125,7 @@ namespace man {
 			int currentX, currentY;
 
 			DebugImage debugDraw;
-			ImageLiteU8 whiteImage, greenImage, orangeImage;
+			ImageLiteU8 whiteImage, greenImage, blackImage;
 			ImageLiteU16 yImage;
 
 			Ball _best;
