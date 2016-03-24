@@ -283,7 +283,7 @@ namespace vision {
         bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
         Ball b(blob, x_rel, -1 * y_rel, cameraHeight, height,
                width, topCamera, false, false, false);
-        b._confidence = 0.9;
+        b._confidence = conf;
         if (!foundBall) {
             _best = b;
         }
