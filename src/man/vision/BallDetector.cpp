@@ -49,23 +49,23 @@ namespace vision {
 
         int centerX = static_cast<int>(currentBlob.centerX());
         int centerY = static_cast<int>(currentBlob.centerY());
-        int principalLength = static_cast<int>(currentBlob.firstPrincipalLength());
-        int principalLength2 = static_cast<int>(currentBlob.secondPrincipalLength());
+        int prinLength = static_cast<int>(currentBlob.firstPrincipalLength());
+        int prinLength2 = static_cast<int>(currentBlob.secondPrincipalLength());
         int minSecond = 1;
         // in principle the bottom camera might use a different standard
         // but for now we don't actally do this
         if (!topCamera) {
             minSecond = 1;
         }
-        if (principalLength < MAXBLACKBLOB &&
-            principalLength2 >= minSecond && currentBlob.area() > MINBLACKAREA &&
+        if (prinLength < MAXBLACKBLOB &&
+            prinLength2 >= minSecond && currentBlob.area() > MINBLACKAREA &&
             (centerY > field->horizonAt(centerX) || !topCamera)) {
             blobs.push_back(std::make_pair(centerX, centerY));
             actualBlobs.push_back(currentBlob);
             if (debugBall) {
                 debugDraw.drawPoint(centerX, centerY, BLUE);
                 std::cout << "Black blob " << centerX << " " << centerY <<
-                    " " << principalLength << " " << principalLength2 << std::endl;
+                    " " << prinLength << " " << prinLength2 << std::endl;
                 }
         }
     }
@@ -85,30 +85,28 @@ namespace vision {
         float MINWHITEAREA = 10.0f;
         int centerX = static_cast<int>(currentBlob.centerX());
         int centerY = static_cast<int>(currentBlob.centerY());
-        int principalLength = static_cast<int>(currentBlob.firstPrincipalLength());
-        int principalLength2 = static_cast<int>(currentBlob.secondPrincipalLength());
+        int prinLength = static_cast<int>(currentBlob.firstPrincipalLength());
+        int prinLength2 = static_cast<int>(currentBlob.secondPrincipalLength());
         int minSecond = 3;
         if (!topCamera) {
             minSecond = 3;
         }
 
         // see if the blob is of the right general shape for a ball
-        if (principalLength < MAXWHITEBLOB &&
-            principalLength2 >= minSecond &&
-            principalLength < principalLength2 * 2 &&
-            currentBlob.area() > MINWHITEAREA &&
+        if (prinLength < MAXWHITEBLOB && prinLength2 >= minSecond &&
+            prinLength < prinLength2 * 2 && currentBlob.area() > MINWHITEAREA &&
             (centerY > field->horizonAt(centerX) || !topCamera)) {
             blobs.push_back(std::make_pair(centerX, centerY));
             if (debugBall) {
                 debugDraw.drawPoint(centerX, centerY, BLUE);
                 std::cout << "White blob " << centerX << " " << centerY <<
-                    " " << principalLength << " " << principalLength2 << std::endl;
+                    " " << prinLength << " " << prinLength2 << std::endl;
             }
             int count = 0;
             // now loop through the black blobs and see if they are inside
             for (std::pair<int,int> p : blackBlobs) {
-                if (abs(p.first - centerX) < principalLength &&
-                    abs(p.second - centerY) < principalLength) {
+                if (abs(p.first - centerX) < prinLength &&
+                    abs(p.second - centerY) < prinLength) {
                     count++;
                 }
             }
@@ -124,18 +122,16 @@ namespace vision {
     {
         int centerX = static_cast<int>(blob.centerX());
         int centerY = static_cast<int>(blob.centerY());
-        int principalLength = static_cast<int>(blob.firstPrincipalLength());
-        int principalLength2 = static_cast<int>(blob.secondPrincipalLength());
+        int prinLength = static_cast<int>(blob.firstPrincipalLength());
+        int prinLength2 = static_cast<int>(blob.secondPrincipalLength());
         // basic scanning circularity
-        for (int i = centerY - principalLength2; i < centerY + principalLength2;
-             i++) {
+        for (int i = centerY - prinLength2; i < centerY + prinLength2; i++) {
             getColor(centerX, i);
             if (isGreen()) {
                 return false;
             }
         }
-        for (int i = centerX - principalLength2; i < centerX + principalLength2;
-             i++) {
+        for (int i = centerX - prinLength2; i < centerX + prinLength2; i++) {
             getColor(i, centerY);
             if (isGreen()) {
                 return false;
@@ -154,13 +150,11 @@ namespace vision {
         float MINWHITEAREA = 10.0f;
         int centerX = static_cast<int>(blob.centerX());
         int centerY = static_cast<int>(blob.centerY());
-        int principalLength = static_cast<int>(blob.firstPrincipalLength());
-        int principalLength2 = static_cast<int>(blob.secondPrincipalLength());
-        if (topCamera && centerY < height / 3 &&
-            principalLength < FARAWAYWHITESIZE &&
-            principalLength2 > principalLength / 2 &&
-            blob.area() > MINWHITEAREA &&
-            principalLength2 >= 1 &&
+        int prinLength = static_cast<int>(blob.firstPrincipalLength());
+        int prinLength2 = static_cast<int>(blob.secondPrincipalLength());
+        if (topCamera && centerY < height /3 && prinLength < FARAWAYWHITESIZE &&
+            prinLength2 > prinLength / 2 && blob.area() > MINWHITEAREA &&
+            prinLength2 >= 1 &&
             (centerY > field->horizonAt(centerX) || !topCamera)) {
             return farSanityChecks(blob);
         }
@@ -326,7 +320,8 @@ namespace vision {
         }
 
         // Now run the blobber on the white image
-        blobber2.run(white.pixelAddr(), white.width(), white.height(), white.pitch());
+        blobber2.run(white.pixelAddr(), white.width(), white.height(),
+                     white.pitch());
         std::vector<std::pair<int,int>> whiteBlobs;
         // loop through the white blobs hoping to find a ball sized blob
         for (auto i =blobber2.blobs.begin(); i!=blobber2.blobs.end(); i++) {
@@ -401,7 +396,8 @@ namespace vision {
 		return false;
 	}
 
-	void BallDetector::setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 black,
+	void BallDetector::setImages(ImageLiteU8 white, ImageLiteU8 green,
+                                 ImageLiteU8 black,
 		ImageLiteU16 yImg) {
 		whiteImage = white;
 		greenImage = green;
@@ -460,8 +456,6 @@ namespace vision {
 			diameterRatio = expectedDiam / (2 * firstPrincipalLength);
 		}
 
-		//_confidence = (density > thresh).f() * (aspectRatio > thresh).f() * (diameterRatio > radThresh).f();
-
 		if ((occludedSide || occludedTop || occludedBottom) && density > 0.9) {
 			_confidence = ((density > thresh) & (aspectRatio > thresh) &
 						   (diameterRatio > radThresh)).f();
@@ -495,7 +489,8 @@ namespace vision {
 		d += "\texpect ball to be this diam: " + to_string(expectedDiam) + "\n";
 		d += "\tdiamRatio: " + to_string(diameterRatio) + "\n";
 		d += "\tdiam Confidence: " + to_string((diameterRatio> radThresh).f()) + "\n";
-		d += "\n\tconfidence is: " + to_string(_confidence) + "\n====================\n";
+		d += "\n\tconfidence is: " + to_string(_confidence) +
+            "\n====================\n";
 		return d;
 	}
 
