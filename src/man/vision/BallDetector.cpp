@@ -44,8 +44,8 @@ namespace vision {
                                         std::vector<std::pair<int,int>> & blobs,
                                         std::vector<Blob> & actualBlobs)
     {
-        int MAXBLACKBLOB = 8;
-        float MINBLACKAREA = 10.0f;
+        int MAX_BLACK_BLOB = 8;
+        float MIN_BLACK_AREA = 10.0f;
 
         int centerX = static_cast<int>(currentBlob.centerX());
         int centerY = static_cast<int>(currentBlob.centerY());
@@ -57,8 +57,8 @@ namespace vision {
         if (!topCamera) {
             minSecond = 1;
         }
-        if (prinLength < MAXBLACKBLOB &&
-            prinLength2 >= minSecond && currentBlob.area() > MINBLACKAREA &&
+        if (prinLength < MAX_BLACK_BLOB &&
+            prinLength2 >= minSecond && currentBlob.area() > MIN_BLACK_AREA &&
             (centerY > field->horizonAt(centerX) || !topCamera)) {
             blobs.push_back(std::make_pair(centerX, centerY));
             actualBlobs.push_back(currentBlob);
@@ -81,8 +81,8 @@ namespace vision {
                                         std::vector<std::pair<int,int>> & blobs,
                                         std::vector<std::pair<int,int>> blackBlobs)
     {
-        int MAXWHITEBLOB = 40;
-        float MINWHITEAREA = 10.0f;
+        int MAX_WHITE_BLOB = 40;
+        float MIN_AREA = 10.0f;
         int centerX = static_cast<int>(currentBlob.centerX());
         int centerY = static_cast<int>(currentBlob.centerY());
         int prinLength = static_cast<int>(currentBlob.firstPrincipalLength());
@@ -93,8 +93,8 @@ namespace vision {
         }
 
         // see if the blob is of the right general shape for a ball
-        if (prinLength < MAXWHITEBLOB && prinLength2 >= minSecond &&
-            prinLength < prinLength2 * 2 && currentBlob.area() > MINWHITEAREA &&
+        if (prinLength < MAX_WHITE_BLOB && prinLength2 >= minSecond &&
+            prinLength < prinLength2 * 2 && currentBlob.area() > MIN_AREA &&
             (centerY > field->horizonAt(centerX) || !topCamera)) {
             blobs.push_back(std::make_pair(centerX, centerY));
             if (debugBall) {
@@ -146,14 +146,15 @@ namespace vision {
      */
     bool BallDetector::lookForFarAwayBalls(Blob blob)
     {
-        int FARAWAYWHITESIZE = 15;
-        float MINWHITEAREA = 10.0f;
+        int FARAWAY_WHITE_SIZE = 15;
+        float MIN_AREA = 10.0f;
         int centerX = static_cast<int>(blob.centerX());
         int centerY = static_cast<int>(blob.centerY());
         int prinLength = static_cast<int>(blob.firstPrincipalLength());
         int prinLength2 = static_cast<int>(blob.secondPrincipalLength());
-        if (topCamera && centerY < height /3 && prinLength < FARAWAYWHITESIZE &&
-            prinLength2 > prinLength / 2 && blob.area() > MINWHITEAREA &&
+        if (topCamera && centerY < height /3 &&
+            prinLength < FARAWAY_WHITE_SIZE &&
+            prinLength2 > prinLength / 2 && blob.area() > MIN_AREA &&
             prinLength2 >= 1 &&
             (centerY > field->horizonAt(centerX) || !topCamera)) {
             return farSanityChecks(blob);
@@ -168,17 +169,17 @@ namespace vision {
     bool BallDetector::blobsAreClose(std::pair<int,int> first,
                                      std::pair<int,int> second)
     {
-        int BOTTOMCAMERABLOBNEARNESS = 20;
-        int TOPCAMERABLOBNEARNESS = 30;
-        int TOTALCLOSENESS = 40;
-        int closeness = TOPCAMERABLOBNEARNESS;
+        int BOTTOM_CAMERA_BLOB_NEARNESS = 20;
+        int TOP_CAMERA_BLOB_NEARNESS = 30;
+        int TOTAL_CLOSENESS = 40;
+        int closeness = TOP_CAMERA_BLOB_NEARNESS;
         int xdiff = abs(first.first - second.first);
         int ydiff = abs(first.second - second.second);
         if (!topCamera) {
-            closeness = BOTTOMCAMERABLOBNEARNESS;
+            closeness = BOTTOM_CAMERA_BLOB_NEARNESS;
         }
         if (xdiff < closeness && ydiff < closeness &&
-            (xdiff + ydiff) < TOTALCLOSENESS &&
+            (xdiff + ydiff) < TOTAL_CLOSENESS &&
             (xdiff > 0 || ydiff > 0)) {
             return true;
         }
