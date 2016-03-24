@@ -66,7 +66,7 @@ namespace vision {
                 debugDraw.drawPoint(centerX, centerY, BLUE);
                 std::cout << "Black blob " << centerX << " " << centerY <<
                     " " << prinLength << " " << prinLength2 << std::endl;
-                }
+            }
         }
     }
 
@@ -117,6 +117,8 @@ namespace vision {
 
     /* We have a potential ball on the horizon. Do some checking to
        screen out potential other stuff.
+       This is a substantial area of possible improvement - more sanity
+       checks are definitely needed!
      */
     bool BallDetector::farSanityChecks(Blob blob)
     {
@@ -369,6 +371,13 @@ namespace vision {
 		return foundBall;
 	}
 
+    /* This next batch of functions checks whether pixels are a certain
+       color. The first, getColor just sets the pixel to be checked. The
+       rest should be self explanatory given the pixel having been set.
+       It should be noted that the numbers are pretty arbitrary. Hopefully
+       that means our system is robust and they aren't actually important.
+     */
+
 	void BallDetector::getColor(int x, int y) {
 		currentX = x;
 		currentY = y;
@@ -406,6 +415,8 @@ namespace vision {
 		yImage = yImg;
 	}
 
+    /* Ball functions.
+     */
 
     Ball::Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_,
 			   int imgWidth_, bool top, bool os, bool ot, bool ob) :
@@ -457,6 +468,8 @@ namespace vision {
 			diameterRatio = expectedDiam / (2 * firstPrincipalLength);
 		}
 
+        // We have sort of lost the ability to detect occlusion, so this
+        // could be drastically simplified again. But maybe we'll detect it again?
 		if ((occludedSide || occludedTop || occludedBottom) && density > 0.9) {
 			_confidence = ((density > thresh) & (aspectRatio > thresh) &
 						   (diameterRatio > radThresh)).f();
