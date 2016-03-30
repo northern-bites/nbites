@@ -234,11 +234,29 @@ public class JsonParser {
 		object.put( (JsonString) key, value);
 	}
 	
+	private void skip() {
+		boolean comment = false;
+		for (; pos < text.length(); ++pos) {
+            if (comment) {
+                if (text.charAt(pos) == '\n') comment = false;
+            } else {
+                if (isWhitespace(pos))
+                    continue;
+                if (text.charAt(pos) == '#') {
+                    comment = true;
+                    continue;
+                }
+
+                return;
+            }
+        }
+	}
+	
 	/*
 	 * Consumes whitespace leading up to next token but does not consume token itself.
 	 * */
 	private Token peekToken() throws JsonParseException {
-		for (; pos < text.length() && isWhitespace(pos); ++pos);
+		skip();
 		
 		if (pos >= text.length() ||
 				text.charAt(pos) == '\0') {
@@ -375,5 +393,8 @@ public class JsonParser {
 		outer.add(inner);
 		
 		Logger.println(outer.print() + "\n");
+		
+		String var = "#some comments\n {word : #cmmnt \n null}";
+		Logger.println(Json.parse(var).print());
 	}
 }

@@ -41,6 +41,7 @@ public class NBConstants {
 	
 	public static final String DEFAULT_S = "_DEFAULT_";
 	public static final String PROTOBUF_S = "_PROTOBUF_";
+    //public static final String IMAGE_S = "_IMAGE_"
 
 	public static final String IMAGE_S = "YUVImage";
 	
