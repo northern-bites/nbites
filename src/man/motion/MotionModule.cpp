@@ -742,6 +742,7 @@ void MotionModule::sendMotionCommand(messages::ScriptedMove script)
         // Stiffness given as gains, can take direct
         stiffness[0] = script.command(i).stiffness().head_yaw();
         stiffness[1] = script.command(i).stiffness().head_pitch();
+
         stiffness[2] = script.command(i).stiffness().l_shoulder_pitch();
         stiffness[3] = script.command(i).stiffness().l_shoulder_roll();
         stiffness[4] = script.command(i).stiffness().l_elbow_yaw();
@@ -1094,35 +1095,66 @@ void MotionModule::setJointsAndStiffness()
     newStiffness.get()->set_head_yaw(nextStiffnesses[HEAD_YAW]);
     newStiffness.get()->set_head_pitch(nextStiffnesses[HEAD_PITCH]);
 
+// THIS WAS SO THAT JUST THE HEAD IS STIFF!!! PLEASE MAKE A NOTE THIS IS NOT NORMAL!!!
+    
     // Left arm angles.
-    newStiffness.get()->set_l_shoulder_pitch(nextStiffnesses[L_SHOULDER_PITCH]);
-    newStiffness.get()->set_l_shoulder_roll(nextStiffnesses[L_SHOULDER_ROLL]);
-    newStiffness.get()->set_l_elbow_yaw(nextStiffnesses[L_ELBOW_YAW]);
-    newStiffness.get()->set_l_elbow_roll(nextStiffnesses[L_ELBOW_ROLL]);
+    newStiffness.get()->set_l_shoulder_pitch(-1.0f);
+    newStiffness.get()->set_l_shoulder_roll(-1.0f);
+    newStiffness.get()->set_l_elbow_yaw(-1.0f);
+    newStiffness.get()->set_l_elbow_roll(-1.0f);
 
     // Right arm angles.
-    newStiffness.get()->set_r_shoulder_pitch(nextStiffnesses[R_SHOULDER_PITCH]);
-    newStiffness.get()->set_r_shoulder_roll(nextStiffnesses[R_SHOULDER_ROLL]);
-    newStiffness.get()->set_r_elbow_yaw(nextStiffnesses[R_ELBOW_YAW]);
-    newStiffness.get()->set_r_elbow_roll(nextStiffnesses[R_ELBOW_ROLL]);
+    newStiffness.get()->set_r_shoulder_pitch(-1.0f);
+    newStiffness.get()->set_r_shoulder_roll(-1.0f);
+    newStiffness.get()->set_r_elbow_yaw(-1.0f);
+    newStiffness.get()->set_r_elbow_roll(-1.0f);
 
     // Pelvis angles.
-    newStiffness.get()->set_l_hip_yaw_pitch(nextStiffnesses[L_HIP_YAW_PITCH]);
-    newStiffness.get()->set_r_hip_yaw_pitch(nextStiffnesses[R_HIP_YAW_PITCH]);
+    newStiffness.get()->set_l_hip_yaw_pitch(-1.0f);
+    newStiffness.get()->set_r_hip_yaw_pitch(-1.0f);
 
     // Left leg angles.
-    newStiffness.get()->set_l_hip_roll(nextStiffnesses[L_HIP_ROLL]);
-    newStiffness.get()->set_l_hip_pitch(nextStiffnesses[L_HIP_PITCH]);
-    newStiffness.get()->set_l_knee_pitch(nextStiffnesses[L_KNEE_PITCH]);
-    newStiffness.get()->set_l_ankle_pitch(nextStiffnesses[L_ANKLE_PITCH]);
-    newStiffness.get()->set_l_ankle_roll(nextStiffnesses[L_ANKLE_ROLL]);
+    newStiffness.get()->set_l_hip_roll(-1.0f);
+    newStiffness.get()->set_l_hip_pitch(-1.0f);
+    newStiffness.get()->set_l_knee_pitch(-1.0f);
+    newStiffness.get()->set_l_ankle_pitch(-1.0f);
+    newStiffness.get()->set_l_ankle_roll(-1.0f);
 
     // Right leg angles.
-    newStiffness.get()->set_r_hip_roll(nextStiffnesses[R_HIP_ROLL]);
-    newStiffness.get()->set_r_hip_pitch(nextStiffnesses[R_HIP_PITCH]);
-    newStiffness.get()->set_r_knee_pitch(nextStiffnesses[R_KNEE_PITCH]);
-    newStiffness.get()->set_r_ankle_pitch(nextStiffnesses[R_ANKLE_PITCH]);
-    newStiffness.get()->set_r_ankle_roll(nextStiffnesses[R_ANKLE_ROLL]);
+    newStiffness.get()->set_r_hip_roll(-1.0f);
+    newStiffness.get()->set_r_hip_pitch(-1.0f);
+    newStiffness.get()->set_r_knee_pitch(-1.0f);
+    newStiffness.get()->set_r_ankle_pitch(-1.0f);
+    newStiffness.get()->set_r_ankle_roll(-1.0f); 
+    // // Left arm angles.
+    // newStiffness.get()->set_l_shoulder_pitch(nextStiffnesses[L_SHOULDER_PITCH]);
+    // newStiffness.get()->set_l_shoulder_roll(nextStiffnesses[L_SHOULDER_ROLL]);
+    // newStiffness.get()->set_l_elbow_yaw(nextStiffnesses[L_ELBOW_YAW]);
+    // newStiffness.get()->set_l_elbow_roll(nextStiffnesses[L_ELBOW_ROLL]);
+
+    // // Right arm angles.
+    // newStiffness.get()->set_r_shoulder_pitch(nextStiffnesses[R_SHOULDER_PITCH]);
+    // newStiffness.get()->set_r_shoulder_roll(nextStiffnesses[R_SHOULDER_ROLL]);
+    // newStiffness.get()->set_r_elbow_yaw(nextStiffnesses[R_ELBOW_YAW]);
+    // newStiffness.get()->set_r_elbow_roll(nextStiffnesses[R_ELBOW_ROLL]);
+
+    // // Pelvis angles.
+    // newStiffness.get()->set_l_hip_yaw_pitch(nextStiffnesses[L_HIP_YAW_PITCH]);
+    // newStiffness.get()->set_r_hip_yaw_pitch(nextStiffnesses[R_HIP_YAW_PITCH]);
+
+    // // Left leg angles.
+    // newStiffness.get()->set_l_hip_roll(nextStiffnesses[L_HIP_ROLL]);
+    // newStiffness.get()->set_l_hip_pitch(nextStiffnesses[L_HIP_PITCH]);
+    // newStiffness.get()->set_l_knee_pitch(nextStiffnesses[L_KNEE_PITCH]);
+    // newStiffness.get()->set_l_ankle_pitch(nextStiffnesses[L_ANKLE_PITCH]);
+    // newStiffness.get()->set_l_ankle_roll(nextStiffnesses[L_ANKLE_ROLL]);
+
+    // // Right leg angles.
+    // newStiffness.get()->set_r_hip_roll(nextStiffnesses[R_HIP_ROLL]);
+    // newStiffness.get()->set_r_hip_pitch(nextStiffnesses[R_HIP_PITCH]);
+    // newStiffness.get()->set_r_knee_pitch(nextStiffnesses[R_KNEE_PITCH]);
+    // newStiffness.get()->set_r_ankle_pitch(nextStiffnesses[R_ANKLE_PITCH]);
+    //newStiffness.get()->set_r_ankle_roll(nextStiffnesses[R_ANKLE_ROLL]);
 
     stiffnessOutput_.setMessage(newStiffness);
 }

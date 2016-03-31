@@ -137,6 +137,30 @@ NO_HEAD_STIFFNESSES = (GAINS_OFF_VALUE, # Head
                           GAINS_OFF_VALUE,
                           GAINS_OFF_VALUE,)
 
+
+NO_BODY_STIFFNESSES = (GAINS_ON_VALUE, # Head
+                          GAINS_ON_VALUE,
+                          GAINS_OFF_VALUE, # larm
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE, # lleg
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE, # rleg
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE, # rarm
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE,)
+
 GOALIE_DIVE_RIGHT_STIFFNESSES=  (LOWER_HEAD_VALUE, # Head
                                  LOWER_HEAD_VALUE,
                                  GAINS_ON_VALUE, # larm
