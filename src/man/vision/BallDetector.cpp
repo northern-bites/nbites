@@ -57,7 +57,15 @@ namespace vision {
         if (!topCamera) {
             minSecond = 1;
         }
-        if (prinLength < MAX_BLACK_BLOB &&
+        int maxB = MAX_BLACK_BLOB;
+        if (centerY < 100) {
+            maxB = 4;
+        } else if (centerY < 140) {
+            maxB = 5;
+        } else if (centerY < 200) {
+            maxB = 6;
+        }
+        if (prinLength < maxB &&
             prinLength2 >= minSecond && currentBlob.area() > MIN_BLACK_AREA &&
             (centerY > field->horizonAt(centerX) || !topCamera)) {
             blobs.push_back(std::make_pair(centerX, centerY));
@@ -173,13 +181,27 @@ namespace vision {
                                      std::pair<int,int> second)
     {
         int BOTTOM_CAMERA_BLOB_NEARNESS = 20;
-        int TOP_CAMERA_BLOB_NEARNESS = 30;
+        int TOP_CAMERA_BLOB_NEARNESS = 25;
         int TOTAL_CLOSENESS = 40;
         int closeness = TOP_CAMERA_BLOB_NEARNESS;
         int xdiff = abs(first.first - second.first);
         int ydiff = abs(first.second - second.second);
+        int ymax = max(first.second, second.second);
         if (!topCamera) {
             closeness = BOTTOM_CAMERA_BLOB_NEARNESS;
+        } else {
+            if (ymax > 200) {
+                closeness = 25;
+            } else if (ymax > 160) {
+                closeness = 20;
+                TOTAL_CLOSENESS = 35;
+            } else if (ymax > 120) {
+                closeness = 17;
+                TOTAL_CLOSENESS = 30;
+            } else {
+                closeness = 15;
+                TOTAL_CLOSENESS = 25;
+            }
         }
         if (xdiff < closeness && ydiff < closeness &&
             (xdiff + ydiff) < TOTAL_CLOSENESS &&
@@ -256,6 +278,12 @@ namespace vision {
                         // don't double count this blob
                         correlatedTo[k][c] = 0;
                         correlations[k] -= 1;
+                        if (debugBall) {
+                            std::cout << "Cor: " << blackBlobs[c].first <<
+                                " " << blackBlobs[c].second << " " <<
+                                blackBlobs[k].first << " " << blackBlobs[k].second <<
+                                std::endl;
+                        }
                     }
                 }
                 makeBall(newBall, cameraHeight, 0.75, foundBall);
@@ -337,7 +365,10 @@ namespace vision {
             if (count > 2) {
                 makeBall((*i), cameraHeight, 0.9, foundBall);
                 foundBall = true;
-            } else if (count > 0 && topCamera &&
+            } else if (count == 2) {
+                makeBall((*i), cameraHeight, 0.8, foundBall);
+                foundBall = true;
+            }else if (count > 0 && topCamera &&
                        centerY + principalLength > height - BUFFER &&
                        principalLength < BOTTOMEDGEWHITEMAX) {
                 makeBall((*i), cameraHeight, 0.5, foundBall);
