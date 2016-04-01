@@ -104,7 +104,8 @@ namespace vision {
             }
             int count = 0;
             // now loop through the black blobs and see if they are inside
-            for (std::pair<int,int> p : blackBlobs) {
+            for (int i = 0; i < blackBlobs.size(); i++) {
+                std::pair<int,int> p = blackBlobs[i];
                 if (abs(p.first - centerX) < prinLength &&
                     abs(p.second - centerY) < prinLength) {
                     count++;
@@ -205,7 +206,8 @@ namespace vision {
         bool foundThree = false;
         int count = 0;
         // loop through filtered black blobs
-        for (std::pair<int,int> p : blackBlobs) {
+        for (int i = 0; i < blackBlobs.size(); i++) {
+            std::pair<int,int> p = blackBlobs[i];
             // initialize the correlations for this blob
             correlations[count] = 0;
             for (int k = 0; k < blackBlobs.size(); k++) {
@@ -213,7 +215,8 @@ namespace vision {
             }
             int secondCounter = 0;
             // we're going to check against all other black blobs
-            for (std::pair<int,int> q : blackBlobs) {
+            for (int j = 0; j < blackBlobs.size(); j++) {
+                std::pair<int,int> q = blackBlobs[j];
                 if (blobsAreClose(p, q)) {
                     correlations[count] += 1;
                     correlatedTo[count][secondCounter] = 1;

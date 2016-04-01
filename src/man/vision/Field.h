@@ -144,7 +144,7 @@ private:
     static const bool debugFieldEdge = false;
 	static const bool debugDrawFieldEdge = false;
 	static const bool drawCameraHorizon = false;
-	static const bool debugRansad = false;
+	static const bool debugRansac = false;
 #endif
 };
 
