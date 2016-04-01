@@ -10,8 +10,9 @@ import math
 import noggin_constants as nogginConstants
 
 #TestingChange
-SAVING = False
-DIVING = False
+SAVING = True
+DIVING = True
+savedebug = False
 
 @superState('gameControllerResponder')
 def gameInitial(player):
@@ -79,6 +80,8 @@ def gameSet(player):
 @superState('gameControllerResponder')
 def gamePlaying(player):
     if player.firstFrame():
+        if player.brain.penalizedHack:
+            player.brain.resetGoalieLocalization()
         player.inKickingState = False
         player.brain.fallController.enabled = True
         player.penaltyKicking = False
@@ -97,9 +100,6 @@ def gamePlaying(player):
         return player.goLater('walkToGoal')
 
     if player.lastDiffState == 'fallen':
-        #TESTINGCHANGE
-        # return player.goLater('watch')
-        # #TODO fix this
         if (fallen.lastState == 'clearBall'
         and player.brain.ball.vis.on
         and math.fabs(player.brain.ball.bearing_deg) < 25.0
@@ -112,6 +112,9 @@ def gamePlaying(player):
         or fallen.lastState == 'repositionAfterWhiff'):
             print("I'm likely away frm the goalbox")
             return player.goLater('returnUsingLoc')
+        elif player.justDived:
+            player.justDived = False
+            return player.goLater('spinToRecover')
         else:
             return player.goLater('checkSafePlacement')
 
@@ -119,7 +122,7 @@ def gamePlaying(player):
     #TESTINGCHANGE
     # return player.goLater('watchWithLineChecks')
     return player.goLater('watch')
-    # return player.goLater('spinToRecover')
+    # return player.goLater('checkSafePlacement')
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
@@ -186,6 +189,7 @@ def watchWithLineChecks(player):
         print ("My num fix:", watchWithLineChecks.numFixes)
         watchWithLineChecks.lines[:] = []
         player.homeDirections = []
+        watchWithLineChecks.hasPanned = False
 
         if (player.lastDiffState is not 'lineCheckReposition'
         and player.lastDiffState is not 'moveBackwards'):
@@ -205,15 +209,17 @@ def watchWithLineChecks(player):
 
     if (player.brain.ball.vis.frames_on > constants.BALL_ON_SAFE_THRESH
         and player.brain.ball.distance > constants.BALL_SAFE_DISTANCE_THRESH
-        and not watchWithLineChecks.looking):
+        and not watchWithLineChecks.looking
+        and not watchWithLineChecks.hasPanned):
         watchWithLineChecks.looking = True
         player.brain.tracker.performBasicPan()
+        watchWithLineChecks.hasPanned = True
 
     if player.brain.tracker.isStopped():
         watchWithLineChecks.looking = False
         player.brain.tracker.trackBall()
 
-    if watchWithLineChecks.counter > 300 or watchWithLineChecks.numFixes > 6:
+    if watchWithLineChecks.counter > 150 or watchWithLineChecks.numFixes > 6:
         print "Counter was over 400, going to watch!"
         return player.goLater('watch')
 
@@ -286,7 +292,7 @@ def shiftPosition(player):
         print("H:", shiftPosition.dest.h)
 
         player.brain.nav.goTo(shiftPosition.dest,
-                            speed = nav.BRISK_SPEED,
+                            speed = nav.QUICK_SPEED,
                             fast = False)
 
     if player.counter > 300:
@@ -333,28 +339,28 @@ def watch(player):
 
 
 #TestingChange
-    # if player.counter % 2 == 0:
-    # #     print("Horizon dist == ", player.brain.vision.horizon_dist)
+    if player.counter % 2 == 0 and savedebug:
+        print("Horizon dist == ", player.brain.vision.horizon_dist)
 
-    #     ball = player.brain.ball
-    #     nball = player.brain.naiveBall
+        ball = player.brain.ball
+        nball = player.brain.naiveBall
 
-    #     print("Ball bearing:", ball.bearing_deg)
-    #     print("Ball x:", ball.x)
-    #     print("Ball y:", ball.y)
-    #     print("Ball dist:", ball.distance)
-    #     print("Ball dist:", ball.distance)
-    #     print("ball.vis.frames_on", ball.vis.frames_on)
-    #     print("nb xvel:", nball.x_vel)
+        print("Ball bearing:", ball.bearing_deg)
+        print("Ball x:", ball.x)
+        print("Ball y:", ball.y)
+        print("Ball dist:", ball.distance)
+        print("Ball dist:", ball.distance)
+        print("ball.vis.frames_on", ball.vis.frames_on)
+        print("nb xvel:", nball.x_vel)
     #     print("nb altxvel:", nball.alt_x_vel)
-    #     print("ball mov vel:", ball.mov_vel_x)
+        print("ball mov vel:", ball.mov_vel_x)
     #     print("ball mov speed:", ball.mov_speed)
     #     print("stationary: ", nball.stationary)
     #     print("yintercept", nball.yintercept)
     # #     print("1", nball.x_v_1)
     # #     print("2", nball.x_v_2)
     # #     print("3", nball.x_v_3)
-    #     print"- - -  -- - -- --- ---    - --"
+        print"- - -  -- - -- --- ---    - --"
 
     # return player.stay()
     return Transition.getNextState(player, watch)
@@ -399,7 +405,7 @@ def moveBackwards(player):
         player.brain.nav.walkTo(RelRobotLocation(-100.0, 0, 0))
 
 #TestingChange
-    if player.counter > 100:
+    if player.counter > 250:
         print("Walking backwards too long... switch to a different state!")
         return player.goLater('spinToRecover')
 
@@ -408,9 +414,10 @@ def moveBackwards(player):
 @superState('gameControllerResponder')
 def spinToRecover(player):
     if player.firstFrame():
-        player.setWalk(0,0,20.0)
+        player.brain.resetGoalieLocalization()
+        player.setWalk(0,0,15.0)
 
-    if player.counter > 250:
+    if player.counter > 275:
         print("Too long... switch to a different state!")
         return player.goLater('returnUsingLoc')
 
@@ -425,10 +432,10 @@ def kickBall(player):
         player.brain.tracker.trackBall()
         player.brain.nav.stop()
 
-    if player.counter is 20:
+    if player.counter is 20 and player.brain.ball.vis.on:
         player.executeMove(player.kick.sweetMove)
 
-    if player.brain.ball.vis.frames_off > 15.0:
+    if player.brain.ball.vis.frames_off > 10.0:
         print("I lost the ball! I'm returning to goal")
         return player.goLater('returnUsingLoc')
 
@@ -444,11 +451,12 @@ def saveCenter(player):
         player.brain.tracker.lookToAngle(0)
         if SAVING:
             player.executeMove(SweetMoves.GOALIE_SQUAT)
-        else:
-            player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
+        # else:
+        #     player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
         #TESTINGCHANGE
+  
 
-    if player.counter > 80:
+    if player.counter > 40:
         if SAVING:
             player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
             return player.goLater('upUpUP')
@@ -478,13 +486,13 @@ def saveRight(player):
         if SAVING and DIVING:
             player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
             player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
-        else:
-            player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
+        # else:
+        #     player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
 
     if player.counter > 80:
         if SAVING and DIVING:
             # player.executeMove(SweetMoves.GOALIE_ROLL_OUT_RIGHT)
-            return player.goLater('fallen')
+            return player.goLater('rollOut')
         else:
             return player.goLater('watch')
 
@@ -498,8 +506,8 @@ def saveLeft(player):
         if SAVING and DIVING:
             player.executeMove(SweetMoves.GOALIE_DIVE_LEFT)
             player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
-        else:
-            player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
+        # else:
+        #     player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
 
     if player.counter > 80:
         if SAVING and DIVING:
@@ -515,6 +523,7 @@ def saveLeft(player):
 def rollOut(player):
     if player.brain.nav.isStopped():
         player.brain.fallController.enabled = True
+        player.justDived = True
         return player.goLater('fallen')
 
     return player.stay()

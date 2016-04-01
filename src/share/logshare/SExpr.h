@@ -25,6 +25,7 @@ namespace nblog {
     const std::string LOG_VERSION_S = "version";
     const std::string LOG_CHECKSUM_S = "checksum";
     const std::string LOG_HOST_TYPE_S = "host_type";
+    const std::string LOG_HOST_NAME_S = "host_name";
     const std::string LOG_FROM_ADDR_S = "from_address";
     
     //content item keys

@@ -24,6 +24,7 @@ message MotionCommand
         WALK_COMMAND = 1;
         SCRIPTED_MOVE = 2;
         ODOMETRY_WALK = 3;
+        KICK = 4;
     }
 
     optional CommandType type = 1;
@@ -32,8 +33,9 @@ message MotionCommand
     optional DestinationWalk dest = 3;
     optional WalkCommand speed = 4;
     optional OdometryWalk odometry_dest = 5;
+    optional Kick kick = 6;
 
-    optional int64 timestamp = 6;
+    optional int64 timestamp = 7;
 }
 
 message ScriptedMove
@@ -82,6 +84,15 @@ message MotionKick
 {
     optional bool  perform_motion_kick = 1;
     optional int32 kick_type = 2;
+}
+
+message Kick
+{
+    enum KickType {
+    	 kickForwardLeft = 0;
+    	 kickForwardRight = 1;
+    }
+    optional KickType type = 2;
 }
 
 message HeadMotionCommand

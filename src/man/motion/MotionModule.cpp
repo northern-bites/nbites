@@ -278,9 +278,10 @@ void MotionModule::processHeadJoints()
         }
     }
 }
-
+int framecount = 0;
 void MotionModule::processMotionInput()
 {
+    framecount++;
     // (1) Process Behavior requests.
     if(lastRequest != requestInput_.message().timestamp())
     {
@@ -368,6 +369,11 @@ void MotionModule::processMotionInput()
                  messages::MotionCommand::WALK_COMMAND)
         {
             sendMotionCommand(bodyCommandInput_.message().speed());
+        }
+        else if (bodyCommandInput_.message().type() ==
+                 messages::MotionCommand::KICK)
+        {
+              sendMotionCommand(bodyCommandInput_.message().kick(), bodyCommandInput_.message().timestamp());
         }
         else if (bodyCommandInput_.message().type() ==
                  messages::MotionCommand::SCRIPTED_MOVE)
@@ -903,6 +909,8 @@ void MotionModule::sendMotionCommand(const DestinationCommand::ptr command)
 }
 
 
+
+
 // TESTED by EJ, works appropriately. Don't fuck with unless I'm told.
 /*
  * Given a DestinationWalk proto,
@@ -967,6 +975,19 @@ void MotionModule::sendMotionCommand(messages::OdometryWalk command)
             relH,
             gain)
         );
+    walkProvider.setCommand(newCommand);
+}
+
+void MotionModule::sendMotionCommand(const KickCommand::ptr command)
+{
+    nextProvider = &walkProvider;
+    walkProvider.setCommand(command);
+}
+
+void MotionModule::sendMotionCommand(messages::Kick command, int time)
+{
+    nextProvider = &walkProvider;
+    KickCommand::ptr newCommand(new KickCommand(command.type(), time));
     walkProvider.setCommand(newCommand);
 }
 

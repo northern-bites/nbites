@@ -9,6 +9,9 @@ set( bhwalk_srcs
   WalkingEngine.cpp
   WalkingEngineKicks.cpp
   WalkingEngineTools.cpp
+  KickEngine/KickEngine.cpp
+  KickEngine/KickEngineData.cpp
+  KickEngine/KickEngineParameters.cpp
   Modules/Infrastructure/NaoProvider.cpp
   Modules/Sensing/TorsoMatrixProvider.cpp
   Modules/Sensing/RobotModelProvider.cpp
@@ -31,6 +34,7 @@ set( bhwalk_srcs
   Representations/Perception/ImageCoordinateSystem.cpp
   Representations/Perception/ColorReference.cpp
   Representations/Blackboard.cpp
+  Representations/MotionControl/KickRequest.cpp
   Platform/File.cpp
   Platform/BHAssert.cpp
   Platform/Linux/NaoBody.cpp

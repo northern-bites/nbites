@@ -1,4 +1,4 @@
-#include "LandmarkSystem.h"
+#include "LandmarkModel.h"
 
 #include <limits>
 #include <boost/math/distributions/normal.hpp>
@@ -6,8 +6,8 @@
 namespace man {
 namespace localization {
 
-LandmarkSystem::LandmarkSystem() 
-    : corners(), ballInSet(), debug(false)
+LandmarkModel::LandmarkModel(const struct ParticleFilterParams& params_) 
+    : params(params_), corners(), ballInSet(), debug(false)
 {
     // Construct map
     // Init corner map
@@ -34,6 +34,8 @@ LandmarkSystem::LandmarkSystem()
     addCorner(vision::CornerID::Convex, LandmarkID::TheirLeftBox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH, BLUE_GOALBOX_TOP_Y);
     addCorner(vision::CornerID::T, LandmarkID::TheirRightT, GREEN_PAD_X + FIELD_WHITE_WIDTH, BLUE_GOALBOX_BOTTOM_Y);
     addCorner(vision::CornerID::T, LandmarkID::TheirLeftT, GREEN_PAD_X + FIELD_WHITE_WIDTH, BLUE_GOALBOX_TOP_Y);
+    addCorner(vision::CornerID::T, LandmarkID::CenterCircleLeftT, CENTER_FIELD_X, CENTER_FIELD_Y + CENTER_CIRCLE_RADIUS);
+    addCorner(vision::CornerID::T, LandmarkID::CenterCircleRightT, CENTER_FIELD_X, CENTER_FIELD_Y - CENTER_CIRCLE_RADIUS);
 
     // Add center circle to map
     circle = std::make_tuple(LandmarkID::CenterCircle, CENTER_FIELD_X, CENTER_FIELD_Y);
@@ -42,8 +44,8 @@ LandmarkSystem::LandmarkSystem()
     ballInSet = std::make_tuple(LandmarkID::BallInSet, CENTER_FIELD_X, CENTER_FIELD_Y);
 }
 
-Landmark LandmarkSystem::matchCorner(const messages::Corner& observation, 
-                                     const messages::RobotLocation& loc)
+Landmark LandmarkModel::matchCorner(const messages::Corner& observation, 
+                                    const messages::RobotLocation& loc)
 {
     Landmark correspondingLandmark;
     double closestDist = std::numeric_limits<double>::max();
@@ -52,7 +54,7 @@ Landmark LandmarkSystem::matchCorner(const messages::Corner& observation,
     messages::RobotLocation obsvAsRobotLocation;
     obsvAsRobotLocation.set_x(observation.x());
     obsvAsRobotLocation.set_y(observation.y());
-    messages::RobotLocation obsvAbs = LandmarkSystem::relRobotToAbsolute(obsvAsRobotLocation, loc);
+    messages::RobotLocation obsvAbs = LandmarkModel::relRobotToAbsolute(obsvAsRobotLocation, loc);
 
     // Loop through all corners with right id from vision and take the corner
     // that best corresponds to the observation
@@ -73,8 +75,8 @@ Landmark LandmarkSystem::matchCorner(const messages::Corner& observation,
     return correspondingLandmark;
 }
 
-double LandmarkSystem::scoreCorner(const messages::Corner& observation, 
-                                   const messages::RobotLocation& loc)
+double LandmarkModel::scoreCorner(const messages::Corner& observation, 
+                                  const messages::RobotLocation& loc)
 {
     // Turn observation into RobotLocation so scoreObservation can operate on it
     messages::RobotLocation obsvAsRobotLocation;
@@ -86,8 +88,8 @@ double LandmarkSystem::scoreCorner(const messages::Corner& observation,
     return scoreObservation(obsvAsRobotLocation, correspondingLandmark, loc, observation.wz0());
 }
 
-double LandmarkSystem::scoreCircle(const messages::CenterCircle& observation, 
-                                   const messages::RobotLocation& loc)
+double LandmarkModel::scoreCircle(const messages::CenterCircle& observation, 
+                                  const messages::RobotLocation& loc)
 {
     // Turn observation into RobotLocation so scoreObservation can operate on it
     messages::RobotLocation obsvAsRobotLocation;
@@ -98,8 +100,8 @@ double LandmarkSystem::scoreCircle(const messages::CenterCircle& observation,
     return scoreObservation(obsvAsRobotLocation, circle, loc, observation.wz0());
 }
 
-double LandmarkSystem::scoreBallInSet(const messages::FilteredBall& observation, 
-                                      const messages::RobotLocation& loc)
+double LandmarkModel::scoreBallInSet(const messages::FilteredBall& observation, 
+                                     const messages::RobotLocation& loc)
 {
     // Polar to cartesian
     double xBall, yBall;
@@ -114,7 +116,7 @@ double LandmarkSystem::scoreBallInSet(const messages::FilteredBall& observation,
     return scoreObservation(obsvAsRobotLocation, ballInSet, loc, observation.vis().wz0());
 }
 
-messages::RobotLocation LandmarkSystem::relRobotToAbsolute(const messages::RobotLocation& observation, const messages::RobotLocation& loc)
+messages::RobotLocation LandmarkModel::relRobotToAbsolute(const messages::RobotLocation& observation, const messages::RobotLocation& loc)
 {
 
     // Translation rotation to absolute coordinate system
@@ -129,10 +131,14 @@ messages::RobotLocation LandmarkSystem::relRobotToAbsolute(const messages::Robot
     return transformed;
 }
 
-double LandmarkSystem::scoreObservation(const messages::RobotLocation& observation, 
-                                        const Landmark& correspondingLandmark,
-                                        const messages::RobotLocation& loc,
-                                        double wz0)
+// FUTURE WORK, currently we use the same gaussians to model error for corners
+//              and center circle, since the detector are different it may be 
+//              better to have different params for the two features, the tradeoff
+//              is that then there are more params to optimize
+double LandmarkModel::scoreObservation(const messages::RobotLocation& observation, 
+                                       const Landmark& correspondingLandmark,
+                                       const messages::RobotLocation& loc,
+                                       double wz0)
 {
     // Observation, cartesian to polar
     double rObsv, tObsv;
@@ -159,9 +165,8 @@ double LandmarkSystem::scoreObservation(const messages::RobotLocation& observati
     double tDiff = vision::diffRadians(tMapRel, tObsv);
  
     // Evaluate gaussian to get probability of observation from location loc
-    // TODO params
-    boost::math::normal_distribution<> tiltGaussian(0, 5*TO_RAD);
-    boost::math::normal_distribution<> tGaussian(0, 20*TO_RAD);
+    boost::math::normal_distribution<> tiltGaussian(0, params.landmarkTiltStdev);
+    boost::math::normal_distribution<> tGaussian(0, params.landmarkBearingStdev);
 
     double tiltProb = pdf(tiltGaussian, tiltDiff);
     double tProb = pdf(tGaussian, tDiff);
@@ -180,9 +185,13 @@ double LandmarkSystem::scoreObservation(const messages::RobotLocation& observati
 
     // Make the conditional independence assumption
     return tiltProb * tProb;
+
+    // FUTURE WORK, also model uncertainity in classification, uncertainity may
+    //              vary as a function of landmark id, for example, the center circle
+    //              may be easier to classify than corners
 }
 
-void LandmarkSystem::addCorner(vision::CornerID type, LandmarkID id, double x, double y)
+void LandmarkModel::addCorner(vision::CornerID type, LandmarkID id, double x, double y)
 {
     Landmark corner = std::make_tuple(id, x, y);
     corners[type].push_back(corner);
