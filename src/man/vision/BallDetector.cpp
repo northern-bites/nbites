@@ -45,7 +45,7 @@ namespace vision {
                                         std::vector<Blob> & actualBlobs)
     {
         int MAX_BLACK_BLOB = 8;
-        float MIN_BLACK_AREA = 10.0f;
+        float MIN_BLACK_AREA = 7.0f;
 
         int centerX = static_cast<int>(currentBlob.centerX());
         int centerY = static_cast<int>(currentBlob.centerY());
@@ -59,11 +59,14 @@ namespace vision {
         }
         int maxB = MAX_BLACK_BLOB;
         if (centerY < 100) {
-            maxB = 4;
-        } else if (centerY < 140) {
             maxB = 5;
-        } else if (centerY < 200) {
+        } else if (centerY < 140) {
             maxB = 6;
+        } else if (centerY < 200) {
+            maxB = 7;
+        }
+        if (!topCamera) {
+            maxB = MAX_BLACK_BLOB;
         }
         if (prinLength < maxB &&
             prinLength2 >= minSecond && currentBlob.area() > MIN_BLACK_AREA &&
@@ -75,6 +78,10 @@ namespace vision {
                 std::cout << "Black blob " << centerX << " " << centerY <<
                     " " << prinLength << " " << prinLength2 << std::endl;
             }
+        } else if (debugBall) {
+            std::cout << "Rejected Black blob " << centerX << " " << centerY <<
+                " " << prinLength << " " << prinLength2 <<
+                " " << currentBlob.area() << std::endl;
         }
     }
 
@@ -114,8 +121,8 @@ namespace vision {
             // now loop through the black blobs and see if they are inside
             for (int i = 0; i < blackBlobs.size(); i++) {
                 std::pair<int,int> p = blackBlobs[i];
-                if (abs(p.first - centerX) < prinLength &&
-                    abs(p.second - centerY) < prinLength) {
+                if (abs(p.first - centerX) <= prinLength &&
+                    abs(p.second - centerY) <= prinLength) {
                     count++;
                 }
             }
@@ -180,7 +187,7 @@ namespace vision {
     bool BallDetector::blobsAreClose(std::pair<int,int> first,
                                      std::pair<int,int> second)
     {
-        int BOTTOM_CAMERA_BLOB_NEARNESS = 20;
+        int BOTTOM_CAMERA_BLOB_NEARNESS = 25;
         int TOP_CAMERA_BLOB_NEARNESS = 25;
         int TOTAL_CLOSENESS = 40;
         int closeness = TOP_CAMERA_BLOB_NEARNESS;
@@ -362,7 +369,7 @@ namespace vision {
             int count = filterWhiteBlobs((*i), whiteBlobs, blackBlobs);
             int centerY = static_cast<int>((*i).centerY());
             int principalLength = static_cast<int>((*i).firstPrincipalLength());
-            if (count > 2) {
+            if (count > 1) {
                 makeBall((*i), cameraHeight, 0.9, foundBall);
                 foundBall = true;
             } else if (count == 2) {
