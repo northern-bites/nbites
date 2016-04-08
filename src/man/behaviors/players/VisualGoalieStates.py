@@ -41,10 +41,11 @@ def checkSafePlacement(player):
         player.corners = []
         checkSafePlacement.lastLook = constants.RIGHT
         checkSafePlacement.looking = False
+        checkSafePlacement.turnCount = 0
         player.goodRightCornerObservation = False
         player.goodLeftCornerObservation = False
 
-    if not checkSafePlacement.looking:
+    if not checkSafePlacement.looking and checkSafePlacement.turnCount < 2:
         checkSafePlacement.looking = True
         if checkSafePlacement.lastLook is constants.RIGHT:
             player.brain.tracker.lookToAngle(constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER)
@@ -53,15 +54,26 @@ def checkSafePlacement(player):
             player.brain.tracker.lookToAngle(0)
             checkSafePlacement.lastLook = constants.UNKNOWN
         else:
+            print("horizon:", player.brain.vision.horizon_dist)
+            checkSafePlacement.turnCount += 1
             player.brain.tracker.lookToAngle(constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER)
             checkSafePlacement.lastLook = constants.RIGHT
-
+    elif checkSafePlacement.turnCount >= 2:
+        player.brain.tracker.lookToAngle(0)
     if player.brain.tracker.isStopped():
         checkSafePlacement.looking = False
 
-    if player.counter > 140:
+    # if player.counter > 50:
+
+        #TESTINGCHANGE
+    if player.counter > 140 and not player.justDived:
         print("Took too long, assume wrong")
         return player.goLater('watchWithLineChecks')
+    elif player.counter > 130 and player.justDived:
+        player.justDived = False
+        return player.goLater('returnUsingLoc')
+
+        # return player.goLater('watchWithLineChecks')
 
     return Transition.getNextState(player, checkSafePlacement)
 
@@ -86,15 +98,15 @@ def clearBall(player):
         # print "approaching ball"
         player.brain.nav.chaseBall(nav.FAST_SPEED, fast = True)
 
-    if player.counter % 2 == 0:
-        nball = player.brain.naiveBall
-        ball = player.brain.ball
-        print "================================="
-        print("yintercept:", nball.yintercept)
-        print("Ball dist:", ball.distance)
-        print("ball.vis.frames_on", ball.vis.frames_on)
-        print("nb xvel:", nball.x_vel)
-        print("ball mov vel:", ball.mov_vel_x)
+    # if player.counter % 2 == 0:
+    #     nball = player.brain.naiveBall
+    #     ball = player.brain.ball
+    #     print "================================="
+    #     print("yintercept:", nball.yintercept)
+    #     print("Ball dist:", ball.distance)
+    #     print("ball.vis.frames_on", ball.vis.frames_on)
+    #     print("nb xvel:", nball.x_vel)
+    #     print("ball mov vel:", ball.mov_vel_x)
 
     return Transition.getNextState(player, clearBall)
 
@@ -110,6 +122,7 @@ def positionForGoalieKick(player):
         positionForGoalieKick.kickPose = RelRobotLocation(ball.rel_x - player.kick.setupX,
                                     ball.rel_y - player.kick.setupY,
                                     0)
+        print("Kickpose:", positionForGoalieKick.kickPose.relX, positionForGoalieKick.kickPose.relY)
         positionForGoalieKick.speed = nav.GRADUAL_SPEED
 
         player.brain.nav.goTo(positionForGoalieKick.kickPose,
@@ -123,6 +136,7 @@ def positionForGoalieKick(player):
 
     if GoalieTransitions.ballReadyToKick(player, positionForGoalieKick.kickPose):
         player.brain.nav.stand()
+        print("Kickpose:", positionForGoalieKick.kickPose.relX, positionForGoalieKick.kickPose.relY)
         return player.goNow('kickBall')
 
     return Transition.getNextState(player, positionForGoalieKick)

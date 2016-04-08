@@ -9,6 +9,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
 import javax.swing.event.*;
@@ -44,7 +45,7 @@ import nbtool.io.CrossIO.CrossCall;
 import nbtool.util.Utility;
 
 public class DebugImageView extends ViewParent
-	implements IOFirstResponder, ActionListener, ChangeListener {
+	implements IOFirstResponder, ActionListener, ChangeListener, MouseMotionListener {
 
 	// Values according to nbcross/vision_defs.cpp - must be kept in sync
 	static final int YIMAGE = 0;
@@ -58,7 +59,8 @@ public class DebugImageView extends ViewParent
 	static final int CENTER_CIRCLE = 8;
 	static final int DRAWING = 9;
 	static final int THRESH = 10;
-	static final int ORIGINAL = 11;
+	static final int LEARN = 11;
+	static final int ORIGINAL = 12;
 
 	static final int DEFAULT_WIDTH = 320;
 	static final int DEFAULT_HEIGHT = 240;
@@ -69,7 +71,7 @@ public class DebugImageView extends ViewParent
 	static final int FIELDH = 554;
 
 	// Images that we can view in this view using the combo box
-	String[] imageViews = { "Original", "Green", "Orange", "White", "Edge", "Thresh" };
+	String[] imageViews = { "Original", "Green", "Orange", "White", "Edge", "Thresh", "Learn" };
 	JComboBox viewList;
 
 	JSlider greenThreshold;
@@ -95,6 +97,9 @@ public class DebugImageView extends ViewParent
 	BufferedImage debugImageDisplay;        // overlay + original
 	BufferedImage displayImages[] = new BufferedImage[ORIGINAL+1]; // our images
 	Y8ThreshImage greenCheck;
+	Y8image green8;
+
+	private String label = null;
 
 	Log currentLog;
 	Log balls;
@@ -125,6 +130,7 @@ public class DebugImageView extends ViewParent
 		add(viewList);
 		add(greenThreshold);
         this.addMouseListener(new DistanceGetter());
+		this.addMouseMotionListener(this);
 
 		// default image to display - save across instances
 		if (firstLoad) {
@@ -174,8 +180,8 @@ public class DebugImageView extends ViewParent
             height = DEFAULT_HEIGHT;
         }
 
-        displayw = width*2;
-        displayh = height*2;
+        displayw = 640; //width*2;
+        displayh = 480; //height*2;
 
         displayImages[ORIGINAL] = Utility.biFromLog(newlog);
 		currentLog = newlog;
@@ -217,17 +223,28 @@ public class DebugImageView extends ViewParent
 
     public void paintComponent(Graphics g) {
 		final int BOX_HEIGHT = 25;
+		super.paintComponent(g);
+
         if (debugImage != null) {
             g.drawImage(debugImageDisplay, 0, 0, displayw, displayh, null);
 			drawLines(g);
 			drawBlobs(g);
 			//displayImages[THRESH].setThresh(persistant.greenThreshold);
-			g.drawImage(displayImages[currentBottom], 0, displayh + 5, displayw,
-						displayh, null);
-			viewList.setBounds(0, displayh * 2 + 10, displayw / 2, BOX_HEIGHT);
-			greenThreshold.setBounds(0, displayh*2 + 15 + BOX_HEIGHT, displayw, BOX_HEIGHT+20);
+			if (currentBottom != LEARN) {
+				g.drawImage(displayImages[currentBottom], 0, displayh + 25, displayw / 2,
+							displayh / 2, null);
+			} else {
+				findGreen(g);
+			}
+			viewList.setBounds(displayw / 2 + 10, displayh  + 10, displayw / 2, BOX_HEIGHT);
+			if (label != null) {
+				g.setColor(Color.BLACK);
+				g.drawString(label, 10, displayh + 20);
+			}
+
+			greenThreshold.setBounds(displayw / 2, displayh + 15 + BOX_HEIGHT, 500, BOX_HEIGHT+20);
 			greenThreshold.repaint();
-			persistant.setBounds(displayw+10, 0, 400, 300);
+			persistant.setBounds(displayw+10, 0, 300, 300);
         }
     }
 
@@ -288,6 +305,10 @@ public class DebugImageView extends ViewParent
 	 */
     public void drawBlobs(Graphics g)
     {
+		int multiplier = 2;
+		if (width != DEFAULT_WIDTH) {
+			multiplier = 4;
+		}
 		// if we don't have an orange image we're in trouble
         if (displayImages[ORANGE_IMAGE] == null) {
 			System.out.println("No orange image");
@@ -308,7 +329,7 @@ public class DebugImageView extends ViewParent
 				}
 				SExpr blob = bl.get(1);
 				if (persistant != null && persistant.drawAllBalls) {
-					drawBlob(graph, blob);
+					drawBlob(graph, blob, multiplier);
 				}
 			}
 
@@ -329,11 +350,13 @@ public class DebugImageView extends ViewParent
 
             int x = (int) Math.round(loc.get(0).valueAsDouble());
             int y = (int) Math.round(loc.get(1).valueAsDouble());
-            graph.draw(new Ellipse2D.Double((x - diam/2) * 2, (y - diam/2)*2, diam*2, diam*2));
+            graph.draw(new Ellipse2D.Double((x - diam/2) * multiplier,
+											(y - diam/2)* multiplier,
+											diam*multiplier, diam*multiplier));
         }
     }
 
-    private void drawBlob(Graphics2D g, SExpr blob)
+    private void drawBlob(Graphics2D g, SExpr blob, int multiplier)
     {
         SExpr loc = blob.find("center").get(1);
 
@@ -350,13 +373,13 @@ public class DebugImageView extends ViewParent
         int secondXOff = (int)Math.round(len2 * Math.cos(ang2));
         int secondYOff = (int)Math.round(len2 * Math.sin(ang2));
 
-        g.drawLine((x - firstXOff)*2, (y - firstYOff)*2,
-				   (x + firstXOff)*2, (y + firstYOff)*2);
-        g.drawLine((x - secondXOff)*2, (y - secondYOff)*2,
-				   (x + secondXOff)*2, (y + secondYOff)*2);
-        Ellipse2D.Double ellipse = new Ellipse2D.Double((x-len1)*2, (y-len2)*2,
-														len1*4, len2*4);
-        Shape rotated = (AffineTransform.getRotateInstance(ang1, x*2, y*2).
+        g.drawLine((x - firstXOff)*multiplier, (y - firstYOff)*multiplier,
+				   (x + firstXOff)*multiplier, (y + firstYOff)*multiplier);
+        g.drawLine((x - secondXOff)*multiplier, (y - secondYOff)*multiplier,
+				   (x + secondXOff)*multiplier, (y + secondYOff)*multiplier);
+        Ellipse2D.Double ellipse = new Ellipse2D.Double((x-len1)*multiplier, (y-len2)*multiplier,
+														len1*2*multiplier, len2*2*multiplier);
+        Shape rotated = (AffineTransform.getRotateInstance(ang1, x*multiplier, y*multiplier).
 						 createTransformedShape(ellipse));
         g.draw(rotated);
     }
@@ -404,6 +427,8 @@ public class DebugImageView extends ViewParent
 			currentBottom = ORIGINAL;
 		} else if (viewName == "Thresh") {
 			currentBottom = THRESH;
+		} else if (viewName == "Learn") {
+			currentBottom = LEARN;
 		} else {
 			currentBottom = ORIGINAL;
 		}
@@ -442,6 +467,34 @@ public class DebugImageView extends ViewParent
 
       public void mouseExited(MouseEvent e) {}
     }
+
+	@Override
+	public void mouseDragged(MouseEvent e) {}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		if (currentLog == null) {
+			return;
+		}
+
+		int col = e.getX();
+		int row = e.getY();
+
+		if (col < 0 || row < 0 || col >= displayw || row >= displayh) {
+			return;
+		}
+
+		boolean first = (col & 1) == 0;
+		int cbase = (col & ~1);
+		int i = (row * displayw * 2) + (cbase * 2);
+
+		int y = currentLog.data()[first ? i : i + 2] & 0xff;
+		int u = currentLog.data()[i + 1] & 0xff;
+		int v = currentLog.data()[i + 3] & 0xff;
+		label = String.format("(%d,%d): y=%d u=%d v=%d", col, row, y, u, v);
+		repaint();
+	}
+
 
 	class PersistantStuff extends JPanel
 		implements ItemListener {
@@ -533,14 +586,54 @@ public class DebugImageView extends ViewParent
 
 	}
 
+	public void findGreen(Graphics g) {
+		int max = 0;
+		int maxY = 0;
+		int maxU = 0;
+		int maxV = 0;
+		for (int col = 0; col < width; col++) {
+			for (int row = 0; row < height; row++) {
+				int gr = (green8.data[row * width + col]) & 0xFF;
+				if (gr > max) {
+					boolean first = (col & 1) == 0;
+					int cbase = (col & ~1);
+					int i = (row * displayw * 2) + (cbase * 2);
+
+					maxY = currentLog.data()[first ? i : i + 2] & 0xff;
+					maxU = currentLog.data()[i + 1] & 0xff;
+					maxV = currentLog.data()[i + 3] & 0xff;
+				}
+			}
+		}
+		for (int col = 0; col < width * 2; col++) {
+			for (int row = 0; row < height * 2; row++) {
+				boolean first = (col & 1) == 0;
+				int cbase = (col & ~1);
+				int i = (row * width * 2 * 2) + (cbase * 2);
+
+				int y = currentLog.data()[first ? i : i + 2] & 0xff;
+				int u = currentLog.data()[i + 1] & 0xff;
+				int v = currentLog.data()[i + 3] & 0xff;
+				if (Math.abs(y - maxY) < 15 && Math.abs(u - maxU) < 10 &&
+					Math.abs(v - maxV) < 10) {
+					g.setColor(Color.GREEN);
+				} else {
+					g.setColor(Color.BLACK);
+				}
+				g.fillRect(col/2, row/2+displayh+30, 1, 1);
+			}
+		}
+	}
+
     @Override
     public void ioFinished(IOInstance instance) {}
 
     @Override
     public void ioReceived(IOInstance inst, int ret, Log... out) {
 		System.out.println("IO received in Debug");
+		//yuv = out[0].bytes;
 		if (out.length > GREEN_IMAGE) {
-            Y8image green8 = new Y8image(width, height, out[GREEN_IMAGE].bytes);
+            green8 = new Y8image(width, height, out[GREEN_IMAGE].bytes);
             displayImages[GREEN_IMAGE] = green8.toBufferedImage();
 			greenCheck = new Y8ThreshImage(width, height, out[GREEN_IMAGE].bytes);
 			greenCheck.setThresh(thresh);

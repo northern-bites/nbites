@@ -71,6 +71,7 @@ class HoughLine : public GeoLine
   double _fitError;
 
   GeoLine _field;
+  bool _onField;
 
   int _fieldLine;
 
@@ -96,6 +97,11 @@ public:
 
   // effect   Map image line to field coordinates
   void setField(const FieldHomography& h) { _field = *this; _field.imageToField(h); }
+
+  // China 2015 hack
+  // We require that line is sufficiently below field horizon to be a hough line
+  bool onField() { return _onField; }
+  void onField(bool newOnField) { _onField = newOnField; }
 
   // Index of field line that this line a part of, or -1 if none.
   int fieldLine() const { return _fieldLine; }
@@ -138,7 +144,7 @@ public:
   }
 
   // Map all lines on the list to field coordinates
-  void mapToField(const FieldHomography&);
+  void mapToField(const FieldHomography&, Field&);
 
   // The field coordinates of the robot at the time mapToField was called.
   double fx0() const { return _fx0; }
@@ -353,6 +359,9 @@ public:
 
   double separation() const { return _lines[0]->field().separation(_lines[1]->field()); }
 
+  // Get length of the longer line
+  double maxLength() const { return max(_lines[0]->field().length(), _lines[1]->field().length()); }
+
   std::string print() const;
 };
 
@@ -391,6 +400,7 @@ public:
 
   // Calibrate tilt if possible.
   bool tiltCalibrate(FieldHomography&, std::string* message = 0);
+
 };
 
 // *****************

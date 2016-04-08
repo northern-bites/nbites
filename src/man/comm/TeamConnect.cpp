@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <math.h>
+#include <stdlib.h>     /* srand, rand */
 
 #include "CommDef.h"
 #include "DebugConfig.h"
@@ -22,8 +23,7 @@ namespace man {
 namespace comm {
 
 TeamConnect::TeamConnect(CommTimer* t, NetworkMonitor* m)
-    : timer(t), monitor(m), myLastSeqNum(0)
-{
+    : timer(t), monitor(m), myLastSeqNum(0) {
     socket = new UDPSocket();
     setUpSocket();
 }
@@ -38,8 +38,9 @@ void TeamConnect::setUpSocket()
     socket->setBlocking(false);
     socket->setBroadcast(true);
 
-    socket->setTarget(IP_TARGET, TEAM_PORT);
-    socket->bind("", TEAM_PORT); // listen for anything on our port
+    printf("TeamConnect::setUpSocket() using port %i\n", SPL_BROADCAST_PORT);
+    socket->setTarget("10.0.255.255", SPL_BROADCAST_PORT);
+    socket->bind("", SPL_BROADCAST_PORT); // listen for anything on our port
 }
 
 void TeamConnect::send(const messages::WorldModel& model,
@@ -101,6 +102,21 @@ PROF_ENTER(P_COMM_BUILD_PACKET);
 
     splMessage.ballVel[0] = model.ball_vel_x()*CM_TO_MM;
     splMessage.ballVel[1] = model.ball_vel_y()*CM_TO_MM;
+    
+    /* MISSING FIELDS for HeFei 2015 */
+    splMessage.averageWalkSpeed = 200;   //200 mm/second
+    splMessage.maxKickDistance = 5000;   //1 meter
+    
+    //85-95% range (random)
+    splMessage.currentPositionConfidence = 85 + (rand() % 10);
+    //random
+    splMessage.currentSideConfidence = 32 + ( rand() % 15 );
+    
+    for (int i = 0; i < SPL_STANDARD_MESSAGE_MAX_NUM_OF_PLAYERS; ++i) {
+        splMessage.suggestion[i] = 0;   //default, no meaning
+    }
+    
+    splMessage.intention = model.intention();   //default, no meaning
 
 PROF_EXIT(P_COMM_BUILD_PACKET);
 
@@ -136,7 +152,8 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
     {
         // initial setup
         struct SPLStandardMessage splMessage;
-        memset(&splMessage, 0, sizeof(SPLStandardMessage)); // @TODO: neccessary?
+        //declared on stack, init all fields to 0
+        memset(&splMessage, 0, sizeof(SPLStandardMessage));
 
         // actually check socket
         result = socket->receive((char*) &splMessage, sizeof(SPLStandardMessage));
@@ -218,7 +235,8 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
         message->set_in_kicking_state(splMessage.pose[0] != splMessage.shootingTo[0] ||
                                       splMessage.pose[1] != splMessage.shootingTo[1]);
         message->set_role(6);
-
+        message->set_intention(splMessage.intention);
+        
         // so that behaviors actually processes world model
         message->set_active(true);
 #else
@@ -320,7 +338,7 @@ void TeamConnect::checkDeadTeammates(portals::OutPortal<messages::WorldModel>* m
         {
             continue;
         }
-        else if (time - teamMates[i].timestamp > TEAMMATE_DEAD_THRESHOLD)
+        else //if (time - teamMates[i].timestamp > TEAMMATE_DEAD_THRESHOLD)
         {
             portals::Message<messages::WorldModel> msg(0);
             msg.get()->set_active(false);

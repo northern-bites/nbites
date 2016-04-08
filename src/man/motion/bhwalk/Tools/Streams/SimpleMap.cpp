@@ -255,6 +255,7 @@ SimpleMap::SimpleMap(In& stream, const std::string& name) :
   }
   catch(const std::logic_error& e)
   {
+    printf("[EXCEPTION ERROR ] SimpleMap.cpp 1\n");
     OUTPUT_ERROR(name << "(" << row << ", " << column << "): " << e.what());
   }
 }
