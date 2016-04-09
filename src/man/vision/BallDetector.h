@@ -9,16 +9,26 @@
 #include "FastBlob.h"
 #include "Homography.h"
 #include "Field.h"
+#include "Hough.h"
 
 
 namespace man {
 	namespace vision {
 
-		const double BALL_RADIUS = 3.25;
+        const double BALL_RADIUS = 5.25; //3.25;
 		const double VERT_FOV_DEG = 47.64;
 		const double VERT_FOV_RAD = VERT_FOV_DEG * M_PI / 180;
 		const double HORIZ_FOV_DEG = 60.97;
 		const double HORIZ_FOV_RAD = HORIZ_FOV_DEG * M_PI / 180;
+
+#define BLACK 1
+#define BLUE 7
+#define MAROON 8
+#define WHITE 2
+#define GREEN 6
+#define YELLOW 5
+#define RED 3
+#define ORANGE 4
 
 		class Ball {
 		public:
@@ -31,15 +41,19 @@ namespace man {
 			double confidence() const { return _confidence; }
 
 			// For tool
-			Blob& getBlob() { return blob; }
+            Blob& getBlob() { return blob; }
 //private: should be private. leaving public for now
 			void compute();
 
 			double pixDiameterFromDist(double d) const;
 
-			Blob blob;
+            Blob blob;
 			FuzzyThr thresh;
 			FuzzyThr radThresh;
+
+			int centerX;
+			int centerY;
+			int firstPrincipalLength;
 
 			double x_rel;
 			double y_rel;
@@ -65,13 +79,32 @@ namespace man {
 			BallDetector(FieldHomography* homography_, Field* field_, bool topCamera);
 			~BallDetector();
 
-			bool findBall(ImageLiteU8 orange, double cameraHeight);
+			void setDebugImage(DebugImage * di);
+			bool findBall(ImageLiteU8 white, double cameraHeight);
 
-			bool preScreen(int centerX, int centerY, int principalLength,
-						   int principalLength2,
-						   bool & occludedSide, bool & occludedTop,
-						   bool & occludedBottom);
+            void filterBlackBlobs(Blob currentBlob,
+                                  std::vector<std::pair<int,int>> & blobs,
+                                  std::vector<Blob> & actualBlobs);
+            int filterWhiteBlobs(Blob currentBlob,
+                                  std::vector<std::pair<int,int>> & blobs,
+                                  std::vector<std::pair<int,int>> blackBlobs);
+            bool findCorrelatedBlackBlobs(std::vector<std::pair<int,int>> & blackBlobs,
+                                          std::vector<Blob> & actualBlobs,
+                                          double cameraHeight, bool foundBall);
+            bool blobsAreClose(std::pair<int,int> first,
+                               std::pair<int,int> second);
 
+            void makeBall(Blob blob, double cameraHeight, double conf,
+                          bool foundBall);
+            bool lookForFarAwayBalls(Blob blob);
+            bool farSanityChecks(Blob blob);
+
+			void setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 black,
+						   ImageLiteU16 yImg);
+			void getColor(int x, int y);
+			bool isGreen();
+			bool isWhite();
+			bool isBlack();
 
 			Ball& best() { return _best; }
 
@@ -83,11 +116,17 @@ namespace man {
 #endif
 		private:
 			Connectivity blobber;
+            Connectivity blobber2;
 			FieldHomography* homography;
 			Field* field;
 			bool topCamera;
 			int width;
 			int height;
+			int currentX, currentY;
+
+			DebugImage debugDraw;
+			ImageLiteU8 whiteImage, greenImage, blackImage;
+			ImageLiteU16 yImage;
 
 			Ball _best;
 

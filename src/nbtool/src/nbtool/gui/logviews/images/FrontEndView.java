@@ -327,7 +327,9 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
             g.drawImage(yImage, 0, height + sH*6 + tB*3, null);
         }
         if (segmentedImage != null) {
-            g.drawImage(segmentedImage, width + vB,  height + sH*6 + tB*3, null);
+            //g.drawImage(segmentedImage, width + vB,  height + sH*6 + tB*3, null);
+            g.drawImage(whiteImage, width + vB,  height + sH*6 + tB*3, null);
+            g.drawImage(greenImage, width + vB,  height + sH*6 + tB*3, null);
         }
 
         // TODO fix slider glitch
