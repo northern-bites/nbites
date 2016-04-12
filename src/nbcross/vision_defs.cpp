@@ -26,6 +26,7 @@ SExpr getSExprFromSavedParams(int color, std::string sexpPath, bool top);
 std::string getSExprStringFromColorJSonNode(boost::property_tree::ptree tree);
 SExpr treeFromBall(man::vision::Ball& b);
 SExpr treeFromBlob(man::vision::Blob& b);
+SExpr treeFromRobot(man::vision::Robot& rob);
 
 messages::YUVImage emptyTop(
     man::vision::DEFAULT_TOP_IMAGE_WIDTH * 2,
@@ -475,6 +476,49 @@ int Vision_func() {
 
     rets.push_back(debugImage);
 
+    // ----------------------------------------
+    //   ROBOT DETECTION: WHITE-GRADIENT IMAGE
+    // ----------------------------------------
+    Log* robotRet = new Log();
+    int robotLength = (width / 4) * (height / 2);
+
+    // Create temp buffer and fill with orange image
+    uint8_t robotBuf[robotLength];
+    memcpy(robotBuf, module.getRobotDetector(topCamera)->getImage().pixelAddr(), robotLength);
+
+    // Convert to string and set log
+    std::string robotBuffer((const char*)robotBuf, robotLength);
+    robotRet->setData(robotBuffer);
+
+    // Read params from JSon and attach to image
+    SExpr rTree = getSExprFromSavedParams(2, sexpPath, topCamera);
+    rTree.append(SExpr::keyValue("width", width / 4));
+    rTree.append(SExpr::keyValue("height", height / 2));
+
+    robotRet->setTree(rTree);
+
+    rets.push_back(robotRet);
+
+    //-------------------
+    //  ROBOT CANDIDATES
+    //-------------------
+    man::vision::RobotDetector* rDetector = module.getRobotDetector(topCamera);
+
+    Log* rRet = new Log();
+    std::vector<man::vision::Robot> robots = rDetector->getRobots();
+
+    SExpr allRobots;
+    int rcount = 0;
+    for (auto i=robots.begin(); i!=robots.end(); i++) {
+        SExpr robotTree = treeFromRobot(*i);
+        SExpr next = SExpr::keyValue("robot" + std::to_string(rcount), robotTree);
+        allRobots.append(next);
+        rcount++;
+    }
+
+    rRet->setTree(allRobots);
+    rets.push_back(rRet);
+
     return 0;
 }
 
@@ -761,6 +805,16 @@ SExpr treeFromBlob(man::vision::Blob& b)
     SExpr toRet = SExpr::list({center, area, count, len1, len2, ang1, ang2});
 
     return toRet;
+}
+
+SExpr treeFromRobot(man::vision::Robot& rob)
+{
+    SExpr left = SExpr::keyValue("left", rob.left);
+    SExpr right = SExpr::keyValue("right", rob.right);
+    SExpr top = SExpr::keyValue("top", rob.top);
+    SExpr bottom = SExpr::keyValue("bottom", rob.bottom);
+    SExpr returnList = SExpr::list({left, right, top, bottom});
+    return returnList;
 }
 
 int Scratch_func() {}

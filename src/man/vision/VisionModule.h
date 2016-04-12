@@ -52,6 +52,7 @@ public:
     GoalboxDetector* getBox(bool topCamera = true) const { return boxDetector[!topCamera]; }
     CornerDetector* getCorners(bool topCamera = true) const { return cornerDetector[!topCamera]; }
     CenterCircleDetector* getCCD(bool topCamera = true) const {return centerCircleDetector[!topCamera]; }
+    RobotDetector* getRobotDetector(bool topCamera = true) const {return robotDetector[!topCamera]; }
 
 #ifdef OFFLINE
 	void setDebugDrawingParameters(nblog::SExpr* debugParams);

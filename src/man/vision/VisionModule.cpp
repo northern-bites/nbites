@@ -500,11 +500,11 @@ void VisionModule::detectObstacles(bool is_top)
     //     ImageLiteU8 tempImage(0, 0, img_wd, img_ht, WG.pitch(), pixels);
 
         // make white-gradient image the same size as green / white / orange images
-        ImageLiteU8 WGImage(frontEnd[0]->greenImage());
-        robotDetector[0]->getWhiteGradImage(WGImage, frontEnd[0]->whiteImage(),
+        // ImageLiteU8 WGImage(frontEnd[0]->greenImage());
+        robotDetector[0]->getWhiteGradImage(frontEnd[0]->whiteImage(),
                                             edgeDetector[0], *(edges[0]));
         // HACK: Intercepting green image for now so I can easily view in tool
-        frontEnd[0]->greenImage() = WGImage;
+        // frontEnd[0]->greenImage() = WGImage;
     } else {
         // run old method of detecting obstacles from bottom camera
         robotImageObstacle->updateVisionObstacle(frontEnd[1]->whiteImage(),

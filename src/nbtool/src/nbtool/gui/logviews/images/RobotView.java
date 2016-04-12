@@ -3,6 +3,9 @@ package nbtool.gui.logviews.images;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.Shape;
+import java.awt.Color;
 
 import java.awt.image.BufferedImage;
 import nbtool.images.Y8image;
@@ -45,6 +48,7 @@ public class RobotView extends ViewParent
     BufferedImage original;
     BufferedImage whiteImage;
     BufferedImage gradientImage; // right now just do green image until i get grad working
+    Log robots;
 
     // Gradient sliders
     private JSlider gFuzzyU;
@@ -118,9 +122,10 @@ public class RobotView extends ViewParent
         }
 
         if (gradientImage != null) {
+            drawRobots();
             g.drawImage(gradientImage, lB, vB, width/2, height/2, null);
         } else {
-            System.out.printf("[ROBOT VIEW] gradient (green) image was null\n");
+            System.out.printf("[ROBOT VIEW] gradient image was null\n");
         }
 
         gFuzzyU.setBounds(hB*1 + lB, vB + sH*2 + tB*3, width/2, sH);
@@ -129,6 +134,27 @@ public class RobotView extends ViewParent
 
         // Draw button
         saveButton.setBounds(hB*1 + lB,  vB + sH*6 + tB*3, width/2, tB*3);
+    }
+
+    public void drawRobots() {
+        Graphics2D graph = gradientImage.createGraphics();
+        graph.setColor(Color.WHITE);
+        String r = "robot";
+
+        for(int i=0; ;i++)
+        {
+            SExpr tree = robots.tree();
+            SExpr robot = tree.find(r+i);
+            if (!robot.exists()){
+                break;
+            }
+            int top = (int) robot.get(1).find("top").get(1).valueAsDouble();
+            int bottom = robot.get(1).find("bottom").get(1).valueAsInt();
+            int left = robot.get(1).find("left").get(1).valueAsInt();
+            int right = robot.get(1).find("right").get(1).valueAsInt();
+
+            graph.draw(new Rectangle2D.Double(left, top, right-left, bottom-top));
+        }
     }
 
     @Override
@@ -171,9 +197,9 @@ public class RobotView extends ViewParent
             System.out.printf("[ROBOT VIEW] No white image received\n");
         }
 
-        if (out.length > 2) {
-            Y8image green8 = new Y8image(width/2, height/2, out[2].bytes);
-            this.gradientImage = green8.toBufferedImage();
+        if (out.length > 10) {
+            Y8image robot8 = new Y8image(width/2, height/2, out[10].bytes);
+            this.gradientImage = robot8.toBufferedImage();
         } else {
             System.out.printf("[ROBOT VIEW] No gradient(green) image received\n");
         }
@@ -181,6 +207,8 @@ public class RobotView extends ViewParent
         if (firstLoad) {
             firstIoReceived(out);
         }
+
+        robots = out[11];
 
         repaint();
     }
