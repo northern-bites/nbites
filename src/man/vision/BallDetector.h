@@ -80,7 +80,14 @@ namespace man {
 			~BallDetector();
 
 			void setDebugImage(DebugImage * di);
-			bool findBall(ImageLiteU8 white, double cameraHeight);
+            void edgeSanityCheck(int x, int y, int radius);
+            void sanityChecks(int bx, int by, int radius);
+            void makeEdgeList(EdgeList & edges);
+            int scanX(int startX, int startY, int direction, int stop);
+            int scanY(int startX, int startY, int direction, int stop);
+
+
+			bool findBall(ImageLiteU8 white, double cameraHeight, EdgeList& edges);
 
             void filterBlackBlobs(Blob currentBlob,
                                   std::vector<std::pair<int,int>> & blobs,
@@ -123,6 +130,7 @@ namespace man {
 			int width;
 			int height;
 			int currentX, currentY;
+            std::vector<Edge> goodEdges;
 
 			DebugImage debugDraw;
 			ImageLiteU8 whiteImage, greenImage, blackImage;
