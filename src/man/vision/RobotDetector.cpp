@@ -33,9 +33,15 @@ RobotDetector::RobotDetector(int wd_, int ht_)
     WGImage = ImageLiteU8(0, 0, img_wd, img_ht, img_wd, pixels);
 }
 
+RobotDetector::~RobotDetector() {
+    // candidates.clear();
+    // delete candidates;
+}
+
 // Run every frame from VisionModule.cpp
 void RobotDetector::getWhiteGradImage(ImageLiteU8 whiteImage,
-                                      EdgeDetector* ed, EdgeList& edges)
+                                      EdgeDetector* ed, EdgeList& edges,
+                                      FieldHomography* hom, bool is_top)
 {
     candidates.clear();
 
@@ -63,7 +69,7 @@ void RobotDetector::getWhiteGradImage(ImageLiteU8 whiteImage,
     }
 
     removeHoughLines(edges);
-    findCandidates();
+    findCandidates(is_top);
 }
 
 uint8_t RobotDetector::getFuzzyValue(uint8_t gradientValue)
@@ -100,10 +106,14 @@ void RobotDetector::removeHoughLines(EdgeList& edges)
     }
 }
 
-void RobotDetector::findCandidates()
+void RobotDetector::findCandidates(bool is_top)
 {
     int boxW = 100;
     int boxH = 160;
+    if (!is_top) {
+        boxW = 50;
+        boxH = 60;
+    }
     unsigned long brightness_thresh = 120;
 
     // Just for me to see what size box I'm using
@@ -150,6 +160,7 @@ void RobotDetector::findCandidates()
             currSum -= accumulators[i-1];
             currSum += accumulators[i-1 + boxW];
             grid[i][j] = currSum;
+            // if (j > 5 && !is_top) { grid[i][j] = 0; } // ignore boxes low in image
         }
     }
 

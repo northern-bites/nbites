@@ -30,10 +30,11 @@ public:
     ~RobotDetector();
 
     void getWhiteGradImage(ImageLiteU8 whiteImage,
-                           EdgeDetector* ed, EdgeList& edges);
+                           EdgeDetector* ed, EdgeList& edges,
+                           FieldHomography* hom, bool is_top);
     uint8_t getFuzzyValue(uint8_t gradientValue);
     void removeHoughLines(EdgeList& edges);
-    void findCandidates();
+    void findCandidates(bool is_top);
 
     struct box {
         int left;

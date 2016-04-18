@@ -312,3 +312,11 @@ void RobotObstacle::toFieldCoordinates(FieldHomography* hom, float* obstacleBox,
 
 } //namespace vision
 } //namespace man
+
+
+        // portals::Message<messages::RobotObstacle> boxOut(0);
+        // boxOut.get()->set_closest_y(obstacleBox[0]);
+        // boxOut.get()->set_box_bottom(obstacleBox[1]);
+        // boxOut.get()->set_box_left(obstacleBox[2]);
+        // boxOut.get()->set_box_right(obstacleBox[3]);
+        // robotObstacleOut.setMessage(boxOut);

@@ -98,6 +98,8 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
 
         if (i == 0) {
             robotDetector[i] = new RobotDetector(wd / 2, ht / 2);
+        } else {
+            robotDetector[i] = new RobotDetector(wd / 4, ht / 4);
         }
 
         bool fast = true;
@@ -113,8 +115,6 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
 
     // Retreive calibration params for the robot name specified in the constructor
     setCalibrationParams(robotName);
-
-    robotImageObstacle = new RobotObstacle(wd / 4, ht / 4);
 }
 
 VisionModule::~VisionModule()
@@ -137,6 +137,7 @@ VisionModule::~VisionModule()
         delete cornerDetector[i];
         delete centerCircleDetector[i];
         delete ballDetector[i];
+        delete robotDetector[i];
     }
 	delete field;
 }
@@ -309,7 +310,9 @@ void VisionModule::run_()
 
         // Detect obstacles
         PROF_ENTER2(P_OBSTACLE_TOP, P_OBSTACLE_BOT, i==0)
-        detectObstacles(i==0);
+        robotDetector[i]->getWhiteGradImage(frontEnd[i]->whiteImage(),
+                                            edgeDetector[i], *(edges[i]),
+                                            homography[i], i==0);
         PROF_EXIT2(P_OBSTACLE_TOP, P_OBSTACLE_BOT, i==0)
         times[i][12] = timer.end();
 
@@ -510,42 +513,6 @@ void VisionModule::outportalVisionField()
     // Send
     portals::Message<messages::Vision> visionOutMessage(&visionField);
     visionOut.setMessage(visionOutMessage);
-}
-
-void VisionModule::detectObstacles(bool is_top)
-{
-    if (is_top) {
-    //     uint8_t* pixels = new uint8_t[img_ht*img_wd];
-    //     for (int j = 1; j < img_ht-1; ++j) {
-    //         for (int i = 1; i < img_wd-1; ++i) {
-    //             pixels[i + img_wd*j] = 0;
-    //         }
-    //     }
-    //     ImageLiteU8 tempImage(0, 0, img_wd, img_ht, WG.pitch(), pixels);
-
-        // make white-gradient image the same size as green / white / orange images
-        // ImageLiteU8 WGImage(frontEnd[0]->greenImage());
-        robotDetector[0]->getWhiteGradImage(frontEnd[0]->whiteImage(),
-                                            edgeDetector[0], *(edges[0]));
-        // HACK: Intercepting green image for now so I can easily view in tool
-        // frontEnd[0]->greenImage() = WGImage;
-    } else {
-        // run old method of detecting obstacles from bottom camera
-        robotImageObstacle->updateVisionObstacle(frontEnd[1]->whiteImage(),
-                                                 *(edges[1]), obstacleBox,
-                                                 homography[1]);
-
-        // std::cout<<"about to set message for obstacle vision"<<std::endl;
-        portals::Message<messages::RobotObstacle> boxOut(0);
-        boxOut.get()->set_closest_y(obstacleBox[0]);
-        boxOut.get()->set_box_bottom(obstacleBox[1]);
-        boxOut.get()->set_box_left(obstacleBox[2]);
-        boxOut.get()->set_box_right(obstacleBox[3]);
-        robotObstacleOut.setMessage(boxOut);
-
-        // printf("Obstacle Box VISION: (%g, %g, %g, %g)\n", obstacleBox[0],
-        //         obstacleBox[1], obstacleBox[2], obstacleBox[3]);
-    }
 }
 
 void VisionModule::setColorParams(Colors* colors, bool topCamera)

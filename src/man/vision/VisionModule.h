@@ -76,7 +76,6 @@ private:
     void logImage(int i);
 #endif
     void outportalVisionField();
-    void detectObstacles(bool is_top);
 
     Colors* colorParams[2];
     ImageFrontEnd* frontEnd[2];
@@ -117,11 +116,6 @@ private:
     // Constants for tilt azimuth adjustment hack
     static constexpr double azimuth_m = 0.032228876;
     static constexpr double azimuth_b = 0.0003214286;
-
-    // obstacleBox
-    RobotObstacle* robotImageObstacle;
-    
-    float obstacleBox[4];
 };
 
 }
