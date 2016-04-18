@@ -85,37 +85,17 @@ void RobotDetector::removeHoughLines(EdgeList& edges)
             int xi = e->x();
             int yi = e->y();
 
-            *WGImage.pixelAddr(xi + img_wd/2, img_ht/2 - yi) = 0;
-
-            // remove all pixels within 1 of hough line pixel
-            *WGImage.pixelAddr(xi + img_wd/2 + 1, img_ht/2 - yi) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2, img_ht/2 - yi + 1) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2 - 1, img_ht/2 - yi) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2, img_ht/2 - yi - 1) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2 + 1, img_ht/2 - yi + 1) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2 + 1, img_ht/2 - yi - 1) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2 - 1, img_ht/2 - yi + 1) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2 - 1, img_ht/2 - yi - 1) = 0;
-
-            // remove all pixels within 2 of hough line pixel
-            *WGImage.pixelAddr(xi + img_wd/2 + 2, img_ht/2 - yi) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2, img_ht/2 - yi + 2) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2 - 2, img_ht/2 - yi) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2, img_ht/2 - yi - 2) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2 + 2, img_ht/2 - yi + 2) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2 + 2, img_ht/2 - yi - 2) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2 - 2, img_ht/2 - yi + 2) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2 - 2, img_ht/2 - yi - 2) = 0;
-
-            // remove all pixels within 3 of hough line pixel
-            *WGImage.pixelAddr(xi + img_wd/2 + 3, img_ht/2 - yi) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2, img_ht/2 - yi + 3) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2 - 3, img_ht/2 - yi) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2, img_ht/2 - yi - 3) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2 + 3, img_ht/2 - yi + 3) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2 + 3, img_ht/2 - yi - 3) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2 - 3, img_ht/2 - yi + 3) = 0;
-            *WGImage.pixelAddr(xi + img_wd/2 - 3, img_ht/2 - yi - 3) = 0;
+            // remove all pixels within "boxsize" of hough line pixel
+            int boxSize = 3;
+            int houghx = xi + img_wd/2;
+            int houghy = img_ht/2 - yi;
+            for (int i = houghx - boxSize; i <= houghx + boxSize; ++i) {
+                for (int j = houghy - boxSize; j <= houghy + boxSize; ++j) {
+                    if (i < 0 || j < 0) { continue; }
+                    if (i >= img_wd || j >= img_ht) { continue; }
+                    *WGImage.pixelAddr(i, j) = 0;
+                }
+            }
         }
     }
 }
@@ -125,9 +105,6 @@ void RobotDetector::findCandidates()
     int boxW = 100;
     int boxH = 160;
     unsigned long brightness_thresh = 120;
-    float percent = .9;
-    int countThresh = ((float)boxW * (float)boxH * percent);
-    int num_candidates = 0;
 
     // Just for me to see what size box I'm using
     // Robot testRobot(0, boxW, 0, boxH);
@@ -187,6 +164,7 @@ void RobotDetector::findCandidates()
             for (int m = i - 2; m <= i + 2; ++m) {
                 for (int n = j - 2; n <= j+2; ++n) {
                     if (m < 0 || n < 0) { continue; }
+                    if (m >= img_wd-boxW+1 || n >= img_ht-boxH+1) { continue; }
                     if (m == i && n == j) { continue; }
                     if (grid[i][j] < grid[m][n]) {
                         amPeak = false;
