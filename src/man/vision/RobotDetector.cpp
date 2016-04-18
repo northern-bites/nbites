@@ -9,6 +9,12 @@
 namespace man {
 namespace vision {
 
+Robot::Robot(int l, int r, int t, int b)
+    : left(l),
+      right(r),
+      top(t),
+      bottom(b) {}
+
 RobotDetector::RobotDetector(int wd_, int ht_)
     : img_wd(wd_),
       img_ht(ht_),
@@ -38,7 +44,7 @@ void RobotDetector::getWhiteGradImage(ImageLiteU8 whiteImage,
     uint8_t* pixels = new uint8_t[img_ht*img_wd];
 
     // HACK: Do this better -> might impact other things
-    ed->gradientThreshold(0); // set to lower fuzzy thresh
+    ed->gradientThreshold(low_fuzzy_thresh);
 
     for (int j = 1; j < img_ht-1; ++j) {
         for (int i = 1; i < img_wd-1; ++i) {
@@ -116,23 +122,27 @@ void RobotDetector::removeHoughLines(EdgeList& edges)
 
 void RobotDetector::findCandidates()
 {
-    // Robot testRobot(0, 150, 0, 100);
-    // candidates.push_back(testRobot);
-
-    int boxW = 70;
-    int boxH = 170;
-    uint8_t brightnessThresh = 120;
+    int boxW = 100;
+    int boxH = 160;
+    unsigned long brightness_thresh = 120;
     float percent = .9;
     int countThresh = ((float)boxW * (float)boxH * percent);
+    int num_candidates = 0;
+
+    // Just for me to see what size box I'm using
+    // Robot testRobot(0, boxW, 0, boxH);
+    // candidates.push_back(testRobot);
 
     // init accumulators:
-    int accumulators[img_wd];
-    int currSum = 0;
+    unsigned long accumulators[img_wd];
+    unsigned long grid[img_wd - boxW + 1][img_ht - boxH + 1];
+    unsigned long currSum = 0;
+
+    std::cout<<"Checking first line"<<std::endl;
 
     // initialize accumulators for each column
     //    as sum of box height in that column, and
     // init current sum
-    // std::cout<<"ACCUMULATORS: ";
     for (int i = 0; i < img_wd; ++i) {
         accumulators[i] = 0;
         for (int j = 0; j < boxH; ++j) {
@@ -140,48 +150,57 @@ void RobotDetector::findCandidates()
         }
         if (i < boxW) {
             currSum += accumulators[i];
-        }
-        // std::cout<<accumulators[i]<<", ";
-    }
-    // std::cout<<std::endl;
-
-    // misisng avg > percent for upper left corner
-
-    // Go through first row: differen't than other rows
-    for (int i = boxW; i < img_wd; ++i) {
-        // update sum
-        currSum -= accumulators[i - boxW];
-        currSum += accumulators[i];
-
-        float avg = (float)currSum / ((float)boxW * (float)boxH * 255.);
-        if (avg > percent) {
-            candidates.push_back(Robot(i-boxW, i, 0, boxH));
-        }
-    }
-
-    for (int j = 1; j < img_ht - boxH; ++j) {
-        for (int i = boxW; i < img_wd; ++i) {
-            // update accumulators
-            accumulators[i] -= *WGImage.pixelAddr(i,j-1);
-            accumulators[i] += *WGImage.pixelAddr(i,j-1 + boxH);
-
-            // update sum
+            if (i == boxW-1) { grid[0][0] = currSum; }
+            continue;
+        } else {
             currSum -= accumulators[i - boxW];
             currSum += accumulators[i];
+            grid[i - boxW + 1][0] = currSum;
+        }
+    }
 
-            float avg = (float)currSum / ((float)boxW * (float)boxH * 255.);
-            if (avg > percent && !(i%15) && !(j%15)) {
-                candidates.push_back(Robot(i - boxW, i, j, j+boxH));
+    for (int j = 1; j <= img_ht - boxH; ++j) {
+        currSum = 0;
+        for (int i = 0; i < boxW; ++i) {
+            accumulators[i] -= *WGImage.pixelAddr(i,j-1);
+            accumulators[i] += *WGImage.pixelAddr(i,j-1 + boxH);
+            currSum += accumulators[i];
+        }
+        grid[0][j] = currSum;
+        for (int i = 1; i <= img_wd - boxW; ++i) {
+            accumulators[i-1 + boxW] -= *WGImage.pixelAddr(i-1+boxW,j-1);
+            accumulators[i-1 + boxW] += *WGImage.pixelAddr(i-1+boxW,j-1+boxH);
+            currSum -= accumulators[i-1];
+            currSum += accumulators[i-1 + boxW];
+            grid[i][j] = currSum;
+        }
+    }
+
+    for (int i = 0; i < img_wd - boxW +1; ++i) {
+        for (int j = 0; j < img_ht - boxH +1; ++j) {
+            // I am not above the thresh, I am not a robot candidate
+            unsigned long avg_val = grid[i][j] / (boxW * boxH);
+            if (avg_val < brightness_thresh) { continue; }
+
+            // Now make sure I have a greater value than all my neighbors
+            bool amPeak = true;
+            for (int m = i - 2; m <= i + 2; ++m) {
+                for (int n = j - 2; n <= j+2; ++n) {
+                    if (m < 0 || n < 0) { continue; }
+                    if (m == i && n == j) { continue; }
+                    if (grid[i][j] < grid[m][n]) {
+                        amPeak = false;
+                    }
+                }
+            }
+
+            // I am above thresh and am greater than all neighbors: ROBOT
+            if (amPeak) {
+                candidates.push_back(Robot(i, i+boxW, j, j+boxH));
             }
         }
     }
 }
-
-Robot::Robot(int l, int r, int t, int b)
-    : left(l),
-      right(r),
-      top(t),
-      bottom(b) {}
 
 } //namespace vision
 } //namespace man
