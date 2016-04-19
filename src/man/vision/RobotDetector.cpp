@@ -52,8 +52,19 @@ void RobotDetector::getWhiteGradImage(ImageLiteU8 whiteImage,
     // HACK: Do this better -> might impact other things
     ed->gradientThreshold(low_fuzzy_thresh);
 
+    int startCol = 1;
+    int endCol = img_wd - 1;
+    if (!is_top) {
+        int val = findAzimuthRestrictions(hom);
+        if (val < 0) { endCol = -val; }
+        else if (val > 1) { startCol = val; }
+    }
+    // std::cout<<"Start col: "<<startCol<<", endCol = "<<endCol<<", wd = "<<img_wd<<std::endl;
+
+    std::cout<<"[ ROBOT DETECTOR] Az = "<<hom->azimuth()<<std::endl;
+
     for (int j = 1; j < img_ht-1; ++j) {
-        for (int i = 1; i < img_wd-1; ++i) {
+        for (int i = startCol; i < endCol; ++i) {
             uint8_t grad = ed->mag(i-1,j-1);
             uint8_t fuzzy = getFuzzyValue(grad);
             uint8_t whiteVal = *(whiteImage.pixelAddr(i,j));
@@ -79,6 +90,39 @@ uint8_t RobotDetector::getFuzzyValue(uint8_t gradientValue)
     uint8_t top = gradientValue - low_fuzzy_thresh;
     uint8_t bot = high_fuzzy_thresh - low_fuzzy_thresh;
     return top * 255 / bot;
+}
+
+int RobotDetector::findAzimuthRestrictions(FieldHomography* hom)
+{
+
+    // A little hacky: TODO make function / calculate better values / use constants
+    // HACK US OPEN 2016 SORRY!!
+    double az = hom->azimuth();
+    int val = 1;
+
+    // if abs(az) 1.3, too great to detect obstacle: return width
+    if (az > 1.3 || az < -1.3) { return img_wd-1; }
+
+    // if abs(az) is > 1.1 and <= 1.3, ignore 2/3
+    if (az > 1.1 || az < -1.1) { val = (int)(.6666 * (double)img_wd); }
+
+    // if abs(az) is > 1 and <= 1.1, ignore 1/2
+    else if (az > 1.0 || az < -1.0) { val = (int)(.5 * (double)img_wd); }
+
+    // if abs(az) is > 0.98 and <= 1, ignore 1/3
+    else if (az > 0.98 || az < -0.98) { val = (int)(.3333 * (double)img_wd); }
+
+    // if abs(az) is > 0.93 and <= 0.98, ignore 1/4
+    else if (az > 0.93 || az < -0.93) { val = (int)(.25 * (double)img_wd); }
+
+    // else, no shoulder obstacle! return 0 to detect everything
+    else { return 0; }
+
+    // if we've gotten to this point, we want to ignore part of the
+    // image. Side of image depends on sign of azimuth.
+    if (az > 0) { return -1*(img_wd - val); } // right side
+    else { return val; } // left side (negative lets us know it is the "end col")
+
 }
 
 void RobotDetector::removeHoughLines(EdgeList& edges)
@@ -124,8 +168,6 @@ void RobotDetector::findCandidates(bool is_top)
     unsigned long accumulators[img_wd];
     unsigned long grid[img_wd - boxW + 1][img_ht - boxH + 1];
     unsigned long currSum = 0;
-
-    std::cout<<"Checking first line"<<std::endl;
 
     // initialize accumulators for each column
     //    as sum of box height in that column, and
@@ -183,7 +225,7 @@ void RobotDetector::findCandidates(bool is_top)
                 }
             }
 
-            // I am above thresh and am greater than all neighbors: ROBOT
+            // I am above thresh and am greater than all neighbors: I AM ROBOT
             if (amPeak) {
                 candidates.push_back(Robot(i, i+boxW, j, j+boxH));
             }

@@ -35,6 +35,9 @@ public:
     uint8_t getFuzzyValue(uint8_t gradientValue);
     void removeHoughLines(EdgeList& edges);
     void findCandidates(bool is_top);
+    // Tells us which part of the image to ignore if we are looking too
+    // far to the right or to the left (would pick up shoulder)
+    int findAzimuthRestrictions(FieldHomography* hom);
 
     struct box {
         int left;
