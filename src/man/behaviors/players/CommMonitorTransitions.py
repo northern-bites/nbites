@@ -7,9 +7,8 @@ def mediocreComm(player):
     return off == 1
 
 def awfulComm(player):
-    return True
-    # off = checkCommDropOffs(player)
-    # return off >= 2
+    off = checkCommDropOffs(player)
+    return off >= 2
 
 def checkCommDropOffs(player):
     off = 0
