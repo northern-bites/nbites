@@ -9,4 +9,12 @@ fi
 echo "using NBITES_DIR=" $NBITES_DIR
 
 cd $NBITES_DIR/src/nbtool
-./RUNnbtool-nobuild
+
+set -e
+ant
+
+echo
+echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> build complete <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+echo
+
+java -ea -Xms200m -Xmx200m -cp .:jars/:../../build/nbtool nbtool.term.NBTool_v8

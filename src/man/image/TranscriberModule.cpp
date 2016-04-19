@@ -725,44 +725,44 @@ void TranscriberModule::run_()
     
 void logThumbnail(messages::YUVImage& image, std::string& ifrom, size_t iindex)
 {
-    int from_width = image.width() / 2;
-    
-    if (from_width == 640) {
-        resconvert::ImageResolution rFrom = resconvert::R640_480;
-        resconvert::ImageResolution rTo = resconvert::R080_060;
-        
-        char buffer[resconvert::ImageBufferSize[rTo]];
-        resconvert::resDownPck(rFrom, (const resconvert::YUVSubPixel *) image.pixelAddress(0,0), rTo, (resconvert::YUVSubPixel *) buffer);
-        //std::string im_buf(buffer, resconvert::ImageBufferSize[rTo]);
-        
-        SExpr ci1("YUVImage", ifrom, clock(), iindex, resconvert::ImageBufferSize[rTo]);
-        ci1.append(SExpr::keyValue("width", resconvert::ImageWidth[rTo]));
-        ci1.append(SExpr::keyValue("height", resconvert::ImageHeight[rTo]));
-        ci1.append(SExpr::keyValue("encoding", "[Y8(U8/V8)]"));
-        
-        std::vector<SExpr> contents = {ci1};
-        NBLog(NBL_IMAGE_BUFFER, "thumbnail",
-              contents, (const void *) buffer, resconvert::ImageBufferSize[rTo]);
-        
-    } else if (from_width == 320) {
-        resconvert::ImageResolution rFrom = resconvert::R320_240;
-        resconvert::ImageResolution rTo = resconvert::R080_060;
-        
-        char buffer[resconvert::ImageBufferSize[rTo]];
-        resconvert::resDownPck(rFrom, (const resconvert::YUVSubPixel *) image.pixelAddress(0,0), rTo, (resconvert::YUVSubPixel *) buffer);
-        //std::string im_buf(buffer, ImageBufferSize[rTo]);
-        
-        SExpr ci1("YUVImage", ifrom, clock(), iindex, resconvert::ImageBufferSize[rTo]);
-        ci1.append(SExpr::keyValue("width", resconvert::ImageWidth[rTo]));
-        ci1.append(SExpr::keyValue("height", resconvert::ImageHeight[rTo]));
-        ci1.append(SExpr::keyValue("encoding", "[Y8(U8/V8)]"));
-        
-        std::vector<SExpr> contents = {ci1};
-        NBLog(NBL_IMAGE_BUFFER, "thumbnail",
-              contents, (void *) buffer, resconvert::ImageBufferSize[rTo]);
-    } else {
-        printf("WARNING: thumbnail sees size it's not prepared for!\n");
-    }
+//    int from_width = image.width() / 2;
+//    
+//    if (from_width == 640) {
+//        resconvert::ImageResolution rFrom = resconvert::R640_480;
+//        resconvert::ImageResolution rTo = resconvert::R080_060;
+//        
+//        char buffer[resconvert::ImageBufferSize[rTo]];
+//        resconvert::resDownPck(rFrom, (const resconvert::YUVSubPixel *) image.pixelAddress(0,0), rTo, (resconvert::YUVSubPixel *) buffer);
+//        //std::string im_buf(buffer, resconvert::ImageBufferSize[rTo]);
+//        
+//        SExpr ci1("YUVImage", ifrom, clock(), iindex, resconvert::ImageBufferSize[rTo]);
+//        ci1.append(SExpr::keyValue("width", resconvert::ImageWidth[rTo]));
+//        ci1.append(SExpr::keyValue("height", resconvert::ImageHeight[rTo]));
+//        ci1.append(SExpr::keyValue("encoding", "[Y8(U8/V8)]"));
+//        
+//        std::vector<SExpr> contents = {ci1};
+//        NBLog(NBL_IMAGE_BUFFER, "thumbnail",
+//              contents, (const void *) buffer, resconvert::ImageBufferSize[rTo]);
+//        
+//    } else if (from_width == 320) {
+//        resconvert::ImageResolution rFrom = resconvert::R320_240;
+//        resconvert::ImageResolution rTo = resconvert::R080_060;
+//        
+//        char buffer[resconvert::ImageBufferSize[rTo]];
+//        resconvert::resDownPck(rFrom, (const resconvert::YUVSubPixel *) image.pixelAddress(0,0), rTo, (resconvert::YUVSubPixel *) buffer);
+//        //std::string im_buf(buffer, ImageBufferSize[rTo]);
+//        
+//        SExpr ci1("YUVImage", ifrom, clock(), iindex, resconvert::ImageBufferSize[rTo]);
+//        ci1.append(SExpr::keyValue("width", resconvert::ImageWidth[rTo]));
+//        ci1.append(SExpr::keyValue("height", resconvert::ImageHeight[rTo]));
+//        ci1.append(SExpr::keyValue("encoding", "[Y8(U8/V8)]"));
+//        
+//        std::vector<SExpr> contents = {ci1};
+//        NBLog(NBL_IMAGE_BUFFER, "thumbnail",
+//              contents, (void *) buffer, resconvert::ImageBufferSize[rTo]);
+//    } else {
+//        printf("WARNING: thumbnail sees size it's not prepared for!\n");
+//    }
 }
 
 }

@@ -15,7 +15,6 @@ echo "in" $(pwd)
 
 sudo cp -v ./nbcross $INSTALL_TO_PATH
 sudo cp -v ./nbtool $INSTALL_TO_PATH
-sudo cp -v ./nbtool-build $INSTALL_TO_PATH
 sudo cp -v ./nbtool-version $INSTALL_TO_PATH
 
 echo

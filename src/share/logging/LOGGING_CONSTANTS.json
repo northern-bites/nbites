@@ -8,38 +8,56 @@
 #online     /home/nao/nbites/Config/LOGGING_CONSTANTS.json
 
 {
-    #prefixes of super types
+    #types
     "PROTOBUF_TYPE_PREFIX" : "proto-",
-    "IMAGE_TYPE_PREFIX" : "image-",
+
+    "YUVImageType_DEFAULT" : "YUVImage422",
+    "SexprType_DEFAULT" : "Sexpr",
+    "JsonType_DEFAULT" : "Json",
+    "LogType_DEFAULT"   : "_LOG_",  #blocks as Logs!
+
+    "LogClass_Null" : "NullClass",
+    "LogClass_Flags" : "_Flags_",
+    "LogClass_Tripoint" : "tripoint",
+
+    "LogClass_RPC_Call" : "RPC_Call",
+    "LogClass_RPC_Return" : "RPC_Return",
+    
+    "RPC_NAME" : "RPC_NAME",
+    "RPC_KEY" : "RPC_KEY",
 
     #ports
     "ROBOT_PORT" : 30000,
-    "CROSS_PORT" : 30002,
+    "CROSS_PORT" : 30001,
 
     #network stuff
-    "REMOTE_HOST_TIMEOUT" : 5000,
-    "LOCAL_HOST_TIMEOUT" : 0,
+    "REMOTE_HOST_TIMEOUT" : 5000000, #microseconds
+#    "LOCAL_HOST_TIMEOUT" : 0,
+
+    #file prefix path on robot
+    "ROBOT_LOG_PATH_PREFIX" : "/home/nao/nbites/log/",
 
     # log keywords #
 
         # (also functions as version)
     "LOG_TOPLEVEL_MAGIC_KEY" : "_NBITES_JSON_LOG_VERSION_",
 
+
     "LOG_TOPLEVEL_BLOCKS" : "BLOCKS",
     "LOG_TOPLEVEL_CREATED_WHEN" : "CREATED_WHEN",
-    "LOG_TOPLEVEL_CHECKSUM" : "CHECKSUM",
+    "LOG_TOPLEVEL_LOGCLASS" : "CLASS",
     "LOG_TOPLEVEL_HOST_TYPE" : "HOST_TYPE",    #e.g., v4, v5, computer
     "LOG_TOPLEVEL_HOST_NAME" : "HOST_NAME",
     "LOG_TOPLEVEL_HOST_ADDR" : "HOST_ADDR",
 
-    "LOG_CONTENT_TYPE" : "TYPE",
-    "LOG_CONTENT_WHERE_FROM" : "WHERE_FROM",
-    "LOG_CONTENT_WHEN_MADE" : "WHEN_MADE",
-    "LOG_CONTENT_IMAGE_INDEX" : "IMAGE_INDEX",
-    "LOG_CONTENT_NUM_BYTES" : "NUM_BYTES",
+    "LOG_BLOCK_TYPE" : "TYPE",
+    "LOG_BLOCK_WHERE_FROM" : "WHERE_FROM",
+    "LOG_BLOCK_WHEN_MADE" : "WHEN_MADE",
+    "LOG_BLOCK_IMAGE_INDEX" : "IMAGE_INDEX",
+    "LOG_BLOCK_NUM_BYTES" : "NUM_BYTES",
 
-    "LOG_CONTENT_IMAGE_WIDTH_PIXELS" : "WIDTH_PIXELS",
-    "LOG_CONTENT_IMAGE_HEIGHT_PIXELS" : "HEIGHT_PIXELS"
+    "LOG_BLOCK_IMAGE_WIDTH_PIXELS" : "WIDTH_PIXELS",
+    "LOG_BLOCK_IMAGE_HEIGHT_PIXELS" : "HEIGHT_PIXELS"
 
     # legacy keywords should be final and so are hard-coded #
 }
