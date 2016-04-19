@@ -575,6 +575,17 @@ class KickDecider(object):
         
         return self.frontKickCrosses()
 
+    def usOpenStrategy2016(self): # TODO REMOVE UNDO POOP
+        closeGoalShot = self.motionKickOnGoal()
+        if closeGoalShot:
+            return closeGoalShot
+
+        asap = self.motionKicksAsap()
+        if asap:
+            return asap
+        
+        return self.frontKickCrosses()
+
     # not currently used
     def nearOurGoal(self):
         nearOurGoal = (math.fabs(self.brain.loc.h) > 100 and 
