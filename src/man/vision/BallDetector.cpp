@@ -129,6 +129,9 @@ int BallDetector::filterWhiteBlobs(Blob currentBlob,
                 count++;
             }
         }
+        if (count == 0 && nearSanityChecks(currentBlob)) {
+            return 2;
+        }
         return count;
     }
     return 0;
@@ -213,6 +216,49 @@ bool BallDetector::farSanityChecks(Blob blob)
     return true;
 }
 
+/* We have a white blob that is relatively near us. For whatever
+   reason we didn't see any black blobs in it. Make sure that
+   wasn't just because our black detector was bad. Watch out for
+   field crosses though.
+ */
+bool BallDetector::nearSanityChecks(Blob blob)
+{
+    int centerX = static_cast<int>(blob.centerX());
+    int centerY = static_cast<int>(blob.centerY());
+    int prinLength = static_cast<int>(blob.firstPrincipalLength());
+    int prinLength2 = static_cast<int>(blob.secondPrincipalLength());
+    // the black in the ball tends to make our blob footprint too small
+    // try to expand it
+    int leftX = centerX;
+    int rightX = centerX;
+    int bottomY = centerY;
+    int topY = centerY;
+
+    leftX = scanX(centerX - 1, centerY, -1, 1);
+    rightX = scanX(centerX + 1, centerY, 1, width - 1);
+    centerX = leftX + (rightX - leftX) / 2;
+    topY = scanY(centerX, centerY - 1, -1, field->horizonAt(centerX));
+    bottomY = scanY(centerX, centerY + 1, 1, height - 1);
+    centerY = topY + (bottomY - topY) / 2;
+    int boxWidth = rightX - leftX;
+    int boxHeight = bottomY - topY;
+    if (debugBall) {
+        //debugDraw.drawBox(leftX, rightX, bottomY, topY, ORANGE);
+        std::cout << "Near Box " << boxWidth << " " << boxHeight << std::endl;
+        std::cout << "Ending at " << centerX << " " << centerY << std::endl;
+    }
+    int MINBOX = 15;
+    int MAXBOX = 50;
+    if (boxWidth < MINBOX || boxHeight < MINBOX || boxWidth > MAXBOX || boxHeight > MAXBOX) {
+        return false;
+    }
+    if (boxWidth > 2 * boxHeight || boxHeight > 2 * boxWidth) {
+        return false;
+    }
+    return true;
+
+}
+
 /* Our worst ball detector. Tries to find small white blobs
    off in the distance. The trouble is that such blobs might
    be other things. This will require a number of sanity checks.
@@ -231,7 +277,11 @@ bool BallDetector::lookForFarAwayBalls(Blob blob)
         prinLength2 >= 1 &&
         (centerY > field->horizonAt(centerX) || !topCamera)) {
         return farSanityChecks(blob);
-    }
+    }/* else if (topCamera && centerY >= height / 3 &&
+               centerY > field->horizonAt(centerX) &&
+               prinLength > 3 && prinLength2 > 3) {
+        return nearSanityChecks(blob);
+        } */
     return false;
 }
 
