@@ -177,15 +177,39 @@ void VisionModule::run_()
 
         HighResTimer timer;
 
+/* The color image in the Front End, built from the color table, is
+ * optional. When we run the tool offline, we assume that we have
+ * the color image, which causes errors when accessing other images.
+ * For reference, this is in vision_defs, part of nbcross, where we
+ * run our instance of the vision module. For the time being,
+ * we are creating a fake color table when running offline
+ * so that our code will not crash in other places - namely accessing
+ * other images / information from the vision func of nbcross.
+ * This should later be fixed so that the "segmented image" is always
+ * the last part of the SExpr built in the vision func. This will
+ * affect how many views of the tool access their data. */
+#ifdef OFFLINE
+        uint8_t* fakeColorTableBytes = new uint8_t[1<<21];
+#endif
 
         // Run front end
         PROF_ENTER2(P_FRONT_TOP, P_FRONT_BOT, i==0)
+#ifdef OFFLINE
+        frontEnd[i]->run(yuvLite, colorParams[i], fakeColorTableBytes);
+#else
         frontEnd[i]->run(yuvLite, colorParams[i]);
+#endif
         PROF_EXIT2(P_FRONT_TOP, P_FRONT_BOT, i==0)
         ImageLiteU16 yImage(frontEnd[i]->yImage());
         ImageLiteU8 whiteImage(frontEnd[i]->whiteImage());
         ImageLiteU8 greenImage(frontEnd[i]->greenImage());
         ImageLiteU8 orangeImage(frontEnd[i]->orangeImage());
+
+/* Delete these fake bytes after we've run the front end so that we
+ * don't have a memory leak. */
+#ifdef OFFLINE
+        delete[] fakeColorTableBytes;
+#endif
 
         times[i][0] = timer.end();
 
