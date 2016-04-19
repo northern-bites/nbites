@@ -338,6 +338,7 @@ copy:  movdqu  xmm0, [esi + ecx + endOfColors]
         packssdw xmm7, xmm2     # multiphase phase 1, combine and write 8 white pixels
         packuswb xmm7, xmm7
         movq    QWORD PTR[edx + ebx*2], xmm7
+        add edx, 8
     .endif
 .else
     packssdw xmm2, xmm2     # single phase, write 4 white pixels
