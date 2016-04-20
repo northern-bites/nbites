@@ -1,7 +1,5 @@
 package nbtool.data.log;
 
-import java.text.ParseException;
-
 import com.google.protobuf.Message;
 
 import nbtool.data.SExpr;
@@ -35,7 +33,8 @@ public class Block {
 	public Block() { }
 	
 	public Log parseAsLog() {
-		
+		parseTypeCheck(SharedConstants.LogType_DEFAULT());
+		return Log.parseFrom(data);
 	}
 	
 	public JsonValue parseAsJson() throws JsonParseException {
@@ -84,6 +83,7 @@ public class Block {
 		}
 	}
 	
+	@SuppressWarnings("serial")
 	public static class BlockParseException extends RuntimeException {
 		public BlockParseException(String type, String rtype) {
 			super(String.format("Block of type '%s' cannot be parsed as '%s'", 

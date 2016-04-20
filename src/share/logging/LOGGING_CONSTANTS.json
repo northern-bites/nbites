@@ -8,21 +8,21 @@
 #online     /home/nao/nbites/Config/LOGGING_CONSTANTS.json
 
 {
-    #types
-    "PROTOBUF_TYPE_PREFIX" : "proto-",
+    #log classes (used for view mapping among other things)
+    "LogClass_Null" : "NullClass",
+    "LogClass_Flags" : "_Flags_",
+    "LogClass_Tripoint" : "tripoint",
 
+    #block types
     "YUVImageType_DEFAULT" : "YUVImage422",
     "SexprType_DEFAULT" : "Sexpr",
     "JsonType_DEFAULT" : "Json",
     "LogType_DEFAULT"   : "_LOG_",  #blocks as Logs!
 
-    "LogClass_Null" : "NullClass",
-    "LogClass_Flags" : "_Flags_",
-    "LogClass_Tripoint" : "tripoint",
-
     "LogClass_RPC_Call" : "RPC_Call",
     "LogClass_RPC_Return" : "RPC_Return",
-    
+
+    #toplevel keys for RPC
     "RPC_NAME" : "RPC_NAME",
     "RPC_KEY" : "RPC_KEY",
 
@@ -32,16 +32,14 @@
 
     #network stuff
     "REMOTE_HOST_TIMEOUT" : 5000000, #microseconds
-#    "LOCAL_HOST_TIMEOUT" : 0,
+    #"LOCAL_HOST_TIMEOUT" : 0,
 
     #file prefix path on robot
     "ROBOT_LOG_PATH_PREFIX" : "/home/nao/nbites/log/",
 
-    # log keywords #
-
+    #keys for attributes in the log
         # (also functions as version)
     "LOG_TOPLEVEL_MAGIC_KEY" : "_NBITES_JSON_LOG_VERSION_",
-
 
     "LOG_TOPLEVEL_BLOCKS" : "BLOCKS",
     "LOG_TOPLEVEL_CREATED_WHEN" : "CREATED_WHEN",
@@ -59,5 +57,5 @@
     "LOG_BLOCK_IMAGE_WIDTH_PIXELS" : "WIDTH_PIXELS",
     "LOG_BLOCK_IMAGE_HEIGHT_PIXELS" : "HEIGHT_PIXELS"
 
-    # legacy keywords should be final and so are hard-coded #
+    # legacy keywords should be final and so are hard-coded (see SExprLog.java) #
 }
