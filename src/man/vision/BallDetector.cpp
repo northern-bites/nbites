@@ -58,6 +58,7 @@ void BallDetector::filterBlackBlobs(Blob currentBlob,
         minSecond = 1;
     }
     int maxB = MAX_BLACK_BLOB;
+	int minB = 1;
     float minArea = MIN_BLACK_AREA;
     if (centerY < 100) {
         minArea = 5.0f;
@@ -69,8 +70,9 @@ void BallDetector::filterBlackBlobs(Blob currentBlob,
     }
     if (!topCamera) {
         maxB = MAX_BLACK_BLOB;
+		minB = 3;
     }
-    if (prinLength < maxB &&
+    if (prinLength < maxB && prinLength >= minB &&
         prinLength2 >= minSecond && currentBlob.area() > minArea &&
         (centerY > field->horizonAt(centerX) || !topCamera)) {
         blobs.push_back(std::make_pair(centerX, centerY));
@@ -337,14 +339,18 @@ bool BallDetector::blobsAreClose(std::pair<int,int> first,
 		int yMid = (first.second + second.second) / 2;
 		int xMid = (first.first + second.first) / 2;
 		int count = 0;
+		int count2 = 0;
 		for (int i = min(first.first, second.first);
 			 i < max(first.first, second.first); i++) {
 			getColor(i, yMid);
 			if (isGreen()) {
 				count++;
 			}
+			if (isWhite()) {
+				count2++;
+			}
 		}
-		if (count > 1) {
+		if (count > 1 || count2 == 0) {
 			return false;
 		}
         return true;
