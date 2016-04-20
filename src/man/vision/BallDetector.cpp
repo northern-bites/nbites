@@ -111,7 +111,7 @@ int BallDetector::filterWhiteBlobs(Blob currentBlob,
     }
 	bool ratio = false;
 	if (prinLength < prinLength2 * 2 || centerX < prinLength ||
-		centerX > width - prinLength) {
+		centerX > width - prinLength || centerY > height - prinLength) {
 		ratio = true;
 	}
 
@@ -132,7 +132,11 @@ int BallDetector::filterWhiteBlobs(Blob currentBlob,
             if (abs(p.first - centerX) <= prinLength &&
                 abs(p.second - centerY) <= prinLength) {
                 count++;
-            }
+            } else if (ratio && !topCamera &&
+					   abs(p.first - centerX) <= prinLength + 3 &&
+					   abs(p.second - centerY) <= prinLength + 3) {
+				count++;
+			}
         }
         if (count < 2 && topCamera && nearSanityChecks(currentBlob)) {
             return 2;
@@ -563,7 +567,10 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
                   principalLength < BOTTOMEDGEWHITEMAX) {
             makeBall((*i), cameraHeight, 0.5, foundBall);
             foundBall = true;
-        }
+        } else if (count == 1 && debugBall) {
+			std::cout << "Found a white blob with one black spot " <<
+				centerY << std::endl;
+		}
 #ifdef OFFLINE
 #else
         if (foundBall) {
