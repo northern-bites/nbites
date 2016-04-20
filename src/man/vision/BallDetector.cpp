@@ -129,7 +129,7 @@ int BallDetector::filterWhiteBlobs(Blob currentBlob,
                 count++;
             }
         }
-        if (count == 0 && nearSanityChecks(currentBlob)) {
+        if (count < 2 && nearSanityChecks(currentBlob)) {
             return 2;
         }
         return count;
@@ -147,7 +147,7 @@ int BallDetector::scanX(int startX, int startY, int direction, int stop) {
             newX = i;
         }
     }
-    std::cout << "Returning " << newX << std::endl;
+    //std::cout << "Returning " << newX << std::endl;
     return newX;
 }
 
@@ -501,8 +501,18 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     candidates.clear();
 #endif
     bool foundBall = false;
-    int BOTTOMEDGEWHITEMAX = 20;
+    int BOTTOMEDGEWHITEMAX = 25;
     int BUFFER = 10;
+	if (!topCamera) {
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				getColor(i, j);
+				if (isWhite()) {
+					debugDraw.drawDot(i, j, BLUE);
+				}
+			}
+		}
+	}
 
     makeEdgeList(edges);
 
@@ -591,6 +601,7 @@ bool BallDetector::isGreen() {
 }
 
 bool BallDetector::isWhite() {
+	std::cout << (int)*(whiteImage.pixelAddr(currentX, currentY)) << std::endl;
     if (*(whiteImage.pixelAddr(currentX, currentY)) > 88)// &&
         //*(yImage.pixelAddr(currentX, currentY)) < 350) {
     {
