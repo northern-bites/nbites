@@ -129,7 +129,7 @@ int BallDetector::filterWhiteBlobs(Blob currentBlob,
                 count++;
             }
         }
-        if (count < 2 && nearSanityChecks(currentBlob)) {
+        if (count < 2 && topCamera && nearSanityChecks(currentBlob)) {
             return 2;
         }
         return count;
@@ -503,16 +503,6 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     bool foundBall = false;
     int BOTTOMEDGEWHITEMAX = 25;
     int BUFFER = 10;
-	if (!topCamera) {
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
-				getColor(i, j);
-				if (isWhite()) {
-					debugDraw.drawDot(i, j, BLUE);
-				}
-			}
-		}
-	}
 
     makeEdgeList(edges);
 
