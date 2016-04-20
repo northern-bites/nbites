@@ -267,7 +267,7 @@ int Vision_func() {
     int colorSegLength = (width / 4) * (height / 2);
     // Create temp buffer and fill with segmented image
     uint8_t segBuf[colorSegLength];
-    //memcpy(segBuf, frontEnd->colorImage().pixelAddr(), colorSegLength);
+    memcpy(segBuf, frontEnd->colorImage().pixelAddr(), colorSegLength);
 
     // Convert to string and set log
     std::string segBuffer((const char*)segBuf, colorSegLength);

@@ -105,6 +105,7 @@ namespace man {
                           bool foundBall);
             bool lookForFarAwayBalls(Blob blob);
             bool farSanityChecks(Blob blob);
+            bool nearSanityChecks(Blob blob);
 
 			void setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 black,
 						   ImageLiteU16 yImg);

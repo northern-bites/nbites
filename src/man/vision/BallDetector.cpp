@@ -109,10 +109,15 @@ int BallDetector::filterWhiteBlobs(Blob currentBlob,
     if (!topCamera) {
         minSecond = 3;
     }
+	bool ratio = false;
+	if (prinLength < prinLength2 * 2 || centerX < prinLength ||
+		centerX > width - prinLength || centerY > height - prinLength) {
+		ratio = true;
+	}
 
     // see if the blob is of the right general shape for a ball
     if (prinLength < MAX_WHITE_BLOB && prinLength2 >= minSecond &&
-        prinLength < prinLength2 * 2 && currentBlob.area() > MIN_AREA &&
+        ratio && currentBlob.area() > MIN_AREA &&
         (centerY > field->horizonAt(centerX) || !topCamera)) {
         blobs.push_back(std::make_pair(centerX, centerY));
         if (debugBall) {
@@ -127,7 +132,14 @@ int BallDetector::filterWhiteBlobs(Blob currentBlob,
             if (abs(p.first - centerX) <= prinLength &&
                 abs(p.second - centerY) <= prinLength) {
                 count++;
-            }
+            } else if (ratio && !topCamera &&
+					   abs(p.first - centerX) <= prinLength + 3 &&
+					   abs(p.second - centerY) <= prinLength + 3) {
+				count++;
+			}
+        }
+        if (count < 2 && topCamera && nearSanityChecks(currentBlob)) {
+            return 2;
         }
         return count;
     }
@@ -144,7 +156,7 @@ int BallDetector::scanX(int startX, int startY, int direction, int stop) {
             newX = i;
         }
     }
-    std::cout << "Returning " << newX << std::endl;
+    //std::cout << "Returning " << newX << std::endl;
     return newX;
 }
 
@@ -213,6 +225,56 @@ bool BallDetector::farSanityChecks(Blob blob)
     return true;
 }
 
+/* We have a white blob that is relatively near us. For whatever
+   reason we didn't see any black blobs in it. Make sure that
+   wasn't just because our black detector was bad. Watch out for
+   field crosses though.
+ */
+bool BallDetector::nearSanityChecks(Blob blob)
+{
+    int centerX = static_cast<int>(blob.centerX());
+    int centerY = static_cast<int>(blob.centerY());
+    int prinLength = static_cast<int>(blob.firstPrincipalLength());
+    int prinLength2 = static_cast<int>(blob.secondPrincipalLength());
+    // the black in the ball tends to make our blob footprint too small
+    // try to expand it
+    int leftX = centerX;
+    int rightX = centerX;
+    int bottomY = centerY;
+    int topY = centerY;
+
+    leftX = scanX(centerX - 1, centerY, -1, 1);
+    rightX = scanX(centerX + 1, centerY, 1, width - 1);
+    centerX = leftX + (rightX - leftX) / 2;
+    topY = scanY(centerX, centerY - 1, -1, field->horizonAt(centerX));
+    bottomY = scanY(centerX, centerY + 1, 1, height - 1);
+    centerY = topY + (bottomY - topY) / 2;
+    int boxWidth = rightX - leftX;
+    int boxHeight = bottomY - topY;
+    if (debugBall) {
+        //debugDraw.drawBox(leftX, rightX, bottomY, topY, ORANGE);
+        std::cout << "Near Box " << boxWidth << " " << boxHeight << std::endl;
+        std::cout << "Ending at " << centerX << " " << centerY << std::endl;
+    }
+    int MINBOXWIDTH = 15;
+	int MINBOXHEIGHT = 15;
+    int MAXBOX = 50;
+	bool atEdge = false;
+	if (centerX < prinLength || centerX > width - prinLength) {
+		MINBOXWIDTH = 8;
+		atEdge = true;
+	}
+    if (boxWidth < MINBOXWIDTH || boxHeight < MINBOXHEIGHT ||
+		boxWidth > MAXBOX || boxHeight > MAXBOX) {
+        return false;
+    }
+    if (boxWidth > 2 * boxHeight || (boxHeight > 2 * boxWidth && !atEdge)) {
+        return false;
+    }
+    return true;
+
+}
+
 /* Our worst ball detector. Tries to find small white blobs
    off in the distance. The trouble is that such blobs might
    be other things. This will require a number of sanity checks.
@@ -231,7 +293,11 @@ bool BallDetector::lookForFarAwayBalls(Blob blob)
         prinLength2 >= 1 &&
         (centerY > field->horizonAt(centerX) || !topCamera)) {
         return farSanityChecks(blob);
-    }
+    }/* else if (topCamera && centerY >= height / 3 &&
+               centerY > field->horizonAt(centerX) &&
+               prinLength > 3 && prinLength2 > 3) {
+        return nearSanityChecks(blob);
+        } */
     return false;
 }
 
@@ -268,6 +334,19 @@ bool BallDetector::blobsAreClose(std::pair<int,int> first,
     if (xdiff < closeness && ydiff < closeness &&
         (xdiff + ydiff) < TOTAL_CLOSENESS &&
         (xdiff > 0 || ydiff > 0)) {
+		int yMid = (first.second + second.second) / 2;
+		int xMid = (first.first + second.first) / 2;
+		int count = 0;
+		for (int i = min(first.first, second.first);
+			 i < max(first.first, second.first); i++) {
+			getColor(i, yMid);
+			if (isGreen()) {
+				count++;
+			}
+		}
+		if (count > 1) {
+			return false;
+		}
         return true;
     }
     return false;
@@ -451,7 +530,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     candidates.clear();
 #endif
     bool foundBall = false;
-    int BOTTOMEDGEWHITEMAX = 20;
+    int BOTTOMEDGEWHITEMAX = 25;
     int BUFFER = 10;
 
     makeEdgeList(edges);
@@ -488,7 +567,10 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
                   principalLength < BOTTOMEDGEWHITEMAX) {
             makeBall((*i), cameraHeight, 0.5, foundBall);
             foundBall = true;
-        }
+        } else if (count == 1 && debugBall) {
+			std::cout << "Found a white blob with one black spot " <<
+				centerY << std::endl;
+		}
 #ifdef OFFLINE
 #else
         if (foundBall) {
