@@ -201,7 +201,7 @@ bool BallDetector::farSanityChecks(Blob blob)
     leftX = scanX(centerX - 1, centerY, -1, 1);
     rightX = scanX(centerX + 1, centerY, 1, width - 1);
     centerX = leftX + (rightX - leftX) / 2;
-    topY = scanY(centerX, centerY - 1, -1, field->horizonAt(centerX));
+    topY = scanY(centerX, centerY - 1, -1, max(0, field->horizonAt(centerX)));
     bottomY = scanY(centerX, centerY + 1, 1, height - 1);
     centerY = topY + (bottomY - topY) / 2;
     int boxWidth = rightX - leftX;
@@ -209,7 +209,7 @@ bool BallDetector::farSanityChecks(Blob blob)
     leftX = scanX(centerX - 1, centerY, -1, 1);
     rightX = scanX(centerX + 1, centerY, 1, width - 1);
     centerX = leftX + (rightX - leftX) / 2;
-    topY = scanY(centerX, centerY - 1, -1, field->horizonAt(centerX));
+    topY = scanY(centerX, centerY - 1, -1, max(0, field->horizonAt(centerX)));
     bottomY = scanY(centerX, centerY + 1, 1, height - 1);
     centerY = topY + (bottomY - topY) / 2;
 
@@ -251,7 +251,7 @@ bool BallDetector::nearSanityChecks(Blob blob)
     leftX = scanX(centerX - 1, centerY, -1, 1);
     rightX = scanX(centerX + 1, centerY, 1, width - 1);
     centerX = leftX + (rightX - leftX) / 2;
-    topY = scanY(centerX, centerY - 1, -1, field->horizonAt(centerX));
+    topY = scanY(centerX, centerY - 1, -1, max(0, field->horizonAt(centerX)));
     bottomY = scanY(centerX, centerY + 1, 1, height - 1);
     centerY = topY + (bottomY - topY) / 2;
     int boxWidth = rightX - leftX;
@@ -376,30 +376,28 @@ bool BallDetector::findCorrelatedBlackBlobs
     int correlations[blackBlobs.size()];
     int correlatedTo[blackBlobs.size()][blackBlobs.size()];
     bool foundThree = false;
-    int count = 0;
     // loop through filtered black blobs
     for (int i = 0; i < blackBlobs.size(); i++) {
         std::pair<int,int> p = blackBlobs[i];
         // initialize the correlations for this blob
-        correlations[count] = 0;
+        correlations[i] = 0;
         for (int k = 0; k < blackBlobs.size(); k++) {
-            correlatedTo[count][k] = 0;
+            correlatedTo[i][k] = 0;
         }
-        int secondCounter = 0;
         // we're going to check against all other black blobs
         for (int j = 0; j < blackBlobs.size(); j++) {
             std::pair<int,int> q = blackBlobs[j];
             if (blobsAreClose(p, q)) {
-                correlations[count] += 1;
-                correlatedTo[count][secondCounter] = 1;
+                correlations[i] += 1;
+                correlatedTo[i][j] = 1;
                 // Four close black blobs is good evidence for a ball
-                if (correlations[count] > 2) {
+                if (correlations[i] > 2) {
                     // grab this blob from our vector
                     foundThree = true;
-                    Blob newBall = actualBlobs[count];
+                    Blob newBall = actualBlobs[i];
                     // find our correlated blobs and merge them in
                     for (int k = 0; k < blackBlobs.size(); k++) {
-                        if (correlatedTo[count][k] == 1) {
+                        if (correlatedTo[i][k] == 1) {
                             Blob merger = actualBlobs[k];
                             newBall.merge(merger);
                         }
@@ -412,12 +410,10 @@ bool BallDetector::findCorrelatedBlackBlobs
 #endif
                 }
             }
-            secondCounter++;
         }
-        count++;
     }
     // If the best case didn't work out, look for 3 black blobs together
-    for (int c = 0; c < count; c++) {
+    for (int c = 0; c < blackBlobs.size(); c++) {
         if (correlations[c] > 1 && !foundThree) {
             // good candidate ball
             Blob newBall = actualBlobs[c];
@@ -568,17 +564,17 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         filterBlackBlobs((*i), blackBlobs, actualBlackBlobs);
     }
 
-	if (topCamera) {
+	/*if (topCamera) {
 
 		ImageLiteU8 bottomWhite(whiteImage, 0, whiteImage.height()/2,
 								whiteImage.width(), whiteImage.height() / 2);
 		// First we're going to run the blobber on the white image
 		blobber2.run(bottomWhite.pixelAddr(), bottomWhite.width(),
 					bottomWhite.height(), bottomWhite.pitch());
-	} else {
+					} else { */
 		blobber2.run(whiteImage.pixelAddr(), whiteImage.width(),
 					 whiteImage.height(), whiteImage.pitch());
-	}
+		//}
     // Now run the blobber on the white image
     std::vector<std::pair<int,int>> whiteBlobs;
     // loop through the white blobs hoping to find a ball sized blob
