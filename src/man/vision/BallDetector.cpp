@@ -568,9 +568,18 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         filterBlackBlobs((*i), blackBlobs, actualBlackBlobs);
     }
 
+	if (topCamera) {
+
+		ImageLiteU8 bottomWhite(whiteImage, 0, whiteImage.height()/2,
+								whiteImage.width(), whiteImage.height() / 2);
+		// First we're going to run the blobber on the white image
+		blobber2.run(bottomWhite.pixelAddr(), bottomWhite.width(),
+					bottomWhite.height(), bottomWhite.pitch());
+	} else {
+		blobber2.run(whiteImage.pixelAddr(), whiteImage.width(),
+					 whiteImage.height(), whiteImage.pitch());
+	}
     // Now run the blobber on the white image
-    blobber2.run(white.pixelAddr(), white.width(), white.height(),
-                 white.pitch());
     std::vector<std::pair<int,int>> whiteBlobs;
     // loop through the white blobs hoping to find a ball sized blob
     for (auto i =blobber2.blobs.begin(); i!=blobber2.blobs.end(); i++) {
