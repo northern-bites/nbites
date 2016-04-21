@@ -160,13 +160,14 @@ void ImageFrontEnd::run(const YuvLite& src, const Colors* colors, uint8_t* color
     dstAllocated = size;
   }
 
-  if (fast())
+  if (fast()) {
     _time = man::vision::_acquire_image(src.pixelAddr(), dstBase.pitch(),
                                         dstBase.height(), src.pitch(),
                                         colors, dstImages, colorTable);
-  else
+  } else {
     _time = testAcquire(src.pixelAddr(), dstBase.pitch(), dstBase.height(), 
                         src.pitch(), colors, dstImages, colorTable);
+  }
 }
 
 }
