@@ -38,16 +38,12 @@ public class SharedConstants {
 	
 	private static JsonObject object = getObject();
 	
-	private static String stringConstant(String key) {
+	public static String stringConstant(String key) {
 		return object.get(key).<JsonString>cast().toString();
 	}
 	
-	private static int intConstant(String key) {
+	public static int intConstant(String key) {
 		return object.get(key).<JsonNumber>cast().intValue();
-	}
-	
-	public static String PROTOBUF_TYPE_PREFIX() {
-		return object.get("PROTOBUF_TYPE_PREFIX").asString().toString();
 	}
 	
 	public static String YUVImageType_DEFAULT() {

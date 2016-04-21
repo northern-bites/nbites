@@ -1,5 +1,6 @@
 package nbtool.data.log;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Vector;
@@ -9,8 +10,16 @@ import nbtool.data.session.Session;
 
 public abstract class Log {
 	
-	public Vector<Block> blocks = null;
-	public JsonObject topLevelDictionary = null;
+	protected File logInFilesystem;
+	public abstract boolean temporary();
+	
+	protected Vector<Block> blocks = null;
+	public abstract Vector<Block> getBlocks();
+	public abstract void setBlocks(Vector<Block> blocks);
+	
+	protected JsonObject topLevelDictionary = null;
+	public abstract JsonObject getDictionary();
+	public abstract void setDictionary(JsonObject obj);
 	
 	public long createdWhen = 0;
 	public String logClass = "";
