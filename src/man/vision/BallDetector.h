@@ -33,7 +33,8 @@ namespace man {
 		class Ball {
 		public:
 			Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_,
-				 int imgWidth_, bool top, bool os, bool ot, bool ob);
+				 int imgWidth_, bool top, bool os, bool ot, bool ob,
+				 double cx, double cy);
 			Ball();
 
 			std::string properties();
@@ -102,7 +103,7 @@ namespace man {
                                std::pair<int,int> second);
 
             void makeBall(Blob blob, double cameraHeight, double conf,
-                          bool foundBall);
+                          bool foundBall, bool isBlack);
             bool lookForFarAwayBalls(Blob blob);
             bool farSanityChecks(Blob blob);
             bool nearSanityChecks(Blob blob);
