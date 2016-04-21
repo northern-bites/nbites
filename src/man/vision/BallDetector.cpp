@@ -153,7 +153,7 @@ int BallDetector::filterWhiteBlobs(Blob currentBlob,
 
 int BallDetector::scanX(int startX, int startY, int direction, int stop) {
     int newX = startX;
-    for (int i = startX; i != stop; i += direction) {
+    for (int i = startX; i != stop && i >= 0 && i < width; i += direction) {
         getColor(i, startY);
         if (!(isWhite() || isBlack()) && isGreen()) {
             break;
@@ -167,7 +167,7 @@ int BallDetector::scanX(int startX, int startY, int direction, int stop) {
 
 int BallDetector::scanY(int startX, int startY, int direction, int stop) {
     int newY = startY;
-    for (int i = startY; i != stop; i += direction) {
+    for (int i = startY; i != stop && i >= 0 && i < height; i += direction) {
         getColor(startX, i);
         if (!(isWhite() || isBlack()) && isGreen()) {
             break;
@@ -641,8 +641,13 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 */
 
 void BallDetector::getColor(int x, int y) {
-    currentX = x;
-    currentY = y;
+    if (x < 0 || y < 0 || x >= width || y >= height) {
+        currentX = 0;
+        currentY = 0;
+    } else {
+        currentX = x;
+        currentY = y;
+    }
 }
 
 bool BallDetector::isGreen() {
