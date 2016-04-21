@@ -49,6 +49,9 @@ void BallDetector::filterBlackBlobs(Blob currentBlob,
 
     int centerX = static_cast<int>(currentBlob.centerX());
     int centerY = static_cast<int>(currentBlob.centerY());
+	if (topCamera) {
+		centerY = centerY + height / 2;
+	}
     int prinLength = static_cast<int>(currentBlob.firstPrincipalLength());
     int prinLength2 = static_cast<int>(currentBlob.secondPrincipalLength());
     int minSecond = 1;
@@ -401,7 +404,7 @@ bool BallDetector::findCorrelatedBlackBlobs
                             newBall.merge(merger);
                         }
                     }
-                    makeBall(newBall, cameraHeight, 0.8, foundBall);
+                    makeBall(newBall, cameraHeight, 0.8, foundBall, true);
 #ifdef OFFLINE
                     foundBall = true;
 #else
@@ -433,7 +436,7 @@ bool BallDetector::findCorrelatedBlackBlobs
                     }
                 }
             }
-            makeBall(newBall, cameraHeight, 0.75, foundBall);
+            makeBall(newBall, cameraHeight, 0.75, foundBall, true);
 #ifdef OFFLINE
             foundBall = true;
 #else
@@ -454,11 +457,14 @@ bool BallDetector::findCorrelatedBlackBlobs
    detect in every image.
 */
 void BallDetector::makeBall(Blob blob, double cameraHeight, double conf,
-                            bool foundBall)
+                            bool foundBall, bool isBlack)
 {
     double bIX = (blob.centerX() - width/2);
     double bIY = (height / 2 - blob.centerY()) -
         blob.firstPrincipalLength();
+	if (topCamera && isBlack) {
+		bIY = bIY + height / 2;
+	}
     double x_rel, y_rel;
     bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
     Ball b(blob, x_rel, -1 * y_rel, cameraHeight, height,
@@ -539,12 +545,20 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     int BOTTOMEDGEWHITEMAX = 25;
     int BUFFER = 10;
 
-    makeEdgeList(edges);
+    //makeEdgeList(edges);
+	if (topCamera) {
 
-    // First we're going to run the blobber on the black image
-    blobber.run(blackImage.pixelAddr(), blackImage.width(),
-                blackImage.height(), blackImage.pitch());
+		ImageLiteU8 bottomBlack(blackImage, 0, blackImage.height()/2,
+								blackImage.width(), blackImage.height() / 2);
+		// First we're going to run the blobber on the black image
+		blobber.run(bottomBlack.pixelAddr(), bottomBlack.width(),
+					bottomBlack.height(), bottomBlack.pitch());
+	} else {
+		blobber.run(blackImage.pixelAddr(), blackImage.width(),
+					 blackImage.height(), blackImage.pitch());
+	}
 
+	std::cout << "Black blobbing " << blobber.ticks() << std::endl;
     // Then we are going to filter out all of the blobs that obviously
     // aren't part of the ball
     std::vector<std::pair<int,int>> blackBlobs;
@@ -563,15 +577,15 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         int centerY = static_cast<int>((*i).centerY());
         int principalLength = static_cast<int>((*i).firstPrincipalLength());
         if (count > 1) {
-            makeBall((*i), cameraHeight, 0.9, foundBall);
+            makeBall((*i), cameraHeight, 0.9, foundBall, false);
             foundBall = true;
         } else if (count == 2) {
-            makeBall((*i), cameraHeight, 0.8, foundBall);
+            makeBall((*i), cameraHeight, 0.8, foundBall, false);
             foundBall = true;
         }else if (count > 0 && topCamera &&
                   centerY + principalLength > height - BUFFER &&
                   principalLength < BOTTOMEDGEWHITEMAX) {
-            makeBall((*i), cameraHeight, 0.5, foundBall);
+            makeBall((*i), cameraHeight, 0.5, foundBall, false);
             foundBall = true;
         } else if (count == 1 && debugBall) {
 			std::cout << "Found a white blob with one black spot " <<
@@ -584,7 +598,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         }
 #endif
     }
-
+	/*
     if (findCorrelatedBlackBlobs(blackBlobs, actualBlackBlobs, cameraHeight,
                                  foundBall)) {
 #ifdef OFFLINE
@@ -592,11 +606,11 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 #else
         return true;
 #endif
-    }
+}*/
 
     for (auto i =blobber2.blobs.begin(); i!=blobber2.blobs.end(); i++) {
         if (lookForFarAwayBalls((*i))) {
-            makeBall((*i), cameraHeight, 0.5, foundBall);
+            makeBall((*i), cameraHeight, 0.5, foundBall, false);
 #ifdef OFFLINE
             std::cout << "Found faraway ball" << std::endl;
             foundBall = true;

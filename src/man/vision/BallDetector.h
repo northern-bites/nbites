@@ -102,7 +102,7 @@ namespace man {
                                std::pair<int,int> second);
 
             void makeBall(Blob blob, double cameraHeight, double conf,
-                          bool foundBall);
+                          bool foundBall, bool isBlack);
             bool lookForFarAwayBalls(Blob blob);
             bool farSanityChecks(Blob blob);
             bool nearSanityChecks(Blob blob);
