@@ -462,13 +462,15 @@ void BallDetector::makeBall(Blob blob, double cameraHeight, double conf,
     double bIX = (blob.centerX() - width/2);
     double bIY = (height / 2 - blob.centerY()) -
         blob.firstPrincipalLength();
+	double cY = blob.centerY();
 	if (topCamera && isBlack) {
 		bIY = bIY + height / 2;
+		cY = cY + height / 2;
 	}
     double x_rel, y_rel;
     bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
     Ball b(blob, x_rel, -1 * y_rel, cameraHeight, height,
-           width, topCamera, false, false, false);
+           width, topCamera, false, false, false, blob.centerX(), cY);
     b._confidence = conf;
     if (!foundBall) {
         _best = b;
@@ -558,7 +560,6 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 					 blackImage.height(), blackImage.pitch());
 	}
 
-	std::cout << "Black blobbing " << blobber.ticks() << std::endl;
     // Then we are going to filter out all of the blobs that obviously
     // aren't part of the ball
     std::vector<std::pair<int,int>> blackBlobs;
@@ -598,7 +599,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         }
 #endif
     }
-	/*
+
     if (findCorrelatedBlackBlobs(blackBlobs, actualBlackBlobs, cameraHeight,
                                  foundBall)) {
 #ifdef OFFLINE
@@ -606,7 +607,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 #else
         return true;
 #endif
-}*/
+	}
 
     for (auto i =blobber2.blobs.begin(); i!=blobber2.blobs.end(); i++) {
         if (lookForFarAwayBalls((*i))) {
@@ -671,7 +672,8 @@ void BallDetector::setImages(ImageLiteU8 white, ImageLiteU8 green,
  */
 
 Ball::Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_,
-           int imgWidth_, bool top, bool os, bool ot, bool ob) :
+           int imgWidth_, bool top, bool os, bool ot, bool ob, double cx,
+	double cy) :
     blob(b),
     radThresh(.3, .7),
     thresh(.5, .8),
@@ -684,6 +686,8 @@ Ball::Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_,
     occludedSide(os),
     occludedTop(ot),
     occludedBottom(ob),
+	centerX(cx),
+	centerY(cy),
     _confidence(0)
 {
     if (!top) {
