@@ -276,6 +276,8 @@ bool BallDetector::nearSanityChecks(Blob blob)
     if (boxWidth > 2 * boxHeight || (boxHeight > 2 * boxWidth && !atEdge)) {
         return false;
     }
+	// field cross check
+	int count = 0;
     return true;
 
 }
@@ -414,7 +416,8 @@ bool BallDetector::findCorrelatedBlackBlobs
     }
     // If the best case didn't work out, look for 3 black blobs together
     for (int c = 0; c < blackBlobs.size(); c++) {
-        if (correlations[c] > 1 && !foundThree) {
+        if ((correlations[c] > 1 || (correlations[c] == 1 && !topCamera))
+			 && !foundThree) {
             // good candidate ball
             Blob newBall = actualBlobs[c];
             for (int k = 0; k < blackBlobs.size(); k++) {
