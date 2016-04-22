@@ -281,7 +281,8 @@ bool BallDetector::nearSanityChecks(Blob blob)
 		boxWidth > MAXBOX || boxHeight > MAXBOX) {
         return false;
     }
-    if (boxWidth > 2 * boxHeight || (boxHeight > 2 * boxWidth && !atEdge)) {
+    if (boxWidth > 2 * boxHeight || (boxHeight > 2 * boxWidth && !atEdge)
+		|| boxHeight > 3 * boxWidth) {
         return false;
     }
 	// field cross check
