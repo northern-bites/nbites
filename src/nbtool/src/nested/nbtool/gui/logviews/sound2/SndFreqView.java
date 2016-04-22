@@ -17,6 +17,8 @@ public class SndFreqView extends ViewParent {
 
 	ShortBuffer sb = null;
 	
+	JLabel topLabel = new JLabel();
+	
 	@Override
 	public void setLog(_Log newlog) {
 		this.sb = new ShortBuffer();
@@ -53,11 +55,14 @@ public class SndFreqView extends ViewParent {
 
 			@Override
 			public String selectionString(int c, int f) {
-				return "" + magn[f];
+				String fmat = String.format("c%df%d: %f", c, f, magn[f]);
+				Debug.printf("%s", fmat);
+				return fmat;
 			}
 			
 		};
 		
+		this.add(topLabel, BorderLayout.NORTH);
 		this.add(sp, BorderLayout.CENTER);
 	}
 	

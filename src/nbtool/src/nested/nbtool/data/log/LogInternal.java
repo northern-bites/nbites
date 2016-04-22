@@ -62,18 +62,48 @@ public class LogInternal extends Log {
 	
 	public static Log explicitLog(Vector<Block> blocks, JsonObject topLevel, String logClass,
 			long created) {
-		
+		return null;
 	}
 	
 	public static Log parseFrom(byte[] bytes) {
-		
+		return null;
 	}
 	
 	public static Log parseFromParts(byte[] json, byte[] data) {
-		
+		return null;
 	}
 	
 	public static Log parseFromStream(InputStream is) {
+		return null;
+	}
+
+	@Override
+	public boolean temporary() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Vector<Block> getBlocks() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setBlocks(Vector<Block> blocks) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public JsonObject getDictionary() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setDictionary(JsonObject obj) {
+		// TODO Auto-generated method stub
 		
 	}
 
