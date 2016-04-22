@@ -993,7 +993,7 @@ def shouldClearBall(player):
         player.aggressive = False
 
     # ball must be visible
-    if not player.brain.ball.vis.on:
+    if player.brain.ball.vis.frames_off > 10:
         return False
 
     shouldGo = False

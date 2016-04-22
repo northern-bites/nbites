@@ -71,7 +71,7 @@ int main() {
     establishLock();
 
     signal(SIGSEGV, error_signal_handler);
-    
+
     printf("\t\tCOMPILED WITH BOSS VERSION == %d\n", BOSS_VERSION);
     
     //it is somewhat important that we write to the old file descriptors before reopening.

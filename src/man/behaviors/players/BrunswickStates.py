@@ -53,7 +53,8 @@ def gameReady(player):
 
         if player.wasPenalized:
             player.wasPenalized = False
-            return player.goNow('afterPenalty')
+            # US OPEN 16 Turns of going into after penalty in ready
+            # return player.goNow('afterPenalty')
 
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
