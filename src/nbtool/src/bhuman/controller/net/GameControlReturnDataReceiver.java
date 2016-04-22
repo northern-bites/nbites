@@ -3,15 +3,19 @@ package controller.net;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.util.regex.Pattern;
 
 import common.Log;
 
 import data.GameControlData;
 import data.GameControlReturnData;
+import data.Rules;
 
 /**
  *
@@ -35,33 +39,61 @@ public class GameControlReturnDataReceiver extends Thread
     /**
      * Creates a new Receiver.
      *
+     * @param address the InetAddress to listen on.<br />
+     *        Only applied if {@link Rules#dropBroadcastMessages rule.dropBroadcastMessages} is set
+     *        to true.
      * @throws SocketException the an error occurs while creating the socket
+     * @throws UnknownHostException if (internally chosen) inet-address is not valid or no network
+     *         device is bound to an address matching the regex (ignoring loopback interfaces)
      */
-    private GameControlReturnDataReceiver() throws SocketException
+    private GameControlReturnDataReceiver(final InetAddress address) throws SocketException, UnknownHostException
     {
         datagramSocket = new DatagramSocket(null);
         datagramSocket.setReuseAddress(true);
         datagramSocket.setSoTimeout(500);
-        datagramSocket.bind(new InetSocketAddress(GameControlData.GAMECONTROLLER_RETURNDATA_PORT));
+        if (Rules.league.dropBroadcastMessages) {
+            datagramSocket.bind(new InetSocketAddress(address,
+                    GameControlData.GAMECONTROLLER_RETURNDATA_PORT));
+        } else {
+            datagramSocket
+                    .bind(new InetSocketAddress(GameControlData.GAMECONTROLLER_RETURNDATA_PORT));
+        }
     }
 
     /**
-     * Returns the instance of the singleton. If the Receiver wasn't initialized once before, a new instance will
-     * be created and returned (lazy instantiation)
+     * Initializes the GameControlReturnDataReceiver. This needs to be called before
+     * {@link #getInstance()} is available.
+     * 
+     * @param address the InetAddress to listen on.<br />
+     *        Only applied if {@link Rules#dropBroadcastMessages rule.dropBroadcastMessages} is set
+     *        to true.
+     * @throws SocketException if an error occurs while creating the socket
+     * @throws UnknownHostException if (internally chosen) inet-address is not valid or no network
+     *         device is bound to an address matching the regex (ignoring loopback interfaces)
+     * @throws IllegalStateException if the Receiver is already initialized
+     */
+    public synchronized static void initialize(final InetAddress address) throws SocketException, UnknownHostException
+    {
+        if (instance != null) {
+            throw new IllegalStateException("receiver is already initialized");
+        } else {
+            instance = new GameControlReturnDataReceiver(address);
+        }
+    }
+
+    /**
+     * Returns the instance of the singleton.
      *
      * @return  The instance of the Receiver
-     * @throws IllegalStateException if the first creation of the singleton throws an exception
+     * @throws  IllegalStateException if the Receiver is not initialized yet
      */
     public synchronized static GameControlReturnDataReceiver getInstance()
     {
         if (instance == null) {
-            try {
-                instance = new GameControlReturnDataReceiver();
-            } catch (SocketException e) {
-                throw new IllegalStateException("fatal: Error while setting up Receiver.", e);
-            }
+            throw new IllegalStateException("receiver is not initialized yet");
+        } else {
+            return instance;
         }
-        return instance;
     }
 
     @Override

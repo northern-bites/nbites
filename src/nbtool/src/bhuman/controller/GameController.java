@@ -16,9 +16,12 @@ import data.Teams;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.regex.Pattern;
+import java.util.Enumeration;
 
 import javax.swing.*;
 
@@ -36,26 +39,23 @@ public class GameController
      * to be written into the log file.
      */
     public static final String version = "GC2 1.3";
-    
+
     /** Relative directory of where logs are stored */
     private final static String LOG_DIRECTORY = "logs";
-    
-    private static Pattern IPV4_PATTERN = Pattern.compile("^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}$");
 
     private static final String HELP_TEMPLATE = "Usage: java -jar GameController.jar {options}"
             + "\n  (-h | --help)                   display help"
-            + "\n  (-b | --broadcast) <address>    set broadcast ip (default is 255.255.255.255)"
+            + "\n  (-i | --interface) <interface>  set network interface (default is a connected IPv4 interface)"
             + "\n  (-l | --league) %s%sselect league (default is spl)"
             + "\n  (-w | --window)                 select window mode (default is fullscreen)"
             + "\n";
-    private static final String DEFAULT_BROADCAST = "255.255.255.255";
-    private static final String COMMAND_BROADCAST = "--broadcast";
-    private static final String COMMAND_BROADCAST_SHORT = "-b";
+    private static final String COMMAND_INTERFACE = "--interface";
+    private static final String COMMAND_INTERFACE_SHORT = "-i";
     private static final String COMMAND_LEAGUE = "--league";
     private static final String COMMAND_LEAGUE_SHORT = "-l";
     private static final String COMMAND_WINDOW = "--window";
     private static final String COMMAND_WINDOW_SHORT = "-w";
-    
+
     /**
      * The program starts here.
      * 
@@ -67,16 +67,15 @@ public class GameController
         System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
 
         //commands
-        String outBroadcastAddress = DEFAULT_BROADCAST;
+        String interfaceName = "";
         boolean windowMode = false;
-        
+
         parsing:
         for (int i=0; i<args.length; i++) {
             if ((args.length > i+1)
-                    && ((args[i].equalsIgnoreCase(COMMAND_BROADCAST_SHORT))
-                    || (args[i].equalsIgnoreCase(COMMAND_BROADCAST)))
-                    && IPV4_PATTERN.matcher(args[++i]).matches()) {
-                outBroadcastAddress = args[i];
+                    && ((args[i].equalsIgnoreCase(COMMAND_INTERFACE_SHORT))
+                    || (args[i].equalsIgnoreCase(COMMAND_INTERFACE)))) {
+                interfaceName = args[++i];
                 continue parsing;
             } else if ((args.length > i+1)
                     && ((args[i].equalsIgnoreCase(COMMAND_LEAGUE_SHORT))
@@ -104,7 +103,7 @@ public class GameController
                               : "\n                                  ");
             System.exit(0);
         }
-        
+
         //application-lock
         final ApplicationLock applicationLock = new ApplicationLock("GameController");
         try {
@@ -144,9 +143,58 @@ public class GameController
         data.gameType = Rules.league.dropInPlayerMode ? GameControlData.GAME_DROPIN
                 : input.outFulltime ? GameControlData.GAME_PLAYOFF : GameControlData.GAME_ROUNDROBIN;
 
+        InterfaceAddress localAddress = null;
         try {
+            NetworkInterface networkInterface = NetworkInterface.getByName(interfaceName);
+            if (networkInterface == null || !networkInterface.isUp()) {
+                Enumeration<NetworkInterface> nifs = NetworkInterface.getNetworkInterfaces();
+                if (interfaceName.isEmpty()) {
+                    while (nifs.hasMoreElements()) {
+                        NetworkInterface nif = nifs.nextElement();
+                        if (!nif.isUp() || nif.isLoopback()) {
+                            continue;
+                        }
+                        for(InterfaceAddress ifAddress : nif.getInterfaceAddresses()) {
+                            if (ifAddress.getAddress().isLoopbackAddress()) {
+                                // ignore loopback during automatic interface lookup
+                                continue;
+                            } else if (ifAddress.getAddress() instanceof Inet4Address) {
+                                networkInterface = nif;
+                                localAddress = ifAddress;
+                            }
+                        }
+                    }
+                } else {
+                    System.err.printf("The specified interface \"%s\" is not available%n", interfaceName);
+                    System.err.print("List of known and up interfaces: ");
+                    while (nifs.hasMoreElements()) {
+                        NetworkInterface nif = nifs.nextElement();
+                        if (nif.isUp()) {
+                            System.err.printf("%s (%s)",nif.getName(), nif.getDisplayName());
+                            if (nifs.hasMoreElements()) {
+                                System.err.print(", ");
+                            }
+                        }
+                    }
+                    System.err.println();
+                    Log.error("fatal: " + String.format("The specified interface \"%s\" is not available", interfaceName));
+                    System.exit(-1);
+                }
+            } else {
+                for (InterfaceAddress ifAddress : networkInterface.getInterfaceAddresses()) {
+                    if (ifAddress.getAddress() instanceof Inet4Address) {
+                        localAddress = ifAddress;
+                    }
+                }
+                if (localAddress == null) {
+                    System.err.printf("The specified interface \"%s\" has no IPv4 address assigned%n", interfaceName);
+                    Log.error("fatal: " + String.format("The specified interface \"%s\" has no IPv4 address assigned", interfaceName));
+                    System.exit(-1);
+                }
+            }
+
             //sender
-            Sender.initialize(outBroadcastAddress);
+            Sender.initialize(localAddress.getBroadcast() == null ? localAddress.getAddress() : localAddress.getBroadcast());
             Sender sender = Sender.getInstance();
             sender.send(data);
             sender.start();
@@ -155,6 +203,7 @@ public class GameController
             EventHandler.getInstance().data = data;
 
             //receiver
+            GameControlReturnDataReceiver.initialize(localAddress.getAddress());
             GameControlReturnDataReceiver receiver = GameControlReturnDataReceiver.getInstance();
             receiver.start();
 
@@ -167,12 +216,13 @@ public class GameController
                     "Error while setting up GameController on port: " + GameControlData.GAMECONTROLLER_RETURNDATA_PORT + ".",
                     "Error on configured port",
                     JOptionPane.ERROR_MESSAGE);
+            Log.error("fatal: " + e.getMessage());
             System.exit(-1);
         }
 
         //log
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-S");
-        
+
         final File logDir = new File(LOG_DIRECTORY);
         if (!logDir.exists() && !logDir.mkdirs()) {
             Log.init("log_"+df.format(new Date(System.currentTimeMillis()))+".txt");
@@ -185,7 +235,8 @@ public class GameController
         Log.toFile("Game type = "+ (data.gameType == GameControlData.GAME_ROUNDROBIN ? "round robin"
                 : data.gameType == GameControlData.GAME_PLAYOFF ?  "play-off" : "drop-in"));
         Log.toFile("Auto color change = "+data.colorChangeAuto);
-        Log.toFile("Using broadcast address " + outBroadcastAddress);
+        Log.toFile("Using broadcast address " + (localAddress.getBroadcast() == null ? localAddress.getAddress() : localAddress.getBroadcast()));
+        Log.toFile("Listening on address " + (Rules.league.dropBroadcastMessages ? localAddress.getAddress() : "0.0.0.0"));
 
         //ui
         ActionBoard.init();

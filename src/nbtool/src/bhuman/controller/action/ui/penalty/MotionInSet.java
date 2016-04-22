@@ -25,6 +25,7 @@ public class MotionInSet extends Penalty
     public void performOn(AdvancedData data, PlayerInfo player, int side, int number)
     {
         player.penalty = PlayerInfo.PENALTY_SPL_ILLEGAL_MOTION_IN_SET;
+        handleRepeatedPenaltyEjection(data, player, side, number);
         data.whenPenalized[side][number] = data.getTime();
         Log.state(data, "Illegal Motion in Set "+
                 Rules.league.teamColorName[data.team[side].teamColor]
