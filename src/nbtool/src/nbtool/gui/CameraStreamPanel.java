@@ -186,11 +186,11 @@ public class CameraStreamPanel extends JPanel implements ActionListener {
 
 		File topFile, botFile;
 		if(naoVersion == 4) {
-			topFile = new File("../../src/man/config/V4topCameraParams.txt");
-			botFile = new File("../../src/man/config/V4bottomCameraParams.txt");
+			topFile = new File("../../../src/man/config/V4topCameraParams.txt");
+			botFile = new File("../../../src/man/config/V4bottomCameraParams.txt");
 		} else {
-			topFile = new File("../../src/man/config/V5topCameraParams.txt");
-			botFile = new File("../../src/man/config/V5bottomCameraParams.txt");
+			topFile = new File("../../../src/man/config/V5topCameraParams.txt");
+			botFile = new File("../../../src/man/config/V5bottomCameraParams.txt");
 		}
 		
 		try {
