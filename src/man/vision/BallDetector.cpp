@@ -73,7 +73,7 @@ void BallDetector::filterBlackBlobs(Blob currentBlob,
     }
     if (!topCamera) {
         maxB = MAX_BLACK_BLOB - 1;
-		minB = 3;
+		minB = 2;
     }
     if (prinLength < maxB && prinLength >= minB &&
 		prinLength < prinLength2 * 3 &&
@@ -621,7 +621,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 			if (!topCamera) {
 				int prinLength = static_cast<int>((*i).firstPrincipalLength());
 				int prinLength2 = static_cast<int>((*i).secondPrincipalLength());
-				if (prinLength2 > 10 && prinLength < 20) {
+				if (prinLength2 > 8 && prinLength < 20) {
 					makeBall((*i), cameraHeight, 0.5, foundBall, false);
 					foundBall = true;
 				} else if (centerY - prinLength < 0 || centerY + prinLength > height) {
