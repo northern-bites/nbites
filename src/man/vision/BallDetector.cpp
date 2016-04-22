@@ -127,6 +127,7 @@ int BallDetector::filterWhiteBlobs(Blob currentBlob,
 
     // see if the blob is of the right general shape for a ball
     if (prinLength < maxB && prinLength2 >= minSecond &&
+		prinLength < prinLength2 * 3 &&
         ratio && currentBlob.area() > MIN_AREA &&
         (centerY > field->horizonAt(centerX) || !topCamera)) {
         blobs.push_back(std::make_pair(centerX, centerY));
@@ -148,7 +149,7 @@ int BallDetector::filterWhiteBlobs(Blob currentBlob,
 				count++;
 			}
         }
-        if (count < 2 && topCamera && nearSanityChecks(currentBlob)) {
+        if (count == 1 && topCamera && nearSanityChecks(currentBlob)) {
 			if (debugBall) {
 				std::cout << "Cheating on bottom ball" << std::endl;
 			}
@@ -285,6 +286,9 @@ bool BallDetector::nearSanityChecks(Blob blob)
 		|| boxHeight > 3 * boxWidth) {
         return false;
     }
+	if (boxWidth > 4 * prinLength || boxHeight > 4 * prinLength) {
+		return false;
+	}
 	// field cross check
 	int count = 0;
     return true;
@@ -321,7 +325,7 @@ bool BallDetector::lookForFarAwayBalls(Blob blob)
                centerY > field->horizonAt(centerX) &&
                prinLength > 3 && prinLength2 > 3) {
         return nearSanityChecks(blob);
-        } */
+		}*/
     return false;
 }
 
@@ -487,20 +491,14 @@ void BallDetector::makeBall(Blob blob, double cameraHeight, double conf,
     bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
     Ball b(blob, x_rel, -1 * y_rel, cameraHeight, height,
            width, topCamera, false, false, false, blob.centerX(), cY);
-	if (b._confidence == 0) {
-		if (debugBall) {
-			std::cout << "Bad confidence" << std::endl;
-		}
-	} else {
-		b._confidence = conf;
-		if (!foundBall) {
-			_best = b;
-		}
+	b._confidence = conf;
+	if (!foundBall) {
+		_best = b;
+	}
 		//edgeSanityCheck((int)blob.centerX(), (int)blob.centerY(), blob.firstPrincipalLength());
 #ifdef OFFLINE
 		candidates.push_back(b);
 #endif
-	}
 }
 
 void BallDetector::sanityChecks(int bx, int by, int radius)
