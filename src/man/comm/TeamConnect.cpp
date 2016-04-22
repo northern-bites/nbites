@@ -338,7 +338,7 @@ void TeamConnect::checkDeadTeammates(portals::OutPortal<messages::WorldModel>* m
         {
             continue;
         }
-        else //if (time - teamMates[i].timestamp > TEAMMATE_DEAD_THRESHOLD)
+        else if (time - teamMates[i].timestamp > TEAMMATE_DEAD_THRESHOLD)
         {
             portals::Message<messages::WorldModel> msg(0);
             msg.get()->set_active(false);
