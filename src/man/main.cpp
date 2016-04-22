@@ -32,6 +32,19 @@ void handler(int signal)
     }
 }
 
+void error_signal_handler(int signal) {
+    char buffer[1000];
+
+    char * sigstr = strsignal(signal);
+    snprintf(buffer, 1000, "error_signal_handler() SIGNALLED: %s\n", sigstr);
+    fprintf(stdout, "%s", buffer);
+    fprintf(stderr, "%s", buffer);
+    fflush(stdout);
+    fflush(stderr);
+
+    printf("error_signal_handler() done.\n");
+}
+
 // Deal with lock file. To ensure that we only have ONE instance of man
 void establishLock()
 {
@@ -52,9 +65,19 @@ void establishLock()
 
 int main() {
     signal(SIGTERM, handler);
+
     establishLock();
+
+    signal(SIGFPE, error_signal_handler);
+    signal(SIGILL, error_signal_handler);
+    signal(SIGSEGV, error_signal_handler);
+    signal(SIGBUS, error_signal_handler);
+    signal(SIGABRT, error_signal_handler);
+    signal(SIGIOT, error_signal_handler);
+    signal(SIGTRAP, error_signal_handler);
+    signal(SIGSYS, error_signal_handler);
     
-    printf("\t\tman 7/%d\n", BOSS_VERSION);
+    printf("\t\tCOMPILED WITH BOSS VERSION == %d\n", BOSS_VERSION);
     
     //it is somewhat important that we write to the old file descriptors before reopening.
     //this copies some stdout buffer behavior to the new file description.
