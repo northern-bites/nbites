@@ -72,10 +72,11 @@ void BallDetector::filterBlackBlobs(Blob currentBlob,
         maxB = 7;
     }
     if (!topCamera) {
-        maxB = MAX_BLACK_BLOB;
+        maxB = MAX_BLACK_BLOB - 1;
 		minB = 3;
     }
     if (prinLength < maxB && prinLength >= minB &&
+		prinLength < prinLength2 * 3 &&
         prinLength2 >= minSecond && currentBlob.area() > minArea &&
         (centerY > field->horizonAt(centerX) || !topCamera)) {
         blobs.push_back(std::make_pair(centerX, centerY));
@@ -115,13 +116,17 @@ int BallDetector::filterWhiteBlobs(Blob currentBlob,
         minSecond = 3;
     }
 	bool ratio = false;
+	int maxB = MAX_WHITE_BLOB;
+	if (!topCamera) {
+		maxB = 24;
+	}
 	if (prinLength < prinLength2 * 2 || centerX < prinLength ||
 		centerX > width - prinLength || centerY > height - prinLength) {
 		ratio = true;
 	}
 
     // see if the blob is of the right general shape for a ball
-    if (prinLength < MAX_WHITE_BLOB && prinLength2 >= minSecond &&
+    if (prinLength < maxB && prinLength2 >= minSecond &&
         ratio && currentBlob.area() > MIN_AREA &&
         (centerY > field->horizonAt(centerX) || !topCamera)) {
         blobs.push_back(std::make_pair(centerX, centerY));
@@ -144,6 +149,9 @@ int BallDetector::filterWhiteBlobs(Blob currentBlob,
 			}
         }
         if (count < 2 && topCamera && nearSanityChecks(currentBlob)) {
+			if (debugBall) {
+				std::cout << "Cheating on bottom ball" << std::endl;
+			}
             return 2;
         }
         return count;
@@ -279,6 +287,13 @@ bool BallDetector::nearSanityChecks(Blob blob)
 	// field cross check
 	int count = 0;
     return true;
+
+}
+
+bool BallDetector::hardSanityCheck(int leftx, int rightx, int topy, int bottomy)
+{
+	int boxWidth = rightx - leftx;
+	int boxHeight = bottomy - topy;
 
 }
 
@@ -470,14 +485,20 @@ void BallDetector::makeBall(Blob blob, double cameraHeight, double conf,
     bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
     Ball b(blob, x_rel, -1 * y_rel, cameraHeight, height,
            width, topCamera, false, false, false, blob.centerX(), cY);
-    b._confidence = conf;
-    if (!foundBall) {
-        _best = b;
-    }
-    //edgeSanityCheck((int)blob.centerX(), (int)blob.centerY(), blob.firstPrincipalLength());
+	if (b._confidence == 0) {
+		if (debugBall) {
+			std::cout << "Bad confidence" << std::endl;
+		}
+	} else {
+		b._confidence = conf;
+		if (!foundBall) {
+			_best = b;
+		}
+		//edgeSanityCheck((int)blob.centerX(), (int)blob.centerY(), blob.firstPrincipalLength());
 #ifdef OFFLINE
-    candidates.push_back(b);
+		candidates.push_back(b);
 #endif
+	}
 }
 
 void BallDetector::sanityChecks(int bx, int by, int radius)
@@ -596,9 +617,24 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
                   principalLength < BOTTOMEDGEWHITEMAX) {
             makeBall((*i), cameraHeight, 0.5, foundBall, false);
             foundBall = true;
-        } else if (count == 1 && debugBall) {
-			std::cout << "Found a white blob with one black spot " <<
-				centerY << std::endl;
+        } else if (count == 1) {
+			if (!topCamera) {
+				int prinLength = static_cast<int>((*i).firstPrincipalLength());
+				int prinLength2 = static_cast<int>((*i).secondPrincipalLength());
+				if (prinLength2 > 10 && prinLength < 20) {
+					makeBall((*i), cameraHeight, 0.5, foundBall, false);
+					foundBall = true;
+				} else if (centerY - prinLength < 0 || centerY + prinLength > height) {
+					if (prinLength2 > 7) {
+						makeBall((*i), cameraHeight, 0.5, foundBall, false);
+						foundBall = true;
+					}
+				}
+			}
+			if (debugBall) {
+				std::cout << "Found a white blob with one black spot " <<
+					centerY << std::endl;
+			}
 		}
 #ifdef OFFLINE
 #else
@@ -751,9 +787,11 @@ void Ball::compute()
 
 
     // Hack/Sanity check to ensure we don't see crazy balls
-    if (dist > 600) {
+    if (dist > 300) {
         _confidence = 0;
-    }
+    } else {
+		_confidence = 0.1;
+	}
 }
 
 std::string Ball::properties()
