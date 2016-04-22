@@ -511,7 +511,8 @@ def saveLeft(player):
 
     if player.counter > 80:
         if SAVING and DIVING:
-            player.executeMove(SweetMoves.GOALIE_ROLL_OUT_LEFT)
+            print("EXECUTING ROLL OUT NOW")
+            # player.executeMove(SweetMoves.GOALIE_ROLL_OUT_LEFT)
             return player.goLater('rollOut')
             #TESTINGCHANGE
         else:
@@ -521,7 +522,7 @@ def saveLeft(player):
 
 @superState('gameControllerResponder')
 def rollOut(player):
-    if player.brain.nav.isStopped():
+    if player.brain.nav.isStopped() and player.counter > 180:
         player.brain.fallController.enabled = True
         player.justDived = True
         return player.goLater('fallen')
