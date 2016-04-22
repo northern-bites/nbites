@@ -57,7 +57,7 @@ def walkToWayPoint(player):
         player.decider = KickDecider.KickDecider(player.brain)
         player.brain.tracker.trackBall()
     
-    player.kick = player.decider.decidingStrategy()
+    player.kick = player.decider.usOpenStrategy2016()
     relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
 
     ball = player.brain.ball
