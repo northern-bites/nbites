@@ -278,17 +278,6 @@ bool BallDetector::nearSanityChecks(Blob blob)
     }
 	// field cross check
 	int count = 0;
-	for (int i = centerX - boxWidth / 4; i < centerX + boxWidth / 4; i++) {
-		for (int j = centerY - boxHeight / 4; j < centerY - boxHeight / 4; j++) {
-			getColor(i, j);
-			if (isBlack()) {
-				count++;
-			}
-		}
-	}
-	if (count < 5) {
-		return false;
-	}
     return true;
 
 }
