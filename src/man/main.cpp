@@ -36,13 +36,15 @@ void error_signal_handler(int signal) {
     char buffer[1000];
 
     char * sigstr = strsignal(signal);
-    snprintf(buffer, 1000, "error_signal_handler() SIGNALLED: %s\n", sigstr);
+    snprintf(buffer, 1000, "error_signal_handler()       SIGNALLED: %s\n", sigstr);
     fprintf(stdout, "%s", buffer);
     fprintf(stderr, "%s", buffer);
     fflush(stdout);
     fflush(stderr);
 
     printf("error_signal_handler() done.\n");
+
+    exit(-1);
 }
 
 // Deal with lock file. To ensure that we only have ONE instance of man
@@ -68,14 +70,7 @@ int main() {
 
     establishLock();
 
-    signal(SIGFPE, error_signal_handler);
-    signal(SIGILL, error_signal_handler);
     signal(SIGSEGV, error_signal_handler);
-    signal(SIGBUS, error_signal_handler);
-    signal(SIGABRT, error_signal_handler);
-    signal(SIGIOT, error_signal_handler);
-    signal(SIGTRAP, error_signal_handler);
-    signal(SIGSYS, error_signal_handler);
     
     printf("\t\tCOMPILED WITH BOSS VERSION == %d\n", BOSS_VERSION);
     

@@ -70,6 +70,9 @@ NOW = 0.0
 
 ##### Ball  #####
 BALL_ON_LEDS = ((BALL_LED, RED, NOW),)
+BALL_FAR_LEDS = ((BALL_LED, WHITE, NOW),)
+BALL_MIDDLE_LEDS = ((BALL_LED, YELLOW, NOW),)
+BALL_CLOSE_LEDS = ((BALL_LED, PINK, NOW),)
 BALL_OFF_LEDS = ((BALL_LED, OFF, NOW),)
 
 ##### GoalBox #####
@@ -177,14 +180,48 @@ class Leds():
         self.flippingCount = 0
         self.oldFlipTime = 0
         self.flashingCount = 150
+        self.current_ball_leds = BALL_OFF_LEDS
+
 
     def processLeds(self):
 
+        # Ball LEDs:
+        # We use a flag to keep track of which ball LED set is currently on so
+        # we don't set the same ball LED consecutively
         if BALL_LEDS:
-            if self.brain.ball.vis.frames_on == 1:
-                self.executeLeds(BALL_ON_LEDS)
+
+            # If it's the first consecutive frame we're seeing the ball
+            if self.brain.ball.vis.frames_on == 1: 
+
+                # We used to use BALL_ON_LEDS to make the eye red when we see the ball
+                # self.executeLeds(BALL_ON_LEDS)
+
+                # If the ball is in the bottom camera - CLOSE LEDS
+                if not self.brain.ball.vis.in_top_cam and self.current_ball_leds != BALL_CLOSE_LEDS:
+                    self.executeLeds(BALL_CLOSE_LEDS)
+                    self.current_ball_leds = BALL_CLOSE_LEDS
+                
+                # If the ball is in the top camera and far away - FAR_LEDS
+                elif self.brain.ball.vis.in_top_cam and self.brain.ball.vis.distance > 100 and self.current_ball_leds != BALL_FAR_LEDS:
+                    self.executeLeds(BALL_FAR_LEDS)
+                    self.current_ball_leds = BALL_FAR_LEDS
+                
+                # If the ball is in the top camera and close - MIDDLE LEDS
+                elif self.brain.ball.vis.in_top_cam and self.brain.ball.vis.distance <= 100 and self.current_ball_leds != BALL_MIDDLE_LEDS:
+
+                    self.executeLeds(BALL_MIDDLE_LEDS)
+                    self.current_ball_leds = BALL_MIDDLE_LEDS
+
+                # Otherwise, we know we can see the ball but we don't know
+                # where it is. Normal BALL_ON LEDs.m
+                else:
+                    self.executeLeds(BALL_ON_LEDS)
+                    self.current_ball_leds = BALL_ON_LEDS
+            
+            # If we can't see the ball at all turn everything off
             elif self.brain.ball.vis.frames_off == 1:
                 self.executeLeds(BALL_OFF_LEDS)
+                self.current_ball_leds = BALL_OFF_LEDS
 
         if GOALBOX_LEDS:
             gbOn = False
