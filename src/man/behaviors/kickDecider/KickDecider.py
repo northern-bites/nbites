@@ -594,12 +594,15 @@ class KickDecider(object):
     def usOpen2016StraightKickStrategy(self): #USOPEN2016 . TODO: REMOVE
         closeGoalShot = self.motionKickOnGoal()
         if closeGoalShot:
+            # print("ONEusOpen2016StraightKickStrategy")
             return closeGoalShot
 
         straight = self.usOpen2016motionKickStraight()
         if straight:
+            # print("TWOusOpen2016StraightKickStrategy")
             return straight
 
+        # print("THREEusOpen2016StraightKickStrategy")
         return self.frontKickCrosses()
 
 

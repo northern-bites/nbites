@@ -58,6 +58,7 @@ def walkToWayPoint(player):
         player.brain.tracker.trackBall()
     
     player.kick = player.decider.usOpen2016StraightKickStrategy() #USOPEN 2016
+    print(player.kick)
     relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
 
     ball = player.brain.ball
@@ -135,12 +136,13 @@ def prepareForKick(player):
 
     if not player.inKickOffPlay:
         if player.shouldKickOff or player.brain.gameController.timeSincePlaying < 10:
-            print "Overriding kick decider for kickoff!"
+            # print "Overriding kick decider for kickoff!"
             player.shouldKickOff = False
             player.kick = player.decider.kicksBeforeBallIsFree()
         else:
             player.shouldKickOff = False
-            player.kick = player.decider.decidingStrategy()
+            # print("PREPAREFOREKICK THIS CASE")
+            player.kick = player.decider.usOpen2016StraightKickStrategy()
         player.inKickingState = True
 
     elif player.finishedPlay:
