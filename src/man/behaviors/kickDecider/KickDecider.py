@@ -74,12 +74,12 @@ class KickDecider(object):
 
         return kickReturned
 
-    def frontKicksOrbit(self):
-        self.brain.player.motionKick = False
+    def motionFrontKicksOrbit(self):
+        self.brain.player.motionKick = True
 
         self.kicks = []
-        self.kicks.append(kicks.LEFT_KICK)
-        self.kicks.append(kicks.RIGHT_KICK)
+        self.kicks.append(kicks.M_LEFT_STRAIGHT)
+        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
 
         self.scoreKick = self.minimizeOrbitTime
 
@@ -531,6 +531,9 @@ class KickDecider(object):
     ###########################
     ### HIGH LEVEL PLANNERS ###
     ###########################
+    def fastKicking(self):
+        return self.motionFrontKicksOrbit()
+
     def decidingStrategy(self):
         goalShot = self.allKicksOnGoal()
         if goalShot:
@@ -541,10 +544,6 @@ class KickDecider(object):
         if nearGoal:
             print "nearOurGoal returned"
             return nearGoal
-
-        # frontKicks = self.frontKicksOrbitIfSmall()
-        # if frontKicks: 
-        #     return frontKicks
 
         asap = self.motionKicksAsap()
         if asap:
