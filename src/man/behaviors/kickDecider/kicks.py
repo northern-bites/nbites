@@ -99,9 +99,9 @@ RIGHT_SIDE_KICK = Kick("Right_Side_Kick",
                       dist = 300,
                       move=SweetMoves.RIGHT_SIDE_KICK)
 
-LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 14.5, y = 4.0,
+LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 10.0, y = 4.0,
                            move=SweetMoves.LEFT_STRAIGHT_KICK)
-RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 14.5, y = -4.0,
+RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 10.5, y = -4.0,
                            move=SweetMoves.RIGHT_STRAIGHT_KICK)
 
 LEFT_SHORT_BACK_KICK =  Kick("L_Short_Back", x = 16.8, y =  4,
