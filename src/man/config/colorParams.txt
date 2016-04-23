@@ -1,16 +1,16 @@
 ( Params
   ( ( Top
       ( ( White
-          ( (dark_u -0.05)
-            (dark_v -0.16)
-            (light_u 0.21)
+          ( (dark_u -0.06)
+            (dark_v -0.155)
+            (light_u 0.205)
             (light_v -0.2)
             (fuzzy_u -0.05)
             (fuzzy_v 0.05)
           )
         )
         ( Green
-          ( (dark_u 0.25666666666666665)
+          ( (dark_u 0.25333333333333335)
             (dark_v -0.006666666666666667)
             (light_u 0.0033333333333333335)
             (light_v 0.09)
