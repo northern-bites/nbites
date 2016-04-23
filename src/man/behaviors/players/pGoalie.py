@@ -51,6 +51,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.inPosition = CENTER_POSITION
         self.inGoalbox = True
 
+        #HACK FOR PENALTY GOALIE IN WATSON2016
+        self.lastPenDiveSide = RIGHT
+
+
         ### ALL TRANSITIONS ARE DEFINED HERE ############
         ### Their conditions are in GoalieTransitions ###
         VisualGoalieStates.walkToGoal.transitions = {

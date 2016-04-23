@@ -556,7 +556,16 @@ def penaltyShotsGamePlaying(player):
         player.isSaving = False
         player.lastStiffStatus = True
 
-    return player.goLater('waitForPenaltySave')
+    if player.counter > 30:
+        if player.lastPenDiveSide == constants.RIGHT:
+            doDive.side = constants.LEFT
+        else:
+            doDive.side = constants.RIGHT
+        player.lastPenDiveSide = doDive.side
+        return player.goLater('doDive')
+
+    return player.stay()
+    # return player.goLater('waitForPenaltySave')
 
 @superState('gameControllerResponder')
 def waitForPenaltySave(player):
