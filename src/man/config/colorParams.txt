@@ -1,17 +1,17 @@
 ( Params
   ( ( Top
       ( ( White
-          ( (dark_u -0.045)
-            (dark_v -0.23)
-            (light_u 0.155)
-            (light_v -0.205)
-            (fuzzy_u -0.04)
-            (fuzzy_v 0.01)
+          ( (dark_u -0.05)
+            (dark_v -0.16)
+            (light_u 0.21)
+            (light_v -0.2)
+            (fuzzy_u -0.05)
+            (fuzzy_v 0.05)
           )
         )
         ( Green
-          ( (dark_u 0.2633333333333333)
-            (dark_v -0.01)
+          ( (dark_u 0.25666666666666665)
+            (dark_v -0.006666666666666667)
             (light_u 0.0033333333333333335)
             (light_v 0.09)
             (fuzzy_u -0.04666666666666667)
@@ -21,7 +21,7 @@
         ( Orange
           ( (dark_u 0.1)
             (dark_v 0.135)
-            (light_u 0.005)
+            (light_u -0.025)
             (light_v -0.05)
             (fuzzy_u 0.035)
             (fuzzy_v 0.05)
