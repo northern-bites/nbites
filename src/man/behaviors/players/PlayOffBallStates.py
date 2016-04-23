@@ -15,7 +15,9 @@ import random
 # IMPORTANT China 2015 bug found
 # TODO fix oscillation between positionAtHome and positionAsSupporter
 
-@defaultState('positionAtHome')
+
+
+@defaultState('branchOnRole')
 @superState('gameControllerResponder')
 @ifSwitchNow(transitions.shouldFindSharedBall, 'searchFieldForSharedBall')
 @ifSwitchNow(transitions.shouldBeSupporter, 'positionAsSupporter')
@@ -25,6 +27,20 @@ def playOffBall(player):
     Superstate for all off ball play.
     """
     player.inKickingState = False
+
+#USOPEN2016: Back to Search Field by Quad
+@superState('playOffBall')
+def branchOnRole(player):
+    """
+    Chasers are going to have a different behavior again.
+    We will branch on behavior based on role here
+    """
+    if role.isChaser(player.role):
+        if transitions.shouldFindSharedBall(player):
+            return player.goNow('searchFieldForSharedBall')
+        return player.goNow('searchFieldByQuad')
+    return player.goNow('positionAtHome')
+
 
 @superState('playOffBall')
 @stay
@@ -140,9 +156,9 @@ def positionAsSupporter(player):
 
 @superState('playOffBall')
 @stay
-@ifSwitchNow(transitions.noBallFoundAtSharedBall, 'positionAtHome')
+@ifSwitchNow(transitions.noBallFoundAtSharedBall, 'searchFieldByQuad') #was: positionAtHome USOPEN2016
 @ifSwitchNow(transitions.shouldFindFlippedSharedBall, 'searchFieldForFlippedSharedBall')
-@ifSwitchNow(transitions.shouldStopLookingForSharedBall, 'positionAtHome')
+@ifSwitchNow(transitions.shouldStopLookingForSharedBall, 'searchFieldByQuad') #was: positionAtHome USOPEN2016
 def searchFieldForSharedBall(player):
     """
     Searches the field for the shared ball.
@@ -172,7 +188,7 @@ def searchFieldForSharedBall(player):
 
 @superState('playOffBall')
 @stay
-@ifSwitchNow(transitions.shouldStopLookingForFlippedSharedBall, 'positionAtHome')
+@ifSwitchNow(transitions.shouldStopLookingForFlippedSharedBall, 'searchFieldByQuad') #was: positionAtHome USOPEN2016
 def searchFieldForFlippedSharedBall(player):
     """
     Flips the shared ball and searches for it.
