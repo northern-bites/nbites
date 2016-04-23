@@ -168,6 +168,22 @@ class KickDecider(object):
         except:
             return None
 
+    def usOpen2016motionKickStraight(self):
+        self.brain.player.motionKick = True
+
+        self.kicks = []
+        self.kicks.append(kicks.M_LEFT_STRAIGHT)
+        self.kicks.append(kicks.M_RIGHT_STRAIGHT)
+
+        self.scoreKick = self.minimizeOrbitTime
+
+        self.filters = []
+
+        self.clearPossibleKicks()
+        self.addShotsOnGoal()
+
+        return (kick for kick in self.possibleKicks).next().next()
+
     def motionKicksOrbit(self):
         self.brain.player.motionKick = True
     
@@ -574,6 +590,18 @@ class KickDecider(object):
             return asap
         
         return self.frontKickCrosses()
+
+    def usOpen2016StraightKickStrategy(self): #USOPEN2016 . TODO: REMOVE
+        closeGoalShot = self.motionKickOnGoal()
+        if closeGoalShot:
+            return closeGoalShot
+
+        straight = self.usOpen2016motionKickStraight()
+        if straight:
+            return straight
+
+        return self.frontKickCrosses()
+
 
     def usOpenStrategy2016(self): # TODO REMOVE UNDO POOP
         closeGoalShot = self.motionKickOnGoal()
