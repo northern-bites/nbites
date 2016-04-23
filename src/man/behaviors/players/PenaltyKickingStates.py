@@ -79,7 +79,7 @@ def penaltyKickSpin(player):
     #    penaltyKickSpin.numberOfLineValues = False
 
     if player.penaltyKickRight:
-        if player.brain.loc.h < -20: #<= (pi/2 - visionLines[0].inner.t):
+        if player.brain.loc.h < -10: #<= (pi/2 - visionLines[0].inner.t):
             penaltyKickSpin.threshCount += 1
             if penaltyKickSpin.threshCount == 4:
                 player.brain.nav.stand()
@@ -90,7 +90,7 @@ def penaltyKickSpin(player):
         else:
             penaltyKickSpin.threshCount = 0
     else:
-        if player.brain.loc.h > 20: #>= (pi/2 - visionLines[0].inner.t):
+        if player.brain.loc.h > 10: #>= (pi/2 - visionLines[0].inner.t):
             penaltyKickSpin.threshCount += 1
             if penaltyKickSpin.threshCount == 4:
                 player.brain.nav.stand()
@@ -122,8 +122,15 @@ def positionForPenaltyKick(player):
         #print "Updating our destination to be in the kickpose"
         player.brain.nav.updateDest(positionForPenaltyKick.kickPose)
 
-    if transitions.ballInPosition(player, positionForPenaltyKick.kickPose):
+    if transitions.ballInPosition(player, positionForPenaltyKick.kickPose) or player.counter > 100:
         player.brain.nav.stand()
-        return player.goNow('executeKick')
+        player.executeMove(player.kick.sweetMove)
+        return player.goLater('afterPenaltyKick')
 
+    return player.stay()
+
+@superState('gameControllerResponder')
+def afterPenaltyKick(player):
+    if player.brain.nav.isStopped():
+        player.brain.nav.stand()
     return player.stay()
