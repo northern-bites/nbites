@@ -123,8 +123,8 @@ M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 16.5, y = -3., dist = 130)
 M_LEFT_CHIP_SHOT =  Kick("M_Left_Chip_Shot", x = 17.0, y = -.3, h = 60, dist = 130)
 M_RIGHT_CHIP_SHOT =  Kick("M_Right_Chip_Shot", x = 17.0, y = .3, h = -60, dist = 130)
 
-M_LEFT_SIDE = Kick("M_Left_Side", x = 18.0, y = -4.76, h = 80, dist = 110)
-M_RIGHT_SIDE = Kick("M_Right_Side", x = 18.0, y = 4.76, h = -80, dist = 110)
+M_LEFT_SIDE = Kick("M_Left_Side", x = 16.7, y = -4.16, h = 80, dist = 110)
+M_RIGHT_SIDE = Kick("M_Right_Side", x = 16.7, y = 4.16, h = -80, dist = 110)
 
 # TODO automate/generalize
 def chooseAlignedKickFromKick(player, kick):
