@@ -80,6 +80,9 @@ def gameSet(player):
         player.brain.nav.stand()
         player.brain.tracker.performWidePan()
 
+        if player.wasPenalized:
+            player.wasPenalized = False
+
     elif player.brain.tracker.isStopped():
         player.brain.tracker.trackBall()
 
@@ -105,13 +108,14 @@ def gamePlaying(player):
     # TODO without pb, is this an issue?
     # if (player.lastDiffState == 'afterPenalty' and
     #     player.brain.play.isChaser()):
-    #     # special behavior case
-    #     return player.goNow('postPenaltyChaser')
+    #     # special behavior return
+    #     case player.goNow('postPenaltyChaser')
     # Wait until the sensors are calibrated before moving.
 
     if player.wasPenalized:
         player.wasPenalized = False
-        return player.goNow('afterPenalty')
+        if player.lastDiffState != 'gameSet': 
+            return player.goNow('afterPenalty')
 
     if not player.brain.motion.calibrated:
         return player.stay()
