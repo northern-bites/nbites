@@ -127,7 +127,7 @@ int BallDetector::filterWhiteBlobs(Blob currentBlob,
 
     // see if the blob is of the right general shape for a ball
     if (prinLength < maxB && prinLength2 >= minSecond &&
-		prinLength < prinLength2 * 3 &&
+		prinLength < prinLength2 * 2 &&
         ratio && currentBlob.area() > MIN_AREA &&
         (centerY > field->horizonAt(centerX) || !topCamera)) {
         blobs.push_back(std::make_pair(centerX, centerY));
@@ -149,9 +149,9 @@ int BallDetector::filterWhiteBlobs(Blob currentBlob,
 				count++;
 			}
         }
-        if (count == 1 && topCamera && nearSanityChecks(currentBlob)) {
+        if (count < 2 && topCamera && nearSanityChecks(currentBlob)) {
 			if (debugBall) {
-				std::cout << "Cheating on bottom ball" << std::endl;
+				std::cout << "Cheating on top ball" << std::endl;
 			}
             return 2;
         }
@@ -270,8 +270,8 @@ bool BallDetector::nearSanityChecks(Blob blob)
         std::cout << "Near Box " << boxWidth << " " << boxHeight << std::endl;
         std::cout << "Ending at " << centerX << " " << centerY << std::endl;
     }
-    int MINBOXWIDTH = 15;
-	int MINBOXHEIGHT = 15;
+    int MINBOXWIDTH = 12;
+	int MINBOXHEIGHT = 12;
     int MAXBOX = 50;
 	bool atEdge = false;
 	if (centerX < prinLength || centerX > width - prinLength) {
@@ -286,7 +286,10 @@ bool BallDetector::nearSanityChecks(Blob blob)
 		|| boxHeight > 3 * boxWidth) {
         return false;
     }
-	if (boxWidth > 4 * prinLength || boxHeight > 4 * prinLength) {
+	if (abs(boxWidth - boxHeight) > 15) {
+		return false;
+	}
+	if (boxWidth > 5 * prinLength || boxHeight > 5 * prinLength) {
 		return false;
 	}
 	// field cross check
@@ -321,11 +324,12 @@ bool BallDetector::lookForFarAwayBalls(Blob blob)
         (centerY > field->horizonAt(centerX) || !topCamera)) {
 		return false;
         //return farSanityChecks(blob);
-    }/* else if (topCamera && centerY >= height / 3 &&
+    } else if (topCamera && centerY >= height / 3 &&
                centerY > field->horizonAt(centerX) &&
                prinLength > 3 && prinLength2 > 3) {
-        return nearSanityChecks(blob);
-		}*/
+		return false;
+        //return nearSanityChecks(blob);
+	}
     return false;
 }
 
@@ -654,7 +658,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 	}
 
     for (auto i =blobber2.blobs.begin(); i!=blobber2.blobs.end(); i++) {
-        if (lookForFarAwayBalls((*i))) {
+        if ((*i).firstPrincipalLength() < 20 && lookForFarAwayBalls((*i))) {
             makeBall((*i), cameraHeight, 0.5, foundBall, false);
 #ifdef OFFLINE
             std::cout << "Found faraway ball" << std::endl;
