@@ -596,10 +596,6 @@ class KickDecider(object):
         if closeGoalShot:
             return closeGoalShot
 
-        goalShot = self.forwardKickOnGoal()
-        if goalShot:
-            return goalShot
-
         straight = self.usOpen2016motionKickStraight()
         if straight:
             return straight
