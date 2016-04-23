@@ -236,7 +236,20 @@ bool BallDetector::farSanityChecks(Blob blob)
     if (boxWidth > 2 * boxHeight || boxHeight > 2 * boxWidth) {
         return false;
     }
-    return true;
+	if (boxWidth > 25 || boxHeight > 25) {
+		return false;
+	}
+	int count = 0;
+	for (int i = leftX; i < rightX; i++) {
+		getColor(i, bottomY + 3);
+		if (isGreen()) {
+			count++;
+		}
+		if (count == 3) {
+			return true;
+		}
+	}
+    return false;
 }
 
 /* We have a white blob that is relatively near us. For whatever
@@ -322,8 +335,8 @@ bool BallDetector::lookForFarAwayBalls(Blob blob)
         prinLength2 > prinLength / 2 && blob.area() > MIN_AREA &&
         prinLength2 >= 1 &&
         (centerY > field->horizonAt(centerX) || !topCamera)) {
-		return false;
-        //return farSanityChecks(blob);
+		//return false;
+        return farSanityChecks(blob);
     } else if (topCamera && centerY >= height / 3 &&
                centerY > field->horizonAt(centerX) &&
                prinLength > 3 && prinLength2 > 3) {
