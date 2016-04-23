@@ -51,7 +51,7 @@ public class DebugImageView extends ViewParent
     static final int YIMAGE = 0;
     static final int WHITE_IMAGE = 1;
     static final int GREEN_IMAGE = 2;
-    static final int ORANGE_IMAGE = 3;
+    static final int BLACK_IMAGE = 3;
     static final int SEGMENTED = 4;
     static final int EDGE_IMAGE = 5;
     static final int LINE_IMAGE = 6;
@@ -71,7 +71,7 @@ public class DebugImageView extends ViewParent
     static final int FIELDH = 554;
 
     // Images that we can view in this view using the combo box
-    String[] imageViews = { "Original", "Green", "Orange", "White", "Edge", "Thresh", "Learn" };
+    String[] imageViews = { "Original", "Green", "Black", "White", "Edge", "Thresh", "Learn" };
     JComboBox viewList;
 
     JSlider greenThreshold;
@@ -309,12 +309,12 @@ public class DebugImageView extends ViewParent
 	if (width != DEFAULT_WIDTH) {
 	    multiplier = 4;
 	}
-	// if we don't have an orange image we're in trouble
-        if (displayImages[ORANGE_IMAGE] == null) {
-	    System.out.println("No orange image");
+	// if we don't have an black image we're in trouble
+        if (displayImages[BLACK_IMAGE] == null) {
+	    System.out.println("No black image");
 	    return;
 	}
-        //Graphics2D graph = orange.createGraphics();
+        //Graphics2D graph = black.createGraphics();
 	Graphics2D graph = (Graphics2D)g;
         graph.setColor(Color.RED);
         String b = "blob";
@@ -419,8 +419,8 @@ public class DebugImageView extends ViewParent
 	    currentBottom = GREEN_IMAGE;
 	} else if (viewName == "White") {
 	    currentBottom = WHITE_IMAGE;
-	} else if (viewName == "Orange") {
-	    currentBottom = ORANGE_IMAGE;
+	} else if (viewName == "Black") {
+	    currentBottom = BLACK_IMAGE;
 	} else if (viewName == "Edge") {
 	    currentBottom = EDGE_IMAGE;
 	} else if (viewName == "Original") {
@@ -452,20 +452,20 @@ public class DebugImageView extends ViewParent
 
     class DistanceGetter implements MouseListener {
 
-	public void mouseClicked(MouseEvent e) {
-	    repaint();
-	}
+		public void mouseClicked(MouseEvent e) {
+			repaint();
+		}
 
-	public void mousePressed(MouseEvent e) {
-	}
+		public void mousePressed(MouseEvent e) {
+		}
 
-	public void mouseReleased(MouseEvent e) {
-	    repaint();
-	}
+		public void mouseReleased(MouseEvent e) {
+			repaint();
+		}
 
-	public void mouseEntered(MouseEvent e) {}
+		public void mouseEntered(MouseEvent e) {}
 
-	public void mouseExited(MouseEvent e) {}
+		public void mouseExited(MouseEvent e) {}
     }
 
     @Override
@@ -473,26 +473,39 @@ public class DebugImageView extends ViewParent
 
     @Override
     public void mouseMoved(MouseEvent e) {
-	if (currentLog == null) {
-	    return;
-	}
+		if (currentLog == null) {
+			return;
+		}
 
-	int col = e.getX();
-	int row = e.getY();
+		int col = e.getX();
+		int row = e.getY();
 
-	if (col < 0 || row < 0 || col >= displayw || row >= displayh) {
-	    return;
-	}
+		if (col < 0 || row < 0 || col >= displayw || row >= displayh) {
+			return;
+		}
 
-	boolean first = (col & 1) == 0;
-	int cbase = (col & ~1);
-	int i = (row * displayw * 2) + (cbase * 2);
+		if (width != DEFAULT_WIDTH) {
+			col = col/2;
+			row = row/2;
+			boolean first = (col & 1) == 0;
+			int cbase = (col & ~1);
+			int i = (row * 320) + (cbase * 2);
 
-	int y = currentLog.data()[first ? i : i + 2] & 0xff;
-	int u = currentLog.data()[i + 1] & 0xff;
-	int v = currentLog.data()[i + 3] & 0xff;
-	label = String.format("(%d,%d): y=%d u=%d v=%d", col, row, y, u, v);
-	repaint();
+			int y = currentLog.data()[first ? i : i + 2] & 0xff;
+			int u = currentLog.data()[i + 1] & 0xff;
+			int v = currentLog.data()[i + 3] & 0xff;
+			label = String.format("(%d,%d): y=%d u=%d v=%d", col/2, row/2, y, u, v);
+		} else {
+			boolean first = (col & 1) == 0;
+			int cbase = (col & ~1);
+			int i = (row * displayw * 2) + (cbase * 2);
+
+			int y = currentLog.data()[first ? i : i + 2] & 0xff;
+			int u = currentLog.data()[i + 1] & 0xff;
+			int v = currentLog.data()[i + 3] & 0xff;
+			label = String.format("(%d,%d): y=%d u=%d v=%d", col/2, row/2, y, u, v);
+		}
+		repaint();
     }
 
 
@@ -646,9 +659,9 @@ public class DebugImageView extends ViewParent
             displayImages[WHITE_IMAGE] = white8.toBufferedImage();
         }
 
-	if (out.length > ORANGE_IMAGE) {
-            Y8image orange8 = new Y8image(width, height, out[ORANGE_IMAGE].bytes);
-            displayImages[ORANGE_IMAGE] = orange8.toBufferedImage();
+	if (out.length > BLACK_IMAGE) {
+            Y8image black8 = new Y8image(width, height, out[BLACK_IMAGE].bytes);
+            displayImages[BLACK_IMAGE] = black8.toBufferedImage();
         }
 
 	if (out.length > EDGE_IMAGE) {
@@ -693,10 +706,10 @@ public class DebugImageView extends ViewParent
             e.printStackTrace();
         }
 
-	SExpr otree = out[ORANGE_IMAGE].tree();
+	SExpr otree = out[BLACK_IMAGE].tree();
         Y8image o = new Y8image(otree.find("width").get(1).valueAsInt(),
                                 otree.find("height").get(1).valueAsInt(),
-                                out[ORANGE_IMAGE].bytes);
+                                out[BLACK_IMAGE].bytes);
         balls = out[BALL_IMAGE];
 
 
