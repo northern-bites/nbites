@@ -40,7 +40,7 @@ def prepareForPenaltyKick(player):
             location = RelRobotLocation(ball.rel_x - 20, ball.rel_y - 10, 0)
         player.brain.nav.updateDestinationWalkDest(location)
 
-    if (location.relX**2 + location.relY**2)**.5 < 15:
+    if (location.relX**2 + location.relY**2)**.5 < 13:
         print "X: ", player.brain.ball.rel_x
         print "Y: ", player.brain.ball.rel_y
         player.brain.nav.stand()
@@ -95,7 +95,7 @@ def penaltyKickSpin(player):
             if penaltyKickSpin.threshCount == 4:
                 player.brain.nav.stand()
                 print "Stopped because facing left" 
-                player.kick = kicks.LEFT_STRAIGHT_KICK
+                player.kick = kicks.RIGHT_STRAIGHT_KICK
                 player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
                 return player.goNow('positionForPenaltyKick')
         else:
