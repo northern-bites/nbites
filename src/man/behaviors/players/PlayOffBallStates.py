@@ -35,7 +35,7 @@ def branchOnRole(player):
     Chasers are going to have a different behavior again.
     We will branch on behavior based on role here
     """
-    print("TIME SINCE PLAYING:", player.brain.gameController.timeSincePlaying)
+    # print("TIME SINCE PLAYING:", player.brain.gameController.timeSincePlaying)
     if role.isChaser(player.role):
         if transitions.shouldFindSharedBall(player) and player.brain.gameController.timeSincePlaying > 75:
             return player.goNow('searchFieldForSharedBall')
