@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -381,8 +382,10 @@ public class LogDisplayPanel extends JPanel implements
 	    // End of variables declaration
 	}
 
-	private JScrollPane wrap(ViewParent vp) {
-		JScrollPane jsp = new JScrollPane(vp);
-		return jsp;
+	private JComponent wrap(ViewParent vp) {
+//		JScrollPane jsp = new JScrollPane(vp);
+//		return jsp;
+		
+		return vp;
 	}
 }

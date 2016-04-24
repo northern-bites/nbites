@@ -16,6 +16,7 @@ import nbtool.gui.logviews.misc.BotStatsView;
 import nbtool.gui.logviews.misc.DefaultView;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.logviews.proto.ProtoBufView;
+import nbtool.gui.logviews.sound.whistle.FrequencyStream;
 import nbtool.gui.logviews.proto.ProtoBallView;
 import nbtool.gui.logviews.sound2.CorrelationView;
 import nbtool.gui.logviews.sound2.DisplayView;
@@ -88,7 +89,7 @@ public class ToolSettings {
 		
 		map.put("sound", new Class[]{SndFreqView.class, SndAmpView.class,
 				CorrelationView.class, DisplayView.class});
-		map.put("frequency", new Class[]{FFTWView.class});
+		map.put("frequency", new Class[]{FFTWView.class, FrequencyStream.class});
 		
 		map.put(DEFAULT_S, new Class[]{DefaultView.class});
 		map.put(PROTOBUF_S, new Class[]{ProtoBufView.class});
