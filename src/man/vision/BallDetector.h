@@ -122,6 +122,7 @@ namespace man {
 #ifdef OFFLINE
 			const std::vector<Ball>& getBalls() const { return candidates; }
 			Connectivity* getBlobber() { return &blobber; }
+            Connectivity* getBlobber2() { return &blobber2; }
 			void setDebugBall(bool debug) {debugBall = debug;}
 #endif
 		private:

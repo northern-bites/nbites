@@ -49,9 +49,9 @@ void BallDetector::filterBlackBlobs(Blob currentBlob,
 
     int centerX = static_cast<int>(currentBlob.centerX());
     int centerY = static_cast<int>(currentBlob.centerY());
-	if (topCamera) {
+	/*if (topCamera) {
 		centerY = centerY + height / 2;
-	}
+        }*/
     int prinLength = static_cast<int>(currentBlob.firstPrincipalLength());
     int prinLength2 = static_cast<int>(currentBlob.secondPrincipalLength());
     int minSecond = 1;
@@ -500,10 +500,10 @@ void BallDetector::makeBall(Blob blob, double cameraHeight, double conf,
     double bIY = (height / 2 - blob.centerY()) -
         blob.firstPrincipalLength();
 	double cY = blob.centerY();
-	if (topCamera && isBlack) {
+	/*if (topCamera && isBlack) {
 		bIY = bIY + height / 2;
 		cY = cY + height / 2;
-	}
+        }*/
     double x_rel, y_rel;
     bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
     Ball b(blob, x_rel, -1 * y_rel, cameraHeight, height,
@@ -585,17 +585,8 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     int BUFFER = 10;
 
     //makeEdgeList(edges);
-	if (topCamera) {
-
-		ImageLiteU8 bottomBlack(blackImage, 0, blackImage.height()/2,
-								blackImage.width(), blackImage.height() / 2);
-		// First we're going to run the blobber on the black image
-		blobber.run(bottomBlack.pixelAddr(), bottomBlack.width(),
-					bottomBlack.height(), bottomBlack.pitch());
-	} else {
-		blobber.run(blackImage.pixelAddr(), blackImage.width(),
-					 blackImage.height(), blackImage.pitch());
-	}
+    blobber.run(blackImage.pixelAddr(), blackImage.width(),
+                blackImage.height(), blackImage.pitch());
 
     // Then we are going to filter out all of the blobs that obviously
     // aren't part of the ball
@@ -605,17 +596,8 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         filterBlackBlobs((*i), blackBlobs, actualBlackBlobs);
     }
 
-	/*if (topCamera) {
-
-		ImageLiteU8 bottomWhite(whiteImage, 0, whiteImage.height()/2,
-								whiteImage.width(), whiteImage.height() / 2);
-		// First we're going to run the blobber on the white image
-		blobber2.run(bottomWhite.pixelAddr(), bottomWhite.width(),
-					bottomWhite.height(), bottomWhite.pitch());
-					} else { */
-		blobber2.run(whiteImage.pixelAddr(), whiteImage.width(),
-					 whiteImage.height(), whiteImage.pitch());
-		//}
+    blobber2.run(whiteImage.pixelAddr(), whiteImage.width(),
+                 whiteImage.height(), whiteImage.pitch());
     // Now run the blobber on the white image
     std::vector<std::pair<int,int>> whiteBlobs;
     // loop through the white blobs hoping to find a ball sized blob

@@ -319,8 +319,25 @@ public class DebugImageView extends ViewParent
         graph.setColor(Color.RED);
         String b = "blob";
 
-	// loop through all of the balls we find in the tree
-	for (int i=0; ; i++)
+	// loop through all of the black blobs we find in the tree
+	int i = 0;
+	for (i=0; ; i++)
+	    {
+		SExpr tree = balls.tree();
+		SExpr bl = tree.find(b+i);
+		if (!bl.exists()) {
+		    break;
+		}
+		SExpr blob = bl.get(1);
+		if (persistant != null && persistant.drawAllBalls) {
+		    drawBlob(graph, blob, multiplier);
+		}
+	    }
+
+	// loop through all of the white blobs we find in the tree
+	b = "white_blob";
+	graph.setColor(Color.BLUE);
+	for ( ; ; i++)
 	    {
 		SExpr tree = balls.tree();
 		SExpr bl = tree.find(b+i);
@@ -337,7 +354,7 @@ public class DebugImageView extends ViewParent
 
         b = "ball";
 
-        for(int i=0; ;i++)
+        for(i=0; ;i++)
 	    {
 		SExpr tree = balls.tree();
 		SExpr ball = tree.find(b+i);
@@ -473,39 +490,39 @@ public class DebugImageView extends ViewParent
 
     @Override
     public void mouseMoved(MouseEvent e) {
-		if (currentLog == null) {
-			return;
-		}
+	if (currentLog == null) {
+	    return;
+	}
 
-		int col = e.getX();
-		int row = e.getY();
+	int col = e.getX();
+	int row = e.getY();
 
-		if (col < 0 || row < 0 || col >= displayw || row >= displayh) {
-			return;
-		}
+	if (col < 0 || row < 0 || col >= displayw || row >= displayh) {
+	    return;
+	}
 
-		if (width != DEFAULT_WIDTH) {
-			col = col/2;
-			row = row/2;
-			boolean first = (col & 1) == 0;
-			int cbase = (col & ~1);
-			int i = (row * 320) + (cbase * 2);
+	if (width != DEFAULT_WIDTH) {
+	    col = col/2;
+	    row = row/2;
+	    boolean first = (col & 1) == 0;
+	    int cbase = (col & ~1);
+	    int i = (row * 160) + (cbase * 2);
 
-			int y = currentLog.data()[first ? i : i + 2] & 0xff;
-			int u = currentLog.data()[i + 1] & 0xff;
-			int v = currentLog.data()[i + 3] & 0xff;
-			label = String.format("(%d,%d): y=%d u=%d v=%d", col/2, row/2, y, u, v);
-		} else {
-			boolean first = (col & 1) == 0;
-			int cbase = (col & ~1);
-			int i = (row * displayw * 2) + (cbase * 2);
+	    int y = currentLog.data()[first ? i : i + 2] & 0xff;
+	    int u = currentLog.data()[i + 1] & 0xff;
+	    int v = currentLog.data()[i + 3] & 0xff;
+	    label = String.format("(%d,%d): y=%d u=%d v=%d", col/2, row/2, y, u, v);
+	} else {
+	    boolean first = (col & 1) == 0;
+	    int cbase = (col & ~1);
+	    int i = (row * displayw * 2) + (cbase * 2);
 
-			int y = currentLog.data()[first ? i : i + 2] & 0xff;
-			int u = currentLog.data()[i + 1] & 0xff;
-			int v = currentLog.data()[i + 3] & 0xff;
-			label = String.format("(%d,%d): y=%d u=%d v=%d", col/2, row/2, y, u, v);
-		}
-		repaint();
+	    int y = currentLog.data()[first ? i : i + 2] & 0xff;
+	    int u = currentLog.data()[i + 1] & 0xff;
+	    int v = currentLog.data()[i + 3] & 0xff;
+	    label = String.format("(%d,%d): y=%d u=%d v=%d", col/2, row/2, y, u, v);
+	}
+	repaint();
     }
 
 
