@@ -98,6 +98,8 @@ public class DebugImageView extends ViewParent
     BufferedImage displayImages[] = new BufferedImage[ORIGINAL+1]; // our images
     Y8ThreshImage greenCheck;
     Y8image green8;
+    Y8image white8;
+    Y8image black8;
 
     private String label = null;
 
@@ -635,23 +637,22 @@ public class DebugImageView extends ViewParent
 		}
 	    }
 	}
-	for (int col = 0; col < width * 2; col++) {
-	    for (int row = 0; row < height * 2; row++) {
-		boolean first = (col & 1) == 0;
-		int cbase = (col & ~1);
-		int i = (row * width * 2 * 2) + (cbase * 2);
+	for (int col = 0; col < width; col++) {
+	    for (int row = 0; row < height; row++) {
+		int gr = (green8.data[row * width + col]) & 0xFF;
+		int wh = (white8.data[row * width + col]) & 0xFF;
+		int bl = (black8.data[row * width + col]) & 0xFF;
 
-		int y = currentLog.data()[first ? i : i + 2] & 0xff;
-		int u = currentLog.data()[i + 1] & 0xff;
-		int v = currentLog.data()[i + 3] & 0xff;
-		if (y < 130 && y > 100 && Math.max(Math.max(y, u), v) - Math.min(Math.min(y, u), v) < 15) {
+		if (gr < 100 && wh < 100 && bl < 100) {
 		    g.setColor(Color.GRAY);
-		} else if (y < 100 && v > 120) {
-		    g.setColor(Color.BLACK);
-		} else {
+		} else if (gr > wh && gr > bl) {
+		    g.setColor(Color.GREEN);
+		} else if (wh > gr && wh > bl) {
 		    g.setColor(Color.WHITE);
+		} else {
+		    g.setColor(Color.BLACK);
 		}
-		g.fillRect(col, row+displayh+30, 2, 2);
+		g.fillRect(col*2, row*2+displayh+30, 2, 2);
 	    }
 	}
     }
@@ -672,12 +673,12 @@ public class DebugImageView extends ViewParent
         }
 
 	if (out.length > WHITE_IMAGE) {
-            Y8image white8 = new Y8image(width, height, out[WHITE_IMAGE].bytes);
+            white8 = new Y8image(width, height, out[WHITE_IMAGE].bytes);
             displayImages[WHITE_IMAGE] = white8.toBufferedImage();
         }
 
 	if (out.length > BLACK_IMAGE) {
-            Y8image black8 = new Y8image(width, height, out[BLACK_IMAGE].bytes);
+            black8 = new Y8image(width, height, out[BLACK_IMAGE].bytes);
             displayImages[BLACK_IMAGE] = black8.toBufferedImage();
         }
 
