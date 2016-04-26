@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Color;
 
 import nbtool.images.Y8image;
 import nbtool.images.Y16image;
@@ -31,12 +32,16 @@ import java.util.Vector;
 
 public class FrontEndView extends ViewParent implements IOFirstResponder {
 
-    // FrontEnd output images 
+    // FrontEnd output images
     private BufferedImage yImage;
     private BufferedImage whiteImage;
     private BufferedImage greenImage;
-    private BufferedImage orangeImage;
+    private BufferedImage blackImage;
     private BufferedImage segmentedImage;
+
+    private Y8image green8;
+    private Y8image white8;
+    private Y8image black8;
 
     // Save button
     private JButton saveButton;
@@ -57,7 +62,7 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
     private JSlider gFuzzyU;
     private JSlider gFuzzyV;
 
-    // Orange sliders
+    // Black sliders
     private JSlider oDarkU;
     private JSlider oDarkV;
     private JSlider oLightU;
@@ -198,14 +203,15 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
         return false;
     }
 
-    /* Called upon slide of any of the 18 sliders. Make an SExpr from the psitions 
-        of each of the sliders. If this.log doesn't have Params saved, add them. Else,
-        replace them. Call nbfunction with updated log description.
+    /* Called upon slide of any of the 18 sliders. Make an SExpr from the psitions
+       of each of the sliders. If this.log doesn't have Params saved, add them. Else,
+       replace them. Call nbfunction with updated log description.
     */
     public void adjustParams() {
 
-        // This is called when the sliders are initialized, so dont run if it's first load,
-        //  or if any values are zero b/c devide by zero error in frontEnd processing
+        // This is called when the sliders are initialized, so dont run if
+	// it's first load, or if any values are zero
+        //  b/c devide by zero error in frontEnd processing
         if (firstLoad)
             return;
         zeroParam();
@@ -227,7 +233,7 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
                 SExpr.newKeyValue("fuzzy_u", (float)(gFuzzyU.getValue()) / gPrecision),
                 SExpr.newKeyValue("fuzzy_v", (float)(gFuzzyV.getValue()) / gPrecision))),
 
-            SExpr.newKeyValue("Orange", SExpr.newList(
+            SExpr.newKeyValue("Black", SExpr.newList(
                 SExpr.newKeyValue("dark_u",  (float)(oDarkU. getValue()) / oPrecision),
                 SExpr.newKeyValue("dark_v",  (float)(oDarkV. getValue()) / oPrecision),
                 SExpr.newKeyValue("light_u", (float)(oLightU.getValue()) / oPrecision),
@@ -235,7 +241,7 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
                 SExpr.newKeyValue("fuzzy_u", (float)(oFuzzyU.getValue()) / oPrecision),
                 SExpr.newKeyValue("fuzzy_v", (float)(oFuzzyV.getValue()) / oPrecision)))
             );
-        
+
         // Look for existing Params atom in current this.log description
         SExpr oldColor, newColor, oldParams = this.log.tree().find("Params");
 
@@ -243,7 +249,7 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
         if (oldParams.exists()) {
             SExpr saveAtom = oldParams.get(1).find("SaveParams");
             this.log.tree().remove(saveAtom);
-            oldParams.setList( SExpr.atom("Params"), newParams); 
+            oldParams.setList( SExpr.atom("Params"), newParams);
         } else {
             this.log.tree().append(SExpr.pair("Params", newParams));
         }
@@ -254,7 +260,7 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
     public void saveParams() {
         SExpr params = this.log.tree().find("Params");
 
-        // Check to see if sliders have been moved (slider adjust would have saved params)
+        // Check to see if sliders have been moved
         if (!params.exists())
             return;
 
@@ -303,9 +309,9 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
 
     // Draw 5 output images, 18 sliders, 6 texts, and a button
     public void paintComponent(Graphics g) {
-    	
+
     	super.paintComponent(g);
-       
+
         int vB = 5;  // verticle buffer
         int sH = 15; // slider height
         int tB = 20; // text buffer
@@ -320,8 +326,8 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
         if (greenImage != null) {
             g.drawImage(greenImage, width + vB, 0, null);
         }
-        if (orangeImage != null) {
-            g.drawImage(orangeImage, width*2 + vB*2, 0, null);
+        if (blackImage != null) {
+            g.drawImage(blackImage, width*2 + vB*2, 0, null);
         }
         if (yImage != null) {
             g.drawImage(yImage, 0, height + sH*6 + tB*3, null);
@@ -331,43 +337,93 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
             g.drawImage(whiteImage, width + vB,  height + sH*6 + tB*3, null);
             g.drawImage(greenImage, width + vB,  height + sH*6 + tB*3, null);
         }
+	int max = 0;
+	int maxY = 0;
+	int maxU = 0;
+	int maxV = 0;
+	for (int col = 0; col < width; col++) {
+	    for (int row = 0; row < height; row++) {
+		int gr = (green8.data[row * width + col]) & 0xFF;
+		int wh = (white8.data[row * width + col]) & 0xFF;
+		int bl = (black8.data[row * width + col]) & 0xFF;
+		if (gr < 100 && wh < 100 && bl < 100) {
+		    g.setColor(Color.GRAY);
+		} else if (gr > wh && gr > bl) {
+		    g.setColor(Color.GREEN);
+		} else if (wh > gr && wh > bl) {
+		    g.setColor(Color.WHITE);
+		} else {
+		    g.setColor(Color.BLACK);
+		}
+		g.fillRect(col + width + vB, row + height + sH*6 + tB*3, 2, 2);
+	    }
+	}
+	g.setColor(Color.BLACK);
+
 
         // TODO fix slider glitch
         // Draw 18 sliders
-        wDarkU. setBounds(width*0 + vB*0 + lB, height + sH*0 + tB*1, width - lB*2, sH);
-        wDarkV. setBounds(width*0 + vB*0 + lB, height + sH*1 + tB*1, width - lB*2, sH);
-        wLightU.setBounds(width*0 + vB*0 + lB, height + sH*2 + tB*2, width - lB*2, sH);
-        wLightV.setBounds(width*0 + vB*0 + lB, height + sH*3 + tB*2, width - lB*2, sH);
-        wFuzzyU.setBounds(width*0 + vB*0 + lB, height + sH*4 + tB*3, width - lB*2, sH);
-        wFuzzyV.setBounds(width*0 + vB*0 + lB, height + sH*5 + tB*3, width - lB*2, sH);
+        wDarkU. setBounds(width*0 + vB*0 + lB, height + sH*0 + tB*1,
+			  width - lB*2, sH);
+        wDarkV. setBounds(width*0 + vB*0 + lB, height + sH*1 + tB*1,
+			  width - lB*2, sH);
+        wLightU.setBounds(width*0 + vB*0 + lB, height + sH*2 + tB*2,
+			  width - lB*2, sH);
+        wLightV.setBounds(width*0 + vB*0 + lB, height + sH*3 + tB*2,
+			  width - lB*2, sH);
+        wFuzzyU.setBounds(width*0 + vB*0 + lB, height + sH*4 + tB*3,
+			  width - lB*2, sH);
+        wFuzzyV.setBounds(width*0 + vB*0 + lB, height + sH*5 + tB*3,
+			  width - lB*2, sH);
 
-        gDarkU. setBounds(width*1 + vB*1 + lB, height + sH*0 + tB*1, width - lB*2, sH);
-        gDarkV. setBounds(width*1 + vB*1 + lB, height + sH*1 + tB*1, width - lB*2, sH);
-        gLightU.setBounds(width*1 + vB*1 + lB, height + sH*2 + tB*2, width - lB*2, sH);
-        gLightV.setBounds(width*1 + vB*1 + lB, height + sH*3 + tB*2, width - lB*2, sH);
-        gFuzzyU.setBounds(width*1 + vB*1 + lB, height + sH*4 + tB*3, width - lB*2, sH);
-        gFuzzyV.setBounds(width*1 + vB*1 + lB, height + sH*5 + tB*3, width - lB*2, sH);
+        gDarkU. setBounds(width*1 + vB*1 + lB, height + sH*0 + tB*1,
+			  width - lB*2, sH);
+        gDarkV. setBounds(width*1 + vB*1 + lB, height + sH*1 + tB*1,
+			  width - lB*2, sH);
+        gLightU.setBounds(width*1 + vB*1 + lB, height + sH*2 + tB*2,
+			  width - lB*2, sH);
+        gLightV.setBounds(width*1 + vB*1 + lB, height + sH*3 + tB*2,
+			  width - lB*2, sH);
+        gFuzzyU.setBounds(width*1 + vB*1 + lB, height + sH*4 + tB*3,
+			  width - lB*2, sH);
+        gFuzzyV.setBounds(width*1 + vB*1 + lB, height + sH*5 + tB*3,
+			  width - lB*2, sH);
 
-        oDarkU. setBounds(width*2 + vB*2 + lB, height + sH*0 + tB*1, width - lB*2, sH);
-        oDarkV. setBounds(width*2 + vB*2 + lB, height + sH*1 + tB*1, width - lB*2, sH);
-        oLightU.setBounds(width*2 + vB*2 + lB, height + sH*2 + tB*2, width - lB*2, sH);
-        oLightV.setBounds(width*2 + vB*2 + lB, height + sH*3 + tB*2, width - lB*2, sH);
-        oFuzzyU.setBounds(width*2 + vB*2 + lB, height + sH*4 + tB*3, width - lB*2, sH);
-        oFuzzyV.setBounds(width*2 + vB*2 + lB, height + sH*5 + tB*3, width - lB*2, sH);
+        oDarkU. setBounds(width*2 + vB*2 + lB, height + sH*0 + tB*1,
+			  width - lB*2, sH);
+        oDarkV. setBounds(width*2 + vB*2 + lB, height + sH*1 + tB*1,
+			  width - lB*2, sH);
+        oLightU.setBounds(width*2 + vB*2 + lB, height + sH*2 + tB*2,
+			  width - lB*2, sH);
+        oLightV.setBounds(width*2 + vB*2 + lB, height + sH*3 + tB*2,
+			  width - lB*2, sH);
+        oFuzzyU.setBounds(width*2 + vB*2 + lB, height + sH*4 + tB*3,
+			  width - lB*2, sH);
+        oFuzzyV.setBounds(width*2 + vB*2 + lB, height + sH*5 + tB*3,
+			  width - lB*2, sH);
 
         // Draw help text
-        g.drawString("white U and V thresholds for when Y is 0",    width*0 + tB*0, height + tB*1 + sH*0 - lB);
-        g.drawString("white U and V thresholds for when Y is 255",  width*0 + tB*0, height + tB*2 + sH*2 - lB);
-        g.drawString("width of fuzzy threshold for U and V",        width*0 + tB*0, height + tB*3 + sH*4 - lB);
+        g.drawString("white U and V thresholds for when Y is 0",
+		     width*0 + tB*0, height + tB*1 + sH*0 - lB);
+        g.drawString("white U and V thresholds for when Y is 255",
+		     width*0 + tB*0, height + tB*2 + sH*2 - lB);
+        g.drawString("width of fuzzy threshold for U and V",
+		     width*0 + tB*0, height + tB*3 + sH*4 - lB);
 
-        g.drawString("green U and V thresholds for when Y is 0",    width*1 + vB*1, height + tB*1 + sH*0 - lB);
-        g.drawString("green U and V thresholds for when Y is 255",  width*1 + vB*1, height + tB*2 + sH*2 - lB);
-        g.drawString("width of fuzzy threshold for U and V",        width*1 + vB*1, height + tB*3 + sH*4 - lB);
+        g.drawString("green U and V thresholds for when Y is 0",
+		     width*1 + vB*1, height + tB*1 + sH*0 - lB);
+        g.drawString("green U and V thresholds for when Y is 255",
+		     width*1 + vB*1, height + tB*2 + sH*2 - lB);
+        g.drawString("width of fuzzy threshold for U and V",
+		     width*1 + vB*1, height + tB*3 + sH*4 - lB);
 
-        g.drawString("orange U and V thresholds for when Y is 0",   width*2 + vB*2, height + tB*1 + sH*0 - lB);
-        g.drawString("orange U and V thresholds for when Y is 255", width*2 + vB*2, height + tB*2 + sH*2 - lB);
-        g.drawString("width of fuzzy threshold for U and V",        width*2 + vB*2, height + tB*3 + sH*4 - lB);
-       
+        g.drawString("black U and V thresholds for when Y is 0",
+		     width*2 + vB*2, height + tB*1 + sH*0 - lB);
+        g.drawString("black U and V thresholds for when Y is 255",
+		     width*2 + vB*2, height + tB*2 + sH*2 - lB);
+        g.drawString("width of fuzzy threshold for U and V",
+		     width*2 + vB*2, height + tB*3 + sH*4 - lB);
+
         // Draw button
         saveButton.setBounds(width*2 + vB*2,  height + sH*6 + tB*3, width, tB*3);
     }
@@ -381,22 +437,24 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
         }
 
         if (out.length > 1) {
-            Y8image white8 = new Y8image(width, height, out[1].bytes);
+            white8 = new Y8image(width, height, out[1].bytes);
             this.whiteImage = white8.toBufferedImage();
         }
 
         if (out.length > 2) {
-            Y8image green8 = new Y8image(width, height, out[2].bytes);
+            green8 = new Y8image(width, height, out[2].bytes);
             this.greenImage = green8.toBufferedImage();
         }
 
         if (out.length > 3) {
-            Y8image orange8 = new Y8image(width, height, out[3].bytes);
-            this.orangeImage = orange8.toBufferedImage();
+            black8 = new Y8image(width, height, out[3].bytes);
+            this.blackImage = black8.toBufferedImage();
         }
 
         if (out.length > 4) {
-            ColorSegmentedImage colorSegImg = new ColorSegmentedImage(width, height, out[4].bytes);
+            ColorSegmentedImage colorSegImg = new ColorSegmentedImage(width,
+								      height,
+								      out[4].bytes);
             this.segmentedImage = colorSegImg.toBufferedImage();
         }
 
@@ -407,10 +465,11 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
         repaint();
     }
 
-    // If and only if it is the first load, we need to set the positions of the sliders
+    // If if is the first load, we need to set the positions of the sliders
     private void firstIoReceived(Log... out) {
-        
-        // Set sliders to positions based on white, green, then orange images descriptions' s-exps
+
+        // Set sliders to positions based on white, green,
+	// then black images descriptions' s-exps
         SExpr colors = out[1].tree();
 
         wDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(0).get(1).value()) * wPrecision));

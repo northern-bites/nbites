@@ -316,7 +316,7 @@ public class DebugImageView extends ViewParent
 	}
         //Graphics2D graph = black.createGraphics();
 	Graphics2D graph = (Graphics2D)g;
-        graph.setColor(Color.RED);
+        graph.setColor(Color.YELLOW);
         String b = "blob";
 
 	// loop through all of the black blobs we find in the tree

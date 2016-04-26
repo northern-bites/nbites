@@ -174,32 +174,32 @@ public class YUVExplore extends ViewParent
     }
 
     public void paintComponent(Graphics g) {
-		final int BOX_HEIGHT = 25;
-		super.paintComponent(g);
+	final int BOX_HEIGHT = 25;
+	super.paintComponent(g);
 
         if (currentLog != null) {
             g.drawImage(displayImages[ORIGINAL], 0, 0, displayw, displayh, null);
-			if (currentBottom == Y || currentBottom == U || currentBottom == V) {
-				drawEdge(g);
-			} else if (currentBottom == EDGEPLUS) {
-				drawEdgePlus(g);
-			}
-			if (currentBottom < LEARN) {
-				g.drawImage(displayImages[currentBottom], 0, displayh + 25, displayw / 2,
-							displayh / 2, null);
-			} else if (currentBottom == LEARN) {
-				findGreen(g);
-			} else {
-				displayYUV(g);
-			}
-			viewList.setBounds(displayw / 2 + 10, displayh  + 10, displayw / 2, BOX_HEIGHT);
-			if (label != null) {
-				g.setColor(Color.BLACK);
-				g.drawString(label, 10, displayh + 20);
-			}
+	    if (currentBottom == Y || currentBottom == U || currentBottom == V) {
+		drawEdge(g);
+	    } else if (currentBottom == EDGEPLUS) {
+		drawEdgePlus(g);
+	    }
+	    if (currentBottom < LEARN) {
+		g.drawImage(displayImages[currentBottom], 0, displayh + 25, displayw / 2,
+			    displayh / 2, null);
+	    } else if (currentBottom == LEARN) {
+		findGreen(g);
+	    } else {
+		displayYUV(g);
+	    }
+	    viewList.setBounds(displayw / 2 + 10, displayh  + 10, displayw / 2, BOX_HEIGHT);
+	    if (label != null) {
+		g.setColor(Color.BLACK);
+		g.drawString(label, 10, displayh + 20);
+	    }
 
-			edgeThreshold.setBounds(displayw / 2, displayh + 15 + BOX_HEIGHT, 500, BOX_HEIGHT+20);
-			edgeThreshold.repaint();
+	    edgeThreshold.setBounds(displayw / 2, displayh + 15 + BOX_HEIGHT, 500, BOX_HEIGHT+20);
+	    edgeThreshold.repaint();
         }
     }
 
@@ -327,44 +327,44 @@ public class YUVExplore extends ViewParent
 	 * should try and figure it out from scratch.
 	 */
 
-	public void findGreen(Graphics g) {
-		int max = 0;
-		int maxY = 0;
-		int maxU = 0;
-		int maxV = 0;
-		for (int col = 0; col < width; col++) {
-			for (int row = 0; row < height; row++) {
-				int gr = (green8.data[row * width + col]) & 0xFF;
-				if (gr > max) {
-					boolean first = (col & 1) == 0;
-					int cbase = (col & ~1);
-					int i = (row * displayw * 2) + (cbase * 2);
+    public void findGreen(Graphics g) {
+	int max = 0;
+	int maxY = 0;
+	int maxU = 0;
+	int maxV = 0;
+	for (int col = 0; col < width; col++) {
+	    for (int row = 0; row < height; row++) {
+		int gr = (green8.data[row * width + col]) & 0xFF;
+		if (gr > max) {
+		    boolean first = (col & 1) == 0;
+		    int cbase = (col & ~1);
+		    int i = (row * displayw * 2) + (cbase * 2);
 
-					maxY = currentLog.data()[first ? i : i + 2] & 0xff;
-					maxU = currentLog.data()[i + 1] & 0xff;
-					maxV = currentLog.data()[i + 3] & 0xff;
-				}
-			}
+		    maxY = currentLog.data()[first ? i : i + 2] & 0xff;
+		    maxU = currentLog.data()[i + 1] & 0xff;
+		    maxV = currentLog.data()[i + 3] & 0xff;
 		}
-		for (int col = 0; col < width * 2; col++) {
-			for (int row = 0; row < height * 2; row++) {
-				boolean first = (col & 1) == 0;
-				int cbase = (col & ~1);
-				int i = (row * width * 2 * 2) + (cbase * 2);
-
-				int y = currentLog.data()[first ? i : i + 2] & 0xff;
-				int u = currentLog.data()[i + 1] & 0xff;
-				int v = currentLog.data()[i + 3] & 0xff;
-				if (Math.abs(y - maxY) < 15 && Math.abs(u - maxU) < 10 &&
-					Math.abs(v - maxV) < 10) {
-					g.setColor(Color.GREEN);
-				} else {
-					g.setColor(Color.BLACK);
-				}
-				g.fillRect(col/2, row/2+displayh+30, 1, 1);
-			}
-		}
+	    }
 	}
+	for (int col = 0; col < width * 2; col++) {
+	    for (int row = 0; row < height * 2; row++) {
+		boolean first = (col & 1) == 0;
+		int cbase = (col & ~1);
+		int i = (row * width * 2 * 2) + (cbase * 2);
+
+		int y = currentLog.data()[first ? i : i + 2] & 0xff;
+		int u = currentLog.data()[i + 1] & 0xff;
+		int v = currentLog.data()[i + 3] & 0xff;
+		if (Math.abs(y - maxY) < 15 && Math.abs(u - maxU) < 10 &&
+		    Math.abs(v - maxV) < 10) {
+		    g.setColor(Color.GREEN);
+		} else {
+		    g.setColor(Color.BLACK);
+		}
+		g.fillRect(col/2, row/2+displayh+30, 1, 1);
+	    }
+	}
+    }
 
 	/* Draws edges on the original image in the Y, U, or V channel.
 	 */
