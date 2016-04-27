@@ -58,24 +58,21 @@ public class Block {
 		return new YUYV8888Image(width / 2, height, this.data);
 	}
 	
-//	@SuppressWarnings("unchecked")
-//	static <T extends Message> T parseAsProtobuf(Block block) {
-//		@SuppressWarnings("rawtypes")
-//		Class cls = Utility.protobufClassFromType(block.type);
-//		
-//		if (cls == null) {
-//			throw new BlockParseException(block.type, "protobuf<?>");
-//		}
-//		
-//		T parsed = Utility.<T>protobufInstanceForClassWithData(cls,
-//				block.data);
-//		
-//		if (parsed == null) {
-//			throw new BlockParseException(block.type, "protobuf<?>");
-//		}
-//		
-//		return parsed;
-//	}
+	public Message parseAsProtobufOfClass(Class<? extends Message> pclass) {
+		if (pclass == null) {
+			throw new BlockParseException(this.type, String.format("protobuf<null>") );
+		}
+		
+		parseTypeCheck(pclass.getSimpleName());
+		
+		Message parsed = Utility.protobufInstanceForClassWithData(pclass, this.data);
+		
+		if (parsed == null) {
+			throw new BlockParseException(this.type, String.format("protobuf<%s>", pclass.getSimpleName()));
+		}
+		
+		return parsed;
+	}
 
 	private void parseTypeCheck(String rType) {
 		if (!rType.equals(type)) {

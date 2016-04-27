@@ -1,5 +1,6 @@
 package nbtool.data.log;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Vector;
@@ -17,7 +18,7 @@ public class LogInternal extends Log {
 	}
 
 	@Override
-	public void writeTo(OutputStream os) {
+	public void writeTo(OutputStream os) throws IOException {
 		// TODO Auto-generated method stub
 		
 	}
@@ -26,6 +27,30 @@ public class LogInternal extends Log {
 	public int version() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+	@Override
+	public boolean temporary() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public String getFullDescription() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void saveChangesToTempFile() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void saveChangesToLoadFile() {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	private static long static_id = 0;
@@ -77,34 +102,6 @@ public class LogInternal extends Log {
 		return null;
 	}
 
-	@Override
-	public boolean temporary() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public Vector<Block> getBlocks() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setBlocks(Vector<Block> blocks) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public JsonObject getDictionary() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setDictionary(JsonObject obj) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 
 }
