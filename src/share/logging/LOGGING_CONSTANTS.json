@@ -39,7 +39,7 @@
 
     #keys for attributes in the log
         # (also functions as version)
-    "LOG_TOPLEVEL_MAGIC_KEY" : "_NBITES_JSON_LOG_VERSION_",
+    "LOG_TOPLEVEL_MAGIC_KEY" : "#_NBITES_JSON_LOG_VERSION_",
 
     "LOG_TOPLEVEL_BLOCKS" : "BLOCKS",
     "LOG_TOPLEVEL_CREATED_WHEN" : "CREATED_WHEN",
