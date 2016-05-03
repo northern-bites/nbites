@@ -15,7 +15,7 @@
 
 #include "utilities.hpp"
 
-namespace nblog {
+namespace nbl {
     namespace rpc {
 
         typedef struct {
@@ -66,11 +66,11 @@ namespace nblog {
 //Does most of the work of declaring a RPC function derivative, leaves class definition open.
 //Arguments after vaAllowed are required log classes, and must be single-constructor equivalent to std::string.
 #define RPC_FUNCTION_DECLARE(name, vaAllowed, ...)   \
-    class RPCFunction ## name : public nblog::rpc::RPCFunctionBase {    \
+    class RPCFunction ## name : public nbl::rpc::RPCFunctionBase {    \
         public:     RPCFunction ## name() :                             \
-                            nblog::rpc::RPCFunctionBase( #name , vaAllowed, { __VA_ARGS__ } ) \
+                            nbl::rpc::RPCFunctionBase( #name , vaAllowed, { __VA_ARGS__ } ) \
                             { initializeFunction(); }                                          \
-                    void defineCall(const std::vector<nblog::logptr>& arguments);
+                    void defineCall(const std::vector<nbl::logptr>& arguments);
 
 #define RPC_FUNCTION_END    };
 
@@ -80,7 +80,7 @@ namespace nblog {
 
 //Helper macro for defining RPCFunction::defineCall()
 #define RPC_FUNCTION_DEFINE(name)   \
-    void RPCFunction ## name ::defineCall(const std::vector<nblog::logptr>& arguments)
+    void RPCFunction ## name ::defineCall(const std::vector<nbl::logptr>& arguments)
 
 //Helper macro for create smart pointer instance of derivative RPCFunction
 #define RPC_FUNCTION_INSTANTIATE(name)   \

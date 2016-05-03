@@ -14,7 +14,7 @@
 
 #define NBL_LOGGING_LEVEL NBL_INFO_LEVEL
 
-namespace nblog {
+namespace nbl {
     namespace network {
 
         SocketMaster::SocketMaster(int port) :

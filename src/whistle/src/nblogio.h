@@ -1,5 +1,5 @@
 //
-//  nblogio.h
+//  exactio.h
 //
 //  Created by Philip Koch on 3/19/16.
 //
@@ -13,7 +13,7 @@
 
 #include <fcntl.h>
 
-namespace nbl {
+namespace nblog {
     namespace io {
 
         /* exact io on file descriptors */

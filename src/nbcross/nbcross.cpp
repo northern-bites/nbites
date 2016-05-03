@@ -10,7 +10,7 @@
 #include "nblogio.h"
 #include <getopt.h>
 
-namespace nblog {
+namespace nbl {
     namespace nbcross {
         std::string NBCROSS_INSTANCE_NAME = "default";
         std::string SERVER_NAME = io::LOCAL_HOST_ADDR;
@@ -122,4 +122,4 @@ namespace nblog {
     }
 }
 
-int umain(int argc, char ** argv) { return nblog::nbcross::nbcross_main(argc, argv); }
+int umain(int argc, char ** argv) { return nbl::nbcross::nbcross_main(argc, argv); }

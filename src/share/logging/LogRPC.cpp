@@ -10,9 +10,9 @@
 
 #define NBL_LOGGING_LEVEL NBL_INFO_LEVEL
 
-using nblog::CONSTANTS;
+using nbl::CONSTANTS;
 
-namespace nblog {
+namespace nbl {
     namespace rpc {
         RPCFunctionBase::RPCFunctionBase(const std::string& name, bool ava, std::initializer_list<const std::string> rac) :
             functionName(name), allowsVariableArguments(ava), reqArgClasses(rac) {}
@@ -135,8 +135,8 @@ namespace nblog {
         }
 
         RPCFunctionPtr functionFromMap(RPCFunctionMap& map, logptr callLog) {
-            if (callLog->logClass == nblog::CONSTANTS.LogClass_RPC_Call()) {
-                std::string name = callLog->toplevelDictionary[nblog::CONSTANTS.RPC_NAME()].asString();
+            if (callLog->logClass == nbl::CONSTANTS.LogClass_RPC_Call()) {
+                std::string name = callLog->toplevelDictionary[nbl::CONSTANTS.RPC_NAME()].asString();
 
                 if (map.find(name) != map.end()) {
                     return map[name];

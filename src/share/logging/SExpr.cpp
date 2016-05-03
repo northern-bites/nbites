@@ -10,7 +10,7 @@
 #define NBL_LOGGING_LEVEL NBL_WARN_LEVEL
 #include "utilities.hpp"
 
-namespace nblog {
+namespace nbl {
     
     SExpr SExpr::createNotFound() {
         

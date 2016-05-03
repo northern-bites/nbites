@@ -19,6 +19,7 @@ import nbtool.util.Center;
 import nbtool.util.Debug;
 import nbtool.util.ToolSettings;
 import nbtool.util.UserSettings;
+import nbtool.util.test.Tests;
 
 public class NBTool_v8 {
 	
@@ -32,6 +33,8 @@ public class NBTool_v8 {
 						
 		System.out.printf("\n\tnbtool version %d.%d\n\tdevelopment tool for Bowdoin's Northern Bites team\n\n",
 				ToolSettings.VERSION, ToolSettings.MINOR_VERSION);
+		
+		assert(Tests.runAll());
 		
 //		System.out.println("Unit tests: ... \n");
 //		if (!UnitsCollection.run(NBConstants.NBITES_DIR + "/build/nbtool")) {
@@ -72,7 +75,7 @@ public class NBTool_v8 {
 						break;
 					}
 					
-					if ("Nimbus".equals(installed.getName())) {
+					if ("metal".equalsIgnoreCase(installed.getName())) {
 						info = installed;
 					}
 				}

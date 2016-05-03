@@ -9,14 +9,14 @@
 #include <stdio.h>
 #include "nbcross.hpp"
 
-namespace nblog {
+namespace nbl {
     namespace nbcross {
 
-        void RPCFunctionTest::defineCall(const std::vector<nblog::logptr> &arguments) {
+        void RPCFunctionTest::defineCall(const std::vector<nbl::logptr> &arguments) {
             NBL_PRINT("test always!");
         }
 
-        void RPCFunctionTest2::defineCall(const std::vector<nblog::logptr> &arguments) {
+        void RPCFunctionTest2::defineCall(const std::vector<nbl::logptr> &arguments) {
             NBL_PRINT("test 2 got %z args.",
                       arguments.size());
         }

@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include "Logging.hpp"
 
-namespace nblog {
+namespace nbl {
     namespace filesystem {
 
         /* 

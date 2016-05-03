@@ -16,7 +16,7 @@
  Both are valid sexprs.  If a non-safe find or indexing operation CANNOT complete, it returns NULL,
  */
 
-namespace nblog {
+namespace nbl {
     
     typedef enum {
         SEXPR_ATOM,

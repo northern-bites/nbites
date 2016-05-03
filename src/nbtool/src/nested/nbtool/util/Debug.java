@@ -70,6 +70,12 @@ public class Debug {
 	private static final DebugSettings global =
 			new DebugSettings(true, true, true, null, "");
 	
+	public static DebugSettings createSettings(boolean checks, boolean asserts,
+				boolean colors, LogLevel lev, String dp ) {
+		return new DebugSettings( checks,  asserts,
+				 colors,  lev,  dp );
+	}
+	
 	public static class DebugSettings {
 		public boolean useChecks;
 		public boolean useAsserts;
@@ -110,31 +116,31 @@ public class Debug {
 			}
 			
 			String formatInside = String.format(f, args);
-			String formatted = String.format("%s[%C][%s] %s\n",
+			String formatted = String.format("%s[%C][%s] %s\n%s",
 					pre, msgLev.name.charAt(0),
-					debugPrefix, formatInside);
+					debugPrefix, formatInside, post);
 			
 			return formatted;
 		}
 		
 		public void printf(String f, Object ... args) {
-			System.out.println(format(ALWAYS, f, args));
+			System.out.print(format(ALWAYS, f, args));
 		}
 		
 		public void event(String f, Object ... args) {
-			System.out.println(format(ALWAYS, f, args));
+			System.out.print(format(ALWAYS, f, args));
 		}
 		
 		public void info(String f, Object ... args) {
-			System.out.println(format(ALWAYS, f, args));
+			System.out.print(format(ALWAYS, f, args));
 		}
 		
 		public void warn(String f, Object ... args) {
-			System.out.println(format(ALWAYS, f, args));
+			System.out.print(format(ALWAYS, f, args));
 		}
 		
 		public void error(String f, Object ... args) {
-			System.out.println(format(ALWAYS, f, args));
+			System.out.print(format(ALWAYS, f, args));
 		}
 	}
 	
@@ -150,13 +156,13 @@ public class Debug {
 	
 	public static void log(LogLevel l, String m) {
 		if (level.shows(l)) {
-			System.out.println(global.format(l, m));
+			System.out.print(global.format(l, m));
 		}
 	}
 	
 	public static void logf(LogLevel l, String f, Object ... args) {
 		if (level.shows(l)) {
-			System.out.println(global.format(l, f, args));
+			System.out.print(global.format(l, f, args));
 		}
 	}
 	

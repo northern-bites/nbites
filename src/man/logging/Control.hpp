@@ -12,8 +12,8 @@
 #include "Log.hpp"
 #include "LogRPC.hpp"
 
-using nblog::rpc::RPCFunctionMap;
-using nblog::rpc::RPCFunctionPtr;
+using nbl::rpc::RPCFunctionMap;
+using nbl::rpc::RPCFunctionPtr;
 
 namespace control {
     namespace flags {
@@ -31,15 +31,15 @@ namespace control {
     const char * stringFor(flags::flag_e f);
 
     //defined in Control.cpp
-    class ControlHandler : public nblog::LogConsumer {
+    class ControlHandler : public nbl::LogConsumer {
         RPCFunctionMap map;
     public:
         ControlHandler();
-        void consumeLog(nblog::logptr ptrTo);
+        void consumeLog(nbl::logptr ptrTo);
         void printFunctions();
     };
 
-    extern std::vector<nblog::rpc::RPCFunctionPtr> setupControlFunctions();
+    extern std::vector<nbl::rpc::RPCFunctionPtr> setupControlFunctions();
 }
 
 #endif /* Control_hpp */

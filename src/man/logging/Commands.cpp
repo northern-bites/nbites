@@ -9,7 +9,7 @@
 #include "Control.hpp"
 #include "LogRPC.hpp"
 
-using nblog::CONSTANTS;
+using nbl::CONSTANTS;
 
 namespace control {
     //helper functions may be defined here
@@ -23,7 +23,7 @@ namespace control {
 
     CONTROL_FUNCTION_SET
 
-    nblog::logptr createFlagStateLog() {
+    nbl::logptr createFlagStateLog() {
         json::Array flags;
         for (int i = flags::_START_EXTERNAL_ + 1; i < flags::_END_EXTERNAL_; ++i) {
             flags::flag_e f = (flags::flag_e) i;
@@ -35,9 +35,9 @@ namespace control {
             flags.push_back(attrs);
         }
 
-        nblog::logptr flagLog = nblog::Log::explicitLog({}, {}, nblog::CONSTANTS.LogClass_Flags());
+        nbl::logptr flagLog = nbl::Log::explicitLog({}, {}, nbl::CONSTANTS.LogClass_Flags());
 
-        flagLog->addBlockFromJson(flags, "createFlagStateLog()", nblog::IMAGE_INDEX_INVALID, clock());
+        flagLog->addBlockFromJson(flags, "createFlagStateLog()", nbl::IMAGE_INDEX_INVALID, clock());
 
         return flagLog;
     }
@@ -45,7 +45,7 @@ namespace control {
 //COMMAND_LIST_START
 //
 //    COMMAND_START(setFlag)
-//    void execute(nblog::logptr arg) {
+//    void execute(nbl::logptr arg) {
 //        uint8_t index = arg->blocks[0].data[0];
 //        uint8_t value = arg->blocks[0].data[1];
 //
@@ -54,7 +54,7 @@ namespace control {
 //    COMMAND_END(setFlag)
 //
 //    COMMAND_START(getFlags)
-//    void execute(nblog::logptr arg) {
+//    void execute(nbl::logptr arg) {
 //        returnLog(createFlagStateLog());
 //    }
 //    COMMAND_END(getFlags)
@@ -62,12 +62,12 @@ namespace control {
 //
 //COMMAND_LIST_END
 
-    void RPCFunctionGetFlags::defineCall(const std::vector<nblog::logptr> &arguments) {
+    void RPCFunctionGetFlags::defineCall(const std::vector<nbl::logptr> &arguments) {
         NBL_PRINT("RPCFunctionGetFlag::call()");
         RETURN(createFlagStateLog());
     }
 
-    void RPCFunctionSetFlag::defineCall(const std::vector<nblog::logptr> &arguments) {
+    void RPCFunctionSetFlag::defineCall(const std::vector<nbl::logptr> &arguments) {
 
         uint8_t index = arguments[0]->blocks[0].data[0];
         uint8_t value = arguments[0]->blocks[0].data[1];
@@ -79,7 +79,7 @@ namespace control {
 #define CONTROL_FUNCTION(name, va, ...) \
     RPC_FUNCTION_INSTANTIATE(name)  ,
 
-    std::vector<nblog::rpc::RPCFunctionPtr> setupControlFunctions() {
+    std::vector<nbl::rpc::RPCFunctionPtr> setupControlFunctions() {
         return {
             CONTROL_FUNCTION_SET
         };

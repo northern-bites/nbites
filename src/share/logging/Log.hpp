@@ -20,7 +20,7 @@
 #include "nblogio.h"
 #include "Images.h"
 
-namespace nblog {
+namespace nbl {
 
 #define NBL_CREATE_CONSTANT_METHOD(name)    \
     const std::string name() const { return dict.at( std::string( #name ) ).asConstString(); }
@@ -144,7 +144,7 @@ namespace nblog {
         //therefore the return value MUST NOT outlive that std::string and this Block.
         messages::YUVImage parseAsYUVImage() const ;
 
-        nblog::SExpr parseAsSexpr() const;
+        nbl::SExpr parseAsSexpr() const;
 
         json::Value parseAsJson() const;
 
@@ -194,7 +194,7 @@ namespace nblog {
 
         bool addBlockFromImage(const messages::YUVImage& image, const std::string& whereFrom, iindex_t imageIndex, clock_t createdWhen);
 
-        bool addBlockFromSexpr(const nblog::SExpr& sexpr, const std::string& whereFrom, iindex_t imageIndex, clock_t createdWhen);
+        bool addBlockFromSexpr(const nbl::SExpr& sexpr, const std::string& whereFrom, iindex_t imageIndex, clock_t createdWhen);
 
         bool addBlockFromJson(const json::Value& val, const std::string& whereFrom, iindex_t imageIndex, clock_t createdWhen);
 

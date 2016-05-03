@@ -17,7 +17,7 @@
 #include "Log.hpp"
 #include "nblogio.h"
 
-namespace nblog {
+namespace nbl {
 
     /* interface for man */
 

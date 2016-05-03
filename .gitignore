@@ -30,3 +30,4 @@ src/nbtool/bin
 .recommenders
 _tempFiles
 *.swp
+src/sound

@@ -9,14 +9,14 @@
 #include <stdio.h>
 #include "nbcross.hpp"
 
-namespace nblog {
+namespace nbl {
     namespace nbcross {
 
-        void RPCFunctionVision::defineCall(const std::vector<nblog::logptr> &arguments) {
+        void RPCFunctionVision::defineCall(const std::vector<nbl::logptr> &arguments) {
 
         }
 
-        void RPCFunctionCalibrate::defineCall(const std::vector<nblog::logptr> &arguments) {
+        void RPCFunctionCalibrate::defineCall(const std::vector<nbl::logptr> &arguments) {
 
         }
 

@@ -28,7 +28,7 @@ public class Center {
 		assert(eventClass.isInstance(listener));
 		
 		HashMap<Class<? extends EventListener>, ArrayList<EventListener>> relevant
-		= guiThread ? guiListeners : centerListeners;
+			= guiThread ? guiListeners : centerListeners;
 		synchronized(relevant) {
 			if (relevant.containsKey(eventClass)) {
 				relevant.get(eventClass).add(listener);
@@ -158,7 +158,7 @@ public class Center {
 	 * tool shutdown handling
 	 */
 	public static interface NBToolShutdownListener {
-		//Guaranteed to be called before Prefs are saved, if Prefs are saved.
+		//Guaranteed to be called before user settings are saved, *if* user settings are saved.
 		public void nbtoolShutdownCallback();
 	}
 	
@@ -176,7 +176,7 @@ public class Center {
 			@Override
 			public void run() {
 				
-				Debug.printf("\n----------------------------------\nCenter hook saving preferences...");
+				System.out.println("\n----------------------------------\nCenter hook saving preferences...");
 				for (NBToolShutdownListener l : shutdownListeners) {
 					Debug.printf("\tinforming %s", l.toString());
 					l.nbtoolShutdownCallback();

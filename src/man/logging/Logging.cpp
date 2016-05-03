@@ -24,7 +24,7 @@
 
 #define NBL_LOGGING_LEVEL NBL_INFO_LEVEL
 
-namespace nblog {
+namespace nbl {
 
 #define LOGGING_Q_M(name) #name ,
     const char * Q_NAMES[] = {
@@ -97,7 +97,7 @@ namespace nblog {
     }
 
     bool NBLog(logptr log, q_enum q) {
-        if (center && q < nblog::NUM_QUEUES) {
+        if (center && q < nbl::NUM_QUEUES) {
             return center->addLog(log, q);
         }
 
@@ -115,7 +115,7 @@ namespace nblog {
         pthread_cond_init(&logAvailableCond, NULL);
     }
 
-    bool Center::addLog(logptr log, nblog::q_enum q) {
+    bool Center::addLog(logptr log, nbl::q_enum q) {
         NBL_ASSERT(IS_PTR_VALID(log));
         if (q >= NUM_QUEUES) return false;
 

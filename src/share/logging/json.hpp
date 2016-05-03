@@ -175,7 +175,7 @@ namespace json {
                 if ( type() == (x ## Type) )        \
                     return static_cast<x&> (*this); \
                 else throw std::domain_error(       \
-                    nblog::utilities::format("json: cannot cast json::%s to json::%s!",  \
+                    nbl::utilities::format("json: cannot cast json::%s to json::%s!",  \
                     JSON_VALUE_TYPE_STRINGS[type()], JSON_VALUE_TYPE_STRINGS[x ## Type] \
                 ) ); \
             }
@@ -188,7 +188,7 @@ namespace json {
                 if ( type() == (x ## Type) )        \
                     return static_cast<const x&> (*this); \
                 else throw std::domain_error(       \
-                    nblog::utilities::format("json: cannot cast json::%s to json::%s!",  \
+                    nbl::utilities::format("json: cannot cast json::%s to json::%s!",  \
                     JSON_VALUE_TYPE_STRINGS[type()], JSON_VALUE_TYPE_STRINGS[x ## Type] \
                 ) ); \
             }

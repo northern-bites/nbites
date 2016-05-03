@@ -304,7 +304,7 @@ namespace json {
                         
                         if (nt.type == ARRAY_END) {
                             if (rstate == NEED_VAL)
-                                throw std::range_error(nblog::utilities::format("Json::Parser::parse() cannot parse {%c} at loc %i, expected value.",
+                                throw std::range_error(nbl::utilities::format("Json::Parser::parse() cannot parse {%c} at loc %i, expected value.",
                                                                  text[tok.startInd], tok.startInd));
                             else break;
                             
@@ -315,7 +315,7 @@ namespace json {
                                 if (nt.type == SEPARATOR) {
                                     rstate = NEED_VAL;
                                 } else {
-                                    throw std::range_error(nblog::utilities::format("Json::Parser::parse() cannot parse {%c} at loc %i",
+                                    throw std::range_error(nbl::utilities::format("Json::Parser::parse() cannot parse {%c} at loc %i",
                                                                      text[tok.startInd], tok.startInd));
                                 }
                                 
@@ -340,7 +340,7 @@ namespace json {
                         
                         if (nt.type == OBJECT_END) {
                             if (rstate == NEED_VAL)
-                                throw std::range_error(nblog::utilities::format("Json::Parser::parse() cannot parse {%c} at loc %i, expected value.",
+                                throw std::range_error(nbl::utilities::format("Json::Parser::parse() cannot parse {%c} at loc %i, expected value.",
                                                                  text[tok.startInd], tok.startInd));
                             else break;
                             
@@ -351,7 +351,7 @@ namespace json {
                                 if (nt.type == SEPARATOR) {
                                     rstate = NEED_VAL;
                                 } else {
-                                    throw std::range_error(nblog::utilities::format("Json::Parser::parse() cannot parse {%c} at loc %i",
+                                    throw std::range_error(nbl::utilities::format("Json::Parser::parse() cannot parse {%c} at loc %i",
                                                                      text[tok.startInd], tok.startInd));
                                 }
                                 
@@ -360,12 +360,12 @@ namespace json {
                                 
                                 Value key = parse(nt);
                                 if (key.type() != StringType)
-                                    throw std::range_error(nblog::utilities::format("Json::Parser::parse() cannot parse {%c} at loc %i, key MUST be string",
+                                    throw std::range_error(nbl::utilities::format("Json::Parser::parse() cannot parse {%c} at loc %i, key MUST be string",
                                                                      text[tok.startInd], tok.startInd));
                                 
                                 Token div = next();
                                 if (div.type != OBJECT_DIVIDER)
-                                    throw std::range_error(nblog::utilities::format("Json::Parser::parse() cannot parse {%c} at loc %i, need divider.",
+                                    throw std::range_error(nbl::utilities::format("Json::Parser::parse() cannot parse {%c} at loc %i, need divider.",
                                                                      text[tok.startInd], tok.startInd));
                                 
                                 Token valt = next();
@@ -403,7 +403,7 @@ namespace json {
                 }
                     
                 default:
-                    throw std::range_error(nblog::utilities::format("Json::Parser::parse() cannot parse {%c} at loc %i",
+                    throw std::range_error(nbl::utilities::format("Json::Parser::parse() cannot parse {%c} at loc %i",
                                                      text[tok.startInd], tok.startInd));
             }
         }
@@ -499,7 +499,7 @@ namespace json {
                         return ret;
                         
                     } else {
-                        throw std::range_error(nblog::utilities::format("Json::Parser::next() found unexpected character {%c}", c1));
+                        throw std::range_error(nbl::utilities::format("Json::Parser::next() found unexpected character {%c}", c1));
                     }
                 }
             }

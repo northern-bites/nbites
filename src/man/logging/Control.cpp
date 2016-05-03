@@ -9,7 +9,7 @@
 #include "Control.hpp"
 #include "LogRPC.hpp"
 
-using namespace nblog::rpc;
+using namespace nbl::rpc;
 
 namespace control {
 
@@ -18,7 +18,7 @@ namespace control {
         mapfromFunctions(map, setupControlFunctions());
     }
 
-    void ControlHandler::consumeLog(nblog::logptr ptrTo) {
+    void ControlHandler::consumeLog(nbl::logptr ptrTo) {
 
         RPCFunctionPtr fptr = functionFromMap(map, ptrTo);
         if (!IS_PTR_VALID(fptr)) {
@@ -38,7 +38,7 @@ namespace control {
         }
 
         NBL_ASSERT(IS_PTR_VALID(ret.returns));
-        nblog::NBLog(ret.returns, nblog::Q_CONTROL);
+        nbl::NBLog(ret.returns, nbl::Q_CONTROL);
     }
 
     void ControlHandler::printFunctions() {

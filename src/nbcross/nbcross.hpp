@@ -30,7 +30,7 @@
     format, ## __VA_ARGS__ );                       \
 };
 
-namespace nblog {
+namespace nbl {
     namespace nbcross {
         /*
          Helper functions

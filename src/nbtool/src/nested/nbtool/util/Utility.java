@@ -24,6 +24,11 @@ import nbtool.images.YUYV8888Image;
 
 public class Utility {
 	
+	public static StackTraceElement codeLocation(int i) {
+		StackTraceElement[] stack = (new Throwable()).getStackTrace();
+		return stack[i];
+	}
+	
 	public static byte[] subArray(byte[] ar, int start, int len) {
 		byte[] ret = new byte[len];
 		

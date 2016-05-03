@@ -8,7 +8,7 @@
 #include "Log.hpp"
 #include "nblogio.h"
 
-namespace nblog {
+namespace nbl {
 
     SharedConstants const CONSTANTS;
 
@@ -54,12 +54,12 @@ namespace nblog {
         return messages::YUVImage( (uint8_t *) &data[0], width, height, width );
     }
 
-    nblog::SExpr Block::parseAsSexpr() const {
+    nbl::SExpr Block::parseAsSexpr() const {
         parseTypeCheck(CONSTANTS.SexprType_DEFAULT());
 
-        nblog::SExpr * sex = nblog::SExpr::read(data);
+        nbl::SExpr * sex = nbl::SExpr::read(data);
         if (sex) {
-            nblog::SExpr ret = *sex;
+            nbl::SExpr ret = *sex;
             delete sex;
             return ret;
         } else {
@@ -152,7 +152,7 @@ namespace nblog {
         return true;
     }
 
-    bool Log::addBlockFromSexpr(const nblog::SExpr &sexpr, const std::string &whereFrom, iindex_t imageIndex, clock_t createdWhen) {
+    bool Log::addBlockFromSexpr(const nbl::SExpr &sexpr, const std::string &whereFrom, iindex_t imageIndex, clock_t createdWhen) {
         blocks.push_back(Block(sexpr.serialize(), std::map<std::string, json::Value>(), CONSTANTS.SexprType_DEFAULT(), whereFrom, imageIndex, createdWhen));
 
         return true;
@@ -164,7 +164,7 @@ namespace nblog {
         return true;
     }
 
-    bool Log::addBlockFromLog(const nblog::Log& log) {
+    bool Log::addBlockFromLog(const nbl::Log& log) {
         std::string data;
         log.serialize(data);
 

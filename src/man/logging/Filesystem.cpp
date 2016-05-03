@@ -18,7 +18,7 @@
 
 #define NBL_LOGGING_LEVEL NBL_WARN_LEVEL
 
-namespace nblog {
+namespace nbl {
     namespace filesystem {
 
         const size_t MAX_WRITTEN_BYTES = (1<<28);

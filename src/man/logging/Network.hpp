@@ -15,7 +15,7 @@
 
 #include "Logging.hpp"
 
-namespace nblog {
+namespace nbl {
     namespace network {
         class SocketMaster : public Threadable {
             io::server_socket_t server;

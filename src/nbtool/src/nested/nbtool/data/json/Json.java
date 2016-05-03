@@ -3,10 +3,13 @@ package nbtool.data.json;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import nbtool.data.json.JsonParser.JsonParseException;
+import nbtool.util.test.TestBase;
+import nbtool.util.test.Tests;
 
 public class Json {
 	
@@ -211,4 +214,143 @@ public class Json {
 	public static JsonBoolean bool(boolean val) {
 		return val ? JsonBoolean.TRUE : JsonBoolean.FALSE;
 	}
+	
+	public static void addTests() {
+		Tests.add("json", new TestBase("encode") {
+			
+			@Override
+			public boolean testBody() throws Exception {
+				JsonArray witho = new JsonArray();
+				JsonArray with = new JsonArray();
+				witho.add(5.0);
+				witho.add(100);
+				witho.add("string");
+				
+				with.add(new JsonNumber(5.0));
+				with.add(new JsonNumber(100));
+				with.add(new JsonString("string"));
+				
+				requireEqual(witho.serialize(), with.serialize());
+				
+				JsonArray array1 = new JsonArray();
+				array1.add(new JsonString("abc"));
+				array1.add(new JsonNumber(123));
+				array1.add(new JsonNumber(222.123));
+				array1.add(JsonBoolean.TRUE);
+				requireEqual(array1.serialize(), "[\"abc\",123,222.123,true]");
+				
+				JsonObject obj1 = new JsonObject();
+				obj1.put("array1", array1);
+				requireEqual("{\"array1\":[\"abc\",123,222.123,true]}", obj1.serialize());
+				
+				obj1.remove("array1");
+				assert(obj1.size() == 0);
+				array1.add(obj1);
+				requireEqual("[\"abc\",123,222.123,true,{}]", array1.serialize());
+				
+				JsonObject map = new JsonObject();
+				map.put("k31", Json.string("v3"));
+				map.put("k32", Json.num(123.45));
+				map.put("k33", Json.bool(false));
+				map.put("k34", Json.NULL_VALUE);
+				
+				List<JsonValue> l = new LinkedList<>();
+				l.add(Json.string("vvv"));
+				l.add(Json.num(1.23456789123456789));
+				l.add(Json.bool(true));
+				l.add(Json.NULL_VALUE);
+				map.put("list", Json.array(l));
+				
+				String correct = "{\"k31\":\"v3\",\"k32\":123.45,\"k33\":false,\"k34\":null,\"list\":[\"vvv\",1.234567891234568,true,null]}";
+				String first = map.serialize();
+				requireEqual(correct, first);
+				
+				requireEqual(Json.parse(correct).serialize(), first);
+				
+				return true;
+			}
+			
+		});
+		
+		Tests.add("json", new TestBase("decode"){
+
+			@Override
+			public boolean testBody() throws Exception {
+				//Good strings
+				try {
+					String s="[0,{\"1\":{\"2\":{\"3\":{\"4\":[5,{\"6\":7}]}}}}]";
+					JsonArray obj = Json.parse(s).<JsonArray>cast();
+					requireEqual("{\"1\":{\"2\":{\"3\":{\"4\":[5,{\"6\":7}]}}}}", obj.get(1).serialize());
+					
+					JsonObject obj2 = obj.get(1).<JsonObject>cast();
+					//System.out.println(obj2.print());
+					requireEqual("{\"2\":{\"3\":{\"4\":[5,{\"6\":7}]}}}", obj2.get("1").serialize());
+					
+					s="{}";
+					JsonValue obj3 = Json.parse(s);
+					requireEqual("{}",obj3.serialize());
+					
+					
+					s="[\"hello\\bworld\\\"abc\\tdef\\\\ghi\\rjkl\\n123\\\"\"]";
+					//Logger.println(s);
+					JsonValue obj4 = Json.parse(s);
+					//Logger.println(obj4.serialize());
+
+					requireEqual("\"hello\\bworld\\\"abc\\tdef\\\\ghi\\rjkl\\n123\\\"\"",
+							obj4.<JsonArray>cast().get(0).serialize());
+					
+					//Logger.println("after");
+					
+					s= "45.0";
+					JsonValue obj5 = Json.parse(s);
+					JsonNumber num = obj5.<JsonNumber>cast();			
+					assert(num.doubleValue() == 45.0);
+					
+					s="0x43";
+					JsonValue obj6 = Json.parse(s);
+					JsonNumber num2 = obj6.<JsonNumber>cast();
+					assert(num2.intValue() == Integer.decode(s));
+					
+					s="{\"first\": 123, \"second\": [4, 5, 6], \"third\": 789}";
+					JsonObject obj7 = Json.parse(s).<JsonObject>cast();
+					assert(obj7.get("first").<JsonNumber>cast().intValue() == 123
+							);
+					assert(obj7.get("second").<JsonArray>cast().size() == 3);
+					assert(obj7.get("third").<JsonNumber>cast().intValue() == 789);
+					
+				} catch (JsonParseException e) {
+					e.printStackTrace();
+					return false;
+				}
+						
+				//requireInvalid("name");	//valid string, test of requireInvalid()
+				
+				requireInvalid("[5,]");
+				requireInvalid("[5,,2]");
+				requireInvalid("{\"name\":");
+				requireInvalid("{\"name\":}");
+				requireInvalid("{\"name");
+				requireInvalid("[[null, 123.45, \"a\\b c\"}, true]");
+				
+				
+				return true;
+			}
+			
+			private void requireInvalid(String s) throws Exception {
+				boolean thrown = false; 
+				try {
+					Json.parse(s);
+				} catch (JsonParseException jpe) {
+					thrown = true;
+				} finally {
+					if (!thrown) {
+						failed(String.format("parser did not throw on invalid string '%s' ", s));
+					}
+				}
+			}
+
+			
+		});
+	}	
+	
 }

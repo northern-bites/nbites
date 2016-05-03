@@ -31,12 +31,10 @@
 
 #include "nblogio.h"
 
-#include "Log.hpp"
-
 #include "utilities.hpp"
-#define NBL_LOGGING_LEVEL NBL_WARN_LEVEL
+#define NBL_LOGLEVEL WARN
 
-namespace nbl {
+namespace nblog {
     namespace io {
 
         const char LOCAL_HOST_ADDR[] = "127.0.0.1";
@@ -45,7 +43,7 @@ namespace nbl {
         const iotime_t IO_NOT_EXPECTING_ST = 500000;
 
         iotime_t IO_MAX_DELAY() {
-            return CONSTANTS.REMOTE_HOST_TIMEOUT();
+            return 5000000;
         }
 
 #define MICROSECONDS_MOD_SECONDS(us) (us % 1000000)
@@ -91,7 +89,7 @@ namespace nbl {
                 } else if (ret < 0) {
 
                     std::string error = utilities::get_error(saved_err);
-                    NBL_WARN( "***%s*** got error: %s", (stub_name) ? stub_name : "exactio",
+                    NBL_LOG(WARN, "***%s*** got error: %s", (stub_name) ? stub_name : "exactio",
                             error.c_str());
                     return ERROR;
 
@@ -227,7 +225,7 @@ return ERROR; }
             int flags = fcntl(socket, F_GETFL, 0);
             flags |= options;
             int ret = fcntl(socket, F_SETFL, flags);
-            NBL_LOG_IF(NBL_ERROR_LEVEL, ret, "config_socket(): %s",
+            NBL_LOG_IF(ERROR, ret, "config_socket(): %s",
                        utilities::get_error(errno).c_str());
 
 #ifdef __APPLE__
