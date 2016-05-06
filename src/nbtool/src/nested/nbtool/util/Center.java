@@ -52,10 +52,10 @@ public class Center {
 			center_thread.setName("nbtool-Center");
 			center_thread.setDaemon(true);
 
-			Debug.log(Debug.INFO, "Starting Center thread...");
+			Debug.info( "Starting Center thread...");
 			center_thread.start();
 		} else {
-			Debug.log(Debug.ERROR, "Could not start Center, center_thread != null.");
+			Debug.error( "Could not start Center, center_thread != null.");
 		}
 	}
 
@@ -63,7 +63,7 @@ public class Center {
 		
 		@Override
 		public void run() {
-			Debug.log(Debug.INFO, "Center thread active.");
+			Debug.info( "Center thread active.");
 			
 			try {
 				while(true) {
@@ -95,11 +95,11 @@ public class Center {
 						}
 					}
 					
-					Debug.logf(Debug.EVENT, "Center choosing event %s", head.getClass().getName());
+					Debug.event( "Center choosing event %s", head.getClass().getName());
 
 					assert(head != null);
 					if (similar != null && head.canCombine()) {
-						Debug.logf(Debug.EVENT, "Center combining event %s, %d instances", head.getClass().getName(),
+						Debug.event( "Center combining event %s, %d instances", head.getClass().getName(),
 								similar.size());
 						head.combine(similar);
 					}
@@ -115,10 +115,10 @@ public class Center {
 						if (clist == null)
 							clist = new ArrayList<EventListener>();
 						
-						Debug.logf(Debug.EVENT, "Center executing event %s with %d cListeners, %d guiListeners.", head.getClass().getName(),
+						Debug.event( "Center executing event %s with %d cListeners, %d guiListeners.", head.getClass().getName(),
 								clist.size(), glist.size());
 					} else {
-						Debug.logf(Debug.EVENT, "Center executing event %s with null event class.", head.getClass().getName());
+						Debug.event( "Center executing event %s with null event class.", head.getClass().getName());
 					}
 
 					head.execute(glist, clist);	//Wow, that sounds macabre.
@@ -178,7 +178,7 @@ public class Center {
 				
 				System.out.println("\n----------------------------------\nCenter hook saving preferences...");
 				for (NBToolShutdownListener l : shutdownListeners) {
-					Debug.printf("\tinforming %s", l.toString());
+					Debug.print("\tinforming %s", l.toString());
 					l.nbtoolShutdownCallback();
 				}
 				
@@ -188,7 +188,7 @@ public class Center {
 					e.printStackTrace();
 				}
 				
-				Debug.printf("Center hook done.");
+				Debug.print("Center hook done.");
 			}
 		}));
 	}

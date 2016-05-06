@@ -43,7 +43,8 @@
     <!-- setup build dir, copy resources from src/nested/nbtool -->
     <target name="init">
         <mkdir dir="../../build/nbtool"/>
-        <copy includeemptydirs="false" todir="../../build/nbtool">
+	<echo message="copying files from src dirs..."/>
+        <copy includeemptydirs="false" todir="../../build/nbtool/nbtool" verbose="true">
             <fileset dir="src/nested/nbtool">
                 <exclude name="**/*.launch"/>
                 <exclude name="**/*.java"/>

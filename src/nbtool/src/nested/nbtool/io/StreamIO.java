@@ -116,7 +116,7 @@ public class StreamIO {
 
 			try {
 				//Setup Socket
-				Debug.logf(Debug.INFO, "%s starting.", name());
+				Debug.info( "%s starting.", name());
 				this.socket = CommonIO.setupNetSocket(host, port);
 
 				//Initialize
@@ -137,7 +137,7 @@ public class StreamIO {
 				out.flush();
 				recv = in.readInt();
 				if (recv != ToolSettings.VERSION) {
-					Debug.log(Debug.WARN,"WARNING: NetIO connected to robot with version " + recv + 
+					Debug.warn("WARNING: NetIO connected to robot with version " + recv + 
 							" but client is running version " + ToolSettings.VERSION + " !!\n");
 				}
 
@@ -162,7 +162,7 @@ public class StreamIO {
 						_Log nl = CommonIO.readLog(in);
 
 						nl.tree().append(SExpr.newKeyValue("from_address", this.host));
-						Debug.log(Debug.INFO, this.name() + ": thread got packet of data size: " + nl.bytes.length + " desc: " + nl.description(50));
+						Debug.info( this.name() + ": thread got packet of data size: " + nl.bytes.length + " desc: " + nl.description(50));
 
 						nl.source = SOURCE.NETWORK;
 
@@ -176,12 +176,12 @@ public class StreamIO {
 
 			} catch (Throwable t) {
 				if (t instanceof SequenceErrorException) {
-					Debug.logf(Debug.ERROR, "%s", ((SequenceErrorException) t).toString());
+					Debug.error( "%s", ((SequenceErrorException) t).toString());
 				}
 
 				t.printStackTrace();
 			} finally {
-				Debug.logf(Debug.INFO, "%s cleaning up...", name());
+				Debug.info( "%s cleaning up...", name());
 
 				this.finish();
 

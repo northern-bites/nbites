@@ -1,4 +1,4 @@
-package nbtool.gui;
+package nbtool.gui.utilitypanes;
 
 import java.awt.event.*;
 import java.awt.*;

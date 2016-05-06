@@ -113,7 +113,7 @@ public class UserSettings {
 	/* SAVE PREFERENCES TO FILESYSTEM */
 	public static void savePreferences() throws IOException {
 		File fp = new File(Utility.localizePath(ToolSettings.USER_PREFERENCES));
-		Debug.logf(Debug.INFO, "saving preferences to %s", fp.getAbsolutePath());
+		Debug.info( "saving preferences to %s", fp.getAbsolutePath());
 
 		SExpr top = SExpr.newList();
 		top.append(SExpr.newAtom("nbtool-prefs"));
@@ -177,7 +177,7 @@ public class UserSettings {
 		System.out.println("\tusing NBITES_DIR=" + ToolSettings.NBITES_DIR);
 
 		if (!prefPath.toFile().exists()) {
-			Debug.log(Debug.WARN, "preferences file not found.");
+			Debug.warn( "preferences file not found.");
 			return;
 		}
 		String prefText = new String(Files.readAllBytes(prefPath),
@@ -187,7 +187,7 @@ public class UserSettings {
 		if (prefs == null || prefs.count() < 1 || 
 				!(prefs.get(0).isAtom() && prefs.get(0).value().equals("nbtool-prefs") ) 
 				) {
-			Debug.log(Debug.WARN, "PREFERENCES FILE HAD INVALID FORMAT");
+			Debug.warn( "PREFERENCES FILE HAD INVALID FORMAT");
 			return;
 		}
 		

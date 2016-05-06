@@ -48,14 +48,14 @@ public final class SessionMaster implements IOFirstResponder {
 	/* path is expected to be absolute. */
 	public synchronized void loadSession(String path) {
 		if (!isIdle()) {
-			Debug.log(Debug.WARN, "SessionMaster cannot load new session, not idle.");
+			Debug.warn("SessionMaster cannot load new session, not idle.");
 			return;
 		}
 		
 		String fullPath = path.trim();
 		
 		if (!FileIO.checkLogFolder(fullPath)) {
-			Debug.log(Debug.WARN, "SessionMaster cannot load new session, bad path.");
+			Debug.warn("SessionMaster cannot load new session, bad path.");
 			return;
 		}
 		
@@ -73,17 +73,17 @@ public final class SessionMaster implements IOFirstResponder {
 	
 	public synchronized void streamSession(String addr, String path) {
 		if (!isIdle()) {
-			Debug.log(Debug.WARN, "SessionMaster cannot stream new session, not idle.");
+			Debug.warn("SessionMaster cannot stream new session, not idle.");
 			return;
 		}
 		
 		if (addr == null || addr.isEmpty()) {
-			Debug.log(Debug.WARN, "SessionMaster cannot stream new session, bad address.");
+			Debug.warn("SessionMaster cannot stream new session, bad address.");
 			return;
 		}
 		
 		if (path != null && !path.isEmpty()) {
-			Debug.log(Debug.INFO, "SessionMaster setting up file writer.");
+			Debug.info("SessionMaster setting up file writer.");
 			fileio = FileIO.newFileWriter(path, this);
 		}
 		
@@ -93,7 +93,7 @@ public final class SessionMaster implements IOFirstResponder {
 		Events.GSessionAdded.generate(this, workingSession);
 		Events.GToolStatus.generate(this, STATUS.RUNNING, workingSession.name);
 		
-		Debug.log(Debug.WARN, "SessionMaster setting up stream.");
+		Debug.warn("SessionMaster setting up stream.");
 		control = ControlIO.create(this, addr, ToolSettings.CONTROL_PORT);
 		streamio = StreamIO.create(this, addr, ToolSettings.STREAM_PORT);
 		
@@ -142,7 +142,7 @@ public final class SessionMaster implements IOFirstResponder {
 	
 	public synchronized void lateStartFileWriting(String path) {
 		if (!isIdle() && streamio != null) {
-			Debug.infof("SessionMaster latestarting a FileInstance...");
+			Debug.info("SessionMaster latestarting a FileInstance...");
 			
 			assert(FileIO.checkLogFolder(path));
 			fileio = FileIO.newFileWriter(path, this);
@@ -151,7 +151,7 @@ public final class SessionMaster implements IOFirstResponder {
 	
 	public synchronized void earlyStopFileWriting() {
 		if (fileio != null) {
-			Debug.warnf("SessionMaster stopping a FileInstance early...");
+			Debug.warn("SessionMaster stopping a FileInstance early...");
 			fileio.kill();
 		}
 	}
@@ -214,7 +214,7 @@ public final class SessionMaster implements IOFirstResponder {
 				}
 			}
 		} else {
-			Debug.logf(Debug.WARN, "SessionMaster got %d surprising logs from %s.", out.length, inst.name());
+			Debug.warn("SessionMaster got %d surprising logs from %s.", out.length, inst.name());
 		}
 		
 	}

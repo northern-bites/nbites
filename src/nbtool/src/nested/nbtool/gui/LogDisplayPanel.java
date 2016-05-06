@@ -73,10 +73,10 @@ public class LogDisplayPanel extends JPanel implements
 		if (isMain) {
 			ExtBounds eb = UserSettings.BOUNDS_MAP.get(MAIN_LOG_DISPLAY_KEY);
 			if (eb != null && eb.profile != null) {
-				Debug.infof("main LogDisplayPanel using profile %s", eb);
+				Debug.info("main LogDisplayPanel using profile %s", eb);
 				this.profile = eb.profile;
 			} else {
-				Debug.warnf("main LogDisplayPanel COULD NOT LOAD PROFILE");
+				Debug.warn("main LogDisplayPanel COULD NOT LOAD PROFILE");
 			}
 		}
 		
@@ -154,7 +154,7 @@ public class LogDisplayPanel extends JPanel implements
 	}
 	
 	protected void setContents(_Log l, ArrayList<_Log> also) {
-		Debug.log(Debug.INFO, "LDP.setContents() type: " + l.primaryType());
+		Debug.info( "LDP.setContents() type: " + l.primaryType());
 		//Class<? extends ViewParent>[] list = UtilityManager.instanceOfLTV().viewsForLog(l);
 		Class<? extends ViewParent>[] list = profile.viewsForLog(l);
 		tabs.removeAll();
@@ -162,7 +162,7 @@ public class LogDisplayPanel extends JPanel implements
 		this.current = l;
 		
 		if (this.current.bytes == null) {
-			Debug.logf(Debug.ERROR, "Could not load log data: %s", l.toString());
+			Debug.error( "Could not load log data: %s", l.toString());
 			ErrorView ev = new ErrorView();
 			ev._setLog(l);
 			tabs.addTab("error loading", ev);
@@ -255,7 +255,7 @@ public class LogDisplayPanel extends JPanel implements
 				if (current == this.log) {
 					finishedLoading(index, view);
 				} else {
-					Debug.log(Debug.WARN, "WARNING: LDP created new view thread before last finished!");
+					Debug.warn( "WARNING: LDP created new view thread before last finished!");
 				}
 			} else {
 				try {
@@ -266,22 +266,22 @@ public class LogDisplayPanel extends JPanel implements
 						view.alsoSelected(also);
 					
 				} catch (IllegalArgumentException e) {
-					Debug.log(Debug.ERROR, e.getMessage());
+					Debug.error( e.getMessage());
 					e.printStackTrace();
 				} catch (SecurityException e) {
-					Debug.log(Debug.ERROR, e.getMessage());
+					Debug.error( e.getMessage());
 					e.printStackTrace();
 				} catch (InstantiationException e) {
-					Debug.log(Debug.ERROR, e.getMessage());
+					Debug.error( e.getMessage());
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {
-					Debug.log(Debug.ERROR, e.getMessage());
+					Debug.error( e.getMessage());
 					e.printStackTrace();
 				} catch (InvocationTargetException e) {
-					Debug.log(Debug.ERROR, e.getMessage());
+					Debug.error( e.getMessage());
 					e.printStackTrace();
 				} catch (NoSuchMethodException e) {
-					Debug.log(Debug.ERROR, e.getMessage());
+					Debug.error( e.getMessage());
 					e.printStackTrace();
 				}
 				finally {

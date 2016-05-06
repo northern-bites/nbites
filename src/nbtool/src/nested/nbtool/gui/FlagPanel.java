@@ -64,19 +64,19 @@ public class FlagPanel extends JPanel implements ActionListener {
 		
 		ControlInstance first = ControlIO.getByIndex(0);
 		if (first == null) {
-			Debug.log(Debug.WARN, "FlagPanel clicked while no ControlInstance available");
+			Debug.warn( "FlagPanel clicked while no ControlInstance available");
 			this.setUnknown();
 			return;
 		}
 		
 		if (e.getSource() == jrb[0]) {
 			boolean success = first.tryAddCmnd(ControlIO.createCmndSetFlag(index, false));
-			Debug.logf(Debug.INFO, "FlagPanel[%s] CommandIO.tryAddSetFlag(%d, false) returned %B\n", flag_name, index, success);
+			Debug.info( "FlagPanel[%s] CommandIO.tryAddSetFlag(%d, false) returned %B\n", flag_name, index, success);
 		} else if (e.getSource() == jrb[1]) {
-			Debug.logf(Debug.ERROR, "ERROR: FlagPanel " + flag_name + " got action from MIDDLE switch!");
+			Debug.error( "ERROR: FlagPanel " + flag_name + " got action from MIDDLE switch!");
 		} else if (e.getSource() == jrb[2]) {
 			boolean success = first.tryAddCmnd(ControlIO.createCmndSetFlag(index, true));
-			Debug.logf(Debug.INFO, "FlagPanel[%s] CommandIO.tryAddSetFlag(%d, true) returned %B\n", flag_name, index, success);
+			Debug.info( "FlagPanel[%s] CommandIO.tryAddSetFlag(%d, true) returned %B\n", flag_name, index, success);
 		} else {}
 		
 		this.setUnknown();

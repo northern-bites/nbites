@@ -28,7 +28,7 @@ public class LogDropListener extends DropTargetAdapter {
 				dtde.rejectDrop();
 			}
 		} catch (Exception e) {
-			Debug.errorf("COULD NOT ACCEPT DROP %s", dtde);
+			Debug.error("COULD NOT ACCEPT DROP %s", dtde);
 			e.printStackTrace();
 			dtde.rejectDrop();
 		}

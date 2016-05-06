@@ -67,7 +67,7 @@ public class EdgeImage extends ImageParent {
 		try {
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
 			int n_edges = data.length / (4 * 4);
-			Debug.logf(Debug.INFO, "%d edges expected.", n_edges);
+			Debug.info( "%d edges expected.", n_edges);
 			
 			for (int i = 0; i < n_edges; ++i) {
 				int x = dis.readInt();
@@ -80,7 +80,7 @@ public class EdgeImage extends ImageParent {
 			}
 
 		} catch (Exception e) {
-			Debug.logf(Debug.ERROR, "Conversion from bytes to EdgeImage to BufferedImage failed.");
+			Debug.error( "Conversion from bytes to EdgeImage to BufferedImage failed.");
 			e.printStackTrace();
 			return null;
 		}

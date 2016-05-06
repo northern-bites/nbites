@@ -122,4 +122,22 @@ public class JsonArray extends ArrayList<JsonValue> implements JsonValue {
 		
 		return copy;
 	}
+
+	@Override
+	public boolean congruent(JsonValue other) {
+		if (other == null || other.type() != this.type())
+			return false;
+		
+		JsonArray array = other.asArray();
+		if (array.size() != this.size())
+			return false;
+		
+		for (int i = 0; i < this.size(); ++i) {
+			if (!this.get(i).congruent(array.get(i))) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
 }

@@ -584,7 +584,7 @@ public class DebugImageView extends ViewParent
                 lines.add(dis.readDouble()); // field coord ep1
             }
         } catch (Exception e) {
-            Debug.logf(Debug.ERROR, "Conversion to hough coord lines failed.");
+            Debug.error( "Conversion to hough coord lines failed.");
             e.printStackTrace();
         }
 
@@ -599,7 +599,7 @@ public class DebugImageView extends ViewParent
                 ccPoints.add(dis.readDouble()); // Y coodinrate
             }
         } catch (Exception e) {
-            Debug.logf(Debug.ERROR, "Conversion from bytes to center failed.");
+            Debug.error( "Conversion from bytes to center failed.");
             e.printStackTrace();
         }
 

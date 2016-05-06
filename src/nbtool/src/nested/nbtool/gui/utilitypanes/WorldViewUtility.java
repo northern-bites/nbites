@@ -94,11 +94,11 @@ public class WorldViewUtility extends UtilityParent {
 		@Override
 		public void acceptTeamBroadcast(NBitesTeamBroadcast tb) {
 			//use tb
-			Debug.printf("got from {%s:%s}", tb.robotName, tb.robotIp);
+			Debug.print("got from {%s:%s}", tb.robotName, tb.robotIp);
 			//Logger.printf("header: %s", tb.message.header);
-			Debug.printf("Team: %s, Player: %s",tb.dataTeamPacket.getTeamNumber(), tb.dataTeamPacket.getPlayerNumber());
+			Debug.print("Team: %s, Player: %s",tb.dataTeamPacket.getTeamNumber(), tb.dataTeamPacket.getPlayerNumber());
 			for (String s : tb.message.errors) {
-				Debug.printf("\t%s", s);
+				Debug.print("\t%s", s);
 			}
 			
 			if(runWorldview) {
@@ -118,7 +118,7 @@ public class WorldViewUtility extends UtilityParent {
 						updateTeamInfo(tb);
 						fieldDisplay.repaint();
 					} else {
-						Debug.warnf("WorldView got packet from correct team with OOB player: %d", 
+						Debug.warn("WorldView got packet from correct team with OOB player: %d", 
 								tb.dataTeamPacket.getPlayerNumber());
 					}
 				}
@@ -238,7 +238,7 @@ public class WorldViewUtility extends UtilityParent {
 					try {
 						teamNumber = Integer.parseInt(teamNumberInput.getText());
 						startWorldView.setText("Stop");
-						Debug.infof("Now listening to team %s", teamNumber);
+						Debug.info("Now listening to team %s", teamNumber);
 					} catch(NumberFormatException E) {
 						E.printStackTrace();
 					}
@@ -246,7 +246,7 @@ public class WorldViewUtility extends UtilityParent {
 			} else if(e.getActionCommand() == "Stop") {
 				runWorldview = false;
 				startWorldView.setText("Start WorldView");
-				Debug.infof("Stopped Listening to team %s", teamNumber);
+				Debug.info("Stopped Listening to team %s", teamNumber);
 				for(int i=0; i<robots.length; i++) {
 					robots[i] = null;
 					teamInfo[i].setText("Player "+(i+1)+": Inactive");

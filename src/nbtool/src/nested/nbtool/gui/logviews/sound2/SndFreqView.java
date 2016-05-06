@@ -56,7 +56,7 @@ public class SndFreqView extends ViewParent {
 			@Override
 			public String selectionString(int c, int f) {
 				String fmat = String.format("c%df%d: %f", c, f, magn[f]);
-				Debug.printf("%s", fmat);
+				Debug.print("%s", fmat);
 				return fmat;
 			}
 			

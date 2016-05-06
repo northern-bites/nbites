@@ -25,8 +25,8 @@ public class UtilityManager {
 	public static final ThreadStateUtility ThreadStateUtility = new ThreadStateUtility();
 	public static final ReplayUtility ReplayUtility = new ReplayUtility();
 			
-	public static final SyntheticImageUtility SyntheticImageUtility = new SyntheticImageUtility();
 	public static final CameraCalibrateUtility2 CameraCalibrateUtility2 = new CameraCalibrateUtility2();
+	public static final CameraSettingsUtility CameraSettingsUtility = new CameraSettingsUtility();
 	
 	
 	public static final WorldViewUtility WorldViewUtility = new WorldViewUtility();
@@ -34,6 +34,7 @@ public class UtilityManager {
 	
 	//Unused at the moment – comment out to re-enable.
 	//public static final MultiStreamUtility MultiStreamUtility = new MultiStreamUtility();
+//	public static final SyntheticImageUtility SyntheticImageUtility = new SyntheticImageUtility();
     
 	public static final SyntheticSndUtility SyntheticSndUtility = new SyntheticSndUtility();
 
@@ -58,7 +59,7 @@ public class UtilityManager {
 					e.printStackTrace();
 				}
 				if (val instanceof UtilityParent) {
-					Debug.infof("UtilityManager found field of class %s...", val.getClass().getName());
+					Debug.info("UtilityManager found field of class %s...", val.getClass().getName());
 					found.add((UtilityParent) val);
 				}
 			}

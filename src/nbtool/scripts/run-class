@@ -23,4 +23,4 @@ echo
 echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> build complete <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 echo
 
-java -ea -Xms200m -Xmx200m -cp .:jars/:../../build/nbtool $1
+java -ea -Xms200m -Xmx200m -cp .:jars/:../../build/nbtool "$@"

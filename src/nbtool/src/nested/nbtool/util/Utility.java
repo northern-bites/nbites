@@ -24,6 +24,12 @@ import nbtool.images.YUYV8888Image;
 
 public class Utility {
 	
+	public static class Pair<A,B> {
+		public A a;
+		public B b;
+		public Pair(A a, B b) {this.a = a; this.b = b;}
+	}
+	
 	public static StackTraceElement codeLocation(int i) {
 		StackTraceElement[] stack = (new Throwable()).getStackTrace();
 		return stack[i];
@@ -55,7 +61,7 @@ public class Utility {
 		} else if (encoding.equalsIgnoreCase("[Y8]")) {
 			ip = new Y8Image(width , height, log.bytes);
 		} else {
-			Debug.log(Debug.WARN, "Cannot use image with encoding:" + encoding);
+			Debug.warn( "Cannot use image with encoding:" + encoding);
 			return null;
 		}
 		
@@ -198,7 +204,7 @@ public class Utility {
 			return true;
 		}
 		if (old._olddesc_ == null) {
-			Debug.log(Debug.WARN, "cannot convert old log without string description.");
+			Debug.warn( "cannot convert old log without string description.");
 			return false;
 		}	//nothing to work with.
 				
@@ -209,25 +215,25 @@ public class Utility {
 			
 			String[] parts = a.split("=");
 			if (parts.length != 2){
-				Debug.warnf("conversion found invalid kvp");
+				Debug.warn("conversion found invalid kvp");
 				return false;	//Don't attempt to reconstruct malformed descriptions.
 			}
 			
 			String key = parts[0].trim();
 			if (key.isEmpty()) {
-				Debug.warnf("conversion found empty key");
+				Debug.warn("conversion found empty key");
 				return false;
 			}
 			
 			String value = parts[1].trim();
 			if (value.isEmpty()) {
-				Debug.warnf("conversion found empty value");
+				Debug.warn("conversion found empty value");
 				return false;
 			}
 			
 			if (map.containsKey(key)) {
 				//we never allowed duplicate keys
-				Debug.warnf("conversion found duplicate key");
+				Debug.warn("conversion found duplicate key");
 				return false;
 			}
 			

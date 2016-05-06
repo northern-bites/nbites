@@ -25,7 +25,7 @@ public class Debug {
 	public static final boolean colorAllowed = mayUseColor();
 	
 	public static enum LogLevel {
-		levelEVENT(0, "EVENT"),
+		levelEVENT(0, "----"),
 		levelINFO(1, "INFO"),
 		levelWARN(2, "WARN"),
 		levelERROR(3, "ERROR"),
@@ -68,7 +68,7 @@ public class Debug {
 	 * */
 	
 	private static final DebugSettings global =
-			new DebugSettings(true, true, true, null, "");
+			new DebugSettings(true, true, true, null, null);
 	
 	public static DebugSettings createSettings(boolean checks, boolean asserts,
 				boolean colors, LogLevel lev, String dp ) {
@@ -100,7 +100,7 @@ public class Debug {
 			return slevel == null ? level : slevel;
 		}
 		
-		public String format(LogLevel msgLev, String f, Object ... args) {
+		public String format(String location, LogLevel msgLev, String f, Object ... args) {
 			if (msgLev == null)
 				return null;
 			
@@ -115,32 +115,62 @@ public class Debug {
 				post = COLOR_RESET;
 			}
 			
+			String printLoc = debugPrefix;
+			if (printLoc == null) printLoc = location;
+			assert(printLoc != null);
+			
 			String formatInside = String.format(f, args);
 			String formatted = String.format("%s[%C][%s] %s\n%s",
 					pre, msgLev.name.charAt(0),
-					debugPrefix, formatInside, post);
+					printLoc, formatInside, post);
 			
 			return formatted;
 		}
 		
+		private void printIfNotNull(String s) {
+			if (s != null) System.out.print(s);
+		}
+		
 		public void printf(String f, Object ... args) {
-			System.out.print(format(ALWAYS, f, args));
+			internal(ALWAYS, f, args);
 		}
 		
 		public void event(String f, Object ... args) {
-			System.out.print(format(ALWAYS, f, args));
+			internal(EVENT, f, args);
 		}
 		
 		public void info(String f, Object ... args) {
-			System.out.print(format(ALWAYS, f, args));
+			internal(INFO, f, args);
 		}
 		
 		public void warn(String f, Object ... args) {
-			System.out.print(format(ALWAYS, f, args));
+			internal(WARN, f, args);
 		}
 		
 		public void error(String f, Object ... args) {
-			System.out.print(format(ALWAYS, f, args));
+			internal(ERROR, f, args);
+		}
+		
+		protected String instanceLocation() {
+			StackTraceElement rel = Utility.codeLocation(4);
+			return formatLocation(rel);
+		}
+		
+		protected String globalLocation() {
+			StackTraceElement rel = Utility.codeLocation(5);
+			return formatLocation(rel);
+		}
+		
+		private String formatLocation(StackTraceElement rel) {
+			String file = rel.getFileName();
+			file = file.substring(0, file.lastIndexOf('.'));
+			return String.format("%s:%d", file, rel.getLineNumber());
+		}
+		
+		protected void internal(LogLevel lev, String format, Object ...args) {
+			printIfNotNull(format(
+					(this == global) ? globalLocation() : instanceLocation()
+					, lev, format, args));
 		}
 	}
 	
@@ -150,43 +180,27 @@ public class Debug {
 		System.out.printf(f + "\n", args);
 	}
 	
-	public static void printf(String f, Object... args) {
+	public static void print(String f, Object... args) {
 		global.printf(f, args);
 	}
 	
-	public static void log(LogLevel l, String m) {
-		if (level.shows(l)) {
-			System.out.print(global.format(l, m));
-		}
+	public static void event(String f, Object ... args) {
+		global.event(f, args);
 	}
 	
-	public static void logf(LogLevel l, String f, Object ... args) {
-		if (level.shows(l)) {
-			System.out.print(global.format(l, f, args));
-		}
-	}
-	
-	public static void warnf(String f, Object ... args) {
+	public static void warn(String f, Object ... args) {
 		global.warn(f, args);
 	}
 	
-	public static void warn(String f) {
-		warnf(f);
-	}
-	
-	public static void infof(String f, Object ... args) {
+	public static void info(String f, Object ... args) {
 		global.info(f, args);
 	}
 	
-	public static void info(String f) {
-		info(f);
-	}
-	
-	public static void errorf(String f, Object ... args) {
+	public static void error(String f, Object ... args) {
 		global.error(f, args);
 	}
 	
-	public static void error(String f) {
-		error(f);
+	public static void lbreak() {
+		System.out.println("");
 	}
 }

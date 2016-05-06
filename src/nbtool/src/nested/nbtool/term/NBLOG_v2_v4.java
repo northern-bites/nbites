@@ -17,31 +17,31 @@ import nbtool.util.Utility;
 
 public class NBLOG_v2_v4 {
 	public static void main(String[] args) {
-		Debug.logf(Debug.INFO, "Attempting to convert %d files:\n\n", args.length);
+		Debug.info( "Attempting to convert %d files:\n\n", args.length);
 
 		for (String f : args) {
-			Debug.logf(Debug.INFO, "file %s\n", f);
+			Debug.info( "file %s\n", f);
 
 			File lf = new File(f);
 
 			if (!lf.exists() ) {
-				Debug.logf(Debug.INFO, "\t... file does not exist.\n");
+				Debug.info( "\t... file does not exist.\n");
 				continue;
 			}
 
 			if (lf.isDirectory()) {
-				Debug.logf(Debug.INFO, "\t... is directory.\n");
+				Debug.info( "\t... is directory.\n");
 				continue;
 			}
 
 			if (!f.endsWith(".nblog") ) {
-				Debug.logf(Debug.INFO, "\t... file isn't nblog.\n");
+				Debug.info( "\t... file isn't nblog.\n");
 				continue;
 			}
 
 			long tlen = lf.length();
 			if (tlen < 8 ) { //min size
-				Debug.logf(Debug.INFO, "\t... could not get reasonable value for file size.\n");
+				Debug.info( "\t... could not get reasonable value for file size.\n");
 				continue;
 			}
 
@@ -62,7 +62,7 @@ public class NBLOG_v2_v4 {
 				rofdis.close();
 
 				if (datalen != rest_of_file.length - 4) {
-					Debug.logf(Debug.INFO, "\t... reformatting...");
+					Debug.info( "\t... reformatting...");
 
 					_Log log = new _Log((new String(descb)).replace("\0", ""), rest_of_file);
 
@@ -74,9 +74,9 @@ public class NBLOG_v2_v4 {
 
 					dos.close();
 
-					Debug.logf(Debug.INFO, "done\n");
+					Debug.info( "done\n");
 				} else {
-					Debug.logf(Debug.INFO, "\tLOG [%s] ALREADY IN v4 FORMAT\n", f);
+					Debug.info( "\tLOG [%s] ALREADY IN v4 FORMAT\n", f);
 				}
 
 			} catch (Exception e) {

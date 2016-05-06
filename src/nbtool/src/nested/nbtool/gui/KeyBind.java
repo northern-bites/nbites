@@ -171,7 +171,7 @@ public class KeyBind {
 					}
 				});
 			} else {
-				Debug.warnf("KeyBind cannot bind %s to key %c, key already bound!",
+				Debug.warn("KeyBind cannot bind %s to key %c, key already bound!",
 						up.getClass().getSimpleName(), up.preferredMemnonic());
 			}
 		}
@@ -198,7 +198,7 @@ public class KeyBind {
 	}
 
 	static {
-		Debug.infof("Installing KeyBind post-processor...");
+		Debug.info("Installing KeyBind post-processor...");
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventPostProcessor(
 				new KeyEventPostProcessor() {
 

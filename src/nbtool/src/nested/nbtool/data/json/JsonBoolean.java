@@ -78,4 +78,12 @@ public class JsonBoolean implements JsonValue {
 	public JsonValue copy() {
 		return new JsonBoolean(value);
 	}
+
+	@Override
+	public boolean congruent(JsonValue other) {
+		if (other == null || other.type() != this.type())
+			return false;
+		
+		return other.asBoolean().value == this.value;
+	}
 }

@@ -69,7 +69,7 @@ public class CrossIO {
 
 					@Override
 					public void run() {
-						Debug.logf(Debug.WARN, "CrossIO attempting to destroy child processes.");
+						Debug.warn( "CrossIO attempting to destroy child processes.");
 						try {
 							
 							for (Process p : children) {
@@ -190,7 +190,7 @@ public class CrossIO {
 
 		@Override
 		public void run() {
-			Debug.logf(Debug.INFO, "CrossInstance %d starting up.", this.unique_id);
+			Debug.info( "CrossInstance %d starting up.", this.unique_id);
 			assert(socket != null && ifr != null);
 			
 			try {
@@ -238,7 +238,7 @@ public class CrossIO {
 						if (ping != 0)
 							throw new CommonIO.SequenceErrorException(0, ping);
 					} else {
-						Debug.logf(Debug.EVENT, "%s calling function %s", name(), call.function.name);
+						Debug.event( "%s calling function %s", name(), call.function.name);
 						dos.writeInt(1);
 						dos.flush();
 						
@@ -262,7 +262,7 @@ public class CrossIO {
 						
 						dos.writeInt(num_out);
 						
-						Debug.logf(Debug.EVENT, "%s finished function %s, ret=%d nout=%d", name(), call.function.name,
+						Debug.event( "%s finished function %s, ret=%d nout=%d", name(), call.function.name,
 								ret, num_out);
 						
 						GIOFirstResponder.generateReceived(this, call.listener, ret, outs);
@@ -272,11 +272,11 @@ public class CrossIO {
 				
 			} catch (Throwable t) {
 				if (t instanceof CommonIO.SequenceErrorException) {
-					Debug.logf(Debug.ERROR, "%s got bad sequence exception: %s", name(), t.toString());
+					Debug.error( "%s got bad sequence exception: %s", name(), t.toString());
 				}
 				t.printStackTrace();
 			} finally {
-				Debug.logf(Debug.INFO, "CrossInstance %d dieing.", this.unique_id);
+				Debug.info( "CrossInstance %d dieing.", this.unique_id);
 				finish();
 				
 				GIOFirstResponder.generateFinished(this, this.ifr);
@@ -388,7 +388,7 @@ public class CrossIO {
 			}
 			
 			timer.schedule(tt, 5000, 1000);
-			Debug.log(Debug.INFO, "CrossServer up.");
+			Debug.info( "CrossServer up.");
 
 			try {
 				
@@ -411,13 +411,13 @@ public class CrossIO {
 						t.start();
 						
 					} catch (Exception e) {
-						Debug.log(Debug.ERROR, "Exception in CrossServer while accepting connection.");
+						Debug.error( "Exception in CrossServer while accepting connection.");
 						e.printStackTrace();
 					}
 				}
 				
 			} catch (Throwable t) {
-				Debug.logf(Debug.ERROR, "CrossServer dieing because: %s", t.getMessage());
+				Debug.error( "CrossServer dieing because: %s", t.getMessage());
 				t.printStackTrace();
 			} finally {
 				if (server != null) {
@@ -442,7 +442,7 @@ public class CrossIO {
 
 		@Override
 		public void ioReceived(IOInstance inst, int ret, _Log... out) {
-			Debug.logf(Debug.ERROR, "%s tried to notify CrossServer of ioReceived!", inst.name());
+			Debug.error( "%s tried to notify CrossServer of ioReceived!", inst.name());
 			throw new Error("CrossServer got ioReceived call!");
 		}
 
@@ -455,11 +455,11 @@ public class CrossIO {
 	
 	public static void startCrossServer() {
 		if (serverThread != null) {
-			Debug.logf(Debug.ERROR, "CrossServer already running!");
+			Debug.error( "CrossServer already running!");
 			return;
 		}
 		
-		Debug.log(Debug.INFO, "starting nbtool-CrossServer...");
+		Debug.info( "starting nbtool-CrossServer...");
 		
 		serverThread = new Thread(new CrossServer(), "nbtool-CrossServer");
 		serverThread.setDaemon(true);

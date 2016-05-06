@@ -38,7 +38,6 @@ namespace nbl {
 
         struct static_test_adder {
             static_test_adder(const char * section, const char * name, TestBase * test) {
-                NBL_INFO("registering test %s", name);
                 add_test_to(section, test);
             }
         };

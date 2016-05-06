@@ -8,4 +8,4 @@ fi
 
 echo "using NBITES_DIR=" $NBITES_DIR
 cd $NBITES_DIR/src/nbtool/src/bhuman/_runfromhere_
-java -ea -Xms200m -Xmx200m -cp .:../../../jars/*:$NBITES_DIR/build/nbtool/ teamcomm.TeamCommunicationMonitor
+java -ea -Xms200m -Xmx200m -cp .:../../../jars/*:$NBITES_DIR/build/nbtool/ teamcomm.TeamCommunicationMonitor "$@"

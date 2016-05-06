@@ -38,7 +38,7 @@ public class ThreadStateUtility extends UtilityParent {
 			//Logger.log(Logger.INFO, " not updating thread pane...");
 					
 			if (this.isFocused()) {
-				Debug.log(Debug.INFO, "updating thread pane...");
+				Debug.info( "updating thread pane...");
 				Thread[] threads = new Thread[Thread.activeCount()];
 				Thread.enumerate(threads);
 				DefaultListModel<String> dlm = new DefaultListModel<String>();

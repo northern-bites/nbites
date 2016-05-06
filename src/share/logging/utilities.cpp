@@ -226,6 +226,7 @@ namespace nbl {
             NBL_ASSERT(test->name);
             init_all_tests();
 
+            NBL_INFO("registering test %s", test->name);
             ++test_count;
             (*all_tests)[section].push_back(std::shared_ptr<TestBase>(test));
         }

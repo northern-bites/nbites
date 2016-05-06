@@ -52,21 +52,21 @@ public class FileIO {
 		
 	public static boolean checkLogFolder(String log_folder) {
 		if(log_folder == null || log_folder.isEmpty()) {
-			Debug.logf(Debug.ERROR, "path string null or empty!\n");
+			Debug.error( "path string null or empty!\n");
 			return false;
 		}
 			
 		File f = new File(log_folder);
 		if (!f.exists()) {
-			Debug.logf(Debug.ERROR, "file does not exist! %s\n", log_folder);
+			Debug.error( "file does not exist! %s\n", log_folder);
 			return false;
 		}
 		if (!f.isDirectory()) {
-			Debug.logf(Debug.ERROR, "file is not a directory! %s\n", log_folder);
+			Debug.error( "file is not a directory! %s\n", log_folder);
 			return false;
 		}
 		if (!f.canRead() || !f.canWrite()) {
-			Debug.logf(Debug.ERROR, "permissions errors for file %s!\n", log_folder);
+			Debug.error( "permissions errors for file %s!\n", log_folder);
 			return false;
 		}
 		
@@ -88,7 +88,7 @@ public class FileIO {
 		_Log full = CommonIO.readLog(dis);
 		
 		if (dis.available() != 0) {
-			Debug.logf(Debug.WARN, "WARNING: log [%s] did not follow log format – %d bytes left, CORRUPTION LIKELY\n", logf.getCanonicalPath(),
+			Debug.warn( "WARNING: log [%s] did not follow log format – %d bytes left, CORRUPTION LIKELY\n", logf.getCanonicalPath(),
 					dis.available());
 			/*
 			int av = dis.available();
@@ -101,7 +101,7 @@ public class FileIO {
 		
 		//Can't check description on old logs – their tree hasn't been created yet.
 		if ((lg._olddesc_ == null) && !(lg.description().equals(full.description()))) {
-			Debug.logf(Debug.WARN, "WARNING: log description found to be different upon load:\n\t%s\n\t%s\n",
+			Debug.warn( "WARNING: log description found to be different upon load:\n\t%s\n\t%s\n",
 					lg.description(), full.description());
 		}
 		
@@ -156,7 +156,7 @@ public class FileIO {
 		
 		for (int i = 0; i < files.length; ++i) {
 			if (files[i].length() < CommonIO.MINIMUM_VALID_NBLOG_SIZE) {
-				Debug.warnf("FileIO.fetchLogs skipping too small file: %d [%s]",
+				Debug.warn("FileIO.fetchLogs skipping too small file: %d [%s]",
 						files[i].length(), files[i].getPath());
 				++rejected;
 				continue;
@@ -166,14 +166,14 @@ public class FileIO {
 			try {
 				desc = readDescriptionFromFile(files[i]);
 			} catch (IOException e) {
-				Debug.errorf("ERROR PARSING LOG AT PATH %s", files[i].getPath());
+				Debug.error("ERROR PARSING LOG AT PATH %s", files[i].getPath());
 				e.printStackTrace();
 				++rejected;
 				continue;
 			}
 			
 			if (desc == null) {
-				Debug.errorf("Log description null after read! file %s", files[i].getPath());
+				Debug.error("Log description null after read! file %s", files[i].getPath());
 				++rejected;
 				continue;
 			}
@@ -193,9 +193,9 @@ public class FileIO {
 				}
 				
 				if (Utility.v6Convert(nlog)) {
-					Debug.warnf("log %s was converted and will be displayed.  Filesystem not changed.", nlog.name);
+					Debug.warn("log %s was converted and will be displayed.  Filesystem not changed.", nlog.name);
 				} else {
-					Debug.warnf("log %s could not be converted!  It will not be displayed.", nlog.name);
+					Debug.warn("log %s could not be converted!  It will not be displayed.", nlog.name);
 					++rejected;
 					continue;
 				}
@@ -210,7 +210,7 @@ public class FileIO {
 			logs.add(nlog);
 		}
 		
-		Debug.logf(Debug.INFO, "FileIO: tried to read in %d logs, accepted %d, rejected %d at path %s",
+		Debug.info( "FileIO: tried to read in %d logs, accepted %d, rejected %d at path %s",
 				files.length, logs.size(), rejected, location);
 		
 		return logs.toArray(new _Log[0]);
@@ -270,10 +270,10 @@ public class FileIO {
 						lg.name = lg.name + ".nblog";
 					try {		 
 						writeLogToPath(lg, this.path + File.separator + lg.name);
-						Debug.log(Debug.EVENT, "FileIO: thread wrote log: " + lg.name);
+						Debug.event("FileIO: thread wrote log: " + lg.name);
 					} catch (IOException e) {
-						Debug.log(Debug.ERROR, "Error writing file to: " + this.path);
-						Debug.log(Debug.ERROR, "msg: " + e.getMessage());
+						Debug.error( "Error writing file to: " + this.path);
+						Debug.error( "msg: " + e.getMessage());
 						e.printStackTrace();
 					}
 					
@@ -285,7 +285,7 @@ public class FileIO {
 					}
 			}
 			
-			Debug.logf(Debug.INFO, "%s finishing.", this.name());			
+			Debug.info( "%s finishing.", this.name());			
 			this.finish();
 			GIOFirstResponder.generateFinished(this, ifr);
 			GFileIOStatus.generate(this, false);

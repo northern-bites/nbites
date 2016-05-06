@@ -63,7 +63,7 @@ public class SessionView extends JPanel implements ActionListener {
 					String fname = path + File.separatorChar + l.name ;
 					
 					if (l.bytes == null) {
-						Debug.log(Debug.INFO, "... loading bytes for save op.");
+						Debug.info( "... loading bytes for save op.");
 						try {
 							FileIO.loadLog(l, session.directoryFrom);
 						} catch (IOException e1) {
@@ -72,7 +72,7 @@ public class SessionView extends JPanel implements ActionListener {
 					}
 					
 					try {
-						Debug.log(Debug.INFO, "saving log to " + fname);
+						Debug.info( "saving log to " + fname);
 						FileIO.writeLogToPath(l, fname);
 					} catch (IOException e1) {
 						e1.printStackTrace();
@@ -92,7 +92,7 @@ public class SessionView extends JPanel implements ActionListener {
 					accepted.add(lg);
 					
 					if (lg.bytes == null) {
-						Debug.log(Debug.INFO, "... loading bytes for pack op.");
+						Debug.info( "... loading bytes for pack op.");
 						try {
 							FileIO.loadLog(lg, session.directoryFrom);
 						} catch (IOException e1) {

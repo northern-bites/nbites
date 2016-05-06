@@ -65,7 +65,7 @@ public class ReplayUtility extends UtilityParent {
 				this.len = ti - fi + 1;
 				this.index = 0;
 				
-				Debug.infof("Loop(%d, %d)", first, len);
+				Debug.info("Loop(%d, %d)", first, len);
 			}
 			
 			Session session;
@@ -135,7 +135,7 @@ public class ReplayUtility extends UtilityParent {
 	    		return;
 	    	}
 	    	
-	    	Debug.infof("starting replay...");
+	    	Debug.info("starting replay...");
 	    	if (fromPlaced == null || toPlaced == null ) {
 	    		JOptionPane.showMessageDialog(this, "set both logs");
 	    		return;
@@ -184,7 +184,7 @@ public class ReplayUtility extends UtilityParent {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					_Log l = lp.getNext();
-					Debug.printf("loop chose: %s", l);
+					Debug.print("loop chose: %s", l);
 					
 					if (l == null) {
 						caller.stop();

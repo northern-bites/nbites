@@ -1,10 +1,10 @@
 package nbtool.term;
 
-import static nbtool.util.Debug.INFO;
-
-import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -16,12 +16,15 @@ import nbtool.data.ToolStats;
 import nbtool.gui.Display;
 import nbtool.io.CrossIO;
 import nbtool.util.Center;
+import nbtool.util.ClassFinder;
 import nbtool.util.Debug;
 import nbtool.util.ToolSettings;
 import nbtool.util.UserSettings;
 import nbtool.util.test.Tests;
 
 public class NBTool_v8 {
+	
+	private static boolean run_tests = false;
 	
 	public static void main(String[] args) {
 		
@@ -30,28 +33,36 @@ public class NBTool_v8 {
 			System.out.println("if you want to disable this, you'll have to edit the source code.");
 			return;
 		}
+		
+		if (!check_NBITES_DIR()) {
+			System.out.println("nbtool requires valid NBITES_DIR environment variable");
+			System.out.println("ensure variable exists, and path is readable/writable");
+			return;
+		}
 						
 		System.out.printf("\n\tnbtool version %d.%d\n\tdevelopment tool for Bowdoin's Northern Bites team\n\n",
 				ToolSettings.VERSION, ToolSettings.MINOR_VERSION);
 		
-		assert(Tests.runAll());
+		parse_args(args);
+		Debug.lbreak();
 		
-//		System.out.println("Unit tests: ... \n");
-//		if (!UnitsCollection.run(NBConstants.NBITES_DIR + "/build/nbtool")) {
-//			System.out.println("unit tests failed.");
-//			return;
-//		} else {
-//			System.out.println("\nunit tests succeeded.");
-//		}
+		if (run_tests) {
+			Tests.findAllTests();
+			assert(Tests.runAll());
+		}
+		
+		Debug.print("Finding required static initialization methods...");
+		ClassFinder.callAllInstancesOfStaticMethod(ToolSettings.staticRequiredStartMethodName);
+		Debug.print("Static init done.");
 				
-		Debug.infof("Generating Center instance..."); Center.startCenter();
+		Debug.info("Generating Center instance..."); Center.startCenter();
 		System.out.println("Generating ToolStats instance: " + ToolStats.INST.toString());
 		System.out.println("Generating SessionMaster instance: " + SessionMaster.get().toString());
 		System.out.println("Generating CrossServer instance ...");
 		CrossIO.startCrossServer();
 		
 		try {
-			Debug.log(Debug.INFO, "loading preferences...");
+			Debug.info("loading preferences...");
 			UserSettings.loadPreferences();
 			Debug.level = UserSettings.logLevel;
 		} catch (ClassNotFoundException e) {
@@ -66,7 +77,7 @@ public class NBTool_v8 {
 
 			@Override
 			public void run() {
-				Debug.logf(INFO, "Finding best LookAndFeel...");
+				Debug.info( "Finding best LookAndFeel...");
 				LookAndFeelInfo info = UIManager.getInstalledLookAndFeels()[0];
 				
 				for (LookAndFeelInfo installed : UIManager.getInstalledLookAndFeels()) {
@@ -80,7 +91,7 @@ public class NBTool_v8 {
 					}
 				}
 				
-				Debug.logf(INFO, "Using LookAndFeel %s", info.getClassName());
+				Debug.info( "Using LookAndFeel %s", info.getClassName());
 				try {
 					UIManager.setLookAndFeel(info.getClassName());
 				} catch (ClassNotFoundException e) {
@@ -97,7 +108,7 @@ public class NBTool_v8 {
 					return;
 				}
 				
-				Debug.logf(INFO, "Creating Display instance...");
+				Debug.info( "Creating Display instance...");
 				@SuppressWarnings("unused")
 				final Display disp = new Display();
 			}
@@ -106,5 +117,22 @@ public class NBTool_v8 {
 
 	}
 	
+	private static void parse_args(String[] args) {
+		for (int i = 0; i < args.length; ++i) {
+			if (args[i].equalsIgnoreCase("test")) {
+				Debug.plain("  %d: %s ----> %s", 
+						i, args[i], "running tests");
+				run_tests = true;
+			}
+		}
+	}
+	
+	private static boolean check_NBITES_DIR() {
+		String sp = System.getenv("NBITES_DIR");
+		if (sp == null)
+			return false;
+		Path pathed = FileSystems.getDefault().getPath(sp);
+		return Files.isReadable(pathed) && Files.isWritable(pathed) && Files.isDirectory(pathed);
+	}
 	
 }

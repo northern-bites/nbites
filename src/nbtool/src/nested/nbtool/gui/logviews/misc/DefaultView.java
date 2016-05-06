@@ -130,7 +130,7 @@ public class DefaultView extends ViewParent implements ActionListener {
 				JOptionPane.showMessageDialog(null, "log checksum did not match, expected "
 						+ recv_checksum + " but calculated " + checksum + "."); */
 				
-				Debug.logf(Debug.WARN, "\n\nWARNING: log checksum DID NOT match!\n\texpected %d\n\tgot %d\n",
+				Debug.warn( "\n\nWARNING: log checksum DID NOT match!\n\texpected %d\n\tgot %d\n",
 						recv_checksum, checksum);
 			}
 		}
@@ -169,14 +169,14 @@ public class DefaultView extends ViewParent implements ActionListener {
 			try {
 				SExpr s = SExpr.deserializeFrom(newdesc);
 				if (s == null || s.count() < 1) {
-					Debug.log(Debug.INFO, "Cannot use new description: " + newdesc);
+					Debug.info( "Cannot use new description: " + newdesc);
 					descArea.setText(log.description());
 				} else {
 					log.setTree(s);
 				}
 				
 			} catch(Exception ex) {
-				Debug.log(Debug.INFO, "Cannot use new description: " + newdesc);
+				Debug.info( "Cannot use new description: " + newdesc);
 				descArea.setText(log.description());
 			}
 		} else if (e.getSource() == saveButton) {
@@ -185,7 +185,7 @@ public class DefaultView extends ViewParent implements ActionListener {
 			if (rVal == JFileChooser.APPROVE_OPTION) {
 				File f = FileIO.fileChooser.getSelectedFile();
 				if (f.isDirectory()) {
-					Debug.log(Debug.INFO, "Cannot overwrite directory with log.");
+					Debug.info( "Cannot overwrite directory with log.");
 					return;
 				}
 				
@@ -193,7 +193,7 @@ public class DefaultView extends ViewParent implements ActionListener {
 				if (!aPath.endsWith(".nblog"))
 					aPath = aPath + ".nblog";
 				
-				Debug.log(Debug.INFO, "Writing log to: " + aPath);
+				Debug.info( "Writing log to: " + aPath);
 				
 				try {
 					FileIO.writeLogToPath(log, aPath);
@@ -207,9 +207,9 @@ public class DefaultView extends ViewParent implements ActionListener {
 	
 	@Override
 	public void alsoSelected(ArrayList<_Log> also) {
-		Debug.log(Debug.INFO, "DefaultView sees also selected:");
+		Debug.info( "DefaultView sees also selected:");
 		for (_Log a: also) {
-			Debug.logf(Debug.INFO, "\t%s", a.toString());
+			Debug.info( "\t%s", a.toString());
 		}
 	}
 }

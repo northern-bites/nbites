@@ -78,7 +78,7 @@ public class CrossPanel extends JPanel implements Events.CrossStatus, IOFirstRes
 				
 				if (index < 0 || index >= recognized.size())
 					return;
-				Debug.log(Debug.INFO, "NBCrossPane instance selected.");
+				Debug.info( "NBCrossPane instance selected.");
 				
 				CrossInstance ci = recognized.get(index);
 				assert(ci != null);
@@ -103,7 +103,7 @@ public class CrossPanel extends JPanel implements Events.CrossStatus, IOFirstRes
 				
 				if (index < 0 || index >= output.size())
 					return;
-				Debug.log(Debug.INFO, "NBCrossPane output selected.");
+				Debug.info( "NBCrossPane output selected.");
 				
 				_Log sel = output.get(index);
 				Events.GLogSelected.generate(this, sel, new ArrayList<_Log>());
@@ -127,7 +127,7 @@ public class CrossPanel extends JPanel implements Events.CrossStatus, IOFirstRes
     }
     
     private void clearOutButtonActionPerformed(java.awt.event.ActionEvent evt) {  
-    	Debug.log(Debug.INFO, "NBCrossPane clear button.");
+    	Debug.info( "NBCrossPane clear button.");
     	output.clear();
     	outModel.update();
     }   
@@ -141,7 +141,7 @@ public class CrossPanel extends JPanel implements Events.CrossStatus, IOFirstRes
     		return;
     	}
     	
-    	Debug.log(Debug.INFO, "NBCrossPane call button.");
+    	Debug.info( "NBCrossPane call button.");
     	
     	CrossInstance ci = recognized.get(inst_i);
     	CrossFunc cf = (CrossFunc) functionBox.getSelectedItem();
@@ -173,7 +173,7 @@ public class CrossPanel extends JPanel implements Events.CrossStatus, IOFirstRes
 				try {
 					FileIO.loadLog(sel, ses.directoryFrom);
 				} catch (IOException e1) {
-					Debug.logf(Debug.ERROR, "Could not load log data!");
+					Debug.error( "Could not load log data!");
 					e1.printStackTrace();
 					
 					return;
@@ -181,7 +181,7 @@ public class CrossPanel extends JPanel implements Events.CrossStatus, IOFirstRes
 				Events.GLogLoaded.generate(this, sel);
 			}
 			
-			Debug.logf(Debug.INFO, "NBCrossPane argument: %s", sel.description());
+			Debug.info( "NBCrossPane argument: %s", sel.description());
 			args[i] = sel;
     	}
     	
@@ -219,7 +219,7 @@ public class CrossPanel extends JPanel implements Events.CrossStatus, IOFirstRes
 	@Override
 	public void ioReceived(IOInstance inst, int ret, _Log... out) {
 		for (_Log l : out) {
-			Debug.logf(Debug.INFO, "NBCrossPane function returned: %s", l.description());
+			Debug.info( "NBCrossPane function returned: %s", l.description());
 			assert(l != null);
 			output.add(l);
 			outModel.update();

@@ -11,6 +11,10 @@ public class JsonNumber extends Number implements JsonValue {
 		this.representation = Integer.toString(val);
 	}
 	
+	public JsonNumber(long val) {
+		this.representation = Long.toString(val);
+	}
+	
 	public JsonNumber(double val) {
 		this.representation = Double.toString(val);
 	}
@@ -74,6 +78,11 @@ public class JsonNumber extends Number implements JsonValue {
 	public String print() {
 		return this.serialize();
 	}
+	
+	@Override
+	public String toString() {
+		return "JsonNumber(" + representation + ")";
+	}
 
 	@Override
 	public String print(int indent) {
@@ -132,5 +141,13 @@ public class JsonNumber extends Number implements JsonValue {
 	@Override
 	public JsonValue copy() {
 		return new JsonNumber(representation);
+	}
+
+	@Override
+	public boolean congruent(JsonValue other) {
+		if (other == null || other.type() != this.type()) 
+			return false;
+		
+		return other.asNumber().representation.equalsIgnoreCase(this.representation);
 	}
 }

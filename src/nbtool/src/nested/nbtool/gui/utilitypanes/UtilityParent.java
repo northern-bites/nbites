@@ -26,14 +26,14 @@ public abstract class UtilityParent {
 			String key = preferenceKey();
 			ExtBounds bounds = UserSettings.BOUNDS_MAP.get(key);
 			if (bounds != null) {
-				Debug.infof("using %s for %s", bounds, preferenceKey());
+				Debug.info("using %s for %s", bounds, preferenceKey());
 				
 				display.setBounds(bounds.bounds);
 			}
 		} 
 		
 		previouslySupplied = display;
-		/* force standard dco behavior... */
+		/* force standard close behavior... */
 		display.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		return display;
 	}

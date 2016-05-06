@@ -35,4 +35,20 @@ public abstract class TestBase {
 			super(msg);
 		}
 	}
+	
+	public static void _NBL_ADD_TESTS_() {
+		Tests.add(new TestBase("resourceAtClass"){
+
+			@Override
+			public boolean testBody() throws Exception {
+				InputStream is = TestBase.resourceAtClass(this, "resourceAtClass-testFile");
+				byte first = (byte) is.read();
+				
+				assert(first == 'T');
+				
+				return true;
+			}
+			
+		});
+	}
 }

@@ -137,7 +137,7 @@ public class ControlIO {
 					!cmnd.tree().get(0).isAtom() ||
 					!cmnd.tree().get(1).isAtom() ||
 					!cmnd.tree().get(0).value().equals(_Log.COMMAND_FIRST_ATOM_S)) {
-				Debug.logf(Debug.ERROR, "invalid format for command log: %s", cmnd.toString());
+				Debug.error( "invalid format for command log: %s", cmnd.toString());
 				return false;
 			}
 			
@@ -156,7 +156,7 @@ public class ControlIO {
 					!cmnd.tree().get(0).isAtom() ||
 					!cmnd.tree().get(1).isAtom() ||
 					!cmnd.tree().get(0).value().equals(_Log.COMMAND_FIRST_ATOM_S)) {
-				Debug.logf(Debug.ERROR, "invalid format for command log: %s", cmnd.toString());
+				Debug.error( "invalid format for command log: %s", cmnd.toString());
 				return false;
 			}
 			
@@ -179,7 +179,7 @@ public class ControlIO {
 
 			try {
 				//Setup Socket
-				Debug.logf(Debug.INFO, "%s starting.", name());
+				Debug.info( "%s starting.", name());
 				this.socket = CommonIO.setupNetSocket(host, port);
 
 				//Initialize
@@ -213,7 +213,7 @@ public class ControlIO {
 					}
 					
 					if (c != null) {
-						Debug.log(Debug.INFO, name() + ": sending command: " + c.log.description());
+						Debug.info( name() + ": sending command: " + c.log.description());
 						out.writeInt(1);
 						out.flush();
 						
@@ -225,7 +225,7 @@ public class ControlIO {
 						
 						int ret = in.readInt();
 						int nout = in.readInt();
-						Debug.logf(Debug.INFO, "%s: [%s] got ret [%d](and %d logs back)\n", name(), c.log.description(), ret, nout);
+						Debug.info( "%s: [%s] got ret [%d](and %d logs back)\n", name(), c.log.description(), ret, nout);
 
 						_Log[] outa = new _Log[nout];
 						for (int i = 0; i < nout; ++i) {
@@ -249,15 +249,15 @@ public class ControlIO {
 
 			} catch (Throwable t) {
 				if (t instanceof SequenceErrorException) {
-					Debug.logf(Debug.ERROR, "SequenceError: %s", ((SequenceErrorException) t).toString());
+					Debug.error( "SequenceError: %s", ((SequenceErrorException) t).toString());
 				} else {
-					Debug.logf(Debug.WARN, "%s got exception: %s:%s", this.name(),
+					Debug.warn( "%s got exception: %s:%s", this.name(),
 							t.getClass().getSimpleName(), t.getMessage());
 				}
 
 				t.printStackTrace();
 			} finally {
-				Debug.logf(Debug.INFO, "%s cleaning up...", name());
+				Debug.info( "%s cleaning up...", name());
 
 				this.finish();
 

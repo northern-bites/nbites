@@ -39,7 +39,7 @@ public class ViewProfile {
 		assert(name != null && !name.isEmpty());
 		
 		if (name.equalsIgnoreCase(DEFAULT_PROFILE_NAME)) {
-			Debug.errorf("cannot overwrite default profile with {%s}", name);
+			Debug.error("cannot overwrite default profile with {%s}", name);
 			return null;
 		}
 		
@@ -101,7 +101,7 @@ public class ViewProfile {
 		
 		views.addAll(Arrays.asList(this.selected(ToolSettings.DEFAULT_S)));
 		
-		Debug.infof( "LogToViewUtility found %d views for log of type %s.", views.size(), ptype);
+		Debug.info("LogToViewUtility found %d views for log of type %s.", views.size(), ptype);
 		
 		return views.toArray(new Class[views.size()]);		
 	}
@@ -173,7 +173,7 @@ public class ViewProfile {
 			try {
 				c = (Class<? extends ViewParent>) Class.forName(s.get(i).value());
 			} catch (Exception e) {
-				Debug.log(Debug.ERROR, "_____ PREVIOUSLY LOADED CLASS COULD NOT BE FOUND! _____");
+				Debug.error( "_____ PREVIOUSLY LOADED CLASS COULD NOT BE FOUND! _____");
 				e.printStackTrace();
 			}
 			

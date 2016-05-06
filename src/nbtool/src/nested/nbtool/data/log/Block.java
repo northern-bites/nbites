@@ -32,6 +32,17 @@ public class Block {
 	
 	public Block() { }
 	
+	public JsonObject getFullDictionary() {
+		JsonObject obj = dict.copy().asObject();
+		obj.put(SharedConstants.LOG_BLOCK_TYPE(), type);
+		obj.put(SharedConstants.LOG_BLOCK_WHERE_FROM(), whereFrom);
+		obj.put(SharedConstants.LOG_BLOCK_IMAGE_INDEX(), imageIndex);
+		obj.put(SharedConstants.LOG_BLOCK_WHEN_MADE(), createdWhen);
+		obj.put(SharedConstants.LOG_BLOCK_NUM_BYTES(), data == null ? 0 : data.length);
+		
+		return obj;
+	}
+	
 	public Log parseAsLog() {
 		parseTypeCheck(SharedConstants.LogType_DEFAULT());
 		return Log.parseFrom(data);

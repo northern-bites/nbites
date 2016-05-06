@@ -335,7 +335,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
         lines = new Vector<Double>();
         byte[] lineBytes = out[6].bytes;
         int numLines = lineBytes.length / (9 * 8);
-        Debug.logf(Debug.INFO, "%d field lines expected.", numLines);
+        Debug.info( "%d field lines expected.", numLines);
         try {
             DataInputStream dis = new DataInputStream(new ByteArrayInputStream(lineBytes));
             for (int i = 0; i < numLines; ++i) {
@@ -351,14 +351,14 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 lines.add(dis.readDouble()); // field coord ep1
             }
         } catch (Exception e) {
-            Debug.logf(Debug.ERROR, "Conversion from bytes to hough coord lines in LineView failed.");
+            Debug.error( "Conversion from bytes to hough coord lines in LineView failed.");
             e.printStackTrace();
         }
 
         ccPoints = new Vector<Double>();
         byte[] pointBytes = out[8].bytes;
         int numPoints = pointBytes.length / (2 * 8);
-        Debug.logf(Debug.INFO, "%d center circle potential centers expected.", numPoints - 1);
+        Debug.info( "%d center circle potential centers expected.", numPoints - 1);
         try {
             DataInputStream dis = new DataInputStream(new ByteArrayInputStream(pointBytes));
             for (int i = 0; i < numPoints; i ++) {
@@ -366,7 +366,7 @@ public class LineView extends ViewParent implements IOFirstResponder {
                 ccPoints.add(dis.readDouble()); // Y coodinrate
             }
         } catch (Exception e) {
-            Debug.logf(Debug.ERROR, "Conversion from bytes to center circ points in LineView failed.");
+            Debug.error( "Conversion from bytes to center circ points in LineView failed.");
             e.printStackTrace();
         }
     }

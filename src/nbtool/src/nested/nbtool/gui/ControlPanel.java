@@ -135,7 +135,7 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 				case 4: SessionMaster.saveMod = 2; break;
 				case 5: SessionMaster.saveMod = 1; break;
 				default:
-					Debug.log(Debug.ERROR, "bad slider value in ControlPanel! " + val);
+					Debug.error( "bad slider value in ControlPanel! " + val);
 				}
 			}
 		});
@@ -163,7 +163,7 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 				case 4: SessionMaster.keepMod = 2; break;
 				case 5: SessionMaster.keepMod = 1; break;
 				default:
-					Debug.log(Debug.ERROR, "bad slider value in ControlPanel! " + val);
+					Debug.error( "bad slider value in ControlPanel! " + val);
 				}
 			}
 		});
@@ -197,13 +197,13 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 			//Not idle, try to latestart
 			String dpath = (String) dirBox.getSelectedItem();
 			if (dpath == null || dpath.trim().isEmpty()) {
-				Debug.warnf("Cannot late start FileInstance with path: %s", dpath);
+				Debug.warn("Cannot late start FileInstance with path: %s", dpath);
 				return;
 			}
 			
 			String absolute = Utility.localizePath(dpath.trim()) + File.separator;
 			if (FileIO.checkLogFolder(absolute)) {
-				Debug.warnf("ControlPanel trying to late start a FileInstance...");
+				Debug.warn("ControlPanel trying to late start a FileInstance...");
 				SessionMaster.get().lateStartFileWriting(absolute);
 			} else {
 				int ret = JOptionPane.showConfirmDialog(this,
@@ -218,12 +218,12 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 						pathCreator.setReadable(true);
 						pathCreator.setWritable(true);
 					} catch (Exception e) {
-						Debug.logf(Debug.ERROR, "could not make full path: %s", absolute);
+						Debug.error( "could not make full path: %s", absolute);
 						return;
 					}
 					
 					if (!FileIO.checkLogFolder(absolute)) {
-						Debug.logf(Debug.ERROR, "could not verify path: %s", absolute);
+						Debug.error( "could not verify path: %s", absolute);
 						return;
 					}
 					
@@ -235,7 +235,7 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 		} else {
 			writeSlider.setEnabled(false);
 			if (!SessionMaster.get().isIdle()) {
-				Debug.warnf("ControlPanel trying to early stop a FileInstance...");
+				Debug.warn("ControlPanel trying to early stop a FileInstance...");
 				SessionMaster.get().earlyStopFileWriting();
 			}
 		}
@@ -279,25 +279,25 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 
 	private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {                                           
 		if (connectButton.getText().equals("connect")) {
-			Debug.log(Debug.INFO, "ControlPanel: connect action.");
+			Debug.info( "ControlPanel: connect action.");
 
 			String filepath = null;
 			String address = ((String) addrBox.getSelectedItem()).trim();
 
 			if (address == null || address.isEmpty()) {
-				Debug.log(Debug.INFO, "ControlPanel: cannot use address: " + address);
+				Debug.info( "ControlPanel: cannot use address: " + address);
 				JOptionPane.showMessageDialog(this, String.format("bad address: %s", address));
 				return;
 			} else {
 				Vector<String> addrs =  updateList(UserSettings.addresses, address);
 				addrBox.setModel(new DefaultComboBoxModel<String>(addrs));
 				addrBox.setSelectedIndex(addrs.indexOf(address));
-				Debug.log(Debug.INFO, "ControlPanel: using address " + address);
+				Debug.info( "ControlPanel: using address " + address);
 			}
 
 			String dpath = (String) dirBox.getSelectedItem();
 			if (!writeBox.isSelected() || dpath == null || dpath.trim().isEmpty()) {
-				Debug.log(Debug.INFO, "ControlPanel: not using file writer.");
+				Debug.info( "ControlPanel: not using file writer.");
 			} else {
 				String absolute = Utility.localizePath(dpath.trim()) + File.separator;
 				
@@ -315,12 +315,12 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 							pathCreator.setReadable(true);
 							pathCreator.setWritable(true);
 						} catch (Exception e) {
-							Debug.logf(Debug.ERROR, "could not make full path: %s", absolute);
+							Debug.error( "could not make full path: %s", absolute);
 							return;
 						}
 						
 						if (!FileIO.checkLogFolder(absolute)) {
-							Debug.logf(Debug.ERROR, "could not verify path: %s", absolute);
+							Debug.error( "could not verify path: %s", absolute);
 							return;
 						}
 						
@@ -333,14 +333,14 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 				Vector<String> pathes = updateList(UserSettings.filepaths, dpath);
 				dirBox.setModel(new DefaultComboBoxModel<String>(pathes));
 				dirBox.setSelectedIndex(pathes.indexOf(dpath));
-				Debug.log(Debug.INFO, "ControlPanel: using directory " + absolute);
+				Debug.info( "ControlPanel: using directory " + absolute);
 				filepath = absolute;
 			}
 
 			SessionMaster.get().streamSession(address, filepath);
 
 		} else {
-			Debug.log(Debug.INFO, "ControlPanel: stop action.");
+			Debug.info( "ControlPanel: stop action.");
 			if (!SessionMaster.get().isIdle()) {
 				SessionMaster.get().stopWorkingSession();
 			}
@@ -352,7 +352,7 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 		if (inst == null)
 			return;
 
-		Debug.log(Debug.INFO, "ControlPane: sending test cmnd");
+		Debug.info( "ControlPane: sending test cmnd");
 		inst.tryAddCmnd(ControlIO.createCmndTest());
 	}       
 
@@ -361,7 +361,7 @@ public class ControlPanel extends JPanel implements Events.LogsFound, Events.Log
 		if (inst == null)
 			return;
 
-		Debug.log(Debug.INFO, "ControlPane: sending exit cmnd");
+		Debug.info( "ControlPane: sending exit cmnd");
 		inst.tryAddCmnd(ControlIO.createCmndExit());
 	}        
 

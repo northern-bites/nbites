@@ -6,8 +6,12 @@ import java.util.Map.Entry;
 
 import nbtool.data.json.Json.JsonValue;
 import nbtool.data.json.Json.JsonValueType;
+import nbtool.util.Debug;
+import nbtool.util.Debug.DebugSettings;
 
 public class JsonObject extends LinkedHashMap<JsonString, JsonValue> implements JsonValue {
+	
+	private static final DebugSettings debug = Debug.createSettings(true, true, true, Debug.INFO, null);
 
 	@Override
 	public JsonValueType type() {
@@ -16,6 +20,23 @@ public class JsonObject extends LinkedHashMap<JsonString, JsonValue> implements 
 	
 	public JsonValue put(String key, JsonValue value) {
 		return this.put(new JsonString(key), value);
+	}
+	
+	public JsonValue put(String key, String value) {
+		return this.put(new JsonString(key), new JsonString(value));
+	}
+	
+	public JsonValue put(String key, int value) {
+		return this.put(new JsonString(key), new JsonNumber(value));
+	}
+	
+	public JsonValue put(String key, long value) {
+//		debug.info("{%s, %s}", key, new JsonNumber(value).toString());
+		return this.put(new JsonString(key), new JsonNumber(value));
+	}
+	
+	public JsonValue put(String key, double value) {
+		return this.put(new JsonString(key), new JsonNumber(value));
 	}
 	
 	public JsonValue get(String key) {
@@ -49,6 +70,7 @@ public class JsonObject extends LinkedHashMap<JsonString, JsonValue> implements 
 		
 		while(it.hasNext()) {
 			Entry<JsonString, JsonValue> entry = it.next();
+			debug.event("Entry: %s, %s", entry.getKey().toString(), entry.getValue().toString());
 			builder.append(entry.getKey().serialize());
 			builder.append(JsonParser.TokenType.OBJECT_DIVIDER.CHARACTER);
 			builder.append(entry.getValue().serialize());
@@ -133,5 +155,27 @@ public class JsonObject extends LinkedHashMap<JsonString, JsonValue> implements 
 		}
 		
 		return copy;
+	}
+
+	@Override
+	public boolean congruent(JsonValue other) {
+		if (other == null || other.type() != this.type()) {
+			return false;
+		}
+		
+		JsonObject obj = other.asObject();
+		if (obj.size() != this.size())
+			return false;
+		
+		for (Entry<JsonString, JsonValue> entry : this.entrySet()) {
+			if (obj.containsKey(entry.getKey())) {
+				if (!obj.get(entry.getKey()).congruent(entry.getValue()))
+					return false;
+			} else {
+				return false;
+			}
+		}
+		
+		return true;
 	}
 }

@@ -85,12 +85,12 @@ public class BroadcastIO {
 	            datagramSocket.setSoTimeout(500);
 	            datagramSocket.bind(new InetSocketAddress(NBITES_TEAM_PORT));
 	        } catch (SocketException e) {
-	           Debug.errorf("TeamBroadcastListener could not bind to port %d!", NBITES_TEAM_PORT);
+	           Debug.error("TeamBroadcastListener could not bind to port %d!", NBITES_TEAM_PORT);
 	           this.state = IOState.FINISHED;
 	           return;
 	        }
 			
-			Debug.printf("%s bound and running.", name());
+			Debug.print("%s bound and running.", name());
 			synchronized(this) {
 				if (this.state != IOState.STARTING)
 					return;
@@ -124,7 +124,7 @@ public class BroadcastIO {
 	                
 	            } catch (SocketTimeoutException e) { // ignore, because we set a timeout
 	            } catch (IOException e) {
-	            	Debug.errorf("TeamBroadcastListener got exception: %s", e.getMessage());
+	            	Debug.error("TeamBroadcastListener got exception: %s", e.getMessage());
 	            	e.printStackTrace();
 	            }
 			}
@@ -189,7 +189,7 @@ public class BroadcastIO {
 					if (data != null 
 							&& data.length < BroadcastDataProvider.MAX_BROADCAST_SIZE) {
 						try {
-							Debug.infof("BroadcastTask sending [%d] bytes from [%s].", data.length,
+							Debug.info("BroadcastTask sending [%d] bytes from [%s].", data.length,
 									provider.name());
 							DatagramPacket packet = new DatagramPacket(data, data.length,
 									destination, destPort);
@@ -197,7 +197,7 @@ public class BroadcastIO {
 							
 						} catch (Exception e) {
 							e.printStackTrace();
-							Debug.errorf("Broadcaster exiting...");
+							Debug.error("Broadcaster exiting...");
 							return;
 						}
 						

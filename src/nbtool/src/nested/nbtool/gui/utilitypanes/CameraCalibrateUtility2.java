@@ -239,7 +239,7 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	                    lastCalculated = new Params(cameraString, rname);
 
 	                    // Call calibrate nbfunc with the 7 logs
-	                    Debug.printf("calibrating for camera{%s} robot{%s} session{%s}",
+	                    Debug.print("calibrating for camera{%s} robot{%s} session{%s}",
 	                    		cameraString, rname, using.name);
 	                    CrossInstance ci = CrossIO.instanceByIndex(0);
 	                    if (ci == null) {
@@ -249,7 +249,7 @@ public class CameraCalibrateUtility2 extends UtilityParent {
 	                    
 	                    CrossFunc func = ci.functionWithName("CameraCalibration");
 	                    if (func == null) {
-	                    	Debug.errorf("COULD NOT GET CameraCalibration FUNCTION");
+	                    	Debug.error("COULD NOT GET CameraCalibration FUNCTION");
 	                    	return;
 	                    }
 	                    

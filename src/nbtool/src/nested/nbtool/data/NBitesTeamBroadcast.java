@@ -45,13 +45,13 @@ public class NBitesTeamBroadcast {
 	
 	public static NBitesTeamBroadcast fromLog(_Log log) throws InvalidProtocolBufferException {
 		if (!log.primaryType().equals(TEAM_BROADCAST_LOGTYPE)) {
-			Debug.errorf("log of type [%s] cannot be parsed into TeamBroadcast object!", 
+			Debug.error("log of type [%s] cannot be parsed into TeamBroadcast object!", 
 					log.primaryType());
 			return null;
 		}
 		
 		if (log.data().length < SPLStandardMessage.SIZE) {
-			Debug.errorf("log of size [%d < SPLStandardMessage.SIZE] cannot be parsed into TeamBroadcast object!", 
+			Debug.error("log of size [%d < SPLStandardMessage.SIZE] cannot be parsed into TeamBroadcast object!", 
 					log.data().length);
 			return null;
 		}

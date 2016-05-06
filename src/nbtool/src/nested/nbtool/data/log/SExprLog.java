@@ -135,7 +135,7 @@ public class SExprLog {
 	
 	protected void setTree(SExpr nt) {
 		if (nt.isAtom()) {
-			Debug.warnf("log tree being set atom: %s", nt.serialize());
+			Debug.warn("log tree being set atom: %s", nt.serialize());
 		}
 		
 		this.tree = nt;

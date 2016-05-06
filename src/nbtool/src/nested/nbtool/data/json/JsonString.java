@@ -115,5 +115,13 @@ public class JsonString implements JsonValue {
 	public JsonValue copy() {
 		return new JsonString(value);
 	}
+
+	@Override
+	public boolean congruent(JsonValue other) {
+		if (other == null || other.type() != this.type())
+			return false;
+		
+		return other.asString().value.equals(this.value);
+	}
 	
 }

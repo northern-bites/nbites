@@ -6,49 +6,57 @@ import java.util.Map.Entry;
 import java.util.Vector;
 
 import nbtool.data.json.Json;
+import nbtool.data.log.Log;
+import nbtool.util.ClassFinder;
 import nbtool.util.Debug;
 import nbtool.util.Debug.DebugSettings;
+import nbtool.util.ToolSettings;
 
 public class Tests {
 	
 	private static DebugSettings debug = Debug.createSettings(true,true,true,Debug.EVENT, "TESTS");
 	
 	public static final String default_section = "default_section";
-	public static final LinkedHashMap<String, Vector<TestBase>> tests = new LinkedHashMap<>();
+	public static final LinkedHashMap<String, Vector<TestBase>> allTests = new LinkedHashMap<>();
 	
-	public static TestBase add(TestBase test) {
-		return add(default_section, test);
+	public static boolean add(TestBase ... tests) {
+		return add(default_section, tests);
 	}
 	
-	public static TestBase add(String section, TestBase test) {
-		debug.info("adding test [%s] to section [%s]", test.testingFor, section);
-		if (!tests.containsKey(section)) {
-			tests.put(section, new Vector<TestBase>());
+	public static boolean add(String section, TestBase ... tests) {
+		
+		for (TestBase test : tests) {
+			debug.info("adding test [%s] to section [%s]", test.testingFor, section);
+			if (!allTests.containsKey(section)) {
+				allTests.put(section, new Vector<TestBase>());
+			}
+			
+			allTests.get(section).add(test);
 		}
 		
-		tests.get(section).add(test);
-		return test;
+		return true;
 	}
 	
-	/* need to reference classes where we add tests to ensure they're static-initialized */
-	static {
-		Json.addTests();
+	public static void findAllTests() {
+		ClassFinder.callAllInstancesOfStaticMethod(ToolSettings.staticAddTestsMethodName);
+		assert(ClassFinderTest.found);
 	}
 	
 	public static boolean run(String section) {
-		if (!tests.containsKey(section)) {
+		if (!allTests.containsKey(section)) {
 			debug.error("no tests registered for section: %s", section);
 			return false;
 		}
 		
-		debug.printf("running tests in section: %s", section);
+		debug.warn("running tests in section: %s", section);
 		
-		for (TestBase t : tests.get(section)) {
+		for (TestBase t : allTests.get(section)) {
 			try {
-				debug.warn("running [%s]{'%s' from %s}", section, t.testingFor, t.whereFrom);
+				debug.warn("\trunning [%s]{'%s' from %s}", section, t.testingFor, t.whereFrom);
 				assert(t.testBody());
+				debug.warn("\t\t(passed)");
 			} catch (Exception e) {
-				debug.error("failed [%s]{'%s' from %s}", section, t.testingFor, t.whereFrom);
+				debug.error("\tfailed [%s]{'%s' from %s}", section, t.testingFor, t.whereFrom);
 				e.printStackTrace();
 				return false;
 			}
@@ -58,11 +66,15 @@ public class Tests {
 	}
 	
 	public static boolean runAll() {
-		debug.printf("running all tests");
+		Debug.lbreak();
+		debug.warn("running all tests");
 		
-		for (String section : tests.keySet()) {
+		for (String section : allTests.keySet()) {
 			assert(run(section));
 		}
+		
+		debug.warn("tests finished.");
+		Debug.lbreak();
 		
 		return true;
 	}

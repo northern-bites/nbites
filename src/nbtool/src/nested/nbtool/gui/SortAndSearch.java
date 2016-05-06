@@ -11,7 +11,6 @@ import javax.swing.border.LineBorder;
 
 import nbtool.data.Session;
 import nbtool.data._log._Log;
-import nbtool.test.TestUtils;
 import nbtool.util.Debug;
 
 public class SortAndSearch extends JPanel implements ActionListener {
@@ -122,7 +121,7 @@ public class SortAndSearch extends JPanel implements ActionListener {
 		};
 	
 	public void actionPerformed(ActionEvent e) {
-		Debug.logf(Debug.INFO, "SortAndSearch: new specs: [sort=%s, search=%s, order=%s]\n", sortNames[sortByBox.getSelectedIndex()],
+		Debug.info( "SortAndSearch: new specs: [sort=%s, search=%s, order=%s]\n", sortNames[sortByBox.getSelectedIndex()],
 				searchField.getText(), reverseBox.isSelected() ? "reverse" : "normal");
 		
 		lcm.ssChanged();
@@ -163,7 +162,6 @@ public class SortAndSearch extends JPanel implements ActionListener {
 	
 	public static void main(String[] args) {
 		SortAndSearch sas = new SortAndSearch(null);
-		TestUtils.frameForPanel(sas);
 	}
 	
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          

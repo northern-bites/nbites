@@ -59,6 +59,8 @@ public class Json {
 		public JsonString asString();
 		
 		public JsonValue copy();
+		
+		public boolean congruent(JsonValue other);
 	}
 	
 	private static final int spacesPerIndent = 2;
@@ -79,6 +81,14 @@ public class Json {
 	
 	public static JsonParser parser(String text, int start) {
 		return new JsonParser(text, start);
+	}
+	
+	public static JsonValue parseAndRequireEnd(String text) throws JsonParseException {
+		JsonParser parser = new JsonParser(text, 0);
+		JsonValue ret = parser.parse();
+		if (parser.position() != text.length()) 
+			throw new JsonParseException("could not parse entire text", parser.position(), text);
+		else return ret;
 	}
 	
 	private static final class JsonNull implements JsonValue {
@@ -137,6 +147,11 @@ public class Json {
 		public JsonValue copy() {
 			return NULL_VALUE;
 		}
+
+		@Override
+		public boolean congruent(JsonValue other) {
+			return other != null && other.type() == this.type();
+		}
 		
 		/* end mirrored section
 		 * ******************************/
@@ -187,6 +202,10 @@ public class Json {
 		return array;
 	}
 	
+	public static JsonArray array(JsonValue ... vals) {
+		return Json.array(Arrays.asList(vals));
+	}
+	
 	public static JsonString string() {
 		return new JsonString("");
 	}
@@ -215,7 +234,7 @@ public class Json {
 		return val ? JsonBoolean.TRUE : JsonBoolean.FALSE;
 	}
 	
-	public static void addTests() {
+	public static void _NBL_ADD_TESTS_() {
 		Tests.add("json", new TestBase("encode") {
 			
 			@Override
@@ -347,10 +366,61 @@ public class Json {
 						failed(String.format("parser did not throw on invalid string '%s' ", s));
 					}
 				}
-			}
+			}	
+		} , new TestBase("congruence") {
 
+			@Override
+			public boolean testBody() throws Exception {
+				
+				JsonNumber num = Json.num(100);
+				JsonNumber num1 = Json.num(100);
+				JsonNumber num2 = Json.num(200);
+				JsonNumber num3 = Json.num(300);
+				
+				assert(num.congruent(num1));
+				assert(!num.congruent(num3));
+				
+				JsonBoolean b1 = Json.bool(true);
+				JsonBoolean b2 = Json.bool(false);
+				JsonBoolean b3 = Json.bool(true);
+				
+				assert(b1.congruent(b3));
+				assert(!b2.congruent(b3));
+				
+				JsonArray a1 = Json.array(num, b1, b2);
+				JsonArray a2 = Json.array(Json.num(100), b1, b2);
+				JsonArray a3 = Json.array(num, b1, b2);
+				JsonArray a4 = Json.array();
+				JsonArray a5 = Json.array(num, b2, b1);
+				
+				assert(a1.congruent(a2));
+				assert(a1.congruent(a3));
+				assert(!a1.congruent(a4));
+				assert(!a1.congruent(a5));
+				
+				JsonString s1 = Json.string("thing");
+				JsonString s2 = Json.string("thinG");
+				JsonString s3 = Json.string("thing");
+				
+				assert(s1.congruent(s1));
+				assert(s1.congruent(s3));
+				assert(!s1.congruent(s2));
+				
+				JsonObject o1 = Json.object();
+				o1.put("a", a1);
+				JsonObject o2 = Json.object();
+				o2.put("a", a3);
+				
+				assert(o1.congruent(o2));
+				JsonObject o3 = Json.object();
+				assert(!o1.congruent(o3));
+				
+				return true;
+			}
 			
-		});
+		}
+		);
+		
 	}	
 	
 }

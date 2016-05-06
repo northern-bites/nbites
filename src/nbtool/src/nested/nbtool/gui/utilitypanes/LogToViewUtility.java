@@ -234,7 +234,7 @@ public class LogToViewUtility extends UtilityParent {
 				int fromIndex = Arrays.asList(vp.states[tindex]).indexOf(vs);
 
 				if (toIndex < vp.states[tindex].length) {
-					logf(INFO, "swapping %s %d to %d", type, fromIndex, toIndex);
+					info("swapping %s %d to %d", type, fromIndex, toIndex);
 					vp.states[tindex][fromIndex] = vp.states[tindex][toIndex];
 					vp.states[tindex][toIndex] = vs;
 

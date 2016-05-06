@@ -72,7 +72,7 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 
 	@Override
 	public void valueForPathChanged(TreePath path, Object newValue) {
-		Debug.logf(Debug.ERROR, "ERROR: TCTreeModel asked to change value, TREE SHOULD NOT BE EDITABLE.");
+		Debug.error( "ERROR: TCTreeModel asked to change value, TREE SHOULD NOT BE EDITABLE.");
 	}
 
 	@Override
@@ -103,10 +103,10 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 		
 		switch (first.getPathCount()) {
 		case 0:
-			Debug.logf(Debug.ERROR, "ERROR: LCTreeModel path size was: " + first.getPathCount());
+			Debug.error( "ERROR: LCTreeModel path size was: " + first.getPathCount());
 			break;
 		case 1:
-			Debug.logf(Debug.ERROR, "ERROR: LCTreeModel path size was: " + first.getPathCount() + "ROOT SHOULD NOT BE VISIBLE");
+			Debug.error( "ERROR: LCTreeModel path size was: " + first.getPathCount() + "ROOT SHOULD NOT BE VISIBLE");
 			break;
 		case 2: {
 			Session session = (Session) first.getPath()[1];
@@ -129,7 +129,7 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 					try {
 						FileIO.loadLog(sel, ses.directoryFrom);
 					} catch (IOException e1) {
-						Debug.logf(Debug.ERROR, "Could not load log data!");
+						Debug.error( "Could not load log data!");
 						e1.printStackTrace();
 						
 						return;
@@ -146,7 +146,7 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 			break;
 		}
 		default:
-			Debug.logf(Debug.ERROR, "ERROR: LCTreeModel path size was: " + first.getPathCount());
+			Debug.error( "ERROR: LCTreeModel path size was: " + first.getPathCount());
 		}
 	}
 
@@ -201,7 +201,7 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 				Session ses = (Session)	tp.getPath()[1];
 				_Log sel = (_Log) tp.getPath()[2];
 				
-				Debug.warnf("deleting {%s} from {%s}", sel, ses);
+				Debug.warn("deleting {%s} from {%s}", sel, ses);
 				
 				assert(ses.logs_ALL.contains(sel));
 				ses.logs_ALL.remove(sel);
@@ -213,7 +213,7 @@ public class LogChooserModel implements TreeModel, TreeSelectionListener, Events
 				}
 				
 			} else {
-				Debug.warnf("cannot delete: %s", tp.toString());
+				Debug.warn("cannot delete: %s", tp.toString());
 			}
 		}
 	}

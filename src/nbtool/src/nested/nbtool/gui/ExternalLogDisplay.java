@@ -19,7 +19,7 @@ public class ExternalLogDisplay extends JFrame {
 	public static ExternalLogDisplay[] displays = new ExternalLogDisplay[9];
 	
 	public static ExternalLogDisplay requestAny() {
-		Debug.infof("ExternalLogDisplay requestAny()");
+		Debug.info("ExternalLogDisplay requestAny()");
 		
 		for (int i = 0; i < MAX_EXTERNAL; ++i) {
 			if (displays[i] != null) {
@@ -35,7 +35,7 @@ public class ExternalLogDisplay extends JFrame {
 	}
 	
 	public static void toggle(int i) {
-		Debug.infof("ExternalLogDisplay toggle(%d)", i);
+		Debug.info("ExternalLogDisplay toggle(%d)", i);
 		
 		if (displays[i] == null) {
 			displays[i] = new ExternalLogDisplay(i);
@@ -68,7 +68,7 @@ public class ExternalLogDisplay extends JFrame {
 
 		ExtBounds eb = UserSettings.BOUNDS_MAP.get(preferenceKey(index));
 		if (eb != null) {
-			Debug.infof("using %s for ExternalLogDisplay[%d]", eb, index);
+			Debug.info("using %s for ExternalLogDisplay[%d]", eb, index);
 			if (eb.bounds != null) {
 				this.setBounds(eb.bounds);
 			}

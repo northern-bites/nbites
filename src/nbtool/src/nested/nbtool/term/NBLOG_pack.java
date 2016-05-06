@@ -24,33 +24,33 @@ import nbtool.util.Utility;
 
 public class NBLOG_pack {
 	public static void main(String[] args) throws IOException {
-		Debug.logf(Debug.INFO, "Attempting pack %d logs into OLD format...\n\n", args.length);
+		Debug.info( "Attempting pack %d logs into OLD format...\n\n", args.length);
 		
 		LinkedList<_Log> accepted = new LinkedList<_Log>();
 		
 		for (String f : args) {
-			Debug.logf(Debug.INFO, "file %s\n", f);
+			Debug.info( "file %s\n", f);
 			
 			File lf = new File(f);
 			
 			if (!lf.exists() ) {
-				Debug.logf(Debug.INFO, "\t... file does not exist.\n");
+				Debug.info( "\t... file does not exist.\n");
 				continue;
 			}
 			
 			if (lf.isDirectory()) {
-				Debug.logf(Debug.INFO, "\t... is directory.\n");
+				Debug.info( "\t... is directory.\n");
 				continue;
 			}
 			
 			if (!f.endsWith(".nblog") ) {
-				Debug.logf(Debug.INFO, "\t... file isn't nblog.\n");
+				Debug.info( "\t... file isn't nblog.\n");
 				continue;
 			}
 			
 			long tlen = lf.length();
 			if (tlen < 8 ) { //min size
-				Debug.logf(Debug.INFO, "\t... could not get reasonable value for file size.\n");
+				Debug.info( "\t... could not get reasonable value for file size.\n");
 				continue;
 			}
 						
@@ -72,7 +72,7 @@ public class NBLOG_pack {
 				
 			} catch (Exception e) {
 				e.printStackTrace();
-				Debug.logf(Debug.INFO, "\tError loading file %f!\n", f);
+				Debug.info( "\tError loading file %f!\n", f);
 			} finally {
 				if (dis != null)
 					dis.close();
@@ -84,7 +84,7 @@ public class NBLOG_pack {
 	}
 	
 	public static void packTo(String path, LinkedList<_Log> accepted) throws IOException {
-		Debug.logf(Debug.INFO, "Found %d acceptable logs for concatenation.\n", accepted.size());
+		Debug.info( "Found %d acceptable logs for concatenation.\n", accepted.size());
 		//... concatenate...
 		
 		if (accepted.size() == 0)
@@ -103,7 +103,7 @@ public class NBLOG_pack {
 			else if (from.contains("BOT") || from.contains("bot"))
 				bot.add(l);
 			else {
-				Debug.logf(Debug.INFO, "Image Log %s [%s] UNKNOWN FROM FIELD!: %s\n", l.name, l.description(), from);
+				Debug.info( "Image Log %s [%s] UNKNOWN FROM FIELD!: %s\n", l.name, l.description(), from);
 			}
 		}
 		
@@ -146,7 +146,7 @@ public class NBLOG_pack {
 			fc.close();
 			fos.close();
 			
-			Debug.logf(Debug.INFO, "Wrote %d logs to %s.\n", top.size(), topName);
+			Debug.info( "Wrote %d logs to %s.\n", top.size(), topName);
 		}
 		
 		{
@@ -187,7 +187,7 @@ public class NBLOG_pack {
 			fc.close();
 			fos.close();
 			
-			Debug.logf(Debug.INFO, "Wrote %d logs to %s.\n", bot.size(), botName);
+			Debug.info( "Wrote %d logs to %s.\n", bot.size(), botName);
 		}
 	}
 }

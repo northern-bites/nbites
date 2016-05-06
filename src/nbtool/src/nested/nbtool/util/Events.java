@@ -120,7 +120,7 @@ public class Events {
 
 						@Override
 						protected void preface() {
-							Debug.logf(Debug.EVENT, "CrossStatus: %s %b",
+							Debug.event( "CrossStatus: %s %b",
 									inst.name(), up);
 						}
 
@@ -144,7 +144,7 @@ public class Events {
 
 				@Override
 				protected void preface() {
-					Debug.logf(Debug.EVENT, "StreamIOStatus: %s %b",
+					Debug.event( "StreamIOStatus: %s %b",
 							inst.name(), up);
 				}
 
@@ -168,7 +168,7 @@ public class Events {
 
 				@Override
 				protected void preface() {
-					Debug.logf(Debug.EVENT, "ControlStatus: %s %b",
+					Debug.event( "ControlStatus: %s %b",
 							inst.name(), up);
 				}
 
@@ -192,7 +192,7 @@ public class Events {
 
 				@Override
 				protected void preface() {
-					Debug.logf(Debug.EVENT, "FileIOStatus: %s %b",
+					Debug.event( "FileIOStatus: %s %b",
 							inst.name(), up);
 				}
 
@@ -230,7 +230,7 @@ public class Events {
 						alsoLoaded.addAll(Arrays.asList(theirs));
 					}
 					
-					Debug.logf(Debug.INFO, "LogLoaded combined %d events with %d logs.", others.size(), alsoLoaded.size());
+					Debug.info( "LogLoaded combined %d events with %d logs.", others.size(), alsoLoaded.size());
 					
 					this.payload[0] = null;
 					this.payload[1] = alsoLoaded.toArray(new _Log[0]);
@@ -238,7 +238,7 @@ public class Events {
 
 				@Override
 				protected void preface() {
-					Debug.logf(Debug.EVENT, "LogLoaded...");
+					Debug.event( "LogLoaded...");
 				}
 
 				@Override
@@ -276,7 +276,7 @@ public class Events {
 						alsoFound.addAll(Arrays.asList(theirs));
 					}
 					
-					Debug.logf(Debug.INFO, "LogFound combined %d events with %d logs.", others.size(), alsoFound.size());
+					Debug.info( "LogFound combined %d events with %d logs.", others.size(), alsoFound.size());
 					
 					this.payload[0] = null;
 					this.payload[1] = alsoFound.toArray(new _Log[0]);
@@ -284,7 +284,7 @@ public class Events {
 
 				@Override
 				protected void preface() {
-					Debug.logf(Debug.EVENT, "LogFound...");
+					Debug.event( "LogFound...");
 				}
 
 				@Override
@@ -306,7 +306,7 @@ public class Events {
 			Center.addEvent(new SimpleForEach(SessionAdded.class) {
 				@Override
 				protected void preface() {
-					Debug.logf(Debug.EVENT, "SessionAdded from %s (%s)", source, session);
+					Debug.event( "SessionAdded from %s (%s)", source, session);
 				}
 				
 				@Override
@@ -330,7 +330,7 @@ public class Events {
 						return;
 					
 					/* other events can only have been posted later, so drop them. */
-					Debug.logf(Debug.EVENT, "RelevantRobotStats dropping %d others.", others.size());
+					Debug.event( "RelevantRobotStats dropping %d others.", others.size());
 					
 					ToolEvent te = others.getLast();
 					assert(te instanceof SimpleCombine);
@@ -342,7 +342,7 @@ public class Events {
 				@Override
 				protected void preface() {
 					String bst = bs.toString();
-					Debug.logf(Debug.EVENT, "RelevantRobotStats{%s}", bst.length() > 50 ? bst.substring(0, 50) : bst);
+					Debug.event( "RelevantRobotStats{%s}", bst.length() > 50 ? bst.substring(0, 50) : bst);
 				}
 
 				@Override
@@ -367,7 +367,7 @@ public class Events {
 						return;
 					
 					/* other events can only have been posted later, so drop them. */
-					Debug.logf(Debug.EVENT, "ToolStats dropping %d others.", others.size());
+					Debug.event( "ToolStats dropping %d others.", others.size());
 					
 					ToolEvent te = others.getLast();
 					assert(te instanceof SimpleCombine);
@@ -378,7 +378,7 @@ public class Events {
 
 				@Override
 				protected void preface() {
-					Debug.logf(Debug.EVENT, "ToolStats...");
+					Debug.event( "ToolStats...");
 				}
 
 				@Override
@@ -400,7 +400,7 @@ public class Events {
 
 				@Override
 				protected void preface() {
-					Debug.logf(Debug.EVENT, "ToolStatus %s %s", s, desc);
+					Debug.event( "ToolStatus %s %s", s, desc);
 				}
 
 				@Override
@@ -426,7 +426,7 @@ public class Events {
 						return;
 					
 					/* other events can only have been posted later, so drop them. */
-					Debug.logf(Debug.EVENT, "LogSelected dropping %d others.", others.size());
+					Debug.event( "LogSelected dropping %d others.", others.size());
 					
 					if (others.isEmpty())
 						return;
@@ -441,7 +441,7 @@ public class Events {
 
 				@Override
 				protected void preface() {
-					Debug.logf(Debug.EVENT, "LogSelected{%s}", payload[0]);
+					Debug.event( "LogSelected{%s}", payload[0]);
 				}
 
 				@Override
@@ -467,7 +467,7 @@ public class Events {
 						return;
 					
 					/* other events can only have been posted later, so drop them. */
-					Debug.logf(Debug.EVENT, "SessionSelected dropping %d others.", others.size());
+					Debug.event( "SessionSelected dropping %d others.", others.size());
 					
 					if (others.isEmpty())
 						return;
@@ -481,7 +481,7 @@ public class Events {
 
 				@Override
 				protected void preface() {
-					Debug.logf(Debug.EVENT, "SessionSelected{%s}", payload[0]);
+					Debug.event( "SessionSelected{%s}", payload[0]);
 				}
 
 				@Override
@@ -512,7 +512,7 @@ public class Events {
 
 				@Override
 				protected void preface() {
-					Debug.logf(Debug.EVENT, "ViewProfileSetChanged{%s}", payload[0]);
+					Debug.event( "ViewProfileSetChanged{%s}", payload[0]);
 				}
 
 				@Override
