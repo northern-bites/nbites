@@ -1,6 +1,11 @@
 package nbtool.util.test;
 
+import java.io.File;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import nbtool.util.Utility;
 
@@ -19,6 +24,16 @@ public abstract class TestBase {
 	
 	public static InputStream resourceAtClass(Object classInst, String resourceName) {
 		return classInst.getClass().getResourceAsStream(resourceName);
+	}
+	
+	public static Path resourcePathAtClass(Object classInst, String resourceName) {
+		URL url = classInst.getClass().getResource(resourceName);
+		try {
+			return (new File(url.toURI())).toPath();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public static void requireEqual(Object a, Object b) {
@@ -46,6 +61,19 @@ public abstract class TestBase {
 				
 				assert(first == 'T');
 				
+				return true;
+			}
+			
+		});
+		
+		Tests.add(new TestBase("resourceAtPath"){
+
+			@Override
+			public boolean testBody() throws Exception {
+				Path testPath = TestBase.resourcePathAtClass(this, "resourceAtClass-testFile");
+				assert(Files.exists(testPath));
+				assert(testPath.endsWith("nbtool/util/test/resourceAtClass-testFile"));
+							
 				return true;
 			}
 			

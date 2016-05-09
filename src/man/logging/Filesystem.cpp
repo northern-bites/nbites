@@ -47,6 +47,7 @@ namespace nbl {
                     std::string file = makeFileName(log);
 
                     if (checkMayWriteString(buffer)) {
+                        NBL_INFO("FileLogger writing Log to filesystem!")
                         io::writeStringToFile(buffer, file);
                     } else {
                         NBL_WARN("FileLogger::threadLoop() cannot write log (%zu bytes) because it has already written %zu bytes (max is %zu)",

@@ -7,36 +7,80 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 
+import nbtool.nio.FileIO;
 import nbtool.util.Debug;
+import nbtool.util.ToolSettings;
+import nbtool.util.Utility;
+import nbtool.util.test.TestBase;
+import nbtool.util.test.Tests;
 import nbtool.util.Debug.DebugSettings;
+import nbtool.util.SharedConstants;
 
 public class LogReference {
 	
 	private static final DebugSettings debug =
-			new DebugSettings(true, true, true, Debug.INFO, "LogFile");
+			new DebugSettings(true, true, true, Debug.INFO, null);
 	
-	private static Path createTempDir() {
-		Path test = null;
+	private static final Path TEMP_DIR = getTempDir();
+	
+	private static Path getTempDir() {
+		return FileSystems.getDefault().getPath(ToolSettings.NBITES_DIR, ".nbtemp/nbtool/");
+	}
+
+	public static void _NBL_REQUIRED_START_() {
+		debug.warn("clearing/creating log temp directory...");
+		
 		try {
-			test = Files.createTempDirectory("nbtool-tempLogs");
+			if (Files.exists(TEMP_DIR)) {
+				Files.walkFileTree(TEMP_DIR, new SimpleFileVisitor<Path>(){
+					@Override
+					public FileVisitResult visitFile(Path file,
+	                        BasicFileAttributes attrs)
+	                          throws IOException {
+						debug.info("deleting: %s", file.toString());
+						Files.delete(file);
+						return FileVisitResult.CONTINUE;
+					}
+					
+					@Override
+					public FileVisitResult postVisitDirectory(Path file,
+	                        IOException e)
+	                          throws IOException {
+						if (e != null) {
+							debug.error("error deleting temp dir!");
+							e.printStackTrace();
+							throw e;
+						}
+						
+						debug.info("deleting dir: %s", file.toString());
+						Files.delete(file);
+						return FileVisitResult.CONTINUE;
+					}
+				});
+			}
+			
+			assert(!Files.exists(TEMP_DIR));
+			Files.createDirectories(TEMP_DIR);
 		} catch (IOException e) {
 			e.printStackTrace();
-			debug.error("LogFile could not set up temporary directory.");
+			debug.error("LogReference could not set up temporary directory.");
 			System.exit(-1);
 		}
 		
-		assert(Files.exists(test));
-		assert(Files.isReadable(test));
-		assert(Files.isWritable(test));
-		
-		return test;
+		assert(Files.exists(TEMP_DIR));
+		assert(Files.isReadable(TEMP_DIR));
+		assert(Files.isWritable(TEMP_DIR));		
 	}
 	
-	private static final Path TEMP_DIR = createTempDir();
 	
 	public long createdWhen = 0;
 	public String logClass = "";
@@ -53,7 +97,7 @@ public class LogReference {
 	private Path tempPath = null;
 	private Path loadPath = null;
 		
-	public Log get() {
+	public synchronized Log get() {
 		if (theLog != null) {
 			Log cur = theLog.get();
 			if (cur != null)
@@ -63,88 +107,137 @@ public class LogReference {
 			}
 		}
 		
+		assert(tempPath != null && Files.exists(tempPath));
 		
+		Log ret = null;
+		try {
+			ret = FileIO.readLogFromPath(tempPath);
+		} catch (IOException e) {
+			debug.error("LogReference(%d) could not load log from tempPath(%s)!", 
+					savedID, tempPath.toString());
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		assert(!manages(ret));
+		this.savedID = ret.jvm_unique_id;
+		updateInternal(ret);
 		
-		return null;
+		theLog = new WeakReference<>(ret);
+		return ret;
 	}
 	
-	public void update(Log same) {
+	public synchronized void copyLogToPath(Path newFile) {
+		Log refered = get();
+		FileIO.queueWrite(newFile, refered.serialize());
+	}
+	
+	public synchronized void pushToTempFileNow(Log same) throws IOException {
 		assert(manages(same));
+		assert(theLog != null && theLog.get() == same);
 		
-		
+		updateInternal(same);
+		FileIO.writeLogToPath(tempPath, same);
 	}
 	
-	public void move(Path newFile) {
+	public synchronized void pushToLoadFileNow(Log same) throws IOException {
+		assert(manages(same));
+		assert(theLog != null && theLog.get() == same);
 		
+		if (loadPath == null) {
+			String em = "cannot pushToLoadFile if loadFile == null";
+			debug.error(em);
+			throw new RuntimeException(em);
+		}
+		
+		pushToTempFileNow(same);
+		FileIO.writeLogToPath(loadPath, same);
 	}
 	
-	public void pushTemp(Log same) {
+	public synchronized void pushToTempFile(Log same) {
+		assert(manages(same));
+		assert(theLog != null && theLog.get() == same);
 		
+		updateInternal(same);
+		FileIO.queueWrite(tempPath, same.serialize());
 	}
 	
-	public void pushLoad(Log same) {
+	public synchronized void pushToLoadFile(Log same) {
+		assert(manages(same));
+		assert(theLog != null && theLog.get() == same);
 		
+		if (loadPath == null) {
+			String em = "cannot pushToLoadFile if loadFile == null";
+			debug.error(em);
+			throw new RuntimeException(em);
+		}
+		
+		pushToTempFile(same);
+		FileIO.queueWrite(loadPath, same.serialize());
 	}
 	
 	public boolean temporary() {
-		return loadPath != null;
+		return loadPath == null;
 	}
 	
 	public boolean manages(Log log) {
 		return log.jvm_unique_id == this.savedID;
 	}
 	
-	public LogReference(Path readFrom) throws IOException {
+	private LogReference(Log makeFrom) {
+		
+		this.savedID = makeFrom.jvm_unique_id;
+		updateInternal(makeFrom);
+		theLog = new WeakReference<>(makeFrom);
+	}
+	
+	private void initializeTemp() {
+		String tempName = String.format("temp_log_id%d_u%s.nblog",
+				this.savedID, Utility.getRandomHexString(10));
+		tempPath = TEMP_DIR.resolve(tempName);
+		
+		assert(!Files.exists(tempPath));
+		Log ourLog = null;
+		assert(theLog != null && (ourLog = theLog.get()) != null);
+		
+		try {
+			Files.createFile(tempPath);
+			FileIO.writeLogToPath(tempPath, ourLog);
+									
+		} catch (IOException e) {
+			e.printStackTrace();
+			debug.error("could not generate temp file{%s}: %s", tempPath.toString(), e.getMessage());
+			throw new RuntimeException(String.format("could not generate temp file: %s", e.getMessage()));
+		}
+		
+		assert(Files.exists(tempPath));
+	}
+	
+	public static LogReference referenceFromFile(Path readFrom) throws IOException {
+		
 		assert(Files.exists(readFrom));
-		InputStream is = Files.newInputStream(readFrom, StandardOpenOption.READ);
-		BufferedInputStream bis = new BufferedInputStream(is);
-		Log read = Log.parseFromStream(bis);
+		Log read = FileIO.readLogFromPath(readFrom);
 		if (read == null) {
 			debug.error("could not parse log from %s", readFrom);
 			throw new IOException("could not parse Log from " + readFrom);
 		}
 		
-		this.savedID = read.jvm_unique_id;
-		updateInternal(read);
+		LogReference ref = new LogReference(read);
+		ref.initializeTemp();
+		ref.loadPath = readFrom;
 		
-		loadPath = readFrom;
-		String tempName = String.format("nbtool_tempLog_id%d_w%d.nblog",
-				read.jvm_unique_id, read.createdWhen);
-		tempPath = TEMP_DIR.resolve(tempName);
+		return ref;
 	}
 	
-	public LogReference(Log makeFrom) {
+	public static LogReference referenceFromLog(Log log) {
 		
-		this.savedID = makeFrom.jvm_unique_id;
-		updateInternal(makeFrom);
-				
-		String tempName = String.format("nbtool_tempLog_id%d_w%d.nblog",
-				makeFrom.jvm_unique_id, makeFrom.createdWhen);
-		tempPath = TEMP_DIR.resolve(tempName);
+		LogReference ref = new LogReference(log);
+		ref.initializeTemp();
+		ref.loadPath = null;
 		
-		assert(!Files.exists(tempPath));
-		
-		try {
-			Files.createFile(tempPath);
-			
-			OutputStream os = Files.newOutputStream(tempPath,
-					StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
-			BufferedOutputStream bos = new BufferedOutputStream(os);
-			
-			makeFrom.writeTo(bos);
-			
-			bos.close();
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-			debug.error("could not generate temp file: %s", e.getMessage());
-			throw new RuntimeException(String.format("could not generate temp file: %s", e.getMessage()));
-		}
-		
-		theLog = new WeakReference<>(makeFrom);
+		return ref;
 	}
 	
-	private void updateInternal(Log from) {
+	private synchronized void updateInternal(Log from) {
 		assert(manages(from));
 		
 		this.createdWhen = from.createdWhen;
@@ -153,5 +246,47 @@ public class LogReference {
 		this.host_name = from.host_name;
 		this.host_addr = from.host_addr;
 		this.description = from.getFullDescription();
+	}
+	
+	public static void _NBL_ADD_TESTS_() {
+		_NBL_REQUIRED_START_();
+		
+		Tests.add("data.LogReference", new TestBase("basic"){
+
+			@Override
+			public boolean testBody() throws Exception {
+				Path loadPath = TestBase.resourcePathAtClass(this, "testLog2");
+				assert(Files.exists(loadPath));
+				
+				LogReference ref = FileIO.readRefFromPath(loadPath);
+				Log refMng = ref.get();
+				assert(refMng != null && refMng.logClass.equals(SharedConstants.LogClass_Tripoint()));
+				assert(ref.manages(refMng));
+				
+				assert(ref.theLog.get() == refMng);
+				
+				assert(!ref.temporary());
+				
+				assert(ref.logClass.equals(refMng.logClass));
+				
+				assert(Files.exists(ref.tempPath));
+				assert(Files.exists(ref.loadPath));
+				
+				String other = "OTHERTYPE";
+				refMng.logClass = other;
+				assert(ref.get().logClass.equals(other));
+				ref.pushToTempFileNow(refMng);
+				
+				ref.theLog = null;
+				
+				Log reload = ref.get();
+				assert(ref.manages(reload));
+				assert(!ref.manages(refMng));
+				assert(reload.logClass.equals(other));
+				
+				return true;
+			}
+			
+		});
 	}
 }

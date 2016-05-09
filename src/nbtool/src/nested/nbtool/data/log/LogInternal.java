@@ -10,12 +10,15 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Vector;
 
 import com.google.protobuf.Message;
 
+import messages.InertialState;
+import messages.JointAngles;
 import nbtool.data.json.Json.JsonValue;
 import nbtool.data.SExpr;
 import nbtool.data.json.Json;
@@ -122,7 +125,7 @@ public class LogInternal extends Log {
 	@Override
 	public void saveChangesToTempFile() throws Exception {
 		if (logReference != null) {
-			logReference.pushTemp(this);
+			logReference.pushToTempFile(this);
 		} else {
 			throw new Exception("cannot save changes to untracked Log!");
 		}
@@ -131,7 +134,7 @@ public class LogInternal extends Log {
 	@Override
 	public void saveChangesToLoadFile() throws Exception {
 		if (logReference != null) {
-			logReference.pushLoad(this);
+			logReference.pushToLoadFile(this);
 		} else {
 			throw new Exception("cannot save changes to untracked Log!");
 		}
@@ -218,12 +221,30 @@ public class LogInternal extends Log {
 	public static Log parseFromParts(byte[] json, byte[] data) {
 		
 		String desc = new String(json);
+		
+		if (LogInternal.isLegacyDesc(desc)) {
+			debug.warn("converting legacy log to JSON format...");
+			return LogInternal.parseLegacy(desc, data);
+		}
+		
+		if (!desc.contains(SharedConstants.LOG_TOPLEVEL_MAGIC_KEY())) {
+			debug.error("parsed log does not contain magic key: %s !in $s", SharedConstants.LOG_TOPLEVEL_MAGIC_KEY(),
+					desc);
+			throw new RuntimeException("parsed log does not contain magic key!");
+		}
+		
 		JsonObject object = null;
 		try {
 			object = Json.parseAndRequireEnd(desc).asObject();
 		} catch (JsonParseException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
+		}
+		
+		int vers = object.get(SharedConstants.LOG_TOPLEVEL_MAGIC_KEY()).asNumber().asInt();
+		if (vers != ToolSettings.VERSION) {
+			debug.warn("parsing log of different version to compiled tool! tool:%d log:%d",
+					ToolSettings.VERSION, vers);
 		}
 		
 		String logClass = valueRemove(SharedConstants.LOG_TOPLEVEL_LOGCLASS(), object).asString().value;
@@ -294,7 +315,7 @@ public class LogInternal extends Log {
 		super.finalize();
 		
 		if (logReference != null) {
-			logReference.pushTemp(this);
+			logReference.pushToTempFileNow(this);
 		}
 		//Don't pushLoad, that action must always be explicitly done by user code.
 	}
@@ -373,6 +394,58 @@ public class LogInternal extends Log {
 		return true;
 	}
 	
+	private static boolean isLegacyDesc(String desc) {
+		char sc = desc.trim().charAt(0);
+		switch(sc) {
+		case '{':
+			return false;
+		case '(':
+			return true;
+		default:
+			debug.error("pre-version 6 description: %s", desc);
+			throw new RuntimeException("LogInternal cannot parse pre-version 6 log!");
+		}
+	}
+	
+	private static Log parseLegacy(String desc, byte[] data) {
+		SExprLog slog = new SExprLog(desc, data);
+		
+//		debug.printf("%s", desc);
+//		debug.printf("%s %s %s", slog.primaryType(), slog.primaryFrom(), slog.primaryEncoding());
+		
+		if (slog.contentCount() < 3 ||
+				!slog.primaryType().equals("YUVImage") ||
+				!slog.madeWhere().equals("tripoint") ||
+				!slog.primaryEncoding().equals("[Y8(U8/V8)]") ) {
+			debug.warn("cannot parse non-tripoint legacy log, returning null");
+			return null;
+		}
+		
+		JsonObject imDict = Json.object();
+		imDict.put(SharedConstants.LOG_BLOCK_IMAGE_WIDTH_PIXELS(), slog.primaryWidth());
+		imDict.put(SharedConstants.LOG_BLOCK_IMAGE_HEIGHT_PIXELS(), slog.primaryHeight());
+		Vector<Block> blocks = new Vector<>();
+		
+		blocks.add(new Block(
+				slog.bytesForContentItem(0), imDict,
+				SharedConstants.YUVImageType_DEFAULT(),
+				slog.madeWhere(),
+				slog.primaryImgIndex(),
+//				slog.primaryTime() 
+				0L
+				));
+		blocks.add(new Block(
+				slog.bytesForContentItem(1), new JsonObject(),
+				"InertialState", "", 0, 0
+				));
+		blocks.add(new Block(
+				slog.bytesForContentItem(2), new JsonObject(),
+				"JointAngles", "", 0, 0
+				));
+
+		return Log.explicitLog(blocks, new JsonObject(), SharedConstants.LogClass_Tripoint(), 0L);		
+	}
+	
 	public static void _NBL_ADD_TESTS_() {
 		Tests.add("data.log", 
 			new TestBase("basic tests"){
@@ -446,6 +519,19 @@ public class LogInternal extends Log {
 				Block b22 = pstream.blocks.get(2);
 				assert(b22.parseAsSExpr().serialize().equals(sexpr.serialize()));
 				Debug.info("parseFromStream OK...");
+				
+				return true;
+			}
+			
+		}, new TestBase("legacy") {
+
+			@Override
+			public boolean testBody() throws Exception {
+				
+				Log test = Log.parseFromStream(TestBase.resourceAtClass(this, "testLog2"));
+				YUYV8888Image img = test.blocks.get(0).parseAsYUVImage();
+				Message m1 = test.blocks.get(1).parseAsProtobufOfClass(InertialState.class);
+				Message m2 = test.blocks.get(2).parseAsProtobufOfClass(JointAngles.class);
 				
 				return true;
 			}

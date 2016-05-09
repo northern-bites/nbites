@@ -55,9 +55,18 @@ namespace nbl {
             int r1 = gettimeofday(&tv, NULL);
             NBL_ASSERT_EQ(r1, 0);
 
-            ts.tv_sec = tv.tv_sec + io_to_s(fromNow);
-            ts.tv_nsec =  (tv.tv_usec + MICROSECONDS_MOD_SECONDS(fromNow))
-                * 1000;
+            long long total_ns = tv.tv_sec * 1e9 + tv.tv_usec * 1000;
+            total_ns += fromNow * 1000;
+
+            long long int seconds = total_ns / 1e9;
+            long long int nsec = total_ns - (1e9 * seconds);
+
+            ts.tv_sec = seconds;
+            ts.tv_nsec =  nsec;
+
+            NBL_ASSERT_GT(ts.tv_sec, 0);
+            NBL_ASSERT_GT(ts.tv_nsec, 0);
+            NBL_ASSERT_LT(ts.tv_nsec, 1e9);
 
             return ts;
         }

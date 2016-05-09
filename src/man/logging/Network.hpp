@@ -60,11 +60,10 @@ namespace nbl {
 
         class Streamer : public SocketUser {
             LogProvider& provider;
-            size_t index;
             logptr ping;
         public:
             Streamer(SocketMaster& master, LogProvider& prov) :
-                SocketUser(master), provider(prov), index(0),
+                SocketUser(master), provider(prov),
                 ping(Log::explicitLog({}, json::Object(), CONSTANTS.LogClass_Null(), 0))
             {}
 

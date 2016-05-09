@@ -139,8 +139,8 @@ namespace nbl {
         NBL_ASSERT_GT(order.size(), 0);
         NBL_ASSERT_GT(max_wait, 0);
 
-        pthread_mutex_lock(&dequeMutex);
-        struct timespec until = io::io_get_abs_ts(max_wait);
+        PERROR_IF(pthread_mutex_lock(&dequeMutex)){ NBL_ERROR("didn't lock mutex...") };
+        struct timespec until;
 
         for (;;) {
             for (q_enum q : order) {
@@ -153,6 +153,7 @@ namespace nbl {
                 }
             }
 
+            until = io::io_get_abs_ts(max_wait);
             int twr = pthread_cond_timedwait(&logAvailableCond, &dequeMutex, &until);
             NBL_ASSERT(twr == ETIMEDOUT || twr == 0)
 

@@ -122,4 +122,10 @@ namespace nbl {
     }
 }
 
-int umain(int argc, char ** argv) { return nbl::nbcross::nbcross_main(argc, argv); }
+#include "utilities-test.hpp"
+
+int umain(int argc, char ** argv) { NBL_RUN_ALL_TESTS(); return nbl::nbcross::nbcross_main(argc, argv); }
+
+
+
+

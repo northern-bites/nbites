@@ -1,13 +1,19 @@
 package nbtool.util;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
 
 import nbtool.data.json.Json;
 import nbtool.data.json.JsonNumber;
 import nbtool.data.json.JsonObject;
 import nbtool.data.json.JsonString;
+import nbtool.util.test.TestBase;
+import nbtool.util.test.Tests;
 
 public class SharedConstants {
 		
@@ -141,6 +147,31 @@ public class SharedConstants {
 	}
 	public static String LOG_BLOCK_IMAGE_HEIGHT_PIXELS() {
 		return object.get("LOG_BLOCK_IMAGE_HEIGHT_PIXELS").asString().toString();
+	}
+	
+	public static void _NBL_ADD_TESTS_() {
+		Tests.add("SharedConstants", new TestBase("check all keys"){
+
+			@Override
+			public boolean testBody() throws Exception {
+				
+				final Set<String> exclude = new HashSet<>();
+				exclude.add("stringConstant");
+				exclude.add("intConstant");
+				exclude.add("_NBL_ADD_TESTS_");
+				
+				for (Method m : SharedConstants.class.getDeclaredMethods()) {
+					if (Modifier.isStatic(m.getModifiers()) && Modifier.isPublic(m.getModifiers())
+							&& !exclude.contains(m.getName())) {
+//						Debug.print("%s", m.getName());
+						m.invoke(null);
+					}
+				}
+				 
+				return true;
+			}
+			
+		});
 	}
 	
 }

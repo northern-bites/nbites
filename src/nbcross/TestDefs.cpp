@@ -20,6 +20,5 @@ namespace nbl {
             NBL_PRINT("test 2 got %z args.",
                       arguments.size());
         }
-
     }
 }

@@ -46,8 +46,7 @@
 
 //If statement, always evaluates expr and if NZ return prints perror string and allows
 //a following if statement body.
-#define PERROR_IF(expr) if ( expr && \
-    _NBUQ(safe_perror_describe)(errno, __FILE__, __LINE__, #expr ) )
+#define PERROR_IF(expr) if ( expr && _NBUQ(safe_perror_describe)(errno, __FILE__, __LINE__, #expr ) )
 
 //Prevent compiler from auto-generating copy constructor/assign for type cname
 #define NBL_DISALLOW_COPY(cname)                 \
@@ -55,11 +54,12 @@
     cname(cname const&)          = delete;   \
     void operator=(cname const&) = delete;   \
 
-
+/* for use inside a class */
 #define NBL_OSTREAM_FRIEND( type, iname, instance_rep )  \
     friend std::ostream& operator<<(std::ostream&os, const type& iname) {    \
         os << instance_rep ; return os; }
 
+/* for use on a non-class type, such as enum */
 #define NBL_OSTREAM_OVERLOAD( type, iname, instance_rep ) \
     inline std::ostream& operator<<(std::ostream&os, const type& iname) {    \
         os << instance_rep ; return os; }

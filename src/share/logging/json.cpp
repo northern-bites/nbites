@@ -8,9 +8,9 @@
 //
 
 #include "json.hpp"
+#include "utilities-test.hpp"
 #include <assert.h>
 #include <stdexcept>
-
 
 namespace json {
     
@@ -84,11 +84,11 @@ namespace json {
         return std::stol(rep);
     }
     
-    long Number::asFloat() const {
+    float Number::asFloat() const {
         return std::stof(rep);
     }
     
-    long Number::asDouble() const {
+    double Number::asDouble() const {
         return std::stod(rep);
     }
     
@@ -527,12 +527,67 @@ namespace json {
     //at character text[from], setting end to index of first character
     //after returned json value.
     Value parseFrom(const std::string& text, int from, int * end) {
+        NBL_ASSERT_LT(from, text.size());
+        NBL_ASSERT_GE(from, 0);
 
-        int alt;
-        Parser parser(text, end ? *end : alt);
-        parser.pos = from;
-        
-        return parser.parse(parser.next());
+        Parser parser(text, from);
+        Value found = parser.parse(parser.next());
+
+        if (end) {
+            *end = parser.pos;
+        }
+
+        return found;
+    }
+
+    NBL_ADD_TEST_TO(json_parse, json) {
+
+        std::string son = "{key:null, key2:'whatttt',key5:5}";
+        int end;
+        Value val = parseFrom(son, 0, &end);
+
+        NBL_ASSERT_EQ(val.type(), ObjectType);
+        NBL_ASSERT_EQ(end, son.size())
+
+        std::string son2 = "[1,2,3] null";
+        Value v2 = parse(son2, &end);
+        NBL_ASSERT_EQ(end, 7)
+        NBL_ASSERT_EQ(v2.asArray().size(), 3)
+
+        Value v3 = parseFrom(son2, 7);
+        NBL_ASSERT_EQ(v3.type(), NullType);
+
+        return true;
+    }
+
+    NBL_ADD_TEST_TO(json_number, json) {
+        Number n1("1");
+        NBL_ASSERT_EQ(n1.asInt(), 1)
+        NBL_ASSERT_EQ(n1.asDouble(), 1.00)
+        NBL_ASSERT_EQ(n1.asFloat(), 1.00)
+        NBL_ASSERT_EQ(n1.asLong(), 1L)
+
+        Number n2("1000000000000000000000");
+        NBL_ASSERT_THROW_OF( ::std::out_of_range, n2.asInt(), "out of range")
+
+        Number n3(" 3.5");
+
+        NBL_ASSERT_EQ(n3.asInt(), 3)
+        NBL_ASSERT_EQ(n3.asDouble(), 3.5)
+
+        return true;
     }
     
 }
+
+
+
+
+
+
+
+
+
+
+
+

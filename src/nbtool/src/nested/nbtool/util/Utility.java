@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.MissingResourceException;
+import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -23,6 +24,16 @@ import nbtool.images.YUYV8888Image;
 
 
 public class Utility {
+	
+	private static final Random hexRandom = new Random();
+	public static String getRandomHexString(int numchars){
+	        StringBuffer sb = new StringBuffer();
+	        while(sb.length() < numchars){
+	            sb.append(Integer.toHexString(hexRandom.nextInt()).toUpperCase());
+	        }
+
+	        return sb.toString().substring(0, numchars);
+	}
 	
 	public static class Pair<A,B> {
 		public A a;

@@ -105,8 +105,8 @@ namespace json {
 
         int asInt() const;
         long asLong() const;
-        long asFloat() const;
-        long asDouble() const;
+        float asFloat() const;
+        double asDouble() const;
 
     private:
         std::string rep;

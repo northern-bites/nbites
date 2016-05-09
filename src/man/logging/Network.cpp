@@ -55,6 +55,8 @@ namespace nbl {
                     throw std::runtime_error("SocketMaster could not poll for client");
                 }
 
+                io::config_socket(temp, io::NONBLOCKING);
+
                 pthread_mutex_lock(&connectionMutex);
                 ++clientIndex;
                 client = temp;
@@ -139,14 +141,13 @@ namespace nbl {
 
         void Streamer::threadLoop() {
 
-            NBL_WARN("Controller::threadLoop() starting...");
+            NBL_WARN("Streamer::threadLoop() starting...");
 
             qorder normal = {Q_CONTROL, Q_STREAM};
             qorder no_stream = {Q_CONTROL};
 
             for (;running;) {
                 if (socket > 0 && master.checkClient(clientIndex)) {
-                    ++index;
 
                     qorder& oref = control::check(control::flags::logToStream) ? normal : no_stream;
 
@@ -156,9 +157,9 @@ namespace nbl {
                     if (tosend) {
                         iret = tosend->send(socket);
                     } else {
-                        NBL_INFO("Streamer::threadLoop() pinging client: %zu",
-                                 clientIndex)
-                        ping->createdWhen = index;
+                        ++(ping->createdWhen);
+                        NBL_INFO("Streamer::threadLoop() to %zu sending heartbeat %zu",
+                                 clientIndex, ping->createdWhen)
                         iret = ping->send(socket);;
                     }
 
@@ -169,6 +170,7 @@ namespace nbl {
 
                 } else {
                     master.blockForClient(socket, clientIndex);
+                    ping->createdWhen = 0;
                 }
             }
 
@@ -179,18 +181,22 @@ namespace nbl {
 
             NBL_WARN("Controller::threadLoop() starting...");
 
-
             for (;running;) {
                 if (socket > 0 && master.checkClient(clientIndex)) {
 
                     logptr recvd = Log::recv(socket);
 
                     if (recvd) {
-                        NBL_INFO( "Controller::threadLoop() got log of type: %s", recvd->logClass.c_str());
-                        consumer.consumeLog(recvd);
+
+                        if (recvd->logClass == CONSTANTS.LogClass_Null()) {
+                            NBL_INFO("Controller::threadLoop() got heartbeat %d", recvd->createdWhen);
+                        } else {
+                            NBL_INFO( "Controller::threadLoop() got log of type: %s", recvd->logClass.c_str());
+                            consumer.consumeLog(recvd);
+                        }
+
                     } else {
                         NBL_WARN( "Controller::threadLoop() failed to read client: %zu", clientIndex);
-
                         master.flagClient(clientIndex);
                     }
 

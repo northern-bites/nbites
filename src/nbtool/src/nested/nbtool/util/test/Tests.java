@@ -42,21 +42,32 @@ public class Tests {
 		assert(ClassFinderTest.found);
 	}
 	
+	private static void test_break() {
+		Debug.set_yellow(); Debug.dbreak(); Debug.lbreak(); Debug.set_reset();
+	}
+	
+	private static void test_break2() {
+		Debug.set_cyan(); Debug.dbreak(); Debug.lbreak(); Debug.set_reset();
+	}
+	
 	public static boolean run(String section) {
 		if (!allTests.containsKey(section)) {
 			debug.error("no tests registered for section: %s", section);
 			return false;
 		}
 		
-		debug.warn("running tests in section: %s", section);
+		debug.warn("  running section <%s>", section);
+		test_break();
 		
 		for (TestBase t : allTests.get(section)) {
 			try {
-				debug.warn("\trunning [%s]{'%s' from %s}", section, t.testingFor, t.whereFrom);
+				debug.warn("    running [%s]", t.testingFor );
+				debug.warn("        from [%s]", t.whereFrom);
 				assert(t.testBody());
-				debug.warn("\t\t(passed)");
-			} catch (Exception e) {
-				debug.error("\tfailed [%s]{'%s' from %s}", section, t.testingFor, t.whereFrom);
+				debug.info("    [passed]");
+				Debug.lbreak();
+			} catch (Throwable e) {
+				debug.error("   !failed! [%s]{'%s' from %s}", section, t.testingFor, t.whereFrom);
 				e.printStackTrace();
 				return false;
 			}
@@ -67,14 +78,18 @@ public class Tests {
 	
 	public static boolean runAll() {
 		Debug.lbreak();
-		debug.warn("running all tests");
+		debug.warn("\trunning all tests");
+		test_break2();
 		
 		for (String section : allTests.keySet()) {
-			assert(run(section));
+			if (!run(section)) {
+				debug.error("< TESTING FAILED >");
+				return false;
+			}
 		}
 		
-		debug.warn("tests finished.");
-		Debug.lbreak();
+		debug.warn("done");
+		test_break2();
 		
 		return true;
 	}

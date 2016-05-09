@@ -86,4 +86,15 @@ namespace nbl {
 
 #endif
 
+
+#define NBL_ASSERT_THROW(statement, failure_msg_cstr)   \
+    NBL_ASSERT_THROW_OF(..., statement, failure_msg_cstr)
+
+#define NBL_ASSERT_THROW_OF(exception, statement, failure_msg_cstr)               \
+    { bool _nbl_test_found_exception_ = false;                                  \
+    try { statement ; } catch( exception ) {_nbl_test_found_exception_=true;}   \
+    if (!_nbl_test_found_exception_) {                                          \
+    NBL_ERROR("\n  statement %s failed to generate exception<%s>:\n\t%s", #statement, #exception, failure_msg_cstr)    \
+    assert(false);   } }
+
 #endif /* utilities_test_h */

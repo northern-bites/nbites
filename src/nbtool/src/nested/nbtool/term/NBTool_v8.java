@@ -1,7 +1,6 @@
 package nbtool.term;
 
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -48,7 +47,9 @@ public class NBTool_v8 {
 		
 		if (run_tests) {
 			Tests.findAllTests();
-			assert(Tests.runAll());
+			if (!Tests.runAll()) {
+				System.exit(-1);
+			}
 		}
 		
 		Debug.print("Finding required static initialization methods...");

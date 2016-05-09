@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.util.Vector;
 
 import com.google.protobuf.Message;
@@ -11,14 +12,17 @@ import com.google.protobuf.Message;
 import nbtool.data.SExpr;
 import nbtool.data.json.Json.JsonValue;
 import nbtool.data.json.JsonObject;
-import nbtool.data.session.Session;
 import nbtool.images.YUYV8888Image;
 import nbtool.util.Debug;
 import nbtool.util.Debug.DebugSettings;
+import nbtool.util.SharedConstants;
 import nbtool.util.test.TestBase;
 import nbtool.util.test.Tests;
 
 public abstract class Log {
+	
+	//very rough.
+	public static final int MINIMUM_LOG_SIZE = 32;
 	
 	protected LogReference logReference;
 	public abstract boolean temporary();
@@ -68,7 +72,8 @@ public abstract class Log {
 	
 	public static Log explicitLog(Vector<Block> blocks, JsonObject topLevel, String logClass,
 			long created) {
-		return LogInternal.explicitLog(blocks, topLevel, logClass, created);
+		return LogInternal.explicitLog( blocks != null ? blocks : new Vector<Block>(),
+				topLevel != null ? topLevel : new JsonObject(), logClass, created);
 	}
 	
 	public static Log parseFrom(byte[] bytes) {

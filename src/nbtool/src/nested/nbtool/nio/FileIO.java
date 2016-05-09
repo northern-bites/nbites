@@ -1,16 +1,100 @@
 package nbtool.nio;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.LinkedList;
+
+import nbtool.data.log.Log;
+import nbtool.data.log.LogReference;
+import nbtool.util.Debug;
+import nbtool.util.Utility.Pair;
 
 public class FileIO {
 	
+	public static Path getPath(String first, String ... parts) {
+		return FileSystems.getDefault().getPath(parts[0], parts);
+	}
+	
+	public static void sizeCheck(Path containsLog) throws IOException {
+		long fsize = Files.size(containsLog);
+		if (fsize < Log.MINIMUM_LOG_SIZE) {
+			Debug.error("asked to read Log file below minimum size: %d < %d @ %s",
+					fsize, Log.MINIMUM_LOG_SIZE, containsLog.toString());
+			throw new RuntimeException("Log below minimum size threshold");
+		}
+	}
+	
+	public static BufferedInputStream inputStreamFrom(Path path) throws IOException {
+		return new BufferedInputStream(Files.newInputStream(path,
+				StandardOpenOption.READ));
+	}
+	
+	public static BufferedOutputStream outputStreamTo(Path path) throws IOException {
+		return new BufferedOutputStream(Files.newOutputStream(path,
+				StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING));
+	}
+	
+	public static Log readLogFromPath(Path path) throws IOException {
+		sizeCheck(path);
+		BufferedInputStream is = inputStreamFrom(path);
+		Log ret = Log.parseFromStream(is);
+		is.close();
+		return ret;
+	}
+	
+	public static LogReference readRefFromPath(Path path) throws IOException {
+		sizeCheck(path);
+		return LogReference.referenceFromFile(path);
+	}
+	
+	public static void writeLogToPath(Path path, Log log) throws IOException {
+		BufferedOutputStream os = outputStreamTo(path);
+		log.writeTo(os);
+		os.close();
+	}
+	
+	public static Log[] readAllLogsFromPath(Path path) throws IOException {
+		if (!isValidLogFolder(path)) {
+			Debug.error("cannot read multiple logs from invalid path: ", path.toString());
+			return null;
+		}
+		
+		LinkedList<Log> found = new LinkedList<>();
+		DirectoryStream<Path> dirStream = Files.newDirectoryStream(path, "*.{nblog}");
+		for (Path file : dirStream) {
+			found.add(readLogFromPath(file));
+		}
+		
+		return found.toArray(new Log[0]);
+	}
+	
+	public static LogReference[] readAllRefsFromPath(Path path) throws IOException {
+		if (!isValidLogFolder(path)) {
+			Debug.error("cannot read multiple refs from invalid path: ", path.toString());
+			return null;
+		}
+		
+		LinkedList<LogReference> found = new LinkedList<>();
+		DirectoryStream<Path> dirStream = Files.newDirectoryStream(path, "*.{nblog}");
+		for (Path file : dirStream) {
+			found.add(readRefFromPath(file));
+		}
+		
+		return found.toArray(new LogReference[0]);
+	}
+	
 	public static String logDescriptionAt(Path path) throws IOException {
-		DataInputStream dis = new DataInputStream(
-				Files.newInputStream(path, StandardOpenOption.READ));
+		sizeCheck(path);
+		
+		DataInputStream dis = new DataInputStream(inputStreamFrom(path));
 		
 		int descSize = dis.readInt();
 		byte[] desc = new byte[descSize];
@@ -22,6 +106,108 @@ public class FileIO {
 		return ret;
 	}
 	
+	public static boolean isValidLogFolder(Path path) {
+		if(path == null || path.getNameCount() < 1) {
+			Debug.error( "path string null or empty!\n");
+			return false;
+		}
+			
+		if (!Files.exists(path)) {
+			Debug.error( "file does not exist! %s\n", path.toString());
+			return false;
+		}
+		if (!Files.isDirectory(path)) {
+			Debug.error( "file is not a directory! %s\n", path.toString());
+			return false;
+		}
+		
+		if (!Files.isReadable(path) || !Files.isWritable(path)) {
+			Debug.error( "permissions errors for file %s!\n", path.toString());
+			return false;
+		}
+		
+		return true;
+	}
 	
+	/* asynchronous file writing thread */
+	
+	public static void queueWrite(Path path, byte[] data) {
+		assert(path != null && data != null);
+		assert(Files.isWritable(path));
+		assert(!Files.exists(path) || Files.isRegularFile(path));
+		
+		addTask(new Task(path, data));
+	}
+	
+	private static void addTask(Task t) {
+		synchronized(writer.queue) {
+			writer.queue.addLast(t);
+			writer.queue.notify();
+		}
+	}
+	
+	private static class Task {
+		byte[] data;
+		Path path;
+		
+		protected Task(Path p, byte[] d) {
+			this.path = p; this.data = d;
+		}
+	}
+	
+	public static void _NBL_REQUIRED_START_() {
+		Debug.warn("starting FileWriter thread...");
+		fileWriteThread.start();
+	}
+	
+	private static final FileWriter writer = new FileWriter();
+	private static final Thread fileWriteThread = new Thread(writer);
+	
+	private static class FileWriter implements Runnable {
+		
+		protected final LinkedList<Task> queue = new LinkedList<>();
+		
+		private void loop() {
+			for (;;) {
+				Task task = null;
+				synchronized(queue) {
+					for(;;) {
+						if (queue.isEmpty()) {
+							try {
+								queue.wait();
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+						} else {
+							task = queue.removeFirst();
+							break;
+						}
+					}
+				}
+				
+				try {
+					Files.write(task.path, task.data,
+							StandardOpenOption.WRITE, StandardOpenOption.CREATE,
+							StandardOpenOption.TRUNCATE_EXISTING);
+				} catch (IOException e) {
+					Debug.error("error writing file to path %s", task.path.toString());
+					e.printStackTrace();
+				}
+			}
+		}
 
+		@Override
+		public void run() {
+			Debug.warn("FileWriter thread running.");
+			try {
+				loop();
+			} catch (Exception e) {
+				Debug.error("FileWriter thread ending...");
+				e.printStackTrace();
+				throw e;
+			}
+		}
+		
+	}
+	
 }

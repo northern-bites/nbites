@@ -16,6 +16,8 @@ namespace control {
 
     ControlHandler::ControlHandler() {
         mapfromFunctions(map, setupControlFunctions());
+
+        set(flags::logToStream, true);
     }
 
     void ControlHandler::consumeLog(nbl::logptr ptrTo) {

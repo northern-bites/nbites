@@ -1,5 +1,7 @@
 package nbtool.util;
 
+import java.util.Arrays;
+
 public class Debug {
 	
 	/* cannot code escape char in java string, this is a work-around.
@@ -10,6 +12,10 @@ public class Debug {
 	public static final String COLOR_BLUE = (char) 27 + "[34m";
 	public static final String COLOR_MAGENTA = (char) 27 + "[35m";
 	public static final String COLOR_CYAN = (char) 27 + "[36m";
+	
+	public static final String COLOR_BOLD_YELLOW = (char) 27 + "[33;1m";
+	public static final String COLOR_BOLD_RED = (char) 27 + "[31;1m";
+	
 	public static final String COLOR_RESET = (char) 27 + "[0m";
 	
 	/* this is so close to a hack the difference is negligible:
@@ -23,6 +29,42 @@ public class Debug {
 	}
 	
 	public static final boolean colorAllowed = mayUseColor();
+	
+	public static void set_red() {
+		if (colorAllowed) System.out.print(COLOR_RED);
+	}
+	
+	public static void set_green() {
+		if (colorAllowed) System.out.print(COLOR_GREEN);
+	}
+	
+	public static void set_yellow() {
+		if (colorAllowed) System.out.print(COLOR_YELLOW);
+	}
+	
+	public static void set_blue() {
+		if (colorAllowed) System.out.print(COLOR_BLUE);
+	}
+	
+	public static void set_magenta() {
+		if (colorAllowed) System.out.print(COLOR_MAGENTA);
+	}
+	
+	public static void set_cyan() {
+		if (colorAllowed) System.out.print(COLOR_CYAN);
+	}
+	
+	public static void set_bold_yellow() {
+		if (colorAllowed) System.out.print(COLOR_BOLD_YELLOW);
+	}
+	
+	public static void set_bold_red() {
+		if (colorAllowed) System.out.print(COLOR_BOLD_RED);
+	}
+	
+	public static void set_reset() {
+		if (colorAllowed) System.out.print(COLOR_RESET);
+	}
 	
 	public static enum LogLevel {
 		levelEVENT(0, "----"),
@@ -56,8 +98,8 @@ public class Debug {
 	private static String[] LOG_COLORS = {
 		"",
 		COLOR_GREEN,
-		COLOR_YELLOW,
-		COLOR_RED,
+		COLOR_BOLD_YELLOW,
+		COLOR_BOLD_RED,
 		COLOR_CYAN
 	};
 		
@@ -131,7 +173,7 @@ public class Debug {
 			if (s != null) System.out.print(s);
 		}
 		
-		public void printf(String f, Object ... args) {
+		public void print(String f, Object ... args) {
 			internal(ALWAYS, f, args);
 		}
 		
@@ -181,7 +223,7 @@ public class Debug {
 	}
 	
 	public static void print(String f, Object... args) {
-		global.printf(f, args);
+		global.print(f, args);
 	}
 	
 	public static void event(String f, Object ... args) {
@@ -202,5 +244,11 @@ public class Debug {
 	
 	public static void lbreak() {
 		System.out.println("");
+	}
+	
+	public static void dbreak() {
+		char[] chars = new char[50];
+		Arrays.fill(chars, '-');
+		System.out.println(new String(chars));
 	}
 }
