@@ -20,10 +20,10 @@
         )
         ( Orange
           ( (dark_u 0.1)
-            (dark_v 0.135)
+            (dark_v 0.14)
             (light_u 0.005)
-            (light_v -0.05)
-            (fuzzy_u 0.035)
+            (light_v -0.165)
+            (fuzzy_u 0.05)
             (fuzzy_v 0.05)
           )
         )

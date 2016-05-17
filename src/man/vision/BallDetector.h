@@ -10,6 +10,7 @@
 #include "Homography.h"
 #include "Field.h"
 #include "Hough.h"
+#include "Spots.h"
 
 
 namespace man {

@@ -120,16 +120,19 @@ int BallDetector::filterWhiteBlobs(Blob currentBlob,
 	if (!topCamera) {
 		maxB = 24;
 	}
-	if (prinLength < prinLength2 * 2 || centerX < prinLength ||
-		centerX > width - prinLength || centerY > height - prinLength) {
-		ratio = true;
-	}
+    // blobs over the field horizon are not viable
+    if (topCamera && centerY < field->horizonAt(centerX)) {
+        return 0;
+    }
+    // badly shaped balls are not viable
+	if (!(prinLength < prinLength2 * 2.5 || centerX < prinLength ||
+          centerX > width - prinLength || centerY > height - prinLength)) {
+		return 0;
+    }
 
-    // see if the blob is of the right general shape for a ball
+    // make sure the blob is of the right general shape
     if (prinLength < maxB && prinLength2 >= minSecond &&
-		prinLength < prinLength2 * 2 &&
-        ratio && currentBlob.area() > MIN_AREA &&
-        (centerY > field->horizonAt(centerX) || !topCamera)) {
+        currentBlob.area() > MIN_AREA) {
         blobs.push_back(std::make_pair(centerX, centerY));
         if (debugBall) {
             debugDraw.drawPoint(centerX, centerY, BLUE);
@@ -583,6 +586,19 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     bool foundBall = false;
     int BOTTOMEDGEWHITEMAX = 25;
     int BUFFER = 10;
+    SpotDetector spots;
+    spots.darkSpot(true);
+    spots.initialInnerDiam(4);
+    spots.filterThreshold(40);
+    spots.greenThreshold(60);
+    spots.filterGain(0.5);
+    //spots.spotFilter(yImage);
+    spots.spotDetect(yImage, homography, &greenImage);
+    SpotList spotter = spots.spots();
+    for (auto i = spotter.begin(); i != spotter.end(); i++) {
+        std::cout << "Got a spot " << (*i).xLo() << " " << (*i).yLo() << std::endl;
+        debugDraw.drawBox((*i).xLo(), (*i).xHi(), (*i).yHi(), (*i).yLo(), ORANGE);
+    }
 
     //makeEdgeList(edges);
     blobber.run(blackImage.pixelAddr(), blackImage.width(),
@@ -605,7 +621,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         int count = filterWhiteBlobs((*i), whiteBlobs, blackBlobs);
         int centerY = static_cast<int>((*i).centerY());
         int principalLength = static_cast<int>((*i).firstPrincipalLength());
-        if (count > 1) {
+        if (count > 2) {
             makeBall((*i), cameraHeight, 0.9, foundBall, false);
             foundBall = true;
         } else if (count == 2) {

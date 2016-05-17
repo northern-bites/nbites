@@ -431,7 +431,7 @@ int Vision_func() {
         }
     }
     for (auto i=whiteBlobs.begin(); i!=whiteBlobs.end(); i++) {
-        if ((*i).firstPrincipalLength() < 30 && (*i).firstPrincipalLength() > 5) {
+        if ((*i).firstPrincipalLength() < 30 && (*i).secondPrincipalLength() > 5) {
             SExpr blobTree = treeFromBlob(*i);
             SExpr next = SExpr::keyValue("white_blob" + std::to_string(count), blobTree);
             allBalls.append(next);
@@ -665,7 +665,7 @@ void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top) {
     textFile.seekg (0, textFile.end);
     long size = textFile.tellg();
     textFile.seekg(0);
-    
+
     // Read file into buffer and convert to string
     char* buff = new char[size];
     textFile.read(buff, size);
@@ -673,7 +673,7 @@ void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top) {
 
     // Get SExpr from string
     SExpr* savedParams, * savedSExpr = SExpr::read((const std::string)sexpText);
-    
+
     if (top) {
         savedParams = savedSExpr->get(1)->find("Top");
     } else {
@@ -685,7 +685,7 @@ void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top) {
 
     const std::vector<SExpr>& newParams = *params->get(1)->getList();
     savedParams->get(1)->setList(newParams);
-       
+
     // Write out
     size = savedSExpr->print().length();
     char* buffer = new char[size + 1];

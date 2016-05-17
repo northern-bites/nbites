@@ -644,9 +644,13 @@ public class DebugImageView extends ViewParent
 		int bl = (black8.data[row * width + col]) & 0xFF;
 
 		if (gr < 100 && wh < 100 && bl < 100) {
-		    g.setColor(Color.GRAY);
+		    g.setColor(new Color(186,85,211));
+		} else if (gr > 100 && wh > 100) {
+		    g.setColor(new Color(255,218,185));
+		} else if (bl > 100 && gr > 100) {
+		    g.setColor(new Color(139,69,19));
 		} else if (gr > wh && gr > bl) {
-		    g.setColor(Color.GREEN);
+		    g.setColor(new Color(0,128,0));
 		} else if (wh > gr && wh > bl) {
 		    g.setColor(Color.WHITE);
 		} else {
