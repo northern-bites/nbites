@@ -91,14 +91,15 @@ namespace man {
 
 			bool findBall(ImageLiteU8 white, double cameraHeight, EdgeList& edges);
 
-            void filterBlackBlobs(Blob currentBlob,
+            void filterBlackSpots(Spot currentBlob,
                                   std::vector<std::pair<int,int>> & blobs,
-                                  std::vector<Blob> & actualBlobs);
+                                  std::vector<Spot> & actualBlobs);
+            bool filterWhiteSpot(Spot spot, std::vector<std::pair<int,int>> & blackSpots);
             int filterWhiteBlobs(Blob currentBlob,
                                   std::vector<std::pair<int,int>> & blobs,
                                   std::vector<std::pair<int,int>> blackBlobs);
-            bool findCorrelatedBlackBlobs(std::vector<std::pair<int,int>> & blackBlobs,
-                                          std::vector<Blob> & actualBlobs,
+            bool findCorrelatedBlackSpots(std::vector<std::pair<int,int>> & blackBlobs,
+                                          std::vector<Spot> & actualBlobs,
                                           double cameraHeight, bool foundBall);
             bool blobsAreClose(std::pair<int,int> first,
                                std::pair<int,int> second);
