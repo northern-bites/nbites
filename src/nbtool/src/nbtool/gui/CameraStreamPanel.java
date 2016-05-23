@@ -41,9 +41,14 @@ public class CameraStreamPanel extends JPanel implements ActionListener {
 		canvas = new JPanel();
 		//canvas.setLayout(new BoxLayout(canvas,BoxLayout.Y_AXIS));
 		canvas.setLayout(null);
+
+		naoVersion = new JButton("V5 Camera Parameters");
+		naoVersion.addActionListener(this);
+		naoVersion.setPreferredSize(new Dimension(180,25));
+		canvas.add(naoVersion);
 		
-		topCameraPrefs = new CameraPrefs("Top Camera");
-		bottomCameraPrefs = new CameraPrefs("Bottom Camera");
+		topCameraPrefs = new CameraPrefs("Top Camera",5);
+		bottomCameraPrefs = new CameraPrefs("Bottom Camera",5);
 		
 		canvas.add(topCameraPrefs);
 		canvas.add(bottomCameraPrefs);
@@ -75,9 +80,14 @@ public class CameraStreamPanel extends JPanel implements ActionListener {
 	
 	private void useSize(Dimension s) {
 		sp.setBounds(0, 0, s.width, s.height);
-		Dimension d1, d2, d3, d4, d5;
+		Dimension d0, d1, d2, d3, d4, d5;
 		int y=0;
 		int x = 0;
+
+		d0 = naoVersion.getPreferredSize();
+		naoVersion.setBounds(x,y,d0.width,d0.height);
+		y += d0.height+3;
+
 		d1 = topCameraPrefs.getPreferredSize();
 		topCameraPrefs.setBounds(x,y,d1.width,d1.height);
 		y += d1.height+3;
@@ -103,6 +113,7 @@ public class CameraStreamPanel extends JPanel implements ActionListener {
 	private JScrollPane sp;
 	private JPanel canvas;
 	
+	private JButton naoVersion;
 	private JButton startStreaming;
 	private JButton saveParamsV4;
 	private JButton saveParamsV5;
@@ -125,6 +136,8 @@ public class CameraStreamPanel extends JPanel implements ActionListener {
 			trySave(topCameraParams, bottomCameraParams,4);
 		} else if(e.getSource() == saveParamsV5) {
 			trySave(topCameraParams,bottomCameraParams,5);
+		} else if(e.getSource() == naoVersion) {
+			updateParamsForCorrectNaoVersion();
 		}
 	}
 	
@@ -203,6 +216,18 @@ public class CameraStreamPanel extends JPanel implements ActionListener {
 			botOut.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void updateParamsForCorrectNaoVersion() {
+		if(naoVersion.getText().equals("V4 Camera Parameters")) {
+			naoVersion.setText("V5 Camera Parameters");
+			topCameraPrefs.refresh("Top Camera",5);
+			bottomCameraPrefs.refresh("Bottom Camera",5);
+		} else {
+			naoVersion.setText("V4 Camera Parameters");
+			topCameraPrefs.refresh("Top Camera",4);
+			bottomCameraPrefs.refresh("Bottom Camera",4);
 		}
 	}
 
