@@ -28,7 +28,7 @@ SpotDetector::SpotDetector()
   innerDiamCm(3.f);
   innerGrowRows(50.f);
   outerGrowRows(30.f);
-  filterGain(2.f);
+  filterGain(0.5f);
   filterThreshold(40);
   greenThreshold(64);
 }
@@ -57,7 +57,7 @@ void SpotDetector::alloc(const ImageLiteBase& src)
     rowAlignMask = (1 << rowAlignBits) - 1
   };
   int pitchNeeded = (src.width() + rowAlignMask) & ~rowAlignMask;
-  int maxHeightNeeded = src.height() - initialOuterDiam() + 1;
+  int maxHeightNeeded = src.height() - initialOuterDiam() + 2;  // one extra for peak detect
   size_t sizeNeeded = pitchNeeded * maxHeightNeeded;
   if (sizeNeeded > filteredSize)
   {
@@ -69,18 +69,18 @@ void SpotDetector::alloc(const ImageLiteBase& src)
                                src.width(), maxHeightNeeded, pitchNeeded, filteredPixels);
 }
 
-void SpotDetector::spotDetect(int y0, const ImageLiteU8* green)
+void SpotDetector::spotDetect(const ImageLiteU8* green)
 {
   _spots.clear();
   int p = filteredImage().pitch();
   int spotThreshold = (int)(filterThreshold() * filterGain()) - 1;
 
   // Scan filtered image, look for peaks, reject those too green
-  for (int y = 1; y < filteredImage().height() - 1; ++y)
+  for (int y = 1; y < filteredImage().height(); ++y)
   {
     uint8_t* row = filteredImage().pixelAddr(0, y);
-    int x0 = row[0] >> 1;
-    _runLengthU8(row + x0, filteredImage().width() - row[0], spotThreshold, outerColumns);
+    int x0 = (row[0] >> 1);
+    _runLengthU8(row + x0, filteredImage().width() - row[0] + 1, spotThreshold, outerColumns);
 
     for (int i = 0; outerColumns[i] >= 0; ++i)
     {
@@ -94,21 +94,22 @@ void SpotDetector::spotDetect(int y0, const ImageLiteU8* green)
         if (green)
         {
           int diam = row[1];
-          int org = diam >> 1;
+          int greenX0 = (green->x0() - filteredImage().x0() - diam + 1) >> 1;
+          int greenY0 = (green->y0() - filteredImage().y0() - diam + 1) >> 1;
           int greenSum = 0;
           for (int gy = 0; gy < diam; ++gy)
           {
-            const uint8_t* gp = green->pixelAddr(x - org, y + y0 + gy - org);
+            const uint8_t* gp = green->pixelAddr(x + greenX0, y + greenY0 + gy);
             for (int gx = 0; gx < diam; ++gx)
               greenSum += *gp++;
           }
-          if (greenSum >= greenThreshold() * diam * diam)
+          if (greenSum > greenThreshold() * diam * diam)
             continue;
           greenScore = greenSum / (diam * diam);
         }
         Spot spot;
-        spot.x = x;
-        spot.y = y + y0;
+        spot.x = (x << 1) - filteredImage().x0();
+        spot.y = (y << 1) - filteredImage().y0();
         spot.filterOutput = z;
         spot.green = greenScore;
         spot.outerDiam = row[0];
@@ -118,7 +119,8 @@ void SpotDetector::spotDetect(int y0, const ImageLiteU8* green)
     }
   }
 
-  // Reject weaker overlapping peaks
+  // Reject weaker overlapping peaks. This is technically O(n^2), but we take
+  // advantage of the natural sorting of the list to keep it fast.
   if (spots().size() >= 2)
   {
     SpotIterator last = spots().end();

@@ -27,18 +27,34 @@ namespace vision {
 // is above a threshold and a local maximum. Optionally, when looking for
 // balls, spots are rejected where the average green confidence is below a
 // threshold, since the ball is white and its spots are black and neither
-// is green. 
+// is green.
+//
+// The integer spot coordinates have one bit to the right of the binary
+// point (s32.1). There is a half-pixel shift in the filtered image, and
+// hence the spots, when the filter diameters are even. The extra bit allows
+// that to be captured. Spot coordinates are relative to the optical axis stored
+// in all ImageLite<T>, which is also s32.1. Windows of images correctly
+// keep track of the optical axis, so that spot coordinates will be the
+// same if the spot detector is run on a window.
 struct Spot
 {
   int filterOutput;   // Filter output, [0 .. 255]
   int green;          // Average green confidence in inner region
-  int x, y;           // Source image coordinates of spot
+  int x, y;           // Image coordinates of spot wrt optical axis (s32.1)
   int innerDiam, outerDiam;
 
-  int xLo() const { return x - (innerDiam >> 1); }
-  int xHi() const { return x + ((innerDiam - 1) >> 1); }
-  int yLo() const { return y - (innerDiam >> 1); }
-  int yHi() const { return y + ((innerDiam - 1) >> 1); }
+  // Image coordinates of spot relative to optical axis, +y is up
+  float ix() const { return  0.5f * x; }
+  float iy() const { return -0.5f * y; }
+
+  // These are intended for the overlap detection code. Note that the
+  // quantities being shifted right will always be even, because
+  // the (x, y) coordinates are off when innerDiam is even (half-
+  // pixel shift).
+  int xLo() const { return (x - innerDiam + 1) >> 1; }
+  int xHi() const { return (x + innerDiam - 1) >> 1; }
+  int yLo() const { return (y - innerDiam + 1) >> 1; }
+  int yHi() const { return (y + innerDiam - 1) >> 1; }
 };
 
 typedef std::list<Spot> SpotList;
@@ -84,10 +100,12 @@ class SpotDetector
 
   // Find spots in filteredImage by peak detection, rejecting green spots if
   // green image is supplied.
-  void spotDetect(int y0, const ImageLiteU8* green);
+  void spotDetect(const ImageLiteU8* green);
 
   // Vector of all spots found
   std::list<Spot> _spots;
+
+  int _horizon;
 
 public:
   SpotDetector();
@@ -158,22 +176,21 @@ public:
   // to detect spots and put them in a list that can be fetched by the
   // spots member function. If a green image is specified, reject green spots.
   template <class T>
-  void spotDetect(ImageLite<T>& src, const FieldHomography& h, const ImageLiteU8* green = NULL);
+  void spotDetect(const ImageLite<T>& src, const FieldHomography& h, const ImageLiteU8* green = NULL);
 
   // Get the filtered image from the last run of spotFilter (and spotDetect, which
   // calls it).
   const ImageLiteU8& filteredImage() const { return _filteredImage; }
 
-  // Get the row offset from filteredImage to the specified source image
-  // (e.g. the one that spotDetect was called on).
-  int filteredYOffset(const ImageLiteBase& src) const
-  {
-    return (src.y0() - filteredImage().y0()) >> 1;
-  }
-
   // Get the detected spots
   const std::list<Spot>& spots() const { return _spots; }
         std::list<Spot>& spots()       { return _spots; }
+
+  // Get horizon used by spotDetect (source image y coordinate). This is not the
+  // true horizon because roll is ignored. This is primarily intended for display
+  // so users can see what was done. Roll is ignored because the spot growing
+  // can happen efficiently only in y.
+  int horizon() const { return _horizon; }
 
   // Get the execution time of the last call to spotDetect
   uint32_t ticks() const { return _ticks; }
@@ -291,7 +308,7 @@ void SpotDetector::spotFilter(const ImageLite<T>& src)
       innerGrowTrigger -= 1.f;
     }
 
-    if (outerGrowTrigger <= 0)
+    if (outerGrowTrigger <= 0 && y < src.height() - 1)
     {
       // Grow outer region by 2
       T* pos0 = src.pixelAddr(0, y);
@@ -347,8 +364,14 @@ void SpotDetector::spotFilter(const ImageLite<T>& src)
       outerSum += outerColumns[x] - outerColumns[x - outerDiam];
       innerSum += innerColumns[x - innerOffset] - innerColumns[x - innerOffset - innerDiam];
     }
-    *pDst = (uint8_t)min(max((int)(innerK * innerSum - outerK * outerSum), 0), 255);
+    *pDst++ = (uint8_t)min(max((int)(innerK * innerSum - outerK * outerSum), 0), 255);
+    *pDst = 0;    // for peak detect
   }
+
+  // Write extra row of 0's for peak detect
+  uint8_t* pDst = _filteredImage.pixelAddr(outerDiam >> 1, yFilt);
+  for (int x = 0; x < src.width() - outerDiam; ++x)
+    pDst[x] = 0;
 
   _filteredImage = ImageLiteU8(_filteredImage, 0, 0, _filteredImage.width(), yFilt);
 }
@@ -360,8 +383,11 @@ void SpotDetector::spotFilter(const ImageLite<T>& src)
 // *************************************
 
 template <class T>
-void SpotDetector::spotDetect(ImageLite<T>& src, const FieldHomography& h, const ImageLiteU8* green)
+void SpotDetector::spotDetect(const ImageLite<T>& src, const FieldHomography& h, const ImageLiteU8* green)
 {
+  // Don't time this, since it will generally only do the allocation once
+  alloc(src);
+
   TickTimer timer;
 
   double ct = cos(h.tilt());
@@ -369,11 +395,11 @@ void SpotDetector::spotDetect(ImageLite<T>& src, const FieldHomography& h, const
   innerGrowRows((float)(2 * h.wz0() / (innerDiamCm() * st)));
   outerGrowRows(0.60f * innerGrowRows());
 
-  int y0;
-  if (0.5 * src.y0() - h.flen() * ct / st < 0)
+  double hy = 0.5 * src.y0() - h.flen() * ct / st;
+  _horizon = (int)round(hy);
+  if (hy < 0)
   {
     // Horizon above image
-    y0 = 0;
     int id = max((int)round((h.flen() * ct - 0.5 * src.y0() * st) * innerDiamCm() / h.wz0()), 3);
     int od = 5 * id / 3;    // Roughly balance inner and outer sizes
     od += (id ^ od) & 1;
@@ -386,13 +412,12 @@ void SpotDetector::spotDetect(ImageLite<T>& src, const FieldHomography& h, const
     // Horizon within image
     initialInnerDiam(3);
     initialOuterDiam(5);
-    y0 = (int)round(0.5 * src.y0() - (ct * h.flen() - initialInnerDiam() * h.wz0() / innerDiamCm()) / st);
+    int y0 = (int)round(0.5 * src.y0() - (ct * h.flen() - initialInnerDiam() * h.wz0() / innerDiamCm()) / st);
     y0 = max(y0 - (initialOuterDiam() >> 1), 0);
     spotFilter(ImageLite<T>(src, 0, y0, src.width(), src.height() - y0));
   }
 
-  y0 += initialOuterDiam() >> 1;
-  spotDetect(y0, green);
+  spotDetect(green);
 
   _ticks = timer.time32();
 }

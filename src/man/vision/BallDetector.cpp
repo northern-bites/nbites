@@ -45,42 +45,42 @@ void BallDetector::setDebugImage(DebugImage * di) {
     int WHITE_JUMP = 40;
 	// Some ideas: spots on the ball should have white in at least two directions
     int buff = 0;
-    int leftX = currentSpot.xLo() - buff;
-    int rightX = currentSpot.xHi() + buff;
-    int topY = currentSpot.yLo() - buff;
-    int bottomY = currentSpot.yHi() + buff;
+    int leftX = currentSpot.xLo() + width / 2 - buff;
+    int rightX = currentSpot.xHi() + width / 2 + buff;
+    int topY = currentSpot.yLo() + height / 2 - buff;
+    int bottomY = currentSpot.yHi() + height / 2 + buff;
 	int scan = currentSpot.innerDiam / 2;
     if (scan < 2) {
         scan = 2;
     }
-    int midY = *(yImage.pixelAddr(currentSpot.x, currentSpot.y)) / 4;
+    int midY = *(yImage.pixelAddr(currentSpot.ix() + width / 2, -currentSpot.iy() + height / 2)) / 4;
     int currentY = 0;
     int whites = 0;
 	// scan out from each edge to see if there is a significant
     // jump in Y in at least two directions
 	for (int i = leftX; i > leftX - scan; i--) {
-        currentY = *(yImage.pixelAddr(i, currentSpot.y)) / 4;
+        currentY = *(yImage.pixelAddr(i, -currentSpot.iy() + height / 2)) / 4;
         if (abs(currentY - midY) > WHITE_JUMP) {
 			whites++;
 			i = i - scan;
 		}
 	}
 	for (int i = rightX; i < rightX + scan; i++) {
-        currentY = *(yImage.pixelAddr(i, currentSpot.y)) / 4;
+        currentY = *(yImage.pixelAddr(i, -currentSpot.iy() + height / 2)) / 4;
         if (abs(currentY - midY) > WHITE_JUMP) {
 			whites++;
 			i = i + scan;
 		}
 	}
 	for (int i = topY; i > topY - scan; i--) {
-        currentY = *(yImage.pixelAddr(currentSpot.x, i)) / 4;
+        currentY = *(yImage.pixelAddr(currentSpot.ix() + width / 2, i)) / 4;
         if (abs(currentY - midY) > WHITE_JUMP) {
 			whites++;
 			i = i - scan;
 		}
 	}
 	for (int i = bottomY; i < bottomY + scan; i++) {
-        currentY = *(yImage.pixelAddr(currentSpot.x, i)) / 4;
+        currentY = *(yImage.pixelAddr(currentSpot.ix() + width / 2, i)) / 4;
         if (abs(currentY - midY) > WHITE_JUMP) {
 			whites++;
 			i = i + scan;
@@ -88,8 +88,9 @@ void BallDetector::setDebugImage(DebugImage * di) {
 	}
     if (whites > 1) {
         if (debugBall) {
-            debugDraw.drawPoint(currentSpot.x, currentSpot.y, BLUE);
-            std::cout << "Black blob " << currentSpot.x << " " << currentSpot.y << std::endl;
+            debugDraw.drawPoint(currentSpot.ix() + width / 2, -currentSpot.iy() + height / 2, BLUE);
+            std::cout << "Black blob " << (currentSpot.ix() + width / 2) << " " <<
+                (-currentSpot.iy() + width / 2) << std::endl;
         }
 		return true;
     } else {
@@ -580,13 +581,13 @@ void BallDetector::makeEdgeList(EdgeList & edges)
 }
 
 bool BallDetector::filterWhiteSpot(Spot spot, std::vector<std::pair<int,int>> & blackSpots) {
-    int leftX = spot.x - spot.innerDiam / 4;
-    int rightX = spot.x + spot.innerDiam / 4;
-    int topY = spot.y - spot.innerDiam / 4;
-    int bottomY = spot.y + spot.innerDiam / 4;
+    int leftX = spot.x + width / 2 - spot.innerDiam / 4;
+    int rightX = spot.x + width / 2 + spot.innerDiam / 4;
+    int topY = spot.y + height / 2 - spot.innerDiam / 4;
+    int bottomY = spot.y + height / 2 + spot.innerDiam / 4;
 
     // don't  bother if off the field
-    if (topCamera && spot.y < field->horizonAt(spot.x)) {
+    if (topCamera && spot.y < field->horizonAt(spot.x + width / 2)) {
         return false;
     }
     // when it is too small it is too dangerous
@@ -597,8 +598,8 @@ bool BallDetector::filterWhiteSpot(Spot spot, std::vector<std::pair<int,int>> & 
     int spots = 0;
     for (int j = 0; j < blackSpots.size(); j++) {
         std::pair<int,int> blackspot = blackSpots[j];
-        if (blackspot.first > spot.xLo() && blackspot.first < spot.xHi() &&
-            blackspot.second > spot.yLo() && blackspot.second < spot.yHi()) {
+        if (blackspot.first > spot.xLo() + width / 2 && blackspot.first < spot.xHi() + width / 2 &&
+            blackspot.second > spot.yLo() + height / 2 && blackspot.second < spot.yHi() + height / 2) {
             spots++;
         }
     }
@@ -652,46 +653,55 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     if (!topCamera) {
         spots.innerDiamCm(5.0f);
     }
-    spots.filterThreshold(40);
+    spots.filterThreshold(140);
     spots.greenThreshold(60);
     spots.filterGain(0.5);
     spots.spotDetect(yImage, homography, &greenImage);
     SpotList spotter = spots.spots();
     for (auto i = spotter.begin(); i != spotter.end(); i++) {
-        int midX = (*i).x;
-        int midY = (*i).y;
+        int midX = (*i).ix() + width / 2;
+        int midY = -(*i).iy() + height / 2;
+        int xLo = (*i).xLo() + width / 2;
+        int xHi = (*i).xHi() + width / 2;
+        int yLo = (*i).yLo() + height / 2;
+        int yHi = (*i).yHi() + height / 2;
         getColor(midX, midY);
         // if the middle of the spot is white or green, ignore it
         if (!(isWhite() || isGreen()) &&
-            (!topCamera || (*i).yLo() > field->horizonAt((*i).xLo()))) {
+            (!topCamera || midY > field->horizonAt(midX))) {
             if (filterBlackSpots((*i))) {
-				debugDraw.drawBox((*i).xLo(), (*i).xHi(), (*i).yHi(), (*i).yLo(), ORANGE);
-				blackBlobs.push_back(std::make_pair((*i).x, (*i).y));
+				debugDraw.drawBox(xLo, xHi, yHi, yLo, ORANGE);
+				blackBlobs.push_back(std::make_pair(midX, midY));
 				actualBlackBlobs.push_back((*i));
 			} else {
-				debugDraw.drawBox((*i).xLo(), (*i).xHi(), (*i).yHi(), (*i).yLo(), BLUE);
-                std::cout << "Drew" << std::endl;
+				debugDraw.drawBox(xLo, xHi, yHi, yLo, BLUE);
 			}
         }
     }
 
     SpotDetector whitespots;
     whitespots.darkSpot(false);
-    whitespots.innerDiamCm(18.0f);
+    whitespots.innerDiamCm(13.0f);
     if (!topCamera) {
         whitespots.innerDiamCm(24.0f);
     }
-    whitespots.filterThreshold(40);
+    whitespots.filterThreshold(140);
     whitespots.greenThreshold(70);
     whitespots.filterGain(0.5);
     //spots.spotFilter(yImage);
     whitespots.spotDetect(yImage, homography, &greenImage);
     SpotList whitespotter = whitespots.spots();
     for (auto i = whitespotter.begin(); i != whitespotter.end(); i++) {
+        int midX = (*i).ix() + width / 2;
+        int midY = -(*i).iy() + height / 2;
+        int xLo = (*i).xLo() + width / 2;
+        int xHi = (*i).xHi() + width / 2;
+        int yLo = (*i).yLo() + height / 2;
+        int yHi = (*i).yHi() + height / 2;
         if (filterWhiteSpot((*i), blackBlobs)) {
-            debugDraw.drawBox((*i).xLo(), (*i).xHi(), (*i).yHi(), (*i).yLo(), RED);
-        } else if (!topCamera || (*i).yLo() > field->horizonAt((*i).xLo())) {
-            debugDraw.drawBox((*i).xLo(), (*i).xHi(), (*i).yHi(), (*i).yLo(), WHITE);
+            debugDraw.drawBox(xLo, xHi, yHi, yLo, RED);
+        } else if (!topCamera || yLo > field->horizonAt(xLo)) {
+            debugDraw.drawBox(xLo, xHi, yHi, yLo, WHITE);
         }
     }
 
