@@ -42,47 +42,50 @@ void BallDetector::setDebugImage(DebugImage * di) {
 */
 	bool BallDetector::filterBlackSpots(Spot currentSpot)
 {
+    int WHITE_JUMP = 40;
 	// Some ideas: spots on the ball should have white in at least two directions
-    int buff = 2;
+    int buff = 0;
     int leftX = currentSpot.xLo() - buff;
     int rightX = currentSpot.xHi() + buff;
-    int topY = currentSpot.yHi() - buff;
-    int bottomY = currentSpot.yLo() + buff;
+    int topY = currentSpot.yLo() - buff;
+    int bottomY = currentSpot.yHi() + buff;
 	int scan = currentSpot.innerDiam / 2;
+    if (scan < 2) {
+        scan = 2;
+    }
+    int midY = *(yImage.pixelAddr(currentSpot.x, currentSpot.y)) / 4;
+    int currentY = 0;
     int whites = 0;
-	// scan out from each edge to see if white can be found
-	// alternative idea: just a significant rise in y value (not white dependent)
+	// scan out from each edge to see if there is a significant
+    // jump in Y in at least two directions
 	for (int i = leftX; i > leftX - scan; i--) {
-		getColor(i, currentSpot.y);
-		if (isWhite()) {
+        currentY = *(yImage.pixelAddr(i, currentSpot.y)) / 4;
+        if (abs(currentY - midY) > WHITE_JUMP) {
 			whites++;
 			i = i - scan;
 		}
 	}
 	for (int i = rightX; i < rightX + scan; i++) {
-		getColor(i, currentSpot.y);
-		if (isWhite()) {
+        currentY = *(yImage.pixelAddr(i, currentSpot.y)) / 4;
+        if (abs(currentY - midY) > WHITE_JUMP) {
 			whites++;
 			i = i + scan;
 		}
 	}
-	// special for bottom of the ball
 	for (int i = topY; i > topY - scan; i--) {
-		getColor(currentSpot.x, i);
-		if (isWhite()) {
-			whites+=2;
+        currentY = *(yImage.pixelAddr(currentSpot.x, i)) / 4;
+        if (abs(currentY - midY) > WHITE_JUMP) {
+			whites++;
 			i = i - scan;
 		}
 	}
-	for (int i = bottomY; i < topY + scan; i++) {
-		getColor(currentSpot.x, i);
-		if (isWhite()) {
+	for (int i = bottomY; i < bottomY + scan; i++) {
+        currentY = *(yImage.pixelAddr(currentSpot.x, i)) / 4;
+        if (abs(currentY - midY) > WHITE_JUMP) {
 			whites++;
 			i = i + scan;
 		}
 	}
-    int half_perimeter = (rightX - leftX) + (bottomY - topY);
-    // intentionally made true for now - no filtering is happening
     if (whites > 1) {
         if (debugBall) {
             debugDraw.drawPoint(currentSpot.x, currentSpot.y, BLUE);
@@ -90,9 +93,11 @@ void BallDetector::setDebugImage(DebugImage * di) {
         }
 		return true;
     } else {
-		std::cout << "Filtered " << half_perimeter << " " << whites << std::endl;
-		debugDraw.drawPoint(currentSpot.x, currentSpot.y, RED);
-		return false;
+        if (debugBall) {
+            std::cout << "Filtered " << scan << " " << whites << std::endl;
+            //debugDraw.drawPoint(currentSpot.x, currentSpot.y, RED);
+        }
+        return false;
     }
 }
 
@@ -580,9 +585,11 @@ bool BallDetector::filterWhiteSpot(Spot spot, std::vector<std::pair<int,int>> & 
     int topY = spot.y - spot.innerDiam / 4;
     int bottomY = spot.y + spot.innerDiam / 4;
 
+    // don't  bother if off the field
     if (topCamera && spot.y < field->horizonAt(spot.x)) {
         return false;
     }
+    // when it is too small it is too dangerous
     if (spot.innerDiam / 4 < 2) {
         return false;
     }
@@ -595,11 +602,13 @@ bool BallDetector::filterWhiteSpot(Spot spot, std::vector<std::pair<int,int>> & 
             spots++;
         }
     }
+    // for now, if there are no black spots then it is too dangerous
     if (spots < 1) {
-        std::cout << "No spots" << std::endl;
         return false;
     }
 
+    // make sure there is some part of the main spot that isn't white
+    // if there is actual green then bail - probably a corner or something
     int nonWhite = 0;
     for (int i = leftX; i < rightX; i++) {
         for (int j = topY; j < bottomY; j++) {
@@ -661,6 +670,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 				actualBlackBlobs.push_back((*i));
 			} else {
 				debugDraw.drawBox((*i).xLo(), (*i).xHi(), (*i).yHi(), (*i).yLo(), BLUE);
+                std::cout << "Drew" << std::endl;
 			}
         }
     }
