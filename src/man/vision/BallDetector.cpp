@@ -129,7 +129,7 @@ int BallDetector::filterWhiteBlobs(Blob currentBlob,
 		maxB = 24;
 	}
     // blobs over the field horizon are not viable
-    if (topCamera && centerY < field->horizonAt(centerX)) {
+    if (topCamera && centerY < field->horizonAt(centerX)) { //should this not be > 
         return 0;
     }
     // badly shaped balls are not viable
@@ -562,6 +562,13 @@ void BallDetector::edgeSanityCheck(int bx, int by, int radius)
 
 }
 
+bool BallDetector::blackSpotGeometryCheck(SpotList *blackSpots)
+{
+    std::cout<<"Black Spots Size:" <<blackSpots->size()<<std::endl;
+    //if(blackSpots)
+    return 0;
+}
+
 /* Filter the edge list down to possible balls */
 void BallDetector::makeEdgeList(EdgeList & edges)
 {
@@ -678,6 +685,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 			}
         }
     }
+    blackSpotGeometryCheck(&spotter);
 
     SpotDetector whitespots;
     whitespots.darkSpot(false);

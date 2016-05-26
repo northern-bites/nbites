@@ -108,6 +108,7 @@ namespace man {
             bool farSanityChecks(Blob blob);
             bool nearSanityChecks(Blob blob);
 			bool hardSanityCheck(int leftx, int rightx, int topy, int bottomy);
+			bool blackSpotGeometryCheck(SpotList *blackSpots);
 
 			void setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 black,
 						   ImageLiteU16 yImg);
