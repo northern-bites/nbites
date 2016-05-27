@@ -488,7 +488,7 @@ void VisionModule::outportalVisionField()
     {
         vb->set_distance(best.dist);
 
-        vb->set_radius(best.firstPrincipalLength);
+        vb->set_radius(best.radius);
         double bearing = atan(best.x_rel / best.y_rel);
         vb->set_bearing(bearing);
         vb->set_bearing_deg(bearing * TO_DEG);

@@ -33,9 +33,9 @@ namespace man {
 
 		class Ball {
 		public:
-			Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_,
-				 int imgWidth_, bool top, bool os, bool ot, bool ob,
-				 double cx, double cy);
+			Ball(double x_, double y_, double cameraH_, int imgHeight_,
+				 int imgWidth_, bool tc,
+				 double cx, double cy, double conf);
 			Ball();
 
 			std::string properties();
@@ -43,19 +43,17 @@ namespace man {
 			double confidence() const { return _confidence; }
 
 			// For tool
-            Blob& getBlob() { return blob; }
 //private: should be private. leaving public for now
 			void compute();
 
 			double pixDiameterFromDist(double d) const;
 
-            Blob blob;
 			FuzzyThr thresh;
 			FuzzyThr radThresh;
 
 			int centerX;
 			int centerY;
-			int firstPrincipalLength;
+			int radius;
 
 			double x_rel;
 			double y_rel;
@@ -102,7 +100,7 @@ namespace man {
             bool blobsAreClose(std::pair<int,int> first,
                                std::pair<int,int> second);
 
-            void makeBall(Blob blob, double cameraHeight, double conf,
+            void makeBall(Spot blob, double cameraHeight, double conf,
                           bool foundBall, bool isBlack);
             bool lookForFarAwayBalls(Blob blob);
             bool farSanityChecks(Blob blob);
