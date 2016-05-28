@@ -393,7 +393,7 @@ bool BallDetector::findCorrelatedBlackSpots
                     }
                     makeBall(newBall, cameraHeight, 0.8, foundBall, true); */
 #ifdef OFFLINE
-                    foundBall = true;
+                    //foundBall = true;
 #else
                     return true;
 #endif
@@ -425,7 +425,7 @@ bool BallDetector::findCorrelatedBlackSpots
             makeBall(newBall, cameraHeight, 0.75, foundBall, true); */
             std::cout << "Found 2d cor. Punting for now" << std::endl;
 #ifdef OFFLINE
-            foundBall = true;
+            //foundBall = true;
 #else
             return true;
 #endif
@@ -450,11 +450,10 @@ void BallDetector::makeBall(Spot spot, double cameraHeight, double conf,
     double bIY = -spot.iy() + height / 2;
     double x_rel, y_rel;
     bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
-    Ball b(x_rel, -1 * y_rel, cameraHeight, height,
+    std::cout << "x " << x_rel << " " << y_rel << " " << bIX << std::endl;
+    Ball b(spot, x_rel, -1 * y_rel, cameraHeight, height,
            width, topCamera, spot.ix() + width / 2, -spot.iy() + height / 2, conf);
-	if (!foundBall) {
-		_best = b;
-	}
+    _best = b;
 		//edgeSanityCheck((int)blob.centerX(), (int)blob.centerY(), blob.firstPrincipalLength());
 #ifdef OFFLINE
 		candidates.push_back(b);
@@ -642,6 +641,8 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         if (filterWhiteSpot((*i), blackBlobs)) {
             debugDraw.drawBox(xLo, xHi, yHi, yLo, RED);
             actualWhiteSpots.push_back((*i));
+            makeBall((*i), cameraHeight, 0.75, foundBall, false);
+            foundBall = true;
         } else if (!topCamera || yLo > field->horizonAt(xLo)) {
             debugDraw.drawBox(xLo, xHi, yHi, yLo, WHITE);
         }
@@ -650,12 +651,17 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     if (findCorrelatedBlackSpots(blackBlobs, actualBlackBlobs, cameraHeight,
                                  foundBall)) {
 #ifdef OFFLINE
-        foundBall = true;
+        //foundBall = true;
 #else
         return true;
 #endif
 	}
-    std::cout << "Done" << std::endl;
+    if (foundBall) {
+        std::cout << "Done" << std::endl;
+        std::cout << "Best " << _best.y_rel << std::endl;
+    } else {
+        std::cout << "Done no" << std::endl;
+    }
 
     return foundBall;
 }
@@ -712,8 +718,9 @@ void BallDetector::setImages(ImageLiteU8 white, ImageLiteU8 green,
 /* Ball functions.
  */
 
-Ball::Ball(double x_, double y_, double cameraH_, int imgHeight_,
+Ball::Ball(Spot & s, double x_, double y_, double cameraH_, int imgHeight_,
            int imgWidth_, bool top, double cx, double cy, double conf) :
+    spot(s),
     radThresh(.3, .7),
     thresh(.5, .8),
     x_rel(x_),
@@ -748,8 +755,9 @@ void Ball::compute()
     double hypotDist = hypot(dist, cameraH);
     expectedDiam = pixDiameterFromDist(hypotDist);
 
-    if (dist > 300) {
-        _confidence = 0;
+    if (dist > 500) {
+        std::cout << "Setting confidence to 0" << std::endl;
+        //_confidence = 0;
     }
 }
 

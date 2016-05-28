@@ -33,13 +33,14 @@ namespace man {
 
 		class Ball {
 		public:
-			Ball(double x_, double y_, double cameraH_, int imgHeight_,
+			Ball(Spot & s, double x_, double y_, double cameraH_, int imgHeight_,
 				 int imgWidth_, bool tc,
 				 double cx, double cy, double conf);
 			Ball();
 
 			std::string properties();
 
+            Spot & getSpot() { return spot; }
 			double confidence() const { return _confidence; }
 
 			// For tool
@@ -47,6 +48,8 @@ namespace man {
 			void compute();
 
 			double pixDiameterFromDist(double d) const;
+
+            Spot spot;
 
 			FuzzyThr thresh;
 			FuzzyThr radThresh;
