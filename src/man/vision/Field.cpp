@@ -56,6 +56,7 @@ namespace vision {
 		debugDrawFieldEdge = false;
 		debugHorizon = false;
 		drawCameraHorizon = false;
+		debugRansac = false;
 #endif
 	}
 
@@ -64,10 +65,12 @@ namespace vision {
 		//cout << "Set debug " << (int)di << endl;
 	}
 
-	void Field::setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 orange) {
+	void Field::setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 orange,
+		ImageLiteU16 yImg) {
 		whiteImage = white;
 		greenImage = green;
 		orangeImage = orange;
+		yImage = yImg;
 	}
 
 
@@ -84,7 +87,8 @@ namespace vision {
 	}
 
 	bool Field::isWhite() {
-		if (*(whiteImage.pixelAddr(currentX, currentY)) > 128) {
+		if (*(whiteImage.pixelAddr(currentX, currentY)) > 128 &&
+			*(yImage.pixelAddr(currentX, currentY)) < 350) {
 			return true;
 		}
 		return true;
@@ -475,6 +479,334 @@ int Field::findSlant() {
 	return 0;
 }
 
+/* Find the field edges if possible and turn them into lines.
+   Heavily borrowed from the UNSW implementation of the same.
+ */
+
+void Field::findFieldEdgeLines(unsigned int *seed) {
+	// Set up some constants based on the camera
+	const int COLS = width;
+	const int ROWS = height;
+	int density = SCANSIZE;
+	int cols = width;
+
+	/* some magic constants (see RANSAC documentation) */
+	static const unsigned int k = 40;
+	static const float        e = 8.0;
+	static const unsigned int n = 8; //(140 / density);
+
+	/* If there are n or greater green tops, which usually fall below
+	 * the field edge, above a field line, invalidate it
+	 */
+	static const int invalidateIfNTops  = 40  / density;
+
+	unsigned int i;
+
+	std::vector<PointI> *edgePoints;       // points where green found
+	std::vector<PointI> edgePoints2;       // subset for possible 2d line
+	edgePoints = &edgePointsTop;
+
+	std::vector<bool> *cons, consBuf[2];
+	consBuf[0].resize(cols * 2);           // which points are in line
+	consBuf[1].resize(cols * 2);           // points in 2d line
+
+	std::vector<RANSACLine> lines(1);      // holds two potential lines
+	RANSACLine result;
+
+	RANSAC::Generator<RANSACLine> g;       // generates possible lines
+	RANSAC::Ransac<RANSACLine> ransac;     // tests possibilities
+
+	int minX = 0;// = min(lines[i].p1.x(), lines[i].p2.x());
+	int maxX = width;// = max(lines[i].p1.x(), lines[i].p2.x());
+
+	// Check if we have a legal ransac line for this image
+	if (ransac(g, *edgePoints, &cons, lines[0], k, e, n, consBuf, seed)) {
+
+		/**
+		 * Line found, now try to find a second line. We could see a corner
+		 * First remove points belonging to the first line
+		 * Then run RANSAC again
+		 */
+		for (i = 0; i < edgePoints->size(); ++i) {
+			if (! (*cons)[i]) {
+				edgePoints2.push_back(edgePoints->at(i));
+			} else {
+				minX = min(edgePoints->at(i).x(), minX);
+				maxX = max(edgePoints->at(i).x(), maxX);
+			}
+		}
+
+		lines.resize(2);  // make room in vector for 2d line
+		if (! ransac(g, edgePoints2, &cons, lines[1], k, e, n, consBuf, seed)) {
+			lines.resize(1);  // on failure trim vector
+		}
+
+	} else {
+		// no line found
+		lines.resize(0);
+	}
+
+	// Sanity checks
+
+	/* Invalidate any line with too much green above it */
+	std::vector<RANSACLine>::iterator line;
+	for (line = lines.begin(); line != lines.end(); ++ line) {
+		int n;
+		if (line->t1 == 0) {
+			n = greenTops[HULLS - 1];
+		} else {
+			/* Solve for x when y = SALIENCY_DENSITY. At y = 0 aliased green
+			 * pixels from a legitimate field edge can be along the top of the
+			 * image
+			 *
+			 * t1x + t2y + t3 = 0
+			 * x = -(t3 + t2*SALIENCY_DENSITY) / t1
+			 */
+			int x;
+			//if (top) {
+			x = -(line->t3 + line->t2 * density) / line->t1;
+			//} else {
+			//   x = -(line->t3 + line->t2*(density+ROWS)) /line->t1;
+			//}
+
+			/* Convert to saliency image resolution */
+			x /= density;
+
+			if (x < 0 || x >= HULLS) {
+				n = greenTops[HULLS - 1];
+			} else {
+				bool positiveSlope = (line->t1 >= 0) == (line->t2 >= 0);
+				if (positiveSlope) {
+					n = greenTops[x];
+				} else {
+					n = greenTops[HULLS - 1] - greenTops[x];
+				}
+			}
+		}
+		if (n >= invalidateIfNTops) {
+			if (debugRansac) {
+				cout << "Ransac line invalidated for too much green above " <<
+					n << " "  << endl;
+			}
+			line = lines.erase(line) - 1;
+		}
+	}
+
+	// possible intersection point
+	float x_intercept;
+	float y_intercept;
+
+	if (lines.size() == 2) {
+		if (debugRansac) {
+			cout << "Two possible lines" << endl;
+		}
+		/**
+		 * begin sanity checks, sort lines by gradient
+		 */
+		RANSACLine *l1;
+		RANSACLine *l2;
+
+		if (abs(lines[0].t2 * lines[1].t1) < abs(lines[1].t2 * lines[0].t1)) {
+			l1 = &lines[0];
+			l2 = &lines[1];
+		} else {
+			l1 = &lines[1];
+			l2 = &lines[0];
+		}
+
+		/**
+		 * sanity check 1: avoid lines that intersect outside the image
+		 */
+		//llog(DEBUG2) << "sanity check 1: intersect inside frame" << endl;
+		x_intercept = (l1->t3*l2->t2 - l2->t3*l1->t2) /
+			(float)(l1->t2*l2->t1 - l1->t1*l2->t2);
+		y_intercept = (l1->t3*l2->t1 - l2->t3*l1->t1)/
+			(float)(l1->t1*l2->t2 - l2->t1*l1->t2);
+
+		if (debugRansac) {
+			cout << "intersection is at " << x_intercept << " " << y_intercept << endl;
+		}
+
+		if (x_intercept < 0 || x_intercept > COLS
+			|| y_intercept < 0 || y_intercept > (2*ROWS))
+		{
+			lines.pop_back();
+		}
+
+		if (lines.size() == 2) {
+			// TODO: write a working version of this
+			/**
+			 * sanity check 2: avoid lines that are close to being parallel
+			 */
+			//llog(DEBUG2) << "sanity check 2: angle between lines" << endl;
+			/*RANSACLine rrl1 = convRR->convertToRRLine(*l1);
+			  RANSACLine rrl2 = convRR->convertToRRLine(*l2);
+			  float m1 = -rrl1.t1 / (float) rrl1.t2;
+			  float m2 = -rrl2.t1/ (float) rrl2.t2;
+			  float theta = atan(abs((m1 - m2) / (1 + m1 * m2)));
+			  // float deviation = M_PI / 2 - theta;
+			  // if (deviation > MAX_EDGE_DEVIATION_FROM_PERPENDICULAR)
+			  const int MIN_ANGLE_BETWEEN_EDGE_LINES = 10;
+			  if (theta < MIN_ANGLE_BETWEEN_EDGE_LINES)
+			  {
+			  lines.pop_back();
+			  //llog(DEBUG2) << "Failed sanity check 2" << std::endl;
+			  //llog(DEBUG2) << "m1: " << m1 << ", m2: " << m2 << ", theta: " << RAD2DEG(theta) << std::endl;
+			  }*/
+		}
+	}
+
+	int smaller = 1;
+	if (lines.size() == 2) {
+		int minX1 = min(lines[0].p1.x(), lines[0].p2.x());
+		int minX2 = min(lines[1].p1.x(), lines[1].p2.x());
+		if (minX1 < minX2) {
+			smaller = 0;
+		}
+	}
+
+	for (i = 0; i < lines.size(); ++ i) {
+		if (debugRansac) {
+			cout << "Outputting ransac line " << " " << lines[i].p1.x() << " " <<
+				lines[i].p1.y() << " " << lines[i].p2.x() << " " <<
+				lines[i].p2.y() << endl;
+		}
+		// Extend the line to include the bounds of the consensus set
+		int size = edgePoints->size();
+		if (i == 1) {
+			size = edgePoints2.size();
+		}
+		int count = 0;
+		if (lines.size() == 2) {
+			if (i == smaller) {
+				maxX = x_intercept;
+				minX = 0;
+			} else {
+				minX = x_intercept;
+				maxX = width - 1;
+			}
+		} else {
+			/*for (int k = 0; k < consBuf[1].size(); k++) {
+				if (consBuf[1].at(k)) {
+					cout << "Got " << k << endl;
+				}
+			}
+			for (int k = 0; k < size; k++) {
+				if (consBuf[i].at(k)) {
+					count++;
+					int curX = edgePoints->at(k).x();
+					if (i > 0) {
+						curX = edgePoints2.at(k).x();
+					}
+					minX = min(minX, curX);
+					maxX = max(maxX, curX);
+				}
+				} */
+		}
+		// next we just make sure our new line covers as much ground as possible
+		if (debugRansac) {
+			cout << "Min and max " << minX << " " << maxX << " " << count << endl;
+		}
+		int left = min(lines[i].p1.x(), lines[i].p2.x());
+		int right = lines[i].p1.x();
+		int leftY = lines[i].p1.y();
+		int rightY = lines[i].p2.y();
+		if (left == right) {
+			right = lines[i].p2.x();
+		} else {
+			rightY = lines[i].p1.y();
+			leftY = lines[i].p2.y();
+		}
+		int range = right - left;
+		int lift = rightY - leftY;
+		float slope = (float)(lift) / (float)(range);
+
+		int extendLeft = left - minX;
+		int extendRight = maxX - right;
+		float minY = leftY - (float)(extendLeft) * slope;
+		float maxY = rightY + (float)(extendRight) * slope;
+		if (debugRansac) {
+			drawLine(minX, (int)(minY), maxX, (int)(maxY), ORANGE);
+		}
+
+	}
+}
+
+/* Find a rough outline of the edge of the field. We are going to scan
+   down from the camera horizon and look for the first clump of green that we
+   can find. This will be a point for our ransac algorithm. We then leave it
+   to ransac to actually fit the points to a good line or lines.
+   @param pH     the pose estimated horizon
+ */
+
+void Field::findFieldEdge(int pH) {
+	int consecutiveGreen = 0;   // how many green pixels we've seen
+	int greenCount = 0;         // how much green overall
+	int whiteCount = 0;         // how much white
+	const int MINRUN = 6;       // minimimum size run to call our point
+	edgePointsTop.clear();      // start with an empty list of points
+
+	for (int i = 0; i < HULLS; i++) {    // we'll track absolute top green points
+		greenTops[i] = 0;
+	}
+
+	for (int i = 0; i < HULLS; i++) {
+		// initialize for this scanline
+		if (i != 0) {
+			greenTops[i] = greenTops[i-1];
+		}
+		greenCount = 0;
+		whiteCount = 0;
+		consecutiveGreen = -1;
+		int x = SCANSIZE * i;
+
+		// now scan down from the pose horizon
+		for (int j = pH; j < height; j++) {
+			// grab the next pixel and check its color
+			getColor(x, j);
+			// if its green, then go to work
+			if (isGreen()) {
+				greenCount++;
+				consecutiveGreen++;
+				whiteCount = 0;
+
+				// when we've seen enough green
+				if (greenCount == MINRUN) {
+					// find the top point
+					j = j - consecutiveGreen;
+					// the top of the screen is a special case
+					if (j != 0) {
+						if (debugRansac) {
+							//cout << "Found ransac point " << x << " " << j << endl;
+							drawPoint(x, j, WHITE);
+						}
+						edgePointsTop.push_back(PointI(x, j));
+					} else {
+						if (debugRansac) {
+							cout << "Incrementing green tops " << i << endl;
+						}
+						++ greenTops[i];
+					}
+					// we're done with this scan
+					break;
+				} else if (greenCount > SCANSIZE) {
+					j = height;
+				}
+			} else if (whiteCount < 1 && greenCount > 0) {
+				consecutiveGreen = 0;
+				whiteCount = 1;
+			} else {
+				greenCount = 0;
+				whiteCount = 0;
+				consecutiveGreen = -1;
+			}
+		}
+	}
+	// now that we have the ransac points, let's actually find the edges
+	unsigned int seed = static_cast<unsigned int>(pH);
+	findFieldEdgeLines(&seed);
+}
+
 /** Find the convex hull of the field.    We've already found the point of maximal
     green.    Now scan down from that point every SCANLINES lines and find the
     highest point of green in each of those scanlines.     We collect those points
@@ -484,6 +816,7 @@ int Field::findSlant() {
 */
 
 void Field::findConvexHull(int pH) {
+	findFieldEdge(pH);
     initialScanForTopGreenPoints(pH);
 
 	// save the points we calculated to use for other things such as robot detection

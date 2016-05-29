@@ -402,6 +402,7 @@ int ConfigMapParser::file(ConfigMap* configMap) throw(PARSEEXCEPTION_THROW)
         }
         catch(invalid_key& ik)
         {
+          std::cout<<"[EXCEPTION ERROR ] ConfigMapParser.cpp 1"<<std::endl;
           throw ParseException(keyLine, keyColumn, ik.what());
         }
         delete cv;
@@ -537,6 +538,7 @@ ConfigMap* ConfigMapParser::map() throw(PARSEEXCEPTION_THROW)
           }
           catch(invalid_key& ik)
           {
+            std::cout<<"[EXCEPTION ERROR ] ConfigMapParser.cpp 2"<<std::endl;
             P_ERROR(ik.what());
           }
           delete cv;
@@ -617,6 +619,7 @@ int ConfigMapParser::parse(bool noThrow)
       pe.printError(lexer->getFilename());
 
     std::stringstream buf;
+    std::cout<<"[EXCEPTION ERROR ] ConfigMapParser.cpp 3"<<std::endl;
     buf << lexer->getFilename() << ":" << pe.line << "," << pe.column << ": " << pe.what();
     ParseException e = ParseException(pe.line, pe.column, buf.str());
     if (noThrow)

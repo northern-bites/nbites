@@ -100,6 +100,9 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
         frontEnd[i]->fast(fast);
         edgeDetector[i]->fast(fast);
         hough[i]->fast(fast);
+#ifdef OFFLINE
+		ballDetector[i]->setDebugImage(debugImage[i]);
+#endif
     }
 #ifdef OFFLINE
 	// Here is an example of how to get access to the debug space. In this case the
@@ -174,15 +177,39 @@ void VisionModule::run_()
 
         HighResTimer timer;
 
+/* The color image in the Front End, built from the color table, is
+ * optional. When we run the tool offline, we assume that we have
+ * the color image, which causes errors when accessing other images.
+ * For reference, this is in vision_defs, part of nbcross, where we
+ * run our instance of the vision module. For the time being,
+ * we are creating a fake color table when running offline
+ * so that our code will not crash in other places - namely accessing
+ * other images / information from the vision func of nbcross.
+ * This should later be fixed so that the "segmented image" is always
+ * the last part of the SExpr built in the vision func. This will
+ * affect how many views of the tool access their data. */
+#ifdef OFFLINE
+        uint8_t* fakeColorTableBytes = new uint8_t[1<<21];
+#endif
 
         // Run front end
         PROF_ENTER2(P_FRONT_TOP, P_FRONT_BOT, i==0)
+#ifdef OFFLINE
+        frontEnd[i]->run(yuvLite, colorParams[i], fakeColorTableBytes);
+#else
         frontEnd[i]->run(yuvLite, colorParams[i]);
+#endif
         PROF_EXIT2(P_FRONT_TOP, P_FRONT_BOT, i==0)
         ImageLiteU16 yImage(frontEnd[i]->yImage());
         ImageLiteU8 whiteImage(frontEnd[i]->whiteImage());
         ImageLiteU8 greenImage(frontEnd[i]->greenImage());
         ImageLiteU8 orangeImage(frontEnd[i]->orangeImage());
+
+/* Delete these fake bytes after we've run the front end so that we
+ * don't have a memory leak. */
+#ifdef OFFLINE
+        delete[] fakeColorTableBytes;
+#endif
 
         times[i][0] = timer.end();
 
@@ -220,7 +247,7 @@ void VisionModule::run_()
 		if (!i) {
 			// field needs the color images
 			field->setImages(frontEnd[0]->whiteImage(), frontEnd[0]->greenImage(),
-							 frontEnd[0]->orangeImage());
+							 frontEnd[0]->orangeImage(), yImage);
 			GeoLine horizon = homography[0]->horizon(image->width() / 2);
 			double x1, x2, y1, y2;
 			horizon.endPoints(x1, y1, x2, y2);
@@ -275,7 +302,11 @@ void VisionModule::run_()
         times[i][10] = timer.end();
 
         PROF_ENTER2(P_BALL_TOP, P_BALL_BOT, i==0)
-        ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
+			//ballDetected |= ballDetector[i]->findBall(orangeImage, kinematics[i]->wz0());
+		ballDetector[i]->setImages(frontEnd[i]->whiteImage(), frontEnd[i]->greenImage(),
+                                   frontEnd[i]->orangeImage(), yImage);
+		ballDetected |= ballDetector[i]->findBall(whiteImage,
+                                                  kinematics[i]->wz0(), *(edges[i]));
         PROF_EXIT2(P_BALL_TOP, P_BALL_BOT, i==0)
         times[i][11] = timer.end();
 
@@ -457,21 +488,22 @@ void VisionModule::outportalVisionField()
     {
         vb->set_distance(best.dist);
 
-        vb->set_radius(best.blob.firstPrincipalLength());
+        vb->set_radius(best.firstPrincipalLength);
         double bearing = atan(best.x_rel / best.y_rel);
         vb->set_bearing(bearing);
         vb->set_bearing_deg(bearing * TO_DEG);
 
-        double angle_x = (best.imgWidth/2 - best.getBlob().centerX()) /
+        double angle_x = (best.imgWidth/2 - best.centerX) /
             (best.imgWidth) * HORIZ_FOV_DEG;
-        double angle_y = (best.imgHeight/2 - best.getBlob().centerY()) /
+        double angle_y = (best.imgHeight/2 - best.centerY) /
             (best.imgHeight) * VERT_FOV_DEG;
         vb->set_angle_x_deg(angle_x);
         vb->set_angle_y_deg(angle_y);
 
         vb->set_confidence(best.confidence());
-        vb->set_x(static_cast<int>(best.blob.centerX()));
-        vb->set_y(static_cast<int>(best.blob.centerY()));
+        vb->set_x(static_cast<int>(best.centerX));
+        vb->set_y(static_cast<int>(best.centerY));
+
     }
 
     visionField.set_horizon_dist(field->horizonDist());
@@ -527,7 +559,7 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
 
 #ifdef OFFLINE
 	void VisionModule::setDebugDrawingParameters(nblog::SExpr* params) {
-		std::cout << "In debug drawing parameters" << params->print() << std::endl;
+		//std::cout << "In debug drawing parameters" << params->print() << std::endl;
 		int cameraHorizon = params->get(1)->find("CameraHorizon")->get(1)->valueAsInt();
 		int fieldHorizon = params->get(1)->find("FieldHorizon")->get(1)->valueAsInt();
 		int debugHorizon = params->get(1)->find("DebugHorizon")->get(1)->valueAsInt();

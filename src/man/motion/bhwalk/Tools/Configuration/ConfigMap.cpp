@@ -531,6 +531,7 @@ int ConfigMap::read(const std::string& filename, bool verbose, void (*onError)(c
       parser.setVerbose();
     result = parser.parse(true);
     if (result < 0)
+      std::cout<<"[EXCEPTION ERROR ] ConfigMap.cpp ConfigMap::read 1"<<std::endl;
       error = parser.getError()->what();
   }
   if(result < 0 && onError)
@@ -549,6 +550,7 @@ int ConfigMap::read(std::istream& input, bool verbose, void (*onError)(const std
   result = parser.parse(true);
   if(result < 0 && onError)
   {
+    std::cout<<"[EXCEPTION ERROR ] ConfigMap.cpp ConfigMap::read 2"<<std::endl;
     error = parser.getError()->what();
     onError(error);
   }
