@@ -35,6 +35,7 @@ namespace control {
             return;
         }
 
+        NBL_PRINT("calling %s", fptr->getName().c_str());
         rpc_return ret = fptr->call(ptrTo);
 
         if (!ret.argumentsValid) {

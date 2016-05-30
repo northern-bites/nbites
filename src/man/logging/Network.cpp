@@ -180,6 +180,8 @@ namespace nbl {
              NBL_PRINT("Streamer::threadLoop() returning.");
         }
 
+#define NBL_LOGGING_LEVEL NBL_INFO_LEVEL
+
         void Controller::threadLoop() {
 
             NBL_WARN("Controller::threadLoop() starting...");
@@ -187,9 +189,10 @@ namespace nbl {
             for (;running;) {
                 if (socket > 0 && master.checkClient(clientIndex)) {
 
-//                    NBL_PRINT("Control looping");
-
+                    NBL_PRINT("before recv...")
                     logptr recvd = Log::recv(socket);
+                    NBL_PRINT("after recv...")
+
 
                     if (recvd) {
 

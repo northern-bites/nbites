@@ -1,4 +1,4 @@
-package nbtool.gui;
+package nbtool.gui.utilitypanes;
 
 import java.awt.event.*;
 import java.awt.*;
@@ -109,11 +109,11 @@ public class CameraPrefs extends JPanel {
 		String botFileContents = "";
 
 		if(naoVersion == 4) {
-			topFileName = "../../../src/man/config/V4topCameraParams.txt";
-			botFileName = "../../../src/man/config/V4bottomCameraParams.txt";
+			topFileName = ToolSettings.NBITES_DIR + "src/man/config/V4topCameraParams.txt";
+			botFileName = ToolSettings.NBITES_DIR + "src/man/config/V4bottomCameraParams.txt";
 		} else {
-			topFileName = "../../../src/man/config/V5topCameraParams.txt";
-			botFileName = "../../../src/man/config/V5bottomCameraParams.txt";
+			topFileName = ToolSettings.NBITES_DIR + "src/man/config/V5topCameraParams.txt";
+			botFileName = ToolSettings.NBITES_DIR + "src/man/config/V5bottomCameraParams.txt";
 		}
 
 		try {
