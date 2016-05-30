@@ -20,7 +20,7 @@ import javax.imageio.ImageIO;
 public class TextureLoader {
 
     private static final TextureLoader instance = new TextureLoader();
-    private final Map<GL, Map<String, Texture>> textures = new HashMap<GL, Map<String, Texture>>();
+    private final Map<GL, Map<String, Texture>> textures = new HashMap<>();
 
     /**
      * Class for storing info about a texture.
@@ -89,7 +89,7 @@ public class TextureLoader {
         // Get the map for the given gl context
         Map<String, Texture> map = textures.get(gl);
         if (map == null) {
-            map = new HashMap<String, Texture>();
+            map = new HashMap<>();
             textures.put(gl, map);
         }
 

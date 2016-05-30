@@ -43,12 +43,12 @@ public class Sender extends Thread
      * @throws SocketException      if an error occurs while creating the socket
      * @throws UnknownHostException if the used inet-address is not valid
      */
-    private Sender(final String broadcastAddress) throws SocketException, UnknownHostException
+    private Sender(final InetAddress broadcastAddress) throws SocketException, UnknownHostException
     {
         instance = this;
 
         this.datagramSocket = new DatagramSocket();
-        this.group = InetAddress.getByName(broadcastAddress);
+        this.group = broadcastAddress;
     }
 
     /**
@@ -58,7 +58,7 @@ public class Sender extends Thread
      * @throws UnknownHostException     if the used inet-address is not valid
      * @throws IllegalStateException    if the sender is already initialized
      */
-    public synchronized static void initialize(final String broadcastAddress) throws SocketException, UnknownHostException
+    public synchronized static void initialize(final InetAddress broadcastAddress) throws SocketException, UnknownHostException
     {
         if (null != instance) {
             throw new IllegalStateException("sender is already initialized");

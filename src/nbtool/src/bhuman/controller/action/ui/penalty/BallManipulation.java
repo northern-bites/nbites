@@ -28,6 +28,7 @@ public class BallManipulation extends Penalty
     public void performOn(AdvancedData data, PlayerInfo player, int side, int number)
     {
         player.penalty = PlayerInfo.PENALTY_HL_BALL_MANIPULATION;
+        handleRepeatedPenaltyEjection(data, player, side, number);
         data.whenPenalized[side][number] = data.getTime();
         Log.state(data, "Ball Manipulation "+
                 Rules.league.teamColorName[data.team[side].teamColor]

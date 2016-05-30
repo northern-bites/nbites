@@ -2,8 +2,9 @@
 #include "Edge.h"
 #include "HighResTimer.h"
 #include "NBMath.h"
-#include "../control/control.h"
-#include "../log/logging.h"
+
+#include "Control.hpp"
+#include "Logging.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -40,8 +41,8 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
     #endif
 
     // Get SExpr from string
-    nblog::SExpr* colors = nblog::SExpr::read(getStringFromTxtFile(colorPath));
-    calibrationLisp = nblog::SExpr::read(getStringFromTxtFile(calibrationPath));
+    nbl::SExpr* colors = nbl::SExpr::read(getStringFromTxtFile(colorPath));
+    calibrationLisp = nbl::SExpr::read(getStringFromTxtFile(calibrationPath));
 
     // Set module pointers for top then bottom images
     // NOTE Constructed on heap because some of the objects below do
@@ -558,8 +559,8 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
 }
 
 #ifdef OFFLINE
-	void VisionModule::setDebugDrawingParameters(nblog::SExpr* params) {
-		//std::cout << "In debug drawing parameters" << params->print() << std::endl;
+	void VisionModule::setDebugDrawingParameters(nbl::SExpr* params) {
+		std::cout << "In debug drawing parameters" << params->print() << std::endl;
 		int cameraHorizon = params->get(1)->find("CameraHorizon")->get(1)->valueAsInt();
 		int fieldHorizon = params->get(1)->find("FieldHorizon")->get(1)->valueAsInt();
 		int debugHorizon = params->get(1)->find("DebugHorizon")->get(1)->valueAsInt();
@@ -581,10 +582,10 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
   load the three compoenets of a Colors struct, white, green, and orange,
   from the 18 values for either the top or bottom image. 
 */
-Colors* VisionModule::getColorsFromLisp(nblog::SExpr* colors, int camera) 
+Colors* VisionModule::getColorsFromLisp(nbl::SExpr* colors, int camera) 
 {
     Colors* ret = new man::vision::Colors;
-    nblog::SExpr* params;
+    nbl::SExpr* params;
 
     if (camera == 0) {
         params = colors->get(1)->find("Top")->get(1);
@@ -646,7 +647,7 @@ void VisionModule::setCalibrationParams(int camera, std::string robotName)
         return;
     }
 
-    nblog::SExpr* robot = calibrationLisp->get(1)->find(robotName);
+    nbl::SExpr* robot = calibrationLisp->get(1)->find(robotName);
 
     if (robot != NULL) {
         std::string cam = camera == 0 ? "TOP" : "BOT";
@@ -692,11 +693,18 @@ void VisionModule::logImage(int i)
             return;
     }
 
-    if (control::flags[control::tripoint]) {
+    if (control::check(control::flags::tripoint)) {
         ++image_index;
+
+        nbl::logptr theLog = nbl::Log::explicitLog(
+                                                   std::vector<nbl::Block>{},
+                                                   json::Object{},
+                                                   "tripoint", time(NULL));
         
         messages::YUVImage image;
         std::string image_from;
+        clock_t clockWhen = clock();
+
         if (!i) {
             image = topIn.message();
             image_from = "camera_TOP";
@@ -704,84 +712,93 @@ void VisionModule::logImage(int i)
             image = bottomIn.message();
             image_from = "camera_BOT";
         }
+
+        theLog->addBlockFromImage(image, image_from, image_index, clockWhen);
         
-        long im_size = (image.width() * image.height() * 1);
-        int im_width = image.width() / 2;
-        int im_height= image.height();
-        
+//        long im_size = (image.width() * image.height() * 1);
+//        int im_width = image.width() / 2;
+//        int im_height= image.height();
+
         messages::JointAngles ja_pb = jointsIn.message();
         messages::InertialState is_pb = inertsIn.message();
-        
-        std::string ja_buf;
-        std::string is_buf;
-        std::string im_buf((char *) image.pixelAddress(0, 0), im_size);
-        ja_pb.SerializeToString(&ja_buf);
-        is_pb.SerializeToString(&is_buf);
-        
-        im_buf.append(is_buf);
-        im_buf.append(ja_buf);
-        
-        std::vector<nblog::SExpr> contents;
-        
-        nblog::SExpr imageinfo("YUVImage", image_from, clock(), image_index, im_size);
-        imageinfo.append(nblog::SExpr("width", im_width)   );
-        imageinfo.append(nblog::SExpr("height", im_height) );
-        imageinfo.append(nblog::SExpr("encoding", "[Y8(U8/V8)]"));
-        contents.push_back(imageinfo);
-        
-        nblog::SExpr inerts("InertialState", "tripoint", clock(), image_index, is_buf.length());
-        inerts.append(nblog::SExpr("acc_x", is_pb.acc_x()));
-        inerts.append(nblog::SExpr("acc_y", is_pb.acc_y()));
-        inerts.append(nblog::SExpr("acc_z", is_pb.acc_z()));
-        
-        inerts.append(nblog::SExpr("gyr_x", is_pb.gyr_x()));
-        inerts.append(nblog::SExpr("gyr_y", is_pb.gyr_y()));
-        
-        inerts.append(nblog::SExpr("angle_x", is_pb.angle_x()));
-        inerts.append(nblog::SExpr("angle_y", is_pb.angle_y()));
-        contents.push_back(inerts);
-        
-        nblog::SExpr joints("JointAngles", "tripoint", clock(), image_index, ja_buf.length());
-        joints.append(nblog::SExpr("head_yaw", ja_pb.head_yaw()));
-        joints.append(nblog::SExpr("head_pitch", ja_pb.head_pitch()));
 
-        joints.append(nblog::SExpr("l_shoulder_pitch", ja_pb.l_shoulder_pitch()));
-        joints.append(nblog::SExpr("l_shoulder_roll", ja_pb.l_shoulder_roll()));
-        joints.append(nblog::SExpr("l_elbow_yaw", ja_pb.l_elbow_yaw()));
-        joints.append(nblog::SExpr("l_elbow_roll", ja_pb.l_elbow_roll()));
-        joints.append(nblog::SExpr("l_wrist_yaw", ja_pb.l_wrist_yaw()));
-        joints.append(nblog::SExpr("l_hand", ja_pb.l_hand()));
+        theLog->addBlockFromProtobuf(is_pb, image_from, image_index, clockWhen);
+        theLog->addBlockFromProtobuf(ja_pb, image_from, image_index, clockWhen);
+        
+//        std::string ja_buf;
+//        std::string is_buf;
+//        std::string im_buf((char *) image.pixelAddress(0, 0), im_size);
+//        ja_pb.SerializeToString(&ja_buf);
+//        is_pb.SerializeToString(&is_buf);
+//        
+//        im_buf.append(is_buf);
+//        im_buf.append(ja_buf);
+//        
+//        std::vector<nbl::SExpr> contents;
+//        
+//        nbl::SExpr imageinfo("YUVImage", image_from, clock(), image_index, im_size);
+//        imageinfo.append(nbl::SExpr("width", im_width)   );
+//        imageinfo.append(nbl::SExpr("height", im_height) );
+//        imageinfo.append(nbl::SExpr("encoding", "[Y8(U8/V8)]"));
+//        contents.push_back(imageinfo);
+//        
+//        nbl::SExpr inerts("InertialState", "tripoint", clock(), image_index, is_buf.length());
+//        inerts.append(nbl::SExpr("acc_x", is_pb.acc_x()));
+//        inerts.append(nbl::SExpr("acc_y", is_pb.acc_y()));
+//        inerts.append(nbl::SExpr("acc_z", is_pb.acc_z()));
+//        
+//        inerts.append(nbl::SExpr("gyr_x", is_pb.gyr_x()));
+//        inerts.append(nbl::SExpr("gyr_y", is_pb.gyr_y()));
+//        
+//        inerts.append(nbl::SExpr("angle_x", is_pb.angle_x()));
+//        inerts.append(nbl::SExpr("angle_y", is_pb.angle_y()));
+//        contents.push_back(inerts);
+//        
+//        nbl::SExpr joints("JointAngles", "tripoint", clock(), image_index, ja_buf.length());
+//        joints.append(nbl::SExpr("head_yaw", ja_pb.head_yaw()));
+//        joints.append(nbl::SExpr("head_pitch", ja_pb.head_pitch()));
+//
+//        joints.append(nbl::SExpr("l_shoulder_pitch", ja_pb.l_shoulder_pitch()));
+//        joints.append(nbl::SExpr("l_shoulder_roll", ja_pb.l_shoulder_roll()));
+//        joints.append(nbl::SExpr("l_elbow_yaw", ja_pb.l_elbow_yaw()));
+//        joints.append(nbl::SExpr("l_elbow_roll", ja_pb.l_elbow_roll()));
+//        joints.append(nbl::SExpr("l_wrist_yaw", ja_pb.l_wrist_yaw()));
+//        joints.append(nbl::SExpr("l_hand", ja_pb.l_hand()));
+//
+//        joints.append(nbl::SExpr("r_shoulder_pitch", ja_pb.r_shoulder_pitch()));
+//        joints.append(nbl::SExpr("r_shoulder_roll", ja_pb.r_shoulder_roll()));
+//        joints.append(nbl::SExpr("r_elbow_yaw", ja_pb.r_elbow_yaw()));
+//        joints.append(nbl::SExpr("r_elbow_roll", ja_pb.r_elbow_roll()));
+//        joints.append(nbl::SExpr("r_wrist_yaw", ja_pb.r_wrist_yaw()));
+//        joints.append(nbl::SExpr("r_hand", ja_pb.r_hand()));
+//
+//        joints.append(nbl::SExpr("l_hip_yaw_pitch", ja_pb.l_hip_yaw_pitch()));
+//        joints.append(nbl::SExpr("r_hip_yaw_pitch", ja_pb.r_hip_yaw_pitch()));
+//
+//        joints.append(nbl::SExpr("l_hip_roll", ja_pb.l_hip_roll()));
+//        joints.append(nbl::SExpr("l_hip_pitch", ja_pb.l_hip_pitch()));
+//        joints.append(nbl::SExpr("l_knee_pitch", ja_pb.l_knee_pitch()));
+//        joints.append(nbl::SExpr("l_ankle_pitch", ja_pb.l_ankle_pitch()));
+//        joints.append(nbl::SExpr("l_ankle_roll", ja_pb.l_ankle_roll()));
+//
+//        joints.append(nbl::SExpr("r_hip_roll", ja_pb.r_hip_roll() ));
+//        joints.append(nbl::SExpr("r_hip_pitch", ja_pb.r_hip_pitch() ));
+//        joints.append(nbl::SExpr("r_knee_pitch", ja_pb.r_knee_pitch() ));
+//        joints.append(nbl::SExpr("r_ankle_pitch", ja_pb.r_ankle_pitch() ));
+//        joints.append(nbl::SExpr("r_ankle_roll", ja_pb.r_ankle_roll() ));
+//        contents.push_back(joints);
 
-        joints.append(nblog::SExpr("r_shoulder_pitch", ja_pb.r_shoulder_pitch()));
-        joints.append(nblog::SExpr("r_shoulder_roll", ja_pb.r_shoulder_roll()));
-        joints.append(nblog::SExpr("r_elbow_yaw", ja_pb.r_elbow_yaw()));
-        joints.append(nblog::SExpr("r_elbow_roll", ja_pb.r_elbow_roll()));
-        joints.append(nblog::SExpr("r_wrist_yaw", ja_pb.r_wrist_yaw()));
-        joints.append(nblog::SExpr("r_hand", ja_pb.r_hand()));
-
-        joints.append(nblog::SExpr("l_hip_yaw_pitch", ja_pb.l_hip_yaw_pitch()));
-        joints.append(nblog::SExpr("r_hip_yaw_pitch", ja_pb.r_hip_yaw_pitch()));
-
-        joints.append(nblog::SExpr("l_hip_roll", ja_pb.l_hip_roll()));
-        joints.append(nblog::SExpr("l_hip_pitch", ja_pb.l_hip_pitch()));
-        joints.append(nblog::SExpr("l_knee_pitch", ja_pb.l_knee_pitch()));
-        joints.append(nblog::SExpr("l_ankle_pitch", ja_pb.l_ankle_pitch()));
-        joints.append(nblog::SExpr("l_ankle_roll", ja_pb.l_ankle_roll()));
-
-        joints.append(nblog::SExpr("r_hip_roll", ja_pb.r_hip_roll() ));
-        joints.append(nblog::SExpr("r_hip_pitch", ja_pb.r_hip_pitch() ));
-        joints.append(nblog::SExpr("r_knee_pitch", ja_pb.r_knee_pitch() ));
-        joints.append(nblog::SExpr("r_ankle_pitch", ja_pb.r_ankle_pitch() ));
-        joints.append(nblog::SExpr("r_ankle_roll", ja_pb.r_ankle_roll() ));
-        contents.push_back(joints);
-
-        nblog::SExpr cal("CalibrationParams", "tripoint", clock(), image_index, 0);
-        cal.append(nblog::SExpr(image_from, calibrationParams[i]->getRoll(), calibrationParams[i]->getTilt()));
+        nbl::SExpr calVal = nbl::SExpr(image_from, calibrationParams[i]->getRoll(), calibrationParams[i]->getTilt());
+        nbl::SExpr cal("CalibrationParams", calVal);
         if (blackStar)
-            cal.append(nblog::SExpr("BlackStar"));
-        contents.push_back(cal);
+            cal.append(nbl::SExpr("BlackStar"));
 
-        nblog::NBLog(NBL_IMAGE_BUFFER, "tripoint", contents, im_buf);
+        theLog->addBlockFromSexpr(cal, "CalibrationParams", image_index, clockWhen);
+
+        nbl::NBLog(theLog);
+
+//        contents.push_back(cal);
+//        nbl::NBLog(NBL_IMAGE_BUFFER, "tripoint", contents, im_buf);
     }
 }
 #endif

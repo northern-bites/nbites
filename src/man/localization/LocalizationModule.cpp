@@ -3,11 +3,18 @@
 #include "Profiler.h"
 #include "RoboCupGameControlData.h"
 #include "DebugConfig.h"
+<<<<<<< HEAD
 #include "../log/logging.h"
 #include "../control/control.h"
+=======
 
-using nblog::SExpr;
-using nblog::NBLog;
+#include "HighResTimer.h"
+>>>>>>> 8c9c5c5b7047f7f5d34619d3b2906e28d90f8a51
+
+#include "Logging.hpp"
+#include "Control.hpp"
+using nbl::SExpr;
+using nbl::NBLog;
 
 namespace man {
 namespace localization {
@@ -68,43 +75,50 @@ void LocalizationModule::update()
 
     // Logging
 #ifdef USE_LOGGING
-    if(control::flags[control::localization]) {
+
+    if(control::check(control::flags::LOCALIZATION)) {
+        ++log_index;
         std::string log_from = "loc";
 
         messages::RobotLocation rl = *output.getMessage(true).get();
         messages::ParticleSwarm ps = *particleOutput.getMessage(true).get();
         messages::Vision vm = curVision;
 
-        std::string rl_buf;
-        std::string ps_buf;
-        std::string vm_buf;
-        std::string log_buf;
+        nbl::logptr theLog = nbl::Log::emptyLog();
+        theLog->logClass = "LOCSWARM";
+        theLog->createdWhen = time(NULL);
 
-        rl.SerializeToString(&rl_buf);
-        ps.SerializeToString(&ps_buf);
-        vm.SerializeToString(&vm_buf);
+        theLog->addBlockFromProtobuf(rl, "LOCSWARM", 0, 0);
+        theLog->addBlockFromProtobuf(ps, "LOCSWARM", 0, 0);
+        theLog->addBlockFromProtobuf(vm, "LOCSWARM", 0, 0);
 
-        log_buf.append(rl_buf);
-        log_buf.append(ps_buf);
-        log_buf.append(vm_buf);
+        nbl::NBLog(theLog);
 
-        std::vector<SExpr> contents;
-
-        SExpr naoLocation("location", log_from, clock(), log_index, rl_buf.length());
-        contents.push_back(naoLocation);
-
-        SExpr naoSwarm("swarm", log_from, clock(), log_index, ps_buf.length());
-        contents.push_back(naoSwarm);
-
-        SExpr naoVision("vision", log_from, clock(), log_index, vm_buf.length());
-        contents.push_back(naoVision);
-
-        NBLog(NBL_SMALL_BUFFER, "LOCSWARM", contents, log_buf);
-
-        // Two images (top and bottom camera) per localization module run
-        // FUTURE WORK, log_index should actually come directly from images used
-        //              to produce observations used in localization
-        log_index += 2;
+//        std::string rl_buf;
+//        std::string ps_buf;
+//        std::string vm_buf;
+//        std::string log_buf;
+//
+//        rl.SerializeToString(&rl_buf);
+//        ps.SerializeToString(&ps_buf);
+//        vm.SerializeToString(&vm_buf);
+//
+//        log_buf.append(rl_buf);
+//        log_buf.append(ps_buf);
+//        log_buf.append(vm_buf);
+//
+//        std::vector<SExpr> contents;
+//
+//        SExpr naoLocation("location", log_from, clock(), log_index, rl_buf.length());
+//        contents.push_back(naoLocation);
+//
+//        SExpr naoSwarm("swarm",log_from,clock(),log_index,ps_buf.length());
+//        contents.push_back(naoSwarm);
+//
+//        SExpr naoVision("vision",log_from,clock(),log_index,vm_buf.length());
+//        contents.push_back(naoVision);
+//
+//        NBLog(NBL_SMALL_BUFFER,"LOCSWARM",contents,log_buf);
     }
 #endif
 }

@@ -6,7 +6,9 @@ echo "cannot use nbtool scripts without NBITES_DIR variable.";
 exit 1
 fi
 
+
 echo "using NBITES_DIR=" $NBITES_DIR
+echo "using NBCROSS_ARGS=" "$*"
 
 cd $NBITES_DIR/src/nbcross
-make nbcross
+make nbcross NBCROSS_ARGS="$*"

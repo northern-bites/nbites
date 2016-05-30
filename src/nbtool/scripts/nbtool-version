@@ -7,4 +7,4 @@ if [[ $NBITES_DIR == "" ]]
 fi
 
 echo "using NBITES_DIR=" $NBITES_DIR
-grep VERSION $NBITES_DIR/src/nbtool/src/nbtool/util/NBConstants.java
+grep VERSION $NBITES_DIR/src/nbtool/src/nested/nbtool/util/ToolSettings.java

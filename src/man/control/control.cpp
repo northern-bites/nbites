@@ -33,7 +33,7 @@ using nblog::Log;
 namespace control {
     
     pthread_t control_thread;
-    static bool STARTED = false;
+    bool STARTED = false;
     
     /* RETURN log may not be 'arg' (double delete) */
     Log * RETURN = NULL;
@@ -53,10 +53,18 @@ namespace control {
         return 0;
     }
     
+    //Construct string_flag array.
+#define XTEMP(n) [n] = #n
+    const char * string_flags[] = {
+#include "control_flags.defs.h"
+    };
+#undef XTEMP
+    
     volatile uint8_t flags[num_flags];
     //expects two bytes of data:
     //  flag index
     //  new flag value (0 or 1)
+    //otherwise, interprets call as request for STATS
     uint32_t cnc_setFlag(Log * arg) {
         
         size_t u = arg->data().size();
@@ -84,26 +92,24 @@ namespace control {
             return 3;
         }
         
-        switch (index) {
-            case serv_connected:
-                printf("cnc_setFlag(): ERROR: CANNOT SET serv_connected!\n");
-                break;
-            case control_connected:
-                printf("cnc_setFlag(): ERROR: CANNOT SET cnc_connected!\n");
-                break;
-            case fileio: //setting fileio
-                if (value) {
-                    memcpy(nblog::fio_start, nblog::total, sizeof(nblog::io_state_t) * NUM_LOG_BUFFERS);
-                    
-                    nblog::fio_upstart = time(NULL);
-                }
+        if (index <= _START_EXTERNAL_ || index >= _END_EXTERNAL_) {
+            printf("cnc_setFlag(): ERROR: tried to set INTERNAL flag!\n");
+            return 4;
+        }
+        
+        if (index == fileio) {
+            //special case, we need to copy starting statistics for
+            //this "to file logging session"
+            if (value) {
+                memcpy(nblog::fio_start, nblog::total, sizeof(nblog::io_state_t) * NUM_LOG_BUFFERS);
                 
-                flags[fileio] = value;
-                break;
-                
-            default:
-                flags[index] = value;
-                break;
+                nblog::fio_upstart = time(NULL);
+            }
+            
+            flags[fileio] = value;
+        } else {
+            
+            flags[index] = value;
         }
         
         RETURN = nblog::makeSTATSlog();
@@ -193,11 +199,47 @@ namespace control {
     
     /* NOTE: this still requires restarting man! */
     uint32_t cnc_setCalibration(Log * arg) {
-        SExpr * params = SExpr::read(arg->data());
+        printf("cnc_setCalibration()!\n");
+        std::ofstream robotParamConfig("/home/nao/nbites/Config/calibrationParams.txt");
+        robotParamConfig << arg->data();
+        robotParamConfig.close();
         
+        return 0;
+    }
+    
+    const std::string switchPath = "/home/nao/nbites/lib/python/players/Switch.py";
+    std::string foundContents;
+    const std::string pCalibrateContents = "from . import pCalibrate as selectedPlayer";
+    const std::string pCalibrateName = "pCalibrate";
+    
+    uint32_t cnc_calibrationPlayerSwitch(Log * arg) {
+        printf("cnc_calibrationPlayerSwitch()");
+        std::ifstream ifs(switchPath);
+        std::stringstream buffer;
+        buffer << ifs.rdbuf();
+        std::string str = buffer.str();
+        ifs.close();
         
+        if (str.find(pCalibrateName) == std::string::npos) {
+            printf("[%s] ---> pCalibrate!\n", str.c_str());
+            foundContents = str;
+            
+            std::ofstream switchOFS(switchPath);
+            switchOFS << pCalibrateContents;
+            switchOFS.close();
+        } else {
+            if (foundContents == "") {
+                printf("ERROR: cannot switch out of pCalibrate without prior state!\n");
+                return 1;
+            }
+            
+            printf("pCalibrate ---> [%s]\n",
+                   foundContents.c_str());
+            std::ofstream switchOFS(switchPath);
+            switchOFS << foundContents;
+            switchOFS.close();
+        }
         
-        delete params;
         return 0;
     }
     
@@ -214,6 +256,7 @@ namespace control {
         ret["exit"] = &cnc_exit;
         
         ret["setCalibration"] = &cnc_setCalibration;
+        ret["calibrationPlayerSwitch"] = &cnc_calibrationPlayerSwitch;
         
 #ifndef __APPLE__
         ret["setCameraParams"] = &cnc_setCameraParams;
@@ -225,8 +268,16 @@ namespace control {
     
 #define CHECK_RET(r) {if (r) goto connection_died;}
     
+#define CHECK_SETUP(r) {if (r) {    \
+    int errsaved = errno;   \
+    printf("ERROR: control COULD NOT START up!\n");    \
+    nbperror("control: ", errsaved);   \
+    return NULL;    \
+} }
+    
+    int listenfd = -1, connfd = -1;
+    
     void * cnc_loop(void * cntxt) {
-        int listenfd = -1, connfd = -1;
         struct sockaddr_in serv_addr;
         
         //Network socket, TCP streaming protocol, default options
@@ -239,10 +290,10 @@ namespace control {
         serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
         serv_addr.sin_port = htons(CONTROL_PORT);
         
-        bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+        CHECK_SETUP(bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)));
                 
         //Accepting connections on this socket, no queue.
-        listen(listenfd, 0);
+        CHECK_SETUP(listen(listenfd, 0));
         
         NBDEBUG("control listening... port = %i\n", CONTROL_PORT);
         
@@ -284,6 +335,10 @@ namespace control {
                         delete found;
                         goto connection_died;
                     }
+                    
+                    printf("control calling [%s]", name.c_str());
+                    std::cout << std::endl; //for flush.
+                    
                     uint32_t ret = -1;
                     try {
                         ret = fmap[name](found);
@@ -350,4 +405,11 @@ namespace control {
         pthread_detach(control_thread);
     }
     
+    
+    void control_destroy() {
+        if (listenfd > 0)
+            close(listenfd);
+        if (connfd > 0)
+            close(connfd);
+    }
 }
