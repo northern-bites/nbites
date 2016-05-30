@@ -30,6 +30,7 @@ public class UtilityManager {
 	
 	public static final ReachableRobots ReachableRobots = new ReachableRobots();
 	public static final CameraOffsetsUtility CameraOffsetsUtility = new CameraOffsetsUtility();
+	public static final CameraSettingsUtility CameraSettingsUtility = new CameraSettingsUtility();
 
 	//Unused at the moment – comment out to re-enable.
 	//public static final MultiStreamUtility MultiStreamUtility = new MultiStreamUtility();

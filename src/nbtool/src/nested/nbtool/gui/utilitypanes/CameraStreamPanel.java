@@ -1,4 +1,4 @@
-package nbtool.gui;
+package nbtool.gui.utilitypanes;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -6,11 +6,9 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import nbtool.data.*;
+import nbtool.data.log.Log;
+import nbtool.nio.RobotConnection;
 import nbtool.util.*;
-import nbtool.io.ControlIO;
-import nbtool.io.ControlIO.ControlInstance;
-import nbtool.util.NBConstants.*;
-import nbtool.util.Logger;
 import messages.CameraParams;
 
 import java.io.File;
@@ -178,13 +176,18 @@ public class CameraStreamPanel extends JPanel implements ActionListener {
 				.setFadeToBlack(bottomCameraParams[13])
 				.build();
 		
-		ControlInstance first = ControlIO.getByIndex(0);
-		if (first == null) {
-			Logger.log(Logger.WARN, "CameraParams clicked when no ControlIO instance available");
+		Log call = Log.emptyLog();
+		call.logClass = "CameraParamsPair";
+		call.addBlockFromProtobuf(topCamera, "CameraStreamPanel", 0, 0);
+		call.addBlockFromProtobuf(bottomCamera, "CameraStreamPanel", 0, 0);
+		
+		RobotConnection rc = RobotConnection.getByIndex(0);
+		if (rc == null) {
+			Debug.warn("CameraParams clicked when no Robot instance available");
 			return;
 		}
-		first.tryAddCmnd(ControlIO.createCmndSetCameraParams(topCamera));
-		first.tryAddCmnd(ControlIO.createCmndSetCameraParams(bottomCamera));
+		
+		rc.addControlCall(null, "SetCameraParams", call);
 	}
 
 	private void trySave(Integer[] topCameraPar, Integer[] bottomCameraPar, int naoVersion) {
@@ -199,11 +202,11 @@ public class CameraStreamPanel extends JPanel implements ActionListener {
 
 		File topFile, botFile;
 		if(naoVersion == 4) {
-			topFile = new File("../../../src/man/config/V4topCameraParams.txt");
-			botFile = new File("../../../src/man/config/V4bottomCameraParams.txt");
+			topFile = new File(ToolSettings.NBITES_DIR + "src/man/config/V4topCameraParams.txt");
+			botFile = new File(ToolSettings.NBITES_DIR + "src/man/config/V4bottomCameraParams.txt");
 		} else {
-			topFile = new File("../../../src/man/config/V5topCameraParams.txt");
-			botFile = new File("../../../src/man/config/V5bottomCameraParams.txt");
+			topFile = new File(ToolSettings.NBITES_DIR + "src/man/config/V5topCameraParams.txt");
+			botFile = new File(ToolSettings.NBITES_DIR + "src/man/config/V5bottomCameraParams.txt");
 		}
 		
 		try {
@@ -250,21 +253,6 @@ public class CameraStreamPanel extends JPanel implements ActionListener {
 			SExpr.newKeyValue("fade_to_black",Params[13])
 			);
 		return s;
-	}
-	
-	private void useStatus(STATUS s) {
-		switch (s) {
-		case IDLE:
-			startStreaming.setText("stream");
-			startStreaming.setEnabled(true);
-			break;
-		case RUNNING:
-			startStreaming.setText("streaming");
-			startStreaming.setEnabled(false);
-			break;
-		default:
-			break;
-		}
 	}
 	
 }
