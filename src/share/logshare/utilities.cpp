@@ -18,12 +18,16 @@ namespace nbl {
             const char * term = getenv("TERM");
 
             if (!term) {
+//                printf("********* mayUseColor() got NULL TERM!\n");
                 return false;
             } else {
                 std::string str(term);
 
+//                printf("********* mayUseColor() got TERM=%s!\n", str.c_str());
+
                 return  str.find("xterm") != std::string::npos ||
-                        str.find("color") != std::string::npos;
+                        str.find("color") != std::string::npos ||
+                        str.find("linux") != std::string::npos;
             }
         }
 

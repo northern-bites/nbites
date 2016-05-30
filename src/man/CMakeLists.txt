@@ -169,7 +169,7 @@ file( GLOB configFiles
 install( FILES ${configFiles}
   DESTINATION ${CMAKE_INSTALL_PREFIX}/Config )
 
-file ( GLOB loggingFiles ${SHARE_DIR}/logging/LOGGING_CONSTANTS.json )
+file ( GLOB loggingFiles "../share/logshare/LOGGING_CONSTANTS.json" )
 
 install ( FILES ${loggingFiles} DESTINATION ${CMAKE_INSTALL_PREFIX}/Config )
 

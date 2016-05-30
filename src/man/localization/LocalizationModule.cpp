@@ -80,7 +80,7 @@ void LocalizationModule::update()
     output.setMessage(locMessage);
 
 #ifdef USE_LOGGING
-    if(control::check[control::flags::LOCALIZATION]) {
+    if(control::check(control::flags::LOCALIZATION)) {
         ++log_index;
         std::string log_from = "loc";
 

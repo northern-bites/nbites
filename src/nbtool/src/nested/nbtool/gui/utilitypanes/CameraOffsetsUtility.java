@@ -1,6 +1,7 @@
 package nbtool.gui.utilitypanes;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -212,13 +213,15 @@ public class CameraOffsetsUtility extends UtilityParent {
 			super("camera offset utility");
 			this.setContentPane(panel);
 			this.panel.displayTable.setModel(model);
+			this.panel.displayTable.getTableHeader().setFont(new Font("PT Serif", Font.BOLD, 14));
+
 			this.setMinimumSize(new Dimension(600,400));
 			
-			this.addComponentListener(new ComponentAdapter(){
-				public void componentShown(ComponentEvent e) {
-					calculate();
-				}
-			});
+//			this.addComponentListener(new ComponentAdapter(){
+//				public void componentShown(ComponentEvent e) {
+//					calculate();
+//				}
+//			});
 			
 			this.panel.goButton.addActionListener(new ActionListener(){
 				@Override

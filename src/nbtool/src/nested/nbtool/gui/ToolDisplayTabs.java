@@ -20,6 +20,8 @@ public class ToolDisplayTabs {
 	private final ToolDisplay display;
 	private Log current;
 	
+	private static final Debug.DebugSettings debug = Debug.createSettings(Debug.WARN);
+	
 	public ToolDisplayTabs(ToolDisplay display) {
 		this.display = display;
 	}
@@ -49,7 +51,7 @@ public class ToolDisplayTabs {
 				wrap = (Boolean) m.invoke(null);
 			} catch (Exception e) {
 				e.printStackTrace();
-				Debug.error("error calling method on ViewParent subclass %s: %s",
+				debug.error("error calling method on ViewParent subclass %s: %s",
 						ttype.getName(), e.getMessage());
 				continue;
 			}
@@ -93,7 +95,7 @@ public class ToolDisplayTabs {
 		private void add() {
 			assert(created != null);
 			if (current != first) {
-				Debug.warn("CreateViewRunnable found current Log != given Log!");
+				debug.info("CreateViewRunnable found current Log != given Log!");
 				return;
 			}
 			

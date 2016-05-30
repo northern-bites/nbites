@@ -16,6 +16,11 @@ namespace control {
 
     ControlHandler::ControlHandler() {
         mapfromFunctions(map, getControlVector());
+
+        for (int i = flags::_START_EXTERNAL_; i < flags::_END_EXTERNAL_; ++i) {
+            set((flags::flag_e) i, false);
+        }
+
         set(flags::logToStream, true);
     }
 

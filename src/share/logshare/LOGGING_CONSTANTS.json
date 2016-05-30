@@ -4,8 +4,9 @@
 # Unused keys are ignored.  This file is not modified programmatically.
 
 #This file should be at:
-#offline    ${NBITES_DIR}/src/share/logging/LOGGING_SharedConstants::json
-#online     /home/nao/nbites/Config/LOGGING_SharedConstants::json
+#offline    ${NBITES_DIR}/src/share/logging/LOGGING_CONSTANTS.json
+#online     /home/nao/nbites/Config/LOGGING_CONSTANTS.json
+# **** if it is not, logging *will* crash ****
 
 {
     #log classes (used for view mapping among other things)

@@ -149,7 +149,6 @@ public class FileIO {
 	
 	public static void queueWriteTask(Path path, byte[] data) {
 		assert(path != null && data != null);
-		assert(Files.isWritable(path));
 		assert(!Files.exists(path) || Files.isRegularFile(path));
 		
 		addTaskToQueue(new Task(path, data));

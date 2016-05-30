@@ -21,7 +21,7 @@
 
 #include <unistd.h>
 
-#define NBL_LOGGING_LEVEL NBL_INFO_LEVEL
+#define NBL_LOGGING_LEVEL NBL_WARN_LEVEL
 
 namespace nbl {
 

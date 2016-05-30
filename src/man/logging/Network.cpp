@@ -12,7 +12,7 @@
 
 #include <exception>
 
-#define NBL_LOGGING_LEVEL NBL_INFO_LEVEL
+#define NBL_LOGGING_LEVEL NBL_WARN_LEVEL
 
 namespace nbl {
     namespace network {
@@ -109,6 +109,7 @@ namespace nbl {
             pthread_mutex_lock(&connectionMutex);
             if ( connected && clientIndex == flagIndex ) {
                 connected = false;
+                close(client);
                 pthread_cond_broadcast(&connectionDiedCond);
             }
 
@@ -169,7 +170,9 @@ namespace nbl {
                     }
 
                 } else {
+                    NBL_WARN("Streamer::threadLoop() blocking for client...");
                     master.blockForClient(socket, clientIndex);
+                    NBL_WARN("Streamer::threadLoop() using client: %zu", clientIndex);
                     ping->createdWhen = 0;
                 }
             }
@@ -183,6 +186,8 @@ namespace nbl {
 
             for (;running;) {
                 if (socket > 0 && master.checkClient(clientIndex)) {
+
+//                    NBL_PRINT("Control looping");
 
                     logptr recvd = Log::recv(socket);
 
@@ -201,7 +206,9 @@ namespace nbl {
                     }
 
                 } else {
+                    NBL_WARN("Controller::threadLoop() blocking for client...");
                     master.blockForClient(socket, clientIndex);
+                    NBL_WARN("Controller::threadLoop() using client: %zu", clientIndex);
                 }
             }
 

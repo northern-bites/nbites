@@ -3,6 +3,7 @@ package nbtool.data.log;
 import java.util.Arrays;
 
 import nbtool.util.Utility.Pair;
+import nbtool.util.SharedConstants;
 
 public class LogSearching {
 	
@@ -11,8 +12,8 @@ public class LogSearching {
 	}
 	
 	public static class ContainsCriteria implements Criteria {
-		String[] requires = null;
-		String[] excludes = null;
+		String[] requires = new String[0];
+		String[] excludes = new String[0];
 		
 		public boolean fits(String description) {
 			for (String r : requires) {
@@ -69,10 +70,17 @@ public class LogSearching {
 					return true;
 				}}),
 			
-			new Pair("all YUVImages", ContainsCriteria.create().require("YUVImage")),
+			new Pair("all YUVImages", ContainsCriteria.create().require("camera_", 
+					SharedConstants.LOG_BLOCK_IMAGE_WIDTH_PIXELS(), 
+					SharedConstants.LOG_BLOCK_IMAGE_HEIGHT_PIXELS())),
 			new Pair("all tripoint", ContainsCriteria.create().require("tripoint")),
-			new Pair("top images", ContainsCriteria.create().require("YUVImage", "cameraTOP")),
-			new Pair("bottom images", ContainsCriteria.create().require("YUVImage", "cameraBOT")),
+			new Pair("top images", ContainsCriteria.create().require(
+					SharedConstants.LOG_BLOCK_IMAGE_WIDTH_PIXELS(), 
+					SharedConstants.LOG_BLOCK_IMAGE_HEIGHT_PIXELS(),
+					"camera_TOP")),
+			new Pair("bottom images", ContainsCriteria.create().require(SharedConstants.LOG_BLOCK_IMAGE_WIDTH_PIXELS(), 
+					SharedConstants.LOG_BLOCK_IMAGE_HEIGHT_PIXELS(),
+					"camera_BOT")),
 			new Pair("location logs", ContainsCriteria.create().require("location", "RobotLocation", "ParticleSwarm"))
 	};	
 }

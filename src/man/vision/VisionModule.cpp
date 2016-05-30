@@ -660,7 +660,7 @@ void VisionModule::logImage(int i)
             return;
     }
 
-    if (control::check[control::flags::tripoint]) {
+    if (control::check(control::flags::tripoint)) {
         ++image_index;
 
         nbl::logptr theLog = nbl::Log::explicitLog(

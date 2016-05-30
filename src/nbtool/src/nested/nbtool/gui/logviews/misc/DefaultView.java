@@ -37,6 +37,10 @@ public class DefaultView extends ViewParent implements ActionListener {
 		Path path = PathChooser.chooseLogPath(this);
 		if (path == null) return;
 		
+		if (!path.toString().endsWith(".nblog")) {
+			path = FileIO.getPath(path.toString() + ".nblog");
+		}
+		
 		try {
 			FileIO.writeLogToPath(path, displayedLog);
 		} catch (IOException e1) {
