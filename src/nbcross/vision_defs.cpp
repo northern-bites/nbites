@@ -24,8 +24,8 @@ void getCalibrationOffsets(Log* l, double* r, double* p, int w, int h, bool t);
 void updateSavedColorParams(std::string sexpPath, SExpr* params, bool top);
 SExpr getSExprFromSavedParams(int color, std::string sexpPath, bool top);
 std::string getSExprStringFromColorJSonNode(boost::property_tree::ptree tree);
-SExpr treeFromBall(man::vision::Ball& b);
-SExpr treeFromBlob(man::vision::Blob& b);
+SExpr treeFromBall(man::vision::Ball& b, int width, int height);
+SExpr treeFromSpot(man::vision::Spot& b, int width, int height);
 
 messages::YUVImage emptyTop(
     man::vision::DEFAULT_TOP_IMAGE_WIDTH * 2,
@@ -410,35 +410,15 @@ int Vision_func() {
 
     Log* ballRet = new Log();
     std::vector<man::vision::Ball> balls = detector->getBalls();
-    std::list<man::vision::Blob> blobs = detector->getBlobber()->blobs;
-    std::list<man::vision::Blob> whiteBlobs = detector->getBlobber2()->blobs;
 
     SExpr allBalls;
     int count = 0;
     for (auto i=balls.begin(); i!=balls.end(); i++) {
-        SExpr ballTree = treeFromBall(*i);
+        SExpr ballTree = treeFromBall(*i, width, height);
         SExpr next = SExpr::keyValue("ball" + std::to_string(count), ballTree);
         allBalls.append(next);
         count++;
     }
-    count = 0;
-    for (auto i=blobs.begin(); i!=blobs.end(); i++) {
-        if ((*i).firstPrincipalLength() < 8) {
-            SExpr blobTree = treeFromBlob(*i);
-            SExpr next = SExpr::keyValue("blob" + std::to_string(count), blobTree);
-            allBalls.append(next);
-            count++;
-        }
-    }
-    for (auto i=whiteBlobs.begin(); i!=whiteBlobs.end(); i++) {
-        if ((*i).firstPrincipalLength() < 30 && (*i).secondPrincipalLength() > 5) {
-            SExpr blobTree = treeFromBlob(*i);
-            SExpr next = SExpr::keyValue("white_blob" + std::to_string(count), blobTree);
-            allBalls.append(next);
-            count++;
-        }
-    }
-
     ballRet->setTree(allBalls);
     rets.push_back(ballRet);
 
@@ -739,34 +719,34 @@ SExpr getSExprFromSavedParams(int color, std::string sexpPath, bool top) {
     return SExpr(atoms);
 }
 
-SExpr treeFromBall(man::vision::Ball& b)
+SExpr treeFromBall(man::vision::Ball& b, int width, int height)
 {
     SExpr x(b.x_rel);
     SExpr y(b.y_rel);
     SExpr p = SExpr::list({x, y});
-    SExpr bl = treeFromBlob(b.getBlob());
+    SExpr bl = treeFromSpot(b.getSpot(), width, height);
 
     SExpr rel = SExpr::keyValue("rel", p);
-    SExpr blob = SExpr::keyValue("blob", bl);
+    SExpr spot = SExpr::keyValue("blob", bl);
     SExpr exDiam = SExpr::keyValue("expectedDiam", b.expectedDiam);
-    SExpr toRet = SExpr::list({rel, blob, exDiam});
+    SExpr toRet = SExpr::list({rel, spot, exDiam});
 
     return toRet;
 }
 
-SExpr treeFromBlob(man::vision::Blob& b)
+SExpr treeFromSpot(man::vision::Spot & b, int width, int height)
 {
-    SExpr x(b.centerX());
-    SExpr y(b.centerY());
+    SExpr x(b.ix() + width / 2);
+    SExpr y(-b.iy() + height / 2);
     SExpr p = SExpr::list({x, y});
 
     SExpr center = SExpr::keyValue("center", p);
-    SExpr area = SExpr::keyValue("area", b.area());
-    SExpr count = SExpr::keyValue("count", b.count());
-    SExpr len1 = SExpr::keyValue("len1", b.firstPrincipalLength());
-    SExpr len2 = SExpr::keyValue("len2", b.secondPrincipalLength());
-    SExpr ang1 = SExpr::keyValue("ang1", b.firstPrincipalAngle());
-    SExpr ang2 = SExpr::keyValue("ang2", b.secondPrincipalAngle());
+    SExpr area = SExpr::keyValue("area", 0.1f);
+    SExpr count = SExpr::keyValue("count", 1);
+    SExpr len1 = SExpr::keyValue("len1", b.innerDiam);
+    SExpr len2 = SExpr::keyValue("len2", b.innerDiam);
+    SExpr ang1 = SExpr::keyValue("ang1", 0);
+    SExpr ang2 = SExpr::keyValue("ang2", 0);
     SExpr toRet = SExpr::list({center, area, count, len1, len2, ang1, ang2});
 
     return toRet;
@@ -784,7 +764,7 @@ man::vision::VisionModule& getModuleRef(const std::string robotName) {
 		man::vision::VisionModule* module = vmRefMap[robotName];
 		module->reset();
         return *module;
-        
+
     } else {
         printf("nbcross-getModuleRef CREATING NEW MODULE [%s]\n",
                robotName.c_str() );

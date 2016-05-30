@@ -43,6 +43,7 @@ void BallDetector::setDebugImage(DebugImage * di) {
 	bool BallDetector::filterBlackSpots(Spot currentSpot)
 {
     int WHITE_JUMP = 40;
+    int MIN_CENTER_Y = 100;
 	// Some ideas: spots on the ball should have white in at least two directions
     int buff = 0;
     int leftX = currentSpot.xLo() + width / 2 - buff;
@@ -53,7 +54,12 @@ void BallDetector::setDebugImage(DebugImage * di) {
     if (scan < 2) {
         scan = 2;
     }
-    int midY = *(yImage.pixelAddr(currentSpot.ix() + width / 2, -currentSpot.iy() + height / 2)) / 4;
+    int midY = *(yImage.pixelAddr(currentSpot.ix() + width / 2,
+                                  -currentSpot.iy() + height / 2)) / 4;
+    // spots in robots are often actually bright, just surrounded by brighter
+    if (midY > MIN_CENTER_Y) {
+        return false;
+    }
     int currentY = 0;
     int whites = 0;
 	// scan out from each edge to see if there is a significant
@@ -456,7 +462,7 @@ bool BallDetector::findCorrelatedBlackSpots
                     }
                     makeBall(newBall, cameraHeight, 0.8, foundBall, true); */
 #ifdef OFFLINE
-                    foundBall = true;
+                    //foundBall = true;
 #else
                     return true;
 #endif
@@ -488,7 +494,7 @@ bool BallDetector::findCorrelatedBlackSpots
             makeBall(newBall, cameraHeight, 0.75, foundBall, true); */
             std::cout << "Found 2d cor. Punting for now" << std::endl;
 #ifdef OFFLINE
-            foundBall = true;
+            //foundBall = true;
 #else
             return true;
 #endif
@@ -506,25 +512,17 @@ bool BallDetector::findCorrelatedBlackSpots
    is helpful to find all of the possible balls that vision could
    detect in every image.
 */
-void BallDetector::makeBall(Blob blob, double cameraHeight, double conf,
+void BallDetector::makeBall(Spot spot, double cameraHeight, double conf,
                             bool foundBall, bool isBlack)
 {
-    double bIX = (blob.centerX() - width/2);
-    double bIY = (height / 2 - blob.centerY()) -
-        blob.firstPrincipalLength();
-	double cY = blob.centerY();
-	/*if (topCamera && isBlack) {
-		bIY = bIY + height / 2;
-		cY = cY + height / 2;
-        }*/
+    double bIX = spot.ix() + width / 2;
+    double bIY = -spot.iy() + height / 2;
     double x_rel, y_rel;
     bool belowHoriz = homography->fieldCoords(bIX, bIY, x_rel, y_rel);
-    Ball b(blob, x_rel, -1 * y_rel, cameraHeight, height,
-           width, topCamera, false, false, false, blob.centerX(), cY);
-	b._confidence = conf;
-	if (!foundBall) {
-		_best = b;
-	}
+    std::cout << "x " << x_rel << " " << y_rel << " " << bIX << std::endl;
+    Ball b(spot, x_rel, -1 * y_rel, cameraHeight, height,
+           width, topCamera, spot.ix() + width / 2, -spot.iy() + height / 2, conf);
+    _best = b;
 		//edgeSanityCheck((int)blob.centerX(), (int)blob.centerY(), blob.firstPrincipalLength());
 #ifdef OFFLINE
 		candidates.push_back(b);
@@ -596,14 +594,19 @@ void BallDetector::makeEdgeList(EdgeList & edges)
     }
 }
 
-bool BallDetector::filterWhiteSpot(Spot spot, std::vector<std::pair<int,int>> & blackSpots) {
-    int leftX = spot.x + width / 2 - spot.innerDiam / 4;
-    int rightX = spot.x + width / 2 + spot.innerDiam / 4;
-    int topY = spot.y + height / 2 - spot.innerDiam / 4;
-    int bottomY = spot.y + height / 2 + spot.innerDiam / 4;
+bool BallDetector::filterWhiteSpot(Spot spot,
+                                   std::vector<std::pair<int,int>> & blackSpots)
+{
+    // convert back to raw coordinates
+    int leftX = spot.ix() + width / 2 - spot.innerDiam / 4;
+    int rightX = spot.ix() + width / 2 + spot.innerDiam / 4;
+    int topY = -spot.iy() + height / 2 - spot.innerDiam / 4;
+    int bottomY = -spot.iy() + height / 2 + spot.innerDiam / 4;
+    int midX = spot.ix() + width / 2;
+    int midY = -spot.iy() + height / 2;
 
     // don't  bother if off the field
-    if (topCamera && spot.y < field->horizonAt(spot.x + width / 2)) {
+    if (topCamera && midY < field->horizonAt(midX)) {
         return false;
     }
     // when it is too small it is too dangerous
@@ -611,11 +614,14 @@ bool BallDetector::filterWhiteSpot(Spot spot, std::vector<std::pair<int,int>> & 
         return false;
     }
 
+    // count up how many black spots are inside
     int spots = 0;
     for (int j = 0; j < blackSpots.size(); j++) {
         std::pair<int,int> blackspot = blackSpots[j];
-        if (blackspot.first > spot.xLo() + width / 2 && blackspot.first < spot.xHi() + width / 2 &&
-            blackspot.second > spot.yLo() + height / 2 && blackspot.second < spot.yHi() + height / 2) {
+        if (blackspot.first > spot.xLo() + width / 2 &&
+            blackspot.first < spot.xHi() + width / 2 &&
+            blackspot.second > spot.yLo() + height / 2 &&
+            blackspot.second < spot.yHi() + height / 2) {
             spots++;
         }
     }
@@ -631,6 +637,7 @@ bool BallDetector::filterWhiteSpot(Spot spot, std::vector<std::pair<int,int>> & 
         for (int j = topY; j < bottomY; j++) {
             getColor(i, j);
             if (isGreen()) {
+                debugDraw.drawPoint(i, j, RED);
                 return false;
             }
             if (!isWhite()) {
@@ -662,6 +669,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     // aren't part of the ball
     std::vector<std::pair<int,int>> blackBlobs;
     std::vector<Spot> actualBlackBlobs;
+    std::vector<Spot> actualWhiteSpots;
 
     SpotDetector spots;
     spots.darkSpot(true);
@@ -675,6 +683,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     spots.spotDetect(yImage, homography, &greenImage);
     SpotList spotter = spots.spots();
     for (auto i = spotter.begin(); i != spotter.end(); i++) {
+        // convert back to raw coordinates
         int midX = (*i).ix() + width / 2;
         int midY = -(*i).iy() + height / 2;
         int xLo = (*i).xLo() + width / 2;
@@ -700,7 +709,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     whitespots.darkSpot(false);
     whitespots.innerDiamCm(13.0f);
     if (!topCamera) {
-        whitespots.innerDiamCm(24.0f);
+        whitespots.innerDiamCm(25.0f);
     }
     whitespots.filterThreshold(140);
     whitespots.greenThreshold(70);
@@ -717,77 +726,27 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         int yHi = (*i).yHi() + height / 2;
         if (filterWhiteSpot((*i), blackBlobs)) {
             debugDraw.drawBox(xLo, xHi, yHi, yLo, RED);
+            actualWhiteSpots.push_back((*i));
+            makeBall((*i), cameraHeight, 0.75, foundBall, false);
+            foundBall = true;
         } else if (!topCamera || yLo > field->horizonAt(xLo)) {
             debugDraw.drawBox(xLo, xHi, yHi, yLo, WHITE);
         }
     }
 
-    blobber2.run(whiteImage.pixelAddr(), whiteImage.width(),
-                 whiteImage.height(), whiteImage.pitch());
-    // Now run the blobber on the white image
-    std::vector<std::pair<int,int>> whiteBlobs;
-    // loop through the white blobs hoping to find a ball sized blob
-    for (auto i =blobber2.blobs.begin(); i!=blobber2.blobs.end(); i++) {
-        int count = filterWhiteBlobs((*i), whiteBlobs, blackBlobs);
-        int centerY = static_cast<int>((*i).centerY());
-        int principalLength = static_cast<int>((*i).firstPrincipalLength());
-        if (count > 2) {
-            makeBall((*i), cameraHeight, 0.9, foundBall, false);
-            foundBall = true;
-        } else if (count == 2) {
-            makeBall((*i), cameraHeight, 0.8, foundBall, false);
-            foundBall = true;
-        }else if (count > 0 && topCamera &&
-                  centerY + principalLength > height - BUFFER &&
-                  principalLength < BOTTOMEDGEWHITEMAX) {
-            makeBall((*i), cameraHeight, 0.5, foundBall, false);
-            foundBall = true;
-        } else if (count == 1) {
-			if (!topCamera) {
-				int prinLength = static_cast<int>((*i).firstPrincipalLength());
-				int prinLength2 = static_cast<int>((*i).secondPrincipalLength());
-				if (prinLength2 > 8 && prinLength < 20) {
-					makeBall((*i), cameraHeight, 0.5, foundBall, false);
-					foundBall = true;
-				} else if (centerY - prinLength < 0 || centerY + prinLength > height) {
-					if (prinLength2 > 7) {
-						makeBall((*i), cameraHeight, 0.5, foundBall, false);
-						foundBall = true;
-					}
-				}
-			}
-			if (debugBall) {
-				std::cout << "Found a white blob with one black spot " <<
-					centerY << std::endl;
-			}
-		}
-#ifdef OFFLINE
-#else
-        if (foundBall) {
-            return true;
-        }
-#endif
-    }
-
     if (findCorrelatedBlackSpots(blackBlobs, actualBlackBlobs, cameraHeight,
                                  foundBall)) {
 #ifdef OFFLINE
-        foundBall = true;
+        //foundBall = true;
 #else
         return true;
 #endif
 	}
-
-    for (auto i =blobber2.blobs.begin(); i!=blobber2.blobs.end(); i++) {
-        if ((*i).firstPrincipalLength() < 20 && lookForFarAwayBalls((*i))) {
-            makeBall((*i), cameraHeight, 0.5, foundBall, false);
-#ifdef OFFLINE
-            std::cout << "Found faraway ball" << std::endl;
-            foundBall = true;
-#else
-            return true;
-#endif
-        }
+    if (foundBall) {
+        std::cout << "Done" << std::endl;
+        std::cout << "Best " << _best.y_rel << std::endl;
+    } else {
+        std::cout << "Done no" << std::endl;
     }
 
     return foundBall;
@@ -845,10 +804,9 @@ void BallDetector::setImages(ImageLiteU8 white, ImageLiteU8 green,
 /* Ball functions.
  */
 
-Ball::Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_,
-           int imgWidth_, bool top, bool os, bool ot, bool ob, double cx,
-	double cy) :
-    blob(b),
+Ball::Ball(Spot & s, double x_, double y_, double cameraH_, int imgHeight_,
+           int imgWidth_, bool top, double cx, double cy, double conf) :
+    spot(s),
     radThresh(.3, .7),
     thresh(.5, .8),
     x_rel(x_),
@@ -857,12 +815,9 @@ Ball::Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_,
     imgHeight(imgHeight_),
     imgWidth(imgWidth_),
     topCamera(top),
-    occludedSide(os),
-    occludedTop(ot),
-    occludedBottom(ob),
 	centerX(cx),
 	centerY(cy),
-    _confidence(0)
+    _confidence(conf)
 {
     if (!top) {
         //radThresh = thresh;
@@ -873,7 +828,6 @@ Ball::Ball(Blob& b, double x_, double y_, double cameraH_, int imgHeight_,
 }
 
 Ball::Ball() :
-    blob(0),
     thresh(0, 0),
     radThresh(0, 0),
     _confidence(0),
@@ -883,40 +837,14 @@ Ball::Ball() :
 void Ball::compute()
 {
     dist = hypot(x_rel, y_rel);
-    double density = blob.area() / blob.count();
-    double aspectRatio = (blob.secondPrincipalLength() /
-                          blob.firstPrincipalLength());
-
+    radius = int(pixDiameterFromDist(dist));
     double hypotDist = hypot(dist, cameraH);
-
     expectedDiam = pixDiameterFromDist(hypotDist);
 
-    diameterRatio;
-    if (expectedDiam > 2 * firstPrincipalLength) {
-        diameterRatio = 2 * firstPrincipalLength / expectedDiam;
-    } else {
-        diameterRatio = expectedDiam / (2 * firstPrincipalLength);
+    if (dist > 500) {
+        std::cout << "Setting confidence to 0" << std::endl;
+        //_confidence = 0;
     }
-
-    // We have sort of lost the ability to detect occlusion, so this
-    // could be drastically simplified again. But maybe we'll detect it again?
-    if ((occludedSide || occludedTop || occludedBottom) && density > 0.9) {
-        _confidence = ((density > thresh) & (aspectRatio > thresh) &
-                       (diameterRatio > radThresh)).f();
-        _confidence = ((density > thresh) &
-                       (diameterRatio > radThresh)).f() * 0.85;
-    } else {
-        _confidence = ((density > thresh) & (aspectRatio > thresh) &
-                       (diameterRatio > radThresh)).f();
-    }
-
-
-    // Hack/Sanity check to ensure we don't see crazy balls
-    if (dist > 300) {
-        _confidence = 0;
-    } else {
-		_confidence = 0.1;
-	}
 }
 
 std::string Ball::properties()
@@ -928,8 +856,8 @@ std::string Ball::properties()
     //d += "\tcount is: " + to_string(blob.count()) + "\n";
     d += "\tlocated: (" + to_string(centerX) +  ", " +
         to_string(centerY) + ")\n";
-    d += "\tprinceLens: " + to_string(firstPrincipalLength) + " " +
-        to_string(firstPrincipalLength) + "\n";
+    d += "\tprinceLens: " + to_string(radius) + " " +
+        to_string(radius) + "\n";
     //d += "\taspectR is: " + to_string(blob.secondPrincipalLength() /
     //								  blob.firstPrincipalLength()) + "\n";
     d += "\texpect ball to be this diam: " + to_string(expectedDiam) + "\n";
