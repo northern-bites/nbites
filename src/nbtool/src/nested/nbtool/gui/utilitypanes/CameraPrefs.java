@@ -9,10 +9,20 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 
+import nbtool.data.*;
+import nbtool.util.*;
+import nbtool.gui.utilitypanes.*;
+
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.FileReader;
+import java.io.BufferedWriter;
+import java.io.BufferedReader;
 import java.io.IOException;
 
-import nbtool.data.*;
-import nbtool.gui.utilitypanes.*;
+import java.util.Scanner;
 
 public class CameraPrefs extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -55,7 +65,7 @@ public class CameraPrefs extends JPanel {
 		new JTextField(4),
 	};
 	
-	protected CameraPrefs(String whichCamera) {
+	protected CameraPrefs(String whichCamera, int naoVersion) {
 		super();
 		setLayout(null);
 		setPreferredSize(new Dimension(250,blockHeight));
@@ -65,7 +75,7 @@ public class CameraPrefs extends JPanel {
 			}
 		});
 		
-		prefsField = new CameraPrefsField(whichCamera);
+		prefsField = new CameraPrefsField(whichCamera, naoVersion);
 		add(prefsField);
 	}
 	
@@ -73,8 +83,10 @@ public class CameraPrefs extends JPanel {
 		prefsField.setBounds(0,0,270,blockHeight);
 	}
 	
-	JButton newButton;
 	JPanel optionsPanel;
+
+	SExpr top;
+	SExpr bot;
 	
 	public Integer[] getParameterValues() {
 		Integer [] paramValues = new Integer[fields.length];
@@ -83,40 +95,80 @@ public class CameraPrefs extends JPanel {
 		}
 		return paramValues;
 	}
+
+	public void refresh(String whichCamera, int naoVersion) {
+		readExistingParamsFromFile(naoVersion);
+		setInitialParameterValues(whichCamera);
+		repaint();
+	}
+
+	public void readExistingParamsFromFile(int naoVersion) {
+
+		String topFileName, botFileName;
+		String topFileContents = ""; 
+		String botFileContents = "";
+
+		if(naoVersion == 4) {
+			topFileName = "../../../src/man/config/V4topCameraParams.txt";
+			botFileName = "../../../src/man/config/V4bottomCameraParams.txt";
+		} else {
+			topFileName = "../../../src/man/config/V5topCameraParams.txt";
+			botFileName = "../../../src/man/config/V5bottomCameraParams.txt";
+		}
+
+		try {
+			topFileContents = readFile(topFileName);
+		} catch (IOException e) {
+			System.err.println("Error Reading Top Parameter File");
+		}
+
+		try {
+			botFileContents = readFile(botFileName);
+		} catch (IOException e) {
+			System.err.println("Error Reading Bottom Parameter File");
+		}
+
+		top = SExpr.deserializeFrom(topFileContents);
+		bot = SExpr.deserializeFrom(botFileContents);
+	}
+
+	private String readFile(String fileName) throws IOException {
+		String content = new Scanner(new File(fileName)).useDelimiter("\\Z").next();
+		return content;
+	}
 	
 	//backlight compensation parameter not set here
 	public void setInitialParameterValues(String whichCamera) {
-		//Searles Camera Parameters
 		if(whichCamera.equals("Top Camera")) {
-			fields[0] = new JTextField("1",4);
-			fields[1] = new JTextField("1",4);
-			fields[2] = new JTextField("0",4);
-			fields[3] = new JTextField("250",4);
-			fields[4] = new JTextField("43",4);
-			fields[5] = new JTextField("144",4);
-			fields[6] = new JTextField("0",4);
-			fields[7] = new JTextField("4",4);
-			fields[8] = new JTextField("220",4);
-			fields[9] = new JTextField("0",4);
-			fields[10] = new JTextField("250",4);
-			fields[11] = new JTextField("53",4);
-			fields[12] = new JTextField("3300",4);
-			fields[13] = new JTextField("0",4);
+			fields[0].setText(top.find("hflip").get(1).value());
+			fields[1].setText(top.find("vflip").get(1).value());
+			fields[2].setText(top.find("autoexposure").get(1).value());
+			fields[3].setText(top.find("brightness").get(1).value()); 
+			fields[4].setText(top.find("contrast").get(1).value());
+			fields[5].setText(top.find("saturation").get(1).value());
+			fields[6].setText(top.find("hue").get(1).value());
+			fields[7].setText(top.find("sharpness").get(1).value());
+			fields[8].setText(top.find("gamma").get(1).value());
+			fields[9].setText(top.find("auto_whitebalance").get(1).value());
+			fields[10].setText(top.find("exposure").get(1).value());
+			fields[11].setText(top.find("gain").get(1).value());
+			fields[12].setText(top.find("white_balance").get(1).value());
+			fields[13].setText(top.find("fade_to_black").get(1).value());
 		} else {
-			fields[0] = new JTextField("0",4);
-			fields[1] = new JTextField("0",4);
-			fields[2] = new JTextField("0",4);
-			fields[3] = new JTextField("200",4);
-			fields[4] = new JTextField("56",4);
-			fields[5] = new JTextField("122",4);
-			fields[6] = new JTextField("0",4);
-			fields[7] = new JTextField("3",4);
-			fields[8] = new JTextField("220",4);
-			fields[9] = new JTextField("0",4);
-			fields[10] = new JTextField("250",4);
-			fields[11] = new JTextField("62",4);
-			fields[12] = new JTextField("3200",4);
-			fields[13] = new JTextField("0",4);
+			fields[0].setText(bot.find("hflip").get(1).value());
+			fields[1].setText(bot.find("vflip").get(1).value());
+			fields[2].setText(bot.find("autoexposure").get(1).value());
+			fields[3].setText(bot.find("brightness").get(1).value()); 
+			fields[4].setText(bot.find("contrast").get(1).value());
+			fields[5].setText(bot.find("saturation").get(1).value());
+			fields[6].setText(bot.find("hue").get(1).value());
+			fields[7].setText(bot.find("sharpness").get(1).value());
+			fields[8].setText(bot.find("gamma").get(1).value());
+			fields[9].setText(bot.find("auto_whitebalance").get(1).value());
+			fields[10].setText(bot.find("exposure").get(1).value());
+			fields[11].setText(bot.find("gain").get(1).value());
+			fields[12].setText(bot.find("white_balance").get(1).value());
+			fields[13].setText(bot.find("fade_to_black").get(1).value());
 		}
 	}
 	
@@ -167,8 +219,9 @@ public class CameraPrefs extends JPanel {
 			return getTwoColumnLayout(labels,fields);
 		}
 		
-		protected CameraPrefsField(String whichCamera) {
+		protected CameraPrefsField(String whichCamera, int naoVersion) {
 			super();
+			readExistingParamsFromFile(naoVersion);
 			setInitialParameterValues(whichCamera);
 			JComponent labelsAndFields = getTwoColumnLayout(listOfParams,fields);
 			JComponent optionsPanel = new JPanel(new BorderLayout(5,5));

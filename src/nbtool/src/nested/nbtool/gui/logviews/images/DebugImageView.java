@@ -48,7 +48,7 @@ public class DebugImageView extends VisionView implements
     static final int YIMAGE = 0;
     static final int WHITE_IMAGE = 1;
     static final int GREEN_IMAGE = 2;
-    static final int ORANGE_IMAGE = 3;
+    static final int BLACK_IMAGE = 3;
     static final int SEGMENTED = 4;
     static final int EDGE_IMAGE = 5;
     static final int LINE_IMAGE = 6;
@@ -75,7 +75,7 @@ public class DebugImageView extends VisionView implements
      * */
 
     // Images that we can view in this view using the combo box
-    String[] imageViews = { "Original", "Green", "Orange", "White", "Edge", "Thresh", "Learn" };
+    String[] imageViews = { "Original", "Green", "Black", "White", "Edge", "Thresh", "Learn" };
     JComboBox<String> viewList;
 
     JSlider greenThreshold;
@@ -277,12 +277,12 @@ public class DebugImageView extends VisionView implements
 	if (width != DEFAULT_WIDTH) {
 	    multiplier = 4;
 	}
-	// if we don't have an orange image we're in trouble
-        if (displayImages[ORANGE_IMAGE] == null) {
-	    System.out.println("No orange image");
+	// if we don't have an black image we're in trouble
+        if (displayImages[BLACK_IMAGE] == null) {
+	    System.out.println("No black image");
 	    return;
 	}
-        //Graphics2D graph = orange.createGraphics();
+        //Graphics2D graph = black.createGraphics();
 	Graphics2D graph = (Graphics2D)g;
         graph.setColor(Color.RED);
         String b = "blob";
@@ -378,8 +378,8 @@ public class DebugImageView extends VisionView implements
 	    currentBottom = GREEN_IMAGE;
 	} else if (viewName == "White") {
 	    currentBottom = WHITE_IMAGE;
-	} else if (viewName == "Orange") {
-	    currentBottom = ORANGE_IMAGE;
+	} else if (viewName == "Black") {
+	    currentBottom = BLACK_IMAGE;
 	} else if (viewName == "Edge") {
 	    currentBottom = EDGE_IMAGE;
 	} else if (viewName == "Original") {
@@ -411,20 +411,20 @@ public class DebugImageView extends VisionView implements
 
     class DistanceGetter implements MouseListener {
 
-	public void mouseClicked(MouseEvent e) {
-	    repaint();
-	}
+		public void mouseClicked(MouseEvent e) {
+			repaint();
+		}
 
-	public void mousePressed(MouseEvent e) {
-	}
+		public void mousePressed(MouseEvent e) {
+		}
 
-	public void mouseReleased(MouseEvent e) {
-	    repaint();
-	}
+		public void mouseReleased(MouseEvent e) {
+			repaint();
+		}
 
-	public void mouseEntered(MouseEvent e) {}
+		public void mouseEntered(MouseEvent e) {}
 
-	public void mouseExited(MouseEvent e) {}
+		public void mouseExited(MouseEvent e) {}
     }
 
     @Override
@@ -438,21 +438,34 @@ public class DebugImageView extends VisionView implements
 
 	int col = e.getX();
 	int row = e.getY();
+    byte[] data = originalImageBytes();
 
-	if (col < 0 || row < 0 || col >= displayw || row >= displayh) {
-	    return;
-	}
+    if (col < 0 || row < 0 || col >= displayw || row >= displayh) {
+        return;
+    }
 
-	boolean first = (col & 1) == 0;
-	int cbase = (col & ~1);
-	int i = (row * displayw * 2) + (cbase * 2);
-	
-	byte[] data = originalImageBytes();
-	int y = data[first ? i : i + 2] & 0xff;
-	int u = data[i + 1] & 0xff;
-	int v = data[i + 3] & 0xff;
-	label = String.format("(%d,%d): y=%d u=%d v=%d", col, row, y, u, v);
-	repaint();
+    if (width != DEFAULT_WIDTH) {
+        col = col/2;
+        row = row/2;
+        boolean first = (col & 1) == 0;
+        int cbase = (col & ~1);
+        int i = (row * 320) + (cbase * 2);
+
+        int y = data[first ? i : i + 2] & 0xff;
+        int u = data[i + 1] & 0xff;
+        int v = data[i + 3] & 0xff;
+        label = String.format("(%d,%d): y=%d u=%d v=%d", col/2, row/2, y, u, v);
+    } else {
+        boolean first = (col & 1) == 0;
+        int cbase = (col & ~1);
+        int i = (row * displayw * 2) + (cbase * 2);
+
+        int y = data[first ? i : i + 2] & 0xff;
+        int u = data[i + 1] & 0xff;
+        int v = data[i + 3] & 0xff;
+        label = String.format("(%d,%d): y=%d u=%d v=%d", col/2, row/2, y, u, v);
+    }
+    repaint();
     }
 
 
@@ -610,7 +623,7 @@ public class DebugImageView extends VisionView implements
 
 	if (this.getOrangeBlock() != null) {
             Y8Image orange8 = new Y8Image(width, height, this.getOrangeBlock().data);
-            displayImages[ORANGE_IMAGE] = orange8.toBufferedImage();
+            displayImages[BLACK_IMAGE] = orange8.toBufferedImage();
         }
 
 	if (this.getEdgeBlock() != null) {
@@ -655,11 +668,12 @@ public class DebugImageView extends VisionView implements
             e.printStackTrace();
         }
 
-//	SExpr otree = out[ORANGE_IMAGE].tree();
-//        Y8Image o = new Y8image(otree.find("width").get(1).valueAsInt(),
+//	SExpr otree = out[BLACK_IMAGE].tree();
+//        Y8image o = new Y8image(otree.find("width").get(1).valueAsInt(),
 //                                otree.find("height").get(1).valueAsInt(),
-//                                out[ORANGE_IMAGE].bytes);
+//                                out[BLACK_IMAGE].bytes);
 //        balls = out[BALL_IMAGE];
+
 
 
         debugImage = new DebugImage(width, height, this.getDebugImageBlock().data,

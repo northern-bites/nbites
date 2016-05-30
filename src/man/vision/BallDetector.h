@@ -107,6 +107,7 @@ namespace man {
             bool lookForFarAwayBalls(Blob blob);
             bool farSanityChecks(Blob blob);
             bool nearSanityChecks(Blob blob);
+			bool hardSanityCheck(int leftx, int rightx, int topy, int bottomy);
 
 			void setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 black,
 						   ImageLiteU16 yImg);
