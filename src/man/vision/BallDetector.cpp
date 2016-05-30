@@ -40,7 +40,7 @@ void BallDetector::setDebugImage(DebugImage * di) {
    posts and the like. True spots ought to be surrounded by white
    on more than one side.
 */
-	bool BallDetector::filterBlackSpots(Spot currentSpot)
+bool BallDetector::filterBlackSpots(Spot currentSpot)
 {
     int WHITE_JUMP = 40;
     int MIN_CENTER_Y = 100;
@@ -135,7 +135,7 @@ int BallDetector::filterWhiteBlobs(Blob currentBlob,
 		maxB = 24;
 	}
     // blobs over the field horizon are not viable
-    if (topCamera && centerY < field->horizonAt(centerX)) { //should this not be > 
+    if (topCamera && centerY < field->horizonAt(centerX)) { 
         return 0;
     }
     // badly shaped balls are not viable
@@ -565,7 +565,7 @@ bool BallDetector::blackSpotGeometryCheck(std::vector<Spot> *blackSpots)
     std::cout<<"Black Spots Size:" <<blackSpots->size()<<std::endl;
     double wx, wy;
     for(int i=0; i < blackSpots->size()-1; ++i) {
-        
+
     }
     if(blackSpots->size() > 0) {
         homography->fieldCoords(blackSpots->at(0).ix(), blackSpots->at(0).iy(),wx,wy);
@@ -637,7 +637,7 @@ bool BallDetector::filterWhiteSpot(Spot spot,
         for (int j = topY; j < bottomY; j++) {
             getColor(i, j);
             if (isGreen()) {
-                debugDraw.drawPoint(i, j, RED);
+                //debugDraw.drawPoint(i, j, RED);
                 return false;
             }
             if (!isWhite()) {
@@ -668,7 +668,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     // Then we are going to filter out all of the blobs that obviously
     // aren't part of the ball
     std::vector<std::pair<int,int>> blackBlobs;
-    std::vector<Spot> actualBlackBlobs;
+    std::vector<Spot> actualBlackSpots;
     std::vector<Spot> actualWhiteSpots;
 
     SpotDetector spots;
@@ -697,13 +697,14 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
             if (filterBlackSpots((*i))) {
 				debugDraw.drawBox(xLo, xHi, yHi, yLo, ORANGE);
 				blackBlobs.push_back(std::make_pair(midX, midY));
-				actualBlackBlobs.push_back((*i));
+				actualBlackSpots.push_back((*i));
 			} else {
 				debugDraw.drawBox(xLo, xHi, yHi, yLo, BLUE);
 			}
         }
     }
-    blackSpotGeometryCheck(&actualBlackBlobs);
+    //blackSpotGeometryCheck(&actualBlackSpots);
+    std::cout<<"actualBlackSpots Size: "<<actualBlackSpots.size()<<std::endl;
 
     SpotDetector whitespots;
     whitespots.darkSpot(false);
@@ -734,7 +735,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         }
     }
 
-    if (findCorrelatedBlackSpots(blackBlobs, actualBlackBlobs, cameraHeight,
+    if (findCorrelatedBlackSpots(blackBlobs, actualBlackSpots, cameraHeight,
                                  foundBall)) {
 #ifdef OFFLINE
         //foundBall = true;
