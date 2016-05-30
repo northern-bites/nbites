@@ -81,8 +81,7 @@ namespace json {
     }
     
     long Number::asLong() const {
-        NBL_INFO("asLong(): %s", rep.c_str())
-        return std::stol(rep);
+        return std::stoll(rep);
     }
     
     float Number::asFloat() const {

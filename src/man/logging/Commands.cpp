@@ -145,7 +145,6 @@ namespace control {
     CONTROL_FUNCTION(SetCameraParams, false, "CameraParamsPair")
         (const std::vector<nbl::logptr> &arguments) {
             NBL_PRINT("SetCameraParams()");
-            return;
 
             messages::CameraParams topParams;
             messages::CameraParams botParams;

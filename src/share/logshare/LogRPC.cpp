@@ -65,10 +65,8 @@ namespace nbl {
                 return RPC_CALL_FAILED;
             }
 
-            NBL_INFO("%zd blocks.", callingLog->blocks.size());
             std::vector<logptr> arguments;
             for (Block b : callingLog->blocks) {
-                NBL_INFO("parsing as log...");
                 arguments.push_back(b.parseAsLog());
             }
 
