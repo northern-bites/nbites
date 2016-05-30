@@ -406,26 +406,31 @@ void ObstacleModule::processVision(const messages::RobotObstacle& input)
     {
         // obstacle to the east
         updateVisionBuffer(FieldObstacles::Obstacle::EAST, input);
+        // std::cout<<"[OBSTACLE ] EAST"<<std::endl;
     }
     else if ( bearing < 3.f * ZONE_WIDTH )
     {
         // obstacle to northeast
         updateVisionBuffer(FieldObstacles::Obstacle::NORTHEAST, input);
+        // std::cout<<"[OBSTACLE ] NORTHEAST"<<std::endl;
     }
     else if ( bearing < 5.f * ZONE_WIDTH )
     {
         // obstacle to north
         updateVisionBuffer(FieldObstacles::Obstacle::NORTH, input);
+        // std::cout<<"[OBSTACLE ] NORTH"<<std::endl;
     }
     else if ( bearing < 7.f * ZONE_WIDTH )
     {
         // obstacle to northwest
         updateVisionBuffer(FieldObstacles::Obstacle::NORTHWEST, input);
+        // std::cout<<"[OBSTACLE ] NORTHWEST"<<std::endl;
     }
     else if ( bearing < 9.f * ZONE_WIDTH )
     {
         // obstacle to west
         updateVisionBuffer(FieldObstacles::Obstacle::WEST, input);
+        // std::cout<<"[OBSTACLE ] WEST"<<std::endl;
     }
 }
 

@@ -1,6 +1,7 @@
 from ..headTracker import HeadMoves
 from .. import SweetMoves
 from ..util import *
+import PMotion_proto
 
 @superState('gameControllerResponder')
 def gameInitial(player):
@@ -31,7 +32,8 @@ def gamePenalized(player):
 @superState('gameControllerResponder')
 def kick(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.LEFT_MEDIUM_STRAIGHT_KICK)
+        player.brain.nav.callKickEngine(PMotion_proto.messages.Kick.kickForwardRight)
+        player.executeMove(SweetMoves.GOALIE_SQUAT)
 
     return player.stay()
 

@@ -31,11 +31,26 @@ bool VisionSystem::update(ParticleSet& particles,
     numObservations = 0;
     avgError = 0;
 
-    // Count observations
+    // Find closest line to use as observation
+    // IMPORTANT currently we only have the time to process a single line
+    //           optimizing this inner loop, so more lines can be 
+    //           processed is an excellent idea
+    bool foundLine = false;
+    double minR = std::numeric_limits<double>::max();
+    messages::FieldLine line;
     for (int i = 0; i < vision.line_size(); i++) {
-        if (LineSystem::shouldUse(vision.line(i), lastEstimate))
-            numObservations++;
+        if (LineSystem::shouldUse(vision.line(i), lastEstimate)) {
+            if (vision.line(i).inner().r() < minR) {
+                foundLine = true;
+                line = vision.line(i);
+                minR = vision.line(i).inner().r();
+            }
+        }
     }
+
+    // Count observations
+    if (foundLine)
+        numObservations++;
     for (int i = 0; i < vision.corner_size(); i++)
         numObservations++;
     if (vision.circle().on())
@@ -60,16 +75,9 @@ bool VisionSystem::update(ParticleSet& particles,
         Particle* particle = &(*iter);
         float curParticleError = 1;
 
-        // Score particle from line observations
-        for (int i = 0; i < vision.line_size(); i++) {
-            if (!LineSystem::shouldUse(vision.line(i), lastEstimate))
-                continue;
-            curParticleError = curParticleError*lineSystem->scoreLine(vision.line(i), particle->getLocation());
-            break;
-            // IMPORTANT currently we only have the time to process a single line
-            //           optimizing this inner loop, so more lines can be 
-            //           processed is an excellent idea
-        }
+        // Score particle from line observation
+        if (foundLine)
+            curParticleError = curParticleError*lineSystem->scoreLine(line, particle->getLocation());
 
         // Score particle from corner observations
         for (int i = 0; i < vision.corner_size(); i++)
@@ -212,20 +220,31 @@ bool VisionSystem::update(ParticleSet& particles,
                         }
 
                         // Inject if reconstucted location is on field
-                        ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 2, 0.01);
-                        if (reconstructed.onField())
-                            injections.push_back(reconstructed);
+                        // ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 2, 0.01);
+                        // if (reconstructed.onField())
+                        //     injections.push_back(reconstructed);
                     }
                 }
 
                 // Based on midpoint of top goalbox
                 // NOTE only valid if line is sufficiently long, otherwise too much
                 //      error in the y direction
-                if (inner.ep1() - inner.ep0() > 200) {
-                    messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(id, field);
-                    ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 3, 0.01);
-                    injections.push_back(reconstructed);
-                }
+                // if (inner.ep1() - inner.ep0() > 200) {
+                //     // China 2015 hack
+                //     // Also require that the endline is sufficiently long
+                //     // This throws away false positives in center circle
+                //     for (int i = 0; i < vision.line_size(); i++) {
+                //         const messages::FieldLine& potentialEndline = vision.line(i);
+
+                //         if (potentialEndline.id() == static_cast<int>(vision::LineID::Endline)) {
+                //             if (potentialEndline.inner().ep1() - potentialEndline.inner().ep0() > 200) {
+                //                 messages::RobotLocation pose = lineSystem->reconstructFromMidpoint(id, field);
+                //                 ReconstructedLocation reconstructed(pose.x(), pose.y(), pose.h(), 2, 3, 0.01);
+                //                 injections.push_back(reconstructed);
+                //             }
+                //         }
+                //     }
+                // }
             }
         }
 

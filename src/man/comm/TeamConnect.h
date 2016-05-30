@@ -95,6 +95,7 @@ private:
     struct TeamMemberInfo teamMates[NUM_PLAYERS_PER_TEAM];
 
     int myLastSeqNum;
+    
 };
 
 }

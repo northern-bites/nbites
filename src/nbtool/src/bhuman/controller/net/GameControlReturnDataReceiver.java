@@ -12,7 +12,6 @@ import java.nio.ByteBuffer;
 import java.util.regex.Pattern;
 
 import common.Log;
-
 import data.GameControlData;
 import data.GameControlReturnData;
 import data.Rules;
@@ -109,6 +108,8 @@ public class GameControlReturnDataReceiver extends Thread
                 buffer.rewind();
                 if (player.fromByteArray(buffer)) {
                     RobotWatcher.update(player);
+                } else {
+                	System.out.println("WARN: RETURN DATA NOT ACCEPTED!");
                 }
             } catch (SocketTimeoutException e) { // ignore, because we set a timeout
             } catch (IOException e) {

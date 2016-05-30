@@ -1,4 +1,5 @@
-( (fixed_defender_home 0)
-(forward_defense 0)
+( (fixed_defender_home 1)
+(left_forward_defense 0)
+(right_forward_defense 1)
 (max_speed 0.8f)
 (min_speed 0.6f) )
