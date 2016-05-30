@@ -562,9 +562,18 @@ void BallDetector::edgeSanityCheck(int bx, int by, int radius)
 
 }
 
-bool BallDetector::blackSpotGeometryCheck(SpotList *blackSpots)
+bool BallDetector::blackSpotGeometryCheck(std::vector<Spot> *blackSpots)
 {
     std::cout<<"Black Spots Size:" <<blackSpots->size()<<std::endl;
+    double wx, wy;
+    for(int i=0; i < blackSpots->size()-1; ++i) {
+        
+    }
+    if(blackSpots->size() > 0) {
+        homography->fieldCoords(blackSpots->at(0).ix(), blackSpots->at(0).iy(),wx,wy);
+        std::cout<<"Image X: "<<blackSpots->at(0).ix()<<" , Y: "<<blackSpots->at(0).iy()<<std::endl;
+        std::cout<<"World X: "<<wx<<" , Y: "<<wy<<std::endl;
+    }
     //if(blackSpots)
     return 0;
 }
@@ -685,7 +694,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 			}
         }
     }
-    blackSpotGeometryCheck(&spotter);
+    blackSpotGeometryCheck(&actualBlackBlobs);
 
     SpotDetector whitespots;
     whitespots.darkSpot(false);
