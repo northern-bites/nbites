@@ -28,24 +28,21 @@ import javax.swing.JSlider;
 import javax.swing.JPanel;
 import java.awt.GridLayout;
 
-import nbtool.util.Logger;
-import nbtool.data.Log;
 import nbtool.data.SExpr;
+import nbtool.data.log.Log;
 import nbtool.gui.logviews.misc.ViewParent;
+import nbtool.gui.logviews.misc.VisionView;
 import nbtool.images.DebugImage;
-import nbtool.images.Y8image;
 import nbtool.images.EdgeImage;
+import nbtool.images.Y8Image;
 import nbtool.images.Y8ThreshImage;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
-import nbtool.io.CrossIO;
-import nbtool.io.CrossIO.CrossFunc;
-import nbtool.io.CrossIO.CrossInstance;
-import nbtool.io.CrossIO.CrossCall;
+import nbtool.util.Debug;
 import nbtool.util.Utility;
 
-public class YUVExplore extends ViewParent
-	implements IOFirstResponder, ActionListener, ChangeListener, MouseMotionListener {
+public class YUVExplore extends VisionView
+	implements ActionListener, ChangeListener, MouseMotionListener {
 
 	// Values according to nbcross/vision_defs.cpp - must be kept in sync
 	static final int YIMAGE = 0;
@@ -94,11 +91,9 @@ public class YUVExplore extends ViewParent
     BufferedImage originalImage;            // what the robot saw
 	BufferedImage displayImages[] = new BufferedImage[ORIGINAL+1]; // our images
 	Y8ThreshImage greenCheck;
-	Y8image green8;
+	Y8Image green8;
 
 	private String label = null;
-
-	Log currentLog;
 
 	static int currentBottom;  // track current selection
 	static boolean firstLoad = true;
@@ -135,49 +130,23 @@ public class YUVExplore extends ViewParent
 			newLogLoaded = true;
 		}
     }
-
+    
     @Override
-    public void setLog(Log newlog) {
-        CrossInstance ci = CrossIO.instanceByIndex(0);
-        if (ci == null)
-            return;
-        CrossFunc func = ci.functionWithName("Vision");
-        assert(func != null);
-
-        CrossCall cc = new CrossCall(this, func, newlog);
-
-        assert(ci.tryAddCall(cc));
-
-        Vector<SExpr> vec = newlog.tree().recursiveFind("width");
-        if (vec.size() > 0) {
-            SExpr w = vec.get(vec.size()-1);
-            width =  w.get(1).valueAsInt() / 2;
-        } else {
-            System.out.printf("COULD NOT READ WIDTH FROM LOG DESC\n");
-            width = DEFAULT_WIDTH;
-        }
-
-        vec = newlog.tree().recursiveFind("height");
-        if (vec.size() > 0) {
-            SExpr h = vec.get(vec.size()-1);
-            height = h.get(1).valueAsInt() / 2;
-        } else {
-            System.out.printf("COULD NOT READ HEIGHT FROM LOG DESC\n");
-            height = DEFAULT_HEIGHT;
-        }
+	protected void setupVisionDisplay() {
+    	width = this.originalWidth() / 2;
+        height = this.originalHeight() / 2;
 
         displayw = 640; //width*2;
         displayh = 480; //height*2;
 
-        displayImages[ORIGINAL] = Utility.biFromLog(newlog);
-		currentLog = newlog;
-    }
+        displayImages[ORIGINAL] = this.getOriginal().toBufferedImage();
+	}
 
     public void paintComponent(Graphics g) {
 		final int BOX_HEIGHT = 25;
 		super.paintComponent(g);
 
-        if (currentLog != null) {
+        if (this.displayedLog != null) {
             g.drawImage(displayImages[ORIGINAL], 0, 0, displayw, displayh, null);
 			if (currentBottom == Y || currentBottom == U || currentBottom == V) {
 				drawEdge(g);
@@ -209,16 +178,7 @@ public class YUVExplore extends ViewParent
 	 */
 
 	public void rerunLog() {
-		System.out.println("Rerunning log");
-        CrossInstance ci = CrossIO.instanceByIndex(0);
-        if (ci == null)
-            return;
-        CrossFunc func = ci.functionWithName("Vision");
-        assert(func != null);
-
-        CrossCall cc = new CrossCall(this, func, currentLog);
-
-        assert(ci.tryAddCall(cc));
+		this.callVision();
 	}
 
 	/* Currently only called by the JComboBox, if we start adding more actions
@@ -300,7 +260,7 @@ public class YUVExplore extends ViewParent
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		if (currentLog == null) {
+		if (this.displayedLog == null) {
 			return;
 		}
 
@@ -315,9 +275,10 @@ public class YUVExplore extends ViewParent
 		int cbase = (col & ~1);
 		int i = (row * displayw * 2) + (cbase * 2);
 
-		int y = currentLog.data()[first ? i : i + 2] & 0xff;
-		int u = currentLog.data()[i + 1] & 0xff;
-		int v = currentLog.data()[i + 3] & 0xff;
+		byte[] data = originalImageBytes();
+		int y = data[first ? i : i + 2] & 0xff;
+		int u = data[i + 1] & 0xff;
+		int v = data[i + 3] & 0xff;
 		label = String.format("(%d,%d): y=%d u=%d v=%d", col, row, y, u, v);
 		repaint();
 	}
@@ -340,9 +301,10 @@ public class YUVExplore extends ViewParent
 					int cbase = (col & ~1);
 					int i = (row * displayw * 2) + (cbase * 2);
 
-					maxY = currentLog.data()[first ? i : i + 2] & 0xff;
-					maxU = currentLog.data()[i + 1] & 0xff;
-					maxV = currentLog.data()[i + 3] & 0xff;
+					byte[] data = originalImageBytes();
+					maxY = data[first ? i : i + 2] & 0xff;
+					maxU = data[i + 1] & 0xff;
+					maxV = data[i + 3] & 0xff;
 				}
 			}
 		}
@@ -352,9 +314,10 @@ public class YUVExplore extends ViewParent
 				int cbase = (col & ~1);
 				int i = (row * width * 2 * 2) + (cbase * 2);
 
-				int y = currentLog.data()[first ? i : i + 2] & 0xff;
-				int u = currentLog.data()[i + 1] & 0xff;
-				int v = currentLog.data()[i + 3] & 0xff;
+				byte[] data = originalImageBytes();
+				int y = data[first ? i : i + 2] & 0xff;
+				int u = data[i + 1] & 0xff;
+				int v = data[i + 3] & 0xff;
 				if (Math.abs(y - maxY) < 15 && Math.abs(u - maxU) < 10 &&
 					Math.abs(v - maxV) < 10) {
 					g.setColor(Color.GREEN);
@@ -377,9 +340,10 @@ public class YUVExplore extends ViewParent
 				int cbase = (col & ~1);
 				int i = (row * width * 2 * 2) + (cbase * 2);
 
-				int y = currentLog.data()[first ? i : i + 2] & 0xff;
-				int u = currentLog.data()[i + 1] & 0xff;
-				int v = currentLog.data()[i + 3] & 0xff;
+				byte[] data = originalImageBytes();
+				int y = data[first ? i : i + 2] & 0xff;
+				int u = data[i + 1] & 0xff;
+				int v = data[i + 3] & 0xff;
 				int color = y;
 				if (currentBottom == U) {
 					color = u;
@@ -391,9 +355,9 @@ public class YUVExplore extends ViewParent
 						if (!(k == 0 && j == 0)) {
 							cbase = ((col+j) & ~1);
 							i = ((row+k)*width*2*2) + (cbase*2);
-							int y1 = currentLog.data()[first ? i : i + 2] & 0xff;
-							int u1 = currentLog.data()[i + 1] & 0xff;
-							int v1 = currentLog.data()[i + 3] & 0xff;
+							int y1 = data[first ? i : i + 2] & 0xff;
+							int u1 = data[i + 1] & 0xff;
+							int v1 = data[i + 3] & 0xff;
 							int color1 = y1;
 							if (currentBottom == U) {
 								color1 = u1;
@@ -424,17 +388,18 @@ public class YUVExplore extends ViewParent
 				int cbase = (col & ~1);
 				int i = (row * width * 2 * 2) + (cbase * 2);
 
-				int y = currentLog.data()[first ? i : i + 2] & 0xff;
-				int u = currentLog.data()[i + 1] & 0xff;
-				int v = currentLog.data()[i + 3] & 0xff;
+				byte[] data = originalImageBytes();
+				int y = data[first ? i : i + 2] & 0xff;
+				int u = data[i + 1] & 0xff;
+				int v = data[i + 3] & 0xff;
 				for (int k = 0; k < 3; k++) {
 					for (int j = 0; j < 3; j++) {
 						if (!(k == 0 && j == 0)) {
 							cbase = ((col+j) & ~1);
 							i = ((row+k)*width*2*2) + (cbase*2);
-							int y1 = currentLog.data()[first ? i : i + 2] & 0xff;
-							int u1 = currentLog.data()[i + 1] & 0xff;
-							int v1 = currentLog.data()[i + 3] & 0xff;
+							int y1 = data[first ? i : i + 2] & 0xff;
+							int u1 = data[i + 1] & 0xff;
+							int v1 = data[i + 3] & 0xff;
 							if (Math.abs(y - y1) > thresh ||
 								Math.abs(u - u1) > thresh ||
 								Math.abs(v - v1) > thresh) {
@@ -460,9 +425,10 @@ public class YUVExplore extends ViewParent
 				int cbase = (col & ~1);
 				int i = (row * width * 2 * 2) + (cbase * 2);
 
-				int y = currentLog.data()[first ? i : i + 2] & 0xff;
-				int u = currentLog.data()[i + 1] & 0xff;
-				int v = currentLog.data()[i + 3] & 0xff;
+				byte[] data = originalImageBytes();
+				int y = data[first ? i : i + 2] & 0xff;
+				int u = data[i + 1] & 0xff;
+				int v = data[i + 3] & 0xff;
 				int color = y;
 				if (currentBottom == U) {
 					color = u;
@@ -482,27 +448,28 @@ public class YUVExplore extends ViewParent
     @Override
     public void ioReceived(IOInstance inst, int ret, Log... out) {
 		System.out.println("IO received in Debug");
+		
 		//yuv = out[0].bytes;
-		if (out.length > GREEN_IMAGE) {
-            green8 = new Y8image(width, height, out[GREEN_IMAGE].bytes);
+		if (this.getGreenBlock() != null) {
+            green8 = new Y8Image(width, height, this.getGreenBlock().data);
             displayImages[GREEN_IMAGE] = green8.toBufferedImage();
-			greenCheck = new Y8ThreshImage(width, height, out[GREEN_IMAGE].bytes);
+			greenCheck = new Y8ThreshImage(width, height, this.getGreenBlock().data);
 			greenCheck.setThresh(thresh);
 			displayImages[THRESH] = greenCheck.toBufferedImage();
         }
 
-		if (out.length > WHITE_IMAGE) {
-            Y8image white8 = new Y8image(width, height, out[WHITE_IMAGE].bytes);
+		if (this.getWhiteBlock() != null) {
+            Y8Image white8 = new Y8Image(width, height, this.getWhiteBlock().data);
             displayImages[WHITE_IMAGE] = white8.toBufferedImage();
         }
 
-		if (out.length > ORANGE_IMAGE) {
-            Y8image orange8 = new Y8image(width, height, out[ORANGE_IMAGE].bytes);
+		if (this.getOrangeBlock() != null) {
+			Y8Image orange8 = new Y8Image(width, height, this.getOrangeBlock().data);
             displayImages[ORANGE_IMAGE] = orange8.toBufferedImage();
         }
 
-		if (out.length > EDGE_IMAGE) {
-			EdgeImage ei = new EdgeImage(width, height,  out[EDGE_IMAGE].bytes);
+		if (this.getEdgeBlock() != null) {
+			EdgeImage ei = new EdgeImage(width, height,  this.getEdgeBlock().data);
 			displayImages[EDGE_IMAGE] = ei.toBufferedImage();
 		}
 
@@ -511,11 +478,7 @@ public class YUVExplore extends ViewParent
 		}
 
         repaint();
-
     }
 
-    @Override
-    public boolean ioMayRespondOnCenterThread(IOInstance inst) {
-        return false;
-    }
+	
 }
