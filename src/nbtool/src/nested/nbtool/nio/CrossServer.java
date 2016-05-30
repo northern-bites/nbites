@@ -13,12 +13,11 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import nbtool.data.SExpr;
-import nbtool.data._log._Log;
-import nbtool.data._log._Log.SOURCE;
 import nbtool.data.log.Log;
 import nbtool.io.CommonIO;
 import nbtool.io.CommonIO.GIOFirstResponder;
@@ -32,6 +31,9 @@ import nbtool.util.SharedConstants;
 import nbtool.util.Utility;
 
 public class CrossServer {
+	
+	private static final Debug.DebugSettings debug =
+			Debug.createSettings(true, true, true, Debug.WARN, null);
 
 	public static void _NBL_REQUIRED_START_() {
 		startCrossServer();
@@ -75,6 +77,10 @@ public class CrossServer {
 			return true;
 		}
 		
+		public boolean tryAddCall(IOFirstResponder ifr, String name, Log...args) {
+			return this.tryAddCall(new RemoteCall(ifr, name, args));
+		}
+		
 		private static final Object indexLock = new Object();
 		private static long class_index = 0;
 		private static long getID() {
@@ -90,11 +96,12 @@ public class CrossServer {
 		@Override
 		public void run() {
 			Debug.info( "CrossInstance %d starting up.", this.unique_id);
-			assert(socket != null && ifr != null);
+			assert(socket != null);
 			Log heartbeat = Log.explicitLog(null, null, SharedConstants.LogClass_Null(), 0);
 			int timeout = SharedConstants.REMOTE_HOST_TIMEOUT() / 2000;
 			
 			try {
+				this.host = socket.getInetAddress().getHostAddress();
 				//Setup connection and gather functions.
 				BufferedOutputStream os = new BufferedOutputStream(socket.getOutputStream());
 				BufferedInputStream is = new BufferedInputStream(socket.getInputStream());
@@ -114,10 +121,17 @@ public class CrossServer {
 					}
 					
 					if (call == null) {
+						debug.info("%s heartbeat...", this);
 						++(heartbeat.createdWhen);
 						heartbeat.writeTo(os);
+						os.flush();
+						Log hbBack = Log.parseFromStream(is);
+						assert(hbBack.logClass.equals(SharedConstants.LogClass_Null()));
 					} else {
+						debug.info("%s call...", this);
 						call.call.writeTo(os);
+						os.flush();
+						
 						Log ret = Log.parseFromStream(is);
 						while(ret.logClass.equals(SharedConstants.LogClass_Null()))
 							ret = Log.parseFromStream(is);
@@ -135,7 +149,6 @@ public class CrossServer {
 			} finally {
 				Debug.warn( "%s dieing.", this);
 				finish();
-
 				remove(this);
 				Events.GCrossStatus.generate(this, false);
 			}
@@ -243,7 +256,16 @@ public class CrossServer {
 	}
 	
 	public static void main(String[] args) throws InterruptedException, IOException {
-		///
+		startCrossServer();
+		Scanner in = new Scanner(System.in);
+		while(true) {
+			Thread.sleep(1000);
+			CrossInstance ci = CrossServer.instanceByIndex(0);
+			if (ci != null) {
+				in.nextLine();
+				ci.tryAddCall(null, "Test");
+			}
+		}
 	}
 	
 }	//CrossServer

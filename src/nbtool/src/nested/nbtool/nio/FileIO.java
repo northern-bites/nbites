@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.LinkedList;
+import java.util.List;
 
 import nbtool.data.log.Log;
 import nbtool.data.log.LogReference;
@@ -18,6 +19,21 @@ import nbtool.util.Debug;
 import nbtool.util.Utility.Pair;
 
 public class FileIO {
+	
+	public static Path[] getContentsOf(Path directory) {
+		List<Path> pathes = new LinkedList<>();
+		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directory)) {
+            for (Path path : directoryStream) {
+                pathes.add(path);
+            }
+        } catch (IOException ex) {
+        	Debug.error("could not list directory: ", directory);
+        	ex.printStackTrace();
+        	return null;
+        }
+		
+		return pathes.toArray(new Path[0]);
+	}
 	
 	public static Path getPath(String first, String ... parts) {
 		return FileSystems.getDefault().getPath(parts[0], parts);
@@ -131,27 +147,33 @@ public class FileIO {
 	
 	/* asynchronous file writing thread */
 	
-	public static void queueWrite(Path path, byte[] data) {
+	public static void queueWriteTask(Path path, byte[] data) {
 		assert(path != null && data != null);
 		assert(Files.isWritable(path));
 		assert(!Files.exists(path) || Files.isRegularFile(path));
 		
-		addTask(new Task(path, data));
+		addTaskToQueue(new Task(path, data));
 	}
 	
-	private static void addTask(Task t) {
+	public static void addTaskToQueue(Task t) {
 		synchronized(writer.queue) {
 			writer.queue.addLast(t);
 			writer.queue.notify();
 		}
 	}
 	
-	private static class Task {
-		byte[] data;
-		Path path;
+	public static class Task {
+		protected byte[] data;
+		protected Path path;
 		
 		protected Task(Path p, byte[] d) {
 			this.path = p; this.data = d;
+		}
+
+		public void executeWrite() throws IOException { 
+			Files.write(path, data,
+					StandardOpenOption.WRITE, StandardOpenOption.CREATE,
+					StandardOpenOption.TRUNCATE_EXISTING);
 		}
 	}
 	
@@ -186,9 +208,7 @@ public class FileIO {
 				}
 				
 				try {
-					Files.write(task.path, task.data,
-							StandardOpenOption.WRITE, StandardOpenOption.CREATE,
-							StandardOpenOption.TRUNCATE_EXISTING);
+					task.executeWrite();
 				} catch (IOException e) {
 					Debug.error("error writing file to path %s", task.path.toString());
 					e.printStackTrace();

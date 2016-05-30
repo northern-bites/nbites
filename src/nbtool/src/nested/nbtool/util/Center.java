@@ -175,8 +175,7 @@ public class Center {
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable(){
 			@Override
 			public void run() {
-				
-				System.out.println("\n----------------------------------\nCenter hook saving preferences...");
+				Debug.dbreak(" <tool saving preferences>");
 				for (NBToolShutdownListener l : shutdownListeners) {
 					Debug.print("\tinforming %s", l.toString());
 					l.nbtoolShutdownCallback();

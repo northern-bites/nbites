@@ -20,6 +20,8 @@ import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.io.CommonIO.IOState;
 import nbtool.util.Debug;
+import nbtool.util.Robots;
+import nbtool.util.Robots.Robot;
 import nbtool.util.ToolSettings;
 import messages.TeamPacket;
 import messages.WorldModel;
@@ -34,33 +36,6 @@ public class BroadcastIO {
 	
 	public static final int GAME_CONTROL_PORT = GameControlData.GAMECONTROLLER_GAMEDATA_PORT;
 	public static final int GAME_CONTROL_RECV_PORT = GameControlData.GAMECONTROLLER_RETURNDATA_PORT;
-	
-	public static final Map<String, String> ROBOT_TO_IP;
-	public static final Map<String, String> IP_TO_ROBOT;
-	static {
-		ROBOT_TO_IP = new HashMap<>();
-		IP_TO_ROBOT = new HashMap<>();
-		ROBOT_TO_IP.put("wash"   , "139.140.192.9" );
-		ROBOT_TO_IP.put("river"  , "139.140.192.10");
-		ROBOT_TO_IP.put("jayne"  , "139.140.192.11");
-		ROBOT_TO_IP.put("simon"  , "139.140.192.12");
-		ROBOT_TO_IP.put("inara"  , "139.140.192.13");
-		ROBOT_TO_IP.put("kaylee" , "139.140.192.14");
-		ROBOT_TO_IP.put("vera"   , "139.140.192.15");
-		ROBOT_TO_IP.put("mal"    , "139.140.192.16");
-		ROBOT_TO_IP.put("zoe"    , "139.140.192.17");
-
-		ROBOT_TO_IP.put("ringo"  , "139.140.192.18");
-		ROBOT_TO_IP.put("beyonce", "139.140.192.19");
-		ROBOT_TO_IP.put("ozzy"   , "139.140.192.20");
-		ROBOT_TO_IP.put("avril"  , "139.140.192.21");
-		ROBOT_TO_IP.put("batman" , "139.140.192.22");
-		ROBOT_TO_IP.put("she-hulk" , "139.140.192.23");
-		
-		for (Entry<String, String> entry : ROBOT_TO_IP.entrySet()) {
-			IP_TO_ROBOT.put(entry.getValue(), entry.getKey());
-		}
-	}
 	
 	public static TeamBroadcastInstance createTBI(TeamBroadcastListener list) {
 		TeamBroadcastInstance ret = new TeamBroadcastInstance();
@@ -107,7 +82,7 @@ public class BroadcastIO {
 	                buffer.rewind();
 	                
 	                String address = packet.getAddress().getHostAddress();
-	                String name = IP_TO_ROBOT.get(address);
+	                String name = Robots.IP_TO_ROBOT.get(address).name;
 	                
 	                data.fromByteArray(buffer);
 	                TeamPacket tp = TeamPacket.parseFrom(data.data);

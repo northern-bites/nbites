@@ -1,14 +1,21 @@
 package nbtool.data;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import nbtool.data._log._Log;
+import nbtool.data.json.Json;
+import nbtool.data.json.JsonArray;
+import nbtool.data.json.JsonObject;
+import nbtool.data.log.Log;
 import nbtool.gui.logviews.misc.ViewParent;
+import nbtool.util.ClassFinder;
 import nbtool.util.Debug;
 import nbtool.util.ToolSettings;
 
@@ -17,8 +24,7 @@ public class ViewProfile {
 	public static final String DEFAULT_PROFILE_NAME = "DEFAULT";
 	public static ViewProfile DEFAULT_PROFILE = null;
 	public static final Map<String, ViewProfile> PROFILES = new HashMap<>();
-	public static final String[] TYPES = 
-			ToolSettings.POSSIBLE_VIEWS.keySet().toArray(new String[0]);
+	
 	
 	/*static*/
 	public static ViewProfile makeDefault() {
@@ -26,7 +32,7 @@ public class ViewProfile {
 		
 		for (int j = 0; j < TYPES.length; ++j) {
 			Class<? extends ViewParent>[] possible =
-					ToolSettings.POSSIBLE_VIEWS.get(TYPES[j]);
+					POSSIBLE_VIEWS.get(TYPES[j]);
 			
 			//Select all.
 			def.states[j] = resolve(possible, null);
@@ -47,7 +53,7 @@ public class ViewProfile {
 		
 		for (int j = 0; j < TYPES.length; ++j) {
 			Class<? extends ViewParent>[] possible =
-					ToolSettings.POSSIBLE_VIEWS.get(TYPES[j]);
+					POSSIBLE_VIEWS.get(TYPES[j]);
 			
 			//Select all.
 			nvp.states[j] = resolve(possible, null);
@@ -82,9 +88,9 @@ public class ViewProfile {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Class<? extends ViewParent>[] viewsForLog(_Log log) {
+	public Class<? extends ViewParent>[] viewsForLog(Log log) {
 		ArrayList<Class<? extends ViewParent>> views = new ArrayList<Class<? extends ViewParent>>();
-		String ptype = log.primaryType();
+		String ptype = log.logClass;
 		assert(ptype != null);
 
 		int tindex = Arrays.asList(TYPES).indexOf(ptype);
@@ -140,7 +146,7 @@ public class ViewProfile {
 			
 			for (int j = 0; j < TYPES.length; ++j) {
 				Class<? extends ViewParent>[] possible =
-						ToolSettings.POSSIBLE_VIEWS.get(TYPES[j]);
+						POSSIBLE_VIEWS.get(TYPES[j]);
 				
 				SExpr lshownSP = profile.find(TYPES[j]);
 				if (lshownSP.exists()) {
@@ -239,6 +245,55 @@ public class ViewProfile {
 		}
 		
 		return top;
+	}
+	
+	public static final Map<String, Class<? extends ViewParent>[]> POSSIBLE_VIEWS = 
+			new HashMap<String, Class<? extends ViewParent>[]>();
+			
+			public static String[] TYPES;
+	
+	@SuppressWarnings("unchecked")
+	public static void findAllViews() {
+		Debug.warn("ViewProfile finding all subclasses of ViewParent");
+		List<Class<?>> found = ClassFinder.findAllSubclasses(ViewParent.class);
+		Map<String, List<Class<?>>> pv_map = 
+				new HashMap<>();
+				
+		for (Class<?> cls : found) {
+			ViewParent inst;
+			String[] types = null;
+			try {
+				inst = (ViewParent) cls.getDeclaredConstructor().newInstance();
+				types = inst.displayableTypes();
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				e.printStackTrace();
+				
+				Debug.error("*************************\n" +
+							"\tfatal error checking no-args constructor of ViewParent subclass:\n" +
+							"\t%s error: %s", cls.getName(), e.getMessage()
+						);
+				System.exit(-1);
+				
+			}
+			
+			for (String t : types) {
+				if (pv_map.containsKey(t)) {
+					pv_map.get(t).add(cls);
+				} else {
+					LinkedList<Class<?>> newList = new LinkedList<>();
+					newList.add(cls);
+					pv_map.put(t, newList);
+				}
+			}
+		}
+		
+		for (String type : pv_map.keySet()) {
+			POSSIBLE_VIEWS.put(type, pv_map.get(type).toArray(new Class[0]));
+		}
+		
+		TYPES = POSSIBLE_VIEWS.keySet().toArray(new String[0]);
+		Debug.info("%s", POSSIBLE_VIEWS.toString());
 	}
 }
 

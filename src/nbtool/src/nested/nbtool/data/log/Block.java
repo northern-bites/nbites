@@ -7,9 +7,13 @@ import nbtool.data.json.Json;
 import nbtool.data.json.Json.JsonValue;
 import nbtool.data.json.JsonObject;
 import nbtool.data.json.JsonParser.JsonParseException;
+import nbtool.images.ImageParent;
+import nbtool.images.Y16Image;
+import nbtool.images.Y8Image;
 import nbtool.images.YUYV8888Image;
 import nbtool.util.SharedConstants;
 import nbtool.util.Utility;
+import nbtool.util.Utility.Pair;
 
 public class Block {
 	public byte[] data = null;
@@ -20,17 +24,38 @@ public class Block {
 	public long imageIndex = 0;
 	public long createdWhen = 0;
 	
+	public static Block explicit(byte[] data, JsonObject dict,
+			String type, String where, long index, long when) {
+		return new Block(data,dict,
+				 type,  where, index, when );
+	}
+	
 	public Block(byte[] data, JsonObject dict,
 			String type, String where, long index, long when ) {
-		this.data = data;
-		this.dict = dict;
-		this.type = type;
-		this.whereFrom = where;
+		this.data = data == null ? new byte[0] : data;
+		this.dict = dict == null ? new JsonObject() : dict;
+		this.type = type == null ? "" : type;
+		this.whereFrom = type == null ? "" : where;
 		this.imageIndex = index;
 		this.createdWhen = when;
 	}
 	
+	public static Block explicit(byte[] data,
+			String type) {
+		return new Block(data, null,
+				 type,  null, 0, 0 );
+	}
+	
+	public Block(byte[] data,
+			String type) {
+		this(data, null, type, null, 0, 0);
+	}
+	
 	public Block() { }
+	
+	public static Block empty() {
+		return new Block();
+	}
 	
 	public JsonObject getFullDictionary() {
 		JsonObject obj = dict.copy().asObject();
@@ -58,16 +83,37 @@ public class Block {
 		return SExpr.deserializeFrom(new String(data));
 	}
 	
-	public YUYV8888Image parseAsYUVImage() {
-		parseTypeCheck(SharedConstants.YUVImageType_DEFAULT());
-		
+	private Pair<Integer,Integer> imagePair() {
 		int width = dict.get(SharedConstants.LOG_BLOCK_IMAGE_WIDTH_PIXELS()).
 				asNumber().asInt();
 		int height = dict.get(SharedConstants.LOG_BLOCK_IMAGE_HEIGHT_PIXELS()).
 				asNumber().asInt();
-		
-		return new YUYV8888Image(width / 2, height, this.data);
+		return new Pair<Integer,Integer>(width, height);
 	}
+	
+	public YUYV8888Image parseAsYUVImage() {
+		parseTypeCheck(SharedConstants.YUVImageType_DEFAULT());
+		
+		Pair<Integer,Integer> pair = imagePair();
+//		return new YUYV8888Image(pair.a / 2, pair.b, this.data);
+		return new YUYV8888Image(pair.a * 2, pair.b, this.data);
+	}
+	
+	public Y16Image parseAsY16Image() {
+		parseTypeCheck(SharedConstants.YUVImageType_Y16());
+		
+		Pair<Integer,Integer> pair = imagePair();
+		return new Y16Image(pair.a, pair.b, this.data);
+	}
+	
+	public Y8Image parseAsY8Image() {
+		parseTypeCheck(SharedConstants.YUVImageType_Y8());
+		
+		Pair<Integer,Integer> pair = imagePair();
+		return new Y8Image(pair.a, pair.b, this.data);
+	}
+	
+	
 	
 	public Message parseAsProtobufOfClass(Class<? extends Message> pclass) {
 		if (pclass == null) {

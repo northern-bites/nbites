@@ -3,7 +3,6 @@
 //  tool8-separate
 //
 //  Created by Philip Koch on 4/6/16.
-//  Copyright © 2016 pkoch. All rights reserved.
 //
 
 #ifndef Network_hpp
@@ -52,7 +51,7 @@ namespace nbl {
             io::client_socket_t socket;
             size_t clientIndex;
 
-            SocketUser(SocketMaster& m) :
+            SocketUser(SocketMaster& m) : Threadable(),
                 master(m), socket(-1), clientIndex(0) {}
         public:
             virtual void threadLoop() = 0;
@@ -64,7 +63,7 @@ namespace nbl {
         public:
             Streamer(SocketMaster& master, LogProvider& prov) :
                 SocketUser(master), provider(prov),
-                ping(Log::explicitLog({}, json::Object(), CONSTANTS.LogClass_Null(), 0))
+                ping(Log::explicitLog({}, json::Object(), SharedConstants::LogClass_Null(), 0))
             {}
 
             void threadLoop();

@@ -21,7 +21,7 @@ import javax.swing.JTextField;
 
 import nbtool.gui.field.*;
 import nbtool.data.NBitesTeamBroadcast;
-import nbtool.data._log._Log;
+import nbtool.data.log.Log;
 import nbtool.io.BroadcastIO;
 import nbtool.io.BroadcastIO.TeamBroadcastInstance;
 import nbtool.io.BroadcastIO.TeamBroadcastListener;
@@ -82,8 +82,8 @@ public class WorldViewUtility extends UtilityParent {
 		}
 
 		@Override	//TBI should be smart enough to use acceptTeamBroadcast() instead.
-		public void ioReceived(IOInstance inst, int ret, _Log... out) {
-			Debug.plain("??? recvd...");
+		public void ioReceived(IOInstance inst, int ret, Log... out) {
+			Debug.error("??? recvd...");
 		}
 
 		@Override

@@ -11,7 +11,7 @@
 
 #include "DebugConfig.h"
 
-using nblog::SExpr;
+using nbl::SExpr;
 
 using namespace boost::python;
 using namespace man::behaviors;

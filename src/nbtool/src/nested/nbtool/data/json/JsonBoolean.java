@@ -30,6 +30,10 @@ public class JsonBoolean implements JsonValue {
 	
 	public static final JsonBoolean TRUE = new JsonBoolean(true);
 	public static final JsonBoolean FALSE = new JsonBoolean(false);
+	
+	public static JsonBoolean from(boolean val) {
+		return val ? TRUE : FALSE;
+	}
 
 	/* ****************************
 	 * this block defines the standard (only) way to implement these methods.

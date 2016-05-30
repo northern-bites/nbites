@@ -3,7 +3,6 @@
 //  tool8-separate
 //
 //  Created by Philip Koch on 4/7/16.
-//  Copyright © 2016 pkoch. All rights reserved.
 //
 
 #include "Filesystem.hpp"
@@ -69,7 +68,7 @@ namespace nbl {
             }
 
             return utilities::format("%s/%s_%lu_%li%s",
-                                     CONSTANTS.ROBOT_LOG_PATH_PREFIX().c_str(),
+                                     SharedConstants::ROBOT_LOG_PATH_PREFIX().c_str(),
                                      type.c_str(),
                                      log->createdWhen,
                                      clock(),

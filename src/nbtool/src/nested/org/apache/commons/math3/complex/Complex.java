@@ -842,7 +842,7 @@ public class Complex implements FieldElement<Complex>, Serializable  {
      *   log(a + bi) = ln(|a + bi|) + arg(a + bi)i
      *  </code>
      * </pre>
-     * where ln on the right hand side is {@link FastMath#log},
+     * where ln on the right hand side is {@link FastMath#displayedLog},
      * {@code |a + bi|} is the modulus, {@link Complex#abs},  and
      * {@code arg(a + bi) = }{@link FastMath#atan2}(b, a).
      * <br/>
@@ -885,7 +885,7 @@ public class Complex implements FieldElement<Complex>, Serializable  {
      *  </code>
      * </pre>
      * where {@code exp} and {@code log} are {@link #exp} and
-     * {@link #log}, respectively.
+     * {@link #displayedLog}, respectively.
      * <br/>
      * Returns {@link Complex#NaN} if either real or imaginary part of the
      * input argument is {@code NaN} or infinite, or if {@code y}

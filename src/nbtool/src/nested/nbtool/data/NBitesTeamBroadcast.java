@@ -1,10 +1,13 @@
 package nbtool.data;
 
 import java.nio.ByteBuffer;
+import java.util.Vector;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import nbtool.data._log._Log;
+import nbtool.data.json.JsonObject;
+import nbtool.data.log.Block;
+import nbtool.data.log.Log;
 import nbtool.util.Debug;
 import nbtool.util.Utility;
 import messages.TeamPacket;
@@ -34,33 +37,28 @@ public class NBitesTeamBroadcast {
 		this.dataWorldModel = wm;
 	}
 	
-	public _Log toLog() {
-		_Log ret = _Log.logWithTypePlus(TEAM_BROADCAST_LOGTYPE, message.toByteArray(),
-				SExpr.pair("robotName", robotName),
-				SExpr.pair("robotIp", robotIp),
-				SExpr.pair(_Log.CONTENT_NBYTES_S, SPLStandardMessage.SIZE));
+	public Log toLog() {
 		
-		return ret;
+		Block block = new Block(message.toByteArray(), null,
+				TEAM_BROADCAST_LOGTYPE, "NBitesTeamBroadcast.toLog()", 0,0);
+		block.dict.put("robotName", robotName);
+		block.dict.put("robotIP", robotIp);
+		
+		return Log.explicitLogFromArray(new Block[]{block}, null, TEAM_BROADCAST_LOGTYPE, 0);
 	}
 	
-	public static NBitesTeamBroadcast fromLog(_Log log) throws InvalidProtocolBufferException {
-		if (!log.primaryType().equals(TEAM_BROADCAST_LOGTYPE)) {
+	public static NBitesTeamBroadcast fromLog(Log log) throws InvalidProtocolBufferException {
+		if (!log.logClass.equals(TEAM_BROADCAST_LOGTYPE)) {
 			Debug.error("log of type [%s] cannot be parsed into TeamBroadcast object!", 
-					log.primaryType());
+					log.logClass);
 			return null;
 		}
 		
-		if (log.data().length < SPLStandardMessage.SIZE) {
-			Debug.error("log of size [%d < SPLStandardMessage.SIZE] cannot be parsed into TeamBroadcast object!", 
-					log.data().length);
-			return null;
-		}
+		Block primary = log.blocks.get(0);
+		String rName = primary.dict.get("robotName").asString().value();
+		String rIP = primary.dict.get("robotIP").asString().value();
 		
-		String rName = log.sexprForContentItem(0).firstValueOf("robotName").value();
-		String rIP = log.sexprForContentItem(0).firstValueOf("robotIP").value();
-		
-		byte[] messageBytes = Utility.subArray(log.bytes, 0, SPLStandardMessage.SIZE);
-		
+		byte[] messageBytes = primary.data;
 		SPLStandardMessage message = new SPLStandardMessage();
 		message.fromByteArray(ByteBuffer.wrap(messageBytes));
 		

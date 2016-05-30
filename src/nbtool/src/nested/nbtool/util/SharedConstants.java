@@ -18,7 +18,7 @@ import nbtool.util.test.Tests;
 public class SharedConstants {
 		
 	private static final String getObjectPath() throws Exception {
-		final String suffix = "/src/share/logging/LOGGING_CONSTANTS.json";
+		final String suffix = "/src/share/logshare/LOGGING_CONSTANTS.json";
 		String nbdir = ToolSettings.NBITES_DIR;
 		
 		if (nbdir == null) {
@@ -55,6 +55,13 @@ public class SharedConstants {
 	public static String YUVImageType_DEFAULT() {
 		return object.get("YUVImageType_DEFAULT").asString().toString();
 	}
+	public static String YUVImageType_Y16() {
+		return object.get("YUVImageType_Y16").asString().toString();
+	}
+	public static String YUVImageType_Y8() {
+		return object.get("YUVImageType_Y8").asString().toString();
+	}
+	
 	public static String SexprType_DEFAULT() {
 		return object.get("SexprType_DEFAULT").asString().toString();
 	}
@@ -73,6 +80,9 @@ public class SharedConstants {
 	}
 	public static String LogClass_Tripoint() {
 		return object.get("LogClass_Tripoint").asString().toString();
+	}
+	public static String LogClass_YUVImage() {
+		return object.get("LogClass_YUVImage").asString().toString();
 	}
 	
 	public static String LogClass_RPC_Call() {

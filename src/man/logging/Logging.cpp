@@ -3,7 +3,6 @@
 //  tool8-separate
 //
 //  Created by Philip Koch on 3/21/16.
-//  Copyright © 2016 pkoch. All rights reserved.
 //
 
 #include "Logging.hpp"
@@ -65,7 +64,7 @@ namespace nbl {
         cntrlHandler = new control::ControlHandler();
         cntrlHandler->printFunctions();
 
-        socketMaster = new SocketMaster(CONSTANTS.ROBOT_PORT());
+        socketMaster = new SocketMaster(SharedConstants::ROBOT_PORT());
 
         pthread_create(&socketThread, NULL, threadLoopWrapperForSocketMaster, socketMaster);
         pthread_detach(socketThread);

@@ -43,11 +43,11 @@ public class Tests {
 	}
 	
 	private static void test_break() {
-		Debug.set_yellow(); Debug.dbreak(); Debug.lbreak(); Debug.set_reset();
+		Debug.set_yellow(); Debug.dbreak(""); Debug.lbreak(); Debug.set_reset();
 	}
 	
 	private static void test_break2() {
-		Debug.set_cyan(); Debug.dbreak(); Debug.lbreak(); Debug.set_reset();
+		Debug.set_cyan(); Debug.dbreak(""); Debug.lbreak(); Debug.set_reset();
 	}
 	
 	public static boolean run(String section) {

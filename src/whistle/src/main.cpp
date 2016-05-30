@@ -15,7 +15,7 @@
 
 const int VERSION = 3;
 
-using namespace nblog;
+using namespace nbl;
 
 nbsound::Capture * capture = NULL;
 nbsound::Transform * transform = NULL;

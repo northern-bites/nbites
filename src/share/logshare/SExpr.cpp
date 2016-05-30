@@ -1,6 +1,5 @@
-#include "SExpr.h"
-#include "nbdebug.h"
 
+#include "SExpr.h"
 #include <ctype.h>
 #include <iostream>
 #include <algorithm>
@@ -8,7 +7,10 @@
 #include <map>
 #include <queue>
 
-namespace nblog {
+#define NBL_LOGGING_LEVEL NBL_WARN_LEVEL
+#include "utilities.hpp"
+
+namespace nbl {
     
     SExpr SExpr::createNotFound() {
         
@@ -36,7 +38,7 @@ namespace nblog {
     _value(v),
     _list()
     {
-        NBDEBUGs(SECTION_SEXPR, "atom SExpr(const std::string& v)\n");
+        NBL_INFO( "atom SExpr(const std::string& v)\n");
     }
     
     SExpr::SExpr(const char * n) :
@@ -44,7 +46,7 @@ namespace nblog {
     _list(),
     _value(n)
     {
-        NBDEBUGs(SECTION_SEXPR, "atom SExpr(const char * n)\n");
+        NBL_INFO( "atom SExpr(const char * n)\n");
     }
     
     //atom from int
@@ -52,7 +54,7 @@ namespace nblog {
     _type(SEXPR_ATOM),
     _list()
     {
-        NBDEBUGs(SECTION_SEXPR, "atom SExpr(int v)\n");
+        NBL_INFO( "atom SExpr(int v)\n");
         char buf[100];
         snprintf(buf, 100, "%i", v);
         _value = std::string(buf);
@@ -63,7 +65,7 @@ namespace nblog {
     _type(SEXPR_ATOM),
     _list()
     {
-        NBDEBUGs(SECTION_SEXPR, "atom SExpr(long v)\n");
+        NBL_INFO( "atom SExpr(long v)\n");
         char buf[100];
         snprintf(buf, 100, "%li", v);
         _value = std::string(buf);
@@ -74,7 +76,7 @@ namespace nblog {
     _type(SEXPR_ATOM),
     _list()
     {
-        NBDEBUGs(SECTION_SEXPR, "atom SExpr(double v)\n");
+        NBL_INFO( "atom SExpr(double v)\n");
         char buf[100];
         snprintf(buf, 100, "%f", v);
         _value = std::string(buf);
@@ -84,29 +86,29 @@ namespace nblog {
      LIST CONSTRUCTORS
      */
 
-    //standard content item initializer
-    SExpr::SExpr(const std::string& type,
-                 const std::string& from, clock_t created,
-                 size_t image_index, size_t nbytes) :
-    _type(SEXPR_LIST),
-    _value("")
-    {
-        _list = {
-            SExpr(CONTENT_TYPE_S, type),
-            SExpr(CONTENT_FROM_S, from),
-            SExpr(CONTENT_WHEN_S, (long) created),
-            SExpr(CONTENT_IINDEX_S, (long) image_index),
-            SExpr(CONTENT_NBYTES_S, (long) nbytes)
-        };
-    }
-    
+//    //standard content item initializer
+//    SExpr::SExpr(const std::string& type,
+//                 const std::string& from, clock_t created,
+//                 size_t image_index, size_t nbytes) :
+//    _type(SEXPR_LIST),
+//    _value("")
+//    {
+//        _list = {
+//            SExpr(CONTENT_TYPE_S, type),
+//            SExpr(CONTENT_FROM_S, from),
+//            SExpr(CONTENT_WHEN_S, (long) created),
+//            SExpr(CONTENT_IINDEX_S, (long) image_index),
+//            SExpr(CONTENT_NBYTES_S, (long) nbytes)
+//        };
+//    }
+
     //list sexpr from vector
     SExpr::SExpr(const std::vector<SExpr>& l) :
     _type(SEXPR_LIST),
     _value(""),
     _list(l)
     {
-        NBDEBUGs(SECTION_SEXPR, "SExpr(const std::vector<SExpr>& l)\n");
+        NBL_INFO( "SExpr(const std::vector<SExpr>& l)\n");
     }
     
     //emtpy list
@@ -115,7 +117,7 @@ namespace nblog {
     _value(""),
     _list()
     {
-        NBDEBUGs(SECTION_SEXPR, "SExpr()\n");
+        NBL_INFO( "SExpr()\n");
     }
     
     SExpr::SExpr(const std::string& key, SExpr& val) :
@@ -292,10 +294,10 @@ namespace nblog {
         if (_type == SEXPR_ATOM)
         {
             if (_value.find_first_of(special) == std::string::npos) {
-                NBDEBUGs(SECTION_SEXPR, "%i: returning [%s]\n", __LINE__, _value.c_str());
+                NBL_INFO( "%i: returning [%s]\n", __LINE__, _value.c_str());
                 return _value;
             } else {
-                NBDEBUGs(SECTION_SEXPR, "special at %i\n", _value.find_first_of(special));
+                NBL_INFO( "special at %i\n", _value.find_first_of(special));
                 
                 //Handle internal quotes.
                 std::string replaced = _value;
@@ -308,16 +310,16 @@ namespace nblog {
                     lpos = replaced.find_first_of("\"", lpos + 2);
                 }
                 
-                NBDEBUGs(SECTION_SEXPR, "replaced to [%s]\n", replaced.c_str());
+                NBL_INFO( "replaced to [%s]\n", replaced.c_str());
                 
                 //Now, wrap in more quotes!
                 char buffer[replaced.size() + 2 + 1];
-                NBLassert(snprintf(buffer, replaced.size() + 2 + 1,
+                NBL_ASSERT(snprintf(buffer, replaced.size() + 2 + 1,
                                 "\"%s\"", replaced.c_str())
                        == replaced.size() + 2);
                 
                 std::string returned(buffer);
-                NBDEBUGs(SECTION_SEXPR, "%i: returning [%s]\n", __LINE__, returned.c_str());
+                NBL_INFO( "%i: returning [%s]\n", __LINE__, returned.c_str());
                 return returned;
             }
         }
@@ -331,7 +333,7 @@ namespace nblog {
         }
         s += ")";
         
-        NBDEBUGs(SECTION_SEXPR, "%i: returning [%s]\n", __LINE__, s.c_str());
+        NBL_INFO( "%i: returning [%s]\n", __LINE__, s.c_str());
         return s;
     }
     

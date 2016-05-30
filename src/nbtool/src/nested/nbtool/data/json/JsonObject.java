@@ -30,6 +30,10 @@ public class JsonObject extends LinkedHashMap<JsonString, JsonValue> implements 
 		return this.put(new JsonString(key), new JsonNumber(value));
 	}
 	
+	public JsonValue put(String key, boolean value) {
+		return this.put(new JsonString(key), JsonBoolean.from(value));
+	}
+	
 	public JsonValue put(String key, long value) {
 //		debug.info("{%s, %s}", key, new JsonNumber(value).toString());
 		return this.put(new JsonString(key), new JsonNumber(value));

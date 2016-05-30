@@ -33,7 +33,6 @@ import javax.swing.tree.TreeSelectionModel;
 
 import nbtool.data.ViewProfile;
 import nbtool.data.ViewProfile.ViewState;
-import nbtool.data._log._Log;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.util.Events;
 import nbtool.util.ToolSettings;
@@ -357,8 +356,6 @@ public class LogToViewUtility extends UtilityParent {
 	        jScrollPane1 = new javax.swing.JScrollPane();
 	        tree = new javax.swing.JTree(this);
 	        nameField = new javax.swing.JTextField();
-
-	        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
 	        profileComboBox.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {

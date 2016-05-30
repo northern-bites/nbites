@@ -22,7 +22,7 @@ import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.TransferHandler;
 
-import nbtool.data._log._Log;
+import nbtool.data.log.Log;
 import nbtool.util.Debug;
 
 public class LogDND {
@@ -32,11 +32,11 @@ public class LogDND {
 	public static final DragSource LOG_DRAG_SOURCE = DragSource.getDefaultDragSource();
 	
 	public static interface LogDNDSource {
-		public _Log[] supplyLogsForDrag();
+		public Log[] supplyLogsForDrag();
 	}
 	
 	public static interface LogDNDTarget {
-		public void takeLogsFromDrop(_Log log[]);
+		public void takeLogsFromDrop(Log log[]);
 	}
 	
 	public static void makeComponentSource(JComponent comp, LogDNDSource source) {

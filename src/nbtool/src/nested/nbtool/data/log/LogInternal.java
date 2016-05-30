@@ -21,6 +21,7 @@ import messages.InertialState;
 import messages.JointAngles;
 import nbtool.data.json.Json.JsonValue;
 import nbtool.data.SExpr;
+import nbtool.data.group.Group;
 import nbtool.data.json.Json;
 import nbtool.data.json.JsonArray;
 import nbtool.data.json.JsonObject;
@@ -36,7 +37,7 @@ import nbtool.util.test.Tests;
 
 public class LogInternal extends Log {
 	
-	private static final DebugSettings debug = Debug.createSettings(true, true, true, Debug.INFO, null);
+	private static final DebugSettings debug = Debug.createSettings(true, true, true, Debug.WARN, null);
 	
 	@Override
 	public String toString() {
@@ -81,6 +82,11 @@ public class LogInternal extends Log {
 	@Override
 	public String getFullDescription() {
 		return getParts().a.serialize();
+	}
+	
+	@Override
+	public JsonObject getFullDictionary() {
+		return getParts().a;
 	}
 
 	@Override
@@ -138,6 +144,11 @@ public class LogInternal extends Log {
 		} else {
 			throw new Exception("cannot save changes to untracked Log!");
 		}
+	}
+	
+	@Override
+	public Log deepCopy() {
+		return LogInternal.parseFrom(this.serialize());
 	}
 	
 	private static long static_id = 0;
@@ -310,15 +321,16 @@ public class LogInternal extends Log {
 		}
 	}
 	
-	@Override
-	protected void finalize() throws Throwable {
-		super.finalize();
-		
-		if (logReference != null) {
-			logReference.pushToTempFileNow(this);
-		}
-		//Don't pushLoad, that action must always be explicitly done by user code.
-	}
+//	@Override
+//	protected void finalize() throws Throwable {
+//		
+//		if (logReference != null) {
+//			logReference.pushToTempFileNow(this);
+//		}
+//		//Don't pushLoad, that action must always be explicitly done by user code.
+//		
+//		super.finalize();
+//	}
 	
 	@Override
 	public boolean addBlockFromProtobuf(Message message, String whereFrom, long imageIndex, long createdWhen) {
@@ -394,6 +406,16 @@ public class LogInternal extends Log {
 		return true;
 	}
 	
+	@Override
+	public Block find(String type) {
+		for (Block b : blocks) {
+			if (b.type.equals(type))
+				return b;
+		}
+		
+		return null;
+	}
+	
 	private static boolean isLegacyDesc(String desc) {
 		char sc = desc.trim().charAt(0);
 		switch(sc) {
@@ -417,9 +439,11 @@ public class LogInternal extends Log {
 				!slog.primaryType().equals("YUVImage") ||
 				!slog.madeWhere().equals("tripoint") ||
 				!slog.primaryEncoding().equals("[Y8(U8/V8)]") ) {
-			debug.warn("cannot parse non-tripoint legacy log, returning null");
+			debug.error("cannot parse non-tripoint legacy log, returning null");
 			return null;
 		}
+		
+		debug.info("%s", slog.tree().print());
 		
 		JsonObject imDict = Json.object();
 		imDict.put(SharedConstants.LOG_BLOCK_IMAGE_WIDTH_PIXELS(), slog.primaryWidth());
@@ -429,21 +453,29 @@ public class LogInternal extends Log {
 		blocks.add(new Block(
 				slog.bytesForContentItem(0), imDict,
 				SharedConstants.YUVImageType_DEFAULT(),
-				slog.madeWhere(),
+				slog.primaryFrom(),
 				slog.primaryImgIndex(),
 //				slog.primaryTime() 
 				0L
 				));
 		blocks.add(new Block(
 				slog.bytesForContentItem(1), new JsonObject(),
-				"InertialState", "", 0, 0
+				"InertialState", slog.primaryFrom(), 0, 0
 				));
 		blocks.add(new Block(
 				slog.bytesForContentItem(2), new JsonObject(),
-				"JointAngles", "", 0, 0
+				"JointAngles", slog.primaryFrom(), 0, 0
 				));
 
-		return Log.explicitLog(blocks, new JsonObject(), SharedConstants.LogClass_Tripoint(), 0L);		
+		JsonObject top = Json.object();
+		top.put(SharedConstants.LOG_TOPLEVEL_MAGIC_KEY(), 7);
+		
+		Log ret = Log.explicitLog(blocks, top, SharedConstants.LogClass_Tripoint(), 0L);
+		ret.host_addr =  slog.tree().firstValueOf(SExprLog.LOG_FROM_ADDR_S).value();
+		ret.host_name = ret.host_addr;
+		ret.host_type = slog.tree().firstValueOf(SExprLog.LOG_HOST_TYPE_S).value();
+		
+		return ret;		
 	}
 	
 	public static void _NBL_ADD_TESTS_() {
@@ -553,5 +585,4 @@ public class LogInternal extends Log {
 		}			
 				);
 	}
-
 }

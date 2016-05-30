@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import nbtool.data.json.JsonObject;
-import nbtool.data._log._Log;
 import nbtool.data.json.Json;
 import nbtool.data.log.Log;
 import nbtool.io.CommonIO;
@@ -19,6 +18,7 @@ import nbtool.io.CommonIO.IOState;
 import nbtool.nio.LogRPC.RemoteCall;
 import nbtool.util.Debug;
 import nbtool.util.Debug.DebugSettings;
+import nbtool.util.Events;
 import nbtool.util.SharedConstants;
 import nbtool.util.ToolSettings;
 import nbtool.util.Utility;
@@ -100,8 +100,8 @@ public class RobotConnection extends IOInstance {
 		@Override
 		public void run() {
 			try {
-				if (which) conn.input();
-				else conn.output();
+				if (which) 	conn.input();
+				else 		conn.output();
 			} catch (Exception e) {
 				debug.warn("RobotConnectionThreadBody %s of %s thread caught exception, killing...", 
 						which ? "INPUT" : "OUTPUT", conn);
@@ -123,6 +123,7 @@ public class RobotConnection extends IOInstance {
 					conn.cleanup();
 					conn.finish();
 					remove(conn);
+					Events.GRobotConnectionStatus.generate(conn, false);
 				}
 			}
 		}
@@ -171,6 +172,8 @@ public class RobotConnection extends IOInstance {
 		inputThread.start();
 		outputThread.start();
 		
+		Events.GRobotConnectionStatus.generate(this, true);
+		
 		return true;
 	}
 	
@@ -208,8 +211,13 @@ public class RobotConnection extends IOInstance {
 							key);
 				}
 			} else {
-//				GIOFirstResponder.generateReceived(this, ifr, 0, input);
-				debug.error("RobotConnection.input() not actually calling generateReceived yet!");
+				if (input.host_addr == null || input.host_addr.isEmpty() ||
+						input.host_addr.equals("n/a")) {
+					input.host_addr = this.host();
+				}
+				
+				GIOFirstResponder.generateReceived(this, ifr, 0, input);
+//				debug.error("RobotConnection.input() not actually calling generateReceived yet!");
 			}
 		}
 	}
@@ -277,7 +285,7 @@ public class RobotConnection extends IOInstance {
 			}
 
 			@Override
-			public void ioReceived(IOInstance inst, int ret, _Log... out) {
+			public void ioReceived(IOInstance inst, int ret, Log... out) {
 				Debug.print("got ioReceived: %s", inst);
 			}
 

@@ -7,7 +7,7 @@ import javax.swing.JFrame;
 
 import nbtool.util.Debug;
 import nbtool.util.UserSettings;
-import nbtool.util.UserSettings.ExtBounds;
+import nbtool.util.UserSettings.DisplaySettings;
 
 public abstract class UtilityParent {
 	
@@ -24,7 +24,7 @@ public abstract class UtilityParent {
 			//first time this utility has been requested, try to load bounds.
 			
 			String key = preferenceKey();
-			ExtBounds bounds = UserSettings.BOUNDS_MAP.get(key);
+			DisplaySettings bounds = UserSettings.BOUNDS_MAP.get(key);
 			if (bounds != null) {
 				Debug.info("using %s for %s", bounds, preferenceKey());
 				

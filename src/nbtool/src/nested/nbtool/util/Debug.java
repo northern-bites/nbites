@@ -4,6 +4,10 @@ import java.util.Arrays;
 
 public class Debug {
 	
+	public static void notRefactored() {
+		global.error("\n\n*************** THIS HAS NOT BEEN REFACTORED YET ***************\n");
+	}
+	
 	/* cannot code escape char in java string, this is a work-around.
 	 * NON PORTABLE (UNIX only, only some terminals) */
 	public static final String COLOR_RED = (char) 27 + "[31m";
@@ -67,17 +71,19 @@ public class Debug {
 	}
 	
 	public static enum LogLevel {
-		levelEVENT(0, "----"),
-		levelINFO(1, "INFO"),
-		levelWARN(2, "WARN"),
-		levelERROR(3, "ERROR"),
-		levelALWAYS(4, "    ");
+		levelEVENT(0, "EVENT", '-'),
+		levelINFO(1, "INFO", 'I'),
+		levelWARN(2, "WARN", 'W'),
+		levelERROR(3, "ERROR", 'E'),
+		levelALWAYS(4, "NONE", ' ');
 		
 		private int internal;
 		private String name;
-		private LogLevel(int i, String name) {
+		public final char symbol;
+		private LogLevel(int i, String name, char symbol) {
 			this.name = name;
-			internal = i;
+			this.internal = i;
+			this.symbol = symbol;
 		}
 		
 		public String toString() {
@@ -112,10 +118,21 @@ public class Debug {
 	private static final DebugSettings global =
 			new DebugSettings(true, true, true, null, null);
 	
+	
+	
 	public static DebugSettings createSettings(boolean checks, boolean asserts,
-				boolean colors, LogLevel lev, String dp ) {
+			boolean colors, LogLevel lev, String dp ) {
 		return new DebugSettings( checks,  asserts,
-				 colors,  lev,  dp );
+			 colors,  lev,  dp );
+	}
+	
+	public static DebugSettings createSettings(LogLevel lev) {
+		return createSettings( true,  true,
+				 true,  lev,  null );
+	}
+	
+	public static DebugSettings createSettings() {
+		return createSettings(null);
 	}
 	
 	public static class DebugSettings {
@@ -163,7 +180,7 @@ public class Debug {
 			
 			String formatInside = String.format(f, args);
 			String formatted = String.format("%s[%C][%s] %s\n%s",
-					pre, msgLev.name.charAt(0),
+					pre, msgLev.symbol,
 					printLoc, formatInside, post);
 			
 			return formatted;
@@ -203,7 +220,7 @@ public class Debug {
 			return formatLocation(rel);
 		}
 		
-		private String formatLocation(StackTraceElement rel) {
+		protected final String formatLocation(StackTraceElement rel) {
 			String file = rel.getFileName();
 			file = file.substring(0, file.lastIndexOf('.'));
 			return String.format("%s:%d", file, rel.getLineNumber());
@@ -246,9 +263,9 @@ public class Debug {
 		System.out.println("");
 	}
 	
-	public static void dbreak() {
+	public static void dbreak(String suffix) {
 		char[] chars = new char[50];
 		Arrays.fill(chars, '-');
-		System.out.println(new String(chars));
+		System.out.println(new String(chars) + suffix);
 	}
 }

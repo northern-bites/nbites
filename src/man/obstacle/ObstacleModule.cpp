@@ -5,7 +5,7 @@ namespace obstacle {
 
 using messages::FieldObstacles;
 using messages::ArmContactState;
-using nblog::SExpr;
+using nbl::SExpr;
 
 // Helper method, used to get the average of the sonar value buffers
 float average(std::list<float>& buf)

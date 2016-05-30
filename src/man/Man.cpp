@@ -6,9 +6,7 @@
 #include "Profiler.h"
 #include "Camera.h"
 
-#include "log/logging.h"
-#include "Log.h"
-#include "control/control.h"
+#include "Logging.hpp"
 
 #ifndef OFFLINE
 SET_POOL_SIZE(messages::WorldModel,  24);
@@ -187,20 +185,20 @@ Man::Man() :
             
             
 #ifdef V5_ROBOT
-        configTopLevelLogAttrs(nblog::V5ROBOT, robotName);
+        configTopLevelLogAttrs(nbl::V5ROBOT, robotName);
 #else
-        configTopLevelLogAttrs(nblog::V4ROBOT, robotName);
+        configTopLevelLogAttrs(nbl::V4ROBOT, robotName);
 #endif
 
-        printf("nblog::log_main_init()\n");
-        nblog::initiateLogging();
+        printf("nbl::initiateLogging()\n");
+        nbl::initiateLogging();
 
 #ifdef START_WITH_FILEIO
 #ifndef USE_LOGGING
 #error "option START_WITH_FILEIO defined WITHOUT option USE_LOGGING"
 #endif
-            printf("CONTROL: Starting with fileio flag set!\n");
-            control::set(control::flags::fileio, true);
+            printf("CONTROL: Starting with logToFilesystem flag set!\n");
+            control::set(control::flags::logToFilesystem, true);
 #endif
 
 #ifdef START_WITH_THUMBNAIL
@@ -262,7 +260,7 @@ Man::Man() :
 //        // cognitionThread.log<messages::InertialState>((control::VISION), &vision.inertial_state_out,
 //                                                     // "proto-InertialState", "vision");
 //
-//        }
+        }   //end USE_LOGGING bracket
 #endif //USE_LOGGING
 
 #ifdef USE_TIME_PROFILING
@@ -270,8 +268,8 @@ Man::Man() :
 #endif
 
         startSubThreads();
-        std::cout << "Man built" << std::endl;
-    }
+        std::cout << "Man constructed" << std::endl;
+}
 
 
 Man::~Man()
@@ -281,11 +279,12 @@ Man::~Man()
 
 void Man::preClose()
 {
+#ifdef USE_LOGGING
+    nbl::teardownLogging();
+#endif
+    
     topTranscriber.closeTranscriber();
     bottomTranscriber.closeTranscriber();
-#ifdef USE_LOGGING
-    nblog::teardownLogging();
-#endif
 }
 
 void Man::startSubThreads()

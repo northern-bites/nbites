@@ -3,7 +3,6 @@
 //  tool8-separate
 //
 //  Created by Philip Koch on 3/21/16.
-//  Copyright © 2016 pkoch. All rights reserved.
 //
 
 #ifndef Logging_hpp
@@ -95,7 +94,8 @@ namespace nbl {
 
     class Threadable {
     protected:
-        bool running = true;
+        bool running;
+        Threadable() : running(true) {}
     public:
         bool stop();
         virtual void threadLoop() = 0;

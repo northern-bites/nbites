@@ -13,17 +13,20 @@
 #include <bn/i2c/i2c-dev.h>
 #include <vector>
 
+#include <ctime>
+#include <sys/stat.h>
+
 #include "Profiler.h"
 #include "DebugConfig.h"
 
-#include "../log/logging.h"
-#include "../control/control.h"
-#include "nbdebug.h"
-#include "thumbnail.h"
-#include "../../share/logshare/SExpr.h"
+#include "Logging.hpp"
+#include "Control.hpp"
 
-using nblog::SExpr;
-using nblog::NBLog;
+//#include "thumbnail.h"
+#include "SExpr.h"
+
+using nbl::SExpr;
+using nbl::NBLog;
 
 #define V4L2_MT9M114_FADE_TO_BLACK (V4L2_CID_PRIVATE_BASE)
 
@@ -679,47 +682,47 @@ void TranscriberModule::run_()
     imageOut.setMessage(imageOutMessage);
 
 #ifdef USE_LOGGING
-    if (control::flags[control::thumbnail]) {
-        std::string image_from;
-        
-        if (it.type() == Camera::TOP) {
-            image_from = "camera_TOP";
-        } else {
-            image_from = "camera_BOT";
-        }
-
-        logThumbnail(image, image_from, ++image_index);
-    }
-
-    if (control::flags[control::multiball]) {
-        messages::NaiveBall nb_pb = naiveBallIn.message();
-        messages::FilteredBall fb_pb = filteredBallIn.message();
-
-        std::string nb_buf;
-        std::string fb_buf;
-
-        nb_pb.SerializeToString(&nb_buf);
-        fb_pb.SerializeToString(&fb_buf);
-
-        int nb_length = nb_buf.length();
-        int fb_length = fb_buf.length();
-
-        nb_buf.append(fb_buf);
-
-        std::vector<SExpr> contents;
-
-        SExpr naive("MULTIBALL", "multiball", clock(), -1, nb_buf.length());
-        naive.append(SExpr("nb_length", nb_length));
-        naive.append(SExpr("fb_length", fb_length));
-
-        contents.push_back(naive);
-
-        SExpr filter("FilteredBall", "multiball", clock(), -1, fb_buf.length());
-        contents.push_back(filter);
-
-        NBLog(NBL_IMAGE_BUFFER, "multiball",
-                   contents, nb_buf);
-    }
+//    if (control::flags[control::thumbnail]) {
+//        std::string image_from;
+//        
+//        if (it.type() == Camera::TOP) {
+//            image_from = "camera_TOP";
+//        } else {
+//            image_from = "camera_BOT";
+//        }
+//
+//        logThumbnail(image, image_from, ++image_index);
+//    }
+//
+//    if (control::flags[control::multiball]) {
+//        messages::NaiveBall nb_pb = naiveBallIn.message();
+//        messages::FilteredBall fb_pb = filteredBallIn.message();
+//
+//        std::string nb_buf;
+//        std::string fb_buf;
+//
+//        nb_pb.SerializeToString(&nb_buf);
+//        fb_pb.SerializeToString(&fb_buf);
+//
+//        int nb_length = nb_buf.length();
+//        int fb_length = fb_buf.length();
+//
+//        nb_buf.append(fb_buf);
+//
+//        std::vector<SExpr> contents;
+//
+//        SExpr naive("MULTIBALL", "multiball", clock(), -1, nb_buf.length());
+//        naive.append(SExpr("nb_length", nb_length));
+//        naive.append(SExpr("fb_length", fb_length));
+//
+//        contents.push_back(naive);
+//
+//        SExpr filter("FilteredBall", "multiball", clock(), -1, fb_buf.length());
+//        contents.push_back(filter);
+//
+//        NBLog(NBL_IMAGE_BUFFER, "multiball",
+//                   contents, nb_buf);
+//    }
 #endif
 }
     

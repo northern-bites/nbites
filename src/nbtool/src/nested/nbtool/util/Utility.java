@@ -1,29 +1,83 @@
 package nbtool.util;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.Random;
+import java.util.Set;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import nbtool.data.SExpr;
-import nbtool.data._log._Log;
 import nbtool.images.ImageParent;
 import nbtool.images.Y16Image;
 import nbtool.images.Y8Image;
 import nbtool.images.YUYV8888Image;
+import nbtool.util.test.TestBase;
+import nbtool.util.test.Tests;
 
 
 public class Utility {
+	
+	/* for testing components standalone */
+	public static void display(Component comp) {
+		JFrame display = new JFrame("test of " + comp);
+		display.add(comp, BorderLayout.CENTER);
+		display.setSize(comp.getPreferredSize());
+		display.setVisible(true);
+		display.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	
+	public static String progressString(int characters, double fraction) {
+		if (fraction < 0 || fraction > 1.0) {
+			return "invalid fraction";
+		}
+		
+		final String format = "[%s%s]";
+		int internal = characters - 2;
+		int left = (int) (fraction * internal);
+		int right = internal - left;
+		assert(left >= 0 && right >= 0);
+		char[] lc = new char[left];
+		Arrays.fill(lc, '|');
+		char[] rc = new char[right];
+		Arrays.fill(rc, ' ');
+		return String.format(format, new String(lc), new String(rc));
+	}
+	
+	private static final Map<Class<?>, Long> indexMap = new HashMap<>();
+	public static final long getNextIndex(Object type) {
+		return getNextIndex(type.getClass());
+	}
+	
+	public static final long getNextIndex(Class<?> type) {
+		synchronized(type) {
+			if (indexMap.containsKey(type)) {
+				long index = indexMap.get(type);
+				++index;
+				indexMap.put(type, index);
+				return index;
+			} else {
+				synchronized(indexMap) {
+					indexMap.put(type, 0L);
+					return 0L;
+				}
+			}
+		}
+	}
 	
 	private static final Random hexRandom = new Random();
 	public static String getRandomHexString(int numchars){
@@ -54,30 +108,30 @@ public class Utility {
 		return ret;
 	}
 	
-	//Almost all image logs will have null or [Y8(U8/V8)] encoding, but this method should be extended if that changes.
-	public static BufferedImage biFromLog(_Log log) {
-		assert(log.primaryType().equalsIgnoreCase(ToolSettings.IMAGE_S));
-		int width = log.primaryWidth();
-		int height = log.primaryHeight();
-		String encoding = log.primaryEncoding();
-		
-		ImageParent ip = null;
-		if (encoding == null ) {
-			//old image
-			ip = new YUYV8888Image(width / 2, height, log.bytes);
-		} else if (encoding.equalsIgnoreCase("[Y8(U8/V8)]")) {
-			ip = new YUYV8888Image(2*width, height, log.bytes);
-		} else if (encoding.equalsIgnoreCase("[Y16]")) {
-			ip = new Y16Image(width , height, log.bytes);
-		} else if (encoding.equalsIgnoreCase("[Y8]")) {
-			ip = new Y8Image(width , height, log.bytes);
-		} else {
-			Debug.warn( "Cannot use image with encoding:" + encoding);
-			return null;
-		}
-		
-		return ip.toBufferedImage();
-	}
+//	//Almost all image logs will have null or [Y8(U8/V8)] encoding, but this method should be extended if that changes.
+//	public static BufferedImage biFromLog(_Log log) {
+//		assert(log.primaryType().equalsIgnoreCase(ToolSettings.IMAGE_S));
+//		int width = log.primaryWidth();
+//		int height = log.primaryHeight();
+//		String encoding = log.primaryEncoding();
+//		
+//		ImageParent ip = null;
+//		if (encoding == null ) {
+//			//old image
+//			ip = new YUYV8888Image(width / 2, height, log.bytes);
+//		} else if (encoding.equalsIgnoreCase("[Y8(U8/V8)]")) {
+//			ip = new YUYV8888Image(2*width, height, log.bytes);
+//		} else if (encoding.equalsIgnoreCase("[Y16]")) {
+//			ip = new Y16Image(width , height, log.bytes);
+//		} else if (encoding.equalsIgnoreCase("[Y8]")) {
+//			ip = new Y8Image(width , height, log.bytes);
+//		} else {
+//			Debug.warn( "Cannot use image with encoding:" + encoding);
+//			return null;
+//		}
+//		
+//		return ip.toBufferedImage();
+//	}
 
 	public static final char[] hexArray = "0123456789ABCDEF".toCharArray();
 	public static String bytesToHexString(byte[] bytes) {
@@ -192,10 +246,7 @@ public class Utility {
 				
 		return ret;
 	}
-	
-	/*
-	 * Path localization assumes unix paths.  It should theoretically work on other filesystems, but this is untested.
-	 * */
+
 	public static String localizePath(String p) {
 		if (p.startsWith("~" + File.separator)) {
 			return System.getProperty("user.home") 
@@ -203,103 +254,22 @@ public class Utility {
 		} else return p;
 	}
 	
-	
-	public static boolean isv6Description(String desc) {
-		return (desc != null && desc.trim().startsWith("(nblog"));
-	}
-	
-	/* creates tree for param old out of old._olddesc_ */
-	public static boolean v6Convert(_Log old) {
-		if (old._olddesc_ != null && isv6Description(old._olddesc_)) {
-			old.setTree(SExpr.deserializeFrom(old._olddesc_));
-			return true;
+	public static void _NBL_ADD_TESTS_() {
+		Tests.add("Utility", new TestBase("getNextIndex"){
+
+			@Override
+			public boolean testBody() throws Exception {
+				class Temp{public long id = getNextIndex(this);}
+				Temp a = new Temp();
+				assert(a.id == 0);
+				Temp b = new Temp();
+				assert(a.id == 0 && b.id == 1);
+				return true;
+			}
+			
 		}
-		if (old._olddesc_ == null) {
-			Debug.warn( "cannot convert old log without string description.");
-			return false;
-		}	//nothing to work with.
-				
-		HashMap<String, String> map = new HashMap<String, String>();
-		String[] attrs = old._olddesc_.trim().split(" ");
-		for (String a : attrs) {
-			if (a.trim().isEmpty()) continue;
-			
-			String[] parts = a.split("=");
-			if (parts.length != 2){
-				Debug.warn("conversion found invalid kvp");
-				return false;	//Don't attempt to reconstruct malformed descriptions.
-			}
-			
-			String key = parts[0].trim();
-			if (key.isEmpty()) {
-				Debug.warn("conversion found empty key");
-				return false;
-			}
-			
-			String value = parts[1].trim();
-			if (value.isEmpty()) {
-				Debug.warn("conversion found empty value");
-				return false;
-			}
-			
-			if (map.containsKey(key)) {
-				//we never allowed duplicate keys
-				Debug.warn("conversion found duplicate key");
-				return false;
-			}
-			
-			map.put(key, value);
-		}
+		//...
+				);
 		
-		/*
-		if (map.containsKey("checksum")) {
-			int found_sum = checksum(old.bytes);
-			int read_sum = Integer.parseInt(map.get("checksum"));
-			if (found_sum != read_sum) {
-				Logger.warnf("conversion found wrong checksum");
-				return false;
-			}
-		} */
-		
-		//Ok, we can convert this.
-		map.remove("checksum");
-		map.remove("version");
-		
-		SExpr top_level = SExpr.newList();
-		top_level.append(SExpr.newAtom("nblog"));
-		top_level.append(SExpr.newList(
-				SExpr.newAtom("created"),
-				SExpr.newAtom("CONVERTED"),
-				SExpr.newAtom("null")
-				));
-		
-		top_level.append(SExpr.newKeyValue("version", 6 + ""));
-		
-		SExpr c1 = SExpr.newList();
-		c1.append(SExpr.newKeyValue("nbytes", old.bytes.length + ""));
-		if (map.containsKey("index")) {
-			c1.append(SExpr.newKeyValue("iindex", map.get("index")));
-			map.remove("index");
-		}
-		
-		for (Entry<String, String> kp : map.entrySet()) {
-			c1.append(SExpr.newKeyValue(kp.getKey(), kp.getValue()));
-		}
-		
-		SExpr clist = SExpr.newList();
-		clist.append(SExpr.newAtom("contents"));
-		clist.append(c1);
-		
-		top_level.append(clist);
-		
-		old.setTree(top_level);
-		return true;
-	}
-	
-	public static int checksum(byte[] data) {
-		int checksum = 0;
-		for (byte b : data)
-			checksum += (b & 0xFF);
-		return checksum;
 	}
 }

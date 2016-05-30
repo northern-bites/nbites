@@ -3,26 +3,21 @@
 //  tool8-separate
 //
 //  Created by Philip Koch on 4/16/16.
-//  Copyright © 2016 pkoch. All rights reserved.
 //
 
 #include "nbcross.hpp"
 #include "nblogio.h"
 #include <getopt.h>
 
+#define NBL_LOGGING_LEVEL NBL_WARN_LEVEL
+
+RPC_MAKE_FUNCTION_GROUP(NBCross)
+
 namespace nbl {
     namespace nbcross {
         std::string NBCROSS_INSTANCE_NAME = "default";
         std::string SERVER_NAME = io::LOCAL_HOST_ADDR;
         bool NBCROSS_PRINTOUTS_ON = true;
-
-#undef  NBCROSS_FUNCTION_DECL
-#define NBCROSS_FUNCTION_DECL(name, ava, ...)   \
-    RPC_FUNCTION_INSTANTIATE(name)  ,
-
-        const std::vector<rpc::RPCFunctionPtr> FUNCTIONS = {
-            NBCROSS_FUNCTION_SET
-        };
 
         const std::string breakString(50, '-');
         void print_break(int newlines = 0) {
@@ -32,9 +27,7 @@ namespace nbl {
 
         int nbcross_main(int argc, char ** argv) {
 
-            opterr = true;
             char flag;
-
             while ( (flag = getopt(argc, argv, "qn:s:")) != -1) {
                 switch (flag) {
                     case 'q':
@@ -63,16 +56,18 @@ namespace nbl {
             print_break();
 
             rpc::RPCFunctionMap map;
-            rpc::mapfromFunctions(map, FUNCTIONS);
+            rpc::mapfromFunctions(map, getNBCrossVector() );
 
-            for (rpc::RPCFunctionPtr ptr : FUNCTIONS) {
-                NBL_PRINT("\t%s", ptr->describe().c_str());
+            for (auto func : map) {
+                NBL_PRINT("\t%s", func.first.c_str());
             }
 
             print_break();
 
             io::client_socket_t sock;
-            io::ioret conret = io::connect_to(sock, CONSTANTS.CROSS_PORT(), SERVER_NAME.c_str());
+            io::ioret conret = io::connect_to(sock, SharedConstants::CROSS_PORT(), SERVER_NAME.c_str());
+            logptr heartbeat = Log::emptyLog();
+            heartbeat->logClass = SharedConstants::LogClass_Null();
 
             if (conret) {
                 NBL_ERROR("FATAL: nbcross connection failed.");
@@ -85,15 +80,31 @@ namespace nbl {
             print_break(2);
 
             for (;;) {
+
+                NBL_INFO("loop...");
+
                 logptr call = Log::recv(sock);
+
                 if (!IS_PTR_VALID(call)) {
                     NBL_ERROR("FATAL: could not read rpc function call from socket.");
                     exit(1);
                 }
 
-                NBL_ASSERT_EQ(call->logClass, CONSTANTS.LogClass_RPC_Call());
+                if (call->logClass == SharedConstants::LogClass_Null()) {
+                    NBL_INFO("heartbeat...")
 
-                rpc::RPCFunctionPtr fptr = functionFromMap(map, call);
+                    io::ioret failure = heartbeat->send(sock);
+                    if (failure) {
+                        NBL_ERROR("FATAL: could not send heartbeat to socket.");
+                        exit(1);
+                    }
+
+                    continue;
+                }
+
+                NBL_ASSERT_EQ(call->logClass, SharedConstants::LogClass_RPC_Call());
+
+                rpc::RPCFunctionBase * fptr = functionFromMap(map, call);
                 if (!IS_PTR_VALID(fptr)) {
                     NBL_ERROR("FATAL: nbcross could not find function.");
                     exit(1);
@@ -124,7 +135,7 @@ namespace nbl {
 
 #include "utilities-test.hpp"
 
-int umain(int argc, char ** argv) { NBL_RUN_ALL_TESTS(); return nbl::nbcross::nbcross_main(argc, argv); }
+int main(int argc, char ** argv) { NBL_RUN_ALL_TESTS(); return nbl::nbcross::nbcross_main(argc, argv); }
 
 
 

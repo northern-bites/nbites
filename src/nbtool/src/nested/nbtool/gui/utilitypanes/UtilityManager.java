@@ -10,8 +10,8 @@ import java.util.Vector;
 import nbtool.util.Center;
 import nbtool.util.Debug;
 import nbtool.util.UserSettings;
+import nbtool.util.UserSettings.DisplaySettings;
 import nbtool.util.Center.NBToolShutdownListener;
-import nbtool.util.UserSettings.ExtBounds;
 import static nbtool.util.Debug.*;
 
 public class UtilityManager {
@@ -20,24 +20,27 @@ public class UtilityManager {
 	 * ** extends UtilityParent 
 	 * ** is 'public static final'
 	 * is enough to get it displayed.  This is also the preferred way of added utilities to the display. */
+	
 	public static final LogToViewUtility LogToViewUtility = new LogToViewUtility();
 	public static final YUVColorUtility YUVColorUtility = new YUVColorUtility();
 	public static final ThreadStateUtility ThreadStateUtility = new ThreadStateUtility();
-	public static final ReplayUtility ReplayUtility = new ReplayUtility();
-			
-	public static final CameraCalibrateUtility2 CameraCalibrateUtility2 = new CameraCalibrateUtility2();
-	public static final CameraSettingsUtility CameraSettingsUtility = new CameraSettingsUtility();
-	
-	
+
 	public static final WorldViewUtility WorldViewUtility = new WorldViewUtility();
 	public static final BroadcastUtility BroadcastUtility = new BroadcastUtility();
 	
+	public static final ReachableRobots ReachableRobots = new ReachableRobots();
+	public static final CameraOffsetsUtility CameraOffsetsUtility = new CameraOffsetsUtility();
+
 	//Unused at the moment – comment out to re-enable.
 	//public static final MultiStreamUtility MultiStreamUtility = new MultiStreamUtility();
 //	public static final SyntheticImageUtility SyntheticImageUtility = new SyntheticImageUtility();
     
-	public static final SyntheticSndUtility SyntheticSndUtility = new SyntheticSndUtility();
+//	public static final SyntheticSndUtility SyntheticSndUtility = new SyntheticSndUtility();
 
+//	public static final ReplayUtility ReplayUtility = new ReplayUtility();
+	
+//	public static final CameraCalibrateUtility2 CameraCalibrateUtility2 = new CameraCalibrateUtility2();
+//	public static final CameraSettingsUtility CameraSettingsUtility = new CameraSettingsUtility();
 
 	public static final UtilityParent[] utilities = findUtilityFields();
 
@@ -75,7 +78,7 @@ public class UtilityManager {
 				for (UtilityParent up : utilities) {
 					if (up.previouslySupplied != null) {
 						Rectangle bnds = up.previouslySupplied.getBounds();
-						UserSettings.BOUNDS_MAP.put(up.preferenceKey(), new ExtBounds(bnds, null));
+						UserSettings.BOUNDS_MAP.put(up.preferenceKey(), new DisplaySettings(bnds, null, 0));
 					}
 				}
 			}

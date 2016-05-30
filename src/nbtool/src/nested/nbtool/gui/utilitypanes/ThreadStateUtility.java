@@ -8,9 +8,6 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.Timer;
 
-import nbtool.data._log._Log;
-import nbtool.gui.logdnd.LogDND;
-import nbtool.gui.logdnd.LogDND.LogDNDTarget;
 import nbtool.util.Debug;
 
 public class ThreadStateUtility extends UtilityParent {

@@ -9,8 +9,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
-import nbtool.data._log._Log;
+import nbtool.data.log.Block;
 import nbtool.gui.logviews.misc.ViewParent;
+import nbtool.util.SharedConstants;
 import nbtool.util.Utility;
 
 public class ImageView extends ViewParent implements MouseMotionListener {
@@ -26,12 +27,6 @@ public class ImageView extends ViewParent implements MouseMotionListener {
 			g.drawString(label, 10, img.getHeight() + 20);
     }
 	
-	public void setLog(_Log newlog) {		
-		this.img = Utility.biFromLog(newlog);
-		
-		repaint();
-	}
-	
 	public ImageView() {
 		super();
 		setLayout(null);
@@ -43,7 +38,7 @@ public class ImageView extends ViewParent implements MouseMotionListener {
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		if (img == null || log == null)
+		if (img == null || displayedLog == null)
 			return;
 		
 		int col = e.getX();
@@ -56,11 +51,24 @@ public class ImageView extends ViewParent implements MouseMotionListener {
 		int cbase = (col & ~1);
 		int i = (row * img.getWidth() * 2) + (cbase * 2);
 		
-		int y = log.data()[first ? i : i + 2] & 0xff;
-		int u = log.data()[i + 1] & 0xff;
-		int v = log.data()[i + 3] & 0xff;
+		Block image = displayedLog.blocks.get(0);
+		int y = image.data[first ? i : i + 2] & 0xff;
+		int u = image.data[i + 1] & 0xff;
+		int v = image.data[i + 3] & 0xff;
 		label = String.format("(%d,%d): y=%d u=%d v=%d", col, row, y, u, v);
 		repaint();
+	}
+
+	@Override
+	public void setupDisplay() {
+		this.img = displayedLog.blocks.get(0).parseAsYUVImage().toBufferedImage();
+		repaint();
+	}
+
+	@Override
+	public String[] displayableTypes() {
+		return new String[]{SharedConstants.LogClass_Tripoint(),
+				SharedConstants.LogClass_YUVImage()};
 	}
 
 	

@@ -14,18 +14,14 @@ import com.google.protobuf.Message;
 
 import messages.*;
 import nbtool.data.SExpr;
-import nbtool.data._log._Log;
 import nbtool.gui.field.*;
 import nbtool.gui.logviews.misc.ViewParent;
 
 public class LocSwarmView extends ViewParent implements ActionListener {
-
-    private int numLines;
-
+	
 	@Override
-	public void setLog(_Log newlog) {
-		log = newlog;
-
+	public void setupDisplay() {
+		
 		RobotLocation naoLoc;
 		ParticleSwarm naoSwarm;
 		VBall naoBall;
@@ -35,15 +31,17 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 		float naoX, naoY, naoH;
 
 		try {
+			
+			int bi = 0;
 
 			// Get loc info from log
-			naoLoc = RobotLocation.parseFrom(log.bytesForContentItem(0));
+			naoLoc = RobotLocation.parseFrom(displayedLog.blocks.get(bi++).data);
 			naoX = naoLoc.getX();
 			naoY = naoLoc.getY();
 			naoH = naoLoc.getH();
 			naoPlayer.moveTo(naoX,naoY, naoH);
 
-			naoSwarm = ParticleSwarm.parseFrom(log.bytesForContentItem(1));
+			naoSwarm = ParticleSwarm.parseFrom(displayedLog.blocks.get(bi++).data);
 			for(int i=0; i<naoSwarm.getParticleCount(); i++) {
 				RobotLocation currentNaoSwarm = naoSwarm.getParticle(i).getLoc();
 				pWeight = naoSwarm.getParticle(i).getWeight();
@@ -54,7 +52,7 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 			
 			
 			// Get vision info log (fild lines, ball, center circle) 
-			naoVision = Vision.parseFrom(log.bytesForContentItem(2));
+			naoVision = Vision.parseFrom(displayedLog.blocks.get(bi++).data);
 
 			// Fild lines
 			for(int i=0; i<naoVision.getLineCount(); i++) {
@@ -111,6 +109,13 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 			e.printStackTrace();
 		}
 	}
+
+	@Override
+	public String[] displayableTypes() {
+		return new String[]{"location"};
+	}
+
+    private int numLines;
 
 	public LocSwarmView() {
 		super();

@@ -13,7 +13,6 @@
 #include "LogRPC.hpp"
 
 using nbl::rpc::RPCFunctionMap;
-using nbl::rpc::RPCFunctionPtr;
 
 namespace control {
     namespace flags {
@@ -38,8 +37,6 @@ namespace control {
         void consumeLog(nbl::logptr ptrTo);
         void printFunctions();
     };
-
-    extern std::vector<nbl::rpc::RPCFunctionPtr> setupControlFunctions();
 }
 
 #endif /* Control_hpp */

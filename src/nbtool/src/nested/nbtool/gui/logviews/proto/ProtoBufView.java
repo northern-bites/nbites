@@ -11,21 +11,19 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 
-import nbtool.data._log._Log;
+import nbtool.data.log.Log;
 import nbtool.util.Debug;
 import nbtool.util.Utility;
 
 public final class ProtoBufView extends nbtool.gui.logviews.misc.ViewParent {
-	private static final long serialVersionUID = -541524730464912737L;
+	private static final long serialVersionUID = 1;
 	
-	public static Boolean shouldLoadInParallel() {return true;}
-	public void setLog(_Log newlog) {
-		
-		String t = (String) newlog.primaryType();
+	@Override
+	public void setupDisplay() {
+		String t = displayedLog.blocks.get(0).type;
 		Class<? extends com.google.protobuf.Message> lClass = Utility.protobufClassFromType(t);
 		Debug.info( "ProtoBufView: using class %s for type %s.\n", lClass.getName(), t);
-		com.google.protobuf.Message msg = Utility.protobufInstanceForClassWithData(lClass, newlog.bytes);
-
+		com.google.protobuf.Message msg = displayedLog.blocks.get(0).parseAsProtobufOfClass(lClass);
 		
 		Map<FieldDescriptor, Object> fields = msg.getAllFields();
 		
@@ -55,8 +53,14 @@ public final class ProtoBufView extends nbtool.gui.logviews.misc.ViewParent {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} */
-		
 	}
+
+	@Override
+	public String[] displayableTypes() {
+		return new String[]{};
+	}
+	
+	public static Boolean shouldLoadInParallel() {return true;}
 	
 	public ProtoBufView() {
 		super();

@@ -10,38 +10,25 @@ import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 
 import nbtool.data.SExpr;
-import nbtool.data._log._Log;
+import nbtool.data.log.Block;
+import nbtool.data.log.Log;
 import nbtool.gui.logviews.misc.ViewParent;
+import nbtool.gui.logviews.misc.VisionView;
+import nbtool.images.Y8Image;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
-import nbtool.io.CrossIO;
-import nbtool.io.CrossIO.CrossFunc;
-import nbtool.io.CrossIO.CrossInstance;
-import nbtool.io.CrossIO.CrossCall;
+import nbtool.util.SharedConstants;
 import nbtool.util.Utility;
-import nbtool.images.Y8Image;
 
-public class BallView extends ViewParent implements IOFirstResponder {
-    _Log in;
+public class BallView extends VisionView {
     BufferedImage original;
     BufferedImage orange;
-    _Log balls;
-
+    Block balls = null;
+    
     @Override
-    public void setLog(_Log newlog)
-    {
-        CrossInstance cross = CrossIO.instanceByIndex(0);
-        if (cross == null) return;
-
-        CrossFunc func = cross.functionWithName("Vision");
-        assert(func != null);
-
-        CrossCall call = new CrossCall(this, func, newlog);
-        assert(cross.tryAddCall(call));
-
-        in = newlog;
-        original = Utility.biFromLog(newlog);
-    }
+	protected void setupVisionDisplay() {
+		original = this.getOriginal().toBufferedImage();
+	}
 
     @Override
     public void paintComponent(Graphics g) {
@@ -57,10 +44,13 @@ public class BallView extends ViewParent implements IOFirstResponder {
         Graphics2D graph = orange.createGraphics();
         graph.setColor(Color.RED);
         String b = "blob";
+        
+        if (balls == null)
+        	return;
+        SExpr tree = balls.parseAsSExpr();
 
         for (int i=0; ; i++)
         {
-            SExpr tree = balls.tree();
             SExpr bl = tree.find(b+i);
             if (!bl.exists()) { 
                 break;
@@ -77,7 +67,6 @@ public class BallView extends ViewParent implements IOFirstResponder {
 
         for(int i=0; ;i++)
         {
-            SExpr tree = balls.tree();
             SExpr ball = tree.find(b+i);
             if (!ball.exists()){
                 break;
@@ -123,22 +112,20 @@ public class BallView extends ViewParent implements IOFirstResponder {
     public void ioFinished(IOInstance instance) {}
 
     @Override
-    public void ioReceived(IOInstance inst, int ret, _Log... out)
+    public void ioReceived(IOInstance inst, int ret, Log... out)
     {
-        SExpr otree = out[3].tree();
-        Y8Image o = new Y8Image(otree.find("width").get(1).valueAsInt(),
-                                otree.find("height").get(1).valueAsInt(),
-                                out[3].bytes);
-        orange = new BufferedImage(o.width, o.height, BufferedImage.TYPE_3BYTE_BGR);
-        Graphics2D g = orange.createGraphics();
-        g.drawImage(o.toBufferedImage(), 0, 0, null);
-        //drawBlobs();
-        balls = out[7];
-    }
-
-    @Override
-    public boolean ioMayRespondOnCenterThread(IOInstance inst) {
-        return false;
+    	Block oB = this.getOrangeBlock();
+    	if (oB != null) {
+    		 Y8Image o = new Y8Image(this.originalWidth() / 4,
+                     this.originalHeight() / 2,
+                     oB.data);
+    		 orange = new BufferedImage(o.width, o.height, BufferedImage.TYPE_3BYTE_BGR);
+    		 Graphics2D g = orange.createGraphics();
+    		 g.drawImage(o.toBufferedImage(), 0, 0, null);
+    		 //drawBlobs();
+    	}
+       
+        balls = this.getBallBlock();
     }
 
 }

@@ -1,7 +1,6 @@
 package nbtool.data.log;
 
 import nbtool.data.SExpr;
-import nbtool.data.Session;
 import nbtool.util.Debug;
 import nbtool.util.ToolSettings;
 import nbtool.util.Utility;
@@ -112,7 +111,6 @@ public class SExprLog {
 	}
 	
 	protected SOURCE source;
-	protected Session parent = null;	//enclosing Session instance.
 	
 	protected byte[] data() {
 		return bytes;

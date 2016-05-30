@@ -7,7 +7,6 @@ import javax.swing.*;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import messages.RobotLocation;
-import nbtool.data._log._Log;
 import nbtool.gui.field.FieldConstants;
 import nbtool.gui.logviews.misc.ViewParent;
 
@@ -36,20 +35,9 @@ public class FieldView extends ViewParent {
 //		myPlayer.draw(g2);
 //	}
 
-	public void setLog(_Log newlog) {
-		log = newlog;
-		if(log.primaryIsProtobuf()) {
-			assert(log.primaryType().equalsIgnoreCase(
-					nbtool.util.ToolSettings.PROTOBUF_TYPE_PREFIX +
-					"RobotLocation"));
-		}
-		RobotLocation ploc = null;
-		try {
-			ploc = RobotLocation.parseFrom(log.bytes);
-		} catch (InvalidProtocolBufferException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void setupDisplay() {		
+		RobotLocation ploc = (RobotLocation) displayedLog.blocks.get(0).parseAsProtobufOfClass(RobotLocation.class);
+	
 		float x = ploc.getX();
 		float y = ploc.getY();
 		robotLocX = x;
@@ -93,10 +81,16 @@ public class FieldView extends ViewParent {
 		
 		@Override
 		public void paintComponent(Graphics g) {
+			super.paintComponent(g);
 			Graphics2D g2 = (Graphics2D) g;
 			myField.drawField(g2);
 			myPlayer.draw(g2);
 		}
+	}
+
+	@Override
+	public String[] displayableTypes() {
+		return new String[]{"RobotLocation"};
 	}
 	
 }

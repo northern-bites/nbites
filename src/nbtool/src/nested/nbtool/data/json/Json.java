@@ -234,6 +234,10 @@ public class Json {
 		return val ? JsonBoolean.TRUE : JsonBoolean.FALSE;
 	}
 	
+	public static JsonNull nullv() {
+		return (JsonNull) NULL_VALUE;
+	}
+	
 	public static void _NBL_ADD_TESTS_() {
 		Tests.add("json", new TestBase("encode") {
 			

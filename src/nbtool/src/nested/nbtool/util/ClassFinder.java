@@ -12,11 +12,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.LinkedList;
+import java.util.List;
+
+import nbtool.gui.logviews.misc.ViewParent;
 
 public class ClassFinder {
-
-	public static void callAllInstancesOfStaticMethod(final String methodName) {
-		
+	
+	private static final Debug.DebugSettings debug =
+			Debug.createSettings(true, true, true, Debug.INFO, null);
+	
+	interface ClassCallback {
+		public boolean callback(Class<?> arg) throws Exception;
+	}
+	
+	private static void nbitesClassCaller(final ClassCallback impl) {
 		final Path baseLoadDir = FileSystems.getDefault().getPath(ToolSettings.NBITES_DIR,
 				"/build/nbtool/");
 		final Path baseDir = baseLoadDir.resolve("nbtool/");
@@ -37,25 +47,13 @@ public class ClassFinder {
 						
 						try {
 							Class<?> fileClass = loader.loadClass(className);
-							
-							for (Method m : fileClass.getDeclaredMethods()) {
-								if (Modifier.isStatic(m.getModifiers()) &&
-										m.getName().equals(methodName)) {
-									Debug.print("ClassFinder: invoking %s on class %s",
-											methodName, fileClass.getName());
-									m.invoke(null);
-								}
-							}
-							
-						} catch (ClassNotFoundException e) {
+							boolean ok = impl.callback(fileClass);
+							if (!ok) return FileVisitResult.TERMINATE;
+						} catch (Exception e) {
+							debug.error("nbitesClassCaller ending because %s: %s",
+									e.getClass().getName(), e.getMessage());
 							e.printStackTrace();
 							return FileVisitResult.TERMINATE;
-						} catch (IllegalAccessException e) {
-							e.printStackTrace();
-						} catch (IllegalArgumentException e) {
-							e.printStackTrace();
-						} catch (InvocationTargetException e) {
-							e.printStackTrace();
 						}
 						
 					}
@@ -70,9 +68,51 @@ public class ClassFinder {
 		}
 	}
 
+	public static void callAllInstancesOfStaticMethod(final String methodName) {
+		
+		ClassFinder.nbitesClassCaller(new ClassCallback(){
+
+			@Override
+			public boolean callback(Class<?> arg) throws Exception {
+				for (Method m : arg.getDeclaredMethods()) {
+					if (Modifier.isStatic(m.getModifiers()) &&
+							m.getName().equals(methodName)) {
+						Debug.print("ClassFinder: invoking %s on class %s",
+								methodName, arg.getName());
+						m.invoke(null);
+					}
+				}
+				
+				return true;
+			}
+			
+		});
+	}
+	
+	public static List<Class<?>> findAllSubclasses(final Class<?> parent) {
+		final LinkedList<Class<?>> found = new LinkedList<>();
+		
+		nbitesClassCaller(new ClassCallback(){
+			@Override
+			public boolean callback(Class<?> arg) throws Exception {
+				
+				if (parent.isAssignableFrom(arg) &&
+						!parent.equals(arg) &&
+						!Modifier.isAbstract(arg.getModifiers())) {
+					
+					found.add(arg);
+				}
+				
+				return true;
+			}
+		});
+		
+		return found;
+	}
+
 	public static void main(String[] args) {
 		Debug.print("searching...");
 		
-		callAllInstancesOfStaticMethod("_NBL_ADD_TESTS_");
+		ClassFinder.findAllSubclasses(ViewParent.class);
 	}
 }

@@ -2,9 +2,10 @@ package nbtool.nio;
 
 import nbtool.data.json.Json;
 import nbtool.data.json.JsonObject;
+import nbtool.data.log.Block;
 import nbtool.data.log.Log;
 import nbtool.io.CommonIO.IOFirstResponder;
-import nbtool.io.CommonIO.IOInstance;
+import nbtool.io.CommonIO.*;
 import nbtool.util.Debug;
 import nbtool.util.SharedConstants;
 import nbtool.util.Utility;
@@ -28,8 +29,8 @@ public class LogRPC {
 			for (int i = 0; i < out.length; ++i) 
 				out[i] = ret.blocks.get(i).parseAsLog();
 			
-//			GIOFirstResponder.generateReceived(connection, caller, 0, out);
-			Debug.error("ControlCall not actually calling generateReceived yet!");
+//			Debug.error("ControlCall not actually calling generateReceived yet!");
+			GIOFirstResponder.generateReceived(connection, caller, 0, out);
 		}
 		
 		public RemoteCall(IOFirstResponder clr, String fname, Log ... args) {
@@ -45,12 +46,20 @@ public class LogRPC {
 		}
 	}
 	
-	public static void requestFlags(RobotConnection conn, int flagi) {
-		
+	public static void requestFlags(IOFirstResponder ifr, RobotConnection conn) {
+		conn.addControlCall(ifr, "GetFlags");
 	}
 	
-	public static void setFlag(RobotConnection conn, int flagi, boolean val) {
+	public static void setFlag(IOFirstResponder ifr, RobotConnection conn, int flagi, boolean val) {
+		byte[] data = new byte[2];
+		data[0] = (byte) flagi;
+		data[1] = (byte) (val ? 1 : 0);
+		Block block = Block.explicit(data, null, null, null, 0, 0);
+		Log only = Log.explicitLogFromArray(new Block[]{block},
+				null,
+				SharedConstants.LogClass_Null(), 0);
 		
+		conn.addControlCall(ifr, "SetFlag", only);
 	}
 	
 }

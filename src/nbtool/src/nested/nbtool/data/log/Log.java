@@ -5,11 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Vector;
 
 import com.google.protobuf.Message;
 
 import nbtool.data.SExpr;
+import nbtool.data.group.Group;
 import nbtool.data.json.Json.JsonValue;
 import nbtool.data.json.JsonObject;
 import nbtool.images.YUYV8888Image;
@@ -25,12 +27,14 @@ public abstract class Log {
 	public static final int MINIMUM_LOG_SIZE = 32;
 	
 	protected LogReference logReference;
+	public LogReference getReference(){ return logReference; }
 	public abstract boolean temporary();
 	
 	public Vector<Block> blocks = null;
 	public JsonObject topLevelDictionary = null;
 	
 	public abstract String getFullDescription();
+	public abstract JsonObject getFullDictionary();
 	
 	public long createdWhen = 0;
 	public String logClass = "";
@@ -65,6 +69,10 @@ public abstract class Log {
 			String whereFrom, long imageIndex, long createdWhen);
 
 	public abstract boolean addBlockFromLog(Log log);
+	
+	public abstract Block find(String type);
+	
+	public abstract Log deepCopy();
 		
 	public static Log emptyLog() {
 		return LogInternal.emptyLog();
@@ -74,6 +82,12 @@ public abstract class Log {
 			long created) {
 		return LogInternal.explicitLog( blocks != null ? blocks : new Vector<Block>(),
 				topLevel != null ? topLevel : new JsonObject(), logClass, created);
+	}
+	
+	public static Log explicitLogFromArray(Block[] blocks, JsonObject topLevel, String logClass,
+			long created) {
+		return Log.explicitLog( new Vector<Block>(Arrays.asList(blocks)),
+				topLevel, logClass, created);
 	}
 	
 	public static Log parseFrom(byte[] bytes) {

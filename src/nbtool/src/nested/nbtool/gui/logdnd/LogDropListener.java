@@ -5,7 +5,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
 
-import nbtool.data._log._Log;
+import nbtool.data.log.Log;
 import nbtool.gui.logdnd.LogDND.LogDNDTarget;
 import nbtool.util.Debug;
 
@@ -21,7 +21,7 @@ public class LogDropListener extends DropTargetAdapter {
 			Transferable tr = dtde.getTransferable();
 
 			if (tr.isDataFlavorSupported(LOG_DATA_FLAVOR)) {
-				_Log[] data = (_Log[]) tr.getTransferData(LOG_DATA_FLAVOR);
+				Log[] data = (Log[]) tr.getTransferData(LOG_DATA_FLAVOR);
 				source.takeLogsFromDrop(data);
 				dtde.dropComplete(true);
 			} else {

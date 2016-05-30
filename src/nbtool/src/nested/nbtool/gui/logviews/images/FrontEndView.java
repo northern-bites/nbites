@@ -3,12 +3,13 @@ package nbtool.gui.logviews.images;
 import java.awt.Graphics;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
+import java.nio.charset.StandardCharsets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import nbtool.images.Y8Image;
-import nbtool.images.Y16Image;
 import nbtool.images.ColorSegmentedImage;
+import nbtool.images.Y16Image;
+import nbtool.images.Y8Image;
 
 import javax.swing.JSlider;
 import javax.swing.JButton;
@@ -16,20 +17,20 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import nbtool.data.SExpr;
-import nbtool.data._log._Log;
+import nbtool.data.log.Log;
 import nbtool.gui.logviews.misc.ViewParent;
+import nbtool.gui.logviews.misc.VisionView;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
-import nbtool.io.CrossIO;
-import nbtool.io.CrossIO.CrossCall;
-import nbtool.io.CrossIO.CrossFunc;
-import nbtool.io.CrossIO.CrossInstance;
-import nbtool.util.Utility;
 
+import nbtool.util.Utility;
 import java.util.Vector;
 
 
-public class FrontEndView extends ViewParent implements IOFirstResponder {
+public class FrontEndView extends VisionView {
+	
+	static final String CALIBRATION_KEY = "ColorCalibrationParams";
+	static final String SAVE_PARAMS_KEY = "SaveColorCalibration";
 
     // FrontEnd output images 
     private BufferedImage yImage;
@@ -91,7 +92,6 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
                 saveParams();
             }
         };
-
 
         // Save button
         saveButton = new JButton("Save color parameters");
@@ -165,38 +165,15 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
         add(oFuzzyU);
         add(oFuzzyV);
     }
-
+    
     @Override
-    public void setLog(_Log newlog) {
-        log = newlog;
+	protected void setupVisionDisplay() {
+		width = this.originalWidth() / 2;
+		height = this.originalHeight() / 2;
+	}
 
-        Vector<SExpr> vec = log.tree().recursiveFind("width");
-        if (vec.size() > 0) {
-            SExpr w = vec.get(vec.size()-1);
-            width =  w.get(1).valueAsInt() / 2;
-        } else {
-            System.out.printf("COULD NOT READ WIDTH FROM LOG DESC\n");
-            width = 320;
-        }
-
-        vec = log.tree().recursiveFind("height");
-        if (vec.size() > 0) {
-            SExpr h = vec.get(vec.size()-1);
-            height = h.get(1).valueAsInt() / 2;
-        } else {
-            System.out.printf("COULD NOT READ HEIGHT FROM LOG DESC\n");
-            height = 240;
-        }
-
-        callNBFunction();
-    }
     @Override
     public void ioFinished(IOInstance instance) {}
-
-    @Override
-    public boolean ioMayRespondOnCenterThread(IOInstance inst) {
-        return false;
-    }
 
     /* Called upon slide of any of the 18 sliders. Make an SExpr from the psitions 
         of each of the sliders. If this.log doesn't have Params saved, add them. Else,
@@ -208,6 +185,7 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
         //  or if any values are zero b/c devide by zero error in frontEnd processing
         if (firstLoad)
             return;
+        
         zeroParam();
 
         SExpr newParams = SExpr.newList(
@@ -237,44 +215,16 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
             );
         
         // Look for existing Params atom in current this.log description
-        SExpr oldColor, newColor, oldParams = this.log.tree().find("Params");
-
-        // Add params or replace params
-        if (oldParams.exists()) {
-            SExpr saveAtom = oldParams.get(1).find("SaveParams");
-            this.log.tree().remove(saveAtom);
-            oldParams.setList( SExpr.atom("Params"), newParams); 
-        } else {
-            this.log.tree().append(SExpr.pair("Params", newParams));
-        }
-
-        callNBFunction();
+        
+        displayedLog.topLevelDictionary.remove(SAVE_PARAMS_KEY);
+        displayedLog.topLevelDictionary.put(CALIBRATION_KEY, SExpr.pair("Params", newParams).serialize());
+        
+        this.callVision();
     }
 
     public void saveParams() {
-        SExpr params = this.log.tree().find("Params");
-
-        // Check to see if sliders have been moved (slider adjust would have saved params)
-        if (!params.exists())
-            return;
-
-        // Add flag for nbfunction to save the params
-        params.get(1).append(SExpr.newKeyValue("SaveParams", "True"));
-
-        callNBFunction();
-    }
-
-    private void callNBFunction() {
-        CrossInstance inst = CrossIO.instanceByIndex(0);
-        if (inst == null)
-            return;
-
-        CrossFunc func = inst.functionWithName("Vision");
-        if (func == null)
-            return;
-
-        CrossCall call = new CrossCall(this, func, this.log);
-        inst.tryAddCall(call);
+    	displayedLog.topLevelDictionary.put(SAVE_PARAMS_KEY, true);
+        this.callVision();
     }
 
     // Check to see if any parameters are zero to avoid devide-by-zero error later
@@ -327,7 +277,9 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
             g.drawImage(yImage, 0, height + sH*6 + tB*3, null);
         }
         if (segmentedImage != null) {
-            g.drawImage(segmentedImage, width + vB,  height + sH*6 + tB*3, null);
+            //g.drawImage(segmentedImage, width + vB,  height + sH*6 + tB*3, null);
+            g.drawImage(whiteImage, width + vB,  height + sH*6 + tB*3, null);
+            g.drawImage(greenImage, width + vB,  height + sH*6 + tB*3, null);
         }
 
         // TODO fix slider glitch
@@ -372,29 +324,30 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
 
 
     @Override
-    public void ioReceived(IOInstance inst, int ret, _Log... out) {
-        if (out.length > 0) {
-            Y16Image yImg = new Y16Image(width, height, out[0].bytes);
+    public void ioReceived(IOInstance inst, int ret, Log... out) {
+        if (this.getYBlock() != null) {
+            Y16Image yImg = new Y16Image(width, height, this.getYBlock().data);
             this.yImage = yImg.toBufferedImage();
         }
 
-        if (out.length > 1) {
-            Y8Image white8 = new Y8Image(width, height, out[1].bytes);
+        if (this.getWhiteBlock() != null) {
+            Y8Image white8 = new Y8Image(width, height, this.getWhiteBlock().data);
             this.whiteImage = white8.toBufferedImage();
         }
 
-        if (out.length > 2) {
-            Y8Image green8 = new Y8Image(width, height, out[2].bytes);
+        if (this.getGreenBlock() != null) {
+        	Y8Image green8 = new Y8Image(width, height, this.getGreenBlock().data);
             this.greenImage = green8.toBufferedImage();
         }
 
-        if (out.length > 3) {
-            Y8Image orange8 = new Y8Image(width, height, out[3].bytes);
+        if (this.getOrangeBlock() != null) {
+        	Y8Image orange8 = new Y8Image(width, height, this.getOrangeBlock().data);
             this.orangeImage = orange8.toBufferedImage();
         }
 
-        if (out.length > 4) {
-            ColorSegmentedImage colorSegImg = new ColorSegmentedImage(width, height, out[4].bytes);
+        if (this.getSegmentedBlock() != null) {
+            ColorSegmentedImage colorSegImg = new ColorSegmentedImage(width, height, 
+            		this.getSegmentedBlock().data);
             this.segmentedImage = colorSegImg.toBufferedImage();
         }
 
@@ -406,10 +359,11 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
     }
 
     // If and only if it is the first load, we need to set the positions of the sliders
-    private void firstIoReceived(_Log... out) {
+    private void firstIoReceived(Log... out) {
         
         // Set sliders to positions based on white, green, then orange images descriptions' s-exps
-        SExpr colors = out[1].tree();
+        SExpr colors = SExpr.deserializeFrom( 
+        		this.getWhiteBlock().dict.get("ColorParams").asString().value );
 
         wDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(0).get(1).value()) * wPrecision));
         wDarkV. setValue((int)(Float.parseFloat(colors.get(1).get(1).get(1).value()) * wPrecision));
@@ -418,7 +372,8 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
         wFuzzyU.setValue((int)(Float.parseFloat(colors.get(1).get(4).get(1).value()) * wPrecision));
         wFuzzyV.setValue((int)(Float.parseFloat(colors.get(1).get(5).get(1).value()) * wPrecision));
 
-        colors = out[2].tree();
+        colors = SExpr.deserializeFrom( 
+        		this.getGreenBlock().dict.get("ColorParams").asString().value );
 
         gDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(0).get(1).value()) * gPrecision));
         gDarkV. setValue((int)(Float.parseFloat(colors.get(1).get(1).get(1).value()) * gPrecision));
@@ -427,7 +382,8 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
         gFuzzyU.setValue((int)(Float.parseFloat(colors.get(1).get(4).get(1).value()) * gPrecision));
         gFuzzyV.setValue((int)(Float.parseFloat(colors.get(1).get(5).get(1).value()) * gPrecision));
 
-        colors = out[3].tree();
+        colors = SExpr.deserializeFrom( 
+        		this.getOrangeBlock().dict.get("ColorParams").asString().value );
 
         oDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(0).get(1).value()) * oPrecision));
         oDarkV. setValue((int)(Float.parseFloat(colors.get(1).get(1).get(1).value()) * oPrecision));
@@ -438,4 +394,5 @@ public class FrontEndView extends ViewParent implements IOFirstResponder {
 
         firstLoad = false;
     }
+
 }

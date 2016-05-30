@@ -16,20 +16,16 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import nbtool.data._log._Log;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.images.ImageParent;
 import nbtool.images.Y16Image;
 import nbtool.images.YUYV8888Image;
+import nbtool.util.SharedConstants;
 import nbtool.util.Utility;
 
 
 public class ZoomImageView extends ViewParent {
 	private static final long serialVersionUID = 1L;
-
-	public void setLog(_Log newlog) {		
-		iv.useImage(Utility.biFromLog(newlog));
-	}
 
 	protected void useSize(Dimension s) {
 		sp.setBounds(0,0, s.width, s.height);
@@ -57,4 +53,14 @@ public class ZoomImageView extends ViewParent {
 	
 	private JScrollPane sp;
 	private ZoomImageDisplay iv;
+
+	@Override
+	public void setupDisplay() {
+		iv.useImage(displayedLog.blocks.get(0).parseAsYUVImage().toBufferedImage());
+	}
+
+	@Override
+	public String[] displayableTypes() {
+		return new String[]{SharedConstants.LogClass_Tripoint(), SharedConstants.LogClass_YUVImage()};
+	}
 }

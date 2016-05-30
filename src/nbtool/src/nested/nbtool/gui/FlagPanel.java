@@ -1,7 +1,6 @@
 package nbtool.gui;
 
 import java.awt.ComponentOrientation;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,10 +11,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import nbtool.io.ControlIO;
-import nbtool.io.ControlIO.ControlInstance;
+import nbtool.data.json.JsonObject;
+import nbtool.data.log.Log;
+import nbtool.io.CommonIO.IOFirstResponder;
+import nbtool.io.CommonIO.IOInstance;
+import nbtool.nio.LogRPC;
+import nbtool.nio.RobotConnection;
 import nbtool.util.Debug;
-import nbtool.util.Utility;
 
 public class FlagPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
@@ -25,14 +27,21 @@ public class FlagPanel extends JPanel implements ActionListener {
 	private ButtonGroup bg;
 	public String flag_name;
 	public int index;
-
+	public RobotConnection robot;
 	
-	public FlagPanel() {
-		this.flag_name = "null";
-		int nspace = 20 - flag_name.length();
+	public FlagPanel(RobotConnection robot, JsonObject object) {
+		String name = object.get("name").asString().value;
+		int index = object.get("index").asNumber().asInt();
+		boolean value = object.get("value").asBoolean().bool();		
+		
+		this.robot = robot;
+		
+		this.flag_name = name;
+		int nspace = 20 - name.length();
 		//even out lengths.
 		this.flag_name += new String(new char[nspace]).replace("\0", " ");
-		this.index = -1;
+		this.index = index;
+		
 		
 		this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 		
@@ -58,29 +67,64 @@ public class FlagPanel extends JPanel implements ActionListener {
 		jrb[2].addActionListener(this);
 		
 		jrb[1].setEnabled(false);
+		lbl.setText(flag_name);
+		
+		setKnown(value);		
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		
-		ControlInstance first = ControlIO.getByIndex(0);
-		if (first == null) {
-			Debug.warn( "FlagPanel clicked while no ControlInstance available");
+		if (robot == null || robot.finished()) {
+			Debug.error( "FlagPanel clicked while no RobotConnection available!");
 			this.setUnknown();
 			return;
 		}
 		
 		if (e.getSource() == jrb[0]) {
-			boolean success = first.tryAddCmnd(ControlIO.createCmndSetFlag(index, false));
-			Debug.info( "FlagPanel[%s] CommandIO.tryAddSetFlag(%d, false) returned %B\n", flag_name, index, success);
+			LogRPC.setFlag(falseR, robot, index, false);
+			Debug.info( "FlagPanel[%s] on %s LogRPC.setFlag(%d, false)\n", flag_name, robot, index);
 		} else if (e.getSource() == jrb[1]) {
 			Debug.error( "ERROR: FlagPanel " + flag_name + " got action from MIDDLE switch!");
 		} else if (e.getSource() == jrb[2]) {
-			boolean success = first.tryAddCmnd(ControlIO.createCmndSetFlag(index, true));
-			Debug.info( "FlagPanel[%s] CommandIO.tryAddSetFlag(%d, true) returned %B\n", flag_name, index, success);
-		} else {}
+			LogRPC.setFlag(trueR, robot, index, true);
+			Debug.info( "FlagPanel[%s] on %s LogRPC.setFlag(%d, true)\n", flag_name, robot, index);
+		} else {
+			Debug.error( "ERROR: FlagPanel " + flag_name + " got action from UNKNOWN!");
+		}
 		
 		this.setUnknown();
 	}
+	
+	private final IOFirstResponder falseR = new IOFirstResponder(){
+		@Override
+		public void ioFinished(IOInstance instance) {}
+
+		@Override
+		public void ioReceived(IOInstance inst, int ret, Log... out) {
+			assert(inst == robot);
+			setKnown(false);
+		}
+
+		@Override
+		public boolean ioMayRespondOnCenterThread(IOInstance inst) {
+			return false;
+		}
+	};
+	
+	private final IOFirstResponder trueR = new IOFirstResponder(){
+		@Override
+		public void ioFinished(IOInstance instance) {}
+
+		@Override
+		public void ioReceived(IOInstance inst, int ret, Log... out) {
+			assert(inst == robot);
+			setKnown(true);
+		}
+
+		@Override
+		public boolean ioMayRespondOnCenterThread(IOInstance inst) {
+			return false;
+		}
+	};
 	
 	public void setUnknown() {
 		jrb[0].setEnabled(false);
@@ -92,15 +136,5 @@ public class FlagPanel extends JPanel implements ActionListener {
 		jrb[v ? 2 : 0].setSelected(true);
 		jrb[0].setEnabled(true);
 		jrb[2].setEnabled(true);
-	}
-	
-	public void setInfo(String name, int index) {
-		this.flag_name = name;
-		int nspace = 20 - name.length();
-		//even out lengths.
-		this.flag_name += new String(new char[nspace]).replace("\0", " ");
-		this.index = index;
-		
-		lbl.setText(flag_name);
 	}
 }

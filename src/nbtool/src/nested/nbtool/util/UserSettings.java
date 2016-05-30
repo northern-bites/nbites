@@ -17,6 +17,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -24,251 +25,203 @@ import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import nbtool.data.OrderedSet;
 import nbtool.data.SExpr;
 import nbtool.data.ViewProfile;
+import nbtool.data.json.Json;
+import nbtool.data.json.Json.JsonValue;
+import nbtool.data.json.JsonArray;
+import nbtool.data.json.JsonObject;
+import nbtool.data.json.JsonParser.JsonParseException;
+import nbtool.data.json.JsonString;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.util.Debug.LogLevel;
 
 public class UserSettings {
 
-	/* "OLD" preference values – stored at top level. */
-	//bounds (and default) for main display
-	public static Rectangle bounds = ToolSettings.DEFAULT_BOUNDS;
-	//splitpane inits for main display
-	public static int leftSplitLoc = -1, rightSplitLoc = -1;
+	public static final Map<String, DisplaySettings> BOUNDS_MAP = new HashMap<>();
+	public static final Map<String, JsonValue> PREFERENCES = new HashMap<>();
+	
+	public static int leftSplitLoc = -1;
+
 	//saved user inputs..
-	public static LinkedList<String> addresses = new LinkedList<String>();
-	public static LinkedList<String> filepaths = new LinkedList<String>();
+	public static OrderedSet<Path> loadPathes = new OrderedSet<>();
+	public static OrderedSet<String> addresses = new OrderedSet<>
+		(Robots.sortedHostnames());
+	
 	public static LogLevel logLevel = LogLevel.levelINFO;
 	
-	/* "NEW" preference values - stored inside appropriate key */
-	private static final String EXT_BOUNDS_KEY = "__EXT_BOUNDS__";
-	private static final String MISC_KEY = "__MISC__";
-	private static final String STATIC_PREFS_KEY = "__STATIC__";
+	private static final String INTERNAL_KEY = "__INTERNAL__";
+	private static final String BOUNDS_KEY = "__BOUNDS__";
+	private static final String ADDR_KEY = "__ADDRESSES__";
+	private static final String LOAD_KEY = "__LOADPATHS__";
+	private static final String LL_KEY = "__LOGLEVEL__";
 	
-	public static class ExtBounds {
-		public Rectangle bounds;
-		public ViewProfile profile;
+	public static class DisplaySettings {
+		public Rectangle bounds = null;
+		public ViewProfile profile = null;
+		public int splitLocation = -1;
 		
-		public ExtBounds(Rectangle r, ViewProfile p) {
-			bounds = r; profile = p;
+		public DisplaySettings(Rectangle r, ViewProfile p, int split) {
+			bounds = r; profile = p; splitLocation = split;
 		}
 		
-		public SExpr serialize() {
-			SExpr top = SExpr.list();
-			if (bounds == null)
-				top.append(SExpr.atom("__NULL__"));
-			else {
-				top.append(
-						SExpr.atom(bounds.x),
-						SExpr.atom(bounds.y),
-						SExpr.atom(bounds.width),
-						SExpr.atom(bounds.height)
+		public JsonObject serialize() {
+			JsonObject obj = Json.object();
+			if (bounds == null) {
+				obj.put("bounds", Json.NULL_VALUE);
+			} else {
+				JsonArray array = Json.array();
+				array.add(bounds.x);
+				array.add(bounds.y);
+				array.add(bounds.width);
+				array.add(bounds.height);
+				obj.put("bounds", array);
+			}
+			
+			obj.put("vp", profile == null ?
+					Json.NULL_VALUE : new JsonString(profile.name));
+			
+			obj.put("split", splitLocation);
+			
+			return obj;
+		}
+		
+		public DisplaySettings(JsonValue _obj) {
+			JsonObject obj = _obj.asObject();
+			if (obj.containsKey("bounds") && !Json.isNull(obj.get("bounds"))) {
+				JsonArray array = obj.get("bounds").asArray();
+				bounds = new Rectangle(
+						array.get(0).asNumber().intValue(),
+						array.get(1).asNumber().intValue(),
+						array.get(2).asNumber().intValue(),
+						array.get(3).asNumber().intValue()
 						);
+			} else {
+				bounds = ToolSettings.DEFAULT_BOUNDS;
 			}
 			
-			if (profile == null) {
-				top.append(SExpr.atom("__NULL__"));
-			} else {
-				top.append(SExpr.atom(profile.name));
+			if (obj.containsKey("vp") && !Json.isNull(obj.get("vp"))) { 
+				JsonString vp = obj.get("vp").asString();
+				profile = ViewProfile.PROFILES.get(vp.value);
 			}
 			
-			return top;
-		}
-		
-		public ExtBounds(SExpr s) {
-			assert(s.isList());
-			assert(s.count() >= 2);
+			if (profile == null)
+				profile = ViewProfile.DEFAULT_PROFILE;
 			
-			int loc = 0;
-			if (s.get(0).isAtom() && s.get(0).value().equals("__NULL__")) {
-				bounds = null;
-				loc = 1;
-			} else {
-				bounds = new Rectangle(s.get(0).valueAsInt(),
-						s.get(1).valueAsInt(),
-						s.get(2).valueAsInt(),
-						s.get(3).valueAsInt());
-				loc = 4;
-			}
-			
-			if (s.get(loc).isAtom() && s.get(loc).value().equals("__NULL__")) {
-				profile = null;
-			} else {
-				String pname = s.get(loc).value();
-				//if get() returns null, then profile should be null.
-				profile = ViewProfile.PROFILES.get(pname);
+			if (obj.containsKey("split")) {
+				splitLocation = obj.get("split").asNumber().asInt();
 			}
 		}
 		
 		@Override
 		public String toString() {
-			return String.format("ExtBounds{%s}{%s}", bounds, profile);
+			return String.format("DisplaySettings{%s}{%s}", bounds, profile);
 		}
 	}
-	
-	public static final Map<String, ExtBounds> BOUNDS_MAP = new HashMap<>();
-	public static final Map<String, SExpr> MISC_MAP = new HashMap<>();
 
 	/* SAVE PREFERENCES TO FILESYSTEM */
 	public static void savePreferences() throws IOException {
-		File fp = new File(Utility.localizePath(ToolSettings.USER_PREFERENCES));
-		Debug.info( "saving preferences to %s", fp.getAbsolutePath());
-
-		SExpr top = SExpr.newList();
-		top.append(SExpr.newAtom("nbtool-prefs"));
+		Debug.info("saving preferences to %s", ToolSettings.USER_PREFERENCES_PATH);
 		
-		SExpr staticPrefs = SExpr.newList(SExpr.atom(STATIC_PREFS_KEY));
-		top.append(staticPrefs);
+		JsonObject object = Json.object();
+		object.put("#NBTOOL_USER_PREFS", Json.NULL_VALUE);
+		object.put(SharedConstants.LOG_TOPLEVEL_MAGIC_KEY(), ToolSettings.VERSION);
 		
-		staticPrefs.append(SExpr.newList(
-				SExpr.newAtom("bounds"),
-				SExpr.newAtom(bounds.x),
-				SExpr.newAtom(bounds.y),
-				SExpr.newAtom(bounds.width),
-				SExpr.newAtom(bounds.height)
-				));
+		JsonObject internal = Json.object();
 		
-		staticPrefs.append(SExpr.list(
-				SExpr.atom("split"),
-				SExpr.atom(leftSplitLoc),
-				SExpr.atom(rightSplitLoc)
-				));
+		JsonObject bounds = Json.object();
+		JsonArray addr = Json.array();
+		JsonArray load = Json.array();
 		
-		{
-			SExpr list = SExpr.newList(SExpr.newAtom("addresses"));
-			for (String a : addresses)
-				list.append(SExpr.newAtom(a));
-			staticPrefs.append(list);
+		internal.put(BOUNDS_KEY, bounds);
+		
+		for (Entry<String, DisplaySettings> entry : BOUNDS_MAP.entrySet()) {
+			bounds.put(entry.getKey(), entry.getValue().serialize());
 		}
-
-		{
-			SExpr list = SExpr.newList(SExpr.newAtom("filepaths"));
-			for (String f : filepaths)
-				list.append(SExpr.newAtom(f));
-			staticPrefs.append(list);
-		}
-
-		staticPrefs.append(SExpr.newKeyValue("logLevel", logLevel.name()));
-
-		top.append(ViewProfile.makeProfilesSExpr());
 		
-		SExpr bnds_se = SExpr.list(SExpr.atom(EXT_BOUNDS_KEY));
-		for (Entry<String, ExtBounds> entry : BOUNDS_MAP.entrySet()) {
-			bnds_se.append(SExpr.pair(entry.getKey(), entry.getValue().serialize()));
-		}
-		top.append(bnds_se);
+		internal.put(ADDR_KEY, addr);
 		
-		SExpr misc_se = SExpr.list(SExpr.atom(MISC_KEY));
-		for (Entry<String, SExpr> entry : MISC_MAP.entrySet()) {
-			misc_se.append(SExpr.pair(entry.getKey(), entry.getValue()));
+		for (String a : addresses.vector()) {
+			addr.add(a);
 		}
-		top.append(misc_se);
 		
-		String writeable = top.print();
-		byte[] bytes = writeable.getBytes(StandardCharsets.UTF_8);
-		Files.write(fp.toPath(), bytes);
+		internal.put(LOAD_KEY, load);
+		
+		for (Path l : loadPathes.vector()) {
+			load.add(l.toString());
+		}
+		
+		internal.put(LL_KEY, logLevel.name());
+		
+		String vpString = ViewProfile.makeProfilesSExpr().serialize();
+		internal.put(ViewProfile.PROFILES_KEY, vpString);
+		
+		object.put(INTERNAL_KEY, internal);
+		
+		for (Entry<String, JsonValue> entry : PREFERENCES.entrySet()) {
+			object.put(entry.getKey(), entry.getValue());
+		}
+		
+		byte[] bytes = object.print().getBytes(StandardCharsets.UTF_8);
+		Files.write(ToolSettings.USER_PREFERENCES_PATH, bytes);
 	}
 
 	/* LOAD PREFERENCES FROM FILESYSTEM */
-	public static void loadPreferences() throws IOException, ClassNotFoundException {
-		Path prefPath = Paths.get(Utility.localizePath(ToolSettings.USER_PREFERENCES));
-		System.out.println("\tfetching user preferences from: " + prefPath);
-		System.out.println("\tusing NBITES_DIR=" + ToolSettings.NBITES_DIR);
-
-		if (!prefPath.toFile().exists()) {
-			Debug.warn( "preferences file not found.");
+	public static void loadPreferences() throws IOException, ClassNotFoundException, JsonParseException {
+		Debug.print("fetching user preferences from: " + ToolSettings.USER_PREFERENCES_PATH);
+		
+		if (!Files.exists(ToolSettings.USER_PREFERENCES_PATH)) {
+			Debug.error("preferences file not found!");
 			return;
 		}
-		String prefText = new String(Files.readAllBytes(prefPath),
+		
+		String prefText = new String(Files.readAllBytes(ToolSettings.USER_PREFERENCES_PATH),
 				StandardCharsets.UTF_8);
-
-		SExpr prefs = SExpr.deserializeFrom(prefText);
-		if (prefs == null || prefs.count() < 1 || 
-				!(prefs.get(0).isAtom() && prefs.get(0).value().equals("nbtool-prefs") ) 
-				) {
-			Debug.warn( "PREFERENCES FILE HAD INVALID FORMAT");
+		prefText = prefText.trim();
+		if (prefText.startsWith("(")) {
+			Debug.error("not using old SExpr user preferences file (it will be overwritten on exit!)");
 			return;
 		}
 		
-		//Logger.println(prefs.print());
-		
-		SExpr staticPrefs = prefs.find(STATIC_PREFS_KEY);
-		staticPrefs = staticPrefs.exists() ? staticPrefs : prefs;
-		readStaticPrefs(staticPrefs);
-				
-		SExpr vp_se = prefs.find(ViewProfile.PROFILES_KEY);
-		if (vp_se.exists()) {
-			ViewProfile.setupProfiles(vp_se);
-		} else {
-			ViewProfile.setupProfiles(VIEW_PROFILE_NOT_FOUND);
+		JsonObject all = Json.parse(prefText).asObject();
+		if (!all.containsKey("#NBTOOL_USER_PREFS") ||
+				!(all.get(SharedConstants.LOG_TOPLEVEL_MAGIC_KEY()).asNumber().intValue() ==
+				ToolSettings.VERSION)) {
+			Debug.error("cannot use saved preferences at: %s", ToolSettings.USER_PREFERENCES_PATH);
+			Debug.error("using default values.");
+			return;
 		}
 		
-		SExpr ext_se = prefs.find(EXT_BOUNDS_KEY);
-		if (ext_se.exists()) {
-			for (int i = 1; i < ext_se.count(); ++i) {
-				SExpr item = ext_se.get(i);
-				String key = item.get(0).value();
-				ExtBounds eb = new ExtBounds(item.get(1));
-				
-				//Logger.printf("****got %s from %s (%s)", eb, item.get(1).serialize(), key);
-				
-				BOUNDS_MAP.put(key, eb);
-			}
+		JsonObject internal = all.remove(INTERNAL_KEY).asObject();
+		JsonObject bounds = internal.remove(BOUNDS_KEY).asObject();
+		JsonArray addr = internal.remove(ADDR_KEY).asArray();
+		JsonArray load = internal.remove(LOAD_KEY).asArray();
+		
+		for (Entry<JsonString, JsonValue> entry : bounds.entrySet()) {
+			BOUNDS_MAP.put(entry.getKey().value, new DisplaySettings(entry.getValue()));
 		}
 		
-		SExpr msc_se = prefs.find(MISC_KEY);
-		if (msc_se.exists()) {
-			for (int i = 1; i < msc_se.count(); ++i) {
-				SExpr item = ext_se.get(i);
-				String key = item.get(0).value();
-				
-				MISC_MAP.put(key, item.get(1));
-			}
-		}
-	}
-	
-	private static final SExpr VIEW_PROFILE_NOT_FOUND = SExpr.list(SExpr.atom(ViewProfile.PROFILES_KEY));
-	
-	private static void readStaticPrefs(SExpr staticPrefs) {
-		if (staticPrefs.find("bounds").exists()) {
-			SExpr pnode = staticPrefs.find("bounds");
-			Rectangle nr = new Rectangle(pnode.get(1).valueAsInt(),
-					pnode.get(2).valueAsInt(),
-					pnode.get(3).valueAsInt(),
-					pnode.get(4).valueAsInt());
-			bounds = nr;
+		for (ListIterator<JsonValue> i = addr.listIterator(addr.size());
+				i.hasPrevious(); ) {
+			JsonValue val = i.previous();
+			addresses.update(val.asString().value);
 		}
 		
-		if (staticPrefs.find("split").exists()) {
-			SExpr pnode = staticPrefs.find("split");
-			leftSplitLoc = pnode.get(1).valueAsInt();
-			rightSplitLoc = pnode.get(2).valueAsInt();
+		for (ListIterator<JsonValue> i = load.listIterator(load.size());
+				i.hasPrevious(); ) {
+			JsonValue val = i.previous();
+			loadPathes.update(Paths.get(val.asString().value));
 		}
-
-		if (staticPrefs.find("addresses").exists()) {
-			SExpr pnode = staticPrefs.find("addresses");
-			LinkedList<String> nr = new LinkedList<String>();
-			for (int i = 1; i < pnode.count(); ++i) {
-				nr.add(pnode.get(i).value());
-			}
-
-			addresses = nr;
-		}
-
-		if (staticPrefs.find("filepaths").exists()) {
-			SExpr pnode = staticPrefs.find("filepaths");
-			LinkedList<String> nr = new LinkedList<String>();
-			for (int i = 1; i < pnode.count(); ++i) {
-				nr.add(pnode.get(i).value());
-			}
-
-			filepaths = nr;
-		}
-
-		if (staticPrefs.find("logLevel").exists()) {
-			SExpr pnode = staticPrefs.find("logLevel");
-			logLevel = Debug.LogLevel.valueOf(pnode.get(1).value());
+		
+		logLevel = Debug.LogLevel.valueOf(internal.get(LL_KEY).asString().value);
+		
+		String vpString = internal.get(ViewProfile.PROFILES_KEY).asString().value;
+		SExpr vpSex = SExpr.deserializeFrom(vpString);
+		ViewProfile.setupProfiles(vpSex);
+		
+		for (Entry<JsonString, JsonValue> entry : all.entrySet()) {
+			PREFERENCES.put(entry.getKey().value, entry.getValue());
 		}
 	}
 }

@@ -10,10 +10,11 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import nbtool.data.SessionMaster;
-import nbtool.data.ToolStats;
-import nbtool.gui.Display;
-import nbtool.io.CrossIO;
+import nbtool.data.ViewProfile;
+import nbtool.data.json.JsonParser.JsonParseException;
+import nbtool.gui.Displays;
+import nbtool.gui.GlobalKeyBind;
+import nbtool.gui.ToolDisplayHandler;
 import nbtool.util.Center;
 import nbtool.util.ClassFinder;
 import nbtool.util.Debug;
@@ -27,7 +28,7 @@ public class NBTool_v8 {
 	
 	public static void main(String[] args) {
 		
-		if (!Display.class.desiredAssertionStatus()) {
+		if (!NBTool_v8.class.desiredAssertionStatus()) {
 			System.out.println("nbtool should always be run with assertions ON (vm argument -ea)");
 			System.out.println("if you want to disable this, you'll have to edit the source code.");
 			return;
@@ -52,18 +53,15 @@ public class NBTool_v8 {
 			}
 		}
 		
-		Debug.print("Finding required static initialization methods...");
-		ClassFinder.callAllInstancesOfStaticMethod(ToolSettings.staticRequiredStartMethodName);
-		Debug.print("Static init done.");
-				
-		Debug.info("Generating Center instance..."); Center.startCenter();
-		System.out.println("Generating ToolStats instance: " + ToolStats.INST.toString());
-		System.out.println("Generating SessionMaster instance: " + SessionMaster.get().toString());
-		System.out.println("Generating CrossServer instance ...");
-		CrossIO.startCrossServer();
+		//Very likely other portions of the code will register listeners, so
+		//manually start the center first.
+		Debug.warn("Generating Center instance..."); Center.startCenter();
 		
+		ViewProfile.findAllViews();
+		
+		//Same with preferences...
 		try {
-			Debug.info("loading preferences...");
+			Debug.warn("loading preferences...");
 			UserSettings.loadPreferences();
 			Debug.level = UserSettings.logLevel;
 		} catch (ClassNotFoundException e) {
@@ -72,7 +70,18 @@ public class NBTool_v8 {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+			return;
 		}
+		
+		Debug.print("Finding required static initialization methods...");
+		ClassFinder.callAllInstancesOfStaticMethod(ToolSettings.staticRequiredStartMethodName);
+		Debug.print("Static init done.");
+		
+		
+		
+		GlobalKeyBind.setupKeyBinds();
 		
 		SwingUtilities.invokeLater(new Runnable(){
 
@@ -110,8 +119,10 @@ public class NBTool_v8 {
 				}
 				
 				Debug.info( "Creating Display instance...");
-				@SuppressWarnings("unused")
-				final Display disp = new Display();
+				Displays.requestAnotherDisplay();
+				
+				Debug.dbreak(" <tool init done>");
+				Debug.lbreak();
 			}
 			
 		});

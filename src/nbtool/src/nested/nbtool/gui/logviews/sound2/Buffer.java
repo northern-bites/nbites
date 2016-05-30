@@ -1,6 +1,6 @@
 package nbtool.gui.logviews.sound2;
 
-import nbtool.data._log._Log;
+import nbtool.data.log.Log;
 
 public abstract class Buffer<T extends Number> {
 	public int frames;
@@ -8,6 +8,6 @@ public abstract class Buffer<T extends Number> {
 	
 	public abstract T get(int i, int c);
 	
-	public abstract void parse(_Log soundLog);
-	public abstract _Log toLog();	
+	public abstract void parse(Log soundLog);
+	public abstract Log toLog();	
 }

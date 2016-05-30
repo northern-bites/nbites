@@ -3,7 +3,6 @@
 //  tool8-separate
 //
 //  Created by Philip Koch on 4/7/16.
-//  Copyright © 2016 pkoch. All rights reserved.
 //
 
 #ifndef Filesystem_hpp
@@ -25,7 +24,7 @@ namespace nbl {
         class Filelogger : public Threadable {
             LogProvider& provider;
         public:
-            Filelogger(LogProvider& p) :
+            Filelogger(LogProvider& p) : Threadable(),
                 provider(p) {}
             void threadLoop();
         };

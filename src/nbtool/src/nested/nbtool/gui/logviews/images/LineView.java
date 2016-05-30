@@ -13,20 +13,23 @@ import java.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 
-import nbtool.util.Debug;
 import nbtool.data.SExpr;
-import nbtool.data._log._Log;
+import nbtool.data.log.Block;
+import nbtool.data.log.Log;
 import nbtool.gui.logviews.misc.ViewParent;
+import nbtool.gui.logviews.misc.VisionView;
 import nbtool.images.EdgeImage;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
-import nbtool.io.CrossIO;
-import nbtool.io.CrossIO.CrossFunc;
-import nbtool.io.CrossIO.CrossInstance;
-import nbtool.io.CrossIO.CrossCall;
+import nbtool.nio.CrossServer;
+import nbtool.nio.CrossServer.CrossInstance;
+import nbtool.util.Debug;
+import nbtool.util.SharedConstants;
 import nbtool.util.Utility;
 
-public class LineView extends ViewParent implements IOFirstResponder {
+public class LineView extends VisionView {
+	
+	private static final Debug.DebugSettings debug = Debug.createSettings(true, true, true, null, null);
     
     int width;
     int height;
@@ -65,40 +68,14 @@ public class LineView extends ViewParent implements IOFirstResponder {
     BufferedImage edgeImage;
     Vector<Double> lines;
     Vector<Double> ccPoints;
-
-
+    
     @Override
-    public void setLog(_Log newlog) {
-        CrossInstance ci = CrossIO.instanceByIndex(0);
-        if (ci == null)
-            return;
-        CrossFunc func = ci.functionWithName("Vision");
-        assert(func != null);
-        
-        CrossCall cc = new CrossCall(this, func, newlog);
+	protected void setupVisionDisplay() {
+    	width = this.originalWidth();
+        height = this.originalHeight();
 
-        assert(ci.tryAddCall(cc));
-
-        Vector<SExpr> vec = newlog.tree().recursiveFind("width");
-        if (vec.size() > 0) {
-            SExpr w = vec.get(vec.size()-1);
-            width =  w.get(1).valueAsInt() / 2;
-        } else {
-            System.out.printf("COULD NOT READ WIDTH FROM LOG DESC\n");
-            width = 320;
-        }
-
-        vec = newlog.tree().recursiveFind("height");
-        if (vec.size() > 0) {
-            SExpr h = vec.get(vec.size()-1);
-            height = h.get(1).valueAsInt() / 2;
-        } else {
-            System.out.printf("COULD NOT READ HEIGHT FROM LOG DESC\n");
-            height = 240;
-        }
-
-        displayw = width*2;
-        displayh = height*2;
+        displayw = width;
+        displayh = height;
 
         fx0 = displayw + buffer;
         fy0 = 0;
@@ -106,9 +83,9 @@ public class LineView extends ViewParent implements IOFirstResponder {
         fxc = displayw + buffer + fieldw/2; 
         fyc = fieldh;
 
-        originalImage = Utility.biFromLog(newlog);
-    }
-    
+        originalImage = this.getOriginal().toBufferedImage();
+	}
+
     public void paintComponent(Graphics g) {
         if (edgeImage != null) { 
             g.drawImage(originalImage, 0, 0, displayw, displayh, null);
@@ -326,53 +303,66 @@ public class LineView extends ViewParent implements IOFirstResponder {
     public void ioFinished(IOInstance instance) {}
 
     @Override
-    public void ioReceived(IOInstance inst, int ret, _Log... out) {
-        EdgeImage ei = new EdgeImage(width, height,  out[5].bytes);
-        edgeImage = ei.toBufferedImage();
-        repaint();
+    public void ioReceived(IOInstance inst, int ret, Log... out) {
+    	assert(out[0] == latestVisionLog);
+    	
+    	Block edgeBlock, lineBlock, ccdBlock;
+    	edgeBlock = this.getEdgeBlock();
+    	if (edgeBlock != null) {
+    		debug.info("found edgeBlock");
+    		EdgeImage ei = new EdgeImage(width, height,  edgeBlock.data);
+            edgeImage = ei.toBufferedImage();
+    	}
 
-        // TODO refactor. Protobuff?
+        // TODO refactor. Protobuf?
         lines = new Vector<Double>();
-        byte[] lineBytes = out[6].bytes;
-        int numLines = lineBytes.length / (9 * 8);
-        Debug.info( "%d field lines expected.", numLines);
-        try {
-            DataInputStream dis = new DataInputStream(new ByteArrayInputStream(lineBytes));
-            for (int i = 0; i < numLines; ++i) {
-                lines.add(dis.readDouble()); // image coord r
-                lines.add(dis.readDouble()); // image coord t
-                lines.add(dis.readDouble()); // image coord ep0
-                lines.add(dis.readDouble()); // image coord ep1
-                lines.add((double)dis.readInt()); // hough index
-                lines.add((double)dis.readInt()); // fieldline index
-                lines.add(dis.readDouble()); // field coord r
-                lines.add(dis.readDouble()); // field coord t
-                lines.add(dis.readDouble()); // field coord ep0
-                lines.add(dis.readDouble()); // field coord ep1
+        
+        lineBlock = this.getLineBlock();
+        if (lineBlock != null) {
+    		debug.info("found lineBlock");
+
+        	byte[] lineBytes = lineBlock.data;
+            int numLines = lineBytes.length / (9 * 8);
+            Debug.info("%d field lines expected.", numLines);
+            try {
+                DataInputStream dis = new DataInputStream(new ByteArrayInputStream(lineBytes));
+                for (int i = 0; i < numLines; ++i) {
+                    lines.add(dis.readDouble()); // image coord r
+                    lines.add(dis.readDouble()); // image coord t
+                    lines.add(dis.readDouble()); // image coord ep0
+                    lines.add(dis.readDouble()); // image coord ep1
+                    lines.add((double)dis.readInt()); // hough index
+                    lines.add((double)dis.readInt()); // fieldline index
+                    lines.add(dis.readDouble()); // field coord r
+                    lines.add(dis.readDouble()); // field coord t
+                    lines.add(dis.readDouble()); // field coord ep0
+                    lines.add(dis.readDouble()); // field coord ep1
+                }
+            } catch (Exception e) {
+                Debug.error("Conversion from bytes to hough coord lines in LineView failed.");
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            Debug.error( "Conversion from bytes to hough coord lines in LineView failed.");
-            e.printStackTrace();
         }
+        
+        
 
         ccPoints = new Vector<Double>();
-        byte[] pointBytes = out[8].bytes;
-        int numPoints = pointBytes.length / (2 * 8);
-        Debug.info( "%d center circle potential centers expected.", numPoints - 1);
-        try {
-            DataInputStream dis = new DataInputStream(new ByteArrayInputStream(pointBytes));
-            for (int i = 0; i < numPoints; i ++) {
-                ccPoints.add(dis.readDouble()); // X coordinate
-                ccPoints.add(dis.readDouble()); // Y coodinrate
+        ccdBlock = this.getCCDBlock();
+        if (ccdBlock != null) {
+        	int numPoints = ccdBlock.data.length / (2 * 8);
+            debug.info("%d center circle potential centers expected.", numPoints - 1);
+            try {
+                DataInputStream dis = new DataInputStream(new ByteArrayInputStream(ccdBlock.data));
+                for (int i = 0; i < numPoints; i ++) {
+                    ccPoints.add(dis.readDouble()); // X coordinate
+                    ccPoints.add(dis.readDouble()); // Y coodinrate
+                }
+            } catch (Exception e) {
+                debug.error("Conversion from bytes to center circ points in LineView failed.");
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            Debug.error( "Conversion from bytes to center circ points in LineView failed.");
-            e.printStackTrace();
         }
-    }
-
-    @Override
-    public boolean ioMayRespondOnCenterThread(IOInstance inst) {
-        return false;
+                
+        repaint();
     }
 }

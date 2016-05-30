@@ -17,7 +17,7 @@
 namespace nbl {
     namespace network {
 
-        SocketMaster::SocketMaster(int port) :
+        SocketMaster::SocketMaster(int port) : Threadable(),
             server(-1), client(-1), clientIndex(0), connected(false)
         {
 
@@ -188,7 +188,7 @@ namespace nbl {
 
                     if (recvd) {
 
-                        if (recvd->logClass == CONSTANTS.LogClass_Null()) {
+                        if (recvd->logClass == SharedConstants::LogClass_Null()) {
                             NBL_INFO("Controller::threadLoop() got heartbeat %d", recvd->createdWhen);
                         } else {
                             NBL_INFO( "Controller::threadLoop() got log of type: %s", recvd->logClass.c_str());

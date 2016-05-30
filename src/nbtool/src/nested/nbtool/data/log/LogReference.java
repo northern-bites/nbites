@@ -25,10 +25,12 @@ import nbtool.util.test.Tests;
 import nbtool.util.Debug.DebugSettings;
 import nbtool.util.SharedConstants;
 
+import nbtool.data.group.*;
+
 public class LogReference {
 	
 	private static final DebugSettings debug =
-			new DebugSettings(true, true, true, Debug.INFO, null);
+			new DebugSettings(true, true, true, Debug.WARN, null);
 	
 	private static final Path TEMP_DIR = getTempDir();
 	
@@ -96,18 +98,21 @@ public class LogReference {
 	private WeakReference<Log> theLog = null;
 	private Path tempPath = null;
 	private Path loadPath = null;
-		
+	public Group container = null;
+	
 	public synchronized Log get() {
 		if (theLog != null) {
 			Log cur = theLog.get();
-			if (cur != null)
+			if (cur != null) {
+				assert(cur.logReference == this);
 				return cur;
-			else {
+			} else {
 				theLog = null;
 			}
 		}
 		
-		assert(tempPath != null && Files.exists(tempPath));
+		assert(tempPath != null);
+		assert(Files.exists(tempPath));
 		
 		Log ret = null;
 		try {
@@ -121,6 +126,7 @@ public class LogReference {
 		assert(!manages(ret));
 		this.savedID = ret.jvm_unique_id;
 		updateInternal(ret);
+		ret.logReference = this;
 		
 		theLog = new WeakReference<>(ret);
 		return ret;
@@ -128,7 +134,13 @@ public class LogReference {
 	
 	public synchronized void copyLogToPath(Path newFile) {
 		Log refered = get();
-		FileIO.queueWrite(newFile, refered.serialize());
+
+		if (Files.isDirectory(newFile)) {
+			Path actual = newFile.resolve(tempPath.getFileName());
+			FileIO.queueWriteTask(actual, refered.serialize());
+		} else {
+			FileIO.queueWriteTask(newFile, refered.serialize());
+		}	
 	}
 	
 	public synchronized void pushToTempFileNow(Log same) throws IOException {
@@ -158,7 +170,7 @@ public class LogReference {
 		assert(theLog != null && theLog.get() == same);
 		
 		updateInternal(same);
-		FileIO.queueWrite(tempPath, same.serialize());
+		FileIO.queueWriteTask(tempPath, same.serialize());
 	}
 	
 	public synchronized void pushToLoadFile(Log same) {
@@ -172,7 +184,7 @@ public class LogReference {
 		}
 		
 		pushToTempFile(same);
-		FileIO.queueWrite(loadPath, same.serialize());
+		FileIO.queueWriteTask(loadPath, same.serialize());
 	}
 	
 	public boolean temporary() {
@@ -190,6 +202,21 @@ public class LogReference {
 		theLog = new WeakReference<>(makeFrom);
 	}
 	
+	private static class InitTask extends FileIO.Task {
+		private Log log;
+		protected InitTask(Path path, Log log) {
+			super(path, null);
+			this.log = log;
+		}
+		
+		@Override
+		public void executeWrite() throws IOException {
+			Files.createFile(path);
+			FileIO.writeLogToPath(path, log);
+			this.log = null;
+		}
+	}
+	
 	private void initializeTemp() {
 		String tempName = String.format("temp_log_id%d_u%s.nblog",
 				this.savedID, Utility.getRandomHexString(10));
@@ -199,22 +226,24 @@ public class LogReference {
 		Log ourLog = null;
 		assert(theLog != null && (ourLog = theLog.get()) != null);
 		
-		try {
-			Files.createFile(tempPath);
-			FileIO.writeLogToPath(tempPath, ourLog);
-									
-		} catch (IOException e) {
-			e.printStackTrace();
-			debug.error("could not generate temp file{%s}: %s", tempPath.toString(), e.getMessage());
-			throw new RuntimeException(String.format("could not generate temp file: %s", e.getMessage()));
-		}
+		FileIO.addTaskToQueue(new InitTask(tempPath, ourLog));
 		
-		assert(Files.exists(tempPath));
+//		try {
+//			Files.createFile(tempPath);
+//			FileIO.writeLogToPath(tempPath, ourLog);
+//									
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			debug.error("could not generate temp file{%s}: %s", tempPath.toString(), e.getMessage());
+//			throw new RuntimeException(String.format("could not generate temp file: %s", e.getMessage()));
+//		}
+		
+//		assert(Files.exists(tempPath));
 	}
 	
 	public static LogReference referenceFromFile(Path readFrom) throws IOException {
-		
 		assert(Files.exists(readFrom));
+		
 		Log read = FileIO.readLogFromPath(readFrom);
 		if (read == null) {
 			debug.error("could not parse log from %s", readFrom);
@@ -225,14 +254,19 @@ public class LogReference {
 		ref.initializeTemp();
 		ref.loadPath = readFrom;
 		
+		read.logReference = ref;
+		
 		return ref;
 	}
 	
 	public static LogReference referenceFromLog(Log log) {
+		assert(log.getReference() == null);
 		
 		LogReference ref = new LogReference(log);
 		ref.initializeTemp();
 		ref.loadPath = null;
+		
+		log.logReference = ref;
 		
 		return ref;
 	}
@@ -246,6 +280,17 @@ public class LogReference {
 		this.host_name = from.host_name;
 		this.host_addr = from.host_addr;
 		this.description = from.getFullDescription();
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("LogReference(of:%d, temp@%s, load@%s ())",
+				savedID, tempPath, loadPath, temporary() ? "TEMP" : "PERM");
+	}
+	
+	public String guiString() {
+		return String.format("log %d: %s from %s@%s time %d %s", 
+				savedID, logClass, host_name, host_addr, createdWhen, temporary() ? "TEMP" : "LOAD"); 
 	}
 	
 	public static void _NBL_ADD_TESTS_() {

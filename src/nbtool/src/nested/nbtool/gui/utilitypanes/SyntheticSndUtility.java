@@ -9,10 +9,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import nbtool.data.SExpr;
-import nbtool.data.Session;
-import nbtool.data.SessionMaster;
-import nbtool.data._log._Log;
-import nbtool.gui.logviews.sound2.ShortBuffer;
 import nbtool.gui.logviews.sound2.Target;
 import nbtool.util.Events;
 import nbtool.util.Debug;
@@ -40,10 +36,8 @@ public class SyntheticSndUtility extends UtilityParent {
 	}
 	
 	private class Snd_Frame extends JFrame implements ActionListener {
-		private Session generated = null;
 		public Snd_Frame() {
 			super("snd maker!");
-			generated = SessionMaster.get().requestSession("synth-sound");
 			
 			JButton b = new JButton("new");
 			b.addActionListener(this);
@@ -65,13 +59,14 @@ public class SyntheticSndUtility extends UtilityParent {
 				bb.putShort((short) t1.sin(i));
 			}
 			
-			_Log newSound = _Log.logWithTypePlus("sound", bb.array(), 
-					SExpr.pair("channels", 2),
-					SExpr.pair("frames", nframes),
-					SExpr.pair("rate", 16000)
-					);
-			generated.addLog(newSound, true);
-			Events.GLogsFound.generate(this, newSound);
+//			_Log newSound = _Log.logWithTypePlus("sound", bb.array(), 
+//					SExpr.pair("channels", 2),
+//					SExpr.pair("frames", nframes),
+//					SExpr.pair("rate", 16000)
+//					);
+//			generated.addLog(newSound, true);
+//			Events.GLogsFound.generate(this, newSound);
+			Debug.notRefactored();
 		}
 	}
 }

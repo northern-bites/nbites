@@ -3,7 +3,6 @@
 //  tool8-separate
 //
 //  Created by Philip Koch on 4/14/16.
-//  Copyright © 2016 pkoch. All rights reserved.
 //
 
 #include "Control.hpp"
@@ -13,16 +12,16 @@ using namespace nbl::rpc;
 
 namespace control {
 
+    RPC_MAKE_FUNCTION_GROUP_VISIBLE(Control)
 
     ControlHandler::ControlHandler() {
-        mapfromFunctions(map, setupControlFunctions());
-
+        mapfromFunctions(map, getControlVector());
         set(flags::logToStream, true);
     }
 
     void ControlHandler::consumeLog(nbl::logptr ptrTo) {
 
-        RPCFunctionPtr fptr = functionFromMap(map, ptrTo);
+        RPCFunctionBase * fptr = functionFromMap(map, ptrTo);
         if (!IS_PTR_VALID(fptr)) {
             NBL_ERROR("ControlHandler::consumeLog() cannot use log: %s",
                       ptrTo->logClass.c_str()
@@ -77,7 +76,9 @@ namespace control {
     }
 
     const char * stringFor( flags::flag_e f) {
-        return flags::string_flags[f];
+        if (f < flags::num_flags)
+            return flags::string_flags[f];
+        else return "INVALID FLAG INDEX";
     }
 
 }
