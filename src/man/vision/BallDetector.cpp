@@ -452,6 +452,7 @@ bool BallDetector::findCorrelatedBlackSpots
                     // grab this blob from our vector
                     foundThree = true;
                     std::cout << "Found correlated, punting for now" << std::endl;
+
                     /*Blob newBall = actualBlobs[i];
                     // find our correlated blobs and merge them in
                     for (int k = 0; k < blackBlobs.size(); k++) {
@@ -474,6 +475,47 @@ bool BallDetector::findCorrelatedBlackSpots
     for (int c = 0; c < blackBlobs.size(); c++) {
         if ((correlations[c] > 1 || (correlations[c] == 1 && !topCamera))
 			 && !foundThree) {
+            std::vector<Spot> correlatedSpots;
+            for (int k = 0; k < blackBlobs.size(); k++) {
+                if(correlatedTo[c][k] == 1) {
+                    correlatedSpots.push_back(actualBlobs[k]);
+                    correlatedTo[k][c] = 0;
+                    correlations[k] -= 1;
+                }
+            }
+            correlatedSpots.push_back(actualBlobs[c]);
+            std::cout<<"Correlated Spots Size: "<<correlatedSpots.size()<<std::endl;
+            if(correlatedSpots.size() == 2) { //lets check the distance here
+                Spot s1 = correlatedSpots[0];
+                Spot s2 = correlatedSpots[1];
+
+                double s1wx, s1wy, s2wx, s2wy;
+                homography->fieldCoords(s1.ix(),s1.iy(), s1wx, s1wy);
+                homography->fieldCoords(s2.ix(),s2.iy(), s2wx, s2wy);
+                double distance;
+                distance = sqrt(pow((s2wx - s1wx),2) + pow((s2wy - s1wy),2));
+                std::cout<<"Distance: "<<distance<<std::endl;
+
+                if(distance > 6.0 || distance < 7.1) {
+                    std::cout<<"Returning True. Distance is in the right range"<<std::endl;
+                    return true;
+                }
+            } else if(correlatedSpots.size() == 3) {
+                Spot s1 = correlatedSpots[0];
+                Spot s2 = correlatedSpots[1];
+                Spot s3 = correlatedSpots[2];
+
+                double s1wx, s1wy, s2wx, s2wy, s3wx, s3wy;
+                homography->fieldCoords(s1.ix(),s1.iy(), s1wx, s1wy);
+                homography->fieldCoords(s2.ix(),s2.iy(), s2wx, s2wy);
+                homography->fieldCoords(s3.ix(),s3.iy(), s3wx, s3wy);
+
+                double area = abs((s1wx*(s2wy-s3wy) + s2wx*(s3wy-s1wy) + s3wx*(s1wy-s2wy))/2);
+                std::cout<<"Area: "<<area<<std::endl;
+
+            }
+
+
             // good candidate ball
             /*Blob newBall = actualBlobs[c];
             for (int k = 0; k < blackBlobs.size(); k++) {
