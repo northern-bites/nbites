@@ -6,6 +6,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -15,6 +24,7 @@ import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.table.DefaultTableModel;
 
+import nbtool.data.SExpr;
 import nbtool.data.group.AllGroups;
 import nbtool.data.group.Group;
 import nbtool.data.log.Log;
@@ -115,8 +125,24 @@ public class CameraOffsetsUtility extends UtilityParent {
 			}
 			
 			if (row != null) {
-				//....
-				//TODO
+				int successes = out[0].topLevelDictionary.get("CalibrationNumSuccess").asNumber().asInt();
+				double droll = out[0].topLevelDictionary.get("CalibrationDeltaTilt").asNumber().asDouble();
+				double dtilt = out[0].topLevelDictionary.get("CalibrationDeltaRoll").asNumber().asDouble();
+				
+				row.used = successes;
+				
+				if (successes >= 7) {
+					row.status = true;
+					row.d_roll = droll;
+					row.d_tilt = dtilt;
+				} else {
+					row.status = false;
+					row.d_roll = Double.NaN;
+					row.d_tilt = Double.NaN;
+				}
+				
+				if (display != null)
+					display.model.reDisplay();
 			}
 		}
 
@@ -187,9 +213,11 @@ public class CameraOffsetsUtility extends UtilityParent {
 				int j = i - topNames.length;
 				rows[i].top = false;
 				rows[i].name = botNames[j];
+				rows[i].given = found_bot.get(rows[i].name).size();
 			} else {
 				rows[i].top = true;
 				rows[i].name = topNames[i];
+				rows[i].given = found_top.get(rows[i].name).size();
 			}
 		}
 		
@@ -234,8 +262,64 @@ public class CameraOffsetsUtility extends UtilityParent {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					
+					Debug.plain("saving parameters...");
+					String filePath = System.getenv().get("NBITES_DIR");
+		            filePath += "/src/man/config/calibrationParams.txt";
+		            Path configPath = Paths.get(filePath);
+		            assert(Files.exists(configPath) && Files.isRegularFile(configPath));
+		            
+		            SExpr config = null;
+		            
+		            try {
+		            	String contents = new String(Files.readAllBytes(configPath));
+		            	config = SExpr.deserializeFrom(contents);
+		            } catch (IOException ie) {
+		            	ie.printStackTrace();
+		            	Debug.error("IOException: %s", ie.getMessage());
+		            	ToolMessage.displayError("error reading src/man/config/CalibrationParams.txt !");
+		            	return;
+		            }
+		            
+		            assert(config != null);
+		            
+		            if (rows == null) {
+		            	ToolMessage.displayError("calculate offsets before saving!");
+		            	return;
+		            }
+		            
+		            for (Row r : rows) {
+		            	if (r != null) {
+		            		if (!r.status) { 
+		            			Debug.info("%s %s failed.", r.name, r.getCamera());
+		            			continue;
+		            		}
+		            		
+		            		Debug.info("replacing offsets for: %s %s", r.name, r.getCamera());
+		            		
+		            		SExpr list = config.get(1);
+		            		SExpr line = list.find(r.name);
+		            		assert(line.exists());
+		            		
+		            		String cameraString = r.top ? "TOP" : "BOT";
+		   
+		            		SExpr part = line.find(cameraString);
+		            		assert(part.exists());
+		            		assert(part.get(0).value().equals(cameraString));
+		            		
+		            		String repString = String.format("(%s %f %f)", 
+		            				cameraString, r.d_roll, r.d_tilt);
+		            		SExpr repSp = SExpr.deserializeFrom(repString);
+		            		
+		            		line.replace(part, repSp);
+		            	}
+		            }
+		            
+		            try {
+						Files.write(configPath, config.print().getBytes(StandardCharsets.UTF_8));
+					} catch (IOException e1) {
+						e1.printStackTrace();
+						ToolMessage.displayError("couldn't write to config file: %s", e1.getMessage());
+					}
 				}
 				
 			});
@@ -244,8 +328,8 @@ public class CameraOffsetsUtility extends UtilityParent {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					
+					//TODO do
+					Debug.notRefactored();
 				}
 				
 			});

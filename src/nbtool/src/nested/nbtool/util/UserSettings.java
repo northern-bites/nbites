@@ -57,6 +57,8 @@ public class UserSettings {
 	private static final String LOAD_KEY = "__LOADPATHS__";
 	private static final String LL_KEY = "__LOGLEVEL__";
 	
+	public static final String PROFILES_KEY = "__PROFILES__";
+	
 	public static class DisplaySettings {
 		public Rectangle bounds = null;
 		public ViewProfile profile = null;
@@ -154,8 +156,7 @@ public class UserSettings {
 		
 		internal.put(LL_KEY, logLevel.name());
 		
-		String vpString = ViewProfile.makeProfilesSExpr().serialize();
-		internal.put(ViewProfile.PROFILES_KEY, vpString);
+		internal.put(PROFILES_KEY, ViewProfile.serializeProfiles());
 		
 		object.put(INTERNAL_KEY, internal);
 		
@@ -173,6 +174,8 @@ public class UserSettings {
 		
 		if (!Files.exists(ToolSettings.USER_PREFERENCES_PATH)) {
 			Debug.error("preferences file not found!");
+			ViewProfile.setupProfiles(null);
+			
 			return;
 		}
 		
@@ -181,6 +184,8 @@ public class UserSettings {
 		prefText = prefText.trim();
 		if (prefText.startsWith("(")) {
 			Debug.error("not using old SExpr user preferences file (it will be overwritten on exit!)");
+			ViewProfile.setupProfiles(null);
+			
 			return;
 		}
 		
@@ -190,8 +195,12 @@ public class UserSettings {
 				ToolSettings.VERSION)) {
 			Debug.error("cannot use saved preferences at: %s", ToolSettings.USER_PREFERENCES_PATH);
 			Debug.error("using default values.");
+			
+			ViewProfile.setupProfiles(null);
 			return;
 		}
+		
+		Debug.print("preferences format accepted.");
 		
 		JsonObject internal = all.remove(INTERNAL_KEY).asObject();
 		JsonObject bounds = internal.remove(BOUNDS_KEY).asObject();
@@ -216,9 +225,12 @@ public class UserSettings {
 		
 		logLevel = Debug.LogLevel.valueOf(internal.get(LL_KEY).asString().value);
 		
-		String vpString = internal.get(ViewProfile.PROFILES_KEY).asString().value;
-		SExpr vpSex = SExpr.deserializeFrom(vpString);
-		ViewProfile.setupProfiles(vpSex);
+		if (internal.get(PROFILES_KEY).type() == Json.JsonValueType.STRING) {
+			Debug.warn("ha! you used tool8 before it was stable... sorry, your profiles do not transfer.");
+			ViewProfile.setupProfiles(null);
+		} else {
+			ViewProfile.setupProfiles(internal.get(PROFILES_KEY).asObject());
+		}
 		
 		for (Entry<JsonString, JsonValue> entry : all.entrySet()) {
 			PREFERENCES.put(entry.getKey().value, entry.getValue());

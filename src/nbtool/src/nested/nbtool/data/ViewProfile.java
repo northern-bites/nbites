@@ -11,8 +11,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import nbtool.data.json.Json;
+import nbtool.data.json.Json.JsonValue;
 import nbtool.data.json.JsonArray;
 import nbtool.data.json.JsonObject;
+import nbtool.data.json.JsonString;
 import nbtool.data.log.Log;
 import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.util.ClassFinder;
@@ -20,14 +22,83 @@ import nbtool.util.Debug;
 import nbtool.util.ToolSettings;
 
 public class ViewProfile {
-	public static final String PROFILES_KEY = "__PROFILES__";
+	
+	/**********  ViewProfile instance methods & constructors*/
+	
+	public String name = null;
+	public ViewState[][] states = null;
+
+	public ViewProfile(String n) {
+		assert(n != null && !n.isEmpty());
+
+		this.name = n;
+		this.states = new ViewState[TYPES.length][];
+	}	
+	
+	@SuppressWarnings("unchecked")
+	public Class<? extends ViewParent>[] selected(String type) {
+		int tindex = Arrays.asList(TYPES).indexOf(type);
+		
+		ArrayList<Class<? extends ViewParent>> sel = new ArrayList<>();
+		for (ViewState vs : states[tindex]) {
+			if (vs.showing)
+				sel.add(vs.viewClass);
+		}
+		
+		return sel.toArray(new Class[sel.size()]);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Class<? extends ViewParent>[] viewsForLog(Log log) {
+		ArrayList<Class<? extends ViewParent>> views = new ArrayList<Class<? extends ViewParent>>();
+		String ptype = log.logClass;
+		assert(ptype != null);
+
+		int tindex = Arrays.asList(TYPES).indexOf(ptype);
+		if (tindex >= 0) {
+			for (ViewState vs : states[tindex]) {
+				if (vs.showing)
+					views.add(vs.viewClass);
+			}
+		}
+//
+//		if (ptype.startsWith("proto-")) {
+//			views.addAll(Arrays.asList(this.selected(ToolSettings.PROTOBUF_S)));
+//		}
+		
+		views.addAll(Arrays.asList(this.selected(ToolSettings.DEFAULT_S)));
+		
+		Debug.info("LogToViewUtility found %d views for log of type %s.", views.size(), ptype);
+		return views.toArray(new Class[views.size()]);		
+	}
+	
+	@Override
+	public String toString() {
+		return name;
+	}
+	
+	public static class ViewState {
+		public boolean showing;
+		public Class<? extends ViewParent> viewClass;
+		
+		ViewState(boolean s, Class<? extends ViewParent> cls) {
+			showing = s;
+			viewClass = cls;
+		}
+		
+		public String toString() {
+			return viewClass.getName();
+		}
+	}
+	
+	/**********  ViewProfile static methods & setup*/
+	
 	public static final String DEFAULT_PROFILE_NAME = "DEFAULT";
 	public static ViewProfile DEFAULT_PROFILE = null;
+	
 	public static final Map<String, ViewProfile> PROFILES = new HashMap<>();
 	
-	
-	/*static*/
-	public static ViewProfile makeDefault() {
+	private static ViewProfile makeDefaultProfile() {
 		ViewProfile def = new ViewProfile(DEFAULT_PROFILE_NAME);
 		
 		for (int j = 0; j < TYPES.length; ++j) {
@@ -63,94 +134,19 @@ public class ViewProfile {
 		return nvp;
 	}
 	
-	/*instance*/
-	public String name;
-	public ViewProfile(String n) {
-		assert(n != null && !n.isEmpty());
-
-		this.name = n;
-		this.states = new ViewState[TYPES.length][];
-	}
-	
-	public ViewState[][] states = null;
-	
-	@SuppressWarnings("unchecked")
-	public Class<? extends ViewParent>[] selected(String type) {
-		int tindex = Arrays.asList(TYPES).indexOf(type);
-		
-		ArrayList<Class<? extends ViewParent>> sel = new ArrayList<Class<? extends ViewParent>>();
-		for (ViewState vs : states[tindex]) {
-			if (vs.showing)
-				sel.add(vs.viewClass);
-		}
-		
-		return sel.toArray(new Class[sel.size()]);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public Class<? extends ViewParent>[] viewsForLog(Log log) {
-		ArrayList<Class<? extends ViewParent>> views = new ArrayList<Class<? extends ViewParent>>();
-		String ptype = log.logClass;
-		assert(ptype != null);
-
-		int tindex = Arrays.asList(TYPES).indexOf(ptype);
-		if (tindex >= 0) {
-			for (ViewState vs : states[tindex]) {
-				if (vs.showing)
-					views.add(vs.viewClass);
-			}
-		}
-
-		if (ptype.startsWith("proto-")) {
-			views.addAll(Arrays.asList(this.selected(ToolSettings.PROTOBUF_S)));
-		}
-		
-		views.addAll(Arrays.asList(this.selected(ToolSettings.DEFAULT_S)));
-		
-		Debug.info("LogToViewUtility found %d views for log of type %s.", views.size(), ptype);
-		
-		return views.toArray(new Class[views.size()]);		
-	}
-	
-	@Override
-	public String toString() {
-		return name;
-	}
-	
-	/*
-	 * Helper classes and static methods.
-	 */
-	public static class ViewState {
-		public boolean showing;
-		public Class<? extends ViewParent> viewClass;
-		
-		ViewState(boolean s, Class<? extends ViewParent> cls) {
-			showing = s;
-			viewClass = cls;
-		}
-		
-		public String toString() {
-			return viewClass.getName();
-		}
-	}
-	
-	public static void setupProfiles(SExpr profiles) {
-		assert( profiles.isList() &&
-				profiles.get(0).isAtom() &&
-				profiles.get(0).value().equals(PROFILES_KEY));
-		
-		for (int pi = 1; pi < profiles.count(); ++pi) {
-			SExpr profile = profiles.get(pi);
-			String name = profile.get(0).value();
+	private static void _setup_(JsonObject profiles) {
+		for (Entry<JsonString, JsonValue> entry : profiles.entrySet()) {
+			String name = entry.getKey().value;
+			JsonObject viewMap = entry.getValue().asObject();
 			ViewProfile vp = new ViewProfile(name);
 			
 			for (int j = 0; j < TYPES.length; ++j) {
 				Class<? extends ViewParent>[] possible =
 						POSSIBLE_VIEWS.get(TYPES[j]);
 				
-				SExpr lshownSP = profile.find(TYPES[j]);
-				if (lshownSP.exists()) {
-					Class<? extends ViewParent>[] lshown = classValuesFrom(lshownSP);
+				JsonValue array = viewMap.get(TYPES[j]);
+				if (array != null) {
+					Class<? extends ViewParent>[] lshown = classValuesFrom(array.asArray());
 					vp.states[j] = resolve(possible, lshown);
 				} else {
 					vp.states[j] = resolve(possible, null);
@@ -159,9 +155,16 @@ public class ViewProfile {
 			
 			PROFILES.put(name, vp);
 		}
+	}
+	
+	public static void setupProfiles(JsonObject profiles) {
 		
+		if (profiles != null) {
+			_setup_(profiles);
+		}
+
 		if (!PROFILES.containsKey(DEFAULT_PROFILE_NAME)) {
-			PROFILES.put(DEFAULT_PROFILE_NAME, ViewProfile.makeDefault());
+			PROFILES.put(DEFAULT_PROFILE_NAME, ViewProfile.makeDefaultProfile());
 		}
 		
 		DEFAULT_PROFILE = PROFILES.get(DEFAULT_PROFILE_NAME);
@@ -169,17 +172,18 @@ public class ViewProfile {
 	
 	
 	@SuppressWarnings("unchecked")
-	public static Class<? extends ViewParent>[] classValuesFrom(SExpr s) {
+	/* where carray is an array of JsonStrings encoding class names */
+	public static Class<? extends ViewParent>[] classValuesFrom(JsonArray carray) {
 		ArrayList<Class<? extends ViewParent>> classes = 
 				new ArrayList<>();
 		
-		//Start after atom
-		for (int i = 1; i < s.count(); ++i) {
+		for (JsonValue val : carray) {
 			Class<? extends ViewParent> c = null;
 			try {
-				c = (Class<? extends ViewParent>) Class.forName(s.get(i).value());
+				c = (Class<? extends ViewParent>) Class.forName(val.asString().value);
 			} catch (Exception e) {
-				Debug.error( "_____ PREVIOUSLY LOADED CLASS COULD NOT BE FOUND! _____");
+				Debug.error( "_____ PREVIOUSLY LOADED CLASS COULD NOT BE FOUND { %s }! _____",
+						val.asString().value);
 				e.printStackTrace();
 			}
 			
@@ -222,36 +226,40 @@ public class ViewProfile {
 		return ret;
 	}
 	
-	public static SExpr makeProfilesSExpr() {
-		SExpr top = SExpr.list(SExpr.atom(PROFILES_KEY));
+	public static JsonObject serializeProfiles() {
 		
+		JsonObject allProfiles = Json.object();
+
 		for (Entry<String, ViewProfile> entry : PROFILES.entrySet()) {
 			assert(entry.getKey().equals(entry.getValue().name));
 			
 			ViewProfile vp = entry.getValue();
-			SExpr profile = SExpr.list( SExpr.atom(vp.name) );
-			
+			JsonObject vpO = Json.object();
+						
 			for (String type : TYPES) {
 				Class<? extends ViewParent>[] sel = vp.selected(type);
-				SExpr selse = SExpr.list(SExpr.atom(type));
+				
+				JsonArray carray = Json.array();
 				for (Class<? extends ViewParent> cls : sel) {
-					selse.append(SExpr.atom(cls.getName()));
+					carray.add(cls.getName());
 				}
 				
-				profile.append(selse);
+				vpO.put(type, carray);
 			}
 			
-			top.append(profile);
+			allProfiles.put(vp.name, vpO);
 		}
 		
-		return top;
+		return allProfiles;
 	}
 	
 	public static final Map<String, Class<? extends ViewParent>[]> POSSIBLE_VIEWS = 
 			new HashMap<String, Class<? extends ViewParent>[]>();
 			
-			public static String[] TYPES;
+	public static String[] TYPES;
 	
+	/* NOTE: not _NBL_REQUIRED_START_ because it is a dependency of many other components */
+	/* Called directly in terminal main() */
 	@SuppressWarnings("unchecked")
 	public static void findAllViews() {
 		Debug.warn("ViewProfile finding all subclasses of ViewParent");

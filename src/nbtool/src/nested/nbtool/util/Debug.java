@@ -136,6 +136,7 @@ public class Debug {
 	}
 	
 	public static class DebugSettings {
+				
 		public boolean useChecks;
 		public boolean useAsserts;
 		public boolean useColorOverride;

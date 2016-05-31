@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import javax.swing.JLabel;
+import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import nbtool.data.ViewProfile;
@@ -34,7 +35,7 @@ public class ToolDisplayTabs {
 
 	protected void setContents(ViewProfile profile, Log first, List<Log> also) {
 		Class<? extends ViewParent>[] list = profile.viewsForLog(first);
-		display.displayTabs.removeAll();
+//		display.displayTabs.removeAll();
 		
 		this.current = first;
 		
@@ -61,27 +62,33 @@ public class ToolDisplayTabs {
 				waitLabel.setFont(waitLabel.getFont().deriveFont(Font.BOLD));
 				waitLabel.setForeground(Color.BLUE);
 				
-				display.displayTabs.addTab(ttype.getSimpleName(), waitLabel);
-				CreateViewRunnable cvr = new CreateViewRunnable(waitLabel, ttype, first, also);
+//				display.displayTabs.addTab(ttype.getSimpleName(), waitLabel);
+				replace(i, ttype.getSimpleName(), ttype.getName(), waitLabel);
+				
+				CreateViewRunnable cvr = new CreateViewRunnable(i, ttype, first, also);
 				Thread thr = new Thread(cvr);
 				thr.start();
 			} else {
-				CreateViewRunnable cvr = new CreateViewRunnable(null, ttype, first, also);
+				CreateViewRunnable cvr = new CreateViewRunnable(i, ttype, first, also);
 				cvr.run();
 			}	
+		}
+		
+		for (int j = list.length; j < display.displayTabs.getTabCount(); ++j) {
+			display.displayTabs.remove(j);
 		}
 	}
 	
 	private final class CreateViewRunnable implements Runnable {
 		boolean ran = false;
-		Component standIn;
+		int showIndex;
 		Class<? extends ViewParent> vClass;
 		ViewParent created = null;
 		Log first;
 		List<Log> also;
 		
-		public CreateViewRunnable(Component standIn, Class<? extends ViewParent> vClass, Log first, List<Log> also) {
-			this.standIn = standIn;
+		public CreateViewRunnable(int showIndex, Class<? extends ViewParent> vClass, Log first, List<Log> also) {
+			this.showIndex = showIndex;
 			this.vClass = vClass;
 			this.first = first;
 			this.also = also;
@@ -99,13 +106,14 @@ public class ToolDisplayTabs {
 				return;
 			}
 			
-			int index = display.displayTabs.indexOfComponent(standIn);
-			if (index >= 0) {
-				display.displayTabs.remove(index);
-			} 
+//			if (index >= 0) {
+//				display.displayTabs.remove(index);
+//			} 
+//			
+//			display.displayTabs.insertTab(vClass.getSimpleName(), null, created, 
+//					vClass.getName(), index >= 0 ? index : display.displayTabs.getTabCount());
 			
-			display.displayTabs.insertTab(vClass.getSimpleName(), null, created, 
-					vClass.getName(), index >= 0 ? index : display.displayTabs.getTabCount());
+			replace(showIndex, vClass.getSimpleName(), vClass.getName(), created);
 			created.repaint();
 		}
 		
@@ -119,6 +127,24 @@ public class ToolDisplayTabs {
 				add();
 			}
 		}
+	}
+	
+	private void replace(int index, String name, String tip, Component cmp) {
+		JTabbedPane tabs = display.displayTabs;
+		int used;
+		
+		if (index >= 0 && index < tabs.getTabCount()) {
+			debug.info("replacing!");
+			tabs.setComponentAt(index, cmp);
+			used = index;
+		} else {
+			debug.info("adding!");
+			used = tabs.getTabCount();
+			tabs.add(cmp);
+		}
+		
+		tabs.setTitleAt(used, name);
+		tabs.setToolTipTextAt(used, tip);
 	}
 	
 }

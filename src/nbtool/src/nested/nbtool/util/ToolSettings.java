@@ -32,7 +32,6 @@ public class ToolSettings {
 	public static final Path NBITES_DIR_PATH = Paths.get(NBITES_DIR);
 	
 	public static final String DEFAULT_S = "_DEFAULT_";
-	public static final String PROTOBUF_S = "_PROTOBUF_";
     //public static final String IMAGE_S = "_IMAGE_"
 
 	public static final String IMAGE_S = "YUVImage";

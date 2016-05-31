@@ -112,7 +112,7 @@ public class LocSwarmView extends ViewParent implements ActionListener {
 
 	@Override
 	public String[] displayableTypes() {
-		return new String[]{"location"};
+		return new String[]{"locswarm"};
 	}
 
     private int numLines;

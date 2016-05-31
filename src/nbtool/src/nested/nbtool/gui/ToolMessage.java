@@ -116,6 +116,8 @@ public class ToolMessage extends JFrame implements ActionListener {
         setUndecorated(true);
         setAlwaysOnTop(true);
         setFocusable(false);
+        setResizable(false);
+        
         setOpacity(0.8F);
         
         JLabel msgLabel = new JLabel(msg);

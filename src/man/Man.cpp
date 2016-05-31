@@ -214,50 +214,50 @@ Man::Man() :
 //         
 //         CALLING NBLOG IN A SPECIFIC LOCATION, as in TRIPOINT, IS ALWAYS MORE EFFICIENT THAN THIS
 //         */
-//        sensorsThread.log<messages::JointAngles>((control::SENSORS), &sensors.jointsOutput_,
+//        sensorsThread.log<messages::JointAngles>((control::flags::SENSORS), &sensors.jointsOutput_,
 //                                                 "proto-JointAngles", "sensorsThread");
-//        sensorsThread.log<messages::JointAngles>((control::SENSORS), &sensors.temperatureOutput_,
+//        sensorsThread.log<messages::JointAngles>((control::flags::SENSORS), &sensors.temperatureOutput_,
 //                                                 "proto-JointAngles", "sensorsThread");
-//        sensorsThread.log<messages::ButtonState>((control::SENSORS), &sensors.chestboardButtonOutput_,
+//        sensorsThread.log<messages::ButtonState>((control::flags::SENSORS), &sensors.chestboardButtonOutput_,
 //                                                 "proto-ButtonState", "sensorsThread");
-//        sensorsThread.log<messages::FootBumperState>((control::SENSORS), &sensors.footbumperOutput_,
+//        sensorsThread.log<messages::FootBumperState>((control::flags::SENSORS), &sensors.footbumperOutput_,
 //                                                     "proto-FootBumperState", "sensorsThread");
-//        sensorsThread.log<messages::InertialState>((control::SENSORS), &sensors.inertialsOutput_,
+//        sensorsThread.log<messages::InertialState>((control::flags::SENSORS), &sensors.inertialsOutput_,
 //                                                   "proto-InertialState", "sensorsThread");
-//        sensorsThread.log<messages::SonarState>((control::SENSORS), &sensors.sonarsOutput_,
+//        sensorsThread.log<messages::SonarState>((control::flags::SENSORS), &sensors.sonarsOutput_,
 //                                                "proto-SonarState", "sensorsThread");
-//        sensorsThread.log<messages::FSR>((control::SENSORS), &sensors.fsrOutput_,
+//        sensorsThread.log<messages::FSR>((control::flags::SENSORS), &sensors.fsrOutput_,
 //                                         "proto-FSR", "sensorsThread");
-//        sensorsThread.log<messages::BatteryState>((control::SENSORS), &sensors.batteryOutput_,
+//        sensorsThread.log<messages::BatteryState>((control::flags::SENSORS), &sensors.batteryOutput_,
 //                                                  "proto-BatteryState", "sensorsThread");
 //
-//        guardianThread.log<messages::StiffnessControl>((control::GUARDIAN), &guardian.stiffnessControlOutput,
+//        guardianThread.log<messages::StiffnessControl>((control::flags::GUARDIAN), &guardian.stiffnessControlOutput,
 //                                                       "proto-StiffnessControl", "guardianThread");
-//        guardianThread.log<messages::FeetOnGround>((control::GUARDIAN), &guardian.feetOnGroundOutput,
+//        guardianThread.log<messages::FeetOnGround>((control::flags::GUARDIAN), &guardian.feetOnGroundOutput,
 //                                                   "proto-FeetOnGround", "guardianThread");
-//        guardianThread.log<messages::FallStatus>((control::GUARDIAN), &guardian.fallStatusOutput,
+//        guardianThread.log<messages::FallStatus>((control::flags::GUARDIAN), &guardian.fallStatusOutput,
 //                                                 "proto-FallStatus", "guardianThread");
-//        guardianThread.log<messages::AudioCommand>((control::GUARDIAN), &guardian.audioOutput,
+//        guardianThread.log<messages::AudioCommand>((control::flags::GUARDIAN), &guardian.audioOutput,
 //                                                   "proto-AudioCommand", "guardianThread");
-////         cognitionThread.log<messages::RobotLocation>((control::LOCATION), &localization.output, "proto-RobotLocation", "location");
-////         cognitionThread.log<messages::RobotLocation>((control::ODOMETRY), &motion.odometryOutput_, "proto-RobotLocation", "odometry");
-////         cognitionThread.log<messages::VisionField>((control::OBSERVATIONS), &vision.vision_field, "proto-VisionField", "observations");
-////         cognitionThread.log<messages::ParticleSwarm>((control::LOCALIZATION), &localization.particleOutput, "proto-ParticleSwarm", "localization");
-////         cognitionThread.log<messages::FilteredBall>((control::BALLTRACK), &ballTrack.ballLocationOutput, "proto-FilteredBall", "balltrack");
-//        // cognitionThread.log<messages::VisionBall>((control::BALLTRACK), &vision.vision_ball, "proto-VisionBall", "balltrack");
-//        cognitionThread.log<messages::Vision>((control::VISION), &vision.visionOut,
+////         cognitionThread.log<messages::RobotLocation>((control::flags::LOCATION), &localization.output, "proto-RobotLocation", "location");
+////         cognitionThread.log<messages::RobotLocation>((control::flags::ODOMETRY), &motion.odometryOutput_, "proto-RobotLocation", "odometry");
+////         cognitionThread.log<messages::VisionField>((control::flags::OBSERVATIONS), &vision.vision_field, "proto-VisionField", "observations");
+            cognitionThread.log<messages::ParticleSwarm>((control::flags::LOCALIZATION), &localization.particleOutput, "proto-ParticleSwarm", "localization");
+////         cognitionThread.log<messages::FilteredBall>((control::flags::BALLTRACK), &ballTrack.ballLocationOutput, "proto-FilteredBall", "balltrack");
+//        // cognitionThread.log<messages::VisionBall>((control::flags::BALLTRACK), &vision.vision_ball, "proto-VisionBall", "balltrack");
+//        cognitionThread.log<messages::Vision>((control::flags::VISION), &vision.visionOut,
 //                                                   "proto-Vision", "vision");
-//        // cognitionThread.log<messages::VisionField>((control::VISION), &vision.vision_field,
+//        // cognitionThread.log<messages::VisionField>((control::flags::VISION), &vision.vision_field,
 //        //                                            "proto-VisionField", "vision");
-//        // cognitionThread.log<messages::VisionBall>((control::VISION), &vision.vision_ball,
+//        // cognitionThread.log<messages::VisionBall>((control::flags::VISION), &vision.vision_ball,
 //        //                                           "proto-VisionBall", "vision");
-//        // cognitionThread.log<messages::VisionRobot>((control::VISION), &vision.vision_robot,
+//        // cognitionThread.log<messages::VisionRobot>((control::flags::VISION), &vision.vision_robot,
 //        //                                            "proto-VisionRobot", "vision");
-//        // cognitionThread.log<messages::VisionObstacle>((control::VISION), &vision.vision_obstacle,
+//        // cognitionThread.log<messages::VisionObstacle>((control::flags::VISION), &vision.vision_obstacle,
 //        //                                               "proto-VisionObstacle", "vision");
-//        // cognitionThread.log<messages::JointAngles>((control::VISION), &vision.joint_angles_out,
+//        // cognitionThread.log<messages::JointAngles>((control::flags::VISION), &vision.joint_angles_out,
 //        //                                            "proto-JointAngles", "vision");
-//        // cognitionThread.log<messages::InertialState>((control::VISION), &vision.inertial_state_out,
+//        // cognitionThread.log<messages::InertialState>((control::flags::VISION), &vision.inertial_state_out,
 //                                                     // "proto-InertialState", "vision");
 //
         }   //end USE_LOGGING bracket

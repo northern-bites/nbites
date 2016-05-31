@@ -267,7 +267,7 @@ void VisionModule::run_()
 
 #ifdef OFFLINE
         if (blackStar_) {
-            printf("\nUSING NULL IMAGE FOR EDGE DETECTION THROWOUTS\n\n");
+//            printf("\nUSING NULL IMAGE FOR EDGE DETECTION THROWOUTS\n\n");
             ImageLiteU8 nullImage{};
             edgeDetector[i]->edgeDetect(nullImage, *(edges[i]));
         } else {
@@ -706,6 +706,11 @@ void VisionModule::logImage(int i)
     }
 
     if (control::check(control::flags::tripoint)) {
+        if (control::check(control::flags::tripoint_bottom_only) && !i) {
+            //logging bottom
+            return;
+        }
+
         ++image_index;
 
         nbl::logptr theLog = nbl::Log::explicitLog(

@@ -113,6 +113,7 @@ add_subdirectory( jointenactor )
 #add_subdirectory( led )
 add_subdirectory( localization )
 add_subdirectory( logging )
+add_subdirectory( logmodule )
 add_subdirectory( motion )
 add_subdirectory( obstacle )
 add_subdirectory( sensors )
@@ -145,6 +146,7 @@ target_link_libraries(
   jointenactor
   #led
   localization
+  logmodule
   logging
   messages
   motion

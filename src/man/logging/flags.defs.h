@@ -29,7 +29,10 @@ FLAG_XM(LOCALIZATION),
 FLAG_XM(BALLTRACK),
 FLAG_XM(VISION),
 
+FLAG_XM(locswarm),
+
 FLAG_XM(tripoint),
+FLAG_XM(tripoint_bottom_only),
 FLAG_XM(multiball),
 FLAG_XM(thumbnail),
 

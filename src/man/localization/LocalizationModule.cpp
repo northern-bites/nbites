@@ -80,7 +80,7 @@ void LocalizationModule::update()
     output.setMessage(locMessage);
 
 #ifdef USE_LOGGING
-    if(control::check(control::flags::LOCALIZATION)) {
+    if(control::check(control::flags::locswarm)) {
         ++log_index;
         std::string log_from = "loc";
 
@@ -93,12 +93,12 @@ void LocalizationModule::update()
         messages::Vision vm = curVision;
 
         nbl::logptr theLog = nbl::Log::emptyLog();
-        theLog->logClass = "LOCSWARM";
+        theLog->logClass = "locswarm";
         theLog->createdWhen = time(NULL);
 
-        theLog->addBlockFromProtobuf(rl, "LOCSWARM", 0, 0);
-        theLog->addBlockFromProtobuf(ps, "LOCSWARM", 0, 0);
-        theLog->addBlockFromProtobuf(vm, "LOCSWARM", 0, 0);
+        theLog->addBlockFromProtobuf(rl, "locswarm", 0, 0);
+        theLog->addBlockFromProtobuf(ps, "locswarm", 0, 0);
+        theLog->addBlockFromProtobuf(vm, "locswarm", 0, 0);
 
         nbl::NBLog(theLog);
 

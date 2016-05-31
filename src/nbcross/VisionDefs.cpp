@@ -552,7 +552,7 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
 NBCROSS_FUNCTION(CalculateCameraOffsets, true, nbl::SharedConstants::LogClass_Tripoint())
     (const std::vector<nbl::logptr> &arguments)
 {
-    printf("CalculateCameraOffsets()\n");
+    printf("CalculateCameraOffsets() %d logs\n", arguments.size());
     bumpLineFitThreshold();
 
     int failures = 0;
@@ -590,7 +590,7 @@ NBCROSS_FUNCTION(CalculateCameraOffsets, true, nbl::SharedConstants::LogClass_Tr
         std::string lbuf;
         messages::YUVImage realImage = imageBlock.copyAsYUVImage(lbuf);
 
-        printf("parsed image width=%d, height=%d\n", realImage.width(), realImage.height() );
+//        printf("parsed image width=%d, height=%d\n", realImage.width(), realImage.height() );
 
         // Location of lisp text file with color params
         std::string sexpPath = std::string(getenv("NBITES_DIR"));
@@ -599,10 +599,6 @@ NBCROSS_FUNCTION(CalculateCameraOffsets, true, nbl::SharedConstants::LogClass_Tr
         // Read number of bytes of image, inertials, and joints if exist
         messages::JointAngles joints;
         jointsBlock.parseAsProtobuf(joints);
-
-        std::string rname = theLog->topLevelDictionary.at(SharedConstants::LOG_TOPLEVEL_HOST_NAME()).asString();
-
-        man::vision::VisionModule& module = getModuleRef(rname);
 
         // Setup module
         portals::Message<messages::YUVImage> rImageMessage(&realImage);
@@ -628,18 +624,18 @@ NBCROSS_FUNCTION(CalculateCameraOffsets, true, nbl::SharedConstants::LogClass_Tr
         // Run it!
         module.run();
 
-        man::vision::FieldHomography* fh = module.getFieldHomography(top);
-        man::vision::HoughLineList* lineList = module.getHoughLines(top);
-        man::vision::FieldLineList* fieldLineList = module.getFieldLines(top);
+        man::vision::FieldHomography* fh = module.getFieldHomography(topCamera);
+        man::vision::HoughLineList* lineList = module.getHoughLines(topCamera);
+        man::vision::FieldLineList* fieldLineList = module.getFieldLines(topCamera);
 
         double rollBefore, tiltBefore, rollAfter, tiltAfter;
 
         rollBefore = fh->roll();
         tiltBefore = fh->tilt();
 
-        bool success = fh->calibrateFromStar(*module.getFieldLines(top));
+        bool success = fh->calibrateFromStar(*module.getFieldLines(topCamera));
 
-        printf("... %s\n", success ? "SUCCESS" : "FAILURE");
+//        printf("... %s\n", success ? "SUCCESS" : "FAILURE");
 
         if (!success) {
             failures++;
@@ -651,16 +647,23 @@ NBCROSS_FUNCTION(CalculateCameraOffsets, true, nbl::SharedConstants::LogClass_Tr
         }
     }
 
-    printf("Failed calibration %d times\n", failures);
-    printf("Success calibrating %d times\n", args.size() - failures);
+    int successes = (arguments.size() - failures);
 
-    totalR /= (args.size() - failures);
-    totalT /= (args.size() - failures);
+    printf("Failed calibration %d times\n", failures);
+    printf("Success calibrating %d times\n", successes);
+
+    if (successes) {
+        totalR /= (successes);
+        totalT /= (successes);
+    } else {
+        totalR = -999;
+        totalT = -999;
+    }
 
     logptr retLog = Log::emptyLog();
-    retLog->logClass = "CalibrationResults"
+    retLog->logClass = "CalibrationResults";
 
-    retLog->topLevelDictionary["CalibrationNumSuccess"] = json::Number( args.size() - failures );
+    retLog->topLevelDictionary["CalibrationNumSuccess"] = json::Number( successes );
     retLog->topLevelDictionary["CalibrationDeltaTilt"] = json::Number(totalT);
     retLog->topLevelDictionary["CalibrationDeltaRoll"] = json::Number(totalR);
 
@@ -951,7 +954,7 @@ NBCROSS_FUNCTION(CheckCameraOffsets, false, nbl::SharedConstants::LogClass_Tripo
 
     logptr retLog = Log::explicitLog(retVec, json::Object{}, "VisionReturn");
     retLog->topLevelDictionary["CalibrationSuccess"] = json::Boolean(success);
-    RETURN();
+    RETURN(retLog);
 }
 
 #endif

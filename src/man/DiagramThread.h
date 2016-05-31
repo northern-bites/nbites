@@ -26,7 +26,7 @@
 #include <time.h>
 #include "RoboGrams.h"
 #include "DebugConfig.h"
-//#include "logging/LogModule.h"
+#include "logmodule/LogModule.h"
 
 namespace man{
     
@@ -51,12 +51,12 @@ namespace man{
          *        the specified OutPortal.
          * @param out The OutPortal that will be providing data
          */
-//        template<class T>
-//        void log(int findex, portals::OutPortal<T>* out, std::string lt, std::string wf)
-//        {
-//            logs.push_back(new log::LogModule<T>(findex, out, lt, wf));
-//            diagram.addModule(*logs.back());
-//        }
+        template<class T>
+        void log(control::flags::flag_e findex, portals::OutPortal<T>* out, std::string lt, std::string wf)
+        {
+            logs.push_back(new log::LogModule<T>(findex, out, lt, wf));
+            diagram.addModule(*logs.back());
+        }
 
         
     private:
@@ -93,7 +93,7 @@ namespace man{
         static void* runDiagram(void* _this);
         
         // Hold all of the LogModules
-//        std::vector<log::LogBase*> logs;
+        std::vector<log::LogBase*> logs;
 
         // The diagram that will be run in this thread
         RobotDiagram diagram;

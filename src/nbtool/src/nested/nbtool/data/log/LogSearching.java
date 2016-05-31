@@ -81,6 +81,6 @@ public class LogSearching {
 			new Pair("bottom images", ContainsCriteria.create().require(SharedConstants.LOG_BLOCK_IMAGE_WIDTH_PIXELS(), 
 					SharedConstants.LOG_BLOCK_IMAGE_HEIGHT_PIXELS(),
 					"camera_BOT")),
-			new Pair("location logs", ContainsCriteria.create().require("location", "RobotLocation", "ParticleSwarm"))
+			new Pair("locswarm logs", ContainsCriteria.create().require("locswarm", "RobotLocation", "ParticleSwarm"))
 	};	
 }

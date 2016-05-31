@@ -126,6 +126,7 @@ public abstract class SExpr implements Serializable{
 
 	//list modifications
 	public abstract void insert(int index, SExpr item);
+	public abstract boolean replace(SExpr item, SExpr repl);
 	public abstract boolean remove(SExpr item);
 	public abstract void append(SExpr ... exprs);
 
@@ -417,6 +418,18 @@ public abstract class SExpr implements Serializable{
 
 			return false;
 		}
+		
+		@Override
+		public boolean replace(SExpr item, SExpr repl) {
+			if (!atom && list.contains(item)) {
+				int index = list.indexOf(item);
+				list.remove(item);
+				list.add(index, repl);
+				return true;
+			}
+
+			return false;
+		}
 
 		@Override
 		public List<SExpr> getList() {
@@ -610,6 +623,11 @@ public abstract class SExpr implements Serializable{
 
 		@Override
 		public boolean remove(SExpr item) {
+			return false;
+		}
+		
+		@Override
+		public boolean replace(SExpr i, SExpr j) {
 			return false;
 		}
 

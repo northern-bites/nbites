@@ -85,6 +85,8 @@ public class ToolDisplayHandler implements
 	
 	private final long id = Utility.getNextIndex(this);
 	
+	private static final Debug.DebugSettings debug = Debug.createSettings(Debug.INFO);
+	
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName() + "-" + id;
@@ -464,7 +466,7 @@ public class ToolDisplayHandler implements
 		Center.listen(Events.LogSelected.class, new Events.LogSelected() {
 			@Override
 			public void logSelected(Object source, Log first, List<Log> alsoSelected) {
-				Debug.warn("Log{%s} selected, %s disabling streaming!", first, outerClassThis);
+				debug.info("Log{%s} selected, %s disabling streaming!", first, outerClassThis);
 				display.streamComboBox.setSelectedItem(last);
 			}
 		}, true);
@@ -475,7 +477,7 @@ public class ToolDisplayHandler implements
 	private ArrayList<LogReference> currentlyDisplayedFrom(Group group) {
 		ArrayList<LogReference> refs = new ArrayList<>((group).logs);
 		LogSearching.Criteria criteria = 
-				LogSearching.criteriaAt(display.streamComboBox.getSelectedIndex());
+				LogSearching.criteriaAt(display.sasStreamProfile.getSelectedIndex());
 		if (criteria != null) {
 			for (int i = 0; i < refs.size(); ) {
 				if ( !criteria.fits(refs.get(i).description) ) 
