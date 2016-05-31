@@ -28,14 +28,14 @@ AdjustParams::AdjustParams()
   : angleThr(0.10f, 0.15f), distanceThr(2.00f, 4.00f), magnitudeThr(12, 20)
 {
   lineEndWeight = 8.0f;
-  fitThresold = -1;
+  fitThreshold = -1;
   scoreThreshold = 32;
 }
 
 AdjustSet::AdjustSet() {
   params[1].angleThr = FuzzyThr(0.08f, 0.12f);
   params[1].distanceThr = FuzzyThr(0.7f, 2.0f);
-  params[1].fitThresold = FIT_THRESH_START;
+  params[1].fitThreshold = FIT_THRESH_START;
 
 }
 
@@ -116,7 +116,7 @@ bool HoughLine::adjust(EdgeList& edges, const AdjustParams& p, bool capture)
       }
 
   _score = fit.area();
-  if (score() < p.scoreThreshold || (p.fitThresold >= 0 && fit.rmsError() > p.fitThresold))
+  if (score() < p.scoreThreshold || (p.fitThreshold >= 0 && fit.rmsError() > p.fitThreshold))
   {
     for (Edge* e = members; e; e = e->nextMember())
       e->memberOf(0);

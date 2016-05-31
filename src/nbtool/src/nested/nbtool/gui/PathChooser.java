@@ -197,41 +197,59 @@ public class PathChooser {
 			debug.event("get() returned: %s", chosen);
 			return chosen;
 		}
+		
+		private Path tabHelper() {
+			Path current = this.expand();
+			Path enclosing = this.enclosing();
+			if (enclosing == null) {
+				Debug.warn("cannot get enclosing: %s", current);
+				return null;
+			}
+			
+			Path[] parts = FileIO.getContentsOf(enclosing);
+			assert(parts != null);
+			if (parts.length == 1) {
+				return parts[0];
+			} else {
+				if (!Files.isDirectory(current)) {
+					Path last = current.getFileName();
+					Path best = null;
+					for (Path sub : parts) {
+						Path subName = sub.getFileName();
+						if (subName.toString().startsWith(last.toString())) {
+							if (best == null ||
+									subName.toString().length() < best.toString().length())
+								best = subName;
+						}
+					}
+					
+					if (best != null) {
+						Path resolved = enclosing.resolve(best);
+						return resolved;
+					} else return null;
+					
+				} else {
+					return current;
+				}
+			}
+		}
 
 		@Override
 		public void keyTyped(KeyEvent e) {
 			if (e.getKeyChar() == '\t') {
 				e.consume();
 				
-				Path current = this.expand();
-				Path enclosing = this.enclosing();
-				if (enclosing == null) {
-					Debug.info("cannot get enclosing: %s", current);
-					return;
-				}
+				Path tabCompleted = tabHelper();
 				
-				Path[] parts = FileIO.getContentsOf(enclosing);
-				assert(parts != null);
-				if (parts.length == 1) {
-					display.chooserTextField.setText(parts[0].toString());
+				if (tabCompleted == null)
+					return;
+				if (Files.isDirectory(tabCompleted)) {
+					display.chooserTextField.setText(tabCompleted.toString() + "/");
+
 				} else {
-					if (!Files.isDirectory(current)) {
-						Path last = current.getFileName();
-						Path best = null;
-						for (Path sub : parts) {
-							Path subName = sub.getFileName();
-							if (subName.toString().startsWith(last.toString())) {
-								if (best == null ||
-										subName.toString().length() < best.toString().length())
-									best = subName;
-							}
-						}
-						
-						if (best != null) {
-							display.chooserTextField.setText(enclosing.resolve(best).toString());
-						}
-					}
-				}				
+					display.chooserTextField.setText(tabCompleted.toString());
+				}
+								
 			}						
 		}
 

@@ -44,7 +44,7 @@ struct AdjustParams
   float lineEndWeight;
 
   // Discard if this is >= 0 and RMS fit error above this
-  double fitThresold;
+  double fitThreshold;
 
   // Discard if adjusted score < this threshold
   double scoreThreshold;

@@ -64,9 +64,13 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 				return false;
 			}
 			
-		}, "Vision", displayedLog));
+		}, functionName(), displayedLog));
 		
 		return true;
+	}
+	
+	protected String functionName() {
+		return "Vision";
 	}
 	
 	protected final YUYV8888Image getOriginal() {
