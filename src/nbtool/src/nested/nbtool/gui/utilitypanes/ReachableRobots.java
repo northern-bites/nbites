@@ -41,7 +41,7 @@ public class ReachableRobots extends UtilityParent {
 
 	@Override
 	public char preferredMemnonic() {
-		return 'p';
+		return 'r';
 	}
 	
 	private static class Display extends JFrame {
