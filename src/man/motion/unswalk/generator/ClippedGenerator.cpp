@@ -1,4 +1,4 @@
-#include "motion/generator/ClippedGenerator.hpp"
+#include "generator/ClippedGenerator.hpp"
 #include "libagent/AgentData.hpp"
 #include "utils/body.hpp"
 #include "utils/clip.hpp"

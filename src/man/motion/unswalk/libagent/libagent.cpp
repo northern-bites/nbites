@@ -249,7 +249,7 @@ void Agent::preCallback() {
    const unsigned int now = timeNow();
    shared_data->actuators_read = shared_data->actuators_latest;
    JointValues& joints = shared_data->joints[shared_data->actuators_read];
-   SensorValues& sensors = shared_data->sensors[shared_data->sensors_latest];
+   UNSWSensorValues& sensors = shared_data->sensors[shared_data->sensors_latest];
 
    //do SAY from runswift
    string sayText(shared_data->sayTexts[shared_data->actuators_read]);
@@ -390,7 +390,7 @@ void Agent::postCallback() {
    }
 
    // Read sensors
-   SensorValues s;
+   UNSWSensorValues s;
    int i;
    for (i = 0; i < Sensors::NUMBER_OF_SENSORS; ++i)
       s.sensors[i] = *sensor_pointers[i];
@@ -506,14 +506,14 @@ Agent::Agent(AL::ALPtr<AL::ALBroker> pBroker, const std::string& pName)
 
    leg_names.push_back("LHipYawPitch"), stand_angles.push_back(0.f);
    leg_names.push_back("LHipRoll"), stand_angles.push_back(0.f);
-   leg_names.push_back("LHipPitch"), stand_angles.push_back(DEG2RAD(-25.f));
-   leg_names.push_back("LKneePitch"), stand_angles.push_back(DEG2RAD(50.f));
-   leg_names.push_back("LAnklePitch"), stand_angles.push_back(DEG2RAD(-25.f));
+   leg_names.push_back("LHipPitch"), stand_angles.push_back(UNSWDEG2RAD(-25.f));
+   leg_names.push_back("LKneePitch"), stand_angles.push_back(UNSWDEG2RAD(50.f));
+   leg_names.push_back("LAnklePitch"), stand_angles.push_back(UNSWDEG2RAD(-25.f));
    leg_names.push_back("LAnkleRoll"), stand_angles.push_back(0.f);
    leg_names.push_back("RHipRoll"), stand_angles.push_back(0.f);
-   leg_names.push_back("RHipPitch"), stand_angles.push_back(DEG2RAD(-25.f));
-   leg_names.push_back("RKneePitch"), stand_angles.push_back(DEG2RAD(50.f));
-   leg_names.push_back("RAnklePitch"), stand_angles.push_back(DEG2RAD(-25.f));
+   leg_names.push_back("RHipPitch"), stand_angles.push_back(UNSWDEG2RAD(-25.f));
+   leg_names.push_back("RKneePitch"), stand_angles.push_back(UNSWDEG2RAD(50.f));
+   leg_names.push_back("RAnklePitch"), stand_angles.push_back(UNSWDEG2RAD(-25.f));
    leg_names.push_back("RAnkleRoll"), stand_angles.push_back(0.f);
 
    // open shared memory as RW, create if !exist, permissions 600
@@ -535,7 +535,7 @@ Agent::Agent(AL::ALPtr<AL::ALBroker> pBroker, const std::string& pName)
    // Initialise shared memory
    shared_data->init();
 
-   SensorValues null_sensors;
+   UNSWSensorValues null_sensors;
    JointValues null_joints;
    ActionCommand::LED null_leds;
    for (i = 0; i < Joints::NUMBER_OF_JOINTS; ++i) {

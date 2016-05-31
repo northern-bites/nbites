@@ -6,8 +6,8 @@
 #pragma once
 
 #include <cmath>
-#include "Generator.hpp"
-#include "BodyModel.hpp"
+#include "generator/Generator.hpp"
+#include "generator/BodyModel.hpp"
 #include "types/XYZ_Coord.hpp"
 #include "types/ActionCommand.hpp"
 #include "utils/Timer.hpp"
@@ -50,9 +50,12 @@ class Walk2014Generator : Generator {
    void readOptions(boost::program_options::variables_map& config);
    void reset();
    void stop();
+
+   bool getIsStopped() {return stopped;}
+   bool getIsStanding() { return walk2014Option == 1;}
    friend class WalkEnginePreProcessor;
 
-   //protected:
+   private:
    bool exactStepsRequested;
 
    bool stopping;

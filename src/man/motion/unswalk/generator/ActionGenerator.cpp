@@ -1,7 +1,7 @@
 #include <fstream>
 #include <limits>
 #include <cctype>
-#include "motion/generator/ActionGenerator.hpp"
+#include "generator/ActionGenerator.hpp"
 #include "utils/Logger.hpp"
 #include "utils/angles.hpp"
 
@@ -135,7 +135,7 @@ void ActionGenerator::constructPose(std::string path) {
             in >> angles;
             // Convert degree to radian because the values in the file
             // are in degree
-            newJoint.angles[i] = DEG2RAD(angles);
+            newJoint.angles[i] = UNSWDEG2RAD(angles);
             newJoint.stiffnesses[i] = 1.0;
          }
 

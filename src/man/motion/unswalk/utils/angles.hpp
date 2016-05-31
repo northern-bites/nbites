@@ -15,7 +15,7 @@ inline static float RAD2DEG(const float x) {
    return ((x) * UNSW_DEG_OVER_RAD);
 }
 
-inline static float DEG2RAD(const float x) {
+inline static float UNSWDEG2RAD(const float x) {
    return ((x) * UNSW_RAD_OVER_DEG);
 }
 
@@ -35,7 +35,7 @@ inline static float DEG360TORAD(const float degree) {
    if (tmp >= 180) {
       tmp = tmp - 360;
    }
-   return (DEG2RAD(tmp));
+   return (UNSWDEG2RAD(tmp));
 }
 
 /* returns min difference between two angles, might need to add/subtract 360 as

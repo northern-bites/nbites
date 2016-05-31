@@ -1,7 +1,7 @@
 #include "KinematicsAdapter.hpp"
 #include "blackboard/Blackboard.hpp"
 #include "utils/Logger.hpp"
-#include "perception/vision/Camera.hpp"
+#include "perception/vision/UNSWCamera.hpp"
 
 using namespace std;
 

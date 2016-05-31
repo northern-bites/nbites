@@ -12,38 +12,39 @@
 #include <deque>
 
 #include "perception/behaviour/ReadySkillPositionAllocation.hpp"
+#include "gamecontroller/GameType.h"
 #include "generator/PendulumModel.hpp"
 #include "utils/body.hpp"
 #include "utils/boostSerializationVariablesMap.hpp"
 #include "perception/kinematics/Parameters.hpp"
-//#include "vision/VisionDefs.hpp" ??????
-//#include "perception/vision/RobotRegion.hpp"
-//#include "perception/localisation/LocalisationDefs.hpp"
-//#include "perception/localisation/SharedLocalisationUpdateBundle.hpp"
+#include "perception/vision/VisionDefs.hpp"
+#include "perception/vision/RobotRegion.hpp"
+#include "perception/localisation/LocalisationDefs.hpp"
+#include "perception/localisation/SharedLocalisationUpdateBundle.hpp"
 #include "perception/kinematics/Pose.hpp"
-//#include "gamecontroller/RoboCupGameControlData.hpp"
-//#include "utils/Logger.hpp"
-//#include "transmitter/TransmitterDefs.hpp"
+#include "gamecontroller/RoboCupGameControlData.hpp"
+#include "utils/Logger.hpp"
+#include "transmitter/TransmitterDefs.hpp"
 #include "types/BehaviourRequest.hpp"
 
 #include "types/ActionCommand.hpp"
 #include "types/ButtonPresses.hpp"
 #include "types/Odometry.hpp"
-#include "types/SensorValues.hpp"
+#include "types/UNSWSensorValues.hpp"
 #include "types/RRCoord.hpp"
 #include "types/AbsCoord.hpp"
 #include "types/XYZ_Coord.hpp"
 #include "types/BroadcastData.hpp"
-#include "../types/BehaviourSharedData.hpp"
+#include "types/BehaviourSharedData.hpp"
 
 #include "types/FootInfo.hpp"
 #include "types/BallInfo.hpp"
 #include "types/PostInfo.hpp"
-//#include "types/RobotInfo.hpp"
-//#include "types/RobotObstacle.hpp"
+#include "types/UNSWRobotInfo.hpp"
+#include "types/RobotObstacle.hpp"
 #include "types/FieldEdgeInfo.hpp"
 #include "types/FieldFeatureInfo.hpp"
-//#include "types/Ipoint.hpp"
+#include "types/Ipoint.hpp"
 #include "types/Odometry.hpp"
 #include "types/TeamBallInfo.hpp"
 
@@ -127,7 +128,7 @@ struct KinematicsBlackboard {
    UNSWSensorValues sensorsLagged;
 };
 
-// Data Behaviour module will be sharing with others
+/* Data Behaviour module will be sharing with others */
 struct BehaviourBlackboard {
    explicit BehaviourBlackboard();
    void readOptions(const boost::program_options::variables_map& config);
@@ -137,7 +138,7 @@ struct BehaviourBlackboard {
    BehaviourSharedData behaviourSharedData;
 };
 
-/* //Data Localisation module will be sharing 
+/* Data Localisation module will be sharing */
 struct LocalisationBlackboard {
    explicit LocalisationBlackboard();
 
@@ -172,69 +173,69 @@ struct LocalisationBlackboard {
    AbsCoord ballPos;
 
    // TODO: get rid of this variable from behaviours and everywhere else!
-   //TeamBallInfo teamBall;
+   TeamBallInfo teamBall;
    
    XYZ_Coord ballNeckRelative;
    
-   //SharedLocalisationUpdateBundle sharedLocalisationBundle;
+   SharedLocalisationUpdateBundle sharedLocalisationBundle;
    
    bool havePendingOutgoingSharedBundle;
    std::vector<bool> havePendingIncomingSharedBundle;
 
-   // filtered positions of visual robots 
-   //std::vector<RobotObstacle> robotObstacles;
+   /** filtered positions of visual robots */
+   std::vector<RobotObstacle> robotObstacles;
 };
 
 
-// Data Vision module will be sharing with others
-// struct VisionBlackboard {
-//    explicit VisionBlackboard();
+/* Data Vision module will be sharing with others */
+struct VisionBlackboard {
+   explicit VisionBlackboard();
 
-//    // Time the frame was captured
-//    int64_t timestamp;
+   /* Time the frame was captured */
+   int64_t timestamp;
   
-//    // Detected features
-//    std::vector<Ipoint>           landmarks;
-//    std::vector<FootInfo>         feet;
-//    std::vector<BallInfo>         balls;
-//    BallHint                      ballHint;
-//    std::vector<PostInfo>         posts;
-//    std::vector<RobotInfo>        robots;
-//    std::vector<FieldEdgeInfo>    fieldEdges;
-//    std::vector<FieldFeatureInfo> fieldFeatures;	
-//    Odometry                      vOdometry;
-//    Odometry                      dualOdometry;
-//    unsigned int                  missedFrames;
-//    std::pair<int, int>           dxdy;
-//    bool                          caughtLeft;
-//    bool                          caughtRight; // robot is caught on LHS or RHS
-//    PostInfo::Type                goalArea;
-//    float                         awayGoalProb;
-//    int                           homeMapSize;
-//    int                           awayMapSize;
+   /* Detected features */
+   std::vector<Ipoint>           landmarks;
+   std::vector<FootInfo>         feet;
+   std::vector<BallInfo>         balls;
+   BallHint                      ballHint;
+   std::vector<PostInfo>         posts;
+   std::vector<UNSWRobotInfo>        robots;
+   std::vector<FieldEdgeInfo>    fieldEdges;
+   std::vector<FieldFeatureInfo> fieldFeatures;	
+   Odometry                      vOdometry;
+   Odometry                      dualOdometry;
+   unsigned int                  missedFrames;
+   std::pair<int, int>           dxdy;
+   bool                          caughtLeft;
+   bool                          caughtRight; // robot is caught on LHS or RHS
+   PostInfo::Type                goalArea;
+   float                         awayGoalProb;
+   int                           homeMapSize;
+   int                           awayMapSize;
 
-//    /** Saliency scan */
-//    Colour *topSaliency;
-//    Colour *botSaliency;
-//    Colour *saliency;
+   /** Saliency scan */
+   Colour *topSaliency;
+   Colour *botSaliency;
+   Colour *saliency;
 
-//    /** Pointer to the current frame being processed by Vision */
-//    uint8_t const* currentFrame;
-//    uint8_t const* topFrame;
-//    uint8_t const* botFrame;
+   /** Pointer to the current frame being processed by Vision */
+   uint8_t const* currentFrame;
+   uint8_t const* topFrame;
+   uint8_t const* botFrame;
 
-//    /**
-//     * DO NOT USE ANYTHING BELOW HERE
-//     * Kept here only for compatibility with 2010 filter
-//     * Will be depricated by daves new filter
-//     */
+   /**
+    * DO NOT USE ANYTHING BELOW HERE
+    * Kept here only for compatibility with 2010 filter
+    * Will be depricated by daves new filter
+    */
 
-//    /** Points on field lines */
-//    int numFieldLinePoints;
-//    RRCoord fieldLinePoints[MAX_FIELD_LINE_POINTS];
-//    bool canSeeBottom[MAX_POSTS];
-//    bool canSeeBottomRobot[MAX_ROBOTS];
-// };
+   /** Points on field lines */
+   int numFieldLinePoints;
+   RRCoord fieldLinePoints[MAX_FIELD_LINE_POINTS];
+   bool canSeeBottom[MAX_POSTS];
+   bool canSeeBottomRobot[MAX_ROBOTS];
+};
 
 struct PerceptionBlackboard {
    explicit PerceptionBlackboard();
@@ -245,17 +246,17 @@ struct PerceptionBlackboard {
    uint32_t total;
 };
 
-// struct GameControllerBlackboard {
-//    explicit GameControllerBlackboard();
-//    void readOptions(const boost::program_options::variables_map& config);
-//    bool connect;
-//    bool connected;
-//    RoboCupGameControlData data;
-//    TeamInfo our_team;
-//    bool team_red;
-//    int player_number;
-//    GameType game_type;
-// };
+struct GameControllerBlackboard {
+   explicit GameControllerBlackboard();
+   void readOptions(const boost::program_options::variables_map& config);
+   bool connect;
+   bool connected;
+   RoboCupGameControlData data;
+   TeamInfo our_team;
+   bool team_red;
+   int player_number;
+   GameType game_type;
+};
 
 
 struct MotionBlackboard {
@@ -315,7 +316,7 @@ class Blackboard {
    friend class VisionAdapter;
    friend class MotionAdapter;
    friend class BehaviourAdapter;
-   //friend class GameController;
+   friend class GameController;
    friend class OffNaoTransmitter;
    friend class NaoTransmitter;
    friend class TeamTransmitter;
@@ -396,7 +397,7 @@ class Blackboard {
       /**
        * the mask of what is stored/loaded from a file or network
        */
-      //OffNaoMask_t mask;
+      OffNaoMask_t mask;
 
       /* Options callback for changes at runtime */
       void readOptions(const boost::program_options::variables_map& config);
@@ -408,15 +409,15 @@ class Blackboard {
       BehaviourBlackboard behaviour;
 
       /* Data Localisation module will be sharing */
-      //LocalisationBlackboard localisation;
+      LocalisationBlackboard localisation;
 
       /* Data Vision module will be sharing with others */
-      //VisionBlackboard vision;
+      VisionBlackboard vision;
 
       PerceptionBlackboard perception;
 
       /* Data GameController will be sharing */
-      //GameControllerBlackboard gameController;
+      GameControllerBlackboard gameController;
 
       /* Data Motion module will be sharing with others */
       MotionBlackboard motion;

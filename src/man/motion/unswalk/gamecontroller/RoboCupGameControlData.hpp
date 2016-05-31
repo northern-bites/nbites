@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef ROBOCUPGAMECONTROLDATA_H
 #define ROBOCUPGAMECONTROLDATA_H
 
@@ -104,13 +106,13 @@ struct RoboCupGameControlData
 };
 
 /* RUNSWIFT ADDITIONAL */
-enum GameType
-{
-   MATCH = 0,
-   DRIBBLE,
-   OPEN,
-   PASSING
-};
+// enum GameType
+// {
+//    MATCH = 0,
+//    DRIBBLE,
+//    OPEN,
+//    PASSING
+// };
 
 // data structure header
 #define GAMECONTROLLER_RETURN_STRUCT_HEADER      "RGrt"

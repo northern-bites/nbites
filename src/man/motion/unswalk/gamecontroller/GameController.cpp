@@ -81,7 +81,7 @@ void GameController::initialiseConnection() {
          continue;
       }
 
-      if (bind(sock, p->ai_addr, p->ai_addrlen) == -1) {
+      if (::bind(sock, p->ai_addr, p->ai_addrlen) == -1) {
          close(sock);
          llog(INFO) << "GameController: Cannot Bind, trying next" << endl;
          continue;

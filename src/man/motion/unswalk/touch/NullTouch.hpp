@@ -4,10 +4,10 @@
 
 class NullTouch : Touch {
    public:
-      SensorValues getSensors(UNSWKinematics &kinematics);
+      UNSWSensorValues getSensors(UNSWKinematics &kinematics);
       bool getStanding();
       ButtonPresses getButtons();
    private:
-      SensorValues nullSensors;
+      UNSWSensorValues nullSensors;
 };
 

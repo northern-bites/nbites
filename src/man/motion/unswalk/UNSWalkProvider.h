@@ -22,6 +22,15 @@
 //UNSW
 #include "generator/Walk2014Generator.hpp"
 #include "blackboard/Blackboard.hpp"
+// #include "touch/FilteredTouch.hpp"
+
+// #include "effector/Effector.hpp"
+// #include "generator/Generator.hpp"
+// #include "touch/FilteredTouch.hpp"
+// // #include "blackboard/Adapter.hpp"
+// // #include "generator/BodyModel.hpp"
+// // #include "perception/kinematics/UNSWKinematics.hpp"
+// #include "SonarRecorder.hpp"
 
 namespace man
 {
@@ -85,7 +94,7 @@ private:
 	bool standby;
 	bool tryingToWalk;
 	MotionCommand::ptr currentCommand;
-	Walk2014Generator *walk2014gen;
+	Walk2014Generator *generator;
 	Odometry startOdometry;
 };
 

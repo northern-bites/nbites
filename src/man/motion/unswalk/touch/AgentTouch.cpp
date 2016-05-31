@@ -1,4 +1,4 @@
-#include "motion/touch/AgentTouch.hpp"
+#include "touch/AgentTouch.hpp"
 #include <sys/mman.h>        /* For shared memory */
 #include <fcntl.h>           /* For O_* constants */
 #include <cstdlib>
@@ -43,7 +43,7 @@ AgentTouch::~AgentTouch() {
    llog(INFO) << "AgentTouch destroyed" << std::endl;
 }
 
-SensorValues AgentTouch::getSensors(UNSWKinematics &kinematics) {
+UNSWSensorValues AgentTouch::getSensors(UNSWKinematics &kinematics) {
    sem_wait(semaphore);
    while (!sem_trywait(semaphore)) ;
    shared_data->sensors_read = shared_data->sensors_latest;

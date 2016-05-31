@@ -4,15 +4,14 @@
 #include "types/RRCoord.hpp"
 #include "types/ActionCommand.hpp"
 #include "types/BehaviourSharedData.hpp"
-//#include "perception/localisation/SharedLocalisationUpdateBundle.hpp"
+#include "perception/localisation/SharedLocalisationUpdateBundle.hpp"
 
 class BroadcastData {
    public:
       BroadcastData()
          : playerNum(0), team(0), robotPos(0.0, 0.0, 0.0), 
            ballPosAbs(), ballPosRR(), lostCount(0),
-           //sharedLocalisationBundle(), 
-           behaviourSharedData(),
+           sharedLocalisationBundle(), behaviourSharedData(),
            acB(ActionCommand::Body::DEAD), uptime(0.0) {}
 
       BroadcastData(const BroadcastData& bd)
@@ -22,7 +21,7 @@ class BroadcastData {
            ballPosAbs(bd.ballPosAbs),
            ballPosRR(bd.ballPosRR),
            lostCount(bd.lostCount), // TODO: this really should be "ballLostCount"
-           //sharedLocalisationBundle(bd.sharedLocalisationBundle),
+           sharedLocalisationBundle(bd.sharedLocalisationBundle),
            behaviourSharedData(bd.behaviourSharedData),
            acB(bd.acB),
            uptime(bd.uptime) {}
@@ -32,7 +31,7 @@ class BroadcastData {
                     const AbsCoord &ballPosAbs,
                     const RRCoord &ballPosRR,
                     const uint32_t &lostCount,
-                    //const SharedLocalisationUpdateBundle &sharedLocalisationBundle,
+                    const SharedLocalisationUpdateBundle &sharedLocalisationBundle,
                     const BehaviourSharedData &behaviourSharedData,
                     const ActionCommand::Body::ActionType &acB,
                     const float &uptime)
@@ -42,7 +41,7 @@ class BroadcastData {
            ballPosAbs(ballPosAbs),
            ballPosRR(ballPosRR),
            lostCount(lostCount),
-           //sharedLocalisationBundle(sharedLocalisationBundle),
+           sharedLocalisationBundle(sharedLocalisationBundle),
            behaviourSharedData(behaviourSharedData),
            acB(acB),
            uptime(uptime) {}
@@ -55,7 +54,7 @@ class BroadcastData {
       RRCoord ballPosRR;
       uint32_t lostCount;
       
-      //SharedLocalisationUpdateBundle sharedLocalisationBundle;
+      SharedLocalisationUpdateBundle sharedLocalisationBundle;
       
       // Data set by the Python behaviours that is shared with other robots.
       BehaviourSharedData behaviourSharedData;
@@ -71,7 +70,7 @@ class BroadcastData {
          ar & ballPosAbs;
          ar & ballPosRR;
          ar & lostCount;
-         //ar & sharedLocalisationBundle;
+         ar & sharedLocalisationBundle;
          ar & behaviourSharedData;
          ar & acB;
          ar & uptime;

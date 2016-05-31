@@ -2,15 +2,14 @@
 #include <iostream>
 #include <list>
 #include "WalkCycle.hpp"
-#include "../types/JointValues.hpp"
-#include "../types/Odometry.hpp"
-#include "../types/XYZ_Coord.hpp"
-#include "../perception/kinematics/Kinematics.hpp"
+#include "types/JointValues.hpp"
+#include "types/Odometry.hpp"
+#include "types/XYZ_Coord.hpp"
+#include "perception/kinematics/UNSWKinematics.hpp"
 
 #include "PendulumModel.hpp"
 
 class BodyModel {
-   friend class Walk2014Generator;
    public:
       BodyModel();
       void update(Odometry *odometry, const UNSWSensorValues &sensors);
@@ -148,6 +147,13 @@ class BodyModel {
       PendulumModel pendulumModel;
       PendulumModel lastPendulumModel;
 
+      bool isLeftPhase;
+      bool isOnFront;
+      bool lastIsLeftPhase;
+      float ZMPL;
+      float lastZMPL;
+
+
    private:
       WalkCycle walkCycle;
 
@@ -166,9 +172,7 @@ class BodyModel {
       float ZMPF;
       float filHighZMPF;
       float filLowZMPF;
-      float ZMPL;
       float filZMPL;
-      float lastZMPL;
       float fsLfr, fsLfl, fsLrr, fsLrl;                       // Maximum foot sensor reading during latest run
       float fsRfr, fsRfl, fsRrr, fsRrl;                       // ... used to scale each foot sensor to read in similar range
 
@@ -179,10 +183,6 @@ class BodyModel {
       static const float MOTION_DT;
       static const float FOOT_LENGTH;
       static const float L_RATE;
-
-      bool isLeftPhase;
-      bool isOnFront;
-      bool lastIsLeftPhase;
 
       // real body model
       float t;

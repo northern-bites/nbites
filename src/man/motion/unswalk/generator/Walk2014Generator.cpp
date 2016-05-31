@@ -10,7 +10,7 @@
  * The CoM is moved forward when walking to position it closer to the center of the foot
  */
 
-#include "Walk2014Generator.hpp"
+#include "generator/Walk2014Generator.hpp"
 #include <cmath>
 #include "utils/angles.hpp"
 #include "utils/body.hpp"
@@ -40,7 +40,7 @@ const float CROUCH_STAND_PERIOD = 0.5;                     // time in seconds to
 const float COM_OFFSET = 0.01;                             // center of mass offset in x direction in meters
 const float FORWARD_CHANGE = 0.2;                          // was 0.08. max change of 100mm/sec at each leg change to ratchet up/down
 const float STAND_HIP_HEIGHT = 0.248;                      // for tall power saving stand
-const float KNEE_PITCH_RANGE = DEG2RAD(60);                // the knee pitch range from standing to crouching
+const float KNEE_PITCH_RANGE = UNSWDEG2RAD(60);                // the knee pitch range from standing to crouching
 const float BASE_WALK_PERIOD = .23; //.25;                 // seconds to walk one step, ie 1/2 walk cycle
 const float WALK_HIP_HEIGHT = .23;                         // Walk hip height - seems to work from .2 to .235
 const float MAX_FORWARD = .3;                              // meters
@@ -516,16 +516,16 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
    for (uint8_t i = 0; i < Joints::NUMBER_OF_JOINTS; ++i) j.stiffnesses[i] = stiffness;
 
    // 10.1 Arms
-   j.angles[LShoulderPitch] = DEG2RAD(90)+shoulderPitchL;
-   j.angles[LShoulderRoll] = DEG2RAD(7)+shoulderRollL;
-   j.angles[LElbowYaw] = DEG2RAD(0);
-   j.angles[LElbowRoll] = DEG2RAD(0);
-   j.angles[LWristYaw] = DEG2RAD(0);
-   j.angles[RShoulderPitch] = DEG2RAD(90)+shoulderPitchR;
-   j.angles[RShoulderRoll] = DEG2RAD(-7)-shoulderRollR;
-   j.angles[RElbowYaw] = DEG2RAD(0);
-   j.angles[RElbowRoll] = DEG2RAD(0);
-   j.angles[RWristYaw] = DEG2RAD(0);
+   j.angles[LShoulderPitch] = UNSWDEG2RAD(90)+shoulderPitchL;
+   j.angles[LShoulderRoll] = UNSWDEG2RAD(7)+shoulderRollL;
+   j.angles[LElbowYaw] = UNSWDEG2RAD(0);
+   j.angles[LElbowRoll] = UNSWDEG2RAD(0);
+   j.angles[LWristYaw] = UNSWDEG2RAD(0);
+   j.angles[RShoulderPitch] = UNSWDEG2RAD(90)+shoulderPitchR;
+   j.angles[RShoulderRoll] = UNSWDEG2RAD(-7)-shoulderRollR;
+   j.angles[RElbowYaw] = UNSWDEG2RAD(0);
+   j.angles[RElbowRoll] = UNSWDEG2RAD(0);
+   j.angles[RWristYaw] = UNSWDEG2RAD(0);
 
    // 10.2 Turn
    j.angles[Joints::LHipYawPitch] = -turnRL;
@@ -636,7 +636,7 @@ void Walk2014Generator::makeForwardKickJoints(float kickLean, float kickStepH, f
       float halfShift = totalShift / 2;
       // We spend the first part shifting our weight over.
       if (t < totalShift) {
-         rock = DEG2RAD(kickLean) * parabolicStep(t, totalShift, 0);
+         rock = UNSWDEG2RAD(kickLean) * parabolicStep(t, totalShift, 0);
          footh = kickStepH * parabolicStep(t, totalShift, 0);
       } else {
          turnRL = 0;
@@ -648,26 +648,26 @@ void Walk2014Generator::makeForwardKickJoints(float kickLean, float kickStepH, f
          forwardDist = interpolateSmooth(lastKickForward, -kickAmp * 0.9, shiftedKickT, BACK_PHASE - halfShift);
          side = interpolateSmooth(0, sideAmp, shiftedKickT, BACK_PHASE - halfShift);
          shoulderRoll = interpolateSmooth(0, shoulderRollAmp, shiftedKickT, BACK_PHASE - halfShift);
-         kneePitch = interpolateSmooth(0, DEG2RAD(35) * 0.9, shiftedKickT, BACK_PHASE - halfShift);
-         anklePitch = interpolateSmooth(0, DEG2RAD(5), shiftedKickT, BACK_PHASE - halfShift);
+         kneePitch = interpolateSmooth(0, UNSWDEG2RAD(35) * 0.9, shiftedKickT, BACK_PHASE - halfShift);
+         anklePitch = interpolateSmooth(0, UNSWDEG2RAD(5), shiftedKickT, BACK_PHASE - halfShift);
       }
    // Swing foot forward.
    } else if (kickT < (BACK_PHASE + kickPhase)) {
       forwardDist = interpolateSmooth(-kickAmp * 0.9, kickAmp, kickT - BACK_PHASE, kickPhase);                
       side = sideAmp;
       shoulderRoll = shoulderRollAmp;
-      kneePitch = interpolateSmooth(DEG2RAD(35) * 0.9, DEG2RAD(-35), kickT - BACK_PHASE, kickPhase);
+      kneePitch = interpolateSmooth(UNSWDEG2RAD(35) * 0.9, UNSWDEG2RAD(-35), kickT - BACK_PHASE, kickPhase);
       anklePitch = -kneePitch;
       // Only start to flatten foot out at the halfway point
       if (forwardDist > 0) {
-         anklePitch = DEG2RAD(5);
+         anklePitch = UNSWDEG2RAD(5);
       }
    // Hold...
    } else if (kickT < (BACK_PHASE + kickPhase + THROUGH_PHASE)) {
       forwardDist = kickAmp;
       side = sideAmp;
       shoulderRoll = shoulderRollAmp;
-      kneePitch = DEG2RAD(-35);
+      kneePitch = UNSWDEG2RAD(-35);
       anklePitch = -kneePitch;
       lastKickForward = forwardDist;
       lastKneePitch = kneePitch;
@@ -685,7 +685,7 @@ void Walk2014Generator::makeForwardKickJoints(float kickLean, float kickStepH, f
       kneePitch = 0;
       anklePitch = 0;
       double endT = totalPhase - kickT;
-      rock = DEG2RAD(kickLean) * sin((endT + SHIFT_END_PERIOD / 4) / SHIFT_END_PERIOD * 2 * M_PI);
+      rock = UNSWDEG2RAD(kickLean) * sin((endT + SHIFT_END_PERIOD / 4) / SHIFT_END_PERIOD * 2 * M_PI);
       footh = kickStepH * sin((endT + SHIFT_END_PERIOD / 4) / SHIFT_END_PERIOD * 2 * M_PI);
    } else {
       kickT = 0;

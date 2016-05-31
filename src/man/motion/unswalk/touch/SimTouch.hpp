@@ -1,13 +1,13 @@
 #pragma once
 
-#include "motion/touch/Touch.hpp"
+#include "touch/Touch.hpp"
 
 class SimTouch : Touch {
    public:
       explicit SimTouch();
       ~SimTouch();
 
-      SensorValues getSensors(UNSWKinematics &kinematics);
+      UNSWSensorValues getSensors(UNSWKinematics &kinematics);
       bool getStanding();
       ButtonPresses getButtons();
 

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "types/ButtonPresses.hpp"
-#include "types/SensorValues.hpp"
-#include "perception/kinematics/Kinematics.hpp"
+#include "types/UNSWSensorValues.hpp"
+#include "perception/kinematics/UNSWKinematics.hpp"
 #include <boost/program_options/variables_map.hpp>
 
 /**
@@ -16,7 +16,7 @@ class Touch {
        * @return current values of sensors
        */
       virtual void readOptions(const boost::program_options::variables_map& config){}
-      virtual SensorValues getSensors(UNSWKinematics &kinematics) = 0;
+      virtual UNSWSensorValues getSensors(UNSWKinematics &kinematics) = 0;
 
       virtual bool getStanding() = 0;
       virtual ButtonPresses getButtons() = 0;

@@ -4,7 +4,7 @@
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 #include <limits>
-#include "motion/SonarRecorder.hpp"
+#include "SonarRecorder.hpp"
 #include "utils/angles.hpp"
 #include "utils/Logger.hpp"
 #include "utils/options.hpp"
@@ -34,13 +34,13 @@ Blackboard::Blackboard(const program_options::variables_map &vm)
 
 Blackboard::~Blackboard() {
    thread.configCallbacks["Blackboard"] =
-      function<void(const program_options::variables_map &)>();
+      boost::function<void(const program_options::variables_map &)>();
    llog(INFO) << "Blackboard destroyed" << endl;
 }
 
 void Blackboard::readOptions(const program_options::variables_map& config) {
    behaviour.readOptions(config);
-   //gameController.readOptions(config);
+   gameController.readOptions(config);
    receiver.readOptions(config);
    kinematics.readOptions(config);
 }
@@ -86,10 +86,10 @@ void BehaviourBlackboard::readOptions(const program_options::variables_map& conf
       request[readBuf].actions.body.actionType = ActionCommand::Body::GOALIE_AFTERSIT_INITIAL;
    request[readBuf].actions.body.forward = config["default.forward"].as<int>();
    request[readBuf].actions.body.left = config["default.left"].as<int>();
-   request[readBuf].actions.body.turn = DEG2RAD(config["default.turn"].as<float>());
-   request[readBuf].actions.body.speed = DEG2RAD(config["default.speed"].as<float>());
+   request[readBuf].actions.body.turn = UNSWDEG2RAD(config["default.turn"].as<float>());
+   request[readBuf].actions.body.speed = UNSWDEG2RAD(config["default.speed"].as<float>());
    request[readBuf].actions.body.power = config["default.power"].as<float>();
-   request[readBuf].actions.body.kickDirection = DEG2RAD(config["default.kickDirection"].as<float>());
+   request[readBuf].actions.body.kickDirection = UNSWDEG2RAD(config["default.kickDirection"].as<float>());
 
    string foot = config["default.foot"].as<string>();
    if (foot == "LEFT") {
@@ -120,39 +120,39 @@ LocalisationBlackboard::LocalisationBlackboard() {
    havePendingIncomingSharedBundle = std::vector<bool>(5, false);
 }
 
-// VisionBlackboard::VisionBlackboard()
-// {
-//    llog(INFO) << "Initialising blackboard: vision" << endl;
-//    landmarks.reserve(MAX_LANDMARKS);
-//    feet.reserve(MAX_FEET);
-//    balls.reserve(MAX_BALLS);
-//    posts.reserve(MAX_POSTS);
-//    robots.reserve(MAX_ROBOTS);
-//    fieldEdges.reserve(MAX_FIELD_EDGES);
-//    fieldFeatures.reserve(MAX_FIELD_FEATURES);
-//    vOdometry = Odometry();
-//    dualOdometry = Odometry();
-//    missedFrames = 0;
-//    dxdy = std::make_pair(0,0);
-//    caughtLeft = false;
-//    caughtRight = false;
-//    goalArea = PostInfo::pNone;
-//    awayGoalProb = 0.5f;
-//    homeMapSize = 0;
-//    awayMapSize = 0;
+VisionBlackboard::VisionBlackboard()
+{
+   llog(INFO) << "Initialising blackboard: vision" << endl;
+   landmarks.reserve(MAX_LANDMARKS);
+   feet.reserve(MAX_FEET);
+   balls.reserve(MAX_BALLS);
+   posts.reserve(MAX_POSTS);
+   robots.reserve(MAX_ROBOTS);
+   fieldEdges.reserve(MAX_FIELD_EDGES);
+   fieldFeatures.reserve(MAX_FIELD_FEATURES);
+   vOdometry = Odometry();
+   dualOdometry = Odometry();
+   missedFrames = 0;
+   dxdy = std::make_pair(0,0);
+   caughtLeft = false;
+   caughtRight = false;
+   goalArea = PostInfo::pNone;
+   awayGoalProb = 0.5f;
+   homeMapSize = 0;
+   awayMapSize = 0;
 
-//    saliency = NULL;
-//    currentFrame = NULL;
-//    topFrame = NULL;
-//    botFrame = NULL;
+   saliency = NULL;
+   currentFrame = NULL;
+   topFrame = NULL;
+   botFrame = NULL;
 
-//    numFieldLinePoints = 0;
-// }
+   numFieldLinePoints = 0;
+}
 
 PerceptionBlackboard::PerceptionBlackboard() {
    kinematics = 0;
    localisation = 0;
-   //vision = 0;
+   vision = 0;
    behaviour = 0;
    total = 33;
 }
@@ -177,19 +177,19 @@ RemoteControlBlackboard::RemoteControlBlackboard() {
 	time_received = 0;
 }
 
-// KinematicsBlackboard::KinematicsBlackboard() {
-//    llog(INFO) << "Initialising blackboard: kinematics" << endl;
-//    std::vector<int> left;
-//    left.reserve(Sonar::NUMBER_OF_READINGS/2*WINDOW_SIZE);
-//    std::vector<int> middle;
-//    middle.reserve(Sonar::NUMBER_OF_READINGS/2*WINDOW_SIZE);
-//    std::vector<int> right;
-//    right.reserve(Sonar::NUMBER_OF_READINGS/2*WINDOW_SIZE);
-//    sonarFiltered.reserve(3);
-//    sonarFiltered.push_back(left);
-//    sonarFiltered.push_back(middle);
-//    sonarFiltered.push_back(right);
-// }
+KinematicsBlackboard::KinematicsBlackboard() {
+   llog(INFO) << "Initialising blackboard: kinematics" << endl;
+   std::vector<int> left;
+   left.reserve(Sonar::NUMBER_OF_READINGS/2*WINDOW_SIZE);
+   std::vector<int> middle;
+   middle.reserve(Sonar::NUMBER_OF_READINGS/2*WINDOW_SIZE);
+   std::vector<int> right;
+   right.reserve(Sonar::NUMBER_OF_READINGS/2*WINDOW_SIZE);
+   sonarFiltered.reserve(3);
+   sonarFiltered.push_back(left);
+   sonarFiltered.push_back(middle);
+   sonarFiltered.push_back(right);
+}
 
 void KinematicsBlackboard::readOptions(const program_options::variables_map& config) {
    isCalibrating = config["kinematics.isCalibrating"].as<bool>();
@@ -209,62 +209,62 @@ void KinematicsBlackboard::readOptions(const program_options::variables_map& con
    }
 }
 
-// GameControllerBlackboard::GameControllerBlackboard() {
-//    llog(INFO) << "Initialising blackboard: gameController" << endl;
-//    connected = false;
-//    game_type = MATCH;
-//    memset(&our_team, 0, sizeof our_team);
-//    memset(&data, 0, sizeof data);
-// }
+GameControllerBlackboard::GameControllerBlackboard() {
+   llog(INFO) << "Initialising blackboard: gameController" << endl;
+   connected = false;
+   game_type = MATCH;
+   memset(&our_team, 0, sizeof our_team);
+   memset(&data, 0, sizeof data);
+}
 
-// void GameControllerBlackboard::readOptions(const program_options::variables_map& config) {
-//    connect = config["gamecontroller.connect"].as<bool>();
-//    player_number = config["player.number"].as<int>();
-//    string a = config["game.type"].as<string>();
-//    if (a == "MATCH") game_type = MATCH;
-//    if (a == "DRIBBLE") game_type = DRIBBLE;
-//    if (a == "OPEN") game_type = OPEN;
-//    if (a == "PASSING") game_type = PASSING;
-//    our_team.teamNumber = config["player.team"].as<int>();
-//    our_team.teamColour = (int)(config["gamecontroller.ourcolour"].
-//                                as<string>() == "red");
-//    team_red = our_team.teamColour;
-//    our_team.score = config["gamecontroller.ourscore"].as<int>();
-//    for (int i = 0; i < MAX_NUM_PLAYERS; ++i) {
-//       our_team.players[i].penalty = PENALTY_NONE;
-//       our_team.players[i].secsTillUnpenalised = 0;
-//    }
-//    TeamInfo their_team;
-//    their_team.teamNumber = config["gamecontroller.opponentteam"].as<int>();
-//    their_team.teamColour = (our_team.teamColour + 1) % 2;
-//    their_team.score = config["gamecontroller.opponentscore"].as<int>();
-//    for (int i = 0; i < MAX_NUM_PLAYERS; ++i) {
-//       their_team.players[i].penalty = PENALTY_NONE;
-//       their_team.players[i].secsTillUnpenalised = 0;
-//    }
-//    map<string, int> gcStateMap;
-//    gcStateMap["INITIAL"] = STATE_INITIAL;
-//    gcStateMap["READY"] = STATE_READY;
-//    gcStateMap["SET"] = STATE_SET;
-//    gcStateMap["PLAYING"] = STATE_PLAYING;
-//    gcStateMap["FINISHED"] = STATE_FINISHED;
-//    if (gcStateMap.count(config["gamecontroller.state"].as<string>())) {
-//       data.state = gcStateMap[config["gamecontroller.state"].as<string>()];
-//    } else {
-//       data.state = STATE_INVALID;
-//    }
-//    data.firstHalf = config["gamecontroller.firsthalf"].as<bool>();
-//    data.kickOffTeam = (int)(config["gamecontroller.kickoffteam"].as<string>()
-//                             == "red");
-//    map<string, int> gcSecStateMap;
-//    gcSecStateMap["NORMAL"] = STATE2_NORMAL;
-//    gcSecStateMap["PENALTYSHOOT"] = STATE2_PENALTYSHOOT;
-//    data.secondaryState = gcSecStateMap[
-//       config["gamecontroller.secondarystate"].as<string>()];
-//    data.secsRemaining = config["gamecontroller.secsremaining"].as<int>();
-//    data.teams[our_team.teamColour] = our_team;
-//    data.teams[their_team.teamColour] = their_team;
-// }
+void GameControllerBlackboard::readOptions(const program_options::variables_map& config) {
+   connect = config["gamecontroller.connect"].as<bool>();
+   player_number = config["player.number"].as<int>();
+   string a = config["game.type"].as<string>();
+   if (a == "MATCH") game_type = MATCH;
+   if (a == "DRIBBLE") game_type = DRIBBLE;
+   if (a == "OPEN") game_type = OPEN;
+   if (a == "PASSING") game_type = PASSING;
+   our_team.teamNumber = config["player.team"].as<int>();
+   our_team.teamColour = (int)(config["gamecontroller.ourcolour"].
+                               as<string>() == "red");
+   team_red = our_team.teamColour;
+   our_team.score = config["gamecontroller.ourscore"].as<int>();
+   for (int i = 0; i < MAX_NUM_PLAYERS; ++i) {
+      our_team.players[i].penalty = PENALTY_NONE;
+      our_team.players[i].secsTillUnpenalised = 0;
+   }
+   TeamInfo their_team;
+   their_team.teamNumber = config["gamecontroller.opponentteam"].as<int>();
+   their_team.teamColour = (our_team.teamColour + 1) % 2;
+   their_team.score = config["gamecontroller.opponentscore"].as<int>();
+   for (int i = 0; i < MAX_NUM_PLAYERS; ++i) {
+      their_team.players[i].penalty = PENALTY_NONE;
+      their_team.players[i].secsTillUnpenalised = 0;
+   }
+   map<string, int> gcStateMap;
+   gcStateMap["INITIAL"] = STATE_INITIAL;
+   gcStateMap["READY"] = STATE_READY;
+   gcStateMap["SET"] = STATE_SET;
+   gcStateMap["PLAYING"] = STATE_PLAYING;
+   gcStateMap["FINISHED"] = STATE_FINISHED;
+   if (gcStateMap.count(config["gamecontroller.state"].as<string>())) {
+      data.state = gcStateMap[config["gamecontroller.state"].as<string>()];
+   } else {
+      data.state = STATE_INVALID;
+   }
+   data.firstHalf = config["gamecontroller.firsthalf"].as<bool>();
+   data.kickOffTeam = (int)(config["gamecontroller.kickoffteam"].as<string>()
+                            == "red");
+   map<string, int> gcSecStateMap;
+   gcSecStateMap["NORMAL"] = STATE2_NORMAL;
+   gcSecStateMap["PENALTYSHOOT"] = STATE2_PENALTYSHOOT;
+   data.secondaryState = gcSecStateMap[
+      config["gamecontroller.secondarystate"].as<string>()];
+   data.secsRemaining = config["gamecontroller.secsremaining"].as<int>();
+   data.teams[our_team.teamColour] = our_team;
+   data.teams[their_team.teamColour] = their_team;
+}
 
 ReceiverBlackboard::ReceiverBlackboard() {
    BOOST_FOREACH(time_t & lr, lastReceived) {

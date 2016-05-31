@@ -2,7 +2,7 @@
 
 #include <string>
 #include <vector>
-#include "motion/generator/Generator.hpp"
+#include "generator/Generator.hpp"
 
 /* Determine whether the class is just called */
 #define NOT_RUNNING -1

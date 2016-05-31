@@ -6,9 +6,9 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
 #include <iostream>
-#include "types/SensorValues.hpp"
-#include "perception/kinematics/Kinematics.hpp"
-#include "FeetState.hpp"
+#include "types/UNSWSensorValues.hpp"
+#include "perception/kinematics/UNSWKinematics.hpp"
+#include "touch/FeetState.hpp"
 
 using namespace boost::numeric::ublas;
 using namespace std;

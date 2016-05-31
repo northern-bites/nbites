@@ -5,7 +5,7 @@
 
 #include <vector>
 #include <Eigen/Eigen>
-#include "types/SensorValues.hpp"
+#include "types/UNSWSensorValues.hpp"
 
 
 /* Complementary Kalman Filter (CKF), estimates robot torso pitch and roll 

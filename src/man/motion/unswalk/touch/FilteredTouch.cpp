@@ -1,6 +1,6 @@
 #include <cmath>
 #include <vector>
-#include "motion/touch/FilteredTouch.hpp"
+#include "touch/FilteredTouch.hpp"
 #include <sys/time.h>
 #include "utils/Logger.hpp"
 #include "utils/speech.hpp"
@@ -54,12 +54,12 @@ void FilteredTouch::readOptions(const boost::program_options::variables_map& con
          config["touch.gyrYOffset"].as<float>();
    targetOffset[GYR][0] = imuOffset[GYR][0];
    targetOffset[GYR][1] = imuOffset[GYR][1];
-   targetOffset[ANG][0] = DEG2RAD(config["touch.angleXOffset"].as<float>());
-   targetOffset[ANG][1] = DEG2RAD(config["touch.angleYOffset"].as<float>());
+   targetOffset[ANG][0] = UNSWDEG2RAD(config["touch.angleXOffset"].as<float>());
+   targetOffset[ANG][1] = UNSWDEG2RAD(config["touch.angleYOffset"].as<float>());
 }
 
 float FilteredTouch::getScaledGyr(int isY){
-   return DEG2RAD(update.sensors[Sensors::InertialSensor_GyrX + isY])/GYR_SCALE;
+   return UNSWDEG2RAD(update.sensors[Sensors::InertialSensor_GyrX + isY])/GYR_SCALE;
 }
 
 void FilteredTouch::filterOffset(int IMUid, int dir, float obs){
@@ -178,7 +178,7 @@ void FilteredTouch::filterSensors(){
 //   state.sensors[Sensors::Battery_Current] = getScaledGyr(1);
 }
 
-SensorValues FilteredTouch::getSensors(Kinematics &kinematics) {
+UNSWSensorValues FilteredTouch::getSensors(UNSWKinematics &kinematics) {
    update = touch->getSensors(kinematics);
    FilteredTouch::kinematics = kinematics;
 

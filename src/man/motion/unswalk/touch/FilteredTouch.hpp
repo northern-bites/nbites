@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Touch.hpp"
-#include "TorsoStateFilter.hpp"
+#include "touch/Touch.hpp"
+#include "touch/TorsoStateFilter.hpp"
 
 using namespace boost::numeric::ublas;
 
@@ -9,15 +9,15 @@ class FilteredTouch : Touch {
    public:
       explicit FilteredTouch(Touch* t);
       ~FilteredTouch();
-      SensorValues getSensors(UNSWKinematics &kinematics);
+      UNSWSensorValues getSensors(UNSWKinematics &kinematics);
       void readOptions(const boost::program_options::variables_map& config);
       bool getStanding();
       ButtonPresses getButtons();
    private:
       Touch* touch;
       bool init;
-      SensorValues state;     //filtered
-      SensorValues update;    //raw
+      UNSWSensorValues state;     //filtered
+      UNSWSensorValues update;    //raw
       FeetState feetState;
 
       //offset calibration variables

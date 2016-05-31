@@ -9,10 +9,10 @@
       return (x > y ? x : y);
    }
    inline static float MAX(const float x, const int y) {
-      return (x > y ? x : (float)y);
+      return (x > y ? x : y);
    }
    inline static float MAX(const int x, const float y) {
-      return (x > y ? (float)x : y);
+      return (x > y ? x : y);
    }
 #endif
 
@@ -22,10 +22,10 @@
       return (x > y ? y : x);
    }
    inline static float MIN(const float x, const int y) {
-      return (x > y ? (float)y : x);
+      return (x > y ? y : x);
    }
    inline static float MIN(const int x, const float y) {
-      return (x > y ? y : (float)x);
+      return (x > y ? y : x);
    }
 #endif
 

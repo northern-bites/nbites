@@ -1,10 +1,10 @@
-#include "motion/generator/WalkEnginePreProcessor.hpp"
+#include "generator/WalkEnginePreProcessor.hpp"
 
 #define MAX_FORWARD_STEP 90
 
 #define MAX_LEFT_STEP 50
 
-#define MAX_TURN_STEP DEG2RAD(20)
+#define MAX_TURN_STEP UNSWDEG2RAD(20)
 
 #define FOOT_LENGTH 100
 #define FORWARD_GAP 50
@@ -13,7 +13,7 @@
 
 #define FORWARD_THRESHOLD 25
 #define LEFT_THRESHOLD 20
-//#define TURN_THRESHOLD DEG2RAD(20)
+//#define TURN_THRESHOLD UNSWDEG2RAD(20)
 
 using namespace ActionCommand;
 using namespace std;
@@ -89,10 +89,10 @@ void WalkEnginePreProcessor::LineUpEngine::preProcess(ActionCommand::All* reques
 
    // don't turn further than 30 degrees away from the ball heading
    float heading = atan2(ballY, ballX);
-   if (NORMALISE(request->body.turn - heading) > DEG2RAD(30)) {
-      request->body.turn = NORMALISE(DEG2RAD(30) + heading);
-   } else if (NORMALISE(request->body.turn - heading) < -DEG2RAD(30)) {
-      request->body.turn = NORMALISE(-DEG2RAD(30) + heading);
+   if (NORMALISE(request->body.turn - heading) > UNSWDEG2RAD(30)) {
+      request->body.turn = NORMALISE(UNSWDEG2RAD(30) + heading);
+   } else if (NORMALISE(request->body.turn - heading) < -UNSWDEG2RAD(30)) {
+      request->body.turn = NORMALISE(-UNSWDEG2RAD(30) + heading);
    }
    request->body.turn = sign(request->body.turn) * min(MAX_TURN_STEP, fabs(request->body.turn/2));
 
@@ -147,7 +147,7 @@ void WalkEnginePreProcessor::DribbleEngine::preProcess(ActionCommand::All* reque
    request->body.left = 0;
    if (dribbleState == DribbleEngine::TURN) {
       request->body.forward = 0;
-      request->body.turn = direction * DEG2RAD(40);
+      request->body.turn = direction * UNSWDEG2RAD(40);
    } else if (dribbleState == DribbleEngine::FORWARD) {
       request->body.forward = 140;
       request->body.turn = 0;
@@ -184,7 +184,7 @@ bool isLineUpRequired(Body::ActionType actionType) {
 
 JointValues WalkEnginePreProcessor::makeJoints(ActionCommand::All* request,
                                           Odometry* odometry,
-                                          const SensorValues &sensors,
+                                          const UNSWSensorValues &sensors,
                                           BodyModel &bodyModel,
                                           float ballX,
                                           float ballY) {

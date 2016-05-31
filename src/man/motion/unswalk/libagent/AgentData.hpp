@@ -2,7 +2,7 @@
 #include <pthread.h>
 #include "types/ActionCommand.hpp"
 #include "types/JointValues.hpp"
-#include "types/SensorValues.hpp"
+#include "types/UNSWSensorValues.hpp"
 #include "types/ButtonPresses.hpp"
 
 #define AGENT_MEMORY "/libagent-memory"
@@ -25,7 +25,7 @@ struct AgentData {
    volatile uint8_t actuators_latest;
    volatile uint8_t actuators_read;
 
-   SensorValues sensors[3];
+   UNSWSensorValues sensors[3];
    ButtonPresses buttons[3];
    JointValues joints[3];
    ActionCommand::LED leds[3];

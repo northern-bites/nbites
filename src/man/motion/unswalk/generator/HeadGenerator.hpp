@@ -1,6 +1,6 @@
 #pragma once
 
-#include "motion/generator/Generator.hpp"
+#include "generator/Generator.hpp"
 
 /**
  * HeadGenerator - a Generator implementation that only moves the Head.
@@ -12,7 +12,7 @@ class HeadGenerator : Generator {
       ~HeadGenerator();
       virtual JointValues makeJoints(ActionCommand::All* request,
                                      Odometry* odometry,
-                                     const SensorValues &sensors,
+                                     const UNSWSensorValues &sensors,
                                      BodyModel &bodyModel,
                                      float ballX,
                                      float ballY);

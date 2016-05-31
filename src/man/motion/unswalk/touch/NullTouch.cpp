@@ -1,6 +1,6 @@
 #include "NullTouch.hpp"
 
-SensorValues NullTouch::getSensors(UNSWKinematics &kinematics) {
+UNSWSensorValues NullTouch::getSensors(UNSWKinematics &kinematics) {
    return nullSensors;
 }
 

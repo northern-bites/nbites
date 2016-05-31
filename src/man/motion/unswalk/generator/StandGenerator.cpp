@@ -1,5 +1,5 @@
-#include "motion/generator/StandGenerator.hpp"
-#include "motion/generator/ActionGenerator.hpp"
+#include "generator/StandGenerator.hpp"
+#include "generator/ActionGenerator.hpp"
 #include "utils/angles.hpp"
 #include "utils/body.hpp"
 #include "utils/Logger.hpp"
@@ -7,7 +7,7 @@
 using boost::program_options::variables_map;
 
 StandGenerator::StandGenerator()
-   : phi(DEG2RAD(0.0f)) {    //was 15, using 20 knee bend to prevent jerky transition between walk and stand
+   : phi(UNSWDEG2RAD(0.0f)) {    //was 15, using 20 knee bend to prevent jerky transition between walk and stand
    llog(INFO) << "StandGenerator constructed" << std::endl;
    posGen = (Generator*)(new ActionGenerator("stand"));
    if (!posGen)
@@ -21,7 +21,7 @@ StandGenerator::~StandGenerator() {
 
 JointValues StandGenerator::makeJoints(ActionCommand::All* request,
                                        Odometry* odometry,
-                                       const SensorValues &sensors,
+                                       const UNSWSensorValues &sensors,
                                        BodyModel &bodyModel,
                                        float ballX,
                                        float ballY) {
@@ -65,7 +65,7 @@ void StandGenerator::stop() {
 
 void StandGenerator::readOptions(const boost::program_options::variables_map &config) {
    posGen->readOptions(config);
-//   phi = DEG2RAD(config["walk.b"].as<float>());
+//   phi = UNSWDEG2RAD(config["walk.b"].as<float>());
 //   llog(INFO) << "Successfully changed stand generator options" << std::endl;
 //   llog(INFO) << "Stand generator options ignored" << std::endl;
 }

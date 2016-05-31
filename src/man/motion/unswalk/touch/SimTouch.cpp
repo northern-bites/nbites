@@ -12,7 +12,7 @@ SimTouch::~SimTouch() {
    llog(INFO) << "Sim Touch destroyed" << endl;
 }
 
-SensorValues SimTouch::getSensors(UNSWKinematics &kinematics) {
+UNSWSensorValues SimTouch::getSensors(UNSWKinematics &kinematics) {
    return oracle->getSensorValues();
 }
 

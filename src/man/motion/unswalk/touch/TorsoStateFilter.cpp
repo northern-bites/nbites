@@ -2,7 +2,7 @@
 #include "TorsoStateFilter.hpp"
 #include "utils/angles.hpp"
 #include "utils/Timer.hpp"
-#include "motion/touch/FilteredTouch.hpp"
+#include "touch/FilteredTouch.hpp"
 
 #define STATE_DIM 2
 //assumption of a straight body here is not good enough, high process variances

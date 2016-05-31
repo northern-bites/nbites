@@ -1,4 +1,4 @@
-#include "motion/effector/AgentEffector.hpp"
+#include "effector/AgentEffector.hpp"
 #include <sys/mman.h>        /* For shared memory */
 #include <fcntl.h>           /* For O_* constants */
 #include <stdexcept>

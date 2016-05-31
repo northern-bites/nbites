@@ -1,7 +1,7 @@
 #pragma once
 
-#include "motion/generator/Walk2014Generator.hpp"
-#include "motion/generator/Generator.hpp"
+#include "generator/Walk2014Generator.hpp"
+#include "generator/Generator.hpp"
 #include "utils/Timer.hpp"
 
 class WalkEnginePreProcessor : Generator {
@@ -10,7 +10,7 @@ class WalkEnginePreProcessor : Generator {
       ~WalkEnginePreProcessor();
       JointValues makeJoints(ActionCommand::All* request,
             Odometry* odometry,
-            const SensorValues &sensors,
+            const UNSWSensorValues &sensors,
             BodyModel &bodyModel,
             float ballX,
             float ballY);

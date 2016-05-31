@@ -1,4 +1,4 @@
-#include "motion/generator/HeadGenerator.hpp"
+#include "generator/HeadGenerator.hpp"
 #include "utils/basic_maths.hpp"
 #include "utils/clip.hpp"
 #include "utils/Logger.hpp"
@@ -16,7 +16,7 @@ HeadGenerator::~HeadGenerator() {
 /* Borrowed from Aaron's 2009 code. Uses a PID controller. */
 JointValues HeadGenerator::makeJoints(ActionCommand::All* request,
                                       Odometry* odometry,
-                                      const SensorValues &sensors,
+                                      const UNSWSensorValues &sensors,
                                       BodyModel &bodyModel,
                                       float ballX,
                                       float ballY) {

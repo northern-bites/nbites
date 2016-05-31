@@ -24,8 +24,8 @@ void Blackboard::shallowSerialize(Archive & ar,
       throw std::runtime_error("Depricated 2011 dump file detected");
    }
 
-   //ar & gameController.team_red;
-   //ar & gameController.player_number;
+   ar & gameController.team_red;
+   ar & gameController.player_number;
 
    ar & motion.sensors;
    ar & motion.pose;
@@ -39,157 +39,157 @@ void Blackboard::shallowSerialize(Archive & ar,
    ar & perception.total;
    ar & perception.vision;
 
-   //ar & behaviour.request;
+   ar & behaviour.request;
 
    ar & kinematics.sonarFiltered;
    ar & kinematics.parameters;
    ar & kinematics.sensorsLagged;
 
-   // if (this->mask & ROBOT_FILTER_MASK) {
-   //    ar & localisation.robotObstacles;
-   // } else {
-   //    std::vector<RobotInfo> empty;
-   //    ar & empty;
-   // }
+   if (this->mask & ROBOT_FILTER_MASK) {
+      ar & localisation.robotObstacles;
+   } else {
+      std::vector<UNSWRobotInfo> empty;
+      ar & empty;
+   }
 
-   // if (this->mask & LANDMARKS_MASK) {
-   //    ar & vision.landmarks;
-   // } else {
-   //    std::vector<Ipoint> empty;
-   //    ar & empty;
-   // }
+   if (this->mask & LANDMARKS_MASK) {
+      ar & vision.landmarks;
+   } else {
+      std::vector<Ipoint> empty;
+      ar & empty;
+   }
 
-   // ar & vision.timestamp;
-   // ar & vision.caughtLeft;
-   // ar & vision.caughtRight;
-   // ar & vision.goalArea;
-   // ar & vision.awayGoalProb;
-   // ar & vision.homeMapSize;
-   // ar & vision.awayMapSize;
-   // ar & vision.feet;
-   // ar & vision.balls;
-   // ar & vision.ballHint;
-   // ar & vision.posts;
-   // ar & vision.robots;
-   // ar & vision.fieldEdges;
-   // ar & vision.fieldFeatures;
-   // ar & vision.vOdometry;
-   // ar & vision.dualOdometry;
-   // ar & vision.missedFrames;
-   // ar & vision.dxdy;
+   ar & vision.timestamp;
+   ar & vision.caughtLeft;
+   ar & vision.caughtRight;
+   ar & vision.goalArea;
+   ar & vision.awayGoalProb;
+   ar & vision.homeMapSize;
+   ar & vision.awayMapSize;
+   ar & vision.feet;
+   ar & vision.balls;
+   ar & vision.ballHint;
+   ar & vision.posts;
+   ar & vision.robots;
+   ar & vision.fieldEdges;
+   ar & vision.fieldFeatures;
+   ar & vision.vOdometry;
+   ar & vision.dualOdometry;
+   ar & vision.missedFrames;
+   ar & vision.dxdy;
 
    ar & receiver.data;
    ar & receiver.incapacitated;
 
    ar & motion.pendulumModel;
 
-   // ar & localisation.robotPos;
-   // ar & localisation.ballLostCount;
-   // ar & localisation.ballPosRR;
-   // ar & localisation.ballPosRRC;
-   // ar & localisation.ballVelRRC;
-   // if (version >= 16) {
-   //    ar & localisation.ballVel;
-   //    ar & localisation.ballPosUncertainty;
-   //    ar & localisation.ballVelEigenvalue;
-   //    ar & localisation.robotPosUncertainty;
-   //    ar & localisation.robotHeadingUncertainty;
-   // }
-   // ar & localisation.ballNeckRelative;
-   // ar & localisation.ballPos;
-   // ar & localisation.teamBall;
-   // ar & localisation.sharedLocalisationBundle;
-   // ar & localisation.havePendingOutgoingSharedBundle;
-   // ar & localisation.havePendingIncomingSharedBundle;
+   ar & localisation.robotPos;
+   ar & localisation.ballLostCount;
+   ar & localisation.ballPosRR;
+   ar & localisation.ballPosRRC;
+   ar & localisation.ballVelRRC;
+   if (version >= 16) {
+      ar & localisation.ballVel;
+      ar & localisation.ballPosUncertainty;
+      ar & localisation.ballVelEigenvalue;
+      ar & localisation.robotPosUncertainty;
+      ar & localisation.robotHeadingUncertainty;
+   }
+   ar & localisation.ballNeckRelative;
+   ar & localisation.ballPos;
+   ar & localisation.teamBall;
+   ar & localisation.sharedLocalisationBundle;
+   ar & localisation.havePendingOutgoingSharedBundle;
+   ar & localisation.havePendingIncomingSharedBundle;
 }
 
 template<class Archive>
 void Blackboard::save(Archive & ar, const unsigned int version) const {
    // note, version is always the latest when saving
-   // OffNaoMask_t mask = this->mask;
-   // if ((mask & SALIENCY_MASK) && (!vision.topSaliency || !vision.botSaliency))
-   //    mask &= (~SALIENCY_MASK);
-   // if ((mask & RAW_IMAGE_MASK) && (!vision.topFrame || !vision.botFrame))
-   //    mask &= (~RAW_IMAGE_MASK);
-   // ar & boost::serialization::make_nvp("Mask", mask);
+   OffNaoMask_t mask = this->mask;
+   if ((mask & SALIENCY_MASK) && (!vision.topSaliency || !vision.botSaliency))
+      mask &= (~SALIENCY_MASK);
+   if ((mask & RAW_IMAGE_MASK) && (!vision.topFrame || !vision.botFrame))
+      mask &= (~RAW_IMAGE_MASK);
+   ar & boost::serialization::make_nvp("Mask", mask);
 
-   // if ((mask & BLACKBOARD_MASK) && (mask & SALIENCY_MASK)) {
-   //    locks.serialization->lock();
-   //    ((Blackboard*)this)->shallowSerialize(ar, version);
-   //    // TODO(jayen): RLE
-   //    ar & boost::serialization::
-   //    make_nvp("TopSaliency",
-   //             boost::serialization::
-   //             make_binary_object(vision.topSaliency,
-   //                                sizeof(Colour[IMAGE_COLS / TOP_SALIENCY_DENSITY][IMAGE_ROWS / TOP_SALIENCY_DENSITY])));
-   //    ar & boost::serialization::
-   //    make_nvp("BotSaliency",
-   //             boost::serialization::
-   //             make_binary_object(vision.botSaliency,
-   //                                sizeof(Colour[IMAGE_COLS / BOT_SALIENCY_DENSITY][IMAGE_ROWS / BOT_SALIENCY_DENSITY])));
-   //    locks.serialization->unlock();
-   // } else if (mask & BLACKBOARD_MASK) {
-   //    ((Blackboard*)this)->shallowSerialize(ar, version);
-   // } else if (mask & SALIENCY_MASK) {
-   //    // TODO(jayen): RLE
-   //    ar & boost::serialization::
-   //    make_nvp("TopSaliency",
-   //             boost::serialization::
-   //             make_binary_object(vision.topSaliency,
-   //                                sizeof(Colour[IMAGE_COLS / TOP_SALIENCY_DENSITY][IMAGE_ROWS / TOP_SALIENCY_DENSITY])));
-   //    ar & boost::serialization::
-   //    make_nvp("BotSaliency",
-   //             boost::serialization::
-   //             make_binary_object(vision.botSaliency,
-   //                                sizeof(Colour[IMAGE_COLS / BOT_SALIENCY_DENSITY][IMAGE_ROWS / BOT_SALIENCY_DENSITY])));
-   // }
-   // if (mask & RAW_IMAGE_MASK) {
-   //    // TODO(jayen): zlib
-   //    ar & boost::serialization::make_nvp(
-   //          "Top Raw Image",
-   //          boost::serialization:: make_binary_object((void *)vision.topFrame,
-   //          sizeof(uint8_t[IMAGE_ROWS * IMAGE_COLS * 2])));
-   //    ar & boost::serialization::make_nvp(
-   //         "Bot Raw Image",
-   //          boost::serialization:: make_binary_object((void *)vision.botFrame,
-   //          sizeof(uint8_t[IMAGE_ROWS * IMAGE_COLS * 2])));
-   // }
+   if ((mask & BLACKBOARD_MASK) && (mask & SALIENCY_MASK)) {
+      locks.serialization->lock();
+      ((Blackboard*)this)->shallowSerialize(ar, version);
+      // TODO(jayen): RLE
+      ar & boost::serialization::
+      make_nvp("TopSaliency",
+               boost::serialization::
+               make_binary_object(vision.topSaliency,
+                                  sizeof(Colour[IMAGE_COLS / TOP_SALIENCY_DENSITY][IMAGE_ROWS / TOP_SALIENCY_DENSITY])));
+      ar & boost::serialization::
+      make_nvp("BotSaliency",
+               boost::serialization::
+               make_binary_object(vision.botSaliency,
+                                  sizeof(Colour[IMAGE_COLS / BOT_SALIENCY_DENSITY][IMAGE_ROWS / BOT_SALIENCY_DENSITY])));
+      locks.serialization->unlock();
+   } else if (mask & BLACKBOARD_MASK) {
+      ((Blackboard*)this)->shallowSerialize(ar, version);
+   } else if (mask & SALIENCY_MASK) {
+      // TODO(jayen): RLE
+      ar & boost::serialization::
+      make_nvp("TopSaliency",
+               boost::serialization::
+               make_binary_object(vision.topSaliency,
+                                  sizeof(Colour[IMAGE_COLS / TOP_SALIENCY_DENSITY][IMAGE_ROWS / TOP_SALIENCY_DENSITY])));
+      ar & boost::serialization::
+      make_nvp("BotSaliency",
+               boost::serialization::
+               make_binary_object(vision.botSaliency,
+                                  sizeof(Colour[IMAGE_COLS / BOT_SALIENCY_DENSITY][IMAGE_ROWS / BOT_SALIENCY_DENSITY])));
+   }
+   if (mask & RAW_IMAGE_MASK) {
+      // TODO(jayen): zlib
+      ar & boost::serialization::make_nvp(
+            "Top Raw Image",
+            boost::serialization:: make_binary_object((void *)vision.topFrame,
+            sizeof(uint8_t[IMAGE_ROWS * IMAGE_COLS * 2])));
+      ar & boost::serialization::make_nvp(
+           "Bot Raw Image",
+            boost::serialization:: make_binary_object((void *)vision.botFrame,
+            sizeof(uint8_t[IMAGE_ROWS * IMAGE_COLS * 2])));
+   }
 
-   //ar & localisation.robotPos;
+   ar & localisation.robotPos;
 }
 
 template<class Archive>
 void Blackboard::load(Archive & ar, const unsigned int version) {
-   // ar & mask;
-   // if (mask & BLACKBOARD_MASK)
-   //    shallowSerialize(ar, version);
-   // if (mask & SALIENCY_MASK) {
-   //    vision.topSaliency = (Colour*) new
-   //                Colour[IMAGE_COLS / TOP_SALIENCY_DENSITY]
-   //                      [IMAGE_ROWS / TOP_SALIENCY_DENSITY];
-   //    // TODO(jayen): RLE
-   //    ar & boost::serialization::make_binary_object(vision.topSaliency,
-   //                                                  sizeof(Colour[IMAGE_COLS / TOP_SALIENCY_DENSITY][IMAGE_ROWS / TOP_SALIENCY_DENSITY]));
+   ar & mask;
+   if (mask & BLACKBOARD_MASK)
+      shallowSerialize(ar, version);
+   if (mask & SALIENCY_MASK) {
+      vision.topSaliency = (Colour*) new
+                  Colour[IMAGE_COLS / TOP_SALIENCY_DENSITY]
+                        [IMAGE_ROWS / TOP_SALIENCY_DENSITY];
+      // TODO(jayen): RLE
+      ar & boost::serialization::make_binary_object(vision.topSaliency,
+                                                    sizeof(Colour[IMAGE_COLS / TOP_SALIENCY_DENSITY][IMAGE_ROWS / TOP_SALIENCY_DENSITY]));
 
-   //    vision.botSaliency = (Colour*) new
-   //                Colour[IMAGE_COLS / BOT_SALIENCY_DENSITY]
-   //                      [IMAGE_ROWS / BOT_SALIENCY_DENSITY];
-   //    // TODO(jayen): RLE
-   //    ar & boost::serialization::make_binary_object(vision.botSaliency,
-   //                                                  sizeof(Colour[IMAGE_COLS / BOT_SALIENCY_DENSITY][IMAGE_ROWS / BOT_SALIENCY_DENSITY]));
-   // }
-   // if (mask & RAW_IMAGE_MASK) {
-   //    vision.topFrame = new uint8_t[IMAGE_ROWS * IMAGE_COLS * 2];
-   //    ar & boost::serialization::
-   //    make_binary_object((void *)vision.topFrame,
-   //                       sizeof(uint8_t[IMAGE_ROWS * IMAGE_COLS * 2]));
-   //    vision.botFrame = new uint8_t[IMAGE_ROWS * IMAGE_COLS * 2];
-   //    ar & boost::serialization::
-   //    make_binary_object((void *)vision.botFrame,
-   //                       sizeof(uint8_t[IMAGE_ROWS * IMAGE_COLS * 2]));
-   // }
+      vision.botSaliency = (Colour*) new
+                  Colour[IMAGE_COLS / BOT_SALIENCY_DENSITY]
+                        [IMAGE_ROWS / BOT_SALIENCY_DENSITY];
+      // TODO(jayen): RLE
+      ar & boost::serialization::make_binary_object(vision.botSaliency,
+                                                    sizeof(Colour[IMAGE_COLS / BOT_SALIENCY_DENSITY][IMAGE_ROWS / BOT_SALIENCY_DENSITY]));
+   }
+   if (mask & RAW_IMAGE_MASK) {
+      vision.topFrame = new uint8_t[IMAGE_ROWS * IMAGE_COLS * 2];
+      ar & boost::serialization::
+      make_binary_object((void *)vision.topFrame,
+                         sizeof(uint8_t[IMAGE_ROWS * IMAGE_COLS * 2]));
+      vision.botFrame = new uint8_t[IMAGE_ROWS * IMAGE_COLS * 2];
+      ar & boost::serialization::
+      make_binary_object((void *)vision.botFrame,
+                         sizeof(uint8_t[IMAGE_ROWS * IMAGE_COLS * 2]));
+   }
 
-   // ar & localisation.robotPos;
+   ar & localisation.robotPos;
 }
 
 namespace boost {

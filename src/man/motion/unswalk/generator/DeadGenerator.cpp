@@ -1,4 +1,4 @@
-#include "motion/generator/DeadGenerator.hpp"
+#include "generator/DeadGenerator.hpp"
 #include "utils/Logger.hpp"
 
 DeadGenerator::DeadGenerator() : ticks(0) {

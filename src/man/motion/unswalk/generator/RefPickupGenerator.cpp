@@ -1,5 +1,5 @@
-#include "motion/generator/RefPickupGenerator.hpp"
-#include "motion/generator/StandGenerator.hpp"
+#include "generator/RefPickupGenerator.hpp"
+#include "generator/StandGenerator.hpp"
 #include "utils/angles.hpp"
 #include "utils/body.hpp"
 #include "utils/Logger.hpp"
@@ -7,7 +7,7 @@
 using boost::program_options::variables_map;
 
 RefPickupGenerator::RefPickupGenerator()
-   : phi(DEG2RAD(0.0f)), t(100), stopping(false), stopped(false) {
+   : phi(UNSWDEG2RAD(0.0f)), t(100), stopping(false), stopped(false) {
    llog(INFO) << "RefPickupGenerator constructed" << std::endl;
    standGen = (Generator *)(new StandGenerator());
 }
@@ -19,7 +19,7 @@ RefPickupGenerator::~RefPickupGenerator() {
 
 JointValues RefPickupGenerator::makeJoints(ActionCommand::All* request,
                                            Odometry* odometry,
-                                           const SensorValues &sensors,
+                                           const UNSWSensorValues &sensors,
                                            BodyModel &bodyModel,
                                            float ballX,
                                            float ballY) {

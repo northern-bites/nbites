@@ -4,7 +4,7 @@
 #include <utility>
 #include <list>
 #include "utils/body.hpp"
-#include "motion/SonarRecorder.hpp"
+#include "SonarRecorder.hpp"
 
 
 #define MERGE_CUTOFF 50 // in mm, how close range observations must be to merge

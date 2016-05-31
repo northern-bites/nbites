@@ -1,6 +1,6 @@
 #pragma once
 
-#include "motion/generator/Generator.hpp"
+#include "generator/Generator.hpp"
 
 class NullGenerator : Generator {
    public:
@@ -8,7 +8,7 @@ class NullGenerator : Generator {
       ~NullGenerator();
       virtual JointValues makeJoints(ActionCommand::All* request,
                                      Odometry* odometry,
-                                     const SensorValues &sensors,
+                                     const UNSWSensorValues &sensors,
                                      BodyModel &bodyModel,
                                      float ballX,
                                      float ballY);

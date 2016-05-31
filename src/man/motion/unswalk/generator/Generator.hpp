@@ -4,8 +4,8 @@
 #include "types/ActionCommand.hpp"
 #include "types/JointValues.hpp"
 #include "types/Odometry.hpp"
-#include "types/SensorValues.hpp"
-#include "BodyModel.hpp"
+#include "types/UNSWSensorValues.hpp"
+#include "generator/BodyModel.hpp"
 
 /**
  * Generator - responsible for tranforming ActionCommands into joint angles.

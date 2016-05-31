@@ -42,9 +42,9 @@ class Logger {
       static void init(std::string logPath, std::string logLevel, bool motion);
       static Logger *instance();
       std::ostream &realLlog(int logLevel);
+      static void readOptions(const boost::program_options::variables_map &config);
 
    private:
-      static void readOptions(const boost::program_options::variables_map &config);
       static void init(std::string logLevel, bool motion);
       static __thread Logger *logger;
       static enum LogLevel logLevel;

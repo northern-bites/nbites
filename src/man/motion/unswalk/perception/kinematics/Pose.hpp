@@ -8,7 +8,7 @@
 
 #include <stdint.h>
 
-//#include "perception/vision/CameraDefs.hpp"
+#include "perception/vision/CameraDefs.hpp"
 #include "types/Point.hpp"
 #include "types/RRCoord.hpp"
 #include "types/JointValues.hpp"

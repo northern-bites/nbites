@@ -1,11 +1,11 @@
-#include "motion/generator/DistributedGenerator.hpp"
-#include "motion/generator/ActionGenerator.hpp"
-#include "motion/generator/DeadGenerator.hpp"
-#include "motion/generator/HeadGenerator.hpp"
-#include "motion/generator/NullGenerator.hpp"
-#include "motion/generator/RefPickupGenerator.hpp"
-#include "motion/generator/StandGenerator.hpp"
-#include "motion/generator/WalkEnginePreProcessor.hpp"
+#include "generator/DistributedGenerator.hpp"
+#include "generator/ActionGenerator.hpp"
+#include "generator/DeadGenerator.hpp"
+#include "generator/HeadGenerator.hpp"
+#include "generator/NullGenerator.hpp"
+#include "generator/RefPickupGenerator.hpp"
+#include "generator/StandGenerator.hpp"
+#include "generator/WalkEnginePreProcessor.hpp"
 
 #include "utils/body.hpp"
 #include "utils/Logger.hpp"
@@ -170,7 +170,7 @@ DistributedGenerator::~DistributedGenerator() {
  *---------------------------------------------------------------------------*/
 JointValues DistributedGenerator::makeJoints(ActionCommand::All* request,
                                              Odometry* odometry,
-                                             const SensorValues &sensors,
+                                             const UNSWSensorValues &sensors,
                                              BodyModel &bodyModel,
                                              float ballX,
                                              float ballY) {
@@ -302,9 +302,9 @@ JointValues DistributedGenerator::makeJoints(ActionCommand::All* request,
       dir = -1;
    }
    if(prev_generator == Body::GOALIE_DIVE_LEFT){
-      turn = DEG2RAD(dir*80);
+      turn = UNSWDEG2RAD(dir*80);
    } else if (prev_generator == Body::GOALIE_DIVE_RIGHT){
-      turn = DEG2RAD(-dir*80);
+      turn = UNSWDEG2RAD(-dir*80);
    }
    *odometry = *odometry + Odometry(0, 0, turn);
    fromBody = bodyGenerators[current_generator]->

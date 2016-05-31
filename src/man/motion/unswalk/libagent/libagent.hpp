@@ -33,30 +33,30 @@ const float sit_angles[Joints::NUMBER_OF_JOINTS] = {
    0.0,              // HeadYaw
    0.0,              // HeadPitch
 
-   DEG2RAD(10),      // LShoulderPitch
+   UNSWDEG2RAD(10),      // LShoulderPitch
    0.0,              // LShoulderRoll
    0.0,              // LElbowYaw
-   DEG2RAD(7.5),     // LElbowRoll
+   UNSWDEG2RAD(7.5),     // LElbowRoll
    0.0,              // LWristYaw
    0.0,              // LHand
 
-   DEG2RAD(-50),     // LHipYawPitch
-   DEG2RAD(-20),     // LHipRoll
-   DEG2RAD(-75),     // LHipPitch
-   DEG2RAD(125),     // LKneePitch
-   DEG2RAD(-70),     // LAnklePitch
+   UNSWDEG2RAD(-50),     // LHipYawPitch
+   UNSWDEG2RAD(-20),     // LHipRoll
+   UNSWDEG2RAD(-75),     // LHipPitch
+   UNSWDEG2RAD(125),     // LKneePitch
+   UNSWDEG2RAD(-70),     // LAnklePitch
    0.0,              // LAnkleRoll
 
-   DEG2RAD(20),      // RHipRoll
-   DEG2RAD(-75),     // RHipPitch
-   DEG2RAD(125),     // RKneePitch
-   DEG2RAD(-70),     // RAnklePitch
+   UNSWDEG2RAD(20),      // RHipRoll
+   UNSWDEG2RAD(-75),     // RHipPitch
+   UNSWDEG2RAD(125),     // RKneePitch
+   UNSWDEG2RAD(-70),     // RAnklePitch
    0.0,              // RAnkleRoll
 
-   DEG2RAD(10),      // RShoulderPitch
+   UNSWDEG2RAD(10),      // RShoulderPitch
    0.0,              // RShoulderRoll
    0.0,              // RElbowYaw
-   DEG2RAD(-7.5),    // RElbowRoll
+   UNSWDEG2RAD(-7.5),    // RElbowRoll
    0.0,              // RWristYaw
    0.0               // RHand
 };

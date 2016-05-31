@@ -1,4 +1,4 @@
-#include "motion/touch/FeetState.hpp"
+#include "touch/FeetState.hpp"
 
 using namespace boost::numeric::ublas;
 
@@ -11,7 +11,7 @@ FeetState::FeetState(){
    }
 }
 
-void FeetState::update(const SensorValues &sensors, Kinematics &kinematics){
+void FeetState::update(const UNSWSensorValues &sensors, UNSWKinematics &kinematics){
    float footSensor[2][4];
    footSensor[0][0] = sensors.sensors[Sensors::LFoot_FSR_FrontLeft];
    footSensor[0][1] = sensors.sensors[Sensors::LFoot_FSR_FrontRight];

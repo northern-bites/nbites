@@ -20,7 +20,13 @@ namespace man
 namespace motion 
 {
 
-const float UNSWalkProvider::INITIAL_BODY_POSE_ANGLES[] = {
+// static const float INITIAL_BODY_POSE_ANGLES[] {
+// 	0.f,0.f,0.f,0.f,0.f,0.f,0.f,
+// 	0.f,0.f,0.f,0.f,0.f,0.f,0.f,
+// 	0.f,0.f,0.f,0.f,0.f,0.f,0.f,0.f,
+// };
+
+const float UNSWalkProvider::INITIAL_BODY_POSE_ANGLES[] {
 	0.f,0.f,0.f,0.f,0.f,0.f,0.f,
 	0.f,0.f,0.f,0.f,0.f,0.f,0.f,
 	0.f,0.f,0.f,0.f,0.f,0.f,0.f,0.f,
@@ -60,13 +66,13 @@ static const Joints::JointCode nb_joint_order[] {
 UNSWalkProvider::UNSWalkProvider() : MotionProvider(WALK_PROVIDER), 
  									 requestedToStop(false), tryingToWalk(false) 
 {
-	walk2014gen = new Walk2014Generator;
+	generator = new Walk2014Generator;
 	resetAll();
 }
 
 UNSWalkProvider::~UNSWalkProvider()
 {
-	delete walk2014gen;
+	delete generator;
 }
 
 void UNSWalkProvider::resetAll() {
@@ -134,11 +140,11 @@ void UNSWalkProvider::getOdometryUpdate(portals::OutPortal<messages::RobotLocati
 }
 
 bool UNSWalkProvider::isStanding() const { //is going to stand rather than at complete standstill
-	return walk2014gen->walk2014Option == 1; //1 corresponds to process of moving from WALK crouch to STAND
+	return generator->getIsStanding(); //1 corresponds to process of moving from WALK crouch to STAND
 }
 
 bool UNSWalkProvider::isWalkActive() const {
-	return !walk2014gen->stopped;
+	return !generator->getIsStopped();
 }
 
 void UNSWalkProvider::stand() {

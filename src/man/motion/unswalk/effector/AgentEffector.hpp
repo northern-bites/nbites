@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Effector.hpp"
+#include "effector/Effector.hpp"
 #include "libagent/AgentData.hpp"
 
 class AgentEffector : Effector {

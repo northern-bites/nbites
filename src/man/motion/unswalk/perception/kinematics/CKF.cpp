@@ -3,13 +3,13 @@
 #include "utils/basic_maths.hpp"
 
 
-static const float angle_var = SQUARE(DEG2RAD(1.f)); //1
-static const float velocity_var = SQUARE(DEG2RAD(5.f)); //1 
+static const float angle_var = SQUARE(UNSWDEG2RAD(1.f)); //1
+static const float velocity_var = SQUARE(UNSWDEG2RAD(5.f)); //1 
 
 static const float dt = 0.01f; // 10ms time intervals
 
-static const float acc_var = SQUARE(DEG2RAD(50.f)); //50
-static const float gyro_var = SQUARE(DEG2RAD(1.f));  
+static const float acc_var = SQUARE(UNSWDEG2RAD(50.f)); //50
+static const float gyro_var = SQUARE(UNSWDEG2RAD(1.f));  
 
 
 CKF::CKF(){
@@ -31,7 +31,7 @@ void CKF::resetFilter(){
 
 
 
-void CKF::update(const SensorValues &sensorValues){
+void CKF::update(const UNSWSensorValues &sensorValues){
 
    // Process matrix   
    Eigen::Matrix<float, 4, 4> F = Eigen::Matrix<float, 4, 4>::Identity();

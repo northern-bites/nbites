@@ -1,6 +1,6 @@
 #include "Oracle.h"
 #include "utils/Logger.hpp"
-#include "motion/effector/SimEffector.hpp"
+#include "effector/SimEffector.hpp"
 
 using namespace std;
 

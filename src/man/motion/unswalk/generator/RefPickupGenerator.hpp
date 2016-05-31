@@ -1,6 +1,6 @@
 #pragma once
 
-#include "motion/generator/Generator.hpp"
+#include "generator/Generator.hpp"
 
 class RefPickupGenerator : Generator {
    public:
@@ -8,7 +8,7 @@ class RefPickupGenerator : Generator {
       ~RefPickupGenerator();
       virtual JointValues makeJoints(ActionCommand::All* request,
                                      Odometry* odometry,
-                                     const SensorValues &sensors,
+                                     const UNSWSensorValues &sensors,
                                      BodyModel &bodyModel,
                                      float ballX,
                                      float ballY);

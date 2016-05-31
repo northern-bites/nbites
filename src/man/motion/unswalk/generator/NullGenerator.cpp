@@ -1,4 +1,4 @@
-#include "motion/generator/NullGenerator.hpp"
+#include "generator/NullGenerator.hpp"
 #include "utils/Logger.hpp"
 
 NullGenerator::NullGenerator() {
@@ -11,7 +11,7 @@ NullGenerator::~NullGenerator() {
 
 JointValues NullGenerator::makeJoints(ActionCommand::All* request,
                                       Odometry* odometry,
-                                      const SensorValues &sensors,
+                                      const UNSWSensorValues &sensors,
                                       BodyModel &bodyModel,
                                       float ballX,
                                       float ballY) {

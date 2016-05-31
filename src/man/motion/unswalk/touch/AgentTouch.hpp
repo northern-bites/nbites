@@ -1,14 +1,14 @@
 #pragma once
 
 #include <semaphore.h>
-#include "Touch.hpp"
+#include "touch/Touch.hpp"
 #include "libagent/AgentData.hpp"
 
 class AgentTouch : Touch {
    public:
       explicit AgentTouch();
       ~AgentTouch();
-      SensorValues getSensors(UNSWKinematics &kinematics);
+      UNSWSensorValues getSensors(UNSWKinematics &kinematics);
       bool getStanding();
       ButtonPresses getButtons();
 
