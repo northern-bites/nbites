@@ -3,13 +3,8 @@
 #include "Profiler.h"
 #include "RoboCupGameControlData.h"
 #include "DebugConfig.h"
-<<<<<<< HEAD
-#include "../log/logging.h"
-#include "../control/control.h"
-=======
 
 #include "HighResTimer.h"
->>>>>>> 8c9c5c5b7047f7f5d34619d3b2906e28d90f8a51
 
 #include "Logging.hpp"
 #include "Control.hpp"
