@@ -107,6 +107,8 @@ public class PathChooser {
 
 	private static final PathChooserHandler handler = new PathChooserHandler();
 
+	private static final Color DARK_GREEN = new Color(0,100,0);
+	
 	private static class PathChooserHandler implements KeyListener, ActionListener, TreeModel, TreeSelectionListener {
 
 		protected final PathChooseDisplay display = new PathChooseDisplay();
@@ -293,7 +295,7 @@ public class PathChooser {
 			boolean valid = isValid();
 			display.choosePathButton.setEnabled(valid);
 			display.choosePathButton.setForeground(
-					valid ? Color.green : Color.BLACK);
+					valid ? DARK_GREEN : Color.BLACK);
 			
 			return valid;
 		}

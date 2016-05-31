@@ -23,12 +23,15 @@ import nbtool.util.Debug.LogLevel;
 
 public class ToolMessage extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
+	
+	private static final Color DARK_GREEN = new Color(0,100,0);
+	private static final Color DARK_ORANGE = new Color(255,140,0);
 
 	public static void displayInfo(String format, Object ... args) {
 		if (Debug.level.shows(LogLevel.levelINFO)) {
 			dbs.info(format, args);
 			String displayed = String.format("nbt: " + format, args);
-			display(displayed, Color.GREEN);
+			display(displayed, DARK_GREEN);
 		}
 	}
 	
@@ -36,7 +39,7 @@ public class ToolMessage extends JFrame implements ActionListener {
 		if (Debug.level.shows(LogLevel.levelWARN)) {
 			dbs.warn(format, args);
 			String displayed = String.format("nbt: " + format, args);
-			display(displayed, Color.ORANGE);
+			display(displayed, DARK_ORANGE);
 		}
 	}
 	
@@ -153,8 +156,10 @@ public class ToolMessage extends JFrame implements ActionListener {
 	
 	//testing
 	public static void main(String[] args) throws InterruptedException {
-		for(;;Thread.sleep(1000))
-			new ToolMessage("a longer message than the last one", Color.RED);		
+		String string = "The quick brown fox jumped over the lazy dog.";	
+		ToolMessage.displayInfo(string);
+		ToolMessage.displayWarn(string);
+		ToolMessage.displayError(string);
 	}
 
 	
