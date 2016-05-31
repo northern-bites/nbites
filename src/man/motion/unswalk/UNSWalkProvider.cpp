@@ -66,7 +66,7 @@ static const Joints::JointCode nb_joint_order[] {
 UNSWalkProvider::UNSWalkProvider() : MotionProvider(WALK_PROVIDER), 
  									 requestedToStop(false), tryingToWalk(false) 
 {
-	generator = new Walk2014Generator;
+	generator = (Generator*)(new WalkEnginePreProcessor());
 	resetAll();
 }
 
@@ -113,7 +113,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 }
 
 void UNSWalkProvider::hardReset() {
-
+	generator->reset();
 }
 
 void UNSWalkProvider::resetOdometry() {
@@ -140,11 +140,11 @@ void UNSWalkProvider::getOdometryUpdate(portals::OutPortal<messages::RobotLocati
 }
 
 bool UNSWalkProvider::isStanding() const { //is going to stand rather than at complete standstill
-	return generator->getIsStanding(); //1 corresponds to process of moving from WALK crouch to STAND
+	// return generator->getIsStanding(); //1 corresponds to process of moving from WALK crouch to STAND
 }
 
 bool UNSWalkProvider::isWalkActive() const {
-	return !generator->getIsStopped();
+	return generator->isActive();
 }
 
 void UNSWalkProvider::stand() {

@@ -51,7 +51,6 @@ class Walk2014Generator : Generator {
    void reset();
    void stop();
 
-   bool getIsStopped() {return stopped;}
    bool getIsStanding() { return walk2014Option == 1;}
    friend class WalkEnginePreProcessor;
 

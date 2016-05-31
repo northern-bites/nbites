@@ -6,10 +6,12 @@ add_definitions(-DLINUX -DRELEASE -DTARGET_ROBOT)
 set( unswalk_srcs
   utils/basic_maths.hpp
   utils/body.hpp
+  utils/Timer.hpp
   utils/Logger.hpp
   gamecontroller/RoboCupGameControlData.cpp
   gamecontroller/GameController.cpp
   blackboard/Blackboard.cpp
+  perception/kinematics/Pose.cpp
   perception/kinematics/UNSWKinematics.cpp
   types/JointValues.hpp
   types/UNSWSensorValues.hpp
@@ -22,8 +24,12 @@ set( unswalk_srcs
   utils/angles.hpp
   UNSWalkProvider.cpp
   IKinematics.cpp
+  effector/Effector.hpp
   generator/Generator.hpp
   generator/BodyModel.cpp
+  generator/WalkCycle.cpp
+  generator/PendulumModel.cpp
+  generator/WalkEnginePreProcessor.cpp
   generator/Walk2014Generator.cpp
 )
 

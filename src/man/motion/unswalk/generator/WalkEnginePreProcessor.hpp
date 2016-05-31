@@ -22,6 +22,7 @@ class WalkEnginePreProcessor : Generator {
    private:
 
       class LineUpEngine {
+         friend class WalkEnginePreProcessor;
          explicit LineUpEngine(Walk2014Generator* walkEngine);
          Walk2014Generator* walkEngine;
          bool hasStarted;
@@ -35,6 +36,7 @@ class WalkEnginePreProcessor : Generator {
       };
 
       class DribbleEngine {
+         friend class WalkEnginePreProcessor;
          explicit DribbleEngine(Walk2014Generator* walkEngine);
 
          enum DribbleState {
