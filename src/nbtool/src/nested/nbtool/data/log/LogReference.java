@@ -94,6 +94,7 @@ public class LogReference {
 	public String description = null;
 	
 	public long savedID = -1;
+	public long thisID = Utility.getNextIndex(this);
 	
 	private WeakReference<Log> theLog = null;
 	private Path tempPath = null;
@@ -289,8 +290,8 @@ public class LogReference {
 	}
 	
 	public String guiString() {
-		return String.format("log %d: %s from %s@%s time %d %s", 
-				savedID, logClass, host_name, host_addr, createdWhen, temporary() ? "TEMP" : "LOAD"); 
+		return String.format("log r%d: %s from %s@%s time %d %s", 
+				thisID, logClass, host_name, host_addr, createdWhen, temporary() ? "TEMP" : "LOAD"); 
 	}
 	
 	public static void _NBL_ADD_TESTS_() {
