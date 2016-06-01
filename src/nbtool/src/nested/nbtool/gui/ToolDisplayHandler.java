@@ -206,7 +206,8 @@ public class ToolDisplayHandler implements
 		AbstractAction loadAction = new AbstractAction(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				display.loadButton.doClick();
+				if (display.leftSideTabs.getSelectedComponent() == display.controlTab)
+					display.loadButton.doClick();
 			}
 		};
 		

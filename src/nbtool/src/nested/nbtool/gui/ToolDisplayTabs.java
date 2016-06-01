@@ -15,6 +15,8 @@ import nbtool.data.group.Group;
 import nbtool.data.log.Log;
 import nbtool.gui.logviews.misc.GroupView;
 import nbtool.gui.logviews.misc.ViewParent;
+import nbtool.util.Center;
+import nbtool.util.Center.NBToolShutdownListener;
 import nbtool.util.Debug;
 
 public class ToolDisplayTabs {
@@ -23,12 +25,31 @@ public class ToolDisplayTabs {
 	
 	private static final Debug.DebugSettings debug = Debug.createSettings(Debug.WARN);
 	
-	public ToolDisplayTabs(ToolDisplay display) {
-		this.display = display;
+	public ToolDisplayTabs(final ToolDisplay _display) {
+		this.display = _display;
+		
+		Center.listen(new NBToolShutdownListener(){
+
+			@Override
+			public void nbtoolShutdownCallback() {
+				warnViews();
+			}
+			
+		});
+	}
+	
+	private void warnViews() {
+		for (int i = 0; i < display.displayTabs.getTabCount(); ++i) {
+			Component cmp = display.displayTabs.getComponentAt(i);
+			if (cmp instanceof ViewParent) {
+				((ViewParent) cmp).disappearing();
+			}
+		}
 	}
 	
 	protected void setContents(Group group) {
 		current = null;
+		warnViews();
 		display.displayTabs.removeAll();
 		display.displayTabs.add(group.toString(), new GroupView(group));
 	}
@@ -38,6 +59,7 @@ public class ToolDisplayTabs {
 //		display.displayTabs.removeAll();
 		
 		this.current = first;
+		warnViews();
 		
 		for (int i = 0; i < list.length; ++i) {
 			Class<? extends ViewParent> ttype = list[i];

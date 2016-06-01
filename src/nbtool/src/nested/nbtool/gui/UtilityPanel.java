@@ -15,7 +15,7 @@ public class UtilityPanel extends JPanel {
 		initComponents();
 		
 		util = up;
-		char memn = up.preferredMemnonic();
+		char memn = Character.toUpperCase(up.preferredMemnonic());
 		if (memn > 0) {
 			this.memLabel.setText("" + memn);
 		} else {
