@@ -39,7 +39,7 @@ void TeamConnect::setUpSocket()
     socket->setBroadcast(true);
 
     printf("TeamConnect::setUpSocket() using port %i\n", SPL_BROADCAST_PORT);
-    socket->setTarget("10.0.255.255", SPL_BROADCAST_PORT);
+    socket->setTarget("255.255.255.255", SPL_BROADCAST_PORT);
     socket->bind("", SPL_BROADCAST_PORT); // listen for anything on our port
 }
 
@@ -338,7 +338,7 @@ void TeamConnect::checkDeadTeammates(portals::OutPortal<messages::WorldModel>* m
         {
             continue;
         }
-        else //if (time - teamMates[i].timestamp > TEAMMATE_DEAD_THRESHOLD)
+        else if (time - teamMates[i].timestamp > TEAMMATE_DEAD_THRESHOLD)
         {
             portals::Message<messages::WorldModel> msg(0);
             msg.get()->set_active(false);
