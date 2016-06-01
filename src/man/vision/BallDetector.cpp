@@ -453,7 +453,6 @@ bool BallDetector::findCorrelatedBlackSpots
                     foundThree = true;
                     std::cout << "Found correlated, punting for now" << std::endl;
                     std::vector<Spot> correlatedSpots;
-                    //Blob newBall = actualBlobs[i];
                     // find our correlated blobs and merge them in
                     for (int k = 0; k < blackBlobs.size(); k++) {
                         if (correlatedTo[i][k] == 1) {
@@ -467,21 +466,21 @@ bool BallDetector::findCorrelatedBlackSpots
                     //area and centroid eqns from: https://en.wikipedia.org/wiki/Centroid
                     //simply averaging the coordinates seems to perform better.
                     //keeping the actual eqns code in, if we will want to switch in the future.
-                    double xsum, ysum;//, asum;
+                    double xsum, ysum; //, asum;
                     // for(int a = 0; a < correlatedSpots.size()-1; a++) {
-                    //     asum += (correlatedSpots[i].ix()*correlatedSpots[i+1].iy() - 
-                    //         correlatedSpots[i+1].ix()*correlatedSpots[i].iy());
+                    //     asum += (correlatedSpots[a].ix()*correlatedSpots[a+1].iy() - 
+                    //         correlatedSpots[a+1].ix()*correlatedSpots[a].iy());
                     // }
-                    double ballSpotX, ballSpotY;//, area;
-                    //area = 0.5 * asum;
-                    for(int s=0; s < correlatedSpots.size(); s++) { // size()-1 for wiki eqns
+                    double ballSpotX, ballSpotY; //, area;
+                    // area = 0.5 * asum;
+                    for(int s = 0; s < correlatedSpots.size(); s++) { // size()-1 for wiki eqns
                         // xsum += (correlatedSpots[s].ix()+correlatedSpots[s+1].ix()) * 
-                        //         (correlatedSpots[i].ix()*correlatedSpots[i+1].iy() - 
-                        //         correlatedSpots[i+1].ix()*correlatedSpots[i].iy());
+                        //         (correlatedSpots[s].ix()*correlatedSpots[s+1].iy() - 
+                        //         correlatedSpots[s+1].ix()*correlatedSpots[s].iy());
                         
                         // ysum += (correlatedSpots[s].iy()+correlatedSpots[s+1].iy()) * 
-                        //         (correlatedSpots[i].ix()*correlatedSpots[i+1].iy() - 
-                        //         correlatedSpots[i+1].ix()*correlatedSpots[i].iy());
+                        //         (correlatedSpots[s].ix()*correlatedSpots[s+1].iy() - 
+                        //         correlatedSpots[s+1].ix()*correlatedSpots[s].iy());
                         xsum += correlatedSpots[s].ix();
                         ysum += correlatedSpots[s].iy();
                     }
