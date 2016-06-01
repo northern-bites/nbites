@@ -1,5 +1,6 @@
 package nbtool.nio;
 
+import java.awt.GridLayout;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.net.Socket;
@@ -7,9 +8,15 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import javax.swing.JPanel;
+
 import nbtool.data.json.JsonObject;
+import nbtool.data.json.Json.JsonValue;
+import nbtool.data.json.JsonParser.JsonParseException;
 import nbtool.data.json.Json;
+import nbtool.data.json.JsonArray;
 import nbtool.data.log.Log;
+import nbtool.gui.FlagPanel;
 import nbtool.io.CommonIO;
 import nbtool.io.CommonIO.GIOFirstResponder;
 import nbtool.io.CommonIO.IOFirstResponder;
@@ -80,6 +87,40 @@ public class RobotConnection extends IOInstance {
 				instances.remove(toRem);
 		}
 	}
+	
+	public static class RobotFlag {
+		public int index;
+		public String name;
+		public boolean value;
+		
+		public RobotFlag(int i, String n, boolean v) {
+			this.index = i; this.name = n; this.value = v;
+		}
+		
+		public RobotFlag(JsonObject obj) {
+			name = obj.get("name").asString().value;
+			index = obj.get("index").asNumber().asInt();
+			value = obj.get("value").asBoolean().bool();
+		}
+		
+		public static RobotFlag[] parseLog(Log flags) {
+			assert(flags.logClass.equals(SharedConstants.LogClass_Flags()));
+			
+			JsonArray fArray = null;
+			try {
+				fArray = flags.blocks.get(0).parseAsJson().asArray();
+			} catch (JsonParseException e) {
+				e.printStackTrace();
+				assert(false);
+			}
+			
+			RobotFlag[] allFlags = new RobotFlag[fArray.size()];
+			for (int i = 0; i < allFlags.length; ++i)
+				allFlags[i] = new RobotFlag(fArray.get(i).asObject());
+			
+			return allFlags;
+		}
+	}
 
 	/* INSTANCE STRUCTURE */
 	/* -------------------------------------------------- */
@@ -144,6 +185,8 @@ public class RobotConnection extends IOInstance {
 	private final Log heartbeat = Log.explicitLog(null, null,
 			SharedConstants.LogClass_Null(), 0);
 	
+	public RobotFlag[] flags = null;
+	
 	protected boolean tryStart() {
 		assert(socket == null);
 		assert(state() == IOState.STARTING);
@@ -204,9 +247,17 @@ public class RobotConnection extends IOInstance {
 				String key = input.topLevelDictionary.get(SharedConstants.RPC_KEY()).asString().value;
 				if (pending.containsKey(key)) {
 					RemoteCall call = pending.remove(key);
+					
+					if (call.callName().equals("GetFlags")) {
+						debug.info("RobotConnection piggy-backing flags from %s",
+								this.host);
+						
+						this.flags = RobotFlag.parseLog(input.blocks.get(0).parseAsLog());
+					}
+					
 					call.finish(this, input);
 				} else {
-					debug.warn("%s got RPCReturn of %s key %s WITH NO MATCHING CALLS PENDING", 
+					debug.error("%s got RPCReturn of %s key %s WITH NO MATCHING CALLS PENDING", 
 							input.topLevelDictionary.get(SharedConstants.RPC_NAME()).asString().value,
 							key);
 				}
