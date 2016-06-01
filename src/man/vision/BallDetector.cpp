@@ -452,18 +452,50 @@ bool BallDetector::findCorrelatedBlackSpots
                     // grab this blob from our vector
                     foundThree = true;
                     std::cout << "Found correlated, punting for now" << std::endl;
-
-                    /*Blob newBall = actualBlobs[i];
+                    std::vector<Spot> correlatedSpots;
+                    //Blob newBall = actualBlobs[i];
                     // find our correlated blobs and merge them in
                     for (int k = 0; k < blackBlobs.size(); k++) {
                         if (correlatedTo[i][k] == 1) {
-                            Blob merger = actualBlobs[k];
-                            newBall.merge(merger);
+                            correlatedSpots.push_back(actualBlobs[k]);
+                            correlatedTo[k][i] = 0;
+                            correlations[k] -= 1;
                         }
                     }
-                    makeBall(newBall, cameraHeight, 0.8, foundBall, true); */
+                    correlatedSpots.push_back(actualBlobs[i]);
+                    std::cout<<"Correlated Spots Size: "<<correlatedSpots.size()<<std::endl;
+                    //area and centroid eqns from: https://en.wikipedia.org/wiki/Centroid
+                    //simply averaging the coordinates seems to perform better.
+                    //keeping the actual eqns code in, if we will want to switch in the future.
+                    double xsum, ysum;//, asum;
+                    // for(int a = 0; a < correlatedSpots.size()-1; a++) {
+                    //     asum += (correlatedSpots[i].ix()*correlatedSpots[i+1].iy() - 
+                    //         correlatedSpots[i+1].ix()*correlatedSpots[i].iy());
+                    // }
+                    double ballSpotX, ballSpotY;//, area;
+                    //area = 0.5 * asum;
+                    for(int s=0; s < correlatedSpots.size(); s++) { // size()-1 for wiki eqns
+                        // xsum += (correlatedSpots[s].ix()+correlatedSpots[s+1].ix()) * 
+                        //         (correlatedSpots[i].ix()*correlatedSpots[i+1].iy() - 
+                        //         correlatedSpots[i+1].ix()*correlatedSpots[i].iy());
+                        
+                        // ysum += (correlatedSpots[s].iy()+correlatedSpots[s+1].iy()) * 
+                        //         (correlatedSpots[i].ix()*correlatedSpots[i+1].iy() - 
+                        //         correlatedSpots[i+1].ix()*correlatedSpots[i].iy());
+                        xsum += correlatedSpots[s].ix();
+                        ysum += correlatedSpots[s].iy();
+                    }
+                    ballSpotX = xsum/correlatedSpots.size();
+                    ballSpotY = ysum/correlatedSpots.size();
+                    // ballSpotX = 1/(6*area)*xsum;
+                    // ballSpotY = 1/(6*area)*ysum; 
+                    Spot ballSpot;
+                    ballSpot.x = ballSpotX;
+                    ballSpot.y = ballSpotY;
+                    debugDraw.drawPoint(ballSpotX+width/2,-1*ballSpotY + height/2,MAROON);
+                    makeBall(ballSpot, cameraHeight, 0.8, foundBall, true);
 #ifdef OFFLINE
-                    foundBall = true;
+                    //foundBall = true;
 #else
                     return true;
 #endif
@@ -473,7 +505,7 @@ bool BallDetector::findCorrelatedBlackSpots
     }
     // If the best case didn't work out, look for 3 black blobs together
     for (int c = 0; c < blackBlobs.size(); c++) {
-        if ((correlations[c] > 1 || (correlations[c] == 1 && !topCamera))
+        if ((correlations[c] > 1 || (correlations[c] == 1))
 			 && !foundThree) {
             std::vector<Spot> correlatedSpots;
             double ballSpotX, ballSpotY = 0;
@@ -490,65 +522,52 @@ bool BallDetector::findCorrelatedBlackSpots
                 Spot s1 = correlatedSpots[0];
                 Spot s2 = correlatedSpots[1];
 
-                double s1wx, s1wy, s2wx, s2wy;
-                homography->fieldCoords(s1.ix(),s1.iy(), s1wx, s1wy);
-                homography->fieldCoords(s2.ix(),s2.iy(), s2wx, s2wy);
+                // double s1wx, s1wy, s2wx, s2wy;
+                // homography->fieldCoords(s1.ix(),s1.iy(), s1wx, s1wy);
+                // homography->fieldCoords(s2.ix(),s2.iy(), s2wx, s2wy);
                 double distance;
-                distance = sqrt(pow((s2wx - s1wx),2) + pow((s2wy - s1wy),2));
+                distance = sqrt(pow((s2.ix() - s1.ix()),2) + pow((s2.iy() - s1.iy()),2));
                 std::cout<<"Distance: "<<distance<<std::endl;
 
-                if(distance > 6.0 && distance < 7.1) {
-                    std::cout<<"Returning True. Distance is in the right range"<<std::endl;
+                if(distance > 19.0 && distance < 21.4) {
+                    std::cout<<"Distance is in the right range"<<std::endl;
 
-                    ballSpotX = (s1wx+s2wx)/2;
-                    ballSpotY = (s1wy+s2wy)/2;
+                    ballSpotX = (s1.ix()+s2.ix())/2;
+                    ballSpotY = (s1.iy()+s2.iy())/2;
                     Spot ballSpot;
+                    ballSpot.x = ballSpotX;
+                    ballSpot.y = ballSpotY;
+                    debugDraw.drawPoint(ballSpotX+width/2,-1*ballSpotY + height/2,BLUE);
                     foundBall = true;
+                    makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);    
                 }
             } else if(correlatedSpots.size() == 3) {
                 Spot s1 = correlatedSpots[0];
                 Spot s2 = correlatedSpots[1];
                 Spot s3 = correlatedSpots[2];
 
-                double s1wx, s1wy, s2wx, s2wy, s3wx, s3wy;
-                homography->fieldCoords(s1.ix(),s1.iy(), s1wx, s1wy);
-                homography->fieldCoords(s2.ix(),s2.iy(), s2wx, s2wy);
-                homography->fieldCoords(s3.ix(),s3.iy(), s3wx, s3wy);
+                // double s1wx, s1wy, s2wx, s2wy, s3wx, s3wy;
+                // homography->fieldCoords(s1.ix(),s1.iy(), s1wx, s1wy);
+                // homography->fieldCoords(s2.ix(),s2.iy(), s2wx, s2wy);
+                // homography->fieldCoords(s3.ix(),s3.iy(), s3wx, s3wy);
 
-                double area = abs((s1wx*(s2wy-s3wy) + s2wx*(s3wy-s1wy) + s3wx*(s1wy-s2wy))/2);
+                double area = abs((s1.ix()*(s2.iy()-s3.iy()) + s2.ix()*(s3.iy()-s1.iy()) + s3.ix()*(s1.iy()-s2.iy()))/2);
                 std::cout<<"Area: "<<area<<std::endl;
 
-                ballSpotX = (s1wx+s2wx+s3wx)/3;
-                ballSpotY = (s2wy+s2wy+s3wy)/3;
+                ballSpotX = (s1.ix()+s2.ix()+s3.ix())/3;
+                ballSpotY = (s2.iy()+s2.iy()+s3.iy())/3;
+                debugDraw.drawPoint(ballSpotX+width/2,-1*ballSpotY + height/2,BLACK);
+
+                Spot ballSpot;
+                ballSpot.x = ballSpotX;
+                ballSpot.y = ballSpotY;
+
                 foundBall = true;
+                makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
             }
-
-            // if(foundBall) {
-            //     Spot newBall = actualBlobs[c];
-            // }
-
-
-            // good candidate ball
-            /*Blob newBall = actualBlobs[c];
-            for (int k = 0; k < blackBlobs.size(); k++) {
-                if (correlatedTo[c][k] == 1) {
-                    Blob merger = actualBlobs[k];
-                    newBall.merge(merger);
-                    // don't double count this blob
-                    correlatedTo[k][c] = 0;
-                    correlations[k] -= 1;
-                    if (debugBall) {
-                        std::cout << "Cor: " << blackBlobs[c].first <<
-                            " " << blackBlobs[c].second << " " <<
-                            blackBlobs[k].first << " " << blackBlobs[k].second <<
-                            std::endl;
-                    }
-                }
-            }
-            makeBall(newBall, cameraHeight, 0.75, foundBall, true); */
             std::cout << "Found 2d cor. Punting for now" << std::endl;
 #ifdef OFFLINE
-            return foundBall;
+            //return foundBall;
 #else
             return true;
 #endif
@@ -790,7 +809,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     }
 
     if (findCorrelatedBlackSpots(blackBlobs, actualBlackSpots, cameraHeight,
-                                 foundBall)) {
+                                 foundBall)) { //&& !foundBall
 #ifdef OFFLINE
         //foundBall = true;
 #else

@@ -33,6 +33,10 @@ namespace man {
 
 		class Ball {
 		public:
+			//spot, first x,y in homography transformed coords
+			//tc - top/bottom camera
+			//center x,y
+			//confidence
 			Ball(Spot & s, double x_, double y_, double cameraH_, int imgHeight_,
 				 int imgWidth_, bool tc,
 				 double cx, double cy, double conf);
