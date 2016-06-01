@@ -39,10 +39,7 @@ void GameStateModule::run_()
 #ifdef USE_LOGGING
     if (control::check(control::flags::state_playing_override)) {
         flag_setPlaying();
-    }
-
-    if (control::check(control::flags::state_penalty_override)) {
-        flag_setPenalized();
+        flag_setPenalized(control::check(control::flags::state_penalty_override));
     }
 #endif
 
@@ -190,15 +187,21 @@ void GameStateModule::manual_penalize()
     }
 }
 
-void GameStateModule::flag_setPenalized() {
+void GameStateModule::flag_setPenalized(bool p) {
     for (int i = 0; i < latest_data.team_size(); ++i)
     {
         messages::TeamInfo* team = latest_data.mutable_team(i);
         if (team->team_number() == team_number)
         {
             messages::RobotInfo* player = team->mutable_player(player_number-1);
-            player->set_penalty(PENALTY_MANUAL);
-            response_status = GAMECONTROLLER_RETURN_MSG_MAN_PENALISE;
+
+            if (p) {
+                player->set_penalty(PENALTY_MANUAL);
+//                response_status = GAMECONTROLLER_RETURN_MSG_MAN_PENALISE;
+            } else {
+//                response_status = GAMECONTROLLER_RETURN_MSG_MAN_UNPENALISE;
+                player->set_penalty(PENALTY_NONE);
+            }
 
             break;
         }

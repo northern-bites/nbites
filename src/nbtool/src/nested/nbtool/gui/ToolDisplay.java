@@ -72,7 +72,7 @@ public class ToolDisplay extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         topLevelSplit.setBackground(new java.awt.Color(153, 153, 153));
-        topLevelSplit.setDividerLocation(300);
+        topLevelSplit.setDividerLocation(350);
 
         utilitiesTab.setBackground(new java.awt.Color(153, 153, 153));
 
@@ -94,7 +94,7 @@ public class ToolDisplay extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(optionsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(viewProfileBox, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(debugLevelBox, 0, 186, Short.MAX_VALUE)))
+                    .addComponent(debugLevelBox, 0, 236, Short.MAX_VALUE)))
         );
         optionsPaneLayout.setVerticalGroup(
             optionsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -144,7 +144,7 @@ public class ToolDisplay extends javax.swing.JFrame {
             .addComponent(pathBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(loadPaneLayout.createSequentialGroup()
                 .addComponent(selectButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 109, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(loadButton))
         );
         loadPaneLayout.setVerticalGroup(
@@ -171,7 +171,7 @@ public class ToolDisplay extends javax.swing.JFrame {
         keepSlider.setSnapToTicks(true);
         keepSlider.setToolTipText("");
 
-        jLabel2.setText("keep");
+        jLabel2.setText("keep %");
 
         javax.swing.GroupLayout robotPaneLayout = new javax.swing.GroupLayout(robotPane);
         robotPane.setLayout(robotPaneLayout);
@@ -183,9 +183,9 @@ public class ToolDisplay extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(keepSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addComponent(keepSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(connectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(connectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         robotPaneLayout.setVerticalGroup(
             robotPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -251,7 +251,7 @@ public class ToolDisplay extends javax.swing.JFrame {
             .addGroup(sortAndSearchPanelLayout.createSequentialGroup()
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(sasOrderBox, 0, 228, Short.MAX_VALUE)
+                .addComponent(sasOrderBox, 0, 278, Short.MAX_VALUE)
                 .addContainerGap())
             .addComponent(sasStreamProfile, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
