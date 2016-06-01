@@ -12,7 +12,8 @@ def shouldChaseBall(player):
     We see the ball. So go get it.
     """
     ball = player.brain.ball
-    return (ball.vis.frames_on > constants.BALL_ON_THRESH)
+    return (ball.vis.frames_on > constants.BALL_ON_THRESH or
+     player.brain.ballMemRatio > constants.BALL_MEM_THRESH)
 
 def shouldReturnHome(player):
     """
@@ -150,7 +151,8 @@ def shouldFindBall(player):
     """
     We lost the ball, scan to find it
     """
-    return (player.brain.ball.vis.frames_off > constants.BALL_OFF_THRESH) and not player.inKickOffPlay
+    return ((player.brain.ball.vis.frames_off > constants.BALL_OFF_THRESH) and 
+    not player.inKickOffPlay and player.brain.ballMemRatio < constants.BALL_MEM_THRESH)
 
 def shouldFindBallKick(player):
     """

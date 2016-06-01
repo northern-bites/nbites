@@ -266,7 +266,6 @@ int Vision_func() {
     //-------------------
     Log* colorSegRet = new Log();
     int colorSegLength = (width / 4) * (height / 2);
-
     // Create temp buffer and fill with segmented image
     uint8_t segBuf[colorSegLength];
     memcpy(segBuf, frontEnd->colorImage().pixelAddr(), colorSegLength);
@@ -424,10 +423,12 @@ int Vision_func() {
     }
     count = 0;
     for (auto i=blobs.begin(); i!=blobs.end(); i++) {
-        SExpr blobTree = treeFromBlob(*i);
-        SExpr next = SExpr::keyValue("blob" + std::to_string(count), blobTree);
-        allBalls.append(next);
-        count++;
+        if ((*i).firstPrincipalLength() < 8) {
+            SExpr blobTree = treeFromBlob(*i);
+            SExpr next = SExpr::keyValue("blob" + std::to_string(count), blobTree);
+            allBalls.append(next);
+            count++;
+        }
     }
 
     ballRet->setTree(allBalls);
@@ -459,7 +460,6 @@ int Vision_func() {
     ccdRet->setData(pointsBuf);
     rets.push_back(ccdRet);
 
-	std::cout << "Debug image" << std::endl;
     //-------------------
     //  DEBUG IMAGE
     //-------------------

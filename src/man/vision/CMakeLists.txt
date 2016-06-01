@@ -18,6 +18,7 @@ SET( VISION_SRCS
   BallDetector.cpp
   RobotObstacle.cpp
   RobotDetector.cpp
+  Ransac.cpp
   )
 
 IF (UNIX AND NOT APPLE)
