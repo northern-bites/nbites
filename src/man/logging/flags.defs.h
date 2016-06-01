@@ -36,6 +36,9 @@ FLAG_XM(tripoint_bottom_only),
 FLAG_XM(multiball),
 FLAG_XM(thumbnail),
 
+FLAG_XM(state_penalty_override),
+FLAG_XM(state_playing_override),
+
 FLAG_XM(_END_EXTERNAL_),
 
 //Num_flags must be last!  In the enum, it has int value ( 'previous' + 1)

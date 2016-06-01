@@ -29,6 +29,8 @@ public class FlagPanel extends JPanel implements ActionListener {
 	public int index;
 	public RobotConnection robot;
 	
+	private final int TOTAL_NAME_LENGTH = 40;
+	
 	public FlagPanel(RobotConnection robot, JsonObject object) {
 		String name = object.get("name").asString().value;
 		int index = object.get("index").asNumber().asInt();
@@ -37,11 +39,16 @@ public class FlagPanel extends JPanel implements ActionListener {
 		this.robot = robot;
 		
 		this.flag_name = name;
-		int nspace = 20 - name.length();
-		//even out lengths.
-		this.flag_name += new String(new char[nspace]).replace("\0", " ");
-		this.index = index;
+		if (name.length() > TOTAL_NAME_LENGTH) {
+			Debug.error("flag name %s is longer than %d chars, this will mess up the GUI!", name,
+					TOTAL_NAME_LENGTH);
+		} else {
+			int nspace = TOTAL_NAME_LENGTH - name.length();
+			//even out lengths.
+			this.flag_name += new String(new char[nspace]).replace("\0", " ");
+		}
 		
+		this.index = index;
 		
 		this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 		
