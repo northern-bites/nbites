@@ -5,6 +5,8 @@
 #include "RoboCupGameControlData.h"
 #include "Common.h"
 
+#include "Control.hpp"
+
 namespace man{
 namespace gamestate{
 
@@ -33,6 +35,16 @@ void GameStateModule::run_()
 {
     latchInputs();
     update();
+
+#ifdef USE_LOGGING
+    if (control::check(control::flags::state_playing_override)) {
+
+    }
+
+    if (control::check(control::flags::state_penalty_override)) {
+
+    }
+#endif
 
     portals::Message<messages::GameState> output(&latest_data);
     gameStateOutput.setMessage(output);
