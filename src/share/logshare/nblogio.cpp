@@ -238,7 +238,7 @@ return ERROR; }
             NBL_LOG_IF(NBL_ERROR_LEVEL, ret, "config_socket(): %s",
                        utilities::get_error(errno).c_str());
 
-#ifdef __APPLE__
+#if defined(__APPLE__) && !defined(OFFLINE)
             int set = 1;
             setsockopt(socket, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
 #endif

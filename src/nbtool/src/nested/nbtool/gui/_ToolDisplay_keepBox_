@@ -50,9 +50,8 @@ public class ToolDisplay extends javax.swing.JFrame {
         robotPane = new javax.swing.JPanel();
         robotAddressBox = new javax.swing.JComboBox<>();
         streamComboBox = new javax.swing.JComboBox<>();
+        keepCheckBox = new javax.swing.JCheckBox();
         connectButton = new javax.swing.JButton();
-        keepSlider = new javax.swing.JSlider();
-        jLabel2 = new javax.swing.JLabel();
         rpcScrollPane = new javax.swing.JScrollPane();
         logTab = new javax.swing.JPanel();
         sortAndSearchPanel = new javax.swing.JPanel();
@@ -72,7 +71,7 @@ public class ToolDisplay extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         topLevelSplit.setBackground(new java.awt.Color(153, 153, 153));
-        topLevelSplit.setDividerLocation(300);
+        topLevelSplit.setDividerLocation(250);
 
         utilitiesTab.setBackground(new java.awt.Color(153, 153, 153));
 
@@ -94,7 +93,7 @@ public class ToolDisplay extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(optionsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(viewProfileBox, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(debugLevelBox, 0, 186, Short.MAX_VALUE)))
+                    .addComponent(debugLevelBox, 0, 136, Short.MAX_VALUE)))
         );
         optionsPaneLayout.setVerticalGroup(
             optionsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -123,7 +122,7 @@ public class ToolDisplay extends javax.swing.JFrame {
             .addGroup(utilitiesTabLayout.createSequentialGroup()
                 .addComponent(optionsPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(utilityScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE))
+                .addComponent(utilityScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 444, Short.MAX_VALUE))
         );
 
         leftSideTabs.addTab("utilities", utilitiesTab);
@@ -144,7 +143,7 @@ public class ToolDisplay extends javax.swing.JFrame {
             .addComponent(pathBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(loadPaneLayout.createSequentialGroup()
                 .addComponent(selectButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 109, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
                 .addComponent(loadButton))
         );
         loadPaneLayout.setVerticalGroup(
@@ -162,16 +161,15 @@ public class ToolDisplay extends javax.swing.JFrame {
 
         robotAddressBox.setEditable(true);
 
+        keepCheckBox.setSelected(true);
+        keepCheckBox.setText("keep");
+        keepCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                keepCheckBoxActionPerformed(evt);
+            }
+        });
+
         connectButton.setText("connect");
-
-        keepSlider.setMajorTickSpacing(1);
-        keepSlider.setMaximum(5);
-        keepSlider.setPaintLabels(true);
-        keepSlider.setPaintTicks(true);
-        keepSlider.setSnapToTicks(true);
-        keepSlider.setToolTipText("");
-
-        jLabel2.setText("keep");
 
         javax.swing.GroupLayout robotPaneLayout = new javax.swing.GroupLayout(robotPane);
         robotPane.setLayout(robotPaneLayout);
@@ -180,12 +178,9 @@ public class ToolDisplay extends javax.swing.JFrame {
             .addComponent(robotAddressBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(streamComboBox, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(robotPaneLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(keepSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(connectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(keepCheckBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(connectButton))
         );
         robotPaneLayout.setVerticalGroup(
             robotPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -193,17 +188,11 @@ public class ToolDisplay extends javax.swing.JFrame {
                 .addComponent(robotAddressBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(streamComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(robotPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(robotPaneLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(robotPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(connectButton)
-                            .addComponent(keepSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap())
-                    .addGroup(robotPaneLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel2)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(robotPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(connectButton)
+                    .addComponent(keepCheckBox))
+                .addContainerGap())
         );
 
         rpcScrollPane.setBackground(new java.awt.Color(153, 153, 153));
@@ -223,10 +212,9 @@ public class ToolDisplay extends javax.swing.JFrame {
             .addGroup(controlTabLayout.createSequentialGroup()
                 .addComponent(loadPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(robotPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addComponent(rpcScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(robotPane, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(rpcScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE))
         );
 
         leftSideTabs.addTab("control", controlTab);
@@ -251,7 +239,7 @@ public class ToolDisplay extends javax.swing.JFrame {
             .addGroup(sortAndSearchPanelLayout.createSequentialGroup()
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(sasOrderBox, 0, 228, Short.MAX_VALUE)
+                .addComponent(sasOrderBox, 0, 178, Short.MAX_VALUE)
                 .addContainerGap())
             .addComponent(sasStreamProfile, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -280,7 +268,7 @@ public class ToolDisplay extends javax.swing.JFrame {
             .addGroup(logTabLayout.createSequentialGroup()
                 .addComponent(sortAndSearchPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(logTreeScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE))
+                .addComponent(logTreeScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 444, Short.MAX_VALUE))
         );
 
         leftSideTabs.addTab("logs", logTab);
@@ -328,6 +316,10 @@ public class ToolDisplay extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>                        
+
+    private void keepCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {                                             
+        // TODO add your handling code here:
+    }                                            
 
     private void sasStreamProfileActionPerformed(java.awt.event.ActionEvent evt) {                                                 
         // TODO add your handling code here:
@@ -378,12 +370,11 @@ public class ToolDisplay extends javax.swing.JFrame {
     protected javax.swing.JToolBar footer;
     protected javax.swing.JLabel footerExtraLabel;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     protected javax.swing.JLabel jLabel4;
     protected javax.swing.JLabel jLabel5;
     protected javax.swing.JLabel jvmAvailLabel;
     protected javax.swing.JLabel jvmMemoryLabel;
-    protected javax.swing.JSlider keepSlider;
+    protected javax.swing.JCheckBox keepCheckBox;
     protected javax.swing.JTabbedPane leftSideTabs;
     protected javax.swing.JButton loadButton;
     protected javax.swing.JPanel loadPane;

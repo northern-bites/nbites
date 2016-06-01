@@ -83,10 +83,14 @@ namespace nbl {
 
         extern ioret connect_to( client_socket_t& sock, int port, const char * host );
 
-#ifdef __APPLE__
-#define NETIO_FLAGS (MSG_DONTWAIT)
+#ifdef OFFLINE
+    #define NETIO_FLAGS 0
 #else
-#define NETIO_FLAGS (MSG_NOSIGNAL | MSG_DONTWAIT)
+    #ifdef __APPLE__
+        #define NETIO_FLAGS (MSG_DONTWAIT)
+    #else
+        #define NETIO_FLAGS (MSG_NOSIGNAL | MSG_DONTWAIT)
+    #endif
 #endif
 
         extern const iotime_t IO_EXPECTING_ST;

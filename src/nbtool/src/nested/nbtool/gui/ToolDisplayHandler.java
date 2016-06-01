@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -426,6 +427,42 @@ public class ToolDisplayHandler implements
 		Events.GGroupAdded.generate(this, lastGroup);
 	}
 	
+	private void setupKeepSlider() {
+		Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
+		labelTable.put( new Integer( 0 ), new JLabel("0.0") );
+		labelTable.put( new Integer( 1 ), new JLabel("0.01") );
+		labelTable.put( new Integer( 2 ), new JLabel("0.1") );
+		labelTable.put( new Integer( 3 ), new JLabel("0.2") );
+		labelTable.put( new Integer( 4 ), new JLabel("1.0") );
+		
+		display.keepSlider.setSnapToTicks(true);
+		display.keepSlider.setMinimum(0);
+		display.keepSlider.setMaximum(labelTable.size() - 1);
+		display.keepSlider.setLabelTable( labelTable );
+		display.keepSlider.setPaintLabels(true);
+		display.keepSlider.setPaintTicks(true);
+		display.keepSlider.setValue(labelTable.size() - 1);
+	}
+	
+	private int keepMod() {
+		int val = display.keepSlider.getValue();
+		switch(val) {
+		case 0: return 0;
+		case 1: return 100;
+		case 2: return 10;
+		case 3: return 5;
+		case 4: return 1;
+		default:
+			debug.error("bad keepSlider value: %d", val);
+			return -1;
+		}
+	}
+	
+	private boolean shouldKeep(long index) {
+		int km = keepMod();
+		return (km > 0) && ((index % km) == 0);
+	}
+	
 	@SuppressWarnings("unchecked")
 	private void setupControlTab() {
 		updateComboBoxAndSettings(display.pathBox, UserSettings.loadPathes, null);
@@ -461,6 +498,8 @@ public class ToolDisplayHandler implements
 				controlConnectAction();
 			}
 		});
+		
+		setupKeepSlider();
 		
 		//Stop streaming if the user selects a log...
 		Center.listen(Events.LogSelected.class, new Events.LogSelected() {
@@ -914,11 +953,10 @@ public class ToolDisplayHandler implements
 			}
 			
 			//Deal with adding to groups (i.e. keeping)...
-			if (display.keepCheckBox.isSelected()) {
-				assert(lastGroup != null);
-				for (Log l : out) {
+			assert(lastGroup != null);
+			for (Log l : out) {
+				if (shouldKeep(l.jvm_unique_id))
 					lastGroup.add(LogReference.referenceFromLog(l));
-				}
 			}
 			
 			Events.GLogsFound.generate(this, out);
