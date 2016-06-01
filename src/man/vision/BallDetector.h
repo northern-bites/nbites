@@ -99,7 +99,7 @@ namespace man {
                                   std::vector<std::pair<int,int>> blackBlobs);
             bool findCorrelatedBlackSpots(std::vector<std::pair<int,int>> & blackBlobs,
                                           std::vector<Spot> & actualBlobs,
-                                          double cameraHeight, bool foundBall);
+                                          double cameraHeight, bool & foundBall);
             bool blobsAreClose(std::pair<int,int> first,
                                std::pair<int,int> second);
 

@@ -427,7 +427,7 @@ bool BallDetector::blobsAreClose(std::pair<int,int> first,
 bool BallDetector::findCorrelatedBlackSpots
 (std::vector<std::pair<int,int>> & blackBlobs,
  std::vector<Spot> & actualBlobs,
- double cameraHeight, bool foundBall)
+ double cameraHeight, bool & foundBall)
 {
     // loop through the filtered blobs and see if any are close together
     int correlations[blackBlobs.size()];
@@ -463,7 +463,7 @@ bool BallDetector::findCorrelatedBlackSpots
                     }
                     makeBall(newBall, cameraHeight, 0.8, foundBall, true); */
 #ifdef OFFLINE
-                    //foundBall = true;
+                    foundBall = true;
 #else
                     return true;
 #endif
@@ -476,6 +476,7 @@ bool BallDetector::findCorrelatedBlackSpots
         if ((correlations[c] > 1 || (correlations[c] == 1 && !topCamera))
 			 && !foundThree) {
             std::vector<Spot> correlatedSpots;
+            double ballSpotX, ballSpotY = 0;
             for (int k = 0; k < blackBlobs.size(); k++) {
                 if(correlatedTo[c][k] == 1) {
                     correlatedSpots.push_back(actualBlobs[k]);
@@ -496,9 +497,13 @@ bool BallDetector::findCorrelatedBlackSpots
                 distance = sqrt(pow((s2wx - s1wx),2) + pow((s2wy - s1wy),2));
                 std::cout<<"Distance: "<<distance<<std::endl;
 
-                if(distance > 6.0 || distance < 7.1) {
+                if(distance > 6.0 && distance < 7.1) {
                     std::cout<<"Returning True. Distance is in the right range"<<std::endl;
-                    return true;
+
+                    ballSpotX = (s1wx+s2wx)/2;
+                    ballSpotY = (s1wy+s2wy)/2;
+                    Spot ballSpot;
+                    foundBall = true;
                 }
             } else if(correlatedSpots.size() == 3) {
                 Spot s1 = correlatedSpots[0];
@@ -513,7 +518,14 @@ bool BallDetector::findCorrelatedBlackSpots
                 double area = abs((s1wx*(s2wy-s3wy) + s2wx*(s3wy-s1wy) + s3wx*(s1wy-s2wy))/2);
                 std::cout<<"Area: "<<area<<std::endl;
 
+                ballSpotX = (s1wx+s2wx+s3wx)/3;
+                ballSpotY = (s2wy+s2wy+s3wy)/3;
+                foundBall = true;
             }
+
+            // if(foundBall) {
+            //     Spot newBall = actualBlobs[c];
+            // }
 
 
             // good candidate ball
@@ -536,7 +548,7 @@ bool BallDetector::findCorrelatedBlackSpots
             makeBall(newBall, cameraHeight, 0.75, foundBall, true); */
             std::cout << "Found 2d cor. Punting for now" << std::endl;
 #ifdef OFFLINE
-            //foundBall = true;
+            return foundBall;
 #else
             return true;
 #endif
@@ -745,8 +757,6 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 			}
         }
     }
-    //blackSpotGeometryCheck(&actualBlackSpots);
-    std::cout<<"actualBlackSpots Size: "<<actualBlackSpots.size()<<std::endl;
 
     SpotDetector whitespots;
     whitespots.darkSpot(false);
@@ -771,7 +781,9 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
             debugDraw.drawBox(xLo, xHi, yHi, yLo, RED);
             actualWhiteSpots.push_back((*i));
             makeBall((*i), cameraHeight, 0.75, foundBall, false);
-            foundBall = true;
+            foundBall = true; //do we want to just bail here or process black spots also?
+            //if we decide to bail, issue of seeing goalpost bottom with 3 non-white around
+            //will be an issue
         } else if (!topCamera || yLo > field->horizonAt(xLo)) {
             debugDraw.drawBox(xLo, xHi, yHi, yLo, WHITE);
         }
