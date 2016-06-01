@@ -287,6 +287,8 @@ public class CameraOffsetsUtility extends UtilityParent {
 		            	return;
 		            }
 		            
+		           String written = "";
+		            
 		            for (Row r : rows) {
 		            	if (r != null) {
 		            		if (!r.status) { 
@@ -311,6 +313,7 @@ public class CameraOffsetsUtility extends UtilityParent {
 		            		SExpr repSp = SExpr.deserializeFrom(repString);
 		            		
 		            		line.replace(part, repSp);
+		            		written += String.format("{%s, %s}", r.name, r.getCamera());
 		            	}
 		            }
 		            
@@ -319,7 +322,10 @@ public class CameraOffsetsUtility extends UtilityParent {
 					} catch (IOException e1) {
 						e1.printStackTrace();
 						ToolMessage.displayError("couldn't write to config file: %s", e1.getMessage());
+						return;
 					}
+		            
+		            ToolMessage.displayInfo("camera offsets written: %s", written);
 				}
 				
 			});
