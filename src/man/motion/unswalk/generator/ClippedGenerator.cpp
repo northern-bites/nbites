@@ -9,12 +9,12 @@ using boost::program_options::variables_map;
 ClippedGenerator::ClippedGenerator(Generator* g)
    : generator(g),
      old_exists(false) {
-   llog(INFO) << "ClippedGenerator constructed" << std::endl;
+   std::cout << "ClippedGenerator constructed" << std::endl;
 }
 
 ClippedGenerator::~ClippedGenerator() {
    delete generator;
-   llog(INFO) << "ClippedGenerator destroyed" << std::endl;
+   std::cout << "ClippedGenerator destroyed" << std::endl;
 }
 
 bool ClippedGenerator::isActive() {

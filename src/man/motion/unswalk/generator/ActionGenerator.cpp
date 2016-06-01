@@ -14,7 +14,7 @@ ActionGenerator::ActionGenerator(std::string filename) : file_name(filename) {
 };
 
 ActionGenerator::~ActionGenerator() {
-   llog(INFO) << "ActionGenerator destroyed" << std::endl;
+   std::cout << "ActionGenerator destroyed" << std::endl;
 };
 
 bool ActionGenerator::isActive() {
@@ -105,10 +105,10 @@ void ActionGenerator::interpolate(JointValues newJoint, int duration) {
 
 void ActionGenerator::constructPose(std::string path) {
    ifstream in(string(path + "/" + file_name + ".pos").c_str());
-   llog(INFO) << "ActionGenerator(" << file_name << ") creating" << endl;
+   std::cout << "ActionGenerator(" << file_name << ") creating" << endl;
 
    if (!in.is_open()) {
-      llog(FATAL) << "ActionGenerator can not open " << file_name << endl;
+      std::cout << "ActionGenerator can not open " << file_name << endl;
    } else {
       int duration = 0;
       float stiffness = 1.0;
@@ -192,10 +192,10 @@ void ActionGenerator::constructPose(std::string path) {
       }
       in.close();
    }
-   llog(INFO) << "ActionGenerator(" << file_name << ") created" << endl;
+   std::cout << "ActionGenerator(" << file_name << ") created" << endl;
 }
 
-void ActionGenerator::readOptions(const boost::program_options::variables_map &config) {
-   std::string path = config["motion.path"].as<std::string>();
-   constructPose(path);
-}
+// void ActionGenerator::readOptions(const boost::program_options::variables_map &config) {
+//    std::string path = config["motion.path"].as<std::string>();
+//    constructPose(path);
+// }

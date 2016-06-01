@@ -24,7 +24,7 @@ class ActionGenerator : Generator {
       virtual bool isActive();
       void reset();
       void stop();
-      void readOptions(const boost::program_options::variables_map &config);
+      // void readOptions(const boost::program_options::variables_map &config);
 
    private:
       int current_time;

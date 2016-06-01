@@ -3,6 +3,8 @@ project( UNSWALK )
 
 add_definitions(-DLINUX -DRELEASE -DTARGET_ROBOT)
 
+set(CMAKE_CXX_FLAGS "-lboost_program_options")
+
 set( unswalk_srcs
   utils/basic_maths.hpp
   utils/body.hpp
@@ -29,9 +31,16 @@ set( unswalk_srcs
   generator/BodyModel.cpp
   generator/WalkCycle.cpp
   generator/PendulumModel.cpp
+  generator/StandGenerator.cpp
+  generator/ClippedGenerator.cpp
+  generator/ActionGenerator.cpp
+  generator/DistributedGenerator.cpp
   generator/WalkEnginePreProcessor.cpp
   generator/Walk2014Generator.cpp
 )
+
+
+
 
 
 

@@ -24,33 +24,33 @@ DistributedGenerator::DistributedGenerator()
      prev_generator(Body::NONE),
      requestedDive(Body::NONE) {
 
-   headGenerator = (Generator*)(new HeadGenerator());
-   if (!headGenerator)
-      llog(FATAL) << "headGenerator is NULL!" << std::endl;
+   // headGenerator = (Generator*)(new HeadGenerator());
+   // if (!headGenerator)
+   //    std::cout << "headGenerator is NULL!" << std::endl;
 
-   // TODO(dpad): Rewrite these ugly llogs to simply loop through bodyGenerators
+   // TODO(dpad): Rewrite these ugly //llogs to simply loop through bodyGenerators
    // and print out the string name
-   bodyGenerators[Body::NONE] = (Generator*)(new NullGenerator());
-   if (!bodyGenerators[Body::NONE])
-      llog(FATAL) << "bodyGenerators[NONE] is NULL!" << std::endl;
+   // bodyGenerators[Body::NONE] = (Generator*)(new NullGenerator());
+   // if (!bodyGenerators[Body::NONE])
+   //    std::cout << "bodyGenerators[NONE] is NULL!" << std::endl;
 
    bodyGenerators[Body::STAND] = (Generator*)(new StandGenerator());
    if (!bodyGenerators[Body::STAND])
-      llog(FATAL) << "bodyGenerators[STAND] is NULL!" << std::endl;
+      std::cout << "bodyGenerators[STAND] is NULL!" << std::endl;
 
-   bodyGenerators[Body::MOTION_CALIBRATE] =
-           (Generator*)(new ActionGenerator("standStraight"));
-   if (!bodyGenerators[Body::MOTION_CALIBRATE])
-      llog(FATAL) << "bodyGenerators[MOTION_CALIBRATE] is NULL!" << std::endl;
+   // bodyGenerators[Body::MOTION_CALIBRATE] =
+   //         (Generator*)(new ActionGenerator("standStraight"));
+   // if (!bodyGenerators[Body::MOTION_CALIBRATE])
+   //    std::cout << "bodyGenerators[MOTION_CALIBRATE] is NULL!" << std::endl;
 
-   bodyGenerators[Body::STAND_STRAIGHT] =
-           (Generator*)(new ActionGenerator("standStraight"));
-   if (!bodyGenerators[Body::STAND_STRAIGHT])
-      llog(FATAL) << "bodyGenerators[STAND_STRAIGHT] is NULL!" << std::endl;
+   // bodyGenerators[Body::STAND_STRAIGHT] =
+   //         (Generator*)(new ActionGenerator("standStraight"));
+   // if (!bodyGenerators[Body::STAND_STRAIGHT])
+   //    std::cout << "bodyGenerators[STAND_STRAIGHT] is NULL!" << std::endl;
 
    bodyGenerators[Body::WALK] = (Generator*)(new WalkEnginePreProcessor());
    if (!bodyGenerators[Body::WALK])
-      llog(FATAL) << "bodyGenerators[WALK] is NULL!" << std::endl;
+      std::cout << "bodyGenerators[WALK] is NULL!" << std::endl;
 
    bodyGenerators[Body::KICK] = bodyGenerators[Body::WALK];
 
@@ -58,102 +58,102 @@ DistributedGenerator::DistributedGenerator()
 
    bodyGenerators[Body::DRIBBLE] = bodyGenerators[Body::WALK];
 
-   bodyGenerators[Body::GETUP_FRONT] = (Generator*)
-                                       (new ActionGenerator("getupFront"));
-   if (!bodyGenerators[Body::GETUP_FRONT])
-      llog(FATAL) << "bodyGenerators[GETUP_FRONT] is NULL!" << std::endl;
+   // bodyGenerators[Body::GETUP_FRONT] = (Generator*)
+   //                                     (new ActionGenerator("getupFront"));
+   // if (!bodyGenerators[Body::GETUP_FRONT])
+   //    std::cout << "bodyGenerators[GETUP_FRONT] is NULL!" << std::endl;
 
-   bodyGenerators[Body::GETUP_BACK] = (Generator*)
-                                      (new ActionGenerator("getupBack"));
-   if (!bodyGenerators[Body::GETUP_BACK])
-      llog(FATAL) << "bodyGenerators[GETUP_BACK] is NULL!" << std::endl;
+   // bodyGenerators[Body::GETUP_BACK] = (Generator*)
+   //                                    (new ActionGenerator("getupBack"));
+   // if (!bodyGenerators[Body::GETUP_BACK])
+   //    std::cout << "bodyGenerators[GETUP_BACK] is NULL!" << std::endl;
 
-   bodyGenerators[Body::INITIAL] = (Generator*)
-                                   (new ActionGenerator("initial"));
-   if (!bodyGenerators[Body::INITIAL])
-      llog(FATAL) << "bodyGenerators[INITIAL] is NULL!" << std::endl;
+   // bodyGenerators[Body::INITIAL] = (Generator*)
+   //                                 (new ActionGenerator("initial"));
+   // if (!bodyGenerators[Body::INITIAL])
+   //    std::cout << "bodyGenerators[INITIAL] is NULL!" << std::endl;
 
-   bodyGenerators[Body::DEAD] = (Generator*)(new DeadGenerator());
-   if (!bodyGenerators[Body::DEAD])
-      llog(FATAL) << "bodyGenerators[DEAD] is NULL!" << std::endl;
+   // bodyGenerators[Body::DEAD] = (Generator*)(new DeadGenerator());
+   // if (!bodyGenerators[Body::DEAD])
+   //    std::cout << "bodyGenerators[DEAD] is NULL!" << std::endl;
 
-   bodyGenerators[Body::REF_PICKUP] = (Generator*)(new RefPickupGenerator());
-   if (!bodyGenerators[Body::REF_PICKUP])
-      llog(FATAL) << "bodyGenerators[REF_PICKUP] is NULL!" << std::endl;
+   // bodyGenerators[Body::REF_PICKUP] = (Generator*)(new RefPickupGenerator());
+   // if (!bodyGenerators[Body::REF_PICKUP])
+   //    std::cout << "bodyGenerators[REF_PICKUP] is NULL!" << std::endl;
 
-   bodyGenerators[Body::OPEN_FEET] = (Generator*)
-                                     (new ActionGenerator("openFeet"));
-   if (!bodyGenerators[Body::OPEN_FEET])
-      llog(FATAL) << "bodyGenerators[OPEN_FEET] is NULL!" << std::endl;
+   // bodyGenerators[Body::OPEN_FEET] = (Generator*)
+   //                                   (new ActionGenerator("openFeet"));
+   // if (!bodyGenerators[Body::OPEN_FEET])
+   //    std::cout << "bodyGenerators[OPEN_FEET] is NULL!" << std::endl;
 
-   bodyGenerators[Body::THROW_IN] = (Generator*)
-                                    (new ActionGenerator("throwIn"));
-   if (!bodyGenerators[Body::THROW_IN])
-      llog(FATAL) << "bodyGenerators[THROW_IN] is NULL!" << std::endl;
+   // bodyGenerators[Body::THROW_IN] = (Generator*)
+   //                                  (new ActionGenerator("throwIn"));
+   // if (!bodyGenerators[Body::THROW_IN])
+   //    std::cout << "bodyGenerators[THROW_IN] is NULL!" << std::endl;
 
-   bodyGenerators[Body::GOALIE_SIT] = (Generator*)
-                                      (new ActionGenerator("goalieSit"));
-   if (!bodyGenerators[Body::GOALIE_SIT])
-      llog(FATAL) << "bodyGenerators[GOALIE_SIT] is NULL!" << std::endl;
+   // bodyGenerators[Body::GOALIE_SIT] = (Generator*)
+   //                                    (new ActionGenerator("goalieSit"));
+   // if (!bodyGenerators[Body::GOALIE_SIT])
+   //    std::cout << "bodyGenerators[GOALIE_SIT] is NULL!" << std::endl;
 
-   bodyGenerators[Body::GOALIE_DIVE_LEFT] = (Generator*)
-                                            (new ActionGenerator("goalieDiveLeft"));
-   if (!bodyGenerators[Body::GOALIE_DIVE_LEFT])
-      llog(FATAL) << "bodyGenerators[GOALIE_DIVE_LEFT] is NULL!" << std::endl;
+   // bodyGenerators[Body::GOALIE_DIVE_LEFT] = (Generator*)
+   //                                          (new ActionGenerator("goalieDiveLeft"));
+   // if (!bodyGenerators[Body::GOALIE_DIVE_LEFT])
+   //    std::cout << "bodyGenerators[GOALIE_DIVE_LEFT] is NULL!" << std::endl;
 
-   bodyGenerators[Body::GOALIE_DIVE_RIGHT] = (Generator*)
-                                             (new ActionGenerator("goalieDiveRight"));
-   if (!bodyGenerators[Body::GOALIE_DIVE_RIGHT])
-      llog(FATAL) << "bodyGenerators[GOALIE_DIVE_RIGHT] is NULL!" << std::endl;
+   // bodyGenerators[Body::GOALIE_DIVE_RIGHT] = (Generator*)
+   //                                           (new ActionGenerator("goalieDiveRight"));
+   // if (!bodyGenerators[Body::GOALIE_DIVE_RIGHT])
+   //    std::cout << "bodyGenerators[GOALIE_DIVE_RIGHT] is NULL!" << std::endl;
 
-   bodyGenerators[Body::GOALIE_CENTRE] = (Generator*)
-                                             (new ActionGenerator("goalieCentre"));
-   if (!bodyGenerators[Body::GOALIE_CENTRE])
-      llog(FATAL) << "bodyGenerators[GOALIE_CENTRE] is NULL!" << std::endl;
+   // bodyGenerators[Body::GOALIE_CENTRE] = (Generator*)
+   //                                           (new ActionGenerator("goalieCentre"));
+   // if (!bodyGenerators[Body::GOALIE_CENTRE])
+   //    std::cout << "bodyGenerators[GOALIE_CENTRE] is NULL!" << std::endl;
 
-   bodyGenerators[Body::GOALIE_UNCENTRE] = (Generator*)
-                                             (new ActionGenerator("goalieUncentre"));
-   if (!bodyGenerators[Body::GOALIE_UNCENTRE])
-      llog(FATAL) << "bodyGenerators[GOALIE_UNCENTRE] is NULL!" << std::endl;
+   // bodyGenerators[Body::GOALIE_UNCENTRE] = (Generator*)
+   //                                           (new ActionGenerator("goalieUncentre"));
+   // if (!bodyGenerators[Body::GOALIE_UNCENTRE])
+   //    std::cout << "bodyGenerators[GOALIE_UNCENTRE] is NULL!" << std::endl;
 
-   bodyGenerators[Body::GOALIE_STAND] = (Generator*)
-                                             (new ActionGenerator("goalieStand"));
-   if (!bodyGenerators[Body::GOALIE_STAND])
-      llog(FATAL) << "bodyGenerators[GOALIE_STAND] is NULL!" << std::endl;
+   // bodyGenerators[Body::GOALIE_STAND] = (Generator*)
+   //                                           (new ActionGenerator("goalieStand"));
+   // if (!bodyGenerators[Body::GOALIE_STAND])
+   //    std::cout << "bodyGenerators[GOALIE_STAND] is NULL!" << std::endl;
 
-   bodyGenerators[Body::GOALIE_INITIAL] = (Generator*)
-                                             (new ActionGenerator("goalieInitial"));
-   if (!bodyGenerators[Body::GOALIE_INITIAL])
-      llog(FATAL) << "bodyGenerators[GOALIE_INITIAL] is NULL!" << std::endl;
+   // bodyGenerators[Body::GOALIE_INITIAL] = (Generator*)
+   //                                           (new ActionGenerator("goalieInitial"));
+   // if (!bodyGenerators[Body::GOALIE_INITIAL])
+   //    std::cout << "bodyGenerators[GOALIE_INITIAL] is NULL!" << std::endl;
 
-   bodyGenerators[Body::GOALIE_AFTERSIT_INITIAL] = (Generator*)
-                                             (new ActionGenerator("goalieInitial"));
-   if (!bodyGenerators[Body::GOALIE_AFTERSIT_INITIAL])
-      llog(FATAL) << "bodyGenerators[GOALIE_AFTERSIT_INITIAL] is NULL!" << std::endl;
+   // bodyGenerators[Body::GOALIE_AFTERSIT_INITIAL] = (Generator*)
+   //                                           (new ActionGenerator("goalieInitial"));
+   // if (!bodyGenerators[Body::GOALIE_AFTERSIT_INITIAL])
+   //    std::cout << "bodyGenerators[GOALIE_AFTERSIT_INITIAL] is NULL!" << std::endl;
 
-   bodyGenerators[Body::DEFENDER_CENTRE] = (Generator*)
-                                          (new ActionGenerator("defenderCentre"));
-   if (!bodyGenerators[Body::DEFENDER_CENTRE])
-     llog(FATAL) << "bodyGenerators[DEFENDER_CENTRE] is NULL!" << std::endl;
+   // bodyGenerators[Body::DEFENDER_CENTRE] = (Generator*)
+   //                                        (new ActionGenerator("defenderCentre"));
+   // if (!bodyGenerators[Body::DEFENDER_CENTRE])
+   //   std::cout << "bodyGenerators[DEFENDER_CENTRE] is NULL!" << std::endl;
 
-   bodyGenerators[Body::GOALIE_PICK_UP] = (Generator*)
-                                          (new ActionGenerator("goaliePickup"));
-   if (!bodyGenerators[Body::GOALIE_PICK_UP])
-     llog(FATAL) << "bodyGenerators[GOALIE_PICK_UP] is NULL!" << std::endl;
+   // bodyGenerators[Body::GOALIE_PICK_UP] = (Generator*)
+   //                                        (new ActionGenerator("goaliePickup"));
+   // if (!bodyGenerators[Body::GOALIE_PICK_UP])
+   //   std::cout << "bodyGenerators[GOALIE_PICK_UP] is NULL!" << std::endl;
 
-   bodyGenerators[Body::GOALIE_FAST_SIT] = (Generator*)
-                                          (new ActionGenerator("goalieFastSit"));
-   if (!bodyGenerators[Body::GOALIE_FAST_SIT])
-     llog(FATAL) << "bodyGenerators[GOALIE_FAST_SIT] is NULL!" << std::endl;
+   // bodyGenerators[Body::GOALIE_FAST_SIT] = (Generator*)
+   //                                        (new ActionGenerator("goalieFastSit"));
+   // if (!bodyGenerators[Body::GOALIE_FAST_SIT])
+   //   std::cout << "bodyGenerators[GOALIE_FAST_SIT] is NULL!" << std::endl;
 
-   llog(INFO) << "DistributedGenerator constructed" << std::endl;
+   //llog(INFO) << "DistributedGenerator constructed" << std::endl;
 }
 
 /*-----------------------------------------------------------------------------
  * Destructor
  *---------------------------------------------------------------------------*/
 DistributedGenerator::~DistributedGenerator() {
-   delete headGenerator;
+   // delete headGenerator;
    for (uint8_t i = 0; i < Body::NUM_ACTION_TYPES; ++i)
       if (bodyGenerators[i]) {
          delete bodyGenerators[i];
@@ -161,7 +161,7 @@ DistributedGenerator::~DistributedGenerator() {
             if (bodyGenerators[j] == bodyGenerators[i])
                bodyGenerators[j] = NULL;
       }
-   llog(INFO) << "DistributedGenerator destroyed" << std::endl;
+   //llog(INFO) << "DistributedGenerator destroyed" << std::endl;
 }
 
 /*-----------------------------------------------------------------------------
@@ -314,14 +314,14 @@ JointValues DistributedGenerator::makeJoints(ActionCommand::All* request,
       current_generator = Body::WALK;
    }
 
-   if (!usesHead) {
-      JointValues fromHead = headGenerator->
-                             makeJoints(request, odometry, sensors, bodyModel, ballX, ballY);
-      for (uint8_t i = Joints::HeadYaw; i <= Joints::HeadPitch; ++i) {
-         fromBody.angles[i] = fromHead.angles[i];
-         fromBody.stiffnesses[i] = fromHead.stiffnesses[i];
-      }
-   }
+   // if (!usesHead) {
+   //    JointValues fromHead = headGenerator->
+   //                           makeJoints(request, odometry, sensors, bodyModel, ballX, ballY);
+   //    for (uint8_t i = Joints::HeadYaw; i <= Joints::HeadPitch; ++i) {
+   //       fromBody.angles[i] = fromHead.angles[i];
+   //       fromBody.stiffnesses[i] = fromHead.stiffnesses[i];
+   //    }
+   // }
    prev_generator = current_generator;
    return fromBody;
 }
@@ -334,7 +334,7 @@ void DistributedGenerator::reset() {
    for (uint8_t i = 0; i < Body::NUM_ACTION_TYPES; ++i) {
       bodyGenerators[i]->reset();
    }
-   headGenerator->reset();
+   // headGenerator->reset();
    current_generator = ActionCommand::Body::NONE;
 }
 
@@ -342,5 +342,5 @@ void DistributedGenerator::readOptions(const boost::program_options::variables_m
    for (uint8_t i = 0; i < Body::NUM_ACTION_TYPES; ++i) {
       bodyGenerators[i]->readOptions(config);
    }
-   headGenerator->readOptions(config);
+   // headGenerator->readOptions(config);
 }

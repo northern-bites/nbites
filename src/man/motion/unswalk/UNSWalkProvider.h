@@ -18,10 +18,14 @@
 
 #include "RoboGrams.h"
 #include "RobotLocation.pb.h"
+#include "MotionConstants.h"
 
 //UNSW
 #include "generator/Walk2014Generator.hpp"
 #include "generator/Generator.hpp"
+#include "generator/DistributedGenerator.hpp"
+#include "generator/StandGenerator.hpp"
+#include "generator/ClippedGenerator.hpp"
 #include "blackboard/Blackboard.hpp"
 #include "generator/WalkEnginePreProcessor.hpp"
 
@@ -88,6 +92,8 @@ public:
 
 	void resetAll();
 
+	JointValues walkOutput;
+
 protected:
 	void stand();
     void setActive() {}
@@ -97,12 +103,14 @@ private:
 	bool standby;
 	bool tryingToWalk;
 	MotionCommand::ptr currentCommand;
-	Touch *touch;
+	// Touch *touch;
 	Generator *generator;
 	Odometry startOdometry;
 	Effector* effector;
 	BodyModel bodyModel;
 	UNSWKinematics kinematics;
+
+	void logMsg(std::string msg) { std::cout << msg << std::endl; }
 
 };
 

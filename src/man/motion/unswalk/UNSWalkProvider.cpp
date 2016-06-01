@@ -66,7 +66,7 @@ static const Joints::JointCode nb_joint_order[] {
 UNSWalkProvider::UNSWalkProvider() : MotionProvider(WALK_PROVIDER), 
  									 requestedToStop(false), tryingToWalk(false) 
 {
-	generator = (Generator*)(new WalkEnginePreProcessor());
+	generator = (Generator*) new ClippedGenerator((Generator*) new DistributedGenerator());
 	resetAll();
 }
 
@@ -109,7 +109,76 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	const messages::FSR& 			sensorFSRs
 	) 
 {
-	
+	PROF_ENTER(P_WALK);
+
+	if (standby) {
+		tryingToWalk = false;
+	} else {
+		if (requestedToStop || !isActive()) {
+			tryingToWalk = false;
+		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP) {
+			logMsg("Odometry walk!");
+			// TODO odometry, handle
+		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK) {
+			logMsg("Walking!");
+		 
+			// HANDLE
+			tryingToWalk = true;
+
+			WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
+
+
+		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
+			logMsg("Destination Walking!");
+			tryingToWalk = true;
+
+
+		} else if (!currentCommand.get()) {
+			tryingToWalk = false;
+			// call stand
+		}
+	}
+
+	logMsg("walking");
+
+	ActionCommand::All* request = new ActionCommand::All();
+	request->body.actionType = ActionCommand::Body::WALK;
+	Odometry* odometry = new Odometry();
+
+	// Update sensor values
+	UNSWSensorValues sensors = new UNSWSensorValues();
+	// TODO investigate calibrating sensors. . .
+	// if(request.body.actionType == Body::MOTION_CALIBRATE){
+ //       // raw sensor values are sent to offnao for calibration
+ //       // these values are straight forward copy paste into pos files
+ //       sensors = nakedTouch->getSensors(kinematics);
+ //       sensors.sensors[Sensors::InertialSensor_AngleX] = -RAD2DEG(sensors.sensors[Sensors::InertialSensor_AngleX]);
+ //       sensors.sensors[Sensors::InertialSensor_AngleY] = -RAD2DEG(sensors.sensors[Sensors::InertialSensor_AngleY]);
+ //       sensors.sensors[Sensors::InertialSensor_GyrX] = -sensors.sensors[Sensors::InertialSensor_GyrX];
+ //       sensors.sensors[Sensors::InertialSensor_GyrY] = -sensors.sensors[Sensors::InertialSensor_GyrY];
+ //   } else {
+    sensors = touch->getSensors(kinematics);
+
+
+	// Update kinematics TODO sensors lagging ? ? 
+
+
+	kinematics.setSensorValues(sensors);
+
+    // Update the body model
+    bodyModel.kinematics = &kinematics;
+    bodyModel.update(&odo, sensors);
+
+	float ballX, ballY;
+
+	// generator->makeJoints(ActionCommand::All* request,
+ //                                          Odometry* odometry,
+ //                                          const UNSWSensorValues &sensors,
+ //                                          BodyModel &bodyModel,
+ //                                          float ballX,
+ //                                          float ballY);
+
+	PROF_EXIT(P_WALK);
 }
 
 void UNSWalkProvider::hardReset() {
@@ -121,6 +190,13 @@ void UNSWalkProvider::resetOdometry() {
 }
 
 void UNSWalkProvider::setCommand(const WalkCommand::ptr command) {
+	if (command->theta_percent == 0 && command->x_percent == 0 && command->y_percent == 0) {
+		this->stand();
+		return;
+	}
+
+	currentCommand = command;
+	active();
 
 }
 
