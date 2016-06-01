@@ -14,11 +14,14 @@ public class LogRPC {
 	
 	public static class RemoteCall {
 		protected String key;
+		protected String name;
+		
+		/* warning, call is NULL after it is sent! */
 		protected Log call;
 		protected IOFirstResponder caller;
 		
 		public String callName() {
-			return call.topLevelDictionary.get(SharedConstants.RPC_NAME()).asString().value;
+			return name;
 		}
 		
 		protected void finish(IOInstance connection, Log ret) {
@@ -36,6 +39,8 @@ public class LogRPC {
 		public RemoteCall(IOFirstResponder clr, String fname, Log ... args) {
 			this.caller = clr;
 			this.key = Utility.getRandomHexString(20);
+			this.name = fname;
+			
 			JsonObject tlo = Json.object();
 			tlo.put(SharedConstants.RPC_NAME(), fname);
 			tlo.put(SharedConstants.RPC_KEY(), key);
