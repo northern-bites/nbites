@@ -131,6 +131,7 @@ public class Center {
 	}
 
 	private static final LinkedList<ToolEvent> events = new LinkedList<ToolEvent>();
+	
 	public static void addEvent(ToolEvent e) {
 		synchronized(events) {
 			events.add(e);
@@ -152,6 +153,27 @@ public class Center {
 		protected abstract Class<? extends EventListener> listenerClass();
 		protected abstract void execute(ArrayList<EventListener> guiList, ArrayList<EventListener> centerList);
 		
+	}
+	
+	public static abstract class EventRunnable extends ToolEvent {
+
+		@Override
+		protected final boolean canCombine() {
+			return false;
+		}
+
+		@Override
+		protected final void combine(LinkedList<ToolEvent> others) { assert(false); }
+
+		@Override
+		protected Class<? extends EventListener> listenerClass() { return null; }
+
+		@Override
+		protected void execute(ArrayList<EventListener> guiList, ArrayList<EventListener> centerList) {
+			run();
+		}
+		
+		protected abstract void run();
 	}
 	
 	/*
