@@ -8,10 +8,14 @@
 
 # Format for head moves:
 
-# ((pitch in degrees, tilt in degrees), time in seconds, 1, stiffness constant)
+# ((yaw in degrees, tilt in degrees), time in seconds, 1, stiffness constant)
 
 # These can be grouped together in an array of s expressions to create a more
 # complex multi-step head move.
+
+# Yaw is looking back and forth. Tilt is looking up and down. Pitch would be
+# turning the head toward the shoulders like you're confused -- our robots
+# don't have the neck joints to do that.
 
 # Tilt is usually 25. Stiffness constant is almost 
 # always stiff.LOW_HEAD_STIFFNESSES
@@ -498,17 +502,10 @@ CALIBRATION_BOTTOM_PAN = ( ( ((-6.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME*2, 1, stiff
 
 SNAP_PAN_TIME = 1
 
-SNAP_PAN = ( ( ((-30.0, 25), SNAP_PAN_TIME*2, 1, stiff.LOW_HEAD_STIFFNESSES), ),
-                        
-                        ( ((-20.0, 25), SNAP_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
-
-                        ( ((-10.0, 25), SNAP_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
-
-                        ( ((0.0, 25), SNAP_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
-
-                        ( ((10.0, 25), SNAP_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
-
-                        ( ((20.0, 25), SNAP_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
-
-                        ( ((30.0, 25), SNAP_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
-                    )
+SNAP_PAN = (((-30.0, 25), SNAP_PAN_TIME*2, 1, stiff.LOW_HEAD_STIFFNESSES),
+            ((-20.0, 25), SNAP_PAN_TIME,   1, stiff.LOW_HEAD_STIFFNESSES),
+            ((-10.0, 25), SNAP_PAN_TIME,   1, stiff.LOW_HEAD_STIFFNESSES),
+            ((  0.0, 25), SNAP_PAN_TIME,   1, stiff.LOW_HEAD_STIFFNESSES),
+            (( 10.0, 25), SNAP_PAN_TIME,   1, stiff.LOW_HEAD_STIFFNESSES),
+            (( 20.0, 25), SNAP_PAN_TIME,   1, stiff.LOW_HEAD_STIFFNESSES),
+            (( 30.0, 25), SNAP_PAN_TIME,   1, stiff.LOW_HEAD_STIFFNESSES))

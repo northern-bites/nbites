@@ -104,6 +104,9 @@ def gamePlaying(player):
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
+    
+    player.goNow('snappan')
+    return player.stay()
 
     # TODO without pb, is this an issue?
     # if (player.lastDiffState == 'afterPenalty' and
@@ -232,4 +235,9 @@ def penaltyShotsGamePlaying(player):
 @superState('gameControllerResponder')
 def fallen(player):
     player.inKickingState = False
+    return player.stay()
+
+@superState('gameControllerResponder')
+def snappan(player):
+    player.brain.tracker.goNow('snapPan')
     return player.stay()

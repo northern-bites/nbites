@@ -15,6 +15,8 @@ def tracking(tracker):
     If the target is lost, switches to altTrackSharedBallAndPan if shared ball
     is reliable and fullPan if shared ball is not realiable.
     """
+    print "Entering tracking"
+    return tracker.goLater('snapPan')
     # makes sure ball is default target when entering tracking
     tracker.target = tracker.brain.ball
 
@@ -30,7 +32,7 @@ def tracking(tracker):
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
         if (tracker.target.vis.frames_off >
             constants.TRACKER_FRAMES_OFF_REFIND_THRESH):
-            return tracker.goLater('fullPan')
+            return tracker.goLater('snapPan')
 
     return tracker.stay()
 
@@ -173,7 +175,9 @@ def lookStraightThenTrack(tracker):
 
     return tracker.stay()
 
+# MODIFIED FULL PAN -- REVERT BACK
 def fullPan(tracker):
+    print "\033[33m\033[1m" + "Starting fullPan"
     """
     Repeatedly executes the headMove FIXED_PITCH_PAN.
     Once the ball is located, switches to tracking.
@@ -184,10 +188,12 @@ def fullPan(tracker):
         request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
         # Smartly start the pan
+        print "\033[33m\033[1m" + "Smartly starting SNAP_PAN"
         tracker.helper.startingPan(HeadMoves.SNAP_PAN)
 
     if not tracker.brain.motion.head_is_active:
         # Repeat the pan
+        print "\033[33m\033[1m" + "Repeating SNAP_PAN"
         tracker.helper.executeHeadMove(HeadMoves.SNAP_PAN)
 
     if not isinstance(tracker.target, Vision.messages.FilteredBall):
@@ -200,9 +206,6 @@ def fullPan(tracker):
 
     return tracker.stay()
 
-"""
-The following function is unused.
-"""
 def snapPan(tracker):  
     print "Entering SnapPan function"
 
@@ -216,15 +219,13 @@ def snapPan(tracker):
     if not tracker.brain.motion.head_is_active:
         if tracker.lastMovement == 0: # If the head should stay still rn
             print "Staying still"
-            tracker.lookToAngle(tracker.currentYaw)
+            tracker.performHeadMove(tracker.lookToAngle(tracker.currentYaw))
             tracker.lastMovement = 1
-            time.sleep(3)
         else:
             print "Let's change up the view"
             tracker.currentYaw += 30 * tracker.direction # 30 degrees of motion for each pan
             print "Current yaw: " + str(tracker.currentYaw)
-            tracker.lookToAngle(tracker.currentYaw)
-            time.sleep(20)
+            tracker.performHeadMove(tracker.lookToAngle(tracker.currentYaw))
 
             if tracker.currentYaw >= 90:
                 tracker.direction = -1
