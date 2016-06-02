@@ -65,14 +65,21 @@ public class Robots {
 		}		
 	}
 	
-	public static String[] sortedHostnames() {
+	public static String[] sortedHostNames() {
 		LinkedList<String> names = new LinkedList<String>(ROBOT_HOSTNAMES);
 		Collections.sort(names);
 		return names.toArray(new String[0]);
 	}
-	
+	public static String[] sortedWifiNames() {
+		LinkedList<String> names = new LinkedList<String>();
+		for (Robot r : ROBOTS) {
+			names.add(r.name);
+		}
+		Collections.sort(names);
+		return names.toArray(new String[0]);
+	}
 	public static void main(String[] args) {
-		for (String s : sortedHostnames()) {
+		for (String s : sortedHostNames()) {
 			Debug.print("%s", s);
 		}
 	}

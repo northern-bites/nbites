@@ -46,9 +46,14 @@ public class UserSettings {
 
 	//saved user inputs..
 	public static OrderedSet<Path> loadPathes = new OrderedSet<>();
+	/* For list with robot names with and without .local
+	public static OrderedSet<String> addresses = new OrderedSet<> 
+		(Robots.sortedHostNames());
+	*/
+	//List of robot names without .local
 	public static OrderedSet<String> addresses = new OrderedSet<>
-		(Robots.sortedHostnames());
-	
+		(Robots.sortedWifiNames());
+
 	public static LogLevel logLevel = LogLevel.levelINFO;
 	
 	private static final String INTERNAL_KEY = "__INTERNAL__";

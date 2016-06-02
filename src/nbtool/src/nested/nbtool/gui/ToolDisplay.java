@@ -53,6 +53,7 @@ public class ToolDisplay extends javax.swing.JFrame {
         connectButton = new javax.swing.JButton();
         keepSlider = new javax.swing.JSlider();
         jLabel2 = new javax.swing.JLabel();
+        localCheckBox = new javax.swing.JCheckBox();
         rpcScrollPane = new javax.swing.JScrollPane();
         logTab = new javax.swing.JPanel();
         sortAndSearchPanel = new javax.swing.JPanel();
@@ -173,11 +174,12 @@ public class ToolDisplay extends javax.swing.JFrame {
 
         jLabel2.setText("keep %");
 
+        localCheckBox.setText("local");
+
         javax.swing.GroupLayout robotPaneLayout = new javax.swing.GroupLayout(robotPane);
         robotPane.setLayout(robotPaneLayout);
         robotPaneLayout.setHorizontalGroup(
             robotPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(robotAddressBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(streamComboBox, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(robotPaneLayout.createSequentialGroup()
                 .addContainerGap()
@@ -186,11 +188,17 @@ public class ToolDisplay extends javax.swing.JFrame {
                 .addComponent(keepSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(connectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(robotPaneLayout.createSequentialGroup()
+                .addComponent(robotAddressBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(localCheckBox))
         );
         robotPaneLayout.setVerticalGroup(
             robotPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(robotPaneLayout.createSequentialGroup()
-                .addComponent(robotAddressBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(robotPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(robotAddressBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(localCheckBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(streamComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(robotPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -387,6 +395,7 @@ public class ToolDisplay extends javax.swing.JFrame {
     protected javax.swing.JTabbedPane leftSideTabs;
     protected javax.swing.JButton loadButton;
     protected javax.swing.JPanel loadPane;
+    protected javax.swing.JCheckBox localCheckBox;
     protected javax.swing.JPanel logTab;
     protected javax.swing.JTree logTree;
     protected javax.swing.JScrollPane logTreeScrollPane;

@@ -460,6 +460,10 @@ public class ToolDisplayHandler implements
 		
 		address = address.trim();
 		
+		if (display.localCheckBox.isSelected() && !address.endsWith(".local")) {
+			address += ".local";
+		}
+		
 		display.connectButton.setEnabled(false);		
 		Center.addEvent(new ControlConnectRunnable(address));
 	}
