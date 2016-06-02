@@ -424,7 +424,10 @@ public class ToolDisplayHandler implements
 						
 						display.connectButton.setText("disconnect");
 						display.loadButton.setEnabled(false);
-						updateComboBoxAndSettings(display.robotAddressBox, UserSettings.addresses, robotAddress);
+						updateComboBoxAndSettings(display.robotAddressBox,
+								UserSettings.addresses, robotAddress);
+						
+						controlRequestFlags();
 						
 						lastGroup = Group.groupForStream(robotAddress);
 						Events.GGroupAdded.generate(this, lastGroup);
