@@ -2,6 +2,24 @@
 
 # TODO: update all pans to speeds that avoid motion blur. @summer 2012
 
+
+
+
+
+# Format for head moves:
+
+# ((pitch in degrees, tilt in degrees), time in seconds, 1, stiffness constant)
+
+# These can be grouped together in an array of s expressions to create a more
+# complex multi-step head move.
+
+# Tilt is usually 25. Stiffness constant is almost 
+# always stiff.LOW_HEAD_STIFFNESSES
+
+
+
+
+
 from .. import StiffnessModes as stiff
 
 HEAD_MOVE_LENGTH = 4
@@ -477,3 +495,18 @@ CALIBRATION_BOTTOM_PAN = ( ( ((-6.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME*2, 1, stiff
 
                            ( ((6.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
                         )
+
+SNAP_PAN = ( ( ((-6.0, CAL_TOP_PITCH), CAL_PAN_TIME*2, 1, stiff.LOW_HEAD_STIFFNESSES), ),
+                        
+                        ( ((-4.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
+
+                        ( ((-2.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
+
+                        ( ((0.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
+
+                        ( ((2.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
+
+                        ( ((4.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
+
+                        ( ((6.0, CAL_TOP_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
+                    )
