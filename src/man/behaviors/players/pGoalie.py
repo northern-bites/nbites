@@ -55,7 +55,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.lastPenDiveSide = RIGHT
 
         # this is only true for drop in player
-        self.dropIn = false
+        self.dropIn = False
 
         ### ALL TRANSITIONS ARE DEFINED HERE ############
         ### Their conditions are in GoalieTransitions ###

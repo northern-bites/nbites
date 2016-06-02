@@ -25,7 +25,7 @@ def shouldReturnHome(player):
 
     if player.buffBoxFiltered.checkCondition(player):
         player.claimedBall = False
-        return True;
+        return True
 
     return claimTrans.shouldCedeClaim(player)
 

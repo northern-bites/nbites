@@ -8,7 +8,10 @@ widthOfField = 600
 lengthOfField = 900
 
 def shouldCedeClaim(player):
-    """
+    
+    if player.dropIn:
+        return False
+
     if not player.useClaims:
         return False
 
@@ -52,7 +55,6 @@ def shouldCedeClaim(player):
 
     player.claimedBall = True
 
-    """
     return False
 
 #TODO: make this make use of amount of orbit necessary
@@ -76,23 +78,3 @@ def ballY(my_y,my_h, ballBearing,distance):
     ball_y_to_me = distance * math.fabs(math.sin(math.radians(ballHeading)))
     ball_y =  ball_y_to_me + my_y
     return ball_y
-
-# The function calculates the distance between your mate and the ball based
-# on the mandatory information given for dropin
-def mateBallDist(my_x, my_y, my_h, distance, ballBearing, mate_x, mate_y): 
-    ballHeading = my_h + ballBearing
-    ball_x_to_me = distance * math.cos(math.radians(ballHeading))
-    ball_x = ball_x_to_me + my_x
-    ball_y = ballY(my_y,my_h, ballBearing, distance)
-    ball_dist_to_mate =((ball_x - mate_x)**2 + (ball_y - mate_y)**2)**0.5
-    return ball_dist_to_mate
-
-# The function calculates the ball heading for the mate
-def mateBallHeading(ball_y, mate_y, mate_h, distance):
-    if distance == 0.0:
-        mate_ballHeading = mate_h
-    else:
-        dy = mate_y - ball_y
-        ball_dist_heading = math.degrees(math.asin(float(dy)/float(distance)))
-        mate_ballHeading = mate_h - ball_dist_heading
-    return mate_ballHeading
