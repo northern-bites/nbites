@@ -770,7 +770,7 @@ void Walk2014Generator::updateOdometry(Odometry *odometry, bool isLeftSwingFoot)
    forwardOdo *= 1;
    leftOdo    *= 1.23;
    turnOdo    *= -.53;
-   //cout << forwardOdo <<" "<< leftOdo <<" "<< turnOdo << endl;
+   std::cout << "UNSW WALK ODO " << forwardOdo <<" "<< leftOdo <<" "<< turnOdo << std::endl;
    *odometry = *odometry + Odometry(forwardOdo, leftOdo, turnOdo);
 
    // backup odometry values
@@ -783,6 +783,10 @@ void Walk2014Generator::updateOdometry(Odometry *odometry, bool isLeftSwingFoot)
 
 bool Walk2014Generator::isActive() {
    return !stopped;
+}
+
+bool Walk2014Generator::isStanding() {
+   return walk2014Option == STAND;
 }
 
 void Walk2014Generator::readOptions(boost::program_options::variables_map &config) {}

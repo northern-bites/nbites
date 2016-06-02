@@ -109,6 +109,7 @@ private:
 	Effector* effector;
 	BodyModel bodyModel;
 	UNSWKinematics kinematics;
+	Odometry* odometry;
 
 	void logMsg(std::string msg) { std::cout << msg << std::endl; }
 

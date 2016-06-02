@@ -2,11 +2,11 @@
 #include "utils/Logger.hpp"
 
 NullGenerator::NullGenerator() {
-   llog(INFO) << "NullGenerator created" << std::endl;
+   std::cout << "NullGenerator created" << std::endl;
 }
 
 NullGenerator::~NullGenerator() {
-   llog(INFO) << "NullGenerator destroyed" << std::endl;
+   std::cout << "NullGenerator destroyed" << std::endl;
 }
 
 JointValues NullGenerator::makeJoints(ActionCommand::All* request,

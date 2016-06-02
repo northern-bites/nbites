@@ -24,6 +24,7 @@ class Walk2014Generator : Generator {
                           float ballX,
                           float ballY);
    bool isActive();
+   bool isStanding();
    ActionCommand::Body active;
 
    enum Walk2014Option {
@@ -51,7 +52,6 @@ class Walk2014Generator : Generator {
    void reset();
    void stop();
 
-   bool getIsStanding() { return walk2014Option == 1;}
    friend class WalkEnginePreProcessor;
 
    private:

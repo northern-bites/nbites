@@ -18,6 +18,7 @@ class WalkEnginePreProcessor : Generator {
       void readOptions(boost::program_options::variables_map& config);
       void reset();
       void stop();
+      bool isStanding();
 
    private:
 

@@ -18,6 +18,8 @@ class DistributedGenerator : Generator {
       void reset();
       void readOptions(const boost::program_options::variables_map &config);
       bool isStopping;
+      static const unsigned int NUM_NBITE_GENS = 3;
+      bool isStanding();
 
    private:
       Generator* bodyGenerators[ActionCommand::Body::NUM_ACTION_TYPES];

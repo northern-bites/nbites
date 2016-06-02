@@ -14,6 +14,7 @@ set( unswalk_srcs
   gamecontroller/GameController.cpp
   blackboard/Blackboard.cpp
   perception/kinematics/Pose.cpp
+  perception/kinematics/Parameters.cpp
   perception/kinematics/UNSWKinematics.cpp
   types/JointValues.hpp
   types/UNSWSensorValues.hpp
@@ -30,6 +31,7 @@ set( unswalk_srcs
   generator/Generator.hpp
   generator/BodyModel.cpp
   generator/WalkCycle.cpp
+  generator/NullGenerator.cpp
   generator/PendulumModel.cpp
   generator/StandGenerator.cpp
   generator/ClippedGenerator.cpp

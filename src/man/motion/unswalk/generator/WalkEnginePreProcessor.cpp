@@ -50,6 +50,10 @@ void WalkEnginePreProcessor::LineUpEngine::reset() {
    walkEngine->exactStepsRequested = false;
 }
 
+bool WalkEnginePreProcessor::isStanding() {
+   return walkEngine->isStanding();
+}
+
 bool WalkEnginePreProcessor::LineUpEngine::hasEnded(ActionCommand::All* request, float ballX, float ballY) {
    // Calculate required left gap (needs to be further out for kicks)
    int leftGap = LEFT_GAP_DRIBBLE;
