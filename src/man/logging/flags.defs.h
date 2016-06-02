@@ -16,6 +16,9 @@ FLAG_XM(_END_INTERNAL_),
 
 //Flags that can be set anywhere
 FLAG_XM(_START_EXTERNAL_),
+FLAG_XM(tripoint),
+FLAG_XM(tripoint_bottom_only),
+
 FLAG_XM(logToFilesystem),
 FLAG_XM(logToStream),
 
@@ -31,8 +34,6 @@ FLAG_XM(VISION),
 
 FLAG_XM(locswarm),
 
-FLAG_XM(tripoint),
-FLAG_XM(tripoint_bottom_only),
 FLAG_XM(multiball),
 FLAG_XM(thumbnail),
 
