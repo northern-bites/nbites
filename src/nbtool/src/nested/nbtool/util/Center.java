@@ -152,7 +152,6 @@ public class Center {
 
 		protected abstract Class<? extends EventListener> listenerClass();
 		protected abstract void execute(ArrayList<EventListener> guiList, ArrayList<EventListener> centerList);
-		
 	}
 	
 	public static abstract class EventRunnable extends ToolEvent {
