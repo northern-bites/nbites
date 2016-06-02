@@ -34,6 +34,8 @@ LandmarkSystem::LandmarkSystem()
     addCorner(vision::CornerID::Convex, LandmarkID::TheirLeftBox, GREEN_PAD_X + FIELD_WHITE_WIDTH - GOALBOX_DEPTH, BLUE_GOALBOX_TOP_Y);
     addCorner(vision::CornerID::T, LandmarkID::TheirRightT, GREEN_PAD_X + FIELD_WHITE_WIDTH, BLUE_GOALBOX_BOTTOM_Y);
     addCorner(vision::CornerID::T, LandmarkID::TheirLeftT, GREEN_PAD_X + FIELD_WHITE_WIDTH, BLUE_GOALBOX_TOP_Y);
+    addCorner(vision::CornerID::T, LandmarkID::CenterCircleLeftT, CENTER_FIELD_X, CENTER_FIELD_Y + CENTER_CIRCLE_RADIUS);
+    addCorner(vision::CornerID::T, LandmarkID::CenterCircleRightT, CENTER_FIELD_X, CENTER_FIELD_Y - CENTER_CIRCLE_RADIUS);
 
     // Add center circle to map
     circle = std::make_tuple(LandmarkID::CenterCircle, CENTER_FIELD_X, CENTER_FIELD_Y);

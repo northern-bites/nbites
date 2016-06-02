@@ -93,7 +93,8 @@ Boss::Boss(boost::shared_ptr<AL::ALBroker> broker_, const std::string &name) :
     sensorLockMiss(0),
     fifo_fd(-1)
 {
-    printf("\t\tboss 7/%d\n", BOSS_VERSION);
+    printf("\t\tBOSS VERSION == %d\n", BOSS_VERSION);
+    
     std::cout << "Boss Constructor" << std::endl;
     bool success = true;
     
