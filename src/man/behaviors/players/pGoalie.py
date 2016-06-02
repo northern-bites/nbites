@@ -54,6 +54,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         #HACK FOR PENALTY GOALIE IN WATSON2016
         self.lastPenDiveSide = RIGHT
 
+        # this is only true for drop in player
+        self.dropIn = false
 
         ### ALL TRANSITIONS ARE DEFINED HERE ############
         ### Their conditions are in GoalieTransitions ###
