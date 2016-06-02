@@ -40,6 +40,11 @@ public:
     _areaAboveFirst += (int)aboveFirst;
   }
 
+  void merge(Blob b)
+  {
+      LineFit::merge(b);
+  }
+
   int areaAboveFirst() const { return _areaAboveFirst; }
 
   double area() const { return LineFit::area() / _w1; }

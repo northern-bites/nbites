@@ -103,14 +103,18 @@ class Brain(object):
         # So that we only try to sit down once upon receiving command
         self.sitting = False
 
-        # coa is Certificate of Authenticity (to keep things short)
-        print '\033[32m'+str(self.CoA)                              +'\033[0m'
-        print '\033[32m'+"GC:  I am on team "+str(self.teamNumber)  +'\033[0m'
-        print '\033[32m'+"GC:  I am player  "+str(self.playerNumber)+'\033[0m'
-        print '\033[32m'+"GC:  I am role  "+str(self.player.role)+'\033[0m'
-
-        # CHINA HACK
+        # CHINA HACK(s)
         self.penalizedHack = False
+        self.penalizedEdgeClose = 0
+        self.penalizedCount = 0
+
+        # US OPEN 16 HACK(z)
+        self.ballMem = []
+        self.ballMemIndx = 0
+        self.BALL_MEM_SIZE = 15
+        self.ballMemRatio = 0.0
+        for i in range(self.BALL_MEM_SIZE):
+            self.ballMem.append(0)
 
     def initTeamMembers(self):
         self.teamMembers = []
@@ -193,6 +197,20 @@ class Brain(object):
 
         # Flush the output
         sys.stdout.flush()
+
+        # US OPEN :(
+        if self.ball.vis.on:
+            self.ballMem[self.ballMemIndx] = 1
+        else:
+            self.ballMem[self.ballMemIndx] = 0
+        self.ballMemIndx = (self.ballMemIndx + 1) % self.BALL_MEM_SIZE
+        count = 0
+        for i in range(self.BALL_MEM_SIZE):
+            count += self.ballMem[i]
+
+        self.ballMemRatio = (count / self.BALL_MEM_SIZE) 
+
+
 
     def updateComm(self):
         me = self.teamMembers[self.playerNumber - 1]
@@ -278,7 +296,6 @@ class Brain(object):
             curr_obst = self.interface.fieldObstacles.obstacle(i)
             if curr_obst.position != curr_obst.position.NONE:
                 self.obstacles[int(curr_obst.position)] = (curr_obst.distance, curr_obst.closest_y)
-
                 if curr_obst.detector == curr_obst.detector.ARMS:
                     self.obstacleDetectors[int(curr_obst.position)] = 'a'
                 elif curr_obst.detector == curr_obst.detector.SONARS:

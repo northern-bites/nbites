@@ -22,7 +22,7 @@ static const char * NBITES_MEM = "/nbites-memory";
 static const int COMMAND_SIZE = (1 << 11);
 static const int SENSOR_SIZE = (1 << 10);
 
-static const int BOSS_VERSION = 10;
+static const int BOSS_VERSION = 11;
 
 struct JointCommand {
     int64_t writeIndex;

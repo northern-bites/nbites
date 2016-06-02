@@ -30,8 +30,8 @@ def approachBall(player):
         if player.inKickOffPlay:
             return player.goNow('giveAndGo')
         else:
-            print "APPROACH KICK OFF"
             return player.goNow('positionAndKickBall')
+
     elif player.penaltyKicking:
         return player.goNow('prepareForPenaltyKick')
     else:
@@ -57,7 +57,8 @@ def walkToWayPoint(player):
         player.decider = KickDecider.KickDecider(player.brain)
         player.brain.tracker.trackBall()
     
-    player.kick = player.decider.decidingStrategy()
+    player.kick = player.decider.usOpen2016StraightKickStrategy() #USOPEN 2016
+    print(player.kick)
     relH = player.decider.normalizeAngle(player.kick.setupH - player.brain.loc.h)
 
     ball = player.brain.ball
@@ -101,10 +102,14 @@ def spinToKickHeading(player):
     if fabs(relH) <= constants.FACING_KICK_ACCEPTABLE_BEARING:
         return player.goNow('positionForKick')
 
-    if fabs(relH) < constants.SHOULD_SPIN_TO_BALL_BEARING:
-        speed = Navigator.MEDIUM_SPEED
+    if fabs(relH) <= constants.FACING_BALL_ACCEPTABLE_BEARING:
+        speed = Navigator.GRADUAL_SPEED
+    elif fabs(relH) >= constants.MAX_BEARING_DIFF:
+        speed = Navigator.FAST_SPEED
     else:
-        speed = constants.FIND_BALL_SPIN_SPEED
+        slope = (Navigator.FAST_SPEED - Navigator.GRADUAL_SPEED) / (constants.MAX_BEARING_DIFF - constants.FACING_BALL_ACCEPTABLE_BEARING)
+        intercept = Navigator.FAST_SPEED - slope*constants.MAX_BEARING_DIFF
+        speed = slope*fabs(relH) + intercept
 
     # spins the appropriate direction
     player.brain.nav.walk(0., 0., copysign(speed, relH))
@@ -131,12 +136,13 @@ def prepareForKick(player):
 
     if not player.inKickOffPlay:
         if player.shouldKickOff or player.brain.gameController.timeSincePlaying < 10:
-            print "Overriding kick decider for kickoff!"
+            # print "Overriding kick decider for kickoff!"
             player.shouldKickOff = False
             player.kick = player.decider.kicksBeforeBallIsFree()
         else:
             player.shouldKickOff = False
-            player.kick = player.decider.decidingStrategy()
+            # print("PREPAREFOREKICK THIS CASE")
+            player.kick = player.decider.usOpen2016StraightKickStrategy()
         player.inKickingState = True
 
     elif player.finishedPlay:

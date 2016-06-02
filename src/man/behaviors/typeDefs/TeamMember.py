@@ -33,6 +33,7 @@ class TeamMember(RobotLocation):
         self.kickingToY = 0
         self.fallen = False
         self.active = True
+        self.alive = True
         self.claimedBall = False
 
         self.frameSinceActive = 0
@@ -64,6 +65,7 @@ class TeamMember(RobotLocation):
         self.kickingToX = info.kicking_to_x
         self.kickingToY = info.kicking_to_y
         self.active = info.active
+        self.alive = info.alive
         self.fallen = info.fallen
         self.claimedBall = info.claimed_ball
 
@@ -137,6 +139,7 @@ class TeamMember(RobotLocation):
                        not self.brain.player.currentState == 'afterPenalty' and
                        not (self.brain.playerNumber == 1 and
                             self.brain.player.returningFromPenalty))
+        self.alive = True
         self.fallen = self.brain.fallController.falling or self.brain.fallController.fell
 
         self.claimedBall = self.brain.player.claimedBall
@@ -163,6 +166,7 @@ class TeamMember(RobotLocation):
             self.kickingToY = 0
         self.active = False
         self.fallen = False
+        self.alive = True
         self.claimedBall = False
         self.frameSinceActive = 0
         self.lastTimestamp = 0

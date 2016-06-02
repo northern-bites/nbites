@@ -67,7 +67,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Controls whether we will role switch
         self.roleSwitching = True
         # Controls whether we use claims
-        self.useClaims = True
+        self.useClaims = False
         self.returningFromPenalty = False
 
         # Trinary flag indicating state of communications
@@ -75,3 +75,5 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # 1 -- one field player is offline
         # 2 -- more than one field player is offline
         self.commMode = 0
+
+

@@ -53,7 +53,8 @@ def gameReady(player):
 
         if player.wasPenalized:
             player.wasPenalized = False
-            return player.goNow('afterPenalty')
+            # US OPEN 16 Turns of going into after penalty in ready
+            # return player.goNow('afterPenalty')
 
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
@@ -78,6 +79,9 @@ def gameSet(player):
         player.stand()
         player.brain.nav.stand()
         player.brain.tracker.performWidePan()
+
+        if player.wasPenalized:
+            player.wasPenalized = False
 
     elif player.brain.tracker.isStopped():
         player.brain.tracker.trackBall()
@@ -104,13 +108,14 @@ def gamePlaying(player):
     # TODO without pb, is this an issue?
     # if (player.lastDiffState == 'afterPenalty' and
     #     player.brain.play.isChaser()):
-    #     # special behavior case
-    #     return player.goNow('postPenaltyChaser')
+    #     # special behavior return
+    #     case player.goNow('postPenaltyChaser')
     # Wait until the sensors are calibrated before moving.
 
     if player.wasPenalized:
         player.wasPenalized = False
-        return player.goNow('afterPenalty')
+        if player.lastDiffState != 'gameSet': 
+            return player.goNow('afterPenalty')
 
     if not player.brain.motion.calibrated:
         return player.stay()
@@ -159,11 +164,17 @@ def gamePenalized(player):
         player.stand()
         player.penalizeHeads()
         player.wasPenalized = True
+        player.brain.penalizedEdgeClose = 0
+        player.brain.penalizedCount = 0
         # RESET LOC TO FIELD CROSS
         if player.brain.penalizedHack:
             player.brain.resetLocToCross()
             print "BRUNSWICK PENALIZED"
 
+    if player.brain.vision.horizon_dist < 200.0:
+        player.brain.penalizedEdgeClose += 1
+
+    player.brain.penalizedCount += 1
     return player.stay()
 
 @superState('gameControllerResponder')

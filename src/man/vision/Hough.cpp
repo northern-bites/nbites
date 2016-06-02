@@ -22,6 +22,8 @@ namespace vision {
 // *                             *
 // *******************************
 
+double FIT_THRESH_START = 0.6;
+
 AdjustParams::AdjustParams()
   : angleThr(0.10f, 0.15f), distanceThr(2.00f, 4.00f), magnitudeThr(12, 20)
 {
@@ -33,7 +35,7 @@ AdjustParams::AdjustParams()
 AdjustSet::AdjustSet() {
   params[1].angleThr = FuzzyThr(0.08f, 0.12f);
   params[1].distanceThr = FuzzyThr(0.7f, 2.0f);
-  params[1].fitThresold = 0.55;
+  params[1].fitThresold = FIT_THRESH_START;
 
 }
 
@@ -1059,7 +1061,7 @@ HoughSpace::HoughSpace(int maxImageWd, int maxImageHt)
 
 HoughSpace::~HoughSpace()
 {
-  delete[] spaceBlock;
+    //delete[] spaceBlock;
   delete[] runs;
 }
 
