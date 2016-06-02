@@ -22,6 +22,11 @@ def switchRoles(player):
     """
     State to decide who on the team should become the new chaser and switch accordingly.
     """
+
+    # drop in player does not role switch
+    if player.dropIn:
+    	pass
+
     roleConstants.setRoleConstants(player, player.openChaser)
 
     return player.goLater(player.gameState)

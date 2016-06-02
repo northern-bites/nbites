@@ -26,10 +26,6 @@ def shouldReturnHome(player):
     if player.buffBoxFiltered.checkCondition(player):
         player.claimedBall = False
         return True;
-    
-    #For  Dropin player! 
-    if player.dropIn:
-        return claimTrans.shouldGiveUpBall(player)
 
     return claimTrans.shouldCedeClaim(player)
 
@@ -41,10 +37,6 @@ def shouldSupport(player):
     if not player.brain.motion.calibrated:
         player.claimedBall = False
         return False
-    # for drop in
-    
-    if player.dropIn:
-        return player.brain.ball.vis.frames_on and claimTrans.shouldGiveUpBall(player)
         
     return player.brain.ball.vis.frames_on and claimTrans.shouldCedeClaim(player)
 

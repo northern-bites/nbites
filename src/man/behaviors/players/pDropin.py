@@ -1,7 +1,7 @@
 import time
 from . import SoccerFSA
 from . import FallControllerStates
-from . import DropinRoleSwitchingStates
+from . import RoleSwitchingStates
 from . import CommMonitorStates
 from . import GameControllerStates
 from . import DropinStates
@@ -21,7 +21,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.__init__(self,brain)
         self.addStates(FallControllerStates)
         self.addStates(GameControllerStates)
-        self.addStates(DropinRoleSwitchingStates)
+        self.addStates(RoleSwitchingStates)
         self.addStates(CommMonitorStates)
         self.addStates(DropinStates)
         self.addStates(PlayOffBallStates)
@@ -35,9 +35,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.currentState = 'fallController' # initial state
         """ THE STATE OF THE PLAYER """
         self.inKickingState = False
-        ### DROP IN HACK CHINA 2015 ###
 
-        self.role = 4
+        ### DROP IN PLAYER ###
+        # FROM CHINA HACK 2015; we change this instead of defaulting to player number
+        self.role = 4 
         roleConstants.setRoleConstants(self, self.role)
         
         # Initialized for the sake of those who aren't

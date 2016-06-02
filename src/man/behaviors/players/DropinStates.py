@@ -7,7 +7,7 @@ from math import fabs
 from ..util import *
 from .. import SweetMoves
 from . import RoleConstants as roleConstants
-from . import DropinRoleSwitchingStates as roleSwitching
+from . import RoleSwitchingStates as roleSwitching
 import KickOffConstants as kickOff
 
 @superState('gameControllerResponder')
@@ -26,8 +26,8 @@ def gameInitial(player):
         player.lastStiffStatus = True
         
         ### HACK CHINA 2015 ###
-
-        player.role = 4
+        ### DROP IN PLAYER ###
+        player.role = 4 # enter player role here; make sure it matches the one in pDropin
 
     # If stiffnesses were JUST turned on, then stand up.
     if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
@@ -121,13 +121,6 @@ def gamePlaying(player):
         else:
             return player.goNow('waitForKickoff')
     return player.goNow('playOffBall')
-    
-    # print "Testing role switching stuff!"
-    # print "active team mates is ", player.brain.activeTeamMates()
-    # if player.roleSwitching and player.brain.activeTeamMates() < 5: #value to change for testing
-    #     print "Should be entering role switching states!"
-    #     return player.goNow('switchRoles')
-    # print "passed if role switching"
     
 @superState('gameControllerResponder')
 def gameFinished(player):
