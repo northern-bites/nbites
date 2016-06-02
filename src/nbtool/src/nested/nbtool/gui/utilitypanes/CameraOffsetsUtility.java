@@ -243,7 +243,7 @@ public class CameraOffsetsUtility extends UtilityParent {
 			this.panel.displayTable.setModel(model);
 			this.panel.displayTable.getTableHeader().setFont(new Font("PT Serif", Font.BOLD, 14));
 
-			this.setMinimumSize(new Dimension(600,400));
+			this.setMinimumSize(new Dimension(600,200));
 			
 //			this.addComponentListener(new ComponentAdapter(){
 //				public void componentShown(ComponentEvent e) {

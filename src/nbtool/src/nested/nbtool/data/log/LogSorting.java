@@ -32,8 +32,8 @@ public class LogSorting {
 		BY_ARRIVAL("by arrival", new Comparator<LogReference>(){
 
 			public int compare(LogReference o1, LogReference o2) {
-				Long s1 = o1.savedID;
-				Long s2 = o2.savedID;
+				Long s1 = o1.thisID;
+				Long s2 = o2.thisID;
 				return s1.compareTo(s2);
 			}
 			

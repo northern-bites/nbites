@@ -41,7 +41,12 @@ public class LogInternal extends Log {
 	
 	@Override
 	public String toString() {
-		return String.format("%s(id:%d)", this.getClass().getName(), this.jvm_unique_id);
+		if (this.getReference() != null) {
+			return String.format("%s(rid:%d)", this.getClass().getName(),
+					this.getReference().thisID);
+		} else {
+			return String.format("%s(id:%d)", this.getClass().getName(), this.jvm_unique_id);
+		}
 	}
 	
 	private Pair<JsonObject, byte[]> getParts() {
