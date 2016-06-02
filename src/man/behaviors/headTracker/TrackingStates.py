@@ -184,11 +184,11 @@ def fullPan(tracker):
         request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
         # Smartly start the pan
-        tracker.helper.startingPan(HeadMoves.FIXED_PITCH_PAN)
+        tracker.helper.startingPan(HeadMoves.SNAP_PAN)
 
     if not tracker.brain.motion.head_is_active:
         # Repeat the pan
-        tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
+        tracker.helper.executeHeadMove(HeadMoves.SNAP_PAN)
 
     if not isinstance(tracker.target, Vision.messages.FilteredBall):
         if tracker.target.on:
@@ -200,6 +200,9 @@ def fullPan(tracker):
 
     return tracker.stay()
 
+"""
+The following function is unused.
+"""
 def snapPan(tracker):  
     print "Entering SnapPan function"
 
