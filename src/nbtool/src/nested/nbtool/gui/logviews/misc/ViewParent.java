@@ -37,6 +37,9 @@ public abstract class ViewParent extends JPanel {
 	
 	public abstract String[] displayableTypes();
 	
+	/* called by display code when view will be removed/closed */
+	public void disappearing() {  }
+	
 	//Override if you want it to load in parallel.
 	public static Boolean shouldLoadInParallel(){ return false; }
 	public static Boolean shouldShowInScrollPane(){ return false; }

@@ -320,6 +320,7 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
     module.run();
 
     std::vector<Block> retVec;
+    json::Object retKeys;
     // -----------
     //   Y IMAGE
     // -----------
@@ -546,7 +547,12 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
     int debugImageLength = (width / 2) * (height / 2);
     retVec.push_back(Block{ std::string{ (const char *) module.getDebugImage(topCamera)->pixArray(), debugImageLength}, json::Object{}, "debugImage", "nbcross", 0, 0});
 
-    RETURN(Log::explicitLog(retVec, json::Object{}, "VisionReturn"));
+    if (theLog->topLevelDictionary.find("BallTest_Balls") !=
+                theLog->topLevelDictionary.end()) {
+        retKeys["BallTest_Balls"] = theLog->topLevelDictionary["BallTest_Balls"];
+    }
+
+    RETURN(Log::explicitLog(retVec, retKeys, "VisionReturn"));
 }
 
 NBCROSS_FUNCTION(CalculateCameraOffsets, true, nbl::SharedConstants::LogClass_Tripoint())

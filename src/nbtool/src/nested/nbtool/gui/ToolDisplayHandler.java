@@ -35,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -79,6 +80,7 @@ import nbtool.util.UserSettings;
 import nbtool.util.UserSettings.DisplaySettings;
 import nbtool.util.Utility;
 import nbtool.util.Center.NBToolShutdownListener;
+import nbtool.util.Center.ToolEvent;
 import nbtool.util.Events.ViewProfileSetChanged;
 import nbtool.util.Utility.Pair;
 
@@ -86,6 +88,7 @@ public class ToolDisplayHandler implements
 	IOFirstResponder, Events.LogsFound, Events.GroupAdded {
 	
 	private final long id = Utility.getNextIndex(this);
+	private final ToolDisplayHandler outerThis = this;
 	
 	private static final Debug.DebugSettings debug = Debug.createSettings(Debug.INFO);
 	
@@ -206,7 +209,8 @@ public class ToolDisplayHandler implements
 		AbstractAction loadAction = new AbstractAction(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				display.loadButton.doClick();
+				if (display.leftSideTabs.getSelectedComponent() == display.controlTab)
+					display.loadButton.doClick();
 			}
 		};
 		
@@ -355,37 +359,7 @@ public class ToolDisplayHandler implements
 		}
 	}
 	
-	private void controlConnectAction() {
-		if (robot == null) {
-			assert(display.connectButton.getText().equals("connect"));
-		} else {
-			assert(display.connectButton.getText().equals("disconnect"));
-			Debug.info("trying to kill %s", robot);
-			robot.kill();
-			return;
-		}
-		
-		String address = (String) display.robotAddressBox.getSelectedItem();
-		if (address == null) {
-			ToolMessage.displayError("choose valid address");
-			return;
-		}
-		
-		address = address.trim();
-		
-		Debug.warn("trying to connect to %s", address);
-		robot = RobotConnection.connectToRobot(address, this);
-		if (robot == null) {
-			ToolMessage.displayError("connection failed to: %s", address);
-			return;
-		}
-		
-		ToolMessage.displayWarn("SUCCESS: connected to %s (%s)", address, robot);
-		display.connectButton.setText("disconnect");
-		display.loadButton.setEnabled(false);
-		updateComboBoxAndSettings(display.robotAddressBox, UserSettings.addresses, address);
-		lastGroup = Group.groupForStream(address);
-		
+	private void controlRequestFlags() {
 		LogRPC.requestFlags(new IOFirstResponder(){
 			@Override
 			public void ioFinished(IOInstance instance) { assert(false); }
@@ -418,8 +392,76 @@ public class ToolDisplayHandler implements
 			}
 			
 		}, robot);
+	}
+	
+	private class ControlConnectRunnable extends Center.EventRunnable {
+		private final String robotAddress;
 		
-		Events.GGroupAdded.generate(this, lastGroup);
+		ControlConnectRunnable(String s) {this.robotAddress = s;}
+
+		protected void run() {
+			Debug.warn("trying to connect to %s", robotAddress);
+			robot = RobotConnection.connectToRobot(robotAddress, outerThis);
+			
+			if (robot == null) {
+				ToolMessage.displayError("connection failed to: %s", robotAddress);
+				
+				SwingUtilities.invokeLater(new Runnable(){
+					@Override
+					public void run() {
+						display.connectButton.setEnabled(true);
+					}
+				});
+				
+				return;
+			} else {
+				ToolMessage.displayWarn("SUCCESS: connected to %s (%s)", robotAddress, robot);
+				
+				SwingUtilities.invokeLater(new Runnable(){
+					@Override
+					public void run() {
+						display.connectButton.setEnabled(true);
+						
+						display.connectButton.setText("disconnect");
+						display.loadButton.setEnabled(false);
+						updateComboBoxAndSettings(display.robotAddressBox, UserSettings.addresses, robotAddress);
+						
+						lastGroup = Group.groupForStream(robotAddress);
+						Events.GGroupAdded.generate(this, lastGroup);
+					}
+				});
+			}
+		}
+	}
+	
+	private void controlConnectAction() {
+		if (robot == null) {
+			assert(display.connectButton.getText().equals("connect"));
+		} else {
+			assert(display.connectButton.getText().equals("disconnect"));
+			Debug.info("trying to kill %s", robot);
+			
+			final RobotConnection _robot = robot;
+			Center.addEvent(new Center.EventRunnable(){
+				@Override
+				protected void run() {
+					_robot.kill();
+				}
+			});
+			
+			return;
+		}
+		
+		String address = (String) display.robotAddressBox.getSelectedItem();
+		if (address == null) {
+			ToolMessage.displayError("choose valid address");
+			return;
+		}
+		
+		address = address.trim();
+		
+		display.connectButton.setEnabled(false);		
+		Center.addEvent(new ControlConnectRunnable(address));
 	}
 	
 	private void setupKeepSlider() {
