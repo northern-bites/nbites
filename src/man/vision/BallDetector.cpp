@@ -524,11 +524,19 @@ bool BallDetector::findCorrelatedBlackSpots
                 // double s1wx, s1wy, s2wx, s2wy;
                 // homography->fieldCoords(s1.ix(),s1.iy(), s1wx, s1wy);
                 // homography->fieldCoords(s2.ix(),s2.iy(), s2wx, s2wy);
-                double distance;
+                double distance, upper, lower;
+                //IDEA: account for area and distance thresholds based on the camera?
+                if(topCamera) {
+                    lower = 9.5;
+                    upper = 14.0;
+                } else {
+                    lower = 19.0;
+                    upper = 21.4;
+                }
                 distance = sqrt(pow((s2.ix() - s1.ix()),2) + pow((s2.iy() - s1.iy()),2));
                 std::cout<<"Distance: "<<distance<<std::endl;
 
-                if(distance > 19.0 && distance < 21.4) {
+                if(distance > lower && distance < upper) {
                     std::cout<<"Distance is in the right range"<<std::endl;
 
                     ballSpotX = (s1.ix()+s2.ix())/2;

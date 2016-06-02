@@ -126,7 +126,7 @@ if NogginConstants.LEFT_FORWARD_DEFENSE:
                                     0)
 else:
     evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 50,
-                                    NogginConstants.MY_GOALBOX_TOP_Y,
+                                    NogginConstants.MY_GOALBOX_TOP_Y - 35,
                                     0)
     
 if NogginConstants.RIGHT_FORWARD_DEFENSE:
@@ -134,8 +134,8 @@ if NogginConstants.RIGHT_FORWARD_DEFENSE:
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 0)
 else:
-    oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 50,
-                                NogginConstants.MY_GOALBOX_BOTTOM_Y,
+    oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 70,
+                                NogginConstants.MY_GOALBOX_BOTTOM_Y + 35,
                                 0)
 
 oddChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,

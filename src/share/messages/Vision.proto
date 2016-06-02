@@ -61,7 +61,7 @@ message VBall
     optional double angle_x_deg = 3;
     optional double angle_y_deg = 4;
     optional double bearing_sd = 5;
-    optional bool inTopCam = 6;
+    optional bool in_top_cam = 6;
     optional double radius = 7;
     optional double confidence = 8;
     optional bool on = 9;

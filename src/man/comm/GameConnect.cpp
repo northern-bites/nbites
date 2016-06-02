@@ -39,9 +39,9 @@ void GameConnect::setUpSocket()
     _socket->setBlocking(false);
     _socket->setBroadcast(false);
 
-    _socket->bind("", GAMECONTROLLER_PORT); // Listen on the GC port.
+    _socket->bind("", GAMECONTROLLER_DATA_PORT); // Listen on the GC port. //data port
 
-    _socket->setTarget("255.255.255.255", GAMECONTROLLER_PORT);
+    _socket->setTarget("255.255.255.255", GAMECONTROLLER_DATA_PORT); //data port
 }
 
 void GameConnect::handle(portals::OutPortal<messages::GameState>& out,
@@ -58,6 +58,7 @@ void GameConnect::handle(portals::OutPortal<messages::GameState>& out,
         portals::Message<messages::GameState> gameMessage(0);
         memset(&packet[0], 0, sizeof(struct RoboCupGameControlData));
 
+        _socket->setTarget("255.255.255.255", GAMECONTROLLER_DATA_PORT);
         result = _socket->receiveFrom(&packet[0], sizeof(packet),
                                       &from, &addrlen);
 
@@ -93,7 +94,7 @@ void GameConnect::handle(portals::OutPortal<messages::GameState>& out,
 
         inet_ntop(AF_INET, &((struct sockaddr_in*)&from)->sin_addr,
                   &destination[0], INET_ADDRSTRLEN);
-        _socket->setTarget(&destination[0], GAMECONTROLLER_PORT);
+        _socket->setTarget(&destination[0], GAMECONTROLLER_RETURN_PORT);
         _socket->setBroadcast(false);
 
         in.latch();
