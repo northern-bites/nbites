@@ -200,6 +200,59 @@ def fullPan(tracker):
 
     return tracker.stay()
 
+def snapPan(tracker):  
+    print "Entering SnapPan function"
+
+    if tracker.firstFrame():
+        request = tracker.brain.interface.motionRequest
+        request.stop_head = True
+        request.timestamp = int(tracker.brain.time * 1000)
+        # Smartly start the pan
+        tracker.performHeadMove(tracker.helper.lookToAngle(tracker.currentYaw))
+
+    if not tracker.brain.motion.head_is_active:
+        if tracker.lastMovement == 0: # If the head should stay still rn
+            print "Staying still"
+            tracker.lookToAngle(tracker.currentYaw)
+            tracker.lastMovement = 1
+            time.sleep(3)
+        else:
+            print "Let's change up the view"
+            tracker.currentYaw += 30 * tracker.direction # 30 degrees of motion for each pan
+            print "Current yaw: " + str(tracker.currentYaw)
+            tracker.lookToAngle(tracker.currentYaw)
+            time.sleep(20)
+
+            if tracker.currentYaw >= 90:
+                tracker.direction = -1
+            if tracker.currentYaw <= -90:
+                tracker.direction = 1
+
+            tracker.lastMovement = 0
+
+    if not isinstance(tracker.target, Vision.messages.FilteredBall):
+
+        print "The first thing"
+        # tracker.lastMovement = 0
+        # tracker.currentYaw = 0
+        # tracker.direction = 1
+        # print "Target Tracker On Bug: " + str(tracker.target)
+        # if tracker.target.on:
+        #     return tracker.goLater('trackingFieldObject')
+
+    if (isinstance(tracker.target, Vision.messages.FilteredBall) and
+        tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH):
+
+        print "The second thing"
+
+        tracker.lastMovement = 0
+        tracker.currentYaw = 0
+        tracker.direction = 1
+        
+        return tracker.goLater('tracking')
+
+    return tracker.stay()
+
 def bounceFullPan(tracker):
     """
     Just like above, but matches with the bounceTracking state instead.
