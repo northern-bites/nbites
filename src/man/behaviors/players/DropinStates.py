@@ -24,10 +24,13 @@ def gameInitial(player):
         player.zeroHeads()
         player.brain.resetInitialLocalization()
         player.lastStiffStatus = True
+
+        print "My player number is ", player.brain.playerNumber
+        print "My role is ", player.role
         
         ### HACK CHINA 2015 ###
         ### DROP IN PLAYER ###
-        player.role = 4 # enter player role here; make sure it matches the one in pDropin
+        player.role = 1 # enter player role here; make sure it matches the one in pDropin
 
     # If stiffnesses were JUST turned on, then stand up.
     if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
