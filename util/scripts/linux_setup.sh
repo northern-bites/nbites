@@ -9,7 +9,7 @@ OLDPACKAGES="libboost1.48-dev libboost-python1.48-dev"
 
 PACKAGES="build-essential cmake git-core \
 emacs cmake-curses-gui ccache aptitude \
-qt4-dev-tools python-pyparsing libeigen3-dev"
+qt4-dev-tools python-pyparsing libeigen3-dev ant"
 
 BITS=`uname -m`
 

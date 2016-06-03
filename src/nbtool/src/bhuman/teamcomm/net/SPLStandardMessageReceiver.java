@@ -28,22 +28,22 @@ import teamcomm.net.logging.Logger;
  * @author Felix Thielke
  */
 public class SPLStandardMessageReceiver extends Thread {
-
+    
     private class ReceiverThread extends Thread {
-
+        
         private final MulticastSocket socket;
         private final int team;
-
+        
         public ReceiverThread(final int team) throws IOException {
             setName("SPLStandardMessageReceiver_team" + team);
-
+            
             this.team = team;
 
             // Bind socket to team port
             socket = new MulticastSocket(null);
             socket.setReuseAddress(true);
             socket.bind(new InetSocketAddress("0.0.0.0", getTeamport(team)));
-
+            
             try {
                 // Join multicast group on all network interfaces (for compatibility with SimRobot)
                 socket.joinGroup(InetAddress.getByName("239.0.0.1"));
@@ -64,7 +64,7 @@ public class SPLStandardMessageReceiver extends Thread {
                 // Ignore, because this is only for testing and does not work everywhere
             }
         }
-
+        
         @Override
         public void run() {
             byte[] buffer = new byte[SPLStandardMessage.SIZE];
@@ -72,7 +72,7 @@ public class SPLStandardMessageReceiver extends Thread {
                 try {
                     final DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                     socket.receive(packet);
-
+                    
                     if (!LogReplayer.getInstance().isReplaying()) {
                         if (packet.getAddress().getAddress()[0] != 10) {
                             queue.add(new SPLStandardMessagePackage("10.0." + team + "." + buffer[5], team, buffer));
@@ -80,23 +80,23 @@ public class SPLStandardMessageReceiver extends Thread {
                             queue.add(new SPLStandardMessagePackage(packet.getAddress().getHostAddress(), team, buffer));
                         }
                     }
-
+                    
                     buffer = new byte[SPLStandardMessage.SIZE];
                 } catch (SocketTimeoutException e) {
                 } catch (IOException e) {
                     Log.error("something went wrong while receiving the message packages: " + e.getMessage());
                 }
             }
-
+            
         }
     }
-
+    
     private static SPLStandardMessageReceiver instance;
-
+    
     private static final int MAX_TEAMNUMBER = 100;
-
+    
     private final ReceiverThread[] receivers = new ReceiverThread[MAX_TEAMNUMBER];
-    private final LinkedBlockingQueue<SPLStandardMessagePackage> queue = new LinkedBlockingQueue<SPLStandardMessagePackage>();
+    private final LinkedBlockingQueue<SPLStandardMessagePackage> queue = new LinkedBlockingQueue<>();
 
     /**
      * Constructor.
@@ -130,7 +130,7 @@ public class SPLStandardMessageReceiver extends Thread {
         }
         return instance;
     }
-
+    
     @Override
     public void run() {
         try {
@@ -156,28 +156,19 @@ public class SPLStandardMessageReceiver extends Thread {
                         message.teamNumValid = false;
                         message.valid = false;
                     }
-
+                    
+                    SPLStandardMessage m = message;
                     if (message instanceof AdvancedMessage && message.valid) {
-                        ((AdvancedMessage) message).init();
+                        try {
+                            ((AdvancedMessage) message).init();
+                        } catch (final Throwable e) {
+                            m = SPLStandardMessage.createFrom(message);
+                            Log.error(e.getClass().getSimpleName() + " was thrown while initializing custom message class " + c.getSimpleName() + ": " + e.getMessage());
+                        }
                     }
-
-                    /*
-                     if (!message.valid && !LogReplayer.getInstance().isReplaying()) {
-                     try {
-                     BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream("error_" + p.team + "_" + p.host));
-                     for (String msg : message.errors) {
-                     stream.write((msg + "\n").getBytes());
-                     }
-                     stream.close();
-                     } catch (IOException ex) {
-
-                     }
-                     }
-                     */
-                    GameState.getInstance().receiveMessage(p.host, message.teamNumValid ? message.teamNum : p.team, message);
-                } catch (InstantiationException ex) {
-                    Log.error("a problem occured while instantiating custom message class " + c.getSimpleName() + ": " + ex.getMessage());
-                } catch (IllegalAccessException ex) {
+                    
+                    GameState.getInstance().receiveMessage(p.host, m.teamNumValid ? m.teamNum : p.team, m);
+                } catch (InstantiationException | IllegalAccessException ex) {
                     Log.error("a problem occured while instantiating custom message class " + c.getSimpleName() + ": " + ex.getMessage());
                 }
                 Thread.yield();
@@ -187,13 +178,13 @@ public class SPLStandardMessageReceiver extends Thread {
             for (final ReceiverThread receiver : receivers) {
                 receiver.interrupt();
             }
-
+            
             try {
                 for (final ReceiverThread receiver : receivers) {
                     receiver.join();
                 }
             } catch (InterruptedException ex) {
-
+                
             }
         }
     }
@@ -217,7 +208,7 @@ public class SPLStandardMessageReceiver extends Thread {
         } catch (InterruptedException ex) {
         }
     }
-
+    
     private static int getTeamport(final int teamNumber) {
         return teamNumber + 10000;
     }

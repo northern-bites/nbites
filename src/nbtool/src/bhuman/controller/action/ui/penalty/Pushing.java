@@ -25,8 +25,9 @@ public class Pushing extends Penalty
     public void performOn(AdvancedData data, PlayerInfo player, int side, int number)
     {
         player.penalty = PlayerInfo.PENALTY_SPL_PLAYER_PUSHING;
+        handleRepeatedPenaltyEjection(data, player, side, number);
         data.whenPenalized[side][number] = data.getTime();
-
+        /*//not required in RoboCup 2016?
         if (data.gameState == GameControlData.STATE_PLAYING) {
             data.pushes[side]++;
             for (int pushes : Rules.league.pushesToEjection) {
@@ -34,7 +35,7 @@ public class Pushing extends Penalty
                     data.ejected[side][number] = true;
                 }
             }
-        }
+        }*/
         
         Log.state(data, "Player Pushing "+
                     Rules.league.teamColorName[data.team[side].teamColor]

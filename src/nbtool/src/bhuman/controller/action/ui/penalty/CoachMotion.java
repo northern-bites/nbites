@@ -21,6 +21,7 @@ public class CoachMotion extends Penalty
     {
         data.whenPenalized[side][number] = data.getTime();
         data.team[side].coach.penalty = PlayerInfo.PENALTY_SPL_COACH_MOTION;
+        handleRepeatedPenaltyEjection(data, data.team[side].coach, side, number);
         data.ejected[side][number] = true;
         Log.state(data, "Coach Motion "+ Rules.league.teamColorName[data.team[side].teamColor]);
     }

@@ -42,8 +42,8 @@ public class PluginLoader {
     private static final PluginLoader instance = new PluginLoader();
 
     private final File pluginDir = new File(PLUGIN_PATH);
-    private final Map<Integer, Class<? extends AdvancedMessage>> messageClasses = new HashMap<Integer, Class<? extends AdvancedMessage>>();
-    private final Map<Integer, Collection<Drawing>> drawings = new HashMap<Integer, Collection<Drawing>>();
+    private final Map<Integer, Class<? extends AdvancedMessage>> messageClasses = new HashMap<>();
+    private final Map<Integer, Collection<Drawing>> drawings = new HashMap<>();
 
     private PluginLoader() {
         scanJar(new File(pluginDir, COMMON_DRAWINGS_PLUGIN), TEAMNUMBER_COMMON);
@@ -97,7 +97,7 @@ public class PluginLoader {
      * @param teamNumbers numbers of the teams
      */
     public void update(final Integer... teamNumbers) {
-        update(new HashSet<Integer>(Arrays.asList(teamNumbers)));
+        update(new HashSet<>(Arrays.asList(teamNumbers)));
     }
 
     /**
@@ -140,9 +140,9 @@ public class PluginLoader {
             }
 
             final int teamNumber = Integer.parseInt(pDir.getName());
-            final LinkedList<File> dirs = new LinkedList<File>();
+            final LinkedList<File> dirs = new LinkedList<>();
             dirs.add(pDir);
-            final List<File> jars = new LinkedList<File>();
+            final List<File> jars = new LinkedList<>();
 
             // Scan plugin directory
             while (!dirs.isEmpty()) {
@@ -165,49 +165,58 @@ public class PluginLoader {
 
     private void scanJar(final File file, final int teamNumber) {
         try {
-            final JarFile jar = new JarFile(file);
-            final Set<String> classNames = new HashSet<String>();
-            final Enumeration<JarEntry> entries = jar.entries();
-            while (entries.hasMoreElements()) {
-                final JarEntry entry = entries.nextElement();
-                if (entry.getName().endsWith(".class")) {
-                    classNames.add(entry.getName().substring(0, entry.getName().length() - 6).replaceAll("/", "\\."));
+            final Set<String> classNames;
+            try (final JarFile jar = new JarFile(file)) {
+                classNames = new HashSet<>();
+                final Enumeration<JarEntry> entries = jar.entries();
+                while (entries.hasMoreElements()) {
+                    final JarEntry entry = entries.nextElement();
+                    if (entry.getName().endsWith(".class")) {
+                        classNames.add(entry.getName().substring(0, entry.getName().length() - 6).replaceAll("/", "\\."));
+                    }
                 }
             }
-            jar.close();
 
             // Load classes from jar
-            final URLClassLoader loader = new URLClassLoader(new URL[]{file.toURI().toURL()});
-            classLoop:
-            for (final String className : classNames) {
-                final Class<?> cls = loader.loadClass(className);
+            try (final URLClassLoader loader = new URLClassLoader(new URL[]{file.toURI().toURL()})) {
+                classLoop:
+                for (final String className : classNames) {
+                    final Class<?> cls = loader.loadClass(className);
 
-                if (AdvancedMessage.class.isAssignableFrom(cls)) {
-                    // Class is a message class: set it as default if no
-                    // other message class exists for the team
-                    if (!messageClasses.containsKey(teamNumber)) {
-                        messageClasses.put(teamNumber, AdvancedMessage.class.cast(cls.newInstance()).getClass());
-                    }
-                } else if (PerPlayer.class.isAssignableFrom(cls) || Static.class.isAssignableFrom(cls)) {
-                    // Class is a drawing: add it to the team drawings
-                    // if it does not yet exist
-                    Collection<Drawing> drawingsForTeam = drawings.get(teamNumber);
-                    if (drawingsForTeam == null) {
-                        drawingsForTeam = new LinkedList<Drawing>();
-                        drawings.put(teamNumber, drawingsForTeam);
-                    }
-                    for (final Drawing d : drawingsForTeam) {
-                        if (cls.isInstance(d)) {
-                            continue classLoop;
+                    if (AdvancedMessage.class.isAssignableFrom(cls)) {
+                        // Class is a message class: set it as default if no
+                        // other message class exists for the team
+                        if (!messageClasses.containsKey(teamNumber)) {
+                            try {
+                                messageClasses.put(teamNumber, AdvancedMessage.class.cast(cls.newInstance()).getClass());
+                            } catch (final Throwable e) {
+                                Log.error(e.getClass().getSimpleName() + " was thrown while initializing custom message class " + cls.getName() + ": " + e.getMessage());
+                            }
+                        }
+                    } else if (PerPlayer.class.isAssignableFrom(cls) || Static.class.isAssignableFrom(cls)) {
+                        // Class is a drawing: add it to the team drawings
+                        // if it does not yet exist
+                        Collection<Drawing> drawingsForTeam = drawings.get(teamNumber);
+                        if (drawingsForTeam == null) {
+                            drawingsForTeam = new LinkedList<>();
+                            drawings.put(teamNumber, drawingsForTeam);
+                        }
+                        for (final Drawing d : drawingsForTeam) {
+                            if (cls.isInstance(d)) {
+                                continue classLoop;
+                            }
+                        }
+                        try {
+                            final Drawing d = (Drawing) cls.newInstance();
+                            d.setTeamNumber(teamNumber);
+                            drawingsForTeam.add(d);
+                        } catch (final Throwable e) {
+                            Log.error(e.getClass().getSimpleName() + " was thrown while initializing custom drawing " + cls.getName() + ": " + e.getMessage());
                         }
                     }
-                    final Drawing d = (Drawing) cls.newInstance();
-                    d.setTeamNumber(teamNumber);
-                    drawingsForTeam.add(d);
                 }
             }
-            loader.close();
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             Log.error(ex.getClass().getSimpleName() + ": Could not open plugin " + file.getPath() + ": " + ex.getMessage());
         }
     }

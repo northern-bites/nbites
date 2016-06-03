@@ -5,29 +5,35 @@
 #include "Man.h"
 #include "SharedData.h"
 
+
 #include <sys/file.h>
 #include <errno.h>
 
 int lockFD = 0;
 man::Man* instance;
-const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
+//const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
+const char * MAN_LOG_PATH = "/home/nao/nbites/log/nblog";
+
+void cleanup() {
+    instance->preClose();
+    flock(lockFD, LOCK_UN);
+
+    printf("Man closing output streams...\n");
+    fflush(stderr);
+    fflush(stdout);
+    fclose(stdout);
+
+    if (instance) delete instance;
+}
 
 void handler(int signal)
 {
     if (signal == SIGTERM)
     {
+
         // Give man a chance to clean up behind it
         // I.e. close camera driver gracefully
-        instance->preClose();
-        flock(lockFD, LOCK_UN);
-        
-        printf("Man closing output streams...\n");
-        fflush(stderr);
-        fflush(stdout);
-        
-        fclose(stdout);
-        
-        delete instance;
+        cleanup();
         exit(0);
     }
 }
@@ -36,13 +42,13 @@ void error_signal_handler(int signal) {
     char buffer[1000];
 
     char * sigstr = strsignal(signal);
-    snprintf(buffer, 1000, "error_signal_handler()       SIGNALLED: %s\n", sigstr);
+    snprintf(buffer, 1000, "error_signal_handler() SIGNALLED: %s\n", sigstr);
     fprintf(stdout, "%s", buffer);
     fprintf(stderr, "%s", buffer);
     fflush(stdout);
     fflush(stderr);
 
-    printf("error_signal_handler() done.\n");
+    cleanup();
 
     exit(-1);
 }
@@ -80,7 +86,8 @@ int main() {
     fprintf(stderr, "Man re-opening stderr...\n");
 
     //Make stdout's fd point to a file description for the manlog file (MAN_LOG_PATH)
-    freopen(MAN_LOG_PATH, "w", stdout);
+//    freopen(MAN_LOG_PATH, "w", stdout);
+     freopen(MAN_LOG_PATH, "wa", stdout);
     //Send stderr to whatever stdout's fd describes
     dup2(STDOUT_FILENO, STDERR_FILENO);
     
