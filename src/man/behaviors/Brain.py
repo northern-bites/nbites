@@ -62,6 +62,19 @@ class Brain(object):
         # Retrieve our robot identification and set per-robot parameters
         self.CoA = robots.get_certificate()
 
+        # Information about the environment
+        self.ball = None
+        self.sharedBall = None
+        self.initTeamMembers()
+        self.motion = None
+        self.game = None
+        self.locUncert = 0
+        self.naiveBall = None
+
+        # New vision system...
+        self.visionLines = None
+        self.visionCorners = None
+
         # FSAs
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
         self.tracker = HeadTracker.HeadTracker(self)
@@ -75,19 +88,6 @@ class Brain(object):
         print '\033[32m'+"GC:  I am on team "+str(self.teamNumber)  +'\033[0m'
         print '\033[32m'+"GC:  I am player number  "+str(self.playerNumber)+'\033[0m'
         print '\033[32m'+"GC:  My role number is  "+str(self.role)+'\033[0m'
-
-        # Information about the environment
-        self.ball = None
-        self.sharedBall = None
-        self.initTeamMembers()
-        self.motion = None
-        self.game = None
-        self.locUncert = 0
-        self.naiveBall = None
-
-        # New vision system...
-        self.visionLines = None
-        self.visionCorners = None
 
         # Not FSAs
         self.gameController = GameController.GameController(self)

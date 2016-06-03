@@ -25,6 +25,7 @@ def switchRoles(player):
 
     # drop in player does not role switch
     if player.dropIn:
+        print "Drop in player does not role switch; pass."
     	pass
 
     roleConstants.setRoleConstants(player, player.openChaser)

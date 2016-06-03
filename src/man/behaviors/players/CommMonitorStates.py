@@ -18,6 +18,7 @@ def commMonitor(player):
 
     # role switching off for dropplayer
     if player.dropIn:
+        print "Player is drop in; passing commMonitor."
         pass
 
     
@@ -26,7 +27,7 @@ def commMonitor(player):
     elif player.commMode != 2 and transitions.awfulComm(player):
         print "Switched to awful comm mode!"
         player.role = player.brain.playerNumber
-        player.prevRoleConfig = Ronstants.roleConfiguration
+        player.prevRoleConfig = RoleConstants.roleConfiguration
         RoleConstants.roleConfiguration = RoleConstants.spread
         RoleConstants.oddDefenderBox = RoleConstants.defenderBox
         RoleConstants.evenDefenderBox = RoleConstants.defenderBox

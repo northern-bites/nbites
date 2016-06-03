@@ -23,7 +23,7 @@ def chaserIsOut(player):
     openPositions = ()
     positions = [False, False, False, False]
     for mate in player.brain.teamMembers:
-       role <= 1:
+        if mate.role <= 1:
             continue
         if mate.frameSinceActive < 30:
             positions[mate.role - 2] = True
@@ -56,6 +56,7 @@ def checkForConsistency(player):
 
     # role switching is off for drop in player
     if player.dropIn:
+        print "Player is drop in; role switching is off."
         return
 
     if not player.roleSwitching:

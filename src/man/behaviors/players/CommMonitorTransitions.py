@@ -16,6 +16,7 @@ def checkCommDropOffs(player):
 
     # ignore all comm during drop in games
     if player.dropIn:
+        print "Player is drop in; not checking for comm drop offs."
         return off
 
     for mate in player.brain.teamMembers:
