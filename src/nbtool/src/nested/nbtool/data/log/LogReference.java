@@ -312,13 +312,15 @@ public class LogReference {
 				
 				assert(ref.logClass.equals(refMng.logClass));
 				
-				assert(Files.exists(ref.tempPath));
 				assert(Files.exists(ref.loadPath));
 				
 				String other = "OTHERTYPE";
 				refMng.logClass = other;
 				assert(ref.get().logClass.equals(other));
 				ref.pushToTempFileNow(refMng);
+				
+				assert(Files.exists(ref.tempPath));
+
 				
 				ref.theLog = null;
 				
