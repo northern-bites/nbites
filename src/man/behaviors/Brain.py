@@ -358,23 +358,28 @@ class Brain(object):
         """
 
         # Changed from player number to role for 2016 drop in, needs testing
-        if self.player.role == 1:
+        if self.role == 1:
+            print "I should be a goalie!"
             self.resetLocTo(Constants.MIDFIELD_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
-        elif self.player.role == 2:
+        elif self.role == 2:
+            print "I should be defender 2!"
             self.resetLocTo(Constants.BLUE_GOALBOX_MIDPOINT_X,
                             Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                             Constants.HEADING_DOWN)
-        elif self.player.role == 3:
+        elif self.role == 3:
+            print "I should be defender 3!"
             self.resetLocTo(Constants.BLUE_GOALBOX_MIDPOINT_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
-        elif self.player.role == 4:
+        elif self.role == 4:
+            print "I should be offense, player 4!"
             self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
                             Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                             Constants.HEADING_DOWN)
-        elif self.player.role == 5:
+        elif self.role == 5:
+            print "I should be striker!"
             self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
