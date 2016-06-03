@@ -55,13 +55,13 @@ public:
     RobotDetector* getRobotDetector(bool topCamera = true) const {return robotDetector[!topCamera]; }
 
 #ifdef OFFLINE
-	void setDebugDrawingParameters(nblog::SExpr* debugParams);
+	void setDebugDrawingParameters(nbl::SExpr* debugParams);
 #endif
     
     // For use by vision_defs
     void setColorParams(Colors* colors, bool topCamera);
     const std::string getStringFromTxtFile(std::string path);
-    Colors* getColorsFromLisp(nblog::SExpr* colors, int camera);
+    Colors* getColorsFromLisp(nbl::SExpr* colors, int camera);
     void setCalibrationParams(std::string robotName);
     void setCalibrationParams(int camera, std::string robotName);
     void setCalibrationParams(CalibrationParams* params, bool topCamera);
@@ -101,7 +101,7 @@ private:
     std::string name;
     
     // Lisp tree with color params saved
-    nblog::SExpr colors;
+    nbl::SExpr colors;
 
     // Tracking ball stuff
     bool ballOn;
@@ -110,7 +110,7 @@ private:
 
 	uint8_t * debugSpace[2];
 
-    nblog::SExpr* calibrationLisp;
+    nbl::SExpr* calibrationLisp;
     size_t image_index;
 
     // Constants for tilt azimuth adjustment hack
