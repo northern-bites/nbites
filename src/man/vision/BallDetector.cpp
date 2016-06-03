@@ -573,6 +573,10 @@ void BallDetector::makeEdgeList(EdgeList & edges)
 bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
                             EdgeList& edges)
 {
+    double t = homography->tilt();
+    double t_deg = (t * 180)/M_PI;
+    std::cout<<"Tilt From Homography [Radians]: "<<t<<std::endl;
+    std::cout<<"Tilt From Homography [Degrees]: "<<t_deg<<std::endl;
     Ball reset;
     _best = reset;
     width = white.width();
