@@ -41,6 +41,7 @@ def gameReady(player):
     """
     Stand up, and pan for localization, and walk to kicking off positions.
     """
+    print "initial"
     if player.firstFrame():
         player.inKickingState = False
         player.brain.fallController.enabled = True

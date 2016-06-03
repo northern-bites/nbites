@@ -1091,9 +1091,9 @@ void MotionModule::setJointsAndStiffness()
 
     portals::Message<messages::JointAngles> newStiffness(0);
 
-    // Head stiffness.
-    newStiffness.get()->set_head_yaw(nextStiffnesses[HEAD_YAW]);
-    newStiffness.get()->set_head_pitch(nextStiffnesses[HEAD_PITCH]);
+    // // Head stiffness.
+    // newStiffness.get()->set_head_yaw(nextStiffnesses[HEAD_YAW]);
+    // newStiffness.get()->set_head_pitch(nextStiffnesses[HEAD_PITCH]);
 
 // THIS WAS SO THAT JUST THE HEAD IS STIFF!!! PLEASE MAKE A NOTE THIS IS NOT NORMAL!!!
     
@@ -1126,17 +1126,17 @@ void MotionModule::setJointsAndStiffness()
     newStiffness.get()->set_r_knee_pitch(-1.0f);
     newStiffness.get()->set_r_ankle_pitch(-1.0f);
     newStiffness.get()->set_r_ankle_roll(-1.0f); 
-    // // Left arm angles.
-    // newStiffness.get()->set_l_shoulder_pitch(nextStiffnesses[L_SHOULDER_PITCH]);
-    // newStiffness.get()->set_l_shoulder_roll(nextStiffnesses[L_SHOULDER_ROLL]);
-    // newStiffness.get()->set_l_elbow_yaw(nextStiffnesses[L_ELBOW_YAW]);
-    // newStiffness.get()->set_l_elbow_roll(nextStiffnesses[L_ELBOW_ROLL]);
+    // Left arm angles.
+    newStiffness.get()->set_l_shoulder_pitch(nextStiffnesses[L_SHOULDER_PITCH]);
+    newStiffness.get()->set_l_shoulder_roll(nextStiffnesses[L_SHOULDER_ROLL]);
+    newStiffness.get()->set_l_elbow_yaw(nextStiffnesses[L_ELBOW_YAW]);
+    newStiffness.get()->set_l_elbow_roll(nextStiffnesses[L_ELBOW_ROLL]);
 
-    // // Right arm angles.
-    // newStiffness.get()->set_r_shoulder_pitch(nextStiffnesses[R_SHOULDER_PITCH]);
-    // newStiffness.get()->set_r_shoulder_roll(nextStiffnesses[R_SHOULDER_ROLL]);
-    // newStiffness.get()->set_r_elbow_yaw(nextStiffnesses[R_ELBOW_YAW]);
-    // newStiffness.get()->set_r_elbow_roll(nextStiffnesses[R_ELBOW_ROLL]);
+    // Right arm angles.
+    newStiffness.get()->set_r_shoulder_pitch(nextStiffnesses[R_SHOULDER_PITCH]);
+    newStiffness.get()->set_r_shoulder_roll(nextStiffnesses[R_SHOULDER_ROLL]);
+    newStiffness.get()->set_r_elbow_yaw(nextStiffnesses[R_ELBOW_YAW]);
+    newStiffness.get()->set_r_elbow_roll(nextStiffnesses[R_ELBOW_ROLL]);
 
     // // Pelvis angles.
     // newStiffness.get()->set_l_hip_yaw_pitch(nextStiffnesses[L_HIP_YAW_PITCH]);
@@ -1154,7 +1154,7 @@ void MotionModule::setJointsAndStiffness()
     // newStiffness.get()->set_r_hip_pitch(nextStiffnesses[R_HIP_PITCH]);
     // newStiffness.get()->set_r_knee_pitch(nextStiffnesses[R_KNEE_PITCH]);
     // newStiffness.get()->set_r_ankle_pitch(nextStiffnesses[R_ANKLE_PITCH]);
-    //newStiffness.get()->set_r_ankle_roll(nextStiffnesses[R_ANKLE_ROLL]);
+    // newStiffness.get()->set_r_ankle_roll(nextStiffnesses[R_ANKLE_ROLL]);
 
     stiffnessOutput_.setMessage(newStiffness);
 }
