@@ -42,6 +42,8 @@ struct Spot
   int green;          // Average green confidence in inner region
   int x, y;           // Image coordinates of spot wrt optical axis (s32.1)
   int innerDiam, outerDiam;
+  int spotType;       // Used for displaying debugging information
+  int rawX, rawY;     // Raw coordinate value of center - used for display
 
   // Image coordinates of spot relative to optical axis, +y is up
   float ix() const { return  0.5f * x; }

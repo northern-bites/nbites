@@ -288,7 +288,7 @@ public class YUVExplore extends VisionView
 	 * should try and figure it out from scratch.
 	 */
 
-<<<<<<< HEAD:src/nbtool/src/nbtool/gui/logviews/images/YUVExplore.java
+
     public void findGreen(Graphics g) {
 	int max = 0;
 	int maxY = 0;
@@ -302,32 +302,12 @@ public class YUVExplore extends VisionView
 		    int cbase = (col & ~1);
 		    int i = (row * displayw * 2) + (cbase * 2);
 
-		    maxY = currentLog.data()[first ? i : i + 2] & 0xff;
-		    maxU = currentLog.data()[i + 1] & 0xff;
-		    maxV = currentLog.data()[i + 3] & 0xff;
-=======
-	public void findGreen(Graphics g) {
-		int max = 0;
-		int maxY = 0;
-		int maxU = 0;
-		int maxV = 0;
-		for (int col = 0; col < width; col++) {
-			for (int row = 0; row < height; row++) {
-				int gr = (green8.data[row * width + col]) & 0xFF;
-				if (gr > max) {
-					boolean first = (col & 1) == 0;
-					int cbase = (col & ~1);
-					int i = (row * displayw * 2) + (cbase * 2);
-
-					byte[] data = originalImageBytes();
-					maxY = data[first ? i : i + 2] & 0xff;
-					maxU = data[i + 1] & 0xff;
-					maxV = data[i + 3] & 0xff;
-				}
-			}
->>>>>>> 7f0e56689ea86a2254c7797955cb2a90ddbc1344:src/nbtool/src/nested/nbtool/gui/logviews/images/YUVExplore.java
+            byte[] data = originalImageBytes();
+		    maxY = data[first ? i : i + 2] & 0xff;
+		    maxU = data[i + 1] & 0xff;
+		    maxV = data[i + 3] & 0xff;
 		}
-	    }
+      }
 	}
 	for (int col = 0; col < width * 2; col++) {
 	    for (int row = 0; row < height * 2; row++) {
@@ -335,29 +315,15 @@ public class YUVExplore extends VisionView
 		int cbase = (col & ~1);
 		int i = (row * width * 2 * 2) + (cbase * 2);
 
-<<<<<<< HEAD:src/nbtool/src/nbtool/gui/logviews/images/YUVExplore.java
-		int y = currentLog.data()[first ? i : i + 2] & 0xff;
-		int u = currentLog.data()[i + 1] & 0xff;
-		int v = currentLog.data()[i + 3] & 0xff;
+        byte[] data = originalImageBytes();
+		int y = data[first ? i : i + 2] & 0xff;
+		int u = data[i + 1] & 0xff;
+		int v = data[i + 3] & 0xff;
 		if (Math.abs(y - maxY) < 15 && Math.abs(u - maxU) < 10 &&
 		    Math.abs(v - maxV) < 10) {
 		    g.setColor(Color.GREEN);
 		} else {
 		    g.setColor(Color.BLACK);
-=======
-				byte[] data = originalImageBytes();
-				int y = data[first ? i : i + 2] & 0xff;
-				int u = data[i + 1] & 0xff;
-				int v = data[i + 3] & 0xff;
-				if (Math.abs(y - maxY) < 15 && Math.abs(u - maxU) < 10 &&
-					Math.abs(v - maxV) < 10) {
-					g.setColor(Color.GREEN);
-				} else {
-					g.setColor(Color.BLACK);
-				}
-				g.fillRect(col/2, row/2+displayh+30, 1, 1);
-			}
->>>>>>> 7f0e56689ea86a2254c7797955cb2a90ddbc1344:src/nbtool/src/nested/nbtool/gui/logviews/images/YUVExplore.java
 		}
 		g.fillRect(col/2, row/2+displayh+30, 1, 1);
 	    }

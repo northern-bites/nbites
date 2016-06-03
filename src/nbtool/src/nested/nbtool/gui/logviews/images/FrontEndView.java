@@ -23,7 +23,7 @@ import nbtool.gui.logviews.misc.ViewParent;
 import nbtool.gui.logviews.misc.VisionView;
 import nbtool.io.CommonIO.IOFirstResponder;
 import nbtool.io.CommonIO.IOInstance;
-
+import nbtool.util.Debug;
 import nbtool.util.Utility;
 import java.util.Vector;
 
@@ -40,9 +40,9 @@ public class FrontEndView extends VisionView {
     private BufferedImage blackImage;
     private BufferedImage segmentedImage;
 
-    private Y8image green8;
-    private Y8image white8;
-    private Y8image black8;
+    private Y8Image green8;
+    private Y8Image white8;
+    private Y8Image black8;
 
     // Save button
     private JButton saveButton;
@@ -180,20 +180,10 @@ public class FrontEndView extends VisionView {
     @Override
     public void ioFinished(IOInstance instance) {}
 
-<<<<<<< HEAD:src/nbtool/src/nbtool/gui/logviews/images/FrontEndView.java
-    @Override
-    public boolean ioMayRespondOnCenterThread(IOInstance inst) {
-        return false;
-    }
 
     /* Called upon slide of any of the 18 sliders. Make an SExpr from the psitions
        of each of the sliders. If this.log doesn't have Params saved, add them. Else,
        replace them. Call nbfunction with updated log description.
-=======
-    /* Called upon slide of any of the 18 sliders. Make an SExpr from the psitions 
-        of each of the sliders. If this.log doesn't have Params saved, add them. Else,
-        replace them. Call nbfunction with updated log description.
->>>>>>> 7f0e56689ea86a2254c7797955cb2a90ddbc1344:src/nbtool/src/nested/nbtool/gui/logviews/images/FrontEndView.java
     */
     public void adjustParams() {
 
@@ -232,47 +222,6 @@ public class FrontEndView extends VisionView {
             );
 
         // Look for existing Params atom in current this.log description
-<<<<<<< HEAD:src/nbtool/src/nbtool/gui/logviews/images/FrontEndView.java
-        SExpr oldColor, newColor, oldParams = this.log.tree().find("Params");
-
-        // Add params or replace params
-        if (oldParams.exists()) {
-            SExpr saveAtom = oldParams.get(1).find("SaveParams");
-            this.log.tree().remove(saveAtom);
-            oldParams.setList( SExpr.atom("Params"), newParams);
-        } else {
-            this.log.tree().append(SExpr.pair("Params", newParams));
-        }
-
-        callNBFunction();
-    }
-
-    public void saveParams() {
-        SExpr params = this.log.tree().find("Params");
-
-        // Check to see if sliders have been moved
-        if (!params.exists())
-            return;
-
-        // Add flag for nbfunction to save the params
-        params.get(1).append(SExpr.newKeyValue("SaveParams", "True"));
-
-        callNBFunction();
-    }
-
-    private void callNBFunction() {
-        CrossInstance inst = CrossIO.instanceByIndex(0);
-        if (inst == null)
-            return;
-
-        CrossFunc func = inst.functionWithName("Vision");
-        if (func == null)
-            return;
-
-        CrossCall call = new CrossCall(this, func, this.log);
-        inst.tryAddCall(call);
-=======
-        
         displayedLog.topLevelDictionary.remove(SAVE_PARAMS_KEY);
         displayedLog.topLevelDictionary.put(CALIBRATION_KEY, SExpr.pair("Params", newParams).serialize());
         
@@ -282,8 +231,8 @@ public class FrontEndView extends VisionView {
     public void saveParams() {
     	displayedLog.topLevelDictionary.put(SAVE_PARAMS_KEY, true);
         this.callVision();
->>>>>>> 7f0e56689ea86a2254c7797955cb2a90ddbc1344:src/nbtool/src/nested/nbtool/gui/logviews/images/FrontEndView.java
     }
+
 
     // Check to see if any parameters are zero to avoid devide-by-zero error later
     private void zeroParam() {
@@ -438,46 +387,26 @@ public class FrontEndView extends VisionView {
             this.yImage = yImg.toBufferedImage();
         }
 
-<<<<<<< HEAD:src/nbtool/src/nbtool/gui/logviews/images/FrontEndView.java
-        if (out.length > 1) {
-            white8 = new Y8image(width, height, out[1].bytes);
-            this.whiteImage = white8.toBufferedImage();
-        }
-
-        if (out.length > 2) {
-            green8 = new Y8image(width, height, out[2].bytes);
-            this.greenImage = green8.toBufferedImage();
-        }
-
-        if (out.length > 3) {
-            black8 = new Y8image(width, height, out[3].bytes);
-            this.blackImage = black8.toBufferedImage();
-        }
-
-        if (out.length > 4) {
-            ColorSegmentedImage colorSegImg = new ColorSegmentedImage(width,
-								      height,
-								      out[4].bytes);
-=======
         if (this.getWhiteBlock() != null) {
-            Y8Image white8 = new Y8Image(width, height, this.getWhiteBlock().data);
+            white8 = new Y8Image(width, height, this.getWhiteBlock().data);
             this.whiteImage = white8.toBufferedImage();
         }
 
         if (this.getGreenBlock() != null) {
-        	Y8Image green8 = new Y8Image(width, height, this.getGreenBlock().data);
+        	green8 = new Y8Image(width, height, this.getGreenBlock().data);
             this.greenImage = green8.toBufferedImage();
+        } else {
+        	Debug.error("no green block!");
         }
 
         if (this.getOrangeBlock() != null) {
-        	Y8Image orange8 = new Y8Image(width, height, this.getOrangeBlock().data);
-            this.orangeImage = orange8.toBufferedImage();
+        	black8 = new Y8Image(width, height, this.getOrangeBlock().data);
+            this.blackImage = black8.toBufferedImage();
         }
 
         if (this.getSegmentedBlock() != null) {
             ColorSegmentedImage colorSegImg = new ColorSegmentedImage(width, height, 
             		this.getSegmentedBlock().data);
->>>>>>> 7f0e56689ea86a2254c7797955cb2a90ddbc1344:src/nbtool/src/nested/nbtool/gui/logviews/images/FrontEndView.java
             this.segmentedImage = colorSegImg.toBufferedImage();
         }
 
@@ -489,18 +418,11 @@ public class FrontEndView extends VisionView {
     }
 
     // If if is the first load, we need to set the positions of the sliders
-    private void firstIoReceived(Log... out) {
-<<<<<<< HEAD:src/nbtool/src/nbtool/gui/logviews/images/FrontEndView.java
-
-        // Set sliders to positions based on white, green,
-	// then black images descriptions' s-exps
-        SExpr colors = out[1].tree();
-=======
-        
+    private void firstIoReceived(Log... out) {        
         // Set sliders to positions based on white, green, then orange images descriptions' s-exps
         SExpr colors = SExpr.deserializeFrom( 
         		this.getWhiteBlock().dict.get("ColorParams").asString().value );
->>>>>>> 7f0e56689ea86a2254c7797955cb2a90ddbc1344:src/nbtool/src/nested/nbtool/gui/logviews/images/FrontEndView.java
+
 
         wDarkU. setValue((int)(Float.parseFloat(colors.get(1).get(0).get(1).value()) * wPrecision));
         wDarkV. setValue((int)(Float.parseFloat(colors.get(1).get(1).get(1).value()) * wPrecision));

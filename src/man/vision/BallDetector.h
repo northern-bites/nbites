@@ -33,10 +33,6 @@ namespace man {
 
 		class Ball {
 		public:
-			//spot, first x,y in homography transformed coords
-			//tc - top/bottom camera
-			//center x,y
-			//confidence
 			Ball(Spot & s, double x_, double y_, double cameraH_, int imgHeight_,
 				 int imgWidth_, bool tc,
 				 double cx, double cy, double conf);
@@ -97,7 +93,8 @@ namespace man {
 			bool findBall(ImageLiteU8 white, double cameraHeight, EdgeList& edges);
 
             bool filterBlackSpots(Spot currentBlob);
-            bool filterWhiteSpot(Spot spot, std::vector<std::pair<int,int>> & blackSpots);
+            bool filterWhiteSpot(Spot spot, std::vector<std::pair<int,int>> & blackSpots,
+								 std::vector<std::pair<int,int>> & badBlackSpots);
             int filterWhiteBlobs(Blob currentBlob,
                                   std::vector<std::pair<int,int>> & blobs,
                                   std::vector<std::pair<int,int>> blackBlobs);
@@ -113,7 +110,6 @@ namespace man {
             bool farSanityChecks(Blob blob);
             bool nearSanityChecks(Blob blob);
 			bool hardSanityCheck(int leftx, int rightx, int topy, int bottomy);
-			bool blackSpotGeometryCheck(std::vector<Spot> *blackSpots);
 
 			void setImages(ImageLiteU8 white, ImageLiteU8 green, ImageLiteU8 black,
 						   ImageLiteU16 yImg);
@@ -127,13 +123,11 @@ namespace man {
 			// For tool
 #ifdef OFFLINE
 			const std::vector<Ball>& getBalls() const { return candidates; }
-			Connectivity* getBlobber() { return &blobber; }
-            Connectivity* getBlobber2() { return &blobber2; }
+			const std::vector<Spot>& getWhiteSpots() { return debugWhiteSpots; }
+			const std::vector<Spot>& getBlackSpots() { return debugBlackSpots; }
 			void setDebugBall(bool debug) {debugBall = debug;}
 #endif
 		private:
-			Connectivity blobber;
-            Connectivity blobber2;
 			FieldHomography* homography;
 			Field* field;
 			bool topCamera;
@@ -141,6 +135,8 @@ namespace man {
 			int height;
 			int currentX, currentY;
             std::vector<Edge> goodEdges;
+			std::vector<Spot> debugBlackSpots;
+			std::vector<Spot> debugWhiteSpots;
 
 			DebugImage debugDraw;
 			ImageLiteU8 whiteImage, greenImage, blackImage;
