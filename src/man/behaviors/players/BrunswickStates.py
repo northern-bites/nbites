@@ -94,6 +94,8 @@ def gameSet(player):
 
 @superState('gameControllerResponder')
 def gamePlaying(player):
+    # Only on the first frame of gamePlaying -- initializing variables and
+    # whatnot
     if player.firstFrame():
         player.inKickingState = False
         # player.inKickOffPlay = (kickOff.shouldRunKickOffPlay(player) and 
@@ -104,9 +106,6 @@ def gamePlaying(player):
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
-    
-    player.goNow('snappan')
-    return player.stay()
 
     # TODO without pb, is this an issue?
     # if (player.lastDiffState == 'afterPenalty' and
@@ -236,8 +235,4 @@ def penaltyShotsGamePlaying(player):
 def fallen(player):
     player.inKickingState = False
     return player.stay()
-
-@superState('gameControllerResponder')
-def snappan(player):
-    player.brain.tracker.goNow('snapPan')
-    return player.stay()
+    
