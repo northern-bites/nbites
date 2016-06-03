@@ -63,12 +63,20 @@ public class SPL extends Rules
         /** Number of penalty-shoots for each team after full 10minutes playing. */
         numberOfPenaltyShotsLong = 5;
         /** Time in seconds for each kind of penalty (-1 = should not be used). */
-        penaltyTime = new int[] {-1, 45, 45, 0, 45, 45, 45, 45, 45, 2 * halfTime};
+        penaltyTime = new int[][] {{-1}, {45, 90, 135, 2 * halfTime}, {45, 90, 135, 2 * halfTime}, {0}, {45, 90, 135, 2 * halfTime}, {45, 90, 135, 2 * halfTime}, {45, 90, 135, 2 * halfTime}, {45, 90, 135, 2 * halfTime}, {45}, {2 * halfTime}};
+        /** Whether the penalty count is reset on halftime */
+        resetPenaltyCountOnHalftime = true;
+        /** Whether the ejected robots are reset on halftime */
+        resetEjectedRobotsOnHalftime = true;
+        /** Whether penalties can be removed before the penalty time has passed. */
+        allowEarlyPenaltyRemoval = false;
+        /** Penalty that players get when they substitute another player. */
+        substitutePenalty = PlayerInfo.PENALTY_SPL_REQUEST_FOR_PICKUP;
         /** if robots should return from penalties when the game state changes. */
         returnRobotsInGameStoppages = true;
         /** Time in seconds one team has as timeOut. */
         timeOutTime = 5*60;
-        /** Time in seconds of a referee timeout*/
+        /** Time in seconds of a referee timeout */
         refereeTimeout = 10*60;
         /** Defines if the option for a referee timeout is available */
         isRefereeTimeoutAvailable = true;
@@ -76,13 +84,15 @@ public class SPL extends Rules
         timeOutPerHalf = false;
         /** On how many pushings is a robot ejected. */
         pushesToEjection = new int[] {4, 6, 8, 10, 12};
-        /** Defines if coach is available **/
+        /** Defines if coach is available */
         isCoachAvailable = true;
         /** Allowed to compensate for lost time? */
         lostTime = true;
-        /** Whether compatibility mode (version 7) is supported **/
+        /** Whether compatibility mode (version 7) is supported */
         compatibilityToVersion7 = false;
-        /** If true, the drop-in player competition is active*/
+        /** If true, the drop-in player competition is active */
         dropInPlayerMode = false;
+        /** If true, the game controller should drop broadcast-messages */
+        dropBroadcastMessages = true;
     }
 }

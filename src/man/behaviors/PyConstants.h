@@ -8,7 +8,7 @@
 #include "../vision/Hough.h"
 #include "../../share/logshare/SExpr.h"
 
-using nblog::SExpr;
+using nbl::SExpr;
 
 void c_init_noggin_constants();
 void get_config_params();

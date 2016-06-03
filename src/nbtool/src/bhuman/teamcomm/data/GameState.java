@@ -5,7 +5,6 @@ import data.Rules;
 import data.SPLStandardMessage;
 import data.TeamInfo;
 import data.Teams;
-import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -54,11 +53,11 @@ public class GameState {
     private GameControlData lastGameControlData;
 
     private final int[] teamNumbers = new int[]{0, 0};
-    private final Map<Integer, Integer> teamColors = new HashMap<Integer, Integer>();
+    private final Map<Integer, Integer> teamColors = new HashMap<>();
 
     private boolean mirrored = false;
 
-    private final Map<Integer, Collection<RobotState>> robots = new HashMap<Integer, Collection<RobotState>>();
+    private final Map<Integer, Collection<RobotState>> robots = new HashMap<>();
 
     private static final Comparator<RobotState> playerNumberComparator = new Comparator<RobotState>() {
         @Override
@@ -75,7 +74,7 @@ public class GameState {
         }
     };
 
-    private final HashMap<String, RobotState> robotsByAddress = new HashMap<String, RobotState>();
+    private final HashMap<String, RobotState> robotsByAddress = new HashMap<>();
 
     private final EventListenerList listeners = new EventListenerList();
 
@@ -102,7 +101,7 @@ public class GameState {
                         final Iterator<RobotState> iter = robotsByAddress.values().iterator();
                         while (iter.hasNext()) {
                             final RobotState r = iter.next();
-                            if (r.isInactive()) {
+                            if (r.updateConnectionStatus() == RobotState.ConnectionStatus.INACTIVE) {
                                 iter.remove();
 
                                 final Collection<RobotState> team = robots.get(r.getTeamNumber());
@@ -130,7 +129,7 @@ public class GameState {
                     sendEvents(changed);
                 }
             }
-        }, RobotState.MILLISECONDS_UNTIL_INACTIVE * 2, RobotState.MILLISECONDS_UNTIL_INACTIVE / 2, TimeUnit.MILLISECONDS);
+        }, RobotState.ConnectionStatus.HIGH_LATENCY.threshold * 2, RobotState.ConnectionStatus.HIGH_LATENCY.threshold / 2, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -275,17 +274,24 @@ public class GameState {
         // update the team info if no GameController info is available
         if (lastGameControlData == null) {
             synchronized (teamNumbers) {
+                boolean exists = false;
                 for (int i = 0; i < 2; i++) {
-                    if (teamNumbers[i] == 0) {
-                        teamNumbers[i] = teamNumber;
-
-                        // (re)load plugins
-                        PluginLoader.getInstance().update(teamNumber);
-
-                        changed = i + 1 | CHANGED_OTHER;
+                    if (teamNumbers[i] == teamNumber) {
+                        exists = true;
                         break;
-                    } else if (teamNumbers[i] == teamNumber) {
-                        break;
+                    }
+                }
+                if (!exists) {
+                    for (int i = 0; i < 2; i++) {
+                        if (teamNumbers[i] == 0) {
+                            teamNumbers[i] = teamNumber;
+
+                            // (re)load plugins
+                            PluginLoader.getInstance().update(teamNumber);
+
+                            changed = i + 1 | CHANGED_OTHER;
+                            break;
+                        }
                     }
                 }
             }
@@ -303,7 +309,7 @@ public class GameState {
 
             Collection<RobotState> set = robots.get(teamNumber);
             if (set == null) {
-                set = new HashSet<RobotState>();
+                set = new HashSet<>();
                 robots.put(teamNumber, set);
             }
             if (set.add(r)) {
@@ -327,12 +333,12 @@ public class GameState {
         boolean rightSent = false;
 
         if ((changed & CHANGED_OTHER) != 0) {
-            final Collection<RobotState> rs = new TreeSet<RobotState>(playerNumberComparator);
+            final Collection<RobotState> rs = new TreeSet<>(playerNumberComparator);
             synchronized (robotsByAddress) {
                 for (final Entry<Integer, Collection<RobotState>> entry : robots.entrySet()) {
                     if (entry.getKey() == teamNumbers[TEAM_LEFT]) {
                         if ((changed & CHANGED_LEFT) != 0) {
-                            final Collection<RobotState> list = new TreeSet<RobotState>(playerNumberComparator);
+                            final Collection<RobotState> list = new TreeSet<>(playerNumberComparator);
                             for (final RobotState r : entry.getValue()) {
                                 list.add(r);
                             }
@@ -341,7 +347,7 @@ public class GameState {
                         }
                     } else if (entry.getKey() == teamNumbers[TEAM_RIGHT]) {
                         if ((changed & CHANGED_RIGHT) != 0) {
-                            final Collection<RobotState> list = new TreeSet<RobotState>(playerNumberComparator);
+                            final Collection<RobotState> list = new TreeSet<>(playerNumberComparator);
                             for (final RobotState r : entry.getValue()) {
                                 list.add(r);
                             }
@@ -363,7 +369,7 @@ public class GameState {
             synchronized (robotsByAddress) {
                 rs = robots.get(teamNumbers[TEAM_LEFT]);
             }
-            final Collection<RobotState> list = new TreeSet<RobotState>(playerNumberComparator);
+            final Collection<RobotState> list = new TreeSet<>(playerNumberComparator);
             if (rs != null) {
                 for (final RobotState r : rs) {
                     list.add(r);
@@ -377,7 +383,7 @@ public class GameState {
             synchronized (robotsByAddress) {
                 rs = robots.get(teamNumbers[TEAM_RIGHT]);
             }
-            final Collection<RobotState> list = new TreeSet<RobotState>(playerNumberComparator);
+            final Collection<RobotState> list = new TreeSet<>(playerNumberComparator);
             if (rs != null) {
                 for (final RobotState r : rs) {
                     list.add(r);
@@ -412,8 +418,7 @@ public class GameState {
                     Rules.league = Rules.LEAGUES[0];
                 }
                 colorStrings = Teams.getColors(teamNumber);
-            } catch (NullPointerException e) {
-            } catch (ArrayIndexOutOfBoundsException e) {
+            } catch (final NullPointerException | ArrayIndexOutOfBoundsException e) {
             }
             if (colorStrings == null || colorStrings.length < 1) {
                 if (teamNumber == teamNumbers[TEAM_RIGHT]) {
@@ -469,21 +474,6 @@ public class GameState {
         } else {
             return "Unknown" + (withPrefix ? " Team" : "");
         }
-    }
-
-    /**
-     * Returns the icon of the given team.
-     *
-     * @param teamNumber number of the team
-     * @return icon as a BufferedImage
-     */
-    public BufferedImage getTeamIcon(final int teamNumber) {
-        if (teamNumber == 98 || teamNumber == 99) {
-            Rules.league = Rules.LEAGUES[1];
-        } else {
-            Rules.league = Rules.LEAGUES[0];
-        }
-        return Teams.getIcon(teamNumber);
     }
 
     /**
