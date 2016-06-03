@@ -31,7 +31,7 @@ def tracking(tracker):
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
         if (tracker.target.vis.frames_off >
             constants.TRACKER_FRAMES_OFF_REFIND_THRESH):
-            return tracker.goLater('fullPan')
+            return tracker.goLater('snapPan')
 
     return tracker.stay()
 
@@ -207,6 +207,7 @@ def snapPan(tracker):
     print "Entering SnapPan function"
 
     if tracker.firstFrame():
+        print "First Frame"
         request = tracker.brain.interface.motionRequest
         request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
@@ -221,7 +222,7 @@ def snapPan(tracker):
             return tracker.stay()
         else:
             print "Let's change up the view"
-            tracker.currentYaw += 30 * tracker.direction # 30 degrees of motion for each pan
+            tracker.currentYaw += 90 * tracker.direction # 30 degrees of motion for each pan
             print "Current yaw: " + str(tracker.currentYaw)
             tracker.performHeadMove(tracker.lookToAngle(tracker.currentYaw))
 
