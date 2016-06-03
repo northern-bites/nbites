@@ -235,12 +235,12 @@ def snapPan(tracker):
     if not isinstance(tracker.target, Vision.messages.FilteredBall):
 
         print "The first thing"
-        # tracker.lastMovement = 0
-        # tracker.currentYaw = 0
-        # tracker.direction = 1
-        # print "Target Tracker On Bug: " + str(tracker.target)
-        # if tracker.target.on:
-        #     return tracker.goLater('trackingFieldObject')
+        tracker.lastMovement = 0
+        tracker.currentYaw = 0
+        tracker.direction = 1
+        print "Target Tracker On Bug: " + str(tracker.target)
+        if tracker.target.on:
+            return tracker.goLater('trackingFieldObject')
 
     if (isinstance(tracker.target, Vision.messages.FilteredBall) and
         tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH):

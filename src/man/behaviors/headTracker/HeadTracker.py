@@ -84,32 +84,33 @@ class HeadTracker(FSA.FSA):
     def performBasicPan(self):
         print "performBasicPan"
         '''Perform the basic fixed pitch pan once.'''
+        # self.performHeadMove(HeadMoves.FIXED_PITCH_PAN)
         self.performHeadMove(HeadMoves.SNAP_PAN)
 
     def repeatBasicPan(self):
         print "repeatBasicPan"
         '''Repeat the basic fixed pitch pan.'''
-        self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN)
-    
+        # self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN)
+        self.repeatHeadMove(HeadMoves.SNAP_PAN)
     def performWidePan(self):
         print "performWidePan"
-        self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
-
+        # self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
+        self.performHeadMove(HeadMoves.SNAP_PAN)
     def repeatWidePan(self):
         print "repeatWidePan"
         """
         Repeat the wide fixed pitch pan.
         Good for localizing.
         """
-        self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
-
+        # self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
+        self.repeatHeadMove(HeadMoves.SNAP_PAN)
     def repeatNarrowPan(self):
         '''Repeat the narrow fixed pitch pan.'''
-        self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN_NARROW)
-
+        # self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN_NARROW)
+        self.repeatHeadMove(HeadMoves.SNAP_PAN)
     def repeatFastNarrowPan(self):
-        self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN_NARROW_FAST)
-
+        # self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN_NARROW_FAST)
+        self.repeatHeadMove(HeadMoves.SNAP_PAN)
     # @param invert: false if pan should start to the left,
     #                true if pan should start to the right
     def performKickPan(self, invert = False):
