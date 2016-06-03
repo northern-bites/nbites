@@ -603,8 +603,8 @@ bool GuardianModule::executeLeftFootClickAction(int nClicks)
     case NO_CLICKS:
         return false;
         break;
-    case 1:
-        switchTeams();
+    case 1:    
+        advanceState();
         break;
     default:
         return false;
@@ -621,7 +621,7 @@ bool GuardianModule::executeRightFootClickAction(int nClicks)
         return false;
         break;
     case 1:
-        switchKickOff();
+        initialState();
         break;
     default:
         return false;
@@ -663,11 +663,12 @@ void GuardianModule::initialState()
 }
 
 void GuardianModule::advanceState()
-{
+{    
+    std::cout << "Guardian::advanceState()" << std::endl;
+
     portals::Message<messages::Toggle> command(0);
     command.get()->set_toggle(!lastAdvance);
     advanceStateOutput.setMessage(command);
-
     lastAdvance = !lastAdvance;
 }
 
