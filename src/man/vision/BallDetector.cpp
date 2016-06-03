@@ -463,31 +463,17 @@ bool BallDetector::findCorrelatedBlackSpots
                     }
                     correlatedSpots.push_back(actualBlobs[i]);
                     std::cout<<"Correlated Spots Size: "<<correlatedSpots.size()<<std::endl;
-                    //area and centroid eqns from: https://en.wikipedia.org/wiki/Centroid
-                    //simply averaging the coordinates seems to perform better.
-                    //keeping the actual eqns code in, if we will want to switch in the future.
-                    double xsum, ysum; //, asum;
-                    // for(int a = 0; a < correlatedSpots.size()-1; a++) {
-                    //     asum += (correlatedSpots[a].ix()*correlatedSpots[a+1].iy() - 
-                    //         correlatedSpots[a+1].ix()*correlatedSpots[a].iy());
-                    // }
-                    double ballSpotX, ballSpotY; //, area;
-                    // area = 0.5 * asum;
-                    for(int s = 0; s < correlatedSpots.size(); s++) { // size()-1 for wiki eqns
-                        // xsum += (correlatedSpots[s].ix()+correlatedSpots[s+1].ix()) * 
-                        //         (correlatedSpots[s].ix()*correlatedSpots[s+1].iy() - 
-                        //         correlatedSpots[s+1].ix()*correlatedSpots[s].iy());
-                        
-                        // ysum += (correlatedSpots[s].iy()+correlatedSpots[s+1].iy()) * 
-                        //         (correlatedSpots[s].ix()*correlatedSpots[s+1].iy() - 
-                        //         correlatedSpots[s+1].ix()*correlatedSpots[s].iy());
+                    
+                    double xsum, ysum, ballSpotX, ballSpotY;
+
+                    for(int s = 0; s < correlatedSpots.size(); s++) {
                         xsum += correlatedSpots[s].ix();
                         ysum += correlatedSpots[s].iy();
                     }
+
                     ballSpotX = xsum/correlatedSpots.size();
                     ballSpotY = ysum/correlatedSpots.size();
-                    // ballSpotX = 1/(6*area)*xsum;
-                    // ballSpotY = 1/(6*area)*ysum; 
+
                     Spot ballSpot;
                     ballSpot.x = ballSpotX;
                     ballSpot.y = ballSpotY;
