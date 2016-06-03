@@ -247,7 +247,6 @@ class Brain(object):
         output.fallen = me.fallen
         output.active = me.active
         output.claimed_ball = me.claimedBall
-        output.intention = 0
 
     def getCommUpdate(self):
         self.teamMembers[self.playerNumber - 1].updateMe()

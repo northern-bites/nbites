@@ -137,6 +137,7 @@ def walkOut(player):
 @superState('gameControllerResponder')
 def determineRole(player):
 
+    # role switching is off for drop in player
     if player.dropIn:
         return player.goLater(player.gameState)
         

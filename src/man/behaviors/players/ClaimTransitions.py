@@ -9,6 +9,7 @@ lengthOfField = 900
 
 def shouldCedeClaim(player):
     
+    # claims off for drop in player
     if player.dropIn:
         return False
 

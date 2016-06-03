@@ -5,6 +5,7 @@ def chaserIsOut(player):
     There is a chaser spot ready to be filled.
     """
 
+    # role switching is off for drop in player
     if player.dropIn:
         return False
     
@@ -16,22 +17,22 @@ def chaserIsOut(player):
 
     checkForConsistency(player)
 
-    if constants.canRoleSwitchTo(player.intention):
+    if constants.canRoleSwitchTo(player.role):
         return False
 
     openPositions = ()
     positions = [False, False, False, False]
     for mate in player.brain.teamMembers:
-        if mate.intention <= 1:
+       role <= 1:
             continue
         if mate.frameSinceActive < 30:
-            positions[mate.intention - 2] = True
+            positions[mate.role - 2] = True
         if mate.playerNumber == player.brain.playerNumber:
             continue
-        if constants.canRoleSwitchTo(mate.intention) and mate.frameSinceActive > 30:
-            openPositions += (mate.intention,)
+        if constants.canRoleSwitchTo(mate.role) and mate.frameSinceActive > 30:
+            openPositions += (mate.role,)
 
-        if constants.willRoleSwitch(mate.intention) \
+        if constants.willRoleSwitch(mate.role) \
                 and mate.playerNumber > player.brain.playerNumber \
                 and (mate.frameSinceActive < 30 or not mate.active):
             return False # Active, higher numbered player takes precedence
@@ -52,6 +53,8 @@ def checkForConsistency(player):
     a lower playerNumber then we change. Otherwise we assume that they will
     fix the issue. Very similar in structure to determineRole in penalty states.
     """
+
+    # role switching is off for drop in player
     if player.dropIn:
         return
 
@@ -65,8 +68,8 @@ def checkForConsistency(player):
     for mate in player.brain.teamMembers:
         if mate.playerNumber == player.brain.playerNumber:
             continue
-        openSpaces[mate.intention - 2] = False
-        if mate.intention == player.intention \
+        openSpaces[mate.role - 2] = False
+        if mate.role == player.role \
                 and mate.playerNumber > player.brain.playerNumber \
                 and mate.frameSinceActive < 30:
             conflict = True
@@ -87,7 +90,3 @@ def checkForConsistency(player):
     constants.setRoleConstants(player, position)
 
     return
-
-
-
-### DROP IN PLAYER ONLY ###

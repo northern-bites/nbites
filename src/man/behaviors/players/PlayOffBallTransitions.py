@@ -100,11 +100,6 @@ def shouldBeSupporter(player):
     return (ballInBox(player) and
             claimTransitions.shouldCedeClaim(player))
 
-def missingPlayers(player):
-    print "number of teammates", player.brain.activeTeamMates()
-    if player.brain.activeTeamMates() < 5:
-        return True
-
 def shouldNotBeSupporter(player):
     if role.isChaser(player.role):
         return shared.ballOffForNFrames(120)(player)

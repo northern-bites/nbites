@@ -14,6 +14,10 @@ def awfulComm(player):
 def checkCommDropOffs(player):
     off = 0
 
+    # ignore all comm during drop in games
+    if player.dropIn:
+        return off
+
     for mate in player.brain.teamMembers:
         if mate.playerNumber == 1 or mate.playerNumber == player.brain.playerNumber:
             continue
