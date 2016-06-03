@@ -11,7 +11,6 @@ def shouldCedeClaim(player):
     
     # claims off for drop in player
     if player.dropIn:
-        print "Player is drop in; claims are off."
         return False
 
     if not player.useClaims:

@@ -18,7 +18,6 @@ def commMonitor(player):
 
     # role switching off for dropplayer
     if player.dropIn:
-        print "Player is drop in; passing commMonitor."
         pass
 
     

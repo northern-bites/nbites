@@ -139,7 +139,6 @@ def determineRole(player):
 
     # role switching is off for drop in player
     if player.dropIn:
-        print "Player is drop in; role switching after penalty is off."
         return player.goLater(player.gameState)
         
     if not player.roleSwitching:

@@ -28,7 +28,7 @@ def gameInitial(player):
         ### HACK CHINA 2015 ###
         ### DROP IN PLAYER ###
         # enter player role here; make sure it matches the one in pDropin
-        player.role = 4
+        player.role = 1
 
     # If stiffnesses were JUST turned on, then stand up.
     if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
