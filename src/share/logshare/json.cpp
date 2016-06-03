@@ -577,6 +577,15 @@ namespace json {
 
         return true;
     }
+
+    NBL_ADD_TEST_TO(json_long_parse, json) {
+        long val = 9223372036854775800l;
+
+        json::Number num(val);
+        NBL_ASSERT_EQ(num.asLong(), val)
+
+        return true;
+    }
     
 }
 

@@ -145,6 +145,7 @@ namespace nbl {
             }
 
             readFileToString(buf, fd);
+            close(fd);
         }
 
         void readFileToString(std::string& buf, int fd) {
@@ -169,6 +170,7 @@ namespace nbl {
             size_t size = buf.size();
             ioret ret = write_exact(fd, size, &buf[0]);
             NBL_ASSERT(!ret)
+            close(fd);
         }
 
         ssize_t send_stub(int sck, void * data, size_t bytes) {

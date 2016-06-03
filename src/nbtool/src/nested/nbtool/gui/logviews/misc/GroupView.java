@@ -30,7 +30,30 @@ public class GroupView extends JPanel implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Path path = PathChooser.chooseDirPath(this);
+		
+		String suggest = null;
+		if (group.source == Group.GroupSource.ROBOT_STREAM) {
+			String rname = null;
+			boolean same = true;
+
+			for (LogReference ref : group.logs) {
+				if (rname == null) {
+					rname = ref.host_name;
+				} else {
+					if (!rname.equals(ref.host_name)) {
+						same = false;
+						break;
+					}
+				}
+			}
+			
+			suggest = (same && rname != null) ? 
+					PathChooser.suggestion(rname) :
+						null;
+		}
+		
+		Path path = PathChooser.chooseDirPath(this, suggest);
+		
 		if (path != null) {
 			for (LogReference ref : group.logs) {
 				ref.copyLogToPath(path);
@@ -85,7 +108,7 @@ public class GroupView extends JPanel implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Path dir = PathChooser.chooseDirPath(finalThis);
+				Path dir = PathChooser.chooseDirPath(finalThis, null);
 				
 				if (dir != null) {
 					try {

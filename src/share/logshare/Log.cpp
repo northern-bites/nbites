@@ -69,7 +69,7 @@ namespace nbl {
         NBL_CREATE_CONSTANT_METHOD(YUVImageType_DEFAULT)
         NBL_CREATE_CONSTANT_METHOD(YUVImageType_Y16)
         NBL_CREATE_CONSTANT_METHOD(YUVImageType_Y8)
-        
+
         NBL_CREATE_CONSTANT_METHOD(SexprType_DEFAULT)
         NBL_CREATE_CONSTANT_METHOD(JsonType_DEFAULT)
         NBL_CREATE_CONSTANT_METHOD(LogType_DEFAULT)
@@ -77,6 +77,10 @@ namespace nbl {
         NBL_CREATE_CONSTANT_METHOD(LogClass_Null)
         NBL_CREATE_CONSTANT_METHOD(LogClass_Flags)
         NBL_CREATE_CONSTANT_METHOD(LogClass_Tripoint)
+        NBL_CREATE_CONSTANT_METHOD(LogClass_YUVImage)
+
+        NBL_CREATE_CONSTANT_METHOD(LogClass_EdgeImage)
+        NBL_CREATE_CONSTANT_METHOD(LogClass_String)
 
         NBL_CREATE_CONSTANT_METHOD(LogClass_RPC_Call)
         NBL_CREATE_CONSTANT_METHOD(LogClass_RPC_Return)

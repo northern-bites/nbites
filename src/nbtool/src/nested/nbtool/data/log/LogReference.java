@@ -215,7 +215,8 @@ public class LogReference {
 	}
 	
 	private void initializeTemp() {
-		String tempName = String.format("temp_log_id%d_u%s.nblog",
+		String tempName = String.format("log_%s_v%d_id%d_u%s.nblog",
+				this.logClass, ToolSettings.VERSION,
 				this.savedID, Utility.getRandomHexString(10));
 		tempPath = TEMP_DIR.resolve(tempName);
 		
