@@ -17,6 +17,7 @@ target_link_libraries(
   support
   portals
   messages
+  logging
   )
 
 # GTEST

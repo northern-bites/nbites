@@ -25,6 +25,7 @@ public class BallContact extends Penalty
     public void performOn(AdvancedData data, PlayerInfo player, int side, int number)
     {
         player.penalty = PlayerInfo.PENALTY_SPL_ILLEGAL_BALL_CONTACT;
+        handleRepeatedPenaltyEjection(data, player, side, number);
         data.whenPenalized[side][number] = data.getTime();
         Log.state(data, "Illegal Ball Contact "+
                 Rules.league.teamColorName[data.team[side].teamColor]

@@ -30,4 +30,6 @@ src/nbtool/bin
 .recommenders
 _tempFiles
 *.swp
-.nbtemp
+.nbtemp/*
+src/sound
+/src/nbtool/gui-forms/nbproject/private/

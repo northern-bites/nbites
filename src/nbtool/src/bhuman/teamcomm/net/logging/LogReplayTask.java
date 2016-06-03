@@ -45,8 +45,8 @@ class LogReplayTask implements Runnable {
 
     private final EventListenerList listeners;
 
-    private final Deque<LoggedObject> prevObjects = new LinkedList<LoggedObject>();
-    private final Deque<LoggedObject> nextObjects = new LinkedList<LoggedObject>();
+    private final Deque<LoggedObject> prevObjects = new LinkedList<>();
+    private final Deque<LoggedObject> nextObjects = new LinkedList<>();
     private LoggedObject curObject;
 
     private ObjectInputStream stream;
@@ -154,14 +154,7 @@ class LogReplayTask implements Runnable {
                 } catch (IOException ex) {
                 }
                 stream = null;
-            } catch (IOException e) {
-                Log.error("error while reading log file: " + e.getClass().getSimpleName() + ": " + e.getMessage());
-                try {
-                    stream.close();
-                } catch (IOException ex) {
-                }
-                stream = null;
-            } catch (ClassNotFoundException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 Log.error("error while reading log file: " + e.getClass().getSimpleName() + ": " + e.getMessage());
                 try {
                     stream.close();

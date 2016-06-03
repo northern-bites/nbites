@@ -748,7 +748,7 @@ int main(int argc, char* argv[])
         break;
 
       case 'fitt':
-        adjustSet.params[1].fitThresold = floatArg(argIndex, argc, argv);
+        adjustSet.params[1].fitThreshold = floatArg(argIndex, argc, argv);
         hs.adjustSet(adjustSet);
         break;
 

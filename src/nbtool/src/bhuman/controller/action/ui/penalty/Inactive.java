@@ -25,6 +25,7 @@ public class Inactive extends Penalty
     public void performOn(AdvancedData data, PlayerInfo player, int side, int number)
     {
         player.penalty = PlayerInfo.PENALTY_SPL_INACTIVE_PLAYER;
+        handleRepeatedPenaltyEjection(data, player, side, number);
         data.whenPenalized[side][number] = data.getTime();
         Log.state(data, "Inactive Player "+
                 Rules.league.teamColorName[data.team[side].teamColor]
