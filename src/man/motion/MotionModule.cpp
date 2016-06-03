@@ -1,11 +1,25 @@
 #include "MotionModule.h"
 #include "Profiler.h"
 #include <fstream>
+#include "unswalk/UNSWalkProvider.h"
+
 
 namespace man
 {
 namespace motion
 {
+    // TODO Refactor and figure out a better way to do this... 
+    // Multiple includes of Eigen were causing issues
+    // I'm sorry
+    UNSWalkProvider        walkProvider;
+
+    bool MotionModule::calibrated() { return walkProvider.calibrated(); }
+    bool MotionModule::upright() { return walkProvider.upright(); }
+
+    bool MotionModule::isWalkActive() { return walkProvider.isWalkActive(); }
+    bool MotionModule::isStanding()   { return walkProvider.isStanding(); }
+    void MotionModule::resetWalkProvider()     { walkProvider.hardReset(); }
+
 MotionModule::MotionModule()
   : jointsOutput_(base()),
     stiffnessOutput_(base()),
@@ -981,14 +995,14 @@ void MotionModule::sendMotionCommand(messages::OdometryWalk command)
 void MotionModule::sendMotionCommand(const KickCommand::ptr command)
 {
     nextProvider = &walkProvider;
-    walkProvider.setCommand(command);
+    // walkProvider.setCommand(command);
 }
 
 void MotionModule::sendMotionCommand(messages::Kick command, int time)
 {
     nextProvider = &walkProvider;
     KickCommand::ptr newCommand(new KickCommand(command.type(), time));
-    walkProvider.setCommand(newCommand);
+    // walkProvider.setCommand(newCommand);
 }
 
 std::vector<BodyJointCommand::ptr> MotionModule::generateNextBodyProviderTransitions()
