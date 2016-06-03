@@ -24,8 +24,8 @@ public class RoSi2Loader {
     public static final String COMMON_SCENE_FILE = "scene/TeamComm.ros2";
 
     private static final RoSi2Loader instance = new RoSi2Loader();
-    private final Map<GL2, Map<String, Map<String, Integer>>> models = new HashMap<GL2, Map<String, Map<String, Integer>>>();
-    private final Map<GL2, Map<String, Set<String>>> modelsToLoad = new HashMap<GL2, Map<String, Set<String>>>();
+    private final Map<GL2, Map<String, Map<String, Integer>>> models = new HashMap<>();
+    private final Map<GL2, Map<String, Set<String>>> modelsToLoad = new HashMap<>();
 
     private RoSi2Loader() {
     }
@@ -60,7 +60,7 @@ public class RoSi2Loader {
      * @param modelnames names of the models to load
      */
     public void cacheModels(final GL2 gl, final String filename, final String... modelnames) {
-        final Set<String> modelNameSet = new HashSet<String>(Arrays.asList(modelnames));
+        final Set<String> modelNameSet = new HashSet<>(Arrays.asList(modelnames));
 
         // Check if some of the models have already been loaded
         final Map<String, Map<String, Integer>> modelFileMap = models.get(gl);
@@ -80,7 +80,7 @@ public class RoSi2Loader {
         if (!modelNameSet.isEmpty()) {
             Map<String, Set<String>> fileMap = modelsToLoad.get(gl);
             if (fileMap == null) {
-                fileMap = new HashMap<String, Set<String>>();
+                fileMap = new HashMap<>();
                 modelsToLoad.put(gl, fileMap);
             }
             Set<String> nameSet = fileMap.get(filename);
@@ -117,12 +117,12 @@ public class RoSi2Loader {
         // Check if the model has already been loaded
         Map<String, Map<String, Integer>> fileMap = models.get(gl);
         if (fileMap == null) {
-            fileMap = new HashMap<String, Map<String, Integer>>();
+            fileMap = new HashMap<>();
             models.put(gl, fileMap);
         }
         Map<String, Integer> modelMap = fileMap.get(filename);
         if (modelMap == null) {
-            modelMap = new HashMap<String, Integer>();
+            modelMap = new HashMap<>();
             fileMap.put(filename, modelMap);
         } else {
             final Integer id = modelMap.get(modelname);
@@ -134,12 +134,12 @@ public class RoSi2Loader {
         // Determine models to load from the same file
         Map<String, Set<String>> loadFileMap = modelsToLoad.get(gl);
         if (loadFileMap == null) {
-            loadFileMap = new HashMap<String, Set<String>>();
+            loadFileMap = new HashMap<>();
             modelsToLoad.put(gl, loadFileMap);
         }
         Set<String> nameSet = loadFileMap.get(filename);
         if (nameSet == null) {
-            nameSet = new HashSet<String>();
+            nameSet = new HashSet<>();
             loadFileMap.put(filename, nameSet);
         }
         nameSet.add(modelname);
@@ -149,19 +149,7 @@ public class RoSi2Loader {
             for (final RoSi2Element e : RoSi2Element.parseFile(filename).findElements(nameSet)) {
                 modelMap.put(e.getName(), e.instantiate(gl).createDisplayList());
             }
-        } catch (RoSi2Element.RoSi2ParseException ex) {
-            JOptionPane.showMessageDialog(null,
-                    ex.getMessage(),
-                    "Error loading scene",
-                    JOptionPane.ERROR_MESSAGE);
-            System.exit(-1);
-        } catch (XMLStreamException ex) {
-            JOptionPane.showMessageDialog(null,
-                    ex.getMessage(),
-                    "Error loading scene",
-                    JOptionPane.ERROR_MESSAGE);
-            System.exit(-1);
-        } catch (IOException ex) {
+        } catch (RoSi2Element.RoSi2ParseException | XMLStreamException | IOException ex) {
             JOptionPane.showMessageDialog(null,
                     ex.getMessage(),
                     "Error loading scene",

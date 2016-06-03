@@ -9,6 +9,7 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.AnimatorBase;
 import com.jogamp.opengl.util.FPSAnimator;
+import common.Log;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
@@ -19,6 +20,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -48,8 +50,8 @@ public class View3D implements GLEventListener, TeamEventListener {
     private final Camera camera = new Camera();
 
     private final int[] teamNumbers = new int[]{PluginLoader.TEAMNUMBER_COMMON, PluginLoader.TEAMNUMBER_COMMON};
-    private final Set<RobotState> leftRobots = new HashSet<RobotState>();
-    private final Set<RobotState> rightRobots = new HashSet<RobotState>();
+    private final Set<RobotState> leftRobots = new HashSet<>();
+    private final Set<RobotState> rightRobots = new HashSet<>();
 
     private static final Comparator<Drawing> drawingComparator = new Comparator<Drawing>() {
         @Override
@@ -66,7 +68,7 @@ public class View3D implements GLEventListener, TeamEventListener {
             return o2.getPriority() - o1.getPriority();
         }
     };
-    private final List<Drawing> drawings = new LinkedList<Drawing>();
+    private final List<Drawing> drawings = new LinkedList<>();
     private final JMenu drawingsMenu = new JMenu("Drawings");
 
     private int width = 0;
@@ -235,19 +237,36 @@ public class View3D implements GLEventListener, TeamEventListener {
 
         // Render drawings
         synchronized (drawings) {
-            for (final Drawing d : drawings) {
+            final Iterator<Drawing> it = drawings.iterator();
+            while (it.hasNext()) {
+                final Drawing d = it.next();
+
                 // Initialize if needed
-                d.initialize(gl);
+                try {
+                    d.initialize(gl);
+                } catch (final Throwable e) {
+                    it.remove();
+                    Log.error(e.getClass().getSimpleName() + " was thrown while initializing drawing " + d.getClass().getName() + ": " + e.getMessage());
+                    continue;
+                }
 
                 // Draw
                 if (d.isActive()) {
                     if (d instanceof Static) {
-                        ((Static) d).draw(gl, camera);
+                        try {
+                            ((Static) d).draw(gl, camera);
+                        } catch (final Throwable e) {
+                            Log.error(e.getClass().getSimpleName() + " was thrown while drawing custom drawing " + d.getClass().getName() + ": " + e.getMessage());
+                        }
                     } else if (d instanceof PerPlayer) {
                         if (d.getTeamNumber() == PluginLoader.TEAMNUMBER_COMMON || d.getTeamNumber() == teamNumbers[GameState.TEAM_LEFT]) {
                             synchronized (leftRobots) {
                                 for (final RobotState r : leftRobots) {
-                                    ((PerPlayer) d).draw(gl, r, camera);
+                                    try {
+                                        ((PerPlayer) d).draw(gl, r, camera);
+                                    } catch (final Throwable e) {
+                                        Log.error(e.getClass().getSimpleName() + " was thrown while drawing custom drawing " + d.getClass().getName() + ": " + e.getMessage());
+                                    }
                                 }
                             }
                         }
@@ -255,7 +274,11 @@ public class View3D implements GLEventListener, TeamEventListener {
                             camera.flip(gl);
                             synchronized (rightRobots) {
                                 for (final RobotState r : rightRobots) {
-                                    ((PerPlayer) d).draw(gl, r, camera);
+                                    try {
+                                        ((PerPlayer) d).draw(gl, r, camera);
+                                    } catch (final Throwable e) {
+                                        Log.error(e.getClass().getSimpleName() + " was thrown while drawing custom drawing " + d.getClass().getName() + ": " + e.getMessage());
+                                    }
                                 }
                             }
                             camera.flip(gl);
@@ -291,7 +314,7 @@ public class View3D implements GLEventListener, TeamEventListener {
         drawingsMenu.removeAll();
 
         // Create submenus for teams
-        final HashMap<Integer, JMenu> submenus = new HashMap<Integer, JMenu>();
+        final HashMap<Integer, JMenu> submenus = new HashMap<>();
         for (final int teamNumber : teamNumbers) {
             if (teamNumber != PluginLoader.TEAMNUMBER_COMMON) {
                 final String name = GameState.getInstance().getTeamName(teamNumber, false, false);

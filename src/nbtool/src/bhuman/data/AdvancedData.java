@@ -41,6 +41,10 @@ public class AdvancedData extends GameControlData implements Cloneable
     /** When was each player penalized last (ms, 0 = never)? */
     public long[][] whenPenalized = Rules.league.isCoachAvailable ? new long[2][Rules.league.teamSize+1] : new long[2][Rules.league.teamSize];
 
+    /** How often was each robot penalized with each league-specific penalty? */
+    public int[][][] penaltyCount = Rules.league.isCoachAvailable ? new int[2][Rules.league.teamSize + 1][Rules.league.penaltyTime.length]
+                                                                  : new int[2][Rules.league.teamSize][Rules.league.penaltyTime.length];
+
     /** Which players were already ejected? */
     public boolean [][] ejected = Rules.league.isCoachAvailable ? new boolean[2][Rules.league.teamSize+1] : new boolean[2][Rules.league.teamSize];
     
@@ -277,7 +281,14 @@ public class AdvancedData extends GameControlData implements Cloneable
             for (int j = 0; j < Rules.league.teamSize; j++) {
                 if (!ActionBoard.robot[i][j].isCoach(this) && team[i].player[j].penalty != PlayerInfo.PENALTY_SUBSTITUTE) {
                     team[i].player[j].penalty = PlayerInfo.PENALTY_NONE;
-                    ejected[i][j] = false;
+                    if (Rules.league.resetEjectedRobotsOnHalftime) {
+                        ejected[i][j] = false;
+                    }
+                }
+                if (Rules.league.resetPenaltyCountOnHalftime) {
+                    for (int k = 0; k < Rules.league.penaltyTime.length; k++) {
+                        penaltyCount[i][j][k] = 0;
+                    }
                 }
             }
         }
@@ -296,11 +307,20 @@ public class AdvancedData extends GameControlData implements Cloneable
     public int getRemainingPenaltyTime(int side, int number)
     {
         int penalty = team[side].player[number].penalty;
-        assert penalty == PlayerInfo.PENALTY_MANUAL || penalty == PlayerInfo.PENALTY_SUBSTITUTE || Rules.league.penaltyTime[penalty] != -1;
+        int penaltyTime = -1;
+        if (penalty != PlayerInfo.PENALTY_MANUAL && penalty != PlayerInfo.PENALTY_SUBSTITUTE) {
+//            System.out.println("penalty: " + penalty);
+//            System.out.println("penalty count: " + penaltyCount[side][number][penalty]);
+            penaltyTime = Rules.league.penaltyTime[penalty][((penaltyCount[side][number][penalty] > Rules.league.penaltyTime[penalty].length)
+                    ? Rules.league.penaltyTime[penalty].length
+                    : penaltyCount[side][number][penalty]) - 1];
+        }
+//        System.out.println("penalty time: " + penaltyTime);
+        assert penalty == PlayerInfo.PENALTY_MANUAL || penalty == PlayerInfo.PENALTY_SUBSTITUTE || penaltyTime != -1;
         return penalty == PlayerInfo.PENALTY_MANUAL || penalty == PlayerInfo.PENALTY_SUBSTITUTE ? 0
                 : gameState == STATE_READY && Rules.league.returnRobotsInGameStoppages && whenPenalized[side][number] >= whenCurrentGameStateBegan
                 ? Rules.league.readyTime - getSecondsSince(whenCurrentGameStateBegan)
-                : Math.max(0, getRemainingSeconds(whenPenalized[side][number], Rules.league.penaltyTime[penalty]));
+                : Math.max(0, getRemainingSeconds(whenPenalized[side][number], penaltyTime));
     }
     
     /**
@@ -330,7 +350,7 @@ public class AdvancedData extends GameControlData implements Cloneable
     public Integer getSecondaryTime(int timeKickOffBlockedOvertime)
     {
         if(timeKickOffBlockedOvertime == 0 // preparing data packet
-                && gameType == GAME_PLAYOFF && secGameState == STATE2_NORMAL && gameState == STATE_PLAYING
+                && secGameState == STATE2_NORMAL && gameState == STATE_PLAYING
                 && getSecondsSince(whenCurrentGameStateBegan) < Rules.league.playOffDelayedSwitchToPlaying) {
             return null;
         }
@@ -395,7 +415,7 @@ public class AdvancedData extends GameControlData implements Cloneable
     }
     
     public void updatePenalties() {
-        if (gameType == GAME_PLAYOFF && secGameState == STATE2_NORMAL && gameState == STATE_PLAYING
+        if (secGameState == STATE2_NORMAL && gameState == STATE_PLAYING
                 && getSecondsSince(whenCurrentGameStateBegan) >= Rules.league.playOffDelayedSwitchToPlaying) {
             for (TeamInfo t : team) {
                 for (PlayerInfo p : t.player) {

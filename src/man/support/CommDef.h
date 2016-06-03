@@ -47,7 +47,7 @@ static const robot_ip_pair beyonce = {"beyonce", "139.140.192.19"};
 static const robot_ip_pair ozzy    = {"ozzy"   , "139.140.192.20"};
 static const robot_ip_pair avril   = {"avril"  , "139.140.192.21"};
 static const robot_ip_pair batman  = {"batman" , "139.140.192.22"};
-static const robot_ip_pair shehulk = {"she-hulk" , "139.140.192.23"};
+static const robot_ip_pair shehulk = {"shehulk" , "139.140.192.23"};
 
 static const robot_ip_pair robotIPs[NUM_ROBOTS] = {wash, river, jayne,
                                                    simon, inara, kaylee,
