@@ -7,16 +7,15 @@ import math
 #TODO: if targets are messed up, insert 'target = tracker.brain.ball'
 #in every function
 
-DEBUG = False
+DEBUG = True
 
 def tracking(tracker):
+    print "Tracking"
     """
     While the target is visible, track it via vision values.
     If the target is lost, switches to altTrackSharedBallAndPan if shared ball
     is reliable and fullPan if shared ball is not realiable.
     """
-    print "Entering tracking"
-    return tracker.goLater('snapPan')
     # makes sure ball is default target when entering tracking
     tracker.target = tracker.brain.ball
 
@@ -32,11 +31,12 @@ def tracking(tracker):
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
         if (tracker.target.vis.frames_off >
             constants.TRACKER_FRAMES_OFF_REFIND_THRESH):
-            return tracker.goLater('snapPan')
+            return tracker.goLater('fullPan')
 
     return tracker.stay()
 
 def bounceTracking(tracker):
+    print "bounceTracking"
     """
     Just like the above, but using a different tracking method.
     """
@@ -175,9 +175,8 @@ def lookStraightThenTrack(tracker):
 
     return tracker.stay()
 
-# MODIFIED FULL PAN -- REVERT BACK
 def fullPan(tracker):
-    print "\033[33m\033[1m" + "Starting fullPan"
+    print "It's fullPan time"
     """
     Repeatedly executes the headMove FIXED_PITCH_PAN.
     Once the ball is located, switches to tracking.
@@ -188,13 +187,11 @@ def fullPan(tracker):
         request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
         # Smartly start the pan
-        print "\033[33m\033[1m" + "Smartly starting SNAP_PAN"
-        tracker.helper.startingPan(HeadMoves.SNAP_PAN)
+        tracker.helper.startingPan(HeadMoves.FIXED_PITCH_PAN)
 
     if not tracker.brain.motion.head_is_active:
         # Repeat the pan
-        print "\033[33m\033[1m" + "Repeating SNAP_PAN"
-        tracker.helper.executeHeadMove(HeadMoves.SNAP_PAN)
+        tracker.performHeadMove(HeadMoves.FIXED_PITCH_PAN)
 
     if not isinstance(tracker.target, Vision.messages.FilteredBall):
         if tracker.target.on:
@@ -221,6 +218,7 @@ def snapPan(tracker):
             print "Staying still"
             tracker.performHeadMove(tracker.lookToAngle(tracker.currentYaw))
             tracker.lastMovement = 1
+            return tracker.stay()
         else:
             print "Let's change up the view"
             tracker.currentYaw += 30 * tracker.direction # 30 degrees of motion for each pan

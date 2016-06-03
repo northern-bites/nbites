@@ -500,7 +500,7 @@ CALIBRATION_BOTTOM_PAN = ( ( ((-6.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME*2, 1, stiff
                            ( ((6.0, CAL_BOTTOM_PITCH), CAL_PAN_TIME, 1, stiff.LOW_HEAD_STIFFNESSES), ),
                         )
 
-SNAP_PAN_TIME = 1
+SNAP_PAN_TIME = 2
 
 SNAP_PAN = (((-30.0, 25), SNAP_PAN_TIME*2, 1, stiff.LOW_HEAD_STIFFNESSES),
             ((-20.0, 25), SNAP_PAN_TIME,   1, stiff.LOW_HEAD_STIFFNESSES),

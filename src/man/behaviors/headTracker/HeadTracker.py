@@ -64,6 +64,7 @@ class HeadTracker(FSA.FSA):
         self.switchTo('penalizeHeads')
 
     def performHeadMove(self, headMove):
+        print "performHeadMove: " + str(headMove)
         """Executes the given headMove, then stops."""
         if (headMove != self.headMove
             or self.currentState != 'doHeadMove'):
@@ -71,6 +72,7 @@ class HeadTracker(FSA.FSA):
             self.switchTo('doHeadMove')
 
     def repeatHeadMove(self, headMove):
+        print "repeatingHeadMove: " + str(headMove)
         '''Executes the given headMove, then repeats it forever.'''
         if (self.headMove != headMove
             or (self.currentState != 'repeatHeadMove' and
@@ -80,17 +82,21 @@ class HeadTracker(FSA.FSA):
 
     ##################### Fixed Pitch #######################
     def performBasicPan(self):
+        print "performBasicPan"
         '''Perform the basic fixed pitch pan once.'''
-        self.performHeadMove(HeadMoves.FIXED_PITCH_PAN)
+        self.performHeadMove(HeadMoves.SNAP_PAN)
 
     def repeatBasicPan(self):
+        print "repeatBasicPan"
         '''Repeat the basic fixed pitch pan.'''
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN)
     
     def performWidePan(self):
+        print "performWidePan"
         self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
 
     def repeatWidePan(self):
+        print "repeatWidePan"
         """
         Repeat the wide fixed pitch pan.
         Good for localizing.
