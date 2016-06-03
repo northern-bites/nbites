@@ -51,6 +51,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.inPosition = CENTER_POSITION
         self.inGoalbox = True
 
+        #HACK FOR PENALTY GOALIE IN WATSON2016
+        self.lastPenDiveSide = RIGHT
+
+
         ### ALL TRANSITIONS ARE DEFINED HERE ############
         ### Their conditions are in GoalieTransitions ###
         VisualGoalieStates.walkToGoal.transitions = {
@@ -96,10 +100,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.LOW_PRECISION)
             : GoalieStates.saveRight,
 
-            Transition.CountTransition(GoalieTransitions.facingBackward,
-                                       Transition.OCCASIONALLY,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.lineCheckReposition,
+            # Transition.CountTransition(GoalieTransitions.facingBackward,
+            #                            Transition.OCCASIONALLY,
+            #                            Transition.LOW_PRECISION)
+            # : GoalieStates.lineCheckReposition,
 
             Transition.CountTransition(GoalieTransitions.shouldGoForward,
                                        Transition.SOME_OF_THE_TIME,
@@ -247,10 +251,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.LOW_PRECISION)
             : GoalieStates.lineCheckReposition,
 
-            Transition.CountTransition(GoalieTransitions.shouldBackUp,
-                                       Transition.MOST_OF_THE_TIME,
-                                       45)
-            : GoalieStates.moveBackwards,
+            # Transition.CountTransition(GoalieTransitions.shouldBackUp,
+            #                            Transition.MOST_OF_THE_TIME,
+            #                            45)
+            # : GoalieStates.moveBackwards,
 
             Transition.CountTransition(GoalieTransitions.safelyPlaced,
                                        Transition.SOME_OF_THE_TIME,
@@ -267,10 +271,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.LOW_PRECISION)
             : GoalieStates.lineCheckReposition,
 
-            Transition.CountTransition(GoalieTransitions.facingBackward,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : GoalieStates.lineCheckReposition,
+            # Transition.CountTransition(GoalieTransitions.facingBackward,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.OK_PRECISION)
+            # : GoalieStates.lineCheckReposition,
 
             Transition.CountTransition(GoalieTransitions.sideLineCheckShouldReposition,
                                        Transition.OCCASIONALLY,

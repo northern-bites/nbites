@@ -24,27 +24,28 @@ if [ "$REMOTE_FOLDER" = "" ]; then
     exit 1
 fi
 
-# echo "Type username for RoboCup server, followed by [ENTER]"
-# read username
+echo "Type username for RoboCup server, followed by [ENTER]"
+read username
 
-SERVER=nbites@starlord.local
-LOGS_DIR=/home/nbites/logs
+SERVER=$username@dover
+ROBOCUP_DIR=/mnt/research/robocup
+FRAMES_DIR=logs
 
-SYNC_UP="$RSYNC $RSYNC_OPTS ./$REMOTE_FOLDER/ $SERVER:$LOGS_DIR/$REMOTE_FOLDER/"
-SYNC_DOWN="$RSYNC $RSYNC_OPTS $SERVER:$LOGS_DIR/$REMOTE_FOLDER/ ./$REMOTE_FOLDER/"
-DIFF="$RSYNC $RSYNC_OPTS -n $SERVER:$LOGS_DIR/$REMOTE_FOLDER/ ./$REMOTE_FOLDER/"
+SYNC_UP="$RSYNC $RSYNC_OPTS ./$REMOTE_FOLDER/ $SERVER:$ROBOCUP_DIR/$FRAMES_DIR/$REMOTE_FOLDER/"
+SYNC_DOWN="$RSYNC $RSYNC_OPTS $SERVER:$ROBOCUP_DIR/$FRAMES_DIR/$REMOTE_FOLDER/ ./$REMOTE_FOLDER/"
+DIFF="$RSYNC $RSYNC_OPTS -n $SERVER:$ROBOCUP_DIR/$FRAMES_DIR/$REMOTE_FOLDER/ ./$REMOTE_FOLDER/"
 
 # Ensure that group is correctly set on the server.
 # Once everyone is running 14.04 we can do this directly in rsync
-#CHOWN="chown -R :robocupgrp $ROBOCUP_DIR/$FRAMES_DIR/$REMOTE_FOLDER/"
-#RUN_CHOWN="ssh $SERVER sh -c '( ( $CHOWN ) )'"
+CHOWN="chown -R :robocupgrp $ROBOCUP_DIR/$FRAMES_DIR/$REMOTE_FOLDER/"
+RUN_CHOWN="ssh $SERVER sh -c '( ( $CHOWN ) )'"
 
 if [ "$UP_OR_DOWN" = "up" ]; then
 
     echo $SYNC_UP
     $SYNC_UP
-    #echo $RUN_CHOWN
-    #$RUN_CHOWN
+    echo $RUN_CHOWN
+    $RUN_CHOWN
 
 elif [ "$UP_OR_DOWN" = "down" ]; then
 

@@ -99,9 +99,9 @@ RIGHT_SIDE_KICK = Kick("Right_Side_Kick",
                       dist = 300,
                       move=SweetMoves.RIGHT_SIDE_KICK)
 
-LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 14.5, y = 4.0,
+LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 10.0, y = 4.0,
                            move=SweetMoves.LEFT_STRAIGHT_KICK)
-RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 14.5, y = -4.0,
+RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 10.5, y = -4.0,
                            move=SweetMoves.RIGHT_STRAIGHT_KICK)
 
 LEFT_SHORT_BACK_KICK =  Kick("L_Short_Back", x = 16.8, y =  4,
@@ -113,18 +113,18 @@ LEFT_KICK = LEFT_SHORT_STRAIGHT_KICK
 RIGHT_KICK = RIGHT_SHORT_STRAIGHT_KICK
 
 # BH kick engine kicks
-BH_LEFT_FORWARD_KICK =  Kick("BH_L_FORWARD", x = 13.6, y =  3.2, dist = 475, bhType = PMotion_proto.messages.Kick.kickForwardLeft)
-BH_RIGHT_FORWARD_KICK =  Kick("BH_R_FORWARD", x = 13.6, y =  -3.2, dist = 475, bhType = PMotion_proto.messages.Kick.kickForwardRight)
+BH_LEFT_FORWARD_KICK =  Kick("BH_L_FORWARD", x = 14.6, y =  4.2, dist = 475, bhType = PMotion_proto.messages.Kick.kickForwardLeft)
+BH_RIGHT_FORWARD_KICK =  Kick("BH_R_FORWARD", x = 14.6, y =  -4.2, dist = 475, bhType = PMotion_proto.messages.Kick.kickForwardRight)
 
 # Motion kicks
-M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 13.3, y = 3., dist = 130)
-M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 13.3, y = -3., dist = 130)
+M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 16.5, y = 3., dist = 130)
+M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 16.5, y = -3., dist = 130)
 
-M_LEFT_CHIP_SHOT =  Kick("M_Left_Chip_Shot", x = 12.3, y = -.3, h = 60, dist = 130)
-M_RIGHT_CHIP_SHOT =  Kick("M_Right_Chip_Shot", x = 12.3, y = .3, h = -60, dist = 130)
+M_LEFT_CHIP_SHOT =  Kick("M_Left_Chip_Shot", x = 17.0, y = -.3, h = 60, dist = 130)
+M_RIGHT_CHIP_SHOT =  Kick("M_Right_Chip_Shot", x = 17.0, y = .3, h = -60, dist = 130)
 
-M_LEFT_SIDE = Kick("M_Left_Side", x = 14.5, y = -2.76, h = 80, dist = 110)
-M_RIGHT_SIDE = Kick("M_Right_Side", x = 14.5, y = 2.76, h = -80, dist = 110)
+M_LEFT_SIDE = Kick("M_Left_Side", x = 16.7, y = -4.16, h = 80, dist = 110)
+M_RIGHT_SIDE = Kick("M_Right_Side", x = 16.7, y = 4.16, h = -80, dist = 110)
 
 # TODO automate/generalize
 def chooseAlignedKickFromKick(player, kick):

@@ -5,8 +5,8 @@ import teamcomm.data.event.RobotStateEventListener;
 import data.PlayerInfo;
 import data.SPLStandardMessage;
 import java.util.LinkedList;
+import java.util.ListIterator;
 import javax.swing.event.EventListenerList;
-import teamcomm.net.logging.LogReplayer;
 
 /**
  * Class representing the state of a robot.
@@ -15,23 +15,32 @@ import teamcomm.net.logging.LogReplayer;
  */
 public class RobotState {
 
-    /**
-     * Amount of time after which a robot will be considered inactive if it did
-     * not send any messages.
-     */
-    public static final int MILLISECONDS_UNTIL_INACTIVE = 2000;
+    public static enum ConnectionStatus {
+
+        INACTIVE(10000),
+        OFFLINE(2000),
+        HIGH_LATENCY(500),
+        ONLINE(0);
+
+        public final int threshold;
+
+        private ConnectionStatus(final int threshold) {
+            this.threshold = threshold;
+        }
+    }
+
+    private static final int AVERAGE_CALCULATION_TIME = 10000;
 
     private final String address;
     private SPLStandardMessage lastMessage;
     private long lastMessageTimestamp;
-    private final LinkedList<Long> recentMessageTimestamps = new LinkedList<Long>();
-    private final LinkedList<Integer> messagesPerSecond = new LinkedList<Integer>();
-    private long lastMpsTest = 0;
+    private final LinkedList<Long> recentMessageTimestamps = new LinkedList<>();
     private int messageCount = 0;
     private int illegalMessageCount = 0;
     private final int teamNumber;
     private Integer playerNumber = null;
     private byte penalty = PlayerInfo.PENALTY_NONE;
+    private ConnectionStatus lastConnectionStatus = ConnectionStatus.ONLINE;
 
     private final EventListenerList listeners = new EventListenerList();
 
@@ -61,11 +70,14 @@ public class RobotState {
             playerNumber = (int) message.playerNum;
         }
         lastMessageTimestamp = System.currentTimeMillis();
-        recentMessageTimestamps.addFirst(lastMessageTimestamp);
+        synchronized (recentMessageTimestamps) {
+            recentMessageTimestamps.addFirst(lastMessageTimestamp);
+        }
         messageCount++;
 
         for (final RobotStateEventListener listener : listeners.getListeners(RobotStateEventListener.class)) {
             listener.robotStateChanged(new RobotStateEvent(this));
+            listener.connectionStatusChanged(new RobotStateEvent(this));
         }
     }
 
@@ -88,47 +100,54 @@ public class RobotState {
     }
 
     /**
-     * Returns the number of messages received during the last second.
-     *
-     * @return number of messages in the last second
-     */
-    public int getRecentMessageCount() {
-        final long cut;
-        if (LogReplayer.getInstance().isReplaying() && LogReplayer.getInstance().isPaused()) {
-            cut = 0;
-        } else {
-            cut = System.currentTimeMillis() - 1000;
-        }
-
-        Long val = recentMessageTimestamps.peekLast();
-        while (val != null && val < cut) {
-            recentMessageTimestamps.pollLast();
-            val = recentMessageTimestamps.peekLast();
-        }
-
-        final int mps = recentMessageTimestamps.size();
-        if (lastMpsTest <= cut) {
-            messagesPerSecond.add(mps);
-            lastMpsTest = System.currentTimeMillis();
-        }
-
-        return mps;
-    }
-
-    /**
      * Returns the average number of messages per second.
      *
      * @return number of messages per second
      */
     public double getMessagesPerSecond() {
-        getRecentMessageCount();
+        synchronized (recentMessageTimestamps) {
+            final ListIterator<Long> it = recentMessageTimestamps.listIterator(recentMessageTimestamps.size());
 
-        long sum = 0;
-        for (final int mps : messagesPerSecond) {
-            sum += mps;
+            final long curTime = System.currentTimeMillis();
+            while (curTime - it.previous() > AVERAGE_CALCULATION_TIME) {
+                it.remove();
+            }
+
+            return recentMessageTimestamps.size() > 0 ? (recentMessageTimestamps.size() * 1000.0 / Math.max(1000, curTime - recentMessageTimestamps.getLast())) : 0;
+        }
+    }
+
+    /**
+     * Updates the current network status of the robot internally. Sends events
+     * about a change of the connection status if needed.
+     *
+     * @return the current connection status
+     */
+    public ConnectionStatus updateConnectionStatus() {
+        final ConnectionStatus c = getConnectionStatus();
+        if (c != lastConnectionStatus) {
+            lastConnectionStatus = c;
+            for (final RobotStateEventListener listener : listeners.getListeners(RobotStateEventListener.class)) {
+                listener.connectionStatusChanged(new RobotStateEvent(this));
+            }
+        }
+        return c;
+    }
+
+    /**
+     * Returns the current network status of the robot.
+     *
+     * @return connection status
+     */
+    public ConnectionStatus getConnectionStatus() {
+        final long timeSinceLastMessage = System.currentTimeMillis() - lastMessageTimestamp;
+        for (final ConnectionStatus c : ConnectionStatus.values()) {
+            if (timeSinceLastMessage >= c.threshold) {
+                return c;
+            }
         }
 
-        return (double) sum / (double) messagesPerSecond.size();
+        return ConnectionStatus.ONLINE;
     }
 
     /**
@@ -174,16 +193,6 @@ public class RobotState {
      */
     public Integer getPlayerNumber() {
         return playerNumber;
-    }
-
-    /**
-     * Returns whether this robot is considered inactive because he did not send
-     * any messages for a while.
-     *
-     * @return boolean
-     */
-    public boolean isInactive() {
-        return lastMessageTimestamp < System.currentTimeMillis() - MILLISECONDS_UNTIL_INACTIVE;
     }
 
     /**

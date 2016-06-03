@@ -30,8 +30,9 @@ build_nbcross:
 .PHONY: nbcross
 nbcross: build_nbcross
 	@echo "nbcross in da house!!"
+	@echo "NBCROSS_ARGS=" ${NBCROSS_ARGS}
 	@cd $(BUILD_DIR); \
-	./$(EXECUTABLE)
+	./$(EXECUTABLE) ${NBCROSS_ARGS}
 
 .PHONY: nbcross_sim
 nbcross_sim: build_nbcross

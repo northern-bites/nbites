@@ -79,14 +79,14 @@ def getLines(player):
         GoalieStates.watchWithLineChecks.lines.append(visionLines(i).inner)
 
     if len(GoalieStates.watchWithLineChecks.lines) > constants.MEM_THRESH:
-        # print("[WATCHDEBUG] HERE")
+        print("[WATCHDEBUG] HERE - resetting goalie.lines, num lines = ", len(GoalieStates.watchWithLineChecks.lines))
         GoalieStates.watchWithLineChecks.lines = []
 
     if len(player.corners) > constants.CORNER_MEM_THRESH:
-        player.corners = player.corners[1:]
+        player.corners = []
 
     if len(player.homeDirections) > constants.BUFFER_THRESH:
-        player.homeDirections = player.homeDirections[1:]
+        player.homeDirections = []
 
         # r = line.inner.r
         # t = line.inner.t
@@ -993,7 +993,7 @@ def shouldClearBall(player):
         player.aggressive = False
 
     # ball must be visible
-    if not player.brain.ball.vis.on:
+    if player.brain.ball.vis.frames_off > 10:
         return False
 
     shouldGo = False

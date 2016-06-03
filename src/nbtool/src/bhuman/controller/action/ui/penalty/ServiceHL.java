@@ -25,11 +25,13 @@ public class ServiceHL extends PickUp
         if (player.penalty == PlayerInfo.PENALTY_NONE) {
             data.whenPenalized[side][number] = data.getTime();
             player.penalty = PlayerInfo.PENALTY_HL_SERVICE;
+            handleRepeatedPenaltyEjection(data, player, side, number);
             Log.state(data, "Request for Service " +
                     Rules.league.teamColorName[data.team[side].teamColor]
                     + " " + (number+1));
         } else {
             player.penalty = PlayerInfo.PENALTY_HL_SERVICE;
+            handleRepeatedPenaltyEjection(data, player, side, number);
             Log.state(data, "Additional Request for Service " +
                     Rules.league.teamColorName[data.team[side].teamColor]
                     + " " + (number+1));
