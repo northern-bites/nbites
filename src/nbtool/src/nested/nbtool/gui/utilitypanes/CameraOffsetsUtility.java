@@ -15,8 +15,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -205,21 +209,40 @@ public class CameraOffsetsUtility extends UtilityParent {
 		String[] topNames = found_top.keySet().toArray(new String[0]);
 		String[] botNames = found_bot.keySet().toArray(new String[0]);
 		
+		List<Row> rowList = new LinkedList<>();
 		rows = new Row[topNames.length + botNames.length];
+		
 		for (int i = 0; i < rows.length; ++i) {
-			rows[i] = new Row();
+			Row ltst = new Row();
 			
 			if (i >= topNames.length) {
 				int j = i - topNames.length;
-				rows[i].top = false;
-				rows[i].name = botNames[j];
-				rows[i].given = found_bot.get(rows[i].name).size();
+				ltst.top = false;
+				ltst.name = botNames[j];
+				ltst.given = found_bot.get(ltst.name).size();
 			} else {
-				rows[i].top = true;
-				rows[i].name = topNames[i];
-				rows[i].given = found_top.get(rows[i].name).size();
+				ltst.top = true;
+				ltst.name = topNames[i];
+				ltst.given = found_top.get(ltst.name).size();
 			}
+			
+			rowList.add(ltst);
 		}
+		
+		Collections.sort(rowList, new Comparator<Row>(){
+
+			@Override
+			public int compare(Row o1, Row o2) {
+				if (o1.name.equals(o2.name)) {
+					return (o1.top == o2.top) ? 0 : 1;
+				} else {
+					return o1.name.compareTo(o2.name);
+				}
+			}
+			
+		});
+		
+		rows = rowList.toArray(new Row[0]);
 		
 		useFound(found_top, true);
 		useFound(found_bot, false);
@@ -243,7 +266,7 @@ public class CameraOffsetsUtility extends UtilityParent {
 			this.panel.displayTable.setModel(model);
 			this.panel.displayTable.getTableHeader().setFont(new Font("PT Serif", Font.BOLD, 14));
 
-			this.setMinimumSize(new Dimension(600,400));
+			this.setMinimumSize(new Dimension(600,200));
 			
 //			this.addComponentListener(new ComponentAdapter(){
 //				public void componentShown(ComponentEvent e) {

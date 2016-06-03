@@ -6,7 +6,7 @@
 
 /* define NBL_NO_DEBUG to prevent this header from generating almost any code in used macros */
 
-/* define NBL_LOGLEVEL to set level for the compilation unit this header is included into.
+/* define NBL_LOGGING_LEVEL to set level for the compilation unit this header is included into.
  INFO WARN ERROR
 
  ****** MAY BE SET / OVERRIDDEN AT LAST SECOND EVEN IF HEADER INCLUDED THIS FILE ;) ******

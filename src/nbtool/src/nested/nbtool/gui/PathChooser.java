@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -50,9 +51,23 @@ import nbtool.util.UserSettings;
 import nbtool.util.Utility;
 
 public class PathChooser {
+		
+	public static String suggestion(String robot) {
+		
+		Calendar cal = Calendar.getInstance();
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		int month = cal.get(Calendar.MONTH);
+		
+		return ToolSettings.NBITES_DIR + 
+				"data/logs/" +
+				String.format("%s/%d_%d/%s/", 
+						UserSettings.venue, month, day, robot);
+	}
+	
+	/* nbites/data/logs/edwards16/01/batman/new_ball_logs */
 
 	public static void main(String[] args) {
-		Path path = chooseDirPath(null);
+		Path path = chooseDirPath(null, null);
 		Debug.print("end: %s", path);
 	}
 
@@ -64,21 +79,23 @@ public class PathChooser {
 	 * 
 	 * */
 
-	public static Path chooseLogPath(Component centered) {
-		return internal(centered, true);
+	public static Path chooseLogPath(Component centered, String suggest) {
+		return internal(centered, true, suggest);
 	}
 
-	public static Path chooseDirPath(Component centered) {
-		return internal(centered, false);
+	public static Path chooseDirPath(Component centered, String suggest) {
+		return internal(centered, false, suggest);
 	}
+	
+//	public static Path chooseDirPath(Component centered, String )
 
-	private static Path internal(Component centered, boolean file) {
+	private static Path internal(Component centered, boolean file, String suggest) {
 		final JDialog dialog = new JDialog();
 		dialog.setModal(true);
 		dialog.setTitle("choose path");
 		dialog.setLocationRelativeTo(centered);
 
-		handler.setMode(file, dialog);
+		handler.setMode(file, dialog, suggest);
 
 		dialog.setContentPane(handler.display);
 		dialog.setSize(handler.display.getPreferredSize());
@@ -167,7 +184,7 @@ public class PathChooser {
 				public void actionPerformed(ActionEvent e) {
 					validate();
 				}
-			});
+			});			
 		}
 		
 		final String tip = " (prefix with '~' or '/',"
@@ -175,7 +192,7 @@ public class PathChooser {
 		final String fileText = "choose file path " + tip;
 		final String dirText = "choose dir path " + tip;
 
-		protected void setMode(boolean file, JDialog dialog) {
+		protected void setMode(boolean file, JDialog dialog, String suggest) {
 			this.forceFile = file;
 			this.dialog = dialog;
 			this.chosen = null;
@@ -184,14 +201,17 @@ public class PathChooser {
 		
 			display.loadPathComboBox.setModel(
 					new DefaultComboBoxModel<Path>(UserSettings.loadPathes.vector()));
-			if (UserSettings.loadPathes.vector().isEmpty()) {
+			
+			if (suggest != null) {
+				display.chooserTextField.setText(suggest);
+			} else if (UserSettings.loadPathes.vector().isEmpty()) {
 				display.chooserTextField.setText(ToolSettings.NBITES_DIR);
 			} else {
 				display.loadPathComboBox.setSelectedIndex(0);
 				display.chooserTextField.setText(display.loadPathComboBox.getSelectedItem().toString());
 			}
 			
-			display.createPathBox.setSelected(false);
+			display.createPathBox.setSelected(true);
 			validate();
 		}
 

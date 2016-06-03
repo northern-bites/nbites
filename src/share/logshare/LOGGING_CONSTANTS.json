@@ -17,6 +17,8 @@
 
     "LogClass_EdgeImage" : "EdgeImage",
 
+    "LogClass_String" : "String",
+
     #block types
     "YUVImageType_DEFAULT" : "YUVImage422",
     "YUVImageType_Y16" : "YImage16",
