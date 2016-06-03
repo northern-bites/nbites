@@ -62,6 +62,20 @@ class Brain(object):
         # Retrieve our robot identification and set per-robot parameters
         self.CoA = robots.get_certificate()
 
+        # FSAs
+        self.player = Switch.selectedPlayer.SoccerPlayer(self)
+        self.tracker = HeadTracker.HeadTracker(self)
+        self.nav = Navigator.Navigator(self)
+
+        # As of 2016 drop in, player role no longer defaults to player number
+        self.role = self.player.role
+
+        # coa is Certificate of Authenticity (to keep things short)
+        print '\033[32m'+str(self.CoA)                              +'\033[0m'
+        print '\033[32m'+"GC:  I am on team "+str(self.teamNumber)  +'\033[0m'
+        print '\033[32m'+"GC:  I am player number  "+str(self.playerNumber)+'\033[0m'
+        print '\033[32m'+"GC:  My role number is  "+str(self.role)+'\033[0m'
+
         # Information about the environment
         self.ball = None
         self.sharedBall = None
@@ -74,11 +88,6 @@ class Brain(object):
         # New vision system...
         self.visionLines = None
         self.visionCorners = None
-
-        # FSAs
-        self.player = Switch.selectedPlayer.SoccerPlayer(self)
-        self.tracker = HeadTracker.HeadTracker(self)
-        self.nav = Navigator.Navigator(self)
 
         # Not FSAs
         self.gameController = GameController.GameController(self)
@@ -348,7 +357,8 @@ class Brain(object):
         Note: Loc uses truly global coordinates, and the
               blue goalbox constants always match up with our goal.
         """
-        # Does this matter for the goalie? It really shouldn't...
+
+        # Changed from player number to role for 2016 drop in, needs testing
         if self.player.role == 1:
             self.resetLocTo(Constants.MIDFIELD_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
@@ -545,8 +555,8 @@ class Brain(object):
         print ("My position was (" + str(self.loc.x) + ", " + str(self.loc.y) + ", " + str(self.loc.h) +
                ") and the ball's position was " + str(self.ball.x) + ", " + str(self.ball.y) + ")")
 
+        # changed from playerNumber to role as of 2016, to work for drop in game
         if (self.player.role == TeamMember.DEFAULT_GOALIE_NUMBER):
-            # I am a goalie. Reset to the penatly box.
             print "I am a goalie. Resetting loc to the goalbox."
             self.resetGoalieLocalization()
             return
