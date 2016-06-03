@@ -32,6 +32,32 @@ void whistleExitEnd() {
     exit(0);
 }
 
+const double WHISTLE_THRESHOLD = 2000000;
+
+/*
+void callback(nbsound::Handler * cap, void * buffer, nbsound::parameter_t * params) {
+    //    printf("callback %ld\n", iteration);
+
+    bool listening = (!shared_memory || shared_memory->whistle_listen);
+
+    if (listening && buffer && transform) {
+        for (int i = 0; i < params->channels; ++i) {
+            transform->transform(buffer, i);
+
+            double summed = sum(1600, 1800);
+            //            NBL_PRINT("summed=\t%lf\n", summed);
+            if (summed > WHISTLE_THRESHOLD) {
+                NBL_WARN("WHISTLE: %lf\n", summed);
+                if (shared_memory) {
+                    shared_memory->whistle_heard = true;
+                }
+            }
+        }
+    }
+    
+    ++iteration;
+} */
+
 void whistleExit() {
     if (capture) {
         NBL_WARN("stopping capture...")
@@ -59,6 +85,20 @@ void handler(int signal) {
 
 long iteration = 0;
 
+std::pair<double, int> peak1() {
+    double mv = 0;
+    int mi = 0;
+    for (int i = 0; i < transform->get_freq_len(); ++i) {
+        double iv = std::abs(transform->outputmag[i]);
+        if (iv > mv) {
+            mv = iv;
+            mi = i;
+        }
+    }
+
+    return {mv, mi};
+}
+
 double sum(int start, int end) {
     NBL_ASSERT_GT(transform->get_freq_len(), end);
     double total = 0;
@@ -69,26 +109,19 @@ double sum(int start, int end) {
     return total;
 }
 
-const double WHISTLE_THRESHOLD = 2000000;
+const int whistleWindow = 100;
+const std::pair<int,int> whistleRange = {1000,2000}
+const double whistleThreshold = 1000;
 
 void callback(nbsound::Handler * cap, void * buffer, nbsound::parameter_t * params) {
-//    printf("callback %ld\n", iteration);
-
-    bool listening = (shared_memory && shared_memory->whistle_listen);
+    bool listening = (!shared_memory || shared_memory->whistle_listen);
 
     if (listening && buffer && transform) {
         for (int i = 0; i < params->channels; ++i) {
-//            printf("\ttransform %d\n", i);
             transform->transform(buffer, i);
 
-            double summed = sum(1600, 1800);
-//            NBL_PRINT("summed=\t%lf\n", summed);
-            if (summed > WHISTLE_THRESHOLD) {
-                NBL_WARN("WHISTLE: %lf\n", summed);
-                if (shared_memory) {
-                    shared_memory->whistle_heard = true;
-                }
-            }
+            std::pair<double, int> p1 = peak1();
+            printf("%d: %lf\n", p1.second, p1.first);
         }
     }
 
@@ -100,27 +133,35 @@ int main(int argc, const char ** argv) {
     signal(SIGINT, handler);
     signal(SIGTERM, handler);
 
-    printf("...whistle...\nfreopen()....\n");
-    freopen(WHISTLE_LOG_PATH, "w", stdout);
+    if (argc == 1) {
 
-    NBL_INFO("whistle::main() log file re-opened...");
+        printf("...whistle...\nfreopen()....\n");
+        freopen(WHISTLE_LOG_PATH, "wa", stdout);
 
-    shared_memory_fd = shm_open(NBITES_MEM, O_RDWR, 0600);
-    if (shared_memory_fd < 0) {
-        std::cout << "sensorsModule couldn't open shared fd!" << std::endl;
-        NBL_ERROR("whistle couldn't open shared memory file!");
-        whistleExitEnd();
+        NBL_INFO("whistle::main() log file re-opened...");
+
+        shared_memory_fd = shm_open(NBITES_MEM, O_RDWR, 0600);
+        if (shared_memory_fd < 0) {
+            std::cout << "sensorsModule couldn't open shared fd!" << std::endl;
+            NBL_ERROR("whistle couldn't open shared memory file!");
+            whistleExitEnd();
+        }
+
+        shared_memory = (volatile SharedData*) mmap(NULL, sizeof(SharedData),
+                                                    PROT_READ | PROT_WRITE,
+                                                    MAP_SHARED, shared_memory_fd, 0);
+
+        if (shared_memory == MAP_FAILED) {
+            NBL_ERROR("whistle couldn't map shared memory file!");
+            close(shared_memory_fd);
+            whistleExitEnd();
+        }
+    } else {
+        printf("main: standalone!\n");
+        shared_memory_fd = 0;
+        shared_memory = nullptr;
     }
 
-    shared_memory = (volatile SharedData*) mmap(NULL, sizeof(SharedData),
-                                         PROT_READ | PROT_WRITE,
-                                         MAP_SHARED, shared_memory_fd, 0);
-
-    if (shared_memory == MAP_FAILED) {
-        NBL_ERROR("whistle couldn't map shared memory file!");
-        close(shared_memory_fd);
-        whistleExitEnd();
-    }
 
     NBL_WHATIS(shared_memory);
 
