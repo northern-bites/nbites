@@ -438,7 +438,7 @@ bool BallDetector::findCorrelatedBlackSpots
                 //IDEA: account for area and distance thresholds based on the camera?
                 if(topCamera) {
                     lower = 9.5;
-                    upper = 14.0;
+                    upper = 17.1; //change from 14
                 } else {
                     lower = 17.0; //change from 19.0
                     upper = 21.4;
