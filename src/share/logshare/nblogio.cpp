@@ -9,6 +9,7 @@
 #include <string>
 #include <algorithm>
 #include <sstream>
+#include <stdexcept>
 
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -39,6 +40,48 @@ namespace nbl {
     namespace io {
 
         const char LOCAL_HOST_ADDR[] = "127.0.0.1";
+
+        FileMonitor::FileMonitor(const char * file, bool trueOnFirst) {
+            fd = open(file, O_RDONLY);
+            if (!fd) {
+                int err = errno;
+                throw std::runtime_error{utilities::format("could not open file: %s: %s",
+                                                           file,
+                                                           utilities::get_error(err).c_str()
+                                                           )};
+            }
+
+            if (!trueOnFirst) {
+                update();
+            }
+        }
+
+        FileMonitor::~FileMonitor() {
+            close();
+        }
+
+        bool FileMonitor::update() {
+            if (fd) {
+                struct stat buf;
+                fstat(fd, &buf);
+                double diff = difftime(buf.st_mtime, last);
+                if (diff > 0) {
+                    last = buf.st_mtime;
+                    return true;
+                } else return false;
+            } else {
+                throw std::runtime_error("FileMonitor: cannot call update() after close()");
+            }
+
+
+        }
+
+        void FileMonitor::close() {
+            if (fd) {
+                ::close(fd);
+                fd = 0;
+            }
+        }
 
         const iotime_t IO_EXPECTING_ST  = 1000;
         const iotime_t IO_NOT_EXPECTING_ST = 500000;

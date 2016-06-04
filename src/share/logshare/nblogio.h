@@ -17,6 +17,19 @@
 namespace nbl {
     namespace io {
 
+        class FileMonitor {
+        private:
+            int fd = 0;
+            time_t last = 0;
+
+        public:
+            FileMonitor(const char * file, bool trueOnFirst);
+            ~FileMonitor();
+
+            bool update();
+            void close();
+        };
+
         /* exact io on file descriptors */
 
         //pointer to function for individual io call.
