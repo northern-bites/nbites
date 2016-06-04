@@ -13,6 +13,7 @@
 #include "../WalkCommand.h"
 #include "../StepCommand.h"
 #include "../DestinationCommand.h"
+#include "../KickCommand.h"
 #include "../BodyJointCommand.h"
 #include "../MotionProvider.h"
 
@@ -69,6 +70,7 @@ public:
 
 	void setCommand(const WalkCommand::ptr command);
     void setCommand(const DestinationCommand::ptr command);
+    void setCommand(const KickCommand::ptr command);
     // StepCommand (currently not used) is actually an odometry destination walk
     void setCommand(const StepCommand::ptr command);
 
@@ -104,12 +106,14 @@ private:
 	bool tryingToWalk;
 	MotionCommand::ptr currentCommand;
 	// Touch *touch;
-	Generator *generator;
+	ClippedGenerator *generator;
 	Odometry startOdometry;
-	Effector* effector;
+	// Effector* effector;
 	BodyModel bodyModel;
 	UNSWKinematics kinematics;
 	Odometry* odometry;
+
+	JointValues joints;
 
 	void logMsg(std::string msg) { std::cout << msg << std::endl; }
 

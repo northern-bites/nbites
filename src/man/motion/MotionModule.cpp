@@ -995,14 +995,14 @@ void MotionModule::sendMotionCommand(messages::OdometryWalk command)
 void MotionModule::sendMotionCommand(const KickCommand::ptr command)
 {
     nextProvider = &walkProvider;
-    // walkProvider.setCommand(command);
+    walkProvider.setCommand(command);
 }
 
 void MotionModule::sendMotionCommand(messages::Kick command, int time)
 {
     nextProvider = &walkProvider;
     KickCommand::ptr newCommand(new KickCommand(command.type(), time));
-    // walkProvider.setCommand(newCommand);
+    walkProvider.setCommand(newCommand);
 }
 
 std::vector<BodyJointCommand::ptr> MotionModule::generateNextBodyProviderTransitions()

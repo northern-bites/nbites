@@ -67,8 +67,9 @@ static const Joints::JointCode nb_joint_order[] {
 UNSWalkProvider::UNSWalkProvider() : MotionProvider(WALK_PROVIDER), 
  									 requestedToStop(false), tryingToWalk(false) 
 {
-	generator = (Generator*) new ClippedGenerator((Generator*) new DistributedGenerator());
+	generator =  new ClippedGenerator((Generator*) new DistributedGenerator());
 	odometry = new Odometry();
+	joints = new JointValues();
 	resetAll();
 }
 
@@ -148,6 +149,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 	// Update sensor values
 	UNSWSensorValues sensors = new UNSWSensorValues();
+	sensors.joints = joints;
 
 	sensors.sensors[Sensors::InertialSensor_GyrX] = sensorInertials.gyr_x();
     sensors.sensors[Sensors::InertialSensor_GyrY] = sensorInertials.gyr_y();
@@ -221,7 +223,13 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     const float* angles = NULL;
     const float* hardness = NULL;
 
-    JointValues joints = generator->makeJoints(request, odometry, sensors, bodyModel, ballX, ballY);
+    joints = generator->makeJoints(request, odometry, sensors, bodyModel, ballX, ballY);
+    // (ActionCommand::All* request,
+    //                       Odometry* odometry,
+    //                       const UNSWSensorValues &sensors,
+    //                       BodyModel &bodyModel,
+    //                       float ballX,
+    //                       float ballY);
 
     angles = joints.angles;
     hardness = joints.stiffnesses;
@@ -292,11 +300,19 @@ void UNSWalkProvider::setCommand(const WalkCommand::ptr command) {
 }
 
 void UNSWalkProvider::setCommand(const DestinationCommand::ptr command) {
-
+	currentCommand = command;
+	active();
 }
 
 void UNSWalkProvider::setCommand(const StepCommand::ptr command) {
 
+
+
+}
+
+void UNSWalkProvider::setCommand(const KickCommand::ptr command) {
+	currentCommand = command;
+	active();
 }
 
 void UNSWalkProvider::getOdometryUpdate(portals::OutPortal<messages::RobotLocation>& out) const {
@@ -307,7 +323,7 @@ void UNSWalkProvider::getOdometryUpdate(portals::OutPortal<messages::RobotLocati
 }
 
 bool UNSWalkProvider::isStanding() const { //is going to stand rather than at complete standstill
-	// return generator->getIsStanding(); //1 corresponds to process of moving from WALK crouch to STAND
+	return generator->isStanding(); //1 corresponds to process of moving from WALK crouch to STAND
 }
 
 bool UNSWalkProvider::isWalkActive() const {
