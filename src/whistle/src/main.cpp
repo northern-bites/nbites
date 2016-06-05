@@ -15,7 +15,7 @@
 #include "../../share/include/SharedData.h"
 
 const int VERSION = 3;
-const char * WHISTLE_LOG_PATH = "/home/nao/nbites/log/manlog";
+const char * WHISTLE_LOG_PATH = "/home/nao/nbites/log/whistle";
 
 using namespace nblog;
 
@@ -175,10 +175,15 @@ void callback(nbsound::Handler * cap, void * buffer, nbsound::parameter_t * para
                 if ( (p2.first * secondPeakMult) < (p1.first) &&
                     sum1 > whistleSumThreshold ) {
                     NBL_WARN("WHISTLE HEARD! {%lf}\n", sum1);
+                    if (shared_memory) {
+                        shared_memory->whistle_heard = true;
+                    }
                 }
             }
 
         }
+    } else {
+        NBL_ERROR("WHISTLE: cannot use this frame!\n");
     }
 
     ++iteration;
@@ -192,8 +197,8 @@ int main(int argc, const char ** argv) {
 
     if (argc == 1) {
 
-        printf("...whistle...\nfreopen()....\n");
-        freopen(WHISTLE_LOG_PATH, "wa", stdout);
+        printf("...whistle...\nfreopen() -> %s\n", WHISTLE_LOG_PATH);
+        freopen(WHISTLE_LOG_PATH, "w", stdout);
 
         NBL_INFO("whistle::main() log file re-opened...");
 

@@ -303,7 +303,7 @@ namespace man{
                         case STATE_SET: {
                             shared_memory->whistle_listen = true;
                             if (shared_memory->whistle_heard) {
-                                printf(":::: WHISTLE OVERRIDE ::::\n");
+                                printf(":::: WHISTLE OVERRIDE :::: (FIRST)\n");
                                 next = STATE_PLAYING;
                             }
                         } break;
@@ -326,7 +326,7 @@ namespace man{
                         case STATE_SET: {
                             shared_memory->whistle_listen = true;
                             if (shared_memory->whistle_heard) {
-                                printf(":::: WHISTLE OVERRIDE ::::\n");
+//                                printf(":::: WHISTLE OVERRIDE :::: (RE)\n");
                                 next = STATE_PLAYING;
                             }
 
