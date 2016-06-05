@@ -99,6 +99,29 @@ std::pair<double, int> peak1() {
     return {mv, mi};
 }
 
+std::pair<double, int> peak2( int astart, int aend ) {
+    double mv = 0;
+    int mi = 0;
+
+    for (int i = 0; i < astart; ++i) {
+        double iv = std::abs(transform->outputmag[i]);
+        if (iv > mv) {
+            mv = iv;
+            mi = i;
+        }
+    }
+
+    for (int i = aend + 1; i < transform->get_freq_len(); ++i) {
+        double iv = std::abs(transform->outputmag[i]);
+        if (iv > mv) {
+            mv = iv;
+            mi = i;
+        }
+    }
+
+    return {mv, mi};
+}
+
 double sum(int start, int end) {
     NBL_ASSERT_GT(transform->get_freq_len(), end);
     double total = 0;
@@ -109,9 +132,11 @@ double sum(int start, int end) {
     return total;
 }
 
-const int whistleWindow = 100;
-const std::pair<int,int> whistleRange = {1000,2000}
-const double whistleThreshold = 1000;
+const int whistleWindow = 50;
+const std::pair<int,int> whistleRange = {1000,2000};
+const double whistleThreshold = 600.0;
+const double whistleSumThreshold = 1000000;
+const double secondPeakMult = 4.0;
 
 void callback(nbsound::Handler * cap, void * buffer, nbsound::parameter_t * params) {
     bool listening = (!shared_memory || shared_memory->whistle_listen);
@@ -122,6 +147,31 @@ void callback(nbsound::Handler * cap, void * buffer, nbsound::parameter_t * para
 
             std::pair<double, int> p1 = peak1();
             printf("%d: %lf\n", p1.second, p1.first);
+
+            if (p1.first < whistleThreshold) {
+                printf("too quiet!\n");
+                continue;
+            }
+
+            if (p1.second >= whistleRange.first && p1.second <= whistleRange.second) {
+                printf("in range!\n");
+
+                int wstart = std::max(0, p1.second - whistleWindow);
+                int wend = std::min(transform->get_freq_len(), p1.second + whistleWindow);
+
+                std::pair<double, int> p2 = peak2(wstart, wend);
+
+                printf("outside {%d, %d}: %d: %lf\n",
+                       wstart, wend, p2.second, p2.first);
+
+                double sum1 = sum(wstart, wend);
+
+                if ( (p2.first * secondPeakMult) < (p1.first) &&
+                    sum1 > whistleSumThreshold ) {
+                    printf("WHISTLE HEARD! {%lf}\n", sum1);
+                }
+            }
+
         }
     }
 
