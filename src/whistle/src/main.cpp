@@ -138,10 +138,16 @@ double sum(int start, int end) {
 //const double whistleSumThreshold = 1000000;
 //const double secondPeakMult = 4.0;
 
-const int whistleWindow = 100;
+//const int whistleWindow = 100;
+//const std::pair<int,int> whistleRange = {1000,2000};
+//const double whistleThreshold = 200.0;
+//const double whistleSumThreshold = 5000000;
+//const double secondPeakMult = 2.0;
+
+const int whistleWindow = 200;
 const std::pair<int,int> whistleRange = {1000,2000};
 const double whistleThreshold = 200.0;
-const double whistleSumThreshold = 5000000;
+const double whistleSumThreshold = 15000000;
 const double secondPeakMult = 2.0;
 
 void callback(nbsound::Handler * cap, void * buffer, nbsound::parameter_t * params) {
@@ -190,7 +196,7 @@ void callback(nbsound::Handler * cap, void * buffer, nbsound::parameter_t * para
 }
 
 int main(int argc, const char ** argv) {
-    printf("\t9:21 AM\n");
+    printf("\t11:29 AM\n");
 	printf("\tversion=%d\n", VERSION);
     signal(SIGINT, handler);
     signal(SIGTERM, handler);
