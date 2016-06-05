@@ -28,7 +28,9 @@ def gameInitial(player):
         ### HACK CHINA 2015 ###
         ### DROP IN PLAYER ###
         # enter player role here; make sure it matches the one in pDropin
-        player.role = 1
+        # player.role = 4
+        print "Commented out player role in drop in states"
+        print "Player.role is", player.role
 
     # If stiffnesses were JUST turned on, then stand up.
     if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
@@ -115,6 +117,7 @@ def gamePlaying(player):
         if player.brain.gameController.ownKickOff:
             if (roleConstants.isChaser(player.role) or roleConstants.isCherryPicker(player.role)
                and player.brain.ball.vis.on):
+                print "PLAYER ROLE IS CHASER/CHERRY PICKER", player.role
                 player.shouldKickOff = True
                 return player.goNow('approachBall')
             else:

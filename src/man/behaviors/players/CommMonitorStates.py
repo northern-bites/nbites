@@ -16,7 +16,7 @@ from ..util import *
 @superState('roleSwitcher')
 def commMonitor(player):
 
-    # role switching off for dropplayer
+    # role switching off for drop in player
     if player.dropIn:
         pass
 
@@ -25,6 +25,7 @@ def commMonitor(player):
         pass
     elif player.commMode != 2 and transitions.awfulComm(player):
         print "Switched to awful comm mode!"
+        print "Setting player role to player number in CommMonitorStates."
         player.role = player.brain.playerNumber
         player.prevRoleConfig = RoleConstants.roleConfiguration
         RoleConstants.roleConfiguration = RoleConstants.spread
