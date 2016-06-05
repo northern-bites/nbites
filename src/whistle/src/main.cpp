@@ -8,8 +8,12 @@
 
 #include "Sound.h"
 #include "Transform.h"
+
 #include "nblogio.h"
 #include "utilities.hpp"
+#include "Logging.hpp"
+#include "Log.hpp"
+#include "Control.hpp"
 
 #define WHISTLE_COMPILE
 #include "../../share/include/SharedData.h"
@@ -17,7 +21,7 @@
 const int VERSION = 3;
 const char * WHISTLE_LOG_PATH = "/home/nao/nbites/log/whistle";
 
-using namespace nblog;
+using namespace nbl;
 
 nbsound::Capture * capture = NULL;
 nbsound::Transform * transform = NULL;
@@ -153,6 +157,17 @@ const double secondPeakMult = 2.0;
 void callback(nbsound::Handler * cap, void * buffer, nbsound::parameter_t * params) {
     bool listening = (!shared_memory || shared_memory->whistle_listen);
 
+    if (!shared_memory) {
+        int length = nbsound::APP_BUFFER_SIZE(*params);
+        std::string newData( (const char *) buffer, length);
+
+        printf("sending....\n");
+        nbl::logptr newLog = nbl::Log::emptyLog();
+        newLog->logClass = "soundStuff";
+        newLog->blocks.push_back(nbl::Block{newData, "soundStuff"});
+        nbl::NBLog(newLog, nbl::Q_FILESYSTEM);
+    }
+
     if (listening && buffer && transform) {
         for (int i = 0; i < params->channels; ++i) {
             transform->transform(buffer, i);
@@ -228,6 +243,9 @@ int main(int argc, const char ** argv) {
         printf("main: standalone!\n");
         shared_memory_fd = 0;
         shared_memory = nullptr;
+
+        nbl::initiateLogging();
+        control::set(control::flags::logToFilesystem, 1);
     }
 
 

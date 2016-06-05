@@ -6,7 +6,7 @@ HDR= src/*.h
 
 whistle: $(HDR) $(SRC)
 	@echo $(CYAN) "Compiling whistle.." $(NORMAL)
-	g++ -std=c++11 -o whistle $(SRC) lib/libfftw3f.a -lasound -lpthread -lrt
+	g++ -std=c++11 -o whistle -D NBL_STANDALONE $(SRC) lib/libfftw3f.a -lasound -lpthread -lrt
 
 clean:
 	rm whistle

@@ -284,6 +284,7 @@ namespace man{
 
                         case STATE_SET: {
                             shared_memory->whistle_listen = true;
+                            shared_memory->whistle_heard = false;
                         } break;
                             
                         case STATE_PLAYING: {
