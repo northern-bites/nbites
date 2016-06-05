@@ -15,7 +15,7 @@
 #include "../../share/include/SharedData.h"
 
 const int VERSION = 3;
-const char * WHISTLE_LOG_PATH = "/home/nao/nbites/log/whistle";
+const char * WHISTLE_LOG_PATH = "/home/nao/nbites/log/manlog";
 
 using namespace nblog;
 
@@ -131,12 +131,18 @@ double sum(int start, int end) {
 
     return total;
 }
+//
+//const int whistleWindow = 50;
+//const std::pair<int,int> whistleRange = {1000,2000};
+//const double whistleThreshold = 600.0;
+//const double whistleSumThreshold = 1000000;
+//const double secondPeakMult = 4.0;
 
-const int whistleWindow = 50;
+const int whistleWindow = 100;
 const std::pair<int,int> whistleRange = {1000,2000};
-const double whistleThreshold = 600.0;
-const double whistleSumThreshold = 1000000;
-const double secondPeakMult = 4.0;
+const double whistleThreshold = 200.0;
+const double whistleSumThreshold = 5000000;
+const double secondPeakMult = 2.0;
 
 void callback(nbsound::Handler * cap, void * buffer, nbsound::parameter_t * params) {
     bool listening = (!shared_memory || shared_memory->whistle_listen);
@@ -168,7 +174,7 @@ void callback(nbsound::Handler * cap, void * buffer, nbsound::parameter_t * para
 
                 if ( (p2.first * secondPeakMult) < (p1.first) &&
                     sum1 > whistleSumThreshold ) {
-                    printf("WHISTLE HEARD! {%lf}\n", sum1);
+                    NBL_WARN("WHISTLE HEARD! {%lf}\n", sum1);
                 }
             }
 
@@ -179,6 +185,7 @@ void callback(nbsound::Handler * cap, void * buffer, nbsound::parameter_t * para
 }
 
 int main(int argc, const char ** argv) {
+    printf("\t9:21 AM\n");
 	printf("\tversion=%d\n", VERSION);
     signal(SIGINT, handler);
     signal(SIGTERM, handler);
