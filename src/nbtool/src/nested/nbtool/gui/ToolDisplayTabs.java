@@ -63,6 +63,7 @@ public class ToolDisplayTabs {
 		
 		for (int i = 0; i < list.length; ++i) {
 			Class<? extends ViewParent> ttype = list[i];
+			debug.info("creating tab %d...", i);
 
 			boolean slip = false;
 			boolean wrap = false;
@@ -96,8 +97,8 @@ public class ToolDisplayTabs {
 			}	
 		}
 		
-		for (int j = list.length; j < display.displayTabs.getTabCount(); ++j) {
-			display.displayTabs.remove(j);
+		while (list.length != display.displayTabs.getTabCount()) {
+			display.displayTabs.remove(display.displayTabs.getTabCount() - 1);
 		}
 	}
 	
@@ -144,7 +145,11 @@ public class ToolDisplayTabs {
 			if (!ran) {
 				create();
 				ran = true;
-				SwingUtilities.invokeLater(this);
+				if (SwingUtilities.isEventDispatchThread()) {
+					this.run();
+				} else {
+					SwingUtilities.invokeLater(this);
+				}
 			} else {
 				add();
 			}
