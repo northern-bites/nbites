@@ -69,11 +69,24 @@ public interface MotionCommandOrBuilder extends
   messages.OdometryWalkOrBuilder getOdometryDestOrBuilder();
 
   /**
-   * <code>optional int64 timestamp = 6;</code>
+   * <code>optional .messages.Kick kick = 6;</code>
+   */
+  boolean hasKick();
+  /**
+   * <code>optional .messages.Kick kick = 6;</code>
+   */
+  messages.Kick getKick();
+  /**
+   * <code>optional .messages.Kick kick = 6;</code>
+   */
+  messages.KickOrBuilder getKickOrBuilder();
+
+  /**
+   * <code>optional int64 timestamp = 7;</code>
    */
   boolean hasTimestamp();
   /**
-   * <code>optional int64 timestamp = 6;</code>
+   * <code>optional int64 timestamp = 7;</code>
    */
   long getTimestamp();
 }

@@ -53,11 +53,11 @@ public interface VBallOrBuilder extends
   double getBearingSd();
 
   /**
-   * <code>optional bool inTopCam = 6;</code>
+   * <code>optional bool in_top_cam = 6;</code>
    */
   boolean hasInTopCam();
   /**
-   * <code>optional bool inTopCam = 6;</code>
+   * <code>optional bool in_top_cam = 6;</code>
    */
   boolean getInTopCam();
 
