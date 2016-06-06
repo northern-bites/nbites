@@ -35,48 +35,12 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 		return false;
 	}
 	
-	final VisionView outer = this;
+	/******
+	 * These variables and methods are provided as helpers.
+	 */
 	
 	/* latest from nbcross */
 	protected Log latestVisionLog = null;
-
-	@Override
-	public final String[] displayableTypes() {
-		return new String[]{SharedConstants.LogClass_Tripoint()};
-	}
-	
-	@Override
-	public final boolean ioMayRespondOnCenterThread(IOInstance inst) {
-		return false;
-	}
-
-	@Override
-	public final void setupDisplay() {
-		if (callVision() || continueIfNoNBCross()) {
-			setupVisionDisplay();
-		} else {
-			Debug.error("%s view not loading because it could not call Vision()", 
-					this.getClass().getName());
-			this.setLayout(null);
-			final NBCrossErrorPane errorPanel = new NBCrossErrorPane();
-			this.add(errorPanel);
-			
-			this.addComponentListener(new ComponentListener(){
-				@Override
-				public void componentResized(ComponentEvent e) {reset(errorPanel);}
-				@Override
-				public void componentMoved(ComponentEvent e) {reset(errorPanel);}
-				@Override
-				public void componentShown(ComponentEvent e) {reset(errorPanel);}
-				@Override
-				public void componentHidden(ComponentEvent e) {reset(errorPanel);}
-			});
-		}
-	}
-	
-	private final void reset(NBCrossErrorPane panel) {
-		panel.setBounds(10,10,this.getSize().width - 20, this.getSize().height - 20);
-	}
 	
 	protected final boolean callVision() {
 		return callVision(displayedLog);
@@ -181,6 +145,49 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 	
 	protected final Block getDebugImageBlock() {
 		return latestVisionLog == null ? null : latestVisionLog.find("debugImage");
+	}
+	
+	/******
+	 * Begin internal implementation.
+	 */
+	final VisionView outer = this;
+
+	@Override
+	public final String[] displayableTypes() {
+		return new String[]{SharedConstants.LogClass_Tripoint()};
+	}
+	
+	@Override
+	public final boolean ioMayRespondOnCenterThread(IOInstance inst) {
+		return false;
+	}
+
+	@Override
+	public final void setupDisplay() {
+		if (callVision() || continueIfNoNBCross()) {
+			setupVisionDisplay();
+		} else {
+			Debug.error("%s view not loading because it could not call Vision()", 
+					this.getClass().getName());
+			this.setLayout(null);
+			final NBCrossErrorPane errorPanel = new NBCrossErrorPane();
+			this.add(errorPanel);
+			
+			this.addComponentListener(new ComponentListener(){
+				@Override
+				public void componentResized(ComponentEvent e) {reset(errorPanel);}
+				@Override
+				public void componentMoved(ComponentEvent e) {reset(errorPanel);}
+				@Override
+				public void componentShown(ComponentEvent e) {reset(errorPanel);}
+				@Override
+				public void componentHidden(ComponentEvent e) {reset(errorPanel);}
+			});
+		}
+	}
+	
+	private final void reset(NBCrossErrorPane panel) {
+		panel.setBounds(10,10,this.getSize().width - 20, this.getSize().height - 20);
 	}	
 	
 	private class NBCrossErrorPane extends JPanel {
