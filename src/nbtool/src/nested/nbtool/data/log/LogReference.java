@@ -282,8 +282,8 @@ public class LogReference {
 	
 	@Override
 	public String toString() {
-		return String.format("LogReference(of:%d, temp@%s, load@%s ())",
-				savedID, tempPath, loadPath, temporary() ? "TEMP" : "PERM");
+		return String.format("LogReference[r%d](of:%d, load@%s, temp@%s ())",
+				thisID, savedID, loadPath, tempPath, temporary() ? "TEMP" : "PERM");
 	}
 	
 	public String guiString() {
