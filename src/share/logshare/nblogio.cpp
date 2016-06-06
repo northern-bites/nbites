@@ -41,7 +41,9 @@ namespace nbl {
 
         const char LOCAL_HOST_ADDR[] = "127.0.0.1";
 
-        FileMonitor::FileMonitor(const char * file, bool trueOnFirst) {
+        FileMonitor::FileMonitor(const char * file, bool trueOnFirst) :
+            fd(0), last(0)
+        {
             fd = open(file, O_RDONLY);
             if (!fd) {
                 int err = errno;

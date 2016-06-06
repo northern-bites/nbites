@@ -19,8 +19,8 @@ namespace nbl {
 
         class FileMonitor {
         private:
-            int fd = 0;
-            time_t last = 0;
+            int fd;
+            time_t last;
 
         public:
             FileMonitor(const char * file, bool trueOnFirst);
