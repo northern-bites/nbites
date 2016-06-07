@@ -21,8 +21,8 @@ FLAG_XM(tripoint_bottom_only),
 
 FLAG_XM(locswarm),
 
-FLAG_XM(state_penalty_override),
 FLAG_XM(state_playing_override),
+FLAG_XM(state_penalty_override),
 
 FLAG_XM(SENSORS),
 FLAG_XM(GUARDIAN),

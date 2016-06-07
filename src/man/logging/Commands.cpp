@@ -57,6 +57,14 @@ namespace control {
             RETURN(createFlagStateLog());
         }
 
+    CONTROL_FUNCTION(SetTextFileContents, false, nbl::SharedConstants::LogClass_String())
+        (const std::vector<nbl::logptr> &arguments) {
+
+            NBL_ASSERT(arguments.size() == 1)
+            std::string path = arguments[0]->topLevelDictionary["TextFilePath"].asString();
+            nbl::io::writeStringToFile(arguments[0]->blocks[0].data, path);
+        }
+
 }
 
 #if !defined(NBL_STANDALONE) && !defined(__APPLE__)

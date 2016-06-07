@@ -56,6 +56,8 @@ public class UserSettings {
 
 	public static LogLevel logLevel = LogLevel.levelINFO;
 	
+	public static String venue = "edwards16";
+	
 	private static final String INTERNAL_KEY = "__INTERNAL__";
 	private static final String BOUNDS_KEY = "__BOUNDS__";
 	private static final String ADDR_KEY = "__ADDRESSES__";
@@ -63,6 +65,8 @@ public class UserSettings {
 	private static final String LL_KEY = "__LOGLEVEL__";
 	
 	public static final String PROFILES_KEY = "__PROFILES__";
+	
+	public static final String VENUE_KEY = "__VENUE__";
 	
 	public static class DisplaySettings {
 		public Rectangle bounds = null;
@@ -160,6 +164,7 @@ public class UserSettings {
 		}
 		
 		internal.put(LL_KEY, logLevel.name());
+		internal.put(VENUE_KEY, venue);
 		
 		internal.put(PROFILES_KEY, ViewProfile.serializeProfiles());
 		
@@ -211,6 +216,11 @@ public class UserSettings {
 		JsonObject bounds = internal.remove(BOUNDS_KEY).asObject();
 		JsonArray addr = internal.remove(ADDR_KEY).asArray();
 		JsonArray load = internal.remove(LOAD_KEY).asArray();
+		
+		if (internal.containsKey(VENUE_KEY)) {
+			JsonString _venue = internal.remove(VENUE_KEY).asString();
+			venue = _venue.value;
+		}
 		
 		for (Entry<JsonString, JsonValue> entry : bounds.entrySet()) {
 			BOUNDS_MAP.put(entry.getKey().value, new DisplaySettings(entry.getValue()));

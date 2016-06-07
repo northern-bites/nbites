@@ -64,6 +64,9 @@ namespace nbl {
         NBL_CREATE_CONSTANT_METHOD(LogClass_Tripoint)
         NBL_CREATE_CONSTANT_METHOD(LogClass_YUVImage)
 
+        NBL_CREATE_CONSTANT_METHOD(LogClass_EdgeImage)
+        NBL_CREATE_CONSTANT_METHOD(LogClass_String)
+
         NBL_CREATE_CONSTANT_METHOD(LogClass_RPC_Call)
         NBL_CREATE_CONSTANT_METHOD(LogClass_RPC_Return)
         NBL_CREATE_CONSTANT_METHOD(RPC_NAME)

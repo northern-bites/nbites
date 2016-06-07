@@ -289,6 +289,15 @@ public class ToolDisplayHandler implements
 				setupViewProfileBox();
 			}
 		}, true);	
+		
+		display.venueField.setText(UserSettings.venue);
+		
+		display.venueField.addKeyListener(new KeyAdapter(){
+			@Override
+			public void keyTyped(KeyEvent e) {
+				UserSettings.venue = display.venueField.getText();
+			}
+		});
 
 		JPanel utilityHolder = new JPanel();
 		//utilityHolder.setLayout(new BoxLayout(utilityHolder, BoxLayout.Y_AXIS));
@@ -302,7 +311,7 @@ public class ToolDisplayHandler implements
 	}
 	
 	private void controlSelectAction() {
-		Path selected = PathChooser.chooseDirPath(display);
+		Path selected = PathChooser.chooseDirPath(display, null);
 		if (selected != null) {
 			if (FileIO.isValidLogFolder(selected)) {
 				updateComboBoxAndSettings(display.pathBox, UserSettings.loadPathes, selected);
