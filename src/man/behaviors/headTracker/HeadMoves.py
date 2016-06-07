@@ -512,4 +512,10 @@ SNAP_PAN = (((-67.5, 25), SNAP_PAN_TIME*2, 1, stiff.LOW_HEAD_STIFFNESSES),
             (( 33.75, 25), SNAP_PAN_TIME,   1, stiff.LOW_HEAD_STIFFNESSES),
             (( 33.75, 25), SNAP_PAN_WAIT_TIME,   1, stiff.LOW_HEAD_STIFFNESSES),
             (( 67.5, 25), SNAP_PAN_TIME,   1, stiff.LOW_HEAD_STIFFNESSES),
-            (( 67.5, 25), SNAP_PAN_WAIT_TIME,   1, stiff.LOW_HEAD_STIFFNESSES))
+            (( 67.5, 25), SNAP_PAN_WAIT_TIME,   1, stiff.LOW_HEAD_STIFFNESSES),
+            (( 33.75, 25), SNAP_PAN_TIME,   1, stiff.LOW_HEAD_STIFFNESSES),
+            (( 33.75, 25), SNAP_PAN_WAIT_TIME,   1, stiff.LOW_HEAD_STIFFNESSES),
+            (( 0.0, 25), SNAP_PAN_TIME,   1, stiff.LOW_HEAD_STIFFNESSES),
+            (( 0.0, 25), SNAP_PAN_WAIT_TIME,   1, stiff.LOW_HEAD_STIFFNESSES),
+            ((-33.75, 25), SNAP_PAN_TIME,   1, stiff.LOW_HEAD_STIFFNESSES),
+            ((-33.75, 25), SNAP_PAN_WAIT_TIME,   1, stiff.LOW_HEAD_STIFFNESSES))
