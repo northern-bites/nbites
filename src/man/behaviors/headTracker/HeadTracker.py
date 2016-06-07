@@ -97,6 +97,24 @@ class HeadTracker(FSA.FSA):
     def repeatSnapPan(self):
         self.repeatHeadMove(HeadMoves.SNAP_PAN)
 
+    def performWideSnapPan(self):
+        self.performHeadMove(HeadMoves.WIDE_SNAP_PAN)
+
+    def repeatWideSnapPan(self):
+        self.repeatHeadMove(HeadMoves.WIDE_SNAP_PAN)
+
+    def performFastSnapPan(self):
+        self.performHeadMove(HeadMoves.FAST_SNAP_PAN)
+
+    def repeatFastSnapPan(self):
+        self.repeatHeadMove(HeadMoves.FAST_SNAP_PAN)
+
+    def performWideFastSnapPan(self):
+        self.performHeadMove(HeadMoves.WIDE_FAST_SNAP_PAN)
+
+    def repeatWideFastSnapPan(self):
+        self.repeatHeadMove(HeadMoves.WIDE_FAST_SNAP_PAN)
+
     def performWidePan(self):
         print "performWidePan"
         self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
@@ -115,7 +133,7 @@ class HeadTracker(FSA.FSA):
 
     def repeatFastNarrowPan(self):
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN_NARROW_FAST)
-        
+
     # @param invert: false if pan should start to the left,
     #                true if pan should start to the right
     def performKickPan(self, invert = False):
