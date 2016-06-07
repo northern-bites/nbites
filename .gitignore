@@ -33,4 +33,4 @@ _tempFiles
 .nbtemp/*
 src/sound
 /src/nbtool/gui-forms/nbproject/private/
-
+util/GameController/logs_teamcomm/
