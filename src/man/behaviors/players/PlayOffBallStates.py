@@ -108,7 +108,8 @@ def doPan(player):
     """
     if player.firstFrame():
         player.stand()
-        player.brain.tracker.repeatWidePan()
+        # @SNAPPAN-CHANGE
+        player.brain.tracker.repeatWideSnapPan()
 
     while player.stateTime < 5:
         return player.stay()
@@ -168,7 +169,8 @@ def searchFieldForSharedBall(player):
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.brain.tracker.repeatBasicPan()
+        # @SNAPPAN-CHANGE
+        player.brain.tracker.repeatSnapPan()
         player.sharedBallCloseCount = 0
         player.sharedBallOffCount = 0
         player.brain.nav.goTo(sharedball, precision = nav.GENERAL_AREA,
@@ -199,7 +201,8 @@ def searchFieldForFlippedSharedBall(player):
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.brain.tracker.repeatBasicPan()
+        # @SNAPPAN-CHANGE
+        player.brain.tracker.repeatSnapPan()
         player.sharedBallCloseCount = 0
         player.brain.nav.goTo(sharedball, precision = nav.GENERAL_AREA,
                               speed = nav.QUICK_SPEED, avoidObstacles = True,
@@ -225,7 +228,8 @@ def searchFieldByQuad(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.brain.tracker.repeatBasicPan()
+        # @SNAPPAN-CHANGE
+        player.brain.tracker.repeatSnapPan()
         searchFieldByQuad.dest = min(points, key=lambda x:fabs(player.brain.loc.distTo(x)))
         player.brain.nav.goTo(searchFieldByQuad.dest, precision = nav.GRAINY,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,

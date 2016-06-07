@@ -98,7 +98,8 @@ def scrumStrategy(player):
 def backPedal(player):
     if player.firstFrame():
         player.setWalk(constants.BACK_PEDAL_SPEED, 0., 0.)
-        player.brain.tracker.repeatFastNarrowPan()
+        # @SNAPPAN-CHANGE - used to be fast narrow pan
+        player.brain.tracker.repeatSnapPan()
 
     elif player.stateTime > constants.BACK_PEDAL_TIME:
         return player.goLater('spinSearch')
@@ -130,6 +131,7 @@ def farBallSearch(player):
 def walkToBallModel(player):
     if player.firstFrame():
         player.brain.nav.chaseBall(Navigator.FAST_SPEED, fast = True)
-        player.brain.tracker.repeatFastNarrowPan()
+        # @SNAPPAN-CHANGE - used to be fast narrow pan
+        player.brain.tracker.repeatSnapPan()
     elif player.stateTime > 5:
         return player.goLater('spinSearch')

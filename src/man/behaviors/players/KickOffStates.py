@@ -14,6 +14,7 @@ def giveAndGo(player):
 
 @superState('gameControllerResponder')
 def passToCorner(player):
+    print "Hey, we're using kickoff states!"
     if player.firstFrame():
         player.passBack = True
         if roleConstants.isFirstChaser(player.role):
@@ -23,7 +24,8 @@ def passToCorner(player):
             player.inKickingState = True
             return player.goNow('approachBall')
         elif roleConstants.isSecondChaser(player.role) or roleConstants.isCherryPicker(player.role):
-            player.brain.tracker.repeatFastNarrowPan()
+            # @SNAPPAN-CHANGE - used to be fast narrow pan
+            player.brain.tracker.repeatSnapPan()
             passDestination = Location(nogginC.OPP_GOALBOX_LEFT_X, 60.)
             player.brain.nav.goTo(passDestination, Navigator.GENERAL_AREA, Navigator.QUICK_SPEED, 
                                 True, False, True, False)
@@ -49,7 +51,8 @@ def passToFieldCross(player):
     if player.firstFrame():
         player.passBack = False
         if roleConstants.isFirstChaser(player.role):
-            player.brain.tracker.repeatFastNarrowPan()
+            # @SNAPPAN-CHANGE - This used to be fast narrow pan
+            player.brain.tracker.repeatSnapPan()
             fieldCross = Location(nogginC.LANDMARK_OPP_FIELD_CROSS[0], nogginC.LANDMARK_OPP_FIELD_CROSS[1])
             player.brain.nav.goTo(fieldCross, Navigator.GENERAL_AREA, Navigator.QUICK_SPEED, 
                                 True, False, True, False)

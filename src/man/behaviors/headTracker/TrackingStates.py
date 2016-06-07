@@ -31,7 +31,7 @@ def tracking(tracker):
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
         if (tracker.target.vis.frames_off >
             constants.TRACKER_FRAMES_OFF_REFIND_THRESH):
-            return tracker.goLater('snapPan')
+            return tracker.repeatFastWidePan()
 
     return tracker.stay()
 
@@ -175,6 +175,7 @@ def lookStraightThenTrack(tracker):
 
     return tracker.stay()
 
+# @SNAPPAN-CHANGE
 def fullPan(tracker):
     print "It's fullPan time"
     """
@@ -187,11 +188,11 @@ def fullPan(tracker):
         request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
         # Smartly start the pan
-        tracker.helper.startingPan(HeadMoves.FIXED_PITCH_PAN)
+        tracker.helper.startingPan(HeadMoves.SNAP_PAN)
 
     if not tracker.brain.motion.head_is_active:
         # Repeat the pan
-        tracker.performHeadMove(HeadMoves.FIXED_PITCH_PAN)
+        tracker.performHeadMove(HeadMoves.SNAP_PAN)
 
     if not isinstance(tracker.target, Vision.messages.FilteredBall):
         if tracker.target.on:
@@ -203,6 +204,9 @@ def fullPan(tracker):
 
     return tracker.stay()
 
+# @SNAPPAN-CHANGE - We don't use this state anymore; instead, we use head tracking
+# states paired with specialized head moves.
+"""
 def snapPan(tracker):  
     print "Entering SnapPan function"
 
@@ -255,6 +259,7 @@ def snapPan(tracker):
         return tracker.goLater('tracking')
 
     return tracker.stay()
+"""
 
 def bounceFullPan(tracker):
     """

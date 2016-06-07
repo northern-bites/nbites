@@ -151,9 +151,9 @@ class HeadTracker(FSA.FSA):
             self.bounceTrackBall()
             return
 
-        if (self.currentState is not 'snapPan' and
+        if (self.currentState is not 'snapPan' and # SNAPPAN -- what is going on here?
             self.currentState is not 'tracking'):
-            self.switchTo('tracking')
+            self.switchTo('tracking') # which is in TrackingStates.py
 
     def bounceTrackBall(self):
         """

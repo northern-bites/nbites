@@ -212,7 +212,8 @@ def watchWithLineChecks(player):
         and not watchWithLineChecks.looking
         and not watchWithLineChecks.hasPanned):
         watchWithLineChecks.looking = True
-        player.brain.tracker.performBasicPan()
+        # @SNAPPAN-CHANGE
+        player.brain.tracker.performSnapPan()
         watchWithLineChecks.hasPanned = True
 
     if player.brain.tracker.isStopped():
@@ -274,7 +275,8 @@ def returnUsingLoc(player):
     if (player.counter % 90 == 0):
         print("Switching headtracker")
         if not returnUsingLoc.panning:
-            player.brain.tracker.repeatBasicPan()
+            # @SNAPPAN-CHANGE
+            player.brain.tracker.repeatSnapPan()
         else:
             player.brain.tracker.trackBall
 

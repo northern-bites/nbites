@@ -79,7 +79,8 @@ def gameSet(player):
         player.gainsOn()
         player.stand()
         player.brain.nav.stand()
-        player.brain.tracker.performWidePan()
+        # @SNAPPAN-CHANGE
+        player.brain.tracker.performWideSnapPan()
 
         if player.wasPenalized:
             player.wasPenalized = False

@@ -118,7 +118,8 @@ def afterPenalty(player):
                 " Right Diff: ", afterPenalty.rightDiff, " StateCount: ", afterPenalty.stateCount
             print "RSUM: ", afterPenalty.rightHorizSum, " LSUM: ", afterPenalty.leftHorizSum
 
-        player.brain.tracker.repeatWidePan()
+        # @SNAPPAN-CHANGE
+        player.brain.tracker.repeatWideSnapPan()
 
         if not roleConstants.isGoalie(player.role):
             return player.goNow('walkOut')
