@@ -5,7 +5,6 @@
 #include "RoboCupGameControlData.h"
 #include "Common.h"
 
-#include "exactio.h"
 #include <netinet/in.h>
 #include <stdlib.h>
 #include <stdint.h>
