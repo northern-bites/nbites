@@ -45,7 +45,8 @@ def gameReady(player):
         player.inKickingState = False
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
-        player.brain.tracker.repeatBasicPan()
+        # @SNAPPAN-CHANGE
+        player.brain.tracker.repeatSnapPan()
 
         player.timeReadyBegan = player.brain.time
         if player.lastDiffState == 'gameInitial':
