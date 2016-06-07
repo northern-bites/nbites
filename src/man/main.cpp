@@ -8,15 +8,22 @@
 
 #include <sys/file.h>
 #include <errno.h>
+#include <unistd.h>
 
 int lockFD = 0;
+pid_t whistlePID = 0;
 man::Man* instance;
+
 //const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
-const char * MAN_LOG_PATH = "/home/nao/nbites/log/nblog";
+const char * MAN_LOG_PATH = "/home/nao/nbites/log/manlog";
 
 void cleanup() {
     instance->preClose();
     flock(lockFD, LOCK_UN);
+
+    if (whistlePID > 0) {
+        kill(whistlePID, SIGTERM);
+    }
 
     printf("Man closing output streams...\n");
     fflush(stderr);
@@ -50,6 +57,7 @@ void error_signal_handler(int signal) {
 
     cleanup();
 
+    printf("error_signal_handler() done.\n");
     exit(-1);
 }
 
@@ -77,6 +85,12 @@ int main() {
     establishLock();
 
     signal(SIGSEGV, error_signal_handler);
+
+    printf("forking for whistle...\n");
+    whistlePID = fork();
+    if (whistlePID == 0) {
+         execl("/home/nao/whistle", "", NULL);
+    }
 
     printf("\t\tCOMPILED WITH BOSS VERSION == %d\n", BOSS_VERSION);
     

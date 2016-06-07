@@ -1,5 +1,5 @@
 //
-//  exactio.h
+//  nblogio.h
 //
 //  Created by Philip Koch on 3/19/16.
 //
@@ -12,9 +12,23 @@
 #include <sstream>
 
 #include <fcntl.h>
+#include <arpa/inet.h>
 
-namespace nblog {
+namespace nbl {
     namespace io {
+
+        class FileMonitor {
+        private:
+            int fd = 0;
+            time_t last = 0;
+
+        public:
+            FileMonitor(const char * file, bool trueOnFirst);
+            ~FileMonitor();
+
+            bool update();
+            void close();
+        };
 
         /* exact io on file descriptors */
 
@@ -82,10 +96,14 @@ namespace nblog {
 
         extern ioret connect_to( client_socket_t& sock, int port, const char * host );
 
-#ifdef __APPLE__
-#define NETIO_FLAGS 0
+#ifdef OFFLINE
+    #define NETIO_FLAGS 0
 #else
-#define NETIO_FLAGS MSG_NOSIGNAL
+    #ifdef __APPLE__
+        #define NETIO_FLAGS (MSG_DONTWAIT)
+    #else
+        #define NETIO_FLAGS (MSG_NOSIGNAL | MSG_DONTWAIT)
+    #endif
 #endif
 
         extern const iotime_t IO_EXPECTING_ST;

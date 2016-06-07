@@ -3,13 +3,13 @@
 //  tool8-separate
 //
 //  Created by Philip Koch on 3/28/16.
-//  Copyright © 2016 pkoch. All rights reserved.
 //
 
 #include <string>
 #include <string>
 #include <algorithm>
 #include <sstream>
+#include <stdexcept>
 
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -31,19 +31,63 @@
 
 #include "nblogio.h"
 
-#include "utilities.hpp"
-#define NBL_LOGLEVEL WARN
+#include "Log.hpp"
 
-namespace nblog {
+#include "utilities.hpp"
+#define NBL_LOGGING_LEVEL NBL_WARN_LEVEL
+
+namespace nbl {
     namespace io {
 
         const char LOCAL_HOST_ADDR[] = "127.0.0.1";
+
+        FileMonitor::FileMonitor(const char * file, bool trueOnFirst) {
+            fd = open(file, O_RDONLY);
+            if (!fd) {
+                int err = errno;
+                throw std::runtime_error{utilities::format("could not open file: %s: %s",
+                                                           file,
+                                                           utilities::get_error(err).c_str()
+                                                           )};
+            }
+
+            if (!trueOnFirst) {
+                update();
+            }
+        }
+
+        FileMonitor::~FileMonitor() {
+            close();
+        }
+
+        bool FileMonitor::update() {
+            if (fd) {
+                struct stat buf;
+                fstat(fd, &buf);
+                double diff = difftime(buf.st_mtime, last);
+                if (diff > 0) {
+                    last = buf.st_mtime;
+                    return true;
+                } else return false;
+            } else {
+                throw std::runtime_error("FileMonitor: cannot call update() after close()");
+            }
+
+
+        }
+
+        void FileMonitor::close() {
+            if (fd) {
+                ::close(fd);
+                fd = 0;
+            }
+        }
 
         const iotime_t IO_EXPECTING_ST  = 1000;
         const iotime_t IO_NOT_EXPECTING_ST = 500000;
 
         iotime_t IO_MAX_DELAY() {
-            return 5000000;
+            return SharedConstants::REMOTE_HOST_TIMEOUT();
         }
 
 #define MICROSECONDS_MOD_SECONDS(us) (us % 1000000)
@@ -53,9 +97,18 @@ namespace nblog {
             int r1 = gettimeofday(&tv, NULL);
             NBL_ASSERT_EQ(r1, 0);
 
-            ts.tv_sec = tv.tv_sec + io_to_s(fromNow);
-            ts.tv_nsec =  (tv.tv_usec + MICROSECONDS_MOD_SECONDS(fromNow))
-                * 1000;
+            long long total_ns = tv.tv_sec * 1e9 + tv.tv_usec * 1000;
+            total_ns += fromNow * 1000;
+
+            long long int seconds = total_ns / 1e9;
+            long long int nsec = total_ns - (1e9 * seconds);
+
+            ts.tv_sec = seconds;
+            ts.tv_nsec =  nsec;
+
+            NBL_ASSERT_GT(ts.tv_sec, 0);
+            NBL_ASSERT_GT(ts.tv_nsec, 0);
+            NBL_ASSERT_LT(ts.tv_nsec, 1e9);
 
             return ts;
         }
@@ -89,7 +142,7 @@ namespace nblog {
                 } else if (ret < 0) {
 
                     std::string error = utilities::get_error(saved_err);
-                    NBL_LOG(WARN, "***%s*** got error: %s", (stub_name) ? stub_name : "exactio",
+                    NBL_WARN( "***%s*** got error: %s", (stub_name) ? stub_name : "exactio",
                             error.c_str());
                     return ERROR;
 
@@ -135,6 +188,7 @@ namespace nblog {
             }
 
             readFileToString(buf, fd);
+            close(fd);
         }
 
         void readFileToString(std::string& buf, int fd) {
@@ -159,6 +213,7 @@ namespace nblog {
             size_t size = buf.size();
             ioret ret = write_exact(fd, size, &buf[0]);
             NBL_ASSERT(!ret)
+            close(fd);
         }
 
         ssize_t send_stub(int sck, void * data, size_t bytes) {
@@ -225,10 +280,10 @@ return ERROR; }
             int flags = fcntl(socket, F_GETFL, 0);
             flags |= options;
             int ret = fcntl(socket, F_SETFL, flags);
-            NBL_LOG_IF(ERROR, ret, "config_socket(): %s",
+            NBL_LOG_IF(NBL_ERROR_LEVEL, ret, "config_socket(): %s",
                        utilities::get_error(errno).c_str());
 
-#ifdef __APPLE__
+#if defined(__APPLE__) && !defined(OFFLINE)
             int set = 1;
             setsockopt(socket, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
 #endif
