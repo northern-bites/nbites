@@ -31,7 +31,7 @@ def tracking(tracker):
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
         if (tracker.target.vis.frames_off >
             constants.TRACKER_FRAMES_OFF_REFIND_THRESH):
-            return tracker.repeatFastWidePan()
+            return tracker.goLater('fullPan')
 
     return tracker.stay()
 
