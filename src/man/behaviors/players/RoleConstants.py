@@ -215,7 +215,14 @@ cherryPickerBox = (((0.5*NogginConstants.FIELD_GREEN_WIDTH + 0.25*NogginConstant
 
 ### SETS PLAYER STATE PER ROLE
 def setRoleConstants(player, role):
+
+    # drop in - debugging role setting
+
+    print "Before assignment statement, player.role", player.role
+    print "Value of role passed in", role
     player.role = role
+    print "Setting role constants for player role", role
+
     if isLeftDefender(role):
         player.homePosition = evenDefenderHome
         player.kickoffPosition = evenDefenderHome

@@ -82,6 +82,7 @@ class Brain(object):
 
         # As of 2016 drop in, player role no longer defaults to player number
         self.role = self.player.role
+        # self.dropIn = self.player.dropIn
 
         # coa is Certificate of Authenticity (to keep things short)
         print '\033[32m'+str(self.CoA)                              +'\033[0m'
@@ -127,6 +128,7 @@ class Brain(object):
 
     def initTeamMembers(self):
         self.teamMembers = []
+
         for i in xrange(Constants.NUM_PLAYERS_PER_TEAM):
             mate = TeamMember.TeamMember(self)
             mate.playerNumber = i + 1
@@ -222,6 +224,7 @@ class Brain(object):
 
 
     def updateComm(self):
+
         me = self.teamMembers[self.playerNumber - 1]
         output = self.interface.myWorldModel
 
@@ -249,6 +252,7 @@ class Brain(object):
         output.claimed_ball = me.claimedBall
 
     def getCommUpdate(self):
+
         self.teamMembers[self.playerNumber - 1].updateMe()
         self.game = self.interface.gameState
         

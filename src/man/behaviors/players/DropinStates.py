@@ -30,7 +30,8 @@ def gameInitial(player):
         # enter player role here; make sure it matches the one in pDropin
         # player.role = 4
         print "Commented out player role in drop in states"
-        print "Player.role is", player.role
+        print "Player.role in gameInitial is", player.role
+        print "player role in brain, gameInitial is", player.brain.role
 
     # If stiffnesses were JUST turned on, then stand up.
     if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
@@ -52,6 +53,8 @@ def gameReady(player):
         player.brain.tracker.repeatWidePan()
         player.timeReadyBegan = player.brain.time
         if player.lastDiffState == 'gameInitial':
+            print "Player role in game ready is", player.role
+            print "player role in brain, gameReady is", player.brain.role
             player.brain.resetInitialLocalization()
 
         if player.wasPenalized:
@@ -76,6 +79,7 @@ def gameSet(player):
         player.stand()
         player.brain.nav.stand()
         player.brain.tracker.performBasicPan()
+        print "Player role in game set is", player.role
 
     elif player.brain.tracker.isStopped():
         player.brain.tracker.trackBall()
@@ -98,6 +102,7 @@ def gamePlaying(player):
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
+        print "player role in game playing is",player.role
 
     # TODO without pb, is this an issue?
     # if (player.lastDiffState == 'afterPenalty' and

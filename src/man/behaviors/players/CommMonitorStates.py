@@ -18,8 +18,8 @@ def commMonitor(player):
 
     # role switching off for drop in player
     if player.dropIn:
-        pass
-
+        # RoleConstants.setRoleConstants(player, player.role)
+        return
     
     if player.commMode == -1:
         pass
