@@ -234,109 +234,192 @@ void RobotDetector::findCandidates(bool is_top)
             if (amPeak) {
                 unmergedCandidates.push_back(Robot(i, i+boxW, j, j+boxH));
                 if (candidates.empty()) {
-                    std::cout<<"candidates empty"<<std::endl;
+                    // std::cout<<"candidates empty"<<std::endl;
                     candidates.push_back(Robot(i, i+boxW, j, j+boxH));
                 } else {
-                    std::cout<<"candidates not empty"<<std::endl;
-                    std::cout<<"Box before merge: "<<i<<", "<<i+boxW<<", "<<j<<", "<<j+boxH<<std::endl;
+                    // std::cout<<"candidates not empty"<<std::endl;
+                    // std::cout<<"Box before merge: "<<i<<", "<<i+boxW<<", "<<j<<", "<<j+boxH<<std::endl;
                     mergeCandidate(i, i+boxW, j, j+boxH);
                 }
             }
         }
     }
-    printCandidates("FINAL CANDIDATES:");
+    // int c1, c2;
+    // c1 = 50;
+    // c2 = 70;
+    // // candidates.push_back(Robot(c1, c1+boxW, c1, c1+boxH));
+    // candidates.push_back(Robot(c2+boxW/2, c2+boxW/2+boxW, c2, c2+boxH));
+    // unmergedCandidates.push_back(Robot(c1, c1+boxW, c1, c1+boxH));
+    // unmergedCandidates.push_back(Robot(c2+boxW/2, c2+boxW/2+boxW, c2, c2+boxH));
+    // std::cout<<"First Candidate: "<<c1<<", "<<c1+boxW<<", "<<c1<<", "<<c1+boxH<<std::endl;
+    // std::cout<<"Second Candidate: "<<c2+boxW/2<<", "<<c2+boxW/2+boxW<<", "<<c2<<", "<<c2+boxH<<std::endl;
+    // // mergeCandidate(c2+boxW/2, c2+boxW+boxW/2, c2, c2+boxH);
+    // mergeCandidate(c1, c1+boxW, c1, c1+boxH);
+
+    printCandidates("[ ROBOT DETECTOR ] FINAL CANDIDATES:");
 }
 
 void RobotDetector::mergeCandidate(int lf, int rt, int tp, int bt)
 {
-    printCandidates("Printing candidates before merging:");
-    bool merged = false;
-    int counter = 0;
+    // std::cout<<"Current merging box: "<<lf<<", "<<rt<<", "<<tp<<", "<<bt<<std::endl;
+    // printCandidates("Printing candidates before merging:");
     // Merge box with existing candidates:
     std::vector<Robot>::iterator it;
     for(it = candidates.begin(); it != candidates.end(); ++it) {
-        std::cout<<"candidate box: "<<(*it).left<<", "<<(*it).right<<", "<<(*it).top<<", "<<(*it).bottom<<std::endl;
+        // std::cout<<"candidate box: "<<(*it).left<<", "<<(*it).right<<", "<<(*it).top<<", "<<(*it).bottom<<std::endl;
         // return;
         // std::cout<<"Robot merge: "<<it->
         /* std::cout << *it; ... */
-        std::cout<<lf<<"<="<<(*it).left<<" && "<<(*it).left<<"<="<<(rt<<1 + lf<<1)<<"?"<<std::endl;
-        std::cout<<(*it).left<<"<="<<lf<<" && "<<lf<<"<="<<((*it).left<<1 + (*it).right<<1)<<"?"<<std::endl;
-        if (lf <= (*it).left && (*it).left <= (rt<<1 + lf<<1)) {
-            std::cout<<"yes!"<<std::endl;
+        // std::cout<<lf<<"<="<<(*it).left<<" && "<<(*it).left<<"<="<<((rt+lf)/2)<<"?"<<std::endl;
+        // std::cout<<(*it).left<<"<="<<lf<<" && "<<lf<<"<="<<(((*it).left+(*it).right)/2)<<"?"<<std::endl;
+        if (lf <= (*it).left && (*it).left <= ((rt+lf)/2)) {
+            // std::cout<<"yes!"<<std::endl;
             // I'm halfway overlapping in the x direction
             // new box is to left of old box
-            std::cout<<tp<<"<="<<(*it).top<<" && "<<(*it).top<<"<="<<(tp<<1 + bt<<1)<<"?"<<std::endl;
-            std::cout<<(*it).top<<"<="<<tp<<" && "<<tp<<"<="<<(((*it).top+(*it).bottom)/2)<<"?"<<std::endl;
-            if (tp <= (*it).top && (*it).top <= (tp<<1+bt<<1)) {
-                std::cout<<"yes1.1!"<<std::endl;
+            // std::cout<<tp<<"<="<<(*it).top<<" && "<<(*it).top<<"<="<<((tp+bt)/2)<<"?"<<std::endl;
+            // std::cout<<(*it).top<<"<="<<tp<<" && "<<tp<<"<="<<(((*it).top+(*it).bottom)/2)<<"?"<<std::endl;
+            if (tp <= (*it).top && (*it).top <= ((tp+bt)/2)) {
+                // std::cout<<"yes1.1!"<<std::endl;
                 // new box is upper left of candidate box
                 // (*it).top = tp;
                 // (*it).left = lf;
                 bt = (*it).bottom;
                 rt = (*it).right;
 
-                printCandidates("printing candidates after merging 1");
-                merged = true;
+                // printCandidates("printing candidates after merging 1");
                 // return;
                 // does this start at the second one actually?
                 candidates.erase(it);
-                counter = 0;
                 it = candidates.begin()-1; // loop through them all again
             } else if ((*it).top <= tp && tp <= (((*it).top+(*it).bottom)/2)) {
+                // std::cout<<"yes1.2!"<<std::endl;
                 // new box is to lower left of candidate box
                 // (*it).bottom = bt;
                 // (*it).left = lf;
                 tp = (*it).top;
                 rt = (*it).right;
-                printCandidates("printing candidates after merging 2");
-                merged = true;
+                // printCandidates("printing candidates after merging 2");
                 // return;
                 // does this start at the second one actually?
                 candidates.erase(it);
-                counter = 0;
                 it = candidates.begin()-1; // loop through them all again
             }
-        } else if ((*it).left <= lf && lf <= ((*it).left<<1 + (*it).right<<1)) {
-            std::cout<<"yes2!"<<std::endl;
+        } else if ((*it).left <= lf && lf <= (((*it).left+(*it).right)/2)) {
+            // std::cout<<"yes2!"<<std::endl;
             // I'm halfway overlapping in the x direction
             // new box is to left of old box
-            std::cout<<tp<<"<="<<(*it).top<<" && "<<(*it).top<<"<="<<(tp<<1 + bt<<1)<<"?"<<std::endl;
-            std::cout<<(*it).top<<"<="<<tp<<" && "<<tp<<"<="<<(((*it).top+(*it).bottom)/2.f)<<"?"<<std::endl;
-            if (tp <= (*it).top && (*it).top <= (tp<<1+bt<<1)) {
-                std::cout<<"yes2.1"<<std::endl;
+            // std::cout<<tp<<"<="<<(*it).top<<" && "<<(*it).top<<"<="<<((tp+bt)/2)<<"?"<<std::endl;
+            // std::cout<<(*it).top<<"<="<<tp<<" && "<<tp<<"<="<<(((*it).top+(*it).bottom)/2)<<"?"<<std::endl;
+            if (tp <= (*it).top && (*it).top <= ((tp+bt)/2)) {
+                // std::cout<<"yes2.1"<<std::endl;
                 // new box is upper right of candidate box
                 // (*it).top = tp;
                 // (*it).right = rt;
                 bt = (*it).bottom;
                 lf = (*it).left;
 
-                printCandidates("printing candidates after merging 3");
-                merged = true;
+                // printCandidates("printing candidates after merging 3");
                 // return;
                 // does this start at the second one actually?
                 candidates.erase(it);
-                counter = 0;
                 it = candidates.begin()-1; // loop through them all again
-            } else if ((*it).top <= tp && tp <= (((*it).top+(*it).bottom)/2.f)) {
-                std::cout<<"yes2.2"<<std::endl;
+            } else if ((*it).top <= tp && tp <= (((*it).top+(*it).bottom)/2)) {
+                // std::cout<<"yes2.2"<<std::endl;
                 // new box is to lower right of candidate box
                 // (*it).bottom = bt;
                 // (*it).right = rt;
                 tp = (*it).top;
                 lf = (*it).left;
                 // return;
-                printCandidates("printing candidates after merging 4");
-                merged = true;
+                // printCandidates("printing candidates after merging 4");
                 // does this start at the second one actually?
                 candidates.erase(it);
-                counter = 0;
                 it = candidates.begin()-1; // loop through them all again
             }
         }
-        counter++;
     }
     candidates.push_back(Robot(lf, rt, tp, bt));
 }
+
+// This should be different, just testing bottom camera stuff out right now.
+// void RobotDetector::toFieldCoordinates(FieldHomography* hom, float* obstacleBox, int lowestCol)
+// {
+//     // If we haven't found an obstacle:
+//     if (lowestCol == -1) { return; }
+
+//     // Homography takes an image coordinate as a parameter, so we must
+//     // convert to that coordinate system
+//     //      FROM: y+ forward, x+ right, TO: x+ forward, y+ left
+
+//     // let's map the lowest point to field coordinates
+//     double x1, y1, xb, yb;
+//     x1 = (double)lowestCol - (double)img_wd/2;
+//     y1 = (double)img_ht/2 - (double)obstacleBox[1]; // bottom of obstacle box
+//     if (!hom->fieldCoords(x1, y1, xb, yb)) {
+//         // we were not successful in our first mapping
+//         resetObstacleBox(obstacleBox);
+//         return;
+//     }
+
+//     // now let's map the left point of the box
+//     double x2, y2, xl, yl;
+//     x2 = (double)obstacleBox[2] - (double)img_wd/2; // left side of obstacle box
+//     if (!hom->fieldCoords(x2, y1, xl, yl)) {
+//         // we were not successful in our second mapping
+//         resetObstacleBox(obstacleBox);
+//         return;
+//     }
+
+//     // finally let's map the right point of the box
+//     double x3, y3, xr, yr;
+//     x3 = (double)obstacleBox[3] - (double)img_wd/2; // left side of obstacle box
+//     if (!hom->fieldCoords(x3, y1, xr, yr)) {
+//         // we were not successful in our third mapping
+//         resetObstacleBox(obstacleBox);
+//         return;
+//     }
+
+//     // All the mapping was successful!
+//     // now that we have them in robot relative coordinates... we have to
+//     // convert them to the correct coordinate system, with same origin:
+//     // FROM: y+ forward, x+ right, TO: x+ forward, y+ to left
+//     obstacleBox[0] = -1.f*(float)xb;     // bottom x coordinate (now y)
+//     obstacleBox[1] = (float)yb;          // bottom y coordinate (now x)
+//     obstacleBox[2] = -1.f*(float)xl;     // left x coordinate (now y)
+//     obstacleBox[3] = -1.f*(float)xr;     // right x coordinate (now y)
+// }
+
+// void RobotDetector::setMessage() {
+//     // Now we take information and return relevant obstacles
+//     portals::Message<messages::VRobot> current(0);
+
+//     unsigned char obstacleDirections[9];
+//     for (int i = 0; i < 9; ++i) {
+//         obstacleDirections[i] = 0;
+//     }
+
+//     // ignore "NONE" direction, start at 1
+//     for (int i = 1; i < NUM_DIRECTIONS; i++)
+//     {
+//         if (obstacleDistances[i]==0) { continue; } //no obstacle here
+
+//         FieldObstacles::Obstacle* temp = current.get()->add_obstacle();
+//         temp->set_position(obstaclesList[i]);
+//         temp->set_distance(obstacleDistances[i]);
+//         temp->set_detector(obstacleDetectors[i]);
+
+//         // update vision box
+//         if (obstacleBox[0] == i && obstacleDetectors[i] ==
+//             FieldObstacles::Obstacle::VISION) {
+//             temp->set_closest_y(obstacleBox[1]);
+//             temp->set_box_bottom(obstacleBox[2]);
+//             temp->set_box_left(obstacleBox[3]);
+//             temp->set_box_right(obstacleBox[4]);
+//         }
+//     }
+
+//     visualRobotOut.setMessage(current);
+// }
 
 void RobotDetector::printCandidates(std::string message) {
     std::cout<<message<<std::endl;
