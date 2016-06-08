@@ -33,6 +33,9 @@ const float UNSWalkProvider::INITIAL_BODY_POSE_ANGLES[] {
 	0.f,0.f,0.f,0.f,0.f,0.f,0.f,0.f,
 };
 
+// Runswift takes walk commands in MM, we use CM
+const float MM_PER_CM  = 10.0;
+
 /*
 *NBites joint order. commented out joints are the ones that UNSW has but we dont use
 */
@@ -76,21 +79,25 @@ UNSWalkProvider::UNSWalkProvider() : MotionProvider(WALK_PROVIDER),
 UNSWalkProvider::~UNSWalkProvider()
 {
 	delete generator;
+	delete odometry;
+	delete &joints;
+	delete startOdometry;
 }
 
 void UNSWalkProvider::resetAll() {
 	inactive();
-
+	generator->reset();
+	resetOdometry();
 	//reset odometry through walk2014gen
 	//reset other parts of walk2014gen
 }
 
 bool UNSWalkProvider::calibrated() const {
-	return NULL;
+	return true;
 }
 
 bool UNSWalkProvider::upright() const {
-	return NULL;
+	return true;
 }
 
 float UNSWalkProvider::leftHandSpeed() const {
@@ -105,6 +112,22 @@ void UNSWalkProvider::requestStopFirstInstance() {
 	requestedToStop = true;
 }
 
+bool hasLargerMagnitude(float x, float y) {
+	if (y > 0.0f) {
+		return x > y;
+	}
+	if (y < 0.0f) {
+		return x < y;
+	}
+	return true;
+}
+
+bool hasPassed(Odometry& odo1, Odometry& odo2) {
+	return (hasLargerMagnitude(odo1.forward, odo2.forward) &&
+		hasLargerMagnitude(odo1.left, odo2.left) &&
+		hasLargerMagnitude(odo1.turn, odo2.turn));
+}
+
 void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	std::vector<float>& 			sensorAngles,
 	std::vector<float>& 			sensorCurrents,
@@ -114,38 +137,75 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 {
 	PROF_ENTER(P_WALK);
 
+
+	ActionCommand::All* request = new ActionCommand::All();
+	request->body.actionType = ActionCommand::Body::WALK;
+
 	if (standby) {
 		tryingToWalk = false;
 	} else {
 		if (requestedToStop || !isActive()) {
 			tryingToWalk = false;
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP) {
-			logMsg("Odometry walk!");
+			logMsg("STEP command! Odometry walk!");
+
+			StepCommand::ptr command = boost::shared_static_cast<StepCommand>(currentCommand);
+			Odometry deltaOdometry = odometry - startOdometry;
+			Odometry absoluteTarget = Odometry(command->x_mms, command->y_mms, command->theta_rads);
+			Odometry relativeTarget = absoluteTarget - (deltaOdometry); 
+
+			if (!hasPassed(deltaOdometry, absoluteTarget)) { // not reached target yet
+
+				request->body.forward = relativeTarget.forward / MM_PER_CM;
+				request->body.left = relativeTarget.left / MM_PER_CM;
+				request->body.turn = relativeTarget.turn;
+			} else {
+				tryingToWalk = false;
+				request->body.actionType = ActionCommand::Body::STAND;
+
+			}
+
+
+
 			// TODO odometry, handle
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK) {
-			logMsg("Walking!");
+			logMsg("Walk command - Walking!");
 		 
 			// HANDLE
 			tryingToWalk = true;
 
 			WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
-
+			// request->body.forward = command->x_percent;
+			// request->body.left = command->y_percent;
+			// request->body.turn = command->theta_percent;
 
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
-			logMsg("Destination Walking!");
+			logMsg("Destination command - Destination Walking!");
 			tryingToWalk = true;
 
+			DestinationCommand::ptr command = boost::shared_static_cast<DestinationCommand>(currentCommand);
+			request->body.forward = command->x_mm;
+			request->body.left = command->y_mm;
+			request->body.turn = command->theta_rads;
+
+			// TODO incorporate motion kicks
+
+
+		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::KICK) {
+			logMsg("Kick command sent now!");
+			tryingToWalk = false;
 
 		} else if (!currentCommand.get()) {
 			tryingToWalk = false;
 			// call stand
+			request->body.actionType = ActionCommand::Body::STAND;
 		}
+
+		// TODO handle kick
 	}
 
 	logMsg("walking");
 
-	ActionCommand::All* request = new ActionCommand::All();
-	request->body.actionType = ActionCommand::Body::WALK;
 
 	// Update sensor values
 	UNSWSensorValues sensors = new UNSWSensorValues();
@@ -274,7 +334,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     if (requestedToStop) {
     	inactive();
     	requestedToStop = false;
-    	// Reset odometry TODO
+    	resetOdometry();
     }
 
 	PROF_EXIT(P_WALK);
@@ -285,7 +345,7 @@ void UNSWalkProvider::hardReset() {
 }
 
 void UNSWalkProvider::resetOdometry() {
-	odometry = new Odometry();
+	odometry->clear();
 }
 
 void UNSWalkProvider::setCommand(const WalkCommand::ptr command) {
@@ -301,11 +361,15 @@ void UNSWalkProvider::setCommand(const WalkCommand::ptr command) {
 
 void UNSWalkProvider::setCommand(const DestinationCommand::ptr command) {
 	currentCommand = command;
+
+	startOdometry = odometry;
+
 	active();
 }
 
 void UNSWalkProvider::setCommand(const StepCommand::ptr command) {
-
+	currentCommand = command;
+	active();
 
 
 }
@@ -320,6 +384,7 @@ void UNSWalkProvider::getOdometryUpdate(portals::OutPortal<messages::RobotLocati
 	//odometryData.get()->set_x();
 	//odometryData.get()->set_y();
 	//odometryData.get()->set_h();
+	out.setMessage(odometryData);
 }
 
 bool UNSWalkProvider::isStanding() const { //is going to stand rather than at complete standstill
@@ -338,10 +403,6 @@ void UNSWalkProvider::stand() {
 // void UNSWalkProvider::restingStand()
 // {
 
-// }
-
-// void UNSWalkProvider::resetOdometry() {
-// 	//rest odo
 // }
 
 }

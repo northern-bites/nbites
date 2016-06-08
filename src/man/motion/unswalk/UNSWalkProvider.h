@@ -107,7 +107,7 @@ private:
 	MotionCommand::ptr currentCommand;
 	// Touch *touch;
 	ClippedGenerator *generator;
-	Odometry startOdometry;
+	Odometry* startOdometry;
 	// Effector* effector;
 	BodyModel bodyModel;
 	UNSWKinematics kinematics;
