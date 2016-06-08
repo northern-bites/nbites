@@ -33,7 +33,7 @@ void BallDetector::setDebugImage(DebugImage * di) {
    posts and the like. True spots ought to be surrounded by white
    on more than one side.
 */
-	bool BallDetector::filterBlackSpots(Spot currentSpot)
+bool BallDetector::filterBlackSpots(Spot currentSpot)
 {
     int WHITE_JUMP = 40;
     int MIN_CENTER_Y = 100;
@@ -352,19 +352,20 @@ bool BallDetector::findCorrelatedBlackSpots
 (std::vector<std::pair<int,int>> & blackBlobs,
  std::vector<Spot> & actualBlobs,
  double cameraHeight, bool & foundBall)
-{
+{   
     // loop through the filtered blobs and see if any are close together
     int correlations[blackBlobs.size()];
     int correlatedTo[blackBlobs.size()][blackBlobs.size()];
+    memset(correlatedTo, 0, blackBlobs.size() * blackBlobs.size() * sizeof(int));
     bool foundThree = false;
     // loop through filtered black blobs
     for (int i = 0; i < blackBlobs.size(); i++) {
         std::pair<int,int> p = blackBlobs[i];
         // initialize the correlations for this blob
         correlations[i] = 0;
-        for (int k = 0; k < blackBlobs.size(); k++) {
-            correlatedTo[i][k] = 0;
-        }
+        // for (int k = 0; k < blackBlobs.size(); k++) {
+        //     correlatedTo[i][k] = 0;
+        // }
         // we're going to check against all other black blobs
         for (int j = 0; j < blackBlobs.size(); j++) {
             std::pair<int,int> q = blackBlobs[j];
@@ -431,9 +432,6 @@ bool BallDetector::findCorrelatedBlackSpots
                 Spot s1 = correlatedSpots[0];
                 Spot s2 = correlatedSpots[1];
 
-                // double s1wx, s1wy, s2wx, s2wy;
-                // homography->fieldCoords(s1.ix(),s1.iy(), s1wx, s1wy);
-                // homography->fieldCoords(s2.ix(),s2.iy(), s2wx, s2wy);
                 double distance, upper, lower;
                 //IDEA: account for area and distance thresholds based on the camera?
                 if(topCamera) {
@@ -462,11 +460,6 @@ bool BallDetector::findCorrelatedBlackSpots
                 Spot s1 = correlatedSpots[0];
                 Spot s2 = correlatedSpots[1];
                 Spot s3 = correlatedSpots[2];
-
-                // double s1wx, s1wy, s2wx, s2wy, s3wx, s3wy;
-                // homography->fieldCoords(s1.ix(),s1.iy(), s1wx, s1wy);
-                // homography->fieldCoords(s2.ix(),s2.iy(), s2wx, s2wy);
-                // homography->fieldCoords(s3.ix(),s3.iy(), s3wx, s3wy);
 
                 double area = abs((s1.ix()*(s2.iy()-s3.iy()) + s2.ix()*(s3.iy()-s1.iy()) + s3.ix()*(s1.iy()-s2.iy()))/2);
                 std::cout<<"Area: "<<area<<std::endl;
