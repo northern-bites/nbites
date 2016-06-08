@@ -47,7 +47,7 @@ public class CameraOffsetsUtility extends UtilityParent {
 	/* utility parent implementation code */
 	/**************************************/
 
-	
+	 
 	private static Display display = null;
 	
 	@Override
@@ -66,10 +66,10 @@ public class CameraOffsetsUtility extends UtilityParent {
 
 	@Override
 	public char preferredMemnonic() {
-		return 'c';
+		return 'o';
 	}
 	
-	/* actual calibration code */
+	/* actual offset code */
 	/***************************/
 
 	private static class Row {
