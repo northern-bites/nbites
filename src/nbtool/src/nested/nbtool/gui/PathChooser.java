@@ -126,6 +126,8 @@ public class PathChooser {
 
 	private static final Color DARK_GREEN = new Color(0,100,0);
 	
+	private static final int DISPLAYED_CONTENTS_LIMIT = 500;
+	
 	private static class PathChooserHandler implements KeyListener, ActionListener, TreeModel, TreeSelectionListener {
 
 		protected final PathChooseDisplay display = new PathChooseDisplay();
@@ -228,7 +230,7 @@ public class PathChooser {
 				return null;
 			}
 			
-			Path[] parts = FileIO.getContentsOf(enclosing);
+			Path[] parts = FileIO.getContentsOf(enclosing, DISPLAYED_CONTENTS_LIMIT);
 			assert(parts != null);
 			if (parts.length == 1) {
 				return parts[0];
@@ -364,7 +366,7 @@ public class PathChooser {
 		private Path[] workingContents() {
 			Path dir = enclosing();
 			if (dir == null) return new Path[0];
-			Path[] found = FileIO.getContentsOf(dir);
+			Path[] found = FileIO.getContentsOf(dir, DISPLAYED_CONTENTS_LIMIT);
 			return (found == null) ? new Path[0] : found;
 		}
 

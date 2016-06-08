@@ -93,7 +93,23 @@ public class LogReference {
 	public long thisID = Utility.getNextIndex(this);
 	
 	private WeakReference<Log> theLog = null;
+	
+	private boolean tempWritten = false;
 	private Path tempPath = null;
+	
+	private synchronized Path useTempPath() {
+		while (!tempWritten) {
+			debug.warn("reference %d waiting for temp write to finish...", thisID);
+			try {
+				this.wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return tempPath;
+	}
+	
 	private Path loadPath = null;
 	public Group container = null;
 	
@@ -108,9 +124,13 @@ public class LogReference {
 			}
 		}
 		
+		assert(theLog == null);
 		assert(tempPath != null);
-		assert(Files.exists(tempPath));
 		
+		debug.info("get() usetemp()");
+		useTempPath();
+		assert(Files.exists(tempPath));
+				
 		Log ret = null;
 		try {
 			ret = FileIO.readLogFromPath(tempPath);
@@ -144,6 +164,7 @@ public class LogReference {
 		assert(manages(same));
 		assert(theLog != null && theLog.get() == same);
 		
+		useTempPath();
 		updateInternal(same);
 		FileIO.writeLogToPath(tempPath, same);
 	}
@@ -158,6 +179,7 @@ public class LogReference {
 			throw new RuntimeException(em);
 		}
 		
+		useTempPath();
 		pushToTempFileNow(same);
 		FileIO.writeLogToPath(loadPath, same);
 	}
@@ -166,6 +188,7 @@ public class LogReference {
 		assert(manages(same));
 		assert(theLog != null && theLog.get() == same);
 		
+		useTempPath();
 		updateInternal(same);
 		FileIO.queueWriteTask(tempPath, same.serialize());
 	}
@@ -180,6 +203,7 @@ public class LogReference {
 			throw new RuntimeException(em);
 		}
 		
+		useTempPath();
 		pushToTempFile(same);
 		FileIO.queueWriteTask(loadPath, same.serialize());
 	}
@@ -199,11 +223,28 @@ public class LogReference {
 		theLog = new WeakReference<>(makeFrom);
 	}
 	
+	protected LogReference(long cw, String lc, String ht, String hn, String ha, String desc,
+			Path copyFrom) throws IOException {
+		this.createdWhen = cw; this.logClass = lc;
+		this.host_type = ht; this.host_name = hn;
+		this.host_addr = ha; this.description = desc;
+		
+		this.savedID = -1;
+		this.theLog = null;
+		String tempName = tempName();
+		loadPath = copyFrom;
+		tempPath = TEMP_DIR.resolve(tempName);
+		
+		FileIO.addTaskToQueue(new CopyTask(tempPath, copyFrom, this));
+	}
+	
 	private static class InitTask extends FileIO.Task {
+		private LogReference ref;
 		private Log log;
-		protected InitTask(Path path, Log log) {
+		protected InitTask(Path path, LogReference ref, Log log) {
 			super(path, null);
 			this.log = log;
+			this.ref = ref;
 		}
 		
 		@Override
@@ -211,32 +252,59 @@ public class LogReference {
 			Files.createFile(path);
 			FileIO.writeLogToPath(path, log);
 			this.log = null;
+			
+			debug.info("Init done...");
+			synchronized(this.ref) {
+				debug.info("in synch...");
+				this.ref.tempWritten = true;
+				this.ref.notify();
+			}
 		}
 	}
 	
-	private void initializeTemp() {
-		String tempName = String.format("log_%s_v%d_id%d_u%s.nblog",
-				this.logClass, ToolSettings.VERSION,
+	private static class CopyTask extends FileIO.Task {
+		private LogReference ref;
+		private Path from;
+		protected CopyTask(Path path, Path from, LogReference ref) {
+			super(path, null);
+			this.ref = ref;
+			this.from = from;
+		}
+		
+		@Override
+		public void executeWrite() throws IOException {
+			Files.copy(from, path);
+			
+			debug.info("Copy done...");
+			synchronized(this.ref) {
+				debug.info("in synch...");
+				this.ref.tempWritten = true;
+				this.ref.notify();
+			}
+		}
+	}
+ 	
+	private String tempName() {
+		return String.format("%s_%s_v%d_id%d_u%s.nblog",
+				this.host_name, this.logClass, ToolSettings.VERSION,
 				this.savedID, Utility.getRandomHexString(10));
+	}
+	
+	private void initializeTemp() {
+		String tempName = tempName();
 		tempPath = TEMP_DIR.resolve(tempName);
 		
 		assert(!Files.exists(tempPath));
 		Log ourLog = null;
+		debug.info("inittemp() calling get()");
 		assert(theLog != null && (ourLog = theLog.get()) != null);
 		
-		FileIO.addTaskToQueue(new InitTask(tempPath, ourLog));
-		
-//		try {
-//			Files.createFile(tempPath);
-//			FileIO.writeLogToPath(tempPath, ourLog);
-//									
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			debug.error("could not generate temp file{%s}: %s", tempPath.toString(), e.getMessage());
-//			throw new RuntimeException(String.format("could not generate temp file: %s", e.getMessage()));
-//		}
-		
-//		assert(Files.exists(tempPath));
+		FileIO.addTaskToQueue(new InitTask(tempPath, this, ourLog));
+	}
+	
+	public static LogReference quickReferenceFromFile(Path readFrom) throws IOException {
+		assert(Files.exists(readFrom));
+		return LogInternal.quickParse(readFrom);
 	}
 	
 	public static LogReference referenceFromFile(Path readFrom) throws IOException {
@@ -244,7 +312,7 @@ public class LogReference {
 		
 		Log read = FileIO.readLogFromPath(readFrom);
 		if (read == null) {
-			debug.error("could not parse log from %s", readFrom);
+			debug.error("could not parse Log from %s", readFrom);
 			throw new IOException("could not parse Log from " + readFrom);
 		}
 		
@@ -301,7 +369,9 @@ public class LogReference {
 				Path loadPath = TestBase.resourcePathAtClass(this, "testLog2");
 				assert(Files.exists(loadPath));
 				
+				debug.info("before read");
 				LogReference ref = FileIO.readRefFromPath(loadPath);
+				debug.info("test() calling get()");
 				Log refMng = ref.get();
 				assert(refMng != null && refMng.logClass.equals(SharedConstants.LogClass_Tripoint()));
 				assert(ref.manages(refMng));
