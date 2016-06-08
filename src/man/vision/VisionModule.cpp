@@ -547,7 +547,7 @@ void VisionModule::updateObstacleBox()
 
 void VisionModule::setColorParams(Colors* colors, bool topCamera)
 { 
-    delete colorParams[!topCamera];
+    if (colorParams[!topCamera]) delete colorParams[!topCamera];
     colorParams[!topCamera] = colors;
 }
 
@@ -675,7 +675,7 @@ void VisionModule::setCalibrationParams(int camera, std::string robotName)
 
 void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamera)
 {
-    delete calibrationParams[!topCamera];
+    if (calibrationParams[!topCamera]) delete calibrationParams[!topCamera];
     calibrationParams[!topCamera] = params;
 }
 

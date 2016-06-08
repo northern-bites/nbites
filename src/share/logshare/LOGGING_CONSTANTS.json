@@ -46,6 +46,12 @@
     #file prefix path on robot
     "ROBOT_LOG_PATH_PREFIX" : "/home/nao/nbites/log/",
 
+    "ONLINE_CAMERA_OFFSET_PATH" : "/home/nao/nbites/Config/cameraOffsets.json",
+    "ONLINE_COLOR_CALIBRATION_PATH" : "/home/nao/nbites/Config/colorCalibration.json",
+
+    "OFFLINE_CAMERA_OFFSET_SUFFIX" : "/src/man/config/cameraOffsets.json",
+    "OFFLINE_COLOR_CALIBRATION_SUFFIX" : "/src/man/config/colorCalibration.json",
+
     #keys for attributes in the log
         # (also functions as version)
     "LOG_TOPLEVEL_MAGIC_KEY" : "#_NBITES_JSON_LOG_VERSION_",
