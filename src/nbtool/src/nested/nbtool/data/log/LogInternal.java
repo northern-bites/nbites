@@ -37,7 +37,7 @@ import nbtool.util.test.Tests;
 
 public class LogInternal extends Log {
 	
-	private static final DebugSettings debug = Debug.createSettings(true, true, true, Debug.WARN, null);
+	private static final DebugSettings debug = Debug.createSettings(true, true, true, Debug.INFO, null);
 	
 	@Override
 	public String toString() {
@@ -471,6 +471,32 @@ public class LogInternal extends Log {
 				slog.bytesForContentItem(2), new JsonObject(),
 				"JointAngles", slog.primaryFrom(), 0, 0
 				));
+		
+		boolean calParamsFound = false;
+		Vector<SExpr>[] found = null;
+		found = slog.tree().recursiveFindAll("camera_TOP");
+		
+		for (Vector<SExpr> vec : found) {
+			if (vec.lastElement().count() == 3) {
+				debug.info("found %s", vec.lastElement());
+				calParamsFound = true;
+				break;
+			}
+		}
+		
+		if (!calParamsFound) {
+			found = slog.tree().recursiveFindAll("camera_BOT");
+			
+			for (Vector<SExpr> vec : found) {
+				if (vec.lastElement().count() == 3) {
+					debug.info("found %s", vec.lastElement());
+					calParamsFound = true;
+					break;
+				}
+			}
+		}
+		
+		Debug.notRefactored();
 
 		JsonObject top = Json.object();
 		top.put(SharedConstants.LOG_TOPLEVEL_MAGIC_KEY(), 7);

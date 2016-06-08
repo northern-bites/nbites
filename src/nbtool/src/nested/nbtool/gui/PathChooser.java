@@ -53,10 +53,10 @@ import nbtool.util.Utility;
 public class PathChooser {
 		
 	public static String suggestion(String robot) {
-		
 		Calendar cal = Calendar.getInstance();
+		
 		int day = cal.get(Calendar.DAY_OF_MONTH);
-		int month = cal.get(Calendar.MONTH);
+		int month = cal.get(Calendar.MONTH) + 1;
 		
 		return ToolSettings.NBITES_DIR + 
 				"data/logs/" +
