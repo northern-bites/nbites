@@ -25,9 +25,6 @@ def gameInitial(player):
         player.brain.resetInitialLocalization()
         player.lastStiffStatus = True
         
-        ### HACK CHINA 2015 ###
-        ### DROP IN PLAYER ###
-        # enter player role here; make sure it matches the one in pDropin
         # player.role = 4
         print "Commented out player role in drop in states"
         print "Player.role in gameInitial is", player.role

@@ -41,12 +41,24 @@ def gameReady(player):
         player.brain.fallController.enabled = True
         player.penaltyKicking = False
         player.stand()
-        player.brain.tracker.lookToAngle(0)
+        # if player.dropIn:
+        #     ## walk to homeposition
+        #     player.brain.tracker.repeatWidePan()
+        #     player.timeReadyBegan = player.brain.time
+        #     if player.lastDiffState == 'gameInitial':
+        #         print "Goalie should walk to goalbox"
+        #         player.brain.resetInitialLocalization()
+        else:
+            player.brain.tracker.lookToAngle(0)
 
     # Wait until the sensors are calibrated before moving.
     if(not player.brain.motion.calibrated):
         return player.stay()
-
+        
+    ## TODO have goalie walk out onto the field
+    # if player.dropIn:
+    #     return player.goNow('positionReady')
+        
     return player.stay()
 
 @superState('gameControllerResponder')

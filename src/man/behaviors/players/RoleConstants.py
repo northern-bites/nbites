@@ -1,5 +1,6 @@
 import noggin_constants as NogginConstants
 from objects import RobotLocation
+import GoalieConstants
 
 ### ROLE CONFIGURATION
 # Possibilites are the following:
@@ -216,12 +217,13 @@ cherryPickerBox = (((0.5*NogginConstants.FIELD_GREEN_WIDTH + 0.25*NogginConstant
 ### SETS PLAYER STATE PER ROLE
 def setRoleConstants(player, role):
 
-    # drop in - debugging role setting
-
-    print "Before assignment statement, player.role", player.role
-    print "Value of role passed in", role
     player.role = role
-    print "Setting role constants for player role", role
+    # TODO set goalie home position in drop in player
+    # if isGoalie(role) and player.dropIn:
+    #     print "Goalie should walk into goalbox in game ready"
+    #     player.homePosition = GoalieConstants.HOME_POSITION
+    #     player.kickoffPosition = GoalieConstants.HOME_POSITION
+    #     player.isKickingOff = False
 
     if isLeftDefender(role):
         player.homePosition = evenDefenderHome

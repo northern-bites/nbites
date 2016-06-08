@@ -38,7 +38,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         ### DROP IN PLAYER ###
         # FROM CHINA HACK 2015; we change this instead of defaulting to player number
-        self.role = 3
+        self.role = 1
+        self.dropIn = True
         print "role in init soccer player", self.role
         roleConstants.setRoleConstants(self, self.role)
         
@@ -69,4 +70,3 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # 1 -- one field player is offline
         # 2 -- more than one field player is offline
         self.commMode = 0
-        self.dropIn = True
