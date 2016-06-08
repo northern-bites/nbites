@@ -3,6 +3,7 @@
 #include "HighResTimer.h"
 #include "NBMath.h"
 
+#include "nblogio.h"
 #include "Control.hpp"
 #include "Logging.hpp"
 
@@ -14,6 +15,8 @@
 #include "Profiler.h"
 #include "DebugConfig.h"
 //#include "PostDetector.h"
+
+#include "VisionCalibration.hpp"
 
 namespace man {
 namespace vision {
@@ -30,19 +33,12 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
       ballOffCount(0),
       blackStar_(false)
 {
-    std:: string colorPath, calibrationPath;
-    #ifdef OFFLINE
-        colorPath =  calibrationPath = std::string(getenv("NBITES_DIR"));
-        colorPath += "/src/man/config/colorParams.txt";
-        calibrationPath += "/src/man/config/calibrationParams.txt";
-    #else
-        colorPath = "/home/nao/nbites/Config/colorParams.txt";
-        calibrationPath = "/home/nao/nbites/Config/calibrationParams.txt";
-    #endif
+    std::string serializedColors, serializedOffsets;
+    nbl::io::readFileToString(serializedColors, calibration::colorParamsPath());
+    nbl::io::readFileToString(serializedOffsets, calibration::cameraOffsetsPath());
 
-    // Get SExpr from string
-    nbl::SExpr* colors = nbl::SExpr::read(getStringFromTxtFile(colorPath));
-    calibrationLisp = nbl::SExpr::read(getStringFromTxtFile(calibrationPath));
+    NBL_ASSERT_EQ( robotName.find(".local"), std::string::npos )
+    name = robotName;
 
     // Set module pointers for top then bottom images
     // NOTE Constructed on heap because some of the objects below do
@@ -51,7 +47,11 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
     //      constructors in the case of C-style arrays, limitation theoretically
     //      removed in C++11.
     for (int i = 0; i < 2; i++) {
-        colorParams[i] = getColorsFromLisp(colors, i);
+        colorParams[i] = calibration::getSavedColors(i==0, serializedColors, &latestUsedColorParams[i]);
+        calibrationParams[i] = calibration::getSavedOffsets( name, i==0, serializedOffsets );
+
+//        getColorsFromLisp(colors, i);
+
         frontEnd[i] = new ImageFrontEnd();
         edgeDetector[i] = new EdgeDetector();
         edges[i] = new EdgeList(32000);
@@ -112,8 +112,6 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
 #endif
 
     // Retreive calibration params for the robot name specified in the constructor
-    setCalibrationParams(robotName);
-
     robotImageObstacle = new RobotObstacle(wd / 4, ht / 4);
 }
 

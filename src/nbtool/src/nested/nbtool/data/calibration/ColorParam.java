@@ -64,14 +64,14 @@ public class ColorParam {
 		}
 	}
 	
-	public static class Robot {
+	public static class Set {
 		public Camera[] cameras = new Camera[2];
 		
 		public Camera getTop() {return cameras[0];}
 		public Camera getBot() {return cameras[1];}
 		
-		public static Robot parse(JsonObject params) {
-			Robot ret = new Robot();
+		public static Set parse(JsonObject params) {
+			Set ret = new Set();
 			ret.cameras[0] = Camera.parse( params.get("camera_TOP").asObject() );
 			ret.cameras[1] = Camera.parse( params.get("camera_BOT").asObject() );
 			return ret;
@@ -86,37 +86,12 @@ public class ColorParam {
 		}
 	}
 	
-	public static class Set extends HashMap<String, Robot> {
-		
-		public static Set parseFrom(JsonObject obj) {
-			Set ret = new Set();
-			
-			for (Entry<JsonString, JsonValue> entry : obj.entrySet()) {
-				String robotName = entry.getKey().value;
-				
-				ret.put(robotName, Robot.parse(entry.getValue().asObject()));
-			}
-			
-			return ret;
-		}
-		
-		public JsonObject serialize() {
-			JsonObject ret = Json.object();
-			
-			for (Entry<String, Robot> entry : this.entrySet()) {
-				ret.put(entry.getKey(), entry.getValue().serialize());				
-			}
-			
-			return ret;
-		}
-	}
-	
 	public static void _NBL_ADD_TESTS_() {
 		Tests.add("calibration", new TestBase("ColorParam"){
 
 			@Override
 			public boolean testBody() throws Exception {
-				Robot set = new Robot();
+				Set set = new Set();
 				
 				ColorParam green = new ColorParam();
 				green.uAtY0 = 1; green.uAtY255 = 2;
@@ -144,7 +119,7 @@ public class ColorParam {
 				set.cameras[1].white = white;
 				
 				assert(set.serialize().congruent(
-						Robot.parse( set.serialize().asObject()).serialize() )
+						Set.parse( set.serialize().asObject()).serialize() )
 						);
 				
 				return true;

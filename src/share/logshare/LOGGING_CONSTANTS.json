@@ -47,10 +47,10 @@
     "ROBOT_LOG_PATH_PREFIX" : "/home/nao/nbites/log/",
 
     "ONLINE_CAMERA_OFFSET_PATH" : "/home/nao/nbites/Config/cameraOffsets.json",
-    "ONLINE_COLOR_CALIBRATION_PATH" : "/home/nao/nbites/Config/colorCalibration.json",
+    "ONLINE_COLOR_PARAMS_PATH" : "/home/nao/nbites/Config/colorParams.json",
 
     "OFFLINE_CAMERA_OFFSET_SUFFIX" : "/src/man/config/cameraOffsets.json",
-    "OFFLINE_COLOR_CALIBRATION_SUFFIX" : "/src/man/config/colorCalibration.json",
+    "OFFLINE_COLOR_PARAMS_SUFFIX" : "/src/man/config/colorParams.json",
 
     #keys for attributes in the log
         # (also functions as version)

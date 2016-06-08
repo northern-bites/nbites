@@ -9,16 +9,24 @@
 
 namespace man {
     namespace vision {
-//        loadColorParams(Colors)
+        namespace calibration {
 
-        const std::string colorParamsPath();
-        const std::string cameraOffsetsPath();
+            const std::string cameraOffsetsPath();
+            const std::string colorParamsPath();
 
-        Colors * parseColorsFromJSON(json::Object& object);
-        Colors * getSavedColors(const std::string& robotName);
+            CalibrationParams * parseOffsetsFromJSON(json::Object& object);
+            CalibrationParams * getSavedOffsets(const std::string& robotName, bool top,
+                                                const std::string& string);
+            CalibrationParams * getSavedOffsets(const std::string& robotName, bool top);
 
-        CalibrationParams * parseOffsetsFromJSON(json::Object& object);
-        CalibrationParams * getSavedOffsets(const std::string& robotName);
+            json::Object serialize(CalibrationParams * params);
+            //ColorParams are mangled by FrontEnd, so it is easier to keep around
+            //the previously parsed json than actually recreate it.
+
+            Colors * parseColorsFromJSON(json::Object& object);
+            Colors * getSavedColors(bool top, const std::string& string, json::Object * used);
+            Colors * getSavedColors(bool top);
+        }
     }
 }
 

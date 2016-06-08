@@ -126,7 +126,7 @@ public class SharedConstants {
 		return object.get("ONLINE_CAMERA_OFFSET_PATH").asString().toString();
 	}
 	
-	public static String ONLINE_COLOR_CALIBRATION_PATH() {
+	public static String ONLINE_COLOR_PARAMS_PATH() {
 		return object.get("ONLINE_COLOR_CALIBRATION_PATH").asString().toString();
 	}
 	
@@ -134,7 +134,7 @@ public class SharedConstants {
 		return object.get("OFFLINE_CAMERA_OFFSET_SUFFIX").asString().toString();
 	}
 	
-	public static String OFFLINE_COLOR_CALIBRATION_SUFFIX() {
+	public static String OFFLINE_COLOR_PARAMS_SUFFIX() {
 		return object.get("OFFLINE_COLOR_CALIBRATION_SUFFIX").asString().toString();
 	}
 	
