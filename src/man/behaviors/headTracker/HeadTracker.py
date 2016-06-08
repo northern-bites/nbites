@@ -64,6 +64,11 @@ class HeadTracker(FSA.FSA):
         self.switchTo('penalizeHeads')
 
     def performHeadMove(self, headMove):
+<<<<<<< HEAD
+=======
+        # print "PERFORMING HEAD MOVE"
+        # print "performHeadMove: " + str(headMove)
+>>>>>>> d0ecabefe073ddc3efc573a5e72acc8bd706ba28
         """Executes the given headMove, then stops."""
         if (headMove != self.headMove
             or self.currentState != 'doHeadMove'):
@@ -71,6 +76,11 @@ class HeadTracker(FSA.FSA):
             self.switchTo('doHeadMove')
 
     def repeatHeadMove(self, headMove):
+<<<<<<< HEAD
+=======
+        # print "REPEATING HEAD MOVE"
+        # print "repeatingHeadMove: " + str(headMove)
+>>>>>>> d0ecabefe073ddc3efc573a5e72acc8bd706ba28
         '''Executes the given headMove, then repeats it forever.'''
         if (self.headMove != headMove
             or (self.currentState != 'repeatHeadMove' and
@@ -80,10 +90,18 @@ class HeadTracker(FSA.FSA):
 
     ##################### Fixed Pitch #######################
     def performBasicPan(self):
+<<<<<<< HEAD
+=======
+        # print "performBasicPan"
+>>>>>>> d0ecabefe073ddc3efc573a5e72acc8bd706ba28
         '''Perform the basic fixed pitch pan once.'''
         self.performHeadMove(HeadMoves.FIXED_PITCH_PAN)
 
     def repeatBasicPan(self):
+<<<<<<< HEAD
+=======
+        # print "repeatBasicPan"
+>>>>>>> d0ecabefe073ddc3efc573a5e72acc8bd706ba28
         '''Repeat the basic fixed pitch pan.'''
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN)
 
@@ -94,6 +112,9 @@ class HeadTracker(FSA.FSA):
         self.repeatHeadMove(HeadMoves.SNAP_PAN)
 
     def performWideSnapPan(self):
+
+        print "PERFORMING WIDE SNAP PAN"
+
         self.performHeadMove(HeadMoves.WIDE_SNAP_PAN)
 
     def repeatWideSnapPan(self):
@@ -112,9 +133,17 @@ class HeadTracker(FSA.FSA):
         self.repeatHeadMove(HeadMoves.WIDE_FAST_SNAP_PAN)
 
     def performWidePan(self):
+<<<<<<< HEAD
         self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
 
     def repeatWidePan(self):
+=======
+        # print "performWidePan"
+        self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
+
+    def repeatWidePan(self):
+        # print "repeatWidePan"
+>>>>>>> d0ecabefe073ddc3efc573a5e72acc8bd706ba28
         """
         Repeat the wide fixed pitch pan.
         Good for localizing.
@@ -177,6 +206,15 @@ class HeadTracker(FSA.FSA):
         Look to the given yaw at an appropriate (fixed) pitch.
         """
         self.performHeadMove(self.helper.lookToAngle(yaw))
+
+    def lookToAngleWithTime(self, yaw, time):
+        """
+        Look to the given yaw with a certain at an appropriate (fixed) pitch.
+        """
+
+        print "LOOKING TO " + str(yaw) + " AT TIME " + str(time)
+
+        self.performHeadMove(self.helper.lookToAngleWithTime(yaw, time))
 
     def trackSharedBall(self):
         self.switchTo('trackSharedBall')
