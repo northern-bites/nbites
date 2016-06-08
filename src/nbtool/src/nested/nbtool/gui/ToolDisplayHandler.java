@@ -85,7 +85,7 @@ import nbtool.util.Events.ViewProfileSetChanged;
 import nbtool.util.Utility.Pair;
 
 public class ToolDisplayHandler implements 
-	IOFirstResponder, Events.LogsFound, Events.GroupAdded {
+	IOFirstResponder, Events.LogsFound, Events.LogRefsFound, Events.GroupAdded {
 	
 	private final long id = Utility.getNextIndex(this);
 	private final ToolDisplayHandler outerThis = this;
@@ -109,6 +109,7 @@ public class ToolDisplayHandler implements
 		setupFooter();
 		
 		Center.listen(Events.LogsFound.class, this, true);
+		Center.listen(Events.LogRefsFound.class, this, true);
 		Center.listen(Events.GroupAdded.class, this, true);
 
 		final String boundsKey = this.toString();		
@@ -336,7 +337,7 @@ public class ToolDisplayHandler implements
 				lastGroup = Group.groupFromPath(selected);
 				LogReference[] added;
 				try {
-					added = FileIO.readAllRefsFromPath(selected);
+					added = FileIO.readAllRefsFromPath(selected, true);
 				} catch (Throwable e) {
 					ToolMessage.displayError("error {%s} (see below) reading Log refs from %s", 
 							e.getMessage(), selected);
@@ -346,14 +347,15 @@ public class ToolDisplayHandler implements
 				}
 				lastGroup.add(added);
 				
-				Log[] addedLogs = new Log[added.length];
-				for (int i = 0; i < added.length; ++i)
-					addedLogs[i] = added[i].get();
+//				Log[] addedLogs = new Log[added.length];
+//				for (int i = 0; i < added.length; ++i)
+//					addedLogs[i] = added[i].get();
 				
-				ToolMessage.displayInfo("loaded %d logs into %s", addedLogs.length, lastGroup);
+				ToolMessage.displayInfo("loaded %d logs into %s", added.length, lastGroup);
 				
 				Events.GGroupAdded.generate(this, lastGroup);
-				Events.GLogsFound.generate(this, addedLogs);
+				Events.GLogRefsFound.generate(this, added);
+//				Events.GLogsFound.generate(this, addedLogs);
 				
 				display.leftSideTabs.setSelectedComponent(display.logTab);
 			} else {
@@ -965,6 +967,13 @@ public class ToolDisplayHandler implements
 			if (ref != null) {
 				model.showReferenceAdded(ref);
 			}
+		}
+	}
+	
+	@Override
+	public void logRefsFound(Object source, LogReference... found) {
+		for (LogReference ref : found) {
+			model.showReferenceAdded(ref);
 		}
 	}
 

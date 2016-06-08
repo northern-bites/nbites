@@ -46,4 +46,8 @@ public abstract class UtilityParent {
 	
 	/* return preferred keybind (the letter you press to cause the utility to pop up) – may not be honored */
 	public abstract char preferredMemnonic();
+	
+	public static interface UtilityListener<P> {
+		void utilityChanged(UtilityProvider<P, ?> who, P what);
+	}
 }
