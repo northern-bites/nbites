@@ -388,7 +388,7 @@ bool BallDetector::findCorrelatedBlackSpots
                     }
                     correlatedSpots.push_back(actualBlobs[i]);
                     std::cout<<"Correlated Spots Size: "<<correlatedSpots.size()<<std::endl;
-                    
+
                     double xsum, ysum, ballSpotX, ballSpotY;
 
                     for(int s = 0; s < correlatedSpots.size(); s++) {
@@ -405,7 +405,7 @@ bool BallDetector::findCorrelatedBlackSpots
                     debugDraw.drawPoint(ballSpotX+width/2,-1*ballSpotY + height/2,MAROON);
                     makeBall(ballSpot, cameraHeight, 0.8, foundBall, true);
 #ifdef OFFLINE
-                    //foundBall = true;
+                    foundBall = true;
 #else
                     return true;
 #endif
@@ -454,7 +454,7 @@ bool BallDetector::findCorrelatedBlackSpots
                     ballSpot.y = ballSpotY;
                     debugDraw.drawPoint(ballSpotX+width/2,-1*ballSpotY + height/2,BLUE);
                     foundBall = true;
-                    makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);    
+                    makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
                 }
             } else if(correlatedSpots.size() == 3) {
                 Spot s1 = correlatedSpots[0];
@@ -475,9 +475,8 @@ bool BallDetector::findCorrelatedBlackSpots
                 foundBall = true;
                 makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
             }
-            std::cout << "Found 2d cor. Punting for now" << std::endl;
 #ifdef OFFLINE
-            //return foundBall;
+            return foundBall;
 #else
             return true;
 #endif
@@ -727,7 +726,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     if (findCorrelatedBlackSpots(blackSpots, actualBlackSpots, cameraHeight,
                                  foundBall)) {
 #ifdef OFFLINE
-        //foundBall = true;
+        foundBall = true;
 #else
         return true;
 #endif

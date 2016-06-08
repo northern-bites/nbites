@@ -4,7 +4,7 @@
           ( (dark_u -0.035)
             (dark_v 0.025)
             (light_u 0.135)
-            (light_v -0.175)
+            (light_v -0.17)
             (fuzzy_u -0.025)
             (fuzzy_v 0.005)
           )
