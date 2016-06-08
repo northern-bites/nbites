@@ -259,7 +259,15 @@ class HeadTrackingHelper(object):
         return (((yaw, pitch),
                  .5, 1, StiffnessModes.LOW_HEAD_STIFFNESSES),)
 
+    def lookToAngleWithTime(self, yaw, time):
 
+        if yaw > 55 or yaw < -55:
+            pitch = 11.0
+        else:
+            pitch = 17.0
+
+        return (((yaw, pitch),
+                 time, 1, StiffnessModes.LOW_HEAD_STIFFNESSES),)
 
         # TODO: use constants above
 

@@ -188,19 +188,33 @@ def fullPan(tracker):
         request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
         # Smartly start the pan
+
+        print "FULL PAN: FIRST FRAME SNAP PAN"
+
         tracker.helper.startingPan(HeadMoves.SNAP_PAN)
 
     if not tracker.brain.motion.head_is_active:
         # Repeat the pan
+
+        print "FULL PAN: REPEAT SNAP PAN -- POST FIRST FRAME"
+
         tracker.performHeadMove(HeadMoves.SNAP_PAN)
 
     if not isinstance(tracker.target, Vision.messages.FilteredBall):
+
+        print "FULL PAN: NUMBER 3"
+
         if tracker.target.on:
             return tracker.goLater('trackingFieldObject')
 
     if (isinstance(tracker.target, Vision.messages.FilteredBall) and
         tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH):
+
+        print "FULL PAN: NUMBER 4"
+
         return tracker.goLater('tracking')
+
+    print "FULL PAN: NONE OF THE ABOVE"
 
     return tracker.stay()
 
