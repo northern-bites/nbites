@@ -81,7 +81,8 @@ def spinToFoundBall(player):
         return player.goLater('playOffBall')
 
     # The head shouldn't turn while we're looking around for the ball
-    player.tracker.lookToAngle(0)
+    self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
+
 
     # spins the appropriate direction
     if theta < 0.:
