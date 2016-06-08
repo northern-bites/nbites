@@ -125,7 +125,7 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 	protected final Block getLineBlock() {
 		return latestVisionLog == null ? null : latestVisionLog.find("lineBuffer");
 	}
-	
+
 	protected final Block getBallBlock() {
 		if (latestVisionLog != null) {
 			for (Block b : latestVisionLog.blocks) {
@@ -134,14 +134,38 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 					return b;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
+	protected final Block getWhiteSpotBlock() {
+		if (latestVisionLog != null) {
+			for (Block b : latestVisionLog.blocks) {
+				if (b.type.equals(SharedConstants.SexprType_DEFAULT()) &&
+						b.whereFrom.equals("nbcross-Vision-spot-white"))
+					return b;
+			}
+		}
+
+		return null;
+	}
+
+	protected final Block getBlackSpotBlock() {
+		if (latestVisionLog != null) {
+			for (Block b : latestVisionLog.blocks) {
+				if (b.type.equals(SharedConstants.SexprType_DEFAULT()) &&
+						b.whereFrom.equals("nbcross-Vision-spot-black"))
+					return b;
+			}
+		}
+
+		return null;
+	}
+
 	protected final Block getCCDBlock() {
 		return latestVisionLog == null ? null : latestVisionLog.find("ccdBuffer");
 	}
-	
+
 	protected final Block getDebugImageBlock() {
 		return latestVisionLog == null ? null : latestVisionLog.find("debugImage");
 	}

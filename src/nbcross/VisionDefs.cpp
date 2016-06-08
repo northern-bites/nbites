@@ -13,6 +13,7 @@
 #include "vision/VisionModule.h"
 #include "vision/FrontEnd.h"
 #include "vision/Homography.h"
+#include "vision/Spots.h"
 #include "ParamReader.h"
 #include "NBMath.h"
 
@@ -115,35 +116,42 @@ SExpr getSExprFromSavedParams(VisionColor color, std::string sexpPath, bool top)
     return SExpr(atoms);
 }
 
-SExpr treeFromBlob(man::vision::Blob& b)
+SExpr treeFromSpot(man::vision::Spot & b, int width, int height)
 {
-    SExpr x(b.centerX());
-    SExpr y(b.centerY());
+	SExpr xLo(b.xLo() + width / 2);
+	SExpr xHi(b.xHi() + width / 2);
+	SExpr yLo(b.yLo() + height / 2);
+	SExpr yHi(b.yHi() + height / 2);
+
+    SExpr x(b.rawX);
+    SExpr y(b.rawY);
     SExpr p = SExpr::list({x, y});
+	SExpr ul = SExpr::list({xLo, yHi});
+	SExpr lr = SExpr::list({xHi, yLo});
 
     SExpr center = SExpr::keyValue("center", p);
-    SExpr area = SExpr::keyValue("area", b.area());
-    SExpr count = SExpr::keyValue("count", b.count());
-    SExpr len1 = SExpr::keyValue("len1", b.firstPrincipalLength());
-    SExpr len2 = SExpr::keyValue("len2", b.secondPrincipalLength());
-    SExpr ang1 = SExpr::keyValue("ang1", b.firstPrincipalAngle());
-    SExpr ang2 = SExpr::keyValue("ang2", b.secondPrincipalAngle());
-    SExpr toRet = SExpr::list({center, area, count, len1, len2, ang1, ang2});
+    SExpr topleft = SExpr::keyValue("topLeft", ul);
+    SExpr lowerright = SExpr::keyValue("lowerRight", lr);
+    SExpr innerdiam = SExpr::keyValue("inner", b.innerDiam);
+    SExpr outerdiam = SExpr::keyValue("outer", b.outerDiam);
+    SExpr spottype = SExpr::keyValue("spottype", b.spotType);
+    SExpr toRet = SExpr::list({center, topleft, lowerright, innerdiam, outerdiam,
+				spottype});
 
     return toRet;
 }
 
-SExpr treeFromBall(man::vision::Ball& b)
+SExpr treeFromBall(man::vision::Ball& b, int width, int height)
 {
     SExpr x(b.x_rel);
     SExpr y(b.y_rel);
     SExpr p = SExpr::list({x, y});
-    SExpr bl = treeFromBlob(b.getBlob());
+    SExpr bl = treeFromSpot(b.getSpot(), width, height);
 
     SExpr rel = SExpr::keyValue("rel", p);
-    SExpr blob = SExpr::keyValue("blob", bl);
+    SExpr spot = SExpr::keyValue("blob", bl);
     SExpr exDiam = SExpr::keyValue("expectedDiam", b.expectedDiam);
-    SExpr toRet = SExpr::list({rel, blob, exDiam});
+    SExpr toRet = SExpr::list({rel, spot, exDiam});
 
     return toRet;
 }
@@ -320,7 +328,6 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
     module.run();
 
     std::vector<Block> retVec;
-    json::Object retKeys;
     // -----------
     //   Y IMAGE
     // -----------
@@ -493,29 +500,64 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
     //-----------
     //  BALL
     //-----------
+//    man::vision::BallDetector* detector = module.getBallDetector(topCamera);
+//    std::vector<man::vision::Ball> balls = detector->getBalls();
+//
+//    SExpr allBalls;
+//    int count = 0;
+//    for (auto i=balls.begin(); i!=balls.end(); i++) {
+//        SExpr ballTree = treeFromBall(*i, width, height);
+//        SExpr next = SExpr::keyValue("ball" + std::to_string(count), ballTree);
+//        allBalls.append(next);
+//        count++;
+//    }
+//    count = 0;
+//    for (auto i=blobs.begin(); i!=blobs.end(); i++) {
+//        if ((*i).firstPrincipalLength() < 8) {
+//            SExpr blobTree = treeFromBlob(*i);
+//            SExpr next = SExpr::keyValue("blob" + std::to_string(count), blobTree);
+//            allBalls.append(next);
+//            count++;
+//        }
+//    }
+
     man::vision::BallDetector* detector = module.getBallDetector(topCamera);
+
     std::vector<man::vision::Ball> balls = detector->getBalls();
-    std::list<man::vision::Blob> blobs = detector->getBlobber()->blobs;
+	std::vector<man::vision::Spot> whiteSpots = detector->getWhiteSpots();
+	std::vector<man::vision::Spot> blackSpots = detector->getBlackSpots();
 
     SExpr allBalls;
+	SExpr allWhite;
+	SExpr allBlack;
     int count = 0;
     for (auto i=balls.begin(); i!=balls.end(); i++) {
-        SExpr ballTree = treeFromBall(*i);
+        SExpr ballTree = treeFromBall(*i, width, height);
         SExpr next = SExpr::keyValue("ball" + std::to_string(count), ballTree);
         allBalls.append(next);
         count++;
     }
-    count = 0;
-    for (auto i=blobs.begin(); i!=blobs.end(); i++) {
-        if ((*i).firstPrincipalLength() < 8) {
-            SExpr blobTree = treeFromBlob(*i);
-            SExpr next = SExpr::keyValue("blob" + std::to_string(count), blobTree);
-            allBalls.append(next);
-            count++;
-        }
+	count = 0;
+    for (auto i=whiteSpots.begin(); i!=whiteSpots.end(); i++) {
+        SExpr spotTree = treeFromSpot(*i, width, height);
+        SExpr next = SExpr::keyValue("whiteSpot" + std::to_string(count), spotTree);
+        allWhite.append(next);
+        count++;
+    }
+	count = 0;
+    for (auto i=blackSpots.begin(); i!=blackSpots.end(); i++) {
+        SExpr spotTree = treeFromSpot(*i, width, height);
+        SExpr next = SExpr::keyValue("darkSpot" + std::to_string(count), spotTree);
+        allBlack.append(next);
+        count++;
     }
 
-    retVec.push_back(Block{allBalls.serialize(), json::Object{}, SharedConstants::SexprType_DEFAULT(), "nbcross-Vision-ball", 0, 0});
+    retVec.push_back(Block{allBalls.serialize(), json::Object{},
+				SharedConstants::SexprType_DEFAULT(), "nbcross-Vision-ball", 0, 0});
+    retVec.push_back(Block{allWhite.serialize(), json::Object{},
+				SharedConstants::SexprType_DEFAULT(), "nbcross-Vision-spot-white", 0, 0});
+    retVec.push_back(Block{allBlack.serialize(), json::Object{},
+				SharedConstants::SexprType_DEFAULT(), "nbcross-Vision-spot-black", 0, 0});
 
     //---------------
     // Center Circle
@@ -547,12 +589,7 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
     int debugImageLength = (width / 2) * (height / 2);
     retVec.push_back(Block{ std::string{ (const char *) module.getDebugImage(topCamera)->pixArray(), debugImageLength}, json::Object{}, "debugImage", "nbcross", 0, 0});
 
-    if (theLog->topLevelDictionary.find("BallTest_Balls") !=
-                theLog->topLevelDictionary.end()) {
-        retKeys["BallTest_Balls"] = theLog->topLevelDictionary["BallTest_Balls"];
-    }
-
-    RETURN(Log::explicitLog(retVec, retKeys, "VisionReturn"));
+    RETURN(Log::explicitLog(retVec, json::Object{}, "VisionReturn"));
 }
 
 NBCROSS_FUNCTION(CalculateCameraOffsets, true, nbl::SharedConstants::LogClass_Tripoint())
