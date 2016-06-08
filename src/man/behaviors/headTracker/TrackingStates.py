@@ -7,10 +7,9 @@ import math
 #TODO: if targets are messed up, insert 'target = tracker.brain.ball'
 #in every function
 
-DEBUG = True
+DEBUG = False
 
 def tracking(tracker):
-    print "Tracking"
     """
     While the target is visible, track it via vision values.
     If the target is lost, switches to altTrackSharedBallAndPan if shared ball
@@ -36,7 +35,6 @@ def tracking(tracker):
     return tracker.stay()
 
 def bounceTracking(tracker):
-    print "bounceTracking"
     """
     Just like the above, but using a different tracking method.
     """
@@ -177,7 +175,6 @@ def lookStraightThenTrack(tracker):
 
 # @SNAPPAN-CHANGE
 def fullPan(tracker):
-    print "It's fullPan time"
     """
     Repeatedly executes the headMove FIXED_PITCH_PAN.
     Once the ball is located, switches to tracking.

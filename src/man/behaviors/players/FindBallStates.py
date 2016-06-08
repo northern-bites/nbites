@@ -30,6 +30,7 @@ def findBall(player):
 @ifSwitchLater(transitions.spunOnce, 'playOffBall')
 @ifSwitchLater(transitions.shouldChaseBall, 'spinToFoundBall')
 def spinSearch(player):
+    print "spinSearch"
     """
     spins and looks to the direction where the ball is thought to be
     """
@@ -61,6 +62,7 @@ def searchAfterFall(player):
 @stay
 @ifSwitchLater(transitions.shouldFindBall, 'findBall')
 def spinToFoundBall(player):
+    print "spinToFoundBall"
     """
     spins to the ball until it is facing the ball 
     """
@@ -77,6 +79,9 @@ def spinToFoundBall(player):
     if spinToFoundBall.isFacingBall:
         print "facing ball"
         return player.goLater('playOffBall')
+
+    # The head shouldn't turn while we're looking around for the ball
+    player.tracker.lookToAngle(0)
 
     # spins the appropriate direction
     if theta < 0.:
