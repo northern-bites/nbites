@@ -8,6 +8,8 @@
 #include <string>
 #include <iostream>
 
+#include <stdlib.h>
+
 #include "generator/Walk2014Generator.hpp"
 #include <cmath>
 #include "utils/angles.hpp"
@@ -52,6 +54,7 @@ static const Joints::JointCode nb_joint_order[] {
 		Joints::LKneePitch,
 		Joints::LAnklePitch,
 		Joints::LAnkleRoll,
+		// Joints::RHipYawPitch,
 		Joints::RHipRoll,
 		Joints::RHipPitch,
 		Joints::RKneePitch,
@@ -142,10 +145,12 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	request->body.actionType = ActionCommand::Body::WALK;
 
 	if (standby) {
+		logMsg("In standby");
 		tryingToWalk = false;
 	} else {
 		if (requestedToStop || !isActive()) {
 			tryingToWalk = false;
+			logMsg("requested to stop or is not active");
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP) {
 			logMsg("STEP command! Odometry walk!");
 
@@ -175,9 +180,10 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 			tryingToWalk = true;
 
 			WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
-			// request->body.forward = command->x_percent;
-			// request->body.left = command->y_percent;
-			// request->body.turn = command->theta_percent;
+			std::cout << "Walk Command: " << command->x_percent << "," << command->y_percent << "," << command->theta_percent << ") \n";
+			request->body.forward = 1.0; //command->x_percent ;
+			request->body.left = 0.0; //command->y_percent ;
+			request->body.turn = 0.0; //command->theta_percent ;
 
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
 			logMsg("Destination command - Destination Walking!");
@@ -196,6 +202,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 			tryingToWalk = false;
 
 		} else if (!currentCommand.get()) {
+			logMsg("Can't get current command! Requesting stand");
 			tryingToWalk = false;
 			// call stand
 			request->body.actionType = ActionCommand::Body::STAND;
@@ -204,7 +211,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 		// TODO handle kick
 	}
 
-	logMsg("walking");
+	logMsg("==========================\nwalking now!");
 
 
 	// Update sensor values
@@ -264,11 +271,11 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 	// Get the position of the ball in robot relative cartesian coordinates
 	// Is this necessary for our system? 
-	float ballX = 1.0;
-	float ballY = 1.0;
-
+	float ballX = 5.0;
+	float ballY = 5.0;
 
     // Update the body model
+    logMsg("Updating body model");
     bodyModel.kinematics = &kinematics;
     bodyModel.update(odometry, sensors);
 
@@ -294,6 +301,11 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     angles = joints.angles;
     hardness = joints.stiffnesses;
 
+    // for (uint8_t i = 0; i < Joints::NUMBER_OF_JOINTS; ++i) {
+
+	   //    std::cout << "WALK PROVIDER: Joint " << Joints::jointNames[i] << " angle: " << angles[i] << " stiffness: " << joints.stiffnesses[i] << std::endl;
+    // }
+
 	// generator->makeJoints(ActionCommand::All* request,
  //                                          Odometry* odometry,
  //                                          const UNSWSensorValues &sensors,
@@ -307,31 +319,30 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     	std::vector<float> chain_angles;
     	std::vector<float> chain_hardness;
     	for (unsigned j = Kinematics::chain_first_joint[i]; j <= Kinematics::chain_last_joint[i]; j++) {
-    		chain_angles.push_back(angles[nb_joint_order[j]]); // TODO I think this should be a lot more complicated than it seems right now...
+    		chain_angles.push_back(joints.angles[nb_joint_order[j]]); // TODO I think this should be a lot more complicated than it seems right now...
+    		logMsgNoEL("ANGLE in "  + Joints::jointNames[nb_joint_order[j]] + " = ");
+			// std::cout << RAD2DEG(joints.angles[nb_joint_order[j]]);
+			std::cout << (joints.angles[nb_joint_order[j]]);
+
+
     		if (hardness[nb_joint_order[j]] == 0) {
-    			logMsg("NO STIFFNESS");
+    			// logMsg("NO STIFFNESS in " + Joints::jointNames[nb_joint_order[j]]);
     			chain_hardness.push_back(MotionConstants::NO_STIFFNESS);
     		} else {
-    			chain_hardness.push_back(hardness[nb_joint_order[j]]);
+    			chain_hardness.push_back(joints.stiffnesses[nb_joint_order[j]]);
     			// TODO Double check this...
-    			logMsg("STIFFNESS: ");
-    			std::cout << hardness[nb_joint_order[j]] << std::endl;
     		}
+    		std::cout << " STIFFNESS: " << joints.stiffnesses[nb_joint_order[j]] << std::endl;
     	}
+
+    	this->setNextChainJoints((Kinematics::ChainID)i, chain_angles);
+    	this->setNextChainStiffnesses((Kinematics::ChainID)i, chain_hardness);
+
     }
-    // this->setNextChainJoints(const Kinematics::ChainID id,
-    //                         const std::vector <float> &chainJoints) {
-    //     nextJoints[id] = chainJoints;
-    // }
-
-    // this->setNextChainStiffnesses(const Kinematics::ChainID id,
-    //                              const std::vector <float> &chainJoints) {
-    //     nextStiffnesses[id] = chainJoints;
-    // }
-
 
     // We only leave when we do a sweet move, so request a special action
     if (requestedToStop) {
+    	logMsg("Requested to stop");
     	inactive();
     	requestedToStop = false;
     	resetOdometry();

@@ -40,25 +40,32 @@ JointValues ClippedGenerator::makeJoints(ActionCommand::All* request,
    for (uint8_t i = 0; i < Joints::NUMBER_OF_JOINTS; ++i) {
       // Clip stifnesses
       if (j.stiffnesses[i] >= 0.0f) {
+
          j.stiffnesses[i] = CLIP(j.stiffnesses[i], 0.0f, 1.0f);
       } else {
+
          j.stiffnesses[i] = -1.0f;
       }
 
       // Clip angles
       if (!isnan(j.angles[i])) {
+        // std::cout << "Clipping angle: Original: " << j.angles[i];
          j.angles[i] = Joints::limitJointRadians(Joints::jointCodes[i],
                                                  j.angles[i]);
+        // std::cout << " Final: " << j.angles[i] << std::endl;
       }
 
       // Clip velocities
       if (old_exists) {
+
          j.angles[i] = CLIP(j.angles[i],
                             old_j.angles[i] - Joints::Radians::MaxSpeed[i],
                             old_j.angles[i] + Joints::Radians::MaxSpeed[i]);
       }
+      // std::cout << "CLIPPED: Joint " << Joints::jointNames[i] << " angle: " << j.angles[i] << " stiffness: " << j.stiffnesses[i] << std::endl;
    }
    old_exists = true;
    old_j = j;
+
    return j;
 }

@@ -115,7 +115,8 @@ private:
 
 	JointValues joints;
 
-	void logMsg(std::string msg) { std::cout << msg << std::endl; }
+	void logMsg(std::string msg) { std::cout << "[UNSW WALK DEBUG] " << msg << std::endl; }
+	void logMsgNoEL(std::string msg) { std::cout << "[UNSW WALK DEBUG] " << msg; }
 
 };
 

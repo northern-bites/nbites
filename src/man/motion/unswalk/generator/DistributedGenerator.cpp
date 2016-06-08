@@ -308,6 +308,7 @@ JointValues DistributedGenerator::makeJoints(ActionCommand::All* request,
    //    turn = UNSWDEG2RAD(-dir*80);
    // }
    // *odometry = *odometry + Odometry(0, 0, turn);
+   std::cout << "IN DISTRIBUTED GENERATOR\n";
    fromBody = bodyGenerators[current_generator]->
               makeJoints(request, odometry, sensors, bodyModel, ballX, ballY);
 

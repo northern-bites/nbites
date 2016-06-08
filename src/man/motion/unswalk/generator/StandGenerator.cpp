@@ -48,6 +48,8 @@ JointValues StandGenerator::makeJoints(ActionCommand::All* request,
 //   joints.stiffnesses[i++] = 0.0f;  // RShoulderRoll
 //   joints.stiffnesses[i++] = 0.0f;  // RElbowYaw
 //   joints.stiffnesses[i++] = 0.0f;  // RElbowRoll
+   std::cout << "IN STAND GENERATOR\n";
+
    return posGen->makeJoints(request, odometry, sensors, bodyModel, ballX, ballY);
 }
 

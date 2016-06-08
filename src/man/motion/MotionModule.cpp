@@ -242,18 +242,26 @@ void MotionModule::processBodyJoints()
         const std::vector<float> larmJoints =
             curProvider->getChainJoints(Kinematics::LARM_CHAIN);
 
+        std::cout << "[MOTION MODULE] LEG JOINTS: ";
+
+
         //copy and clip joints for safety
         for(unsigned int i = 0; i < Kinematics::LEG_JOINTS; i ++)
         {
+
             nextJoints[Kinematics::R_HIP_YAW_PITCH + i] =
                 NBMath::clip(rlegJoints.at(i),
                              Kinematics::RIGHT_LEG_BOUNDS[i][0],
                              Kinematics::RIGHT_LEG_BOUNDS[i][1]);
+            std::cout << "FROM CHAIN: " << Kinematics::JOINT_STRINGS[Kinematics::R_HIP_YAW_PITCH + i] << " " << RAD2DEG(rlegJoints.at(i)) << "  " << Kinematics::JOINT_STRINGS[Kinematics::L_HIP_YAW_PITCH + i] << " " << RAD2DEG(llegJoints.at(i)) << std::endl;
 
             nextJoints[Kinematics::L_HIP_YAW_PITCH + i]
                 = NBMath::clip(llegJoints.at(i),
                                Kinematics::LEFT_LEG_BOUNDS[i][0],
                                Kinematics::LEFT_LEG_BOUNDS[i][1]);
+
+            std::cout << Kinematics::JOINT_STRINGS[Kinematics::R_HIP_YAW_PITCH + i] << " " << RAD2DEG(nextJoints[Kinematics::L_HIP_YAW_PITCH + i]) << "  " << Kinematics::JOINT_STRINGS[Kinematics::L_HIP_YAW_PITCH + i] << " " << RAD2DEG(nextJoints[Kinematics::R_HIP_YAW_PITCH + i]) << std::endl;
+
         }
 
         for(unsigned int i = 0; i < Kinematics::ARM_JOINTS; i ++)
@@ -269,6 +277,11 @@ void MotionModule::processBodyJoints()
                              Kinematics::RIGHT_ARM_BOUNDS[i][1]);
         }
     }
+}
+
+float RAD2DEG(const float x) {
+    return x;
+   // return ((x) * UNSW_DEG_OVER_RAD);
 }
 
 void MotionModule::processHeadJoints()

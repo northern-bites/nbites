@@ -119,6 +119,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
       // Calculate the current hip height by checking how bent the knee is 
       hiph = sensors.joints.angles[LKneePitch] / KNEE_PITCH_RANGE * (WALK_HIP_HEIGHT - STAND_HIP_HEIGHT) + STAND_HIP_HEIGHT;
    }
+   std::cout << "IN WALK2014 GENERATOR\n";
 
    // 1. Read in new walk values (forward, left, turn, power) only at the start of a walk step cycle, ie when t = 0
    if (t == 0) {
@@ -269,6 +270,7 @@ JointValues Walk2014Generator::makeJoints(ActionCommand::All* request,
 
    // 4. Execute Walk2014 Option
    if (walk2014Option == STAND) {                             // Place CoM over ankle and turn set power to motors
+      std::cout << "EXECUTING STAND\n";
       hiph = STAND_HIP_HEIGHT;
       forward = left = turn = 0;
       t = nextFootSwitchT = 0;
