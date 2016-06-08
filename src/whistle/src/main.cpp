@@ -151,7 +151,8 @@ double sum(int start, int end) {
 const int whistleWindow = 200;
 const std::pair<int,int> whistleRange = {1000,2000};
 const double whistleThreshold = 200.0;
-const double whistleSumThreshold = 15000000;
+//const double whistleSumThreshold = 15000000;
+const double whistleSumThreshold = 1000000;
 const double secondPeakMult = 2.0;
 
 void callback(nbsound::Handler * cap, void * buffer, nbsound::parameter_t * params) {
@@ -176,22 +177,23 @@ void callback(nbsound::Handler * cap, void * buffer, nbsound::parameter_t * para
             printf("%d: %lf\n", p1.second, p1.first);
 
             if (p1.first < whistleThreshold) {
-                printf("too quiet!\n");
+                printf("\ttoo quiet!\n");
                 continue;
             }
 
             if (p1.second >= whistleRange.first && p1.second <= whistleRange.second) {
-                printf("in range!\n");
+                printf("\tin range!\n");
 
                 int wstart = std::max(0, p1.second - whistleWindow);
                 int wend = std::min(transform->get_freq_len(), p1.second + whistleWindow);
 
                 std::pair<double, int> p2 = peak2(wstart, wend);
 
-                printf("outside {%d, %d}: %d: %lf\n",
+                printf("\toutside {%d, %d}: %d: %lf\n",
                        wstart, wend, p2.second, p2.first);
 
                 double sum1 = sum(wstart, wend);
+                printf("\tsum1: %lf\n", sum1);
 
                 if ( (p2.first * secondPeakMult) < (p1.first) &&
                     sum1 > whistleSumThreshold ) {
