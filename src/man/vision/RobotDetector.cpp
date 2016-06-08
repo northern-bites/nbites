@@ -44,6 +44,7 @@ void RobotDetector::getWhiteGradImage(ImageLiteU8 whiteImage,
                                       FieldHomography* hom, bool is_top)
 {
     candidates.clear();
+    unmergedCandidates.clear();
 
     uint8_t min = 255;
     uint8_t max = 0;
@@ -164,6 +165,10 @@ void RobotDetector::findCandidates(bool is_top)
     // Robot testRobot(0, boxW, 0, boxH);
     // candidates.push_back(testRobot);
 
+    // Just for now, find best box candidate
+    unsigned int bestID = 0;
+    unsigned int bestBrightness = 0;
+
     // init accumulators:
     unsigned long accumulators[img_wd];
     unsigned long grid[img_wd - boxW + 1][img_ht - boxH + 1];
@@ -227,9 +232,118 @@ void RobotDetector::findCandidates(bool is_top)
 
             // I am above thresh and am greater than all neighbors: I AM ROBOT
             if (amPeak) {
-                candidates.push_back(Robot(i, i+boxW, j, j+boxH));
+                unmergedCandidates.push_back(Robot(i, i+boxW, j, j+boxH));
+                if (candidates.empty()) {
+                    std::cout<<"candidates empty"<<std::endl;
+                    candidates.push_back(Robot(i, i+boxW, j, j+boxH));
+                } else {
+                    std::cout<<"candidates not empty"<<std::endl;
+                    std::cout<<"Box before merge: "<<i<<", "<<i+boxW<<", "<<j<<", "<<j+boxH<<std::endl;
+                    mergeCandidate(i, i+boxW, j, j+boxH);
+                }
             }
         }
+    }
+    printCandidates("FINAL CANDIDATES:");
+}
+
+void RobotDetector::mergeCandidate(int lf, int rt, int tp, int bt)
+{
+    printCandidates("Printing candidates before merging:");
+    bool merged = false;
+    int counter = 0;
+    // Merge box with existing candidates:
+    std::vector<Robot>::iterator it;
+    for(it = candidates.begin(); it != candidates.end(); ++it) {
+        std::cout<<"candidate box: "<<(*it).left<<", "<<(*it).right<<", "<<(*it).top<<", "<<(*it).bottom<<std::endl;
+        // return;
+        // std::cout<<"Robot merge: "<<it->
+        /* std::cout << *it; ... */
+        std::cout<<lf<<"<="<<(*it).left<<" && "<<(*it).left<<"<="<<(rt<<1 + lf<<1)<<"?"<<std::endl;
+        std::cout<<(*it).left<<"<="<<lf<<" && "<<lf<<"<="<<((*it).left<<1 + (*it).right<<1)<<"?"<<std::endl;
+        if (lf <= (*it).left && (*it).left <= (rt<<1 + lf<<1)) {
+            std::cout<<"yes!"<<std::endl;
+            // I'm halfway overlapping in the x direction
+            // new box is to left of old box
+            std::cout<<tp<<"<="<<(*it).top<<" && "<<(*it).top<<"<="<<(tp<<1 + bt<<1)<<"?"<<std::endl;
+            std::cout<<(*it).top<<"<="<<tp<<" && "<<tp<<"<="<<(((*it).top+(*it).bottom)/2)<<"?"<<std::endl;
+            if (tp <= (*it).top && (*it).top <= (tp<<1+bt<<1)) {
+                std::cout<<"yes1.1!"<<std::endl;
+                // new box is upper left of candidate box
+                // (*it).top = tp;
+                // (*it).left = lf;
+                bt = (*it).bottom;
+                rt = (*it).right;
+
+                printCandidates("printing candidates after merging 1");
+                merged = true;
+                // return;
+                // does this start at the second one actually?
+                candidates.erase(it);
+                counter = 0;
+                it = candidates.begin()-1; // loop through them all again
+            } else if ((*it).top <= tp && tp <= (((*it).top+(*it).bottom)/2)) {
+                // new box is to lower left of candidate box
+                // (*it).bottom = bt;
+                // (*it).left = lf;
+                tp = (*it).top;
+                rt = (*it).right;
+                printCandidates("printing candidates after merging 2");
+                merged = true;
+                // return;
+                // does this start at the second one actually?
+                candidates.erase(it);
+                counter = 0;
+                it = candidates.begin()-1; // loop through them all again
+            }
+        } else if ((*it).left <= lf && lf <= ((*it).left<<1 + (*it).right<<1)) {
+            std::cout<<"yes2!"<<std::endl;
+            // I'm halfway overlapping in the x direction
+            // new box is to left of old box
+            std::cout<<tp<<"<="<<(*it).top<<" && "<<(*it).top<<"<="<<(tp<<1 + bt<<1)<<"?"<<std::endl;
+            std::cout<<(*it).top<<"<="<<tp<<" && "<<tp<<"<="<<(((*it).top+(*it).bottom)/2.f)<<"?"<<std::endl;
+            if (tp <= (*it).top && (*it).top <= (tp<<1+bt<<1)) {
+                std::cout<<"yes2.1"<<std::endl;
+                // new box is upper right of candidate box
+                // (*it).top = tp;
+                // (*it).right = rt;
+                bt = (*it).bottom;
+                lf = (*it).left;
+
+                printCandidates("printing candidates after merging 3");
+                merged = true;
+                // return;
+                // does this start at the second one actually?
+                candidates.erase(it);
+                counter = 0;
+                it = candidates.begin()-1; // loop through them all again
+            } else if ((*it).top <= tp && tp <= (((*it).top+(*it).bottom)/2.f)) {
+                std::cout<<"yes2.2"<<std::endl;
+                // new box is to lower right of candidate box
+                // (*it).bottom = bt;
+                // (*it).right = rt;
+                tp = (*it).top;
+                lf = (*it).left;
+                // return;
+                printCandidates("printing candidates after merging 4");
+                merged = true;
+                // does this start at the second one actually?
+                candidates.erase(it);
+                counter = 0;
+                it = candidates.begin()-1; // loop through them all again
+            }
+        }
+        counter++;
+    }
+    candidates.push_back(Robot(lf, rt, tp, bt));
+}
+
+void RobotDetector::printCandidates(std::string message) {
+    std::cout<<message<<std::endl;
+    std::vector<Robot>::iterator it;
+    int counter = 0;
+    for(it = candidates.begin(); it != candidates.end(); ++it) {
+        std::cout<<"   "<<++counter<<": "<<(*it).left<<", "<<(*it).right<<", "<<(*it).top<<", "<<(*it).bottom<<std::endl;
     }
 }
 

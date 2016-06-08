@@ -35,9 +35,12 @@ public:
     uint8_t getFuzzyValue(uint8_t gradientValue);
     void removeHoughLines(EdgeList& edges);
     void findCandidates(bool is_top);
+    void mergeCandidate(int lf, int rt, int tp, int bt);
     // Tells us which part of the image to ignore if we are looking too
     // far to the right or to the left (would pick up shoulder)
     int findAzimuthRestrictions(FieldHomography* hom);
+
+    void printCandidates(std::string message);
 
     struct box {
         int left;
@@ -49,6 +52,7 @@ public:
 #ifdef OFFLINE
     ImageLiteU8 getImage() { return WGImage; }
     std::vector<Robot> getRobots() { return candidates; }
+    std::vector<Robot> getOldRobots() { return unmergedCandidates; }
 #endif
 
 private:
@@ -62,6 +66,7 @@ private:
 
     // For tool right now
     std::vector<Robot> candidates;
+    std::vector<Robot> unmergedCandidates;
 };
 
 } // vision

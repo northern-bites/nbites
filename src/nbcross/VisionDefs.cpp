@@ -602,6 +602,23 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
 
     retVec.push_back(Block{allRobots.serialize(), json::Object{}, SharedConstants::SexprType_DEFAULT(), "nbcross-robot-candidates", 0, 0});
 
+    //-----------------------------
+    //  UNMERGED ROBOT CANDIDATES
+    //-----------------------------
+    // Log* rRet = new Log();
+    std::vector<man::vision::Robot> urobots = rDetector->getOldRobots();
+
+    SExpr allURobots;
+    rcount = 0;
+    for (auto i=urobots.begin(); i!=urobots.end(); i++) {
+        SExpr robotTree = treeFromRobot(*i);
+        SExpr next = SExpr::keyValue("urobot" + std::to_string(rcount), robotTree);
+        allURobots.append(next);
+        rcount++;
+    }
+
+    retVec.push_back(Block{allURobots.serialize(), json::Object{}, SharedConstants::SexprType_DEFAULT(), "nbcross-unmerged-robot-candidates", 0, 0});
+
 
     if (theLog->topLevelDictionary.find("BallTest_Balls") !=
                 theLog->topLevelDictionary.end()) {

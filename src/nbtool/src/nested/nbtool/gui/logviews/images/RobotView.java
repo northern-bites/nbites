@@ -157,6 +157,26 @@ public class RobotView extends VisionView
 
             graph.draw(new Rectangle2D.Double(left, top, right-left, bottom-top));
         }
+
+        // this doesn't always draw - but it's not because of the SEXpr / message passing
+        Graphics2D u_graph = original.createGraphics();
+        u_graph.setColor(Color.RED);
+        String ur = "urobot";
+
+        for(int i=0; ;i++)
+        {
+            SExpr tree = this.getUnmergedRobotCandidatesBlock().parseAsSExpr();
+            SExpr robot = tree.find(ur+i);
+            if (!robot.exists()){
+                break;
+            }
+            int top = (int) robot.get(1).find("top").get(1).valueAsDouble();
+            int bottom = robot.get(1).find("bottom").get(1).valueAsInt();
+            int left = robot.get(1).find("left").get(1).valueAsInt();
+            int right = robot.get(1).find("right").get(1).valueAsInt();
+
+            u_graph.draw(new Rectangle2D.Double(left*2, top*2, (right-left)*2, (bottom-top)*2));
+        }
     }
 
     @Override

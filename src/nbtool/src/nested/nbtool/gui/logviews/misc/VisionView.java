@@ -161,6 +161,17 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 		return null;
 	}
 
+	protected final Block getUnmergedRobotCandidatesBlock() {
+		if (latestVisionLog != null) {
+			for (Block r : latestVisionLog.blocks) {
+				if (r.type.equals(SharedConstants.SexprType_DEFAULT()) &&
+						r.whereFrom.equals("nbcross-unmerged-robot-candidates"))
+					return r;
+			}
+		}
+		return null;
+	}
+
 	protected abstract void setupVisionDisplay();
 
 }
