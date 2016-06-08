@@ -297,6 +297,7 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
     }
 
     if (theLog->blocks.size() > 3) {
+        std::cout<<"Blocks Size > 3"<<std::endl;
         SExpr _calParams = theLog->blocks[3].parseAsSexpr();
 
         SExpr* calParams = &_calParams;
@@ -313,6 +314,8 @@ NBCROSS_FUNCTION(Vision, false, nbl::SharedConstants::LogClass_Tripoint())
 
         if (_calParams.recursiveFind("BlackStar").size() > 0)
             module.blackStar(true);
+    } else {
+        std::cout<<"Blobks Size < 3"<<std::endl;
     }
 
     if (theLog->topLevelDictionary.find("DebugDrawing") !=

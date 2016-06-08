@@ -642,9 +642,9 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
                             EdgeList& edges)
 {
 
-    double t = homography->tilt();
-    double t_deg = (t * 180)/M_PI;
-    std::cout<<"Tilt From Homography [Radians]: "<<t<<std::endl;
+    double t_rad = homography->tilt();
+    double t_deg = (t_rad * 180)/M_PI;
+    std::cout<<"Tilt From Homography [Radians]: "<<t_rad<<std::endl;
     std::cout<<"Tilt From Homography [Degrees]: "<<t_deg<<std::endl;
 
 	int WHITE_CANDIDATE = 1;
