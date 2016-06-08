@@ -55,7 +55,7 @@ loop16:
         movdqu  xmm2, [edi + ecx*4]
         movdqu  xmm3, [edi + ecx*4 + 16]
 
-        psubw   xmm0, xmm1        # subtract training from leading
+        psubw   xmm0, xmm1        # subtract trailing from leading
 
 # Convert 16-bit differences to 32-bit (signed). The punpck*wd instructions place
 # the 16-bit word in the high 16 bits of the 32-bit doublewords of the destination
