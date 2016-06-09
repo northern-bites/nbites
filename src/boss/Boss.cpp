@@ -284,7 +284,7 @@ int Boss::constructSharedMem()
     return 0;
 }
 
-
+//DO NOT PUT PRINT OUTS/BLOCKING CODE HERES! WILL CRASH ROBOT!
 bool bossSyncRead(volatile SharedData * sd, uint8_t * stage) {
     //We know there exists new data in >sd<,
     //now we just need to safely read it out.
@@ -301,6 +301,7 @@ bool bossSyncRead(volatile SharedData * sd, uint8_t * stage) {
     return true;
 }
 
+//DO NOT PUT PRINT OUTS/BLOCKING CODE HERES! WILL CRASH ROBOT!
 void Boss::DCMPreProcessCallback()
 {
     DCM_TIMING_DEBUG_PRE1();
@@ -355,6 +356,7 @@ void Boss::DCMPreProcessCallback()
     DCM_TIMING_DEBUG_PRE2();
 }
 
+//DO NOT PUT PRINT OUTS/BLOCKING CODE HERES! WILL CRASH ROBOT!
 bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, int64_t index)
 {
     // trylock because we're in the DCMs cycle right now. We don't want to block!
@@ -371,6 +373,7 @@ bool bossSyncWrite(volatile SharedData * sd, uint8_t * stage, int64_t index)
     return true;
 }
 
+//DO NOT PUT PRINT OUTS/BLOCKING CODE HERES! WILL CRASH ROBOT!
 void Boss::DCMPostProcessCallback()
 {
     if (!manRunning) return;

@@ -31,7 +31,10 @@ void Enactor::command(messages::JointAngles angles, messages::JointAngles stiffn
     {
         jointCommand[5][i][0] = jointAngles[i];
         stiffnessCommand[5][i][0] = jointStiffnesses[i];
+        //std::cout << "Joint "<< i<< " "<< jointAngles[i]<<std::endl;
+
     }
+   // std::cout<<"\n\n"<<std::endl;
 
     try
     {
