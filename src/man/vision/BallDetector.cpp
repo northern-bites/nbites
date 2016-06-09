@@ -349,25 +349,25 @@ bool BallDetector::blobsAreClose(std::pair<int,int> first,
    are enough of them then it is strong evidence of a ball.
 */
 bool BallDetector::findCorrelatedBlackSpots
-(std::vector<std::pair<int,int>> & blackBlobs,
+(std::vector<std::pair<int,int>> & blackSpots,
  std::vector<Spot> & actualBlobs,
  double cameraHeight, bool & foundBall)
 {
     // loop through the filtered blobs and see if any are close together
-    int correlations[blackBlobs.size()];
-    int correlatedTo[blackBlobs.size()][blackBlobs.size()];
+    int correlations[blackSpots.size()];
+    int correlatedTo[blackSpots.size()][blackSpots.size()];
     bool foundThree = false;
     // loop through filtered black blobs
-    for (int i = 0; i < blackBlobs.size(); i++) {
-        std::pair<int,int> p = blackBlobs[i];
+    for (int i = 0; i < blackSpots.size(); i++) {
+        std::pair<int,int> p = blackSpots[i];
         // initialize the correlations for this blob
         correlations[i] = 0;
-        for (int k = 0; k < blackBlobs.size(); k++) {
+        for (int k = 0; k < blackSpots.size(); k++) {
             correlatedTo[i][k] = 0;
         }
         // we're going to check against all other black blobs
-        for (int j = 0; j < blackBlobs.size(); j++) {
-            std::pair<int,int> q = blackBlobs[j];
+        for (int j = 0; j < blackSpots.size(); j++) {
+            std::pair<int,int> q = blackSpots[j];
             if (blobsAreClose(p, q)) {
                 correlations[i] += 1;
                 correlatedTo[i][j] = 1;
@@ -375,10 +375,9 @@ bool BallDetector::findCorrelatedBlackSpots
                 if (correlations[i] > 2) {
                     // grab this blob from our vector
                     foundThree = true;
-                    std::cout << "Found correlated, punting for now" << std::endl;
                     std::vector<Spot> correlatedSpots;
                     // find our correlated blobs and merge them in
-                    for (int k = 0; k < blackBlobs.size(); k++) {
+                    for (int k = 0; k < blackSpots.size(); k++) {
                         if (correlatedTo[i][k] == 1) {
                             correlatedSpots.push_back(actualBlobs[k]);
                             correlatedTo[k][i] = 0;
@@ -386,9 +385,7 @@ bool BallDetector::findCorrelatedBlackSpots
                         }
                     }
                     correlatedSpots.push_back(actualBlobs[i]);
-                    std::cout<<"Correlated Spots Size: "<<correlatedSpots.size()<<std::endl;
-
-                    double xsum, ysum, ballSpotX, ballSpotY;
+                    double xsum = 0.0, ysum = 0.0, ballSpotX, ballSpotY;
 
                     for(int s = 0; s < correlatedSpots.size(); s++) {
                         xsum += correlatedSpots[s].ix();
@@ -398,10 +395,22 @@ bool BallDetector::findCorrelatedBlackSpots
                     ballSpotX = xsum/correlatedSpots.size();
                     ballSpotY = ysum/correlatedSpots.size();
 
+					if (debugBall) {
+						std::cout<<"Correlated Spots Size: "<<
+							correlatedSpots.size() << " " << ballSpotX <<
+							" " << ballSpotY << std::endl;
+					}
+
                     Spot ballSpot;
-                    ballSpot.x = ballSpotX;
-                    ballSpot.y = ballSpotY;
-                    debugDraw.drawPoint(ballSpotX+width/2,-1*ballSpotY + height/2,MAROON);
+                    ballSpot.x = ballSpotX * 2;
+                    ballSpot.y = ballSpotY * 2;
+					ballSpot.rawX = ballSpotX + width / 2;
+					ballSpot.rawY = -1 * ballSpotY + height / 2;
+					ballSpot.innerDiam = 5;
+					if (debugBall) {
+						debugDraw.drawPoint(ballSpotX+width/2,
+											-1*ballSpotY + height/2,MAROON);
+					}
                     makeBall(ballSpot, cameraHeight, 0.8, foundBall, true);
 #ifdef OFFLINE
                     foundBall = true;
@@ -413,12 +422,12 @@ bool BallDetector::findCorrelatedBlackSpots
         }
     }
     // If the best case didn't work out, look for 3 black blobs together
-    for (int c = 0; c < blackBlobs.size(); c++) {
+    for (int c = 0; c < blackSpots.size(); c++) {
         if ((correlations[c] > 1 || (correlations[c] == 1))
              && !foundThree) {
             std::vector<Spot> correlatedSpots;
             double ballSpotX, ballSpotY = 0;
-            for (int k = 0; k < blackBlobs.size(); k++) {
+            for (int k = 0; k < blackSpots.size(); k++) {
                 if(correlatedTo[c][k] == 1) {
                     correlatedSpots.push_back(actualBlobs[k]);
                     correlatedTo[k][c] = 0;
@@ -443,18 +452,29 @@ bool BallDetector::findCorrelatedBlackSpots
                     lower = 17.0; //change from 19.0
                     upper = 21.4;
                 }
-                distance = sqrt(pow((s2.ix() - s1.ix()),2) + pow((s2.iy() - s1.iy()),2));
-                std::cout<<"Distance: "<<distance<<std::endl;
+                distance = sqrt(pow((s2.ix() - s1.ix()),2) +
+								pow((s2.iy() - s1.iy()),2));
+				if (debugBall) {
+					std::cout<<"Distance: "<<distance<<std::endl;
+				}
 
                 if(distance > lower && distance < upper) {
-                    std::cout<<"Distance is in the right range"<<std::endl;
+					if (debugBall) {
+						std::cout<<"Distance is in the right range"<<std::endl;
+					}
 
                     ballSpotX = (s1.ix()+s2.ix())/2;
                     ballSpotY = (s1.iy()+s2.iy())/2;
                     Spot ballSpot;
-                    ballSpot.x = ballSpotX;
-                    ballSpot.y = ballSpotY;
-                    debugDraw.drawPoint(ballSpotX+width/2,-1*ballSpotY + height/2,BLUE);
+                    ballSpot.x = ballSpotX * 2;
+                    ballSpot.y = ballSpotY * 2;
+					ballSpot.rawX = ballSpotX + width / 2;
+					ballSpot.rawY = -1 * ballSpotY + height / 2;
+					ballSpot.innerDiam = 5;
+					if (debugBall) {
+						debugDraw.drawPoint(ballSpotX+width/2,
+											-1*ballSpotY + height/2,BLUE);
+					}
                     foundBall = true;
                     makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
                 }
@@ -468,16 +488,24 @@ bool BallDetector::findCorrelatedBlackSpots
                 // homography->fieldCoords(s2.ix(),s2.iy(), s2wx, s2wy);
                 // homography->fieldCoords(s3.ix(),s3.iy(), s3wx, s3wy);
 
-                double area = abs((s1.ix()*(s2.iy()-s3.iy()) + s2.ix()*(s3.iy()-s1.iy()) + s3.ix()*(s1.iy()-s2.iy()))/2);
-                std::cout<<"Area: "<<area<<std::endl;
+                double area = abs((s1.ix()*(s2.iy()-s3.iy()) +
+								   s2.ix()*(s3.iy()-s1.iy()) +
+								   s3.ix()*(s1.iy()-s2.iy()))/2);
 
                 ballSpotX = (s1.ix()+s2.ix()+s3.ix())/3;
                 ballSpotY = (s2.iy()+s2.iy()+s3.iy())/3;
-                debugDraw.drawPoint(ballSpotX+width/2,-1*ballSpotY + height/2,BLACK);
+				if (debugBall) {
+					std::cout<<"Area: "<<area<<std::endl;
+					debugDraw.drawPoint(ballSpotX+width/2,
+										-1*ballSpotY + height/2,BLACK);
+				}
 
                 Spot ballSpot;
-                ballSpot.x = ballSpotX;
-                ballSpot.y = ballSpotY;
+                ballSpot.x = ballSpotX * 2; // in half pixels
+                ballSpot.y = ballSpotY * 2;
+				ballSpot.rawX = ballSpotX + width / 2;
+				ballSpot.rawY = -1 * ballSpotY + height / 2;
+				ballSpot.innerDiam = 5;
 
                 foundBall = true;
                 makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
