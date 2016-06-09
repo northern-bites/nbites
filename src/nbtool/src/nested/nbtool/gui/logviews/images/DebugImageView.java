@@ -352,6 +352,8 @@ public class DebugImageView extends VisionView implements
 		final int WHITE_REJECT = 2;
 		final int DARK_CANDIDATE = 3;
 		final int DARK_REJECT = 4;
+		final int WHITE_BLOB = 5;
+		final int WHITE_BLOB_BAD = 6;
 
         SExpr loc = blob.find("center").get(1);
 
@@ -370,6 +372,10 @@ public class DebugImageView extends VisionView implements
 		case DARK_CANDIDATE: g.setColor(Color.ORANGE);
 			break;
 		case DARK_REJECT: g.setColor(Color.BLUE);
+			break;
+		case WHITE_BLOB: g.setColor(Color.MAGENTA);
+			break;
+		case WHITE_BLOB_BAD: g.setColor(Color.WHITE);
 			break;
 		}
 

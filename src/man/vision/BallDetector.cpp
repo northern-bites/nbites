@@ -624,6 +624,9 @@ bool BallDetector::filterWhiteSpot(Spot spot,
         for (int j = topY; j < bottomY; j++) {
             getColor(i, j);
             if (isGreen()) {
+				if (debugBall) {
+					std::cout << "Rejecting spot because of green" << std::endl;
+				}
                 return false;
             }
             if (!isWhite()) {
@@ -644,6 +647,8 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 	int WHITE_REJECT = 2;
 	int DARK_CANDIDATE = 3;
 	int DARK_REJECT = 4;
+	int WHITE_BLOB = 5;
+	int WHITE_BLOB_BAD = 6;
 
     Ball reset;
     _best = reset;
@@ -670,7 +675,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     spots.darkSpot(true);
     spots.innerDiamCm(3.0f);
     if (!topCamera) {
-        spots.innerDiamCm(5.0f);
+        spots.innerDiamCm(3.0f);
     }
     spots.filterThreshold(140);
     spots.greenThreshold(60);
@@ -701,6 +706,49 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         }
     }
 
+	// run blobber on parts of the image where spot detector won't work
+	int bottomQuarter = height * 3 / 4;
+	if (topCamera) {
+		ImageLiteU8 bottomWhite(whiteImage, 0, bottomQuarter, whiteImage.width(),
+								height - bottomQuarter);
+		blobber.run(bottomWhite.pixelAddr(), bottomWhite.width(),
+					bottomWhite.height(), bottomWhite.pitch());
+	} else {
+		bottomQuarter = 0;
+		blobber.run(white.pixelAddr(), white.width(), white.height(), white.pitch());
+	}
+	for (auto i = blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
+		int diam = (*i).firstPrincipalLength();
+		if (diam < 20 && diam >= 10) {
+			// convert this blob to a Spot
+			int cx = (*i).centerX();
+			int cy = (*i).centerY();
+			Spot foo;
+			foo.x = (cx - width / 2) * 2;
+			foo.y = (cy + bottomQuarter - height / 2) * 2;
+			foo.rawX = cx;
+			foo.rawY = cy + bottomQuarter;
+			foo.innerDiam = (*i).firstPrincipalLength() * 2;
+			if (filterWhiteSpot(foo, blackSpots, badBlackSpots)) {
+				foo.spotType = WHITE_BLOB;
+				actualWhiteSpots.push_back(foo);
+				makeBall(foo, cameraHeight, 0.75, foundBall, false);
+#ifdef OFFLINE
+				foundBall = true;
+#else
+				return true;
+#endif
+			} else {
+				foo.spotType = WHITE_BLOB_BAD;
+			}
+			if (debugBall) {
+				debugWhiteSpots.push_back(foo);
+			}
+		} else {
+			std::cout << "Rejected blob " << diam << std::endl;
+		}
+	}
+
     SpotDetector whitespots;
     whitespots.darkSpot(false);
     whitespots.innerDiamCm(13.0f);
@@ -720,7 +768,11 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         if (filterWhiteSpot((*i), blackSpots, badBlackSpots)) {
             actualWhiteSpots.push_back((*i));
             makeBall((*i), cameraHeight, 0.75, foundBall, false);
+#ifdef OFFLINE
             foundBall = true;
+#else
+			return true;
+#endif
 			(*i).spotType = WHITE_CANDIDATE;
         } else if (!topCamera || midY > field->horizonAt(midX)) {
 			(*i).spotType = WHITE_REJECT;
