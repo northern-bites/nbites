@@ -65,7 +65,7 @@ void RobotDetector::getWhiteGradImage(ImageLiteU8 whiteImage,
     }
     // std::cout<<"Start col: "<<startCol<<", endCol = "<<endCol<<", wd = "<<img_wd<<std::endl;
 
-    std::cout<<"[ ROBOT DETECTOR] Az = "<<hom->azimuth()<<std::endl;
+    // std::cout<<"[ ROBOT DETECTOR] Az = "<<hom->azimuth()<<std::endl;
 
     for (int j = 1; j < img_ht-1; ++j) {
         for (int i = startCol; i < endCol; ++i) {
@@ -271,7 +271,7 @@ void RobotDetector::findCandidates(bool is_top)
     // // mergeCandidate(c2+boxW/2, c2+boxW+boxW/2, c2, c2+boxH);
     // mergeCandidate(c1, c1+boxW, c1, c1+boxH);
 
-    printCandidates("[ ROBOT DETECTOR ] FINAL CANDIDATES:");
+    // printCandidates("[ ROBOT DETECTOR ] FINAL CANDIDATES:");
 }
 
 void RobotDetector::mergeCandidate(int lf, int rt, int tp, int bt)
