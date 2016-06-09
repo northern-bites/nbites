@@ -137,6 +137,7 @@ namespace man {
             std::vector<Edge> goodEdges;
 			std::vector<Spot> debugBlackSpots;
 			std::vector<Spot> debugWhiteSpots;
+			Connectivity blobber;
 
 			DebugImage debugDraw;
 			ImageLiteU8 whiteImage, greenImage, blackImage;
