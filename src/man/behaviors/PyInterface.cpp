@@ -80,6 +80,10 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::stiffStatus_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
+        .add_property("behaviors",
+                      make_getter(&PyInterface::behaviors_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
         .add_property("fieldObstacles",
                       make_getter(&PyInterface::obstacle_ptr,
                                   return_value_policy

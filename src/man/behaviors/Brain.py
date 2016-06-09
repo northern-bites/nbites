@@ -36,6 +36,7 @@ import ButtonState_proto
 import FallStatus_proto
 import StiffnessControl_proto
 import Vision_proto
+import Behaviors_proto
 
 class Brain(object):
     """
@@ -220,6 +221,7 @@ class Brain(object):
     def updateComm(self):
         me = self.teamMembers[self.playerNumber - 1]
         output = self.interface.myWorldModel
+        print str(self.interface)
 
         output.timestamp = int(self.time * 1000)
         output.my_x = me.x

@@ -17,6 +17,8 @@ def gameInitial(player):
     In the future, we may wish to make the head move a bit slower here.
     """
     if player.firstFrame():
+        print str(player.brain.interface.behaviors.on)
+        # player.brain.interface.behaviors.GCState = 1
         player.inKickingState = False
         player.brain.fallController.enabled = False
         player.gainsOn()

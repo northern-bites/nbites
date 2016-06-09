@@ -18,6 +18,7 @@
 #include "Obstacle.pb.h"
 #include "Toggle.pb.h"
 #include "Vision.pb.h"
+#include "Behaviors.pb.h"
 
 namespace man {
 namespace behaviors {
@@ -42,6 +43,7 @@ public:
     messages::FallStatus        const * fallStatus_ptr;
     messages::WorldModel        const * myWorldModel_ptr;
     messages::StiffStatus       const * stiffStatus_ptr;
+    messages::Behaviors         const * behaviors_ptr;
     messages::FieldObstacles    const * obstacle_ptr;
     // messages::VisionObstacle    const * visionObstacle_ptr;
     messages::SharedBall        const * sharedBall_ptr;
@@ -77,6 +79,11 @@ public:
     void setLedCommand_ptr(const messages::LedCommand* msg)
     {
         ledCommand_ptr = msg;
+    }
+
+    void setBehaviors_ptr(const messages::Behaviors* msg)
+    {
+        behaviors_ptr = msg;
     }
 
 

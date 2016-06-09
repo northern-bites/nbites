@@ -25,6 +25,7 @@ extern "C" void initObstacle_proto();
 extern "C" void initToggle_proto();
 extern "C" void initVision_proto();
 extern "C" void initObstacle_proto();
+extern "C" void initBehaviors_proto();
 extern "C" void initinterface();
 
 namespace man {
@@ -99,6 +100,7 @@ void BehaviorsModule::initializePython()
         initToggle_proto();
         initVision_proto();
         initObstacle_proto();
+        initBehaviors_proto();
         // Init the interface as well
         initinterface();
     } catch (error_already_set) {
@@ -256,6 +258,9 @@ void BehaviorsModule::prepareMessages()
 
     visionIn.latch();
     pyInterface.setVision_ptr(&visionIn.message());
+
+    behaviorsIn.latch();
+    pyInterface.setBehaviors_ptr(&behaviorsIn.message());
 
     obstacleIn.latch();
     pyInterface.setObstacle_ptr(&obstacleIn.message());

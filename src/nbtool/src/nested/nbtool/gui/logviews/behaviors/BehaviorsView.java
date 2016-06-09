@@ -3,9 +3,6 @@ package nbtool.gui.logviews.images;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-// import java.awt.image.BufferedImage;
-// import java.io.ByteArrayInputStream;
-// import java.io.DataInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -13,43 +10,23 @@ import java.util.Vector;
 import nbtool.data.log.Block;
 import nbtool.data.log.Log;
 import nbtool.gui.logviews.misc.ViewParent;
-// import nbtool.images.EdgeImage;
 import nbtool.io.CommonIO.IOInstance;
 import nbtool.util.Debug;
 import nbtool.util.SharedConstants;
 
 public class BehaviorsView extends ViewParent {
 	
-	private static final Debug.DebugSettings debug = Debug.createSettings(true, true, true, null, null);
+	// private static final Debug.DebugSettings debug = Debug.createSettings(true, true, true, null, null);
 
 	@Override
 	public void setupDisplay() {
-		// width = this.originalWidth();
-  //       height = this.originalHeight();
-
-  //       displayw = width;
-  //       displayh = height;
-
-        // fx0 = displayw + buffer;
-        // fy0 = 0;
-
-        // fxc = displayw + buffer + fieldw/2; 
-        // fyc = fieldh;
-
-        // originalImage = this.getOriginal().toBufferedImage();
+		// Silence is golden
 	}
 
 	@Override
 	public String[] displayableTypes() {
 		return new String[]{SharedConstants.LogClass_Tripoint()};
 	}
-	
-	// @Override
-	// protected String functionName() {
-	// 	return "CheckCameraOffsets";
-	// }
-	
-	///
 	
 	int width;
 	int height;
@@ -60,13 +37,6 @@ public class BehaviorsView extends ViewParent {
 	final int fieldw = 640;
 	final int fieldh = 554;
 
-	// final int buffer = 5;
-
-	// double resize = 1;
-
-	// Starting size. The larger the number, the smaller the field ratio
-	// final int startSize = 1;
-
 	boolean click = false;
 	boolean drag = false;
 
@@ -75,20 +45,6 @@ public class BehaviorsView extends ViewParent {
 	int clickY1 = 0;
 	int clickX2 = 0;
 	int clickY2 = 0;
-
-	// Field coordinate image upper left hand corder
-	// int fx0;
-	// int fy0;
-
-	// Center of field cordinate system
-	// int fxc = displayw + buffer + fieldw/2; 
-	// int fyc = fieldh;
-
-	// BufferedImage originalImage;
-	// BufferedImage edgeImage;
-	// Vector<Double> lines;
-
-	// boolean calibrationSuccess = false;
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -101,12 +57,20 @@ public class BehaviorsView extends ViewParent {
 		g.setFont(calFont.deriveFont((float)calFont.getSize() * 0.66f));
 		g.setColor(new Color(56, 56, 56));
 		g.drawString("Last updated by James Little on June 8, 2016", 20, 35);
+		g.fillRect(20, 40, 800, 1);
+		g.setFont(calFont);
+		g.setColor(new Color(128, 128, 128));
+		g.drawString("GameInitial", 20, 70);
+		g.drawString("GameReady", 150, 70);
+		g.drawString("GameSet", 270, 70);
+		g.drawString("GamePlaying", 370, 70);
+		g.drawString("GamePenalty", 500, 70);
+
 	}
 
 	public BehaviorsView() {
 		super();
 		setLayout(null);
-		// lines = new Vector<Double>();
 	}
 
 	// @Override

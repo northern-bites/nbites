@@ -87,6 +87,7 @@ public:
     portals::InPortal<messages::FieldObstacles> obstacleIn;
     // portals::InPortal<messages::VisionObstacle> visionObstacleIn;
     portals::InPortal<messages::Vision> visionIn;
+    portals::InPortal<messages::Behaviors> behaviorsIn;
     portals::InPortal<messages::SharedBall> sharedBallIn;
     portals::InPortal<messages::RobotLocation> sharedFlipIn;
 

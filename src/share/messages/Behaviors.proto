@@ -1,0 +1,19 @@
+package messages;
+
+option java_outer_classname = "_File_Behaviors";
+option java_multiple_files = true;
+
+message Behaviors
+{
+	enum GameControllerState {
+		GAMEINITIAL = 1;
+		GAMEREADY = 2;
+		GAMESET = 3;
+		GAMEPLAYING = 4;
+		GAMEFINISHED = 5;
+		GAMEPENALIZED = 6;
+	}
+
+    optional GameControllerState GCState = 1 [default = GAMEINITIAL];
+    optional bool on = 2;
+}
