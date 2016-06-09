@@ -19,6 +19,7 @@
 #include "VisionRobot.pb.h"
 
 #include "json.hpp"
+#include "nblogio.h"
 
 namespace man {
 namespace vision {
@@ -64,6 +65,10 @@ public:
     void blackStar(bool blackStar) { blackStar_ = blackStar; }
     bool blackStar() const {return blackStar_;}
 
+    json::Object latestUsedColorParams[2];
+    Colors* colorParams[2];
+    CalibrationParams* calibrationParams[2];
+
 protected:
     virtual void run_();
 
@@ -74,9 +79,10 @@ private:
     void outportalVisionField();
     void updateObstacleBox();
 
-    Colors* colorParams[2];
-    json::Object latestUsedColorParams[2];
-    CalibrationParams* calibrationParams[2];
+    nbl::io::FileMonitor colorParamsMonitor;
+    nbl::io::FileMonitor camOffsetsMonitor;
+    void reloadColorParams();
+    void reloadCameraOffsets();
 
     ImageFrontEnd* frontEnd[2];
     EdgeDetector* edgeDetector[2];

@@ -1,13 +1,21 @@
 package nbtool.data.calibration;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import nbtool.data.SExpr;
 import nbtool.data.json.Json;
 import nbtool.data.json.JsonObject;
 import nbtool.data.json.JsonString;
 import nbtool.data.json.Json.JsonValue;
+import nbtool.util.Debug;
+import nbtool.util.SharedConstants;
+import nbtool.util.ToolSettings;
 import nbtool.util.test.TestBase;
 import nbtool.util.test.Tests;
 
@@ -86,6 +94,10 @@ public class ColorParam {
 		}
 	}
 	
+	public static Path getPath() {
+		return Paths.get(ToolSettings.NBITES_DIR, SharedConstants.OFFLINE_COLOR_PARAMS_SUFFIX());
+	}
+	
 	public static void _NBL_ADD_TESTS_() {
 		Tests.add("calibration", new TestBase("ColorParam"){
 
@@ -125,6 +137,56 @@ public class ColorParam {
 				return true;
 			}
 			
+		}, new TestBase("ColorParamsExists") {
+
+			@Override
+			public boolean testBody() throws Exception {
+				
+				String cpStr = new String(Files.readAllBytes(
+						Paths.get(ToolSettings.NBITES_DIR, SharedConstants.OFFLINE_COLOR_PARAMS_SUFFIX())
+						));
+				
+				Set.parse(Json.parse(cpStr).asObject());
+				
+				return true;
+			}
+			
 		});
+	}
+	
+	private static ColorParam makeC(SExpr se) {
+		Debug.plain(se.print());
+		ColorParam param = new ColorParam();
+		int i = 0;
+		param.uAtY0 = se.get(i++).get(1).valueAsDouble();
+		param.vAtY0 = se.get(i++).get(1).valueAsDouble();
+		param.uAtY255 = se.get(i++).get(1).valueAsDouble();
+		param.vAtY255 = se.get(i++).get(1).valueAsDouble();
+		param.u_fuzzy_range = se.get(i++).get(1).valueAsDouble();
+		param.v_fuzzy_range = se.get(i++).get(1).valueAsDouble();
+		return param;
+	}
+	
+	private static Camera make(SExpr se) {
+		Camera camera = new Camera();
+		camera.green = makeC(se.find("Green").get(1));
+		camera.black = makeC(se.find("Orange").get(1));
+		camera.white = makeC(se.find("White").get(1));
+		return camera;
+	}
+	
+	public static void main(String[] args) throws IOException {
+		String lisp = new String(Files.readAllBytes(ToolSettings.NBITES_DIR_PATH.resolve("src/man/config/colorParams.txt")));
+		SExpr se = SExpr.deserializeFrom(lisp);
+		
+		SExpr list = se.get(1);
+		SExpr top = list.get(0).get(1);
+		SExpr bot = list.get(1).get(1);
+		
+		Set set = new Set();
+		set.cameras[0] = make(top);
+		set.cameras[1] = make(bot);
+		
+		Debug.plain("%s", set.serialize().print());
 	}
 }

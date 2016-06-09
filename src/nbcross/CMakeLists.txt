@@ -105,6 +105,7 @@ set( NBCROSS_SRCS
   nbcross.cpp
   TestDefs.cpp
   VisionDefs.cpp
+  Helpers.cpp
 )
 
 set( NBCROSS_HEADERS

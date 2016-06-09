@@ -1,6 +1,12 @@
 #include "VisionCalibration.hpp"
 #include "Log.hpp"
 
+#include "utilities-test.hpp"
+
+#ifndef __APPLE__
+#include "DebugConfig.h"
+#endif
+
 namespace man {
 namespace vision {
 namespace calibration {
@@ -24,9 +30,11 @@ namespace calibration {
 
     const std::string cameraOffsetsPath() {
 #ifdef OFFLINE
+//        NBL_INFO("offline path")
         return nbites_dir() + nbl::SharedConstants::OFFLINE_CAMERA_OFFSET_SUFFIX();
 #else
-        return nbl::SharedConstants::ONLINE_COLOR_CALIBRATION_PATH();
+//         NBL_INFO("online path")
+        return nbl::SharedConstants::ONLINE_CAMERA_OFFSET_PATH();
 #endif
     }
 
@@ -47,6 +55,13 @@ namespace calibration {
             NBL_ERROR("cannot find camera offsets for robot: %s", robotName.c_str() )
             return new CalibrationParams();
         }
+    }
+
+    NBL_ADD_TEST_TO(cameraOffsetsExist, calibration) {
+
+        delete (getSavedOffsets("batman", true));
+
+        return true;
     }
 
     CalibrationParams * getSavedOffsets(const std::string& robotName, bool top) {
@@ -106,6 +121,13 @@ namespace calibration {
         return getSavedColors(top, contents, NULL);
     }
 
+    NBL_ADD_TEST_TO(colorParamsExist, calibration) {
+
+         delete (getSavedColors(true));
+
+        return true;
+    }
+
 //    json::Object serialize(ColorParams& params) {
 //        json::Object ret;
 //        ret["uAtY0"] = json::Number(params.)
@@ -120,6 +142,8 @@ namespace calibration {
 //
 //        return ret;
 //    }
+
+    
 }
 }
 }

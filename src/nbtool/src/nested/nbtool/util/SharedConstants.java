@@ -127,7 +127,7 @@ public class SharedConstants {
 	}
 	
 	public static String ONLINE_COLOR_PARAMS_PATH() {
-		return object.get("ONLINE_COLOR_CALIBRATION_PATH").asString().toString();
+		return object.get("ONLINE_COLOR_PARAMS_PATH").asString().toString();
 	}
 	
 	public static String OFFLINE_CAMERA_OFFSET_SUFFIX() {
@@ -135,7 +135,7 @@ public class SharedConstants {
 	}
 	
 	public static String OFFLINE_COLOR_PARAMS_SUFFIX() {
-		return object.get("OFFLINE_COLOR_CALIBRATION_SUFFIX").asString().toString();
+		return object.get("OFFLINE_COLOR_PARAMS_SUFFIX").asString().toString();
 	}
 	
 	public static String LOG_TOPLEVEL_MAGIC_KEY() {

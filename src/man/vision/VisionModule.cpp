@@ -31,14 +31,15 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
       ballOn(false),
       ballOnCount(0),
       ballOffCount(0),
-      blackStar_(false)
+      blackStar_(false),
+      colorParamsMonitor( calibration::colorParamsPath().c_str(), false),
+      camOffsetsMonitor( calibration::cameraOffsetsPath().c_str(), false)
 {
-    std::string serializedColors, serializedOffsets;
-    nbl::io::readFileToString(serializedColors, calibration::colorParamsPath());
-    nbl::io::readFileToString(serializedOffsets, calibration::cameraOffsetsPath());
-
     NBL_ASSERT_EQ( robotName.find(".local"), std::string::npos )
     name = robotName;
+
+    reloadColorParams();
+    reloadCameraOffsets();
 
     // Set module pointers for top then bottom images
     // NOTE Constructed on heap because some of the objects below do
@@ -47,9 +48,6 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
     //      constructors in the case of C-style arrays, limitation theoretically
     //      removed in C++11.
     for (int i = 0; i < 2; i++) {
-        colorParams[i] = calibration::getSavedColors(i==0, serializedColors, &latestUsedColorParams[i]);
-        calibrationParams[i] = calibration::getSavedOffsets( name, i==0, serializedOffsets );
-
 //        getColorsFromLisp(colors, i);
 
         frontEnd[i] = new ImageFrontEnd();
@@ -149,6 +147,20 @@ void VisionModule::run_()
     bottomIn.latch();
     jointsIn.latch();
     inertsIn.latch();
+
+#ifndef OFFLINE
+
+    if ( colorParamsMonitor.update() ) {
+        NBL_WARN("VisionModule RELOADING COLOR PARAMETERS!");
+        reloadColorParams();
+    }
+
+    if (    camOffsetsMonitor.update() ) {
+        NBL_WARN("VisionModule RELOADING CAMERA OFFSETS!");
+        reloadCameraOffsets();
+    }
+
+#endif
 
     // Setup
     std::vector<const messages::YUVImage*> images { &topIn.message(),
@@ -543,29 +555,38 @@ void VisionModule::updateObstacleBox()
     //         obstacleBox[1], obstacleBox[2], obstacleBox[3]);
 }
 
+void VisionModule::reloadColorParams() {
+    std::string serializedColors;
+    nbl::io::readFileToString(serializedColors, calibration::colorParamsPath());
+    for (int i = 0; i < 2; ++i) {
+        setColorParams(calibration::getSavedColors(i==0, serializedColors, &latestUsedColorParams[i]), i==0);
+    }
+}
+
 void VisionModule::setColorParams(Colors* colors, bool topCamera)
-{ 
+{
+    NBL_WARN("VisionModule: using colors for camera[%d] = {%s}",
+             topCamera, latestUsedColorParams[!topCamera].serialize().c_str() );
+
     if (colorParams[!topCamera]) delete colorParams[!topCamera];
     colorParams[!topCamera] = colors;
 }
 
-const std::string VisionModule::getStringFromTxtFile(std::string path) 
+void VisionModule::reloadCameraOffsets() {
+    std::string serializedOffsets;
+    nbl::io::readFileToString(serializedOffsets, calibration::cameraOffsetsPath());
+    for (int i = 0; i < 2; ++i) {
+        setCalibrationParams(calibration::getSavedOffsets( name, i==0, serializedOffsets) , i==0);
+    }
+}
+
+void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamera)
 {
-    std::ifstream textFile;
-    textFile.open(path);
+    NBL_WARN("VisionModule: using offsets for camera[%d] = {%lf, %lf}",
+             topCamera, params->getRoll(), params->getTilt());
 
-    // Get size of file
-    textFile.seekg (0, textFile.end);
-    long size = (long)textFile.tellg();
-    textFile.seekg(0);
-
-    // Read file into buffer and convert to string
-    char* buff = new char[size];
-    textFile.read(buff, size);
-    std::string sexpText(buff);
-
-    textFile.close();
-    return (const std::string)sexpText;
+    if (calibrationParams[!topCamera]) delete calibrationParams[!topCamera];
+    calibrationParams[!topCamera] = params;
 }
 
 #ifdef OFFLINE
@@ -587,95 +608,6 @@ const std::string VisionModule::getStringFromTxtFile(std::string path)
 	}
 #endif
 
-/*
- Lisp data in config/colorParams.txt stores 32 parameters. Read lisp and
-  load the three compoenets of a Colors struct, white, green, and orange,
-  from the 18 values for either the top or bottom image. 
-*/
-Colors* VisionModule::getColorsFromLisp(nbl::SExpr* colors, int camera) 
-{
-    Colors* ret = new man::vision::Colors;
-    nbl::SExpr* params;
-
-    if (camera == 0) {
-        params = colors->get(1)->find("Top")->get(1);
-    } else if (camera == 1) {
-        params = colors->get(1)->find("Bottom")->get(1);
-    } else {
-        params = colors->get(1);
-    }
-
-    colors = params->get(0)->get(1);
-
-    ret->white. load(std::stof(colors->get(0)->get(1)->serialize()),
-                     std::stof(colors->get(1)->get(1)->serialize()),
-                     std::stof(colors->get(2)->get(1)->serialize()),
-                     std::stof(colors->get(3)->get(1)->serialize()),
-                     std::stof(colors->get(4)->get(1)->serialize()),
-                     std::stof(colors->get(5)->get(1)->serialize()));
-
-    colors = params->get(1)->get(1);
-
-    ret->green. load(std::stof(colors->get(0)->get(1)->serialize()),
-                     std::stof(colors->get(1)->get(1)->serialize()),
-                     std::stof(colors->get(2)->get(1)->serialize()),
-                     std::stof(colors->get(3)->get(1)->serialize()),
-                     std::stof(colors->get(4)->get(1)->serialize()),
-                     std::stof(colors->get(5)->get(1)->serialize()));
-
-    colors = params->get(2)->get(1);
-
-    ret->orange.load(std::stof(colors->get(0)->get(1)->serialize()),
-                     std::stof(colors->get(1)->get(1)->serialize()),
-                     std::stof(colors->get(2)->get(1)->serialize()),
-                     std::stof(colors->get(3)->get(1)->serialize()),
-                     std::stof(colors->get(4)->get(1)->serialize()),
-                     std::stof(colors->get(5)->get(1)->serialize()));
-
-    return ret;
-}
-
-void VisionModule::setCalibrationParams(std::string robotName) 
-{
-    setCalibrationParams(0, robotName);
-    setCalibrationParams(1, robotName);
-}
-
-void VisionModule::setCalibrationParams(int camera, std::string robotName) 
-{
-    if (std::string::npos != robotName.find(".local")) {
-        robotName.resize(robotName.find("."));
-        //Much love for the edge cases.
-        if (robotName == "she-hulk")
-            robotName = "shehulk";
-    }
-
-    // Set local private variable
-    name = robotName;
-
-    if (robotName == "") {
-        return;
-    }
-
-    nbl::SExpr* robot = calibrationLisp->get(1)->find(robotName);
-
-    if (robot != NULL) {
-        std::string cam = camera == 0 ? "TOP" : "BOT";
-        double roll =  robot->find(cam)->get(1)->valueAsDouble();
-        double tilt = robot->find(cam)->get(2)->valueAsDouble();
-        delete calibrationParams[camera];
-        calibrationParams[camera] = new CalibrationParams(roll, tilt);
-
-        std::cerr << "Found and set calibration params for " << robotName;
-        std::cerr << "Roll: " << roll << " Tilt: " << tilt << std::endl;
-    }
-}
-
-void VisionModule::setCalibrationParams(CalibrationParams* params, bool topCamera)
-{
-    if (calibrationParams[!topCamera]) delete calibrationParams[!topCamera];
-    calibrationParams[!topCamera] = params;
-}
 
 #ifdef USE_LOGGING
 void VisionModule::logImage(int i) 
@@ -704,7 +636,7 @@ void VisionModule::logImage(int i)
     }
 
     if (control::check(control::flags::tripoint)) {
-        if (control::check(control::flags::tripoint_bottom_only) && !i) {
+        if (control::check(control::flags::tripoint_bottom_only) && (i==0)) {
             //logging bottom
             return;
         }
@@ -729,91 +661,20 @@ void VisionModule::logImage(int i)
         }
 
         theLog->addBlockFromImage(image, image_from, image_index, clockWhen);
-        
-//        long im_size = (image.width() * image.height() * 1);
-//        int im_width = image.width() / 2;
-//        int im_height= image.height();
 
         messages::JointAngles ja_pb = jointsIn.message();
         messages::InertialState is_pb = inertsIn.message();
 
         theLog->addBlockFromProtobuf(is_pb, image_from, image_index, clockWhen);
         theLog->addBlockFromProtobuf(ja_pb, image_from, image_index, clockWhen);
-        
-//        std::string ja_buf;
-//        std::string is_buf;
-//        std::string im_buf((char *) image.pixelAddress(0, 0), im_size);
-//        ja_pb.SerializeToString(&ja_buf);
-//        is_pb.SerializeToString(&is_buf);
-//        
-//        im_buf.append(is_buf);
-//        im_buf.append(ja_buf);
-//        
-//        std::vector<nbl::SExpr> contents;
-//        
-//        nbl::SExpr imageinfo("YUVImage", image_from, clock(), image_index, im_size);
-//        imageinfo.append(nbl::SExpr("width", im_width)   );
-//        imageinfo.append(nbl::SExpr("height", im_height) );
-//        imageinfo.append(nbl::SExpr("encoding", "[Y8(U8/V8)]"));
-//        contents.push_back(imageinfo);
-//        
-//        nbl::SExpr inerts("InertialState", "tripoint", clock(), image_index, is_buf.length());
-//        inerts.append(nbl::SExpr("acc_x", is_pb.acc_x()));
-//        inerts.append(nbl::SExpr("acc_y", is_pb.acc_y()));
-//        inerts.append(nbl::SExpr("acc_z", is_pb.acc_z()));
-//        
-//        inerts.append(nbl::SExpr("gyr_x", is_pb.gyr_x()));
-//        inerts.append(nbl::SExpr("gyr_y", is_pb.gyr_y()));
-//        
-//        inerts.append(nbl::SExpr("angle_x", is_pb.angle_x()));
-//        inerts.append(nbl::SExpr("angle_y", is_pb.angle_y()));
-//        contents.push_back(inerts);
-//        
-//        nbl::SExpr joints("JointAngles", "tripoint", clock(), image_index, ja_buf.length());
-//        joints.append(nbl::SExpr("head_yaw", ja_pb.head_yaw()));
-//        joints.append(nbl::SExpr("head_pitch", ja_pb.head_pitch()));
-//
-//        joints.append(nbl::SExpr("l_shoulder_pitch", ja_pb.l_shoulder_pitch()));
-//        joints.append(nbl::SExpr("l_shoulder_roll", ja_pb.l_shoulder_roll()));
-//        joints.append(nbl::SExpr("l_elbow_yaw", ja_pb.l_elbow_yaw()));
-//        joints.append(nbl::SExpr("l_elbow_roll", ja_pb.l_elbow_roll()));
-//        joints.append(nbl::SExpr("l_wrist_yaw", ja_pb.l_wrist_yaw()));
-//        joints.append(nbl::SExpr("l_hand", ja_pb.l_hand()));
-//
-//        joints.append(nbl::SExpr("r_shoulder_pitch", ja_pb.r_shoulder_pitch()));
-//        joints.append(nbl::SExpr("r_shoulder_roll", ja_pb.r_shoulder_roll()));
-//        joints.append(nbl::SExpr("r_elbow_yaw", ja_pb.r_elbow_yaw()));
-//        joints.append(nbl::SExpr("r_elbow_roll", ja_pb.r_elbow_roll()));
-//        joints.append(nbl::SExpr("r_wrist_yaw", ja_pb.r_wrist_yaw()));
-//        joints.append(nbl::SExpr("r_hand", ja_pb.r_hand()));
-//
-//        joints.append(nbl::SExpr("l_hip_yaw_pitch", ja_pb.l_hip_yaw_pitch()));
-//        joints.append(nbl::SExpr("r_hip_yaw_pitch", ja_pb.r_hip_yaw_pitch()));
-//
-//        joints.append(nbl::SExpr("l_hip_roll", ja_pb.l_hip_roll()));
-//        joints.append(nbl::SExpr("l_hip_pitch", ja_pb.l_hip_pitch()));
-//        joints.append(nbl::SExpr("l_knee_pitch", ja_pb.l_knee_pitch()));
-//        joints.append(nbl::SExpr("l_ankle_pitch", ja_pb.l_ankle_pitch()));
-//        joints.append(nbl::SExpr("l_ankle_roll", ja_pb.l_ankle_roll()));
-//
-//        joints.append(nbl::SExpr("r_hip_roll", ja_pb.r_hip_roll() ));
-//        joints.append(nbl::SExpr("r_hip_pitch", ja_pb.r_hip_pitch() ));
-//        joints.append(nbl::SExpr("r_knee_pitch", ja_pb.r_knee_pitch() ));
-//        joints.append(nbl::SExpr("r_ankle_pitch", ja_pb.r_ankle_pitch() ));
-//        joints.append(nbl::SExpr("r_ankle_roll", ja_pb.r_ankle_roll() ));
-//        contents.push_back(joints);
 
-        nbl::SExpr calVal = nbl::SExpr(image_from, calibrationParams[i]->getRoll(), calibrationParams[i]->getTilt());
-        nbl::SExpr cal("CalibrationParams", calVal);
-        if (blackStar)
-            cal.append(nbl::SExpr("BlackStar"));
-
-        theLog->addBlockFromSexpr(cal, "CalibrationParams", image_index, clockWhen);
+        json::Object camOffsets;
+        camOffsets["d_roll"] = json::Number( calibrationParams[i]->getRoll() );
+        camOffsets["d_tilt"] = json::Number( calibrationParams[i]->getTilt() );
+        theLog->topLevelDictionary["OriginalCameraOffsets"] = camOffsets;
+        theLog->topLevelDictionary["OriginalColorParams"] = latestUsedColorParams[i];
 
         nbl::NBLog(theLog);
-
-//        contents.push_back(cal);
-//        nbl::NBLog(NBL_IMAGE_BUFFER, "tripoint", contents, im_buf);
     }
 }
 #endif
