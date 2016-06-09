@@ -10,6 +10,8 @@
 #include "BehaviorsModule.h"
 #include "PyObjects.h"
 
+#include "Logging.hpp"
+
 using namespace boost::python;
 
 extern "C" void initLedCommand_proto();
@@ -259,8 +261,8 @@ void BehaviorsModule::prepareMessages()
     visionIn.latch();
     pyInterface.setVision_ptr(&visionIn.message());
 
-    behaviorsIn.latch();
-    pyInterface.setBehaviors_ptr(&behaviorsIn.message());
+    // behaviorsIn.latch();
+    // pyInterface.setBehaviors_ptr(&behaviorsIn.message());
 
     obstacleIn.latch();
     pyInterface.setObstacle_ptr(&obstacleIn.message());
@@ -282,6 +284,9 @@ void BehaviorsModule::prepareMessages()
     bodyMotionCommand = portals::Message<messages::MotionCommand>(0);
     pyInterface.setBodyMotionCommand_ptr(bodyMotionCommand.get());
 
+    behaviors = portals::Message<messages::Behaviors>(0);
+    pyInterface.setBehaviors_ptr(behaviors.get());
+
     headMotionCommand = portals::Message<messages::HeadMotionCommand>(0);
     pyInterface.setHeadMotionCommand_ptr(headMotionCommand.get());
 
@@ -297,6 +302,7 @@ void BehaviorsModule::prepareMessages()
 
 void BehaviorsModule::sendMessages()
 {
+    std::cout << "Stuff" << std::endl;
     ledCommandOut.setMessage(ledCommand);
 
     if (resetLocRequest.get()->timestamp() != 0)
@@ -318,6 +324,16 @@ void BehaviorsModule::sendMessages()
     {
         myWorldModelOut.setMessage(myWorldModel);
     }
+
+    nbl::logptr theLog = nbl::Log::explicitLog(
+                                   std::vector<nbl::Block>{},
+                                   json::Object{},
+                                   "behaviors", time(NULL));
+
+    // messages::Behaviors be_pb = behaviorsIn.message();
+    messages::Behaviors be_pb;
+    theLog->addBlockFromProtobuf(be_pb, "behaviors", 0, clock());
+    nbl::NBLog(theLog);
 }
 
 void BehaviorsModule::modifySysPath ()

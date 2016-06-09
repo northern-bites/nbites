@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.FieldObstacles}
  */
-public final class FieldObstacles extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.FieldObstacles)
-    FieldObstaclesOrBuilder {
+public  final class FieldObstacles extends
+    com.google.protobuf.GeneratedMessage
+    implements FieldObstaclesOrBuilder {
   // Use FieldObstacles.newBuilder() to construct.
   private FieldObstacles(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -105,10 +104,10 @@ public final class FieldObstacles extends
     return PARSER;
   }
 
-  public interface ObstacleOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:messages.FieldObstacles.Obstacle)
-      com.google.protobuf.MessageOrBuilder {
+  public interface ObstacleOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
 
+    // optional .messages.FieldObstacles.Obstacle.ObstaclePosition position = 1;
     /**
      * <code>optional .messages.FieldObstacles.Obstacle.ObstaclePosition position = 1;</code>
      */
@@ -118,6 +117,7 @@ public final class FieldObstacles extends
      */
     messages.FieldObstacles.Obstacle.ObstaclePosition getPosition();
 
+    // optional float distance = 2;
     /**
      * <code>optional float distance = 2;</code>
      */
@@ -127,6 +127,7 @@ public final class FieldObstacles extends
      */
     float getDistance();
 
+    // optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;
     /**
      * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
      */
@@ -136,6 +137,7 @@ public final class FieldObstacles extends
      */
     messages.FieldObstacles.Obstacle.ObstacleDetector getDetector();
 
+    // optional float closest_y = 4;
     /**
      * <code>optional float closest_y = 4;</code>
      */
@@ -145,6 +147,7 @@ public final class FieldObstacles extends
      */
     float getClosestY();
 
+    // optional float box_bottom = 5;
     /**
      * <code>optional float box_bottom = 5;</code>
      */
@@ -154,6 +157,7 @@ public final class FieldObstacles extends
      */
     float getBoxBottom();
 
+    // optional float box_left = 6;
     /**
      * <code>optional float box_left = 6;</code>
      */
@@ -163,6 +167,7 @@ public final class FieldObstacles extends
      */
     float getBoxLeft();
 
+    // optional float box_right = 7;
     /**
      * <code>optional float box_right = 7;</code>
      */
@@ -176,9 +181,8 @@ public final class FieldObstacles extends
    * Protobuf type {@code messages.FieldObstacles.Obstacle}
    */
   public static final class Obstacle extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:messages.FieldObstacles.Obstacle)
-      ObstacleOrBuilder {
+      com.google.protobuf.GeneratedMessage
+      implements ObstacleOrBuilder {
     // Use Obstacle.newBuilder() to construct.
     private Obstacle(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -556,6 +560,7 @@ public final class FieldObstacles extends
     }
 
     private int bitField0_;
+    // optional .messages.FieldObstacles.Obstacle.ObstaclePosition position = 1;
     public static final int POSITION_FIELD_NUMBER = 1;
     private messages.FieldObstacles.Obstacle.ObstaclePosition position_;
     /**
@@ -571,6 +576,7 @@ public final class FieldObstacles extends
       return position_;
     }
 
+    // optional float distance = 2;
     public static final int DISTANCE_FIELD_NUMBER = 2;
     private float distance_;
     /**
@@ -586,6 +592,7 @@ public final class FieldObstacles extends
       return distance_;
     }
 
+    // optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;
     public static final int DETECTOR_FIELD_NUMBER = 3;
     private messages.FieldObstacles.Obstacle.ObstacleDetector detector_;
     /**
@@ -601,6 +608,7 @@ public final class FieldObstacles extends
       return detector_;
     }
 
+    // optional float closest_y = 4;
     public static final int CLOSEST_Y_FIELD_NUMBER = 4;
     private float closestY_;
     /**
@@ -616,6 +624,7 @@ public final class FieldObstacles extends
       return closestY_;
     }
 
+    // optional float box_bottom = 5;
     public static final int BOX_BOTTOM_FIELD_NUMBER = 5;
     private float boxBottom_;
     /**
@@ -631,6 +640,7 @@ public final class FieldObstacles extends
       return boxBottom_;
     }
 
+    // optional float box_left = 6;
     public static final int BOX_LEFT_FIELD_NUMBER = 6;
     private float boxLeft_;
     /**
@@ -646,6 +656,7 @@ public final class FieldObstacles extends
       return boxLeft_;
     }
 
+    // optional float box_right = 7;
     public static final int BOX_RIGHT_FIELD_NUMBER = 7;
     private float boxRight_;
     /**
@@ -673,8 +684,7 @@ public final class FieldObstacles extends
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
+      if (isInitialized != -1) return isInitialized == 1;
 
       memoizedIsInitialized = 1;
       return true;
@@ -823,9 +833,8 @@ public final class FieldObstacles extends
      * Protobuf type {@code messages.FieldObstacles.Obstacle}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:messages.FieldObstacles.Obstacle)
-        messages.FieldObstacles.ObstacleOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements messages.FieldObstacles.ObstacleOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return messages._File_Obstacle.internal_static_messages_FieldObstacles_Obstacle_descriptor;
@@ -992,6 +1001,7 @@ public final class FieldObstacles extends
       }
       private int bitField0_;
 
+      // optional .messages.FieldObstacles.Obstacle.ObstaclePosition position = 1;
       private messages.FieldObstacles.Obstacle.ObstaclePosition position_ = messages.FieldObstacles.Obstacle.ObstaclePosition.NONE;
       /**
        * <code>optional .messages.FieldObstacles.Obstacle.ObstaclePosition position = 1;</code>
@@ -1027,6 +1037,7 @@ public final class FieldObstacles extends
         return this;
       }
 
+      // optional float distance = 2;
       private float distance_ ;
       /**
        * <code>optional float distance = 2;</code>
@@ -1059,6 +1070,7 @@ public final class FieldObstacles extends
         return this;
       }
 
+      // optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;
       private messages.FieldObstacles.Obstacle.ObstacleDetector detector_ = messages.FieldObstacles.Obstacle.ObstacleDetector.NA;
       /**
        * <code>optional .messages.FieldObstacles.Obstacle.ObstacleDetector detector = 3;</code>
@@ -1094,6 +1106,7 @@ public final class FieldObstacles extends
         return this;
       }
 
+      // optional float closest_y = 4;
       private float closestY_ ;
       /**
        * <code>optional float closest_y = 4;</code>
@@ -1126,6 +1139,7 @@ public final class FieldObstacles extends
         return this;
       }
 
+      // optional float box_bottom = 5;
       private float boxBottom_ ;
       /**
        * <code>optional float box_bottom = 5;</code>
@@ -1158,6 +1172,7 @@ public final class FieldObstacles extends
         return this;
       }
 
+      // optional float box_left = 6;
       private float boxLeft_ ;
       /**
        * <code>optional float box_left = 6;</code>
@@ -1190,6 +1205,7 @@ public final class FieldObstacles extends
         return this;
       }
 
+      // optional float box_right = 7;
       private float boxRight_ ;
       /**
        * <code>optional float box_right = 7;</code>
@@ -1233,6 +1249,7 @@ public final class FieldObstacles extends
     // @@protoc_insertion_point(class_scope:messages.FieldObstacles.Obstacle)
   }
 
+  // repeated .messages.FieldObstacles.Obstacle obstacle = 1;
   public static final int OBSTACLE_FIELD_NUMBER = 1;
   private java.util.List<messages.FieldObstacles.Obstacle> obstacle_;
   /**
@@ -1274,8 +1291,7 @@ public final class FieldObstacles extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -1382,9 +1398,8 @@ public final class FieldObstacles extends
    * Protobuf type {@code messages.FieldObstacles}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.FieldObstacles)
-      messages.FieldObstaclesOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.FieldObstaclesOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_Obstacle.internal_static_messages_FieldObstacles_descriptor;
@@ -1528,6 +1543,7 @@ public final class FieldObstacles extends
     }
     private int bitField0_;
 
+    // repeated .messages.FieldObstacles.Obstacle obstacle = 1;
     private java.util.List<messages.FieldObstacles.Obstacle> obstacle_ =
       java.util.Collections.emptyList();
     private void ensureObstacleIsMutable() {
@@ -1669,8 +1685,7 @@ public final class FieldObstacles extends
         java.lang.Iterable<? extends messages.FieldObstacles.Obstacle> values) {
       if (obstacleBuilder_ == null) {
         ensureObstacleIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, obstacle_);
+        super.addAll(values, obstacle_);
         onChanged();
       } else {
         obstacleBuilder_.addAllMessages(values);

@@ -221,7 +221,6 @@ class Brain(object):
     def updateComm(self):
         me = self.teamMembers[self.playerNumber - 1]
         output = self.interface.myWorldModel
-        print str(self.interface)
 
         output.timestamp = int(self.time * 1000)
         output.my_x = me.x

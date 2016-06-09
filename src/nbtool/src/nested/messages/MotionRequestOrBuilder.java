@@ -3,10 +3,10 @@
 
 package messages;
 
-public interface MotionRequestOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:messages.MotionRequest)
-    com.google.protobuf.MessageOrBuilder {
+public interface MotionRequestOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // optional bool stop_body = 1;
   /**
    * <code>optional bool stop_body = 1;</code>
    */
@@ -16,6 +16,7 @@ public interface MotionRequestOrBuilder extends
    */
   boolean getStopBody();
 
+  // optional bool stop_head = 2;
   /**
    * <code>optional bool stop_head = 2;</code>
    */
@@ -25,6 +26,7 @@ public interface MotionRequestOrBuilder extends
    */
   boolean getStopHead();
 
+  // optional bool reset_odometry = 3;
   /**
    * <code>optional bool reset_odometry = 3;</code>
    */
@@ -34,6 +36,7 @@ public interface MotionRequestOrBuilder extends
    */
   boolean getResetOdometry();
 
+  // optional bool remove_stiffness = 4;
   /**
    * <code>optional bool remove_stiffness = 4;</code>
    */
@@ -43,6 +46,7 @@ public interface MotionRequestOrBuilder extends
    */
   boolean getRemoveStiffness();
 
+  // optional bool enable_stiffness = 5;
   /**
    * <code>optional bool enable_stiffness = 5;</code>
    */
@@ -52,6 +56,7 @@ public interface MotionRequestOrBuilder extends
    */
   boolean getEnableStiffness();
 
+  // optional bool reset_providers = 6;
   /**
    * <code>optional bool reset_providers = 6;</code>
    */
@@ -61,6 +66,7 @@ public interface MotionRequestOrBuilder extends
    */
   boolean getResetProviders();
 
+  // optional int64 timestamp = 7;
   /**
    * <code>optional int64 timestamp = 7;</code>
    */

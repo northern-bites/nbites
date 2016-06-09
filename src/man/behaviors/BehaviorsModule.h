@@ -107,6 +107,7 @@ private:
     portals::Message<messages::MotionCommand> bodyMotionCommand;
     portals::Message<messages::HeadMotionCommand> headMotionCommand;
     portals::Message<messages::MotionRequest> motionRequest;
+    portals::Message<messages::Behaviors> behaviors;
     portals::Message<messages::RobotLocation> resetLocRequest;
     portals::Message<messages::WorldModel> myWorldModel;
 };

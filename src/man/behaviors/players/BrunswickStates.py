@@ -17,8 +17,9 @@ def gameInitial(player):
     In the future, we may wish to make the head move a bit slower here.
     """
     if player.firstFrame():
-        print str(player.brain.interface.behaviors.on)
-        # player.brain.interface.behaviors.GCState = 1
+        # player.brain.interface.behaviors.on = True
+        # print str(player.brain.interface.behaviors.on)
+        player.brain.interface.behaviors.GCState = player.brain.interface.behaviors.GameControllerState.GAMEINITIAL
         player.inKickingState = False
         player.brain.fallController.enabled = False
         player.gainsOn()
@@ -44,6 +45,7 @@ def gameReady(player):
     Stand up, and pan for localization, and walk to kicking off positions.
     """
     if player.firstFrame():
+        player.brain.interface.behaviors.GCState = player.brain.interface.behaviors.GameControllerState.GAMEREADY
         player.inKickingState = False
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
@@ -75,6 +77,7 @@ def gameSet(player):
     Fixate on the ball, or scan to look for it
     """
     if player.firstFrame():
+        player.brain.interface.behaviors.GCState = player.brain.interface.behaviors.GameControllerState.GAMESET
         player.inKickingState = False
         player.brain.fallController.enabled = True
         player.gainsOn()
@@ -97,6 +100,7 @@ def gameSet(player):
 @superState('gameControllerResponder')
 def gamePlaying(player):
     if player.firstFrame():
+        player.brain.interface.behaviors.GCState = player.brain.interface.behaviors.GameControllerState.GAMEPLAYING
         player.inKickingState = False
         # player.inKickOffPlay = (kickOff.shouldRunKickOffPlay(player) and 
         #                        (roleConstants.isChaser(player.role) or 
@@ -143,6 +147,7 @@ def gameFinished(player):
     In the future, we may wish to make the head move a bit slower here
     """
     if player.firstFrame():
+        player.brain.interface.behaviors.GCState = player.brain.interface.behaviors.GameControllerState.GAMEFINISHED
         player.inKickingState = False
         player.brain.fallController.enabled = False
         player.stopWalking()
@@ -159,6 +164,7 @@ def gameFinished(player):
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
+    player.brain.interface.behaviors.GCState = player.brain.interface.behaviors.GameControllerState.GAMEPENALIZED
     if player.firstFrame():
         player.inKickingState = False
         player.brain.fallController.enabled = False

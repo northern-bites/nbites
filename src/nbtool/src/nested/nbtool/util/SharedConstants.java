@@ -81,6 +81,10 @@ public class SharedConstants {
 	public static String LogClass_Tripoint() {
 		return object.get("LogClass_Tripoint").asString().toString();
 	}
+
+	public static String LogClass_Behaviors() {
+		return object.get("LogClass_Behaviors").asString().toString();
+	}
 	
 	public static String LogClass_YUVImage() {
 		return object.get("LogClass_YUVImage").asString().toString();

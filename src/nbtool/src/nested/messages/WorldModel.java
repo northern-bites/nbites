@@ -6,10 +6,9 @@ package messages;
 /**
  * Protobuf type {@code messages.WorldModel}
  */
-public final class WorldModel extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:messages.WorldModel)
-    WorldModelOrBuilder {
+public  final class WorldModel extends
+    com.google.protobuf.GeneratedMessage
+    implements WorldModelOrBuilder {
   // Use WorldModel.newBuilder() to construct.
   private WorldModel(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -160,6 +159,16 @@ public final class WorldModel extends
             claimedBall_ = input.readBool();
             break;
           }
+          case 176: {
+            bitField0_ |= 0x00200000;
+            intention_ = input.readInt32();
+            break;
+          }
+          case 184: {
+            bitField0_ |= 0x00400000;
+            alive_ = input.readBool();
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -200,6 +209,7 @@ public final class WorldModel extends
   }
 
   private int bitField0_;
+  // optional int64 timestamp = 1;
   public static final int TIMESTAMP_FIELD_NUMBER = 1;
   private long timestamp_;
   /**
@@ -215,6 +225,7 @@ public final class WorldModel extends
     return timestamp_;
   }
 
+  // optional float my_x = 2;
   public static final int MY_X_FIELD_NUMBER = 2;
   private float myX_;
   /**
@@ -230,6 +241,7 @@ public final class WorldModel extends
     return myX_;
   }
 
+  // optional float my_y = 3;
   public static final int MY_Y_FIELD_NUMBER = 3;
   private float myY_;
   /**
@@ -245,6 +257,7 @@ public final class WorldModel extends
     return myY_;
   }
 
+  // optional float my_h = 4;
   public static final int MY_H_FIELD_NUMBER = 4;
   private float myH_;
   /**
@@ -260,6 +273,7 @@ public final class WorldModel extends
     return myH_;
   }
 
+  // optional float my_uncert = 5;
   public static final int MY_UNCERT_FIELD_NUMBER = 5;
   private float myUncert_;
   /**
@@ -275,6 +289,7 @@ public final class WorldModel extends
     return myUncert_;
   }
 
+  // optional float walking_to_x = 6;
   public static final int WALKING_TO_X_FIELD_NUMBER = 6;
   private float walkingToX_;
   /**
@@ -290,6 +305,7 @@ public final class WorldModel extends
     return walkingToX_;
   }
 
+  // optional float walking_to_y = 7;
   public static final int WALKING_TO_Y_FIELD_NUMBER = 7;
   private float walkingToY_;
   /**
@@ -305,6 +321,7 @@ public final class WorldModel extends
     return walkingToY_;
   }
 
+  // optional bool ball_on = 8;
   public static final int BALL_ON_FIELD_NUMBER = 8;
   private boolean ballOn_;
   /**
@@ -320,6 +337,7 @@ public final class WorldModel extends
     return ballOn_;
   }
 
+  // optional int32 ball_age = 9;
   public static final int BALL_AGE_FIELD_NUMBER = 9;
   private int ballAge_;
   /**
@@ -335,6 +353,7 @@ public final class WorldModel extends
     return ballAge_;
   }
 
+  // optional float ball_dist = 10;
   public static final int BALL_DIST_FIELD_NUMBER = 10;
   private float ballDist_;
   /**
@@ -350,6 +369,7 @@ public final class WorldModel extends
     return ballDist_;
   }
 
+  // optional float ball_bearing = 11;
   public static final int BALL_BEARING_FIELD_NUMBER = 11;
   private float ballBearing_;
   /**
@@ -365,6 +385,7 @@ public final class WorldModel extends
     return ballBearing_;
   }
 
+  // optional float ball_vel_x = 12;
   public static final int BALL_VEL_X_FIELD_NUMBER = 12;
   private float ballVelX_;
   /**
@@ -380,6 +401,7 @@ public final class WorldModel extends
     return ballVelX_;
   }
 
+  // optional float ball_vel_y = 13;
   public static final int BALL_VEL_Y_FIELD_NUMBER = 13;
   private float ballVelY_;
   /**
@@ -395,6 +417,7 @@ public final class WorldModel extends
     return ballVelY_;
   }
 
+  // optional float ball_uncert = 14;
   public static final int BALL_UNCERT_FIELD_NUMBER = 14;
   private float ballUncert_;
   /**
@@ -410,6 +433,7 @@ public final class WorldModel extends
     return ballUncert_;
   }
 
+  // optional int32 role = 15;
   public static final int ROLE_FIELD_NUMBER = 15;
   private int role_;
   /**
@@ -425,6 +449,7 @@ public final class WorldModel extends
     return role_;
   }
 
+  // optional bool in_kicking_state = 16;
   public static final int IN_KICKING_STATE_FIELD_NUMBER = 16;
   private boolean inKickingState_;
   /**
@@ -440,6 +465,7 @@ public final class WorldModel extends
     return inKickingState_;
   }
 
+  // optional float kicking_to_x = 17;
   public static final int KICKING_TO_X_FIELD_NUMBER = 17;
   private float kickingToX_;
   /**
@@ -455,6 +481,7 @@ public final class WorldModel extends
     return kickingToX_;
   }
 
+  // optional float kicking_to_y = 18;
   public static final int KICKING_TO_Y_FIELD_NUMBER = 18;
   private float kickingToY_;
   /**
@@ -470,6 +497,7 @@ public final class WorldModel extends
     return kickingToY_;
   }
 
+  // optional bool fallen = 19;
   public static final int FALLEN_FIELD_NUMBER = 19;
   private boolean fallen_;
   /**
@@ -485,6 +513,7 @@ public final class WorldModel extends
     return fallen_;
   }
 
+  // optional bool active = 20;
   public static final int ACTIVE_FIELD_NUMBER = 20;
   private boolean active_;
   /**
@@ -500,6 +529,7 @@ public final class WorldModel extends
     return active_;
   }
 
+  // optional bool claimed_ball = 21;
   public static final int CLAIMED_BALL_FIELD_NUMBER = 21;
   private boolean claimedBall_;
   /**
@@ -513,6 +543,38 @@ public final class WorldModel extends
    */
   public boolean getClaimedBall() {
     return claimedBall_;
+  }
+
+  // optional int32 intention = 22;
+  public static final int INTENTION_FIELD_NUMBER = 22;
+  private int intention_;
+  /**
+   * <code>optional int32 intention = 22;</code>
+   */
+  public boolean hasIntention() {
+    return ((bitField0_ & 0x00200000) == 0x00200000);
+  }
+  /**
+   * <code>optional int32 intention = 22;</code>
+   */
+  public int getIntention() {
+    return intention_;
+  }
+
+  // optional bool alive = 23;
+  public static final int ALIVE_FIELD_NUMBER = 23;
+  private boolean alive_;
+  /**
+   * <code>optional bool alive = 23;</code>
+   */
+  public boolean hasAlive() {
+    return ((bitField0_ & 0x00400000) == 0x00400000);
+  }
+  /**
+   * <code>optional bool alive = 23;</code>
+   */
+  public boolean getAlive() {
+    return alive_;
   }
 
   private void initFields() {
@@ -537,12 +599,13 @@ public final class WorldModel extends
     fallen_ = false;
     active_ = false;
     claimedBall_ = false;
+    intention_ = 0;
+    alive_ = false;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     memoizedIsInitialized = 1;
     return true;
@@ -613,6 +676,12 @@ public final class WorldModel extends
     }
     if (((bitField0_ & 0x00100000) == 0x00100000)) {
       output.writeBool(21, claimedBall_);
+    }
+    if (((bitField0_ & 0x00200000) == 0x00200000)) {
+      output.writeInt32(22, intention_);
+    }
+    if (((bitField0_ & 0x00400000) == 0x00400000)) {
+      output.writeBool(23, alive_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -707,6 +776,14 @@ public final class WorldModel extends
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(21, claimedBall_);
     }
+    if (((bitField0_ & 0x00200000) == 0x00200000)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(22, intention_);
+    }
+    if (((bitField0_ & 0x00400000) == 0x00400000)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(23, alive_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSerializedSize = size;
     return size;
@@ -789,9 +866,8 @@ public final class WorldModel extends
    * Protobuf type {@code messages.WorldModel}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:messages.WorldModel)
-      messages.WorldModelOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements messages.WorldModelOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return messages._File_WorldModel.internal_static_messages_WorldModel_descriptor;
@@ -866,6 +942,10 @@ public final class WorldModel extends
       bitField0_ = (bitField0_ & ~0x00080000);
       claimedBall_ = false;
       bitField0_ = (bitField0_ & ~0x00100000);
+      intention_ = 0;
+      bitField0_ = (bitField0_ & ~0x00200000);
+      alive_ = false;
+      bitField0_ = (bitField0_ & ~0x00400000);
       return this;
     }
 
@@ -978,6 +1058,14 @@ public final class WorldModel extends
         to_bitField0_ |= 0x00100000;
       }
       result.claimedBall_ = claimedBall_;
+      if (((from_bitField0_ & 0x00200000) == 0x00200000)) {
+        to_bitField0_ |= 0x00200000;
+      }
+      result.intention_ = intention_;
+      if (((from_bitField0_ & 0x00400000) == 0x00400000)) {
+        to_bitField0_ |= 0x00400000;
+      }
+      result.alive_ = alive_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -1057,6 +1145,12 @@ public final class WorldModel extends
       if (other.hasClaimedBall()) {
         setClaimedBall(other.getClaimedBall());
       }
+      if (other.hasIntention()) {
+        setIntention(other.getIntention());
+      }
+      if (other.hasAlive()) {
+        setAlive(other.getAlive());
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       return this;
     }
@@ -1084,6 +1178,7 @@ public final class WorldModel extends
     }
     private int bitField0_;
 
+    // optional int64 timestamp = 1;
     private long timestamp_ ;
     /**
      * <code>optional int64 timestamp = 1;</code>
@@ -1116,6 +1211,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional float my_x = 2;
     private float myX_ ;
     /**
      * <code>optional float my_x = 2;</code>
@@ -1148,6 +1244,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional float my_y = 3;
     private float myY_ ;
     /**
      * <code>optional float my_y = 3;</code>
@@ -1180,6 +1277,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional float my_h = 4;
     private float myH_ ;
     /**
      * <code>optional float my_h = 4;</code>
@@ -1212,6 +1310,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional float my_uncert = 5;
     private float myUncert_ ;
     /**
      * <code>optional float my_uncert = 5;</code>
@@ -1244,6 +1343,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional float walking_to_x = 6;
     private float walkingToX_ ;
     /**
      * <code>optional float walking_to_x = 6;</code>
@@ -1276,6 +1376,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional float walking_to_y = 7;
     private float walkingToY_ ;
     /**
      * <code>optional float walking_to_y = 7;</code>
@@ -1308,6 +1409,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional bool ball_on = 8;
     private boolean ballOn_ ;
     /**
      * <code>optional bool ball_on = 8;</code>
@@ -1340,6 +1442,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional int32 ball_age = 9;
     private int ballAge_ ;
     /**
      * <code>optional int32 ball_age = 9;</code>
@@ -1372,6 +1475,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional float ball_dist = 10;
     private float ballDist_ ;
     /**
      * <code>optional float ball_dist = 10;</code>
@@ -1404,6 +1508,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional float ball_bearing = 11;
     private float ballBearing_ ;
     /**
      * <code>optional float ball_bearing = 11;</code>
@@ -1436,6 +1541,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional float ball_vel_x = 12;
     private float ballVelX_ ;
     /**
      * <code>optional float ball_vel_x = 12;</code>
@@ -1468,6 +1574,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional float ball_vel_y = 13;
     private float ballVelY_ ;
     /**
      * <code>optional float ball_vel_y = 13;</code>
@@ -1500,6 +1607,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional float ball_uncert = 14;
     private float ballUncert_ ;
     /**
      * <code>optional float ball_uncert = 14;</code>
@@ -1532,6 +1640,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional int32 role = 15;
     private int role_ ;
     /**
      * <code>optional int32 role = 15;</code>
@@ -1564,6 +1673,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional bool in_kicking_state = 16;
     private boolean inKickingState_ ;
     /**
      * <code>optional bool in_kicking_state = 16;</code>
@@ -1596,6 +1706,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional float kicking_to_x = 17;
     private float kickingToX_ ;
     /**
      * <code>optional float kicking_to_x = 17;</code>
@@ -1628,6 +1739,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional float kicking_to_y = 18;
     private float kickingToY_ ;
     /**
      * <code>optional float kicking_to_y = 18;</code>
@@ -1660,6 +1772,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional bool fallen = 19;
     private boolean fallen_ ;
     /**
      * <code>optional bool fallen = 19;</code>
@@ -1692,6 +1805,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional bool active = 20;
     private boolean active_ ;
     /**
      * <code>optional bool active = 20;</code>
@@ -1724,6 +1838,7 @@ public final class WorldModel extends
       return this;
     }
 
+    // optional bool claimed_ball = 21;
     private boolean claimedBall_ ;
     /**
      * <code>optional bool claimed_ball = 21;</code>
@@ -1752,6 +1867,72 @@ public final class WorldModel extends
     public Builder clearClaimedBall() {
       bitField0_ = (bitField0_ & ~0x00100000);
       claimedBall_ = false;
+      onChanged();
+      return this;
+    }
+
+    // optional int32 intention = 22;
+    private int intention_ ;
+    /**
+     * <code>optional int32 intention = 22;</code>
+     */
+    public boolean hasIntention() {
+      return ((bitField0_ & 0x00200000) == 0x00200000);
+    }
+    /**
+     * <code>optional int32 intention = 22;</code>
+     */
+    public int getIntention() {
+      return intention_;
+    }
+    /**
+     * <code>optional int32 intention = 22;</code>
+     */
+    public Builder setIntention(int value) {
+      bitField0_ |= 0x00200000;
+      intention_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 intention = 22;</code>
+     */
+    public Builder clearIntention() {
+      bitField0_ = (bitField0_ & ~0x00200000);
+      intention_ = 0;
+      onChanged();
+      return this;
+    }
+
+    // optional bool alive = 23;
+    private boolean alive_ ;
+    /**
+     * <code>optional bool alive = 23;</code>
+     */
+    public boolean hasAlive() {
+      return ((bitField0_ & 0x00400000) == 0x00400000);
+    }
+    /**
+     * <code>optional bool alive = 23;</code>
+     */
+    public boolean getAlive() {
+      return alive_;
+    }
+    /**
+     * <code>optional bool alive = 23;</code>
+     */
+    public Builder setAlive(boolean value) {
+      bitField0_ |= 0x00400000;
+      alive_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional bool alive = 23;</code>
+     */
+    public Builder clearAlive() {
+      bitField0_ = (bitField0_ & ~0x00400000);
+      alive_ = false;
       onChanged();
       return this;
     }

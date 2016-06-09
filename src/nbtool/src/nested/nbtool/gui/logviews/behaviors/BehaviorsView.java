@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import com.google.protobuf.Message;
+import messages.*;
+
 import nbtool.data.log.Block;
 import nbtool.data.log.Log;
 import nbtool.gui.logviews.misc.ViewParent;
@@ -17,6 +20,7 @@ import nbtool.util.SharedConstants;
 public class BehaviorsView extends ViewParent {
 	
 	// private static final Debug.DebugSettings debug = Debug.createSettings(true, true, true, null, null);
+	Behaviors be;
 
 	@Override
 	public void setupDisplay() {
@@ -25,30 +29,18 @@ public class BehaviorsView extends ViewParent {
 
 	@Override
 	public String[] displayableTypes() {
-		return new String[]{SharedConstants.LogClass_Tripoint()};
+		return new String[]{"behaviors"};
 	}
-	
-	int width;
-	int height;
-
-	int displayw;
-	int displayh;
-
-	final int fieldw = 640;
-	final int fieldh = 554;
-
-	boolean click = false;
-	boolean drag = false;
-
-	// Click and release values
-	int clickX1 = 0;
-	int clickY1 = 0;
-	int clickX2 = 0;
-	int clickY2 = 0;
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		
+
+		try{
+			be = Behaviors.parseFrom(displayedLog.blocks.get(0).data);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+
 		Font f = g.getFont();
 		Font calFont = f.deriveFont( (float) f.getSize() * 1.5f);
 		g.setFont(calFont);
@@ -60,6 +52,8 @@ public class BehaviorsView extends ViewParent {
 		g.fillRect(20, 40, 800, 1);
 		g.setFont(calFont);
 		g.setColor(new Color(128, 128, 128));
+
+		System.out.println(be);
 		g.drawString("GameInitial", 20, 70);
 		g.drawString("GameReady", 150, 70);
 		g.drawString("GameSet", 270, 70);
