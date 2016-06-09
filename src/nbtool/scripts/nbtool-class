@@ -1,0 +1,26 @@
+#!/bin/bash
+
+if [[ $NBITES_DIR == "" ]]
+    then
+        echo "cannot use nbtool scripts without NBITES_DIR variable.";
+        exit 1
+fi
+
+if [[ $1 == "" ]]
+    then
+        echo "cannot run empty class name";
+        exit 1
+fi
+
+echo "using NBITES_DIR=" $NBITES_DIR
+
+cd $NBITES_DIR/src/nbtool
+
+set -e
+ant
+
+echo
+echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> build complete <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+echo
+
+java -ea -Xms200m -Xmx200m -cp .:jars/:../../build/nbtool "$@"

@@ -511,7 +511,8 @@ def saveLeft(player):
 
     if player.counter > 80:
         if SAVING and DIVING:
-            player.executeMove(SweetMoves.GOALIE_ROLL_OUT_LEFT)
+            print("EXECUTING ROLL OUT NOW")
+            # player.executeMove(SweetMoves.GOALIE_ROLL_OUT_LEFT)
             return player.goLater('rollOut')
             #TESTINGCHANGE
         else:
@@ -521,7 +522,7 @@ def saveLeft(player):
 
 @superState('gameControllerResponder')
 def rollOut(player):
-    if player.brain.nav.isStopped():
+    if player.brain.nav.isStopped() and player.counter > 180:
         player.brain.fallController.enabled = True
         player.justDived = True
         return player.goLater('fallen')
@@ -555,7 +556,16 @@ def penaltyShotsGamePlaying(player):
         player.isSaving = False
         player.lastStiffStatus = True
 
-    return player.goLater('waitForPenaltySave')
+    if player.counter > 30:
+        if player.lastPenDiveSide == constants.RIGHT:
+            doDive.side = constants.LEFT
+        else:
+            doDive.side = constants.RIGHT
+        player.lastPenDiveSide = doDive.side
+        return player.goLater('doDive')
+
+    return player.stay()
+    # return player.goLater('waitForPenaltySave')
 
 @superState('gameControllerResponder')
 def waitForPenaltySave(player):

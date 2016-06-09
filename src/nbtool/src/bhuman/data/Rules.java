@@ -72,12 +72,20 @@ public abstract class Rules
     /** Number of penalty-shots for each team after full 10minutes playing. */
     public int numberOfPenaltyShotsLong;
     /** Time in seconds for each kind of penalty. */
-    public int[] penaltyTime;
+    public int[][] penaltyTime;
+    /** Whether the penalty count is reset on halftime */
+    public boolean resetPenaltyCountOnHalftime;
+    /** Whether the ejected robots are reset on halftime */
+    public boolean resetEjectedRobotsOnHalftime;
+    /** Whether penalties can be removed before the penalty time has passed. */
+    public boolean allowEarlyPenaltyRemoval;
+    /** Penalty that players get when they substitute another player. */
+    public byte substitutePenalty;
     /** if robots should return from penalties when the game state changes. */
     public boolean returnRobotsInGameStoppages;
     /** Time in seconds one team has as timeOut. */
     public int timeOutTime;
-    /** Time in seconds of a referee timeout*/
+    /** Time in seconds of a referee timeout */
     public int refereeTimeout;
     /** Defines if the option for a referee timeout is available. */ 
     public boolean isRefereeTimeoutAvailable;
@@ -85,12 +93,14 @@ public abstract class Rules
     public boolean timeOutPerHalf;
     /** On how many pushings is a robot ejected. */
     public int[] pushesToEjection;
-    /** Defines if coach is available **/
+    /** Defines if coach is available */
     public boolean isCoachAvailable;
     /** Allowed to compensate for lost time? */
     public boolean lostTime;
-    /** Whether compatibility mode (version 7) is supported **/
+    /** Whether compatibility mode (version 7) is supported */
     public boolean compatibilityToVersion7;
-    /** If true, the drop-in player competition is active*/
+    /** If true, the drop-in player competition is active */
     public boolean dropInPlayerMode;
+    /** If true, the game controller should drop broadcast-messages */
+    public boolean dropBroadcastMessages;
 }
