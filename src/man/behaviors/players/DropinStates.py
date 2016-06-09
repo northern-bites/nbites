@@ -155,6 +155,7 @@ def gamePenalized(player):
         player.stand()
         player.penalizeHeads()
         player.wasPenalized = True
+        player.executeMove(SweetMoves.STRETCHED_KNEE_STAND)
 
     return player.stay()
 
