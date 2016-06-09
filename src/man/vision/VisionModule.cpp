@@ -499,13 +499,9 @@ void VisionModule::outportalVisionField()
 
     if (ballOn)
     {
-        std::cout << "getting ball" << std::endl;
         vb->set_distance(best.dist);
 
         vb->set_radius(best.radius);
-        if (best.y_rel == 0) {
-            std::cout << "zero" << std::endl;
-        }
         double bearing = atan(best.x_rel / best.y_rel);
         vb->set_bearing(bearing);
         vb->set_bearing_deg(bearing * TO_DEG);
@@ -520,8 +516,6 @@ void VisionModule::outportalVisionField()
         vb->set_confidence(best.confidence());
         vb->set_x(static_cast<int>(best.centerX));
         vb->set_y(static_cast<int>(best.centerY));
-        std::cout << "getting ball done" << std::endl;
-
     }
 
     visionField.set_horizon_dist(field->horizonDist());

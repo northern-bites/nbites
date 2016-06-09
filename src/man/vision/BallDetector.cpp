@@ -435,7 +435,10 @@ bool BallDetector::findCorrelatedBlackSpots
                 }
             }
             correlatedSpots.push_back(actualBlobs[c]);
-            std::cout<<"Correlated Spots Size: "<<correlatedSpots.size()<<std::endl;
+			if (debugBall) {
+				std::cout<<"Correlated Spots Size: "<<correlatedSpots.size()
+						 <<std::endl;
+			}
             if(correlatedSpots.size() == 2) { //lets check the distance here
                 Spot s1 = correlatedSpots[0];
                 Spot s2 = correlatedSpots[1];
@@ -773,7 +776,9 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 				debugWhiteSpots.push_back(foo);
 			}
 		} else {
-			std::cout << "Rejected blob " << diam << std::endl;
+			if (debugBall) {
+				std::cout << "Rejected blob " << diam << std::endl;
+			}
 		}
 	}
 
