@@ -160,6 +160,16 @@ public final class WorldModel extends
             claimedBall_ = input.readBool();
             break;
           }
+          case 176: {
+            bitField0_ |= 0x00200000;
+            intention_ = input.readInt32();
+            break;
+          }
+          case 184: {
+            bitField0_ |= 0x00400000;
+            alive_ = input.readBool();
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -515,6 +525,36 @@ public final class WorldModel extends
     return claimedBall_;
   }
 
+  public static final int INTENTION_FIELD_NUMBER = 22;
+  private int intention_;
+  /**
+   * <code>optional int32 intention = 22;</code>
+   */
+  public boolean hasIntention() {
+    return ((bitField0_ & 0x00200000) == 0x00200000);
+  }
+  /**
+   * <code>optional int32 intention = 22;</code>
+   */
+  public int getIntention() {
+    return intention_;
+  }
+
+  public static final int ALIVE_FIELD_NUMBER = 23;
+  private boolean alive_;
+  /**
+   * <code>optional bool alive = 23;</code>
+   */
+  public boolean hasAlive() {
+    return ((bitField0_ & 0x00400000) == 0x00400000);
+  }
+  /**
+   * <code>optional bool alive = 23;</code>
+   */
+  public boolean getAlive() {
+    return alive_;
+  }
+
   private void initFields() {
     timestamp_ = 0L;
     myX_ = 0F;
@@ -537,6 +577,8 @@ public final class WorldModel extends
     fallen_ = false;
     active_ = false;
     claimedBall_ = false;
+    intention_ = 0;
+    alive_ = false;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -613,6 +655,12 @@ public final class WorldModel extends
     }
     if (((bitField0_ & 0x00100000) == 0x00100000)) {
       output.writeBool(21, claimedBall_);
+    }
+    if (((bitField0_ & 0x00200000) == 0x00200000)) {
+      output.writeInt32(22, intention_);
+    }
+    if (((bitField0_ & 0x00400000) == 0x00400000)) {
+      output.writeBool(23, alive_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -706,6 +754,14 @@ public final class WorldModel extends
     if (((bitField0_ & 0x00100000) == 0x00100000)) {
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(21, claimedBall_);
+    }
+    if (((bitField0_ & 0x00200000) == 0x00200000)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(22, intention_);
+    }
+    if (((bitField0_ & 0x00400000) == 0x00400000)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(23, alive_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSerializedSize = size;
@@ -866,6 +922,10 @@ public final class WorldModel extends
       bitField0_ = (bitField0_ & ~0x00080000);
       claimedBall_ = false;
       bitField0_ = (bitField0_ & ~0x00100000);
+      intention_ = 0;
+      bitField0_ = (bitField0_ & ~0x00200000);
+      alive_ = false;
+      bitField0_ = (bitField0_ & ~0x00400000);
       return this;
     }
 
@@ -978,6 +1038,14 @@ public final class WorldModel extends
         to_bitField0_ |= 0x00100000;
       }
       result.claimedBall_ = claimedBall_;
+      if (((from_bitField0_ & 0x00200000) == 0x00200000)) {
+        to_bitField0_ |= 0x00200000;
+      }
+      result.intention_ = intention_;
+      if (((from_bitField0_ & 0x00400000) == 0x00400000)) {
+        to_bitField0_ |= 0x00400000;
+      }
+      result.alive_ = alive_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -1056,6 +1124,12 @@ public final class WorldModel extends
       }
       if (other.hasClaimedBall()) {
         setClaimedBall(other.getClaimedBall());
+      }
+      if (other.hasIntention()) {
+        setIntention(other.getIntention());
+      }
+      if (other.hasAlive()) {
+        setAlive(other.getAlive());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       return this;
@@ -1752,6 +1826,70 @@ public final class WorldModel extends
     public Builder clearClaimedBall() {
       bitField0_ = (bitField0_ & ~0x00100000);
       claimedBall_ = false;
+      onChanged();
+      return this;
+    }
+
+    private int intention_ ;
+    /**
+     * <code>optional int32 intention = 22;</code>
+     */
+    public boolean hasIntention() {
+      return ((bitField0_ & 0x00200000) == 0x00200000);
+    }
+    /**
+     * <code>optional int32 intention = 22;</code>
+     */
+    public int getIntention() {
+      return intention_;
+    }
+    /**
+     * <code>optional int32 intention = 22;</code>
+     */
+    public Builder setIntention(int value) {
+      bitField0_ |= 0x00200000;
+      intention_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 intention = 22;</code>
+     */
+    public Builder clearIntention() {
+      bitField0_ = (bitField0_ & ~0x00200000);
+      intention_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private boolean alive_ ;
+    /**
+     * <code>optional bool alive = 23;</code>
+     */
+    public boolean hasAlive() {
+      return ((bitField0_ & 0x00400000) == 0x00400000);
+    }
+    /**
+     * <code>optional bool alive = 23;</code>
+     */
+    public boolean getAlive() {
+      return alive_;
+    }
+    /**
+     * <code>optional bool alive = 23;</code>
+     */
+    public Builder setAlive(boolean value) {
+      bitField0_ |= 0x00400000;
+      alive_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional bool alive = 23;</code>
+     */
+    public Builder clearAlive() {
+      bitField0_ = (bitField0_ & ~0x00400000);
+      alive_ = false;
       onChanged();
       return this;
     }

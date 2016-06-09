@@ -1,5 +1,8 @@
 package nbtool.util;
 
+import java.awt.Dimension;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,6 +71,22 @@ public class UserSettings {
 	
 	public static final String VENUE_KEY = "__VENUE__";
 	
+	private static void verify(Rectangle bounds) {
+		GraphicsEnvironment ge = GraphicsEnvironment
+		        .getLocalGraphicsEnvironment();
+		GraphicsDevice[] gs = ge.getScreenDevices();
+		if (gs.length == 1) {
+			Dimension size = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+			boolean x_bad = bounds.x < 0 || bounds.x > size.width;
+			boolean y_bad = bounds.y < 0 || bounds.y > size.height;
+			if (x_bad || y_bad) {
+				Debug.error("The tool believes the bounds %s will not display on your screen!"
+						+ " It is using defaults.", bounds);
+				bounds.setBounds(ToolSettings.DEFAULT_BOUNDS);
+			}
+		}
+	}
+	
 	public static class DisplaySettings {
 		public Rectangle bounds = null;
 		public ViewProfile profile = null;
@@ -108,6 +127,8 @@ public class UserSettings {
 						array.get(2).asNumber().intValue(),
 						array.get(3).asNumber().intValue()
 						);
+				
+				verify(bounds);
 			} else {
 				bounds = ToolSettings.DEFAULT_BOUNDS;
 			}

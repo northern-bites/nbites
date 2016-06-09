@@ -35,15 +35,8 @@ public class UtilityManager {
 	public static final BallTestUtility BallTestUtility = new BallTestUtility();
 
 	//Unused at the moment – comment out to re-enable.
-	//public static final MultiStreamUtility MultiStreamUtility = new MultiStreamUtility();
 //	public static final SyntheticImageUtility SyntheticImageUtility = new SyntheticImageUtility();
-    
-//	public static final SyntheticSndUtility SyntheticSndUtility = new SyntheticSndUtility();
-
 //	public static final ReplayUtility ReplayUtility = new ReplayUtility();
-	
-//	public static final CameraCalibrateUtility2 CameraCalibrateUtility2 = new CameraCalibrateUtility2();
-//	public static final CameraSettingsUtility CameraSettingsUtility = new CameraSettingsUtility();
 
 	public static final UtilityParent[] utilities = findUtilityFields();
 
