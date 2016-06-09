@@ -31,7 +31,7 @@ public class BroadcastUtility extends UtilityParent {
 
 	@Override
 	public String purpose() {
-		return "repeatedly generating broadcast packets";
+		return "spamming generated broadcast packets";
 	}
 
 	@Override
