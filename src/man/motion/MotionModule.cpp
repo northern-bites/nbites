@@ -242,7 +242,7 @@ void MotionModule::processBodyJoints()
         const std::vector<float> larmJoints =
             curProvider->getChainJoints(Kinematics::LARM_CHAIN);
 
-        std::cout << "[MOTION MODULE] LEG JOINTS: ";
+        // std::cout << "[MOTION MODULE] LEG JOINTS: ";
 
 
         //copy and clip joints for safety
@@ -260,7 +260,7 @@ void MotionModule::processBodyJoints()
                                Kinematics::LEFT_LEG_BOUNDS[i][0],
                                Kinematics::LEFT_LEG_BOUNDS[i][1]);
 
-            std::cout << Kinematics::JOINT_STRINGS[Kinematics::R_HIP_YAW_PITCH + i] << " " << (rlegJoints.at(i)) << "  " << Kinematics::JOINT_STRINGS[Kinematics::L_HIP_YAW_PITCH + i] << " " << (llegJoints.at(i)) << std::endl;
+            // std::cout << Kinematics::JOINT_STRINGS[Kinematics::R_HIP_YAW_PITCH + i] << " " << (rlegJoints.at(i)) << "  " << Kinematics::JOINT_STRINGS[Kinematics::L_HIP_YAW_PITCH + i] << " " << (llegJoints.at(i)) << std::endl;
 
         }
 

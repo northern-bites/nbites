@@ -66,7 +66,7 @@ void NullProvider::calculateNextJointsAndStiffnesses(
             chainJoints[chain_joint] = sensorAngles[joint];
             chainStiffness[chain_joint] = nextStiffness[joint];
         }
-        std::cout << "NULL PROVIDER SETTING JOINTS" << std::endl;
+        // std::cout << "NULL PROVIDER SETTING JOINTS" << std::endl;
         setNextChainJoints(static_cast<Kinematics::ChainID>(chain),chainJoints);
         setNextChainStiffnesses(static_cast<Kinematics::ChainID>(chain),
                                 chainStiffness);

@@ -20,9 +20,10 @@ set( unswalk_srcs
   types/UNSWSensorValues.hpp
   types/Odometry.hpp
   types/XYZ_Coord.hpp
+  touch/Touch.hpp
+  touch/NullTouch.hpp
   touch/FilteredTouch.cpp
   touch/FeetState.cpp
-  touch/Touch.hpp
   touch/TorsoStateFilter.cpp
   utils/angles.hpp
   UNSWalkProvider.cpp

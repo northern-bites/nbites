@@ -30,11 +30,11 @@
 #include "blackboard/Blackboard.hpp"
 #include "generator/WalkEnginePreProcessor.hpp"
 
-// #include "touch/FilteredTouch.hpp"
 
 #include "effector/Effector.hpp"
 // #include "generator/Generator.hpp"
-// #include "touch/FilteredTouch.hpp"
+#include "touch/Touch.hpp"
+#include "touch/NullTouch.hpp"
 // // #include "blackboard/Adapter.hpp"
 #include "generator/BodyModel.hpp"
 #include "perception/kinematics/UNSWKinematics.hpp"
@@ -61,8 +61,8 @@ public:
 	void calculateNextJointsAndStiffnesses(
 		std::vector<float>&				sensorAngles,
 		std::vector<float>&				sensorCurrents,
-		const messages::InertialState&	sensorInertials,
-		const messages::FSR&			sensorFSRs
+		const ::messages::InertialState&	sensorInertials,
+		const ::messages::FSR&			sensorFSRs
 		);
 
 	void hardReset();
@@ -78,7 +78,7 @@ public:
         return std::vector<BodyJointCommand::ptr>();
     }
 
-    void getOdometryUpdate(portals::OutPortal<messages::RobotLocation>& out) const;
+    void getOdometryUpdate(portals::OutPortal< ::messages::RobotLocation>& out) const;
 
     static const float INITIAL_BODY_POSE_ANGLES[Kinematics::NUM_JOINTS];
 
@@ -105,7 +105,7 @@ private:
 	bool standby;
 	bool tryingToWalk;
 	MotionCommand::ptr currentCommand;
-	// Touch *touch;
+	Touch *touch;
 	ClippedGenerator *generator;
 	Odometry* startOdometry;
 	// Effector* effector;

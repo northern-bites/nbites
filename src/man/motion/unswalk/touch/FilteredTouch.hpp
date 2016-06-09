@@ -4,14 +4,18 @@
 #include "touch/TorsoStateFilter.hpp"
 
 using namespace boost::numeric::ublas;
+// using boost::program_options::variables_map;
 
 class FilteredTouch : Touch {
    public:
       explicit FilteredTouch(Touch* t);
+      FilteredTouch();
       ~FilteredTouch();
       UNSWSensorValues getSensors(UNSWKinematics &kinematics);
-      void readOptions(const boost::program_options::variables_map& config);
+      UNSWSensorValues getSensors(UNSWKinematics &kinematics, UNSWSensorValues &sensors);
+      void readOptions(const boost::program_options::variables_map& config) {};
       bool getStanding();
+      void NBSetOptions();
       ButtonPresses getButtons();
    private:
       Touch* touch;

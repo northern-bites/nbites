@@ -21,7 +21,32 @@ using namespace std;
 FilteredTouch::FilteredTouch(Touch* t)
    : touch(t),
      init(true){
-   llog(INFO) << "FilteredTouch constructed" << std::endl;
+   std::cout << "FilteredTouch constructed" << std::endl;
+
+   kf[1].init(1.0/100.0, 0.01, 0.35, true);  //0.01, 0.25
+   kf[0].init(1.0/100.0, 0.01, 0.35, false);
+
+   // init body position
+   lastBodyPosition = vec4<float>(0, 0, 390, 1);
+
+   // init the inertial sensor calibration offsets
+   for(int i = 0; i < 3; i++){
+      for(int j = 0; j < 3; j++){
+         imuOffset[i][j] = 0;
+         targetOffset[i][j] = 0;
+         count[i][j] = 0;
+         avg[i][j] = 0;
+         err[i][j] = 0;
+         k[i][j] = 0;
+      }
+   }
+   prevAng[0] = prevAng[1] = 0;
+}
+
+
+FilteredTouch::FilteredTouch() {
+   init = true;
+   std::cout << "FilteredTouch constructed" << std::endl;
 
    kf[1].init(1.0/100.0, 0.01, 0.35, true);  //0.01, 0.25
    kf[0].init(1.0/100.0, 0.01, 0.35, false);
@@ -44,18 +69,27 @@ FilteredTouch::FilteredTouch(Touch* t)
 }
 
 FilteredTouch::~FilteredTouch() {
-   llog(INFO) << "FilteredTouch destYroyed" << std::endl;
+   std::cout << "FilteredTouch destYroyed" << std::endl;
 }
 
-void FilteredTouch::readOptions(const boost::program_options::variables_map& config){
-   imuOffset[GYR][0] =
-         config["touch.gyrXOffset"].as<float>();
-   imuOffset[GYR][1] =
-         config["touch.gyrYOffset"].as<float>();
+// void FilteredTouch::readOptions(const boost::program_options::variables_map& config){
+//    // imuOffset[GYR][0] =
+//    //       config["touch.gyrXOffset"].as<float>();
+//    // imuOffset[GYR][1] =
+//    //       config["touch.gyrYOffset"].as<float>();
+//    // targetOffset[GYR][0] = imuOffset[GYR][0];
+//    // targetOffset[GYR][1] = imuOffset[GYR][1];
+//    // targetOffset[ANG][0] = UNSWDEG2RAD(config["touch.angleXOffset"].as<float>());
+//    // targetOffset[ANG][1] = UNSWDEG2RAD(config["touch.angleYOffset"].as<float>());
+// }
+
+void FilteredTouch::NBSetOptions() {
+   imuOffset[GYR][0] = 2.75f;
+   imuOffset[GYR][1] = 0.0f;
    targetOffset[GYR][0] = imuOffset[GYR][0];
    targetOffset[GYR][1] = imuOffset[GYR][1];
-   targetOffset[ANG][0] = UNSWDEG2RAD(config["touch.angleXOffset"].as<float>());
-   targetOffset[ANG][1] = UNSWDEG2RAD(config["touch.angleYOffset"].as<float>());
+   targetOffset[ANG][0] = UNSWDEG2RAD(-0.8f);
+   targetOffset[ANG][1] = UNSWDEG2RAD(-0.4f);
 }
 
 float FilteredTouch::getScaledGyr(int isY){
@@ -180,6 +214,50 @@ void FilteredTouch::filterSensors(){
 
 UNSWSensorValues FilteredTouch::getSensors(UNSWKinematics &kinematics) {
    update = touch->getSensors(kinematics);
+   FilteredTouch::kinematics = kinematics;
+
+   struct timeval tv;
+   static bool said = false;
+   gettimeofday(&tv, NULL);
+   if (tv.tv_sec % 5 == 0 && !said) {
+      if (update.sonar[0] < Sonar::MIN) {
+//         SAY("sonar error");  for it to shut up about sonar error
+      }
+   }
+   said = (tv.tv_sec % 5 == 0);
+   if (init) {
+      init = false;
+      state = update;
+      state.sensors[Sensors::InertialSensor_GyrX] = 0;
+      state.sensors[Sensors::InertialSensor_GyrY] = 0;
+      for (uint8_t i = 0; i < Sonar::NUMBER_OF_READINGS; ++i) {
+         if (state.sonar[i] >= Sonar::INVALID )
+            state.sonar[i] = Sonar::DISCARD;
+         if (state.sonar[i] <= Sonar::MIN)
+            state.sonar[i] = Sonar::MIN;
+      }
+   } else {
+      state.joints = update.joints;
+      uint8_t i;
+      for (i = 0; i < Sensors::NUMBER_OF_SENSORS; ++i){
+         //don't erase previous sensor values
+         if(i < Sensors::InertialSensor_AccX || i > Sensors::InertialSensor_AngleY)
+            state.sensors[i] = update.sensors[i];
+      }
+      for (i = 0; i < Sonar::NUMBER_OF_READINGS; ++i) {
+         if (update.sonar[i] >= Sonar::INVALID)
+            update.sonar[i] = Sonar::DISCARD;
+         if (update.sonar[i] >= Sonar::MIN)
+            state.sonar[i] += (update.sonar[i] - state.sonar[i]) * 1.0;
+      }
+      feetState.update(update, kinematics);
+      filterSensors();
+   }
+   return state;
+}
+
+UNSWSensorValues FilteredTouch::getSensors(UNSWKinematics &kinematics, UNSWSensorValues &sensors) {
+   update = sensors; //touch->getSensors(kinematics);
    FilteredTouch::kinematics = kinematics;
 
    struct timeval tv;

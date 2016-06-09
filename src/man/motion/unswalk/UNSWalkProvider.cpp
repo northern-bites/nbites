@@ -17,6 +17,8 @@
 #include "utils/Logger.hpp"
 #include "utils/basic_maths.hpp"
 #include "utils/speech.hpp"
+#include "touch/FilteredTouch.hpp"
+
 
 namespace man 
 {
@@ -76,6 +78,8 @@ UNSWalkProvider::UNSWalkProvider() : MotionProvider(WALK_PROVIDER),
 	generator =  new ClippedGenerator((Generator*) new DistributedGenerator());
 	odometry = new Odometry();
 	joints = new JointValues();
+	// Touch* nullTouch = (Touch*) new NullTouch();
+	touch = (Touch*) new FilteredTouch();
 	resetAll();
 }
 
@@ -134,8 +138,8 @@ bool hasPassed(Odometry& odo1, Odometry& odo2) {
 void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	std::vector<float>& 			sensorAngles,
 	std::vector<float>& 			sensorCurrents,
-	const messages::InertialState&  sensorInertials,
-	const messages::FSR& 			sensorFSRs
+	const ::messages::InertialState&  sensorInertials,
+	const ::messages::FSR& 			sensorFSRs
 	) 
 {
 	PROF_ENTER(P_WALK);
@@ -218,16 +222,28 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	UNSWSensorValues sensors = new UNSWSensorValues();
 	sensors.joints = joints;
 
-	sensors.sensors[Sensors::InertialSensor_GyrX] = sensorInertials.gyr_x();
-    sensors.sensors[Sensors::InertialSensor_GyrY] = sensorInertials.gyr_y();
+	// I think something is amiss with the sensors
+	// logMsg("Testing sensor ish");
+	// TODO check this!!
+	sensors.sensors[Sensors::InertialSensor_GyrX] = -sensorInertials.gyr_x() * 0.01;
+    sensors.sensors[Sensors::InertialSensor_GyrY] = -sensorInertials.gyr_y() * 0.01;
+	// sensors.sensors[Sensors::InertialSensor_GyrX] = sensorInertials.gyr_x();
+ //    sensors.sensors[Sensors::InertialSensor_GyrY] = sensorInertials.gyr_y();
     // sensors.sensors[Sensors::InertialSensor_GyrZ] = sensorInertials.gyr_z(); // they don't use this
 
     sensors.sensors[Sensors::InertialSensor_AccX] = sensorInertials.acc_x();
     sensors.sensors[Sensors::InertialSensor_AccY] = sensorInertials.acc_y();
     sensors.sensors[Sensors::InertialSensor_AccZ] = sensorInertials.acc_z();
 
-    sensors.sensors[Sensors::InertialSensor_AngleX] = sensorInertials.angle_x();
-    sensors.sensors[Sensors::InertialSensor_AngleY] = sensorInertials.angle_y();
+    sensors.sensors[Sensors::InertialSensor_AngleX] = -RAD2DEG(sensorInertials.angle_x());
+    sensors.sensors[Sensors::InertialSensor_AngleY] = -RAD2DEG(sensorInertials.angle_y());
+    // TODO check this too!! I think filteredTouch needs RAW sensor values, but I'm NOT SURE
+    // sensors.sensors[Sensors::InertialSensor_AngleX] = sensorInertials.angle_x();
+    // sensors.sensors[Sensors::InertialSensor_AngleY] = sensorInertials.angle_y();
+    std::cout << "InertialSensor_AngleX: " << -RAD2DEG(sensorInertials.angle_x()) << ", InertialSensor_AngleY: " << -RAD2DEG(sensorInertials.angle_y()) << std::endl;
+    std::cout << "InertialSensor_GyrX: " << sensorInertials.gyr_x() << ", InertialSensor_GyrY: " << sensorInertials.gyr_y() << std::endl;
+    std::cout << "InertialSensor_AccX: " << sensorInertials.acc_x() << ", InertialSensor_AccY: " << sensorInertials.acc_y() << std::endl;
+    // std::cout << "InertialSensor_AngleX: " << -RAD2DEG(sensorInertials.angle_x()) << ", InertialSensor_AngleY: " << -RAD2DEG(sensorInertials.angle_y()) << std::endl;
     // sensors.sensors[Sensors::angleZ] = sensorInertials.angle_z(); // this either
 
     sensors.sensors[Sensors::LFoot_FSR_FrontLeft] = sensorFSRs.lfl();
@@ -243,6 +259,10 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     for (int i = 0; i < 21; i++) {
     	sensors.joints.angles[nb_joint_order[i]] = sensorAngles[i];
     }
+
+    ((FilteredTouch*)touch)->NBSetOptions();
+    UNSWSensorValues filteredSensors = ((FilteredTouch*)touch)->getSensors(kinematics, sensors);
+    // sensors = filteredSensors;
 
 	// TODO investigate calibrating sensors. . .
 	// if(request.body.actionType == Body::MOTION_CALIBRATE){
@@ -271,8 +291,8 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 	// Get the position of the ball in robot relative cartesian coordinates
 	// Is this necessary for our system? 
-	float ballX = 5.0;
-	float ballY = 5.0;
+	float ballX = 1.0;
+	float ballY = 1.0;
 
     // Update the body model
     // logMsg("Updating body model");
@@ -298,6 +318,10 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     //                       float ballX,
     //                       float ballY);
 
+    // for (unsigned int i = 0; i < Joints::NUMBER_OF_JOINTS; i++) {
+    // 	std::cout << Joints::jointNames[i] << " : " << joints.angles[i] << "\n";
+    // }
+
     angles = joints.angles;
     hardness = joints.stiffnesses;
 
@@ -319,10 +343,27 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     	std::vector<float> chain_angles;
     	std::vector<float> chain_hardness;
     	for (unsigned j = Kinematics::chain_first_joint_UNSWALK[i]; j <= Kinematics::chain_last_joint_UNSWALK[i]; j++) {
-    		chain_angles.push_back(joints.angles[nb_joint_order[j]]); // TODO I think this should be a lot more complicated than it seems right now...
-    		logMsgNoEL("ANGLE in "  + Joints::jointNames[nb_joint_order[j]] + " = ");
+
+    		if ((Kinematics::ChainID)i == Kinematics::RLEG_CHAIN && j == 11) {
+    			// RHIPYAWPITCH
+    			chain_angles.push_back(joints.angles[nb_joint_order[6]]);
+    			// logMsg("SPECIAL CASE: used " + Joints::jointNames[nb_joint_order[6]]);
+    		} 
+    		// else if ((Kinematics::ChainID)i == Kinematics::LLEG_CHAIN && j == 8) {
+    		// 	chain_angles.push_back(UNSWDEG2RAD(-57.3));
+    		// 	logMsg("SPECIAL CASE: used " + Joints::jointNames[nb_joint_order[8]]);
+    		// } else if ((Kinematics::ChainID)i == Kinematics::RLEG_CHAIN && j == 13) {
+    		// 	chain_angles.push_back(UNSWDEG2RAD(-56.9));
+    		// 	logMsg("SPECIAL CASE: used " + Joints::jointNames[nb_joint_order[13]]);
+    		// }
+    		else {
+	    		chain_angles.push_back(joints.angles[nb_joint_order[j]]); // TODO I think this should be a lot more complicated than it seems right now...
+    		}
+
+    		
+    		// logMsgNoEL("ANGLE in "  + Joints::jointNames[nb_joint_order[j]] + " = ");
 			// std::cout << RAD2DEG(joints.angles[nb_joint_order[j]]);
-			std::cout << (joints.angles[nb_joint_order[j]]);
+			// std::cout << (joints.angles[nb_joint_order[j]]);
 
 
     		if (hardness[nb_joint_order[j]] == 0) {
@@ -332,7 +373,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     			chain_hardness.push_back(joints.stiffnesses[nb_joint_order[j]]);
     			// TODO Double check this...
     		}
-    		std::cout << " STIFFNESS: " << joints.stiffnesses[nb_joint_order[j]] << std::endl;
+    		// std::cout << " STIFFNESS: " << joints.stiffnesses[nb_joint_order[j]] << std::endl;
     	}
 
     	this->setNextChainJoints((Kinematics::ChainID)i, chain_angles);
@@ -390,8 +431,8 @@ void UNSWalkProvider::setCommand(const KickCommand::ptr command) {
 	active();
 }
 
-void UNSWalkProvider::getOdometryUpdate(portals::OutPortal<messages::RobotLocation>& out) const {
-	portals::Message<messages::RobotLocation> odometryData(0);
+void UNSWalkProvider::getOdometryUpdate(portals::OutPortal< ::messages::RobotLocation>& out) const {
+	portals::Message< ::messages::RobotLocation> odometryData(0);
 	//odometryData.get()->set_x();
 	//odometryData.get()->set_y();
 	//odometryData.get()->set_h();
