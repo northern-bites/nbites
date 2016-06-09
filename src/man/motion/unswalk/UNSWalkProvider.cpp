@@ -262,8 +262,11 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
     ((FilteredTouch*)touch)->NBSetOptions();
     UNSWSensorValues filteredSensors = ((FilteredTouch*)touch)->getSensors(kinematics, sensors);
-    // sensors = filteredSensors;
+    std::cout << "FILTERED InertialSensor_GyrX: " << filteredSensors.sensors[Sensors::InertialSensor_GyrX] << ", InertialSensor_GyrY: " << filteredSensors.sensors[Sensors::InertialSensor_GyrX] << std::endl;
 
+    sensors = filteredSensors;
+	sensors.sensors[Sensors::InertialSensor_GyrX] = -filteredSensors.sensors[Sensors::InertialSensor_GyrX] * 0.01;
+    sensors.sensors[Sensors::InertialSensor_GyrY] = -filteredSensors.sensors[Sensors::InertialSensor_GyrY] * 0.01;
 	// TODO investigate calibrating sensors. . .
 	// if(request.body.actionType == Body::MOTION_CALIBRATE){
  //       // raw sensor values are sent to offnao for calibration
@@ -291,8 +294,8 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 	// Get the position of the ball in robot relative cartesian coordinates
 	// Is this necessary for our system? 
-	float ballX = 1.0;
-	float ballY = 1.0;
+	float ballX = 5.0;
+	float ballY = 5.0;
 
     // Update the body model
     // logMsg("Updating body model");
