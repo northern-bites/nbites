@@ -253,14 +253,14 @@ void MotionModule::processBodyJoints()
                 NBMath::clip(rlegJoints.at(i),
                              Kinematics::RIGHT_LEG_BOUNDS[i][0],
                              Kinematics::RIGHT_LEG_BOUNDS[i][1]);
-            std::cout << "FROM CHAIN: " << Kinematics::JOINT_STRINGS[Kinematics::R_HIP_YAW_PITCH + i] << " " << RAD2DEG(rlegJoints.at(i)) << "  " << Kinematics::JOINT_STRINGS[Kinematics::L_HIP_YAW_PITCH + i] << " " << RAD2DEG(llegJoints.at(i)) << std::endl;
+            // std::cout << "FROM CHAIN: " << Kinematics::JOINT_STRINGS[Kinematics::R_HIP_YAW_PITCH + i] << " " << RAD2DEG(rlegJoints.at(i)) << "  " << Kinematics::JOINT_STRINGS[Kinematics::L_HIP_YAW_PITCH + i] << " " << RAD2DEG(llegJoints.at(i)) << std::endl;
 
             nextJoints[Kinematics::L_HIP_YAW_PITCH + i]
                 = NBMath::clip(llegJoints.at(i),
                                Kinematics::LEFT_LEG_BOUNDS[i][0],
                                Kinematics::LEFT_LEG_BOUNDS[i][1]);
 
-            std::cout << Kinematics::JOINT_STRINGS[Kinematics::R_HIP_YAW_PITCH + i] << " " << RAD2DEG(nextJoints[Kinematics::L_HIP_YAW_PITCH + i]) << "  " << Kinematics::JOINT_STRINGS[Kinematics::L_HIP_YAW_PITCH + i] << " " << RAD2DEG(nextJoints[Kinematics::R_HIP_YAW_PITCH + i]) << std::endl;
+            std::cout << Kinematics::JOINT_STRINGS[Kinematics::R_HIP_YAW_PITCH + i] << " " << (rlegJoints.at(i)) << "  " << Kinematics::JOINT_STRINGS[Kinematics::L_HIP_YAW_PITCH + i] << " " << (llegJoints.at(i)) << std::endl;
 
         }
 
@@ -277,11 +277,6 @@ void MotionModule::processBodyJoints()
                              Kinematics::RIGHT_ARM_BOUNDS[i][1]);
         }
     }
-}
-
-float RAD2DEG(const float x) {
-    return x;
-   // return ((x) * UNSW_DEG_OVER_RAD);
 }
 
 void MotionModule::processHeadJoints()
@@ -450,6 +445,7 @@ void MotionModule::preProcessBody()
 
         if (!curProvider->isActive())
         {
+            std::cout << "[MOTION MODULE] Swapping body providers \n";
             swapBodyProvider();
         }
     }
@@ -719,6 +715,8 @@ void MotionModule::sendMotionCommand(messages::WalkCommand command)
 
 void MotionModule::sendMotionCommand(const BodyJointCommand::ptr command)
 {
+    std::cout << "[MOTION MODULE] Switching to scripted body providers \n";
+
     noWalkTransitionCommand = true;
     nextProvider = &scriptedProvider;
     scriptedProvider.setCommand(command);
@@ -726,6 +724,8 @@ void MotionModule::sendMotionCommand(const BodyJointCommand::ptr command)
 
 void MotionModule::sendMotionCommand(const std::vector<BodyJointCommand::ptr> commands)
 {
+    std::cout << "[MOTION MODULE] Switching to scripted body providers \n";
+
     noWalkTransitionCommand = true;
     nextProvider = &scriptedProvider;
     for(std::vector<BodyJointCommand::ptr>::const_iterator iter = commands.begin();
@@ -805,6 +805,8 @@ void MotionModule::sendMotionCommand(messages::ScriptedMove script)
             );
 
         noWalkTransitionCommand = true;
+        std::cout << "[MOTION MODULE] Swapping body providers \n";
+
         nextProvider = &scriptedProvider;
         scriptedProvider.setCommand(newCommand);
     }
@@ -904,6 +906,8 @@ void MotionModule::sendMotionCommand(const messages::ScriptedHeadCommand script)
 
 void MotionModule::sendMotionCommand(const FreezeCommand::ptr command)
 {
+    std::cout << "[MOTION MODULE] Switching to NULL body providers \n";
+
     nextProvider = &nullBodyProvider;
     nextHeadProvider = &nullHeadProvider;
 
@@ -993,6 +997,7 @@ void MotionModule::sendMotionCommand(messages::OdometryWalk command)
         gain = command.gain();
     else
         gain = DEFAULT_SPEED;
+    std::cout << "[MOTION MODULE] Swapping to walk provider! \n";
 
     nextProvider = &walkProvider;
     StepCommand::ptr newCommand(
@@ -1007,12 +1012,16 @@ void MotionModule::sendMotionCommand(messages::OdometryWalk command)
 
 void MotionModule::sendMotionCommand(const KickCommand::ptr command)
 {
+    std::cout << "[MOTION MODULE] Swapping to walk provider! \n";
+
     nextProvider = &walkProvider;
     walkProvider.setCommand(command);
 }
 
 void MotionModule::sendMotionCommand(messages::Kick command, int time)
 {
+    std::cout << "[MOTION MODULE] Swapping to walk provider! \n";
+
     nextProvider = &walkProvider;
     KickCommand::ptr newCommand(new KickCommand(command.type(), time));
     walkProvider.setCommand(newCommand);

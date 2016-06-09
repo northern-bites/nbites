@@ -275,7 +275,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	float ballY = 5.0;
 
     // Update the body model
-    logMsg("Updating body model");
+    // logMsg("Updating body model");
     bodyModel.kinematics = &kinematics;
     bodyModel.update(odometry, sensors);
 
@@ -318,7 +318,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     for (unsigned i = 1; i < Kinematics::NUM_CHAINS; i++) {
     	std::vector<float> chain_angles;
     	std::vector<float> chain_hardness;
-    	for (unsigned j = Kinematics::chain_first_joint[i]; j <= Kinematics::chain_last_joint[i]; j++) {
+    	for (unsigned j = Kinematics::chain_first_joint_UNSWALK[i]; j <= Kinematics::chain_last_joint_UNSWALK[i]; j++) {
     		chain_angles.push_back(joints.angles[nb_joint_order[j]]); // TODO I think this should be a lot more complicated than it seems right now...
     		logMsgNoEL("ANGLE in "  + Joints::jointNames[nb_joint_order[j]] + " = ");
 			// std::cout << RAD2DEG(joints.angles[nb_joint_order[j]]);
