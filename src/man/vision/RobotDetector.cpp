@@ -51,7 +51,7 @@ void RobotDetector::getWhiteGradImage(ImageLiteU8 whiteImage,
 
     uint8_t min = 255;
     uint8_t max = 0;
-    uint8_t* pixels = new uint8_t[img_ht*img_wd];
+    // uint8_t* pixels = new uint8_t[img_ht*img_wd];
 
     // HACK: Do this better -> might impact other things
     ed->gradientThreshold(low_fuzzy_thresh);
