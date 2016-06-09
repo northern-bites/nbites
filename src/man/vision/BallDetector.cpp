@@ -441,8 +441,7 @@ bool BallDetector::findCorrelatedBlackSpots
             correlatedSpots.push_back(actualBlobs[c]);
 
 			if (debugBall) {
-				std::cout<<"Correlated Spots Size: "<<correlatedSpots.size()
-						 <<std::endl;
+				std::cout<<"Correlated Spots Size: "<<correlatedSpots.size()<<std::endl;
 			}
 
             if(correlatedSpots.size() == 2) { //lets check the distance here
@@ -453,9 +452,9 @@ bool BallDetector::findCorrelatedBlackSpots
                 //IDEA: account for area and distance thresholds based on the camera?
                 if(topCamera) {
                     lower = 9.5;
-                    upper = 17.1; //change from 14
+                    upper = 17.2; //change from 14
                 } else {
-                    lower = 17.0; //change from 19.0
+                    lower = 16.4; //change from 19.0
                     upper = 21.4;
                 }
 
@@ -491,15 +490,14 @@ bool BallDetector::findCorrelatedBlackSpots
 
                 double area, upper, lower;
                 if(topCamera) {
-                    upper = 100;
+                    upper = 181.1;
                     lower = 70;
                 } else {
                     upper = 210;
-                    lower = 70;
+                    lower = 55;
                 }
 
                 area = abs((s1.ix()*(s2.iy()-s3.iy()) + s2.ix()*(s3.iy()-s1.iy()) + s3.ix()*(s1.iy()-s2.iy()))/2);
-
                 if(area > lower && area < upper) {
                     ballSpotX = (s1.ix()+s2.ix()+s3.ix())/3;
                     ballSpotY = (s2.iy()+s2.iy()+s3.iy())/3;
@@ -519,13 +517,13 @@ bool BallDetector::findCorrelatedBlackSpots
 
                     foundBall = true;
                     makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
+#ifdef OFFLINE
+                    return foundBall;
+#else
+                    return true;
+#endif
                 }
             }
-#ifdef OFFLINE
-            return foundBall;
-#else
-            return true;
-#endif
         }
     }
     return foundBall;
@@ -744,7 +742,6 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 			}
         }
     }
-
 	// run blobber on parts of the image where spot detector won't work
 	int bottomQuarter = height * 3 / 4;
 	if (topCamera) {
@@ -789,7 +786,6 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 			}
 		}
 	}
-
     SpotDetector whitespots;
     whitespots.darkSpot(false);
     whitespots.innerDiamCm(13.0f);

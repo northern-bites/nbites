@@ -499,7 +499,6 @@ void VisionModule::outportalVisionField()
 
     if (ballOn)
     {
-
 #ifdef OFFLINE
         std::cout << "getting ball" << std::endl;
 #endif
@@ -526,7 +525,6 @@ void VisionModule::outportalVisionField()
         vb->set_confidence(best.confidence());
         vb->set_x(static_cast<int>(best.centerX));
         vb->set_y(static_cast<int>(best.centerY));
-
 #ifdef OFFLINE
         std::cout << "getting ball done" << std::endl;
 #endif
