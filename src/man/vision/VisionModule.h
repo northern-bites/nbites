@@ -14,11 +14,8 @@
 #include "Field.h"
 
 #include "BallDetector.h"
-#include "RobotObstacle.h"
 #include "RobotDetector.h"
 #include "InertialState.pb.h"
-#include "VisionRobot.pb.h"
-
 
 namespace man {
 namespace vision {
@@ -37,7 +34,6 @@ public:
     portals::InPortal<messages::InertialState> inertsIn;
 
     portals::OutPortal<messages::Vision> visionOut;
-    portals::OutPortal<messages::RobotObstacle> robotObstacleOut;
 
     ImageFrontEnd* getFrontEnd(bool topCamera = true) const { return frontEnd[!topCamera]; }
     EdgeList* getEdges(bool topCamera = true) const { return edges[!topCamera]; }

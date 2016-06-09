@@ -1,5 +1,6 @@
 #pragma once
 
+#include "RoboGrams.h"
 #include <vector>
 #include <utility>
 #include "Images.h"
@@ -7,6 +8,7 @@
 #include "Gradient.h"
 #include "Edge.h"
 // #include "Vision.h"
+#include "VisionRobot.pb.h"
 
 namespace man {
 namespace vision {
@@ -39,7 +41,8 @@ public:
     // Tells us which part of the image to ignore if we are looking too
     // far to the right or to the left (would pick up shoulder)
     int findAzimuthRestrictions(FieldHomography* hom);
-
+    void getCurrentDirection(FieldHomography* hom);
+    void getDetectedRobots(bool* detectedObstacles, int size);
     void printCandidates(std::string message);
 
     struct box {
@@ -56,11 +59,16 @@ public:
 #endif
 
 private:
+    enum Direction { none, north, northeast, east, southeast,
+                     south, southwest, west, northwest };
+
     int img_wd;
     int img_ht;
 
-    int low_fuzzy_thresh;
-    int high_fuzzy_thresh;
+    uint8_t low_fuzzy_thresh;
+    uint8_t high_fuzzy_thresh;
+
+    Direction current_direction;
 
     ImageLiteU8 WGImage;
 

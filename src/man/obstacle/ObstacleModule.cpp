@@ -173,14 +173,14 @@ void ObstacleModule::run_()
         temp->set_distance(obstacleDistances[i]);
         temp->set_detector(obstacleDetectors[i]);
 
-        // update vision box
-        if (obstacleBox[0] == i && obstacleDetectors[i] ==
-            FieldObstacles::Obstacle::VISION) {
-            temp->set_closest_y(obstacleBox[1]);
-            temp->set_box_bottom(obstacleBox[2]);
-            temp->set_box_left(obstacleBox[3]);
-            temp->set_box_right(obstacleBox[4]);
-        }
+        // // update vision box
+        // if (obstacleBox[0] == i && obstacleDetectors[i] ==
+        //     FieldObstacles::Obstacle::VISION) {
+        //     temp->set_closest_y(obstacleBox[1]);
+        //     temp->set_box_bottom(obstacleBox[2]);
+        //     temp->set_box_left(obstacleBox[3]);
+        //     temp->set_box_right(obstacleBox[4]);
+        // }
     }
 
     obstacleOut.setMessage(current);
@@ -363,75 +363,85 @@ void ObstacleModule::combineArmsAndSonars
 
 }
 
-void ObstacleModule::updateVisionBuffer
-(FieldObstacles::Obstacle::ObstaclePosition pos,
- const messages::RobotObstacle& input)
-{
-    // update with distance in meters instead of cm
-    updateObstacleArrays(FieldObstacles::Obstacle::VISION, pos, .01f*input.box_bottom());
+// void ObstacleModule::updateVisionBuffer
+// (FieldObstacles::Obstacle::ObstaclePosition pos,
+//  const messages::RobotObstacle& input)
+// {
+//     // update with distance in meters instead of cm
+//     // updateObstacleArrays(FieldObstacles::Obstacle::VISION, pos, .01f*input.box_bottom());
 
-    obstacleBox[0] = (float)pos;
-    obstacleBox[1] = input.closest_y();
-    obstacleBox[2] = input.box_bottom();
-    obstacleBox[3] = input.box_left();
-    obstacleBox[4] = input.box_right();
+//     // obstacleBox[0] = (float)pos;
+//     // obstacleBox[1] = input.closest_y();
+//     // obstacleBox[2] = input.box_bottom();
+//     // obstacleBox[3] = input.box_left();
+//     // obstacleBox[4] = input.box_right();
 
-    // printf("Obstacle Box OBST2: (%g, %g, %g, %g)\n",
-    //         obstacleBox[1], obstacleBox[2], obstacleBox[3], obstacleBox[4]);
-}
+//     // printf("Obstacle Box OBST2: (%g, %g, %g, %g)\n",
+//     //         obstacleBox[1], obstacleBox[2], obstacleBox[3], obstacleBox[4]);
+// }
 
-void ObstacleModule::processVision(const messages::RobotObstacle& input)
+void ObstacleModule::processVision(const messages::Vision& input)
 {
     // printf("Obstacle Box OBST: (%g, %g, %g, %g)\n",
     //         input.closest_y(), input.box_bottom(),
     //         input.box_left(), input.box_right());
 
-    // reset obstacle box
-    for (int i = 0; i < 5; i++) {
-        obstacleBox[i] = -1;
+    int size = input.robot_size();
+    for (int i = 0; i < size; i++) {
+        messages::VRobot current_robot = input.robot(i);
+        updateObstacleArrays(FieldObstacles::Obstacle::VISION, obstaclesList[current_robot.position()], 1.f);
     }
 
-    // check for no obstacle in vision
-    if (input.closest_y() == -1) { return; }
+    return;
 
-    // Don't want to dodge obstacles too far away
-    if (input.box_bottom() > VISION_MAX_DIST) { return; }
+    // EVERYTHING BELOW THIS POINT WAS HERE BEFORE:
 
-    float bearing = (float)atan2(input.box_bottom(),
-                    ((input.box_left() - input.box_right()) / 2.f));
+    // // reset obstacle box
+    // for (int i = 0; i < 5; i++) {
+    //     obstacleBox[i] = -1;
+    // }
 
-    // Robot facing bearing of pi/2, east is 0, west is pi
-    // Process what direction obstacle is in: act appropriately
-    if ( bearing < ZONE_WIDTH )
-    {
-        // obstacle to the east
-        updateVisionBuffer(FieldObstacles::Obstacle::EAST, input);
-        // std::cout<<"[OBSTACLE ] EAST"<<std::endl;
-    }
-    else if ( bearing < 3.f * ZONE_WIDTH )
-    {
-        // obstacle to northeast
-        updateVisionBuffer(FieldObstacles::Obstacle::NORTHEAST, input);
-        // std::cout<<"[OBSTACLE ] NORTHEAST"<<std::endl;
-    }
-    else if ( bearing < 5.f * ZONE_WIDTH )
-    {
-        // obstacle to north
-        updateVisionBuffer(FieldObstacles::Obstacle::NORTH, input);
-        // std::cout<<"[OBSTACLE ] NORTH"<<std::endl;
-    }
-    else if ( bearing < 7.f * ZONE_WIDTH )
-    {
-        // obstacle to northwest
-        updateVisionBuffer(FieldObstacles::Obstacle::NORTHWEST, input);
-        // std::cout<<"[OBSTACLE ] NORTHWEST"<<std::endl;
-    }
-    else if ( bearing < 9.f * ZONE_WIDTH )
-    {
-        // obstacle to west
-        updateVisionBuffer(FieldObstacles::Obstacle::WEST, input);
-        // std::cout<<"[OBSTACLE ] WEST"<<std::endl;
-    }
+    // // check for no obstacle in vision
+    // if (input.closest_y() == -1) { return; }
+
+    // // Don't want to dodge obstacles too far away
+    // if (input.box_bottom() > VISION_MAX_DIST) { return; }
+
+    // float bearing = (float)atan2(input.box_bottom(),
+    //                 ((input.box_left() - input.box_right()) / 2.f));
+
+    // // Robot facing bearing of pi/2, east is 0, west is pi
+    // // Process what direction obstacle is in: act appropriately
+    // if ( bearing < ZONE_WIDTH )
+    // {
+    //     // obstacle to the east
+    //     updateVisionBuffer(FieldObstacles::Obstacle::EAST, input);
+    //     // std::cout<<"[OBSTACLE ] EAST"<<std::endl;
+    // }
+    // else if ( bearing < 3.f * ZONE_WIDTH )
+    // {
+    //     // obstacle to northeast
+    //     updateVisionBuffer(FieldObstacles::Obstacle::NORTHEAST, input);
+    //     // std::cout<<"[OBSTACLE ] NORTHEAST"<<std::endl;
+    // }
+    // else if ( bearing < 5.f * ZONE_WIDTH )
+    // {
+    //     // obstacle to north
+    //     updateVisionBuffer(FieldObstacles::Obstacle::NORTH, input);
+    //     // std::cout<<"[OBSTACLE ] NORTH"<<std::endl;
+    // }
+    // else if ( bearing < 7.f * ZONE_WIDTH )
+    // {
+    //     // obstacle to northwest
+    //     updateVisionBuffer(FieldObstacles::Obstacle::NORTHWEST, input);
+    //     // std::cout<<"[OBSTACLE ] NORTHWEST"<<std::endl;
+    // }
+    // else if ( bearing < 9.f * ZONE_WIDTH )
+    // {
+    //     // obstacle to west
+    //     updateVisionBuffer(FieldObstacles::Obstacle::WEST, input);
+    //     // std::cout<<"[OBSTACLE ] WEST"<<std::endl;
+    // }
 }
 
 void ObstacleModule::updateObstacleArrays

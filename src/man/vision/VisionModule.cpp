@@ -24,7 +24,6 @@ VisionModule::VisionModule(int wd, int ht, std::string robotName)
       bottomIn(),
       jointsIn(),
       visionOut(base()),
-      robotObstacleOut(base()),
       ballOn(false),
       ballOnCount(0),
       ballOffCount(0),
@@ -330,9 +329,11 @@ void VisionModule::run_()
 
         // Detect obstacles
         PROF_ENTER2(P_OBSTACLE_TOP, P_OBSTACLE_BOT, i==0)
+        if (i!=0) {
         robotDetector[i]->getWhiteGradImage(frontEnd[i]->whiteImage(),
                                             edgeDetector[i], *(edges[i]),
                                             homography[i], i==0);
+        }
         PROF_EXIT2(P_OBSTACLE_TOP, P_OBSTACLE_BOT, i==0)
         times[i][12] = timer.end();
 
@@ -529,7 +530,25 @@ void VisionModule::outportalVisionField()
 
     }
 
+    // (5)
     visionField.set_horizon_dist(field->horizonDist());
+
+    // (6) Outportal visually detected robots
+    int size = 10;
+    // Make array bigger than 8 directions so we can do direction +- 1 without error
+    bool* topRobots = new bool[size];
+    bool* bottomRobots = new bool[size];
+    robotDetector[0]->getDetectedRobots(topRobots,size);
+    robotDetector[1]->getDetectedRobots(bottomRobots,size);
+
+    for (int i = 1; i < size-1; i++)
+    {
+        bool result = topRobots[i] || bottomRobots[i];
+        if (!result) { continue; } //no obstacle here
+
+        messages::VRobot* temp = visionField.add_robot();
+        temp->set_position(i);
+    }
 
     // Send
     portals::Message<messages::Vision> visionOutMessage(&visionField);

@@ -19,7 +19,8 @@ RobotDetector::RobotDetector(int wd_, int ht_)
     : img_wd(wd_),
       img_ht(ht_),
       low_fuzzy_thresh(2),
-      high_fuzzy_thresh(11)
+      high_fuzzy_thresh(11),
+      current_direction(none)
 {
     std::cout<<"[ ROBOT DETECTOR] width = "<<wd_<<", height = "<<ht_<<std::endl;
 
@@ -35,7 +36,9 @@ RobotDetector::RobotDetector(int wd_, int ht_)
 
 RobotDetector::~RobotDetector() {
     // candidates.clear();
+    // unmergedCandidates.clear();
     // delete candidates;
+    // delete unmergedCandidates;
 }
 
 // Run every frame from VisionModule.cpp
@@ -104,17 +107,17 @@ int RobotDetector::findAzimuthRestrictions(FieldHomography* hom)
     // if abs(az) 1.3, too great to detect obstacle: return width
     if (az > 1.3 || az < -1.3) { return img_wd-1; }
 
-    // if abs(az) is > 1.1 and <= 1.3, ignore 2/3
-    if (az > 1.1 || az < -1.1) { val = (int)(.6666 * (double)img_wd); }
+    // if abs(az) is > 1.15 and <= 1.3, ignore 2/3
+    if (az > 1.15 || az < -1.15) { val = (int)(.6666 * (double)img_wd); }
 
-    // if abs(az) is > 1 and <= 1.1, ignore 1/2
-    else if (az > 1.0 || az < -1.0) { val = (int)(.5 * (double)img_wd); }
+    // if abs(az) is > 1.05 and <= 1.15, ignore 1/2
+    else if (az > 1.05 || az < -1.05) { val = (int)(.5 * (double)img_wd); }
 
-    // if abs(az) is > 0.98 and <= 1, ignore 1/3
-    else if (az > 0.98 || az < -0.98) { val = (int)(.3333 * (double)img_wd); }
+    // if abs(az) is > 0.95 and <= 1.05, ignore 1/3
+    else if (az > 0.95 || az < -0.95) { val = (int)(.3333 * (double)img_wd); }
 
-    // if abs(az) is > 0.93 and <= 0.98, ignore 1/4
-    else if (az > 0.93 || az < -0.93) { val = (int)(.25 * (double)img_wd); }
+    // if abs(az) is > 0.91 and <= 0.95, ignore 1/4
+    else if (az > 0.91 || az < -0.91) { val = (int)(.25 * (double)img_wd); }
 
     // else, no shoulder obstacle! return 0 to detect everything
     else { return 0; }
@@ -124,6 +127,18 @@ int RobotDetector::findAzimuthRestrictions(FieldHomography* hom)
     if (az > 0) { return -1*(img_wd - val); } // right side
     else { return val; } // left side (negative lets us know it is the "end col")
 
+}
+
+void RobotDetector::getCurrentDirection(FieldHomography* hom)
+{
+    double az = hom->azimuth();
+    if (az > 1.825) { current_direction = southeast; }
+    else if (az > 1.125) { current_direction = east; }
+    else if (az > 0.375) { current_direction = northeast; }
+    else if (az > -0.375) { current_direction = north; }
+    else if (az > -1.125) { current_direction = northwest; }
+    else if (az > -1.825) { current_direction = west; }
+    else {current_direction = southwest; }
 }
 
 void RobotDetector::removeHoughLines(EdgeList& edges)
@@ -389,37 +404,95 @@ void RobotDetector::mergeCandidate(int lf, int rt, int tp, int bt)
 //     obstacleBox[3] = -1.f*(float)xr;     // right x coordinate (now y)
 // }
 
-// void RobotDetector::setMessage() {
-//     // Now we take information and return relevant obstacles
-//     portals::Message<messages::VRobot> current(0);
+// Right now, to figure out the robot's position, we are using the left and right coordinates of
+// the box to determine in which direction the obstructing robot is. This could definitely be
+// improved, but right now we don't know the distance to the robot because the box doesn't
+// necessarily extend to the actual bottom of the robot... meaning homography will fail. We
+// divide the image into three sections:
+//
+//               ___|___________|___________|___
+//              |       |               |       |
+//              | Left  |    Middle     | Right |
+//              |Section|    Section    |Section|
+//              |       |               |       |
+//              |  25%  |      50%,     |  25%  |
+//              |       |    Current    |       |
+//              |       |   Direction   |       |
+//              |_______|_______________|_______|
+//                  |           |           |
+//
+void RobotDetector::getDetectedRobots(bool* detectedObstacles, int size) {
+    // Now we take information and return relevant obstacles
+    // portals::Message<messages::RobotObstacle> current(0);
 
-//     unsigned char obstacleDirections[9];
-//     for (int i = 0; i < 9; ++i) {
-//         obstacleDirections[i] = 0;
-//     }
+    // Make array bigger than 8 directions so we can do direction +- 1 without error
+    for (int i = 0; i < size; ++i) {
+        detectedObstacles[i] = false;
+    }
 
-//     // ignore "NONE" direction, start at 1
-//     for (int i = 1; i < NUM_DIRECTIONS; i++)
-//     {
-//         if (obstacleDistances[i]==0) { continue; } //no obstacle here
+    int left_barrier = img_wd / 4;
+    int right_barrier = (img_wd / 4)*3;
+    int left_halfway = img_wd / 8;
+    int middle_halfway = img_wd / 2;
+    int right_halfway = (img_wd / 8)*7;
 
-//         FieldObstacles::Obstacle* temp = current.get()->add_obstacle();
-//         temp->set_position(obstaclesList[i]);
-//         temp->set_distance(obstacleDistances[i]);
-//         temp->set_detector(obstacleDetectors[i]);
+    std::vector<Robot>::iterator it;
+    for(it = candidates.begin(); it != candidates.end(); ++it) {
+        if ((*it).right < left_barrier) {
+            // box is entirely contained in left section of image
+            detectedObstacles[current_direction-1] = true;
+        } else if ((*it).right < middle_halfway) {
+            // box is either in left section or middle section
+            if ((*it).left < left_halfway) {
+                // left section
+                detectedObstacles[current_direction-1] = true;
+            } else {
+                // between two: choose middle
+                detectedObstacles[current_direction] = true;
+            }
+        } else if ((*it).right < right_halfway) { // right halway and right barrier were same
+            // box is either in middle section, or both left and middle
+            if ((*it).left < left_halfway) {
+                // both sections
+                detectedObstacles[current_direction-1] = true;
+                detectedObstacles[current_direction] = true;
+            } else {
+                // middle section
+                detectedObstacles[current_direction] = true;
+            }
+        } else {
+            // right section, right+middle, or right+middle+left
+            if ((*it).left < left_halfway) {
+                // all sections
+                detectedObstacles[current_direction-1] = true;
+                detectedObstacles[current_direction] = true;
+                detectedObstacles[current_direction+1] = true;
+            } else if ((*it).left < middle_halfway) {
+                // right and middle sections
+                detectedObstacles[current_direction] = true;
+                detectedObstacles[current_direction+1] = true;
+            } else {
+                // right section
+                detectedObstacles[current_direction+1] = true;
+            }
+        }
+    }
 
-//         // update vision box
-//         if (obstacleBox[0] == i && obstacleDetectors[i] ==
-//             FieldObstacles::Obstacle::VISION) {
-//             temp->set_closest_y(obstacleBox[1]);
-//             temp->set_box_bottom(obstacleBox[2]);
-//             temp->set_box_left(obstacleBox[3]);
-//             temp->set_box_right(obstacleBox[4]);
-//         }
-//     }
+    // Account for buffer space in array
+    if (detectedObstacles[0]) { detectedObstacles[8] = true; }
+    if (detectedObstacles[9]) { detectedObstacles[1] = true; }
 
-//     visualRobotOut.setMessage(current);
-// }
+    // // ignore "NONE" direction, start at 1
+    // for (int i = 1; i < 9; i++)
+    // {
+    //     if (detectedObstacles[i]==0) { continue; } //no obstacle here
+
+    //     messages::RobotObstacle::VRobot* temp = current.get()->add_obstacle();
+    //     temp->set_position(obstaclesList[i]);
+    // }
+
+    // visualRobotOut.setMessage(current);
+}
 
 void RobotDetector::printCandidates(std::string message) {
     std::cout<<message<<std::endl;

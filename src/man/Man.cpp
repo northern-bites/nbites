@@ -143,7 +143,7 @@ Man::Man() :
         naiveBall.ballIn.wireTo(&ballTrack.ballLocationOutput);
 
         obstacle.armContactIn.wireTo(&arms.contactOut, true);
-        obstacle.visionIn.wireTo(&vision.robotObstacleOut, true);
+        obstacle.visionIn.wireTo(&vision.visionOut, true);
         obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
 
         gamestate.commInput.wireTo(&comm._gameStateOutput, true);

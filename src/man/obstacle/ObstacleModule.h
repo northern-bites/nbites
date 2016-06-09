@@ -59,7 +59,7 @@
 #include "NBMath.h"
 #include "../../share/logshare/SExpr.h"
 
-#include "VisionRobot.pb.h"
+#include "Vision.pb.h"
 #include "ArmContactState.pb.h"
 #include "SonarState.pb.h"
 
@@ -100,7 +100,7 @@ public:
     ObstacleModule(std::string filepath, std::string robotName);
 
     portals::InPortal<messages::ArmContactState> armContactIn;
-    portals::InPortal<messages::RobotObstacle> visionIn;
+    portals::InPortal<messages::Vision> visionIn;
     portals::InPortal<messages::SonarState> sonarIn;
 
     portals::OutPortal<messages::FieldObstacles> obstacleOut;
@@ -109,7 +109,7 @@ protected:
     virtual void run_();
 
     // Makes a decision based on vision
-    void processVision(const messages::RobotObstacle& input);
+    void processVision(const messages::Vision& input);
 
     // Makes a decision based on arm contact
     messages::FieldObstacles::Obstacle::ObstaclePosition
@@ -119,8 +119,8 @@ protected:
     messages::FieldObstacles::Obstacle::ObstaclePosition
     processSonar(const messages::SonarState& input);
 
-    void updateVisionBuffer(messages::FieldObstacles::Obstacle::ObstaclePosition pos,
-                            const messages::RobotObstacle& input);
+    // void updateVisionBuffer(messages::FieldObstacles::Obstacle::ObstaclePosition pos,
+    //                         const messages::RobotObstacle& input);
 
     // Updates vision buffer with info from last frame of vision
     void updateObstacleArrays(messages::FieldObstacles::Obstacle::ObstacleDetector detector,

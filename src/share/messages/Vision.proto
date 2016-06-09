@@ -52,6 +52,7 @@ message Vision
     optional CenterCircle circle = 3;
     optional VBall ball = 4;
     optional int32 horizon_dist = 5;
+    repeated VRobot robot = 6;
 }
 
 message VBall
@@ -152,4 +153,10 @@ message NaiveBall {
     optional float x_v_2 = 16;
     optional float x_v_3 = 17;
 
+}
+
+message VRobot
+{
+    optional int32 position = 1;
+    optional float distance = 2;
 }
