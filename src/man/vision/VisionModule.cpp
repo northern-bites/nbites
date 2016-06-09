@@ -549,6 +549,8 @@ void VisionModule::outportalVisionField()
         messages::VRobot* temp = visionField.add_robot();
         temp->set_position(i);
     }
+    delete topRobots;
+    delete bottomRobots;
 
     // Send
     portals::Message<messages::Vision> visionOutMessage(&visionField);
