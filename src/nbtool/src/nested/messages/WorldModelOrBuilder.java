@@ -195,4 +195,22 @@ public interface WorldModelOrBuilder extends
    * <code>optional bool claimed_ball = 21;</code>
    */
   boolean getClaimedBall();
+
+  /**
+   * <code>optional int32 intention = 22;</code>
+   */
+  boolean hasIntention();
+  /**
+   * <code>optional int32 intention = 22;</code>
+   */
+  int getIntention();
+
+  /**
+   * <code>optional bool alive = 23;</code>
+   */
+  boolean hasAlive();
+  /**
+   * <code>optional bool alive = 23;</code>
+   */
+  boolean getAlive();
 }

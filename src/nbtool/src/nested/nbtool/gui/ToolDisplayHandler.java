@@ -19,9 +19,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -85,7 +87,7 @@ import nbtool.util.Events.ViewProfileSetChanged;
 import nbtool.util.Utility.Pair;
 
 public class ToolDisplayHandler implements 
-	IOFirstResponder, Events.LogsFound, Events.GroupAdded {
+	IOFirstResponder, Events.LogsFound, Events.LogRefsFound, Events.GroupAdded {
 	
 	private final long id = Utility.getNextIndex(this);
 	private final ToolDisplayHandler outerThis = this;
@@ -109,6 +111,7 @@ public class ToolDisplayHandler implements
 		setupFooter();
 		
 		Center.listen(Events.LogsFound.class, this, true);
+		Center.listen(Events.LogRefsFound.class, this, true);
 		Center.listen(Events.GroupAdded.class, this, true);
 
 		final String boundsKey = this.toString();		
@@ -336,7 +339,7 @@ public class ToolDisplayHandler implements
 				lastGroup = Group.groupFromPath(selected);
 				LogReference[] added;
 				try {
-					added = FileIO.readAllRefsFromPath(selected);
+					added = FileIO.readAllRefsFromPath(selected, true);
 				} catch (Throwable e) {
 					ToolMessage.displayError("error {%s} (see below) reading Log refs from %s", 
 							e.getMessage(), selected);
@@ -346,14 +349,15 @@ public class ToolDisplayHandler implements
 				}
 				lastGroup.add(added);
 				
-				Log[] addedLogs = new Log[added.length];
-				for (int i = 0; i < added.length; ++i)
-					addedLogs[i] = added[i].get();
+//				Log[] addedLogs = new Log[added.length];
+//				for (int i = 0; i < added.length; ++i)
+//					addedLogs[i] = added[i].get();
 				
-				ToolMessage.displayInfo("loaded %d logs into %s", addedLogs.length, lastGroup);
+				ToolMessage.displayInfo("loaded %d logs into %s", added.length, lastGroup);
 				
 				Events.GGroupAdded.generate(this, lastGroup);
-				Events.GLogsFound.generate(this, addedLogs);
+				Events.GLogRefsFound.generate(this, added);
+//				Events.GLogsFound.generate(this, addedLogs);
 				
 				display.leftSideTabs.setSelectedComponent(display.logTab);
 			} else {
@@ -720,6 +724,9 @@ public class ToolDisplayHandler implements
 		}
 		
 		protected void deleteCurrent() {
+			int num_logs_deleted = 0;
+			Set<Group> groups_changed = new HashSet<>();
+			
 			for (TreePath tp : display.logTree.getSelectionPaths()) {
 				if (tp.getPathCount() == 3) {
 					Group group = (Group) tp.getPath()[1];
@@ -728,16 +735,22 @@ public class ToolDisplayHandler implements
 					Debug.warn("deleting {%s} from {%s}", reference, group);
 					group.remove(reference);
 					
-					TreeModelEvent removeEvent = new TreeModelEvent(this, 
-							new Object[]{this, group});
-					
-					for (TreeModelListener listener : listeners)
-						listener.treeStructureChanged(removeEvent);
-					
+					++num_logs_deleted;
+					groups_changed.add(group);
 				} else {
 					Debug.warn("cannot delete {%s}", tp.getLastPathComponent());
 				}
 			}
+			
+			for (Group group : groups_changed) {
+				TreeModelEvent removeEvent = new TreeModelEvent(this, 
+						new Object[]{this, group});
+				
+				for (TreeModelListener listener : listeners)
+					listener.treeStructureChanged(removeEvent);
+			}
+			
+			ToolMessage.displayAndPrint("deleted %d logs", num_logs_deleted);
 		}
 		
 		protected void showGroupAdded(Group group) {
@@ -965,6 +978,13 @@ public class ToolDisplayHandler implements
 			if (ref != null) {
 				model.showReferenceAdded(ref);
 			}
+		}
+	}
+	
+	@Override
+	public void logRefsFound(Object source, LogReference... found) {
+		for (LogReference ref : found) {
+			model.showReferenceAdded(ref);
 		}
 	}
 

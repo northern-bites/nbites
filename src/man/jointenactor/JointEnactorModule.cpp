@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <signal.h>
 
 #include "DebugConfig.h"
 
@@ -19,7 +20,7 @@ JointEnactorModule::JointEnactorModule()
     shared_fd = shm_open(NBITES_MEM, O_RDWR, 0600);
     if (shared_fd < 0) {
         std::cout << "Jointenactor couldn't open shared fd!" << std::endl;
-        exit(0);
+        kill(getpid(), SIGTERM);
     }
 
     shared = (volatile SharedData*) mmap(NULL, sizeof(SharedData),
@@ -28,7 +29,7 @@ JointEnactorModule::JointEnactorModule()
 
     if (shared == MAP_FAILED) {
         std::cout << "Jointenactor couldn't map to pointer!" << std::endl;
-        exit(0);
+        kill(getpid(), SIGTERM);
     }
 }
 
@@ -81,7 +82,7 @@ void JointEnactorModule::writeCommand()
         ) {
         std::cout << "Commands aren't getting read! Did Boss die?" << std::endl;
         std::cout << "commandIndex: " << lw << " lastRead: " << lr << std::endl;
-        exit(0);
+        kill(getpid(), SIGTERM);
     }
 }
 

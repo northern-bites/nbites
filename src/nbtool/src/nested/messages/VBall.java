@@ -255,16 +255,16 @@ public final class VBall extends
     return bearingSd_;
   }
 
-  public static final int INTOPCAM_FIELD_NUMBER = 6;
+  public static final int IN_TOP_CAM_FIELD_NUMBER = 6;
   private boolean inTopCam_;
   /**
-   * <code>optional bool inTopCam = 6;</code>
+   * <code>optional bool in_top_cam = 6;</code>
    */
   public boolean hasInTopCam() {
     return ((bitField0_ & 0x00000020) == 0x00000020);
   }
   /**
-   * <code>optional bool inTopCam = 6;</code>
+   * <code>optional bool in_top_cam = 6;</code>
    */
   public boolean getInTopCam() {
     return inTopCam_;
@@ -1098,19 +1098,19 @@ public final class VBall extends
 
     private boolean inTopCam_ ;
     /**
-     * <code>optional bool inTopCam = 6;</code>
+     * <code>optional bool in_top_cam = 6;</code>
      */
     public boolean hasInTopCam() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional bool inTopCam = 6;</code>
+     * <code>optional bool in_top_cam = 6;</code>
      */
     public boolean getInTopCam() {
       return inTopCam_;
     }
     /**
-     * <code>optional bool inTopCam = 6;</code>
+     * <code>optional bool in_top_cam = 6;</code>
      */
     public Builder setInTopCam(boolean value) {
       bitField0_ |= 0x00000020;
@@ -1119,7 +1119,7 @@ public final class VBall extends
       return this;
     }
     /**
-     * <code>optional bool inTopCam = 6;</code>
+     * <code>optional bool in_top_cam = 6;</code>
      */
     public Builder clearInTopCam() {
       bitField0_ = (bitField0_ & ~0x00000020);

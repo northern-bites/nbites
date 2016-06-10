@@ -751,7 +751,7 @@ NBCROSS_FUNCTION(CalculateCameraOffsets, true, nbl::SharedConstants::LogClass_Tr
 }
 
 NBCROSS_FUNCTION(CheckCameraOffsets, false, nbl::SharedConstants::LogClass_Tripoint())
-(const std::vector<nbl::logptr> &arguments)
+            (const std::vector<nbl::logptr> &arguments)
 {
     printf("CheckCameraOffsets()\n");
     NBL_ASSERT(arguments.size() == 1);

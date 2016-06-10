@@ -20,6 +20,8 @@ import nbtool.util.Utility.Pair;
 
 public class FileIO {
 	
+	private static final Debug.DebugSettings debug = Debug.createSettings(Debug.WARN);
+	
 	public static Path[] getContentsOf(Path directory) {
 		List<Path> pathes = new LinkedList<>();
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directory)) {
@@ -35,8 +37,29 @@ public class FileIO {
 		return pathes.toArray(new Path[0]);
 	}
 	
+	public static Path[] getContentsOf(Path directory, int limit) {
+		assert(Files.isDirectory(directory));
+		List<Path> pathes = new LinkedList<>();
+		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directory)) {
+            for (Path path : directoryStream) {
+                pathes.add(path);
+                
+                if (pathes.size() == limit) { 
+                	debug.info("traversal of dir:{%s} stopping at %d files!", directory, limit);
+                	break;
+                }
+            }
+        } catch (IOException ex) {
+        	Debug.error("could not list directory: ", directory);
+        	ex.printStackTrace();
+        	return null;
+        }
+		
+		return pathes.toArray(new Path[0]);
+	}
+	
 	public static Path getPath(String first, String ... parts) {
-		return FileSystems.getDefault().getPath(parts[0], parts);
+		return FileSystems.getDefault().getPath(first, parts);
 	}
 	
 	public static void sizeCheck(Path containsLog) throws IOException {
@@ -92,7 +115,7 @@ public class FileIO {
 		return found.toArray(new Log[0]);
 	}
 	
-	public static LogReference[] readAllRefsFromPath(Path path) throws IOException {
+	public static LogReference[] readAllRefsFromPath(Path path, boolean quick) throws IOException {
 		if (!isValidLogFolder(path)) {
 			Debug.error("cannot read multiple refs from invalid path: ", path.toString());
 			return null;
@@ -101,7 +124,12 @@ public class FileIO {
 		LinkedList<LogReference> found = new LinkedList<>();
 		DirectoryStream<Path> dirStream = Files.newDirectoryStream(path, "*.{nblog}");
 		for (Path file : dirStream) {
-			found.add(readRefFromPath(file));
+			sizeCheck(file);
+			if (quick) {
+				found.add(LogReference.quickReferenceFromFile(file));
+			} else {
+				found.add(LogReference.referenceFromFile(file));
+			}
 		}
 		
 		return found.toArray(new LogReference[0]);
