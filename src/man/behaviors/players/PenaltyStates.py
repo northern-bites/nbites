@@ -13,6 +13,7 @@ from ..util import *
 
 DEBUG_PENALTY_STATES = True
 CHECK_VALS_EACH_PAN = True
+SCRIMMAGE = True
 angle = 80
 
 # So this entire state is cobbled together in the rush of China 2015.
@@ -47,12 +48,6 @@ def afterPenalty(player):
         afterPenalty.right = True
         afterPenalty.decidedSide = False
         player.brain.tracker.lookToAngle(-1 * angle)
-
-        # state specific counters
-        afterPenalty.rightDiff = 0
-        afterPenalty.leftDiff = 0
-        afterPenalty.cornerCOn = 0
-        afterPenalty.cornerTOn = 0
 
         # number of times we see the horizon on either side - if corner check fails, try using this.
         afterPenalty.leftHorizSum = 0
@@ -138,9 +133,30 @@ def afterPenalty(player):
 
     # TODO define thresholds and hierarchy. If all numbers are negaive, the goalbox is on our left.
     # TODO need to switch 'decidedSide'... should we keep panning until we've decided, or proceed when we're unsure?
+    if afterPenalty.frameCount > 200:
+
+        # arbitrary thresholds for now!
+        if afterPenalty.tCornerLeft > 20 and afterPenalty.outerLCornerRight > 20:
+            if DEBUG_PENALTY_STATES:
+                print "Player thinks the goal is on the right!"
+            afterPenalty.decidedSide = True
+
+        elif afterPenalty.tCornerLeft < -20 and afterPenalty.outerLCornerRight < -20:
+            if DEBUG_PENALTY_STATES:
+                print "Player thinks the goal is on the left!"
+            afterPenalty.decidedSide = True
+            afterPenalty.right = False
 
     if afterPenalty.frameCount > 300 or afterPenalty.decidedSide:
-        # TODO see if the goalie role affects this
+        if afterPenalty.decidedSide:
+            player.brain.resetLocalizationFromPenalty(afterPenalty.right)
+
+        else:
+            if DEBUG_PENALTY_STATES:
+                print("THRESHOLDS WERE NOT MET! Rely on Horizons!")
+                # TODO test if horizons are actually more reliable.
+            player.brain.resetLocalizationFromPenalty(afterPenalty.leftHorizSum > afterPenalty.rightHorizSum)
+
         if DEBUG_PENALTY_STATES:
             print ("\n-------------------------------------------------------------")
             print("COUNTER TOTALS: ")
@@ -149,14 +165,15 @@ def afterPenalty(player):
             print("HORIZON DISTANCE TOTALS:")
             print ("left horizon:", afterPenalty.leftHorizSum, "right horizon", afterPenalty.rightHorizSum)
             print ("-------------------------------------------------------------\n")
-            return player.goNow('gamePenalized')
+            if not SCRIMMAGE:
+                return player.goNow('gamePenalized')
 
+        # TODO see if the goalie role affects this
         return player.goNow('walkOut')
 
     # Stay until we've finished checking out our surroundings
     return player.stay()
 
-    ## ALTERNATE SOLUTION: LEAVE PENALTY AFTER COUNTERS REACH A CERTAIN NUMBER? --> not with negative counters
 
 @superState('gameControllerResponder')
 def manualPlacement(player):
