@@ -358,7 +358,7 @@ bool BallDetector::findCorrelatedBlackSpots
     int correlatedTo[blackSpots.size()][blackSpots.size()];
     bool foundThree = false;
     // loop through filtered black blobs
-    for (int i = 0; i < blackSpots.size(); i++) {
+    for (int i = 0; i < blackSpots.size()-1; i++) {
         std::pair<int,int> p = blackSpots[i];
         // initialize the correlations for this blob
         correlations[i] = 0;
@@ -366,7 +366,7 @@ bool BallDetector::findCorrelatedBlackSpots
             correlatedTo[i][k] = 0;
         }
         // we're going to check against all other black blobs
-        for (int j = 0; j < blackSpots.size(); j++) {
+        for (int j = i+1; j < blackSpots.size(); j++) {
             std::pair<int,int> q = blackSpots[j];
             if (blobsAreClose(p, q)) {
                 correlations[i] += 1;
@@ -452,7 +452,7 @@ bool BallDetector::findCorrelatedBlackSpots
                 //IDEA: account for area and distance thresholds based on the camera?
                 if(topCamera) {
                     lower = 9.5; //change from 9.5
-                    upper = 17.2; //change from 14
+                    upper = 25.0; //change from 14
                 } else {
                     lower = 9.4; //change from 19.0 //lower threshold because distance is smaller
                     upper = 23.0; //when ball is in motion
@@ -480,10 +480,9 @@ bool BallDetector::findCorrelatedBlackSpots
 						debugDraw.drawPoint(ballSpotX+width/2,
 											-1*ballSpotY + height/2,BLUE);
 					}
-                    foundBall = true;
                     makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
 #ifdef OFFLINE
-                    return foundBall;
+                    foundBall = true;
 #else
                     return true;
 #endif
@@ -513,7 +512,7 @@ bool BallDetector::findCorrelatedBlackSpots
                     ballSpotY = (s2.iy()+s2.iy()+s3.iy())/3;
 
                     if (debugBall) {
-                        std::cout<<"Area is in the right range"<<area<<std::endl;
+                        std::cout<<"Area is in the right range"<<std::endl;
                         debugDraw.drawPoint(ballSpotX+width/2,-1*ballSpotY + height/2,BLACK);
                     }
                     debugDraw.drawPoint(ballSpotX+width/2,-1*ballSpotY + height/2,BLACK);
@@ -525,10 +524,9 @@ bool BallDetector::findCorrelatedBlackSpots
     				ballSpot.rawY = -1 * ballSpotY + height / 2;
     				ballSpot.innerDiam = 5;
 
-                    foundBall = true;
                     makeBall(ballSpot, cameraHeight, 0.6, foundBall, true);
 #ifdef OFFLINE
-                    return foundBall;
+                    foundBall = true;
 #else
                     return true;
 #endif
@@ -891,14 +889,13 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 		}
     }
     if(blackSpots.size() != 0) {
-    if (findCorrelatedBlackSpots(blackSpots, actualBlackSpots, cameraHeight,
-                                 foundBall)) {
+        if (findCorrelatedBlackSpots(blackSpots, actualBlackSpots, cameraHeight, foundBall)) {
 #ifdef OFFLINE
-        foundBall = true;
+            foundBall = true;
 #else
         return true;
 #endif
-	}
+	   }
     }
 
     return foundBall;
