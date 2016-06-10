@@ -12,6 +12,7 @@ from ..navigator import Navigator
 from ..util import *
 
 DEBUG_PENALTY_STATES = True
+CHECK_VALS_EACH_PAN = True
 angle = 80
 
 # So this entire state is cobbled together in the rush of China 2015.
@@ -28,13 +29,13 @@ def afterPenalty(player):
 
     if player.firstFrame():
         if DEBUG_PENALTY_STATES:
-            print "Entering the 'afterPenalty' state."
+            print "Entering the 'afterPenalty' state; DEBUG_PENALTY_STATES IS ON."
 
         afterPenalty.decidedSide = False
         afterPenalty.lookRight = True
 
         # count the number of times we see the goalbox and C-Corner on the right
-        afterPenalty.cCornerRight = 0
+        afterPenalty.lCornerRight = 0
         afterPenalty.goalboxRight = 0
 
         # count the number of times we see the CC and T-Corner on the left
@@ -66,20 +67,14 @@ def afterPenalty(player):
     afterPenalty.frameCount += 1
     vis = player.brain.vision
 
-    # Alternate looking left and right every several frames
-        # Increment/Decrement all the counters
-    # Check final values of corner counters after a certain number of frames in afterpenalty
-    # Need to define threshold for this ^ 
-    # If counters are too close to 0, use horizon counters instead
-
     if afterPenalty.frameCount % 50 == 0:
 
         # LOOK RIGHT
         if afterPenalty.lookRight:
             player.brain.tracker.lookToAngle(angle)
-            if DEBUG_PENALTY_STATES:
+            if DEBUG_PENALTY_STATES and CHECK_VALS_EACH_PAN:
                 print "Looking to my right! Angle:", angle
-                print "I've seen the C-Corner", afterPenalty.cCornerRight, "times, T-Corner", afterPenalty.tCornerLeft, "times"
+                print "I've seen the C-Corner", afterPenalty.lCornerRight, "times, T-Corner", afterPenalty.tCornerLeft, "times"
                 print "I've seen the goalbox", afterPenalty.goalboxRight, "times, Center Circle", afterPenalty.CenterCircleLeft, "times"
                 print "Cumulative horizon distance on this side is", afterPenalty.leftHorizSum
 
@@ -87,9 +82,9 @@ def afterPenalty(player):
         else:
             otherAngle = -1 * angle
             player.brain.tracker.lookToAngle(-1 * angle)
-            if DEBUG_PENALTY_STATES:
+            if DEBUG_PENALTY_STATES and CHECK_VALS_EACH_PAN:
                 print "Looking to my left! Angle:", otherAngle
-                print "I've seen the C-Corner", afterPenalty.cCornerRight, "times, T-Corner", afterPenalty.tCornerLeft, "times"
+                print "I've seen the C-Corner", afterPenalty.lCornerRight, "times, T-Corner", afterPenalty.tCornerLeft, "times"
                 print "I've seen the goalbox", afterPenalty.goalboxRight, "times, Center Circle", afterPenalty.CenterCircleLeft, "times"
                 print "Cumulative horizon distance on this side is", afterPenalty.rightHorizSum
 
@@ -98,16 +93,62 @@ def afterPenalty(player):
         if DEBUG_PENALTY_STATES:
             afterPenalty.numOfPans += 1
 
+    # Look for landmarks after we've panned.
+    # Corner IDs:
+    ## 0: Inner L-Corner
+    ## 1: Outer L-Corner
+    ## 2: T-Corner
+    ## 3: Center Circle Corner
+
+    # TODO see if this could work for "Blue" corners; can we identify our own side in this state?
+
     if player.brain.tracker.isStopped():
         if afterPenalty.lookRight:
+
+            # TODO For now, accumulate the horizon distance on this side; eventually average?
             afterPenalty.rightHorizSum += vis.horizon_dist
+
+            # Update the corner counters according to what we see on this side.
+            for i in range(0, vis.corner_size()):  
+                corner = vis.corner(i)
+                if corner.id == 0:
+                    afterPenalty.lCornerRight += 1
+                if corner.id == 1:
+                    afterPenalty.goalboxRight += 1
+                if corner.id == 2:
+                    afterPenalty.afterPenalty.tCornerLeft -= 1
+                if corner.id == 3: 
+                    afterPenalty.CenterCircleLeft -= 1
+
         else:
             afterPenalty.leftHorizSum += vis.horizon_dist
+            for i in range(0, vis.corner_size()):
+                corner = vis.corner(i)
+                if corner.id == 0:
+                    afterPenalty.lCornerRight -= 1
+                if corner.id == 1:
+                    afterPenalty.goalboxRight -=1
+                if corner.id == 2:
+                    afterPenalty.tCornerLeft += 1
+                if corner.id == 3:
+                    afterPenalty.CenerCircleLeft += 1
 
+    # TODO define thresholds and hierarchy. If all numbers are negaive, the goalbox is on our left.
+    # TODO need to switch 'decidedSide'... should we keep panning until we've decided, or proceed when we're unsure?
 
-    if afterPenalty.frameCount > 300:
-        print "Done checking horizons!"
-        return player.goNow('walkout')
+    if afterPenalty.frameCount > 300 or afterPenalty.decidedSide:
+        # TODO see if the goalie role affects this
+        if DEBUG_PENALTY_STATES:
+            print ("-------------------------------------------------------------")
+            print("COUNTER TOTALS: ")
+            print ("lCornerRight:", afterPenalty.lCornerRight, "goalboxRight:", afterPenalty.goalboxRight, "tCornerLeft:", afterPenalty.tCornerLeft, "CenterCircleLeft:", afterPenalty.CenterCircleLeft)
+            print ("-------------------------------------------------------------")
+            return player.goNow('gamePenalized')
+
+        return player.goNow('walkOut')
+
+    # Stay until we've finished checking out our surroundings
+    return player.stay()
 
     ## ALTERNATE SOLUTION: LEAVE PENALTY AFTER COUNTERS REACH A CERTAIN NUMBER? --> not with negative counters
 
@@ -190,11 +231,6 @@ def afterPenalty(player):
         return player.goLater(player.gameState)
 
     """
-
-    if afterPenalty.decidedSide:
-        # TODO see if the goalie role affects this
-        return player.goNow('walkOut')
-    return player.goLater(player.gameState)
 
 @superState('gameControllerResponder')
 def manualPlacement(player):
