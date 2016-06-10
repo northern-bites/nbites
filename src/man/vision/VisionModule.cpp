@@ -329,11 +329,9 @@ void VisionModule::run_()
 
         // Detect obstacles
         PROF_ENTER2(P_OBSTACLE_TOP, P_OBSTACLE_BOT, i==0)
-        if (i!=0) {
         robotDetector[i]->getWhiteGradImage(frontEnd[i]->whiteImage(),
                                             edgeDetector[i], *(edges[i]),
                                             homography[i], i==0);
-        }
         PROF_EXIT2(P_OBSTACLE_TOP, P_OBSTACLE_BOT, i==0)
         times[i][12] = timer.end();
 
