@@ -819,7 +819,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         } else if (!topCamera || midY > field->horizonAt(midX)) {
 			(*i).spotType = WHITE_REJECT;
         }
-		if (debugBall) {
+		if (debugBall && (!topCamera || midY > field->horizonAt(midX))) {
 			debugWhiteSpots.push_back((*i));
 		}
     }
