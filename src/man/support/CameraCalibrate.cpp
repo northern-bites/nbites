@@ -81,22 +81,22 @@ void CameraCalibrate::UpdateByName(std::string name)
         paramsTop[PITCH] = 0.10f;
         paramsBottom[ROLL] = 0.0f;
         paramsBottom[PITCH] = 0.09f;
-    } else if (name == "ringo") {
+    } else if (name == "groot") {
         paramsTop[ROLL] = 0.01f;
         paramsTop[PITCH] = 0.08f;
         paramsBottom[ROLL] = -0.03f;
         paramsBottom[PITCH] = -.01f;
-    } else if (name == "ozzy") {
+    } else if (name == "wasp") {
         paramsTop[ROLL] = 0.02f;
         paramsTop[PITCH] = 0.05f;
         paramsBottom[ROLL] = -0.02f;
         paramsBottom[PITCH] = -0.00f;
-    } else if (name == "avril") {
+    } else if (name == "blt") {
         paramsTop[ROLL] = 0.02f;
         paramsTop[PITCH] = 0.08f;
         paramsBottom[ROLL] = 0.00f;
         paramsBottom[PITCH] = -0.05f;
-    } else if (name == "beyonce") {
+    } else if (name == "elektra") {
         paramsTop[ROLL] = 0.02f;
         paramsTop[PITCH] = 0.05f;
         paramsBottom[ROLL] = 0.0f;
@@ -106,7 +106,7 @@ void CameraCalibrate::UpdateByName(std::string name)
         paramsTop[PITCH] = 0.02f;
         paramsBottom[ROLL] = -0.02f;
         paramsBottom[PITCH] = 0.03f;
-    } else if (name == "she-hulk") {
+    } else if (name == "shehulk") {
         paramsTop[ROLL] = 0.01f;
         paramsTop[PITCH] = 0.04f;
         paramsBottom[ROLL] = -0.05f;

@@ -87,17 +87,17 @@ elif [ "$HOSTNAME" = mal ]; then
     sed -i 's/ROBOT/16/g' /etc/init.d/nbwired
 elif [ "$HOSTNAME" = zoe ]; then
     sed -i 's/ROBOT/17/g' /etc/init.d/nbwired
-elif [ "$HOSTNAME" = ringo ]; then
+elif [ "$HOSTNAME" = groot ]; then
     sed -i 's/ROBOT/18/g' /etc/init.d/nbwired
-elif [ "$HOSTNAME" = beyonce ]; then
+elif [ "$HOSTNAME" = elektra ]; then
     sed -i 's/ROBOT/19/g' /etc/init.d/nbwired
-elif [ "$HOSTNAME" = ozzy ]; then
+elif [ "$HOSTNAME" = wasp ]; then
     sed -i 's/ROBOT/20/g' /etc/init.d/nbwired
-elif [ "$HOSTNAME" = avril ]; then
+elif [ "$HOSTNAME" = blt ]; then
     sed -i 's/ROBOT/21/g' /etc/init.d/nbwired
 elif [ "$HOSTNAME" = batman ]; then
     sed -i 's/ROBOT/22/g' /etc/init.d/nbwired
-elif [ "$HOSTNAME" = she-hulk ]; then
+elif [ "$HOSTNAME" = shehulk ]; then
     sed -i 's/ROBOT/23/g' /etc/init.d/nbwired
 else
     echo "Robot does not have a valid hostname. Link local will not be configured correctly"

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="waveScrollPane" max="32767" attributes="0"/>
+                  <Component id="magLabel" alignment="0" max="32767" attributes="0"/>
+                  <Component id="magSlider" alignment="0" max="32767" attributes="0"/>
+                  <Component id="diffSlider" alignment="1" max="32767" attributes="0"/>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="DMIN_LABEL" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="206" max="-2" attributes="0"/>
+                      <Component id="diffLabel" min="-2" pref="236" max="-2" attributes="0"/>
+                      <EmptySpace pref="344" max="32767" attributes="0"/>
+                      <Component id="DMAX_LABEL" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="leftLabel" max="32767" attributes="0"/>
+                          <Component id="rightLabel" pref="223" max="32767" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="rightBar" max="32767" attributes="0"/>
+                          <Component id="leftBar" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="details1" pref="345" max="32767" attributes="0"/>
+                          <Component id="details2" max="32767" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Component id="showTargetBox" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="showFirstBox" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="showSecondBox" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          </Group>
+                          <Component id="formatUsageStats" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="details1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="formatUsageStats" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="details2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="showTargetBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="showFirstBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="showSecondBox" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="waveScrollPane" min="-2" pref="288" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="leftBar" min="-2" max="-2" attributes="0"/>
+                  <Component id="leftLabel" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="rightBar" min="-2" max="-2" attributes="0"/>
+                  <Component id="rightLabel" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="diffLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="DMIN_LABEL" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="DMAX_LABEL" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="diffSlider" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+              <Component id="magLabel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="magSlider" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="javax.swing.JProgressBar" name="leftBar">
+    </Component>
+    <Component class="javax.swing.JProgressBar" name="rightBar">
+    </Component>
+    <Component class="javax.swing.JLabel" name="leftLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="left"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="rightLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="right"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="diffLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="difference"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="magLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="magnitude:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="DMIN_LABEL">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="-2PI"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="DMAX_LABEL">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="2PI"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JSlider" name="magSlider">
+      <Properties>
+        <Property name="toolTipText" type="java.lang.String" value=""/>
+        <Property name="focusable" type="boolean" value="false"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JSlider" name="diffSlider">
+      <Properties>
+        <Property name="minimum" type="int" value="-100"/>
+        <Property name="focusable" type="boolean" value="false"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="details1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="jLabel1"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="details2">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="jLabel2"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="formatUsageStats">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="jLabel1"/>
+      </Properties>
+    </Component>
+    <Container class="javax.swing.JScrollPane" name="waveScrollPane">
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+    </Container>
+    <Component class="javax.swing.JCheckBox" name="showTargetBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="target"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="showTargetBoxActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="showFirstBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="first"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="showFirstBoxActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="showSecondBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="second"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="showSecondBoxActionPerformed"/>
+      </Events>
+    </Component>
+  </SubComponents>
+</Form>

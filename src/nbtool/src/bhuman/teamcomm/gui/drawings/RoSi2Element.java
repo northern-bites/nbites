@@ -55,17 +55,17 @@ public class RoSi2Element {
     /**
      * Immediate children of this element.
      */
-    private final List<RoSi2Element> children = new LinkedList<RoSi2Element>();
+    private final List<RoSi2Element> children = new LinkedList<>();
 
     /**
      * Set variable bindings for this element and its children.
      */
-    private final Map<String, String> vars = new HashMap<String, String>();
+    private final Map<String, String> vars = new HashMap<>();
 
     /**
      * Attributes of this element.
      */
-    private final Map<String, String> attributes = new HashMap<String, String>();
+    private final Map<String, String> attributes = new HashMap<>();
 
     /**
      * Name of this element or null if it is unnamed.
@@ -128,7 +128,7 @@ public class RoSi2Element {
             return null;
         }
 
-        final LinkedList<RoSi2Element> elems = new LinkedList<RoSi2Element>(children);
+        final LinkedList<RoSi2Element> elems = new LinkedList<>(children);
 
         while (!elems.isEmpty()) {
             final RoSi2Element cur = elems.pollFirst();
@@ -150,14 +150,14 @@ public class RoSi2Element {
      * @return List containing found elements
      */
     public List<RoSi2Element> findElements(final Collection<String> names) {
-        final List<RoSi2Element> foundElems = new LinkedList<RoSi2Element>();
+        final List<RoSi2Element> foundElems = new LinkedList<>();
 
         if (names.isEmpty()) {
             return foundElems;
         }
 
-        final Set<String> searchedNames = new HashSet<String>(names);
-        final LinkedList<RoSi2Element> elems = new LinkedList<RoSi2Element>(children);
+        final Set<String> searchedNames = new HashSet<>(names);
+        final LinkedList<RoSi2Element> elems = new LinkedList<>(children);
 
         while (!elems.isEmpty()) {
             final RoSi2Element cur = elems.pollFirst();
@@ -180,8 +180,8 @@ public class RoSi2Element {
      *
      * @param gl OpenGL context
      * @return drawable
-     * @throws teamcomm.gui.RoSi2Element.RoSi2ParseException if instantiated
-     * attributes of the element could not be parsed
+     * @throws teamcomm.gui.drawings.RoSi2Element.RoSi2ParseException if
+     * instantiated attributes of the element could not be parsed
      */
     public RoSi2Drawable instantiate(final GL2 gl) throws RoSi2ParseException {
         return instantiate(gl, null);
@@ -193,8 +193,8 @@ public class RoSi2Element {
      * @param gl OpenGL context
      * @param vars variable assignments to use
      * @return drawable
-     * @throws teamcomm.gui.RoSi2Element.RoSi2ParseException if instantiated
-     * attributes of the element could not be parsed
+     * @throws teamcomm.gui.drawings.RoSi2Element.RoSi2ParseException if
+     * instantiated attributes of the element could not be parsed
      */
     public RoSi2Drawable instantiate(final GL2 gl, final Map<String, String> vars) throws RoSi2ParseException {
         return instantiate(gl, vars, null);
@@ -219,16 +219,11 @@ public class RoSi2Element {
                 }
             }
         } else {
-            varBindings = new HashMap<String, String>(this.vars);
+            varBindings = new HashMap<>(this.vars);
         }
 
         // Instantiate all child elements
-        final List<RoSi2Drawable> childInstances;
-        if (refChilds != null) {
-            childInstances = new LinkedList<RoSi2Drawable>(refChilds);
-        } else {
-            childInstances = new LinkedList<RoSi2Drawable>();
-        }
+        final List<RoSi2Drawable> childInstances = (refChilds != null) ? new LinkedList<>(refChilds) : new LinkedList<RoSi2Drawable>();
         for (final RoSi2Element child : children) {
             final RoSi2Drawable childInst = child.instantiate(gl, varBindings, null);
             if (childInst != null) {
@@ -255,273 +250,284 @@ public class RoSi2Element {
 
         // Instantiate this element
         final RoSi2Drawable instance;
-        if (tag.equals("Compound")) {
-            instance = new Compound(gl, childInstances);
-        } else if (tag.equals("Body")) {
-            instance = new Body(gl, childInstances);
-        } else if (tag.equals("Translation")) {
-            instance = new Translation(new float[]{
-                getLength(varBindings, "x", false, 0.0f),
-                getLength(varBindings, "y", false, 0.0f),
-                getLength(varBindings, "z", false, 0.0f)
-            });
-        } else if (tag.equals("Rotation")) {
-            instance = new Rotation(new float[]{
-                getAngle(varBindings, "x", false, 0.0f),
-                getAngle(varBindings, "y", false, 0.0f),
-                getAngle(varBindings, "z", false, 0.0f)
-            });
-        } else if (tag.equals("Appearance")) {
-            instance = new Appearance(gl, childInstances);
-        } else if (tag.equals("BoxAppearance")) {
-            instance = new BoxAppearance(gl, childInstances,
-                    getLength(varBindings, "width", true, 0.0f),
-                    getLength(varBindings, "height", true, 0.0f),
-                    getLength(varBindings, "depth", true, 0.0f));
-        } else if (tag.equals("SphereAppearance")) {
-            instance = new SphereAppearance(gl, childInstances,
-                    getLength(varBindings, "radius", true, 0.0f));
-        } else if (tag.equals("CylinderAppearance")) {
-            instance = new CylinderAppearance(gl, childInstances,
-                    getLength(varBindings, "height", true, 0.0f),
-                    getLength(varBindings, "radius", true, 0.0f));
-        } else if (tag.equals("CapsuleAppearance")) {
-            instance = new CapsuleAppearance(gl, childInstances,
-                    getLength(varBindings, "height", true, 0.0f),
-                    getLength(varBindings, "radius", true, 0.0f));
-        } else if (tag.equals("ComplexAppearance")) {
-            instance = new ComplexAppearance(gl, childInstances);
-        } else if (tag.equals("Vertices")) {
-            final double unit = getUnit(varBindings, "unit", false, 1.0f);
-            final ArrayList<Vertices.Vertex> vs = new ArrayList<Vertices.Vertex>();
-            final String str = content.toString();
-            final DecimalFormat fmt = new DecimalFormat();
-            fmt.setGroupingUsed(false);
-            final DecimalFormatSymbols sym = (DecimalFormatSymbols) DecimalFormatSymbols.getInstance().clone();
-            sym.setDecimalSeparator('.');
-            fmt.setDecimalFormatSymbols(sym);
-            int pos = 0;
-            final double[] vertex = new double[3];
-            int i = 0;
-
-            // parse vertices
-            parsing:
-            while (pos < str.length()) {
-                while (Character.isWhitespace(str.charAt(pos))) {
-                    pos++;
-                    if (pos == str.length()) {
-                        break parsing;
-                    }
-                }
-                while (str.charAt(pos) == '#') {
-                    do {
-                        pos++;
-                        if (pos == str.length()) {
-                            break parsing;
-                        }
-                    } while (str.charAt(pos) != '\n' && str.charAt(pos) != '\r');
+        switch (tag) {
+            case "Compound":
+                instance = new Compound(gl, childInstances);
+                break;
+            case "Body":
+                instance = new Body(gl, childInstances);
+                break;
+            case "Translation":
+                instance = new Translation(new float[]{
+                    getLength(varBindings, "x", false, 0.0f),
+                    getLength(varBindings, "y", false, 0.0f),
+                    getLength(varBindings, "z", false, 0.0f)
+                });
+                break;
+            case "Rotation":
+                instance = new Rotation(new float[]{
+                    getAngle(varBindings, "x", false, 0.0f),
+                    getAngle(varBindings, "y", false, 0.0f),
+                    getAngle(varBindings, "z", false, 0.0f)
+                });
+                break;
+            case "Appearance":
+                instance = new Appearance(gl, childInstances);
+                break;
+            case "BoxAppearance":
+                instance = new BoxAppearance(gl, childInstances,
+                        getLength(varBindings, "width", true, 0.0f),
+                        getLength(varBindings, "height", true, 0.0f),
+                        getLength(varBindings, "depth", true, 0.0f));
+                break;
+            case "SphereAppearance":
+                instance = new SphereAppearance(gl, childInstances,
+                        getLength(varBindings, "radius", true, 0.0f));
+                break;
+            case "CylinderAppearance":
+                instance = new CylinderAppearance(gl, childInstances,
+                        getLength(varBindings, "height", true, 0.0f),
+                        getLength(varBindings, "radius", true, 0.0f));
+                break;
+            case "CapsuleAppearance":
+                instance = new CapsuleAppearance(gl, childInstances,
+                        getLength(varBindings, "height", true, 0.0f),
+                        getLength(varBindings, "radius", true, 0.0f));
+                break;
+            case "ComplexAppearance":
+                instance = new ComplexAppearance(gl, childInstances);
+                break;
+            case "Vertices": {
+                final double unit = getUnit(varBindings, "unit", false, 1.0f);
+                final ArrayList<Vertices.Vertex> vs = new ArrayList<>();
+                final String str = content.toString();
+                final DecimalFormat fmt = new DecimalFormat();
+                fmt.setGroupingUsed(false);
+                final DecimalFormatSymbols sym = (DecimalFormatSymbols) DecimalFormatSymbols.getInstance().clone();
+                sym.setDecimalSeparator('.');
+                fmt.setDecimalFormatSymbols(sym);
+                int pos = 0;
+                final double[] vertex = new double[3];
+                int i = 0;
+                // parse vertices
+                parsing:
+                while (pos < str.length()) {
                     while (Character.isWhitespace(str.charAt(pos))) {
                         pos++;
                         if (pos == str.length()) {
                             break parsing;
                         }
                     }
-                }
-                final ParsePosition p = new ParsePosition(pos);
-                final Number n = fmt.parse(str, p);
-                if (n == null) {
-                    throw new RoSi2ParseException("Vertex coordinate is not a number: " + str.substring(pos, pos + 1));
-                }
-                pos = p.getIndex();
-                vertex[i++] = n.doubleValue();
+                    while (str.charAt(pos) == '#') {
+                        do {
+                            pos++;
+                            if (pos == str.length()) {
+                                break parsing;
+                            }
+                        } while (str.charAt(pos) != '\n' && str.charAt(pos) != '\r');
+                        while (Character.isWhitespace(str.charAt(pos))) {
+                            pos++;
+                            if (pos == str.length()) {
+                                break parsing;
+                            }
+                        }
+                    }
+                    final ParsePosition p = new ParsePosition(pos);
+                    final Number n = fmt.parse(str, p);
+                    if (n == null) {
+                        throw new RoSi2ParseException("Vertex coordinate is not a number: " + str.substring(pos, pos + 1));
+                    }
+                    pos = p.getIndex();
+                    vertex[i++] = n.doubleValue();
 
-                if (i == 3) {
-                    vs.add(new Vertices.Vertex((float) (vertex[0] * unit), (float) (vertex[1] * unit), (float) (vertex[2] * unit)));
-                    i = 0;
-                }
-            }
-
-            vs.trimToSize();
-            instance = new Vertices(vs);
-        } else if (tag.equals("Normals")) {
-            final ArrayList<Normals.Normal> ns = new ArrayList<Normals.Normal>();
-            final String str = content.toString();
-            final DecimalFormat fmt = new DecimalFormat();
-            fmt.setGroupingUsed(false);
-            final DecimalFormatSymbols sym = (DecimalFormatSymbols) DecimalFormatSymbols.getInstance().clone();
-            sym.setDecimalSeparator('.');
-            fmt.setDecimalFormatSymbols(sym);
-            int pos = 0;
-            final float[] normal = new float[3];
-            int i = 0;
-
-            // parse normals
-            parsing:
-            while (pos < str.length()) {
-                while (Character.isWhitespace(str.charAt(pos))) {
-                    pos++;
-                    if (pos == str.length()) {
-                        break parsing;
+                    if (i == 3) {
+                        vs.add(new Vertices.Vertex((float) (vertex[0] * unit), (float) (vertex[1] * unit), (float) (vertex[2] * unit)));
+                        i = 0;
                     }
                 }
-                while (str.charAt(pos) == '#') {
-                    do {
-                        pos++;
-                        if (pos == str.length()) {
-                            break parsing;
-                        }
-                    } while (str.charAt(pos) != '\n' && str.charAt(pos) != '\r');
+                vs.trimToSize();
+                instance = new Vertices(vs);
+                break;
+            }
+            case "Normals": {
+                final ArrayList<Normals.Normal> ns = new ArrayList<>();
+                final String str = content.toString();
+                final DecimalFormat fmt = new DecimalFormat();
+                fmt.setGroupingUsed(false);
+                final DecimalFormatSymbols sym = (DecimalFormatSymbols) DecimalFormatSymbols.getInstance().clone();
+                sym.setDecimalSeparator('.');
+                fmt.setDecimalFormatSymbols(sym);
+                int pos = 0;
+                final float[] normal = new float[3];
+                int i = 0;
+                // parse normals
+                parsing:
+                while (pos < str.length()) {
                     while (Character.isWhitespace(str.charAt(pos))) {
                         pos++;
                         if (pos == str.length()) {
                             break parsing;
                         }
                     }
-                }
-                final ParsePosition p = new ParsePosition(pos);
-                final Number n = fmt.parse(str, p);
-                if (n == null) {
-                    throw new RoSi2ParseException("Normal coordinate is not a number");
-                }
-                normal[i++] = n.floatValue();
-                pos = p.getIndex();
+                    while (str.charAt(pos) == '#') {
+                        do {
+                            pos++;
+                            if (pos == str.length()) {
+                                break parsing;
+                            }
+                        } while (str.charAt(pos) != '\n' && str.charAt(pos) != '\r');
+                        while (Character.isWhitespace(str.charAt(pos))) {
+                            pos++;
+                            if (pos == str.length()) {
+                                break parsing;
+                            }
+                        }
+                    }
+                    final ParsePosition p = new ParsePosition(pos);
+                    final Number n = fmt.parse(str, p);
+                    if (n == null) {
+                        throw new RoSi2ParseException("Normal coordinate is not a number");
+                    }
+                    normal[i++] = n.floatValue();
+                    pos = p.getIndex();
 
-                if (i == 3) {
-                    ns.add(new Normals.Normal(normal[0], normal[1], normal[2], 1));
-                    i = 0;
-                }
-            }
-
-            ns.trimToSize();
-            instance = new Normals(ns);
-        } else if (tag.equals("TexCoords")) {
-            final ArrayList<TexCoords.TexCoord> ts = new ArrayList<TexCoords.TexCoord>();
-            final String str = content.toString();
-            final DecimalFormat fmt = new DecimalFormat();
-            fmt.setGroupingUsed(false);
-            final DecimalFormatSymbols sym = (DecimalFormatSymbols) DecimalFormatSymbols.getInstance().clone();
-            sym.setDecimalSeparator('.');
-            fmt.setDecimalFormatSymbols(sym);
-            int pos = 0;
-            final float[] coord = new float[2];
-            int i = 0;
-
-            // parse texture coordinates
-            parsing:
-            while (pos < str.length()) {
-                while (Character.isWhitespace(str.charAt(pos))) {
-                    pos++;
-                    if (pos == str.length()) {
-                        break parsing;
+                    if (i == 3) {
+                        ns.add(new Normals.Normal(normal[0], normal[1], normal[2], 1));
+                        i = 0;
                     }
                 }
-                while (str.charAt(pos) == '#') {
-                    do {
-                        pos++;
-                        if (pos == str.length()) {
-                            break parsing;
-                        }
-                    } while (str.charAt(pos) != '\n' && str.charAt(pos) != '\r');
+                ns.trimToSize();
+                instance = new Normals(ns);
+                break;
+            }
+            case "TexCoords": {
+                final ArrayList<TexCoords.TexCoord> ts = new ArrayList<>();
+                final String str = content.toString();
+                final DecimalFormat fmt = new DecimalFormat();
+                fmt.setGroupingUsed(false);
+                final DecimalFormatSymbols sym = (DecimalFormatSymbols) DecimalFormatSymbols.getInstance().clone();
+                sym.setDecimalSeparator('.');
+                fmt.setDecimalFormatSymbols(sym);
+                int pos = 0;
+                final float[] coord = new float[2];
+                int i = 0;
+                // parse texture coordinates
+                parsing:
+                while (pos < str.length()) {
                     while (Character.isWhitespace(str.charAt(pos))) {
                         pos++;
                         if (pos == str.length()) {
                             break parsing;
                         }
                     }
-                }
-                final ParsePosition p = new ParsePosition(pos);
-                final Number n = fmt.parse(str, p);
-                if (n == null) {
-                    throw new RoSi2ParseException("Texture coordinate is not a number");
-                }
-                coord[i++] = n.floatValue();
-                pos = p.getIndex();
+                    while (str.charAt(pos) == '#') {
+                        do {
+                            pos++;
+                            if (pos == str.length()) {
+                                break parsing;
+                            }
+                        } while (str.charAt(pos) != '\n' && str.charAt(pos) != '\r');
+                        while (Character.isWhitespace(str.charAt(pos))) {
+                            pos++;
+                            if (pos == str.length()) {
+                                break parsing;
+                            }
+                        }
+                    }
+                    final ParsePosition p = new ParsePosition(pos);
+                    final Number n = fmt.parse(str, p);
+                    if (n == null) {
+                        throw new RoSi2ParseException("Texture coordinate is not a number");
+                    }
+                    coord[i++] = n.floatValue();
+                    pos = p.getIndex();
 
-                if (i == 2) {
-                    ts.add(new TexCoords.TexCoord(coord[0], coord[1]));
-                    i = 0;
-                }
-            }
-
-            ts.trimToSize();
-            instance = new TexCoords(ts);
-        } else if (tag.equals("Triangles") || tag.equals("Quads")) {
-            final LinkedList<Integer> vs = new LinkedList<Integer>();
-            final String str = content.toString();
-            final DecimalFormat fmt = new DecimalFormat();
-            fmt.setParseIntegerOnly(true);
-            int pos = 0;
-
-            // parse vertex indices
-            parsing:
-            while (pos < str.length()) {
-                while (Character.isWhitespace(str.charAt(pos))) {
-                    pos++;
-                    if (pos == str.length()) {
-                        break parsing;
+                    if (i == 2) {
+                        ts.add(new TexCoords.TexCoord(coord[0], coord[1]));
+                        i = 0;
                     }
                 }
-                while (str.charAt(pos) == '#') {
-                    do {
-                        pos++;
-                        if (pos == str.length()) {
-                            break parsing;
-                        }
-                    } while (str.charAt(pos) != '\n' && str.charAt(pos) != '\r');
+                ts.trimToSize();
+                instance = new TexCoords(ts);
+                break;
+            }
+            case "Triangles":
+            case "Quads": {
+                final LinkedList<Integer> vs = new LinkedList<>();
+                final String str = content.toString();
+                final DecimalFormat fmt = new DecimalFormat();
+                fmt.setParseIntegerOnly(true);
+                int pos = 0;
+                // parse vertex indices
+                parsing:
+                while (pos < str.length()) {
                     while (Character.isWhitespace(str.charAt(pos))) {
                         pos++;
                         if (pos == str.length()) {
                             break parsing;
                         }
                     }
-                }
-                final ParsePosition p = new ParsePosition(pos);
-                final Number n = fmt.parse(str, p);
-                if (n == null) {
-                    throw new RoSi2ParseException("Vertex index is not a number");
-                }
-                vs.add(n.intValue());
-                pos = p.getIndex();
-            }
-
-            instance = new PrimitiveGroup(tag.equals("Triangles") ? GL.GL_TRIANGLES : GL2.GL_QUADS, vs);
-        } else if (tag.equals("Surface")) {
-            final String texturePath = getAttributeValue(varBindings, "diffuseTexture", false);
-            final Texture texture;
-            if (texturePath == null) {
-                texture = null;
-            } else {
-                try {
-                    texture = TextureLoader.getInstance().loadTexture(gl, new File(filepath.getParentFile(), texturePath));
-                } catch (IOException ex) {
-                    throw new RoSi2ParseException("Texture not found: " + texturePath);
-                }
-            }
-
-            final String shininessStr = getAttributeValue(varBindings, "shininess", false);
-            Float shininess;
-            if (shininessStr == null) {
-                shininess = null;
-            } else {
-                try {
-                    shininess = Float.valueOf(shininessStr);
-                    if (shininess < 0.0f || shininess > 128.0f) {
-                        throw new RoSi2ParseException("Shininess value must be between 0 and 128, found: " + shininess);
+                    while (str.charAt(pos) == '#') {
+                        do {
+                            pos++;
+                            if (pos == str.length()) {
+                                break parsing;
+                            }
+                        } while (str.charAt(pos) != '\n' && str.charAt(pos) != '\r');
+                        while (Character.isWhitespace(str.charAt(pos))) {
+                            pos++;
+                            if (pos == str.length()) {
+                                break parsing;
+                            }
+                        }
                     }
-                } catch (final NumberFormatException e) {
+                    final ParsePosition p = new ParsePosition(pos);
+                    final Number n = fmt.parse(str, p);
+                    if (n == null) {
+                        throw new RoSi2ParseException("Vertex index is not a number");
+                    }
+                    vs.add(n.intValue());
+                    pos = p.getIndex();
+                }
+                instance = new PrimitiveGroup(tag.equals("Triangles") ? GL.GL_TRIANGLES : GL2.GL_QUADS, vs);
+                break;
+            }
+            case "Surface":
+                final String texturePath = getAttributeValue(varBindings, "diffuseTexture", false);
+                final Texture texture;
+                if (texturePath == null) {
+                    texture = null;
+                } else {
+                    try {
+                        texture = TextureLoader.getInstance().loadTexture(gl, new File(filepath.getParentFile(), texturePath));
+                    } catch (IOException ex) {
+                        throw new RoSi2ParseException("Texture not found: " + texturePath);
+                    }
+                }
+                final String shininessStr = getAttributeValue(varBindings, "shininess", false);
+                Float shininess;
+                if (shininessStr == null) {
                     shininess = null;
+                } else {
+                    try {
+                        shininess = Float.valueOf(shininessStr);
+                        if (shininess < 0.0f || shininess > 128.0f) {
+                            throw new RoSi2ParseException("Shininess value must be between 0 and 128, found: " + shininess);
+                        }
+                    } catch (final NumberFormatException e) {
+                        shininess = null;
+                    }
                 }
-            }
-
-            instance = new Surface(
-                    getColor(varBindings, "diffuseColor", true),
-                    getColor(varBindings, "ambientColor", false),
-                    getColor(varBindings, "specularColor", false),
-                    getColor(varBindings, "emissionColor", false),
-                    shininess,
-                    texture);
-        } else {
-            return null;
+                instance = new Surface(
+                        getColor(varBindings, "diffuseColor", true),
+                        getColor(varBindings, "ambientColor", false),
+                        getColor(varBindings, "specularColor", false),
+                        getColor(varBindings, "emissionColor", false),
+                        shininess,
+                        texture);
+                break;
+            default:
+                return null;
         }
 
         // Store the instance if it is constant
@@ -648,16 +654,17 @@ public class RoSi2Element {
             return defaultValue;
         }
 
-        if (unit.equals("m")) {
-            return 1.0f;
-        } else if (unit.equals("mm")) {
-            return 0.001f;
-        } else if (unit.equals("cm")) {
-            return 0.01f;
-        } else if (unit.equals("dm")) {
-            return 0.1f;
-        } else if (unit.equals("km")) {
-            return 1000.0f;
+        switch (unit) {
+            case "m":
+                return 1.0f;
+            case "mm":
+                return 0.001f;
+            case "cm":
+                return 0.01f;
+            case "dm":
+                return 0.1f;
+            case "km":
+                return 1000.0f;
         }
 
         throw new RoSi2ParseException("Unexpected unit \"" + unit + " (expected one of \"mm, cm, dm, m, km\")");
@@ -783,7 +790,7 @@ public class RoSi2Element {
          */
         protected RoSi2Drawable() {
             gl = null;
-            children = new LinkedList<RoSi2Drawable>();
+            children = new LinkedList<>();
             rotation = null;
             translation = null;
         }
@@ -1173,7 +1180,7 @@ public class RoSi2Element {
             super(gl, children);
 
             // scan children for elements defining the complex appearance
-            primitiveGroups = new LinkedList<PrimitiveGroup>();
+            primitiveGroups = new LinkedList<>();
             Vertices v = null;
             Normals n = null;
             TexCoords t = null;
@@ -1223,8 +1230,8 @@ public class RoSi2Element {
         }
 
         private Normals computeNormals() {
-            ArrayList<Normals.Normal> ns = new ArrayList<Normals.Normal>(vertices.vertices.size());
-            for (int i = 0; i < vertices.vertices.size(); i++) {
+            ArrayList<Normals.Normal> ns = new ArrayList<>(vertices.vertices.size());
+            for (Vertices.Vertex v : vertices.vertices) {
                 ns.add(new Normals.Normal());
             }
 
@@ -1553,8 +1560,8 @@ public class RoSi2Element {
      *
      * @param filename path to the file to parse
      * @return Element representing the scene
-     * @throws teamcomm.gui.RoSi2Element.RoSi2ParseException if the file could
-     * not be parsed as a ros2 file
+     * @throws teamcomm.gui.drawings.RoSi2Element.RoSi2ParseException if the
+     * file could not be parsed as a ros2 file
      * @throws javax.xml.stream.XMLStreamException if the file could not be
      * parsed as a XML file
      * @throws java.io.FileNotFoundException if the file could not be found
@@ -1567,13 +1574,13 @@ public class RoSi2Element {
         factory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
 
         // Stack containing the opened files
-        final Deque<InputFileState> inputFileStack = new LinkedList<InputFileState>();
+        final Deque<InputFileState> inputFileStack = new LinkedList<>();
 
         // Stack containing the current element hierarchy
-        final Deque<RoSi2Element> parentStack = new LinkedList<RoSi2Element>();
+        final Deque<RoSi2Element> parentStack = new LinkedList<>();
 
         // Map with mappings of all named elements
-        final Map<String, RoSi2Element> namedElements = new HashMap<String, RoSi2Element>();
+        final Map<String, RoSi2Element> namedElements = new HashMap<>();
 
         // Flag indicating whether the parser is within the scene element
         boolean withinSceneElement = false;

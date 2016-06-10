@@ -244,7 +244,11 @@ public:
   //          Print disgnostic trace if enabled.
   // note     Cast the returned void* to whatever pixel type you want.
   
-  void release() { --referenceCount_; printTrace(true); if (referenceCount_ == 0) delete this;}
+  void release() { --referenceCount_; printTrace(true); if (referenceCount_ == 0) {
+//      printf("%s: ~PixelBuffer()\n", __FILE__);
+      delete this;
+    }
+  }
   // effect   Stop sharing this buffer . If this was the last share, delete the buffer.
   // note     The concrete pixel buffer objects are always on the heap. They are deleted by using
   //          the delete operator on this object itself, which first invokes the virtual
@@ -763,6 +767,11 @@ public:
   // note     Just like the one in PackedImage<T>, but guarantee that the result is a
   //          proper YUVImage (width is a multiple of 4 and x0 is adjusted to start
   //          on a YUYV boundary).
+
+  YUVImage& operator=(const YUVImage& other) {
+      this->MemoryImage::operator=(other);
+      return *this;
+  }
 };
 
 // ***********************

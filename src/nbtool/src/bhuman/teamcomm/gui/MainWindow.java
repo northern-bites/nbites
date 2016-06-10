@@ -2,9 +2,7 @@ package teamcomm.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -13,7 +11,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -51,12 +48,12 @@ public class MainWindow extends JFrame implements TeamEventListener {
 
     private static final long serialVersionUID = 6549981924840180076L;
 
-    private static final Map<Integer, ImageIcon> logos = new HashMap<Integer, ImageIcon>();
+    private static final Map<Integer, ImageIcon> logos = new HashMap<>();
 
     private final View3D fieldView = new View3D();
     private final JPanel[] teamPanels = new JPanel[]{new JPanel(), new JPanel(), new JPanel()};
     private final JLabel[] teamLogos = new JLabel[]{new JLabel((Icon) null, SwingConstants.CENTER), new JLabel((Icon) null, SwingConstants.CENTER)};
-    private final Map<String, RobotPanel> robotPanels = new HashMap<String, RobotPanel>();
+    private final Map<String, RobotPanel> robotPanels = new HashMap<>();
 
     @SuppressWarnings("unused")
     private final LogReplayFrame logReplayFrame = new LogReplayFrame(this);
@@ -139,7 +136,7 @@ public class MainWindow extends JFrame implements TeamEventListener {
         });
         resetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
         fileMenu.add(resetItem);
-        
+
         final JMenuItem replayItem = new JMenuItem("Replay log file");
         fileMenu.add(replayItem);
         replayItem.addActionListener(new ActionListener() {
@@ -159,7 +156,7 @@ public class MainWindow extends JFrame implements TeamEventListener {
             }
         });
         replayItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
-        
+
         final JMenuItem exitItem = new JMenuItem("Exit");
         exitItem.addActionListener(new ActionListener() {
             @Override
@@ -199,81 +196,49 @@ public class MainWindow extends JFrame implements TeamEventListener {
         fieldView.terminate();
     }
 
-    private ImageIcon getTeamIcon(final int team) {
-        ImageIcon icon = logos.get(team);
-        if (icon != null) {
-            return icon;
-        }
-
-        try {
-            icon = new ImageIcon(GameState.getInstance().getTeamIcon(team));
-        } catch (NullPointerException e) {
-            return null;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return null;
-        }
-        final float scaleFactor = Math.min((float) (RobotPanel.PANEL_WIDTH) / icon.getImage().getWidth(null), (float) (RobotPanel.PANEL_HEIGHT) / icon.getImage().getHeight(null));
-
-        // getScaledInstance/SCALE_SMOOTH does not work with all color models, so we need to convert image
-        BufferedImage image = (BufferedImage) icon.getImage();
-        if (image.getType() != BufferedImage.TYPE_INT_ARGB) {
-            BufferedImage temp = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            Graphics g = temp.createGraphics();
-            g.drawImage(image, 0, 0, null);
-            g.dispose();
-            image = temp;
-        }
-
-        icon.setImage(image.getScaledInstance(
-                (int) (icon.getImage().getWidth(null) * scaleFactor),
-                (int) (icon.getImage().getHeight(null) * scaleFactor),
-                Image.SCALE_SMOOTH));
-
-        logos.put(team, icon);
-
-        return icon;
-    }
-
     @Override
     public void teamChanged(final TeamEvent e) {
-        if (e.side != GameState.TEAM_OTHER) {
-            teamLogos[e.side].setIcon(getTeamIcon(e.teamNumber));
-        }
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                if (e.side != GameState.TEAM_OTHER) {
+                    teamLogos[e.side].setIcon(TeamLogoLoader.getInstance().getTeamLogoPanelIcon(e.teamNumber));
+                }
 
-        int i = 0;
-        for (final RobotState r : e.players) {
-            RobotPanel panel = robotPanels.get(r.getAddress());
-            if (panel == null) {
-                panel = new RobotPanel(r);
-                robotPanels.put(r.getAddress(), panel);
-            }
+                int i = 0;
+                for (final RobotState r : e.players) {
+                    RobotPanel panel = robotPanels.get(r.getAddress());
+                    if (panel == null) {
+                        panel = new RobotPanel(r);
+                        robotPanels.put(r.getAddress(), panel);
+                    }
 
-            synchronized (teamPanels[e.side].getTreeLock()) {
-                if (teamPanels[e.side].getComponentCount() <= i + (e.side < 2 ? 1 : 0)) {
-                    teamPanels[e.side].add(panel);
-                    panel.revalidate();
-                } else if (panel != teamPanels[e.side].getComponent(i + (e.side < 2 ? 1 : 0))) {
-                    teamPanels[e.side].remove(panel);
-                    teamPanels[e.side].add(panel, i + (e.side < 2 ? 1 : 0));
-                    panel.revalidate();
+                    if (teamPanels[e.side].getComponentCount() <= i + (e.side < 2 ? 1 : 0)) {
+                        teamPanels[e.side].add(panel);
+                        panel.revalidate();
+                    } else if (panel != teamPanels[e.side].getComponent(i + (e.side < 2 ? 1 : 0))) {
+                        teamPanels[e.side].remove(panel);
+                        teamPanels[e.side].add(panel, i + (e.side < 2 ? 1 : 0));
+                        panel.revalidate();
+                    }
+
+                    panel.setTeamLogoVisible(e.side == GameState.TEAM_OTHER);
+
+                    i++;
+                }
+
+                boolean teamPanelChanged = false;
+                while (e.players.size() < teamPanels[e.side].getComponentCount() - (e.side < 2 ? 1 : 0)) {
+                    teamPanelChanged = true;
+                    final RobotPanel panel = (RobotPanel) teamPanels[e.side].getComponent(teamPanels[e.side].getComponentCount() - 1);
+                    teamPanels[e.side].remove(teamPanels[e.side].getComponentCount() - 1);
+                    robotPanels.remove(panel.getRobotAddress());
+                    panel.dispose();
+                }
+                if (teamPanelChanged) {
+                    teamPanels[e.side].repaint();
                 }
             }
-
-            i++;
-        }
-
-        boolean teamPanelChanged = false;
-        synchronized (teamPanels[e.side].getTreeLock()) {
-            while (e.players.size() < teamPanels[e.side].getComponentCount() - (e.side < 2 ? 1 : 0)) {
-                teamPanelChanged = true;
-                final RobotPanel panel = (RobotPanel) teamPanels[e.side].getComponent(teamPanels[e.side].getComponentCount() - 1);
-                teamPanels[e.side].remove(teamPanels[e.side].getComponentCount() - 1);
-                robotPanels.remove(panel.getRobotAddress());
-                panel.dispose();
-            }
-        }
-        if (teamPanelChanged) {
-            teamPanels[e.side].repaint();
-        }
+        });
     }
 }
