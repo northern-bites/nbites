@@ -780,7 +780,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     if (!topCamera) {
         spots.innerDiamCm(3.0f);
     }
-    spots.filterThreshold(140);
+    spots.filterThreshold(150);
     spots.greenThreshold(60);
     spots.filterGain(0.5);
     spots.spotDetect(smallerY, homography, &smallerGreen);
