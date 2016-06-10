@@ -25,16 +25,21 @@ namespace man
 namespace motion 
 {
 
-// static const float INITIAL_BODY_POSE_ANGLES[] {
-// 	0.f,0.f,0.f,0.f,0.f,0.f,0.f,
-// 	0.f,0.f,0.f,0.f,0.f,0.f,0.f,
-// 	0.f,0.f,0.f,0.f,0.f,0.f,0.f,0.f,
+// NICE AND STRAIGHT LEGS
+// const float UNSWalkProvider::INITIAL_BODY_POSE_ANGLES[] {
+// 	1.57f, 0.17f, -1.57f, -0.05f,
+// 	0.f,0.f,0.f,0.f,0.f,0.f,
+// 	0.f,0.f,0.f,0.f,0.f,0.f,
+// 	1.57f, -0.17f, 1.57f, 0.05f,
+// 	0.f,0.f,
 // };
 
 const float UNSWalkProvider::INITIAL_BODY_POSE_ANGLES[] {
-	0.f,0.f,0.f,0.f,0.f,0.f,0.f,
-	0.f,0.f,0.f,0.f,0.f,0.f,0.f,
-	0.f,0.f,0.f,0.f,0.f,0.f,0.f,0.f,
+	1.57f, 0.17f, -1.57f, -0.05f,
+	0.0f, 0.0f, -0.44f, 0.98f, -0.55f, 0.0f,
+	0.0f, 0.0f, -0.44f, 0.98f, -0.55f, 0.0f,
+	1.57f, -0.17f, 1.57f, 0.05f,
+	0.f,0.f,
 };
 
 // Runswift takes walk commands in MM, we use CM
@@ -189,10 +194,10 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 			WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
 			std::cout << "Walk Command: " << command->x_percent << "," << command->y_percent << "," << command->theta_percent << ") \n";
-			request->body.forward = 600.0; //command->x_percent ;
+			request->body.forward = 6.0; //command->x_percent ;
 			request->body.left = 0.0; //command->y_percent ;
 			request->body.turn = 0.0; //command->theta_percent ;
-			request->body.speed = 0.3f;
+			request->body.speed = 0.0f;
 
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
 			logMsg("Destination command - Destination Walking!");
@@ -221,8 +226,9 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	}
 	request->body.speed = 0.0f;
 
-	logMsg("Can't get current command! Requesting stand");
-	request->body.actionType = ActionCommand::Body::STAND;
+	// For testing stand action
+	// logMsg("Can't get current command! Requesting stand");
+	// request->body.actionType = ActionCommand::Body::STAND;
 
 
 	// Update sensor values

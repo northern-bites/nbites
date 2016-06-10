@@ -31,7 +31,6 @@ class ActionGenerator : Generator {
       int current_time;
       std::string file_name;
       std::vector<JointValues> joints;
-      std::vector<JointValues*> jointPtrs;
       ActionCommand::Body active;
 
       /**

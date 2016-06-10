@@ -24,7 +24,7 @@ namespace motion
 		old_gyro_zero_x = old_gyro_zero_x * 0.99 + gyro_value * 0.01;
 		old_filtered_gyro_x = old_filtered_gyro_x * 0.8 + gyro_value * 0.2;
 		std::cout << "NEW ZERO X: " << old_gyro_zero_x << std::endl;
-
+		return old_filtered_gyro_x;
 	}
 
 	float IMUAdjuster::adjustGyrY(float gyro_value) {
@@ -33,7 +33,7 @@ namespace motion
 		old_gyro_zero_x = old_gyro_zero_x * 0.99 + gyro_value * 0.01;
 		old_filtered_gyro_x = old_filtered_gyro_x * 0.8 + gyro_value * 0.2;
 		std::cout << "NEW ZERO Y: " << old_gyro_zero_x << std::endl;
-
+		return old_filtered_gyro_y;
 	}
 
 }

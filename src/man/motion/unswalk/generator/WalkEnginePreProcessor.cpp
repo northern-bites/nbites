@@ -27,10 +27,11 @@ int sign(float num) {
 }
 
 void toWalkRequest(ActionCommand::All* request) {
+   std::cout << "[PREPROCESS DEBUG] Converting walk request!" << std::endl;
    request->body.actionType = Body::WALK;
    request->body.power = 0;
    request->body.bend = 1;
-   request->body.speed = 1;
+   request->body.speed = 0;
 }
 
 // LineUpEngine
@@ -247,6 +248,8 @@ JointValues WalkEnginePreProcessor::makeJoints(ActionCommand::All* request,
       request->body.speed = 0;   // reverted overloaded param for turn threshold
    }
 
+   std::cout << "[PREPROCESS DEBUG] calling make joints from the walk engine" << std::endl;
+   request->body.speed = 0;
    JointValues joints = walkEngine->makeJoints(request, odometry, sensors, bodyModel, ballX, ballY);
    
 //   cout << "walk option: " << walkEngine->walk2014Option << " " << active << " " << request->body.actionType << endl;
