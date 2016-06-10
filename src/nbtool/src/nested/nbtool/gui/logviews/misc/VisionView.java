@@ -1,5 +1,13 @@
 package nbtool.gui.logviews.misc;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+
+import javax.swing.JPanel;
+
 import nbtool.data.log.Block;
 import nbtool.data.log.Log;
 import nbtool.images.YUYV8888Image;
@@ -11,31 +19,28 @@ import nbtool.util.Debug;
 import nbtool.util.SharedConstants;
 
 public abstract class VisionView extends ViewParent implements IOFirstResponder {
+
+	/* you must implement this! */
+	protected abstract void setupVisionDisplay();
+
+	/* you may override these! */
 	
-	final VisionView outer = this;
+	//determines what function 'callVision()' executes
+	protected String functionName() {
+		return "Vision";
+	}
+	
+	//Should VisionView call setupVisionDisplay() if no NBCross instance is found?
+	protected boolean continueIfNoNBCross() {
+		return false;
+	}
+	
+	/******
+	 * These variables and methods are provided as helpers.
+	 */
 	
 	/* latest from nbcross */
 	protected Log latestVisionLog = null;
-
-	@Override
-	public final String[] displayableTypes() {
-		return new String[]{SharedConstants.LogClass_Tripoint()};
-	}
-	
-	@Override
-	public final boolean ioMayRespondOnCenterThread(IOInstance inst) {
-		return false;
-	}
-
-	@Override
-	public final void setupDisplay() {
-		if (callVision()) {
-			setupVisionDisplay();
-		} else {
-			Debug.error("%s view not loading because it could not call Vision()", 
-					this.getClass().getName());
-		}
-	}
 	
 	protected final boolean callVision() {
 		return callVision(displayedLog);
@@ -68,11 +73,7 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 		
 		return true;
 	}
-	
-	protected String functionName() {
-		return "Vision";
-	}
-	
+		
 	protected final YUYV8888Image getOriginal() {
 		return displayedLog.blocks.get(0).parseAsYUVImage();
 	}
@@ -170,6 +171,59 @@ public abstract class VisionView extends ViewParent implements IOFirstResponder 
 		return latestVisionLog == null ? null : latestVisionLog.find("debugImage");
 	}
 	
-	protected abstract void setupVisionDisplay();
+	/******
+	 * Begin internal implementation.
+	 */
+	final VisionView outer = this;
+
+	@Override
+	public final String[] displayableTypes() {
+		return new String[]{SharedConstants.LogClass_Tripoint()};
+	}
 	
+	@Override
+	public final boolean ioMayRespondOnCenterThread(IOInstance inst) {
+		return false;
+	}
+
+	@Override
+	public final void setupDisplay() {
+		if (callVision() || continueIfNoNBCross()) {
+			setupVisionDisplay();
+		} else {
+			Debug.error("%s view not loading because it could not call Vision()", 
+					this.getClass().getName());
+			this.setLayout(null);
+			final NBCrossErrorPane errorPanel = new NBCrossErrorPane();
+			this.add(errorPanel);
+			
+			this.addComponentListener(new ComponentListener(){
+				@Override
+				public void componentResized(ComponentEvent e) {reset(errorPanel);}
+				@Override
+				public void componentMoved(ComponentEvent e) {reset(errorPanel);}
+				@Override
+				public void componentShown(ComponentEvent e) {reset(errorPanel);}
+				@Override
+				public void componentHidden(ComponentEvent e) {reset(errorPanel);}
+			});
+		}
+	}
+	
+	private final void reset(NBCrossErrorPane panel) {
+		panel.setBounds(10,10,this.getSize().width - 20, this.getSize().height - 20);
+	}	
+	
+	private class NBCrossErrorPane extends JPanel {
+		@Override
+		public void paintComponent(Graphics g) {
+			g.setColor(Color.DARK_GRAY);
+			g.fillRect(0, 0, this.getSize().width, this.getSize().height);
+			
+			g.setColor(Color.RED);
+			Font use = this.getFont().deriveFont(24.0f);
+			g.setFont(use);
+			g.drawString("could not connect to NBCross!", 50, 50);
+		}
+	}
 }

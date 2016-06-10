@@ -35,22 +35,6 @@ set(
 set(PYTHON_PLAYER ${@PYTHON_PLAYER@})
 
 set(
-  @TABLE_TOP@
-  "../../data/tables/station15.mtb"
-  CACHE STRING
-  "Path relative to man directory for the desired top camera color table"
-)
-set(TABLE_TOP ${@TABLE_TOP@})
-
-set(
-  @TABLE_BOTTOM@
-  "../../data/tables/station15.mtb"
-  CACHE STRING
-  "Path relative to man directory for the desired bottom camera color table"
-)
-set(TABLE_BOTTOM ${@TABLE_BOTTOM@})
-
-set(
   INSTALL_LOCATION
   "nbites/"
   CACHE STRING

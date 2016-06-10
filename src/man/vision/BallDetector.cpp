@@ -611,6 +611,54 @@ void BallDetector::makeEdgeList(EdgeList & edges)
     }
 }
 
+/* The next two are very similar, but the first one assumes that the
+   "spot" actually comes from the blob detector.
+ */
+bool BallDetector::filterWhiteBlob(Spot spot,
+                                   std::vector<std::pair<int,int>> & blackSpots,
+								   std::vector<std::pair<int,int>> & badBlack)
+{
+    // convert back to raw coordinates
+    int leftX = spot.ix() + width / 2 - spot.innerDiam / 4;
+    int rightX = spot.ix() + width / 2 + spot.innerDiam / 4;
+    int topY = -spot.iy() + height / 2 - spot.innerDiam / 4;
+    int bottomY = -spot.iy() + height / 2 + spot.innerDiam / 4;
+    int midX = spot.ix() + width / 2;
+    int midY = -spot.iy() + height / 2;
+
+    // count up how many black spots are inside
+    int spots = 0;
+    for (int j = 0; j < blackSpots.size(); j++) {
+        std::pair<int,int> blackspot = blackSpots[j];
+        if (blackspot.first > spot.xLo() + width / 2 &&
+            blackspot.first < spot.xHi() + width / 2 &&
+            blackspot.second > spot.yLo() + height / 2 &&
+            blackspot.second < spot.yHi() + height / 2) {
+            spots++;
+        }
+    }
+    // for now, if there are no black spots then it is too dangerous
+    if (spots < 1) {
+        return false;
+    }
+
+    // count up how many bad black spots are inside
+    int badspots = 0;
+    for (int j = 0; j < badBlack.size(); j++) {
+        std::pair<int,int> blackspot = badBlack[j];
+        if (blackspot.first > spot.xLo() + width / 2 &&
+            blackspot.first < spot.xHi() + width / 2 &&
+            blackspot.second > spot.yLo() + height / 2 &&
+            blackspot.second < spot.yHi() + height / 2) {
+            badspots++;
+        }
+    }
+    // for now, if there are several bad spots then it is too dangerous
+    if (badspots > 1) {
+        return false;
+    }
+}
+
 bool BallDetector::filterWhiteSpot(Spot spot,
                                    std::vector<std::pair<int,int>> & blackSpots,
 								   std::vector<std::pair<int,int>> & badBlack)
@@ -667,14 +715,18 @@ bool BallDetector::filterWhiteSpot(Spot spot,
     // make sure there is some part of the main spot that isn't white
     // if there is actual green then bail - probably a corner or something
     int nonWhite = 0;
+	int green = 0;
     for (int i = leftX; i < rightX; i++) {
         for (int j = topY; j < bottomY; j++) {
             getColor(i, j);
             if (isGreen()) {
-				if (debugBall) {
-					std::cout << "Rejecting spot because of green" << std::endl;
+				green++;
+				if (green > 2) {
+					if (debugBall) {
+						std::cout << "Rejecting spot because of green" << std::endl;
+					}
+					return false;
 				}
-                return false;
             }
             if (!isWhite()) {
                 nonWhite++;
@@ -718,16 +770,25 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 	debugBlackSpots.clear();
 	debugWhiteSpots.clear();
 
+	int horiz = 0;
+	if (topCamera) {
+		horiz = max(0, min(field->horizonAt(0), field->horizonAt(width - 1)));
+	}
+	ImageLiteU16 smallerY(yImage, 0, horiz, yImage.width(),
+							 height - horiz);
+	ImageLiteU8 smallerGreen(greenImage, 0, horiz, greenImage.width(),
+							 height - horiz);
+
     SpotDetector spots;
     spots.darkSpot(true);
     spots.innerDiamCm(3.0f);
     if (!topCamera) {
         spots.innerDiamCm(3.0f);
     }
-    spots.filterThreshold(140);
+    spots.filterThreshold(150);
     spots.greenThreshold(60);
     spots.filterGain(0.5);
-    spots.spotDetect(yImage, homography, &greenImage);
+    spots.spotDetect(smallerY, homography, &smallerGreen);
     SpotList spotter = spots.spots();
     for (auto i = spotter.begin(); i != spotter.end(); i++) {
         // convert back to raw coordinates
@@ -765,7 +826,8 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 	}
 	for (auto i = blobber.blobs.begin(); i!=blobber.blobs.end(); i++) {
 		int diam = (*i).firstPrincipalLength();
-		if (diam < 20 && diam >= 10) {
+		int diam2 = (*i).secondPrincipalLength();
+		if (diam < 25 && diam >= 6 && diam2 >= 5) {
 			// convert this blob to a Spot
 			int cx = (*i).centerX();
 			int cy = (*i).centerY();
@@ -775,7 +837,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
 			foo.rawX = cx;
 			foo.rawY = cy + bottomQuarter;
 			foo.innerDiam = (*i).firstPrincipalLength() * 2;
-			if (filterWhiteSpot(foo, blackSpots, badBlackSpots)) {
+			if (filterWhiteBlob(foo, blackSpots, badBlackSpots)) {
 				foo.spotType = WHITE_BLOB;
 				actualWhiteSpots.push_back(foo);
 				makeBall(foo, cameraHeight, 0.75, foundBall, false);
@@ -805,7 +867,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
     whitespots.filterThreshold(140);
     whitespots.greenThreshold(70);
     whitespots.filterGain(0.5);
-    whitespots.spotDetect(yImage, homography, &greenImage);
+    whitespots.spotDetect(smallerY, homography, &smallerGreen);
     SpotList whitespotter = whitespots.spots();
     for (auto i = whitespotter.begin(); i != whitespotter.end(); i++) {
         int midX = (*i).ix() + width / 2;
@@ -824,7 +886,7 @@ bool BallDetector::findBall(ImageLiteU8 white, double cameraHeight,
         } else if (!topCamera || midY > field->horizonAt(midX)) {
 			(*i).spotType = WHITE_REJECT;
         }
-		if (debugBall) {
+		if (debugBall && (!topCamera || midY > field->horizonAt(midX))) {
 			debugWhiteSpots.push_back((*i));
 		}
     }
