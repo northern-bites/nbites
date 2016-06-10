@@ -65,11 +65,6 @@ public  final class Behaviors extends
             }
             break;
           }
-          case 16: {
-            bitField0_ |= 0x00000002;
-            on_ = input.readBool();
-            break;
-          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -131,13 +126,13 @@ public  final class Behaviors extends
      */
     GAMEPLAYING(3, 4),
     /**
-     * <code>GAMEFINISHED = 5;</code>
+     * <code>GAMEPENALTY = 5;</code>
      */
-    GAMEFINISHED(4, 5),
+    GAMEPENALTY(4, 5),
     /**
-     * <code>GAMEPENALIZED = 6;</code>
+     * <code>GAMEFINISHED = 6;</code>
      */
-    GAMEPENALIZED(5, 6),
+    GAMEFINISHED(5, 6),
     ;
 
     /**
@@ -157,13 +152,13 @@ public  final class Behaviors extends
      */
     public static final int GAMEPLAYING_VALUE = 4;
     /**
-     * <code>GAMEFINISHED = 5;</code>
+     * <code>GAMEPENALTY = 5;</code>
      */
-    public static final int GAMEFINISHED_VALUE = 5;
+    public static final int GAMEPENALTY_VALUE = 5;
     /**
-     * <code>GAMEPENALIZED = 6;</code>
+     * <code>GAMEFINISHED = 6;</code>
      */
-    public static final int GAMEPENALIZED_VALUE = 6;
+    public static final int GAMEFINISHED_VALUE = 6;
 
 
     public final int getNumber() { return value; }
@@ -174,8 +169,8 @@ public  final class Behaviors extends
         case 2: return GAMEREADY;
         case 3: return GAMESET;
         case 4: return GAMEPLAYING;
-        case 5: return GAMEFINISHED;
-        case 6: return GAMEPENALIZED;
+        case 5: return GAMEPENALTY;
+        case 6: return GAMEFINISHED;
         default: return null;
       }
     }
@@ -244,25 +239,8 @@ public  final class Behaviors extends
     return gCState_;
   }
 
-  // optional bool on = 2;
-  public static final int ON_FIELD_NUMBER = 2;
-  private boolean on_;
-  /**
-   * <code>optional bool on = 2;</code>
-   */
-  public boolean hasOn() {
-    return ((bitField0_ & 0x00000002) == 0x00000002);
-  }
-  /**
-   * <code>optional bool on = 2;</code>
-   */
-  public boolean getOn() {
-    return on_;
-  }
-
   private void initFields() {
     gCState_ = messages.Behaviors.GameControllerState.GAMEINITIAL;
-    on_ = false;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -279,9 +257,6 @@ public  final class Behaviors extends
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeEnum(1, gCState_.getNumber());
     }
-    if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      output.writeBool(2, on_);
-    }
     getUnknownFields().writeTo(output);
   }
 
@@ -294,10 +269,6 @@ public  final class Behaviors extends
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += com.google.protobuf.CodedOutputStream
         .computeEnumSize(1, gCState_.getNumber());
-    }
-    if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(2, on_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSerializedSize = size;
@@ -417,8 +388,6 @@ public  final class Behaviors extends
       super.clear();
       gCState_ = messages.Behaviors.GameControllerState.GAMEINITIAL;
       bitField0_ = (bitField0_ & ~0x00000001);
-      on_ = false;
-      bitField0_ = (bitField0_ & ~0x00000002);
       return this;
     }
 
@@ -451,10 +420,6 @@ public  final class Behaviors extends
         to_bitField0_ |= 0x00000001;
       }
       result.gCState_ = gCState_;
-      if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-        to_bitField0_ |= 0x00000002;
-      }
-      result.on_ = on_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -473,9 +438,6 @@ public  final class Behaviors extends
       if (other == messages.Behaviors.getDefaultInstance()) return this;
       if (other.hasGCState()) {
         setGCState(other.getGCState());
-      }
-      if (other.hasOn()) {
-        setOn(other.getOn());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       return this;
@@ -536,39 +498,6 @@ public  final class Behaviors extends
     public Builder clearGCState() {
       bitField0_ = (bitField0_ & ~0x00000001);
       gCState_ = messages.Behaviors.GameControllerState.GAMEINITIAL;
-      onChanged();
-      return this;
-    }
-
-    // optional bool on = 2;
-    private boolean on_ ;
-    /**
-     * <code>optional bool on = 2;</code>
-     */
-    public boolean hasOn() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    /**
-     * <code>optional bool on = 2;</code>
-     */
-    public boolean getOn() {
-      return on_;
-    }
-    /**
-     * <code>optional bool on = 2;</code>
-     */
-    public Builder setOn(boolean value) {
-      bitField0_ |= 0x00000002;
-      on_ = value;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>optional bool on = 2;</code>
-     */
-    public Builder clearOn() {
-      bitField0_ = (bitField0_ & ~0x00000002);
-      on_ = false;
       onChanged();
       return this;
     }

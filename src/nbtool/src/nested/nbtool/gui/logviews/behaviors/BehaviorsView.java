@@ -3,6 +3,9 @@ package nbtool.gui.logviews.images;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.FontMetrics;
+import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -41,41 +44,89 @@ public class BehaviorsView extends ViewParent {
 			e.printStackTrace();
 		}
 
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+        	RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
 		Font f = g.getFont();
-		Font calFont = f.deriveFont( (float) f.getSize() * 1.5f);
-		g.setFont(calFont);
-		g.setColor(new Color(26, 44, 116));
+		Font body = g.getFont().deriveFont((float)f.getSize() * 1.5f);
+		Font info = body.deriveFont((float)body.getSize() * 0.61f);
+
+		FontMetrics fm;
+
+		int pageWidth = 800;
+
+
+
+		// http://clrs.cc
+		Color red = new Color(255, 65, 54);
+		Color blue = new Color(0, 116, 217);
+		Color navy = new Color(0, 31, 63);
+		Color green = new Color(46, 204, 64);
+		Color black = new Color(17, 17, 17);
+		Color yellow = new Color(255, 220, 0);
+		Color purple = new Color(177, 13, 201);
+		Color gray = new Color(128, 128, 128);
+
+
+		g.setFont(body);
+		g.setColor(navy);
 		g.drawString("BehaviorsView 0.1", 20, 20);
-		g.setFont(calFont.deriveFont((float)calFont.getSize() * 0.66f));
-		g.setColor(new Color(56, 56, 56));
+		g.setFont(info);
+		g.setColor(black);
 		g.drawString("Last updated by James Little on June 8, 2016", 20, 35);
-		g.fillRect(20, 40, 800, 1);
-		g.setFont(calFont);
-		g.setColor(new Color(128, 128, 128));
+		g.fillRect(20, 40, pageWidth, 1);
+		g.setFont(body);
+		fm = g.getFontMetrics();
+		g.setColor(gray);
 
-		if (be.getGCState() == Behaviors.GameControllerState.GAMEINITIAL) {
-			g.setColor(new Color(51, 83, 209));
+		String[] gcStateStrs = {
+			"Initial", "Ready", "Set", "Playing", "Penalty", "Finished"};
+
+		Behaviors.GameControllerState[] gcStates = {
+			Behaviors.GameControllerState.GAMEINITIAL,
+			Behaviors.GameControllerState.GAMEREADY,
+			Behaviors.GameControllerState.GAMESET,
+			Behaviors.GameControllerState.GAMEPLAYING,
+			Behaviors.GameControllerState.GAMEPENALTY,
+			Behaviors.GameControllerState.GAMEFINISHED,
+			// Behaviors.GameControllerState.GAMEPENALTY,
+			// Behaviors.GameControllerState.GAMEFINISHED
+		};
+
+		Color[] gcStrColors = {black, blue, yellow, green, red, black};
+
+		int gcStateWidth = pageWidth / gcStateStrs.length;
+
+		for (int i=0; i<gcStateStrs.length; i++) {
+			if(be.getGCState() == gcStates[i]) {
+				g.setColor(gcStrColors[i]);
+			}
+
+			g.drawString(gcStateStrs[i], gcStateWidth*i+20, 70);
+			g.setColor(gray);
 		}
 
-		g.drawString("GameInitial", 20, 70);
+		// g.drawString("Initial", 20, 70);
+		// g.setColor(gray);
 
-		g.setColor(new Color(128, 128, 128));
+		// if (be.getGCState() == Behaviors.GameControllerState.GAMEREADY) {
+		// 	g.setColor(blue);
+		// }
 
-		if (be.getGCState() == Behaviors.GameControllerState.GAMEREADY) {
-			g.setColor(new Color(51, 83, 209));
-		}
+		// g.drawString("Ready", 150, 70);
+		// g.setColor(gray);
 
-		g.drawString("GameReady", 150, 70);
-
-		g.setColor(new Color(128, 128, 128));
-
-		if (be.getOn()) {
-			g.setColor(new Color(209, 51, 51));
-		}
-
-		g.drawString("GameSet", 270, 70);
-		g.drawString("GamePlaying", 370, 70);
-		g.drawString("GamePenalty", 500, 70);
+		// g.drawString("Set", 270, 70);
+		// g.setColor(gray);
+		// g.drawString("Playing", 370, 70);
+		// g.setColor(gray);
+		// g.drawString("Penalty", 500, 70);
+		// g.setColor(gray);
+		// g.drawString("Finished", 600, 70);
+		// g.setFont(info);
+		// g.setColor(black);
+		// g.drawString("GAME CONTROLLER STATE", 20, 85);
 
 	}
 

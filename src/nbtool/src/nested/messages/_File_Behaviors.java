@@ -22,13 +22,13 @@ public final class _File_Behaviors {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\017Behaviors.proto\022\010messages\"\330\001\n\tBehavior" +
+      "\n\017Behaviors.proto\022\010messages\"\312\001\n\tBehavior" +
       "s\022E\n\007GCState\030\001 \001(\0162\'.messages.Behaviors." +
-      "GameControllerState:\013GAMEINITIAL\022\n\n\002on\030\002" +
-      " \001(\010\"x\n\023GameControllerState\022\017\n\013GAMEINITI" +
-      "AL\020\001\022\r\n\tGAMEREADY\020\002\022\013\n\007GAMESET\020\003\022\017\n\013GAME" +
-      "PLAYING\020\004\022\020\n\014GAMEFINISHED\020\005\022\021\n\rGAMEPENAL" +
-      "IZED\020\006B\023B\017_File_BehaviorsP\001"
+      "GameControllerState:\013GAMEINITIAL\"v\n\023Game" +
+      "ControllerState\022\017\n\013GAMEINITIAL\020\001\022\r\n\tGAME" +
+      "READY\020\002\022\013\n\007GAMESET\020\003\022\017\n\013GAMEPLAYING\020\004\022\017\n" +
+      "\013GAMEPENALTY\020\005\022\020\n\014GAMEFINISHED\020\006B\023B\017_Fil" +
+      "e_BehaviorsP\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -40,7 +40,7 @@ public final class _File_Behaviors {
           internal_static_messages_Behaviors_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_messages_Behaviors_descriptor,
-              new java.lang.String[] { "GCState", "On", });
+              new java.lang.String[] { "GCState", });
           return null;
         }
       };

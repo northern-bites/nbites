@@ -15,14 +15,4 @@ public interface BehaviorsOrBuilder
    * <code>optional .messages.Behaviors.GameControllerState GCState = 1 [default = GAMEINITIAL];</code>
    */
   messages.Behaviors.GameControllerState getGCState();
-
-  // optional bool on = 2;
-  /**
-   * <code>optional bool on = 2;</code>
-   */
-  boolean hasOn();
-  /**
-   * <code>optional bool on = 2;</code>
-   */
-  boolean getOn();
 }

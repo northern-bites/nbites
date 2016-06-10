@@ -10,10 +10,9 @@ message Behaviors
 		GAMEREADY = 2;
 		GAMESET = 3;
 		GAMEPLAYING = 4;
-		GAMEFINISHED = 5;
-		GAMEPENALIZED = 6;
+		GAMEPENALTY = 5;
+		GAMEFINISHED = 6;
 	}
 
     optional GameControllerState GCState = 1 [default = GAMEINITIAL];
-    optional bool on = 2;
 }

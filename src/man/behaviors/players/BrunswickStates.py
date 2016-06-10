@@ -12,7 +12,9 @@ import KickOffConstants as kickOff
 ### NORMAL PLAY ###
 @superState('gameControllerResponder')
 def gameInitial(player):
-    player.brain.interface.behaviors.gcstate = player.brain.interface.behaviors.GameControllerState.GAMEINITIAL
+    proto = player.brain.interface.behaviors;
+    proto.gcstate = proto.GameControllerState.GAMEINITIAL
+    # player.brain.interface.behaviors.gcstate = player.brain.interface.behaviors.GameControllerState.GAMEINITIAL
     """
     Ensure we are sitting down and head is snapped forward.
     In the future, we may wish to make the head move a bit slower here.
@@ -39,12 +41,12 @@ def gameInitial(player):
 
 @superState('gameControllerResponder')
 def gameReady(player):
-    player.brain.interface.behaviors.gcstate = player.brain.interface.behaviors.GameControllerState.GAMEREADY
+    proto = player.brain.interface.behaviors;
+    proto.gcstate = proto.GameControllerState.GAMEREADY
     """
     Stand up, and pan for localization, and walk to kicking off positions.
     """
     if player.firstFrame():
-        player.brain.interface.behaviors.GCState = player.brain.interface.behaviors.GameControllerState.GAMEREADY
         player.inKickingState = False
         player.brain.fallController.enabled = True
         player.brain.nav.stand()
@@ -72,11 +74,12 @@ def gameReady(player):
 
 @superState('gameControllerResponder')
 def gameSet(player):
+    proto = player.brain.interface.behaviors;
+    proto.gcstate = proto.GameControllerState.GAMESET
     """
     Fixate on the ball, or scan to look for it
     """
     if player.firstFrame():
-        player.brain.interface.behaviors.GCState = player.brain.interface.behaviors.GameControllerState.GAMESET
         player.inKickingState = False
         player.brain.fallController.enabled = True
         player.gainsOn()
@@ -98,8 +101,9 @@ def gameSet(player):
 
 @superState('gameControllerResponder')
 def gamePlaying(player):
+    proto = player.brain.interface.behaviors;
+    proto.gcstate = proto.GameControllerState.GAMEPLAYING
     if player.firstFrame():
-        player.brain.interface.behaviors.GCState = player.brain.interface.behaviors.GameControllerState.GAMEPLAYING
         player.inKickingState = False
         # player.inKickOffPlay = (kickOff.shouldRunKickOffPlay(player) and 
         #                        (roleConstants.isChaser(player.role) or 
@@ -120,6 +124,7 @@ def gamePlaying(player):
     if player.wasPenalized:
         player.wasPenalized = False
         if player.lastDiffState != 'gameSet': 
+            proto.gcstate = proto.GameControllerState.GAMEPLAYING
             return player.goNow('afterPenalty')
 
     if not player.brain.motion.calibrated:
@@ -141,12 +146,13 @@ def gamePlaying(player):
 
 @superState('gameControllerResponder')
 def gameFinished(player):
+    proto = player.brain.interface.behaviors;
+    proto.gcstate = proto.GameControllerState.GAMEFINISHED
     """
     Ensure we are sitting down and head is snapped forward.
     In the future, we may wish to make the head move a bit slower here
     """
     if player.firstFrame():
-        player.brain.interface.behaviors.GCState = player.brain.interface.behaviors.GameControllerState.GAMEFINISHED
         player.inKickingState = False
         player.brain.fallController.enabled = False
         player.stopWalking()
@@ -163,7 +169,8 @@ def gameFinished(player):
 
 @superState('gameControllerResponder')
 def gamePenalized(player):
-    player.brain.interface.behaviors.GCState = player.brain.interface.behaviors.GameControllerState.GAMEPENALIZED
+    proto = player.brain.interface.behaviors;
+    proto.gcstate = proto.GameControllerState.GAMEPENALTY
     if player.firstFrame():
         player.inKickingState = False
         player.brain.fallController.enabled = False
