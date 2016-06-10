@@ -75,7 +75,7 @@
         <property name="proto.dir.path" location="${proto.dir}"/>
 
         <echo message="building protobufs"/>
-        <exec executable="/usr/local/bin/protoc" failonerror="true">
+        <exec executable="protoc" failonerror="true">
             <arg value="--java_out=./src/nested/" />
             <arg value="-I=${proto.dir.path}" />
             <arg line="${converted.srcs}" />

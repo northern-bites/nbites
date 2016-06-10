@@ -1,13 +1,21 @@
 package nbtool.data.calibration;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import nbtool.data.SExpr;
 import nbtool.data.json.Json;
 import nbtool.data.json.JsonObject;
 import nbtool.data.json.JsonString;
 import nbtool.data.json.Json.JsonValue;
+import nbtool.util.Debug;
+import nbtool.util.SharedConstants;
+import nbtool.util.ToolSettings;
 import nbtool.util.test.TestBase;
 import nbtool.util.test.Tests;
 
@@ -64,14 +72,14 @@ public class ColorParam {
 		}
 	}
 	
-	public static class Robot {
+	public static class Set {
 		public Camera[] cameras = new Camera[2];
 		
 		public Camera getTop() {return cameras[0];}
 		public Camera getBot() {return cameras[1];}
 		
-		public static Robot parse(JsonObject params) {
-			Robot ret = new Robot();
+		public static Set parse(JsonObject params) {
+			Set ret = new Set();
 			ret.cameras[0] = Camera.parse( params.get("camera_TOP").asObject() );
 			ret.cameras[1] = Camera.parse( params.get("camera_BOT").asObject() );
 			return ret;
@@ -86,29 +94,8 @@ public class ColorParam {
 		}
 	}
 	
-	public static class Set extends HashMap<String, Robot> {
-		
-		public static Set parseFrom(JsonObject obj) {
-			Set ret = new Set();
-			
-			for (Entry<JsonString, JsonValue> entry : obj.entrySet()) {
-				String robotName = entry.getKey().value;
-				
-				ret.put(robotName, Robot.parse(entry.getValue().asObject()));
-			}
-			
-			return ret;
-		}
-		
-		public JsonObject serialize() {
-			JsonObject ret = Json.object();
-			
-			for (Entry<String, Robot> entry : this.entrySet()) {
-				ret.put(entry.getKey(), entry.getValue().serialize());				
-			}
-			
-			return ret;
-		}
+	public static Path getPath() {
+		return Paths.get(ToolSettings.NBITES_DIR, SharedConstants.OFFLINE_COLOR_PARAMS_SUFFIX());
 	}
 	
 	public static void _NBL_ADD_TESTS_() {
@@ -116,7 +103,7 @@ public class ColorParam {
 
 			@Override
 			public boolean testBody() throws Exception {
-				Robot set = new Robot();
+				Set set = new Set();
 				
 				ColorParam green = new ColorParam();
 				green.uAtY0 = 1; green.uAtY255 = 2;
@@ -144,12 +131,62 @@ public class ColorParam {
 				set.cameras[1].white = white;
 				
 				assert(set.serialize().congruent(
-						Robot.parse( set.serialize().asObject()).serialize() )
+						Set.parse( set.serialize().asObject()).serialize() )
 						);
 				
 				return true;
 			}
 			
+		}, new TestBase("ColorParamsExists") {
+
+			@Override
+			public boolean testBody() throws Exception {
+				
+				String cpStr = new String(Files.readAllBytes(
+						Paths.get(ToolSettings.NBITES_DIR, SharedConstants.OFFLINE_COLOR_PARAMS_SUFFIX())
+						));
+				
+				Set.parse(Json.parse(cpStr).asObject());
+				
+				return true;
+			}
+			
 		});
+	}
+	
+	private static ColorParam makeC(SExpr se) {
+		Debug.plain(se.print());
+		ColorParam param = new ColorParam();
+		int i = 0;
+		param.uAtY0 = se.get(i++).get(1).valueAsDouble();
+		param.vAtY0 = se.get(i++).get(1).valueAsDouble();
+		param.uAtY255 = se.get(i++).get(1).valueAsDouble();
+		param.vAtY255 = se.get(i++).get(1).valueAsDouble();
+		param.u_fuzzy_range = se.get(i++).get(1).valueAsDouble();
+		param.v_fuzzy_range = se.get(i++).get(1).valueAsDouble();
+		return param;
+	}
+	
+	private static Camera make(SExpr se) {
+		Camera camera = new Camera();
+		camera.green = makeC(se.find("Green").get(1));
+		camera.black = makeC(se.find("Orange").get(1));
+		camera.white = makeC(se.find("White").get(1));
+		return camera;
+	}
+	
+	public static void main(String[] args) throws IOException {
+		String lisp = new String(Files.readAllBytes(ToolSettings.NBITES_DIR_PATH.resolve("src/man/config/colorParams.txt")));
+		SExpr se = SExpr.deserializeFrom(lisp);
+		
+		SExpr list = se.get(1);
+		SExpr top = list.get(0).get(1);
+		SExpr bot = list.get(1).get(1);
+		
+		Set set = new Set();
+		set.cameras[0] = make(top);
+		set.cameras[1] = make(bot);
+		
+		Debug.plain("%s", set.serialize().print());
 	}
 }
