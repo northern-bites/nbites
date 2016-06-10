@@ -23,7 +23,7 @@ DistributedGenerator::DistributedGenerator()
      current_generator(Body::NONE),
      prev_generator(Body::NONE),
      requestedDive(Body::NONE) {
-
+      std::cout << "Constructing distributed generator!!\n";
    // headGenerator = (Generator*)(new HeadGenerator());
    // if (!headGenerator)
    //    std::cout << "headGenerator is NULL!" << std::endl;
@@ -192,6 +192,9 @@ JointValues DistributedGenerator::makeJoints(ActionCommand::All* request,
    //    requestedDive = request->body.actionType;
    // }
 
+   // std::cout << "DISTRIBUTEDGEN making joints\n";
+   // ((ActionGenerator*)bodyGenerators[Body::STAND])->NBSetStand();
+
    JointValues fromBody;
    bool usesHead = false;
 
@@ -308,7 +311,7 @@ JointValues DistributedGenerator::makeJoints(ActionCommand::All* request,
    //    turn = UNSWDEG2RAD(-dir*80);
    // }
    // *odometry = *odometry + Odometry(0, 0, turn);
-   std::cout << "IN DISTRIBUTED GENERATOR\n";
+   // std::cout << "IN DISTRIBUTED GENERATOR\n";
    fromBody = bodyGenerators[current_generator]->
               makeJoints(request, odometry, sensors, bodyModel, ballX, ballY);
 

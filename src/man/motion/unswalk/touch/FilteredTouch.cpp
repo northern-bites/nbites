@@ -148,10 +148,14 @@ void FilteredTouch::updateIMUOffset(){
       }
    }
 
+   // std::cout << "ADJUST OFFSETS IN FILTERED TOUCH\n";
    //slowly adjust to target bias
    for(int j = 0; j < 3; j++){
       for(int i = 0; i < 3; i++){
          imuOffset[j][i] += (targetOffset[j][i] - imuOffset[j][i]) * .03;
+         if (j == GYR) {
+           // std::cout << "TARGET OFFSET: " << targetOffset[j][i] << std::endl;
+         } 
       }
    }
 

@@ -32,6 +32,7 @@
 
 
 #include "effector/Effector.hpp"
+#include "IMUAdjuster.h"
 // #include "generator/Generator.hpp"
 #include "touch/Touch.hpp"
 #include "touch/NullTouch.hpp"
@@ -114,6 +115,7 @@ private:
 	Odometry* odometry;
 
 	JointValues joints;
+	IMUAdjuster* imuAdjuster;
 
 	void logMsg(std::string msg) { std::cout << "[UNSW WALK DEBUG] " << msg << std::endl; }
 	void logMsgNoEL(std::string msg) { std::cout << "[UNSW WALK DEBUG] " << msg; }

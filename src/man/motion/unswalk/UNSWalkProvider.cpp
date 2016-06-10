@@ -75,9 +75,11 @@ static const Joints::JointCode nb_joint_order[] {
 UNSWalkProvider::UNSWalkProvider() : MotionProvider(WALK_PROVIDER), 
  									 requestedToStop(false), tryingToWalk(false) 
 {
+	std::cout << "Constructing walk provider!\n";
 	generator =  new ClippedGenerator((Generator*) new DistributedGenerator());
 	odometry = new Odometry();
 	joints = new JointValues();
+	imuAdjuster = new IMUAdjuster();
 	// Touch* nullTouch = (Touch*) new NullTouch();
 	touch = (Touch*) new FilteredTouch();
 	resetAll();
@@ -89,6 +91,7 @@ UNSWalkProvider::~UNSWalkProvider()
 	delete odometry;
 	delete &joints;
 	delete startOdometry;
+	delete imuAdjuster;
 }
 
 void UNSWalkProvider::resetAll() {
@@ -143,7 +146,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	) 
 {
 	PROF_ENTER(P_WALK);
-
+	logMsg("\n");
 
 	ActionCommand::All* request = new ActionCommand::All();
 	request->body.actionType = ActionCommand::Body::WALK;
@@ -152,6 +155,7 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 		logMsg("In standby");
 		tryingToWalk = false;
 	} else {
+		logMsg("NOT in standby");
 		if (requestedToStop || !isActive()) {
 			tryingToWalk = false;
 			logMsg("requested to stop or is not active");
@@ -185,9 +189,10 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 			WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
 			std::cout << "Walk Command: " << command->x_percent << "," << command->y_percent << "," << command->theta_percent << ") \n";
-			request->body.forward = 1.0; //command->x_percent ;
+			request->body.forward = 600.0; //command->x_percent ;
 			request->body.left = 0.0; //command->y_percent ;
 			request->body.turn = 0.0; //command->theta_percent ;
+			request->body.speed = 0.3f;
 
 		} else if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
 			logMsg("Destination command - Destination Walking!");
@@ -214,8 +219,10 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 
 		// TODO handle kick
 	}
+	request->body.speed = 0.0f;
 
-	logMsg("==========================\nwalking now!");
+	logMsg("Can't get current command! Requesting stand");
+	request->body.actionType = ActionCommand::Body::STAND;
 
 
 	// Update sensor values
@@ -225,24 +232,30 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
 	// I think something is amiss with the sensors
 	// logMsg("Testing sensor ish");
 	// TODO check this!!
-	sensors.sensors[Sensors::InertialSensor_GyrX] = -sensorInertials.gyr_x() * 0.01;
-    sensors.sensors[Sensors::InertialSensor_GyrY] = -sensorInertials.gyr_y() * 0.01;
-	// sensors.sensors[Sensors::InertialSensor_GyrX] = sensorInertials.gyr_x();
- //    sensors.sensors[Sensors::InertialSensor_GyrY] = sensorInertials.gyr_y();
-    // sensors.sensors[Sensors::InertialSensor_GyrZ] = sensorInertials.gyr_z(); // they don't use this
+	// sensors.sensors[Sensors::InertialSensor_GyrX] = -sensorInertials.gyr_x() * 0.01;
+ //    sensors.sensors[Sensors::InertialSensor_GyrY] = -sensorInertials.gyr_y() * 0.01;
+	sensors.sensors[Sensors::InertialSensor_GyrX] = sensorInertials.gyr_x();
+    sensors.sensors[Sensors::InertialSensor_GyrY] = sensorInertials.gyr_y();
+ //    sensors.sensors[Sensors::InertialSensor_GyrZ] = sensorInertials.gyr_z(); // they don't use this
 
     sensors.sensors[Sensors::InertialSensor_AccX] = sensorInertials.acc_x();
     sensors.sensors[Sensors::InertialSensor_AccY] = sensorInertials.acc_y();
     sensors.sensors[Sensors::InertialSensor_AccZ] = sensorInertials.acc_z();
 
-    sensors.sensors[Sensors::InertialSensor_AngleX] = -RAD2DEG(sensorInertials.angle_x());
-    sensors.sensors[Sensors::InertialSensor_AngleY] = -RAD2DEG(sensorInertials.angle_y());
+    // sensors.sensors[Sensors::InertialSensor_AngleX] = -RAD2DEG(sensorInertials.angle_x());
+    // sensors.sensors[Sensors::InertialSensor_AngleY] = -RAD2DEG(sensorInertials.angle_y());
     // TODO check this too!! I think filteredTouch needs RAW sensor values, but I'm NOT SURE
-    // sensors.sensors[Sensors::InertialSensor_AngleX] = sensorInertials.angle_x();
-    // sensors.sensors[Sensors::InertialSensor_AngleY] = sensorInertials.angle_y();
-    std::cout << "InertialSensor_AngleX: " << -RAD2DEG(sensorInertials.angle_x()) << ", InertialSensor_AngleY: " << -RAD2DEG(sensorInertials.angle_y()) << std::endl;
+    sensors.sensors[Sensors::InertialSensor_AngleX] = sensorInertials.angle_x();
+    sensors.sensors[Sensors::InertialSensor_AngleY] = sensorInertials.angle_y();
+
+    // std::cout << "InertialSensor_AngleX: " << -RAD2DEG(sensorInertials.angle_x()) << ", InertialSensor_AngleY: " << -RAD2DEG(sensorInertials.angle_y()) << std::endl;
     std::cout << "InertialSensor_GyrX: " << sensorInertials.gyr_x() << ", InertialSensor_GyrY: " << sensorInertials.gyr_y() << std::endl;
-    std::cout << "InertialSensor_AccX: " << sensorInertials.acc_x() << ", InertialSensor_AccY: " << sensorInertials.acc_y() << std::endl;
+    float adjGyrX = imuAdjuster->adjustGyrX(sensorInertials.gyr_x());
+    float adjGyrY = imuAdjuster->adjustGyrY(sensorInertials.gyr_y());
+    std::cout << "ADJUSTED InertialSensor_GyrX: " << adjGyrX << ", InertialSensor_GyrY: " << adjGyrY << std::endl;
+
+    // std::cout << "InertialSensor_AccX: " << sensorInertials.acc_x() << ", InertialSensor_AccY: " << sensorInertials.acc_y() << std::endl;
+    
     // std::cout << "InertialSensor_AngleX: " << -RAD2DEG(sensorInertials.angle_x()) << ", InertialSensor_AngleY: " << -RAD2DEG(sensorInertials.angle_y()) << std::endl;
     // sensors.sensors[Sensors::angleZ] = sensorInertials.angle_z(); // this either
 
@@ -267,6 +280,8 @@ void UNSWalkProvider::calculateNextJointsAndStiffnesses(
     sensors = filteredSensors;
 	sensors.sensors[Sensors::InertialSensor_GyrX] = -filteredSensors.sensors[Sensors::InertialSensor_GyrX] * 0.01;
     sensors.sensors[Sensors::InertialSensor_GyrY] = -filteredSensors.sensors[Sensors::InertialSensor_GyrY] * 0.01;
+
+
 	// TODO investigate calibrating sensors. . .
 	// if(request.body.actionType == Body::MOTION_CALIBRATE){
  //       // raw sensor values are sent to offnao for calibration

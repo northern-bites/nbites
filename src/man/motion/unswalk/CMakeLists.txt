@@ -27,6 +27,7 @@ set( unswalk_srcs
   touch/TorsoStateFilter.cpp
   utils/angles.hpp
   UNSWalkProvider.cpp
+  IMUAdjuster.cpp
   IKinematics.cpp
   effector/Effector.hpp
   generator/Generator.hpp

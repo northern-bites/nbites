@@ -10,6 +10,7 @@ StandGenerator::StandGenerator()
    : phi(UNSWDEG2RAD(0.0f)) {    //was 15, using 20 knee bend to prevent jerky transition between walk and stand
    //llog(INFO) << "StandGenerator constructed" << std::endl;
    posGen = (Generator*)(new ActionGenerator("stand"));
+   std::cout << "Constructing stand generator!\n";
    // if (!posGen)
       //llog(FATAL) << "stand generator is NULL!" << std::endl;
 }
@@ -48,7 +49,6 @@ JointValues StandGenerator::makeJoints(ActionCommand::All* request,
 //   joints.stiffnesses[i++] = 0.0f;  // RShoulderRoll
 //   joints.stiffnesses[i++] = 0.0f;  // RElbowYaw
 //   joints.stiffnesses[i++] = 0.0f;  // RElbowRoll
-   std::cout << "IN STAND GENERATOR\n";
 
    return posGen->makeJoints(request, odometry, sensors, bodyModel, ballX, ballY);
 }

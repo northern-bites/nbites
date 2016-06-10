@@ -24,12 +24,14 @@ class ActionGenerator : Generator {
       virtual bool isActive();
       void reset();
       void stop();
+      void NBSetStand();
       // void readOptions(const boost::program_options::variables_map &config);
 
    private:
       int current_time;
       std::string file_name;
       std::vector<JointValues> joints;
+      std::vector<JointValues*> jointPtrs;
       ActionCommand::Body active;
 
       /**

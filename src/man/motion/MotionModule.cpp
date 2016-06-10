@@ -42,7 +42,7 @@ MotionModule::MotionModule()
     gainsOn(false),
     stiff(false)
 {
-
+    std::cout << "Constructing MM" << std::endl;
 }
 
 MotionModule::~MotionModule()
@@ -78,6 +78,15 @@ void MotionModule::run_()
     sensorCurrents = Kinematics::toJointAngles(currentsInput_.message());
 
     newInputJoints = false;
+    if (curProvider != &walkProvider) {
+        std::cout << "Curprovider is NOT the walk provider!\n";
+        if (curProvider == &nullBodyProvider) {
+            std::cout << "Curprovider is NULL PROVIDER!\n";
+        }
+        if (curProvider == &scriptedProvider) {
+            std::cout << "Curprovider is scriptedProvider!\n";
+        }
+    }
 
     // (2) If motion is enabled, perform a single iteration
     //     of the main motion loop.
@@ -609,6 +618,7 @@ void MotionModule::swapBodyProvider()
                 for(unsigned int i = 0; i< transitions.size(); i++){
                     scriptedProvider.setCommand(transitions[i]);
                 }
+                std::cout << "Switching to scripted provider!\n";
                 curProvider = static_cast<MotionProvider * >(&scriptedProvider);
                 break;
             }
