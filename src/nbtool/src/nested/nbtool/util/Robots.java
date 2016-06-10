@@ -37,10 +37,10 @@ public class Robots {
 			new Robot("mal" , "139.140.192.16"),
 			new Robot("zoe" , "139.140.192.17"),
 
-			new Robot("ringo" , "139.140.192.18"),
-			new Robot("beyonce", "139.140.192.19"),
-			new Robot("ozzy", "139.140.192.20"),
-			new Robot("avril" , "139.140.192.21"),
+			new Robot("blt" , "139.140.192.18"),
+			new Robot("elektra", "139.140.192.19"),
+			new Robot("wasp", "139.140.192.20"),
+			new Robot("buzz" , "139.140.192.21"),
 			new Robot("batman" , "139.140.192.22"),
 			new Robot("shehulk" , "139.140.192.23"),
 	};
