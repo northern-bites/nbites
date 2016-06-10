@@ -5,7 +5,6 @@
 #include "RoboCupGameControlData.h"
 #include "Common.h"
 
-#include "exactio.h"
 #include <netinet/in.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -256,8 +255,8 @@ namespace man{
             latest_data.set_kick_off_team(latest_data.kick_off_team() ? team_number : team_number+1);
         }
 
-        whistle::status connect_wrap(whistle::request req) {
-            whistle::status stt = whistle::connect(req);
+        whistle::whistle_status connect_wrap(whistle::whistle_request req) {
+            whistle::whistle_status stt = whistle::connect(req);
             if (!stt) {
                 NBL_ERROR("GameStateModule could not connect to whistle!");
             }
@@ -266,6 +265,8 @@ namespace man{
         }
 
         void GameStateModule::whistleHandler(game_state_t last, game_state_t& next) {
+
+            latest_data.set_whistle_override(false);
 
             switch(last) {
                 case STATE_READY: {
@@ -291,9 +292,10 @@ namespace man{
                         } break;
 
                         case STATE_SET: {
-                            whistle::status stt = connect_wrap(whistle::QUERY);
+                            whistle::whistle_status stt = connect_wrap(whistle::QUERY);
                             if (stt == whistle::HEARD) {
                                 printf(":::: WHISTLE OVERRIDE :::: (FIRST)\n");
+                                latest_data.set_whistle_override(true);
                                 next = STATE_PLAYING;
                             }
                         } break;
@@ -312,9 +314,10 @@ namespace man{
                         } break;
 
                         case STATE_SET: {
-                            whistle::status stt = connect_wrap(whistle::QUERY);
+                            whistle::whistle_status stt = connect_wrap(whistle::QUERY);
                             if (stt == whistle::HEARD) {
 //                                printf(":::: WHISTLE OVERRIDE :::: (RE)\n");
+                                latest_data.set_whistle_override(true);
                                 next = STATE_PLAYING;
                             }
 
